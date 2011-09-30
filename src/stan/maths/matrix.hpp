@@ -12,66 +12,7 @@ namespace stan {
     typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
     typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 
-    /**
-     * Return the a reference to the value of the specified standard vector at the
-     * specified index.
-     *
-     * @param x Vector.
-     * @param n Index.
-     * @return Value of vector at index.
-     * @tparam T Type of entries in the vector.
-     */
-    template <typename T>
-    inline
-    T& get(std::vector<T>& x, unsigned int n) {
-      return x[n];
-    }
 
-    /**
-     * Return the specified row of the specified matrix.
-     *
-     * @param x Matrix.
-     * @param n Index.
-     * @return Row of matrix at index.
-     * @tparam T Type of entries in the matrix.
-     */
-    template <typename T>
-    inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>& get(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
-					   unsigned int n) {
-      return x.row(n);
-    }
-
-    /**
-     * Return the value of the specified column vector at the specified
-     * index.
-     *
-     * @param x Column vector.
-     * @param n Index.
-     * @param Value of vector at index.
-     * @tparam T Type of entries in vector.
-     */
-    template <typename T>
-    inline
-    T& get(Eigen::Matrix<T,Eigen::Dynamic,1>& x, unsigned int n) {
-      return x[n];
-    }
-
-
-    /**
-     * Return the value of the specified row vector at the specified
-     * index.
-     *
-     * @param x Row vector.
-     * @param n Index.
-     * @param Value of vector at index.
-     * @tparam T Type of entries in vector.
-     */
-    template <typename T>
-    inline
-    T& get(Eigen::Matrix<T,1,Eigen::Dynamic>& x, unsigned int n) {
-      return x[n];
-    }
 
     namespace {
 

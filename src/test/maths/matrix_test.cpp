@@ -5,6 +5,9 @@
 using Eigen::Matrix;
 using Eigen::Dynamic;
 
+
+
+
 TEST(matrix_test, resize_double) {
   double x = 5;
   std::vector<unsigned int> dims;
