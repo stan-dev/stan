@@ -1,0 +1,278 @@
+BNF for Stan Models a la BUGS
+==================================================
+
+<program> ::= "data" '{' <var_decl>* '}'
+              "params" '{' <var_decl>* '}'
+              "model" <statement>
+
+<var_decl> ::= <identifier> ':' <var_type> ';'
+
+<var_type> ::= <int_type> | <float_type> | <simplex_type> | <pos_def_sym_type>
+
+<int_type> ::= "int" ?<int_range> ?<var_dims>
+
+<float_type> ::= "float" ?<float_range> ?<var_dims>
+
+<simplex_type> ::= "simplex" '(' <uint> ')' ?<var_dims>
+
+<pos_def__sym_type> ::= "pos_def_sym" '(' <uint> ')' ?<var_dims>
+
+<int_range> :: '(' <int> ',' <int> ')'
+
+<float_range> :: '(' <float> ',' <float> ')'
+
+<var_dims> ::= '[' <expression> (',' <expression>)* ']'
+
+<var_val> ::= <identifier> ?<var_dims>
+
+<statement> ::= <var_val> '~' <distribution> ';'
+              | <var_val> '<-' <expression> ';'
+              | 'for' '(' <identifier> 'in' <range> ')' <statement>
+              | '{' <statement>+ '}'
+
+<range> ::= <int> ':' <int>
+
+<distribution> ::= <identifier> '(' <expression>* ')'
+
+<expression> ::= <expression1>
+
+<expression1> ::= <expression2> (<binary_op_1> <expression1>)*
+
+<expression2> ::= <expression3> (<binary_op_2> <expression2>)*
+
+<expression3> ::= <expression4>
+                | <unary_op> <expression3>
+
+<expression4> ::= <var_val>
+                | <int_literal>
+                | <float_literal>
+                | '(' <expression> ')'
+                | <function_literal> '(' <expression> (',' <expression>)* ')'
+                
+
+<binary_op_1> ::= '+' | '-'
+
+<binary_op_2> ::= '*' | '/'
+
+<unary_op_1> ::=
+
+<unary_op_2> ::= '-' | '+'
+
+
+
+
+EXAMPLE
+--------------------------------------------------
+Here's a simple example program for a normal mean and deviation:
+
+data {
+  N : int;
+  y : float[N];
+ nu : float(0,);
+}
+param {
+  mu : float;
+  sigma : float (0,);
+}
+model {
+  mu ~ norm(0,2.5);
+  sigma ~ inv_chi_sq(nu);
+  for (n in 1:N)
+    y[n] ~ norm(mu,sigma);
+}
+
+User would supply data (N,y,nu) and get back
+samples (mu,sigma).
+
+
+
+NOTES
+--------------------------------------------------
+The grammar is patterned after JAGS (which is in turn based on BUGS),
+with a few differences highlighted below.
+
+The parser will produce an abstract syntax tree representation of
+a program that will then be used to generate a C++ model definition
+that may be executed with Stan.
+
+
+Comments
+--------------------------------------------------
+The grammar will support three comment styles:
+
+Python:  "#" to end of line
+C:       "//" to end of line
+C++:     between "/*" and the first following "*/"
+
+
+Statement Ordering
+--------------------------------------------------
+Unlike BUGS and JAGS, we require values to be defined before they
+are used in a program rather than inferring execution order from
+the structure of the graphical model.
+
+
+Array Indexing
+--------------------------------------------------
+Following programming languages, we'll index matrices from 0.
+
+
+Variable Declarations
+--------------------------------------------------
+A program requires full variable declarations for both data variables
+and parameter values.  Data variables will be compiled to member
+variables for the class implementing the model and parameter variables
+will be sampled.  
+
+All variables must be declared before they are used. 
+
+All variables are implicitly arrays, though arrays of zero dimensions
+can be represented using standard scalar notation. Variables can be of
+integer or float types.  Integers and floats may have ranges that are
+bounded above, bounded below, or bounded both above and below.  The
+simplex types add a final dimension, the values of which with the
+other dimensions fixed is constrained to be a simplex.  The
+positive-definite-symmetric matrix type adds two dimensions and is
+constrained to be a positive-definite and symmetric matrix.  The
+simplex and matrix types are subtypes of the float type.
+
+
+Top-Down, Left-to-Right Parsing 
+--------------------------------------------------
+Input characters will be matched top down and left to right with
+backtracking.  This results in "greedy" matching for rules and
+prohibits left recursion in the grammar (e.g., <foo> ::= <foo> <bar>).
+
+Thus we place <int_literal> before <float_literal> in contexts where
+both are allowed, because an integer literal is also a valid float
+literal, and we wish to prohibit unwarranted type promotion.
+
+
+Operator Precedence and Associativity
+--------------------------------------------------
+The expression grammar captures operator precedence without using left
+recursion.  <expressionN> has an unbracketed subexpression of
+precedence N, with higher precedence operators binding more tightly.
+
+Binary operators apply as a sequence, with a post-parsing
+process used for left associativity (i.e., a/b*c = (a/b)*c).
+
+Our operators are:
+
+Operator   Example        Precedence
+--------   ----------     ----------
+array      x[..]          4
+function   foo(..)        4
+unary      -a, +a         3
+binary     a*b, a/b       2
+binary     a+b, a-b       1
+
+For example, 
+
+a + b * c == a + (b * c)   [* higher precedence than +]
+ 
+a / b * c == (a / b) * c   [left associativity]
+
+-a / b = (-a) / b          [unary - higher precedence than /]
+
+Because a bare sequence of statements is not itself a statement
+without being wrapped in curly braces, we have the usual tight
+binding for the bodies of loops without brackets, namely that
+
+    for (n in 1:N) 
+        a[n] ~ norm(mu,sigma);  
+        b[n] ~ norm(a[n],tau);
+
+parses as 
+
+    for (n in 1:N) { 
+        a[n] ~ norm(mu,sigma); 
+    } 
+    b[n] ~ norm(a[n],tau);
+
+
+Link Functions
+--------------------------------------------------
+For a handful of link functions, BUGS and JAGS allow them to
+be applied to values on the left-hand side of an assignment, as in:
+
+  logit(theta) <- alpha * x + beta;
+  y ~ Bern(theta);
+
+In Stan, that's going to be written out explicitly as:
+
+  theta <- inv_logit(alpha * x + beta);
+  y ~ bern(theta);
+
+or as:
+
+  y ~ bern(inv_logit(alpha * x + beta));
+
+or even as:
+
+  y ~ bern_inv_logit(alpha*x + beta);
+
+where we have reparameterized the Bernoulli itself.
+
+
+Truncation
+--------------------------------------------------
+
+We will allow truncation for univariate distributions for which we
+have the cumulative density functions.  In JAGS, these are coded as:
+
+  y ~ norm(mu,sigma) T(lower_bound,upper_bound)
+  y ~ norm(mu,sigma) T(lower_bound,)
+  y ~ norm(mu,sigma) T(,upper_bound)
+
+In Stan, we can use bounded disributions directly:
+
+ y ~ bounded_norm(mu,sigma,lower_bound,upper_bound);
+ y ~ lower_bounded_norm(mu,sigma,lower_bound); 
+ y ~ upper_bounded_norm(mu,sigma,upper_bound);
+
+Or we could add syntactic sugar like BUGS does.  The Boost C++
+libs supply all the cumulative distros we need.
+
+
+Censoring
+--------------------------------------------------
+Censoring will be handled directly in the models, as in JAGS.
+
+
+Data Transforms
+--------------------------------------------------
+BUGS allows limited data transforms in the model:
+
+   y <- y.raw * foo + bar;
+   y ~ norm(mu,sigma);
+
+In JAGS, these all go in a special block with the declarations.
+
+For now, these are not supported in Stan.  If we were to support
+them, the JAGS approach is cleaner.
+
+
+Logical Expressions
+--------------------------------------------------
+The JAGS manual defines logical expressions (e.g., float > float),
+but it's not clear (to me) where they are used.  Are they allowing
+array magic with arrays of booleans as in R?
+
+
+Array/Vector/Matrix Sizes
+--------------------------------------------------
+Conforming arrays, vectors, and matrices will be treated as such where
+required.  Like JAGS and R, Stan will allow mapping scalar functions
+over arrays as well as promoting lower-dimension objects.  So we
+can write c * M if c is a scalar and M is a matrix and it operates
+component-wise.  
+
+We canb also reduce dimensions, for instance using sum(M) for the sum
+of the elements in the matrix.
+
+
+
+
+
+

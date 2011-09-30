@@ -1,0 +1,4 @@
+/**
+ * @namespace stan::io
+ * Input/output utilities.
+ */

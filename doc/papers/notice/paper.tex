@@ -1,0 +1,242 @@
+\documentclass[twoside,11pt]{article}
+
+% Any additional packages needed should be included after jmlr2e.
+% Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
+% and defines many common macros, such as 'proof' and 'example'.
+%
+% It also sets the bibliographystyle to plainnat; for more information on
+% natbib citation styles, see the natbib documentation, a copy of which
+% is archived at http://www.jmlr.org/format/natbib.pdf
+
+\usepackage{jmlr2e}
+
+% Definitions of handy macros can go here
+
+% Heading arguments are {volume}{year}{pages}{submitted}{published}{author-full-names}
+
+\jmlrheading{?}{20??}{??-??}{??/??}{??/??}{Bob Carpenter, Matthew D.\ Hoffman and Andrew Gelman}
+
+% Short headings should be running head and authors last names
+
+\ShortHeadings{STAN: HMC for Arbitrary Densities}{Carpenter, Hoffman and Gelman}
+\firstpageno{1}
+
+\begin{document}
+
+\title{STAN: Hamiltonian Monte Carlo Sampling \\ for Arbitrary Densities}
+
+\author{\name Bob Carpenter \email carp@stat.columbia.edu
+  \AND
+  \name Matthew D. Hoffman \email mdhoffma@cs.princeton.edu
+  \AND
+  \name Andrew Gelman \email gelman@stat.columbia.edu
+  \\
+       \addr Department of Statistics\\
+       Columbia University \\
+       1255 Amsterdam Ave. \\
+       New York, NY \ 10027, USA}
+
+\editor{???? ? ??????}
+
+\maketitle
+
+\begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
+  Stan is an open-source implementation of Hamiltonian Monte Carlo
+  (HMC) sampling for arbitrary log density functions implemented as
+  templated C++ functions. Stan also provides a compiler for
+  BUGS-style sampling notation for arbitrary directed graphical models
+  (i.e., Bayesian networks). HMC requires the gradient of the log
+  density, which may be implemented directly or calculated by Stan
+  through algorithmic differentiation of the log density
+  implementation. Stan implements basic HMC, which requires parameters
+  for number of leapfrog steps and step size, as well as the no-U-turn
+  sampler, which dynamically adapts the number of steps. Stan provides
+  automatic convergence monitoring over multiple Markov chains, which
+  may run in their own threads. Stan is integrated with templated
+  libraries for densities, cumulative distributions, special
+  functions, as well as a vector, matrix and linear algebra library.
+  Because HMC requires support on all of ${\mathbb R}^n$, Stan
+  impelements differentiable Jacobians for variable transforms for
+  univariate scalar parameters bounded above and/or below, simplex
+  vectors, covariance matrices, and ordered scalar vectors.
+\end{abstract}
+
+\begin{keywords}
+  Graphical Models, Hamiltonian Monte Carlo, Algorithmic Differentiation
+\end{keywords}
+
+\section{Hamiltonian Monte Carlo}
+
+Given a density function $p(\theta)$ with variables $\theta \in
+{\mathbb R}^n$, our primary goal is to draw a sequence of samples
+$\theta^{(m)}$ with each marginally distributed according to
+$p(\theta)$.  Ideally, samples will not be autocorrleated.  We are
+particularly interested in Bayesian models in which $p(\theta) =
+p(\theta|y)$ is the posterior distribution of model parameters
+$\theta$ given observed data $y$.  
+
+Monte Carlo Markov chain (MCMC) methods sample by defining a Markov
+chain with states corresponding to the values of parameters $\theta$
+whose stationary distribution over states is $p(\theta)$.  Popular,
+general MCMC methods include Gibbs sampling and the
+Metropolis-Hastings method based on a random walk.  Both methods are
+ineffective when the variables being sampled are highly correlated, as
+in hierarchical regression models with interacted predictors (Gelman
+and Hill 2007).
+
+Hamiltonian Monte Carlo (HMC) is a general-purpose MCMC method based
+on simulated Hamiltonian dynamics (Neal 1994).  The dynamics in
+question consist of a randomly initialized momentum term representing
+kinetic energy, combined with a potential energy term derived from the
+negative log of the density function being sampled.  The momentum term
+is treated as an auxiliary variable, and the acceptance rate is
+typically near 100\%.  The use of gradient information allows nearly
+independent multivariate samples to be drawn even when the variables
+in each sample are highly correlated.
+
+\section{Stan}
+
+There are two principal challenges in implementing HMC.  The first is
+that the variables being sampled must have support on all of ${\mathbb
+R}^n$.  The second is that the log probability function and its
+gradient need to be calculated typically dozens of times per sample.
+
+To deal with constrained variables, Stan provides transforms along
+with absolute determinants of the Jacobian of the transform.  For
+instance, log transforms are used on positive-only variables and logit
+transforms are used on variables bounded between 0~and~1.  Simplexes
+are handled using an inverse softmax transform.  Covariance matrices
+are transformed using a partial correlation decomposition based on the
+extended onion method and then expanded to all of ${\mathbb R}^n$
+using a logit transform (Lewandowski et al.~2009).  Vectors of ordered
+scalars, such as required by ordinal regression models, are handled by
+log differences.
+
+For gradients, Stan supplies a full-featured reverse-mode algorithmic
+differentiation module (Griewank and Walther 2008).  Clients can write
+a templated log density function and leave the gradient calculations
+to Stan.  Reverse-mode algorithmic differentiation builds up an
+expression tree on a stack as the log density is evaluated, then
+propagates the partial derivatives backward along the edges of the
+expression tree in ``reverse'' as it pops nodes of the expression tree
+off the stack. 
+
+Stan implements its own automatic differentiation for reasons of
+efficiency, extensibility and completeness. For ease of use, Stan 
+works through a simple reference class that may be instantiated
+along with {\tt double} values from the templated log density
+function.    This reference class is based by object-oriented
+implementation of the derivative propagation operation through
+a virtual base class with virtual propagation function.  Efficiency
+is achieved by using operator-specific classes and overriding
+overriding C++'s operator {\tt new} to recover the memory for a
+gradient calculation in a single operation.  For completeness, Stan
+implements gradients over the entire C math library, the C99
+math extensions, as well as many probability and statistics specific
+special functions such as softmax.  It overrides all of the built-in
+C++ operators and assignment operators.  
+
+
+
+\section*{References}
+
+\begin{itemize}
+\item
+Gelman, Andrew and Jennifer Hill (2006)
+{\it Data Analysis using Regression and Multilevel/Hiearchical
+Models}. Cambridge University Press.
+%
+\item
+Griewank, Andreas and Andrea Walther (2008) {\it Evaluating
+Derivatives: Principles and Techniques of Algorithmic
+Differentiation}, Second Edition. SIAM.
+%
+\item Lewandowski, Daniel, Dorota Kurowicka and Harry Joe (2009)
+Generating random correlation matrices based on vines and extended
+onion method. {\it Journalof Multivariate Analysis} {\bf 100}(9).
+%
+\item Neal, Radford M. (1994) An improved acceptance procedure for the
+hybrid Monte Carlo algorithm.  {\it Journal of Computational Physics}
+{\bf 111}:194--203.
+\end{itemize}
+
+
+Using gradients to direct sampling while maintaining detailed balance,
+HMC solves the problem of the slow mixing of Gibbs sampling or
+Metropolis random walks when there are highly correlated parameters,
+as in hierarchical regression models with interacted predictors. Stan
+compiles the popular BUGS-style sampling notation for graphical models
+to C++, which is especially useful for sampling from Bayesian
+posterior densities. To support the implementation of density
+functions, Stan provides an integration of the templated Eigen C++
+library for vector, matrix and linear algebra solvers and the
+templated Boost library for special functions. Stan supports the full
+C and C99 math libraries and all of the standard univariate and
+multivariate log density and distribution functions. Stan computes
+gradients from templated C++ functions using its own extensible,
+object-oriented algorithmic differentiation implementation. Because
+HMC requires support on all of ${\mathbb R}^n$ for a model with $n$
+continuous parameters, Stan provides built-in transforms with
+algorithmically differentiable Jacobians for scalars bounded above
+and/or below, simplex vectors, correlation matrices, and ordered
+scalar vectors. Random number generation, special functions,
+cumulative density, parsing, and template metaprogramming are
+supported through Boost. Random number generation, special functions,
+cumulative densities, and parsing are implemented with Boost. Stan is
+integrated into the R statistical computing language, allowing
+initialization of chains from R and subsequent analysis using coda and
+other MCMC analysis packages. Stan allows fixed numbers of samples and
+thinning as well as supporting automatic convergence monitoring based
+on effective sample sizes and monitors of cross-chain mixing. HMC
+itslef has two tuning parameters, number of leapfrog steps and step
+size. Stan provides an implementation of the self-tuning No-U-Turn
+(NUT) sampler. Stan provides Gibbs sampling for discrete parameters,
+though these are typically summed out when using HMC.
+
+Probabilistic inference has become a core technology in AI,
+largely due to developments in graph-theoretic methods for the 
+representation and manipulation of complex probability 
+distributions~\citep{pearl:88}.  Whether in their guise as 
+directed graphs (Bayesian networks) or as undirected graphs (Markov 
+random fields), \emph{probabilistic graphical models} have a number 
+of virtues as representations of uncertainty and as inference engines.  
+Graphical models allow a separation between qualitative, structural
+aspects of uncertain knowledge and the quantitative, parametric aspects 
+of uncertainty...\\
+
+{\noindent \em Remainder omitted in this sample. See http://www.jmlr.org/papers/ for full paper.}
+
+% Acknowledgements should go at the end, before appendices and references
+
+\acks{We would like to acknowledge support for this project
+from the National Science Foundation (NSF grant IIS-9988642)
+and the Multidisciplinary Research Program of the Department
+of Defense (MURI N00014-00-1-0637). }
+
+% Manual newpage inserted to improve layout of sample file - not
+% needed in general before appendices/bibliography.
+
+\newpage
+
+\appendix
+\section*{Appendix A.}
+\label{app:theorem}
+
+% Note: in this sample, the section number is hard-coded in. Following
+% proper LaTeX conventions, it should properly be coded as a reference:
+
+%In this appendix we prove the following theorem from
+%Section~\ref{sec:textree-generalization}:
+
+In this appendix we prove the following theorem from
+Section~6.2:
+
+\vskip 0.2in
+\bibliography{sample}
+
+\end{document}
+
+
+
+
+

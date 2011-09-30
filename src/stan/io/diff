@@ -1,0 +1,129 @@
+Index: dump.hpp
+===================================================================
+--- dump.hpp	(revision 469)
++++ dump.hpp	(working copy)
+@@ -492,7 +492,6 @@
+ 	if (!scan_char('(')) return false;
+ 	if (!scan_char('c')) return false;
+ 	scan_seq_value();
+-	dims_.clear();
+ 	if (!scan_char(',')) return false;
+ 	if (!scan_char('.')) return false;
+ 	if (!scan_chars("Dim")) return false;
+@@ -518,7 +517,6 @@
+ 	  return scan_seq_value();
+ 	if (scan_chars("structure"))
+ 	  return scan_struct_value();
+-	// dims_.push_back(1U); // w/o dims_ = {}, w. dims_ = { 1 }
+ 	return scan_number();
+       }
+ 
+@@ -600,6 +598,7 @@
+       bool next() {
+ 	stack_r_.clear();
+ 	stack_i_.clear();
++	dims_.clear();
+ 	name_.erase();
+ 	if (!scan_name()) return false;
+ 	if (!scan_char('<')) return false;
+@@ -647,6 +646,21 @@
+     private: 
+       std::map<std::string, std::pair<std::vector<double>, std::vector<unsigned int> > > vars_r_;
+       std::map<std::string, std::pair<std::vector<int>, std::vector<unsigned int> > > vars_i_;
++      std::vector<double> const empty_vec_r_;
++      std::vector<int> const empty_vec_i_;
++      std::vector<unsigned int> const empty_vec_ui_;
++      /**
++       * Return <code>true</code> if this dump contains the specified variable
++       * name is defined in the real values. This method returns <code>false</code>
++       * if the values are all integers.
++       *
++       * @param name Variable name to test.
++       * @return <code>true</code> if the variable exists in the 
++       * real values of the dump.
++       */
++      bool contains_r_only(const std::string& name) {
++	return vars_r_.find(name) != vars_r_.end();
++      }
+     public: 
+ 
+       /**
+@@ -681,8 +695,7 @@
+        * @return <code>true</code> if the variable exists.
+        */
+       bool contains_r(const std::string& name) {
+-	return vars_r_.find(name) != vars_r_.end() || 
+-	  vars_i_.find(name) != vars_i_.end();
++	return contains_r_only(name) || contains_i(name);
+       }
+ 
+       /**
+@@ -699,13 +712,15 @@
+ 
+       /**
+        * Return the double values for the variable with the specified
+-       * name or null.
++       * name or null. 
+        *
+        * @param name Name of variable.
+        * @return Values of variable.
+        */
+       std::vector<double> vals_r(const std::string& name) {
+-	if (contains_i(name)) {
++	if (contains_r_only(name)) {
++	  return vars_r_[name].first;
++	} else if (contains_i(name)) {
+ 	  std::vector<int> vec_int = vars_i_[name].first;
+ 	  std::vector<double> vec_r(vec_int.size());
+ 	  for (int ii = 0; ii < vec_int.size(); ii++) {
+@@ -713,7 +728,7 @@
+ 	  }
+ 	  return vec_r;
+ 	}
+-	return vars_r_[name].first;
++	return empty_vec_r_;
+       }
+       
+       /**
+@@ -724,7 +739,12 @@
+        * @return Dimensions of variable.
+        */
+       std::vector<unsigned int> dims_r(const std::string& name) {
+-	return vars_r_[name].second;
++	if (contains_r_only(name)) {
++	  return vars_r_[name].second;
++	} else if (contains_i(name)) {
++	  return vars_i_[name].second;
++	}
++	return empty_vec_ui_;
+       }
+ 
+       /**
+@@ -735,18 +755,24 @@
+        * @return Values.
+        */
+       std::vector<int> vals_i(const std::string& name) {
+-	return vars_i_[name].first;
++	if (contains_i(name)) {
++	  return vars_i_[name].first;
++	}
++	return empty_vec_i_;
+       }
+       
+       /**
+-       * Return the dimensions for the double variable with the specified
++       * Return the dimensions for the integer variable with the specified
+        * name.
+        *
+        * @param name Name of variable.
+        * @return Dimensions of variable.
+        */
+       std::vector<unsigned int> dims_i(const std::string& name) {
+-	return vars_i_[name].second;
++	if (contains_i(name)) {
++	  return vars_i_[name].second;
++	}
++	return (empty_vec_ui_);
+       }
+ 
+       bool remove(const std::string& name) {

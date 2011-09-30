@@ -1,0 +1,4 @@
+/**
+ * @namespace stan::mcmc 
+ * Markov chain Monte Carlo samplers.
+ */

@@ -1,0 +1,4 @@
+/**
+ * @namespace stan::prob 
+ * Templated probability distributions.
+ */

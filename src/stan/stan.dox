@@ -1,0 +1,68 @@
+/**
+ * @mainpage
+ * 
+ * @section what_is What is Stan?
+ *
+ * Stan is a C++ library for computations involving probability,
+ * sampling, and optimization.
+ *
+ * @subsection components Components
+ *
+ * Stan consists of the following largely independent components
+ *
+ * <ul>	
+ * <li>(Adaptive) Hamiltonian Monte Carlo Sampling
+ * <li>Directed Graphical Model Compiler
+ * <li>Reverse Mode Algorithmic Differentiation
+ * <li>Probability Distributions
+ * <li>Special Functions
+ * <li>Matrices and Linear Algebra
+ * </ul>	
+ *
+ * Models may be written directly using C++ or in the 
+ * <a href="http://www.mrc-bsu.cam.ac.uk/bugs/">BUGS</a>-like language
+ * which is compiled to C++.  
+ *
+ * @subsection rinterface Interface to R
+ *
+ * Stan may be invoked from <a href="http://www.r-project.org/">R</a>
+ * following the design of <a href="http://cran.r-project.org/web/packages/R2WinBUGS/index.html">R2WinBugs</a>.
+ *	
+ * @section license Open-Source Licensing
+ *
+ * Stan is released under the 
+ * <a href="http://www.opensource.org/licenses/bsd-license.php">New BSD license</a>.  
+ *
+ * <p>Portions of Stan have dependencies on <a href="http://www.boost.org/">Boost</a>
+ * (<a href="http://www.boost.org/users/license.html">Boost license</a>) 
+ * and <a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> 
+ * (<a href="http://www.gnu.org/licenses/lgpl.html">Lesser Gnu Public License 3+</a>).
+ * 
+ * <p>Stan's standalone interface to R is released under the 
+ * <a href="http://www.gnu.org/copyleft/gpl.html">Gnu Public License, version 3</a>.  It
+ * depends on <a href="http://www.r-project.org/">R</a> 
+ * (<a href="http://www.gnu.org/copyleft/gpl.html">Gnu Public License, version 3</a>).
+ *	
+ * @section team Project Team
+ *
+ * <a href="http://malecki.wustl.edu/">Michael Malecki</a>, Columbia University, Departments of Statistics and Political Science
+ *
+ * <a href="http://www.stat.columbia.edu/visitor-postdoc-bios/lee/postdoc.html">Daniel Lee</a>, Columbia University, Department of Statistics
+ *
+ * <a href="http://www.cs.princeton.edu/~mdhoffma/">Matt Hoffman</a>, Columbia University, Department of Statistics
+ *
+ * <a href="http://www.columbia.edu/~bg2382/">Ben Goodrich</a>, Columbia University, Departments of Statistics and Political Science
+ *
+ * <a href="http://www.stat.columbia.edu/~gelman/">Andrew Gelman</a>, Columbia University, Departments of Statistics and Political Science
+ *
+ * <a href="http://colloquial.com/carp">Bob Carpenter</a>, Columbia University, Department of Statistics
+ *
+ *	
+ * @section Acknowledgements
+ *
+ * The development of Stan was supported by ???.
+ */
+
+/** 
+ * @namespace stan Probability, optimization and sampling library.
+ */

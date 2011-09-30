@@ -1,0 +1,105 @@
+TO DO
+=================================================
+
+* pull out optimization algorithms
+
+* pull out auto-tuning for HMC, basic HMC, etc.
+
+* Gibbs sampling for discrete case
+
+* file I/O format
+ - match Coda input format so easy to read into R
+ - names?
+ - data format for input to match R's
+
+* convergence monitoring
+  - R-hat
+  - n.eff (whose?)
+  - mean and variance of samples (per chain & across)
+  - innovate
+
+* distribution engineering
+  - tarball
+  - basic distro site
+
+* interface to R
+ - how exactly with need to compile?
+
+* remaining API doc
+
+* error/exception policy
+
+* finalize license
+
+* profile and optimize, at least one round
+
+* truncation and censoring
+
+--------------- optional below here ----------------------
+
+* forward-mode simulation
+  - if no descendants of a sampled variable are fixed,
+    we can use fully forward simulation to draw a sample
+  - initially, just use Stan with data/params reverses,
+    which is more general anyway
+
+* i/o streams for marshaling variables by name/structure
+
+* benchmarks
+  - agrad vs. RAD/Sacado, CppAD, ... ?
+  - stan vs. MCMCpack, R, BUGS, JAGS, OpenBUGS, ...
+  - 
+
+* web site
+- web site
+
+* tutorial documentation
+- html (req web site?)
+- PDF?
+
+* logo
+
+* symbol table for tracking names of variables
+ - like R, everything's a matrix?
+
+* compiler for BUGS model notation
+- interpreter?
+
+* compiler for R's linear model notation
+- interpreter?
+
+* automated tuning for HMC params
+ - learning rate
+ - number leapfrog steps
+
+* templated distribution library improvements
+ - covariance matrix prior a la Ben's take on Lewandowski et al.
+ - override templates for sampling up to proportion (new function names)
+ - gradient specializations for overrides
+
+* generalize vari to chainable interface, then introduce
+  variables for matrices, vectors, etc.  Then matrix.get(a,b)
+  would return a new vari that points back to the matrix and
+  knows how to propagate auto-dif
+
+* threading
+  - separate out just vari thread concern for agrad_thread_safe.hpp
+    and link both to separate agrad_general.hpp
+
+* set params in HMC
+- partial?
+
+* interface to Python
+
+* precompiled standard models
+
+* slice sampling for continuous Gibbs
+  - block samples?
+
+* Dream or Skilling's leapfrog sampling
+
+* Riemannian manifold sampling
+ - Girolami's method with auto-diff Hessians
+
+
+
