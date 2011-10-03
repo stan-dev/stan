@@ -1,3 +1,6 @@
+#ifndef __STAN__MATHS__MATRIX_H__
+#define __STAN__MATHS__MATRIX_H__
+
 #include <vector>
 #include <Eigen/Dense>
 
