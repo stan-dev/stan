@@ -1,6 +1,7 @@
-#include <vector>
-#include <string>
+#include <fstream>
 #include <sstream>
+#include <string>
+#include <vector>
 #include <gtest/gtest.h>
 #include <stan/io/dump.hpp>
 #include <stan/maths/special_functions.hpp>
@@ -253,4 +254,21 @@ TEST(io_dump, dump_safety) {
   EXPECT_FALSE(dump.contains_r("bing"));
   EXPECT_EQ(0,dump.dims_i("bing").size());
   EXPECT_FALSE(dump.contains_i("bing"));
+}
+
+TEST(io_dump, dump_abs_ref) {
+  std::string txt = "\"N\" <-\n5\n\"y\" <-\n c(1.0, 2.0, 1.2, -0.2, 2.7)";
+  std::stringstream in(txt);
+  stan::io::dump dump(in);
+  EXPECT_TRUE(dump.contains_i("N"));
+  stan::io::var_context& context = dump;
+  EXPECT_TRUE(context.contains_i("N"));
+}
+
+TEST(io_dump, dump_file) {
+  std::fstream in("src/models/normal_estimate/normal_estimate.data");
+  stan::io::dump dump(in);
+  EXPECT_TRUE(dump.contains_i("N"));
+  stan::io::var_context& context = dump;
+  EXPECT_TRUE(context.contains_i("N"));
 }
