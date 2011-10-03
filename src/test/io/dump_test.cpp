@@ -114,8 +114,6 @@ TEST(io_dump, reader_ints) {
   test_list("b12",vs,"b12 <- c(-5, -2, 3, 0)");
 }
 
-
-
 TEST(io_dump, reader_vec_double) {
   std::vector<double> expected_vals;
   expected_vals.push_back(1.0);
