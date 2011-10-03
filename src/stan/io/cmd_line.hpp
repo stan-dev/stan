@@ -14,6 +14,30 @@ namespace stan {
     /**
      * The <code>cmd_line</code> class parses and stores command-line
      * arguments.
+     *
+     * <p>Command-line arguments are organized into four types.
+     *
+     * <p><b>Command</b>: The first argument (at index 0) is just the
+     * command itself.  There method <code>command()</code> retrieves
+     * the command.
+     *
+     * <p><b>Key/Value</b>: The second type of argument is a key-value pair, 
+     * which must be in the form <code>--key=val</code>.  Two hyphens
+     * are used to separate arguments from negated numbers.  The method
+     * <code>has_key(const std::string&)</code> indicates if there is a key
+     * and <code>val(const std::string&,T&)</code> writes its value into
+     * a reference (whose type is templated; any type understand by the
+     * output operator <code>&gt;&gt;</code> is acceptable.
+     *
+     * <p><b>Flag</b>: Flags are specified as <code>--flag</code>.  The
+     * method <code>has_flag(const std::string&)</code> tests if a flag
+     * is present.
+     *
+     * <p><b>Bare Argument</b>: Bare arguments are any arguments that
+     * are not prefixed with two hyphens (<code>--</code>).  The
+     * method <code>bare_size()</code> returns the number of bare
+     * arguments and they are retrieved with the generic method
+     * <code>bare(const std::string&,T&)</code>.
      */
     class cmd_line {
     private:
