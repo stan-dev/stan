@@ -150,7 +150,7 @@ namespace stan {
     }
 
     inline void m_to_var(const matrix_d& m,
-			 matrix_d& m_v) {
+			 matrix_v& m_v) {
       m_v.resize(m.rows(), m.cols());
       for (int i = 0; i < m.rows(); ++i)
 	for (int j = 0; j < m.cols(); ++j)
@@ -283,8 +283,8 @@ namespace stan {
      * @param rv Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_v& v, const row_vector_d& rv) {
-      return v.dot(rv_to_var(rv));
+    inline var dot_product(const vector_v& v, const row_vector_d& rd) {
+      return v.dot(rv_to_var(rd));
     }
     /**
      * Returns the dot product of the specified column vector
