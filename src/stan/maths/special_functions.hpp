@@ -1,5 +1,5 @@
-#ifndef __MATHS__SPECIAL_FUNCTIONS_H__
-#define __MATHS__SPECIAL_FUNCTIONS_H__
+#ifndef __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
+#define __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
 
 #include <assert.h>
 #include <boost/math/special_functions/gamma.hpp>

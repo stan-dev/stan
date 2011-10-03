@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__VAR_CONTEXT_H__
-#define __STAN__IO__VAR_CONTEXT_H__
+#ifndef __STAN__IO__VAR_CONTEXT_HPP__
+#define __STAN__IO__VAR_CONTEXT_HPP__
 
 #include <vector>
 

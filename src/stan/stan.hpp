@@ -1,3 +1,7 @@
+#ifndef __STAN__STAN_HPP__
+#define __STAN__STAN_HPP__
+
+
 #include <string>
 
 namespace stan {
@@ -8,5 +12,6 @@ namespace stan {
   /** Minor version number for Stan package. */
   const std::string MINOR_VERSION = "0";
 
-
 }
+
+#endif

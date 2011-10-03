@@ -1,5 +1,5 @@
-#ifndef __MEMORY__STACK_ALLOC__H__
-#define __MEMORY__STACK_ALLOC__H__
+#ifndef __STAN__MEMORY__STACK_ALLOC_HPP__
+#define __STAN__MEMORY__STACK_ALLOC_HPP__
 
 #include <stdlib.h>
 #include <vector>

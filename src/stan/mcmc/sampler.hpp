@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__SAMPLER_H__
-#define __STAN__MCMC__SAMPLER_H__
+#ifndef __STAN__MCMC__SAMPLER_HPP__
+#define __STAN__MCMC__SAMPLER_HPP__
 
 #include <vector>
 

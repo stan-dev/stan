@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__RHAT_H__
-#define __STAN__PROB__RHAT_H__
+#ifndef __STAN__PROB__RHAT_HPP__
+#define __STAN__PROB__RHAT_HPP__
 
 #include "stan/prob/online_avg.hpp"
 

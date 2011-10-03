@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__HMC_H__
-#define __STAN__MCMC__HMC_H__
+#ifndef __STAN__MCMC__HMC_HPP__
+#define __STAN__MCMC__HMC_HPP__
 
 #include <ctime>
 #include <vector>

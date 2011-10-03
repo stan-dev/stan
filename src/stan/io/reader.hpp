@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__READER_H__
-#define __STAN__IO__READER_H__
+#ifndef __STAN__IO__READER_HPP__
+#define __STAN__IO__READER_HPP__
 
 #include <cassert>
 #include <vector>

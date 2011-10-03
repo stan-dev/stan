@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__PROB_GRAD_H__
-#define __STAN__MCMC__PROB_GRAD_H__
+#ifndef __STAN__MCMC__PROB_GRAD_HPP__
+#define __STAN__MCMC__PROB_GRAD_HPP__
 
 #include <assert.h>
 #include <vector>

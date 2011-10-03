@@ -1,3 +1,6 @@
+#ifndef __STAN__PROB__TRANSFORM_HPP__
+#define __STAN__PROB__TRANSFORM_HPP__
+
 #include <cassert>
 #include <vector>
 #include <Eigen/Dense>
@@ -1310,16 +1313,8 @@ namespace stan {
       return x;
     }
 
-
-    
-    
-
-
-
-    
-    
-    
-
   }
 
 }
+
+#endif

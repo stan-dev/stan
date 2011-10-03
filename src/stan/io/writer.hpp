@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__WRITER_H__
-#define __STAN__IO__WRITER_H__
+#ifndef __STAN__IO__WRITER_HPP__
+#define __STAN__IO__WRITER_HPP__
 
 #include <cassert>
 #include <vector>

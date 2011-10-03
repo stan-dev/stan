@@ -1,3 +1,6 @@
+#ifndef __STAN__GM__AST_HPP__
+#define __STAN__GM__AST_HPP__
+
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
@@ -468,3 +471,5 @@ namespace stan {
 
   }
 }
+
+#endif

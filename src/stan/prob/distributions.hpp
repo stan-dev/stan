@@ -1,5 +1,5 @@
-#ifndef __PROB__DISTRIBUTIONS_H__
-#define __PROB__DISTRIBUTIONS_H__
+#ifndef __STAN__PROB__DISTRIBUTIONS_HPP__
+#define __STAN__PROB__DISTRIBUTIONS_HPP__
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>

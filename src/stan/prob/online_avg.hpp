@@ -1,5 +1,5 @@
-#ifndef PROB_ONLINE_AVG_H
-#define PROB_ONLINE_AVG_H
+#ifndef __STAN__PROB__ONLINE_AVG_HPP__
+#define __STAN__PROB__ONLINE_AVG_HPP__
 
 #include <vector>
 
