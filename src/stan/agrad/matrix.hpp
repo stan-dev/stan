@@ -374,152 +374,45 @@ namespace stan {
     }
 
     /**
-     * Returns the dot product of the specified column vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
+     * Returns the dot product of the specified vectors.
+     * @param v1 First column vector.
+     * @param v2 Second column vector.
      * @return Dot product of the vectors.
      */
     template<typename T1, typename T2>
     inline var dot_product(Eigen::Matrix<T1, Eigen::Dynamic, 1> v1, Eigen::Matrix<T2, Eigen::Dynamic, 1> v2) {
       return to_var(v1).dot(to_var(v2));
     }
-
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First row vector.
+     * @param v2 Second row vector.
+     * @return Dot product of the vectors.
+     */
     template<typename T1, typename T2>
     inline var dot_product(Eigen::Matrix<T1, 1, Eigen::Dynamic> v1, Eigen::Matrix<T2, 1, Eigen::Dynamic> v2) {
       return to_var(v1).dot(to_var(v2));
     }
-
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First column vector.
+     * @param v2 Second row vector.
+     * @return Dot product of the vectors.
+     */
     template<typename T1, typename T2>
     inline var dot_product(Eigen::Matrix<T1, Eigen::Dynamic, 1> v1, Eigen::Matrix<T2, 1, Eigen::Dynamic> v2) {
       return to_var(v1).dot(to_var(v2));
     }
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First row vector.
+     * @param v2 Second column vector.
+     * @return Dot product of the vectors.
+     */
     template<typename T1, typename T2>
     inline var dot_product(Eigen::Matrix<T1, 1, Eigen::Dynamic> v1, Eigen::Matrix<T2, Eigen::Dynamic, 1> v2) {
       return to_var(v1).dot(to_var(v2));
     }
-
-
-
-    /**
-     * Returns the dot product of the specified column vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const vector_v& v1, const vector_v& v2) {
-    //  return v1.dot(v2);
-    //}
-    /**
-     * Returns the dot product of the specified column vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const vector_v& v1, const vector_d& v2) {
-    //  return v1.dot(to_var(v2));
-    //}
-    /**
-     * Returns the dot product of the specified column vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const vector_d& v1, const vector_v& v2) {
-    //  return to_var(v1).dot(v2);
-    //}
-
-    /**
-     * Returns the dot product of the specified column vector
-     * and row vector.
-     * @param v First vector.
-     * @param rv Second vector.
-     * @return Dot product of the vectors.
-     */
-  //inline var dot_product(const vector_v& v, const row_vector_v& rv) {
-    //  return v.dot(rv);
-    //}
-    /**
-     * Returns the dot product of the specified column vector
-     * and row vector.
-     * @param v First vector.
-     * @param rv Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const vector_v& v, const row_vector_d& rd) {
-    //  return v.dot(to_var(rd));
-    //}
-    /**
-     * Returns the dot product of the specified column vector
-     * and row vector.
-     * @param v First vector.
-     * @param rv Second vector.
-     * @return Dot product of the vectors.
-     */
-    ///inline var dot_product(const vector_d& v, const row_vector_v& rv) {
-    //return to_var(v).dot(rv);
-    //}
-
-    /**
-     * Returns the dot product of the specified row vector
-     * and column vector.
-     * @param rv First vector.
-     * @param v Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const row_vector_v& rv, const vector_v& v) {
-    //  return rv.dot(v);
-    //}
-    /**
-     * Returns the dot product of the specified row vector
-     * and column vector.
-     * @param rv First vector.
-     * @param v Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const row_vector_v& rv, const vector_d& v) {
-    //return rv.dot(to_var(v));
-    //}
-    /**
-     * Returns the dot product of the specified row vector
-     * and column vector.
-     * @param rv First vector.
-     * @param v Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const row_vector_d& rv, const vector_v& v) {
-    // return to_var(rv).dot(v);
-    //}
-
-    /**
-     * Returns the dot product of the specified row vectors.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return Dot product of the vectors.
-     */
-  //inline var dot_product(const row_vector_v& rv1, 
-    //			   const row_vector_v& rv2) {
-    //return rv1.dot(rv2);
-    //}
-    /**
-     * Returns the dot product of the specified row vectors.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return Dot product of the vectors.
-     */
-    //inline var dot_product(const row_vector_v& rv1, 
-    //			   const row_vector_d& rv2) {
-    // return rv1.dot(to_var(rv2));
-    //}
-    /**
-     * Returns the dot product of the specified row vectors.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return Dot product of the vectors.
-     */
-  //inline var dot_product(const row_vector_d& rv1, 
-    //			   const row_vector_v& rv2) {
-    //return to_var(rv1).dot(rv2);
-    //}
 
     /**
      * Returns the minimum coefficient in the specified
