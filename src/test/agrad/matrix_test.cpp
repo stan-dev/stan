@@ -264,9 +264,11 @@ TEST(agrad_matrix,determinant_rd_rv) {
 // add tests
 TEST(agrad_matrix, add_vector) {
   vector_v expected_output(5), output;
-  vector_d vd_1(5), vd_2(5), vd_mis(4);
-  vector_v vv_1(5), vv_2(5), vv_mis(3);
-
+  vector_d vd_1(5), vd_2(5);
+  vector_v vv_1(5), vv_2(5);
+  vector_d vd_mis(4);
+  vector_v vv_mis(3);
+  
   vd_1 << 1, 2, 3, 4, 5;
   vv_1 << 1, 2, 3, 4, 5;
   vd_2 << 2, 3, 4, 5, 6;
@@ -367,7 +369,7 @@ TEST(agrad_matrix, add_matrix) {
   matrix_d md_1(2,2), md_2(2,2);
   matrix_v mv_1(2,2), mv_2(2,2);
   matrix_d md_mis (2, 3);
-  matrix_v mv_mis (3, 3);
+  matrix_v mv_mis (1, 1);
 
   md_1 << -10, 1, 10, 0;
   mv_1 << -10, 1, 10, 0;
@@ -416,6 +418,8 @@ TEST(agrad_matrix, subtract_vector) {
   vector_v expected_output(5), output;
   vector_d vd_1(5), vd_2(5);
   vector_v vv_1(5), vv_2(5);
+  vector_d vd_mis(4);
+  vector_v vv_mis(3);
 
   vd_1 << 0, 2, -6, 10, 6;
   vv_1 << 0, 2, -6, 10, 6;
@@ -451,11 +455,22 @@ TEST(agrad_matrix, subtract_vector) {
   EXPECT_FLOAT_EQ (expected_output(2).val(), output(2).val());
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
+
+  EXPECT_DEATH(output = stan::agrad::subtract(vv_mis, vv_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vv_1,   vv_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vv_mis, vd_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vv_1,   vd_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vd_mis, vv_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vd_1,   vv_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vd_mis, vd_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(vd_1,   vd_mis), "");
 }
 TEST(agrad_matrix, subtract_row_vector) {
   row_vector_v expected_output(5), output;
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_v rvv_1(5), rvv_2(5);
+  row_vector_d rvd_mis(10);
+  row_vector_v rvv_mis(2);
 
   rvd_1 << 0, 2, -6, 10, 6;
   rvv_1 << 0, 2, -6, 10, 6;
@@ -491,11 +506,22 @@ TEST(agrad_matrix, subtract_row_vector) {
   EXPECT_FLOAT_EQ (expected_output(2).val(), output(2).val());
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
+
+  EXPECT_DEATH(output = stan::agrad::subtract(rvv_mis, rvv_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvv_1,   rvv_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvv_mis, rvd_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvv_1,   rvd_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvd_mis, rvv_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvd_1,   rvv_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvd_mis, rvd_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(rvd_1,   rvd_mis), "");
 }
 TEST(agrad_matrix, subtract_matrix) {
   matrix_v expected_output(2,2), output;
   matrix_d md_1(2,2), md_2(2,2);
   matrix_v mv_1(2,2), mv_2(2,2);
+  matrix_d md_mis (2, 3);
+  matrix_v mv_mis (1, 1);
 
   md_1 << -10, 1, 10, 0;
   mv_1 << -10, 1, 10, 0;
@@ -527,5 +553,14 @@ TEST(agrad_matrix, subtract_matrix) {
   EXPECT_FLOAT_EQ (expected_output(0,1).val(), output(0,1).val());
   EXPECT_FLOAT_EQ (expected_output(1,0).val(), output(1,0).val());
   EXPECT_FLOAT_EQ (expected_output(1,1).val(), output(1,1).val());
+
+  EXPECT_DEATH(output = stan::agrad::subtract(mv_mis, mv_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(mv_1,   mv_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(mv_mis, md_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(mv_1,   md_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(md_mis, mv_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(md_1,   mv_mis), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(md_mis, md_2), "");
+  EXPECT_DEATH(output = stan::agrad::subtract(md_1,   md_mis), "");
 }
 // end subtract tests
