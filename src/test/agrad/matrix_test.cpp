@@ -20,7 +20,7 @@ TEST(agrad_matrix,to_var) {
 TEST(agrad_matrix,m_to_var) {
   matrix_d m_d(2,3);
   m_d << 0, 1, 2, 3, 4, 5;
-  matrix_v m_v = stan::agrad::m_to_var(m_d);
+  matrix_v m_v = stan::agrad::to_var(m_d);
   
   EXPECT_EQ (2, m_v.rows());
   EXPECT_EQ (3, m_v.cols());
@@ -36,7 +36,7 @@ TEST(agrad_matrix,m_to_var_ref) {
   EXPECT_EQ(5, m_v.rows());
   EXPECT_EQ(5, m_v.cols());
 
-  stan::agrad::m_to_var(m_d, m_v);  
+  stan::agrad::to_var(m_d, m_v);  
   EXPECT_EQ (2, m_v.rows());
   EXPECT_EQ (3, m_v.cols());
   EXPECT_FLOAT_EQ (0, m_v(0, 0).val());
@@ -50,7 +50,7 @@ TEST(agrad_matrix,v_to_var) {
   vector_d v_d(5);
   v_d << 1, 2, 3, 4, 5;
   
-  vector_v v_v = stan::agrad::v_to_var(v_d);
+  vector_v v_v = stan::agrad::to_var(v_d);
   EXPECT_FLOAT_EQ (1, v_v(0).val());
   EXPECT_FLOAT_EQ (2, v_v(1).val());
   EXPECT_FLOAT_EQ (3, v_v(2).val());
@@ -64,7 +64,7 @@ TEST(agrad_matrix,v_to_var_ref) {
   vector_v v_v;
   EXPECT_EQ(0, v_v.size());
 
-  stan::agrad::v_to_var(v_d, v_v);
+  stan::agrad::to_var(v_d, v_v);
   EXPECT_FLOAT_EQ (1, v_v(0).val());
   EXPECT_FLOAT_EQ (2, v_v(1).val());
   EXPECT_FLOAT_EQ (3, v_v(2).val());
@@ -75,7 +75,7 @@ TEST(agrad_matrix,rv_to_var) {
   row_vector_d rv_d(5);
   rv_d << 1, 2, 3, 4, 5;
   
-  row_vector_v rv_v = stan::agrad::rv_to_var(rv_d);
+  row_vector_v rv_v = stan::agrad::to_var(rv_d);
   EXPECT_FLOAT_EQ (1, rv_v(0).val());
   EXPECT_FLOAT_EQ (2, rv_v(1).val());
   EXPECT_FLOAT_EQ (3, rv_v(2).val());
@@ -89,7 +89,7 @@ TEST(agrad_matrix,rv_to_var_asref) {
   row_vector_v rv_v;
   EXPECT_EQ(0, rv_v.size());
 
-  stan::agrad::rv_to_var(rv_d, rv_v);
+  stan::agrad::to_var(rv_d, rv_v);
   EXPECT_FLOAT_EQ (1, rv_v(0).val());
   EXPECT_FLOAT_EQ (2, rv_v(1).val());
   EXPECT_FLOAT_EQ (3, rv_v(2).val());

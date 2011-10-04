@@ -125,52 +125,187 @@ namespace stan {
     typedef Eigen::Matrix<var,Eigen::Dynamic,1> vector_v;
     typedef Eigen::Matrix<var,1,Eigen::Dynamic> row_vector_v;
 
-    inline var to_var(double x) {
+    /**
+     * Returns an automatic differentiation variable with the input value.
+     *
+     * @param x A scalar value
+     * @return An automatic differentiation variable with the input value.
+     */
+    inline var to_var(const double& x) {
       return var(x);
     }
-
-    inline matrix_v m_to_var(const matrix_d& m) {
+    /**
+     * Sets an automatic differentiation variable with the input value.
+     *
+     * @param x A scalar value
+     * @param var_x A reference to an automatic differentiation variable
+     *   which will have the value of x.
+     */
+    inline void to_var(const double& x, var& var_x) {
+      var_x = x;
+    }
+    /**
+     * Returns an automatic differentiation variable with the input value.
+     *
+     * @param x An automatic differentiation variable.
+     * @return An automatic differentiation variable with the input value.
+     */    
+    inline var to_var(const var& x) {
+      return (x);
+    }
+    /**
+     * Sets an automatic differentiation variable with the input value.
+     *
+     * @param var_in An automatic differentiation variable.
+     * @param var_out A reference to an automatic differentiation variable
+     *   which will be set to the input value.
+     */
+    inline void to_var(const var& var_in, var& var_out) {
+      var_out = var_in;
+    }
+    /**
+     * Returns a Matrix with automatic differentiation variables.
+     *
+     * @param m A Matrix with scalars
+     * @return A Matrix with automatic differentiation variables
+     */
+    inline matrix_v to_var (const matrix_d& m) {
       matrix_v m_v(m.rows(), m.cols());
       for (int i = 0; i < m.rows(); ++i)
 	for (int j = 0; j < m.cols(); ++j)
 	  m_v(i,j) = m(i,j);
       return m_v;
     }
-    inline vector_v v_to_var(const vector_d& v) {
+    
+    /**
+     * Sets a Matrix with automatic differentiation variables.
+     *
+     * @param m A Matrix of scalars.
+     * @param m_v A Matrix with automatic differentiation variables
+     *    assigned with values of m.
+     */
+    inline matrix_v to_var (const matrix_d& m, matrix_v& m_v) {
+      m_v.resize(m.rows(), m.cols());
+      for (int i = 0; i < m.rows(); ++i)
+	for (int j = 0; j < m.cols(); ++j)
+	  m_v(i,j) = m(i,j);
+      return m_v;
+    }
+    /**
+     * Returns a Matrix with automatic differentiation variables.
+     * 
+     * @param m A Matrix with automatic differentiation variables.
+     */
+    inline matrix_v to_var(const matrix_v& m) {
+      return m;
+    }
+    /**
+     * Sets a Matirx with automatic differentiation variables.
+     *
+     * @param m_in A Matrix of automatic differentiation variables.
+     * @param m_out A Matrix of automatic differentiation variables
+     *    assigned with values of m_in.
+     */
+    inline void to_var (const matrix_v& m_in,
+			matrix_v& m_out) {
+      m_out = m_in;
+    }
+    /**
+     * Returns a Vector with automatic differentiation variables
+     *
+     * @param v A Vector of scalars
+     * @return A Vector of automatic differentiation variables with
+     *   values of v
+     */
+    inline vector_v to_var(const vector_d& v) {
       vector_v v_v(v.size());
       for (int i = 0; i < v.size(); ++i)
 	v_v[i] = v[i];
       return v_v;
     }
-    inline row_vector_v rv_to_var(const row_vector_d& rv) {
+    /**
+     * Sets a Vector with automatic differentation variables.
+     *
+     * @param v A Vector of scalars.
+     * @param v_v A Vector of automatic differentation variables with
+     *   values of v.
+     */
+    inline void to_var(const vector_d& v,
+		       vector_v& v_v) {
+      v_v.resize(v.size());
+      for (int i = 0; i < v.size(); ++i)
+	v_v[i] = v[i];
+    }
+    /**
+     * Returns a Vector with automatic differentiation variables
+     *
+     * @param v A Vector of automatic differentiation variables
+     * @return A Vector of automatic differentiation variables with
+     *   values of v
+     */
+    inline vector_v to_var(const vector_v& v) {
+      return v;
+    }
+    /**
+     * Sets a Vector with automatic differentiation variables
+     *
+     * @param v_in A Vector of automatic differentiation variables
+     * @param v_out A Vector of automatic differentiation variables
+     *    with values of v_in
+     */
+    inline void to_var(const vector_v& v_in,
+			 vector_v& v_out) {
+      v_out = v_in;
+    }
+    /**
+     * Returns a row vector with automatic differentiation variables
+     *
+     * @param rv A row vector of scalars
+     * @return A row vector of automatic differentation variables with 
+     *   values of rv.
+     */
+    inline row_vector_v to_var(const row_vector_d& rv) {
       row_vector_v rv_v(rv.size());
       for (int i = 0; i < rv.size(); ++i)
 	rv_v[i] = rv[i];
       return rv_v;
     }
-
-    inline void m_to_var(const matrix_d& m,
-			 matrix_v& m_v) {
-      m_v.resize(m.rows(), m.cols());
-      for (int i = 0; i < m.rows(); ++i)
-	for (int j = 0; j < m.cols(); ++j)
-	  m_v(i,j) = m(i,j);
-    }
-    inline void v_to_var(const vector_d& v,
-			 vector_v& v_v) {
-      v_v.resize(v.size());
-      for (int i = 0; i < v.size(); ++i)
-	v_v[i] = v[i];
-    }
-    inline void rv_to_var(const row_vector_d& rv,
+    /**
+     * Sets a row vector with automatic differentiation variables
+     *
+     * @param rv A row vector of scalars
+     * @param rv_v A row vector of automatic differentiation variables
+     *   with values set to rv.
+     */
+    inline void to_var(const row_vector_d& rv,
 			  row_vector_v& rv_v) {
       rv_v.resize(rv.size());
       for (int i = 0; i < rv.size(); ++i)
 	rv_v[i] = rv[i];
     }
+    /**
+     * Returns a row vector with automatic differentiation variables
+     *
+     * @param rv A row vector with automatic differentiation variables
+     * @return A row vector with automatic differentiation variables
+     *    with values of rv.
+     */
+    inline row_vector_v to_var(const row_vector_v& rv) {
+      return rv;
+    }
+    /**
+     * Sets a row vector with automatic differentiation variables
+     *
+     * @param rv_in A row vector with automatic differentiation variables
+     * @param rv_out A row vector with automatic differentiation variables
+     *    with values of rv_in
+     */
+    inline void to_var(const row_vector_v& rv_in,
+		       row_vector_v& rv_out) {
+      rv_out = rv_in;
+    }
 
     // int returns
-
     /**
      * Return the number of rows in the specified 
      * column vector.
@@ -244,27 +379,54 @@ namespace stan {
      * @param v2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_v& v1, const vector_v& v2) {
-      return v1.dot(v2);
+    template<typename T1, typename T2>
+    inline var dot_product(Eigen::Matrix<T1, Eigen::Dynamic, 1> v1, Eigen::Matrix<T2, Eigen::Dynamic, 1> v2) {
+      return to_var(v1).dot(to_var(v2));
     }
+
+    template<typename T1, typename T2>
+    inline var dot_product(Eigen::Matrix<T1, 1, Eigen::Dynamic> v1, Eigen::Matrix<T2, 1, Eigen::Dynamic> v2) {
+      return to_var(v1).dot(to_var(v2));
+    }
+
+    template<typename T1, typename T2>
+    inline var dot_product(Eigen::Matrix<T1, Eigen::Dynamic, 1> v1, Eigen::Matrix<T2, 1, Eigen::Dynamic> v2) {
+      return to_var(v1).dot(to_var(v2));
+    }
+    template<typename T1, typename T2>
+    inline var dot_product(Eigen::Matrix<T1, 1, Eigen::Dynamic> v1, Eigen::Matrix<T2, Eigen::Dynamic, 1> v2) {
+      return to_var(v1).dot(to_var(v2));
+    }
+
+
+
     /**
      * Returns the dot product of the specified column vectors.
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_v& v1, const vector_d& v2) {
-      return v1.dot(v_to_var(v2));
-    }
+    //inline var dot_product(const vector_v& v1, const vector_v& v2) {
+    //  return v1.dot(v2);
+    //}
     /**
      * Returns the dot product of the specified column vectors.
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_d& v1, const vector_v& v2) {
-      return v_to_var(v1).dot(v2);
-    }
+    //inline var dot_product(const vector_v& v1, const vector_d& v2) {
+    //  return v1.dot(to_var(v2));
+    //}
+    /**
+     * Returns the dot product of the specified column vectors.
+     * @param v1 First vector.
+     * @param v2 Second vector.
+     * @return Dot product of the vectors.
+     */
+    //inline var dot_product(const vector_d& v1, const vector_v& v2) {
+    //  return to_var(v1).dot(v2);
+    //}
 
     /**
      * Returns the dot product of the specified column vector
@@ -273,9 +435,9 @@ namespace stan {
      * @param rv Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_v& v, const row_vector_v& rv) {
-      return v.dot(rv);
-    }
+  //inline var dot_product(const vector_v& v, const row_vector_v& rv) {
+    //  return v.dot(rv);
+    //}
     /**
      * Returns the dot product of the specified column vector
      * and row vector.
@@ -283,9 +445,9 @@ namespace stan {
      * @param rv Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_v& v, const row_vector_d& rd) {
-      return v.dot(rv_to_var(rd));
-    }
+    //inline var dot_product(const vector_v& v, const row_vector_d& rd) {
+    //  return v.dot(to_var(rd));
+    //}
     /**
      * Returns the dot product of the specified column vector
      * and row vector.
@@ -293,9 +455,9 @@ namespace stan {
      * @param rv Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const vector_d& v, const row_vector_v& rv) {
-      return v_to_var(v).dot(rv);
-    }
+    ///inline var dot_product(const vector_d& v, const row_vector_v& rv) {
+    //return to_var(v).dot(rv);
+    //}
 
     /**
      * Returns the dot product of the specified row vector
@@ -304,9 +466,9 @@ namespace stan {
      * @param v Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const row_vector_v& rv, const vector_v& v) {
-      return rv.dot(v);
-    }
+    //inline var dot_product(const row_vector_v& rv, const vector_v& v) {
+    //  return rv.dot(v);
+    //}
     /**
      * Returns the dot product of the specified row vector
      * and column vector.
@@ -314,9 +476,9 @@ namespace stan {
      * @param v Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const row_vector_v& rv, const vector_d& v) {
-      return rv.dot(v_to_var(v));
-    }
+    //inline var dot_product(const row_vector_v& rv, const vector_d& v) {
+    //return rv.dot(to_var(v));
+    //}
     /**
      * Returns the dot product of the specified row vector
      * and column vector.
@@ -324,9 +486,9 @@ namespace stan {
      * @param v Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const row_vector_d& rv, const vector_v& v) {
-      return rv_to_var(rv).dot(v);
-    }
+    //inline var dot_product(const row_vector_d& rv, const vector_v& v) {
+    // return to_var(rv).dot(v);
+    //}
 
     /**
      * Returns the dot product of the specified row vectors.
@@ -334,30 +496,30 @@ namespace stan {
      * @param rv2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const row_vector_v& rv1, 
-			   const row_vector_v& rv2) {
-      return rv1.dot(rv2);
-    }
+  //inline var dot_product(const row_vector_v& rv1, 
+    //			   const row_vector_v& rv2) {
+    //return rv1.dot(rv2);
+    //}
     /**
      * Returns the dot product of the specified row vectors.
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const row_vector_v& rv1, 
-			   const row_vector_d& rv2) {
-      return rv1.dot(rv_to_var(rv2));
-    }
+    //inline var dot_product(const row_vector_v& rv1, 
+    //			   const row_vector_d& rv2) {
+    // return rv1.dot(to_var(rv2));
+    //}
     /**
      * Returns the dot product of the specified row vectors.
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline var dot_product(const row_vector_d& rv1, 
-			   const row_vector_v& rv2) {
-      return rv_to_var(rv1).dot(rv2);
-    }
+  //inline var dot_product(const row_vector_d& rv1, 
+    //			   const row_vector_v& rv2) {
+    //return to_var(rv1).dot(rv2);
+    //}
 
     /**
      * Returns the minimum coefficient in the specified
@@ -612,7 +774,7 @@ namespace stan {
      */
     inline vector_v add(const vector_v& v1, vector_d& v2) {
       assert(v1.size() == v2.size());
-      return v1 + v_to_var(v2);
+      return v1 + to_var(v2);
     }
     /**
      * Return the sum of the specified column vectors.
@@ -623,7 +785,7 @@ namespace stan {
      */
     inline vector_v add(const vector_d& v1, vector_v& v2) {
       assert(v1.size() == v2.size());
-      return v_to_var(v1) + v2;
+      return to_var(v1) + v2;
     }
 
 
@@ -650,7 +812,7 @@ namespace stan {
     inline row_vector_v add(const row_vector_v& rv1, 
 			    const row_vector_d& rv2) {
       assert(rv1.size() == rv2.size());
-      return rv1 + rv_to_var(rv2);
+      return rv1 + to_var(rv2);
     }
     /**
      * Return the sum of the specified row vectors.  The
@@ -662,7 +824,7 @@ namespace stan {
     inline row_vector_v add(const row_vector_d& rv1, 
 			    const row_vector_v& rv2) {
       assert(rv1.size() == rv2.size());
-      return rv_to_var(rv1) + rv2;
+      return to_var(rv1) + rv2;
     }
 
     /**
@@ -685,7 +847,7 @@ namespace stan {
      */
     inline matrix_v add(const matrix_v& m1, const matrix_d& m2) {
       assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m1 + m_to_var(m2);
+      return m1 + to_var(m2);
     }
     /**
      * Return the sum of the specified matrices.  The two matrices
@@ -696,7 +858,7 @@ namespace stan {
      */
     inline matrix_v add(const matrix_d& m1, const matrix_v& m2) {
       assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m_to_var(m1) + m2;
+      return to_var(m1) + m2;
     }
 
     /**
@@ -719,7 +881,7 @@ namespace stan {
      */
     inline vector_v subtract(const vector_v& v1, const vector_d& v2) {
       assert(v1.size() == v2.size());
-      return v1 - v_to_var(v2);
+      return v1 - to_var(v2);
     }
     /**
      * Return the difference between the first specified column vector
@@ -730,7 +892,7 @@ namespace stan {
      */
     inline vector_v subtract(const vector_d& v1, const vector_v& v2) {
       assert(v1.size() == v2.size());
-      return v_to_var(v1) - v2;
+      return to_var(v1) - v2;
     }
 
     /**
@@ -755,7 +917,7 @@ namespace stan {
     inline row_vector_v subtract(const row_vector_v& rv1, 
 				 const row_vector_d& rv2) {
       assert(rv1.size() == rv2.size());
-      return rv1 - rv_to_var(rv2);
+      return rv1 - to_var(rv2);
     }
     /**
      * Return the difference between the first specified row vector and
@@ -767,7 +929,7 @@ namespace stan {
     inline row_vector_v subtract(const row_vector_d& rv1, 
 				 const row_vector_v& rv2) {
       assert(rv1.size() == rv2.size());
-      return rv_to_var(rv1) - rv2;
+      return to_var(rv1) - rv2;
     }
 
     /**
@@ -790,7 +952,7 @@ namespace stan {
      */
     inline matrix_v subtract(const matrix_v& m1, const matrix_d& m2) {
       assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m1 - m_to_var(m2);
+      return m1 - to_var(m2);
     }
     /**
      * Return the difference between the first specified matrix and
@@ -801,7 +963,7 @@ namespace stan {
      */
     inline matrix_v subtract(const matrix_d& m1, const matrix_v& m2) {
       assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m_to_var(m1) - m2;
+      return to_var(m1) - m2;
     }
 
     /**
@@ -860,7 +1022,7 @@ namespace stan {
      * @return Vector divided by the scalar.
      */
     inline vector_v divide(const vector_d& v, var c) {
-      return v_to_var(v) / c;
+      return to_var(v) / c;
     }
 
     /**
@@ -891,7 +1053,7 @@ namespace stan {
      * @return Vector divided by the scalar.
      */
     inline row_vector_v divide(const row_vector_d& rv, var c) {
-      return rv_to_var(rv) / c;
+      return to_var(rv) / c;
     }
 
     /**
@@ -922,7 +1084,7 @@ namespace stan {
      * @return Matrix divided by the scalar.
      */
     inline matrix_v divide(const matrix_d& m, var c) {
-      return m_to_var(m) / c;
+      return to_var(m) / c;
     }
     
     /**
@@ -953,7 +1115,7 @@ namespace stan {
      * @return Product of vector and scalar.
      */
     inline vector_v multiply(const vector_d& v, var c) {
-      return v_to_var(v) * c;
+      return to_var(v) * c;
     }
 
     /**
@@ -984,7 +1146,7 @@ namespace stan {
      * @return Product of vector and scalar.
      */
     inline row_vector_v multiply(const row_vector_d& rv, var c) {
-      return rv_to_var(rv) * c;
+      return to_var(rv) * c;
     }
 
     /**
@@ -1015,7 +1177,7 @@ namespace stan {
      * @return Product of matrix and scalar.
      */
     inline matrix_v multiply(const matrix_d& m, var c) {
-      return m_to_var(m) * c;
+      return to_var(m) * c;
     }
 
     /**
@@ -1040,7 +1202,7 @@ namespace stan {
      */
     inline var multiply(const row_vector_v& rv, const vector_d& v) {
       assert(rv.size() == v.size());
-      return rv.dot(v_to_var(v));
+      return rv.dot(to_var(v));
     }
     /**
      * Return the scalar product of the specified row vector and
@@ -1052,7 +1214,7 @@ namespace stan {
      */
     inline var multiply(const row_vector_d& rv, const vector_v& v) {
       assert(rv.size() == v.size());
-      return rv_to_var(rv).dot(v);
+      return to_var(rv).dot(v);
     }
     
 
@@ -1074,7 +1236,7 @@ namespace stan {
      * @return Product of column vector and row vector.
      */
     inline matrix_v multiply(const vector_v& v, const row_vector_d& rv) {
-      return v * rv_to_var(rv);
+      return v * to_var(rv);
     }
     /**
      * Return the product of the specified column vector
@@ -1084,7 +1246,7 @@ namespace stan {
      * @return Product of column vector and row vector.
      */
     inline matrix_v multiply(const vector_d& v, const row_vector_v& rv) {
-      return v_to_var(v) * rv;
+      return to_var(v) * rv;
     }
 
     /**
@@ -1109,7 +1271,7 @@ namespace stan {
      */
     inline vector_v multiply(const matrix_v& m, const vector_d& v) {
       assert(m.rows() == v.size());
-      return m * v_to_var(v);
+      return m * to_var(v);
     }
     /**
      * Return the product of the specified matrix and
@@ -1121,7 +1283,7 @@ namespace stan {
      */
     inline vector_v multiply(const matrix_d& m, const vector_v& v) {
       assert(m.rows() == v.size());
-      return m_to_var(m) * v;
+      return to_var(m) * v;
     }
 
     /**
@@ -1146,7 +1308,7 @@ namespace stan {
      */
     inline row_vector_v multiply(const row_vector_v& rv, const matrix_d& m) {
       assert(rv.size() == m.cols());
-      return rv * m_to_var(m);
+      return rv * to_var(m);
     }
     /**
      * Return the product of the specifieid row vector and specified
@@ -1158,7 +1320,7 @@ namespace stan {
      */
     inline row_vector_v multiply(const row_vector_d& rv, const matrix_v& m) {
       assert(rv.size() == m.cols());
-      return rv_to_var(rv) * m;
+      return to_var(rv) * m;
     }
 
     /**
@@ -1183,7 +1345,7 @@ namespace stan {
      */
     inline matrix_v multiply(const matrix_v& m1, const matrix_d& m2) {
       assert(m1.rows() == m2.cols());
-      return m1 * m_to_var(m2);
+      return m1 * to_var(m2);
     }
     /**
      * Return the product of the specified matrices.  The number of
@@ -1195,7 +1357,7 @@ namespace stan {
      */
     inline matrix_v multiply(const matrix_d& m1, const matrix_v& m2) {
       assert(m1.rows() == m2.cols());
-      return m_to_var(m1) * m2;
+      return to_var(m1) * m2;
     }
     
     /**
