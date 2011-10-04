@@ -302,4 +302,44 @@ TEST(agrad_matrix, add_vector) {
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
 }
+TEST(agrad_matrix, add_row_vector) {
+  row_vector_v expected_output(5), output;
+  row_vector_d rvd_1(5), rvd_2(5);
+  row_vector_v rvv_1(5), rvv_2(5);
+
+  rvd_1 << 1, 2, 3, 4, 5;
+  rvv_1 << 1, 2, 3, 4, 5;
+  rvd_2 << 2, 3, 4, 5, 6;
+  rvv_2 << 2, 3, 4, 5, 6;
+  
+  expected_output << 3, 5, 7, 9, 11;
+  
+  output = stan::agrad::add(rvd_1, rvd_2);
+  EXPECT_FLOAT_EQ (expected_output(0).val(), output(0).val());
+  EXPECT_FLOAT_EQ (expected_output(1).val(), output(1).val());
+  EXPECT_FLOAT_EQ (expected_output(2).val(), output(2).val());
+  EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
+  EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
+
+  output = stan::agrad::add(rvv_1, rvd_2);
+  EXPECT_FLOAT_EQ (expected_output(0).val(), output(0).val());
+  EXPECT_FLOAT_EQ (expected_output(1).val(), output(1).val());
+  EXPECT_FLOAT_EQ (expected_output(2).val(), output(2).val());
+  EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
+  EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
+
+  output = stan::agrad::add(rvd_1, rvv_2);
+  EXPECT_FLOAT_EQ (expected_output(0).val(), output(0).val());
+  EXPECT_FLOAT_EQ (expected_output(1).val(), output(1).val());
+  EXPECT_FLOAT_EQ (expected_output(2).val(), output(2).val());
+  EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
+  EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
+
+  output = stan::agrad::add(rvv_1, rvv_2);
+  EXPECT_FLOAT_EQ (expected_output(0).val(), output(0).val());
+  EXPECT_FLOAT_EQ (expected_output(1).val(), output(1).val());
+  EXPECT_FLOAT_EQ (expected_output(2).val(), output(2).val());
+  EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
+  EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
+}
 // end add tests

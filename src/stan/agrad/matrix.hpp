@@ -664,34 +664,11 @@ namespace stan {
      * @param rv2 Second vector.
      * @return Sum of the two vectors.
      */
-    inline row_vector_v add(const row_vector_v& rv1, 
-			    const row_vector_v& rv2) {
-      assert(rv1.size() == rv2.size());
-      return rv1 + rv2;
-    }
-    /**
-     * Return the sum of the specified row vectors.  The
-     * two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return Sum of the two vectors.
-     */
-    inline row_vector_v add(const row_vector_v& rv1, 
-			    const row_vector_d& rv2) {
-      assert(rv1.size() == rv2.size());
-      return rv1 + to_var(rv2);
-    }
-    /**
-     * Return the sum of the specified row vectors.  The
-     * two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return Sum of the two vectors.
-     */
-    inline row_vector_v add(const row_vector_d& rv1, 
-			    const row_vector_v& rv2) {
-      assert(rv1.size() == rv2.size());
-      return to_var(rv1) + rv2;
+    template<typename T1, typename T2>
+    inline Eigen::Matrix<var, 1, Eigen::Dynamic> add(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, 
+						     const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
+      assert(v1.size() == v2.size());
+      return to_var(v1) + to_var(v2);
     }
 
     /**
