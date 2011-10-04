@@ -381,6 +381,7 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
+      assert (v1.size() == v2.size());
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -391,6 +392,7 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
+      assert (v1.size() == v2.size());
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -401,6 +403,7 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
+      assert (v1.size() == v2.size());
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -411,6 +414,7 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
+      assert (v1.size() == v2.size());
       return to_var(v1).dot(to_var(v2));
     }
 
@@ -505,6 +509,7 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline var variance(const vector_v& v) {
+      assert (v.size() > 1);
       var mean = v.mean();
       var sum_sq_diff = 0;
       // FIXME: redefine in terms of vectorized ops
@@ -522,6 +527,7 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline var variance(const row_vector_v& rv) {
+      assert (rv.size() > 1);
       var mean = rv.mean();
       var sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
@@ -654,7 +660,7 @@ namespace stan {
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, 1> add(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
 						     const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      //assert(v1.size() == v2.size());
+      assert(v1.size() == v2.size());
       return to_var(v1) + to_var(v2);
     }
     /**
@@ -667,7 +673,7 @@ namespace stan {
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, 1, Eigen::Dynamic> add(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, 
 						     const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      //assert(v1.size() == v2.size());
+      assert(v1.size() == v2.size());
       return to_var(v1) + to_var(v2);
     }
 
@@ -681,7 +687,7 @@ namespace stan {
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> add(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
 								  const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      //assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
+      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
       return to_var(m1) + to_var(m2);
     }
 
