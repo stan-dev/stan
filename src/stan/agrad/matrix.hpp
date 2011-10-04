@@ -646,6 +646,14 @@ namespace stan {
 
 
 
+    template<typename T1, typename T2>
+    inline Eigen::Matrix<var, Eigen::Dynamic, 1> add(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
+						     const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
+      assert(v1.size() == v2.size());
+      return to_var(v1) + to_var(v2);
+    }
+
+
 
     /**
      * Return the sum of the specified column vectors.
@@ -654,10 +662,10 @@ namespace stan {
      * @param v2 Second vector.
      * @return Sum of the two vectors.
      */
-    inline vector_v add(const vector_v& v1, vector_v& v2) {
-      assert(v1.size() == v2.size());
-      return v1 + v2;
-    }
+    //inline vector_v add(const vector_v& v1, vector_v& v2) {
+    //  assert(v1.size() == v2.size());
+    //  return v1 + v2;
+    //}
     /**
      * Return the sum of the specified column vectors.
      * The two vectors must have the same size.
@@ -665,10 +673,10 @@ namespace stan {
      * @param v2 Second vector.
      * @return Sum of the two vectors.
      */
-    inline vector_v add(const vector_v& v1, vector_d& v2) {
-      assert(v1.size() == v2.size());
-      return v1 + to_var(v2);
-    }
+    //inline vector_v add(const vector_v& v1, vector_d& v2) {
+    //  assert(v1.size() == v2.size());
+    //  return v1 + to_var(v2);
+    //}
     /**
      * Return the sum of the specified column vectors.
      * The two vectors must have the same size.
@@ -676,12 +684,10 @@ namespace stan {
      * @param v2 Second vector.
      * @return Sum of the two vectors.
      */
-    inline vector_v add(const vector_d& v1, vector_v& v2) {
-      assert(v1.size() == v2.size());
-      return to_var(v1) + v2;
-    }
-
-
+    //inline vector_v add(const vector_d& v1, vector_v& v2) {
+    //  assert(v1.size() == v2.size());
+    //  return to_var(v1) + v2;
+    //}
 
     /**
      * Return the sum of the specified row vectors.  The
