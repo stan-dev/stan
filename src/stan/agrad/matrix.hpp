@@ -380,7 +380,7 @@ namespace stan {
      * @return Dot product of the vectors.
      */
     template<typename T1, typename T2>
-    inline var dot_product(Eigen::Matrix<T1, Eigen::Dynamic, 1> v1, Eigen::Matrix<T2, Eigen::Dynamic, 1> v2) {
+    inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -390,7 +390,7 @@ namespace stan {
      * @return Dot product of the vectors.
      */
     template<typename T1, typename T2>
-    inline var dot_product(Eigen::Matrix<T1, 1, Eigen::Dynamic> v1, Eigen::Matrix<T2, 1, Eigen::Dynamic> v2) {
+    inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -400,7 +400,7 @@ namespace stan {
      * @return Dot product of the vectors.
      */
     template<typename T1, typename T2>
-    inline var dot_product(Eigen::Matrix<T1, Eigen::Dynamic, 1> v1, Eigen::Matrix<T2, 1, Eigen::Dynamic> v2) {
+    inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -410,7 +410,7 @@ namespace stan {
      * @return Dot product of the vectors.
      */
     template<typename T1, typename T2>
-    inline var dot_product(Eigen::Matrix<T1, 1, Eigen::Dynamic> v1, Eigen::Matrix<T2, Eigen::Dynamic, 1> v2) {
+    inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
       return to_var(v1).dot(to_var(v2));
     }
 
@@ -645,7 +645,7 @@ namespace stan {
     }
 
 
-    // vector and matrix returns
+
 
     /**
      * Return the sum of the specified column vectors.
