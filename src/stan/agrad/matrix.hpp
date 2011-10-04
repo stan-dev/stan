@@ -678,31 +678,11 @@ namespace stan {
      * @param m2 Second matrix.
      * @return Sum of the two vectors.
      */
-    inline matrix_v add(const matrix_v& m1, const matrix_v& m2) {
+    template<typename T1, typename T2>
+    inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> add(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
+								  const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
       assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m1 + m2;
-    }
-    /**
-     * Return the sum of the specified matrices.  The two matrices
-     * must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return Sum of the two vectors.
-     */
-    inline matrix_v add(const matrix_v& m1, const matrix_d& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m1 + to_var(m2);
-    }
-    /**
-     * Return the sum of the specified matrices.  The two matrices
-     * must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return Sum of the two vectors.
-     */
-    inline matrix_v add(const matrix_d& m1, const matrix_v& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return to_var(m1) + m2;
+      return to_var(m1) + to_var(m2);
     }
 
     /**
@@ -712,68 +692,24 @@ namespace stan {
      * @param v2 Second vector.
      * @return First vector minus the second vector.
      */
-    inline vector_v subtract(const vector_v& v1, const vector_v& v2) {
+    template<typename T1, typename T2>
+    inline Eigen::Matrix<var, Eigen::Dynamic, 1> subtract(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
+							  const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
       assert(v1.size() == v2.size());
-      return v1 - v2;
+      return to_var(v1) - to_var(v2);
     }
     /**
-     * Return the difference between the first specified column vector
+     * Return the difference between the first specified row vector
      * and the second.  The two vectors must have the same size.
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return First vector minus the second vector.
      */
-    inline vector_v subtract(const vector_v& v1, const vector_d& v2) {
+    template<typename T1, typename T2>
+    inline Eigen::Matrix<var, 1, Eigen::Dynamic> subtract(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, 
+							  const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
       assert(v1.size() == v2.size());
-      return v1 - to_var(v2);
-    }
-    /**
-     * Return the difference between the first specified column vector
-     * and the second.  The two vectors must have the same size.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return First vector minus the second vector.
-     */
-    inline vector_v subtract(const vector_d& v1, const vector_v& v2) {
-      assert(v1.size() == v2.size());
-      return to_var(v1) - v2;
-    }
-
-    /**
-     * Return the difference between the first specified row vector and
-     * the second.  The two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return First vector minus the second vector.
-     */
-    inline row_vector_v subtract(const row_vector_v& rv1, 
-				 const row_vector_v& rv2) {
-      assert(rv1.size() == rv2.size());
-      return rv1 - rv2;
-    }
-    /**
-     * Return the difference between the first specified row vector and
-     * the second.  The two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return First vector minus the second vector.
-     */
-    inline row_vector_v subtract(const row_vector_v& rv1, 
-				 const row_vector_d& rv2) {
-      assert(rv1.size() == rv2.size());
-      return rv1 - to_var(rv2);
-    }
-    /**
-     * Return the difference between the first specified row vector and
-     * the second.  The two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return First vector minus the second vector.
-     */
-    inline row_vector_v subtract(const row_vector_d& rv1, 
-				 const row_vector_v& rv2) {
-      assert(rv1.size() == rv2.size());
-      return to_var(rv1) - rv2;
+      return to_var(v1) - to_var(v2);
     }
 
     /**
@@ -783,31 +719,11 @@ namespace stan {
      * @param m2 Second matrix.
      * @return First matrix minus the second matrix.
      */
-    inline matrix_v subtract(const matrix_v& m1, const matrix_v& m2) {
+    template<typename T1, typename T2>
+    inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> subtract(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
+								       const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
       assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m1 - m2;
-    }
-    /**
-     * Return the difference between the first specified matrix and
-     * the second.  The two matrices must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return First matrix minus the second matrix.
-     */
-    inline matrix_v subtract(const matrix_v& m1, const matrix_d& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return m1 - to_var(m2);
-    }
-    /**
-     * Return the difference between the first specified matrix and
-     * the second.  The two matrices must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return First matrix minus the second matrix.
-     */
-    inline matrix_v subtract(const matrix_d& m1, const matrix_v& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
-      return to_var(m1) - m2;
+      return to_var(m1) - to_var(m2);
     }
 
     /**
