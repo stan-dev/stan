@@ -369,9 +369,10 @@ namespace stan {
      * @param m Specified matrix.
      * @return Determinant of the matrix.
      */
-    inline var determinant(const matrix_v& m) {
+    template <typename T>
+    inline var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       assert (m.rows() == m.cols());
-      return m.determinant();
+      return to_var(m).determinant();
     }
 
     /**
@@ -733,14 +734,26 @@ namespace stan {
       return to_var(m1) - to_var(m2);
     }
 
+
+    /**
+     * Return the negation of the specified variable.  The result
+     * is the same as multiplying by the scalar <code>-1</code>.
+     * @param v Specified variable.  
+     * @return The negation of the variable.
+     */
+    template <typename T>
+    inline var minus(const T& v) {
+      return -to_var(v);
+    }
     /**
      * Return the negation of the specified column vector.  The result
      * is the same as multiplying by the scalar <code>-1</code>.
      * @param v Specified vector.  
      * @return The negation of the vector.
      */
-    inline vector_v minus(const vector_v& v) {
-      return -v;
+    template <typename T>
+    inline vector_v minus(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      return -to_var(v);
     }
     /**
      * Return the negation of the specified row vector.  The result is
@@ -748,8 +761,9 @@ namespace stan {
      * @param rv Specified vector.
      * @return The negation of the vector.
      */
-    inline row_vector_v minus(const row_vector_v& rv) {
-      return -rv;
+    template <typename T>
+    inline row_vector_v minus(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      return -to_var(rv);
     }
     /**
      * Return the negation of the specified matrix.  The result is the same
@@ -757,8 +771,9 @@ namespace stan {
      * @param m Specified matrix.
      * @return The negation of the matrix.
      */
-    inline matrix_v minus(const matrix_v& m) {
-      return -m;
+    template <typename T>
+    inline matrix_v minus(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      return -to_var(m);
     }
 
     /**

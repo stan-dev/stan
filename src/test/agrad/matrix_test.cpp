@@ -136,14 +136,21 @@ TEST(agrad_matrix,cols_m) {
 
 // determinant tests
 TEST(agrad_matrix,determinant) {
-  matrix_v m(2,2);
-  m << 0, 1, 2, 3;
-  var det = stan::agrad::determinant (m);
-  
+  matrix_v v(2,2);
+  matrix_d d(2,2);
+  v << 0, 1, 2, 3;
+  d << 0, 1, 2, 3;
+
+  var det;
+  det = stan::agrad::determinant (v);
+  EXPECT_FLOAT_EQ (-2, det.val());
+  det = stan::agrad::determinant (d);
   EXPECT_FLOAT_EQ (-2, det.val());
 
-  m.resize(2,3);
-  EXPECT_DEATH (det = stan::agrad::determinant(m), "[[:print:]]*determinant");
+  d.resize(2,3);
+  EXPECT_DEATH (det = stan::agrad::determinant(d), "[[:print:]]*determinant");
+  v.resize(2,3);
+  EXPECT_DEATH (det = stan::agrad::determinant(v), "[[:print:]]*determinant");
 }
 // end determinant tests
 
@@ -549,3 +556,73 @@ TEST(agrad_matrix, subtract_matrix) {
   EXPECT_DEATH(output = stan::agrad::subtract(md_1,   md_mis), "");
 }
 // end subtract tests
+
+// minus tests
+TEST(agrad_matrix, minus_scalar) {
+  double x = 10;
+  var v = 11;
+  
+  EXPECT_FLOAT_EQ (-10, stan::agrad::minus(x).val());
+  EXPECT_FLOAT_EQ (-11, stan::agrad::minus(v).val());
+}
+TEST(agrad_matrix, minus_vector) {
+  vector_d d(3);
+  vector_v v(3);
+
+  d << -100, 0, 1;
+  v << -100, 0, 1;
+  
+  vector_v output;
+  output = stan::agrad::minus (d);
+  EXPECT_FLOAT_EQ (100, output[0].val());
+  EXPECT_FLOAT_EQ (0, output[1].val());
+  EXPECT_FLOAT_EQ (-1, output[2].val());
+
+  output = stan::agrad::minus (v);
+  EXPECT_FLOAT_EQ (100, output[0].val());
+  EXPECT_FLOAT_EQ (0, output[1].val());
+  EXPECT_FLOAT_EQ (-1, output[2].val());
+}
+TEST(agrad_matrix, minus_row_vector) {
+  row_vector_d d(3);
+  row_vector_v v(3);
+
+  d << -100, 0, 1;
+  v << -100, 0, 1;
+  
+  row_vector_v output;
+  output = stan::agrad::minus (d);
+  EXPECT_FLOAT_EQ (100, output[0].val());
+  EXPECT_FLOAT_EQ (0, output[1].val());
+  EXPECT_FLOAT_EQ (-1, output[2].val());
+
+  output = stan::agrad::minus (v);
+  EXPECT_FLOAT_EQ (100, output[0].val());
+  EXPECT_FLOAT_EQ (0, output[1].val());
+  EXPECT_FLOAT_EQ (-1, output[2].val());
+}
+TEST(agrad_matrix, minus_matrix) {
+  matrix_d d(2, 3);
+  matrix_v v(2, 3);
+
+  d << -100, 0, 1, 20, -40, 2;
+  v << -100, 0, 1, 20, -40, 2;
+
+  matrix_v output;
+  output = stan::agrad::minus (d);
+  EXPECT_FLOAT_EQ (100, output(0,0).val());
+  EXPECT_FLOAT_EQ (  0, output(0,1).val());
+  EXPECT_FLOAT_EQ ( -1, output(0,2).val());
+  EXPECT_FLOAT_EQ (-20, output(1,0).val());
+  EXPECT_FLOAT_EQ ( 40, output(1,1).val());
+  EXPECT_FLOAT_EQ ( -2, output(1,2).val());
+
+  output = stan::agrad::minus (v);
+  EXPECT_FLOAT_EQ (100, output(0,0).val());
+  EXPECT_FLOAT_EQ (  0, output(0,1).val());
+  EXPECT_FLOAT_EQ ( -1, output(0,2).val());
+  EXPECT_FLOAT_EQ (-20, output(1,0).val());
+  EXPECT_FLOAT_EQ ( 40, output(1,1).val());
+  EXPECT_FLOAT_EQ ( -2, output(1,2).val());
+}
+// end minus tests
