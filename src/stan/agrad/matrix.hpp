@@ -370,6 +370,7 @@ namespace stan {
      * @return Determinant of the matrix.
      */
     inline var determinant(const matrix_v& m) {
+      assert (m.rows() == m.cols());
       return m.determinant();
     }
 

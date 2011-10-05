@@ -141,6 +141,9 @@ TEST(agrad_matrix,determinant) {
   var det = stan::agrad::determinant (m);
   
   EXPECT_FLOAT_EQ (-2, det.val());
+
+  m.resize(2,3);
+  EXPECT_DEATH (det = stan::agrad::determinant(m), "[[:print:]]*determinant");
 }
 // end determinant tests
 
@@ -170,90 +173,76 @@ TEST(agrad_matrix, dot_product_vector_vector) {
   EXPECT_DEATH (stan::agrad::dot_product(vv_1,   vv_mis), "[[:print:]]*dot_product");
   EXPECT_DEATH (stan::agrad::dot_product(vv_mis, vv_2),   "[[:print:]]*dot_product");
 }
+TEST(agrad_matrix, dot_product_rowvector_vector) {
+  row_vector_d rvd_1(3);
+  row_vector_v rvv_1(3);
+  vector_d vd_2(3);
+  vector_v vv_2(3);
+  
+  rvd_1 << 1, 3, -5;
+  rvv_1 << 1, 3, -5;
+  vd_2 << 4, -2, -1;
+  vv_2 << 4, -2, -1;
 
-TEST(agrad_matrix,dot_product_vv_rv) {
-  vector_v v_v(3);
-  row_vector_v r_v(3);
-  v_v << 1, 3, -5;
-  r_v << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(v_v, r_v);
-  EXPECT_FLOAT_EQ (3, v.val());
-}
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvd_1, vd_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvv_1, vd_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvd_1, vv_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvv_1, vv_2).val());
 
-TEST(agrad_matrix,determinant_vv_rd) {
-  vector_v v_v(3);
-  row_vector_d r_d(3);
-  v_v << 1, 3, -5;
-  r_d << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(v_v, r_d);
-  EXPECT_FLOAT_EQ (3, v.val());
+  row_vector_d rvd_mis(2);
+  row_vector_v rvv_mis(4);
+  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, vd_2),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, vd_2),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, vv_2),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, vv_2),   "[[:print:]]*dot_product");
 }
+TEST(agrad_matrix, dot_product_vector_rowvector) {
+  vector_d vd_1(3);
+  vector_v vv_1(3);
+  row_vector_d rvd_2(3);
+  row_vector_v rvv_2(3);
+  
+  vd_1 << 1, 3, -5;
+  vv_1 << 1, 3, -5;
+  rvd_2 << 4, -2, -1;
+  rvv_2 << 4, -2, -1;
 
-TEST(agrad_matrix,dot_product_vd_rv) {
-  vector_d v_d(3);
-  row_vector_v r_v(3);
-  v_d << 1, 3, -5;
-  r_v << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(v_d, r_v);
-  EXPECT_FLOAT_EQ (3, v.val());
-}
-TEST(agrad_matrix,determinant_rv_vv) {
-  row_vector_v r_v(3);
-  vector_v v_v(3);
-  r_v << 1, 3, -5;
-  v_v << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(r_v, v_v);
-  EXPECT_FLOAT_EQ (3, v.val());
-}
-TEST(agrad_matrix,determinant_rv_vd) {
-  row_vector_v r_v(3);
-  vector_d v_d(3);
-  r_v << 1, 3, -5;
-  v_d << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(r_v, v_d);
-  EXPECT_FLOAT_EQ (3, v.val());
-}
-TEST(agrad_matrix,determinant_rd_vv) {
-  row_vector_d r_d(3);
-  vector_v v_v(3);
-  r_d << 1, 3, -5;
-  v_v << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(r_d, v_v);
-  EXPECT_FLOAT_EQ (3, v.val());
-}
-TEST(agrad_matrix,determinant_rv_rv) {
-  row_vector_v r_v1(3);
-  row_vector_v r_v2(3);
-  r_v1 << 1, 3, -5;
-  r_v2 << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(r_v1, r_v2);
-  EXPECT_FLOAT_EQ (3, v.val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(vd_1, rvd_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(vv_1, rvd_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(vd_1, rvv_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(vv_1, rvv_2).val());
 
+  row_vector_d rvd_mis(2);
+  row_vector_v rvv_mis(4);
+  EXPECT_DEATH (stan::agrad::dot_product(vd_1, rvd_mis),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(vd_1, rvv_mis),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(vv_1, rvd_mis),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(vv_1, rvv_mis),   "[[:print:]]*dot_product");
 }
-TEST(agrad_matrix,determinant_rv_rd) {
-  row_vector_v r_v(3);
-  row_vector_d r_d(3);
-  r_v << 1, 3, -5;
-  r_d << 4, -2, -1;
+TEST(agrad_matrix, dot_product_rowvector_rowvector) {
+  row_vector_d rvd_1(3), rvd_2(3);
+  row_vector_v rvv_1(3), rvv_2(3);
   
-  var v = stan::agrad::dot_product(r_v, r_d);
-  EXPECT_FLOAT_EQ (3, v.val());
-}
-TEST(agrad_matrix,determinant_rd_rv) {
-  row_vector_d r_d(3);
-  row_vector_v r_v(3);
-  r_d << 1, 3, -5;
-  r_v << 4, -2, -1;
-  
-  var v = stan::agrad::dot_product(r_d, r_v);
-  EXPECT_FLOAT_EQ (3, v.val());
+  rvd_1 << 1, 3, -5;
+  rvv_1 << 1, 3, -5;
+  rvd_2 << 4, -2, -1;
+  rvv_2 << 4, -2, -1;
+
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvd_1, rvd_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvv_1, rvd_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvd_1, rvv_2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::dot_product(rvv_1, rvv_2).val());
+
+  vector_d rvd_mis(2);
+  vector_v rvv_mis(4);
+  EXPECT_DEATH (stan::agrad::dot_product(rvd_1,   rvd_mis), "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, rvd_2),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvv_1,   rvd_mis), "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, rvd_2),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvd_1,   rvv_mis), "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, rvv_2),   "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvv_1,   rvv_mis), "[[:print:]]*dot_product");
+  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, rvv_2),   "[[:print:]]*dot_product");
 }
 // end dot_product tests
 
