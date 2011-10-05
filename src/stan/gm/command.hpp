@@ -45,25 +45,24 @@ namespace stan {
 	cmd_line.val("num_steps",num_steps);
       
 	stan::mcmc::hmc sampler(model,step_size,num_steps);
-	stan::mcmc::sample sample;
 
 	std::vector<double> params_r;
 	std::vector<int> params_i;
 	for (unsigned int m = 0; m < num_samples; ++m) {
-	  sampler.next(sample);
+	stan::mcmc::sample sample = sampler.next();
 	  if (m < num_burnin)
 	    return; // still burning in
 	  if (m || (m - burn_in) % thin != 0)
 	    return;
-	  stan::mcmc::sample sample = sampler.next(sample);
+
+	  sample = sampler.next(sample);
 	  sample.params_r(params_r);
 	  sample.params_i(params_i);
 	  model->write_csv(sample_file,params_r,params_i);
 	}
       }
 
-      virtual void write_csv(const std::vector<double>& params_r,
-			     const std::vector<int>& params_i,
+      virtual void write_csv(const stan::mcmc::sample& sample
 			     std::ostream& out) = 0;
 
       // in generated code
