@@ -626,3 +626,208 @@ TEST(agrad_matrix, minus_matrix) {
   EXPECT_FLOAT_EQ ( -2, output(1,2).val());
 }
 // end minus tests
+
+// divide tests
+TEST(agrad_matrix, divide_scalar) {
+  double d1, d2;
+  var    v1, v2;
+
+  d1 = 10;
+  v1 = 10;
+  d2 = -2;
+  v2 = -2;
+  
+  EXPECT_FLOAT_EQ (-5, stan::agrad::divide(d1, d2).val());
+  EXPECT_FLOAT_EQ (-5, stan::agrad::divide(d1, v2).val());
+  EXPECT_FLOAT_EQ (-5, stan::agrad::divide(v1, d2).val());
+  EXPECT_FLOAT_EQ (-5, stan::agrad::divide(v1, v2).val());
+
+  d2 = 0;
+  v2 = 0;
+
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), stan::agrad::divide(d1, d2).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), stan::agrad::divide(d1, v2).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), stan::agrad::divide(v1, d2).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), stan::agrad::divide(v1, v2).val());
+
+  d1 = 0;
+  v1 = 0;
+  EXPECT_TRUE (std::isnan(stan::agrad::divide(d1, d2).val()));
+  EXPECT_TRUE (std::isnan(stan::agrad::divide(d1, v2).val()));
+  EXPECT_TRUE (std::isnan(stan::agrad::divide(v1, d2).val()));
+  EXPECT_TRUE (std::isnan(stan::agrad::divide(v1, v2).val()));
+}
+TEST(agrad_matrix, divide_vector) {
+  vector_d d1(3);
+  vector_v v1(3);
+  double d2;
+  var v2;
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  d2 = -2;
+  v2 = -2;
+  
+  vector_v output;
+  output = stan::agrad::divide(d1, d2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+  output = stan::agrad::divide(d1, v2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+  output = stan::agrad::divide(v1, d2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+  output = stan::agrad::divide(v1, v2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+
+  d2 = 0;
+  v2 = 0;
+  output = stan::agrad::divide(d1, d2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = stan::agrad::divide(d1, v2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = stan::agrad::divide(v1, d2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = stan::agrad::divide(v1, v2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+}
+TEST(agrad_matrix, divide_row_vector) {
+  row_vector_d d1(3);
+  row_vector_v v1(3);
+  double d2;
+  var v2;
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  d2 = -2;
+  v2 = -2;
+  
+  row_vector_v output;
+  output = stan::agrad::divide(d1, d2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+  output = stan::agrad::divide(d1, v2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+  output = stan::agrad::divide(v1, d2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+  output = stan::agrad::divide(v1, v2);
+  EXPECT_FLOAT_EQ (-50, output(0).val());
+  EXPECT_FLOAT_EQ (  0, output(1).val());
+  EXPECT_FLOAT_EQ (1.5, output(2).val());
+
+
+  d2 = 0;
+  v2 = 0;
+  output = stan::agrad::divide(d1, d2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = stan::agrad::divide(d1, v2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = stan::agrad::divide(v1, d2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = stan::agrad::divide(v1, v2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE (std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(2).val());
+}
+TEST(agrad_matrix, divide_matrix) {
+  matrix_d d1(2,2);
+  matrix_v v1(2,2);
+  double d2;
+  var v2;
+  
+  d1 << 100, 0, -3, 4;
+  v1 << 100, 0, -3, 4;
+  d2 = -2;
+  v2 = -2;
+  
+  matrix_v output;
+  output = stan::agrad::divide(d1, d2);
+  EXPECT_FLOAT_EQ (-50, output(0,0).val());
+  EXPECT_FLOAT_EQ (  0, output(0,1).val());
+  EXPECT_FLOAT_EQ (1.5, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(1,1).val());
+
+  output = stan::agrad::divide(d1, v2);
+  EXPECT_FLOAT_EQ (-50, output(0,0).val());
+  EXPECT_FLOAT_EQ (  0, output(0,1).val());
+  EXPECT_FLOAT_EQ (1.5, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(1,1).val());
+  
+  output = stan::agrad::divide(v1, d2);
+  EXPECT_FLOAT_EQ (-50, output(0,0).val());
+  EXPECT_FLOAT_EQ (  0, output(0,1).val());
+  EXPECT_FLOAT_EQ (1.5, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(1,1).val());
+  
+  output = stan::agrad::divide(v1, v2);
+  EXPECT_FLOAT_EQ (-50, output(0,0).val());
+  EXPECT_FLOAT_EQ (  0, output(0,1).val());
+  EXPECT_FLOAT_EQ (1.5, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(1,1).val());
+
+  d2 = 0;
+  v2 = 0;
+  output = stan::agrad::divide(d1, d2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0,0).val());
+  EXPECT_TRUE (std::isnan(output(0,1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(1,0).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(1,1).val());
+
+  output = stan::agrad::divide(d1, v2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0,0).val());
+  EXPECT_TRUE (std::isnan(output(0,1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(1,0).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(1,1).val());
+
+  output = stan::agrad::divide(v1, d2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0,0).val());
+  EXPECT_TRUE (std::isnan(output(0,1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(1,0).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(1,1).val());
+
+  output = stan::agrad::divide(v1, v2);
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(0,0).val());
+  EXPECT_TRUE (std::isnan(output(0,1).val()));
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), output(1,0).val());
+  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), output(1,1).val());
+}
+
+// end divide tests

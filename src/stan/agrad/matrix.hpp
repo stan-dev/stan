@@ -777,15 +777,17 @@ namespace stan {
     }
 
     /**
-     * Return the division of the specified column vector by
-     * the specified scalar.
+     * Return the division of the first scalar by
+     * the second scalar.
      * @param v Specified vector.
      * @param c Specified scalar.
      * @return Vector divided by the scalar.
      */
-    inline vector_v divide(const vector_v& v, var c) {
-      return v / c;
+    template<typename T1, typename T2>
+    inline var divide(const T1& v, const T2& c) {
+      return to_var(v) / to_var(c);
     }
+
     /**
      * Return the division of the specified column vector by
      * the specified scalar.
@@ -793,18 +795,9 @@ namespace stan {
      * @param c Specified scalar.
      * @return Vector divided by the scalar.
      */
-    inline vector_v divide(const vector_v& v, double c) {
-      return v / to_var(c);
-    }
-    /**
-     * Return the division of the specified column vector by
-     * the specified scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
-     * @return Vector divided by the scalar.
-     */
-    inline vector_v divide(const vector_d& v, var c) {
-      return to_var(v) / c;
+    template<typename T1, typename T2>
+    inline vector_v divide(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const T2& c) {
+      return to_var(v) / to_var(c);
     }
 
     /**
@@ -814,39 +807,9 @@ namespace stan {
      * @param c Specified scalar.
      * @return Vector divided by the scalar.
      */
-    inline row_vector_v divide(const row_vector_v& rv, var c) {
-      return rv / c;
-    }
-    /**
-     * Return the division of the specified row vector by
-     * the specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Vector divided by the scalar.
-     */
-    inline row_vector_v divide(const row_vector_v& rv, double c) {
-      return rv / to_var(c);
-    }
-    /**
-     * Return the division of the specified row vector by
-     * the specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Vector divided by the scalar.
-     */
-    inline row_vector_v divide(const row_vector_d& rv, var c) {
-      return to_var(rv) / c;
-    }
-
-    /**
-     * Return the division of the specified matrix by the specified
-     * scalar.
-     * @param m Specified matrix.
-     * @param c Specified scalar.
-     * @return Matrix divided by the scalar.
-     */
-    inline matrix_v divide(const matrix_v& m, var c) {
-      return m / c;
+    template<typename T1, typename T2>
+    inline row_vector_v divide(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const T2& c) {
+      return to_var(rv) / to_var(c);
     }
     /**
      * Return the division of the specified matrix by the specified
@@ -855,18 +818,9 @@ namespace stan {
      * @param c Specified scalar.
      * @return Matrix divided by the scalar.
      */
-    inline matrix_v divide(const matrix_v& m, double c) {
-      return m / to_var(c);
-    }
-    /**
-     * Return the division of the specified matrix by the specified
-     * scalar.
-     * @param m Specified matrix.
-     * @param c Specified scalar.
-     * @return Matrix divided by the scalar.
-     */
-    inline matrix_v divide(const matrix_d& m, var c) {
-      return to_var(m) / c;
+    template<typename T1, typename T2>
+    inline matrix_v divide(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, const T2& c) {
+      return to_var(m) / to_var(c);
     }
     
     /**
