@@ -346,7 +346,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic cosine of the variable.
      */
-    inline var acosh(const stan::agrad::var a) {
+    inline var acosh(const stan::agrad::var& a) {
       return var(new acosh_vari(a.vi_));
     }
 
@@ -362,7 +362,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic sine of the variable.
      */
-    inline var asinh(const stan::agrad::var a) {
+    inline var asinh(const stan::agrad::var& a) {
       return var(new asinh_vari(a.vi_));
     }
 
@@ -378,7 +378,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic tangent of the variable.
      */
-    inline var atanh(const stan::agrad::var a) {
+    inline var atanh(const stan::agrad::var& a) {
       return var(new atanh_vari(a.vi_));
     }
 
@@ -394,7 +394,7 @@ namespace stan {
      * @param a The variable.
      * @return Error function applied to the variable.
      */
-    inline var erf(const stan::agrad::var a) {
+    inline var erf(const stan::agrad::var& a) {
       return var(new erf_vari(a.vi_));
     }
 
@@ -410,7 +410,7 @@ namespace stan {
      * @param a The variable.
      * @return Complementary error function applied to the variable.
      */
-    inline var erfc(const stan::agrad::var a) {
+    inline var erfc(const stan::agrad::var& a) {
       return var(new erfc_vari(a.vi_));
     }
 
@@ -426,7 +426,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::agrad::var a) {
+    inline var exp2(const stan::agrad::var& a) {
       return var(new exp2_vari(a.vi_));
     }
 
@@ -442,7 +442,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var expm1(const stan::agrad::var a) {
+    inline var expm1(const stan::agrad::var& a) {
       return var(new expm1_vari(a.vi_));
     }
 
@@ -456,7 +456,7 @@ namespace stan {
      * @param a The variable.
      * @return Log gamma of the variable.
      */
-    inline var lgamma(const stan::agrad::var a) {
+    inline var lgamma(const stan::agrad::var& a) {
       return var(new lgamma_vari(a.vi_));
     }
 
@@ -470,7 +470,7 @@ namespace stan {
      * @param a The variable.
      * @return The log of 1 plus the variable.
      */
-    inline var log1p(const stan::agrad::var a) {
+    inline var log1p(const stan::agrad::var& a) {
       return var(new log1p_vari(a.vi_));
     }
 
@@ -484,7 +484,7 @@ namespace stan {
      * @param a The variable.
      * @return The variable representing log of 1 minus the variable.
      */
-    inline var log1m(const stan::agrad::var a) {
+    inline var log1m(const stan::agrad::var& a) {
       return var(new log1m_vari(a.vi_));
     }
 
@@ -508,9 +508,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var a,
-		   const stan::agrad::var b,
-		   const stan::agrad::var c) {
+    inline var fma(const stan::agrad::var& a,
+		   const stan::agrad::var& b,
+		   const stan::agrad::var& c) {
       return var(new fma_vvv_vari(a.vi_,b.vi_,c.vi_));
     }
 
@@ -532,9 +532,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var a,
-		   const stan::agrad::var b,
-		   const double c) {
+    inline var fma(const stan::agrad::var& a,
+		   const stan::agrad::var& b,
+		   const double& c) {
       return var(new fma_vvd_vari(a.vi_,b.vi_,c));
     }
 
@@ -556,9 +556,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var a,
-		   double b,
-		   const stan::agrad::var c) {
+    inline var fma(const stan::agrad::var& a,
+		   const double& b,
+		   const stan::agrad::var& c) {
       return var(new fma_vdv_vari(a.vi_,b,c.vi_));
     }
 
@@ -578,9 +578,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var a,
-		   double b, 
-		   double c) {
+    inline var fma(const stan::agrad::var& a,
+		   const double& b, 
+		   const double& c) {
       return var(new fma_vdd_vari(a.vi_,b,c));
     }
 
@@ -600,9 +600,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const double a,
-		   const stan::agrad::var b,
-		   const double c) {
+    inline var fma(const double& a,
+		   const stan::agrad::var& b,
+		   const double& c) {
       return var(new fma_vdd_vari(b.vi_,a,c));
     }
 
@@ -622,9 +622,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const double a,
-		   const double b,
-		   const stan::agrad::var c) {
+    inline var fma(const double& a,
+		   const double& b,
+		   const stan::agrad::var& c) {
       return var(new fma_ddv_vari(a,b,c.vi_));
     }
 
@@ -646,9 +646,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const double a,
-		   const stan::agrad::var b,
-		   const stan::agrad::var c) {
+    inline var fma(const double& a,
+		   const stan::agrad::var& b,
+		   const stan::agrad::var& c) {
       return var(new fma_vdv_vari(b.vi_,a,c.vi_)); // a-b symmetry
     }
 
@@ -669,8 +669,8 @@ namespace stan {
      * @return If the first variable's value is larger than the
      * second's, the first variable, otherwise the second variable.
      */
-    inline var fmax(const stan::agrad::var a,
-		    const stan::agrad::var b) {
+    inline var fmax(const stan::agrad::var& a,
+		    const stan::agrad::var& b) {
       return a.vi_->val_ > b.vi_->val_ ? a : b;
     }
 
@@ -690,8 +690,8 @@ namespace stan {
      * to the second value, the first variable, otherwise the second
      * value promoted to a fresh variable.
      */
-    inline var fmax(const stan::agrad::var a,
-		    double b) {
+    inline var fmax(const stan::agrad::var& a,
+		    const double& b) {
       return a.vi_->val_ >= b ? a : var(b);
     }
 
@@ -711,8 +711,8 @@ namespace stan {
      * return the first value promoted to a variable, otherwise return the 
      * second variable.
      */
-    inline var fmax(double a,
-		    const stan::agrad::var b) {
+    inline var fmax(const double& a,
+		    const stan::agrad::var& b) {
       return a > b.vi_->val_ ? var(a) : b;
     }
 
@@ -729,8 +729,8 @@ namespace stan {
      * @return If the first variable's value is smaller than the
      * second's, the first variable, otherwise the second variable.
      */
-    inline var fmin(const stan::agrad::var a,
-		    const stan::agrad::var b) {
+    inline var fmin(const stan::agrad::var& a,
+		    const stan::agrad::var& b) {
       return a.vi_->val_ < b.vi_->val_ ? a : b;
     }
 
@@ -748,8 +748,8 @@ namespace stan {
      * @return If the first variable's value is less than or equal to the second value,
      * the first variable, otherwise the second value promoted to a fresh variable.
      */
-    inline var fmin(const stan::agrad::var a,
-		    double b) {
+    inline var fmin(const stan::agrad::var& a,
+		    const double& b) {
       return a.vi_->val_ <= b ? a : var(b);
     }
 
@@ -769,8 +769,8 @@ namespace stan {
      * return the first value promoted to a variable, otherwise return the 
      * second variable.
      */
-    inline var fmin(double a,
-		    const stan::agrad::var b) {
+    inline var fmin(const double& a,
+		    const stan::agrad::var& b) {
       return a < b.vi_->val_ ? var(a) : b;
     }
 
@@ -790,8 +790,8 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::agrad::var a,
-		     const stan::agrad::var b) {
+    inline var hypot(const stan::agrad::var& a,
+		     const stan::agrad::var& b) {
       return var(new hypot_vv_vari(a.vi_,b.vi_));
     }
 
@@ -809,8 +809,8 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::agrad::var a,
-		     double b) {
+    inline var hypot(const stan::agrad::var& a,
+		     const double& b) {
       return var(new hypot_vd_vari(a.vi_,b));
     }
 
@@ -828,8 +828,8 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(double a,
-		     const stan::agrad::var b) {
+    inline var hypot(const double& a,
+		     const stan::agrad::var& b) {
       return var(new hypot_vd_vari(b.vi_,a));
     }
 
@@ -845,7 +845,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Base 2 logarithm of the variable.
      */
-    inline var log2(const stan::agrad::var a) {
+    inline var log2(const stan::agrad::var& a) {
       return var(new log2_vari(a.vi_));
     }
 
@@ -861,7 +861,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Cube root of the variable.
      */
-    inline var cbrt(const stan::agrad::var a) {
+    inline var cbrt(const stan::agrad::var& a) {
       return var(new cbrt_vari(a.vi_));
     }
 
@@ -879,7 +879,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Rounded variable.
      */
-    inline var round(const stan::agrad::var a) {
+    inline var round(const stan::agrad::var& a) {
       return var(new round_vari(a.vi_));
     }
 
@@ -896,7 +896,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Truncation of the variable.
      */
-    inline var trunc(const stan::agrad::var a) {
+    inline var trunc(const stan::agrad::var& a) {
       return var(new trunc_vari(a.vi_));
     }
 
@@ -923,8 +923,8 @@ namespace stan {
      * @return The positive difference between the first and second
      * variable.
      */
-     inline var fdim(const stan::agrad::var a,
-		     const stan::agrad::var b) {
+     inline var fdim(const stan::agrad::var& a,
+		     const stan::agrad::var& b) {
        return a.vi_->val_ > b.vi_->val_
 	 ? var(new fdim_vv_vari(a.vi_,b.vi_))
 	 : var(new vari(0.0));
@@ -947,8 +947,8 @@ namespace stan {
      * @return The positive difference between the first and second
      * arguments.
      */
-    inline var fdim(double a,
-		    const stan::agrad::var b) {
+    inline var fdim(const double& a,
+		    const stan::agrad::var& b) {
       return a > b.vi_->val_
 	? var(new fdim_dv_vari(a,b.vi_))
 	: var(new vari(0.0));
@@ -970,8 +970,8 @@ namespace stan {
      * @param b Second variable.
      * @return The positive difference between the first and second arguments.
      */
-    inline var fdim(const stan::agrad::var a,
-		    double b) {
+    inline var fdim(const stan::agrad::var& a,
+		    const double& b) {
       return a.vi_->val_ > b
 	? var(new fdim_vd_vari(a.vi_,b))
 	: var(new vari(0.0));
@@ -994,7 +994,7 @@ namespace stan {
      * @param a Argument to function.
      * @return The Gamma function applied to the specified argument.
      */
-    inline var tgamma(const stan::agrad::var a) {
+    inline var tgamma(const stan::agrad::var& a) {
       return var(new tgamma_vari(a.vi_));
     }
 
@@ -1014,7 +1014,7 @@ namespace stan {
      * @return The constant variable with value 1.0 if the argument's
      * value is greater than or equal to 0.0, and value 0.0 otherwise.
      */
-    inline var step(const stan::agrad::var a) {
+    inline var step(const stan::agrad::var& a) {
       return var(new vari(a.vi_->val_ < 0.0 ? 0.0 : 1.0));
     }
 
@@ -1032,7 +1032,7 @@ namespace stan {
      * @return The inverse complementary log-log of the specified
      * argument.
      */
-    inline var inv_cloglog(const stan::agrad::var a) {
+    inline var inv_cloglog(const stan::agrad::var& a) {
       return var(new inv_cloglog_vari(a.vi_));
     }
 
@@ -1048,7 +1048,7 @@ namespace stan {
      * @param a Variable argument.
      * @return The unit normal cdf evaluated at the specified argument.
      */
-    inline var Phi(const stan::agrad::var a) {
+    inline var Phi(const stan::agrad::var& a) {
       return var(new Phi_vari(a.vi_));
     }
 
@@ -1064,7 +1064,7 @@ namespace stan {
      * @param a Argument variable.
      * @return Inverse logit of argument.
      */
-    inline var inv_logit(const stan::agrad::var a) {
+    inline var inv_logit(const stan::agrad::var& a) {
       return var(new inv_logit_vari(a.vi_));
     }
 
@@ -1083,8 +1083,8 @@ namespace stan {
      * @param y_hat Response variable.
      * @return Log loss of response versus reference value.
      */
-    inline var log_loss(const int y, 
-			const stan::agrad::var y_hat) {
+    inline var log_loss(const int& y, 
+			const stan::agrad::var& y_hat) {
       return y == 0  
 	? var(new binary_log_loss_0_vari(y_hat.vi_))
 	: var(new binary_log_loss_1_vari(y_hat.vi_));
