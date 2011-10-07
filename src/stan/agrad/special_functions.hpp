@@ -330,7 +330,76 @@ namespace stan {
 	  avi_->adj_ += adj_ * INV_SQRT_TWO_PI * std::exp(NEG_HALF * avi_->val_ * avi_->val_);
 	}
       };
-
+      
+      /**
+       * Helper class for calculating the log sum of exponentials.
+       */
+      class log_sum_exp_ {
+      public:
+	/**
+	 * Calculates the log sum of exponetials while avoiding underflow.
+	 * See: http://lingpipe-blog.com/2009/06/25/log-sum-of-exponentials/
+	 *
+	 * log (exp(a) + exp(b))
+	 * 
+	 * @param a the first variable
+	 * @param b the second variable
+	 */
+	static double calculate_log_sum_exp (const double& a, const double& b) {
+	  // calculates the log sum of exponentials while avoiding underflow
+	  // 
+	  double max = a > b ? a : b;
+	  return max + std::log(std::exp(a-max) + std::exp(b-max));
+	}
+	
+	/**
+	 * Calculates the partial derivative of the log sum of exponentials
+	 * while avoiding underflow.
+	 *
+	 * [ log (exp(a) + exp(b)) ] d/da
+	 *    = exp (log(exp(a)) - log ((exp(a) + exp(b))))
+	 *    = exp (a - val_)
+	 * where val_ is the value of this variable.
+	 *
+	 * @param x the variable
+	 * @param val_ the value of the log sum of exponentials
+	 */
+	inline static double calculate_chain (const double& x, const double& val_) {
+	  return std::exp(x - val_);
+	}
+      };
+      
+      class log_sum_exp_vv_vari : public op_vv_vari, log_sum_exp_ {
+      public:
+	log_sum_exp_vv_vari(vari* avi, vari* bvi) :
+	  op_vv_vari(calculate_log_sum_exp(avi->val_, bvi->val_),
+		     avi, bvi) {
+	}
+	void chain() {
+	  avi_->adj_ += adj_ * calculate_chain (avi_->val_, val_);
+	  bvi_->adj_ += adj_ * calculate_chain (bvi_->val_, val_);
+	}
+      };
+      class log_sum_exp_vd_vari : public op_vd_vari, log_sum_exp_ {
+      public:
+	log_sum_exp_vd_vari(vari* avi, double b) :
+	  op_vd_vari(calculate_log_sum_exp(avi->val_, b),
+		     avi, b) {
+	}
+	void chain() {
+	  avi_->adj_ += adj_ * calculate_chain (avi_->val_, val_);
+	}
+      };
+      class log_sum_exp_dv_vari : public op_dv_vari, log_sum_exp_ {
+      public:
+	log_sum_exp_dv_vari(double a, vari* bvi) :
+	  op_dv_vari(calculate_log_sum_exp(a, bvi->val_),
+		     a, bvi) {
+	}
+	void chain() {
+	  bvi_->adj_ += adj_ * calculate_chain (bvi_->val_, val_);
+	}
+      };
 
     }
 
@@ -1089,7 +1158,28 @@ namespace stan {
 	? var(new binary_log_loss_0_vari(y_hat.vi_))
 	: var(new binary_log_loss_1_vari(y_hat.vi_));
     }
-
+    
+    /**
+     * Returns the log sum of exponentials.
+     */
+    inline var log_sum_exp(const stan::agrad::var& a,
+			   const stan::agrad::var& b) {
+      return var(new log_sum_exp_vv_vari(a.vi_, b.vi_));
+    }
+    /**
+     * Returns the log sum of exponentials.
+     */
+    inline var log_sum_exp(const stan::agrad::var& a,
+			   const double& b) {
+      return var(new log_sum_exp_vd_vari(a.vi_, b));
+    }
+    /**
+     * Returns the log sum of exponentials.
+     */
+    inline var log_sum_exp(const double& a,
+			   const stan::agrad::var& b) {
+      return var(new log_sum_exp_dv_vari(a, b.vi_));
+    }
   }
 }
 
