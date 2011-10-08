@@ -1132,3 +1132,63 @@ TEST (agrad_matrix, sd_m) {
   EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
 }
 // end sd tests
+
+// sum tests
+TEST (agrad_matrix, sum_v) {
+  vector_d d1(6);
+  vector_v v1(6);
+  
+  d1 << 1, 2, 3, 4, 5, 6;
+  v1 << 1, 2, 3, 4, 5, 6;
+  
+  var output;
+  output = stan::agrad::sum(d1);
+  EXPECT_FLOAT_EQ (21.0, output.val());
+		   
+  output = stan::agrad::sum(v1);
+  EXPECT_FLOAT_EQ (21.0, output.val());
+
+  d1.resize(0);
+  v1.resize(0);
+  EXPECT_FLOAT_EQ (0.0, stan::agrad::sum(d1).val());
+  EXPECT_FLOAT_EQ (0.0, stan::agrad::sum(v1).val());
+}
+TEST (agrad_matrix, sum_rv) {
+  row_vector_d d1(6);
+  row_vector_v v1(6);
+  
+  d1 << 1, 2, 3, 4, 5, 6;
+  v1 << 1, 2, 3, 4, 5, 6;
+  
+  var output;
+  output = stan::agrad::sum(d1);
+  EXPECT_FLOAT_EQ (21.0, output.val());
+		   
+  output = stan::agrad::sum(v1);
+  EXPECT_FLOAT_EQ (21.0, output.val());
+
+  d1.resize(0);
+  v1.resize(0);
+  EXPECT_FLOAT_EQ (0.0, stan::agrad::sum(d1).val());
+  EXPECT_FLOAT_EQ (0.0, stan::agrad::sum(v1).val());
+}
+TEST (agrad_matrix, sum_m) {
+  matrix_d d1(2, 3);
+  matrix_v v1(2, 3);
+  
+  d1 << 1, 2, 3, 4, 5, 6;
+  v1 << 1, 2, 3, 4, 5, 6;
+  
+  var output;
+  output = stan::agrad::sum(d1);
+  EXPECT_FLOAT_EQ (21.0, output.val());
+		   
+  output = stan::agrad::sum(v1);
+  EXPECT_FLOAT_EQ (21.0, output.val());
+
+  d1.resize(0, 0);
+  v1.resize(0, 0);
+  EXPECT_FLOAT_EQ (0.0, stan::agrad::sum(d1).val());
+  EXPECT_FLOAT_EQ (0.0, stan::agrad::sum(v1).val());
+}
+// end sum tests

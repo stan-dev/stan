@@ -588,7 +588,7 @@ namespace stan {
     template<typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       assert (v.size() > 1);
-      return sqrt(variance(v));
+      return to_var(sqrt(variance(v)));
     }
     /**
      * Returns the unbiased sample standard deviation of the
@@ -599,7 +599,7 @@ namespace stan {
     template<typename T>
     inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
       assert (rv.size() > 1);
-      return sqrt(variance(rv));
+      return to_var(sqrt(variance(rv)));
     }
     /**
      * Returns the unbiased sample standard deviation of the
@@ -610,7 +610,7 @@ namespace stan {
     template<typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       assert (m.size() > 1);
-      return sqrt(variance(m));
+      return to_var(sqrt(variance(m)));
     }
 
     /**
@@ -619,8 +619,9 @@ namespace stan {
      * @param v Specified vector.
      * @return Sum of coefficients of vector.
      */
-    inline var sum(const vector_v& v) {
-      return v.sum();
+    template<typename T>
+    inline var sum(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      return to_var(v.sum());
     }
     /**
      * Returns the sum of the coefficients of the specified
@@ -628,8 +629,9 @@ namespace stan {
      * @param rv Specified vector.
      * @return Sum of coefficients of vector.
      */
-    inline var sum(const row_vector_v& rv) {
-      return rv.sum();
+    template<typename T>
+    inline var sum(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      return to_var(rv.sum());
     }
     /**
      * Returns the sum of the coefficients of the specified
@@ -637,8 +639,9 @@ namespace stan {
      * @param m Specified matrix.
      * @return Sum of coefficients of matrix.
      */
-    inline var sum(const matrix_v& m) {
-      return m.sum();
+    template<typename T>
+    inline var sum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      return to_var(m.sum());
     }
 
     /**
