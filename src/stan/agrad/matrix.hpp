@@ -856,14 +856,14 @@ namespace stan {
     }
     
     /**
-     * Return the product of the of the specified column
-     * vector and specified scalar.
-     * @param v Specified vector.
+     * Return the product of two scalars.
+     * @param v First scalar.
      * @param c Specified scalar.
      * @return Product of vector and scalar.
      */
-    inline vector_v multiply(const vector_v& v, var c) {
-      return v * c;
+    template<typename T1, typename T2>
+    inline var multiply(const T1& v, const T2& c) {
+      return to_var(v) * to_var(c);
     }
     /**
      * Return the product of the of the specified column
@@ -872,18 +872,9 @@ namespace stan {
      * @param c Specified scalar.
      * @return Product of vector and scalar.
      */
-    inline vector_v multiply(const vector_v& v, double c) {
-      return v * to_var(c);
-    }
-    /**
-     * Return the product of the of the specified column
-     * vector and specified scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    inline vector_v multiply(const vector_d& v, var c) {
-      return to_var(v) * c;
+    template<typename T1, typename T2>
+    inline vector_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const T2& c) {
+      return to_var(v) * to_var(c);
     }
 
     /**
@@ -893,28 +884,9 @@ namespace stan {
      * @param c Specified scalar.
      * @return Product of vector and scalar.
      */
-    inline row_vector_v multiply(const row_vector_v& rv, var c) {
-      return rv * c;
-    }
-    /**
-     * Return the product of the of the specified row
-     * vector and specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    inline row_vector_v multiply(const row_vector_v& rv, double c) {
-      return rv * to_var(c);
-    }
-    /**
-     * Return the product of the of the specified row
-     * vector and specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    inline row_vector_v multiply(const row_vector_d& rv, var c) {
-      return to_var(rv) * c;
+    template<typename T1, typename T2>
+    inline row_vector_v multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const T2& c) {
+      return to_var(rv) * to_var(c);
     }
 
     /**
@@ -924,28 +896,9 @@ namespace stan {
      * @param c Scalar.
      * @return Product of matrix and scalar.
      */
-    inline matrix_v multiply(const matrix_v& m, var c) {
-      return m * c;
-    }
-    /**
-     * Return the product of the of the specified matrix
-     * and specified scalar.
-     * @param m Matrix.
-     * @param c Scalar.
-     * @return Product of matrix and scalar.
-     */
-    inline matrix_v multiply(const matrix_v& m, double c) {
-      return m * to_var(c);
-    }
-    /**
-     * Return the product of the of the specified matrix
-     * and specified scalar.
-     * @param m Matrix.
-     * @param c Scalar.
-     * @return Product of matrix and scalar.
-     */
-    inline matrix_v multiply(const matrix_d& m, var c) {
-      return to_var(m) * c;
+    template<typename T1, typename T2>
+    inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, const T2& c) {
+      return to_var(m) * to_var(c);
     }
 
     /**
