@@ -372,7 +372,7 @@ namespace stan {
     template <typename T>
     inline var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       assert (m.rows() == m.cols());
-      return to_var(m).determinant();
+      return to_var(m.determinant());
     }
 
     /**
@@ -429,7 +429,7 @@ namespace stan {
     template<typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       assert(v.size() > 0);
-      return to_var(v).minCoeff();
+      return to_var(v.minCoeff());
     }
     /**
      * Returns the minimum coefficient in the specified
@@ -440,7 +440,7 @@ namespace stan {
     template<typename T>
     inline var min(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
       assert(rv.size() > 0);
-      return to_var(rv).minCoeff();
+      return to_var(rv.minCoeff());
     }
     /**
      * Returns the minimum coefficient in the specified
@@ -451,7 +451,7 @@ namespace stan {
     template<typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       assert(m.size() > 0);
-      return to_var(m).minCoeff();
+      return to_var(m.minCoeff());
     }
 
     /**
@@ -462,7 +462,7 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      return to_var(v).maxCoeff();
+      return to_var(v.maxCoeff());
     }
     /**
      * Returns the maximum coefficient in the specified
@@ -472,7 +472,7 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      return to_var(rv).maxCoeff();
+      return to_var(rv.maxCoeff());
     }
     /**
      * Returns the maximum coefficient in the specified
@@ -482,7 +482,7 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      return to_var(m).maxCoeff();
+      return to_var(m.maxCoeff());
     }
 
     /**
