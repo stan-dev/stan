@@ -891,3 +891,64 @@ TEST (agrad_matrix, min_m) {
   EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
 }
 // end min tests
+
+
+// max tests
+TEST (agrad_matrix, max_v) {
+  vector_d d1(3);
+  vector_v v1(3);
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  
+  var output;
+  output = stan::agrad::max(d1);
+  EXPECT_FLOAT_EQ (100, output.val());
+		   
+  output = stan::agrad::max(v1);
+  EXPECT_FLOAT_EQ (100, output.val());
+
+  d1.resize(0);
+  v1.resize(0);
+  EXPECT_DEATH (stan::agrad::max(d1), "[[:print:]]*max");
+  EXPECT_DEATH (stan::agrad::max(v1), "[[:print:]]*max");
+}
+TEST (agrad_matrix, max_rv) {
+  row_vector_d d1(3);
+  row_vector_v v1(3);
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  
+  var output;
+  output = stan::agrad::max(d1);
+  EXPECT_FLOAT_EQ (100, output.val());
+		   
+  output = stan::agrad::max(v1);
+  EXPECT_FLOAT_EQ (100, output.val());
+
+  d1.resize(0);
+  v1.resize(0);
+  EXPECT_DEATH (stan::agrad::max(d1), "[[:print:]]*max");
+  EXPECT_DEATH (stan::agrad::max(v1), "[[:print:]]*max");
+}
+TEST (agrad_matrix, max_m) {
+  matrix_d d1(3,1);
+  matrix_v v1(1,3);
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  
+  var output;
+  output = stan::agrad::max(d1);
+  EXPECT_FLOAT_EQ (100, output.val());
+		   
+  output = stan::agrad::max(v1);
+  EXPECT_FLOAT_EQ (100, output.val());
+
+  d1.resize(0,0);
+  v1.resize(0,0);
+  EXPECT_DEATH (stan::agrad::max(d1), "[[:print:]]*max");
+  EXPECT_DEATH (stan::agrad::max(v1), "[[:print:]]*max");
+}
+// end max tests

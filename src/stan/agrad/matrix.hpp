@@ -460,8 +460,9 @@ namespace stan {
      * @param v Specified vector.
      * @return Maximum coefficient value in the vector.
      */
-    inline var max(const vector_v& v) {
-      return v.maxCoeff();
+    template<typename T>
+    inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      return to_var(v).maxCoeff();
     }
     /**
      * Returns the maximum coefficient in the specified
@@ -469,8 +470,9 @@ namespace stan {
      * @param rv Specified vector.
      * @return Maximum coefficient value in the vector.
      */
-    inline var max(const row_vector_v& rv) {
-      return rv.maxCoeff();
+    template<typename T>
+    inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      return to_var(rv).maxCoeff();
     }
     /**
      * Returns the maximum coefficient in the specified
@@ -478,8 +480,9 @@ namespace stan {
      * @param m Specified matrix.
      * @return Maximum coefficient value in the matrix.
      */
-    inline var max(const matrix_v& m) {
-      return m.maxCoeff();
+    template<typename T>
+    inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      return to_var(m).maxCoeff();
     }
 
     /**
