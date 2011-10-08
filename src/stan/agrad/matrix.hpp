@@ -426,8 +426,10 @@ namespace stan {
      * @param v Specified vector.
      * @return Minimum coefficient value in the vector.
      */
-    inline var min(const vector_v& v) {
-      return v.minCoeff();
+    template<typename T>
+    inline var min(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      assert(v.size() > 0);
+      return to_var(v).minCoeff();
     }
     /**
      * Returns the minimum coefficient in the specified
@@ -435,8 +437,10 @@ namespace stan {
      * @param rv Specified vector.
      * @return Minimum coefficient value in the vector.
      */
-    inline var min(const row_vector_v& rv) {
-      return rv.minCoeff();
+    template<typename T>
+    inline var min(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      assert(rv.size() > 0);
+      return to_var(rv).minCoeff();
     }
     /**
      * Returns the minimum coefficient in the specified
@@ -444,8 +448,10 @@ namespace stan {
      * @param m Specified matrix.
      * @return Minimum coefficient value in the matrix.
      */
-    inline var min(const matrix_v& m) {
-      return m.minCoeff();
+    template<typename T>
+    inline var min(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      assert(m.size() > 0);
+      return to_var(m).minCoeff();
     }
 
     /**

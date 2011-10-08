@@ -831,3 +831,63 @@ TEST(agrad_matrix, divide_matrix) {
 }
 
 // end divide tests
+
+// min tests
+TEST (agrad_matrix, min_v) {
+  vector_d d1(3);
+  vector_v v1(3);
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  
+  var output;
+  output = stan::agrad::min(d1);
+  EXPECT_FLOAT_EQ (-3, output.val());
+		   
+  output = stan::agrad::min(v1);
+  EXPECT_FLOAT_EQ (-3, output.val());
+
+  d1.resize(0);
+  v1.resize(0);
+  EXPECT_DEATH (stan::agrad::min(d1), "[[:print:]]*min");
+  EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
+}
+TEST (agrad_matrix, min_rv) {
+  row_vector_d d1(3);
+  row_vector_v v1(3);
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  
+  var output;
+  output = stan::agrad::min(d1);
+  EXPECT_FLOAT_EQ (-3, output.val());
+		   
+  output = stan::agrad::min(v1);
+  EXPECT_FLOAT_EQ (-3, output.val());
+
+  d1.resize(0);
+  v1.resize(0);
+  EXPECT_DEATH (stan::agrad::min(d1), "[[:print:]]*min");
+  EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
+}
+TEST (agrad_matrix, min_m) {
+  matrix_d d1(3,1);
+  matrix_v v1(1,3);
+  
+  d1 << 100, 0, -3;
+  v1 << 100, 0, -3;
+  
+  var output;
+  output = stan::agrad::min(d1);
+  EXPECT_FLOAT_EQ (-3, output.val());
+		   
+  output = stan::agrad::min(v1);
+  EXPECT_FLOAT_EQ (-3, output.val());
+
+  d1.resize(0,0);
+  v1.resize(0,0);
+  EXPECT_DEATH (stan::agrad::min(d1), "[[:print:]]*min");
+  EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
+}
+// end min tests
