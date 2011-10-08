@@ -528,17 +528,19 @@ namespace stan {
      * @param v Specified vector.
      * @return Sample variance of vector.
      */
-    inline var variance(const vector_v& v) {
+    template<typename T>
+    inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       assert (v.size() > 1);
-      var mean = v.mean();
-      var sum_sq_diff = 0;
+      T mean = v.mean();
+      T sum_sq_diff = 0;
       // FIXME: redefine in terms of vectorized ops
+      // FIXME: should we use Welford's algorithm for numeric stability?
       // (v.array() - mean).square().sum() / (v.size() - 1);
       for (int i = 0; i < v.size(); ++i) {
-	var diff = v[i] - mean;
+	T diff = v[i] - mean;
 	sum_sq_diff += diff * diff;
       }
-      return sum_sq_diff / (v.size() - 1);
+      return to_var(sum_sq_diff / (v.size() - 1));
     }
     /**
      * Returns the sample variance (divide by length - 1) of the
@@ -546,15 +548,16 @@ namespace stan {
      * @param rv Specified vector.
      * @return Sample variance of vector.
      */
-    inline var variance(const row_vector_v& rv) {
+    template<typename T>
+    inline var variance(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
       assert (rv.size() > 1);
-      var mean = rv.mean();
-      var sum_sq_diff = 0;
+      T mean = rv.mean();
+      T sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
-	var diff = rv[i] - mean;
+	T diff = rv[i] - mean;
 	sum_sq_diff += diff * diff;
       }
-      return sum_sq_diff / (rv.size() - 1);
+      return to_var(sum_sq_diff / (rv.size() - 1));
     }
     /**
      * Returns the sample variance (divide by length - 1) of the
@@ -562,16 +565,18 @@ namespace stan {
      * @param m Specified matrix.
      * @return Sample variance of matrix.
      */
-    inline var variance(const matrix_v& m) {
-      var mean = m.mean();
-      var sum_sq_diff = 0;
+    template<typename T>
+    inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      assert (m.size() > 1);
+      T mean = m.mean();
+      T sum_sq_diff = 0;
       for (int i = 0; i < m.rows(); ++i) {
 	for (int j = 0; j < m.cols(); ++j) { 
-	  var diff = m(i,j) - mean;
+	  T diff = m(i,j) - mean;
 	  sum_sq_diff += diff * diff;
 	}
       }
-      return sum_sq_diff / (m.size() - 1);
+      return to_var(sum_sq_diff / (m.size() - 1));
     }
 
     /**
