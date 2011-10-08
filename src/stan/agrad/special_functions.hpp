@@ -10,7 +10,7 @@ namespace stan {
   namespace agrad {
     
     namespace {
-
+      
       class lgamma_vari : public op_v_vari {
       public:
 	lgamma_vari(vari* avi) :
@@ -353,6 +353,27 @@ namespace stan {
 	}
 	
 	/**
+	 * Calculates the log sum of exponetials while avoiding underflow.
+	 * See: http://lingpipe-blog.com/2009/06/25/log-sum-of-exponentials/
+	 *
+	 * log (sum_i (x_i) )
+	 * 
+	 * @param x the vector of vars
+	 */
+	static double calculate_log_sum_exp (const std::vector<var>& x) {
+	  double max = 0.0;
+	  for (int ii = 0; ii < x.size(); ii++) 
+	    if (x[ii] > max) 
+	      max = x[ii].val();
+	    
+	  double sum = 0.0;
+	  for (int ii = 0; ii < x.size(); ii++) 
+	    if (x[ii] != -std::numeric_limits<double>::infinity()) 
+	      sum += std::exp (x[ii].val() - max);
+	  
+	  return max + std::log(sum);
+	}
+	/**
 	 * Calculates the partial derivative of the log sum of exponentials
 	 * while avoiding underflow.
 	 *
@@ -398,6 +419,24 @@ namespace stan {
 	}
 	void chain() {
 	  bvi_->adj_ += adj_ * calculate_chain (bvi_->val_, val_);
+	}
+      };
+      std::vector<vari*> to_vari (const std::vector<var>& x) {
+	std::vector<vari*> v(x.size());
+	for (int ii = 0; ii < x.size(); ii++) {
+	  v[ii] = x[ii].vi_;
+	}
+	return v;
+      }
+      class log_sum_exp_vector_vari : public op_vector_vari, log_sum_exp_ {
+      public:
+	log_sum_exp_vector_vari(std::vector<var> x) :
+	  op_vector_vari(calculate_log_sum_exp(x), to_vari(x)) {
+	}
+	void chain() {
+	  for (int ii = 0; ii < vi_.size(); ii++) {
+	    vi_[ii]->adj_ += adj_ * calculate_chain(vi_[ii]->val_, val_);
+	  }
 	}
       };
 
@@ -1179,6 +1218,12 @@ namespace stan {
     inline var log_sum_exp(const double& a,
 			   const stan::agrad::var& b) {
       return var(new log_sum_exp_dv_vari(a, b.vi_));
+    }
+    /**
+     * Returns the log sum of exponentials.
+     */
+    inline var log_sum_exp(const std::vector<var>& x) {
+      return var(new log_sum_exp_vector_vari(x));
     }
   }
 }

@@ -102,9 +102,6 @@ namespace stan {
 	for (; it >= begin; --it)
 	  (*it)->chain();
       }
-
-
-
     };
 
     /**
@@ -311,6 +308,16 @@ namespace stan {
 	  ad_(a),
 	  bd_(b),
 	  cvi_(cvi) {
+	}
+      };
+
+      class op_vector_vari : public vari {
+      protected:
+	std::vector<vari*> vi_;
+      public:
+	op_vector_vari(double f, std::vector<vari*> vi) :
+	  vari(f),
+	  vi_(vi) {
 	}
       };
 
