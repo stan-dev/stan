@@ -1072,3 +1072,63 @@ TEST (agrad_matrix, variance_m) {
   EXPECT_DEATH (stan::agrad::variance(v1), "[[:print:]]*variance");
 }
 // end variance tests
+
+// sd tests
+TEST (agrad_matrix, sd_v) {
+  vector_d d1(6);
+  vector_v v1(6);
+  
+  d1 << 1, 2, 3, 4, 5, 6;
+  v1 << 1, 2, 3, 4, 5, 6;
+  
+  var output;
+  output = stan::agrad::sd(d1);
+  EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
+		   
+  output = stan::agrad::sd(v1);
+  EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
+
+  d1.resize(1);
+  v1.resize(1);
+  EXPECT_DEATH (stan::agrad::sd(d1), "[[:print:]]*sd");
+  EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
+}
+TEST (agrad_matrix, sd_rv) {
+  row_vector_d d1(6);
+  row_vector_v v1(6);
+  
+  d1 << 1, 2, 3, 4, 5, 6;
+  v1 << 1, 2, 3, 4, 5, 6;
+  
+  var output;
+  output = stan::agrad::sd(d1);
+  EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
+		   
+  output = stan::agrad::sd(v1);
+  EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
+
+  d1.resize(1);
+  v1.resize(1);
+  EXPECT_DEATH (stan::agrad::sd(d1), "[[:print:]]*sd");
+  EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
+}
+TEST (agrad_matrix, sd_m) {
+  matrix_d d1(2, 3);
+  matrix_v v1(2, 3);
+  
+  d1 << 1, 2, 3, 4, 5, 6;
+  v1 << 1, 2, 3, 4, 5, 6;
+  
+  var output;
+  output = stan::agrad::sd(d1);
+  EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
+		   
+  output = stan::agrad::sd(v1);
+  EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
+
+  d1.resize(1, 1);
+  v1.resize(1, 1);
+  EXPECT_DEATH (stan::agrad::sd(d1), "[[:print:]]*sd");
+  EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
+}
+// end sd tests

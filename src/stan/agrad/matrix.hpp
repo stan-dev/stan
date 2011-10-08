@@ -585,7 +585,9 @@ namespace stan {
      * @param v Specified vector.
      * @return Sample variance of vector.
      */
-    inline var sd(const vector_v& v) {
+    template<typename T>
+    inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      assert (v.size() > 1);
       return sqrt(variance(v));
     }
     /**
@@ -594,7 +596,9 @@ namespace stan {
      * @param rv Specified vector.
      * @return Sample variance of vector.
      */
-    inline var sd(const row_vector_v& rv) {
+    template<typename T>
+    inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      assert (rv.size() > 1);
       return sqrt(variance(rv));
     }
     /**
@@ -603,7 +607,9 @@ namespace stan {
      * @param m Specified matrix.
      * @return Sample variance of matrix.
      */
-    inline var sd(const matrix_v& m) {
+    template<typename T>
+    inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      assert (m.size() > 1);
       return sqrt(variance(m));
     }
 
