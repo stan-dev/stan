@@ -462,6 +462,7 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      assert(v.size() > 0);
       return to_var(v.maxCoeff());
     }
     /**
@@ -472,6 +473,7 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      assert(rv.size() > 0);
       return to_var(rv.maxCoeff());
     }
     /**
@@ -482,6 +484,7 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      assert(m.size() > 0);
       return to_var(m.maxCoeff());
     }
 
@@ -491,8 +494,10 @@ namespace stan {
      * @param v Specified vector.
      * @return Sample mean of vector coefficients.
      */
-    inline var mean(const vector_v& v) {
-      return v.mean();
+    template<typename T>
+    inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
+      assert(v.size() > 0);
+      return to_var(v.mean());
     }
     /**
      * Returns the sample mean (i.e., average) of the coefficients
@@ -500,8 +505,10 @@ namespace stan {
      * @param rv Specified vector.
      * @return Sample mean of vector coefficients.
      */
-    inline var mean(const row_vector_v& rv) {
-      return rv.mean();
+    template<typename T>
+    inline var mean(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
+      assert(rv.size() > 0);
+      return to_var(rv.mean());
     }
     /**
      * Returns the sample mean (i.e., average) of the coefficients
@@ -509,8 +516,10 @@ namespace stan {
      * @param m Specified matrix.
      * @return Sample mean of matrix coefficients.
      */
-    inline var mean(const matrix_v& m) {
-      return m.mean();
+    template<typename T>
+    inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      assert(m.size() > 0);
+      return to_var(m.mean());
     }
 
     /**
