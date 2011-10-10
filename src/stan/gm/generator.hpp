@@ -159,6 +159,7 @@ namespace stan {
       generate_include("stan/agrad/agrad.hpp",o);
       generate_include("stan/agrad/special_functions.hpp",o);
       generate_include("stan/agrad/matrix.hpp",o);
+      generate_include("stan/gm/command.hpp",o);
       generate_include("stan/io/cmd_line.hpp",o);
       generate_include("stan/io/dump.hpp",o);
       generate_include("stan/io/reader.hpp",o);
@@ -1259,7 +1260,7 @@ namespace stan {
       write_csv_visgen vis(o);
       for (unsigned int i = 0; i < var_decls.size(); ++i)
 	boost::apply_visitor(vis,var_decls[i].decl_);
-      
+      o << INDENT2 << "writer__.newline();" << EOL;
       o << INDENT << "}" << EOL2;
     }
     
@@ -1395,14 +1396,17 @@ namespace stan {
     void generate_main(const std::string& model_name,
 		       std::ostream& out) {
       out << "int main(int argc__, const char* argv__[]) {" << EOL;
-      out << INDENT << "stan::io::cmd_line cmd(argc__,argv__);" << EOL;
-      out << INDENT << "std::string data_file_path__ = cmd.val(\"data_file\");" << EOL;
+      out << INDENT << "stan::io::cmd_line cmd__(argc__,argv__);" << EOL;
+      out << INDENT << "std::string data_file_path__;" << EOL;
+      out << INDENT << "cmd__.val(\"data_file\",data_file_path__);" << EOL;
       out << INDENT << "std::fstream data_file__(data_file_path__.c_str(),std::fstream::in);" << EOL;
       out << INDENT << "stan::io::dump dump__(data_file__);" << EOL;
       
       out << INDENT << model_name << "_namespace::" << model_name << " model__(dump__);" << EOL;
 
       out << INDENT << "data_file__.close();" << EOL;
+      out << INDENT << "stan::gm::hmc_command(cmd__,model__);" << EOL;
+
       out << "}" << EOL2;
     }
 

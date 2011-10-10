@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <vector>
 #include <limits>
+#include <stan/io/csv_writer.hpp>
 
 namespace stan {
 
@@ -84,6 +85,28 @@ namespace stan {
 	double result = log_prob(params_r,params_i);
 	params_i[idx] = original_val;
 	return result;
+      }
+
+      /**
+       * Write the parameters on a single line in CSV format.  The implementation in
+       * this abstract base class writes out the free parameters as
+       * viwed by HMC.  Subclasses may extend this class and override
+       * this implementation to return constrained values which may differ
+       * in both number and scale from the raw unconstrained parameters.
+       *
+       * @param params_r Real-valued parameter vector.
+       * @param params_r Integer-valued parameter vector.
+       * @param o Output stream to which values are written
+       */
+      virtual void write_csv(std::vector<double>& params_r,
+			     std::vector<int>& params_i,
+			     std::ostream& o) {
+	stan::io::csv_writer writer(o);
+	for (unsigned int i = 0; i < params_i.size(); ++i)
+	  writer.write(params_i[i]);
+	for (unsigned int i = 0; i < params_r.size(); ++i)
+	  writer.write(params_r[i]);
+	writer.newline();
       }
 
 
