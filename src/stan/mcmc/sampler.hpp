@@ -81,8 +81,8 @@ namespace stan {
      */
     class sample {
     private:
-      const std::vector<double> _params_r;
-      const std::vector<int> _params_i;
+      const std::vector<double> params_r_;
+      const std::vector<int> params_i_;
       const double _log_prob;
 
     public:
@@ -100,11 +100,11 @@ namespace stan {
        * @param log_prob Log probability of parameters and data in the
        * model.
        */
-      sample(std::vector<double>& params_r,
-	     std::vector<int>& params_i,
+      sample(const std::vector<double>& params_r,
+	     const std::vector<int>& params_i,
 	     double log_prob) :
-	_params_r(params_r), 
-	_params_i(params_i),
+	params_r_(params_r), 
+	params_i_(params_i),
 	_log_prob(log_prob) {
       }
       
@@ -121,8 +121,8 @@ namespace stan {
        * 
        * @return Number of real parameters.
        */
-      inline int size_r() {
-	return _params_r.size();
+      inline int size_r() const {
+	return params_r_.size();
       }
 
       /**
@@ -132,8 +132,8 @@ namespace stan {
        * @param k Index of parameter.
        * @return Parameter at index.
        */
-      inline double params_r(int k) {
-	return _params_r[k];
+      inline double params_r(int k) const {
+	return params_r_[k];
       }
 
       /**
@@ -142,8 +142,18 @@ namespace stan {
        * 
        * @param x Vector into which to write the parameters.
        */
-      inline void params_r(std::vector<double>& x) {
-	x = _params_r;
+      inline void params_r(std::vector<double>& x) const {
+	x = params_r_;
+      }
+
+      /**
+       * Return the underlying continuous parameter vector.
+       *
+       * @return Continuous parameter vector for this sample.
+       *
+       */
+      inline const std::vector<double>& params_r() const {
+	return params_r_;
       }
 
       /**
@@ -151,8 +161,8 @@ namespace stan {
        * 
        * @return Number of integer parameters.
        */
-      inline int size_i() {
-	return _params_i.size();
+      inline int size_i() const {
+	return params_i_.size();
       }
 
       /**
@@ -161,8 +171,8 @@ namespace stan {
        * @param k Index of parameter.
        * @return Parameter at the specified index.
        */
-      inline int params_i(int k) {
-	return _params_i[k];
+      inline int params_i(int k) const {
+	return params_i_[k];
       }
 
       /**
@@ -171,8 +181,15 @@ namespace stan {
        *
        * @param n Vector into which to write parameters.
        */
-      inline void params_i(std::vector<int>& n) {
-	n = _params_i;
+      inline void params_i(std::vector<int>& n) const {
+	n = params_i_;
+      }
+
+      /**
+       * Return the vector of integer parameters for this sample.
+       */
+      inline const std::vector<int>& params_i() const {
+	return params_i_;
       }
   
       /**
@@ -181,7 +198,7 @@ namespace stan {
        *
        * @return Log probability.
        */
-      inline double log_prob() {
+      inline double log_prob() const {
 	return _log_prob;
       }
 
@@ -239,8 +256,11 @@ namespace stan {
        * A useful alternative to wall time in evaluating relative
        * performance. However, it's up to the sampler implementation
        * to be sure to actually keep track of this.
+       *
+       * @return Number of log probability function evaluations.
        */
       unsigned int nfevals() { return _nfevals; }
+
     };
   }
 }

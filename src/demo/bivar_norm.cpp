@@ -76,14 +76,15 @@ int main() {
   // printf("tim=%d\n",t_start);
 
   // sample
-  int num_samples = 32; // 100K for speed tests
+  int num_samples = 128; // 100K for speed tests
+
   for (int m = 0; m < num_samples; ++m) {
     stan::mcmc::sample sample = sampler.next();
-    std::vector<double> params_r;
-    sample.params_r(params_r);
+    double x = sample.params_r(0);
+    double y = sample.params_r(1);
     double log_prob = sample.log_prob();
     printf("sample %4d:  (%+5.3f, %+5.3f)  log prob=%+5.3f\n",
-	   m, params_r[0], params_r[1], log_prob);
+	   m, x, y, log_prob);
   }
 
   std::clock_t t_end = std::clock();

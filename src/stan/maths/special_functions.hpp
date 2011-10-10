@@ -398,6 +398,7 @@ namespace stan {
      * @param k Number of dimensions.
      * @param x Function argument.
      * @return Natural log of the multivariate gamma function.
+     * @tparam T Type of scalar.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
@@ -409,6 +410,27 @@ namespace stan {
       return result;
     }
       
+
+    /**
+     * Return the second argument if the first argument is true
+     * and otherwise return the second argument.
+     *
+     * <p>This is just a convenience method to provide a function
+     * with the same behavior as the built-in ternary operator.
+     * In general, this function behaves as if defined by
+     *
+     * <p><code>if_else(c,y1,y0) = c ? y1 : y0</code>.
+     *
+     * @param c Boolean condition value.
+     * @param y_true Value to return if condition is true.
+     * @param y_false Value to return if condition is false.
+     * @tparam B Type of conditional.
+     * @tparam T Type of scalar.
+     */
+    template <typename B, typename T>
+    T if_else(B c, T y_true, T y_false) {
+      return c ? y_true : y_false;
+    }
 
 
 

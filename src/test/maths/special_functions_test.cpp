@@ -101,3 +101,20 @@ TEST(maths_test, lmgamma) {
   EXPECT_FLOAT_EQ(result, stan::maths::lmgamma(k,x));
   
 }
+
+TEST(maths_test, if_else) {
+  unsigned int c = 5;
+  double x = 1.0;
+  double y = -1.0;
+  EXPECT_FLOAT_EQ(x, stan::maths::if_else(c,x,y));
+  c = 0;
+  EXPECT_FLOAT_EQ(y, stan::maths::if_else(c,x,y));
+
+  bool d = true;
+  int u = 1;
+  int v = -1;
+  EXPECT_EQ(1, stan::maths::if_else(d,u,v));
+  d = false;
+  EXPECT_EQ(-1, stan::maths::if_else(d,u,v));
+  
+}
