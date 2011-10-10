@@ -69,7 +69,6 @@ namespace stan {
 	stan::mcmc::sample sample = sampler.next();
 	sample.params_r(params_r);
 	sample.params_i(params_i);
-	std::cout << params_r[0] << "," << std::exp(params_r[1]) << std::endl;
 	model.write_csv(params_r,params_i,sample_file_stream);
       }
       sample_file_stream.close();
