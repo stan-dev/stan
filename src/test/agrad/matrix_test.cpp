@@ -1307,4 +1307,229 @@ TEST(agrad_matrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ (   6, output(1,0).val());
   EXPECT_FLOAT_EQ (  -8, output(1,1).val());
 }
+TEST(agrad_matrix, multiply_rv_v) {
+  row_vector_d d1(3);
+  row_vector_v v1(3);
+  vector_d d2(3);
+  vector_v v2(3);
+  
+  d1 << 1, 3, -5;
+  v1 << 1, 3, -5;
+  d2 << 4, -2, -1;
+  v2 << 4, -2, -1;
+
+  EXPECT_FLOAT_EQ (3, stan::agrad::multiply(v1, v2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::multiply(v1, d2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::multiply(d1, v2).val());
+  EXPECT_FLOAT_EQ (3, stan::agrad::multiply(d1, d2).val());
+  
+  d1.resize(1);
+  v1.resize(1);
+  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+}
+TEST(agrad_matrix, multiply_v_rv) {
+  vector_d d1(3);
+  vector_v v1(3);
+  row_vector_d d2(3);
+  row_vector_v v2(3);
+  
+  d1 << 1, 3, -5;
+  v1 << 1, 3, -5;
+  d2 << 4, -2, -1;
+  v2 << 4, -2, -1;
+
+  matrix_v output = stan::agrad::multiply(v1, v2);
+  EXPECT_EQ (3, output.rows());
+  EXPECT_EQ (3, output.cols());
+  EXPECT_FLOAT_EQ (  4, output(0,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(0,1).val());
+  EXPECT_FLOAT_EQ ( -1, output(0,2).val());
+  EXPECT_FLOAT_EQ ( 12, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -6, output(1,1).val());
+  EXPECT_FLOAT_EQ ( -3, output(1,2).val());
+  EXPECT_FLOAT_EQ (-20, output(2,0).val());
+  EXPECT_FLOAT_EQ ( 10, output(2,1).val());
+  EXPECT_FLOAT_EQ (  5, output(2,2).val());
+  
+  output = stan::agrad::multiply(v1, d2);
+  EXPECT_EQ (3, output.rows());
+  EXPECT_EQ (3, output.cols());
+  EXPECT_FLOAT_EQ (  4, output(0,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(0,1).val());
+  EXPECT_FLOAT_EQ ( -1, output(0,2).val());
+  EXPECT_FLOAT_EQ ( 12, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -6, output(1,1).val());
+  EXPECT_FLOAT_EQ ( -3, output(1,2).val());
+  EXPECT_FLOAT_EQ (-20, output(2,0).val());
+  EXPECT_FLOAT_EQ ( 10, output(2,1).val());
+  EXPECT_FLOAT_EQ (  5, output(2,2).val());
+  
+  output = stan::agrad::multiply(d1, v2);
+  EXPECT_EQ (3, output.rows());
+  EXPECT_EQ (3, output.cols());
+  EXPECT_FLOAT_EQ (  4, output(0,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(0,1).val());
+  EXPECT_FLOAT_EQ ( -1, output(0,2).val());
+  EXPECT_FLOAT_EQ ( 12, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -6, output(1,1).val());
+  EXPECT_FLOAT_EQ ( -3, output(1,2).val());
+  EXPECT_FLOAT_EQ (-20, output(2,0).val());
+  EXPECT_FLOAT_EQ ( 10, output(2,1).val());
+  EXPECT_FLOAT_EQ (  5, output(2,2).val());
+  
+  output = stan::agrad::multiply(d1, d2);
+  EXPECT_EQ (3, output.rows());
+  EXPECT_EQ (3, output.cols());
+  EXPECT_FLOAT_EQ (  4, output(0,0).val());
+  EXPECT_FLOAT_EQ ( -2, output(0,1).val());
+  EXPECT_FLOAT_EQ ( -1, output(0,2).val());
+  EXPECT_FLOAT_EQ ( 12, output(1,0).val());
+  EXPECT_FLOAT_EQ ( -6, output(1,1).val());
+  EXPECT_FLOAT_EQ ( -3, output(1,2).val());
+  EXPECT_FLOAT_EQ (-20, output(2,0).val());
+  EXPECT_FLOAT_EQ ( 10, output(2,1).val());
+  EXPECT_FLOAT_EQ (  5, output(2,2).val());
+  
+  d1.resize(1);
+  v1.resize(1);
+  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+}
+TEST(agrad_matrix, multiply_matrix_vector) {
+  matrix_d d1(3,2);
+  matrix_v v1(3,2);
+  vector_d d2(2);
+  vector_v v2(2);
+  
+  d1 << 1, 3, -5, 4, -2, -1;
+  v1 << 1, 3, -5, 4, -2, -1;
+  d2 << -2, 4;
+  v2 << -2, 4;
+
+  vector_v output = stan::agrad::multiply(v1, v2);
+  EXPECT_EQ (3, output.size());
+  EXPECT_FLOAT_EQ (10, output(0).val());
+  EXPECT_FLOAT_EQ (26, output(1).val());
+  EXPECT_FLOAT_EQ ( 0, output(2).val());
+
+  
+  output = stan::agrad::multiply(v1, d2);
+  EXPECT_EQ (3, output.size());
+  EXPECT_FLOAT_EQ (10, output(0).val());
+  EXPECT_FLOAT_EQ (26, output(1).val());
+  EXPECT_FLOAT_EQ ( 0, output(2).val());
+  
+  output = stan::agrad::multiply(d1, v2);
+  EXPECT_EQ (3, output.size());
+  EXPECT_FLOAT_EQ (10, output(0).val());
+  EXPECT_FLOAT_EQ (26, output(1).val());
+  EXPECT_FLOAT_EQ ( 0, output(2).val());
+  
+  output = stan::agrad::multiply(d1, d2);
+  EXPECT_EQ (3, output.size());
+  EXPECT_FLOAT_EQ (10, output(0).val());
+  EXPECT_FLOAT_EQ (26, output(1).val());
+  EXPECT_FLOAT_EQ ( 0, output(2).val());
+  
+  d2.resize(4);
+  v2.resize(4);
+  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+}
+TEST(agrad_matrix, multiply_rv_matrix) {
+  row_vector_d d1(3);
+  row_vector_v v1(3);
+  matrix_d d2(3,2);
+  matrix_v v2(3,2);
+  
+  d1 << -2, 4, 1;
+  v1 << -2, 4, 1;
+  d2 << 1, 3, -5, 4, -2, -1;
+  v2 << 1, 3, -5, 4, -2, -1;
+
+
+  vector_v output = stan::agrad::multiply(v1, v2);
+  EXPECT_EQ (2, output.size());
+  EXPECT_FLOAT_EQ (-24, output(0).val());
+  EXPECT_FLOAT_EQ (  9, output(1).val());
+
+  output = stan::agrad::multiply(v1, d2);
+  EXPECT_EQ (2, output.size());
+  EXPECT_FLOAT_EQ (-24, output(0).val());
+  EXPECT_FLOAT_EQ (  9, output(1).val());
+  
+  output = stan::agrad::multiply(d1, v2);
+  EXPECT_EQ (2, output.size());
+  EXPECT_FLOAT_EQ (-24, output(0).val());
+  EXPECT_FLOAT_EQ (  9, output(1).val());
+  
+  output = stan::agrad::multiply(d1, d2);
+  EXPECT_EQ (2, output.size());
+  EXPECT_FLOAT_EQ (-24, output(0).val());
+  EXPECT_FLOAT_EQ (  9, output(1).val());
+  
+  d1.resize(4);
+  v1.resize(4);
+  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+}
+TEST(agrad_matrix, multiply_matrix_matrix) {
+  matrix_d d1(2,3);
+  matrix_v v1(2,3);
+  matrix_d d2(3,2);
+  matrix_v v2(3,2);
+  
+  d1 << 9, 24, 3, 46, -9, -33;
+  v1 << 9, 24, 3, 46, -9, -33;
+  d2 << 1, 3, -5, 4, -2, -1;
+  v2 << 1, 3, -5, 4, -2, -1;
+
+  matrix_v output = stan::agrad::multiply(v1, v2);
+  EXPECT_EQ (2, output.rows());
+  EXPECT_EQ (2, output.cols());
+  EXPECT_FLOAT_EQ (-117, output(0,0).val());
+  EXPECT_FLOAT_EQ ( 120, output(0,1).val());
+  EXPECT_FLOAT_EQ ( 157, output(1,0).val());
+  EXPECT_FLOAT_EQ ( 135, output(1,1).val());
+
+  output = stan::agrad::multiply(v1, d2);
+  EXPECT_EQ (2, output.rows());
+  EXPECT_EQ (2, output.cols());
+  EXPECT_FLOAT_EQ (-117, output(0,0).val());
+  EXPECT_FLOAT_EQ ( 120, output(0,1).val());
+  EXPECT_FLOAT_EQ ( 157, output(1,0).val());
+  EXPECT_FLOAT_EQ ( 135, output(1,1).val());
+  
+  output = stan::agrad::multiply(d1, v2);
+  EXPECT_EQ (2, output.rows());
+  EXPECT_EQ (2, output.cols());
+  EXPECT_FLOAT_EQ (-117, output(0,0).val());
+  EXPECT_FLOAT_EQ ( 120, output(0,1).val());
+  EXPECT_FLOAT_EQ ( 157, output(1,0).val());
+  EXPECT_FLOAT_EQ ( 135, output(1,1).val());
+  
+  output = stan::agrad::multiply(d1, d2);
+  EXPECT_EQ (2, output.rows());
+  EXPECT_EQ (2, output.cols());
+  EXPECT_FLOAT_EQ (-117, output(0,0).val());
+  EXPECT_FLOAT_EQ ( 120, output(0,1).val());
+  EXPECT_FLOAT_EQ ( 157, output(1,0).val());
+  EXPECT_FLOAT_EQ ( 135, output(1,1).val());
+  
+  d1.resize(2,2);
+  v1.resize(2,2);
+  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
+  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+}
 // end multiply tests

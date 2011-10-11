@@ -909,35 +909,11 @@ namespace stan {
      * @param v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
      */
-    inline var multiply(const row_vector_v& rv, const vector_v& v) {
+    template<typename T1, typename T2>
+    inline var multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
       assert(rv.size() == v.size());
-      return rv.dot(v);
+      return dot_product(rv, v);
     }
-    /**
-     * Return the scalar product of the specified row vector and
-     * specified column vector.  The return is the same as the dot
-     * product.  The two vectors must be the same size.
-     * @param rv Row vector.
-     * @param v Column vector.
-     * @return Scalar result of multiplying row vector by column vector.
-     */
-    inline var multiply(const row_vector_v& rv, const vector_d& v) {
-      assert(rv.size() == v.size());
-      return rv.dot(to_var(v));
-    }
-    /**
-     * Return the scalar product of the specified row vector and
-     * specified column vector.  The return is the same as the dot
-     * product.  The two vectors must be the same size.
-     * @param rv Row vector.
-     * @param v Column vector.
-     * @return Scalar result of multiplying row vector by column vector.
-     */
-    inline var multiply(const row_vector_d& rv, const vector_v& v) {
-      assert(rv.size() == v.size());
-      return to_var(rv).dot(v);
-    }
-    
 
     /**
      * Return the product of the specified column vector
@@ -946,41 +922,10 @@ namespace stan {
      * @param rv Row vector.
      * @return Product of column vector and row vector.
      */
-    inline matrix_v multiply(const vector_v& v, const row_vector_v& rv) {
-      return v * rv;
-    }
-    /**
-     * Return the product of the specified column vector
-     * and specified row vector.  The two vectors may be of any size.
-     * @param v Column vector.
-     * @param rv Row vector.
-     * @return Product of column vector and row vector.
-     */
-    inline matrix_v multiply(const vector_v& v, const row_vector_d& rv) {
-      return v * to_var(rv);
-    }
-    /**
-     * Return the product of the specified column vector
-     * and specified row vector.  The two vectors may be of any size.
-     * @param v Column vector.
-     * @param rv Row vector.
-     * @return Product of column vector and row vector.
-     */
-    inline matrix_v multiply(const vector_d& v, const row_vector_v& rv) {
-      return to_var(v) * rv;
-    }
-
-    /**
-     * Return the product of the specified matrix and
-     * column vector.  The number of rows of the matrix must be
-     * the same as the size of the vector.
-     * @param m Matrix.
-     * @param v Column vector.
-     * @return Product of matrix and vector.
-     */
-    inline vector_v multiply(const matrix_v& m, const vector_v& v) {
-      assert(m.rows() == v.size());
-      return m * v;
+    template<typename T1, typename T2>
+    inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv) {
+      assert(v.size() == rv.size());
+      return to_var(v) * to_var(rv);
     }
     /**
      * Return the product of the specified matrix and
@@ -990,34 +935,10 @@ namespace stan {
      * @param v Column vector.
      * @return Product of matrix and vector.
      */
-    inline vector_v multiply(const matrix_v& m, const vector_d& v) {
-      assert(m.rows() == v.size());
-      return m * to_var(v);
-    }
-    /**
-     * Return the product of the specified matrix and
-     * column vector.  The number of rows of the matrix must be
-     * the same as the size of the vector.
-     * @param m Matrix.
-     * @param v Column vector.
-     * @return Product of matrix and vector.
-     */
-    inline vector_v multiply(const matrix_d& m, const vector_v& v) {
-      assert(m.rows() == v.size());
-      return to_var(m) * v;
-    }
-
-    /**
-     * Return the product of the specifieid row vector and specified
-     * matrix.  The number of columns of the matrix must be the same
-     * as the size of the vector.
-     * @param rv Row vector.
-     * @param m Matrix.
-     * @return Product of vector and matrix.
-     */
-    inline row_vector_v multiply(const row_vector_v& rv, const matrix_v& m) {
-      assert(rv.size() == m.cols());
-      return rv * m;
+    template<typename T1, typename T2>
+    inline vector_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
+      assert(m.cols() == v.size());
+      return to_var(m) * to_var(v);
     }
     /**
      * Return the product of the specifieid row vector and specified
@@ -1027,34 +948,10 @@ namespace stan {
      * @param m Matrix.
      * @return Product of vector and matrix.
      */
-    inline row_vector_v multiply(const row_vector_v& rv, const matrix_d& m) {
-      assert(rv.size() == m.cols());
-      return rv * to_var(m);
-    }
-    /**
-     * Return the product of the specifieid row vector and specified
-     * matrix.  The number of columns of the matrix must be the same
-     * as the size of the vector.
-     * @param rv Row vector.
-     * @param m Matrix.
-     * @return Product of vector and matrix.
-     */
-    inline row_vector_v multiply(const row_vector_d& rv, const matrix_v& m) {
-      assert(rv.size() == m.cols());
-      return to_var(rv) * m;
-    }
-
-    /**
-     * Return the product of the specified matrices.  The number of
-     * rows in the first matrix must be the same as the number of columns
-     * in the second matrix.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return The product of the first and second matrices.
-     */
-    inline matrix_v multiply(const matrix_v& m1, const matrix_v& m2) {
-      assert(m1.rows() == m2.cols());
-      return m1 * m2;
+    template<typename T1, typename T2>
+    inline row_vector_v multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      assert(rv.size() == m.rows());
+      return to_var(rv) * to_var(m);
     }
     /**
      * Return the product of the specified matrices.  The number of
@@ -1064,21 +961,10 @@ namespace stan {
      * @param m2 Second matrix.
      * @return The product of the first and second matrices.
      */
-    inline matrix_v multiply(const matrix_v& m1, const matrix_d& m2) {
-      assert(m1.rows() == m2.cols());
-      return m1 * to_var(m2);
-    }
-    /**
-     * Return the product of the specified matrices.  The number of
-     * rows in the first matrix must be the same as the number of columns
-     * in the second matrix.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return The product of the first and second matrices.
-     */
-    inline matrix_v multiply(const matrix_d& m1, const matrix_v& m2) {
-      assert(m1.rows() == m2.cols());
-      return to_var(m1) * m2;
+    template<typename T1, typename T2>
+    inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
+      assert(m1.cols() == m2.rows());
+      return to_var(m1) * to_var(m2);
     }
     
     /**
