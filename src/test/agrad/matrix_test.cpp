@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
+#include <stdexcept>
 #include <stan/agrad/matrix.hpp>
 
 using stan::agrad::var;
@@ -148,9 +149,9 @@ TEST(agrad_matrix,determinant) {
   EXPECT_FLOAT_EQ (-2, det.val());
 
   d.resize(2,3);
-  EXPECT_DEATH (det = stan::agrad::determinant(d), "[[:print:]]*determinant");
+  EXPECT_THROW (det = stan::agrad::determinant(d), std::domain_error);
   v.resize(2,3);
-  EXPECT_DEATH (det = stan::agrad::determinant(v), "[[:print:]]*determinant");
+  EXPECT_THROW (det = stan::agrad::determinant(v), std::domain_error);
 }
 // end determinant tests
 
@@ -171,14 +172,14 @@ TEST(agrad_matrix, dot_product_vector_vector) {
 
   vector_d vd_mis(2);
   vector_v vv_mis(4);
-  EXPECT_DEATH (stan::agrad::dot_product(vd_1,   vd_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vd_mis, vd_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vv_1,   vd_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vv_mis, vd_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vd_1,   vv_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vd_mis, vv_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vv_1,   vv_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vv_mis, vv_2),   "[[:print:]]*dot_product");
+  EXPECT_THROW (stan::agrad::dot_product(vd_1,   vd_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vd_mis, vd_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vv_1,   vd_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vv_mis, vd_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vd_1,   vv_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vd_mis, vv_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vv_1,   vv_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vv_mis, vv_2),   std::invalid_argument);
 }
 TEST(agrad_matrix, dot_product_rowvector_vector) {
   row_vector_d rvd_1(3);
@@ -198,10 +199,10 @@ TEST(agrad_matrix, dot_product_rowvector_vector) {
 
   row_vector_d rvd_mis(2);
   row_vector_v rvv_mis(4);
-  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, vd_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, vd_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, vv_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, vv_2),   "[[:print:]]*dot_product");
+  EXPECT_THROW (stan::agrad::dot_product(rvd_mis, vd_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvv_mis, vd_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvd_mis, vv_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvv_mis, vv_2),   std::invalid_argument);
 }
 TEST(agrad_matrix, dot_product_vector_rowvector) {
   vector_d vd_1(3);
@@ -221,10 +222,10 @@ TEST(agrad_matrix, dot_product_vector_rowvector) {
 
   row_vector_d rvd_mis(2);
   row_vector_v rvv_mis(4);
-  EXPECT_DEATH (stan::agrad::dot_product(vd_1, rvd_mis),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vd_1, rvv_mis),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vv_1, rvd_mis),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(vv_1, rvv_mis),   "[[:print:]]*dot_product");
+  EXPECT_THROW (stan::agrad::dot_product(vd_1, rvd_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vd_1, rvv_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vv_1, rvd_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(vv_1, rvv_mis), std::invalid_argument);
 }
 TEST(agrad_matrix, dot_product_rowvector_rowvector) {
   row_vector_d rvd_1(3), rvd_2(3);
@@ -242,14 +243,14 @@ TEST(agrad_matrix, dot_product_rowvector_rowvector) {
 
   vector_d rvd_mis(2);
   vector_v rvv_mis(4);
-  EXPECT_DEATH (stan::agrad::dot_product(rvd_1,   rvd_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, rvd_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvv_1,   rvd_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, rvd_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvd_1,   rvv_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvd_mis, rvv_2),   "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvv_1,   rvv_mis), "[[:print:]]*dot_product");
-  EXPECT_DEATH (stan::agrad::dot_product(rvv_mis, rvv_2),   "[[:print:]]*dot_product");
+  EXPECT_THROW (stan::agrad::dot_product(rvd_1,   rvd_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvd_mis, rvd_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvv_1,   rvd_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvv_mis, rvd_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvd_1,   rvv_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvd_mis, rvv_2),   std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvv_1,   rvv_mis), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(rvv_mis, rvv_2),   std::invalid_argument);
 }
 // end dot_product tests
 
@@ -296,14 +297,14 @@ TEST(agrad_matrix, add_vector) {
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
 
-  EXPECT_DEATH(output = stan::agrad::add(vv_mis, vv_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(vv_1, vv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(vv_mis, vd_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(vv_1, vd_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(vd_mis, vv_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(vd_1, vv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(vd_mis, vd_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(vd_1, vd_mis), "");
+  EXPECT_THROW(output = stan::agrad::add(vv_mis, vv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vv_1, vv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vv_mis, vd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vv_1, vd_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vd_mis, vv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vd_1, vv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vd_mis, vd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(vd_1, vd_mis), std::invalid_argument);
 }
 TEST(agrad_matrix, add_row_vector) {
   row_vector_v expected_output(5), output;
@@ -347,14 +348,14 @@ TEST(agrad_matrix, add_row_vector) {
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
 
-  EXPECT_DEATH(output = stan::agrad::add(rvv_mis, rvv_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvv_1, rvv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvv_mis, rvd_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvv_1, rvd_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvd_mis, rvv_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvd_1, rvv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvd_mis, rvd_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(rvd_1, rvd_mis), "");
+  EXPECT_THROW(output = stan::agrad::add(rvv_mis, rvv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvv_1, rvv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvv_mis, rvd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvv_1, rvd_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvd_mis, rvv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvd_1, rvv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvd_mis, rvd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(rvd_1, rvd_mis), std::invalid_argument);
 }
 TEST(agrad_matrix, add_matrix) {
   matrix_v expected_output(2,2), output;
@@ -394,14 +395,14 @@ TEST(agrad_matrix, add_matrix) {
   EXPECT_FLOAT_EQ (expected_output(1,0).val(), output(1,0).val());
   EXPECT_FLOAT_EQ (expected_output(1,1).val(), output(1,1).val());
 
-  EXPECT_DEATH(output = stan::agrad::add(mv_mis, mv_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(mv_1,   mv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(mv_mis, md_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(mv_1,   md_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(md_mis, mv_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(md_1,   mv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::add(md_mis, md_2), "");
-  EXPECT_DEATH(output = stan::agrad::add(md_1,   md_mis), "");
+  EXPECT_THROW(output = stan::agrad::add(mv_mis, mv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(mv_1,   mv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(mv_mis, md_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(mv_1,   md_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(md_mis, mv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(md_1,   mv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(md_mis, md_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(md_1,   md_mis), std::invalid_argument);
 }
 // end add tests
 
@@ -448,14 +449,14 @@ TEST(agrad_matrix, subtract_vector) {
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
 
-  EXPECT_DEATH(output = stan::agrad::subtract(vv_mis, vv_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vv_1,   vv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vv_mis, vd_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vv_1,   vd_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vd_mis, vv_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vd_1,   vv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vd_mis, vd_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(vd_1,   vd_mis), "");
+  EXPECT_THROW(output = stan::agrad::subtract(vv_mis, vv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vv_1,   vv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vv_mis, vd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vv_1,   vd_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vd_mis, vv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vd_1,   vv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vd_mis, vd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(vd_1,   vd_mis), std::invalid_argument);
 }
 TEST(agrad_matrix, subtract_row_vector) {
   row_vector_v expected_output(5), output;
@@ -499,14 +500,14 @@ TEST(agrad_matrix, subtract_row_vector) {
   EXPECT_FLOAT_EQ (expected_output(3).val(), output(3).val());
   EXPECT_FLOAT_EQ (expected_output(4).val(), output(4).val());  
 
-  EXPECT_DEATH(output = stan::agrad::subtract(rvv_mis, rvv_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvv_1,   rvv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvv_mis, rvd_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvv_1,   rvd_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvd_mis, rvv_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvd_1,   rvv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvd_mis, rvd_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(rvd_1,   rvd_mis), "");
+  EXPECT_THROW(output = stan::agrad::subtract(rvv_mis, rvv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvv_1,   rvv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvv_mis, rvd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvv_1,   rvd_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvd_mis, rvv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvd_1,   rvv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvd_mis, rvd_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(rvd_1,   rvd_mis), std::invalid_argument);
 }
 TEST(agrad_matrix, subtract_matrix) {
   matrix_v expected_output(2,2), output;
@@ -546,14 +547,14 @@ TEST(agrad_matrix, subtract_matrix) {
   EXPECT_FLOAT_EQ (expected_output(1,0).val(), output(1,0).val());
   EXPECT_FLOAT_EQ (expected_output(1,1).val(), output(1,1).val());
 
-  EXPECT_DEATH(output = stan::agrad::subtract(mv_mis, mv_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(mv_1,   mv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(mv_mis, md_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(mv_1,   md_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(md_mis, mv_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(md_1,   mv_mis), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(md_mis, md_2), "");
-  EXPECT_DEATH(output = stan::agrad::subtract(md_1,   md_mis), "");
+  EXPECT_THROW(output = stan::agrad::subtract(mv_mis, mv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(mv_1,   mv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(mv_mis, md_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(mv_1,   md_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(md_mis, mv_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(md_1,   mv_mis), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(md_mis, md_2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(md_1,   md_mis), std::invalid_argument);
 }
 // end subtract tests
 
@@ -848,8 +849,8 @@ TEST (agrad_matrix, min_v) {
 
   d1.resize(0);
   v1.resize(0);
-  EXPECT_DEATH (stan::agrad::min(d1), "[[:print:]]*min");
-  EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
+  EXPECT_THROW (stan::agrad::min(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::min(v1), std::domain_error);
 }
 TEST (agrad_matrix, min_rv) {
   row_vector_d d1(3);
@@ -867,8 +868,8 @@ TEST (agrad_matrix, min_rv) {
 
   d1.resize(0);
   v1.resize(0);
-  EXPECT_DEATH (stan::agrad::min(d1), "[[:print:]]*min");
-  EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
+  EXPECT_THROW (stan::agrad::min(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::min(v1), std::domain_error);
 }
 TEST (agrad_matrix, min_m) {
   matrix_d d1(3,1);
@@ -886,8 +887,8 @@ TEST (agrad_matrix, min_m) {
 
   d1.resize(0,0);
   v1.resize(0,0);
-  EXPECT_DEATH (stan::agrad::min(d1), "[[:print:]]*min");
-  EXPECT_DEATH (stan::agrad::min(v1), "[[:print:]]*min");
+  EXPECT_THROW (stan::agrad::min(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::min(v1), std::domain_error);
 }
 // end min tests
 
@@ -909,8 +910,8 @@ TEST (agrad_matrix, max_v) {
 
   d1.resize(0);
   v1.resize(0);
-  EXPECT_DEATH (stan::agrad::max(d1), "[[:print:]]*max");
-  EXPECT_DEATH (stan::agrad::max(v1), "[[:print:]]*max");
+  EXPECT_THROW (stan::agrad::max(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::max(v1), std::domain_error);
 }
 TEST (agrad_matrix, max_rv) {
   row_vector_d d1(3);
@@ -928,8 +929,8 @@ TEST (agrad_matrix, max_rv) {
 
   d1.resize(0);
   v1.resize(0);
-  EXPECT_DEATH (stan::agrad::max(d1), "[[:print:]]*max");
-  EXPECT_DEATH (stan::agrad::max(v1), "[[:print:]]*max");
+  EXPECT_THROW (stan::agrad::max(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::max(v1), std::domain_error);
 }
 TEST (agrad_matrix, max_m) {
   matrix_d d1(3,1);
@@ -947,8 +948,8 @@ TEST (agrad_matrix, max_m) {
 
   d1.resize(0,0);
   v1.resize(0,0);
-  EXPECT_DEATH (stan::agrad::max(d1), "[[:print:]]*max");
-  EXPECT_DEATH (stan::agrad::max(v1), "[[:print:]]*max");
+  EXPECT_THROW (stan::agrad::max(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::max(v1), std::domain_error);
 }
 // end max tests
 
@@ -969,8 +970,8 @@ TEST (agrad_matrix, mean_v) {
 
   d1.resize(0);
   v1.resize(0);
-  EXPECT_DEATH (stan::agrad::mean(d1), "[[:print:]]*mean");
-  EXPECT_DEATH (stan::agrad::mean(v1), "[[:print:]]*mean");
+  EXPECT_THROW (stan::agrad::mean(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::mean(v1), std::domain_error);
 }
 TEST (agrad_matrix, mean_rv) {
   row_vector_d d1(3);
@@ -988,8 +989,8 @@ TEST (agrad_matrix, mean_rv) {
 
   d1.resize(0);
   v1.resize(0);
-  EXPECT_DEATH (stan::agrad::mean(d1), "[[:print:]]*mean");
-  EXPECT_DEATH (stan::agrad::mean(v1), "[[:print:]]*mean");
+  EXPECT_THROW (stan::agrad::mean(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::mean(v1), std::domain_error);
 }
 TEST (agrad_matrix, mean_m) {
   matrix_d d1(3,1);
@@ -1007,8 +1008,8 @@ TEST (agrad_matrix, mean_m) {
 
   d1.resize(0,0);
   v1.resize(0,0);
-  EXPECT_DEATH (stan::agrad::mean(d1), "[[:print:]]*mean");
-  EXPECT_DEATH (stan::agrad::mean(v1), "[[:print:]]*mean");
+  EXPECT_THROW (stan::agrad::mean(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::mean(v1), std::domain_error);
 }
 // end mean tests
 
@@ -1029,8 +1030,8 @@ TEST (agrad_matrix, variance_v) {
 
   d1.resize(1);
   v1.resize(1);
-  EXPECT_DEATH (stan::agrad::variance(d1), "[[:print:]]*variance");
-  EXPECT_DEATH (stan::agrad::variance(v1), "[[:print:]]*variance");
+  EXPECT_THROW (stan::agrad::variance(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::variance(v1), std::domain_error);
 }
 TEST (agrad_matrix, variance_rv) {
   row_vector_d d1(6);
@@ -1048,8 +1049,8 @@ TEST (agrad_matrix, variance_rv) {
 
   d1.resize(1);
   v1.resize(1);
-  EXPECT_DEATH (stan::agrad::variance(d1), "[[:print:]]*variance");
-  EXPECT_DEATH (stan::agrad::variance(v1), "[[:print:]]*variance");
+  EXPECT_THROW (stan::agrad::variance(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::variance(v1), std::domain_error);
 }
 TEST (agrad_matrix, variance_m) {
   matrix_d d1(2, 3);
@@ -1067,8 +1068,8 @@ TEST (agrad_matrix, variance_m) {
 
   d1.resize(1, 1);
   v1.resize(1, 1);
-  EXPECT_DEATH (stan::agrad::variance(d1), "[[:print:]]*variance");
-  EXPECT_DEATH (stan::agrad::variance(v1), "[[:print:]]*variance");
+  EXPECT_THROW (stan::agrad::variance(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::variance(v1), std::domain_error);
 }
 // end variance tests
 
@@ -1089,8 +1090,8 @@ TEST (agrad_matrix, sd_v) {
 
   d1.resize(1);
   v1.resize(1);
-  EXPECT_DEATH (stan::agrad::sd(d1), "[[:print:]]*sd");
-  EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
+  EXPECT_THROW (stan::agrad::sd(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::sd(v1), std::domain_error);
 }
 TEST (agrad_matrix, sd_rv) {
   row_vector_d d1(6);
@@ -1108,8 +1109,8 @@ TEST (agrad_matrix, sd_rv) {
 
   d1.resize(1);
   v1.resize(1);
-  EXPECT_DEATH (stan::agrad::sd(d1), "[[:print:]]*sd");
-  EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
+  EXPECT_THROW (stan::agrad::sd(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::sd(v1), std::domain_error);
 }
 TEST (agrad_matrix, sd_m) {
   matrix_d d1(2, 3);
@@ -1127,8 +1128,8 @@ TEST (agrad_matrix, sd_m) {
 
   d1.resize(1, 1);
   v1.resize(1, 1);
-  EXPECT_DEATH (stan::agrad::sd(d1), "[[:print:]]*sd");
-  EXPECT_DEATH (stan::agrad::sd(v1), "[[:print:]]*sd");
+  EXPECT_THROW (stan::agrad::sd(d1), std::domain_error);
+  EXPECT_THROW (stan::agrad::sd(v1), std::domain_error);
 }
 // end sd tests
 
@@ -1325,10 +1326,10 @@ TEST(agrad_matrix, multiply_rv_v) {
   
   d1.resize(1);
   v1.resize(1);
-  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, d2), std::invalid_argument);
 }
 TEST(agrad_matrix, multiply_v_rv) {
   vector_d d1(3);
@@ -1395,10 +1396,10 @@ TEST(agrad_matrix, multiply_v_rv) {
   
   d1.resize(1);
   v1.resize(1);
-  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, d2), std::invalid_argument);
 }
 TEST(agrad_matrix, multiply_matrix_vector) {
   matrix_d d1(3,2);
@@ -1438,10 +1439,10 @@ TEST(agrad_matrix, multiply_matrix_vector) {
   
   d2.resize(4);
   v2.resize(4);
-  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, d2), std::invalid_argument);
 }
 TEST(agrad_matrix, multiply_rv_matrix) {
   row_vector_d d1(3);
@@ -1477,10 +1478,10 @@ TEST(agrad_matrix, multiply_rv_matrix) {
   
   d1.resize(4);
   v1.resize(4);
-  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, d2), std::invalid_argument);
 }
 TEST(agrad_matrix, multiply_matrix_matrix) {
   matrix_d d1(2,3);
@@ -1527,9 +1528,9 @@ TEST(agrad_matrix, multiply_matrix_matrix) {
   
   d1.resize(2,2);
   v1.resize(2,2);
-  EXPECT_DEATH(stan::agrad::multiply(v1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(v1, d2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, v2), "[[:print:]]*multiply");
-  EXPECT_DEATH(stan::agrad::multiply(d1, d2), "[[:print:]]*multiply");
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(d1, d2), std::invalid_argument);
 }
 // end multiply tests

@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__MATRIX_H__
 
 // global include
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <stan/maths/matrix.hpp>
 #include <stan/agrad/agrad.hpp>
@@ -368,10 +369,12 @@ namespace stan {
      * square matrix.
      * @param m Specified matrix.
      * @return Determinant of the matrix.
+     * @throw std::domain_error if m is not a square matrix
      */
     template <typename T>
     inline var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert (m.rows() == m.cols());
+      if (m.rows() != m.cols())
+	throw std::domain_error ("m must be a square matrix");
       return to_var(m.determinant());
     }
 
@@ -380,10 +383,12 @@ namespace stan {
      * @param v1 First column vector.
      * @param v2 Second column vector.
      * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      assert (v1.size() == v2.size());
+      if (v1.size() != v2.size())
+	throw std::invalid_argument("v1.size() must equal v2.size()");
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -391,10 +396,12 @@ namespace stan {
      * @param v1 First row vector.
      * @param v2 Second row vector.
      * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      assert (v1.size() == v2.size());
+      if (v1.size() != v2.size())
+	throw std::invalid_argument("v1.size() must equal v2.size()");
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -402,10 +409,12 @@ namespace stan {
      * @param v1 First column vector.
      * @param v2 Second row vector.
      * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      assert (v1.size() == v2.size());
+      if (v1.size() != v2.size())
+	throw std::invalid_argument("v1.size() must equal v2.size()");
       return to_var(v1).dot(to_var(v2));
     }
     /**
@@ -413,10 +422,12 @@ namespace stan {
      * @param v1 First row vector.
      * @param v2 Second column vector.
      * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
     template<typename T1, typename T2>
     inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      assert (v1.size() == v2.size());
+      if (v1.size() != v2.size())
+	throw std::invalid_argument("v1.size() must equal v2.size()");
       return to_var(v1).dot(to_var(v2));
     }
 
@@ -428,7 +439,8 @@ namespace stan {
      */
     template<typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      assert(v.size() > 0);
+      if (v.size() == 0) 
+	throw std::domain_error ("v.size() == 0");
       return to_var(v.minCoeff());
     }
     /**
@@ -439,7 +451,8 @@ namespace stan {
      */
     template<typename T>
     inline var min(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      assert(rv.size() > 0);
+      if (rv.size() == 0) 
+	throw std::domain_error ("rv.size() == 0");
       return to_var(rv.minCoeff());
     }
     /**
@@ -450,7 +463,8 @@ namespace stan {
      */
     template<typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert(m.size() > 0);
+      if (m.size() == 0) 
+	throw std::domain_error ("m.size() == 0");
       return to_var(m.minCoeff());
     }
 
@@ -462,7 +476,8 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      assert(v.size() > 0);
+      if (v.size() == 0) 
+	throw std::domain_error ("v.size() == 0");
       return to_var(v.maxCoeff());
     }
     /**
@@ -473,7 +488,8 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      assert(rv.size() > 0);
+      if (rv.size() == 0) 
+	throw std::domain_error ("rv.size() == 0");
       return to_var(rv.maxCoeff());
     }
     /**
@@ -484,7 +500,8 @@ namespace stan {
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert(m.size() > 0);
+      if (m.size() == 0) 
+	throw std::domain_error ("m.size() == 0");
       return to_var(m.maxCoeff());
     }
 
@@ -496,7 +513,8 @@ namespace stan {
      */
     template<typename T>
     inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      assert(v.size() > 0);
+      if (v.size() == 0) 
+	throw std::domain_error ("v.size() == 0");
       return to_var(v.mean());
     }
     /**
@@ -507,7 +525,8 @@ namespace stan {
      */
     template<typename T>
     inline var mean(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      assert(rv.size() > 0);
+      if (rv.size() == 0) 
+	throw std::domain_error ("rv.size() == 0");
       return to_var(rv.mean());
     }
     /**
@@ -518,7 +537,8 @@ namespace stan {
      */
     template<typename T>
     inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert(m.size() > 0);
+      if (m.size() == 0) 
+	throw std::domain_error ("m.size() == 0");
       return to_var(m.mean());
     }
 
@@ -530,7 +550,8 @@ namespace stan {
      */
     template<typename T>
     inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      assert (v.size() > 1);
+      if (v.size() <= 1) 
+	throw std::domain_error ("v.size() <= 1");
       T mean = v.mean();
       T sum_sq_diff = 0;
       // FIXME: redefine in terms of vectorized ops
@@ -550,7 +571,8 @@ namespace stan {
      */
     template<typename T>
     inline var variance(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      assert (rv.size() > 1);
+      if (rv.size() <= 1) 
+	throw std::domain_error ("rv.size() <= 1");
       T mean = rv.mean();
       T sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
@@ -567,7 +589,8 @@ namespace stan {
      */
     template<typename T>
     inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert (m.size() > 1);
+      if (m.size() <= 1) 
+	throw std::domain_error ("m.size() <= 1");
       T mean = m.mean();
       T sum_sq_diff = 0;
       for (int i = 0; i < m.rows(); ++i) {
@@ -587,7 +610,8 @@ namespace stan {
      */
     template<typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      assert (v.size() > 1);
+      if (v.size() <= 1) 
+	throw std::domain_error ("v.size() <= 1");
       return to_var(sqrt(variance(v)));
     }
     /**
@@ -598,7 +622,8 @@ namespace stan {
      */
     template<typename T>
     inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      assert (rv.size() > 1);
+      if (rv.size() <= 1) 
+	throw std::domain_error ("rv.size() <= 1");
       return to_var(sqrt(variance(rv)));
     }
     /**
@@ -609,7 +634,8 @@ namespace stan {
      */
     template<typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert (m.size() > 1);
+      if (m.size() <= 1) 
+	throw std::domain_error ("m.size() <= 1");
       return to_var(sqrt(variance(m)));
     }
 
@@ -690,11 +716,13 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return Sum of the two vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, 1> add(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
 						     const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      assert(v1.size() == v2.size());
+      if (v1.size() != v2.size())
+	throw std::invalid_argument("v1.size() must equal v2.size()");
       return to_var(v1) + to_var(v2);
     }
     /**
@@ -703,12 +731,14 @@ namespace stan {
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return Sum of the two vectors.
+     * @throw std::invalid_argument if length of rv1 is not equal to length of rv2.
      */
     template<typename T1, typename T2>
-    inline Eigen::Matrix<var, 1, Eigen::Dynamic> add(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, 
-						     const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      assert(v1.size() == v2.size());
-      return to_var(v1) + to_var(v2);
+    inline Eigen::Matrix<var, 1, Eigen::Dynamic> add(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv1, 
+						     const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv2) {
+      if (rv1.size() != rv2.size())
+	throw std::invalid_argument("rv1.size() must equal rv2.size()");
+      return to_var(rv1) + to_var(rv2);
     }
 
     /**
@@ -717,11 +747,13 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return Sum of the two vectors.
+     * @throw std::invalid_argument if dimension of m1 and m2 do not match.
      */
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> add(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
 								  const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
+      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
+	throw std::invalid_argument("m1 dimensions must match m2 dimensions");
       return to_var(m1) + to_var(m2);
     }
 
@@ -731,25 +763,29 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return First vector minus the second vector.
+     * @throw std::invalid_argument if size of v1 does not match size of v2.
      */
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, 1> subtract(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
 							  const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      assert(v1.size() == v2.size());
+      if (v1.size() != v2.size())
+	throw std::invalid_argument("v1.size() must equal v2.size()");
       return to_var(v1) - to_var(v2);
     }
     /**
      * Return the difference between the first specified row vector
      * and the second.  The two vectors must have the same size.
-     * @param v1 First vector.
-     * @param v2 Second vector.
+     * @param rv1 First vector.
+     * @param rv2 Second vector.
      * @return First vector minus the second vector.
+     * @throw std::invalid_argument if size of rv1 does not match size of rv2.
      */
     template<typename T1, typename T2>
-    inline Eigen::Matrix<var, 1, Eigen::Dynamic> subtract(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, 
-							  const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      assert(v1.size() == v2.size());
-      return to_var(v1) - to_var(v2);
+    inline Eigen::Matrix<var, 1, Eigen::Dynamic> subtract(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv1, 
+							  const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv2) {
+      if (rv1.size() != rv2.size())
+	throw std::invalid_argument("rv1.size() must equal rv2.size()");
+      return to_var(rv1) - to_var(rv2);
     }
 
     /**
@@ -758,11 +794,13 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return First matrix minus the second matrix.
+     * @throw std::invalid_argument if dimension of m1 and m2 do not match.
      */
     template<typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> subtract(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
 								       const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
+      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
+	throw std::invalid_argument("m1 dimensions must match m2 dimensions");
       return to_var(m1) - to_var(m2);
     }
 
@@ -911,7 +949,8 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline var multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
-      assert(rv.size() == v.size());
+      if (rv.size() != v.size())
+	throw std::invalid_argument("rv.size() != v.size()");
       return dot_product(rv, v);
     }
 
@@ -924,7 +963,8 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv) {
-      assert(v.size() == rv.size());
+      if (v.size() != rv.size())
+	throw std::invalid_argument("v.size() != rv.size()");
       return to_var(v) * to_var(rv);
     }
     /**
@@ -937,7 +977,8 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline vector_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
-      assert(m.cols() == v.size());
+      if (m.cols() != v.size())
+	throw std::invalid_argument("m.cols() != v.size()");
       return to_var(m) * to_var(v);
     }
     /**
@@ -950,7 +991,8 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline row_vector_v multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      assert(rv.size() == m.rows());
+      if (rv.size() !=  m.rows())
+	throw std::invalid_argument("rv.size() != m.rows()");
       return to_var(rv) * to_var(m);
     }
     /**
@@ -963,7 +1005,8 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      assert(m1.cols() == m2.rows());
+      if (m1.cols() !=  m2.rows())
+	throw std::invalid_argument("m1.cols() != m2.rows()");
       return to_var(m1) * to_var(m2);
     }
     
