@@ -436,6 +436,7 @@ namespace stan {
      * column vector.
      * @param v Specified vector.
      * @return Minimum coefficient value in the vector.
+     * @throw std::domain_error if v has no elements
      */
     template<typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
@@ -448,6 +449,7 @@ namespace stan {
      * row vector.
      * @param rv Specified vector.
      * @return Minimum coefficient value in the vector.
+     * @throw std::domain_error if rv has no elements
      */
     template<typename T>
     inline var min(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
@@ -460,6 +462,7 @@ namespace stan {
      * matrix.
      * @param m Specified matrix.
      * @return Minimum coefficient value in the matrix.
+     * @throw std::domain_error if m has no elements
      */
     template<typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
@@ -473,6 +476,7 @@ namespace stan {
      * column vector.
      * @param v Specified vector.
      * @return Maximum coefficient value in the vector.
+     * @throw std::domain_error if v has no elements
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
@@ -485,6 +489,7 @@ namespace stan {
      * row vector.
      * @param rv Specified vector.
      * @return Maximum coefficient value in the vector.
+     * @throw std::domain_error if rv has no elements
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
@@ -497,6 +502,7 @@ namespace stan {
      * matrix.
      * @param m Specified matrix.
      * @return Maximum coefficient value in the matrix.
+     * @throw std::domain_error if m has no elements
      */
     template<typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
@@ -510,6 +516,7 @@ namespace stan {
      * in the specified column vector.
      * @param v Specified vector.
      * @return Sample mean of vector coefficients.
+     * @throw std::domain_error if v has no elements
      */
     template<typename T>
     inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
@@ -522,6 +529,7 @@ namespace stan {
      * in the specified row vector.
      * @param rv Specified vector.
      * @return Sample mean of vector coefficients.
+     * @throw std::domain_error if rv has no elements
      */
     template<typename T>
     inline var mean(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
@@ -534,6 +542,7 @@ namespace stan {
      * in the specified matrix.
      * @param m Specified matrix.
      * @return Sample mean of matrix coefficients.
+     * @throw std::domain_error if m has no elements
      */
     template<typename T>
     inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
@@ -546,12 +555,15 @@ namespace stan {
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified column vector.
      * @param v Specified vector.
-     * @return Sample variance of vector.
+     * @return Sample variance of vector. If there is only one element, returns 0.0
+     * @throw std::domain_error if v has 0 elements
      */
     template<typename T>
     inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() <= 1) 
-	throw std::domain_error ("v.size() <= 1");
+      if (v.size() == 0) 
+	throw std::domain_error ("v.size() == 1");
+      if (v.size() == 1) 
+	return to_var(0.0);
       T mean = v.mean();
       T sum_sq_diff = 0;
       // FIXME: redefine in terms of vectorized ops
@@ -567,12 +579,15 @@ namespace stan {
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified row vector.
      * @param rv Specified vector.
-     * @return Sample variance of vector.
+     * @return Sample variance of vector. If there is only one element, returns 0.0
+     * @throw std::domain_error if rv has 0 elements
      */
     template<typename T>
     inline var variance(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() <= 1) 
-	throw std::domain_error ("rv.size() <= 1");
+      if (rv.size() == 0) 
+	throw std::domain_error ("rv.size() == 0");
+      if (rv.size() == 1)
+	return to_var(0.0);
       T mean = rv.mean();
       T sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
@@ -585,12 +600,15 @@ namespace stan {
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified matrix.
      * @param m Specified matrix.
-     * @return Sample variance of matrix.
+     * @return Sample variance of vector. If there is only one element, returns 0.0
+     * @throw std::domain_error if v has 0 elements
      */
     template<typename T>
     inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() <= 1) 
-	throw std::domain_error ("m.size() <= 1");
+      if (m.size() == 0) 
+	throw std::domain_error ("m.size() == 0");
+      if (m.size() == 1) 
+	return to_var(0.0);
       T mean = m.mean();
       T sum_sq_diff = 0;
       for (int i = 0; i < m.rows(); ++i) {
@@ -606,23 +624,25 @@ namespace stan {
      * Returns the unbiased sample standard deviation of the
      * coefficients in the specified column vector.
      * @param v Specified vector.
-     * @return Sample variance of vector.
+     * @return Sample standard deviation of vector. If there is only one element, returns 0.0
+     * @throw std::domain_error if v has 0 elements
      */
     template<typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() <= 1) 
-	throw std::domain_error ("v.size() <= 1");
+      if (v.size() == 0) 
+	throw std::domain_error ("v.size() == 0");
       return to_var(sqrt(variance(v)));
     }
     /**
      * Returns the unbiased sample standard deviation of the
      * coefficients in the specified row vector.
      * @param rv Specified vector.
-     * @return Sample variance of vector.
+     * @return Sample standard deviation of vector. If there is only one element, returns 0.0
+     * @throw std::domain_error if rv has 0 elements
      */
     template<typename T>
     inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() <= 1) 
+      if (rv.size() == 0) 
 	throw std::domain_error ("rv.size() <= 1");
       return to_var(sqrt(variance(rv)));
     }
@@ -630,12 +650,13 @@ namespace stan {
      * Returns the unbiased sample standard deviation of the
      * coefficients in the specified matrix.
      * @param m Specified matrix.
-     * @return Sample variance of matrix.
+     * @return Sample standard deviation of a matrix. If there is only one element, returns 0.0
+     * @throw std::domain_error if m has 0 elements
      */
     template<typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() <= 1) 
-	throw std::domain_error ("m.size() <= 1");
+      if (m.size() == 0) 
+	throw std::domain_error ("m.size() == 0");
       return to_var(sqrt(variance(m)));
     }
 
@@ -946,6 +967,7 @@ namespace stan {
      * @param rv Row vector.
      * @param v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
+     * @throw std::invalid_argument if rv and v are not the same size
      */
     template<typename T1, typename T2>
     inline var multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
@@ -963,17 +985,16 @@ namespace stan {
      */
     template<typename T1, typename T2>
     inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv) {
-      if (v.size() != rv.size())
-	throw std::invalid_argument("v.size() != rv.size()");
       return to_var(v) * to_var(rv);
     }
     /**
      * Return the product of the specified matrix and
-     * column vector.  The number of rows of the matrix must be
+     * column vector.  The number of cols of the matrix must be
      * the same as the size of the vector.
      * @param m Matrix.
      * @param v Column vector.
      * @return Product of matrix and vector.
+     * @throw std::invalid_argument if the number of columns of the matrix does not match the size of the vector
      */
     template<typename T1, typename T2>
     inline vector_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
@@ -983,11 +1004,12 @@ namespace stan {
     }
     /**
      * Return the product of the specifieid row vector and specified
-     * matrix.  The number of columns of the matrix must be the same
+     * matrix.  The number of rows of the matrix must be the same
      * as the size of the vector.
      * @param rv Row vector.
      * @param m Matrix.
      * @return Product of vector and matrix.
+     * @throw std::invalid_argument if the size of the row vector does not match the number of rows of the matrix
      */
     template<typename T1, typename T2>
     inline row_vector_v multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m) {
@@ -997,11 +1019,13 @@ namespace stan {
     }
     /**
      * Return the product of the specified matrices.  The number of
-     * rows in the first matrix must be the same as the number of columns
+     * columns in the first matrix must be the same as the number of rows
      * in the second matrix.
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return The product of the first and second matrices.
+     * @throw std::invalid_argument if the number of columns in the first vector does not match the
+     *    number of rows in the second vector
      */
     template<typename T1, typename T2>
     inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
@@ -1191,9 +1215,12 @@ namespace stan {
      * <p>\f$A = L \times L^T\f$.
      * @param m Symmetrix matrix.
      * @return Square root of matrix.
+     * @throw std::domain_error if m is not a square matrix
      */
     inline matrix_v cholesky_decompose(const matrix_v& m) {
-      assert(m.rows() == m.cols());
+      if (m.rows() != m.cols()) {
+	throw std::domain_error ("m must be a square matrix");
+      }
       Eigen::LLT<matrix_v> llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
@@ -1249,10 +1276,7 @@ namespace stan {
       v = svd.matrixV();
       s = svd.singularValues();
     }
-
-
   }
 }
-
 #endif
 
