@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__PROB_GRAD_HPP__
 #define __STAN__MCMC__PROB_GRAD_HPP__
 
-#include <assert.h>
+#include <stdexcept>
 #include <vector>
 #include <limits>
 #include <stan/io/csv_writer.hpp>
@@ -75,10 +75,10 @@ namespace stan {
 				   int val,
 				   std::vector<double>& params_r,
 				   std::vector<int>& params_i) {
-	// assert(idx >= 0);
-	assert(idx < num_params_i());
-	// assert(val >= 0);
-	assert(val < param_range_i(idx));
+	if (idx >= num_params_i()) // || idx < 0
+	  throw std::runtime_error ();
+	if (val >= param_range_i(idx)) // || val < 0
+	  throw std::runtime_error ();
 
 	int original_val = params_i[idx];
 	params_i[idx] = val;
