@@ -2,6 +2,7 @@
 #define __STAN__PROB__TRANSFORM_HPP__
 
 #include <cassert>
+#include <stdexcept>
 #include <vector>
 #include <Eigen/Dense>
 #include <boost/multi_array.hpp>
@@ -33,6 +34,7 @@ namespace stan {
      * The transformations are hard coded as log for standard deviations and Fisher
      * transformations (atanh()) of CPCs
      * @author Ben Goodrich
+     * @return false if any of the diagonals of Sigma are 0
      */
     template<typename T>
     bool
@@ -43,7 +45,7 @@ namespace stan {
       unsigned int K = sds.rows();
 
       sds = Sigma.diagonal().array();
-      if( (sds <= 0).any() ) return false;
+      if( (sds <= 0.0).any() ) return false;
       sds = sds.sqrt();
   
       DiagonalMatrix<T,Dynamic> D(K);
@@ -390,10 +392,13 @@ namespace stan {
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
      * @tparam T Type of scalar.
+     * @throw std::domain_error if the variable is negative.
      */
     template <typename T>
     T positive_free(const T y) {
-      assert(positive_validate(y));
+      if (!positive_validate(y)) {
+	throw std::domain_error ("y must be positive");
+      }
       return log(y);
     }
 
@@ -464,11 +469,13 @@ namespace stan {
      * @return Unconstrained value that produces the input when
      * constrained.
      * @tparam T Type of scalar.
+     * @throw std::invalid_argument if y is lower than the lower bound.
      */
     template <typename T>
     inline
     T lb_free(const T y, const double lb) {
-      assert(lb_validate(y,lb));
+      if (!lb_validate(y,lb)) 
+	throw std::invalid_argument ("y must be greater than the lower bound");
       return log(y - lb);
     }
     
@@ -546,10 +553,12 @@ namespace stan {
      * @param ub Upper bound.
      * @return Free scalar corresponding to upper-bounded scalar.
      * @tparam T Type of scalar.
+     * @throw std::invalid_argument if y is greater than the upper bound.
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      assert(ub_validate(y,ub));
+      if(!ub_validate(y,ub))
+	throw std::invalid_argument ("y is greater than the upper bound");
       return log(ub - y);
     }
 
@@ -640,10 +649,14 @@ namespace stan {
      * given the bounds.
      *
      * @tparam T Type of scalar.
+     * @throw std::invalid_argument if the lower bound is greater than the upper bound,
+     *   y is less than the lower bound, or
+     *   y is greater than the upper bound
      */
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
-      assert(lub_validate(y,lb,ub));
+      if(!lub_validate(y,lb,ub)) 
+	throw std::invalid_argument("");
       return logit((y - lb) / (ub - lb));
     }
 
@@ -721,11 +734,14 @@ namespace stan {
      *
      * <p>\f$f^{-1}(y) = \mbox{logit}(y) = \frac{1 - y}{y}\f$.
      * 
+     * @param y Scalar input.
      * @tparam T Type of scalar.
+     * @throw std::domain_error if y is less than 0 or greater than 1.
      */
     template <typename T>
     T prob_free(const T y) {
-      assert(prob_validate(y));
+      if(!prob_validate(y))
+	throw std::domain_error("y is not a probability");
       return logit(y);
     }
     
@@ -878,7 +894,7 @@ namespace stan {
 	  J(m,n) = (J(n,m) = y[m] * y[n]);
 	}
       }
-      lp += log(abs(J.determinant()));
+      lp += log(fabs(J.determinant()));
       return y;
     }
 
@@ -896,7 +912,9 @@ namespace stan {
     template <typename T>
     bool
     simplex_validate(const Matrix<T,Dynamic,1>& y) {
-      if (abs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
+      if (y.size() == 0)
+	return false;
+      if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
 	return false;
       for (unsigned int i = 0; i < y.size(); ++i) {
 	if (!(y[i] >= 0.0)) 
@@ -925,10 +943,12 @@ namespace stan {
      * @return Free vector of dimensionality (K-1) that transfroms to
      * the simplex.
      * @tparam T Type of scalar.
+     * @throw std::domain_error if y is not a valid simplex
      */
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
-      assert(simplex_validate(y));
+      if(!simplex_validate(y))
+	throw std::domain_error("y is not a valid simplex");
       unsigned int k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
       Matrix<T,Dynamic,1> x(k_minus_1);
@@ -1036,10 +1056,13 @@ namespace stan {
      * @param y Vector of positive, ordered scalars.
      * @return Free vector that transforms into the input vector.
      * @tparam T Type of scalar.
+     * @throw std::domain_error if y is not a vector of positive,
+     *   ordered scalars.
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
-      assert(pos_ordered_validate(y));
+      if(!pos_ordered_validate(y)) 
+	throw std::domain_error("y is not a vector of positive ordered scalars");
       unsigned int k = y.size();
       Matrix<T,Dynamic,1> x(k);
       if (k == 0) 
@@ -1052,7 +1075,6 @@ namespace stan {
     
 
     // CORRELATION MATRIX
-    
     /**
      * Return the correlation matrix of the specified dimensionality
      * derived from the specified vector of unconstrained values.  The
@@ -1074,12 +1096,14 @@ namespace stan {
      * @param x Vector of unconstrained partial correlations.
      * @param k Dimensionality of returned correlation matrix.
      * @tparam T Type of scalar.
+     * @throw std::invalid_argument if x is not a valid correlation matrix.
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x,
 						    unsigned int k) {
       unsigned int k_choose_2 = (k * (k - 1)) / 2;
-      assert(k_choose_2 == x.size());
+      if (k_choose_2 != x.size())
+	throw std::invalid_argument ("x is not a valid correlation matrix");
       Array<T,Dynamic,1> cpcs(k_choose_2);
       for (unsigned int i = 0; i < k_choose_2; ++i)
 	cpcs[i] = corr_constrain(x[i]);
@@ -1110,8 +1134,9 @@ namespace stan {
 						    unsigned int k,
 						    T& lp) {
       unsigned int k_choose_2 = (k * (k - 1)) / 2;
-      assert(k_choose_2 == x.size());
-
+      if (k_choose_2 != x.size())
+	throw std::invalid_argument ("x is not a valid correlation matrix");
+      
       Array<T,Dynamic,1> cpcs(k_choose_2);
       for (unsigned int i = 0; i < k_choose_2; ++i)
 	cpcs[i] = corr_constrain(x[i],lp);
@@ -1138,7 +1163,7 @@ namespace stan {
       if (!cov_matrix_validate(y))
 	return false;
       for (unsigned int k = 0; k < y.rows(); ++k) {
-	if (abs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
+	if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
 	  return false;
       }
       return true;
@@ -1158,20 +1183,27 @@ namespace stan {
      * @return Vector of unconstrained values that produce the specified
      * correlation matrix when transformed.
      * @tparam T Type of scalar.
+     * @throw std::domain_error if the correlation matrix has no elements or
+     *    is not a square matrix.
+     * @throw std::runtime_error if the correlation matrix cannot be factorized
+     *    by factor_cov_matrix() or if the sds returned by factor_cov_matrix()
+     *    on log scale are unconstrained.
      */
     template <typename T>
     Matrix<T,Dynamic,1> corr_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
       unsigned int k = y.rows();
-      assert(k > 0);
-      assert(y.cols() == k);
+      if (y.cols() != k || k == 0)
+	throw std::domain_error("y is not a square matrix or there are no elements");
       unsigned int k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> x(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(x,sds,y);
-      assert(successful);
+      if (!successful)
+	throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       for (unsigned int i = 0; i < k; ++i) {
 	// sds on log scale unconstrained
-	assert(abs(sds[i] - 0.0) < CONSTRAINT_TOLERANCE);
+	if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
+	  throw std::runtime_error ("sds on log scale are unconstrained");
       }
       return x.matrix();
     }
@@ -1268,7 +1300,7 @@ namespace stan {
 	return false;
       for (unsigned int m = 0; m < k; ++m) {
 	for (unsigned int n = m + 1; n < k; ++n) {
-	  if (abs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
+	  if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
 	    return false;
 	}
       }
@@ -1293,17 +1325,22 @@ namespace stan {
      * @return Vector of unconstrained values that transforms to the
      * specified covariance matrix.
      * @tparam T Type of scalar.
+     * @throw std::domain_error if the correlation matrix has no elements or
+     *    is not a square matrix.
+     * @throw std::runtime_error if the correlation matrix cannot be factorized
+     *    by factor_cov_matrix()
      */
     template <typename T>
     Matrix<T,Dynamic,1> cov_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
       unsigned int k = y.rows();
-      assert(k > 0);
-      assert(y.cols() == k);
+      if (y.cols() != k || k == 0)
+	throw std::domain_error("y is not a square matrix or there are no elements");
       unsigned int k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(cpcs,sds,y);
-      assert(successful);
+      if (!successful)
+	throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       Matrix<T,Dynamic,1> x(k_choose_2 + k);
       unsigned int pos = 0;
       for (unsigned int i = 0; i < k_choose_2; ++i)

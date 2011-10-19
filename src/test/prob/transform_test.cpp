@@ -1,5 +1,6 @@
 #include <vector>
 #include <cmath>
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include "stan/prob/transform.hpp"
@@ -46,6 +47,9 @@ TEST(prob_transform, positive_j) {
 TEST(prob_transform, positive_f) {
   EXPECT_FLOAT_EQ(log(0.5), stan::prob::positive_free(0.5));
 }
+TEST(prob_transform, positive_f_exception) {
+  EXPECT_THROW (stan::prob::positive_free(-1.0), std::domain_error);
+}
 TEST(prob_transform, positive_rt) {
   double x = -1.0;
   double xc = stan::prob::positive_constrain(x);
@@ -66,6 +70,10 @@ TEST(prob_transform, lb_j) {
 }
 TEST(prob_transform, lb_f) {
   EXPECT_FLOAT_EQ(log(3.0 - 2.0), stan::prob::lb_free(3.0,2.0));
+}
+TEST(prob_transform, lb_f_exception) {
+  double lb = 2.0;
+  EXPECT_THROW (stan::prob::lb_free(lb - 0.01, lb), std::invalid_argument);
 }
 TEST(prob_transform, lb_rt) {
   double x = -1.0;
@@ -88,6 +96,10 @@ TEST(prob_transform, ub_f) {
   double y = 2.0;
   double U = 4.0;
   EXPECT_FLOAT_EQ(log(-(y - U)), stan::prob::ub_free(2.0,4.0));
+}
+TEST(prob_transform, ub_f_exception) {
+  double ub = 4.0;
+  EXPECT_THROW (stan::prob::ub_free(ub+0.01, ub), std::invalid_argument);
 }
 TEST(prob_transform, ub_rt) {
   double x = -1.0;
@@ -121,6 +133,14 @@ TEST(prob_transform, lub_f) {
   EXPECT_FLOAT_EQ(stan::maths::logit((y - L) / (U - L)),
 		  stan::prob::lub_free(y,L,U));
 }
+TEST(prob_transform, lub_f_exception) {
+  double L = -10.0;
+  double U = 27.0;
+  EXPECT_THROW(stan::prob::lub_free (L-0.01,L,U), std::invalid_argument);
+  EXPECT_THROW(stan::prob::lub_free (U+0.01,L,U), std::invalid_argument);
+
+  EXPECT_THROW(stan::prob::lub_free ((L+U)/2,U,L), std::invalid_argument);
+}
 TEST(prob_transform, lub_rt) {
   double x = -1.0;
   double xc = stan::prob::lub_constrain(x,2.0,4.0);
@@ -152,6 +172,10 @@ TEST(prob_transform, prob_f) {
   double y = 0.4;
   EXPECT_FLOAT_EQ(stan::maths::logit((y - L) / (U - L)),
 		  stan::prob::prob_free(y));
+}
+TEST(prob_transform, prob_f_exception) {
+  EXPECT_THROW (stan::prob::prob_free(1.1), std::domain_error);
+  EXPECT_THROW (stan::prob::prob_free(-0.1), std::domain_error);
 }
 TEST(prob_transform, prob_rt) {
   double x = -1.0;
@@ -249,6 +273,15 @@ TEST(prob_transform,simplex_f) {
   EXPECT_EQ(log(y[1]) - log(0.1), x[1]);
   EXPECT_EQ(log(y[2]) - log(0.1), x[2]);
 }
+TEST(prob_transform,simplex_f_exception) {
+  Matrix<double,Dynamic,1> y(2);
+  y << 0.5, 0.55;
+  EXPECT_THROW(stan::prob::simplex_free(y), std::domain_error);
+  y << 1.1, -0.1;
+  EXPECT_THROW(stan::prob::simplex_free(y), std::domain_error);
+  y.resize(0);
+  EXPECT_THROW(stan::prob::simplex_free(y), std::domain_error);
+}
 TEST(prob_transform,simplex_rt) {
   Matrix<double,Dynamic,1> x(3);
   x << 1.0, -1.0, 2.0;
@@ -291,6 +324,15 @@ TEST(prob_transform,pos_ordered_f) {
   EXPECT_FLOAT_EQ(log(1.1 - 1.0), x[1]);
   EXPECT_FLOAT_EQ(log(172.1 - 1.1), x[2]);
 }
+TEST(prob_transform,pos_ordered_f_exception) {
+  Matrix<double,Dynamic,1> y(3);
+  y << -0.1, 0.0, 1.0;
+  EXPECT_THROW(stan::prob::pos_ordered_free(y), std::domain_error);
+  y << 0.0, 0.0, 0.0;
+  EXPECT_THROW(stan::prob::pos_ordered_free(y), std::domain_error);
+  y << 0.0, 1, 0.9;
+  EXPECT_THROW(stan::prob::pos_ordered_free(y), std::domain_error);
+}
 TEST(prob_transform,pos_ordered_rt) {
   Matrix<double,Dynamic,1> x(3);
   x << -1.0, 8.0, -3.9;
@@ -316,6 +358,19 @@ TEST(prob_transform,corr_matrix_j) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
+TEST(prob_transform,corr_matrix_constrain_exception) {
+  unsigned int K = 4;
+  unsigned int K_choose_2 = 6; 
+  Matrix<double,Dynamic,1> x(K_choose_2-1);
+  double lp = -12.9;
+
+  EXPECT_THROW(stan::prob::corr_matrix_constrain(x, K), std::invalid_argument);
+  EXPECT_THROW(stan::prob::corr_matrix_constrain(x, K, lp), std::invalid_argument);
+  
+  x.resize(K_choose_2+1);
+  EXPECT_THROW(stan::prob::corr_matrix_constrain(x, K), std::invalid_argument);
+  EXPECT_THROW(stan::prob::corr_matrix_constrain(x, K, lp), std::invalid_argument);
+}
 TEST(prob_transform,corr_matrix_rt) {
   unsigned int K = 4;
   unsigned int K_choose_2 = 6; 
@@ -329,8 +384,21 @@ TEST(prob_transform,corr_matrix_rt) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
+TEST(prob_transform,corr_matrix_free_exception) {
+  Matrix<double,Dynamic,Dynamic> y;
+  
+  EXPECT_THROW(stan::prob::corr_matrix_free(y), std::domain_error);
+  y.resize(0,10);
+  EXPECT_THROW(stan::prob::corr_matrix_free(y), std::domain_error);
+  y.resize(10,0);
+  EXPECT_THROW(stan::prob::corr_matrix_free(y), std::domain_error);
+  y.resize(1,2);
+  EXPECT_THROW(stan::prob::corr_matrix_free(y), std::domain_error);
 
-
+  y.resize(2,2);
+  y << 0, 0, 0, 0;
+  EXPECT_THROW(stan::prob::corr_matrix_free(y), std::runtime_error);
+}
 TEST(prob_transform,cov_matrix_rt) {
   unsigned int K = 4;
   unsigned int K_choose_2 = 6; 
@@ -344,6 +412,21 @@ TEST(prob_transform,cov_matrix_rt) {
   for (unsigned int i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
+}
+TEST(prob_transform,cov_matrix_free_exception) {
+  Matrix<double,Dynamic,Dynamic> y;
+  
+  EXPECT_THROW(stan::prob::cov_matrix_free(y), std::domain_error);
+  y.resize(0,10);
+  EXPECT_THROW(stan::prob::cov_matrix_free(y), std::domain_error);
+  y.resize(10,0);
+  EXPECT_THROW(stan::prob::cov_matrix_free(y), std::domain_error);
+  y.resize(1,2);
+  EXPECT_THROW(stan::prob::cov_matrix_free(y), std::domain_error);
+
+  y.resize(2,2);
+  y << 0, 0, 0, 0;
+  EXPECT_THROW(stan::prob::cov_matrix_free(y), std::runtime_error);
 }
 
 
