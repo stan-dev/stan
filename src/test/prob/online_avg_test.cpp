@@ -1,5 +1,6 @@
 #include <cmath>
 #include <vector>
+#include <stdexcept>
 #include <gtest/gtest.h>
 #include "stan/prob/online_avg.hpp"
 
@@ -109,4 +110,63 @@ TEST(prob_online_avg,everything) {
   EXPECT_FLOAT_EQ(sqrt(0.125),ola.sample_deviation(2));
 
   EXPECT_EQ(2U,ola.num_samples());
+}
+TEST(prob_online_avg,add_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(3U,ola.num_dimensions());
+
+  std::vector<double> x(2);
+  EXPECT_THROW (ola.add(x), std::runtime_error);
+}
+TEST(prob_online_avg,remove_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(0U,ola.num_samples());
+
+  std::vector<double> x;
+  EXPECT_THROW (ola.remove(x), std::runtime_error);
+}
+TEST(prob_online_avg,avg_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(3U,ola.num_dimensions());
+
+  ola.avg(0);
+  ola.avg(1);
+  ola.avg(2);
+  EXPECT_THROW (ola.avg(3), std::runtime_error);
+}
+TEST(prob_online_avg,sample_variance_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(3U,ola.num_dimensions());
+
+  ola.sample_variance(0);
+  ola.sample_variance(1);
+  ola.sample_variance(2);
+  EXPECT_THROW (ola.sample_variance(3), std::runtime_error);
+}
+TEST(prob_online_avg,avgs_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(3U,ola.num_dimensions());
+
+  std::vector<double> x(3);
+  ola.avgs(x);
+  x.resize(2);
+  EXPECT_THROW (ola.avgs(x), std::runtime_error);
+}
+TEST(prob_online_avg,sample_variances_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(3U,ola.num_dimensions());
+
+  std::vector<double> x(3);
+  ola.sample_variances(x);
+  x.resize(2);
+  EXPECT_THROW (ola.sample_variances(x), std::runtime_error);
+}
+TEST(prob_online_avg,sample_deviations_exception) {
+  stan::prob::online_avg ola(3);
+  EXPECT_EQ(3U,ola.num_dimensions());
+
+  std::vector<double> x(3);
+  ola.sample_deviations(x);
+  x.resize(2);
+  EXPECT_THROW (ola.sample_deviations(x), std::runtime_error);
 }

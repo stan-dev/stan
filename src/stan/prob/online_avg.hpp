@@ -2,6 +2,7 @@
 #define __STAN__PROB__ONLINE_AVG_HPP__
 
 #include <vector>
+#include <stdexcept>
 
 namespace stan {
 
@@ -27,9 +28,14 @@ namespace stan {
       unsigned int num_dimensions() {
 	return _mM.size();
       };
-
+      
+      /**
+       *
+       * @throw std::runtime_error if x.size() != num_dimensions()
+       */
       void add(std::vector<double>& x) {
-	assert(x.size() == num_dimensions());
+	if (x.size() != num_dimensions())
+	  throw std::runtime_error("x.size() must equal num_dimensions()");
 	++_num_samples;
 	for (unsigned int n = 0; n < num_dimensions(); ++n) {
 	  double nextM = _mM[n] + (x[n] - _mM[n]) / _num_samples;
@@ -37,9 +43,14 @@ namespace stan {
 	  _mM[n] = nextM;
 	}
       }
-
+      
+      /**
+       *
+       * @throw std::runtime_error if there are no samples
+       */
       void remove(std::vector<double>& x) {
-	assert(_num_samples > 0);
+	if (num_samples() == 0)
+	  throw std::runtime_error ("no samples to remove");
 	for (unsigned int n = 0; n < num_dimensions(); ++n) {
 	  double m_old = (_num_samples * _mM[n] - x[n])/(_num_samples - 1);
 	  _mS[n] -= (x[n] - _mM[n]) * (x[n] - m_old);
@@ -51,14 +62,24 @@ namespace stan {
       unsigned int num_samples() {
 	return _num_samples;
       }
-
+      
+      /**
+       *
+       * @throw std::runtime_error if n >= num_dimensions
+       */
       double avg(unsigned int n) {
-	assert(n < num_dimensions());
+	if (n >= num_dimensions())
+	  throw std::runtime_error("n >= num_dimensions()");
 	return _mM[n];
       }
 
+      /**
+       *
+       * @throw std::runtime_error if n >= num_dimensions
+       */
       double sample_variance(unsigned int n) {
-	assert(n < num_dimensions());
+	if (n >= num_dimensions())
+	  throw std::runtime_error("n >= num_dimensions()");
 	return _num_samples > 1
 	  ? _mS[n] / (_num_samples - 1)
 	  : 0.0;
@@ -68,20 +89,38 @@ namespace stan {
 	return sqrt(sample_variance(n));
       }
 
+      /**
+       *
+       * @throw std::runtime_error if dimension of avgs does not match
+       *    num_dimensions()
+       */      
       void avgs(std::vector<double>& avgs) {
-	assert(avgs.size() == num_dimensions());
+	if(avgs.size() != num_dimensions())
+	  throw std::runtime_error ("avgs.size() must equal num_dimensions()");
 	for (unsigned int n = 0; n < num_dimensions(); ++n) 
 	  avgs[n] = avg(n);
       }
 
+      /**
+       *
+       * @throw std::runtime_error if dimension of variances does not match
+       *    num_dimensions()
+       */      
       void sample_variances(std::vector<double>& variances) {
-	assert(variances.size() == num_dimensions());
+	if(variances.size() != num_dimensions())
+	  throw std::runtime_error ("variances.size() must equal num_dimensions()");
 	for (unsigned int n = 0; n < num_dimensions(); ++n) 
 	  variances[n] = sample_variance(n);
       }
 
+      /**
+       *
+       * @throw std::runtime_error if dimension of devs does not match
+       *    num_dimensions()
+       */      
       void sample_deviations(std::vector<double>& devs) {
-	assert(devs.size() == num_dimensions());
+	if(devs.size() != num_dimensions())
+	  throw std::runtime_error ("devs.size() must equal num_dimensions()");
 	for (unsigned int n = 0; n < num_dimensions(); ++n) 
 	  devs[n] = sample_deviation(n);
       }
