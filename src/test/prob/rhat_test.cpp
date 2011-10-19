@@ -1,4 +1,5 @@
 #include <vector>
+#include <stdexcept>
 #include <gtest/gtest.h>
 #include "stan/prob/rhat.hpp"
 
@@ -47,6 +48,18 @@ TEST(prob_rhat,construct) {
   
   
   EXPECT_FLOAT_EQ(1.027516,x[0]);
-  
-
 }
+TEST(prob_rhat,construct_exception) {
+  EXPECT_THROW (stan::prob::rhat rh(0,1), std::invalid_argument);
+  EXPECT_THROW (stan::prob::rhat rh(3,0), std::invalid_argument);
+  EXPECT_THROW (stan::prob::rhat rh(0,0), std::invalid_argument);
+}
+TEST(prob_rhat,add_exception) {
+  stan::prob::rhat rh(3,1);
+  
+  std::vector<double> x(1);
+  EXPECT_EQ(3, rh.num_chains());  
+  EXPECT_THROW(rh.add(3, x), std::out_of_range);
+}
+
+

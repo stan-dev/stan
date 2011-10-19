@@ -1,6 +1,7 @@
 #ifndef __STAN__PROB__RHAT_HPP__
 #define __STAN__PROB__RHAT_HPP__
 
+#include <stdexcept>
 #include "stan/prob/online_avg.hpp"
 
 namespace stan {
@@ -9,10 +10,17 @@ namespace stan {
 
     class rhat {
     public:
+      /**
+       *
+       * @throw std::invalid_argument if num_chains or num_params are equal to or less
+       *   than 0.
+       */
       rhat(unsigned int num_chains, unsigned int num_params) 
 	: _avgs(num_chains) {
-	assert(num_chains > 0);
-	assert(num_params > 0);
+	if (num_chains <= 0) 
+	  throw std::invalid_argument ("num_chains must be greater than 0");
+	if (num_params <= 0) 
+	  throw std::invalid_argument ("num_params must be greater than 0");
 	for (unsigned int m = 0; m < num_chains; ++m) {
 	  online_avg avgs(num_params);  // could move this out if next fully copies
 	  _avgs[m] = avgs;
@@ -28,9 +36,14 @@ namespace stan {
       int num_chains() {
 	return _avgs.size();
       }
-
+      
+      /**
+       *
+       * @throw std::out_of_range if j is greater than or equal to num_chains()
+       */
       void add(unsigned int j, std::vector<double>& theta) {
-	assert((int)j < num_chains());
+	if ((int)j >= num_chains()) 
+	  throw std::out_of_range ("j must be less than num_chains()");
 	_avgs[j].add(theta);
 	//if (_auto_corr_prod_avgs[j].num_samples() > 0) {
       
