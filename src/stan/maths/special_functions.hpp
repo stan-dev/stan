@@ -1,13 +1,14 @@
 #ifndef __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
 #define __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
 
-#include <assert.h>
+#include <stdexcept>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
 
   namespace maths {
+
 
     // for promote_args<> return types, see:
     // http://www.boost.org/doc/libs/1_46_0/libs/math/doc/sf_and_dist/html/math_toolkit/main_overview/result_type.html
@@ -267,7 +268,8 @@ namespace stan {
     namespace {
       template <typename Vector, typename Scalar>
       int maximum(const Vector& x) {
-	assert(x.size() > 0.0);
+	if(x.size() == 0)
+	  throw std::invalid_argument ("x must have at least one element");
 	Scalar max_x(x[0]);
 	for (unsigned int i = 1; i < x.size(); ++i)
 	  if (x[i] < max_x)
@@ -324,10 +326,12 @@ namespace stan {
      *
      * @param x Input vector of unbounded parameters.
      * @param simplex Output vector of simplex values.
+     * @throw std::invalid_argument if size of the input and output vectors differ.
      */
     template <typename Vector, typename Scalar>
     void softmax(const Vector& x, Vector& simplex) {
-      assert(x.size() == simplex.size());
+      if(x.size() != simplex.size()) 
+	throw std::invalid_argument ("x.size() != simplex.size()");
       Scalar sum(0.0); 
       Scalar max_x = maximum<Vector,Scalar>(x);
       for (unsigned int i = 0; i < x.size(); ++i)
@@ -357,10 +361,12 @@ namespace stan {
      *
      * @param simplex Simplex vector input.
      * @param y Vector into which the inverse softmax is written.
+     * @throw std::invalid_argument if size of the input and output vectors differ.
      */
     template <typename Vector>
     void inverse_softmax(const Vector& simplex, Vector& y) {
-      assert(simplex.size() == y.size());
+      if(simplex.size() != y.size())
+	throw std::invalid_argument ("simplex.size() != y.size()");
       for (unsigned int i = 0; i < simplex.size(); ++i)
 	y[i] = log(simplex[i]);
     }

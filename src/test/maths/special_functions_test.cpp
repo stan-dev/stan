@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdexcept>
 #include <gtest/gtest.h>
 #include "stan/maths/special_functions.hpp"
 
@@ -85,7 +86,27 @@ TEST(maths_test, softmax) {
   EXPECT_FLOAT_EQ(exp(-1.0)/sum, simplex[1]);
   EXPECT_FLOAT_EQ(exp(2.0)/sum, simplex[2]);
 }
-
+TEST(maths_test, softmax_exception) {
+  std::vector<double> x;
+  x.push_back(1.0);
+  x.push_back(-1.0);
+  x.push_back(2.0);
+  std::vector<double> simplex(2);
+  
+  // dl: EXPECT_THROW is not able to handle this templating
+  //EXPECT_THROW(stan::maths::softmax<std::vector<double>,double>(x,simplex), std::invalid_argument);
+  try{
+    stan::maths::softmax<std::vector<double>,double>(x,simplex);
+    FAIL();
+  } catch (std::invalid_argument e) {
+    SUCCEED();
+  }
+}
+TEST(maths_test, inverse_softmax_exception) {
+  std::vector<double> simplex(2);
+  std::vector<double> y(3);
+  EXPECT_THROW(stan::maths::inverse_softmax< std::vector<double> >(simplex, y), std::invalid_argument);
+}
 TEST(maths_test, lmgamma) {
   unsigned int k = 1;
   double x = 2.5;
@@ -116,5 +137,4 @@ TEST(maths_test, if_else) {
   EXPECT_EQ(1, stan::maths::if_else(d,u,v));
   d = false;
   EXPECT_EQ(-1, stan::maths::if_else(d,u,v));
-  
 }
