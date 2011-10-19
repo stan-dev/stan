@@ -418,9 +418,11 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return Sum of the two vectors.
+     * @throw std::invalid_argument if v1 and v2 are not the same size.
      */
     inline vector_d add(const vector_d& v1, vector_d& v2) {
-      assert(v1.size() == v2.size());
+      if (v1.size() != v2.size()) 
+	throw std::invalid_argument ("v1.size() != v2.size()");
       return v1 + v2;
     }
     /**
@@ -429,10 +431,12 @@ namespace stan {
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return Sum of the two vectors.
+     * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
     inline row_vector_d add(const row_vector_d& rv1, 
 			    const row_vector_d& rv2) {
-      assert(rv1.size() == rv2.size());
+      if (rv1.size() != rv2.size()) 
+	throw std::invalid_argument ("rv1.size() != rv2.size()");
       return rv1 + rv2;
     }
     /**
@@ -441,9 +445,11 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return Sum of the two vectors.
+     * @throw std::invalid_argument if m1 and m2 are not the same size.
      */
     inline matrix_d add(const matrix_d& m1, const matrix_d& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
+      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
+	throw std::invalid_argument ("dimensions of m1 and m2 do not match");
       return m1 + m2;
     }
 
@@ -453,9 +459,11 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return First vector minus the second vector.
+     * @throw std::invalid_argument if v1 and v2 are not the same size.
      */
     inline vector_d subtract(const vector_d& v1, const vector_d& v2) {
-      assert(v1.size() == v2.size());
+      if (v1.size() != v2.size()) 
+	throw std::invalid_argument ("v1.size() != v2.size()");
       return v1 - v2;
     }
     /**
@@ -464,10 +472,12 @@ namespace stan {
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return First vector minus the second vector.
+     * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
     inline row_vector_d subtract(const row_vector_d& rv1, 
 				 const row_vector_d& rv2) {
-      assert(rv1.size() == rv2.size());
+      if (rv1.size() != rv2.size()) 
+	throw std::invalid_argument ("rv1.size() != rv2.size()");
       return rv1 - rv2;
     }
     /**
@@ -476,9 +486,11 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return First matrix minus the second matrix.
+     * @throw std::invalid_argument if m1 and m2 are not the same size.
      */
     inline matrix_d subtract(const matrix_d& m1, const matrix_d& m2) {
-      assert(m1.rows() == m2.rows() && m1.cols() == m2.cols());
+      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
+	throw std::invalid_argument ("dimensions of m1 and m2 do not match");
       return m1 - m2;
     }
 
@@ -578,9 +590,11 @@ namespace stan {
      * @param rv Row vector.
      * @param v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
+     * @throw std::invalid_argument if rv and v are not the same size.
      */
     inline double multiply(const row_vector_d& rv, const vector_d& v) {
-      assert(rv.size() == v.size());
+      if (rv.size() != v.size()) 
+	throw std::invalid_argument ("rv.size() != v.size()");
       return rv.dot(v);
     }
     /**
@@ -595,38 +609,47 @@ namespace stan {
     }
     /**
      * Return the product of the specified matrix and
-     * column vector.  The number of rows of the matrix must be
+     * column vector.  The number of cols of the matrix must be
      * the same as the size of the vector.
      * @param m Matrix.
      * @param v Column vector.
      * @return Product of matrix and vector.
+     * @throw std::invalid_argument if number of columns of the matrix
+     *    is not the same size as the vector.
      */
     inline vector_d multiply(const matrix_d& m, const vector_d& v) {
-      assert(m.rows() == v.size());
+      if (m.cols() != v.size())
+	throw std::invalid_argument ("m.cols() != v.size()");
       return m * v;
     }
     /**
      * Return the product of the specifieid row vector and specified
-     * matrix.  The number of columns of the matrix must be the same
+     * matrix.  The number of rows of the matrix must be the same
      * as the size of the vector.
      * @param rv Row vector.
      * @param m Matrix.
      * @return Product of vector and matrix.
+     * @throw std::invalid_argument if size of the row vector is not the
+     *    number of rows of the matrix.
      */
     inline row_vector_d multiply(const row_vector_d& rv, const matrix_d& m) {
-      assert(rv.size() == m.cols());
+      if (rv.size() != m.rows())
+	throw std::invalid_argument ("rv.size() != m.rows()");
       return rv * m;
     }
     /**
      * Return the product of the specified matrices.  The number of
-     * rows in the first matrix must be the same as the number of columns
+     * columns in the first matrix must be the same as the number of rows
      * in the second matrix.
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return The product of the first and second matrices.
+     * @throw std::invalid_argument if the number of columns of m1 does not match
+     *   the number of rows of m2.
      */
     inline matrix_d multiply(const matrix_d& m1, const matrix_d& m2) {
-      assert(m1.rows() == m2.cols());
+      if (m1.cols() != m2.rows())
+	throw std::invalid_argument ("m1.cols() != m2.rows()");
       return m1 * m2;
     }
 
@@ -811,9 +834,11 @@ namespace stan {
      * <p>\f$A = L \times L^T\f$.
      * @param m Symmetrix matrix.
      * @return Square root of matrix.
+     * @throw std::invalid_argument if m is not a square matrix
      */
     inline matrix_d cholesky_decompose(const matrix_d& m) {
-      assert(m.rows() == m.cols());
+      if (m.rows() != m.cols())
+	throw std::invalid_argument ("m must be a square matrix");
       Eigen::LLT<matrix_d> llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
