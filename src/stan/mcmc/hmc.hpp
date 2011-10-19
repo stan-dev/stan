@@ -98,11 +98,13 @@ namespace stan {
        *
        * @param x Real parameters.
        * @param z Integer parameters.
+       * @throw std::invalid_argument if x or z do not match size 
+       *    of parameters specified by the model.
        */
       virtual void set_params(std::vector<double> x, 
 			      std::vector<int> z) {
-	assert(x.size() == _x.size());
-	assert(z.size() == _z.size());
+	if (x.size() != _x.size() || z.size() != _z.size())
+	  throw std::invalid_argument();
 	_x = x;
 	_z = z;
       }
@@ -115,9 +117,12 @@ namespace stan {
        * by the client of this class after initialization.  
        *
        * @param x Real parameters.
+       * @throw std::invalid_argument if the number of real parameters does
+       *   not match the number of parameters defined by the model.
        */
       virtual void set_params_r(const std::vector<double>& x) {
-	assert(x.size() == _model.num_params_r());
+	if (x.size() != _model.num_params_r())
+	  throw std::invalid_argument ("x.size() must match the number of parameters of the model.");
 	_x = x;
 	_E = -_model.grad_log_prob(_x,_z,_g);
       }
@@ -130,9 +135,12 @@ namespace stan {
        * by the client of this class after initialization.  
        *
        * @param z Integer parameters.
+       * @throw std::invalid_argument if the number of integer parameters does
+       *   not match the number of parameters defined by the model.
        */
       virtual void set_params_i(const std::vector<int>& z) {
-	assert(z.size() == _model.num_params_i());
+	if (z.size() != _model.num_params_i())
+	  throw std::invalid_argument ("z.size() must match the number of parameters of the model.");
 	_z = z;
 	_E = -_model.grad_log_prob(_x,_z,_g);
       }

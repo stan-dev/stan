@@ -19,10 +19,15 @@ namespace stan {
 
 
     namespace {
-
+      
+      /**
+       *
+       * @throw std::invalid_argument if sizes of x1 and x2 do not match
+       */
       inline double dist(std::vector<double>& x1, std::vector<double>& x2) {
         double result = 0;
-        assert(x1.size() == x2.size());
+	if (x1.size() != x2.size())
+	  throw std::invalid_argument();
         for (unsigned int i = 0; i < x1.size(); i++) {
           double diff = x1[i] - x2[i];
           result += diff * diff;
@@ -163,11 +168,13 @@ namespace stan {
        *
        * @param x Real parameters.
        * @param z Integer parameters.
+       * @throw std::invalid_argument if x or z do not match size 
+       *    of parameters specified by the model.
        */
       virtual void set_params(std::vector<double> x,
                               std::vector<unsigned int> z) {
-	assert(x.size() == _x.size());
-	assert(z.size() == _z.size());
+	if (x.size() != _x.size() || z.size() != _z.size())
+	  throw std::invalid_argument();
 	_x = x;
         _z = z;
 	_E = -_model.grad_log_prob(_x,_z,_g);
