@@ -2,7 +2,7 @@
 #define __STAN__IO__DUMP_HPP__
 
 #include <Eigen/Dense>
-#include <cassert>
+#include <stdexcept>
 #include <map>
 #include <vector>
 #include <utility>
@@ -18,7 +18,7 @@ namespace stan {
 
      namespace {
        double product(std::vector<unsigned int> dims) {
-	 unsigned int y = 0U;
+	 unsigned int y = 1U;
 	 for (unsigned int i = 0; i < dims.size(); ++i)
 	   y *= dims[i];
 	 return y;
@@ -35,7 +35,8 @@ namespace stan {
       // checks doesn't contain quote char
       void write_name_equals(const std::string& name) {
 	for (unsigned int i = 0; i < name.size(); ++i)
-	  assert(name.at(i) != '"');
+	  if (name.at(i) == '"')
+	    throw std::invalid_argument ("name can not contain quote char");
        	out_ << '"' << name << '"' << " <- " << '\n';
       }
 
@@ -274,7 +275,8 @@ namespace stan {
       void dump_structure(std::string name,
 			  std::vector<unsigned int> dims,
 			  std::vector<T> xs) {
-	assert(xs.size() == product(dims));
+	if (xs.size() != product(dims)) 
+	  throw std::invalid_argument ("xs.size() != product(dims)");
 	write_structure(xs,dims);
       }
 

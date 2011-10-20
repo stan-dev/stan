@@ -270,3 +270,12 @@ TEST(io_dump, dump_file) {
   stan::io::var_context& context = dump;
   EXPECT_TRUE(context.contains_i("N"));
 }
+TEST(io_dump, product) {
+  std::vector<unsigned int>dims;
+  dims.push_back(1);
+  
+  EXPECT_FLOAT_EQ(1.0, stan::io::product(dims));
+  dims.push_back(3);
+  dims.push_back(4);
+  EXPECT_FLOAT_EQ(12.0, stan::io::product(dims));
+}
