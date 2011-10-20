@@ -1295,7 +1295,7 @@ namespace stan {
       // test symmetry
       // FIXME:  is symmetry test necessary, or is it implied by eigenvalue test?
       unsigned int k = y.rows();
-      if (y.rows() != y.cols())
+      if (y.rows() != y.cols() || k == 0)
 	return false;
       for (unsigned int m = 0; m < k; ++m) {
 	for (unsigned int n = m + 1; n < k; ++n) {

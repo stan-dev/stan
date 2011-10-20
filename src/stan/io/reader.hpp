@@ -1,7 +1,7 @@
 #ifndef __STAN__IO__READER_HPP__
 #define __STAN__IO__READER_HPP__
 
-#include <cassert>
+#include <stdexcept>
 #include <vector>
 #include <Eigen/Dense>
 #include <boost/multi_array.hpp>
@@ -305,10 +305,12 @@ namespace stan {
        * <p>See <code>stan::prob::positive_validate(T)</code>.
        *
        * @return Next positive scalar.
+       * @throw std::runtime_error if x is not positive
        */
       T scalar_pos() {
 	T x(scalar());
-	assert(stan::prob::positive_validate(x));
+	if(!stan::prob::positive_validate(x))
+	  throw std::runtime_error ("x is not positive");
 	return x;
       }
 
@@ -344,10 +346,13 @@ namespace stan {
        *
        * @param lb Lower bound.
        * @return Next scalar value.
+       * @throw std::runtime_error if the scalar is less than the
+       *    specified lower bound
        */
       T scalar_lb(double lb) {
 	T x(scalar());
-	assert(stan::prob::lb_validate(x,lb));
+	if (!stan::prob::lb_validate(x,lb))
+	  throw std::runtime_error ("x is less than the lower bound");
 	return x;
       }
 
@@ -383,16 +388,19 @@ namespace stan {
 
       /**
        * Return the next scalar, checking that it is
-       * greater than or equal to the specified lower bound.
+       * less than or equal to the specified upper bound.
        *
        * <p>See <code>stan::prob::ub_validate(T,double)</code>.
        *
        * @param ub Upper bound.
        * @return Next scalar value.
+       * @throw std::runtime_error if the scalar is greater than the
+       *    specified upper bound
        */
       T scalar_ub(double ub) {
 	T x(scalar());
-	assert(stan::prob::ub_validate(x,ub));
+	if(!stan::prob::ub_validate(x,ub))
+	  throw std::runtime_error("x is greater than the upper bound");
 	return x;
       }
 
@@ -433,10 +441,13 @@ namespace stan {
        * @param lb Lower bound.
        * @param ub Upper bound.
        * @return Next scalar value.
+       * @throw std::runtime_error if the scalar is not between the specified
+       *    lower and upper bounds.
        */
       T scalar_lub(double lb, double ub) {
 	T x(scalar());
-	assert(stan::prob::lub_validate(x,lb,ub));
+	if(!stan::prob::lub_validate(x,lb,ub))
+	  throw std::runtime_error ("scalar is not between lower and upper bounds");
 	return x;
       }
 
@@ -520,10 +531,13 @@ namespace stan {
        * <p>See <code>stan::prob::corr_validate(T)</code>.
        *
        * @return Next correlation value.
+       * @throw std::runtime_error if the value is not valid
+       *   for a correlation
        */
       T corr() {
 	T x(scalar());
-	assert(stan::prob::corr_validate(x));
+	if (!stan::prob::corr_validate(x))
+	  throw std::runtime_error ("x is not a valid correlation value");
 	return x;
       }
 
@@ -561,10 +575,12 @@ namespace stan {
        *
        * @param k Size of returned simplex.
        * @return Simplex read from the specified size number of scalars.
+       * @throw std::runtime_error if the k values is not a simplex.
        */
       Matrix<T,Dynamic,1> simplex(unsigned int k) {
 	Matrix<T,Dynamic,1> theta(vector(k));
-	assert(stan::prob::simplex_validate(theta));
+	if(!stan::prob::simplex_validate(theta))
+	  throw std::runtime_error("the k values is not a simplex");
 	return theta;
       }
 
@@ -605,10 +621,12 @@ namespace stan {
        *
        * @param k Size of returned vector.
        * @return Vector of positive values in ascending order.
+       * @throw std::runtime_error if the vector is not positive ordered
        */
       Matrix<T,Dynamic,1> pos_ordered(unsigned int k) {
 	Matrix<T,Dynamic,1> x(vector(k));
-	assert(stan::prob::pos_ordered_validate(x));
+	if(!stan::prob::pos_ordered_validate(x)) 
+	  throw std::runtime_error ("vector is not a positive ordered");
 	return x;
       }
 
@@ -648,10 +666,12 @@ namespace stan {
        *
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
+       * @throw std::runtime_error if the matrix is not a correlation matrix
        */
       Matrix<T,Dynamic,Dynamic> corr_matrix(unsigned int k) {
 	Matrix<T,Dynamic,Dynamic> x(matrix(k,k));
-	assert(stan::prob::corr_matrix_validate(x));
+	if(!stan::prob::corr_matrix_validate(x))
+	  throw std::runtime_error ("the matrix returned is not a valid correlation matrix");
 	return x;
       }
 
@@ -691,10 +711,13 @@ namespace stan {
        *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
+       * @throw std::runtime_error if the matrix is not a valid
+       *    covariance matrix
        */
       Matrix<T,Dynamic,Dynamic> cov_matrix(unsigned int k) {
 	Matrix<T,Dynamic,Dynamic> y(matrix(k,k));
-	assert(stan::prob::cov_matrix_validate(y));
+	if(!stan::prob::cov_matrix_validate(y))
+	  throw std::runtime_error ("the matrix returned is not a valid covariance matrix");
 	return y;
       }
 

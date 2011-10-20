@@ -1,4 +1,5 @@
 #include <vector>
+#include <stdexcept>
 #include <gtest/gtest.h>
 #include <stan/io/reader.hpp>
 #include <stan/maths/special_functions.hpp>
@@ -55,6 +56,15 @@ TEST(io_reader, scalar_pos) {
   EXPECT_FLOAT_EQ(2.0,y);
   EXPECT_EQ(0U,reader.available());
 }
+TEST(io_reader, scalar_pos_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(1.0);
+  theta.push_back(-1.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_NO_THROW (reader.scalar_pos());
+  EXPECT_THROW (reader.scalar_pos(), std::runtime_error);
+}
 TEST(io_reader, scalar_pos_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -98,6 +108,15 @@ TEST(io_reader, scalar_lb) {
   EXPECT_FLOAT_EQ(2.0,y);
   EXPECT_EQ(0U,reader.available());
 }
+TEST(io_reader, scalar_lb_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-1.0);
+  theta.push_back(2.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_NO_THROW (reader.scalar_lb(-1.0));
+  EXPECT_THROW (reader.scalar_lb(3.0), std::runtime_error);
+}
 TEST(io_reader, scalar_lb_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -140,6 +159,15 @@ TEST(io_reader, scalar_ub) {
 
   EXPECT_EQ(0U,reader.available());
 }
+TEST(io_reader, scalar_ub_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-1.0);
+  theta.push_back(2.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_NO_THROW (reader.scalar_ub(-1.0));
+  EXPECT_THROW (reader.scalar_ub(1.0), std::runtime_error);
+}
 TEST(io_reader, scalar_ub_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -181,6 +209,15 @@ TEST(io_reader, scalar_lub) {
   EXPECT_FLOAT_EQ(2.0,y);
 
   EXPECT_EQ(0U,reader.available());
+}
+TEST(io_reader, scalar_lub_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-1.0);
+  theta.push_back(2.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_NO_THROW (reader.scalar_lub(-2.0, 2.0));
+  EXPECT_THROW (reader.scalar_lub(-1.0, 1.0), std::runtime_error);
 }
 TEST(io_reader, scalar_lub_constrain) {
   std::vector<int> theta_i;
@@ -284,6 +321,17 @@ TEST(io_reader, corr) {
   EXPECT_FLOAT_EQ(0.0,rho3);
 
   EXPECT_EQ(0U,reader.available());
+}
+TEST(io_reader, corr_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-0.9);
+  theta.push_back(-1.1);
+  theta.push_back(1.1);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_NO_THROW (reader.corr());
+  EXPECT_THROW (reader.corr(), std::runtime_error);
+  EXPECT_THROW (reader.corr(), std::runtime_error);
 }
 TEST(io_reader, corr_constrain) {
   std::vector<int> theta_i;
@@ -441,6 +489,22 @@ TEST(io_reader, simplex) {
   EXPECT_FLOAT_EQ(1.0,z[0]);
   EXPECT_FLOAT_EQ(6.0,reader.scalar());
 }
+TEST(io_reader, simplex_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  theta[0] = 0.00;
+  theta[1] = 0.29;
+  theta[2] = 0.70;
+  theta[3] = 0.01;
+  theta[4] = 1.0;
+  theta[5] = 1.0;
+  EXPECT_NO_THROW (reader.simplex(4));
+  EXPECT_THROW (reader.simplex(2), std::runtime_error);
+  EXPECT_THROW (reader.simplex(0), std::runtime_error);
+}
 TEST(io_reader, simplex_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -513,6 +577,20 @@ TEST(io_reader, pos_ordered) {
   EXPECT_FLOAT_EQ(5.0,y[4]);
   EXPECT_FLOAT_EQ(6.0,reader.scalar());
 }
+TEST(io_reader, pos_ordered_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_FLOAT_EQ(0.0,reader.scalar()); // throw away theta[0]
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.pos_ordered(5);
+  EXPECT_EQ(5U,y.size());
+  EXPECT_FLOAT_EQ(1.0,y[0]);
+  EXPECT_FLOAT_EQ(2.0,y[1]);
+  EXPECT_FLOAT_EQ(5.0,y[4]);
+  EXPECT_FLOAT_EQ(6.0,reader.scalar());
+}
 TEST(io_reader, pos_ordered_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -572,6 +650,20 @@ TEST(io_reader, corr_matrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S
     = reader.corr_matrix(3);
   EXPECT_FLOAT_EQ(theta[0], S(0,0));
+}
+TEST(io_reader, corr_matrix_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  theta[0] = 1.5;
+  theta[1] = 1.0;
+  theta[2] = 2.0;
+  theta[3] = 0.0;
+  theta[4] = 1.0;
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_THROW (reader.corr_matrix(1), std::runtime_error);
+  EXPECT_THROW (reader.corr_matrix(2), std::runtime_error);
 }
 TEST(io_reader,corr_matrix_constrain) {
   std::vector<int> theta_i;
@@ -650,6 +742,19 @@ TEST(io_reader, cov_matrix) {
   EXPECT_FLOAT_EQ(theta[1], S(1,0));
   EXPECT_FLOAT_EQ(theta[7], S(2,1));
   EXPECT_FLOAT_EQ(theta[8], S(2,2));
+}
+TEST(io_reader, cov_matrix_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  theta[0] = 6.3;
+  theta[1] = 0.7;
+  theta[2] = 0.6;
+  theta[3] = 1.9;
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_THROW (reader.cov_matrix(2), std::runtime_error);
+  EXPECT_THROW (reader.cov_matrix(0), std::runtime_error);
 }
 TEST(io_reader,cov_matrix_constrain) {
   std::vector<int> theta_i;
