@@ -626,7 +626,7 @@ namespace stan {
       Matrix<T,Dynamic,1> pos_ordered(unsigned int k) {
 	Matrix<T,Dynamic,1> x(vector(k));
 	if(!stan::prob::pos_ordered_validate(x)) 
-	  throw std::runtime_error ("vector is not a positive ordered");
+	  throw std::runtime_error ("vector is not positive ordered");
 	return x;
       }
 
