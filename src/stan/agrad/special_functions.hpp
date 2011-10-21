@@ -318,6 +318,9 @@ namespace stan {
 	}
       };
 
+      /**
+       * Helper class for calculating the unit normal cumulative density function.
+       */
       class Phi_vari : public op_v_vari {
       public:
 	Phi_vari(vari* avi) :

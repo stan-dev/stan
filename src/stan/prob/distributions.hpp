@@ -42,15 +42,25 @@ namespace stan {
       const double SQRT_2 = std::sqrt(2);
     }
 
-    // for a priori truncation
-    //    truncated_norm(y|mu,sigma,low,high)
-    //         = norm(y|mu,sigma) / (norm_p(high,mu,sigma) - norm_p(low,mu,sigma))
+    /**
+     * Calculates the normal cumulative distribution function for the given
+     * y, mean, and variance.
+     * 
+     * \f$\Phi(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\inf}^x e^{-t^2/2} dt\f$.
+     * 
+     * @param y A scalar variable.
+     * @param loc The location of the normal distribution.
+     * @param scale The variance of the normal distriubtion
+     * @return The unit normal cdf evaluated at the specified argument.
+     * @tparam T_y Type of y.
+     * @tparam T_loc Type of location parameter.
+     * @tparam T_scale Type of scale paramater.
+     */
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
     normal_p(T_y y, T_loc loc, T_scale scale) {
       return 0.5 * erfc(-(y - loc)/(scale * SQRT_2));
     }
-
 
     // CONTINUOUS, UNIVARIATE DENSITIES
 
