@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
 #include "stan/maths/special_functions.hpp"
+#include "stan/agrad/matrix.hpp"
 
 namespace stan {
 
@@ -49,20 +50,83 @@ namespace stan {
      * \f$\Phi(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\inf}^x e^{-t^2/2} dt\f$.
      * 
      * @param y A scalar variable.
-     * @param loc The location of the normal distribution.
-     * @param scale The variance of the normal distriubtion
+     * @param mean The mean of the normal distribution.
+     * @param sigma The standard deviation of the normal distriubtion
      * @return The unit normal cdf evaluated at the specified argument.
      * @tparam T_y Type of y.
-     * @tparam T_loc Type of location parameter.
-     * @tparam T_scale Type of scale paramater.
+     * @tparam T_loc Type of mean parameter.
+     * @tparam T_scale Type of standard deviation paramater.
      */
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
-    normal_p(T_y y, T_loc loc, T_scale scale) {
-      return 0.5 * erfc(-(y - loc)/(scale * SQRT_2));
+    normal_p(const T_y& y, const T_loc& mean, const T_scale& sigma) {
+      return 0.5 * erfc(-(y - mean)/(sigma * SQRT_2));
     }
 
     // CONTINUOUS, UNIVARIATE DENSITIES
+
+    // Normal(y|mu,sigma)   [sigma > 0]
+    /**
+     * The log of the normal density for the given y, mean, and standard deviation.
+     * The standard deviation must be greater than 0.
+     * 
+     * @param y A scalar variable.
+     * @param mu The mean of the normal distribution.
+     * @param sigma The standard deviation of the normal distribution. 
+     * @throw std::domain_error if sigma is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_scale Type of scale.
+     */
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    normal_log(T_y y, T_loc mu, T_scale sigma) {
+      if (sigma <= 0.0)
+	throw std::domain_error ("sigma must be greater than 0");
+      return NEG_LOG_SQRT_TWO_PI
+	- log(sigma)
+	- ((y - mu) * (y - mu)) / (2.0 * sigma * sigma);
+    }
+
+    /**
+     * The log of the normal density up to a proportion for the given 
+     * y, mean, and standard deviation.
+     * The standard deviation must be greater than 0.
+     * 
+     * @param y A scalar variable.
+     * @param mu The mean of the normal distribution.
+     * @param sigma The standard deviation of the normal distribution. 
+     * @throw std::domain_error if sigma is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_scale Type of scale.
+     */    
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    normal_propto_log(T_y y, T_loc mu, T_scale sigma) {
+      return normal_log(y,mu,sigma);
+    }
+    
+    /**
+     * The log of the normal density up to a proportion for the given 
+     * y, mean, and standard deviation.
+     * The standard deviation must be greater than 0.
+     * 
+     * @param y A scalar variable.
+     * @param mu The mean of the normal distribution.
+     * @param sigma The standard deviation of the normal distribution. 
+     * @throw std::domain_error if sigma is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_scale Type of scale.
+     */    
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline void
+    normal_propto_log(stan::agrad::var& lp, T_y y, T_loc mu, T_scale sigma) {
+      if (sigma <= 0)
+	throw std::domain_error ("sigma must be greater than 0");
+      lp += normal_log(y,mu,sigma);
+    }
 
     // NormalTruncatedLH(y|mu,sigma,low,high)  [sigma > 0, low < high]
     // Norm(y|mu,sigma) / (Norm_p(high|mu,sigma) - Norm_p(low|mu,sigma))
@@ -97,15 +161,7 @@ namespace stan {
     uniform_log(T_y y, T_low alpha, T_high beta) {
       return -log(beta - alpha);
     }
-  
-    // Normal(y|mu,sigma)   [sigma > 0]
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_log(T_y y, T_loc mu, T_scale sigma) {
-      return NEG_LOG_SQRT_TWO_PI
-	- log(sigma)
-	- ((y - mu) * (y - mu)) / (2.0 * sigma * sigma);
-    }
+
 
     // Gamma(y|alpha,beta)   [alpha > 0;  beta > 0;  y > 0]
     template <typename T_y, typename T_shape, typename T_inv_scale>

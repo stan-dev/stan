@@ -3,10 +3,13 @@
 #include <Eigen/Dense>
 #include "stan/maths/special_functions.hpp"
 #include "stan/prob/distributions.hpp"
+#include "stan/agrad/matrix.hpp"
 
 using Eigen::Array;
 using Eigen::Dynamic;
 using Eigen::Matrix;
+
+using stan::agrad::var;
 
 TEST(prob_prob,uniform) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(0.2,0.0,1.0)));
@@ -18,12 +21,24 @@ TEST(prob_prob,uniform) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(1.0,0.0,1.0)));
 }
 
+TEST(prob_prob,norm_p) {
+  // values from R pnorm()
+  EXPECT_FLOAT_EQ(0.5000000, stan::prob::normal_p (0.0, 0.0, 1.0));
+  EXPECT_FLOAT_EQ(0.8413447, stan::prob::normal_p (1.0, 0.0, 1.0));
+  EXPECT_FLOAT_EQ(0.4012937, stan::prob::normal_p (1.0, 2.0, 4.0));
+}
 TEST(prob_prob,norm) {
   // values from R dnorm()
   EXPECT_FLOAT_EQ(-0.9189385, stan::prob::normal_log(0.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-1.418939, stan::prob::normal_log(1.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-2.918939, stan::prob::normal_log(-2.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-3.174270, stan::prob::normal_log(-3.5,1.9,7.2));
+  EXPECT_FLOAT_EQ(-1.418939,  stan::prob::normal_log(1.0,0.0,1.0));
+  EXPECT_FLOAT_EQ(-2.918939,  stan::prob::normal_log(-2.0,0.0,1.0));
+  EXPECT_FLOAT_EQ(-3.174270,  stan::prob::normal_log(-3.5,1.9,7.2));
+}
+TEST(prob_prob,norm_exception) {
+  double sigma_d = 0.0;
+  var sigma_v = 0.0;
+  EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
+  EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_v), std::domain_error);
 }
 
 TEST(prob_prob,gamma) {
