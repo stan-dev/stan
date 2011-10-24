@@ -73,6 +73,7 @@ namespace stan {
      * @param y A scalar variable.
      * @param mu The mean of the normal distribution.
      * @param sigma The standard deviation of the normal distribution. 
+     * @return The log of the normal density.
      * @throw std::domain_error if sigma is not greater than 0.
      * @tparam T_y Type of scalar.
      * @tparam T_loc Type of location.
@@ -80,7 +81,7 @@ namespace stan {
      */
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_log(T_y y, T_loc mu, T_scale sigma) {
+    normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       if (sigma <= 0.0)
 	throw std::domain_error ("sigma must be greater than 0");
       return NEG_LOG_SQRT_TWO_PI
@@ -96,6 +97,7 @@ namespace stan {
      * @param y A scalar variable.
      * @param mu The mean of the normal distribution.
      * @param sigma The standard deviation of the normal distribution. 
+     * @return The log of the normal density up to a proportion.
      * @throw std::domain_error if sigma is not greater than 0.
      * @tparam T_y Type of scalar.
      * @tparam T_loc Type of location.
@@ -103,7 +105,9 @@ namespace stan {
      */    
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_propto_log(T_y y, T_loc mu, T_scale sigma) {
+    normal_propto_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      if (sigma <= 0)
+	throw std::domain_error ("sigma must be greater than 0");
       return normal_log(y,mu,sigma);
     }
     
@@ -119,10 +123,10 @@ namespace stan {
      * @tparam T_y Type of scalar.
      * @tparam T_loc Type of location.
      * @tparam T_scale Type of scale.
-     */    
+     */
     template <typename T_y, typename T_loc, typename T_scale>
     inline void
-    normal_propto_log(stan::agrad::var& lp, T_y y, T_loc mu, T_scale sigma) {
+    normal_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma) {
       if (sigma <= 0)
 	throw std::domain_error ("sigma must be greater than 0");
       lp += normal_log(y,mu,sigma);
@@ -130,11 +134,34 @@ namespace stan {
 
     // NormalTruncatedLH(y|mu,sigma,low,high)  [sigma > 0, low < high]
     // Norm(y|mu,sigma) / (Norm_p(high|mu,sigma) - Norm_p(low|mu,sigma))
+    /**
+     * The log of a truncated normal density for the given 
+     * y, mean, and standard deviation, low, and high.
+     * The standard deviation must be greater than 0.
+     * high must be greater than low.
+     * 
+     * @param y A scalar variable.
+     * @param mu The mean of the normal distribution.
+     * @param sigma The standard deviation of the normal distribution. 
+     * @param low Lower bound.
+     * @param high Upper bound.
+     * @throw std::domain_error if sigma is not greater than 0.
+     * @throw std::invalid_argument if high is not greater than low.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_scale Type of scale.
+     */
     template <typename T_y, typename T_loc, typename T_scale, typename T_low, typename T_high>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale, T_low, T_high>::type
-    normal_trunc_lh_log(T_y y, T_loc mu, T_scale sigma, T_low low, T_high high) {
+    normal_trunc_lh_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_low& low, const T_high& high) {
+      if (high < low)
+	throw std::invalid_argument ("high must be greater than low");
+      if (sigma <= 0)
+	throw std::domain_error ("sigma must be greater than 0");
+      if (y > high || y < low)
+	return log (0.0);
       return normal_log(y,mu,sigma) 
-	- log(normal_p(y,mu,high) - normal_p(y,mu,low));
+	- log(normal_p(high,mu,sigma) - normal_p(low,mu,sigma));
     }
 
     // NormalTruncatedL(y|mu,sigma,low)  [sigma > 0]

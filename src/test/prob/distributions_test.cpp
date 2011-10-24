@@ -39,7 +39,51 @@ TEST(prob_prob,norm_exception) {
   var sigma_v = 0.0;
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_v), std::domain_error);
+  sigma_d = -1.0;
+  sigma_v = -1.0;
+  EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
+  EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_v), std::domain_error);
 }
+TEST(prob_prob,norm_trunc_lh) {
+  // values from R dnorm()
+  double mu;
+  double sigma;
+  double low;
+  double high;
+  
+  mu = 0;
+  sigma = 1.0;
+  low = -2.0;
+  high = 1.0;
+  // mu <- 0; sigma <- 1.0; low <- -2.0; high <- 1.0;
+  // R: log ( 0.0 )
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), stan::prob::normal_trunc_lh_log(-5.0, mu, sigma, low, high));
+  // R: log ( dnorm(-2.0, mu, sigma) / (pnorm (high, mu, sigma) - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-2.718772, stan::prob::normal_trunc_lh_log(-2.0, mu, sigma, low, high));
+  // R: log ( dnorm(1.0, mu, sigma) / (pnorm (high, mu, sigma) - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-1.218772, stan::prob::normal_trunc_lh_log( 1.0, mu, sigma, low, high));
+  // R: log ( 0.0 )
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), stan::prob::normal_trunc_lh_log(10.0, mu, sigma, low, high));
+
+  // R: log ( dnorm(0.0, mu, sigma) / (pnorm (high, mu, sigma) - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-0.7187722, stan::prob::normal_trunc_lh_log(0.0, mu, sigma, low, high));
+  // R: log ( dnorm(0.5, mu, sigma) / (pnorm (high, mu, sigma) - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-0.8437722, stan::prob::normal_trunc_lh_log(0.5, mu, sigma, low, high));
+  // R: log ( dnorm(-0.5, mu, sigma) / (pnorm (high, mu, sigma) - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-0.8437722, stan::prob::normal_trunc_lh_log(-0.5, mu, sigma, low, high));
+}
+TEST(prob_prob,norm_trunc_lh_exception) {
+  double y = 0;
+  double mu = 0;
+  double sigma = 1;
+  double low = -5;
+  double high = 5;
+  EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, 0.0, low, high), std::domain_error);
+  EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, -1.0, low, high), std::domain_error);
+  EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, high, low), std::invalid_argument);
+  EXPECT_NO_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, low, low));
+}
+
 
 TEST(prob_prob,gamma) {
   EXPECT_FLOAT_EQ(-0.6137056, stan::prob::gamma_log(1.0,2.0,2.0));
