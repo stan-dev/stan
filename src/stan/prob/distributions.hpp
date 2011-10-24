@@ -225,9 +225,26 @@ namespace stan {
     }
 
     // Uniform(y|alpha,beta)   [alpha < beta;  alpha <= y;  beta <= y]
+    /**
+     * The log of a uniform density for the given 
+     * y, lower, and upper bound.
+     * 
+     * @param y A scalar variable.
+     * @param alpha Lower bound.
+     * @param beta Upper bound.
+     * @throw std::invalid_argument if the lower bound is greater than 
+     *    or equal to the lower bound
+     * @tparam T_y Type of scalar.
+     * @tparam T_low Type of lower bound.
+     * @tparam T_high Type of upper bound.
+     */
     template <typename T_y, typename T_low, typename T_high>
     inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
     uniform_log(T_y y, T_low alpha, T_high beta) {
+      if (alpha >= beta)
+	throw std::invalid_argument ("lower bound must be less than the upper bound");
+      if (y < alpha || y > beta)
+	return LOG_ZERO;
       return -log(beta - alpha);
     }
 

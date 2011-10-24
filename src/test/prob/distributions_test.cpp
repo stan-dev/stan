@@ -17,8 +17,19 @@ TEST(prob_prob,uniform) {
   EXPECT_FLOAT_EQ(0.1, exp(stan::prob::uniform_log(101.0,100.0,110.0)));
   // lower boundary
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(0.0,0.0,1.0)));
+  EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(-1.0,0.0,1.0)));
   // upper boundary
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(1.0,0.0,1.0)));
+  EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(2.0,0.0,1.0)));
+  
+}
+TEST(prob_prob,uniform_exception) {
+  EXPECT_THROW (stan::prob::uniform_log(0.0,1.0,0.0), std::invalid_argument);
+  // lower and upper boundary the same
+  EXPECT_THROW (stan::prob::uniform_log(0.0, 0.0, 0.0), std::invalid_argument);
+  EXPECT_THROW (stan::prob::uniform_log(1.0, 0.0, 0.0), std::invalid_argument);
+  EXPECT_THROW (stan::prob::uniform_log(-1.0, 0.0, 0.0), std::invalid_argument);
+  
 }
 
 TEST(prob_prob,norm_p) {
