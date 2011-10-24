@@ -196,11 +196,30 @@ namespace stan {
 
     // NormalTruncatedH(y|mu,sigma,high)  [sigma > 0]
     // Norm(y|mu,sigma) / (Norm_p(high|mu,sigma) - 0)
+    /**
+     * The log of a truncated normal density for the given 
+     * y, mean, and standard deviation, the upper bound.
+     * The standard deviation must be greater than 0.
+     * 
+     * @param y A scalar variable.
+     * @param mu The mean of the normal distribution.
+     * @param sigma The standard deviation of the normal distribution. 
+     * @param high Upper bound.
+     * @throw std::domain_error if sigma is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_scale Type of scale.
+     * @tparam T_high Type of upper bound.
+     */
     template <typename T_y, typename T_loc, typename T_scale, typename T_high>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale, T_high>::type
     normal_trunc_h_log(T_y y, T_loc mu, T_scale sigma, T_high high) {
+      if (sigma <= 0)
+	throw std::domain_error ("sigma must be greater than 0");
+      if (y > high)
+	return log (0.0);
       return normal_log(y,mu,sigma) 
-	- log(normal_p(y,mu,high));
+	- log(normal_p(high,mu,sigma));
     }
 
     // Uniform(y|alpha,beta)   [alpha < beta;  alpha <= y;  beta <= y]

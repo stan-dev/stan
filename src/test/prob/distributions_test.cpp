@@ -118,8 +118,39 @@ TEST(prob_prob,norm_trunc_l_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_l_log(y, mu, 0.0, low), std::domain_error);
   EXPECT_THROW(stan::prob::normal_trunc_l_log(y, mu, -1.0, low), std::domain_error);
 }
+TEST(prob_prob,norm_trunc_h) {
+  // values from R dnorm()
+  double mu;
+  double sigma;
+  double high;
+  
+  mu = 0;
+  sigma = 1.0;
+  high = 1.0;
+  // mu <- 0; sigma <- 1.0; high <- 1.0
+  // R: log ( 0.0 )
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), stan::prob::normal_trunc_h_log(5.0, mu, sigma, high));
+  // R: log ( dnorm(-2.0, mu, sigma) / pnorm(high, mu, sigma) )
+  EXPECT_FLOAT_EQ(-2.746185, stan::prob::normal_trunc_h_log(-2.0, mu, sigma, high));
+  // R: log ( dnorm(1.0, mu, sigma) / pnorm(high, mu, sigma) )
+  EXPECT_FLOAT_EQ(-1.246185, stan::prob::normal_trunc_h_log( 1.0, mu, sigma, high));
 
-
+  // R: log ( dnorm(0.0, mu, sigma) / pnorm(high, mu, sigma) )
+  EXPECT_FLOAT_EQ(-0.7461848, stan::prob::normal_trunc_h_log(0.0, mu, sigma, high));
+  // R: log ( dnorm(0.5, mu, sigma) / pnorm(high, mu, sigma) )
+  EXPECT_FLOAT_EQ(-0.8711848, stan::prob::normal_trunc_h_log(0.5, mu, sigma, high));
+  // R: log ( dnorm(-0.5, mu, sigma) / pnorm(high, mu, sigma) )
+  EXPECT_FLOAT_EQ(-0.8711848, stan::prob::normal_trunc_h_log(-0.5, mu, sigma, high));
+}
+TEST(prob_prob,norm_trunc_h_exception) {
+  double y = 0;
+  double mu = 0;
+  double sigma = 1;
+  double high = -5;
+  EXPECT_NO_THROW(stan::prob::normal_trunc_h_log(y, mu, sigma, high));
+  EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, 0.0, high), std::domain_error);
+  EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
+}
 
 
 TEST(prob_prob,gamma) {
