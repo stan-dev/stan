@@ -280,19 +280,54 @@ namespace stan {
     }
 
     // InvGamma(y|alpha,beta)    [alpha > 0;  beta > 0;  y > 0]
+    /**
+     * The log of an inverse gamma density for y with the specified
+     * shape and inverse scale parameters.
+     * 
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
     template <typename T_y, typename T_shape, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
     inv_gamma_log(T_y y, T_shape alpha, T_scale beta) {
+      if (alpha <= 0)
+	throw std::domain_error ("alpha is <= 0");
+      if (beta <= 0)
+	throw std::domain_error ("beta is <= 0");
+      if (y <= 0)
+	throw std::domain_error ("y <= 0");
       return - lgamma(alpha)
 	+ alpha * log(beta)
 	- (alpha + 1) * log(y)
 	- beta / y;
     }
 
-    // ChiSquare(y|nu)  [nu > 0;  y > 0]
+    // ChiSquare(y|nu)  [nu >= 0;  y >= 0]
+    /**
+     * The log of a chi-squared density for y with the specified
+     * degrees of freedom parameter.
+     * 
+     * @param y A scalar variable.
+     * @param nu Degrees of freedom.
+     * @throw std::domain_error if nu is not greater than or equal to 0
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     */
     template <typename T_y, typename T_dof>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_log(T_y y, T_dof nu) {
+      if (nu < 0)
+	throw std::domain_error ("nu is < 0");
+      if (y < 0)
+	throw std::domain_error ("y < 0");
       return - lgamma(0.5 * nu)
 	+ nu * NEG_LOG_TWO_OVER_TWO
 	+ (0.5 * nu - 1.0) * log(y)
