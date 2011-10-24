@@ -23,7 +23,9 @@ namespace stan {
     namespace {
    
       const double PI = boost::math::constants::pi<double>();
-      
+
+      const double LOG_ZERO = log(0.0);
+
       const double LOG_TWO = log(2.0);
 
       const double NEG_LOG_TWO = -LOG_TWO;
@@ -161,7 +163,7 @@ namespace stan {
       if (sigma <= 0)
 	throw std::domain_error ("sigma must be greater than 0");
       if (y > high || y < low)
-	return log (0.0);
+	return LOG_ZERO;
       return normal_log(y,mu,sigma) 
 	- log(normal_p(high,mu,sigma) - normal_p(low,mu,sigma));
     }
@@ -189,7 +191,7 @@ namespace stan {
       if (sigma <= 0)
 	throw std::domain_error ("sigma must be greater than 0");
       if (y < low)
-	return log (0.0);
+	return LOG_ZERO;
       return normal_log(y,mu,sigma) 
 	- log1m(normal_p(low,mu,sigma));
     }
@@ -217,7 +219,7 @@ namespace stan {
       if (sigma <= 0)
 	throw std::domain_error ("sigma must be greater than 0");
       if (y > high)
-	return log (0.0);
+	return LOG_ZERO;
       return normal_log(y,mu,sigma) 
 	- log(normal_p(high,mu,sigma));
     }
