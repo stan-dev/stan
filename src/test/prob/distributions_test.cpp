@@ -83,6 +83,43 @@ TEST(prob_prob,norm_trunc_lh_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, high, low), std::invalid_argument);
   EXPECT_NO_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, low, low));
 }
+TEST(prob_prob,norm_trunc_l) {
+  // values from R dnorm()
+  double mu;
+  double sigma;
+  double low;
+  
+  mu = 0;
+  sigma = 1.0;
+  low = -2.0;
+  // mu <- 0; sigma <- 1.0; low <- -2.0; 
+  // R: log ( 0.0 )
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), stan::prob::normal_trunc_l_log(-5.0, mu, sigma, low));
+  // R: log ( dnorm(-2.0, mu, sigma) / (1 - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-2.895926, stan::prob::normal_trunc_l_log(-2.0, mu, sigma, low));
+  // R: log ( dnorm(1.0, mu, sigma) / (1 - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-1.395926, stan::prob::normal_trunc_l_log( 1.0, mu, sigma, low));
+  // R: log ( dnorm(10.0, mu, sigma) / (1 - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-50.89593, stan::prob::normal_trunc_l_log(10.0, mu, sigma, low));
+
+  // R: log ( dnorm(0.0, mu, sigma) / (1 - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-0.8959256, stan::prob::normal_trunc_l_log(0.0, mu, sigma, low));
+  // R: log ( dnorm(0.5, mu, sigma) / (1 - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-1.020926, stan::prob::normal_trunc_l_log(0.5, mu, sigma, low));
+  // R: log ( dnorm(-0.5, mu, sigma) / (1 - pnorm(low, mu, sigma)) )
+  EXPECT_FLOAT_EQ(-1.020926, stan::prob::normal_trunc_l_log(-0.5, mu, sigma, low));
+}
+TEST(prob_prob,norm_trunc_l_exception) {
+  double y = 0;
+  double mu = 0;
+  double sigma = 1;
+  double low = -5;
+  EXPECT_NO_THROW(stan::prob::normal_trunc_l_log(y, mu, sigma, low));
+  EXPECT_THROW(stan::prob::normal_trunc_l_log(y, mu, 0.0, low), std::domain_error);
+  EXPECT_THROW(stan::prob::normal_trunc_l_log(y, mu, -1.0, low), std::domain_error);
+}
+
+
 
 
 TEST(prob_prob,gamma) {
