@@ -155,6 +155,7 @@ namespace stan {
       generate_include("fstream",o);
       generate_include("iostream",o);
       generate_include("sstream",o);
+      generate_include("stdexcept",o);
       generate_include("Eigen/Dense",o);
       generate_include("stan/agrad/agrad.hpp",o);
       generate_include("stan/agrad/special_functions.hpp",o);
@@ -745,7 +746,7 @@ namespace stan {
       void operator()(int_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	unsigned int indentation = 1;
@@ -774,7 +775,7 @@ namespace stan {
 	std::vector<expression> dims = x.dims_;
 	generate_resize(x.name_,dims,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	unsigned int indentation = 1;
@@ -802,7 +803,7 @@ namespace stan {
       void operator()(vector_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
@@ -836,7 +837,7 @@ namespace stan {
       void operator()(row_vector_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
@@ -870,7 +871,7 @@ namespace stan {
       void operator()(simplex_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
@@ -904,7 +905,7 @@ namespace stan {
       void operator()(pos_ordered_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
@@ -938,7 +939,7 @@ namespace stan {
       void operator()(matrix_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	o_ << INDENT2 << "unsigned int " << x.name_ << "_m_mat_lim__ = ";
@@ -976,7 +977,7 @@ namespace stan {
       void operator()(cov_matrix_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
 	o_ << INDENT2 << "unsigned int " << x.name_ << "_k_mat_lim__ = ";
@@ -1282,7 +1283,7 @@ namespace stan {
 	o_ << INDENT2 << "if (0 != ";
 	generate_expression(x.range_.low_,o_);
 	o_ << ")" << EOL;
-	o_ << INDENT3 << "throw std::runtime_exception();";
+	o_ << INDENT3 << "throw std::runtime_error(\"param_ranges error\");";
 	for (int i = 0; i < x.dims_.size(); ++i) {
 	  generate_indent(i + 2, o_);
 	  o_ << "for (unsigned int i_" << i << "__ = 0; ";

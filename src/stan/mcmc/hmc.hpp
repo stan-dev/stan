@@ -104,7 +104,7 @@ namespace stan {
       virtual void set_params(std::vector<double> x, 
 			      std::vector<int> z) {
 	if (x.size() != _x.size() || z.size() != _z.size())
-	  throw std::invalid_argument();
+	  throw std::invalid_argument("x.size() or z.size() mismatch");
 	_x = x;
 	_z = z;
       }
