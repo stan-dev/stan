@@ -1,0 +1,112 @@
+\documentclass[11pt]{article}
+
+\title{Automatic Gradients:
+\\
+Extensible, Object-Oriented Reverse-Mode 
+\\
+Algorithmic Differentiation}
+\author{Bob Carpenter and Matthew D.\ Hoffman}
+
+
+\begin{document}
+\maketitle
+\begin{abstract}
+  Given a a C++ function templated on $N$ scalar parameters,
+  reverse-mode algorithmic differentiation (AD) calculates the
+  function's value and gradient simultaneously in only a small
+  constant multiple of the cost of evaluating the function itself.  It
+  works by instantiating the template parameter to a special AD class
+  and then calling the function with {\tt double} arguments.  Each
+  function called with AD arguments must return an AD result that
+  represents the resulting expression graph.  A backwards sweep then
+  propagates partial derivatives using the chain rule from the result
+  node to the input nodes in the expression graph.
+
+  The innovation we present in this paper is to use an object-oriented
+  representation of the expressions, with all internal code written in
+  terms of abstract base class interfaces.  This both cleans up the
+  code by localizing derivative operations to the class representing
+  their expression type and opens the way for clients to extend the
+  set of functions which can be algorithmically differentiated.  This
+  allows client code to introduce new expression types along with
+  partial derivatives, both increasing flexibility and increasing
+  efficiency through partial evaluation.  We demonstrate that the
+  object-oriented abstraction does not incur any computational
+  overhead when the code is inlined with an optimizing compiler.
+\end{abstract}
+
+\section{Reverse-Mode Algorithmic Differentiation}
+
+For many efficient approaches to optimization and simulation, it is
+necessary to compute the gradient $\nabla f(x)$ of some scalar
+function $f$ at an input $x = \langle x_1,\ldots,x_N \rangle$,
+%
+\[
+\nabla f(x) 
+= \left\langle 
+\frac{\partial f(x)}{\partial x_1},
+\ldots,
+\frac{\partial f(x)}{\partial x_N}
+\right\rangle.
+\]
+
+Algorithmic differentiation (AD) is a technique for calculating the
+derivatives of a function specified as a computer program.  AD works
+by building-in the partial derivative of every scalar function with
+respect to each of its arguments, then using the chain rule to
+propagate derivatives through the expression graph defined by the
+program.  Unlike partial differences, AD is accurate up to machine
+arithmetic precision.
+
+Forward-mode algorithmic differenitation (FAD) works by propagating
+derivatives forward from the inputs to the output.  FAD uses not much
+more memory or time than would be required to execute the function on
+floating-point inputs.  The only drawback is that FAD only calculates
+a single partial derivative $\partial f(x)/\partial x_n$, requiring
+$N$ calls to calculate the gradient of $f(x)$.
+
+Reverse mode algorithmic differentiation (RAD) propagates information
+in reverse from the output to the inputs.  It works by building up the
+expression graph defined by the program for the function being
+computed as the function is evaluated.  RAD applies dynamic
+programming to propagate the partial derivatives backwards through the
+expression graph all at once, allowing the partial derivatives in
+the gradient $\nabla f(x)$ to be calculated in a single pass.
+
+\subsection{Example: The Exponential Distribution}
+
+The log of the exponential distribution $\mbox{Expon}(\theta|\beta)$
+given inverse scale parameter $\beta > 0$ and outcome $\theta > 0$ 
+defines a function $f(\theta,\beta)$ defined by
+%
+\[
+f(\theta,\beta) 
+= \log \mbox{Expon}(\theta|\beta)
+= \log(\beta)  - ( \beta \times \theta ).
+\]
+%
+
+\[
+\begin{array}{lllll}
+\mbox{\it Node} & \mbox{\it Function} & \mbox{\it Inputs} & \mbox{\it
+  Partials} & \mbox{\it Expression}
+\\
+x_0 &  \mbox{n/a} & \mbox{n/a} & \mbox{n/a} & \theta
+\\
+x_1 &  \mbox{n/a} & \mbox{n/a} & \mbox{n/a} & \alpha
+\\
+x_2 &  \log {} & x_0 & 1/x_0 & \log(\beta)
+\\
+x_3 &  {} \times {} & x_1; \ x_0 & 
+\frac{\partial (x_1 \times x_0)}{\partial x_1} = x_0; \
+\frac{\partial (x_1 \times x_0)}{\partial x_0} = x_1
+& \beta \times \theta
+\\[6pt]
+x_4 &  {} - {} & x_2; \ x_3 & 
+\frac{\partial (x_2 -x_3)}{\partial x_2} = 1; \ 
+\frac{\partial (x_2 - x_3)}{\partial x_3} = -1
+& \log(\beta) - (\beta \times \theta)
+\end{array}
+\]
+
+\end{document}
