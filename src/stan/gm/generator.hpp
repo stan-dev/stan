@@ -155,7 +155,7 @@ namespace stan {
       generate_include("fstream",o);
       generate_include("iostream",o);
       generate_include("sstream",o);
-      generate_include("stdexcept",o);
+      generate_include("boost/exception/all.hpp",o);
       generate_include("Eigen/Dense",o);
       generate_include("stan/agrad/agrad.hpp",o);
       generate_include("stan/agrad/special_functions.hpp",o);
@@ -1406,16 +1406,22 @@ namespace stan {
     void generate_main(const std::string& model_name,
 		       std::ostream& out) {
       out << "int main(int argc__, const char* argv__[]) {" << EOL;
-      out << INDENT << "stan::io::cmd_line cmd__(argc__,argv__);" << EOL;
-      out << INDENT << "std::string data_file_path__;" << EOL;
-      out << INDENT << "cmd__.val(\"data_file\",data_file_path__);" << EOL;
-      out << INDENT << "std::fstream data_file__(data_file_path__.c_str(),std::fstream::in);" << EOL;
-      out << INDENT << "stan::io::dump dump__(data_file__);" << EOL;
+      out << INDENT << "try {" << EOL;
+      out << INDENT2 << "stan::io::cmd_line cmd__(argc__,argv__);" << EOL;
+      out << INDENT2 << "std::string data_file_path__;" << EOL;
+      out << INDENT2 << "cmd__.val(\"data_file\",data_file_path__);" << EOL;
+      out << INDENT2 << "std::fstream data_file__(data_file_path__.c_str(),std::fstream::in);" << EOL;
+      out << INDENT2 << "stan::io::dump dump__(data_file__);" << EOL;
       
-      out << INDENT << model_name << "_namespace::" << model_name << " model__(dump__);" << EOL;
+      out << INDENT2 << model_name << "_namespace::" << model_name << " model__(dump__);" << EOL;
 
-      out << INDENT << "data_file__.close();" << EOL;
-      out << INDENT << "stan::gm::hmc_command(cmd__,model__);" << EOL;
+      out << INDENT2 << "data_file__.close();" << EOL;
+      out << INDENT2 << "stan::gm::hmc_command(cmd__,model__);" << EOL;
+
+      out << INDENT << "} catch (std::exception& e) {" << EOL;
+      out << INDENT2 << "std::cerr << std::endl << \"Exception caught: \" << e.what() << std::endl;" << EOL;
+      out << INDENT2 << "std::cerr << \"Diagnostic informtion: \" << std::endl << boost::diagnostic_information(e) << std::endl;" << EOL;
+      out << INDENT << "}" << EOL;
 
       out << "}" << EOL2;
     }

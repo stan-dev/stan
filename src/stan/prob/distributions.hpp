@@ -4,10 +4,12 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <boost/throw_exception.hpp>
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
 #include "stan/maths/special_functions.hpp"
 #include "stan/agrad/matrix.hpp"
+
 
 namespace stan {
 
@@ -85,7 +87,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       if (sigma <= 0.0)
-	throw std::domain_error ("sigma must be greater than 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("sigma must be greater than 0"));
       return NEG_LOG_SQRT_TWO_PI
 	- log(sigma)
 	- ((y - mu) * (y - mu)) / (2.0 * sigma * sigma);
@@ -109,7 +111,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_propto_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       if (sigma <= 0)
-	throw std::domain_error ("sigma must be greater than 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("sigma must be greater than 0"));
       return normal_log(y,mu,sigma);
     }
     
@@ -130,7 +132,7 @@ namespace stan {
     inline void
     normal_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma) {
       if (sigma <= 0)
-	throw std::domain_error ("sigma must be greater than 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("sigma must be greater than 0"));
       lp += normal_log(y,mu,sigma);
     }
 
@@ -161,7 +163,7 @@ namespace stan {
       if (high < low)
 	throw std::invalid_argument ("high must be greater than low");
       if (sigma <= 0)
-	throw std::domain_error ("sigma must be greater than 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("sigma must be greater than 0"));
       if (y > high || y < low)
 	return LOG_ZERO;
       return normal_log(y,mu,sigma) 
@@ -189,7 +191,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale, T_low>::type
     normal_trunc_l_log(T_y y, T_loc mu, T_scale sigma, T_low low) {
       if (sigma <= 0)
-	throw std::domain_error ("sigma must be greater than 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("sigma must be greater than 0"));
       if (y < low)
 	return LOG_ZERO;
       return normal_log(y,mu,sigma) 
@@ -217,7 +219,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale, T_high>::type
     normal_trunc_h_log(T_y y, T_loc mu, T_scale sigma, T_high high) {
       if (sigma <= 0)
-	throw std::domain_error ("sigma must be greater than 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("sigma must be greater than 0"));
       if (y > high)
 	return LOG_ZERO;
       return normal_log(y,mu,sigma) 
@@ -242,7 +244,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
     uniform_log(T_y y, T_low alpha, T_high beta) {
       if (alpha >= beta)
-	throw std::invalid_argument ("lower bound must be less than the upper bound");
+	BOOST_THROW_EXCEPTION(std::invalid_argument ("lower bound must be less than the upper bound"));
       if (y < alpha || y > beta)
 	return LOG_ZERO;
       return -log(beta - alpha);
@@ -268,11 +270,11 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_log(T_y y, T_shape alpha, T_inv_scale beta) {
       if (alpha <= 0)
-	throw std::domain_error ("alpha is <= 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("alpha is <= 0"));
       if (beta <= 0)
-	throw std::domain_error ("beta is <= 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("beta is <= 0"));
       if (y < 0)
-	throw std::domain_error ("y < 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("y < 0"));
       return - lgamma(alpha)
 	+ alpha * log(beta)
 	+ (alpha - 1.0) * log(y)
@@ -298,11 +300,11 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
     inv_gamma_log(T_y y, T_shape alpha, T_scale beta) {
       if (alpha <= 0)
-	throw std::domain_error ("alpha is <= 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("alpha is <= 0"));
       if (beta <= 0)
-	throw std::domain_error ("beta is <= 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("beta is <= 0"));
       if (y <= 0)
-	throw std::domain_error ("y <= 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("y <= 0"));
       return - lgamma(alpha)
 	+ alpha * log(beta)
 	- (alpha + 1) * log(y)
@@ -325,9 +327,9 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_log(T_y y, T_dof nu) {
       if (nu < 0)
-	throw std::domain_error ("nu is < 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("nu is < 0"));
       if (y < 0)
-	throw std::domain_error ("y < 0");
+	BOOST_THROW_EXCEPTION(std::domain_error ("y < 0"));
       return - lgamma(0.5 * nu)
 	+ nu * NEG_LOG_TWO_OVER_TWO
 	+ (0.5 * nu - 1.0) * log(y)
