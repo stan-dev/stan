@@ -4,7 +4,6 @@ data {
     int N;
     int T;
     double x[T];
-    double xbar;
 }
 parameters {
     double mu[N,T];
@@ -18,6 +17,7 @@ parameters {
     double(0,) Y[N,T];
     double sigma;
     double alpha0;
+    double xbar;
 }
 model {
     for (i in 1:N) {
