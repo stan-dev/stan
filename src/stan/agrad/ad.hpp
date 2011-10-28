@@ -70,6 +70,59 @@ namespace stan {
       const T prime() const { return prime_; }
       
       /**
+       * Return a reference to this variable after addition of
+       * the specified variable with derivative propagation.
+       *
+       * @param b Variable summand.
+       * @return This plus summand.
+       */
+      inline 
+      fvar<T>& operator+=(const fvar<T>& b) {
+	val_ += b.val_;
+	prime_ += b.prime_;
+	return *this;
+      }
+      /**
+       * Return a reference to this variable after addition of
+       * the specified scalar with derivative propagation.
+       *
+       * @param b Scalar summand.
+       * @return This plus summand.
+       */
+      inline 
+      fvar<T>& operator+=(const T& b) {
+	val_ += b;
+	return *this;
+      }
+
+      /**
+       * Return a reference to this variable after subtraction
+       * of the specified variable with derivative propagation.
+       *
+       * @param b Variable summand.
+       * @return This minus summand.
+       */
+      inline 
+      fvar<T>& operator-=(const fvar<T>& b) {
+	val_ -= b.val_;
+	prime_ -= b.prime_;
+	return *this;
+      }
+      /**
+       * Return a reference to this variable after subtraction of the
+       * specified scalar with derivative propagation.
+       *
+       * @param b Scalar summand.
+       * @return This minus summand.
+       */
+      inline 
+      fvar<T>& operator-=(const T& b) {
+	val_ -= b;
+	return *this;
+      }
+
+
+      /**
        * Return a reference to this variable after multiplication by
        * the specified variable with derivative propagation.
        *
@@ -98,7 +151,280 @@ namespace stan {
       }
 
 
+      /**
+       * Return a reference to this variable after division by
+       * the specified variable with derivative propagation.
+       *
+       * @param b Variable multiplicand.
+       * @return This divided by multiplicand.
+       */
+      inline 
+      fvar<T>& operator/=(const fvar<T>& b) {
+	prime_ = (prime_ * b.val_ - val_ * b.prime_) / (b.val_ * b.val_);
+	val_ /= b.val_;
+	return *this;
+      }
+      /**
+       * Return a reference to this variable after division by
+       * the specified scalar with derivative propagation.
+       *
+       * @param b Scalar multiplicand.
+       * @return This divided by multiplicand.
+       */
+      inline 
+      fvar<T>& operator/=(const T& b) {
+	val_ /= b;
+	prime_ /= b;
+	return *this;
+      }
+
+
     };
+      
+    /*
+     * Equality operator comparing two variable's values (C++).
+     *
+     * @param a First variable.  
+     * @param b Second variable. 
+     * @return True if the first variable's value is the same as the
+     * second's.
+     */
+    template <typename T>
+    inline 
+    bool operator==(const fvar<T>& a, const fvar<T>& b) {
+      return a.val() == b.val();
+    }
+    /**
+     * Equality operator comparing a variable's value and a double
+     * (C++).
+     *
+     * @param a First variable.  
+     * @param b Second value.
+     * @return True if the first variable's value is the same as the
+     * second value.
+     */
+    template <typename T>
+    inline 
+    bool operator==(const fvar<T>& a, const double& b) {
+      return a.val() == b;
+    }
+    /**
+     * Equality operator comparing a scalar and a variable's value
+     * (C++).
+     *
+     * @param a First scalar.
+     * @param b Second variable.
+     * @return True if the variable's value is equal to the scalar.
+     */
+    template <typename T>
+    inline 
+    bool operator==(const double& a, const fvar<T>& b) {
+      return a == b.val();
+    }
+
+    /**
+     * Inequality operator comparing two variables' values (C++).
+     *
+     * @param a First variable.  
+     * @param b Second variable. 
+     * @return True if the first variable's value is not the same as the
+     * second's.
+     */
+    template <typename T>
+    inline 
+    bool operator!=(const fvar<T>& a, const fvar<T>& b) {
+      return a.val() != b.val();
+    }
+    /**
+     * Inequality operator comparing a variable's value and a double
+     * (C++).
+     *
+     * @param a First variable.  
+     * @param b Second value.
+     * @return True if the first variable's value is not the same as the
+     * second value.
+     */
+    template <typename T>
+    inline 
+    bool operator!=(const fvar<T>& a, const double& b) {
+      return a.val() != b;
+    }
+    /**
+     * Inequality operator comparing a double and a variable's value
+     * (C++).
+     *
+     * @param a First value.
+     * @param b Second variable. 
+     * @return True if the first value is not the same as the
+     * second variable's value.
+     */
+    template <typename T>
+    inline 
+    bool operator!=(const double& a, const fvar<T>& b) {
+      return a != b.val();
+    }
+
+    /**
+     * Less than operator comparing variables' values (C++).
+     *
+     * @param a First variable.
+     * @param b Second variable.
+     * @return True if first variable's value is less than second's.
+     */
+    template <typename T>
+    inline 
+    bool operator<(const fvar<T>& a, const fvar<T>& b) {
+      return a.val() < b.val();
+    }
+    /**
+     * Less than operator comparing variable's value and a double
+     * (C++).
+     *
+     * @param a First variable.
+     * @param b Second value.
+     * @return True if first variable's value is less than second value.
+     */
+    template <typename T>
+    inline 
+    bool operator<(const fvar<T>& a, const double& b) {
+      return a.val() < b;
+    }
+    /**
+     * Less than operator comparing a double and variable's value
+     * (C++).
+     *
+     * @param a First value.
+     * @param b Second variable.
+     * @return True if first value is less than second variable's value.
+     */
+    template <typename T>
+    inline 
+    bool operator<(const double& a, const fvar<T>& b) {
+      return a < b.val();
+    }
+
+    /**
+     * Greater than operator comparing variables' values (C++).
+     *
+     * @param a First variable.
+     * @param b Second variable.
+     * @return True if first variable's value is greater than second's.
+     */
+    template <typename T>
+    inline 
+    bool operator>(const fvar<T>& a, const fvar<T>& b) {
+      return a.val() > b.val();
+    }
+    /**
+     * Greater than operator comparing variable's value and double
+     * (C++).
+     *
+     * @param a First variable.
+     * @param b Second value.
+     * @return True if first variable's value is greater than second value.
+     */
+     template <typename T>
+     inline 
+     bool operator>(const fvar<T>& a, const double& b) {
+       return a.val() > b;
+		   }
+    /**
+     * Greater than operator comparing a double and a variable's value
+     * (C++).
+     *
+     * @param a First value.
+     * @param b Second variable.
+     * @return True if first value is greater than second variable's value.
+     */
+    template <typename T>
+    inline 
+    bool operator>(const double& a, const fvar<T>& b) {
+      return a > b.val();
+    }
+
+    /**
+     * Less than or equal operator comparing two variables' values
+     * (C++).
+     *
+     * @param a First variable.
+     * @param b Second variable.
+     * @return True if first variable's value is less than or equal to
+     * the second's.
+     */
+    template <typename T>
+    inline 
+    bool operator<=(const fvar<T>& a, const fvar<T>& b) {
+      return a.val() <= b.val();
+    }
+    /**
+     * Less than or equal operator comparing a variable's value and a
+     * scalar (C++).
+     *
+     * @param a First variable.
+     * @param b Second value.
+     * @return True if first variable's value is less than or equal to
+     * the second value.
+     */
+    template <typename T>
+    inline 
+    bool operator<=(const fvar<T>& a, const double& b) {
+      return a.val() <= b;
+    }
+    /**
+     * Less than or equal operator comparing a double and variable's
+     * value (C++).
+     *
+     * @param a First value.
+     * @param b Second variable.
+     * @return True if first value is less than or equal to the second
+     * variable's value.
+     */
+    template <typename T>
+    inline 
+    bool operator<=(const double& a, const fvar<T>& b) {
+      return a <= b.val();
+    }
+
+    /**
+     * Greater than or equal operator comparing two variables' values
+     * (C++).
+     *
+     * @param a First variable.
+     * @param b Second variable.
+     * @return True if first variable's value is greater than or equal
+     * to the second's.
+     */
+    template <typename T>
+    inline 
+    bool operator>=(const fvar<T>& a, const fvar<T>& b) {
+      return a.val() >= b.val();
+    }
+    /**
+     * Greater than or equal operator comparing variable's value and
+     * double (C++).
+     *
+     * @param a First variable.
+     * @param b Second value.
+     * @return True if first variable's value is greater than or equal
+     * to second value.
+     */
+    template <typename T>
+    inline bool operator>=(const fvar<T>& a, const double& b) {
+      return a.val() >= b;
+    }
+    /**
+     * Greater than or equal operator comparing double and variable's
+     * value (C++).
+     *
+     * @param a First value.
+     * @param b Second variable.
+     * @return True if the first value is greater than or equal to the
+     * second variable's value.
+     */
+    template <typename T>
+    inline bool operator>=(const double& a, const fvar<T>& b) {
+      return a >= b.val();
+    }
 
     /**
      * The class for representing a distinguished independent variable
