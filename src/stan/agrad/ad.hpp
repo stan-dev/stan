@@ -10,6 +10,10 @@ namespace stan {
 
   namespace agrad {
 
+    using std::exp;
+    using std::log;
+    using std::log10;
+
     /**
      * The variable class used for forward-mode algorithmic
      * differentiation.
@@ -79,6 +83,7 @@ namespace stan {
        */
       const T prime() const { return prime_; }
 
+
       // COMPOUND ASSIGNMENT OPERATORS
 
       /**
@@ -102,7 +107,7 @@ namespace stan {
        * @return This plus summand.
        */
       inline 
-      fvar<T>& operator+=(const T& b) {
+      fvar<T>& operator+=(const double& b) {
 	val_ += b;
 	return *this;
       }
@@ -128,7 +133,7 @@ namespace stan {
        * @return This minus summand.
        */
       inline 
-      fvar<T>& operator-=(const T& b) {
+      fvar<T>& operator-=(const double& b) {
 	val_ -= b;
 	return *this;
       }
@@ -155,7 +160,7 @@ namespace stan {
        * @return This times multiplicand.
        */
       inline 
-      fvar<T>& operator*=(const T& b) {
+      fvar<T>& operator*=(const double& b) {
 	val_ *= b;
 	prime_ *= b;
 	return *this;
@@ -183,7 +188,7 @@ namespace stan {
        * @return This divided by multiplicand.
        */
       inline 
-      fvar<T>& operator/=(const T& b) {
+      fvar<T>& operator/=(const double& b) {
 	val_ /= b;
 	prime_ /= b;
 	return *this;
@@ -218,7 +223,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator==(const fvar<T>& a, const T& b) {
+    bool operator==(const fvar<T>& a, const double& b) {
       return a.val() == b;
     }
     /**
@@ -231,7 +236,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator==(const T& a, const fvar<T>& b) {
+    bool operator==(const double& a, const fvar<T>& b) {
       return a == b.val();
     }
 
@@ -260,7 +265,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator!=(const fvar<T>& a, const T& b) {
+    bool operator!=(const fvar<T>& a, const double& b) {
       return a.val() != b;
     }
 
@@ -275,7 +280,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator!=(const T& a, const fvar<T>& b) {
+    bool operator!=(const double& a, const fvar<T>& b) {
       return a != b.val();
     }
 
@@ -302,7 +307,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<(const fvar<T>& a, const T& b) {
+    bool operator<(const fvar<T>& a, const double& b) {
       return a.val() < b;
     }
 
@@ -316,7 +321,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<(const T& a, const fvar<T>& b) {
+    bool operator<(const double& a, const fvar<T>& b) {
       return a < b.val();
     }
 
@@ -342,7 +347,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator>(const fvar<T>& a, const T& b) {
+    bool operator>(const fvar<T>& a, const double& b) {
       return a.val() > b;
     }
 
@@ -356,7 +361,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator>(const T& a, const fvar<T>& b) {
+    bool operator>(const double& a, const fvar<T>& b) {
       return a > b.val();
     }
 
@@ -386,7 +391,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<=(const fvar<T>& a, const T& b) {
+    bool operator<=(const fvar<T>& a, const double& b) {
       return a.val() <= b;
     }
 
@@ -401,7 +406,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<=(const T& a, const fvar<T>& b) {
+    bool operator<=(const double& a, const fvar<T>& b) {
       return a <= b.val();
     }
 
@@ -429,7 +434,7 @@ namespace stan {
      * to second value.
      */
     template <typename T>
-    inline bool operator>=(const fvar<T>& a, const T& b) {
+    inline bool operator>=(const fvar<T>& a, const double& b) {
       return a.val() >= b;
     }
     /**
@@ -442,7 +447,7 @@ namespace stan {
      * second variable's value.
      */
     template <typename T>
-    inline bool operator>=(const T& a, const fvar<T>& b) {
+    inline bool operator>=(const double& a, const fvar<T>& b) {
       return a >= b.val();
     }
 
@@ -530,7 +535,7 @@ namespace stan {
      */
     template <typename T>  
     inline 
-    fvar<T> operator+(const fvar<T>& a, const T& bf) {
+    fvar<T> operator+(const fvar<T>& a, const double& bf) {
       return fvar<T>(a.val() + bf,  a.prime());
     }
 
@@ -546,7 +551,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    fvar<T> operator+(const T& af, const fvar<T>& b) {
+    fvar<T> operator+(const double& af, const fvar<T>& b) {
       return fvar<T>(af + b.val(), b.prime());
     }
 
@@ -581,7 +586,7 @@ namespace stan {
      */
     template <typename T>  
     inline 
-    fvar<T> operator-(const fvar<T>& a, const T& bf) {
+    fvar<T> operator-(const fvar<T>& a, const double& bf) {
       return fvar<T>(a.val() - bf,  a.prime());
     }
 
@@ -598,7 +603,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    fvar<T> operator-(const T& af, const fvar<T>& b) {
+    fvar<T> operator-(const double& af, const fvar<T>& b) {
       return fvar<T>(af - b.val(), -b.prime());
     }
 
@@ -632,7 +637,7 @@ namespace stan {
      */
     template <typename T>  
     inline 
-    fvar<T> operator*(const fvar<T>& a, const T& bf) {
+    fvar<T> operator*(const fvar<T>& a, const double& bf) {
       return fvar<T>(a.val() * bf, a.prime() * bf);
     }
 
@@ -648,9 +653,10 @@ namespace stan {
      */
     template <typename T>
     inline 
-    fvar<T> operator*(const T& af, const fvar<T>& b) {
+    fvar<T> operator*(const double& af, const fvar<T>& b) {
       return fvar<T>(af * b.val(), af * b.prime());
     }
+
 
     /**
      * Return the division of the first variable by the second.
@@ -682,7 +688,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    fvar<T> operator/(const fvar<T>& a, const T& b) {
+    fvar<T> operator/(const fvar<T>& a, const double& b) {
       return fvar<T>(a.val() / b, a.prime() / b);
     }
     
@@ -698,7 +704,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    fvar<T> operator/(const T& a, const fvar<T>& b) {
+    fvar<T> operator/(const double& a, const fvar<T>& b) {
       return fvar<T>(a / b.val(),
 		     - (a * b.prime())
 		     / (b.val() * b.val()));
@@ -710,23 +716,22 @@ namespace stan {
      * Following C++, the expression <code>(a++)</code> is defined to
      * behave like the sequence of operations
      *
-     * <code>var temp = a;  a = a + 1.0;  return temp;</code>
+     * <code>a = a + 1.0;  return a;</code>
      *
      * @param a Variable to increment.
-     * @param dummy Unused dummy variable used to distinguish postfix operator
-     * from prefix operator.
-     * @return Input variable. 
+     * @return Input variable incremented. 
      */
     template <typename T>
     inline
     fvar<T> operator++(fvar<T>& a) {
-      return fvar<T>(a.val_ + 1, a.prime_);
+      ++a.val_;
+      return a;
     }
 
     /**
      * Postfix increment operator for variables (C++).
      * 
-     * Following C++, the expression <code>(a++)</code> i s defined to
+     * Following C++, the expression <code>(a++)</code> is defined to
      * behave like the sequence of operations
      *
      * <code>fvar<T> temp = a;  a = a + 1.0;  return temp;</code>
@@ -739,10 +744,102 @@ namespace stan {
     template <typename T>
     inline
     fvar<T> operator++(fvar<T>& a, int dummy) {
-      fvar<T> temp(a);
+      fvar<T> temp(a.val_,a.prime_);
       ++a.val_;
       return temp;
     }
+
+    /**
+     * Prefix decrement operator for variables (C++).
+     * 
+     * Following C++, the expression <code>(a--)</code> is defined to
+     * behave like the sequence of operations
+     *
+     * <code>a = a - 1.0;  return a;</code>
+     *
+     * @param a Variable to decrement.
+     * @return Decremented input.
+     */
+    template <typename T>
+    inline
+    fvar<T> operator--(fvar<T>& a) {
+      --a.val_;
+      return a;
+    }
+
+    /**
+     * Postfix decrement operator for variables (C++).
+     * 
+     * Following C++, the expression <code>(a--)</code> is defined to
+     * behave like the sequence of operations
+     *
+     * <code>fvar<T> temp = a;  a = a - 1.0;  return temp;</code>
+     *
+     * @param a Variable to decrement.
+     * @param dummy Unused dummy variable used to distinguish postfix operator
+     * from prefix operator.
+     * @return Input variable. 
+     */
+    template <typename T>
+    inline
+    fvar<T> operator--(fvar<T>& a, int dummy) {
+      fvar<T> temp(a.val_,a.prime_);
+      --a.val_;
+      return temp;
+    }
+
+    // CMATH EXP AND LOG
+
+    /**
+     * Return the exponentiation of the specified variable (cmath).
+     *
+     * \f$\exp'(x) = \exp(x)\f$.
+     * 
+     * @param a Variable to exponentiate.
+     * @return Exponentiated value.
+     * @tparam Scalar type.
+     */
+    template <typename T>
+    inline
+    fvar<T> exp(const fvar<T>& a) {
+      T exp_a = exp(a.val());
+      return fvar<T>(exp_a, a.prime() * exp_a);
+    }
+
+    /**
+     * Return the natural logarithm of the specified variable (cmath).
+     *
+     * \f$\log'(x) = 1/x\f$.
+     * 
+     * @param a Variable argument.
+     * @return Logarithm of the argument.
+     * @tparam Scalar type.
+     */
+    template <typename T>
+    inline
+    fvar<T> log(const fvar<T>& a) {
+      return fvar<T>(log(a.val_), 1.0/a.val_ * a.prime_);
+    }
+
+    namespace {
+      const double ONE_OVER_LOG_10 = 1.0 / log(10.0);
+    }
+
+    /**
+     * Return the base 10 logarithm of the specified variable (cmath).
+     *
+     * \f$\log_{10}'(x) = 1/(x \log 10)\f$.
+     * 
+     * @param a Variable argument.
+     * @return Base 10 logarithm of the argument.
+     * @tparam Scalar type.
+     */
+    template <typename T>
+    inline
+    fvar<T> log10(const fvar<T>& a) {
+      return fvar<T>(log10(a.val_), a.prime_ * ONE_OVER_LOG_10 / a.val_);
+    }
+
 
 
     /**

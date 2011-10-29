@@ -8,6 +8,14 @@
 typedef stan::agrad::fvar<double> FVAR;
 typedef stan::agrad::indep_fvar<double> DEP_FVAR;
 
+using stan::agrad::exp;
+using std::exp;
+using stan::agrad::log;
+using std::log;
+using stan::agrad::log10;
+using std::log10;
+
+
 TEST(agrad_ad,av_eq) {
   FVAR a = 2.0;
   EXPECT_FLOAT_EQ(2.0,a.val());
@@ -358,4 +366,79 @@ TEST(agrad_ad,a_div_bv_2) {
   FVAR g = c / d;
   EXPECT_FLOAT_EQ(2.0/3.0, g.val());
   EXPECT_FLOAT_EQ(-2.0/(3.0 * 3.0), g.prime());
+}
+
+TEST(agrad_ad,av_plus_plus) {
+  DEP_FVAR a = -2.0;
+  FVAR b = a++;
+  EXPECT_FLOAT_EQ(-1.0,a.val());
+  EXPECT_FLOAT_EQ(-2.0,b.val());
+  EXPECT_FLOAT_EQ(1.0,a.prime());
+  EXPECT_FLOAT_EQ(1.0,b.prime());
+}
+
+TEST(agrad_ad,plus_plus_av) {
+  DEP_FVAR a = -2.0;
+  FVAR b = ++a;
+  EXPECT_FLOAT_EQ(-1.0,a.val());
+  EXPECT_FLOAT_EQ(-1.0,b.val());
+  EXPECT_FLOAT_EQ(1.0,a.prime());
+  EXPECT_FLOAT_EQ(1.0,b.prime());
+}
+
+TEST(agrad_ad,av_minus_minus) {
+  DEP_FVAR a = -2.0;
+  FVAR b = a--;
+  EXPECT_FLOAT_EQ(-3.0,a.val());
+  EXPECT_FLOAT_EQ(-2.0,b.val());
+  EXPECT_FLOAT_EQ(1.0,a.prime());
+  EXPECT_FLOAT_EQ(1.0,b.prime());
+}
+
+TEST(agrad_ad,minus_minus_av) {
+  DEP_FVAR a = -2.0;
+  FVAR b = --a;
+  EXPECT_FLOAT_EQ(-3.0,a.val());
+  EXPECT_FLOAT_EQ(-3.0,b.val());
+  EXPECT_FLOAT_EQ(1.0,a.prime());
+  EXPECT_FLOAT_EQ(1.0,b.prime());
+}
+
+TEST(agrad_ad,exp_av) {
+  DEP_FVAR a = -2.0;
+  FVAR b = exp(a);
+  EXPECT_FLOAT_EQ(exp(-2.0), b.val());
+  EXPECT_FLOAT_EQ(exp(-2.0), b.prime());
+
+  DEP_FVAR c = 3.0;
+  FVAR d = exp(2 * c);
+  EXPECT_FLOAT_EQ(exp(6.0), d.val());
+  EXPECT_FLOAT_EQ(2.0 * exp(6.0), d.prime());
+}
+
+
+TEST(agrad_ad,log_av) {
+  DEP_FVAR a = 3.0;
+  FVAR b = log(a);
+  EXPECT_FLOAT_EQ(log(3.0), b.val());
+  EXPECT_FLOAT_EQ(1.0/3.0, b.prime());
+}
+TEST(agrad_ad,log_av_2) {
+  DEP_FVAR c = 3.0;
+  FVAR d = log(2 * c);
+  EXPECT_FLOAT_EQ(log(6.0), d.val());
+  EXPECT_FLOAT_EQ(1.0/3.0, d.prime());
+}
+
+TEST(agrad_ad,log10_av) {
+  DEP_FVAR a = 3.0;
+  FVAR b = log10(a);
+  EXPECT_FLOAT_EQ(log10(3.0), b.val());
+  EXPECT_FLOAT_EQ(1.0/3.0/log(10.0), b.prime());
+}
+TEST(agrad_ad,log10_av_2) {
+  DEP_FVAR c = 3.0;
+  FVAR d = log10(2 * c);
+  EXPECT_FLOAT_EQ(log10(6.0), d.val());
+  EXPECT_FLOAT_EQ(1.0/3.0/log(10.0), d.prime());
 }
