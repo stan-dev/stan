@@ -638,10 +638,10 @@ namespace stan {
     }
 
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
-    template <typename T_prob>
+    template <typename T_n, typename T_N, typename T_prob>
     inline typename boost::math::tools::promote_args<T_prob>::type
-    binomial_log(unsigned int n, unsigned int N, T_prob theta) {
-      return maths::binomial_coefficient_log<unsigned int>(N,n)
+    binomial_log(T_n n, T_N N, T_prob theta) {
+      return maths::binomial_coefficient_log<T_N>(N,n)
 	+ n * log(theta)
 	+ (N - n) * log(1.0 - theta);
     }

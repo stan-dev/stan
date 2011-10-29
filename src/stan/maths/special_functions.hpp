@@ -151,9 +151,9 @@ namespace stan {
      * @param n number of objects chosen.
      * @return log (N choose n).
      */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    binomial_coefficient_log(T N, T n) {
+    template <typename T_N, typename T_n>
+    inline typename boost::math::tools::promote_args<T_N, T_n>::type
+    binomial_coefficient_log(T_N N, T_n n) {
       return lgamma(N + 1.0)
 	- lgamma(n + 1.0)
 	- lgamma(N - n + 1.0);

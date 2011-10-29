@@ -745,6 +745,7 @@ namespace stan {
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
