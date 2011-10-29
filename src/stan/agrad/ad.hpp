@@ -18,10 +18,19 @@ namespace stan {
      */
     template <typename T>
     class fvar {
+    public:
+
+      /**
+       * The value of this variable.
+       */
       T val_;
+
+      /**
+       * The derivative of this variable with respect to the
+       * distinguished independent variable.
+       */
       T prime_;
 
-    public:
 
       /**
        * Construct a forward-mode algorithmic differentiation
@@ -49,7 +58,8 @@ namespace stan {
        * type <code>S</code>.
        *
        * @tparam S Type of scalar value.
-       * @param val Value of constructed variable.       * @param prime Value of the derivative.
+       * @param val Value of constructed variable.      
+       * @param prime Value of the derivative.
        */
       template <typename S>
       fvar(S val, S prime) : val_(val), prime_(prime) { }
@@ -68,7 +78,9 @@ namespace stan {
        * @return Derivative of this variable.
        */
       const T prime() const { return prime_; }
-      
+
+      // COMPOUND ASSIGNMENT OPERATORS
+
       /**
        * Return a reference to this variable after addition of
        * the specified variable with derivative propagation.
@@ -120,7 +132,6 @@ namespace stan {
 	val_ -= b;
 	return *this;
       }
-
 
       /**
        * Return a reference to this variable after multiplication by
@@ -180,6 +191,8 @@ namespace stan {
 
 
     };
+
+    // COMPARISON OPERATORS
       
     /*
      * Equality operator comparing two variable's values (C++).
@@ -205,7 +218,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator==(const fvar<T>& a, const double& b) {
+    bool operator==(const fvar<T>& a, const T& b) {
       return a.val() == b;
     }
     /**
@@ -218,7 +231,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator==(const double& a, const fvar<T>& b) {
+    bool operator==(const T& a, const fvar<T>& b) {
       return a == b.val();
     }
 
@@ -235,6 +248,7 @@ namespace stan {
     bool operator!=(const fvar<T>& a, const fvar<T>& b) {
       return a.val() != b.val();
     }
+
     /**
      * Inequality operator comparing a variable's value and a double
      * (C++).
@@ -246,9 +260,10 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator!=(const fvar<T>& a, const double& b) {
+    bool operator!=(const fvar<T>& a, const T& b) {
       return a.val() != b;
     }
+
     /**
      * Inequality operator comparing a double and a variable's value
      * (C++).
@@ -260,7 +275,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator!=(const double& a, const fvar<T>& b) {
+    bool operator!=(const T& a, const fvar<T>& b) {
       return a != b.val();
     }
 
@@ -276,8 +291,9 @@ namespace stan {
     bool operator<(const fvar<T>& a, const fvar<T>& b) {
       return a.val() < b.val();
     }
+
     /**
-     * Less than operator comparing variable's value and a double
+     * Less than operator comparing variable's value and a scalar
      * (C++).
      *
      * @param a First variable.
@@ -286,11 +302,12 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<(const fvar<T>& a, const double& b) {
+    bool operator<(const fvar<T>& a, const T& b) {
       return a.val() < b;
     }
+
     /**
-     * Less than operator comparing a double and variable's value
+     * Less than operator comparing a scalar and variable value
      * (C++).
      *
      * @param a First value.
@@ -299,7 +316,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<(const double& a, const fvar<T>& b) {
+    bool operator<(const T& a, const fvar<T>& b) {
       return a < b.val();
     }
 
@@ -315,19 +332,20 @@ namespace stan {
     bool operator>(const fvar<T>& a, const fvar<T>& b) {
       return a.val() > b.val();
     }
+
     /**
-     * Greater than operator comparing variable's value and double
-     * (C++).
+     * Greater than operator comparing variable's value and double.
      *
      * @param a First variable.
      * @param b Second value.
      * @return True if first variable's value is greater than second value.
      */
-     template <typename T>
-     inline 
-     bool operator>(const fvar<T>& a, const double& b) {
-       return a.val() > b;
-		   }
+    template <typename T>
+    inline 
+    bool operator>(const fvar<T>& a, const T& b) {
+      return a.val() > b;
+    }
+
     /**
      * Greater than operator comparing a double and a variable's value
      * (C++).
@@ -338,7 +356,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator>(const double& a, const fvar<T>& b) {
+    bool operator>(const T& a, const fvar<T>& b) {
       return a > b.val();
     }
 
@@ -356,6 +374,7 @@ namespace stan {
     bool operator<=(const fvar<T>& a, const fvar<T>& b) {
       return a.val() <= b.val();
     }
+
     /**
      * Less than or equal operator comparing a variable's value and a
      * scalar (C++).
@@ -367,9 +386,10 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<=(const fvar<T>& a, const double& b) {
+    bool operator<=(const fvar<T>& a, const T& b) {
       return a.val() <= b;
     }
+
     /**
      * Less than or equal operator comparing a double and variable's
      * value (C++).
@@ -381,7 +401,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    bool operator<=(const double& a, const fvar<T>& b) {
+    bool operator<=(const T& a, const fvar<T>& b) {
       return a <= b.val();
     }
 
@@ -409,7 +429,7 @@ namespace stan {
      * to second value.
      */
     template <typename T>
-    inline bool operator>=(const fvar<T>& a, const double& b) {
+    inline bool operator>=(const fvar<T>& a, const T& b) {
       return a.val() >= b;
     }
     /**
@@ -422,9 +442,308 @@ namespace stan {
      * second variable's value.
      */
     template <typename T>
-    inline bool operator>=(const double& a, const fvar<T>& b) {
+    inline bool operator>=(const T& a, const fvar<T>& b) {
       return a >= b.val();
     }
+
+
+    // LOGICAL OPERATORS
+
+    /**
+     * Prefix logical negation for the value of variables (C++).  The
+     * expression (!a) is equivalent to negating the scalar value of
+     * the variable a.
+     *
+     * Note that this is the only logical operator defined for
+     * variables.  Overridden logical conjunction (&&) and disjunction
+     * (||) operators do not apply the same "short circuit" rules
+     * as the built-in logical operators.  
+     *
+     * @param a Variable to negate.
+     * @return True if variable is non-zero.
+     */
+     template <typename T>
+     inline bool operator!(const fvar<T>& a) {
+       return !a.val();
+     }
+
+
+    // ARITHMETIC OPERATORS
+
+    /**
+     * Unary plus operator for variables (C++).  
+     *
+     * <p>The function simply returns its input.  The effect of unary
+     * plus on a built-in C++ scalar type is integer promotion.
+     * Because variables are all double-precision floating point
+     * already, promotion is not necessary.
+     *
+     * \f$(+f)' = +f' = f'\f$.
+     *
+     * @param a Argument variable.
+     * @return The input reference.
+     */
+    template <typename T>
+    inline fvar<T> operator+(const fvar<T>& a) {
+      return a;
+    }
+
+    /**
+     * Unary minus operator for variables (C++).  
+     *
+     * \f$(-f)' = -(f')\f$.
+     *
+     * @param a Argument variable.
+     * @return The input reference.
+     */
+    template <typename T>
+    inline fvar<T> operator-(const fvar<T>& a) {
+      return fvar<T>(-a.val(),-a.prime());
+    }
+
+    /**
+     * Return the sum (and derivative) of the two variables.
+     *
+     * \f$(f + g)' = f' + g'\f$.
+     * 
+     * @param a First variable.
+     * @param b Second variable.
+     * @return Product of the variables.
+     * @tparam T Type of scalars in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator+(const fvar<T>& a, const fvar<T>& b) {
+      return fvar<T>(a.val() + b.val(), a.prime() + b.prime());
+    }
+
+    /**
+     * Return the sum (and derivative) of the variable and
+     * scalar.
+     *
+     * \f$(f + c)' = f'\f$.
+     *
+     * @param a First variable.
+     * @param b Second scalar.
+     * @return Product of the variable and scalar.
+     * @tparam T Type of scalar in variables.
+     */
+    template <typename T>  
+    inline 
+    fvar<T> operator+(const fvar<T>& a, const T& bf) {
+      return fvar<T>(a.val() + bf,  a.prime());
+    }
+
+    /**
+     * Return the product (and derivative) of the scalar and variable.
+     *
+     * \f$(c + g)' = g'\f$.
+     * 
+     * @param a First scalar.
+     * @param b Second variable.
+     * @return Product of the scalar and variable.
+     * @tparam T Type of scalar in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator+(const T& af, const fvar<T>& b) {
+      return fvar<T>(af + b.val(), b.prime());
+    }
+
+
+
+    /**
+     * Return the difference (and derivative) of the two variables.
+     *
+     * \f$(f - g)' = f' - g'\f$.
+     * 
+     * @param a First variable.
+     * @param b Second variable.
+     * @return Difference of the variables.
+     * @tparam T Type of scalars in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator-(const fvar<T>& a, const fvar<T>& b) {
+      return fvar<T>(a.val() - b.val(), a.prime() - b.prime());
+    }
+
+    /**
+     * Return the difference (and derivative) between the variable and
+     * scalar.
+     *
+     * \f$(f - c)' = f'\f$.
+     *
+     * @param a First variable.
+     * @param b Second scalar.
+     * @return Difference of the variable and scalar.
+     * @tparam T Type of scalar in variables.
+     */
+    template <typename T>  
+    inline 
+    fvar<T> operator-(const fvar<T>& a, const T& bf) {
+      return fvar<T>(a.val() - bf,  a.prime());
+    }
+
+    /**
+     * Return the difference (and derivative) between the scalar and
+     * variable.
+     *
+     * \f$(c - g)' = -g'\f$.
+     * 
+     * @param a First scalar.
+     * @param b Second variable.
+     * @return Difference of the scalar and variable.
+     * @tparam T Type of scalar in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator-(const T& af, const fvar<T>& b) {
+      return fvar<T>(af - b.val(), -b.prime());
+    }
+
+    /**
+     * Return the product (and derivative) of the two variables.
+     *
+     * \f$(fg)' = f'g + fg'\f$.
+     * 
+     * @param a First variable.
+     * @param b Second variable.
+     * @return Product of the variables.
+     * @tparam T Type of scalars in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator*(const fvar<T>& a, const fvar<T>& b) {
+      return fvar<T>(a.val() * b.val(),
+		     a.prime() * b.val() + a.val() * b.prime());
+    }
+
+    /**
+     * Return the product (and derivative) of the variable and
+     * scalar.
+     *
+     * \f$(fc)' = f'c\f$.
+     *
+     * @param a First variable.
+     * @param b Second scalar.
+     * @return Product of the variable and scalar.
+     * @tparam T Type of scalar in variables.
+     */
+    template <typename T>  
+    inline 
+    fvar<T> operator*(const fvar<T>& a, const T& bf) {
+      return fvar<T>(a.val() * bf, a.prime() * bf);
+    }
+
+    /**
+     * Return the product (and derivative) of the scalar and variable.
+     *
+     * \f$(cg)' = cg'\f$.
+     * 
+     * @param a First scalar.
+     * @param b Second variable.
+     * @return Product of the scalar and variable.
+     * @tparam T Type of scalar in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator*(const T& af, const fvar<T>& b) {
+      return fvar<T>(af * b.val(), af * b.prime());
+    }
+
+    /**
+     * Return the division of the first variable by the second.
+     *
+     * \f$(f/g)' = (f'g - fg')/g^2\f$.
+     * 
+     * @param a First variable.
+     * @param b Second variable.
+     * @return Product of the variables.
+     * @tparam T Type of scalars in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator/(const fvar<T>& a, const fvar<T>& b) {
+      return fvar<T>(a.val() / b.val(),
+		     (a.prime() * b.val() - a.val() * b.prime())
+		     / (b.val() * b.val()));
+    }
+    
+    /**
+     * Return the division of the first variable by the second scalar.
+     *
+     * \f$(f/c)' = f'/c\f$.
+     * 
+     * @param a First variable.
+     * @param b Second scalar
+     * @return Product of the variables.
+     * @tparam T Type of scalars in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator/(const fvar<T>& a, const T& b) {
+      return fvar<T>(a.val() / b, a.prime() / b);
+    }
+    
+    /**
+     * Return the division of the first scalar by the second variable.
+     *
+     * \f$(c/g)' = -cg' / g^2\f$.
+     * 
+     * @param a First variable.
+     * @param b Second variable.
+     * @return Product of the variables.
+     * @tparam T Type of scalars in variables.
+     */
+    template <typename T>
+    inline 
+    fvar<T> operator/(const T& a, const fvar<T>& b) {
+      return fvar<T>(a / b.val(),
+		     - (a * b.prime())
+		     / (b.val() * b.val()));
+    }
+
+    /**
+     * Prefix increment operator for variables (C++).
+     * 
+     * Following C++, the expression <code>(a++)</code> is defined to
+     * behave like the sequence of operations
+     *
+     * <code>var temp = a;  a = a + 1.0;  return temp;</code>
+     *
+     * @param a Variable to increment.
+     * @param dummy Unused dummy variable used to distinguish postfix operator
+     * from prefix operator.
+     * @return Input variable. 
+     */
+    template <typename T>
+    inline
+    fvar<T> operator++(fvar<T>& a) {
+      return fvar<T>(a.val_ + 1, a.prime_);
+    }
+
+    /**
+     * Postfix increment operator for variables (C++).
+     * 
+     * Following C++, the expression <code>(a++)</code> i s defined to
+     * behave like the sequence of operations
+     *
+     * <code>fvar<T> temp = a;  a = a + 1.0;  return temp;</code>
+     *
+     * @param a Variable to increment.
+     * @param dummy Unused dummy variable used to distinguish postfix operator
+     * from prefix operator.
+     * @return Input variable. 
+     */
+    template <typename T>
+    inline
+    fvar<T> operator++(fvar<T>& a, int dummy) {
+      fvar<T> temp(a);
+      ++a.val_;
+      return temp;
+    }
+
 
     /**
      * The class for representing a distinguished independent variable
@@ -457,51 +776,7 @@ namespace stan {
       indep_fvar(S val) : fvar<T>(val,S(1.0)) { }
     };
 
-    /**
-     * Return the product (and derivative) of the two variables.
-     *
-     * @param a First variable.
-     * @param b Second variable.
-     * @return Product of the variables.
-     * @tparam T Type of scalars in variables.
-     */
-    template <typename T>
-    inline 
-    fvar<T> operator*(const fvar<T>& a, const fvar<T>& b) {
-      return fvar<T>(a.val() * b.val(), a.prime() * b.val() + a.val() * b.prime());
-    }
-
-    /**
-     * Return the product (and derivative) of the variable and
-     * scalar.
-     *
-     * @param a First variable.
-     * @param b Second scalar.
-     * @return Product of the variable and scalar.
-     * @tparam T Type of scalar in variables.
-     */
-    template <typename T>  
-    inline 
-    fvar<T> operator*(const fvar<T>& a, const T& bf) {
-      return fvar<T>(a.val() * bf, a.prime() * bf);
-    }
-
-    /**
-     * Return the product (and derivative) of the scalar and variable.
-     *
-     * @param a First scalar.
-     * @param b Second variable.
-     * @return Product of the scalar and variable.
-     * @tparam T Type of scalar in variables.
-     */
-    template <typename T>
-    inline 
-    fvar<T> operator*(const T& af, const fvar<T>& b) {
-      return fvar<T>(af * b.val(), af * b.prime());
-    }
   }
-
 }
-
 #endif
     

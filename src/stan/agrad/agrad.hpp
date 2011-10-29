@@ -1289,6 +1289,7 @@ namespace stan {
       return !a.val();
     }
 
+
     // ARITHMETIC OPERATORS
 
     /**
@@ -1530,7 +1531,7 @@ namespace stan {
     /**
      * Postfix increment operator for variables (C++).  
      *
-     * Following C++, the expression <code>(a++)</code> i s defined to behave like
+     * Following C++, the expression <code>(a++)</code> is defined to behave like
      * the sequence of operations
      *
      * <code>var temp = a;  a = a + 1.0;  return temp;</code>
@@ -1782,7 +1783,6 @@ namespace stan {
     /**
      * Return the principal value of the arc tangent, in radians, of
      * the first variable divided by the second (cmath).
-     *
      *
      * The partial derivatives are defined by
      *

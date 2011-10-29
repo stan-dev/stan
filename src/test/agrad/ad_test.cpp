@@ -18,28 +18,6 @@ TEST(agrad_ad,av_eq) {
   EXPECT_FLOAT_EQ(1.0,b.prime());
 }
 
-TEST(agrad_ad,av_times_bv) {
-  DEP_FVAR a = 2;
-  FVAR b = 3.0;
-  FVAR f = a * b;
-  EXPECT_FLOAT_EQ(6.0,f.val());
-  EXPECT_FLOAT_EQ(3.0,f.prime());
-}
-TEST(agrad_ad,av_times_b) {
-  DEP_FVAR a = 2;
-  double b = 3.0;
-  FVAR f = a * b;
-  EXPECT_FLOAT_EQ(6.0,f.val());
-  EXPECT_FLOAT_EQ(3.0,f.prime());
-}
-TEST(agrad_ad,a_times_bv) {
-  double a = 2.0;
-  DEP_FVAR b = 3.0;
-  FVAR f = a * b;
-  EXPECT_FLOAT_EQ(6.0,f.val());
-  EXPECT_FLOAT_EQ(2.0,f.prime());
-}
-
 TEST(agrad_ad,av_plus_eq_bv) {
   DEP_FVAR a = 2.0;
   DEP_FVAR b = 3.0;
@@ -237,4 +215,147 @@ TEST(agrad_ad,a_gte_bv) {
   EXPECT_FALSE(a >= d);
 }
 
+TEST(agrad_ad,negation_a) {
+  FVAR a = -1.0;
+  FVAR b = 0.0;
+  FVAR c = 1.0;
+  EXPECT_FALSE(!a);
+  EXPECT_TRUE(!b);
+  EXPECT_FALSE(!c);
+}
 
+TEST(agrad_ad,pos_a) {
+  DEP_FVAR a = -1.0;
+  DEP_FVAR b = 0.0;
+  DEP_FVAR c = 1.0;
+  FVAR p_a = +a;
+  FVAR p_b = +b;
+  FVAR p_c = +c;
+  EXPECT_FLOAT_EQ(-1.0,p_a.val());
+  EXPECT_FLOAT_EQ(0.0,p_b.val());
+  EXPECT_FLOAT_EQ(1.0,p_c.val());
+  EXPECT_FLOAT_EQ(1.0,p_a.prime());
+  EXPECT_FLOAT_EQ(1.0,p_a.prime());
+  EXPECT_FLOAT_EQ(1.0,p_a.prime());
+}
+
+TEST(agrad_ad,negative_a) {
+  DEP_FVAR a = -1.0;
+  DEP_FVAR b = 0.0;
+  DEP_FVAR c = 1.0;
+  FVAR p_a = -a;
+  FVAR p_b = -b;
+  FVAR p_c = -c;
+  EXPECT_FLOAT_EQ(1.0,p_a.val());
+  EXPECT_FLOAT_EQ(0.0,p_b.val());
+  EXPECT_FLOAT_EQ(-1.0,p_c.val());
+  EXPECT_FLOAT_EQ(-1.0,p_a.prime());
+  EXPECT_FLOAT_EQ(-1.0,p_a.prime());
+  EXPECT_FLOAT_EQ(-1.0,p_a.prime());
+}
+
+TEST(agrad_ad,a_plus_b) {
+  DEP_FVAR a = 2.0;
+  FVAR b = 3.0;
+  FVAR c = a + b;
+  EXPECT_FLOAT_EQ(5.0, c.val());
+  EXPECT_FLOAT_EQ(1.0, c.prime());
+
+  DEP_FVAR d = 4.0;
+  FVAR e = d + d;
+  EXPECT_FLOAT_EQ(8.0,e.val());
+  EXPECT_FLOAT_EQ(2.0,e.prime());
+
+  DEP_FVAR f = 5.0;
+  double g = 2.0;
+  FVAR h = f + g;
+  EXPECT_FLOAT_EQ(7.0,h.val());
+  EXPECT_FLOAT_EQ(1.0,h.prime());
+  
+  double i = 7.0;
+  DEP_FVAR j = 11.0;
+  FVAR k = i + j;
+  EXPECT_FLOAT_EQ(18.0,k.val());
+  EXPECT_FLOAT_EQ(1.0,k.prime());
+}
+
+TEST(agrad_ad,av_minus_bv) {
+  DEP_FVAR a = 2;
+  FVAR b = 3.0;
+  FVAR f = a - b;
+  EXPECT_FLOAT_EQ(-1.0,f.val());
+  EXPECT_FLOAT_EQ(1.0,f.prime());
+}
+TEST(agrad_ad,av_minus_b) {
+  DEP_FVAR a = 2;
+  double b = 3.0;
+  FVAR f = a - b;
+  EXPECT_FLOAT_EQ(-1.0,f.val());
+  EXPECT_FLOAT_EQ(1.0,f.prime());
+}
+TEST(agrad_ad,a_minus_bv) {
+  double a = 2.0;
+  DEP_FVAR b = 3.0;
+  FVAR f = a - b;
+  EXPECT_FLOAT_EQ(-1.0,f.val());
+  EXPECT_FLOAT_EQ(-1.0,f.prime());
+}
+
+TEST(agrad_ad,av_times_bv) {
+  DEP_FVAR a = 2;
+  FVAR b = 3.0;
+  FVAR f = a * b;
+  EXPECT_FLOAT_EQ(6.0,f.val());
+  EXPECT_FLOAT_EQ(3.0,f.prime());
+}
+TEST(agrad_ad,av_times_b) {
+  DEP_FVAR a = 2;
+  double b = 3.0;
+  FVAR f = a * b;
+  EXPECT_FLOAT_EQ(6.0,f.val());
+  EXPECT_FLOAT_EQ(3.0,f.prime());
+}
+TEST(agrad_ad,a_times_bv) {
+  double a = 2.0;
+  DEP_FVAR b = 3.0;
+  FVAR f = a * b;
+  EXPECT_FLOAT_EQ(6.0,f.val());
+  EXPECT_FLOAT_EQ(2.0,f.prime());
+}
+
+TEST(agrad_ad,av_div_bv) {
+  DEP_FVAR a = 2.0;
+  FVAR b = 3.0;
+  FVAR f = a / b;
+  EXPECT_FLOAT_EQ(2.0/3.0, f.val());
+  EXPECT_FLOAT_EQ(3.0 / (3.0 * 3.0), f.prime());
+}
+TEST(agrad_ad,av_div_bv_2) {
+  FVAR c = 2.0;
+  DEP_FVAR d = 3.0;
+  FVAR g = c / d;
+  EXPECT_FLOAT_EQ(2.0/3.0, g.val());
+  EXPECT_FLOAT_EQ(-2.0/(3.0 * 3.0), g.prime());
+}
+TEST(agrad_ad,av_div_bv_3) {
+  DEP_FVAR c = 2.0;
+  DEP_FVAR d = 3.0;
+  FVAR g = c / d;
+  EXPECT_FLOAT_EQ(2.0/3.0, g.val());
+  EXPECT_FLOAT_EQ((3.0 -2.0)/(3.0 * 3.0), g.prime());
+}
+
+TEST(agrad_ad,av_div_b) {
+  DEP_FVAR a = 2.0;
+  double b = 3.0;
+  FVAR f = a / b;
+  EXPECT_FLOAT_EQ(2.0/3.0, f.val());
+  EXPECT_FLOAT_EQ(3.0 / (3.0 * 3.0), f.prime());
+}
+TEST(agrad_ad,a_div_bv_2) {
+  double c = 2.0;
+  DEP_FVAR d = 3.0;
+  FVAR g = c / d;
+  EXPECT_FLOAT_EQ(2.0/3.0, g.val());
+  EXPECT_FLOAT_EQ(-2.0/(3.0 * 3.0), g.prime());
+}
