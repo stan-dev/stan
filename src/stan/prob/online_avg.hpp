@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <boost/throw_exception.hpp>
 
 namespace stan {
 
@@ -35,7 +36,7 @@ namespace stan {
        */
       void add(std::vector<double>& x) {
 	if (x.size() != num_dimensions())
-	  throw std::runtime_error("x.size() must equal num_dimensions()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error("x.size() must equal num_dimensions()"));
 	++_num_samples;
 	for (unsigned int n = 0; n < num_dimensions(); ++n) {
 	  double nextM = _mM[n] + (x[n] - _mM[n]) / _num_samples;
@@ -50,7 +51,7 @@ namespace stan {
        */
       void remove(std::vector<double>& x) {
 	if (num_samples() == 0)
-	  throw std::runtime_error ("no samples to remove");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("no samples to remove"));
 	for (unsigned int n = 0; n < num_dimensions(); ++n) {
 	  double m_old = (_num_samples * _mM[n] - x[n])/(_num_samples - 1);
 	  _mS[n] -= (x[n] - _mM[n]) * (x[n] - m_old);
@@ -69,7 +70,7 @@ namespace stan {
        */
       double avg(unsigned int n) {
 	if (n >= num_dimensions())
-	  throw std::runtime_error("n >= num_dimensions()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error("n >= num_dimensions()"));
 	return _mM[n];
       }
 
@@ -79,7 +80,7 @@ namespace stan {
        */
       double sample_variance(unsigned int n) {
 	if (n >= num_dimensions())
-	  throw std::runtime_error("n >= num_dimensions()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error("n >= num_dimensions()"));
 	return _num_samples > 1
 	  ? _mS[n] / (_num_samples - 1)
 	  : 0.0;
@@ -96,7 +97,7 @@ namespace stan {
        */      
       void avgs(std::vector<double>& avgs) {
 	if(avgs.size() != num_dimensions())
-	  throw std::runtime_error ("avgs.size() must equal num_dimensions()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("avgs.size() must equal num_dimensions()"));
 	for (unsigned int n = 0; n < num_dimensions(); ++n) 
 	  avgs[n] = avg(n);
       }
@@ -108,7 +109,7 @@ namespace stan {
        */      
       void sample_variances(std::vector<double>& variances) {
 	if(variances.size() != num_dimensions())
-	  throw std::runtime_error ("variances.size() must equal num_dimensions()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("variances.size() must equal num_dimensions()"));
 	for (unsigned int n = 0; n < num_dimensions(); ++n) 
 	  variances[n] = sample_variance(n);
       }
@@ -120,7 +121,7 @@ namespace stan {
        */      
       void sample_deviations(std::vector<double>& devs) {
 	if(devs.size() != num_dimensions())
-	  throw std::runtime_error ("devs.size() must equal num_dimensions()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("devs.size() must equal num_dimensions()"));
 	for (unsigned int n = 0; n < num_dimensions(); ++n) 
 	  devs[n] = sample_deviation(n);
       }

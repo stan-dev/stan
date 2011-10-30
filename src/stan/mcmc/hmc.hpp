@@ -7,6 +7,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
+#include <boost/throw_exception.hpp>
 #include "stan/mcmc/sampler.hpp"
 #include "stan/mcmc/prob_grad.hpp"
 
@@ -104,7 +105,7 @@ namespace stan {
       virtual void set_params(std::vector<double> x, 
 			      std::vector<int> z) {
 	if (x.size() != _x.size() || z.size() != _z.size())
-	  throw std::invalid_argument("x.size() or z.size() mismatch");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument("x.size() or z.size() mismatch"));
 	_x = x;
 	_z = z;
       }
@@ -122,7 +123,7 @@ namespace stan {
        */
       virtual void set_params_r(const std::vector<double>& x) {
 	if (x.size() != _model.num_params_r())
-	  throw std::invalid_argument ("x.size() must match the number of parameters of the model.");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() must match the number of parameters of the model."));
 	_x = x;
 	_E = -_model.grad_log_prob(_x,_z,_g);
       }
@@ -140,7 +141,7 @@ namespace stan {
        */
       virtual void set_params_i(const std::vector<int>& z) {
 	if (z.size() != _model.num_params_i())
-	  throw std::invalid_argument ("z.size() must match the number of parameters of the model.");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument ("z.size() must match the number of parameters of the model."));
 	_z = z;
 	_E = -_model.grad_log_prob(_x,_z,_g);
       }

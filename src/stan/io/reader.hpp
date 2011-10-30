@@ -5,6 +5,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include <boost/multi_array.hpp>
+#include <boost/throw_exception.hpp>
 #include <stan/maths/special_functions.hpp>
 #include <stan/prob/transform.hpp>
 
@@ -310,7 +311,7 @@ namespace stan {
       T scalar_pos() {
 	T x(scalar());
 	if(!stan::prob::positive_validate(x))
-	  throw std::runtime_error ("x is not positive");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("x is not positive"));
 	return x;
       }
 
@@ -352,7 +353,7 @@ namespace stan {
       T scalar_lb(double lb) {
 	T x(scalar());
 	if (!stan::prob::lb_validate(x,lb))
-	  throw std::runtime_error ("x is less than the lower bound");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("x is less than the lower bound"));
 	return x;
       }
 
@@ -400,7 +401,7 @@ namespace stan {
       T scalar_ub(double ub) {
 	T x(scalar());
 	if(!stan::prob::ub_validate(x,ub))
-	  throw std::runtime_error("x is greater than the upper bound");
+	  BOOST_THROW_EXCEPTION(std::runtime_error("x is greater than the upper bound"));
 	return x;
       }
 
@@ -447,7 +448,7 @@ namespace stan {
       T scalar_lub(double lb, double ub) {
 	T x(scalar());
 	if(!stan::prob::lub_validate(x,lb,ub))
-	  throw std::runtime_error ("scalar is not between lower and upper bounds");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("scalar is not between lower and upper bounds"));
 	return x;
       }
 
@@ -537,7 +538,7 @@ namespace stan {
       T corr() {
 	T x(scalar());
 	if (!stan::prob::corr_validate(x))
-	  throw std::runtime_error ("x is not a valid correlation value");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("x is not a valid correlation value"));
 	return x;
       }
 
@@ -580,7 +581,7 @@ namespace stan {
       Matrix<T,Dynamic,1> simplex(unsigned int k) {
 	Matrix<T,Dynamic,1> theta(vector(k));
 	if(!stan::prob::simplex_validate(theta))
-	  throw std::runtime_error("the k values is not a simplex");
+	  BOOST_THROW_EXCEPTION(std::runtime_error("the k values is not a simplex"));
 	return theta;
       }
 
@@ -626,7 +627,7 @@ namespace stan {
       Matrix<T,Dynamic,1> pos_ordered(unsigned int k) {
 	Matrix<T,Dynamic,1> x(vector(k));
 	if(!stan::prob::pos_ordered_validate(x)) 
-	  throw std::runtime_error ("vector is not positive ordered");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
 	return x;
       }
 
@@ -671,7 +672,7 @@ namespace stan {
       Matrix<T,Dynamic,Dynamic> corr_matrix(unsigned int k) {
 	Matrix<T,Dynamic,Dynamic> x(matrix(k,k));
 	if(!stan::prob::corr_matrix_validate(x))
-	  throw std::runtime_error ("the matrix returned is not a valid correlation matrix");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("the matrix returned is not a valid correlation matrix"));
 	return x;
       }
 
@@ -717,7 +718,7 @@ namespace stan {
       Matrix<T,Dynamic,Dynamic> cov_matrix(unsigned int k) {
 	Matrix<T,Dynamic,Dynamic> y(matrix(k,k));
 	if(!stan::prob::cov_matrix_validate(y))
-	  throw std::runtime_error ("the matrix returned is not a valid covariance matrix");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("the matrix returned is not a valid covariance matrix"));
 	return y;
       }
 

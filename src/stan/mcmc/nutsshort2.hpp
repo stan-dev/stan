@@ -7,6 +7,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
+#include <boost/throw_exception.hpp>
 #include "stan/mcmc/sampler.hpp"
 #include "stan/mcmc/prob_grad.hpp"
 #include "stan/mcmc/hmc.hpp"
@@ -138,7 +139,7 @@ namespace stan {
       virtual void set_params(std::vector<double> x,
                               std::vector<unsigned int> z) {
 	if (x.size() != _x.size() || z.size() != _z.size())
-	  throw std::invalid_argument();
+	  BOOST_THROW_EXCEPTION(std::invalid_argument(""));
 	_x = x;
         _z = z;
 	_E = -_model.grad_log_prob(_x,_z,_g);

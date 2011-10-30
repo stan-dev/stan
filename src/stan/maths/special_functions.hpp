@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <boost/throw_exception.hpp>
 
 namespace stan {
 
@@ -269,7 +270,7 @@ namespace stan {
       template <typename Vector, typename Scalar>
       int maximum(const Vector& x) {
 	if(x.size() == 0)
-	  throw std::invalid_argument ("x must have at least one element");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument ("x must have at least one element"));
 	Scalar max_x(x[0]);
 	for (unsigned int i = 1; i < x.size(); ++i)
 	  if (x[i] < max_x)
@@ -331,7 +332,7 @@ namespace stan {
     template <typename Vector, typename Scalar>
     void softmax(const Vector& x, Vector& simplex) {
       if(x.size() != simplex.size()) 
-	throw std::invalid_argument ("x.size() != simplex.size()");
+	BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
       Scalar sum(0.0); 
       Scalar max_x = maximum<Vector,Scalar>(x);
       for (unsigned int i = 0; i < x.size(); ++i)
@@ -366,7 +367,7 @@ namespace stan {
     template <typename Vector>
     void inverse_softmax(const Vector& simplex, Vector& y) {
       if(simplex.size() != y.size())
-	throw std::invalid_argument ("simplex.size() != y.size()");
+	BOOST_THROW_EXCEPTION(std::invalid_argument ("simplex.size() != y.size()"));
       for (unsigned int i = 0; i < simplex.size(); ++i)
 	y[i] = log(simplex[i]);
     }

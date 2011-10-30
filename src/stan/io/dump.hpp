@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 #include <locale>
+#include <boost/throw_exception.hpp>
 #include <stan/io/var_context.hpp>
 
 namespace stan {
@@ -36,7 +37,7 @@ namespace stan {
       void write_name_equals(const std::string& name) {
 	for (unsigned int i = 0; i < name.size(); ++i)
 	  if (name.at(i) == '"')
-	    throw std::invalid_argument ("name can not contain quote char");
+	    BOOST_THROW_EXCEPTION(std::invalid_argument ("name can not contain quote char"));
        	out_ << '"' << name << '"' << " <- " << '\n';
       }
 
@@ -276,7 +277,7 @@ namespace stan {
 			  std::vector<unsigned int> dims,
 			  std::vector<T> xs) {
 	if (xs.size() != product(dims)) 
-	  throw std::invalid_argument ("xs.size() != product(dims)");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument ("xs.size() != product(dims)"));
 	write_structure(xs,dims);
       }
 

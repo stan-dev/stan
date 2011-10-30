@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 #include <limits>
+#include <boost/throw_exception.hpp>
 #include <stan/io/csv_writer.hpp>
 
 namespace stan {
@@ -76,9 +77,9 @@ namespace stan {
 				   std::vector<double>& params_r,
 				   std::vector<int>& params_i) {
 	if (idx >= num_params_i()) // || idx < 0
-	  throw std::runtime_error ("idx >= num_params_i()");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("idx >= num_params_i()"));
 	if (val >= param_range_i(idx)) // || val < 0
-	  throw std::runtime_error ("val >= param_range_i(idx)");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("val >= param_range_i(idx)"));
 
 	int original_val = params_i[idx];
 	params_i[idx] = val;

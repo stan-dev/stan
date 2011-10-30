@@ -2,6 +2,7 @@
 #define __STAN__PROB__RHAT_HPP__
 
 #include <stdexcept>
+#include <boost/throw_exception.hpp>
 #include "stan/prob/online_avg.hpp"
 
 namespace stan {
@@ -18,9 +19,9 @@ namespace stan {
       rhat(unsigned int num_chains, unsigned int num_params) 
 	: _avgs(num_chains) {
 	if (num_chains <= 0) 
-	  throw std::invalid_argument ("num_chains must be greater than 0");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument ("num_chains must be greater than 0"));
 	if (num_params <= 0) 
-	  throw std::invalid_argument ("num_params must be greater than 0");
+	  BOOST_THROW_EXCEPTION(std::invalid_argument ("num_params must be greater than 0"));
 	for (unsigned int m = 0; m < num_chains; ++m) {
 	  online_avg avgs(num_params);  // could move this out if next fully copies
 	  _avgs[m] = avgs;
@@ -43,7 +44,7 @@ namespace stan {
        */
       void add(unsigned int j, std::vector<double>& theta) {
 	if ((int)j >= num_chains()) 
-	  throw std::out_of_range ("j must be less than num_chains()");
+	  BOOST_THROW_EXCEPTION(std::out_of_range ("j must be less than num_chains()"));
 	_avgs[j].add(theta);
 	//if (_auto_corr_prod_avgs[j].num_samples() > 0) {
       

@@ -5,6 +5,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include <boost/multi_array.hpp>
+#include <boost/throw_exception.hpp>
 #include <stan/maths/special_functions.hpp>
 #include <stan/prob/transform.hpp>
 
@@ -108,7 +109,7 @@ namespace stan {
        */
       void scalar_pos_unconstrain(T& y) {
 	if (y < 0.0)
-	  throw std::runtime_error ("y is negative");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is negative"));
 	data_r_.push_back(log(y));
       }
 
@@ -125,7 +126,7 @@ namespace stan {
        */
       void scalar_lb_unconstrain(double lb, T& y) {
 	if (y < lb)
-	  throw std::runtime_error ("y is lower than the lower bound");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is lower than the lower bound"));
 	data_r_.push_back(log(y - lb));
       }
 
@@ -141,7 +142,7 @@ namespace stan {
        */
       void scalar_ub_unconstrain(double ub, T& y) {
 	if (y > ub)
-	  throw std::runtime_error ("y is higher than the lower bound");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is higher than the lower bound"));
 	data_r_.push_back(log(ub - y));
       }
 
@@ -159,7 +160,7 @@ namespace stan {
        */
       void scalar_lub_unconstrain(double lb, double ub, T& y) {
 	if (y < lb || y > ub)
-	  throw std::runtime_error ("y is not between the lower and upper bounds");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between the lower and upper bounds"));
 	data_r_.push_back(stan::maths::logit((y - lb) / (ub - lb)));
       }
 
@@ -175,7 +176,7 @@ namespace stan {
        */
       void corr_unconstrain(T& y) {
 	if (y > 1.0 || y < -1.0)
-	  throw std::runtime_error ("y is not between -1.0 and 1.0");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between -1.0 and 1.0"));
 	data_r_.push_back(atanh(y));
       }
 
@@ -192,7 +193,7 @@ namespace stan {
         */
       void prob_unconstrain(T& y) {
 	if (y > 1.0 || y < 0.0)
-	  throw std::runtime_error ("y is not between 0.0 and 1.0");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between 0.0 and 1.0"));
 	data_r_.push_back(stan::maths::logit(y));
       }
 
@@ -214,7 +215,7 @@ namespace stan {
       void pos_ordered_unconstrain(Matrix<T,Dynamic,1>& y) {
 	if (y.size() == 0) return;
 	if(!stan::prob::pos_ordered_validate(y)) 
-	  throw std::runtime_error ("vector is not positive ordered");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
 	data_r_.push_back(log(y[0]));
 	for (unsigned int i = 1; i < y.size(); ++i) {
 	  data_r_.push_back(log(y[i] - y[i-1]));
@@ -239,7 +240,7 @@ namespace stan {
        */
       void simplex_unconstrain(Matrix<T,Dynamic,1>& y) {
 	if (!stan::prob::simplex_validate(y))
-	  throw std::runtime_error("y is not a simplex");
+	  BOOST_THROW_EXCEPTION(std::runtime_error("y is not a simplex"));
 	unsigned int k_minus_1 = y.size() - 1;
 	double log_y_k = log(y[k_minus_1]);
 	for (unsigned int i = 0; i < k_minus_1; ++i) {
@@ -264,18 +265,18 @@ namespace stan {
        */
       void corr_matrix_unconstrain(Matrix<T,Dynamic,Dynamic>& y) {
 	if (!stan::prob::corr_matrix_validate(y))
-	  throw std::runtime_error ("y is not a valid correlation matrix");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y is not a valid correlation matrix"));
 	unsigned int k = y.rows();
 	unsigned int k_choose_2 = (k * (k-1)) / 2;
 	Array<T,Dynamic,1> cpcs(k_choose_2);
 	Array<T,Dynamic,1> sds(k);
 	bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
 	if (!successful)
-	  throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y cannot be factorized by factor_cov_matrix"));
 	for (unsigned int i = 0; i < k; ++i) {
 	  // sds on log scale unconstrained
 	  if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
-	    throw std::runtime_error ("sds on log scale are unconstrained");
+	    BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
 	}
 	for (unsigned int i = 0; i < k_choose_2; ++i)
 	  data_r_.push_back(cpcs[i]);
@@ -295,13 +296,13 @@ namespace stan {
       void cov_matrix_unconstrain(Matrix<T,Dynamic,Dynamic>& y) {
 	unsigned int k = y.rows();
 	if (k == 0 || y.cols() != k)
-	  throw std::runtime_error ("y must have elements and y must be a square matrix");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("y must have elements and y must be a square matrix"));
 	unsigned int k_choose_2 = (k * (k-1)) / 2;
 	Array<T,Dynamic,1> cpcs(k_choose_2);
 	Array<T,Dynamic,1> sds(k);
 	bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
 	if(!successful)
-	  throw std::runtime_error ("factor_cov_matrix failed");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
 	for (unsigned int i = 0; i < k_choose_2; ++i)
 	  data_r_.push_back(cpcs[i]);
 	for (unsigned int i = 0; i < k; ++i)

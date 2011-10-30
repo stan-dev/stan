@@ -5,6 +5,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include <boost/multi_array.hpp>
+#include <boost/throw_exception.hpp>
 #include <stan/maths/special_functions.hpp>
 
 namespace stan {
@@ -396,7 +397,7 @@ namespace stan {
     template <typename T>
     T positive_free(const T y) {
       if (!positive_validate(y)) {
-	throw std::domain_error ("y must be positive");
+	BOOST_THROW_EXCEPTION(std::domain_error ("y must be positive"));
       }
       return log(y);
     }
@@ -474,7 +475,7 @@ namespace stan {
     inline
     T lb_free(const T y, const double lb) {
       if (!lb_validate(y,lb)) 
-	throw std::invalid_argument ("y must be greater than the lower bound");
+	BOOST_THROW_EXCEPTION(std::invalid_argument ("y must be greater than the lower bound"));
       return log(y - lb);
     }
     
@@ -557,7 +558,7 @@ namespace stan {
     template <typename T>
     T ub_free(const T y, const double ub) {
       if(!ub_validate(y,ub))
-	throw std::invalid_argument ("y is greater than the upper bound");
+	BOOST_THROW_EXCEPTION(std::invalid_argument ("y is greater than the upper bound"));
       return log(ub - y);
     }
 
@@ -1202,7 +1203,7 @@ namespace stan {
       for (unsigned int i = 0; i < k; ++i) {
 	// sds on log scale unconstrained
 	if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
-	  throw std::runtime_error ("sds on log scale are unconstrained");
+	  BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
       }
       return x.matrix();
     }
