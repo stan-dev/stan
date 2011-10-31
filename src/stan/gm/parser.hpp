@@ -139,16 +139,17 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
-    struct add_int_var_decl {
+    struct add_var_decl {
       template <typename T1, typename T2>
-      struct result { typedef int_var_decl type; };
-      int_var_decl 
-      operator()(const int_var_decl& var_decl, std::map<std::string,expr_type>& name_to_type) const { 
-	name_to_type[var_decl.name_] = expr_type(INT_T,var_decl.dims_.size());
+      struct result { typedef T1 type; };
+      template <typename T> T
+      operator()(const T& var_decl, std::map<std::string,base_var_decl>& name_to_type) const { 
+	name_to_type[var_decl.name_] = var_decl;
+	std::cout << "add decl=" << var_decl.name_ << std::endl;
 	return var_decl;
       }
     };
-    boost::phoenix::function<add_int_var_decl> add_int_var;
+    boost::phoenix::function<add_var_decl> add_var;
 
     template <typename Iterator>
     class whitespace_grammar : public qi::grammar<Iterator> {
@@ -170,7 +171,7 @@ namespace stan {
     struct program_grammar : qi::grammar<Iterator, 
 					 program(), 
 					 whitespace_grammar<Iterator> > {
-      std::map<std::string,expr_type> var_to_dims_;
+      std::map<std::string,base_var_decl> var_name_to_decl_;
       program_grammar() 
 	: program_grammar::base_type(program_r) {
 	using qi::_val;
@@ -212,17 +213,19 @@ namespace stan {
 	  > *var_decl_r
 	  > qi::lit('}');
 
+	// duplication because top-level is variant, not specific
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  %= int_decl_r              [_val = add_int_var(_1,boost::phoenix::ref(var_to_dims_))]
-	  | double_decl_r 
-	  | vector_decl_r
-	  | row_vector_decl_r
-	  | matrix_decl_r
-	  | simplex_decl_r
-	  | pos_ordered_decl_r
-	  | corr_matrix_decl_r
-	  | cov_matrix_decl_r;
+	  %= int_decl_r          [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | double_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | vector_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | row_vector_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | matrix_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | simplex_decl_r       [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | pos_ordered_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | corr_matrix_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | cov_matrix_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  ;
 
 	int_decl_r.name("integer declaration");
 	int_decl_r 
