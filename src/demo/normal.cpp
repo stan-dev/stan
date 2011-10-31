@@ -5,7 +5,7 @@
 #include "stan/agrad/agrad.hpp"
 #include "stan/mcmc/prob_grad_ad.hpp"
 #include "stan/mcmc/hmc.hpp"
-#include "stan/mcmc/adaptivehmc.hpp"
+#include "stan/mcmc/adaptive_hmc.hpp"
 #include "stan/mcmc/adaptive_cdhmc.hpp"
 #include "stan/mcmc/nuts.hpp"
 

@@ -62,7 +62,7 @@ namespace stan {
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
       // Gamma parameter for dual averaging.
-      const static double da_gamma = 0.05;
+      inline static double da_gamma() { return 0.05; }
 
     public:
 
@@ -116,7 +116,7 @@ namespace stan {
                           boost::normal_distribution<>()),
           _rand_uniform_01(_rand_int),
 
-          _da(da_gamma, std::vector<double>(1, 0)) {
+          _da(da_gamma(), std::vector<double>(1, 0)) {
         set_epsilon(_epsilon);
         model.init(_x,_z);
         _logp = model.grad_log_prob(_x,_z,_g);

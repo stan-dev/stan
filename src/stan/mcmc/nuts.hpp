@@ -57,7 +57,7 @@ namespace stan {
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
       // Gamma parameter for dual averaging.
-      const static double da_gamma = 0.05;
+      static double da_gamma() { return 0.05; }
 
       /**
        * Determine whether we've started to make a "U-turn" at either end
@@ -121,7 +121,7 @@ namespace stan {
 
           _maxchange(-1000),
 
-          _da(da_gamma, std::vector<double>(1, 0)) {
+          _da(da_gamma(), std::vector<double>(1, 0)) {
         model.init(_x, _z);
         _logp = model.grad_log_prob(_x, _z, _g);
         if (_epsilon <= 0)
