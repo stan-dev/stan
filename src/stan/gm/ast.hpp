@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <map>
 #include <vector>
 
 namespace stan {
@@ -73,21 +74,29 @@ namespace stan {
       MATRIX_T // includes: POS_SYM_DEF_MATRIX_T
     };
 
-    struct expr_type {
-      base_expr_type base_type_;
-      unsigned int num_dims_;
+    class expr_type {
+    private: 
+      const base_expr_type base_type_;
+      const unsigned int num_dims_;
+    public:
       expr_type() 
 	: base_type_(DOUBLE_T),
 	  num_dims_(0) { 
       }
-      expr_type(base_expr_type base_type) 
+      expr_type(const base_expr_type base_type) 
 	: base_type_(base_type),
 	  num_dims_(0) {
       }
-      expr_type(base_expr_type base_type,
+      expr_type(const base_expr_type base_type,
 		unsigned int num_dims) 
 	: base_type_(base_type),
 	  num_dims_(num_dims) {
+      }
+      base_expr_type type() {
+	return base_type_;
+      }
+      int num_dims() {
+	return num_dims_;
       }
     };
 

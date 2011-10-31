@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <iostream>
 #include <istream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -129,18 +130,25 @@ namespace stan {
     // type deduction mechanism that prevents us from doing
     // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
     // we will use a phoenix::function below:
-    struct negate_expr
-    {
+    struct negate_expr {
       template <typename T>
       struct result { typedef T type; };
-
-      expression operator()(expression const& expr) const
-      {
+      expression operator()(expression const& expr) const {
 	return expression(unary_op('-', expr));
       }
     };
-
     boost::phoenix::function<negate_expr> neg;
+
+    struct add_int_var_decl {
+      template <typename T1, typename T2>
+      struct result { typedef int_var_decl type; };
+      int_var_decl 
+      operator()(const int_var_decl& var_decl, std::map<std::string,unsigned int>& name_to_dims) const { 
+	name_to_dims[var_decl.name_] = var_decl.dims_.size();
+	return var_decl;
+      }
+    };
+    boost::phoenix::function<add_int_var_decl> add_int_var;
 
     template <typename Iterator>
     class whitespace_grammar : public qi::grammar<Iterator> {
@@ -162,6 +170,7 @@ namespace stan {
     struct program_grammar : qi::grammar<Iterator, 
 					 program(), 
 					 whitespace_grammar<Iterator> > {
+      std::map<std::string,unsigned int> var_to_dims_;
       program_grammar() 
 	: program_grammar::base_type(program_r) {
 	using qi::_val;
@@ -205,7 +214,7 @@ namespace stan {
 
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  = int_decl_r 
+	  %= int_decl_r              [_val = add_int_var(_1,boost::phoenix::ref(var_to_dims_))]
 	  | double_decl_r 
 	  | vector_decl_r
 	  | row_vector_decl_r
