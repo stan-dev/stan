@@ -71,8 +71,9 @@ namespace stan {
 
     // Normal(y|mu,sigma)   [sigma > 0]
     /**
-     * The log of the normal density for the given y, mean, and standard deviation.
-     * The standard deviation must be greater than 0.
+     * The log of the normal density for the given y, mean, and
+     * standard deviation.  The standard deviation must be greater
+     * than 0.
      * 
      * @param y A scalar variable.
      * @param mu The mean of the normal distribution.

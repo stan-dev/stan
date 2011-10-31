@@ -7,74 +7,6 @@ namespace stan {
 
   namespace mcmc {
 
-    namespace {
-      // x' * y
-      inline double dot(std::vector<double>& x,
-                        std::vector<double>& y) {
-	double sum = 0.0;
-	for (unsigned int i = 0; i < x.size(); ++i)
-	  sum += x[i] * y[i];
-	return sum;
-      }
-
-      // x' * x
-      inline double dot_self(std::vector<double>& x) {
-	double sum = 0.0;
-	for (unsigned int i = 0; i < x.size(); ++i)
-	  sum += x[i] * x[i];
-	return sum;
-      }
-
-      // x <- x + lambda * y
-      inline void scaled_add(std::vector<double>& x, 
-			     std::vector<double>& y,
-			     double lambda) {
-	for (unsigned int i = 0; i < x.size(); ++i)
-	  x[i] += lambda * y[i];
-      }
-
-      inline double dist(const std::vector<double>& x, const std::vector<double>& y) {
-	double result = 0;
-	for (unsigned int i = 0; i < x.size(); ++i) {
-	  double diff = x[i] - y[i];
-	  result += diff * diff;
-	}
-	return sqrt(result);
-      }
-
-      inline double sum_vec(std::vector<double> x) {
-	double sum = x[0];
-	for (unsigned int i = 1; i < x.size(); ++i)
-	  sum += x[i];
-	return sum;
-      }
-
-      inline double max_vec(std::vector<double> x) {
-	double max = x[0];
-	for (unsigned int i = 1; i < x.size(); ++i)
-	  if (x[i] > max)
-	    max = x[i];
-	return max;
-      }
-      
-      int sample_unnorm_log(std::vector<double> probs, boost::uniform_01<boost::mt19937&>& rand_uniform_01) {
-	// linearize and scale, but don't norm
-	double mx = max_vec(probs);
-	for (unsigned int k = 0; k < probs.size(); ++k)
-	  probs[k] = exp(probs[k] - mx);
-
-	// norm by scaling uniform sample
-	double sum_probs = sum_vec(probs);
-	// handles overrun due to arithmetic imprecision
-	double sample_0_sum = std::max(rand_uniform_01() * sum_probs, sum_probs);  
-	int k = 0;
-	double cum_unnorm_prob = probs[0];
-	while (cum_unnorm_prob < sample_0_sum)
-	  cum_unnorm_prob += probs[++k];
-	return k;
-      }
-    }
-
     /**
      * A sample consists of real parameters, integer parameters, and a
      * log probability.
@@ -209,16 +141,16 @@ namespace stan {
      */
     class sampler {
     protected:
-      unsigned int _nfevals;
+      unsigned int _nfevals, _n_steps;
 
     public:
 
       /**
        * Construct a sampler.
        *
-       * This is a no-op for this base class.
+       * This just initializes nfevals=0, _n_steps=0 for this base class.
        */
-      sampler() : _nfevals(0) { 
+      sampler() : _nfevals(0), _n_steps(0) { 
       }
       
       /**
@@ -253,9 +185,10 @@ namespace stan {
       /**
        * Return the number of times that the (possibly unnormalized)
        * log probability function has been evaluated by this sampler.
-       * A useful alternative to wall time in evaluating relative
-       * performance. However, it's up to the sampler implementation
-       * to be sure to actually keep track of this.
+       * This is a useful alternative to wall time in evaluating the
+       * relative performance of different algorithms. However, it's
+       * up to the sampler implementation to be sure to actually keep
+       * track of this.
        *
        * @return Number of log probability function evaluations.
        */
