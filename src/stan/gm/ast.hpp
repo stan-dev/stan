@@ -76,8 +76,8 @@ namespace stan {
 
     class expr_type {
     private: 
-      const base_expr_type base_type_;
-      const unsigned int num_dims_;
+      base_expr_type base_type_;
+      unsigned int num_dims_;
     public:
       expr_type() 
 	: base_type_(DOUBLE_T),
@@ -91,6 +91,15 @@ namespace stan {
 		unsigned int num_dims) 
 	: base_type_(base_type),
 	  num_dims_(num_dims) {
+      }
+      expr_type(const expr_type& et)
+	: base_type_(et.base_type_),
+	  num_dims_(et.num_dims_) { 
+      }
+      expr_type& operator=(const expr_type& et) {
+	base_type_ = et.base_type_;
+	num_dims_ = et.num_dims_;
+	return *this;
       }
       base_expr_type type() {
 	return base_type_;
@@ -196,129 +205,126 @@ namespace stan {
       expression high_;
     };
 
-    struct int_var_decl {
-      int_var_decl() { }
+    struct base_var_decl {
+      std::string name_;
+      std::vector<expression> dims_;
+      base_expr_type base_type_;
+      base_var_decl() { }
+      base_var_decl(const base_expr_type& base_type) 
+      : base_type_(base_type) {
+      }
+      base_var_decl(const std::string& name,
+		    const std::vector<expression>& dims,
+		    const base_expr_type& base_type)
+      : name_(name),
+	dims_(dims),
+	base_type_(base_type) {
+      }
+    };
+
+
+    struct int_var_decl : public base_var_decl {
+      int_var_decl() : base_var_decl(INT_T) { }
       int_var_decl(range const& range,
 		   std::string const& name,
 		   std::vector<expression> const& dims) 
-	: name_(name),
-	  range_(range),
-	  dims_(dims) { 
+	: base_var_decl(name,dims,INT_T),
+	  range_(range) {
       }
-      std::string name_;
       range range_;
-      std::vector<expression> dims_;
     };
 
-    struct double_var_decl {
-      double_var_decl() { }
+    struct double_var_decl : public base_var_decl {
+      double_var_decl() : base_var_decl(DOUBLE_T) { }
       double_var_decl(range const& range,
 		      std::string const& name,
 		      std::vector<expression> const& dims)
-	: name_(name),
-	  range_(range),
-	  dims_(dims) { 
+	: base_var_decl(name,dims,DOUBLE_T),
+	  range_(range) {
       }
-      std::string name_;
       range range_;
-      std::vector<expression> dims_;
     };
 
-    struct simplex_var_decl {
-      simplex_var_decl() { }
+    struct simplex_var_decl : public base_var_decl {
+      simplex_var_decl() : base_var_decl(VECTOR_T) { }
       simplex_var_decl(expression const& K,
 		       std::string const& name,
 		       std::vector<expression> const& dims)
-	: name_(name),
-	  K_(K),
-	  dims_(dims) { 
+	: base_var_decl(name,dims,VECTOR_T),
+	  K_(K) {
       }
-      std::string name_;
       expression K_;
-      std::vector<expression> dims_;
     };
 
-    struct pos_ordered_var_decl {
-      pos_ordered_var_decl() { }
+    struct pos_ordered_var_decl : public base_var_decl {
+      pos_ordered_var_decl() : base_var_decl(VECTOR_T) { }
       pos_ordered_var_decl(expression const& K,
 			   std::string const& name,
 			   std::vector<expression> const& dims)
-	: name_(name),
-	  K_(K),
-	  dims_(dims) { 
+	: base_var_decl(name,dims,VECTOR_T),
+	  K_(K) {
       }
       std::string name_;
       expression K_;
       std::vector<expression> dims_;
     };
 
-    struct vector_var_decl {
-      vector_var_decl() { }
+    struct vector_var_decl : public base_var_decl {
+      vector_var_decl() : base_var_decl(VECTOR_T) { }
       vector_var_decl(expression const& M,
 		      std::string const& name,
 		      std::vector<expression> const& dims)
-	: name_(name),
-	  M_(M),
-	  dims_(dims) { 
+	: base_var_decl(name,dims,VECTOR_T),
+	  M_(M) {
       }
-      std::string name_;
       expression M_;
-      std::vector<expression> dims_;
     };
 
-    struct row_vector_var_decl {
-      row_vector_var_decl() { }
+    struct row_vector_var_decl : public base_var_decl {
+      row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
       row_vector_var_decl(expression const& N,
 			  std::string const& name,
 			  std::vector<expression> const& dims)
-	: name_(name),
-	  N_(N),
-	  dims_(dims) { 
+	: base_var_decl(name,dims,ROW_VECTOR_T),
+	  N_(N) {
       }
-      std::string name_;
       expression N_;
-      std::vector<expression> dims_;
     };
 
-    struct matrix_var_decl {
-      matrix_var_decl() { }
+    struct matrix_var_decl : public base_var_decl {
+      matrix_var_decl() : base_var_decl(MATRIX_T) { }
       matrix_var_decl(expression const& M,
 		      expression const& N,
 		      std::string const& name,
 		      std::vector<expression> const& dims)
-	: name_(name),
+	: base_var_decl(name,dims,MATRIX_T),
 	  M_(M),
-	  N_(N),
-	  dims_(dims) { 
+	  N_(N) {
       }
-      std::string name_;
       expression M_;
       expression N_;
-      std::vector<expression> dims_;
     };
 
-    struct cov_matrix_var_decl {
-      cov_matrix_var_decl() { }
+    struct cov_matrix_var_decl : public base_var_decl {
+      cov_matrix_var_decl() : base_var_decl(MATRIX_T) { }
       cov_matrix_var_decl(expression const& K,
 			   std::string const& name,
 			   std::vector<expression> const& dims)
-	: name_(name),
-	  K_(K),
-	  dims_(dims) {
+	: base_var_decl(name,dims,MATRIX_T),
+	  K_(K) {
       }
       std::string name_;
       expression K_;
       std::vector<expression> dims_;
     };
 
-    struct corr_matrix_var_decl {
-      corr_matrix_var_decl() { }
+    struct corr_matrix_var_decl : public base_var_decl {
+      corr_matrix_var_decl() : base_var_decl(MATRIX_T) { }
       corr_matrix_var_decl(expression const& K,
 			   std::string const& name,
 			   std::vector<expression> const& dims)
-	: name_(name),
-	  K_(K),
-	  dims_(dims) {
+	: base_var_decl(name,dims,MATRIX_T),
+	  K_(K) {
       }
       std::string name_;
       expression K_;

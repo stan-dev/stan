@@ -143,8 +143,8 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef int_var_decl type; };
       int_var_decl 
-      operator()(const int_var_decl& var_decl, std::map<std::string,unsigned int>& name_to_dims) const { 
-	name_to_dims[var_decl.name_] = var_decl.dims_.size();
+      operator()(const int_var_decl& var_decl, std::map<std::string,expr_type>& name_to_type) const { 
+	name_to_type[var_decl.name_] = expr_type(INT_T,var_decl.dims_.size());
 	return var_decl;
       }
     };
@@ -170,7 +170,7 @@ namespace stan {
     struct program_grammar : qi::grammar<Iterator, 
 					 program(), 
 					 whitespace_grammar<Iterator> > {
-      std::map<std::string,unsigned int> var_to_dims_;
+      std::map<std::string,expr_type> var_to_dims_;
       program_grammar() 
 	: program_grammar::base_type(program_r) {
 	using qi::_val;
