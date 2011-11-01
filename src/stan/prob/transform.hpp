@@ -612,20 +612,23 @@ namespace stan {
     T lub_constrain(const T x, const double lb, const double ub, T& lp) {
       T inv_logit_x;
       if (x > 0) {
-        T one_plus_exp_minus_x = 1.0 + exp(-x);
-        inv_logit_x = 1.0 / one_plus_exp_minus_x;
-        lp += log(ub - lb) - x - 2 * log(one_plus_exp_minus_x);
+        T exp_minus_x = exp(-x);
+        inv_logit_x = 1.0 / (1.0 + exp_minus_x);
+        lp += log(ub - lb) - x - 2 * log1p(exp_minus_x);
         // Prevent x from reaching one unless it really really should.
         if ((x < std::numeric_limits<double>::infinity()) && (inv_logit_x==1))
             inv_logit_x = 1 - 1e-15;
       } else {
-        T one_plus_exp_x = 1.0 + exp(x);
-        inv_logit_x = 1.0 - 1.0 / one_plus_exp_x;
-        lp += log(ub - lb) + x - 2 * log(one_plus_exp_x);
+        T exp_x = exp(x);
+        inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
+        lp += log(ub - lb) + x - 2 * log1p(exp_x);
         // Prevent x from reaching zero unless it really really should.
         if ((x > -std::numeric_limits<double>::infinity()) && (inv_logit_x==0))
             inv_logit_x = 1e-100;
       }
+      agrad::var blah = -x;
+      fprintf(stderr, "x = %f, inv_logit(x) = %e, log(inv_logit(x)) = %e, log1p(exp(-x)) = %e\n",
+              as_double(blah), as_double(inv_logit(blah)), log(inv_logit(as_double(blah))), log1p(as_double(exp(-blah))));
       return lb + (ub - lb) * inv_logit_x;
     }
 

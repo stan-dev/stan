@@ -373,6 +373,29 @@ namespace stan {
     }
 
     /**
+     * Return the natural logarithm of one plus the specified value.
+     *
+     * The main use of this function is to cut down on intermediate
+     * values during algorithmic differentiation.
+     *
+     * @param x Specified value.
+     * @return Natural log of one plus <code>x</code>.
+     */
+    template <typename T>
+    inline typename boost::math::tools::promote_args<T>::type
+    log1p(T x) {
+      double absx = fabs(agrad::as_double(x));
+      // Use 2nd-order Taylor approximation for very small values
+      // Use 1st-order Taylor approximation for very very small values
+      if (absx > 1e-9)
+        return log(1 + x);
+      else if (absx > 1e-16)
+        return x - x*x/2;
+      else
+        return x;
+    }
+
+    /**
      * Return the natural logarithm of one minus the specified value.
      *
      * The main use of this function is to cut down on intermediate
