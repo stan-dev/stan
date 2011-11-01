@@ -10,11 +10,13 @@
 #include "stan/mcmc/adaptive_sampler.hpp"
 #include "stan/mcmc/dualaverage.hpp"
 #include "stan/mcmc/prob_grad.hpp"
-
+#include "stan/maths/util.hpp"
 
 namespace stan {
 
   namespace mcmc {
+
+    using namespace stan::util;
 
     /**
      * Adaptive "constant distance" Hamiltonian Monte Carlo (CDHMC)

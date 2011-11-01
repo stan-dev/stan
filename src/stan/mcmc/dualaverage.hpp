@@ -34,7 +34,7 @@ namespace stan {
        * @param x0 Point towards which iterates are shrunk.
        */
       DualAverage(double gamma, const std::vector<double>& x0) 
-        : _gbar(x0.size()), _xbar(x0.size()), _x0(x0), _lastx(x0),
+        : _gbar(x0.size(), 0), _xbar(x0.size(), 0), _x0(x0), _lastx(x0),
           _k(0), _gamma(gamma){
       }
 
@@ -47,7 +47,7 @@ namespace stan {
       void update(const std::vector<double>& g, std::vector<double>& xk) {
         _k++;
         xk.resize(_gbar.size());
-        double avgeta = 1.0 / _k;
+        double avgeta = 1.0 / (_k + 10);
         double xbar_avgeta = pow(_k, -0.75);
         double muk = 0.5 * sqrt(_k) / _gamma;
         for (unsigned int i = 0; i < _gbar.size(); ++i) {

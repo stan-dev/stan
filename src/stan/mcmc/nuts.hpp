@@ -9,10 +9,13 @@
 #include <boost/random/uniform_01.hpp>
 #include "stan/mcmc/adaptive_sampler.hpp"
 #include "stan/mcmc/dualaverage.hpp"
+#include "stan/maths/util.hpp"
 
 namespace stan {
 
   namespace mcmc {
+
+    using namespace stan::util;
 
     /**
      * No-U-Turn Sampler (NUTS).

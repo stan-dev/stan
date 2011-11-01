@@ -11,7 +11,6 @@
 #include "stan/mcmc/prob_grad.hpp"
 #include "stan/maths/util.hpp"
 
-
 namespace stan {
 
   namespace mcmc {
