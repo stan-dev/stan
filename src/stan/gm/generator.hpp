@@ -1417,7 +1417,7 @@ namespace stan {
       out << INDENT2 << model_name << "_namespace::" << model_name << " model__(dump__);" << EOL;
 
       out << INDENT2 << "data_file__.close();" << EOL;
-      out << INDENT2 << "stan::gm::hmc_command(cmd__,model__);" << EOL;
+      out << INDENT2 << "stan::gm::nuts_command(cmd__,model__);" << EOL;
 
       out << INDENT << "} catch (std::exception& e) {" << EOL;
       out << INDENT2 << "std::cerr << std::endl << \"Exception caught: \" << e.what() << std::endl;" << EOL;

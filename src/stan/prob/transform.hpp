@@ -610,8 +610,22 @@ namespace stan {
      */
     template <typename T>
     T lub_constrain(const T x, const double lb, const double ub, T& lp) {
-      T inv_logit_x = inv_logit(x);
-      lp += log(ub - lb) + log(inv_logit_x) + log1m(inv_logit_x);
+      T inv_logit_x;
+      if (x > 0) {
+        T one_plus_exp_minus_x = 1.0 + exp(-x);
+        inv_logit_x = 1.0 / one_plus_exp_minus_x;
+        lp += log(ub - lb) - x - 2 * log(one_plus_exp_minus_x);
+        // Prevent x from reaching one unless it really really should.
+        if ((x < std::numeric_limits<double>::infinity()) && (inv_logit_x==1))
+            inv_logit_x = 1 - 1e-15;
+      } else {
+        T one_plus_exp_x = 1.0 + exp(x);
+        inv_logit_x = 1.0 - 1.0 / one_plus_exp_x;
+        lp += log(ub - lb) + x - 2 * log(one_plus_exp_x);
+        // Prevent x from reaching zero unless it really really should.
+        if ((x > -std::numeric_limits<double>::infinity()) && (inv_logit_x==0))
+            inv_logit_x = 1e-100;
+      }
       return lb + (ub - lb) * inv_logit_x;
     }
 

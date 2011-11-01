@@ -89,6 +89,21 @@ namespace stan {
        */
       virtual std::vector<unsigned int> dims_i(const std::string& name) = 0;
 
+      /**
+       * Return a list of the names of the floating point variables in
+       * the context.
+       *
+       * @param Vector to store the list of names in.
+       */
+      virtual void names_r(std::vector<std::string>& names) = 0;
+
+      /**
+       * Return a list of the names of the integer variables in
+       * the context.
+       *
+       * @param Vector to store the list of names in.
+       */
+      virtual void names_i(std::vector<std::string>& names) = 0;
     };
     
 

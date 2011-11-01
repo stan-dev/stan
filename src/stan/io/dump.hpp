@@ -727,7 +727,7 @@ namespace stan {
 	} else if (contains_i(name)) {
 	  std::vector<int> vec_int = vars_i_[name].first;
 	  std::vector<double> vec_r(vec_int.size());
-	  for (int ii = 0; ii < vec_int.size(); ii++) {
+	  for (unsigned int ii = 0; ii < vec_int.size(); ii++) {
 	    vec_r[ii] = vec_int[ii];
 	  }
 	  return vec_r;
@@ -777,6 +777,32 @@ namespace stan {
 	  return vars_i_[name].second;
 	}
 	return (empty_vec_ui_);
+      }
+
+      /**
+       * Return a list of the names of the floating point variables in
+       * the dump.
+       *
+       * @param Vector to store the list of names in.
+       */
+      virtual void names_r(std::vector<std::string>& names) {
+        names.resize(0);        
+        for (std::map<std::string, std::pair<std::vector<double>, std::vector<unsigned int> > >::iterator it = vars_r_.begin();
+             it != vars_r_.end(); ++it)
+          names.push_back((*it).first);
+      }
+
+      /**
+       * Return a list of the names of the integer variables in
+       * the dump.
+       *
+       * @param Vector to store the list of names in.
+       */
+      virtual void names_i(std::vector<std::string>& names) {
+        names.resize(0);        
+        for (std::map<std::string, std::pair<std::vector<int>, std::vector<unsigned int> > >::iterator it = vars_i_.begin();
+             it != vars_i_.end(); ++it)
+          names.push_back((*it).first);
       }
 
       bool remove(const std::string& name) {
