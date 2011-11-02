@@ -626,9 +626,6 @@ namespace stan {
         if ((x > -std::numeric_limits<double>::infinity()) && (inv_logit_x==0))
             inv_logit_x = 1e-100;
       }
-      agrad::var blah = -x;
-      fprintf(stderr, "x = %f, inv_logit(x) = %e, log(inv_logit(x)) = %e, log1p(exp(-x)) = %e\n",
-              as_double(blah), as_double(inv_logit(blah)), log(inv_logit(as_double(blah))), log1p(as_double(exp(-blah))));
       return lb + (ub - lb) * inv_logit_x;
     }
 
