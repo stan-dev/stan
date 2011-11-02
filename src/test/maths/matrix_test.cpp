@@ -295,3 +295,21 @@ TEST(matrix_test,cholesky_decompose_exception) {
   m.resize(2, 3);
   EXPECT_THROW(stan::maths::cholesky_decompose(m), std::invalid_argument);
 }
+TEST(matrix_test,std_vector_sum_double) {
+  std::vector<double> x(3);
+  EXPECT_FLOAT_EQ(0.0,stan::maths::sum(x));
+  x[0] = 1.0;
+  x[1] = 2.0;
+  x[2] = 3.0;
+  EXPECT_FLOAT_EQ(6.0,stan::maths::sum(x));
+}
+TEST(matrix_test,std_vector_sum_int) {
+  std::vector<int> x(3);
+  EXPECT_EQ(0,stan::maths::sum(x));
+  x[0] = 1;
+  x[1] = 2;
+  x[2] = 3;
+  EXPECT_EQ(6,stan::maths::sum(x));
+}
+
+

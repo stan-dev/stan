@@ -1,6 +1,7 @@
 data {
      int(0,) N;
      double y[N];
+     double N;
 }
 parameters {
      double mu;

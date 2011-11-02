@@ -158,7 +158,7 @@ namespace stan {
 	  throw std::runtime_error("variable name already exists");
 	}
 	name_to_type[var_decl.name_] = var_decl;
-	std::cout << "add decl=" << var_decl.name_ << std::endl;
+	// std::cout << "add decl=" << var_decl.name_ << std::endl;
 	return var_decl;
       }
     };
