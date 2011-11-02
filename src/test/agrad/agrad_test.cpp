@@ -996,5 +996,3 @@ TEST(agrad_agrad,fmod_double_var) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(-2.0,g[0]); // (int)(2.7/1.3) = 2
 }
-
-
