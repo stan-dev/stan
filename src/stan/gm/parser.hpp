@@ -9,10 +9,10 @@
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/classic_position_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/support_multi_pass.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -29,6 +29,15 @@
 #include <vector>
 
 // ADAPT must be in global namespace 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
+			  (int,val_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
+			  (double,val_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::identifier,
+			  (std::string,name_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
 			  (stan::gm::range, range_)
 			  (std::string, name_)
@@ -186,7 +195,7 @@ namespace stan {
 	  > -param_var_decls_r
 	  > -derived_var_decls_r
 	  > model_r;
-
+	
 	model_r.name("model declaration");
 	model_r 
 	  = qi::lit("model")
@@ -405,8 +414,8 @@ namespace stan {
 
 	identifier_r.name("identifier");
 	identifier_r
-	  = qi::lexeme[qi::char_("a-zA-Z") 
-		       >> *qi::char_("a-zA-Z0-9_.")];
+	  = (qi::lexeme[qi::char_("a-zA-Z") 
+			>> *qi::char_("a-zA-Z0-9_.")]);
 
 	distribution_r.name("distribution and parameters");
 	distribution_r

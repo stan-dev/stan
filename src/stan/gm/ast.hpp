@@ -46,10 +46,13 @@ namespace stan {
     struct binary_op;
     struct distribution;
     struct double_var_decl;
+    struct double_literal;
     struct expression;
     struct for_statement;
     struct fun;
+    struct identifier;
     struct index_op;
+    struct int_literal;
     struct inv_var_decl;
     struct matrix_var_decl;
     struct pos_ordered_var_decl;
@@ -136,6 +139,9 @@ namespace stan {
 			     int,
 			     double,
 			     std::string, // for identifiers
+			     boost::recursive_wrapper<int_literal>,
+			     boost::recursive_wrapper<double_literal>,
+			     boost::recursive_wrapper<identifier>,
 			     boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
 			     boost::recursive_wrapper<binary_op>,
@@ -182,11 +188,29 @@ namespace stan {
       std::string name_;
       std::vector<expression> dims_;
     };
+
+    struct int_literal {
+      int_literal() { }
+      int_literal(int val) : val_(val) { }
+      int val_;
+    };
+
+    struct double_literal {
+      double_literal() { }
+      double_literal(double val) : val_(val) { }
+      double val_;
+    };
+
+    struct identifier {
+      identifier() { }
+      identifier(std::string name) : name_(name) { }
+      std::string name_;
+    };
     
     struct fun {
       fun() { }
       fun(std::string const& name,
-	       std::vector<expression> const& args) 
+	  std::vector<expression> const& args) 
 	: name_(name),
 	  args_(args) {
       }
@@ -464,12 +488,12 @@ namespace stan {
       expression expr_;
     };
       
-    expression& expression::operator+=(expression const& rhs) {
+    expression& expression::operator+=(const expression& rhs) {
       expr_ = binary_op('+', expr_, rhs);
       return *this;
     }
 
-    expression& expression::operator-=(expression const& rhs) {
+    expression& expression::operator-=(const expression& rhs) {
       expr_ = binary_op('-', expr_, rhs);
       return *this;
     }
