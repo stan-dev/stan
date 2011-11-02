@@ -151,8 +151,12 @@ namespace stan {
     struct add_var_decl {
       template <typename T1, typename T2>
       struct result { typedef T1 type; };
-      template <typename T> T
-      operator()(const T& var_decl, std::map<std::string,base_var_decl>& name_to_type) const { 
+      template <typename T>
+      T operator()(const T& var_decl, std::map<std::string,base_var_decl>& name_to_type) const {
+	if (name_to_type.find(var_decl.name_) != name_to_type.end()) {
+	  // variable already exists
+	  throw std::runtime_error("variable name already exists");
+	}
 	name_to_type[var_decl.name_] = var_decl;
 	std::cout << "add decl=" << var_decl.name_ << std::endl;
 	return var_decl;

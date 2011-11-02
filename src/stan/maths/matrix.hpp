@@ -341,6 +341,22 @@ namespace stan {
     }
 
     /**
+     * Return the sum of the values in the specified
+     * standard vector.
+     *
+     * @param xs Standard vector to sum.
+     * @return Sum of elements.
+     * @tparam T Type of elements summed.
+     */
+    template <typename T>
+    inline double sum(const std::vector<T>& xs) {
+      T sum(0);
+      for (unsigned int i = 0; i < xs.size(); ++i)
+	sum += xs[i];
+      return sum;
+    }
+
+    /**
      * Returns the sum of the coefficients of the specified
      * column vector.
      * @param v Specified vector.
