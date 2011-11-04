@@ -107,6 +107,39 @@ TEST(maths_test, inverse_softmax_exception) {
   std::vector<double> y(3);
   EXPECT_THROW(stan::maths::inverse_softmax< std::vector<double> >(simplex, y), std::invalid_argument);
 }
+TEST(maths_test, log1p) {
+  double x;
+
+  x = 0;
+  EXPECT_FLOAT_EQ (0.0, stan::maths::log1p(x));
+  x = 0.0000001;
+  EXPECT_FLOAT_EQ (0.0000001, stan::maths::log1p(x));
+  x = 0.001;
+  EXPECT_FLOAT_EQ (0.0009995003, stan::maths::log1p(x));
+  x = 0.1;
+  EXPECT_FLOAT_EQ (0.09531018, stan::maths::log1p(x));
+  x = 1;
+  EXPECT_FLOAT_EQ (0.6931472, stan::maths::log1p(x));
+  x = 10;
+  EXPECT_FLOAT_EQ (2.397895, stan::maths::log1p(x));
+
+  x = -0.0000001;
+  EXPECT_FLOAT_EQ (-0.0000001, stan::maths::log1p(x));
+  x = -0.001;
+  EXPECT_FLOAT_EQ (-0.0010005, stan::maths::log1p(x));
+  x = -0.1;
+  EXPECT_FLOAT_EQ (-0.1053605, stan::maths::log1p(x));
+  x = -0.999;
+  EXPECT_FLOAT_EQ (-6.907755, stan::maths::log1p(x));
+  x = -1;
+  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), stan::maths::log1p(x));
+}
+TEST(maths_test, log1p_exception) {
+  double x;
+
+  x = -2;
+  EXPECT_THROW (stan::maths::log1p(x), std::domain_error);
+}
 TEST(maths_test, lmgamma) {
   unsigned int k = 1;
   double x = 2.5;
@@ -120,7 +153,6 @@ TEST(maths_test, lmgamma) {
   result += lgamma(x); // j = 1
   result += lgamma(x + (1.0 - 2.0)/2.0); // j = 2
   EXPECT_FLOAT_EQ(result, stan::maths::lmgamma(k,x));
-  
 }
 
 TEST(maths_test, if_else) {
