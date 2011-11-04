@@ -119,6 +119,11 @@ namespace stan {
       o << "using " << type << ";" << EOL;
     }
 
+    void generate_using_namespace(const std::string& ns, std::ostream& o) {
+      o << "using namespace " << ns << ";" << EOL;
+    }
+
+
     void generate_usings(std::ostream& o) {
       generate_using("std::vector",o);
       generate_using("std::string",o);
@@ -127,6 +132,7 @@ namespace stan {
       generate_using("stan::mcmc::prob_grad_ad",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
+      generate_using_namespace("stan::maths",o);
       o << EOL;
     }
 
@@ -572,81 +578,90 @@ namespace stan {
       }
       void operator()(nil const& x) const { }
       void operator()(int_var_decl const& x) const {
-	declare_array("int",x.name_,x.dims_.size());
+	declare_array("int",x.name_,x.dims_);
       }
       void operator()(double_var_decl const& x) const {
-	declare_array("var",x.name_,x.dims_.size());
+	declare_array("var",x.name_,x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
-	declare_array("vector_v", x.name_, x.dims_.size());
+	declare_array("vector_v", x.name_, x.dims_);
       }
       void operator()(row_vector_var_decl const& x) const {
-	declare_array("row_vector_v", x.name_, x.dims_.size());
+	declare_array("row_vector_v", x.name_, x.dims_);
       }
       void operator()(matrix_var_decl const& x) const {
-	declare_array("matrix_v", x.name_, x.dims_.size());
+	declare_array("matrix_v", x.name_, x.dims_);
       }
       void operator()(simplex_var_decl const& x) const {
-	declare_array("vector_v", x.name_, x.dims_.size());
+	declare_array("vector_v", x.name_, x.dims_);
       }
       void operator()(pos_ordered_var_decl const& x) const {
-	declare_array("vector_v", x.name_, x.dims_.size());
+	declare_array("vector_v", x.name_, x.dims_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
-	declare_array("matrix_v", x.name_, x.dims_.size());
+	declare_array("matrix_v", x.name_, x.dims_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
-	declare_array("matrix_v", x.name_, x.dims_.size());
+	declare_array("matrix_v", x.name_, x.dims_);
       }
-      void declare_array(std::string const& type, std::string const& name, 
-			 unsigned int size) const {
+      void declare_array(const std::string& type, 
+			 const std::string& name, 
+			 const std::vector<expression>& dims) const {
 	for (int i = 0; i < indents_; ++i)
 	  o_ << INDENT;
-	for (unsigned int i = 0; i < size; ++i) {
+	for (unsigned int i = 0; i < dims.size(); ++i) {
 	  o_ << "vector<";
 	}
 	o_ << type;
-	if (size > 0) {
+	for (unsigned int i = 0; i < dims.size(); ++i) {
+	  if (i > 0) o_ << " ";
 	  o_ << ">";
 	}
-	for (unsigned int i = 1; i < size; ++i) {
-	  o_ << " >";
+	o_ << " "  << name;
+	if (dims.size() > 0)
+	  o_ << "(";
+	for (unsigned int i = 0; i < dims.size(); ++i) {
+	  if (i > 0)
+	    o_ << ", vector<" << type << ">(";
+	  generate_expression(dims[i].expr_,o_);
 	}
-	o_ << " "  << name << ";" << EOL;
+	for (unsigned int i = 0; i < dims.size(); ++i)
+	  o_ << ")";
+	o_ << ";" << EOL;
       }
     };
 
     void generate_local_var_decls(std::vector<var_decl> const& vs,
-				   int indent,
-				   std::ostream& o) {
-      local_var_decl_visgen vis(indent,o);
-      for (unsigned int i = 0; i < vs.size(); ++i)
-	boost::apply_visitor(vis,vs[i].decl_);
-    }
-
-
-    void generate_start_namespace(std::string name,
+				  int indent,
 				  std::ostream& o) {
-      o << "namespace "	<< name << "_namespace {" << EOL2;
-    }
+       local_var_decl_visgen vis(indent,o);
+       for (unsigned int i = 0; i < vs.size(); ++i)
+	 boost::apply_visitor(vis,vs[i].decl_);
+     }
 
-    void generate_end_namespace(std::ostream& o) {
-      o << "} // namespace" << EOL2;
-    }
 
-    void generate_comment(std::string const& msg, int indent, 
-			  std::ostream& o) {
-      generate_indent(indent,o);
-      o << "// " << msg	<< EOL;
-    }
+     void generate_start_namespace(std::string name,
+				   std::ostream& o) {
+       o << "namespace "	<< name << "_namespace {" << EOL2;
+     }
 
-    void generate_var(var const& x, std::ostream& o) {
-      o << x.name_;
-      if (x.dims_.size() == 0) return;
-      o << '[';
-      for (unsigned int i = 0; i < x.dims_.size(); ++i) {
-	if (i > 0) o << "][";
-	generate_expression(x.dims_[i],o);
+     void generate_end_namespace(std::ostream& o) {
+       o << "} // namespace" << EOL2;
+     }
+
+     void generate_comment(std::string const& msg, int indent, 
+			   std::ostream& o) {
+       generate_indent(indent,o);
+       o << "// " << msg	<< EOL;
+     }
+
+     void generate_var(var const& x, std::ostream& o) {
+       o << x.name_;
+       if (x.dims_.size() == 0) return;
+       o << '[';
+       for (unsigned int i = 0; i < x.dims_.size(); ++i) {
+	 if (i > 0) o << "][";
+	 generate_expression(x.dims_[i],o);
 	o << " - 1";
       }
       o << ']';
