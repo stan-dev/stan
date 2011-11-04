@@ -57,6 +57,7 @@ namespace stan {
      * @param mean The mean of the normal distribution.
      * @param sigma The standard deviation of the normal distriubtion
      * @return The unit normal cdf evaluated at the specified argument.
+     * @throw std::domain_error if sigma is less than 0
      * @tparam T_y Type of y.
      * @tparam T_loc Type of mean parameter.
      * @tparam T_scale Type of standard deviation paramater.
@@ -64,6 +65,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
     normal_p(const T_y& y, const T_loc& mean, const T_scale& sigma) {
+      if (sigma < 0)
+	BOOST_THROW_EXCEPTION (std::domain_error ("sigma is less than 0"));
       return 0.5 * erfc(-(y - mean)/(sigma * SQRT_2));
     }
 
