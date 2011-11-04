@@ -159,16 +159,11 @@ namespace stan {
       T operator()(const T& var_decl, std::map<std::string,base_var_decl>& name_to_type, bool& pass) const {
 	if (name_to_type.find(var_decl.name_) != name_to_type.end()) {
 	  // variable already exists
-	  std::stringstream msg; 
-	  msg << "ROOT CAUSE:  variable \"" << var_decl.name_ << "\" was already declared.";
-	  std::cout << msg.str() << std::endl;
-	  // throw std::runtime_error(msg.str());
 	  pass = false;
 	  return var_decl;
 	}
 	pass = true;
 	name_to_type[var_decl.name_] = var_decl;
-	// std::cout << "add decl=" << var_decl.name_ << std::endl;
 	return var_decl;
       }
     };
@@ -480,7 +475,7 @@ namespace stan {
 	  > qi::lit('}');
 
 	qi::on_error<qi::rethrow>(var_decl_r,
-				  std::cout << boost::phoenix::val("ERROR: Duplicate variable definition.")
+				  std::cout << boost::phoenix::val("ERROR: Duplicate variable declaration.")
 				  << std::endl);
 
 	qi::on_error<qi::rethrow>(program_r,

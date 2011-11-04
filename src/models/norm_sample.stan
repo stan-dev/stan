@@ -6,8 +6,10 @@ parameters {
     double y;
 }
 derived {
-    double y;
+    double z;
 }
 model {
     y ~ normal(mu,sigma);
+    for (n in) {
+    }
 }
