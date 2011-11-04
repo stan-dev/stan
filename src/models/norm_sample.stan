@@ -6,8 +6,7 @@ parameters {
     double y;
 }
 derived {
-    double w[2];
-    double z[5,7];
+    double y;
 }
 model {
     y ~ normal(mu,sigma);

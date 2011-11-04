@@ -149,14 +149,24 @@ namespace stan {
     boost::phoenix::function<negate_expr> neg;
 
     struct add_var_decl {
-      template <typename T1, typename T2>
+      typedef std::istreambuf_iterator<char> base_iterator_type;
+      typedef boost::spirit::multi_pass<base_iterator_type> forward_iterator_type;
+      typedef boost::spirit::classic::position_iterator2<forward_iterator_type> pos_iterator_type;
+
+      template <typename T1, typename T2, typename T3>
       struct result { typedef T1 type; };
       template <typename T>
-      T operator()(const T& var_decl, std::map<std::string,base_var_decl>& name_to_type) const {
+      T operator()(const T& var_decl, std::map<std::string,base_var_decl>& name_to_type, bool& pass) const {
 	if (name_to_type.find(var_decl.name_) != name_to_type.end()) {
 	  // variable already exists
-	  throw std::runtime_error("variable name already exists");
+	  std::stringstream msg; 
+	  msg << "ROOT CAUSE:  variable \"" << var_decl.name_ << "\" was already declared.";
+	  std::cout << msg.str() << std::endl;
+	  // throw std::runtime_error(msg.str());
+	  pass = false;
+	  return var_decl;
 	}
+	pass = true;
 	name_to_type[var_decl.name_] = var_decl;
 	// std::cout << "add decl=" << var_decl.name_ << std::endl;
 	return var_decl;
@@ -189,8 +199,10 @@ namespace stan {
 	: program_grammar::base_type(program_r) {
 	using qi::_val;
 	using qi::_1;
+	using qi::_pass;
 	using qi::double_;
 	using qi::int_;
+	using boost::spirit::qi::eps;
 	using namespace qi::labels;
 
 	program_r.name("program");
@@ -229,17 +241,19 @@ namespace stan {
 	// duplication because top-level is variant, not specific
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  %= int_decl_r          [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | double_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | vector_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | row_vector_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | matrix_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | simplex_decl_r       [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | pos_ordered_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | corr_matrix_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | cov_matrix_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  %= (int_decl_r             [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | double_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | vector_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | row_vector_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | matrix_decl_r        [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | simplex_decl_r       [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | pos_ordered_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | corr_matrix_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | cov_matrix_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      )
+	  > qi::eps[_pass = _a]
 	  ;
-
+	
 	int_decl_r.name("integer declaration");
 	int_decl_r 
 	  = qi::lit("int")
@@ -465,6 +479,10 @@ namespace stan {
 	  >> *statement_r
 	  > qi::lit('}');
 
+	qi::on_error<qi::rethrow>(var_decl_r,
+				  std::cout << boost::phoenix::val("ERROR: Duplicate variable definition.")
+				  << std::endl);
+
 	qi::on_error<qi::rethrow>(program_r,
 				  std::cout << boost::phoenix::val("ERROR: Expected ")
 				  << _4 
@@ -491,7 +509,7 @@ namespace stan {
       qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > pos_ordered_decl_r;
       qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > cov_matrix_decl_r;
       qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> > corr_matrix_decl_r;
-      qi::rule<Iterator, var_decl(), whitespace_grammar<Iterator> > var_decl_r;
+      qi::rule<Iterator, qi::locals<bool>, var_decl(), whitespace_grammar<Iterator> > var_decl_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > data_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > derived_var_decls_r;

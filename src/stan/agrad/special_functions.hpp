@@ -34,7 +34,7 @@ namespace stan {
       class log1p_vari : public op_v_vari {
       public:
         log1p_vari(vari* avi) :
-          op_v_vari(log1p(avi->val_),avi) {
+          op_v_vari(stan::maths::log1p(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1 + avi_->val_);
@@ -44,7 +44,7 @@ namespace stan {
       class log1m_vari : public op_v_vari {
       public:
         log1m_vari(vari* avi) :
-          op_v_vari(log1p(-avi->val_),avi) {
+          op_v_vari(stan::maths::log1p(-avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (avi_->val_ - 1);
@@ -64,7 +64,7 @@ namespace stan {
       class binary_log_loss_0_vari : public op_v_vari {
       public:
         binary_log_loss_0_vari(vari* avi) :
-          op_v_vari(-log1p(-avi->val_),avi) {
+          op_v_vari(-stan::maths::log1p(-avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 - avi_->val_);
@@ -400,8 +400,8 @@ namespace stan {
                      avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * calculate_chain (avi_->val_, val_);
-          bvi_->adj_ += adj_ * calculate_chain (bvi_->val_, val_);
+          avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
+          bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
         }
       };
       class log_sum_exp_vd_vari : public op_vd_vari, log_sum_exp_ {
@@ -411,7 +411,7 @@ namespace stan {
                      avi, b) {
         }
         void chain() {
-          avi_->adj_ += adj_ * calculate_chain (avi_->val_, val_);
+          avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
         }
       };
       class log_sum_exp_dv_vari : public op_dv_vari, log_sum_exp_ {
@@ -421,7 +421,7 @@ namespace stan {
                      a, bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * calculate_chain (bvi_->val_, val_);
+          bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
         }
       };
       std::vector<vari*> to_vari (const std::vector<var>& x) {
