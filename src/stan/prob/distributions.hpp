@@ -83,7 +83,8 @@ namespace stan {
         y &\sim& U(\alpha, \beta) \\
         \log (p (y \,|\, \alpha, \beta)) &=& \log \left( \frac{1}{\beta-\alpha} \right) \\
 	                                 &=& \log (1) - \log (\beta - \alpha) \\
-					 &=& -\log (\beta - \alpha)
+					 &=& -\log (\beta - \alpha) \\
+					 & & \mathrm{ where } \; y \in [\alpha, \beta], \log(0) \; \mathrm{otherwise}
        \f}
      * when \f$ y \in [\alpha, \beta], 0\f$ otherwise.
      * 
@@ -525,7 +526,7 @@ namespace stan {
        y &\sim& \mathrm{Gamma}(\alpha, \beta) \\
        \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha - 1} \exp^{- \beta y} \right) \\
        &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) + (\alpha - 1) \log(y) - \beta y\\
-       & & \mathrm{where } y > 0
+       & & \mathrm{where} \; y > 0
      \f}
      * @param y A scalar variable.
      * @param alpha Shape parameter.
