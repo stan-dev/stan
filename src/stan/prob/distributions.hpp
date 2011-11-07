@@ -9,6 +9,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
 #include "stan/maths/special_functions.hpp"
+
+#include "stan/prob/transform.hpp"
 #include "stan/agrad/matrix.hpp"
 
 
@@ -731,11 +733,38 @@ namespace stan {
     // MultiNormal(y|mu,Sigma)   [y.rows() = mu.rows() = Sigma.rows();
     //                            y.cols() = mu.cols() = 0;
     //                            Sigma symmetric, non-negative, definite]
+    /**
+     * The log of the multivariate normal density for the given y, mu, and
+     * variance matrix. 
+     * The variance matrix, Sigma, must be size d x d, symmetric,
+     * and positive definite. Dimension, d, is implicit.
+     *
+     * \f{eqnarray*}{
+       y &\sim& N (\mu, \Sigma) \\
+       \log (p (y \,|\, \mu, \Sigma) ) &=& \log \left( (2 \pi)^{-d/2} \left| \sigma \right|^{-1/2} \times \exp \left(-\frac{1}{2}(y - \mu)^T \Sigma^{-1} (y - \mu) \right) \right) \\
+       &=& -\frac{d}{2}\log (2 \pi) - \frac{1}{2} \log (\det(\Sigma)) - \frac{1}{2} (y - \mu)^T \Sigma^{-1} (y - \mu)
+     \f}
+     * 
+     * 
+     * @param y A scalar vector
+     * @param mu The mean vector of the multivariate normal distribution.
+     * @param Sigma The variance matrix of the multivariate normal distribution
+     * @return The log of the multivariate normal density.
+     * @throw std::domain_error if Sigma is not square, not symmetric, or not positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_covar Type of scale.
+     */
     template <typename T_y, typename T_loc, typename T_covar> 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(Matrix<T_y,Dynamic,1>& y,
 		     Matrix<T_loc,Dynamic,1>& mu,
 		     Matrix<T_covar,Dynamic,Dynamic>& Sigma) {
+      if (!stan::prob::cov_matrix_validate(Sigma)) {
+	std::ostringstream err;
+	stan::prob::cov_matrix_validate(Sigma, err);
+	BOOST_THROW_EXCEPTION (std::domain_error (err.str()));
+      }
       return NEG_LOG_SQRT_TWO_PI * y.rows()
 	- 0.5 * log(Sigma.determinant())
 	- 0.5 * ((y - mu).transpose() * Sigma.inverse() * (y - mu))(0,0);

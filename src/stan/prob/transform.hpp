@@ -1322,7 +1322,43 @@ namespace stan {
       Eigen::SelfAdjointEigenSolver<Matrix<T,Dynamic,Dynamic> > 
 	solver(y,Eigen::EigenvaluesOnly);
       if (solver.eigenvalues()[0] < CONSTRAINT_TOLERANCE)
-	return false;; // eigenvalues in INCREASING order
+	return false; // eigenvalues in INCREASING order
+      return true;
+    }
+
+    /**
+     * Return <code>true</code> if the specified matrix is a valid
+     * covariance matrix.  A valid covariance matrix must be symmetric
+     * and positive definite.
+     *
+     * @param y Matrix to test.
+     * @return <code>true</code> if the matrix is a valid covariance matrix.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostringstream& err_msg) {
+      // test symmetry
+      // FIXME:  is symmetry test necessary, or is it implied by eigenvalue test?
+      unsigned int k = y.rows();
+      if (y.rows() != y.cols() || k == 0) {
+	err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
+	return false;
+      }
+      for (unsigned int m = 0; m < k; ++m) {
+	for (unsigned int n = m + 1; n < k; ++n) {
+	  if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
+	    err_msg << "Matrix is not symmetric (" << m << ", " << n << ")";
+	    return false;
+	  }
+	}
+      }
+      // test non-zero eigenvalues
+      Eigen::SelfAdjointEigenSolver<Matrix<T,Dynamic,Dynamic> > 
+	solver(y,Eigen::EigenvaluesOnly);
+      if (solver.eigenvalues()[0] < CONSTRAINT_TOLERANCE) {
+	err_msg << "Matrix is not positive definite";
+	return false; // eigenvalues in INCREASING order
+      }
       return true;
     }
 
