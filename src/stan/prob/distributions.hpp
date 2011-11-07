@@ -831,11 +831,29 @@ namespace stan {
     //                            Sigma = LL' with L a Cholesky factor]
     template <typename T_y, typename T_loc, typename T_covar> 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(Matrix<T_y,Dynamic,1>& y,
-		     Matrix<T_loc,Dynamic,1>& mu,
-		     Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
+    multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
+		     const Matrix<T_loc,Dynamic,1>& mu,
+		     const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
       Matrix<T_covar,Dynamic,1> half = L.solveTriangular(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows()).setOnes()) * (y - mu);
       return NEG_LOG_SQRT_TWO_PI * y.rows() - log(L.diagonal().array().prod()) - 0.5 * half.dot(half);
+    }
+    // MultiNormal(y|mu,L)       [y.rows() = mu.rows() = L.rows() = L.cols();
+    //                            y.cols() = mu.cols() = 0;
+    //                            Sigma = LL' with L a Cholesky factor]
+    template <typename T_y, typename T_loc, typename T_covar> 
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_propto_log(const Matrix<T_y,Dynamic,1>& y,
+			    const Matrix<T_loc,Dynamic,1>& mu,
+			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
+      return multi_normal_log(y, mu, L);
+    }
+    template <typename T_y, typename T_loc, typename T_covar> 
+    inline void
+    multi_normal_propto_log(stan::agrad::var& lp,
+			    const Matrix<T_y,Dynamic,1>& y,
+			    const Matrix<T_loc,Dynamic,1>& mu,
+			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
+      lp += multi_normal_propto_log(y, mu, L);
     }
    
     namespace {

@@ -1332,11 +1332,12 @@ namespace stan {
      * and positive definite.
      *
      * @param y Matrix to test.
+     * @param err_msg Output stream for error messages.
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
     template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostringstream& err_msg) {
+    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostream& err_msg) {
       // test symmetry
       // FIXME:  is symmetry test necessary, or is it implied by eigenvalue test?
       unsigned int k = y.rows();
