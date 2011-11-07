@@ -514,7 +514,7 @@ namespace stan {
       lp += normal_trunc_h_propto_log (y, mu, sigma, high);
     }
 
-    // Gamma(y|alpha,beta)   [alpha > 0;  beta > 0;  y >= 0]
+
     /**
      * The log of a gamma density for y with the specified
      * shape and inverse scale parameters.
@@ -522,9 +522,9 @@ namespace stan {
      * y must be greater than or equal to 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{\Gamma}(\alpha, \beta) \\
-       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha - 1)} \exp^{- \beta y} \right) \\
-       &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha - 1) \log(y) - \beta y\\
+       y &\sim& \mathrm{Gamma}(\alpha, \beta) \\
+       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha - 1} \exp^{- \beta y} \right) \\
+       &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) + (\alpha - 1) \log(y) - \beta y\\
        & & \mathrm{where } y > 0
      \f}
      * @param y A scalar variable.
@@ -560,7 +560,6 @@ namespace stan {
 	+ (alpha - 1.0) * log(y)
 	- beta * y;
     }
-    // Gamma(y|alpha,beta)   [alpha > 0;  beta > 0;  y >= 0]
     /**
      * The log of a distribution proportional to a gamma density for y with the specified
      * shape and inverse scale parameters.
@@ -597,7 +596,6 @@ namespace stan {
       }
       return gamma_log (y, alpha, beta);
     }
-    // Gamma(y|alpha,beta)   [alpha > 0;  beta > 0;  y >= 0]
     /**
      * The log of a distribution proportional to a gamma density for y with the specified
      * shape and inverse scale parameters.
@@ -640,6 +638,44 @@ namespace stan {
     /**
      * The log of an inverse gamma density for y with the specified
      * shape and inverse scale parameters.
+     * Shape and inverse scale parameters must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     \f{eqnarray*}{
+       y &\sim& \mathrm{Inv-gamma}(\alpha, \beta) \\
+       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha + 1)} \exp^{- \beta / y} \right) \\
+       &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha + 1) \log(y) - \frac{\beta}{y} \\
+       & & \mathrm{where } y > 0
+     \f}
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_shape, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
+      if (alpha <= 0)
+	BOOST_THROW_EXCEPTION(std::domain_error ("alpha is <= 0"));
+      if (beta <= 0)
+	BOOST_THROW_EXCEPTION(std::domain_error ("beta is <= 0"));
+      if (y <= 0)
+	BOOST_THROW_EXCEPTION(std::domain_error ("y <= 0"));
+      return - lgamma(alpha)
+	+ alpha * log(beta)
+	- (alpha + 1) * log(y)
+	- beta / y;
+    }
+    /**
+     * The log of a distribution proportional to an inverse gamma density for y with the specified
+     * shape and inverse scale parameters.
+     * Shape and inverse scale parameters must be greater than 0.
+     * y must be greater than or equal to 0.
      * 
      * @param y A scalar variable.
      * @param alpha Shape parameter.
@@ -653,17 +689,42 @@ namespace stan {
      */
     template <typename T_y, typename T_shape, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    inv_gamma_log(T_y y, T_shape alpha, T_scale beta) {
+    inv_gamma_propto_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
       if (alpha <= 0)
 	BOOST_THROW_EXCEPTION(std::domain_error ("alpha is <= 0"));
       if (beta <= 0)
 	BOOST_THROW_EXCEPTION(std::domain_error ("beta is <= 0"));
       if (y <= 0)
 	BOOST_THROW_EXCEPTION(std::domain_error ("y <= 0"));
-      return - lgamma(alpha)
-	+ alpha * log(beta)
-	- (alpha + 1) * log(y)
-	- beta / y;
+      return inv_gamma_log (y, alpha, beta);
+    }
+    /**
+     * The log of a distribution proportional to an inverse gamma density for y with the specified
+     * shape and inverse scale parameters.
+     * Shape and inverse scale parameters must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     * @param lp
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_shape, typename T_scale>
+    inline void
+    inv_gamma_propto_log(stan::agrad::var& lp, const T_y& y, const T_shape& alpha, const T_scale& beta) {
+      if (alpha <= 0)
+	BOOST_THROW_EXCEPTION(std::domain_error ("alpha is <= 0"));
+      if (beta <= 0)
+	BOOST_THROW_EXCEPTION(std::domain_error ("beta is <= 0"));
+      if (y <= 0)
+	BOOST_THROW_EXCEPTION(std::domain_error ("y <= 0"));
+      lp += inv_gamma_propto_log (y, alpha, beta);
     }
 
     // ChiSquare(y|nu)  [nu >= 0;  y >= 0]
@@ -833,7 +894,7 @@ namespace stan {
      *
      * \f{eqnarray*}{
        y &\sim& N (\mu, \Sigma) \\
-       \log (p (y \,|\, \mu, \Sigma) ) &=& \log \left( (2 \pi)^{-d/2} \left| \sigma \right|^{-1/2} \times \exp \left(-\frac{1}{2}(y - \mu)^T \Sigma^{-1} (y - \mu) \right) \right) \\
+       \log (p (y \,|\, \mu, \Sigma) ) &=& \log \left( (2 \pi)^{-d/2} \left| \Sigma \right|^{-1/2} \times \exp \left(-\frac{1}{2}(y - \mu)^T \Sigma^{-1} (y - \mu) \right) \right) \\
        &=& -\frac{d}{2}\log (2 \pi) - \frac{1}{2} \log (\det(\Sigma)) - \frac{1}{2} (y - \mu)^T \Sigma^{-1} (y - \mu)
      \f}
      * 
