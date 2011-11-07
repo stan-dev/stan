@@ -523,7 +523,7 @@ namespace stan {
      * 
      \f{eqnarray*}{
        y &\sim& \mathrm{\Gamma}(\alpha, \beta) \\
-       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha - 1)} \exp^{- \beta y} \\
+       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha - 1)} \exp^{- \beta y} \right) \\
        &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha - 1) \log(y) - \beta y\\
        & & \mathrm{where } y > 0
      \f}
