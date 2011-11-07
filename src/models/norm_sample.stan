@@ -11,8 +11,12 @@ derived data {
 parameters {
     double y;
 }
-derived {
+derived parameters {
     double z;
+    double w[1];
+
+    z <- y * 2.0 + 1.0;
+    w[0] <- pow(z,3.0);
 }
 model {
     y ~ normal(mu,sigma);

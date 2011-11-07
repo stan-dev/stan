@@ -730,9 +730,11 @@ namespace stan {
       o << EOL;
 
       generate_comment("derived variables",2,o);
-      generate_local_var_decls(p.derived_decl_,2,o);
+      generate_local_var_decls(p.derived_decl_.first,2,o);
       o << EOL;
-      
+      generate_statement(p.derived_decl_.second,2,o);
+      o << EOL;
+
       generate_comment("model body",2,o);
       generate_statement(p.statement_,2,o);
       o << EOL;

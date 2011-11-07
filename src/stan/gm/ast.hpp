@@ -415,7 +415,7 @@ namespace stan {
       program(const std::vector<var_decl> & data_decl,
 	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_data_decl,
 	      const std::vector<var_decl>& parameter_decl,
-	      const std::vector<var_decl> const& derived_decl,
+	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_decl,
 	      statement const& stmt) 
 	: data_decl_(data_decl),
 	  derived_data_decl_(derived_data_decl),
@@ -426,7 +426,7 @@ namespace stan {
       std::vector<var_decl> data_decl_;
       std::pair<std::vector<var_decl>,std::vector<statement> > derived_data_decl_;
       std::vector<var_decl> parameter_decl_;
-      std::vector<var_decl> derived_decl_;
+      std::pair<std::vector<var_decl>,std::vector<statement> > derived_decl_;
       statement statement_;
     };
 
