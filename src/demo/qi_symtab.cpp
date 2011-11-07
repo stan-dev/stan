@@ -4,6 +4,7 @@
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/spirit/home/phoenix/container.hpp>
 
 #include <iostream>
 #include <set>
@@ -31,6 +32,7 @@ namespace symtab {
   };
   phoenix::function<add_id_struct> add_id;
     
+  using phoenix::insert;
 
   template <typename It>
   struct st_grammar : qi::grammar<It,
@@ -59,15 +61,17 @@ namespace symtab {
   };
 }
 
-int main() {
+void parse(const std::string& input) {
+  std::cout << std::endl << "INPUT=" << '"' << input << '"' << std::endl;
   typedef std::istreambuf_iterator<char> base_iterator_type;
   typedef spirit::multi_pass<base_iterator_type> forward_iterator_type;
   typedef classic::position_iterator2<forward_iterator_type> pos_iterator_type;
-  base_iterator_type in_begin(std::cin);
+  std::stringbuf sb(input);
+  base_iterator_type in_begin(&sb);
   forward_iterator_type fwd_begin 
     = spirit::make_default_multi_pass(in_begin);
   forward_iterator_type fwd_end;
-  pos_iterator_type position_begin(fwd_begin, fwd_end, "STDIN");
+  pos_iterator_type position_begin(fwd_begin, fwd_end, "string");
   pos_iterator_type position_end;
   symtab::st_grammar<pos_iterator_type> st_grammar;
   ascii::space_type whitespace_grammar;
@@ -77,7 +81,7 @@ int main() {
 			  st_grammar, whitespace_grammar, 
 			  symbols) || position_begin != position_end) {
       std::cerr << "PARSE FAILED." << std::endl;
-      return -1;
+      return;
     }
   } catch (const qi::expectation_failure<pos_iterator_type>& e) {
     std::cerr << "ERROR: file " << e.first.get_position().file
@@ -86,9 +90,14 @@ int main() {
 	      << std::endl << e.first.get_currentline() << std::endl;
     for (int i = 1; i < e.first.get_position().column; ++i) std::cerr << ' ';
     std::cerr << "^-- here" << std::endl;
-    return -2;
+    return;
   }
   for (unsigned int i = 0; i < symbols.size(); ++i)
     std::cout << symbols[i] << std::endl;
-  return 0;
+}
+
+int main() {
+  parse("a; b; c;");  // OK
+  parse("a; b c;");   // BAD: missing semicolon after b
+  parse("a; b; a;");  // BAD: duplicated symbol a
 }

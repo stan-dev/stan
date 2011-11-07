@@ -1,6 +1,6 @@
 # g++ (GCC), clang (Clang)
-CC = clang++ # g++
-OPT = -O0 -Wall -g  -Wno-unused -Wno-self-assign #-rdynamic
+CC = g++ # clang++ # g++
+OPT = -O3 -Wall -g  #-rdynamic
 INCLUDES = -I src -I lib
 CFLAGS = $(OPT) $(INCLUDES)
 CFLAGS_T = $(CFLAGS) -I lib/gtest/include  -I lib/gtest # -lpthread
