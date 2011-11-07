@@ -101,7 +101,7 @@ namespace stan {
        * Return a list of the names of the integer variables in
        * the context.
        *
-       * @param Vector to store the list of names in.
+       * @param names Vector to store the list of names in.
        */
       virtual void names_i(std::vector<std::string>& names) = 0;
     };
