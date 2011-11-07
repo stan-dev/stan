@@ -518,6 +518,54 @@ namespace stan {
     /**
      * The log of a gamma density for y with the specified
      * shape and inverse scale parameters.
+     * Shape and inverse scale parameters must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     \f{eqnarray*}{
+       y &\sim& \mathrm{\Gamma}(\alpha, \beta) \\
+       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha - 1)} \exp^{- \beta y} \\
+       &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha - 1) \log(y) - \beta y\\
+       & & \mathrm{where } y > 0
+     \f}
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_shape, typename T_inv_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
+    gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
+      if (alpha <= 0) {
+	std::ostringstream err;
+	err << "alpha (" << alpha << ") must be greater than 0";
+	BOOST_THROW_EXCEPTION(std::domain_error(err.str()));
+      }
+      if (beta <= 0) {
+	std::ostringstream err;
+	err << "beta (" << beta << ") must be greater than 0";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      if (y < 0) {
+	std::ostringstream err;
+	err << "y (" << y << ") must be greater than or equal to 0";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      return - lgamma(alpha)
+	+ alpha * log(beta)
+	+ (alpha - 1.0) * log(y)
+	- beta * y;
+    }
+    // Gamma(y|alpha,beta)   [alpha > 0;  beta > 0;  y >= 0]
+    /**
+     * The log of a distribution proportional to a gamma density for y with the specified
+     * shape and inverse scale parameters.
+     * Shape and inverse scale parameters must be greater than 0.
+     * y must be greater than or equal to 0.
      * 
      * @param y A scalar variable.
      * @param alpha Shape parameter.
@@ -531,17 +579,61 @@ namespace stan {
      */
     template <typename T_y, typename T_shape, typename T_inv_scale>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
-    gamma_log(T_y y, T_shape alpha, T_inv_scale beta) {
-      if (alpha <= 0)
-	BOOST_THROW_EXCEPTION(std::domain_error ("alpha is <= 0"));
-      if (beta <= 0)
-	BOOST_THROW_EXCEPTION(std::domain_error ("beta is <= 0"));
-      if (y < 0)
-	BOOST_THROW_EXCEPTION(std::domain_error ("y < 0"));
-      return - lgamma(alpha)
-	+ alpha * log(beta)
-	+ (alpha - 1.0) * log(y)
-	- beta * y;
+    gamma_propto_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
+      if (alpha <= 0) {
+	std::ostringstream err;
+	err << "alpha (" << alpha << ") must be greater than 0";
+	BOOST_THROW_EXCEPTION(std::domain_error(err.str()));
+      }
+      if (beta <= 0) {
+	std::ostringstream err;
+	err << "beta (" << beta << ") must be greater than 0";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      if (y < 0) {
+	std::ostringstream err;
+	err << "y (" << y << ") must be greater than or equal to 0";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      return gamma_log (y, alpha, beta);
+    }
+    // Gamma(y|alpha,beta)   [alpha > 0;  beta > 0;  y >= 0]
+    /**
+     * The log of a distribution proportional to a gamma density for y with the specified
+     * shape and inverse scale parameters.
+     * Shape and inverse scale parameters must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     * @param lp The log probability to increment.
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_shape, typename T_inv_scale>
+    inline void
+    gamma_propto_log(stan::agrad::var& lp, const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
+      if (alpha <= 0) {
+	std::ostringstream err;
+	err << "alpha (" << alpha << ") must be greater than 0";
+	BOOST_THROW_EXCEPTION(std::domain_error(err.str()));
+      }
+      if (beta <= 0) {
+	std::ostringstream err;
+	err << "beta (" << beta << ") must be greater than 0";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      if (y < 0) {
+	std::ostringstream err;
+	err << "y (" << y << ") must be greater than or equal to 0";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      lp += gamma_propto_log (y, alpha, beta);
     }
 
     // InvGamma(y|alpha,beta)    [alpha > 0;  beta > 0;  y > 0]
@@ -834,6 +926,7 @@ namespace stan {
     multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
 		     const Matrix<T_loc,Dynamic,1>& mu,
 		     const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
+      // FIXME: checks on L
       Matrix<T_covar,Dynamic,1> half = L.solveTriangular(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows()).setOnes()) * (y - mu);
       return NEG_LOG_SQRT_TWO_PI * y.rows() - log(L.diagonal().array().prod()) - 0.5 * half.dot(half);
     }
@@ -845,6 +938,7 @@ namespace stan {
     multi_normal_propto_log(const Matrix<T_y,Dynamic,1>& y,
 			    const Matrix<T_loc,Dynamic,1>& mu,
 			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
+      // FIXME: checks on L
       return multi_normal_log(y, mu, L);
     }
     template <typename T_y, typename T_loc, typename T_covar> 
@@ -853,6 +947,7 @@ namespace stan {
 			    const Matrix<T_y,Dynamic,1>& y,
 			    const Matrix<T_loc,Dynamic,1>& mu,
 			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
+      // FIXME: checks on L
       lp += multi_normal_propto_log(y, mu, L);
     }
    
