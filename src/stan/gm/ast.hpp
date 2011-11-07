@@ -20,14 +20,13 @@
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/variant/static_visitor.hpp>
 
-
 #include <iomanip>
 #include <iostream>
 #include <istream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <utility>
-#include <map>
 #include <vector>
 
 namespace stan {
@@ -413,16 +412,19 @@ namespace stan {
 
     struct program {
       program() { }
-      program(std::vector<var_decl> const& data_decl,
-	      std::vector<var_decl> const& parameter_decl,
-	      std::vector<var_decl> const& derived_decl,
+      program(const std::vector<var_decl> & data_decl,
+	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_data_decl,
+	      const std::vector<var_decl>& parameter_decl,
+	      const std::vector<var_decl> const& derived_decl,
 	      statement const& stmt) 
 	: data_decl_(data_decl),
+	  derived_data_decl_(derived_data_decl),
 	  parameter_decl_(parameter_decl),
 	  derived_decl_(derived_decl),
 	  statement_(stmt) {
       }
       std::vector<var_decl> data_decl_;
+      std::pair<std::vector<var_decl>,std::vector<statement> > derived_data_decl_;
       std::vector<var_decl> parameter_decl_;
       std::vector<var_decl> derived_decl_;
       statement statement_;

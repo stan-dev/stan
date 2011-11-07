@@ -104,9 +104,16 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
 			  (std::string, variable_)
 			  (stan::gm::range, range_)
 			  (stan::gm::statement, statement_) )
+namespace {
+  // hack to pass pair into macro to adapt
+  struct DUMMY_STRUCT {
+    typedef std::pair<std::vector<stan::gm::var_decl>,std::vector<stan::gm::statement> > type;
+  };
+}
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::program,
 			  (std::vector<stan::gm::var_decl>, data_decl_)
+			  (DUMMY_STRUCT::type, derived_data_decl_)
 			  (std::vector<stan::gm::var_decl>, parameter_decl_)
 			  (std::vector<stan::gm::var_decl>, derived_decl_)
 			  (stan::gm::statement, statement_) )
@@ -203,6 +210,7 @@ namespace stan {
 	program_r.name("program");
 	program_r 
 	  = -data_var_decls_r
+	  > -derived_data_var_decls_r
 	  > -param_var_decls_r
 	  > -derived_var_decls_r
 	  > model_r;
@@ -212,16 +220,25 @@ namespace stan {
 	  = qi::lit("model")
 	  > statement_r;
 
-	param_var_decls_r.name("parameter variable declarations");
-	param_var_decls_r
-	  = qi::lit("parameters")
+	data_var_decls_r.name("data variable declarations");
+	data_var_decls_r
+	  = qi::lit("data")
 	  > qi::lit('{')
 	  > *var_decl_r
 	  > qi::lit('}');
 
-	data_var_decls_r.name("data variable declarations");
-	data_var_decls_r
-	  = qi::lit("data")
+	derived_data_var_decls_r.name("derived data variable declaration and statement");
+	derived_data_var_decls_r
+	  = qi::lit("derived")
+	  >> qi::lit("data")
+	  > qi::lit('{')
+	  > *var_decl_r
+	  > *statement_r
+	  > qi::lit('}');
+
+	param_var_decls_r.name("parameter variable declarations");
+	param_var_decls_r
+	  = qi::lit("parameters")
 	  > qi::lit('{')
 	  > *var_decl_r
 	  > qi::lit('}');
@@ -246,7 +263,7 @@ namespace stan {
 	      | corr_matrix_decl_r   [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
 	      | cov_matrix_decl_r    [_val = add_var(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
 	      )
-	  > qi::eps[_pass = _a]
+	  > qi::eps[_pass = _a] // hack to get error message out
 	  ;
 	
 	int_decl_r.name("integer declaration");
@@ -505,8 +522,9 @@ namespace stan {
       qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > cov_matrix_decl_r;
       qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> > corr_matrix_decl_r;
       qi::rule<Iterator, qi::locals<bool>, var_decl(), whitespace_grammar<Iterator> > var_decl_r;
-      qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > data_var_decls_r;
+      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), whitespace_grammar<Iterator> > derived_data_var_decls_r;
+      qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > derived_var_decls_r;
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;
       qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> > distribution_r;
