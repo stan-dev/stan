@@ -1,5 +1,8 @@
 /**
  * @namespace stan::prob 
- * Templated probability distributions. All paramaterizations are based on
- * Bayesian Data Analysis.
+ * Templated probability distributions. 
+ * All paramaterizations are based on Bayesian Data Analysis.
+ *
+ * Default behavior is if a distribution is called with a value outside of its
+ * support, the distribution throws a std::domain_error exception.
  */

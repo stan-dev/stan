@@ -732,6 +732,7 @@ namespace stan {
     /**
      * The log of a chi-squared density for y with the specified
      * degrees of freedom parameter.
+     * The degrees of freedom prarameter must be greater than 0.
      * 
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
