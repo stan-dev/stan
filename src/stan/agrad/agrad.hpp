@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <cmath>
+#include <iostream>
 #include "stan/memory/stack_alloc.hpp"
 
 
@@ -1043,6 +1044,10 @@ namespace stan {
       }
 
 
+      friend std::ostream& operator<< (std::ostream& os, const var& v) {
+	os << v.val();
+	return os;
+      }
     };
 
     /**
