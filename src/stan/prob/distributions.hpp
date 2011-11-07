@@ -737,7 +737,7 @@ namespace stan {
      * The log of the multivariate normal density for the given y, mu, and
      * variance matrix. 
      * The variance matrix, Sigma, must be size d x d, symmetric,
-     * and positive definite. Dimension, d, is implicit.
+     * and semi-positive definite. Dimension, d, is implicit.
      *
      * \f{eqnarray*}{
        y &\sim& N (\mu, \Sigma) \\
@@ -750,16 +750,16 @@ namespace stan {
      * @param mu The mean vector of the multivariate normal distribution.
      * @param Sigma The variance matrix of the multivariate normal distribution
      * @return The log of the multivariate normal density.
-     * @throw std::domain_error if Sigma is not square, not symmetric, or not positive definite.
+     * @throw std::domain_error if Sigma is not square, not symmetric, or not semi-positive definite.
      * @tparam T_y Type of scalar.
      * @tparam T_loc Type of location.
      * @tparam T_covar Type of scale.
      */
     template <typename T_y, typename T_loc, typename T_covar> 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(Matrix<T_y,Dynamic,1>& y,
-		     Matrix<T_loc,Dynamic,1>& mu,
-		     Matrix<T_covar,Dynamic,Dynamic>& Sigma) {
+    multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
+		     const Matrix<T_loc,Dynamic,1>& mu,
+		     const Matrix<T_covar,Dynamic,Dynamic>& Sigma) {
       if (!stan::prob::cov_matrix_validate(Sigma)) {
 	std::ostringstream err;
 	stan::prob::cov_matrix_validate(Sigma, err);
@@ -768,6 +768,62 @@ namespace stan {
       return NEG_LOG_SQRT_TWO_PI * y.rows()
 	- 0.5 * log(Sigma.determinant())
 	- 0.5 * ((y - mu).transpose() * Sigma.inverse() * (y - mu))(0,0);
+    }
+    /**
+     * The log of a density proportional to the multivariate normal density for the given y, mu, and
+     * variance matrix. 
+     * The variance matrix, Sigma, must be size d x d, symmetric,
+     * and semi-positive definite. Dimension, d, is implicit.
+     * 
+     * @param y A scalar vector
+     * @param mu The mean vector of the multivariate normal distribution.
+     * @param Sigma The variance matrix of the multivariate normal distribution
+     * @return The log of the multivariate normal density.
+     * @throw std::domain_error if Sigma is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_covar Type of scale.
+     */
+    template <typename T_y, typename T_loc, typename T_covar> 
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_propto_log(const Matrix<T_y,Dynamic,1>& y,
+			    const Matrix<T_loc,Dynamic,1>& mu,
+			    const Matrix<T_covar,Dynamic,Dynamic>& Sigma) {
+      if (!stan::prob::cov_matrix_validate(Sigma)) {
+	std::ostringstream err;
+	stan::prob::cov_matrix_validate(Sigma, err);
+	BOOST_THROW_EXCEPTION (std::domain_error (err.str()));
+      }
+      return multi_normal_log (y, mu, Sigma);
+    }
+    /**
+     * The log of a density proportional to the multivariate normal density for the given y, mu, and
+     * variance matrix. 
+     * The variance matrix, Sigma, must be size d x d, symmetric,
+     * and semi-positive definite. Dimension, d, is implicit.
+     * 
+     * @param lp The log probability to increment. 
+     * @param y A scalar vector
+     * @param mu The mean vector of the multivariate normal distribution.
+     * @param Sigma The variance matrix of the multivariate normal distribution
+     * @return The log of the multivariate normal density.
+     * @throw std::domain_error if Sigma is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_covar Type of scale.
+     */
+    template <typename T_y, typename T_loc, typename T_covar> 
+    inline void
+    multi_normal_propto_log(stan::agrad::var &lp,
+			    const Matrix<T_y,Dynamic,1>& y,
+			    const Matrix<T_loc,Dynamic,1>& mu,
+			    const Matrix<T_covar,Dynamic,Dynamic>& Sigma) {
+      if (!stan::prob::cov_matrix_validate(Sigma)) {
+	std::ostringstream err;
+	stan::prob::cov_matrix_validate(Sigma, err);
+	BOOST_THROW_EXCEPTION (std::domain_error (err.str()));
+      }
+      lp += multi_normal_propto_log (y, mu, Sigma);
     }
 
     // MultiNormal(y|mu,L)       [y.rows() = mu.rows() = L.rows() = L.cols();
