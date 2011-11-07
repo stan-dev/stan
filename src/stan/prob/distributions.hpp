@@ -636,7 +636,6 @@ namespace stan {
       lp += gamma_propto_log (y, alpha, beta);
     }
 
-    // InvGamma(y|alpha,beta)    [alpha > 0;  beta > 0;  y > 0]
     /**
      * The log of an inverse gamma density for y with the specified
      * shape and inverse scale parameters.
@@ -756,18 +755,17 @@ namespace stan {
       lp += inv_gamma_propto_log (y, alpha, beta);
     }
 
-    // ChiSquare(y|nu)  [nu >= 0;  y >= 0]
     /**
      * The log of a chi-squared density for y with the specified
      * degrees of freedom parameter.
      * The degrees of freedom prarameter must be greater than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than or equal to 0.
      * 
      \f{eqnarray*}{
        y &\sim& \chi^2_\nu \\
        \log (p (y \,|\, \nu)) &=& \log \left( \frac{2^{-\nu / 2}}{\Gamma (\nu / 2)} y^{\nu / 2 - 1} \exp^{- y / 2} \right) \\
        &=& - \frac{\nu}{2} \log(2) - \log (\Gamma (\nu / 2)) + (\frac{\nu}{2} - 1) \log(y) - \frac{y}{2} \\
-       & & \mathrm{ where } \; y > 0
+       & & \mathrm{ where } \; y \ge 0
      \f}
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -779,7 +777,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -798,7 +796,7 @@ namespace stan {
      * The log of a distribution proportional to a chi-squared density for y with the specified
      * degrees of freedom parameter.
      * The degrees of freedom prarameter must be greater than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than or equal to 0.
      *
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -810,7 +808,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_propto_log(const T_y& y, const T_dof& nu) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -826,7 +824,7 @@ namespace stan {
      * The log of a distribution proportional to a chi-squared density for y with the specified
      * degrees of freedom parameter.
      * The degrees of freedom prarameter must be greater than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than or equal to 0.
      *
      * @param lp The log probability to increment.
      * @param y A scalar variable.
@@ -839,7 +837,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline void
     chi_square_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -852,12 +850,11 @@ namespace stan {
       lp += chi_square_propto_log(y, nu);
     } 
 
-    // InvChiSquare(y|nu)  [nu > 0;  y > 0]
     /**
      * The log of an inverse chi-squared density for y with the specified
      * degrees of freedom parameter.
      * The degrees of freedom prarameter must be greater than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than 0.
      * 
      \f{eqnarray*}{
        y &\sim& \mathrm{Inv-}\chi^2_\nu \\
@@ -875,12 +872,12 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     inv_chi_square_log(const T_y& y, const T_dof& nu) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
-      if (y < 0) {
+      if (y <= 0) {
 	std::ostringstream err;
 	err << "y (" << y << ") must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -894,7 +891,7 @@ namespace stan {
      * The log of a distribution proportional to an inverse chi-squared density for y with the specified
      * degrees of freedom parameter.
      * The degrees of freedom prarameter must be greater than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than 0.
      * 
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -906,12 +903,12 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     inv_chi_square_propto_log(const T_y& y, const T_dof& nu) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
-      if (y < 0) {
+      if (y <= 0) {
 	std::ostringstream err;
 	err << "y (" << y << ") must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -922,7 +919,7 @@ namespace stan {
      * The log of a distribution proportional to an inverse chi-squared density for y with the specified
      * degrees of freedom parameter.
      * The degrees of freedom prarameter must be greater than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than 0.
      * 
      * @param lp The log probability to increment.
      * @param y A scalar variable.
@@ -935,12 +932,12 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline void
     inv_chi_square_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
-      if (y < 0) {
+      if (y <= 0) {
 	std::ostringstream err;
 	err << "y (" << y << ") must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -949,13 +946,12 @@ namespace stan {
     }
 
 
-    // ScaledInvChiSquare(y|nu,s)  [nu > 0;  s > 0;  y > 0]
     /**
      * The log of a scaled inverse chi-squared density for y with the specified
      * degrees of freedom parameter and scale parameter.
      * The degrees of freedom prarameter must be greater than 0. The scale parameter must be greater
      * than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than 0.
      * 
      \f{eqnarray*}{
        y &\sim& \mathrm{Inv-}\chi^2(\nu, s^2) \\
@@ -975,17 +971,17 @@ namespace stan {
     template <typename T_y, typename T_dof, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
-      if (s < 0) {
+      if (s <= 0) {
 	std::ostringstream err;
 	err << "s (" << s << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }      
-      if (y < 0) {
+      if (y <= 0) {
 	std::ostringstream err;
 	err << "y (" << y << ") must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -1002,7 +998,7 @@ namespace stan {
      * degrees of freedom parameter and scale parameter.
      * The degrees of freedom prarameter must be greater than 0. The scale parameter must be greater
      * than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than 0.
      * 
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -1016,17 +1012,17 @@ namespace stan {
     template <typename T_y, typename T_dof, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     scaled_inv_chi_square_propto_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
-      if (s < 0) {
+      if (s <= 0) {
 	std::ostringstream err;
 	err << "s (" << s << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }      
-      if (y < 0) {
+      if (y <= 0) {
 	std::ostringstream err;
 	err << "y (" << y << ") must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -1038,7 +1034,7 @@ namespace stan {
      * degrees of freedom parameter and scale parameter.
      * The degrees of freedom prarameter must be greater than 0. The scale parameter must be greater
      * than 0.
-     * y has support from 0 to infinity.
+     * y must be greater than 0.
      * 
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -1052,17 +1048,17 @@ namespace stan {
     template <typename T_y, typename T_dof, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     scaled_inv_chi_square_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu, const T_scale& s) {
-      if (nu < 0) {
+      if (nu <= 0) {
 	std::ostringstream err;
 	err << "nu (" << nu << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
-      if (s < 0) {
+      if (s <= 0) {
 	std::ostringstream err;
 	err << "s (" << s << " must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }      
-      if (y < 0) {
+      if (y <= 0) {
 	std::ostringstream err;
 	err << "y (" << y << ") must be greater than 0";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
@@ -1071,7 +1067,6 @@ namespace stan {
     }
 
 
-    // Exponential(y|beta) [beta > 0;  y > 0]
     /**
      * The log of an exponential density for y with the specified
      * inverse scale parameter.
