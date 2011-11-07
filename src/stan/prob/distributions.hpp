@@ -4,6 +4,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <boost/exception/all.hpp>
 #include <boost/throw_exception.hpp>
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
@@ -21,7 +22,7 @@ namespace stan {
     using Eigen::Dynamic;
     using namespace std;
     using namespace stan::maths;
-
+    
     namespace {
    
       const double PI = boost::math::constants::pi<double>();
@@ -65,8 +66,9 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
     normal_p(const T_y& y, const T_loc& mean, const T_scale& sigma) {
-      if (sigma < 0)
+      if (sigma < 0) {
 	BOOST_THROW_EXCEPTION (std::domain_error ("sigma is less than 0"));
+      }
       return 0.5 * erfc(-(y - mean)/(sigma * SQRT_2));
     }
 
@@ -77,6 +79,13 @@ namespace stan {
      * The log of the normal density for the given y, mean, and
      * standard deviation.  The standard deviation must be greater
      * than 0.
+     *
+     * \f{eqnarray*}{
+       y &\sim& N (\mu, \sigma^2) \\
+       \log (p (y \,|\, \mu, \sigma) ) &=& \log \left( \frac{1}{\sqrt{2 \pi} \sigma} \exp \left( - \frac{1}{2 \sigma^2} (y - \mu)^2 \right) \right) \\
+       &=& \log (1) - \frac{1}{2}\log (2 \pi) - \log (\sigma) - \frac{(y - \mu)^2}{2 \sigma^2}
+     \f}
+     * 
      * 
      * @param y A scalar variable.
      * @param mu The mean of the normal distribution.
@@ -124,6 +133,7 @@ namespace stan {
      * y, mean, and standard deviation.
      * The standard deviation must be greater than 0.
      * 
+     * @param lp The log probability to increment.
      * @param y A scalar variable.
      * @param mu The mean of the normal distribution.
      * @param sigma The standard deviation of the normal distribution. 
@@ -230,10 +240,18 @@ namespace stan {
 	- log(normal_p(high,mu,sigma));
     }
 
-    // Uniform(y|alpha,beta)   [alpha < beta;  alpha <= y;  beta <= y]
+
     /**
      * The log of a uniform density for the given 
-     * y, lower, and upper bound.
+     * y, lower, and upper bound. 
+     *
+     * \f{eqnarray*}{
+        y &\sim& U(\alpha, \beta) \\
+        \log (p (y \,|\, \alpha, \beta)) &=& \log \left( \frac{1}{\beta-\alpha} \right) \\
+	                                 &=& \log (1) - \log (\beta - \alpha) \\
+					 &=& -\log (\beta - \alpha)
+       \f}
+     * when \f$ y \in [\alpha, \beta], 0\f$ otherwise.
      * 
      * @param y A scalar variable.
      * @param alpha Lower bound.
@@ -246,12 +264,62 @@ namespace stan {
      */
     template <typename T_y, typename T_low, typename T_high>
     inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
-    uniform_log(T_y y, T_low alpha, T_high beta) {
-      if (alpha >= beta)
-	BOOST_THROW_EXCEPTION(std::invalid_argument ("lower bound must be less than the upper bound"));
+    uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
+      if (alpha >= beta) {
+	std::ostringstream err;
+	err << "lower bound (" << alpha << ") must be less than the upper bound (" << beta <<")";
+	BOOST_THROW_EXCEPTION(std::invalid_argument (err.str()));
+      }
       if (y < alpha || y > beta)
 	return LOG_ZERO;
       return -log(beta - alpha);
+    }
+    /**
+     * The log of a density proportional to a uniform density for the given 
+     * y, lower, and upper bound. 
+     *
+     * @param y A scalar variable.
+     * @param alpha Lower bound.
+     * @param beta Upper bound.
+     * @throw std::invalid_argument if the lower bound is greater than 
+     *    or equal to the lower bound
+     * @tparam T_y Type of scalar.
+     * @tparam T_low Type of lower bound.
+     * @tparam T_high Type of upper bound.
+     */
+    template <typename T_y, typename T_low, typename T_high>
+    inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    uniform_propto_log(const T_y& y, const T_low& alpha, const T_high& beta) {
+      if (alpha >= beta) {
+	std::ostringstream err;
+	err << "lower bound (" << alpha << ") must be less than the upper bound (" << beta <<")";
+	BOOST_THROW_EXCEPTION(std::invalid_argument (err.str()));
+      }
+      return uniform_log (y, alpha, beta);
+    }
+    /**
+     * The log of a density proportional to a uniform density for the given 
+     * y, lower, and upper bound. 
+     *
+     * @param lp The log probability to increment.
+     * @param y A scalar variable.
+     * @param alpha Lower bound.
+     * @param beta Upper bound.
+     * @throw std::invalid_argument if the lower bound is greater than 
+     *    or equal to the lower bound
+     * @tparam T_y Type of scalar.
+     * @tparam T_low Type of lower bound.
+     * @tparam T_high Type of upper bound.
+     */
+    template <typename T_y, typename T_low, typename T_high>
+    inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    uniform_propto_log(stan::agrad::var& lp, const T_y& y, const T_low& alpha, const T_high& beta) {
+      if (alpha >= beta) {
+	std::ostringstream err;
+	err << "lower bound (" << alpha << ") must be less than the upper bound (" << beta <<")";
+	BOOST_THROW_EXCEPTION(std::invalid_argument (err.str()));
+      }
+      lp += uniform_propto_log (y, alpha, beta);
     }
 
 

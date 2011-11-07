@@ -253,7 +253,7 @@ namespace stan {
        * ordering.
        * 
        * @param name Name of variable to write.
-       * @param val Value of variable.
+       * @param x Value of variable.
        * @tparam Type of variable being written.
        */
       template <typename T>
@@ -269,7 +269,7 @@ namespace stan {
        *
        * @param name Name of variable.
        * @param dims Dimensions of variable.
-       * @param vals Values of variable in last-index major format.
+       * @param xs Values of variable in last-index major format.
        * @tparam T <code>double</code> or <code>int</code>.
        */
       template <typename T>
@@ -783,7 +783,7 @@ namespace stan {
        * Return a list of the names of the floating point variables in
        * the dump.
        *
-       * @param Vector to store the list of names in.
+       * @param names Vector to store the list of names in.
        */
       virtual void names_r(std::vector<std::string>& names) {
         names.resize(0);        
@@ -796,7 +796,7 @@ namespace stan {
        * Return a list of the names of the integer variables in
        * the dump.
        *
-       * @param Vector to store the list of names in.
+       * @param names Vector to store the list of names in.
        */
       virtual void names_i(std::vector<std::string>& names) {
         names.resize(0);        

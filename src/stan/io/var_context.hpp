@@ -84,7 +84,7 @@ namespace stan {
        * If the variable doesn't exist (or if it is a scalar), the
        * return result should be the empty vector.
        *
-       * @param Name of variable.
+       * @param name Name of variable.
        * @return Sequence of dimensions for the variable.
        */
       virtual std::vector<unsigned int> dims_i(const std::string& name) = 0;
@@ -93,7 +93,7 @@ namespace stan {
        * Return a list of the names of the floating point variables in
        * the context.
        *
-       * @param Vector to store the list of names in.
+       * @param names Vector to store the list of names in.
        */
       virtual void names_r(std::vector<std::string>& names) = 0;
 

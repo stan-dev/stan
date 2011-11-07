@@ -92,7 +92,7 @@ namespace stan {
        * called from the <code>ctime</code> library.
        * 
        * @param model Probability model with gradients.
-       * @param L Number of leapfrog steps per simulation.
+       * @param epsilonL Number of leapfrog steps per simulation.
        * @param delta Target value of E[acceptance probability]. Optional;
        * defaults to the value of 0.651, which has some theoretical
        * justification.

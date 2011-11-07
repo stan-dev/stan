@@ -90,7 +90,7 @@ namespace stan {
        * scalar.  Here, the unconstrain operation is a no-op, which
        * matches <code>reader::scalar_constrain()</code>.
        *
-       * @param x The value.
+       * @param y The value.
        */
       void scalar_unconstrain(T& y) {
 	data_r_.push_back(y);

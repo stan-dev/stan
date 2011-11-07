@@ -1,5 +1,6 @@
 #include <cmath>
 #include <gtest/gtest.h>
+#include <boost/exception/all.hpp>
 #include <Eigen/Dense>
 #include "stan/maths/special_functions.hpp"
 #include "stan/prob/distributions.hpp"
@@ -24,12 +25,12 @@ TEST(prob_prob,uniform) {
   EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(2.0,0.0,1.0)));  
 }
 TEST(prob_prob,uniform_exception) {
+  // lower bound higher than the upper bound
   EXPECT_THROW (stan::prob::uniform_log(0.0,1.0,0.0), std::invalid_argument);
   // lower and upper boundary the same
   EXPECT_THROW (stan::prob::uniform_log(0.0, 0.0, 0.0), std::invalid_argument);
   EXPECT_THROW (stan::prob::uniform_log(1.0, 0.0, 0.0), std::invalid_argument);
   EXPECT_THROW (stan::prob::uniform_log(-1.0, 0.0, 0.0), std::invalid_argument);
-  
 }
 
 TEST(prob_prob,normal_p) {
@@ -482,7 +483,7 @@ TEST(prob_prob,iwishart) {
   Matrix<double,Dynamic,Dynamic> Y(3,3);
   Y <<  12.147233, -11.9036079, 1.0910458,
     -11.903608,  16.7585782, 0.8530256,
-     1.091046,   0.8530256, 2.5786609;
+    1.091046,   0.8530256, 2.5786609;
 
   Matrix<double,Dynamic,Dynamic> Sigma(3,3);
   Sigma << 7.785215,  3.0597878,  1.1071663,

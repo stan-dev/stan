@@ -313,7 +313,7 @@ namespace stan {
        * @param direction Simulate backwards if -1, forwards if 1.
        * @param x The position value to start from.
        * @param m The momentum value to start from.
-       * @param g The gradient at the initial position.
+       * @param grad The gradient at the initial position.
        * @param depth The depth of the tree to build---we'll run 2^depth
        * leapfrog steps.
        * @param u The slice variable.

@@ -1,4 +1,5 @@
 /**
  * @namespace stan::prob 
- * Templated probability distributions.
+ * Templated probability distributions. All paramaterizations are based on
+ * Bayesian Data Analysis.
  */

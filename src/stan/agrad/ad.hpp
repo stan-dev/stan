@@ -529,7 +529,7 @@ namespace stan {
      * \f$(f + c)' = f'\f$.
      *
      * @param a First variable.
-     * @param b Second scalar.
+     * @param bf Second scalar.
      * @return Product of the variable and scalar.
      * @tparam T Type of scalar in variables.
      */
@@ -544,7 +544,7 @@ namespace stan {
      *
      * \f$(c + g)' = g'\f$.
      * 
-     * @param a First scalar.
+     * @param af First scalar.
      * @param b Second variable.
      * @return Product of the scalar and variable.
      * @tparam T Type of scalar in variables.
@@ -580,7 +580,7 @@ namespace stan {
      * \f$(f - c)' = f'\f$.
      *
      * @param a First variable.
-     * @param b Second scalar.
+     * @param bf Second scalar.
      * @return Difference of the variable and scalar.
      * @tparam T Type of scalar in variables.
      */
@@ -596,7 +596,7 @@ namespace stan {
      *
      * \f$(c - g)' = -g'\f$.
      * 
-     * @param a First scalar.
+     * @param af First scalar.
      * @param b Second variable.
      * @return Difference of the scalar and variable.
      * @tparam T Type of scalar in variables.
@@ -631,7 +631,7 @@ namespace stan {
      * \f$(fc)' = f'c\f$.
      *
      * @param a First variable.
-     * @param b Second scalar.
+     * @param bf Second scalar.
      * @return Product of the variable and scalar.
      * @tparam T Type of scalar in variables.
      */
@@ -646,7 +646,7 @@ namespace stan {
      *
      * \f$(cg)' = cg'\f$.
      * 
-     * @param a First scalar.
+     * @param af First scalar.
      * @param b Second variable.
      * @return Product of the scalar and variable.
      * @tparam T Type of scalar in variables.

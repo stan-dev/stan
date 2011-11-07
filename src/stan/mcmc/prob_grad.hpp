@@ -95,7 +95,7 @@ namespace stan {
        * in both number and scale from the raw unconstrained parameters.
        *
        * @param params_r Real-valued parameter vector.
-       * @param params_r Integer-valued parameter vector.
+       * @param params_i Integer-valued parameter vector.
        * @param o Output stream to which values are written
        */
       virtual void write_csv(std::vector<double>& params_r,

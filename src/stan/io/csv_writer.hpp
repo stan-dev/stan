@@ -78,7 +78,7 @@ namespace stan {
        * Write the specified vector to the output stream
        * on the current line.
        *
-       * @param x Double to write.
+       * @param v Vector of doubles to write.
        */
       void write(const Eigen::Matrix<double,Eigen::Dynamic,1>& v) {
 	for (unsigned int i = 0; i < v.size(); ++i)
@@ -89,7 +89,7 @@ namespace stan {
        * Write the specified row vector to the output stream
        * on the current line.
        *
-       * @param x Double to write.
+       * @param rv Row vector of doubles to write.
        */
       void write(const Eigen::Matrix<double,1,Eigen::Dynamic>& rv) {
 	for (unsigned int i = 0; i < rv.size(); ++i)
@@ -100,7 +100,7 @@ namespace stan {
        * Write the specified matrix to the output stream in
        * row-major order.
        *
-       * @param x Matrix to write.
+       * @param m Matrix to write.
        */
       void write(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
 	for (unsigned int i = 0; i < m.rows(); ++i)
@@ -112,7 +112,7 @@ namespace stan {
        * Write the specified matrix to the output stream in
        * column-major order.
        *
-       * @param x Matrix to write.
+       * @param m Matrix of doubles to write.
        */
       void write_col_major(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
 	for (unsigned int j = 0; j < m.cols(); ++j)

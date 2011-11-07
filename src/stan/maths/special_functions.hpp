@@ -425,9 +425,9 @@ namespace stan {
      * <p>The multivariate gamma function \f$\Gamma_k(x)\f$ for
      * dimensionality \f$k\f$ and argument \f$x\f$ is defined by
      *
-     * <p>\f$\Gamma_k(x) = \pi^{k(k\1)/4} \, \prod_{j=1}^k \Gamma(x + (1 - j)/2)\f$,
+     * <p>\f$\Gamma_k(x) = \pi^{k(k-1)/4} \, \prod_{j=1}^k \Gamma(x + (1 - j)/2)\f$,
      *
-     * where $\f\Gamma()\f$ is the gamma function.
+     * where \f$\Gamma()\f$ is the gamma function.
      *
      * @param k Number of dimensions.
      * @param x Function argument.

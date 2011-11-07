@@ -561,7 +561,7 @@ namespace stan {
        *
        * <p>See <code>stan::prob::corr_constrain(T,T&)</code>.
        * 
-       * @param log_prob The reference to the variable to increment.
+       * @param lp The reference to the variable holding the log probability to increment.
        * @return The next scalar transformed to a correlation.
        */
       T corr_constrain(T& lp) {
