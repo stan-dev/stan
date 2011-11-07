@@ -38,14 +38,13 @@ TEST(prob_prob,normal_p) {
   EXPECT_FLOAT_EQ(0.5000000, stan::prob::normal_p (0.0, 0.0, 1.0));
   EXPECT_FLOAT_EQ(0.8413447, stan::prob::normal_p (1.0, 0.0, 1.0));
   EXPECT_FLOAT_EQ(0.4012937, stan::prob::normal_p (1.0, 2.0, 4.0));
-  EXPECT_FLOAT_EQ(0.0000000, stan::prob::normal_p (1.0, 2.0, 0.0));
 }
 TEST(prob_prob,normal_p_exception_sigma) {
   double sigma; 
   
-  // exception when sigma < 0
+  // exception when sigma <= 0
   sigma = 0.0;
-  EXPECT_NO_THROW (stan::prob::normal_p (0.0, 0.0, sigma));
+  EXPECT_THROW (stan::prob::normal_p (0.0, 0.0, sigma), std::domain_error);
 
   sigma = -1.0;
   EXPECT_THROW (stan::prob::normal_p (0.0, 0.0, sigma), std::domain_error);  
