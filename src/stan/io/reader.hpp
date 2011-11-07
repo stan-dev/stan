@@ -241,6 +241,7 @@ namespace stan {
        * probability is not incremented.
        *
        * @param m Number of rows in the vector to read.
+       * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
       Matrix<T,Dynamic,1> row_vector_constrain(unsigned int m, T& lp) {

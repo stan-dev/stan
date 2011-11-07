@@ -185,7 +185,7 @@ TEST(prob_prob,norm_trunc_lh_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, 0.0, low, high), std::domain_error);
   EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, -1.0, low, high), std::domain_error);
   EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, high, low), std::invalid_argument);
-  EXPECT_NO_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, low, low));
+  EXPECT_THROW(stan::prob::normal_trunc_lh_log(y, mu, sigma, low, low), std::invalid_argument);
 }
 TEST(prob_prob,norm_trunc_l) {
   // values from R dnorm()
