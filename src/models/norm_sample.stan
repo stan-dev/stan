@@ -4,7 +4,9 @@ data {
 }
 derived data {
     double mu_pp;
+
     mu_pp <- mu + 1;
+    mu_pp <- 2 * mu_pp;
 }
 parameters {
     double y;

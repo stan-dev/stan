@@ -523,7 +523,8 @@ namespace stan {
       qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> > corr_matrix_decl_r;
       qi::rule<Iterator, qi::locals<bool>, var_decl(), whitespace_grammar<Iterator> > var_decl_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > data_var_decls_r;
-      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), whitespace_grammar<Iterator> > derived_data_var_decls_r;
+      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
+	       whitespace_grammar<Iterator> > derived_data_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > derived_var_decls_r;
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;

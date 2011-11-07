@@ -764,7 +764,7 @@ namespace stan {
       void operator()(int_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	generate_resize(x.name_,dims,2,o_);
-	o_ << INDENT2 << "if(!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT2 << "if (!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
 	o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1049,6 +1049,8 @@ namespace stan {
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
       generate_dump_member_var_inits(prog.data_decl_,o);
       o << INDENT2 << "set_param_ranges();" << EOL;
+      for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
+	generate_statement(prog.derived_data_decl_.second[i],2,o);
       o << INDENT << "} // dump ctor" << EOL;
     }
 
@@ -1456,6 +1458,7 @@ namespace stan {
       generate_class_decl(model_name,out);
       generate_private_decl(out);
       generate_member_var_decls(prog.data_decl_,1,out);
+      generate_member_var_decls(prog.derived_data_decl_.first,1,out);
       generate_public_decl(out);
       // FIXME: generate or delete
       // generate_constructor(prog,model_name,out);
