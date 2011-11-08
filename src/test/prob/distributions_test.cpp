@@ -91,7 +91,7 @@ TEST(agrad_agrad,norm_grad) {
   params[1] = sigma;
   lp.grad(params, g);
   
-  EXPECT_EQ (2, g.size());
+  EXPECT_EQ (2U, g.size());
   EXPECT_FLOAT_EQ (((0.0 - 3.0) + (1.0 - 3.0)) / (2.0 * 2.0), g[0]);
   EXPECT_FLOAT_EQ (-2/2.0 + (9.0 + 4.0)/8.0, g[1]);
 }
@@ -141,7 +141,7 @@ TEST(agrad_agrad,norm_grad_small_example) {
   params[0] = mu;
   params[1] = sigma;
   lp.grad(params, g);
-  EXPECT_EQ (2, g.size());
+  EXPECT_EQ (2U, g.size());
   EXPECT_FLOAT_EQ ((49.0+48.8+48.9+49.1+48.9+48.85+48.69+49.05+48.88+48.98), g[0]);
   EXPECT_FLOAT_EQ ((49.0*49.0+48.8*48.8+48.9*48.9+49.1*49.1+48.9*48.9+48.85*48.85+48.69*48.69+49.05*49.05+48.88*48.88+48.98*48.98) - 10.0, g[1]);
 }
@@ -298,7 +298,7 @@ TEST(prob_prob,chi_square) {
 TEST(prob_prob,chi_square_exception) {
   double y = 0.0;
   double nu = 0.0;
-  EXPECT_NO_THROW(stan::prob::chi_square_log(y, nu));
+  EXPECT_THROW(stan::prob::chi_square_log(y, nu), std::domain_error);
   EXPECT_THROW(stan::prob::chi_square_log(y, -1), std::domain_error);
   EXPECT_THROW(stan::prob::chi_square_log(-1, nu), std::domain_error);
 }

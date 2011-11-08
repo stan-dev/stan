@@ -1371,6 +1371,27 @@ namespace stan {
     // MultiNormal(y|mu,L)       [y.rows() = mu.rows() = L.rows() = L.cols();
     //                            y.cols() = mu.cols() = 0;
     //                            Sigma = LL' with L a Cholesky factor]
+    /**
+     * The log of the multivariate normal density for the given y, mu, and
+     * L (a Cholesky factor of Sigma, a variance matrix).
+     * Sigma = LL', a square, semi-positive definite matrix.
+     * Dimension, d, is implicit.
+     *
+     * \f{eqnarray*}{
+       y &\sim& N (\mu, LL') \\
+       \log (p (y \,|\, \mu, L) ) &=& \log \left( (2 \pi)^{-d/2} \left| LL' \right|^{-1/2} \times \exp \left(-\frac{1}{2}(y - \mu)^T (LL')^{-1} (y - \mu) \right) \right)
+     \f}
+     * 
+     * 
+     * @param y A scalar vector
+     * @param mu The mean vector of the multivariate normal distribution.
+     * @param L The Cholesky decomposition of a variance matrix of the multivariate normal distribution
+     * @return The log of the multivariate normal density.
+     * @throw std::domain_error if LL' is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_covar Type of scale.
+     */
     template <typename T_y, typename T_loc, typename T_covar> 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
@@ -1380,9 +1401,21 @@ namespace stan {
       Matrix<T_covar,Dynamic,1> half = L.solveTriangular(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows()).setOnes()) * (y - mu);
       return NEG_LOG_SQRT_TWO_PI * y.rows() - log(L.diagonal().array().prod()) - 0.5 * half.dot(half);
     }
-    // MultiNormal(y|mu,L)       [y.rows() = mu.rows() = L.rows() = L.cols();
-    //                            y.cols() = mu.cols() = 0;
-    //                            Sigma = LL' with L a Cholesky factor]
+    /**
+     * The log of the multivariate normal density for the given y, mu, and
+     * L (a Cholesky factor of Sigma, a variance matrix).
+     * Sigma = LL', a square, semi-positive definite matrix.
+     * Dimension, d, is implicit.
+     *
+     * @param y A scalar vector
+     * @param mu The mean vector of the multivariate normal distribution.
+     * @param L The Cholesky decomposition of a variance matrix of the multivariate normal distribution
+     * @return The log of the multivariate normal density.
+     * @throw std::domain_error if LL' is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_covar Type of scale.
+     */
     template <typename T_y, typename T_loc, typename T_covar> 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_propto_log(const Matrix<T_y,Dynamic,1>& y,
@@ -1391,6 +1424,22 @@ namespace stan {
       // FIXME: checks on L
       return multi_normal_log(y, mu, L);
     }
+    /**
+     * The log of the multivariate normal density for the given y, mu, and
+     * L (a Cholesky factor of Sigma, a variance matrix).
+     * Sigma = LL', a square, semi-positive definite matrix.
+     * Dimension, d, is implicit.
+     *
+     * @param lp The log probability to increment.
+     * @param y A scalar vector
+     * @param mu The mean vector of the multivariate normal distribution.
+     * @param L The Cholesky decomposition of a variance matrix of the multivariate normal distribution
+     * @return The log of the multivariate normal density.
+     * @throw std::domain_error if LL' is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_loc Type of location.
+     * @tparam T_covar Type of scale.
+     */
     template <typename T_y, typename T_loc, typename T_covar> 
     inline void
     multi_normal_propto_log(stan::agrad::var& lp,
@@ -1407,25 +1456,116 @@ namespace stan {
     // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite; 
     //                          Sigma.dims() = Omega.dims();
     //                           n > Sigma.rows() - 1]
+    /**
+     * The log of the Wishart density for the given W, degrees of freedom, 
+     * and scale matrix. 
+     * 
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
+     * Dimension, k, is implicit.
+     * nu must be greater than k-1
+     *
+     * \f{eqnarray*}{
+       W &\sim& \mathrm{Wishart}_{\nu} (S) \\
+       \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
+                                                  \times \left| S \right|^{\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
+						  \times \exp (-\frac{1}{2} \tr (S^{-1} W)) \right) \\
+       &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
+           -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \tr(S^{-1}W)
+     \f}
+     * 
+     * 
+     * @param W A scalar matrix
+     * @param nu Degrees of freedom
+     * @param S The scale matrix
+     * @return The log of the Wishart density at W given nu and S.
+     * @throw std::domain_error if nu is not greater than k-1
+     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     * @tparam T_scale Type of scale.
+     */
     template <typename T_y, typename T_dof, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    wishart_log(Matrix<T_y,Dynamic,Dynamic> W,
-		T_dof n,
-		Matrix<T_scale,Dynamic,Dynamic> S) {
+    wishart_log(const Matrix<T_y,Dynamic,Dynamic>& W,
+		const T_dof& nu,
+		const Matrix<T_scale,Dynamic,Dynamic>& S) {
+      // FIXME: domain checks
       unsigned int k = W.rows();
-      if (n == (k + 1)) {  
+      if (nu <= k - 1) {
+	std::ostringstream err;
+	err << "nu (" << nu << ") must be greater than k-1 (" << k-1 << ")";
+	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
+      }
+      if (nu == (k + 1)) {  
 	// don't need W.determinant() term if n == k + 1
-	return 	n * k * NEG_LOG_TWO_OVER_TWO
-	  - (0.5 * n) * log(S.determinant())
-	  - lmgamma(k, 0.5 * n)
+	return 	nu * k * NEG_LOG_TWO_OVER_TWO
+	  - (0.5 * nu) * log(S.determinant())
+	  - lmgamma(k, 0.5 * nu)
 	  - 0.5 * abs((S.inverse() * W).trace());
       } else {
-	return 0.5 * (n - k - 1.0) * log(W.determinant())
-	  + n * k * NEG_LOG_TWO_OVER_TWO
-	  - (0.5 * n) * log(S.determinant())
-	  - lmgamma(k, 0.5 * n)
+	return 0.5 * (nu - k - 1.0) * log(W.determinant())
+	  + nu * k * NEG_LOG_TWO_OVER_TWO
+	  - (0.5 * nu) * log(S.determinant())
+	  - lmgamma(k, 0.5 * nu)
 	  - 0.5 * abs((S.inverse() * W).trace());
       }
+    }
+    /**
+     * The log of a density proportional to a Wishart density for the given W,
+     * degrees of freedom, and scale matrix. 
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
+     * Dimension, k, is implicit.
+     * 
+     * @param W A scalar matrix
+     * @param nu Degrees of freedom
+     * @param S The scale matrix
+     * @return The log of the Wishart density at W given nu and S.
+     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     * @tparam T_scale Type of scale.
+     */
+    template <typename T_y, typename T_dof, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    wishart_propto_log(const Matrix<T_y,Dynamic,Dynamic>& W,
+		       const T_dof& nu,
+		       const Matrix<T_scale,Dynamic,Dynamic>& S) {
+      if (nu <= W.rows() - 1) {
+	std::ostringstream err;
+	err << "nu (" << nu << ") must be greater than k-1 (" << W.rows()-1 << ")";
+	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
+      }
+      // FIXME: domain checks
+      return wishart_log (W, nu, S);
+    }
+    /**
+     * The log of a density proportional to a Wishart density for the given W,
+     * degrees of freedom, and scale matrix. 
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
+     * Dimension, k, is implicit.
+     * 
+     * @param W A scalar matrix
+     * @param nu Degrees of freedom
+     * @param S The scale matrix
+     * @return The log of the Wishart density at W given nu and S.
+     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     * @tparam T_scale Type of scale.
+     */
+    template <typename T_y, typename T_dof, typename T_scale>
+    inline void
+    wishart_propto_log(stan::agrad::var& lp, 
+		       const Matrix<T_y,Dynamic,Dynamic>& W,
+		       const T_dof& nu,
+		       const Matrix<T_scale,Dynamic,Dynamic>& S) {
+      if (nu <= W.rows() - 1) {
+	std::ostringstream err;
+	err << "nu (" << nu << ") must be greater than k-1 (" << W.rows()-1 << ")";
+	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
+      }
+      // FIXME: domain checks
+      lp += wishart_propto_log (W, nu, S);
     }
 
     // InvWishart(Sigma|n,Omega)  [W, S symmetric, non-neg, definite; 
