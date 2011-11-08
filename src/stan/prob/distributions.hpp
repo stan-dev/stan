@@ -1467,7 +1467,7 @@ namespace stan {
      * \f{eqnarray*}{
        W &\sim& \mathrm{Wishart}_{\nu} (S) \\
        \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
-                                                  \times \left| S \right|^{\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
+                                                  \times \left| S \right|^{-\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
 						  \times \exp (-\frac{1}{2} \tr (S^{-1} W)) \right) \\
        &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
            -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \tr(S^{-1}W)
@@ -1530,9 +1530,9 @@ namespace stan {
     wishart_propto_log(const Matrix<T_y,Dynamic,Dynamic>& W,
 		       const T_dof& nu,
 		       const Matrix<T_scale,Dynamic,Dynamic>& S) {
-      if (nu <= W.rows() - 1) {
+      if (nu <= S.rows() - 1) {
 	std::ostringstream err;
-	err << "nu (" << nu << ") must be greater than k-1 (" << W.rows()-1 << ")";
+	err << "nu (" << nu << ") must be greater than k-1 (" << S.rows()-1 << ")";
 	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
       }
       // FIXME: domain checks
@@ -1559,9 +1559,9 @@ namespace stan {
 		       const Matrix<T_y,Dynamic,Dynamic>& W,
 		       const T_dof& nu,
 		       const Matrix<T_scale,Dynamic,Dynamic>& S) {
-      if (nu <= W.rows() - 1) {
+      if (nu <= S.rows() - 1) {
 	std::ostringstream err;
-	err << "nu (" << nu << ") must be greater than k-1 (" << W.rows()-1 << ")";
+	err << "nu (" << nu << ") must be greater than k-1 (" << S.rows()-1 << ")";
 	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
       }
       // FIXME: domain checks
@@ -1571,19 +1571,112 @@ namespace stan {
     // InvWishart(Sigma|n,Omega)  [W, S symmetric, non-neg, definite; 
     //                             W.dims() = S.dims();
     //                             n > S.rows() - 1]
+    /**
+     * The log of the Inverse-Wishart density for the given W, degrees of freedom, 
+     * and scale matrix. 
+     * 
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
+     * Dimension, k, is implicit.
+     * nu must be greater than k-1
+     *
+     * \f{eqnarray*}{
+       W &\sim& \mathrm{Inv-Wishart}_{\nu} (S) \\
+       \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
+                                                  \times \left| S \right|^{\nu/2} \left| W \right|^{-(\nu + k + 1) / 2}
+						  \times \exp (-\frac{1}{2} \tr (S W^{-1})) \right) \\
+       &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
+           +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \tr(S W^{-1})
+     \f}
+     * 
+     * 
+     * @param W A scalar matrix
+     * @param nu Degrees of freedom
+     * @param S The scale matrix
+     * @return The log of the Inverse-Wishart density at W given nu and S.
+     * @throw std::domain_error if nu is not greater than k-1
+     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     * @tparam T_scale Type of scale.
+     */
     template <typename T_y, typename T_dof, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    inv_wishart_log(Matrix<T_y,Dynamic,Dynamic> W,
-		    T_dof n,
-		    Matrix<T_scale,Dynamic,Dynamic> S) {
+    inv_wishart_log(const Matrix<T_y,Dynamic,Dynamic>& W,
+		    const T_dof& nu,
+		    const Matrix<T_scale,Dynamic,Dynamic>& S) {
       unsigned int k = S.rows();
-      return 0.5 * n * log(S.determinant())
-	- 0.5 * (n + k + 1.0) * log(W.determinant())
+      if (nu <= k - 1) {
+	std::ostringstream err;
+	err << "nu (" << nu << ") must be greater than k-1 (" << k-1 << ")";
+	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
+      }
+      return 0.5 * nu * log(S.determinant())
+	- 0.5 * (nu + k + 1.0) * log(W.determinant())
 	- 0.5 * (S * W.inverse()).trace()
-	+  n * k * NEG_LOG_TWO_OVER_TWO
-	- lmgamma(k, 0.5 * n);
+	+  nu * k * NEG_LOG_TWO_OVER_TWO
+	- lmgamma(k, 0.5 * nu);
     }
-
+    /**
+     * The log of a density proportional to the Inverse-Wishart density for 
+     * the given W, degrees of freedom, and scale matrix. 
+     * 
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
+     * Dimension, k, is implicit.
+     * nu must be greater than k-1
+     *
+     * @param W A scalar matrix
+     * @param nu Degrees of freedom
+     * @param S The scale matrix
+     * @return The log of the Inverse-Wishart density at W given nu and S.
+     * @throw std::domain_error if nu is not greater than k-1
+     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     * @tparam T_scale Type of scale.
+     */
+    template <typename T_y, typename T_dof, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    inv_wishart_propto_log(const Matrix<T_y,Dynamic,Dynamic>& W,
+			   const T_dof& nu,
+			   const Matrix<T_scale,Dynamic,Dynamic>& S) {
+      if (nu <= S.rows() - 1) {
+	std::ostringstream err;
+	err << "nu (" << nu << ") must be greater than k-1 (" << S.rows()-1 << ")";
+	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
+      }
+      return inv_wishart_log (W, nu, S);
+    }
+    /**
+     * The log of a density proportional to the Inverse-Wishart density for 
+     * the given W, degrees of freedom, and scale matrix. 
+     * 
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
+     * Dimension, k, is implicit.
+     * nu must be greater than k-1
+     *
+     * @param W A scalar matrix
+     * @param nu Degrees of freedom
+     * @param S The scale matrix
+     * @return The log of the Inverse-Wishart density at W given nu and S.
+     * @throw std::domain_error if nu is not greater than k-1
+     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_dof Type of degrees of freedom.
+     * @tparam T_scale Type of scale.
+     */
+    template <typename T_y, typename T_dof, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    inv_wishart_propto_log(stan::agrad::var& lp,
+			   const Matrix<T_y,Dynamic,Dynamic>& W,
+			   const T_dof& nu,
+			   const Matrix<T_scale,Dynamic,Dynamic>& S) {
+      if (nu <= S.rows() - 1) {
+	std::ostringstream err;
+	err << "nu (" << nu << ") must be greater than k-1 (" << S.rows()-1 << ")";
+	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
+      }
+      lp += inv_wishart_propto_log (W, nu, S);
+    }
     // ?? write these in terms of cpcs rather than corr matrix
     
     // LKJ_Corr(y|eta) [ y correlation matrix (not covariance matrix)
