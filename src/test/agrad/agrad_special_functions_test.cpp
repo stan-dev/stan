@@ -854,7 +854,7 @@ TEST(agrad_agrad_special_functions,log_sum_exp_vector) {
   EXPECT_FLOAT_EQ (expected_log_sum_exp,
 		   f.val());
   
-  grad_f;
+  grad_f.clear();
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(std::exp(1.0) / exp(expected_log_sum_exp), grad_f[0]);
   EXPECT_FLOAT_EQ(std::exp(2.0) / exp(expected_log_sum_exp), grad_f[1]);
@@ -892,3 +892,16 @@ TEST(agrad_agrad_special_functions,log_sum_exp_vector) {
   EXPECT_FLOAT_EQ (std::exp (   0.0 - expected_log_sum_exp), grad_f[3]);
   EXPECT_FLOAT_EQ (std::exp (-100.0 - expected_log_sum_exp), grad_f[4]);
 }
+
+TEST(agrad_agrad_special_functions,square) {
+  AVAR a = 7.0;
+  AVEC x = createAVEC(a);
+  AVAR f = square(a);
+  EXPECT_FLOAT_EQ(49.0, f.val());
+
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_EQ(1U,grad_f.size());
+  EXPECT_FLOAT_EQ(14.0, grad_f[0]);
+}
+

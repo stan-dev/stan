@@ -443,6 +443,16 @@ namespace stan {
         }
       };
 
+      class square_vari : public op_v_vari {
+      public:
+	square_vari(vari* avi) :
+	  op_v_vari(avi->val_ * avi->val_,avi) {
+	}
+	void chain() {
+	  avi_->adj_ += adj_ * 2.0 * avi_->val_;
+	}
+      };
+
     }
 
     /**
@@ -1227,6 +1237,19 @@ namespace stan {
      */
     inline var log_sum_exp(const std::vector<var>& x) {
       return var(new log_sum_exp_vector_vari(x));
+    }
+
+    /**
+     * Return the square of the input variable.
+     *
+     * <p>Using <code>square(x)</code> is more efficient
+     * than using <code>x * x</code>.
+     *
+     * @param x Variable to square.
+     * @return Square of variable.
+     */
+    inline var square(const var& x) {
+      return var(new square_vari(x.vi_));
     }
   }
 }

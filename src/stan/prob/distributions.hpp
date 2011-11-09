@@ -182,14 +182,50 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      if (sigma <= 0) {
+      if (!(sigma > 0.0)) {
 	std::ostringstream err;
 	err << "sigma (" << sigma << ") must be greater than 0.";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
       return NEG_LOG_SQRT_TWO_PI
 	- log(sigma)
-	- ((y - mu) * (y - mu)) / (2.0 * sigma * sigma);
+	- square(y - mu) / (2.0 * square(sigma));
+    }
+
+    /**
+     * The log of the normal density for the specified sequence of
+     * scalars given the specified mean and deviation.  If the
+     * sequence of values is of length 0, the result is 0.0.
+     *
+     * <p>The result log probability is defined to be the sum of the
+     * log probabilities for each observation.  Hence if the sequence
+     * is of length 0, the log probability is 0.0.
+     *
+     * @param y Sequence of scalars.
+     * @param mu Location parameter for the normal distribution.
+     * @param sigma Scale parameter for the normal distribution.
+     * @return The log of the product of the densities.
+     * @throw std::domain_error if the scale is not positive.
+     * @tparam T_y Underlying type of scalar in sequence.
+     * @tparam T_loc Type of location parameter.
+     */
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    normal_log(const std::vector<T_y>& y,
+	       const T_loc& mu,
+	       const T_scale& sigma) {
+      if (!(sigma > 0.0)) {
+	std::ostringstream err;
+	err << "sigma (" << sigma << ") must be greater than 0.";
+	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
+      }
+      double size = y.size();
+      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      for (unsigned int n = 0; n < y.size(); ++n)
+	lp += square(y[n] - mu);
+      return (size * NEG_LOG_SQRT_TWO_PI)
+	- (lp / (2.0 * square(sigma)))
+	+ (-size) * log(sigma);
     }
 
     /**

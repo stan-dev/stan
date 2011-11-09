@@ -170,3 +170,14 @@ TEST(maths_test, if_else) {
   d = false;
   EXPECT_EQ(-1, stan::maths::if_else(d,u,v));
 }
+
+TEST(maths_test, square) {
+  double y = 2.0;
+  EXPECT_FLOAT_EQ(y * y, stan::maths::square(y));
+
+  y = 0.0;
+  EXPECT_FLOAT_EQ(y * y, stan::maths::square(y));
+
+  y = -32.7;
+  EXPECT_FLOAT_EQ(y * y, stan::maths::square(y));
+}
