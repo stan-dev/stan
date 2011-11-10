@@ -34,9 +34,9 @@ model {
   sigmasq_alpha ~ inv_gamma(0.001, 0.001);
   sigmasq_beta ~ inv_gamma(0.001, 0.001);
   alpha ~ normal(mu_alpha, sigma_alpha); // vectorized
-  beta ~ normal(mu_alpha, sigma_alpha);  // vectorized
-  for (t in 1:T) 
-    for (n in 1:N)
-      y[n] ~ normal(alpha[n] + beta[n] * (x[t] - xbar), sigma_y);
+  beta ~ normal(mu_beta, sigma_beta);  // vectorized
+  for (n in 1:N)
+    for (t in 1:T) 
+      y[n,t] ~ normal(alpha[n] + beta[n] * (x[t] - xbar), sigma_y);
 
 }
