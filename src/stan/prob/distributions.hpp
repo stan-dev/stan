@@ -42,14 +42,11 @@ namespace stan {
       const double NEG_LOG_SQRT_PI = -log(sqrt(PI));
 
       const double NEG_LOG_TWO_OVER_TWO = -LOG_TWO / 2.0;
-    }
 
-    // UNIVARIATE CUMULATIVE DISTRIBUTIONS
-
-    namespace {
       const double SQRT_2 = std::sqrt(2);
     }
 
+    // UNIVARIATE CUMULATIVE DISTRIBUTIONS
     /**
      * Calculates the normal cumulative distribution function for the given
      * y, mean, and variance.
@@ -1701,9 +1698,6 @@ namespace stan {
       lp += multi_normal_propto_log(y, mu, L);
     }
    
-    namespace {
-    }
-
     // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite; 
     //                          Sigma.dims() = Omega.dims();
     //                           n > Sigma.rows() - 1]
