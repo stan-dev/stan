@@ -298,7 +298,7 @@ namespace stan {
         }
         std::vector<double> result;
         _da.xbar(result);
-//         fprintf(stderr, "xbar = %f\n", exp(result[0]));
+        fprintf(stderr, "xbar = %f\n", exp(result[0]));
         ++_n_steps;
         double avg_eta = 1.0 / _n_steps;
         _mean_stat = avg_eta * adapt_stat + (1 - avg_eta) * _mean_stat;

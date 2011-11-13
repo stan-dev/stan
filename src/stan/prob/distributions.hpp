@@ -1431,7 +1431,7 @@ namespace stan {
     }
   
 
-    // CONTINUOUS, MULTIIVARIATE
+    // CONTINUOUS, MULTIVARIATE
 
     // Dirichlet(theta|alpha)    [0 <= theta[n] <= 1;  SUM theta = 1;
     //                            0 < alpha[n]]
