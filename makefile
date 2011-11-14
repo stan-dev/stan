@@ -18,6 +18,7 @@ all: test-all
 
 # TEST
 # =========================================================
+
 test:
 	mkdir -p ar test 
 	$(foreach var,$(UNIT_TESTS_DIR:src/%/=%), mkdir -p $(var);)
@@ -36,7 +37,20 @@ test-all: $(UNIT_TESTS_OBJ)
 	$(foreach var,$(UNIT_TESTS_OBJ), $(var);)
 
 
+# MODELS (to be passed through demo/gm)
+# =========================================================
 
+models:
+	mkdir -p models
+
+models/% :  | demo/gm models
+	@echo '--- translating src/models/%.stan using demo/gm ---'
+	cat src/models/$@.stan | demo/gm > models/$(notdir $@).cpp
+	@echo '--- building models/$(notdir $@).cpp ---'
+	$(CC) $(CFLAGS) models/$@.cpp -c -o models/$@.o
+	$(CC) $(CFLAGS) models/$@.o -o models/$@
+	@echo '--- copying model data to models/ ---'
+	cp src/models/%@*data models/
 
 # DEMO
 # =========================================================
@@ -67,9 +81,13 @@ doxygen: | dox
 
 .PHONY: clean clean-dox clean-all
 clean:
-	rm -rf demo test ar *.dSYM
+	rm -rf demo test *.dSYM
+
+clean-models:
+	rm -rf models
 
 clean-dox:
 	rm -rf doc/api
 
-clean-all: clean clean-dox
+clean-all: clean clean-dox clean-models
+	rm -rf ar
