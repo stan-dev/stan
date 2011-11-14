@@ -7,7 +7,8 @@ CFLAGS_T = $(CFLAGS) -I lib/gtest/include  -I lib/gtest # -lpthread
 
 # find all unit tests
 UNIT_TESTS := $(wildcard src/test/*/*.cpp)
-UNIT_TEST_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
+UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
+UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 
 # DEFAULT
 # =========================================================
@@ -17,14 +18,9 @@ all: test-all
 
 # TEST
 # =========================================================
-.PHONY: tmp
-tmp:
-	$(foreach var,$(UNIT_TEST_OBJS), $(var);)
-
-
 test:
-	mkdir -p ar test test/agrad test/io test/maths test/mcmc\
-	    test/memory test/prob test/maths
+	mkdir -p ar test 
+	$(foreach var,$(UNIT_TESTS_DIR:src/%/=%), mkdir -p $(var);)
 
 ar/libgtest.a:  | test
 	$(CC) $(CFLAGS_T) -c lib/gtest/src/gtest-all.cc -o ar/gtest-all.o
@@ -33,6 +29,7 @@ ar/libgtest.a:  | test
 # : src/stan/%.hpp
 test/% : src/test/%_test.cpp ar/libgtest.a
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
+	$@
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ)
