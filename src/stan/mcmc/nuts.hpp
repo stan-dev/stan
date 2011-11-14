@@ -46,9 +46,6 @@ namespace stan {
       // The desired value of E[number of states in slice in last doubling]
       double _delta;
 
-      // How many in-slice states we've seen this iteration
-      int _ninslice;
-
       // RNGs
       boost::mt19937 _rand_int;
       boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > _rand_unit_norm;
@@ -101,11 +98,11 @@ namespace stan {
        * @param delta Optional target value between 0 and 1 used to tune 
        * epsilon. Lower delta => higher epsilon => more efficiency, unless
        * epsilon gets _too_ big in which case efficiency suffers.
-       * If not specified, defaults to the usually reasonable value of 0.5.
+       * If not specified, defaults to the usually reasonable value of 0.6.
        * @param random_seed Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
-      nuts(mcmc::prob_grad& model, double delta = 0.5, double epsilon = -1,
+      nuts(mcmc::prob_grad& model, double delta = 0.6, double epsilon = -1,
            unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
         : _model(model),
           _x(model.num_params_r()),
@@ -114,8 +111,6 @@ namespace stan {
 
           _epsilon(epsilon),
           _delta(delta),
-
-          _ninslice(0),
 
           _rand_int(random_seed),
           _rand_unit_norm(_rand_int,
@@ -209,7 +204,7 @@ namespace stan {
         std::vector<double> mplus(mminus);
         // The log-joint probability of the momentum and position terms, i.e.
         // -(kinetic energy + potential energy)
-        double H = -0.5 * dot_self(mminus) + _logp;
+        double H0 = -0.5 * dot_self(mminus) + _logp;
 
         std::vector<double> gradminus(_g);
         std::vector<double> gradplus(_g);
@@ -217,77 +212,47 @@ namespace stan {
         std::vector<double> xplus(_x);
 
         // Sample the slice variable
-        double u = log(_rand_uniform_01()) + H;
-
-        // Do the first iteration by hand
-        int depth = 1;
+        double u = log(_rand_uniform_01()) + H0;
+        int depth = 0;
         int nvalid = 1;
-        int direction = _rand_uniform_01() < 0.5;
-        if (direction == 0) {
-          // Go backwards
-          double logpminus = leapfrog(_model, _z, xminus, mminus, gradminus,
-                                      -_epsilon);
-          H = -0.5 * dot_self(mminus) + logpminus;
-          if (u < H) {
-            _x = xminus;
-            _g = gradminus;
-            _logp = logpminus;
-          }
-        } else {
-          // Go forwards
-          double logpplus = leapfrog(_model, _z, xplus, mplus, gradplus,
-                                     _epsilon);
-          H = -0.5 * dot_self(mplus) + logpplus;
-          if (u < H) {
-            _x = xplus;
-            _g = gradplus;
-            _logp = logpplus;
-          }
-        }
-        // Bookkeeping
-        ++_nfevals;
-        nvalid += u < H;
-        _ninslice = u < H;
-        // Stop if we're turning around or the error is enormous
-        int criterion = computeCriterion(xplus, xminus, mplus, mminus);
-        criterion &= H - u > _maxchange;
+        int direction = 2 * (_rand_uniform_01() > 0.5) - 1;
+        int criterion = 1;
 
-        // Now repeatedly double the set of points we've visited
-        std::vector<double> newsample, newgrad, tempx, tempm, tempg;
+        // Repeatedly double the set of points we've visited
+        std::vector<double> newx, newgrad, dummy1, dummy2, dummy3;
         double newlogp = -1;
-        int nvalid1 = -1;
-        int nvalid2 = -1;
+        double prob_sum = -1;
+        int newnvalid = -1;
+        int n_considered = 0;
         while (criterion) {
-          _ninslice = 0;
-          direction = _rand_uniform_01() < 0.5;
-          if (direction == 0)
-            build_tree(direction, xminus, mminus, gradminus, depth,
-                       u, newsample, newgrad,
-                       newlogp, xminus, tempx, mminus, tempm, gradminus, tempg,
-                       criterion, nvalid2);
+          direction = 2 * (_rand_uniform_01() > 0.5) - 1;
+          if (direction == -1)
+            build_tree(xminus, mminus, gradminus, u, direction, depth,
+                       H0, xminus, mminus, gradminus, dummy1, dummy2, dummy3,
+                       newx, newgrad, newlogp, newnvalid, criterion, prob_sum,
+                       n_considered);
           else
-            build_tree(direction, xplus, mplus, gradplus, depth,
-                       u, newsample, newgrad,
-                       newlogp, tempx, xplus, tempm, mplus, tempg, gradplus,
-                       criterion, nvalid2);
+            build_tree(xplus, mplus, gradplus, u, direction, depth,
+                       H0, dummy1, dummy2, dummy3, xplus, mplus, gradplus, 
+                       newx, newgrad, newlogp, newnvalid, criterion, prob_sum,
+                       n_considered);
           // We can't look at the results of this last doubling if criterion==0
           if (!criterion)
             break;
-          nvalid1 = nvalid;
-          nvalid += nvalid2;
           criterion = computeCriterion(xplus, xminus, mplus, mminus);
           // Metropolis-Hastings to determine if we can jump to a point in
           // the new half-tree
-          if (_rand_uniform_01() < float(nvalid2) / (1e-100+float(nvalid1))) {
-            _x = newsample;
+          if (_rand_uniform_01() < float(newnvalid) / (1e-100+float(nvalid))) {
+            _x = newx;
             _g = newgrad;
             _logp = newlogp;
           }
+          nvalid += newnvalid;
           ++depth;
         }
 
         // Now we just have to update epsilon, if adaptation is on.
-        double adapt_stat = float(_ninslice) / float(1 << (depth-1));
+        double adapt_stat = prob_sum / float(n_considered);
         if (_adapt) {
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
@@ -298,7 +263,7 @@ namespace stan {
         }
         std::vector<double> result;
         _da.xbar(result);
-        fprintf(stderr, "xbar = %f\n", exp(result[0]));
+//         fprintf(stderr, "xbar = %f\n", exp(result[0]));
         ++_n_steps;
         double avg_eta = 1.0 / _n_steps;
         _mean_stat = avg_eta * adapt_stat + (1 - avg_eta) * _mean_stat;
@@ -310,138 +275,113 @@ namespace stan {
       /**
        * The core recursion in NUTS.
        *
-       * @param direction Simulate backwards if -1, forwards if 1.
        * @param x The position value to start from.
        * @param m The momentum value to start from.
        * @param grad The gradient at the initial position.
+       * @param u The slice variable.
+       * @param direction Simulate backwards if -1, forwards if 1.
        * @param depth The depth of the tree to build---we'll run 2^depth
        * leapfrog steps.
-       * @param u The slice variable.
+       * @param H0 The joint probability of the position-momentum we started
+       * from initially---used to compute statistic to adapt epsilon.
        * @param newsample Returns the position of the new sample selected from
+       * this subtree.
+       * @param xminus Returns the position of the backwardmost leaf of this
+       * subtree.
+       * @param mminus Returns the momentum of the backwardmost leaf of this
+       * subtree.
+       * @param gradminus Returns the gradient at xminus.
+       * @param xplus Returns the position of the forwardmost leaf of this
+       * subtree.
+       * @param mplus Returns the momentum of the forwardmost leaf of this
+       * subtree.
+       * @param gradplus Returns the gradient at xplus.
+       * @param newx Returns the new position sample selected from
        * this subtree.
        * @param newgrad Returns the gradient at the new sample selected from
        * this subtree.
        * @param newlogp Returns the log-probability of the new sample selected
        * from this subtree.
-       * @param xminus Returns the position of the backwardmost leaf of this
-       * subtree.
-       * @param xplus Returns the position of the forwardmost leaf of this
-       * subtree.
-       * @param mminus Returns the momentum of the backwardmost leaf of this
-       * subtree.
-       * @param mplus Returns the momentum of the forwardmost leaf of this
-       * subtree.
-       * @param gradminus Returns the gradient at xminus.
-       * @param gradplus Returns the gradient at xplus.
+       * @param n Returns the number of usable points in the subtree.
        * @param criterion Returns 1 if the subtree is usable, 0 if not.
-       * @param nvalid Returns the number of usable points in the subtree.
+       * @param prob_sum Returns the sum of the HMC acceptance probabilities
+       * at each point in the subtree.
+       * @param n_considered Returns the number of states in the subtree.
        */
-      void build_tree(int direction, std::vector<double>& x,
-                      std::vector<double>& m,
-                      std::vector<double>& grad,
-                      int depth,
+      void build_tree(const std::vector<double>& x, 
+                      const std::vector<double>& m,
+                      const std::vector<double>& grad,
                       double u,
-                      std::vector<double>& newsample, 
-                      std::vector<double>& newgrad, 
-                      double& newlogp, std::vector<double>& xminus,
-                      std::vector<double>& xplus,
+                      int direction,
+                      int depth, 
+                      double H0,
+                      std::vector<double>& xminus,
                       std::vector<double>& mminus,
-                      std::vector<double>& mplus,
                       std::vector<double>& gradminus,
+                      std::vector<double>& xplus,
+                      std::vector<double>& mplus,
                       std::vector<double>& gradplus,
-                      int& criterion, int& nvalid) {
-        int criterion1 = 1;
-        int criterion2 = 1;
-        if (depth == 1) { // base case
-          double logpplus = -1e100;
-          double logpminus = -1e100;
-          double Hplus = -1e100;
-          double Hminus = -1e100;
-          if (direction == 0) {
-            xplus = x;
-            mplus = m;
-            gradplus = grad;
-            logpplus = leapfrog(_model, _z, xplus, mplus, gradplus, -_epsilon);
-            Hplus = logpplus - 0.5 * dot_self(mplus);
-            criterion1 &= Hplus - u > _maxchange;
-            if (criterion1) {
-              xminus = xplus;
-              mminus = mplus;
-              gradminus = gradplus;
-              logpminus = leapfrog(_model, _z, xminus, mminus, gradminus,-_epsilon);
-              Hminus = logpminus - 0.5 * dot_self(mminus);
-              criterion2 &= Hminus - u > _maxchange;
-              ++_nfevals;
-            }
-          } else {
-            xminus = x;
-            mminus = m;
-            gradminus = grad;
-            logpminus = leapfrog(_model, _z, xminus, mminus, gradminus, _epsilon);
-            Hminus = logpminus - 0.5 * dot_self(mminus);
-            criterion1 &= Hminus - u > _maxchange;
-            if (criterion1) {
-              xplus = xminus;
-              mplus = mminus;
-              gradplus = gradminus;
-              logpplus = leapfrog(_model, _z, xplus, mplus, gradplus, _epsilon);
-              Hplus = logpplus - 0.5 * dot_self(mplus);
-              criterion2 &= Hplus - u > _maxchange;
-              ++_nfevals;
-            }
-          }
+                      std::vector<double>& newx,
+                      std::vector<double>& newgrad,
+                      double& newlogp,
+                      int& nvalid, 
+                      int& criterion, 
+                      double& prob_sum, 
+                      int& n_considered) {
+        if (depth == 0) {   // base case
+          xminus = x;
+          gradminus = grad;
+          mminus = m;
+          newlogp = leapfrog(_model, _z, xminus, mminus, gradminus,
+                             direction * _epsilon);
+          newx = xminus;
+          newgrad = gradminus;
+          xplus = xminus;
+          mplus = mminus;
+          gradplus = gradminus;
+          double newH = newlogp - 0.5 * dot_self(mminus);
+          if (newH != newH) // treat nan as -inf
+            newH = -std::numeric_limits<double>::infinity();
+          nvalid = newH > u;
+          criterion = newH - u > _maxchange;
+          prob_sum = min(1, exp(newH - H0));
+          n_considered = 1;
           ++_nfevals;
-          if ((u < Hplus) && ((_rand_uniform_01() < 0.5) || (u > Hminus))) {
-            newsample = xplus;
-            newgrad = gradplus;
-            newlogp = logpplus;
-          } else {
-            newsample = xminus;
-            newgrad = gradminus;
-            newlogp = logpminus;
-          }
-          nvalid = (u < Hplus) + (u < Hminus);
-          _ninslice += nvalid;
-        } else { // depth > 1
-          std::vector<double> newsample1, newgrad1, newsample2, newgrad2,
-            tempx, tempm, tempg;
-          double newlogp1, newlogp2;
-          int nvalid1, nvalid2;
-          build_tree(direction, x, m, grad, depth-1,
-                  u, newsample1, newgrad1, newlogp1,
-                  xminus, xplus, mminus, mplus, gradminus, gradplus,
-                  criterion1, nvalid1);
-          if (criterion1) {
-            if (direction == 0)
-              build_tree(direction, xminus, mminus, gradminus, depth-1,
-                      u, newsample2, newgrad2, newlogp2,
-                      xminus, tempx, mminus, tempm, gradminus, tempg,
-                      criterion2, nvalid2);
+        } else {            // depth >= 1
+          build_tree(x, m, grad, u, direction, depth-1, H0, xminus, mminus,
+                     gradminus, xplus, mplus, gradplus, newx, newgrad, newlogp,
+                     nvalid, criterion, prob_sum, n_considered);
+          if (criterion) {
+            std::vector<double> dummy1, dummy2, dummy3;
+            std::vector<double> newx2;
+            std::vector<double> newgrad2;
+            double newlogp2;
+            int nvalid2;
+            int criterion2;
+            double prob_sum2;
+            int n_considered2;
+            if (direction == -1)
+              build_tree(xminus, mminus, gradminus, u, direction, depth-1, H0,
+                         xminus, mminus, gradminus, dummy1, dummy2, dummy3,
+                         newx2, newgrad2, newlogp2, nvalid2, criterion2, 
+                         prob_sum2, n_considered2);
             else
-              build_tree(direction, xplus, mplus, gradplus, depth-1,
-                      u, newsample2, newgrad2, newlogp2,
-                      tempx, xplus, tempm, mplus, tempg, gradplus,
-                      criterion2, nvalid2);
-          }
-
-          if (criterion1 && criterion2) {
-            if (_rand_uniform_01() < float(nvalid1) / float(nvalid1 + nvalid2)) {
-              newsample = newsample1;
-              newgrad = newgrad1;
-              newlogp = newlogp1;
-            } else {
-              newsample = newsample2;
+              build_tree(xplus, mplus, gradplus, u, direction, depth-1, H0,
+                         dummy1, dummy2, dummy3, xplus, mplus, gradplus, 
+                         newx2, newgrad2, newlogp2, nvalid2, criterion2,
+                         prob_sum2, n_considered2);
+            if (criterion && 
+                (_rand_uniform_01() < float(nvalid2) / float(nvalid+nvalid2))){
+              newx = newx2;
               newgrad = newgrad2;
-              newlogp = newlogp2; 
+              newlogp = newlogp2;
             }
-            nvalid = nvalid1 + nvalid2;
-          } else {
-            nvalid = 0;
+            n_considered += n_considered2;
+            prob_sum += prob_sum2;
+            criterion &= criterion2;
+            nvalid += nvalid2;
           }
         }
-
-        criterion = computeCriterion(xplus, xminus, mplus, mminus);
-        criterion &= criterion1 && criterion2;
       }
 
       /**
