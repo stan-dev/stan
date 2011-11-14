@@ -1,3 +1,6 @@
+// These tests should not have reference to stan::agrad::var. Distribution tests 
+// with stan::agrad::var should be placed in src/test/agrad/distributions_test.cpp
+
 #include <cmath>
 #include <gtest/gtest.h>
 #include <boost/exception/all.hpp>

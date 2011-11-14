@@ -242,7 +242,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_propto_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      if (sigma <= 0) {
+      if (!(sigma > 0.0)) {
 	std::ostringstream err;
 	err << "sigma (" << sigma << ") must be greater than 0.";
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
