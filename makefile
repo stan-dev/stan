@@ -1,14 +1,44 @@
 # g++ (GCC), clang (Clang)
-CC = g++ # clang++ # g++
+CC = clang++ # g++
 OPT = -O3 -Wall -g  #-rdynamic
 INCLUDES = -I src -I lib
 CFLAGS = $(OPT) $(INCLUDES)
 CFLAGS_T = $(CFLAGS) -I lib/gtest/include  -I lib/gtest # -lpthread
 
+# find all unit tests
+UNIT_TESTS := $(wildcard src/test/*/*.cpp)
+UNIT_TEST_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
+
 # DEFAULT
 # =========================================================
 
+.PHONY: all test-all
 all: test-all
+
+# TEST
+# =========================================================
+.PHONY: tmp
+tmp:
+	$(foreach var,$(UNIT_TEST_OBJS), $(var);)
+
+
+test:
+	mkdir -p ar test test/agrad test/io test/maths test/mcmc\
+	    test/memory test/prob test/maths
+
+ar/libgtest.a:  | test
+	$(CC) $(CFLAGS_T) -c lib/gtest/src/gtest-all.cc -o ar/gtest-all.o
+	ar -rv ar/libgtest.a ar/gtest-all.o
+
+# : src/stan/%.hpp
+test/% : src/test/%_test.cpp ar/libgtest.a
+	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
+
+# run all tests
+test-all: $(UNIT_TESTS_OBJ)
+	$(foreach var,$(UNIT_TESTS_OBJ), $(var);)
+
+
 
 
 # DEMO
@@ -24,40 +54,10 @@ demo/% : src/demo/%.cpp | demo
 demo-all: demo/bivar_norm demo/model1 demo/eight_schools
 
 
-# TEST
-# =========================================================
-
-test:
-	mkdir -p ar test test/agrad test/io test/maths test/mcmc test/memory test/prob test/maths
-
-ar/libgtest.a:  | test
-	$(CC) $(CFLAGS_T) -c lib/gtest/src/gtest-all.cc -o ar/gtest-all.o
-	ar -rv ar/libgtest.a ar/gtest-all.o
-
-# : src/stan/%.hpp
-test/% : src/test/%_test.cpp ar/libgtest.a
-	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-
-test-all: test/agrad/agrad test/agrad/agrad_special_functions test/agrad/agrad_eigen test/agrad/matrix test/io/reader test/io/dump test/maths/special_functions test/maths/matrix test/memory/stack_alloc test/prob/distributions test/prob/online_avg test/prob/rhat test/prob/transform
-	test/agrad/agrad 
-	test/agrad/agrad_special_functions
-	test/agrad/agrad_eigen
-	test/agrad/matrix
-	test/io/reader
-	test/io/dump
-	test/maths/matrix
-	test/maths/special_functions 
-	test/memory/stack_alloc 
-	test/prob/distributions 
-	test/prob/online_avg
-	test/prob/rhat
-	test/prob/transform
-
-
-
 # DOC
 # =========================================================
 
+.PHONY: dox
 dox:
 	mkdir -p doc/api
 
@@ -68,8 +68,11 @@ doxygen: | dox
 # CLEAN
 # =========================================================
 
+.PHONY: clean clean-dox clean-all
 clean:
-	rm -r -f demo test ar *.dSYM
+	rm -rf demo test ar *.dSYM
 
-clean-all:
-	rm -r -f demo test ar *.dSYM doc/api
+clean-dox:
+	rm -rf doc/api
+
+clean-all: clean clean-dox
