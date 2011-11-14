@@ -54,7 +54,7 @@ demo-all: demo/bivar_norm demo/model1 demo/eight_schools
 # DOC
 # =========================================================
 
-.PHONY: dox
+.PHONY: dox doxygen
 dox:
 	mkdir -p doc/api
 
