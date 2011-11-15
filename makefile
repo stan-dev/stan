@@ -27,10 +27,14 @@ ar/libgtest.a:  | test
 	$(CC) $(CFLAGS_T) -c lib/gtest/src/gtest-all.cc -o ar/gtest-all.o
 	ar -rv ar/libgtest.a ar/gtest-all.o
 
-# : src/stan/%.hpp
-test/% : src/test/%_test.cpp ar/libgtest.a
+
+# The last argument, $$(wildcard src/stan/$$(dir $$*)*.hpp), puts *.hpp files from the
+#   same directory as a prerequisite. For example, for test/prob/distributions, it will expand to
+#   all the hpp files in the src/stan/prob/ directory.
+.SECONDEXPANSION:
+test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp)
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-	$@
+	-$@
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ)
