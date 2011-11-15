@@ -904,7 +904,7 @@ namespace stan {
       Matrix<T,Dynamic,Dynamic> J(K_minus_1,K_minus_1);
       for (unsigned int m = 0; m < K_minus_1; ++m) {
 	J(m,m) = y[m] * (1.0 - y[m]);
-	for (unsigned int n = 0; n < K_minus_1; ++n) {
+	for (unsigned int n = m+1; n < K_minus_1; ++n) {
 	  J(m,n) = (J(n,m) = y[m] * y[n]);
 	}
       }

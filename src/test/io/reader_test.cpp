@@ -557,7 +557,7 @@ TEST(io_reader, simplex_constrain_jacobian) {
   J(0,1) = (J(1,0) = p0 * p1);
   J(0,2) = (J(2,0) = p0 * p2);
   J(1,2) = (J(2,1) = p1 * p2);
-  expected_lp += log(abs(J.determinant()));
+  expected_lp += log(fabs(J.determinant()));
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
