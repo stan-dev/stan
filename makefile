@@ -34,7 +34,7 @@ ar/libgtest.a:  | test
 .SECONDEXPANSION:
 test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp)
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-	-$@
+	-$@ --gtest_output="xml:$@.xml"
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ)
