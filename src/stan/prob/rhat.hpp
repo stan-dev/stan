@@ -1,6 +1,7 @@
 #ifndef __STAN__PROB__RHAT_HPP__
 #define __STAN__PROB__RHAT_HPP__
 
+#include <cmath>
 #include <stdexcept>
 #include <boost/throw_exception.hpp>
 #include "stan/prob/online_avg.hpp"
