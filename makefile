@@ -1,6 +1,8 @@
 # g++ (GCC), clang (Clang)
 CC = clang++ # g++
-OPT = -O3 -Wall -g  #-rdynamic
+EIGEN_OPT = -DNDEBUG
+OPTIMIZE_OPT = 0
+OPT = -O$(OPTIMIZE_OPT) -Wall -g  $(EIGEN_OPT) #-rdynamic 
 INCLUDES = -I src -I lib
 CFLAGS = $(OPT) $(INCLUDES)
 CFLAGS_T = $(CFLAGS) -I lib/gtest/include  -I lib/gtest # -lpthread
