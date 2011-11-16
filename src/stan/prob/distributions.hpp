@@ -1314,7 +1314,7 @@ namespace stan {
      \f{eqnarray*}{
        y &\sim& \mathrm{Beta}(\alpha, \beta) \\
        \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1-y)^{\beta - 1} \right) \\
-       &=& \log (\Gamma(\alpha + \beta)) - \log (\Gamma (\alpha) - \log(\Gamma(\beta)) + (\alpha-1) \log(y) + (\beta-1) \log(1 - y)
+       &=& \log (\Gamma(\alpha + \beta)) - \log (\Gamma (\alpha) - \log(\Gamma(\beta)) + (\alpha-1) \log(y) + (\beta-1) \log(1 - y) \\
        & & \mathrm{where} \; y \in [0, 1]
      \f}
      * @param y A scalar variable.

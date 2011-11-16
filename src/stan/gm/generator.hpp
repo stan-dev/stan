@@ -1056,6 +1056,298 @@ namespace stan {
       o << INDENT << "} // dump ctor" << EOL;
     }
 
+   struct generate_init_visgen : public visgen {
+      generate_init_visgen(std::ostream& o) 
+	: visgen(o) {
+      }
+      void operator()(nil const& x) const { } // dummy
+      void operator()(int_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,2,o_);
+	o_ << INDENT2 << "if (!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	unsigned int indentation = 1;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << " = vals_i__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 1 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+      }
+      // minor changes to int_var_decl
+      void operator()(double_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,2,o_);
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	unsigned int indentation = 1;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 1 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+      }
+      // extra outer loop around double_var_decl
+      void operator()(vector_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
+	generate_expression(x.M_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+	unsigned int indentation = 2;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "[i_vec__]";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT2 << "}" << EOL;
+      }
+      // change variable name from vector_var_decl
+      void operator()(row_vector_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
+	generate_expression(x.N_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+	unsigned int indentation = 2;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "[i_vec__]";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT2 << "}" << EOL;
+      }
+      // diff name of dims from vector
+      void operator()(simplex_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
+	generate_expression(x.K_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+	unsigned int indentation = 2;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "[i_vec__]";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT2 << "}" << EOL;
+      }
+      // same as simplex
+      void operator()(pos_ordered_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
+	generate_expression(x.K_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+	unsigned int indentation = 2;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "[i_vec__]";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT2 << "}" << EOL;
+      }
+      // extra loop and different accessor vs. vector
+      void operator()(matrix_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_m_mat_lim__ = ";
+	generate_expression(x.M_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_n_mat_lim__ = ";
+	generate_expression(x.N_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "n_mat__ = 0; " << "n_mat__ < " << x.name_ << "_n_mat_lim__; ++n_mat__) {" << EOL;
+	o_ << INDENT3 << "for (unsigned int " << "m_mat__ = 0; " << "m_mat__ < " << x.name_ << "_m_mat_lim__; ++m_mat__) {" << EOL;
+	unsigned int indentation = 3;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "(m_mat__,n_mat__)";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT3 << "}" << EOL;
+	o_ << INDENT2 << "}" << EOL;
+      }
+      void operator()(cov_matrix_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_k_mat_lim__ = ";
+	generate_expression(x.K_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "n_mat__ = 0; " << "n_mat__ < " << x.name_ << "_k_mat_lim__; ++n_mat__) {" << EOL;
+	o_ << INDENT3 << "for (unsigned int " << "m_mat__ = 0; " << "m_mat__ < " << x.name_ << "_k_mat_lim__; ++m_mat__) {" << EOL;
+	unsigned int indentation = 3;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "(m_mat__,n_mat__)";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT3 << "}" << EOL;
+	o_ << INDENT2 << "}" << EOL;
+      }
+      void operator()(corr_matrix_var_decl const& x) const {
+      }
+    };
+    
+
+    void generate_init_method(const std::vector<var_decl>& vs,
+			      std::ostream& o) {
+      o << EOL;
+      o << INDENT << "void transform_inits(stan::io::var_context& context__," << EOL;
+      o << INDENT << "                     std::vector<double> params_r__," << EOL;
+      o << INDENT << "                     std::vector<double> params_i__) {" << EOL;
+      o << INDENT2 << "params_r__.clear();" << EOL;
+      o << INDENT2 << "params_i__.clear();" << EOL;
+      generate_init_visgen vis(o);
+      for (unsigned int i = 0; i < vs.size(); ++i)
+	boost::apply_visitor(vis, vs[i].decl_);
+      o << INDENT << "}" << EOL;
+    }
+
+
     // see write_csv_visgen for similar structure
     struct write_csv_header_visgen : public visgen {
       write_csv_header_visgen(std::ostream& o)
@@ -1417,13 +1709,14 @@ namespace stan {
 
     void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
 				   std::ostream& o) {
+      o << EOL;
       o << INDENT << "void set_param_ranges() {" << EOL;
       o << INDENT2 << "num_params_r__ = 0U;" << EOL;
       o << INDENT2 << "param_ranges_i__.clear();" << EOL;
       set_param_ranges_visgen vis(o);
       for (unsigned int i = 0; i < var_decls.size(); ++i)
 	boost::apply_visitor(vis,var_decls[i].decl_);
-      o << INDENT << "}" << EOL2;
+      o << INDENT << "}" << EOL;
     }
    
     void generate_main(const std::string& model_name,
@@ -1466,6 +1759,7 @@ namespace stan {
       // generate_constructor(prog,model_name,out);
       generate_dump_constructor(prog,model_name,out);
       generate_set_param_ranges(prog.parameter_decl_,out);
+      generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
       generate_write_csv_method(prog.parameter_decl_,out);
       // FIXME: generate or delete
