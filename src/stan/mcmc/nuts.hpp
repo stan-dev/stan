@@ -381,6 +381,7 @@ namespace stan {
             criterion &= criterion2;
             nvalid += nvalid2;
           }
+          criterion &= computeCriterion(xplus, xminus, mplus, mminus);
         }
       }
 
