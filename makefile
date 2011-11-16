@@ -38,7 +38,7 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ)
-	$(foreach var,$(UNIT_TESTS_OBJ), $(var);)
+	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
 
 
 # MODELS (to be passed through demo/gm)
