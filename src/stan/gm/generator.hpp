@@ -746,6 +746,8 @@ namespace stan {
 			 const std::vector<expression>& dims,
 			 unsigned int indentation,
 			 std::ostream& o) {
+      if (dims.size() == 0)
+	return; // nothing to resize
       generate_indent(indentation,o);
       o << "std::vector<unsigned int> dims_" << name << "__;" << EOL;
       for (unsigned int i = 0; i < dims.size(); ++i) {
@@ -995,6 +997,41 @@ namespace stan {
 	o_ << INDENT3 << "}" << EOL;
 	o_ << INDENT2 << "}" << EOL;
       }
+      void operator()(corr_matrix_var_decl const& x) const {
+	std::vector<expression> dims = x.dims_;
+	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0;" << EOL;
+	o_ << INDENT2 << "unsigned int " << x.name_ << "_k_mat_lim__ = ";
+	generate_expression(x.K_,o_);
+	o_ << ";" << EOL;
+	o_ << INDENT2 << "for (unsigned int " << "n_mat__ = 0; " << "n_mat__ < " << x.name_ << "_k_mat_lim__; ++n_mat__) {" << EOL;
+	o_ << INDENT3 << "for (unsigned int " << "m_mat__ = 0; " << "m_mat__ < " << x.name_ << "_k_mat_lim__; ++m_mat__) {" << EOL;
+	unsigned int indentation = 3;
+	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+	  unsigned int dim = dims.size() - dim_up - 1U;
+	  ++indentation;
+	  generate_indent(indentation,o_);
+	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
+	  generate_expression(dims[dim],o_);
+	  o_ << ";" << EOL;
+	  generate_indent(indentation,o_);
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	}
+	generate_indent(indentation+1,o_);
+	o_ << x.name_;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim)
+	  o_ << "[i_" << dim << "__]";
+	o_ << "(m_mat__,n_mat__)";
+	o_ << " = vals_r__[pos__++];" << EOL;
+	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
+	  generate_indent(dims.size() + 2 - dim,o_);
+	  o_ << "}" << EOL;
+	}
+	o_ << INDENT3 << "}" << EOL;
+	o_ << INDENT2 << "}" << EOL;
+      }
       void operator()(cov_matrix_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
@@ -1030,13 +1067,46 @@ namespace stan {
 	o_ << INDENT3 << "}" << EOL;
 	o_ << INDENT2 << "}" << EOL;
       }
-      void operator()(corr_matrix_var_decl const& x) const {
-      }
     };
 
     void generate_dump_member_var_inits(const std::vector<var_decl>& vs,
 					std::ostream& o) {
       dump_member_var_visgen vis(o);
+      for (unsigned int i = 0; i < vs.size(); ++i)
+	boost::apply_visitor(vis, vs[i].decl_);
+    }
+
+    struct derived_data_resizing_visgen : public visgen {
+      derived_data_resizing_visgen(std::ostream& o) 
+	: visgen(o) {
+      }
+      void operator()(nil const& x) const { } // dummy
+      void operator()(int_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, 3, o_);
+      }
+      void operator()(double_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, 3, o_);
+      }
+      void operator()(vector_var_decl const& x) const {
+	// FIXME
+      }
+      void operator()(row_vector_var_decl const& x) const {
+      }
+      void operator()(simplex_var_decl const& x) const {
+      }
+      void operator()(pos_ordered_var_decl const& x) const {
+      }
+      void operator()(matrix_var_decl const& x) const {
+      }
+      void operator()(cov_matrix_var_decl const& x) const {
+      }
+      void operator()(corr_matrix_var_decl const& x) const {
+      }
+    };
+
+    void generate_derived_data_resizing(const std::vector<var_decl>& vs,
+					std::ostream& o) {
+      derived_data_resizing_visgen vis(o);
       for (unsigned int i = 0; i < vs.size(); ++i)
 	boost::apply_visitor(vis, vs[i].decl_);
     }
@@ -1049,10 +1119,14 @@ namespace stan {
       o << INDENT2 << "unsigned int pos__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
+
       generate_dump_member_var_inits(prog.data_decl_,o);
-      o << INDENT2 << "set_param_ranges();" << EOL;
+
+      generate_derived_data_resizing(prog.derived_data_decl_.first, o);
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
 	generate_statement(prog.derived_data_decl_.second[i],2,o);
+
+      o << EOL << INDENT2 << "set_param_ranges();" << EOL;
       o << INDENT << "} // dump ctor" << EOL;
     }
 
@@ -1062,271 +1136,26 @@ namespace stan {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	generate_resize(x.name_,dims,2,o_);
-	o_ << INDENT2 << "if (!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	unsigned int indentation = 1;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << " = vals_i__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 1 - dim,o_);
-	  o_ << "}" << EOL;
-	}
       }
       // minor changes to int_var_decl
       void operator()(double_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	generate_resize(x.name_,dims,2,o_);
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	unsigned int indentation = 1;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 1 - dim,o_);
-	  o_ << "}" << EOL;
-	}
       }
       // extra outer loop around double_var_decl
       void operator()(vector_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
-	generate_expression(x.M_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
-	unsigned int indentation = 2;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << "[i_vec__]";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 2 - dim,o_);
-	  o_ << "}" << EOL;
-	}
-	o_ << INDENT2 << "}" << EOL;
       }
       // change variable name from vector_var_decl
       void operator()(row_vector_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
-	generate_expression(x.N_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
-	unsigned int indentation = 2;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << "[i_vec__]";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 2 - dim,o_);
-	  o_ << "}" << EOL;
-	}
-	o_ << INDENT2 << "}" << EOL;
       }
       // diff name of dims from vector
       void operator()(simplex_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
-	generate_expression(x.K_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
-	unsigned int indentation = 2;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << "[i_vec__]";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 2 - dim,o_);
-	  o_ << "}" << EOL;
-	}
-	o_ << INDENT2 << "}" << EOL;
       }
       // same as simplex
       void operator()(pos_ordered_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_i_vec_lim__ = ";
-	generate_expression(x.K_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "for (unsigned int " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
-	unsigned int indentation = 2;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << "[i_vec__]";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 2 - dim,o_);
-	  o_ << "}" << EOL;
-	}
-	o_ << INDENT2 << "}" << EOL;
       }
       // extra loop and different accessor vs. vector
       void operator()(matrix_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_m_mat_lim__ = ";
-	generate_expression(x.M_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_n_mat_lim__ = ";
-	generate_expression(x.N_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "for (unsigned int " << "n_mat__ = 0; " << "n_mat__ < " << x.name_ << "_n_mat_lim__; ++n_mat__) {" << EOL;
-	o_ << INDENT3 << "for (unsigned int " << "m_mat__ = 0; " << "m_mat__ < " << x.name_ << "_m_mat_lim__; ++m_mat__) {" << EOL;
-	unsigned int indentation = 3;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << "(m_mat__,n_mat__)";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 2 - dim,o_);
-	  o_ << "}" << EOL;
-	}
-	o_ << INDENT3 << "}" << EOL;
-	o_ << INDENT2 << "}" << EOL;
       }
       void operator()(cov_matrix_var_decl const& x) const {
-	std::vector<expression> dims = x.dims_;
-	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
-	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-	o_ << INDENT2 << "pos__ = 0;" << EOL;
-	o_ << INDENT2 << "unsigned int " << x.name_ << "_k_mat_lim__ = ";
-	generate_expression(x.K_,o_);
-	o_ << ";" << EOL;
-	o_ << INDENT2 << "for (unsigned int " << "n_mat__ = 0; " << "n_mat__ < " << x.name_ << "_k_mat_lim__; ++n_mat__) {" << EOL;
-	o_ << INDENT3 << "for (unsigned int " << "m_mat__ = 0; " << "m_mat__ < " << x.name_ << "_k_mat_lim__; ++m_mat__) {" << EOL;
-	unsigned int indentation = 3;
-	for (unsigned int dim_up = 0U; dim_up < dims.size(); ++dim_up) {
-	  unsigned int dim = dims.size() - dim_up - 1U;
-	  ++indentation;
-	  generate_indent(indentation,o_);
-	  o_ << "unsigned int " << x.name_ << "_limit_" << dim << "__ = ";
-	  generate_expression(dims[dim],o_);
-	  o_ << ";" << EOL;
-	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
-	}
-	generate_indent(indentation+1,o_);
-	o_ << x.name_;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim)
-	  o_ << "[i_" << dim << "__]";
-	o_ << "(m_mat__,n_mat__)";
-	o_ << " = vals_r__[pos__++];" << EOL;
-	for (unsigned int dim = 0; dim < dims.size(); ++dim) {
-	  generate_indent(dims.size() + 2 - dim,o_);
-	  o_ << "}" << EOL;
-	}
-	o_ << INDENT3 << "}" << EOL;
-	o_ << INDENT2 << "}" << EOL;
       }
       void operator()(corr_matrix_var_decl const& x) const {
       }

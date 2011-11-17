@@ -4,6 +4,7 @@ data {
 }
 derived data {
     double mu_pp;
+    vector(4) foo[3];
 
     mu_pp <- mu + 1;
     mu_pp <- 2 * mu_pp;
