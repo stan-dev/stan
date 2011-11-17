@@ -748,6 +748,7 @@ namespace stan {
 			 std::ostream& o) {
       if (dims.size() == 0)
 	return; // nothing to resize
+      o << EOL;
       generate_indent(indentation,o);
       o << "std::vector<unsigned int> dims_" << name << "__;" << EOL;
       for (unsigned int i = 0; i < dims.size(); ++i) {
@@ -758,6 +759,30 @@ namespace stan {
       }
       generate_indent(indentation,o);
       o << "stan::maths::resize(" << name << ",dims_" << name << "__);" << EOL;
+    }
+
+    void generate_resize(const std::string& name,
+			 const std::vector<expression>& dims,
+			 const expression& dim,
+			 unsigned int indentation,
+			 std::ostream& o) {
+      std::vector<expression> dims_dim;
+      dims_dim.insert(dims_dim.begin(), dims.begin(), dims.end());
+      dims_dim.push_back(dim);
+      generate_resize(name, dims_dim, indentation, o);
+    }
+
+    void generate_resize(const std::string& name,
+			 const std::vector<expression>& dims,
+			 const expression& dim1,
+			 const expression& dim2,
+			 unsigned int indentation,
+			 std::ostream& o) {
+      std::vector<expression> dims_dim1_dim2;
+      dims_dim1_dim2.insert(dims_dim1_dim2.begin(), dims.begin(), dims.end());
+      dims_dim1_dim2.push_back(dim1);
+      dims_dim1_dim2.push_back(dim2);
+      generate_resize(name, dims_dim1_dim2, indentation, o);
     }
 
     struct dump_member_var_visgen : public visgen {
@@ -781,7 +806,9 @@ namespace stan {
 	  generate_expression(dims[dim],o_);
 	  o_ << ";" << EOL;
 	  generate_indent(indentation,o_);
-	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+	  o_ << "for (unsigned int i_" << dim << "__ = 0; i_" 
+	     << dim << "__ < " << x.name_ << "_limit_" << dim 
+	     << "__; ++i_" << dim << "__) {" << EOL;
 	}
 	generate_indent(indentation+1,o_);
 	o_ << x.name_;
@@ -825,6 +852,7 @@ namespace stan {
       // extra outer loop around double_var_decl
       void operator()(vector_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.M_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -859,6 +887,7 @@ namespace stan {
       // change variable name from vector_var_decl
       void operator()(row_vector_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.N_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -893,6 +922,7 @@ namespace stan {
       // diff name of dims from vector
       void operator()(simplex_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.K_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -927,6 +957,7 @@ namespace stan {
       // same as simplex
       void operator()(pos_ordered_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.K_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -961,6 +992,7 @@ namespace stan {
       // extra loop and different accessor vs. vector
       void operator()(matrix_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.M_,x.N_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -999,6 +1031,7 @@ namespace stan {
       }
       void operator()(corr_matrix_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.K_,x.K_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -1034,6 +1067,7 @@ namespace stan {
       }
       void operator()(cov_matrix_var_decl const& x) const {
 	std::vector<expression> dims = x.dims_;
+	generate_resize(x.name_,dims,x.K_,x.K_,2,o_);
 	o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
 	o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
 	o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
@@ -1082,25 +1116,31 @@ namespace stan {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
-	generate_resize(x.name_, x.dims_, 3, o_);
+	generate_resize(x.name_, x.dims_, 2, o_);
       }
       void operator()(double_var_decl const& x) const {
-	generate_resize(x.name_, x.dims_, 3, o_);
+	generate_resize(x.name_, x.dims_, 2, o_);
       }
       void operator()(vector_var_decl const& x) const {
-	// FIXME
+	generate_resize(x.name_, x.dims_, x.M_, 2, o_);
       }
       void operator()(row_vector_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, x.N_, 2, o_);
       }
       void operator()(simplex_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, x.K_, 2, o_);
       }
       void operator()(pos_ordered_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, x.K_, 2, o_);
       }
       void operator()(matrix_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, x.M_, x.N_, 2, o_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, x.K_, x.K_, 2, o_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
+	generate_resize(x.name_, x.dims_, x.K_, x.K_, 2, o_);
       }
     };
 
@@ -1123,6 +1163,7 @@ namespace stan {
       generate_dump_member_var_inits(prog.data_decl_,o);
 
       generate_derived_data_resizing(prog.derived_data_decl_.first, o);
+      o << EOL;
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
 	generate_statement(prog.derived_data_decl_.second[i],2,o);
 

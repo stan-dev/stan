@@ -66,7 +66,7 @@ namespace stan {
      * @tparam T Type of object being resized.
      */
     template <typename T>
-    void resize(T& x, std::vector<unsigned int> dims) {
+    inline void resize(T& x, std::vector<unsigned int> dims) {
       resize(x,dims,0U);
     }
 
