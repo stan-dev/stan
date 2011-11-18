@@ -79,7 +79,7 @@ namespace stan {
      * y, lower, and upper bound. 
      *
      \f{eqnarray*}{
-       y &\sim& U(\alpha, \beta) \\
+       y &\sim& \mbox{\sf{U}}(\alpha, \beta) \\
        \log (p (y \,|\, \alpha, \beta)) &=& \log \left( \frac{1}{\beta-\alpha} \right) \\
          &=& \log (1) - \log (\beta - \alpha) \\
          &=& -\log (\beta - \alpha) \\
@@ -161,7 +161,7 @@ namespace stan {
      * than 0.
      *
      * \f{eqnarray*}{
-       y &\sim& N (\mu, \sigma^2) \\
+       y &\sim& \mbox{\sf{N}} (\mu, \sigma^2) \\
        \log (p (y \,|\, \mu, \sigma) ) &=& \log \left( \frac{1}{\sqrt{2 \pi} \sigma} \exp \left( - \frac{1}{2 \sigma^2} (y - \mu)^2 \right) \right) \\
        &=& \log (1) - \frac{1}{2}\log (2 \pi) - \log (\sigma) - \frac{(y - \mu)^2}{2 \sigma^2}
      \f}
@@ -557,7 +557,7 @@ namespace stan {
      * y must be greater than or equal to 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{Gamma}(\alpha, \beta) \\
+       y &\sim& \mbox{\sf{Gamma}}(\alpha, \beta) \\
        \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha - 1} \exp^{- \beta y} \right) \\
        &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) + (\alpha - 1) \log(y) - \beta y\\
        & & \mathrm{where} \; y > 0
@@ -676,7 +676,7 @@ namespace stan {
      * y must be greater than 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{Inv-gamma}(\alpha, \beta) \\
+       y &\sim& \mbox{\sf{Inv-gamma}}(\alpha, \beta) \\
        \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha + 1)} \exp^{- \beta / y} \right) \\
        &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha + 1) \log(y) - \frac{\beta}{y} \\
        & & \mathrm{where } y > 0
@@ -890,7 +890,7 @@ namespace stan {
      * y must be greater than 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{Inv-}\chi^2_\nu \\
+       y &\sim& \mbox{\sf{Inv-}}\chi^2_\nu \\
        \log (p (y \,|\, \nu)) &=& \log \left( \frac{2^{-\nu / 2}}{\Gamma (\nu / 2)} y^{- (\nu / 2 + 1)} \exp^{-1 / (2y)} \right) \\
        &=& - \frac{\nu}{2} \log(2) - \log (\Gamma (\nu / 2)) - (\frac{\nu}{2} + 1) \log(y) - \frac{1}{2y} \\
        & & \mathrm{ where } \; y > 0
@@ -987,7 +987,7 @@ namespace stan {
      * y must be greater than 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{Inv-}\chi^2(\nu, s^2) \\
+       y &\sim& \mbox{\sf{Inv-}}\chi^2(\nu, s^2) \\
        \log (p (y \,|\, \nu, s)) &=& \log \left( \frac{(\nu / 2)^{\nu / 2}}{\Gamma (\nu / 2)} s^\nu y^{- (\nu / 2 + 1)} \exp^{-\nu s^2 / (2y)} \right) \\
        &=& \frac{\nu}{2} \log(\frac{\nu}{2}) - \log (\Gamma (\nu / 2)) + \nu \log(s) - (\frac{\nu}{2} + 1) \log(y) - \frac{\nu s^2}{2y} \\
        & & \mathrm{ where } \; y > 0
@@ -1107,7 +1107,7 @@ namespace stan {
      * y must be greater than or equal to 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{Expon}(\beta) \\
+       y &\sim& \mbox{\sf{Expon}}(\beta) \\
        \log (p (y \,|\, \beta) ) &=& \log \left( \beta \exp^{-\beta y} \right) \\
        &=& \log (\beta) - \beta y \\
        & & \mathrm{where} \; y > 0
@@ -1312,7 +1312,7 @@ namespace stan {
      * y must be between 0 and 1 inclusive.
      * 
      \f{eqnarray*}{
-       y &\sim& \mathrm{Beta}(\alpha, \beta) \\
+       y &\sim& \mbox{\sf{Beta}}(\alpha, \beta) \\
        \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1-y)^{\beta - 1} \right) \\
        &=& \log (\Gamma(\alpha + \beta)) - \log (\Gamma (\alpha) - \log(\Gamma(\beta)) + (\alpha-1) \log(y) + (\beta-1) \log(1 - y) \\
        & & \mathrm{where} \; y \in [0, 1]
@@ -1443,9 +1443,9 @@ namespace stan {
      * Theta sums to 1.
      *
      * \f{eqnarray*}{
-       \theta &\sim& \mathrm{Dirichlet} (\alpha_1, \ldots, \alpha_k) \\
+       \theta &\sim& \mbox{\sf{Dirichlet}} (\alpha_1, \ldots, \alpha_k) \\
        \log (p (\theta \,|\, \alpha_1, \ldots, \alpha_k) ) &=& \log \left( \frac{\Gamma(\alpha_1 + \cdots + \alpha_k)}{\Gamma(\alpha_1) \cdots \Gamma(\alpha_k)}
-          \theta_1^{\alpha_1 - 1} \cdots \theta_k^{\alpha_k - 1} \\
+          \theta_1^{\alpha_1 - 1} \cdots \theta_k^{\alpha_k - 1} \right) \\
        &=& \log (\Gamma(\alpha_1 + \cdots + \alpha_k)) - \log(\Gamma(\alpha_1)) - \cdots - \log(\Gamma(\alpha_k)) +
            (\alpha_1 - 1) \log (\theta_1) + \cdots + (\alpha_k - 1) \log (\theta_k)
      \f}
@@ -1530,7 +1530,7 @@ namespace stan {
      * and semi-positive definite. Dimension, d, is implicit.
      *
      * \f{eqnarray*}{
-       y &\sim& N (\mu, \Sigma) \\
+       y &\sim& \mbox{\sf{N}} (\mu, \Sigma) \\
        \log (p (y \,|\, \mu, \Sigma) ) &=& \log \left( (2 \pi)^{-d/2} \left| \Sigma \right|^{-1/2} \times \exp \left(-\frac{1}{2}(y - \mu)^T \Sigma^{-1} (y - \mu) \right) \right) \\
        &=& -\frac{d}{2}\log (2 \pi) - \frac{1}{2} \log (\det(\Sigma)) - \frac{1}{2} (y - \mu)^T \Sigma^{-1} (y - \mu)
      \f}
@@ -1626,7 +1626,7 @@ namespace stan {
      * Dimension, d, is implicit.
      *
      * \f{eqnarray*}{
-       y &\sim& N (\mu, LL') \\
+       y &\sim& \mbox{\sf{N}} (\mu, LL') \\
        \log (p (y \,|\, \mu, L) ) &=& \log \left( (2 \pi)^{-d/2} \left| LL' \right|^{-1/2} \times \exp \left(-\frac{1}{2}(y - \mu)^T (LL')^{-1} (y - \mu) \right) \right)
      \f}
      * 
@@ -1710,12 +1710,12 @@ namespace stan {
      * nu must be greater than k-1
      *
      * \f{eqnarray*}{
-       W &\sim& \mathrm{Wishart}_{\nu} (S) \\
+       W &\sim& \mbox{\sf{Wishart}}_{\nu} (S) \\
        \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
                                                   \times \left| S \right|^{-\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
-						  \times \exp (-\frac{1}{2} \tr (S^{-1} W)) \right) \\
+						  \times \exp (-\frac{1}{2} \mathsf{tr} (S^{-1} W)) \right) \\
        &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
-           -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \tr(S^{-1}W)
+           -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \mathsf{tr} (S^{-1}W)
      \f}
      * 
      * 
@@ -1826,12 +1826,12 @@ namespace stan {
      * nu must be greater than k-1
      *
      * \f{eqnarray*}{
-       W &\sim& \mathrm{Inv-Wishart}_{\nu} (S) \\
+       W &\sim& \mbox{\sf{Inv-Wishart}}_{\nu} (S) \\
        \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
                                                   \times \left| S \right|^{\nu/2} \left| W \right|^{-(\nu + k + 1) / 2}
-						  \times \exp (-\frac{1}{2} \tr (S W^{-1})) \right) \\
+						  \times \exp (-\frac{1}{2} \mathsf{tr} (S W^{-1})) \right) \\
        &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
-           +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \tr(S W^{-1})
+           +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \mathsf{tr}(S W^{-1})
      \f}
      * 
      * 
