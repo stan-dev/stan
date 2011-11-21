@@ -233,7 +233,40 @@ namespace stan {
 
 
       /**
-       * Return the unconstrained vector corresponding to the specified simplex 
+       * Write the specified unconstrained vector.
+       * 
+       * @param y Vector to write.
+       */
+      void vector_unconstrain(const Matrix<T,Dynamic,1>& y) {
+	for (unsigned int i = 0; i < y.size(); ++i)
+	  data_r_.push_back(y[i]);
+      }
+
+      /**
+       * Write the specified unconstrained vector.
+       * 
+       * @param y Vector to write.
+       */
+      void row_vector_unconstrain(const Matrix<T,1,Dynamic>& y) {
+	for (unsigned int i = 0; i < y.size(); ++i)
+	  data_r_.push_back(y[i]);
+      }
+
+      /**
+       * Write the specified unconstrained matrix.
+       *
+       * @param y Matrix to write.
+       */
+      void matrix_unconstrain(const Matrix<T,Dynamic,Dynamic>& y) {
+	for (unsigned int i = 0; i < y.rows(); ++i)
+	  for (unsigned int j = 0; j < y.cols(); ++j) 
+	    data_r_.push_back(y(i,j));
+      }
+
+      
+
+      /**
+       * Write the unconstrained vector corresponding to the specified simplex 
        * value.  If the specified constrained simplex is of size <code>K</code>,
        * the returned unconstrained vector is of size <code>K-1</code>.
        *

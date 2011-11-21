@@ -1180,68 +1180,91 @@ namespace stan {
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
 	generate_check_int(x.name_,x.dims_.size());
-	generate_declaration(x.name_,"int",expression(),expression(),x.dims_);
-	generate_dims_loop(x.dims_,expression(),expression(),2U);
-
-	generate_indent(x.dims_.size() + 2U,o_);
-	o_ << x.name_;
-	for (unsigned int i = 0; i < x.dims_.size(); ++i)
-	  o_ << "[i" << i << "__]";
-	o_ << " = vals_i__[pos__++];" << EOL;
-
-	generate_dims_loop_fwd(x.dims_,expression(),expression(),2U);
-	o_ << INDENT2 << "writer__.integer(" << x.name_;
-	for (unsigned int i = 0; i < x.dims_.size(); ++i)
-	  o_ << "[i" << i << "__]";
-	o_ << ");" << EOL;
-
+	generate_declaration(x.name_,"int",x.dims_);
+	generate_buffer_loop("i",x.name_, x.dims_);
+	generate_write_loop("integer(",x.name_,x.dims_);
       }
       void operator()(double_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size());
-	generate_dims_loop(x.dims_,expression(),expression(),2U);
-
-	generate_indent(x.dims_.size() + 2,o_);
-	if (!is_nil(x.range_.low_.expr_)) {
-	  if (!is_nil(x.range_.high_.expr_)) {
-	    o_ << "writer__.scalar_lub_unconstrain(";
-	    generate_expression(x.range_.low_.expr_,o_);
-	    o_ << ',';
-	    generate_expression(x.range_.high_.expr_,o_);
-	    o_ << ",vals_r__[pos__++]);";
-	  } else {
-	    o_ << "writer__.scalar_lb_unconstrain(";
-	    generate_expression(x.range_.low_.expr_,o_);
-	    o_ << ",vals_r__[pos__++]);";
-	  }
-	} else if (!is_nil(x.range_.high_.expr_)) {
-	  o_ << "writer__.scalar_ub_unconstrain(";
-	  generate_expression(x.range_.high_.expr_,o_);
-	  o_ << ",vals_r__[pos__++]);";
-	} else {
-	  o_ << "writer__.scalar_unconstrain(vals_r__[pos__++]);";
+	generate_declaration(x.name_,"double",x.dims_);
+	generate_buffer_loop("r",x.name_,x.dims_);
+	bool has_lower_bound = !is_nil(x.range_.low_.expr_);
+	bool has_upper_bound = !is_nil(x.range_.high_.expr_);
+	std::stringstream ss;
+	if (has_lower_bound && has_upper_bound) {
+	  ss << "scalar_lub_unconstrain(";
+	  generate_expression(x.range_.low_.expr_,ss);
+	  ss << ',';
+	  generate_expression(x.range_.high_.expr_,ss);
+	  ss << ',';
+	} else if (has_lower_bound && !has_upper_bound) {
+	  ss << "scalar_lb_unconstrain(";
+	  generate_expression(x.range_.low_.expr_,ss);
+	  ss << ',';
+	} else if ((!has_lower_bound) && has_upper_bound) {
+	  ss << "scalar_ub_unconstrain(";
+	  generate_expression(x.range_.high_.expr_,ss);
+	  ss << ',';
+	} else if ((!has_lower_bound) && (!has_upper_bound)) {
+	  ss << "scalar_unconstrain(";
 	}
-	o_ << EOL;
+	generate_write_loop(ss.str(),x.name_,x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 1);
+	generate_declaration(x.name_,"vector_d",x.dims_,x.M_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.M_);
+	generate_write_loop("vector_unconstrain(",x.name_,x.dims_);
       }
       void operator()(row_vector_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 1);
+	generate_declaration(x.name_,"row_vector_d",x.dims_,x.N_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.N_);
+	generate_write_loop("row_vector_unconstrain(",x.name_,x.dims_);
       }
       void operator()(simplex_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 1);
+	generate_declaration(x.name_,"vector_d",x.dims_,x.K_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.K_);
+	generate_write_loop("simplex_unconstrain(",x.name_,x.dims_);
       }
       void operator()(pos_ordered_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 1);
+	generate_declaration(x.name_,"vector_d",x.dims_,x.K_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.K_);
+	generate_write_loop("pos_ordered_unconstrain(",x.name_,x.dims_);
       }
       void operator()(matrix_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 2);
+	generate_declaration(x.name_,"matrix_d",x.dims_,x.M_,x.N_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.M_,x.N_);
+	generate_write_loop("matrix_unconstrain(",x.name_,x.dims_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 2);
+	generate_declaration(x.name_,"matrix_d",x.dims_,x.K_,x.K_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.K_,x.K_);
+	generate_write_loop("cov_matrix_unconstrain(",x.name_,x.dims_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
 	generate_check_double(x.name_,x.dims_.size() + 2);
+	generate_declaration(x.name_,"matrix_d",x.dims_,x.K_,x.K_);
+	generate_buffer_loop("r",x.name_,x.dims_,x.K_,x.K_);
+	generate_write_loop("corr_matrix_unconstrain(",x.name_,x.dims_);
+      }
+      void generate_write_loop(const std::string& write_method_name,
+			       const std::string& var_name,
+			       const std::vector<expression>& dims) const {
+	generate_dims_loop_fwd(dims);
+	o_ << "writer__." << write_method_name;
+	generate_name_dims(var_name,dims.size());
+	o_ << ");" << EOL;
+      }
+      void generate_name_dims(const std::string name, 
+			      unsigned int num_dims) const {
+	o_ << name;
+	for (unsigned int i = 0; i < num_dims; ++i)
+	  o_ << "[i" << i << "__]";
       }
       void generate_type(const std::string& base_type,
 			 const std::vector<expression>& dims,
@@ -1255,9 +1278,9 @@ namespace stan {
       }
       void generate_declaration(const std::string& name,
 				const std::string& base_type,
-				const expression& type_arg1,
-				const expression& type_arg2,
-				const std::vector<expression>& dims) const {
+				const std::vector<expression>& dims,
+				const expression& type_arg1 = expression(),
+				const expression& type_arg2 = expression()) const {
 	o_ << INDENT2;
 	generate_type(base_type,dims,dims.size());
 	o_ << ' ' << name;
@@ -1287,30 +1310,67 @@ namespace stan {
 	  o_ << ')';
 	o_ << ';' << EOL;
       }
-      void generate_dims_loop(const std::vector<expression>& dims, 
-			      const expression& dim1,
-			      const expression& dim2, 
-			      int indent) const {
+      void generate_indent_num_dims(unsigned int base_indent,
+				    const std::vector<expression>& dims, 
+				    const expression& dim1,
+				    const expression& dim2) const {
+	generate_indent(dims.size() + base_indent,o_);
+	if (!is_nil(dim1)) o_ << INDENT;
+	if (!is_nil(dim2)) o_ << INDENT;
+      }
+      void generate_buffer_loop(const std::string& base_type,
+				const std::string& name,
+				const std::vector<expression>& dims, 
+				const expression& dim1 = expression(),
+				const expression& dim2 = expression(), 
+				int indent = 2U) const {
 	unsigned int size = dims.size();
+	bool is_matrix = !is_nil(dim1) && !is_nil(dim2);
+	bool is_vector = !is_nil(dim1) && is_nil(dim2);
+	int extra_indent = is_matrix ? 2U : is_vector ? 1U : 0U;
+	if (is_matrix) {
+	  generate_indent(indent,o_);
+	  o_ << "for (unsigned int j2__ = 0U; j2__ < ";
+	  generate_expression(dim2.expr_,o_);
+	  o_ << "; ++j2__)" << EOL;
+
+	  generate_indent(indent+1,o_);
+	  o_ << "for (unsigned int j1__ = 0U; j1__ < ";
+	  generate_expression(dim1.expr_,o_);
+	  o_ << "; ++j1__)" << EOL;
+	} else if (is_vector) {
+	  generate_indent(indent,o_);
+	  o_ << "for (unsigned int j1__ = 0U; j1__ < ";
+	  generate_expression(dim1.expr_,o_);
+	  o_ << "; ++j1__)" << EOL;
+	}
 	for (unsigned int i = 0; i < size; ++i) {
 	  unsigned int idx = size - i - 1;
-	  generate_indent(i + indent, o_);
-	  o_ << "for (unsigned int i" << idx << "__ = 0; i" << idx << "__ < ";
+	  generate_indent(i + indent + extra_indent, o_);
+	  o_ << "for (unsigned int i" << idx << "__ = 0U; i" << idx << "__ < ";
 	  generate_expression(dims[idx].expr_,o_);
 	  o_ << "; ++i" << idx << "__)" << EOL;
 	}
+	generate_indent_num_dims(2U,dims,dim1,dim2);
+	o_ << name; 
+	for (unsigned int i = 0; i < dims.size(); ++i)
+	  o_ << "[i" << i << "__]";
+	if (is_matrix) 
+	  o_ << "(j1__,j2__)";
+	else if (is_vector)
+	  o_ << "(j1__)";
+	o_ << " = vals_" << base_type << "__[pos__++];" << EOL;
       }
       void generate_dims_loop_fwd(const std::vector<expression>& dims, 
-				  const expression& dim1,
-				  const expression& dim2, 
-				  int indent) const {
+				  int indent = 2U) const {
 	unsigned int size = dims.size();
 	for (unsigned int i = 0; i < size; ++i) {
 	  generate_indent(i + indent, o_);
-	  o_ << "for (unsigned int i" << i << "__ = 0; i" << i << "__ < ";
+	  o_ << "for (unsigned int i" << i << "__ = 0U; i" << i << "__ < ";
 	  generate_expression(dims[i].expr_,o_);
 	  o_ << "; ++i" << i << "__)" << EOL;
 	}
+	generate_indent(2U + dims.size(),o_);
       }
       void generate_check_int(const std::string& name, unsigned int n) const {
 	o_ << EOL << INDENT2
