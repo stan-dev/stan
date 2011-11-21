@@ -86,6 +86,15 @@ namespace stan {
       }
 
       /**
+       * Write the specified integer to the sequence of integer values.
+       *
+       * @param n Integer to write.
+       */
+      void integer(int n) {
+	data_i_.push_back(n);
+      }
+
+      /**
        * Write the unconstrained value corresponding to the specified
        * scalar.  Here, the unconstrain operation is a no-op, which
        * matches <code>reader::scalar_constrain()</code>.

@@ -163,6 +163,7 @@ namespace stan {
       generate_include("vector",o);
       generate_include("fstream",o);
       generate_include("iostream",o);
+      generate_include("stdexcept",o);
       generate_include("sstream",o);
       generate_include("boost/exception/all.hpp",o);
       generate_include("Eigen/Dense",o);
@@ -173,6 +174,7 @@ namespace stan {
       generate_include("stan/io/cmd_line.hpp",o);
       generate_include("stan/io/dump.hpp",o);
       generate_include("stan/io/reader.hpp",o);
+      generate_include("stan/io/writer.hpp",o);
       generate_include("stan/io/csv_writer.hpp",o);
       generate_include("stan/maths/matrix.hpp",o);
       generate_include("stan/maths/special_functions.hpp",o);
@@ -1171,34 +1173,172 @@ namespace stan {
       o << INDENT << "} // dump ctor" << EOL;
     }
 
-   struct generate_init_visgen : public visgen {
+    struct generate_init_visgen : public visgen {
       generate_init_visgen(std::ostream& o) 
 	: visgen(o) {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
+	generate_check_int(x.name_,x.dims_.size());
+	generate_declaration(x.name_,"int",expression(),expression(),x.dims_);
+	generate_dims_loop(x.dims_,expression(),expression(),2U);
+
+	generate_indent(x.dims_.size() + 2U,o_);
+	o_ << x.name_;
+	for (unsigned int i = 0; i < x.dims_.size(); ++i)
+	  o_ << "[i" << i << "__]";
+	o_ << " = vals_i__[pos__++];" << EOL;
+
+	generate_dims_loop_fwd(x.dims_,expression(),expression(),2U);
+	o_ << INDENT2 << "writer__.integer(" << x.name_;
+	for (unsigned int i = 0; i < x.dims_.size(); ++i)
+	  o_ << "[i" << i << "__]";
+	o_ << ");" << EOL;
+
       }
-      // minor changes to int_var_decl
       void operator()(double_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size());
+	generate_dims_loop(x.dims_,expression(),expression(),2U);
+
+	generate_indent(x.dims_.size() + 2,o_);
+	if (!is_nil(x.range_.low_.expr_)) {
+	  if (!is_nil(x.range_.high_.expr_)) {
+	    o_ << "writer__.scalar_lub_unconstrain(";
+	    generate_expression(x.range_.low_.expr_,o_);
+	    o_ << ',';
+	    generate_expression(x.range_.high_.expr_,o_);
+	    o_ << ",vals_r__[pos__++]);";
+	  } else {
+	    o_ << "writer__.scalar_lb_unconstrain(";
+	    generate_expression(x.range_.low_.expr_,o_);
+	    o_ << ",vals_r__[pos__++]);";
+	  }
+	} else if (!is_nil(x.range_.high_.expr_)) {
+	  o_ << "writer__.scalar_ub_unconstrain(";
+	  generate_expression(x.range_.high_.expr_,o_);
+	  o_ << ",vals_r__[pos__++]);";
+	} else {
+	  o_ << "writer__.scalar_unconstrain(vals_r__[pos__++]);";
+	}
+	o_ << EOL;
       }
-      // extra outer loop around double_var_decl
       void operator()(vector_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 1);
       }
-      // change variable name from vector_var_decl
       void operator()(row_vector_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 1);
       }
-      // diff name of dims from vector
       void operator()(simplex_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 1);
       }
-      // same as simplex
       void operator()(pos_ordered_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 1);
       }
-      // extra loop and different accessor vs. vector
       void operator()(matrix_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 2);
       }
       void operator()(cov_matrix_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 2);
       }
       void operator()(corr_matrix_var_decl const& x) const {
+	generate_check_double(x.name_,x.dims_.size() + 2);
+      }
+      void generate_type(const std::string& base_type,
+			 const std::vector<expression>& dims,
+			 unsigned int end) const {
+	for (unsigned int i = 0; i < end; ++i) o_ << "std::vector<";
+	o_ << base_type;
+	for (unsigned int i = 0; i < end; ++i) {
+	  if (i > 0) o_ << ' ';
+	  o_ << '>';
+	}	
+      }
+      void generate_declaration(const std::string& name,
+				const std::string& base_type,
+				const expression& type_arg1,
+				const expression& type_arg2,
+				const std::vector<expression>& dims) const {
+	o_ << INDENT2;
+	generate_type(base_type,dims,dims.size());
+	o_ << ' ' << name;
+
+	for (unsigned int i = 0; i < dims.size(); ++i) {
+	  o_ << '(';
+	  generate_expression(dims[i].expr_,o_);
+	  o_ << ',';
+	  generate_type(base_type,dims,dims.size()- i - 1);
+	}
+
+	o_ << '(';
+	if (!is_nil(type_arg1)) {
+	  generate_expression(type_arg1.expr_,o_);
+	  if (!is_nil(type_arg2)) {
+	    o_ << ',';
+	    generate_expression(type_arg2.expr_,o_);
+	  }
+	} else if (!is_nil(type_arg2.expr_)) {
+	  generate_expression(type_arg2.expr_,o_);
+	} else {
+	  o_ << '0';
+	}
+	o_ << ')';
+
+	for (unsigned int i = 0; i < dims.size(); ++i)
+	  o_ << ')';
+	o_ << ';' << EOL;
+      }
+      void generate_dims_loop(const std::vector<expression>& dims, 
+			      const expression& dim1,
+			      const expression& dim2, 
+			      int indent) const {
+	unsigned int size = dims.size();
+	for (unsigned int i = 0; i < size; ++i) {
+	  unsigned int idx = size - i - 1;
+	  generate_indent(i + indent, o_);
+	  o_ << "for (unsigned int i" << idx << "__ = 0; i" << idx << "__ < ";
+	  generate_expression(dims[idx].expr_,o_);
+	  o_ << "; ++i" << idx << "__)" << EOL;
+	}
+      }
+      void generate_dims_loop_fwd(const std::vector<expression>& dims, 
+				  const expression& dim1,
+				  const expression& dim2, 
+				  int indent) const {
+	unsigned int size = dims.size();
+	for (unsigned int i = 0; i < size; ++i) {
+	  generate_indent(i + indent, o_);
+	  o_ << "for (unsigned int i" << i << "__ = 0; i" << i << "__ < ";
+	  generate_expression(dims[i].expr_,o_);
+	  o_ << "; ++i" << i << "__)" << EOL;
+	}
+      }
+      void generate_check_int(const std::string& name, unsigned int n) const {
+	o_ << EOL << INDENT2
+	   << "if (!(var_context__.contains_i(\"" << name << "\")))"
+	   << EOL << INDENT3
+	   << "throw std::runtime_error(\"variable " << name << " missing\");" << EOL;
+	o_ << INDENT2
+	   << "if (var_context__.dims_i(\"" << name << "\").size() != " << n << ")"
+	   << EOL << INDENT3
+	   << "throw std::runtime_error(\"require " 
+	   << n << " dimensionss for variable " 
+	   << name << "\");" << EOL;
+	o_ << INDENT2 << "vals_i__ = var_context__.vals_i(\"" << name << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0U;" << EOL;
+      }
+      void generate_check_double(const std::string& name, unsigned int n) const {
+	o_ << EOL << INDENT2
+	   << "if (!(var_context__.contains_r(\"" << name << "\")))"
+	   << EOL << INDENT3
+	   << "throw std::runtime_error(\"variable " << name << " missing\");" << EOL;
+	o_ << INDENT2
+	   << "if (var_context__.dims_r(\"" << name << "\").size() != " << n << ")"
+	   << EOL << INDENT3
+	   << "throw std::runtime_error(\"require " 
+	   << n << " dimensions for variable " 
+	   << name << "\");" << EOL;
+	o_ << INDENT2 << "vals_r__ = var_context__.vals_r(\"" << name << "\");" << EOL;
+	o_ << INDENT2 << "pos__ = 0U;" << EOL;
       }
     };
     
@@ -1206,11 +1346,16 @@ namespace stan {
     void generate_init_method(const std::vector<var_decl>& vs,
 			      std::ostream& o) {
       o << EOL;
-      o << INDENT << "void transform_inits(stan::io::var_context& context__," << EOL;
-      o << INDENT << "                     std::vector<double> params_r__," << EOL;
-      o << INDENT << "                     std::vector<double> params_i__) {" << EOL;
+      o << INDENT << "void transform_inits(const stan::io::var_context& var_context__," << EOL;
+      o << INDENT << "                     std::vector<int>& params_i__," << EOL;
+      o << INDENT << "                     std::vector<double>& params_r__) {" << EOL;
       o << INDENT2 << "params_r__.clear();" << EOL;
       o << INDENT2 << "params_i__.clear();" << EOL;
+      o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
+      o << INDENT2 << "unsigned int pos__;" << EOL;
+      o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
+      o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
+      o << EOL;
       generate_init_visgen vis(o);
       for (unsigned int i = 0; i < vs.size(); ++i)
 	boost::apply_visitor(vis, vs[i].decl_);
@@ -1465,27 +1610,27 @@ namespace stan {
       }
       void operator()(const nil& x) const { }
       void operator()(const int_var_decl& x) const {
-	o_ << INDENT2 << "if (0 != ";
-	generate_expression(x.range_.low_,o_);
-	o_ << ")" << EOL;
-	o_ << INDENT3 << "throw std::runtime_error(\"param_ranges error\");";
-	for (int i = 0; i < x.dims_.size(); ++i) {
-	  generate_indent(i + 2, o_);
-	  o_ << "for (unsigned int i_" << i << "__ = 0; ";
-	  o_ << "i_" << i << "__ < ";
-	  generate_expression(x.dims_[i],o_);
-	  o_ << "; ++i_" << i << "__) {" << EOL;
-	}
+	// o_ << INDENT2 << "if (0 != ";
+	// generate_expression(x.range_.low_,o_);
+	// o_ << ")" << EOL;
+	// o_ << INDENT3 << "throw std::runtime_error(\"param_ranges error\");";
+	// for (int i = 0; i < x.dims_.size(); ++i) {
+	//   generate_indent(i + 2, o_);
+	//   o_ << "for (unsigned int i_" << i << "__ = 0; ";
+	//   o_ << "i_" << i << "__ < ";
+	//   generate_expression(x.dims_[i],o_);
+	//   o_ << "; ++i_" << i << "__) {" << EOL;
+	// }
 
-	generate_indent(x.dims_.size() + 2,o_);
-	o_ << "param_ranges_i__.push_back(";
-	generate_expression(x.range_.high_,o_);
-	o_ << ");" << EOL;
+	// generate_indent(x.dims_.size() + 2,o_);
+	// o_ << "param_ranges_i__.push_back(";
+	// generate_expression(x.range_.high_,o_);
+	// o_ << ");" << EOL;
 
-	for (int i = 0; i < x.dims_.size(); ++i) {
-	  generate_indent(x.dims_.size() + 1 - i, o_);
-	  o_ << "}" << EOL;
-	}
+	// for (int i = 0; i < x.dims_.size(); ++i) {
+	//   generate_indent(x.dims_.size() + 1 - i, o_);
+	//   o_ << "}" << EOL;
+	// }
       }
       void operator()(const double_var_decl& x) const {
 	generate_increment(x.dims_);

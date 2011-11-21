@@ -1,30 +1,23 @@
 data {
-    double(0,) sigma;
     int N;
-    int x[N];
-    vector(4) aa;
-    matrix(3,4) bb[5,6];
+    int M;
+    double z[M];
+    double y[N];
+    double mu;
+    double(0,) sigma;
 }
 derived data {
-    int y[N];
-    vector(3) a;
-    vector(4) b[5];
-    vector(4) c[5,6];
-    matrix(3,4) d;
-    matrix(3,4) e[5];
-    matrix(3,4) f[5,6];
-
-    for (n in 1:N)
-        y[n] <- log(x[n]);
 }
 parameters {
-    double mu;
+    int a;
+    int b[5];
+    int c[5,6,7];
 }
 derived parameters {
-    double two_mu;
-    two_mu <- mu * 2;
 }
 model {
+   for (m in 1:M)
+       z[m] ~ normal(mu,sigma);
    for (n in 1:N) 
        y[n] ~ normal(mu,sigma);
 }

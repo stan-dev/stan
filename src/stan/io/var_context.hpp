@@ -35,12 +35,13 @@ namespace stan {
        * @return <code>true</code> if the variable exists with real
        * values.
        */
-      virtual bool contains_r(const std::string& name) = 0;
+      virtual bool contains_r(const std::string& name) const = 0;
 
       /**
-       * Return the floating point values for the variable of the specified
-       * variable name.  This method should cast integers to floating
-       * point values if the values of the named variable are all integers.
+       * Return the floating point values for the variable of the
+       * specified variable name in last-index-major order.  This
+       * method should cast integers to floating point values if the
+       * values of the named variable are all integers.
        *
        * <p>If there is no variable of the specified name, the empty
        * vector is returned.
@@ -48,7 +49,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Sequence of values for the named variable.
        */
-      virtual std::vector<double> vals_r(const std::string& name) = 0;
+      virtual std::vector<double> vals_r(const std::string& name) const = 0;
 
       /**
        * Return the dimensions for the specified floating point variable.
@@ -58,7 +59,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Sequence of dimensions for the variable.
        */
-      virtual std::vector<unsigned int> dims_r(const std::string& name) = 0;
+      virtual std::vector<unsigned int> dims_r(const std::string& name) const = 0;
 
       /**
        * Return <code>true</code> if the specified variable name has
@@ -68,16 +69,17 @@ namespace stan {
        * @return <code>true</code> if an integer variable of the specified
        * name is defined.
        */
-      virtual bool contains_i(const std::string& name) = 0;
+      virtual bool contains_i(const std::string& name) const = 0;
 
       /**
-       * Return the integer values for the variable of the specified name
-       * or the empty sequence if the variable is not defined.
+       * Return the integer values for the variable of the specified
+       * name in last-index-major order or the empty sequence if the
+       * variable is not defined.
        *
        * @param name Name of variable.
        * @return Sequence of integer values.
        */
-      virtual std::vector<int> vals_i(const std::string& name) = 0;
+      virtual std::vector<int> vals_i(const std::string& name) const = 0;
 
       /**
        * Return the dimensions of the specified floating point variable.
@@ -87,7 +89,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Sequence of dimensions for the variable.
        */
-      virtual std::vector<unsigned int> dims_i(const std::string& name) = 0;
+      virtual std::vector<unsigned int> dims_i(const std::string& name) const = 0;
 
       /**
        * Return a list of the names of the floating point variables in
@@ -95,7 +97,7 @@ namespace stan {
        *
        * @param names Vector to store the list of names in.
        */
-      virtual void names_r(std::vector<std::string>& names) = 0;
+      virtual void names_r(std::vector<std::string>& names) const = 0;
 
       /**
        * Return a list of the names of the integer variables in
@@ -103,7 +105,7 @@ namespace stan {
        *
        * @param names Vector to store the list of names in.
        */
-      virtual void names_i(std::vector<std::string>& names) = 0;
+      virtual void names_i(std::vector<std::string>& names) const = 0;
     };
     
 

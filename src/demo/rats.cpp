@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <sstream>
 #include <boost/exception/all.hpp>
 #include <Eigen/Dense>
@@ -14,6 +15,7 @@
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/reader.hpp>
+#include <stan/io/writer.hpp>
 #include <stan/io/csv_writer.hpp>
 #include <stan/maths/matrix.hpp>
 #include <stan/maths/special_functions.hpp>
@@ -21,7 +23,6 @@
 #include <stan/mcmc/sampler.hpp>
 #include <stan/mcmc/prob_grad_ad.hpp>
 #include <stan/prob/distributions.hpp>
-#include <stan/prob/ag_distributions.hpp>
 
 namespace test_model_namespace {
 
@@ -54,20 +55,17 @@ public:
         unsigned int pos__;
         std::vector<int> vals_i__;
         std::vector<double> vals_r__;
-        std::vector<unsigned int> dims_N__;
-        stan::maths::resize(N,dims_N__);
         if (!context__.contains_i("N"))
             throw std::runtime_error("variable N not found.");
         vals_i__ = context__.vals_i("N");
         pos__ = 0;
         N = vals_i__[pos__++];
-        std::vector<unsigned int> dims_T__;
-        stan::maths::resize(T,dims_T__);
         if (!context__.contains_i("T"))
             throw std::runtime_error("variable T not found.");
         vals_i__ = context__.vals_i("T");
         pos__ = 0;
         T = vals_i__[pos__++];
+
         std::vector<unsigned int> dims_x__;
         dims_x__.push_back(T);
         stan::maths::resize(x,dims_x__);
@@ -79,13 +77,12 @@ public:
         for (unsigned int i_0__ = 0; i_0__ < x_limit_0__; ++i_0__) {
             x[i_0__] = vals_r__[pos__++];
         }
-        std::vector<unsigned int> dims_xbar__;
-        stan::maths::resize(xbar,dims_xbar__);
         if(!context__.contains_r("xbar"))
             throw std::runtime_error("variable xbar not found.");
         vals_r__ = context__.vals_r("xbar");
         pos__ = 0;
         xbar = vals_r__[pos__++];
+
         std::vector<unsigned int> dims_y__;
         dims_y__.push_back(N);
         dims_y__.push_back(T);
@@ -101,8 +98,11 @@ public:
                 y[i_0__][i_1__] = vals_r__[pos__++];
             }
         }
+
+
         set_param_ranges();
     } // dump ctor
+
     void set_param_ranges() {
         num_params_r__ = 0U;
         param_ranges_i__.clear();
@@ -115,6 +115,75 @@ public:
         ++num_params_r__;
     }
 
+    void transform_inits(const stan::io::var_context& var_context__,
+                         std::vector<int>& params_i__,
+                         std::vector<double>& params_r__) {
+        params_r__.clear();
+        params_i__.clear();
+        stan::io::writer<double> writer__(params_r__,params_i__);
+        unsigned int pos__;
+        std::vector<double> vals_r__;
+        std::vector<int> vals_i__;
+
+
+        if (!(var_context__.contains_r("alpha")))
+            throw std::runtime_error("variable alpha missing");
+        if (var_context__.dims_r("alpha").size() != 1)
+            throw std::runtime_error("require 1 dimensions for variable alpha");
+        vals_r__ = var_context__.vals_r("alpha");
+        pos__ = 0U;
+        for (unsigned int i0__ = 0; i0__ < N; ++i0__)
+            writer__.scalar_unconstrain(vals_r__[pos__++]);
+
+        if (!(var_context__.contains_r("beta")))
+            throw std::runtime_error("variable beta missing");
+        if (var_context__.dims_r("beta").size() != 1)
+            throw std::runtime_error("require 1 dimensions for variable beta");
+        vals_r__ = var_context__.vals_r("beta");
+        pos__ = 0U;
+        for (unsigned int i0__ = 0; i0__ < N; ++i0__)
+            writer__.scalar_unconstrain(vals_r__[pos__++]);
+
+        if (!(var_context__.contains_r("mu_alpha")))
+            throw std::runtime_error("variable mu_alpha missing");
+        if (var_context__.dims_r("mu_alpha").size() != 0)
+            throw std::runtime_error("require 0 dimensions for variable mu_alpha");
+        vals_r__ = var_context__.vals_r("mu_alpha");
+        pos__ = 0U;
+        writer__.scalar_unconstrain(vals_r__[pos__++]);
+
+        if (!(var_context__.contains_r("mu_beta")))
+            throw std::runtime_error("variable mu_beta missing");
+        if (var_context__.dims_r("mu_beta").size() != 0)
+            throw std::runtime_error("require 0 dimensions for variable mu_beta");
+        vals_r__ = var_context__.vals_r("mu_beta");
+        pos__ = 0U;
+        writer__.scalar_unconstrain(vals_r__[pos__++]);
+
+        if (!(var_context__.contains_r("sigma_y")))
+            throw std::runtime_error("variable sigma_y missing");
+        if (var_context__.dims_r("sigma_y").size() != 0)
+            throw std::runtime_error("require 0 dimensions for variable sigma_y");
+        vals_r__ = var_context__.vals_r("sigma_y");
+        pos__ = 0U;
+        writer__.scalar_lb_unconstrain(0,vals_r__[pos__++]);
+
+        if (!(var_context__.contains_r("sigma_alpha")))
+            throw std::runtime_error("variable sigma_alpha missing");
+        if (var_context__.dims_r("sigma_alpha").size() != 0)
+            throw std::runtime_error("require 0 dimensions for variable sigma_alpha");
+        vals_r__ = var_context__.vals_r("sigma_alpha");
+        pos__ = 0U;
+        writer__.scalar_lb_unconstrain(0,vals_r__[pos__++]);
+
+        if (!(var_context__.contains_r("sigma_beta")))
+            throw std::runtime_error("variable sigma_beta missing");
+        if (var_context__.dims_r("sigma_beta").size() != 0)
+            throw std::runtime_error("require 0 dimensions for variable sigma_beta");
+        vals_r__ = var_context__.vals_r("sigma_beta");
+        pos__ = 0U;
+        writer__.scalar_lb_unconstrain(0,vals_r__[pos__++]);
+    }
 
     var log_prob(vector<var>& params_r__,
                  vector<int>& params_i__) {
@@ -135,25 +204,25 @@ public:
         }
         var mu_alpha = in__.scalar_constrain(lp__);
         var mu_beta = in__.scalar_constrain(lp__);
-        var tau_y = in__.scalar_lb_constrain(0,lp__);
-        var tau_alpha = in__.scalar_lb_constrain(0,lp__);
-        var tau_beta = in__.scalar_lb_constrain(0,lp__);
+        var sigma_y = in__.scalar_lb_constrain(0,lp__);
+        var sigma_alpha = in__.scalar_lb_constrain(0,lp__);
+        var sigma_beta = in__.scalar_lb_constrain(0,lp__);
 
         // derived variables
-        var sigma_y;
-        var sigma_alpha;
-        var sigma_beta;
+        var sigmasq_y;
+        var sigmasq_alpha;
+        var sigmasq_beta;
 
-        sigma_y = (1 / sqrt(tau_y));
-        sigma_alpha = (1 / sqrt(tau_alpha));
-        sigma_beta = (1 / sqrt(tau_beta));
+        sigmasq_y = (sigma_y * sigma_y);
+        sigmasq_alpha = (sigma_alpha * sigma_alpha);
+        sigmasq_beta = (sigma_beta * sigma_beta);
 
         // model body
         lp__ += stan::prob::normal_log(mu_alpha, 0, 100);
         lp__ += stan::prob::normal_log(mu_beta, 0, 100);
-        lp__ += stan::prob::gamma_log(tau_y, 0.001, 0.001);
-        lp__ += stan::prob::gamma_log(tau_alpha, 0.001, 0.001);
-        lp__ += stan::prob::gamma_log(tau_beta, 0.001, 0.001);
+        lp__ += stan::prob::inv_gamma_log(sigmasq_y, 0.001, 0.001);
+        lp__ += stan::prob::inv_gamma_log(sigmasq_alpha, 0.001, 0.001);
+        lp__ += stan::prob::inv_gamma_log(sigmasq_beta, 0.001, 0.001);
         lp__ += stan::prob::normal_log(alpha, mu_alpha, sigma_alpha);
         lp__ += stan::prob::normal_log(beta, mu_beta, sigma_beta);
         for (int n = 1; n <= N; ++n) {
@@ -187,12 +256,12 @@ public:
         writer__.write(mu_alpha);
         double mu_beta = in__.scalar_constrain();
         writer__.write(mu_beta);
-        double tau_y = in__.scalar_lb_constrain(0);
-        writer__.write(tau_y);
-        double tau_alpha = in__.scalar_lb_constrain(0);
-        writer__.write(tau_alpha);
-        double tau_beta = in__.scalar_lb_constrain(0);
-        writer__.write(tau_beta);
+        double sigma_y = in__.scalar_lb_constrain(0);
+        writer__.write(sigma_y);
+        double sigma_alpha = in__.scalar_lb_constrain(0);
+        writer__.write(sigma_alpha);
+        double sigma_beta = in__.scalar_lb_constrain(0);
+        writer__.write(sigma_beta);
         writer__.newline();
     }
 
@@ -208,8 +277,6 @@ int main(int argc__, const char* argv__[]) {
         std::fstream data_file__(data_file_path__.c_str(),std::fstream::in);
         stan::io::dump dump__(data_file__);
         test_model_namespace::test_model model__(dump__);
-        std::vector<double> params_r(model__.num_params_r(), 1);
-        std::vector<int> params_i(model__.num_params_i());
         data_file__.close();
         stan::gm::nuts_command(cmd__,model__);
     } catch (std::exception& e) {

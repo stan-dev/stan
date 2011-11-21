@@ -662,7 +662,7 @@ namespace stan {
        * @return <code>true</code> if the variable exists in the 
        * real values of the dump.
        */
-      bool contains_r_only(const std::string& name) {
+      bool contains_r_only(const std::string& name) const {
 	return vars_r_.find(name) != vars_r_.end();
       }
     public: 
@@ -698,7 +698,7 @@ namespace stan {
        * @param name Variable name to test.
        * @return <code>true</code> if the variable exists.
        */
-      bool contains_r(const std::string& name) {
+      bool contains_r(const std::string& name) const {
 	return contains_r_only(name) || contains_i(name);
       }
 
@@ -710,7 +710,7 @@ namespace stan {
        * @return <code>true</code> if the variable name has an integer
        * array value.
        */
-      bool contains_i(const std::string& name) {
+      bool contains_i(const std::string& name) const {
 	return vars_i_.find(name) != vars_i_.end();
       }
 
@@ -721,11 +721,11 @@ namespace stan {
        * @param name Name of variable.
        * @return Values of variable.
        */
-      std::vector<double> vals_r(const std::string& name) {
+      std::vector<double> vals_r(const std::string& name) const {
 	if (contains_r_only(name)) {
-	  return vars_r_[name].first;
+	  return (vars_r_.find(name)->second).first;
 	} else if (contains_i(name)) {
-	  std::vector<int> vec_int = vars_i_[name].first;
+	  std::vector<int> vec_int = (vars_i_.find(name)->second).first;
 	  std::vector<double> vec_r(vec_int.size());
 	  for (unsigned int ii = 0; ii < vec_int.size(); ii++) {
 	    vec_r[ii] = vec_int[ii];
@@ -742,11 +742,11 @@ namespace stan {
        * @param name Name of variable.
        * @return Dimensions of variable.
        */
-      std::vector<unsigned int> dims_r(const std::string& name) {
+      std::vector<unsigned int> dims_r(const std::string& name) const {
 	if (contains_r_only(name)) {
-	  return vars_r_[name].second;
+	  return (vars_r_.find(name)->second).second;
 	} else if (contains_i(name)) {
-	  return vars_i_[name].second;
+	  return (vars_i_.find(name)->second).second;
 	}
 	return empty_vec_ui_;
       }
@@ -758,9 +758,9 @@ namespace stan {
        * @param name Name of variable.
        * @return Values.
        */
-      std::vector<int> vals_i(const std::string& name) {
+      std::vector<int> vals_i(const std::string& name) const {
 	if (contains_i(name)) {
-	  return vars_i_[name].first;
+	  return (vars_i_.find(name)->second).first;
 	}
 	return empty_vec_i_;
       }
@@ -772,11 +772,11 @@ namespace stan {
        * @param name Name of variable.
        * @return Dimensions of variable.
        */
-      std::vector<unsigned int> dims_i(const std::string& name) {
+      std::vector<unsigned int> dims_i(const std::string& name) const {
 	if (contains_i(name)) {
-	  return vars_i_[name].second;
+	  return (vars_i_.find(name)->second).second;
 	}
-	return (empty_vec_ui_);
+	return empty_vec_ui_;
       }
 
       /**
@@ -785,9 +785,9 @@ namespace stan {
        *
        * @param names Vector to store the list of names in.
        */
-      virtual void names_r(std::vector<std::string>& names) {
+      virtual void names_r(std::vector<std::string>& names) const {
         names.resize(0);        
-        for (std::map<std::string, std::pair<std::vector<double>, std::vector<unsigned int> > >::iterator it = vars_r_.begin();
+        for (std::map<std::string, std::pair<std::vector<double>, std::vector<unsigned int> > >::const_iterator it = vars_r_.begin();
              it != vars_r_.end(); ++it)
           names.push_back((*it).first);
       }
@@ -798,9 +798,9 @@ namespace stan {
        *
        * @param names Vector to store the list of names in.
        */
-      virtual void names_i(std::vector<std::string>& names) {
+      virtual void names_i(std::vector<std::string>& names) const {
         names.resize(0);        
-        for (std::map<std::string, std::pair<std::vector<int>, std::vector<unsigned int> > >::iterator it = vars_i_.begin();
+        for (std::map<std::string, std::pair<std::vector<int>, std::vector<unsigned int> > >::const_iterator it = vars_i_.begin();
              it != vars_i_.end(); ++it)
           names.push_back((*it).first);
       }
