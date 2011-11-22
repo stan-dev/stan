@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <stan/io/cmd_line.hpp>
+#include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
 #include <stan/mcmc/prob_grad_ad.hpp>
@@ -17,9 +18,6 @@ namespace stan {
 
     void hmc_command(const stan::io::cmd_line& command,
 		     stan::mcmc::prob_grad& model) {
-
-      std::string init_file = "init.dump";
-      command.val("init_file",init_file);
 
       std::string sample_file = "samples.csv";
       command.val("sample_file",sample_file);
@@ -42,7 +40,6 @@ namespace stan {
       command.val("num_steps",num_steps);
       
       std::cout << "HMC" << std::endl;
-      std::cout << "init_file=" << init_file << std::endl;
       std::cout << "sample_file=" << sample_file << std::endl;
       std::cout << "num_iterations=" << num_iterations << std::endl;
       std::cout << "num_burnin=" << num_burnin << std::endl;
@@ -75,13 +72,18 @@ namespace stan {
       sample_file_stream.close();
     }
 
-    void nuts_command(const stan::io::cmd_line& command,
-                      stan::mcmc::prob_grad& model,
-		      const std::vector<double>& inits_r,
-		      const std::vector<int>& inits_i) {
+    template <typename T_model>
+    void nuts_command(int argc, const char* argv[]) {
 
-      std::string init_file = "init.dump";
-      command.val("init_file",init_file);
+      stan::io::cmd_line command(argc,argv);
+
+      std::string data_path;
+      command.val("data_file",data_path);
+      std::fstream data_stream(data_path.c_str(),std::fstream::in);
+      stan::io::dump data_var_context(data_stream);
+      data_stream.close();
+
+      T_model model(data_var_context);
 
       std::string sample_file = "samples.csv";
       command.val("sample_file",sample_file);
@@ -101,7 +103,6 @@ namespace stan {
       command.val("delta", delta);
       
       std::cout << "NUTS" << std::endl;
-      std::cout << "init_file=" << init_file << std::endl;
       std::cout << "sample_file=" << sample_file << std::endl;
       std::cout << "num_iterations=" << num_iterations << std::endl;
       std::cout << "num_burnin=" << num_burnin << std::endl;
@@ -112,13 +113,22 @@ namespace stan {
       stan::mcmc::nuts sampler(model, 0.5, -1);
       sampler.adapt_on();
 
-      std::vector<double> params_r;
       std::vector<int> params_i;
-      if (inits_r.size() > 0 || inits_i.size() > 0) {
-	params_r = inits_r;
-	params_i = inits_i;
+      std::vector<double> params_r;
+      if (command.has_key("init")) {
+	std::string init_path;
+	command.val("init",init_path);
+	std::cout << "init file=" << init_path << std::endl;
+	
+	std::fstream init_stream(init_path.c_str(),std::fstream::in);
+	stan::io::dump init_var_context(init_stream);
+	init_stream.close();
+	model.transform_inits(init_var_context,params_i,params_r);
+
       } else {
-	// random inits instead of zero!
+	// FIXME:  default to random inits rather than 0s
+	params_i = std::vector<int>(model.num_params_i(),0.0);
+	params_r = std::vector<double>(model.num_params_r(),0.0);
       }
       for (unsigned int m = 0; m < num_iterations; ++m) {
 	std::cout << "iteration=" << (m + 1);
