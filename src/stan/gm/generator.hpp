@@ -246,59 +246,53 @@ namespace stan {
 				 unsigned int indent,
 				 const std::string& var_name,
 				 const std::string& base_type,
-				 const std::string& type_suffix,
 				 const std::vector<expression>& dims,
 				 const expression& type_arg1 = expression(),
 				 const expression& type_arg2 = expression()) {
-      std::stringstream base_type_suffix(base_type);
-      base_type_suffix << type_suffix;
       generate_indent(indent,o);
       o << var_name << " = ";
       generate_type(base_type,dims,dims.size(),o);
-      generate_initializer(o,base_type_suffix.str(),dims,type_arg1,type_arg2);
+      generate_initializer(o,base_type,dims,type_arg1,type_arg2);
     }
 
 
     struct var_resizing_visgen : public visgen {
-      const std::string type_suffix_;
-      var_resizing_visgen(std::ostream& o, const std::string& type_suffix) 
-	: visgen(o),
-	  type_suffix_(type_suffix) {
+      var_resizing_visgen(std::ostream& o) 
+	: visgen(o) {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"int","",x.dims_);
+	generate_initialization(o_,2U,x.name_,"int",x.dims_);
       }
       void operator()(double_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"double","",x.dims_);
+	generate_initialization(o_,2U,x.name_,"double",x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"vector_",type_suffix_,x.dims_,x.M_);
+	generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.M_);
       }
       void operator()(row_vector_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"row_vector_",type_suffix_,x.dims_,x.N_);
+	generate_initialization(o_,2U,x.name_,"row_vector_d",x.dims_,x.N_);
       }
       void operator()(simplex_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"vector_",type_suffix_,x.dims_,x.K_);
+	generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.K_);
       }
       void operator()(pos_ordered_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"vector_",type_suffix_,x.dims_,x.K_);
+	generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.K_);
       }
       void operator()(matrix_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"matrix_",type_suffix_,x.dims_,x.M_,x.N_);
+	generate_initialization(o_,2U,x.name_,"matrix_d",x.dims_,x.M_,x.N_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"matrix",type_suffix_,x.dims_,x.K_,x.K_);
+	generate_initialization(o_,2U,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
-	generate_initialization(o_,2U,x.name_,"matrix",type_suffix_,x.dims_,x.K_,x.K_);
+	generate_initialization(o_,2U,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
       }
     };
 
-    void generate_var_resizing(const std::string& type_suffix,
-			       const std::vector<var_decl>& vs,
+    void generate_var_resizing(const std::vector<var_decl>& vs,
 			       std::ostream& o) {
-      var_resizing_visgen vis(o,type_suffix);
+      var_resizing_visgen vis(o);
       for (unsigned int i = 0; i < vs.size(); ++i)
 	boost::apply_visitor(vis, vs[i].decl_);
     }
@@ -852,7 +846,7 @@ namespace stan {
       var_resizing_visgen var_resizer_;
       dump_member_var_visgen(std::ostream& o) 
 	: visgen(o),
-	  var_resizer_(var_resizing_visgen(o,"d")) {
+	  var_resizer_(var_resizing_visgen(o)) {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
@@ -1186,7 +1180,7 @@ namespace stan {
 
       generate_dump_member_var_inits(prog.data_decl_,o);
 
-      generate_var_resizing("d",prog.derived_data_decl_.first, o);
+      generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
 	generate_statement(prog.derived_data_decl_.second[i],2,o);
