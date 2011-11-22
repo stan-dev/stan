@@ -17,6 +17,7 @@ parameters {
     matrix(2,3) aa;
     matrix(4,5) bb[6];
     matrix(7,8) cc[9,10,11];
+    cov_matrix(5) cvcv;
 }
 derived parameters {
 }
