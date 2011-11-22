@@ -76,7 +76,9 @@ namespace stan {
     }
 
     void nuts_command(const stan::io::cmd_line& command,
-                      stan::mcmc::prob_grad& model) {
+                      stan::mcmc::prob_grad& model,
+		      const std::vector<double>& inits_r,
+		      const std::vector<int>& inits_i) {
 
       std::string init_file = "init.dump";
       command.val("init_file",init_file);
@@ -112,6 +114,12 @@ namespace stan {
 
       std::vector<double> params_r;
       std::vector<int> params_i;
+      if (inits_r.size() > 0 || inits_i.size() > 0) {
+	params_r = inits_r;
+	params_i = inits_i;
+      } else {
+	// random inits instead of zero!
+      }
       for (unsigned int m = 0; m < num_iterations; ++m) {
 	std::cout << "iteration=" << (m + 1);
 	if (m < num_burnin) {

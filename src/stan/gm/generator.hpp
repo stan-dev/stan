@@ -1782,19 +1782,34 @@ namespace stan {
       out << "int main(int argc__, const char* argv__[]) {" << EOL;
       out << INDENT << "try {" << EOL;
       out << INDENT2 << "stan::io::cmd_line cmd__(argc__,argv__);" << EOL;
+
+      out << EOL;
       out << INDENT2 << "std::string data_file_path__;" << EOL;
       out << INDENT2 << "cmd__.val(\"data_file\",data_file_path__);" << EOL;
       out << INDENT2 << "std::fstream data_file__(data_file_path__.c_str(),std::fstream::in);" << EOL;
       out << INDENT2 << "stan::io::dump dump__(data_file__);" << EOL;
-      
+      out << INDENT2 << "data_file__.close();" << EOL;
+
+      out << EOL;
       out << INDENT2 << model_name << "_namespace::" << model_name << " model__(dump__);" << EOL;
 
-      out << INDENT2 << "data_file__.close();" << EOL;
-      out << INDENT2 << "stan::gm::nuts_command(cmd__,model__);" << EOL;
+      out << EOL;
+      out << INDENT2 << "std::vector<double> inits_r__;" << EOL;
+      out << INDENT2 << "std::vector<int> inits_i__;" << EOL;
+      out << INDENT2 << "if (cmd__.has_key(\"init\")) {" << EOL;
+      out << INDENT3 << "std::string init_file_path__;" << EOL;
+      out << INDENT3 << "cmd__.val(\"init\",init_file_path__);" << EOL;
+      out << INDENT3 << "std::fstream init_file__(init_file_path__);" << EOL;
+      out << INDENT3 << "stan::io::dump init_dump__(init_file__);" << EOL;
+      out << INDENT3 << "model__.transform_inits(init_dump__,inits_r__,inits_i__);" << EOL;
+      out << INDENT2 << "}" << EOL;
+
+      out << EOL;
+      out << INDENT2 << "stan::gm::nuts_command(cmd__,model__,inits_r__,inits_i__);" << EOL;
 
       out << INDENT << "} catch (std::exception& e) {" << EOL;
       out << INDENT2 << "std::cerr << std::endl << \"Exception caught: \" << e.what() << std::endl;" << EOL;
-      out << INDENT2 << "std::cerr << \"Diagnostic informtion: \" << std::endl << boost::diagnostic_information(e) << std::endl;" << EOL;
+      out << INDENT2 << "std::cerr << \"Diagnostic information: \" << std::endl << boost::diagnostic_information(e) << std::endl;" << EOL;
       out << INDENT << "}" << EOL;
 
       out << "}" << EOL2;
