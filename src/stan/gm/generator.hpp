@@ -70,7 +70,7 @@ namespace stan {
       }
       void operator()(const int_literal& n) const { o_ << n.val_; }
       void operator()(const double_literal& x) const { o_ << x.val_; }
-      void operator()(const identifier& v) const { o_ << v.name_; }
+      void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const { o_ << n; }
       void operator()(double x) const { o_ << x; }
       void operator()(const std::string& x) const { o_ << x; } // identifiers

@@ -64,6 +64,7 @@ namespace stan {
     struct statements;
     struct unary_op;
     struct var;
+    struct variable;
     struct var_decl;
     struct var_type;
     struct vector_var_decl;
@@ -137,10 +138,10 @@ namespace stan {
       typedef boost::variant<nil, 
 			     int,
 			     double,
-			     std::string, // for identifiers
+			     // std::string, // for identifiers
 			     boost::recursive_wrapper<int_literal>,
 			     boost::recursive_wrapper<double_literal>,
-			     boost::recursive_wrapper<identifier>,
+			     boost::recursive_wrapper<variable>,
 			     boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
 			     boost::recursive_wrapper<binary_op>,
@@ -150,6 +151,8 @@ namespace stan {
       expression()
 	: expr_(nil()) {
       }
+
+      
 
       template <typename Expr>
       expression(const Expr& expr)
@@ -200,9 +203,9 @@ namespace stan {
       double val_;
     };
 
-    struct identifier {
-      identifier() { }
-      identifier(std::string name) : name_(name) { }
+    struct variable {
+      variable() { }
+      variable(std::string name) : name_(name) { }
       std::string name_;
     };
     

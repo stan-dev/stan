@@ -1,0 +1,44 @@
+\documentclass[11pt]{report}
+
+\title{Stan Manual: \\[8pt] {\bf Directed Graphical Model Compiler}}
+\author{{\it The Stan Development Team}}
+\date{\footnotesize \today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Stan's graphical model compiler converts a model specifying a joint
+  probability density into an executable sampler from that density.
+  The motivating use case is sampling from Bayesian posterior densities.
+  
+  This manual provides a getting-started guide and complete reference
+  for Stan's graphical model compiler.  The compiler converts a Stan
+  program specifying a directed graphical model into executable code
+  through the generation of a C++ program for the model written using
+  Stan's C++ modeling framework.  Stan's primary use is sampling
+  parameter values from the Bayesian posterior given a data set.
+
+  Stan generates samples using the no-U-turn sampler (NUTS), a variant
+  of Hamiltonian Monte Carlo sampling (HMC) that automatically tunes
+  its step size and number of leapfrog steps.  Variables are declared
+  with types and automatically transformed for use with HMC.  Each
+  variable in the program is declared as being data, derived data, a
+  parameter, or a derived parameter.  The sampler producs sample from
+  the model's distribution over the parameters.  
+
+  
+
+
+  graphical model description into C++ code, which may then be
+  compiled to perform sampling.  
+
+\end{abstract}
+
+\chapter{Getting Started}
+
+This section provides a quick demonstration of the end-to-end
+use of Stan's graphical model compiler.
+
+\end{document}

@@ -35,7 +35,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
 			  (double,val_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::identifier,
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable,
 			  (std::string,name_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
@@ -384,14 +384,10 @@ namespace stan {
 	
 	factor_r.name("factor");
 	factor_r
-	  = (int_ 
-	     >> !(  qi::lit('.')
-		    | qi::lit('e')
-		    | qi::lit('E') )
-	     )                           [_val = _1] 
-	  | double_                      [_val = _1] 
+	  = int_literal_r                [_val = _1]
+	  | double_literal_r             [_val = _1]
 	  | fun_r                        [_val = _1] 
-	  | identifier_r                 [_val = _1]
+	  | variable_r                   [_val = _1]
 	  | ( qi::lit('(') 
 	      > expression_r             [_val = _1] 
 	      > qi::lit(')') )
@@ -402,6 +398,22 @@ namespace stan {
 	      > factor_r                 [_val = _1]
 	      )
 	  ;
+
+	int_literal_r.name("integer literal");
+	int_literal_r
+	  = int_ 
+	     >> !( qi::lit('.')
+		   | qi::lit('e')
+		   | qi::lit('E') );
+
+	double_literal_r.name("double literal");
+	double_literal_r
+	  = double_;
+
+
+	variable_r.name("variable expression");
+	variable_r
+	  = identifier_r;
 
 	fun_r.name("function and argument expressions");
 	fun_r 
@@ -505,6 +517,9 @@ namespace stan {
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > expression_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > term_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > factor_r;
+      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > variable_r;
+      qi::rule<Iterator, int_literal(), whitespace_grammar<Iterator> > int_literal_r;
+      qi::rule<Iterator, double_literal(), whitespace_grammar<Iterator> > double_literal_r;
       qi::rule<Iterator, var(), whitespace_grammar<Iterator> > var_r;
       qi::rule<Iterator, fun(), whitespace_grammar<Iterator> > fun_r;
       qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > identifier_r;
