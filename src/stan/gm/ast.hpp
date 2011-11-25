@@ -136,9 +136,6 @@ namespace stan {
 
     struct expression {
       typedef boost::variant<nil, 
-			     int,
-			     double,
-			     // std::string, // for identifiers
 			     boost::recursive_wrapper<int_literal>,
 			     boost::recursive_wrapper<double_literal>,
 			     boost::recursive_wrapper<variable>,
@@ -195,18 +192,21 @@ namespace stan {
       int_literal() { }
       int_literal(int val) : val_(val) { }
       int val_;
+      expr_type type_;
     };
 
     struct double_literal {
       double_literal() { }
       double_literal(double val) : val_(val) { }
       double val_;
+      expr_type type_;
     };
 
     struct variable {
       variable() { }
       variable(std::string name) : name_(name) { }
       std::string name_;
+      expr_type type_;
     };
     
     struct fun {
@@ -218,8 +218,51 @@ namespace stan {
       }
       std::string name_;
       std::vector<expression> args_;
+      expr_type type_;
     };
     
+    struct index_op {
+      index_op() { }
+      index_op(const expression& expr,
+	       const std::vector<std::vector<expression> >& dimss)
+	: expr_(expr),
+	  dimss_(dimss) {
+      }
+      expression expr_;
+      std::vector<std::vector<expression> > dimss_;
+      expr_type type_;
+    };
+
+    struct binary_op {
+      binary_op(char op,
+		expression const& left,
+		expression const& right)
+        : op(op), 
+	  left(left), 
+	  right(right) {
+      }
+
+      char op;
+      expression left;
+      expression right;
+      expr_type type_;
+    };
+
+    struct unary_op {
+      unary_op(char op,
+	       expression const& subject)
+        : op(op), 
+	  subject(subject) {
+      }
+
+      char op;
+      expression subject;
+      expr_type type_;
+    };
+
+
+
+
     struct range {
       range() { } 
       range(expression const& low,
@@ -431,42 +474,6 @@ namespace stan {
       std::vector<var_decl> parameter_decl_;
       std::pair<std::vector<var_decl>,std::vector<statement> > derived_decl_;
       statement statement_;
-    };
-
-    struct binary_op {
-      binary_op(char op,
-		expression const& left,
-		expression const& right)
-        : op(op), 
-	  left(left), 
-	  right(right) {
-      }
-
-      char op;
-      expression left;
-      expression right;
-    };
-
-    struct unary_op {
-      unary_op(char op,
-	       expression const& subject)
-        : op(op), 
-	  subject(subject) {
-      }
-
-      char op;
-      expression subject;
-    };
-
-    struct index_op {
-      index_op() { }
-      index_op(const expression& expr,
-	       const std::vector<std::vector<expression> >& dimss)
-	: expr_(expr),
-	  dimss_(dimss) {
-      }
-      expression expr_;
-      std::vector<std::vector<expression> > dimss_;
     };
 
     struct sample {
