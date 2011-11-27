@@ -154,11 +154,22 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
-    struct add_var_decl {
-      typedef std::istreambuf_iterator<char> base_iterator_type;
-      typedef boost::spirit::multi_pass<base_iterator_type> forward_iterator_type;
-      typedef boost::spirit::classic::position_iterator2<forward_iterator_type> pos_iterator_type;
+    struct set_variable_type {
+      template <typename T1, typename T2>
+      struct result { typedef T1 type; };
+      template <typename T>
+      T operator()(T& var_expr, std::map<std::string,base_var_decl>& name_to_type) const {
+	if (name_to_type.find(var_expr.name_) == name_to_type.end()) {
+	  // FIXME: fail
+	}
+	var_expr.set_type(name_to_type[var_expr.name_].base_type_, 
+			  name_to_type[var_expr.name_].dims_.size());
+	return var_expr;
+      }
+    };
+    boost::phoenix::function<set_variable_type> set_var_type;
 
+    struct add_var_decl {
       template <typename T1, typename T2, typename T3>
       struct result { typedef T1 type; };
       template <typename T>
@@ -387,7 +398,7 @@ namespace stan {
 	  = int_literal_r                [_val = _1]
 	  | double_literal_r             [_val = _1]
 	  | fun_r                        [_val = _1] 
-	  | variable_r                   [_val = _1]
+	  | variable_r                   [_val = set_var_type(_1,boost::phoenix::ref(var_name_to_decl_))]
 	  | ( qi::lit('(') 
 	      > expression_r             [_val = _1] 
 	      > qi::lit(')') )
@@ -590,6 +601,9 @@ namespace stan {
 				   whitespace_grammar,
 				   result);
       } catch (const qi::expectation_failure<pos_iterator_type>& e) {
+	// std::stringstream msg;
+	// msg << "ITERATOR SPAN=" << std::endl
+	//     << std::string(position_begin,position_end);
 	const classic::file_position_base<std::string>& pos = e.first.get_position();
 	std::stringstream msg;
 	msg << "parse error at file " 

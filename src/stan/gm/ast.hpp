@@ -33,12 +33,12 @@ namespace stan {
 
   namespace gm {
 
-    namespace qi = boost::spirit::qi;
-    namespace ascii = boost::spirit::ascii;
-
     struct nil {
       /* placeholder val for boost::variant default ctors */
     };
+
+    namespace qi = boost::spirit::qi;
+    namespace ascii = boost::spirit::ascii;
 
     // components of abstract syntax tree 
     struct assignment;
@@ -69,12 +69,13 @@ namespace stan {
     struct var_type;
     struct vector_var_decl;
 
+
     enum base_expr_type {
       INT_T,
       DOUBLE_T,
       VECTOR_T, // includes: SIMPLEX_T, POS_ORDERED_T
       ROW_VECTOR_T,
-      MATRIX_T // includes: POS_SYM_DEF_MATRIX_T
+      MATRIX_T // includes: CORR_MATRIX_T, COV_MATRIX_T
     };
 
     class expr_type {
@@ -134,6 +135,17 @@ namespace stan {
       std::vector<statement> statements_;
     };
 
+    struct expression_type_vis : public boost::static_visitor<expr_type> {
+      expr_type operator()(const nil& e) const {
+	return expr_type();
+      }
+      template <typename T>
+      expr_type operator()(const T& e) const {
+	return e.type_;
+      }
+    };
+
+
     struct expression {
       typedef boost::variant<nil, 
 			     boost::recursive_wrapper<int_literal>,
@@ -145,11 +157,14 @@ namespace stan {
 			     boost::recursive_wrapper<unary_op> > 
       expression_t;
 
+      expr_type expression_type() {
+	expression_type_vis vis;
+	return boost::apply_visitor(vis,expr_);
+      }
+
       expression()
 	: expr_(nil()) {
       }
-
-      
 
       template <typename Expr>
       expression(const Expr& expr)
@@ -160,7 +175,6 @@ namespace stan {
       expression& operator-=(expression const& rhs);
       expression& operator*=(expression const& rhs);
       expression& operator/=(expression const& rhs);
-
 
       expression_t expr_;
     };
@@ -202,9 +216,15 @@ namespace stan {
       expr_type type_;
     };
 
+    // struct base_var_decl;
+
     struct variable {
       variable() { }
       variable(std::string name) : name_(name) { }
+      void set_type(const base_expr_type& base_type, 
+		    unsigned int num_dims) {
+	type_ = expr_type(base_type, num_dims);
+      }
       std::string name_;
       expr_type type_;
     };
@@ -259,9 +279,6 @@ namespace stan {
       expression subject;
       expr_type type_;
     };
-
-
-
 
     struct range {
       range() { } 

@@ -18,7 +18,7 @@ namespace stan {
   namespace io {
 
      namespace {
-       double product(std::vector<unsigned int> dims) {
+       unsigned int product(std::vector<unsigned int> dims) {
 	 unsigned int y = 1U;
 	 for (unsigned int i = 0; i < dims.size(); ++i)
 	   y *= dims[i];
