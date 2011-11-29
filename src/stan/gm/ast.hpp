@@ -75,7 +75,8 @@ namespace stan {
       DOUBLE_T,
       VECTOR_T, // includes: SIMPLEX_T, POS_ORDERED_T
       ROW_VECTOR_T,
-      MATRIX_T // includes: CORR_MATRIX_T, COV_MATRIX_T
+      MATRIX_T,
+      ILL_FORMED_T // includes: CORR_MATRIX_T, COV_MATRIX_T
     };
 
     class expr_type {
@@ -84,7 +85,7 @@ namespace stan {
       unsigned int num_dims_;
     public:
       expr_type() 
-	: base_type_(DOUBLE_T),
+	: base_type_(ILL_FORMED_T),
 	  num_dims_(0) { 
       }
       expr_type(const base_expr_type base_type) 
@@ -105,14 +106,44 @@ namespace stan {
 	num_dims_ = et.num_dims_;
 	return *this;
       }
-      base_expr_type type() {
+      bool is_primitive() const {
+	return (base_type_ == INT_T
+		|| base_type_ == DOUBLE_T)
+	  && num_dims_ == 0U;
+      }
+      base_expr_type type() const {
 	return base_type_;
       }
-      int num_dims() {
+      int num_dims() const {
 	return num_dims_;
       }
     };
 
+    std::ostream& operator<<(std::ostream& o, const expr_type& et) {
+      switch (et.type()) {
+      case INT_T: o << "int"; break;
+      case DOUBLE_T: o << "double"; break;
+      case VECTOR_T: o << "vector"; break;
+      case ROW_VECTOR_T: o << "row_vector"; break;
+      case MATRIX_T: o << "matrix"; break;
+      case ILL_FORMED_T: o << "ill_formed"; break;
+      }
+      o << '[' << et.num_dims() << ']';
+      return o;
+    }
+
+    expr_type promote_primitive(const expr_type& et) {
+      if (!et.is_primitive())
+	return expr_type();
+      return et;
+    }
+
+    expr_type promote_primitive(const expr_type& et1,
+				const expr_type& et2) {
+      if (!et1.is_primitive() || !et2.is_primitive())
+	return expr_type();
+      return et1.type() == DOUBLE_T ? et1 : et2;
+    }
 
     struct distribution {
       distribution() {
@@ -157,7 +188,7 @@ namespace stan {
 			     boost::recursive_wrapper<unary_op> > 
       expression_t;
 
-      expr_type expression_type() {
+      expr_type expression_type() const {
 	expression_type_vis vis;
 	return boost::apply_visitor(vis,expr_);
       }
@@ -203,15 +234,35 @@ namespace stan {
     };
 
     struct int_literal {
-      int_literal() { }
-      int_literal(int val) : val_(val) { }
+      int_literal()
+	: type_(INT_T,0U) { 
+      }
+      int_literal(int val) 
+      : val_(val), 
+	type_(INT_T,0U) { 
+      }
+      int_literal& operator=(const int_literal& il) {
+	val_ = il.val_;
+	type_ = il.type_;
+	return *this;
+      }
       int val_;
       expr_type type_;
     };
 
     struct double_literal {
-      double_literal() { }
-      double_literal(double val) : val_(val) { }
+      double_literal() 
+	: type_(DOUBLE_T,0U) { 
+      }
+      double_literal& operator=(const double_literal& dl) {
+	val_ = dl.val_;
+	type_ = dl.type_;
+	return *this;
+      }
+      double_literal(double val)
+      : val_(val),
+	type_(DOUBLE_T,0U) {
+      }
       double val_;
       expr_type type_;
     };
@@ -229,24 +280,139 @@ namespace stan {
       expr_type type_;
     };
     
+    typedef std::pair<expr_type, std::vector<expr_type> > function_signature_t;
+
+    std::map<std::string, std::vector<function_signature_t> > base_map();
+
+    // this is the global function type map:  stan::gm::function_type_map
+    static std::map<std::string, std::vector<function_signature_t> > function_type_map
+    = base_map();
+
+    void add_function_signature(const std::string& function_name,
+				const expr_type& result_type,
+				const std::vector<expr_type>& arg_types) {
+      function_type_map[function_name].push_back(function_signature_t(result_type,arg_types));
+    }
+
+    void add_function_signature(const std::string& function_name,
+				const expr_type& result_type) {
+      std::vector<expr_type> arg_types;
+      add_function_signature(function_name,result_type,arg_types);
+    }
+
+    void add_function_signature(const std::string& function_name,
+				const expr_type& result_type,
+				const expr_type& arg_type) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type);
+      add_function_signature(function_name,result_type,arg_types);
+    }
+
+    void add_function_signature(const std::string& function_name,
+				const expr_type& result_type,
+				const expr_type& arg_type1,
+				const expr_type& arg_type2) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      add_function_signature(function_name,result_type,arg_types);
+    }
+
+    void add_function_signature(const std::string& function_name,
+				const expr_type& result_type,
+				const expr_type& arg_type1,
+				const expr_type& arg_type2,
+				const expr_type& arg_type3) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      add_function_signature(function_name,result_type,arg_types);
+    }
+
+    void add_function_signature(const std::string& function_name,
+				const expr_type& result_type,
+				const expr_type& arg_type1,
+				const expr_type& arg_type2,
+				const expr_type& arg_type3,
+				const expr_type& arg_type4) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      add_function_signature(function_name,result_type,arg_types);
+    }
+
+    std::map<std::string, std::vector<function_signature_t> > base_map() {
+      std::map<std::string, std::vector<function_signature_t> > result;
+      
+      add_function_signature("normal",
+			     expr_type(DOUBLE_T,0U),
+			     expr_type(DOUBLE_T,0U),
+			     expr_type(DOUBLE_T,0U),
+			     expr_type(DOUBLE_T,0U));
+
+      return result;
+    }
+
+    bool equal_arg_type(const expr_type& type1,
+			const expr_type& type2) {
+      return type1.type() == type2.type()
+	&& type1.num_dims() == type2.num_dims();
+    }
+
+    bool equal_arg_types(const std::vector<expr_type> types,
+			 const std::vector<expression> args) {
+      if (types.size() != args.size()) return false;
+      for (unsigned int i = 0; i < types.size(); ++i)
+	if (!equal_arg_type(types[i],args[i].expression_type()))
+	  return false;
+      return true;
+    }
+
+    expr_type get_result_type(const std::string& function_name,
+			      const std::vector<expression>& args) {
+      std::vector<function_signature_t> signature_vec = function_type_map[function_name];
+      for (unsigned int i = 0; i < signature_vec.size(); ++i)
+	if (equal_arg_types(signature_vec[i].second, args))
+	  return signature_vec[i].first;
+      return expr_type();
+    }
+
+    // add_function_signature("normal",
+    // expr_type(DOUBLE_T,0));
+			   
+
     struct fun {
       fun() { }
       fun(std::string const& name,
 	  std::vector<expression> const& args) 
 	: name_(name),
-	  args_(args) {
+	  args_(args),
+	  type_(get_result_type(name,args)) {
       }
       std::string name_;
       std::vector<expression> args_;
       expr_type type_;
     };
     
+    unsigned int total_dims(const std::vector<std::vector<expression> >& dimss) {
+      unsigned int total = 0U;
+      for (unsigned int i = 0; i < dimss.size(); ++i)
+	total += dimss[i].size();
+      return total;
+    }
+
     struct index_op {
       index_op() { }
+      // vec of vec for e.g., e[1,2][3][4,5,6]
       index_op(const expression& expr,
-	       const std::vector<std::vector<expression> >& dimss)
+	       const std::vector<std::vector<expression> >& dimss) 
 	: expr_(expr),
-	  dimss_(dimss) {
+	  dimss_(dimss),
+	  type_(expr.expression_type().type(),
+		expr.expression_type().num_dims() - total_dims(dimss)) {
       }
       expression expr_;
       std::vector<std::vector<expression> > dimss_;
@@ -259,9 +425,11 @@ namespace stan {
 		expression const& right)
         : op(op), 
 	  left(left), 
-	  right(right) {
+	  right(right),
+	  type_(promote_primitive(left.expression_type(),
+				  right.expression_type())) {
+	// std::cout << "binary_op, left=" << left.expression_type() << "; right=" << right.expression_type() << "; calctype=" << type_ << std::endl;
       }
-
       char op;
       expression left;
       expression right;
@@ -272,9 +440,9 @@ namespace stan {
       unary_op(char op,
 	       expression const& subject)
         : op(op), 
-	  subject(subject) {
+	  subject(subject),
+	  type_(promote_primitive(subject.expression_type())) {
       }
-
       char op;
       expression subject;
       expr_type type_;

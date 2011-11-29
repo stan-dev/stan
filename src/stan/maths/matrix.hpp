@@ -238,6 +238,20 @@ namespace stan {
 
     /**
      * Returns the sample mean (i.e., average) of the coefficients
+     * in the specified standard vector.
+     * @param v Specified vector.
+     * @return Sample mean of vector coefficients.
+     */
+    template <typename T>
+    inline double mean(const std::vector<T>& v) {
+      double sum(0);
+      for (unsigned int i = 0; i < v.size(); ++i)
+	sum += v[i];
+      return sum / v.size();
+    }
+
+    /**
+     * Returns the sample mean (i.e., average) of the coefficients
      * in the specified column vector.
      * @param v Specified vector.
      * @return Sample mean of vector coefficients.

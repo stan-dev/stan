@@ -29,14 +29,14 @@
 #include <vector>
 
 // ADAPT must be in global namespace 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
-			  (int,val_) )
+// BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
+// 			  (int,val_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
-			  (double,val_) )
+// BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
+// 			  (double,val_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable,
-			  (std::string,name_) )
+// BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable,
+//			  (std::string,name_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
 			  (stan::gm::range, range_)
@@ -148,7 +148,8 @@ namespace stan {
     struct negate_expr {
       template <typename T>
       struct result { typedef T type; };
-      expression operator()(expression const& expr) const {
+
+      expression operator()(const expression& expr) const {
 	return expression(unary_op('-', expr));
       }
     };
@@ -422,6 +423,7 @@ namespace stan {
 	  = double_;
 
 
+	// no optional dims in the variable_r
 	variable_r.name("variable expression");
 	variable_r
 	  = identifier_r;
@@ -475,7 +477,7 @@ namespace stan {
 	distribution_r
 	  = identifier_r
 	  >> qi::lit('(')
-	  >> (expression_r % ',')
+	  >> -(expression_r % ',')
 	  > qi::lit(')');
 
 	sample_r.name("distribution of expression");
