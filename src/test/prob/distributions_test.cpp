@@ -48,7 +48,6 @@ TEST(prob_prob,normal_p_exception_sigma) {
   EXPECT_THROW (stan::prob::normal_p (0.0, 0.0, sigma), std::domain_error);  
 }
 
-
 TEST(prob_prob,norm_trunc_lh) {
   // values from R dnorm()
   double mu;

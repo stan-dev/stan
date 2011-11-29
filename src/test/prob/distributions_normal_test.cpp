@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 #include <boost/math/policies/policy.hpp>
-#include "stan/prob/distributions.hpp"
+#include "stan/prob/distributions_normal.hpp"
 
 TEST(distributions,Normal) {
   // values from R dnorm()

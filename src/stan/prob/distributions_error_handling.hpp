@@ -50,17 +50,15 @@ namespace stan {
 			const std::vector<T_x>& x,
 			T_result* result,
 			const Policy& pol) {
-      bool error = false;
       for (int i = 0; i < x.size(); i++) {
-	if (error == false && !(boost::math::isfinite)(x[i])) {
+	if (!(boost::math::isfinite)(x[i])) {
 	  *result = boost::math::policies::raise_domain_error<T_x>(function,
 								   "Random variate x is %1%, but must be finite!",
 								   x[i], pol);
-	  error = true;
 	  return false;
 	}
-	return true;
       }
+      return true;
       // Note that this test catches both infinity and NaN.
       // Some special cases permit x to be infinite, so these must be tested 1st,
       // leaving this test to catch any NaNs.  see Normal and cauchy for example.
@@ -151,7 +149,114 @@ namespace stan {
 	}
       return true;
     }
-      
+
+    template <typename T_bound, typename T_result, class Policy>
+    inline bool check_lower_bound(
+			       const char* function,
+			       const T_bound& lb,
+			       T_result* result,
+			       const Policy& pol) {
+      if(!(boost::math::isfinite)(lb)) {
+	*result = boost::math::policies::raise_domain_error<T_bound>(
+									function,
+									"Lower bound is %1%, but must be finite!", lb, pol);
+	return false;
+      }
+      return true;
+    }
+
+    template <typename T_result, class Policy>
+    inline bool check_lower_bound(
+			       const char* function,
+			       const stan::agrad::var& lb,
+			       T_result* result,
+			       const Policy& pol) {
+      if(!(boost::math::isfinite)(lb.val()))
+	{
+	  *result = boost::math::policies::raise_domain_error<double>(
+								      function,
+								      "Lower bound is %1%, but must be finite!", lb.val(), pol);
+	  return false;
+	}
+      return true;
+    }
+
+    template <typename T_bound, typename T_result, class Policy>
+    inline bool check_upper_bound(
+			       const char* function,
+			       const T_bound& ub,
+			       T_result* result,
+			       const Policy& pol) {
+      if(!(boost::math::isfinite)(ub)) {
+	*result = boost::math::policies::raise_domain_error<T_bound>(
+									function,
+									"Upper bound is %1%, but must be finite!", ub, pol);
+	return false;
+      }
+      return true;
+    }
+
+    template <typename T_result, class Policy>
+    inline bool check_upper_bound(
+			       const char* function,
+			       const stan::agrad::var& ub,
+			       T_result* result,
+			       const Policy& pol) {
+      if(!(boost::math::isfinite)(ub.val()))
+	{
+	  *result = boost::math::policies::raise_domain_error<double>(
+								      function,
+								      "Upper bound is %1%, but must be finite!", ub.val(), pol);
+	  return false;
+	}
+      return true;
+    }
+
+    template <typename T_lb, typename T_ub, typename T_result, class Policy>
+    inline bool check_bounds(
+			     const char* function,
+			     const T_lb& lower,
+			     const T_ub& upper,
+			     T_result* result,
+			     const Policy& pol) {
+      if (false == check_lower_bound(function, lower, result, pol))
+	return false;
+      if (false == check_upper_bound(function, upper, result, pol))
+	return false;
+      if (lower >= upper) {
+	*result = boost::math::policies::raise_domain_error<T_lb>(function,
+								  "lower parameter is %1%, but must be less than upper!", lower, pol);
+	return false;
+      }
+      return true;
+    }
+
+
+    template <typename T_ub, typename T_result, class Policy>
+    inline bool check_bounds(
+			     const char* function,
+			     const stan::agrad::var& lower,
+			     const T_ub& upper,
+			     T_result* result,
+			     const Policy& pol) {
+      if (false == check_lower_bound(function, lower, result, pol))
+	return false;
+      if (false == check_upper_bound(function, upper, result, pol))
+	return false;
+      if (lower >= upper) {
+	*result = boost::math::policies::raise_domain_error<double>(function,
+								    "lower parameter is %1%, but must be less than upper!", lower.val(), pol);
+	return false;
+      }
+      return true;
+    }
+
+
+
+
+    
   }}
 
+
+    
 #endif
