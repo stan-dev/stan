@@ -70,13 +70,53 @@ namespace stan {
 			const std::vector<stan::agrad::var>& x,
 			T_result* result,
 			const Policy& pol) {
-      bool error = false;
       for (int i = 0; i < x.size(); i++) {
-	if (error == false && !(boost::math::isfinite)(x[i].val())) {
+	if (!(boost::math::isfinite)(x[i].val())) {
 	  *result = boost::math::policies::raise_domain_error<double>(function,
 								      "Random variate x is %1%, but must be finite!",
 								      x[i].val(), pol);
-	  error = true;
+	  return false;
+	}
+	return true;
+      }
+      return true;
+      // Note that this test catches both infinity and NaN.
+      // Some special cases permit x to be infinite, so these must be tested 1st,
+      // leaving this test to catch any NaNs.  see Normal and cauchy for example.
+    } // bool check_x
+
+
+template <typename T_x, typename T_result, class Policy>
+    inline bool check_x(
+			const char* function,
+			const Eigen::Matrix<T_x,Eigen::Dynamic,1>& x,
+			T_result* result,
+			const Policy& pol) {
+      for (int i = 0; i < x.rows(); i++) {
+	if (!(boost::math::isfinite)(x[i])) {
+	  *result = boost::math::policies::raise_domain_error<T_x>(function,
+								   "Random variate x is %1%, but must be finite!",
+								   x[i], pol);
+	  return false;
+	}
+      }
+      return true;
+      // Note that this test catches both infinity and NaN.
+      // Some special cases permit x to be infinite, so these must be tested 1st,
+      // leaving this test to catch any NaNs.  see Normal and cauchy for example.
+    }
+    
+    template <typename T_result, class Policy>
+    inline bool check_x(
+			const char* function,
+			const Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>& x,
+			T_result* result,
+			const Policy& pol) {
+      for (int i = 0; i < x.rows(); i++) {
+	if (!(boost::math::isfinite)(x[i].val())) {
+	  *result = boost::math::policies::raise_domain_error<double>(function,
+								      "Random variate x is %1%, but must be finite!",
+								      x[i].val(), pol);
 	  return false;
 	}
 	return true;
@@ -251,12 +291,42 @@ namespace stan {
       return true;
     }
 
-
-
-
     
-  }}
+    template <typename T_covar, typename T_result, class Policy>
+    inline bool check_cov_matrix(
+				 const char* function,
+				 const Matrix<T_covar,Dynamic,Dynamic>& Sigma,
+				 T_result* result,
+				 const Policy& pol) {
+      if (!stan::prob::cov_matrix_validate(Sigma)) {
+	*result = boost::math::policies::raise_domain_error<T_covar>(function,
+								     "Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite.", 
+								     Sigma(0,0),
+								     pol);
+	return false;
+      }
+      return true;
+    }
 
 
-    
+    template <typename T_result, class Policy>
+    inline bool check_cov_matrix(
+				 const char* function,
+				 const Matrix<stan::agrad::var,Dynamic,Dynamic>& Sigma,
+				 T_result* result,
+				 const Policy& pol) {
+      if (!stan::prob::cov_matrix_validate(Sigma)) {
+	*result = boost::math::policies::raise_domain_error<double>(function,
+								    "Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite.", 
+								    Sigma(0,0),
+								    pol);
+	return false;
+      }
+      return true;
+    }
+
+
+
+  }
+}
 #endif

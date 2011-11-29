@@ -11,26 +11,6 @@ using Eigen::Array;
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-TEST(prob_prob,uniform) {
-  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(0.2,0.0,1.0)));
-  EXPECT_FLOAT_EQ(2.0, exp(stan::prob::uniform_log(0.2,-0.25,0.25)));
-  EXPECT_FLOAT_EQ(0.1, exp(stan::prob::uniform_log(101.0,100.0,110.0)));
-  // lower boundary
-  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(0.0,0.0,1.0)));
-  EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(-1.0,0.0,1.0)));
-  // upper boundary
-  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(1.0,0.0,1.0)));
-  EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(2.0,0.0,1.0)));  
-}
-TEST(prob_prob,uniform_exception) {
-  // lower bound higher than the upper bound
-  EXPECT_THROW (stan::prob::uniform_log(0.0,1.0,0.0), std::invalid_argument);
-  // lower and upper boundary the same
-  EXPECT_THROW (stan::prob::uniform_log(0.0, 0.0, 0.0), std::invalid_argument);
-  EXPECT_THROW (stan::prob::uniform_log(1.0, 0.0, 0.0), std::invalid_argument);
-  EXPECT_THROW (stan::prob::uniform_log(-1.0, 0.0, 0.0), std::invalid_argument);
-}
-
 TEST(prob_prob,normal_p) {
   // values from R pnorm()
   EXPECT_FLOAT_EQ(0.5000000, stan::prob::normal_p (0.0, 0.0, 1.0));
@@ -280,32 +260,6 @@ TEST(prob_prob,dirichlet) {
   Matrix<double,Dynamic,1> alpha2(4,1);
   alpha2 << 10.5, 11.5, 19.3, 5.1;
   EXPECT_FLOAT_EQ(-43.40045, stan::prob::dirichlet_log(theta2,alpha2));
-}
-
-TEST(prob_prob,multi_normal) {
-  Matrix<double,Dynamic,1> y(3,1);
-  y << 2.0, -2.0, 11.0;
-  Matrix<double,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<double,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log<double>(y,mu,Sigma));
-}
-TEST(prob_prob,multi_normal_exception) {
-  Matrix<double,Dynamic,1> y(2,1);
-  y << 2.0, -2.0;
-  Matrix<double,Dynamic,1> mu(2,1);
-  mu << 1.0, -1.0;
-  Matrix<double,Dynamic,Dynamic> Sigma(2,2);
-  Sigma << 9.0, -3.0, -3.0, 4.0;
-  EXPECT_NO_THROW (stan::prob::multi_normal_log<double>(y, mu, Sigma));
-
-  // non-symmetric
-  Sigma(0, 1) = -2.5;
-  EXPECT_THROW (stan::prob::multi_normal_log<double>(y, mu, Sigma), std::domain_error);
-  Sigma(0, 1) = Sigma(1,0);
 }
 
 
