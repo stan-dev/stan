@@ -8,7 +8,7 @@
 namespace stan { 
   namespace prob {
     // reimplementing: #include <boost/math/distributions/detail/common_error_handling.hpp>
-
+    
     template <typename T_x, typename T_result, class Policy>
     inline bool check_x(
 			const char* function,
@@ -44,6 +44,52 @@ namespace stan {
       // leaving this test to catch any NaNs.  see Normal and cauchy for example.
     } // bool check_x
     
+    template <typename T_x, typename T_result, class Policy>
+    inline bool check_x(
+			const char* function,
+			const std::vector<T_x>& x,
+			T_result* result,
+			const Policy& pol) {
+      bool error = false;
+      for (int i = 0; i < x.size(); i++) {
+	if (error == false && !(boost::math::isfinite)(x[i])) {
+	  *result = boost::math::policies::raise_domain_error<T_x>(function,
+								   "Random variate x is %1%, but must be finite!",
+								   x[i], pol);
+	  error = true;
+	  return false;
+	}
+	return true;
+      }
+      // Note that this test catches both infinity and NaN.
+      // Some special cases permit x to be infinite, so these must be tested 1st,
+      // leaving this test to catch any NaNs.  see Normal and cauchy for example.
+    }
+    
+    template <typename T_result, class Policy>
+    inline bool check_x(
+			const char* function,
+			const std::vector<stan::agrad::var>& x,
+			T_result* result,
+			const Policy& pol) {
+      bool error = false;
+      for (int i = 0; i < x.size(); i++) {
+	if (error == false && !(boost::math::isfinite)(x[i].val())) {
+	  *result = boost::math::policies::raise_domain_error<double>(function,
+								      "Random variate x is %1%, but must be finite!",
+								      x[i].val(), pol);
+	  error = true;
+	  return false;
+	}
+	return true;
+      }
+      return true;
+      // Note that this test catches both infinity and NaN.
+      // Some special cases permit x to be infinite, so these must be tested 1st,
+      // leaving this test to catch any NaNs.  see Normal and cauchy for example.
+    } // bool check_x
+
+
     template <typename T_scale, typename T_result, class Policy>
     inline bool check_scale(
 			    const char* function,

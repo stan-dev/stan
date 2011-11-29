@@ -50,11 +50,11 @@ inline bool check_scale(
       const Policy& pol)
 {
    if((scale <= 0) || !(boost::math::isfinite)(scale))
-   { // Assume scale == 0 is NOT valid for any distribution.
-      *result = policies::raise_domain_error<RealType>(
-         function,
-         "Scale parameter is %1%, but must be > 0 !", scale, pol);
-      return false;
+     { // Assume scale == 0 is NOT valid for any distribution.
+       *result = policies::raise_domain_error<RealType>(
+							function,
+							"Scale parameter is %1%, but must be > 0 !", scale, pol);
+     return false;
    }
    return true;
 }
