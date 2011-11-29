@@ -264,7 +264,7 @@ TEST(io_dump, dump_abs_ref) {
 }
 
 TEST(io_dump, dump_file) {
-  std::fstream in("src/models/normal_estimate/normal_estimate.data");
+  std::fstream in("src/models/normal_estimate/normal_estimate.Rdata");
   stan::io::dump dump(in);
   EXPECT_TRUE(dump.contains_i("N"));
   stan::io::var_context& context = dump;
