@@ -48,24 +48,6 @@ TEST(prob_prob,normal_p_exception_sigma) {
   EXPECT_THROW (stan::prob::normal_p (0.0, 0.0, sigma), std::domain_error);  
 }
 
-TEST(prob_prob,normal_vec) {
-  double mu = -2.9;
-  double sigma = 1.7;
-
-  std::vector<double> x;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::normal_log(x,mu,sigma));
-
-  x.push_back(-2.0);
-  x.push_back(-1.5);
-  x.push_back(0.0);
-  x.push_back(12.0);
-  
-  double lp = 0.0;
-  for (unsigned int i = 0; i < x.size(); ++i)
-    lp += stan::prob::normal_log(x[i],mu,sigma);
-		  
-  EXPECT_FLOAT_EQ(lp, stan::prob::normal_log(x,mu,sigma));
-}
 
 TEST(prob_prob,norm_trunc_lh) {
   // values from R dnorm()
