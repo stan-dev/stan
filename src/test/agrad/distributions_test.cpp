@@ -2,8 +2,10 @@
 #include <gtest/gtest.h>
 #include <boost/exception/all.hpp>
 #include <Eigen/Dense>
-#include "stan/prob/distributions.hpp"
+#include "stan/agrad/agrad.hpp"
 #include "stan/maths/special_functions.hpp"
+#include "stan/prob/distributions.hpp"
+
 
 
 using Eigen::Array;
