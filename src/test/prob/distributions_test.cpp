@@ -136,18 +136,6 @@ TEST(prob_prob,norm_trunc_h_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
 }
 
-TEST(prob_prob,chi_square) {
-  EXPECT_FLOAT_EQ(-3.835507, stan::prob::chi_square_log(7.9,3.0));
-  EXPECT_FLOAT_EQ(-2.8927, stan::prob::chi_square_log(1.9,0.5));
-}
-TEST(prob_prob,chi_square_exception) {
-  double y = 0.0;
-  double nu = 0.0;
-  EXPECT_THROW(stan::prob::chi_square_log(y, nu), std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_log(y, -1), std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_log(-1, nu), std::domain_error);
-}
-
 TEST(prob_prob,inv_chi_square) {
   EXPECT_FLOAT_EQ(-0.3068528, stan::prob::inv_chi_square_log(0.5,2.0));
   EXPECT_FLOAT_EQ(-12.28905, stan::prob::inv_chi_square_log(3.2,9.1));
