@@ -197,15 +197,19 @@ namespace stan {
 	: expr_(nil()) {
       }
 
+      expression(const expression& e) 
+	: expr_(e.expr_) {
+      }
+
       template <typename Expr>
       expression(const Expr& expr)
 	: expr_(expr) {
       }
 
-      expression& operator+=(expression const& rhs);
-      expression& operator-=(expression const& rhs);
-      expression& operator*=(expression const& rhs);
-      expression& operator/=(expression const& rhs);
+      expression& operator+=(const expression& rhs);
+      expression& operator-=(const expression& rhs);
+      expression& operator*=(const expression& rhs);
+      expression& operator/=(const expression& rhs);
 
       expression_t expr_;
     };
@@ -240,6 +244,10 @@ namespace stan {
       int_literal(int val) 
       : val_(val), 
 	type_(INT_T,0U) { 
+      }
+      int_literal(const int_literal& il) 
+	: val_(il.val_),
+	  type_(il.type_) {
       }
       int_literal& operator=(const int_literal& il) {
 	val_ = il.val_;
@@ -420,15 +428,16 @@ namespace stan {
     };
 
     struct binary_op {
-      binary_op(char op,
-		expression const& left,
-		expression const& right)
+      binary_op() {
+      }
+      binary_op(const expression& left,
+		char op,
+		const expression& right)
         : op(op), 
 	  left(left), 
 	  right(right),
 	  type_(promote_primitive(left.expression_type(),
 				  right.expression_type())) {
-	// std::cout << "binary_op, left=" << left.expression_type() << "; right=" << right.expression_type() << "; calctype=" << type_ << std::endl;
       }
       char op;
       expression left;
@@ -685,23 +694,25 @@ namespace stan {
       expression expr_;
     };
       
+    void generate_expression(const expression& e, std::ostream& o);
+
     expression& expression::operator+=(const expression& rhs) {
-      expr_ = binary_op('+', expr_, rhs);
+      expr_ = binary_op(expr_, '+', rhs);
       return *this;
     }
 
     expression& expression::operator-=(const expression& rhs) {
-      expr_ = binary_op('-', expr_, rhs);
+      expr_ = binary_op(expr_, '-', rhs);
       return *this;
     }
 
     expression& expression::operator*=(expression const& rhs) {
-      expr_ = binary_op('*', expr_, rhs);
+      expr_ = binary_op(expr_, '*', rhs);
       return *this;
     }
 
     expression& expression::operator/=(expression const& rhs) {
-      expr_ = binary_op('/', expr_, rhs);
+      expr_ = binary_op(expr_, '/', rhs);
       return *this;
     }
 

@@ -29,14 +29,20 @@
 #include <vector>
 
 // ADAPT must be in global namespace 
-// BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
-// 			  (int,val_) )
 
-// BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
-// 			  (double,val_) )
+// not using adaptation relies on unary constructor
 
-// BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable,
-//			  (std::string,name_) )
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
+			  (int,val_)
+                          (stan::gm::expr_type,type_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
+ 			  (double,val_)
+			  (stan::gm::expr_type,type_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable,
+			  (std::string,name_)
+			  (stan::gm::expr_type,type_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
 			  (stan::gm::range, range_)
@@ -105,7 +111,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
 			  (stan::gm::range, range_)
 			  (stan::gm::statement, statement_) )
 namespace {
-  // hack to pass pair into macro to adapt
+  // hack to pass pair into macro below to adapt
   struct DUMMY_STRUCT {
     typedef std::pair<std::vector<stan::gm::var_decl>,std::vector<stan::gm::statement> > type;
   };
@@ -154,6 +160,23 @@ namespace stan {
       }
     };
     boost::phoenix::function<negate_expr> neg;
+
+
+    // the following is for debugging:
+    // void generate_expression(const expression& e, std::ostream& o);
+    // struct print_expr {
+    //   template <typename T1, typename T2>
+    //   struct result { typedef void type; };
+
+    //   void operator()(const expression& e, const std::string& s) const {
+    // 	std::cout << "***print_expression " << s << std::endl;
+    // 	std::cout << "    expr=";
+    // 	generate_expression(e,std::cout);
+    // 	std::cout << std::endl;
+    // 	std::cout << "    type=" << e.expression_type() << std::endl;
+    //   }
+    // };
+    // boost::phoenix::function<print_expr> print;
 
     struct set_variable_type {
       template <typename T1, typename T2>
@@ -369,34 +392,31 @@ namespace stan {
 
 	expression_r.name("expression");
 	expression_r 
-	  =  term_r                           [_val = _1]
-	  >> *( (qi::lit('+') > term_r        [_val += _1])
-		|   (qi::lit('-') > term_r    [_val -= _1])
-		)
+	  %=  term_r                           [_val = _1]
+	  >> *( (qi::lit('+') > term_r         [_val += _1])
+		 |   (qi::lit('-') > term_r    [_val -= _1])
+	      )
 	  ;
+
+	// cf.
+	// expression_r = term_r | term_r >> '+' expression_r | term_r >> '-' expression_r
 
 	term_r.name("term");
 	term_r 
-	  = ( indexed_factor_r                           [_val = _1]
+	  %= ( indexed_factor_r                          [_val = _1]
 	      >> *( (qi::lit('*') > indexed_factor_r     [_val *= _1])
 		    | (qi::lit('/') > indexed_factor_r   [_val /= _1])
 		    )
 	      )
 	  ;
 
-	// can't get it to compile w/o indirection and assignment =
-
-	indexed_factor_r.name("(optionally) indexed factor");
+	indexed_factor_r.name("(optionally) indexed factor [sub]");
 	indexed_factor_r
-	  = indexed_factor_sub_r [_val = _1];
-
-	indexed_factor_sub_r.name("(optionally) indexed factor [sub]");
-	indexed_factor_sub_r
-	  = (factor_r >> (*dims_r));
+	  %= (factor_r >> (*dims_r));
 	
 	factor_r.name("factor");
 	factor_r
-	  = int_literal_r                [_val = _1]
+	  %= int_literal_r               [_val = _1]
 	  | double_literal_r             [_val = _1]
 	  | fun_r                        [_val = _1] 
 	  | variable_r                   [_val = set_var_type(_1,boost::phoenix::ref(var_name_to_decl_))]
@@ -413,14 +433,14 @@ namespace stan {
 
 	int_literal_r.name("integer literal");
 	int_literal_r
-	  = int_ 
+	  %= int_ 
 	     >> !( qi::lit('.')
 		   | qi::lit('e')
 		   | qi::lit('E') );
 
 	double_literal_r.name("double literal");
 	double_literal_r
-	  = double_;
+	  %= double_;
 
 
 	// no optional dims in the variable_r
@@ -518,11 +538,11 @@ namespace stan {
 	  > qi::lit('}');
 
 	qi::on_error<qi::rethrow>(var_decl_r,
-				  std::cout << boost::phoenix::val("ERROR: Duplicate variable declaration.")
+				  std::cerr << boost::phoenix::val("ERROR: Duplicate variable declaration.")
 				  << std::endl);
 
 	qi::on_error<qi::rethrow>(program_r,
-				  std::cout << boost::phoenix::val("ERROR: Expected ")
+				  std::cerr << boost::phoenix::val("ERROR: Expected ")
 				  << _4 
 				  << std::endl);
       }
@@ -566,7 +586,6 @@ namespace stan {
       qi::rule<Iterator, for_statement(), whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > indexed_factor_r;
-      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_sub_r;
     };
 
     // Cut and paste source for iterator & reporting pattern:
@@ -603,9 +622,6 @@ namespace stan {
 				   whitespace_grammar,
 				   result);
       } catch (const qi::expectation_failure<pos_iterator_type>& e) {
-	// std::stringstream msg;
-	// msg << "ITERATOR SPAN=" << std::endl
-	//     << std::string(position_begin,position_end);
 	const classic::file_position_base<std::string>& pos = e.first.get_position();
 	std::stringstream msg;
 	msg << "parse error at file " 
@@ -619,7 +635,6 @@ namespace stan {
 	    << std::endl;
 	for (int i = 2; i < pos.column; ++i)
 	  msg << ' ';
-	// << std::setw(pos.column) 
 	msg << " ^-- here";
 	throw std::runtime_error(msg.str());
       }
