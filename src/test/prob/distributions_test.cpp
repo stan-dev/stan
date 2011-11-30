@@ -136,24 +136,6 @@ TEST(prob_prob,norm_trunc_h_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
 }
 
-TEST(prob_prob,gamma) {
-  EXPECT_FLOAT_EQ(-0.6137056, stan::prob::gamma_log(1.0,2.0,2.0));
-  EXPECT_FLOAT_EQ(-3.379803, stan::prob::gamma_log(2.0,0.25,0.75));
-  EXPECT_FLOAT_EQ(-1, stan::prob::gamma_log(1,1,1));
-}
-TEST(prob_prob,gamma_exception) {
-  double y = 0;
-  double alpha = 1.0;
-  double beta = 2.0;
-  
-  EXPECT_NO_THROW(stan::prob::gamma_log(y, alpha, beta));
-  EXPECT_THROW (stan::prob::gamma_log(-1, alpha, beta), std::domain_error);
-  EXPECT_THROW (stan::prob::gamma_log(y, 0.0, beta), std::domain_error);
-  EXPECT_THROW (stan::prob::gamma_log(y, -1.0, beta), std::domain_error);
-  EXPECT_THROW (stan::prob::gamma_log(y, alpha, 0.0), std::domain_error);
-  EXPECT_THROW (stan::prob::gamma_log(y, alpha, -1.0), std::domain_error);
-}
-
 TEST(prob_prob,inv_gamma) {
   EXPECT_FLOAT_EQ(-1, stan::prob::inv_gamma_log(1,1,1.0));
   EXPECT_FLOAT_EQ(-0.8185295, stan::prob::inv_gamma_log(0.5,2.9,3.1));

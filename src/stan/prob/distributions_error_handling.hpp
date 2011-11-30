@@ -7,7 +7,7 @@
 
 namespace stan { 
   namespace prob {
-    // reimplementing: #include <boost/math/distributions/detail/common_error_handling.hpp>
+    // reimplementing a lot from: #include <boost/math/distributions/detail/common_error_handling.hpp>
     
     template <typename T_x, typename T_result, class Policy>
     inline bool check_x(
@@ -86,7 +86,7 @@ namespace stan {
     } // bool check_x
 
 
-template <typename T_x, typename T_result, class Policy>
+    template <typename T_x, typename T_result, class Policy>
     inline bool check_x(
 			const char* function,
 			const Eigen::Matrix<T_x,Eigen::Dynamic,1>& x,
@@ -158,7 +158,81 @@ template <typename T_x, typename T_result, class Policy>
       }
       return true;
     }
-      
+    
+    template <typename T_x, typename T_result, class Policy>
+    inline bool check_nonnegative(
+				  const char* function,
+				  const T_x& x,
+				  const char* name,
+				  T_result* result,
+				  const Policy& pol) {
+      if(!(boost::math::isfinite)(x) || !(x >= 0)) {
+	std::ostringstream stream;
+	stream << name << " is %1%, but must be finite and >= 0!";
+	*result = boost::math::policies::raise_domain_error<T_x>(
+								 function,
+								 stream.str().c_str(), x, pol);
+	return false;
+      }
+      return true;
+    }
+    
+    template <typename T_result, class Policy>
+    inline bool check_nonnegative(
+				  const char* function,
+				  const stan::agrad::var& x,
+				  const char* name,
+				  T_result* result,
+				  const Policy& pol) {
+      if(!(boost::math::isfinite)(x.val()) || !(x >= 0)) {
+	std::ostringstream stream;
+	stream << name << " is %1%, but must be finite and >= 0!";
+	*result = boost::math::policies::raise_domain_error<double>(
+								    function,
+								    stream.str().c_str(), x.val(), pol);
+	return false;
+      }
+      return true;
+    }
+
+
+    template <typename T_x, typename T_result, class Policy>
+    inline bool check_positive(
+				  const char* function,
+				  const T_x& x,
+				  const char* name,
+				  T_result* result,
+				  const Policy& pol) {
+      if(!(boost::math::isfinite)(x) || !(x > 0)) {
+	std::ostringstream stream;
+	stream << name << " is %1%, but must be finite and > 0!";
+	*result = boost::math::policies::raise_domain_error<T_x>(
+								 function,
+								 stream.str().c_str(), x, pol);
+	return false;
+      }
+      return true;
+    }
+    
+    template <typename T_result, class Policy>
+    inline bool check_positive(
+				  const char* function,
+				  const stan::agrad::var& x,
+				  const char* name,
+				  T_result* result,
+				  const Policy& pol) {
+      if(!(boost::math::isfinite)(x.val()) || !(x > 0)) {
+	std::ostringstream stream;
+	stream << name << " is %1%, but must be finite and > 0!";
+	*result = boost::math::policies::raise_domain_error<double>(
+								    function,
+								    stream.str().c_str(), x.val(), pol);
+	return false;
+      }
+      return true;
+    }
+
+
     template <typename T_location, typename T_result, class Policy>
     inline bool check_location(
 			       const char* function,
@@ -192,14 +266,14 @@ template <typename T_x, typename T_result, class Policy>
 
     template <typename T_bound, typename T_result, class Policy>
     inline bool check_lower_bound(
-			       const char* function,
-			       const T_bound& lb,
-			       T_result* result,
-			       const Policy& pol) {
+				  const char* function,
+				  const T_bound& lb,
+				  T_result* result,
+				  const Policy& pol) {
       if(!(boost::math::isfinite)(lb)) {
 	*result = boost::math::policies::raise_domain_error<T_bound>(
-									function,
-									"Lower bound is %1%, but must be finite!", lb, pol);
+								     function,
+								     "Lower bound is %1%, but must be finite!", lb, pol);
 	return false;
       }
       return true;
@@ -207,10 +281,10 @@ template <typename T_x, typename T_result, class Policy>
 
     template <typename T_result, class Policy>
     inline bool check_lower_bound(
-			       const char* function,
-			       const stan::agrad::var& lb,
-			       T_result* result,
-			       const Policy& pol) {
+				  const char* function,
+				  const stan::agrad::var& lb,
+				  T_result* result,
+				  const Policy& pol) {
       if(!(boost::math::isfinite)(lb.val()))
 	{
 	  *result = boost::math::policies::raise_domain_error<double>(
@@ -223,14 +297,14 @@ template <typename T_x, typename T_result, class Policy>
 
     template <typename T_bound, typename T_result, class Policy>
     inline bool check_upper_bound(
-			       const char* function,
-			       const T_bound& ub,
-			       T_result* result,
-			       const Policy& pol) {
+				  const char* function,
+				  const T_bound& ub,
+				  T_result* result,
+				  const Policy& pol) {
       if(!(boost::math::isfinite)(ub)) {
 	*result = boost::math::policies::raise_domain_error<T_bound>(
-									function,
-									"Upper bound is %1%, but must be finite!", ub, pol);
+								     function,
+								     "Upper bound is %1%, but must be finite!", ub, pol);
 	return false;
       }
       return true;
@@ -238,10 +312,10 @@ template <typename T_x, typename T_result, class Policy>
 
     template <typename T_result, class Policy>
     inline bool check_upper_bound(
-			       const char* function,
-			       const stan::agrad::var& ub,
-			       T_result* result,
-			       const Policy& pol) {
+				  const char* function,
+				  const stan::agrad::var& ub,
+				  T_result* result,
+				  const Policy& pol) {
       if(!(boost::math::isfinite)(ub.val()))
 	{
 	  *result = boost::math::policies::raise_domain_error<double>(
