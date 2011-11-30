@@ -19,6 +19,7 @@
 #include "stan/prob/distributions_normal.hpp"
 #include "stan/prob/distributions_multi_normal.hpp"
 #include "stan/prob/distributions_gamma.hpp"
+#include "stan/prob/distributions_inv_gamma.hpp"
 
 
 namespace stan {
@@ -335,125 +336,6 @@ namespace stan {
     }
 
 
-
-    /**
-     * The log of an inverse gamma density for y with the specified
-     * shape and inverse scale parameters.
-     * Shape and inverse scale parameters must be greater than 0.
-     * y must be greater than 0.
-     * 
-     \f{eqnarray*}{
-       y &\sim& \mbox{\sf{Inv-gamma}}(\alpha, \beta) \\
-       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha + 1)} \exp^{- \beta / y} \right) \\
-       &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha + 1) \log(y) - \frac{\beta}{y} \\
-       & & \mathrm{where } y > 0
-     \f}
-     * @param y A scalar variable.
-     * @param alpha Shape parameter.
-     * @param beta Inverse scale parameter.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_shape Type of shape.
-     * @tparam T_inv_scale Type of inverse scale.
-     */
-    template <typename T_y, typename T_shape, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      if (alpha <= 0) {
-	std::ostringstream err;
-	err << "alpha (" << alpha << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error(err.str()));
-      }
-      if (beta <= 0) {
-	std::ostringstream err;
-	err << "beta (" << beta << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (y <= 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      return - lgamma(alpha)
-	+ alpha * log(beta)
-	- (alpha + 1) * log(y)
-	- beta / y;
-    }
-    /**
-     * The log of a distribution proportional to an inverse gamma density for y with the specified
-     * shape and inverse scale parameters.
-     * Shape and inverse scale parameters must be greater than 0.
-     * y must be greater than 0.
-     * 
-     * @param y A scalar variable.
-     * @param alpha Shape parameter.
-     * @param beta Inverse scale parameter.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_shape Type of shape.
-     * @tparam T_inv_scale Type of inverse scale.
-     */
-    template <typename T_y, typename T_shape, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    inv_gamma_propto_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      if (alpha <= 0) {
-	std::ostringstream err;
-	err << "alpha (" << alpha << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error(err.str()));
-      }
-      if (beta <= 0) {
-	std::ostringstream err;
-	err << "beta (" << beta << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (y <= 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      return inv_gamma_log (y, alpha, beta);
-    }
-    /**
-     * The log of a distribution proportional to an inverse gamma density for y with the specified
-     * shape and inverse scale parameters.
-     * Shape and inverse scale parameters must be greater than 0.
-     * y must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param alpha Shape parameter.
-     * @param beta Inverse scale parameter.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_shape Type of shape.
-     * @tparam T_inv_scale Type of inverse scale.
-     */
-    template <typename T_y, typename T_shape, typename T_scale>
-    inline void
-    inv_gamma_propto_log(stan::agrad::var& lp, const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      if (alpha <= 0) {
-	std::ostringstream err;
-	err << "alpha (" << alpha << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error(err.str()));
-      }
-      if (beta <= 0) {
-	std::ostringstream err;
-	err << "beta (" << beta << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (y <= 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      lp += inv_gamma_propto_log (y, alpha, beta);
-    }
 
     /**
      * The log of a chi-squared density for y with the specified
