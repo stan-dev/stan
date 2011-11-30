@@ -21,6 +21,7 @@
 #include "stan/prob/distributions_gamma.hpp"
 #include "stan/prob/distributions_inv_gamma.hpp"
 #include "stan/prob/distributions_chi_square.hpp"
+#include "stan/prob/distributions_inv_chi_square.hpp"
 
 namespace stan {
   namespace prob {
