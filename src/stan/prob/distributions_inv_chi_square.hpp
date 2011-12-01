@@ -65,7 +65,7 @@ namespace stan {
      * @tparam T_y Type of scalar.
      * @tparam T_dof Type of degrees of freedom.
      */
-    template <typename T_y, typename T_dof, class Policy = boost::math::policies::policy<>>
+    template <typename T_y, typename T_dof, class Policy = boost::math::policies::policy<> >
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
       inv_chi_square_propto_log(const T_y& y, const T_dof& nu, const Policy& /* pol */ = Policy()) {
       return inv_chi_square_log(y, nu, Policy());

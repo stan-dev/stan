@@ -25,9 +25,9 @@ namespace stan {
 			T_result* result,
 			const Policy& pol) {
       if (!(boost::math::isfinite)(convert(x))) {
-	*result = boost::math::policies::raise_domain_error<double>(function,
+	*result = boost::math::policies::raise_domain_error<T_x>(function,
 								 "Random variate x is %1%, but must be finite!",
-								 convert(x), pol);
+								 x, pol);
 	return false;
       }
       return true;
