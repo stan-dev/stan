@@ -138,41 +138,6 @@ namespace stan {
       }
       return (normal_trunc_lh_log (y, mu, sigma, low, high));
     }
-    /**
-     * The log of a distribution proportional to a truncated normal density for the given 
-     * y, mean, standard deviation, lower bound, and upper bound.
-     * The standard deviation must be greater than 0.
-     * The lower bound must be less than the upper bound.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param mu The mean of the normal distribution.
-     * @param sigma The standard deviation of the normal distribution. 
-     * @param low Lower bound.
-     * @param high Upper bound.
-     * @throw std::domain_error if sigma is not greater than 0.
-     * @throw std::invalid_argument if high is not greater than low.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_scale Type of scale.
-     * @tparam T_low Type of lower bound.
-     * @tparam T_high Type of upper bound.
-     */
-    template <typename T_y, typename T_loc, typename T_scale, typename T_low, typename T_high>
-    inline void
-    normal_trunc_lh_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma, const T_low& low, const T_high& high) {
-      if (sigma <= 0) {
-	std::ostringstream err;
-	err << "sigma (" << sigma << ") must be greater than 0.";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (high <= low) {
-	std::ostringstream err;
-	err << "lower bound (" << low << ") must be less than the upper bound (" << high <<")";
-	BOOST_THROW_EXCEPTION (std::invalid_argument (err.str()));
-      }
-      lp += normal_trunc_lh_propto_log (y, mu, sigma, low, high);
-    }
 
     // NormalTruncatedL(y|mu,sigma,low)  [sigma > 0]
     // Norm(y|mu,sigma) / (1 - Norm_p(low|mu,sigma))
@@ -229,32 +194,6 @@ namespace stan {
       }
       return normal_trunc_l_log (y, mu, sigma, low);
     }
-    /**
-     * The log of a truncated normal density for the given 
-     * y, mean, standard deviation, and lower bound.
-     * The standard deviation must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param mu The mean of the normal distribution.
-     * @param sigma The standard deviation of the normal distribution. 
-     * @param low Lower bound.
-     * @throw std::domain_error if sigma is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_scale Type of scale.
-     * @tparam T_low Type of lower bound.
-     */
-    template <typename T_y, typename T_loc, typename T_scale, typename T_low>
-    inline void
-    normal_trunc_l_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma, const T_low& low) {
-      if (sigma <= 0) {
-	std::ostringstream err;
-	err << "sigma (" << sigma << ") must be greater than 0.";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      lp += normal_trunc_l_propto_log (y, mu, sigma, low);
-    }
     // NormalTruncatedH(y|mu,sigma,high)  [sigma > 0]
     // Norm(y|mu,sigma) / (Norm_p(high|mu,sigma) - 0)
     /**
@@ -309,32 +248,6 @@ namespace stan {
 	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
       }
       return normal_trunc_h_log (y, mu, sigma, high);
-    }
-    /**
-     * The log of a density proportional to a truncated normal density for the given 
-     * y, mean, standard deviation, and upper bound.
-     * The standard deviation must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param mu The mean of the normal distribution.
-     * @param sigma The standard deviation of the normal distribution. 
-     * @param high Upper bound.
-     * @throw std::domain_error if sigma is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_scale Type of scale.
-     * @tparam T_high Type of upper bound.
-     */
-    template <typename T_y, typename T_loc, typename T_scale, typename T_high>
-    inline void
-    normal_trunc_h_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma, const T_high& high) {
-      if (sigma <= 0) {
-	std::ostringstream err;
-	err << "sigma (" << sigma << ") must be greater than 0.";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      lp += normal_trunc_h_propto_log (y, mu, sigma, high);
     }
 
     /**
@@ -406,40 +319,6 @@ namespace stan {
       }
       return exponential_log (y, beta);
     }
-    /**
-     * The log of a distribution proportional to an exponential density for y with the specified
-     * inverse scale parameter.
-     * Inverse scale parameter must be greater than 0.
-     * y must be greater than or equal to 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param alpha Shape parameter.
-     * @param beta Inverse scale parameter.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_shape Type of shape.
-     * @tparam T_inv_scale Type of inverse scale.
-     */
-    template <typename T_y, typename T_inv_scale>
-    inline void
-    exponential_propto_log(stan::agrad::var& lp, const T_y& y, const T_inv_scale& beta) {
-      if (beta <= 0) {
-	std::ostringstream err;
-	err << "beta (" << beta << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (y < 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than or equal to 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      lp += exponential_propto_log (y, beta);
-    }
-
-
 
     // StudentT(y|nu,mu,sigma)  [nu > 0;   sigma > 0]
     /**
@@ -506,31 +385,6 @@ namespace stan {
       // FIXME: checks on parameters
       return student_t_log (y, nu, mu, sigma);
     }
-    /**
-     * The log of a density proportional to the Student-t density for the given y, nu,
-     * mean, and scale parameter.  The scale parameter must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param nu Degrees of freedom.
-     * @param mu The mean of the Student-t distribution.
-     * @param sigma The scale parameter of the Student-t distribution.
-     * @throw std::domain_error if sigma is not greater than 0.
-     * @throw std::domain_error if nu is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_dof Type of degrees of freedom.
-     * @tparam T_loc Type of location.
-     * @tparam T_scale Type of scale.
-     */
-    template <typename T_y, 
-	      typename T_dof, 
-	      typename T_loc, 
-	      typename T_scale>
-    inline void
-    student_t_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma) {
-      // FIXME: checks on parameters
-      lp += student_t_propto_log (y, nu, mu, sigma);
-    }
 
     // Cauchy(y|mu,sigma)  [sigma > 0]
     template <typename T_y, typename T_loc, typename T_scale>
@@ -594,31 +448,6 @@ namespace stan {
     beta_propto_log(const T_y& y, const T_alpha& alpha, const T_beta& beta) {
       return beta_log (y, alpha, beta);
     }
-    /**
-     * The log of a distribution proportional to a beta density for y with the specified
-     * prior sample sizes.
-     * Prior sample sizes, alpha and beta, must be greater than 0.
-     * y must be between 0 and 1 inclusive.
-     *
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param alpha Prior sample size.
-     * @param beta Prior sample size.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_alpha Type of prior sample size for alpha.
-     * @tparam T_beta Type of prior sample size for beta.
-     */
-    template <typename T_y, typename T_alpha, typename T_beta>
-    inline void
-    beta_propto_log(stan::agrad::var& lp, const T_y& y, const T_alpha& alpha, const T_beta& beta) {
-      lp += beta_propto_log (y, alpha, beta);
-    }
-
-
-
 
     // Pareto(y|y_m,alpha)  [y > y_m;  y_m > 0;  alpha > 0]
     template <typename T_y, typename T_scale, typename T_shape>
@@ -732,31 +561,6 @@ namespace stan {
       // FIXME: parameter check
       return dirichlet_log (theta, alpha);
     }
-    /**
-     * The log of a density proportional to the Dirichlet density for the given theta and
-     * a vector of prior sample sizes, alpha.
-     * Each element of alpha must be greater than 0. 
-     * Each element of theta must be greater than or 0.
-     * Theta sums to 1.
-     *
-     * @param lp The log probability to increment.
-     * @param theta A scalar vector.
-     * @param alpha Prior sample sizes.
-     * @throw std::domain_error if any element of alpha is less than or equal to 0.
-     * @throw std::domain_error if any element of theta is less than 0.
-     * @throw std::domain_error if the sum of theta is not 1.
-     * @tparam T_prob Type of scalar.
-     * @tparam T_prior_sample_size Type of prior sample sizes.
-     */
-    template <typename T_prob, typename T_prior_sample_size> 
-    inline void
-    dirichlet_propto_log(stan::agrad::var& lp,
-			 const Matrix<T_prob,Dynamic,1>& theta,
-			 const Matrix<T_prior_sample_size,Dynamic,1>& alpha) {
-      // FIXME: parameter check
-      lp += dirichlet_propto_log (theta, alpha);
-    }
-
 
     // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite; 
     //                          Sigma.dims() = Omega.dims();
@@ -842,36 +646,6 @@ namespace stan {
       // FIXME: domain checks
       return wishart_log (W, nu, S);
     }
-    /**
-     * The log of a density proportional to a Wishart density for the given W,
-     * degrees of freedom, and scale matrix. 
-     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
-     * Dimension, k, is implicit.
-     * 
-     * @param lp The log probability to increment.
-     * @param W A scalar matrix
-     * @param nu Degrees of freedom
-     * @param S The scale matrix
-     * @return The log of the Wishart density at W given nu and S.
-     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
-     * @tparam T_y Type of scalar.
-     * @tparam T_dof Type of degrees of freedom.
-     * @tparam T_scale Type of scale.
-     */
-    template <typename T_y, typename T_dof, typename T_scale>
-    inline void
-    wishart_propto_log(stan::agrad::var& lp, 
-		       const Matrix<T_y,Dynamic,Dynamic>& W,
-		       const T_dof& nu,
-		       const Matrix<T_scale,Dynamic,Dynamic>& S) {
-      if (nu <= S.rows() - 1) {
-	std::ostringstream err;
-	err << "nu (" << nu << ") must be greater than k-1 (" << S.rows()-1 << ")";
-	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
-      }
-      // FIXME: domain checks
-      lp += wishart_propto_log (W, nu, S);
-    }
 
     // InvWishart(Sigma|n,Omega)  [W, S symmetric, non-neg, definite; 
     //                             W.dims() = S.dims();
@@ -949,38 +723,6 @@ namespace stan {
 	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
       }
       return inv_wishart_log (W, nu, S);
-    }
-    /**
-     * The log of a density proportional to the Inverse-Wishart density for 
-     * the given W, degrees of freedom, and scale matrix. 
-     * 
-     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
-     * Dimension, k, is implicit.
-     * nu must be greater than k-1
-     *
-     * @param lp The log probability to increment.
-     * @param W A scalar matrix
-     * @param nu Degrees of freedom
-     * @param S The scale matrix
-     * @return The log of the Inverse-Wishart density at W given nu and S.
-     * @throw std::domain_error if nu is not greater than k-1
-     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
-     * @tparam T_y Type of scalar.
-     * @tparam T_dof Type of degrees of freedom.
-     * @tparam T_scale Type of scale.
-     */
-    template <typename T_y, typename T_dof, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    inv_wishart_propto_log(stan::agrad::var& lp,
-			   const Matrix<T_y,Dynamic,Dynamic>& W,
-			   const T_dof& nu,
-			   const Matrix<T_scale,Dynamic,Dynamic>& S) {
-      if (nu <= S.rows() - 1) {
-	std::ostringstream err;
-	err << "nu (" << nu << ") must be greater than k-1 (" << S.rows()-1 << ")";
-	BOOST_THROW_EXCEPTION (std::domain_error(err.str()));
-      }
-      lp += inv_wishart_propto_log (W, nu, S);
     }
     // ?? write these in terms of cpcs rather than corr matrix
     

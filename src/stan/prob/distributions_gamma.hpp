@@ -129,52 +129,6 @@ namespace stan {
       return gamma_log (y, alpha, beta, boost::math::policies::policy<>());
     }
 
-    /**
-     * The log of a distribution proportional to a gamma density for y with the specified
-     * shape and inverse scale parameters.
-     * Shape and inverse scale parameters must be greater than 0.
-     * y must be greater than or equal to 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param alpha Shape parameter.
-     * @param beta Inverse scale parameter.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_shape Type of shape.
-     * @tparam T_inv_scale Type of inverse scale.
-     */
-    template <typename T_y, typename T_shape, typename T_inv_scale, class Policy>
-    inline void
-    gamma_propto_log(stan::agrad::var& lp, const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy /* pol */) {
-      lp += gamma_propto_log (y, alpha, beta, Policy());
-    }
-    
-    /**
-     * The log of a distribution proportional to a gamma density for y with the specified
-     * shape and inverse scale parameters.
-     * Shape and inverse scale parameters must be greater than 0.
-     * y must be greater than or equal to 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param alpha Shape parameter.
-     * @param beta Inverse scale parameter.
-     * @throw std::domain_error if alpha is not greater than 0.
-     * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_shape Type of shape.
-     * @tparam T_inv_scale Type of inverse scale.
-     */
-    template <typename T_y, typename T_shape, typename T_inv_scale>
-    inline void
-    gamma_propto_log(stan::agrad::var& lp, const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      lp += gamma_propto_log (y, alpha, beta, boost::math::policies::policy<>());
-    }
-    
     
   }
 }

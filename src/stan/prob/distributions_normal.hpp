@@ -17,13 +17,29 @@ namespace stan {
     using namespace std;
     using namespace stan::maths;
 
-
-    template <typename T_y, typename T_loc, typename T_scale, class Policy>
+    /**
+     * The log of the normal density for the specified sequence of
+     * scalars given the specified mean and deviation.  If the
+     * sequence of values is of length 0, the result is 0.0.
+     *
+     * <p>The result log probability is defined to be the sum of the
+     * log probabilities for each observation.  Hence if the sequence
+     * is of length 0, the log probability is 0.0.
+     *
+     * @param y Sequence of scalars.
+     * @param mu Location parameter for the normal distribution.
+     * @param sigma Scale parameter for the normal distribution.
+     * @return The log of the product of the densities.
+     * @throw std::domain_error if the scale is not positive.
+     * @tparam T_y Underlying type of scalar in sequence.
+     * @tparam T_loc Type of location parameter.
+     */
+    template <typename T_y, typename T_loc, typename T_scale, class Policy = boost::math::policies::policy<> >
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const std::vector<T_y>& y,
 	       const T_loc& mu,
 	       const T_scale& sigma,
-	       const Policy& /* pol */) {
+	       const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type result;
@@ -42,34 +58,6 @@ namespace stan {
 	- (lp / (2.0 * square(sigma)))
 	+ (-size) * log(sigma);
     }
- 
-
-    /**
-     * The log of the normal density for the specified sequence of
-     * scalars given the specified mean and deviation.  If the
-     * sequence of values is of length 0, the result is 0.0.
-     *
-     * <p>The result log probability is defined to be the sum of the
-     * log probabilities for each observation.  Hence if the sequence
-     * is of length 0, the log probability is 0.0.
-     *
-     * @param y Sequence of scalars.
-     * @param mu Location parameter for the normal distribution.
-     * @param sigma Scale parameter for the normal distribution.
-     * @return The log of the product of the densities.
-     * @throw std::domain_error if the scale is not positive.
-     * @tparam T_y Underlying type of scalar in sequence.
-     * @tparam T_loc Type of location parameter.
-     */
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_log(const std::vector<T_y>& y,
-	       const T_loc& mu,
-	       const T_scale& sigma) {
-      return normal_log (y, mu, sigma, boost::math::policies::policy<>());
-    }
-
-
 
     /**
      * The log of the normal density for the given y, mean, and
@@ -93,9 +81,9 @@ namespace stan {
      * @tparam T_scale Type of scale.
      * @tparam Policy policy as defined by boost::math::policies
      */
-    template <typename T_y, typename T_loc, typename T_scale, class Policy>
+    template <typename T_y, typename T_loc, typename T_scale, class Policy = boost::math::policies::policy<> >
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */) {
+    normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
       
       typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type result;
@@ -111,12 +99,6 @@ namespace stan {
 	      - square(y - mu) / (2.0 * square(sigma)));
     }
 
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_log (const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return normal_log (y, mu, sigma, boost::math::policies::policy<>());
-    }
-     
 
     /**
      * The log of the normal density up to a proportion for the given 
@@ -132,44 +114,12 @@ namespace stan {
      * @tparam T_loc Type of location.
      * @tparam T_scale Type of scale.
      */    
-    template <typename T_y, typename T_loc, typename T_scale, class Policy>
+    template <typename T_y, typename T_loc, typename T_scale, class Policy = boost::math::policies::policy<> >
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_propto_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */) {
+    normal_propto_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */ = Policy()) {
       return normal_log(y,mu,sigma, Policy());
     }
     
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    normal_propto_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return normal_propto_log(y,mu,sigma, boost::math::policies::policy<>());
-    }
-    
-    /**
-     * The log of the normal density up to a proportion for the given 
-     * y, mean, and standard deviation.
-     * The standard deviation must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param mu The mean of the normal distribution.
-     * @param sigma The standard deviation of the normal distribution. 
-     * @throw std::domain_error if sigma is not greater than 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_scale Type of scale.
-     */
-    template <typename T_y, typename T_loc, typename T_scale, class Policy>
-    inline void
-    normal_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */) {
-      lp += normal_propto_log(y,mu,sigma,Policy());
-    }
-
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline void
-    normal_propto_log(stan::agrad::var& lp, const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      lp += normal_propto_log(y,mu,sigma, boost::math::policies::policy<>());
-    }
-
   }
 }
 

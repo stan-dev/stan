@@ -145,58 +145,6 @@ namespace stan {
       return multi_normal_log (y, mu, Sigma, boost::math::policies::policy<>() );
     }
 
-    
-    /**
-     * The log of a density proportional to the multivariate normal density for the given y, mu, and
-     * variance matrix. 
-     * The variance matrix, Sigma, must be size d x d, symmetric,
-     * and semi-positive definite. Dimension, d, is implicit.
-     * 
-     * @param lp The log probability to increment. 
-     * @param y A scalar vector
-     * @param mu The mean vector of the multivariate normal distribution.
-     * @param Sigma The variance matrix of the multivariate normal distribution
-     * @return The log of the multivariate normal density.
-     * @throw std::domain_error if Sigma is not square, not symmetric, or not semi-positive definite.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_covar Type of scale.
-     */
-    template <typename T_y, typename T_loc, typename T_covar, class Policy> 
-    inline void
-    multi_normal_propto_log(stan::agrad::var &lp,
-			    const Matrix<T_y,Dynamic,1>& y,
-			    const Matrix<T_loc,Dynamic,1>& mu,
-			    const Matrix<T_covar,Dynamic,Dynamic>& Sigma,
-			    const Policy& /* pol */) {
-      lp += multi_normal_propto_log (y, mu, Sigma, Policy() );
-    }
-
-    /**
-     * The log of a density proportional to the multivariate normal density for the given y, mu, and
-     * variance matrix. 
-     * The variance matrix, Sigma, must be size d x d, symmetric,
-     * and semi-positive definite. Dimension, d, is implicit.
-     * 
-     * @param lp The log probability to increment. 
-     * @param y A scalar vector
-     * @param mu The mean vector of the multivariate normal distribution.
-     * @param Sigma The variance matrix of the multivariate normal distribution
-     * @return The log of the multivariate normal density.
-     * @throw std::domain_error if Sigma is not square, not symmetric, or not semi-positive definite.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_covar Type of scale.
-     */
-    template <typename T_y, typename T_loc, typename T_covar>
-    inline void
-    multi_normal_propto_log(stan::agrad::var &lp,
-			    const Matrix<T_y,Dynamic,1>& y,
-			    const Matrix<T_loc,Dynamic,1>& mu,
-			    const Matrix<T_covar,Dynamic,Dynamic>& Sigma) {
-      lp += multi_normal_propto_log (y, mu, Sigma, boost::math::policies::policy<>() );
-    }
-
     // MultiNormal(y|mu,L)       [y.rows() = mu.rows() = L.rows() = L.cols();
     //                            y.cols() = mu.cols() = 0;
     //                            Sigma = LL' with L a Cholesky factor]
@@ -312,57 +260,7 @@ namespace stan {
 			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
       return multi_normal_propto_log(y, mu, L, boost::math::policies::policy<>());
     }
-    /**
-     * The log of the multivariate normal density for the given y, mu, and
-     * L (a Cholesky factor of Sigma, a variance matrix).
-     * Sigma = LL', a square, semi-positive definite matrix.
-     * Dimension, d, is implicit.
-     *
-     * @param lp The log probability to increment.
-     * @param y A scalar vector
-     * @param mu The mean vector of the multivariate normal distribution.
-     * @param L The Cholesky decomposition of a variance matrix of the multivariate normal distribution
-     * @return The log of the multivariate normal density.
-     * @throw std::domain_error if LL' is not square, not symmetric, or not semi-positive definite.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_covar Type of scale.
-     */
-    template <typename T_y, typename T_loc, typename T_covar, class Policy> 
-    inline void
-    multi_normal_propto_log(stan::agrad::var& lp,
-			    const Matrix<T_y,Dynamic,1>& y,
-			    const Matrix<T_loc,Dynamic,1>& mu,
-			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L,
-			    const Policy& /* pol */) {
-      lp += multi_normal_propto_log(y, mu, L, Policy());
-    }
 
-    /**
-     * The log of the multivariate normal density for the given y, mu, and
-     * L (a Cholesky factor of Sigma, a variance matrix).
-     * Sigma = LL', a square, semi-positive definite matrix.
-     * Dimension, d, is implicit.
-     *
-     * @param lp The log probability to increment.
-     * @param y A scalar vector
-     * @param mu The mean vector of the multivariate normal distribution.
-     * @param L The Cholesky decomposition of a variance matrix of the multivariate normal distribution
-     * @return The log of the multivariate normal density.
-     * @throw std::domain_error if LL' is not square, not symmetric, or not semi-positive definite.
-     * @tparam T_y Type of scalar.
-     * @tparam T_loc Type of location.
-     * @tparam T_covar Type of scale.
-     */
-    template <typename T_y, typename T_loc, typename T_covar> 
-    inline void
-    multi_normal_propto_log(stan::agrad::var& lp,
-			    const Matrix<T_y,Dynamic,1>& y,
-			    const Matrix<T_loc,Dynamic,1>& mu,
-			    const Eigen::TriangularView<T_covar,Eigen::Lower>& L) {
-      lp += multi_normal_propto_log(y, mu, L, boost::math::policies::policy<>());
-    }
-   
   }
 }
 

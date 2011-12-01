@@ -20,7 +20,7 @@ TEST(distributions,Uniform) {
 TEST(distributions,UniformDefaultPolicy) {
   // lower bound higher than the upper bound
   EXPECT_THROW (stan::prob::uniform_log(0.0,1.0,0.0), std::domain_error);
-  // lower and upper boundary the same
+  // lower and upper boundary the same 
   EXPECT_THROW (stan::prob::uniform_log(0.0, 0.0, 0.0), std::domain_error);
   EXPECT_THROW (stan::prob::uniform_log(1.0, 0.0, 0.0), std::domain_error);
   EXPECT_THROW (stan::prob::uniform_log(-1.0, 0.0, 0.0), std::domain_error);

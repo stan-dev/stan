@@ -101,43 +101,6 @@ namespace stan {
       }
       return scaled_inv_chi_square_log(y, nu, s);
     }
-    /**
-     * The log of a distribution proportional to a scaled inverse chi-squared density for y with the specified
-     * degrees of freedom parameter and scale parameter.
-     * The degrees of freedom prarameter must be greater than 0. The scale parameter must be greater
-     * than 0.
-     * y must be greater than 0.
-     * 
-     * @param y A scalar variable.
-     * @param nu Degrees of freedom.
-     * @param s Scale parameter.
-     * @throw std::domain_error if nu is not greater than or equal to 0
-     * @throw std::domain_error if s is not greater than or equal to 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_dof Type of degrees of freedom.
-     */
-    template <typename T_y, typename T_dof, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu, const T_scale& s) {
-      if (nu <= 0) {
-	std::ostringstream err;
-	err << "nu (" << nu << " must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (s <= 0) {
-	std::ostringstream err;
-	err << "s (" << s << " must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }      
-      if (y <= 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      lp += scaled_inv_chi_square_propto_log(y, nu, s);
-    }
-
 
   }
 }

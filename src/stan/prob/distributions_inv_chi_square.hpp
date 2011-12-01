@@ -113,45 +113,6 @@ namespace stan {
       return inv_chi_square_propto_log(y, nu, boost::math::policies::policy<>());
     }
 
-    /**
-     * The log of a distribution proportional to an inverse chi-squared density for y with the specified
-     * degrees of freedom parameter.
-     * The degrees of freedom prarameter must be greater than 0.
-     * y must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param nu Degrees of freedom.
-     * @throw std::domain_error if nu is not greater than or equal to 0
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_dof Type of degrees of freedom.
-     */
-    template <typename T_y, typename T_dof, class Policy>
-    inline void
-    inv_chi_square_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu, const Policy& /* pol */) {
-      lp += inv_chi_square_propto_log(y, nu, Policy());
-    }
-    
-    /**
-     * The log of a distribution proportional to an inverse chi-squared density for y with the specified
-     * degrees of freedom parameter.
-     * The degrees of freedom prarameter must be greater than 0.
-     * y must be greater than 0.
-     * 
-     * @param lp The log probability to increment.
-     * @param y A scalar variable.
-     * @param nu Degrees of freedom.
-     * @throw std::domain_error if nu is not greater than or equal to 0
-     * @throw std::domain_error if y is not greater than or equal to 0.
-     * @tparam T_y Type of scalar.
-     * @tparam T_dof Type of degrees of freedom.
-     */
-    template <typename T_y, typename T_dof>
-    inline void
-    inv_chi_square_propto_log(stan::agrad::var& lp, const T_y& y, const T_dof& nu) {
-      lp += inv_chi_square_propto_log(y, nu, boost::math::policies::policy<>());
-    }
 
   }
 }
