@@ -31,33 +31,25 @@ namespace stan {
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
      * @param s Scale parameter.
-     * @throw std::domain_error if nu is not greater than or equal to 0
-     * @throw std::domain_error if s is not greater than or equal to 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @throw std::domain_error if nu is not greater than 0
+     * @throw std::domain_error if s is not greater than 0.
+     * @throw std::domain_error if y is not greater than 0.
      * @tparam T_y Type of scalar.
      * @tparam T_dof Type of degrees of freedom.
      */
-    template <typename T_y, typename T_dof, typename T_scale>
+    template <typename T_y, typename T_dof, typename T_scale, class Policy = boost::math::policies::policy<> >
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      /*static const char* function = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
+    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, const Policy& /* pol */ = Policy()) {
+      static const char* function = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
       
-	typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type result;*/
-      if (nu <= 0) {
-	std::ostringstream err;
-	err << "nu (" << nu << " must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (s <= 0) {
-	std::ostringstream err;
-	err << "s (" << s << " must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }      
-      if (y <= 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
+      double result;
+      if (!check_positive (function, nu, "Degrees of freedom", &result, Policy()))
+	return result;
+      if (!check_scale (function, s, &result, Policy()))
+	return result;
+      if (!check_positive (function, y, "Random variate y", &result, Policy()))
+	return result;
+
       T_dof half_nu = 0.5 * nu;
       return - lgamma(half_nu)
 	+ (half_nu) * log(half_nu)
@@ -65,6 +57,7 @@ namespace stan {
 	- (half_nu + 1.0) * log(y)
 	- half_nu * s * s / y;
     }
+
     /**
      * The log of a distribution proportional to a scaled inverse chi-squared density for y with the specified
      * degrees of freedom parameter and scale parameter.
@@ -81,25 +74,10 @@ namespace stan {
      * @tparam T_y Type of scalar.
      * @tparam T_dof Type of degrees of freedom.
      */
-    template <typename T_y, typename T_dof, typename T_scale>
+    template <typename T_y, typename T_dof, typename T_scale, class Policy = boost::math::policies::policy<> >
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_propto_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      if (nu <= 0) {
-	std::ostringstream err;
-	err << "nu (" << nu << " must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      if (s <= 0) {
-	std::ostringstream err;
-	err << "s (" << s << " must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }      
-      if (y <= 0) {
-	std::ostringstream err;
-	err << "y (" << y << ") must be greater than 0";
-	BOOST_THROW_EXCEPTION(std::domain_error (err.str()));
-      }
-      return scaled_inv_chi_square_log(y, nu, s);
+    scaled_inv_chi_square_propto_log(const T_y& y, const T_dof& nu, const T_scale& s, const Policy& /* pol */ = Policy()) {
+      return scaled_inv_chi_square_log(y, nu, s, Policy());
     }
 
   }
