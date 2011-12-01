@@ -83,10 +83,25 @@ namespace stan {
 			    const T_scale& scale,
 			    T_result* result,
 			    const Policy& pol) {
-      if((scale <= 0) || !(boost::math::isfinite)(convert(scale))) { // Assume scale == 0 is NOT valid for any distribution.
+      if(!(scale > 0) || !(boost::math::isfinite)(convert(scale))) { // Assume scale == 0 is NOT valid for any distribution.
 	*result = boost::math::policies::raise_domain_error<double>(
 								     function,
 								     "Scale parameter is %1%, but must be > 0 !", convert(scale), pol);
+	return false;
+      }
+      return true;
+    }
+
+    template <typename T_inv_scale, typename T_result, class Policy>
+    inline bool check_inv_scale(
+			    const char* function,
+			    const T_inv_scale& invScale,
+			    T_result* result,
+			    const Policy& pol) {
+      if(!(invScale > 0) || !(boost::math::isfinite)(convert(invScale))) { // Assume scale == 0 is NOT valid for any distribution.
+	*result = boost::math::policies::raise_domain_error<double>(
+								     function,
+								     "Inverse scale parameter is %1%, but must be > 0 !", convert(invScale), pol);
 	return false;
       }
       return true;

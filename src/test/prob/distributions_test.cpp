@@ -136,11 +136,6 @@ TEST(prob_prob,norm_trunc_h_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
 }
 
-TEST(prob_prob,exponential) {
-  EXPECT_FLOAT_EQ(-2.594535, stan::prob::exponential_log(2.0,1.5));
-  EXPECT_FLOAT_EQ(-57.13902, stan::prob::exponential_log(15.0,3.9));
-}
-
 TEST(prob_prob,cauchy) {
   EXPECT_FLOAT_EQ(-1.837877, stan::prob::cauchy_log(1.0, 0.0, 1.0));
   EXPECT_FLOAT_EQ(-2.323385, stan::prob::cauchy_log(-1.5, 0.0, 1.0));
