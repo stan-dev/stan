@@ -5,17 +5,19 @@
 library(coda) 
 logit <- function(x) log(x / (1 - x)); 
 
-post <- read.csv(file = "samples.csv"); 
+post <- read.csv(file = "samples.csv", header = FALSE); 
 
-colnames(post) <- c("alpha", "beta", "lambda", "sigma") 
+## assuming the order of variables in samples.csv are the same as model
+## specification file 
+colnames(post) <- c("alpha", "beta", "lambda", "tau")   
 U3 <- logit(post[, 'lambda']) 
 names(U3) <- "U3"; 
 
+sigma <- 1 / sqrt(post[, "tau"])
+names(sigma) <- "sigma" 
 
 
-poi <- cbind(U3, post); 
-## assuming the order of variables in samples.csv are the same as model
-## specification file 
+poi <- cbind(U3, post[, c("alpha", "beta", "lambda")], sigma); 
 
 poi <- as.mcmc(poi)
 summary(poi) 

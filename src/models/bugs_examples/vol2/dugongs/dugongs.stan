@@ -12,31 +12,35 @@
 
 
 data {
-   int(0,) N; 
-   double x[N]; 
-   double Y[N]; 
+  int(0,) N; 
+  double x[N]; 
+  double Y[N]; 
 } 
 parameters {
-   double alpha; 
-   double beta;  
-   double(.5, 1) lambda; // orginal gamma in the JAGS example  
-   // double lambda; 
-   double(0,) sigma; 
+  double alpha; 
+  double beta;  
+  double(.5, 1) lambda; // orginal gamma in the JAGS example  
+  // double lambda; 
+  double(0,) tau; // or double sigma; 
+  // It looks like it is fine to declare either tau or sigma as parameters and
+  // declare sigma or tau as dervied parameters with the prior always 
+  // specified on tau. 
+   
 } 
 derived parameters {
-   double tau; 
-   double U3; 
-   tau <- 1 / (sigma * sigma);
-   U3 <- logit(lambda);
+  double(0,) sigma; // or double tau; 
+  double U3; 
+  // tau <- 1 / (sigma * sigma);
+  sigma <- 1 / sqrt(tau); 
+  U3 <- logit(lambda);
 } 
 model {
-   for (i in 1:N) 
-      Y[i] ~ normal(alpha - beta * pow(lambda, x[i]), sigma);
+  for (i in 1:N) Y[i] ~ normal(alpha - beta * pow(lambda, x[i]), sigma);
     
-   alpha ~ normal(0.0, 1000); 
-   beta ~ normal(0.0, 1000); 
-   lambda ~ uniform(.5, 1); 
-   tau ~ gamma(.0001, .0001); 
-   // sigma ~ gamma(2, .001); // a different prior 
+  alpha ~ normal(0.0, 1000); 
+  beta ~ normal(0.0, 1000); 
+  lambda ~ uniform(.5, 1); 
+  tau ~ gamma(.0001, .0001); 
+  // sigma ~ gamma(2, .001); // a different prior 
 }
 
