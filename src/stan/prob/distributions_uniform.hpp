@@ -46,10 +46,10 @@ namespace stan {
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
       
-      typename boost::math::tools::promote_args<T_y,T_low,T_high>::type result;
-      if(false == stan::prob::check_x(function, y, &result, Policy()))
+      double result;
+      if(!stan::prob::check_x(function, y, &result, Policy()))
 	return result;
-      if(false == stan::prob::check_bounds(function, alpha, beta, &result, Policy()))
+      if(!stan::prob::check_bounds(function, alpha, beta, &result, Policy()))
 	return result;
       
       if (y < alpha || y > beta)

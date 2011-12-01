@@ -42,12 +42,12 @@ namespace stan {
 	       const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type result;
-      if(false == stan::prob::check_scale(function, sigma, &result, Policy()))
+      double result;
+      if(!stan::prob::check_scale(function, sigma, &result, Policy()))
 	return result;
-      if(false == stan::prob::check_location(function, mu, &result, Policy()))
+      if(!stan::prob::check_location(function, mu, &result, Policy()))
 	return result;
-      if(false == stan::prob::check_x(function, y, &result, Policy()))
+      if(!stan::prob::check_x(function, y, &result, Policy()))
 	return result;
 
       double size = y.size();
@@ -86,12 +86,12 @@ namespace stan {
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
       
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type result;
-      if(false == stan::prob::check_scale(function, sigma, &result, Policy()))
+      double result;
+      if(!stan::prob::check_scale(function, sigma, &result, Policy()))
 	return result;
-      if(false == stan::prob::check_location(function, mu, &result, Policy()))
+      if(!stan::prob::check_location(function, mu, &result, Policy()))
 	return result;
-      if(false == stan::prob::check_x(function, y, &result, Policy()))
+      if(!stan::prob::check_x(function, y, &result, Policy()))
 	return result;
       
       return (NEG_LOG_SQRT_TWO_PI

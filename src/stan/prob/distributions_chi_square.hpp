@@ -40,10 +40,10 @@ namespace stan {
     chi_square_log(const T_y& y, const T_dof& nu, const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::chi_square_log<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_y,T_dof>::type result;
-      if (false == stan::prob::check_positive (function, nu, "Degrees of freedom", &result, Policy()))
+      double result;
+      if (!stan::prob::check_positive (function, nu, "Degrees of freedom", &result, Policy()))
 	return result;
-      if (false == stan::prob::check_nonnegative (function, y, "Random variate y", &result, Policy()))
+      if (!stan::prob::check_nonnegative (function, y, "Random variate y", &result, Policy()))
 	return result;
       return - lgamma(0.5 * nu)
 	+ nu * NEG_LOG_TWO_OVER_TWO

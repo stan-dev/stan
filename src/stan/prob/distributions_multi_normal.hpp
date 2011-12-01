@@ -56,10 +56,10 @@ namespace stan {
 		     const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
-      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type result;
-      if (false == stan::prob::check_x(function, y, &result, Policy())) 
+      double result;
+      if (!stan::prob::check_x(function, y, &result, Policy())) 
       	return result;
-      if (false == stan::prob::check_cov_matrix(function, Sigma, &result, Policy())) 
+      if (!stan::prob::check_cov_matrix(function, Sigma, &result, Policy())) 
 	return result;
       
       return NEG_LOG_SQRT_TWO_PI * y.rows()
@@ -124,8 +124,8 @@ namespace stan {
 		     const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
-      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type result;
-      if (false == stan::prob::check_x(function, y, &result, Policy())) 
+      double result;
+      if (!stan::prob::check_x(function, y, &result, Policy())) 
       	return result;
       // FIXME: checks on L
       
