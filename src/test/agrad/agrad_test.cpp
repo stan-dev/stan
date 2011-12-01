@@ -669,12 +669,12 @@ TEST(agrad_agrad,a_ostream) {
   std::ostringstream os;
   
   os << a;
-  EXPECT_EQ ("6", os.str());
+  EXPECT_EQ ("6:0", os.str());
 
   os.str("");
   a = 10.5;
   os << a;
-  EXPECT_EQ ("10.5", os.str());
+  EXPECT_EQ ("10.5:0", os.str());
 }
 
 TEST(agrad_agrad,log_a) {
