@@ -143,13 +143,6 @@ TEST(prob_prob,cauchy) {
   // need test with scale != 1
 }
 
-TEST(prob_prob,student_t) {
-  EXPECT_FLOAT_EQ(-1.837877, stan::prob::student_t_log(1.0,1.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-3.596843, stan::prob::student_t_log(-3.0,2.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-2.531024, stan::prob::student_t_log(2.0,1.0,0.0,2.0));
-  // need test with scale != 1
-}
-
 TEST(prob_prob,beta) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::beta_log(0.2,1.0,1.0));
   EXPECT_FLOAT_EQ(1.628758, stan::prob::beta_log(0.3,12.0,25.0));
