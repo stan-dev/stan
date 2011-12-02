@@ -17,14 +17,14 @@ namespace stan {
 
   namespace io {
 
-     namespace {
+    namespace {
        unsigned int product(std::vector<unsigned int> dims) {
-	 unsigned int y = 1U;
-	 for (unsigned int i = 0; i < dims.size(); ++i)
-	   y *= dims[i];
-	 return y;
+       	 unsigned int y = 1U;
+       	 for (unsigned int i = 0; i < dims.size(); ++i)
+       	   y *= dims[i];
+       	 return y;
        }
-     }
+    }
 
     using Eigen::Matrix;
     using Eigen::Dynamic;

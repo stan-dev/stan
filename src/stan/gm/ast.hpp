@@ -101,6 +101,13 @@ namespace stan {
 	: base_type_(et.base_type_),
 	  num_dims_(et.num_dims_) { 
       }
+      bool operator==(const expr_type& et) const {
+	return base_type_ == et.base_type_
+	  && num_dims_ == et.num_dims_;
+      }
+      bool operator!=(const expr_type& et) const {
+	return !(*this == et);
+      }
       expr_type& operator=(const expr_type& et) {
 	base_type_ = et.base_type_;
 	num_dims_ = et.num_dims_;
@@ -144,6 +151,128 @@ namespace stan {
 	return expr_type();
       return et1.type() == DOUBLE_T ? et1 : et2;
     }
+
+    typedef std::pair<expr_type, std::vector<expr_type> > function_signature_t;
+
+ /**
+     * Singleton for all of the function signature specifications.
+     * This includes constants which are treated as nullary functions.
+     */
+    class function_signatures {
+    public:
+
+      /**
+       * Get the function signatures instance as a singleton.
+       *
+       * @return The single instance.
+       */
+      static function_signatures& instance() {
+	// FIXME:  for threaded models, requires double-check lock
+	if (!sigs_)
+	  sigs_ = new function_signatures;
+	return *sigs_;
+      }
+
+      /**
+       * Add a signature for the function with specified name,
+       * result type, and argument types.
+       *
+       * @param name Name of function.
+       * @param result_type Return type for function.
+       * @param arg_types Sequence of argument types for function.
+       */
+      void add(const std::string& name,
+	       const expr_type& result_type,
+	       const std::vector<expr_type>& arg_types) {
+	sigs_map_[name].push_back(function_signature_t(result_type,arg_types));
+
+      }
+
+      void add(const std::string& name,
+	       const expr_type& result_type) {
+	std::vector<expr_type> arg_types;
+	add(name,result_type,arg_types);
+      }
+
+      void add(const std::string& name,
+	       const expr_type& result_type,
+	       const expr_type& arg_type) {
+	std::vector<expr_type> arg_types;
+	arg_types.push_back(arg_type);
+	add(name,result_type,arg_types);
+      }
+
+      void add(const std::string& name,
+	       const expr_type& result_type,
+	       const expr_type& arg_type1,
+	       const expr_type& arg_type2) {
+	std::vector<expr_type> arg_types;
+	arg_types.push_back(arg_type1);
+	arg_types.push_back(arg_type2);
+	add(name,result_type,arg_types);
+      }
+
+      void add(const std::string& name,
+	       const expr_type& result_type,
+	       const expr_type& arg_type1,
+	       const expr_type& arg_type2,
+	       const expr_type& arg_type3) {
+	std::vector<expr_type> arg_types;
+	arg_types.push_back(arg_type1);
+	arg_types.push_back(arg_type2);
+	arg_types.push_back(arg_type3);
+	add(name,result_type,arg_types);
+      }
+
+      void add(const std::string& name,
+	       const expr_type& result_type,
+	       const expr_type& arg_type1,
+	       const expr_type& arg_type2,
+	       const expr_type& arg_type3,
+	       const expr_type& arg_type4) {
+	std::vector<expr_type> arg_types;
+	arg_types.push_back(arg_type1);
+	arg_types.push_back(arg_type2);
+	arg_types.push_back(arg_type3);
+	arg_types.push_back(arg_type4);
+	add(name,result_type,arg_types);
+      }
+
+      /**
+       * Return the result type for the function with the specified
+       * name and argument types.  If the function and argument pair
+       * do not have a result type defined, return the dmmy
+       * expression type.
+       *
+       * @param name Name of function.
+       * @param args Sequence of argument expression types.
+       */
+      expr_type get_result_type(const std::string& name,
+				const std::vector<expr_type>& args) {
+	std::vector<function_signature_t> signatures = sigs_map_[name];
+	for (unsigned int i = 0; i < signatures.size(); ++i)
+	  if (args == signatures[i].second)
+	    return signatures[i].first;
+	return expr_type(); // dummy
+      }
+
+
+
+    private:
+
+      function_signatures() { 
+	// FIXME: this is where inits go
+      }
+
+      function_signatures(const function_signatures& fs) { }
+
+      std::map<std::string, std::vector<function_signature_t> > sigs_map_;
+
+      static function_signatures* sigs_;  // see out-of-line init to 0 below
+    };
+
+    function_signatures* function_signatures::sigs_ = 0;
+
 
     struct distribution {
       distribution() {
@@ -287,107 +416,8 @@ namespace stan {
       std::string name_;
       expr_type type_;
     };
+
     
-    typedef std::pair<expr_type, std::vector<expr_type> > function_signature_t;
-
-    std::map<std::string, std::vector<function_signature_t> > base_map();
-
-    // this is the global function type map:  stan::gm::function_type_map
-    static std::map<std::string, std::vector<function_signature_t> > function_type_map
-    = base_map();
-
-    void add_function_signature(const std::string& function_name,
-				const expr_type& result_type,
-				const std::vector<expr_type>& arg_types) {
-      function_type_map[function_name].push_back(function_signature_t(result_type,arg_types));
-    }
-
-    void add_function_signature(const std::string& function_name,
-				const expr_type& result_type) {
-      std::vector<expr_type> arg_types;
-      add_function_signature(function_name,result_type,arg_types);
-    }
-
-    void add_function_signature(const std::string& function_name,
-				const expr_type& result_type,
-				const expr_type& arg_type) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type);
-      add_function_signature(function_name,result_type,arg_types);
-    }
-
-    void add_function_signature(const std::string& function_name,
-				const expr_type& result_type,
-				const expr_type& arg_type1,
-				const expr_type& arg_type2) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      add_function_signature(function_name,result_type,arg_types);
-    }
-
-    void add_function_signature(const std::string& function_name,
-				const expr_type& result_type,
-				const expr_type& arg_type1,
-				const expr_type& arg_type2,
-				const expr_type& arg_type3) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
-      add_function_signature(function_name,result_type,arg_types);
-    }
-
-    void add_function_signature(const std::string& function_name,
-				const expr_type& result_type,
-				const expr_type& arg_type1,
-				const expr_type& arg_type2,
-				const expr_type& arg_type3,
-				const expr_type& arg_type4) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
-      arg_types.push_back(arg_type4);
-      add_function_signature(function_name,result_type,arg_types);
-    }
-
-    std::map<std::string, std::vector<function_signature_t> > base_map() {
-      std::map<std::string, std::vector<function_signature_t> > result;
-      
-      add_function_signature("normal",
-			     expr_type(DOUBLE_T,0U),
-			     expr_type(DOUBLE_T,0U),
-			     expr_type(DOUBLE_T,0U),
-			     expr_type(DOUBLE_T,0U));
-
-      return result;
-    }
-
-    bool equal_arg_type(const expr_type& type1,
-			const expr_type& type2) {
-      return type1.type() == type2.type()
-	&& type1.num_dims() == type2.num_dims();
-    }
-
-    bool equal_arg_types(const std::vector<expr_type> types,
-			 const std::vector<expression> args) {
-      if (types.size() != args.size()) return false;
-      for (unsigned int i = 0; i < types.size(); ++i)
-	if (!equal_arg_type(types[i],args[i].expression_type()))
-	  return false;
-      return true;
-    }
-
-    expr_type get_result_type(const std::string& function_name,
-			      const std::vector<expression>& args) {
-      std::vector<function_signature_t> signature_vec = function_type_map[function_name];
-      for (unsigned int i = 0; i < signature_vec.size(); ++i)
-	if (equal_arg_types(signature_vec[i].second, args))
-	  return signature_vec[i].first;
-      return expr_type();
-    }
-
     // add_function_signature("normal",
     // expr_type(DOUBLE_T,0));
 			   
@@ -398,7 +428,7 @@ namespace stan {
 	  std::vector<expression> const& args) 
 	: name_(name),
 	  args_(args),
-	  type_(get_result_type(name,args)) {
+	  type_() { // FIXME: plumb in typer
       }
       std::string name_;
       std::vector<expression> args_;
