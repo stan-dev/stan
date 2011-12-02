@@ -97,21 +97,12 @@ namespace stan {
 	: base_type_(base_type),
 	  num_dims_(num_dims) {
       }
-      expr_type(const expr_type& et)
-	: base_type_(et.base_type_),
-	  num_dims_(et.num_dims_) { 
-      }
       bool operator==(const expr_type& et) const {
 	return base_type_ == et.base_type_
 	  && num_dims_ == et.num_dims_;
       }
       bool operator!=(const expr_type& et) const {
 	return !(*this == et);
-      }
-      expr_type& operator=(const expr_type& et) {
-	base_type_ = et.base_type_;
-	num_dims_ = et.num_dims_;
-	return *this;
       }
       bool is_primitive() const {
 	return (base_type_ == INT_T
@@ -121,7 +112,7 @@ namespace stan {
       base_expr_type type() const {
 	return base_type_;
       }
-      int num_dims() const {
+      unsigned int num_dims() const {
 	return num_dims_;
       }
     };
@@ -154,7 +145,7 @@ namespace stan {
 
     typedef std::pair<expr_type, std::vector<expr_type> > function_signature_t;
 
- /**
+    /**
      * Singleton for all of the function signature specifications.
      * This includes constants which are treated as nullary functions.
      */
@@ -162,7 +153,7 @@ namespace stan {
     public:
 
       /**
-       * Get the function signatures instance as a singleton.
+       * Return the single function signatures object.  
        *
        * @return The single instance.
        */
@@ -188,12 +179,27 @@ namespace stan {
 
       }
 
+      /**
+       * Add a signature for the nullary function with specified name
+       * and result type.
+       *
+       * @param name Name of function.
+       * @param result_type Return type for function.
+       */
       void add(const std::string& name,
 	       const expr_type& result_type) {
 	std::vector<expr_type> arg_types;
 	add(name,result_type,arg_types);
       }
 
+      /**
+       * Add a signature for the unary function with specified name,
+       * result type and argument type.
+       *
+       * @param name Name of function.
+       * @param result_type Return type for function.
+       * @param arg_type Type of argument.
+       */
       void add(const std::string& name,
 	       const expr_type& result_type,
 	       const expr_type& arg_type) {
@@ -202,6 +208,15 @@ namespace stan {
 	add(name,result_type,arg_types);
       }
 
+      /**
+       * Add a signature for the binary function with specified name,
+       * result type and argument types.
+       *
+       * @param name Name of function.
+       * @param result_type Return type for function.
+       * @param arg_type1 Type of first argument.
+       * @param arg_type2 Type of second argument.
+       */
       void add(const std::string& name,
 	       const expr_type& result_type,
 	       const expr_type& arg_type1,
@@ -212,6 +227,16 @@ namespace stan {
 	add(name,result_type,arg_types);
       }
 
+      /**
+       * Add a signature for the ternary function with specified name,
+       * result type and argument types.
+       *
+       * @param name Name of function.
+       * @param result_type Return type for function.
+       * @param arg_type1 Type of first argument.
+       * @param arg_type2 Type of second argument.
+       * @param arg_type3 Type of third argument.
+       */
       void add(const std::string& name,
 	       const expr_type& result_type,
 	       const expr_type& arg_type1,
@@ -224,6 +249,17 @@ namespace stan {
 	add(name,result_type,arg_types);
       }
 
+      /**
+       * Add a signature for the quaternary function with specified name,
+       * result type and argument types.
+       *
+       * @param name Name of function.
+       * @param result_type Return type for function.
+       * @param arg_type1 Type of first argument.
+       * @param arg_type2 Type of second argument.
+       * @param arg_type3 Type of third argument.
+       * @param arg_type4 Type of fourth argument.
+       */
       void add(const std::string& name,
 	       const expr_type& result_type,
 	       const expr_type& arg_type1,
@@ -246,17 +282,18 @@ namespace stan {
        *
        * @param name Name of function.
        * @param args Sequence of argument expression types.
+       * @return Result type of function with specified name and
+       * argument types.
        */
       expr_type get_result_type(const std::string& name,
 				const std::vector<expr_type>& args) {
 	std::vector<function_signature_t> signatures = sigs_map_[name];
-	for (unsigned int i = 0; i < signatures.size(); ++i)
+	for (unsigned int i = 0; i < signatures.size(); ++i) {
 	  if (args == signatures[i].second)
 	    return signatures[i].first;
+	}
 	return expr_type(); // dummy
       }
-
-
 
     private:
 
@@ -264,15 +301,14 @@ namespace stan {
 	// FIXME: this is where inits go
       }
 
-      function_signatures(const function_signatures& fs) { }
+      function_signatures(const function_signatures& fs);
 
       std::map<std::string, std::vector<function_signature_t> > sigs_map_;
 
-      static function_signatures* sigs_;  // see out-of-line init to 0 below
+      static function_signatures* sigs_;  // init below outside of class
     };
 
     function_signatures* function_signatures::sigs_ = 0;
-
 
     struct distribution {
       distribution() {
