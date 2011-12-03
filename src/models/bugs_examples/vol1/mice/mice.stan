@@ -29,6 +29,10 @@ parameters {
   // double pos_control; 
   // double median[M]; 
 // } 
+derived parameters {
+  double sigma[M]; 
+  for (m in 1:M)  sigma[m] <- exp(-beta[m] / r);
+} 
 
 model {
   r ~ gamma(1.0, 0.0001);      
@@ -38,7 +42,7 @@ model {
   }
   for(i in 1:N) {                          
     // is_censored[i] ~ dinterval(t[i], last_t[i]);
-    t[i] ~ weibull(r, exp(beta[group[i]])); 
+    t[i] ~ weibull(r, sigma[group[i]]); 
   }
 
   // irr_control <- beta[1];              
@@ -47,8 +51,10 @@ model {
   // pos_control <- beta[4] - beta[1];
 }
 
+// change the generated cpp code: 
 /*
-    if (1 == is_censored[i - 1]) 
-        lp__ += stan::prob::weibull_log(t[i - 1], r, exp(beta[group[i - 1] - 1]));
-    else lp__ += -pow(last_t[i - 1] / r, beta[group[i - 1] - 1]);
+            if (0 == is_censored[i - 1]) 
+                lp__ += stan::prob::weibull_log(t[i - 1], r, sigma[group[i - 1] - 1]);
+            // right censored: log(1 - F(t_r)), where F: weibull CDF  
+            else lp__ += -pow(last_t[i - 1] / sigma[group[i - 1] - 1], r);
 **/

@@ -19,13 +19,14 @@ medians <- matrix(0, ncol = M, nrow = nrow(post))
 
 for (j in 1:M) {
     betaj <- paste("beta", j, sep = '')  
-    medians[, j] <- pow(log(2) * exp(-post[, betaj]), 1 / post[, "r"])   
+    medians[, j] <- (log(2) * exp(-post[, betaj])) ^ (1 / post[, "r"])   
     names(medians[, j]) <- paste("median", j, sep = '')  
 } 
 
-poi <- cbind(irr_control, test_sub, veh_control, post_control, medians) 
-colnames(poi)[1:4] <- c("irr_control", "test_sub", "veh_control", "post_control");
-poi <- as.mcmc(poi)
+poi <- cbind(irr_control, veh_control, test_sub, post_control, post[, "r"], medians) 
+colnames(poi)[1:5] <- c("irr_control", "veh_control", "test_sub", "post_control", "r");
+colnames(poi)[6:(5 + M)] <- paste("median", 1:M, sep = '')
+poi <- as.mcmc(poi[, -1])
 summary(poi) 
 
 # copied from jags example 
