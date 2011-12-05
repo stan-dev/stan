@@ -20,6 +20,7 @@
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/variant/static_visitor.hpp>
 
+#include <climits>
 #include <iomanip>
 #include <iostream>
 #include <istream>
@@ -105,8 +106,15 @@ namespace stan {
 	return !(*this == et);
       }
       bool is_primitive() const {
-	return (base_type_ == INT_T
-		|| base_type_ == DOUBLE_T)
+	return is_primitive_int() 
+	  || is_primitive_double();
+      }
+      bool is_primitive_int() const {
+	return base_type_ == INT_T
+	  && num_dims_ == 0U;
+      }
+      bool is_primitive_double() const {
+	return base_type_ == DOUBLE_T
 	  && num_dims_ == 0U;
       }
       base_expr_type type() const {
@@ -274,6 +282,34 @@ namespace stan {
 	add(name,result_type,arg_types);
       }
 
+      void add_unary(const::std::string& name) {
+	add(name,DOUBLE_T,DOUBLE_T);
+      }
+
+      void add_binary(const::std::string& name) {
+	add(name,DOUBLE_T,DOUBLE_T,DOUBLE_T);
+      }
+
+      void add_ternary(const::std::string& name) {
+	add(name,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
+      }
+
+      unsigned int num_promotions(const std::vector<expr_type>& call_args,
+			 const std::vector<expr_type>& sig_args) {
+	int num_promotions = 0U;
+	for (unsigned int i = 0; i < call_args.size(); ++i) {
+	  if (call_args[i] == sig_args[i]) {
+	    continue;
+	  } else if (call_args[i].is_primitive_int()
+		     && sig_args[i].is_primitive_double()) {
+	    ++num_promotions;
+	  } else {
+	    return -1;
+	  } 
+	}
+	return num_promotions;
+      }
+
       /**
        * Return the result type for the function with the specified
        * name and argument types.  If the function and argument pair
@@ -288,17 +324,41 @@ namespace stan {
       expr_type get_result_type(const std::string& name,
 				const std::vector<expr_type>& args) {
 	std::vector<function_signature_t> signatures = sigs_map_[name];
-	for (unsigned int i = 0; i < signatures.size(); ++i) {
-	  if (args == signatures[i].second)
-	    return signatures[i].first;
-	}
-	return expr_type(); // dummy
-      }
+	unsigned int match_index = 0U; 
+	unsigned int min_promotions = UINT_MAX; 
+	unsigned int num_matches = 0U;
 
+	for (unsigned int i = 0; i < signatures.size(); ++i) {
+	  int promotions = num_promotions(args,signatures[i].second);
+	  if (promotions < 0) continue; // no match
+	  if (promotions < min_promotions) {
+	    min_promotions = promotions;
+	    match_index = i;
+	    num_matches = 1U;
+	  } else if (promotions == min_promotions) {
+	    ++num_matches;
+	  }
+	}
+
+	if (num_matches == 1) {
+	  return signatures[match_index].first;
+	} else if (num_matches == 0U) {
+	  std::cerr << "no matches for function name=\"" << name << "\"" 
+		    << std::endl;
+	} else {
+	  std::cerr << num_matches << " matches with " 
+		    << min_promotions << " integer promotions "
+		    << "for function name=\"" << name << "\"" << std::endl;
+	}
+	for (unsigned int i = 0; i < args.size(); ++i)
+	  std::cerr << "    arg " << i << " type=" << args[i] << std::endl;
+	return expr_type(); // ill-formed dummy
+      }
+      
     private:
 
       function_signatures() { 
-	// FIXME: this is where inits go
+#include <stan/gm/function_signatures.hpp>
       }
 
       function_signatures(const function_signatures& fs);

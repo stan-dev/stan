@@ -26,6 +26,22 @@ TEST(gm_ast,expr_type_is_primitive) {
   EXPECT_FALSE(expr_type(MATRIX_T).is_primitive());
   EXPECT_FALSE(expr_type(INT_T,2U).is_primitive());
 }
+TEST(gm_ast,expr_type_is_primitive_int) {
+  EXPECT_FALSE(expr_type(DOUBLE_T).is_primitive_int());
+  EXPECT_TRUE(expr_type(INT_T).is_primitive_int());
+  EXPECT_FALSE(expr_type(VECTOR_T).is_primitive_int());
+  EXPECT_FALSE(expr_type(ROW_VECTOR_T).is_primitive_int());
+  EXPECT_FALSE(expr_type(MATRIX_T).is_primitive_int());
+  EXPECT_FALSE(expr_type(INT_T,2U).is_primitive_int());
+}
+TEST(gm_ast,expr_type_is_primitive_double) {
+  EXPECT_TRUE(expr_type(DOUBLE_T).is_primitive_double());
+  EXPECT_FALSE(expr_type(INT_T).is_primitive_double());
+  EXPECT_FALSE(expr_type(VECTOR_T).is_primitive_double());
+  EXPECT_FALSE(expr_type(ROW_VECTOR_T).is_primitive_double());
+  EXPECT_FALSE(expr_type(MATRIX_T).is_primitive_double());
+  EXPECT_FALSE(expr_type(INT_T,2U).is_primitive_double());
+}
 TEST(gm_ast,expr_type_eq) {
   EXPECT_EQ(expr_type(DOUBLE_T),expr_type(DOUBLE_T));
   EXPECT_EQ(expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U));
@@ -66,9 +82,20 @@ std::vector<expr_type> expr_type_vec(const expr_type& t1,
 
 TEST(gm_ast,function_signatures_add) {
   stan::gm::function_signatures& fs = stan::gm::function_signatures::instance();
-  fs.add("sqrt",expr_type(DOUBLE_T),expr_type(DOUBLE_T));
 
   EXPECT_EQ(expr_type(DOUBLE_T), fs.get_result_type("sqrt",expr_type_vec(expr_type(DOUBLE_T))));
-  EXPECT_EQ(expr_type(), fs.get_result_type("foo",expr_type_vec()));
+  EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec()));
+  EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec(expr_type(DOUBLE_T))));
 
+  // these next two conflict
+  fs.add("bar__",expr_type(DOUBLE_T),expr_type(INT_T),expr_type(DOUBLE_T));
+  fs.add("bar__",expr_type(DOUBLE_T),expr_type(DOUBLE_T),expr_type(INT_T));
+  EXPECT_EQ(expr_type(), 
+	    fs.get_result_type("bar__",expr_type_vec(expr_type(INT_T),expr_type(INT_T))));
+
+  // after this, should be resolvable
+  fs.add("bar__",expr_type(INT_T), expr_type(INT_T), expr_type(INT_T));
+  EXPECT_EQ(expr_type(INT_T), 
+	    fs.get_result_type("bar__",expr_type_vec(INT_T,INT_T))); // expr_type(INT_T),expr_type(INT_T))));
+  
 }
