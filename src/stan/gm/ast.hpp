@@ -739,12 +739,12 @@ namespace stan {
     struct sample {
       sample() {
       }
-      sample(var& v,
+      sample(expression& e,
 	     distribution& dist) 
-	: v_(v),
+	: expr_(e),
 	  dist_(dist) {
       }
-      var v_;
+      expression expr_;
       distribution dist_;
     };
 

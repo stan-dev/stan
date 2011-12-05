@@ -133,7 +133,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
 			  (std::vector<stan::gm::statement>, statements_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
-			  (stan::gm::var, v_)
+			  (stan::gm::expression, expr_)
 			  (stan::gm::distribution, dist_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
@@ -502,7 +502,7 @@ namespace stan {
 
 	sample_r.name("distribution of expression");
 	sample_r 
-	  = var_r
+	  = expression_r
 	  >> qi::lit('~')
 	  > distribution_r
 	  > qi::lit(';');
