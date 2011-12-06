@@ -26,20 +26,25 @@
  * @subsection rinterface Interface to R
  *
  * Stan may be invoked from <a href="http://www.r-project.org/">R</a>
- * following the design of <a href="http://cran.r-project.org/web/packages/R2WinBUGS/index.html">R2WinBugs</a>.
+ * following the pattern of 
+ * <a href="http://cran.r-project.org/web/packages/R2WinBUGS/index.html">R2WinBugs</a>.
  *	
  * @section license Open-Source Licensing
  *
  * Stan is released under the 
- * <a href="http://www.opensource.org/licenses/bsd-license.php">New BSD license</a>.  
+ * <a href="http://www.opensource.org/licenses/bsd-license.php">New BSD license</a> (aka
+ * modified BSD or 3-clause BSD).  
  *
  * <p>Portions of Stan have dependencies on <a href="http://www.boost.org/">Boost</a>
  * (<a href="http://www.boost.org/users/license.html">Boost license</a>) 
  * and <a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> 
  * (<a href="http://www.gnu.org/licenses/lgpl.html">Lesser Gnu Public License 3+</a>).
+ * Compatible versions of Boost and Eigen are distributed with Stan.
  * 
  * <p>The R interface has dependencies on <a href="http://statistics.columbia.edu/people-full/106">R</a> 
- * (<a href="http://www.gnu.org/copyleft/gpl.html">Gnu Public License, version 3</a>).  It
+ * (<a href="http://www.gnu.org/copyleft/gpl.html">Gnu Public License, version 3</a>).  R must be
+ * downloaded and installed separately.  The combination of Stan and R is then governed under the
+ * Gnu Public License, version 3, as required by the Gnu Public License's compatibility terms.
  *	
  * @section team Project Team
  *
@@ -62,9 +67,10 @@
  *	
  * @section Acknowledgements
  *
- * The development of Stan was supported by ???.
+ * The development of Stan was partly supported by the U.&nbsp;S. Department
+ * of Energy (DE-SC0002099).
  */
 
 /** 
  * @namespace stan Probability, optimization and sampling library.
- */
+ */ 

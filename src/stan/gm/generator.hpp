@@ -786,7 +786,7 @@ namespace stan {
       void operator()(sample const& x) const {
 	generate_indent(indent_,o_);
 	o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log(";
-	generate_var(x.v_,o_);
+	generate_expression(x.expr_,o_);
 	for (unsigned int i = 0; i < x.dist_.args_.size(); ++i) {
 	  o_ << ", ";
 	  generate_expression(x.dist_.args_[i],o_);

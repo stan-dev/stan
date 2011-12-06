@@ -133,7 +133,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
 			  (std::vector<stan::gm::statement>, statements_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
-			  (stan::gm::var, v_)
+			  (stan::gm::expression, expr_)
 			  (stan::gm::distribution, dist_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
@@ -161,6 +161,26 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
+    struct validate_expr_type {
+      template <typename T>
+      struct result { typedef bool type; };
+
+      bool operator()(const expression& expr) const {
+	std::cout << "validating expr type=" << expr.expression_type() << std::endl;
+	return !expr.expression_type().is_ill_formed();
+      }
+    };
+    boost::phoenix::function<validate_expr_type> validate_expr_type_f;
+
+    struct validate_primitive_int_type {
+      template <typename T>
+      struct result { typedef bool type; };
+
+      bool operator()(const expression& expr) const {
+	return expr.expression_type().is_primitive_int();
+      }
+    };
+    boost::phoenix::function<validate_primitive_int_type> validate_primitive_int_type_f;
 
     // the following is for debugging:
     // void generate_expression(const expression& e, std::ostream& o);
@@ -209,6 +229,34 @@ namespace stan {
       }
     };
     boost::phoenix::function<add_var_decl> add_var;
+
+    struct add_loop_identifier {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(const std::string& name, 
+		      std::string& name_local,
+		      std::map<std::string,base_var_decl>& name_to_type) const {
+	std::cout << "add loop, name=" << name << std::endl;
+	name_local = name;
+	if (name_to_type.find(name) != name_to_type.end())
+	  return false; // variable exists
+	name_to_type[name] = base_var_decl(name,std::vector<expression>(),INT_T);
+	return true;
+      }
+    };
+    boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
+
+    struct remove_loop_identifier {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+      void operator()(const std::string& name, 
+		      std::map<std::string,base_var_decl>& name_to_type) const {
+	std::cout << "remove loop, name=" << name << std::endl;
+	name_to_type.erase(name);
+      }
+    };
+    boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
+
 
     template <typename Iterator>
     class whitespace_grammar : public qi::grammar<Iterator> {
@@ -392,14 +440,12 @@ namespace stan {
 
 	expression_r.name("expression");
 	expression_r 
-	  %=  term_r                           [_val = _1]
+	  %=  term_r                                 [_val = _1]
 	  >> *( (qi::lit('+') > term_r         [_val += _1])
-		 |   (qi::lit('-') > term_r    [_val -= _1])
-	      )
+		|   (qi::lit('-') > term_r    [_val -= _1])
+		)
+	  // > qi::eps[_pass = validate_expr_type_f(_val)];
 	  ;
-
-	// cf.
-	// expression_r = term_r | term_r >> '+' expression_r | term_r >> '-' expression_r
 
 	term_r.name("term");
 	term_r 
@@ -502,7 +548,7 @@ namespace stan {
 
 	sample_r.name("distribution of expression");
 	sample_r 
-	  = var_r
+	  = expression_r
 	  >> qi::lit('~')
 	  > distribution_r
 	  > qi::lit(';');
@@ -516,21 +562,23 @@ namespace stan {
 
 	statement_r.name("statement");
 	statement_r
-	  = assignment_r
-	  | sample_r
-	  | statement_seq_r
-	  | for_statement_r;
+	  = statement_seq_r
+	  | for_statement_r
+	  | assignment_r
+	  | sample_r;
 
 	for_statement_r.name("for statement");
 	for_statement_r
-	  = qi::lit("for")
+	  %= qi::lit("for")
 	  > qi::lit('(')
-	  > identifier_r
+	  > identifier_r [_pass = add_loop_identifier_f(_1,_a,boost::phoenix::ref(var_name_to_decl_))]
 	  > qi::lit("in")
 	  > range_r
 	  > qi::lit(')')
-	  > statement_r;
-	
+	  > statement_r
+	  > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
+	  ;
+
 	statement_seq_r.name("sequence of statements");
 	statement_seq_r
 	  = qi::lit('{')
@@ -538,7 +586,8 @@ namespace stan {
 	  > qi::lit('}');
 
 	qi::on_error<qi::rethrow>(var_decl_r,
-				  std::cerr << boost::phoenix::val("ERROR: Duplicate variable declaration.")
+				  std::cerr 
+				  << boost::phoenix::val("ERROR: Duplicate variable declaration.")
 				  << std::endl);
 
 	qi::on_error<qi::rethrow>(program_r,
@@ -583,7 +632,8 @@ namespace stan {
       qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > assignment_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > statement_r;
       qi::rule<Iterator, statements(), whitespace_grammar<Iterator> > statement_seq_r;
-      qi::rule<Iterator, for_statement(), whitespace_grammar<Iterator> > for_statement_r;
+      qi::rule<Iterator, qi::locals<std::string>, for_statement(), 
+               whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > indexed_factor_r;
     };
