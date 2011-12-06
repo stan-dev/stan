@@ -166,7 +166,7 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr) const {
-	std::cout << "validating expr type=" << expr.expression_type() << std::endl;
+	// std::cout << "validating expr type=" << expr.expression_type() << std::endl;
 	return !expr.expression_type().is_ill_formed();
       }
     };
@@ -236,7 +236,6 @@ namespace stan {
       bool operator()(const std::string& name, 
 		      std::string& name_local,
 		      std::map<std::string,base_var_decl>& name_to_type) const {
-	std::cout << "add loop, name=" << name << std::endl;
 	name_local = name;
 	if (name_to_type.find(name) != name_to_type.end())
 	  return false; // variable exists
@@ -251,7 +250,6 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(const std::string& name, 
 		      std::map<std::string,base_var_decl>& name_to_type) const {
-	std::cout << "remove loop, name=" << name << std::endl;
 	name_to_type.erase(name);
       }
     };
