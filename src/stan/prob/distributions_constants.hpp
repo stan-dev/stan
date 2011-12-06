@@ -26,7 +26,7 @@ namespace stan {
 
       const double NEG_LOG_TWO_OVER_TWO = -LOG_TWO / 2.0;
 
-      const double SQRT_2 = std::sqrt(2);
+      const double SQRT_2 = sqrt(2.0);
     }
  
  }
