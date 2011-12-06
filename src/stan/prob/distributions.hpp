@@ -30,6 +30,8 @@
 #include "stan/prob/distributions_beta.hpp"
 #include "stan/prob/distributions_dirichlet.hpp"
 
+#include "stan/prob/distributions_cauchy.hpp"
+
 namespace stan {
   namespace prob {
 
@@ -256,15 +258,6 @@ namespace stan {
       return normal_trunc_h_log (y, mu, sigma, high);
     }
 
-
-    // Cauchy(y|mu,sigma)  [sigma > 0]
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    cauchy_log(T_y y, T_loc mu, T_scale sigma) {
-      return NEG_LOG_PI
-	- log(sigma)
-	- log(1.0 + (y - mu) * (y - mu) / (sigma * sigma));
-    }
 
     // Pareto(y|y_m,alpha)  [y > y_m;  y_m > 0;  alpha > 0]
     template <typename T_y, typename T_scale, typename T_shape>
