@@ -464,11 +464,11 @@ namespace stan {
 
     struct int_literal {
       int_literal()
-	: type_(INT_T,0U) { 
+	: type_(INT_T) { 
       }
       int_literal(int val) 
       : val_(val), 
-	type_(INT_T,0U) { 
+	type_(INT_T) { 
       }
       int_literal(const int_literal& il) 
 	: val_(il.val_),
