@@ -130,7 +130,7 @@ namespace stan {
     template <typename T_y, typename T_alpha, typename T_beta>
     inline typename boost::math::tools::promote_args<T_y,T_alpha,T_beta>::type
     beta_propto_log(const T_y& y, const T_alpha& alpha, const T_beta& beta) {
-      return beta_log (y, alpha, beta, boost::math::policies::policy<>());
+      return beta_propto_log (y, alpha, beta, boost::math::policies::policy<>());
     }
 
   }

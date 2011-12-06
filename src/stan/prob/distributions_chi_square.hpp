@@ -111,7 +111,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_propto_log(const T_y& y, const T_dof& nu) {
-      return chi_square_log(y, nu, boost::math::policies::policy<>());
+      return chi_square_propto_log(y, nu, boost::math::policies::policy<>());
     } 
 
   }
