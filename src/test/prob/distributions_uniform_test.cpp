@@ -25,4 +25,27 @@ TEST(distributions,UniformDefaultPolicy) {
   EXPECT_THROW (stan::prob::uniform_log(1.0, 0.0, 0.0), std::domain_error);
   EXPECT_THROW (stan::prob::uniform_log(-1.0, 0.0, 0.0), std::domain_error);
 }
+TEST(distributions,UniformErrorNoPolicy) {
+  using boost::math::policies::policy;
+  using boost::math::policies::evaluation_error;
+  using boost::math::policies::domain_error;
+  using boost::math::policies::overflow_error;
+  using boost::math::policies::domain_error;
+  using boost::math::policies::pole_error;
+  using boost::math::policies::errno_on_error;
 
+  typedef policy<
+    domain_error<errno_on_error>, 
+    pole_error<errno_on_error>,
+    overflow_error<errno_on_error>,
+    evaluation_error<errno_on_error> 
+    > pol;
+  
+  double y = 0;
+  double result;
+  // lower and uppper bounds same
+  EXPECT_NO_THROW (result = stan::prob::uniform_log (y, 0.0, 0.0, pol()));
+  EXPECT_EQ (33, errno);
+  
+
+}

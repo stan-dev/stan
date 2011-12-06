@@ -36,9 +36,9 @@ namespace stan {
      * @tparam T_y Type of scalar.
      * @tparam T_inv_scale Type of inverse scale.
      */
-    template <typename T_y, typename T_inv_scale, class Policy = boost::math::policies::policy<> >
+    template <typename T_y, typename T_inv_scale, class Policy>
     inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
-    exponential_log(const T_y& y, const T_inv_scale& beta, const Policy& /* pol */ = Policy()) {
+    exponential_log(const T_y& y, const T_inv_scale& beta, const Policy& /* pol */) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       double result;
@@ -50,6 +50,34 @@ namespace stan {
       return log(beta)
 	- beta * y;
     }
+
+
+    /**
+     * The log of an exponential density for y with the specified
+     * inverse scale parameter.
+     * Inverse scale parameter must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     \f{eqnarray*}{
+       y &\sim& \mbox{\sf{Expon}}(\beta) \\
+       \log (p (y \,|\, \beta) ) &=& \log \left( \beta \exp^{-\beta y} \right) \\
+       &=& \log (\beta) - \beta y \\
+       & & \mathrm{where} \; y > 0
+     \f}
+     * @param y A scalar variable.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_inv_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_log(const T_y& y, const T_inv_scale& beta) {
+      return exponential_log (y, beta, boost::math::policies::policy<> ());
+    }
+
+
     /**
      * The log of a distribution proportional to an exponential density for y with the specified
      * inverse scale parameter.
@@ -63,11 +91,31 @@ namespace stan {
      * @tparam T_y Type of scalar.
      * @tparam T_inv_scale Type of inverse scale.
      */
-    template <typename T_y, typename T_inv_scale, class Policy = boost::math::policies::policy<> >
+    template <typename T_y, typename T_inv_scale, class Policy>
     inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
-    exponential_propto_log(const T_y& y, const T_inv_scale& beta, const Policy& /* pol */ = Policy()) {
+    exponential_propto_log(const T_y& y, const T_inv_scale& beta, const Policy& /* pol */) {
       return exponential_log (y, beta, Policy());
     }
+
+    /**
+     * The log of a distribution proportional to an exponential density for y with the specified
+     * inverse scale parameter.
+     * Inverse scale parameter must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     * @param y A scalar variable.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_inv_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_propto_log(const T_y& y, const T_inv_scale& beta) {
+      return exponential_propto_log (y, beta, boost::math::policies::policy<>());
+    }
+
 
   }
 }

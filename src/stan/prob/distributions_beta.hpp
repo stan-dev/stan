@@ -40,9 +40,9 @@ namespace stan {
      * @tparam T_alpha Type of prior sample size for alpha.
      * @tparam T_beta Type of prior sample size for beta.
      */
-    template <typename T_y, typename T_alpha, typename T_beta, class Policy = boost::math::policies::policy<> >
+    template <typename T_y, typename T_alpha, typename T_beta, class Policy>
     inline typename boost::math::tools::promote_args<T_y,T_alpha,T_beta>::type
-    beta_log(const T_y& y, const T_alpha& alpha, const T_beta& beta, const Policy& /* pol */ = Policy() ) {
+    beta_log(const T_y& y, const T_alpha& alpha, const T_beta& beta, const Policy& /* pol */) {
       static const char* function = "stan::prob::beta_log<%1%>(%1%)";
 
       double result;
@@ -59,6 +59,35 @@ namespace stan {
 	+ (alpha - 1.0) * log(y)
 	+ (beta - 1.0) * log(1.0 - y);
     }
+
+    /**
+     * The log of a beta density for y with the specified
+     * prior sample sizes.
+     * Prior sample sizes, alpha and beta, must be greater than 0.
+     * y must be between 0 and 1 inclusive.
+     * 
+     \f{eqnarray*}{
+     y &\sim& \mbox{\sf{Beta}}(\alpha, \beta) \\
+     \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1-y)^{\beta - 1} \right) \\
+     &=& \log (\Gamma(\alpha + \beta)) - \log (\Gamma (\alpha) - \log(\Gamma(\beta)) + (\alpha-1) \log(y) + (\beta-1) \log(1 - y) \\
+     & & \mathrm{where} \; y \in [0, 1]
+     \f}
+     * @param y A scalar variable.
+     * @param alpha Prior sample size.
+     * @param beta Prior sample size.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_alpha Type of prior sample size for alpha.
+     * @tparam T_beta Type of prior sample size for beta.
+     */
+    template <typename T_y, typename T_alpha, typename T_beta>
+    inline typename boost::math::tools::promote_args<T_y,T_alpha,T_beta>::type
+    beta_log(const T_y& y, const T_alpha& alpha, const T_beta& beta) {
+      return beta_log (y, alpha, beta, boost::math::policies::policy<>());
+    }
+
     /**
      * The log of a distribution proportional to a beta density for y with the specified
      * prior sample sizes.
@@ -75,12 +104,34 @@ namespace stan {
      * @tparam T_alpha Type of prior sample size for alpha.
      * @tparam T_beta Type of prior sample size for beta.
      */
-    template <typename T_y, typename T_alpha, typename T_beta, class Policy = boost::math::policies::policy<> >
+    template <typename T_y, typename T_alpha, typename T_beta, class Policy>
     inline typename boost::math::tools::promote_args<T_y,T_alpha,T_beta>::type
-    beta_propto_log(const T_y& y, const T_alpha& alpha, const T_beta& beta, const Policy& /* pol */ = Policy() ) {
+    beta_propto_log(const T_y& y, const T_alpha& alpha, const T_beta& beta, const Policy& /* pol */) {
       return beta_log (y, alpha, beta, Policy());
     }
-
+    
+    
+    /**
+     * The log of a distribution proportional to a beta density for y with the specified
+     * prior sample sizes.
+     * Prior sample sizes, alpha and beta, must be greater than 0.
+     * y must be between 0 and 1 inclusive.
+     *
+     * @param y A scalar variable.
+     * @param alpha Prior sample size.
+     * @param beta Prior sample size.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_alpha Type of prior sample size for alpha.
+     * @tparam T_beta Type of prior sample size for beta.
+     */
+    template <typename T_y, typename T_alpha, typename T_beta>
+    inline typename boost::math::tools::promote_args<T_y,T_alpha,T_beta>::type
+    beta_propto_log(const T_y& y, const T_alpha& alpha, const T_beta& beta) {
+      return beta_log (y, alpha, beta, boost::math::policies::policy<>());
+    }
 
   }
 }
