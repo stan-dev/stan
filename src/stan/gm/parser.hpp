@@ -161,6 +161,26 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
+    struct validate_expr_type {
+      template <typename T>
+      struct result { typedef bool type; };
+
+      bool operator()(const expression& expr) const {
+	std::cout << "validating expr type=" << expr.expression_type() << std::endl;
+	return !expr.expression_type().is_ill_formed();
+      }
+    };
+    boost::phoenix::function<validate_expr_type> validate_expr_type_f;
+
+    struct validate_primitive_int_type {
+      template <typename T>
+      struct result { typedef bool type; };
+
+      bool operator()(const expression& expr) const {
+	return expr.expression_type().is_primitive_int();
+      }
+    };
+    boost::phoenix::function<validate_primitive_int_type> validate_primitive_int_type_f;
 
     // the following is for debugging:
     // void generate_expression(const expression& e, std::ostream& o);
@@ -392,14 +412,12 @@ namespace stan {
 
 	expression_r.name("expression");
 	expression_r 
-	  %=  term_r                           [_val = _1]
-	  >> *( (qi::lit('+') > term_r         [_val += _1])
-		 |   (qi::lit('-') > term_r    [_val -= _1])
-	      )
+	  %=  term_r                                 [_val = _1]
+	  >> *( (qi::lit('+') > expression_r         [_val += _1])
+		|   (qi::lit('-') > expression_r    [_val -= _1])
+		)
+	  // > qi::eps[_pass = validate_expr_type_f(_val)];
 	  ;
-
-	// cf.
-	// expression_r = term_r | term_r >> '+' expression_r | term_r >> '-' expression_r
 
 	term_r.name("term");
 	term_r 

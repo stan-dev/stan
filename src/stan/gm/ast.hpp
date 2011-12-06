@@ -117,6 +117,9 @@ namespace stan {
 	return base_type_ == DOUBLE_T
 	  && num_dims_ == 0U;
       }
+      bool is_ill_formed() const {
+	return base_type_ == ILL_FORMED_T;
+      }
       base_expr_type type() const {
 	return base_type_;
       }
