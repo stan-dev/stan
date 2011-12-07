@@ -136,17 +136,3 @@ TEST(prob_prob,norm_trunc_h_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
 }
 
-TEST(prob_prob,hypergeometric) {
-  EXPECT_FLOAT_EQ(-4.119424, stan::prob::hypergeometric_log(5,15,10,10));
-  EXPECT_FLOAT_EQ(-2.302585, stan::prob::hypergeometric_log(0,2,3,2));
-}
-
-TEST(prob_prob,multinomial) {
-  std::vector<int> ns;
-  ns.push_back(1);
-  ns.push_back(2);
-  ns.push_back(3);
-  Matrix<double,Dynamic,1> theta(3,1);
-  theta << 0.2, 0.3, 0.5;
-  EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta));
-}
