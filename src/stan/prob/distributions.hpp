@@ -41,8 +41,8 @@
 #include "stan/prob/distributions_bernoulli.hpp"
 #include "stan/prob/distributions_categorical.hpp"
 #include "stan/prob/distributions_binomial.hpp"
-/*#include "stan/prob/distributions_poisson.hpp"
-#include "stan/prob/distributions_neg_binomial.hpp"
+#include "stan/prob/distributions_poisson.hpp"
+/*#include "stan/prob/distributions_neg_binomial.hpp"
 #include "stan/prob/distributions_beta_binomial.hpp"
 #include "stan/prob/distributions_hypergeometric.hpp"
 #include "stan/prob/distributions_multinomial.hpp"*/
@@ -279,15 +279,6 @@ namespace stan {
     
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
-
-    // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <typename T_rate>
-    inline typename boost::math::tools::promote_args<T_rate>::type
-    poisson_log(unsigned int n, T_rate lambda) {
-      return - lgamma(n + 1.0)
-	+ n * log(lambda)
-	- lambda;
-    }
 
     // NegBinomial(n|alpha,beta)  [alpha > 0;  beta > 0;  n >= 0]
     template <typename T_shape, typename T_inv_scale>
