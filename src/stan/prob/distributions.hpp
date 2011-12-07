@@ -36,9 +36,9 @@
 #include "stan/prob/distributions_weibull.hpp"
 #include "stan/prob/distributions_logistic.hpp"
 #include "stan/prob/distributions_lognormal.hpp"
-/*#include "stan/prob/distributions_lkj_corr.hpp"
+#include "stan/prob/distributions_lkj_corr.hpp"
 #include "stan/prob/distributions_lkj_cov.hpp"
-#include "stan/prob/distributions_bernoulli.hpp"
+/*#include "stan/prob/distributions_bernoulli.hpp"
 #include "stan/prob/distributions_categorical.hpp"
 #include "stan/prob/distributions_binomial.hpp"
 #include "stan/prob/distributions_poisson.hpp"
@@ -276,91 +276,9 @@ namespace stan {
 
     // CONTINUOUS, MULTIVARIATE
 
-    //     // ?? write these in terms of cpcs rather than corr matrix
     
-    // LKJ_Corr(y|eta) [ y correlation matrix (not covariance matrix)
-    //                  eta > 0 ]
-    template <typename T_y, typename T_shape>
-    inline typename boost::math::tools::promote_args<T_y, T_shape>::type
-    lkj_corr_log(Matrix<T_y,Dynamic,Dynamic> y,
-		 T_shape eta) {
+    
 
-      // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
-      
-      const unsigned int K = y.rows();
-      T_shape the_sum = 0.0;
-      T_shape constant = 0.0;
-      T_shape beta_arg;
-      
-      if(eta == 1.0) {
-	for(unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-	  beta_arg = 0.5 * (k + 1.0);
-	  constant += k * beta_log(beta_arg, beta_arg);
-	  the_sum += pow(static_cast<double>(k),2.0);
-	}
-	constant += the_sum * LOG_TWO;
-	return constant;
-      }
-
-      T_shape diff;
-      for(unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-	diff = K - k;
-	beta_arg = eta + 0.5 * (diff - 1);
-	constant += diff * beta_log(beta_arg, beta_arg);
-	the_sum += (2.0 * eta - 2.0 + diff) * diff;
-      }
-      constant += the_sum * LOG_TWO;
-      return (eta - 1.0) * log(y.determinant()) + constant;
-    }
-
-    // LKJ_cov(y|mu,sigma,eta) [ y covariance matrix (not correlation matrix)
-    //                         mu vector, sigma > 0 vector, eta > 0 ]
-    template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type
-    lkj_cov_log(Matrix<T_y,Dynamic,Dynamic> y,
-		Matrix<T_loc,Dynamic,1> mu,
-		Matrix<T_scale,Dynamic,1> sigma,
-		T_shape eta) {
-
-      const unsigned int K = y.rows();
-      const Array<T_y,Dynamic,1> sds = y.diagonal().array().sqrt();
-      T_shape log_prob = 0.0;
-      for(unsigned int k = 0; k < K; k++) {
-	log_prob += lognormal_log(log(sds(k,1)), mu(k,1), sigma(k,1));
-      }
-      if(eta == 1.0) {
-	// no need to rescale y into a correlation matrix
-	log_prob += lkj_corr_log(y,eta); 
-	return log_prob;
-      }
-      DiagonalMatrix<double,Dynamic> D(K);
-      D.diagonal() = sds.inverse();
-      log_prob += lkj_corr_log(D * y * D, eta);
-      return log_prob;
-    }
-
-    // LKJ_Cov(y|mu,sigma,eta) [ y covariance matrix (not correlation matrix)
-    //                         mu scalar, sigma > 0 scalar, eta > 0 ]
-    template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type
-    lkj_cov_log(Matrix<T_y,Dynamic,Dynamic> y,
-		T_loc mu, T_scale sigma, T_shape eta) {
-
-      const unsigned int K = y.rows();
-      const Array<T_y,Dynamic,1> sds = y.diagonal().array().sqrt();
-      T_shape log_prob = 0.0;
-      for(unsigned int k = 0; k < K; k++) {
-	log_prob += lognormal_log(sds(k,1), mu, sigma);
-      }
-      if(eta == 1.0) {
-	log_prob += lkj_corr_log(y,eta); // no need to rescale y into a correlation matrix
-	return log_prob;
-      }
-      DiagonalMatrix<double,Dynamic> D(K);
-      D.diagonal() = sds.inverse();
-      log_prob += lkj_corr_log(D * y * D, eta);
-      return log_prob;
-    }
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
 
