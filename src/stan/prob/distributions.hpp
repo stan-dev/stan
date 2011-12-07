@@ -44,8 +44,8 @@
 #include "stan/prob/distributions_poisson.hpp"
 #include "stan/prob/distributions_neg_binomial.hpp"
 #include "stan/prob/distributions_beta_binomial.hpp"
-/*#include "stan/prob/distributions_hypergeometric.hpp"
-#include "stan/prob/distributions_multinomial.hpp"*/
+#include "stan/prob/distributions_hypergeometric.hpp"
+/*#include "stan/prob/distributions_multinomial.hpp"*/
 
 namespace stan {
   namespace prob {
@@ -280,15 +280,6 @@ namespace stan {
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
 
-    // Hypergeometric(n|N,a,b)  [0 <= n <= a;  0 <= N-n <= b;  0 <= N <= a+b]
-    // n: #white balls drawn;  N: #balls drawn;  a: #white balls;  b: #black balls
-    double
-    hypergeometric_log(unsigned int n, unsigned int N, 
-		       unsigned int a, unsigned int b) {
-      return maths::binomial_coefficient_log(a,n)
-	+ maths::binomial_coefficient_log(b,N-n)
-	- maths::binomial_coefficient_log(a+b,N);
-    }
 
     // DISCRETE, MULTIVARIATE MASS FUNCTIONS
 
