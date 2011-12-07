@@ -39,8 +39,8 @@
 #include "stan/prob/distributions_lkj_corr.hpp"
 #include "stan/prob/distributions_lkj_cov.hpp"
 #include "stan/prob/distributions_bernoulli.hpp"
-/*#include "stan/prob/distributions_categorical.hpp"
-#include "stan/prob/distributions_binomial.hpp"
+#include "stan/prob/distributions_categorical.hpp"
+/*#include "stan/prob/distributions_binomial.hpp"
 #include "stan/prob/distributions_poisson.hpp"
 #include "stan/prob/distributions_neg_binomial.hpp"
 #include "stan/prob/distributions_beta_binomial.hpp"
@@ -279,13 +279,6 @@ namespace stan {
     
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
-
-    // Categorical(n|theta)  [0 <= n < N;   0 <= theta[n] <= 1;  SUM theta = 1]
-    template <typename T_prob>
-    inline typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(unsigned int n, Matrix<T_prob,Dynamic,1>& theta) {
-      return log(theta(n));
-    }
 
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <typename T_n, typename T_N, typename T_prob>
