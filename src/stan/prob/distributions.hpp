@@ -31,6 +31,21 @@
 #include "stan/prob/distributions_dirichlet.hpp"
 
 #include "stan/prob/distributions_cauchy.hpp"
+#include "stan/prob/distributions_pareto.hpp"
+/*#include "stan/prob/distributions_double_exponential.hpp"
+#include "stan/prob/distributions_weibull.hpp"
+#include "stan/prob/distributions_logistic.hpp"
+#include "stan/prob/distributions_lognormal.hpp"
+#include "stan/prob/distributions_lkj_corr.hpp"
+#include "stan/prob/distributions_lkj_cov.hpp"
+#include "stan/prob/distributions_bernoulli.hpp"
+#include "stan/prob/distributions_categorical.hpp"
+#include "stan/prob/distributions_binomial.hpp"
+#include "stan/prob/distributions_poisson.hpp"
+#include "stan/prob/distributions_neg_binomial.hpp"
+#include "stan/prob/distributions_beta_binomial.hpp"
+#include "stan/prob/distributions_hypergeometric.hpp"
+#include "stan/prob/distributions_multinomial.hpp"*/
 
 namespace stan {
   namespace prob {
@@ -258,15 +273,6 @@ namespace stan {
       return normal_trunc_h_log (y, mu, sigma, high);
     }
 
-
-    // Pareto(y|y_m,alpha)  [y > y_m;  y_m > 0;  alpha > 0]
-    template <typename T_y, typename T_scale, typename T_shape>
-    inline typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
-    pareto_log(T_y y, T_scale y_min, T_shape alpha) {
-      return log(alpha)
-	+ alpha * log(y_min)
-	- (alpha + 1.0) * log(y);
-    }
 
     // DoubleExponential(y|mu,sigma)  [sigma > 0]
     template <typename T_y, typename T_loc, typename T_scale> 
