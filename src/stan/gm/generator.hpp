@@ -755,7 +755,7 @@ namespace stan {
        o << "// " << msg	<< EOL;
      }
 
-     void generate_var(var const& x, std::ostream& o) {
+     void generate_var(const var& x, std::ostream& o) {
        o << x.name_;
        if (x.dims_.size() == 0) return;
        o << '[';

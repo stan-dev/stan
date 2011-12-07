@@ -161,16 +161,63 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
+    struct validate_int_expr {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+
+      void operator()(const expression& expr,
+		      bool& pass) const {
+	if (!expr.expression_type().is_primitive_int()) {
+	  std::cerr << "expression denoting integer required; found type=" 
+		    << expr.expression_type() << std::endl;
+	  pass = false;
+	}
+      }
+    };
+    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+
+    // from generator.hpp: generate_expression(const expression&, std::ostream&);
     struct validate_expr_type {
       template <typename T>
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr) const {
-	bool is_ill_formed = expr.expression_type().is_ill_formed();
-	return !is_ill_formed;
+	return !expr.expression_type().is_ill_formed();
       }
     };
     boost::phoenix::function<validate_expr_type> validate_expr_type_f;
+
+    void generate_var(const var&, std::ostream&);
+    void generate_expression(const expression&, std::ostream&);
+    struct validate_assignment {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+
+      void operator()(const assignment& a, bool& pass) const {
+	// std::cerr << "validating assignment" << std::endl;
+	// std::cerr << "    var=";
+	// generate_var(a.var_,std::cerr);
+	// std::cerr << ";  expr=";
+	// generate_expression(a.expr_,std::cerr);
+	pass = true;
+      }
+    };
+    boost::phoenix::function<validate_assignment> validate_assignment_f;
+
+    struct validate_sample {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+
+      void operator()(const sample& s, bool& pass) const {
+	// std::cerr << "validating sample" << std::endl;
+	// std::cerr << "    expression=";
+	// generate_expression(s.expr_,std::cerr);
+	// std::cerr << ";  dist=";
+	// generate_distribution(s.dist_,std::cerr); // need this
+	pass = true;
+      }
+    };
+    boost::phoenix::function<validate_sample> validate_sample_f;
 
     struct validate_primitive_int_type {
       template <typename T>
@@ -240,10 +287,11 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     struct set_indexed_factor_type {
-      template <typename T1>
+      template <typename T1, typename T2>
       struct result { typedef void type; };
-      void operator()(index_op& io) const {
+      void operator()(index_op& io, bool& pass) const {
 	io.infer_type();
+	pass = !io.type_.is_ill_formed();
       }
     };
     boost::phoenix::function<set_indexed_factor_type> set_indexed_factor_type_f;
@@ -447,7 +495,7 @@ namespace stan {
 	  ;
 
 	indexed_factor_r.name("(optionally) indexed factor [sub]");
-	indexed_factor_r %= indexed_factor_2_r [set_indexed_factor_type_f(_1)];
+	indexed_factor_r %= indexed_factor_2_r [set_indexed_factor_type_f(_1,_pass)];
 
 	indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
 	indexed_factor_2_r %= (factor_r >> *dims_r);
@@ -502,9 +550,11 @@ namespace stan {
 
 	dims_r.name("array dimensions");
 	dims_r 
-	  =  ( qi::lit('[') 
-	       >> (expression_r % ',')
-	       > qi::lit(']') );
+	  %= qi::lit('[') 
+	  > (expression_r [validate_int_expr_f(_1,_pass)]
+	     % ',')
+	  > qi::lit(']')
+	  ;
 	
 	range_r.name("range expression pair, colon");
 	range_r 
@@ -550,14 +600,15 @@ namespace stan {
 	  = var_r
 	  >> qi::lit("<-")
 	  > expression_r
-	  > qi::lit(';');
+	  > qi::lit(';') 
+	  ;
 
 	statement_r.name("statement");
 	statement_r
-	  = statement_seq_r
+	  %= statement_seq_r
 	  | for_statement_r
-	  | assignment_r
-	  | sample_r;
+	  | assignment_r [validate_assignment_f(_1,_pass)]
+	  | sample_r [validate_sample_f(_1,_pass)];
 
 	for_statement_r.name("for statement");
 	for_statement_r

@@ -552,8 +552,18 @@ namespace stan {
 	infer_type();
       }
       void infer_type() {
+	unsigned int num_index_dims = total_dims(dimss_);
+	unsigned int num_expr_dims = expr_.expression_type().num_dims();
+	if (num_index_dims > num_expr_dims) {
+	  std::cerr << "too many index dimensions;"
+		    << " require at most " << num_expr_dims
+		    << " found " << num_index_dims
+		    << std::endl;
+	  type_ = expr_type();
+	  return;
+	}
 	type_ = expr_type(expr_.expression_type().type(),
-			  expr_.expression_type().num_dims() - total_dims(dimss_));
+			  num_expr_dims - num_index_dims);
       }
       expression expr_;
       std::vector<std::vector<expression> > dimss_;
