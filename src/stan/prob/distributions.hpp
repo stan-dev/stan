@@ -33,8 +33,8 @@
 #include "stan/prob/distributions_cauchy.hpp"
 #include "stan/prob/distributions_pareto.hpp"
 #include "stan/prob/distributions_double_exponential.hpp"
-/*#include "stan/prob/distributions_weibull.hpp"
-#include "stan/prob/distributions_logistic.hpp"
+#include "stan/prob/distributions_weibull.hpp"
+/*#include "stan/prob/distributions_logistic.hpp"
 #include "stan/prob/distributions_lognormal.hpp"
 #include "stan/prob/distributions_lkj_corr.hpp"
 #include "stan/prob/distributions_lkj_cov.hpp"
@@ -273,16 +273,6 @@ namespace stan {
       return normal_trunc_h_log (y, mu, sigma, high);
     }
 
-
-    // Weibull(y|sigma,alpha)     [y >= 0;  sigma > 0;  alpha > 0]
-    template <typename T_y, typename T_shape, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    weibull_log(T_y y, T_shape alpha, T_scale sigma) {
-      return log(alpha)
-	- log(sigma)
-	+ (alpha - 1.0) * (log(y) - log(sigma))
-	- pow(y / sigma, alpha);
-    }
 
     // Logistic(y|mu,sigma)    [sigma > 0]
     template <typename T_y, typename T_loc, typename T_scale>
