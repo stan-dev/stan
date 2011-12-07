@@ -136,21 +136,9 @@ TEST(prob_prob,norm_trunc_h_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
 }
 
-TEST(prob_prob,neg_binomial) {
-  EXPECT_FLOAT_EQ(-7.786663, stan::prob::neg_binomial_log(10,2.0,1.5));
-  EXPECT_FLOAT_EQ(-142.6147, stan::prob::neg_binomial_log(100,3.0,3.5));
-}
-
 TEST(prob_prob,beta_binomial) {
   EXPECT_FLOAT_EQ(-1.854007, stan::prob::beta_binomial_log(5,20,10.0,25.0));
   EXPECT_FLOAT_EQ(-4.376696, stan::prob::beta_binomial_log(25,100,30.0,50.0));
-}
-
-TEST(prob_prob,categorical) {
-  Matrix<double,Dynamic,1> theta(3,1);
-  theta << 0.3, 0.5, 0.2;
-  EXPECT_FLOAT_EQ(-1.203973, stan::prob::categorical_log(0,theta));
-  EXPECT_FLOAT_EQ(-0.6931472, stan::prob::categorical_log(1,theta));
 }
 
 TEST(prob_prob,hypergeometric) {

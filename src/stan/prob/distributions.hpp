@@ -42,8 +42,8 @@
 #include "stan/prob/distributions_categorical.hpp"
 #include "stan/prob/distributions_binomial.hpp"
 #include "stan/prob/distributions_poisson.hpp"
-/*#include "stan/prob/distributions_neg_binomial.hpp"
-#include "stan/prob/distributions_beta_binomial.hpp"
+#include "stan/prob/distributions_neg_binomial.hpp"
+/*#include "stan/prob/distributions_beta_binomial.hpp"
 #include "stan/prob/distributions_hypergeometric.hpp"
 #include "stan/prob/distributions_multinomial.hpp"*/
 
@@ -279,15 +279,6 @@ namespace stan {
     
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
-
-    // NegBinomial(n|alpha,beta)  [alpha > 0;  beta > 0;  n >= 0]
-    template <typename T_shape, typename T_inv_scale>
-    inline typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
-    neg_binomial_log(int n, T_shape alpha, T_inv_scale beta) {
-      return maths::binomial_coefficient_log<T_shape>(n + alpha - 1.0, n)
-	+ alpha * log(beta / (beta + 1.0))
-	+ n * -log(beta + 1.0);
-    }
 
     // BetaBinomial(n|alpha,beta) [alpha > 0;  beta > 0;  n >= 0]
     template <typename T_size>
