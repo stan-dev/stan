@@ -35,8 +35,8 @@
 #include "stan/prob/distributions_double_exponential.hpp"
 #include "stan/prob/distributions_weibull.hpp"
 #include "stan/prob/distributions_logistic.hpp"
-/*#include "stan/prob/distributions_lognormal.hpp"
-#include "stan/prob/distributions_lkj_corr.hpp"
+#include "stan/prob/distributions_lognormal.hpp"
+/*#include "stan/prob/distributions_lkj_corr.hpp"
 #include "stan/prob/distributions_lkj_cov.hpp"
 #include "stan/prob/distributions_bernoulli.hpp"
 #include "stan/prob/distributions_categorical.hpp"
@@ -273,17 +273,6 @@ namespace stan {
       return normal_trunc_h_log (y, mu, sigma, high);
     }
 
-
-    // LogNormal(y|mu,sigma)  [y >= 0;  sigma > 0]
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    lognormal_log(T_y y, T_loc mu, T_scale sigma) {
-      return NEG_LOG_SQRT_TWO_PI
-	- log(sigma)
-	- log(y)
-	- pow(log(y) - mu,2.0) / (2.0 * sigma * sigma);
-    }
-  
 
     // CONTINUOUS, MULTIVARIATE
 
