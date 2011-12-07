@@ -8,12 +8,12 @@ using Eigen::Array;
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-TEST(distributions,Gamma) {
+TEST(ProbDistributions,Gamma) {
   EXPECT_FLOAT_EQ(-0.6137056, stan::prob::gamma_log(1.0,2.0,2.0));
   EXPECT_FLOAT_EQ(-3.379803, stan::prob::gamma_log(2.0,0.25,0.75));
   EXPECT_FLOAT_EQ(-1, stan::prob::gamma_log(1,1,1));
 }
-TEST(distributions,GammaDefaultPolicy) {
+TEST(ProbDistributions,GammaDefaultPolicy) {
   double y = 0;
   double alpha = 1.0;
   double beta = 2.0;

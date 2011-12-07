@@ -9,7 +9,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 
-TEST(distributions,MultiNormal) {
+TEST(ProbDistributions,MultiNormal) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<double,Dynamic,1> mu(3,1);
@@ -20,7 +20,7 @@ TEST(distributions,MultiNormal) {
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log<double>(y,mu,Sigma));
 }
-TEST(distributions,MultiNormalDefaultPolicy) {
+TEST(ProbDistributions,MultiNormalDefaultPolicy) {
   Matrix<double,Dynamic,1> y(2,1);
   y << 2.0, -2.0;
   Matrix<double,Dynamic,1> mu(2,1);

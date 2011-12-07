@@ -7,7 +7,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-TEST(distributions,InvWishart) {
+TEST(ProbDistributions,InvWishart) {
   Matrix<double,Dynamic,Dynamic> Y(3,3);
   Y <<  12.147233, -11.9036079, 1.0910458,
     -11.903608,  16.7585782, 0.8530256,

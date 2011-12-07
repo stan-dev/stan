@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions_exponential.hpp"
 
-TEST(distributions,Exponential) {
+TEST(ProbDistributions,Exponential) {
   EXPECT_FLOAT_EQ(-2.594535, stan::prob::exponential_log(2.0,1.5));
   EXPECT_FLOAT_EQ(-57.13902, stan::prob::exponential_log(15.0,3.9));
 }

@@ -5,11 +5,11 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions_inv_gamma.hpp"
 
-TEST(distributions,InvGamma) {
+TEST(ProbDistributions,InvGamma) {
   EXPECT_FLOAT_EQ(-1, stan::prob::inv_gamma_log(1,1,1.0));
   EXPECT_FLOAT_EQ(-0.8185295, stan::prob::inv_gamma_log(0.5,2.9,3.1));
 }
-TEST(distributions,InvGammaDefaultPolicy) {
+TEST(ProbDistributions,InvGammaDefaultPolicy) {
   double y = 0.5;
   double alpha = 1.0;
   double beta = 2.0;

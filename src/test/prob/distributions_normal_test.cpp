@@ -4,20 +4,20 @@
 #include <boost/math/policies/policy.hpp>
 #include "stan/prob/distributions_normal.hpp"
 
-TEST(distributions,Normal) {
+TEST(ProbDistributions,Normal) {
   // values from R dnorm()
   EXPECT_FLOAT_EQ(-0.9189385, stan::prob::normal_log(0.0,0.0,1.0));
   EXPECT_FLOAT_EQ(-1.418939,  stan::prob::normal_log(1.0,0.0,1.0));
   EXPECT_FLOAT_EQ(-2.918939,  stan::prob::normal_log(-2.0,0.0,1.0));
   EXPECT_FLOAT_EQ(-3.174270,  stan::prob::normal_log(-3.5,1.9,7.2));
 }
-TEST(distributions,NormalDefaultPolicy) {
+TEST(ProbDistributions,NormalDefaultPolicy) {
   double sigma_d = 0.0;
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
   sigma_d = -1.0;
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
 }
-TEST(distributions,NormalErrnoPolicy) {
+TEST(ProbDistributions,NormalErrnoPolicy) {
   using boost::math::policies::policy;
   using boost::math::policies::evaluation_error;
   using boost::math::policies::domain_error;
@@ -44,7 +44,7 @@ TEST(distributions,NormalErrnoPolicy) {
   EXPECT_TRUE (std::isnan (result));
 }
 
-TEST(distributions,NormalPropTo) {
+TEST(ProbDistributions,NormalPropTo) {
   double diff = stan::prob::normal_propto_log (0.0, 0.0, 1.0) - (-0.9189385);
   
   EXPECT_FLOAT_EQ(-0.9189385 + diff, stan::prob::normal_propto_log(0.0,0.0,1.0));
@@ -52,13 +52,13 @@ TEST(distributions,NormalPropTo) {
   EXPECT_FLOAT_EQ(-2.918939 + diff,  stan::prob::normal_propto_log(-2.0,0.0,1.0));
   EXPECT_FLOAT_EQ(-3.174270 + diff,  stan::prob::normal_propto_log(-3.5,1.9,7.2));
 }
-TEST(distributions,NormalPropToDefaultPolicy) {
+TEST(ProbDistributions,NormalPropToDefaultPolicy) {
   double sigma_d = 0.0;
   EXPECT_THROW(stan::prob::normal_propto_log(0.0,0.0,sigma_d), std::domain_error);
   sigma_d = -1.0;
   EXPECT_THROW(stan::prob::normal_propto_log(0.0,0.0,sigma_d), std::domain_error);
 }
-TEST(distributions,NormalPropToErronoPolicy) {
+TEST(ProbDistributions,NormalPropToErronoPolicy) {
   using boost::math::policies::policy;
   using boost::math::policies::evaluation_error;
   using boost::math::policies::domain_error;
@@ -85,7 +85,7 @@ TEST(distributions,NormalPropToErronoPolicy) {
   EXPECT_TRUE (std::isnan (result));
 }
 
-TEST(distributions,NormalVec) {
+TEST(ProbDistributions,NormalVec) {
   double mu = -2.9;
   double sigma = 1.7;
 

@@ -5,7 +5,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-TEST(distributions,Dirichlet) {
+TEST(ProbDistributions,Dirichlet) {
   Matrix<double,Dynamic,1> theta(3,1);
   theta << 0.2, 0.3, 0.5;
   Matrix<double,Dynamic,1> alpha(3,1);

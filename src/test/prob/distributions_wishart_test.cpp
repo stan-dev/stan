@@ -5,7 +5,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-TEST(distributions,Wishart1) {
+TEST(ProbDistributions,Wishart1) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;
@@ -21,7 +21,7 @@ TEST(distributions,Wishart1) {
   EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma), 0.01);
 }
 
-TEST(distributions,Wishart) {
+TEST(ProbDistributions,Wishart) {
   Matrix<double,Dynamic,Dynamic> Y(4,4);
   Y << 7.988168,  -9.555605, -14.47483,   4.395895,
     -9.555605,  44.750570,  49.21577, -18.454186,
