@@ -40,8 +40,8 @@
 #include "stan/prob/distributions_lkj_cov.hpp"
 #include "stan/prob/distributions_bernoulli.hpp"
 #include "stan/prob/distributions_categorical.hpp"
-/*#include "stan/prob/distributions_binomial.hpp"
-#include "stan/prob/distributions_poisson.hpp"
+#include "stan/prob/distributions_binomial.hpp"
+/*#include "stan/prob/distributions_poisson.hpp"
 #include "stan/prob/distributions_neg_binomial.hpp"
 #include "stan/prob/distributions_beta_binomial.hpp"
 #include "stan/prob/distributions_hypergeometric.hpp"
@@ -279,15 +279,6 @@ namespace stan {
     
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
-
-    // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
-    template <typename T_n, typename T_N, typename T_prob>
-    inline typename boost::math::tools::promote_args<T_prob>::type
-    binomial_log(T_n n, T_N N, T_prob theta) {
-      return maths::binomial_coefficient_log<T_N>(N,n)
-	+ n * log(theta)
-	+ (N - n) * log(1.0 - theta);
-    }
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
     template <typename T_rate>

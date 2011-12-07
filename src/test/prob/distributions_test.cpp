@@ -136,21 +136,6 @@ TEST(prob_prob,norm_trunc_h_exception) {
   EXPECT_THROW(stan::prob::normal_trunc_h_log(y, mu, -1.0, high), std::domain_error);
 }
 
-TEST(prob_prob,lognormal) {
-  EXPECT_FLOAT_EQ(-1.509803, stan::prob::lognormal_log(1.2,0.3,1.5));
-  EXPECT_FLOAT_EQ(-3.462263, stan::prob::lognormal_log(12.0,3.0,0.9));
-}
-
-TEST(prob_prob,bernoulli) {
-  EXPECT_FLOAT_EQ(std::log(0.25), stan::prob::bernoulli_log(1,0.25));
-  EXPECT_FLOAT_EQ(std::log(1.0 - 0.25), stan::prob::bernoulli_log(0,0.25));
-}
-
-TEST(prob_prob,binomial) {
-  EXPECT_FLOAT_EQ(-2.144372, stan::prob::binomial_log(10,20,0.4));
-  EXPECT_FLOAT_EQ(-16.09438, stan::prob::binomial_log(0,10,0.8));
-}
-
 TEST(prob_prob,poisson) {
   EXPECT_FLOAT_EQ(-2.900934, stan::prob::poisson_log(17,13.0));
   EXPECT_FLOAT_EQ(-145.3547, stan::prob::poisson_log(192,42.0));
