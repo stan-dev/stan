@@ -38,8 +38,8 @@
 #include "stan/prob/distributions_lognormal.hpp"
 #include "stan/prob/distributions_lkj_corr.hpp"
 #include "stan/prob/distributions_lkj_cov.hpp"
-/*#include "stan/prob/distributions_bernoulli.hpp"
-#include "stan/prob/distributions_categorical.hpp"
+#include "stan/prob/distributions_bernoulli.hpp"
+/*#include "stan/prob/distributions_categorical.hpp"
 #include "stan/prob/distributions_binomial.hpp"
 #include "stan/prob/distributions_poisson.hpp"
 #include "stan/prob/distributions_neg_binomial.hpp"
@@ -277,17 +277,8 @@ namespace stan {
     // CONTINUOUS, MULTIVARIATE
 
     
-    
-
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
-
-    // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
-    template <typename T_prob> 
-    inline typename boost::math::tools::promote_args<T_prob>::type
-    bernoulli_log(unsigned int n, T_prob theta) {
-      return log(n ? theta : (1.0 - theta));
-    }
 
     // Categorical(n|theta)  [0 <= n < N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <typename T_prob>
