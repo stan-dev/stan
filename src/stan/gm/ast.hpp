@@ -548,9 +548,12 @@ namespace stan {
       index_op(const expression& expr,
 	       const std::vector<std::vector<expression> >& dimss) 
 	: expr_(expr),
-	  dimss_(dimss),
-	  type_(expr.expression_type().type(),
-		expr.expression_type().num_dims() - total_dims(dimss)) {
+	  dimss_(dimss) {
+	infer_type();
+      }
+      void infer_type() {
+	type_ = expr_type(expr_.expression_type().type(),
+			  expr_.expression_type().num_dims() - total_dims(dimss_));
       }
       expression expr_;
       std::vector<std::vector<expression> > dimss_;

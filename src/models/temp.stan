@@ -19,5 +19,5 @@ model {
     mu ~ normal(0,10);
     xi ~ normal(0, sigma_xi);
     for (j in 1:J)
-        y[j] ~ normal(eta, sigma_y[j]);
+        y[j] ~ normal(eta[j,k], sigma_y[j]);
 }

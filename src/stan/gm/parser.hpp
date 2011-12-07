@@ -166,9 +166,7 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr) const {
-	// std::cout << "validating expr type=" << expr.expression_type() << std::endl;
 	bool is_ill_formed = expr.expression_type().is_ill_formed();
-	// std::cout << "    is_ill_formed=" << is_ill_formed << std::endl;
 	return !is_ill_formed;
       }
     };
@@ -183,22 +181,6 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_primitive_int_type> validate_primitive_int_type_f;
-
-    // the following is for debugging:
-    // void generate_expression(const expression& e, std::ostream& o);
-    // struct print_expr {
-    //   template <typename T1, typename T2>
-    //   struct result { typedef void type; };
-
-    //   void operator()(const expression& e, const std::string& s) const {
-    // 	std::cout << "***print_expression " << s << std::endl;
-    // 	std::cout << "    expr=";
-    // 	generate_expression(e,std::cout);
-    // 	std::cout << std::endl;
-    // 	std::cout << "    type=" << e.expression_type() << std::endl;
-    //   }
-    // };
-    // boost::phoenix::function<print_expr> print;
 
     struct set_variable_type {
       template <typename T1, typename T2>
@@ -257,6 +239,14 @@ namespace stan {
     };
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
+    struct set_indexed_factor_type {
+      template <typename T1>
+      struct result { typedef void type; };
+      void operator()(index_op& io) const {
+	io.infer_type();
+      }
+    };
+    boost::phoenix::function<set_indexed_factor_type> set_indexed_factor_type_f;
 
     template <typename Iterator>
     class whitespace_grammar : public qi::grammar<Iterator> {
@@ -444,7 +434,7 @@ namespace stan {
 	  >> *( (qi::lit('+') > term_r         [_val += _1])
 		|   (qi::lit('-') > term_r    [_val -= _1])
 		)
-	  // > qi::eps[_pass = validate_expr_type_f(_val)];
+	  > qi::eps[_pass = validate_expr_type_f(_val)];
 	  ;
 
 	term_r.name("term");
@@ -457,8 +447,10 @@ namespace stan {
 	  ;
 
 	indexed_factor_r.name("(optionally) indexed factor [sub]");
-	indexed_factor_r 
-	  %= (factor_r >> *dims_r);
+	indexed_factor_r %= indexed_factor_2_r [set_indexed_factor_type_f(_1)];
+
+	indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
+	indexed_factor_2_r %= (factor_r >> *dims_r);
 
 	factor_r.name("factor");
 	factor_r
@@ -641,6 +633,7 @@ namespace stan {
                whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
       qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_r;
+      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_2_r;
     };
 
     // Cut and paste source for iterator & reporting pattern:
