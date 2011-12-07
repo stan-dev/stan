@@ -43,8 +43,8 @@
 #include "stan/prob/distributions_binomial.hpp"
 #include "stan/prob/distributions_poisson.hpp"
 #include "stan/prob/distributions_neg_binomial.hpp"
-/*#include "stan/prob/distributions_beta_binomial.hpp"
-#include "stan/prob/distributions_hypergeometric.hpp"
+#include "stan/prob/distributions_beta_binomial.hpp"
+/*#include "stan/prob/distributions_hypergeometric.hpp"
 #include "stan/prob/distributions_multinomial.hpp"*/
 
 namespace stan {
@@ -279,15 +279,6 @@ namespace stan {
     
 
     // DISCRETE, UNIVARIATE MASS FUNCTIONS
-
-    // BetaBinomial(n|alpha,beta) [alpha > 0;  beta > 0;  n >= 0]
-    template <typename T_size>
-    inline typename boost::math::tools::promote_args<T_size>::type
-    beta_binomial_log(int n, int N, T_size alpha, T_size beta) {
-      return maths::binomial_coefficient_log(N,n)
-	+ maths::beta_log(n + alpha, N - n + beta)
-	- maths::beta_log(alpha,beta);
-    }
 
     // Hypergeometric(n|N,a,b)  [0 <= n <= a;  0 <= N-n <= b;  0 <= N <= a+b]
     // n: #white balls drawn;  N: #balls drawn;  a: #white balls;  b: #black balls
