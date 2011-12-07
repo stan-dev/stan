@@ -34,8 +34,8 @@
 #include "stan/prob/distributions_pareto.hpp"
 #include "stan/prob/distributions_double_exponential.hpp"
 #include "stan/prob/distributions_weibull.hpp"
-/*#include "stan/prob/distributions_logistic.hpp"
-#include "stan/prob/distributions_lognormal.hpp"
+#include "stan/prob/distributions_logistic.hpp"
+/*#include "stan/prob/distributions_lognormal.hpp"
 #include "stan/prob/distributions_lkj_corr.hpp"
 #include "stan/prob/distributions_lkj_cov.hpp"
 #include "stan/prob/distributions_bernoulli.hpp"
@@ -273,15 +273,6 @@ namespace stan {
       return normal_trunc_h_log (y, mu, sigma, high);
     }
 
-
-    // Logistic(y|mu,sigma)    [sigma > 0]
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    logistic_log(T_y y, T_loc mu, T_scale sigma) {
-      return -(y - mu)/sigma
-	- log(sigma)
-	- 2.0 * log(1.0 + exp(-(y - mu)/sigma));
-    }
 
     // LogNormal(y|mu,sigma)  [y >= 0;  sigma > 0]
     template <typename T_y, typename T_loc, typename T_scale>
