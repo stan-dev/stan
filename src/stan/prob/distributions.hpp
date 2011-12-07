@@ -45,7 +45,7 @@
 #include "stan/prob/distributions_neg_binomial.hpp"
 #include "stan/prob/distributions_beta_binomial.hpp"
 #include "stan/prob/distributions_hypergeometric.hpp"
-/*#include "stan/prob/distributions_multinomial.hpp"*/
+#include "stan/prob/distributions_multinomial.hpp"
 
 namespace stan {
   namespace prob {
@@ -282,25 +282,6 @@ namespace stan {
 
 
     // DISCRETE, MULTIVARIATE MASS FUNCTIONS
-
-    // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;   
-    //                            0 <= theta[n] <= 1;  SUM theta = 1]
-    template <typename T_prob>
-    inline typename boost::math::tools::promote_args<T_prob>::type
-    multinomial_log(std::vector<int>& ns,
-		    Matrix<T_prob,Dynamic,1>& theta) {
-      unsigned int len = ns.size();
-      double sum = 1.0;
-      for (unsigned int i = 0; i < len; ++i) 
-	sum += ns[i];
-      typename boost::math::tools::promote_args<T_prob>::type log_p
-	= lgamma(sum);
-      for (unsigned int i = 0; i < len; ++i)
-	log_p -= lgamma(ns[i] + 1.0);
-      for (unsigned int i = 0; i < len; ++i)
-	log_p += ns[i] * log(theta[i]);
-      return log_p;
-    }
 
     // LINEAR SCALE DENSITIES AND MASS FUNCTIONS
   
