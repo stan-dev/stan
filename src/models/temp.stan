@@ -1,29 +1,23 @@
+// EIGHT SCHOOLS MODEL
+
 data {
-    int M;
-    int N;
-    double y[M];
-}
-derived data {
+    int(0,) J;               // number of schools
+    double y[J];             // estimated treatment effect (school j)
+    double(0,) sigma_y[J];   // standard error of effect estimate (school j)
+    double sigma_xi;         // prior scale (coefficient)
 }
 parameters {
-    int a;
-    int b[5];
-    int c[5,6,7];
-    double z[N];
-    double(0,) sigma;
-    double mu;
-    vector(17) yy;
-    vector(19) zz[3];
-    matrix(2,3) aa;
-    matrix(4,5) bb[6];
-    matrix(7,8) cc[9,10,11];
-    cov_matrix(5) cvcv;
-}
-derived parameters {
+    double mu;               // intercept coefficient (for y)
+    double xi;               // slope coefficient (for y)
+    double eta[J];           // predictor (school j)
+    double(0,) sigma_eta;    // deviation of eta
 }
 model {
-   for (m in 1:M)
-       y[m] ~ normal(mu,sigma);
-   for (n in 1:N) 
-       z[n] ~ normal(mu,sigma);
+    sigma_eta ~ cauchy(0,1);
+    for (j in 1:J)
+        eta[j] ~ normal(0, sigma_eta);
+    mu ~ normal(0,10);
+    xi ~ normal(0, sigma_xi);
+    for (j in 1:J)
+        y[j] ~ normal(eta, sigma_y[j]);
 }

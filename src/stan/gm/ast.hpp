@@ -542,7 +542,8 @@ namespace stan {
     }
 
     struct index_op {
-      index_op() { }
+      index_op() { 
+      }
       // vec of vec for e.g., e[1,2][3][4,5,6]
       index_op(const expression& expr,
 	       const std::vector<std::vector<expression> >& dimss) 

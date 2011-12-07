@@ -167,7 +167,9 @@ namespace stan {
 
       bool operator()(const expression& expr) const {
 	// std::cout << "validating expr type=" << expr.expression_type() << std::endl;
-	return !expr.expression_type().is_ill_formed();
+	bool is_ill_formed = expr.expression_type().is_ill_formed();
+	// std::cout << "    is_ill_formed=" << is_ill_formed << std::endl;
+	return !is_ill_formed;
       }
     };
     boost::phoenix::function<validate_expr_type> validate_expr_type_f;
@@ -455,9 +457,9 @@ namespace stan {
 	  ;
 
 	indexed_factor_r.name("(optionally) indexed factor [sub]");
-	indexed_factor_r
-	  %= (factor_r >> (*dims_r));
-	
+	indexed_factor_r 
+	  %= (factor_r >> *dims_r);
+
 	factor_r.name("factor");
 	factor_r
 	  %= int_literal_r               [_val = _1]
@@ -585,7 +587,12 @@ namespace stan {
 
 	qi::on_error<qi::rethrow>(var_decl_r,
 				  std::cerr 
-				  << boost::phoenix::val("ERROR: Duplicate variable declaration.")
+				  << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
+				  << std::endl);
+
+	qi::on_error<qi::rethrow>(indexed_factor_r,
+				  std::cerr 
+				  << boost::phoenix::val("ERROR: Ill-formed factor.")
 				  << std::endl);
 
 	qi::on_error<qi::rethrow>(program_r,
@@ -633,7 +640,7 @@ namespace stan {
       qi::rule<Iterator, qi::locals<std::string>, for_statement(), 
                whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > indexed_factor_r;
+      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_r;
     };
 
     // Cut and paste source for iterator & reporting pattern:
