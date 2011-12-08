@@ -1,6 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_ERROR_HANDLING_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_ERROR_HANDLING_HPP__
 
+#include <limits>
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/distributions/detail/common_error_handling.hpp>
@@ -152,6 +153,26 @@ namespace stan {
       }
       return true;
     }
+
+    template <typename T_result, class Policy>
+    inline bool check_nonnegative(
+				  const char* function,
+				  const unsigned int& x,
+				  const char* name,
+				  T_result* result,
+				  const Policy& pol) {
+      if (std::numeric_limits< unsigned int >::has_infinity &&
+	  x == std::numeric_limits< unsigned int>::infinity() ) {
+	std::ostringstream stream;
+	stream << name << " is %1%, but must be finite and >= 0!";
+	*result = boost::math::policies::raise_domain_error<double>(
+								 function,
+								 stream.str().c_str(), convert(x), pol);
+	return false;
+      }
+      return true;
+    }
+
 
     template <typename T_x, typename T_result, class Policy>
     inline bool check_positive(
