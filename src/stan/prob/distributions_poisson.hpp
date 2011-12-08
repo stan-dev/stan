@@ -21,6 +21,17 @@ namespace stan {
     template <typename T_rate, class Policy>
     inline typename boost::math::tools::promote_args<T_rate>::type
     poisson_log(const unsigned int n, const T_rate& lambda, const Policy& /* pol */) {
+      static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
+
+      double result;
+      if(!stan::prob::check_nonnegative(function, lambda, "Rate parameter, lambda,", &result, Policy()))
+	return result;
+      if(!stan::prob::check_nonnegative(function, n, "Number n", &result, Policy()))
+	return result;
+      
+      if (lambda == 0)
+	return LOG_ZERO;
+      
       return - lgamma(n + 1.0)
 	+ n * log(lambda)
 	- lambda;
