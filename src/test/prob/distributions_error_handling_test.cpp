@@ -54,7 +54,7 @@ TEST(ProbDistributionsErrorHandling,ConvertVarQuietNaN) {
   EXPECT_TRUE (std::isnan (convert(x))) << "Check for std_numeric_limits<stan::agrad::var>::quiet_NaN: " << x;
 }
 
-//---------- check_x ----------
+//---------- check_x tests ----------
 TEST(ProbDistributionsErrorHandling,CheckXDefaultPolicy) {
   const char* function = "function %1%";
   double x = 0;
@@ -84,6 +84,69 @@ TEST(ProbDistributionsErrorHandling,CheckXErrnoPolicy) {
   x = std::numeric_limits<double>::quiet_NaN();
   EXPECT_FALSE (check_x (function, x, &result, errno_policy())) << "check_x should return FALSE on NaN: " << x;
   EXPECT_TRUE (std::isnan (result)) << "check_x should have returned NaN: " << x;
+}
+
+
+// ---------- check_x: vector tests ----------
+TEST(ProbDistributionsErrorHandling,CheckXVectorDefaultPolicy) {
+  const char* function = "function %1%";
+  double result;
+  std::vector<double> x;
+  
+  x.clear();
+  x.push_back (-1);
+  x.push_back (0);
+  x.push_back (1);
+  ASSERT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should be true with finite x";
+
+  x.clear();
+  x.push_back(-1);
+  x.push_back(0);
+  x.push_back(std::numeric_limits<double>::max());
+  EXPECT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should return TRUE on Inf";
+
+  x.clear();
+  x.push_back(-1);
+  x.push_back(0);
+  x.push_back(-std::numeric_limits<double>::max());
+  EXPECT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should return TRUE on -Inf";
+  
+  x.clear();
+  x.push_back(-1);
+  x.push_back(0);
+  x.push_back(std::numeric_limits<double>::quiet_NaN());
+  EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN";
+}
+
+TEST(ProbDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
+  const char* function = "function %1%";
+  std::vector<double> x;
+  x.push_back (-1);
+  x.push_back (0);
+  x.push_back (1);
+  double result;
+ 
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should be true with finite x";
+
+  x.clear();
+  x.push_back(-1);
+  x.push_back(0);
+  x.push_back(std::numeric_limits<double>::max());
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should return TRUE on Inf";
+
+
+  x.clear();
+  x.push_back(-1);
+  x.push_back(0);
+  x.push_back(-std::numeric_limits<double>::max());
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should return TRUE on -Inf";
+
+  x.clear();
+  x.push_back(-1);
+  x.push_back(0);
+  x.push_back(std::numeric_limits<double>::quiet_NaN());
+  EXPECT_FALSE (check_x (function, x, &result, errno_policy())) << "check_x should return FALSE on NaN";
+  EXPECT_TRUE (std::isnan (result)) << "check_x should have returned NaN";
 }
 
 
