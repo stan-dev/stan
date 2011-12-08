@@ -34,5 +34,7 @@ model {
   }
   for (i in 1:N_rc) {
     1 ~ bernoulli(exp(-pow(last_t_rc[i] / sigma[group_rc[i]], r)));
+    // TODO: try using weibull_p instead (the following line):
+    // 0 ~ bernoulli(weibull_p(last_t_rc[i], sigma[group_rc[i]], r)); 
   } 
 } 
