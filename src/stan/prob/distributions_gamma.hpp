@@ -132,6 +132,56 @@ namespace stan {
     gamma_propto_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta){
       return gamma_propto_log (y, alpha, beta, boost::math::policies::policy<> ());
     }
+
+    /**
+     * The cumulative density function for a gamma distribution for y with the specified
+     * shape and inverse scale parameters.
+     *
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */    
+    template <typename T_y, typename T_shape, typename T_inv_scale, class Policy>
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
+    gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy&){
+      static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
+
+      double result;
+      if (!stan::prob::check_positive(function, alpha, "Shape parameter", &result, Policy())) 
+	return result;
+      if (!stan::prob::check_positive(function, beta, "Inverse scale parameter", &result, Policy())) 
+	return result;
+      if (!stan::prob::check_nonnegative(function, y, "Random variate y", &result, Policy()))
+	return result;
+
+      return boost::math::gamma_p (alpha, y * beta);
+    }
+
+    /**
+     * The cumulative density function for a gamma distribution for y with the specified
+     * shape and inverse scale parameters.
+     *
+     * @param y A scalar variable.
+     * @param alpha Shape parameter.
+     * @param beta Inverse scale parameter.
+     * @throw std::domain_error if alpha is not greater than 0.
+     * @throw std::domain_error if beta is not greater than 0.
+     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @tparam T_y Type of scalar.
+     * @tparam T_shape Type of shape.
+     * @tparam T_inv_scale Type of inverse scale.
+     */
+    template <typename T_y, typename T_shape, typename T_inv_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
+    gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta){
+      return gamma_p (y, alpha, beta, boost::math::policies::policy<>());
+    }
     
   }
 }
