@@ -149,6 +149,54 @@ TEST(ProbDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
   EXPECT_TRUE (std::isnan (result)) << "check_x should have returned NaN";
 }
 
+// ---------- check_x: matrix tests ----------
+TEST(ProbDistributionsErrorHandling,CheckXMatrixDefaultPolicy) {
+  const char* function = "function %1%";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
+  
+  x.resize(3);
+  x << -1, 0, 1;
+  ASSERT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should be true with finite x";
+
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::max();
+  EXPECT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should return TRUE on Inf";
+
+  x.resize(3);
+  x << -1, 0, -std::numeric_limits<double>::max();
+  EXPECT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should return TRUE on -Inf";
+  
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN";
+}
+
+TEST(ProbDistributionsErrorHandling,CheckXMatrixErrnoPolicy) {
+  const char* function = "function %1%";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
+  
+  x.resize(3);
+  x << -1, 0, 1;
+ 
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should be true with finite x";
+
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::max();
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should return TRUE on Inf";
+
+
+  x.resize(3);
+  x << -1, 0, -std::numeric_limits<double>::max();
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should return TRUE on -Inf";
+
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::quiet_NaN();  EXPECT_FALSE (check_x (function, x, &result, errno_policy())) << "check_x should return FALSE on NaN";
+  EXPECT_TRUE (std::isnan (result)) << "check_x should have returned NaN";
+  }
+
+
 
 // ----------  ----------
 //TEST(ProbDistributionsErrorHandling,)
