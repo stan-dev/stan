@@ -70,5 +70,22 @@ TEST(ProbDistributionsErrorHandling,CheckXDefaultPolicy) {
   EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN: " << x;
 }
 
+TEST(ProbDistributionsErrorHandling,CheckXErrnoPolicy) {
+  const char* function = "function %1%";
+  double x = 0;
+  double result;
+ 
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should be true with finite x:" << x;
+  x = std::numeric_limits<double>::max();
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should return TRUE on Inf: " << x;
+  x = -std::numeric_limits<double>::max();
+  EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should return TRUE on -Inf: " << x;
+
+  x = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_FALSE (check_x (function, x, &result, errno_policy())) << "check_x should return FALSE on NaN: " << x;
+  EXPECT_TRUE (std::isnan (result)) << "check_x should have returned NaN: " << x;
+}
+
+
 // ----------  ----------
 //TEST(ProbDistributionsErrorHandling,)
