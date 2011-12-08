@@ -526,8 +526,10 @@ namespace stan {
       fun(std::string const& name,
 	  std::vector<expression> const& args) 
 	: name_(name),
-	  args_(args),
-	  type_() { // FIXME: plumb in typer
+	  args_(args) {
+	infer_type();
+      }
+      void infer_type() {
       }
       std::string name_;
       std::vector<expression> args_;
@@ -821,8 +823,14 @@ namespace stan {
 	: expr_(e),
 	  dist_(dist) {
       }
+      bool is_ill_formed() {
+	if (expr_.expression_type().is_ill_formed())
+	  return true;
+	return false;
+      }
       expression expr_;
       distribution dist_;
+      
     };
 
     struct assignment {

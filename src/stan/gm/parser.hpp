@@ -242,7 +242,23 @@ namespace stan {
 	return var_expr;
       }
     };
-    boost::phoenix::function<set_variable_type> set_var_type;
+    boost::phoenix::function<set_variable_type> set_var_type_f;
+
+    struct set_fun_type {
+      template <typename T1>
+      struct result { typedef T1 type; };
+
+      fun operator()(fun& fun) const {
+	std::vector<expr_type> arg_types;
+	for (unsigned int i = 0; i < fun.args_.size(); ++i)
+	  arg_types.push_back(fun.args_[i].expression_type());
+	fun.type_ = function_signatures::instance().get_result_type(fun.name_,
+								    arg_types);
+	return fun;
+      }
+    };
+    boost::phoenix::function<set_fun_type> set_fun_type_f;
+
 
     struct add_var_decl {
       template <typename T1, typename T2, typename T3>
@@ -504,8 +520,8 @@ namespace stan {
 	factor_r
 	  %= int_literal_r               [_val = _1]
 	  | double_literal_r             [_val = _1]
-	  | fun_r                        [_val = _1] 
-	  | variable_r                   [_val = set_var_type(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | fun_r                        [_val = set_fun_type_f(_1)]
+	  | variable_r                   [_val = set_var_type_f(_1,boost::phoenix::ref(var_name_to_decl_))]
 	  | ( qi::lit('(') 
 	      > expression_r             [_val = _1] 
 	      > qi::lit(')') )
