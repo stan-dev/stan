@@ -50,7 +50,26 @@ namespace stan {
       return weibull_propto_log (y, alpha, sigma, boost::math::policies::policy<>());
     }
 
+    template <typename T_y, typename T_shape, typename T_scale, class Policy>
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& /* pol */) {
+      //static const char* function = "stan::prob::weibull_p<%1%>(%1%)";
 
+      //double result;
+      // FIXME: domain checks
+      
+      if (y < 0)
+	return 0;
+      return 1.0 - exp (- pow (y / sigma, alpha));
+    }
+
+    template <typename T_y, typename T_shape, typename T_scale>
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      return weibull_p (y, alpha, sigma, boost::math::policies::policy<>());
+    }
+
+    
   }
 }
 #endif
