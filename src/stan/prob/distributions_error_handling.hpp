@@ -2,8 +2,11 @@
 #define __STAN__PROB__DISTRIBUTIONS_ERROR_HANDLING_HPP__
 
 #include <boost/math/policies/policy.hpp>
-
+#include <boost/math/policies/error_handling.hpp>
+#include <boost/math/distributions/detail/common_error_handling.hpp>
+#include <Eigen/Dense>
 #include "stan/agrad/agrad.hpp"
+#include "stan/prob/transform.hpp"
 
 namespace stan { 
   namespace prob {
@@ -237,7 +240,7 @@ namespace stan {
     template <typename T_covar, typename T_result, class Policy>
     inline bool check_cov_matrix(
 				 const char* function,
-				 const Matrix<T_covar,Dynamic,Dynamic>& Sigma,
+				 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
 				 T_result* result,
 				 const Policy& pol) {
       if (!stan::prob::cov_matrix_validate(Sigma)) {
