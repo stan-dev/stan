@@ -265,13 +265,14 @@ namespace stan {
 				 T_result* result,
 				 const Policy& pol) {
       if (!stan::prob::cov_matrix_validate(Sigma)) {
-	std::string message ("Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite. Sigma: \n");
-	message += Sigma;
-	message += "\nSigma(0,0): %1%";
+	std::ostringstream stream;
+	stream << "Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite. Sigma: \n" 
+	       << Sigma
+	       << "\nSigma(0,0): %1%";
 	*result = boost::math::policies::raise_domain_error<double>(function,
-								     message.c_str(), 
-								     convert(Sigma(0,0)),
-								     pol);
+								    stream.str().c_str(), 
+								    convert(Sigma(0,0)),
+								    pol);
 	return false;
       }
       return true;
