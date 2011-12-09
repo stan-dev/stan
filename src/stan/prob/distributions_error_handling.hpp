@@ -144,11 +144,11 @@ namespace stan {
 				  T_result* result,
 				  const Policy& pol) {
       if(!(boost::math::isfinite)(convert(x)) || !(x >= 0)) {
-	std::ostringstream stream;
-	stream << name << " is %1%, but must be finite and >= 0!";
+	std::string message(name);
+	message += " is %1%, but must be finite and >= 0!";
 	*result = boost::math::policies::raise_domain_error<double>(
 								 function,
-								 stream.str().c_str(), convert(x), pol);
+								 message.c_str(), convert(x), pol);
 	return false;
       }
       return true;
@@ -163,11 +163,11 @@ namespace stan {
 				  const Policy& pol) {
       if (std::numeric_limits< unsigned int >::has_infinity &&
 	  x == std::numeric_limits< unsigned int>::infinity() ) {
-	std::ostringstream stream;
-	stream << name << " is %1%, but must be finite and >= 0!";
+	std::string message(name);
+	message += " is %1%, but must be finite and >= 0!";
 	*result = boost::math::policies::raise_domain_error<double>(
 								 function,
-								 stream.str().c_str(), convert(x), pol);
+								 message.c_str(), convert(x), pol);
 	return false;
       }
       return true;
@@ -182,11 +182,11 @@ namespace stan {
 				  T_result* result,
 				  const Policy& pol) {
       if(!(boost::math::isfinite)(convert(x)) || !(x > 0)) {
-	std::ostringstream stream;
-	stream << name << " is %1%, but must be finite and > 0!";
+	std::string message(name);
+	message += " is %1%, but must be finite and > 0!";
 	*result = boost::math::policies::raise_domain_error<double>(
 								 function,
-								 stream.str().c_str(), convert(x), pol);
+								 message.c_str(), convert(x), pol);
 	return false;
       }
       return true;
@@ -265,10 +265,11 @@ namespace stan {
 				 T_result* result,
 				 const Policy& pol) {
       if (!stan::prob::cov_matrix_validate(Sigma)) {
-	std::ostringstream stream;
-	stream << "Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite. Sigma: \n"<< Sigma << "\nSigma(0,0): %1%";
+	std::string message ("Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite. Sigma: \n");
+	message += Sigma;
+	message += "\nSigma(0,0): %1%";
 	*result = boost::math::policies::raise_domain_error<double>(function,
-								     stream.str().c_str(), 
+								     message.c_str(), 
 								     convert(Sigma(0,0)),
 								     pol);
 	return false;
