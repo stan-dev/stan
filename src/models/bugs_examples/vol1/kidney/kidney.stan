@@ -1,3 +1,7 @@
+# http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol1.pdf
+# Page 51: Kidney: Weibull regression with random efects
+
+
 data {
   int(0,) NP; 
   int(0,) N_uc;

@@ -1,3 +1,15 @@
+# BUGS example vol 1: LeukFr 
+# http://mathstat.helsinki.fi/openbugs/Examples/Leukfr.html
+
+# The result for sigma is a bit different from those in the 
+# webpage. 
+
+# But the result for beta on 
+# http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol1.pdf
+# might not be correct. 
+
+
+
 data {
   int(0,) N;
   int(0,) NT;
@@ -5,7 +17,7 @@ data {
   int(0,) t[NT + 1]; 
   int(0,) fail[N]; 
   int(0,) Npair; 
-  int(0,) pair[Npair];
+  int(0,) pair[N];
   double Z[N]; 
 }
 
@@ -39,7 +51,7 @@ derived parameters {
 model {
   beta ~ normal(0, 1000);
   tau ~ gamma(.001, .001); 
-  for (k in 1:Npair) b[k] ~ normal(0, sigma); 
+  for (k in 1:Npair)  b[k] ~ normal(0, sigma); 
   for(j in 1:NT) {
     dL0[j] ~ gamma(r * (t[j + 1] - t[j]) * c, c);
     for(i in 1:N) {
