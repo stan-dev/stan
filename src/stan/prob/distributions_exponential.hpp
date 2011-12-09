@@ -283,6 +283,8 @@ namespace stan {
 	return result;
       if(!stan::prob::check_upper_bound(function, high, &result, Policy()))
 	return result;
+      if(!stan::prob::check_positive(function, high, "Upper bound", &result, Policy()))
+	return result;
 
       if (y > high)
 	return LOG_ZERO;
