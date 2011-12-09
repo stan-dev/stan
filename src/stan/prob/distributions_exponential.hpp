@@ -180,8 +180,10 @@ namespace stan {
 	return result;
       if(!stan::prob::check_bounds(function, low, high, &result, Policy()))
 	return result;
+      if(!stan::prob::check_nonnegative(function, low, "Lower bound", &result, Policy()))
+	 return result;
 
-      if (y > high || y < low)
+      if (y < low || y > high)
 	return LOG_ZERO;
       return exponential_log(y,beta) 
 	- log(exponential_p(high,beta) - exponential_p(low,beta));
