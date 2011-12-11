@@ -7,30 +7,25 @@
 data {
   int(0,) N; 
   double y[N]; 
-  double alpha[2];
+  vector(2) alpha;
 } 
 parameters {
-  int(0,) T[N]; 
+  int(0,) z[N]; 
   double(0,) sigma;
   double(0,) theta;
   double lambda[2]; 
-  // how to specify P, which has prior of Dirichlet dsn? 
-  matrix(2,1) P; 
-} 
-
-derived parameters {
-  double(0,) tau; 
-  tau <- 1 / (sigma * sigma); 
+  vector(2) p;
 } 
 model {
-  for (i in 1:N) {
-    y[i] ~ normal(lambda[T[i]], sigma);
-    T[i] ~ categorical(P);
-  }
-  P ~ dirichlet(alpha); 
+  p ~ dirichlet(alpha); 
+  theta ~ normal(0,1000);  // propto half normal because theta truncated
+  lambda[1] ~ normal(0, 1e3); 
   lambda[2] <- lambda[1] + theta;
-  theta ~ normal_trunc_l(0, 1000, 0); 
-  lambda[1] ~ normal(0.0, 1000); 
-  tau ~ gamma(0.001, 0.001); 
+  // equiv: tau ~ gamma(); sigma <- 1 / sqrt(tau);
+  1 / square(sigma) ~ gamma(1e-3, 1e-3);
+  for (n in 1:N) {
+    z[n] ~ categorical(p);
+    y[n] ~ normal(lambda[z[n]], sigma);
+  }
 }
 

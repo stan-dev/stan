@@ -14,8 +14,8 @@ derived data {
   double r; 
   for(i in 1:N) {
     for(j in 1:NT) {
-      Y[i, j] <- step(obs_t[i] - t[j] + .000000001);
-      dN[i, j] <- Y[i, j] * fail[i] * step(t[j + 1] - obs_t[i] - .000000001);
+      Y[i, j] <- int_step(obs_t[i] - t[j] + .000000001);
+      dN[i, j] <- Y[i, j] * fail[i] * int_step(t[j + 1] - obs_t[i] - .000000001);
     }
   }
   c <- 0.001; 

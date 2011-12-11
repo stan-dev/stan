@@ -40,22 +40,27 @@ add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 
+add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("min",DOUBLE_T,VECTOR_T);
 add("min",DOUBLE_T,ROW_VECTOR_T);
 add("min",DOUBLE_T,MATRIX_T);
 
+add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
 add("max",DOUBLE_T,MATRIX_T);
 
+add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("mean",DOUBLE_T,VECTOR_T);
 add("mean",DOUBLE_T,ROW_VECTOR_T);
 add("mean",DOUBLE_T,MATRIX_T);
 
+add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("variance",DOUBLE_T,VECTOR_T);
 add("variance",DOUBLE_T,ROW_VECTOR_T);
 add("variance",DOUBLE_T,MATRIX_T);
 
+add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sd",DOUBLE_T,VECTOR_T);
 add("sd",DOUBLE_T,ROW_VECTOR_T);
 add("sd",DOUBLE_T,MATRIX_T);
@@ -153,12 +158,15 @@ add_binary("fdim");
 
 add_unary("tgamma");
 
+add("int_step",INT_T,DOUBLE_T);
+
 add_unary("step");
 
 add_unary("inv_cloglog");
 
 add_unary("Phi");
 
+add_unary("logit");
 add_unary("inv_logit");
 
 add_binary("log_loss");
@@ -168,8 +176,41 @@ add("log_sum_exp", expr_type(DOUBLE_T,1U));
 
 add_unary("square");
 
+add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
+add_ternary("beta_log");
+add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
+add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
+add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
+add_ternary("cauchy_log");
+add_binary("chi_square_log");
+add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
+add_ternary("double_exponential_log");
+add_binary("exponential_log");
+add_ternary("gamma_log");
+add("hypergeometric_log",DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
+add_binary("inv_chi_square_log");
+add_ternary("inv_gamma_log");
+add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
+add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
+add("lkj_cov_log",DOUBLE_T, MATRIX_T,MATRIX_T,MATRIX_T,DOUBLE_T);
+add_ternary("logistic_log");
+add_ternary("lognormal_log");
+add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
+add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
+add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
+add_ternary("normal_log");
+add_quaternary("normal_trunc_l_log");
+add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T,DOUBLE_T); // vectorized
+add_ternary("pareto_log");
+add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
+add_ternary("scaled_inv_chi_square_log");
+add_quaternary("student_t_log");
+add_ternary("uniform_log");
+add_ternary("weibull_log");
+add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
-	   
+
+// MULTINOMIAL?  no vector<int> type
 
 
 

@@ -3,6 +3,13 @@
 #include <gtest/gtest.h>
 #include "stan/maths/special_functions.hpp"
 
+TEST(maths_test, int_step) {
+  EXPECT_EQ(0, stan::maths::int_step(-1.0));
+  EXPECT_EQ(0, stan::maths::int_step(0.0));
+  EXPECT_EQ(1, stan::maths::int_step(0.00000000001));
+  EXPECT_EQ(1, stan::maths::int_step(100.0));
+}
+
 TEST(maths_test, binomial_coefficient_log) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::maths::binomial_coefficient_log(2.0,2.0)));
   EXPECT_FLOAT_EQ(2.0, exp(stan::maths::binomial_coefficient_log(2.0,1.0)));

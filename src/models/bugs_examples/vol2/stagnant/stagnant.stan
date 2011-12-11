@@ -10,9 +10,8 @@ data {
 } 
 
 derived data {
-  double punif[N]; 
-  // matrix(N, 1) punif; ?? 
-  for (i in 1:N)  punif[i] <- 1.0 / N; 
+  vector(N) punif;
+  for (n in 1:N) punif[n] <- (1.0 / N); 
 } 
 
 parameters {
@@ -33,6 +32,6 @@ model {
   alpha ~ normal(0, 1000); 
   for (i in 1:2) beta[i] ~ normal(0, 1000);
   for (i in 1:N)  
-    Y[i] ~ normal(alpha + beta[1 + step(i - k - .5)] * (x[i] - x[k]), sigma); 
+    Y[i] ~ normal(alpha + beta[1 + int_step(i - k - .5)] * (x[i] - x[k]), sigma); 
 } 
 

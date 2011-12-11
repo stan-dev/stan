@@ -64,8 +64,8 @@ namespace stan {
     struct statement;
     struct statements;
     struct unary_op;
-    struct var;
     struct variable;
+    struct variable_dims;
     struct var_decl;
     struct var_type;
     struct vector_var_decl;
@@ -80,11 +80,35 @@ namespace stan {
       ILL_FORMED_T // includes: CORR_MATRIX_T, COV_MATRIX_T
     };
 
-    class expr_type {
-    private: 
+    std::ostream& operator<<(std::ostream& o, base_expr_type type) {
+      switch (type) {
+      case INT_T :
+	o << "int";
+	break;
+      case DOUBLE_T :
+	o << "double";
+	break;
+      case VECTOR_T :
+	o << "vector";
+	break;
+      case ROW_VECTOR_T :
+	o << "row vector";
+	break;
+      case MATRIX_T :
+	o << "matrix";
+	break;
+      case ILL_FORMED_T :
+	o << "ill formed";
+	break;
+      default:
+	o << "UNKNOWN";
+      }
+      return o;
+    }
+
+    struct expr_type {
       base_expr_type base_type_;
       unsigned int num_dims_;
-    public:
       expr_type() 
 	: base_type_(ILL_FORMED_T),
 	  num_dims_(0) { 
@@ -297,6 +321,10 @@ namespace stan {
 	add(name,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
       }
 
+      void add_quaternary(const::std::string& name) {
+	add(name,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
+      }
+
       unsigned int num_promotions(const std::vector<expr_type>& call_args,
 			 const std::vector<expr_type>& sig_args) {
 	int num_promotions = 0U;
@@ -454,10 +482,10 @@ namespace stan {
       return boost::apply_visitor(ino,e.expr_);
     }
 
-    struct var {
-      var() { } // req for FUSION_ADAPT
-      var(std::string const& name,
-	  std::vector<expression> const& dims) 
+    struct variable_dims {
+      variable_dims() { } // req for FUSION_ADAPT
+      variable_dims(std::string const& name,
+		   std::vector<expression> const& dims) 
 	: name_(name),
 	  dims_(dims) {
       }
@@ -503,8 +531,6 @@ namespace stan {
       expr_type type_;
     };
 
-    // struct base_var_decl;
-
     struct variable {
       variable() { }
       variable(std::string name) : name_(name) { }
@@ -543,6 +569,36 @@ namespace stan {
       return total;
     }
 
+    expr_type infer_type_indexing(const base_expr_type& expr_base_type,
+				  unsigned int num_expr_dims,
+				  unsigned int num_index_dims) {
+      if (num_index_dims <= num_expr_dims)
+	return expr_type(expr_base_type,num_expr_dims - num_index_dims);
+      if (num_index_dims == (num_expr_dims + 1)) {
+	if (expr_base_type == VECTOR_T || expr_base_type == ROW_VECTOR_T)
+	  return expr_type(DOUBLE_T,0U);
+	if (expr_base_type == MATRIX_T)
+	  return expr_type(ROW_VECTOR_T,0U);
+      }
+      if (num_index_dims == (num_expr_dims + 2))
+	if (expr_base_type == MATRIX_T)
+	  return expr_type(DOUBLE_T,0U);
+      
+      std::cerr << "expression base type=" << expr_base_type << std::endl;
+      std::cerr << "too many index dimensions;"
+		<< " require at most " << num_expr_dims
+		<< " found " << num_index_dims
+		<< std::endl;
+      return expr_type();
+    }
+
+    expr_type infer_type_indexing(const expression& expr,
+				  unsigned int num_index_dims) {
+      return infer_type_indexing(expr.expression_type().base_type_,
+				 expr.expression_type().num_dims(),
+				 num_index_dims);
+    }
+
     struct index_op {
       index_op() { 
       }
@@ -554,18 +610,7 @@ namespace stan {
 	infer_type();
       }
       void infer_type() {
-	unsigned int num_index_dims = total_dims(dimss_);
-	unsigned int num_expr_dims = expr_.expression_type().num_dims();
-	if (num_index_dims > num_expr_dims) {
-	  std::cerr << "too many index dimensions;"
-		    << " require at most " << num_expr_dims
-		    << " found " << num_index_dims
-		    << std::endl;
-	  type_ = expr_type();
-	  return;
-	}
-	type_ = expr_type(expr_.expression_type().type(),
-			  num_expr_dims - num_index_dims);
+	type_ = infer_type_indexing(expr_,total_dims(dimss_));
       }
       expression expr_;
       std::vector<std::vector<expression> > dimss_;
@@ -836,13 +881,14 @@ namespace stan {
     struct assignment {
       assignment() {
       }
-      assignment(var& var,
+      assignment(variable_dims& var_dims,
 		 expression& expr)
-	: var_(var),
+	: var_dims_(var_dims),
 	  expr_(expr) {
       }
-      var var_;
-      expression expr_;
+      variable_dims var_dims_; // lhs_var[dim0,...,dimN-1] 
+      expression expr_;        // = rhs
+      base_var_decl var_type_; // type of lhs_var
     };
       
     void generate_expression(const expression& e, std::ostream& o);

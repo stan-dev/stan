@@ -21,7 +21,7 @@ parameters {
 
 derived parameters {
   double sigma[M]; 
-  for (m in 1:M)  sigma[m] <- exp(-beta[m] / r);
+  for (m in 1:M)  sigma[m] <- exp(-beta[m] / r);  
 } 
 
 model {

@@ -32,7 +32,7 @@
 
 #include <stan/stan.hpp>
 #include <stan/io/dump.hpp>
-
+#include <stan/gm/ast.hpp>
 
 namespace stan {
 
@@ -63,6 +63,43 @@ namespace stan {
       visgen(std::ostream& o) : o_(o) { }
     };
 
+    void generate_indexes(const std::vector<expression> indexes,
+			  base_expr_type base_type,
+			  unsigned int e_num_dims,
+			  std::ostream& o) {
+      unsigned int ai_size = indexes.size();
+      if (ai_size <= e_num_dims || base_type != MATRIX_T) {
+	// BASE_TYPE -> BASE_TYPE
+	for (unsigned int n = 0; n < ai_size; ++n) {
+	  o << '[';
+	  generate_expression(indexes[n],o);
+	  o << "- 1]";
+	}
+      } else if (ai_size == e_num_dims + 1) {
+	// MATRIX_T -> ROW_VECTOR_T
+	for (unsigned int n = 0; n < ai_size - 1; ++n) {
+	  o << '[';
+	  generate_expression(indexes[n],o);
+	  o << "- 1]";
+	}
+	o << ".row(";
+	generate_expression(indexes[ai_size - 1U],o);
+	o << "-1)";
+      } else { 
+	// MATRIX_T -> DOUBLE
+	for (unsigned int n = 0; n < ai_size - 2; ++n) {
+	  o << '[';
+	  generate_expression(indexes[n],o);
+	  o << " - 1]";
+	}
+	o << '(';
+	generate_expression(indexes[ai_size - 2U],o);
+	o << " - 1,";
+	generate_expression(indexes[ai_size - 1U],o);
+	o << " - 1)";
+      }
+    }
+
     struct expression_visgen : public visgen {
       expression_visgen(std::ostream& o) : visgen(o) {  }
       void operator()(nil const& x) const { 
@@ -76,16 +113,13 @@ namespace stan {
       void operator()(const std::string& x) const { o_ << x; } // identifiers
       void operator()(const index_op& x) const {
 	boost::apply_visitor(*this, x.expr_.expr_); 
-	for (unsigned int i = 0; i < x.dimss_.size(); ++i) {
-	  std::vector<expression> indexes = x.dimss_[i];
-	  o_ << '[';
-	  for (unsigned j = 0; j < indexes.size(); ++j) {
-	    if (j > 0) o_ << "][";
-	    boost::apply_visitor(*this,indexes[j].expr_);
-	    o_ << " - 1";
-	  }
-	  o_ << ']';
-	}
+	std::vector<expression> indexes; 
+	unsigned int e_num_dims = x.expr_.expression_type().num_dims_;
+	base_expr_type base_type = x.expr_.expression_type().base_type_;
+	for (unsigned int i = 0; i < x.dimss_.size(); ++i)
+	  for (unsigned int j = 0; j < x.dimss_[i].size(); ++j) 
+	    indexes.push_back(x.dimss_[i][j]); // wasteful copy
+	generate_indexes(indexes,base_type,e_num_dims,o_);
       }
       void operator()(const fun& fx) const { 
 	o_ << fx.name_ << '(';
@@ -755,18 +789,6 @@ namespace stan {
        o << "// " << msg	<< EOL;
      }
 
-     void generate_var(const var& x, std::ostream& o) {
-       o << x.name_;
-       if (x.dims_.size() == 0) return;
-       o << '[';
-       for (unsigned int i = 0; i < x.dims_.size(); ++i) {
-	 if (i > 0) o << "][";
-	 generate_expression(x.dims_[i],o);
-	o << " - 1";
-      }
-      o << ']';
-    }
-
     void generate_statement(statement const& s, int indent, std::ostream& o);
 
     struct statement_visgen : public visgen {
@@ -778,7 +800,11 @@ namespace stan {
       void operator()(nil const& x) const { }
       void operator()(assignment const& x) const {
 	generate_indent(indent_,o_);
-	generate_var(x.var_,o_);
+	o_ << x.var_dims_.name_;
+	generate_indexes(x.var_dims_.dims_,
+			 x.var_type_.base_type_,
+			 x.var_type_.dims_.size(),
+			 o_);
 	o_ << " = ";
 	generate_expression(x.expr_,o_);
 	o_ << ";" << EOL;

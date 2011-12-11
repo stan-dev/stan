@@ -85,7 +85,19 @@ namespace stan {
     }
 
 
+
+
     // OTHER BASIC FUNCTIONS
+
+    /**
+     * The integer step, or Heaviside, function.  
+     *
+     * @param y Value to test.
+     * @return 1 if value is greater than 0.0 and 0 otherwise.
+     */
+    unsigned int int_step(double y) {
+      return y > 0.0;
+    }
 
     /**
      * The step, or Heaviside, function.  
