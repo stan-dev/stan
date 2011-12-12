@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include "stan/memory/stack_alloc.hpp"
+#include "stan/meta/conversions.hpp"
 
 namespace stan {
 
@@ -1448,6 +1449,8 @@ namespace stan {
      * @return Result of subtracting the scalar from the variable.
      */
     inline var operator-(const var& a, const double& b) {
+      if (b == 0.0)
+	return a;
       return var(new subtract_vd_vari(a.vi_,b));
     }
 
@@ -2117,6 +2120,21 @@ namespace std {
     static const bool tinyness_before = numeric_limits<double>::tinyness_before;
     static const float_round_style round_style = numeric_limits<double>::round_style;
   };
+
+  /**
+   * Convert the specified auto-dif variable to a double
+   * by returning its value.
+   *
+   * @param x Auto-dif variable.
+   * @return Value of variable.
+   */
+  template <>
+  inline double convert(const stan::agrad::var& x) {
+    return x.val();
+  }
+
+
+
 
 }
 

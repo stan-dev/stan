@@ -6,71 +6,66 @@
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 #include <Eigen/Dense>
-#include "stan/agrad/agrad.hpp"
 #include "stan/prob/transform.hpp"
+#include "stan/meta/conversions.hpp"
 
 namespace stan { 
+
   namespace prob {
-    // reimplementing a lot from: #include <boost/math/distributions/detail/common_error_handling.hpp>
-    template <typename T>
-    inline double convert (const T& x) {
-      return x;
-    }
-    template <>
-    inline double convert (const stan::agrad::var& x) {
-      return x.val();
-    }
+
+    using boost::math::policies::raise_domain_error;
 
 
+    /**
+     * Note that this test catches both infinity and NaN.
+     * Some special cases permit x to be infinite, so these must be tested 1st,
+     * leaving this test to catch any NaNs.  see Normal and cauchy for example.
+     */
     template <typename T_x, typename T_result, class Policy>
-    inline bool check_x(
-			const char* function,
+    inline bool check_x(const char* function,
 			const T_x& x,
 			T_result* result,
 			const Policy& pol) {
       if (!(boost::math::isfinite)(convert(x))) {
-	*result = boost::math::policies::raise_domain_error<double>(function,
-								 "Random variate x is %1%, but must be finite!",
-								 convert(x), pol);
+	*result = raise_domain_error<double>(function,
+					     "Random variate x is %1%, but must be finite!",
+					     convert(x), pol);
 	return false;
       }
       return true;
-      // Note that this test catches both infinity and NaN.
-      // Some special cases permit x to be infinite, so these must be tested 1st,
-      // leaving this test to catch any NaNs.  see Normal and cauchy for example.
     }
-        
+
+    /**
+     * Note that this test catches both infinity and NaN.
+     * Some special cases permit x to be infinite, so these must be tested 1st,
+     * leaving this test to catch any NaNs.  see Normal and cauchy for example.
+     */
     template <typename T_x, typename T_result, class Policy>
-    inline bool check_x(
-			const char* function,
+    inline bool check_x(const char* function,
 			const std::vector<T_x>& x,
 			T_result* result,
 			const Policy& pol) {
       for (int i = 0; i < x.size(); i++) {
 	if (!(boost::math::isfinite)(convert(x[i]))) {
-	  *result = boost::math::policies::raise_domain_error<double>(function,
-								   "Random variate x is %1%, but must be finite!",
-								   convert(x[i]), pol);
+	  *result = raise_domain_error<double>(function,
+					       "Random variate x is %1%, but must be finite!",
+					       convert(x[i]), pol);
 	  return false;
 	}
       }
       return true;
-      // Note that this test catches both infinity and NaN.
-      // Some special cases permit x to be infinite, so these must be tested 1st,
-      // leaving this test to catch any NaNs.  see Normal and cauchy for example.
     }
     
     template <typename T_x, typename T_result, class Policy>
-    inline bool check_x(
-			const char* function,
+    inline bool check_x(const char* function,
 			const Eigen::Matrix<T_x,Eigen::Dynamic,1>& x,
 			T_result* result,
 			const Policy& pol) {
       for (int i = 0; i < x.rows(); i++) {
 	if (!(boost::math::isfinite)(convert(x[i]))) {
-	  *result = boost::math::policies::raise_domain_error<double>(function,
-								   "Random variate x is %1%, but must be finite!",
-								   convert(x[i]), pol);
+	  *result = raise_domain_error<double>(function,
+					       "Random variate x is %1%, but must be finite!",
+					       convert(x[i]), pol);
 	  return false;
 	}
       }
@@ -93,9 +88,9 @@ namespace stan {
 	msg += low;
 	msg += " and ";
 	msg += high;
-	*result = boost::math::policies::raise_domain_error<double>(function,
-								    msg.c_str(),
-								    convert(x), pol);
+	*result = raise_domain_error<double>(function,
+					     msg.c_str(),
+					     convert(x), pol);
 	return false;
       }
       return true;
@@ -106,15 +101,13 @@ namespace stan {
     
 
     template <typename T_scale, typename T_result, class Policy>
-    inline bool check_scale(
-			    const char* function,
+    inline bool check_scale(const char* function,
 			    const T_scale& scale,
 			    T_result* result,
 			    const Policy& pol) {
       if(!(scale > 0) || !(boost::math::isfinite)(convert(scale))) { // Assume scale == 0 is NOT valid for any distribution.
-	*result = boost::math::policies::raise_domain_error<double>(
-								     function,
-								     "Scale parameter is %1%, but must be > 0 !", convert(scale), pol);
+	*result = raise_domain_error<double>(function,
+					     "Scale parameter is %1%, but must be > 0 !", convert(scale), pol);
 	return false;
       }
       return true;
@@ -127,9 +120,8 @@ namespace stan {
 			    T_result* result,
 			    const Policy& pol) {
       if(!(invScale > 0) || !(boost::math::isfinite)(convert(invScale))) { // Assume scale == 0 is NOT valid for any distribution.
-	*result = boost::math::policies::raise_domain_error<double>(
-								     function,
-								     "Inverse scale parameter is %1%, but must be > 0 !", convert(invScale), pol);
+	*result = raise_domain_error<double>(function,
+					     "Inverse scale parameter is %1%, but must be > 0 !", convert(invScale), pol);
 	return false;
       }
       return true;
@@ -146,9 +138,8 @@ namespace stan {
       if(!(boost::math::isfinite)(convert(x)) || !(x >= 0)) {
 	std::string message(name);
 	message += " is %1%, but must be finite and >= 0!";
-	*result = boost::math::policies::raise_domain_error<double>(
-								 function,
-								 message.c_str(), convert(x), pol);
+	*result = raise_domain_error<double>(function,
+					     message.c_str(), convert(x), pol);
 	return false;
       }
       return true;
@@ -165,9 +156,8 @@ namespace stan {
 	  x == std::numeric_limits< unsigned int>::infinity() ) {
 	std::string message(name);
 	message += " is %1%, but must be finite and >= 0!";
-	*result = boost::math::policies::raise_domain_error<double>(
-								 function,
-								 message.c_str(), convert(x), pol);
+	*result = raise_domain_error<double>(function,
+					     message.c_str(), convert(x), pol);
 	return false;
       }
       return true;
@@ -184,9 +174,8 @@ namespace stan {
       if(!(boost::math::isfinite)(convert(x)) || !(x > 0)) {
 	std::string message(name);
 	message += " is %1%, but must be finite and > 0!";
-	*result = boost::math::policies::raise_domain_error<double>(
-								 function,
-								 message.c_str(), convert(x), pol);
+	*result = raise_domain_error<double>(function,
+					     message.c_str(), convert(x), pol);
 	return false;
       }
       return true;
@@ -199,9 +188,9 @@ namespace stan {
 			       T_result* result,
 			       const Policy& pol) {
       if(!(boost::math::isfinite)(convert(location))) {
-	*result = boost::math::policies::raise_domain_error<double>(
-									function,
-									"Location parameter is %1%, but must be finite!", convert(location), pol);
+	*result = raise_domain_error<double>(
+					     function,
+					     "Location parameter is %1%, but must be finite!", convert(location), pol);
 	return false;
       }
       return true;
@@ -214,9 +203,9 @@ namespace stan {
 				  T_result* result,
 				  const Policy& pol) {
       if(!(boost::math::isfinite)(convert(lb))) {
-	*result = boost::math::policies::raise_domain_error<double>(
-								     function,
-								     "Lower bound is %1%, but must be finite!", convert(lb), pol);
+	*result = raise_domain_error<double>(function,
+					     "Lower bound is %1%, but must be finite!", 
+					     convert(lb), pol);
 	return false;
       }
       return true;
@@ -230,9 +219,8 @@ namespace stan {
 				  T_result* result,
 				  const Policy& pol) {
       if(!(boost::math::isfinite)(convert(ub))) {
-	*result = boost::math::policies::raise_domain_error<double>(
-								     function,
-								     "Upper bound is %1%, but must be finite!", convert(ub), pol);
+	*result = raise_domain_error<double>(function,
+					     "Upper bound is %1%, but must be finite!", convert(ub), pol);
 	return false;
       }
       return true;
@@ -250,8 +238,9 @@ namespace stan {
       if (false == check_upper_bound(function, upper, result, pol))
 	return false;
       if (lower >= upper) {
-	*result = boost::math::policies::raise_domain_error<double>(function,
-								  "lower parameter is %1%, but must be less than upper!", convert(lower), pol);
+	*result = raise_domain_error<double>(function,
+					     "lower parameter is %1%, but must be less than upper!", 
+					     convert(lower), pol);
 	return false;
       }
       return true;
@@ -269,10 +258,10 @@ namespace stan {
 	stream << "Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite. Sigma: \n" 
 	       << Sigma
 	       << "\nSigma(0,0): %1%";
-	*result = boost::math::policies::raise_domain_error<double>(function,
-								    stream.str().c_str(), 
-								    convert(Sigma(0,0)),
-								    pol);
+	*result = raise_domain_error<double>(function,
+					     stream.str().c_str(), 
+					     convert(Sigma(0,0)),
+					     pol);
 	return false;
       }
       return true;
