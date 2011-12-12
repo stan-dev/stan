@@ -11,21 +11,20 @@ data {
 } 
 parameters {
   int(0,) z[N]; 
-  double(0,) sigma;
+  double(0,) sigmasq;
   double(0,) theta;
   double lambda[2]; 
   vector(2) p;
 } 
 model {
   p ~ dirichlet(alpha); 
-  theta ~ normal(0,1000);  // propto half normal because theta truncated
+  theta ~ normal(0, 1000);  // propto half normal because theta truncated
   lambda[1] ~ normal(0, 1e3); 
   lambda[2] <- lambda[1] + theta;
-  // equiv: tau ~ gamma(); sigma <- 1 / sqrt(tau);
-  1 / square(sigma) ~ gamma(1e-3, 1e-3);
+  sigmasq ~ inv_gamma(1e-3, 1e-3); 
   for (n in 1:N) {
     z[n] ~ categorical(p);
-    y[n] ~ normal(lambda[z[n]], sigma);
+    y[n] ~ normal(lambda[z[n]], sqrt(sigmasq)); 
   }
 }
 

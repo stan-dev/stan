@@ -8,8 +8,7 @@ colnames(post) <- c("alpha", "beta")
 
 summary(as.mcmc(post)) 
 
-# run in JAGS 
-library(BUGSExamples)
+# run in JAGS, BUGSExamples is needed.  
 # BUGSExamples package is installed by 
 # install.packages("BUGSExamples", repos = "http://R-Forge.R-project.org")
 
@@ -18,6 +17,7 @@ if (!is.element("BUGSExamples", installed.packages()[, 1])) {
         "the results from JAGS.", sep = '\n')
     quit();
 } 
+library(BUGSExamples)
 
 ex <- list(name = "Dogs", parameters = c("alpha", "beta"), 
            nSample = 2000, nBurnin = 500, nThin = 1, 

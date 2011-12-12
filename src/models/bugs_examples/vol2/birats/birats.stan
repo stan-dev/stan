@@ -12,19 +12,17 @@ data {
   cov_matrix(2) Omega; 
 }
 parameters {
-  vector(2)  beta[N];
+  vector(2) beta[N];
   vector(2) mu_beta;
-  double(0,) sigma_y;
+  double(0,) sigmasq_y;
   cov_matrix(2) Sigma_beta; 
 }
-derived parameters {
-  double(0,) sigmasq_y;
-  double(-1, 1) rho; 
-  double alpha0; 
-  sigmasq_y <- sigma_y * sigma_y;
-  //rho <- Sigma_beta[1, 2] / sqrt(Sigma_beta[1, 1] * Sigma_beta[2, 2]);
-  //alpha0 <- mu_beta[1] - mu_beta[2] * xbar; 
-}
+//  derived parameters {
+//    double(-1, 1) rho; 
+//    double alpha0; 
+//    //rho <- Sigma_beta[1, 2] / sqrt(Sigma_beta[1, 1] * Sigma_beta[2, 2]);
+//    //alpha0 <- mu_beta[1] - mu_beta[2] * xbar; 
+//  }
 model {
   sigmasq_y ~ inv_gamma(0.001, 0.001);
   mu_beta[1] ~ normal(0, 100); 
@@ -34,5 +32,5 @@ model {
     beta[n] ~ multi_normal(mu_beta, Sigma_beta);
   for (n in 1:N)
     for (t in 1:T) 
-      y[n,t] ~ normal(beta[n, 1]+ beta[n, 2] * (x[t] - xbar), sigma_y);
+      y[n,t] ~ normal(beta[n, 1]+ beta[n, 2] * (x[t] - xbar), sqrt(sigmasq_y));
 }
