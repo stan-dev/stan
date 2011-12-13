@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-//#include <boost/math/policies/policy.hpp>
 #include "stan/prob/distributions_normal.hpp"
 
 using boost::math::policies::policy;
