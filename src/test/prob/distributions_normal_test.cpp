@@ -1,7 +1,5 @@
-#include <cmath>
 #include <gtest/gtest.h>
-#include <Eigen/Dense>
-#include <boost/math/policies/policy.hpp>
+//#include <boost/math/policies/policy.hpp>
 #include "stan/prob/distributions_normal.hpp"
 
 using boost::math::policies::policy;
