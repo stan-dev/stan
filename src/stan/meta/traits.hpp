@@ -1,3 +1,6 @@
+#ifndef __STAN__META__TRAITS_HPP__
+#define __STAN__META__TRAITS_HPP__
+
 #include <boost/type_traits.hpp>
 
 namespace stan {
@@ -8,3 +11,5 @@ namespace stan {
   };
 
 }
+
+#endif

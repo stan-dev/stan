@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions_error_handling.hpp"
+#include "stan/meta/conversions.hpp"
+#include "stan/agrad/agrad.hpp"
 #include <limits>
 
 typedef boost::math::policies::policy<
@@ -11,11 +13,12 @@ typedef boost::math::policies::policy<
 typedef boost::math::policies::policy<> default_policy;
 
 using namespace stan::prob;
+using stan::convert;
 
 //---------- convert: double tests ----------
 TEST(ProbDistributionsErrorHandling,ConvertDouble) {
   double x = 100.0;
-  EXPECT_FLOAT_EQ (x, convert(x)) << "Expect the same number back";
+  EXPECT_FLOAT_EQ (x, stan::convert(x)) << "Expect the same number back";
 }
 TEST(ProbDistributionsErrorHandling,ConvertDoubleInfinity) {
   double x = std::numeric_limits<double>::infinity();
