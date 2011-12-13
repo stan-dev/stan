@@ -152,7 +152,6 @@ namespace stan {
       if (y.size() == 0)
 	return 0.0;
       
-      //FIXME: respect propto below
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!propto 
 	  || !is_constant<T_y>::value 
