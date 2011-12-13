@@ -1,12 +1,17 @@
 # g++ (GCC), clang (Clang)
-CC = clang++ # g++
+CC = clang++
 EIGEN_OPT = -DNDEBUG
 OPTIMIZE_OPT = 0
 OPT = -O$(OPTIMIZE_OPT) -Wall -g  $(EIGEN_OPT) #-rdynamic 
 
 INCLUDES = -I src -I lib
+INCLUDES_T = -I lib/gtest/include  -I lib/gtest
 CFLAGS = $(OPT) $(INCLUDES)
-CFLAGS_T = $(CFLAGS) -I lib/gtest/include  -I lib/gtest # -lpthread
+ifneq (,$(findstring g++,$(CC)))
+	CFLAGS += -std=gnu++0x
+endif
+CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0
+
 
 # find all unit tests
 UNIT_TESTS := $(wildcard src/test/*/*.cpp)
