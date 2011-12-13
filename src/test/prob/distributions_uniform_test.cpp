@@ -17,6 +17,17 @@ TEST(ProbDistributions,Uniform) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(1.0,0.0,1.0)));
   EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(2.0,0.0,1.0)));  
 }
+TEST(ProbDistributions,UniformPropto) {
+  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(0.2,0.0,1.0)));
+  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(0.2,-0.25,0.25)));
+  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(101.0,100.0,110.0)));
+  // lower boundary
+  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(0.0,0.0,1.0)));
+  EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log<true>(-1.0,0.0,1.0)));
+  // upper boundary
+  EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(1.0,0.0,1.0)));
+  EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log<true>(2.0,0.0,1.0)));  
+}
 TEST(ProbDistributions,UniformDefaultPolicy) {
   // lower bound higher than the upper bound
   EXPECT_THROW (stan::prob::uniform_log(0.0,1.0,0.0), std::domain_error);
@@ -46,6 +57,4 @@ TEST(ProbDistributions,UniformErrorNoPolicy) {
   // lower and uppper bounds same
   EXPECT_NO_THROW (result = stan::prob::uniform_log (y, 0.0, 0.0, pol()));
   EXPECT_EQ (33, errno);
-  
-
 }
