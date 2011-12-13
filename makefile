@@ -3,6 +3,13 @@ CC = clang++ # g++
 EIGEN_OPT = -DNDEBUG
 OPTIMIZE_OPT = 0
 OPT = -O$(OPTIMIZE_OPT) -Wall -g  $(EIGEN_OPT) #-rdynamic 
+ifneq (,$(findstring g++,$(CC)))
+	OPT += -std=c++0x
+endif
+ifneq (,$(findstring clang++,$(CC)))
+	OPT += -Wc++0x-extensions
+endif
+
 INCLUDES = -I src -I lib
 CFLAGS = $(OPT) $(INCLUDES)
 CFLAGS_T = $(CFLAGS) -I lib/gtest/include  -I lib/gtest # -lpthread
