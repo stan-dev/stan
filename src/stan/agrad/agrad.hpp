@@ -956,8 +956,9 @@ namespace stan {
        * @param b The scalar to add to this variable.
        * @return The result of adding the specified variable to this variable.
        */
-      inline var& operator+=(const double& b) {
-	vi_ = new add_vd_vari(vi_,b);
+      inline var& operator+=(const double b) {
+	if (b != 0.0)
+	  vi_ = new add_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -988,8 +989,9 @@ namespace stan {
        * @return The result of subtracting the specified variable from this
        * variable.
        */
-      inline var& operator-=(const double& b) {
-	vi_ = new subtract_vd_vari(vi_,b);
+      inline var& operator-=(const double b) {
+	if (b != 0.0)
+	  vi_ = new subtract_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -1020,8 +1022,9 @@ namespace stan {
        * @return The result of multplying this variable by the specified
        * variable.
        */
-      inline var& operator*=(const double& b) {
-	vi_ = new multiply_vd_vari(vi_,b);
+      inline var& operator*=(const double b) {
+	if (b != 1.0)
+	  vi_ = new multiply_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -1051,8 +1054,9 @@ namespace stan {
        * @return The result of dividing this variable by the specified
        * variable.
        */
-      inline var& operator/=(const double& b) {
-	vi_ = new divide_vd_vari(vi_,b);
+      inline var& operator/=(const double b) {
+	if (b != 1.0)
+	  vi_ = new divide_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -1116,7 +1120,7 @@ namespace stan {
      * @return True if the first variable's value is the same as the
      * second value.
      */
-    inline bool operator==(const var& a, const double& b) {
+    inline bool operator==(const var& a, const double b) {
       return a.val() == b;
     }
   
@@ -1128,7 +1132,7 @@ namespace stan {
      * @param b Second variable.
      * @return True if the variable's value is equal to the scalar.
      */
-    inline bool operator==(const double& a, const var& b) {
+    inline bool operator==(const double a, const var& b) {
       return a == b.val();
     }
 
@@ -1153,7 +1157,7 @@ namespace stan {
      * @return True if the first variable's value is not the same as the
      * second value.
      */
-    inline bool operator!=(const var& a, const double& b) {
+    inline bool operator!=(const var& a, const double b) {
       return a.val() != b;
     }
 
@@ -1166,7 +1170,7 @@ namespace stan {
      * @return True if the first value is not the same as the
      * second variable's value.
      */
-    inline bool operator!=(const double& a, const var& b) {
+    inline bool operator!=(const double a, const var& b) {
       return a != b.val();
     }
 
@@ -1189,7 +1193,7 @@ namespace stan {
      * @param b Second value.
      * @return True if first variable's value is less than second value.
      */
-    inline bool operator<(const var& a, const double& b) {
+    inline bool operator<(const var& a, const double b) {
       return a.val() < b;
     }
 
@@ -1201,7 +1205,7 @@ namespace stan {
      * @param b Second variable.
      * @return True if first value is less than second variable's value.
      */
-    inline bool operator<(const double& a, const var& b) {
+    inline bool operator<(const double a, const var& b) {
       return a < b.val();
     }
 
@@ -1224,7 +1228,7 @@ namespace stan {
      * @param b Second value.
      * @return True if first variable's value is greater than second value.
      */
-    inline bool operator>(const var& a, const double& b) {
+    inline bool operator>(const var& a, const double b) {
       return a.val() > b;
     }
 
@@ -1236,7 +1240,7 @@ namespace stan {
      * @param b Second variable.
      * @return True if first value is greater than second variable's value.
      */
-    inline bool operator>(const double& a, const var& b) {
+    inline bool operator>(const double a, const var& b) {
       return a > b.val();
     }
 
@@ -1262,7 +1266,7 @@ namespace stan {
      * @return True if first variable's value is less than or equal to
      * the second value.
      */
-    inline bool operator<=(const var& a, const double& b) {
+    inline bool operator<=(const var& a, const double b) {
       return a.val() <= b;
     }
 
@@ -1275,7 +1279,7 @@ namespace stan {
      * @return True if first value is less than or equal to the second
      * variable's value.
      */
-    inline bool operator<=(const double& a, const var& b) {
+    inline bool operator<=(const double a, const var& b) {
       return a <= b.val();
     }
 
@@ -1301,7 +1305,7 @@ namespace stan {
      * @return True if first variable's value is greater than or equal
      * to second value.
      */
-    inline bool operator>=(const var& a, const double& b) {
+    inline bool operator>=(const var& a, const double b) {
       return a.val() >= b;
     }
 
@@ -1314,7 +1318,7 @@ namespace stan {
      * @return True if the first value is greater than or equal to the
      * second variable's value.
      */
-    inline bool operator>=(const double& a, const var& b) {
+    inline bool operator>=(const double a, const var& b) {
       return a >= b.val();
     }
 
@@ -1400,7 +1404,9 @@ namespace stan {
      * @param b Second scalar operand.
      * @return Result of adding variable and scalar.
      */
-    inline var operator+(const var& a, const double& b) {
+    inline var operator+(const var& a, const double b) {
+      if (b == 0.0)
+	return a;
       return var(new add_vd_vari(a.vi_,b));
     }
 
@@ -1415,7 +1421,7 @@ namespace stan {
      * @param b Second variable operand.
      * @return Result of adding variable and scalar.
      */
-    inline var operator+(const double& a, const var& b) {
+    inline var operator+(const double a, const var& b) {
       return var(new add_vd_vari(b.vi_,a)); // by symmetry
     }
 
@@ -1448,7 +1454,7 @@ namespace stan {
      * @param b Second scalar operand.
      * @return Result of subtracting the scalar from the variable.
      */
-    inline var operator-(const var& a, const double& b) {
+    inline var operator-(const var& a, const double b) {
       if (b == 0.0)
 	return a;
       return var(new subtract_vd_vari(a.vi_,b));
@@ -1465,7 +1471,7 @@ namespace stan {
      * @param b Second variable operand.
      * @return Result of sutracting a variable from a scalar.
      */
-    inline var operator-(const double& a, const var& b) {
+    inline var operator-(const double a, const var& b) {
       return var(new subtract_dv_vari(a,b.vi_));
     }
 
@@ -1483,6 +1489,8 @@ namespace stan {
      * @return Variable result of multiplying operands.
      */
     inline var operator*(const var& a, const var& b) {
+      if (b == 1.0)
+	return a;
       return var(new multiply_vv_vari(a.vi_,b.vi_));
     }
 
@@ -1497,7 +1505,7 @@ namespace stan {
      * @param b Scalar operand.
      * @return Variable result of multiplying operands.
      */
-    inline var operator*(const var& a, const double& b) {
+    inline var operator*(const var& a, const double b) {
       return var(new multiply_vd_vari(a.vi_,b));
     }
 
@@ -1512,7 +1520,7 @@ namespace stan {
      * @param b Variable operand.
      * @return Variable result of multiplying the operands.
      */
-    inline var operator*(const double& a, const var& b) {
+    inline var operator*(const double a, const var& b) {
       return var(new multiply_vd_vari(b.vi_,a)); // by symmetry
     }
 
@@ -1545,7 +1553,9 @@ namespace stan {
      * @param b Scalar operand.
      * @return Variable result of dividing the variable by the scalar.
      */
-    inline var operator/(const var& a, const double& b) {
+    inline var operator/(const var& a, const double b) {
+      if (b == 1.0)
+	return a;
       return var(new divide_vd_vari(a.vi_,b));
     }
 
@@ -1560,7 +1570,7 @@ namespace stan {
      * @param b Variable operand.
      * @return Variable result of dividing the scalar by the variable.
      */
-    inline var operator/(const double& a, const var& b) {
+    inline var operator/(const double a, const var& b) {
       return var(new divide_dv_vari(a,b.vi_));
     }
 
@@ -1720,7 +1730,15 @@ namespace stan {
      * @param exponent Exponent scalar.
      * @return Base raised to the exponent.
      */
-    inline var pow(const var& base, const double& exponent) {
+    inline var pow(const var& base, const double exponent) {
+      if (exponent == 0.0)
+	return var(1.0);
+      if (exponent == 0.5)
+	return sqrt(base);
+      if (exponent == 1.0)
+	return base;
+      if (exponent == 2.0)
+	return base * base;
       return var(new pow_vd_vari(base.vi_,exponent));
     }
 
@@ -1736,7 +1754,7 @@ namespace stan {
      * @param exponent Exponent variable.
      * @return Base raised to the exponent.
      */
-    inline var pow(const double& base, const var& exponent) {
+    inline var pow(const double base, const var& exponent) {
       return var(new pow_dv_vari(base,exponent.vi_));
     }
 
@@ -1860,7 +1878,7 @@ namespace stan {
      * @param b Denominator scalar.
      * @return The arc tangent of the fraction, in radians.
      */
-    inline var atan2(const var& a, const double& b) {
+    inline var atan2(const var& a, const double b) {
       return var(new atan2_vd_vari(a.vi_,b));
     }
 
@@ -1876,7 +1894,7 @@ namespace stan {
      * @param b Denominator variable.
      * @return The arc tangent of the fraction, in radians.
      */
-    inline var atan2(const double& a, const var& b) {
+    inline var atan2(const double a, const var& b) {
       return var(new atan2_dv_vari(a,b.vi_));
     }
 
@@ -2030,7 +2048,7 @@ namespace stan {
      * @return Floating pointer remainder of dividing the first variable by
      * the second scalar.
      */
-    inline var fmod(const var& a, const double& b) {
+    inline var fmod(const var& a, const double b) {
       return var(new fmod_vd_vari(a.vi_,b));
     }
 
@@ -2047,7 +2065,7 @@ namespace stan {
      * @return Floating pointer remainder of dividing first scalar by
      * the second variable.
      */
-    inline var fmod(const double& a, const var& b) {
+    inline var fmod(const double a, const var& b) {
       return var(new fmod_dv_vari(a,b.vi_));
     }
 
