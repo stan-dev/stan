@@ -62,19 +62,18 @@ namespace stan {
       if(!stan::prob::check_x(function, y, &lp, Policy()))
 	return lp;
       
-      if (!propto)
-	lp += NEG_LOG_SQRT_TWO_PI;
-      
-      if (!propto 
-	  || !stan::is_constant<T_scale>::value)
-	lp -= log(sigma);
-      
       if (!propto 
 	  || !stan::is_constant<T_y>::value 
 	  || !stan::is_constant<T_loc>::value 
 	  || !stan::is_constant<T_scale>::value)
-	lp -= square(y - mu) / (2.0 * square(sigma));
-      
+	lp -= square(y - mu);
+
+      if (!propto 
+	  || !stan::is_constant<T_scale>::value)
+	lp = lp / (2.0 * square(sigma)) - log (sigma);
+
+      if (!propto)
+	lp += NEG_LOG_SQRT_TWO_PI;
       return lp;
     }
 
@@ -141,7 +140,8 @@ namespace stan {
      * @tparam T_loc Type of location parameter.
      */
     template <bool propto = false,
-	      typename T_y, typename T_loc, typename T_scale, class Policy = policy<> >
+	      typename T_y, typename T_loc, typename T_scale, 
+	      class Policy = policy<> >
     inline typename promote_args<T_y,T_loc,T_scale>::type
     normal_log(const std::vector<T_y>& y,
 	       const T_loc& mu,
@@ -149,24 +149,34 @@ namespace stan {
 	       const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
-	return lp;
-      if (!stan::prob::check_location(function, mu, &lp, Policy()))
-	return lp;
-      if (!stan::prob::check_x(function, y, &lp, Policy()))
-	return lp;
+      double temp;
+      if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
+	return temp;
+      if (!stan::prob::check_location(function, mu, &temp, Policy()))
+	return temp;
+      if (!stan::prob::check_x(function, y, &temp, Policy()))
+	return temp;
 
       if (y.size() == 0)
-	return lp;
+	return 0.0;
       
       //FIXME: respect propto below
-
-      for (unsigned int n = 0; n < y.size(); ++n)
-	lp += square(y[n] - mu);
-      return (y.size() * NEG_LOG_SQRT_TWO_PI)
-	- (lp / (2.0 * square(sigma)))
-	- y.size() * log(sigma);
+      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      if (!propto 
+	  || !is_constant<T_y>::value 
+	  || !is_constant<T_loc>::value
+	  || !is_constant<T_scale>::value) {
+	for (unsigned int n = 0; n < y.size(); ++n)
+	  lp -= square(y[n] - mu);
+      }
+      
+      if (!propto || !is_constant<T_scale>::value) 
+	lp = lp / (2.0 * square(sigma)) - y.size() * log(sigma);
+      
+      if (!propto) 
+	lp += y.size() * NEG_LOG_SQRT_TWO_PI;
+      
+      return lp;
     }
 
 
