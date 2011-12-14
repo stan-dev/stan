@@ -33,7 +33,7 @@ namespace stan {
     template <bool propto = false, 
 	      typename T_y, typename T_dof, 
 	      class Policy = policy<> >
-    inline typename boost::math::tools::promote_args<T_y,T_dof>::type
+    inline typename promote_args<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu, const Policy& = Policy()) {
       static const char* function = "stan::prob::chi_square_log<%1%>(%1%)";
 

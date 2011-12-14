@@ -36,7 +36,7 @@ namespace stan {
     template <bool propto = false,
 	      typename T_y, typename T_shape, typename T_inv_scale, 
 	      class Policy = policy<> >
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
+    inline typename promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::gamma_log<%1%>(%1%)";
 
@@ -84,7 +84,7 @@ namespace stan {
     template <bool propto = false,
 	      typename T_y, typename T_shape, typename T_inv_scale, 
 	      class Policy = policy<> >
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
+    inline typename promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()){
       static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
 
