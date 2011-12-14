@@ -1007,3 +1007,27 @@ TEST(agrad_agrad,fmod_double_var) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(-2.0,g[0]); // (int)(2.7/1.3) = 2
 }
+
+TEST(agrad_agrad,jacobian) {
+  AVAR x1 = 2.0;
+  AVAR x2 = 3.0;
+  
+  AVAR y1 = x1 * x2;
+  AVAR y2 = x1 + x2;
+  AVAR y3 = 17.0 * x1;
+
+  AVEC x = createAVEC(x1,x2);
+  AVEC y = createAVEC(y1,y2,y3);
+
+  std::vector<std::vector<double> > J;
+  jacobian(y,x,J);
+
+  EXPECT_FLOAT_EQ(3.0,J[0][0]); // dy1/dx1
+  EXPECT_FLOAT_EQ(2.0,J[0][1]); // dy1/dx2
+
+  EXPECT_FLOAT_EQ(1.0,J[1][0]); // dy2/dx1
+  EXPECT_FLOAT_EQ(1.0,J[1][1]); // dy2/dx2
+
+  EXPECT_FLOAT_EQ(17.0,J[2][0]); // dy2/dx1
+  EXPECT_FLOAT_EQ(0.0,J[2][1]); // dy2/dx2
+}

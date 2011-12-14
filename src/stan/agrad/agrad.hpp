@@ -22,6 +22,10 @@ namespace stan {
       memory::stack_alloc memalloc_;
     }
 
+    static void recover_memory();
+
+    static void grad(chainable* vi);
+
     /**
      * Abstract base class for variable implementations that handles
      * memory management and applying the chain rule.
@@ -51,6 +55,21 @@ namespace stan {
       }
 
       /**
+       * Initialize this chainable's adjoint value to make it
+       * the dependent variable in a gradient calculation. 
+       */
+      virtual void init_dependent() {
+      }
+
+      /**
+       * Set the value of the adjoint for this chainable
+       * to its initial value.
+       */
+      virtual void set_zero_adjoint() {
+      }
+      
+
+      /**
        * Allocate memory from the underlying memory pool.  This memory is
        * is managed by the gradient program and will be recovered as a whole.
        * Classes should not be allocated with this operator if they have
@@ -63,47 +82,6 @@ namespace stan {
 	return memalloc_.alloc(nbytes);
       }
 
-      /**
-       * Recover memory used for all variables for reuse.
-       */
-      static void recover_memory() {
-	var_stack_.resize(0);
-	memalloc_.recover_all();
-      }
-
-      /**
-       * Return all memory used for gradients back to the system.
-       */
-      static void free_memory() {
-	memalloc_.free_all();
-      }
-
-      virtual void init_dependent() {
-      }
-
-      /**
-       * Compute the gradient for all variables starting from the
-       * specified root variable implementation.  Does not recover
-       * memory.  This chainable variable's adjoint is initialized
-       * using the method <code>init_dependent()</code> and then the
-       * chain rule is applied working down the stack from this
-       * chainable and calling each chainable's <code>chain()</code>
-       * method in turn.
-       *
-       * @param vi Variable implementation for root of partial
-       * derivative propagation.
-       */
-      static void grad(chainable* vi) {
-	std::vector<chainable*>::iterator it = var_stack_.end();
-	std::vector<chainable*>::iterator begin = var_stack_.begin();
-	// skip to root variable
-	for (; (it >= begin) && (*it != vi); --it)
-	  ;
-	vi->init_dependent(); 
-	// propagate derivates for remaining vars
-	for (; it >= begin; --it)
-	  (*it)->chain();
-      }
     };
 
     /**
@@ -163,6 +141,13 @@ namespace stan {
        */
       virtual void init_dependent() {
 	adj_ = 1.0;   // droot/droot = 1
+      }
+
+      /**
+       * Set the adjoint value of this variable to 0.
+       */
+      virtual void set_zero_adjoint() {
+	adj_ = 0.0;
       }
 
     };
@@ -901,11 +886,11 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
 		std::vector<double>& g) {
-	chainable::grad(vi_);
+	stan::agrad::grad(vi_);
 	g.resize(0);
 	for (size_t i = 0U; i < x.size(); ++i) 
 	  g.push_back(x[i].vi_->adj_);
-	chainable::recover_memory();
+	recover_memory();
       }
 
       /**
@@ -913,8 +898,8 @@ namespace stan {
        * all variables on which it depends.  
        *
        * Memory is recovered, but not freed after this operation,
-       * calling <code>vari::recover_memory()</code>; see
-       * <code>vari::free_all()</code> to release resources back to
+       * calling <code>recover_memory()</code>; see
+       * <code>free_all()</code> to release resources back to
        * the system rather than saving them for reuse).
        *
        * Until the next creation of a stan::agrad::var instance, the
@@ -925,8 +910,8 @@ namespace stan {
        * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.
        */
       void grad() {
-	chainable::grad(vi_);
-	chainable::recover_memory();
+	stan::agrad::grad(vi_);
+	recover_memory();
       }
 
       // COMPOUND ASSIGNMENT OPERATORS
@@ -2093,6 +2078,95 @@ namespace stan {
       if (a.val() < 0.0)
 	return var(new neg_vari(a.vi_));
       return var(new vari(0.0));
+    }
+
+
+    /**
+     * Recover memory used for all variables for reuse.
+     */
+    static void recover_memory() {
+      var_stack_.resize(0);
+      memalloc_.recover_all();
+    }
+
+    /**
+     * Return all memory used for gradients back to the system.
+     */
+    static void free_memory() {
+      memalloc_.free_all();
+    }
+
+    /**
+     * Compute the gradient for all variables starting from the
+     * specified root variable implementation.  Does not recover
+     * memory.  This chainable variable's adjoint is initialized
+     * using the method <code>init_dependent()</code> and then the
+     * chain rule is applied working down the stack from this
+     * chainable and calling each chainable's <code>chain()</code>
+     * method in turn.
+     *
+     * @param vi Variable implementation for root of partial
+     * derivative propagation.
+     */
+    static void grad(chainable* vi) {
+      std::vector<chainable*>::iterator it = var_stack_.end();
+      std::vector<chainable*>::iterator begin = var_stack_.begin();
+      // skip to root variable
+      for (; (it >= begin) && (*it != vi); --it)
+	;
+      vi->init_dependent(); 
+      // propagate derivates for remaining vars
+      for (; it >= begin; --it)
+	(*it)->chain();
+    }
+
+    /**
+     * Reset all adjoint values in the stack to zero.
+     */
+    static void set_zero_all_adjoints() {
+      for (unsigned int i = 0; i < var_stack_.size(); ++i)
+	var_stack_[i]->set_zero_adjoint();
+    }
+
+    /**
+     * Return the Jacobian of the function producing the specified
+     * dependent variables with respect to the specified independent
+     * variables. 
+     *
+     * A typical use case would be to take the Jacobian of a function
+     * from independent variables to dependentant variables.  For instance,
+     * 
+     * <pre>
+     * std::vector<var> f(std::vector<var>& x) { ... }
+     * std::vector<var> x = ...;
+     * std::vector<var> y = f(x);
+     * std::vector<std::vector<double> > J;
+     * jacobian(y,x,J);
+     * </pre>
+     *
+     * After executing this code, <code>J</code> will contain the
+     * Jacobian, stored as a standard vector of gradients.
+     * Specifically, <code>J[m]</code> will be the gradient of <code>y[m]</code>
+     * with respect to <code>x</code>, and thus <code>J[m][n]</code> will be 
+     * <code><i>d</i>y[m]/<i>d</i>x[n]</code>.
+     *
+     * @param dependents Dependent (output) variables.
+     * @param independents Indepent (input) variables.
+     * @return Jacobian of the transform.  
+     */
+    void jacobian(std::vector<var>& dependents,
+		  std::vector<var>& independents,
+		  std::vector<std::vector<double> >& jacobian) {
+      jacobian.resize(dependents.size());
+      for (unsigned int i = 0U; i < dependents.size(); ++i) {
+	jacobian[i].resize(independents.size());
+	if (i > 0U) 
+	  set_zero_all_adjoints();
+	jacobian.push_back(std::vector<double>(0U));
+	grad(dependents[i].vi_);
+	for (unsigned int j = 0U; j < independents.size(); ++j)
+	  jacobian[i][j] = independents[j].adj();
+      }
     }
 
   }
