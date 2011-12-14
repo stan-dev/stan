@@ -346,6 +346,7 @@ namespace stan {
 	generate_initialize_array("integer",EMPTY_EXP_VECTOR,x.name_,x.dims_);
       }      
       void operator()(const double_var_decl& x) const {
+	// FIXME:  refactor to use range.has_low() and .has_high()
 	if (!is_nil(x.range_.low_.expr_)) {
 	  if (!is_nil(x.range_.high_.expr_)) {
 	    std::vector<expression> read_args;
@@ -818,6 +819,43 @@ namespace stan {
 	  generate_expression(x.dist_.args_[i],o_);
 	}
 	o_ << ");" << EOL;
+	if (x.truncation_.has_low() && x.truncation_.has_high()) {
+	  generate_indent(indent_,o_);
+	  o_ << "lp__ += log(";
+	  o_ << x.dist_.family_ << "_p(";
+	  generate_expression(x.truncation_.high_.expr_,o_);
+	  for (unsigned int i = 0; i < x.dist_.args_.size(); ++i) {
+	    o_ << ", ";
+	    generate_expression(x.dist_.args_[i],o_);
+	  }
+	  o_ << ") - " << x.dist_.family_ << "_p(";
+	  generate_expression(x.truncation_.low_.expr_,o_);
+	  for (unsigned int i = 0; i < x.dist_.args_.size(); ++i) {
+	    o_ << ", ";
+	    generate_expression(x.dist_.args_[i],o_);
+	  }
+	  o_ << "));" << EOL;
+	} else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
+	  generate_indent(indent_,o_);
+	  o_ << "lp__ += log(";
+	  o_ << x.dist_.family_ << "_p(";
+	  generate_expression(x.truncation_.high_.expr_,o_);
+	  for (unsigned int i = 0; i < x.dist_.args_.size(); ++i) {
+	    o_ << ", ";
+	    generate_expression(x.dist_.args_[i],o_);
+	  }
+	  o_ << "));" << EOL;
+	} else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
+	  generate_indent(indent_,o_);
+	  o_ << "lp__ += log(1.0 - "; // FIXME: use log1m()
+	  o_ << x.dist_.family_ << "_p(";
+	  generate_expression(x.truncation_.low_.expr_,o_);
+	  for (unsigned int i = 0; i < x.dist_.args_.size(); ++i) {
+	    o_ << ", ";
+	    generate_expression(x.dist_.args_[i],o_);
+	  }
+	  o_ << "));" << EOL;
+	}
       }
       void operator()(statements const& x) const {
 	for (unsigned int i = 0; i < x.statements_.size(); ++i)

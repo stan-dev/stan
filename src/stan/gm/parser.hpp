@@ -134,7 +134,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
 			  (stan::gm::expression, expr_)
-			  (stan::gm::distribution, dist_) )
+			  (stan::gm::distribution, dist_) 
+			  (stan::gm::range, truncation_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
 			  (stan::gm::variable_dims, var_dims_)
@@ -396,6 +397,9 @@ namespace stan {
 	using boost::spirit::qi::eps;
 	using namespace qi::labels;
 
+	var_name_to_decl_["lp__"] 
+	  = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
+
 	program_r.name("program");
 	program_r 
 	  = -data_var_decls_r
@@ -626,20 +630,29 @@ namespace stan {
 	  >> qi::lit(':') 
 	  >> expression_r [validate_int_expr_f(_1,_pass)];
 
+	truncation_range_r.name("range pair");
+	truncation_range_r
+	  %= qi::lit('T')
+	  > qi::lit('(') 
+	  > -expression_r
+	  > qi::lit(',')
+	  > -expression_r
+	  > qi::lit(')');
+	
 	range_brackets_int_r.name("range expression pair, brackets");
 	range_brackets_int_r 
-	  = qi::lit('(') 
-	  >> -(expression_r [validate_int_expr_f(_1,_pass)])
+	  %= qi::lit('(') 
+	  > -(expression_r [validate_int_expr_f(_1,_pass)])
 	  > qi::lit(',')
-	  >> -(expression_r [validate_int_expr_f(_1,_pass)])
+	  > -(expression_r [validate_int_expr_f(_1,_pass)])
 	  > qi::lit(')');
 
 	range_brackets_double_r.name("range expression pair, brackets");
 	range_brackets_double_r 
-	  = qi::lit('(') 
-	  >> -(expression_r [validate_double_expr_f(_1,_pass)])
+	  %= qi::lit('(') 
+	  > -(expression_r [validate_double_expr_f(_1,_pass)])
 	  > qi::lit(',')
-	  >> -(expression_r [validate_double_expr_f(_1,_pass)])
+	  > -(expression_r [validate_double_expr_f(_1,_pass)])
 	  > qi::lit(')');
 
 	args_r.name("function argument expressions");
@@ -662,9 +675,10 @@ namespace stan {
 
 	sample_r.name("distribution of expression");
 	sample_r 
-	  = expression_r
+	  %= expression_r
 	  >> qi::lit('~')
 	  > distribution_r
+	  > -truncation_range_r
 	  > qi::lit(';');
 	
 	var_lhs_r.name("variable and array dimensions");
@@ -734,6 +748,7 @@ namespace stan {
       qi::rule<Iterator, std::vector<expression>(), whitespace_grammar<Iterator> > opt_dims_r;
       qi::rule<Iterator, std::vector<expression>(), whitespace_grammar<Iterator> > dims_r;
       qi::rule<Iterator, range(), whitespace_grammar<Iterator> > range_r;
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > truncation_range_r;
       qi::rule<Iterator, range(), whitespace_grammar<Iterator> > range_brackets_int_r;
       qi::rule<Iterator, range(), whitespace_grammar<Iterator> > range_brackets_double_r;
       qi::rule<Iterator, std::vector<expression>(), whitespace_grammar<Iterator> > args_r;
@@ -765,7 +780,6 @@ namespace stan {
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > indexed_factor_r;
       // two of these because of type-coercion from index_op to expression
       qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_2_r; 
-      
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > negated_factor_r;
     };
 

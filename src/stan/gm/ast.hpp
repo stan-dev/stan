@@ -654,6 +654,12 @@ namespace stan {
 	: low_(low),
 	  high_(high) {
       }
+      bool has_low() const {
+	return !is_nil(low_.expr_);
+      }
+      bool has_high() const {
+	return !is_nil(high_.expr_);
+      }
       expression low_;
       expression high_;
     };
@@ -868,14 +874,16 @@ namespace stan {
 	: expr_(e),
 	  dist_(dist) {
       }
-      bool is_ill_formed() {
-	if (expr_.expression_type().is_ill_formed())
-	  return true;
-	return false;
+      bool is_ill_formed() const {
+	return expr_.expression_type().is_ill_formed()
+	  || ( truncation_.has_low()
+	       && expr_.expression_type() != truncation_.low_.expression_type() )
+	  || ( truncation_.has_high()
+	       && expr_.expression_type() != truncation_.high_.expression_type() );
       }
       expression expr_;
       distribution dist_;
-      
+      range truncation_;
     };
 
     struct assignment {
