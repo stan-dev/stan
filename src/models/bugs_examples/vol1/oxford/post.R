@@ -2,7 +2,7 @@
 ## in other program. 
 
 library(coda) 
-post <- read.csv(file = "samples.csv"); 
+post <- read.csv(file = "samples.csv", header = FALSE); 
 
 poi <- post[, c(121, 122, 123, 124)]
 ## assuming the order of variables in samples.csv are the same as model
