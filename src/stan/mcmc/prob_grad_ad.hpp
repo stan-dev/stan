@@ -51,7 +51,7 @@ namespace stan {
 	}
 	agrad::var adLogProb = log_prob(ad_params_r,params_i);
 	double val = adLogProb.val();
-	agrad::vari::recover_memory();
+	agrad::recover_memory();
 	return val;
       }
     

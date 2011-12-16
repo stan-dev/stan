@@ -5,7 +5,7 @@
 #include "stan/prob/distributions_constants.hpp"
 
 #include <stan/meta/traits.hpp>
-#inclue "stan/prob/distributions_beta.hpp"
+#include "stan/prob/distributions_beta.hpp"
 
 namespace stan {
   namespace prob {
