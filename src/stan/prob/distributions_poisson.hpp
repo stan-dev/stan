@@ -1,26 +1,22 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_POISSON_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_POISSON_HPP__
 
-#include <boost/math/constants/constants.hpp>
-#include <boost/math/special_functions.hpp>
-#include <boost/math/tools/promotion.hpp>
-#include <boost/math/distributions/detail/common_error_handling.hpp>
-#include <boost/math/policies/error_handling.hpp>
-#include <boost/math/policies/policy.hpp>
-
-#include "stan/prob/transform.hpp"
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
 
+#include <stan/meta/traits.hpp>
+
 namespace stan {
   namespace prob {
-    using namespace std;
-    using namespace stan::maths;
+    using boost::math::tools::promote_args;
+    using boost::math::policies::policy;
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <typename T_rate, class Policy>
-    inline typename boost::math::tools::promote_args<T_rate>::type
-    poisson_log(const unsigned int n, const T_rate& lambda, const Policy& /* pol */) {
+    template <bool propto = false,
+	      typename T_rate, 
+	      class Policy = policy<> >
+    inline typename promote_args<T_rate>::type
+      poisson_log(const unsigned int n, const T_rate& lambda, const Policy& = Policy()) {
       static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
 
       double result;
@@ -29,31 +25,19 @@ namespace stan {
       if(!stan::prob::check_nonnegative(function, n, "Number n", &result, Policy()))
 	return result;
       
+
       if (lambda == 0)
 	return LOG_ZERO;
-      
-      return - lgamma(n + 1.0)
-	+ n * log(lambda)
-	- lambda;
-    }
-    
-    template <typename T_rate>
-    inline typename boost::math::tools::promote_args<T_rate>::type
-    poisson_log(const unsigned int n, const T_rate& lambda) {
-      return poisson_log (n, lambda, boost::math::policies::policy<>());
-    }
 
-    template <typename T_rate, class Policy>
-    inline typename boost::math::tools::promote_args<T_rate>::type
-    poisson_propto_log(const unsigned int n, const T_rate& lambda, const Policy& /* pol */) {
-      return poisson_log (n, lambda, Policy());
+      typename promote_args<T_rate>::type lp(0.0);
+      if (!propto)
+	lp -= lgamma (n + 1.0);
+      if (!propto
+	  || !is_constant<T_rate>::value)
+	lp += n * log(lambda) - lambda;
+      return lp;
     }
     
-    template <typename T_rate>
-    inline typename boost::math::tools::promote_args<T_rate>::type
-    poisson_propto_log(const unsigned int n, const T_rate& lambda) {
-      return poisson_propto_log (n, lambda, boost::math::policies::policy<>());
-    }
 
 
   }
