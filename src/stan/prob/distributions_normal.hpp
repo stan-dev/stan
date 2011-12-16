@@ -46,26 +46,29 @@ namespace stan {
 
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
       
-      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
-	return lp;
-      if (!stan::prob::check_location(function, mu, &lp, Policy()))
-	return lp;
-      if (!stan::prob::check_x(function, y, &lp, Policy()))
-	return lp;
+      double temp;
+      if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
+	return temp;
+      if (!stan::prob::check_location(function, mu, &temp, Policy()))
+	return temp;
+      if (!stan::prob::check_x(function, y, &temp, Policy()))
+	return temp;
       
+      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!propto 
 	  || !stan::is_constant<T_y>::value 
 	  || !stan::is_constant<T_loc>::value 
-	  || !stan::is_constant<T_scale>::value)
+	  || !stan::is_constant<T_scale>::value) {
 	lp -= square(y - mu);
-
-      if (!propto 
-	  || !stan::is_constant<T_scale>::value)
-	lp = lp / (2.0 * square(sigma)) - log (sigma);
-
+	if (!propto)
+	  lp /= (2.0 * square(sigma));
+	else if (!stan::is_constant<T_scale>::value)
+	  lp /= square(sigma);
+      }
+      
       if (!propto)
-	lp += NEG_LOG_SQRT_TWO_PI;
+	lp += NEG_LOG_SQRT_TWO_PI - log (sigma);
+      
       return lp;
     }
 

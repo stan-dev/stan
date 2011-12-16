@@ -5,7 +5,6 @@
 #include "stan/prob/distributions_constants.hpp"
 
 #include <stan/meta/traits.hpp>
-//#include <Eigen/Cholesky>
 
 namespace stan {
   namespace prob {
@@ -61,20 +60,14 @@ namespace stan {
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       if (!propto) 
-	lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-      
+	lp += NEG_LOG_SQRT_TWO_PI * y.rows() - 0.5 * log (Sigma.determinant());	
 
-      if (!propto 
-	  || !is_constant<T_covar>::value) 
-	lp -= 0.5 * log (Sigma.determinant());
-	
-
-      if (!propto 
-	  || !is_constant<T_y>::value 
-	  || !is_constant<T_loc>::value
-	  || !is_constant<T_covar>::value) 
+      if (!propto) 
 	lp -= 0.5 * ((y - mu).transpose() * Sigma.inverse() * (y - mu))(0,0);
-      
+      else if (!is_constant<T_covar>::value)
+	lp -= ((y - mu).transpose() * Sigma.inverse() * (y - mu))(0,0);
+      else
+	lp -= ((y - mu).transpose() * (y - mu))(0,0);
       return lp;
     }
 
@@ -122,12 +115,7 @@ namespace stan {
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       if (!propto) 
-	lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-      
-      if (!propto 
-	  || !is_constant<T_covar>::value) 
-	lp -= log(L.diagonal().array().prod());
-	
+	lp += NEG_LOG_SQRT_TWO_PI * y.rows() - log(L.diagonal().array().prod());
 
       if (!propto 
 	  || !is_constant<T_y>::value 
