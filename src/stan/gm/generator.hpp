@@ -857,11 +857,11 @@ namespace stan {
 	  o_ << "));" << EOL;
 	}
       }
-      void operator()(statements const& x) const {
+      void operator()(const statements& x) const {
 	for (unsigned int i = 0; i < x.statements_.size(); ++i)
 	  generate_statement(x.statements_[i],indent_,o_);
       }
-      void operator()(for_statement const& x) const {
+      void operator()(const for_statement& x) const {
 	generate_indent(indent_,o_);
 	o_ << "for (int " << x.variable_ << " = ";
 	generate_expression(x.range_.low_,o_);
@@ -871,6 +871,9 @@ namespace stan {
 	generate_statement(x.statement_, indent_ + 1, o_);
 	generate_indent(indent_,o_);
 	o_ << "}" << EOL;
+      }
+      void operator()(const no_op_statement& x) const {
+	// called no_op for a reason
       }
     };
 

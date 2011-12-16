@@ -110,6 +110,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
 			  (std::string, variable_)
 			  (stan::gm::range, range_)
 			  (stan::gm::statement, statement_) )
+
 namespace {
   // hack to pass pair into macro below to adapt
   struct DUMMY_STRUCT {
@@ -700,7 +701,13 @@ namespace stan {
 	  | for_statement_r
 	  | assignment_r [_pass 
 			  = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | sample_r [validate_sample_f(_1,_pass)];
+	  | sample_r [validate_sample_f(_1,_pass)]
+	  | no_op_statement_r
+	  ;
+
+	no_op_statement_r.name("no op statement");
+	no_op_statement_r 
+	  = qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
 	for_statement_r.name("for statement");
 	for_statement_r
@@ -777,6 +784,7 @@ namespace stan {
       qi::rule<Iterator, qi::locals<std::string>, for_statement(), 
                whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
+      qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > no_op_statement_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > indexed_factor_r;
       // two of these because of type-coercion from index_op to expression
       qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_2_r; 

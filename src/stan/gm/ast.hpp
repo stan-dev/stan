@@ -55,6 +55,7 @@ namespace stan {
     struct int_literal;
     struct inv_var_decl;
     struct matrix_var_decl;
+    struct no_op_statement;
     struct pos_ordered_var_decl;
     struct program;
     struct range;
@@ -816,12 +817,11 @@ namespace stan {
 			     boost::recursive_wrapper<assignment>,
 			     boost::recursive_wrapper<sample>,
 			     boost::recursive_wrapper<statements>,
-			     boost::recursive_wrapper<for_statement> >
+			     boost::recursive_wrapper<for_statement>,
+			     boost::recursive_wrapper<no_op_statement> >
       type;
 
-      statement()
-	: statement_(nil()) {
-      }
+      statement() : statement_(nil()) { }
 
       template <typename Statement>
       statement(Statement const& statement)
@@ -844,6 +844,10 @@ namespace stan {
 	  range_(range),
 	  statement_(stmt) {
       }
+    };
+
+    struct no_op_statement {
+      // no op, no data
     };
 
     struct program {
