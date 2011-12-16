@@ -8,6 +8,7 @@
 
 namespace stan {
   namespace prob {
+
     using boost::math::tools::promote_args;
     using boost::math::policies::policy;
     

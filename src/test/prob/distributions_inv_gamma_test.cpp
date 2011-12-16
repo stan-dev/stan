@@ -1,13 +1,13 @@
-// These tests should not have reference to stan::agrad::var. Distribution tests 
-// with stan::agrad::var should be placed in src/test/agrad/distributions_test.cpp
-
-#include <cmath>
 #include <gtest/gtest.h>
 #include "stan/prob/distributions_inv_gamma.hpp"
 
 TEST(ProbDistributions,InvGamma) {
   EXPECT_FLOAT_EQ(-1, stan::prob::inv_gamma_log(1,1,1.0));
   EXPECT_FLOAT_EQ(-0.8185295, stan::prob::inv_gamma_log(0.5,2.9,3.1));
+}
+TEST(ProbDistributions,InvGammaPropto) {
+  EXPECT_FLOAT_EQ(0.0, stan::prob::inv_gamma_log<true>(1,1,1.0));
+  EXPECT_FLOAT_EQ(0.0, stan::prob::inv_gamma_log<true>(0.5,2.9,3.1));
 }
 TEST(ProbDistributions,InvGammaDefaultPolicy) {
   double y = 0.5;
