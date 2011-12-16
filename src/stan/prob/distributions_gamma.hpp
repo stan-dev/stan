@@ -95,8 +95,13 @@ namespace stan {
 	return result;
       if (!stan::prob::check_nonnegative(function, y, "Random variate y", &result, Policy()))
 	return result;
-
-      return boost::math::gamma_p (alpha, y * beta);
+      
+      if (!propto
+	  || !is_constant<T_y>::value
+	  || !is_constant<T_shape>::value
+	  || !is_constant<T_inv_scale>::value)
+	return boost::math::gamma_p (alpha, y * beta);
+      return 1.0;
     }
 
   }
