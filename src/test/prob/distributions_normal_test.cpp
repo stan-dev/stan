@@ -24,13 +24,13 @@ TEST(ProbDistributions,Normal) {
   EXPECT_FLOAT_EQ(-2.918939,  stan::prob::normal_log(-2.0,0.0,1.0));
   EXPECT_FLOAT_EQ(-3.174270,  stan::prob::normal_log(-3.5,1.9,7.2));
 }
-TEST(ProbDistributions,NormalDefaultPolicyScale) {
+TEST(ProbDistributionsDefaultPolicy,NormalScale) {
   double sigma_d = 0.0;
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
   sigma_d = -1.0;
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
 }
-TEST(ProbDistributions,NormalErrnoPolicyScale) {
+TEST(ProbDistributionsErrnoPolicy,NormalScale) {
   double sigma_d = 0.0;
   double result = 0;
   
@@ -41,7 +41,7 @@ TEST(ProbDistributions,NormalErrnoPolicyScale) {
   result = stan::prob::normal_log(0.0,0.0,sigma_d, errno_policy());
   EXPECT_TRUE (std::isnan (result));
 }
-TEST(ProbDistributions,NormalDefaultPolicyY) {
+TEST(ProbDistributionsDefaultPolicy,NormalY) {
   double y = 0.0;
   EXPECT_NO_THROW (stan::prob::normal_log (y,0.0,1.0));
   
@@ -52,7 +52,7 @@ TEST(ProbDistributions,NormalDefaultPolicyY) {
   y = -std::numeric_limits<double>::infinity();
   EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
 }
-TEST(ProbDistributions,NormalErrnoPolicyY) {
+TEST(ProbDistributionsErrnoPolicy,NormalY) {
   double result = 0;
   double y = 0.0;
   EXPECT_NO_THROW (result = stan::prob::normal_log (y,0.0,1.0,errno_policy()));
@@ -69,7 +69,7 @@ TEST(ProbDistributions,NormalErrnoPolicyY) {
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
   EXPECT_TRUE (std::isnan(result));
 }
-TEST(ProbDistributions,NormalDefaultPolicyLocation) {
+TEST(ProbDistributionsDefaultPolicy,NormalLocation) {
   double mu = 0.0;
   EXPECT_NO_THROW (stan::prob::normal_log (0.0,mu,1.0));
   
@@ -80,7 +80,7 @@ TEST(ProbDistributions,NormalDefaultPolicyLocation) {
   mu = -std::numeric_limits<double>::infinity();
   EXPECT_THROW(stan::prob::normal_log(0.0,mu,1.0), std::domain_error);
 }
-TEST(ProbDistributions,NormalErrnoPolicyLocation) {
+TEST(ProbDistributionsErrnoPolicy,NormalLocation) {
   double result = 0;
   double mu = 0.0;
   EXPECT_NO_THROW (result = stan::prob::normal_log (0.0,mu,1.0,errno_policy()));
@@ -97,7 +97,7 @@ TEST(ProbDistributions,NormalErrnoPolicyLocation) {
   result = stan::prob::normal_log(0.0,mu,1.0,errno_policy());
   EXPECT_TRUE (std::isnan(result));
 }
-TEST(ProbDistributions,NormalPropTo) {
+TEST(ProbDistributionsPropTo,Normal) {
   EXPECT_FLOAT_EQ(0, stan::prob::normal_log<true>(0.0,0.0,1.0));
   EXPECT_FLOAT_EQ(0, stan::prob::normal_log<true>(1.0,0.0,1.0));
   EXPECT_FLOAT_EQ(0, stan::prob::normal_log<true>(-2.0,0.0,1.0));
@@ -108,7 +108,7 @@ TEST(ProbDistributionsCumulative,Normal) {
   EXPECT_FLOAT_EQ(0.8413447, stan::prob::normal_p(1.0, 0.0, 1.0));
   EXPECT_FLOAT_EQ(0.4012937, stan::prob::normal_p(1.0, 2.0, 4.0));
 }
-TEST(ProbDistributionsCumulative,NormalDefaultPolicySigma) {
+TEST(ProbDistributionsCumulativeDefaultPolicy,NormalSigma) {
   // sigma = 0
   EXPECT_THROW(stan::prob::normal_p(0.0, 0.0, 0.0), std::domain_error);
   // sigma = -1
@@ -128,7 +128,7 @@ TEST(ProbDistributions,NormalVector) {
   
   EXPECT_FLOAT_EQ(-46.14256, stan::prob::normal_log(x,mu,sigma));
 }
-TEST(ProbDistributions,NormaVectorlPropTo) {
+TEST(ProbDistributionsPropTo,NormaVector) {
   std::vector<double> x;
   EXPECT_FLOAT_EQ(0.0, stan::prob::normal_log<true>(x,0.0,1.0));
 
@@ -142,7 +142,7 @@ TEST(ProbDistributions,NormaVectorlPropTo) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::normal_log<true>(x,0.0,1.0));
   EXPECT_FLOAT_EQ(0.0, stan::prob::normal_log<true>(x,1.9,7.2));
 }
-TEST(ProbDistributions,NormalVectorDefaultPolicyScale) {
+TEST(ProbDistributionsDefaultPolicy,NormalVectorScale) {
   std::vector<double> x;
   x.push_back(-2.0);
   x.push_back(-1.5);
@@ -154,7 +154,7 @@ TEST(ProbDistributions,NormalVectorDefaultPolicyScale) {
   sigma_d = -1.0;
   EXPECT_THROW(stan::prob::normal_log(x,0.0,sigma_d), std::domain_error);
 }
-TEST(ProbDistributions,NormalVectorErronoPolicyScale) {
+TEST(ProbDistributionsErronoPolicy,NormalVectorScale) {
   std::vector<double> x;
   x.push_back(-2.0);
   x.push_back(-1.5);
