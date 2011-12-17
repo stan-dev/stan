@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions_multinomial.hpp"
-#include <Eigen/Dense>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-
 
 TEST(ProbDistributions,Multinomial) {
   std::vector<int> ns;
