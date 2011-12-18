@@ -59,15 +59,13 @@ namespace stan {
 	  || !stan::is_constant<T_y>::value 
 	  || !stan::is_constant<T_loc>::value 
 	  || !stan::is_constant<T_scale>::value) {
-	lp -= square(y - mu);
-	if (!propto)
-	  lp /= (2.0 * square(sigma));
-	else if (!stan::is_constant<T_scale>::value)
-	  lp /= square(sigma);
+	lp -= square(y - mu) / (2.0 * square(sigma));
       }
-      
+      if (!propto
+	  || !stan::is_constant<T_scale>::value)
+	lp -= log(sigma);
       if (!propto)
-	lp += NEG_LOG_SQRT_TWO_PI - log (sigma);
+	lp += NEG_LOG_SQRT_TWO_PI;
       
       return lp;
     }

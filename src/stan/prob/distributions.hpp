@@ -1,18 +1,6 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_HPP__
 
-#include <boost/math/constants/constants.hpp>
-#include <boost/math/special_functions.hpp>
-#include <boost/math/tools/promotion.hpp>
-#include <boost/exception/all.hpp>
-#include <boost/throw_exception.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Cholesky>
-#include "stan/maths/special_functions.hpp"
-
-#include "stan/prob/transform.hpp"
-#include "stan/agrad/matrix.hpp"
-
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
 #include "stan/prob/distributions_uniform.hpp"
