@@ -43,10 +43,8 @@ namespace stan {
     inline typename promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
 	       const Policy& = Policy()) {
-
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
-      
-      double temp;
+
       if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
 	return temp;
       if (!stan::prob::check_location(function, mu, &temp, Policy()))
