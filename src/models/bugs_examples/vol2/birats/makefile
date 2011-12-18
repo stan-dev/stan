@@ -1,11 +1,9 @@
 STAN_HOME = ../../../../..
-PGM = dugongs
-CC = clang++ 
-
+PGM = birats
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
-	$(CC) -O0 -DNDEBUG  -std=c++0x -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
+	g++ -O0 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
 	./$(PGM) --data_file=$(PGM).Rdata
 
 clean :

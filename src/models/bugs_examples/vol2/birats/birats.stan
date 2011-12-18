@@ -32,5 +32,5 @@ model {
     beta[n] ~ multi_normal(mu_beta, Sigma_beta);
   for (n in 1:N)
     for (t in 1:T) 
-      y[n,t] ~ normal(beta[n, 1]+ beta[n, 2] * (x[t] - xbar), sqrt(sigmasq_y));
+      y[n,t] ~ normal(beta[n, 1] + beta[n, 2] * (x[t] - xbar), sqrt(sigmasq_y));
 }
