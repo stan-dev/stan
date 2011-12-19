@@ -45,6 +45,7 @@ namespace stan {
 	       const Policy& = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
+      double temp;
       if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
 	return temp;
       if (!stan::prob::check_location(function, mu, &temp, Policy()))
