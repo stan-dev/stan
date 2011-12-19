@@ -2206,7 +2206,7 @@ namespace std {
 
   template<> 
   struct numeric_limits<stan::agrad::var> {
-    static const bool is_specialized = false;
+    static const bool is_specialized = true;
     static stan::agrad::var min() { return numeric_limits<double>::min(); }
     static stan::agrad::var max() { return numeric_limits<double>::max(); }
     static const int digits = numeric_limits<double>::digits;
@@ -2242,6 +2242,9 @@ namespace std {
     static const float_round_style round_style = numeric_limits<double>::round_style;
   };
 
+  int isnan (stan::agrad::var arg) {
+    return isnan(arg.val());
+  }
 }
 
 

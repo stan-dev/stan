@@ -75,21 +75,22 @@ namespace stan {
       // leaving this test to catch any NaNs.  see Normal and cauchy for example.
     }
 
-    template <typename T_x, typename T_result, class Policy>
+    template <typename T_x, typename T_low, typename T_high, typename T_result, class Policy>
     inline bool check_bounded_x(
 			const char* function,
 			const T_x& x,
-			const double low,
-			const double high,
+			const T_low& low,
+			const T_high& high,
 			T_result* result,
 			const Policy& pol) {
       if (!(boost::math::isfinite)(convert(x)) || !(low <= x && x <= high)) {
-	std::string msg ("Random variate x is %1%, but must be finite and between ");
-	msg += low;
-	msg += " and ";
-	msg += high;
+	std::ostringstream msg;
+	msg << "Random variate x is %1%, but must be finite and between "
+	    << low
+	    << " and "
+	    << high;
 	*result = raise_domain_error<double>(function,
-					     msg.c_str(),
+					     msg.str().c_str(),
 					     convert(x), pol);
 	return false;
       }
