@@ -1,18 +1,23 @@
-// Orange Trees 
-// http://mathstat.helsinki.fi/openbugs/Examples/Otrees.html
+// Orange Trees (Multi-variate normal) 
+// http://www.openbugs.info/Examples/OtreesMVN.html
+// refer to ../orange 
 
 data {
   int(0,) K;
   int(0,) N;
   int x[N];
   double Y[K, N]; 
+  cov_matrix(3) R;  // R should be positive definite: could cov_matrix be used? 
+  // matrix(3, 3) R; 
+  cov_matrix(3) mu_var_prior; 
+  vector(3) mu_m_prior; 
 }
 
 parameters{
   double(0,) sigmasq;
-  double theta[K, 3];
-  double theta_mu[3]; 
-  double(0,) theta_sigmasq[3]; 
+  vector(3)  theta[K]; 
+  vector(3)  thetamu; 
+  cov_matrix(3) thetavar; 
 } 
 
 derived parameters {
@@ -22,10 +27,6 @@ derived parameters {
 
 model {
   sigmasq ~ inv_gamma(.001, .001); 
-  for (j in 1:3) {
-    theta_mu[j] ~ normal(0, 100); 
-    theta_sigmasq[j] ~ inv_gamma(.001, .001); 
-  }
   for (i in 1:K) {
     phi[i, 1] <- exp(theta[i, 1]);
     phi[i, 2] <- exp(theta[i, 2]) - 1;
@@ -34,9 +35,9 @@ model {
       mu[i, n] <- phi[i, 1] / (1 + phi[i, 2] * exp(phi[i, 3] * x[n]));
       Y[i, n] ~ normal(mu[i, n], sqrt(sigmasq)); 
     }
-    for (j in 1:3) {
-      theta[i, j] ~ normal(theta_mu[j], sqrt(theta_sigmasq[j]));
-    }
+    theta[i] ~ multi_normal(thetamu, thetavar); 
+    thetamu ~ multi_normal(mu_m_prior, mu_var_prior); 
+    thetavar ~ inv_wishart(R, 3); 
   }
 }
 
