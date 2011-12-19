@@ -16,13 +16,17 @@ parameters{
 } 
 
 derived parameters {
-  double mu[K, N]; 
   double phi[K, 3]; 
-  for (i in 1:K) { 
-    phi[i, 1] <- exp(theta[i, 1]);
-    phi[i, 2] <- exp(theta[i, 2]) - 1;
-    phi[i, 3] <- -exp(theta[i, 3]);
+  double theta_sigma[3];
+  double sigma;
+  for (k in 1:K) { 
+    phi[k, 1] <- exp(theta[k, 1]);
+    phi[k, 2] <- exp(theta[k, 2]) - 1;
+    phi[k, 3] <- -exp(theta[k, 3]);
   } 
+  for (j in 1:3)
+    theta_sigma[j] <- sqrt(theta_sigmasq[j]);
+  sigma <- sqrt(sigmasq);
 } 
 
 model {
@@ -31,14 +35,11 @@ model {
     theta_mu[j] ~ normal(0, 100); 
     theta_sigmasq[j] ~ inv_gamma(.001, .001); 
   }
-  for (i in 1:K) {
-    for (j in 1:3) {
-      theta[i, j] ~ normal(theta_mu[j], sqrt(theta_sigmasq[j]));
-    }
-    for (n in 1:N) {
-      mu[i, n] <- phi[i, 1] / (1 + phi[i, 2] * exp(phi[i, 3] * x[n]));
-      Y[i, n] ~ normal(mu[i, n], sqrt(sigmasq)); 
-    }
+  for (k in 1:K) {
+    for (j in 1:3)
+      theta[k, j] ~ normal(theta_mu[j], theta_sigma[j]);
+    for (n in 1:N)
+      Y[k, n] ~ normal(phi[k,1] / (1 + phi[k,2] * exp(phi[k,3] * x[n])), sigma);
   }
 }
 
