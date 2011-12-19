@@ -17,21 +17,31 @@ using stan::convert;
 using stan::agrad::var;
 
 //---------- check_x tests ----------
-TEST(ProbDistributionsErrorHandling,CheckXDefaultPolicy) {
+TEST(AgradDistributionsErrorHandling,CheckXDefaultPolicy) {
   const char* function = "check_x (%1%)";
   var x = 0;
+  double x_d = 0;
   var result;
- 
   EXPECT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should be true with finite x: " << x;
+  EXPECT_TRUE (check_x (function, x_d, &result, default_policy())) << "check_x should be true with finite x_d: " << x_d;
+
   x = std::numeric_limits<var>::infinity();
+  x_d = std::numeric_limits<double>::infinity();
   EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on Inf: " << x;
+  EXPECT_THROW (check_x (function, x_d, &result, default_policy()), std::domain_error) << "check_x should throw exception on Inf: " << x_d;
+
   x = -std::numeric_limits<var>::infinity();
+  x_d = -std::numeric_limits<double>::infinity();
   EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on -Inf: " << x;
+  EXPECT_THROW (check_x (function, x_d, &result, default_policy()), std::domain_error) << "check_x should throw exception on -Inf: " << x_d;
+
   x = std::numeric_limits<var>::quiet_NaN();
+  x_d = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN: " << x;
+  EXPECT_THROW (check_x (function, x_d, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN: " << x_d;
 }
 
-TEST(ProbDistributionsErrorHandling,CheckXErrnoPolicy) {
+TEST(AgradDistributionsErrorHandling,CheckXErrnoPolicy) {
   const char* function = "check_x (%1%)";
   var x = 0;
   var result;
@@ -52,7 +62,7 @@ TEST(ProbDistributionsErrorHandling,CheckXErrnoPolicy) {
 
 
 // ---------- check_x: vector tests ----------
-TEST(ProbDistributionsErrorHandling,CheckXVectorDefaultPolicy) {
+TEST(AgradDistributionsErrorHandling,CheckXVectorDefaultPolicy) {
   const char* function = "check_x (%1%)";
   var result;
   std::vector<var> x;
@@ -82,7 +92,7 @@ TEST(ProbDistributionsErrorHandling,CheckXVectorDefaultPolicy) {
   EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN";
 }
 
-TEST(ProbDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
+TEST(AgradDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
   const char* function = "check_x (%1%)";
   std::vector<var> x;
   x.push_back (-1);
@@ -121,7 +131,7 @@ TEST(ProbDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
 }
 
 // ---------- check_x: matrix tests ----------
-TEST(ProbDistributionsErrorHandling,CheckXMatrixDefaultPolicy) {
+TEST(AgradDistributionsErrorHandling,CheckXMatrixDefaultPolicy) {
   const char* function = "check_x (%1%)";
   var result;
   Eigen::Matrix<var,Eigen::Dynamic,1> x;
@@ -147,7 +157,7 @@ TEST(ProbDistributionsErrorHandling,CheckXMatrixDefaultPolicy) {
   EXPECT_THROW (check_x (function, x, &result, default_policy()), std::domain_error) << "check_x should throw exception on NaN";
 }
 
-TEST(ProbDistributionsErrorHandling,CheckXMatrixErrnoPolicy) {
+TEST(AgradDistributionsErrorHandling,CheckXMatrixErrnoPolicy) {
   const char* function = "check_x (%1%)";
   var result;
   Eigen::Matrix<var,Eigen::Dynamic,1> x;
@@ -177,7 +187,7 @@ TEST(ProbDistributionsErrorHandling,CheckXMatrixErrnoPolicy) {
   }
 
 // ---------- check_bounded_x tests ----------
-TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyX) {
+TEST(AgradDistributionsErrorHandling,CheckBoundedXDefaultPolicyX) {
   const char* function = "check_bounded_x (%1%)";
   var x = 0;
   var low = -1;
@@ -215,7 +225,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyX) {
     << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
   
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyLow) {
+TEST(AgradDistributionsErrorHandling,CheckBoundedXDefaultPolicyLow) {
   const char* function = "check_bounded_x (%1%)";
   var x = 0;
   var low = -1;
@@ -236,7 +246,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyLow) {
   EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
     << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyHigh) {
+TEST(AgradDistributionsErrorHandling,CheckBoundedXDefaultPolicyHigh) {
   const char* function = "check_bounded_x (%1%)";
   var x = 0;
   var low = -1;
@@ -260,7 +270,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyHigh) {
 }
 
 
-TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyX) {
+TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyX) {
   const char* function = "check_bounded_x (%1%)";
   var x = 0;
   var low = -1;
@@ -310,7 +320,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyX) {
     << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyLow) {
+TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyLow) {
   const char* function = "check_bounded_x (%1%)";
   var x = 0;
   var low = -1;
@@ -337,7 +347,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyLow) {
     << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
+TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
   const char* function = "check_bounded_x (%1%)";
   var x = 0;
   var low = -1;
@@ -366,4 +376,4 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
 }
 
 // ----------  ----------
-//TEST(ProbDistributionsErrorHandling,)
+//TEST(AgradDistributionsErrorHandling,)

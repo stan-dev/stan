@@ -26,10 +26,10 @@ namespace stan {
 			const T_x& x,
 			T_result* result,
 			const Policy& pol) {
-      if (!(boost::math::isfinite)(convert(x))) {
-	*result = raise_domain_error<double>(function,
-					     "Random variate x is %1%, but must be finite!",
-					     convert(x), pol);
+      if (!boost::math::isfinite(x)) {
+	*result = raise_domain_error<T_x>(function,
+					  "Random variate x is %1%, but must be finite!",
+					  x, pol);
 	return false;
       }
       return true;
@@ -46,10 +46,10 @@ namespace stan {
 			T_result* result,
 			const Policy& pol) {
       for (int i = 0; i < x.size(); i++) {
-	if (!(boost::math::isfinite)(convert(x[i]))) {
-	  *result = raise_domain_error<double>(function,
-					       "Random variate x is %1%, but must be finite!",
-					       convert(x[i]), pol);
+	if (!boost::math::isfinite(x[i])) {
+	  *result = raise_domain_error<T_x>(function,
+					    "Random variate x is %1%, but must be finite!",
+					    x[i], pol);
 	  return false;
 	}
       }
