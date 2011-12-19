@@ -1,9 +1,9 @@
 data {
   int(0,) N;
   int(0,) NT;
-  int obs_t[N]; 
-  int t[NT + 1]; 
-  int fail[N]; 
+  int(0,) obs_t[N]; 
+  int(0,) t[NT + 1]; 
+  int(0,) fail[N]; 
   double Z[N]; 
 }
 
@@ -28,11 +28,11 @@ parameters {
 } 
 
 model {
-  beta ~ normal(0, 10);
+  beta ~ normal(0, 1000);
   for(j in 1:NT) {
     dL0[j] ~ gamma(r * (t[j + 1] - t[j]) * c, c);
     for(i in 1:N) {
-       dN[i, j] ~ poisson(Y[i, j] * exp(beta * Z[i]) * dL0[j]); 
+      dN[i, j] ~ poisson(Y[i, j] * exp(beta * Z[i]) * dL0[j]); 
     }     
     // Survivor function = exp(-Integral{l0(u)du})^exp(beta*z)    
     // S.treat[j] <- pow(exp(-sum(dL0[1:j])), exp(beta * -0.5));
