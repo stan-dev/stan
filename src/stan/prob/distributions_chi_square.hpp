@@ -37,18 +37,17 @@ namespace stan {
     chi_square_log(const T_y& y, const T_dof& nu, const Policy& = Policy()) {
       static const char* function = "stan::prob::chi_square_log<%1%>(%1%)";
 
-      double result;
-      if (!stan::prob::check_positive (function, nu, "Degrees of freedom", &result, Policy()))
-	return result;
-      if (!stan::prob::check_x (function, y, &result, Policy()))
-	return result;
+      typename promote_args<T_y,T_dof>::type lp(0.0);
+      if (!stan::prob::check_positive (function, nu, "Degrees of freedom", &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_x (function, y, &lp, Policy()))
+	return lp;
       
       if (y < 0)
 	return LOG_ZERO;
       
-      typename promote_args<T_y,T_dof>::type lp(0.0);
-      
-      if (!propto)
+      if (!propto
+	  || !is_constant<T_dof>::value)
 	lp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
       if (!propto
 	  || !stan::is_constant<T_y>::value

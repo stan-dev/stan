@@ -45,21 +45,19 @@ namespace stan {
 	       const Policy& = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      double temp;
-      if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
-	return temp;
-      if (!stan::prob::check_location(function, mu, &temp, Policy()))
-	return temp;
-      if (!stan::prob::check_x(function, y, &temp, Policy()))
-	return temp;
-      
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_location(function, mu, &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
+      
       if (!propto 
 	  || !stan::is_constant<T_y>::value 
 	  || !stan::is_constant<T_loc>::value 
-	  || !stan::is_constant<T_scale>::value) {
+	  || !stan::is_constant<T_scale>::value) 
 	lp -= square(y - mu) / (2.0 * square(sigma));
-      }
       if (!propto
 	  || !stan::is_constant<T_scale>::value)
 	lp -= log(sigma);
@@ -93,13 +91,13 @@ namespace stan {
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */ = Policy() ) {
       static const char* function = "stan::prob::normal_p(%1%)";
 
-      double temp;
-      if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
-	return temp;
-      if (!stan::prob::check_location(function, mu, &temp, Policy()))
-	return temp;
-      if (!stan::prob::check_x(function, y, &temp, Policy()))
-	return temp;
+      typename promote_args<T_y, T_loc, T_scale>::type lp;
+      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_location(function, mu, &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
 
       if (propto 
 	  && stan::is_constant<T_y>::value 
@@ -141,28 +139,28 @@ namespace stan {
 	       const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      double temp;
-      if (!stan::prob::check_scale(function, sigma, &temp, Policy()))
-	return temp;
-      if (!stan::prob::check_location(function, mu, &temp, Policy()))
-	return temp;
-      if (!stan::prob::check_x(function, y, &temp, Policy()))
-	return temp;
+      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_location(function, mu, &lp, Policy()))
+	return lp;
+      if (!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
 
       if (y.size() == 0)
-	return 0.0;
+	return lp;
       
-      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!propto 
 	  || !is_constant<T_y>::value 
 	  || !is_constant<T_loc>::value
 	  || !is_constant<T_scale>::value) {
 	for (unsigned int n = 0; n < y.size(); ++n)
 	  lp -= square(y[n] - mu);
+	lp /= 2.0 * square(sigma);
       }
       
       if (!propto || !is_constant<T_scale>::value) 
-	lp = lp / (2.0 * square(sigma)) - y.size() * log(sigma);
+	lp -= y.size() * log(sigma);
       
       if (!propto) 
 	lp += y.size() * NEG_LOG_SQRT_TWO_PI;

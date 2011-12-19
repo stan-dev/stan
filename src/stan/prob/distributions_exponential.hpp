@@ -38,13 +38,12 @@ namespace stan {
     exponential_log(const T_y& y, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::exponential_log<%1%>(%1%)";
 
-      double result;
-      if(!stan::prob::check_inv_scale(function, beta, &result, Policy()))
-	return result;
-      if(!stan::prob::check_x(function, y, &result, Policy()))
-	return result;
-      
       typename promote_args<T_y,T_inv_scale>::type lp(0.0);
+      if(!stan::prob::check_inv_scale(function, beta, &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
+      
       if (!propto)
 	lp += log(beta);
       if (!propto
@@ -73,14 +72,14 @@ namespace stan {
     exponential_p(const T_y& y, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::exponential_p<%1%>(%1%)";
 
-      double result;
-      if(!stan::prob::check_inv_scale(function, beta, &result, Policy()))
-	return result;
-      if(!stan::prob::check_x(function, y, &result, Policy()))
-	return result;
+      typename promote_args<T_y,T_inv_scale>::type lp(0.0);
+      if(!stan::prob::check_inv_scale(function, beta, &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
       
       if (y < 0)
-	return 0.0;
+	return lp;
       
       if (!propto)
 	return 1.0 - exp(-beta * y);

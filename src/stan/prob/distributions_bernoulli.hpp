@@ -21,9 +21,9 @@ namespace stan {
       if (!propto
 	  || !is_constant<T_prob>::value) {
 	if (n == 1)
-	  return log (theta);
+	  return log(theta);
 	else if (n == 0)
-	  return log1m (theta);
+	  return log1m(theta);
       }
       return 0.0;
     }

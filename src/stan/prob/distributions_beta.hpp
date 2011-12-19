@@ -41,17 +41,24 @@ namespace stan {
       beta_log(const T_y& y, const T_alpha& alpha, const T_beta& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::beta_log<%1%>(%1%)";
 
-      double result;
-      if(!stan::prob::check_positive(function, alpha, "Prior sample size, alpha,", &result, Policy()))
-	return result;
-      if(!stan::prob::check_positive(function, beta, "Prior sample size, beta,", &result, Policy()))
-	return result;
-      if(!stan::prob::check_bounded_x(function, y, 0, 1, &result, Policy()))
-	return result;
-
       typename promote_args<T_y,T_alpha,T_beta>::type lp(0.0);
-      if (!propto)
-	lp += lgamma(alpha + beta) - lgamma(alpha) - lgamma(beta);
+      if(!stan::prob::check_positive(function, alpha, "Prior sample size, alpha,", &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_positive(function, beta, "Prior sample size, beta,", &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_bounded_x(function, y, 0, 1, &lp, Policy()))
+	return lp;
+
+      if (!propto 
+	  || !is_constant<T_alpha>::value
+	  || !is_constant<T_beta>::value)
+	lp += lgamma(alpha + beta);
+      if (!propto 
+	  || !is_constant<T_alpha>::value)
+      lp -= lgamma(alpha);
+      if (!propto 
+	  || !is_constant<T_beta>::value)
+      lp -= lgamma(beta);
       if (!propto
 	  || !is_constant<T_y>::value
 	  || !is_constant<T_alpha>::value)

@@ -48,19 +48,22 @@ namespace stan {
       student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
 
-      double result;
-      if(!stan::prob::check_positive(function, nu, "Degrees of freedom", &result, Policy()))
-	return result;
-      if(!stan::prob::check_scale(function, sigma, &result, Policy()))
-	return result;
-      if(!stan::prob::check_location(function, mu, &result, Policy()))
-	return result;
-      if(!stan::prob::check_x(function, y, &result, Policy()))
-	return result;
-
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      if(!stan::prob::check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_scale(function, sigma, &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_location(function, mu, &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
+
+
+      if (!propto
+	  || !is_constant<T_dof>::value)
+	lp += lgamma ( (nu + 1.0) / 2.0) - lgamma (nu / 2.0);
       if (!propto)
-	lp += lgamma ( (nu + 1.0) / 2.0) - lgamma (nu / 2.0) + NEG_LOG_SQRT_PI;
+	lp += NEG_LOG_SQRT_PI;
       if (!propto
 	  || !is_constant<T_dof>::value)
 	lp -= 0.5 * log(nu);
@@ -71,7 +74,7 @@ namespace stan {
 	  || !is_constant<T_y>::value
 	  || !is_constant<T_dof>::value
 	  || !is_constant<T_scale>::value)
-	lp -= ((nu + 1.0) / 2.0) * log(1.0 + (((y - mu) / sigma) * ((y - mu) / sigma)) / nu);
+	lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
       return lp;
     }
     

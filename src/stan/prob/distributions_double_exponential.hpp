@@ -13,13 +13,12 @@ namespace stan {
 
     // DoubleExponential(y|mu,sigma)  [sigma > 0]
     template <bool propto = false,
-      typename T_y, typename T_loc, typename T_scale, 
-      class Policy = policy<> > 
-	inline typename promote_args<T_y,T_loc,T_scale>::type
-	double_exponential_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
-	//static const char* function = "stan::prob::double_exponential_log<%1%>(%1%)";
-
-      //double result;
+	      typename T_y, typename T_loc, typename T_scale, 
+	      class Policy = policy<> > 
+    inline typename promote_args<T_y,T_loc,T_scale>::type
+    double_exponential_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
+      //static const char* function = "stan::prob::double_exponential_log<%1%>(%1%)";
+      
       // FIXME: domain checks
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!propto)

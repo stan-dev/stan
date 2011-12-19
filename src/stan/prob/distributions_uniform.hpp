@@ -37,15 +37,15 @@ namespace stan {
     template <bool propto = false, 
       typename T_y, typename T_low, typename T_high, 
       class Policy = policy<> >
-    inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    inline typename promote_args<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
       
-      double result;
-      if(!stan::prob::check_x(function, y, &result, Policy()))
-	return result;
-      if(!stan::prob::check_bounds(function, alpha, beta, &result, Policy()))
-	return result;
+      typename promote_args<T_y,T_low,T_high>::type lp(0.0);
+      if(!stan::prob::check_x(function, y, &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_bounds(function, alpha, beta, &lp, Policy()))
+	return lp;
       
       if (y < alpha || y > beta)
 	return LOG_ZERO;
@@ -54,7 +54,7 @@ namespace stan {
           || !stan::is_constant<T_low>::value
           || !stan::is_constant<T_high>::value)
         return -log(beta - alpha);
-      return 0.0;
+      return lp;
     }
      
   }

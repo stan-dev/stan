@@ -40,15 +40,14 @@ namespace stan {
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::gamma_log<%1%>(%1%)";
 
-      double result;
-      if (!stan::prob::check_positive(function, alpha, "Shape parameter", &result, Policy())) 
-	return result;
-      if (!stan::prob::check_positive(function, beta, "Inverse scale parameter", &result, Policy())) 
-	return result;
-      if (!stan::prob::check_nonnegative(function, y, "Random variate y", &result, Policy()))
-	return result;
-      
       typename promote_args<T_y,T_shape,T_inv_scale>::type lp(0.0);
+      if (!stan::prob::check_positive(function, alpha, "Shape parameter", &lp, Policy())) 
+	return lp;
+      if (!stan::prob::check_positive(function, beta, "Inverse scale parameter", &lp, Policy())) 
+	return lp;
+      if (!stan::prob::check_nonnegative(function, y, "Random variate y", &lp, Policy()))
+	return lp;
+      
       if (!propto 
 	  || !is_constant<T_shape>::value)
 	lp -= lgamma(alpha);
@@ -85,7 +84,7 @@ namespace stan {
     gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()){
       static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
 
-      double result;
+      typename promote_args<T_y,T_shape,T_inv_scale>::type result(0.0);
       if (!stan::prob::check_positive(function, alpha, "Shape parameter", &result, Policy())) 
 	return result;
       if (!stan::prob::check_positive(function, beta, "Inverse scale parameter", &result, Policy())) 
@@ -97,7 +96,7 @@ namespace stan {
 	  || !is_constant<T_y>::value
 	  || !is_constant<T_shape>::value
 	  || !is_constant<T_inv_scale>::value)
-	return boost::math::gamma_p (alpha, y * beta);
+	return boost::math::gamma_p(alpha, y*beta);
       return 1.0;
     }
 

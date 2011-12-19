@@ -50,7 +50,8 @@ namespace stan {
 		  const Policy& = Policy()) {
       // FIXME: parameter check
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
-      if (!propto) {
+      if (!propto
+	  || !is_constant<T_prior_sample_size>::value) {
 	lp += lgamma(alpha.sum());
 	for (int k = 0; k < alpha.rows(); ++k)
 	  lp -= lgamma(alpha[k]);

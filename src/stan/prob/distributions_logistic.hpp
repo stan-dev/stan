@@ -32,7 +32,7 @@ namespace stan {
 	  || !is_constant<T_y>::value
 	  || !is_constant<T_loc>::value
 	  || !is_constant<T_scale>::value)
-	lp -= 2.0 * log(1.0 + exp(-(y - mu)/sigma));
+	lp -= 2.0 * log1p(exp(-(y - mu)/sigma));
       return lp;
     }
 

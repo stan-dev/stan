@@ -19,19 +19,18 @@ namespace stan {
       poisson_log(const unsigned int n, const T_rate& lambda, const Policy& = Policy()) {
       static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
 
-      double result;
-      if(!stan::prob::check_nonnegative(function, lambda, "Rate parameter, lambda,", &result, Policy()))
-	return result;
-      if(!stan::prob::check_nonnegative(function, n, "Number n", &result, Policy()))
-	return result;
+      typename promote_args<T_rate>::type lp(0.0);
+      if(!stan::prob::check_nonnegative(function, lambda, "Rate parameter, lambda,", &lp, Policy()))
+	return lp;
+      if(!stan::prob::check_nonnegative(function, n, "Number n", &lp, Policy()))
+	return lp;
       
 
       if (lambda == 0)
 	return LOG_ZERO;
 
-      typename promote_args<T_rate>::type lp(0.0);
       if (!propto)
-	lp -= lgamma (n + 1.0);
+	lp -= lgamma(n + 1.0);
       if (!propto
 	  || !is_constant<T_rate>::value)
 	lp += n * log(lambda) - lambda;

@@ -26,12 +26,12 @@ namespace stan {
      * nu must be greater than k-1
      *
      * \f{eqnarray*}{
-       W &\sim& \mbox{\sf{Wishart}}_{\nu} (S) \\
-       \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
-                                                  \times \left| S \right|^{-\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
-						  \times \exp (-\frac{1}{2} \mathsf{tr} (S^{-1} W)) \right) \\
-       &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
-           -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \mathsf{tr} (S^{-1}W)
+     W &\sim& \mbox{\sf{Wishart}}_{\nu} (S) \\
+     \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
+     \times \left| S \right|^{-\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
+     \times \exp (-\frac{1}{2} \mathsf{tr} (S^{-1} W)) \right) \\
+     &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
+     -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \mathsf{tr} (S^{-1}W)
      \f}
      * 
      * @param W A scalar matrix
@@ -45,8 +45,8 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto = false,
-			typename T_y, typename T_dof, typename T_scale, 
-			class Policy = policy<> >
+	      typename T_y, typename T_dof, typename T_scale, 
+	      class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_scale>::type
     wishart_log(const Matrix<T_y,Dynamic,Dynamic>& W,
 		const T_dof& nu,
@@ -55,33 +55,36 @@ namespace stan {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
       unsigned int k = W.rows();
-      double result;
-      if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &result, Policy()))
-	return result;
+      typename promote_args<T_y,T_dof,T_scale>::type lp;
+      if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
+	return lp;
       // FIXME: domain checks
 
-			typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-			if (!propto)
-				lp += nu * k * NEG_LOG_TWO_OVER_TWO - lmgamma(k, 0.5 * nu);
-			if (!propto
-				|| !stan::is_constant<T_dof>::value
-				|| !stan::is_constant<T_scale>::value)
-				lp -= (0.5 * nu) * log(S.determinant());
-			if (!propto
-				|| !stan::is_constant<T_scale>::value
-				|| !stan::is_constant<T_y>::value)
-				lp -= 0.5 * abs((S.inverse() * W).trace());
-			if (!propto
-				|| !stan::is_constant<T_y>::value
-				|| !stan::is_constant<T_dof>::value
-				|| !stan::is_constant<T_scale>::value) {
-				if (nu != (k + 1))
-					lp += 0.5 * (nu - k - 1.0) * log(W.determinant());
-			}
-			
-			return lp;
+      if (!propto)
+	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
+      if (!propto
+	  || !is_constant<T_y>::value
+	  || !is_constant<T_dof>::value)
+	lp -= lmgamma(k, 0.5 * nu);
+      if (!propto
+	  || !stan::is_constant<T_dof>::value
+	  || !stan::is_constant<T_scale>::value)
+	lp -= (0.5 * nu) * log(S.determinant());
+      if (!propto
+	  || !stan::is_constant<T_scale>::value
+	  || !stan::is_constant<T_y>::value)
+	lp -= 0.5 * abs((S.inverse() * W).trace());
+      if (!propto
+	  || !stan::is_constant<T_y>::value
+	  || !stan::is_constant<T_dof>::value
+	  || !stan::is_constant<T_scale>::value) {
+	if (nu != (k + 1))
+	  lp += 0.5 * (nu - k - 1.0) * log(W.determinant());
+      }
+      
+      return lp;
     }
 
-	}
+  }
 }
 #endif

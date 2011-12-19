@@ -41,15 +41,14 @@ namespace stan {
       inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::inv_gamma_log<%1%>(%1%)";
 
-      double result;
-      if (!stan::prob::check_positive(function, alpha, "Shape parameter", &result, Policy())) 
-	return result;
-      if (!stan::prob::check_positive(function, beta, "Scale parameter", &result, Policy())) 
-	return result;
-      if (!stan::prob::check_positive(function, y, "Random variate y", &result, Policy()))
-	return result;
-      
       typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
+      if (!stan::prob::check_positive(function, alpha, "Shape parameter", &lp, Policy())) 
+	return lp;
+      if (!stan::prob::check_positive(function, beta, "Scale parameter", &lp, Policy())) 
+	return lp;
+      if (!stan::prob::check_positive(function, y, "Random variate y", &lp, Policy()))
+	return lp;
+      
       if (!propto)
 	lp -= lgamma(alpha);
       if (!propto 

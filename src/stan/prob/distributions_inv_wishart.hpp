@@ -56,12 +56,11 @@ namespace stan {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
       unsigned int k = S.rows();
-      double result;
-      if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &result, Policy()))
-	return result;
+      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
+      if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
+	return lp;
       // FIXME: domain checks
 
-      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if (!propto)
 	lp -= lmgamma(k, 0.5 * nu);
       if (!propto

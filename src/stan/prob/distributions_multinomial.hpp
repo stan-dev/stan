@@ -31,7 +31,7 @@ namespace stan {
 	  sum += ns[i];
 	lp += lgamma(sum);
 	for (unsigned int i = 0; i < ns.size(); ++i)
-	lp -= lgamma(ns[i] + 1.0);
+	  lp -= lgamma(ns[i] + 1.0);
       }
       if (!propto
 	  || !is_constant<T_prob>::value)

@@ -47,8 +47,8 @@ TEST(ProbDistributions,ChiSquareErrnoPolicy) {
   
   result = stan::prob::chi_square_log(y, nu, errno_policy());
   EXPECT_TRUE (std::isnan(result));
-  result = stan::prob::chi_square_log(y, -1, errno_policy());
+  result = stan::prob::chi_square_log(y, -1.0, errno_policy());
   EXPECT_TRUE (std::isnan(result));
-  result = stan::prob::chi_square_log(-1, nu, errno_policy());  
+  result = stan::prob::chi_square_log(-1.0, nu, errno_policy());  
   EXPECT_TRUE (std::isnan(result));
 }
