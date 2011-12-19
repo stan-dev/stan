@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
+#include "stan/agrad/agrad.hpp"
+#include "stan/meta/traits.hpp"
 #include "stan/prob/distributions_normal.hpp"
+
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
@@ -43,7 +46,7 @@ TEST(ProbDistributionsErrnoPolicy,NormalScale) {
 }
 TEST(ProbDistributionsDefaultPolicy,NormalY) {
   double y = 0.0;
-  EXPECT_NO_THROW (stan::prob::normal_log (y,0.0,1.0));
+  EXPECT_NO_THROW (stan::prob::normal_log(y,0.0,1.0));
   
   y = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
@@ -55,7 +58,7 @@ TEST(ProbDistributionsDefaultPolicy,NormalY) {
 TEST(ProbDistributionsErrnoPolicy,NormalY) {
   double result = 0;
   double y = 0.0;
-  EXPECT_NO_THROW (result = stan::prob::normal_log (y,0.0,1.0,errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::normal_log(y,0.0,1.0,errno_policy()));
   
   y = std::numeric_limits<double>::quiet_NaN();
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
@@ -71,7 +74,7 @@ TEST(ProbDistributionsErrnoPolicy,NormalY) {
 }
 TEST(ProbDistributionsDefaultPolicy,NormalLocation) {
   double mu = 0.0;
-  EXPECT_NO_THROW (stan::prob::normal_log (0.0,mu,1.0));
+  EXPECT_NO_THROW (stan::prob::normal_log(0.0,mu,1.0));
   
   mu = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::normal_log(0.0,mu,1.0), std::domain_error);
@@ -83,7 +86,7 @@ TEST(ProbDistributionsDefaultPolicy,NormalLocation) {
 TEST(ProbDistributionsErrnoPolicy,NormalLocation) {
   double result = 0;
   double mu = 0.0;
-  EXPECT_NO_THROW (result = stan::prob::normal_log (0.0,mu,1.0,errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::normal_log(0.0,mu,1.0,errno_policy()));
   
   mu = std::numeric_limits<double>::quiet_NaN();
   result = stan::prob::normal_log(0.0,mu,1.0,errno_policy());
@@ -178,7 +181,7 @@ TEST(ProbDistributionsDefaultPolicy,NormalVectorY) {
   y.push_back(0.0);
   y.push_back(12.0);
 
-  EXPECT_NO_THROW (stan::prob::normal_log (y,0.0,1.0));
+  EXPECT_NO_THROW (stan::prob::normal_log(y,0.0,1.0));
   
   y[1] = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
@@ -194,7 +197,7 @@ TEST(ProbDistributionsErrnoPolicy,NormalVectorY) {
   y.push_back(-1.5);
   y.push_back(0.0);
   y.push_back(12.0);
-  EXPECT_NO_THROW (result = stan::prob::normal_log (y,0.0,1.0,errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::normal_log(y,0.0,1.0,errno_policy()));
   
   y[2] = std::numeric_limits<double>::quiet_NaN();
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
@@ -216,7 +219,7 @@ TEST(ProbDistributionsDefaultPolicy,NormalVectorLocation) {
   y.push_back(12.0);
 
   double mu = 0.0;
-  EXPECT_NO_THROW (stan::prob::normal_log (y,mu,1.0));
+  EXPECT_NO_THROW (stan::prob::normal_log(y,mu,1.0));
   
   mu = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::normal_log(y,mu,1.0), std::domain_error);
@@ -233,7 +236,7 @@ TEST(ProbDistributionsErrnoPolicy,NormalVectorLocation) {
   y.push_back(-1.5);
   y.push_back(0.0);
   y.push_back(12.0);
-  EXPECT_NO_THROW (result = stan::prob::normal_log (y,mu,1.0,errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::normal_log(y,mu,1.0,errno_policy()));
   
   mu = std::numeric_limits<double>::quiet_NaN();
   result = stan::prob::normal_log(y,mu,1.0,errno_policy());
@@ -247,3 +250,56 @@ TEST(ProbDistributionsErrnoPolicy,NormalVectorLocation) {
   result = stan::prob::normal_log(y,mu,1.0,errno_policy());
   EXPECT_TRUE (std::isnan(result));
 }
+
+
+using stan::prob::normal_log;
+using stan::is_constant;
+using stan::agrad::var;
+
+void expect_eq_diffs(double x1, double x2, 
+		     double y1, double y2) {
+  EXPECT_FLOAT_EQ(x1-x2,y1-y2);
+}
+
+void expect_eq_diffs(var x1, var x2,
+		     var y1, var y2) {
+  expect_eq_diffs(x1.val(), x2.val(), 
+		  y1.val(), y2.val());
+}
+
+template <typename T_y, typename T_loc, typename T_scale>
+void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
+		   T_y y2, T_loc mu2, T_scale sigma2) {
+  expect_eq_diffs(normal_log<false>(y1,mu1,sigma1),
+		  normal_log<false>(y2,mu2,sigma2),
+		  normal_log<true>(y1,mu1,sigma1),
+		  normal_log<true>(y2,mu2,sigma2));
+}
+
+TEST(distributionsNormal,propto) {
+  // d,d,d
+  expect_propto(1.0,2.0,3.0, 
+		1.0,2.0,3.0);
+  // d,d,v
+  expect_propto(1.0,2.0,var(3.0), 
+		1.0,2.0,var(4.0));
+  // d,v,d
+  expect_propto(1.0,var(2.0),3.0, 
+		1.0,var(4.0),3.0);
+  // d,v,v
+  expect_propto(1.0,var(2.0),var(3.0), 
+		1.0,var(-1.0),var(1.0));
+  // v,d,d
+  expect_propto(var(1.0),2.0,3.0, 
+		var(3.0),17.0,3.0);
+  // v,d,v
+  expect_propto(var(1.0),2.0,var(3.0), 
+		var(4.0),2.0,var(1.0));
+  // v,v,d
+  expect_propto(var(1.0),var(2.0),3.0, 
+		var(2.0),var(-4.0),3.0);
+  // v,v,v
+  expect_propto(var(1.0),var(2.0),var(3.0), 
+		var(5.0),var(7.0),var(1.5));
+}
+
