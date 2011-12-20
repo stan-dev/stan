@@ -57,9 +57,12 @@ namespace stan {
 	lp += alpha * log(beta);
       if (!propto 
 	  || !is_constant<T_y>::value
-	  || !is_constant<T_shape>::value
+	  || !is_constant<T_shape>::value)
+	lp += (alpha - 1.0) * log(y);
+      if (!propto 
+	  || !is_constant<T_y>::value
 	  || !is_constant<T_inv_scale>::value)
-	lp += (alpha - 1.0) * log(y) - beta * y;
+      lp -= beta * y;
       return lp;
     }
 
