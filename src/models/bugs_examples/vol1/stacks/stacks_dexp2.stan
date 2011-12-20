@@ -8,13 +8,13 @@
 # use `make normal' or `make normal2' to build/run the model 
 
 # stacks_dexp.stan: double exponential error term 
-# stacks_dexp2.stan: double exponential error term with regression
+# stacks_dexp2.stan: double exponential error term with ridge regression
 # specification on coefficients 
 # ------
 # use `make dexp' or `make dexp2' to build/run the model 
 
 # stacks_t.stan: student T  error term 
-# stacks_t2.stan: student T error term with regression specification on
+# stacks_t2.stan: student T error term with regression ridge specification on
 #  coefficients 
 # ------
 # use `make t' or `make t2' to build/run the model 
