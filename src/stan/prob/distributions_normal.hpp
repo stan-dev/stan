@@ -1,10 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_NORMAL_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-
-#include <stan/meta/traits.hpp>
+#include <stan/prob/distributions_error_handling.hpp>
+#include <stan/prob/distributions_constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -46,22 +45,18 @@ namespace stan {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
+      if (!check_scale(function, sigma, &lp, Policy()))
 	return lp;
-      if (!stan::prob::check_location(function, mu, &lp, Policy()))
+      if (!check_location(function, mu, &lp, Policy()))
 	return lp;
-      if (!stan::prob::check_x(function, y, &lp, Policy()))
+      if (!check_x(function, y, &lp, Policy()))
 	return lp;
       
-      if (!propto 
-	  || !stan::is_constant<T_y>::value 
-	  || !stan::is_constant<T_loc>::value 
-	  || !stan::is_constant<T_scale>::value) 
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= square(y - mu) / (2.0 * square(sigma));
-      if (!propto
-	  || !stan::is_constant<T_scale>::value)
+      if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += NEG_LOG_SQRT_TWO_PI;
       
       return lp;
@@ -92,24 +87,23 @@ namespace stan {
       static const char* function = "stan::prob::normal_p(%1%)";
 
       typename promote_args<T_y, T_loc, T_scale>::type lp;
-      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
+      if (!check_scale(function, sigma, &lp, Policy()))
 	return lp;
-      if (!stan::prob::check_location(function, mu, &lp, Policy()))
+      if (!check_location(function, mu, &lp, Policy()))
 	return lp;
-      if (!stan::prob::check_x(function, y, &lp, Policy()))
+      if (!check_x(function, y, &lp, Policy()))
 	return lp;
 
-      if (propto 
-	  && stan::is_constant<T_y>::value 
-	  && stan::is_constant<T_loc>::value 
-	  && stan::is_constant<T_scale>::value)
+      if (!include_summand<propto,T_y,T_loc,T_scale>::value)
 	return 1.0;
 
-      if (!propto)
+      if (include_summand<propto>::value)
 	return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
       
       return erfc(-(y - mu)/(sigma * SQRT_2));
     }
+
+   
 
 
     /**
@@ -140,9 +134,9 @@ namespace stan {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!stan::prob::check_scale(function, sigma, &lp, Policy()))
+      if (!check_scale(function, sigma, &lp, Policy()))
 	return lp;
-      if (!stan::prob::check_location(function, mu, &lp, Policy()))
+      if (!check_location(function, mu, &lp, Policy()))
 	return lp;
       if (!stan::prob::check_x(function, y, &lp, Policy()))
 	return lp;
@@ -150,19 +144,16 @@ namespace stan {
       if (y.size() == 0)
 	return lp;
       
-      if (!propto 
-	  || !is_constant<T_y>::value 
-	  || !is_constant<T_loc>::value
-	  || !is_constant<T_scale>::value) {
+      if (include_summand<propto,T_y,T_loc,T_scale>::value) {
 	for (unsigned int n = 0; n < y.size(); ++n)
 	  lp -= square(y[n] - mu);
 	lp /= 2.0 * square(sigma);
       }
       
-      if (!propto || !is_constant<T_scale>::value) 
+      if (include_summand<propto,T_scale>::value) 
 	lp -= y.size() * log(sigma);
       
-      if (!propto) 
+      if (include_summand<propto>::value) 
 	lp += y.size() * NEG_LOG_SQRT_TWO_PI;
       
       return lp;

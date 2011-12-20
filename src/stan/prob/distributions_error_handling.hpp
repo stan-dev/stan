@@ -237,19 +237,20 @@ namespace stan {
       return true;
     }
 
-    template <typename T, class Policy>
+    template <typename T_result, class Policy>
     inline bool check_size_match(const char* function,
-				 const unsigned int i,
-				 const unsigned int j,
-				 T& result,
+				 unsigned int i,
+				 unsigned int j,
+				 T_result* result,
 				 const Policy& /*pol*/) {
       if (i != j) {
 	std::ostringstream msg;
 	msg << "i and j must be same.  Found i=" << i << " j=" << j;
 	std::cout << "msg=" << msg.str() << std::endl;
-	result = raise_domain_error<T>(function,
-				       msg.str().c_str(),
-				       result, Policy());
+	*result = raise_domain_error<T_result>(function,
+					       msg.str().c_str(),
+					       i,
+					       Policy());
 	return false;
       }
       return true;
@@ -266,8 +267,8 @@ namespace stan {
 	       << Sigma
 	       << "\nSigma(0,0): %1%";
 	*result = raise_domain_error<T_covar>(function,
-					     stream.str().c_str(), 
-					     Sigma(0,0),
+					      stream.str().c_str(), 
+					      Sigma(0,0),
 					      Policy());
 	return false;
       }

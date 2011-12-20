@@ -50,26 +50,30 @@ namespace stan {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
       double result;
-      if (!stan::prob::check_bounds(function,y.size(),mu.size(),&result, Policy()))
+      if (!stan::prob::check_size_match(function,y.size(),mu.size(),&result, Policy()))
+	return result;
+      if (!stan::prob::check_size_match(function,y.size(),Sigma.rows(),&result, Policy()))
+	return result;
+      if (!stan::prob::check_size_match(function,y.size(),Sigma.cols(),&result, Policy()))
 	return result;
       if (!stan::prob::check_x(function, y, &result, Policy())) 
 	return result;
       if (!stan::prob::check_cov_matrix(function, Sigma, &result, Policy())) 
 	return result;
       
-      if (y.rows() == 0)
-	return 0.0; 
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+      if (y.rows() == 0)
+	return lp;
       if (!propto) 
-	lp += NEG_LOG_SQRT_TWO_PI * y.rows() - 0.5 * log (Sigma.determinant());	
-
-      if (!propto) 
+	lp += NEG_LOG_SQRT_TWO_PI * y.rows();
+      if (!propto || !is_constant<T_covar>::value)
+	lp -= 0.5 * log(Sigma.determinant());	
+      if (!propto 
+	  || !is_constant<T_y>::value
+	  || !is_constant<T_loc>::value
+	  || !is_constant<T_covar>::value)
 	lp -= 0.5 * ((y - mu).transpose() * Sigma.inverse() * (y - mu))(0,0);
-      else if (!is_constant<T_covar>::value)
-	lp -= ((y - mu).transpose() * Sigma.inverse() * (y - mu))(0,0);
-      else
-	lp -= ((y - mu).transpose() * (y - mu))(0,0);
       return lp;
     }
 

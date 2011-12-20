@@ -252,17 +252,16 @@ TEST(ProbDistributionsErrnoPolicy,NormalVectorLocation) {
 }
 
 
-using stan::prob::normal_log;
-using stan::is_constant;
-using stan::agrad::var;
 
 void expect_eq_diffs(double x1, double x2, 
 		     double y1, double y2) {
   EXPECT_FLOAT_EQ(x1-x2,y1-y2);
 }
 
-void expect_eq_diffs(var x1, var x2,
-		     var y1, var y2) {
+void expect_eq_diffs(const stan::agrad::var& x1, 
+		     const stan::agrad::var& x2,
+		     const stan::agrad::var& y1, 
+		     const stan::agrad::var& y2) {
   expect_eq_diffs(x1.val(), x2.val(), 
 		  y1.val(), y2.val());
 }
@@ -270,11 +269,13 @@ void expect_eq_diffs(var x1, var x2,
 template <typename T_y, typename T_loc, typename T_scale>
 void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
 		   T_y y2, T_loc mu2, T_scale sigma2) {
-  expect_eq_diffs(normal_log<false>(y1,mu1,sigma1),
-		  normal_log<false>(y2,mu2,sigma2),
-		  normal_log<true>(y1,mu1,sigma1),
-		  normal_log<true>(y2,mu2,sigma2));
+  expect_eq_diffs(stan::prob::normal_log<false>(y1,mu1,sigma1),
+		  stan::prob::normal_log<false>(y2,mu2,sigma2),
+		  stan::prob::normal_log<true>(y1,mu1,sigma1),
+		  stan::prob::normal_log<true>(y2,mu2,sigma2));
 }
+
+using stan::agrad::var;
 
 TEST(distributionsNormal,propto) {
   // d,d,d
