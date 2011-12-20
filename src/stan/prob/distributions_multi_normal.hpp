@@ -50,13 +50,15 @@ namespace stan {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
       double result;
+      if (!stan::prob::check_bounds(function,y.size(),mu.size(),&result, Policy()))
+	return result;
       if (!stan::prob::check_x(function, y, &result, Policy())) 
 	return result;
       if (!stan::prob::check_cov_matrix(function, Sigma, &result, Policy())) 
 	return result;
       
       if (y.rows() == 0)
-	return 0.0;
+	return 0.0; 
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       if (!propto) 

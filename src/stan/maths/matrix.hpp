@@ -8,9 +8,62 @@ namespace stan {
   
   namespace maths {
 
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
-    typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
-    typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
+    /**
+     * Template metaprogram struct to calculate the type of
+     * a matrix holding objects of the specified template type.
+     *
+     * @tparam T Type of values in matrix.
+     */
+    template <typename T>
+    struct matrix_of {
+      /**
+       * Type of matrix with values of type <code>T</code>.
+       */
+      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> type;
+    };
+
+    /**
+     * Template metaprogram struct to calculate the type of
+     * a (column) vector holding objects of the specified template type.
+     *
+     * @tparam T Type of values in vector.
+     */
+    template <typename T>
+    struct vector_of {
+      /**
+       * Type of (column) vector with values of type <code>T</code>.
+       */
+      typedef Eigen::Matrix<T,Eigen::Dynamic,1> type;
+    };
+
+    /**
+     * Template metaprogram struct to calculate the type of
+     * a matrix holding objects of the specified template type.
+     *
+     * @tparam T Type of values in matrix.
+     */
+    template <typename T>
+    struct row_vector_of {
+      /**
+       * Type of matrix with values of type <code>T</code>.
+       */
+      typedef Eigen::Matrix<T,1,Eigen::Dynamic> type;
+    };
+
+    /**
+     * Type for matrix of double values.
+     */
+    typedef matrix_of<double>::type matrix_d;
+
+    /**
+     * Type for (column) vector of double values.
+     */
+    typedef vector_of<double>::type vector_d;
+
+    /**
+     * Type for (row) vector of double values.
+     */
+    typedef row_vector_of<double>::type row_vector_d;
 
 
 
