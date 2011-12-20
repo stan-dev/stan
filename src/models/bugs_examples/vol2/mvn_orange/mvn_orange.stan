@@ -21,23 +21,23 @@ parameters{
 } 
 
 derived parameters {
-  double mu[K, N]; 
+  double sigma; 
   double phi[K, 3]; 
+  sigma <- sqrt(sigmasq);
 } 
 
 model {
   sigmasq ~ inv_gamma(.001, .001); 
-  for (i in 1:K) {
-    phi[i, 1] <- exp(theta[i, 1]);
-    phi[i, 2] <- exp(theta[i, 2]) - 1;
-    phi[i, 3] <- -exp(theta[i, 3]);
-    for (n in 1:N) {
-      mu[i, n] <- phi[i, 1] / (1 + phi[i, 2] * exp(phi[i, 3] * x[n]));
-      Y[i, n] ~ normal(mu[i, n], sqrt(sigmasq)); 
-    }
-    theta[i] ~ multi_normal(thetamu, thetavar); 
+  for (k in 1:K) {
+    phi[k, 1] <- exp(theta[k, 1]);
+    phi[k, 2] <- exp(theta[k, 2]) - 1;
+    phi[k, 3] <- -exp(theta[k, 3]);
+    for (n in 1:N)  
+      Y[k, n] ~ normal(phi[k, 1] / (1 + phi[k, 2] * exp(phi[k, 3] * x[n])), sigma); 
+
+    theta[k] ~ multi_normal(thetamu, thetavar); 
     thetamu ~ multi_normal(mu_m_prior, mu_var_prior); 
-    thetavar ~ inv_wishart(R, 3); 
+    thetavar ~ inv_wishart(3, R); 
   }
 }
 

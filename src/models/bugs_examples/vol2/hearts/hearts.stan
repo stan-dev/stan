@@ -13,7 +13,7 @@ data {
 parameters {
   double alpha; 
   double delta; 
-  int state[N]; // these are discrete parameters. the support is 0 or 1 actually. ??
+  int(0,) state[N]; // these are discrete parameters. the support is 0 or 1 actually. ??
 } 
 
 derived parameters {
