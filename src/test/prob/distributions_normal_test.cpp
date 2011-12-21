@@ -279,28 +279,28 @@ using stan::agrad::var;
 
 TEST(distributionsNormal,propto) {
   // d,d,d
-  expect_propto(1.0,2.0,3.0, 
-		1.0,2.0,3.0);
+  expect_propto<double,double,double>(1.0,2.0,3.0, 
+				      1.0,2.0,3.0);
   // d,d,v
-  expect_propto(1.0,2.0,var(3.0), 
-		1.0,2.0,var(4.0));
+  expect_propto<double,double,var>(1.0,2.0,3.0, 
+				   1.0,2.0,4.0);
   // d,v,d
-  expect_propto(1.0,var(2.0),3.0, 
-		1.0,var(4.0),3.0);
+  expect_propto<double,var,double>(1.0,2.0,3.0, 
+				   1.0,4.0,3.0);
   // d,v,v
-  expect_propto(1.0,var(2.0),var(3.0), 
-		1.0,var(-1.0),var(1.0));
+  expect_propto<double,var,var>(1.0,2.0,3.0, 
+				1.0,-1.0,1.0);
   // v,d,d
-  expect_propto(var(1.0),2.0,3.0, 
-		var(3.0),17.0,3.0);
+  expect_propto<var,double,double>(1.0,2.0,3.0, 
+				   3.0,17.0,3.0);
   // v,d,v
-  expect_propto(var(1.0),2.0,var(3.0), 
-		var(4.0),2.0,var(1.0));
+  expect_propto<var,double,var>(1.0,2.0,3.0, 
+				4.0,2.0,1.0);
   // v,v,d
-  expect_propto(var(1.0),var(2.0),3.0, 
-		var(2.0),var(-4.0),3.0);
+  expect_propto<var,var,double>(1.0,2.0,3.0, 
+				2.0,-4.0,3.0);
   // v,v,v
-  expect_propto(var(1.0),var(2.0),var(3.0), 
-		var(5.0),var(7.0),var(1.5));
+  expect_propto<var,var,var>(1.0,2.0,3.0, 
+			     5.0,7.0,1.5);
 }
 
