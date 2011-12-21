@@ -81,16 +81,25 @@ namespace stan {
      * @tparam T_scale Type of standard deviation paramater.
      * @tparam Policy Error-handling policy.
      */
-    template <bool propto = false, typename T_y, typename T_loc, typename T_scale, class Policy = policy<> >
+    template <bool propto = false, 
+	      typename T_y, typename T_loc, typename T_scale,
+	      class Policy = policy<> >
+
     inline typename promote_args<T_y, T_loc, T_scale>::type
-    normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& /* pol */ = Policy() ) {
+
+    normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+	     const Policy& /* pol */ = Policy() ) {
+
       static const char* function = "stan::prob::normal_p(%1%)";
 
       typename promote_args<T_y, T_loc, T_scale>::type lp;
+
       if (!check_scale(function, sigma, &lp, Policy()))
 	return lp;
+
       if (!check_location(function, mu, &lp, Policy()))
 	return lp;
+
       if (!check_x(function, y, &lp, Policy()))
 	return lp;
 
