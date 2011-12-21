@@ -49,13 +49,18 @@ namespace stan {
 	return lp;
       if (!check_location(function, mu, &lp, Policy()))
 	return lp;
+      // !boost::math::isfinite(y);
+      /*
       if (!check_x(function, y, &lp, Policy()))
 	return lp;
-      
+      */
+
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
-	lp -= square(y - mu) / (2.0 * square(sigma));
+	lp -= (y - mu) * (y - mu) / (2.0 * sigma * sigma);
+      
       if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
+
       if (include_summand<propto>::value)
 	lp += NEG_LOG_SQRT_TWO_PI;
       

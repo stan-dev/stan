@@ -942,8 +942,8 @@ namespace stan {
        * @return The result of adding the specified variable to this variable.
        */
       inline var& operator+=(const double b) {
-	if (b != 0.0)
-	  vi_ = new add_vd_vari(vi_,b);
+	// FIXME: optimize for b == 0
+	vi_ = new add_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -975,8 +975,8 @@ namespace stan {
        * variable.
        */
       inline var& operator-=(const double b) {
-	if (b != 0.0)
-	  vi_ = new subtract_vd_vari(vi_,b);
+	// FIXME: optimize for b == 0
+	vi_ = new subtract_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -1008,8 +1008,8 @@ namespace stan {
        * variable.
        */
       inline var& operator*=(const double b) {
-	if (b != 1.0)
-	  vi_ = new multiply_vd_vari(vi_,b);
+	// FIXME: optimize for b == 1
+	vi_ = new multiply_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -1040,8 +1040,8 @@ namespace stan {
        * variable.
        */
       inline var& operator/=(const double b) {
-	if (b != 1.0)
-	  vi_ = new divide_vd_vari(vi_,b);
+	// FIXME: optimize for b == 1
+	vi_ = new divide_vd_vari(vi_,b);
 	return *this;
       }
 
@@ -1390,8 +1390,9 @@ namespace stan {
      * @return Result of adding variable and scalar.
      */
     inline var operator+(const var& a, const double b) {
-      if (b == 0.0)
-	return a;
+      // FIXME: optimize for b == 1
+      // if (b == 0.0)
+      // return a;
       return var(new add_vd_vari(a.vi_,b));
     }
 
@@ -1440,8 +1441,9 @@ namespace stan {
      * @return Result of subtracting the scalar from the variable.
      */
     inline var operator-(const var& a, const double b) {
-      if (b == 0.0)
-	return a;
+      // FIXME: optimize for b == 0
+      // if (b == 0.0)
+      // return a;
       return var(new subtract_vd_vari(a.vi_,b));
     }
 
@@ -1474,8 +1476,9 @@ namespace stan {
      * @return Variable result of multiplying operands.
      */
     inline var operator*(const var& a, const var& b) {
-      if (b == 1.0)
-	return a;
+      // FIXME: test b == 1.0
+      // if (b == 1.0)
+      // return a;
       return var(new multiply_vv_vari(a.vi_,b.vi_));
     }
 
@@ -1539,8 +1542,7 @@ namespace stan {
      * @return Variable result of dividing the variable by the scalar.
      */
     inline var operator/(const var& a, const double b) {
-      if (b == 1.0)
-	return a;
+      // FIXME: b == 1 case
       return var(new divide_vd_vari(a.vi_,b));
     }
 
@@ -1716,14 +1718,15 @@ namespace stan {
      * @return Base raised to the exponent.
      */
     inline var pow(const var& base, const double exponent) {
-      if (exponent == 0.0)
-	return var(1.0);
-      if (exponent == 0.5)
-	return sqrt(base);
-      if (exponent == 1.0)
-	return base;
-      if (exponent == 2.0)
-	return base * base;
+      // FIXME: b == 1 case
+      // if (exponent == 0.0)
+      // return var(1.0);
+      // if (exponent == 0.5)
+      // return sqrt(base);
+      // if (exponent == 1.0)
+      // return base;
+      // if (exponent == 2.0)
+      // return base * base;
       return var(new pow_vd_vari(base.vi_,exponent));
     }
 
@@ -1952,6 +1955,7 @@ namespace stan {
 	return a;
       if (a.val() < 0.0)
 	return var(new neg_vari(a.vi_));
+      // FIXME:  is this right?  breaks connection to a
       return var(new vari(0.0));
     }
 
@@ -2077,6 +2081,7 @@ namespace stan {
 	return a;
       if (a.val() < 0.0)
 	return var(new neg_vari(a.vi_));
+      // FIXME:  same as fabs() -- is this right?
       return var(new vari(0.0));
     }
 
