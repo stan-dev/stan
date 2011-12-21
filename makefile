@@ -41,6 +41,8 @@ ar/libgtest.a:  | test
 #   all the hpp files in the src/stan/prob/ directory.
 .SECONDEXPANSION:
 test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp)
+	@echo '================================================================================'
+	@echo '================================================================================'
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
 	-$@ --gtest_output="xml:$@.xml"
 
