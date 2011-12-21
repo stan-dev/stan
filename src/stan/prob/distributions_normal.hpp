@@ -53,7 +53,7 @@ namespace stan {
 	return lp;
 
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
-	lp -= (y - mu) * (y - mu) / (2.0 * sigma * sigma);
+	lp -= square(y - mu) / (2.0 * square(sigma));
       
       if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
