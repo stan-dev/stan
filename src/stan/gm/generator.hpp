@@ -177,12 +177,12 @@ namespace stan {
     }
 
     void generate_typedefs(std::ostream& o) {
-      generate_typedef("Eigen::Matrix<double,1,Eigen::Dynamic>","vector_d",o);
-      generate_typedef("Eigen::Matrix<double,Eigen::Dynamic,1>","row_vector_d",o);
+      generate_typedef("Eigen::Matrix<double,Eigen::Dynamic,1>","vector_d",o);
+      generate_typedef("Eigen::Matrix<double,1,Eigen::Dynamic>","row_vector_d",o);
       generate_typedef("Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>","matrix_d",o);
 
-      generate_typedef("Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>","vector_v",o);
-      generate_typedef("Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>","row_vector_v",o);
+      generate_typedef("Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>","vector_v",o);
+      generate_typedef("Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>","row_vector_v",o);
       generate_typedef("Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>","matrix_v",o);
       // moved to include
       o << EOL;
