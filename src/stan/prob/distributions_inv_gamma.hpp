@@ -18,12 +18,12 @@ namespace stan {
      * Shape and scale parameters must be greater than 0.
      * y must be greater than 0.
      * 
-     \f{eqnarray*}{
-       y &\sim& \mbox{\sf{Inv-gamma}}(\alpha, \beta) \\
-       \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha + 1)} \exp^{- \beta / y} \right) \\
-       &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha + 1) \log(y) - \frac{\beta}{y} \\
-       & & \mathrm{where } y > 0
-     \f}
+     // \f{eqnarray*}{
+     // y &\sim& \mbox{\sf{Inv-gamma}}(\alpha, \beta) \			\
+     // \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha + 1)} \exp^{- \beta / y} \right) \ \
+     // &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha + 1) \log(y) - \frac{\beta}{y} \ \
+     // & & \mathrm{where } y > 0
+     // \f}
      * @param y A scalar variable.
      * @param alpha Shape parameter.
      * @param beta Scale parameter.
@@ -47,8 +47,9 @@ namespace stan {
       if (!stan::prob::check_positive(function, beta, "Scale parameter", &lp, Policy())) 
 	return lp;
       if (!stan::prob::check_positive(function, y, "Random variate y", &lp, Policy()))
-	return lp;
-      
+        return lp;
+
+
       if (!propto)
 	lp -= lgamma(alpha);
       if (!propto 
