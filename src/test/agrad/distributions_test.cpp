@@ -121,25 +121,13 @@ TEST(agrad_agrad,norm_grad_small_example) {
   x[8] = 48.88; 
   x[9] = 48.98;
 
-  unsigned int N = 1;
+  unsigned int N = 10;
 
   var lp(0.0);
   for (unsigned int n = 0; n < N; ++n)
     lp += stan::prob::normal_log(x[n], mu, sigma);
 
-  /*
-  EXPECT_FLOAT_EQ (-1201.418939, stan::prob::normal_log(x[0], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1191.638939, stan::prob::normal_log(x[1], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1196.523939, stan::prob::normal_log(x[2], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1206.323939, stan::prob::normal_log(x[3], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1196.523939, stan::prob::normal_log(x[4], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1194.080189, stan::prob::normal_log(x[5], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1186.276989, stan::prob::normal_log(x[6], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1203.870189, stan::prob::normal_log(x[7], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1195.546139, stan::prob::normal_log(x[8], mu, sigma).val());
-  EXPECT_FLOAT_EQ (-1200.439139, stan::prob::normal_log(x[9], mu, sigma).val());
-  */
-  // EXPECT_FLOAT_EQ (-11972.64, lp.val());
+  EXPECT_FLOAT_EQ (-11972.64, lp.val());
 
   std::vector<double> g;
   std::vector<var> params;

@@ -49,11 +49,8 @@ namespace stan {
 	return lp;
       if (!check_location(function, mu, &lp, Policy()))
 	return lp;
-      // !boost::math::isfinite(y);
-      /*
       if (!check_x(function, y, &lp, Policy()))
 	return lp;
-      */
 
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= (y - mu) * (y - mu) / (2.0 * sigma * sigma);
