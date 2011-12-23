@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_uniform.hpp"
+#include "stan/prob/distributions/uniform.hpp"
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
@@ -17,7 +17,7 @@ typedef policy<
   > errno_policy;
 
 
-TEST(ProbDistributions,Uniform) {
+TEST(ProbDistributionsUniform,Uniform) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(0.2,0.0,1.0)));
   EXPECT_FLOAT_EQ(2.0, exp(stan::prob::uniform_log(0.2,-0.25,0.25)));
   EXPECT_FLOAT_EQ(0.1, exp(stan::prob::uniform_log(101.0,100.0,110.0)));
@@ -28,7 +28,7 @@ TEST(ProbDistributions,Uniform) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log(1.0,0.0,1.0)));
   EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log(2.0,0.0,1.0)));  
 }
-TEST(ProbDistributionsPropto,Uniform) {
+TEST(ProbDistributionsUniform,Propto) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(0.2,0.0,1.0)));
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(0.2,-0.25,0.25)));
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(101.0,100.0,110.0)));
@@ -39,7 +39,7 @@ TEST(ProbDistributionsPropto,Uniform) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::prob::uniform_log<true>(1.0,0.0,1.0)));
   EXPECT_FLOAT_EQ(0.0, exp(stan::prob::uniform_log<true>(2.0,0.0,1.0)));  
 }
-TEST(ProbDistributionsDefaultPolicy,UniformY) {
+TEST(ProbDistributionsUniform,DefaultPolicyY) {
   double y = 0.0;
   EXPECT_NO_THROW(stan::prob::uniform_log(y,0.0,1.0));
 
@@ -50,7 +50,7 @@ TEST(ProbDistributionsDefaultPolicy,UniformY) {
   y = -std::numeric_limits<double>::infinity();
   EXPECT_THROW(stan::prob::uniform_log(y,0.0,0.0), std::domain_error);
 }
-TEST(ProbDistributionsDefaultPolicy,UniformLower) {
+TEST(ProbDistributionsUniform,DefaultPolicyLower) {
   double lb = 0.0;
   EXPECT_NO_THROW(stan::prob::uniform_log(0.0,lb,1.0));
 
@@ -61,7 +61,7 @@ TEST(ProbDistributionsDefaultPolicy,UniformLower) {
   lb = -std::numeric_limits<double>::infinity();
   EXPECT_THROW(stan::prob::uniform_log(0.0,lb,0.0), std::domain_error);
 }
-TEST(ProbDistributionsDefaultPolicy,UniformUpper) {
+TEST(ProbDistributionsUniform,DefaultPolicyUpper) {
   double ub = 10.0;
   EXPECT_NO_THROW(stan::prob::uniform_log(0.0,0.0,ub));
 
@@ -72,20 +72,20 @@ TEST(ProbDistributionsDefaultPolicy,UniformUpper) {
   ub = -std::numeric_limits<double>::infinity();
   EXPECT_THROW(stan::prob::uniform_log(0.0,0.0,ub), std::domain_error);
 }
-TEST(ProbDistributionsDefaultPolicy,UniformBounds) {
+TEST(ProbDistributionsUniform,DefaultPolicyBounds) {
   // lower bound higher than the upper bound
   EXPECT_THROW(stan::prob::uniform_log(0.0,1.0,0.0), std::domain_error);
   // lower and upper boundary the same 
   EXPECT_THROW(stan::prob::uniform_log(0.0, 0.0, 0.0), std::domain_error);
 }
-TEST(ProbDistributionsErrnoPolicy,UniformBounds) {
+TEST(ProbDistributionsUniform,ErrnoPolicyBounds) {
   double y = 0;
   double result;
   // lower and uppper bounds same
   EXPECT_NO_THROW(result = stan::prob::uniform_log(y, 0.0, 0.0, errno_policy()));
   EXPECT_EQ(33, errno);
 }
-TEST(ProbDistributionsErrnoPolicy,UniformY) {
+TEST(ProbDistributionsUniform,ErrnoPolicyY) {
   double y = 0.0;
   double result;
   result = stan::prob::uniform_log(y,0.0,1.0,errno_policy());
@@ -103,7 +103,7 @@ TEST(ProbDistributionsErrnoPolicy,UniformY) {
   result = stan::prob::uniform_log(y,0.0,1.0,errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
-TEST(ProbDistributionsErrnoPolicy,UniformLower) {
+TEST(ProbDistributionsUniform,ErrnoPolicyLower) {
   double lb = 0.0;
   double result;
   result = stan::prob::uniform_log(0.0,lb,1.0,errno_policy());
@@ -119,7 +119,7 @@ TEST(ProbDistributionsErrnoPolicy,UniformLower) {
   result = stan::prob::uniform_log(0.0,lb,0.0,errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
-TEST(ProbDistributionsErrnoPolicy,UniformUpper) {
+TEST(ProbDistributionsUniform,ErrnoPolicyUpper) {
   double ub = 10.0;
   double result;
   result = stan::prob::uniform_log(0.0,0.0,ub,errno_policy());

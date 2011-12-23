@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_UNIFORM_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_UNIFORM_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIFORM_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIFORM_HPP__
 
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
@@ -8,7 +8,6 @@
 
 namespace stan {
   namespace prob {
-
     using boost::math::tools::promote_args;
     using boost::math::policies::policy;
     

@@ -3,7 +3,8 @@
 
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
-#include "stan/prob/distributions_uniform.hpp"
+
+#include "stan/prob/distributions/uniform.hpp"
 #include "stan/prob/distributions_normal.hpp"
 #include "stan/prob/distributions_multi_normal.hpp"
 #include "stan/prob/distributions_gamma.hpp"
