@@ -1552,8 +1552,9 @@ namespace stan {
       }
     };
 
-    void generate_write_csv_header_method(const std::vector<var_decl>& var_decls,
+    void generate_write_csv_header_method(const program& prog,
 					  std::ostream& o) {
+      std::vector<var_decl>& var_decls = prog.parameter_decl_;
       o << INDENT << "void write_csv_header(std::ostream& o__) {" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
       write_csv_header_visgen vis(o);

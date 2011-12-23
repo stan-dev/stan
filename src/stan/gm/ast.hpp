@@ -154,15 +154,8 @@ namespace stan {
     };
 
     std::ostream& operator<<(std::ostream& o, const expr_type& et) {
-      switch (et.type()) {
-      case INT_T: o << "int"; break;
-      case DOUBLE_T: o << "double"; break;
-      case VECTOR_T: o << "vector"; break;
-      case ROW_VECTOR_T: o << "row_vector"; break;
-      case MATRIX_T: o << "matrix"; break;
-      case ILL_FORMED_T: o << "ill_formed"; break;
-      }
-      o << '[' << et.num_dims() << ']';
+      o << et.type()
+	<< '[' << et.num_dims() << ']';
       return o;
     }
 
@@ -403,13 +396,6 @@ namespace stan {
     function_signatures* function_signatures::sigs_ = 0;
 
     struct distribution {
-      distribution() {
-      }
-      distribution(std::string& family,
-		   std::vector<expression>& args)
-	: family_(family),
-	  args_(args) {
-      }
       std::string family_;
       std::vector<expression> args_;
     };
@@ -851,23 +837,12 @@ namespace stan {
     };
 
     struct program {
-      program() { }
-      program(const std::vector<var_decl> & data_decl,
-	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_data_decl,
-	      const std::vector<var_decl>& parameter_decl,
-	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_decl,
-	      statement const& stmt) 
-	: data_decl_(data_decl),
-	  derived_data_decl_(derived_data_decl),
-	  parameter_decl_(parameter_decl),
-	  derived_decl_(derived_decl),
-	  statement_(stmt) {
-      }
       std::vector<var_decl> data_decl_;
       std::pair<std::vector<var_decl>,std::vector<statement> > derived_data_decl_;
       std::vector<var_decl> parameter_decl_;
       std::pair<std::vector<var_decl>,std::vector<statement> > derived_decl_;
       statement statement_;
+      std::pair<std::vector<var_decl>,std::vector<statement> > generated_decl_;
     };
 
     struct sample {

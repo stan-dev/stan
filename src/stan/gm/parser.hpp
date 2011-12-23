@@ -123,7 +123,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::program,
 			  (DUMMY_STRUCT::type, derived_data_decl_)
 			  (std::vector<stan::gm::var_decl>, parameter_decl_)
 			  (DUMMY_STRUCT::type, derived_decl_)
-			  (stan::gm::statement, statement_) )
+			  (stan::gm::statement, statement_)
+			  (DUMMY_STRUCT::type, generated_decl_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::distribution,
 			  (std::string, family_)
@@ -407,7 +408,8 @@ namespace stan {
 	  > -derived_data_var_decls_r
 	  > -param_var_decls_r
 	  > -derived_var_decls_r
-	  > model_r;
+	  > model_r
+	  > -generated_var_decls_r;
 	
 	model_r.name("model declaration");
 	model_r 
@@ -441,6 +443,15 @@ namespace stan {
 	derived_var_decls_r
 	  = qi::lit("derived")
 	  >> qi::lit("parameters")
+	  > qi::lit('{')
+	  > *var_decl_r
+	  > *statement_r
+	  > qi::lit('}');
+
+	generated_var_decls_r.name("generated variable declarations");
+	generated_var_decls_r
+	  = qi::lit("generated")
+	  > qi::lit("quantities")
 	  > qi::lit('{')
 	  > *var_decl_r
 	  > *statement_r
@@ -775,6 +786,8 @@ namespace stan {
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
       qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
 	       whitespace_grammar<Iterator> > derived_var_decls_r;
+      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
+	       whitespace_grammar<Iterator> > generated_var_decls_r;
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;
       qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> > distribution_r;
       qi::rule<Iterator, sample(), whitespace_grammar<Iterator> > sample_r;
