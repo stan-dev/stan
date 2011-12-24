@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_NORMAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_NORMAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__NORMAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__NORMAL_HPP__
 
 #include <stan/prob/distributions_error_handling.hpp>
 #include <stan/prob/distributions_constants.hpp>
