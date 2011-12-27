@@ -320,7 +320,10 @@ namespace stan {
       }
 
       unsigned int num_promotions(const std::vector<expr_type>& call_args,
-			 const std::vector<expr_type>& sig_args) {
+				  const std::vector<expr_type>& sig_args) {
+	if (call_args.size() != sig_args.size()) {
+	  return -1; // failure
+	}
 	int num_promotions = 0U;
 	for (unsigned int i = 0; i < call_args.size(); ++i) {
 	  if (call_args[i] == sig_args[i]) {
@@ -329,7 +332,7 @@ namespace stan {
 		     && sig_args[i].is_primitive_double()) {
 	    ++num_promotions;
 	  } else {
-	    return -1;
+	    return -1; // failed match
 	  } 
 	}
 	return num_promotions;
@@ -348,6 +351,7 @@ namespace stan {
        */
       expr_type get_result_type(const std::string& name,
 				const std::vector<expr_type>& args) {
+
 	std::vector<function_signature_t> signatures = sigs_map_[name];
 	unsigned int match_index = 0U; 
 	unsigned int min_promotions = UINT_MAX; 

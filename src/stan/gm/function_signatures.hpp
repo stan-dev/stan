@@ -171,8 +171,8 @@ add_unary("inv_logit");
 
 add_binary("log_loss");
 
+add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");
-add("log_sum_exp", expr_type(DOUBLE_T,1U));
 
 add_unary("square");
 
