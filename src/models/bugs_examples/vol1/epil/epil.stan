@@ -2,6 +2,9 @@
 # in R package BUGSExamples 
 # [install.packages("BUGSExamples", repos="http://R-Forge.R-project.org")]
 # 
+
+
+## status: not work (Mon Dec 19 18:08:33 EST 2011)
 data {
   int(0,) N; 
   int(0,) T; 

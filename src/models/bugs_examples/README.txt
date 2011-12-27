@@ -4,6 +4,7 @@ This folder contains WinBUGS examples in Stan. The descriptions can be found at:
  http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol3.pdf
 
 OpenBUGS examples: 
+ http://www.openbugs.info/w/Examples
  http://mathstat.helsinki.fi/openbugs/ExamplesFrames.html
 
 JAGS models and data for all these examples are in:
