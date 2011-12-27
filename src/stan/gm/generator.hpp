@@ -167,6 +167,7 @@ namespace stan {
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
       generate_using_namespace("stan::maths",o);
+      generate_using_namespace("stan::prob",o);
       o << EOL;
     }
 
@@ -768,7 +769,8 @@ namespace stan {
 
     void generate_local_var_decls(std::vector<var_decl> const& vs,
 				  int indent,
-				  std::ostream& o) {
+				  std::ostream& o,
+				  bool is_var) {
        local_var_decl_visgen vis(indent,o);
        for (unsigned int i = 0; i < vs.size(); ++i)
 	 boost::apply_visitor(vis,vs[i].decl_);
@@ -790,7 +792,8 @@ namespace stan {
        o << "// " << msg	<< EOL;
      }
 
-    void generate_statement(statement const& s, int indent, std::ostream& o);
+    void generate_statement(statement const& s, int indent, std::ostream& o,
+			    bool include_sampling);
 
     struct statement_visgen : public visgen {
       unsigned int indent_;
@@ -858,8 +861,9 @@ namespace stan {
 	}
       }
       void operator()(const statements& x) const {
+	static bool include_sampling = true;
 	for (unsigned int i = 0; i < x.statements_.size(); ++i)
-	  generate_statement(x.statements_[i],indent_,o_);
+	  generate_statement(x.statements_[i],indent_,o_,include_sampling);
       }
       void operator()(const for_statement& x) const {
 	generate_indent(indent_,o_);
@@ -868,7 +872,8 @@ namespace stan {
 	o_ << "; " << x.variable_ << " <= ";
 	generate_expression(x.range_.high_,o_);
 	o_ << "; ++" << x.variable_ << ") {" << EOL;
-	generate_statement(x.statement_, indent_ + 1, o_);
+	static bool include_sampling = true;
+	generate_statement(x.statement_, indent_ + 1, o_, include_sampling);
 	generate_indent(indent_,o_);
 	o_ << "}" << EOL;
       }
@@ -879,7 +884,8 @@ namespace stan {
 
     void generate_statement(statement const& s,
 			    int indent,
-			    std::ostream& o) {
+			    std::ostream& o,
+			    bool include_sampling) {
       statement_visgen vis(indent,o);
       boost::apply_visitor(vis, s.statement_);
     }
@@ -896,14 +902,16 @@ namespace stan {
       generate_local_var_inits(p.parameter_decl_,true,o);
       o << EOL;
 
+      static bool is_var = true;
       generate_comment("derived variables",2,o);
-      generate_local_var_decls(p.derived_decl_.first,2,o);
+      generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
       o << EOL;
-      generate_statement(p.derived_decl_.second,2,o);
+      static bool include_sampling = true;
+      generate_statement(p.derived_decl_.second,2,o,include_sampling);
       o << EOL;
 
       generate_comment("model body",2,o);
-      generate_statement(p.statement_,2,o);
+      generate_statement(p.statement_,2,o,include_sampling);
       o << EOL;
       o << INDENT2 << "return lp__;" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
@@ -1249,8 +1257,9 @@ namespace stan {
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
+      static bool include_sampling = true;
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
-	generate_statement(prog.derived_data_decl_.second[i],2,o);
+	generate_statement(prog.derived_data_decl_.second[i],2,o,include_sampling);
 
       o << EOL << INDENT2 << "set_param_ranges();" << EOL;
       o << INDENT << "} // dump ctor" << EOL;
@@ -1554,12 +1563,11 @@ namespace stan {
 
     void generate_write_csv_header_method(const program& prog,
 					  std::ostream& o) {
-      std::vector<var_decl>& var_decls = prog.parameter_decl_;
       o << INDENT << "void write_csv_header(std::ostream& o__) {" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
       write_csv_header_visgen vis(o);
-      for (unsigned int i = 0; i < var_decls.size(); ++i)
-	boost::apply_visitor(vis,var_decls[i].decl_);
+      for (unsigned int i = 0; i < prog.parameter_decl_.size(); ++i)
+	boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
       o << INDENT << "}" << EOL2;
     }
 
@@ -1700,16 +1708,33 @@ namespace stan {
     };
 
 
-    void generate_write_csv_method(const std::vector<var_decl>& var_decls,
+    void generate_write_csv_method(const program& prog,
 				   std::ostream& o) {
       o << INDENT << "void write_csv(std::vector<double>& params_r__," << EOL;
       o << INDENT << "               std::vector<int>& params_i__," << EOL;
       o << INDENT << "               std::ostream& o__) {" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
+
+      generate_comment("write parameters",2,o);
       write_csv_visgen vis(o);
-      for (unsigned int i = 0; i < var_decls.size(); ++i)
-	boost::apply_visitor(vis,var_decls[i].decl_);
+      for (unsigned int i = 0; i < prog.parameter_decl_.size(); ++i)
+	boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
+
+      generate_comment("write transformed parameters",2,o);
+      static bool is_var = true;
+      generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
+      o << EOL;
+      static bool include_sampling = true;
+      generate_statement(prog.derived_decl_.second,2,o,include_sampling); 
+      o << EOL;
+
+      generate_comment("write generated quantities",2,o);
+      generate_local_var_decls(prog.generated_decl_.first,2,o,is_var); 
+      o << EOL;
+      generate_statement(prog.generated_decl_.second,2,o,include_sampling); 
+      o << EOL;
+
       o << INDENT2 << "writer__.newline();" << EOL;
       o << INDENT << "}" << EOL2;
     }
@@ -1877,7 +1902,7 @@ namespace stan {
       generate_set_param_ranges(prog.parameter_decl_,out);
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
-      generate_write_csv_method(prog.parameter_decl_,out);
+      generate_write_csv_method(prog,out);
       // FIXME: generate or delete
       // generate_write_csv_header_method(prog.parameter_decl_,out);
       generate_end_class_decl(out);
