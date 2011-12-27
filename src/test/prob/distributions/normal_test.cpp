@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/normal.hpp"
 
-
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
 using boost::math::policies::domain_error;
