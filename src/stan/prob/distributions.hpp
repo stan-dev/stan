@@ -8,7 +8,7 @@
 #include "stan/prob/distributions/normal.hpp"
 #include "stan/prob/distributions/multi_normal.hpp"
 #include "stan/prob/distributions/gamma.hpp"
-#include "stan/prob/distributions_inv_gamma.hpp"
+#include "stan/prob/distributions/inv_gamma.hpp"
 #include "stan/prob/distributions_chi_square.hpp"
 #include "stan/prob/distributions_inv_chi_square.hpp"
 #include "stan/prob/distributions_scaled_inv_chi_square.hpp"

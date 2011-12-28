@@ -1,11 +1,9 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_INV_GAMMA_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_INV_GAMMA_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__INV_GAMMA_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__INV_GAMMA_HPP__
 
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
-
-#include <stan/meta/traits.hpp>
-
+#include "stan/prob/traits.hpp"
 
 namespace stan {
   namespace prob {
@@ -46,28 +44,21 @@ namespace stan {
 	return lp;
       if (!stan::prob::check_positive(function, beta, "Scale parameter", &lp, Policy())) 
 	return lp;
-      if (!stan::prob::check_positive(function, y, "Random variate y", &lp, Policy()))
+      if (!stan::prob::check_nonnegative(function, y, "Random variate y", &lp, Policy()))
         return lp;
 
 
-      if (!propto)
+      if (include_summand<propto,T_shape>::value)
 	lp -= lgamma(alpha);
-      if (!propto 
-	  || !is_constant<T_shape>::value
-	  || !is_constant<T_scale>::value)
-	lp += alpha * log(beta);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_shape>::value)
-	lp -= (alpha + 1.0) * log(y);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_shape,T_scale>::value)
+	lp += multiply_log(alpha,beta);
+      if (include_summand<propto,T_y,T_shape>::value)
+	lp -= multiply_log(alpha+1.0, y);
+      if (include_summand<propto,T_y,T_scale>::value)
 	lp -= beta / y;
       return lp;
     }
-      
-    
+          
   }
 }
 
