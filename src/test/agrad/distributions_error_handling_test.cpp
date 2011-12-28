@@ -3,6 +3,11 @@
 #include "stan/meta/conversions.hpp"
 #include "stan/agrad/agrad.hpp"
 #include <limits>
+#include "stan/agrad/matrix.hpp"
+
+using Eigen::Dynamic;
+using Eigen::Matrix;
+
 
 typedef boost::math::policies::policy<
   boost::math::policies::domain_error<boost::math::policies::errno_on_error>, 
@@ -375,5 +380,18 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
   EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
 }
 
+
+TEST(AgradDistributionsErrorHandling,CheckCovMatrixDefaultPolicy) {
+  const char* function = "check_cov_matrix (%1%)";
+  var result;
+  Matrix<var,Dynamic,Dynamic> Sigma;
+  Sigma.resize(1,1);
+  Sigma << 1;
+  
+  std::cout << "Sigma: " << Sigma << std::endl;
+
+  check_cov_matrix(function,Sigma,&result,default_policy());
+  //EXPECT_NO_THROW(check_cov_matrix(function, Sigma, &result, default_policy())) << "check_cov_matrix should not throw exception with Sigma: " << Sigma;
+}
 // ----------  ----------
 //TEST(AgradDistributionsErrorHandling,)

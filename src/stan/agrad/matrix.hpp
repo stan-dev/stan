@@ -2,10 +2,9 @@
 #define __STAN__AGRAD__MATRIX_H__
 
 // global include
-#include <stdexcept>
+#include <stan/agrad/agrad.hpp>
 #include <Eigen/Dense>
 #include <stan/maths/matrix.hpp>
-#include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
 
 /**
@@ -110,6 +109,21 @@ namespace Eigen {
     };
   };
 
+  namespace internal {
+    /**
+     * Implemented this for printing to stream.
+     */
+    template<>
+    struct significant_decimals_default_impl<stan::agrad::var,false>
+    {
+      static inline int run()
+      {
+	using std::ceil;
+	return cast<double,int>(ceil(-log(NumTraits<stan::agrad::var>::epsilon().val())/log(10.0)));
+      }
+    };
+
+  }
 }
 
 namespace stan {
