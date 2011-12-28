@@ -1,105 +1,276 @@
 TO DO
 =================================================
 
-* pull out optimization algorithms
+* check L < U in bounds
 
-* pull out auto-tuning for HMC, basic HMC, etc.
+* random inits between -2 and 2 uniform
 
-* Gibbs sampling for discrete case
+* make sure validation happens on inits and data
 
-* file I/O format
- - match Coda input format so easy to read into R
- - names?
- - data format for input to match R's
+* namespace usings in StanGM
+  - must be enough for all declared funs and agrads
 
-* convergence monitoring
-  - R-hat
-  - n.eff (whose?)
-  - mean and variance of samples (per chain & across)
-  - innovate
+* HMC
+  - command w. specified step size, number of steps
+  - include Gibbs for discrete (exact, sliced)
+
+* command line: 
+  - arguments
+    + help option
+    + model, data, parameters
+    + inits
+    + num_iterations, burn_in, thin
+    + refresh, progress_type
+    + working_directory, clear_working_directory
+    + random_seed
+    X num_chains (??)
+    X DIC
+  - return
+    + Stan object (?)
+
+* discrete samplers: 
+  - Gibbs for small intervals
+  - slice for others
+  - what about multinomial with constraints?
 
 * distribution engineering
   - tarball
   - basic distro site
+  - check cross-platform
 
-* interface to R
- - how exactly with need to compile?
+* include dependencies
+  - top-level include headers
+  - clean up dependencies
+
+* R interface
+  - simple process-level calls
+    + compile model
+    + dump data
+    + dump inits
+    + run model
+    + load results
+  - built-in from Rcpp
+  - functions
+  - attach.stan(fit)
+    + traceplot(fit)
+    + plot.stan(fit)
+    + dump.stan(fit)
+    + read.stan(file_path)
 
 * remaining API doc
 
-* error/exception policy
-
-* finalize license
+* error/exception policy throughout
+  - maths
+  - prob
+  - matrix
 
 * profile and optimize, at least one round
 
-* truncation and censoring
+* name variable types
+  - basic naming
+     + data     | parameter
+     + known    | unknown
+     + constant | variable
+  - secondary naming
+     + derived, transformed, dependent
+  - tertiary naming
+     + generated, derived, free, cut
+  - I/O modifier
+     + local, nuisance
+  - Andrew and Jennifer terminology
+     + modeled vs. unmodeled
 
---------------- optional below here ----------------------
+* disallow sampling statements in derived blocks
+
+* remove standalone optimization algorithms
+
+* exceptions handled by samplers
+  - rejection or restart?
+
+* merging and monitoring several threads/processes
+
+* plug in propto calls in generator
+
+
+EXTENSIONS
+=================================================
+* optimization
+  - functor-based concept design with templates  
+
+* convergence monitoring
+  - R-hat
+  - n.eff (variogram, at least)
+  - mean and variance of samples (per chain & across)
 
 * forward-mode simulation
-  - if no descendants of a sampled variable are fixed,
-    we can use fully forward simulation to draw a sample
-  - initially, just use Stan with data/params reverses,
-    which is more general anyway
-
-* i/o streams for marshaling variables by name/structure
+  - use when nodes can be ordered and sampled with
+    all parents in graphical model defined
 
 * benchmarks
   - agrad vs. RAD/Sacado, CppAD, ... ?
   - stan vs. MCMCpack, R, BUGS, JAGS, OpenBUGS, ...
   - 
 
-* web site
-- web site
-
-* tutorial documentation
-- html (req web site?)
-- PDF?
-
-* logo
-
-* symbol table for tracking names of variables
- - like R, everything's a matrix?
-
-* compiler for BUGS model notation
-- interpreter?
-
 * compiler for R's linear model notation
-- interpreter?
-
-* automated tuning for HMC params
- - learning rate
- - number leapfrog steps
-
-* templated distribution library improvements
- - covariance matrix prior a la Ben's take on Lewandowski et al.
- - override templates for sampling up to proportion (new function names)
- - gradient specializations for overrides
-
-* generalize vari to chainable interface, then introduce
-  variables for matrices, vectors, etc.  Then matrix.get(a,b)
-  would return a new vari that points back to the matrix and
-  knows how to propagate auto-dif
 
 * threading
-  - separate out just vari thread concern for agrad_thread_safe.hpp
-    and link both to separate agrad_general.hpp
-
-* set params in HMC
-- partial?
+  - rewrite memory arena as thread-local object
 
 * interface to Python
 
-* precompiled standard models
-
-* slice sampling for continuous Gibbs
-  - block samples?
-
-* Dream or Skilling's leapfrog sampling
+* interface to MATLAB
 
 * Riemannian manifold sampling
  - Girolami's method with auto-diff Hessians
 
+* mapped distributions
+  - foo(x|theta) ==> foo(xs|theta)
+  - C style: x*, int size
+  - iterator concept: (x.start(),x.end())
+  - array concept: (x[n], x.size())
 
+* special functions
+  - inv(x) = 1/x
+  - inv_square(x) = 1/(x * x)
+  - dot_self(vector v);  dot_self(row_vector v);  
+  - log_sum_exp_ratio(vector<double> log_ratios, 
+                      vector<double> log_probs);
+  - rank(v,s): number of components of v less than v[s]
+  - ranked(v,s): s-th smallest component of v
+  - interp_ln(e,v1,v2) from BUGS (whatever for?)
+  
+* random generation functions
+  - rnorm(),...
+
+* type inference & propagation
+  - variable vs. constant
+  - local/nuisance vs. written
+
+* multiple imputation
+  - can't do each leapfrog step
+  - generated quantitities before leapfrogs
+
+* warnings
+  - a <- foo(theta) if LHS contains variable: overwrite var
+  - a ~ foo(theta)  if LHS is complex expression: need Jacobian
+
+* integer subtypes
+  - integer(-inf,inf), count(1,inf), natural(0,inf)
+  - boolean(0,1), categorical(1,K), ordinal(1,K),
+
+* double subtypes
+  - probability(0,1), correlation(-1,1)
+  - positive(0,inf), negative(-inf,0)
+
+* vector subtypes
+  - ordered (vs. positive ordered)
+
+* monitor/sampler interface
+  - sampler, filter, aggregator, buffer
+  - online means and variances
+  - rHat, and split rHat
+  - run in second process as we go?
+
+* matrix slice and assign
+  - index m
+  - range-indexes :, a:, :b, a:b
+  - e.g., matrix(M,N) m; vector(M) v;  m[,1] = v;
+  
+* conditionals
+  - conditional expression
+  - ternary op: cond ? x : y
+  - if (cond) statement else if (cond) statement ... else statement;
+  - while (cond) statement;
+  - repeat statement until cond;
+  
+* multi-returns and array literals
+  - (a,b,c) = foo();  // function returns array
+  - (m,n,p) = (1,2,3);   // (1,2,3) is array literal
+
+* multiple declarations
+  - e.g., double a, b, c[N];
+
+* declare and assign
+  - e.g., double x = 5.0;
+
+* extensions
+  - declare file paths to #include
+  - declare namespace usings
+  - declare function sigs for parser
+
+* ragged arrays
+  - ready to use with vec<...<vec<x>...> pattern
+  - not clear how to declare (follow C?)
+
+* constant vari values
+  - avoid placing on stack
+  - how to deal with adjoints?
+  - use for numeric traits
+  - units 0 and 1 (scalar, vector, matrix)
+
+* alternative distribution parameterizations
+  - e.g., precision for (multi) normal
+  - inverse_sqrt_gamma(...)
+
+* subroutines
+  - user-defined functions in StanGM
+  - user-defined densities (how much to require?)
+
+* compound op-assigns in StanGM
+  - +=, *=, etc.
+
+* blocking updates
+  - only update subset of parameters
+  - use more than one instance per sampler
+  - specify blocks in program?
+
+* complete math robustness and limits review
+
+* restart from where command left off a la R2jags
+
+* auto convergence monitoring -- just keep doubling (or other ratio)
+
+* parallel random number generation necessary for MCMC?
+
+* cut out last derivative step in leapfrog if not nec.
+  - only saves if very small number of leapfrog steps
+
+* precompiled headers to speed up model compiles
+
+* speed measurement
+  - to converge
+  - time per effective sample once converged
+  - time to 4 chains at 25 ESS/chain, rHat < 1.1 for all
+    parameters theta[k] and theta[k]*theta[k]
+  - discarding first half of samples too many if fast to converge
+
+* automatic Jacobians
+  - just specify transform
+  - requires 2nd-order diff
+
+* check each parameter shows up on LHS of ~
+  - true check is run-time based on data, etc.
+
+
+Stan GM MANUAL
+=================================================
+
+1.  Intro
+2.  Modeling Language
+    a.  basic organization
+    b.  variable types
+    c.  expressions: operator precedence, associativity
+    d.  statements: precedence, associativity
+    e.  programs
+    f.  full BNF
+3.  Reference
+    a.  special functions
+    b.  distributions
+    c.  built-in variable transforms
+4.  Stan Command Line 
+5.  Extending Stan
+6.  C++ Code Generated
+    a.  auto-dif
+A.  Examples 
+    References
 
