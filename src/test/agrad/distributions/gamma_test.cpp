@@ -19,6 +19,17 @@ void expect_propto(T_y y1, T_shape alpha1, T_inv_scale beta1,
 
 using stan::agrad::var;
 
+TEST(AgradDistributionsGamma,Boundary) {
+  var y;
+  var alpha;
+  var gamma;
+
+  y = 0;
+  alpha = 1;
+  gamma = 1;
+  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log(y,alpha,gamma).val());
+}
+
 TEST(AgradDistributionsGamma,Propto) {
   expect_propto<var,var,var>(5.0,2.5,2.0,
 			     6.0,5.0,3.0,

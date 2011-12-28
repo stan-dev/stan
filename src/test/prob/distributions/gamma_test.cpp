@@ -23,6 +23,16 @@ TEST(ProbDistributionsGamma,Gamma) {
   EXPECT_FLOAT_EQ(-3.379803, stan::prob::gamma_log(2.0,0.25,0.75));
   EXPECT_FLOAT_EQ(-1, stan::prob::gamma_log(1,1,1));
 }
+TEST(ProbDistributionsGamma,Boundary) {
+  double y;
+  double alpha;
+  double gamma;
+
+  y = 0;
+  alpha = 1;
+  gamma = 1;
+  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log(y,alpha,gamma));
+}
 TEST(ProbDistributionsGamma,Propto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log<true>(1.0,2.0,2.0));
   EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log<true>(2.0,0.25,0.75));

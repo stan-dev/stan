@@ -50,9 +50,9 @@ namespace stan {
       if (include_summand<propto,T_shape>::value)
 	lp -= lgamma(alpha);
       if (include_summand<propto,T_shape,T_inv_scale>::value)
-	lp += alpha * log(beta);
+	lp += multiply_log(alpha,beta);
       if (include_summand<propto,T_y,T_shape>::value)
-	lp += (alpha - 1.0) * log(y);
+	lp += multiply_log(alpha-1.0,y);
       if (include_summand<propto,T_y,T_inv_scale>::value)
 	lp -= beta * y;
       return lp;
