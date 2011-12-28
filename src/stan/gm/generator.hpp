@@ -707,38 +707,49 @@ namespace stan {
     // see member_var_decl_visgen cut & paste
     struct local_var_decl_visgen : public visgen {
       int indents_;
+      bool is_var_;
       local_var_decl_visgen(int indents,
-			     std::ostream& o)
+			    bool is_var,
+			    std::ostream& o)
 	: visgen(o),
-	  indents_(indents) {
+	  indents_(indents),
+	  is_var_(is_var) {
       }
       void operator()(nil const& x) const { }
       void operator()(int_var_decl const& x) const {
 	declare_array("int",x.name_,x.dims_);
       }
       void operator()(double_var_decl const& x) const {
-	declare_array("var",x.name_,x.dims_);
+	declare_array(is_var_ ? "var" : "double",
+		      x.name_,x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
-	declare_array("vector_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "vector_v" : "vector_d", 
+		      x.name_, x.dims_);
       }
       void operator()(row_vector_var_decl const& x) const {
-	declare_array("row_vector_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "row_vector_v" : "row_vector_d", 
+		      x.name_, x.dims_);
       }
       void operator()(matrix_var_decl const& x) const {
-	declare_array("matrix_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "matrix_v" : "matrix_d", 
+		      x.name_, x.dims_);
       }
       void operator()(simplex_var_decl const& x) const {
-	declare_array("vector_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "vector_v" : "vector_d", 
+		      x.name_, x.dims_);
       }
       void operator()(pos_ordered_var_decl const& x) const {
-	declare_array("vector_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "vector_v" : "vector_d", 
+		      x.name_, x.dims_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
-	declare_array("matrix_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "matrix_v" : "matrix_d", 
+		      x.name_, x.dims_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
-	declare_array("matrix_v", x.name_, x.dims_);
+	declare_array(is_var_ ? "matrix_v" : "matrix_d", 
+		      x.name_, x.dims_);
       }
       void declare_array(const std::string& type, 
 			 const std::string& name, 
@@ -771,16 +782,16 @@ namespace stan {
 				  int indent,
 				  std::ostream& o,
 				  bool is_var) {
-       local_var_decl_visgen vis(indent,o);
-       for (unsigned int i = 0; i < vs.size(); ++i)
-	 boost::apply_visitor(vis,vs[i].decl_);
-     }
+      local_var_decl_visgen vis(indent,is_var,o);
+      for (unsigned int i = 0; i < vs.size(); ++i)
+	boost::apply_visitor(vis,vs[i].decl_);
+    }
 
 
-     void generate_start_namespace(std::string name,
+    void generate_start_namespace(std::string name,
 				   std::ostream& o) {
-       o << "namespace "	<< name << "_namespace {" << EOL2;
-     }
+      o << "namespace "	<< name << "_namespace {" << EOL2;
+    }
 
      void generate_end_namespace(std::ostream& o) {
        o << "} // namespace" << EOL2;
@@ -797,9 +808,13 @@ namespace stan {
 
     struct statement_visgen : public visgen {
       unsigned int indent_;
-      statement_visgen(unsigned int indent, std::ostream& o)
+      bool include_sampling_;
+      statement_visgen(unsigned int indent, 
+		       bool include_sampling,
+		       std::ostream& o)
 	: visgen(o),
-	  indent_(indent) {
+	  indent_(indent),
+	  include_sampling_(include_sampling) {
       }
       void operator()(nil const& x) const { }
       void operator()(assignment const& x) const {
@@ -814,6 +829,7 @@ namespace stan {
 	o_ << ";" << EOL;
       }
       void operator()(sample const& x) const {
+	if (!include_sampling_) return;
 	generate_indent(indent_,o_);
 	o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log(";
 	generate_expression(x.expr_,o_);
@@ -861,9 +877,8 @@ namespace stan {
 	}
       }
       void operator()(const statements& x) const {
-	static bool include_sampling = true;
 	for (unsigned int i = 0; i < x.statements_.size(); ++i)
-	  generate_statement(x.statements_[i],indent_,o_,include_sampling);
+	  generate_statement(x.statements_[i],indent_,o_,include_sampling_);
       }
       void operator()(const for_statement& x) const {
 	generate_indent(indent_,o_);
@@ -872,8 +887,7 @@ namespace stan {
 	o_ << "; " << x.variable_ << " <= ";
 	generate_expression(x.range_.high_,o_);
 	o_ << "; ++" << x.variable_ << ") {" << EOL;
-	static bool include_sampling = true;
-	generate_statement(x.statement_, indent_ + 1, o_, include_sampling);
+	generate_statement(x.statement_, indent_ + 1, o_, include_sampling_);
 	generate_indent(indent_,o_);
 	o_ << "}" << EOL;
       }
@@ -886,8 +900,8 @@ namespace stan {
 			    int indent,
 			    std::ostream& o,
 			    bool include_sampling) {
-      statement_visgen vis(indent,o);
-      boost::apply_visitor(vis, s.statement_);
+      statement_visgen vis(indent,include_sampling,o);
+      boost::apply_visitor(vis,s.statement_);
     }
 
 
@@ -1248,7 +1262,7 @@ namespace stan {
 				   const std::string& model_name,
 				   std::ostream& o) {
       o << INDENT << model_name << "(stan::io::var_context& context__)" << EOL;
-      o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL; // FIXME: need size of params_r here
+      o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL; // resize 0 with var_resizing
       o << INDENT2 << "unsigned int pos__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
@@ -1257,7 +1271,7 @@ namespace stan {
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
-      static bool include_sampling = true;
+      static bool include_sampling = false;
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
 	generate_statement(prog.derived_data_decl_.second[i],2,o,include_sampling);
 
@@ -1642,9 +1656,7 @@ namespace stan {
 				     const std::string& read_type,
 				     const std::vector<expression>& read_args,
 				     const std::string& name,
-				     const std::vector<expression>& dims) 
-	const {
-
+				     const std::vector<expression>& dims) const {
 	if (dims.size() == 0) {
 	  generate_indent(2,o_);
 	  o_ << var_type << " ";
@@ -1707,6 +1719,76 @@ namespace stan {
       }
     };
 
+    struct write_csv_vars_visgen : public visgen {
+      write_csv_vars_visgen(std::ostream& o)
+	: visgen(o) {
+      }
+      void operator()(const nil& x) const { }
+      // FIXME: template these out
+      void operator()(const int_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const double_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const vector_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const simplex_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const pos_ordered_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+	write_array(x.name_,x.dims_);
+      }
+      void write_array(const std::string& name,
+		       const std::vector<expression>& dims) const {
+	if (dims.size() == 0) {
+	  o_ << INDENT2 << "writer__.write(" << name << ");" << EOL;
+	  return;
+	}
+	for (unsigned int i = 0; i < dims.size(); ++i) {
+	  unsigned int idx = dims.size() - 1 - i;
+	  generate_indent(i + 2, o_);
+	  o_ << "for (unsigned int k_" << idx << " = 0;"
+	     << " k_" << idx << " < ";
+	  generate_expression(dims[idx],o_);
+	  o_ << "; ++k_" << idx << ") {" << EOL;
+	}
+
+	generate_indent(dims.size() + 2, o_);
+	o_ << "writer__.write(" << name;
+	if (dims.size() > 0) {
+	  o_ << '[';
+	  for (unsigned int i = 0; i < dims.size(); ++i) {
+	    if (i > 0) o_ << "][";
+	    o_ << "k_" << i;
+	  }
+	  o_ << ']';
+	}
+	o_ << ");" << EOL;
+	
+	for (unsigned int i = dims.size(); i > 0; --i) {
+	  generate_indent(i + 1, o_);
+	  o_ << "}" << EOL;
+	}
+      }
+    };
+
+
+
+    
 
     void generate_write_csv_method(const program& prog,
 				   std::ostream& o) {
@@ -1716,23 +1798,32 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
 
-      generate_comment("write parameters",2,o);
+      // declares, reads, and writes parameters
+      generate_comment("read-transform, write parameters",2,o);
       write_csv_visgen vis(o);
       for (unsigned int i = 0; i < prog.parameter_decl_.size(); ++i)
 	boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
 
+      write_csv_vars_visgen vis_writer(o);
+
       generate_comment("write transformed parameters",2,o);
-      static bool is_var = true;
+      static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
-      static bool include_sampling = true;
+      static bool include_sampling = false;
       generate_statement(prog.derived_decl_.second,2,o,include_sampling); 
+      o << EOL;
+      for (unsigned int i = 0; i < prog.derived_decl_.first.size(); ++i)
+	boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
       o << EOL;
 
       generate_comment("write generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,is_var); 
       o << EOL;
       generate_statement(prog.generated_decl_.second,2,o,include_sampling); 
+      o << EOL;
+      for (unsigned int i = 0; i < prog.generated_decl_.first.size(); ++i)
+	boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
       o << EOL;
 
       o << INDENT2 << "writer__.newline();" << EOL;
