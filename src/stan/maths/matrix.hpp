@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <Eigen/Dense>
+#include <stdexcept>
 
 namespace stan {
   

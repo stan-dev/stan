@@ -3,11 +3,11 @@
 
 #include <stan/prob/distributions_error_handling.hpp>
 #include <stan/prob/distributions_constants.hpp>
+#include <stan/prob/traits.hpp>
 
 #include <stan/maths/matrix.hpp>
 
-#include <stan/meta/traits.hpp>
-#include <stan/prob/traits.hpp>
+
 
 namespace stan {
   namespace prob {

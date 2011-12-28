@@ -21,7 +21,7 @@ UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 # DEFAULT
 # =========================================================
 
-.PHONY: all test-all test
+.PHONY: all test-all
 all: test-all
 
 # TEST
