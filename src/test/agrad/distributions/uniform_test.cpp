@@ -18,15 +18,15 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
 using stan::agrad::var;
 
 TEST(AgradDistributionsUniform,Propto) {
-  expect_propto<double,double,var>(-2.0,-2.5,2.0,
+  expect_propto<var,var,var>(-2.0,-2.5,2.0,
 				   3.0,-5.0,5.0,
 				   "y is within both lower and upper bounds.");
 
-  expect_propto<double,double,var>(2.0,-2.0,4.0,
+  expect_propto<var,var,var>(2.0,-2.0,4.0,
 				   10.0,-4.0,2.0,
 				   "y is within one set of bounds and not the other");
 
-  expect_propto<double,double,var>(-20.0,-10.0,-5.0,
+  expect_propto<var,var,var>(-20.0,-10.0,-5.0,
 				   20.0,1.0,5.0,
 				   "y is outside both bounds");
 }
