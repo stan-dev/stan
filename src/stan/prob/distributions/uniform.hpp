@@ -50,7 +50,8 @@ namespace stan {
 	return LOG_ZERO;
       
       if (include_summand<propto,T_low,T_high>::value)
-	return lp;
+	return -log(beta - alpha);
+      return lp;
     }
      
   }
