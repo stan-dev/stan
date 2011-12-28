@@ -74,9 +74,8 @@ namespace stan {
 	return lp;
       if (!check_x(function, y, &lp, Policy())) 
 	return lp;
-      // FIXME(daniel): check_cov_matrix does not work with Matrix<var,Dynamic,Dynamic>
-      //if (!check_cov_matrix(function, Sigma, &lp, Policy()))
-      //return lp;
+      if (!check_cov_matrix(function, Sigma, &lp, Policy()))
+	return lp;
       if (y.rows() == 0)
 	return lp;
       if (include_summand<propto>::value) 

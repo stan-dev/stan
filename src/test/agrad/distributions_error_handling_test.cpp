@@ -388,10 +388,7 @@ TEST(AgradDistributionsErrorHandling,CheckCovMatrixDefaultPolicy) {
   Sigma.resize(1,1);
   Sigma << 1;
   
-  std::cout << "Sigma: " << Sigma << std::endl;
-
-  check_cov_matrix(function,Sigma,&result,default_policy());
-  //EXPECT_NO_THROW(check_cov_matrix(function, Sigma, &result, default_policy())) << "check_cov_matrix should not throw exception with Sigma: " << Sigma;
+  EXPECT_NO_THROW(check_cov_matrix(function, Sigma, &result, default_policy())) << "check_cov_matrix should not throw exception with Sigma: " << Sigma;
 }
 // ----------  ----------
 //TEST(AgradDistributionsErrorHandling,)
