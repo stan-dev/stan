@@ -1,10 +1,9 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_INV_CHI_SQUARE_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_INV_CHI_SQUARE_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__INV_CHI_SQUARE_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__INV_CHI_SQUARE_HPP__
 
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
-
-#include <stan/meta/traits.hpp>
+#include "stan/prob/traits.hpp"
 
 namespace stan {
   namespace prob {
@@ -43,15 +42,11 @@ namespace stan {
       if (!stan::prob::check_positive (function, y, "Random variate y", &lp, Policy()))
 	return lp;
       
-      if (!propto
-	  || !is_constant<T_dof>::value)
+      if (include_summand<propto,T_dof>::value)
 	lp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_dof>::value)
-	lp -= (0.5 * nu + 1.0) * log(y);
-      if (!propto
-	  || !is_constant<T_y>::value)
+      if (include_summand<propto,T_y,T_dof>::value)
+	lp -= multiply_log(0.5*nu+1.0, y);
+      if (include_summand<propto,T_y>::value)
 	lp -= 0.5 / y;
       return lp;
     }

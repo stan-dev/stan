@@ -1,10 +1,10 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_CHI_SQUARE_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_CHI_SQUARE_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__CHI_SQUARE_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__CHI_SQUARE_HPP__
 
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
+#include "stan/prob/traits.hpp"
 
-#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -18,10 +18,10 @@ namespace stan {
      * y must be greater than or equal to 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \chi^2_\nu \\
-       \log (p (y \,|\, \nu)) &=& \log \left( \frac{2^{-\nu / 2}}{\Gamma (\nu / 2)} y^{\nu / 2 - 1} \exp^{- y / 2} \right) \\
-       &=& - \frac{\nu}{2} \log(2) - \log (\Gamma (\nu / 2)) + (\frac{\nu}{2} - 1) \log(y) - \frac{y}{2} \\
-       & & \mathrm{ where } \; y \ge 0
+     y &\sim& \chi^2_\nu \\
+     \log (p (y \,|\, \nu)) &=& \log \left( \frac{2^{-\nu / 2}}{\Gamma (\nu / 2)} y^{\nu / 2 - 1} \exp^{- y / 2} \right) \\
+     &=& - \frac{\nu}{2} \log(2) - \log (\Gamma (\nu / 2)) + (\frac{\nu}{2} - 1) \log(y) - \frac{y}{2} \\
+     & & \mathrm{ where } \; y \ge 0
      \f}
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -46,15 +46,11 @@ namespace stan {
       if (y < 0)
 	return LOG_ZERO;
       
-      if (!propto
-	  || !is_constant<T_dof>::value)
+      if (include_summand<propto,T_dof>::value)
 	lp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
-      if (!propto
-	  || !stan::is_constant<T_y>::value
-	  || !stan::is_constant<T_dof>::value)
-	lp += (0.5 * nu - 1.0) * log(y);
-      if (!propto
-	  || !stan::is_constant<T_y>::value)
+      if (include_summand<propto,T_y,T_dof>::value)
+	lp += multiply_log(0.5*nu-1.0, y);
+      if (include_summand<propto,T_y>::value)
 	lp -= 0.5 * y;
       return lp;
     }
