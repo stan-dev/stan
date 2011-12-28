@@ -162,7 +162,7 @@ namespace stan {
       }
       
       if (include_summand<propto,T_scale>::value) 
-	lp -= y.size() * log(sigma);
+	lp -= multiply_log(y.size(),sigma);
       
       if (include_summand<propto>::value) 
 	lp += y.size() * NEG_LOG_SQRT_TWO_PI;
