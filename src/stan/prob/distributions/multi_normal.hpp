@@ -81,7 +81,7 @@ namespace stan {
       if (include_summand<propto>::value) 
 	lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       if (include_summand<propto,T_covar>::value)
-	lp -= 0.5 * log(determinant(Sigma));
+	lp -= multiply_log(0.5,determinant(Sigma));
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
 	Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff 
 	  = subtract(y,mu);
