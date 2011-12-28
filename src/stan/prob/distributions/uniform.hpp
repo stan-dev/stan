@@ -56,5 +56,4 @@ namespace stan {
      
   }
 }
-
 #endif

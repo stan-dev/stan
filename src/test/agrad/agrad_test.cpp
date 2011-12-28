@@ -29,23 +29,23 @@ AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
   return v;
 }
 
-TEST(agrad_agrad,a_eq_x) {
+TEST(AgradAgrad,a_eq_x) {
   AVAR a = 5.0;
   EXPECT_FLOAT_EQ(5.0,a.val());
 }
 
-TEST(agrad_agrad,a_of_x) {
+TEST(AgradAgrad,a_of_x) {
   AVAR a(6.0);
   EXPECT_FLOAT_EQ(6.0,a.val());
 }
 
-TEST(agrad_agrad,a__a_eq_x) {
+TEST(AgradAgrad,a__a_eq_x) {
   AVAR a;
   a = 7.0;
   EXPECT_FLOAT_EQ(7.0,a.val());
 }
 
-TEST(agrad_agrad,a) {
+TEST(AgradAgrad,a) {
   AVAR a = 5.0;
   AVEC x = createAVEC(a);
   VEC dx;
@@ -54,7 +54,7 @@ TEST(agrad_agrad,a) {
 }
 
 
-TEST(agrad_agrad,eq_a) {
+TEST(AgradAgrad,eq_a) {
   AVAR a = 5.0;
   AVAR f = a;
   AVEC x = createAVEC(a);
@@ -65,7 +65,7 @@ TEST(agrad_agrad,eq_a) {
 
 
 
-TEST(agrad_agrad,a_lt_b) {
+TEST(AgradAgrad,a_lt_b) {
   AVAR a = 5.0;
   AVAR b = 6.0;
   EXPECT_TRUE(a < b);
@@ -75,7 +75,7 @@ TEST(agrad_agrad,a_lt_b) {
   EXPECT_FALSE(c < b);
 }
 
-TEST(agrad_agrad,a_lt_y) {
+TEST(AgradAgrad,a_lt_y) {
   AVAR a = 5.0;
   double y = 6.0;
   EXPECT_TRUE(a < y);
@@ -85,7 +85,7 @@ TEST(agrad_agrad,a_lt_y) {
   EXPECT_FALSE(y < b);
 }
 
-TEST(agrad_agrad,x_lt_b) {
+TEST(AgradAgrad,x_lt_b) {
   double x = 5.0;
   AVAR b = 6.0;
   EXPECT_TRUE(x < b);
@@ -96,7 +96,7 @@ TEST(agrad_agrad,x_lt_b) {
 }
 
 
-TEST(agrad_agrad,a_gt_b) {
+TEST(AgradAgrad,a_gt_b) {
   AVAR a = 5.0;
   AVAR b = 6.0;
   EXPECT_TRUE(b > a);
@@ -106,7 +106,7 @@ TEST(agrad_agrad,a_gt_b) {
   EXPECT_FALSE(c > b);
 }
 
-TEST(agrad_agrad,a_gt_y) {
+TEST(AgradAgrad,a_gt_y) {
   AVAR a = 6.0;
   double y = 5.0;
   EXPECT_TRUE(a > y);
@@ -116,7 +116,7 @@ TEST(agrad_agrad,a_gt_y) {
   EXPECT_FALSE(c > a);
 }
 
-TEST(agrad_agrad,x_gt_b) {
+TEST(AgradAgrad,x_gt_b) {
   double x = 6.0;
   AVAR b = 5.0;
   EXPECT_TRUE(x > b);
@@ -126,7 +126,7 @@ TEST(agrad_agrad,x_gt_b) {
   EXPECT_FALSE(y > b);
 }
 
-TEST(agrad_agrad,a_lte_b) {
+TEST(AgradAgrad,a_lte_b) {
   AVAR a = 5.0;
   AVAR b = 6.0;
   EXPECT_TRUE(a <= b);
@@ -136,7 +136,7 @@ TEST(agrad_agrad,a_lte_b) {
   EXPECT_TRUE(c <= b);
 }
 
-TEST(agrad_agrad,a_lte_y) {
+TEST(AgradAgrad,a_lte_y) {
   AVAR a = 5.0;
   double y = 6.0;
   EXPECT_TRUE(a <= y);
@@ -147,7 +147,7 @@ TEST(agrad_agrad,a_lte_y) {
 }
 
 
-TEST(agrad_agrad,x_lte_b) {
+TEST(AgradAgrad,x_lte_b) {
   double x = 5.0;
   AVAR b = 6.0;
   EXPECT_TRUE(x <= b);
@@ -158,7 +158,7 @@ TEST(agrad_agrad,x_lte_b) {
 }
 
 
-TEST(agrad_agrad,a_gte_b) {
+TEST(AgradAgrad,a_gte_b) {
   AVAR a = 5.0;
   AVAR b = 6.0;
   EXPECT_TRUE(b >= a);
@@ -168,7 +168,7 @@ TEST(agrad_agrad,a_gte_b) {
   EXPECT_TRUE(c >= b);
 }
 
-TEST(agrad_agrad,a_gte_y) {
+TEST(AgradAgrad,a_gte_y) {
   AVAR a = 6.0;
   double y = 5.0;
   EXPECT_TRUE(a >= y);
@@ -178,7 +178,7 @@ TEST(agrad_agrad,a_gte_y) {
   EXPECT_TRUE(c >= a);
 }
 
-TEST(agrad_agrad,x_gte_b) {
+TEST(AgradAgrad,x_gte_b) {
   double x = 6.0;
   AVAR b = 5.0;
   EXPECT_TRUE(x >= b);
@@ -188,7 +188,7 @@ TEST(agrad_agrad,x_gte_b) {
   EXPECT_TRUE(y >= b);
 }
 
-TEST(agrad_agrad,a_eq_b) {
+TEST(AgradAgrad,a_eq_b) {
   AVAR a = 2.0;
   AVAR b = 2.0;
   EXPECT_TRUE(a == b);
@@ -198,7 +198,7 @@ TEST(agrad_agrad,a_eq_b) {
   EXPECT_FALSE(c == a);
 }
 
-TEST(agrad_agrad,x_eq_b) {
+TEST(AgradAgrad,x_eq_b) {
   double x = 2.0;
   AVAR b = 2.0;
   EXPECT_TRUE(x == b);
@@ -208,7 +208,7 @@ TEST(agrad_agrad,x_eq_b) {
   EXPECT_FALSE(c == x);
 }
 
-TEST(agrad_agrad,a_eq_y) {
+TEST(AgradAgrad,a_eq_y) {
   AVAR a = 2.0;
   double y = 2.0;
   EXPECT_TRUE(a == y);
@@ -219,7 +219,7 @@ TEST(agrad_agrad,a_eq_y) {
 }
 
 
-TEST(agrad_agrad,a_neq_y) {
+TEST(AgradAgrad,a_neq_y) {
   AVAR a = 2.0;
   double y = 3.0;
   EXPECT_TRUE(a != y);
@@ -229,7 +229,7 @@ TEST(agrad_agrad,a_neq_y) {
   EXPECT_FALSE(z != a);
 }
 
-TEST(agrad_agrad,pos_a) {
+TEST(AgradAgrad,pos_a) {
   AVAR a = 5.0;
   AVAR f = +a;
   EXPECT_FLOAT_EQ(5.0,f.val());
@@ -240,7 +240,7 @@ TEST(agrad_agrad,pos_a) {
   EXPECT_FLOAT_EQ(1.0,dx[0]);
 }
 
-TEST(agrad_agrad,neg_a) {
+TEST(AgradAgrad,neg_a) {
   AVAR a = 5.0;
   AVAR f = -a;
   EXPECT_FLOAT_EQ(-5.0,f.val());
@@ -250,7 +250,7 @@ TEST(agrad_agrad,neg_a) {
   EXPECT_FLOAT_EQ(-1.0,dx[0]);
 }
 
-TEST(agrad_agrad,a_plus_b) {
+TEST(AgradAgrad,a_plus_b) {
   AVAR a = 5.0;
   AVAR b = -1.0;
   AVAR f = a + b;
@@ -262,7 +262,7 @@ TEST(agrad_agrad,a_plus_b) {
   EXPECT_FLOAT_EQ(1.0,dx[1]);
 }
 
-TEST(agrad_agrad,a_plus_a) {
+TEST(AgradAgrad,a_plus_a) {
   AVAR a = 5.0;
   AVAR f = a + a;
   EXPECT_FLOAT_EQ(10.0,f.val());
@@ -272,7 +272,7 @@ TEST(agrad_agrad,a_plus_a) {
   EXPECT_FLOAT_EQ(2.0,dx[0]);
 }
 
-TEST(agrad_agrad,a_plus_neg_b) {
+TEST(AgradAgrad,a_plus_neg_b) {
   AVAR a = 5.0;
   AVAR b = -1.0;
   AVAR f = a + -b;
@@ -284,7 +284,7 @@ TEST(agrad_agrad,a_plus_neg_b) {
   EXPECT_FLOAT_EQ(-1.0,dx[1]);
 }
 
-TEST(agrad_agrad,a_plus_x) {
+TEST(AgradAgrad,a_plus_x) {
   AVAR a = 5.0;
   double z = 3.0;
   AVAR f = a + z;
@@ -295,7 +295,7 @@ TEST(agrad_agrad,a_plus_x) {
   EXPECT_FLOAT_EQ(1.0,dx[0]);
 }
 
-TEST(agrad_agrad,x_plus_a) {
+TEST(AgradAgrad,x_plus_a) {
   AVAR a = 5.0;
   double z = 3.0;
   AVAR f = z + a;
@@ -308,7 +308,7 @@ TEST(agrad_agrad,x_plus_a) {
 
 
 
-TEST(agrad_agrad,a_minus_b) {
+TEST(AgradAgrad,a_minus_b) {
   AVAR a = 5.0;
   AVAR b = 2.0;
   AVAR f = a - b;
@@ -320,7 +320,7 @@ TEST(agrad_agrad,a_minus_b) {
   EXPECT_FLOAT_EQ(-1.0,dx[1]);
 }
 
-TEST(agrad_agrad,a_minus_a) {
+TEST(AgradAgrad,a_minus_a) {
   AVAR a = 5.0;
   AVAR f = a - a;
   EXPECT_FLOAT_EQ(0.0,f.val());
@@ -330,7 +330,7 @@ TEST(agrad_agrad,a_minus_a) {
   EXPECT_FLOAT_EQ(0.0,dx[0]);
 }
 
-TEST(agrad_agrad,a_minus_x) {
+TEST(AgradAgrad,a_minus_x) {
   AVAR a = 5.0;
   double z = 3.0;
   AVAR f = a - z;
@@ -341,7 +341,7 @@ TEST(agrad_agrad,a_minus_x) {
   EXPECT_FLOAT_EQ(1.0,dx[0]);
 }
 
-TEST(agrad_agrad,x_minus_a) {
+TEST(AgradAgrad,x_minus_a) {
   AVAR a = 2.0;
   double z = 5.0;
   AVAR f = z - a;
@@ -352,7 +352,7 @@ TEST(agrad_agrad,x_minus_a) {
   EXPECT_FLOAT_EQ(-1.0,dx[0]);
 }
 
-TEST(agrad_agrad,a_times_b) {
+TEST(AgradAgrad,a_times_b) {
   AVAR a = 2.0;
   AVAR b = -3.0;
   AVAR f = a * b;
@@ -365,7 +365,7 @@ TEST(agrad_agrad,a_times_b) {
   EXPECT_FLOAT_EQ(2.0,grad_f[1]);
 }
 
-TEST(agrad_agrad,a_times_a) {
+TEST(AgradAgrad,a_times_a) {
   AVAR a = 2.0;
   AVAR f = a * a;
   EXPECT_FLOAT_EQ(4.0,f.val());
@@ -376,7 +376,7 @@ TEST(agrad_agrad,a_times_a) {
   EXPECT_FLOAT_EQ(4.0,grad_f[0]);
 }
 
-TEST(agrad_agrad,a_times_y) {
+TEST(AgradAgrad,a_times_y) {
   AVAR a = 2.0;
   double y = -3.0;
   AVAR f = a * y;
@@ -388,7 +388,7 @@ TEST(agrad_agrad,a_times_y) {
   EXPECT_FLOAT_EQ(-3.0,g[0]);
 }
  
-TEST(agrad_agrad,x_times_b) {
+TEST(AgradAgrad,x_times_b) {
   double x = 2.0;
   AVAR b = -3.0;
   AVAR f = x * b;
@@ -400,7 +400,7 @@ TEST(agrad_agrad,x_times_b) {
   EXPECT_FLOAT_EQ(2.0,g[0]);
 }
 
-TEST(agrad_agrad,a_div_b) {
+TEST(AgradAgrad,a_div_b) {
   AVAR a = 6.0;
   AVAR b = 3.0;
   AVAR f = a / b;
@@ -413,7 +413,7 @@ TEST(agrad_agrad,a_div_b) {
   EXPECT_FLOAT_EQ(-6.0/(3.0*3.0),g[1]);
 }
 
-TEST(agrad_agrad,a_divide_bd) {
+TEST(AgradAgrad,a_divide_bd) {
   AVAR a = 6.0;
   double b = 3.0;
   AVAR f = a / b;
@@ -425,7 +425,7 @@ TEST(agrad_agrad,a_divide_bd) {
   EXPECT_FLOAT_EQ(1.0/3.0,g[0]);
 }
 
-TEST(agrad_agrad,ad_divide_b) {
+TEST(AgradAgrad,ad_divide_b) {
   double a = 6.0;
   AVAR b = 3.0;
   AVAR f = a / b;
@@ -437,7 +437,7 @@ TEST(agrad_agrad,ad_divide_b) {
   EXPECT_FLOAT_EQ(-6.0/(3.0*3.0),g[0]);
 }
 
-TEST(agrad_agrad,plus_plus_a) {
+TEST(AgradAgrad,plus_plus_a) {
   AVAR a(5.0);
   EXPECT_FLOAT_EQ(5.0,a.val());
   AVAR f = ++a;
@@ -449,7 +449,7 @@ TEST(agrad_agrad,plus_plus_a) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,plus_plus_a_2) {
+TEST(AgradAgrad,plus_plus_a_2) {
   AVAR a(5.0);
   EXPECT_FLOAT_EQ(5.0,a.val());
   AVAR f = ++a;
@@ -468,7 +468,7 @@ TEST(agrad_agrad,plus_plus_a_2) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,plus_plus_a_3) {
+TEST(AgradAgrad,plus_plus_a_3) {
   AVAR a(5.0);
   AVAR f = ++a;
   ++a; // reassignment loses connection to f
@@ -478,7 +478,7 @@ TEST(agrad_agrad,plus_plus_a_3) {
   EXPECT_FLOAT_EQ(0.0,g[0]);
 }
 
-TEST(agrad_agrad,a_plus_plus) {
+TEST(AgradAgrad,a_plus_plus) {
   AVAR a(5.0);
   AVEC x = createAVEC(a); // compare to placement in test 2
   AVAR f = a++;
@@ -489,7 +489,7 @@ TEST(agrad_agrad,a_plus_plus) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,a_plus_plus_2) {
+TEST(AgradAgrad,a_plus_plus_2) {
   AVAR a(5.0);
   AVAR f = a++;
   AVEC x = createAVEC(a); // compare to placement in test 1
@@ -500,7 +500,7 @@ TEST(agrad_agrad,a_plus_plus_2) {
   EXPECT_FLOAT_EQ(0.0,g[0]);
 }
 
-TEST(agrad_agrad,minus_minus_a) {
+TEST(AgradAgrad,minus_minus_a) {
   AVAR a(5.0);
   AVAR f = --a;
   EXPECT_FLOAT_EQ(4.0,f.val());
@@ -511,7 +511,7 @@ TEST(agrad_agrad,minus_minus_a) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,minus_minus_a_2) {
+TEST(AgradAgrad,minus_minus_a_2) {
   AVAR a(5.0);
   AVEC x = createAVEC(a);
   AVAR f = --a;
@@ -522,7 +522,7 @@ TEST(agrad_agrad,minus_minus_a_2) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,a_minus_minus) {
+TEST(AgradAgrad,a_minus_minus) {
   AVAR a(5.0);
   AVEC x = createAVEC(a); // compare to placement in test 2
   AVAR f = a--;
@@ -533,7 +533,7 @@ TEST(agrad_agrad,a_minus_minus) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,a_minus_minus_2) {
+TEST(AgradAgrad,a_minus_minus_2) {
   AVAR a(5.0);
   AVAR f = a--;
   AVEC x = createAVEC(a); // compare to placement in test 1
@@ -544,7 +544,7 @@ TEST(agrad_agrad,a_minus_minus_2) {
   EXPECT_FLOAT_EQ(0.0,g[0]);
 }
 
-TEST(agrad_agrad,a_pluseq_b) {
+TEST(AgradAgrad,a_pluseq_b) {
   AVAR a(5.0);
   AVAR b(-1.0);
   AVEC x = createAVEC(a,b);
@@ -558,7 +558,7 @@ TEST(agrad_agrad,a_pluseq_b) {
   EXPECT_FLOAT_EQ(1.0,g[1]);
 }
 
-TEST(agrad_agrad,a_pluseq_bd) {
+TEST(AgradAgrad,a_pluseq_bd) {
   AVAR a(5.0);
   double b = -1.0;
   AVEC x = createAVEC(a);
@@ -570,7 +570,7 @@ TEST(agrad_agrad,a_pluseq_bd) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,a_minuseq_b) {
+TEST(AgradAgrad,a_minuseq_b) {
   AVAR a(5.0);
   AVAR b(-1.0);
   AVEC x = createAVEC(a,b);
@@ -584,7 +584,7 @@ TEST(agrad_agrad,a_minuseq_b) {
   EXPECT_FLOAT_EQ(-1.0,g[1]);
 }
 
-TEST(agrad_agrad,a_negeq_bd) {
+TEST(AgradAgrad,a_negeq_bd) {
   AVAR a(5.0);
   double b = -1.0;
   AVEC x = createAVEC(a);
@@ -596,7 +596,7 @@ TEST(agrad_agrad,a_negeq_bd) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,a_timeseq_b) {
+TEST(AgradAgrad,a_timeseq_b) {
   AVAR a(5.0);
   AVAR b(-1.0);
   AVEC x = createAVEC(a,b);
@@ -610,7 +610,7 @@ TEST(agrad_agrad,a_timeseq_b) {
   EXPECT_FLOAT_EQ(5.0,g[1]);
 }
 
-TEST(agrad_agrad,a_timeseq_bd) {
+TEST(AgradAgrad,a_timeseq_bd) {
   AVAR a(5.0);
   double b = -1.0;
   AVEC x = createAVEC(a);
@@ -622,7 +622,7 @@ TEST(agrad_agrad,a_timeseq_bd) {
   EXPECT_FLOAT_EQ(-1.0,g[0]);
 }
 
-TEST(agrad_agrad,a_divideeq_b) {
+TEST(AgradAgrad,a_divideeq_b) {
   AVAR a(6.0);
   AVAR b(-2.0);
   AVEC x = createAVEC(a,b);
@@ -636,7 +636,7 @@ TEST(agrad_agrad,a_divideeq_b) {
   EXPECT_FLOAT_EQ(-6.0/((-2.0)*(-2.0)),g[1]);
 }
 
-TEST(agrad_agrad,a_divideeq_bd) {
+TEST(AgradAgrad,a_divideeq_bd) {
   AVAR a(6.0);
   double b = -2.0;
   AVEC x = createAVEC(a);
@@ -648,14 +648,14 @@ TEST(agrad_agrad,a_divideeq_bd) {
   EXPECT_FLOAT_EQ(1.0/-2.0,g[0]);
 }
 
-TEST(agrad_agrad,not_a) {
+TEST(AgradAgrad,not_a) {
   AVAR a(6.0);
   EXPECT_EQ(0, !a);
   AVAR b(0.0);
   EXPECT_EQ(1, !b);
 }
 
-TEST(agrad_agrad,exp_a) {
+TEST(AgradAgrad,exp_a) {
   AVAR a(6.0);
   AVAR f = exp(a); // mix exp() functs w/o namespace
   EXPECT_FLOAT_EQ(exp(6.0),f.val());
@@ -664,7 +664,7 @@ TEST(agrad_agrad,exp_a) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(exp(6.0),g[0]);
 }
-TEST(agrad_agrad,a_ostream) {
+TEST(AgradAgrad,a_ostream) {
   AVAR a = 6.0;
   std::ostringstream os;
   
@@ -677,7 +677,7 @@ TEST(agrad_agrad,a_ostream) {
   EXPECT_EQ ("10.5:0", os.str());
 }
 
-TEST(agrad_agrad,log_a) {
+TEST(AgradAgrad,log_a) {
   AVAR a(5.0);
   AVAR f = log(a); 
   EXPECT_FLOAT_EQ(log(5.0),f.val());
@@ -688,7 +688,7 @@ TEST(agrad_agrad,log_a) {
 }
 
 
-TEST(agrad_agrad,log10_a) {
+TEST(AgradAgrad,log10_a) {
   AVAR a(5.0);
   AVAR f = log10(a); 
   EXPECT_FLOAT_EQ(log10(5.0),f.val());
@@ -698,7 +698,7 @@ TEST(agrad_agrad,log10_a) {
   EXPECT_FLOAT_EQ(1.0/(log(10.0) * 5.0),g[0]);
 }
 
-TEST(agrad_agrad,sqrt_a) {
+TEST(AgradAgrad,sqrt_a) {
   AVAR a(5.0);
   AVAR f = sqrt(a); 
   EXPECT_FLOAT_EQ(sqrt(5.0),f.val());
@@ -708,7 +708,7 @@ TEST(agrad_agrad,sqrt_a) {
   EXPECT_FLOAT_EQ((1.0/2.0) * pow(5.0,-0.5), g[0]);
 }
 
-TEST(agrad_agrad,pow_var_var) {
+TEST(AgradAgrad,pow_var_var) {
   AVAR a(3.0);
   AVAR b(4.0);
   AVAR f = pow(a,b);
@@ -721,7 +721,7 @@ TEST(agrad_agrad,pow_var_var) {
   EXPECT_FLOAT_EQ(log(3.0) * pow(3.0,4.0), g[1]);
 }
 
-TEST(agrad_agrad,pow_var_double) {
+TEST(AgradAgrad,pow_var_double) {
   AVAR a(3.0);
   double b = 4.0;
   AVAR f = pow(a,b);
@@ -734,7 +734,7 @@ TEST(agrad_agrad,pow_var_double) {
 }
 
 
-TEST(agrad_agrad,pow_double_var) {
+TEST(AgradAgrad,pow_double_var) {
   double a = 3.0;
   AVAR b(4.0);
   AVAR f = pow(a,b);
@@ -746,7 +746,7 @@ TEST(agrad_agrad,pow_double_var) {
   EXPECT_FLOAT_EQ(log(3.0) * pow(3.0,4.0), g[0]);
 }
 
-TEST(agrad_agrad,cos_var) {
+TEST(AgradAgrad,cos_var) {
   AVAR a = 0.43;
   AVAR f = cos(a);
   EXPECT_FLOAT_EQ(cos(0.43), f.val());
@@ -757,7 +757,7 @@ TEST(agrad_agrad,cos_var) {
   EXPECT_FLOAT_EQ(-sin(0.43),g[0]);
 }
 
-TEST(agrad_agrad,sin_var) {
+TEST(AgradAgrad,sin_var) {
   AVAR a = 0.49;
   AVAR f = sin(a);
   EXPECT_FLOAT_EQ(sin(0.49), f.val());
@@ -768,7 +768,7 @@ TEST(agrad_agrad,sin_var) {
    EXPECT_FLOAT_EQ(cos(0.49),g[0]);
 }
 
-TEST(agrad_agrad,tan_var) {
+TEST(AgradAgrad,tan_var) {
   AVAR a = 0.68;
   AVAR f = tan(a);
   EXPECT_FLOAT_EQ(tan(0.68), f.val());
@@ -779,7 +779,7 @@ TEST(agrad_agrad,tan_var) {
   EXPECT_FLOAT_EQ(1 + tan(0.68)*tan(0.68), g[0]);
 }
 
-TEST(agrad_agrad,acos_var) {
+TEST(AgradAgrad,acos_var) {
   AVAR a = 0.68;
   AVAR f = acos(a);
   EXPECT_FLOAT_EQ(acos(0.68), f.val());
@@ -790,7 +790,7 @@ TEST(agrad_agrad,acos_var) {
   EXPECT_FLOAT_EQ(-1.0/sqrt(1.0 - (0.68 * 0.68)), g[0]);
 }
 
-TEST(agrad_agrad,asin_var) {
+TEST(AgradAgrad,asin_var) {
   AVAR a = 0.68;
   AVAR f = asin(a);
   EXPECT_FLOAT_EQ(asin(0.68), f.val());
@@ -801,7 +801,7 @@ TEST(agrad_agrad,asin_var) {
   EXPECT_FLOAT_EQ(1.0/sqrt(1.0 - (0.68 * 0.68)), g[0]);
 }
 
-TEST(agrad_agrad,atan_var) {
+TEST(AgradAgrad,atan_var) {
   AVAR a = 0.68;
   AVAR f = atan(a);
   EXPECT_FLOAT_EQ(atan(0.68), f.val());
@@ -812,7 +812,7 @@ TEST(agrad_agrad,atan_var) {
   EXPECT_FLOAT_EQ(1.0/(1.0 + (0.68 * 0.68)), g[0]);
 }
 
-TEST(agrad_agrad,atan2_var_var) {
+TEST(AgradAgrad,atan2_var_var) {
   AVAR a = 1.2;
   AVAR b = 3.9;
   AVAR f = atan2(a,b);
@@ -825,7 +825,7 @@ TEST(agrad_agrad,atan2_var_var) {
   EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9), g[1]);
 }
 
-TEST(agrad_agrad,atan2_var_double) {
+TEST(AgradAgrad,atan2_var_double) {
   AVAR a = 1.2;
   double b = 3.9;
   AVAR f = atan2(a,b);
@@ -837,7 +837,7 @@ TEST(agrad_agrad,atan2_var_double) {
   EXPECT_FLOAT_EQ(3.9 / (1.2 * 1.2 + 3.9 * 3.9), g[0]);
 }
 
-TEST(agrad_agrad,atan2_double_var) {
+TEST(AgradAgrad,atan2_double_var) {
   double a = 1.2;
   AVAR b = 3.9;
   AVAR f = atan2(a,b);
@@ -849,7 +849,7 @@ TEST(agrad_agrad,atan2_double_var) {
   EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9), g[0]);
 }
 
-TEST(agrad_agrad,cosh_var) {
+TEST(AgradAgrad,cosh_var) {
   AVAR a = 0.68;
   AVAR f = cosh(a);
   EXPECT_FLOAT_EQ(cosh(0.68), f.val());
@@ -860,7 +860,7 @@ TEST(agrad_agrad,cosh_var) {
   EXPECT_FLOAT_EQ(sinh(0.68), g[0]);
 }
 
-TEST(agrad_agrad,sinh_var) {
+TEST(AgradAgrad,sinh_var) {
   AVAR a = 0.68;
   AVAR f = sinh(a);
   EXPECT_FLOAT_EQ(sinh(0.68), f.val());
@@ -871,7 +871,7 @@ TEST(agrad_agrad,sinh_var) {
   EXPECT_FLOAT_EQ(cosh(0.68),g[0]);
 }
 
-TEST(agrad_agrad,tanh_var) {
+TEST(AgradAgrad,tanh_var) {
   AVAR a = 0.68;
   AVAR f = tanh(a);
   EXPECT_FLOAT_EQ(tanh(0.68), f.val());
@@ -882,7 +882,7 @@ TEST(agrad_agrad,tanh_var) {
   EXPECT_FLOAT_EQ(1.0/(cosh(0.68) * cosh(0.68)), g[0]);
 }
 
-TEST(agrad_agrad,fabs_var) {
+TEST(AgradAgrad,fabs_var) {
   AVAR a = 0.68;
   AVAR f = fabs(a);
   EXPECT_FLOAT_EQ(0.68, f.val());
@@ -893,7 +893,7 @@ TEST(agrad_agrad,fabs_var) {
   EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 
-TEST(agrad_agrad,fabs_var_2) {
+TEST(AgradAgrad,fabs_var_2) {
   AVAR a = -0.68;
   AVAR f = fabs(a);
   EXPECT_FLOAT_EQ(0.68, f.val());
@@ -904,7 +904,7 @@ TEST(agrad_agrad,fabs_var_2) {
   EXPECT_FLOAT_EQ(-1.0, g[0]);
 }
 
-TEST(agrad_agrad,fabs_var_3) {
+TEST(AgradAgrad,fabs_var_3) {
   AVAR a = 0.0;
   AVAR f = fabs(a);
   EXPECT_FLOAT_EQ(0.0, f.val());
@@ -916,7 +916,7 @@ TEST(agrad_agrad,fabs_var_3) {
 }
 
 
-TEST(agrad_agrad,abs_var) {
+TEST(AgradAgrad,abs_var) {
   AVAR a = 0.68;
   AVAR f = abs(a);
   EXPECT_FLOAT_EQ(0.68, f.val());
@@ -927,7 +927,7 @@ TEST(agrad_agrad,abs_var) {
   EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 
-TEST(agrad_agrad,abs_var_2) {
+TEST(AgradAgrad,abs_var_2) {
   AVAR a = -0.68;
   AVAR f = abs(a);
   EXPECT_FLOAT_EQ(0.68, f.val());
@@ -938,7 +938,7 @@ TEST(agrad_agrad,abs_var_2) {
   EXPECT_FLOAT_EQ(-1.0, g[0]);
 }
 
-TEST(agrad_agrad,abs_var_3) {
+TEST(AgradAgrad,abs_var_3) {
   AVAR a = 0.0;
   AVAR f = abs(a);
   EXPECT_FLOAT_EQ(0.0, f.val());
@@ -949,7 +949,7 @@ TEST(agrad_agrad,abs_var_3) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 
-TEST(agrad_agrad,floor_var) {
+TEST(AgradAgrad,floor_var) {
   AVAR a = 1.2;
   AVAR f = floor(a);
   EXPECT_FLOAT_EQ(1.0, f.val());
@@ -960,7 +960,7 @@ TEST(agrad_agrad,floor_var) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 
-TEST(agrad_agrad,ceil_var) {
+TEST(AgradAgrad,ceil_var) {
   AVAR a = 1.9;
   AVAR f = ceil(a);
   EXPECT_FLOAT_EQ(2.0, f.val());
@@ -971,7 +971,7 @@ TEST(agrad_agrad,ceil_var) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 
-TEST(agrad_agrad,fmod_var_var) {
+TEST(AgradAgrad,fmod_var_var) {
   AVAR a = 2.7;
   AVAR b = 1.3;
   AVAR f = fmod(a,b);
@@ -984,7 +984,7 @@ TEST(agrad_agrad,fmod_var_var) {
   EXPECT_FLOAT_EQ(-2.0,g[1]); // (int)(2.7/1.3) = 2
 }
 
-TEST(agrad_agrad,fmod_var_double) {
+TEST(AgradAgrad,fmod_var_double) {
   AVAR a = 2.7;
   double b = 1.3;
   AVAR f = fmod(a,b);
@@ -996,7 +996,7 @@ TEST(agrad_agrad,fmod_var_double) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(agrad_agrad,fmod_double_var) {
+TEST(AgradAgrad,fmod_double_var) {
   double a = 2.7;
   AVAR b = 1.3;
   AVAR f = fmod(a,b);
@@ -1008,7 +1008,7 @@ TEST(agrad_agrad,fmod_double_var) {
   EXPECT_FLOAT_EQ(-2.0,g[0]); // (int)(2.7/1.3) = 2
 }
 
-TEST(agrad_agrad,jacobian) {
+TEST(AgradAgrad,jacobian) {
   AVAR x1 = 2.0;
   AVAR x2 = 3.0;
   
@@ -1031,3 +1031,4 @@ TEST(agrad_agrad,jacobian) {
   EXPECT_FLOAT_EQ(17.0,J[2][0]); // dy2/dx1
   EXPECT_FLOAT_EQ(0.0,J[2][1]); // dy2/dx2
 }
+
