@@ -80,8 +80,6 @@ TO DO
   - Andrew and Jennifer terminology
      + modeled vs. unmodeled
 
-* disallow sampling statements in derived blocks
-
 * remove standalone optimization algorithms
 
 * exceptions handled by samplers
@@ -90,8 +88,6 @@ TO DO
 * merging and monitoring several threads/processes
 
 * plug in propto calls in generator
-
-* remove cout dependencies in parser; collect error messages locally
 
 
 EXTENSIONS

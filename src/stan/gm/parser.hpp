@@ -27,6 +27,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 // ADAPT must be in global namespace 
 
@@ -164,14 +165,31 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
-    struct validate_int_expr {
-      template <typename T>
+    struct validate_allow_sample {
+      template <typename T1, typename T2>
       struct result { typedef bool type; };
 
-      bool operator()(const expression& expr) const {
+      bool operator()(const bool& allow_sample,
+		      std::stringstream& error_msgs) const {
+	if (!allow_sample) {
+	  error_msgs << "ERROR:  sampling only allowed in model."
+		     << std::endl;
+	  return false;
+	}
+	return true;
+      }
+    };
+    boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
+
+    struct validate_int_expr {
+      template <typename T1, typename T2>
+      struct result { typedef bool type; };
+
+      bool operator()(const expression& expr,
+		      std::stringstream& error_msgs) const {
 	if (!expr.expression_type().is_primitive_int()) {
-	  std::cerr << "expression denoting integer required; found type=" 
-		    << expr.expression_type() << std::endl;
+	  error_msgs << "expression denoting integer required; found type=" 
+		     << expr.expression_type() << std::endl;
 	  return false;
 	}
 	return true;
@@ -180,14 +198,15 @@ namespace stan {
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     struct validate_double_expr {
-      template <typename T>
+      template <typename T1, typename T2>
       struct result { typedef bool type; };
 
-      bool operator()(const expression& expr) const {
+      bool operator()(const expression& expr,
+		      std::stringstream& error_msgs) const {
 	if (!expr.expression_type().is_primitive_double()
 	    && !expr.expression_type().is_primitive_int()) {
-	  std::cerr << "expression denoting double required; found type=" 
-		    << expr.expression_type() << std::endl;
+	  error_msgs << "expression denoting double required; found type=" 
+		     << expr.expression_type() << std::endl;
 	  return false;
 	}
 	return true;
@@ -404,6 +423,7 @@ namespace stan {
 	using qi::int_;
 	using boost::spirit::qi::eps;
 	using namespace qi::labels;
+	using boost::phoenix::ref;
 
 	var_name_to_decl_["lp__"] 
 	  = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
@@ -466,15 +486,15 @@ namespace stan {
 	// duplication because top-level is variant, not specific
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	  %= (int_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | double_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | vector_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | row_vector_decl_r    [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | matrix_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | simplex_decl_r       [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | pos_ordered_decl_r   [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | corr_matrix_decl_r   [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | cov_matrix_decl_r    [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
 	      )
 	  > qi::eps[_pass = _a] // hack to get error message out
 	  ;
@@ -499,7 +519,7 @@ namespace stan {
 	vector_decl_r 
 	  %= qi::lit("vector")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -509,7 +529,7 @@ namespace stan {
 	row_vector_decl_r 
 	  %= qi::lit("row_vector")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -519,9 +539,9 @@ namespace stan {
 	matrix_decl_r 
 	  %= qi::lit("matrix")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(',')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -531,7 +551,7 @@ namespace stan {
 	simplex_decl_r 
 	  %= qi::lit("simplex")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -541,7 +561,7 @@ namespace stan {
 	pos_ordered_decl_r 
 	  %= qi::lit("pos_ordered")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -551,7 +571,7 @@ namespace stan {
 	cov_matrix_decl_r 
 	  %= qi::lit("cov_matrix")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -561,7 +581,7 @@ namespace stan {
 	corr_matrix_decl_r 
 	  %= qi::lit("corr_matrix")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1)]
+	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -602,7 +622,7 @@ namespace stan {
 	  %= int_literal_r      [_val = _1]
 	  | double_literal_r    [_val = _1]
 	  | fun_r               [_val = set_fun_type_f(_1)]
-	  | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_name_to_decl_))]
+	  | variable_r          [_val = set_var_type_f(_1,ref(var_name_to_decl_))]
 	  | ( qi::lit('(') 
 	      > expression_r    [_val = _1] 
 	      > qi::lit(')') )
@@ -637,16 +657,16 @@ namespace stan {
 	dims_r.name("array dimensions");
 	dims_r 
 	  %= qi::lit('[') 
-	  > (expression_r [_pass = validate_int_expr_f(_1)]
+	  > (expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	     % ',')
 	  > qi::lit(']')
 	  ;
 	
 	range_r.name("range expression pair, colon");
 	range_r 
-	  %= expression_r [_pass = validate_int_expr_f(_1)]
+	  %= expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
 	  >> qi::lit(':') 
-	  >> expression_r [_pass = validate_int_expr_f(_1)];
+	  >> expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))];
 
 	truncation_range_r.name("range pair");
 	truncation_range_r
@@ -660,17 +680,17 @@ namespace stan {
 	range_brackets_int_r.name("range expression pair, brackets");
 	range_brackets_int_r 
 	  %= qi::lit('(') 
-	  > -(expression_r [_pass = validate_int_expr_f(_1)])
+	  > -(expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))])
 	  > qi::lit(',')
-	  > -(expression_r [_pass = validate_int_expr_f(_1)])
+	  > -(expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))])
 	  > qi::lit(')');
 
 	range_brackets_double_r.name("range expression pair, brackets");
 	range_brackets_double_r 
 	  %= qi::lit('(') 
-	  > -(expression_r [_pass = validate_double_expr_f(_1)])
+	  > -(expression_r [_pass = validate_double_expr_f(_1,ref(error_msgs_))])
 	  > qi::lit(',')
-	  > -(expression_r [_pass = validate_double_expr_f(_1)])
+	  > -(expression_r [_pass = validate_double_expr_f(_1,ref(error_msgs_))])
 	  > qi::lit(')');
 
 	args_r.name("function argument expressions");
@@ -696,7 +716,7 @@ namespace stan {
 	sample_r 
 	  %= expression_r
 	  >> qi::lit('~')
-	  > qi::eps[_pass = _r1] // FIXME: better warning
+	  > qi::eps[_pass = validate_allow_sample_f(_r1,ref(error_msgs_))] 
 	  > distribution_r
 	  > -truncation_range_r
 	  > qi::lit(';');
@@ -721,8 +741,8 @@ namespace stan {
 	  %= statement_seq_r(_r1)
 	  | for_statement_r(_r1)
 	  | assignment_r [_pass 
-			  = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_),
-						  boost::phoenix::ref(error_msgs_))]
+			  = validate_assignment_f(_1,ref(var_name_to_decl_),
+						  ref(error_msgs_))]
 	  | sample_r(_r1) [_pass = validate_sample_f(_1)]
 	  | no_op_statement_r
 	  ;
@@ -737,13 +757,13 @@ namespace stan {
 	  > qi::lit('(')
 	  > identifier_r [_pass 
 			  = add_loop_identifier_f(_1,_a,
-						  boost::phoenix::ref(var_name_to_decl_),
-						  boost::phoenix::ref(error_msgs_))]
+						  ref(var_name_to_decl_),
+						  ref(error_msgs_))]
 	  > qi::lit("in")
 	  > range_r
 	  > qi::lit(')')
 	  > statement_r(_r1)
-	  > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
+	  > qi::eps [remove_loop_identifier_f(_a,ref(var_name_to_decl_))];
 	  ;
 
 	statement_seq_r.name("sequence of statements");
@@ -752,18 +772,20 @@ namespace stan {
 	  >> *statement_r(_r1)
 	  > qi::lit('}');
 
+	// hack cast to write to error_msgs_ of type stringstream
 	qi::on_error<qi::rethrow>(var_decl_r,
-				  std::cerr 
+				  (std::ostream&)error_msgs_
 				  << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
 				  << std::endl);
 
 	qi::on_error<qi::rethrow>(indexed_factor_r,
-				  std::cerr 
+				  (std::ostream&)error_msgs_
 				  << boost::phoenix::val("ERROR: Ill-formed factor.")
 				  << std::endl);
 
 	qi::on_error<qi::rethrow>(program_r,
-				  std::cerr << boost::phoenix::val("ERROR: Expected ")
+				  (std::ostream&)error_msgs_
+				  << boost::phoenix::val("ERROR: Expected ")
 				  << _4 
 				  << std::endl);
       }
@@ -852,6 +874,7 @@ namespace stan {
 				   whitespace_grammar,
 				   result);
       } catch (const qi::expectation_failure<pos_iterator_type>& e) {
+	// FIXME: generalize beyond expectation failures
 	const classic::file_position_base<std::string>& pos = e.first.get_position();
 	std::stringstream msg;
 	msg << "parse error at file " 
@@ -866,7 +889,10 @@ namespace stan {
 	for (int i = 2; i < pos.column; ++i)
 	  msg << ' ';
 	msg << " ^-- here";
-	throw std::runtime_error(msg.str());
+	msg << std::endl;
+	msg << program_grammar.error_msgs_;
+	msg << std::endl;
+	throw std::invalid_argument(msg.str());
       }
       return success && (position_begin == position_end); // want to consume ALL input
     }

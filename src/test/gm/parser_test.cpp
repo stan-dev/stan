@@ -3,6 +3,7 @@
 #include <fstream>
 #include <istream>
 #include <exception>
+#include <stdexcept>
 
 #include "stan/gm/ast.hpp"
 #include "stan/gm/parser.hpp"
@@ -78,19 +79,19 @@ TEST(gm_parser,good_trunc) {
 
 TEST(gm_parser,parsable_test_bad1) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad1.stan"),
-	       std::runtime_error);
+	       std::invalid_argument);
 }
 TEST(gm_parser,parsable_test_bad2) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad2.stan"),
-	       std::runtime_error);
+	       std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad3) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad3.stan"),
-	       std::runtime_error);
+	       std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad4) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad4.stan"),
-	       std::runtime_error);
+	       std::invalid_argument);
 }
