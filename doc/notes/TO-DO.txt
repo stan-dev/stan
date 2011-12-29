@@ -91,6 +91,8 @@ TO DO
 
 * plug in propto calls in generator
 
+* remove cout dependencies in parser; collect error messages locally
+
 
 EXTENSIONS
 =================================================

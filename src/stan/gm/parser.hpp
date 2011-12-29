@@ -206,16 +206,17 @@ namespace stan {
     boost::phoenix::function<validate_expr_type> validate_expr_type_f;
 
     struct validate_assignment {
-      template <typename T1, typename T2>
+      template <typename T1, typename T2, typename T3>
       struct result { typedef bool type; };
 
       bool operator()(assignment& a,
-		      std::map<std::string,base_var_decl>& name_to_type) const {
+		      std::map<std::string,base_var_decl>& name_to_type,
+		      std::stringstream& error_msgs) const {
 
 	if (name_to_type.find(a.var_dims_.name_) == name_to_type.end()) {
-	  std::cerr << "unknown variable in assignment"
-		    << "; lhs variable=" << a.var_dims_.name_ 
-		    << std::endl;
+	  error_msgs << "unknown variable in assignment"
+		     << "; lhs variable=" << a.var_dims_.name_ 
+		     << std::endl;
 	  return false;
 	}
 	a.var_type_ = name_to_type[a.var_dims_.name_];
@@ -228,12 +229,12 @@ namespace stan {
 
 	if (lhs_type.is_ill_formed()
 	    || lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-	  std::cerr << "too many indices on left-hand-side of assignment"
-		    << "; lhs variable=" << a.var_dims_.name_ 
-		    << "; base type=" << a.var_type_.base_type_
-		    << "; num dims=" << lhs_var_num_dims
-		    << "; num indices=" << num_index_dims
-		    << std::endl;
+	  error_msgs << "too many indices on left-hand-side of assignment"
+		     << "; lhs variable=" << a.var_dims_.name_ 
+		     << "; base type=" << a.var_type_.base_type_
+		     << "; num dims=" << lhs_var_num_dims
+		     << "; num indices=" << num_index_dims
+		     << std::endl;
 	  return false;
 	}
 
@@ -243,11 +244,11 @@ namespace stan {
 	  = lhs_base_type == rhs_base_type
 	  || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T ); // int -> double promotion
 	if (!types_compatible) {
-	  std::cerr << "base type mismatch in assignment"
-		    << "; lhs variable=" << a.var_dims_.name_
-		    << "; lhs base type=" << lhs_base_type
-		    << "; rhs base type=" << rhs_base_type
-		    << std::endl;
+	  error_msgs << "base type mismatch in assignment"
+		     << "; lhs variable=" << a.var_dims_.name_
+		     << "; lhs base type=" << lhs_base_type
+		     << "; rhs base type=" << rhs_base_type
+		     << std::endl;
 	  return false;
 	}
 	return true;
@@ -334,14 +335,18 @@ namespace stan {
     boost::phoenix::function<add_var> add_var_f;
 
     struct add_loop_identifier {
-      template <typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
       bool operator()(const std::string& name, 
 		      std::string& name_local,
-		      std::map<std::string,base_var_decl>& name_to_type) const {
+		      std::map<std::string,base_var_decl>& name_to_type,
+		      std::stringstream& error_msgs) const {
 	name_local = name;
-	if (name_to_type.find(name) != name_to_type.end())
+	if (name_to_type.find(name) != name_to_type.end()) {
+	  error_msgs << "ERROR: loop variable already declared."
+		     << " variable name=\"" << name << "\"" << std::endl;
 	  return false; // variable exists
+	}
 	name_to_type[name] = base_var_decl(name,std::vector<expression>(),INT_T);
 	return true;
       }
@@ -389,6 +394,7 @@ namespace stan {
 					 program(), 
 					 whitespace_grammar<Iterator> > {
       std::map<std::string,base_var_decl> var_name_to_decl_;
+      std::stringstream error_msgs_;
       program_grammar() 
 	: program_grammar::base_type(program_r) {
 	using qi::_val;
@@ -414,7 +420,7 @@ namespace stan {
 	model_r.name("model declaration");
 	model_r 
 	  = qi::lit("model")
-	  > statement_r;
+	  > statement_r(true);
 
 	data_var_decls_r.name("data variable declarations");
 	data_var_decls_r
@@ -429,7 +435,7 @@ namespace stan {
 	  >> qi::lit("data")
 	  > qi::lit('{')
 	  > *var_decl_r
-	  > *statement_r
+	  > *statement_r(false)
 	  > qi::lit('}');
 
 	param_var_decls_r.name("parameter variable declarations");
@@ -445,7 +451,7 @@ namespace stan {
 	  >> qi::lit("parameters")
 	  > qi::lit('{')
 	  > *var_decl_r
-	  > *statement_r
+	  > *statement_r(false)
 	  > qi::lit('}');
 
 	generated_var_decls_r.name("generated variable declarations");
@@ -454,7 +460,7 @@ namespace stan {
 	  > qi::lit("quantities")
 	  > qi::lit('{')
 	  > *var_decl_r
-	  > *statement_r
+	  > *statement_r(false)
 	  > qi::lit('}');
 
 	// duplication because top-level is variant, not specific
@@ -685,10 +691,12 @@ namespace stan {
 	  >> -(expression_r % ',')
 	  > qi::lit(')');
 
+	// inherited  _r1 = true if samples allowed as statements
 	sample_r.name("distribution of expression");
 	sample_r 
 	  %= expression_r
 	  >> qi::lit('~')
+	  > qi::eps[_pass = _r1] // FIXME: better warning
 	  > distribution_r
 	  > -truncation_range_r
 	  > qi::lit(';');
@@ -706,13 +714,16 @@ namespace stan {
 	  > qi::lit(';') 
 	  ;
 
+	// inherited attribute _r1 is type bool
+	// set to true if sample_r are allowed
 	statement_r.name("statement");
 	statement_r
-	  %= statement_seq_r
-	  | for_statement_r
+	  %= statement_seq_r(_r1)
+	  | for_statement_r(_r1)
 	  | assignment_r [_pass 
-			  = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | sample_r [_pass = validate_sample_f(_1)]
+			  = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_),
+						  boost::phoenix::ref(error_msgs_))]
+	  | sample_r(_r1) [_pass = validate_sample_f(_1)]
 	  | no_op_statement_r
 	  ;
 
@@ -724,18 +735,21 @@ namespace stan {
 	for_statement_r
 	  %= qi::lit("for")
 	  > qi::lit('(')
-	  > identifier_r [_pass = add_loop_identifier_f(_1,_a,boost::phoenix::ref(var_name_to_decl_))]
+	  > identifier_r [_pass 
+			  = add_loop_identifier_f(_1,_a,
+						  boost::phoenix::ref(var_name_to_decl_),
+						  boost::phoenix::ref(error_msgs_))]
 	  > qi::lit("in")
 	  > range_r
 	  > qi::lit(')')
-	  > statement_r
+	  > statement_r(_r1)
 	  > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
 	  ;
 
 	statement_seq_r.name("sequence of statements");
 	statement_seq_r
 	  = qi::lit('{')
-	  >> *statement_r
+	  >> *statement_r(_r1)
 	  > qi::lit('}');
 
 	qi::on_error<qi::rethrow>(var_decl_r,
@@ -790,11 +804,11 @@ namespace stan {
 	       whitespace_grammar<Iterator> > generated_var_decls_r;
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;
       qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> > distribution_r;
-      qi::rule<Iterator, sample(), whitespace_grammar<Iterator> > sample_r;
+      qi::rule<Iterator, sample(bool), whitespace_grammar<Iterator> > sample_r;
       qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > assignment_r;
-      qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > statement_r;
-      qi::rule<Iterator, statements(), whitespace_grammar<Iterator> > statement_seq_r;
-      qi::rule<Iterator, qi::locals<std::string>, for_statement(), 
+      qi::rule<Iterator, statement(bool), whitespace_grammar<Iterator> > statement_r;
+      qi::rule<Iterator, statements(bool), whitespace_grammar<Iterator> > statement_seq_r;
+      qi::rule<Iterator, qi::locals<std::string>, for_statement(bool), 
                whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
       qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > no_op_statement_r;
