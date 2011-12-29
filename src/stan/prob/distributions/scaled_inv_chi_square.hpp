@@ -1,10 +1,10 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_SCALED_INV_CHI_SQUARE_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_SCALED_INV_CHI_SQUARE_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__SCALED_INV_CHI_SQUARE_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__SCALED_INV_CHI_SQUARE_HPP__
 
 #include "stan/prob/distributions_error_handling.hpp"
 #include "stan/prob/distributions_constants.hpp"
+#include "stan/prob/traits.hpp"
 
-#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -48,23 +48,15 @@ namespace stan {
       if (!check_positive (function, y, "Random variate y", &lp, Policy()))
 	return lp;
       
-      if (!propto
-	  || !is_constant<T_dof>::value) {
+      if (include_summand<propto,T_dof>::value) {
 	T_dof half_nu = 0.5 * nu;
-	lp += (half_nu) * log(half_nu) - lgamma(half_nu);
+	lp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
       }
-      if (!propto
-	  || !is_constant<T_dof>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_dof,T_scale>::value)
 	lp += nu * log(s);
-      if (!propto
-	  || !is_constant<T_dof>::value
-	  || !is_constant<T_y>::value)
-	lp -= (nu * 0.5 + 1.0) * log(y);
-      if (!propto
-	  || !is_constant<T_dof>::value
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_dof,T_y>::value)
+	lp -= multiply_log(nu*0.5+1.0, y);
+      if (include_summand<propto,T_dof,T_y,T_scale>::value)
 	lp -= nu * 0.5 * square(s) / y;
       return lp;
     }
