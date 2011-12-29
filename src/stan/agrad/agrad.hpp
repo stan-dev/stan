@@ -9,7 +9,6 @@
 #include <limits>
 #include "stan/memory/stack_alloc.hpp"
 #include "stan/meta/conversions.hpp"
-#include "stan/maths/special_functions.hpp"
 
 namespace stan {
 
@@ -495,7 +494,7 @@ namespace stan {
 	  op_vv_vari(std::pow(avi->val_,bvi->val_),avi,bvi) {
 	}
 	void chain() {
-	  if (avi_->val_ == 0.0) return; // partials zero, avoids /0 & log(0)
+	  if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
 	  avi_->adj_ += adj_ * bvi_->val_ * val_ / avi_->val_;
 	  bvi_->adj_ += adj_ * std::log(avi_->val_) * val_;
 	}
@@ -507,7 +506,7 @@ namespace stan {
 	  op_vd_vari(std::pow(avi->val_,b),avi,b) {
 	}
 	void chain() {
-	  if (avi_->val_ == 0.0) return; // partials zero, avoids /0 & log(0)
+	  if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
 	  avi_->adj_ += adj_ * bd_ * val_ / avi_->val_;
 	}
       };
@@ -518,7 +517,7 @@ namespace stan {
 	  op_dv_vari(std::pow(a,bvi->val_),a,bvi) {
 	}
 	void chain() {
-	  if (ad_ == 0.0) return; // partials zero, avoids /0 & log(0)
+	  if (ad_ == 0.0) return; // partials zero, avoids 0 & log(0)
 	  bvi_->adj_ += adj_ * std::log(ad_) * val_;
 	}
       };
@@ -695,41 +694,6 @@ namespace stan {
 	}
       };
 
-
-      class multiply_log_vv_vari : public op_vv_vari {
-      public:
-	multiply_log_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(stan::maths::multiply_log(avi->val_,bvi->val_),avi,bvi) {
-	}
-	void chain() {
-	  avi_->adj_ += log(bvi_->val_);
-	  if (bvi_->val_==0 && avi_->val_==0)
-	    bvi_->adj_ += std::numeric_limits<double>::infinity();
-	  else
-	    bvi_->adj_ += avi_->val_ / bvi_->val_;
-	}
-      };
-      class multiply_log_vd_vari : public op_vd_vari {
-      public:
-	multiply_log_vd_vari(vari* avi, double b) :
-	  op_vd_vari(stan::maths::multiply_log(avi->val_,b),avi,b) {
-	}
-	void chain() {
-	  avi_->adj_ += log(bd_);
-	}
-      };
-      class multiply_log_dv_vari : public op_dv_vari {
-      public:
-	multiply_log_dv_vari(double a, vari* bvi) :
-	  op_dv_vari(stan::maths::multiply_log(a,bvi->val_),a,bvi) {
-	}
-	void chain() {
-	  if (bvi_->val_==0 && ad_==0)
-	    bvi_->adj_ += std::numeric_limits<double>::infinity();
-	  else
-	    bvi_->adj_ += ad_ / bvi_->val_;
-	}
-      };
 
     }
 
@@ -975,7 +939,8 @@ namespace stan {
        * @return The result of adding the specified variable to this variable.
        */
       inline var& operator+=(const double b) {
-	// FIXME: optimize for b == 0
+	if (b == 0.0)
+	  return *this;
 	vi_ = new add_vd_vari(vi_,b);
 	return *this;
       }
@@ -1008,7 +973,8 @@ namespace stan {
        * variable.
        */
       inline var& operator-=(const double b) {
-	// FIXME: optimize for b == 0
+	if (b == 0.0)
+	  return *this;
 	vi_ = new subtract_vd_vari(vi_,b);
 	return *this;
       }
@@ -1041,7 +1007,8 @@ namespace stan {
        * variable.
        */
       inline var& operator*=(const double b) {
-	// FIXME: optimize for b == 1
+	if (b == 1.0)
+	  return *this;
 	vi_ = new multiply_vd_vari(vi_,b);
 	return *this;
       }
@@ -1073,7 +1040,8 @@ namespace stan {
        * variable.
        */
       inline var& operator/=(const double b) {
-	// FIXME: optimize for b == 1
+	if (b == 1.0)
+	  return *this;
 	vi_ = new divide_vd_vari(vi_,b);
 	return *this;
       }
@@ -1423,9 +1391,8 @@ namespace stan {
      * @return Result of adding variable and scalar.
      */
     inline var operator+(const var& a, const double b) {
-      // FIXME: optimize for b == 1
-      // if (b == 0.0)
-      // return a;
+      if (b == 0.0)
+	return a;
       return var(new add_vd_vari(a.vi_,b));
     }
 
@@ -1441,6 +1408,8 @@ namespace stan {
      * @return Result of adding variable and scalar.
      */
     inline var operator+(const double a, const var& b) {
+      if (a == 0.0)
+	return b;
       return var(new add_vd_vari(b.vi_,a)); // by symmetry
     }
 
@@ -1474,9 +1443,8 @@ namespace stan {
      * @return Result of subtracting the scalar from the variable.
      */
     inline var operator-(const var& a, const double b) {
-      // FIXME: optimize for b == 0
-      // if (b == 0.0)
-      // return a;
+      if (b == 0.0)
+	return a;
       return var(new subtract_vd_vari(a.vi_,b));
     }
 
@@ -1509,9 +1477,6 @@ namespace stan {
      * @return Variable result of multiplying operands.
      */
     inline var operator*(const var& a, const var& b) {
-      // FIXME: test b == 1.0
-      // if (b == 1.0)
-      // return a;
       return var(new multiply_vv_vari(a.vi_,b.vi_));
     }
 
@@ -1527,6 +1492,8 @@ namespace stan {
      * @return Variable result of multiplying operands.
      */
     inline var operator*(const var& a, const double b) {
+      if (b == 1.0)
+	return a;
       return var(new multiply_vd_vari(a.vi_,b));
     }
 
@@ -1542,6 +1509,8 @@ namespace stan {
      * @return Variable result of multiplying the operands.
      */
     inline var operator*(const double a, const var& b) {
+      if (a == 1.0)
+	return b;
       return var(new multiply_vd_vari(b.vi_,a)); // by symmetry
     }
 
@@ -1575,7 +1544,8 @@ namespace stan {
      * @return Variable result of dividing the variable by the scalar.
      */
     inline var operator/(const var& a, const double b) {
-      // FIXME: b == 1 case
+      if (b == 1.0)
+	return a;
       return var(new divide_vd_vari(a.vi_,b));
     }
 
@@ -1751,15 +1721,12 @@ namespace stan {
      * @return Base raised to the exponent.
      */
     inline var pow(const var& base, const double exponent) {
-      // FIXME: b == 1 case
-      // if (exponent == 0.0)
-      // return var(1.0);
-      // if (exponent == 0.5)
-      // return sqrt(base);
-      // if (exponent == 1.0)
-      // return base;
-      // if (exponent == 2.0)
-      // return base * base;
+      if (exponent == 0.5)
+	return sqrt(base);
+      if (exponent == 1.0)
+	return base;
+      if (exponent == 2.0)
+	return base * base; // FIXME: square() functionality from special_functions
       return var(new pow_vd_vari(base.vi_,exponent));
     }
 
@@ -2118,50 +2085,6 @@ namespace stan {
       return var(new vari(0.0));
     }
 
-
-    // OTHER FUNCTIONS: stan/maths/special_functions.hpp implementations
-    /**
-     * Return the value of a*log(b).
-     *
-     * When both a and b are 0, the value returned is 0.
-     * The partial deriviative with respect to a is log(b). 
-     * The partial deriviative with respect to b is a/b. When
-     * a and b are both 0, this is set to Inf.
-     *
-     * @param a First variable.
-     * @param b Second variable.
-     * @return Value of a*log(b)
-     */
-    inline var multiply_log(const var& a, const var& b) {
-      return var(new multiply_log_vv_vari(a.vi_,b.vi_));
-    }
-    /**
-     * Return the value of a*log(b).
-     *
-     * When both a and b are 0, the value returned is 0.
-     * The partial deriviative with respect to a is log(b). 
-     *
-     * @param a First variable.
-     * @param b Second scalar.
-     * @return Value of a*log(b)
-     */
-    inline var multiply_log(const var& a, const double b) {
-      return var(new multiply_log_vd_vari(a.vi_,b));
-    }
-    /**
-     * Return the value of a*log(b).
-     *
-     * When both a and b are 0, the value returned is 0.
-     * The partial deriviative with respect to b is a/b. When
-     * a and b are both 0, this is set to Inf.
-     *
-     * @param a First scalar.
-     * @param b Second variable.
-     * @return Value of a*log(b)
-     */
-    inline var multiply_log(const double a, const var& b) {
-      return var(new multiply_log_dv_vari(a,b.vi_));
-    }
 
     /**
      * Recover memory used for all variables for reuse.

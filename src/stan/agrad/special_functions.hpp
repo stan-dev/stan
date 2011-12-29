@@ -156,7 +156,7 @@ namespace stan {
         fma_ddv_vari(double a, double b, vari* cvi) :
           op_v_vari(a * b + cvi->val_, 
                     cvi) {
-          }
+	}
         void chain() {
           // avi_ is cvi from constructor
           avi_->adj_ += adj_;
@@ -318,9 +318,6 @@ namespace stan {
         }
       };
 
-      /**
-       * Helper class for calculating the unit normal cumulative density function.
-       */
       class Phi_vari : public op_v_vari {
       public:
         Phi_vari(vari* avi) :
@@ -333,114 +330,76 @@ namespace stan {
           avi_->adj_ += adj_ * INV_SQRT_TWO_PI * std::exp(NEG_HALF * avi_->val_ * avi_->val_);
         }
       };
-      
-      /**
-       * Helper class for calculating the log sum of exponentials.
-       */
-      class log_sum_exp_ {
-      public:
-        /**
-         * Calculates the log sum of exponetials while avoiding underflow.
-         * See: http://lingpipe-blog.com/2009/06/25/log-sum-of-exponentials/
-         *
-         * log (exp(a) + exp(b))
-         * 
-         * @param a the first variable
-         * @param b the second variable
-         */
-        static double calculate_log_sum_exp (const double& a, const double& b) {
-          // calculates the log sum of exponentials while avoiding underflow
-          // 
-          double max = a > b ? a : b;
-          return max + std::log(std::exp(a-max) + std::exp(b-max));
-        }
-        
-        /**
-         * Calculates the log sum of exponetials while avoiding underflow.
-         * See: http://lingpipe-blog.com/2009/06/25/log-sum-of-exponentials/
-         *
-         * log (sum_i (x_i) )
-         * 
-         * @param x the vector of vars
-         */
-        static double calculate_log_sum_exp (const std::vector<var>& x) {
-          double max = 0.0;
-          for (unsigned int ii = 0; ii < x.size(); ii++) 
-            if (x[ii] > max) 
-              max = x[ii].val();
+
+      inline double calculate_chain(const double& x, const double& val) {
+	return std::exp(x - val);
+      }
+
+      double log_sum_exp_as_double(const std::vector<var>& x) {
+	using std::numeric_limits;
+	using std::exp;
+	using std::log;
+	double max = -numeric_limits<double>::infinity();
+	for (unsigned int i = 0; i < x.size(); ++i) 
+	  if (x[i] > max) 
+	    max = x[i].val();
             
-          double sum = 0.0;
-          for (unsigned int ii = 0; ii < x.size(); ii++) 
-            if (x[ii] != -std::numeric_limits<double>::infinity()) 
-              sum += std::exp (x[ii].val() - max);
+	double sum = 0.0;
+	for (unsigned int i = 0; i < x.size(); ++i) 
+	  if (x[i] != -numeric_limits<double>::infinity()) 
+	    sum += exp(x[i].val() - max);
           
-          return max + std::log(sum);
-        }
-        /**
-         * Calculates the partial derivative of the log sum of exponentials
-         * while avoiding underflow.
-         *
-         * [ log (exp(a) + exp(b)) ] d/da
-         *    = exp (log(exp(a)) - log ((exp(a) + exp(b))))
-         *    = exp (a - val_)
-         * where val_ is the value of this variable.
-         *
-         * @param x the variable
-         * @param val_ the value of the log sum of exponentials
-         */
-        inline static double calculate_chain (const double& x, const double& val_) {
-          return std::exp(x - val_);
-        }
-      };
+	return max + log(sum);
+      }
       
-      class log_sum_exp_vv_vari : public op_vv_vari, log_sum_exp_ {
+      class log_sum_exp_vv_vari : public op_vv_vari {
       public:
-        log_sum_exp_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(calculate_log_sum_exp(avi->val_, bvi->val_),
-                     avi, bvi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
-          bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
-        }
+	log_sum_exp_vv_vari(vari* avi, vari* bvi) :
+	  op_vv_vari(stan::maths::log_sum_exp(avi->val_, bvi->val_),
+		     avi, bvi) {
+	}
+	void chain() {
+	  avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
+	  bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
+	}
       };
-      class log_sum_exp_vd_vari : public op_vd_vari, log_sum_exp_ {
+      class log_sum_exp_vd_vari : public op_vd_vari {
       public:
-        log_sum_exp_vd_vari(vari* avi, double b) :
-          op_vd_vari(calculate_log_sum_exp(avi->val_, b),
-                     avi, b) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
-        }
+	log_sum_exp_vd_vari(vari* avi, double b) :
+	  op_vd_vari(stan::maths::log_sum_exp(avi->val_, b),
+		     avi, b) {
+	}
+	void chain() {
+	  avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
+	}
       };
-      class log_sum_exp_dv_vari : public op_dv_vari, log_sum_exp_ {
+      class log_sum_exp_dv_vari : public op_dv_vari {
       public:
-        log_sum_exp_dv_vari(double a, vari* bvi) :
-          op_dv_vari(calculate_log_sum_exp(a, bvi->val_),
-                     a, bvi) {
-        }
-        void chain() {
-          bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
-        }
+	log_sum_exp_dv_vari(double a, vari* bvi) :
+	  op_dv_vari(stan::maths::log_sum_exp(a, bvi->val_),
+		     a, bvi) {
+	}
+	void chain() {
+	  bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
+	}
       };
       std::vector<vari*> to_vari (const std::vector<var>& x) {
-        std::vector<vari*> v(x.size());
-        for (unsigned int ii = 0; ii < x.size(); ii++) {
-          v[ii] = x[ii].vi_;
-        }
-        return v;
+	std::vector<vari*> v(x.size());
+	for (unsigned int i = 0; i < x.size(); ++i) {
+	  v[i] = x[i].vi_;
+	}
+	return v;
       }
-      class log_sum_exp_vector_vari : public op_vector_vari, log_sum_exp_ {
+      class log_sum_exp_vector_vari : public op_vector_vari {
       public:
-        log_sum_exp_vector_vari(std::vector<var> x) :
-          op_vector_vari(calculate_log_sum_exp(x), to_vari(x)) {
-        }
-        void chain() {
-          for (unsigned int ii = 0; ii < vi_.size(); ii++) {
-            vi_[ii]->adj_ += adj_ * calculate_chain(vi_[ii]->val_, val_);
-          }
-        }
+	log_sum_exp_vector_vari(std::vector<var> x) :
+	  op_vector_vari(log_sum_exp_as_double(x), to_vari(x)) {
+	}
+	void chain() {
+	  for (unsigned int i = 0; i < vi_.size(); ++i) {
+	    vi_[i]->adj_ += adj_ * calculate_chain(vi_[i]->val_, val_);
+	  }
+	}
       };
 
       class square_vari : public op_v_vari {
@@ -450,6 +409,43 @@ namespace stan {
 	}
 	void chain() {
 	  avi_->adj_ += adj_ * 2.0 * avi_->val_;
+	}
+      };
+
+      class multiply_log_vv_vari : public op_vv_vari {
+      public:
+	multiply_log_vv_vari(vari* avi, vari* bvi) :
+	  op_vv_vari(stan::maths::multiply_log(avi->val_,bvi->val_),avi,bvi) {
+	}
+	void chain() {
+	  using std::log;
+	  avi_->adj_ += log(bvi_->val_);
+	  if (bvi_->val_==0 && avi_->val_==0)
+	    bvi_->adj_ += std::numeric_limits<double>::infinity();
+	  else
+	    bvi_->adj_ += avi_->val_ / bvi_->val_;
+	}
+      };
+      class multiply_log_vd_vari : public op_vd_vari {
+      public:
+	multiply_log_vd_vari(vari* avi, double b) :
+	  op_vd_vari(stan::maths::multiply_log(avi->val_,b),avi,b) {
+	}
+	void chain() {
+	  using std::log;
+	  avi_->adj_ += log(bd_);
+	}
+      };
+      class multiply_log_dv_vari : public op_dv_vari {
+      public:
+	multiply_log_dv_vari(double a, vari* bvi) :
+	  op_dv_vari(stan::maths::multiply_log(a,bvi->val_),a,bvi) {
+	}
+	void chain() {
+	  if (bvi_->val_==0 && ad_==0)
+	    bvi_->adj_ += std::numeric_limits<double>::infinity();
+	  else
+	    bvi_->adj_ += ad_ / bvi_->val_;
 	}
       };
 
@@ -630,8 +626,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const stan::agrad::var& a,
-                   const stan::agrad::var& b,
-                   const stan::agrad::var& c) {
+		   const stan::agrad::var& b,
+		   const stan::agrad::var& c) {
       return var(new fma_vvv_vari(a.vi_,b.vi_,c.vi_));
     }
 
@@ -654,8 +650,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const stan::agrad::var& a,
-                   const stan::agrad::var& b,
-                   const double& c) {
+		   const stan::agrad::var& b,
+		   const double& c) {
       return var(new fma_vvd_vari(a.vi_,b.vi_,c));
     }
 
@@ -678,8 +674,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const stan::agrad::var& a,
-                   const double& b,
-                   const stan::agrad::var& c) {
+		   const double& b,
+		   const stan::agrad::var& c) {
       return var(new fma_vdv_vari(a.vi_,b,c.vi_));
     }
 
@@ -700,8 +696,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const stan::agrad::var& a,
-                   const double& b, 
-                   const double& c) {
+		   const double& b, 
+		   const double& c) {
       return var(new fma_vdd_vari(a.vi_,b,c));
     }
 
@@ -722,8 +718,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const double& a,
-                   const stan::agrad::var& b,
-                   const double& c) {
+		   const stan::agrad::var& b,
+		   const double& c) {
       return var(new fma_vdd_vari(b.vi_,a,c));
     }
 
@@ -744,8 +740,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const double& a,
-                   const double& b,
-                   const stan::agrad::var& c) {
+		   const double& b,
+		   const stan::agrad::var& c) {
       return var(new fma_ddv_vari(a,b,c.vi_));
     }
 
@@ -768,8 +764,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const double& a,
-                   const stan::agrad::var& b,
-                   const stan::agrad::var& c) {
+		   const stan::agrad::var& b,
+		   const stan::agrad::var& c) {
       return var(new fma_vdv_vari(b.vi_,a,c.vi_)); // a-b symmetry
     }
 
@@ -791,7 +787,7 @@ namespace stan {
      * second's, the first variable, otherwise the second variable.
      */
     inline var fmax(const stan::agrad::var& a,
-                    const stan::agrad::var& b) {
+		    const stan::agrad::var& b) {
       return a.vi_->val_ > b.vi_->val_ ? a : b;
     }
 
@@ -812,7 +808,7 @@ namespace stan {
      * value promoted to a fresh variable.
      */
     inline var fmax(const stan::agrad::var& a,
-                    const double& b) {
+		    const double& b) {
       return a.vi_->val_ >= b ? a : var(b);
     }
 
@@ -833,7 +829,7 @@ namespace stan {
      * second variable.
      */
     inline var fmax(const double& a,
-                    const stan::agrad::var& b) {
+		    const stan::agrad::var& b) {
       return a > b.vi_->val_ ? var(a) : b;
     }
 
@@ -851,7 +847,7 @@ namespace stan {
      * second's, the first variable, otherwise the second variable.
      */
     inline var fmin(const stan::agrad::var& a,
-                    const stan::agrad::var& b) {
+		    const stan::agrad::var& b) {
       return a.vi_->val_ < b.vi_->val_ ? a : b;
     }
 
@@ -870,7 +866,7 @@ namespace stan {
      * the first variable, otherwise the second value promoted to a fresh variable.
      */
     inline var fmin(const stan::agrad::var& a,
-                    const double& b) {
+		    const double& b) {
       return a.vi_->val_ <= b ? a : var(b);
     }
 
@@ -891,7 +887,7 @@ namespace stan {
      * second variable.
      */
     inline var fmin(const double& a,
-                    const stan::agrad::var& b) {
+		    const stan::agrad::var& b) {
       return a < b.vi_->val_ ? var(a) : b;
     }
 
@@ -912,7 +908,7 @@ namespace stan {
      * @return Length of hypoteneuse.
      */
     inline var hypot(const stan::agrad::var& a,
-                     const stan::agrad::var& b) {
+		     const stan::agrad::var& b) {
       return var(new hypot_vv_vari(a.vi_,b.vi_));
     }
 
@@ -931,7 +927,7 @@ namespace stan {
      * @return Length of hypoteneuse.
      */
     inline var hypot(const stan::agrad::var& a,
-                     const double& b) {
+		     const double& b) {
       return var(new hypot_vd_vari(a.vi_,b));
     }
 
@@ -950,7 +946,7 @@ namespace stan {
      * @return Length of hypoteneuse.
      */
     inline var hypot(const double& a,
-                     const stan::agrad::var& b) {
+		     const stan::agrad::var& b) {
       return var(new hypot_vd_vari(b.vi_,a));
     }
 
@@ -1044,12 +1040,12 @@ namespace stan {
      * @return The positive difference between the first and second
      * variable.
      */
-     inline var fdim(const stan::agrad::var& a,
-                     const stan::agrad::var& b) {
-       return a.vi_->val_ > b.vi_->val_
-         ? var(new fdim_vv_vari(a.vi_,b.vi_))
-         : var(new vari(0.0));
-     }
+    inline var fdim(const stan::agrad::var& a,
+		    const stan::agrad::var& b) {
+      return a.vi_->val_ > b.vi_->val_
+	? var(new fdim_vv_vari(a.vi_,b.vi_))
+	: var(new vari(0.0));
+    }
 
     /**
      * Return the positive difference between the first value and the
@@ -1069,10 +1065,10 @@ namespace stan {
      * arguments.
      */
     inline var fdim(const double& a,
-                    const stan::agrad::var& b) {
+		    const stan::agrad::var& b) {
       return a > b.vi_->val_
-        ? var(new fdim_dv_vari(a,b.vi_))
-        : var(new vari(0.0));
+	? var(new fdim_dv_vari(a,b.vi_))
+	: var(new vari(0.0));
     }
 
     /**
@@ -1092,10 +1088,10 @@ namespace stan {
      * @return The positive difference between the first and second arguments.
      */
     inline var fdim(const stan::agrad::var& a,
-                    const double& b) {
+		    const double& b) {
       return a.vi_->val_ > b
-        ? var(new fdim_vd_vari(a.vi_,b))
-        : var(new vari(0.0));
+	? var(new fdim_vd_vari(a.vi_,b))
+	: var(new vari(0.0));
     }
 
 
@@ -1205,31 +1201,31 @@ namespace stan {
      * @return Log loss of response versus reference value.
      */
     inline var log_loss(const int& y, 
-                        const stan::agrad::var& y_hat) {
+			const stan::agrad::var& y_hat) {
       return y == 0  
-        ? var(new binary_log_loss_0_vari(y_hat.vi_))
-        : var(new binary_log_loss_1_vari(y_hat.vi_));
+	? var(new binary_log_loss_0_vari(y_hat.vi_))
+	: var(new binary_log_loss_1_vari(y_hat.vi_));
     }
     
     /**
      * Returns the log sum of exponentials.
      */
     inline var log_sum_exp(const stan::agrad::var& a,
-                           const stan::agrad::var& b) {
+			   const stan::agrad::var& b) {
       return var(new log_sum_exp_vv_vari(a.vi_, b.vi_));
     }
     /**
      * Returns the log sum of exponentials.
      */
     inline var log_sum_exp(const stan::agrad::var& a,
-                           const double& b) {
+			   const double& b) {
       return var(new log_sum_exp_vd_vari(a.vi_, b));
     }
     /**
      * Returns the log sum of exponentials.
      */
     inline var log_sum_exp(const double& a,
-                           const stan::agrad::var& b) {
+			   const stan::agrad::var& b) {
       return var(new log_sum_exp_dv_vari(a, b.vi_));
     }
     /**
@@ -1251,6 +1247,55 @@ namespace stan {
     inline var square(const var& x) {
       return var(new square_vari(x.vi_));
     }
+
+    // OTHER FUNCTIONS: stan/maths/special_functions.hpp implementations
+    /**
+     * Return the value of a*log(b).
+     *
+     * When both a and b are 0, the value returned is 0.
+     * The partial deriviative with respect to a is log(b). 
+     * The partial deriviative with respect to b is a/b. When
+     * a and b are both 0, this is set to Inf.
+     *
+     * @param a First variable.
+     * @param b Second variable.
+     * @return Value of a*log(b)
+     */
+    inline var multiply_log(const var& a, const var& b) {
+      return var(new multiply_log_vv_vari(a.vi_,b.vi_));
+    }
+    /**
+     * Return the value of a*log(b).
+     *
+     * When both a and b are 0, the value returned is 0.
+     * The partial deriviative with respect to a is log(b). 
+     *
+     * @param a First variable.
+     * @param b Second scalar.
+     * @return Value of a*log(b)
+     */
+    inline var multiply_log(const var& a, const double b) {
+      return var(new multiply_log_vd_vari(a.vi_,b));
+    }
+    /**
+     * Return the value of a*log(b).
+     *
+     * When both a and b are 0, the value returned is 0.
+     * The partial deriviative with respect to b is a/b. When
+     * a and b are both 0, this is set to Inf.
+     *
+     * @param a First scalar.
+     * @param b Second variable.
+     * @return Value of a*log(b)
+     */
+    inline var multiply_log(const double a, const var& b) {
+      if (a == 1.0)
+	return log(b);
+      return var(new multiply_log_dv_vari(a,b.vi_));
+    }
+
+
+
   }
 }
 
