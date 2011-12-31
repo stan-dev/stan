@@ -1,19 +1,24 @@
 #include <iostream>
-
-#include <boost/exception/all.hpp>
-#include <boost/math/policies/policy.hpp>
-
-#include <stan/prob/distributions_error_handling.hpp>
+#include <vector>
+#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/special_functions.hpp>
 
 int main() {
-  double result = 0.0;
-  try {
-    stan::prob::check_bounds("bar_fun",
-			     1.0, 0.0,
-			     &result,
-			     boost::math::policies::policy<>());
-  } catch (std::exception e) {
-    std::cout << "what=" << e.what() << std::endl;
-    std::cout << "diagnostics=" << boost::diagnostic_information(e) << std::endl;
-  }
+  using stan::agrad::var;
+  using stan::agrad::vari;
+  using stan::agrad::log_sum_exp;
+  unsigned int I = 3;
+  std::vector<var> vs(I);
+  for (unsigned int i = 0; i < I; ++i)
+    vs[i] = i;
+
+  var lse = log_sum_exp(vs);
+
+  std::cout << "sizeof(var)=" << sizeof(var) << std::endl;
+  std::cout << "sizeof(vari)=" << sizeof(vari) << std::endl;
+  std::cout << "sizeof(vector<vari*>)=" << sizeof(std::vector<vari*>) << std::endl;
+
+  std::cout << "DONE" << std::endl;
+
+
 }

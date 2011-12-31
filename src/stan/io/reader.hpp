@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__READER_HPP__
 #define __STAN__IO__READER_HPP__
 
+#include <exception>
 #include <stdexcept>
 #include <vector>
 #include <Eigen/Dense>
@@ -73,6 +74,9 @@ namespace stan {
        * as the source of scalar and integer values for data.  This
        * class holds a reference to the specified data vectors.
        *
+       * Attempting to read beyond the end of the data or integer
+       * value sequences raises a runtime exception.
+       *
        * @param data_r Sequence of scalar values.
        * @param data_i Sequence of integer values.
        */
@@ -80,7 +84,8 @@ namespace stan {
 	     std::vector<int>& data_i) 
 	: data_r_(data_r),
 	  data_i_(data_i),
-	  pos_(0) {
+	  pos_(0),
+	  int_pos_(0) {
       }
 
       /**
@@ -98,11 +103,22 @@ namespace stan {
       }
 
       /**
+       * Return the number of integers remaining to be read.
+       *
+       * @return Number of integers left to read.
+       */
+      inline unsigned int available_i() {
+	return data_i_.size() - int_pos_;
+      }
+
+      /**
        * Return the next integer in the integer sequence.
        *
        * @return Next integer value.
        */
       inline int integer() {
+	if (int_pos_ >= data_i_.size())
+	  BOOST_THROW_EXCEPTION(std::runtime_error("no more integers to read."));
 	return data_i_[int_pos_++];
       }
 
@@ -114,7 +130,7 @@ namespace stan {
        * @return Next integer value.
        */
       inline int integer_constrain() {
-	return data_i_[int_pos_++];
+	return integer();
       }
       
       /**
@@ -125,7 +141,7 @@ namespace stan {
        * @return Next integer value.
        */
       inline int integer_constrain(T& log_prob) {
-	return data_i_[int_pos_++];
+	return integer();
       }
       
 
@@ -136,6 +152,8 @@ namespace stan {
        * @return Next scalar value.
        */
       inline T scalar() {
+	if (pos_ >= data_r_.size())
+	  BOOST_THROW_EXCEPTION(std::runtime_error("no more scalars to read"));
 	return data_r_[pos_++];
       }
 
@@ -301,6 +319,138 @@ namespace stan {
 
 
       /**
+       * Return the next integer, checking that it is greater than
+       * or equal to the specified lower bound.
+       *
+       * @param lb Lower bound.
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * greater than or equal to the lower bound.
+       */
+      int integer_lb(int lb) {
+	int i = integer();
+	if (!(i >= lb))
+	  BOOST_THROW_EXCEPTION(std::runtime_error("required value greater than or equal to lb"));
+	return i;
+      }
+      /**
+       * Return the next integer, checking that it is greater than
+       * or equal to the specified lower bound.
+       * 
+       * @param lb Lower bound.
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * greater than or equal to the lower bound.
+       */
+      int integer_lb_constrain(int lb) {
+	return integer_lb(lb);
+      }
+      /**
+       * Return the next integer, checking that it is greater than
+       * or equal to the specified lower bound.
+       * 
+       * @param lb Lower bound.
+       * @param lp Log probability (ignored because no Jacobian)
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * greater than or equal to the lower bound.
+       */
+      int integer_lb_constrain(int lb, T& lp) {
+	return integer_lb(lb);
+      }
+
+
+      /**
+       * Return the next integer, checking that it is less than
+       * or equal to the specified upper bound.
+       *
+       * @param ub Upper bound.
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * less than or equal to the upper bound.
+       */
+      int integer_ub(int ub) {
+	int i = integer();
+	if (!(i <= ub))
+	  BOOST_THROW_EXCEPTION(std::runtime_error("required value less than or equal to ub"));
+	return i;
+      }
+      /**
+       * Return the next integer, checking that it is less than
+       * or equal to the specified upper bound.
+       * 
+       * @param ub Upper bound.
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * less than or equal to the upper bound.
+       */
+      int integer_ub_constrain(int ub) {
+	return integer_ub(ub);
+      }
+      /**
+       * Return the next integer, checking that it is less than
+       * or equal to the specified upper bound.
+       * 
+       * @param ub Upper bound.
+       * @param lp Log probability (ignored because no Jacobian)
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * less than or equal to the upper bound.
+       */
+      int integer_ub_constrain(int ub, T& lp) {
+	return integer_ub(ub);
+      }
+
+      /**
+       * Return the next integer, checking that it is less than
+       * or equal to the specified upper bound.  Even if the upper
+       * bounds and lower bounds are not consistent, the next integer
+       * value will be consumed.
+       *
+       * @param ub Upper bound.
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * less than or equal to the upper bound.
+       */
+      int integer_lub(int lb, int ub) {
+	int i = integer(); // read first to make position deterministic [arbitrary choice]
+	if (lb > ub)
+	  BOOST_THROW_EXCEPTION(std::runtime_error("lower bound must be less than or equal to ub"));
+	if (!(i >= lb))
+	  BOOST_THROW_EXCEPTION(std::runtime_error("required value greater than or equal to lb"));
+	if (!(i <= ub))
+	  BOOST_THROW_EXCEPTION(std::runtime_error("required value less than or equal to ub"));
+	return i;
+      }
+      /**
+       * Return the next integer, checking that it is less than
+       * or equal to the specified upper bound.
+       * 
+       * @param ub Upper bound.
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * less than or equal to the upper bound.
+       */
+      int integer_lub_constrain(int lb, int ub) {
+	return integer_lub(lb,ub);
+      }
+      /**
+       * Return the next integer, checking that it is less than
+       * or equal to the specified upper bound.
+       * 
+       * @param ub Upper bound.
+       * @param lp Log probability (ignored because no Jacobian)
+       * @return Next integer read.
+       * @throw std::runtime_error If the next integer read is not
+       * less than or equal to the upper bound.
+       */
+      int integer_lub_constrain(int lb, int ub, T& lp) {
+	return integer_lub(lb,ub);
+      }
+      
+
+
+      /**
        * Return the next scalar, checking that it is
        * positive.  
        *
@@ -354,7 +504,7 @@ namespace stan {
       T scalar_lb(double lb) {
 	T x(scalar());
 	if (!stan::prob::lb_validate(x,lb))
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("x is less than the lower bound"));
+	  BOOST_THROW_EXCEPTION(std::runtime_error("x is less than the lower bound"));
 	return x;
       }
 

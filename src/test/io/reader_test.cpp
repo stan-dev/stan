@@ -807,8 +807,49 @@ TEST(io_reader,cov_matrix_constrain_jacobian) {
   // FIXME: test Jacobian
 }
 
+TEST(io_reader,eos_exception) {
+  std::vector<double> theta;
+  theta.push_back(1.0);
+  theta.push_back(2.0);
+  std::vector<int> theta_i;
+  theta_i.push_back(1);
+  stan::io::reader<double> reader(theta,theta_i);
+
+  EXPECT_EQ(2U,reader.available());
+  EXPECT_EQ(1U,reader.available_i());
+
+  EXPECT_NO_THROW(reader.scalar());
+  EXPECT_NO_THROW(reader.scalar());
+  EXPECT_THROW(reader.scalar(),std::runtime_error);
+
+  // should go back to working
+  EXPECT_NO_THROW(reader.integer());
+  EXPECT_THROW(reader.integer(),std::runtime_error);
+
+  // should keep throwing
+  EXPECT_THROW(reader.scalar(),std::runtime_error);
+  EXPECT_THROW(reader.integer(),std::runtime_error);
+}
 
 
+TEST(io_reader,lub_exception) {
+  std::vector<double> theta;
+  for (int i = 0; i < 10; ++i)
+    theta.push_back(static_cast<double>(i));
+  std::vector<int> theta_i;
+  for (int i = 0; i < 10; ++i)
+    theta_i.push_back(i);
+  stan::io::reader<double> reader(theta,theta_i);
 
+  EXPECT_THROW(reader.scalar_lb(10.0),std::runtime_error);
+  EXPECT_THROW(reader.scalar_ub(-2.0),std::runtime_error);
+  EXPECT_THROW(reader.scalar_lub(-20.0,-18.0),std::runtime_error);
+  EXPECT_THROW(reader.scalar_lub(-18.0,-20.0),std::runtime_error);
+  EXPECT_FLOAT_EQ(4.0, reader.scalar());
 
-
+  EXPECT_THROW(reader.integer_lb(10),std::runtime_error);
+  EXPECT_THROW(reader.integer_ub(-2),std::runtime_error);
+  EXPECT_THROW(reader.integer_lub(-20,-18),std::runtime_error);
+  EXPECT_THROW(reader.integer_lub(-18,-20),std::runtime_error);
+  EXPECT_EQ(4, reader.integer());
+}

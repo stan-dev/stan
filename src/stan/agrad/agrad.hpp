@@ -1,14 +1,13 @@
 #ifndef __STAN__AGRAD__AGRAD_HPP__
 #define __STAN__AGRAD__AGRAD_HPP__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include <cmath>
-#include <iostream>
 #include <limits>
-#include "stan/memory/stack_alloc.hpp"
-#include "stan/meta/conversions.hpp"
+#include <stdexcept>
+#include <vector>
+
+#include <stan/memory/stack_alloc.hpp>
+#include <stan/meta/conversions.hpp>
 
 namespace stan {
 
@@ -17,7 +16,7 @@ namespace stan {
     class chainable;
 
     namespace {
-      // FIXME: manage all this as a single object with thread safe switch
+      // FIXME: manage all this as a single singleton (thread local)
       std::vector<chainable*> var_stack_; 
       memory::stack_alloc memalloc_;
     }
@@ -41,10 +40,13 @@ namespace stan {
       chainable() { }
 
       /**
-       * Destroy a chainable object.  The implementation
-       * in this abstract base class is a no-op.
+       * Throws a logic exception.  Chainables are not destructible by
+       * clients because the vari stack manages all memory for
+       * auto-dif.
        */
-      virtual ~chainable() { }
+      ~chainable() { 
+	throw std::logic_error("chainable destruction handled automatically");
+      }
 
       /**
        * Apply the chain rule to this variable based on the variables
@@ -132,7 +134,16 @@ namespace stan {
 	var_stack_.push_back(this);
       }
 
-      virtual ~vari() { }
+      /**
+       * Throw an illegal argument exception.
+       *
+       * <i>Warning</i>: Destructors should never called for agrad objects.
+       *
+       * @throw Logic exception always.
+       */
+      ~vari() { 
+	throw std::logic_error("vari destruction handled automatically");
+      }
 
       /**
        * Initialize the adjoint for this (dependent) variable to 1.
@@ -150,6 +161,338 @@ namespace stan {
 	adj_ = 0.0;
       }
 
+    };
+
+
+ /**
+     * Independent (input) and dependent (output) variables for gradients.
+     *
+     * An agrad::var is constructed with a double and used like any
+     * other scalar.  Arithmetical functions like negation, addition,
+     * and subtraction, as well as a range of mathematical functions
+     * like exponentiation and powers are overridden to operate on
+     * agrad::var values objects.
+     */
+    class var {
+    public:
+
+      // FIXME: doc what this is for
+      typedef double Scalar;
+
+      /**
+       * Pointer to the implementation of this variable.  
+       *
+       * This value should not be modified, but may be accessed in
+       * <code>var</code> operators to construct <code>vari</code>
+       * instances.
+       */
+      vari * vi_;
+
+      /**
+       * Construct a variable from a pointer to a variable implementation.
+       *
+       * @param vi Variable implementation. 
+       */
+      explicit var(vari* vi) :
+	vi_(vi) {
+      }
+
+      /**
+       * Construct a variable for later assignment.   
+       *
+       * This is implemented as a no-op, leaving the underlying implementation
+       * dangling.  Before an assignment, the behavior is thus undefined just
+       * as for a basic double.
+       */
+      var() {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param b Value.
+       */
+      var(bool b) :
+	vi_(new vari(static_cast<double>(b))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param c Value.
+       */
+      var(char c) :
+	vi_(new vari(static_cast<double>(c))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(short n) :
+	vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(unsigned short n) :
+	vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(int n) :
+	vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(unsigned int n) :
+	vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(long int n) :
+	vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(unsigned long int n) :
+	vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(float x) :
+	vi_(new vari(static_cast<double>(x))) {
+      }
+
+      /**      
+       * Construct a variable with the specified value.
+       *
+       * @param x Value of the variable.
+       */
+      var(double x) :
+	vi_(new vari(x)) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(long double x) :
+	vi_(new vari(static_cast<double>(x))) {
+      }
+
+      /**
+       * Return the value of this variable.
+       *
+       * @return The value of this variable.
+       */
+      inline double val() const {
+	return vi_->val_;
+      }
+
+      /**
+       * Return the derivative of the root expression with
+       * respect to this expression.  This method only works
+       * after one of the <code>grad()</code> methods has been
+       * called.  
+       *
+       * @return Adjoint value for this variable.
+       */
+      inline double adj() const {
+	return vi_->adj_;
+      }
+
+      /**
+       * Compute the gradient of this (dependent) variable with respect to
+       * the specified vector of (independent) variables, assigning the
+       * specified vector to the gradient.
+       *
+       * After the computation of the gradient and value, memory is
+       * recovered.
+       *
+       * @param x Vector of independent variables.
+       * @param g Gradient vector of partial derivatives of this
+       * variable with respect to x.
+       */
+      void grad(std::vector<var>& x,
+		std::vector<double>& g) {
+	stan::agrad::grad(vi_);
+	g.resize(0);
+	for (size_t i = 0U; i < x.size(); ++i) 
+	  g.push_back(x[i].vi_->adj_);
+	recover_memory();
+      }
+
+      /**
+       * Compute gradients of this dependent variable with respect to
+       * all variables on which it depends.  
+       *
+       * Memory is recovered, but not freed after this operation,
+       * calling <code>recover_memory()</code>; see
+       * <code>free_all()</code> to release resources back to
+       * the system rather than saving them for reuse).
+       *
+       * Until the next creation of a stan::agrad::var instance, the
+       * gradient values will be available from an instance <code>x</code>
+       * of <code>stan::agrad::var</code> via <code>x.adj()</code>.
+       * It may be slightly more efficient to do this without the intermediate
+       * creation and population of two vectors as done in the two-argument
+       * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.
+       */
+      void grad() {
+	stan::agrad::grad(vi_);
+	recover_memory();
+      }
+
+      // COMPOUND ASSIGNMENT OPERATORS
+    
+      /**
+       * The compound add/assignment operator for variables (C++).  
+       *
+       * If this variable is a and the argument is the variable b,
+       * then (a += b) behaves exactly the same way as (a = a + b),
+       * creating an intermediate variable representing (a + b).
+       * 
+       * @param b The variable to add to this variable.
+       * @return The result of adding the specified variable to this variable.
+       */
+      inline var& operator+=(const var& b); 
+
+      /**
+       * The compound add/assignment operator for scalars (C++).  
+       *
+       * If this variable is a and the argument is the scalar b, then
+       * (a += b) behaves exactly the same way as (a = a + b).  Note
+       * that the result is an assignable lvalue.
+       *
+       * @param b The scalar to add to this variable.
+       * @return The result of adding the specified variable to this variable.
+       */
+      inline var& operator+=(const double b);
+
+      /**
+       * The compound subtract/assignment operator for variables (C++).  
+       *
+       * If this variable is a and the argument is the variable b,
+       * then (a -= b) behaves exactly the same way as (a = a - b).
+       * Note that the result is an assignable lvalue.
+       *
+       * @param b The variable to subtract from this variable.
+       * @return The result of subtracting the specified variable from
+       * this variable.
+       */
+      inline var& operator-=(const var& b);
+
+      /**
+       * The compound subtract/assignment operator for scalars (C++).  
+       *
+       * If this variable is a and the argument is the scalar b, then
+       * (a -= b) behaves exactly the same way as (a = a - b).  Note
+       * that the result is an assignable lvalue.
+       *
+       * @param b The scalar to subtract from this variable.
+       * @return The result of subtracting the specified variable from this
+       * variable.
+       */
+      inline var& operator-=(const double b);
+
+      /**
+       * The compound multiply/assignment operator for variables (C++).  
+       *
+       * If this variable is a and the argument is the variable b,
+       * then (a *= b) behaves exactly the same way as (a = a * b).
+       * Note that the result is an assignable lvalue.
+       *
+       * @param b The variable to multiply this variable by.
+       * @return The result of multiplying this variable by the
+       * specified variable.
+       */
+      inline var& operator*=(const var& b);
+
+      /**
+       * The compound multiply/assignment operator for scalars (C++).  
+       *
+       * If this variable is a and the argument is the scalar b, then
+       * (a *= b) behaves exactly the same way as (a = a * b).  Note
+       * that the result is an assignable lvalue.
+       *
+       * @param b The scalar to multiply this variable by.
+       * @return The result of multplying this variable by the specified
+       * variable.
+       */
+      inline var& operator*=(const double b);
+
+      /**
+       * The compound divide/assignment operator for variables (C++).  If this
+       * variable is a and the argument is the variable b, then (a /= b)
+       * behaves exactly the same way as (a = a / b).  Note that the
+       * result is an assignable lvalue.
+       *
+       * @param b The variable to divide this variable by.
+       * @return The result of dividing this variable by the
+       * specified variable.
+       */
+      inline var& operator/=(const var& b);
+
+      /**
+       * The compound divide/assignment operator for scalars (C++). 
+       *
+       * If this variable is a and the argument is the scalar b, then
+       * (a /= b) behaves exactly the same way as (a = a / b).  Note
+       * that the result is an assignable lvalue.
+       *
+       * @param b The scalar to divide this variable by.
+       * @return The result of dividing this variable by the specified
+       * variable.
+       */
+      inline var& operator/=(const double b);
+
+      /**
+       * Write the value of this auto-dif variable and its adjoint to 
+       * the specified output stream.
+       *
+       * @param os Output stream to which to write.
+       * @param v Variable to write.
+       * @return Reference to the specified output stream.
+       */
+      friend std::ostream& operator<<(std::ostream& os, const var& v) {
+	return os << v.val() << ':' << v.adj();
+      }
     };
 
     namespace {
@@ -298,13 +641,24 @@ namespace stan {
 	}
       };
 
+      // FIXME: memory leak -- copy vector to local memory
       class op_vector_vari : public vari {
       protected:
-	std::vector<vari*> vi_;
+	const unsigned int size_;
+	vari** vis_;
       public:
-	op_vector_vari(double f, std::vector<vari*> vi) :
+	op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
 	  vari(f),
-	  vi_(vi) {
+	  size_(vs.size()) {
+	  vis_ = (vari**) operator new(sizeof(vari*[vs.size()]));
+	  for (unsigned int i = 0; i < vs.size(); ++i)
+	    vis_[i] = vs[i].vi_;
+	}
+	vari* operator[](unsigned int n) const {
+	  return vis_[n];
+	}
+	unsigned int size() {
+	  return size_;
 	}
       };
 
@@ -697,368 +1051,7 @@ namespace stan {
 
     }
 
-    /**
-     * Independent (input) and dependent (output) variables for gradients.
-     *
-     * An agrad::var is constructed with a double and used like any
-     * other scalar.  Arithmetical functions like negation, addition,
-     * and subtraction, as well as a range of mathematical functions
-     * like exponentiation and powers are overridden to operate on
-     * agrad::var values objects.
-     */
-    class var {
-    public:
-
-      typedef double Scalar;
-
-      /**
-       * Pointer to the implementation of this variable.  
-       *
-       * This value should not be modified, but may be accessed in
-       * <code>var</code> operators to construct <code>vari</code>
-       * instances.
-       */
-      vari * vi_;
-
-      /**
-       * Construct a variable from a pointer to a variable implementation.
-       *
-       * @param vi Variable implementation. 
-       */
-      explicit var(vari* vi) :
-	vi_(vi) {
-      }
-
-      /**
-       * Construct a variable for later assignment.   
-       *
-       * This is implemented as a no-op, leaving the underlying implementation
-       * dangling.  Before an assignment, the behavior is thus undefined just
-       * as for a basic double.
-       */
-      var() {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param b Value.
-       */
-      var(bool b) :
-	vi_(new vari(static_cast<double>(b))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param c Value.
-       */
-      var(char c) :
-	vi_(new vari(static_cast<double>(c))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(short n) :
-	vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned short n) :
-	vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(int n) :
-	vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned int n) :
-	vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long int n) :
-	vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long int n) :
-	vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(float x) :
-	vi_(new vari(static_cast<double>(x))) {
-      }
-
-      /**      
-       * Construct a variable with the specified value.
-       *
-       * @param x Value of the variable.
-       */
-      var(double x) :
-	vi_(new vari(x)) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(long double x) :
-	vi_(new vari(static_cast<double>(x))) {
-      }
-
-      /**
-       * Return the value of this variable.
-       *
-       * @return The value of this variable.
-       */
-      inline double val() const {
-	return vi_->val_;
-      }
-
-      /**
-       * Return the derivative of the root expression with
-       * respect to this expression.  This method only works
-       * after one of the <code>grad()</code> methods has been
-       * called.  
-       *
-       * @return Adjoint value for this variable.
-       */
-      inline double adj() const {
-	return vi_->adj_;
-      }
-
-      /**
-       * Compute the gradient of this (dependent) variable with respect to
-       * the specified vector of (independent) variables, assigning the
-       * specified vector to the gradient.
-       *
-       * After the computation of the gradient and value, memory is
-       * recovered.
-       *
-       * @param x Vector of independent variables.
-       * @param g Gradient vector of partial derivatives of this
-       * variable with respect to x.
-       */
-      void grad(std::vector<var>& x,
-		std::vector<double>& g) {
-	stan::agrad::grad(vi_);
-	g.resize(0);
-	for (size_t i = 0U; i < x.size(); ++i) 
-	  g.push_back(x[i].vi_->adj_);
-	recover_memory();
-      }
-
-      /**
-       * Compute gradients of this dependent variable with respect to
-       * all variables on which it depends.  
-       *
-       * Memory is recovered, but not freed after this operation,
-       * calling <code>recover_memory()</code>; see
-       * <code>free_all()</code> to release resources back to
-       * the system rather than saving them for reuse).
-       *
-       * Until the next creation of a stan::agrad::var instance, the
-       * gradient values will be available from an instance <code>x</code>
-       * of <code>stan::agrad::var</code> via <code>x.adj()</code>.
-       * It may be slightly more efficient to do this without the intermediate
-       * creation and population of two vectors as done in the two-argument
-       * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.
-       */
-      void grad() {
-	stan::agrad::grad(vi_);
-	recover_memory();
-      }
-
-      // COMPOUND ASSIGNMENT OPERATORS
-    
-      /**
-       * The compound add/assignment operator for variables (C++).  
-       *
-       * If this variable is a and the argument is the variable b,
-       * then (a += b) behaves exactly the same way as (a = a + b),
-       * creating an intermediate variable representing (a + b).
-       * 
-       * @param b The variable to add to this variable.
-       * @return The result of adding the specified variable to this variable.
-       */
-      inline var& operator+=(const var& b) {
-	vi_ = new add_vv_vari(vi_,b.vi_);
-	return *this;
-      }
-
-      /**
-       * The compound add/assignment operator for scalars (C++).  
-       *
-       * If this variable is a and the argument is the scalar b, then
-       * (a += b) behaves exactly the same way as (a = a + b).  Note
-       * that the result is an assignable lvalue.
-       *
-       * @param b The scalar to add to this variable.
-       * @return The result of adding the specified variable to this variable.
-       */
-      inline var& operator+=(const double b) {
-	if (b == 0.0)
-	  return *this;
-	vi_ = new add_vd_vari(vi_,b);
-	return *this;
-      }
-
-      /**
-       * The compound subtract/assignment operator for variables (C++).  
-       *
-       * If this variable is a and the argument is the variable b,
-       * then (a -= b) behaves exactly the same way as (a = a - b).
-       * Note that the result is an assignable lvalue.
-       *
-       * @param b The variable to subtract from this variable.
-       * @return The result of subtracting the specified variable from
-       * this variable.
-       */
-      inline var& operator-=(const var& b) {
-	vi_ = new subtract_vv_vari(vi_,b.vi_);
-	return *this;
-      }
-
-      /**
-       * The compound subtract/assignment operator for scalars (C++).  
-       *
-       * If this variable is a and the argument is the scalar b, then
-       * (a -= b) behaves exactly the same way as (a = a - b).  Note
-       * that the result is an assignable lvalue.
-       *
-       * @param b The scalar to subtract from this variable.
-       * @return The result of subtracting the specified variable from this
-       * variable.
-       */
-      inline var& operator-=(const double b) {
-	if (b == 0.0)
-	  return *this;
-	vi_ = new subtract_vd_vari(vi_,b);
-	return *this;
-      }
-
-      /**
-       * The compound multiply/assignment operator for variables (C++).  
-       *
-       * If this variable is a and the argument is the variable b,
-       * then (a *= b) behaves exactly the same way as (a = a * b).
-       * Note that the result is an assignable lvalue.
-       *
-       * @param b The variable to multiply this variable by.
-       * @return The result of multiplying this variable by the
-       * specified variable.
-       */
-      inline var& operator*=(const var& b) {
-	vi_ = new multiply_vv_vari(vi_,b.vi_);
-	return *this;
-      }
-
-      /**
-       * The compound multiply/assignment operator for scalars (C++).  
-       *
-       * If this variable is a and the argument is the scalar b, then
-       * (a *= b) behaves exactly the same way as (a = a * b).  Note
-       * that the result is an assignable lvalue.
-       *
-       * @param b The scalar to multiply this variable by.
-       * @return The result of multplying this variable by the specified
-       * variable.
-       */
-      inline var& operator*=(const double b) {
-	if (b == 1.0)
-	  return *this;
-	vi_ = new multiply_vd_vari(vi_,b);
-	return *this;
-      }
-
-      /**
-       * The compound divide/assignment operator for variables (C++).  If this
-       * variable is a and the argument is the variable b, then (a /= b)
-       * behaves exactly the same way as (a = a / b).  Note that the
-       * result is an assignable lvalue.
-       *
-       * @param b The variable to divide this variable by.
-       * @return The result of dividing this variable by the
-       * specified variable.
-       */
-      inline var& operator/=(const var& b) {
-	vi_ = new divide_vv_vari(vi_,b.vi_);
-	return *this;
-      }
-
-      /**
-       * The compound divide/assignment operator for scalars (C++). 
-       *
-       * If this variable is a and the argument is the scalar b, then
-       * (a /= b) behaves exactly the same way as (a = a / b).  Note
-       * that the result is an assignable lvalue.
-       *
-       * @param b The scalar to divide this variable by.
-       * @return The result of dividing this variable by the specified
-       * variable.
-       */
-      inline var& operator/=(const double b) {
-	if (b == 1.0)
-	  return *this;
-	vi_ = new divide_vd_vari(vi_,b);
-	return *this;
-      }
-
-      /**
-       * Write the value of this auto-dif variable and its adjoint to 
-       * the specified output stream.
-       *
-       * @param os Output stream to which to write.
-       * @param v Variable to write.
-       * @return Reference to the specified output stream.
-       */
-      friend std::ostream& operator<<(std::ostream& os, const var& v) {
-	return os << v.val() << ':' << v.adj();
-      }
-    };
-
+   
     /**
      * Cast variable to double. Useful for templated functions where a
      * variable may be a var or a double and we want to be able to use
@@ -2174,6 +2167,54 @@ namespace stan {
       }
     }
 
+
+    inline var& var::operator+=(const var& b) {
+      vi_ = new add_vv_vari(vi_,b.vi_);
+      return *this;
+    }
+
+    inline var& var::operator+=(const double b) {
+      if (b == 0.0)
+	return *this;
+      vi_ = new add_vd_vari(vi_,b);
+      return *this;
+    }
+
+    inline var& var::operator-=(const var& b) {
+      vi_ = new subtract_vv_vari(vi_,b.vi_);
+      return *this;
+    }
+
+    inline var& var::operator-=(const double b) {
+      if (b == 0.0)
+	return *this;
+      vi_ = new subtract_vd_vari(vi_,b);
+      return *this;
+    }
+
+    inline var& var::operator*=(const var& b) {
+      vi_ = new multiply_vv_vari(vi_,b.vi_);
+      return *this;
+    }
+
+    inline var& var::operator*=(const double b) {
+      if (b == 1.0)
+	return *this;
+      vi_ = new multiply_vd_vari(vi_,b);
+      return *this;
+    }
+
+    inline var& var::operator/=(const var& b) {
+	vi_ = new divide_vv_vari(vi_,b.vi_);
+	return *this;
+      }
+
+    inline var& var::operator/=(const double b) {
+	if (b == 1.0)
+	  return *this;
+	vi_ = new divide_vd_vari(vi_,b);
+	return *this;
+      }
   }
 
 }

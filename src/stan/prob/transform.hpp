@@ -670,7 +670,7 @@ namespace stan {
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
       if(!lub_validate(y,lb,ub)) 
-	throw std::invalid_argument("");
+	throw std::invalid_argument("require lb <= y <= ub");
       return logit((y - lb) / (ub - lb));
     }
 

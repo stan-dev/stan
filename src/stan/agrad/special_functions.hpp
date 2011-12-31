@@ -294,6 +294,7 @@ namespace stan {
         }
       };
 
+      // derivative 0 almost everywhere
       class round_vari : public vari {
       public:
         round_vari(vari* avi) :
@@ -301,6 +302,7 @@ namespace stan {
         }
       };
 
+      // derivative 0 almost everywhere
       class trunc_vari : public vari {
       public:
         trunc_vari(vari* avi) :
@@ -343,12 +345,10 @@ namespace stan {
 	for (unsigned int i = 0; i < x.size(); ++i) 
 	  if (x[i] > max) 
 	    max = x[i].val();
-            
 	double sum = 0.0;
 	for (unsigned int i = 0; i < x.size(); ++i) 
 	  if (x[i] != -numeric_limits<double>::infinity()) 
 	    sum += exp(x[i].val() - max);
-          
 	return max + log(sum);
       }
       
@@ -383,21 +383,14 @@ namespace stan {
 	  bvi_->adj_ += adj_ * calculate_chain(bvi_->val_, val_);
 	}
       };
-      std::vector<vari*> to_vari (const std::vector<var>& x) {
-	std::vector<vari*> v(x.size());
-	for (unsigned int i = 0; i < x.size(); ++i) {
-	  v[i] = x[i].vi_;
-	}
-	return v;
-      }
       class log_sum_exp_vector_vari : public op_vector_vari {
       public:
-	log_sum_exp_vector_vari(std::vector<var> x) :
-	  op_vector_vari(log_sum_exp_as_double(x), to_vari(x)) {
+	log_sum_exp_vector_vari(const std::vector<var>& x) :
+	  op_vector_vari(log_sum_exp_as_double(x), x) {
 	}
 	void chain() {
-	  for (unsigned int i = 0; i < vi_.size(); ++i) {
-	    vi_[i]->adj_ += adj_ * calculate_chain(vi_[i]->val_, val_);
+	  for (unsigned int i = 0; i < size_; ++i) {
+	    vis_[i]->adj_ += adj_ * calculate_chain(vis_[i]->val_, val_);
 	  }
 	}
       };
