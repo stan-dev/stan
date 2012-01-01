@@ -19,9 +19,9 @@ parameters {
   double(0,) sigma_beta;
 }
 derived parameters {
-  double(0,) sigmasq_y;
-  double(0,) sigmasq_alpha;
-  double(0,) sigmasq_beta;
+  double sigmasq_y;
+  double sigmasq_alpha;
+  double sigmasq_beta;
 
   sigmasq_y <- sigma_y * sigma_y;
   sigmasq_alpha <- sigma_alpha * sigma_alpha;

@@ -30,7 +30,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0,) sigma;
+  double sigma;
   double yabeta_disease[4];
   yabeta_disease[1] <- 0; 
   yabeta_disease[2] <- beta_disease2;

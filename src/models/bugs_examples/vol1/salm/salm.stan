@@ -29,7 +29,7 @@ parameters {
     double lambda[I,J];
 }
 derived parameters {
-    double(0,) sigma;
+    double sigma;
     double alpha;
 
     alpha <- alpha_star - beta * mean_logx - gamma * mean_x;

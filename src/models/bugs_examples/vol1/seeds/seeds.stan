@@ -14,7 +14,7 @@ parameters {
     double b[I];
 }
 derived parameters {
-    double(0,) sigma;
+    double sigma;
 }
 model {
    alpha0 ~ normal(0.0,1.0E3);

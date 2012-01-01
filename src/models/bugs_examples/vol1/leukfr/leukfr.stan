@@ -22,10 +22,11 @@ data {
 }
 
 derived data {
-  int(0,) Y[N, NT];
-  int(0,) dN[N, NT]; 
+  int Y[N, NT];
+  int dN[N, NT]; 
   double c;
   double r; 
+
   for(i in 1:N) {
     for(j in 1:NT) {
       Y[i, j] <- int_step(obs_t[i] - t[j] + .000000001);
@@ -44,7 +45,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0,) sigma; 
+  double sigma; 
   sigma <- 1 / sqrt(tau); 
 } 
 

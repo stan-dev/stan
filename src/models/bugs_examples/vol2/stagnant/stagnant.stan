@@ -22,7 +22,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0,) sigma;
+  double sigma;
   sigma <- 1 / sqrt(tau); 
 } 
 

@@ -28,7 +28,7 @@ parameters {
    
 } 
 derived parameters {
-  double(0,) sigma; // or double tau; 
+  double sigma; // or double tau; 
   double U3; 
   // tau <- 1 / (sigma * sigma);
   sigma <- 1 / sqrt(tau); 

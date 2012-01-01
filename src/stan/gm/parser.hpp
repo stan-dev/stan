@@ -165,6 +165,81 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> neg;
 
+    struct validate_no_constraints_vis : public boost::static_visitor<bool> {
+      std::stringstream& error_msgs_;
+      validate_no_constraints_vis(std::stringstream& error_msgs)
+	: error_msgs_(error_msgs) { 
+      }
+      bool operator()(const nil& x) const { 
+	error_msgs_ << "nil declarations not allowed";
+	return false; // fail if arises
+      } 
+      bool operator()(const int_var_decl& x) const {
+	if (x.range_.has_low() || x.range_.has_high()) {
+	  error_msgs_ << "require unconstrained."
+		      << " found range constraint." << std::endl;
+	  return false;
+	}
+	return true;
+      }
+      bool operator()(const double_var_decl& x) const {
+	if (x.range_.has_low() || x.range_.has_high()) {
+	  error_msgs_ << "require unconstrained."
+		      << " found range constraint." << std::endl;
+	  return false;
+	}
+	return true;
+      }
+      bool operator()(const vector_var_decl& x) const {
+	return true;
+      }
+      bool operator()(const row_vector_var_decl& x) const {
+	return true;
+      }
+      bool operator()(const matrix_var_decl& x) const {
+	return true;
+      }
+      bool operator()(const simplex_var_decl& x) const {
+	error_msgs_ << "require unconstrained variable declaration."
+		    << " found simplex." << std::endl;
+	return false;
+      }
+      bool operator()(const pos_ordered_var_decl& x) const {
+	error_msgs_ << "require unconstrained variable declaration."
+		    << " found pos_ordered." << std::endl;
+	return false;
+      }
+      bool operator()(const cov_matrix_var_decl& x) const {
+	error_msgs_ << "require unconstrained variable declaration."
+		    << " found cov_matrix." << std::endl;
+	return false;
+      }
+      bool operator()(const corr_matrix_var_decl& x) const {
+	error_msgs_ << "require unconstrained variable declaration."
+		    << " found corr_matrix." << std::endl;
+	return false;
+      }
+    };
+
+    struct validate_decl_constraints {
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef bool type; };
+
+      bool operator()(const bool& allow_constraints,
+		      const bool& declaration_ok,
+		      const var_decl& var_decl,
+		      std::stringstream& error_msgs) const {
+	if (allow_constraints)
+	  return declaration_ok;
+	if (!declaration_ok)
+	  return false; // short-circuits test of constraints
+	validate_no_constraints_vis vis(error_msgs);
+	bool constraints_ok = boost::apply_visitor(vis,var_decl.decl_);
+	return declaration_ok && constraints_ok;
+      }
+    };
+    boost::phoenix::function<validate_decl_constraints> validate_decl_constraints_f;
+
     struct validate_allow_sample {
       template <typename T1, typename T2>
       struct result { typedef bool type; };
@@ -446,7 +521,7 @@ namespace stan {
 	data_var_decls_r
 	  = qi::lit("data")
 	  > qi::lit('{')
-	  > *var_decl_r
+	  > *var_decl_r(true) // +constraints
 	  > qi::lit('}');
 
 	derived_data_var_decls_r.name("derived data variable declaration and statement");
@@ -454,15 +529,15 @@ namespace stan {
 	  = qi::lit("derived")
 	  >> qi::lit("data")
 	  > qi::lit('{')
-	  > *var_decl_r
-	  > *statement_r(false)
+	  > *var_decl_r(false)  // -constraints
+	  > *statement_r(false) // -sampling
 	  > qi::lit('}');
 
 	param_var_decls_r.name("parameter variable declarations");
 	param_var_decls_r
 	  = qi::lit("parameters")
 	  > qi::lit('{')
-	  > *var_decl_r
+	  > *var_decl_r(true) // +constraints
 	  > qi::lit('}');
 
 	derived_var_decls_r.name("derived variable declarations");
@@ -470,8 +545,8 @@ namespace stan {
 	  = qi::lit("derived")
 	  >> qi::lit("parameters")
 	  > qi::lit('{')
-	  > *var_decl_r
-	  > *statement_r(false)
+	  > *var_decl_r(false) // -constraints
+	  > *statement_r(false) // -sampling
 	  > qi::lit('}');
 
 	generated_var_decls_r.name("generated variable declarations");
@@ -479,26 +554,26 @@ namespace stan {
 	  = qi::lit("generated")
 	  > qi::lit("quantities")
 	  > qi::lit('{')
-	  > *var_decl_r
-	  > *statement_r(false)
+	  > *var_decl_r(false) // -constraints
+	  > *statement_r(false) // -sampling
 	  > qi::lit('}');
 
-	// duplication because top-level is variant, not specific
+	// _a local to hold error state, _r1 inherited true if constriaints allowed
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  %= (int_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | double_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | vector_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | row_vector_decl_r    [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | matrix_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | simplex_decl_r       [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | pos_ordered_decl_r   [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | corr_matrix_decl_r   [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | cov_matrix_decl_r    [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	  %= (int_decl_r                  [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | double_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | vector_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | row_vector_decl_r         [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | matrix_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | simplex_decl_r            [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | pos_ordered_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | corr_matrix_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	      | cov_matrix_decl_r         [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
 	      )
-	  > qi::eps[_pass = _a] // hack to get error message out
+	  > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,ref(error_msgs_))]
 	  ;
-	
+
 	int_decl_r.name("integer declaration");
 	int_decl_r 
 	  %= qi::lit("int")
@@ -769,6 +844,7 @@ namespace stan {
 	statement_seq_r.name("sequence of statements");
 	statement_seq_r
 	  = qi::lit('{')
+	  
 	  >> *statement_r(_r1)
 	  > qi::lit('}');
 
@@ -815,7 +891,7 @@ namespace stan {
       qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > pos_ordered_decl_r;
       qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > cov_matrix_decl_r;
       qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> > corr_matrix_decl_r;
-      qi::rule<Iterator, qi::locals<bool>, var_decl(), whitespace_grammar<Iterator> > var_decl_r;
+      qi::rule<Iterator, qi::locals<bool>, var_decl(bool), whitespace_grammar<Iterator> > var_decl_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > data_var_decls_r;
       qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
 	       whitespace_grammar<Iterator> > derived_data_var_decls_r;

@@ -8,8 +8,8 @@ data {
 }
 
 derived data {
-  int(0,) Y[N, NT];
-  int(0,) dN[N, NT]; 
+  int Y[N, NT];
+  int dN[N, NT]; 
   double c;
   double r; 
   for(i in 1:N) {
