@@ -1,10 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_LOGISTIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_LOGISTIC_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-
 #include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
 
 namespace stan {
   namespace prob {

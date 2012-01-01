@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_exponential.hpp"
+#include "stan/prob/distributions/exponential.hpp"
 
 TEST(ProbDistributions,Exponential) {
   EXPECT_FLOAT_EQ(-2.594535, stan::prob::exponential_log(2.0,1.5));

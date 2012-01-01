@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/meta/conversions.hpp"
-#include "stan/agrad/agrad.hpp"
+#include <stan/prob/error_handling.hpp>
+#include <stan/meta/conversions.hpp>
+#include <stan/agrad/agrad.hpp>
 #include <limits>
 
 typedef boost::math::policies::policy<

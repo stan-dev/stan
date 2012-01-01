@@ -1,9 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__SCALED_INV_CHI_SQUARE_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__SCALED_INV_CHI_SQUARE_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-#include "stan/prob/traits.hpp"
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 
 namespace stan {
@@ -37,9 +37,13 @@ namespace stan {
 	      typename T_y, typename T_dof, typename T_scale, 
 	      class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, const Policy& = Policy()) {
+    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
+			      const Policy& = Policy()) {
       static const char* function = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
       
+      using stan::maths::multiply_log;
+      using stan::maths::square;
+
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if (!check_positive (function, nu, "Degrees of freedom", &lp, Policy()))
 	return lp;

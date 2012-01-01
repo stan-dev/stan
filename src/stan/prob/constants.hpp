@@ -5,8 +5,8 @@
 
 namespace stan {
   namespace prob {
-    using namespace std;
-    using namespace stan::maths;
+    using std::log;
+    using std::sqrt;
     
     namespace {
    

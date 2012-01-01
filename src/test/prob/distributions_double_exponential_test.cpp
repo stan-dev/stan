@@ -1,6 +1,6 @@
 
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_double_exponential.hpp"
+#include "stan/prob/distributions/double_exponential.hpp"
 
 TEST(ProbDistributions,DoubleExponential) {
   EXPECT_FLOAT_EQ(-0.6931472, stan::prob::double_exponential_log(1.0,1.0,1.0));

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_lognormal.hpp"
+#include "stan/prob/distributions/lognormal.hpp"
 
 TEST(ProbDistributions,Lognormal) {
   EXPECT_FLOAT_EQ(-1.509803, stan::prob::lognormal_log(1.2,0.3,1.5));

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_weibull.hpp"
+#include "stan/prob/distributions/weibull.hpp"
 
 TEST(ProbDistributions,Weibull) {
   EXPECT_FLOAT_EQ(-2.0, stan::prob::weibull_log(2.0,1.0,1.0));

@@ -1,11 +1,10 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_LKJ_CORR_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_LKJ_CORR_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-
 #include <stan/meta/traits.hpp>
-#include "stan/prob/distributions_beta.hpp"
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
+#include <stan/prob/distributions/beta.hpp>
 
 namespace stan {
   namespace prob {

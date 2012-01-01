@@ -1,10 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_STUDENT_T_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_STUDENT_T_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-
 #include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
 
 namespace stan {
   namespace prob {
@@ -45,8 +44,12 @@ namespace stan {
 	      typename T_scale,
 	      class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_loc,T_scale>::type
-      student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
+      student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
+		    const Policy& = Policy()) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
+
+      using stan::maths::square;
+      using boost::math::lgamma;
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if(!stan::prob::check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
@@ -61,7 +64,7 @@ namespace stan {
 
       if (!propto
 	  || !is_constant<T_dof>::value)
-	lp += lgamma ( (nu + 1.0) / 2.0) - lgamma (nu / 2.0);
+	lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
       if (!propto)
 	lp += NEG_LOG_SQRT_PI;
       if (!propto

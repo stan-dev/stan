@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_neg_binomial.hpp"
+#include "stan/prob/distributions/neg_binomial.hpp"
 
 TEST(ProbDistributions,NegBinomial) {
   EXPECT_FLOAT_EQ(-7.786663, stan::prob::neg_binomial_log(10,2.0,1.5));

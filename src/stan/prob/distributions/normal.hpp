@@ -1,9 +1,10 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__NORMAL_HPP__
 
-#include <stan/prob/distributions_error_handling.hpp>
-#include <stan/prob/distributions_constants.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/maths/special_functions.hpp>
 
 namespace stan {
 
@@ -51,6 +52,8 @@ namespace stan {
 	return lp;
       if (!check_x(function, y, &lp, Policy()))
 	return lp;
+
+      using stan::maths::square;
 
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= square(y - mu) / (2.0 * square(sigma));
@@ -155,6 +158,9 @@ namespace stan {
       if (y.size() == 0)
 	return lp;
       
+      using stan::maths::square;
+      using stan::maths::multiply_log;
+
       if (include_summand<propto,T_y,T_loc,T_scale>::value) {
 	for (unsigned int n = 0; n < y.size(); ++n)
 	  lp -= square(y[n] - mu);

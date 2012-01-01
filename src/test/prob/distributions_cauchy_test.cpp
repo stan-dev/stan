@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_cauchy.hpp"
+#include "stan/prob/distributions/cauchy.hpp"
 
 TEST(ProbDistributions,Cauchy) {
   EXPECT_FLOAT_EQ(-1.837877, stan::prob::cauchy_log(1.0, 0.0, 1.0));

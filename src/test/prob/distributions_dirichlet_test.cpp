@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions_dirichlet.hpp"
+#include "stan/prob/distributions/dirichlet.hpp"
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

@@ -1,8 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__GAMMA_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__GAMMA_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -47,6 +47,9 @@ namespace stan {
       if (!stan::prob::check_nonnegative(function, y, "Random variate y", &lp, Policy()))
 	return lp;
       
+      using boost::math::lgamma;
+      using stan::maths::multiply_log;
+
       if (include_summand<propto,T_shape>::value)
 	lp -= lgamma(alpha);
       if (include_summand<propto,T_shape,T_inv_scale>::value)

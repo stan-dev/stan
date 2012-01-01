@@ -1,9 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__INV_GAMMA_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__INV_GAMMA_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-#include "stan/prob/traits.hpp"
+#include <stan/prob/error_handling.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -36,8 +36,12 @@ namespace stan {
 	      typename T_y, typename T_shape, typename T_scale, 
 	      class Policy = policy<> >
       inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-      inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, const Policy& = Policy()) {
+      inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, 
+		    const Policy& = Policy()) {
       static const char* function = "stan::prob::inv_gamma_log<%1%>(%1%)";
+
+      using boost::math::lgamma;
+      using stan::maths::multiply_log;
 
       typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
       if (!stan::prob::check_positive(function, alpha, "Shape parameter", &lp, Policy())) 

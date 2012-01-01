@@ -1,11 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_INV_WISHART_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_INV_WISHART_HPP__
 
-
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-
 #include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/error_handling.hpp>
 
 namespace stan {
   namespace prob {
@@ -54,6 +52,8 @@ namespace stan {
 		    const Matrix<T_scale,Dynamic,Dynamic>& S,
 		    const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
+
+      using stan::maths::lmgamma;
 
       unsigned int k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);

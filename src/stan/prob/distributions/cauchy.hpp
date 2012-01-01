@@ -1,15 +1,16 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS_CAUCHY_HPP__
 #define __STAN__PROB__DISTRIBUTIONS_CAUCHY_HPP__
 
-#include "stan/prob/distributions_error_handling.hpp"
-#include "stan/prob/distributions_constants.hpp"
-
 #include <stan/meta/traits.hpp>
+#include <stan/prob/error_handling.hpp>
+#include <stan/prob/constants.hpp>
 
 namespace stan {
   namespace prob {
     using boost::math::tools::promote_args;
     using boost::math::policies::policy;
+
+    using stan::maths::square;
 
     // Cauchy(y|mu,sigma)  [sigma > 0]
     template <bool propto = false,
