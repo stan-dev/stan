@@ -3,10 +3,7 @@ PGM = endo#
 CXX = clang++ -std=c++0x 
 CXX = g++-4.6.2 -std=c++0x 
 
-
-$(PGM) : three
-
-all : one two three 
+.PHONY : one two three 
 
 one : 
 	cat $(PGM)1.stan | $(STAN_HOME)/demo/gm > $(PGM)1.cpp
@@ -21,9 +18,11 @@ two :
 three : 
 	cat $(PGM)3.stan | $(STAN_HOME)/demo/gm > $(PGM)3.cpp
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)3.cpp -o $(PGM)3
-	./$(PGM)3 --data_file=$(PGM).Rdata --sample_file=samples3.csv 
+	./$(PGM)3 --data_file=$(PGM)2.Rdata --sample_file=samples3.csv 
+
+.PHONY : clean 
 
 clean :
-	rm $(PGM)1.cpp samples1.csv $(PGM) 
-	rm $(PGM)2.cpp samples2.csv $(PGM) 
-	rm $(PGM)3.cpp samples3.csv $(PGM) 
+	rm $(PGM)1.cpp samples1.csv $(PGM)1 
+	rm $(PGM)2.cpp samples2.csv $(PGM)2
+	rm $(PGM)3.cpp samples3.csv $(PGM)3

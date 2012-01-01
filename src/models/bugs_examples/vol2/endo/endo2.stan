@@ -3,7 +3,9 @@
 
 # In this example, three methods of different 
 # model specifications are used for one equivalent
-# model. This is method 3. 
+# model. This is method 2. 
+
+# status: not work, multinomial specification error/problem?
 
 
 data {
@@ -43,14 +45,20 @@ derived data {
 
 parameters {
   double beta; 
-  double beta0[I];
+} 
+
+derived parameters {
+  double p[I, 2];
+  for (i in 1:I) {
+    p[i, 1] <- exp(beta * est[i, 1]); 
+    p[i, 2] <- exp(beta * est[i, 2]); 
+    p[i, 1] <- 1 / (p[i, 1] + p[i, 2]); 
+    p[i, 2] <- 1 - p[i, 1];
+  } 
 } 
 
 model {
-  # METHOD 3 fit standard Poisson regressions relative to baseline
+  # METHOD 2 - conditional likelihoods
   beta ~ normal(0, 1000); 
-  for (i in 1:I)  {
-    beta0[i] ~ normal(0, 1000);
-    for (j in 1:J)  Y[i, j] ~ poisson(exp(beta0[i] + beta * est[i, j])); 
-  }
+  for (i in 1:I)  Y[i] ~ multinomial(p[i]);
 } 
