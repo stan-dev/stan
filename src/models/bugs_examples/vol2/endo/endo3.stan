@@ -3,9 +3,8 @@
 
 # In this example, three methods of different 
 # model specifications are used for one equivalent
-# model. This is method 1. 
+# model. This is method 3. 
 
-# status: (works) 
 
 data {
   int n10; 
@@ -42,11 +41,14 @@ derived data {
 
 parameters {
   double beta; 
+  double beta0[I];
 } 
 
 model {
-  # METHOD 1: Logistic regression 
+  # METHOD 3 fit standard Poisson regressions relative to baseline
   beta ~ normal(0, 1000); 
-  for (i in 1:I)  
-    Y[i, 1] ~ binomial(1, inv_logit(beta * (est[i, 1] - est[i, J])));
+  for (i in 1:I)  {
+    beta0[i] ~ normal(0, 1000);
+    for (j in 1:J)  Y[i, j] ~ poisson(exp(beta0[i] + beta * est[i, j])); 
+  }
 } 
