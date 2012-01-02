@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_WEIBULL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_WEIBULL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -23,21 +23,16 @@ namespace stan {
       if (y < 0)
 	return LOG_ZERO;
       
+      using stan::maths::multiply_log;
+      
       typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
-      if (!propto
-	  || !is_constant<T_shape>::value)
+      if (include_summand<propto,T_shape>::value)
 	lp += log(alpha);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_shape>::value)
-	lp += (alpha - 1.0) * log (y);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_scale>::value)
-	lp -= alpha * log(sigma);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_y,T_shape>::value)
+	lp += multiply_log(alpha-1.0, y);
+      if (include_summand<propto,T_y,T_scale>::value)
+	lp -= multiply_log(alpha, sigma);
+      if (include_summand<propto,T_y,T_scale>::value)
 	lp -= pow(y / sigma, alpha);
 	
       return lp;
@@ -55,10 +50,7 @@ namespace stan {
       
       if (y < 0)
 	return 0;
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_shape>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_y,T_shape,T_scale>::value)
 	return 1.0 - exp (- pow (y / sigma, alpha));
       return 1;
     }

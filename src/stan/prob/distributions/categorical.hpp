@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_CATEGORICAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_CATEGORICAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__CATEGORICAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__CATEGORICAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -20,8 +20,7 @@ namespace stan {
     inline typename promote_args<T_prob>::type
       categorical_log(const unsigned int n, const Matrix<T_prob,Dynamic,1>& theta, const Policy& = Policy()) {
       // FIXME: domain checks
-      if (!propto
-	  || !is_constant<T_prob>::value)
+      if (include_summand<propto,T_prob>::value)
 	return log(theta(n));
       return 0.0;
     }

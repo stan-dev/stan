@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_WISHART_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_WISHART_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__WISHART_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__WISHART_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 
@@ -62,27 +62,20 @@ namespace stan {
       if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
 	return lp;
       // FIXME: domain checks
-
-      if (!propto)
+      
+      using stan::maths::multiply_log;
+      
+      if (include_summand<propto>::value)
 	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_dof>::value)
+      if (include_summand<propto,T_y,T_dof>::value)
 	lp -= lmgamma(k, 0.5 * nu);
-      if (!propto
-	  || !stan::is_constant<T_dof>::value
-	  || !stan::is_constant<T_scale>::value)
+      if (include_summand<propto,T_dof,T_scale>::value)
 	lp -= (0.5 * nu) * log(S.determinant());
-      if (!propto
-	  || !stan::is_constant<T_scale>::value
-	  || !stan::is_constant<T_y>::value)
+      if (include_summand<propto,T_scale,T_y>::value)
 	lp -= 0.5 * abs((S.inverse() * W).trace());
-      if (!propto
-	  || !stan::is_constant<T_y>::value
-	  || !stan::is_constant<T_dof>::value
-	  || !stan::is_constant<T_scale>::value) {
+      if (include_summand<propto,T_y,T_dof,T_scale>::value) {
 	if (nu != (k + 1))
-	  lp += 0.5 * (nu - k - 1.0) * log(W.determinant());
+	  lp += 0.5 * multiply_log(nu-k-1.0, W.determinant());
       }
       
       return lp;

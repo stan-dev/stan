@@ -1,19 +1,18 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_ERROR_HANDLING_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_ERROR_HANDLING_HPP__
+#ifndef __STAN__PROB__ERROR_HANDLING_HPP__
+#define __STAN__PROB__ERROR_HANDLING_HPP__
 
 #include <limits>
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 #include <Eigen/Dense>
-#include "stan/prob/transform.hpp"
+#include <stan/prob/transform.hpp>
 
 namespace stan { 
 
   namespace prob {
 
     using boost::math::policies::raise_domain_error;
-
 
     /**
      * Note that this test catches both infinity and NaN.

@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_MULTINOMIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_MULTINOMIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__MULTINOMIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__MULTINOMIAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -23,8 +23,10 @@ namespace stan {
 		    const Matrix<T_prob,Dynamic,1>& theta, 
 		    const Policy& = Policy()) {
       // FIXME: domain checks
+      using stan::maths::multiply_log;
+
       typename promote_args<T_prob>::type lp(0.0);
-      if (!propto) {	
+      if (include_summand<propto>::value) {	
 	double sum = 1.0;
 	for (unsigned int i = 0; i < ns.size(); ++i) 
 	  sum += ns[i];
@@ -32,10 +34,9 @@ namespace stan {
 	for (unsigned int i = 0; i < ns.size(); ++i)
 	  lp -= lgamma(ns[i] + 1.0);
       }
-      if (!propto
-	  || !is_constant<T_prob>::value)
+      if (include_summand<propto,T_prob>::value)
 	for (unsigned int i = 0; i < ns.size(); ++i)
-	  lp += ns[i] * log(theta[i]);
+	  lp += multiply_log(ns[i], theta[i]);
       return lp;
     }
 

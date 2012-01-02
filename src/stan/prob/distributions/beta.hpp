@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_BETA_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_BETA_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__BETA_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__BETA_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 
@@ -48,23 +48,16 @@ namespace stan {
       if(!stan::prob::check_bounded_x(function, y, 0, 1, &lp, Policy()))
 	return lp;
 
-      if (!propto 
-	  || !is_constant<T_alpha>::value
-	  || !is_constant<T_beta>::value)
+      using stan::maths::multiply_log;
+      if (include_summand<propto,T_alpha,T_beta>::value)
 	lp += lgamma(alpha + beta);
-      if (!propto 
-	  || !is_constant<T_alpha>::value)
-      lp -= lgamma(alpha);
-      if (!propto 
-	  || !is_constant<T_beta>::value)
-      lp -= lgamma(beta);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_alpha>::value)
-	lp += (alpha - 1.0) * log(y);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_beta>::value)
+      if (include_summand<propto,T_alpha>::value)
+	lp -= lgamma(alpha);
+      if (include_summand<propto,T_beta>::value)
+	lp -= lgamma(beta);
+      if (include_summand<propto,T_y,T_alpha>::value)
+	lp += multiply_log(alpha-1.0, y);
+      if (include_summand<propto,T_y,T_beta>::value)
 	lp += (beta - 1.0) * log1m(y);
       return lp;
     }

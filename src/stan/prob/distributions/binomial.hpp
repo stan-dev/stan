@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_BINOMIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_BINOMIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__BINOMIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__BINOMIAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -18,12 +18,9 @@ namespace stan {
       binomial_log(const T_n& n, const T_N& N, const T_prob& theta, const Policy& = Policy()) {
       // FIXME: domain checks
       typename promote_args<T_prob>::type lp(0.0);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += maths::binomial_coefficient_log<T_N>(N,n);
-      if (!propto
-	  || !is_constant<T_n>::value
-	  || !is_constant<T_N>::value
-	  || !is_constant<T_prob>::value)
+      if (include_summand<propto,T_n,T_N,T_prob>::value)
 	lp += n * log(theta) + (N-n) * log1m (theta);
       return lp;
     }

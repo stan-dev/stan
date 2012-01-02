@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/pareto.hpp"
+#include <stan/prob/distributions/pareto.hpp>
 
 TEST(ProbDistributions,Pareto) {
   EXPECT_FLOAT_EQ(-1.909543, stan::prob::pareto_log(1.5,0.5,2.0));

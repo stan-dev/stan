@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/student_t.hpp"
+#include <stan/prob/distributions/student_t.hpp>
 
 TEST(ProbDistributions,StudentT) {
   EXPECT_FLOAT_EQ(-1.837877, stan::prob::student_t_log(1.0,1.0,0.0,1.0));

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multinomial.hpp"
+#include <stan/prob/distributions/multinomial.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

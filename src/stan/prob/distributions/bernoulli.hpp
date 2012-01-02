@@ -1,10 +1,9 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_BERNOULLI_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_BERNOULLI_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__BERNOULLI_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__BERNOULLI_HPP__
 
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
-
-#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -18,8 +17,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_prob>::type
       bernoulli_log(const unsigned int n, const T_prob& theta, const Policy& = Policy()) {
       // FIXME: domain checks		
-      if (!propto
-	  || !is_constant<T_prob>::value) {
+      if (include_summand<propto,T_prob>::value) {
 	if (n == 1)
 	  return log(theta);
 	else if (n == 0)

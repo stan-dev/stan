@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_EXPONENTIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_EXPONENTIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__EXPONENTIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__EXPONENTIAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -42,11 +42,9 @@ namespace stan {
       if(!stan::prob::check_x(function, y, &lp, Policy()))
 	return lp;
       
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += log(beta);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_inv_scale>::value)
+      if (include_summand<propto,T_y,T_inv_scale>::value)
 	lp -= beta * y;
       return lp;
     }
@@ -79,7 +77,7 @@ namespace stan {
       if (y < 0)
 	return lp;
       
-      if (!propto)
+      if (include_summand<propto>::value)
 	return 1.0 - exp(-beta * y);
       return 1.0;
     }

@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_LOGNORMAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_LOGNORMAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__LOGNORMAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__LOGNORMAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -20,18 +20,13 @@ namespace stan {
       //FIXME: bounds checks
       
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += NEG_LOG_SQRT_TWO_PI;
-      if (!propto
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
-      if (!propto
-	  || !is_constant<T_y>::value)
-	lp -= log (y);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_loc>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_y>::value)
+	lp -= log(y);
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= pow(log(y) - mu,2.0) / (2.0 * sigma * sigma);
       return lp;
     }

@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_NEG_BINOMIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_NEG_BINOMIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__NEG_BINOMIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__NEG_BINOMIAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 
@@ -17,13 +17,14 @@ namespace stan {
     inline typename promote_args<T_shape, T_inv_scale>::type
       neg_binomial_log(const int n, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       // FIXME: domain checks
+
+      using stan::maths::multiply_log;
+
       typename promote_args<T_shape, T_inv_scale>::type lp(0.0);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += maths::binomial_coefficient_log<T_shape>(n + alpha - 1.0, n);
-      if (!propto
-	  || !is_constant<T_shape>::value
-	  || !is_constant<T_inv_scale>::value)
-	lp += alpha * log(beta) - (alpha + n) * log1p(beta);
+      if (include_summand<propto,T_shape,T_inv_scale>::value)
+	lp += multiply_log(alpha, beta) - (alpha + n) * log1p(beta);
       return lp;
     }
 

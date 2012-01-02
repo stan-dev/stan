@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_DOUBLE_EXPONENTIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_DOUBLE_EXPONENTIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -22,15 +22,11 @@ namespace stan {
       
       // FIXME: domain checks
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += NEG_LOG_TWO;
-      if (!propto
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_loc>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= abs(y - mu) / sigma;
       return lp;
     }

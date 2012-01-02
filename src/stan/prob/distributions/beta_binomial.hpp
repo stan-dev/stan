@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_BETA_BINOMIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_BETA_BINOMIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__BETA_BINOMIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__BETA_BINOMIAL_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/maths/special_functions.hpp>
@@ -25,10 +25,9 @@ namespace stan {
 
       // FIXME: domain checks
       typename promote_args<T_size>::type lp(0.0);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += binomial_coefficient_log(N,n);
-      if (!propto
-	  || !is_constant<T_size>::value)
+      if (include_summand<propto,T_size>::value)
 	lp += beta_log(n + alpha, N - n + beta) - beta_log(alpha,beta);
       return lp;
     }

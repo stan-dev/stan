@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_STUDENT_T_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_STUDENT_T_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__STUDENT_T_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__STUDENT_T_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 
@@ -62,21 +62,15 @@ namespace stan {
 	return lp;
 
 
-      if (!propto
-	  || !is_constant<T_dof>::value)
+      if (include_summand<propto,T_dof>::value)
 	lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += NEG_LOG_SQRT_PI;
-      if (!propto
-	  || !is_constant<T_dof>::value)
+      if (include_summand<propto,T_dof>::value)
 	lp -= 0.5 * log(nu);
-      if (!propto
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_dof>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_y,T_dof,T_scale>::value)
 	lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
       return lp;
     }

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/poisson.hpp"
+#include <stan/prob/distributions/poisson.hpp>
 
 TEST(ProbDistributions,Poisson) {
   EXPECT_FLOAT_EQ(-2.900934, stan::prob::poisson_log(17,13.0));

@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_CAUCHY_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_CAUCHY_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__CAUCHY_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__CAUCHY_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -28,15 +28,11 @@ namespace stan {
       if(!stan::prob::check_x(function, y, &lp, Policy()))
 	return lp;
 
-      if (!propto)
+      if (include_summand<propto>::value)
 	lp += NEG_LOG_PI;
-      if (!propto
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_loc>::value
-	  || !is_constant<T_scale>::value)
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= log1p(square ((y - mu) / sigma));
       return lp;
     }

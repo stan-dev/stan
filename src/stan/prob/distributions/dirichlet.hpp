@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_DIRICHLET_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_DIRICHLET_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__DIRICHLET_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__DIRICHLET_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -9,6 +9,7 @@ namespace stan {
   namespace prob {
     using boost::math::tools::promote_args;
     using boost::math::policies::policy;
+    using stan::maths::multiply_log;
 
     using Eigen::Dynamic;
     using Eigen::Matrix;
@@ -48,17 +49,14 @@ namespace stan {
 		  const Policy& = Policy()) {
       // FIXME: parameter check
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
-      if (!propto
-	  || !is_constant<T_prior_sample_size>::value) {
+      if (include_summand<propto,T_prior_sample_size>::value) {
 	lp += lgamma(alpha.sum());
 	for (int k = 0; k < alpha.rows(); ++k)
 	  lp -= lgamma(alpha[k]);
       }
-      if (!propto
-	  || !is_constant<T_prob>::value
-	  || !is_constant<T_prior_sample_size>::value)
+      if (include_summand<propto,T_prob,T_prior_sample_size>::value)
 	for (int k = 0; k < theta.rows(); ++k) 
-	  lp += (alpha[k] - 1) * log(theta[k]);
+	  lp += multiply_log(alpha[k]-1, theta[k]);
       return lp;
     }
 

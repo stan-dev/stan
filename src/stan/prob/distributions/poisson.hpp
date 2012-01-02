@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_POISSON_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_POISSON_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__POISSON_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__POISSON_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 
@@ -28,11 +28,12 @@ namespace stan {
       if (lambda == 0)
 	return LOG_ZERO;
 
-      if (!propto)
+      using stan::maths::multiply_log;
+
+      if (include_summand<propto>::value)
 	lp -= lgamma(n + 1.0);
-      if (!propto
-	  || !is_constant<T_rate>::value)
-	lp += n * log(lambda) - lambda;
+      if (include_summand<propto,T_rate>::value)
+	lp += multiply_log(n, lambda) - lambda;
       return lp;
     }
     

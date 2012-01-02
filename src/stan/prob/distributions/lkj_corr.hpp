@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_LKJ_CORR_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_LKJ_CORR_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__LKJ_CORR_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__LKJ_CORR_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/distributions/beta.hpp>

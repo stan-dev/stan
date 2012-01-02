@@ -1,7 +1,7 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS_PARETO_HPP__
-#define __STAN__PROB__DISTRIBUTIONS_PARETO_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__PARETO_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__PARETO_HPP__
 
-#include <stan/meta/traits.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -20,18 +20,14 @@ namespace stan {
       if (y < y_min)
 	return LOG_ZERO;
 	  
+      using stan::maths::multiply_log;
       typename promote_args<T_y,T_scale,T_shape>::type lp(0.0);
-      if (!propto
-	  || !is_constant<T_shape>::value)
+      if (include_summand<propto,T_shape>::value)
 	lp += log(alpha);
-      if (!propto
-	  || !is_constant<T_scale>::value
-	  || !is_constant<T_shape>::value)
-	lp += alpha * log(y_min);
-      if (!propto
-	  || !is_constant<T_y>::value
-	  || !is_constant<T_shape>::value)
-	lp -= (alpha + 1.0) * log(y);
+      if (include_summand<propto,T_scale,T_shape>::value)
+	lp += multiply_log(alpha, y_min);
+      if (include_summand<propto,T_y,T_shape>::value)
+	lp -= multiply_log(alpha+1.0, y);
       return lp;
     }
 
