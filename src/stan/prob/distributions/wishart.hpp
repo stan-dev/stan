@@ -72,7 +72,7 @@ namespace stan {
       if (include_summand<propto,T_dof,T_scale>::value)
 	lp -= (0.5 * nu) * log(S.determinant());
       if (include_summand<propto,T_scale,T_y>::value)
-	lp -= 0.5 * abs((S.inverse() * W).trace());
+	lp -= 0.5 * fabs((S.inverse() * W).trace());
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
 	if (nu != (k + 1))
 	  lp += 0.5 * multiply_log(nu-k-1.0, W.determinant());

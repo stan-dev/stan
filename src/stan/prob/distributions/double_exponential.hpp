@@ -20,6 +20,7 @@ namespace stan {
     double_exponential_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
       //static const char* function = "stan::prob::double_exponential_log<%1%>(%1%)";
       
+      //using stan::maths::abs;
       // FIXME: domain checks
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (include_summand<propto>::value)
@@ -27,7 +28,7 @@ namespace stan {
       if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
-	lp -= abs(y - mu) / sigma;
+	lp -= fabs(y - mu) / sigma;
       return lp;
     }
     
