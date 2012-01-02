@@ -42,7 +42,7 @@ namespace stan {
       if(!stan::prob::check_x(function, y, &lp, Policy()))
 	return lp;
       
-      if (include_summand<propto>::value)
+      if (include_summand<propto,T_inv_scale>::value)
 	lp += log(beta);
       if (include_summand<propto,T_y,T_inv_scale>::value)
 	lp -= beta * y;
