@@ -1,3 +1,6 @@
+#ifndef __TEST__AGRAD__DISTRIBUTIONS__EXPECT_EQ_DIFFS_HPP__
+#define __TEST__AGRAD__DISTRIBUTIONS__EXPECT_EQ_DIFFS_HPP__
+
 #include "stan/agrad/agrad.hpp"
 
 void expect_eq_diffs(double x1, double x2, 
@@ -17,3 +20,5 @@ void expect_eq_diffs(const stan::agrad::var& x1,
   expect_eq_diffs(x1.val(), x2.val(), 
 		  y1.val(), y2.val(), message);
 }
+
+#endif

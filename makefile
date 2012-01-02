@@ -21,7 +21,7 @@ UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 # DEFAULT
 # =========================================================
 
-.PHONY: all test-all
+.PHONY: all test-all test-unit
 all: test-all
 
 # TEST
@@ -48,8 +48,13 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ)
-	-$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
+	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
 
+# run unit tests without having make fail
+test-unit: $(UNIT_TESTS_OBJ) | test
+	-$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
+	#$(CC) $(CFLAGS_T) $(UNIT_TESTS) lib/gtest/src/gtest_main.cc ar/libgtest.a -o test/unit
+	#-test/unit --gtest_output="xml:test/unit.xml";)
 
 # MODELS (to be passed through demo/gm)
 # =========================================================
