@@ -358,7 +358,7 @@ namespace stan {
 	unsigned int num_matches = 0U;
 
 	for (unsigned int i = 0; i < signatures.size(); ++i) {
-	  int promotions = num_promotions(args,signatures[i].second);
+	  unsigned int promotions = num_promotions(args,signatures[i].second);
 	  if (promotions < 0) continue; // no match
 	  if (promotions < min_promotions) {
 	    min_promotions = promotions;

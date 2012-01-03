@@ -498,7 +498,6 @@ namespace stan {
 	using qi::int_;
 	using boost::spirit::qi::eps;
 	using namespace qi::labels;
-	using boost::phoenix::ref;
 
 	var_name_to_decl_["lp__"] 
 	  = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
@@ -561,17 +560,17 @@ namespace stan {
 	// _a local to hold error state, _r1 inherited true if constriaints allowed
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  %= (int_decl_r                  [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | double_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | vector_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | row_vector_decl_r         [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | matrix_decl_r             [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | simplex_decl_r            [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | pos_ordered_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | corr_matrix_decl_r        [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
-	      | cov_matrix_decl_r         [_val = add_var_f(_1,ref(var_name_to_decl_),_a)]
+	  %= (int_decl_r                  [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | double_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | vector_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | row_vector_decl_r         [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | matrix_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | simplex_decl_r            [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | pos_ordered_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | corr_matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | cov_matrix_decl_r         [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
 	      )
-	  > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,ref(error_msgs_))]
+	  > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,boost::phoenix::ref(error_msgs_))]
 	  ;
 
 	int_decl_r.name("integer declaration");
@@ -594,7 +593,7 @@ namespace stan {
 	vector_decl_r 
 	  %= qi::lit("vector")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -604,7 +603,7 @@ namespace stan {
 	row_vector_decl_r 
 	  %= qi::lit("row_vector")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -614,9 +613,9 @@ namespace stan {
 	matrix_decl_r 
 	  %= qi::lit("matrix")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(',')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -626,7 +625,7 @@ namespace stan {
 	simplex_decl_r 
 	  %= qi::lit("simplex")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -636,7 +635,7 @@ namespace stan {
 	pos_ordered_decl_r 
 	  %= qi::lit("pos_ordered")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -646,7 +645,7 @@ namespace stan {
 	cov_matrix_decl_r 
 	  %= qi::lit("cov_matrix")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -656,7 +655,7 @@ namespace stan {
 	corr_matrix_decl_r 
 	  %= qi::lit("corr_matrix")
 	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  > qi::lit(')')
 	  > identifier_r 
 	  > opt_dims_r
@@ -697,7 +696,7 @@ namespace stan {
 	  %= int_literal_r      [_val = _1]
 	  | double_literal_r    [_val = _1]
 	  | fun_r               [_val = set_fun_type_f(_1)]
-	  | variable_r          [_val = set_var_type_f(_1,ref(var_name_to_decl_))]
+	  | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_name_to_decl_))]
 	  | ( qi::lit('(') 
 	      > expression_r    [_val = _1] 
 	      > qi::lit(')') )
@@ -732,16 +731,16 @@ namespace stan {
 	dims_r.name("array dimensions");
 	dims_r 
 	  %= qi::lit('[') 
-	  > (expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  > (expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	     % ',')
 	  > qi::lit(']')
 	  ;
 	
 	range_r.name("range expression pair, colon");
 	range_r 
-	  %= expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))]
+	  %= expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
 	  >> qi::lit(':') 
-	  >> expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))];
+	  >> expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
 
 	truncation_range_r.name("range pair");
 	truncation_range_r
@@ -755,17 +754,17 @@ namespace stan {
 	range_brackets_int_r.name("range expression pair, brackets");
 	range_brackets_int_r 
 	  %= qi::lit('(') 
-	  > -(expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))])
+	  > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
 	  > qi::lit(',')
-	  > -(expression_r [_pass = validate_int_expr_f(_1,ref(error_msgs_))])
+	  > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
 	  > qi::lit(')');
 
 	range_brackets_double_r.name("range expression pair, brackets");
 	range_brackets_double_r 
 	  %= qi::lit('(') 
-	  > -(expression_r [_pass = validate_double_expr_f(_1,ref(error_msgs_))])
+	  > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
 	  > qi::lit(',')
-	  > -(expression_r [_pass = validate_double_expr_f(_1,ref(error_msgs_))])
+	  > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
 	  > qi::lit(')');
 
 	args_r.name("function argument expressions");
@@ -791,7 +790,7 @@ namespace stan {
 	sample_r 
 	  %= expression_r
 	  >> qi::lit('~')
-	  > qi::eps[_pass = validate_allow_sample_f(_r1,ref(error_msgs_))] 
+	  > qi::eps[_pass = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
 	  > distribution_r
 	  > -truncation_range_r
 	  > qi::lit(';');
@@ -816,8 +815,8 @@ namespace stan {
 	  %= statement_seq_r(_r1)
 	  | for_statement_r(_r1)
 	  | assignment_r [_pass 
-			  = validate_assignment_f(_1,ref(var_name_to_decl_),
-						  ref(error_msgs_))]
+			  = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_),
+						  boost::phoenix::ref(error_msgs_))]
 	  | sample_r(_r1) [_pass = validate_sample_f(_1)]
 	  | no_op_statement_r
 	  ;
@@ -832,13 +831,13 @@ namespace stan {
 	  > qi::lit('(')
 	  > identifier_r [_pass 
 			  = add_loop_identifier_f(_1,_a,
-						  ref(var_name_to_decl_),
-						  ref(error_msgs_))]
+						  boost::phoenix::ref(var_name_to_decl_),
+						  boost::phoenix::ref(error_msgs_))]
 	  > qi::lit("in")
 	  > range_r
 	  > qi::lit(')')
 	  > statement_r(_r1)
-	  > qi::eps [remove_loop_identifier_f(_a,ref(var_name_to_decl_))];
+	  > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
 	  ;
 
 	statement_seq_r.name("sequence of statements");
