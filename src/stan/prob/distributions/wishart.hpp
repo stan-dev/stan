@@ -1,10 +1,10 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__WISHART_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__WISHART_HPP__
 
+#include <stan/maths/matrix.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
-
 
 namespace stan {
   namespace prob {
@@ -54,16 +54,14 @@ namespace stan {
 		const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
-      using boost::math::lgamma;
-      using stan::maths::lmgamma;
-
       unsigned int k = W.rows();
-      typename promote_args<T_y,T_dof,T_scale>::type lp;
+      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
 	return lp;
       // FIXME: domain checks
       
       using stan::maths::multiply_log;
+      using stan::maths::lmgamma;
       
       if (include_summand<propto>::value)
 	lp += nu * k * NEG_LOG_TWO_OVER_TWO;

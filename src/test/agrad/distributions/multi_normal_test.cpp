@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include "test/agrad/distributions/expect_eq_diffs.hpp"
-#include "stan/prob/distributions/multi_normal.hpp"
-#include "stan/agrad/agrad.hpp"
-#include "stan/meta/traits.hpp"
-#include "stan/agrad/matrix.hpp"
+#include <test/agrad/distributions/expect_eq_diffs.hpp>
+#include <stan/prob/distributions/multi_normal.hpp>
+#include <stan/agrad/agrad.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/agrad/matrix.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
