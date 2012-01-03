@@ -3,9 +3,7 @@
 
 ## specify the model using Poisson distribution 
 
-## status (works), just not sure in what order 
-## the parameters drawn from the posterior 
-## are dumped ( Sun Jan  1 23:01:46 EST 2012). 
+## status (works)
 
 data {
   int I; // 4 

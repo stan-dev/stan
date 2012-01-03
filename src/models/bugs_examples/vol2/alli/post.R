@@ -16,12 +16,8 @@ colnames(post) <- c(paste("alpha", 2:K, sep = ''),
                     paste("gamma", as.vector(t(outer(2:J, 2:K, FUN = tmpfun))), sep = ''), 
                     paste("lambda", as.vector(t(outer(1:I, 1:J, FUN = tmpfun))), sep = ''), 
                     paste("yaalpha", 1:K, sep = ''), 
-#                   paste("yabeta", as.vector(t(outer(1:I, 1:K, FUN = tmpfun))), sep = ''),
-#                   paste("yagamma", as.vector(t(outer(1:J, 1:K, FUN = tmpfun))), sep = ''));   
-## for some reason, the derived parameters are in different order 
-## [Mon Jan  2 13:18:29 EST 2012]
-                    paste("yabeta", as.vector((outer(1:I, 1:K, FUN = tmpfun))), sep = ''),
-                    paste("yagamma", as.vector((outer(1:J, 1:K, FUN = tmpfun))), sep = ''));   
+                    paste("yabeta", as.vector(t(outer(1:I, 1:K, FUN = tmpfun))), sep = ''),
+                    paste("yagamma", as.vector(t(outer(1:J, 1:K, FUN = tmpfun))), sep = ''));   
 
 summary(as.mcmc(post)) 
 

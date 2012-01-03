@@ -20,4 +20,3 @@ two :
 clean :
 	rm $(PGM)1.cpp samples1.csv $(PGM)1 
 	rm $(PGM)2.cpp samples2.csv $(PGM)2
-	rm $(PGM)3.cpp samples3.csv $(PGM)3
