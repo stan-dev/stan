@@ -1759,12 +1759,11 @@ namespace stan {
 	  return;
 	}
 	for (unsigned int i = 0; i < dims.size(); ++i) {
-	  unsigned int idx = dims.size() - 1 - i;
 	  generate_indent(i + 2, o_);
-	  o_ << "for (unsigned int k_" << idx << " = 0;"
-	     << " k_" << idx << " < ";
-	  generate_expression(dims[idx],o_);
-	  o_ << "; ++k_" << idx << ") {" << EOL;
+	  o_ << "for (unsigned int k_" << i << " = 0;"
+	     << " k_" << i << " < ";
+	  generate_expression(dims[i],o_);
+	  o_ << "; ++k_" << i << ") {" << EOL;
 	}
 
 	generate_indent(dims.size() + 2, o_);
@@ -1806,6 +1805,7 @@ namespace stan {
 
       write_csv_vars_visgen vis_writer(o);
 
+      o << EOL;
       generate_comment("write transformed parameters",2,o);
       static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
@@ -1824,7 +1824,8 @@ namespace stan {
       o << EOL;
       for (unsigned int i = 0; i < prog.generated_decl_.first.size(); ++i)
 	boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
-      o << EOL;
+      if (prog.generated_decl_.first.size() > 0)
+	o << EOL;
 
       o << INDENT2 << "writer__.newline();" << EOL;
       o << INDENT << "}" << EOL2;
