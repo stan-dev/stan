@@ -62,15 +62,17 @@ namespace stan {
       
       using stan::maths::multiply_log;
       using stan::maths::lmgamma;
-      
-      if (include_summand<propto>::value)
+      using stan::maths::multiply;
+      using stan::maths::inverse;
+
+      if (include_summand<propto,T_y,T_dof>::value)
 	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       if (include_summand<propto,T_y,T_dof>::value)
 	lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp -= (0.5 * nu) * log(S.determinant());
+	lp -= multiply_log(0.5*nu, S.determinant());
       if (include_summand<propto,T_scale,T_y>::value)
-	lp -= 0.5 * fabs((S.inverse() * W).trace());
+	lp -= 0.5 * fabs(multiply(inverse(S), W).trace());
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
 	if (nu != (k + 1))
 	  lp += 0.5 * multiply_log(nu-k-1.0, W.determinant());

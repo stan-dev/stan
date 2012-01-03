@@ -56,16 +56,14 @@ TEST_F(AgradDistributionsWishart,Propto) {
 		"var: y, nu, and sigma");
 }
 TEST_F(AgradDistributionsWishart,ProptoY) {
-  ASSERT_TRUE(false) << "Can't multiply with var Y and double Sigma";
-  //expect_propto(to_var(Y1),nu1,S1,
-  //to_var(Y2),nu1,S1,
-  //"var: y");
+  expect_propto(to_var(Y1),nu1,S1,
+		to_var(Y2),nu1,S1,
+		"var: y");
 }
 TEST_F(AgradDistributionsWishart,ProptoYNu) {
-  ASSERT_TRUE(false) << "Can't multiply with var Y and double Sigma";
-  //expect_propto(to_var(Y1),to_var(nu1),S1,
-  //to_var(Y2),to_var(nu2),S1,
-  //"var: y, and nu");
+  expect_propto(to_var(Y1),to_var(nu1),S1,
+		to_var(Y2),to_var(nu2),S1,
+		"var: y, and nu");
 }
 TEST_F(AgradDistributionsWishart,ProptoYSigma) {
   expect_propto(to_var(Y1),nu1,to_var(S1),
@@ -78,15 +76,13 @@ TEST_F(AgradDistributionsWishart,ProptoNu) {
 		"var: nu");
 }
 TEST_F(AgradDistributionsWishart,ProptoNuSigma) {
-  ASSERT_TRUE(false) << "Can't multiply with double Y and var Sigma";
-  //expect_propto(Y1,to_var(nu1),to_var(S1),
-  //Y1,to_var(nu2),to_var(S2),
-  //"var: nu and sigma");
+  expect_propto(Y1,to_var(nu1),to_var(S1),
+		Y1,to_var(nu2),to_var(S2),
+		"var: nu and sigma");
 }
 TEST_F(AgradDistributionsWishart,ProptoSigma) {
-  ASSERT_TRUE(false) << "Can't multiply with double Y and var Sigma";
-  //expect_propto(Y1,nu1,to_var(S1),
-  //Y1,nu1,to_var(S2),
-  //"var: sigma");
+  expect_propto(Y1,nu1,to_var(S1),
+		Y1,nu1,to_var(S2),
+		"var: sigma");
 }
 
