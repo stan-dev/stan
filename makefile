@@ -47,11 +47,11 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 	-$@ --gtest_output="xml:$@.xml"
 
 # run all tests
-test-all: $(UNIT_TESTS_OBJ)
+test-all: $(UNIT_TESTS_OBJ) demo/gm
 	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
 
 # run unit tests without having make fail
-test-unit: $(UNIT_TESTS_OBJ) | test
+test-all-no-fail: $(UNIT_TESTS_OBJ) demo/gm
 	-$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
 	#$(CC) $(CFLAGS_T) $(UNIT_TESTS) lib/gtest/src/gtest_main.cc ar/libgtest.a -o test/unit
 	#-test/unit --gtest_output="xml:test/unit.xml";)
