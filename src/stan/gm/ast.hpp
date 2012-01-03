@@ -411,6 +411,7 @@ namespace stan {
       statements(std::vector<statement> stmts)
 	: statements_(stmts) {
       }
+      std::vector<var_decl> local_decl_;
       std::vector<statement> statements_;
     };
 
@@ -782,6 +783,40 @@ namespace stan {
       std::vector<expression> dims_;
     };
 
+    struct name_vis : public boost::static_visitor<std::string> {
+      name_vis() { }
+      std::string operator()(const nil& x) const { 
+	return ""; // fail if arises
+      } 
+      std::string operator()(const int_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const double_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const vector_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const row_vector_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const matrix_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const simplex_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const pos_ordered_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const cov_matrix_var_decl& x) const {
+	return x.name_;
+      }
+      std::string operator()(const corr_matrix_var_decl& x) const {
+	return x.name_;
+      }
+    };
+
     struct var_decl {
       typedef boost::variant<nil, // just for default constructor
 			     boost::recursive_wrapper<int_var_decl>,
@@ -799,6 +834,10 @@ namespace stan {
 
       template <typename Decl>
       var_decl(Decl const& decl) : decl_(decl) { }
+
+      std::string name() const {
+	return boost::apply_visitor(name_vis(),decl_);
+      }
 
       type decl_;
     };

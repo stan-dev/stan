@@ -778,7 +778,7 @@ namespace stan {
       }
     };
 
-    void generate_local_var_decls(std::vector<var_decl> const& vs,
+    void generate_local_var_decls(const std::vector<var_decl>& vs,
 				  int indent,
 				  std::ostream& o,
 				  bool is_var) {
@@ -877,6 +877,8 @@ namespace stan {
 	}
       }
       void operator()(const statements& x) const {
+	generate_local_var_decls(x.local_decl_,indent_,o_,false); // need to fix false to is_var
+				 
 	for (unsigned int i = 0; i < x.statements_.size(); ++i)
 	  generate_statement(x.statements_[i],indent_,o_,include_sampling_);
       }

@@ -65,6 +65,7 @@ add("sd",DOUBLE_T,VECTOR_T);
 add("sd",DOUBLE_T,ROW_VECTOR_T);
 add("sd",DOUBLE_T,MATRIX_T);
 
+add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sum",DOUBLE_T,VECTOR_T);
 add("sum",DOUBLE_T,ROW_VECTOR_T);
 add("sum",DOUBLE_T,MATRIX_T);

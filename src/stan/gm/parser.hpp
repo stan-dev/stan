@@ -133,6 +133,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::distribution,
 
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
+                          (std::vector<stan::gm::var_decl>, local_decl_)
 			  (std::vector<stan::gm::statement>, statements_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
@@ -299,6 +300,8 @@ namespace stan {
     };
     boost::phoenix::function<validate_expr_type> validate_expr_type_f;
 
+    
+
     struct validate_assignment {
       template <typename T1, typename T2, typename T3>
       struct result { typedef bool type; };
@@ -392,6 +395,18 @@ namespace stan {
       }
     };
     boost::phoenix::function<set_variable_type> set_var_type_f;
+
+    struct unscope_locals {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+      void operator()(const std::vector<var_decl>& var_decls,
+		      std::map<std::string,base_var_decl>& name_to_type) const {
+	for (unsigned int i = 0; i < var_decls.size(); ++i)
+	  name_to_type.erase(var_decls[i].name());
+      }
+    };
+    boost::phoenix::function<unscope_locals> unscope_locals_f;
+
 
     struct set_fun_type {
       template <typename T1>
@@ -560,15 +575,15 @@ namespace stan {
 	// _a local to hold error state, _r1 inherited true if constriaints allowed
 	var_decl_r.name("variable declaration");
 	var_decl_r 
-	  %= (int_decl_r                  [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | double_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | vector_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | row_vector_decl_r         [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | matrix_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | simplex_decl_r            [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | pos_ordered_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | corr_matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | cov_matrix_decl_r         [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	  %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+	      | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
 	      )
 	  > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,boost::phoenix::ref(error_msgs_))]
 	  ;
@@ -840,12 +855,18 @@ namespace stan {
 	  > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
 	  ;
 
+	  // _r1 = true if sampling statements allowed
 	statement_seq_r.name("sequence of statements");
 	statement_seq_r
 	  = qi::lit('{')
-	  
-	  >> *statement_r(_r1)
-	  > qi::lit('}');
+	  > local_var_decls_r[_a = _1]
+	  > *statement_r(_r1)
+	  > qi::lit('}')
+	  > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_name_to_decl_))]
+	  ;
+
+	local_var_decls_r
+	  = *var_decl_r(false); // - constants
 
 	// hack cast to write to error_msgs_ of type stringstream
 	qi::on_error<qi::rethrow>(var_decl_r,
@@ -899,12 +920,14 @@ namespace stan {
 	       whitespace_grammar<Iterator> > derived_var_decls_r;
       qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
 	       whitespace_grammar<Iterator> > generated_var_decls_r;
+      qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > local_var_decls_r;
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;
       qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> > distribution_r;
       qi::rule<Iterator, sample(bool), whitespace_grammar<Iterator> > sample_r;
       qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > assignment_r;
       qi::rule<Iterator, statement(bool), whitespace_grammar<Iterator> > statement_r;
-      qi::rule<Iterator, statements(bool), whitespace_grammar<Iterator> > statement_seq_r;
+      qi::rule<Iterator, qi::locals<std::vector<var_decl> >, 
+	       statements(bool), whitespace_grammar<Iterator> > statement_seq_r;
       qi::rule<Iterator, qi::locals<std::string>, for_statement(bool), 
                whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
