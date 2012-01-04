@@ -64,18 +64,20 @@ namespace stan {
       using stan::maths::lmgamma;
       using stan::maths::multiply;
       using stan::maths::inverse;
+      using stan::maths::determinant;
+      using stan::maths::trace;
 
       if (include_summand<propto,T_y,T_dof>::value)
 	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       if (include_summand<propto,T_y,T_dof>::value)
 	lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp -= multiply_log(0.5*nu, S.determinant());
+	lp -= multiply_log(0.5*nu, determinant(S));
       if (include_summand<propto,T_scale,T_y>::value)
-	lp -= 0.5 * fabs(multiply(inverse(S), W).trace());
+	lp -= 0.5 * fabs(trace(multiply(inverse(S), W)));
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
 	if (nu != (k + 1))
-	  lp += 0.5 * multiply_log(nu-k-1.0, W.determinant());
+	  lp += 0.5 * multiply_log(nu-k-1.0, determinant(W));
       }
       
       return lp;
