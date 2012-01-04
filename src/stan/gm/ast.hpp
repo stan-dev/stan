@@ -881,12 +881,28 @@ namespace stan {
     };
 
     struct program {
+      program() { }
+      program(const std::vector<var_decl>& data_decl,
+	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_data_decl,
+	      const std::vector<var_decl>& parameter_decl,
+	      const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_decl,
+	      const statement& st,
+	      const std::pair<std::vector<var_decl>,std::vector<statement> >& generated_decl)
+	: data_decl_(data_decl),
+	  derived_data_decl_(derived_data_decl),
+	  parameter_decl_(parameter_decl),
+	  derived_decl_(derived_decl),
+	  statement_(st),
+	  generated_decl_(generated_decl) {
+      }
+
       std::vector<var_decl> data_decl_;
       std::pair<std::vector<var_decl>,std::vector<statement> > derived_data_decl_;
       std::vector<var_decl> parameter_decl_;
       std::pair<std::vector<var_decl>,std::vector<statement> > derived_decl_;
       statement statement_;
       std::pair<std::vector<var_decl>,std::vector<statement> > generated_decl_;
+
     };
 
     struct sample {
