@@ -28,6 +28,8 @@ namespace stan {
       if(!stan::prob::check_x(function, y, &lp, Policy()))
 	return lp;
 
+      using stan::maths::log1p;
+      
       if (include_summand<propto>::value)
 	lp += NEG_LOG_PI;
       if (include_summand<propto,T_scale>::value)
