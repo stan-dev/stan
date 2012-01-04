@@ -51,7 +51,7 @@ namespace stan {
       using stan::maths::square;
       using boost::math::lgamma;
 
-      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
       if(!stan::prob::check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
 	return lp;
       if(!stan::prob::check_scale(function, sigma, &lp, Policy()))
@@ -70,7 +70,7 @@ namespace stan {
 	lp -= 0.5 * log(nu);
       if (include_summand<propto,T_scale>::value)
 	lp -= log(sigma);
-      if (include_summand<propto,T_y,T_dof,T_scale>::value)
+      if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
 	lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
       return lp;
     }
