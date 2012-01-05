@@ -24,7 +24,6 @@ namespace stan {
       if(!stan::prob::check_nonnegative(function, n, "Number n", &lp, Policy()))
 	return lp;
       
-
       if (lambda == 0)
 	return LOG_ZERO;
 
