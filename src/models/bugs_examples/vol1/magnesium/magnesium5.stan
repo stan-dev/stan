@@ -28,8 +28,8 @@ parameters {
 } 
 
 derived parameters {
-  double(0, 1) pt[N];
-  double(0, 50) sigma; 
+  double pt[N];
+  double sigma; 
 
   sigma <-  sqrt(s0_sqrd) * (1 - D0) / D0; 
  

@@ -1,6 +1,8 @@
 // Orange Trees 
 // http://www.openbugs.info/Examples/Otrees.html
 
+# status: error thrown out during execution immediately 
+
 data {
   int(0,) K;
   int(0,) N;

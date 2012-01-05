@@ -17,7 +17,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0, 1) theta;
+  double theta;
   double yap[2];
   theta <- inv_logit(delta); 
   yap[1] <- inv_logit(alpha); 

@@ -21,7 +21,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0, 1) pt[N];
+  double pt[N];
  
   for (n in 1:N) 
     pt[n] <- inv_logit(theta[n] + logit(pc[n])); 

@@ -5,6 +5,7 @@
 
 
 ## status: not work (Mon Dec 19 18:08:33 EST 2011)
+##         error thrown out 
 data {
   int(0,) N; 
   int(0,) T; 
@@ -35,8 +36,8 @@ parameters {
 }
 
 derived parameters {
-  double(0,) sigma_b; 
-  double(0,) sigma_b1; 
+  double sigma_b; 
+  double sigma_b1; 
   sigma_b <- sqrt(sigmasq_b); 
   sigma_b1 <- sqrt(sigmasq_b1); 
 } 

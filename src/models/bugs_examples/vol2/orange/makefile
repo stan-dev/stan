@@ -1,7 +1,6 @@
 STAN_HOME = ../../../../..
 PGM = orange
-CXX = g++
-CXX = g++-4.6 -std=c++0x 
+CXX = g++ -std=c++0x 
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp

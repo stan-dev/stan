@@ -30,7 +30,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0, 1) pt[N];
+  double pt[N];
   double sigma;
   sigma <- sqrt(sigmasq); 
  

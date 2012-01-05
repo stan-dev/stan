@@ -35,7 +35,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0, 1) pt[N, 6];
+  double pt[N, 6];
   double yasigma[6]; 
  
   yasigma[1] <- sqrt(sigmasq1); 

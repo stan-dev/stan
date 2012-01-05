@@ -1,7 +1,7 @@
 STAN_HOME = ../../../../..
 PGM = circle#
 PGM2 = squaremc#
-CC = g++-4.6
+CC = g++
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp

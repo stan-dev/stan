@@ -7,13 +7,14 @@ $(PGM) :
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM) 
 	./$(PGM) --data_file=$(PGM).Rdata --num_burnin=1000 --num_iterations=10000 # --sample_file=samples.csv 
 
+.PHONY: all 
 
 all : one two three four five six
 
 one : 
 	cat $(PGM)1.stan | $(STAN_HOME)/demo/gm > $(PGM)1.cpp 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)1.cpp -o $(PGM)1 
-	./$(PGM)1 --data_file=$(PGM).Rdata --num_burnin=1000 --num_iterations=10000 --sample_file=samples1.csv 
+	./$(PGM)1 --data_file=$(PGM).Rdata --num_burnin=1000 --num_iterations=2000 --sample_file=samples1.csv 
 
 two :
 	cat $(PGM)2.stan | $(STAN_HOME)/demo/gm > $(PGM)2.cpp 
