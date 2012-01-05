@@ -34,8 +34,8 @@ parameters {
 } 
 
 derived parameters {
-  double(0,) sigma; 
-  double(0,) sigma_beta; 
+  double sigma; 
+  double sigma_beta; 
   sigma <- sqrt(sigmasq); 
   sigma_beta <- sqrt(sigmasq_beta); 
 } 

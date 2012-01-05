@@ -18,7 +18,7 @@ parameters {
 } 
 
 derived parameters {
-  double(0,) sigma_delta; 
+  double sigma_delta; 
   sigma_delta <- sqrt(sigmasq_delta); 
 } 
 

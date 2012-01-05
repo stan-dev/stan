@@ -18,7 +18,7 @@ parameters {
   cov_matrix(2) Sigma_beta; 
 }
 //  derived parameters {
-//    double(-1, 1) rho; 
+//    double rho; 
 //    double alpha0; 
 //    //rho <- Sigma_beta[1, 2] / sqrt(Sigma_beta[1, 1] * Sigma_beta[2, 2]);
 //    //alpha0 <- mu_beta[1] - mu_beta[2] * xbar; 
