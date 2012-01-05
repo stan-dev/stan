@@ -19,6 +19,8 @@ namespace stan {
       // FIXME: bounds checks
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       
+      using stan::maths::log1p;
+
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	lp -= (y - mu)/sigma;
       if (include_summand<propto,T_scale>::value)
