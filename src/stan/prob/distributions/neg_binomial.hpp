@@ -4,6 +4,7 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
+#include <stan/maths/special_functions.hpp>
 
 namespace stan {
   namespace prob {
@@ -19,10 +20,11 @@ namespace stan {
       // FIXME: domain checks
 
       using stan::maths::multiply_log;
+      using stan::maths::binomial_coefficient_log;
 
       typename promote_args<T_shape, T_inv_scale>::type lp(0.0);
-      if (include_summand<propto>::value)
-	lp += maths::binomial_coefficient_log<T_shape>(n + alpha - 1.0, n);
+      if (include_summand<propto,T_shape>::value)
+	lp += binomial_coefficient_log<T_shape>(n + alpha - 1.0, n);
       if (include_summand<propto,T_shape,T_inv_scale>::value)
 	lp += multiply_log(alpha, beta) - (alpha + n) * log1p(beta);
       return lp;
