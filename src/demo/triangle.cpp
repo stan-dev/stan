@@ -34,12 +34,13 @@ using stan::mcmc::prob_grad_ad;
 using stan::io::dump;
 using std::istream;
 using namespace stan::maths;
+using namespace stan::prob;
 
-typedef Eigen::Matrix<double,1,Eigen::Dynamic> vector_d;
-typedef Eigen::Matrix<double,Eigen::Dynamic,1> row_vector_d;
+typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
+typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
-typedef Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> vector_v;
-typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> row_vector_v;
+typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> vector_v;
+typedef Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> row_vector_v;
 typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> matrix_v;
 
 class test_model : public prob_grad_ad {
@@ -96,7 +97,7 @@ public:
 
 
         // model body
-        lp__ = (lp__ + log((1 - abs(y))));
+        lp__ = (lp__ + log(fmax(0,(1 - fabs(y)))));
 
         return lp__;
 
@@ -107,8 +108,17 @@ public:
                    std::ostream& o__) {
         stan::io::reader<double> in__(params_r__,params_i__);
         stan::io::csv_writer writer__(o__);
+        // read-transform, write parameters
         double y = in__.scalar_lub_constrain(-(1),1);
         writer__.write(y);
+
+        // write transformed parameters
+
+
+
+        // write generated quantities
+
+
         writer__.newline();
     }
 

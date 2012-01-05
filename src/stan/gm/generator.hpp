@@ -816,7 +816,8 @@ namespace stan {
 	  indent_(indent),
 	  include_sampling_(include_sampling) {
       }
-      void operator()(nil const& x) const { }
+      void operator()(nil const& x) const { 
+      }
       void operator()(assignment const& x) const {
 	generate_indent(indent_,o_);
 	o_ << x.var_dims_.name_;
@@ -898,12 +899,21 @@ namespace stan {
       }
     };
 
-    void generate_statement(statement const& s,
+    void generate_statement(const statement& s,
 			    int indent,
 			    std::ostream& o,
 			    bool include_sampling) {
       statement_visgen vis(indent,include_sampling,o);
       boost::apply_visitor(vis,s.statement_);
+    }
+
+    void generate_statements(const std::vector<statement>& ss,
+			     int indent,
+			     std::ostream& o,
+			     bool include_sampling) {
+      statement_visgen vis(indent,include_sampling,o);
+      for (unsigned int i = 0; i < ss.size(); ++i)
+	boost::apply_visitor(vis,ss[i].statement_);
     }
 
 
@@ -923,7 +933,7 @@ namespace stan {
       generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
       o << EOL;
       static bool include_sampling = true;
-      generate_statement(p.derived_decl_.second,2,o,include_sampling);
+      generate_statements(p.derived_decl_.second,2,o,include_sampling);
       o << EOL;
 
       generate_comment("model body",2,o);
@@ -1813,7 +1823,7 @@ namespace stan {
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
       static bool include_sampling = false;
-      generate_statement(prog.derived_decl_.second,2,o,include_sampling); 
+      generate_statements(prog.derived_decl_.second,2,o,include_sampling); 
       o << EOL;
       for (unsigned int i = 0; i < prog.derived_decl_.first.size(); ++i)
 	boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
@@ -1822,7 +1832,7 @@ namespace stan {
       generate_comment("write generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,is_var); 
       o << EOL;
-      generate_statement(prog.generated_decl_.second,2,o,include_sampling); 
+      generate_statements(prog.generated_decl_.second,2,o,include_sampling); 
       o << EOL;
       for (unsigned int i = 0; i < prog.generated_decl_.first.size(); ++i)
 	boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);

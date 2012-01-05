@@ -408,8 +408,10 @@ namespace stan {
     struct statements {
       statements() {
       }
-      statements(std::vector<statement> stmts)
-	: statements_(stmts) {
+      statements(const std::vector<var_decl>& local_decl,
+		 const std::vector<statement>& stmts)
+	: local_decl_(local_decl),
+	  statements_(stmts) {
       }
       std::vector<var_decl> local_decl_;
       std::vector<statement> statements_;
@@ -853,8 +855,12 @@ namespace stan {
 
       statement() : statement_(nil()) { }
 
+      statement(const nil& nil) 
+	: statement_(nil) { 
+      }
+
       template <typename Statement>
-      statement(Statement const& statement)
+      statement(const Statement& statement)
 	: statement_(statement) {
       }
 

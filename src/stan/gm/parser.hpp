@@ -514,12 +514,13 @@ namespace stan {
 	using boost::spirit::qi::eps;
 	using namespace qi::labels;
 
+	// FIXME:  put this in scope only in model and derived parameters
 	var_name_to_decl_["lp__"] 
 	  = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
 
 	program_r.name("program");
 	program_r 
-	  = -data_var_decls_r
+	  %= -data_var_decls_r
 	  > -derived_data_var_decls_r
 	  > -param_var_decls_r
 	  > -derived_var_decls_r
@@ -528,19 +529,19 @@ namespace stan {
 	
 	model_r.name("model declaration");
 	model_r 
-	  = qi::lit("model")
+	  %= qi::lit("model")
 	  > statement_r(true);
 
 	data_var_decls_r.name("data variable declarations");
 	data_var_decls_r
-	  = qi::lit("data")
+	  %= qi::lit("data")
 	  > qi::lit('{')
 	  > *var_decl_r(true) // +constraints
 	  > qi::lit('}');
 
 	derived_data_var_decls_r.name("derived data variable declaration and statement");
 	derived_data_var_decls_r
-	  = qi::lit("derived")
+	  %= qi::lit("derived")
 	  >> qi::lit("data")
 	  > qi::lit('{')
 	  > *var_decl_r(false)  // -constraints
@@ -549,14 +550,14 @@ namespace stan {
 
 	param_var_decls_r.name("parameter variable declarations");
 	param_var_decls_r
-	  = qi::lit("parameters")
+	  %= qi::lit("parameters")
 	  > qi::lit('{')
 	  > *var_decl_r(true) // +constraints
 	  > qi::lit('}');
 
 	derived_var_decls_r.name("derived variable declarations");
 	derived_var_decls_r
-	  = qi::lit("derived")
+	  %= qi::lit("derived")
 	  >> qi::lit("parameters")
 	  > qi::lit('{')
 	  > *var_decl_r(false) // -constraints
@@ -565,7 +566,7 @@ namespace stan {
 
 	generated_var_decls_r.name("generated variable declarations");
 	generated_var_decls_r
-	  = qi::lit("generated")
+	  %= qi::lit("generated")
 	  > qi::lit("quantities")
 	  > qi::lit('{')
 	  > *var_decl_r(false) // -constraints
@@ -701,10 +702,12 @@ namespace stan {
 	
 	// two of these to put semantic action on this one w. index_op input
 	indexed_factor_r.name("(optionally) indexed factor [sub]");
-	indexed_factor_r %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
+	indexed_factor_r 
+	  %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
 
 	indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
-	indexed_factor_2_r %= (factor_r >> *dims_r);
+	indexed_factor_2_r 
+	  %= (factor_r >> *dims_r);
 
 	factor_r.name("factor");
 	factor_r
@@ -732,16 +735,16 @@ namespace stan {
 	// no optional dims in the variable_r
 	variable_r.name("variable expression");
 	variable_r
-	  = identifier_r;
+	  %= identifier_r;
 
 	fun_r.name("function and argument expressions");
 	fun_r 
-	  = identifier_r 
+	  %= identifier_r 
 	  >> args_r; 
 	    
 	opt_dims_r.name("array dimensions (optional)");
 	opt_dims_r 
-	  =  - dims_r;
+	  %=  - dims_r;
 
 	dims_r.name("array dimensions");
 	dims_r 
@@ -784,18 +787,18 @@ namespace stan {
 
 	args_r.name("function argument expressions");
 	args_r 
-	  = qi::lit('(') 
+	  %= qi::lit('(') 
 	  >> (expression_r % ',')
 	  > qi::lit(')');
 
 	identifier_r.name("identifier");
 	identifier_r
-	  = (qi::lexeme[qi::char_("a-zA-Z") 
+	  %= (qi::lexeme[qi::char_("a-zA-Z") 
 			>> *qi::char_("a-zA-Z0-9_.")]);
 
 	distribution_r.name("distribution and parameters");
 	distribution_r
-	  = identifier_r
+	  %= identifier_r
 	  >> qi::lit('(')
 	  >> -(expression_r % ',')
 	  > qi::lit(')');
@@ -812,12 +815,12 @@ namespace stan {
 	
 	var_lhs_r.name("variable and array dimensions");
 	var_lhs_r 
-	  = identifier_r 
+	  %= identifier_r 
 	  >> opt_dims_r;
 
 	assignment_r.name("variable assignment by expression");
 	assignment_r
-	  = var_lhs_r
+	  %= var_lhs_r
 	  >> qi::lit("<-")
 	  > expression_r
 	  > qi::lit(';') 
@@ -838,7 +841,7 @@ namespace stan {
 
 	no_op_statement_r.name("no op statement");
 	no_op_statement_r 
-	  = qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
+	  %= qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
 	for_statement_r.name("for statement");
 	for_statement_r
@@ -858,7 +861,7 @@ namespace stan {
 	  // _r1 = true if sampling statements allowed
 	statement_seq_r.name("sequence of statements");
 	statement_seq_r
-	  = qi::lit('{')
+	  %= qi::lit('{')
 	  > local_var_decls_r[_a = _1]
 	  > *statement_r(_r1)
 	  > qi::lit('}')
@@ -866,7 +869,7 @@ namespace stan {
 	  ;
 
 	local_var_decls_r
-	  = *var_decl_r(false); // - constants
+	  %= *var_decl_r(false); // - constants
 
 	// hack cast to write to error_msgs_ of type stringstream
 	qi::on_error<qi::rethrow>(var_decl_r,
