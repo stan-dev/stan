@@ -30,9 +30,9 @@ namespace stan {
 	lp += log(alpha);
       if (include_summand<propto,T_y,T_shape>::value)
 	lp += multiply_log(alpha-1.0, y);
-      if (include_summand<propto,T_y,T_scale>::value)
+      if (include_summand<propto,T_shape,T_scale>::value)
 	lp -= multiply_log(alpha, sigma);
-      if (include_summand<propto,T_y,T_scale>::value)
+      if (include_summand<propto,T_y,T_shape,T_scale>::value)
 	lp -= pow(y / sigma, alpha);
 	
       return lp;
