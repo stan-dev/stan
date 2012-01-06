@@ -7,7 +7,7 @@
 #include <stan/prob/distributions/uniform.hpp>
 #include <stan/prob/distributions/normal.hpp>
 #include <stan/prob/distributions/multi_normal.hpp>
-#include "stan/prob/distributions/gamma.hpp"
+#include <stan/prob/distributions/gamma.hpp>
 #include "stan/prob/distributions/inv_gamma.hpp"
 #include "stan/prob/distributions/chi_square.hpp"
 #include "stan/prob/distributions/inv_chi_square.hpp"
