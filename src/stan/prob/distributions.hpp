@@ -4,7 +4,7 @@
 #include "stan/prob/error_handling.hpp"
 #include "stan/prob/constants.hpp"
 
-#include "stan/prob/distributions/uniform.hpp"
+#include <stan/prob/distributions/uniform.hpp>
 #include "stan/prob/distributions/normal.hpp"
 #include "stan/prob/distributions/multi_normal.hpp"
 #include "stan/prob/distributions/gamma.hpp"

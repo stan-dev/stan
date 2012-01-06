@@ -46,9 +46,9 @@ TEST(ProbDistributionsUniform,DefaultPolicyY) {
   y = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::uniform_log(y,0.0,0.0), std::domain_error);
   y = std::numeric_limits<double>::infinity();
-  EXPECT_THROW(stan::prob::uniform_log(y,0.0,0.0), std::domain_error);
+  EXPECT_NO_THROW(stan::prob::uniform_log(y,0.0,1.0));
   y = -std::numeric_limits<double>::infinity();
-  EXPECT_THROW(stan::prob::uniform_log(y,0.0,0.0), std::domain_error);
+  EXPECT_NO_THROW(stan::prob::uniform_log(y,0.0,1.0));
 }
 TEST(ProbDistributionsUniform,DefaultPolicyLower) {
   double lb = 0.0;
@@ -97,11 +97,11 @@ TEST(ProbDistributionsUniform,ErrnoPolicyY) {
 
   y = std::numeric_limits<double>::infinity();
   result = stan::prob::uniform_log(y,0.0,1.0,errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_FALSE(std::isnan(result));
 
   y = -std::numeric_limits<double>::infinity();
   result = stan::prob::uniform_log(y,0.0,1.0,errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_FALSE(std::isnan(result));
 }
 TEST(ProbDistributionsUniform,ErrnoPolicyLower) {
   double lb = 0.0;

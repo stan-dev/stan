@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <stan/prob/error_handling.hpp>
-#include <stan/meta/conversions.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <limits>
 #include <stan/agrad/matrix.hpp>
@@ -18,7 +17,6 @@ typedef boost::math::policies::policy<
 typedef boost::math::policies::policy<> default_policy;
 
 using namespace stan::prob;
-using stan::convert;
 using stan::agrad::var;
 
 //---------- check_x tests ----------

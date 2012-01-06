@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <stan/memory/stack_alloc.hpp>
-#include <stan/meta/conversions.hpp>
 
 namespace stan {
 
@@ -2219,34 +2218,6 @@ namespace stan {
 
 }
 
-namespace stan {
-
-  /**
-   * Convert the specified auto-dif variable to a double
-   * by returning its value.
-   *
-   * @param x Auto-dif variable.
-   * @return Value of variable.
-   */
-  template <>
-  inline double convert(const stan::agrad::var& x) {
-    return x.val();
-  }
-
-  /**
-   * Convert the specified auto-dif variable to a double
-   * by returning its value.
-   *
-   * @param x Auto-dif variable.
-   * @return Value of variable.
-   */
-  template <>
-  inline double convert(const stan::agrad::var x) {
-    return x.val();
-  }
-
-
-}
 
 namespace std {
 

@@ -41,7 +41,7 @@ namespace stan {
       static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
       
       typename promote_args<T_y,T_low,T_high>::type lp(0.0);
-      if(!stan::prob::check_x(function, y, &lp, Policy()))
+      if(!stan::prob::check_not_nan(function, y, "y", &lp, Policy()))
 	return lp;
       if(!stan::prob::check_bounds(function, alpha, beta, &lp, Policy()))
 	return lp;

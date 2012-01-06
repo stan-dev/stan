@@ -15,6 +15,26 @@ namespace stan {
     using boost::math::policies::raise_domain_error;
 
     /**
+     * Checks if the variable y is nan.
+     */
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+			      const T_y& y,
+			      const char* name,
+			      T_result* result,
+			      const Policy& pol) {
+      if (boost::math::isnan(y)) {
+	std::string message(name);
+	message += " is %1%, but must not be nan!";
+	*result = raise_domain_error<T_y>(function,
+					  message.c_str(), 
+					  y, Policy());
+	return false;
+      }
+      return true;
+    }
+
+    /**
      * Note that this test catches both infinity and NaN.
      * Some special cases permit x to be infinite, so these must be tested 1st,
      * leaving this test to catch any NaNs.  see Normal and cauchy for example.

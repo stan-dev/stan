@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
 #include <stan/prob/error_handling.hpp>
-#include <stan/meta/conversions.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <limits>
 
 typedef boost::math::policies::policy<
   boost::math::policies::domain_error<boost::math::policies::errno_on_error>, 
@@ -13,49 +10,42 @@ typedef boost::math::policies::policy<
 typedef boost::math::policies::policy<> default_policy;
 
 using namespace stan::prob;
-using stan::convert;
 
-//---------- convert: double tests ----------
-TEST(ProbDistributionsErrorHandling,ConvertDouble) {
-  double x = 100.0;
-  EXPECT_FLOAT_EQ (x, stan::convert(x)) << "Expect the same number back";
-}
-TEST(ProbDistributionsErrorHandling,ConvertDoubleInfinity) {
-  double x = std::numeric_limits<double>::infinity();
-  EXPECT_FLOAT_EQ (x, convert(x)) << "Check for std_numeric_limits<double>::max: " << x;
-}
-TEST(ProbDistributionsErrorHandling,ConvertDoubleMinusInfinity) {
-  double x = -std::numeric_limits<double>::infinity();
-  EXPECT_FLOAT_EQ (x, convert(x)) << "Check for -std_numeric_limits<double>::max: " << x;
-}
-TEST(ProbDistributionsErrorHandling,ConvertDoubleQuietNaN) {
-  double x = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_TRUE (std::isnan (convert(x))) << "Check for std_numeric_limits<double>::quiet_NaN: " << x;
+//---------- check_not_nan tests ----------
+TEST(ProbDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
+  const char* function = "check_not_nan(%1%)";
+  double x = 0;
+  double result;
+ 
+  EXPECT_TRUE(check_not_nan(function, x, "x", &result, default_policy())) << "check_not_nan should be true with finite x: " << x;
+  x = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_not_nan(function, x, "x", &result, default_policy())) << "check_not_nan should be true with x = Inf: " << x;
+  x = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_not_nan(function, x, "x", &result, default_policy())) << "check_not_nan should be true with x = -Inf: " << x;
+
+  x = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(check_not_nan(function, x, "x", &result, default_policy()), std::domain_error) << "check_not_nan should throw exception on NaN: " << x;
 }
 
-//---------- convert: var tests ----------
-TEST(ProbDistributionsErrorHandling,ConvertVar) {
-  stan::agrad::var x(100.0);
-  EXPECT_FLOAT_EQ (100.0, convert(x)) << "Expect the same number back";
+TEST(ProbDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
+  const char* function = "check_not_nan(%1%)";
+  double x = 0;
+  double result;
+ 
+  EXPECT_TRUE(check_not_nan(function, x, "x", &result, errno_policy())) << "check_not_nan should be true with finite x: " << x;
+  x = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_not_nan(function, x, "x", &result, errno_policy())) << "check_not_nan should be true with x = Inf: " << x;
+  EXPECT_FALSE(std::isnan (result)) << "check_not_nan should not have returned nan: " << x;
+
+  x = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_not_nan (function, x, "x", &result, errno_policy())) << "check_not_nan should be true with x = -Inf: " << x;
+  EXPECT_FALSE(std::isnan (result)) << "check_not_nan should have returned nan: " << x;
+ 
+  x = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_FALSE(check_not_nan (function, x, "x", &result, errno_policy())) << "check_not_nan should return FALSE on nan: " << x;
+  EXPECT_TRUE(std::isnan (result)) << "check_not_nan should have returned nan: " << x;
 }
-TEST(ProbDistributionsErrorHandling,ConvertVarInfinity) {
-  stan::agrad::var x(std::numeric_limits<double>::infinity());
-  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), convert(x)) << "Check for std_numeric_limits<double>::max: " << x;
-  x = std::numeric_limits<stan::agrad::var>::infinity();
-  EXPECT_FLOAT_EQ (std::numeric_limits<double>::infinity(), convert(x)) << "Check for std_numeric_limits<stan::agrad::var>::max: " << x;
-}
-TEST(ProbDistributionsErrorHandling,ConvertVarMinusInfinity) {
-  stan::agrad::var x = -std::numeric_limits<double>::infinity();
-  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), convert(x)) << "Check for -std_numeric_limits<double>::max: " << x;
-  x = -std::numeric_limits<stan::agrad::var>::infinity();
-  EXPECT_FLOAT_EQ (-std::numeric_limits<double>::infinity(), convert(x)) << "Check for -std_numeric_limits<stan::agrad::var>::max: " << x;
-}
-TEST(ProbDistributionsErrorHandling,ConvertVarQuietNaN) {
-  stan::agrad::var x = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_TRUE (std::isnan (convert(x))) << "Check for std_numeric_limits<double>::quiet_NaN: " << x;
-  x = std::numeric_limits<stan::agrad::var>::quiet_NaN();
-  EXPECT_TRUE (std::isnan (convert(x))) << "Check for std_numeric_limits<stan::agrad::var>::quiet_NaN: " << x;
-}
+
 
 //---------- check_x tests ----------
 TEST(ProbDistributionsErrorHandling,CheckXDefaultPolicy) {
