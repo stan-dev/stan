@@ -210,6 +210,8 @@ add_ternary("uniform_log");
 add_ternary("weibull_log");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
+add_ternary("weibull_p");
+
 
 // MULTINOMIAL?  no vector<int> type
 

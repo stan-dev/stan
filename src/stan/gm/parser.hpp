@@ -23,6 +23,7 @@
 #include <iostream>
 #include <istream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -34,83 +35,83 @@
 // not using adaptation relies on unary constructor
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
-			  (int,val_)
+                          (int,val_)
                           (stan::gm::expr_type,type_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
- 			  (double,val_)
-			  (stan::gm::expr_type,type_) )
+                          (double,val_)
+                          (stan::gm::expr_type,type_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable,
-			  (std::string,name_)
-			  (stan::gm::expr_type,type_) )
+                          (std::string,name_)
+                          (stan::gm::expr_type,type_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
-			  (stan::gm::range, range_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::range, range_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_var_decl,
-			  (stan::gm::range, range_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::range, range_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::vector_var_decl,
-			  (stan::gm::expression, M_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, M_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::row_vector_var_decl,
-			  (stan::gm::expression, N_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, N_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::matrix_var_decl,
-			  (stan::gm::expression, M_)
-			  (stan::gm::expression, N_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, M_)
+                          (stan::gm::expression, N_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::simplex_var_decl,
-			  (stan::gm::expression, K_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::pos_ordered_var_decl,
-			  (stan::gm::expression, K_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::cov_matrix_var_decl,
-			  (stan::gm::expression, K_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::corr_matrix_var_decl,
-			  (stan::gm::expression, K_)
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable_dims,
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, dims_) )
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
-			  (std::string, name_)
-			  (std::vector<stan::gm::expression>, args_) )
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, args_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
-			  (stan::gm::expression, expr_)
-			  (std::vector<std::vector<stan::gm::expression> >, dimss_) )
+                          (stan::gm::expression, expr_)
+                          (std::vector<std::vector<stan::gm::expression> >, dimss_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::range,
-			  (stan::gm::expression, low_)
-			  (stan::gm::expression, high_) )
+                          (stan::gm::expression, low_)
+                          (stan::gm::expression, high_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
-			  (std::string, variable_)
-			  (stan::gm::range, range_)
-			  (stan::gm::statement, statement_) )
+                          (std::string, variable_)
+                          (stan::gm::range, range_)
+                          (stan::gm::statement, statement_) )
 
 namespace {
   // hack to pass pair into macro below to adapt
@@ -120,30 +121,30 @@ namespace {
 }
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::program,
-			  (std::vector<stan::gm::var_decl>, data_decl_)
-			  (DUMMY_STRUCT::type, derived_data_decl_)
-			  (std::vector<stan::gm::var_decl>, parameter_decl_)
-			  (DUMMY_STRUCT::type, derived_decl_)
-			  (stan::gm::statement, statement_)
-			  (DUMMY_STRUCT::type, generated_decl_) )
+                          (std::vector<stan::gm::var_decl>, data_decl_)
+                          (DUMMY_STRUCT::type, derived_data_decl_)
+                          (std::vector<stan::gm::var_decl>, parameter_decl_)
+                          (DUMMY_STRUCT::type, derived_decl_)
+                          (stan::gm::statement, statement_)
+                          (DUMMY_STRUCT::type, generated_decl_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::distribution,
-			  (std::string, family_)
-			  (std::vector<stan::gm::expression>, args_) )
+                          (std::string, family_)
+                          (std::vector<stan::gm::expression>, args_) )
 
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
                           (std::vector<stan::gm::var_decl>, local_decl_)
-			  (std::vector<stan::gm::statement>, statements_) )
+                          (std::vector<stan::gm::statement>, statements_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
-			  (stan::gm::expression, expr_)
-			  (stan::gm::distribution, dist_) 
-			  (stan::gm::range, truncation_) )
+                          (stan::gm::expression, expr_)
+                          (stan::gm::distribution, dist_) 
+                          (stan::gm::range, truncation_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
-			  (stan::gm::variable_dims, var_dims_)
-			  (stan::gm::expression, expr_) )
+                          (stan::gm::variable_dims, var_dims_)
+                          (stan::gm::expression, expr_) )
 
 
 
@@ -161,64 +162,83 @@ namespace stan {
       struct result { typedef T type; };
 
       expression operator()(const expression& expr) const {
-	return expression(unary_op('-', expr));
+        return expression(unary_op('-', expr));
       }
     };
     boost::phoenix::function<negate_expr> neg;
 
+    struct add_lp_var {
+      template <typename T>
+      struct result { typedef void type; };
+      void operator()(std::map<std::string,base_var_decl>& var_name_to_decl) const {
+        var_name_to_decl["lp__"] 
+          = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
+      }
+    };
+    boost::phoenix::function<add_lp_var> add_lp_var_f;
+
+    struct remove_lp_var {
+      template <typename T>
+      struct result { typedef void type; };
+      void operator()(std::map<std::string,base_var_decl>& var_name_to_decl) const {
+        var_name_to_decl.erase("lp__");
+      }
+    };
+    boost::phoenix::function<remove_lp_var> remove_lp_var_f;
+
     struct validate_no_constraints_vis : public boost::static_visitor<bool> {
       std::stringstream& error_msgs_;
       validate_no_constraints_vis(std::stringstream& error_msgs)
-	: error_msgs_(error_msgs) { 
+        : error_msgs_(error_msgs) { 
       }
       bool operator()(const nil& x) const { 
-	error_msgs_ << "nil declarations not allowed";
-	return false; // fail if arises
+        error_msgs_ << "nil declarations not allowed";
+        return false; // fail if arises
       } 
       bool operator()(const int_var_decl& x) const {
-	if (x.range_.has_low() || x.range_.has_high()) {
-	  error_msgs_ << "require unconstrained."
-		      << " found range constraint." << std::endl;
-	  return false;
-	}
-	return true;
+        if (x.range_.has_low() || x.range_.has_high()) {
+          error_msgs_ << "require unconstrained."
+                      << " found range constraint." << std::endl;
+          return false;
+        }
+        return true;
       }
       bool operator()(const double_var_decl& x) const {
-	if (x.range_.has_low() || x.range_.has_high()) {
-	  error_msgs_ << "require unconstrained."
-		      << " found range constraint." << std::endl;
-	  return false;
-	}
-	return true;
+        if (x.range_.has_low() || x.range_.has_high()) {
+          error_msgs_ << "require unconstrained."
+                      << " found range constraint." << std::endl;
+          return false;
+        }
+        return true;
       }
       bool operator()(const vector_var_decl& x) const {
-	return true;
+        return true;
       }
       bool operator()(const row_vector_var_decl& x) const {
-	return true;
+        return true;
       }
       bool operator()(const matrix_var_decl& x) const {
-	return true;
+        return true;
       }
       bool operator()(const simplex_var_decl& x) const {
-	error_msgs_ << "require unconstrained variable declaration."
-		    << " found simplex." << std::endl;
-	return false;
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found simplex." << std::endl;
+        return false;
       }
       bool operator()(const pos_ordered_var_decl& x) const {
-	error_msgs_ << "require unconstrained variable declaration."
-		    << " found pos_ordered." << std::endl;
-	return false;
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found pos_ordered." << std::endl;
+        return false;
       }
       bool operator()(const cov_matrix_var_decl& x) const {
-	error_msgs_ << "require unconstrained variable declaration."
-		    << " found cov_matrix." << std::endl;
-	return false;
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found cov_matrix." << std::endl;
+        return false;
       }
       bool operator()(const corr_matrix_var_decl& x) const {
-	error_msgs_ << "require unconstrained variable declaration."
-		    << " found corr_matrix." << std::endl;
-	return false;
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found corr_matrix." << std::endl;
+        return false;
       }
     };
 
@@ -227,16 +247,16 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const bool& allow_constraints,
-		      const bool& declaration_ok,
-		      const var_decl& var_decl,
-		      std::stringstream& error_msgs) const {
-	if (allow_constraints)
-	  return declaration_ok;
-	if (!declaration_ok)
-	  return false; // short-circuits test of constraints
-	validate_no_constraints_vis vis(error_msgs);
-	bool constraints_ok = boost::apply_visitor(vis,var_decl.decl_);
-	return declaration_ok && constraints_ok;
+                      const bool& declaration_ok,
+                      const var_decl& var_decl,
+                      std::stringstream& error_msgs) const {
+        if (allow_constraints)
+          return declaration_ok;
+        if (!declaration_ok)
+          return false; // short-circuits test of constraints
+        validate_no_constraints_vis vis(error_msgs);
+        bool constraints_ok = boost::apply_visitor(vis,var_decl.decl_);
+        return declaration_ok && constraints_ok;
       }
     };
     boost::phoenix::function<validate_decl_constraints> validate_decl_constraints_f;
@@ -246,13 +266,13 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const bool& allow_sample,
-		      std::stringstream& error_msgs) const {
-	if (!allow_sample) {
-	  error_msgs << "ERROR:  sampling only allowed in model."
-		     << std::endl;
-	  return false;
-	}
-	return true;
+                      std::stringstream& error_msgs) const {
+        if (!allow_sample) {
+          error_msgs << "ERROR:  sampling only allowed in model."
+                     << std::endl;
+          return false;
+        }
+        return true;
       }
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
@@ -262,13 +282,13 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr,
-		      std::stringstream& error_msgs) const {
-	if (!expr.expression_type().is_primitive_int()) {
-	  error_msgs << "expression denoting integer required; found type=" 
-		     << expr.expression_type() << std::endl;
-	  return false;
-	}
-	return true;
+                      std::stringstream& error_msgs) const {
+        if (!expr.expression_type().is_primitive_int()) {
+          error_msgs << "expression denoting integer required; found type=" 
+                     << expr.expression_type() << std::endl;
+          return false;
+        }
+        return true;
       }
     };
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
@@ -278,14 +298,14 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr,
-		      std::stringstream& error_msgs) const {
-	if (!expr.expression_type().is_primitive_double()
-	    && !expr.expression_type().is_primitive_int()) {
-	  error_msgs << "expression denoting double required; found type=" 
-		     << expr.expression_type() << std::endl;
-	  return false;
-	}
-	return true;
+                      std::stringstream& error_msgs) const {
+        if (!expr.expression_type().is_primitive_double()
+            && !expr.expression_type().is_primitive_int()) {
+          error_msgs << "expression denoting double required; found type=" 
+                     << expr.expression_type() << std::endl;
+          return false;
+        }
+        return true;
       }
     };
     boost::phoenix::function<validate_double_expr> validate_double_expr_f;
@@ -295,7 +315,7 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr) const {
-	return !expr.expression_type().is_ill_formed();
+        return !expr.expression_type().is_ill_formed();
       }
     };
     boost::phoenix::function<validate_expr_type> validate_expr_type_f;
@@ -307,48 +327,48 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(assignment& a,
-		      std::map<std::string,base_var_decl>& name_to_type,
-		      std::stringstream& error_msgs) const {
+                      std::map<std::string,base_var_decl>& name_to_type,
+                      std::stringstream& error_msgs) const {
 
-	if (name_to_type.find(a.var_dims_.name_) == name_to_type.end()) {
-	  error_msgs << "unknown variable in assignment"
-		     << "; lhs variable=" << a.var_dims_.name_ 
-		     << std::endl;
-	  return false;
-	}
-	a.var_type_ = name_to_type[a.var_dims_.name_];
-	unsigned int lhs_var_num_dims = name_to_type[a.var_dims_.name_].dims_.size();
-	unsigned int num_index_dims = a.var_dims_.dims_.size();
+        if (name_to_type.find(a.var_dims_.name_) == name_to_type.end()) {
+          error_msgs << "unknown variable in assignment"
+                     << "; lhs variable=" << a.var_dims_.name_ 
+                     << std::endl;
+          return false;
+        }
+        a.var_type_ = name_to_type[a.var_dims_.name_];
+        unsigned int lhs_var_num_dims = name_to_type[a.var_dims_.name_].dims_.size();
+        unsigned int num_index_dims = a.var_dims_.dims_.size();
 
-	expr_type lhs_type = infer_type_indexing(a.var_type_.base_type_,
-						 lhs_var_num_dims,
-						 num_index_dims);
+        expr_type lhs_type = infer_type_indexing(a.var_type_.base_type_,
+                                                 lhs_var_num_dims,
+                                                 num_index_dims);
 
-	if (lhs_type.is_ill_formed()
-	    || lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-	  error_msgs << "too many indices on left-hand-side of assignment"
-		     << "; lhs variable=" << a.var_dims_.name_ 
-		     << "; base type=" << a.var_type_.base_type_
-		     << "; num dims=" << lhs_var_num_dims
-		     << "; num indices=" << num_index_dims
-		     << std::endl;
-	  return false;
-	}
+        if (lhs_type.is_ill_formed()
+            || lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
+          error_msgs << "too many indices on left-hand-side of assignment"
+                     << "; lhs variable=" << a.var_dims_.name_ 
+                     << "; base type=" << a.var_type_.base_type_
+                     << "; num dims=" << lhs_var_num_dims
+                     << "; num indices=" << num_index_dims
+                     << std::endl;
+          return false;
+        }
 
-	base_expr_type lhs_base_type = lhs_type.base_type_;
-	base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
-	bool types_compatible 
-	  = lhs_base_type == rhs_base_type
-	  || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T ); // int -> double promotion
-	if (!types_compatible) {
-	  error_msgs << "base type mismatch in assignment"
-		     << "; lhs variable=" << a.var_dims_.name_
-		     << "; lhs base type=" << lhs_base_type
-		     << "; rhs base type=" << rhs_base_type
-		     << std::endl;
-	  return false;
-	}
-	return true;
+        base_expr_type lhs_base_type = lhs_type.base_type_;
+        base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
+        bool types_compatible 
+          = lhs_base_type == rhs_base_type
+          || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T ); // int -> double promotion
+        if (!types_compatible) {
+          error_msgs << "base type mismatch in assignment"
+                     << "; lhs variable=" << a.var_dims_.name_
+                     << "; lhs base type=" << lhs_base_type
+                     << "; rhs base type=" << rhs_base_type
+                     << std::endl;
+          return false;
+        }
+        return true;
       }
     };
     boost::phoenix::function<validate_assignment> validate_assignment_f;
@@ -358,15 +378,15 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const sample& s) const {
-	std::vector<expr_type> arg_types;
-	arg_types.push_back(s.expr_.expression_type());
-	for (unsigned int i = 0; i < s.dist_.args_.size(); ++i)
-	  arg_types.push_back(s.dist_.args_[i].expression_type());
-	std::string function_name(s.dist_.family_);
-	function_name += "_log";
-	expr_type result_type 
-	  = function_signatures::instance().get_result_type(function_name,arg_types);
-	return result_type.is_primitive_double();
+        std::vector<expr_type> arg_types;
+        arg_types.push_back(s.expr_.expression_type());
+        for (unsigned int i = 0; i < s.dist_.args_.size(); ++i)
+          arg_types.push_back(s.dist_.args_[i].expression_type());
+        std::string function_name(s.dist_.family_);
+        function_name += "_log";
+        expr_type result_type 
+          = function_signatures::instance().get_result_type(function_name,arg_types);
+        return result_type.is_primitive_double();
       }
     };
     boost::phoenix::function<validate_sample> validate_sample_f;
@@ -376,7 +396,7 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(const expression& expr) const {
-	return expr.expression_type().is_primitive_int();
+        return expr.expression_type().is_primitive_int();
       }
     };
     boost::phoenix::function<validate_primitive_int_type> validate_primitive_int_type_f;
@@ -385,13 +405,13 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef variable type; };
       variable operator()(variable& var_expr, 
-			  std::map<std::string,base_var_decl>& name_to_type) const {
-	if (name_to_type.find(var_expr.name_) == name_to_type.end()) {
-	  // FIXME: fail
-	}
-	var_expr.set_type(name_to_type[var_expr.name_].base_type_, 
-			  name_to_type[var_expr.name_].dims_.size());
-	return var_expr;
+                          std::map<std::string,base_var_decl>& name_to_type) const {
+        if (name_to_type.find(var_expr.name_) == name_to_type.end()) {
+          // FIXME: fail
+        }
+        var_expr.set_type(name_to_type[var_expr.name_].base_type_, 
+                          name_to_type[var_expr.name_].dims_.size());
+        return var_expr;
       }
     };
     boost::phoenix::function<set_variable_type> set_var_type_f;
@@ -400,9 +420,9 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef void type; };
       void operator()(const std::vector<var_decl>& var_decls,
-		      std::map<std::string,base_var_decl>& name_to_type) const {
-	for (unsigned int i = 0; i < var_decls.size(); ++i)
-	  name_to_type.erase(var_decls[i].name());
+                      std::map<std::string,base_var_decl>& name_to_type) const {
+        for (unsigned int i = 0; i < var_decls.size(); ++i)
+          name_to_type.erase(var_decls[i].name());
       }
     };
     boost::phoenix::function<unscope_locals> unscope_locals_f;
@@ -413,12 +433,12 @@ namespace stan {
       struct result { typedef T1 type; };
 
       fun operator()(fun& fun) const {
-	std::vector<expr_type> arg_types;
-	for (unsigned int i = 0; i < fun.args_.size(); ++i)
-	  arg_types.push_back(fun.args_[i].expression_type());
-	fun.type_ = function_signatures::instance().get_result_type(fun.name_,
-								    arg_types);
-	return fun;
+        std::vector<expr_type> arg_types;
+        for (unsigned int i = 0; i < fun.args_.size(); ++i)
+          arg_types.push_back(fun.args_[i].expression_type());
+        fun.type_ = function_signatures::instance().get_result_type(fun.name_,
+                                                                    arg_types);
+        return fun;
       }
     };
     boost::phoenix::function<set_fun_type> set_fun_type_f;
@@ -429,16 +449,16 @@ namespace stan {
       struct result { typedef T1 type; };
       template <typename T>
       T operator()(const T& var_decl, 
-		   std::map<std::string,base_var_decl>& name_to_type, 
-		   bool& pass) const {
-	if (name_to_type.find(var_decl.name_) != name_to_type.end()) {
-	  // variable already exists
-	  pass = false;
-	  return var_decl;
-	}
-	pass = true;
-	name_to_type[var_decl.name_] = var_decl;
-	return var_decl;
+                   std::map<std::string,base_var_decl>& name_to_type, 
+                   bool& pass) const {
+        if (name_to_type.find(var_decl.name_) != name_to_type.end()) {
+          // variable already exists
+          pass = false;
+          return var_decl;
+        }
+        pass = true;
+        name_to_type[var_decl.name_] = var_decl;
+        return var_decl;
       }
     };
     boost::phoenix::function<add_var> add_var_f;
@@ -447,17 +467,17 @@ namespace stan {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
       bool operator()(const std::string& name, 
-		      std::string& name_local,
-		      std::map<std::string,base_var_decl>& name_to_type,
-		      std::stringstream& error_msgs) const {
-	name_local = name;
-	if (name_to_type.find(name) != name_to_type.end()) {
-	  error_msgs << "ERROR: loop variable already declared."
-		     << " variable name=\"" << name << "\"" << std::endl;
-	  return false; // variable exists
-	}
-	name_to_type[name] = base_var_decl(name,std::vector<expression>(),INT_T);
-	return true;
+                      std::string& name_local,
+                      std::map<std::string,base_var_decl>& name_to_type,
+                      std::stringstream& error_msgs) const {
+        name_local = name;
+        if (name_to_type.find(name) != name_to_type.end()) {
+          error_msgs << "ERROR: loop variable already declared."
+                     << " variable name=\"" << name << "\"" << std::endl;
+          return false; // variable exists
+        }
+        name_to_type[name] = base_var_decl(name,std::vector<expression>(),INT_T);
+        return true;
       }
     };
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
@@ -466,8 +486,8 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef void type; };
       void operator()(const std::string& name, 
-		      std::map<std::string,base_var_decl>& name_to_type) const {
-	name_to_type.erase(name);
+                      std::map<std::string,base_var_decl>& name_to_type) const {
+        name_to_type.erase(name);
       }
     };
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
@@ -476,8 +496,8 @@ namespace stan {
       template <typename T>
       struct result { typedef bool type; };
       bool operator()(index_op& io) const {
-	io.infer_type();
-	return !io.type_.is_ill_formed();
+        io.infer_type();
+        return !io.type_.is_ill_formed();
       }
     };
     boost::phoenix::function<set_indexed_factor_type> set_indexed_factor_type_f;
@@ -486,12 +506,12 @@ namespace stan {
     class whitespace_grammar : public qi::grammar<Iterator> {
     public:
       whitespace_grammar() : whitespace_grammar::base_type(whitespace) {
-	whitespace 
-	  = ( qi::omit["/*"] >> *(qi::char_ - "*/") > qi::omit["*/"] )
-	  | ( qi::omit["//"] >> *(qi::char_ - qi::eol) )
-	  | ( qi::omit["#"] >> *(qi::char_ - qi::eol) )
-	  | ascii::space_type()
-	  ;
+        whitespace 
+          = ( qi::omit["/*"] >> *(qi::char_ - "*/") > qi::omit["*/"] )
+          | ( qi::omit["//"] >> *(qi::char_ - qi::eol) )
+          | ( qi::omit["#"] >> *(qi::char_ - qi::eol) )
+          | ascii::space_type()
+          ;
       }
     private:
       qi::rule<Iterator> whitespace;
@@ -500,395 +520,405 @@ namespace stan {
 
     template <typename Iterator>
     struct program_grammar : qi::grammar<Iterator, 
-					 program(), 
-					 whitespace_grammar<Iterator> > {
-      std::map<std::string,base_var_decl> var_name_to_decl_;
-      std::stringstream error_msgs_;
+                                         program(), 
+                                         whitespace_grammar<Iterator> > {
+ 
       program_grammar() 
-	: program_grammar::base_type(program_r) {
-	using qi::_val;
-	using qi::_1;
-	using qi::_pass;
-	using qi::double_;
-	using qi::int_;
-	using boost::spirit::qi::eps;
-	using namespace qi::labels;
+        : program_grammar::base_type(program_r) {
+        using qi::_val;
+        using qi::_1;
+        using qi::_pass;
+        using qi::double_;
+        using qi::int_;
+        using boost::spirit::qi::eps;
+        using namespace qi::labels;
 
-	// FIXME:  put this in scope only in model and derived parameters
-	var_name_to_decl_["lp__"] 
-	  = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
+        program_r.name("program");
+        program_r 
+          %= -data_var_decls_r
+          > -derived_data_var_decls_r
+          > -param_var_decls_r
+          // scope lp__ to "transformed params" and "model" only
+          > qi::eps[add_lp_var_f(boost::phoenix::ref(var_name_to_decl_))]
+          > -derived_var_decls_r
+          > model_r
+          > qi::eps[remove_lp_var_f(boost::phoenix::ref(var_name_to_decl_))]
+          > -generated_var_decls_r
+          ;
+        
+        model_r.name("model declaration");
+        model_r 
+          %= qi::lit("model")
+          > statement_r(true)
+          ;
 
-	program_r.name("program");
-	program_r 
-	  %= -data_var_decls_r
-	  > -derived_data_var_decls_r
-	  > -param_var_decls_r
-	  > -derived_var_decls_r
-	  > model_r
-	  > -generated_var_decls_r;
-	
-	model_r.name("model declaration");
-	model_r 
-	  %= qi::lit("model")
-	  > statement_r(true);
+        data_var_decls_r.name("data variable declarations");
+        data_var_decls_r
+          %= qi::lit("data")
+          > qi::lit('{')
+          > *var_decl_r(true,data_origin) // +constraints
+          > qi::lit('}');
 
-	data_var_decls_r.name("data variable declarations");
-	data_var_decls_r
-	  %= qi::lit("data")
-	  > qi::lit('{')
-	  > *var_decl_r(true) // +constraints
-	  > qi::lit('}');
+        derived_data_var_decls_r.name("derived data variable declaration and statement");
+        derived_data_var_decls_r
+          %= qi::lit("derived")
+          >> qi::lit("data")
+          > qi::lit('{')
+          > *var_decl_r(false,transformed_data_origin)  // -constraints
+          > *statement_r(false) // -sampling
+          > qi::lit('}');
 
-	derived_data_var_decls_r.name("derived data variable declaration and statement");
-	derived_data_var_decls_r
-	  %= qi::lit("derived")
-	  >> qi::lit("data")
-	  > qi::lit('{')
-	  > *var_decl_r(false)  // -constraints
-	  > *statement_r(false) // -sampling
-	  > qi::lit('}');
+        param_var_decls_r.name("parameter variable declarations");
+        param_var_decls_r
+          %= qi::lit("parameters")
+          > qi::lit('{')
+          > *var_decl_r(true,parameter_origin) // +constraints
+          > qi::lit('}');
 
-	param_var_decls_r.name("parameter variable declarations");
-	param_var_decls_r
-	  %= qi::lit("parameters")
-	  > qi::lit('{')
-	  > *var_decl_r(true) // +constraints
-	  > qi::lit('}');
+        derived_var_decls_r.name("derived variable declarations");
+        derived_var_decls_r
+          %= qi::lit("derived")
+          >> qi::lit("parameters")
+          > qi::lit('{')
+          > *var_decl_r(false,transformed_parameter_origin) // -constraints
+          > *statement_r(false) // -sampling
+          > qi::lit('}');
 
-	derived_var_decls_r.name("derived variable declarations");
-	derived_var_decls_r
-	  %= qi::lit("derived")
-	  >> qi::lit("parameters")
-	  > qi::lit('{')
-	  > *var_decl_r(false) // -constraints
-	  > *statement_r(false) // -sampling
-	  > qi::lit('}');
+        generated_var_decls_r.name("generated variable declarations");
+        generated_var_decls_r
+          %= qi::lit("generated")
+          > qi::lit("quantities")
+          > qi::lit('{')
+          > *var_decl_r(false,derived_origin) // -constraints
+          > *statement_r(false) // -sampling
+          > qi::lit('}');
 
-	generated_var_decls_r.name("generated variable declarations");
-	generated_var_decls_r
-	  %= qi::lit("generated")
-	  > qi::lit("quantities")
-	  > qi::lit('{')
-	  > *var_decl_r(false) // -constraints
-	  > *statement_r(false) // -sampling
-	  > qi::lit('}');
+        // _a local to hold error state, _r1 inherited true if constriaints allowed
+        var_decl_r.name("variable declaration");
+        var_decl_r 
+          %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+              )
+          > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,boost::phoenix::ref(error_msgs_))]
+          ;
 
-	// _a local to hold error state, _r1 inherited true if constriaints allowed
-	var_decl_r.name("variable declaration");
-	var_decl_r 
-	  %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-	      )
-	  > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,boost::phoenix::ref(error_msgs_))]
-	  ;
+        int_decl_r.name("integer declaration");
+        int_decl_r 
+          %= qi::lit("int")
+          > -range_brackets_int_r
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	int_decl_r.name("integer declaration");
-	int_decl_r 
-	  %= qi::lit("int")
-	  > -range_brackets_int_r
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        double_decl_r.name("double declaration");
+        double_decl_r 
+          %= qi::lit("double")
+          > -range_brackets_double_r
+          > identifier_r
+          > opt_dims_r
+          > qi::lit(';');
 
-	double_decl_r.name("double declaration");
-	double_decl_r 
-	  %= qi::lit("double")
-	  > -range_brackets_double_r
-	  > identifier_r
-	  > opt_dims_r
-	  > qi::lit(';');
+        vector_decl_r.name("vector declaration");
+        vector_decl_r 
+          %= qi::lit("vector")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	vector_decl_r.name("vector declaration");
-	vector_decl_r 
-	  %= qi::lit("vector")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        row_vector_decl_r.name("row vector declaration");
+        row_vector_decl_r 
+          %= qi::lit("row_vector")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	row_vector_decl_r.name("row vector declaration");
-	row_vector_decl_r 
-	  %= qi::lit("row_vector")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        matrix_decl_r.name("matrix declaration");
+        matrix_decl_r 
+          %= qi::lit("matrix")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(',')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	matrix_decl_r.name("matrix declaration");
-	matrix_decl_r 
-	  %= qi::lit("matrix")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(',')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        simplex_decl_r.name("simplex declaration");
+        simplex_decl_r 
+          %= qi::lit("simplex")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	simplex_decl_r.name("simplex declaration");
-	simplex_decl_r 
-	  %= qi::lit("simplex")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        pos_ordered_decl_r.name("positive ordered declaration");
+        pos_ordered_decl_r 
+          %= qi::lit("pos_ordered")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	pos_ordered_decl_r.name("positive ordered declaration");
-	pos_ordered_decl_r 
-	  %= qi::lit("pos_ordered")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        cov_matrix_decl_r.name("positive definite symmetric (covariance) matrix declaration");
+        cov_matrix_decl_r 
+          %= qi::lit("cov_matrix")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	cov_matrix_decl_r.name("positive definite symmetric (covariance) matrix declaration");
-	cov_matrix_decl_r 
-	  %= qi::lit("cov_matrix")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        corr_matrix_decl_r.name("correlation matrix declaration");
+        corr_matrix_decl_r 
+          %= qi::lit("corr_matrix")
+          > qi::lit('(')
+          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
 
-	corr_matrix_decl_r.name("correlation matrix declaration");
-	corr_matrix_decl_r 
-	  %= qi::lit("corr_matrix")
-	  > qi::lit('(')
-	  > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  > qi::lit(')')
-	  > identifier_r 
-	  > opt_dims_r
-	  > qi::lit(';');
+        expression_r.name("expression");
+        expression_r 
+          %=  term_r                          [_val = _1]
+          >> *( (qi::lit('+') > term_r        [_val += _1])
+                |   (qi::lit('-') > term_r    [_val -= _1])
+                )
+          > qi::eps[_pass = validate_expr_type_f(_val)];
+          ;
 
-	expression_r.name("expression");
-	expression_r 
-	  %=  term_r                          [_val = _1]
-	  >> *( (qi::lit('+') > term_r        [_val += _1])
-		|   (qi::lit('-') > term_r    [_val -= _1])
-		)
-	  > qi::eps[_pass = validate_expr_type_f(_val)];
-	  ;
+        term_r.name("term");
+        term_r 
+          %= ( negated_factor_r                          [_val = _1]
+              >> *( (qi::lit('*') > negated_factor_r     [_val *= _1])
+                    | (qi::lit('/') > negated_factor_r   [_val /= _1])
+                    )
+              )
+          ;
 
-	term_r.name("term");
-	term_r 
-	  %= ( negated_factor_r                          [_val = _1]
-	      >> *( (qi::lit('*') > negated_factor_r     [_val *= _1])
-		    | (qi::lit('/') > negated_factor_r   [_val /= _1])
-		    )
-	      )
-	  ;
+        negated_factor_r 
+          %= qi::lit('-') >> indexed_factor_r [_val = neg(_1)]
+          | qi::lit('+') >> indexed_factor_r [_val = _1]
+          | indexed_factor_r [_val = _1];
+        
+        // two of these to put semantic action on this one w. index_op input
+        indexed_factor_r.name("(optionally) indexed factor [sub]");
+        indexed_factor_r 
+          %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
 
-	negated_factor_r 
-	  %= qi::lit('-') >> indexed_factor_r [_val = neg(_1)]
-	  | qi::lit('+') >> indexed_factor_r [_val = _1]
-	  | indexed_factor_r [_val = _1];
-	
-	// two of these to put semantic action on this one w. index_op input
-	indexed_factor_r.name("(optionally) indexed factor [sub]");
-	indexed_factor_r 
-	  %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
+        indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
+        indexed_factor_2_r 
+          %= (factor_r >> *dims_r);
 
-	indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
-	indexed_factor_2_r 
-	  %= (factor_r >> *dims_r);
+        factor_r.name("factor");
+        factor_r
+          %= int_literal_r      [_val = _1]
+          | double_literal_r    [_val = _1]
+          | fun_r               [_val = set_fun_type_f(_1)]
+          | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_name_to_decl_))]
+          | ( qi::lit('(') 
+              > expression_r    [_val = _1] 
+              > qi::lit(')') )
+          ;
 
-	factor_r.name("factor");
-	factor_r
-	  %= int_literal_r      [_val = _1]
-	  | double_literal_r    [_val = _1]
-	  | fun_r               [_val = set_fun_type_f(_1)]
-	  | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_name_to_decl_))]
-	  | ( qi::lit('(') 
-	      > expression_r    [_val = _1] 
-	      > qi::lit(')') )
-	  ;
+        int_literal_r.name("integer literal");
+        int_literal_r
+          %= int_ 
+             >> !( qi::lit('.')
+                   | qi::lit('e')
+                   | qi::lit('E') );
 
-	int_literal_r.name("integer literal");
-	int_literal_r
-	  %= int_ 
-	     >> !( qi::lit('.')
-		   | qi::lit('e')
-		   | qi::lit('E') );
-
-	double_literal_r.name("double literal");
-	double_literal_r
-	  %= double_;
+        double_literal_r.name("double literal");
+        double_literal_r
+          %= double_;
 
 
-	// no optional dims in the variable_r
-	variable_r.name("variable expression");
-	variable_r
-	  %= identifier_r;
+        // no optional dims in the variable_r
+        variable_r.name("variable expression");
+        variable_r
+          %= identifier_r;
 
-	fun_r.name("function and argument expressions");
-	fun_r 
-	  %= identifier_r 
-	  >> args_r; 
-	    
-	opt_dims_r.name("array dimensions (optional)");
-	opt_dims_r 
-	  %=  - dims_r;
+        fun_r.name("function and argument expressions");
+        fun_r 
+          %= identifier_r 
+          >> args_r; 
+            
+        opt_dims_r.name("array dimensions (optional)");
+        opt_dims_r 
+          %=  - dims_r;
 
-	dims_r.name("array dimensions");
-	dims_r 
-	  %= qi::lit('[') 
-	  > (expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	     % ',')
-	  > qi::lit(']')
-	  ;
-	
-	range_r.name("range expression pair, colon");
-	range_r 
-	  %= expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-	  >> qi::lit(':') 
-	  >> expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
+        dims_r.name("array dimensions");
+        dims_r 
+          %= qi::lit('[') 
+          > (expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+             % ',')
+          > qi::lit(']')
+          ;
+        
+        range_r.name("range expression pair, colon");
+        range_r 
+          %= expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          >> qi::lit(':') 
+          >> expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
 
-	truncation_range_r.name("range pair");
-	truncation_range_r
-	  %= qi::lit('T')
-	  > qi::lit('(') 
-	  > -expression_r
-	  > qi::lit(',')
-	  > -expression_r
-	  > qi::lit(')');
-	
-	range_brackets_int_r.name("range expression pair, brackets");
-	range_brackets_int_r 
-	  %= qi::lit('(') 
-	  > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-	  > qi::lit(',')
-	  > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-	  > qi::lit(')');
+        truncation_range_r.name("range pair");
+        truncation_range_r
+          %= qi::lit('T')
+          > qi::lit('(') 
+          > -expression_r
+          > qi::lit(',')
+          > -expression_r
+          > qi::lit(')');
+        
+        range_brackets_int_r.name("range expression pair, brackets");
+        range_brackets_int_r 
+          %= qi::lit('(') 
+          > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(',')
+          > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(')');
 
-	range_brackets_double_r.name("range expression pair, brackets");
-	range_brackets_double_r 
-	  %= qi::lit('(') 
-	  > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-	  > qi::lit(',')
-	  > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-	  > qi::lit(')');
+        range_brackets_double_r.name("range expression pair, brackets");
+        range_brackets_double_r 
+          %= qi::lit('(') 
+          > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(',')
+          > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(')');
 
-	args_r.name("function argument expressions");
-	args_r 
-	  %= qi::lit('(') 
-	  >> (expression_r % ',')
-	  > qi::lit(')');
+        args_r.name("function argument expressions");
+        args_r 
+          %= qi::lit('(') 
+          >> (expression_r % ',')
+          > qi::lit(')');
 
-	identifier_r.name("identifier");
-	identifier_r
-	  %= (qi::lexeme[qi::char_("a-zA-Z") 
-			>> *qi::char_("a-zA-Z0-9_.")]);
+        identifier_r.name("identifier");
+        identifier_r
+          %= (qi::lexeme[qi::char_("a-zA-Z") 
+                        >> *qi::char_("a-zA-Z0-9_.")]);
 
-	distribution_r.name("distribution and parameters");
-	distribution_r
-	  %= identifier_r
-	  >> qi::lit('(')
-	  >> -(expression_r % ',')
-	  > qi::lit(')');
+        distribution_r.name("distribution and parameters");
+        distribution_r
+          %= identifier_r
+          >> qi::lit('(')
+          >> -(expression_r % ',')
+          > qi::lit(')');
 
-	// inherited  _r1 = true if samples allowed as statements
-	sample_r.name("distribution of expression");
-	sample_r 
-	  %= expression_r
-	  >> qi::lit('~')
-	  > qi::eps[_pass = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
-	  > distribution_r
-	  > -truncation_range_r
-	  > qi::lit(';');
-	
-	var_lhs_r.name("variable and array dimensions");
-	var_lhs_r 
-	  %= identifier_r 
-	  >> opt_dims_r;
+        // inherited  _r1 = true if samples allowed as statements
+        sample_r.name("distribution of expression");
+        sample_r 
+          %= expression_r
+          >> qi::lit('~')
+          > qi::eps[_pass = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
+          > distribution_r
+          > -truncation_range_r
+          > qi::lit(';');
+        
+        var_lhs_r.name("variable and array dimensions");
+        var_lhs_r 
+          %= identifier_r 
+          >> opt_dims_r;
 
-	assignment_r.name("variable assignment by expression");
-	assignment_r
-	  %= var_lhs_r
-	  >> qi::lit("<-")
-	  > expression_r
-	  > qi::lit(';') 
-	  ;
+        assignment_r.name("variable assignment by expression");
+        assignment_r
+          %= var_lhs_r
+          >> qi::lit("<-")
+          > expression_r
+          > qi::lit(';') 
+          ;
 
-	// inherited attribute _r1 is type bool
-	// set to true if sample_r are allowed
-	statement_r.name("statement");
-	statement_r
-	  %= statement_seq_r(_r1)
-	  | for_statement_r(_r1)
-	  | assignment_r [_pass 
-			  = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_),
-						  boost::phoenix::ref(error_msgs_))]
-	  | sample_r(_r1) [_pass = validate_sample_f(_1)]
-	  | no_op_statement_r
-	  ;
+        // inherited attribute _r1 is type bool
+        // set to true if sample_r are allowed
+        statement_r.name("statement");
+        statement_r
+          %= statement_seq_r(_r1)
+          | for_statement_r(_r1)
+          | assignment_r [_pass 
+                          = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_),
+                                                  boost::phoenix::ref(error_msgs_))]
+          | sample_r(_r1) [_pass = validate_sample_f(_1)]
+          | no_op_statement_r
+          ;
 
-	no_op_statement_r.name("no op statement");
-	no_op_statement_r 
-	  %= qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
+        no_op_statement_r.name("no op statement");
+        no_op_statement_r 
+          %= qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
-	for_statement_r.name("for statement");
-	for_statement_r
-	  %= qi::lit("for")
-	  > qi::lit('(')
-	  > identifier_r [_pass 
-			  = add_loop_identifier_f(_1,_a,
-						  boost::phoenix::ref(var_name_to_decl_),
-						  boost::phoenix::ref(error_msgs_))]
-	  > qi::lit("in")
-	  > range_r
-	  > qi::lit(')')
-	  > statement_r(_r1)
-	  > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
-	  ;
+        for_statement_r.name("for statement");
+        for_statement_r
+          %= qi::lit("for")
+          > qi::lit('(')
+          > identifier_r [_pass 
+                          = add_loop_identifier_f(_1,_a,
+                                                  boost::phoenix::ref(var_name_to_decl_),
+                                                  boost::phoenix::ref(error_msgs_))]
+          > qi::lit("in")
+          > range_r
+          > qi::lit(')')
+          > statement_r(_r1)
+          > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
+          ;
 
-	  // _r1 = true if sampling statements allowed
-	statement_seq_r.name("sequence of statements");
-	statement_seq_r
-	  %= qi::lit('{')
-	  > local_var_decls_r[_a = _1]
-	  > *statement_r(_r1)
-	  > qi::lit('}')
-	  > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_name_to_decl_))]
-	  ;
+          // _r1 = true if sampling statements allowed
+        statement_seq_r.name("sequence of statements");
+        statement_seq_r
+          %= qi::lit('{')
+          > local_var_decls_r[_a = _1]
+          > *statement_r(_r1)
+          > qi::lit('}')
+          > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_name_to_decl_))]
+          ;
 
-	local_var_decls_r
-	  %= *var_decl_r(false); // - constants
+        local_var_decls_r
+          %= *var_decl_r(false,local_origin); // - constants
 
-	// hack cast to write to error_msgs_ of type stringstream
-	qi::on_error<qi::rethrow>(var_decl_r,
-				  (std::ostream&)error_msgs_
-				  << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
-				  << std::endl);
+        // hack cast to write to error_msgs_ of type stringstream
+        qi::on_error<qi::rethrow>(var_decl_r,
+                                  (std::ostream&)error_msgs_
+                                  << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
+                                  << std::endl);
 
-	qi::on_error<qi::rethrow>(indexed_factor_r,
-				  (std::ostream&)error_msgs_
-				  << boost::phoenix::val("ERROR: Ill-formed factor.")
-				  << std::endl);
+        qi::on_error<qi::rethrow>(indexed_factor_r,
+                                  (std::ostream&)error_msgs_
+                                  << boost::phoenix::val("ERROR: Ill-formed factor.")
+                                  << std::endl);
 
-	qi::on_error<qi::rethrow>(program_r,
-				  (std::ostream&)error_msgs_
-				  << boost::phoenix::val("ERROR: Expected ")
-				  << _4 
-				  << std::endl);
+        qi::on_error<qi::rethrow>(program_r,
+                                  (std::ostream&)error_msgs_
+                                  << boost::phoenix::val("ERROR: Expected ")
+                                  << _4 
+                                  << std::endl);
       }
 
+      // global info for parses
+      std::map<std::string,base_var_decl> var_name_to_decl_;
+      std::stringstream error_msgs_;
+      std::set<std::string> data_vars;
+      std::set<std::string> derived_data_vars;
+      std::set<std::string> parameter_vars;
+      std::set<std::string> derived_parameter_vars;
+      std::set<std::string> generated_quantity_vars;
+
+      // rules
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > expression_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > term_r;
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > factor_r;
@@ -914,15 +944,15 @@ namespace stan {
       qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > pos_ordered_decl_r;
       qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > cov_matrix_decl_r;
       qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> > corr_matrix_decl_r;
-      qi::rule<Iterator, qi::locals<bool>, var_decl(bool), whitespace_grammar<Iterator> > var_decl_r;
+      qi::rule<Iterator, qi::locals<bool>, var_decl(bool,var_origin), whitespace_grammar<Iterator> > var_decl_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > data_var_decls_r;
       qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
-	       whitespace_grammar<Iterator> > derived_data_var_decls_r;
+               whitespace_grammar<Iterator> > derived_data_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
       qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
-	       whitespace_grammar<Iterator> > derived_var_decls_r;
+               whitespace_grammar<Iterator> > derived_var_decls_r;
       qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
-	       whitespace_grammar<Iterator> > generated_var_decls_r;
+               whitespace_grammar<Iterator> > generated_var_decls_r;
       qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > local_var_decls_r;
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;
       qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> > distribution_r;
@@ -930,7 +960,7 @@ namespace stan {
       qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > assignment_r;
       qi::rule<Iterator, statement(bool), whitespace_grammar<Iterator> > statement_r;
       qi::rule<Iterator, qi::locals<std::vector<var_decl> >, 
-	       statements(bool), whitespace_grammar<Iterator> > statement_seq_r;
+               statements(bool), whitespace_grammar<Iterator> > statement_seq_r;
       qi::rule<Iterator, qi::locals<std::string>, for_statement(bool), 
                whitespace_grammar<Iterator> > for_statement_r;
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
@@ -945,8 +975,8 @@ namespace stan {
     // http://boost-spirit.com/home/articles/qi-example/tracking-the-input-position-while-parsing/
     // http://boost-spirit.com/dl_more/parsing_tracking_position/stream_iterator_errorposition_parsing.cpp
     bool parse(std::istream& input, 
-	       const std::string& filename, 
-	       program& result) {
+               const std::string& filename, 
+               program& result) {
 
       namespace classic = boost::spirit::classic;
 
@@ -964,36 +994,36 @@ namespace stan {
       pos_iterator_type position_begin(fwd_begin, fwd_end, filename);
       pos_iterator_type position_end;
       
-      program_grammar<pos_iterator_type> program_grammar;
-      whitespace_grammar<pos_iterator_type> whitespace_grammar;
+      program_grammar<pos_iterator_type> prog_grammar;
+      whitespace_grammar<pos_iterator_type> whitesp_grammar;
       
       bool success = 0;
       try {
-	success = qi::phrase_parse(position_begin, 
-				   position_end,
-				   program_grammar,
-				   whitespace_grammar,
-				   result);
+        success = qi::phrase_parse(position_begin, 
+                                   position_end,
+                                   prog_grammar,
+                                   whitesp_grammar,
+                                   result);
       } catch (const qi::expectation_failure<pos_iterator_type>& e) {
-	// FIXME: generalize beyond expectation failures
-	const classic::file_position_base<std::string>& pos = e.first.get_position();
-	std::stringstream msg;
-	msg << "parse error at file " 
-	    << pos.file 
-	    << " line " 
-	    << pos.line 
-	    << " column " 
-	    << pos.column 
-	    << std::endl 
-	    << e.first.get_currentline() 
-	    << std::endl;
-	for (int i = 2; i < pos.column; ++i)
-	  msg << ' ';
-	msg << " ^-- here";
-	msg << std::endl;
-	msg << program_grammar.error_msgs_;
-	msg << std::endl;
-	throw std::invalid_argument(msg.str());
+        // FIXME: generalize beyond expectation failures
+        const classic::file_position_base<std::string>& pos = e.first.get_position();
+        std::stringstream msg;
+        msg << "parse error at file " 
+            << pos.file 
+            << " line " 
+            << pos.line 
+            << " column " 
+            << pos.column 
+            << std::endl 
+            << e.first.get_currentline() 
+            << std::endl;
+        for (int i = 2; i < pos.column; ++i)
+          msg << ' ';
+        msg << " ^-- here";
+        msg << std::endl;
+        msg << prog_grammar.error_msgs_;
+        msg << std::endl;
+        throw std::invalid_argument(msg.str());
       }
       return success && (position_begin == position_end); // want to consume ALL input
     }

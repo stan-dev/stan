@@ -91,7 +91,7 @@ namespace stan {
      * A variable implementation is constructed with a constant
      * value.  It also stores the adjoint for storing the partial
      * derivative with respect to the root of the derivative tree.
-   
+     * 
      * The chain() method applies the chain rule.  Concrete extensions
      * of this class will represent base variables or the result
      * of operations such as addition or subtraction.  These extended
@@ -163,8 +163,12 @@ namespace stan {
     };
 
 
- /**
+    /**
      * Independent (input) and dependent (output) variables for gradients.
+     *
+     * This class acts as a smart pointer, with resources managed by
+     * an agenda-based memory manager scoped to a single gradient
+     * calculation.
      *
      * An agrad::var is constructed with a double and used like any
      * other scalar.  Arithmetical functions like negation, addition,
@@ -376,6 +380,38 @@ namespace stan {
       void grad() {
 	stan::agrad::grad(vi_);
 	recover_memory();
+      }
+
+      // POINTER OVERRIDES
+      
+      /**
+       * Return a reference to underlying implementation of this variable.
+       *
+       * If <code>x</code> is of type <code>var</code>, then applying
+       * this operator, <code>*x</code>, has the same behavior as
+       * <code>*(x.vi_)</code>.
+       *
+       * <i>Warning</i>:  The returned reference does not track changes to
+       * this variable.
+       *
+       * @return variable
+       */
+      inline vari& operator*() {
+	return *vi_;
+      }
+
+      /**
+       * Return a pointer to the underlying implementation of this variable.
+       *
+       * If <code>x</code> is of type <code>var</code>, then applying
+       * this operator, <code>x-&gt;</code>, behaves the same way as
+       * <code>x.vi_-&gt;</code>.
+       *
+       * <i>Warning</i>: The returned result does not track changes to
+       * this variable.
+       */
+      inline vari* operator->() {
+	return vi_;
       }
 
       // COMPOUND ASSIGNMENT OPERATORS

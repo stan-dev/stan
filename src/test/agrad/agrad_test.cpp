@@ -1056,3 +1056,12 @@ TEST(AgradAgrad,free_memory) {
   EXPECT_FLOAT_EQ(-3.0,grad_ff[0]);
   EXPECT_FLOAT_EQ(2.0,grad_ff[1]);
 }
+
+TEST(AgradAgrad, smart_ptrs) {
+  AVAR a = 2.0;
+  EXPECT_FLOAT_EQ(2.0, (*a).val_);
+  EXPECT_FLOAT_EQ(2.0, a->val_);
+
+  EXPECT_FLOAT_EQ(2.0,(*a.vi_).val_);
+  EXPECT_FLOAT_EQ(2.0,a.vi_->val_);
+}
