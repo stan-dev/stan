@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/normal.hpp"
+#include <stan/prob/distributions/normal.hpp>
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
@@ -29,6 +29,9 @@ TEST(ProbDistributionsNormal,DefaultPolicyScale) {
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
   sigma_d = -1.0;
   EXPECT_THROW(stan::prob::normal_log(0.0,0.0,sigma_d), std::domain_error);
+
+  sigma_d = 1.0;
+  EXPECT_NO_THROW(stan::prob::normal_log(0.0,0.0,sigma_d));
 }
 TEST(ProbDistributionsNormal,ErrnoPolicyScale) {
   double sigma_d = 0.0;
@@ -43,14 +46,17 @@ TEST(ProbDistributionsNormal,ErrnoPolicyScale) {
 }
 TEST(ProbDistributionsNormal,DefaultPolicyY) {
   double y = 0.0;
+  double result;
   EXPECT_NO_THROW (stan::prob::normal_log(y,0.0,1.0));
   
   y = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
   y = std::numeric_limits<double>::infinity();
-  EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
+  EXPECT_NO_THROW(result = stan::prob::normal_log(y,0.0,1.0));
+  EXPECT_FLOAT_EQ(log(0.0), result);
   y = -std::numeric_limits<double>::infinity();
-  EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
+  EXPECT_NO_THROW(result = stan::prob::normal_log(y,0.0,1.0));
+  EXPECT_FLOAT_EQ(log(0.0), result);
 }
 TEST(ProbDistributionsNormal,ErrnoPolicyY) {
   double result = 0;
@@ -63,11 +69,11 @@ TEST(ProbDistributionsNormal,ErrnoPolicyY) {
   
   y = std::numeric_limits<double>::infinity();
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
-  EXPECT_TRUE (std::isnan(result));
+  EXPECT_FLOAT_EQ(log(0.0), result);
 
   y = -std::numeric_limits<double>::infinity();
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
-  EXPECT_TRUE (std::isnan(result));
+  EXPECT_FLOAT_EQ(log(0.0), result);
 }
 TEST(ProbDistributionsNormal,DefaultPolicyLocation) {
   double mu = 0.0;
@@ -183,9 +189,9 @@ TEST(ProbDistributionsNormal,DefaultPolicyNormalVectorY) {
   y[1] = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
   y[1] = std::numeric_limits<double>::infinity();
-  EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
+  EXPECT_NO_THROW(stan::prob::normal_log(y,0.0,1.0));
   y[1] = -std::numeric_limits<double>::infinity();
-  EXPECT_THROW(stan::prob::normal_log(y,0.0,1.0), std::domain_error);
+  EXPECT_NO_THROW(stan::prob::normal_log(y,0.0,1.0));
 }
 TEST(ProbDistributionsNormal,ErrnoPolicyNormalVectorY) {
   double result = 0;
@@ -202,11 +208,11 @@ TEST(ProbDistributionsNormal,ErrnoPolicyNormalVectorY) {
   
   y[2] = std::numeric_limits<double>::infinity();
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
-  EXPECT_TRUE (std::isnan(result));
+  EXPECT_FALSE (std::isnan(result));
 
   y[2] = -std::numeric_limits<double>::infinity();
   result = stan::prob::normal_log(y,0.0,1.0,errno_policy());
-  EXPECT_TRUE (std::isnan(result));
+  EXPECT_FALSE (std::isnan(result));
 }
 TEST(ProbDistributionsNormal,DefaultPolicyNormalVectorLocation) {
   std::vector<double> y;

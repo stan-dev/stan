@@ -38,31 +38,31 @@ namespace stan {
      * @tparam Policy Error-handling policy.
      */
     template <bool propto = false, 
-	      typename T_y, typename T_loc, typename T_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_loc, typename T_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-	       const Policy& = Policy()) {
+               const Policy& = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!check_scale(function, sigma, &lp, Policy()))
-	return lp;
+        return lp;
       if (!check_location(function, mu, &lp, Policy()))
-	return lp;
-      if (!check_x(function, y, &lp, Policy()))
-	return lp;
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp, Policy()))
+        return lp;
 
       using stan::maths::square;
 
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
-	lp -= square(y - mu) / (2.0 * square(sigma));
+        lp -= square(y - mu) / (2.0 * square(sigma));
       
       if (include_summand<propto,T_scale>::value)
-	lp -= log(sigma);
+        lp -= log(sigma);
 
       if (include_summand<propto>::value)
-	lp += NEG_LOG_SQRT_TWO_PI;
+        lp += NEG_LOG_SQRT_TWO_PI;
       
       return lp;
     }
@@ -87,32 +87,30 @@ namespace stan {
      * @tparam Policy Error-handling policy.
      */
     template <bool propto = false, 
-	      typename T_y, typename T_loc, typename T_scale,
-	      class Policy = policy<> >
+              typename T_y, typename T_loc, typename T_scale,
+              class Policy = policy<> >
 
     inline typename promote_args<T_y, T_loc, T_scale>::type
 
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-	     const Policy& /* pol */ = Policy() ) {
+             const Policy& /* pol */ = Policy() ) {
 
       static const char* function = "stan::prob::normal_p(%1%)";
 
       typename promote_args<T_y, T_loc, T_scale>::type lp;
 
       if (!check_scale(function, sigma, &lp, Policy()))
-	return lp;
-
+        return lp;
       if (!check_location(function, mu, &lp, Policy()))
-	return lp;
-
-      if (!check_x(function, y, &lp, Policy()))
-	return lp;
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp, Policy()))
+        return lp;
 
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
-	return 1.0;
+        return 1.0;
 
       if (include_summand<propto>::value)
-	return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
+        return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
       
       return erfc(-(y - mu)/(sigma * SQRT_2));
     }
@@ -138,44 +136,43 @@ namespace stan {
      * @tparam T_loc Type of location parameter.
      */
     template <bool propto = false,
-	      typename T_y, typename T_loc, typename T_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_loc, typename T_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_loc,T_scale>::type
     normal_log(const std::vector<T_y>& y,
-	       const T_loc& mu,
-	       const T_scale& sigma,
-	       const Policy& /* pol */ = Policy()) {
+               const T_loc& mu,
+               const T_scale& sigma,
+               const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!check_scale(function, sigma, &lp, Policy()))
-	return lp;
+        return lp;
       if (!check_location(function, mu, &lp, Policy()))
-	return lp;
-      if (!stan::prob::check_x(function, y, &lp, Policy()))
-	return lp;
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp, Policy()))
+        return lp;
 
       if (y.size() == 0)
-	return lp;
+        return lp;
       
       using stan::maths::square;
       using stan::maths::multiply_log;
 
       if (include_summand<propto,T_y,T_loc,T_scale>::value) {
-	for (unsigned int n = 0; n < y.size(); ++n)
-	  lp -= square(y[n] - mu);
-	lp /= 2.0 * square(sigma);
+        for (unsigned int n = 0; n < y.size(); ++n)
+          lp -= square(y[n] - mu);
+        lp /= 2.0 * square(sigma);
       }
       
       if (include_summand<propto,T_scale>::value) 
-	lp -= multiply_log(y.size(),sigma);
+        lp -= multiply_log(y.size(),sigma);
       
       if (include_summand<propto>::value) 
-	lp += y.size() * NEG_LOG_SQRT_TWO_PI;
+        lp += y.size() * NEG_LOG_SQRT_TWO_PI;
       
       return lp;
     }
-
 
   }
 }
