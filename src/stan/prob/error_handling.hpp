@@ -55,6 +55,26 @@ namespace stan {
       return true;
     }
 
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                              const char* name,
+                              T_result* result,
+                              const Policy& /*pol*/) {
+      for (int i = 0; i < y.rows(); i++) {
+        if (boost::math::isnan(y[i])) {
+          std::string message(name);
+          message += "[";
+          message += i;
+          message += "] is %1%, but must not be nan!";
+          *result = raise_domain_error<T_y>(function,
+                                            message.c_str(),
+                                            y[i], Policy());
+          return false;
+        }
+      }
+      return true;
+    }
 
     /**
      * Note that this test catches both infinity and NaN.

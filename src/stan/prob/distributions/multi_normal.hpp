@@ -56,13 +56,13 @@ namespace stan {
      * @tparam T_covar Type of scale.
      */
     template <bool propto = false, 
-	      typename T_y, typename T_loc, typename T_covar, 
-	      class Policy = policy<> > 
+              typename T_y, typename T_loc, typename T_covar, 
+              class Policy = policy<> > 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
-		     const Matrix<T_loc,Dynamic,1>& mu,
-		     const Matrix<T_covar,Dynamic,Dynamic>& Sigma,
-		     const Policy& = Policy()) {
+                     const Matrix<T_loc,Dynamic,1>& mu,
+                     const Matrix<T_covar,Dynamic,Dynamic>& Sigma,
+                     const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
       using stan::maths::multiply_log;
@@ -70,26 +70,26 @@ namespace stan {
 
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
-	return lp;
+        return lp;
       if (!check_size_match(function, y.size(), Sigma.rows(), &lp, Policy()))
-	return lp;
+        return lp;
       if (!check_size_match(function, y.size(), Sigma.cols(), &lp, Policy()))
-	return lp;
-      if (!check_x(function, y, &lp, Policy())) 
-	return lp;
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp, Policy())) 
+        return lp;
       if (!check_cov_matrix(function, Sigma, &lp, Policy()))
-	return lp;
+        return lp;
       if (y.rows() == 0)
-	return lp;
+        return lp;
       if (include_summand<propto>::value) 
-	lp += NEG_LOG_SQRT_TWO_PI * y.rows();
+        lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       if (include_summand<propto,T_covar>::value)
-	lp -= multiply_log(0.5,determinant(Sigma));
+        lp -= multiply_log(0.5,determinant(Sigma));
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-	Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff 
-	  = subtract(y,mu);
-	lp -= 0.5 * multiply(multiply(transpose(diff),inverse(Sigma)),
-			     diff);
+        Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff 
+          = subtract(y,mu);
+        lp -= 0.5 * multiply(multiply(transpose(diff),inverse(Sigma)),
+                             diff);
       }
       return lp;
     }
@@ -119,41 +119,41 @@ namespace stan {
      * @tparam T_covar Type of scale.
      */
     template <bool propto = false, 
-	      typename T_y, typename T_loc, typename T_covar, 
-	      class Policy = policy<> > 
+              typename T_y, typename T_loc, typename T_covar, 
+              class Policy = policy<> > 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
-		     const Matrix<T_loc,Dynamic,1>& mu,
-		     const Eigen::TriangularView<T_covar,Eigen::Lower>& L,
-		     const Policy& = Policy()) {
+                     const Matrix<T_loc,Dynamic,1>& mu,
+                     const Eigen::TriangularView<T_covar,Eigen::Lower>& L,
+                     const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
-	return lp;
+        return lp;
       if (!check_size_match(function, y.size(), L.rows(), &lp, Policy()))
-	return lp;
+        return lp;
       if (!check_size_match(function, y.size(), L.cols(), &lp, Policy()))
-	return lp; // redundant with Triangular View?
-      if (!check_x(function, y, &lp, Policy())) 
-	return lp;
+        return lp; // redundant with Triangular View?
+      if (!check_not_nan(function, y, &lp, Policy())) 
+        return lp;
 
       // FIXME: checks on L -- what are they?
       
       if (y.rows() == 0)
-	return lp;
+        return lp;
 
       if (include_summand<propto>::value) 
-	lp += NEG_LOG_SQRT_TWO_PI * y.rows();
+        lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       if (include_summand<propto,T_covar>::value) 
-	lp -= log(L.diagonal().array().prod());
+        lp -= log(L.diagonal().array().prod());
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-	Matrix<T_covar,Dynamic,1> half 
-	  = L.solveTriangular(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows())
-			      .setOnes())
-	  * (y - mu);
-	lp -= 0.5 * dot_product(half,half);
+        Matrix<T_covar,Dynamic,1> half 
+          = L.solveTriangular(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows())
+                              .setOnes())
+          * (y - mu);
+        lp -= 0.5 * dot_product(half,half);
       }
       return lp;
     }
