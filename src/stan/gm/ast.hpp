@@ -26,6 +26,7 @@
 #include <istream>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -668,11 +669,13 @@ namespace stan {
       local_origin
     };
 
+
     struct base_var_decl {
       std::string name_;
       std::vector<expression> dims_;
       base_expr_type base_type_;
-      base_var_decl() { }
+      base_var_decl() { 
+      }
       base_var_decl(const base_expr_type& base_type) 
       : base_type_(base_type) {
       }
@@ -685,6 +688,30 @@ namespace stan {
       }
     };
 
+
+    struct variable_map {
+      std::map<std::string,base_var_decl> map_;
+      bool exists(const std::string& name) const {
+        return map_.find(name) != map_.end();
+      }
+      base_var_decl get(const std::string& name) const {
+        if (!exists(name)) throw std::invalid_argument("variable does not exist"); // FIXME: message
+        return map_.find(name)->second;
+      }
+      base_expr_type get_base_type(const std::string& name) const {
+        return get(name).base_type_;
+      }
+      unsigned int get_num_dims(const std::string& name) const {
+        return get(name).dims_.size();
+      }
+      void add(const std::string& name,
+               const base_var_decl& base_var_decl) {
+        map_[name] = base_var_decl;
+      }
+      void remove(const std::string& name) {
+        map_.erase(name);
+      }
+    };
 
     struct int_var_decl : public base_var_decl {
       int_var_decl() : base_var_decl(INT_T) { }

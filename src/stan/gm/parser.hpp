@@ -170,9 +170,9 @@ namespace stan {
     struct add_lp_var {
       template <typename T>
       struct result { typedef void type; };
-      void operator()(std::map<std::string,base_var_decl>& var_name_to_decl) const {
-        var_name_to_decl["lp__"] 
-          = base_var_decl("lp__",std::vector<expression>(),DOUBLE_T);
+      void operator()(variable_map& vm) const {
+        vm.add("lp__",
+               base_var_decl("lp__",std::vector<expression>(),DOUBLE_T));
       }
     };
     boost::phoenix::function<add_lp_var> add_lp_var_f;
@@ -180,8 +180,8 @@ namespace stan {
     struct remove_lp_var {
       template <typename T>
       struct result { typedef void type; };
-      void operator()(std::map<std::string,base_var_decl>& var_name_to_decl) const {
-        var_name_to_decl.erase("lp__");
+      void operator()(variable_map& vm) const {
+        vm.remove("lp__");
       }
     };
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
@@ -256,7 +256,7 @@ namespace stan {
           return false; // short-circuits test of constraints
         validate_no_constraints_vis vis(error_msgs);
         bool constraints_ok = boost::apply_visitor(vis,var_decl.decl_);
-        return declaration_ok && constraints_ok;
+        return constraints_ok;
       }
     };
     boost::phoenix::function<validate_decl_constraints> validate_decl_constraints_f;
@@ -327,17 +327,18 @@ namespace stan {
       struct result { typedef bool type; };
 
       bool operator()(assignment& a,
-                      std::map<std::string,base_var_decl>& name_to_type,
+                      variable_map& vm,
                       std::stringstream& error_msgs) const {
 
-        if (name_to_type.find(a.var_dims_.name_) == name_to_type.end()) {
+        std::string name = a.var_dims_.name_;
+        if (!vm.exists(name)) {
           error_msgs << "unknown variable in assignment"
                      << "; lhs variable=" << a.var_dims_.name_ 
                      << std::endl;
           return false;
         }
-        a.var_type_ = name_to_type[a.var_dims_.name_];
-        unsigned int lhs_var_num_dims = name_to_type[a.var_dims_.name_].dims_.size();
+        a.var_type_ = vm.get(name);
+        unsigned int lhs_var_num_dims = a.var_type_.dims_.size();
         unsigned int num_index_dims = a.var_dims_.dims_.size();
 
         expr_type lhs_type = infer_type_indexing(a.var_type_.base_type_,
@@ -401,28 +402,29 @@ namespace stan {
     };
     boost::phoenix::function<validate_primitive_int_type> validate_primitive_int_type_f;
 
-    struct set_variable_type {
+    struct set_var_type {
       template <typename T1, typename T2>
       struct result { typedef variable type; };
       variable operator()(variable& var_expr, 
-                          std::map<std::string,base_var_decl>& name_to_type) const {
-        if (name_to_type.find(var_expr.name_) == name_to_type.end()) {
-          // FIXME: fail
+                          variable_map& vm) const {
+        std::string name = var_expr.name_;
+        if (!vm.exists(name)) {
+          throw std::runtime_error("variable does not exist");  
+          // FIXME: patch with pass = false and thread
         }
-        var_expr.set_type(name_to_type[var_expr.name_].base_type_, 
-                          name_to_type[var_expr.name_].dims_.size());
+        var_expr.set_type(vm.get_base_type(name),vm.get_num_dims(name));
         return var_expr;
       }
     };
-    boost::phoenix::function<set_variable_type> set_var_type_f;
+    boost::phoenix::function<set_var_type> set_var_type_f;
 
     struct unscope_locals {
       template <typename T1, typename T2>
       struct result { typedef void type; };
       void operator()(const std::vector<var_decl>& var_decls,
-                      std::map<std::string,base_var_decl>& name_to_type) const {
+                      variable_map& vm) const {
         for (unsigned int i = 0; i < var_decls.size(); ++i)
-          name_to_type.erase(var_decls[i].name());
+          vm.remove(var_decls[i].name());
       }
     };
     boost::phoenix::function<unscope_locals> unscope_locals_f;
@@ -445,19 +447,20 @@ namespace stan {
 
 
     struct add_var {
-      template <typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef T1 type; };
       template <typename T>
       T operator()(const T& var_decl, 
-                   std::map<std::string,base_var_decl>& name_to_type, 
-                   bool& pass) const {
-        if (name_to_type.find(var_decl.name_) != name_to_type.end()) {
+                   variable_map& vm,
+                   bool& pass,
+                   const var_origin& vo) const {
+        if (vm.exists(var_decl.name_)) {
           // variable already exists
           pass = false;
           return var_decl;
         }
-        pass = true;
-        name_to_type[var_decl.name_] = var_decl;
+        pass = true;  // probably don't need to set true
+        vm.add(var_decl.name_,var_decl);
         return var_decl;
       }
     };
@@ -468,15 +471,15 @@ namespace stan {
       struct result { typedef bool type; };
       bool operator()(const std::string& name, 
                       std::string& name_local,
-                      std::map<std::string,base_var_decl>& name_to_type,
+                      variable_map& vm,
                       std::stringstream& error_msgs) const {
         name_local = name;
-        if (name_to_type.find(name) != name_to_type.end()) {
+        if (vm.exists(name)) {
           error_msgs << "ERROR: loop variable already declared."
                      << " variable name=\"" << name << "\"" << std::endl;
           return false; // variable exists
         }
-        name_to_type[name] = base_var_decl(name,std::vector<expression>(),INT_T);
+        vm.add(name, base_var_decl(name,std::vector<expression>(),INT_T));
         return true;
       }
     };
@@ -486,8 +489,8 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef void type; };
       void operator()(const std::string& name, 
-                      std::map<std::string,base_var_decl>& name_to_type) const {
-        name_to_type.erase(name);
+                      variable_map& vm) const {
+        vm.remove(name);
       }
     };
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
@@ -539,10 +542,10 @@ namespace stan {
           > -derived_data_var_decls_r
           > -param_var_decls_r
           // scope lp__ to "transformed params" and "model" only
-          > qi::eps[add_lp_var_f(boost::phoenix::ref(var_name_to_decl_))]
+          > qi::eps[add_lp_var_f(boost::phoenix::ref(var_map_))]
           > -derived_var_decls_r
           > model_r
-          > qi::eps[remove_lp_var_f(boost::phoenix::ref(var_name_to_decl_))]
+          > qi::eps[remove_lp_var_f(boost::phoenix::ref(var_map_))]
           > -generated_var_decls_r
           ;
         
@@ -596,15 +599,15 @@ namespace stan {
         // _a local to hold error state, _r1 inherited true if constriaints allowed
         var_decl_r.name("variable declaration");
         var_decl_r 
-          %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
-              | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_name_to_decl_),_a)]
+          %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
               )
           > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,boost::phoenix::ref(error_msgs_))]
           ;
@@ -734,7 +737,7 @@ namespace stan {
           %= int_literal_r      [_val = _1]
           | double_literal_r    [_val = _1]
           | fun_r               [_val = set_fun_type_f(_1)]
-          | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_name_to_decl_))]
+          | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_))]
           | ( qi::lit('(') 
               > expression_r    [_val = _1] 
               > qi::lit(')') )
@@ -853,7 +856,7 @@ namespace stan {
           %= statement_seq_r(_r1)
           | for_statement_r(_r1)
           | assignment_r [_pass 
-                          = validate_assignment_f(_1,boost::phoenix::ref(var_name_to_decl_),
+                          = validate_assignment_f(_1,boost::phoenix::ref(var_map_),
                                                   boost::phoenix::ref(error_msgs_))]
           | sample_r(_r1) [_pass = validate_sample_f(_1)]
           | no_op_statement_r
@@ -869,13 +872,13 @@ namespace stan {
           > qi::lit('(')
           > identifier_r [_pass 
                           = add_loop_identifier_f(_1,_a,
-                                                  boost::phoenix::ref(var_name_to_decl_),
+                                                  boost::phoenix::ref(var_map_),
                                                   boost::phoenix::ref(error_msgs_))]
           > qi::lit("in")
           > range_r
           > qi::lit(')')
           > statement_r(_r1)
-          > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_name_to_decl_))];
+          > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
           ;
 
           // _r1 = true if sampling statements allowed
@@ -885,7 +888,7 @@ namespace stan {
           > local_var_decls_r[_a = _1]
           > *statement_r(_r1)
           > qi::lit('}')
-          > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_name_to_decl_))]
+          > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))]
           ;
 
         local_var_decls_r
@@ -910,13 +913,8 @@ namespace stan {
       }
 
       // global info for parses
-      std::map<std::string,base_var_decl> var_name_to_decl_;
+      variable_map var_map_;
       std::stringstream error_msgs_;
-      std::set<std::string> data_vars;
-      std::set<std::string> derived_data_vars;
-      std::set<std::string> parameter_vars;
-      std::set<std::string> derived_parameter_vars;
-      std::set<std::string> generated_quantity_vars;
 
       // rules
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > expression_r;
