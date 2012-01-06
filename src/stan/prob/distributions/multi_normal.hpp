@@ -65,9 +65,6 @@ namespace stan {
                      const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
-      using stan::maths::multiply_log;
-      using stan::maths::subtract;
-
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
         return lp;
@@ -75,10 +72,16 @@ namespace stan {
         return lp;
       if (!check_size_match(function, y.size(), Sigma.cols(), &lp, Policy()))
         return lp;
+      if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+        return lp;
       if (!check_not_nan(function, y, "y", &lp, Policy())) 
         return lp;
       if (!check_cov_matrix(function, Sigma, &lp, Policy()))
         return lp;
+      
+      using stan::maths::multiply_log;
+      using stan::maths::subtract;
+      
       if (y.rows() == 0)
         return lp;
       if (include_summand<propto>::value) 
