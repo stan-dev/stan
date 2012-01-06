@@ -804,17 +804,20 @@ namespace stan {
      }
 
     void generate_statement(statement const& s, int indent, std::ostream& o,
-			    bool include_sampling);
+			    bool include_sampling, bool is_var);
 
     struct statement_visgen : public visgen {
       unsigned int indent_;
       bool include_sampling_;
+      bool is_var_;
       statement_visgen(unsigned int indent, 
 		       bool include_sampling,
+		       bool is_var,
 		       std::ostream& o)
 	: visgen(o),
 	  indent_(indent),
-	  include_sampling_(include_sampling) {
+	  include_sampling_(include_sampling),
+	  is_var_(is_var) {
       }
       void operator()(nil const& x) const { 
       }
@@ -878,10 +881,21 @@ namespace stan {
 	}
       }
       void operator()(const statements& x) const {
-	generate_local_var_decls(x.local_decl_,indent_,o_,false); // need to fix false to is_var
+	bool has_local_vars = x.local_decl_.size() > 0;
+	unsigned int indent = has_local_vars ? (indent_ + 1) : indent_;
+	if (has_local_vars) {
+	  generate_indent(indent_,o_);
+	  o_ << "{" << EOL;  // need brackets for scope
+	  generate_local_var_decls(x.local_decl_,indent,o_,is_var_);
+	}
 				 
 	for (unsigned int i = 0; i < x.statements_.size(); ++i)
-	  generate_statement(x.statements_[i],indent_,o_,include_sampling_);
+	  generate_statement(x.statements_[i],indent,o_,include_sampling_,is_var_);
+
+	if (has_local_vars) {
+	  generate_indent(indent_,o_);
+	  o_ << "}" << EOL;
+	}
       }
       void operator()(const for_statement& x) const {
 	generate_indent(indent_,o_);
@@ -890,7 +904,7 @@ namespace stan {
 	o_ << "; " << x.variable_ << " <= ";
 	generate_expression(x.range_.high_,o_);
 	o_ << "; ++" << x.variable_ << ") {" << EOL;
-	generate_statement(x.statement_, indent_ + 1, o_, include_sampling_);
+	generate_statement(x.statement_, indent_ + 1, o_, include_sampling_,is_var_);
 	generate_indent(indent_,o_);
 	o_ << "}" << EOL;
       }
@@ -902,16 +916,18 @@ namespace stan {
     void generate_statement(const statement& s,
 			    int indent,
 			    std::ostream& o,
-			    bool include_sampling) {
-      statement_visgen vis(indent,include_sampling,o);
+			    bool include_sampling,
+			    bool is_var) {
+      statement_visgen vis(indent,include_sampling,is_var,o);
       boost::apply_visitor(vis,s.statement_);
     }
 
     void generate_statements(const std::vector<statement>& ss,
 			     int indent,
 			     std::ostream& o,
-			     bool include_sampling) {
-      statement_visgen vis(indent,include_sampling,o);
+			     bool include_sampling,
+			     bool is_var) {
+      statement_visgen vis(indent,include_sampling,is_var,o);
       for (unsigned int i = 0; i < ss.size(); ++i)
 	boost::apply_visitor(vis,ss[i].statement_);
     }
@@ -933,11 +949,11 @@ namespace stan {
       generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
       o << EOL;
       static bool include_sampling = true;
-      generate_statements(p.derived_decl_.second,2,o,include_sampling);
+      generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
       o << EOL;
 
       generate_comment("model body",2,o);
-      generate_statement(p.statement_,2,o,include_sampling);
+      generate_statement(p.statement_,2,o,include_sampling,is_var);
       o << EOL;
       o << INDENT2 << "return lp__;" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
@@ -1284,8 +1300,9 @@ namespace stan {
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
       static bool include_sampling = false;
+      static bool is_var = false;
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
-	generate_statement(prog.derived_data_decl_.second[i],2,o,include_sampling);
+	generate_statement(prog.derived_data_decl_.second[i],2,o,include_sampling,is_var);
 
       o << EOL << INDENT2 << "set_param_ranges();" << EOL;
       o << INDENT << "} // dump ctor" << EOL;
@@ -1823,7 +1840,7 @@ namespace stan {
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
       static bool include_sampling = false;
-      generate_statements(prog.derived_decl_.second,2,o,include_sampling); 
+      generate_statements(prog.derived_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
       for (unsigned int i = 0; i < prog.derived_decl_.first.size(); ++i)
 	boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
@@ -1832,7 +1849,7 @@ namespace stan {
       generate_comment("write generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,is_var); 
       o << EOL;
-      generate_statements(prog.generated_decl_.second,2,o,include_sampling); 
+      generate_statements(prog.generated_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
       for (unsigned int i = 0; i < prog.generated_decl_.first.size(); ++i)
 	boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
