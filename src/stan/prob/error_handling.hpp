@@ -287,6 +287,7 @@ namespace stan {
         *result = raise_domain_error<T_x>(function,
                                           message.c_str(), 
                                           x, Policy());
+        
         return false;
       }
       return true;
@@ -363,7 +364,6 @@ namespace stan {
       if (i != j) {
         std::ostringstream msg;
         msg << "i and j must be same.  Found i=" << i << " j=" << j;
-        std::cout << "msg=" << msg.str() << std::endl;
         *result = raise_domain_error<T_result>(function,
                                                msg.str().c_str(),
                                                i,
