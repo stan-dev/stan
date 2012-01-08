@@ -175,7 +175,7 @@ namespace stan {
       void operator()(variable_map& vm) const {
         vm.add("lp__",
                base_var_decl("lp__",std::vector<expression>(),DOUBLE_T),
-               transformed_parameter_origin); // lp acts as a trans param
+               local_origin); // lp acts as a local where defined
       }
     };
     boost::phoenix::function<add_lp_var> add_lp_var_f;
@@ -327,13 +327,15 @@ namespace stan {
     
 
     struct validate_assignment {
-      template <typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
 
       bool operator()(assignment& a,
+                      const var_origin& origin_allowed,
                       variable_map& vm,
                       std::stringstream& error_msgs) const {
 
+        // validate existence
         std::string name = a.var_dims_.name_;
         if (!vm.exists(name)) {
           error_msgs << "unknown variable in assignment"
@@ -341,6 +343,18 @@ namespace stan {
                      << std::endl;
           return false;
         }
+        
+        // validate origin
+        var_origin lhs_origin = vm.get_origin(name);
+        if (lhs_origin != local_origin
+            && lhs_origin != origin_allowed) {
+          error_msgs << "attempt to assign variable in wrong block."
+                     << " left-hand-side variable origin=" << lhs_origin
+                     << std::endl;
+          return false;
+        }
+
+        // validate types
         a.var_type_ = vm.get(name);
         unsigned int lhs_var_num_dims = a.var_type_.dims_.size();
         unsigned int num_index_dims = a.var_dims_.dims_.size();
@@ -901,8 +915,8 @@ namespace stan {
           | for_statement_r(_r1,_r2)
           | assignment_r 
             [_pass 
-             = validate_assignment_f(_1,boost::phoenix::ref(var_map_),
-                                        boost::phoenix::ref(error_msgs_))]
+             = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
+                                     boost::phoenix::ref(error_msgs_))]
           | sample_r(_r1) [_pass = validate_sample_f(_1)]
           | no_op_statement_r
           ;

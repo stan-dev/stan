@@ -15,6 +15,7 @@ parameters {
 }
 derived parameters {
     double sigma;
+    sigma  <- 1.0 / sqrt(tau);
 }
 model {
    alpha0 ~ normal(0.0,1.0E3);
@@ -22,7 +23,6 @@ model {
    alpha2 ~ normal(0.0,1.0E3);
    alpha12 ~ normal(0.0,1.0E3);
    tau ~ gamma(1.0E-3,1.0E-3);
-   sigma  <- 1.0 / sqrt(tau);
    for (i in 1:I) {
       b[i] ~ normal(0.0, sigma);
       n[i] ~ binomial(N[i], inv_logit(alpha0 

@@ -33,13 +33,13 @@ derived parameters {
     double alpha;
 
     alpha <- alpha_star - beta * mean_logx - gamma * mean_x;
+    sigma <- 1.0 / sqrt(tau);
 }
 model {
    alpha_star ~ normal(0.0,1.0E3);
    beta ~ normal(0.0,1.0E3);
    gamma ~ normal(0.0,1.0E3); 
    tau ~ gamma(1.0E-3,1.0E-3);
-   sigma <- 1.0 / sqrt(tau);
    for (i in 1:I) {
       for (j in 1:J) {
          lambda[i,j] ~ normal(0.0,tau);

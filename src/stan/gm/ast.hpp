@@ -705,6 +705,11 @@ namespace stan {
       unsigned int get_num_dims(const std::string& name) const {
         return get(name).dims_.size();
       }
+      var_origin get_origin(const std::string& name) const {
+        if (!exists(name))
+          throw std::invalid_argument("variable does not exist");
+        return map_.find(name)->second.second;
+      }
       void add(const std::string& name,
                const base_var_decl& base_decl,
                const var_origin& vo) {

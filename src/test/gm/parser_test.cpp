@@ -80,6 +80,9 @@ TEST(gm_parser,triangle_lp) {
   EXPECT_TRUE(is_parsable("src/models/triangle.stan"));
 }
 
+TEST(gm_parser,good_vars) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_vars.stan"));
+}
 
 TEST(gm_parser,parsable_test_bad1) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad1.stan"),
@@ -103,3 +106,19 @@ TEST(gm_parser,parsable_test_bad4) {
 //    EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad5.stan"),
 //                 std::invalid_argument);
 // }
+
+TEST(gm_parser,parsable_test_bad6) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad6.stan"),
+               std::invalid_argument);
+}
+
+TEST(gm_parser,parsable_test_bad7) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad7.stan"),
+               std::invalid_argument);
+}
+
+TEST(gm_parser,parsable_test_bad8) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad7.stan"),
+               std::invalid_argument);
+}
+
