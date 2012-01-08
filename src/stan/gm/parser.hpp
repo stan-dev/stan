@@ -564,7 +564,7 @@ namespace stan {
         model_r.name("model declaration");
         model_r 
           %= qi::lit("model")
-          > statement_r(true)
+          > statement_r(true,local_origin)  // assign only to locals
           ;
 
         data_var_decls_r.name("data variable declarations");
@@ -580,7 +580,7 @@ namespace stan {
           >> qi::lit("data")
           > qi::lit('{')
           > *var_decl_r(false,transformed_data_origin)  // -constraints
-          > *statement_r(false) // -sampling
+          > *statement_r(false,transformed_data_origin) // -sampling
           > qi::lit('}');
 
         param_var_decls_r.name("parameter variable declarations");
@@ -596,7 +596,7 @@ namespace stan {
           >> qi::lit("parameters")
           > qi::lit('{')
           > *var_decl_r(false,transformed_parameter_origin) // -constraints
-          > *statement_r(false) // -sampling
+          > *statement_r(false,transformed_parameter_origin) // -sampling
           > qi::lit('}');
 
         generated_var_decls_r.name("generated variable declarations");
@@ -605,7 +605,7 @@ namespace stan {
           > qi::lit("quantities")
           > qi::lit('{')
           > *var_decl_r(false,derived_origin) // -constraints
-          > *statement_r(false) // -sampling
+          > *statement_r(false,derived_origin) // -sampling
           > qi::lit('}');
 
         // _a = error state local, _r1 constraints allowed inherited
@@ -892,12 +892,13 @@ namespace stan {
           > qi::lit(';') 
           ;
 
-        // inherited attribute _r1 is type bool
+        // _r1 true if sample_r allowed (inherited)
+        // _r2 source of variables allowed for assignments
         // set to true if sample_r are allowed
         statement_r.name("statement");
         statement_r
-          %= statement_seq_r(_r1)
-          | for_statement_r(_r1)
+          %= statement_seq_r(_r1,_r2)
+          | for_statement_r(_r1,_r2)
           | assignment_r 
             [_pass 
              = validate_assignment_f(_1,boost::phoenix::ref(var_map_),
@@ -910,6 +911,7 @@ namespace stan {
         no_op_statement_r 
           %= qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
+        // _r1, _r2 same as statement_r
         for_statement_r.name("for statement");
         for_statement_r
           %= qi::lit("for")
@@ -921,17 +923,17 @@ namespace stan {
           > qi::lit("in")
           > range_r
           > qi::lit(')')
-          > statement_r(_r1)
+          > statement_r(_r1,_r2)
           > qi::eps 
             [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
           ;
 
-          // _r1 = true if sampling statements allowed
+          // _r1, _r2 same as statement_r
         statement_seq_r.name("sequence of statements");
         statement_seq_r
           %= qi::lit('{')
           > local_var_decls_r[_a = _1]
-          > *statement_r(_r1)
+          > *statement_r(_r1,_r2)
           > qi::lit('}')
           > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))]
           ;
@@ -1083,14 +1085,18 @@ namespace stan {
       qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > 
       assignment_r;
 
-      qi::rule<Iterator, statement(bool), whitespace_grammar<Iterator> > 
+      qi::rule<Iterator, 
+               statement(bool,var_origin), 
+               whitespace_grammar<Iterator> > 
       statement_r;
 
-      qi::rule<Iterator, qi::locals<std::vector<var_decl> >, 
-               statements(bool), whitespace_grammar<Iterator> >
+      qi::rule<Iterator, 
+               qi::locals<std::vector<var_decl> >,
+               statements(bool,var_origin), whitespace_grammar<Iterator> >
       statement_seq_r;
 
-      qi::rule<Iterator, qi::locals<std::string>, for_statement(bool), 
+      qi::rule<Iterator, qi::locals<std::string>, 
+               for_statement(bool,var_origin), 
                whitespace_grammar<Iterator> > 
       for_statement_r;
 

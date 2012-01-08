@@ -857,6 +857,7 @@ namespace stan {
       }
     };
 
+
     struct var_decl {
       typedef boost::variant<nil, // just for default constructor
                              boost::recursive_wrapper<int_var_decl>,
