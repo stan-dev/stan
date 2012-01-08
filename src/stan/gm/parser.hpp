@@ -102,7 +102,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (stan::gm::expression, expr_)
-                          (std::vector<std::vector<stan::gm::expression> >, dimss_) )
+                          (std::vector<std::vector<stan::gm::expression> >, 
+                           dimss_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::range,
                           (stan::gm::expression, low_)
@@ -114,9 +115,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
                           (stan::gm::statement, statement_) )
 
 namespace {
-  // hack to pass pair into macro below to adapt
+  // hack to pass pair into macro below to adapt; in namespace to hide
   struct DUMMY_STRUCT {
-    typedef std::pair<std::vector<stan::gm::var_decl>,std::vector<stan::gm::statement> > type;
+    typedef std::pair<std::vector<stan::gm::var_decl>,
+                      std::vector<stan::gm::statement> > type;
   };
 }
 
@@ -172,7 +174,8 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(variable_map& vm) const {
         vm.add("lp__",
-               base_var_decl("lp__",std::vector<expression>(),DOUBLE_T));
+               base_var_decl("lp__",std::vector<expression>(),DOUBLE_T),
+               transformed_parameter_origin); // lp acts as a trans param
       }
     };
     boost::phoenix::function<add_lp_var> add_lp_var_f;
@@ -259,7 +262,8 @@ namespace stan {
         return constraints_ok;
       }
     };
-    boost::phoenix::function<validate_decl_constraints> validate_decl_constraints_f;
+    boost::phoenix::function<validate_decl_constraints> 
+    validate_decl_constraints_f;
 
     struct validate_allow_sample {
       template <typename T1, typename T2>
@@ -358,9 +362,10 @@ namespace stan {
 
         base_expr_type lhs_base_type = lhs_type.base_type_;
         base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
+        // int -> double promotion
         bool types_compatible 
           = lhs_base_type == rhs_base_type
-          || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T ); // int -> double promotion
+          || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T );
         if (!types_compatible) {
           error_msgs << "base type mismatch in assignment"
                      << "; lhs variable=" << a.var_dims_.name_
@@ -386,7 +391,8 @@ namespace stan {
         std::string function_name(s.dist_.family_);
         function_name += "_log";
         expr_type result_type 
-          = function_signatures::instance().get_result_type(function_name,arg_types);
+          = function_signatures::instance()
+          .get_result_type(function_name,arg_types);
         return result_type.is_primitive_double();
       }
     };
@@ -400,7 +406,8 @@ namespace stan {
         return expr.expression_type().is_primitive_int();
       }
     };
-    boost::phoenix::function<validate_primitive_int_type> validate_primitive_int_type_f;
+    boost::phoenix::function<validate_primitive_int_type> 
+    validate_primitive_int_type_f;
 
     struct set_var_type {
       template <typename T1, typename T2>
@@ -449,6 +456,7 @@ namespace stan {
     struct add_var {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef T1 type; };
+      // each type derived from base_var_decl gets own instance
       template <typename T>
       T operator()(const T& var_decl, 
                    variable_map& vm,
@@ -460,11 +468,12 @@ namespace stan {
           return var_decl;
         }
         pass = true;  // probably don't need to set true
-        vm.add(var_decl.name_,var_decl);
+        vm.add(var_decl.name_,var_decl,vo);
         return var_decl;
       }
     };
     boost::phoenix::function<add_var> add_var_f;
+
 
     struct add_loop_identifier {
       template <typename T1, typename T2, typename T3, typename T4>
@@ -479,7 +488,10 @@ namespace stan {
                      << " variable name=\"" << name << "\"" << std::endl;
           return false; // variable exists
         }
-        vm.add(name, base_var_decl(name,std::vector<expression>(),INT_T));
+        vm.add(name, 
+               base_var_decl(name,std::vector<expression>(),
+                             INT_T),
+               local_origin); // loop var acts like local
         return true;
       }
     };
@@ -562,7 +574,7 @@ namespace stan {
           > *var_decl_r(true,data_origin) // +constraints
           > qi::lit('}');
 
-        derived_data_var_decls_r.name("derived data variable declaration and statement");
+        derived_data_var_decls_r.name("derived data block");
         derived_data_var_decls_r
           %= qi::lit("derived")
           >> qi::lit("data")
@@ -596,20 +608,32 @@ namespace stan {
           > *statement_r(false) // -sampling
           > qi::lit('}');
 
-        // _a local to hold error state, _r1 inherited true if constriaints allowed
+        // _a = error state local, _r1 constraints allowed inherited
         var_decl_r.name("variable declaration");
         var_decl_r 
-          %= (int_decl_r             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | double_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | vector_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | row_vector_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | matrix_decl_r        [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | simplex_decl_r       [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | pos_ordered_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | corr_matrix_decl_r   [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
-              | cov_matrix_decl_r    [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+          %= (int_decl_r             
+              [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | double_decl_r        
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | vector_decl_r        
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | row_vector_decl_r    
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | matrix_decl_r        
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | simplex_decl_r       
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | pos_ordered_decl_r   
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | corr_matrix_decl_r   
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | cov_matrix_decl_r    
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
               )
-          > qi::eps[_pass = validate_decl_constraints_f(_r1,_a,_val,boost::phoenix::ref(error_msgs_))]
+          > qi::eps
+            [_pass 
+             = validate_decl_constraints_f(_r1,_a,_val,
+                                           boost::phoenix::ref(error_msgs_))]
           ;
 
         int_decl_r.name("integer declaration");
@@ -632,7 +656,8 @@ namespace stan {
         vector_decl_r 
           %= qi::lit("vector")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
@@ -642,7 +667,8 @@ namespace stan {
         row_vector_decl_r 
           %= qi::lit("row_vector")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
@@ -652,9 +678,11 @@ namespace stan {
         matrix_decl_r 
           %= qi::lit("matrix")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(',')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
@@ -664,7 +692,8 @@ namespace stan {
         simplex_decl_r 
           %= qi::lit("simplex")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
@@ -674,17 +703,19 @@ namespace stan {
         pos_ordered_decl_r 
           %= qi::lit("pos_ordered")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
 
-        cov_matrix_decl_r.name("positive definite symmetric (covariance) matrix declaration");
+        cov_matrix_decl_r.name("covariance matrix declaration");
         cov_matrix_decl_r 
           %= qi::lit("cov_matrix")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
@@ -694,7 +725,8 @@ namespace stan {
         corr_matrix_decl_r 
           %= qi::lit("corr_matrix")
           > qi::lit('(')
-          > expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > expression_r 
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
           > opt_dims_r
@@ -737,7 +769,8 @@ namespace stan {
           %= int_literal_r      [_val = _1]
           | double_literal_r    [_val = _1]
           | fun_r               [_val = set_fun_type_f(_1)]
-          | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_))]
+          | variable_r          
+                      [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_))]
           | ( qi::lit('(') 
               > expression_r    [_val = _1] 
               > qi::lit(')') )
@@ -772,16 +805,19 @@ namespace stan {
         dims_r.name("array dimensions");
         dims_r 
           %= qi::lit('[') 
-          > (expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > (expression_r 
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
              % ',')
           > qi::lit(']')
           ;
         
         range_r.name("range expression pair, colon");
         range_r 
-          %= expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          %= expression_r 
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           >> qi::lit(':') 
-          >> expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
+          >> expression_r 
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
 
         truncation_range_r.name("range pair");
         truncation_range_r
@@ -795,17 +831,22 @@ namespace stan {
         range_brackets_int_r.name("range expression pair, brackets");
         range_brackets_int_r 
           %= qi::lit('(') 
-          > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > -(expression_r 
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(',')
-          > -(expression_r [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > -(expression_r 
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(')');
 
         range_brackets_double_r.name("range expression pair, brackets");
         range_brackets_double_r 
           %= qi::lit('(') 
-          > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > -(expression_r 
+          [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(',')
-          > -(expression_r [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > -(expression_r 
+              [_pass 
+                = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(')');
 
         args_r.name("function argument expressions");
@@ -831,7 +872,9 @@ namespace stan {
         sample_r 
           %= expression_r
           >> qi::lit('~')
-          > qi::eps[_pass = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
+          > qi::eps
+           [_pass 
+            = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
           > distribution_r
           > -truncation_range_r
           > qi::lit(';');
@@ -855,9 +898,10 @@ namespace stan {
         statement_r
           %= statement_seq_r(_r1)
           | for_statement_r(_r1)
-          | assignment_r [_pass 
-                          = validate_assignment_f(_1,boost::phoenix::ref(var_map_),
-                                                  boost::phoenix::ref(error_msgs_))]
+          | assignment_r 
+            [_pass 
+             = validate_assignment_f(_1,boost::phoenix::ref(var_map_),
+                                        boost::phoenix::ref(error_msgs_))]
           | sample_r(_r1) [_pass = validate_sample_f(_1)]
           | no_op_statement_r
           ;
@@ -872,13 +916,14 @@ namespace stan {
           > qi::lit('(')
           > identifier_r [_pass 
                           = add_loop_identifier_f(_1,_a,
-                                                  boost::phoenix::ref(var_map_),
-                                                  boost::phoenix::ref(error_msgs_))]
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
           > qi::lit("in")
           > range_r
           > qi::lit(')')
           > statement_r(_r1)
-          > qi::eps [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
+          > qi::eps 
+            [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
           ;
 
           // _r1 = true if sampling statements allowed
@@ -896,20 +941,20 @@ namespace stan {
 
         // hack cast to write to error_msgs_ of type stringstream
         qi::on_error<qi::rethrow>(var_decl_r,
-                                  (std::ostream&)error_msgs_
-                                  << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
-                                  << std::endl);
+             (std::ostream&)error_msgs_
+              << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
+              << std::endl);
 
         qi::on_error<qi::rethrow>(indexed_factor_r,
-                                  (std::ostream&)error_msgs_
-                                  << boost::phoenix::val("ERROR: Ill-formed factor.")
-                                  << std::endl);
+              (std::ostream&)error_msgs_
+              << boost::phoenix::val("ERROR: Ill-formed factor.")
+              << std::endl);
 
         qi::on_error<qi::rethrow>(program_r,
-                                  (std::ostream&)error_msgs_
-                                  << boost::phoenix::val("ERROR: Expected ")
-                                  << _4 
-                                  << std::endl);
+              (std::ostream&)error_msgs_
+               << boost::phoenix::val("ERROR: Expected ")
+               << _4 
+               << std::endl);
       }
 
       // global info for parses
@@ -917,61 +962,160 @@ namespace stan {
       std::stringstream error_msgs_;
 
       // rules
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > expression_r;
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > term_r;
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > factor_r;
-      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > variable_r;
-      qi::rule<Iterator, int_literal(), whitespace_grammar<Iterator> > int_literal_r;
-      qi::rule<Iterator, double_literal(), whitespace_grammar<Iterator> > double_literal_r;
-      qi::rule<Iterator, variable_dims(), whitespace_grammar<Iterator> > var_lhs_r;
-      qi::rule<Iterator, fun(), whitespace_grammar<Iterator> > fun_r;
-      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > identifier_r;
-      qi::rule<Iterator, std::vector<expression>(), whitespace_grammar<Iterator> > opt_dims_r;
-      qi::rule<Iterator, std::vector<expression>(), whitespace_grammar<Iterator> > dims_r;
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > range_r;
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > truncation_range_r;
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > range_brackets_int_r;
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > range_brackets_double_r;
-      qi::rule<Iterator, std::vector<expression>(), whitespace_grammar<Iterator> > args_r;
-      qi::rule<Iterator, int_var_decl(), whitespace_grammar<Iterator> > int_decl_r;
-      qi::rule<Iterator, double_var_decl(), whitespace_grammar<Iterator> > double_decl_r;
-      qi::rule<Iterator, vector_var_decl(), whitespace_grammar<Iterator> > vector_decl_r;
-      qi::rule<Iterator, row_vector_var_decl(), whitespace_grammar<Iterator> > row_vector_decl_r;
-      qi::rule<Iterator, matrix_var_decl(), whitespace_grammar<Iterator> > matrix_decl_r;
-      qi::rule<Iterator, simplex_var_decl(), whitespace_grammar<Iterator> > simplex_decl_r;
-      qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > pos_ordered_decl_r;
-      qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > cov_matrix_decl_r;
-      qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> > corr_matrix_decl_r;
-      qi::rule<Iterator, qi::locals<bool>, var_decl(bool,var_origin), whitespace_grammar<Iterator> > var_decl_r;
-      qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > data_var_decls_r;
-      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
-               whitespace_grammar<Iterator> > derived_data_var_decls_r;
-      qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > param_var_decls_r;
-      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
-               whitespace_grammar<Iterator> > derived_var_decls_r;
-      qi::rule<Iterator, std::pair<std::vector<var_decl>,std::vector<statement> >(), 
-               whitespace_grammar<Iterator> > generated_var_decls_r;
-      qi::rule<Iterator, std::vector<var_decl>(), whitespace_grammar<Iterator> > local_var_decls_r;
-      qi::rule<Iterator, program(), whitespace_grammar<Iterator> > program_r;
-      qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> > distribution_r;
-      qi::rule<Iterator, sample(bool), whitespace_grammar<Iterator> > sample_r;
-      qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > assignment_r;
-      qi::rule<Iterator, statement(bool), whitespace_grammar<Iterator> > statement_r;
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      expression_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      term_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      factor_r;
+
+      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > 
+      variable_r;
+
+      qi::rule<Iterator, int_literal(), whitespace_grammar<Iterator> > 
+      int_literal_r;
+
+      qi::rule<Iterator, double_literal(), whitespace_grammar<Iterator> > 
+      double_literal_r;
+
+      qi::rule<Iterator, variable_dims(), whitespace_grammar<Iterator> > 
+      var_lhs_r;
+
+      qi::rule<Iterator, fun(), whitespace_grammar<Iterator> > 
+      fun_r;
+
+      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > 
+      identifier_r;
+
+      qi::rule<Iterator, std::vector<expression>(),
+               whitespace_grammar<Iterator> > 
+      opt_dims_r;
+
+      qi::rule<Iterator, std::vector<expression>(), 
+               whitespace_grammar<Iterator> > 
+      dims_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      truncation_range_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_brackets_int_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_brackets_double_r;
+
+      qi::rule<Iterator, std::vector<expression>(), 
+               whitespace_grammar<Iterator> > 
+      args_r;
+
+      qi::rule<Iterator, int_var_decl(), whitespace_grammar<Iterator> > 
+      int_decl_r;
+
+      qi::rule<Iterator, double_var_decl(), whitespace_grammar<Iterator> > 
+      double_decl_r;
+
+      qi::rule<Iterator, vector_var_decl(), whitespace_grammar<Iterator> > 
+      vector_decl_r;
+
+      qi::rule<Iterator, row_vector_var_decl(), whitespace_grammar<Iterator> > 
+      row_vector_decl_r;
+
+      qi::rule<Iterator, matrix_var_decl(), whitespace_grammar<Iterator> > 
+      matrix_decl_r;
+
+      qi::rule<Iterator, simplex_var_decl(), whitespace_grammar<Iterator> > 
+      simplex_decl_r;
+
+      qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > 
+      pos_ordered_decl_r;
+
+      qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > 
+      cov_matrix_decl_r;
+
+      qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> >
+      corr_matrix_decl_r;
+
+      qi::rule<Iterator, qi::locals<bool>, var_decl(bool,var_origin), 
+               whitespace_grammar<Iterator> > 
+      var_decl_r;
+
+      qi::rule<Iterator, std::vector<var_decl>(), 
+               whitespace_grammar<Iterator> >       
+      data_var_decls_r;
+      
+      qi::rule<Iterator, std::pair<std::vector<var_decl>,
+                                   std::vector<statement> >(), 
+               whitespace_grammar<Iterator> > 
+      derived_data_var_decls_r;
+
+      qi::rule<Iterator, std::vector<var_decl>(), 
+               whitespace_grammar<Iterator> >
+      param_var_decls_r;
+    
+      qi::rule<Iterator, std::pair<std::vector<var_decl>,
+                                   std::vector<statement> >(), 
+               whitespace_grammar<Iterator> > 
+      derived_var_decls_r;
+    
+      qi::rule<Iterator, std::pair<std::vector<var_decl>,
+                             std::vector<statement> >(), 
+               whitespace_grammar<Iterator> >
+      generated_var_decls_r;
+    
+      qi::rule<Iterator, std::vector<var_decl>(), 
+               whitespace_grammar<Iterator> >
+      local_var_decls_r;
+
+      qi::rule<Iterator, program(), whitespace_grammar<Iterator> >
+      program_r;
+    
+      qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> >
+      distribution_r;
+
+      qi::rule<Iterator, sample(bool), whitespace_grammar<Iterator> > 
+      sample_r;
+
+      qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > 
+      assignment_r;
+
+      qi::rule<Iterator, statement(bool), whitespace_grammar<Iterator> > 
+      statement_r;
+
       qi::rule<Iterator, qi::locals<std::vector<var_decl> >, 
-               statements(bool), whitespace_grammar<Iterator> > statement_seq_r;
+               statements(bool), whitespace_grammar<Iterator> >
+      statement_seq_r;
+
       qi::rule<Iterator, qi::locals<std::string>, for_statement(bool), 
-               whitespace_grammar<Iterator> > for_statement_r;
-      qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > model_r;
-      qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > no_op_statement_r;
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > indexed_factor_r;
+               whitespace_grammar<Iterator> > 
+      for_statement_r;
+
+      qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > 
+      model_r;
+      
+      qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > 
+      no_op_statement_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      indexed_factor_r;
+
       // two of these because of type-coercion from index_op to expression
-      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > indexed_factor_2_r; 
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > negated_factor_r;
+      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > 
+      indexed_factor_2_r; 
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      negated_factor_r;
     };
 
     // Cut and paste source for iterator & reporting pattern:
-    // http://boost-spirit.com/home/articles/qi-example/tracking-the-input-position-while-parsing/
-    // http://boost-spirit.com/dl_more/parsing_tracking_position/stream_iterator_errorposition_parsing.cpp
+    // http://boost-spirit.com/home/articles/qi-example
+    //                 /tracking-the-input-position-while-parsing/
+    // http://boost-spirit.com/dl_more/parsing_tracking_position
+    //                 /stream_iterator_errorposition_parsing.cpp
     bool parse(std::istream& input, 
                const std::string& filename, 
                program& result) {
@@ -980,15 +1124,21 @@ namespace stan {
 
       // iterate over stream input
       typedef std::istreambuf_iterator<char> base_iterator_type;
+
       base_iterator_type in_begin(input);
       
       // convert input iterator to forward iterator, usable by spirit parser
-      typedef boost::spirit::multi_pass<base_iterator_type> forward_iterator_type;
-      forward_iterator_type fwd_begin = boost::spirit::make_default_multi_pass(in_begin);
+      typedef boost::spirit::multi_pass<base_iterator_type> 
+        forward_iterator_type;
+
+      forward_iterator_type fwd_begin 
+        = boost::spirit::make_default_multi_pass(in_begin);
       forward_iterator_type fwd_end;
       
       // wrap forward iterator with position iterator, to record the position
-      typedef classic::position_iterator2<forward_iterator_type> pos_iterator_type;
+      typedef classic::position_iterator2<forward_iterator_type> 
+        pos_iterator_type;
+
       pos_iterator_type position_begin(fwd_begin, fwd_end, filename);
       pos_iterator_type position_end;
       
@@ -1004,7 +1154,8 @@ namespace stan {
                                    result);
       } catch (const qi::expectation_failure<pos_iterator_type>& e) {
         // FIXME: generalize beyond expectation failures
-        const classic::file_position_base<std::string>& pos = e.first.get_position();
+        const classic::file_position_base<std::string>& pos 
+          = e.first.get_position();
         std::stringstream msg;
         msg << "parse error at file " 
             << pos.file 
@@ -1023,7 +1174,8 @@ namespace stan {
         msg << std::endl;
         throw std::invalid_argument(msg.str());
       }
-      return success && (position_begin == position_end); // want to consume ALL input
+      bool consumed_all_input = (position_begin == position_end); 
+      return success && consumed_all_input;
     }
 
   }

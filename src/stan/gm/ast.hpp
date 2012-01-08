@@ -688,15 +688,16 @@ namespace stan {
       }
     };
 
-
     struct variable_map {
-      std::map<std::string,base_var_decl> map_;
+      typedef std::pair<base_var_decl,var_origin> range_t;
+      std::map<std::string, range_t> map_;
       bool exists(const std::string& name) const {
         return map_.find(name) != map_.end();
       }
       base_var_decl get(const std::string& name) const {
-        if (!exists(name)) throw std::invalid_argument("variable does not exist"); // FIXME: message
-        return map_.find(name)->second;
+        if (!exists(name)) 
+          throw std::invalid_argument("variable does not exist"); 
+        return map_.find(name)->second.first;
       }
       base_expr_type get_base_type(const std::string& name) const {
         return get(name).base_type_;
@@ -705,8 +706,9 @@ namespace stan {
         return get(name).dims_.size();
       }
       void add(const std::string& name,
-               const base_var_decl& base_var_decl) {
-        map_[name] = base_var_decl;
+               const base_var_decl& base_decl,
+               const var_origin& vo) {
+        map_[name] = range_t(base_decl,vo);
       }
       void remove(const std::string& name) {
         map_.erase(name);
@@ -925,11 +927,14 @@ namespace stan {
     struct program {
       program() { }
       program(const std::vector<var_decl>& data_decl,
-              const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_data_decl,
+              const std::pair<std::vector<var_decl>,
+                              std::vector<statement> >& derived_data_decl,
               const std::vector<var_decl>& parameter_decl,
-              const std::pair<std::vector<var_decl>,std::vector<statement> >& derived_decl,
+              const std::pair<std::vector<var_decl>,
+                              std::vector<statement> >& derived_decl,
               const statement& st,
-              const std::pair<std::vector<var_decl>,std::vector<statement> >& generated_decl)
+              const std::pair<std::vector<var_decl>,
+                              std::vector<statement> >& generated_decl)
         : data_decl_(data_decl),
           derived_data_decl_(derived_data_decl),
           parameter_decl_(parameter_decl),
@@ -939,10 +944,17 @@ namespace stan {
       }
 
       std::vector<var_decl> data_decl_;
-      std::pair<std::vector<var_decl>,std::vector<statement> > derived_data_decl_;
+
+      std::pair<std::vector<var_decl>,std::vector<statement> > 
+      derived_data_decl_;
+
       std::vector<var_decl> parameter_decl_;
-      std::pair<std::vector<var_decl>,std::vector<statement> > derived_decl_;
+
+      std::pair<std::vector<var_decl>,std::vector<statement> > 
+      derived_decl_;
+
       statement statement_;
+
       std::pair<std::vector<var_decl>,std::vector<statement> > generated_decl_;
 
     };
@@ -958,9 +970,11 @@ namespace stan {
       bool is_ill_formed() const {
         return expr_.expression_type().is_ill_formed()
           || ( truncation_.has_low()
-               && expr_.expression_type() != truncation_.low_.expression_type() )
+               && expr_.expression_type() 
+                  != truncation_.low_.expression_type() )
           || ( truncation_.has_high()
-               && expr_.expression_type() != truncation_.high_.expression_type() );
+               && expr_.expression_type() 
+                  != truncation_.high_.expression_type() );
       }
       expression expr_;
       distribution dist_;
