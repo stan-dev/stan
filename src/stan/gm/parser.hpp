@@ -363,13 +363,15 @@ namespace stan {
                                                  lhs_var_num_dims,
                                                  num_index_dims);
 
-        if (lhs_type.is_ill_formed()
-            || lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-          error_msgs << "too many indices on left-hand-side of assignment"
-                     << "; lhs variable=" << a.var_dims_.name_ 
-                     << "; base type=" << a.var_type_.base_type_
-                     << "; num dims=" << lhs_var_num_dims
-                     << "; num indices=" << num_index_dims
+        if (lhs_type.is_ill_formed()) {
+          error_msgs << "ill-formed lhs of assignment"
+                     << std::endl;
+          return false;
+        }
+        if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
+          error_msgs << "mismatched dimensions on left- and right-hand side of assignment"
+                     << "; left dims=" << lhs_type.num_dims_
+                     << "; right dims=" << a.expr_.expression_type().num_dims_
                      << std::endl;
           return false;
         }
@@ -382,9 +384,9 @@ namespace stan {
           || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T );
         if (!types_compatible) {
           error_msgs << "base type mismatch in assignment"
-                     << "; lhs variable=" << a.var_dims_.name_
-                     << "; lhs base type=" << lhs_base_type
-                     << "; rhs base type=" << rhs_base_type
+                     << "; left variable=" << a.var_dims_.name_
+                     << "; left base type=" << lhs_base_type
+                     << "; right base type=" << rhs_base_type
                      << std::endl;
           return false;
         }
@@ -424,15 +426,20 @@ namespace stan {
     validate_primitive_int_type_f;
 
     struct set_var_type {
-      template <typename T1, typename T2>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef variable type; };
       variable operator()(variable& var_expr, 
-                          variable_map& vm) const {
+                          variable_map& vm,
+                          std::ostream& error_msgs,
+                          bool& pass) const {
         std::string name = var_expr.name_;
         if (!vm.exists(name)) {
-          throw std::runtime_error("variable does not exist");  
-          // FIXME: patch with pass = false and thread
+          pass = false;
+          error_msgs << "variable \"" << name << '"' << " does not exist." 
+                     << std::endl;
+          return var_expr;
         }
+        pass = true;
         var_expr.set_type(vm.get_base_type(name),vm.get_num_dims(name));
         return var_expr;
       }
@@ -780,13 +787,15 @@ namespace stan {
 
         factor_r.name("factor");
         factor_r
-          %= int_literal_r      [_val = _1]
+          %=  int_literal_r      [_val = _1]
           | double_literal_r    [_val = _1]
           | fun_r               [_val = set_fun_type_f(_1)]
           | variable_r          
-                      [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_))]
+            [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
+                                   boost::phoenix::ref(error_msgs_),
+                                   _pass)]
           | ( qi::lit('(') 
-              > expression_r    [_val = _1] 
+              > expression_r    [_val = _1]
               > qi::lit(')') )
           ;
 
@@ -956,12 +965,18 @@ namespace stan {
           %= *var_decl_r(false,local_origin); // - constants
 
         // hack cast to write to error_msgs_ of type stringstream
+        /*
         qi::on_error<qi::rethrow>(var_decl_r,
              (std::ostream&)error_msgs_
               << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
               << std::endl);
 
         qi::on_error<qi::rethrow>(indexed_factor_r,
+              (std::ostream&)error_msgs_
+              << boost::phoenix::val("ERROR: Ill-formed indexed factor.")
+              << std::endl);
+
+        qi::on_error<qi::rethrow>(factor_r,
               (std::ostream&)error_msgs_
               << boost::phoenix::val("ERROR: Ill-formed factor.")
               << std::endl);
@@ -971,6 +986,8 @@ namespace stan {
                << boost::phoenix::val("ERROR: Expected ")
                << _4 
                << std::endl);
+        */
+
       }
 
       // global info for parses
@@ -984,7 +1001,8 @@ namespace stan {
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
       term_r;
 
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      qi::rule<Iterator, qi::locals<bool>, 
+               expression(), whitespace_grammar<Iterator> > 
       factor_r;
 
       qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > 
@@ -1177,21 +1195,25 @@ namespace stan {
         const classic::file_position_base<std::string>& pos 
           = e.first.get_position();
         std::stringstream msg;
-        msg << "parse error at file " 
-            << pos.file 
-            << " line " 
-            << pos.line 
-            << " column " 
-            << pos.column 
-            << std::endl 
-            << e.first.get_currentline() 
+        msg << "PARSE ERROR." 
+            << std::endl;
+        msg << "file=" << pos.file
+            << "; line=" << pos.line 
+            << "; column=" << pos.column 
+            << std::endl;
+        msg << std::endl << e.first.get_currentline() 
             << std::endl;
         for (int i = 2; i < pos.column; ++i)
           msg << ' ';
-        msg << " ^-- here";
-        msg << std::endl;
-        msg << prog_grammar.error_msgs_;
-        msg << std::endl;
+        msg << " ^-- here" 
+            << std::endl << std::endl;
+        msg << prog_grammar.error_msgs_.str();
+        throw std::invalid_argument(msg.str());
+      } catch (const std::runtime_error& e) {
+        std::stringstream msg;
+        msg << "PARSE ERROR." << std::endl;
+        msg << "unknown location" << std::endl;
+        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
         throw std::invalid_argument(msg.str());
       }
       bool consumed_all_input = (position_begin == position_end); 

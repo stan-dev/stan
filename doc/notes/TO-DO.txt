@@ -1,8 +1,29 @@
 TO DO
 =================================================
 
-* check L < U in bounds
-
+* make sure block allocs are 8-byte aligned
+  - make sure all the structs inside are aligned
+  - int new_size = iceil(size / 8.0) * 8
+  - min size = 24 bytes, add at most 7 bytes,
+    so at most 30% extra memory or so
+    
+* check bounds
+  - model load time
+    + data: 
+        validate constraints as read
+    + transformed data: 
+        validate constraints after statement
+  - model init time
+    + parameters:
+        validate constraints on initial values
+  - leapfrog step time:
+    + transformed parameters:
+        validate after statement
+  - per written sample:
+    + derived quantities:
+        validate after statement
+  - local vars have no constraints
+    
 * random inits between -2 and 2 uniform
 
 * make sure validation happens on inits and data
@@ -64,6 +85,9 @@ TO DO
   - prob
   - matrix
 
+* sensible error messages everywhere with
+  variable names and line number/position
+
 * profile and optimize, at least one round
 
 * name variable types
@@ -92,6 +116,16 @@ TO DO
 
 EXTENSIONS
 =================================================
+
+* run-time checks for
+  - positive definiteness
+  - array/vector/matrix index bounds
+
+* special positive-definiteness-preserving operations
+  - basic data type (or trait)
+  - operations that preserve well-formedness, perhaps
+    by fudging boundary conditions
+
 * optimization
   - functor-based concept design with templates  
 
