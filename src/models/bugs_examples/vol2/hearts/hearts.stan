@@ -5,7 +5,7 @@
 ## status: not work (there are discrete parameters) 
 data {
   int(0,) N;
-  // int(0,) x[N];
+  int(0,) x[N];
   int(0,) y[N];
   int(0,) t[N];
 } 
@@ -18,17 +18,18 @@ parameters {
 
 derived parameters {
   double theta;
-  double yap[2];
   theta <- inv_logit(delta); 
-  yap[1] <- inv_logit(alpha); 
-  yap[2] <- 0;
 } 
 
 model {
+  double yap[2]; 
+  yap[1] <- inv_logit(alpha); 
+  yap[2] <- 0;
+
   alpha ~ normal(0, 100);
   delta ~ normal(0, 100); 
   for (i in 1:N) {
     state[i] ~ bernoulli(theta); // either 0 or 1
-    y[i] ~ binomial(t[i], yap[state1[i] + 1]);
+    y[i] ~ binomial(t[i], yap[state[i] + 1]);
   }
 }

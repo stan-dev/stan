@@ -1,6 +1,6 @@
 STAN_HOME = ../../../../..
 PGM = hearts#
-CC = g++-4.6 -std=c++0x 
+CC = g++
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
