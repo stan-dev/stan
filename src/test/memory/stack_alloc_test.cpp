@@ -1,6 +1,18 @@
 #include <gtest/gtest.h>
+#include <stdlib.h>
 #include <vector>
 #include "stan/memory/stack_alloc.hpp"
+
+TEST(stack_alloc,is_aligned) {
+  char* ptr = static_cast<char*>(malloc(1024));
+  EXPECT_TRUE(stan::memory::is_aligned(ptr,1U));
+  EXPECT_TRUE(stan::memory::is_aligned(ptr,2U));
+  EXPECT_TRUE(stan::memory::is_aligned(ptr,4U));
+  EXPECT_TRUE(stan::memory::is_aligned(ptr,8U));
+  
+  EXPECT_FALSE(stan::memory::is_aligned(ptr+1,8U));
+  free(ptr); // not very safe, but just a test
+}
 
 TEST(stack_alloc,alloc) {
 

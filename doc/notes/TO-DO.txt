@@ -1,12 +1,6 @@
 TO DO
 =================================================
 
-* make sure block allocs are 8-byte aligned
-  - make sure all the structs inside are aligned
-  - int new_size = iceil(size / 8.0) * 8
-  - min size = 24 bytes, add at most 7 bytes,
-    so at most 30% extra memory or so
-    
 * check bounds
   - model load time
     + data: 
@@ -32,7 +26,7 @@ TO DO
 
 * HMC
   - command w. specified step size, number of steps
-  - include Gibbs for discrete (exact, sliced)
+  - include Gibbs for discrete (small exact, o.w. slice)
 
 * command line: 
   - arguments
@@ -115,6 +109,12 @@ TO DO
 
 EXTENSIONS
 =================================================
+
+* cumulative densities and derivatives for truncations
+
+* reparameterize simplex transform using hyperspherical coordinates
+  - use "Wierstrass trick" to avoid numerical trig
+  - use log_sum_exp to prevent underflow in products
 
 * run-time checks for
   - positive definiteness

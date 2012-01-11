@@ -1,6 +1,8 @@
 #ifndef __STAN__MEMORY__STACK_ALLOC_HPP__
 #define __STAN__MEMORY__STACK_ALLOC_HPP__
 
+#include <stdexcept>
+#include <sstream>
 #include <stdlib.h>
 #include <vector>
 
@@ -8,10 +10,43 @@ namespace stan {
 
   namespace memory { 
 
-    namespace {
-      const size_t DEFAULT_INITIAL_NBYTES = 1 << 10;
+    /**
+     * Return <code>true</code> if the specified pointer is aligned
+     * on the number of bytes.
+     *
+     * This doesn't really make sense other than for powers of 2.
+     *
+     * @param ptr Pointer to test.
+     * @param bytes_aligned Number of bytes of alignment required.
+     * @return <code>true</code> if pointer is aligned.
+     * @tparam Type of object to which pointer points.
+     */
+    template <typename T>
+    bool is_aligned(T* ptr, unsigned int bytes_aligned) {
+      return (reinterpret_cast<uintptr_t>(ptr) % bytes_aligned) == 0U;
     }
 
+
+    namespace {
+      const size_t DEFAULT_INITIAL_NBYTES = 1 << 16; // 64KB
+
+
+      // FIXME: enforce alignment
+      // big fun to inline, but only called twice
+      inline char* eight_byte_aligned_malloc(size_t size) {
+        char* ptr = static_cast<char*>(malloc(size));
+        if (!is_aligned(ptr,8U)) {
+          std::stringstream s;
+          s << "invalid alignment to 8 bytes, ptr=" 
+            << reinterpret_cast<uintptr_t>(ptr) 
+            << std::endl;
+          throw std::runtime_error(s.str());
+        }
+        return ptr;
+      }
+    }
+
+    
     /**
      * Here's an example of how to use HMC for a simple model with
      * strong parameter correlations.
@@ -33,6 +68,11 @@ namespace stan {
      * is twice as large as the previous one.  The memory may be
      * recovered, with the blocks being reused, or all blocks may be
      * freed, resetting the stack of blocks to its original state. 
+     *
+     * Alignment up to 8 byte boundaries guaranteed for the first malloc,
+     * and after that it's up to the caller.  On 64-bit architectures,
+     * all struct values should be padded to 8-byte boundaries if they
+     * contain an 8-byte member or a virtual function.
      */
     class stack_alloc {
     private: 
@@ -42,29 +82,21 @@ namespace stan {
       size_t used_;
     public:
 
-      /**
-       * Construct a resizable stack allocator initially holding the
-       * default number of bytes, 1024.
-       */
-      stack_alloc() :
-	blocks_(1, static_cast<char*>(malloc(DEFAULT_INITIAL_NBYTES))),
-	sizes_(1,DEFAULT_INITIAL_NBYTES),
-	cur_block_(0),
-	used_(0) {
-      }
 
       /**
        * Construct a resizable stack allocator initially holding the
        * specified number of bytes.
        *
        * @param $initial_nbytes Initial number of bytes for the
-       * allocator.
+       * allocator.  Defaults to <code>(1 << 16) = 64KB</code> initial bytes.
+       * @throws std::runtime_error if the underlying malloc is not 8-byte
+       * aligned.
        */
-      stack_alloc(size_t initial_nbytes) :
-	blocks_(1, static_cast<char*>(malloc(initial_nbytes))),
-	sizes_(1,initial_nbytes),
-	cur_block_(0),
-	used_(0) {
+      stack_alloc(size_t initial_nbytes = DEFAULT_INITIAL_NBYTES) :
+        blocks_(1, eight_byte_aligned_malloc(initial_nbytes)),
+        sizes_(1,initial_nbytes),
+        cur_block_(0),
+        used_(0) {
       }
 
       /**
@@ -80,6 +112,8 @@ namespace stan {
        * Return a newly allocated block of memory of the appropriate
        * size managed by the stack allocator.
        *
+       * The allocated pointer will be 8-byte aligned.
+       *
        * This function may call C++'s <code>malloc()</code> function,
        * with any exceptions percolated throught this function.
        *
@@ -87,24 +121,24 @@ namespace stan {
        * @return A pointer to the allocated memory.
        */
       inline void* alloc(size_t len) {
-	if (sizes_[cur_block_] < used_ + len)
-	  ++cur_block_;
+        if (sizes_[cur_block_] < used_ + len)
+          ++cur_block_;
  
-	while (cur_block_ < blocks_.size() && sizes_[cur_block_] < len)
-	  ++cur_block_;
-		   
-	if (cur_block_ >= sizes_.size()) {
-	  size_t newsize = sizes_.back() * 2;
-	  if (newsize < len)
-	    newsize = len;
-	  blocks_.push_back((char*)malloc(newsize));
-	  sizes_.push_back(newsize);
-	  used_ = 0;
-	}
+        while (cur_block_ < blocks_.size() && sizes_[cur_block_] < len)
+          ++cur_block_;
+                   
+        if (cur_block_ >= sizes_.size()) {
+          size_t newsize = sizes_.back() * 2;
+          if (newsize < len)
+            newsize = len;
+          blocks_.push_back(eight_byte_aligned_malloc(newsize));
+          sizes_.push_back(newsize);
+          used_ = 0;
+        }
 
-	void* result = &blocks_[cur_block_][used_];
-	used_ += len;
-	return result;
+        void* result = &blocks_[cur_block_][used_];
+        used_ += len;
+        return result;
       }
 
       /**
@@ -114,17 +148,17 @@ namespace stan {
        * function free_all().
        */
       inline void recover_all() {
-	cur_block_ = 0;
-	used_ = 0;
+        cur_block_ = 0;
+        used_ = 0;
       }
     
       /**
        * Free all memory used by the stack allocator back to the system.
        */
       inline void free_all() {
-	for (unsigned int i = 0; i < cur_block_; ++i)
-	  free(blocks_[i]);
-	recover_all();
+        for (unsigned int i = 0; i < cur_block_; ++i)
+          free(blocks_[i]);
+        recover_all();
       }
   
     };
