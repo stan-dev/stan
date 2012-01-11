@@ -27,6 +27,7 @@ namespace stan {
      * Samples from the sampler are returned through the
      * base class <code>sampler</code>.
      */
+    template <typename BaseRNG = boost::mt19937>
     class nuts : public adaptive_sampler {
     protected:
       // Provides the target distribution we're trying to sample from
@@ -47,9 +48,9 @@ namespace stan {
       double _delta;
 
       // RNGs
-      boost::mt19937 _rand_int;
-      boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > _rand_unit_norm;
-      boost::uniform_01<boost::mt19937&> _rand_uniform_01;
+      BaseRNG _rand_int;
+      boost::variate_generator<BaseRNG&, boost::normal_distribution<> > _rand_unit_norm;
+      boost::uniform_01<BaseRNG&> _rand_uniform_01;
 
       // Stop immediately if H < u - _maxchange
       const double _maxchange;
@@ -102,8 +103,10 @@ namespace stan {
        * @param random_seed Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
-      nuts(mcmc::prob_grad& model, double delta = 0.6, double epsilon = -1,
-           unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
+      nuts(mcmc::prob_grad& model, 
+           double delta = 0.6, 
+           double epsilon = -1,
+           BaseRNG base_rng = BaseRNG(std::time(0)))
         : _model(model),
           _x(model.num_params_r()),
           _z(model.num_params_i()),
@@ -112,14 +115,15 @@ namespace stan {
           _epsilon(epsilon),
           _delta(delta),
 
-          _rand_int(random_seed),
+          _rand_int(base_rng),
           _rand_unit_norm(_rand_int,
-                          boost::normal_distribution<>()),
+                          boost::normal_distribution<double>()),
           _rand_uniform_01(_rand_int),
 
           _maxchange(-1000),
 
           _da(da_gamma(), std::vector<double>(1, 0)) {
+        
         model.init(_x, _z);
         _logp = model.grad_log_prob(_x, _z, _g);
         if (_epsilon <= 0)

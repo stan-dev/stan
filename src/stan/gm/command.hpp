@@ -2,8 +2,12 @@
 #define __STAN__GM__COMMAND_HPP__
 
 #include <cmath>
+#include <ctime>
 #include <iostream>
 #include <fstream>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc.hpp>
@@ -17,7 +21,7 @@ namespace stan {
   namespace gm {
 
     void hmc_command(const stan::io::cmd_line& command,
-		     stan::mcmc::prob_grad& model) {
+                     stan::mcmc::prob_grad& model) {
 
       std::string sample_file = "samples.csv";
       command.val("sample_file",sample_file);
@@ -52,22 +56,22 @@ namespace stan {
       std::vector<double> params_r;
       std::vector<int> params_i;
       for (unsigned int m = 0; m < num_iterations; ++m) {
-	std::cout << "iteration=" << (m + 1);
-	if (m < num_burnin) {
-	  std::cout << " burning in" << std::endl;
-	  sampler.next();
-	  continue;
-	}
-	if (((m - num_burnin) % num_thin) != 0) {
-	  std::cout << " thinning" << std::endl;
-	  sampler.next();
-	  continue;
-	} 
-	std::cout << " saving" << std::endl;
-	stan::mcmc::sample sample = sampler.next();
-	sample.params_r(params_r);
-	sample.params_i(params_i);
-	model.write_csv(params_r,params_i,sample_file_stream);
+        std::cout << "iteration=" << (m + 1);
+        if (m < num_burnin) {
+          std::cout << " burning in" << std::endl;
+          sampler.next();
+          continue;
+        }
+        if (((m - num_burnin) % num_thin) != 0) {
+          std::cout << " thinning" << std::endl;
+          sampler.next();
+          continue;
+        } 
+        std::cout << " saving" << std::endl;
+        stan::mcmc::sample sample = sampler.next();
+        sample.params_r(params_r);
+        sample.params_i(params_i);
+        model.write_csv(params_r,params_i,sample_file_stream);
       }
       sample_file_stream.close();
     }
@@ -101,6 +105,20 @@ namespace stan {
 
       double delta = 0.5;
       command.val("delta", delta);
+
+      int random_seed(0);
+      if (command.has_key("random_seed"))
+        command.val("random_seed",random_seed);
+      else
+        random_seed = std::time(0);
+
+      boost::mt19937 base_rng(random_seed);
+      boost::random::uniform_real_distribution<double> init_range_distribution(-2.0,2.0);
+      boost::variate_generator<boost::mt19937&, 
+                               boost::random::uniform_real_distribution<double> >
+        init_rng(base_rng,init_range_distribution);
+
+
       
       std::cout << "NUTS" << std::endl;
       std::cout << "sample_file=" << sample_file << std::endl;
@@ -108,47 +126,55 @@ namespace stan {
       std::cout << "num_burnin=" << num_burnin << std::endl;
       std::cout << "num_thin=" << num_thin << std::endl;
       std::cout << "delta=" << delta << std::endl;
+      std::cout << "random seed=" << random_seed 
+                << " (" << (command.has_key("random_seed") ? "user specified" : "randomly generated") << ")"
+                << std::endl;
 
       // Choose default value for delta (0.5)
-      stan::mcmc::nuts sampler(model, 0.5, -1);
+      stan::mcmc::nuts<> sampler(model, 0.5, -1, base_rng);
       sampler.adapt_on();
 
       std::vector<int> params_i;
       std::vector<double> params_r;
       if (command.has_key("init")) {
-	std::string init_path;
-	command.val("init",init_path);
-	std::cout << "init file=" << init_path << std::endl;
-	
-	std::fstream init_stream(init_path.c_str(),std::fstream::in);
-	stan::io::dump init_var_context(init_stream);
-	init_stream.close();
-	model.transform_inits(init_var_context,params_i,params_r);
+        std::string init_path;
+        command.val("init",init_path);
+        std::cout << "init file=" << init_path << std::endl;
+        
+        std::fstream init_stream(init_path.c_str(),std::fstream::in);
+        stan::io::dump init_var_context(init_stream);
+        init_stream.close();
+        model.transform_inits(init_var_context,params_i,params_r);
 
+      } else if (command.has_key("zero_init")) {
+        // FIXME:  default to random inits rather than 0s
+        params_i = std::vector<int>(model.num_params_i(),0);
+        params_r = std::vector<double>(model.num_params_r(),0.0);
       } else {
-	// FIXME:  default to random inits rather than 0s
-	params_i = std::vector<int>(model.num_params_i(),0.0);
-	params_r = std::vector<double>(model.num_params_r(),0.0);
+        params_i = std::vector<int>(model.num_params_i(),0);
+        params_r = std::vector<double>(model.num_params_r());
+        for (unsigned int i = 0; i < params_r.size(); ++i)
+          params_r[i] = init_rng();
       }
       for (unsigned int m = 0; m < num_iterations; ++m) {
-	std::cout << "iteration=" << (m + 1);
-	if (m < num_burnin) {
-	  std::cout << " burning in" << std::endl;
-	  sampler.next();
-	  continue;
-	} else {
+        std::cout << "iteration=" << (m + 1);
+        if (m < num_burnin) {
+          std::cout << " burning in" << std::endl;
+          sampler.next();
+          continue;
+        } else {
           sampler.adapt_off();
         }
-	if (((m - num_burnin) % num_thin) != 0) {
-	  std::cout << " thinning" << std::endl;
-	  sampler.next();
-	  continue;
-	} 
-	std::cout << " saving" << std::endl;
-	stan::mcmc::sample sample = sampler.next();
-	sample.params_r(params_r);
-	sample.params_i(params_i);
-	model.write_csv(params_r,params_i,sample_file_stream);
+        if (((m - num_burnin) % num_thin) != 0) {
+          std::cout << " thinning" << std::endl;
+          sampler.next();
+          continue;
+        } 
+        std::cout << " saving" << std::endl;
+        stan::mcmc::sample sample = sampler.next();
+        sample.params_r(params_r);
+        sample.params_i(params_i);
+        model.write_csv(params_r,params_i,sample_file_stream);
       }
       sample_file_stream.close();
     }

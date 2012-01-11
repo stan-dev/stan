@@ -1,6 +1,9 @@
-data {
+derived data {
     double mu;
-    double(0,) sigma;
+    double sigma;
+    
+    mu <- -20.0;
+    sigma <- 10.0;
 }
 parameters {
     double y;
