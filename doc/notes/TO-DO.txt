@@ -106,9 +106,10 @@ TO DO
 
 * plug in propto calls in generator
 
-
 EXTENSIONS
 =================================================
+
+* precompiled headers for model compilation speed
 
 * cumulative densities and derivatives for truncations
 

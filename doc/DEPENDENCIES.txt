@@ -19,8 +19,8 @@ includes a standard Bash shell.
 home: http://gcc.gnu.org/
 license: GPL3+
          http://www.gnu.org/licenses/gpl.html
-version: gcc (GCC) 4.3.4 20090804 (release) 1 [cygwin]
-         i686-apple-darwin10-g++-4.2.1:
+version: Mac: gcc (GCC) 4.3.4 20090804 (release) 1 [cygwin]
+              i686-apple-darwin10-g++-4.2.1:
 
 2. gnu make
 ----------------------------------------
@@ -44,7 +44,7 @@ home:    http://eigen.tuxfamily.org
 license: LGPL3+
          http://www.gnu.org/licenses/lgpl.html
 unpack:  lib/Eigen/{Array,...}
-version  3.0.3
+version  3.0.4
 
 
 4. boost

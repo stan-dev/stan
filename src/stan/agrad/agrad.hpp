@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__AGRAD_HPP__
 
 #include <cmath>
+#include <cstddef>
 #include <limits>
 #include <stdexcept>
 #include <vector>
@@ -44,7 +45,7 @@ namespace stan {
        * auto-dif.
        */
       ~chainable() { 
-	throw std::logic_error("chainable destruction handled automatically");
+        throw std::logic_error("chainable destruction handled automatically");
       }
 
       /**
@@ -80,7 +81,7 @@ namespace stan {
        * @return Pointer to allocated bytes.
        */
       static inline void* operator new(size_t nbytes) {
-	return memalloc_.alloc(nbytes);
+        return memalloc_.alloc(nbytes);
       }
 
     };
@@ -128,9 +129,9 @@ namespace stan {
        * @param x Value of the constructed variable.
        */
       vari(const double x): 
-	val_(x),
-	adj_(0.0) {
-	var_stack_.push_back(this);
+        val_(x),
+        adj_(0.0) {
+        var_stack_.push_back(this);
       }
 
       /**
@@ -141,7 +142,7 @@ namespace stan {
        * @throw Logic exception always.
        */
       ~vari() { 
-	throw std::logic_error("vari destruction handled automatically");
+        throw std::logic_error("vari destruction handled automatically");
       }
 
       /**
@@ -150,14 +151,14 @@ namespace stan {
        * propagating derivatives.
        */
       virtual void init_dependent() {
-	adj_ = 1.0;   // droot/droot = 1
+        adj_ = 1.0;   // droot/droot = 1
       }
 
       /**
        * Set the adjoint value of this variable to 0.
        */
       virtual void set_zero_adjoint() {
-	adj_ = 0.0;
+        adj_ = 0.0;
       }
 
     };
@@ -197,7 +198,7 @@ namespace stan {
        * @param vi Variable implementation. 
        */
       explicit var(vari* vi) :
-	vi_(vi) {
+        vi_(vi) {
       }
 
       /**
@@ -217,7 +218,7 @@ namespace stan {
        * @param b Value.
        */
       var(bool b) :
-	vi_(new vari(static_cast<double>(b))) {
+        vi_(new vari(static_cast<double>(b))) {
       }
 
       /**      
@@ -227,7 +228,7 @@ namespace stan {
        * @param c Value.
        */
       var(char c) :
-	vi_(new vari(static_cast<double>(c))) {
+        vi_(new vari(static_cast<double>(c))) {
       }
 
       /**      
@@ -237,7 +238,7 @@ namespace stan {
        * @param n Value.
        */
       var(short n) :
-	vi_(new vari(static_cast<double>(n))) {
+        vi_(new vari(static_cast<double>(n))) {
       }
 
       /**      
@@ -247,7 +248,7 @@ namespace stan {
        * @param n Value.
        */
       var(unsigned short n) :
-	vi_(new vari(static_cast<double>(n))) {
+        vi_(new vari(static_cast<double>(n))) {
       }
 
       /**      
@@ -257,7 +258,7 @@ namespace stan {
        * @param n Value.
        */
       var(int n) :
-	vi_(new vari(static_cast<double>(n))) {
+        vi_(new vari(static_cast<double>(n))) {
       }
 
       /**      
@@ -267,7 +268,7 @@ namespace stan {
        * @param n Value.
        */
       var(unsigned int n) :
-	vi_(new vari(static_cast<double>(n))) {
+        vi_(new vari(static_cast<double>(n))) {
       }
 
       /**      
@@ -277,7 +278,7 @@ namespace stan {
        * @param n Value.
        */
       var(long int n) :
-	vi_(new vari(static_cast<double>(n))) {
+        vi_(new vari(static_cast<double>(n))) {
       }
 
       /**      
@@ -287,7 +288,27 @@ namespace stan {
        * @param n Value.
        */
       var(unsigned long int n) :
-	vi_(new vari(static_cast<double>(n))) {
+        vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(unsigned long long n) :
+        vi_(new vari(static_cast<double>(n))) {
+      }
+
+      /**      
+       * Construct a variable by static casting the specified
+       * value to <code>double</code>.
+       *
+       * @param n Value.
+       */
+      var(long long n) :
+        vi_(new vari(static_cast<double>(n))) {
       }
 
       /**      
@@ -297,7 +318,7 @@ namespace stan {
        * @param x Value.
        */
       var(float x) :
-	vi_(new vari(static_cast<double>(x))) {
+        vi_(new vari(static_cast<double>(x))) {
       }
 
       /**      
@@ -306,7 +327,7 @@ namespace stan {
        * @param x Value of the variable.
        */
       var(double x) :
-	vi_(new vari(x)) {
+        vi_(new vari(x)) {
       }
 
       /**      
@@ -316,7 +337,7 @@ namespace stan {
        * @param x Value.
        */
       var(long double x) :
-	vi_(new vari(static_cast<double>(x))) {
+        vi_(new vari(static_cast<double>(x))) {
       }
 
       /**
@@ -325,7 +346,7 @@ namespace stan {
        * @return The value of this variable.
        */
       inline double val() const {
-	return vi_->val_;
+        return vi_->val_;
       }
 
       /**
@@ -337,7 +358,7 @@ namespace stan {
        * @return Adjoint value for this variable.
        */
       inline double adj() const {
-	return vi_->adj_;
+        return vi_->adj_;
       }
 
       /**
@@ -353,12 +374,12 @@ namespace stan {
        * variable with respect to x.
        */
       void grad(std::vector<var>& x,
-		std::vector<double>& g) {
-	stan::agrad::grad(vi_);
-	g.resize(0);
-	for (size_t i = 0U; i < x.size(); ++i) 
-	  g.push_back(x[i].vi_->adj_);
-	recover_memory();
+                std::vector<double>& g) {
+        stan::agrad::grad(vi_);
+        g.resize(0);
+        for (size_t i = 0U; i < x.size(); ++i) 
+          g.push_back(x[i].vi_->adj_);
+        recover_memory();
       }
 
       /**
@@ -378,8 +399,8 @@ namespace stan {
        * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.
        */
       void grad() {
-	stan::agrad::grad(vi_);
-	recover_memory();
+        stan::agrad::grad(vi_);
+        recover_memory();
       }
 
       // POINTER OVERRIDES
@@ -397,7 +418,7 @@ namespace stan {
        * @return variable
        */
       inline vari& operator*() {
-	return *vi_;
+        return *vi_;
       }
 
       /**
@@ -411,7 +432,7 @@ namespace stan {
        * this variable.
        */
       inline vari* operator->() {
-	return vi_;
+        return vi_;
       }
 
       // COMPOUND ASSIGNMENT OPERATORS
@@ -526,7 +547,7 @@ namespace stan {
        * @return Reference to the specified output stream.
        */
       friend std::ostream& operator<<(std::ostream& os, const var& v) {
-	return os << v.val() << ':' << v.adj();
+        return os << v.val() << ':' << v.adj();
       }
     };
 
@@ -534,553 +555,553 @@ namespace stan {
 
       class op_v_vari : public vari {
       protected:
-	vari* avi_;
+        vari* avi_;
       public:
-	op_v_vari(double f, vari* avi) :
-	  vari(f),
-	  avi_(avi) {
-	}
+        op_v_vari(double f, vari* avi) :
+          vari(f),
+          avi_(avi) {
+        }
       };
 
       class op_vv_vari : public vari {
       protected:
-	vari* avi_;
-	vari* bvi_;
+        vari* avi_;
+        vari* bvi_;
       public:
-	op_vv_vari(double f, vari* avi, vari* bvi):
-	  vari(f),
-	  avi_(avi),
-	  bvi_(bvi) {
-	}
+        op_vv_vari(double f, vari* avi, vari* bvi):
+          vari(f),
+          avi_(avi),
+          bvi_(bvi) {
+        }
       };
 
       class op_vd_vari : public vari {
       protected:
-	vari* avi_;
-	double bd_;
+        vari* avi_;
+        double bd_;
       public:
-	op_vd_vari(double f, vari* avi, double b) :
-	  vari(f),
-	  avi_(avi),
-	  bd_(b) {
-	}
+        op_vd_vari(double f, vari* avi, double b) :
+          vari(f),
+          avi_(avi),
+          bd_(b) {
+        }
       };
 
       class op_dv_vari : public vari {
       protected:
-	double ad_;
-	vari* bvi_;
+        double ad_;
+        vari* bvi_;
       public:
-	op_dv_vari(double f, double a, vari* bvi) :
-	  vari(f),
-	  ad_(a),
-	  bvi_(bvi) {
-	}
+        op_dv_vari(double f, double a, vari* bvi) :
+          vari(f),
+          ad_(a),
+          bvi_(bvi) {
+        }
       };
 
       class op_vvv_vari : public vari {
       protected:
-	vari* avi_;
-	vari* bvi_;
-	vari* cvi_;
+        vari* avi_;
+        vari* bvi_;
+        vari* cvi_;
       public:
-	op_vvv_vari(double f, vari* avi, vari* bvi, vari* cvi) :
-	  vari(f),
-	  avi_(avi),
-	  bvi_(bvi),
-	  cvi_(cvi) {
-	}
+        op_vvv_vari(double f, vari* avi, vari* bvi, vari* cvi) :
+          vari(f),
+          avi_(avi),
+          bvi_(bvi),
+          cvi_(cvi) {
+        }
       };
 
       class op_vvd_vari : public vari {
       protected:
-	vari* avi_;
-	vari* bvi_;
-	double cd_;
+        vari* avi_;
+        vari* bvi_;
+        double cd_;
       public:
-	op_vvd_vari(double f, vari* avi, vari* bvi, double c) :
-	  vari(f),
-	  avi_(avi),
-	  bvi_(bvi),
-	  cd_(c) {
-	}
+        op_vvd_vari(double f, vari* avi, vari* bvi, double c) :
+          vari(f),
+          avi_(avi),
+          bvi_(bvi),
+          cd_(c) {
+        }
       };
 
       class op_vdv_vari : public vari {
       protected:
-	vari* avi_;
-	double bd_;
-	vari* cvi_;
+        vari* avi_;
+        double bd_;
+        vari* cvi_;
       public:
-	op_vdv_vari(double f, vari* avi, double b, vari* cvi) :
-	  vari(f),
-	  avi_(avi),
-	  bd_(b), 
-	  cvi_(cvi) {
-	}
+        op_vdv_vari(double f, vari* avi, double b, vari* cvi) :
+          vari(f),
+          avi_(avi),
+          bd_(b), 
+          cvi_(cvi) {
+        }
       };
 
       class op_vdd_vari : public vari {
       protected:
-	vari* avi_;
-	double bd_;
-	double cd_;
+        vari* avi_;
+        double bd_;
+        double cd_;
       public:
-	op_vdd_vari(double f, vari* avi, double b, double c) :
-	  vari(f),
-	  avi_(avi),
-	  bd_(b), 
-	  cd_(c) {
-	}
+        op_vdd_vari(double f, vari* avi, double b, double c) :
+          vari(f),
+          avi_(avi),
+          bd_(b), 
+          cd_(c) {
+        }
       };
 
       class op_dvv_vari : public vari {
       protected:
-	double ad_;
-	vari* bvi_;
-	vari* cvi_;
+        double ad_;
+        vari* bvi_;
+        vari* cvi_;
       public:
-	op_dvv_vari(double f, double a, vari* bvi, vari* cvi) :
-	  vari(f),
-	  ad_(a),
-	  bvi_(bvi),
-	  cvi_(cvi) {
-	}
+        op_dvv_vari(double f, double a, vari* bvi, vari* cvi) :
+          vari(f),
+          ad_(a),
+          bvi_(bvi),
+          cvi_(cvi) {
+        }
       };
 
       class op_dvd_vari : public vari {
       protected:
-	double ad_;
-	vari* bvi_;
-	double cd_;
+        double ad_;
+        vari* bvi_;
+        double cd_;
       public:
-	op_dvd_vari(double f, double a, vari* bvi, double c) :
-	  vari(f),
-	  ad_(a),
-	  bvi_(bvi),
-	  cd_(c) {
-	}
+        op_dvd_vari(double f, double a, vari* bvi, double c) :
+          vari(f),
+          ad_(a),
+          bvi_(bvi),
+          cd_(c) {
+        }
       };
 
       class op_ddv_vari : public vari {
       protected:
-	double ad_;
-	double bd_;
-	vari* cvi_;
+        double ad_;
+        double bd_;
+        vari* cvi_;
       public:
-	op_ddv_vari(double f, double a, double b, vari* cvi) :
-	  vari(f),
-	  ad_(a),
-	  bd_(b),
-	  cvi_(cvi) {
-	}
+        op_ddv_vari(double f, double a, double b, vari* cvi) :
+          vari(f),
+          ad_(a),
+          bd_(b),
+          cvi_(cvi) {
+        }
       };
 
       // FIXME: memory leak -- copy vector to local memory
       class op_vector_vari : public vari {
       protected:
-	const unsigned int size_;
-	vari** vis_;
+        const unsigned int size_;
+        vari** vis_;
       public:
-	op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
-	  vari(f),
-	  size_(vs.size()) {
-	  vis_ = (vari**) operator new(sizeof(vari*[vs.size()]));
-	  for (unsigned int i = 0; i < vs.size(); ++i)
-	    vis_[i] = vs[i].vi_;
-	}
-	vari* operator[](unsigned int n) const {
-	  return vis_[n];
-	}
-	unsigned int size() {
-	  return size_;
-	}
+        op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
+          vari(f),
+          size_(vs.size()) {
+          vis_ = (vari**) operator new(sizeof(vari*[vs.size()]));
+          for (unsigned int i = 0; i < vs.size(); ++i)
+            vis_[i] = vs[i].vi_;
+        }
+        vari* operator[](unsigned int n) const {
+          return vis_[n];
+        }
+        unsigned int size() {
+          return size_;
+        }
       };
 
       class neg_vari : public op_v_vari {
       public: 
-	neg_vari(vari* avi) :
-	  op_v_vari(-(avi->val_), avi) {
-	}
-	void chain() {
-	  avi_->adj_ -= adj_;
-	}
+        neg_vari(vari* avi) :
+          op_v_vari(-(avi->val_), avi) {
+        }
+        void chain() {
+          avi_->adj_ -= adj_;
+        }
       };
 
 
       class add_vv_vari : public op_vv_vari {
       public:
-	add_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(avi->val_ + bvi->val_, avi, bvi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	  bvi_->adj_ += adj_;
-	}
+        add_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(avi->val_ + bvi->val_, avi, bvi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+          bvi_->adj_ += adj_;
+        }
       };
 
       class add_vd_vari : public op_vd_vari {
       public:
-	add_vd_vari(vari* avi, double b) :
-	  op_vd_vari(avi->val_ + b, avi, b) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	}
+        add_vd_vari(vari* avi, double b) :
+          op_vd_vari(avi->val_ + b, avi, b) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+        }
       };
 
       class increment_vari : public op_v_vari {
       public:
-	increment_vari(vari* avi) :
-	  op_v_vari(avi->val_ + 1.0, avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	}
+        increment_vari(vari* avi) :
+          op_v_vari(avi->val_ + 1.0, avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+        }
       };
 
       class decrement_vari : public op_v_vari {
       public:
-	decrement_vari(vari* avi) :
-	  op_v_vari(avi->val_ - 1.0, avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	}
+        decrement_vari(vari* avi) :
+          op_v_vari(avi->val_ - 1.0, avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+        }
       };
 
       class subtract_vv_vari : public op_vv_vari {
       public:
-	subtract_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(avi->val_ - bvi->val_, avi, bvi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	  bvi_->adj_ -= adj_;
-	}
+        subtract_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(avi->val_ - bvi->val_, avi, bvi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+          bvi_->adj_ -= adj_;
+        }
       };
     
       class subtract_vd_vari : public op_vd_vari {
       public:
-	subtract_vd_vari(vari* avi, double b) :
-	  op_vd_vari(avi->val_ - b, avi, b) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	}
+        subtract_vd_vari(vari* avi, double b) :
+          op_vd_vari(avi->val_ - b, avi, b) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+        }
       };
 
       class subtract_dv_vari : public op_dv_vari {
       public:
-	subtract_dv_vari(double a, vari* bvi) :
-	  op_dv_vari(a - bvi->val_, a, bvi) {
-	}
-	void chain() {
-	  bvi_->adj_ -= adj_;
-	}
+        subtract_dv_vari(double a, vari* bvi) :
+          op_dv_vari(a - bvi->val_, a, bvi) {
+        }
+        void chain() {
+          bvi_->adj_ -= adj_;
+        }
       };
 
       class multiply_vv_vari : public op_vv_vari {
       public:
-	multiply_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(avi->val_ * bvi->val_, avi, bvi) {
-	}
-	void chain() {
-	  avi_->adj_ += bvi_->val_ * adj_;
-	  bvi_->adj_ += avi_->val_ * adj_;
-	}
+        multiply_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(avi->val_ * bvi->val_, avi, bvi) {
+        }
+        void chain() {
+          avi_->adj_ += bvi_->val_ * adj_;
+          bvi_->adj_ += avi_->val_ * adj_;
+        }
       };
 
       class multiply_vd_vari : public op_vd_vari {
       public:
-	multiply_vd_vari(vari* avi, double b) :
-	  op_vd_vari(avi->val_ * b, avi, b) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ * bd_;
-	}
+        multiply_vd_vari(vari* avi, double b) :
+          op_vd_vari(avi->val_ * b, avi, b) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * bd_;
+        }
       };
 
       // (a/b)' = a' * (1 / b) - b' * (a / [b * b])
       class divide_vv_vari : public op_vv_vari {
       public:
-	divide_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(avi->val_ / bvi->val_, avi, bvi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / bvi_->val_;
-	  bvi_->adj_ -= adj_ * avi_->val_ / (bvi_->val_ * bvi_->val_);
-	}
+        divide_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(avi->val_ / bvi->val_, avi, bvi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / bvi_->val_;
+          bvi_->adj_ -= adj_ * avi_->val_ / (bvi_->val_ * bvi_->val_);
+        }
       };
 
       class divide_vd_vari : public op_vd_vari {
       public:
-	divide_vd_vari(vari* avi, double b) :
-	  op_vd_vari(avi->val_ / b, avi, b) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / bd_;
-	}
+        divide_vd_vari(vari* avi, double b) :
+          op_vd_vari(avi->val_ / b, avi, b) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / bd_;
+        }
       };
 
       class divide_dv_vari : public op_dv_vari {
       public:
-	divide_dv_vari(double a, vari* bvi) :
-	  op_dv_vari(a / bvi->val_, a, bvi) {
-	}
-	void chain() {
-	  bvi_->adj_ -= adj_ * ad_ / (bvi_->val_ * bvi_->val_);
-	}
+        divide_dv_vari(double a, vari* bvi) :
+          op_dv_vari(a / bvi->val_, a, bvi) {
+        }
+        void chain() {
+          bvi_->adj_ -= adj_ * ad_ / (bvi_->val_ * bvi_->val_);
+        }
       };
 
       class exp_vari : public op_v_vari {
       public:
-	exp_vari(vari* avi) :
-	  op_v_vari(std::exp(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ * val_;
-	}
+        exp_vari(vari* avi) :
+          op_v_vari(std::exp(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * val_;
+        }
       };
 
       class log_vari : public op_v_vari {
       public:
-	log_vari(vari* avi) :
-	  op_v_vari(std::log(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / avi_->val_;
-	}
+        log_vari(vari* avi) :
+          op_v_vari(std::log(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / avi_->val_;
+        }
       };
 
       double LOG_10 = std::log(10.0);
     
       class log10_vari : public op_v_vari {
       public:
-	const double exp_val_;
-	log10_vari(vari* avi) :
-	  op_v_vari(std::log10(avi->val_),avi),
-	  exp_val_(avi->val_) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / (LOG_10 * exp_val_);
-	}
+        const double exp_val_;
+        log10_vari(vari* avi) :
+          op_v_vari(std::log10(avi->val_),avi),
+          exp_val_(avi->val_) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / (LOG_10 * exp_val_);
+        }
       };
 
       class sqrt_vari : public op_v_vari {
       public:
-	sqrt_vari(vari* avi) :
-	  op_v_vari(std::sqrt(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / (2.0 * val_);
-	}
+        sqrt_vari(vari* avi) :
+          op_v_vari(std::sqrt(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / (2.0 * val_);
+        }
       };
 
       class pow_vv_vari : public op_vv_vari {
       public:
-	pow_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(std::pow(avi->val_,bvi->val_),avi,bvi) {
-	}
-	void chain() {
-	  if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
-	  avi_->adj_ += adj_ * bvi_->val_ * val_ / avi_->val_;
-	  bvi_->adj_ += adj_ * std::log(avi_->val_) * val_;
-	}
+        pow_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(std::pow(avi->val_,bvi->val_),avi,bvi) {
+        }
+        void chain() {
+          if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
+          avi_->adj_ += adj_ * bvi_->val_ * val_ / avi_->val_;
+          bvi_->adj_ += adj_ * std::log(avi_->val_) * val_;
+        }
       };
 
       class pow_vd_vari : public op_vd_vari {
       public:
-	pow_vd_vari(vari* avi, double b) :
-	  op_vd_vari(std::pow(avi->val_,b),avi,b) {
-	}
-	void chain() {
-	  if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
-	  avi_->adj_ += adj_ * bd_ * val_ / avi_->val_;
-	}
+        pow_vd_vari(vari* avi, double b) :
+          op_vd_vari(std::pow(avi->val_,b),avi,b) {
+        }
+        void chain() {
+          if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
+          avi_->adj_ += adj_ * bd_ * val_ / avi_->val_;
+        }
       };
 
       class pow_dv_vari : public op_dv_vari {
       public:
-	pow_dv_vari(double a, vari* bvi) :
-	  op_dv_vari(std::pow(a,bvi->val_),a,bvi) {
-	}
-	void chain() {
-	  if (ad_ == 0.0) return; // partials zero, avoids 0 & log(0)
-	  bvi_->adj_ += adj_ * std::log(ad_) * val_;
-	}
+        pow_dv_vari(double a, vari* bvi) :
+          op_dv_vari(std::pow(a,bvi->val_),a,bvi) {
+        }
+        void chain() {
+          if (ad_ == 0.0) return; // partials zero, avoids 0 & log(0)
+          bvi_->adj_ += adj_ * std::log(ad_) * val_;
+        }
       };
 
       class cos_vari : public op_v_vari {
       public:
-	cos_vari(vari* avi) :
-	  op_v_vari(std::cos(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ -= adj_ * std::sin(avi_->val_);
-	}
+        cos_vari(vari* avi) :
+          op_v_vari(std::cos(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ -= adj_ * std::sin(avi_->val_);
+        }
       };
 
       class sin_vari : public op_v_vari {
       public:
-	sin_vari(vari* avi) :
-	  op_v_vari(std::sin(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ * std::cos(avi_->val_);
-	}
+        sin_vari(vari* avi) :
+          op_v_vari(std::sin(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * std::cos(avi_->val_);
+        }
       };
 
       class tan_vari : public op_v_vari {
       public:
-	tan_vari(vari* avi) :
-	  op_v_vari(std::tan(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ * (1.0 + val_ * val_); 
-	}
+        tan_vari(vari* avi) :
+          op_v_vari(std::tan(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * (1.0 + val_ * val_); 
+        }
       };
 
       class acos_vari : public op_v_vari {
       public:
-	acos_vari(vari* avi) :
-	  op_v_vari(std::acos(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ -= adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
-	}
+        acos_vari(vari* avi) :
+          op_v_vari(std::acos(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ -= adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
+        }
       };
 
       class asin_vari : public op_v_vari {
       public:
-	asin_vari(vari* avi) :
-	  op_v_vari(std::asin(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
-	}
+        asin_vari(vari* avi) :
+          op_v_vari(std::asin(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
+        }
       };
 
       class atan_vari : public op_v_vari {
       public:
-	atan_vari(vari* avi) :
-	  op_v_vari(std::atan(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ / (1.0 + (avi_->val_ * avi_->val_));
-	}
+        atan_vari(vari* avi) :
+          op_v_vari(std::atan(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / (1.0 + (avi_->val_ * avi_->val_));
+        }
       };
 
       class atan2_vv_vari : public op_vv_vari {
       public:
-	atan2_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(std::atan2(avi->val_,bvi->val_),avi,bvi) {
-	}
-	void chain() {
-	  double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bvi_->val_ * bvi_->val_);
-	  avi_->adj_ += bvi_->val_ / a_sq_plus_b_sq;
-	  bvi_->adj_ -= avi_->val_ / a_sq_plus_b_sq;
-	}
+        atan2_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(std::atan2(avi->val_,bvi->val_),avi,bvi) {
+        }
+        void chain() {
+          double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bvi_->val_ * bvi_->val_);
+          avi_->adj_ += bvi_->val_ / a_sq_plus_b_sq;
+          bvi_->adj_ -= avi_->val_ / a_sq_plus_b_sq;
+        }
       };
 
       class atan2_vd_vari : public op_vd_vari {
       public:
-	atan2_vd_vari(vari* avi, double b) :
-	  op_vd_vari(std::atan2(avi->val_,b),avi,b) {
-	}
-	void chain() {
-	  double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bd_ * bd_);
-	  avi_->adj_ += bd_ / a_sq_plus_b_sq;
-	}
+        atan2_vd_vari(vari* avi, double b) :
+          op_vd_vari(std::atan2(avi->val_,b),avi,b) {
+        }
+        void chain() {
+          double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bd_ * bd_);
+          avi_->adj_ += bd_ / a_sq_plus_b_sq;
+        }
       };
 
       class atan2_dv_vari : public op_dv_vari {
       public:
-	atan2_dv_vari(double a, vari* bvi) :
-	  op_dv_vari(std::atan2(a,bvi->val_),a,bvi) {
-	}
-	void chain() {
-	  double a_sq_plus_b_sq = (ad_ * ad_) + (bvi_->val_ * bvi_->val_);
-	  bvi_->adj_ -= ad_ / a_sq_plus_b_sq;
-	}
+        atan2_dv_vari(double a, vari* bvi) :
+          op_dv_vari(std::atan2(a,bvi->val_),a,bvi) {
+        }
+        void chain() {
+          double a_sq_plus_b_sq = (ad_ * ad_) + (bvi_->val_ * bvi_->val_);
+          bvi_->adj_ -= ad_ / a_sq_plus_b_sq;
+        }
       };
 
       class cosh_vari : public op_v_vari {
       public:
-	cosh_vari(vari* avi) :
-	  op_v_vari(std::cosh(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ * std::sinh(avi_->val_);
-	}
+        cosh_vari(vari* avi) :
+          op_v_vari(std::cosh(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * std::sinh(avi_->val_);
+        }
       };
 
       class sinh_vari : public op_v_vari {
       public:
-	sinh_vari(vari* avi) :
-	  op_v_vari(std::sinh(avi->val_),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_ * std::cosh(avi_->val_);
-	}
+        sinh_vari(vari* avi) :
+          op_v_vari(std::sinh(avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * std::cosh(avi_->val_);
+        }
       };
 
       class tanh_vari : public op_v_vari {
       public:
-	tanh_vari(vari* avi) :
-	  op_v_vari(std::tanh(avi->val_),avi) {
-	}
-	void chain() {
-	  double cosh = std::cosh(avi_->val_);
-	  avi_->adj_ += adj_ / (cosh * cosh);
-	}
+        tanh_vari(vari* avi) :
+          op_v_vari(std::tanh(avi->val_),avi) {
+        }
+        void chain() {
+          double cosh = std::cosh(avi_->val_);
+          avi_->adj_ += adj_ / (cosh * cosh);
+        }
       };
 
 
       class floor_vari : public vari {
       public:
-	floor_vari(vari* avi) :
-	  vari(std::floor(avi->val_)) {
-	}
+        floor_vari(vari* avi) :
+          vari(std::floor(avi->val_)) {
+        }
       };
 
       class ceil_vari : public vari {
       public:
-	ceil_vari(vari* avi) :
-	  vari(std::ceil(avi->val_)) {
-	}
+        ceil_vari(vari* avi) :
+          vari(std::ceil(avi->val_)) {
+        }
       };
 
       class fmod_vv_vari : public op_vv_vari {
       public:
-	fmod_vv_vari(vari* avi, vari* bvi) :
-	  op_vv_vari(std::fmod(avi->val_,bvi->val_),avi,bvi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	  bvi_->adj_ -= adj_ * static_cast<int>(avi_->val_ / bvi_->val_);
-	}
+        fmod_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(std::fmod(avi->val_,bvi->val_),avi,bvi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+          bvi_->adj_ -= adj_ * static_cast<int>(avi_->val_ / bvi_->val_);
+        }
       };
 
       class fmod_vd_vari : public op_v_vari {
       public:
-	fmod_vd_vari(vari* avi, double b) :
-	  op_v_vari(std::fmod(avi->val_,b),avi) {
-	}
-	void chain() {
-	  avi_->adj_ += adj_;
-	}
+        fmod_vd_vari(vari* avi, double b) :
+          op_v_vari(std::fmod(avi->val_,b),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_;
+        }
       };
       
       class fmod_dv_vari : public op_dv_vari {
       public:
-	fmod_dv_vari(double a, vari* bvi) :
-	  op_dv_vari(std::fmod(a,bvi->val_),a,bvi) {
-	}
-	void chain() {
-	  int d = static_cast<int>(ad_ / bvi_->val_);
-	  bvi_->adj_ -= adj_ * d;
-	}
+        fmod_dv_vari(double a, vari* bvi) :
+          op_dv_vari(std::fmod(a,bvi->val_),a,bvi) {
+        }
+        void chain() {
+          int d = static_cast<int>(ad_ / bvi_->val_);
+          bvi_->adj_ -= adj_ * d;
+        }
       };
 
 
@@ -1420,7 +1441,7 @@ namespace stan {
      */
     inline var operator+(const var& a, const double b) {
       if (b == 0.0)
-	return a;
+        return a;
       return var(new add_vd_vari(a.vi_,b));
     }
 
@@ -1437,7 +1458,7 @@ namespace stan {
      */
     inline var operator+(const double a, const var& b) {
       if (a == 0.0)
-	return b;
+        return b;
       return var(new add_vd_vari(b.vi_,a)); // by symmetry
     }
 
@@ -1472,7 +1493,7 @@ namespace stan {
      */
     inline var operator-(const var& a, const double b) {
       if (b == 0.0)
-	return a;
+        return a;
       return var(new subtract_vd_vari(a.vi_,b));
     }
 
@@ -1521,7 +1542,7 @@ namespace stan {
      */
     inline var operator*(const var& a, const double b) {
       if (b == 1.0)
-	return a;
+        return a;
       return var(new multiply_vd_vari(a.vi_,b));
     }
 
@@ -1538,7 +1559,7 @@ namespace stan {
      */
     inline var operator*(const double a, const var& b) {
       if (a == 1.0)
-	return b;
+        return b;
       return var(new multiply_vd_vari(b.vi_,a)); // by symmetry
     }
 
@@ -1573,7 +1594,7 @@ namespace stan {
      */
     inline var operator/(const var& a, const double b) {
       if (b == 1.0)
-	return a;
+        return a;
       return var(new divide_vd_vari(a.vi_,b));
     }
 
@@ -1750,11 +1771,11 @@ namespace stan {
      */
     inline var pow(const var& base, const double exponent) {
       if (exponent == 0.5)
-	return sqrt(base);
+        return sqrt(base);
       if (exponent == 1.0)
-	return base;
+        return base;
       if (exponent == 2.0)
-	return base * base; // FIXME: square() functionality from special_functions
+        return base * base; // FIXME: square() functionality from special_functions
       return var(new pow_vd_vari(base.vi_,exponent));
     }
 
@@ -1980,9 +2001,9 @@ namespace stan {
     inline var fabs(const var& a) {
       // cut-and-paste from abs()
       if (a.val() > 0.0)
-	return a;
+        return a;
       if (a.val() < 0.0)
-	return var(new neg_vari(a.vi_));
+        return var(new neg_vari(a.vi_));
       // FIXME:  is this right?  breaks connection to a
       return var(new vari(0.0));
     }
@@ -2106,9 +2127,9 @@ namespace stan {
     inline var abs(const var& a) {   
       // cut-and-paste from fabs()
       if (a.val() > 0.0)
-	return a;
+        return a;
       if (a.val() < 0.0)
-	return var(new neg_vari(a.vi_));
+        return var(new neg_vari(a.vi_));
       // FIXME:  same as fabs() -- is this right?
       return var(new vari(0.0));
     }
@@ -2146,11 +2167,11 @@ namespace stan {
       std::vector<chainable*>::iterator begin = var_stack_.begin();
       // skip to root variable
       for (; (it >= begin) && (*it != vi); --it)
-	;
+        ;
       vi->init_dependent(); 
       // propagate derivates for remaining vars
       for (; it >= begin; --it)
-	(*it)->chain();
+        (*it)->chain();
     }
 
     /**
@@ -2158,7 +2179,7 @@ namespace stan {
      */
     static void set_zero_all_adjoints() {
       for (unsigned int i = 0; i < var_stack_.size(); ++i)
-	var_stack_[i]->set_zero_adjoint();
+        var_stack_[i]->set_zero_adjoint();
     }
 
     /**
@@ -2188,17 +2209,17 @@ namespace stan {
      * @return Jacobian of the transform.  
      */
     void jacobian(std::vector<var>& dependents,
-		  std::vector<var>& independents,
-		  std::vector<std::vector<double> >& jacobian) {
+                  std::vector<var>& independents,
+                  std::vector<std::vector<double> >& jacobian) {
       jacobian.resize(dependents.size());
       for (unsigned int i = 0U; i < dependents.size(); ++i) {
-	jacobian[i].resize(independents.size());
-	if (i > 0U) 
-	  set_zero_all_adjoints();
-	jacobian.push_back(std::vector<double>(0U));
-	grad(dependents[i].vi_);
-	for (unsigned int j = 0U; j < independents.size(); ++j)
-	  jacobian[i][j] = independents[j].adj();
+        jacobian[i].resize(independents.size());
+        if (i > 0U) 
+          set_zero_all_adjoints();
+        jacobian.push_back(std::vector<double>(0U));
+        grad(dependents[i].vi_);
+        for (unsigned int j = 0U; j < independents.size(); ++j)
+          jacobian[i][j] = independents[j].adj();
       }
     }
 
@@ -2210,7 +2231,7 @@ namespace stan {
 
     inline var& var::operator+=(const double b) {
       if (b == 0.0)
-	return *this;
+        return *this;
       vi_ = new add_vd_vari(vi_,b);
       return *this;
     }
@@ -2222,7 +2243,7 @@ namespace stan {
 
     inline var& var::operator-=(const double b) {
       if (b == 0.0)
-	return *this;
+        return *this;
       vi_ = new subtract_vd_vari(vi_,b);
       return *this;
     }
@@ -2234,21 +2255,21 @@ namespace stan {
 
     inline var& var::operator*=(const double b) {
       if (b == 1.0)
-	return *this;
+        return *this;
       vi_ = new multiply_vd_vari(vi_,b);
       return *this;
     }
 
     inline var& var::operator/=(const var& b) {
-	vi_ = new divide_vv_vari(vi_,b.vi_);
-	return *this;
+        vi_ = new divide_vv_vari(vi_,b.vi_);
+        return *this;
       }
 
     inline var& var::operator/=(const double b) {
-	if (b == 1.0)
-	  return *this;
-	vi_ = new divide_vd_vari(vi_,b);
-	return *this;
+        if (b == 1.0)
+          return *this;
+        vi_ = new divide_vd_vari(vi_,b);
+        return *this;
       }
   }
 
