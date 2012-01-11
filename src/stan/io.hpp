@@ -1,11 +1,11 @@
 #ifndef STAN_IO_HPP
 #define STAN_IO_HPP
 
-#include "stan/cmd_line.hpp"
-#include "stan/csv_writer.hpp"
-#include "stan/dump.hpp"
-#include "stan/reader.hpp"
-#include "stan/var_context.hpp"
-#include "stan/writer.hpp"
+#include "stan/io/cmd_line.hpp"
+#include "stan/io/csv_writer.hpp"
+#include "stan/io/dump.hpp"
+#include "stan/io/reader.hpp"
+#include "stan/io/var_context.hpp"
+#include "stan/io/writer.hpp"
 
 #endif
