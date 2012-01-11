@@ -1,17 +1,16 @@
-#ifndef __STAN__STAN_HPP__
-#define __STAN__STAN_HPP__
+#ifndef STAN_HPP
+#define STAN_HPP
 
+#include "stan/gm.hpp"
+#include "stan/io.hpp"
+#include "stan/memory.hpp"
+#include "stan/mcmc.hpp"
+#include "stan/optimize.hpp"
+#include "stan/meta.hpp"
+#include "stan/prob.hpp"
+#include "stan/version.hpp"
 
-#include <string>
+#endif
 
-namespace stan {
-
-  /** Major version number for Stan package. */
-  const std::string MAJOR_VERSION = "alpha";
-
-  /** Minor version number for Stan package. */
-  const std::string MINOR_VERSION = "0";
-
-}
 
 #endif

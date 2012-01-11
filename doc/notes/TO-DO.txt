@@ -26,10 +26,9 @@ TO DO
     
 * random inits between -2 and 2 uniform
 
-* make sure validation happens on inits and data
-
 * namespace usings in StanGM
   - must be enough for all declared funs and agrads
+  - just use top-level .hpp for Stan and for modules
 
 * HMC
   - command w. specified step size, number of steps
@@ -120,6 +119,8 @@ EXTENSIONS
 * run-time checks for
   - positive definiteness
   - array/vector/matrix index bounds
+  - undefined derived parameters (.vi_ == 0)
+  - array loops out of bounds
 
 * special positive-definiteness-preserving operations
   - basic data type (or trait)
