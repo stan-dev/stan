@@ -14,14 +14,11 @@ CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0
 ## --- multiple platform section ---
 UNAME := $(shell uname)      # uname provides information about the platform
 ifeq (CYGWIN, $(filter CYGWIN%,$(UNAME))) # Windows under Cygwin
-	@echo 'Windows'
 	CFLAGS += -static-libgcc -static-libstdc++
 else ifeq (LINUX, $(UNAME))
-	@echo 'Linux'
 	OPT += -g
 	CFLAGS_T += -lpthread
 else ifeq (Darwin, $(UNAME)) # Mac OS X
-	@echo 'Mac'
 	OPT += -g
 endif
 ## --------------------------------
