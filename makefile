@@ -30,6 +30,9 @@ UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
 UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 
+define \n
+
+endef
 
 # DEFAULT
 # =========================================================
@@ -57,11 +60,11 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 	@echo '================================================================================'
 	@echo '================================================================================'
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-	-$@ --gtest_output="xml:$@.xml"
+	$@ --gtest_output="xml:$@.xml"
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ) #demo/gm
-	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
+	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";${\n})
 
 # run unit tests without having make fail
 test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
