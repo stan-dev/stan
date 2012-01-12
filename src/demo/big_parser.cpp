@@ -46,6 +46,20 @@ namespace foo {
     qi::rule<Iterator> whitespace;
   };
 
+
+  template <typename Iterator>
+  class sub_grammar : public qi::grammar<Iterator,
+                                         std::string(),
+                                         whitespace_grammar<Iterator> > {
+  public:
+    sub_grammar()
+      : sub_grammar::base_type(root_r) {
+      root_r %= qi::lit("foo");
+    }
+  private:
+    qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > root_r;
+  };
+
   template <typename Iterator>
   class big_grammar : public qi::grammar<Iterator,
                                           std::string(),
@@ -54,7 +68,7 @@ namespace foo {
     big_grammar()
       : big_grammar::base_type(root_r) {
 
-      root_r %= qi::lit("foo");
+      root_r %= *sub_r;
       rule1_r %= *qi::lit("bar") >> -qi::lit("baz");
       rule2_r %= *qi::lit("bar") >> -qi::lit("baz");
       rule3_r %= *qi::lit("bar") >> -qi::lit("baz");
@@ -106,6 +120,8 @@ namespace foo {
       rule49_r %= *qi::lit("bar") >> -qi::lit("baz");
     }
   private:
+    sub_grammar<Iterator> sub_r;
+    
     qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > root_r;
     qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > rule1_r;
     qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > rule2_r;
