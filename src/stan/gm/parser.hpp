@@ -553,6 +553,10 @@ namespace stan {
       qi::rule<Iterator> whitespace;
     };
 
+
+                              
+                              
+
     template <typename Iterator>
     struct expression_grammar : qi::grammar<Iterator,
                                             expression(),
@@ -708,6 +712,265 @@ namespace stan {
       variable_r;
 
     };
+
+    template <typename Iterator>
+    struct var_decl_grammar : qi::grammar<Iterator,
+                                          qi::locals<bool>,
+                                          var_decl(bool,var_origin),
+                                          whitespace_grammar<Iterator> > {
+      var_decl_grammar(variable_map& var_map,
+                       std::stringstream& error_msgs)
+        : var_decl_grammar::base_type(var_decl_r),
+          var_map_(var_map),
+          error_msgs_(error_msgs),
+          expression_g(var_map,error_msgs) {
+
+        using qi::_val;
+        using qi::_1;
+        using qi::_pass;
+        using qi::double_;
+        using qi::int_;
+        using boost::spirit::qi::eps;
+        using namespace qi::labels;
+
+        // _a = error state local, _r1 constraints allowed inherited
+        var_decl_r.name("variable declaration");
+        var_decl_r 
+          %= (int_decl_r             
+              [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | double_decl_r        
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | vector_decl_r        
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | row_vector_decl_r    
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | matrix_decl_r        
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | simplex_decl_r       
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | pos_ordered_decl_r   
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | corr_matrix_decl_r   
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              | cov_matrix_decl_r    
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              )
+          > qi::eps
+            [_pass 
+             = validate_decl_constraints_f(_r1,_a,_val,
+                                           boost::phoenix::ref(error_msgs_))]
+          ;
+
+        int_decl_r.name("integer declaration");
+        int_decl_r 
+          %= qi::lit("int")
+          > -range_brackets_int_r
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+
+        double_decl_r.name("double declaration");
+        double_decl_r 
+          %= qi::lit("double")
+          > -range_brackets_double_r
+          > identifier_r
+          > opt_dims_r
+          > qi::lit(';');
+
+        vector_decl_r.name("vector declaration");
+        vector_decl_r 
+          %= qi::lit("vector")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        row_vector_decl_r.name("row vector declaration");
+        row_vector_decl_r 
+          %= qi::lit("row_vector")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        matrix_decl_r.name("matrix declaration");
+        matrix_decl_r 
+          %= qi::lit("matrix")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(',')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        simplex_decl_r.name("simplex declaration");
+        simplex_decl_r 
+          %= qi::lit("simplex")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        pos_ordered_decl_r.name("positive ordered declaration");
+        pos_ordered_decl_r 
+          %= qi::lit("pos_ordered")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        corr_matrix_decl_r.name("correlation matrix declaration");
+        corr_matrix_decl_r 
+          %= qi::lit("corr_matrix")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        cov_matrix_decl_r.name("covariance matrix declaration");
+        cov_matrix_decl_r 
+          %= qi::lit("cov_matrix")
+          > qi::lit('(')
+          > expression_g
+            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          > qi::lit(')')
+          > identifier_r 
+          > opt_dims_r
+          > qi::lit(';');
+
+        opt_dims_r.name("array dimensions (optional)");
+        opt_dims_r 
+          %=  - dims_r;
+
+        dims_r.name("array dimensions");
+        dims_r 
+          %= qi::lit('[') 
+          > (expression_g
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+             % ',')
+          > qi::lit(']')
+          ;
+
+        range_brackets_int_r.name("range expression pair, brackets");
+        range_brackets_int_r 
+          %= qi::lit('(') 
+          > -(expression_g
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(',')
+          > -(expression_g
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(')');
+
+        range_brackets_double_r.name("range expression pair, brackets");
+        range_brackets_double_r 
+          %= qi::lit('(') 
+          > -(expression_g
+          [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(',')
+          > -(expression_g
+              [_pass 
+                = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+          > qi::lit(')');
+
+        identifier_r.name("identifier");
+        identifier_r
+          %= (qi::lexeme[qi::char_("a-zA-Z") 
+                        >> *qi::char_("a-zA-Z0-9_.")]);
+
+        range_r.name("range expression pair, colon");
+        range_r 
+          %= expression_g
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          >> qi::lit(':') 
+          >> expression_g
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
+
+
+
+
+      }
+      
+     // global info for parses
+      variable_map& var_map_;
+      std::stringstream& error_msgs_;
+
+      // grammars
+      expression_grammar<Iterator> expression_g;      
+
+      // rules
+
+      qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> >
+      corr_matrix_decl_r;
+
+      qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > 
+      cov_matrix_decl_r;
+
+      qi::rule<Iterator, std::vector<expression>(), 
+               whitespace_grammar<Iterator> > 
+      dims_r;
+
+      qi::rule<Iterator, double_var_decl(), whitespace_grammar<Iterator> > 
+      double_decl_r;
+
+      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > 
+      identifier_r;
+
+      qi::rule<Iterator, int_var_decl(), whitespace_grammar<Iterator> > 
+      int_decl_r;
+
+      qi::rule<Iterator, matrix_var_decl(), whitespace_grammar<Iterator> > 
+      matrix_decl_r;
+
+      qi::rule<Iterator, std::vector<expression>(),
+               whitespace_grammar<Iterator> > 
+      opt_dims_r;
+
+      qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > 
+      pos_ordered_decl_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_brackets_double_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_brackets_int_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_r;
+
+      qi::rule<Iterator, row_vector_var_decl(), whitespace_grammar<Iterator> > 
+      row_vector_decl_r;
+
+      qi::rule<Iterator, simplex_var_decl(), whitespace_grammar<Iterator> > 
+      simplex_decl_r;
+
+      qi::rule<Iterator, vector_var_decl(), whitespace_grammar<Iterator> > 
+      vector_decl_r;
+
+      qi::rule<Iterator, qi::locals<bool>, var_decl(bool,var_origin), 
+               whitespace_grammar<Iterator> > 
+      var_decl_r;
+
+    };
                                             
 
 
@@ -720,7 +983,9 @@ namespace stan {
         : program_grammar::base_type(program_r),
           var_map_(),
           error_msgs_(),
-          expression_g(var_map_,error_msgs_) {
+          expression_g(var_map_,error_msgs_),
+          var_decl_g(var_map_,error_msgs_) 
+      {
         using qi::_val;
         using qi::_1;
         using qi::_pass;
@@ -752,7 +1017,7 @@ namespace stan {
         data_var_decls_r
           %= qi::lit("data")
           > qi::lit('{')
-          > *var_decl_r(true,data_origin) // +constraints
+          > *var_decl_g(true,data_origin) // +constraints
           > qi::lit('}');
 
         derived_data_var_decls_r.name("derived data block");
@@ -760,7 +1025,7 @@ namespace stan {
           %= qi::lit("derived")
           >> qi::lit("data")
           > qi::lit('{')
-          > *var_decl_r(false,transformed_data_origin)  // -constraints
+          > *var_decl_g(false,transformed_data_origin)  // -constraints
           > *statement_r(false,transformed_data_origin) // -sampling
           > qi::lit('}');
 
@@ -768,7 +1033,7 @@ namespace stan {
         param_var_decls_r
           %= qi::lit("parameters")
           > qi::lit('{')
-          > *var_decl_r(true,parameter_origin) // +constraints
+          > *var_decl_g(true,parameter_origin) // +constraints
           > qi::lit('}');
 
         derived_var_decls_r.name("derived variable declarations");
@@ -776,7 +1041,7 @@ namespace stan {
           %= qi::lit("derived")
           >> qi::lit("parameters")
           > qi::lit('{')
-          > *var_decl_r(false,transformed_parameter_origin) // -constraints
+          > *var_decl_g(false,transformed_parameter_origin) // -constraints
           > *statement_r(false,transformed_parameter_origin) // -sampling
           > qi::lit('}');
 
@@ -785,7 +1050,7 @@ namespace stan {
           %= qi::lit("generated")
           > qi::lit("quantities")
           > qi::lit('{')
-          > *var_decl_r(false,derived_origin) // -constraints
+          > *var_decl_g(false,derived_origin) // -constraints
           > *statement_r(false,derived_origin) // -sampling
           > qi::lit('}');
 
@@ -1048,7 +1313,7 @@ namespace stan {
           ;
 
         local_var_decls_r
-          %= *var_decl_r(false,local_origin); // - constants
+          %= *var_decl_g(false,local_origin); // - constants
 
         // hack cast to write to error_msgs_ of type stringstream
         /*
@@ -1082,6 +1347,7 @@ namespace stan {
 
       // grammars
       expression_grammar<Iterator> expression_g;
+      var_decl_grammar<Iterator> var_decl_g;
 
       // rules
 
