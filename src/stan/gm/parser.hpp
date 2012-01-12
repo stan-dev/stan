@@ -913,73 +913,10 @@ namespace stan {
           > opt_dims_r
           > qi::lit(';');
 
-        expression_r.name("expression");
-        expression_r 
-          %=  term_r                          [_val = _1]
-          >> *( (qi::lit('+') > term_r        [_val += _1])
-                |   (qi::lit('-') > term_r    [_val -= _1])
-                )
-          > qi::eps[_pass = validate_expr_type_f(_val)];
-          ;
-
-        term_r.name("term");
-        term_r 
-          %= ( negated_factor_r                          [_val = _1]
-              >> *( (qi::lit('*') > negated_factor_r     [_val *= _1])
-                    | (qi::lit('/') > negated_factor_r   [_val /= _1])
-                    )
-              )
-          ;
-
-        negated_factor_r 
-          %= qi::lit('-') >> indexed_factor_r [_val = neg(_1)]
-          | qi::lit('+') >> indexed_factor_r [_val = _1]
-          | indexed_factor_r [_val = _1];
-        
-        // two of these to put semantic action on this one w. index_op input
-        indexed_factor_r.name("(optionally) indexed factor [sub]");
-        indexed_factor_r 
-          %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
-
-        indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
-        indexed_factor_2_r 
-          %= (factor_r >> *dims_r);
-
-        factor_r.name("factor");
-        factor_r
-          %=  int_literal_r      [_val = _1]
-          | double_literal_r    [_val = _1]
-          | fun_r               [_val = set_fun_type_f(_1)]
-          | variable_r          
-            [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
-                                   boost::phoenix::ref(error_msgs_),
-                                   _pass)]
-          | ( qi::lit('(') 
-              > expression_r    [_val = _1]
-              > qi::lit(')') )
-          ;
-
-        int_literal_r.name("integer literal");
-        int_literal_r
-          %= int_ 
-             >> !( qi::lit('.')
-                   | qi::lit('e')
-                   | qi::lit('E') );
-
-        double_literal_r.name("double literal");
-        double_literal_r
-          %= double_;
-
-
         variable_r.name("variable expression");
         variable_r
           %= identifier_r;
 
-        fun_r.name("function and argument expressions");
-        fun_r 
-          %= identifier_r 
-          >> args_r; 
-            
         opt_dims_r.name("array dimensions (optional)");
         opt_dims_r 
           %=  - dims_r;
@@ -987,7 +924,7 @@ namespace stan {
         dims_r.name("array dimensions");
         dims_r 
           %= qi::lit('[') 
-          > (expression_r 
+          > (expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
              % ',')
           > qi::lit(']')
@@ -1157,127 +1094,104 @@ namespace stan {
       expression_grammar<Iterator> expression_g;
 
       // rules
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
-      expression_r;
-
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
-      term_r;
-
-      qi::rule<Iterator, qi::locals<bool>, 
-               expression(), whitespace_grammar<Iterator> > 
-      factor_r;
-
-      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > 
-      variable_r;
-
-      qi::rule<Iterator, int_literal(), whitespace_grammar<Iterator> > 
-      int_literal_r;
-
-      qi::rule<Iterator, double_literal(), whitespace_grammar<Iterator> > 
-      double_literal_r;
-
-      qi::rule<Iterator, variable_dims(), whitespace_grammar<Iterator> > 
-      var_lhs_r;
-
-      qi::rule<Iterator, fun(), whitespace_grammar<Iterator> > 
-      fun_r;
-
-      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > 
-      identifier_r;
-
-      qi::rule<Iterator, std::vector<expression>(),
-               whitespace_grammar<Iterator> > 
-      opt_dims_r;
-
-      qi::rule<Iterator, std::vector<expression>(), 
-               whitespace_grammar<Iterator> > 
-      dims_r;
-
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
-      range_r;
-
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
-      truncation_range_r;
-
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
-      range_brackets_int_r;
-
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
-      range_brackets_double_r;
-
       qi::rule<Iterator, std::vector<expression>(), 
                whitespace_grammar<Iterator> > 
       args_r;
 
-      qi::rule<Iterator, int_var_decl(), whitespace_grammar<Iterator> > 
-      int_decl_r;
-
-      qi::rule<Iterator, double_var_decl(), whitespace_grammar<Iterator> > 
-      double_decl_r;
-
-      qi::rule<Iterator, vector_var_decl(), whitespace_grammar<Iterator> > 
-      vector_decl_r;
-
-      qi::rule<Iterator, row_vector_var_decl(), whitespace_grammar<Iterator> > 
-      row_vector_decl_r;
-
-      qi::rule<Iterator, matrix_var_decl(), whitespace_grammar<Iterator> > 
-      matrix_decl_r;
-
-      qi::rule<Iterator, simplex_var_decl(), whitespace_grammar<Iterator> > 
-      simplex_decl_r;
-
-      qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > 
-      pos_ordered_decl_r;
-
-      qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > 
-      cov_matrix_decl_r;
+      qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > 
+      assignment_r;
 
       qi::rule<Iterator, corr_matrix_var_decl(), whitespace_grammar<Iterator> >
       corr_matrix_decl_r;
 
-      qi::rule<Iterator, qi::locals<bool>, var_decl(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
-      var_decl_r;
+      qi::rule<Iterator, cov_matrix_var_decl(), whitespace_grammar<Iterator> > 
+      cov_matrix_decl_r;
 
       qi::rule<Iterator, std::vector<var_decl>(), 
                whitespace_grammar<Iterator> >       
       data_var_decls_r;
-      
+
       qi::rule<Iterator, std::pair<std::vector<var_decl>,
                                    std::vector<statement> >(), 
                whitespace_grammar<Iterator> > 
       derived_data_var_decls_r;
 
-      qi::rule<Iterator, std::vector<var_decl>(), 
-               whitespace_grammar<Iterator> >
-      param_var_decls_r;
-    
       qi::rule<Iterator, std::pair<std::vector<var_decl>,
                                    std::vector<statement> >(), 
                whitespace_grammar<Iterator> > 
       derived_var_decls_r;
     
+      qi::rule<Iterator, std::vector<expression>(), 
+               whitespace_grammar<Iterator> > 
+      dims_r;
+
+      qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> >
+      distribution_r;
+
+      qi::rule<Iterator, double_var_decl(), whitespace_grammar<Iterator> > 
+      double_decl_r;
+
+      qi::rule<Iterator, qi::locals<std::string>, 
+               for_statement(bool,var_origin), 
+               whitespace_grammar<Iterator> > 
+      for_statement_r;
+
       qi::rule<Iterator, std::pair<std::vector<var_decl>,
                              std::vector<statement> >(), 
                whitespace_grammar<Iterator> >
       generated_var_decls_r;
-    
+
+
+      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > 
+      identifier_r;
+
+      qi::rule<Iterator, int_var_decl(), whitespace_grammar<Iterator> > 
+      int_decl_r;
+
       qi::rule<Iterator, std::vector<var_decl>(), 
                whitespace_grammar<Iterator> >
       local_var_decls_r;
 
+      qi::rule<Iterator, matrix_var_decl(), whitespace_grammar<Iterator> > 
+      matrix_decl_r;
+
+      qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > 
+      model_r;
+
+      qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > 
+      no_op_statement_r;
+
+      qi::rule<Iterator, std::vector<expression>(),
+               whitespace_grammar<Iterator> > 
+      opt_dims_r;
+
+      qi::rule<Iterator, std::vector<var_decl>(), 
+               whitespace_grammar<Iterator> >
+      param_var_decls_r;
+
+      qi::rule<Iterator, pos_ordered_var_decl(), whitespace_grammar<Iterator> > 
+      pos_ordered_decl_r;
+
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> >
       program_r;
     
-      qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> >
-      distribution_r;
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_brackets_double_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_brackets_int_r;
+
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      range_r;
+
+      qi::rule<Iterator, row_vector_var_decl(), whitespace_grammar<Iterator> > 
+      row_vector_decl_r;
 
       qi::rule<Iterator, sample(bool), whitespace_grammar<Iterator> > 
       sample_r;
 
-      qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > 
-      assignment_r;
+      qi::rule<Iterator, simplex_var_decl(), whitespace_grammar<Iterator> > 
+      simplex_decl_r;
 
       qi::rule<Iterator, 
                statement(bool,var_origin), 
@@ -1289,26 +1203,22 @@ namespace stan {
                statements(bool,var_origin), whitespace_grammar<Iterator> >
       statement_seq_r;
 
-      qi::rule<Iterator, qi::locals<std::string>, 
-               for_statement(bool,var_origin), 
+      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
+      truncation_range_r;
+
+      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > 
+      variable_r;
+
+      qi::rule<Iterator, vector_var_decl(), whitespace_grammar<Iterator> > 
+      vector_decl_r;
+
+      qi::rule<Iterator, qi::locals<bool>, var_decl(bool,var_origin), 
                whitespace_grammar<Iterator> > 
-      for_statement_r;
+      var_decl_r;
 
-      qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > 
-      model_r;
-      
-      qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > 
-      no_op_statement_r;
+      qi::rule<Iterator, variable_dims(), whitespace_grammar<Iterator> > 
+      var_lhs_r;
 
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
-      indexed_factor_r;
-
-      // two of these because of type-coercion from index_op to expression
-      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > 
-      indexed_factor_2_r; 
-
-      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
-      negated_factor_r;
     };
 
     // Cut and paste source for iterator & reporting pattern:
