@@ -561,20 +561,11 @@ namespace stan {
     struct expression_grammar : qi::grammar<Iterator,
                                             expression(),
                                             whitespace_grammar<Iterator> > {
-      expression_grammar(variable_map& var_map,
-                         std::stringstream& error_msgs) 
-      : expression_grammar::base_type(expression_r),
-        var_map_(var_map),
-        error_msgs_(error_msgs) {
-
+      void sub_ctor1() {
         using qi::_val;
         using qi::_1;
         using qi::_pass;
-        using qi::double_;
-        using qi::int_;
         using boost::spirit::qi::eps;
-        using namespace qi::labels;
-
         expression_r.name("expression");
         expression_r 
           %=  term_r                          [_val = _1]
@@ -583,8 +574,12 @@ namespace stan {
                 )
           > qi::eps[_pass = validate_expr_type_f(_val)];
         ;
+      }
 
-       term_r.name("term");
+      void sub_ctor2() {
+        using qi::_val;
+        using qi::_1;
+        term_r.name("term");
         term_r 
           %= ( negated_factor_r                          [_val = _1]
               >> *( (qi::lit('*') > negated_factor_r     [_val *= _1])
@@ -592,21 +587,37 @@ namespace stan {
                     )
               )
           ;
+      }
 
+      void sub_ctor3() {
+        using qi::_val;
+        using qi::_1;
         negated_factor_r 
           %= qi::lit('-') >> indexed_factor_r [_val = neg(_1)]
           | qi::lit('+') >> indexed_factor_r [_val = _1]
           | indexed_factor_r [_val = _1];
-        
+      }
+
+      void sub_ctor4() {
+        using qi::_1;
+        using qi::_pass;
+
         // two of these to put semantic action on this one w. index_op input
         indexed_factor_r.name("(optionally) indexed factor [sub]");
         indexed_factor_r 
           %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
+      }
 
+      void sub_ctor5() {
         indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
         indexed_factor_2_r 
           %= (factor_r >> *dims_r);
+      }
 
+      void sub_ctor6() {
+        using qi::_val;
+        using qi::_1;
+        using qi::_pass;
         factor_r.name("factor");
         factor_r
           %=  int_literal_r      [_val = _1]
@@ -620,35 +631,50 @@ namespace stan {
               > expression_r    [_val = _1]
               > qi::lit(')') )
           ;
+      }
 
+      void sub_ctor7() {
+        using qi::int_;
         int_literal_r.name("integer literal");
         int_literal_r
           %= int_ 
              >> !( qi::lit('.')
                    | qi::lit('e')
                    | qi::lit('E') );
+      }
 
+      void sub_ctor8() {
+        using qi::double_;
         double_literal_r.name("double literal");
         double_literal_r
           %= double_;
+      }
 
-
+      void sub_ctor9() {
         fun_r.name("function and argument expressions");
         fun_r 
           %= identifier_r 
           >> args_r; 
+      }
 
+      void sub_ctor10() {
         identifier_r.name("identifier");
         identifier_r
           %= (qi::lexeme[qi::char_("a-zA-Z") 
                         >> *qi::char_("a-zA-Z0-9_.")]);
+      }
 
+      void sub_ctor11() {
         args_r.name("function argument expressions");
         args_r 
           %= qi::lit('(') 
           >> (expression_r % ',')
           > qi::lit(')');
+      }
 
+      void sub_ctor12() {
+        using qi::_1;
+        using qi::_pass;
         dims_r.name("array dimensions");
         dims_r 
           %= qi::lit('[') 
@@ -657,11 +683,34 @@ namespace stan {
              % ',')
           > qi::lit(']')
           ;
-        
+      }
+ 
+      void sub_ctor13() {
         variable_r.name("variable expression");
         variable_r
           %= identifier_r;
+      }
 
+
+      expression_grammar(variable_map& var_map,
+                         std::stringstream& error_msgs) 
+      : expression_grammar::base_type(expression_r),
+        var_map_(var_map),
+        error_msgs_(error_msgs) {
+        
+        sub_ctor1();
+        sub_ctor2();
+        sub_ctor3();
+        sub_ctor4();
+        sub_ctor5();
+        sub_ctor6();
+        sub_ctor7();
+        sub_ctor8();
+        sub_ctor9();
+        sub_ctor10();
+        sub_ctor11();
+        sub_ctor12();
+        sub_ctor13();
       }
 
       variable_map& var_map_;
@@ -718,18 +767,12 @@ namespace stan {
                                           qi::locals<bool>,
                                           var_decl(bool,var_origin),
                                           whitespace_grammar<Iterator> > {
-      var_decl_grammar(variable_map& var_map,
-                       std::stringstream& error_msgs)
-        : var_decl_grammar::base_type(var_decl_r),
-          var_map_(var_map),
-          error_msgs_(error_msgs),
-          expression_g(var_map,error_msgs) {
 
+
+      void sub_ctor1() { 
         using qi::_val;
         using qi::_1;
         using qi::_pass;
-        using qi::double_;
-        using qi::int_;
         using boost::spirit::qi::eps;
         using namespace qi::labels;
 
@@ -760,7 +803,9 @@ namespace stan {
              = validate_decl_constraints_f(_r1,_a,_val,
                                            boost::phoenix::ref(error_msgs_))]
           ;
+      }
 
+      void sub_ctor2() {
         int_decl_r.name("integer declaration");
         int_decl_r 
           %= qi::lit("int")
@@ -768,8 +813,9 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
-
+      void sub_ctor3() {
         double_decl_r.name("double declaration");
         double_decl_r 
           %= qi::lit("double")
@@ -777,7 +823,11 @@ namespace stan {
           > identifier_r
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor4() {
+        using qi::_1;
+        using qi::_pass;
         vector_decl_r.name("vector declaration");
         vector_decl_r 
           %= qi::lit("vector")
@@ -788,7 +838,11 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor5() {
+        using qi::_1;
+        using qi::_pass;
         row_vector_decl_r.name("row vector declaration");
         row_vector_decl_r 
           %= qi::lit("row_vector")
@@ -799,7 +853,11 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor6() {
+        using qi::_1;
+        using qi::_pass;
         matrix_decl_r.name("matrix declaration");
         matrix_decl_r 
           %= qi::lit("matrix")
@@ -813,7 +871,11 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor7() {
+        using qi::_1;
+        using qi::_pass;
         simplex_decl_r.name("simplex declaration");
         simplex_decl_r 
           %= qi::lit("simplex")
@@ -824,7 +886,11 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor8() {
+        using qi::_1;
+        using qi::_pass;
         pos_ordered_decl_r.name("positive ordered declaration");
         pos_ordered_decl_r 
           %= qi::lit("pos_ordered")
@@ -835,7 +901,11 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor9() {
+        using qi::_1;
+        using qi::_pass;
         corr_matrix_decl_r.name("correlation matrix declaration");
         corr_matrix_decl_r 
           %= qi::lit("corr_matrix")
@@ -846,7 +916,11 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor10() {
+        using qi::_1;
+        using qi::_pass;
         cov_matrix_decl_r.name("covariance matrix declaration");
         cov_matrix_decl_r 
           %= qi::lit("cov_matrix")
@@ -857,11 +931,17 @@ namespace stan {
           > identifier_r 
           > opt_dims_r
           > qi::lit(';');
+      }
 
+      void sub_ctor11() {
         opt_dims_r.name("array dimensions (optional)");
         opt_dims_r 
           %=  - dims_r;
+      }
 
+      void sub_ctor12() {
+        using qi::_1;
+        using qi::_pass;
         dims_r.name("array dimensions");
         dims_r 
           %= qi::lit('[') 
@@ -870,7 +950,11 @@ namespace stan {
              % ',')
           > qi::lit(']')
           ;
+      }
 
+      void sub_ctor13() {
+        using qi::_1;
+        using qi::_pass;
         range_brackets_int_r.name("range expression pair, brackets");
         range_brackets_int_r 
           %= qi::lit('(') 
@@ -880,7 +964,11 @@ namespace stan {
           > -(expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(')');
+      }
 
+      void sub_ctor14() {
+        using qi::_1;
+        using qi::_pass;
         range_brackets_double_r.name("range expression pair, brackets");
         range_brackets_double_r 
           %= qi::lit('(') 
@@ -891,12 +979,18 @@ namespace stan {
               [_pass 
                 = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(')');
+      }
 
+      void sub_ctor15() {
         identifier_r.name("identifier");
         identifier_r
           %= (qi::lexeme[qi::char_("a-zA-Z") 
                         >> *qi::char_("a-zA-Z0-9_.")]);
+      }
 
+      void sub_ctor16() {
+        using qi::_1;
+        using qi::_pass;
         range_r.name("range expression pair, colon");
         range_r 
           %= expression_g
@@ -904,13 +998,35 @@ namespace stan {
           >> qi::lit(':') 
           >> expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
+      }
 
+      var_decl_grammar(variable_map& var_map,
+                       std::stringstream& error_msgs)
+        : var_decl_grammar::base_type(var_decl_r),
+          var_map_(var_map),
+          error_msgs_(error_msgs),
+          expression_g(var_map,error_msgs) {
 
-
-
+        // windows compiler stack size hack
+        sub_ctor1();
+        sub_ctor2();
+        sub_ctor3();
+        sub_ctor4();
+        sub_ctor5();
+        sub_ctor6();
+        sub_ctor7();
+        sub_ctor8();
+        sub_ctor9();
+        sub_ctor10();
+        sub_ctor11();
+        sub_ctor12();
+        sub_ctor13();
+        sub_ctor14();
+        sub_ctor15();
+        sub_ctor16();
       }
       
-     // global info for parses
+      // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
 
@@ -976,23 +1092,11 @@ namespace stan {
     struct statement_grammar : qi::grammar<Iterator,
                                            statement(bool,var_origin),
                                            whitespace_grammar<Iterator> > {
-      statement_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs)
-        : statement_grammar::base_type(statement_r),
-          var_map_(var_map),
-          error_msgs_(error_msgs),
-          expression_g(var_map,error_msgs),
-          var_decl_g(var_map,error_msgs) {
 
-        using qi::_val;
+      void sub_ctor1() {
         using qi::_1;
         using qi::_pass;
-        using qi::double_;
-        using qi::int_;
-        using boost::spirit::qi::eps;
         using namespace qi::labels;
-
-
         // _r1 true if sample_r allowed (inherited)
         // _r2 source of variables allowed for assignments
         // set to true if sample_r are allowed
@@ -1007,7 +1111,11 @@ namespace stan {
           | sample_r(_r1) [_pass = validate_sample_f(_1)]
           | no_op_statement_r
           ;
-      
+      }
+
+      void sub_ctor2() {
+        using qi::_1;
+        using namespace qi::labels;
         // _r1, _r2 same as statement_r
         statement_seq_r.name("sequence of statements");
         statement_seq_r
@@ -1017,10 +1125,18 @@ namespace stan {
           > qi::lit('}')
           > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))]
           ;
+      }
 
+      void sub_ctor3() {
         local_var_decls_r
           %= *var_decl_g(false,local_origin); // - constants
+      }
 
+      void sub_ctor4() {
+        using qi::_1;
+        using qi::_pass;
+        using boost::spirit::qi::eps;
+        using namespace qi::labels;
         // _r1, _r2 same as statement_r
         for_statement_r.name("for statement");
         for_statement_r
@@ -1037,12 +1153,18 @@ namespace stan {
           > qi::eps 
             [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
           ;
+      }
 
+      void sub_ctor5() {
         identifier_r.name("identifier");
         identifier_r
           %= (qi::lexeme[qi::char_("a-zA-Z") 
                         >> *qi::char_("a-zA-Z0-9_.")]);
+      }
 
+      void sub_ctor6() {
+        using qi::_1;
+        using qi::_pass;
         range_r.name("range expression pair, colon");
         range_r 
           %= expression_g
@@ -1050,7 +1172,9 @@ namespace stan {
           >> qi::lit(':') 
           >> expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
+      }
 
+      void sub_ctor7() {
         assignment_r.name("variable assignment by expression");
         assignment_r
           %= var_lhs_r
@@ -1058,16 +1182,24 @@ namespace stan {
           > expression_g
           > qi::lit(';') 
           ;
+      }
 
+      void sub_ctor8() {
         var_lhs_r.name("variable and array dimensions");
         var_lhs_r 
           %= identifier_r 
           >> opt_dims_r;
+      }
 
+      void sub_ctor9() {
         opt_dims_r.name("array dimensions (optional)");
         opt_dims_r 
           %=  - dims_r;
+      }
 
+      void sub_ctor10() {
+        using qi::_1;
+        using qi::_pass;
         dims_r.name("array dimensions");
         dims_r 
           %= qi::lit('[') 
@@ -1076,7 +1208,12 @@ namespace stan {
              % ',')
           > qi::lit(']')
           ;
+      }
 
+      void sub_ctor11() {
+        using qi::_pass;
+        using boost::spirit::qi::eps;
+        using namespace qi::labels;
         // inherited  _r1 = true if samples allowed as statements
         sample_r.name("distribution of expression");
         sample_r 
@@ -1088,14 +1225,18 @@ namespace stan {
           > distribution_r
           > -truncation_range_r
           > qi::lit(';');
+      }
 
+      void sub_ctor12() {
         distribution_r.name("distribution and parameters");
         distribution_r
           %= identifier_r
           >> qi::lit('(')
           >> -(expression_g % ',')
           > qi::lit(')');
+      }
 
+      void sub_ctor13() {
         truncation_range_r.name("range pair");
         truncation_range_r
           %= qi::lit('T')
@@ -1104,11 +1245,40 @@ namespace stan {
           > qi::lit(',')
           > -expression_g
           > qi::lit(')');
-        
+      }
+
+      void sub_ctor14() {
+        using qi::_val;
         no_op_statement_r.name("no op statement");
         no_op_statement_r 
           %= qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
       }
+      
+      statement_grammar(variable_map& var_map,
+                        std::stringstream& error_msgs)
+        : statement_grammar::base_type(statement_r),
+          var_map_(var_map),
+          error_msgs_(error_msgs),
+          expression_g(var_map,error_msgs),
+          var_decl_g(var_map,error_msgs) {
+
+        sub_ctor1();
+        sub_ctor2();
+        sub_ctor3();
+        sub_ctor4();
+        sub_ctor5();
+        sub_ctor6();
+        sub_ctor7();
+        sub_ctor8();
+        sub_ctor9();
+        sub_ctor10();
+        sub_ctor11();
+        sub_ctor12();
+        sub_ctor13();
+        sub_ctor14();
+      }
+
+
 
      // global info for parses
       variable_map& var_map_;
@@ -1170,33 +1340,15 @@ namespace stan {
       qi::rule<Iterator, variable_dims(), whitespace_grammar<Iterator> > 
       var_lhs_r;
 
-
     };
                                
-                                            
-
-
     template <typename Iterator>
     struct program_grammar : qi::grammar<Iterator, 
                                          program(), 
                                          whitespace_grammar<Iterator> > {
  
-      program_grammar() 
-        : program_grammar::base_type(program_r),
-          var_map_(),
-          error_msgs_(),
-          expression_g(var_map_,error_msgs_),
-          var_decl_g(var_map_,error_msgs_),
-          statement_g(var_map_,error_msgs_)
-      {
-        using qi::_val;
-        using qi::_1;
-        using qi::_pass;
-        using qi::double_;
-        using qi::int_;
+      void sub_ctor1() {
         using boost::spirit::qi::eps;
-        using namespace qi::labels;
-
         program_r.name("program");
         program_r 
           %= -data_var_decls_r
@@ -1209,20 +1361,26 @@ namespace stan {
           > qi::eps[remove_lp_var_f(boost::phoenix::ref(var_map_))]
           > -generated_var_decls_r
           ;
-        
+      }
+
+      void sub_ctor2() {
         model_r.name("model declaration");
         model_r 
           %= qi::lit("model")
           > statement_g(true,local_origin)  // assign only to locals
           ;
+      }
 
+      void sub_ctor3() {
         data_var_decls_r.name("data variable declarations");
         data_var_decls_r
           %= qi::lit("data")
           > qi::lit('{')
           > *var_decl_g(true,data_origin) // +constraints
           > qi::lit('}');
+      }
 
+      void sub_ctor4() {
         derived_data_var_decls_r.name("derived data block");
         derived_data_var_decls_r
           %= qi::lit("derived")
@@ -1231,14 +1389,18 @@ namespace stan {
           > *var_decl_g(false,transformed_data_origin)  // -constraints
           > *statement_g(false,transformed_data_origin) // -sampling
           > qi::lit('}');
+      }
 
+      void sub_ctor5() {
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
           %= qi::lit("parameters")
           > qi::lit('{')
           > *var_decl_g(true,parameter_origin) // +constraints
           > qi::lit('}');
+      }
 
+      void sub_ctor6() {
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
           %= qi::lit("derived")
@@ -1247,7 +1409,9 @@ namespace stan {
           > *var_decl_g(false,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin) // -sampling
           > qi::lit('}');
+      }
 
+      void sub_ctor7() {
         generated_var_decls_r.name("generated variable declarations");
         generated_var_decls_r
           %= qi::lit("generated")
@@ -1256,34 +1420,50 @@ namespace stan {
           > *var_decl_g(false,derived_origin) // -constraints
           > *statement_g(false,derived_origin) // -sampling
           > qi::lit('}');
+      }
 
+      program_grammar() 
+        : program_grammar::base_type(program_r),
+          var_map_(),
+          error_msgs_(),
+          expression_g(var_map_,error_msgs_),
+          var_decl_g(var_map_,error_msgs_),
+          statement_g(var_map_,error_msgs_) {
+
+        sub_ctor1();
+        sub_ctor2();
+        sub_ctor3();
+        sub_ctor4();
+        sub_ctor5();
+        sub_ctor6();
+        sub_ctor7();
+      }
 
 
         // hack cast to write to error_msgs_ of type stringstream
-        /*
-        qi::on_error<qi::rethrow>(var_decl_r,
-             (std::ostream&)error_msgs_
-              << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
-              << std::endl);
 
-        qi::on_error<qi::rethrow>(indexed_factor_r,
-              (std::ostream&)error_msgs_
-              << boost::phoenix::val("ERROR: Ill-formed indexed factor.")
-              << std::endl);
+        // qi::on_error<qi::rethrow>(var_decl_r,
+        //      (std::ostream&)error_msgs_
+        //       << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
+        //       << std::endl);
 
-        qi::on_error<qi::rethrow>(factor_r,
-              (std::ostream&)error_msgs_
-              << boost::phoenix::val("ERROR: Ill-formed factor.")
-              << std::endl);
+        // qi::on_error<qi::rethrow>(indexed_factor_r,
+        //       (std::ostream&)error_msgs_
+        //       << boost::phoenix::val("ERROR: Ill-formed indexed factor.")
+        //       << std::endl);
 
-        qi::on_error<qi::rethrow>(program_r,
-              (std::ostream&)error_msgs_
-               << boost::phoenix::val("ERROR: Expected ")
-               << _4 
-               << std::endl);
-        */
+        // qi::on_error<qi::rethrow>(factor_r,
+        //       (std::ostream&)error_msgs_
+        //       << boost::phoenix::val("ERROR: Ill-formed factor.")
+        //       << std::endl);
 
-      }
+        // qi::on_error<qi::rethrow>(program_r,
+        //       (std::ostream&)error_msgs_
+        //        << boost::phoenix::val("ERROR: Expected ")
+        //        << _4 
+        //        << std::endl);
+
+
 
       // global info for parses
       variable_map var_map_;
