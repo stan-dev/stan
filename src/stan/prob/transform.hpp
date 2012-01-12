@@ -83,22 +83,26 @@ namespace stan {
     // MATRIX TRANSFORMS +/- JACOBIANS
 
     /**
-     * Return the correlation matrix of the specified dimensionality
-     * corresponding to the specified canonical partial correlations.
+     * Return the Cholesky factor of the correlation matrix of the specified
+     * dimensionality corresponding to the specified canonical partial correlations.
+     * 
+     * It is generally better to work with the Cholesky factor rather than the
+     * correlation matrix itself when the determinant, inverse, etc. of the
+     * correlation matrix is needed for some statistical calculation.
      *
      * <p>See <code>read_corr_matrix(Array,unsigned int,T)</code>
      * for more information.
      *
      * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
      * @param K Dimensionality of correlation matrix.
-     * @return Correlation matrix for specified partial correlations.
+     * @return Cholesky factor of correlation matrix for specified canonical partial correlations.
      * @tparam T Type of underlying scalar.  
      * @author Ben Goodrich
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
-    read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-		     const unsigned int K) {
+    read_corr_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+                const unsigned int K) {
       Array<T,Dynamic,1> temp;         // temporary holder
       Array<T,Dynamic,1> acc(K-1);     // accumlator of products
       acc.setOnes();
@@ -120,12 +124,33 @@ namespace stan {
 	acc.tail(pull) *= 1.0 - temp.square();
       }
       L(K-1,K-1) = sqrt(acc(K-2));
-      return L.matrix().template triangularView<Eigen::Lower>() * L.matrix().transpose();
+      return L.matrix();
     }
 
     /**
-     * Return the correlation matrix of the specified dimensionality
-     * corresponding to the specified canonical partial correlations,
+     * Return the correlation matrix of the specified dimensionality 
+     * corresponding to the specified canonical partial correlations.
+     *
+     * <p>See <code>read_corr_matrix(Array,unsigned int,T)</code>
+     * for more information.
+     *
+     * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
+     * @param K Dimensionality of correlation matrix.
+     * @return Cholesky factor of correlation matrix for specified canonical partial correlations.
+     * @tparam T Type of underlying scalar.  
+     * @author Ben Goodrich
+     */
+    template <typename T>
+    Matrix<T,Dynamic,Dynamic>
+    read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+                     const unsigned int K) {
+      Matrix<T,Dynamic,Dynamic> L = read_corr_L(CPCs, K);
+      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+    }
+    
+    /**
+     * Return the Cholesky factor of the correlation matrix of the specified
+     * dimensionality corresponding to the specified canonical partial correlations,
      * incrementing the specified scalar reference with the log
      * absolute determinant of the Jacobian of the transformation.
      *
@@ -144,15 +169,15 @@ namespace stan {
      * @param K Dimensionality of correlation matrix.
      * @param log_prob Reference to variable to increment with the log
      * Jacobian determinant.
-     * @return Correlation matrix for specified partial correlations.
+     * @return Cholesky factor of correlation matrix for specified partial correlations.
      * @tparam T Type of underlying scalar.  
      * @author Ben Goodrich
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
-    read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-		     const unsigned int K,
-		     T& log_prob) {
+    read_corr_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+                const unsigned int K,
+                T& log_prob) {
 
       unsigned int k = 0; 
       unsigned int i = 0;
@@ -172,18 +197,47 @@ namespace stan {
 	}
 	counter++;
       }
-      return read_corr_matrix(CPCs, K);
+      return read_corr_L(CPCs, K);
     }
 
-
-    /** this is the main one we'll call from outside for covariance transforms
+    /**
+     * Return the correlation matrix of the specified dimensionality
+     * corresponding to the specified canonical partial correlations,
+     * incrementing the specified scalar reference with the log
+     * absolute determinant of the Jacobian of the transformation.
+     *
+     * It is usually preferable to utilize the version that returns
+     * the Cholesky factor of the correlation matrix rather than the
+     * correlation matrix itself in statistical calculations.
+     * 
+     * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
+     * @param K Dimensionality of correlation matrix.
+     * @param log_prob Reference to variable to increment with the log
+     * Jacobian determinant.
+     * @return Correlation matrix for specified partial correlations.
+     * @tparam T Type of underlying scalar.  
      * @author Ben Goodrich
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
-    read_cov_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-		    const Array<T,Dynamic,1>& sds,  // on (0,inf)
-		    T& log_prob) {
+    read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+                     const unsigned int K,
+                     T& log_prob) {
+
+      Matrix<T,Dynamic,Dynamic> L = read_corr_L(CPCs, K, log_prob);
+      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+    }
+    
+    /** this is the function that should be called prior to evaluating the
+     * density of any elliptical distribution
+     * @return Cholesky factor of covariance matrix for specified partial correlations.
+     * @author Ben Goodrich
+     */
+    template <typename T>
+    Matrix<T,Dynamic,Dynamic>
+    read_cov_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+               const Array<T,Dynamic,1>& sds,  // on (0,inf)
+               T& log_prob) {
       unsigned int K = sds.rows();
       // unsigned int counter = 0;
       const Array<T,Dynamic,1> log_sds = sds.log();
@@ -197,9 +251,23 @@ namespace stan {
 
       DiagonalMatrix<T,Dynamic> D(K);
       D.diagonal() = sds;
-      return D * read_corr_matrix(CPCs, K, log_prob) * D;
+      return D * read_corr_L(CPCs, K, log_prob);
     }
 
+    /** a generally worse alternative to call prior to evaluating the density
+     * of an elliptical distribution
+     * @return Covariance matrix for specified partial correlations.
+     * @author Ben Goodrich
+     */
+    template <typename T>
+    Matrix<T,Dynamic,Dynamic>
+    read_cov_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+                    const Array<T,Dynamic,1>& sds,  // on (0,inf)
+                    T& log_prob) {
+
+      Matrix<T,Dynamic,Dynamic> L = read_cov_L(CPCs, sds, log_prob);
+      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+    }
 
     /** 
      *
@@ -214,7 +282,8 @@ namespace stan {
       unsigned int K = sds.rows();
       DiagonalMatrix<T,Dynamic> D(K);
       D.diagonal() = sds;
-      return D * read_corr_matrix(CPCs, K) * D;
+      Matrix<T,Dynamic,Dynamic> L = D * read_corr_L(CPCs, K);
+      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
     }
 
 

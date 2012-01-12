@@ -137,26 +137,23 @@ namespace stan {
         return lp;
       if (!check_size_match(function, y.size(), L.rows(), &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.size(), L.cols(), &lp, Policy()))
-        return lp; // redundant with Triangular View?
-      if (!check_not_nan(function, y, &lp, Policy())) 
+      if (!check_not_nan(function, y, "y", &lp, Policy())) 
         return lp;
 
-      // FIXME: checks on L -- what are they?
-      
       if (y.rows() == 0)
         return lp;
 
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-      if (include_summand<propto,T_covar>::value) 
-        lp -= log(L.diagonal().array().prod());
+      // Eigen does not have a .diagonal() method for a TriangularView
+      if (include_summand<propto,T_covar>::value)
+        for(unsigned int i = 0; i < L.rows(); ++i) lp += log(L(i,i));
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Matrix<T_covar,Dynamic,1> half 
-          = L.solveTriangular(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows())
-                              .setOnes())
-          * (y - mu);
-        lp -= 0.5 * dot_product(half,half);
+          = L.solve(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows()).setOnes()) *                
+            stan::maths::subtract(y,mu);
+
+        lp -= 0.5 * half.dot(half);
       }
       return lp;
     }
