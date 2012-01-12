@@ -76,10 +76,74 @@ namespace stan {
       sample_file_stream.close();
     }
 
+    void pad_help_option(std::string option) {
+      std::cout << "  " << option;
+      for (unsigned int i = option.size(); i < 25; ++i)
+        std::cout << ' ';
+    }
+
+    void print_nuts_help(std::string cmd) {
+      std::cout << "USAGE:  " << cmd << " [options]" << std::endl;
+      std::cout << "OPTIONS:" << std::endl;
+
+      pad_help_option("--help");
+      std::cout << "Display this information" << std::endl;
+
+      pad_help_option("--random_seed=<int>");
+      std::cout << "Set random number generation seed" << std::endl;
+
+      pad_help_option("--inits=<path to file>");
+      std::cout << "Use initial values from specialized file"
+                << std::endl;
+      pad_help_option("");
+      std::cout << "    (default is random initialization)" << std::endl;
+
+      pad_help_option("--iter=<positive int>");
+      std::cout << "Total number of iterations, including burn in"
+                << std::endl;
+      pad_help_option("");
+      std::cout << "    (default = 2000)" << std::endl;
+      
+      pad_help_option("--burn_in=<positive int>");
+      std::cout << "Discard the specified number of initial samples"
+                << std::endl;
+      pad_help_option("");
+      std::cout << "    (default = iter / 2)" << std::endl;
+
+      pad_help_option("--thin=<positive int>");
+      std::cout << "Period between saved samples after burn in" << std::endl;
+      pad_help_option("");
+      std::cout << "    (default = max(1, floor(iter - burn_in) / 1000))"
+                << std::endl;
+      
+      pad_help_option("--samples=<path to file>");
+      std::cout << "File into which samples are written." << std::endl;
+      pad_help_option("");
+      std::cout << "    (default = samples.csv)" << std::endl;
+
+      pad_help_option("--append_samples");
+      std::cout << "Append samples to existing samples file if it exists"
+                << std::endl;
+      pad_help_option("");
+      std::cout << "    (default erases existing samples file before writing)"
+                << std::endl;
+
+      pad_help_option("--progress_refresh");
+      std::cout << "Period between samples producing progress output" 
+                << std::endl;
+      pad_help_option("");
+      std::cout << "    (default = max(1,iter/200))" << std::endl;
+    }
+
     template <typename T_model>
     void nuts_command(int argc, const char* argv[]) {
 
       stan::io::cmd_line command(argc,argv);
+
+      if (command.has_flag("help")) {
+        print_nuts_help(argv[0]);
+        return;
+      }
 
       std::string data_path;
       command.val("data_file",data_path);

@@ -18,15 +18,12 @@ TO DO
         validate after statement
   - local vars have no constraints
     
-* random inits between -2 and 2 uniform
-
 * namespace usings in StanGM
   - must be enough for all declared funs and agrads
   - just use top-level .hpp for Stan and for modules
 
 * HMC
   - command w. specified step size, number of steps
-  - include Gibbs for discrete (small exact, o.w. slice)
 
 * command line: 
   - arguments
