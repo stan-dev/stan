@@ -1186,7 +1186,8 @@ namespace stan {
           var_map_(),
           error_msgs_(),
           expression_g(var_map_,error_msgs_),
-          var_decl_g(var_map_,error_msgs_) 
+          var_decl_g(var_map_,error_msgs_),
+          statement_g(var_map_,error_msgs_)
       {
         using qi::_val;
         using qi::_1;
@@ -1212,7 +1213,7 @@ namespace stan {
         model_r.name("model declaration");
         model_r 
           %= qi::lit("model")
-          > statement_r(true,local_origin)  // assign only to locals
+          > statement_g(true,local_origin)  // assign only to locals
           ;
 
         data_var_decls_r.name("data variable declarations");
@@ -1228,7 +1229,7 @@ namespace stan {
           >> qi::lit("data")
           > qi::lit('{')
           > *var_decl_g(false,transformed_data_origin)  // -constraints
-          > *statement_r(false,transformed_data_origin) // -sampling
+          > *statement_g(false,transformed_data_origin) // -sampling
           > qi::lit('}');
 
         param_var_decls_r.name("parameter variable declarations");
@@ -1244,7 +1245,7 @@ namespace stan {
           >> qi::lit("parameters")
           > qi::lit('{')
           > *var_decl_g(false,transformed_parameter_origin) // -constraints
-          > *statement_r(false,transformed_parameter_origin) // -sampling
+          > *statement_g(false,transformed_parameter_origin) // -sampling
           > qi::lit('}');
 
         generated_var_decls_r.name("generated variable declarations");
@@ -1253,125 +1254,10 @@ namespace stan {
           > qi::lit("quantities")
           > qi::lit('{')
           > *var_decl_g(false,derived_origin) // -constraints
-          > *statement_r(false,derived_origin) // -sampling
+          > *statement_g(false,derived_origin) // -sampling
           > qi::lit('}');
 
-        opt_dims_r.name("array dimensions (optional)");
-        opt_dims_r 
-          %=  - dims_r;
 
-        dims_r.name("array dimensions");
-        dims_r 
-          %= qi::lit('[') 
-          > (expression_g
-             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-             % ',')
-          > qi::lit(']')
-          ;
-        
-        range_r.name("range expression pair, colon");
-        range_r 
-          %= expression_g
-             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-          >> qi::lit(':') 
-          >> expression_g
-             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
-
-        truncation_range_r.name("range pair");
-        truncation_range_r
-          %= qi::lit('T')
-          > qi::lit('(') 
-          > -expression_g
-          > qi::lit(',')
-          > -expression_g
-          > qi::lit(')');
-        
-
-        identifier_r.name("identifier");
-        identifier_r
-          %= (qi::lexeme[qi::char_("a-zA-Z") 
-                        >> *qi::char_("a-zA-Z0-9_.")]);
-
-        distribution_r.name("distribution and parameters");
-        distribution_r
-          %= identifier_r
-          >> qi::lit('(')
-          >> -(expression_g % ',')
-          > qi::lit(')');
-
-        // inherited  _r1 = true if samples allowed as statements
-        sample_r.name("distribution of expression");
-        sample_r 
-          %= expression_g
-          >> qi::lit('~')
-          > qi::eps
-           [_pass 
-            = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
-          > distribution_r
-          > -truncation_range_r
-          > qi::lit(';');
-        
-        var_lhs_r.name("variable and array dimensions");
-        var_lhs_r 
-          %= identifier_r 
-          >> opt_dims_r;
-
-        assignment_r.name("variable assignment by expression");
-        assignment_r
-          %= var_lhs_r
-          >> qi::lit("<-")
-          > expression_g
-          > qi::lit(';') 
-          ;
-
-        // _r1 true if sample_r allowed (inherited)
-        // _r2 source of variables allowed for assignments
-        // set to true if sample_r are allowed
-        statement_r.name("statement");
-        statement_r
-          %= statement_seq_r(_r1,_r2)
-          | for_statement_r(_r1,_r2)
-          | assignment_r 
-            [_pass 
-             = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs_))]
-          | sample_r(_r1) [_pass = validate_sample_f(_1)]
-          | no_op_statement_r
-          ;
-
-        no_op_statement_r.name("no op statement");
-        no_op_statement_r 
-          %= qi::lit(';') [_val = no_op_statement()];  // ok to re-use instance
-
-        // _r1, _r2 same as statement_r
-        for_statement_r.name("for statement");
-        for_statement_r
-          %= qi::lit("for")
-          > qi::lit('(')
-          > identifier_r [_pass 
-                          = add_loop_identifier_f(_1,_a,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
-          > qi::lit("in")
-          > range_r
-          > qi::lit(')')
-          > statement_r(_r1,_r2)
-          > qi::eps 
-            [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
-          ;
-
-          // _r1, _r2 same as statement_r
-          statement_seq_r.name("sequence of statements");
-          statement_seq_r
-            %= qi::lit('{')
-            > local_var_decls_r[_a = _1]
-            > *statement_r(_r1,_r2)
-            > qi::lit('}')
-            > qi::eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))]
-            ;
-
-        local_var_decls_r
-          %= *var_decl_g(false,local_origin); // - constants
 
         // hack cast to write to error_msgs_ of type stringstream
         /*
@@ -1406,11 +1292,9 @@ namespace stan {
       // grammars
       expression_grammar<Iterator> expression_g;
       var_decl_grammar<Iterator> var_decl_g;
+      statement_grammar<Iterator> statement_g;
 
       // rules
-
-      qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > 
-      assignment_r;
 
       qi::rule<Iterator, std::vector<var_decl>(), 
                whitespace_grammar<Iterator> >       
@@ -1425,41 +1309,14 @@ namespace stan {
                                    std::vector<statement> >(), 
                whitespace_grammar<Iterator> > 
       derived_var_decls_r;
-    
-      qi::rule<Iterator, std::vector<expression>(), 
-               whitespace_grammar<Iterator> > 
-      dims_r;
-
-      qi::rule<Iterator, distribution(), whitespace_grammar<Iterator> >
-      distribution_r;
-
-      qi::rule<Iterator, qi::locals<std::string>, 
-               for_statement(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
-      for_statement_r;
 
       qi::rule<Iterator, std::pair<std::vector<var_decl>,
-                             std::vector<statement> >(), 
-               whitespace_grammar<Iterator> >
+                                   std::vector<statement> >(), 
+               whitespace_grammar<Iterator> > 
       generated_var_decls_r;
-
-
-      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > 
-      identifier_r;
-
-      qi::rule<Iterator, std::vector<var_decl>(), 
-               whitespace_grammar<Iterator> >
-      local_var_decls_r;
 
       qi::rule<Iterator, statement(), whitespace_grammar<Iterator> > 
       model_r;
-
-      qi::rule<Iterator, no_op_statement(), whitespace_grammar<Iterator> > 
-      no_op_statement_r;
-
-      qi::rule<Iterator, std::vector<expression>(),
-               whitespace_grammar<Iterator> > 
-      opt_dims_r;
 
       qi::rule<Iterator, std::vector<var_decl>(), 
                whitespace_grammar<Iterator> >
@@ -1468,28 +1325,6 @@ namespace stan {
       qi::rule<Iterator, program(), whitespace_grammar<Iterator> >
       program_r;
     
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
-      range_r;
-
-      qi::rule<Iterator, sample(bool), whitespace_grammar<Iterator> > 
-      sample_r;
-
-      qi::rule<Iterator, 
-               statement(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
-      statement_r;
-
-      qi::rule<Iterator, 
-               qi::locals<std::vector<var_decl> >,
-               statements(bool,var_origin), whitespace_grammar<Iterator> >
-      statement_seq_r;
-
-      qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
-      truncation_range_r;
-
-      qi::rule<Iterator, variable_dims(), whitespace_grammar<Iterator> > 
-      var_lhs_r;
-
     };
 
     // Cut and paste source for iterator & reporting pattern:
