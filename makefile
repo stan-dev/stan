@@ -1,17 +1,29 @@
-# g++ (GCC), clang (Clang)
 CC = g++
 EIGEN_OPT = -DNDEBUG
 OPTIMIZE_OPT = 0
-OPT = -O$(OPTIMIZE_OPT) -Wall -g  $(EIGEN_OPT) #-rdynamic 
+OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
 
 INCLUDES = -I src -I lib
 INCLUDES_T = -I lib/gtest/include  -I lib/gtest
 CFLAGS = $(OPT) $(INCLUDES)
-#ifneq (,$(filter g++%,$(CC)))
-#	CFLAGS += -std=gnu++0x
-#endif
-CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0 -lpthread
+ifneq (,$(filter g++%,$(CC)))
+	CFLAGS += -std=gnu++0x
+endif
+CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0 
 
+## --- multiple platform section ---
+UNAME := $(shell uname)      # uname provides information about the platform
+ifeq (CYGWIN, $(filter CYGWIN%,$(UNAME))) # Windows under Cygwin
+	@echo 'Windows'
+else ifeq (LINUX, $(UNAME))
+	@echo 'Linux'
+	OPT += -g
+	CFLAGS_T += -lpthread
+else ifeq (Darwin, $(UNAME)) # Mac OS X
+	@echo 'Mac'
+	OPT += -g
+endif
+## --------------------------------
 
 # find all unit tests
 UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
@@ -53,8 +65,10 @@ test-all: $(UNIT_TESTS_OBJ) #demo/gm
 # run unit tests without having make fail
 test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
 	-$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
-	#$(CC) $(CFLAGS_T) $(UNIT_TESTS) lib/gtest/src/gtest_main.cc ar/libgtest.a -o test/unit
-	#-test/unit --gtest_output="xml:test/unit.xml";)
+
+## Attempt to build all unit tests as one.
+#$(CC) $(CFLAGS_T) $(UNIT_TESTS) lib/gtest/src/gtest_main.cc ar/libgtest.a -o test/unit
+#-test/unit --gtest_output="xml:test/unit.xml";)
 
 # MODELS (to be passed through demo/gm)
 # =========================================================
