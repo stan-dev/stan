@@ -553,6 +553,163 @@ namespace stan {
       qi::rule<Iterator> whitespace;
     };
 
+    template <typename Iterator>
+    struct expression_grammar : qi::grammar<Iterator,
+                                            expression(),
+                                            whitespace_grammar<Iterator> > {
+      expression_grammar(variable_map& var_map,
+                         std::stringstream& error_msgs) 
+      : expression_grammar::base_type(expression_r),
+        var_map_(var_map),
+        error_msgs_(error_msgs) {
+
+        using qi::_val;
+        using qi::_1;
+        using qi::_pass;
+        using qi::double_;
+        using qi::int_;
+        using boost::spirit::qi::eps;
+        using namespace qi::labels;
+
+        expression_r.name("expression");
+        expression_r 
+          %=  term_r                          [_val = _1]
+          >> *( (qi::lit('+') > term_r        [_val += _1])
+                |   (qi::lit('-') > term_r    [_val -= _1])
+                )
+          > qi::eps[_pass = validate_expr_type_f(_val)];
+        ;
+
+       term_r.name("term");
+        term_r 
+          %= ( negated_factor_r                          [_val = _1]
+              >> *( (qi::lit('*') > negated_factor_r     [_val *= _1])
+                    | (qi::lit('/') > negated_factor_r   [_val /= _1])
+                    )
+              )
+          ;
+
+        negated_factor_r 
+          %= qi::lit('-') >> indexed_factor_r [_val = neg(_1)]
+          | qi::lit('+') >> indexed_factor_r [_val = _1]
+          | indexed_factor_r [_val = _1];
+        
+        // two of these to put semantic action on this one w. index_op input
+        indexed_factor_r.name("(optionally) indexed factor [sub]");
+        indexed_factor_r 
+          %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
+
+        indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
+        indexed_factor_2_r 
+          %= (factor_r >> *dims_r);
+
+        factor_r.name("factor");
+        factor_r
+          %=  int_literal_r      [_val = _1]
+          | double_literal_r    [_val = _1]
+          | fun_r               [_val = set_fun_type_f(_1)]
+          | variable_r          
+            [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
+                                   boost::phoenix::ref(error_msgs_),
+                                   _pass)]
+          | ( qi::lit('(') 
+              > expression_r    [_val = _1]
+              > qi::lit(')') )
+          ;
+
+        int_literal_r.name("integer literal");
+        int_literal_r
+          %= int_ 
+             >> !( qi::lit('.')
+                   | qi::lit('e')
+                   | qi::lit('E') );
+
+        double_literal_r.name("double literal");
+        double_literal_r
+          %= double_;
+
+
+        fun_r.name("function and argument expressions");
+        fun_r 
+          %= identifier_r 
+          >> args_r; 
+
+        identifier_r.name("identifier");
+        identifier_r
+          %= (qi::lexeme[qi::char_("a-zA-Z") 
+                        >> *qi::char_("a-zA-Z0-9_.")]);
+
+        args_r.name("function argument expressions");
+        args_r 
+          %= qi::lit('(') 
+          >> (expression_r % ',')
+          > qi::lit(')');
+
+        dims_r.name("array dimensions");
+        dims_r 
+          %= qi::lit('[') 
+          > (expression_r 
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+             % ',')
+          > qi::lit(']')
+          ;
+        
+        variable_r.name("variable expression");
+        variable_r
+          %= identifier_r;
+
+      }
+
+      variable_map& var_map_;
+      std::stringstream& error_msgs_;
+
+
+      qi::rule<Iterator, std::vector<expression>(), 
+               whitespace_grammar<Iterator> > 
+      args_r;
+
+      qi::rule<Iterator, std::vector<expression>(), 
+               whitespace_grammar<Iterator> > 
+      dims_r;
+
+      qi::rule<Iterator, double_literal(), whitespace_grammar<Iterator> > 
+      double_literal_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      expression_r;
+
+      qi::rule<Iterator, qi::locals<bool>, 
+               expression(), whitespace_grammar<Iterator> > 
+      factor_r;
+
+      qi::rule<Iterator, fun(), whitespace_grammar<Iterator> > 
+      fun_r;
+
+      qi::rule<Iterator, std::string(), whitespace_grammar<Iterator> > 
+      identifier_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      indexed_factor_r;
+
+      // two of these because of type-coercion from index_op to expression
+      qi::rule<Iterator, index_op(), whitespace_grammar<Iterator> > 
+      indexed_factor_2_r; 
+
+      qi::rule<Iterator, int_literal(), whitespace_grammar<Iterator> > 
+      int_literal_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      negated_factor_r;
+
+      qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
+      term_r;
+
+      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > 
+      variable_r;
+
+    };
+                                            
+
 
     template <typename Iterator>
     struct program_grammar : qi::grammar<Iterator, 
@@ -560,7 +717,10 @@ namespace stan {
                                          whitespace_grammar<Iterator> > {
  
       program_grammar() 
-        : program_grammar::base_type(program_r) {
+        : program_grammar::base_type(program_r),
+          var_map_(),
+          error_msgs_(),
+          expression_g(var_map_,error_msgs_) {
         using qi::_val;
         using qi::_1;
         using qi::_pass;
@@ -677,7 +837,7 @@ namespace stan {
         vector_decl_r 
           %= qi::lit("vector")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -688,7 +848,7 @@ namespace stan {
         row_vector_decl_r 
           %= qi::lit("row_vector")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -699,10 +859,10 @@ namespace stan {
         matrix_decl_r 
           %= qi::lit("matrix")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(',')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -713,7 +873,7 @@ namespace stan {
         simplex_decl_r 
           %= qi::lit("simplex")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -724,7 +884,7 @@ namespace stan {
         pos_ordered_decl_r 
           %= qi::lit("pos_ordered")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -735,7 +895,7 @@ namespace stan {
         cov_matrix_decl_r 
           %= qi::lit("cov_matrix")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -746,7 +906,7 @@ namespace stan {
         corr_matrix_decl_r 
           %= qi::lit("corr_matrix")
           > qi::lit('(')
-          > expression_r 
+          > expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           > qi::lit(')')
           > identifier_r 
@@ -811,7 +971,6 @@ namespace stan {
           %= double_;
 
 
-        // no optional dims in the variable_r
         variable_r.name("variable expression");
         variable_r
           %= identifier_r;
@@ -836,38 +995,38 @@ namespace stan {
         
         range_r.name("range expression pair, colon");
         range_r 
-          %= expression_r 
+          %= expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
           >> qi::lit(':') 
-          >> expression_r 
+          >> expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
 
         truncation_range_r.name("range pair");
         truncation_range_r
           %= qi::lit('T')
           > qi::lit('(') 
-          > -expression_r
+          > -expression_g
           > qi::lit(',')
-          > -expression_r
+          > -expression_g
           > qi::lit(')');
         
         range_brackets_int_r.name("range expression pair, brackets");
         range_brackets_int_r 
           %= qi::lit('(') 
-          > -(expression_r 
+          > -(expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(',')
-          > -(expression_r 
+          > -(expression_g
              [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(')');
 
         range_brackets_double_r.name("range expression pair, brackets");
         range_brackets_double_r 
           %= qi::lit('(') 
-          > -(expression_r 
+          > -(expression_g
           [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(',')
-          > -(expression_r 
+          > -(expression_g
               [_pass 
                 = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
           > qi::lit(')');
@@ -875,7 +1034,7 @@ namespace stan {
         args_r.name("function argument expressions");
         args_r 
           %= qi::lit('(') 
-          >> (expression_r % ',')
+          >> (expression_g % ',')
           > qi::lit(')');
 
         identifier_r.name("identifier");
@@ -887,13 +1046,13 @@ namespace stan {
         distribution_r
           %= identifier_r
           >> qi::lit('(')
-          >> -(expression_r % ',')
+          >> -(expression_g % ',')
           > qi::lit(')');
 
         // inherited  _r1 = true if samples allowed as statements
         sample_r.name("distribution of expression");
         sample_r 
-          %= expression_r
+          %= expression_g
           >> qi::lit('~')
           > qi::eps
            [_pass 
@@ -911,7 +1070,7 @@ namespace stan {
         assignment_r
           %= var_lhs_r
           >> qi::lit("<-")
-          > expression_r
+          > expression_g
           > qi::lit(';') 
           ;
 
@@ -993,6 +1152,9 @@ namespace stan {
       // global info for parses
       variable_map var_map_;
       std::stringstream error_msgs_;
+
+      // grammars
+      expression_grammar<Iterator> expression_g;
 
       // rules
       qi::rule<Iterator, expression(), whitespace_grammar<Iterator> > 
