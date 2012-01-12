@@ -15,6 +15,7 @@ CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0
 UNAME := $(shell uname)      # uname provides information about the platform
 ifeq (CYGWIN, $(filter CYGWIN%,$(UNAME))) # Windows under Cygwin
 	@echo 'Windows'
+	CFLAGS += -static-libgcc -static-libstdc++
 else ifeq (LINUX, $(UNAME))
 	@echo 'Linux'
 	OPT += -g
@@ -29,6 +30,7 @@ endif
 UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
 UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
+
 
 # DEFAULT
 # =========================================================
