@@ -13,7 +13,7 @@
 
 # status: (not work)
 #  1. there is discrete parameters 
-#  2. If we just the complete data --- not discrete parameters needed, not work
+#  2. If we just the use complete data --- no discrete parameters needed, not work
 #     
 
 

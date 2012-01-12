@@ -1,6 +1,6 @@
 STAN_HOME = ../../../../..
 PGM = birats
-CXX = g++-4.6.2 -std=c++0x 
+CXX = g++  -std=c++0x 
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp

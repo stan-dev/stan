@@ -14,5 +14,5 @@ $(PGM2) :
 	./$(PGM2) # --data_file=$(PGM2).Rdata
 
 clean :
-	rm $(PGM).cpp samples.csv $(PGM) 
-	rm $(PGM2).cpp samples.csv $(PGM2) 
+	rm -f $(PGM).cpp samples.csv $(PGM) 
+	rm -f $(PGM2).cpp samples.csv $(PGM2) 
