@@ -913,10 +913,6 @@ namespace stan {
           > opt_dims_r
           > qi::lit(';');
 
-        variable_r.name("variable expression");
-        variable_r
-          %= identifier_r;
-
         opt_dims_r.name("array dimensions (optional)");
         opt_dims_r 
           %=  - dims_r;
@@ -966,12 +962,6 @@ namespace stan {
           > -(expression_g
               [_pass 
                 = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-          > qi::lit(')');
-
-        args_r.name("function argument expressions");
-        args_r 
-          %= qi::lit('(') 
-          >> (expression_g % ',')
           > qi::lit(')');
 
         identifier_r.name("identifier");
@@ -1094,9 +1084,6 @@ namespace stan {
       expression_grammar<Iterator> expression_g;
 
       // rules
-      qi::rule<Iterator, std::vector<expression>(), 
-               whitespace_grammar<Iterator> > 
-      args_r;
 
       qi::rule<Iterator, assignment(), whitespace_grammar<Iterator> > 
       assignment_r;
@@ -1205,9 +1192,6 @@ namespace stan {
 
       qi::rule<Iterator, range(), whitespace_grammar<Iterator> > 
       truncation_range_r;
-
-      qi::rule<Iterator, variable(), whitespace_grammar<Iterator> > 
-      variable_r;
 
       qi::rule<Iterator, vector_var_decl(), whitespace_grammar<Iterator> > 
       vector_decl_r;
