@@ -14,9 +14,44 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                   stan::prob::normal_log<true>(y1,mu1,sigma1),
                   stan::prob::normal_log<true>(y2,mu2,sigma2),
                   message);
+  // FIXME:
+  // should recover memory after tests that don't do grads
+  // leaving this out causes the tests to fail
+  // they shouldn't fail, just leak memory
+  stan::agrad::recover_memory();
+
 }
 
 using stan::agrad::var;
+
+TEST(AgradDistributionsNormal,NoRecovery) {
+  var y1 = 0.0; 
+  var mu1 = -1.0;
+  var sigma1 = 2.0;
+
+  var y2 = 10.0;
+  var mu2 = 7.0;
+  var sigma2 = 3.0;
+
+  expect_eq_diffs(stan::prob::normal_log<false>(y1,mu1,sigma1),
+                  stan::prob::normal_log<false>(y2,mu2,sigma2),
+                  stan::prob::normal_log<true>(y1,mu1,sigma1),
+                  stan::prob::normal_log<true>(y2,mu2,sigma2),
+                  "dummy");
+
+  // should be recovering memory here
+
+  var a = 1.0;
+  var b = 2.0;
+  var f = a * b;
+  std::vector<double> g;
+  std::vector<var> x;
+  x.push_back(a);
+  x.push_back(b);
+  f.grad(x,g);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
+}
 
 TEST(AgradDistributionsNormal,Propto) {
   expect_propto<var,var,var>(1.0,2.0,10.0, 
@@ -108,6 +143,9 @@ TEST(AgradDistributionsNormal,Gradient) {
   EXPECT_FLOAT_EQ (((0.0 - 3.0) + (1.0 - 3.0)) / (2.0 * 2.0), g[0]);
   EXPECT_FLOAT_EQ (-2/2.0 + (9.0 + 4.0)/8.0, g[1]);
 }
+
+
+
 double grad_y(double y, double mu, double sigma) {
   return (mu - y) / (sigma * sigma);
 }
@@ -122,6 +160,7 @@ TEST(AgradDistributionsNormal,Gradient2) {
   var y = 3.0;
   var mu = 1.0;
   var sigma = 2.0;
+  
   var lp = stan::prob::normal_log(y,mu,sigma);
   std::vector<var> params;
   params.push_back(y);
@@ -135,7 +174,6 @@ TEST(AgradDistributionsNormal,Gradient2) {
   EXPECT_FLOAT_EQ(grad_mu(3.0,1.0,2.0), g[1]);
   EXPECT_FLOAT_EQ(grad_sigma(3.0,1.0,2.0), g[2]);
 }
-
 TEST(AgradDistributionsNormal,Gradient3) {
   var y = -2.7;
   var mu = 1.9;
@@ -206,4 +244,3 @@ TEST(agrad_agrad,norm_grad_small_example) {
     dsigma += grad_sigma(x[n], 0.0, 1.0);
   EXPECT_FLOAT_EQ(dsigma,g[1]);
 }
-

@@ -1,0 +1,33 @@
+How to install MacPorts g++
+
+1.  From the download page:
+
+https://distfiles.macports.org/MacPorts/
+
+2.  Snow Leopard:
+
+    MacPorts-2.0.3-10.6-SnowLeopard.dmg
+
+3.  Click on .dmg file
+
+4.  Double click on the .pkg file.
+
+5.  Click through menus (you'll need to enter your password)
+
+6.  Pull up a NEW terminal and run from anywhere:
+
+    > sudo port install gcc46
+
+    You'll need to enter your password again
+
+7.  Installed as:
+
+    > g++-mp-4.6
+
+8.  Run Stan with
+
+    > make CC=g++-mp-4.6
+
+    (or make a link)
+
+ 
