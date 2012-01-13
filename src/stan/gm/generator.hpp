@@ -717,64 +717,102 @@ namespace stan {
       }
       void operator()(nil const& x) const { }
       void operator()(int_var_decl const& x) const {
-        declare_array("int",x.name_,x.dims_);
+        std::vector<expression> ctor_args;
+        declare_array("int",ctor_args,x.name_,x.dims_);
       }
       void operator()(double_var_decl const& x) const {
+        std::vector<expression> ctor_args;
         declare_array(is_var_ ? "var" : "double",
-                      x.name_,x.dims_);
+                      ctor_args,x.name_,x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
-        declare_array(is_var_ ? "vector_v" : "vector_d", 
-                      x.name_, x.dims_);
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.M_);
+        declare_array(is_var_ ? "vector_v" : "vector_d",
+                      ctor_args, x.name_, x.dims_);
       }
       void operator()(row_vector_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.N_);
         declare_array(is_var_ ? "row_vector_v" : "row_vector_d", 
-                      x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_);
       }
       void operator()(matrix_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.M_);
+        ctor_args.push_back(x.N_);
         declare_array(is_var_ ? "matrix_v" : "matrix_d", 
-                      x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_);
       }
       void operator()(simplex_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
         declare_array(is_var_ ? "vector_v" : "vector_d", 
-                      x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_);
       }
       void operator()(pos_ordered_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
         declare_array(is_var_ ? "vector_v" : "vector_d", 
-                      x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
+        ctor_args.push_back(x.K_);
         declare_array(is_var_ ? "matrix_v" : "matrix_d", 
-                      x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
+        ctor_args.push_back(x.K_);
         declare_array(is_var_ ? "matrix_v" : "matrix_d", 
-                      x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_);
+      }
+      void generate_type(const std::string& type,
+                         unsigned int num_dims) const {
+        for (unsigned int i = 0; i < num_dims; ++i)
+          o_ << "vector<";
+        o_ << type;
+        for (unsigned int i = 0; i < num_dims; ++i) {
+          if (i > 0) o_ << " ";
+          o_ << ">";
+        }
       }
       void declare_array(const std::string& type, 
+                         const std::vector<expression>& ctor_args,
                          const std::string& name, 
                          const std::vector<expression>& dims) const {
         for (int i = 0; i < indents_; ++i)
           o_ << INDENT;
+        generate_type(type,dims.size());
+        o_ << ' '  << name << '(';  // open (1)
         for (unsigned int i = 0; i < dims.size(); ++i) {
-          o_ << "vector<";
-        }
-        o_ << type;
-        for (unsigned int i = 0; i < dims.size(); ++i) {
-          if (i > 0) o_ << " ";
-          o_ << ">";
-        }
-        o_ << " "  << name;
-        if (dims.size() > 0)
-          o_ << "(";
-        for (unsigned int i = 0; i < dims.size(); ++i) {
-          if (i > 0)
-            o_ << ", vector<" << type << ">(";
+          if (i > 0U) {
+            o_ << ',';
+            generate_type(type,dims.size() - i);
+            o_ << '('; // open (2)
+          }
           generate_expression(dims[i].expr_,o_);
         }
-        for (unsigned int i = 0; i < dims.size(); ++i)
-          o_ << ")";
-        o_ << ";" << EOL;
+        if (dims.size() > 0) o_ << ',';
+        if (ctor_args.size() > 0) {
+          o_ << type;
+          o_ << '(';
+          generate_expression(ctor_args[0],o_);
+          if (ctor_args.size() > 1) {
+            o_ << ',';
+            generate_expression(ctor_args[1],o_);
+          }
+          o_ << ')';
+        } else {
+          o_ << "0";
+        }
+        o_ << ')'; // close (1)
+        for (unsigned int i = 1; i < dims.size(); ++i)
+          o_ << ')'; // close (2)
+        o_ << ';' << EOL;
       }
     };
 
