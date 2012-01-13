@@ -16,12 +16,6 @@ namespace stan {
      * Shape and scale parameters must be greater than 0.
      * y must be greater than 0.
      * 
-     // \f{eqnarray*}{
-     // y &\sim& \mbox{\sf{Inv-gamma}}(\alpha, \beta) \                 \
-     // \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{-(\alpha + 1)} \exp^{- \beta / y} \right) \ \
-     // &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) - (\alpha + 1) \log(y) - \frac{\beta}{y} \ \
-     // & & \mathrm{where } y > 0
-     // \f}
      * @param y A scalar variable.
      * @param alpha Shape parameter.
      * @param beta Scale parameter.

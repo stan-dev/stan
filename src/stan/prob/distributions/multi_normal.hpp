@@ -32,19 +32,7 @@ namespace stan {
      * The variance matrix, Sigma, must be size d x d, symmetric,
      * and semi-positive definite. Dimension, d, is implicit.
      *
-     * \f{eqnarray*}{
-     y &\sim& \mbox{\sf{N}} (\mu, \Sigma) \\
-     \log (p (y \,|\, \mu, \Sigma) ) 
-     &=& \log \left( (2 \pi)^{-d/2} \left| \Sigma \right|^{-1/2} 
-         \times 
-         \exp \left(-\frac{1}{2}(y - \mu)^T \Sigma^{-1} 
-                                (y - \mu) \right) \right) \\
-     &=& -\frac{d}{2}\log (2 \pi) 
-         - \frac{1}{2} \log (\det(\Sigma)) 
-         - \frac{1}{2} (y - \mu)^T \Sigma^{-1} (y - \mu)
-     \f}
-     * 
-     * 
+rev     * 
      * @param y A scalar vector
      * @param mu The mean vector of the multivariate normal distribution.
      * @param Sigma The variance matrix of the multivariate normal distribution
@@ -102,14 +90,7 @@ namespace stan {
      * a Cholesky factor L of the variance matrix.
      * Sigma = LL', a square, semi-positive definite matrix.
      *
-     * \f${eqnarray*}
-     * y &\sim& \mbox{\sf{N}} (\mu, LL') \\
-     * \log (p (y \,|\, \mu, L) )
-     * &=& \log \left( (2 \pi)^{-d/2} \left| LL' \right|^{-1/2} 
-     * \times \exp \left(-\frac{1}{2}(y - \mu)^T (LL')^{-1} (y - \mu) 
-     * \right) \right)
-     \f$
-     * 
+
      * @param y A scalar vector
      * @param mu The mean vector of the multivariate normal distribution.
      * @param L The Cholesky decomposition of a variance matrix 

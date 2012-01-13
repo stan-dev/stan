@@ -121,13 +121,19 @@ namespace stan {
        * @return A pointer to the allocated memory.
        */
       inline void* alloc(size_t len) {
-        if (sizes_[cur_block_] < used_ + len)
+        // not enough space in current block
+        if (sizes_[cur_block_] < used_ + len) {
           ++cur_block_;
- 
+          used_ = 0; // not using anything in next blocks
+        }
+
+        // continue skipping blocks that are too small
         while (cur_block_ < blocks_.size() && sizes_[cur_block_] < len)
           ++cur_block_;
                    
+        // alloc block if necessary
         if (cur_block_ >= sizes_.size()) {
+          // malloc if can't reuse
           size_t newsize = sizes_.back() * 2;
           if (newsize < len)
             newsize = len;
@@ -158,6 +164,8 @@ namespace stan {
       inline void free_all() {
         for (unsigned int i = 0; i < cur_block_; ++i)
           free(blocks_[i]);
+        sizes_.clear();
+        blocks_.clear();
         recover_all();
       }
   
