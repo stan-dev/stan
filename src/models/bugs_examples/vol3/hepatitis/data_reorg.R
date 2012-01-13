@@ -1,6 +1,8 @@
 source('hepatitis.Rdata') 
-Yvec <- c(Y[, 1], Y[, 2], Y[, 3]) 
-tvec <- c(t[, 1], t[, 2], t[, 3]) 
+# Yvec <- c(Y[, 1], Y[, 2], Y[, 3]) 
+Yvec <- as.vector(Y) 
+# tvec <- c(t[, 1], t[, 2], t[, 3]) 
+tvec <- as.vector(t) 
 idxn <- rep(1:N, T); 
 
 
