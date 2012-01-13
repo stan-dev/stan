@@ -787,7 +787,9 @@ namespace stan {
         for (int i = 0; i < indents_; ++i)
           o_ << INDENT;
         generate_type(type,dims.size());
-        o_ << ' '  << name << '(';  // open (1)
+        o_ << ' '  << name;
+        if (dims.size() > 0 || ctor_args.size() > 0) 
+          o_ << '(';  // open (1)
         for (unsigned int i = 0; i < dims.size(); ++i) {
           if (i > 0U) {
             o_ << ',';
@@ -796,20 +798,22 @@ namespace stan {
           }
           generate_expression(dims[i].expr_,o_);
         }
-        if (dims.size() > 0) o_ << ',';
+        if (dims.size() > 0
+            && ctor_args.size() > 0) o_ << ','; // NEW
         if (ctor_args.size() > 0) {
           o_ << type;
-          o_ << '(';
+          o_ << '('; // open (3)
           generate_expression(ctor_args[0],o_);
           if (ctor_args.size() > 1) {
             o_ << ',';
             generate_expression(ctor_args[1],o_);
           }
-          o_ << ')';
+          o_ << ')'; // close (3)
         } else {
-          o_ << "0";
+          // o_ << "0"; // new to do nothing
         }
-        o_ << ')'; // close (1)
+        if (dims.size() > 0 || ctor_args.size() > 0)
+          o_ << ')'; // close (1)
         for (unsigned int i = 1; i < dims.size(); ++i)
           o_ << ')'; // close (2)
         o_ << ';' << EOL;
