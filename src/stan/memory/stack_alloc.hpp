@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <vector>
+#include <stdint.h> // necessary on Debian?
 
 namespace stan { 
 

@@ -22,7 +22,7 @@ namespace stan {
      * @param beta Prior sample size.
      * @throw std::domain_error if alpha is not greater than 0.
      * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @throw std::domain_error if y is not between 0 and 1.
      * @tparam T_y Type of scalar.
      * @tparam T_alpha Type of prior sample size for alpha.
      * @tparam T_beta Type of prior sample size for beta.
@@ -55,6 +55,34 @@ namespace stan {
         lp += (beta - 1.0) * log1m(y);
       return lp;
     }
+
+    // Beta(y|mu,theta)  [0 < mu < 1; theta > 0;  0 <= y <= 1]
+    /**
+     * The log of a beta density for y with the specified
+     * mean and sample size.
+     * Sample size, theta, must be greater than 0.
+     * Mean must be between zero and one exclusive.
+     * y must be between 0 and 1 inclusive.
+     * 
+     * @param y A scalar variable.
+     * @param mu Prior mean.
+     * @param theta Prior sample size.
+     * @throw std::domain_error if mu * theta is not greater than 0.
+     * @throw std::domain_error if (1 - mu) * theta is not greater than 0.
+     * @throw std::domain_error if y is not between 0 and 1.
+     * @tparam T_y Type of scalar.
+     * @tparam T_mu Type of prior mean for mu.
+     * @tparam T_theta Type of prior sample size for theta.
+     */
+    template <bool propto = false,
+              typename T_y, typename T_mu, typename T_theta, 
+              class Policy = policy<> >
+      inline typename promote_args<T_y,T_mu,T_theta>::type
+      beta_ls_log(const T_y& y, const T_mu& mu, const T_theta& theta, const Policy& = Policy()) {
+        T_mu alpha = mu * theta;
+        T_mu beta = (1.0 - mu) * theta;
+        return beta_log(y, alpha, beta, Policy());
+      }
 
   }
 }

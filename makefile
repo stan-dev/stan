@@ -1,6 +1,6 @@
 CC = g++
 EIGEN_OPT = -DNDEBUG
-OPTIMIZE_OPT = 0
+OPTIMIZE_OPT = 3
 OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
 
 INCLUDES = -I src -I lib
@@ -22,6 +22,9 @@ else ifeq (LINUX, $(UNAME))
 	CFLAGS_T += -lpthread
 else ifeq (Darwin, $(UNAME)) # Mac OS X
 	OPT += -g
+else # assume Linux
+	OPT += -g
+	CFLAGS_T += -lpthread
 endif
 ## --------------------------------
 
