@@ -32,7 +32,6 @@ namespace stan {
      * The variance matrix, Sigma, must be size d x d, symmetric,
      * and semi-positive definite. Dimension, d, is implicit.
      *
-rev     * 
      * @param y A scalar vector
      * @param mu The mean vector of the multivariate normal distribution.
      * @param Sigma The variance matrix of the multivariate normal distribution
@@ -90,7 +89,7 @@ rev     *
      * a Cholesky factor L of the variance matrix.
      * Sigma = LL', a square, semi-positive definite matrix.
      *
-
+     *
      * @param y A scalar vector
      * @param mu The mean vector of the multivariate normal distribution.
      * @param L The Cholesky decomposition of a variance matrix 
@@ -130,10 +129,9 @@ rev     *
       if (include_summand<propto,T_covar>::value)
         for(unsigned int i = 0; i < L.rows(); ++i) lp += log(L(i,i));
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Matrix<T_covar,Dynamic,1> half 
-          = L.solve(Matrix<T_covar,Dynamic,Dynamic>(L.rows(),L.rows()).setOnes()) *                
-            stan::maths::subtract(y,mu);
-
+        Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff = stan::maths::subtract(y,mu);
+        Matrix<T_covar,Dynamic,Dynamic> L_inv = L.solve(Matrix<T_covar,Dynamic,Dynamic>::Identity(L.rows(),L.rows()));
+        Eigen::Matrix<typename promote_args<T_covar,T_loc,T_y>::type, Dynamic, 1> half = multiply(L_inv,diff);
         lp -= 0.5 * half.dot(half);
       }
       return lp;

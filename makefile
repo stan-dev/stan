@@ -1,4 +1,4 @@
-CC = g++
+CC = clang++
 EIGEN_OPT = -DNDEBUG
 OPTIMIZE_OPT = 3
 OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
