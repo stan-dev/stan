@@ -24,7 +24,7 @@ TEST(AgradDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
   const char* function = "check_not_nan(%1%)";
   var x = 0;
   double x_d = 0;
-  var result;
+  var result = 0;
  
   EXPECT_TRUE(check_not_nan(function, x, "x", &result, default_policy())) << "check_not_nan should be true with finite x: " << x;
   EXPECT_TRUE(check_not_nan(function, x_d, "x", &result, default_policy())) << "check_not_nan should be true with finite x: " << x_d;
@@ -49,7 +49,7 @@ TEST(AgradDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
   const char* function = "check_not_nan(%1%)";
   var x = 0;
   double x_d = 0;
-  var result;
+  var result = 0;
  
   EXPECT_TRUE(check_not_nan(function, x, "x", &result, errno_policy())) << "check_not_nan should be true with finite x: " << x;
   EXPECT_TRUE(check_not_nan(function, x_d, "x", &result, errno_policy())) << "check_not_nan should be true with finite x: " << x;
@@ -82,7 +82,7 @@ TEST(AgradDistributionsErrorHandling,CheckXDefaultPolicy) {
   const char* function = "check_x (%1%)";
   var x = 0;
   double x_d = 0;
-  var result;
+  var result = 0;
   EXPECT_TRUE (check_x (function, x, &result, default_policy())) << "check_x should be true with finite x: " << x;
   EXPECT_TRUE (check_x (function, x_d, &result, default_policy())) << "check_x should be true with finite x_d: " << x_d;
 
@@ -105,7 +105,7 @@ TEST(AgradDistributionsErrorHandling,CheckXDefaultPolicy) {
 TEST(AgradDistributionsErrorHandling,CheckXErrnoPolicy) {
   const char* function = "check_x (%1%)";
   var x = 0;
-  var result;
+  var result = 0;
  
   EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should be true with finite x: " << x;
   x = std::numeric_limits<var>::infinity();
@@ -125,7 +125,7 @@ TEST(AgradDistributionsErrorHandling,CheckXErrnoPolicy) {
 // ---------- check_x: vector tests ----------
 TEST(AgradDistributionsErrorHandling,CheckXVectorDefaultPolicy) {
   const char* function = "check_x (%1%)";
-  var result;
+  var result = 0;
   std::vector<var> x;
   
   x.clear();
@@ -159,7 +159,7 @@ TEST(AgradDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
   x.push_back (-1);
   x.push_back (0);
   x.push_back (1);
-  var result;
+  var result = 0;
  
   result = 0;
   EXPECT_TRUE (check_x (function, x, &result, errno_policy())) << "check_x should be true with finite x";
@@ -194,7 +194,7 @@ TEST(AgradDistributionsErrorHandling,CheckXVectorErrnoPolicy) {
 // ---------- check_x: matrix tests ----------
 TEST(AgradDistributionsErrorHandling,CheckXMatrixDefaultPolicy) {
   const char* function = "check_x (%1%)";
-  var result;
+  var result = 0;
   Eigen::Matrix<var,Eigen::Dynamic,1> x;
   
   result = 0;
@@ -220,7 +220,7 @@ TEST(AgradDistributionsErrorHandling,CheckXMatrixDefaultPolicy) {
 
 TEST(AgradDistributionsErrorHandling,CheckXMatrixErrnoPolicy) {
   const char* function = "check_x (%1%)";
-  var result;
+  var result = 0;
   Eigen::Matrix<var,Eigen::Dynamic,1> x;
   
   result = 0;
@@ -253,7 +253,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXDefaultPolicyX) {
   var x = 0;
   var low = -1;
   var high = 1;
-  var result;
+  var result = 0;
  
   EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
   
@@ -291,7 +291,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXDefaultPolicyLow) {
   var x = 0;
   var low = -1;
   var high = 1;
-  var result;
+  var result = 0;
  
   EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
   
@@ -312,7 +312,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXDefaultPolicyHigh) {
   var x = 0;
   var low = -1;
   var high = 1;
-  var result;
+  var result = 0;
  
   EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
 
@@ -336,7 +336,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyX) {
   var x = 0;
   var low = -1;
   var high = 1;
-  var result;
+  var result = 0;
  
   result = 0;
   EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
@@ -386,7 +386,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyLow) {
   var x = 0;
   var low = -1;
   var high = 1;
-  var result;
+  var result = 0;
 
   result = 0; 
   EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
@@ -413,7 +413,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
   var x = 0;
   var low = -1;
   var high = 1;
-  var result;
+  var result = 0;
 
   result = 0; 
   EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
@@ -439,7 +439,7 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
 
 TEST(AgradDistributionsErrorHandling,CheckCovMatrixDefaultPolicy) {
   const char* function = "check_cov_matrix (%1%)";
-  var result;
+  var result = 0;
   Matrix<var,Dynamic,Dynamic> Sigma;
   Sigma.resize(1,1);
   Sigma << 1;
