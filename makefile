@@ -13,7 +13,7 @@ CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0
 
 ## --- multiple platform section ---
 UNAME := $(shell uname)      # uname provides information about the platform
-ifeq (, $(findstring CYGWIN%,$(UNAME))) # Windows under Cygwin
+ifneq (, $(findstring CYGWIN%,$(UNAME))) # Windows under Cygwin
 	ifneq (,$(filter g++%,$(CC)))
 		CFLAGS += -static-libgcc -static-libstdc++
 	endif	
