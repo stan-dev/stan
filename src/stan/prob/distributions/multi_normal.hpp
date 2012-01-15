@@ -129,7 +129,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
 
       if (include_summand<propto,T_covar>::value)
-        for (unsigned int i = 0; i < L.rows(); ++i) lp += log(L(i,i));
+        lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff
