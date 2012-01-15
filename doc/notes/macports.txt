@@ -20,6 +20,18 @@ https://distfiles.macports.org/MacPorts/
 
     You'll need to enter your password again
 
+    NOTE:  On my notebook, I got a lot of errors like:
+
+               Error: Target org.macports.activate returned: Image
+	       error: /opt/local/include/gmp.h already exists and does
+	       not belong to a registered port.  Unable to activate
+	       port gmp. Use 'port -f activate gmp' to force the
+	       activation.
+
+           and had to do what it suggested for several packages:
+
+           >  sudo port -f activate gmp
+
 7.  Installed as:
 
     > g++-mp-4.6
