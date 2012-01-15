@@ -16,8 +16,6 @@ namespace stan {
     using Eigen::Matrix;
     using Eigen::Dynamic;
     
-    // ?? write these in terms of cpcs rather than corr matrix
-
     // LKJ_cov(y|mu,sigma,eta) [ y covariance matrix (not correlation matrix)
     //                         mu vector, sigma > 0 vector, eta > 0 ]
     template <bool propto = false,
@@ -29,21 +27,27 @@ namespace stan {
 		const Matrix<T_scale,Dynamic,1>& sigma,
 		const T_shape& eta,
 		const Policy& = Policy()) {
+
+      typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
+      if (!check_size_match(function, y.rows(), mu.size(), &lp, Policy()))
+        return lp;
+      if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+        return lp;
+      
       const unsigned int K = y.rows();
       const Array<T_y,Dynamic,1> sds = y.diagonal().array().sqrt();
-      T_shape log_prob = 0.0;
       for(unsigned int k = 0; k < K; k++) {
-	log_prob += lognormal_log(log(sds(k,1)), mu(k,1), sigma(k,1));
+	lp += lognormal_log<propto>(log(sds(k,1)), mu(k,1), sigma(k,1));
       }
       if(eta == 1.0) {
 	// no need to rescale y into a correlation matrix
-	log_prob += lkj_corr_log(y,eta); 
+	lp += lkj_corr_log<propto>(y,eta); 
 	return log_prob;
       }
       DiagonalMatrix<double,Dynamic> D(K);
       D.diagonal() = sds.inverse();
-      log_prob += lkj_corr_log(D * y * D, eta);
-      return log_prob;
+      lp += lkj_corr_log<propto>(D * y * D, eta);
+      return lp;
     }
 
 
@@ -54,21 +58,29 @@ namespace stan {
 	      class Policy = policy<> >
     inline typename promote_args<T_y,T_loc,T_scale,T_shape>::type
     lkj_cov_log(const Matrix<T_y,Dynamic,Dynamic>& y,
-		const T_loc& mu, const T_scale& sigma, const T_shape& eta, const Policy& = Policy()) {
+		const T_loc& mu, 
+		const T_scale& sigma, 
+		const T_shape& eta, 
+		const Policy& = Policy()) {
+      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+
+      typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
+      if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+        return lp;
+      
       const unsigned int K = y.rows();
       const Array<T_y,Dynamic,1> sds = y.diagonal().array().sqrt();
-      T_shape log_prob = 0.0;
       for(unsigned int k = 0; k < K; k++) {
-	log_prob += lognormal_log(sds(k,1), mu, sigma);
+	lp += lognormal_log<propto>(sds(k,1), mu, sigma);
       }
       if(eta == 1.0) {
-	log_prob += lkj_corr_log(y,eta); // no need to rescale y into a correlation matrix
-	return log_prob;
+	lp += lkj_corr_log<propto>(y,eta); // no need to rescale y into a correlation matrix
+	return lp;
       }
       DiagonalMatrix<double,Dynamic> D(K);
       D.diagonal() = sds.inverse();
-      log_prob += lkj_corr_log(D * y * D, eta);
-      return log_prob;
+      lp += lkj_corr_log<propto>(D * y * D, eta);
+      return lp;
     }
 
 
