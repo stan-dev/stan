@@ -30,7 +30,10 @@ TEST(ProbDistributionsMultiNormal,MultiNormal) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
-//   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma.llt().matrixL()));
+  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL(); // .template triangularView<Eigen::Lower>();
+  // works, but wrong answer
+  double lp = stan::prob::multi_normal_cholesky_log(y,mu,L);
+  // EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
 TEST(ProbDistributionsMultiNormal,DefaultPolicySigma) {
   Matrix<double,Dynamic,1> y(2,1);

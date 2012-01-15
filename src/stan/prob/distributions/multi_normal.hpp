@@ -105,10 +105,10 @@ namespace stan {
               typename T_y, typename T_loc, typename T_covar, 
               class Policy = policy<> > 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
-                     const Matrix<T_loc,Dynamic,1>& mu,
-                     const Eigen::TriangularView<T_covar,Eigen::Lower>& L,
-                     const Policy& = Policy()) {
+    multi_normal_cholesky_log(const Matrix<T_y,Dynamic,1>& y,
+                              const Matrix<T_loc,Dynamic,1>& mu,
+                              const Matrix<T_covar,Dynamic,Dynamic>& L,
+                              const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
@@ -116,6 +116,8 @@ namespace stan {
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
         return lp;
       if (!check_size_match(function, y.size(), L.rows(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, y.size(), L.cols(), &lp, Policy()))
         return lp;
       if (!check_not_nan(function, y, "y", &lp, Policy())) 
         return lp;
@@ -125,14 +127,27 @@ namespace stan {
 
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-      // Eigen does not have a .diagonal() method for a TriangularView
+
       if (include_summand<propto,T_covar>::value)
-        for(unsigned int i = 0; i < L.rows(); ++i) lp += log(L(i,i));
+        for (unsigned int i = 0; i < L.rows(); ++i) lp += log(L(i,i));
+
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff = stan::maths::subtract(y,mu);
-        Matrix<T_covar,Dynamic,Dynamic> L_inv = L.solve(Matrix<T_covar,Dynamic,Dynamic>::Identity(L.rows(),L.rows()));
-        Eigen::Matrix<typename promote_args<T_covar,T_loc,T_y>::type, Dynamic, 1> half = multiply(L_inv,diff);
+        Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff
+          = stan::maths::subtract(y,mu);
+        
+        Eigen::Matrix<T_covar,Dynamic,Dynamic> I
+          = Matrix<T_covar,Dynamic,Dynamic>::Identity(L.rows(),L.rows());
+
+        Eigen::Matrix<T_covar,Dynamic,Dynamic> L_inv
+          = L
+          .template triangularView<Eigen::Lower>()
+          .solve(I);
+
+        Eigen::Matrix<typename promote_args<T_covar,T_loc,T_y>::type, Dynamic, 1> half 
+          = multiply(L_inv,diff);
+
         lp -= 0.5 * half.dot(half);
+
       }
       return lp;
     }

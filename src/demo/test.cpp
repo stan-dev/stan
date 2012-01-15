@@ -10,6 +10,16 @@ using stan::agrad::var;
 using stan::maths::subtract;
 using boost::math::tools::promote_args;
 
+void
+foo1(Matrix<var,Dynamic,Dynamic>& L) {
+  L.triangularView<Eigen::Lower>();
+}
+
+template <typename T>
+void
+foo2(Matrix<T,Dynamic,Dynamic>& L) {
+  L.template triangularView<Eigen::Lower>();
+}
 
 var 
 multivar_norm(Matrix<var,Dynamic,1>& y,
