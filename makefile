@@ -1,4 +1,4 @@
-CC = clang++
+CC = g++
 EIGEN_OPT = -DNDEBUG
 OPTIMIZE_OPT = 3
 OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
@@ -17,11 +17,11 @@ ifneq (, $(findstring CYGWIN%,$(UNAME))) # Windows under Cygwin
 	ifneq (,$(filter g++%,$(CC)))
 		CFLAGS += -static-libgcc -static-libstdc++
 	endif	
+else ifeq (Darwin, $(UNAME)) # Mac OS X
+	OPT += -g
 else ifeq (LINUX, $(UNAME))
 	OPT += -g
 	CFLAGS_T += -lpthread
-else ifeq (Darwin, $(UNAME)) # Mac OS X
-	OPT += -g
 else # assume Linux
 	OPT += -g
 	CFLAGS_T += -lpthread
@@ -32,10 +32,6 @@ endif
 UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
 UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
-
-define \n
-
-endef
 
 # DEFAULT
 # =========================================================
@@ -67,7 +63,7 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ) #demo/gm
-	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";${\n})
+	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
 
 # run unit tests without having make fail
 test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
