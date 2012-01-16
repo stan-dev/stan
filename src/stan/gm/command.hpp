@@ -221,7 +221,7 @@ namespace stan {
           params_r[i] = init_rng();
       }
       // FIXME: put back
-      // model.write_csv_header(sample_file_stream);
+      model.write_csv_header(sample_file_stream);
       for (unsigned int m = 0; m < num_iterations; ++m) {
         std::cout << "iteration=" << (m + 1);
         if (m < num_burnin) {

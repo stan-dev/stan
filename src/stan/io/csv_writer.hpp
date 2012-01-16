@@ -21,6 +21,12 @@ namespace stan {
       std::ostream& o_;
       bool at_bol_;
 
+    public: 
+
+      /**
+       * On the first call do nothing, subsequently write
+       * a comma.
+       */
       void comma() {
         if (at_bol_) {
           at_bol_ = false;
@@ -29,7 +35,6 @@ namespace stan {
         o_ << ",";
       }
 
-    public: 
 
       /**
        * Construct a CSV writer that writes to the specified

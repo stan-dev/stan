@@ -1674,55 +1674,51 @@ namespace stan {
       o << INDENT << "}" << EOL;
     }
 
-    /*
-
     // see write_csv_visgen for similar structure
     struct write_csv_header_visgen : public visgen {
-      bool at_first_;
       write_csv_header_visgen(std::ostream& o)
-        : visgen(o),
-          at_first_(true) {
+        : visgen(o) {
       }
-      void operator()(const nil& x) { }
-      void operator()(const int_var_decl& x) {
+      void operator()(const nil& x) const  { }
+      void operator()(const int_var_decl& x) const {
         generate_csv_header_array(EMPTY_EXP_VECTOR,x.name_,x.dims_);
       }
-      void operator()(const double_var_decl& x) {
+      void operator()(const double_var_decl& x) const {
         generate_csv_header_array(EMPTY_EXP_VECTOR,x.name_,x.dims_);
       }
-      void operator()(const vector_var_decl& x) {
+      void operator()(const vector_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.M_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const row_vector_var_decl& x) {
+      void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.N_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const matrix_var_decl& x) {
+      void operator()(const matrix_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.M_);
         matrix_args.push_back(x.N_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const simplex_var_decl& x) {
+      void operator()(const simplex_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const pos_ordered_var_decl& x) {
+      void operator()(const pos_ordered_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const cov_matrix_var_decl& x) {
+      void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
         matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const corr_matrix_var_decl& x) {
+      void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
         matrix_args.push_back(x.K_);
@@ -1731,8 +1727,7 @@ namespace stan {
       void 
       generate_csv_header_array(const std::vector<expression>& matrix_dims, 
                                 const std::string& name,
-                                const std::vector<expression>& dims) 
-        {
+                                const std::vector<expression>& dims) const {
 
         // begin for loop dims
         std::vector<expression> combo_dims(dims);
@@ -1749,12 +1744,12 @@ namespace stan {
 
         // variable + indices
         generate_indent(2 + combo_dims.size(),o_);
-        // FIXME: next line only beyond first item
-        // o_ << "o__ << \", \" << ";
-        o_ << "o__ <<  \"" << name << "\"";
-        for (unsigned int i = 0; i < combo_dims.size(); ++i) {
+        o_ << "writer__.comma();" << EOL;  // only writes comma after first call
+
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "o__ << \"" << name << '"';
+        for (unsigned int i = 0; i < combo_dims.size(); ++i)
           o_ << " << '.' << k_" << i << "__";
-        }
         o_ << ';' << EOL;
 
         // end for loop dims
@@ -1770,28 +1765,22 @@ namespace stan {
                                           std::ostream& o) {
       write_csv_header_visgen vis(o);
       o << EOL << INDENT << "void write_csv_header(std::ostream& o__) {" << EOL;
-      o << INDENT2 << "bool at_first_ = true;" << EOL;
+      o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
       // parameters
       for (unsigned int i = 0; i < prog.parameter_decl_.size(); ++i) {
-        if (i > 0) 
-          vis.at_first_ = false;
         boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
       }
       // transformed parameters
       for (unsigned int i = 0; i < prog.derived_decl_.first.size(); ++i) {
-        if (i > 0) 
-          vis.at_first_ = false;
         boost::apply_visitor(vis,prog.derived_decl_.first[i].decl_);
       }
       // generated quantities
       for (unsigned int i = 0; i < prog.generated_decl_.first.size(); ++i) {
-        if (i > 0) 
-          vis.at_first_ = false;
         boost::apply_visitor(vis,prog.generated_decl_.first[i].decl_);
-      o << INDENT2 << "o__ << std::endl;" << EOL;
+      }
+      o << INDENT2 << "writer__.newline();" << EOL;
       o << INDENT << "}" << EOL2;
     }
-    */
 
     // see init_member_var_visgen for cut & paste
     struct write_csv_visgen : public visgen {
@@ -2201,7 +2190,7 @@ namespace stan {
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
       // FIXME: put back
-      // generate_write_csv_header_method(prog,out);
+      generate_write_csv_header_method(prog,out);
       generate_write_csv_method(prog,out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
