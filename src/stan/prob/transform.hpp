@@ -20,6 +20,7 @@ namespace stan {
     using Eigen::Dynamic;
     using Eigen::LDLT;
     using Eigen::Matrix;
+    using Eigen::Array;
     using Eigen::DiagonalMatrix;
 
     /**
@@ -1366,9 +1367,55 @@ namespace stan {
     }
 
     /**
+     * Return <code>true</code> if the specified matrix is symmetric
+     * 
+     * NOTE: squareness is not checked by this function
+     *
+     * @param y Matrix to test.
+     * @return <code>true</code> if the matrix is symmetric.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool symmetry_validate(const Matrix<T,Dynamic,Dynamic>& y) {
+      unsigned int k = y.rows();
+      if (k == 1)
+	return true;
+      
+      for (unsigned int m = 0; m < k; ++m) {
+	for (unsigned int n = m + 1; n < k; ++n) {
+	  if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
+	    return false;
+	}
+      }
+      return true;
+    }
+
+
+    /**
+     * Return <code>true</code> if the specified matrix is positive definite
+     *
+     * NOTE: symmetry is NOT checked by this function
+     * 
+     * @param y Matrix to test.
+     * @return <code>true</code> if the matrix is positive definite.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool pd_validate(const Matrix<T,Dynamic,Dynamic>& y) {
+      if (y.rows() == 1)
+	return y(0,0) > CONSTRAINT_TOLERANCE;
+      
+      LDLT< Matrix<T,Dynamic,Dynamic> > cholesky = y.ldlt();
+      if( (cholesky.vectorD().array() > CONSTRAINT_TOLERANCE).all() )
+	return true;
+      
+      return false;
+    }
+
+    /**
      * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix.  A valid covariance matrix must be symmetric
-     * and positive definite.
+     * covariance matrix.  A valid covariance matrix must be square,
+     * symmetric, and positive definite.
      *
      * @param y Matrix to test.
      * @return <code>true</code> if the matrix is a valid covariance matrix.
@@ -1376,22 +1423,15 @@ namespace stan {
      */
     template <typename T>
     bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      // test symmetry
-      // FIXME:  is symmetry test necessary, or is it implied by eigenvalue test?
-      unsigned int k = y.rows();
-      if (y.rows() != y.cols() || k == 0)
+      if (y.rows() != y.cols() || y.rows() == 0)
 	return false;
-      for (unsigned int m = 0; m < k; ++m) {
-	for (unsigned int n = m + 1; n < k; ++n) {
-	  if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
-	    return false;
-	}
-      }
-      // test non-zero eigenvalues
-      Eigen::SelfAdjointEigenSolver<Matrix<T,Dynamic,Dynamic> > 
-	solver(y,Eigen::EigenvaluesOnly);
-      if (solver.eigenvalues()[0] < CONSTRAINT_TOLERANCE)
-	return false; // eigenvalues in INCREASING order
+
+      if (!symmetry_validate(y))
+	return false;
+
+      if (!pd_validate(y))
+	return false;
+
       return true;
     }
 
@@ -1407,28 +1447,21 @@ namespace stan {
      */
     template <typename T>
     bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostream& err_msg) {
-      // test symmetry
-      // FIXME:  is symmetry test necessary, or is it implied by eigenvalue test?
-      unsigned int k = y.rows();
-      if (y.rows() != y.cols() || k == 0) {
+      if (y.rows() != y.cols() || y.rows() == 0) {
 	err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
 	return false;
       }
-      for (unsigned int m = 0; m < k; ++m) {
-	for (unsigned int n = m + 1; n < k; ++n) {
-	  if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
-	    err_msg << "Matrix is not symmetric (" << m << ", " << n << ")";
-	    return false;
-	  }
-	}
+
+      if (!symmetry_validate(y)) {
+	err_msg << "Matrix is not symmetric";
+	return false;
       }
-      // test non-zero eigenvalues
-      Eigen::SelfAdjointEigenSolver<Matrix<T,Dynamic,Dynamic> > 
-	solver(y,Eigen::EigenvaluesOnly);
-      if (solver.eigenvalues()[0] < CONSTRAINT_TOLERANCE) {
+
+      if (!pd_validate(y)) {
 	err_msg << "Matrix is not positive definite";
-	return false; // eigenvalues in INCREASING order
+	return false;
       }
+      
       return true;
     }
 

@@ -443,7 +443,7 @@ TEST(AgradDistributionsErrorHandling,CheckCovMatrixDefaultPolicy) {
   Matrix<var,Dynamic,Dynamic> Sigma;
   Sigma.resize(1,1);
   Sigma << 1;
-  
+
   EXPECT_NO_THROW(check_cov_matrix(function, Sigma, &result, default_policy())) << "check_cov_matrix should not throw exception with Sigma: " << Sigma;
 }
 // ----------  ----------
