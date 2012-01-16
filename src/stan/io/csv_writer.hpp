@@ -22,11 +22,11 @@ namespace stan {
       bool at_bol_;
 
       void comma() {
-	if (at_bol_) {
-	  at_bol_ = false;
-	  return;
-	}
-	o_ << ",";
+        if (at_bol_) {
+          at_bol_ = false;
+          return;
+        }
+        o_ << ",";
       }
 
     public: 
@@ -38,7 +38,7 @@ namespace stan {
        * @param o Output stream on which to write.
        */
       csv_writer(std::ostream& o)
-	: o_(o), at_bol_(true) {
+        : o_(o), at_bol_(true) {
       }
 
       /**
@@ -48,8 +48,8 @@ namespace stan {
        * the comma flag.
        */
       void newline() {
-	o_ << "\n";
-	at_bol_ = true;
+        o_ << "\n";
+        at_bol_ = true;
       }
 
       /**
@@ -59,8 +59,8 @@ namespace stan {
        * @param n Integer to write.
        */
       void write(int n) {
-	comma();
-	o_ << n;
+        comma();
+        o_ << n;
       }
 
       /**
@@ -70,8 +70,8 @@ namespace stan {
        * @param x Double to write.
        */
       void write(double x) {
-	comma();
-	o_ << x;
+        comma();
+        o_ << x;
       }
 
       /**
@@ -81,8 +81,8 @@ namespace stan {
        * @param v Vector of doubles to write.
        */
       void write(const Eigen::Matrix<double,Eigen::Dynamic,1>& v) {
-	for (unsigned int i = 0; i < v.size(); ++i)
-	  write(v[i]);
+        for (unsigned int i = 0; i < v.size(); ++i)
+          write(v[i]);
       }
       
       /**
@@ -92,8 +92,8 @@ namespace stan {
        * @param rv Row vector of doubles to write.
        */
       void write(const Eigen::Matrix<double,1,Eigen::Dynamic>& rv) {
-	for (unsigned int i = 0; i < rv.size(); ++i)
-	  write(rv[i]);
+        for (unsigned int i = 0; i < rv.size(); ++i)
+          write(rv[i]);
       }
 
       /**
@@ -103,9 +103,9 @@ namespace stan {
        * @param m Matrix to write.
        */
       void write(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
-	for (unsigned int i = 0; i < m.rows(); ++i)
-	  for (unsigned int j = 0; j < m.cols(); ++j)
-	    write(m(i,j));
+        for (unsigned int i = 0; i < m.rows(); ++i)
+          for (unsigned int j = 0; j < m.cols(); ++j)
+            write(m(i,j));
       }
 
       /**
@@ -115,9 +115,9 @@ namespace stan {
        * @param m Matrix of doubles to write.
        */
       void write_col_major(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
-	for (unsigned int j = 0; j < m.cols(); ++j)
-	  for (unsigned int i = 0; i < m.rows(); ++i)
-	    write(m(i,j));
+        for (unsigned int j = 0; j < m.cols(); ++j)
+          for (unsigned int i = 0; i < m.rows(); ++i)
+            write(m(i,j));
       }
 
       /**
@@ -127,18 +127,18 @@ namespace stan {
        *
        * @param s String to write.
        */
-      void write(std::string s) {
-	comma();
+      void write(const std::string& s) {
+        comma();
 
-	o_ << '"';
-	for (unsigned int i = 0; i < s.size(); ++i) {
-	  if (s.at(i) == '"') {
-	    o_ << '"' << '"'; // double quotes
-	  } else {
-	    o_ << s.at(i);
-	  }
-	}
-	o_ << '"';
+        o_ << '"';
+        for (unsigned int i = 0; i < s.size(); ++i) {
+          if (s.at(i) == '"') {
+            o_ << '"' << '"'; // double quotes
+          } else {
+            o_ << s.at(i);
+          }
+        }
+        o_ << '"';
       }
 
 

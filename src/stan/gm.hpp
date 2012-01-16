@@ -3,6 +3,7 @@
 
 #include "stan/gm/ast.hpp"
 #include "stan/gm/command.hpp"
+#include "stan/gm/compiler.hpp"
 #include "stan/gm/generator.hpp"
 #include "stan/gm/parser.hpp"
 

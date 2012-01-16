@@ -110,6 +110,9 @@ namespace stan {
                               const Matrix<T_covar,Dynamic,Dynamic>& L,
                               const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+
+      using stan::maths::multiply;
+      using stan::maths::subtract;
       
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
@@ -132,21 +135,18 @@ namespace stan {
         lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff
-          = stan::maths::subtract(y,mu);
         
-        Eigen::Matrix<T_covar,Dynamic,Dynamic> I
-          = Matrix<T_covar,Dynamic,Dynamic>::Identity(L.rows(),L.rows());
+        Eigen::Matrix<T_covar,Dynamic,Dynamic> 
+          L_inv(L
+                .template triangularView<Eigen::Lower>()
+                .solve(Matrix<T_covar,Dynamic,Dynamic>
+                       ::Identity(L.rows(),L.rows())));
+        
+        Eigen::Matrix<typename promote_args<T_covar,T_loc,T_y>::type, Dynamic, 1> 
+          half(multiply(L_inv,
+                        subtract(y,mu)));
 
-        Eigen::Matrix<T_covar,Dynamic,Dynamic> L_inv
-          = L
-          .template triangularView<Eigen::Lower>()
-          .solve(I);
-
-        Eigen::Matrix<typename promote_args<T_covar,T_loc,T_y>::type, Dynamic, 1> half 
-          = multiply(L_inv,diff);
-
-        lp -= 0.5 * half.dot(half);
+        lp -= 0.5 * half.dot(half);  // FIXME:  add dot_self function + deriv, fold in half
 
       }
       return lp;
