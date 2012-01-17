@@ -3,8 +3,6 @@ TO DO
 
 * range checks for std::vector accesses in model
 
-* remove standalone optimization algorithms
-
 * eliminate tabs (replace w. 4 spaces)
 
 * name variable types
