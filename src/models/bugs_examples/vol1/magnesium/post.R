@@ -2,7 +2,7 @@ library(coda);
 
 ## read samples from models specified all-together (magnesium_all.stan)
 
-post <- read.csv(file = 'samples.csv', header = FALSE)
+post <- read.csv(file = 'samples.csv', header = TRUE)
 colnames(post)[1:6] <- paste('mu', 1:6, sep = ''); 
 
 s0_sqrd <- 0.1272041; 

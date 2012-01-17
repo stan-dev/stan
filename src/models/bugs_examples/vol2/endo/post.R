@@ -1,5 +1,5 @@
 library(coda)
-post <- read.csv(file = 'samples3.csv', header = FALSE)[, 1]
+post <- read.csv(file = 'samples3.csv', header = TRUE)[, 1]
 names(post)[1] <- c("beta");
 
 summary(as.mcmc(post)); 

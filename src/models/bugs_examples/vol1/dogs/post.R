@@ -2,7 +2,7 @@
 ## in other program. 
 
 library(coda) 
-post <- read.csv(file = "samples.csv", header = FALSE)
+post <- read.csv(file = "samples.csv", header = TRUE)
 
 colnames(post) <- c("alpha", "beta")  
 

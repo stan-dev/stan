@@ -5,7 +5,7 @@
 library(coda) 
 logit <- function(x) log(x / (1 - x)); 
 
-post <- read.csv(file = "samples.csv", header = FALSE); 
+post <- read.csv(file = "samples.csv", header = TRUE); 
 
 ## assuming the order of variables in samples.csv are the same as model
 ## specification file 

@@ -6,7 +6,7 @@ library(coda)
 
 J <- 3; 
 
-post <- read.csv(file = "samples.csv", header = FALSE); 
+post <- read.csv(file = "samples.csv", header = TRUE); 
 colnames(post) <- c("theta1", "theta2", paste("X[", 1:J, "]", sep = '')); 
 
 summary(as.mcmc(post)) 

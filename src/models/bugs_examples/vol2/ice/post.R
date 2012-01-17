@@ -4,7 +4,7 @@
 
 library(coda) 
 
-post <- read.csv(file = "samples.csv", header = FALSE); 
+post <- read.csv(file = "samples.csv", header = TRUE); 
 
 Nage <- 13
 K <- 11

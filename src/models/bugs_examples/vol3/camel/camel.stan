@@ -31,7 +31,8 @@ parameters {
 
 derived parameters {
   vector(2) Y[12]; 
-  double rho; 
+  # double rho; 
+  # rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
   Y[1, 1] <- 1; 
   Y[1, 2] <- 1; 
   Y[2, 1] <- 1; 
@@ -57,7 +58,6 @@ derived parameters {
   Y[11, 2] <- -2; 
   Y[12, 2] <- -2; 
 
-  rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 
 
 model {
