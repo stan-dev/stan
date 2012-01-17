@@ -20,7 +20,7 @@ parameters{
   cov_matrix(3) thetavar; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma; 
   double phi[K, 3]; 
   sigma <- sqrt(sigmasq);

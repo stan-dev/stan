@@ -18,7 +18,7 @@ parameters {
   double(0,) sigma_alpha;
   double(0,) sigma_beta;
 }
-derived parameters {
+transformed parameters {
   double sigmasq_y;
   double sigmasq_alpha;
   double sigmasq_beta;

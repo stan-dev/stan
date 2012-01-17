@@ -1,4 +1,4 @@
-derived data {
+transformed data {
     double y[5];
     y[1] <- 2.0;
     y[2] <- 1.0;

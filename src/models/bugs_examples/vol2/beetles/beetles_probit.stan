@@ -4,7 +4,7 @@ data {
     int(0,) r[N];
     double x[N];
 }
-derived data {
+transformed data {
     double mean_x;
     double centered_x[N];
 
@@ -16,7 +16,7 @@ parameters {
     double alpha_star;
     double beta;
 }
-derived parameters {
+transformed parameters {
     double p[N];
     double llike[N];
     double alpha;

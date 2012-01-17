@@ -17,7 +17,7 @@ parameters {
   double(0,) sigmasq_y;
   cov_matrix(2) Sigma_beta; 
 }
-//  derived parameters {
+//  transformed parameters {
 //    double rho; 
 //    double alpha0; 
 //    //rho <- Sigma_beta[1, 2] / sqrt(Sigma_beta[1, 1] * Sigma_beta[2, 2]);

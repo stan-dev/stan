@@ -27,7 +27,7 @@ parameters {
   // specified on tau. 
    
 } 
-derived parameters {
+transformed parameters {
   double sigma; // or double tau; 
   double U3; 
   // tau <- 1 / (sigma * sigma);

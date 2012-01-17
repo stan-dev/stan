@@ -1,4 +1,4 @@
-derived data {
+transformed data {
     double mu;
     double sigma;
     

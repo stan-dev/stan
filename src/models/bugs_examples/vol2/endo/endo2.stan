@@ -18,7 +18,7 @@ data {
 # int est[I, 2]; 
 } 
 
-derived data {
+transformed data {
   int(0,) Y[I, 2]; 
   int(0,) est[I, 2]; 
   for (i in 1:I) {
@@ -47,7 +47,7 @@ parameters {
   double beta; 
 } 
 
-derived parameters {
+transformed parameters {
   double p[I, 2];
   for (i in 1:I) {
     p[i, 1] <- exp(beta * est[i, 1]); 

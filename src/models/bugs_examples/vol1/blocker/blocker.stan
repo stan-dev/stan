@@ -17,7 +17,7 @@ parameters {
   double delta[N]; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma_delta; 
   sigma_delta <- sqrt(sigmasq_delta); 
 } 

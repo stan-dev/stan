@@ -35,7 +35,7 @@ parameters {
   double(0,) sigmasq_b1; 
 }
 
-derived parameters {
+transformed parameters {
   double sigma_b; 
   double sigma_b1; 
   sigma_b <- sqrt(sigmasq_b); 

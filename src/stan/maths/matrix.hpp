@@ -9,6 +9,36 @@ namespace stan {
   
   namespace maths {
 
+
+    /**
+     * This is a traits structure for Eigen matrix types.
+     *
+     * @tparam T Underlying scalar type.
+     */ 
+    template<typename T>
+    struct EigenType {
+
+      /** Type of scalar. 
+       */
+      typedef T scalar;
+
+      /**
+       * Type of Eigen matrix.
+       */
+      typedef Matrix<T,Dynamic,Dynamic>  matrix;
+
+      /**
+       * Type of Eigen column vector.
+       */
+      typedef Matrix<T,Dynamic,1>  vector;
+
+      /**
+       * Type of Eigen row vector.
+       */
+      typedef Matrix<T,1,Dynamic>  row_vector;
+    };      
+    
+
     /**
      * Template metaprogram struct to calculate the type of
      * a matrix holding objects of the specified template type.
@@ -72,40 +102,40 @@ namespace stan {
 
       template <typename T>
       void resize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
-		  const std::vector<unsigned int>& dims, 
-		  unsigned int pos) {
-	x.resize(dims[pos],dims[pos+1]);
+                  const std::vector<unsigned int>& dims, 
+                  unsigned int pos) {
+        x.resize(dims[pos],dims[pos+1]);
       }
 
       template <typename T>
       void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x, 
-		  const std::vector<unsigned int>& dims, 
-		  unsigned int pos) {
-	x.resize(dims[pos]);
+                  const std::vector<unsigned int>& dims, 
+                  unsigned int pos) {
+        x.resize(dims[pos]);
       }
 
       template <typename T>
       void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-		  const std::vector<unsigned int>& dims, 
-		  unsigned int pos) {
-	x.resize(dims[pos]);
+                  const std::vector<unsigned int>& dims, 
+                  unsigned int pos) {
+        x.resize(dims[pos]);
       }
 
       void resize(double x, 
-		  const std::vector<unsigned int>& dims, 
-		  unsigned int pos) {
-	// no-op
+                  const std::vector<unsigned int>& dims, 
+                  unsigned int pos) {
+        // no-op
       }
 
       template <typename T>
       void resize(std::vector<T>& x, 
-		  const std::vector<unsigned int>& dims, 
-		  unsigned int pos) {
-	x.resize(dims[pos]);
-	++pos;
-	if (pos >= dims.size()) return; // skips lowest loop to scalar
-	for (unsigned int i = 0; i < x.size(); ++i)
-	  resize(x[i],dims,pos);
+                  const std::vector<unsigned int>& dims, 
+                  unsigned int pos) {
+        x.resize(dims[pos]);
+        ++pos;
+        if (pos >= dims.size()) return; // skips lowest loop to scalar
+        for (unsigned int i = 0; i < x.size(); ++i)
+          resize(x[i],dims,pos);
       }
 
     }
@@ -230,7 +260,7 @@ namespace stan {
      * @return Dot product of the vectors.
      */
     inline double dot_product(const row_vector_d& rv1, 
-			      const row_vector_d& rv2) {
+                              const row_vector_d& rv2) {
       return rv1.dot(rv2);
     }
 
@@ -300,7 +330,7 @@ namespace stan {
     inline double mean(const std::vector<T>& v) {
       double sum(0);
       for (unsigned int i = 0; i < v.size(); ++i)
-	sum += v[i];
+        sum += v[i];
       return sum / v.size();
     }
 
@@ -342,8 +372,8 @@ namespace stan {
       double mean = v.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < v.size(); ++i) {
-	double diff = v[i] - mean;
-	sum_sq_diff += diff * diff;
+        double diff = v[i] - mean;
+        sum_sq_diff += diff * diff;
       }
       return sum_sq_diff / (v.size() - 1);
     }
@@ -357,8 +387,8 @@ namespace stan {
       double mean = rv.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
-	double diff = rv[i] - mean;
-	sum_sq_diff += diff * diff;
+        double diff = rv[i] - mean;
+        sum_sq_diff += diff * diff;
       }
       return sum_sq_diff / (rv.size() - 1);
     }
@@ -372,10 +402,10 @@ namespace stan {
       double mean = m.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < m.rows(); ++i) {
-	for (int j = 0; j < m.cols(); ++j) { 
-	  double diff = m(i,j) - mean;
-	  sum_sq_diff += diff * diff;
-	}
+        for (int j = 0; j < m.cols(); ++j) { 
+          double diff = m(i,j) - mean;
+          sum_sq_diff += diff * diff;
+        }
       }
       return sum_sq_diff / (m.size() - 1);
     }
@@ -420,7 +450,7 @@ namespace stan {
     inline T sum(const std::vector<T>& xs) {
       T sum(0);
       for (unsigned int i = 0; i < xs.size(); ++i)
-	sum += xs[i];
+        sum += xs[i];
       return sum;
     }
 
@@ -506,7 +536,7 @@ namespace stan {
      */
     inline vector_d add(const vector_d& v1, vector_d& v2) {
       if (v1.size() != v2.size()) 
-	throw std::invalid_argument ("v1.size() != v2.size()");
+        throw std::invalid_argument ("v1.size() != v2.size()");
       return v1 + v2;
     }
     /**
@@ -518,9 +548,9 @@ namespace stan {
      * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
     inline row_vector_d add(const row_vector_d& rv1, 
-			    const row_vector_d& rv2) {
+                            const row_vector_d& rv2) {
       if (rv1.size() != rv2.size()) 
-	throw std::invalid_argument ("rv1.size() != rv2.size()");
+        throw std::invalid_argument ("rv1.size() != rv2.size()");
       return rv1 + rv2;
     }
     /**
@@ -533,7 +563,7 @@ namespace stan {
      */
     inline matrix_d add(const matrix_d& m1, const matrix_d& m2) {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-	throw std::invalid_argument ("dimensions of m1 and m2 do not match");
+        throw std::invalid_argument ("dimensions of m1 and m2 do not match");
       return m1 + m2;
     }
 
@@ -547,7 +577,7 @@ namespace stan {
      */
     inline vector_d subtract(const vector_d& v1, const vector_d& v2) {
       if (v1.size() != v2.size()) 
-	throw std::invalid_argument ("v1.size() != v2.size()");
+        throw std::invalid_argument ("v1.size() != v2.size()");
       return v1 - v2;
     }
     /**
@@ -559,9 +589,9 @@ namespace stan {
      * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
     inline row_vector_d subtract(const row_vector_d& rv1, 
-				 const row_vector_d& rv2) {
+                                 const row_vector_d& rv2) {
       if (rv1.size() != rv2.size()) 
-	throw std::invalid_argument ("rv1.size() != rv2.size()");
+        throw std::invalid_argument ("rv1.size() != rv2.size()");
       return rv1 - rv2;
     }
     /**
@@ -574,7 +604,7 @@ namespace stan {
      */
     inline matrix_d subtract(const matrix_d& m1, const matrix_d& m2) {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-	throw std::invalid_argument ("dimensions of m1 and m2 do not match");
+        throw std::invalid_argument ("dimensions of m1 and m2 do not match");
       return m1 - m2;
     }
 
@@ -678,7 +708,7 @@ namespace stan {
      */
     inline double multiply(const row_vector_d& rv, const vector_d& v) {
       if (rv.size() != v.size()) 
-	throw std::invalid_argument ("rv.size() != v.size()");
+        throw std::invalid_argument ("rv.size() != v.size()");
       return rv.dot(v);
     }
     /**
@@ -703,7 +733,7 @@ namespace stan {
      */
     inline vector_d multiply(const matrix_d& m, const vector_d& v) {
       if (m.cols() != v.size())
-	throw std::invalid_argument ("m.cols() != v.size()");
+        throw std::invalid_argument ("m.cols() != v.size()");
       return m * v;
     }
     /**
@@ -718,7 +748,7 @@ namespace stan {
      */
     inline row_vector_d multiply(const row_vector_d& rv, const matrix_d& m) {
       if (rv.size() != m.rows())
-	throw std::invalid_argument ("rv.size() != m.rows()");
+        throw std::invalid_argument ("rv.size() != m.rows()");
       return rv * m;
     }
     /**
@@ -733,7 +763,7 @@ namespace stan {
      */
     inline matrix_d multiply(const matrix_d& m1, const matrix_d& m2) {
       if (m1.cols() != m2.rows())
-	throw std::invalid_argument ("m1.cols() != m2.rows()");
+        throw std::invalid_argument ("m1.cols() != m2.rows()");
       return m1 * m2;
     }
 
@@ -856,8 +886,8 @@ namespace stan {
      * are written.
      */
     inline void eigen_decompose(const matrix_d& m,
-				vector_d& eigenvalues,
-				matrix_d& eigenvectors) {
+                                vector_d& eigenvalues,
+                                matrix_d& eigenvectors) {
       Eigen::EigenSolver<matrix_d> solver(m);
       eigenvalues = solver.eigenvalues().real();
       eigenvectors = solver.eigenvectors().real();
@@ -902,8 +932,8 @@ namespace stan {
      * are written.
      */
     inline void eigen_decompose_sym(const matrix_d& m,
-				    vector_d& eigenvalues,
-				    matrix_d& eigenvectors) {
+                                    vector_d& eigenvalues,
+                                    matrix_d& eigenvectors) {
       Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
       eigenvalues = solver.eigenvalues().real();
       eigenvectors = solver.eigenvectors().real();
@@ -922,7 +952,7 @@ namespace stan {
      */
     inline matrix_d cholesky_decompose(const matrix_d& m) {
       if (m.rows() != m.cols())
-	throw std::invalid_argument ("m must be a square matrix");
+        throw std::invalid_argument ("m must be a square matrix");
       Eigen::LLT<matrix_d> llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
@@ -970,9 +1000,9 @@ namespace stan {
      * @param s Singular values.
      */
     inline void svd(const matrix_d& m,
-		    matrix_d& u,
-		    matrix_d& v,
-		    vector_d& s) {
+                    matrix_d& u,
+                    matrix_d& v,
+                    vector_d& s) {
       Eigen::JacobiSVD<matrix_d> svd(m, THIN_SVD_OPTIONS);
       u = svd.matrixU();
       v = svd.matrixV();

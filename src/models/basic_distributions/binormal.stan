@@ -1,4 +1,4 @@
-derived data {
+transformed data {
     matrix(2,2) Sigma;
     vector(2) mu;
 

@@ -1381,9 +1381,9 @@ namespace stan {
       }
 
       void sub_ctor4() {
-        derived_data_var_decls_r.name("derived data block");
+        derived_data_var_decls_r.name("transformed data block");
         derived_data_var_decls_r
-          %= qi::lit("derived")
+          %= qi::lit("transformed")
           >> qi::lit("data")
           > qi::lit('{')
           > *var_decl_g(true,transformed_data_origin)  // -constraints
@@ -1403,7 +1403,7 @@ namespace stan {
       void sub_ctor6() {
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
-          %= qi::lit("derived")
+          %= qi::lit("transformed")
           >> qi::lit("parameters")
           > qi::lit('{')
           > *var_decl_g(true,transformed_parameter_origin) // -constraints

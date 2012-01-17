@@ -7,7 +7,7 @@ data {
   double Z[N]; 
 }
 
-derived data {
+transformed data {
   int Y[N, NT];
   int dN[N, NT]; 
   double c;

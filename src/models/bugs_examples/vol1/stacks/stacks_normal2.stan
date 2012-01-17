@@ -32,7 +32,7 @@ parameters {
   double(0,) sigmasq_beta; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma; 
   double sigma_beta;
   sigma <- sqrt(sigmasq); 

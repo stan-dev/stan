@@ -21,7 +21,7 @@ parameters {
   double mu[BATCHES]; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma_within;
   double sigma_between; 
   sigma_between <- sqrt(sigmasq_between); 

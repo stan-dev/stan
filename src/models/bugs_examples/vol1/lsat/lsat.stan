@@ -6,7 +6,7 @@ data {
   int(0,) response[R,T];
 }
 
-derived data {
+transformed data {
   int r[N,T];
   
   for (j in 1:culm[1]) {
@@ -28,7 +28,7 @@ parameters {
   double(0,) beta;
 }
 
-//derived parameters {
+//transformed parameters {
 //  double mean_alpha;
 //  double a[T];
 //}

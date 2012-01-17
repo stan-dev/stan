@@ -19,7 +19,7 @@ parameters {
   double(0,) theta;
 } 
 
-derived parameters {
+transformed parameters {
   double mu;
   mu <- log(theta) - alpha * sigma * sigma; 
 } 

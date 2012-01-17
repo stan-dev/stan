@@ -29,7 +29,7 @@ parameters {
   double b[NP]; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma;
   double yabeta_disease[4];
   yabeta_disease[1] <- 0; 

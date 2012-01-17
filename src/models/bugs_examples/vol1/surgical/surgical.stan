@@ -8,7 +8,7 @@ parameters {
      double mu;
      double(0,) sigma;
 }
-derived parameters {
+transformed parameters {
     double pop_mean;
     pop_mean <- exp(mu) / (1.0 + exp(mu)); // fixme -- inv-logit
 }

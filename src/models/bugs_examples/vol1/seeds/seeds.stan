@@ -13,7 +13,7 @@ parameters {
     double(0,) tau;
     double b[I];
 }
-derived parameters {
+transformed parameters {
     double sigma;
     sigma  <- 1.0 / sqrt(tau);
 }

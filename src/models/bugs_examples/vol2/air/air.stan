@@ -8,7 +8,7 @@ data {
   int n[J]; 
 } 
 
-derived data {
+transformed data {
   double(0,) sigma; 
   sigma <- sqrt(sigma2); 
 } 

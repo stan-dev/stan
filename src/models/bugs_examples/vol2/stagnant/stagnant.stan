@@ -9,7 +9,7 @@ data {
   
 } 
 
-derived data {
+transformed data {
   vector(N) punif;
   for (n in 1:N) punif[n] <- (1.0 / N); 
 } 
@@ -21,7 +21,7 @@ parameters {
   int(0,) k;
 } 
 
-derived parameters {
+transformed parameters {
   double sigma;
   sigma <- 1 / sqrt(tau); 
 } 

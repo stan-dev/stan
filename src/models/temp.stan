@@ -2,7 +2,7 @@ data {
     int N;
     double(0,1) theta;
 }
-derived data {
+transformed data {
     double(0,1) one_minus_theta;
 
     one_minus_theta <- 1.0 - theta;
@@ -10,7 +10,7 @@ derived data {
 parameters {
     double y[N];
 }
-derived parameters {
+transformed parameters {
     double(0,) y_abs[N];
 
     for (n in 1:N)

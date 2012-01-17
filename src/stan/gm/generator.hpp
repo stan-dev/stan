@@ -945,7 +945,7 @@ namespace stan {
       o << EOL;
 
       static bool is_var = true;
-      generate_comment("derived variables",2,o);
+      generate_comment("transformed parameters",2,o);
       generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
       o << EOL;
       static bool include_sampling = true;

@@ -8,7 +8,7 @@ data {
   int Y[Ndogs, Ntrials];
 }
 
-derived data {
+transformed data {
   int xa[Ndogs, Ntrials]; 
   int xs[Ndogs, Ntrials]; 
   for (i in 1:Ndogs) {

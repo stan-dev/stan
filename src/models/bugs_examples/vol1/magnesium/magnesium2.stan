@@ -20,7 +20,7 @@ parameters {
   double theta[N]; 
 } 
 
-derived parameters {
+transformed parameters {
   double pt[N];
  
   for (n in 1:N) 

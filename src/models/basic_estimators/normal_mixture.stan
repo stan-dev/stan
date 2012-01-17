@@ -9,7 +9,7 @@ parameters {
   double(0,1) theta;
   double mu[2];
 }
-derived parameters {
+transformed parameters {
   double(0,1) log_theta;
   double(0,1) log_one_minus_theta;
 

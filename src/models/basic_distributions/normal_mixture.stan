@@ -1,4 +1,4 @@
-derived data {
+transformed data {
   double(0,1) theta;
   double mu[2];
   double(0,) sigma[2];

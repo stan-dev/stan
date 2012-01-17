@@ -11,10 +11,10 @@ data {
   int T[N, P]; 
 } 
 
-// If T is not in the data, using the following derived
+// If T is not in the data, using the following transformed
 // data:
 // 
-#   derived data {
+#   transformed data {
 #     int T[N, P]; 
 #     for (n in 1:N) for (p in 1:P)  
 #       // (group[n] * (p - 1.5) + 1.5)  is 1/2, but of type double, 
@@ -31,7 +31,7 @@ parameters {
   double delta[N]; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma; 
   sigma <- sqrt(sigmasq); 
 } 

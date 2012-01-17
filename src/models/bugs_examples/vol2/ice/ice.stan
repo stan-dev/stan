@@ -27,7 +27,7 @@ parameters {
   double(0,) sigma; 
 } 
 
-derived parameters {
+transformed parameters {
   double yaalpha[Nage]; 
   // double logRR[K]; 
   yaalpha[1] <- alpha1; 

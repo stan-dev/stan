@@ -6,7 +6,7 @@
 #     
 #   } 
 
-derived data {
+transformed data {
   vector(2) mu; 
   matrix(2, 2) R; 
   mu[1] <- 0; 
@@ -29,7 +29,7 @@ parameters {
   double y121; 
 } 
 
-derived parameters {
+transformed parameters {
   vector(2) Y[12]; 
   # double rho; 
   # rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 

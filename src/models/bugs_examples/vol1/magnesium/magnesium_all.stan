@@ -13,7 +13,7 @@ data {
   int nt[N]; 
 } 
 
-derived data {
+transformed data {
   double s0_sqrd; 
   double psigma; 
   s0_sqrd <- 0.1272041; 
@@ -34,7 +34,7 @@ parameters {
   double theta[N, 6]; 
 } 
 
-derived parameters {
+transformed parameters {
   double pt[N, 6];
   double yasigma[6]; 
  

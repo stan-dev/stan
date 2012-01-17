@@ -4,7 +4,7 @@ data {
     int(0,) y[I,J];
     double x[I];
 }
-derived data {
+transformed data {
     double logx[I];
     double mean_x;
     double mean_logx;
@@ -28,7 +28,7 @@ parameters {
     double(0,) tau;
     double lambda[I,J];
 }
-derived parameters {
+transformed parameters {
     double sigma;
     double alpha;
 

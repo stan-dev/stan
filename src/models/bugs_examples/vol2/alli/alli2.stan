@@ -19,7 +19,7 @@ parameters {
   double lambda[I, J]; 
 }
 
-derived parameters {
+transformed parameters {
   double yaalpha[K]; 
   double yabeta[I, K];
   double yagamma[J, K];

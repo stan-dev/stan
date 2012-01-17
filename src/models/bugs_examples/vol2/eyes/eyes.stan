@@ -20,7 +20,7 @@ parameters {
   double lambda_1; 
   vector(2) p;
 } 
-derived parameters {
+transformed parameters {
     double lambda[2];
     lambda[1] <- lambda_1;
     lambda[2] <- lambda[1] + theta;

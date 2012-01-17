@@ -16,7 +16,7 @@ parameters {
   int(0,) state[N]; // these are discrete parameters. the support is 0 or 1 actually. ??
 } 
 
-derived parameters {
+transformed parameters {
   double theta;
   theta <- inv_logit(delta); 
 } 

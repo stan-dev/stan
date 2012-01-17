@@ -19,7 +19,7 @@ parameters {
   double(0,) r; 
 } 
 
-derived parameters {
+transformed parameters {
   double sigma[M]; 
   for (m in 1:M)  sigma[m] <- exp(-beta[m] / r);  
 } 

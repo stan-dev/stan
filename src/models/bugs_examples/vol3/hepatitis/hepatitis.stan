@@ -23,7 +23,7 @@ data {
   double y0[N]; 
 } 
 
-derived data {
+transformed data {
   double y0_mean; 
   y0_mean <- mean(y0); 
 } 
@@ -40,7 +40,7 @@ parameters {
 } 
 
   
-derived parameters {
+transformed parameters {
   double sigma_y; 
   double sigma_alpha; 
   double sigma_beta; 

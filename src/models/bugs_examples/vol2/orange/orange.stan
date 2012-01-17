@@ -17,7 +17,7 @@ parameters{
   double(0,) theta_sigmasq[3]; 
 } 
 
-derived parameters {
+transformed parameters {
   double phi[K, 3]; 
   double theta_sigma[3];
   double sigma;

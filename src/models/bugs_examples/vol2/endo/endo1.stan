@@ -56,7 +56,7 @@ structure(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), .Dim = c(183, 2))
 */
 
-derived data {
+transformed data {
   int Y[I, 2]; 
   int est[I, 2]; 
   for (i in 1:I) {

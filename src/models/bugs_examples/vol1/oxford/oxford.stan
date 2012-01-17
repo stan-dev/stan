@@ -9,7 +9,7 @@ data {
   int(0,) r1[K]; 
   int year[K]; 
 } 
-derived data {
+transformed data {
   int yearsq[K]; 
   for (i in 1:K) 
     yearsq[i] <- year[i] * year[i]; 
