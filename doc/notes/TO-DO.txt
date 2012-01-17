@@ -1,67 +1,34 @@
 TO DO
 =================================================
 
-* check bounds
- - model init time
-    + parameters:
-        validate constraints on initial values
-  - leapfrog step time:
-    + transformed parameters:
-        validate after statement
-  - per written sample:
-    + derived quantities:
-        validate after statement
-  - local vars have no constraints
-    
-* namespace usings in StanGM
-  - must be enough for all declared funs and agrads
-  - just use top-level .hpp for Stan and for modules
+* remove standalone optimization algorithms
 
-* HMC
-  - command w. specified step size, number of steps
+* eliminate tabs (replace w. 4 spaces)
 
-* command line: 
-  - arguments
-    + help option
-    + model, data, parameters
-    + inits
-    + num_iterations, burn_in, thin
-    + refresh, progress_type
-    + working_directory, clear_working_directory
-    + random_seed
-    X num_chains (??)
-    X DIC
-  - return
-    + Stan object (?)
-
-* discrete samplers: 
-  - Gibbs for small intervals
-  - slice for others
-  - what about multinomial with constraints?
+* name variable types
+ - basic naming
+    + data     | parameter
+    + known    | unknown
+    + constant | variable
+ - secondary naming
+    + derived, transformed, dependent
+ - tertiary naming
+    + generated, derived, free, cut
+ - I/O modifier
+    + local, nuisance
+ - Andrew and Jennifer terminology
+    + modeled vs. unmodeled
 
 * distribution engineering
   - tarball
   - basic distro site
   - check cross-platform
 
-* include dependencies
+* include dependencies in compiled models
   - top-level include headers
   - clean up dependencies
-
-* R interface
-  - simple process-level calls
-    + compile model
-    + dump data
-    + dump inits
-    + run model
-    + load results
-  - built-in from Rcpp
-  - functions
-  - attach.stan(fit)
-    + traceplot(fit)
-    + plot.stan(fit)
-    + dump.stan(fit)
-    + read.stan(file_path)
+  - must be enough for all declared funs and agrads
+ - just use top-level .hpp for Stan and for modules
 
 * remaining API doc
 
@@ -73,28 +40,38 @@ TO DO
 * sensible error messages everywhere with
   variable names and line number/position
 
-* eliminate tabs (replace w. 4 spaces)
-
-* name variable types
-  - basic naming
-     + data     | parameter
-     + known    | unknown
-     + constant | variable
-  - secondary naming
-     + derived, transformed, dependent
-  - tertiary naming
-     + generated, derived, free, cut
-  - I/O modifier
-     + local, nuisance
-  - Andrew and Jennifer terminology
-     + modeled vs. unmodeled
-
-* remove standalone optimization algorithms
-
 * exceptions handled by samplers
   - rejection or restart?
 
 * merging and monitoring several threads/processes
+
+* HMC Sampler
+  - set step size, number of steps
+  - tune step size (optional)
+
+* discrete samplers: 
+- Gibbs for small intervals
+- slice for others
+- what about multinomial with constraints?
+
+* R interface
+ - simple process-level calls
+   + compile model
+   + dump data
+   + dump inits
+   + run model
+   + load results
+ - built-in from Rcpp
+ - functions
+ - attach.stan(fit)
+   + traceplot(fit)
+   + plot.stan(fit)
+   + dump.stan(fit)
+   + read.stan(file_path)
+
+
+
+
 
 EXTENSIONS
 =================================================

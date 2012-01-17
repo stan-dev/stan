@@ -78,53 +78,74 @@ namespace stan {
 
     void pad_help_option(std::string option) {
       std::cout << "  " << option;
-      for (unsigned int i = option.size(); i < 25; ++i)
+      for (unsigned int i = option.size(); i < 20; ++i)
         std::cout << ' ';
     }
 
     void print_nuts_help(std::string cmd) {
+      std::cout << std::endl;
+      std::cout << "Compiled Stan Graphical Model Command" << std::endl;
+      std::cout << std::endl;
+
       std::cout << "USAGE:  " << cmd << " [options]" << std::endl;
+      std::cout << std::endl;
+
       std::cout << "OPTIONS:" << std::endl;
+      std::cout << std::endl;
 
       pad_help_option("--help");
       std::cout << "Display this information" << std::endl;
+      std::cout << std::endl;
 
-      pad_help_option("--data_file=<path to file>");
+      pad_help_option("--data=<file>");
       std::cout << "Read data from specified dump-format file" << std::endl;
       pad_help_option("");
       std::cout << "  (required if model declares data)" << std::endl;
+      std::cout << std::endl;
 
-      pad_help_option("--random_seed=<int>");
+      pad_help_option("--seed=<int>");
       std::cout << "Set random number generation seed" << std::endl;
+      std::cout << std::endl;
 
-      pad_help_option("--inits=<path to file>");
+      pad_help_option("--inits=<file>");
       std::cout << "Use initial values from specialized file"
                 << std::endl;
       pad_help_option("");
       std::cout << "    (default is random initialization)" << std::endl;
+      std::cout << std::endl;
 
-      pad_help_option("--iter=<positive int>");
+      pad_help_option("--iter=<+int>");
       std::cout << "Total number of iterations, including burn in"
                 << std::endl;
       pad_help_option("");
       std::cout << "    (default = 2000)" << std::endl;
+      std::cout << std::endl;
       
-      pad_help_option("--burn_in=<positive int>");
+      pad_help_option("--burnin=<+int>");
       std::cout << "Discard the specified number of initial samples"
                 << std::endl;
       pad_help_option("");
       std::cout << "    (default = iter / 2)" << std::endl;
+      std::cout << std::endl;
 
-      pad_help_option("--thin=<positive int>");
+      pad_help_option("--thin=<+int>");
       std::cout << "Period between saved samples after burn in" << std::endl;
       pad_help_option("");
-      std::cout << "    (default = max(1, floor(iter - burn_in) / 1000))"
+      std::cout << "    (default = max(1, floor(iter - burnin) / 1000))"
                 << std::endl;
+      std::cout << std::endl;
       
-      pad_help_option("--samples=<path to file>");
+      pad_help_option("--delta=<+float>");
+      std::cout << "Initial parameter for NUTS step-size tuning." << std::endl;
+      pad_help_option("");
+      std::cout << "    (default = 0.5)" << std::endl;
+      std::cout << std::endl;
+
+      pad_help_option("--samples=<file>");
       std::cout << "File into which samples are written." << std::endl;
       pad_help_option("");
       std::cout << "    (default = samples.csv)" << std::endl;
+      std::cout << std::endl;
 
       pad_help_option("--append_samples");
       std::cout << "Append samples to existing samples file if it exists"
@@ -132,12 +153,14 @@ namespace stan {
       pad_help_option("");
       std::cout << "    (default erases existing samples file before writing)"
                 << std::endl;
+      std::cout << std::endl;
 
-      pad_help_option("--progress_refresh");
+      pad_help_option("--refresh=<+int>");
       std::cout << "Period between samples producing progress output" 
                 << std::endl;
       pad_help_option("");
       std::cout << "    (default = max(1,iter/200))" << std::endl;
+      std::cout << std::endl;
     }
 
     template <typename T_model>
@@ -151,7 +174,7 @@ namespace stan {
       }
 
       std::string data_path;
-      command.val("data_file",data_path);
+      command.val("data",data_path);
       std::fstream data_stream(data_path.c_str(),std::fstream::in);
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
@@ -159,25 +182,25 @@ namespace stan {
       T_model model(data_var_context);
 
       std::string sample_file = "samples.csv";
-      command.val("sample_file",sample_file);
+      command.val("samples",sample_file);
       std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
       
       unsigned int num_iterations = 2000;
-      command.val("num_iterations",num_iterations);
+      command.val("iter",num_iterations);
       
       unsigned int num_burnin = num_iterations / 2;
-      command.val("num_burnin",num_burnin);
+      command.val("burnin",num_burnin);
       
       unsigned int calculated_thin = (num_iterations - num_burnin) / 1000U;
       unsigned int num_thin = (calculated_thin > 1) ? calculated_thin : 1U;
-      command.val("num_thin",num_thin);
+      command.val("thin",num_thin);
 
       double delta = 0.5;
       command.val("delta", delta);
 
       int random_seed(0);
-      if (command.has_key("random_seed"))
-        command.val("random_seed",random_seed);
+      if (command.has_key("seed"))
+        command.val("seed",random_seed);
       else
         random_seed = std::time(0);
 
