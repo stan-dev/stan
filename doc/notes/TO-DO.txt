@@ -1,6 +1,8 @@
 TO DO
 =================================================
 
+* range checks for std::vector accesses in model
+
 * remove standalone optimization algorithms
 
 * eliminate tabs (replace w. 4 spaces)
@@ -70,11 +72,15 @@ TO DO
    + read.stan(file_path)
 
 
-
+* remove -NDEBUG from Jenkins tests
 
 
 EXTENSIONS
 =================================================
+
+* remove all [] Eigen vector accesses and replace with ()
+  the range check for which is configurable through the -NDEBUG 
+  compiler option
 
 * precompiled headers for model compilation speed
 

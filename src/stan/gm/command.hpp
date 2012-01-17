@@ -205,13 +205,7 @@ namespace stan {
         random_seed = std::time(0);
 
       boost::mt19937 base_rng(random_seed);
-      boost::random::uniform_real_distribution<double> init_range_distribution(-2.0,2.0);
-      boost::variate_generator<boost::mt19937&, 
-                               boost::random::uniform_real_distribution<double> >
-        init_rng(base_rng,init_range_distribution);
 
-
-      
       std::cout << "NUTS" << std::endl;
       std::cout << "sample_file=" << sample_file << std::endl;
       std::cout << "num_iterations=" << num_iterations << std::endl;
@@ -219,15 +213,18 @@ namespace stan {
       std::cout << "num_thin=" << num_thin << std::endl;
       std::cout << "delta=" << delta << std::endl;
       std::cout << "random seed=" << random_seed 
-                << " (" << (command.has_key("random_seed") ? "user specified" : "randomly generated") << ")"
+                << " (" << (command.has_key("random_seed") 
+                            ? "user specified"
+                            : "randomly generated") << ")"
                 << std::endl;
 
-      // Choose default value for delta (0.5)
-      stan::mcmc::nuts<> sampler(model, 0.5, -1, base_rng);
+      stan::mcmc::nuts<> sampler(model, delta, -1, base_rng);
       sampler.adapt_on();
 
       std::vector<int> params_i;
       std::vector<double> params_r;
+
+      // parameter initialization
       if (command.has_key("init")) {
         std::string init_path;
         command.val("init",init_path);
@@ -243,12 +240,19 @@ namespace stan {
         params_i = std::vector<int>(model.num_params_i(),0);
         params_r = std::vector<double>(model.num_params_r(),0.0);
       } else {
+        // init_rng generates uniformly from -2 to 2
+        boost::random::uniform_real_distribution<double> 
+          init_range_distribution(-2.0,2.0);
+        boost::variate_generator<boost::mt19937&, 
+                                 boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng,init_range_distribution);
+
         params_i = std::vector<int>(model.num_params_i(),0);
         params_r = std::vector<double>(model.num_params_r());
         for (unsigned int i = 0; i < params_r.size(); ++i)
           params_r[i] = init_rng();
       }
-      // FIXME: put back
+
       model.write_csv_header(sample_file_stream);
       for (unsigned int m = 0; m < num_iterations; ++m) {
         std::cout << "iteration=" << (m + 1);
