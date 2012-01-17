@@ -1,20 +1,28 @@
+data {
+    int N;
+    double(0,1) theta;
+}
+derived data {
+    double(0,1) one_minus_theta;
+
+    one_minus_theta <- 1.0 - theta;
+}
 parameters {
-    double y;
-    double z[2];
+    double y[N];
 }
 derived parameters {
-   double y_adj;
+    double(0,) y_abs[N];
 
-   y_adj <- fabs(y);
+    for (n in 1:N)
+        y_abs[n] <- fabs(y[n]);
 }
 model {
-    y ~ normal(0,1); 
-    for (n in 1:2)
-        z[n] ~ normal(-10,5);
+    for (n in 1:N) 
+        y[n] ~ normal(0,theta); 
 }
 generated quantities {
-   double z_adj[2];
+   double(,0) z_neg[N];
 
-   for (n in 1:2) 
-      z_adj[n] <- z[n] * z[n];
+   for (n in 1:N) 
+      z_neg[n] <- -y_abs[n];
 }

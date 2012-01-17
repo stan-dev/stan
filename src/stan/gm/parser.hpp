@@ -1386,7 +1386,7 @@ namespace stan {
           %= qi::lit("derived")
           >> qi::lit("data")
           > qi::lit('{')
-          > *var_decl_g(false,transformed_data_origin)  // -constraints
+          > *var_decl_g(true,transformed_data_origin)  // -constraints
           > *statement_g(false,transformed_data_origin) // -sampling
           > qi::lit('}');
       }
@@ -1406,7 +1406,7 @@ namespace stan {
           %= qi::lit("derived")
           >> qi::lit("parameters")
           > qi::lit('{')
-          > *var_decl_g(false,transformed_parameter_origin) // -constraints
+          > *var_decl_g(true,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin) // -sampling
           > qi::lit('}');
       }
@@ -1417,7 +1417,7 @@ namespace stan {
           %= qi::lit("generated")
           > qi::lit("quantities")
           > qi::lit('{')
-          > *var_decl_g(false,derived_origin) // -constraints
+          > *var_decl_g(true,derived_origin) // -constraints
           > *statement_g(false,derived_origin) // -sampling
           > qi::lit('}');
       }

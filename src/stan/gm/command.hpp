@@ -89,6 +89,11 @@ namespace stan {
       pad_help_option("--help");
       std::cout << "Display this information" << std::endl;
 
+      pad_help_option("--data_file=<path to file>");
+      std::cout << "Read data from specified dump-format file" << std::endl;
+      pad_help_option("");
+      std::cout << "  (required if model declares data)" << std::endl;
+
       pad_help_option("--random_seed=<int>");
       std::cout << "Set random number generation seed" << std::endl;
 

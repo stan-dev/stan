@@ -2,12 +2,7 @@ TO DO
 =================================================
 
 * check bounds
-  - model load time
-    + data: 
-        validate constraints as read
-    + transformed data: 
-        validate constraints after statement
-  - model init time
+ - model init time
     + parameters:
         validate constraints on initial values
   - leapfrog step time:
@@ -78,7 +73,7 @@ TO DO
 * sensible error messages everywhere with
   variable names and line number/position
 
-* profile and optimize, at least one round
+* eliminate tabs (replace w. 4 spaces)
 
 * name variable types
   - basic naming
@@ -100,8 +95,6 @@ TO DO
   - rejection or restart?
 
 * merging and monitoring several threads/processes
-
-* plug in propto calls in generator
 
 EXTENSIONS
 =================================================
@@ -282,6 +275,7 @@ EXTENSIONS
 * check each parameter shows up on LHS of ~
   - true check is run-time based on data, etc.
 
+* allow +/- propto flag in densities
 
 Stan GM MANUAL
 =================================================
@@ -305,3 +299,7 @@ Stan GM MANUAL
 A.  Examples 
     References
 
+MODELS
+=================================================
+
+http://stat-athens.aueb.gr/~jbn/winbugs_book/

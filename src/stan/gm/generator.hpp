@@ -194,6 +194,7 @@ namespace stan {
     }
    
     void generate_includes(std::ostream& o) {
+      generate_include("cassert",o);
       generate_include("cmath",o);
       generate_include("vector",o);
       generate_include("fstream",o);
@@ -334,149 +335,6 @@ namespace stan {
 
     const std::vector<expression> EMPTY_EXP_VECTOR(0);
 
-    // see init_local_var_visgen for cut & paste
-    struct init_member_var_visgen : public visgen {
-      const bool declare_vars_;
-      init_member_var_visgen(bool declare_vars,
-                             std::ostream& o)
-        : visgen(o),
-          declare_vars_(declare_vars) {
-      }
-      void operator()(const nil& x) const { }
-      void operator()(const int_var_decl& x) const {
-        generate_initialize_array("integer",EMPTY_EXP_VECTOR,x.name_,x.dims_);
-      }      
-      void operator()(const double_var_decl& x) const {
-        // FIXME:  refactor to use range.has_low() and .has_high()
-        if (!is_nil(x.range_.low_.expr_)) {
-          if (!is_nil(x.range_.high_.expr_)) {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.low_);
-            read_args.push_back(x.range_.high_);
-            generate_initialize_array("double_lub",read_args,x.name_,x.dims_);
-          } else {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.low_);
-            generate_initialize_array("double_lb",read_args,x.name_,x.dims_);
-          }
-        } else {
-          if (!is_nil(x.range_.high_.expr_)) {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.high_);
-            generate_initialize_array("double_ub",read_args,x.name_,x.dims_);
-          } else {
-            generate_initialize_array("double",EMPTY_EXP_VECTOR,x.name_,x.dims_);
-          }
-        }
-      }
-      void operator()(const vector_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.M_);
-        generate_initialize_array("vector_d",read_args,x.name_,x.dims_);
-      }
-      void operator()(const row_vector_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.N_);
-        generate_initialize_array("row_vector",read_args,x.name_,x.dims_);
-      }
-      void operator()(const matrix_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.N_);
-        generate_initialize_array("matrix",read_args,x.name_,x.dims_);
-      }
-      void operator()(const simplex_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.K_);
-        generate_initialize_array("simplex",read_args,x.name_,x.dims_);
-      }
-      void operator()(const pos_ordered_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.K_);
-        generate_initialize_array("pos_ordered",read_args,x.name_,x.dims_);
-      }
-      void operator()(const cov_matrix_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.K_);
-        generate_initialize_array("cov_matrix",read_args,x.name_,x.dims_);
-      }
-      void operator()(const corr_matrix_var_decl& x) const {
-        std::vector<expression> read_args;
-        read_args.push_back(x.K_);
-        generate_initialize_array("corr_matrix",read_args,x.name_,x.dims_);
-      }
-      void generate_initialize_array(std::string const& type,
-                                     const std::vector<expression>& read_args,
-                                     const std::string& name,
-                                     const std::vector<expression>& dims) const {
-        if (dims.size() > 0) {
-          // if == 0, partial eval expressions inside read
-          for (unsigned int j = 0; j < read_args.size(); ++j) {
-            generate_indent(2,o_);
-            o_ << "unsigned int " << "read_arg_" << name << "_" << j << " = ";
-            generate_expression(read_args[j],o_);
-            o_ << ";" << EOL;
-          }
-        }
-        if (dims.size() == 0) {
-          generate_indent(2,o_);
-          if (declare_vars_) o_ << type << " ";
-          o_ << name << " = in.next_" << type  << "(";
-          for (unsigned int j = 0; j < read_args.size(); ++j) {
-            if (j > 0) o_ << ",";
-            generate_expression(read_args[j],o_);
-          }
-          o_ << ");" << EOL;
-          return;
-        }
-        if (declare_vars_) {
-          o_ << INDENT2;
-          for (unsigned int i = 0; i < dims.size(); ++i) o_ << "vector<";
-          o_ << type;
-          for (unsigned int i = 0; i < dims.size(); ++i) o_ << "> ";
-          o_ << name << ";" << EOL;
-        }
-        std::string name_dims(name);
-        for (unsigned int i = 0; i < dims.size(); ++i) {
-          generate_indent(i + 2, o_);
-          o_ << "unsigned int dim_"  << name << "_" << i << " = ";
-          generate_expression(dims[i],o_);
-          o_ << ";" << EOL;
-          if (i < dims.size() - 1) {  
-            generate_indent(i + 2, o_);
-            o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << ");" 
-               << EOL;
-            name_dims.append("[k_").append(to_string(i)).append("]");
-          }
-          generate_indent(i + 2, o_);
-          o_ << "for (unsigned int k_" << i << " = 0;"
-             << " k_" << i << " < dim_" << name << "_" << i << ";"
-             << " ++k_" << i << ") {" << EOL;
-          if (i == dims.size() - 1) {
-            generate_indent(i + 3, o_);
-            o_ << name_dims << ".push_back(in.next_" << type << "(";
-            for (unsigned int j = 0; j < read_args.size(); ++j) {
-              if (j > 0) o_ << ",";
-              o_ << "read_arg_" << name << "_" << j;
-            }
-            o_ << "));" << EOL;
-          }
-        }
-        for (unsigned int i = dims.size(); i > 0; --i) {
-          generate_indent(i + 1, o_);
-          o_ << "}" << EOL;
-        }
-      }
-    };
-
-    void generate_member_var_inits(const std::vector<var_decl>& vs,
-                                   bool declare_vars,
-                                   std::ostream& o) {
-      init_member_var_visgen vis(declare_vars,o);
-      for (unsigned int i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
-    }
-
-    // see init_member_var_visgen for cut & paste
     struct init_local_var_visgen : public visgen {
       const bool declare_vars_;
       init_local_var_visgen(bool declare_vars,
@@ -621,17 +479,6 @@ namespace stan {
 
 
 
-    void generate_constructor(const program& p,
-                              const std::string& model_name,
-                              std::ostream& o) {
-      o << INDENT << model_name << "(vector<double> data_r__, vector<int> data_i__)"
-        << EOL;
-      o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL;
-      o << INDENT2 << "stan::io::reader<double> in(data_r__,data_i__);" << EOL;
-      generate_member_var_inits(p.data_decl_,false,o);
-
-      o << INDENT << "} // vector ctor" << EOL2;
-    }
 
     void generate_public_decl(std::ostream& o) {
       o << "public:" << EOL;
@@ -658,13 +505,14 @@ namespace stan {
              << " k" << i << "__ < ";
           generate_expression(dims[i].expr_,o_);
           o_ << ";";
-          o_ << " ++k" << i << "__) {";
+          o_ << " ++k" << i << "__) {" << EOL;
         }
       }
       void generate_end_for_dims(unsigned int dims_size) const {
-        for (unsigned int i = 0; i < dims_size; ++i)
-          generate_indent(indents_ + dims_size - i, o_);
-        o_ << "}" << EOL;
+        for (unsigned int i = 0; i < dims_size; ++i) {
+          generate_indent(indents_ + dims_size - i - 1, o_);
+          o_ << "}" << EOL;
+        }
       }
 
       void generate_loop_var(const std::string& name,
@@ -716,6 +564,7 @@ namespace stan {
       void nonbasic_validate(const T& x,
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
+        generate_indent(indents_ + x.dims_.size(),o_);
         o_ << "assert(stan::prob::" << type_name << "_validate(";
         generate_loop_var(x.name_,x.dims_.size());
         o_ << "));" << EOL;
@@ -985,7 +834,8 @@ namespace stan {
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         generate_indent(indent_,o_);
-        o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log(";
+        // FOO_log<true> is the log FOO distribution up to a proportion
+        o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log<true>(";
         generate_expression(x.expr_,o_);
         for (unsigned int i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
@@ -1429,23 +1279,26 @@ namespace stan {
       }
     };
 
-    void generate_dump_member_var_inits(const std::vector<var_decl>& vs,
-                                        std::ostream& o) {
+    void generate_member_var_inits(const std::vector<var_decl>& vs,
+                                   std::ostream& o) {
       dump_member_var_visgen vis(o);
       for (unsigned int i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
     }
 
-    void generate_dump_constructor(const program& prog,
-                                   const std::string& model_name,
-                                   std::ostream& o) {
+    void generate_constructor(const program& prog,
+                              const std::string& model_name,
+                              std::ostream& o) {
       o << INDENT << model_name << "(stan::io::var_context& context__)" << EOL;
       o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL; // resize 0 with var_resizing
       o << INDENT2 << "unsigned int pos__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
 
-      generate_dump_member_var_inits(prog.data_decl_,o);
+      generate_member_var_inits(prog.data_decl_,o);
+
+      generate_comment("validate data",2,o);
+      generate_validate_var_decls(prog.data_decl_,2,o);
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
@@ -1453,6 +1306,9 @@ namespace stan {
       static bool is_var = false;
       for (unsigned int i = 0; i < prog.derived_data_decl_.second.size(); ++i)
         generate_statement(prog.derived_data_decl_.second[i],2,o,include_sampling,is_var);
+      
+      generate_comment("validate transformed data",2,o);
+      generate_validate_var_decls(prog.derived_data_decl_.first,2,o);
 
       o << EOL << INDENT2 << "set_param_ranges();" << EOL;
       o << INDENT << "} // dump ctor" << EOL;
@@ -2000,23 +1856,37 @@ namespace stan {
 
       write_csv_vars_visgen vis_writer(o);
 
+      // transformed parameters guaranteed to satisfy constraints
+
       o << EOL;
-      generate_comment("write transformed parameters",2,o);
+      generate_comment("declare and define transformed parameters",2,o);
       static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
       static bool include_sampling = false;
       generate_statements(prog.derived_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
+
+      generate_comment("validate transformed parameters",2,o);
+      generate_validate_var_decls(prog.derived_decl_.first,2,o);
+      o << EOL;
+
+      generate_comment("write transformed parameters",2,o);
       for (unsigned int i = 0; i < prog.derived_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
       o << EOL;
 
-      generate_comment("write generated quantities",2,o);
+      generate_comment("declare and define generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,is_var); 
       o << EOL;
       generate_statements(prog.generated_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
+
+      generate_comment("validate generated quantities",2,o);
+      generate_validate_var_decls(prog.generated_decl_.first,2,o);
+      o << EOL;
+
+      generate_comment("write generated quantities",2,o);
       for (unsigned int i = 0; i < prog.generated_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
       if (prog.generated_decl_.first.size() > 0)
@@ -2183,9 +2053,7 @@ namespace stan {
       generate_member_var_decls(prog.data_decl_,1,out);
       generate_member_var_decls(prog.derived_data_decl_.first,1,out);
       generate_public_decl(out);
-      // FIXME: generate or delete
-      // generate_constructor(prog,model_name,out);
-      generate_dump_constructor(prog,model_name,out);
+      generate_constructor(prog,model_name,out);
       generate_set_param_ranges(prog.parameter_decl_,out);
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
