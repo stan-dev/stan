@@ -1,11 +1,11 @@
 #ifndef __STAN__MEMORY__STACK_ALLOC_HPP__
 #define __STAN__MEMORY__STACK_ALLOC_HPP__
 
-#include <stdexcept>
+#include <cstdlib>
 #include <sstream>
-#include <stdlib.h>
+#include <stdexcept>
+#include <stdint.h> // FIXME: replace with cstddef?
 #include <vector>
-#include <stdint.h> // necessary on Debian?
 
 namespace stan { 
 

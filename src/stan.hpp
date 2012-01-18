@@ -10,6 +10,3 @@
 #include "stan/version.hpp"
 
 #endif
-
-
-#endif

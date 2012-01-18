@@ -6,9 +6,13 @@
 using Eigen::Matrix;
 using Eigen::Dynamic;
 
-typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
-typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
-typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
+using stan::maths::matrix_d;
+using stan::maths::vector_d;
+using stan::maths::row_vector_d;
+
+// typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
+// typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
+// typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 
 TEST(matrix_test, resize_double) {
   double x = 5;

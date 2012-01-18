@@ -1,36 +1,19 @@
 TO DO
 =================================================
 
+* code review includes, so each file can be
+  included independently w/o relying on any
+  global includes
+
 * range checks for std::vector accesses in model
 
 * eliminate tabs (replace w. 4 spaces)
-
-* name variable types
- - basic naming
-    + data     | parameter
-    + known    | unknown
-    + constant | variable
- - secondary naming
-    + derived, transformed, dependent
- - tertiary naming
-    + generated, derived, free, cut
- - I/O modifier
-    + local, nuisance
- - Andrew and Jennifer terminology
-    + modeled vs. unmodeled
-
-* distribution engineering
-  - tarball
-  - basic distro site
-  - check cross-platform
 
 * include dependencies in compiled models
   - top-level include headers
   - clean up dependencies
   - must be enough for all declared funs and agrads
  - just use top-level .hpp for Stan and for modules
-
-* remaining API doc
 
 * error/exception policy throughout
   - maths
@@ -43,11 +26,20 @@ TO DO
 * exceptions handled by samplers
   - rejection or restart?
 
-* merging and monitoring several threads/processes
-
 * HMC Sampler
   - set step size, number of steps
   - tune step size (optional)
+
+* remaining API doc
+
+* distribution engineering
+ - tarball
+ - basic distro site
+ - check cross-platform
+
+
+MAYBE PUNT
+=================================================
 
 * discrete samplers: 
 - Gibbs for small intervals
@@ -69,12 +61,13 @@ TO DO
    + dump.stan(fit)
    + read.stan(file_path)
 
-
 * remove -NDEBUG from Jenkins tests
 
 
 EXTENSIONS
 =================================================
+
+* merging and monitoring several threads/processes
 
 * remove all [] Eigen vector accesses and replace with ()
   the range check for which is configurable through the -NDEBUG 
@@ -85,14 +78,8 @@ EXTENSIONS
 * cumulative densities and derivatives for truncations
 
 * reparameterize simplex transform using hyperspherical coordinates
-  - use "Wierstrass trick" to avoid numerical trig
+  - use Weirstrass trick to avoid numerical trig
   - use log_sum_exp to prevent underflow in products
-
-* run-time checks for
-  - positive definiteness
-  - array/vector/matrix index bounds
-  - undefined derived parameters (.vi_ == 0)
-  - array loops out of bounds
 
 * special positive-definiteness-preserving operations
   - basic data type (or trait)
@@ -100,7 +87,8 @@ EXTENSIONS
     by fudging boundary conditions
 
 * optimization
-  - functor-based concept design with templates  
+  - functor-based concept design with templates 
+  - easily pluggable with log prob in model for MAP 
 
 * convergence monitoring
   - R-hat
@@ -114,7 +102,6 @@ EXTENSIONS
 * benchmarks
   - agrad vs. RAD/Sacado, CppAD, ... ?
   - stan vs. MCMCpack, R, BUGS, JAGS, OpenBUGS, ...
-  - 
 
 * compiler for R's linear model notation
 
@@ -256,7 +243,15 @@ EXTENSIONS
 * check each parameter shows up on LHS of ~
   - true check is run-time based on data, etc.
 
-* allow +/- propto flag in densities
+* allow +/- propto flag in densities in Stan-GM
+
+* forward mode auto-dif
+  - last revision 548: 
+  - src/stan/agrad/ad.hpp
+
+* bring back specialized auto-dif for densities
+  - bring up to speed with new templates for densities & propto
+  - last revision 549:  ag_distributions.hpp & test 
 
 Stan GM MANUAL
 =================================================

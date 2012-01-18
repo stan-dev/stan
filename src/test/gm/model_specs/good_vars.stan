@@ -1,7 +1,7 @@
 data {
     double a;
 }
-derived data {
+transformed data {
     double b;
     b <- 1.0; 
     b <- a + b + 1.0;
@@ -15,7 +15,7 @@ derived data {
 parameters {
     double c;
 }
-derived parameters {
+transformed parameters {
     double d; 
     d <- 1.0;
     d <- a + b + c + d;

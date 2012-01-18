@@ -1,31 +1,12 @@
 #ifndef __STAN__GM__AST_HPP__
 #define __STAN__GM__AST_HPP__
 
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
-#include <boost/variant/static_visitor.hpp>
 
 #include <climits>
-#include <iomanip>
 #include <iostream>
-#include <istream>
 #include <map>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -38,9 +19,6 @@ namespace stan {
     struct nil {
       /* placeholder val for boost::variant default ctors */
     };
-
-    namespace qi = boost::spirit::qi;
-    namespace ascii = boost::spirit::ascii;
 
     // components of abstract syntax tree 
     struct assignment;

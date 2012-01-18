@@ -7,14 +7,14 @@
 #include <stan/maths/special_functions.hpp>
 
 void test_list3(stan::io::dump_reader& reader,
-	       const std::vector<double>& vals) {
+               const std::vector<double>& vals) {
   std::vector<double> vals2 = reader.double_values();
   EXPECT_EQ(vals.size(),vals2.size());
   for (unsigned int i = 0; i < vals.size(); ++i)
     EXPECT_FLOAT_EQ(vals[i],vals2[i]);
 }
 void test_list3(stan::io::dump_reader& reader,
-	       const std::vector<int>& vals) {
+               const std::vector<int>& vals) {
   std::vector<int> vals2 = reader.int_values();
   EXPECT_EQ(vals.size(),vals2.size());
   for (unsigned int i = 0; i < vals.size(); ++i)
@@ -22,9 +22,9 @@ void test_list3(stan::io::dump_reader& reader,
 }
 template <typename T>
 void test_list2(stan::io::dump_reader& reader,
-		const std::string& name,
-		const std::vector<T>& vals,
-		const std::vector<unsigned int>& dims) {
+                const std::string& name,
+                const std::vector<T>& vals,
+                const std::vector<unsigned int>& dims) {
   bool has_next = reader.next();
   EXPECT_EQ(true,has_next);
   EXPECT_EQ(name,reader.name());
@@ -37,8 +37,8 @@ void test_list2(stan::io::dump_reader& reader,
 
 template <typename T>
 void test_list(const std::string& name, 
-	       const std::vector<T>& vals, 
-	       const std::string& s) {
+               const std::vector<T>& vals, 
+               const std::string& s) {
   std::stringstream in(s);
   stan::io::dump_reader reader(in);
   std::vector<unsigned int> expected_dims;
@@ -263,13 +263,6 @@ TEST(io_dump, dump_abs_ref) {
   EXPECT_TRUE(context.contains_i("N"));
 }
 
-TEST(io_dump, dump_file) {
-  std::fstream in("src/models/normal_estimate/normal_estimate.Rdata");
-  stan::io::dump dump(in);
-  EXPECT_TRUE(dump.contains_i("N"));
-  stan::io::var_context& context = dump;
-  EXPECT_TRUE(context.contains_i("N"));
-}
 TEST(io_dump, product) {
   std::vector<unsigned int>dims;
   dims.push_back(1);

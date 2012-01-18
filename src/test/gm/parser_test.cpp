@@ -16,7 +16,7 @@ bool is_parsable(const std::string& file_name) {
 }
 
 TEST(gm_parser,eight_schools) {
-  EXPECT_TRUE(is_parsable("src/models/eight_schools.stan"));
+  EXPECT_TRUE(is_parsable("src/models/misc/eight_schools/eight_schools.stan"));
 }
 
 TEST(gm_parser,bugs_1_kidney) {
@@ -77,7 +77,7 @@ TEST(gm_parser,good_trunc) {
 }
 
 TEST(gm_parser,triangle_lp) {
-  EXPECT_TRUE(is_parsable("src/models/triangle.stan"));
+  EXPECT_TRUE(is_parsable("src/models/basic_distributions/triangle.stan"));
 }
 
 TEST(gm_parser,good_vars) {

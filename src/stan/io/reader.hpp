@@ -4,9 +4,10 @@
 #include <exception>
 #include <stdexcept>
 #include <vector>
-#include <Eigen/Dense>
-#include <boost/multi_array.hpp>
+
 #include <boost/throw_exception.hpp>
+
+#include <stan/maths/matrix.hpp>
 #include <stan/maths/special_functions.hpp>
 #include <stan/prob/transform.hpp>
 
@@ -14,9 +15,6 @@ namespace stan {
 
   namespace io {
 
-    using Eigen::Dynamic;
-    using Eigen::Matrix;
-    
 
     /**
      * A stream-based reader for integer, scalar, vector, matrix
@@ -50,24 +48,33 @@ namespace stan {
       unsigned int int_pos_;
       
       inline T& scalar_ptr() {
-	return data_r_.at(pos_);
+        return data_r_.at(pos_);
       }
       
       inline T& scalar_ptr_increment(unsigned int m) {
-	pos_ += m;
-	return data_r_.at(pos_ - m);
+        pos_ += m;
+        return data_r_.at(pos_ - m);
       }
 
       inline int& int_ptr() {
-	return data_i_.at(int_pos_);
+        return data_i_.at(int_pos_);
       }
       
       inline int& int_ptr_increment(unsigned int m) {
-	int_pos_ += m;
-	return data_i_.at(int_pos_ - m);
+        int_pos_ += m;
+        return data_i_.at(int_pos_ - m);
       }
 
     public:
+
+      typedef typename stan::maths::EigenType<T>::matrix matrix_t;
+      typedef typename stan::maths::EigenType<T>::vector vector_t;
+      typedef typename stan::maths::EigenType<T>::row_vector row_vector_t;
+
+      typedef Eigen::Map<matrix_t> map_matrix_t;
+      typedef Eigen::Map<vector_t> map_vector_t;
+      typedef Eigen::Map<row_vector_t> map_row_vector_t;
+
 
       /**
        * Construct a variable reader using the specified vectors
@@ -81,11 +88,11 @@ namespace stan {
        * @param data_i Sequence of integer values.
        */
       reader(std::vector<T>& data_r,
-	     std::vector<int>& data_i) 
-	: data_r_(data_r),
-	  data_i_(data_i),
-	  pos_(0),
-	  int_pos_(0) {
+             std::vector<int>& data_i) 
+        : data_r_(data_r),
+          data_i_(data_i),
+          pos_(0),
+          int_pos_(0) {
       }
 
       /**
@@ -99,7 +106,7 @@ namespace stan {
        * @return Number of scalars left to read.
        */
       inline unsigned int available() {
-	return data_r_.size() - pos_;
+        return data_r_.size() - pos_;
       }
 
       /**
@@ -108,7 +115,7 @@ namespace stan {
        * @return Number of integers left to read.
        */
       inline unsigned int available_i() {
-	return data_i_.size() - int_pos_;
+        return data_i_.size() - int_pos_;
       }
 
       /**
@@ -117,9 +124,10 @@ namespace stan {
        * @return Next integer value.
        */
       inline int integer() {
-	if (int_pos_ >= data_i_.size())
-	  BOOST_THROW_EXCEPTION(std::runtime_error("no more integers to read."));
-	return data_i_[int_pos_++];
+        if (int_pos_ >= data_i_.size())
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error("no more integers to read."));
+        return data_i_[int_pos_++];
       }
 
       /**
@@ -130,7 +138,7 @@ namespace stan {
        * @return Next integer value.
        */
       inline int integer_constrain() {
-	return integer();
+        return integer();
       }
       
       /**
@@ -141,7 +149,7 @@ namespace stan {
        * @return Next integer value.
        */
       inline int integer_constrain(T& log_prob) {
-	return integer();
+        return integer();
       }
       
 
@@ -152,9 +160,9 @@ namespace stan {
        * @return Next scalar value.
        */
       inline T scalar() {
-	if (pos_ >= data_r_.size())
-	  BOOST_THROW_EXCEPTION(std::runtime_error("no more scalars to read"));
-	return data_r_[pos_++];
+        if (pos_ >= data_r_.size())
+          BOOST_THROW_EXCEPTION(std::runtime_error("no more scalars to read"));
+        return data_r_[pos_++];
       }
 
       /**
@@ -164,7 +172,7 @@ namespace stan {
        * @return Next scalar.
        */
       T scalar_constrain() {
-	return scalar();
+        return scalar();
       }
 
       /**
@@ -179,7 +187,7 @@ namespace stan {
        * @return Next scalar.
        */
       T scalar_constrain(T& log_prob) {
-	return scalar();
+        return scalar();
       }
 
 
@@ -191,9 +199,9 @@ namespace stan {
        * @return Vector made up of the next scalars.
        */
       std::vector<T> std_vector(unsigned int m) {
-	std::vector<T> vec;
-	T& start = scalar_ptr_increment(m);
-	vec.insert(vec.begin(), &start, &scalar_ptr());
+        std::vector<T> vec;
+        T& start = scalar_ptr_increment(m);
+        vec.insert(vec.begin(), &start, &scalar_ptr());
         return vec;
       }
 
@@ -204,9 +212,12 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      Matrix<T,Dynamic,1> vector(unsigned int m) {
-	return Eigen::Map<Matrix<T,Dynamic,1> >(&scalar_ptr_increment(m),m);
+      vector_t vector(unsigned int m) {
+        return map_vector_t(&scalar_ptr_increment(m),m);
       }
+
+      // FIXME:  replace remaining Eigen::Matrix w. EigenType
+
 
       /**
        * Return a column vector of specified dimensionality made up of
@@ -215,8 +226,8 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      Matrix<T,Dynamic,1> vector_constrain(unsigned int m) {
-	return Eigen::Map<Matrix<T,Dynamic,1> >(&scalar_ptr_increment(m),m);
+      vector_t vector_constrain(unsigned int m) {
+        return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
       /**
@@ -227,8 +238,8 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      Matrix<T,Dynamic,1> vector_constrain(unsigned int m, T& lp) {
-	return Eigen::Map<Matrix<T,Dynamic,1> >(&scalar_ptr_increment(m),m);
+      vector_t vector_constrain(unsigned int m, T& lp) {
+        return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
       /**
@@ -238,8 +249,8 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      Matrix<T,Dynamic,1> row_vector(unsigned int m) {
-	return Eigen::Map<Matrix<T,1,Dynamic> >(&scalar_ptr_increment(m),m);
+      row_vector_t row_vector(unsigned int m) {
+        return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
 
       /**
@@ -249,8 +260,8 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      Matrix<T,Dynamic,1> row_vector_constrain(unsigned int m) {
-	return Eigen::Map<Matrix<T,1,Dynamic> >(&scalar_ptr_increment(m),m);
+      row_vector_t row_vector_constrain(unsigned int m) {
+        return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
 
       /**
@@ -262,8 +273,8 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      Matrix<T,Dynamic,1> row_vector_constrain(unsigned int m, T& lp) {
-	return Eigen::Map<Matrix<T,1,Dynamic> >(&scalar_ptr_increment(m),m);
+      row_vector_t row_vector_constrain(unsigned int m, T& lp) {
+        return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
       
       /**
@@ -281,24 +292,24 @@ namespace stan {
        *
        * @param m Number of rows.  
        * @param n Number of columns.
-       * @return Matrix made up of the next scalars.
+       * @return Eigen::Matrix made up of the next scalars.
        */
-      Matrix<T,Dynamic,Dynamic> matrix(unsigned int m, unsigned int n) {
-	return Eigen::Map<Matrix<T,Dynamic,Dynamic> >(&scalar_ptr_increment(m*n),m,n);
+      matrix_t matrix(unsigned int m, unsigned int n) {
+        return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
       /**
        * Return a matrix of the specified dimensionality made up of
        * the next scalars arranged in column-major order.  The
-       * constraint is a no-op.  See <code>matrix(unsigned int, unsigned int)</code>
-       * for more information.
+       * constraint is a no-op.  See <code>matrix(unsigned int,
+       * unsigned int)</code> for more information.
        *
        * @param m Number of rows.  
        * @param n Number of columns.
        * @return Matrix made up of the next scalars.
        */
-      Matrix<T,Dynamic,Dynamic> matrix_constrain(unsigned int m, unsigned int n) {
-	return Eigen::Map<Matrix<T,Dynamic,Dynamic> >(&scalar_ptr_increment(m*n),m,n);
+      matrix_t matrix_constrain(unsigned int m, unsigned int n) {
+        return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
       /**
@@ -313,8 +324,8 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
-      Matrix<T,Dynamic,Dynamic> matrix_constrain(unsigned int m, unsigned int n, T& lp) {
-	return Eigen::Map<Matrix<T,Dynamic,Dynamic> >(&scalar_ptr_increment(m*n),m,n);
+      matrix_t matrix_constrain(unsigned int m, unsigned int n, T& lp) {
+        return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
 
@@ -328,10 +339,11 @@ namespace stan {
        * greater than or equal to the lower bound.
        */
       int integer_lb(int lb) {
-	int i = integer();
-	if (!(i >= lb))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("required value greater than or equal to lb"));
-	return i;
+        int i = integer();
+        if (!(i >= lb))
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error("required value greater than or equal to lb"));
+        return i;
       }
       /**
        * Return the next integer, checking that it is greater than
@@ -343,7 +355,7 @@ namespace stan {
        * greater than or equal to the lower bound.
        */
       int integer_lb_constrain(int lb) {
-	return integer_lb(lb);
+        return integer_lb(lb);
       }
       /**
        * Return the next integer, checking that it is greater than
@@ -356,7 +368,7 @@ namespace stan {
        * greater than or equal to the lower bound.
        */
       int integer_lb_constrain(int lb, T& lp) {
-	return integer_lb(lb);
+        return integer_lb(lb);
       }
 
 
@@ -370,10 +382,11 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       int integer_ub(int ub) {
-	int i = integer();
-	if (!(i <= ub))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("required value less than or equal to ub"));
-	return i;
+        int i = integer();
+        if (!(i <= ub))
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error("required value less than or equal to ub"));
+        return i;
       }
       /**
        * Return the next integer, checking that it is less than
@@ -385,7 +398,7 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       int integer_ub_constrain(int ub) {
-	return integer_ub(ub);
+        return integer_ub(ub);
       }
       /**
        * Return the next integer, checking that it is less than
@@ -398,7 +411,7 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       int integer_ub_constrain(int ub, T& lp) {
-	return integer_ub(ub);
+        return integer_ub(ub);
       }
 
       /**
@@ -413,14 +426,18 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       int integer_lub(int lb, int ub) {
-	int i = integer(); // read first to make position deterministic [arbitrary choice]
-	if (lb > ub)
-	  BOOST_THROW_EXCEPTION(std::runtime_error("lower bound must be less than or equal to ub"));
-	if (!(i >= lb))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("required value greater than or equal to lb"));
-	if (!(i <= ub))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("required value less than or equal to ub"));
-	return i;
+        // read first to make position deterministic [arbitrary choice]
+        int i = integer(); 
+        if (lb > ub)
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error("lower bound must be less than or equal to ub"));
+        if (!(i >= lb))
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error("required value greater than or equal to lb"));
+        if (!(i <= ub))
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error("required value less than or equal to ub"));
+        return i;
       }
       /**
        * Return the next integer, checking that it is less than
@@ -432,7 +449,7 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       int integer_lub_constrain(int lb, int ub) {
-	return integer_lub(lb,ub);
+        return integer_lub(lb,ub);
       }
       /**
        * Return the next integer, checking that it is less than
@@ -445,7 +462,7 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       int integer_lub_constrain(int lb, int ub, T& lp) {
-	return integer_lub(lb,ub);
+        return integer_lub(lb,ub);
       }
       
 
@@ -460,10 +477,10 @@ namespace stan {
        * @throw std::runtime_error if x is not positive
        */
       T scalar_pos() {
-	T x(scalar());
-	if(!stan::prob::positive_validate(x))
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("x is not positive"));
-	return x;
+        T x(scalar());
+        if(!stan::prob::positive_validate(x))
+          BOOST_THROW_EXCEPTION(std::runtime_error ("x is not positive"));
+        return x;
       }
 
       /**
@@ -474,7 +491,7 @@ namespace stan {
        * @return The next scalar transformed to be positive.
        */
       T scalar_pos_constrain() {
-	return stan::prob::positive_constrain(scalar());
+        return stan::prob::positive_constrain(scalar());
       }
 
       /**
@@ -487,7 +504,7 @@ namespace stan {
        * @return The next scalar transformed to be positive.
        */
       T scalar_pos_constrain(T& lp) {
-	return stan::prob::positive_constrain(scalar(),lp);
+        return stan::prob::positive_constrain(scalar(),lp);
       }
 
       /**
@@ -502,10 +519,11 @@ namespace stan {
        *    specified lower bound
        */
       T scalar_lb(double lb) {
-	T x(scalar());
-	if (!stan::prob::lb_validate(x,lb))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("x is less than the lower bound"));
-	return x;
+        T x(scalar());
+        if (!stan::prob::lb_validate(x,lb))
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error("x is less than the lower bound"));
+        return x;
       }
 
       /**
@@ -519,7 +537,7 @@ namespace stan {
        * lower bound.
        */
       T scalar_lb_constrain(double lb) {
-	return stan::prob::lb_constrain(scalar(),lb);
+        return stan::prob::lb_constrain(scalar(),lb);
       }
 
       /**
@@ -533,7 +551,7 @@ namespace stan {
        * @param lp Reference to log probability variable to increment.
        */
       T scalar_lb_constrain(double lb, T& lp) {
-	return stan::prob::lb_constrain(scalar(),lb,lp);
+        return stan::prob::lb_constrain(scalar(),lb,lp);
       }
 
 
@@ -550,10 +568,11 @@ namespace stan {
        *    specified upper bound
        */
       T scalar_ub(double ub) {
-	T x(scalar());
-	if(!stan::prob::ub_validate(x,ub))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("x is greater than the upper bound"));
-	return x;
+        T x(scalar());
+        if(!stan::prob::ub_validate(x,ub))
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error("x is greater than the upper bound"));
+        return x;
       }
 
       /**
@@ -567,7 +586,7 @@ namespace stan {
        * upper bound.
        */
       T scalar_ub_constrain(double ub) {
-	return stan::prob::ub_constrain(scalar(),ub);
+        return stan::prob::ub_constrain(scalar(),ub);
       }
 
       /**
@@ -581,7 +600,7 @@ namespace stan {
        * @param lp Reference to log probability variable to increment.
        */
       T scalar_ub_constrain(double ub, T& lp) {
-	return stan::prob::ub_constrain(scalar(),ub,lp);
+        return stan::prob::ub_constrain(scalar(),ub,lp);
       }
 
       /**
@@ -597,10 +616,11 @@ namespace stan {
        *    lower and upper bounds.
        */
       T scalar_lub(double lb, double ub) {
-	T x(scalar());
-	if(!stan::prob::lub_validate(x,lb,ub))
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("scalar is not between lower and upper bounds"));
-	return x;
+        T x(scalar());
+        if(!stan::prob::lub_validate(x,lb,ub))
+          BOOST_THROW_EXCEPTION(
+           std::runtime_error ("scalar is not between lower and upper bounds"));
+        return x;
       }
 
       /**
@@ -615,7 +635,7 @@ namespace stan {
        * bounds.
        */
       T scalar_lub_constrain(double lb, double ub) {
-	return stan::prob::lub_constrain(scalar(),lb,ub);
+        return stan::prob::lub_constrain(scalar(),lb,ub);
       }
 
       /**
@@ -629,7 +649,7 @@ namespace stan {
        * @param lp Reference to log probability variable to increment.
        */
       T scalar_lub_constrain(double lb, double ub, T& lp) {
-	return stan::prob::lub_constrain(scalar(),lb,ub,lp);
+        return stan::prob::lub_constrain(scalar(),lb,ub,lp);
       }
 
       /**
@@ -641,9 +661,9 @@ namespace stan {
        * @return Next probability value.
        */
       T prob() {
-	T x(scalar());
-	stan::prob::prob_validate(x);
-	return x;
+        T x(scalar());
+        stan::prob::prob_validate(x);
+        return x;
       }
 
       /**
@@ -655,13 +675,13 @@ namespace stan {
        * @return The next scalar transformed to a probability.
        */
       T prob_constrain() {
-	return stan::prob::prob_constrain(scalar());
+        return stan::prob::prob_constrain(scalar());
       }
 
       /**
-       * Return the next scalar transformed to be a probability between 0 and 1,
-       * incrementing the specified reference with the log of the absolute Jacobian
-       * determinant.
+       * Return the next scalar transformed to be a probability
+       * between 0 and 1, incrementing the specified reference with
+       * the log of the absolute Jacobian determinant.
        * 
        * <p>See <code>stan::prob::prob_constrain(T)</code>.
        *
@@ -669,7 +689,7 @@ namespace stan {
        * @return The next scalar transformed to a probability.
        */
       T prob_constrain(T& lp) {
-	return stan::prob::prob_constrain(scalar(),lp);
+        return stan::prob::prob_constrain(scalar(),lp);
       }
 
 
@@ -687,10 +707,11 @@ namespace stan {
        *   for a correlation
        */
       T corr() {
-	T x(scalar());
-	if (!stan::prob::corr_validate(x))
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("x is not a valid correlation value"));
-	return x;
+        T x(scalar());
+        if (!stan::prob::corr_validate(x))
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error ("x is not a valid correlation value"));
+        return x;
       }
 
       /**
@@ -702,21 +723,22 @@ namespace stan {
        * @return The next scalar transformed to a correlation.
        */
       T corr_constrain() {
-	return stan::prob::corr_constrain(scalar());
+        return stan::prob::corr_constrain(scalar());
       }
 
       /**
-       * Return the next scalar transformed to be a (partial) correlation between -1 and
-       * 1, incrementing the specified reference with the log of the absolute Jacobian
-       * determinant.
+       * Return the next scalar transformed to be a (partial)
+       * correlation between -1 and 1, incrementing the specified
+       * reference with the log of the absolute Jacobian determinant.
        *
        * <p>See <code>stan::prob::corr_constrain(T,T&)</code>.
        * 
-       * @param lp The reference to the variable holding the log probability to increment.
+       * @param lp The reference to the variable holding the log
+       * probability to increment.
        * @return The next scalar transformed to a correlation.
        */
       T corr_constrain(T& lp) {
-	return stan::prob::corr_constrain(scalar(),lp);
+        return stan::prob::corr_constrain(scalar(),lp);
       }
 
       /**
@@ -729,11 +751,12 @@ namespace stan {
        * @return Simplex read from the specified size number of scalars.
        * @throw std::runtime_error if the k values is not a simplex.
        */
-      Matrix<T,Dynamic,1> simplex(unsigned int k) {
-	Matrix<T,Dynamic,1> theta(vector(k));
-	if(!stan::prob::simplex_validate(theta))
-	  BOOST_THROW_EXCEPTION(std::runtime_error("the k values is not a simplex"));
-	return theta;
+      vector_t simplex(unsigned int k) {
+        vector_t theta(vector(k));
+        if(!stan::prob::simplex_validate(theta))
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error("the k values is not a simplex"));
+        return theta;
       }
 
       /**
@@ -746,8 +769,8 @@ namespace stan {
        * @param k Number of dimensions in resulting simplex.
        * @return Simplex derived from next <code>k-1</code> scalars.
        */
-      Matrix<T,Dynamic,1> simplex_constrain(unsigned int k) {
-	return stan::prob::simplex_constrain(vector(k-1));
+      vector_t simplex_constrain(unsigned int k) {
+        return stan::prob::simplex_constrain(vector(k-1));
       }
 
       /**
@@ -758,11 +781,12 @@ namespace stan {
        * <p>See <code>stan::prob::simplex_constrain(Eigen::Matrix,T&)</code>.
        *
        * @param k Size of simplex.
-       * @param lp Log probability to increment with log absolute Jacobian determinant.
+       * @param lp Log probability to increment with log absolute
+       * Jacobian determinant.
        * @return The next simplex of the specified size.
        */
-      Matrix<T,Dynamic,1> simplex_constrain(unsigned int k, T& lp) {
-	return stan::prob::simplex_constrain(vector(k-1),lp);
+      vector_t simplex_constrain(unsigned int k, T& lp) {
+        return stan::prob::simplex_constrain(vector(k-1),lp);
       }
 
       /**
@@ -775,11 +799,12 @@ namespace stan {
        * @return Vector of positive values in ascending order.
        * @throw std::runtime_error if the vector is not positive ordered
        */
-      Matrix<T,Dynamic,1> pos_ordered(unsigned int k) {
-	Matrix<T,Dynamic,1> x(vector(k));
-	if(!stan::prob::pos_ordered_validate(x)) 
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
-	return x;
+      vector_t pos_ordered(unsigned int k) {
+        vector_t x(vector(k));
+        if (!stan::prob::pos_ordered_validate(x)) 
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error ("vector is not positive ordered"));
+        return x;
       }
 
       /**
@@ -792,13 +817,14 @@ namespace stan {
        * @return Next positive, ordered vector of the specified
        * length.
        */
-      Matrix<T,Dynamic,1> pos_ordered_constrain(unsigned int k) {
-	return stan::prob::pos_ordered_constrain(vector(k));
+      vector_t pos_ordered_constrain(unsigned int k) {
+        return stan::prob::pos_ordered_constrain(vector(k));
       }
 
       /**
-       * Return the next positive ordered vector of the specified size, incrementing
-       * the specified reference with the log absolute Jacobian of the determinant.
+       * Return the next positive ordered vector of the specified
+       * size, incrementing the specified reference with the log
+       * absolute Jacobian of the determinant.
        *
        * <p>See <code>stan::prob::pos_ordered_constrain(Matrix,T&)</code>.
        *
@@ -806,10 +832,9 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return Next positive ordered vector of the specified size.
        */
-      Matrix<T,Dynamic,1> pos_ordered_constrain(unsigned int k, T& lp) {
-	return stan::prob::pos_ordered_constrain(vector(k),lp);
+      vector_t pos_ordered_constrain(unsigned int k, T& lp) {
+        return stan::prob::pos_ordered_constrain(vector(k),lp);
       }
-
 
       /**
        * Returns the next correlation matrix of the specified dimensionality.
@@ -820,11 +845,13 @@ namespace stan {
        * @return Next correlation matrix of the specified dimensionality.
        * @throw std::runtime_error if the matrix is not a correlation matrix
        */
-      Matrix<T,Dynamic,Dynamic> corr_matrix(unsigned int k) {
-	Matrix<T,Dynamic,Dynamic> x(matrix(k,k));
-	if(!stan::prob::corr_matrix_validate(x))
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("the matrix returned is not a valid correlation matrix"));
-	return x;
+      matrix_t corr_matrix(unsigned int k) {
+        matrix_t x(matrix(k,k));
+        if (!stan::prob::corr_matrix_validate(x))
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error(
+              "the matrix returned is not a valid correlation matrix"));
+        return x;
       }
 
       /**
@@ -835,8 +862,8 @@ namespace stan {
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
        */
-      Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(unsigned int k) {
-	return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
+      matrix_t corr_matrix_constrain(unsigned int k) {
+        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
       }
 
       /**
@@ -850,8 +877,9 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return The next correlation matrix of the specified dimensionality.
        */
-      Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(unsigned int k, T& lp) {
-	return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k,lp);
+      matrix_t corr_matrix_constrain(unsigned int k, T& lp) {
+        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
+                                                 k,lp);
       }
 
 
@@ -866,11 +894,13 @@ namespace stan {
        * @throw std::runtime_error if the matrix is not a valid
        *    covariance matrix
        */
-      Matrix<T,Dynamic,Dynamic> cov_matrix(unsigned int k) {
-	Matrix<T,Dynamic,Dynamic> y(matrix(k,k));
-	if(!stan::prob::cov_matrix_validate(y))
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("the matrix returned is not a valid covariance matrix"));
-	return y;
+      matrix_t cov_matrix(unsigned int k) {
+        matrix_t y(matrix(k,k));
+        if (!stan::prob::cov_matrix_validate(y))
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error(
+              "the matrix returned is not a valid covariance matrix"));
+        return y;
       }
 
 
@@ -882,8 +912,9 @@ namespace stan {
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
        */
-      Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(unsigned int k) {
-	return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),k);
+      matrix_t cov_matrix_constrain(unsigned int k) {
+        return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
+                                                k);
       }
 
       /**
@@ -897,10 +928,10 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return The next covariance matrix of the specified dimensionality.
        */
-      Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(unsigned int k, T& lp) {
-	return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),k,lp);
+      matrix_t cov_matrix_constrain(unsigned int k, T& lp) {
+        return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
+                                                k,lp);
       }
-
 
 
     };

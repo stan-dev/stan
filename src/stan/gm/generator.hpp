@@ -1,37 +1,14 @@
 #ifndef __STAN__GM__GENERATOR_HPP__
 #define __STAN__GM__GENERATOR_HPP__
 
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/get.hpp>
-#include <boost/variant/recursive_variant.hpp>
 
-#include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <istream>
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <stan/version.hpp>
-#include <stan/io/dump.hpp>
 #include <stan/gm/ast.hpp>
 
 namespace stan {
