@@ -9,6 +9,7 @@
 
 #include <stan/maths/matrix.hpp>
 #include <stan/maths/special_functions.hpp>
+
 #include <stan/prob/transform.hpp>
 
 namespace stan {
@@ -769,7 +770,7 @@ namespace stan {
        * @param k Number of dimensions in resulting simplex.
        * @return Simplex derived from next <code>k-1</code> scalars.
        */
-      vector_t simplex_constrain(unsigned int k) {
+      Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(unsigned int k) {
         return stan::prob::simplex_constrain(vector(k-1));
       }
 

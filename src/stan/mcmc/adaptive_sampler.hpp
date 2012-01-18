@@ -1,8 +1,7 @@
 #ifndef __STAN__MCMC__ADAPTIVE_SAMPLER_HPP__
 #define __STAN__MCMC__ADAPTIVE_SAMPLER_HPP__
 
-#include "stan/mcmc/sampler.hpp"
-
+#include <stan/mcmc/sampler.hpp>
 
 namespace stan {
 

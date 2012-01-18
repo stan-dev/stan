@@ -1,27 +1,22 @@
 TO DO
 =================================================
 
-* code review includes, so each file can be
-  included independently w/o relying on any
-  global includes
+* clean up dependencies
+  - only include as much as necessary
+  - no namespace or file-level includes
+  - templated matrix use
+  - simplify model includes with higher-level ones
 
 * range checks for std::vector accesses in model
 
 * eliminate tabs (replace w. 4 spaces)
-
-* include dependencies in compiled models
-  - top-level include headers
-  - clean up dependencies
-  - must be enough for all declared funs and agrads
- - just use top-level .hpp for Stan and for modules
 
 * error/exception policy throughout
   - maths
   - prob
   - matrix
 
-* sensible error messages everywhere with
-  variable names and line number/position
+* sensible error messages from parser
 
 * exceptions handled by samplers
   - rejection or restart?
@@ -36,10 +31,6 @@ TO DO
  - tarball
  - basic distro site
  - check cross-platform
-
-
-MAYBE PUNT
-=================================================
 
 * discrete samplers: 
 - Gibbs for small intervals

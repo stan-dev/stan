@@ -1,14 +1,15 @@
 #ifndef __STAN__MATHS__MATRIX_H__
 #define __STAN__MATHS__MATRIX_H__
 
-#include <vector>
-#include <Eigen/Dense>
 #include <stdexcept>
+#include <vector>
+
+#include <Eigen/Dense>
+
 
 namespace stan {
   
   namespace maths {
-
 
     /**
      * This is a traits structure for Eigen matrix types.
@@ -36,6 +37,26 @@ namespace stan {
        * Type of Eigen row vector.
        */
       typedef Eigen::Matrix<T,1,Eigen::Dynamic>  row_vector;
+
+      /**
+       * Type of Eigen diagonal matrix.
+       */
+      typedef Eigen::DiagonalMatrix<T,Eigen::Dynamic> diagonal_matrix;
+
+      /**
+       * Type of Eigen array shaped like a (column) vector.
+       */
+      typedef Eigen::Array<T,1,Eigen::Dynamic> array_vector;
+      
+      /**
+       * Type of Eigen array shaped like a row vector.
+       */
+      typedef Eigen::Array<T,Eigen::Dynamic,1> array_row_vector;
+
+      /**
+       * Type of Eigen array shaped like a matrix.
+       */
+      typedef Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> array_matrix;
     };      
     
     /**
@@ -65,18 +86,19 @@ namespace stan {
       }
 
       template <typename T>
-      void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x, 
+      void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
                   const std::vector<unsigned int>& dims, 
                   unsigned int pos) {
         x.resize(dims[pos]);
       }
 
       template <typename T>
-      void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+      void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x, 
                   const std::vector<unsigned int>& dims, 
                   unsigned int pos) {
         x.resize(dims[pos]);
       }
+
 
       void resize(double x, 
                   const std::vector<unsigned int>& dims, 

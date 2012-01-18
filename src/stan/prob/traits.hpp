@@ -10,7 +10,7 @@ namespace stan {
     /**
      * Template metaprogram to calculate whether a summand
      * needs to be included in a proportional (log) probability 
-     * calculations.  For usage, the first boolean parameter
+     * calculation.  For usage, the first boolean parameter
      * should be set to <code>true</code> if calculating
      * a term up to proportionality.  Other type parameters
      * should be included for all of the types of variables
@@ -26,27 +26,31 @@ namespace stan {
      * @tparam T1 First 
      */
     template <bool propto,
-	      typename T1=double, typename T2=double, 
-	      typename T3=double, typename T4=double,
-	      typename T5=double, typename T6=double>
+              typename T1=double, typename T2=double, 
+              typename T3=double, typename T4=double,
+              typename T5=double, typename T6=double>
     struct include_summand {
+
       /**
        * <code>true</code> if a term with the specified propto
        * value and subterm types should be included in a proportionality
        * calculation.
        */
       enum { 
-	value =  ( !propto
-		   || !stan::is_constant<T1>::value
-		   || !stan::is_constant<T2>::value
-		   || !stan::is_constant<T3>::value
-		   || !stan::is_constant<T4>::value 
-		   || !stan::is_constant<T5>::value 
-		   || !stan::is_constant<T6>::value  )
+        value =  ( !propto
+                   || !stan::is_constant<T1>::value
+                   || !stan::is_constant<T2>::value
+                   || !stan::is_constant<T3>::value
+                   || !stan::is_constant<T4>::value 
+                   || !stan::is_constant<T5>::value 
+                   || !stan::is_constant<T6>::value  )
+
       };
+
     };
 
   }
+
 }
 
 #endif

@@ -3,19 +3,20 @@
 
 #include <ctime>
 #include <vector>
+
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
-#include "stan/mcmc/adaptive_sampler.hpp"
-#include "stan/mcmc/dualaverage.hpp"
-#include "stan/maths/util.hpp"
+
+#include <stan/maths/util.hpp>
+#include <stan/mcmc/adaptive_sampler.hpp>
+#include <stan/mcmc/dualaverage.hpp>
+#include <stan/mcmc/util.hpp>
 
 namespace stan {
 
   namespace mcmc {
-
-    using namespace stan::util;
 
     /**
      * No-U-Turn Sampler (NUTS).
@@ -31,7 +32,7 @@ namespace stan {
     class nuts : public adaptive_sampler {
     protected:
       // Provides the target distribution we're trying to sample from
-      mcmc::prob_grad& _model;
+      prob_grad& _model;
     
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
@@ -72,9 +73,9 @@ namespace stan {
                                          std::vector<double>& mplus,
                                          std::vector<double>& mminus) {
         std::vector<double> total_direction;
-        sub(xplus, xminus, total_direction);
-        return (dot(total_direction, mminus) > 0) &&
-          (dot(total_direction, mplus) > 0);
+        stan::maths::sub(xplus, xminus, total_direction);
+        return stan::maths::dot(total_direction, mminus) > 0
+          && stan::maths::dot(total_direction, mplus) > 0;
       }
 
     public:
@@ -103,7 +104,7 @@ namespace stan {
        * @param random_seed Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
-      nuts(mcmc::prob_grad& model, 
+      nuts(prob_grad& model, 
            double delta = 0.6, 
            double epsilon = -1,
            BaseRNG base_rng = BaseRNG(std::time(0)))
@@ -208,7 +209,7 @@ namespace stan {
         std::vector<double> mplus(mminus);
         // The log-joint probability of the momentum and position terms, i.e.
         // -(kinetic energy + potential energy)
-        double H0 = -0.5 * dot_self(mminus) + _logp;
+        double H0 = -0.5 * stan::maths::dot_self(mminus) + _logp;
 
         std::vector<double> gradminus(_g);
         std::vector<double> gradplus(_g);
@@ -343,12 +344,12 @@ namespace stan {
           xplus = xminus;
           mplus = mminus;
           gradplus = gradminus;
-          double newH = newlogp - 0.5 * dot_self(mminus);
+          double newH = newlogp - 0.5 * stan::maths::dot_self(mminus);
           if (newH != newH) // treat nan as -inf
             newH = -std::numeric_limits<double>::infinity();
           nvalid = newH > u;
           criterion = newH - u > _maxchange;
-          prob_sum = min(1, exp(newH - H0));
+          prob_sum = stan::maths::min(1, exp(newH - H0));
           n_considered = 1;
           ++_nfevals;
         } else {            // depth >= 1

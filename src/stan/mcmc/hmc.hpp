@@ -3,19 +3,21 @@
 
 #include <ctime>
 #include <vector>
-#include <boost/random/normal_distribution.hpp>
+
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/random/variate_generator.hpp>
+#include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_01.hpp>
-#include "stan/mcmc/sampler.hpp"
-#include "stan/mcmc/prob_grad.hpp"
-#include "stan/maths/util.hpp"
+#include <boost/random/variate_generator.hpp>
+
+#include <stan/mcmc/prob_grad.hpp>
+#include <stan/mcmc/sampler.hpp>
+#include <stan/mcmc/util.hpp>
+#include <stan/maths/util.hpp>
 
 namespace stan {
 
   namespace mcmc {
 
-    using namespace stan::util;
 
     /**
      * Hamiltonian Monte Carlo sampler.
@@ -165,7 +167,7 @@ namespace stan {
         std::vector<double> m(_model.num_params_r());
         for (unsigned int i = 0; i < m.size(); ++i)
           m[i] = _rand_unit_norm();
-        double H = -(dot_self(m) / 2.0) + _logp; 
+        double H = -(stan::maths::dot_self(m) / 2.0) + _logp; 
         
         std::vector<double> g_new(_g);
         std::vector<double> x_new(_x);
@@ -176,7 +178,7 @@ namespace stan {
           logp_new = leapfrog(_model, _z, x_new, m, g_new, _epsilon);
         _nfevals += _L;
 
-        double H_new = -(dot_self(m) / 2.0) + logp_new;
+        double H_new = -(stan::maths::dot_self(m) / 2.0) + logp_new;
         double dH = H_new - H;
         if (_rand_uniform_01() < exp(dH)) {
           _x = x_new;

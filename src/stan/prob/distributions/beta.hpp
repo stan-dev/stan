@@ -7,6 +7,7 @@
 
 namespace stan {
   namespace prob {
+
     using boost::math::tools::promote_args;
     using boost::math::policies::policy;
 
@@ -43,6 +44,7 @@ namespace stan {
         return lp;
 
       using stan::maths::multiply_log;
+      using stan::maths::log1m;
       if (include_summand<propto,T_alpha,T_beta>::value)
         lp += lgamma(alpha + beta);
       if (include_summand<propto,T_alpha>::value)

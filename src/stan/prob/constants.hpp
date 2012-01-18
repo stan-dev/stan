@@ -4,11 +4,15 @@
 #include <boost/math/constants/constants.hpp>
 
 namespace stan {
+
   namespace prob {
-    using std::log;
-    using std::sqrt;
+
     
     namespace {
+
+      using std::log;
+
+      using std::sqrt;
    
       const double PI = boost::math::constants::pi<double>();
 
@@ -27,9 +31,11 @@ namespace stan {
       const double NEG_LOG_TWO_OVER_TWO = -LOG_TWO / 2.0;
 
       const double SQRT_2 = sqrt(2.0);
+
     }
  
  }
+
 }
 
 #endif

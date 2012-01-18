@@ -12,10 +12,6 @@ namespace stan {
   
   namespace prob {
 
-    using stan::maths::inv_logit;
-    using stan::maths::log1m;
-    using stan::maths::logit;
-
     using Eigen::Array;
     using Eigen::Dynamic;
     using Eigen::LDLT;
@@ -40,8 +36,8 @@ namespace stan {
     template<typename T>
     bool
     factor_cov_matrix(Array<T,Dynamic,1>& CPCs, // will fill this unbounded
-		      Array<T,Dynamic,1>& sds,  // will fill this unbounded
-		      const Matrix<T,Dynamic,Dynamic>& Sigma) {
+                      Array<T,Dynamic,1>& sds,  // will fill this unbounded
+                      const Matrix<T,Dynamic,Dynamic>& Sigma) {
 
       unsigned int K = sds.rows();
 
@@ -70,12 +66,12 @@ namespace stan {
       acc(0) = -0.0;
       acc.tail(pull) = 1.0 - temp.square();
       for(unsigned int i = 1; i < (K - 1); i++) {
-	position += pull;
-	pull--;
-	temp = U.row(i).tail(pull).array();
-	temp /= sqrt(acc.tail(pull) / acc(i));
-	CPCs.segment(position, pull) = temp;
-	acc.tail(pull) *= 1.0 - temp.square();
+        position += pull;
+        pull--;
+        temp = U.row(i).tail(pull).array();
+        temp /= sqrt(acc.tail(pull) / acc(i));
+        CPCs.segment(position, pull) = temp;
+        acc.tail(pull) *= 1.0 - temp.square();
       }
       CPCs = 0.5 * ( (1.0 + CPCs) / (1.0 - CPCs) ).log(); // now unbounded
       return true;
@@ -117,12 +113,12 @@ namespace stan {
       L.col(0).tail(pull) = temp = CPCs.head(pull);
       acc.tail(pull) = 1.0 - temp.square();
       for(unsigned int i = 1; i < (K - 1); i++) {
-	position += pull;
-	pull--;
-	temp = CPCs.segment(position, pull);
-	L(i,i) = sqrt(acc(i-1));
-	L.col(i).tail(pull) = temp * acc.tail(pull).sqrt();
-	acc.tail(pull) *= 1.0 - temp.square();
+        position += pull;
+        pull--;
+        temp = CPCs.segment(position, pull);
+        L(i,i) = sqrt(acc(i-1));
+        L.col(i).tail(pull) = temp * acc.tail(pull).sqrt();
+        acc.tail(pull) *= 1.0 - temp.square();
       }
       L(K-1,K-1) = sqrt(acc(K-2));
       return L.matrix();
@@ -187,16 +183,16 @@ namespace stan {
       T lead = K - 2.0;
       // no need to abs() because this Jacobian determinant is strictly positive (and triangular)
       for (unsigned int j = 0; j < (CPCs.rows() - 1); j++) {
-	// FIXME:  replace power 2
-	log_1cpc2 = log(1.0 - pow(CPCs[counter], 2));
-	log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
-	i++;
-	if (i > K) {
-	  k++;
-	  i = k + 1;
-	  lead = K - k - 1.0;
-	}
-	counter++;
+        // FIXME:  replace power 2
+        log_1cpc2 = log(1.0 - pow(CPCs[counter], 2));
+        log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
+        i++;
+        if (i > K) {
+          k++;
+          i = k + 1;
+          lead = K - k - 1.0;
+        }
+        counter++;
       }
       return read_corr_L(CPCs, K);
     }
@@ -244,10 +240,10 @@ namespace stan {
       const Array<T,Dynamic,1> log_sds = sds.log();
       // (diagonal and positive) Jacobian determinant for the mapping: correlations -> covariances
       for (unsigned int i = 0; i < (K - 1); i++) {
-	for (unsigned int j = i + 1; j < K; j++) {
-	  // log_prob += log_sds(i,1) + log_sds(j,1); // throws assert trap
-	  log_prob += log_sds[i] + log_sds[j]; // OK
-	}
+        for (unsigned int j = i + 1; j < K; j++) {
+          // log_prob += log_sds(i,1) + log_sds(j,1); // throws assert trap
+          log_prob += log_sds[i] + log_sds[j]; // OK
+        }
       }
 
       DiagonalMatrix<T,Dynamic> D(K);
@@ -278,7 +274,7 @@ namespace stan {
     template<typename T>
     Matrix<T,Dynamic,Dynamic>
     read_cov_matrix(const Array<T,Dynamic,1>& CPCs,    // on (-1,1)
-		    const Array<T,Dynamic,1>& sds) {   // on (0,inf)
+                    const Array<T,Dynamic,1>& sds) {   // on (0,inf)
 
       unsigned int K = sds.rows();
       DiagonalMatrix<T,Dynamic> D(K);
@@ -296,7 +292,7 @@ namespace stan {
     template<typename T>
     const Array<T,Dynamic,1>
     make_nu(const T eta,             // hyperparameter on (0,inf), eta = 1 <-> correlation matrix is uniform
-	    const unsigned int K) {  // number of variables in covariance matrix
+            const unsigned int K) {  // number of variables in covariance matrix
   
       Array<T,Dynamic,1> nu(K * (K - 1) / 2);
   
@@ -306,16 +302,16 @@ namespace stan {
       T alpha2 = 2.0 * alpha; 
 
       for (unsigned int j = 0; j < (K - 1); j++) {
-	nu(j) = alpha2;
+        nu(j) = alpha2;
       }
       unsigned int counter = K - 1;
       for (unsigned int i = 1; i < (K - 1); i++) {
-	alpha -= 0.5;
-	alpha2 = 2.0 * alpha;
-	for (unsigned int j = i + 1; j < K; j++) {
-	  nu(counter) = alpha2;
-	  counter++;
-	}
+        alpha -= 0.5;
+        alpha2 = 2.0 * alpha;
+        for (unsigned int j = i + 1; j < K; j++) {
+          nu(counter) = alpha2;
+          counter++;
+        }
       }
       return nu;
     }
@@ -467,7 +463,7 @@ namespace stan {
     template <typename T>
     T positive_free(const T y) {
       if (!positive_validate(y)) {
-	BOOST_THROW_EXCEPTION(std::domain_error ("y must be positive"));
+        BOOST_THROW_EXCEPTION(std::domain_error ("y must be positive"));
       }
       return log(y);
     }
@@ -545,7 +541,7 @@ namespace stan {
     inline
     T lb_free(const T y, const double lb) {
       if (!lb_validate(y,lb)) 
-	BOOST_THROW_EXCEPTION(std::invalid_argument ("y must be greater than the lower bound"));
+        BOOST_THROW_EXCEPTION(std::invalid_argument ("y must be greater than the lower bound"));
       return log(y - lb);
     }
     
@@ -628,7 +624,7 @@ namespace stan {
     template <typename T>
     T ub_free(const T y, const double ub) {
       if(!ub_validate(y,ub))
-	BOOST_THROW_EXCEPTION(std::invalid_argument ("y is greater than the upper bound"));
+        BOOST_THROW_EXCEPTION(std::invalid_argument ("y is greater than the upper bound"));
       return log(ub - y);
     }
 
@@ -654,6 +650,7 @@ namespace stan {
      */
     template <typename T>
     T lub_constrain(const T x, double lb, double ub) {
+      using stan::maths::inv_logit;
       return lb + (ub - lb) * inv_logit(x);
     }
 
@@ -680,6 +677,7 @@ namespace stan {
      */
     template <typename T>
     T lub_constrain(const T x, const double lb, const double ub, T& lp) {
+
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -739,8 +737,9 @@ namespace stan {
      */
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
+      using stan::maths::logit;
       if(!lub_validate(y,lb,ub)) 
-	throw std::invalid_argument("require lb <= y <= ub");
+        throw std::invalid_argument("require lb <= y <= ub");
       return logit((y - lb) / (ub - lb));
     }
 
@@ -762,6 +761,7 @@ namespace stan {
      */
     template <typename T>
     T prob_constrain(const T x) {
+      using stan::maths::inv_logit;
       return inv_logit(x);
     }
 
@@ -788,6 +788,8 @@ namespace stan {
      */
     template <typename T>
     T prob_constrain(const T x, T& lp) {
+      using stan::maths::inv_logit;
+      using stan::maths::log1m;
       T inv_logit_x = inv_logit(x);
       lp += log(inv_logit_x) + log1m(inv_logit_x);
       return inv_logit_x;
@@ -824,8 +826,9 @@ namespace stan {
      */
     template <typename T>
     T prob_free(const T y) {
+      using stan::maths::logit;
       if(!prob_validate(y))
-	throw std::domain_error("y is not a probability");
+        throw std::domain_error("y is not a probability");
       return logit(y);
     }
     
@@ -862,6 +865,7 @@ namespace stan {
      */
     template <typename T>
     T corr_constrain(const T x, T& lp) {
+      using stan::maths::log1m;
       T tanh_x = tanh(x);
       lp += log1m(tanh_x * tanh_x);
       return tanh_x;
@@ -929,7 +933,7 @@ namespace stan {
       Matrix<T,Dynamic,1> y(x.size() + 1);
       T max_x = x.maxCoeff();
       for (unsigned int k = 0; k < x.size(); ++k)
-	y[k] = exp(x[k] - max_x);
+        y[k] = exp(x[k] - max_x);
       y[x.size()] = exp(-max_x);
       return y / y.sum();
     }
@@ -973,10 +977,10 @@ namespace stan {
       unsigned int K_minus_1 = x.size();
       Matrix<T,Dynamic,Dynamic> J(K_minus_1,K_minus_1);
       for (unsigned int m = 0; m < K_minus_1; ++m) {
-	J(m,m) = y[m] * (1.0 - y[m]);
-	for (unsigned int n = m+1; n < K_minus_1; ++n) {
-	  J(m,n) = (J(n,m) = y[m] * y[n]);
-	}
+        J(m,m) = y[m] * (1.0 - y[m]);
+        for (unsigned int n = m+1; n < K_minus_1; ++n) {
+          J(m,n) = (J(n,m) = y[m] * y[n]);
+        }
       }
       lp += log(fabs(J.determinant()));
       return y;
@@ -997,12 +1001,12 @@ namespace stan {
     bool
     simplex_validate(const Matrix<T,Dynamic,1>& y) {
       if (y.size() == 0)
-	return false;
+        return false;
       if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
-	return false;
+        return false;
       for (unsigned int i = 0; i < y.size(); ++i) {
-	if (!(y[i] >= 0.0)) 
-	  return false;
+        if (!(y[i] >= 0.0)) 
+          return false;
       }
       return true;
     }
@@ -1032,12 +1036,12 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
       if(!simplex_validate(y))
-	throw std::domain_error("y is not a valid simplex");
+        throw std::domain_error("y is not a valid simplex");
       unsigned int k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
       Matrix<T,Dynamic,1> x(k_minus_1);
       for (unsigned int i = 0; i < k_minus_1; ++i)
-	x[i] = log(y[i]) - log_y_k_minus_1;
+        x[i] = log(y[i]) - log_y_k_minus_1;
       return x;
     }
 
@@ -1053,7 +1057,7 @@ namespace stan {
      * each dimension \f$k\f$,
      *
      * <p>\f$ f(x)[k] = \sum_{k' = 0}^{k} \exp(x[k])\f$
-     *	
+     *  
      * @param x Free vector of scalars.
      * @return Positive, increasing ordered vector.
      * @tparam T Type of scalar.
@@ -1063,9 +1067,9 @@ namespace stan {
       unsigned int k = x.size();
       Matrix<T,Dynamic,1> y(k);
       if (k > 0)
-	y[0] = exp(x[0]);
+        y[0] = exp(x[0]);
       for (unsigned int i = 1; i < k; ++i)
-	y[i] = y[i-1] + exp(x[i]);
+        y[i] = y[i-1] + exp(x[i]);
       return y;
     }
 
@@ -1094,7 +1098,7 @@ namespace stan {
      * <p>\f${} = \log \prod_{k=0}^{K-1} \exp(x[k])\f$
      *
      * <p>\f${} = \sum_{k=0}^{K-1} x[k]\f$.
-     *	
+     *  
      * @param x Free vector of scalars.
      * @param lp Log probability reference.
      * @return Positive, increasing ordered vector. 
@@ -1122,8 +1126,8 @@ namespace stan {
       if (y.size() == 0) return true;
       if (!(y[0] > 0.0)) return false;
       for (unsigned int k = 1; k < y.size(); ++k) {
-	if (!(y[k] > y[k-1]))
-	  return false;
+        if (!(y[k] > y[k-1]))
+          return false;
       }
       return true;
     }
@@ -1146,14 +1150,14 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
       if(!pos_ordered_validate(y)) 
-	throw std::domain_error("y is not a vector of positive ordered scalars");
+        throw std::domain_error("y is not a vector of positive ordered scalars");
       unsigned int k = y.size();
       Matrix<T,Dynamic,1> x(k);
       if (k == 0) 
-	return x;
+        return x;
       x[0] = log(y[0]);
       for (unsigned int i = 1; i < k; ++i)
-	x[i] = log(y[i] - y[i-1]);
+        x[i] = log(y[i] - y[i-1]);
       return x;
     }
     
@@ -1184,13 +1188,13 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x,
-						    unsigned int k) {
+                                                    unsigned int k) {
       unsigned int k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
-	throw std::invalid_argument ("x is not a valid correlation matrix");
+        throw std::invalid_argument ("x is not a valid correlation matrix");
       Array<T,Dynamic,1> cpcs(k_choose_2);
       for (unsigned int i = 0; i < k_choose_2; ++i)
-	cpcs[i] = corr_constrain(x[i]);
+        cpcs[i] = corr_constrain(x[i]);
       return read_corr_matrix(cpcs,k); 
     }
 
@@ -1215,15 +1219,15 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-						    unsigned int k,
-						    T& lp) {
+                                                    unsigned int k,
+                                                    T& lp) {
       unsigned int k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
-	throw std::invalid_argument ("x is not a valid correlation matrix");
+        throw std::invalid_argument ("x is not a valid correlation matrix");
       
       Array<T,Dynamic,1> cpcs(k_choose_2);
       for (unsigned int i = 0; i < k_choose_2; ++i)
-	cpcs[i] = corr_constrain(x[i],lp);
+        cpcs[i] = corr_constrain(x[i],lp);
       return read_corr_matrix(cpcs,k,lp);
     }
 
@@ -1245,10 +1249,10 @@ namespace stan {
     template <typename T>
     bool corr_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
       if (!cov_matrix_validate(y))
-	return false;
+        return false;
       for (unsigned int k = 0; k < y.rows(); ++k) {
-	if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
-	  return false;
+        if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
+          return false;
       }
       return true;
     }
@@ -1277,17 +1281,17 @@ namespace stan {
     Matrix<T,Dynamic,1> corr_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
       unsigned int k = y.rows();
       if (y.cols() != k || k == 0)
-	throw std::domain_error("y is not a square matrix or there are no elements");
+        throw std::domain_error("y is not a square matrix or there are no elements");
       unsigned int k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> x(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(x,sds,y);
       if (!successful)
-	throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
+        throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       for (unsigned int i = 0; i < k; ++i) {
-	// sds on log scale unconstrained
-	if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
-	  BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
+        // sds on log scale unconstrained
+        if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
+          BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
       }
       return x.matrix();
     }
@@ -1316,15 +1320,15 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-						   unsigned int k) {
+                                                   unsigned int k) {
       unsigned int k_choose_2 = (k * (k - 1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
       for (unsigned int i = 0; i < k_choose_2; ++i)
-	cpcs[i] = corr_constrain(x[pos++]);
+        cpcs[i] = corr_constrain(x[pos++]);
       Array<T,Dynamic,1> sds(k);
       for (unsigned int i = 0; i < k; ++i)
-	sds[i] = positive_constrain(x[pos++]);
+        sds[i] = positive_constrain(x[pos++]);
       return read_cov_matrix(cpcs, sds);
     }
 
@@ -1353,16 +1357,16 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-						   unsigned int k, 
-						   T& lp) {
+                                                   unsigned int k, 
+                                                   T& lp) {
       unsigned int k_choose_2 = (k * (k - 1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
       for (unsigned int i = 0; i < k_choose_2; ++i)
-	cpcs[i] = corr_constrain(x[pos++]);
+        cpcs[i] = corr_constrain(x[pos++]);
       Array<T,Dynamic,1> sds(k);
       for (unsigned int i = 0; i < k; ++i)
-	sds[i] = positive_constrain(x[pos++]);
+        sds[i] = positive_constrain(x[pos++]);
       return read_cov_matrix(cpcs, sds, lp);
     }
 
@@ -1379,13 +1383,13 @@ namespace stan {
     bool symmetry_validate(const Matrix<T,Dynamic,Dynamic>& y) {
       unsigned int k = y.rows();
       if (k == 1)
-	return true;
+        return true;
       
       for (unsigned int m = 0; m < k; ++m) {
-	for (unsigned int n = m + 1; n < k; ++n) {
-	  if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
-	    return false;
-	}
+        for (unsigned int n = m + 1; n < k; ++n) {
+          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
+            return false;
+        }
       }
       return true;
     }
@@ -1403,11 +1407,11 @@ namespace stan {
     template <typename T>
     bool pd_validate(const Matrix<T,Dynamic,Dynamic>& y) {
       if (y.rows() == 1)
-	return y(0,0) > CONSTRAINT_TOLERANCE;
+        return y(0,0) > CONSTRAINT_TOLERANCE;
       
       LDLT< Matrix<T,Dynamic,Dynamic> > cholesky = y.ldlt();
       if( (cholesky.vectorD().array() > CONSTRAINT_TOLERANCE).all() )
-	return true;
+        return true;
       
       return false;
     }
@@ -1424,13 +1428,13 @@ namespace stan {
     template <typename T>
     bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
       if (y.rows() != y.cols() || y.rows() == 0)
-	return false;
+        return false;
 
       if (!symmetry_validate(y))
-	return false;
+        return false;
 
       if (!pd_validate(y))
-	return false;
+        return false;
 
       return true;
     }
@@ -1448,18 +1452,18 @@ namespace stan {
     template <typename T>
     bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostream& err_msg) {
       if (y.rows() != y.cols() || y.rows() == 0) {
-	err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
-	return false;
+        err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
+        return false;
       }
 
       if (!symmetry_validate(y)) {
-	err_msg << "Matrix is not symmetric";
-	return false;
+        err_msg << "Matrix is not symmetric";
+        return false;
       }
 
       if (!pd_validate(y)) {
-	err_msg << "Matrix is not positive definite";
-	return false;
+        err_msg << "Matrix is not positive definite";
+        return false;
       }
       
       return true;
@@ -1487,19 +1491,19 @@ namespace stan {
     Matrix<T,Dynamic,1> cov_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
       unsigned int k = y.rows();
       if (y.cols() != k || k == 0)
-	throw std::domain_error("y is not a square matrix or there are no elements");
+        throw std::domain_error("y is not a square matrix or there are no elements");
       unsigned int k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(cpcs,sds,y);
       if (!successful)
-	throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
+        throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       Matrix<T,Dynamic,1> x(k_choose_2 + k);
       unsigned int pos = 0;
       for (unsigned int i = 0; i < k_choose_2; ++i)
-	x[pos++] = cpcs[i];
+        x[pos++] = cpcs[i];
       for (unsigned int i = 0; i < k; ++i)
-	x[pos++] = sds[i];
+        x[pos++] = sds[i];
       return x;
     }
 

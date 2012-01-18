@@ -10,5 +10,6 @@
 #include "stan/mcmc/prob_grad.hpp"
 #include "stan/mcmc/prob_grad_ad.hpp"
 #include "stan/mcmc/sampler.hpp"
+#include "stan/mcmc/util.hpp"
 
 #endif

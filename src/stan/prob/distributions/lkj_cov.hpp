@@ -1,6 +1,10 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__LKJ_COV_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__LKJ_COV_HPP__
 
+#include <Eigen/Dense>
+
+#include <stan/maths/matrix.hpp>
+
 #include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
@@ -13,6 +17,8 @@ namespace stan {
     using boost::math::tools::promote_args;
     using boost::math::policies::policy;
 
+    using Eigen::Array;
+    using Eigen::DiagonalMatrix;
     using Eigen::Matrix;
     using Eigen::Dynamic;
     
@@ -22,9 +28,9 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale, typename T_shape, 
               class Policy = policy<> >
     inline typename promote_args<T_y,T_loc,T_scale,T_shape>::type
-    lkj_cov_log(const Matrix<T_y,Dynamic,Dynamic>& y,
-                const Matrix<T_loc,Dynamic,1>& mu,
-                const Matrix<T_scale,Dynamic,1>& sigma,
+    lkj_cov_log(const typename stan::maths::EigenType<T_y>::matrix& y,
+                const typename stan::maths::EigenType<T_loc>::vector& mu,
+                const typename stan::maths::EigenType<T_scale>::vector& sigma,
                 const T_shape& eta,
                 const Policy& = Policy()) {
       static const std::string function = "lkj_cov_log<%1>";

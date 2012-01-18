@@ -1,12 +1,15 @@
 #ifndef __STAN__MCMC__DUALAVERAGE_H__
 #define __STAN__MCMC__DUALAVERAGE_H__
 
+#include <cmath>
+
 #include <vector>
 
-#include <math.h>
 
 namespace stan {
+
   namespace mcmc {
+
     /**
      * Class implementing Nesterov's dual average algorithm.  Use by
      * repeatedly calling update() with the gradient evaluated at

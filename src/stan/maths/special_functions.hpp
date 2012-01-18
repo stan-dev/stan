@@ -2,6 +2,7 @@
 #define __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
 
 #include <stdexcept>
+
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
@@ -10,9 +11,6 @@ namespace stan {
 
   namespace maths {
 
-
-    // for promote_args<> return types, see:
-    // http://www.boost.org/doc/libs/1_46_0/libs/math/doc/sf_and_dist/html/math_toolkit/main_overview/result_type.html
 
     // C99 
 
@@ -142,8 +140,8 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     beta_log(T a, T b) {
       return lgamma(a)
-	+ lgamma(b)
-	- lgamma(a + b);
+        + lgamma(b)
+        - lgamma(a + b);
     }
 
     /**
@@ -168,8 +166,8 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_N, T_n>::type
     binomial_coefficient_log(T_N N, T_n n) {
       return lgamma(N + 1.0)
-	- lgamma(n + 1.0)
-	- lgamma(N - n + 1.0);
+        - lgamma(n + 1.0)
+        - lgamma(N - n + 1.0);
     }
 
     /**
@@ -281,13 +279,13 @@ namespace stan {
     namespace {
       template <typename Vector, typename Scalar>
       int maximum(const Vector& x) {
-	if(x.size() == 0)
-	  BOOST_THROW_EXCEPTION(std::invalid_argument ("x must have at least one element"));
-	Scalar max_x(x[0]);
-	for (unsigned int i = 1; i < x.size(); ++i)
-	  if (x[i] < max_x)
-	    max_x = x[i];
-	return max_x;
+        if(x.size() == 0)
+          BOOST_THROW_EXCEPTION(std::invalid_argument ("x must have at least one element"));
+        Scalar max_x(x[0]);
+        for (unsigned int i = 1; i < x.size(); ++i)
+          if (x[i] < max_x)
+            max_x = x[i];
+        return max_x;
       }
     }
 
@@ -344,13 +342,13 @@ namespace stan {
     template <typename Vector, typename Scalar>
     void softmax(const Vector& x, Vector& simplex) {
       if(x.size() != simplex.size()) 
-	BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
+        BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
       Scalar sum(0.0); 
       Scalar max_x = maximum<Vector,Scalar>(x);
       for (unsigned int i = 0; i < x.size(); ++i)
-	sum += (simplex[i] = exp(x[i]-max_x));
+        sum += (simplex[i] = exp(x[i]-max_x));
       for (unsigned int i = 0; i < x.size(); ++i)
-	simplex[i] /= sum;
+        simplex[i] /= sum;
     }
 
     
@@ -379,9 +377,9 @@ namespace stan {
     template <typename Vector>
     void inverse_softmax(const Vector& simplex, Vector& y) {
       if(simplex.size() != y.size())
-	BOOST_THROW_EXCEPTION(std::invalid_argument ("simplex.size() != y.size()"));
+        BOOST_THROW_EXCEPTION(std::invalid_argument ("simplex.size() != y.size()"));
       for (unsigned int i = 0; i < simplex.size(); ++i)
-	y[i] = log(simplex[i]);
+        y[i] = log(simplex[i]);
     }
 
     /**
@@ -397,7 +395,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     log1p(T x) {
       if (x < -1)
-	BOOST_THROW_EXCEPTION (std::domain_error ("x can not be less than -1"));
+        BOOST_THROW_EXCEPTION (std::domain_error ("x can not be less than -1"));
       T absx = fabs(x);
       //double absx = fabs(stan::agrad::as_double(x));
 
@@ -450,9 +448,9 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     lmgamma(unsigned int k, T x) {
       typename boost::math::tools::promote_args<T>::type result 
-	= k * (k - 1) * LOG_PI_OVER_FOUR;
+        = k * (k - 1) * LOG_PI_OVER_FOUR;
       for (unsigned int j = 1; j <= k; ++j)
-	result += lgamma(x + (1.0 - j) / 2.0);
+        result += lgamma(x + (1.0 - j) / 2.0);
       return result;
     }
       
@@ -501,7 +499,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_a,T_b>::type
     multiply_log(T_a a, T_b b) {
       if (b==0 && a==0)
-	return 0.0;
+        return 0.0;
       return a * log(b);
     }
 
@@ -517,7 +515,7 @@ namespace stan {
      */
     inline double log_sum_exp(const double& a, const double& b) {
       if (a > b)
-	return a + log1p(exp(b - a));
+        return a + log1p(exp(b - a));
       return b + log1p(exp(a - b));
     }
 
@@ -538,13 +536,13 @@ namespace stan {
       using std::exp;
       double max = -numeric_limits<double>::infinity();
       for (unsigned int ii = 0; ii < x.size(); ii++) 
-	if (x[ii] > max) 
-	  max = x[ii];
+        if (x[ii] > max) 
+          max = x[ii];
             
       double sum = 0.0;
       for (unsigned int ii = 0; ii < x.size(); ii++) 
-	if (x[ii] != -numeric_limits<double>::infinity()) 
-	  sum += exp(x[ii] - max);
+        if (x[ii] != -numeric_limits<double>::infinity()) 
+          sum += exp(x[ii] - max);
           
       return max + log(sum);
     }
