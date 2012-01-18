@@ -5,7 +5,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-TEST(ProbDistributions,Wishart2x2) {
+TEST(ProbDistributionsWishart,2x2) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;
@@ -20,7 +20,7 @@ TEST(ProbDistributions,Wishart2x2) {
  
   EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma), 0.01);
 }
-TEST(ProbDistributions,Wishart4x4) {
+TEST(ProbDistributionsWishart,4x4) {
   Matrix<double,Dynamic,Dynamic> Y(4,4);
   Y << 7.988168,  -9.555605, -14.47483,   4.395895,
     -9.555605,  44.750570,  49.21577, -18.454186,
@@ -41,7 +41,7 @@ TEST(ProbDistributions,Wishart4x4) {
   log_p = log(1.517951e-10);
   EXPECT_NEAR(log_p, stan::prob::wishart_log(Y,dof,Sigma),0.01);
 }
-TEST(ProbDistributions,Wishart2x2Propto) {
+TEST(ProbDistributionsWishart,2x2Propto) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;
@@ -54,7 +54,7 @@ TEST(ProbDistributions,Wishart2x2Propto) {
  
   EXPECT_FLOAT_EQ(0.0, stan::prob::wishart_log<true>(Y,dof,Sigma));
 }
-TEST(ProbDistributions,Wishart4x4Propto) {
+TEST(ProbDistributionsWishart,4x4Propto) {
   Matrix<double,Dynamic,Dynamic> Y(4,4);
   Y << 7.988168,  -9.555605, -14.47483,   4.395895,
     -9.555605,  44.750570,  49.21577, -18.454186,
@@ -72,4 +72,94 @@ TEST(ProbDistributions,Wishart4x4Propto) {
   
   dof = 5;
   EXPECT_FLOAT_EQ(0.0, stan::prob::wishart_log<true>(Y,dof,Sigma));
+}
+
+using boost::math::policies::policy;
+using boost::math::policies::evaluation_error;
+using boost::math::policies::domain_error;
+using boost::math::policies::overflow_error;
+using boost::math::policies::domain_error;
+using boost::math::policies::pole_error;
+using boost::math::policies::errno_on_error;
+
+typedef policy<
+  domain_error<errno_on_error>, 
+  pole_error<errno_on_error>,
+  overflow_error<errno_on_error>,
+  evaluation_error<errno_on_error> 
+  > errno_policy;
+
+using stan::prob::wishart_log;
+
+TEST(ProbDistributionsWishart,DefaultPolicy) {
+  Matrix<double,Dynamic,Dynamic> Sigma;
+  Matrix<double,Dynamic,Dynamic> Y;
+  double nu;
+  
+  Sigma.resize(1,1);
+  Y.resize(1,1);
+  nu = 1;
+  EXPECT_NO_THROW(wishart_log(Y, nu, Sigma));
+  
+  nu = 5;
+  Sigma.resize(2,1);
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+
+  nu = 5;
+  Sigma.resize(2,2);
+  Y.resize(2,1);
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+  
+  nu = 5;
+  Sigma.resize(2,2);
+  Y.resize(3,3);
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+
+  Sigma.resize(3,3);
+  Y.resize(3,3);
+  nu = 2;
+  EXPECT_NO_THROW(wishart_log(Y, nu, Sigma));
+  nu = 1;
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+}
+TEST(ProbDistributionsWishart,ErrnoPolicy) {
+  Matrix<double,Dynamic,Dynamic> Sigma;
+  Matrix<double,Dynamic,Dynamic> Y;
+  double nu;
+  double result;
+  
+  Sigma.resize(1,1);
+  Y.resize(1,1);
+  nu = 1;
+  result = wishart_log(Y, nu, Sigma, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+
+  nu = 5;
+  Sigma.resize(2,1);
+  result = wishart_log(Y, nu, Sigma, errno_policy());
+  EXPECT_TRUE(std::isnan(result));
+
+  nu = 5;
+  Sigma.resize(2,2);
+  Y.resize(2,1);
+  result = wishart_log(Y, nu, Sigma, errno_policy());
+  EXPECT_TRUE(std::isnan(result));
+  
+  nu = 5;
+  Sigma.resize(2,2);
+  Y.resize(3,3);
+  result = wishart_log(Y, nu, Sigma, errno_policy());
+  EXPECT_TRUE(std::isnan(result));
+
+  Sigma.resize(3,3);
+  Sigma << 1,0,0, 0,1,0, 0,0,1;
+  Y.resize(3,3);
+  Y << 1,0,0, 0,1,0, 0,0,1;
+  nu = 2;
+  result = wishart_log(Y, nu, Sigma, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+  
+  nu = 1;
+  result = wishart_log(Y, nu, Sigma, errno_policy());
+  EXPECT_TRUE(std::isnan(result));
 }

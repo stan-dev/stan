@@ -45,19 +45,27 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto = false,
-	      typename T_y, typename T_dof, typename T_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_dof, typename T_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_scale>::type
     wishart_log(const Matrix<T_y,Dynamic,Dynamic>& W,
-		const T_dof& nu,
-		const Matrix<T_scale,Dynamic,Dynamic>& S,
-		const Policy& = Policy()) {
+                const T_dof& nu,
+                const Matrix<T_scale,Dynamic,Dynamic>& S,
+                const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
       unsigned int k = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
-	return lp;
+      if(!stan::prob::check_nonnegative(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, S.rows(), S.cols(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
+        return lp;
+      if (!check_nonnegative(function, 1+nu-k, "nu - S.rows() + 1", &lp, Policy()))
+        return lp;
       // FIXME: domain checks
       
       using stan::maths::multiply_log;
@@ -68,16 +76,16 @@ namespace stan {
       using stan::maths::trace;
 
       if (include_summand<propto,T_y,T_dof>::value)
-	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
+        lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       if (include_summand<propto,T_y,T_dof>::value)
-	lp -= lmgamma(k, 0.5 * nu);
+        lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp -= multiply_log(0.5*nu, determinant(S));
+        lp -= multiply_log(0.5*nu, determinant(S));
       if (include_summand<propto,T_scale,T_y>::value)
-	lp -= 0.5 * fabs(trace(multiply(inverse(S), W)));
+        lp -= 0.5 * fabs(trace(multiply(inverse(S), W)));
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
-	if (nu != (k + 1))
-	  lp += 0.5 * multiply_log(nu-k-1.0, determinant(W));
+        if (nu != (k + 1))
+          lp += 0.5 * multiply_log(nu-k-1.0, determinant(W));
       }
       
       return lp;

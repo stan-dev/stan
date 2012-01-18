@@ -9,11 +9,11 @@
 #include <stan/prob/distributions/multi_normal.hpp>
 #include <stan/prob/distributions/gamma.hpp>
 #include <stan/prob/distributions/inv_gamma.hpp>
-#include "stan/prob/distributions/chi_square.hpp"
-#include "stan/prob/distributions/inv_chi_square.hpp"
-#include "stan/prob/distributions/scaled_inv_chi_square.hpp"
-#include "stan/prob/distributions/exponential.hpp"
-#include "stan/prob/distributions/wishart.hpp"
+#include <stan/prob/distributions/chi_square.hpp>
+#include <stan/prob/distributions/inv_chi_square.hpp>
+#include <stan/prob/distributions/scaled_inv_chi_square.hpp>
+#include <stan/prob/distributions/exponential.hpp>
+#include <stan/prob/distributions/wishart.hpp>
 #include "stan/prob/distributions/inv_wishart.hpp"
 #include "stan/prob/distributions/student_t.hpp"
 #include "stan/prob/distributions/beta.hpp"

@@ -262,15 +262,6 @@ namespace stan {
                                   const char* name,
                                   T_result* result,
                                   const Policy& /*pol*/) {
-      if (std::numeric_limits<unsigned int>::has_infinity &&
-          x == std::numeric_limits<unsigned int>::infinity() ) {
-        std::string message(name);
-        message += " is %1%, but must be finite and >= 0!";
-        *result = raise_domain_error<unsigned int>(function,
-                                                   message.c_str(), 
-                                                   x, Policy());
-        return false;
-      }
       return true;
     }
 
@@ -363,11 +354,11 @@ namespace stan {
                                  const Policy& /*pol*/) {
       if (i != j) {
         std::ostringstream msg;
-        msg << "i and j must be same.  Found i=" << i << " j=" << j;
-        *result = raise_domain_error<T_result>(function,
-                                               msg.str().c_str(),
-                                               i,
-                                               Policy());
+        msg << "i and j must be same.  Found i=%1%, j=" << j;
+        *result = raise_domain_error<double>(function,
+                                             msg.str().c_str(),
+                                             i,
+                                             Policy());
         return false;
       }
       return true;

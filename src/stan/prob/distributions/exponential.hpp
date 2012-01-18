@@ -30,22 +30,22 @@ namespace stan {
      * @tparam T_inv_scale Type of inverse scale.
      */
     template <bool propto = false,
-	      typename T_y, typename T_inv_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_inv_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::exponential_log<%1%>(%1%)";
 
       typename promote_args<T_y,T_inv_scale>::type lp(0.0);
-      if(!stan::prob::check_inv_scale(function, beta, &lp, Policy()))
-	return lp;
-      if(!stan::prob::check_x(function, y, &lp, Policy()))
-	return lp;
+      if(!stan::prob::check_positive(function, beta, "Inverse scale", &lp, Policy()))
+        return lp;
+      if(!stan::prob::check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
       
       if (include_summand<propto,T_inv_scale>::value)
-	lp += log(beta);
+        lp += log(beta);
       if (include_summand<propto,T_y,T_inv_scale>::value)
-	lp -= beta * y;
+        lp -= beta * y;
       return lp;
     }
     
@@ -62,24 +62,25 @@ namespace stan {
      * @tparam T_inv_scale Type of inverse scale.
      */
     template <bool propto = false, 
-	      typename T_y, typename T_inv_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_inv_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_inv_scale>::type
     exponential_p(const T_y& y, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::exponential_p<%1%>(%1%)";
 
       typename promote_args<T_y,T_inv_scale>::type lp(0.0);
-      if(!stan::prob::check_inv_scale(function, beta, &lp, Policy()))
-	return lp;
-      if(!stan::prob::check_x(function, y, &lp, Policy()))
-	return lp;
+      if(!stan::prob::check_positive(function, beta, "Inverse scale", &lp, Policy()))
+        return lp;
+      if(!stan::prob::check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
       
       if (y < 0)
-	return lp;
+        return lp;
       
+      lp = 1.0;
       if (include_summand<propto>::value)
-	return 1.0 - exp(-beta * y);
-      return 1.0;
+        lp -= exp(-beta * y);
+      return lp;
     }
 
 

@@ -30,27 +30,30 @@ namespace stan {
      * @tparam T_dof Type of degrees of freedom.
      */
     template <bool propto = false,
-	      typename T_y, typename T_dof, 
-	      class Policy = policy<> >
+              typename T_y, typename T_dof, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_dof>::type
     inv_chi_square_log(const T_y& y, const T_dof& nu, const Policy& = Policy()) {
       static const char* function = "stan::prob::inv_chi_square_log<%1%>(%1%)";
       
       typename promote_args<T_y,T_dof>::type lp(0.0);
-      if (!stan::prob::check_positive (function, nu, "Degrees of freedom", &lp, Policy()))
-	return lp;
-      if (!stan::prob::check_positive (function, y, "Random variate y", &lp, Policy()))
-	return lp;
+      if (!stan::prob::check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
+        return lp;
+      if (!stan::prob::check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
       
       using boost::math::lgamma;
       using stan::maths::multiply_log;
+      
+      if (y <= 0)
+        return LOG_ZERO;
 
       if (include_summand<propto,T_dof>::value)
-	lp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
+        lp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
       if (include_summand<propto,T_y,T_dof>::value)
-	lp -= multiply_log(0.5*nu+1.0, y);
+        lp -= multiply_log(0.5*nu+1.0, y);
       if (include_summand<propto,T_y>::value)
-	lp -= 0.5 / y;
+        lp -= 0.5 / y;
       return lp;
     }
     

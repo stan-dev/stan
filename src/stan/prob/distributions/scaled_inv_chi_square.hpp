@@ -34,34 +34,37 @@ namespace stan {
      * @tparam T_dof Type of degrees of freedom.
      */
     template <bool propto = false,
-	      typename T_y, typename T_dof, typename T_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_dof, typename T_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
-			      const Policy& = Policy()) {
+                              const Policy& = Policy()) {
       static const char* function = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
       
       using stan::maths::multiply_log;
       using stan::maths::square;
 
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if (!check_positive (function, nu, "Degrees of freedom", &lp, Policy()))
-	return lp;
-      if (!check_scale (function, s, &lp, Policy()))
-	return lp;
-      if (!check_positive (function, y, "Random variate y", &lp, Policy()))
-	return lp;
+      if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
+        return lp;
+      if (!check_positive(function, s, "Scale", &lp, Policy()))
+        return lp;
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
+
+      if (y <= 0)
+        return LOG_ZERO;
       
       if (include_summand<propto,T_dof>::value) {
-	T_dof half_nu = 0.5 * nu;
-	lp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
+        T_dof half_nu = 0.5 * nu;
+        lp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
       }
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp += nu * log(s);
+        lp += nu * log(s);
       if (include_summand<propto,T_dof,T_y>::value)
-	lp -= multiply_log(nu*0.5+1.0, y);
+        lp -= multiply_log(nu*0.5+1.0, y);
       if (include_summand<propto,T_dof,T_y,T_scale>::value)
-	lp -= nu * 0.5 * square(s) / y;
+        lp -= nu * 0.5 * square(s) / y;
       return lp;
     }
 
