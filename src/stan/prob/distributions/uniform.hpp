@@ -7,10 +7,9 @@
 
 
 namespace stan {
+
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-    
+
     // CONTINUOUS, UNIVARIATE DENSITIES
     /**
      * The log of a uniform density for the given 
@@ -35,15 +34,15 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_low, typename T_high, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_low,T_high>::type
+              class Policy = default_policy>
+    inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
       
-      typename promote_args<T_y,T_low,T_high>::type lp(0.0);
-      if(!stan::prob::check_not_nan(function, y, "y", &lp, Policy()))
+      typename boost::math::tools::promote_args<T_y,T_low,T_high>::type lp(0.0);
+      if(!check_not_nan(function, y, "y", &lp, Policy()))
         return lp;
-      if(!stan::prob::check_bounds(function, alpha, beta, &lp, Policy()))
+      if(!check_bounds(function, alpha, beta, &lp, Policy()))
         return lp;
       
       if (y < alpha || y > beta)

@@ -58,6 +58,15 @@ TO DO
 EXTENSIONS
 =================================================
 
+* Ben's implicit function idea -- iterative solver,
+  analytic derivative
+
+* smallest posterior interval (SPIn) as default 
+
+* complement to the current foo<false> propto, so that
+  normal_log<false>(...)
+    = normal_log_adj_propto(...) + normal_log<true>(...)
+
 * merging and monitoring several threads/processes
 
 * remove all [] Eigen vector accesses and replace with ()

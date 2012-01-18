@@ -15,6 +15,13 @@ namespace stan {
 
   namespace prob {
 
+
+    /**
+     * Default error-handling policy from Boost.
+     */
+    typedef boost::math::policies::policy<> default_policy;
+
+
     /**
      * Checks if the variable y is nan.
      */
