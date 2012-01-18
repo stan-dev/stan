@@ -45,13 +45,13 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto = false, 
-	      typename T_y, typename T_dof, typename T_scale, 
-	      class Policy = policy<> >
+              typename T_y, typename T_dof, typename T_scale, 
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_scale>::type
     inv_wishart_log(const Matrix<T_y,Dynamic,Dynamic>& W,
-		    const T_dof& nu,
-		    const Matrix<T_scale,Dynamic,Dynamic>& S,
-		    const Policy& = Policy()) {
+                    const T_dof& nu,
+                    const Matrix<T_scale,Dynamic,Dynamic>& S,
+                    const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
       using stan::maths::multiply_log;
@@ -63,20 +63,26 @@ namespace stan {
 
       unsigned int k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!stan::prob::check_positive(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
-	return lp;
+      if(!check_nonnegative(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, S.rows(), S.cols(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
+        return lp;
       // FIXME: domain checks
 
       if (include_summand<propto,T_dof>::value)
-	lp -= lmgamma(k, 0.5 * nu);
+        lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp += multiply_log(0.5*nu, determinant(S));
+        lp += multiply_log(0.5*nu, determinant(S));
       if (include_summand<propto,T_y,T_dof,T_scale>::value)
-	lp -= multiply_log(0.5*(nu+k+1.0), determinant(W));
+        lp -= multiply_log(0.5*(nu+k+1.0), determinant(W));
       if (include_summand<propto,T_y,T_scale>::value)
-	lp -= 0.5 * trace(multiply(S, inverse(W)));
+        lp -= 0.5 * trace(multiply(S, inverse(W)));
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
+        lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       return lp;
     }
   }
