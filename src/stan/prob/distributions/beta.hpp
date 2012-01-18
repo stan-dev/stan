@@ -40,8 +40,11 @@ namespace stan {
         return lp;
       if(!stan::prob::check_positive(function, beta, "Prior sample size, beta,", &lp, Policy()))
         return lp;
-      if(!stan::prob::check_bounded_x(function, y, 0, 1, &lp, Policy()))
+      if(!stan::prob::check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
+      
+      if (y < 0.0 || y > 1.0)
+        return LOG_ZERO;
 
       using stan::maths::multiply_log;
       using stan::maths::log1m;
