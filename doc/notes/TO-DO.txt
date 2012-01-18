@@ -58,6 +58,8 @@ TO DO
 EXTENSIONS
 =================================================
 
+* Watanabe's WAIC: Widely applicable information criterion
+
 * Ben's implicit function idea -- iterative solver,
   analytic derivative
 
