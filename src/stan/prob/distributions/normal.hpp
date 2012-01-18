@@ -46,11 +46,11 @@ namespace stan {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!check_scale(function, sigma, &lp, Policy()))
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
-      if (!check_location(function, mu, &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "y", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
 
       using stan::maths::square;

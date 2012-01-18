@@ -38,40 +38,39 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto = false,
-	      typename T_y, 
-	      typename T_dof, 
-	      typename T_loc, 
-	      typename T_scale,
-	      class Policy = policy<> >
+              typename T_y, 
+              typename T_dof, 
+              typename T_loc, 
+              typename T_scale,
+              class Policy = policy<> >
     inline typename promote_args<T_y,T_dof,T_loc,T_scale>::type
       student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-		    const Policy& = Policy()) {
+                    const Policy& = Policy()) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
 
       using stan::maths::square;
       using boost::math::lgamma;
 
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
-      if(!stan::prob::check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
-	return lp;
-      if(!stan::prob::check_scale(function, sigma, &lp, Policy()))
-	return lp;
-      if(!stan::prob::check_location(function, mu, &lp, Policy()))
-	return lp;
-      if(!stan::prob::check_x(function, y, &lp, Policy()))
-	return lp;
-
+      if(!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
+        return lp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
+        return lp;
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
 
       if (include_summand<propto,T_dof>::value)
-	lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
+        lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
       if (include_summand<propto>::value)
-	lp += NEG_LOG_SQRT_PI;
+        lp += NEG_LOG_SQRT_PI;
       if (include_summand<propto,T_dof>::value)
-	lp -= 0.5 * log(nu);
+        lp -= 0.5 * log(nu);
       if (include_summand<propto,T_scale>::value)
-	lp -= log(sigma);
+        lp -= log(sigma);
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
-	lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
+        lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
       return lp;
     }
     
