@@ -15,17 +15,22 @@ namespace stan {
               typename T_y, typename T_shape, typename T_scale, 
               class Policy = policy<> >
     inline typename promote_args<T_y,T_shape,T_scale>::type
-      weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& = Policy()) {
-      //static const char* function = "stan::prob::weibull_log<%1%>(%1%)";
+    weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& = Policy()) {
+      static const char* function = "stan::prob::weibull_log<%1%>(%1%)";
+      
+      typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
+      if(!stan::prob::check_finite(function, y, "Random variate, y,", &lp, Policy()))
+        return lp;
+      if(!stan::prob::check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+        return lp;
+      if(!stan::prob::check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
 
-      //double result;
-      // FIXME: domain checks
       if (y < 0)
         return LOG_ZERO;
       
       using stan::maths::multiply_log;
       
-      typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
       if (include_summand<propto,T_shape>::value)
         lp += log(alpha);
       if (include_summand<propto,T_y,T_shape>::value)
