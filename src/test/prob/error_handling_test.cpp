@@ -369,193 +369,199 @@ TEST(ProbDistributionsErrorHandling,CheckXMatrixErrnoPolicy) {
   EXPECT_TRUE (std::isnan (result)) << "check_x should have returned NaN";
   }
 
-// ---------- check_bounded_x tests ----------
-TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyX) {
-  const char* function = "check_bounded_x (%1%)";
+// ---------- check_bounded tests ----------
+TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
+  const char* function = "check_bounded (%1%)";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
   double result;
  
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) << "check_bounded should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
   
   x = low;
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " equal to the lower bound: " << low;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " equal to the lower bound: " << low;
 
   x = high;
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " equal to the lower bound: " << low;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " equal to the lower bound: " << low;
 
   x = low-1;
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;  
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
   
   x = high+1;
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 
   x = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 
   x = -std::numeric_limits<double>::infinity();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 
   x = std::numeric_limits<double>::infinity();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyLow) {
-  const char* function = "check_bounded_x (%1%)";
+TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
+  const char* function = "check_bounded (%1%)";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
   double result;
  
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) << "check_bounded should be true x: " << x << " and bounds: " << low << ", " << high;
   
   low = -std::numeric_limits<double>::infinity();
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
 
   low = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 
   low = std::numeric_limits<double>::infinity();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXDefaultPolicyHigh) {
-  const char* function = "check_bounded_x (%1%)";
+TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
+  const char* function = "check_bounded (%1%)";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
   double result;
  
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) << "check_bounded should be true x: " << x << " and bounds: " << low << ", " << high;
 
   high = std::numeric_limits<double>::infinity();
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, default_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, default_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
   
   high = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 
   high = -std::numeric_limits<double>::infinity();
-  EXPECT_THROW (check_bounded_x (function, x, low, high, &result, default_policy()), std::domain_error) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 
 }
 
 
-TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyX) {
-  const char* function = "check_bounded_x (%1%)";
+TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
+  const char* function = "check_bounded (%1%)";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
   double result;
  
   result = 0;
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) << "check_bounded should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
 
   result = 0;
   x = low;
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " equal to the lower bound: " << low;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " equal to the lower bound: " << low;
 
   result = 0;
   x = high;
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " equal to the lower bound: " << low;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " equal to the lower bound: " << low;
 
   result = 0;
   x = low-1;
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy()))
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;  
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy()))
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 
 
   result = 0;
   x = high+1;
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy()))
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy()))
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 
   result = 0;
   x = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy()))
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy()))
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 
   result = 0;
   x = -std::numeric_limits<double>::infinity();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy()))
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy()))
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 
   result = 0;
   x = std::numeric_limits<double>::infinity();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy()))
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << high << ", " << low;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy()))
+    << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyLow) {
-  const char* function = "check_bounded_x (%1%)";
+TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
+  const char* function = "check_bounded (%1%)";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
   double result;
 
   result = 0; 
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) << "check_bounded should be true x: " << x << " and bounds: " << low << ", " << high;
 
   result = 0;
   low = -std::numeric_limits<double>::infinity();
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
 
   result = 0;
   low = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
  
   result = 0;
   low = std::numeric_limits<double>::infinity();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedXErrnoPolicyHigh) {
-  const char* function = "check_bounded_x (%1%)";
+TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
+  const char* function = "check_bounded (%1%)";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
   double result;
 
   result = 0; 
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) << "check_bounded_x should be true x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) << "check_bounded should be true x: " << x << " and bounds: " << low << ", " << high;
 
   result = 0;
   high = std::numeric_limits<double>::infinity();
-  EXPECT_TRUE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should be TRUE with x: " << x << " and bounds: " << low << ", " << high;
   
   result = 0;
   high = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 
   result = 0;
   high = -std::numeric_limits<double>::infinity();
-  EXPECT_FALSE (check_bounded_x (function, x, low, high, &result, errno_policy())) 
-    << "check_bounded_x should throw with x: " << x << " and bounds: " << low << ", " << high;
-  EXPECT_TRUE (std::isnan (result)) << "check_bounded_x should set return value to NaN: " << result;
+  EXPECT_FALSE (check_bounded (function, x, low, high, name, &result, errno_policy())) 
+    << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
+  EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
 
 // ----------  ----------

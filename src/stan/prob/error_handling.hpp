@@ -199,15 +199,17 @@ namespace stan {
     }
 
     template <typename T_x, typename T_low, typename T_high, typename T_result, class Policy>
-    inline bool check_bounded_x(const char* function,
-                                const T_x& x,
-                                const T_low& low,
-                                const T_high& high,
-                                T_result* result,
-                                const Policy& /*pol*/) {
+    inline bool check_bounded(const char* function,
+                              const T_x& x,
+                              const T_low& low,
+                              const T_high& high,
+                              const char* name,  
+                              T_result* result,
+                              const Policy& /*pol*/) {
       if (!boost::math::isfinite(x) || !(low <= x && x <= high)) {
         std::ostringstream msg;
-        msg << "Random variate x is %1%, but must be finite and between "
+        msg << name 
+            << " is %1%, but must be finite and between "
             << low
             << " and "
             << high;
@@ -218,6 +220,29 @@ namespace stan {
       }
       return true;
     }
+    template <typename T_low, typename T_high, typename T_result, class Policy>
+    inline bool check_bounded(const char* function,
+                              const unsigned int x,
+                              const T_low& low,
+                              const T_high& high,
+                              const char* name,  
+                              T_result* result,
+                              const Policy& /*pol*/) {
+      if (!(low <= x && x <= high)) {
+        std::ostringstream msg;
+        msg << name 
+            << " is %1%, but must be finite and between "
+            << low
+            << " and "
+            << high;
+        *result = boost::math::policies::raise_domain_error<double>(function,
+                                                                    msg.str().c_str(),
+                                                                    x, Policy());
+        return false;
+      }
+      return true;
+    }
+
     
 
     template <typename T_scale, typename T_result, class Policy>
