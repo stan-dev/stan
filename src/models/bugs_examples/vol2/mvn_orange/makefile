@@ -1,7 +1,7 @@
 STAN_HOME = ../../../../..
 PGM = mvn_orange#
-CXX = g++
 CXX = g++-4.6 -std=c++0x 
+CXX = clang++
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
@@ -9,4 +9,4 @@ $(PGM) :
 	./$(PGM) --data=$(PGM).Rdata
 
 clean :
-	rm $(PGM).cpp samples.csv $(PGM) 
+	rm -f $(PGM).cpp samples.csv $(PGM) 
