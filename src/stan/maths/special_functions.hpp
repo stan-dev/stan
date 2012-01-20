@@ -135,10 +135,12 @@ namespace stan {
      * @param a First value
      * @param b Second value
      * @return Log of the beta function applied to the two values.
+     * @tparam T1 Type of first value.
+     * @tparam T2 Type of second value.
      */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    beta_log(T a, T b) {
+    template <typename T1, typename T2>
+    inline typename boost::math::tools::promote_args<T1,T2>::type
+    lbeta(T1 a, T2 b) {
       return lgamma(a)
         + lgamma(b)
         - lgamma(a + b);

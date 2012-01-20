@@ -24,23 +24,28 @@ namespace stan {
      * @throw std::domain_error if alpha is not greater than 0.
      * @throw std::domain_error if beta is not greater than 0.
      * @throw std::domain_error if y is not between 0 and 1.
-     * @tparam T_y Type of scalar.
-     * @tparam T_alpha Type of prior sample size for alpha.
-     * @tparam T_beta Type of prior sample size for beta.
+     * @tparam T_y Type of scalar outcome.
+     * @tparam T_scale_succ Type of prior scale for successes.
+     * @tparam T_scale_fail Type of prior scale for failures.
      */
     template <bool propto = false,
-              typename T_y, typename T_alpha, typename T_beta, 
+              typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy = policy<> >
-      inline typename promote_args<T_y,T_alpha,T_beta>::type
-      beta_log(const T_y& y, const T_alpha& alpha, const T_beta& beta, const Policy& = Policy()) {
+      inline typename promote_args<T_y,T_scale_succ,T_scale_fail>::type
+      beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
+               const Policy& = Policy()) {
       static const char* function = "stan::prob::beta_log<%1%>(%1%)";
 
-      typename promote_args<T_y,T_alpha,T_beta>::type lp(0.0);
-      if(!stan::prob::check_positive(function, alpha, "Prior sample size, alpha,", &lp, Policy()))
+      typename promote_args<T_y,T_scale_succ,T_scale_fail>::type lp(0.0);
+      if (!stan::prob::check_positive(function, alpha, 
+                                     "Prior success sample size plus 1, alpha,",
+                                     &lp, Policy()))
         return lp;
-      if(!stan::prob::check_positive(function, beta, "Prior sample size, beta,", &lp, Policy()))
+      if (!stan::prob::check_positive(function, beta, 
+                                     "Prior failure sample size plus 1, beta,",
+                                     &lp, Policy()))
         return lp;
-      if(!stan::prob::check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
+      if (!stan::prob::check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       
       if (y < 0.0 || y > 1.0)
@@ -48,46 +53,18 @@ namespace stan {
 
       using stan::maths::multiply_log;
       using stan::maths::log1m;
-      if (include_summand<propto,T_alpha,T_beta>::value)
+      if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
         lp += lgamma(alpha + beta);
-      if (include_summand<propto,T_alpha>::value)
+      if (include_summand<propto,T_scale_succ>::value)
         lp -= lgamma(alpha);
-      if (include_summand<propto,T_beta>::value)
+      if (include_summand<propto,T_scale_fail>::value)
         lp -= lgamma(beta);
-      if (include_summand<propto,T_y,T_alpha>::value)
+      if (include_summand<propto,T_y,T_scale_succ>::value)
         lp += multiply_log(alpha-1.0, y);
-      if (include_summand<propto,T_y,T_beta>::value)
+      if (include_summand<propto,T_y,T_scale_fail>::value)
         lp += (beta - 1.0) * log1m(y);
       return lp;
     }
-
-    // Beta(y|mu,theta)  [0 < mu < 1; theta > 0;  0 <= y <= 1]
-    /**
-     * The log of a beta density for y with the specified
-     * mean and sample size.
-     * Sample size, theta, must be greater than 0.
-     * Mean must be between zero and one exclusive.
-     * y must be between 0 and 1 inclusive.
-     * 
-     * @param y A scalar variable.
-     * @param mu Prior mean.
-     * @param theta Prior sample size.
-     * @throw std::domain_error if mu * theta is not greater than 0.
-     * @throw std::domain_error if (1 - mu) * theta is not greater than 0.
-     * @throw std::domain_error if y is not between 0 and 1.
-     * @tparam T_y Type of scalar.
-     * @tparam T_mu Type of prior mean for mu.
-     * @tparam T_theta Type of prior sample size for theta.
-     */
-    template <bool propto = false,
-              typename T_y, typename T_mu, typename T_theta, 
-              class Policy = policy<> >
-      inline typename promote_args<T_y,T_mu,T_theta>::type
-      beta_ls_log(const T_y& y, const T_mu& mu, const T_theta& theta, const Policy& = Policy()) {
-        T_mu alpha = mu * theta;
-        T_mu beta = (1.0 - mu) * theta;
-        return beta_log(y, alpha, beta, Policy());
-      }
 
   }
 }

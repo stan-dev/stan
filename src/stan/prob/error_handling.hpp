@@ -250,7 +250,8 @@ namespace stan {
                             const T_scale& scale,
                             T_result* result,
                             const Policy& /*pol*/) {
-      if (!(scale > 0) || !boost::math::isfinite(scale)) { // Assume scale == 0 is NOT valid for any distribution.
+      // Assume scale == 0 is NOT valid for any distribution.
+      if (!(scale > 0) || !boost::math::isfinite(scale)) { 
         *result = boost::math::policies::raise_domain_error<T_scale>(function,
                                               "Scale parameter is %1%, but must be > 0 !", 
                                               scale, Policy());
@@ -264,7 +265,8 @@ namespace stan {
                                 const T_inv_scale& invScale,
                                 T_result* result,
                                 const Policy& /*pol*/) {
-      if (!(invScale > 0) || !boost::math::isfinite(invScale)) { // Assume scale == 0 is NOT valid for any distribution.
+      if (!(invScale > 0)
+          || !boost::math::isfinite(invScale)) { // Assume scale == 0 is NOT valid for any distribution.
         *result = boost::math::policies::raise_domain_error<T_inv_scale>(function,
                                                   "Inverse scale parameter is %1%, but must be > 0 !", 
                                                   invScale, Policy());
@@ -311,8 +313,8 @@ namespace stan {
         std::string message(name);
         message += " is %1%, but must be finite and > 0!";
         *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                          message.c_str(), 
-                                          x, Policy());
+                                                                 message.c_str(), 
+                                                                 x, Policy());
         
         return false;
       }

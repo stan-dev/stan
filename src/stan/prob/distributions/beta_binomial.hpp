@@ -14,21 +14,21 @@ namespace stan {
 
     // BetaBinomial(n|alpha,beta) [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto = false,
-	      typename T_size, 
-	      class Policy = policy<> >
+              typename T_size, 
+              class Policy = policy<> >
       inline typename promote_args<T_size>::type
       beta_binomial_log(const int n, const int N, const T_size& alpha, const T_size& beta,
-			const Policy& = Policy()) {
+                        const Policy& = Policy()) {
 
-      using stan::maths::beta_log;
+      using stan::maths::lbeta;
       using stan::maths::binomial_coefficient_log;
 
       // FIXME: domain checks
       typename promote_args<T_size>::type lp(0.0);
       if (include_summand<propto>::value)
-	lp += binomial_coefficient_log(N,n);
+        lp += binomial_coefficient_log(N,n);
       if (include_summand<propto,T_size>::value)
-	lp += beta_log(n + alpha, N - n + beta) - beta_log(alpha,beta);
+        lp += lbeta(n + alpha, N - n + beta) - lbeta(alpha,beta);
       return lp;
     }
 

@@ -908,7 +908,7 @@ TEST (agrad_matrix, min__vector) {
   var output;
   output = stan::agrad::min(d1);
   EXPECT_FLOAT_EQ (-3, output.val());
-		   
+                   
   output = stan::agrad::min(v1);
   EXPECT_FLOAT_EQ (-3, output.val());
 }
@@ -930,7 +930,7 @@ TEST (agrad_matrix, min__rowvector) {
   var output;
   output = stan::agrad::min(d1);
   EXPECT_FLOAT_EQ (-3, output.val());
-		   
+                   
   output = stan::agrad::min(v1);
   EXPECT_FLOAT_EQ (-3, output.val());
 }
@@ -950,7 +950,7 @@ TEST (agrad_matrix, min__matrix) {
   var output;
   output = stan::agrad::min(d1);
   EXPECT_FLOAT_EQ (-3, output.val());
-		   
+                   
   output = stan::agrad::min(v1);
   EXPECT_FLOAT_EQ (-3, output.val());
 }
@@ -973,7 +973,7 @@ TEST (agrad_matrix, max__vector) {
   var output;
   output = stan::agrad::max(d1);
   EXPECT_FLOAT_EQ (100, output.val());
-		   
+                   
   output = stan::agrad::max(v1);
   EXPECT_FLOAT_EQ (100, output.val());
 }
@@ -993,7 +993,7 @@ TEST (agrad_matrix, max__rowvector) {
   var output;
   output = stan::agrad::max(d1);
   EXPECT_FLOAT_EQ (100, output.val());
-		   
+                   
   output = stan::agrad::max(v1);
   EXPECT_FLOAT_EQ (100, output.val());
 }
@@ -1013,7 +1013,7 @@ TEST (agrad_matrix, max__matrix) {
   var output;
   output = stan::agrad::max(d1);
   EXPECT_FLOAT_EQ (100, output.val());
-		   
+                   
   output = stan::agrad::max(v1);
   EXPECT_FLOAT_EQ (100, output.val());
 }
@@ -1036,7 +1036,7 @@ TEST (agrad_matrix, mean__vector) {
   var output;
   output = stan::agrad::mean(d1);
   EXPECT_FLOAT_EQ (97.0/3.0, output.val());
-		   
+                   
   output = stan::agrad::mean(v1);
   EXPECT_FLOAT_EQ (97.0/3.0, output.val());
 }
@@ -1056,7 +1056,7 @@ TEST (agrad_matrix, mean__rowvector) {
   var output;
   output = stan::agrad::mean(d1);
   EXPECT_FLOAT_EQ (97.0/3.0, output.val());
-		   
+                   
   output = stan::agrad::mean(v1);
   EXPECT_FLOAT_EQ (97.0/3.0, output.val());
 }
@@ -1076,7 +1076,7 @@ TEST (agrad_matrix, mean__matrix) {
   var output;
   output = stan::agrad::mean(d1);
   EXPECT_FLOAT_EQ (97.0/3.0, output.val());
-		   
+                   
   output = stan::agrad::mean(v1);
   EXPECT_FLOAT_EQ (97.0/3.0, output.val());
 }
@@ -1099,7 +1099,7 @@ TEST (agrad_matrix, variance__vector) {
   var output;
   output = stan::agrad::variance(d1);
   EXPECT_FLOAT_EQ (17.5/5.0, output.val());
-		   
+                   
   output = stan::agrad::variance(v1);
   EXPECT_FLOAT_EQ (17.5/5.0, output.val());
 
@@ -1126,7 +1126,7 @@ TEST (agrad_matrix, variance__rowvector) {
   var output;
   output = stan::agrad::variance(d1);
   EXPECT_FLOAT_EQ (17.5/5.0, output.val());
-		   
+                   
   output = stan::agrad::variance(v1);
   EXPECT_FLOAT_EQ (17.5/5.0, output.val());
 
@@ -1153,7 +1153,7 @@ TEST (agrad_matrix, variance__matrix) {
   var output;
   output = stan::agrad::variance(d1);
   EXPECT_FLOAT_EQ (17.5/5.0, output.val());
-		   
+                   
   output = stan::agrad::variance(v1);
   EXPECT_FLOAT_EQ (17.5/5.0, output.val());
 
@@ -1193,7 +1193,7 @@ TEST (agrad_matrix, sd__vector) {
   var output;
   output = stan::agrad::sd(d1);
   EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
-		   
+                   
   output = stan::agrad::sd(v1);
   EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
   
@@ -1220,7 +1220,7 @@ TEST (agrad_matrix, sd__rowvector) {
   var output;
   output = stan::agrad::sd(d1);
   EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
-		   
+                   
   output = stan::agrad::sd(v1);
   EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
 
@@ -1248,7 +1248,7 @@ TEST (agrad_matrix, sd__matrix) {
   var output;
   output = stan::agrad::sd(d1);
   EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
-		   
+                   
   output = stan::agrad::sd(v1);
   EXPECT_FLOAT_EQ (std::sqrt(17.5/5.0), output.val());
 
@@ -1289,7 +1289,7 @@ TEST (agrad_matrix, sum__vector) {
   var output;
   output = stan::agrad::sum(d);
   EXPECT_FLOAT_EQ (21.0, output.val());
-		   
+                   
   output = stan::agrad::sum(v);
   EXPECT_FLOAT_EQ (21.0, output.val());
 
@@ -1308,7 +1308,7 @@ TEST (agrad_matrix, sum__rowvector) {
   var output;
   output = stan::agrad::sum(d);
   EXPECT_FLOAT_EQ (21.0, output.val());
-		   
+                   
   output = stan::agrad::sum(v);
   EXPECT_FLOAT_EQ (21.0, output.val());
 
@@ -1327,7 +1327,7 @@ TEST (agrad_matrix, sum__matrix) {
   var output;
   output = stan::agrad::sum(d);
   EXPECT_FLOAT_EQ (21.0, output.val());
-		   
+                   
   output = stan::agrad::sum(v);
   EXPECT_FLOAT_EQ (21.0, output.val());
 

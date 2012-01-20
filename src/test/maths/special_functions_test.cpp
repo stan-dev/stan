@@ -21,11 +21,11 @@ TEST(MathsSpecialFunctions, fma) {
   EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, stan::maths::fma(3.0,5.0,7.0));
 }
 
-TEST(MathsSpecialFunctions, beta_log) {
-  EXPECT_FLOAT_EQ(0.0, stan::maths::beta_log(1.0,1.0));
-  EXPECT_FLOAT_EQ(2.981361, stan::maths::beta_log(0.1,0.1));
-  EXPECT_FLOAT_EQ(-4.094345, stan::maths::beta_log(3.0,4.0));
-  EXPECT_FLOAT_EQ(-4.094345, stan::maths::beta_log(4.0,3.0));
+TEST(MathsSpecialFunctions, lbeta) {
+  EXPECT_FLOAT_EQ(0.0, stan::maths::lbeta(1.0,1.0));
+  EXPECT_FLOAT_EQ(2.981361, stan::maths::lbeta(0.1,0.1));
+  EXPECT_FLOAT_EQ(-4.094345, stan::maths::lbeta(3.0,4.0));
+  EXPECT_FLOAT_EQ(-4.094345, stan::maths::lbeta(4.0,3.0));
 }
 
 TEST(MathsSpecialFunctions, inv_logit) {
