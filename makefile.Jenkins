@@ -5,28 +5,8 @@ OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
 
 INCLUDES = -I src -I lib
 INCLUDES_T = -I lib/gtest/include  -I lib/gtest
-CFLAGS = $(OPT) $(INCLUDES)
-ifneq (,$(filter g++%,$(CC)))
-	CFLAGS += -std=gnu++0x
-endif
+CFLAGS = $(OPT) $(INCLUDES) -std=gnu++0x
 CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0 
-
-## --- multiple platform section ---
-UNAME := $(shell uname)      # uname provides information about the platform
-ifneq (, $(filter CYGWIN%,$(UNAME))) # Windows under Cygwin
-	ifneq (,$(filter g++%,$(CC)))
-		CFLAGS += -static-libgcc -static-libstdc++
-	endif	
-else ifeq (Darwin, $(UNAME)) # Mac OS X
-	OPT += -g
-else ifeq (LINUX, $(UNAME))
-	OPT += -g
-	CFLAGS_T += -lpthread
-else # assume Linux
-	OPT += -g
-	CFLAGS_T += -lpthread
-endif
-## --------------------------------
 
 # find all unit tests
 UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
@@ -50,7 +30,6 @@ ar/libgtest.a:  | test
 	$(CC) $(CFLAGS_T) -c lib/gtest/src/gtest-all.cc -o ar/gtest-all.o
 	ar -rv ar/libgtest.a ar/gtest-all.o
 
-
 # The last argument, $$(wildcard src/stan/$$(dir $$*)*.hpp), puts *.hpp files from the
 #   same directory as a prerequisite. For example, for test/prob/distributions, it will expand to
 #   all the hpp files in the src/stan/prob/ directory.
@@ -59,7 +38,7 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 	@echo '================================================================================'
 	@echo '================================================================================'
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-	-$@ --gtest_output="xml:$@.xml"
+	$@ --gtest_output="xml:$@.xml"
 
 # run all tests
 test-all: $(UNIT_TESTS_OBJ) #demo/gm
@@ -95,8 +74,7 @@ demo:
 	mkdir -p demo
 
 demo/% : src/demo/%.cpp | demo
-	$(CC) $(CFLAGS) src/$@.cpp -c -o $@.o
-	$(CC) $(CFLAGS) $@.o -o $@
+	cl /EHsc /I src /I lib src/$@.cpp /link /OUT:$@.exe
 
 demo-all: demo/bivar_norm demo/model1 demo/eight_schools
 
