@@ -161,11 +161,13 @@ TEST(AgradDistributionsNormal,Gradient2) {
   var mu = 1.0;
   var sigma = 2.0;
   
-  var lp = stan::prob::normal_log(y,mu,sigma);
   std::vector<var> params;
   params.push_back(y);
   params.push_back(mu);
   params.push_back(sigma);
+
+  var lp = stan::prob::normal_log<false>(y,mu,sigma);
+
   std::vector<double> g;
   lp.grad(params,g);
   

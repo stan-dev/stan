@@ -9,8 +9,6 @@ TO DO
 
 * range checks for std::vector accesses in model
 
-* eliminate tabs (replace w. 4 spaces)
-
 * error/exception policy throughout
   - maths
   - prob
@@ -24,6 +22,8 @@ TO DO
 * HMC Sampler
   - set step size, number of steps
   - tune step size (optional)
+
+* eliminate tabs (replace w. 4 spaces)
 
 * remaining API doc
 
@@ -54,9 +54,27 @@ TO DO
 
 * remove -NDEBUG from Jenkins tests
 
+* fix off-by-2 problem in grad for normal (see stack_alloc?)
 
 EXTENSIONS
 =================================================
+
+* Allow normal_log(y|0,1) as parser synonym for normal_log(y,0,1)
+
+* Add matrix/vector/scalar operators to compiler
+  - binary (*,/,+,-), unary (+,-)
+  - translate down to our overloaded promotion-based lib
+  - find operator for transpose? 
+
+* more matrix tests (for all ops w. gradients)
+
+* More matrix functions from Eigen:
+  - norm()
+  - squaredNorm()
+  - lpNorm<1>
+  - lpNorm<Eigen::Infinity>
+
+
 
 * Watanabe's WAIC: Widely applicable information criterion
 

@@ -14,6 +14,7 @@ namespace stan {
   namespace agrad {
 
     class chainable;
+    class vari;
 
     namespace {
       // FIXME: manage all this as a single singleton (thread local)
@@ -161,7 +162,23 @@ namespace stan {
         adj_ = 0.0;
       }
 
+      friend std::ostream& operator<<(std::ostream& os, const vari* v) {
+        return os << v << "  " << v->val_ << " : " << v->adj_;
+      }
+
     };
+
+
+    void print_stack() {
+      std::cout << std::endl << "STACK, size=" << var_stack_.size() << std::endl;
+      for (unsigned int i = 0; i < var_stack_.size(); ++i)
+        std::cout << i 
+                  << "  " << var_stack_[i]
+                  << "  " << ((vari*)var_stack_[i])->val_
+                  << " : " << ((vari*)var_stack_[i])->adj_
+                  << std::endl;
+    }
+
 
 
     /**
@@ -375,10 +392,14 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
+        // std::cout << "STARTING STACK" << std::endl;
+        // print_stack();
         stan::agrad::grad(vi_);
         g.resize(0);
         for (size_t i = 0U; i < x.size(); ++i) 
           g.push_back(x[i].vi_->adj_);
+        // std::cout << std::endl << "MIDDLING STACK" << std::endl;
+        // print_stack();
         recover_memory();
       }
 

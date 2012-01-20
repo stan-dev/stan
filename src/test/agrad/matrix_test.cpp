@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
-#include <Eigen/Dense>
+
 #include <stdexcept>
+#include <complex>
+
+#include <Eigen/Dense>
+
 #include <stan/agrad/matrix.hpp>
 
 using stan::agrad::var;
@@ -11,6 +15,67 @@ using stan::maths::vector_d;
 using stan::agrad::vector_v;
 using stan::maths::row_vector_d;
 using stan::agrad::row_vector_v;
+
+typedef stan::agrad::var AVAR;
+typedef std::vector<AVAR> AVEC;
+typedef std::vector<double> VEC;
+
+
+AVEC createAVEC(AVAR x) {
+  AVEC v;
+  v.push_back(x);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2) {
+  AVEC v = createAVEC(x1);
+  v.push_back(x2);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
+  AVEC v = createAVEC(x1,x2);
+  v.push_back(x3);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3, AVAR x4) {
+  AVEC v = createAVEC(x1,x2,x3);
+  v.push_back(x4);
+  return v;
+}
+
+VEC cgrad(AVAR f, AVAR x1) {
+  AVEC x = createAVEC(x1);
+  VEC g;
+  f.grad(x,g);
+  return g;
+}
+
+VEC cgrad(AVAR f, AVAR x1, AVAR x2) {
+  AVEC x = createAVEC(x1,x2);
+  VEC g;
+  f.grad(x,g);
+  return g;
+}
+
+VEC cgrad(AVAR f, AVAR x1, AVAR x2, AVAR x3) {
+  AVEC x = createAVEC(x1,x2,x3);
+  VEC g;
+  f.grad(x,g);
+  return g;
+}
+
+VEC cgrad(AVAR f, AVAR x1, AVAR x2, AVAR x3, AVAR x4) {
+  AVEC x = createAVEC(x1,x2,x3,x4);
+  VEC g;
+  f.grad(x,g);
+  return g;
+}
+
+VEC cgradvec(AVAR f, AVEC x) {
+  VEC g;
+  f.grad(x,g);
+  return g;
+}
+
 
 // to_var tests
 TEST(agrad_matrix,to_var__scalar) {
@@ -203,9 +268,9 @@ TEST(agrad_matrix,determinant) {
   d << 0, 1, 2, 3;
 
   var det;
-  det = stan::agrad::determinant (v);
+  det = stan::agrad::determinant(v);
   EXPECT_FLOAT_EQ (-2, det.val());
-  det = stan::agrad::determinant (d);
+  det = stan::agrad::determinant(d);
   EXPECT_FLOAT_EQ (-2, det.val());
 }
 TEST(agrad_matrix,deteriminant__exception) {
@@ -216,6 +281,37 @@ TEST(agrad_matrix,deteriminant__exception) {
   EXPECT_THROW (det = stan::agrad::determinant(d), std::domain_error);
   EXPECT_THROW (det = stan::agrad::determinant(v), std::domain_error);
 }
+TEST(agrad_matrix,determinant_grad) {
+  matrix_v X(2,2);
+  AVAR a = 2.0;
+  AVAR b = 3.0;
+  AVAR c = 5.0;
+  AVAR d = 7.0;
+  X << a, b, c, d;
+
+  AVEC x = createAVEC(a,b,c,d);
+
+  AVAR f = X.determinant();
+
+  // det = ad - bc
+  EXPECT_FLOAT_EQ(-1.0,f.val());
+
+  std::vector<double> g;
+  f.grad(x,g);
+  EXPECT_FLOAT_EQ(7.0,g[0]);
+  EXPECT_FLOAT_EQ(-5.0,g[1]);
+  EXPECT_FLOAT_EQ(-3.0,g[2]);
+  EXPECT_FLOAT_EQ(2.0,g[3]);
+}
+TEST(agrad_matrix,determinant3by3) {
+   // just test it can handle it
+  matrix_v Z(9,9);
+  for (int i = 0; i < 9; ++i)
+    for (int j = 0; j < 9; ++j)
+      Z(i,j) = i * j + 1;
+  AVAR h = Z.determinant();
+}
+
 // end determinant tests
 
 // dot_product tests
@@ -1681,3 +1777,256 @@ TEST(agrad_matrix, multiply__matrix_matrix__exception) {
   EXPECT_THROW(stan::agrad::multiply(d1, d2), std::invalid_argument);
 }
 // end multiply tests
+
+
+
+TEST(agrad_matrix,transpose_matrix) {
+  matrix_v a(2,3);
+  a << -1.0, 2.0, -3.0, 
+        5.0, 10.0, 100.0;
+  
+  AVEC x = createAVEC(a(0,0), a(0,2), a(1,1));
+  
+  matrix_v c = transpose(a);
+  EXPECT_FLOAT_EQ(-1.0,c(0,0).val());
+  EXPECT_FLOAT_EQ(10.0,c(1,1).val());
+  EXPECT_FLOAT_EQ(-3.0,c(2,0).val());
+  EXPECT_EQ(3,c.rows());
+  EXPECT_EQ(2,c.cols());
+
+  VEC g = cgradvec(c(2,0),x);
+  EXPECT_FLOAT_EQ(0.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+}
+TEST(agrad_matrix,transpose_vector) {
+  vector_v a(3);
+  a << 1.0, 2.0, 3.0;
+  
+  AVEC x = createAVEC(a(0),a(1),a(2));
+
+  row_vector_v a_tr = transpose(a);
+  EXPECT_EQ(a.size(),a_tr.size());
+  for (unsigned int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
+
+  VEC g = cgradvec(a_tr(1),x);
+  EXPECT_FLOAT_EQ(0.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+}
+TEST(agrad_matrix,transpose_row_vector) {
+  row_vector_v a(3);
+  a << 1.0, 2.0, 3.0;
+  
+  AVEC x = createAVEC(a(0),a(1),a(2));
+
+  vector_v a_tr = transpose(a);
+  EXPECT_EQ(a.size(),a_tr.size());
+  for (unsigned int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
+
+  VEC g = cgradvec(a_tr(1),x);
+  EXPECT_FLOAT_EQ(0.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+}
+
+
+TEST(agrad_matrix,mv_trace) {
+  matrix_v a(2,2);
+  a << -1.0, 2.0, 
+       5.0, 10.0;
+  
+  AVEC x = createAVEC(a(0,0), a(0,1), a(1,0), a(1,1));
+
+  AVAR s = trace(a);
+  EXPECT_FLOAT_EQ(9.0,s.val());
+  
+  VEC g = cgradvec(s,x);
+  EXPECT_FLOAT_EQ(1.0, g[0]);
+  EXPECT_FLOAT_EQ(0.0, g[1]);
+  EXPECT_FLOAT_EQ(0.0, g[2]);
+  EXPECT_FLOAT_EQ(1.0, g[3]);
+}  
+
+
+TEST(agrad_matrix,inverse_val) {
+  using stan::maths::inverse;
+  matrix_v a(2,2);
+  a << 2.0, 3.0, 
+       5.0, 7.0;
+
+  matrix_v a_inv = inverse(a);
+
+  matrix_v I = multiply(a,a_inv);
+
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+}
+TEST(agrad_matrix,inverse_grad) {
+  using stan::maths::inverse;
+  
+  for (unsigned int k = 0; k < 2; ++k) {
+    for (unsigned int l = 0; l < 2; ++l) {
+
+      matrix_v ad(2,2);
+      ad << 2.0, 3.0, 
+        5.0, 7.0;
+
+      AVEC x = createAVEC(ad(0,0),ad(0,1),ad(1,0),ad(1,1));
+
+      matrix_v ad_inv = inverse(ad);
+
+      // int k = 0;
+      // int l = 1;
+      std::vector<double> g;
+      ad_inv(k,l).grad(x,g);
+
+      int idx = 0;
+      for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+          EXPECT_FLOAT_EQ(-ad_inv(k,i).val() * ad_inv(j,l).val(), g[idx]);
+          ++idx;
+        }
+      }
+    }
+  }
+}
+TEST(agrad_matrix,inverse_inverse_sum) {
+  using stan::maths::sum;
+  using stan::maths::inverse;
+
+  matrix_v a(4,4);
+  a << 2.0, 3.0, 4.0, 5.0, 
+    9.0, -1.0, 2.0, 2.0,
+    4.0, 3.0, 7.0, -1.0,
+    0.0, 1.0, 19.0, 112.0;
+
+  AVEC x;
+  for (int i = 0; i < 4; ++i)
+    for (int j = 0; j < 4; ++j)
+      x.push_back(a(i,j));
+
+  AVAR a_inv_inv_sum = sum(inverse(inverse(a)));
+
+  VEC g = cgradvec(a_inv_inv_sum,x);
+
+  for (unsigned int k = 0; k < x.size(); ++k)
+    EXPECT_FLOAT_EQ(1.0,g[k]);
+}
+
+
+
+TEST(agrad_matrix,eigenval_sum) {
+  using stan::maths::eigenvalues;
+  using stan::maths::sum;
+
+  matrix_v a(3,3);
+  a << 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 13.0, 11.0, 19.0;
+  AVEC x = createAVEC(a(0,0), a(1,1), a(2,2), a(1,2));
+  x.push_back(a(0,1));
+  x.push_back(a(2,0));
+
+  // grad sum eig = I
+  vector_v a_eigenvalues = eigenvalues(a);
+  
+  AVAR sum_a_eigenvalues = sum(a_eigenvalues);
+  
+  VEC g = cgradvec(sum_a_eigenvalues,x);
+
+  EXPECT_NEAR(1.0,g[0],1.0E-11);
+  EXPECT_NEAR(1.0,g[1],1.0E-11);
+  EXPECT_NEAR(1.0,g[2],1.0E-11);
+
+  EXPECT_NEAR(0.0,g[3],1.0E-10);
+  EXPECT_NEAR(0.0,g[4],1.0E-10);
+  EXPECT_NEAR(0.0,g[5],1.0E-10);
+}
+
+TEST(agrad_matrix,mat_cholesky) {
+  // symmetric
+  matrix_v X(2,2);
+  AVAR a = 3.0;
+  AVAR b = -1.0;
+  AVAR c = -1.0;
+  AVAR d = 1.0;
+  X << a, b, 
+       c, d;
+  
+  matrix_v L = cholesky_decompose(X);
+
+  matrix_v LL_trans = multiply(L,transpose(L));
+  EXPECT_FLOAT_EQ(a.val(),LL_trans(0,0).val());
+  EXPECT_FLOAT_EQ(b.val(),LL_trans(0,1).val());
+  EXPECT_FLOAT_EQ(c.val(),LL_trans(1,0).val());
+  EXPECT_FLOAT_EQ(d.val(),LL_trans(1,1).val());
+}
+
+
+// norm tests for raw calls; move into promotion lib
+TEST(agrad_matrix,mv_squaredNorm) {
+  matrix_v a(2,2);
+  a << -1.0, 2.0, 
+       5.0, 10.0;
+  
+  AVEC x = createAVEC(a(0,0), a(0,1), a(1,0), a(1,1));
+
+  AVAR s = a.squaredNorm();
+  EXPECT_FLOAT_EQ(130.0,s.val());
+  
+  VEC g = cgradvec(s,x);
+  EXPECT_FLOAT_EQ(-2.0, g[0]);
+  EXPECT_FLOAT_EQ(4.0, g[1]);
+  EXPECT_FLOAT_EQ(10.0, g[2]);
+  EXPECT_FLOAT_EQ(20.0, g[3]);
+}  
+TEST(agrad_matrix,mv_norm) {
+  matrix_v a(2,1);
+  a << -3.0, 4.0;
+  
+  AVEC x = createAVEC(a(0,0), a(1,0));
+
+  AVAR s = a.norm();
+  EXPECT_FLOAT_EQ(5.0,s.val());
+
+  // (see hypot in special_functions_test) 
+  VEC g = cgradvec(s,x);
+  EXPECT_FLOAT_EQ(-3.0/5.0, g[0]);
+  EXPECT_FLOAT_EQ(4.0/5.0, g[1]);
+}  
+TEST(agrad_matrix,mv_lp_norm) {
+  matrix_v a(2,2);
+  a << -1.0, 2.0, 
+    5.0, 0.0;
+  
+  AVEC x = createAVEC(a(0,0), a(0,1), a(1,0), a(1,1));
+
+  AVAR s = a.lpNorm<1>();
+  EXPECT_FLOAT_EQ(8.0,s.val());
+  
+  VEC g = cgradvec(s,x);
+  EXPECT_FLOAT_EQ(-1.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
+  EXPECT_FLOAT_EQ(1.0,g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]); // ? depends on impl here, could be -1 or 1
+}  
+TEST(agrad_matrix,mv_lp_norm_inf) {
+  matrix_v a(2,2);
+  a << -1.0, 2.0, 
+    -5.0, 0.0;
+  
+  AVEC x = createAVEC(a(0,0), a(0,1), a(1,0), a(1,1));
+
+  AVAR s = a.lpNorm<Eigen::Infinity>();
+  EXPECT_FLOAT_EQ(5.0,s.val());
+  
+  VEC g = cgradvec(s,x);
+  EXPECT_FLOAT_EQ(0.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(-1.0,g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]); 
+}  
+

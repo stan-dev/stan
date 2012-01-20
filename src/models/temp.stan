@@ -1,28 +1,7 @@
-data {
-    int N;
-    double(0,1) theta;
-}
 transformed data {
-    double(0,1) one_minus_theta;
+    double x;
 
-    one_minus_theta <- 1.0 - theta;
-}
-parameters {
-    double y[N];
-}
-transformed parameters {
-    double(0,) y_abs[N];
-
-    for (n in 1:N)
-        y_abs[n] <- fabs(y[n]);
+    x <- beta_binomial_log(2,7,1,1);
 }
 model {
-    for (n in 1:N) 
-        y[n] ~ normal(0,theta); 
-}
-generated quantities {
-   double(,0) z_neg[N];
-
-   for (n in 1:N) 
-      z_neg[n] <- -y_abs[n];
 }
