@@ -107,6 +107,9 @@ namespace stan {
        * required.
        */
       ~stack_alloc() { 
+        // free ALL blocks
+        for (unsigned int i = 0; i < cur_block_; ++i)
+          free(blocks_[i]);
       }
 
       /**
@@ -160,13 +163,16 @@ namespace stan {
       }
     
       /**
-       * Free all memory used by the stack allocator back to the system.
+       * Free all memory used by the stack allocator other than the
+       * initial block allocation back to the system.  Note:  the
+       * destructor will free all memory.
        */
       inline void free_all() {
-        for (unsigned int i = 0; i < cur_block_; ++i)
+        // frees all BUT the first (index 0) block
+        for (unsigned int i = 1; i < cur_block_; ++i)
           free(blocks_[i]);
-        sizes_.clear();
-        blocks_.clear();
+        sizes_.resize(1);
+        blocks_.resize(1); 
         recover_all();
       }
   
