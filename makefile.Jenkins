@@ -10,6 +10,12 @@ CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0
 
 # find all unit tests
 UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
+# exclude the unit tests that don't run in windows:
+UNIT_TESTS := $(filter-out \
+src/test/agrad/matrix_test.cpp src/test/gm/parser_test.cpp src/test/agrad/distributions/inv_wishart_test.cpp\
+src/test/agrad/distributions/wishart_test.cpp src/test/agrad/distributions/multi_normal_test.cpp\
+,$(UNIT_TESTS))
+
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
 UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 

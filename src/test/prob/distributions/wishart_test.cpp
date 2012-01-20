@@ -130,6 +130,8 @@ TEST(ProbDistributionsWishart,ErrnoPolicy) {
   
   Sigma.resize(1,1);
   Y.resize(1,1);
+  Sigma << 1;
+  Y << 1;
   nu = 1;
   result = wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_FALSE(std::isnan(result));
