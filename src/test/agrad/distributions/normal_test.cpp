@@ -18,7 +18,7 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
   // should recover memory after tests that don't do grads
   // leaving this out causes the tests to fail
   // they shouldn't fail, just leak memory
-  stan::agrad::recover_memory();
+  // stan::agrad::recover_memory();
 
 }
 
@@ -69,6 +69,7 @@ TEST(AgradDistributionsNormal,ProptoY) {
                                    "var: y");
 
 }
+
 TEST(AgradDistributionsNormal,ProptoYMu) {
   double sigma;
   sigma = 5.0;

@@ -168,17 +168,18 @@ namespace stan {
 
     };
 
-
-    void print_stack() {
-      std::cout << std::endl << "STACK, size=" << var_stack_.size() << std::endl;
+    /*
+    #include <ostream>
+    void print_stack(ostream& o) {
+      o << "STACK, size=" << var_stack_.size() << std::endl;
       for (unsigned int i = 0; i < var_stack_.size(); ++i)
-        std::cout << i 
-                  << "  " << var_stack_[i]
-                  << "  " << ((vari*)var_stack_[i])->val_
-                  << " : " << ((vari*)var_stack_[i])->adj_
-                  << std::endl;
+        o << i 
+          << "  " << var_stack_[i]
+          << "  " << ((vari*)var_stack_[i])->val_
+          << " : " << ((vari*)var_stack_[i])->adj_
+          << std::endl;
     }
-
+    */
 
 
     /**
@@ -392,14 +393,10 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
-        // std::cout << "STARTING STACK" << std::endl;
-        // print_stack();
         stan::agrad::grad(vi_);
         g.resize(0);
         for (size_t i = 0U; i < x.size(); ++i) 
           g.push_back(x[i].vi_->adj_);
-        // std::cout << std::endl << "MIDDLING STACK" << std::endl;
-        // print_stack();
         recover_memory();
       }
 
@@ -2184,11 +2181,16 @@ namespace stan {
      * derivative propagation.
      */
     static void grad(chainable* vi) {
-      std::vector<chainable*>::iterator it = var_stack_.end();
+      // old with subtle *2 bug
+      // std::vector<chainable*>::iterator begin = var_stack_.begin();
+      // std::vector<chainable*>::iterator it = var_stack_.end();
+      // for (; (it >= begin) && (*it != vi); --it) ;
+
       std::vector<chainable*>::iterator begin = var_stack_.begin();
-      // skip to root variable
-      for (; (it >= begin) && (*it != vi); --it)
-        ;
+      std::vector<chainable*>::iterator it  = var_stack_.end();
+      if (begin == it) return; // nothing on stack
+      for (--it; (it >= begin) && (*it != vi); --it) ;
+
       vi->init_dependent(); 
       // propagate derivates for remaining vars
       for (; it >= begin; --it)
