@@ -60,6 +60,9 @@ test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
 
 # MODELS (to be passed through demo/gm)
 # =========================================================
+# find all bugs models
+BUGS_MODELS = $(subst src/,,$(wildcard src/models/bugs_examples/vol*/*/*.stan))
+
 .PHONY: test-models
 test-models: $(BUGS_MODELS) | demo/gm models
 
