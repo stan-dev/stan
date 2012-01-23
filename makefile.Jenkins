@@ -60,18 +60,20 @@ test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
 
 # MODELS (to be passed through demo/gm)
 # =========================================================
+.PHONY: test-models
+test-models: $(BUGS_MODELS) | demo/gm models
 
 models:
 	mkdir -p models
 
-models/% :  | demo/gm models
-	@echo '--- translating src/models/%.stan using demo/gm ---'
-	cat src/models/$@.stan | demo/gm > models/$(notdir $@).cpp
-	@echo '--- building models/$(notdir $@).cpp ---'
-	$(CC) $(CFLAGS) models/$@.cpp -c -o models/$@.o
-	$(CC) $(CFLAGS) models/$@.o -o models/$@
-	@echo '--- copying model data to models/ ---'
-	cp src/models/%@*data models/
+models/%.stan : | demo/gm models
+	mkdir -p $(dir $@)
+	@echo '--- translating Stan graphical model to C++ code ---'
+	cat src/$@ | demo/gm > $(basename $@).cpp
+	@echo '--- compiling C++ model ---'
+	$(CC) $(CFLAGS) $(basename $@).cpp -o $(basename $@)
+	@echo '--- run the model ---'
+	$(basename $@) --data=src/$(basename $@).Rdata --samples=$(basename $@).csv
 
 # DEMO
 # =========================================================
