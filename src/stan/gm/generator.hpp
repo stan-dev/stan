@@ -2012,6 +2012,7 @@ namespace stan {
       out << INDENT << "} catch (std::exception& e) {" << EOL;
       out << INDENT2 << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" << EOL;
       out << INDENT2 << "std::cerr << \"Diagnostic information: \" << std::endl << boost::diagnostic_information(e) << std::endl;" << EOL;
+      out << INDENT2 << "return -1;" << EOL;
       out << INDENT << "}" << EOL;
 
       out << "}" << EOL2;
