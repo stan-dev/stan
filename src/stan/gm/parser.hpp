@@ -1307,6 +1307,11 @@ namespace stan {
           > *statement_g(false,derived_origin) // -sampling
           > lit('}');
 
+        boost::spirit::qi::on_error<boost::spirit::qi::rethrow>(program_r,
+                                                                (std::ostream&)error_msgs_
+                                                                << boost::phoenix::val("ERROR: Expected ")
+                                                                << boost::spirit::qi::labels::_4 
+                                                                << std::endl);
       }
 
 
@@ -1327,11 +1332,6 @@ namespace stan {
         //       << boost::phoenix::val("ERROR: Ill-formed factor.")
         //       << std::endl);
 
-        // qi::on_error<qi::rethrow>(program_r,
-        //       (std::ostream&)error_msgs_
-        //        << boost::phoenix::val("ERROR: Expected ")
-        //        << _4 
-        //        << std::endl);
 
 
 
@@ -1438,6 +1438,7 @@ namespace stan {
           msg << ' ';
         msg << " ^-- here" 
             << std::endl << std::endl;
+
         msg << prog_grammar.error_msgs_.str();
         throw std::invalid_argument(msg.str());
       } catch (const std::runtime_error& e) {
@@ -1447,8 +1448,34 @@ namespace stan {
         msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
         throw std::invalid_argument(msg.str());
       }
+      if (!success) {
+        std::cout << "PARSE ERROR." 
+                  << std::endl
+                  << "Unknown error"
+                  << std::endl;
+      }
       bool consumed_all_input = (position_begin == position_end); 
-      return success && consumed_all_input;
+      if (!consumed_all_input) {
+        std::stringstream msg;
+        msg << "ERROR: non-whitespace beyond end of program:" << std::endl;
+        
+        const classic::file_position_base<std::string>& pos 
+          = position_begin.get_position();
+        msg << "file=" << pos.file
+            << "; line=" << pos.line
+            << "; column=" << pos.column
+            << std::endl;
+
+        msg << position_begin.get_currentline() 
+            << std::endl;
+        for (int i = 2; i < pos.column; ++i)
+          msg << ' ';
+        msg << " ^-- starting here" 
+            << std::endl << std::endl;
+        
+        throw std::invalid_argument(msg.str());
+      }
+      return (success && consumed_all_input);
     }
 
   }
