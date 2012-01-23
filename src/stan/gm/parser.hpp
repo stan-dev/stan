@@ -299,6 +299,84 @@ namespace stan {
     };
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
+    struct data_only_expression : public boost::static_visitor<bool> {
+      std::stringstream& error_msgs_;
+      variable_map& var_map_;
+      data_only_expression(std::stringstream& error_msgs,
+                           variable_map& var_map) 
+        : error_msgs_(error_msgs),
+          var_map_(var_map) {
+      }
+      bool operator()(const nil& e) const {
+        return true;
+      }
+      bool operator()(const int_literal& x) const {
+        return true;
+      }
+      bool operator()(const double_literal& x) const {
+        return true;
+      }
+      bool operator()(const variable& x) const {
+        // std::cout << "var name=" << x.name_ << std::endl;
+        bool origin = var_map_.get_origin(x.name_);
+        // std::cout << "var origin=" << origin << std::endl;
+        bool is_data = (origin == data_origin) || (origin == transformed_data_origin);
+        return is_data;
+      }
+      bool operator()(const fun& x) const {
+        for (unsigned int i = 0; i < x.args_.size(); ++i)
+          if (!boost::apply_visitor(*this,x.args_[i].expr_))
+            return false;
+        return true;
+      }
+      bool operator()(const index_op& x) const {
+        for (unsigned int i = 0; i < x.dimss_.size(); ++i)
+          for (unsigned int j = 0; j < x.dimss_[i].size(); ++j)
+            if (!boost::apply_visitor(*this,x.dimss_[i][j].expr_))
+              return false;
+        return true;
+      }
+      bool operator()(const binary_op& x) const {
+        return boost::apply_visitor(*this,x.left.expr_)
+          && boost::apply_visitor(*this,x.right.expr_);
+      }
+      bool operator()(const unary_op& x) const {
+        return boost::apply_visitor(*this,x.subject.expr_);
+      }
+    };
+
+    // #include <stan/gm/generator.hpp>
+
+    struct validate_int_data_expr {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+
+      bool operator()(const expression& expr,
+                      variable_map& var_map,
+                      std::stringstream& error_msgs) const {
+        // std::cout << "********validate int data; expression=";
+        // generate_expression(expr,std::cout);
+        // std::cout << std::endl;
+
+        if (!expr.expression_type().is_primitive_int()) {
+          error_msgs << "dimension declaration requires expression denoting integer;"
+                     << " found type=" 
+                     << expr.expression_type() 
+                     << std::endl;
+          return false;
+        }
+        data_only_expression vis(error_msgs,var_map);
+        bool only_data = boost::apply_visitor(vis,expr.expr_);
+        if (!only_data) {
+          error_msgs << "dimension declaration may only use data or transformed data variables."
+                     << std::endl;
+          return false;
+        }
+        return true;
+      }
+    };
+    boost::phoenix::function<validate_int_data_expr> validate_int_data_expr_f;
+
     struct validate_double_expr {
       template <typename T1, typename T2>
       struct result { typedef bool type; };
@@ -598,9 +676,9 @@ namespace stan {
           %= ( negated_factor_r                          [_val = _1]
                >> *( (lit('*') > negated_factor_r     [_val *= _1])
                       | (lit('/') > negated_factor_r   [_val /= _1])
-                         )
-              )
-                    ;
+                     )
+               )
+          ;
 
         negated_factor_r 
           %= lit('-') >> indexed_factor_r [_val = neg(_1)]
@@ -891,7 +969,9 @@ namespace stan {
         dims_r 
           %= lit('[') 
           > (expression_g
-             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+             [_pass = validate_int_data_expr_f(_1,
+                                               boost::phoenix::ref(var_map_),
+                                               boost::phoenix::ref(error_msgs_))]
              % ',')
           > lit(']')
           ;

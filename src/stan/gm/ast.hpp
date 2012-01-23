@@ -647,6 +647,23 @@ namespace stan {
       local_origin
     };
 
+    std::ostream& operator<<(std::ostream& o, const var_origin& vo) {
+      if (vo == data_origin)
+        o << "data";
+      else if (vo == transformed_data_origin)
+        o << "transformed data";
+      else if (vo == parameter_origin) 
+        o << "parameter";
+      else if (vo == transformed_parameter_origin)
+        o << "transformed parameter";
+      else if (vo == derived_origin)
+        o << "derived";
+      else if (vo == local_origin)
+        o << "local";
+      else 
+        o << "UNKNOWN ORIGIN";
+      return o;
+    }    
 
     struct base_var_decl {
       std::string name_;

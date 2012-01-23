@@ -4,7 +4,7 @@ TO DO
 * clean up dependencies
   - only include as much as necessary
   - no namespace or file-level includes
-  - templated matrix use
+  - typedefs for matrix, vector, row vector
   - simplify model includes with higher-level ones
 
 * range checks for std::vector accesses in model
@@ -13,8 +13,6 @@ TO DO
   - maths
   - prob
   - matrix
-
-* sensible error messages from parser
 
 * exceptions handled by samplers
   - rejection or restart?
@@ -53,8 +51,6 @@ TO DO
    + read.stan(file_path)
 
 * remove -NDEBUG from Jenkins tests
-
-* fix off-by-2 problem in grad for normal (see stack_alloc?)
 
 EXTENSIONS
 =================================================
