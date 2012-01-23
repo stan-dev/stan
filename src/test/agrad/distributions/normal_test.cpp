@@ -14,12 +14,6 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                   stan::prob::normal_log<true>(y1,mu1,sigma1),
                   stan::prob::normal_log<true>(y2,mu2,sigma2),
                   message);
-  // FIXME:
-  // should recover memory after tests that don't do grads
-  // leaving this out causes the tests to fail
-  // they shouldn't fail, just leak memory
-  // stan::agrad::recover_memory();
-
 }
 
 using stan::agrad::var;
