@@ -74,7 +74,7 @@ models/%.stan : | demo/gm models
 	@echo '--- translating Stan graphical model to C++ code ---'
 	cat src/$@ | demo/gm > $(basename $@).cpp
 	@echo '--- compiling C++ model ---'
-	$(CC) $(CFLAGS) $(basename $@).cpp -o $(basename $@)
+	$(CC) $(CFLAGS) $(basename $@).cpp -o $(basename $@).exe
 	@echo '--- run the model ---'
 	$(basename $@) --data=src/$(basename $@).Rdata --samples=$(basename $@).csv
 
