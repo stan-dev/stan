@@ -14,6 +14,7 @@ UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
 UNIT_TESTS := $(filter-out \
 src/test/agrad/matrix_test.cpp src/test/gm/parser_test.cpp src/test/agrad/distributions/inv_wishart_test.cpp\
 src/test/agrad/distributions/wishart_test.cpp src/test/agrad/distributions/multi_normal_test.cpp\
+src/test/agrad/error_handling_test.cpp\
 ,$(UNIT_TESTS))
 
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
