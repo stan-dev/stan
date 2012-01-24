@@ -6,7 +6,6 @@ TO DO
 * error/exception policy throughout
   - remove memory overhead from numeric_limits<stan::agrad::var>
   - maths
-  - prob
   - matrix
 
 * exceptions handled by samplers
