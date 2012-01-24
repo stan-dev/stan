@@ -5,10 +5,6 @@
 // note that in the original example, the parameter 
 // called gamma is called lambda here.  
 // 
-// If we specify lambda as ``double lambda'' instead of
-// ``double(.5, 1) lambda'', it looks like stan would 
-// go to an infinite loop.  (Fri Nov 25 15:58:21 EST 2011)
-//
 
 
 data {
@@ -20,17 +16,12 @@ parameters {
   double alpha; 
   double beta;  
   double(.5, 1) lambda; // orginal gamma in the JAGS example  
-  // double lambda; 
-  double(0,) tau; // or double sigma; 
-  // It looks like it is fine to declare either tau or sigma as parameters and
-  // declare sigma or tau as dervied parameters with the prior always 
-  // specified on tau. 
+  double(0,) tau; 
    
 } 
 transformed parameters {
-  double sigma; // or double tau; 
+  double sigma; 
   double U3; 
-  // tau <- 1 / (sigma * sigma);
   sigma <- 1 / sqrt(tau); 
   U3 <- logit(lambda);
 } 
@@ -41,6 +32,5 @@ model {
   beta ~ normal(0.0, 1000); 
   lambda ~ uniform(.5, 1); 
   tau ~ gamma(.0001, .0001); 
-  // sigma ~ gamma(2, .001); // a different prior 
 }
 

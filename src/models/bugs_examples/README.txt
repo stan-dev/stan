@@ -11,6 +11,6 @@ JAGS models and data for all these examples are in:
 
  http://sourceforge.net/projects/mcmc-jags/files/Examples/2.x/
 
-JAGS'a author has a R package: 
+JAGS' author has a R package for BUGS examples: 
  https://r-forge.r-project.org/projects/bugs-examples/
  To install the package, install.packages("BUGSExamples", repos="http://R-Forge.R-project.org")
