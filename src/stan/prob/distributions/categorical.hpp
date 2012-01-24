@@ -15,13 +15,24 @@ namespace stan {
 
     // Categorical(n|theta)  [0 <= n < N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto = false, 
-	      typename T_prob, 
-	      class Policy = policy<> >
+              typename T_prob, 
+              class Policy = policy<> >
     inline typename promote_args<T_prob>::type
       categorical_log(const unsigned int n, const Matrix<T_prob,Dynamic,1>& theta, const Policy& = Policy()) {
-      // FIXME: domain checks
+      static const char* function = "stan::prob::categorical_log<%1%>(%1%)";
+
+      typename promote_args<T_prob>::type lp(0.0);
+      if (!check_bounded(function, n, 0U, theta.size()-1,
+                         "Number of items, n,",
+                         &lp, Policy()))
+        return lp;
+      if (!check_simplex(function, theta,
+                         "Simplex, theta,",
+                         &lp, Policy()))
+        return lp;
+  
       if (include_summand<propto,T_prob>::value)
-	return log(theta(n));
+        return log(theta(n));
       return 0.0;
     }
 

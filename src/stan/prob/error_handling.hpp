@@ -55,8 +55,8 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must not be nan!";
           *result = boost::math::policies::raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
+                                                                   message.str().c_str(),
+                                                                   y[i], Policy());
           return false;
         }
       }
@@ -74,8 +74,8 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must not be nan!";
           *result = boost::math::policies::raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
+                                                                   message.str().c_str(),
+                                                                   y[i], Policy());
           return false;
         }
       }
@@ -96,8 +96,8 @@ namespace stan {
         std::string message(name);
         message += " is %1%, but must be finite!";
         *result = boost::math::policies::raise_domain_error<T_y>(function,
-                                          message.c_str(), 
-                                          y, Policy());
+                                                                 message.c_str(), 
+                                                                 y, Policy());
         return false;
       }
       return true;
@@ -114,8 +114,8 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be finite!";
           *result = boost::math::policies::raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
+                                                                   message.str().c_str(),
+                                                                   y[i], Policy());
           return false;
         }
       }
@@ -133,8 +133,8 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be finite!";
           *result = boost::math::policies::raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
+                                                                   message.str().c_str(),
+                                                                   y[i], Policy());
           return false;
         }
       }
@@ -154,8 +154,8 @@ namespace stan {
                         const Policy& pol) {
       if (!boost::math::isfinite(x)) {
         *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                          "Random variate x is %1%, but must be finite!",
-                                          x, pol);
+                                                                 "Random variate x is %1%, but must be finite!",
+                                                                 x, pol);
         return false;
       }
       return true;
@@ -174,8 +174,8 @@ namespace stan {
       for (int i = 0; i < x.size(); i++) {
         if (!boost::math::isfinite(x[i])) {
           *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                            "Random variate x is %1%, but must be finite!",
-                                            x[i], Policy());
+                                                                   "Random variate x is %1%, but must be finite!",
+                                                                   x[i], Policy());
           return false;
         }
       }
@@ -190,13 +190,35 @@ namespace stan {
       for (int i = 0; i < x.rows(); i++) {
         if (!boost::math::isfinite(x[i])) {
           *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                            "Random variate x is %1%, but must be finite!",
-                                            x[i], Policy());
+                                                                   "Random variate x is %1%, but must be finite!",
+                                                                   x[i], Policy());
           return false;
         }
       }
       return true;
     }
+
+    template <typename T_x, typename T_low, typename T_result, class Policy>
+    inline bool check_greater(const char* function,
+                              const T_x& x,
+                              const T_low& low,
+                              const char* name,  
+                              T_result* result,
+                              const Policy& /*pol*/) {
+      if (!boost::math::isfinite(x) || !(x > low)) {
+        std::ostringstream msg;
+        msg << name 
+            << " is %1%, but must be finite and greater than "
+            << low;
+        *result = boost::math::policies::raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >
+          (function,
+           msg.str().c_str(),
+           x, Policy());
+        return false;
+      }
+      return true;
+    }
+
 
     template <typename T_x, typename T_low, typename T_high, typename T_result, class Policy>
     inline bool check_bounded(const char* function,
@@ -213,9 +235,10 @@ namespace stan {
             << low
             << " and "
             << high;
-        *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                          msg.str().c_str(),
-                                          x, Policy());
+        *result = boost::math::policies::raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >
+          (function,
+           msg.str().c_str(),
+           x, Policy());
         return false;
       }
       return true;
@@ -243,8 +266,6 @@ namespace stan {
       return true;
     }
 
-    
-
     template <typename T_scale, typename T_result, class Policy>
     inline bool check_scale(const char* function,
                             const T_scale& scale,
@@ -253,8 +274,8 @@ namespace stan {
       // Assume scale == 0 is NOT valid for any distribution.
       if (!(scale > 0) || !boost::math::isfinite(scale)) { 
         *result = boost::math::policies::raise_domain_error<T_scale>(function,
-                                              "Scale parameter is %1%, but must be > 0 !", 
-                                              scale, Policy());
+                                                                     "Scale parameter is %1%, but must be > 0 !", 
+                                                                     scale, Policy());
         return false;
       }
       return true;
@@ -268,8 +289,8 @@ namespace stan {
       if (!(invScale > 0)
           || !boost::math::isfinite(invScale)) { // Assume scale == 0 is NOT valid for any distribution.
         *result = boost::math::policies::raise_domain_error<T_inv_scale>(function,
-                                                  "Inverse scale parameter is %1%, but must be > 0 !", 
-                                                  invScale, Policy());
+                                                                         "Inverse scale parameter is %1%, but must be > 0 !", 
+                                                                         invScale, Policy());
         return false;
       }
       return true;
@@ -285,9 +306,9 @@ namespace stan {
       if (!boost::math::isfinite(x) || !(x >= 0)) {
         std::string message(name);
         message += " is %1%, but must be finite and >= 0!";
-        *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                          message.c_str(), 
-                                          x, Policy());
+        *result = boost::math::policies::raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >(function,
+                                                                                                                   message.c_str(), 
+                                                                                                                   x, Policy());
         return false;
       }
       return true;
@@ -321,6 +342,26 @@ namespace stan {
       return true;
     }
 
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_positive(const char* function,
+                               const std::vector<T_y>& y,
+                               const char* name,
+                               T_result* result,
+                               const Policy& /*pol*/) {
+      for (int i = 0; i < y.size(); i++) {
+        if (!boost::math::isfinite(y[i]) || !(y[i] > 0)) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must be finite and > 0!";
+          *result = boost::math::policies::raise_domain_error<T_y>(function,
+                                                                   message.str().c_str(),
+                                                                   y[i], Policy());
+          return false;
+        }
+      }
+      return true;
+    }
+
+
     template <typename T_location, typename T_result, class Policy>
     inline bool check_location(const char* function,
                                const T_location& location,
@@ -328,8 +369,8 @@ namespace stan {
                                const Policy& /*pol*/) {
       if (!boost::math::isfinite(location)) {
         *result = boost::math::policies::raise_domain_error<T_location>(function,
-                                                 "Location parameter is %1%, but must be finite!", 
-                                                 location, Policy());
+                                                                        "Location parameter is %1%, but must be finite!", 
+                                                                        location, Policy());
         return false;
       }
       return true;
@@ -342,8 +383,8 @@ namespace stan {
                                   const Policy& /*pol*/) {
       if (!boost::math::isfinite(lb)) {
         *result = boost::math::policies::raise_domain_error<T_bound>(function,
-                                              "Lower bound is %1%, but must be finite!", 
-                                              lb, Policy());
+                                                                     "Lower bound is %1%, but must be finite!", 
+                                                                     lb, Policy());
         return false;
       }
       return true;
@@ -357,8 +398,8 @@ namespace stan {
                                   const Policy& /*pol*/) {
       if (!boost::math::isfinite(ub)) {
         *result = boost::math::policies::raise_domain_error<T_bound>(function,
-                                              "Upper bound is %1%, but must be finite!", 
-                                              ub, Policy());
+                                                                     "Upper bound is %1%, but must be finite!", 
+                                                                     ub, Policy());
         return false;
       }
       return true;
@@ -376,8 +417,8 @@ namespace stan {
         return false;
       if (lower >= upper) {
         *result = boost::math::policies::raise_domain_error<T_lb>(function,
-                                           "lower parameter is %1%, but must be less than upper!", 
-                                           lower, Policy());
+                                                                  "lower parameter is %1%, but must be less than upper!", 
+                                                                  lower, Policy());
         return false;
       }
       return true;
@@ -393,9 +434,9 @@ namespace stan {
         std::ostringstream msg;
         msg << "i and j must be same.  Found i=%1%, j=" << j;
         *result = boost::math::policies::raise_domain_error<double>(function,
-                                             msg.str().c_str(),
-                                             i,
-                                             Policy());
+                                                                    msg.str().c_str(),
+                                                                    i,
+                                                                    Policy());
         return false;
       }
       return true;
@@ -412,15 +453,33 @@ namespace stan {
                << Sigma
                << "\nSigma(0,0): %1%";
         *result = boost::math::policies::raise_domain_error<T_covar>(function,
-                                              stream.str().c_str(), 
-                                              Sigma(0,0),
-                                              Policy());
+                                                                     stream.str().c_str(), 
+                                                                     Sigma(0,0),
+                                                                     Policy());
         return false;
       }
       return true;
     }
 
-
+    template <typename T_prob, typename T_result, class Policy>
+    inline bool check_simplex(const char* function,
+                              const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
+                              const char* name,
+                              T_result* result,
+                              const Policy& /*pol*/) {
+      if (!simplex_validate(theta)) {
+        std::ostringstream stream;
+        stream << name
+               << "is not a valid simplex. The first element of the simplex is: %1%.";
+        *result = boost::math::policies::raise_domain_error<T_prob>(function,
+                                                                    stream.str().c_str(), 
+                                                                    theta(0),
+                                                                    Policy());
+        return false;
+      }
+      return true;
+    }
+    
   }
 }
 #endif
