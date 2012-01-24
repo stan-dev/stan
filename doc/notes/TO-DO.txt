@@ -53,8 +53,6 @@ TO DO
    + dump.stan(fit)
    + read.stan(file_path)
 
-* remove -NDEBUG from Jenkins tests
-
 EXTENSIONS
 =================================================
 
