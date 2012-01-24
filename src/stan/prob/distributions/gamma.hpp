@@ -7,9 +7,6 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     /**
      * The log of a gamma density for y with the specified
      * shape and inverse scale parameters.
@@ -34,12 +31,12 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_shape, typename T_inv_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_shape,T_inv_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::gamma_log<%1%>(%1%)";
 
-      typename promote_args<T_y,T_shape,T_inv_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type lp(0.0);
       if (!stan::prob::check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
         return lp;
       if (!stan::prob::check_positive(function, beta, "Inverse scale parameter, beta,", &lp, Policy())) 
@@ -77,12 +74,12 @@ namespace stan {
      */    
     template <bool propto = false,
               typename T_y, typename T_shape, typename T_inv_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_shape,T_inv_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()){
       static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
 
-      typename promote_args<T_y,T_shape,T_inv_scale>::type result(0.0);
+      typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type result(0.0);
       if (!stan::prob::check_positive(function, alpha, "Shape parameter, alpha,", &result, Policy())) 
         return result;
       if (!stan::prob::check_positive(function, beta, "Inverse scale parameter, beta,", &result, Policy())) 

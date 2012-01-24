@@ -8,9 +8,6 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-    
     /**
      * The log of a scaled inverse chi-squared density for y with the specified
      * degrees of freedom parameter and scale parameter.
@@ -19,10 +16,10 @@ namespace stan {
      * y must be greater than 0.
      * 
      \f{eqnarray*}{
-       y &\sim& \mbox{\sf{Inv-}}\chi^2(\nu, s^2) \\
-       \log (p (y \,|\, \nu, s)) &=& \log \left( \frac{(\nu / 2)^{\nu / 2}}{\Gamma (\nu / 2)} s^\nu y^{- (\nu / 2 + 1)} \exp^{-\nu s^2 / (2y)} \right) \\
-       &=& \frac{\nu}{2} \log(\frac{\nu}{2}) - \log (\Gamma (\nu / 2)) + \nu \log(s) - (\frac{\nu}{2} + 1) \log(y) - \frac{\nu s^2}{2y} \\
-       & & \mathrm{ where } \; y > 0
+     y &\sim& \mbox{\sf{Inv-}}\chi^2(\nu, s^2) \\
+     \log (p (y \,|\, \nu, s)) &=& \log \left( \frac{(\nu / 2)^{\nu / 2}}{\Gamma (\nu / 2)} s^\nu y^{- (\nu / 2 + 1)} \exp^{-\nu s^2 / (2y)} \right) \\
+     &=& \frac{\nu}{2} \log(\frac{\nu}{2}) - \log (\Gamma (\nu / 2)) + \nu \log(s) - (\frac{\nu}{2} + 1) \log(y) - \frac{\nu s^2}{2y} \\
+     & & \mathrm{ where } \; y > 0
      \f}
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
@@ -35,8 +32,8 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_dof,T_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
                               const Policy& = Policy()) {
       static const char* function = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
@@ -44,7 +41,7 @@ namespace stan {
       using stan::maths::multiply_log;
       using stan::maths::square;
 
-      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       if (!check_positive(function, s, "Scale", &lp, Policy()))

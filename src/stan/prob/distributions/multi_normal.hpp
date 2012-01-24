@@ -6,23 +6,8 @@
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
-
-
-
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
-    using stan::maths::determinant;
-    using stan::maths::dot_product;
-    using stan::maths::inverse;
-    using stan::maths::multiply;
-    using stan::maths::transpose;
-
-    using Eigen::Matrix;
-    using Eigen::Dynamic;
-
     // MultiNormal(y|mu,Sigma)   [y.rows() = mu.rows() = Sigma.rows();
     //                            y.cols() = mu.cols() = 0;
     //                            Sigma symmetric, non-negative, definite]
@@ -44,15 +29,15 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_loc, typename T_covar, 
-              class Policy = policy<> > 
+              class Policy = boost::math::policies::policy<> > 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Matrix<T_y,Dynamic,1>& y,
-                     const Matrix<T_loc,Dynamic,1>& mu,
-                     const Matrix<T_covar,Dynamic,Dynamic>& Sigma,
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                      const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
       
-      typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
         return lp;
       if (!check_size_match(function, y.size(), Sigma.rows(), &lp, Policy()))
@@ -68,7 +53,11 @@ namespace stan {
       
       using stan::maths::multiply_log;
       using stan::maths::subtract;
-      
+      using stan::maths::determinant;
+      using stan::maths::inverse;
+      using stan::maths::multiply;
+      using stan::maths::transpose;
+
       if (y.rows() == 0)
         return lp;
       if (include_summand<propto>::value) 
@@ -76,7 +65,7 @@ namespace stan {
       if (include_summand<propto,T_covar>::value)
         lp -= multiply_log(0.5,determinant(Sigma));
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename promote_args<T_y,T_loc>::type, Dynamic, 1> diff 
+        Eigen::Matrix<typename boost::math::tools::promote_args<T_y,T_loc>::type, Eigen::Dynamic, 1> diff 
           = subtract(y,mu);
         lp -= 0.5 * multiply(multiply(transpose(diff),inverse(Sigma)),
                              diff);
@@ -103,18 +92,18 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_loc, typename T_covar, 
-              class Policy = policy<> > 
+              class Policy = boost::math::policies::policy<> > 
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Matrix<T_y,Dynamic,1>& y,
-                              const Matrix<T_loc,Dynamic,1>& mu,
-                              const Matrix<T_covar,Dynamic,Dynamic>& L,
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                               const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
       using stan::maths::multiply;
       using stan::maths::subtract;
       
-      typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
         return lp;
@@ -136,13 +125,13 @@ namespace stan {
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         
-        Eigen::Matrix<T_covar,Dynamic,Dynamic> 
+        Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> 
           L_inv(L
                 .template triangularView<Eigen::Lower>()
-                .solve(Matrix<T_covar,Dynamic,Dynamic>
+                .solve(Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>
                        ::Identity(L.rows(),L.rows())));
         
-        Eigen::Matrix<typename promote_args<T_covar,T_loc,T_y>::type, Dynamic, 1> 
+        Eigen::Matrix<typename boost::math::tools::promote_args<T_covar,T_loc,T_y>::type, Eigen::Dynamic, 1> 
           half(multiply(L_inv,
                         subtract(y,mu)));
 

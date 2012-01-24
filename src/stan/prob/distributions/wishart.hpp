@@ -8,12 +8,6 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-    
-    using Eigen::Dynamic;
-    using Eigen::Matrix;
-
     // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite; 
     //                          Sigma.dims() = Omega.dims();
     //                           n > Sigma.rows() - 1]
@@ -46,16 +40,16 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_dof,T_scale>::type
-    wishart_log(const Matrix<T_y,Dynamic,Dynamic>& W,
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
-                const Matrix<T_scale,Dynamic,Dynamic>& S,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                 const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
       unsigned int k = W.rows();
-      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if(!stan::prob::check_nonnegative(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))

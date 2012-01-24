@@ -7,10 +7,6 @@
 
 namespace stan {
   namespace prob {
-
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     // StudentT(y|nu,mu,sigma)  [nu > 0;   sigma > 0]
     /**
      * The log of the Student-t density for the given y, nu, mean, and
@@ -42,8 +38,8 @@ namespace stan {
               typename T_dof, 
               typename T_loc, 
               typename T_scale,
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_dof,T_loc,T_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
       student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
@@ -51,7 +47,7 @@ namespace stan {
       using stan::maths::square;
       using boost::math::lgamma;
 
-      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
       if(!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))

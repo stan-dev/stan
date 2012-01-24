@@ -7,9 +7,6 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     /**
      * The log of an inverse gamma density for y with the specified
      * shape and scale parameters.
@@ -28,7 +25,7 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_shape, typename T_scale, 
-              class Policy = policy<> >
+              class Policy = boost::math::policies::policy<> >
       inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
       inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, 
                     const Policy& = Policy()) {
@@ -37,7 +34,7 @@ namespace stan {
       using boost::math::lgamma;
       using stan::maths::multiply_log;
 
-      typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type lp(0.0);
       if (!stan::prob::check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
         return lp;
       if (!stan::prob::check_positive(function, beta, "Scale parameter, beta,", &lp, Policy())) 

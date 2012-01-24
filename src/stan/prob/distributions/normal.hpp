@@ -9,10 +9,6 @@
 namespace stan {
 
   namespace prob {
-
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     /**
      * The log of the normal density for the given y, mean, and
      * standard deviation.  The standard deviation must be greater
@@ -39,13 +35,13 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_loc,T_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy& = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type lp(0.0);
 
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
@@ -92,16 +88,16 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_loc, typename T_scale,
-              class Policy = policy<> >
+              class Policy = boost::math::policies::policy<> >
 
-    inline typename promote_args<T_y, T_loc, T_scale>::type
+    inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
 
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
              const Policy& /* pol */ = Policy() ) {
 
       static const char* function = "stan::prob::normal_p(%1%)";
 
-      typename promote_args<T_y, T_loc, T_scale>::type lp;
+      typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type lp;
 
       if (!check_scale(function, sigma, &lp, Policy()))
         return lp;
@@ -141,15 +137,15 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y,T_loc,T_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const std::vector<T_y>& y,
                const T_loc& mu,
                const T_scale& sigma,
                const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!check_scale(function, sigma, &lp, Policy()))
         return lp;
       if (!check_location(function, mu, &lp, Policy()))

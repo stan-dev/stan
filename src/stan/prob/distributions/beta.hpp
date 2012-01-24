@@ -8,9 +8,6 @@
 namespace stan {
   namespace prob {
 
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     // Beta(y|alpha,beta)  [alpha > 0;  beta > 0;  0 <= y <= 1]
     /**
      * The log of a beta density for y with the specified
@@ -30,13 +27,13 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy = policy<> >
-      inline typename promote_args<T_y,T_scale_succ,T_scale_fail>::type
+              class Policy = boost::math::policies::policy<> >
+      inline typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
       beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
                const Policy& = Policy()) {
       static const char* function = "stan::prob::beta_log<%1%>(%1%)";
 
-      typename promote_args<T_y,T_scale_succ,T_scale_fail>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type lp(0.0);
       if (!stan::prob::check_positive(function, alpha, 
                                      "Prior success sample size plus 1, alpha,",
                                      &lp, Policy()))
