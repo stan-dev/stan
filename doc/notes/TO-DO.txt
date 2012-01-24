@@ -1,15 +1,10 @@
 TO DO
 =================================================
 
-* clean up dependencies
-  - only include as much as necessary
-  - no namespace or file-level includes
-  - typedefs for matrix, vector, row vector
-  - simplify model includes with higher-level ones
-
 * range checks for std::vector accesses in model
 
 * error/exception policy throughout
+  - remove memory overhead from numeric_limits<stan::agrad::var>
   - maths
   - prob
   - matrix
@@ -21,19 +16,28 @@ TO DO
   - set step size, number of steps
   - tune step size (optional)
 
-* eliminate tabs (replace w. 4 spaces)
+* clean up dependencies
+  - only include as much as necessary
+  - no namespace or file-level includes
+  - typedefs for matrix, vector, row vector
+  - simplify model includes with higher-level ones
 
-* remaining API doc
+* remaining doc
+  - API doc
+  - reference manual
+  - getting started guide
+  - R interface
 
 * distribution engineering
- - tarball
- - basic distro site
- - check cross-platform
+  - eliminate tabs from code
+  - tarball
+  - basic distro site
+  - check cross-platform compilation
 
 * discrete samplers: 
-- Gibbs for small intervals
-- slice for others
-- what about multinomial with constraints?
+  - Gibbs for small intervals
+  - slice for others
+  - what about multinomial with constraints?
 
 * R interface
  - simple process-level calls

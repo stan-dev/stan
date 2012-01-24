@@ -14,11 +14,14 @@ int main() {
       = stan::gm::compile(std::cin,std::cout,"demo_model");
 
     if (!ok) {
-      std::cout << "PARSE FAIL." << std::endl;
+      std::cout << "PARSING FAILED." << std::endl;
       return PARSE_FAIL_RC;
     }
   } catch(const std::exception& e) {
-    std::cerr << "  EXCEPTION. " << e.what() << std::endl;
+    std::cerr << std::endl
+              << "ERROR PARSING"
+              << std::endl
+              << e.what();
     return EXCEPTION_RC;
   }
   

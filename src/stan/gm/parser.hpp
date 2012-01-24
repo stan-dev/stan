@@ -317,10 +317,15 @@ namespace stan {
         return true;
       }
       bool operator()(const variable& x) const {
-        // std::cout << "var name=" << x.name_ << std::endl;
-        bool origin = var_map_.get_origin(x.name_);
-        // std::cout << "var origin=" << origin << std::endl;
+        var_origin origin = var_map_.get_origin(x.name_);
         bool is_data = (origin == data_origin) || (origin == transformed_data_origin);
+        if (!is_data) {
+          error_msgs_ << "non-data variables not allowed in dimension declarations."
+                      << std::endl
+                      << "     found variable=" << x.name_
+                      << "; declared in block=" << origin
+                      << std::endl;
+        }
         return is_data;
       }
       bool operator()(const fun& x) const {
@@ -330,6 +335,8 @@ namespace stan {
         return true;
       }
       bool operator()(const index_op& x) const {
+        if (!boost::apply_visitor(*this,x.expr_.expr_))
+          return false;
         for (unsigned int i = 0; i < x.dimss_.size(); ++i)
           for (unsigned int j = 0; j < x.dimss_[i].size(); ++j)
             if (!boost::apply_visitor(*this,x.dimss_[i][j].expr_))
@@ -354,10 +361,6 @@ namespace stan {
       bool operator()(const expression& expr,
                       variable_map& var_map,
                       std::stringstream& error_msgs) const {
-        // std::cout << "********validate int data; expression=";
-        // generate_expression(expr,std::cout);
-        // std::cout << std::endl;
-
         if (!expr.expression_type().is_primitive_int()) {
           error_msgs << "dimension declaration requires expression denoting integer;"
                      << " found type=" 
@@ -366,13 +369,8 @@ namespace stan {
           return false;
         }
         data_only_expression vis(error_msgs,var_map);
-        bool only_data = boost::apply_visitor(vis,expr.expr_);
-        if (!only_data) {
-          error_msgs << "dimension declaration may only use data or transformed data variables."
-                     << std::endl;
-          return false;
-        }
-        return true;
+        bool only_data_dimensions = boost::apply_visitor(vis,expr.expr_);
+        return only_data_dimensions;
       }
     };
     boost::phoenix::function<validate_int_data_expr> validate_int_data_expr_f;
@@ -1387,32 +1385,14 @@ namespace stan {
           > *statement_g(false,derived_origin) // -sampling
           > lit('}');
 
-        boost::spirit::qi::on_error<boost::spirit::qi::rethrow>(program_r,
-                                                                (std::ostream&)error_msgs_
-                                                                << boost::phoenix::val("ERROR: Expected ")
-                                                                << boost::spirit::qi::labels::_4 
-                                                                << std::endl);
+        using boost::spirit::qi::on_error;
+        using boost::spirit::qi::rethrow;
+        on_error<rethrow>(program_r,
+                          (std::ostream&)error_msgs_
+                          << std::endl
+                          << boost::phoenix::val("Parser expecting: ")
+                          << boost::spirit::qi::labels::_4); 
       }
-
-
-        // hack cast to write to error_msgs_ of type stringstream
-
-        // qi::on_error<qi::rethrow>(var_decl_r,
-        //      (std::ostream&)error_msgs_
-        //       << boost::phoenix::val("ERROR: Ill-formed variable declaration.")
-        //       << std::endl);
-
-        // qi::on_error<qi::rethrow>(indexed_factor_r,
-        //       (std::ostream&)error_msgs_
-        //       << boost::phoenix::val("ERROR: Ill-formed indexed factor.")
-        //       << std::endl);
-
-        // qi::on_error<qi::rethrow>(factor_r,
-        //       (std::ostream&)error_msgs_
-        //       << boost::phoenix::val("ERROR: Ill-formed factor.")
-        //       << std::endl);
-
-
 
 
       // global info for parses
@@ -1468,49 +1448,45 @@ namespace stan {
                const std::string& filename, 
                program& result) {
 
-      namespace classic = boost::spirit::classic;
+      using boost::spirit::classic::position_iterator2;
+      using boost::spirit::multi_pass;
+      using boost::spirit::make_default_multi_pass;
+      using std::istreambuf_iterator;
+
+      using boost::spirit::qi::expectation_failure;
+      using boost::spirit::classic::file_position_base;
+      using boost::spirit::qi::phrase_parse;
+
 
       // iterate over stream input
-      typedef std::istreambuf_iterator<char> base_iterator_type;
+      typedef istreambuf_iterator<char> base_iterator_type;
+      typedef multi_pass<base_iterator_type>  forward_iterator_type;
+      typedef position_iterator2<forward_iterator_type> pos_iterator_type;
 
       base_iterator_type in_begin(input);
       
-      // convert input iterator to forward iterator, usable by spirit parser
-      typedef boost::spirit::multi_pass<base_iterator_type> 
-        forward_iterator_type;
-
-      forward_iterator_type fwd_begin 
-        = boost::spirit::make_default_multi_pass(in_begin);
+      forward_iterator_type fwd_begin = make_default_multi_pass(in_begin);
       forward_iterator_type fwd_end;
       
-      // wrap forward iterator with position iterator, to record the position
-      typedef classic::position_iterator2<forward_iterator_type> 
-        pos_iterator_type;
-
       pos_iterator_type position_begin(fwd_begin, fwd_end, filename);
       pos_iterator_type position_end;
       
       program_grammar<pos_iterator_type> prog_grammar;
       whitespace_grammar<pos_iterator_type> whitesp_grammar;
       
-      bool success = 0;
+      bool parse_succeeded = false;
       try {
-        success = boost::spirit::qi::phrase_parse(position_begin, 
-                                                  position_end,
-                                                  prog_grammar,
-                                                  whitesp_grammar,
-                                                  result);
-      } catch (const 
-               boost::spirit::qi::expectation_failure<pos_iterator_type>& e) {
-        // FIXME: generalize beyond expectation failures
-        const classic::file_position_base<std::string>& pos 
-          = e.first.get_position();
+        parse_succeeded = phrase_parse(position_begin, 
+                                       position_end,
+                                       prog_grammar,
+                                       whitesp_grammar,
+                                       result);
+      } catch (const expectation_failure<pos_iterator_type>& e) {
+        const file_position_base<std::string>& pos = e.first.get_position();
         std::stringstream msg;
-        msg << "PARSE ERROR." 
-            << std::endl;
-        msg << "file=" << pos.file
+        msg << "LOCATION:  file=" << pos.file
             << "; line=" << pos.line 
-            << "; column=" << pos.column 
+            << ", colum=" << pos.column 
             << std::endl;
         msg << std::endl << e.first.get_currentline() 
             << std::endl;
@@ -1519,43 +1495,48 @@ namespace stan {
         msg << " ^-- here" 
             << std::endl << std::endl;
 
-        msg << prog_grammar.error_msgs_.str();
+        msg << "DIAGNOSTIC(S) FROM PARSER:" << std::endl;
+        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
         throw std::invalid_argument(msg.str());
+
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
-        msg << "PARSE ERROR." << std::endl;
-        msg << "unknown location" << std::endl;
+        msg << "LOCATION: unknown" << std::endl;
+
+        msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
         msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
         throw std::invalid_argument(msg.str());
       }
-      if (!success) {
-        std::cout << "PARSE ERROR." 
-                  << std::endl
-                  << "Unknown error"
-                  << std::endl;
-      }
+      
       bool consumed_all_input = (position_begin == position_end); 
-      if (!consumed_all_input) {
-        std::stringstream msg;
-        msg << "ERROR: non-whitespace beyond end of program:" << std::endl;
-        
-        const classic::file_position_base<std::string>& pos 
-          = position_begin.get_position();
-        msg << "file=" << pos.file
-            << "; line=" << pos.line
-            << "; column=" << pos.column
-            << std::endl;
+      bool success = parse_succeeded && consumed_all_input;
 
+      if (!success) {      
+        std::stringstream msg;
+        if (!parse_succeeded)
+          msg << "PARSE DID NOT SUCCEED." << std::endl; 
+        if (!consumed_all_input)
+          msg << "ERROR: non-whitespace beyond end of program:" << std::endl;
+        
+        const file_position_base<std::string>& pos 
+          = position_begin.get_position();
+        msg << "LOCATION: file=" << pos.file
+            << "; line=" << pos.line
+            << ", column=" << pos.column
+            << std::endl;
         msg << position_begin.get_currentline() 
             << std::endl;
         for (int i = 2; i < pos.column; ++i)
           msg << ' ';
         msg << " ^-- starting here" 
             << std::endl << std::endl;
-        
+
+        msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
+        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
+
         throw std::invalid_argument(msg.str());
       }
-      return (success && consumed_all_input);
+      return true;
     }
 
   }
