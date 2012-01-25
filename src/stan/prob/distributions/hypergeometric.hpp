@@ -7,13 +7,10 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-    
     // Hypergeometric(n|N,a,b)  [0 <= n <= a;  0 <= N-n <= b;  0 <= N <= a+b]
     // n: #white balls drawn;  N: #balls drawn;  a: #white balls;  b: #black balls
     template <bool propto = false, 
-              class Policy = policy<> >
+              class Policy = boost::math::policies::policy<> >
     inline double
     hypergeometric_log(const unsigned int n, const unsigned int N, 
                        const unsigned int a, const unsigned int b, const Policy& = Policy()) {

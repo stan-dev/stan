@@ -8,17 +8,9 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
-    using Eigen::Matrix;
-    using Eigen::Dynamic;
-    using Eigen::LLT;
-    using Eigen::NumericalIssue;
-
     template <typename T_shape>
     T_shape do_ljk_constant(const T_shape& eta, const unsigned int& K) {
-       // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
+      // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
       T_shape the_sum = 0.0;
       T_shape constant = 0.0;
       T_shape beta_arg;
@@ -48,12 +40,12 @@ namespace stan {
     //                  eta > 0; eta == 1 <-> uniform]
     template <bool propto = false,
               typename T_covar, typename T_shape, 
-              class Policy = policy<> >
-    inline typename promote_args<T_covar, T_shape>::type
-    lkj_corr_cholesky_log(const Matrix<T_covar,Dynamic,Dynamic>& L, 
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_covar, T_shape>::type
+    lkj_corr_cholesky_log(const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
                           const T_shape& eta, const Policy& /* pol */) {
 
-      typename promote_args<T_covar,T_shape>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_covar,T_shape>::type lp(0.0);
       const unsigned int K = L.rows();
       if (K == 0)
         return lp;
@@ -71,14 +63,14 @@ namespace stan {
     //                  eta > 0; eta == 1 <-> uniform]
     template <bool propto = false,
               typename T_y, typename T_shape, 
-              class Policy = policy<> >
-    inline typename promote_args<T_y, T_shape>::type
-    lkj_corr_log(const Matrix<T_y,Dynamic,Dynamic>& y, const T_shape& eta, const Policy& /* pol */) {
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_y, T_shape>::type
+    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, const T_shape& eta, const Policy& /* pol */) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
       // FIXME: should there be a test on eta?  
 
-      typename promote_args<T_y,T_shape>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_y,T_shape>::type lp(0.0);
 
       if (!check_size_match(function, y.rows(), y.cols(), &lp, Policy()))
         return lp;
@@ -90,8 +82,8 @@ namespace stan {
       if (K == 0)
         return lp;
 
-      LLT<T_y, Dynamic> Cholesky = y.llt();
-      if(Cholesky.info() == NumericalIssue) // do we need a check_numerical_issue function?
+      Eigen::LLT<T_y,Eigen::Dynamic> Cholesky = y.llt();
+      if(Cholesky.info() == Eigen::NumericalIssue) // do we need a check_numerical_issue function?
         return lp;
       
       lp = lkj_corr_cholesky_log<propto>(Cholesky.matrixL(), eta);

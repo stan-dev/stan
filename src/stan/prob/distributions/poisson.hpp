@@ -7,18 +7,15 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
     template <bool propto = false,
               typename T_rate, 
-              class Policy = policy<> >
-    inline typename promote_args<T_rate>::type
-      poisson_log(const unsigned int n, const T_rate& lambda, const Policy& = Policy()) {
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_rate>::type
+    poisson_log(const unsigned int n, const T_rate& lambda, const Policy& = Policy()) {
       static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
       
-      typename promote_args<T_rate>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_rate>::type lp(0.0);
       if(!stan::prob::check_nonnegative(function, lambda, "Rate parameter, lambda,", &lp, Policy()))
         return lp;
       if(!stan::prob::check_nonnegative(function, n, "Number n", &lp, Policy()))

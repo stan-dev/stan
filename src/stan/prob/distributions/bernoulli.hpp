@@ -8,13 +8,10 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
     template <bool propto = false,
               typename T_prob, 
-              class Policy = policy<> > 
+              class Policy = boost::math::policies::policy<> > 
     inline typename boost::math::tools::promote_args<T_prob>::type
     bernoulli_log(const unsigned int n, const T_prob& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::bernoulli_log<%1%>(%1%)";

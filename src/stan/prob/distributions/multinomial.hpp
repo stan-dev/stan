@@ -8,23 +8,20 @@
 namespace stan {
 
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     using Eigen::Matrix;
     using Eigen::Dynamic;
 
     // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;   
     //                            0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto = false,
-              typename T_prob, class Policy = policy<> >
-    inline typename promote_args<T_prob>::type
+              typename T_prob, class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
                     const Matrix<T_prob,Dynamic,1>& theta, 
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::multinomial_log<%1%>(%1%)";
 
-      typename promote_args<T_prob>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_prob>::type lp(0.0);
       if (!check_positive(function, ns, "Sample sizes, ns,", &lp, Policy()))
         return lp;
       if (!check_simplex(function, theta, "Probabilities, theta,", &lp, Policy()))

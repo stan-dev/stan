@@ -7,21 +7,15 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
-    using Eigen::Dynamic;
-    using Eigen::Matrix;
-
     // Categorical(n|theta)  [0 <= n < N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto = false, 
               typename T_prob, 
-              class Policy = policy<> >
-    inline typename promote_args<T_prob>::type
-      categorical_log(const unsigned int n, const Matrix<T_prob,Dynamic,1>& theta, const Policy& = Policy()) {
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_prob>::type
+    categorical_log(const unsigned int n, const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::categorical_log<%1%>(%1%)";
 
-      typename promote_args<T_prob>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_prob>::type lp(0.0);
       if (!check_bounded(function, n, 0U, theta.size()-1,
                          "Number of items, n,",
                          &lp, Policy()))

@@ -8,18 +8,15 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     // NegBinomial(n|alpha,beta)  [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto = false,
               typename T_shape, typename T_inv_scale, 
-              class Policy = policy<> >
-    inline typename promote_args<T_shape, T_inv_scale>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
     neg_binomial_log(const int n, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::neg_binomial_log<%1%>(%1%)";
             
-      typename promote_args<T_shape, T_inv_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type lp(0.0);
       if (!check_nonnegative(function, n, "n", &lp, Policy()))
         return lp;
       if (!check_positive(function, alpha, "Shape, alpha,", &lp, Policy()))

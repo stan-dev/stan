@@ -8,18 +8,15 @@
 
 namespace stan {
   namespace prob {
-    using boost::math::tools::promote_args;
-    using boost::math::policies::policy;
-
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <bool propto = false,
               typename T_n, typename T_N, typename T_prob, 
-              class Policy = policy<> >
-    inline typename promote_args<T_prob,T_n,T_N>::type
+              class Policy = boost::math::policies::policy<> >
+    inline typename boost::math::tools::promote_args<T_prob,T_n,T_N>::type
     binomial_log(const T_n& n, const T_N& N, const T_prob& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::binomial_log<%1%>(%1%)";
 
-      typename promote_args<T_prob,T_n,T_N>::type lp(0.0);
+      typename boost::math::tools::promote_args<T_prob,T_n,T_N>::type lp(0.0);
       if (!check_bounded(function, n, 0, N,
                          "Successes, n,",
                          &lp, Policy()))
