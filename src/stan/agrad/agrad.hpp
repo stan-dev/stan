@@ -2339,8 +2339,15 @@ namespace std {
     static const float_round_style round_style = numeric_limits<double>::round_style;
   };
 
-  int isnan (stan::agrad::var arg) {
-    return isnan(arg.val());
+  /**
+   * Return <code>true</code> if the value of the
+   * specivied variable is not a number.
+   *
+   * @param a Variable to test.
+   * @return <code>true</code> if value is not a number.
+   */
+  int isnan(const stan::agrad::var& a) {
+    return isnan(a.val());
   }
 }
 

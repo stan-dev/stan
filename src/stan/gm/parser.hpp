@@ -1486,7 +1486,7 @@ namespace stan {
         std::stringstream msg;
         msg << "LOCATION:  file=" << pos.file
             << "; line=" << pos.line 
-            << ", colum=" << pos.column 
+            << ", column=" << pos.column 
             << std::endl;
         msg << std::endl << e.first.get_currentline() 
             << std::endl;

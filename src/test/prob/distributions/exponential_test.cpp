@@ -87,9 +87,3 @@ TEST(ProbDistributionsExponential,Cumulative) {
   EXPECT_FLOAT_EQ(1.0, stan::prob::exponential_p(15.0,3.9));
   EXPECT_FLOAT_EQ(0.62280765, stan::prob::exponential_p(0.25,3.9));
 }
-TEST(ProbDistributionsExponential,CumulativePropto) {
-  EXPECT_FLOAT_EQ(1.0, stan::prob::exponential_p<true>(2.0,1.5));
-  EXPECT_FLOAT_EQ(1.0, stan::prob::exponential_p<true>(0,1.5));
-  EXPECT_FLOAT_EQ(1.0, stan::prob::exponential_p<true>(15.0,3.9));
-  EXPECT_FLOAT_EQ(1.0, stan::prob::exponential_p<true>(0.25,3.9));
-}
