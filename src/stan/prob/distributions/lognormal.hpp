@@ -1,4 +1,4 @@
-using#ifndef __STAN__PROB__DISTRIBUTIONS__LOGNORMAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__LOGNORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__LOGNORMAL_HPP__
 
 #include <stan/prob/traits.hpp>
