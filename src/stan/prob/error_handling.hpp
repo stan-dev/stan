@@ -229,15 +229,21 @@ namespace stan {
                               T_result* result,
                               const Policy& /*pol*/) {
       if (!boost::math::isfinite(x) || !(low <= x && x <= high)) {
-        std::ostringstream msg;
-        msg << name 
+        std::ostringstream msg_o;
+        msg_o << name 
             << " is %1%, but must be finite and between "
             << low
             << " and "
             << high;
+        std::string msg_str = msg_o.str();
+        const char* msg1 = msg_str.c_str();
+        const char* msg2 = msg_o.str().c_str();
         *result = boost::math::policies::raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >
           (function,
-           msg.str().c_str(),
+           // msg1, // OK
+           // msg2, // FAILS
+           // msg_str.c_str(), // OK
+           msg_o.str().c_str(), // OK, original
            x, Policy());
         return false;
       }
