@@ -136,6 +136,7 @@ add_unary("erfc");
 add_unary("exp2");
 add_unary("expm1");
 
+add_binary("lbeta");
 add_unary("lgamma");
 
 add_unary("log1p");
@@ -178,7 +179,7 @@ add_binary("log_sum_exp");
 add_unary("square");
 
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
-add_ternary("lbeta");
+add_ternary("beta_log");
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
 add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
