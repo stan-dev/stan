@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include <vector>
-
+#include <cstdio>
 
 namespace stan {
 
