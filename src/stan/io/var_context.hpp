@@ -2,6 +2,7 @@
 #define __STAN__IO__VAR_CONTEXT_HPP__
 
 #include <vector>
+#include <string>
 
 namespace stan {
 
