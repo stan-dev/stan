@@ -24,7 +24,7 @@ data {
 parameters {
   double alpha[Nage - 1]; 
   double beta[K]; 
-  double(0,) sigma; 
+  double(0,1) sigma; 
 } 
 
 transformed parameters {
