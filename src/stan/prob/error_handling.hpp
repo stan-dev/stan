@@ -142,62 +142,6 @@ namespace stan {
     }
 
 
-    /**
-     * Note that this test catches both infinity and NaN.
-     * Some special cases permit x to be infinite, so these must be tested 1st,
-     * leaving this test to catch any NaNs.  see Normal and cauchy for example.
-     */
-    template <typename T_x, typename T_result, class Policy>
-    inline bool check_x(const char* function,
-                        const T_x& x,
-                        T_result* result,
-                        const Policy& pol) {
-      if (!boost::math::isfinite(x)) {
-        *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                                                 "Random variate x is %1%, but must be finite!",
-                                                                 x, pol);
-        return false;
-      }
-      return true;
-    }
-
-    /**
-     * Note that this test catches both infinity and NaN.
-     * Some special cases permit x to be infinite, so these must be tested 1st,
-     * leaving this test to catch any NaNs.  see Normal and cauchy for example.
-     */
-    template <typename T_x, typename T_result, class Policy>
-    inline bool check_x(const char* function,
-                        const std::vector<T_x>& x,
-                        T_result* result,
-                        const Policy& /*pol*/) {
-      for (int i = 0; i < x.size(); i++) {
-        if (!boost::math::isfinite(x[i])) {
-          *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                                                   "Random variate x is %1%, but must be finite!",
-                                                                   x[i], Policy());
-          return false;
-        }
-      }
-      return true;
-    }
-    
-    template <typename T_x, typename T_result, class Policy>
-    inline bool check_x(const char* function,
-                        const Eigen::Matrix<T_x,Eigen::Dynamic,1>& x,
-                        T_result* result,
-                        const Policy& /*pol*/) {
-      for (int i = 0; i < x.rows(); i++) {
-        if (!boost::math::isfinite(x[i])) {
-          *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                                                   "Random variate x is %1%, but must be finite!",
-                                                                   x[i], Policy());
-          return false;
-        }
-      }
-      return true;
-    }
-
     template <typename T_x, typename T_low, typename T_result, class Policy>
     inline bool check_greater(const char* function,
                               const T_x& x,
