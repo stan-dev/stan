@@ -42,7 +42,11 @@ namespace stan {
       typename boost::math::tools::promote_args<T_y,T_low,T_high>::type lp(0.0);
       if(!check_not_nan(function, y, "y", &lp, Policy()))
         return lp;
-      if(!check_bounds(function, alpha, beta, &lp, Policy()))
+      if (!check_finite(function, alpha, "Lower bound, alpha,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, beta, "Upper bound, beta,", &lp, Policy()))
+        return lp;
+      if (!check_greater(function, beta, alpha, "Upper bound, beta,", &lp, Policy()))
         return lp;
       
       if (y < alpha || y > beta)

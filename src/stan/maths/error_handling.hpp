@@ -214,39 +214,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_scale, typename T_result, class Policy>
-    inline bool check_scale(const char* function,
-                            const T_scale& scale,
-                            T_result* result,
-                            const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      // Assume scale == 0 is NOT valid for any distribution.
-      if (!(scale > 0) || !boost::math::isfinite(scale)) { 
-        *result = raise_domain_error<T_scale>(function,
-                                              "Scale parameter is %1%, but must be > 0 !", 
-                                              scale, Policy());
-        return false;
-      }
-      return true;
-    }
-
-    template <typename T_inv_scale, typename T_result, class Policy>
-    inline bool check_inv_scale(const char* function,
-                                const T_inv_scale& invScale,
-                                T_result* result,
-                                const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!(invScale > 0)
-          || !boost::math::isfinite(invScale)) { // Assume scale == 0 is NOT valid for any distribution.
-        *result = raise_domain_error<T_inv_scale>(function,
-                                                  "Inverse scale parameter is %1%, but must be > 0 !", 
-                                                  invScale, Policy());
-        return false;
-      }
-      return true;
-    }
-
-
     template <typename T_x, typename T_result, class Policy>
     inline bool check_nonnegative(const char* function,
                                   const T_x& x,
@@ -310,73 +277,6 @@ namespace stan {
                                             y[i], Policy());
           return false;
         }
-      }
-      return true;
-    }
-
-
-    template <typename T_location, typename T_result, class Policy>
-    inline bool check_location(const char* function,
-                               const T_location& location,
-                               T_result* result,
-                               const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!boost::math::isfinite(location)) {
-        *result = raise_domain_error<T_location>(function,
-                                                 "Location parameter is %1%, but must be finite!", 
-                                                 location, Policy());
-        return false;
-      }
-      return true;
-    }
-
-    template <typename T_bound, typename T_result, class Policy>
-    inline bool check_lower_bound(const char* function,
-                                  const T_bound& lb,
-                                  T_result* result,
-                                  const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!boost::math::isfinite(lb)) {
-        *result = raise_domain_error<T_bound>(function,
-                                              "Lower bound is %1%, but must be finite!", 
-                                              lb, Policy());
-        return false;
-      }
-      return true;
-    }
-
-
-    template <typename T_bound, typename T_result, class Policy>
-    inline bool check_upper_bound(const char* function,
-                                  const T_bound& ub,
-                                  T_result* result,
-                                  const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!boost::math::isfinite(ub)) {
-        *result = raise_domain_error<T_bound>(function,
-                                              "Upper bound is %1%, but must be finite!", 
-                                              ub, Policy());
-        return false;
-      }
-      return true;
-    }
-
-    template <typename T_lb, typename T_ub, typename T_result, class Policy>
-    inline bool check_bounds(const char* function,
-                             const T_lb& lower,
-                             const T_ub& upper,
-                             T_result* result,
-                             const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!check_lower_bound(function, lower, result, Policy()))
-        return false;
-      if (!check_upper_bound(function, upper, result, Policy()))
-        return false;
-      if (lower >= upper) {
-        *result = raise_domain_error<T_lb>(function,
-                                           "lower parameter is %1%, but must be less than upper!", 
-                                           lower, Policy());
-        return false;
       }
       return true;
     }
