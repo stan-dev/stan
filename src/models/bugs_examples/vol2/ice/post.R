@@ -3,6 +3,12 @@
 
 
 library(coda) 
+post <- read.csv(file = "samples.csv", header = TRUE)
+poi <- as.mcmc(post)
+summary(poi)
+q(save = "no")
+
+# The rest is for the ice example from JAGS
 
 post <- read.csv(file = "samples.csv", header = TRUE); 
 
