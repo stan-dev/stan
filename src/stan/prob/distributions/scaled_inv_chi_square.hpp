@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__SCALED_INV_CHI_SQUARE_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 
@@ -32,16 +32,17 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
                               const Policy& = Policy()) {
       static const char* function = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
       
-      using stan::maths::multiply_log;
-      using stan::maths::square;
-
-      typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type lp(0.0);
+      using stan::maths::check_positive;
+      using stan::maths::check_not_nan;
+      using boost::math::tools::promote_args;
+      
+      typename promote_args<T_y,T_dof,T_scale>::type lp;
       if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       if (!check_positive(function, s, "Scale", &lp, Policy()))
@@ -52,6 +53,10 @@ namespace stan {
       if (y <= 0)
         return LOG_ZERO;
       
+      using stan::maths::multiply_log;
+      using stan::maths::square;
+
+      lp = 0.0;
       if (include_summand<propto,T_dof>::value) {
         T_dof half_nu = 0.5 * nu;
         lp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
