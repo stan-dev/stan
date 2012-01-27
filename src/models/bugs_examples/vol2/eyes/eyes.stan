@@ -1,20 +1,22 @@
 // http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol2.pdf
 // Page 11: Eyes: Normal Mixture Model 
 // 
-// not work yet, (not sure how to specify multivariate dsn: type of variables?)
 // 
 // from bugs example now, (have not looked at JAGS version yet) 
 
 // FIXME vI: use beta-bernoulli rather than dirichlet-multinomial (done), no bernoulli now 
 // FIXME vII: marginalize out z[N] (done) 
 
+
+// not work yet 
+
 data {
   int(0,) N; 
   double y[N]; 
-  vector(2) alpha;
+//  vector(2) alpha;
 } 
 parameters {
-  int(0,) z[N]; 
+  // int(0,) z[N]; 
   double(0,) sigmasq;
   double(0,) theta;
   double lambda_1; 
