@@ -53,6 +53,40 @@ TO DO
    + dump.stan(fit)
    + read.stan(file_path)
 
+* refactor probability distributions to use stan/maths/error_handling. 
+  1) change include. 
+  2) use stan::maths::default_policy 
+  3) add usings for the error handling.
+  4) remove propto for cumulative function
+ - normal
+ - multi_normal
+ - inv_gamma
+ - chi_square
+ - inv_chi_square
+ - scaled_inv_chi_square
+ - exponential
+ - wishart
+ - inv_wishart
+ - student_t
+ - beta
+ - dirichlet
+ - cauchy
+ - pareto
+ - double_exponential
+ - weibull
+ - logistic
+ - lognormal
+ - lkj_corr
+ - lkj_cov
+ - bernoulli
+ - categorical
+ - binomial
+ - poisson
+ - neg_binomial
+ - beta_binomial
+ - hypergeometric
+ - multinomial
+
 EXTENSIONS
 =================================================
 

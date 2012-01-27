@@ -35,7 +35,7 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_inv_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta, 
                     const Policy& = Policy()) {

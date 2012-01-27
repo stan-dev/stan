@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__GAMMA_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -31,17 +31,21 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_shape, typename T_inv_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::gamma_log<%1%>(%1%)";
-
-      typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type lp(0.0);
-      if (!stan::prob::check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
+      
+      using boost::math::tools::promote_args;
+      using stan::maths::check_positive;
+      using stan::maths::check_nonnegative;
+      
+      typename promote_args<T_y,T_shape,T_inv_scale>::type lp(0.0);
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
         return lp;
-      if (!stan::prob::check_positive(function, beta, "Inverse scale parameter, beta,", &lp, Policy())) 
+      if (!check_positive(function, beta, "Inverse scale parameter, beta,", &lp, Policy())) 
         return lp;
-      if (!stan::prob::check_nonnegative(function, y, "Random variate, y,", &lp, Policy()))
+      if (!check_nonnegative(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       
       using boost::math::lgamma;
@@ -72,24 +76,26 @@ namespace stan {
      * @tparam T_shape Type of shape.
      * @tparam T_inv_scale Type of inverse scale.
      */    
-    template <bool propto = false,
-              typename T_y, typename T_shape, typename T_inv_scale, 
-              class Policy = boost::math::policies::policy<> >
+    template <typename T_y, typename T_shape, typename T_inv_scale, 
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()){
       static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type result(0.0);
-      if (!stan::prob::check_positive(function, alpha, "Shape parameter, alpha,", &result, Policy())) 
+      using boost::math::tools::promote_args;
+      using stan::maths::check_positive;
+      using stan::maths::check_nonnegative;
+
+      typename promote_args<T_y,T_shape,T_inv_scale>::type result;
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", &result, Policy())) 
         return result;
-      if (!stan::prob::check_positive(function, beta, "Inverse scale parameter, beta,", &result, Policy())) 
+      if (!check_positive(function, beta, "Inverse scale parameter, beta,", &result, Policy())) 
         return result;
-      if (!stan::prob::check_nonnegative(function, y, "Random variate, y,", &result, Policy()))
+      if (!check_nonnegative(function, y, "Random variate, y,", &result, Policy()))
         return result;
       
-      if (include_summand<propto,T_y,T_shape,T_inv_scale>::value)
-        return boost::math::gamma_p(alpha, y*beta);
-      return 1.0;
+      using boost::math::gamma_p;
+      return gamma_p(alpha, y*beta);
     }
 
   }
