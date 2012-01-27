@@ -2,9 +2,8 @@
 #define __STAN__PROB__DISTRIBUTIONS__NORMAL_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/maths/special_functions.hpp>
 
 namespace stan {
 
@@ -35,20 +34,22 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy& = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
+      
+      using stan::maths::check_positive;
+      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
+      using boost::math::tools::promote_args;
 
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-
+      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
-
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-
       if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
 
@@ -86,19 +87,19 @@ namespace stan {
      * @tparam T_scale Type of standard deviation paramater.
      * @tparam Policy Error-handling policy.
      */
-    template <bool propto = false, 
-              typename T_y, typename T_loc, typename T_scale,
-              class Policy = boost::math::policies::policy<> >
-
+    template <typename T_y, typename T_loc, typename T_scale,
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
-
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
              const Policy& /* pol */ = Policy() ) {
-
       static const char* function = "stan::prob::normal_p(%1%)";
 
-      typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type lp;
+      using stan::maths::check_positive;
+      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
 
+      using boost::math::tools::promote_args;
+      typename promote_args<T_y, T_loc, T_scale>::type lp;
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
@@ -106,13 +107,7 @@ namespace stan {
       if (!check_not_nan(function, y, "y", &lp, Policy()))
         return lp;
 
-      if (!include_summand<propto,T_y,T_loc,T_scale>::value)
-        return 1.0;
-
-      if (include_summand<propto>::value)
-        return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
-      
-      return erfc(-(y - mu)/(sigma * SQRT_2));
+      return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
     }
 
    
@@ -137,7 +132,7 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const std::vector<T_y>& y,
                const T_loc& mu,
@@ -145,7 +140,12 @@ namespace stan {
                const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      using stan::maths::check_positive;
+      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
+
+      using boost::math::tools::promote_args;
+      typename promote_args<T_y,T_loc,T_scale>::type lp;
       if (!check_positive(function, sigma, "Scale parameter, sigma", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
@@ -154,20 +154,19 @@ namespace stan {
         return lp;
 
       if (y.size() == 0)
-        return lp;
+        return 0.0;
       
       using stan::maths::square;
       using stan::maths::multiply_log;
-
+      
+      lp = 0.0;
       if (include_summand<propto,T_y,T_loc,T_scale>::value) {
         for (unsigned int n = 0; n < y.size(); ++n)
           lp -= square(y[n] - mu);
         lp /= 2.0 * square(sigma);
       }
-      
       if (include_summand<propto,T_scale>::value) 
         lp -= multiply_log(y.size(),sigma);
-      
       if (include_summand<propto>::value) 
         lp += y.size() * NEG_LOG_SQRT_TWO_PI;
       

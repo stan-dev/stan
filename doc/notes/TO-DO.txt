@@ -61,7 +61,6 @@ TO DO
   2) use stan::maths::default_policy 
   3) add usings for the error handling.
   4) remove propto for cumulative function
- - multinomial
  - normal
  - multi_normal
  - wishart
@@ -70,6 +69,7 @@ TO DO
  - lkj_corr
  - lkj_cov
  - categorical
+ - multinomial
 
 EXTENSIONS
 =================================================

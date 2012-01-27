@@ -33,8 +33,7 @@ namespace stan {
       if (boost::math::isnan(y)) {
         std::string msg_str(name);
         msg_str += " is %1%, but must not be nan!";
-        const char* msg = msg_str.c_str();
-        *result = raise_domain_error<T_y>(function,msg,y,Policy());
+        *result = raise_domain_error<T_y>(function,msg_str.c_str(),y,Policy());
         return false;
       }
       return true;
@@ -51,8 +50,7 @@ namespace stan {
         if (boost::math::isnan(y[i])) {
           std::ostringstream msg_o;
           msg_o << name << "[" << i << "] is %1%, but must not be nan!";
-          const char* msg = msg_o.str().c_str();
-          *result = raise_domain_error<T_y>(function,msg,y[i],Policy());
+          *result = raise_domain_error<T_y>(function,msg_o.str().c_str(),y[i],Policy());
           return false;
         }
       }
