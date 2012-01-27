@@ -241,40 +241,47 @@ namespace stan {
       return true;
     }
 
-
-    template <typename T_x, typename T_result, class Policy>
+    template <bool finite=true,typename T_x, typename T_result, class Policy>
     inline bool check_positive(const char* function,
                                const T_x& x,
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!boost::math::isfinite(x) || !(x > 0)) {
+      if ((finite && !boost::math::isfinite(x))
+          || (!finite && !boost::math::isnan(x))
+          || !(x > 0)) {
         std::string message(name);
-        message += " is %1%, but must be finite and > 0!";
-        *result = raise_domain_error<T_x>(function,
-                                          message.c_str(), 
-                                          x, Policy());
+        message += " is %1%, but must be ";
+        if (finite)
+          message += "finite and ";
+        message += "> 0!";
+        *result = boost::math::policies::raise_domain_error<T_x>(function,
+                                                                 message.c_str(), 
+                                                                 x, Policy());
         
         return false;
       }
       return true;
     }
-
-    template <typename T_y, typename T_result, class Policy>
+    
+    template <bool finite=true,typename T_y, typename T_result, class Policy>
     inline bool check_positive(const char* function,
                                const std::vector<T_y>& y,
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
       for (int i = 0; i < y.size(); i++) {
-        if (!boost::math::isfinite(y[i]) || !(y[i] > 0)) {
+        if ((finite && !boost::math::isfinite(y[i]))
+            || (!finite && !boost::math::isnan(y[i]))
+            || !(y[i] > 0)) {
           std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must be finite and > 0!";
-          *result = raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
+          message << name << "[" << i << "] is %1%, but must be ";
+          if (finite)
+            message << "finite and ";
+          message << "> 0!";
+          *result = boost::math::policies::raise_domain_error<T_y>(function,
+                                                                   message.str().c_str(),
+                                                                   y[i], Policy());
           return false;
         }
       }
