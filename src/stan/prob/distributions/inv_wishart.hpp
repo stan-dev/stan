@@ -2,9 +2,9 @@
 #define __STAN__PROB__DISTRIBUTIONS__INV_WISHART_HPP__
 
 #include <stan/maths/matrix.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -40,24 +40,21 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                     const T_dof& nu,
                     const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
-
-      using stan::maths::multiply_log;
-      using stan::maths::lmgamma;
-      using stan::maths::multiply;
-      using stan::maths::inverse;
-      using stan::maths::determinant;
-      using stan::maths::trace;
+      
+      using stan::maths::check_greater_or_equal;
+      using stan::maths::check_size_match;
+      using boost::math::tools::promote_args;
 
       unsigned int k = S.rows();
       typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!check_nonnegative(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
+      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
         return lp;
@@ -66,6 +63,13 @@ namespace stan {
       if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
         return lp;
       // FIXME: domain checks
+        
+      using stan::maths::multiply_log;
+      using stan::maths::lmgamma;
+      using stan::maths::multiply;
+      using stan::maths::inverse;
+      using stan::maths::determinant;
+      using stan::maths::trace;
 
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
