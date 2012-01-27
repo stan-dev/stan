@@ -5,9 +5,9 @@
 
 #include <stan/maths/matrix.hpp>
 
-#include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 #include <stan/prob/distributions/lognormal.hpp>
 #include <stan/prob/distributions/lkj_corr.hpp>
@@ -18,7 +18,7 @@ namespace stan {
     //                         mu vector, sigma > 0 vector, eta > 0 ]
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, typename T_shape, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type
     lkj_cov_log(const typename stan::maths::EigenType<T_y>::matrix& y,
                 const typename stan::maths::EigenType<T_loc>::vector& mu,
@@ -26,8 +26,12 @@ namespace stan {
                 const T_shape& eta,
                 const Policy& = Policy()) {
       static const std::string function = "lkj_cov_log<%1>";
-
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
+      
+      using stan::maths::check_size_match;
+      using stan::maths::check_finite;
+      using boost::math::tools::promote_args;
+      
+      typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
       if (!check_size_match(function, y.rows(), mu.size(), &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
@@ -49,12 +53,11 @@ namespace stan {
       return lp;
     }
 
-
     // LKJ_Cov(y|mu,sigma,eta) [ y covariance matrix (not correlation matrix)
     //                         mu scalar, sigma > 0 scalar, eta > 0 ]
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, typename T_shape, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type
     lkj_cov_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                 const T_loc& mu, 
@@ -63,7 +66,10 @@ namespace stan {
                 const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
+      using stan::maths::check_finite;
+      using boost::math::tools::promote_args;
+      
+      typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
       if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
         return lp;
       
@@ -81,8 +87,6 @@ namespace stan {
       lp += lkj_corr_log<propto>(D * y * D, eta);
       return lp;
     }
-
-
   }
 }
 #endif
