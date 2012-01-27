@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__CHI_SQUARE_HPP__
 
 #include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -28,25 +28,31 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_dof, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu, const Policy& = Policy()) {
       static const char* function = "stan::prob::chi_square_log<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_y,T_dof>::type lp(0.0);
-      if (!stan::prob::check_positive (function, nu, "Degrees of freedom", &lp, Policy()))
+      using stan::maths::check_positive;
+      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
+        using boost::math::tools::promote_args;
+
+      typename promote_args<T_y,T_dof>::type lp;
+      if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
-      if (!stan::prob::check_finite (function, nu, "Degrees of freedom", &lp, Policy()))
+      if (!check_finite(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
-      if (!stan::prob::check_not_nan (function, y, "Random variate y", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
       
       if (y < 0)
         return LOG_ZERO;
-
+      
       using boost::math::lgamma;
       using stan::maths::multiply_log;
       
+      lp = 0.0;
       if (include_summand<propto,T_dof>::value)
         lp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
       if (include_summand<propto,T_y,T_dof>::value)
