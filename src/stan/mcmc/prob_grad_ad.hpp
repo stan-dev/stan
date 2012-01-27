@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__PROB_GRAD_AD_H__
 #define __STAN__MCMC__PROB_GRAD_AD_H__
 
+#include <utility>
 #include <vector>
 
 #include <stan/agrad/agrad.hpp>
@@ -18,7 +19,7 @@ namespace stan {
       }
 
       prob_grad_ad(unsigned int num_params_r,
-                   std::vector<int>& param_ranges_i)
+                   std::vector<std::pair<int,int> >& param_ranges_i)
         : prob_grad::prob_grad(num_params_r,
                                param_ranges_i) {
       }

@@ -36,8 +36,10 @@ namespace stan {
                      const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                      const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
-      
-      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+
+      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type 
+        lp(0.0);
+
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
         return lp;
       if (!check_size_match(function, y.size(), Sigma.rows(), &lp, Policy()))

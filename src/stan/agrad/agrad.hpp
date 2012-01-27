@@ -2349,6 +2349,20 @@ namespace std {
   int isnan(const stan::agrad::var& a) {
     return isnan(a.val());
   }
+
+  /**
+   * Return <code>true</code> if the value of the
+   * a is positive or negative infinity.
+   *
+   * @param a Variable to test.
+   * @return <code>true</code> if value is infinite.
+   */
+  int isinf(const stan::agrad::var& a) {
+    return isinf(a.val());
+  }
+
+
+
 }
 
 

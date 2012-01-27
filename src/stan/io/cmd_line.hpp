@@ -46,19 +46,19 @@ namespace stan {
       std::set<std::string> flag_;
       std::vector<std::string> bare_;
       void parse_arg(const std::string& s) {
-	if (s.size() < 2
-	    || s[0] != '-'
-	    || s[1] != '-') {
-	  bare_.push_back(s);
-	  return;
-	}
-	for (unsigned int i = 2; i < s.size(); ++i) {
-	  if (s[i] == '=') {
-	    key_val_[s.substr(2,i - 2)] = s.substr(i + 1,s.size() - i - 1);
-	    return;
-	  } 
-	}
-	flag_.insert(s.substr(2,s.size()));
+        if (s.size() < 2
+            || s[0] != '-'
+            || s[1] != '-') {
+          bare_.push_back(s);
+          return;
+        }
+        for (unsigned int i = 2; i < s.size(); ++i) {
+          if (s[i] == '=') {
+            key_val_[s.substr(2,i - 2)] = s.substr(i + 1,s.size() - i - 1);
+            return;
+          } 
+        }
+        flag_.insert(s.substr(2,s.size()));
       }
     public:
       /**
@@ -69,9 +69,9 @@ namespace stan {
        * @param argv Argument strings.
        */
       cmd_line(int argc, const char* argv[])
-	: cmd_(argv[0]) {
-	for (int i = 1; i < argc; ++i) 
-	  parse_arg(argv[i]);
+        : cmd_(argv[0]) {
+        for (int i = 1; i < argc; ++i) 
+          parse_arg(argv[i]);
       }
 
       /**
@@ -82,7 +82,7 @@ namespace stan {
        * @return Name of command.
        */
       std::string command() {
-	return cmd_;
+        return cmd_;
       }
       
       /**
@@ -92,7 +92,7 @@ namespace stan {
        * @return <code>true</code> if it has a value.
        */
       bool has_key(const std::string& key) const {
-	return key_val_.find(key) != key_val_.end();
+        return key_val_.find(key) != key_val_.end();
       }
 
       /**
@@ -113,11 +113,10 @@ namespace stan {
        */
       template <typename T>
       bool val(const std::string& key, T& x) const {
-	if (!has_key(key))
-	  return false;
-	std::stringstream s(key_val_.find(key)->second);
-	s >> x;
-	return true;
+        if (!has_key(key))
+          return false;
+        std::stringstream s(key_val_.find(key)->second);
+        return s >> x;
       }
 
       /**
@@ -127,7 +126,7 @@ namespace stan {
        * @return <code>true</code> if flag is defined.
        */
       bool has_flag(const std::string& flag) const {
-	return flag_.find(flag) != flag_.end();
+        return flag_.find(flag) != flag_.end();
       }
 
       /**
@@ -136,7 +135,7 @@ namespace stan {
        * @return Number of bare arguments.
        */
       unsigned int bare_size() const {
-	return bare_.size();
+        return bare_.size();
       }
 
       /**
@@ -152,11 +151,11 @@ namespace stan {
        */
       template <typename T>
       bool bare(unsigned int n, T& x) const {
-	if (n >= bare_.size())
-	  return false;
-	std::stringstream s(bare_[n]);
-	s >> x;
-	return true;
+        if (n >= bare_.size())
+          return false;
+        std::stringstream s(bare_[n]);
+        s >> x;
+        return true;
       }
 
       /**
@@ -166,27 +165,27 @@ namespace stan {
        * @param out Output stream.
        */
       void print(std::ostream& out) const {
-	out << "COMMAND=" << cmd_ << '\n';
-	unsigned int flag_count = 0;
-	for (std::set<std::string>::const_iterator it = flag_.begin();
-	     it != flag_.end();
-	     ++it) {
-	  out << "FLAG " << flag_count << "=" << (*it) << '\n';
-	  ++flag_count;
-	}
-	unsigned int key_val_count = 0;
-	for (std::map<std::string,std::string>::const_iterator it = key_val_.begin();
-	     it != key_val_.end();
-	     ++it) {
-	  out << "KEY " << key_val_count << "=" << (*it).first;
-	  out << " VAL " << key_val_count << "=" << (*it).second << '\n';
-	  ++key_val_count;
-	}
-	unsigned int bare_count = 0;
-	for (unsigned int i = 0; i < bare_.size(); ++i) {
-	  out << "BARE ARG " << bare_count << "=" << bare_[i] << '\n';
-	  ++bare_count;
-	}
+        out << "COMMAND=" << cmd_ << '\n';
+        unsigned int flag_count = 0;
+        for (std::set<std::string>::const_iterator it = flag_.begin();
+             it != flag_.end();
+             ++it) {
+          out << "FLAG " << flag_count << "=" << (*it) << '\n';
+          ++flag_count;
+        }
+        unsigned int key_val_count = 0;
+        for (std::map<std::string,std::string>::const_iterator it = key_val_.begin();
+             it != key_val_.end();
+             ++it) {
+          out << "KEY " << key_val_count << "=" << (*it).first;
+          out << " VAL " << key_val_count << "=" << (*it).second << '\n';
+          ++key_val_count;
+        }
+        unsigned int bare_count = 0;
+        for (unsigned int i = 0; i < bare_.size(); ++i) {
+          out << "BARE ARG " << bare_count << "=" << bare_[i] << '\n';
+          ++bare_count;
+        }
       }
 
     };

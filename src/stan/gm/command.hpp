@@ -163,14 +163,15 @@ namespace stan {
       std::cout << std::endl;
     }
 
+
     template <typename T_model>
-    void nuts_command(int argc, const char* argv[]) {
+    int nuts_command(int argc, const char* argv[]) {
 
       stan::io::cmd_line command(argc,argv);
 
       if (command.has_flag("help")) {
         print_nuts_help(argv[0]);
-        return;
+        return 0;
       }
 
       std::string data_path;
@@ -199,10 +200,17 @@ namespace stan {
       command.val("delta", delta);
 
       int random_seed(0);
-      if (command.has_key("seed"))
-        command.val("seed",random_seed);
-      else
+      if (command.has_key("seed")) {
+        if (!command.val("seed",random_seed)) {
+          std::string seed_val;
+          command.val("seed",seed_val);
+          std::cerr << "value for seed must be integer"
+                    << "found value=" << seed_val << std::endl;
+          return -1;
+        }
+      } else {
         random_seed = std::time(0);
+      }
 
       boost::mt19937 base_rng(random_seed);
 
@@ -213,7 +221,7 @@ namespace stan {
       std::cout << "num_thin=" << num_thin << std::endl;
       std::cout << "delta=" << delta << std::endl;
       std::cout << "random seed=" << random_seed 
-                << " (" << (command.has_key("random_seed") 
+                << " (" << (command.has_key("seed") 
                             ? "user specified"
                             : "randomly generated") << ")"
                 << std::endl;
@@ -275,11 +283,12 @@ namespace stan {
         model.write_csv(params_r,params_i,sample_file_stream);
       }
       sample_file_stream.close();
+      return 0;
     }
 
-  }
+  } // namespace prob
 
 
-}
+} // namespace stan
 
 #endif

@@ -250,7 +250,7 @@ namespace stan {
                                T_result* result,
                                const Policy& /*pol*/) {
       if ((finite && !boost::math::isfinite(x))
-          || (!finite && !boost::math::isnan(x))
+          || boost::math::isnan(x)
           || !(x > 0)) {
         std::string message(name);
         message += " is %1%, but must be ";

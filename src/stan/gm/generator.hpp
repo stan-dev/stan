@@ -178,6 +178,7 @@ namespace stan {
       generate_include("iostream",o);
       generate_include("stdexcept",o);
       generate_include("sstream",o);
+      generate_include("utility",o);
       generate_include("boost/exception/all.hpp",o);
       generate_include("Eigen/Dense",o);
       generate_include("stan/agrad/agrad.hpp",o);
@@ -1880,27 +1881,27 @@ namespace stan {
       }
       void operator()(const nil& x) const { }
       void operator()(const int_var_decl& x) const {
-        // o_ << INDENT2 << "if (0 != ";
-        // generate_expression(x.range_.low_,o_);
-        // o_ << ")" << EOL;
-        // o_ << INDENT3 << "throw std::runtime_error(\"param_ranges error\");";
-        // for (int i = 0; i < x.dims_.size(); ++i) {
-        //   generate_indent(i + 2, o_);
-        //   o_ << "for (unsigned int i_" << i << "__ = 0; ";
-        //   o_ << "i_" << i << "__ < ";
-        //   generate_expression(x.dims_[i],o_);
-        //   o_ << "; ++i_" << i << "__) {" << EOL;
-        // }
-
-        // generate_indent(x.dims_.size() + 2,o_);
-        // o_ << "param_ranges_i__.push_back(";
-        // generate_expression(x.range_.high_,o_);
-        // o_ << ");" << EOL;
-
-        // for (int i = 0; i < x.dims_.size(); ++i) {
-        //   generate_indent(x.dims_.size() + 1 - i, o_);
-        //   o_ << "}" << EOL;
-        // }
+        generate_increment_i(x.dims_);
+        // for loop for ranges
+        for (int i = 0; i < x.dims_.size(); ++i) {
+          generate_indent(i + 2, o_);
+          o_ << "for (unsigned int i_" << i << "__ = 0; ";
+          o_ << "i_" << i << "__ < ";
+          generate_expression(x.dims_[i],o_);
+          o_ << "; ++i_" << i << "__) {" << EOL;
+        }
+        // add range
+        generate_indent(x.dims_.size() + 2,o_);
+        o_ << "param_ranges_i__.push_back(std::pair<int,int>(";
+        generate_expression(x.range_.low_,o_);
+        o_ << ", ";
+        generate_expression(x.range_.high_,o_);
+        o_ << "));" << EOL;
+        // close for loop
+        for (int i = 0; i < x.dims_.size(); ++i) {
+          generate_indent(x.dims_.size() + 1 - i, o_);
+          o_ << "}" << EOL;
+        }
       }
       void operator()(const double_var_decl& x) const {
         generate_increment(x.dims_);
@@ -1952,6 +1953,19 @@ namespace stan {
         for (unsigned int i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
           generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      // cut-and-paste from next for r
+      void generate_increment_i(std::vector<expression> dims) const {
+        if (dims.size() == 0) { 
+          o_ << INDENT2 << "++num_params_i__;" << EOL;
+          return;
+        }
+        o_ << INDENT2 << "num_params_r__ += ";
+        for (unsigned int i = 0; i < dims.size(); ++i) {
+          if (i > 0) o_ << " * ";
+          generate_expression(dims[i],o_);
         }
         o_ << ";" << EOL;
       }

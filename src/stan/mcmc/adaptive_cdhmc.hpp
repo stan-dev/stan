@@ -236,7 +236,9 @@ namespace stan {
         std::vector<double> probs;
         for (unsigned int m = 0; m < _model.num_params_i(); ++m) {
           probs.resize(0);
-          for (int k = 0; k < _model.param_range_i(m); ++k)
+          for (int k = _model.param_range_i_lower(m); 
+               k < _model.param_range_i_upper(m); 
+               ++k)
             probs.push_back(_model.log_prob_star(m,k,_x,_z));
           _z[m] = sample_unnorm_log(probs,_rand_uniform_01);
         }

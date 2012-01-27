@@ -1,11 +1,12 @@
 parameters {
-    int N;
-    double a[N];
+    double x;
 }
-transformed parameters {
-    int M;
-    double b[M];
-    double c[N];
-}
+derived parameters {
+    double(,0) lp;
 model {
+    x ~ normal(0,1);
+    lp <- lp__;
+}
+generated quantities {
+    double(,0) lp;
 }

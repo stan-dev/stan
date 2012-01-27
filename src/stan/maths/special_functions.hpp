@@ -396,19 +396,15 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log1p(T x) {
-      if (x < -1)
-        BOOST_THROW_EXCEPTION (std::domain_error ("x can not be less than -1"));
-      T absx = fabs(x);
-      //double absx = fabs(stan::agrad::as_double(x));
+      if (x < -1.0)
+        BOOST_THROW_EXCEPTION(std::domain_error ("x can not be less than -1"));
 
-      // Use 2nd-order Taylor approximation for very small values
-      // Use 1st-order Taylor approximation for very very small values
-      if (absx > 1e-9)
-        return log(1 + x);
-      else if (absx > 1e-16)
-        return x - x*x/2;
+      if (x > 1e-9 || x < -1e-9)
+        return log(1.0 + x);     // direct, if distant from 1
+      else if (x > 1e-16 || x < -1e-16)
+        return x - 0.5 * x * x;  // 2nd order Taylor, if close to 1
       else
-        return x;
+        return x;                // 1st order Taylor, if very close to 1
     }
 
     /**

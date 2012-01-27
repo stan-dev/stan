@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 #include <stan/io/csv_writer.hpp>
@@ -20,17 +21,17 @@ namespace stan {
     class prob_grad {
     protected:
       unsigned int num_params_r__;
-      std::vector<int> param_ranges_i__;
+      std::vector<std::pair<int,int> > param_ranges_i__;
 
     public:
 
       prob_grad(unsigned int num_params_r)
         : num_params_r__(num_params_r),
-          param_ranges_i__(std::vector<int>(0)) {
+          param_ranges_i__(std::vector<std::pair<int,int> >(0)) {
       }
 
       prob_grad(unsigned int num_params_r,
-                std::vector<int>& param_ranges_i)
+                std::vector<std::pair<int,int> >& param_ranges_i)
         : num_params_r__(num_params_r),
           param_ranges_i__(param_ranges_i) { 
       }
@@ -41,7 +42,7 @@ namespace stan {
         num_params_r__ = num_params_r;
       }
 
-      void setparam_ranges_i__(std::vector<int> param_ranges_i) {
+      void setparam_ranges_i__(std::vector<std::pair<int,int> > param_ranges_i) {
         param_ranges_i__ = param_ranges_i;
       }
 
@@ -53,8 +54,24 @@ namespace stan {
         return param_ranges_i__.size();
       }
 
-      inline int param_range_i(unsigned int idx) {
+      inline std::pair<int,int> param_range_i(unsigned int idx) {
         return param_ranges_i__[idx];
+      }
+
+      inline void set_param_range_i_lower(unsigned int idx, int low) {
+        param_ranges_i__[idx].first = low;
+      }
+
+      inline void set_param_range_i_upper(unsigned int idx, int up) {
+        param_ranges_i__[idx].second = up;
+      }
+
+      inline int param_range_i_lower(unsigned int idx) {
+        return param_ranges_i__[idx].first;
+      }
+
+      inline int param_range_i_upper(unsigned int idx) {
+        return param_ranges_i__[idx].second;
       }
 
       virtual void init(std::vector<double>& params_r, 
@@ -62,7 +79,7 @@ namespace stan {
         for (unsigned int i = 0; i < num_params_r(); ++i)
           params_r[i] = 0.0;
         for (unsigned int j = 0; j < num_params_i(); ++j)
-          params_i[j] = 0;
+          params_i[j] = param_range_i_lower(j);
       }
 
       virtual double grad_log_prob(std::vector<double>& params_r, 
@@ -78,8 +95,10 @@ namespace stan {
                                    std::vector<int>& params_i) {
         if (idx >= num_params_i()) // || idx < 0
           throw std::runtime_error ("idx >= num_params_i()");
-        if (val >= param_range_i(idx)) // || val < 0
-          throw std::runtime_error ("val >= param_range_i(idx)");
+        if (val >= param_range_i(idx).first) // 
+          throw std::runtime_error ("val <= param_range_i(idx) lower");
+        if (val >= param_range_i(idx).second) //
+          throw std::runtime_error ("val >= param_range_i(idx) upper");
 
         int original_val = params_i[idx];
         params_i[idx] = val;
