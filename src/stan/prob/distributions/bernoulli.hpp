@@ -1,9 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__BERNOULLI_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__BERNOULLI_HPP__
 
-#include <stan/maths/special_functions.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -11,12 +10,14 @@ namespace stan {
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
     template <bool propto = false,
               typename T_prob, 
-              class Policy = boost::math::policies::policy<> > 
+              class Policy = stan::maths::default_policy> 
     inline typename boost::math::tools::promote_args<T_prob>::type
     bernoulli_log(const unsigned int n, const T_prob& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::bernoulli_log<%1%>(%1%)";
 
-      T_prob lp(0.0);
+      using stan::maths::check_bounded;
+
+      T_prob lp;
       if (!check_bounded(function, n, 0, 1, "n", &lp, Policy()))
         return lp;
       if (!check_bounded(function, theta, 0.0, 1.0, "Probability, theta,", &lp, Policy()))

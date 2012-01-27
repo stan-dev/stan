@@ -61,10 +61,6 @@ TO DO
   2) use stan::maths::default_policy 
   3) add usings for the error handling.
   4) remove propto for cumulative function
- - lognormal
- - lkj_corr
- - lkj_cov
- - bernoulli
  - categorical
  - binomial
  - poisson
@@ -77,6 +73,8 @@ TO DO
  - wishart
  - inv_wishart
  - dirichlet
+ - lkj_corr
+ - lkj_cov
 
 EXTENSIONS
 =================================================
