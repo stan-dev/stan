@@ -1,21 +1,25 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__LOGISTIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__LOGISTIC_HPP__
 
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
     // Logistic(y|mu,sigma)    [sigma > 0]
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
       static const char* function = "stan::prob::logistic_log<%1%>(%1%)";
-
-      typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      
+      using stan::maths::check_positive;
+      using stan::maths::check_finite;
+      using boost::math::tools::promote_args;
+      
+      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
