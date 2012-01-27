@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__HYPERGEOMETRIC_HPP__
 
 #include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -10,12 +10,15 @@ namespace stan {
     // Hypergeometric(n|N,a,b)  [0 <= n <= a;  0 <= N-n <= b;  0 <= N <= a+b]
     // n: #white balls drawn;  N: #balls drawn;  a: #white balls;  b: #black balls
     template <bool propto = false, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline double
     hypergeometric_log(const unsigned int n, const unsigned int N, 
                        const unsigned int a, const unsigned int b, const Policy& = Policy()) {
       static const char* function = "stan::prob::hypergeometric_log<%1%>(%1%)";
       
+      using stan::maths::check_bounded;
+      using stan::maths::check_greater;
+
       double lp(0.0);
       if (!check_bounded(function, n, 0U, a, "Number, n,", &lp, Policy()))
         return lp;
