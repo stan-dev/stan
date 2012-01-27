@@ -82,7 +82,7 @@ namespace stan {
         lp += lkj_corr_log<propto>(y,eta); // no need to rescale y into a correlation matrix
         return lp;
       }
-      DiagonalMatrix<double,Eigen::Dynamic> D(K);
+      Eigen::DiagonalMatrix<double,Eigen::Dynamic> D(K);
       D.diagonal() = sds.inverse();
       lp += lkj_corr_log<propto>(D * y * D, eta);
       return lp;
