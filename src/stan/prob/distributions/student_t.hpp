@@ -1,9 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__STUDENT_T_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__STUDENT_T_HPP__
 
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -38,16 +38,18 @@ namespace stan {
               typename T_dof, 
               typename T_loc, 
               typename T_scale,
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
-      student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-                    const Policy& = Policy()) {
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma, 
+                  const Policy& = Policy()) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
 
-      using stan::maths::square;
-      using boost::math::lgamma;
-
-      typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
+      using stan::maths::check_positive;
+      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
+      using boost::math::tools::promote_args;
+            
+      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp;
       if(!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
@@ -57,6 +59,10 @@ namespace stan {
       if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
 
+      using stan::maths::square;
+      using boost::math::lgamma;
+
+      lp = 0.0;
       if (include_summand<propto,T_dof>::value)
         lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
       if (include_summand<propto>::value)

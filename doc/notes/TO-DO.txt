@@ -65,7 +65,6 @@ TO DO
  - multi_normal
  - wishart
  - inv_wishart
- - student_t
  - beta
  - dirichlet
  - cauchy
