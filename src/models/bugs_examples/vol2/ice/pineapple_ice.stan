@@ -13,27 +13,28 @@ data {
 }
 transformed data { # deterministic functions of data to be called only once
     int Nneighs[K];
-    double shape;
+    double betasd[K];
 
     Nneighs[1] <- 1;
     Nneighs[2] <- 5;
-    for (k in 3:(K-2))
+    betasd[2] <- 1.0 / sqrt(Nneighs[2]);
+    for (k in 3:(K-2)) {
         Nneighs[k] <- 6;
+    }
     Nneighs[K - 1] <- 5;
     Nneighs[K] <- 1;
 
-    shape <- 0.0001 + K / 2.0;
+    for(k in 1:K) {
+      betasd[k] <- 1.0 / sqrt(Nneighs[k]);
+    }
 }
 parameters {
   double alpha[Nage - 1]; 
-  double beta[K]; 
-  double(0,) tau;
+  double beta[K];
+  double(0.05,) sigma;
 } 
 transformed parameters { # deterministic functions of parameters called every iteration
     double betamean[K];
-    double betasd[K];
-    double tau_like[K];
-    double d;
 
     betamean[1] <- 2.0 * beta[2] - beta[3];
     betamean[2] <- (2.0 * beta[1] + 4.0 * beta[3] - beta[4]) / 5.0;
@@ -42,35 +43,42 @@ transformed parameters { # deterministic functions of parameters called every it
     }
     betamean[K - 1] <- (2.0 * beta[K] + 4.0 * beta[K - 2] - beta[K - 3]) / 5.0;
     betamean[K] <- 2.0 * beta[K - 1] - beta[K - 2];
-    for (k in 1 : K) {
-        betasd[k] <- 1.0 / sqrt(Nneighs[k] * tau);
-        tau_like[k] <- Nneighs[k] * beta[k] * (beta[k] - betamean[k]);
-    }
-    d <- 0.0001 + sum(tau_like) / 2.0;
-}
-generated quantities {
-    double log_RR[K];
-    for (k in 1 : K) {
-        log_RR[k] <- beta[k] - beta[5];
-    }
 }
 model {
     double ln_mu;
+#   uncommenting these lines leads to an overflow in exp(ln_mu)
+#    double globalmean;
+
+#   alpha[1] is supposed to be constrained to zero 
+#   so we shorten alpha by one and split the loop for the likelihood
     for(j in 1:(Nage-1)) {
         alpha[j] ~ normal(0.0, 1000.0);
     }
-    tau ~ gamma(shape, d);
+    sigma ~ gamma(1.00001, 1.0);
 
     for(k in 1:K) {
         beta[k] ~ normal(betamean[k], betasd[k]);
     }
 
+#    globalmean <- sum(beta) / K;
+
+    # likelihood among people where age == 1
     for(i in 1:None) {
-        ln_mu <- log(pyr[i]) + beta[year[i]];
+        ln_mu <- log(pyr[i]) + sigma * beta[year[i]];
+#        ln_mu <- log(pyr[i]) + sigma * (beta[year[i]] - globalmean);
         cases[i] ~ poisson(exp(ln_mu));
     }
+
+    # likelihood among people where age > 1
     for(i in (None+1):N) {
-        ln_mu <- log(pyr[i]) + alpha[age[i] - 1] + beta[year[i]];
+        ln_mu <- log(pyr[i]) + alpha[age[i] - 1] + sigma * beta[year[i]];
+#        ln_mu <- log(pyr[i]) + alpha[age[i] - 1] + sigma * (beta[year[i]] - globalmean);
         cases[i] ~ poisson(exp(ln_mu));
+    }
+}
+generated quantities {
+    double log_RR[K];
+    for (k in 1 : K) {
+        log_RR[k] <- sigma * (beta[k] - beta[5]);
     }
 }

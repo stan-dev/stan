@@ -1,5 +1,5 @@
 STAN_HOME = ../../../../..
-PGM = vanilla_ice
+PGM = pineapple_ice
 
 
 $(PGM) :
