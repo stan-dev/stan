@@ -61,7 +61,6 @@ TO DO
   2) use stan::maths::default_policy 
   3) add usings for the error handling.
   4) remove propto for cumulative function
- - double_exponential
  - weibull
  - logistic
  - lognormal
