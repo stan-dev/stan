@@ -63,7 +63,6 @@ TO DO
   4) remove propto for cumulative function
  - normal
  - multi_normal
- - inv_chi_square
  - scaled_inv_chi_square
  - exponential
  - wishart
