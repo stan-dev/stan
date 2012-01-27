@@ -69,7 +69,9 @@ TO DO
 
 * return log probability as parameter
 
-* multi-t
+* multi-t error checking
+
+* convert unsigned int return types to signed long
 
 EXTENSIONS
 =================================================
