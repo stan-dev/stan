@@ -1,22 +1,25 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__BINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__BINOMIAL_HPP__
 
-#include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <bool propto = false,
               typename T_n, typename T_N, typename T_prob, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_prob,T_n,T_N>::type
     binomial_log(const T_n& n, const T_N& N, const T_prob& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::binomial_log<%1%>(%1%)";
-
-      typename boost::math::tools::promote_args<T_prob,T_n,T_N>::type lp(0.0);
+      
+      using stan::maths::check_bounded;
+      using stan::maths::check_nonnegative;
+      using boost::math::tools::promote_args;
+      
+      typename promote_args<T_prob,T_n,T_N>::type lp(0.0);
       if (!check_bounded(function, n, 0, N,
                          "Successes, n,",
                          &lp, Policy()))

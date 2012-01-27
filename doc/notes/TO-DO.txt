@@ -61,8 +61,6 @@ TO DO
   2) use stan::maths::default_policy 
   3) add usings for the error handling.
   4) remove propto for cumulative function
- - categorical
- - binomial
  - poisson
  - neg_binomial
  - beta_binomial
@@ -75,6 +73,7 @@ TO DO
  - dirichlet
  - lkj_corr
  - lkj_cov
+ - categorical
 
 EXTENSIONS
 =================================================
