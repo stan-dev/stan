@@ -1,9 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__DIRICHLET_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__DIRICHLET_HPP__
 
-#include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -35,16 +35,16 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_prob, typename T_prior_sample_size, 
-              class Policy = boost::math::policies::policy<> > 
+              class Policy = stan::maths::default_policy> 
     inline typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                   const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
                   const Policy& = Policy()) {
       // FIXME: parameter check
-      typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
+      using boost::math::tools::promote_args;
+      typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
 
       using stan::maths::multiply_log;
-
       if (include_summand<propto,T_prior_sample_size>::value) {
         lp += lgamma(alpha.sum());
         for (int k = 0; k < alpha.rows(); ++k)

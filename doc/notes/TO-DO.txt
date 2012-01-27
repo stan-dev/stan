@@ -62,8 +62,6 @@ TO DO
   3) add usings for the error handling.
   4) remove propto for cumulative function
  - multi_normal
- - dirichlet
- - lkj_corr
  - lkj_cov
  - categorical
  - multinomial
