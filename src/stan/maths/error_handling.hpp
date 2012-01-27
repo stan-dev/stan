@@ -162,6 +162,27 @@ namespace stan {
       return true;
     }
 
+    template <typename T_x, typename T_low, typename T_result, class Policy>
+    inline bool check_greater_or_equal(const char* function,
+                                       const T_x& x,
+                                       const T_low& low,
+                                       const char* name,  
+                                       T_result* result,
+                                       const Policy& /*pol*/) {
+      using boost::math::policies::raise_domain_error;
+      using boost::math::tools::promote_args;
+      if (!boost::math::isfinite(x) || !(x >= low)) {
+        std::ostringstream msg;
+        msg << name 
+            << " is %1%, but must be finite and greater than or equal to "
+            << low;
+        *result = raise_domain_error<typename promote_args<T_x>::type>
+          (function, msg.str().c_str(), x, Policy());
+        return false;
+      }
+      return true;
+    }
+
 
     template <typename T_x, typename T_low, typename T_high, typename T_result,
               class Policy>

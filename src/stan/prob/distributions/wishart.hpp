@@ -2,9 +2,9 @@
 #define __STAN__PROB__DISTRIBUTIONS__WISHART_HPP__
 
 #include <stan/maths/matrix.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -40,25 +40,26 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
-                const T_dof& nu,
-                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
+                const T_dof& nu,const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                 const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
+      using stan::maths::check_greater_or_equal;
+      using stan::maths::check_size_match;
+      using boost::math::tools::promote_args;
+
       unsigned int k = W.rows();
-      typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!stan::prob::check_nonnegative(function, nu - (k-1), "Degrees of freedom - k-1", &lp, Policy()))
+      typename promote_args<T_y,T_dof,T_scale>::type lp;
+      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
         return lp;
       if (!check_size_match(function, S.rows(), S.cols(), &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
-        return lp;
-      if (!check_nonnegative(function, 1+nu-k, "nu - S.rows() + 1", &lp, Policy()))
         return lp;
       // FIXME: domain checks
       
@@ -69,6 +70,7 @@ namespace stan {
       using stan::maths::determinant;
       using stan::maths::trace;
 
+      lp = 0.0;
       if (include_summand<propto,T_y,T_dof>::value)
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       if (include_summand<propto,T_y,T_dof>::value)
