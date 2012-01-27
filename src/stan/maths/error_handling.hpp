@@ -8,12 +8,11 @@
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 
 #include <stan/maths/matrix.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/prob/transform.hpp>
 
 namespace stan { 
 
   namespace maths {
+    const double CONSTRAINT_TOLERANCE = 1E-8;
 
     /**
      * Default error-handling policy from Boost.
@@ -77,7 +76,6 @@ namespace stan {
       }
       return true;
     }
-
 
     /**
      * Checks if the variable y is finite.
@@ -347,27 +345,36 @@ namespace stan {
       }
       return true;
     }
-
-    template <typename T_prob, typename T_result, class Policy>
+    
+    template <typename T_prob_vector, typename T_result, class Policy>
     inline bool check_simplex(const char* function,
-                              const typename stan::maths::EigenType<T_prob>::vector& theta,
+                              const T_prob_vector& theta,
                               const char* name,
                               T_result* result,
                               const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
-      if (!simplex_validate(theta)) {
-        std::ostringstream stream;
-        stream << name
-               << "is not a valid simplex."
-               << " The first element of the simplex is: %1%.";
-        *result = raise_domain_error<T_prob>(function,
-                                             stream.str().c_str(), 
-                                             theta(0),
-                                             Policy());
+      if (theta.size() == 0) {
+        std::string message(name);
+        message += " is not a valid simplex. %1% elements in the vector.";
+        *result = raise_domain_error<double>(function,message.c_str(),theta.size(),Policy());
+      }
+      if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
+        std::string message(name);
+        message += " is not a valid simplex. The sum of the elements is %1%, but should be 1.0";
+        *result = raise_domain_error(function, message.c_str(), theta.sum(), Policy());
         return false;
       }
+      for (int n = 0; n < theta.size(); n++) {
+        if (boost::math::isnan(theta[n]) || !(theta[n] >= 0)) {
+          std::ostringstream stream;
+          stream << name << " is not a valid simplex. The element at " << n << " is %1%, but should be greater than or equal to 0";
+          *result = raise_domain_error(function, stream.str().c_str(), theta[n], Policy());
+          return false;
+        }
+      }
+
       return true;
-    }
+    }                         
     
   }
 }
