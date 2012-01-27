@@ -17,12 +17,6 @@ TEST(ProbDistributionsWeibull,Cumulative) {
   EXPECT_FLOAT_EQ(0.0032585711, stan::prob::weibull_p(0.25,2.9,1.8));
   EXPECT_FLOAT_EQ(1.0, stan::prob::weibull_p(3.9,1.7,0.25));
 }
-TEST(ProbDistributionsWeibull,CumulativePropto) {
-  EXPECT_FLOAT_EQ(1.0, stan::prob::weibull_p<true>(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(1.0, stan::prob::weibull_p<true>(0.25,2.9,1.8));
-  EXPECT_FLOAT_EQ(1.0, stan::prob::weibull_p<true>(3.9,1.7,0.25));
-}
-
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
