@@ -32,6 +32,7 @@ namespace stan {
         return LOG_ZERO;
       
       using stan::maths::square;
+      using std::log;
       
       lp = 0.0;
       if (include_summand<propto>::value)

@@ -7,6 +7,7 @@
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 
+#include <stan/maths/special_functions.hpp>
 #include <stan/maths/matrix.hpp>
 
 namespace stan { 
