@@ -7,6 +7,7 @@ TO DO
   - remove memory overhead from numeric_limits<stan::agrad::var>
   - maths
   - matrix
+  - rewrite raise_domain_error to make use of return type.
 
 * exceptions handled by samplers
   - rejection or restart?
@@ -52,6 +53,8 @@ TO DO
    + plot.stan(fit)
    + dump.stan(fit)
    + read.stan(file_path)
+
+
 
 * refactor probability distributions to use stan/maths/error_handling. 
   1) change include. 
