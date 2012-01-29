@@ -8,8 +8,8 @@
 #include <stan/prob/distributions/multi_student_t.hpp>
 #include <stan/prob/distributions/wishart.hpp>
 #include <stan/prob/distributions/inv_wishart.hpp>
-
 #include <stan/prob/distributions/dirichlet.hpp>
+
 
 #include <stan/prob/distributions/cauchy.hpp>
 #include <stan/prob/distributions/pareto.hpp>

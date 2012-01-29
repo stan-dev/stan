@@ -9,8 +9,6 @@
 #include <stan/prob/distributions/univariate/continuous/inv_chi_square.hpp>
 #include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
-#include <stan/prob/distributions/univariate/continuous/wishart.hpp>
-#include <stan/prob/distributions/univariate/continuous/inv_wishart.hpp>
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
