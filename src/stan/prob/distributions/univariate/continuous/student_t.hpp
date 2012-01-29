@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__STUDENT_T_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__STUDENT_T_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
 
 #include <stan/prob/constants.hpp>
 #include <stan/maths/error_handling.hpp>

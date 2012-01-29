@@ -6,10 +6,11 @@
 
 #include <stan/prob/distributions/multi_normal.hpp>
 #include <stan/prob/distributions/multi_student_t.hpp>
-
-#include <stan/prob/distributions/exponential.hpp>
 #include <stan/prob/distributions/wishart.hpp>
 #include <stan/prob/distributions/inv_wishart.hpp>
+
+
+#include <stan/prob/distributions/exponential.hpp>
 #include <stan/prob/distributions/student_t.hpp>
 #include <stan/prob/distributions/beta.hpp>
 #include <stan/prob/distributions/dirichlet.hpp>

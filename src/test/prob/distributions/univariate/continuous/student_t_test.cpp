@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/student_t.hpp>
+#include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/beta.hpp>
+#include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
