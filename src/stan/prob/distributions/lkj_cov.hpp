@@ -9,7 +9,7 @@
 #include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
-#include <stan/prob/distributions/lognormal.hpp>
+#include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 #include <stan/prob/distributions/lkj_corr.hpp>
 
 namespace stan {

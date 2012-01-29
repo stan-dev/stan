@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/logistic.hpp>
+#include <stan/prob/distributions/univariate/continuous/logistic.hpp>
 
 TEST(ProbDistributionsLogistic,Logistic) {
   EXPECT_FLOAT_EQ(-2.129645, stan::prob::logistic_log(1.2,0.3,2.0));

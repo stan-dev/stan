@@ -3,7 +3,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/distributions/pareto.hpp>
+#include <stan/prob/distributions/univariate/continuous/pareto.hpp>
 
 template <typename T_y, typename T_scale, typename T_shape>
 void expect_propto(T_y y1, T_scale y_min1, T_shape alpha1,

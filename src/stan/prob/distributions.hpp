@@ -9,14 +9,9 @@
 #include <stan/prob/distributions/wishart.hpp>
 #include <stan/prob/distributions/inv_wishart.hpp>
 #include <stan/prob/distributions/dirichlet.hpp>
-
-#include <stan/prob/distributions/pareto.hpp>
-#include <stan/prob/distributions/double_exponential.hpp>
-#include <stan/prob/distributions/weibull.hpp>
-#include <stan/prob/distributions/logistic.hpp>
-#include <stan/prob/distributions/lognormal.hpp>
 #include <stan/prob/distributions/lkj_corr.hpp>
 #include <stan/prob/distributions/lkj_cov.hpp>
+
 #include <stan/prob/distributions/bernoulli.hpp>
 #include <stan/prob/distributions/categorical.hpp>
 #include <stan/prob/distributions/binomial.hpp>

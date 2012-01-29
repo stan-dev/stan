@@ -12,5 +12,11 @@
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <stan/prob/distributions/univariate/continuous/cauchy.hpp>
+#include <stan/prob/distributions/univariate/continuous/pareto.hpp>
+#include <stan/prob/distributions/univariate/continuous/double_exponential.hpp>
+#include <stan/prob/distributions/univariate/continuous/weibull.hpp>
+#include <stan/prob/distributions/univariate/continuous/logistic.hpp>
+#include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
+
 
 #endif
