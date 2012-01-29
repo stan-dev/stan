@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/inv_gamma.hpp"
+#include "stan/prob/distributions/univariate/continuous/inv_gamma.hpp"
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;

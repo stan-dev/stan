@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__INV_GAMMA_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__INV_GAMMA_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__INV_GAMMA_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__INV_GAMMA_HPP__
 
 #include <stan/prob/constants.hpp>
 #include <stan/maths/error_handling.hpp>
