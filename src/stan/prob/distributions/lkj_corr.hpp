@@ -4,7 +4,7 @@
 #include <stan/prob/constants.hpp>
 #include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/distributions/beta.hpp>
+#include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
 namespace stan {
   namespace prob {
