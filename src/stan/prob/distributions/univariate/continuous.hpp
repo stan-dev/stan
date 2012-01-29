@@ -3,5 +3,6 @@
 
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
+#include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 
 #endif
