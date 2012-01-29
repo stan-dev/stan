@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__INV_CHI_SQUARE_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__INV_CHI_SQUARE_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__INV_CHI_SQUARE_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__INV_CHI_SQUARE_HPP__
 
 #include <stan/prob/traits.hpp>
 #include <stan/maths/error_handling.hpp>

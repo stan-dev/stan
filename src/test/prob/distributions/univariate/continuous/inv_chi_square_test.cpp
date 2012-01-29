@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/inv_chi_square.hpp"
+#include "stan/prob/distributions/univariate/continuous/inv_chi_square.hpp"
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
