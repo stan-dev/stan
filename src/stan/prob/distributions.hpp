@@ -4,7 +4,6 @@
 #include <stan/prob/distributions/univariate.hpp>
 #include <stan/prob/distributions/multivariate.hpp>
 
-#include <stan/prob/distributions/normal.hpp>
 #include <stan/prob/distributions/multi_normal.hpp>
 #include <stan/prob/distributions/multi_student_t.hpp>
 #include <stan/prob/distributions/gamma.hpp>
