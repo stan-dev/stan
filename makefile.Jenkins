@@ -1,6 +1,7 @@
 CC = g++
 EIGEN_OPT = 
-OPTIMIZE_OPT = 3
+O = 3
+OPTIMIZE_OPT = $(O)
 OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
 
 INCLUDES = -I src -I lib
