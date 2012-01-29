@@ -5,5 +5,6 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
+#include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
 
 #endif

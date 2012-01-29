@@ -8,7 +8,6 @@
 #include <stan/prob/distributions/multi_student_t.hpp>
 
 
-#include <stan/prob/distributions/chi_square.hpp>
 #include <stan/prob/distributions/inv_chi_square.hpp>
 #include <stan/prob/distributions/scaled_inv_chi_square.hpp>
 #include <stan/prob/distributions/exponential.hpp>
