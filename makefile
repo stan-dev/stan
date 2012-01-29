@@ -30,7 +30,7 @@ endif
 ## --------------------------------
 
 # find all unit tests
-UNIT_TESTS := $(wildcard src/test/*.cpp src/test/*/*.cpp src/test/*/*/*.cpp src/test/*/*/*/*.cpp)
+UNIT_TESTS := $(shell find src/test/ -type f -name '*_test.cpp')
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
 UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 

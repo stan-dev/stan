@@ -10,7 +10,7 @@ CFLAGS = $(OPT) $(INCLUDES) -std=gnu++0x
 CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0 
 
 # find all unit tests
-UNIT_TESTS := $(wildcard src/test/*/*.cpp src/test/*/*/*.cpp)
+UNIT_TESTS := $(shell find src/test/ -type f -name '*_test.cpp')
 # exclude the unit tests that don't run in windows:
 UNIT_TESTS_TO_EXCLUDE = src/test/agrad/matrix_test.cpp src/test/gm/parser_test.cpp src/test/agrad/distributions/inv_wishart_test.cpp
 UNIT_TESTS_TO_EXCLUDE += src/test/agrad/distributions/wishart_test.cpp src/test/agrad/distributions/multi_normal_test.cpp
