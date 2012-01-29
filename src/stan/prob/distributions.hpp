@@ -10,8 +10,6 @@
 #include <stan/prob/distributions/inv_wishart.hpp>
 #include <stan/prob/distributions/dirichlet.hpp>
 
-
-#include <stan/prob/distributions/cauchy.hpp>
 #include <stan/prob/distributions/pareto.hpp>
 #include <stan/prob/distributions/double_exponential.hpp>
 #include <stan/prob/distributions/weibull.hpp>
