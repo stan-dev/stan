@@ -1,8 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
 
-#include <stan/maths/matrix.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/maths/matrix_error_handling.hpp>
 #include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
@@ -53,7 +53,7 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       unsigned int k = S.rows();
-      typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type lp(0.0);
+      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))

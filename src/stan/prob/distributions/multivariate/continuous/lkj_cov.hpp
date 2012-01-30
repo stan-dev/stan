@@ -3,9 +3,8 @@
 
 #include <Eigen/Dense>
 
-#include <stan/maths/matrix.hpp>
-
 #include <stan/prob/constants.hpp>
+#include <stan/maths/matrix_error_handling.hpp>
 #include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 

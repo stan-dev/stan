@@ -8,7 +8,6 @@
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 
 #include <stan/maths/special_functions.hpp>
-#include <stan/maths/matrix.hpp>
 
 namespace stan { 
 
@@ -57,27 +56,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_not_nan(const char* function,
-                              const typename 
-                              stan::maths::EigenType<T_y>::vector& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (boost::math::isnan(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must not be nan!";
-          *result = raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
-          return false;
-        }
-      }
-      return true;
-    }
-
     /**
      * Checks if the variable y is finite.
      */
@@ -119,26 +97,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_finite(const char* function,
-                             const typename 
-                             stan::maths::EigenType<T_y>::vector& y,
-                             const char* name,
-                             T_result* result,
-                             const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (!boost::math::isfinite(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must be finite!";
-          *result = raise_domain_error<T_y>(function,
-                                            message.str().c_str(),
-                                            y[i], Policy());
-          return false;
-        }
-      }
-      return true;
-    }
 
     template <typename T_x, typename T_low, typename T_result, class Policy>
     inline bool check_greater(const char* function,
@@ -306,47 +264,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_result, class Policy>
-    inline bool check_size_match(const char* function,
-                                 unsigned int i,
-                                 unsigned int j,
-                                 T_result* result,
-                                 const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (i != j) {
-        std::ostringstream msg;
-        msg << "i and j must be same.  Found i=%1%, j=" << j;
-        *result = raise_domain_error<double>(function,
-                                             msg.str().c_str(),
-                                             i,
-                                             Policy());
-        return false;
-      }
-      return true;
-    }
-    
-    template <typename T_covar, typename T_result, class Policy>
-    inline bool check_cov_matrix(const char* function,
-                                 const typename stan::maths::EigenType<T_covar>::matrix& Sigma,
-                                 T_result* result,
-                                 const Policy& /*pol*/) {
-      using boost::math::policies::raise_domain_error;
-      if (!cov_matrix_validate(Sigma)) {
-        std::ostringstream stream;
-        stream << "Sigma is not a valid covariance matrix."
-               << " Sigma must be symmetric and positive semi-definite."
-               << " Sigma:" << std::endl
-               << Sigma << std::endl
-               << "Sigma(0,0): %1%";
-        *result = raise_domain_error<T_covar>(function,
-                                              stream.str().c_str(), 
-                                              Sigma(0,0),
-                                              Policy());
-        return false;
-      }
-      return true;
-    }
-    
     template <typename T_prob_vector, typename T_result, class Policy>
     inline bool check_simplex(const char* function,
                               const T_prob_vector& theta,
