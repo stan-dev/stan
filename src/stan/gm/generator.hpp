@@ -5,8 +5,11 @@
 
 #include <ostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <Eigen/Dense>
 
 #include <stan/version.hpp>
 #include <stan/gm/ast.hpp>
@@ -39,6 +42,7 @@ namespace stan {
       std::ostream& o_;
       visgen(std::ostream& o) : o_(o) { }
     };
+
 
     void generate_indexes(const std::vector<expression> indexes,
                           base_expr_type base_type,

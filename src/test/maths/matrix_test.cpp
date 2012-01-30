@@ -131,50 +131,100 @@ TEST(matrix_test, resize_svec_svec_matrix_double) {
   EXPECT_EQ(6U,mm[1][2].rows());
   EXPECT_EQ(3U,mm[3][4].cols());
 }
+
+TEST(matrix,get_base1_vec1) {
+  using stan::maths::get_base1;
+  std::vector<double> x(2);
+  x[0] = 10.0;
+  x[1] = 20.0;
+  EXPECT_FLOAT_EQ(10.0,get_base1(x,1,"x[1]",0));
+  EXPECT_FLOAT_EQ(20.0,get_base1(x,2,"x[1]",0));
+  
+  get_base1(x,2,"x[2]",0) = 5.0;
+  EXPECT_FLOAT_EQ(5.0,get_base1(x,2,"x[1]",0));
+
+  EXPECT_THROW(get_base1(x,0,"x[0]",0),
+               std::out_of_range);
+  EXPECT_THROW(get_base1(x,3,"x[3]",0),
+               std::out_of_range);
+}
+TEST(matrix,get_base1_vec2) {
+  using stan::maths::get_base1;
+  using std::vector;
+  size_t M = 3;
+  size_t N = 4;
+
+  vector<vector<double> > x(M,vector<double>(N,0.0));
+  
+
+  for (size_t m = 1; m <= M; ++m)
+    for (size_t n = 1; n <= N; ++n)
+      x[m - 1][n - 1] = (m * 10) + n;
+
+  for (size_t m = 1; m <= M; ++m) {
+    for (size_t n = 1; n <= N; ++n) {
+      double expected = x[m - 1][n - 1];
+      double found = get_base1(get_base1(x, m, "x[m]",1),
+                               n, "x[m][n]",2);
+      EXPECT_FLOAT_EQ(expected,found);
+    }
+  }
+
+  get_base1(get_base1(x,1,"",-1),2,"",-1) = 112.5;
+  EXPECT_FLOAT_EQ(112.5, x[0][1]);
+
+  EXPECT_THROW(get_base1(x,0,"",-1),std::out_of_range);
+  EXPECT_THROW(get_base1(x,M+1,"",-1),std::out_of_range);
+  
+  EXPECT_THROW(get_base1(get_base1(x,1,"",-1), 
+                         12,"",-1),
+               std::out_of_range);
+}
+
 TEST(matrix_test,add_v_exception) {
   vector_d d1, d2;
 
   d1.resize(3);
   d2.resize(3);
-  EXPECT_NO_THROW(stan::maths::add (d1, d2));
+  EXPECT_NO_THROW(stan::maths::add(d1, d2));
 
   d1.resize(0);
   d2.resize(0);
-  EXPECT_NO_THROW(stan::maths::add (d1, d2));
+  EXPECT_NO_THROW(stan::maths::add(d1, d2));
 
   d1.resize(2);
   d2.resize(3);
-  EXPECT_THROW(stan::maths::add (d1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::add(d1, d2), std::invalid_argument);
 }
 TEST(matrix_test,add_rv_exception) {
   row_vector_d d1, d2;
 
   d1.resize(3);
   d2.resize(3);
-  EXPECT_NO_THROW(stan::maths::add (d1, d2));
+  EXPECT_NO_THROW(stan::maths::add(d1, d2));
 
   d1.resize(0);
   d2.resize(0);
-  EXPECT_NO_THROW(stan::maths::add (d1, d2));
+  EXPECT_NO_THROW(stan::maths::add(d1, d2));
 
   d1.resize(2);
   d2.resize(3);
-  EXPECT_THROW(stan::maths::add (d1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::add(d1, d2), std::invalid_argument);
 }
 TEST(matrix_test,add_m_exception) {
   matrix_d d1, d2;
 
   d1.resize(2,3);
   d2.resize(2,3);
-  EXPECT_NO_THROW(stan::maths::add (d1, d2));
+  EXPECT_NO_THROW(stan::maths::add(d1, d2));
 
   d1.resize(0,0);
   d2.resize(0,0);
-  EXPECT_NO_THROW(stan::maths::add (d1, d2));
+  EXPECT_NO_THROW(stan::maths::add(d1, d2));
 
   d1.resize(2,3);
   d2.resize(3,3);
-  EXPECT_THROW(stan::maths::add (d1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::add(d1, d2), std::invalid_argument);
 }
 
 TEST(matrix_test,subtract_v_exception) {
@@ -182,45 +232,45 @@ TEST(matrix_test,subtract_v_exception) {
 
   d1.resize(3);
   d2.resize(3);
-  EXPECT_NO_THROW(stan::maths::subtract (d1, d2));
+  EXPECT_NO_THROW(stan::maths::subtract(d1, d2));
 
   d1.resize(0);
   d2.resize(0);
-  EXPECT_NO_THROW(stan::maths::subtract (d1, d2));
+  EXPECT_NO_THROW(stan::maths::subtract(d1, d2));
 
   d1.resize(2);
   d2.resize(3);
-  EXPECT_THROW(stan::maths::subtract (d1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::subtract(d1, d2), std::invalid_argument);
 }
 TEST(matrix_test,subtract_rv_exception) {
   row_vector_d d1, d2;
 
   d1.resize(3);
   d2.resize(3);
-  EXPECT_NO_THROW(stan::maths::subtract (d1, d2));
+  EXPECT_NO_THROW(stan::maths::subtract(d1, d2));
 
   d1.resize(0);
   d2.resize(0);
-  EXPECT_NO_THROW(stan::maths::subtract (d1, d2));
+  EXPECT_NO_THROW(stan::maths::subtract(d1, d2));
 
   d1.resize(2);
   d2.resize(3);
-  EXPECT_THROW(stan::maths::subtract (d1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::subtract(d1, d2), std::invalid_argument);
 }
 TEST(matrix_test,subtract_m_exception) {
   matrix_d d1, d2;
 
   d1.resize(2,3);
   d2.resize(2,3);
-  EXPECT_NO_THROW(stan::maths::subtract (d1, d2));
+  EXPECT_NO_THROW(stan::maths::subtract(d1, d2));
 
   d1.resize(0,0);
   d2.resize(0,0);
-  EXPECT_NO_THROW(stan::maths::subtract (d1, d2));
+  EXPECT_NO_THROW(stan::maths::subtract(d1, d2));
 
   d1.resize(2,3);
   d2.resize(3,3);
-  EXPECT_THROW(stan::maths::subtract (d1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::subtract(d1, d2), std::invalid_argument);
 }
 
 TEST(matrix_test,multiply_rv_v_exception) {
@@ -229,15 +279,15 @@ TEST(matrix_test,multiply_rv_v_exception) {
   
   rv.resize(3);
   v.resize(3);
-  EXPECT_NO_THROW(stan::maths::multiply (rv, v));
+  EXPECT_NO_THROW(stan::maths::multiply(rv, v));
 
   rv.resize(0);
   v.resize(0);
-  EXPECT_NO_THROW(stan::maths::multiply (rv, v));
+  EXPECT_NO_THROW(stan::maths::multiply(rv, v));
 
   rv.resize(2);
   v.resize(3);
-  EXPECT_THROW(stan::maths::multiply (rv, v), std::invalid_argument);
+  EXPECT_THROW(stan::maths::multiply(rv, v), std::invalid_argument);
 }
 TEST(matrix_test,multiply_m_v_exception) {
   matrix_d m;
@@ -245,15 +295,15 @@ TEST(matrix_test,multiply_m_v_exception) {
   
   m.resize(3, 5);
   v.resize(5);
-  EXPECT_NO_THROW(stan::maths::multiply (m, v));
+  EXPECT_NO_THROW(stan::maths::multiply(m, v));
 
   m.resize(3, 0);
   v.resize(0);
-  EXPECT_NO_THROW(stan::maths::multiply (m, v));
+  EXPECT_NO_THROW(stan::maths::multiply(m, v));
 
   m.resize(2, 3);
   v.resize(2);
-  EXPECT_THROW(stan::maths::multiply (m, v), std::invalid_argument);  
+  EXPECT_THROW(stan::maths::multiply(m, v), std::invalid_argument);  
 }
 TEST(matrix_test,multiply_rv_m_exception) {
   row_vector_d rv;
@@ -261,31 +311,31 @@ TEST(matrix_test,multiply_rv_m_exception) {
     
   rv.resize(3);
   m.resize(3, 5);
-  EXPECT_NO_THROW(stan::maths::multiply (rv, m));
+  EXPECT_NO_THROW(stan::maths::multiply(rv, m));
 
   rv.resize(0);
   m.resize(0, 3);
-  EXPECT_NO_THROW(stan::maths::multiply (rv, m));
+  EXPECT_NO_THROW(stan::maths::multiply(rv, m));
 
   rv.resize(3);
   m.resize(2, 3);
-  EXPECT_THROW(stan::maths::multiply (rv, m), std::invalid_argument);
+  EXPECT_THROW(stan::maths::multiply(rv, m), std::invalid_argument);
 }
 TEST(matrix_test,multiply_m_m_exception) {
   matrix_d m1, m2;
   
   m1.resize(1, 3);
   m2.resize(3, 5);
-  EXPECT_NO_THROW(stan::maths::multiply (m1, m2));
+  EXPECT_NO_THROW(stan::maths::multiply(m1, m2));
 
   
   m1.resize(2, 0);
   m2.resize(0, 3);
-  EXPECT_NO_THROW(stan::maths::multiply (m1, m2));
+  EXPECT_NO_THROW(stan::maths::multiply(m1, m2));
 
   m1.resize(4, 3);
   m2.resize(2, 3);
-  EXPECT_THROW(stan::maths::multiply (m1, m2), std::invalid_argument);
+  EXPECT_THROW(stan::maths::multiply(m1, m2), std::invalid_argument);
 }
 TEST(matrix_test,cholesky_decompose_exception) {
   matrix_d m;

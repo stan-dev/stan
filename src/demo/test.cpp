@@ -3,42 +3,44 @@
 #include <iostream>
 #include <vector>
 
-#include <stan/agrad/agrad.hpp>
+#include <stan/maths/matrix.hpp>
 
 int main(int argc, char* argv[]) {
 
-  using stan::agrad::var;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::maths::get_base1;
 
-  var x1 = 2.0;
-  var x2 = 3.0;
-
-  std::cout << "sizeof(vari)=" << sizeof(stan::agrad::vari) << std::endl;
-
-  std::vector<var> x;
-  x.push_back(x1);
-  x.push_back(x2);
-
-  var fx = x1 * x2;
   
-  std::vector<double> gx;
-  fx.grad(x,gx);
 
-  for (unsigned int i = 0; i < gx.size(); ++i)
-    std::cout << "gx[" << i << "]=" << gx[i] << std::endl;
+  std::cout << "x[1]=" << get_base1(x,1,"x[1]",1) << std::endl;
 
-  var y1 = 4.0;
-  var y2 = 5.0;
-  
-  std::vector<var> y;
-  y.push_back(y1);
-  y.push_back(y2);
-  
-  var fy = y1 + y2;
-  
-  std::vector<double> gy;
-  fy.grad(y,gy);
+  vector<double> y(2, 1.75);
 
-  for (unsigned int i = 0; i < gy.size(); ++i)
-    std::cout << "gy[" << i << "]=" << gy[i] << std::endl;
+  vector<vector<double> > xx(2);
+  xx[0] = x;
+  xx[1] = y;
+
   
+  std::cout << "xx[2,1]=" 
+            << get_base1(get_base1(xx,2,"xx[2]",1),
+                         1,
+                         "xx[2][1]",2)
+            << std::endl;
+
+  Matrix<double,Dynamic,Dynamic> m(2,3);
+  m << 0, 1, 2, 3, 4, 5;
+  std::cout << "m=" << m << std::endl;
+  std::cout << "m.row(1)=" << m.row(1) << std::endl;
+  
+  std::cout << "get(m,2)=" << get_base1(m,2,"m[2]",1) << std::endl;
+  std::cout << "get(m,2,3)=" << get_base1(m,2,3,"m[2][3]",2) << std::endl;
+
+  try {
+    get_base1(m,3,2,"foo",1);
+  } catch (const std::r& e) {
+    std::cout << e.what() << std::endl;
+  }
+
 }

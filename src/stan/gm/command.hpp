@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <boost/random/mersenne_twister.hpp>
@@ -163,6 +164,14 @@ namespace stan {
       std::cout << std::endl;
     }
 
+    bool do_print(int refresh) {
+      return refresh > 0;
+    }
+
+    bool do_print(int n, int refresh) {
+      return do_print(refresh)
+        && ((n + 1) % refresh == 0);
+    }
 
     template <typename T_model>
     int nuts_command(int argc, const char* argv[]) {
@@ -199,9 +208,13 @@ namespace stan {
       double delta = 0.5;
       command.val("delta", delta);
 
-      int random_seed(0);
+      int refresh = 1;
+      command.val("refresh",refresh);
+
+      int random_seed = 0;
       if (command.has_key("seed")) {
-        if (!command.val("seed",random_seed)) {
+        bool well_formed = command.val("seed",random_seed);
+        if (!well_formed) {
           std::string seed_val;
           command.val("seed",seed_val);
           std::cerr << "value for seed must be integer"
@@ -225,9 +238,6 @@ namespace stan {
                             ? "user specified"
                             : "randomly generated") << ")"
                 << std::endl;
-
-      stan::mcmc::nuts<> sampler(model, delta, -1, base_rng);
-      sampler.adapt_on();
 
       std::vector<int> params_i;
       std::vector<double> params_r;
@@ -262,27 +272,39 @@ namespace stan {
       }
 
       model.write_csv_header(sample_file_stream);
+      int it_print_width = std::ceil(std::log10(num_iterations));
+      std::cout << std::endl;
+
+      stan::mcmc::nuts<> sampler(model, delta, -1, base_rng);
+      sampler.adapt_on();
       for (unsigned int m = 0; m < num_iterations; ++m) {
-        std::cout << "iteration=" << (m + 1);
+        if (do_print(m,refresh)) {
+          std::cout << "\rIteration: ";
+          std::cout << std::setw(it_print_width) << (m + 1)
+                    << " / " << num_iterations;
+          std::cout << " [" << std::setw(3) 
+                    << static_cast<int>((100.0 * (m + 1))/num_iterations)
+                    << "%] ";
+          std::cout << ((m < num_burnin) ? " (Adapting)" : " (Sampling)");
+          std::cout.flush();
+        }
         if (m < num_burnin) {
-          std::cout << " burning in" << std::endl;
-          sampler.next();
-          continue;
+          sampler.next(); // discard
         } else {
           sampler.adapt_off();
+          if (((m - num_burnin) % num_thin) != 0) {
+            sampler.next();
+            continue;
+          } else {
+            stan::mcmc::sample sample = sampler.next();
+            sample.params_r(params_r);
+            sample.params_i(params_i);
+            model.write_csv(params_r,params_i,sample_file_stream);
+          }
         }
-        if (((m - num_burnin) % num_thin) != 0) {
-          std::cout << " thinning" << std::endl;
-          sampler.next();
-          continue;
-        } 
-        std::cout << " saving" << std::endl;
-        stan::mcmc::sample sample = sampler.next();
-        sample.params_r(params_r);
-        sample.params_i(params_i);
-        model.write_csv(params_r,params_i,sample_file_stream);
       }
       sample_file_stream.close();
+      std::cout << std::endl << std::endl;
       return 0;
     }
 
