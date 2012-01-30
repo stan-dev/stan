@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multivariate/continuous/multi_student_t.hpp"
+#include "stan/prob/distributions/multi_student_t.hpp"
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
