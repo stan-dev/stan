@@ -7,7 +7,7 @@
 #include <stan/prob/constants.hpp>
 #include <stan/prob/error_handling.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/distributions/multi_normal.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
 namespace stan {
 

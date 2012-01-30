@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/prob/distributions/multi_normal.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
@@ -10,13 +10,13 @@ using Eigen::Matrix;
 
 template <typename T_y, typename T_loc, typename T_scale>
 void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
-		   T_y y2, T_loc mu2, T_scale sigma2,
-		   std::string message = "") {
+                   T_y y2, T_loc mu2, T_scale sigma2,
+                   std::string message = "") {
   expect_eq_diffs(stan::prob::multi_normal_log<false>(y1,mu1,sigma1),
-		  stan::prob::multi_normal_log<false>(y2,mu2,sigma2),
-		  stan::prob::multi_normal_log<true>(y1,mu1,sigma1),
-		  stan::prob::multi_normal_log<true>(y2,mu2,sigma2),
-		  message);
+                  stan::prob::multi_normal_log<false>(y2,mu2,sigma2),
+                  stan::prob::multi_normal_log<true>(y1,mu1,sigma1),
+                  stan::prob::multi_normal_log<true>(y2,mu2,sigma2),
+                  message);
 }
 
 using stan::agrad::var;
@@ -55,37 +55,37 @@ protected:
 
 TEST_F(AgradDistributionsMultiNormal,Propto) {
   expect_propto(to_var(y),to_var(mu),to_var(Sigma),
-		to_var(y2),to_var(mu2),to_var(Sigma2),
-		"All vars: y, mu, sigma");
+                to_var(y2),to_var(mu2),to_var(Sigma2),
+                "All vars: y, mu, sigma");
 }
 TEST_F(AgradDistributionsMultiNormal,ProptoY) {
   expect_propto(to_var(y),mu,Sigma,
-		to_var(y2),mu,Sigma,
-		"var: y");
+                to_var(y2),mu,Sigma,
+                "var: y");
 
 }
 TEST_F(AgradDistributionsMultiNormal,ProptoYMu) {
   expect_propto(to_var(y),to_var(mu),Sigma,
-		to_var(y2),to_var(mu2),Sigma,
-		"var: y and mu");
+                to_var(y2),to_var(mu2),Sigma,
+                "var: y and mu");
 }
 TEST_F(AgradDistributionsMultiNormal,ProptoYSigma) {
   expect_propto(to_var(y),mu,to_var(Sigma),
-		to_var(y2),mu,to_var(Sigma2),
-		"var: y and sigma");
+                to_var(y2),mu,to_var(Sigma2),
+                "var: y and sigma");
 }
 TEST_F(AgradDistributionsMultiNormal,ProptoMu) {
   expect_propto(y,to_var(mu),Sigma,
-		y,to_var(mu2),Sigma,
-		"var: mu");
+                y,to_var(mu2),Sigma,
+                "var: mu");
 }
 TEST_F(AgradDistributionsMultiNormal,ProptoMuSigma) {
   expect_propto(y,to_var(mu),to_var(Sigma),
-		y,to_var(mu2),to_var(Sigma2),
-		"var: mu and sigma");
+                y,to_var(mu2),to_var(Sigma2),
+                "var: mu and sigma");
 }
 TEST_F(AgradDistributionsMultiNormal,ProptoSigma) {
   expect_propto(y,mu,to_var(Sigma),
-		y,mu,to_var(Sigma2),
-		"var: sigma");
+                y,mu,to_var(Sigma2),
+                "var: sigma");
 }

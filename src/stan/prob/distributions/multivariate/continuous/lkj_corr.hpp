@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__LKJ_CORR_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__LKJ_CORR_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP__
 
 #include <stan/prob/constants.hpp>
 #include <stan/maths/error_handling.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__LKJ_COV_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__LKJ_COV_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP__
 
 #include <Eigen/Dense>
 
@@ -10,7 +10,7 @@
 #include <stan/prob/traits.hpp>
 
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
-#include <stan/prob/distributions/lkj_corr.hpp>
+#include <stan/prob/distributions/multivariate/continuous/lkj_corr.hpp>
 
 namespace stan {
   namespace prob {

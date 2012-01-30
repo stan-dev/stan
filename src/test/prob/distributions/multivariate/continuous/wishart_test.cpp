@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
-#include <stan/prob/distributions/wishart.hpp>
+#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

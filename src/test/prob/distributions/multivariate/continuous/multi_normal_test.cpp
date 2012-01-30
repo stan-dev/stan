@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multi_normal.hpp"
+#include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

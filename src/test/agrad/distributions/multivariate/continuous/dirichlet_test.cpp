@@ -1,19 +1,19 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/prob/distributions/dirichlet.hpp>
+#include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
 
 template <typename T_prob, typename T_prior_sample_size>
 void expect_propto(T_prob theta, T_prior_sample_size alpha,
-		   T_prob theta2, T_prior_sample_size alpha2,
-		   std::string message) {
+                   T_prob theta2, T_prior_sample_size alpha2,
+                   std::string message) {
   expect_eq_diffs(stan::prob::dirichlet_log<false>(theta, alpha),
-		  stan::prob::dirichlet_log<false>(theta2, alpha2),
-		  stan::prob::dirichlet_log<true>(theta, alpha),
-		  stan::prob::dirichlet_log<true>(theta2, alpha2),
-		  message);
+                  stan::prob::dirichlet_log<false>(theta2, alpha2),
+                  stan::prob::dirichlet_log<true>(theta, alpha),
+                  stan::prob::dirichlet_log<true>(theta2, alpha2),
+                  message);
 }
 
 using Eigen::Dynamic;
@@ -41,16 +41,16 @@ protected:
 
 TEST_F(AgradDistributionsDirichlet,Propto) {
   expect_propto(to_var(theta),to_var(alpha),
-		to_var(theta2),to_var(alpha2),
-		"var: theta and alpha");
+                to_var(theta2),to_var(alpha2),
+                "var: theta and alpha");
 }
 TEST_F(AgradDistributionsDirichlet,ProptoTheta) {
   expect_propto(to_var(theta), alpha,
-		to_var(theta2), alpha,
-		"var: theta");
+                to_var(theta2), alpha,
+                "var: theta");
 }
 TEST_F(AgradDistributionsDirichlet,ProptoAlpha) {
   expect_propto(theta, to_var(alpha), 
-		theta, to_var(alpha2), 
-		"var: alpha");
+                theta, to_var(alpha2), 
+                "var: alpha");
 }

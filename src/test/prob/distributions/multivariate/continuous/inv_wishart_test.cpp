@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/inv_wishart.hpp>
+#include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
