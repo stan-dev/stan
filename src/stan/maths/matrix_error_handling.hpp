@@ -146,7 +146,7 @@ namespace stan {
                               const char* name,
                               T_result* result,
                               const Policy& /*pol*/) {
-      if (!simplex_validate(theta)) {
+      if (!stan::prob::simplex_validate(theta)) {
         std::ostringstream stream;
         stream << name
                << "is not a valid simplex. The first element of the simplex is: %1%.";

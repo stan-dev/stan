@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/univariate/discrete/categorical.hpp>
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
