@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/bernoulli.hpp"
+#include "stan/prob/distributions/univariate/discrete/bernoulli.hpp"
 
 TEST(ProbDistributionsBernoulli,Bernoulli) {
   EXPECT_FLOAT_EQ(std::log(0.25), stan::prob::bernoulli_log(1,0.25));

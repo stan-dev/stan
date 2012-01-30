@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__NEG_BINOMIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__NEG_BINOMIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_HPP__
 
 #include <stan/prob/constants.hpp>
 #include <stan/maths/error_handling.hpp>

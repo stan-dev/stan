@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTINOMIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTINOMIAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__MULTINOMIAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 
 #include <stan/prob/traits.hpp>
 #include <stan/prob/error_handling.hpp>

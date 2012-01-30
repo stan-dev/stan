@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__CATEGORICAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__CATEGORICAL_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__CATEGORICAL_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__CATEGORICAL_HPP__
 
 #include <stan/prob/traits.hpp>
 #include <stan/maths/error_handling.hpp>

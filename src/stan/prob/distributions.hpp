@@ -12,14 +12,6 @@
 #include <stan/prob/distributions/lkj_corr.hpp>
 #include <stan/prob/distributions/lkj_cov.hpp>
 
-#include <stan/prob/distributions/bernoulli.hpp>
-#include <stan/prob/distributions/categorical.hpp>
-#include <stan/prob/distributions/binomial.hpp>
-#include <stan/prob/distributions/poisson.hpp>
-#include <stan/prob/distributions/neg_binomial.hpp>
-#include <stan/prob/distributions/beta_binomial.hpp>
-#include <stan/prob/distributions/hypergeometric.hpp>
-#include <stan/prob/distributions/multinomial.hpp>
 
 // FIXME: get rid of this crude import by moving down
 
