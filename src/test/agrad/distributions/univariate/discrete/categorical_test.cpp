@@ -3,7 +3,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/distributions/univariate/discrete/categorical.hpp>
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
 
 template <typename T_prob>
 void expect_propto(unsigned int n1, T_prob theta1, 
