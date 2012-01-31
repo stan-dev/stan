@@ -14,25 +14,8 @@ TO DO
 
 * HMC Sampler
   - set step size, number of steps
+  - allowing random variation +/-%
   - tune step size (optional)
-
-* clean up dependencies
-  - only include as much as necessary
-  - no namespace or file-level includes
-  - typedefs for matrix, vector, row vector
-  - simplify model includes with higher-level ones
-
-* remaining doc
-  - API doc
-  - reference manual
-  - getting started guide
-  - R interface
-
-* distribution engineering
-  - eliminate tabs from code
-  - tarball
-  - basic distro site
-  - check cross-platform compilation
 
 * discrete samplers: 
   - Gibbs for small intervals
@@ -63,15 +46,31 @@ TO DO
  - categorical
  - multinomial
 
-* fix command-line string to int conversions, say user supplied
+* return log probability as parameter?
+  - compute lp__ and sampling statements for output
 
-* if refresh is 0, no output;  add refresh option properly
-
-* return log probability as parameter
-
-* multi-t error checking
+* multi-t propto code and tests, error tests
 
 * convert unsigned int return types to signed long
+  or size_t
+
+* clean up dependencies
+  - only include as much as necessary
+  - no namespace or file-level includes
+  - typedefs for matrix, vector, row vector
+  - simplify model includes with higher-level ones
+
+* remaining doc
+  - API doc
+  - reference manual
+  - getting started guide
+  - R interface
+
+* distribution engineering
+  - eliminate tabs from code
+  - tarball
+  - basic distro site
+  - check cross-platform compilation
 
 EXTENSIONS
 =================================================

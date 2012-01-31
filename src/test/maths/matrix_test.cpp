@@ -180,6 +180,19 @@ TEST(matrix,get_base1_vec2) {
                          12,"",-1),
                std::out_of_range);
 }
+TEST(matrix,get_base1_8) {
+  using std::vector;
+  vector<vector<vector<vector<vector<vector<vector<vector<double> > > > > > > > x8;
+  vector<vector<vector<vector<vector<vector<vector<double> > > > > > > x7;
+  vector<vector<vector<vector<vector<vector<double> > > > > > x6;
+  vector<vector<vector<vector<vector<double> > > > > x5;
+  vector<vector<vector<vector<double> > > > x4;
+  vector<vector<vector<double> > > x3;
+  vector<vector<double> > x2;
+  vector<double> x1;
+  double x0;
+
+}
 
 TEST(matrix_test,add_v_exception) {
   vector_d d1, d2;

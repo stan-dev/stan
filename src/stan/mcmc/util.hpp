@@ -2,6 +2,8 @@
 #define __STAN__MCMC__UTIL_HPP__
 
 
+#include <stdexcept>
+
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
@@ -19,7 +21,12 @@ namespace stan {
                     std::vector<double>& g, double epsilon) {
       stan::maths::scaled_add(m, g, 0.5 * epsilon);
       stan::maths::scaled_add(x, m, epsilon);
-      double logp = model.grad_log_prob(x, z, g);
+      double logp = -std::numeric_limits<double>::infinity();
+      try {
+        double logp = model.grad_log_prob(x, z, g);
+      } catch (std::domain_error e) {
+        
+      }
       stan::maths::scaled_add(m, g, 0.5 * epsilon);
       return logp;
     }
