@@ -44,10 +44,12 @@ namespace stan {
     };
 
 
-    void generate_indexes(const std::vector<expression> indexes,
-                          base_expr_type base_type,
-                          unsigned int e_num_dims,
-                          std::ostream& o) {
+    void generate_indexed_expr(const std::string& expr,
+                               const std::vector<expression> indexes,
+                               base_expr_type base_type,
+                               unsigned int e_num_dims,
+                               std::ostream& o) {
+      o << expr;
       unsigned int ai_size = indexes.size();
       if (ai_size <= e_num_dims || base_type != MATRIX_T) {
         // BASE_TYPE -> BASE_TYPE
@@ -93,14 +95,16 @@ namespace stan {
       void operator()(double x) const { o_ << x; }
       void operator()(const std::string& x) const { o_ << x; } // identifiers
       void operator()(const index_op& x) const {
-        boost::apply_visitor(*this, x.expr_.expr_); 
+        std::stringstream expr_o;
+        generate_expression(x.expr_,expr_o);
+        std::string expr_string = expr_o.str();
         std::vector<expression> indexes; 
         unsigned int e_num_dims = x.expr_.expression_type().num_dims_;
         base_expr_type base_type = x.expr_.expression_type().base_type_;
         for (unsigned int i = 0; i < x.dimss_.size(); ++i)
           for (unsigned int j = 0; j < x.dimss_[i].size(); ++j) 
-            indexes.push_back(x.dimss_[i][j]); // wasteful copy
-        generate_indexes(indexes,base_type,e_num_dims,o_);
+            indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
+        generate_indexed_expr(expr_string,indexes,base_type,e_num_dims,o_);
       }
       void operator()(const fun& fx) const { 
         o_ << fx.name_ << '(';
@@ -123,7 +127,6 @@ namespace stan {
         o_ << ')';
       }
     };
-
 
     void generate_expression(const expression& e, std::ostream& o) {
       expression_visgen vis(o);
@@ -804,11 +807,11 @@ namespace stan {
       }
       void operator()(assignment const& x) const {
         generate_indent(indent_,o_);
-        o_ << x.var_dims_.name_;
-        generate_indexes(x.var_dims_.dims_,
-                         x.var_type_.base_type_,
-                         x.var_type_.dims_.size(),
-                         o_);
+        generate_indexed_expr(x.var_dims_.name_,
+                              x.var_dims_.dims_,
+                              x.var_type_.base_type_,
+                              x.var_type_.dims_.size(),
+                              o_);
         o_ << " = ";
         generate_expression(x.expr_,o_);
         o_ << ";" << EOL;

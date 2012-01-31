@@ -37,8 +37,6 @@ namespace stan {
       using std::isinf;
 
 
-      // FIXME:  if nu = infinity, call multivariate normal
-
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
 
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
@@ -54,26 +52,27 @@ namespace stan {
       if (!check_cov_matrix(function, Sigma, &lp, Policy()))
         return lp;
 
-      // false means allow infinity
+      // allows infinities
       if (!check_positive<false>(function, nu, 
                                  "Degrees of freedom, nu", &lp,
                                  Policy()))
         return lp;
       
-      // FIXME: calls checks twice
+      // FIXME: calls expensive (!) checks twice, here and in multi normal
 
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma,Policy());
 
       double d = y.size();
 
-      lp += lgamma(0.5 * (nu + d));
-      
-      lp -= lgamma(0.5 * nu);
-      
-      lp -= (0.5 * d) * log(nu);
-      
-      lp -= (0.5 * d) * LOG_PI;
+      if (include_summand<propto,T_dof>::value) {
+        lp += lgamma(0.5 * (nu + d));
+        lp -= lgamma(0.5 * nu);
+        lp -= (0.5 * d) * log(nu);
+      }
+
+      if (include_summand<propto>::value) 
+        lp -= (0.5 * d) * LOG_PI;
 
       using std::fabs;
       using stan::maths::determinant;
@@ -82,20 +81,21 @@ namespace stan {
       using stan::maths::subtract;
       using stan::maths::transpose;
 
-      lp -= 0.5 * log(fabs(determinant(Sigma)));
+      if (include_summand<propto,T_scale>::value) 
+        lp -= 0.5 * log(fabs(determinant(Sigma)));
 
-      Eigen::Matrix<T_scale,Eigen::Dynamic,1> y_minus_mu
-        = subtract(y,mu);
-
-      typename promote_args<T_y,T_loc,T_scale>::type temp
-        = 
-
-      lp -= 0.5 * (nu + d) 
-        * log(1.0 + (multiply(multiply(transpose(y_minus_mu),
-                                       inverse(Sigma)),
-                              y_minus_mu)
-                     / nu));
-
+      if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
+        Eigen::Matrix<typename promote_args<T_y,T_loc>::type,
+                      Eigen::Dynamic,
+                      1> y_minus_mu = subtract(y,mu);
+        
+        lp -= 0.5 
+          * (nu + d) 
+          * log(1.0 + (multiply(multiply(transpose(y_minus_mu),
+                                         inverse(Sigma)),
+                                y_minus_mu)
+                       / nu));
+      }
       return lp;
     }
 
