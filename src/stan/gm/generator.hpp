@@ -45,41 +45,41 @@ namespace stan {
 
 
     void generate_indexed_expr(const std::string& expr,
-                               const std::vector<expression> indexes,
-                               base_expr_type base_type,
-                               unsigned int e_num_dims,
+                               const std::vector<expression> indexes, 
+                               base_expr_type base_type, // may have more dims
+                               unsigned int e_num_dims, // array dims
                                std::ostream& o) {
-      o << expr;
+      // FIXME: add more get_base1 functions and fold nested calls into API
+      // up to a given size, then default to this behavior
       unsigned int ai_size = indexes.size();
-      if (ai_size <= e_num_dims || base_type != MATRIX_T) {
-        // BASE_TYPE -> BASE_TYPE
+      if (ai_size == 0) {
+        // no indexes
+        o << expr;
+        return;
+      }
+      if (ai_size <= (e_num_dims + 1) || base_type != MATRIX_T) {
+        for (unsigned int n = 0; n < ai_size; ++n)
+          o << "get_base1(";
+        o << expr;
         for (unsigned int n = 0; n < ai_size; ++n) {
-          o << '[';
+          o << ',';
           generate_expression(indexes[n],o);
-          o << "- 1]";
+          o << ',' << '"' << expr << '"' << ',' << (n+1) << ')';
         }
-      } else if (ai_size == e_num_dims + 1) {
-        // MATRIX_T -> ROW_VECTOR_T
-        for (unsigned int n = 0; n < ai_size - 1; ++n) {
-          o << '[';
-          generate_expression(indexes[n],o);
-          o << "- 1]";
-        }
-        o << ".row(";
-        generate_expression(indexes[ai_size - 1U],o);
-        o << "-1)";
       } else { 
-        // MATRIX_T -> DOUBLE
+        for (unsigned int n = 0; n < ai_size - 1; ++n)
+          o << "get_base1(";
+        o << expr;
         for (unsigned int n = 0; n < ai_size - 2; ++n) {
-          o << '[';
+          o << ',';
           generate_expression(indexes[n],o);
-          o << " - 1]";
+          o << ',' << '"' << expr << '"' << ',' << (n+1) << ')';
         }
-        o << '(';
+        o << ',';
         generate_expression(indexes[ai_size - 2U],o);
-        o << " - 1,";
+        o << ',';
         generate_expression(indexes[ai_size - 1U],o);
-        o << " - 1)";
+        o << ',' << '"' << expr << '"' << ',' << (ai_size-1U) << ')';
       }
     }
 
@@ -148,6 +148,7 @@ namespace stan {
       generate_using("std::stringstream",o);
       generate_using("stan::agrad::var",o);
       generate_using("stan::mcmc::prob_grad_ad",o);
+      generate_using("stan::maths::get_base1",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
       generate_using_namespace("stan::maths",o);
