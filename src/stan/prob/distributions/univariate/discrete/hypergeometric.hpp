@@ -20,7 +20,11 @@ namespace stan {
       using stan::maths::check_greater;
 
       double lp(0.0);
+      if (!check_finite(function, n, "Number, n,", &lp, Policy()))
+        return lp;
       if (!check_bounded(function, n, 0U, a, "Number, n,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, N, "Number, N,", &lp, Policy()))
         return lp;
       if (!check_greater(function, N, n, "Number, N,", &lp, Policy()))
         return lp;

@@ -15,14 +15,19 @@ namespace stan {
     bernoulli_log(const unsigned int n, const T_prob& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::bernoulli_log<%1%>(%1%)";
 
+      using stan::maths::check_finite;
       using stan::maths::check_bounded;
 
       T_prob lp;
+      if (!check_finite(function, n, "n", &lp, Policy()))
+        return lp;
       if (!check_bounded(function, n, 0, 1, "n", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, theta, "Probability, theta,", &lp, Policy()))
         return lp;
       if (!check_bounded(function, theta, 0.0, 1.0, "Probability, theta,", &lp, Policy()))
         return lp;
-      
+
       using stan::maths::log1m;
       
       if (include_summand<propto,T_prob>::value) {

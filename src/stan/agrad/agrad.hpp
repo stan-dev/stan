@@ -168,7 +168,7 @@ namespace stan {
 
     };
 
-    /*
+    /**/
     #include <ostream>
     void print_stack(ostream& o) {
       o << "STACK, size=" << var_stack_.size() << std::endl;
@@ -179,7 +179,7 @@ namespace stan {
           << " : " << ((vari*)var_stack_[i])->adj_
           << std::endl;
     }
-    */
+    /**/
 
 
     /**
