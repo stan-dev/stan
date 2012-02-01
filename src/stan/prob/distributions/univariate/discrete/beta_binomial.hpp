@@ -16,14 +16,22 @@ namespace stan {
                       const Policy& = Policy()) {
       static const char* function = "stan::prob::beta_binomial_log<%1%>(%1%)";
 
+      using stan::maths::check_not_nan;
+      using stan::maths::check_finite;
       using stan::maths::check_nonnegative;
       using stan::maths::check_positive;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_size>::type lp;
-      if (!check_nonnegative(function, N, "Sample size, N,", &lp, Policy()))
+      if (!check_not_nan(function, n, "Successes, n,", &lp, Policy()))
+        return lp;
+      if (!check_nonnegative(function, N, "Population size, N,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, alpha, "Prior sample size, alpha,", &lp, Policy()))
         return lp;
       if (!check_positive(function, alpha, "Prior sample size, alpha,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, beta, "Prior sample size, beta,", &lp, Policy()))
         return lp;
       if (!check_positive(function, beta, "Prior sample size, beta,", &lp, Policy()))
         return lp;
