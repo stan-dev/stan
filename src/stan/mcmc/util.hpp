@@ -32,10 +32,8 @@ namespace stan {
         std::cerr << std::endl
                   << "****************************************" 
                   << "****************************************" 
-                  << "Error in model.grad_log_prob:"
-                  << e.what()
                   << std::endl
-                  << "Diagnostic information: "
+                  << "Error in model.grad_log_prob:" 
                   << std::endl
                   << boost::diagnostic_information(e)
                   << std::endl
