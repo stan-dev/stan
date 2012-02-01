@@ -107,10 +107,10 @@ namespace stan {
                               const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
-      if (!boost::math::isfinite(x) || !(x > low)) {
+      if (!(x > low)) {
         std::ostringstream msg;
         msg << name 
-            << " is %1%, but must be finite and greater than "
+            << " is %1%, but must be greater than "
             << low;
         *result = raise_domain_error<typename promote_args<T_x>::type>
                       (function, msg.str().c_str(), x, Policy());
@@ -128,10 +128,10 @@ namespace stan {
                                        const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
-      if (!boost::math::isfinite(x) || !(x >= low)) {
+      if (!(x >= low)) {
         std::ostringstream msg;
         msg << name 
-            << " is %1%, but must be finite and greater than or equal to "
+            << " is %1%, but must be greater than or equal to "
             << low;
         *result = raise_domain_error<typename promote_args<T_x>::type>
           (function, msg.str().c_str(), x, Policy());
@@ -151,10 +151,10 @@ namespace stan {
                               T_result* result,
                               const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
-      if (!boost::math::isfinite(x) || !(low <= x && x <= high)) {
+      if (!(low <= x && x <= high)) {
         std::ostringstream msg;
         msg << name 
-            << " is %1%, but must be finite and between "
+            << " is %1%, but must be between "
             << low
             << " and "
             << high;
@@ -178,7 +178,7 @@ namespace stan {
       if (!(low <= x && x <= high)) {
         std::ostringstream msg;
         msg << name 
-            << " is %1%, but must be finite and between "
+            << " is %1%, but must be between "
             << low
             << " and "
             << high;
@@ -197,9 +197,9 @@ namespace stan {
                                   T_result* result,
                                   const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
-      if (!boost::math::isfinite(x) || !(x >= 0)) {
+      if (!(x >= 0)) {
         std::string message(name);
-        message += " is %1%, but must be finite and >= 0!";
+        message += " is %1%, but must be >= 0!";
         *result = raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >(function,
                                                                                             message.c_str(), 
                                                                                             x, Policy());
@@ -217,20 +217,15 @@ namespace stan {
       return true;
     }
 
-    template <bool finite=true,typename T_x, typename T_result, class Policy>
+    template <typename T_x, typename T_result, class Policy>
     inline bool check_positive(const char* function,
                                const T_x& x,
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
-      if ((finite && !boost::math::isfinite(x))
-          || (!finite && !boost::math::isnan(x))
-          || !(x > 0)) {
+      if (!(x > 0)) {
         std::string message(name);
-        message += " is %1%, but must be ";
-        if (finite)
-          message += "finite and ";
-        message += "> 0!";
+        message += " is %1%, but must be > 0";
         *result = boost::math::policies::raise_domain_error<T_x>(function,
                                                                  message.c_str(), 
                                                                  x, Policy());
@@ -240,21 +235,16 @@ namespace stan {
       return true;
     }
     
-    template <bool finite=true,typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_positive(const char* function,
                                const std::vector<T_y>& y,
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
       for (int i = 0; i < y.size(); i++) {
-        if ((finite && !boost::math::isfinite(y[i]))
-            || (!finite && !boost::math::isnan(y[i]))
-            || !(y[i] > 0)) {
+        if (!(y[i] > 0)) {
           std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must be ";
-          if (finite)
-            message << "finite and ";
-          message << "> 0!";
+          message << name << "[" << i << "] is %1%, but must be > 0";
           *result = boost::math::policies::raise_domain_error<T_y>(function,
                                                                    message.str().c_str(),
                                                                    y[i], Policy());
