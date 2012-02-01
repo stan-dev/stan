@@ -15,17 +15,30 @@ namespace stan {
   namespace mcmc {
 
     // Returns the new log probability of x and m
+    // Catches domain errors and sets logp as -inf.
     double leapfrog(prob_grad& model, 
                     std::vector<int> z,
                     std::vector<double>& x, std::vector<double>& m,
                     std::vector<double>& g, double epsilon) {
       stan::maths::scaled_add(m, g, 0.5 * epsilon);
       stan::maths::scaled_add(x, m, epsilon);
-      double logp = -std::numeric_limits<double>::infinity();
+      double logp;
       try {
-        double logp = model.grad_log_prob(x, z, g);
+        logp = model.grad_log_prob(x, z, g);
       } catch (std::domain_error e) {
-        
+        // FIXME: remove output
+        std::cerr << std::endl
+                  << "****************************************" 
+                  << "****************************************" 
+                  << "Error in model.grad_log_prob:"
+                  << e.what()
+                  << std::endl
+                  << "Diagnostic information: "
+                  << std::endl
+                  << boost::diagnostic_information(e)
+                  << std::endl
+                  << std::endl;
+        logp = -std::numeric_limits<double>::infinity();
       }
       stan::maths::scaled_add(m, g, 0.5 * epsilon);
       return logp;
