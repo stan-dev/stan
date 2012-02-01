@@ -205,35 +205,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,error_msg,idx+1);
-    }
-
-    /**
-     * Return a reference to the value of the specified vector at the
-     * specified base-one indexes.  If an index is out of range, throw
-     * a <code>std::out_of_range</code> exception with the specified
-     * error message and index indicated.
-     *
-     * @param x Vector from which to get a value.
-     * @param i1 First index plus 1.
-     * @param i2 Second index plus 1.
-     * @param i3 Third index plus 1.
-     * @param error_msg Error message if an index is out of range.
-     * @param idx Nested index level to report in error message if
-     * the index is out of range.
-     * @return Value of vector at indexes.
-     * @tparam T type of value.
-     */
-    template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<T> >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 size_t i3,
-                 const std::string& error_msg,
-                 size_t idx) {
-      check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,error_msg,idx+1);
     }
 
     /**
@@ -261,7 +233,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,i3,error_msg,idx+1);
     }
 
     /**
@@ -291,7 +263,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,i4,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,i3,i4,error_msg,idx+1);
     }
 
     /**
@@ -323,7 +295,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,i4,i5,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,i3,i4,i5,error_msg,idx+1);
     }
 
     /**
@@ -357,7 +329,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,i4,i5,i6,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,error_msg,idx+1);
     }
 
 
@@ -383,7 +355,7 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
+    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
                  size_t i1, 
                  size_t i2,
                  size_t i3,
@@ -394,7 +366,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,i4,i5,i6,i7,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,i7,error_msg,idx+1);
     }
 
 
@@ -421,7 +393,7 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
+    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
                  size_t i1, 
                  size_t i2,
                  size_t i3,
@@ -433,7 +405,7 @@ namespace stan {
                  const std::string& error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
-      return get_base1(x[i1],i2,i3,i4,i5,i6,i7,i8,error_msg,idx+1);
+      return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,i7,i8,error_msg,idx+1);
     }
 
 
@@ -464,7 +436,7 @@ namespace stan {
               size_t m,
               const std::string& error_msg,
               size_t idx) {
-      check_range(x.size(),m,error_msg,idx);
+      check_range(x.rows(),m,error_msg,idx);
       return x.row(m - 1);
     }
 
@@ -518,6 +490,7 @@ namespace stan {
                  size_t idx) {
       check_range(x.size(),m,error_msg,idx);
       return x(m - 1);
+      
     }
 
     /**
