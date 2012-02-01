@@ -32,14 +32,21 @@ namespace stan {
       static const char* function = "stan::prob::inv_gamma_log<%1%>(%1%)";
       
       using stan::maths::check_positive;
+      using stan::maths::check_finite;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
-        return lp;
-      if (!check_positive(function, beta, "Scale parameter, beta,", &lp, Policy())) 
+      if (!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       if (!check_positive(function, y, "Random variate, y,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
+        return lp;
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
+        return lp;
+      if (!check_finite(function, beta, "Scale parameter, beta,", &lp, Policy())) 
+        return lp;
+      if (!check_positive(function, beta, "Scale parameter, beta,", &lp, Policy())) 
         return lp;
 
       using boost::math::lgamma;

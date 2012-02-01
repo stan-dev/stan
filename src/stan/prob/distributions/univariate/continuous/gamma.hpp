@@ -36,16 +36,23 @@ namespace stan {
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::gamma_log<%1%>(%1%)";
       
-      using boost::math::tools::promote_args;
+      using stan::maths::check_finite;
       using stan::maths::check_positive;
       using stan::maths::check_nonnegative;
+      using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_shape,T_inv_scale>::type lp(0.0);
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
-        return lp;
-      if (!check_positive(function, beta, "Inverse scale parameter, beta,", &lp, Policy())) 
+      if (!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       if (!check_nonnegative(function, y, "Random variate, y,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
+        return lp;
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
+        return lp;
+      if (!check_finite(function, beta, "Inverse scale parameter, beta,", &lp, Policy())) 
+        return lp;
+      if (!check_positive(function, beta, "Inverse scale parameter, beta,", &lp, Policy())) 
         return lp;
       
       using boost::math::lgamma;
@@ -82,16 +89,23 @@ namespace stan {
     gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, const Policy& = Policy()){
       static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
 
-      using boost::math::tools::promote_args;
+      using stan::maths::check_finite;
       using stan::maths::check_positive;
       using stan::maths::check_nonnegative;
+      using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_inv_scale>::type result;
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", &result, Policy())) 
-        return result;
-      if (!check_positive(function, beta, "Inverse scale parameter, beta,", &result, Policy())) 
+      if (!check_finite(function, y, "Random variate, y,", &result, Policy()))
         return result;
       if (!check_nonnegative(function, y, "Random variate, y,", &result, Policy()))
+        return result;
+      if (!check_finite(function, alpha, "Shape parameter, alpha,", &result, Policy())) 
+        return result;
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", &result, Policy())) 
+        return result;
+      if (!check_finite(function, beta, "Inverse scale parameter, beta,", &result, Policy())) 
+        return result;
+      if (!check_positive(function, beta, "Inverse scale parameter, beta,", &result, Policy())) 
         return result;
       
       using boost::math::gamma_p;

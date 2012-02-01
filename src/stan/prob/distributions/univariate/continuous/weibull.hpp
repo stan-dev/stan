@@ -22,7 +22,11 @@ namespace stan {
       typename promote_args<T_y,T_shape,T_scale>::type lp;
       if(!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
+      if(!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+        return lp;
       if(!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+        return lp;
+      if(!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
       if(!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
@@ -58,7 +62,11 @@ namespace stan {
       typename promote_args<T_y,T_shape,T_scale>::type lp;
       if(!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
+      if(!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+        return lp;
       if(!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+        return lp;
+      if(!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
       if(!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;

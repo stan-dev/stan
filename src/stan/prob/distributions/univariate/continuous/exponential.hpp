@@ -41,14 +41,17 @@ namespace stan {
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::exponential_log<%1%>(%1%)";
 
+      using stan::maths::check_finite;
       using stan::maths::check_positive;
       using stan::maths::check_not_nan;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_inv_scale>::type lp(0.0);
-      if(!check_positive(function, beta, "Inverse scale", &lp, Policy()))
-        return lp;
       if(!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
+      if(!check_finite(function, beta, "Inverse scale", &lp, Policy()))
+        return lp;
+      if(!check_positive(function, beta, "Inverse scale", &lp, Policy()))
         return lp;
       
       if (include_summand<propto,T_inv_scale>::value)
@@ -81,17 +84,17 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_p<%1%>(%1%)";
 
-      using boost::math::tools::promote_args;
+      using stan::maths::check_finite;
       using stan::maths::check_positive;
       using stan::maths::check_not_nan;
-
-      // FIXME(?possible?): throw away lp if succeeds tests and y >= 0
+      using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_inv_scale>::type lp;
-      if (!check_positive(function, beta, "Inverse scale", &lp, Policy()))
+      if(!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
-
-      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+      if(!check_finite(function, beta, "Inverse scale", &lp, Policy()))
+        return lp;
+      if(!check_positive(function, beta, "Inverse scale", &lp, Policy()))
         return lp;
       
       if (y < 0)

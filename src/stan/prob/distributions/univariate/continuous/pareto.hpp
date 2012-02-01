@@ -16,16 +16,21 @@ namespace stan {
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha, const Policy& = Policy()) {
       static const char* function = "stan::prob::pareto_log<%1%>(%1%)";
       
+      using stan::maths::check_finite;
       using stan::maths::check_positive;
       using stan::maths::check_not_nan;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_scale,T_shape>::type lp;
+      if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, y_min, "Scale parameter, y_min,", &lp, Policy()))
+        return lp;
       if (!check_positive(function, y_min, "Scale parameter, y_min,", &lp, Policy()))
         return lp;
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if (!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
         return lp;
       
       if (y < y_min)

@@ -50,13 +50,17 @@ namespace stan {
       using boost::math::tools::promote_args;
             
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp;
-      if(!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if(!check_finite(function, nu, "Degrees of freedom", &lp, Policy()))
+        return lp;
+      if(!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
 
       using stan::maths::square;

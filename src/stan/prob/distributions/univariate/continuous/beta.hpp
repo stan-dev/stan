@@ -35,12 +35,21 @@ namespace stan {
       static const char* function = "stan::prob::beta_log<%1%>(%1%)";
       
       using stan::maths::check_positive;
+      using stan::maths::check_finite;
       using stan::maths::check_not_nan;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_scale_succ,T_scale_fail>::type lp;
+      if (!check_finite(function, alpha,
+                        "Prior success sample size plus 1, alpha,",
+                        &lp, Policy()))
+        return lp;
       if (!check_positive(function, alpha, 
                           "Prior success sample size plus 1, alpha,",
+                          &lp, Policy()))
+        return lp;
+      if (!check_finite(function, beta, 
+                          "Prior failure sample size plus 1, beta,",
                           &lp, Policy()))
         return lp;
       if (!check_positive(function, beta, 

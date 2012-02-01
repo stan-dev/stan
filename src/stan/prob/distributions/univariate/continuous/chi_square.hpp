@@ -36,14 +36,14 @@ namespace stan {
       using stan::maths::check_positive;
       using stan::maths::check_finite;
       using stan::maths::check_not_nan;
-        using boost::math::tools::promote_args;
+      using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_dof>::type lp;
-      if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
       if (!check_finite(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+      if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       
       if (y < 0)

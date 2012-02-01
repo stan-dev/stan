@@ -46,13 +46,14 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
-
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
 
       using stan::maths::square;
 
@@ -100,11 +101,13 @@ namespace stan {
 
       using boost::math::tools::promote_args;
       typename promote_args<T_y, T_loc, T_scale>::type lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "y", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
 
       return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
@@ -146,11 +149,13 @@ namespace stan {
 
       using boost::math::tools::promote_args;
       typename promote_args<T_y,T_loc,T_scale>::type lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "y", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
 
       if (y.size() == 0)

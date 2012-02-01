@@ -25,6 +25,8 @@ namespace stan {
         return lp;
       if(!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
+      if(!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+        return lp;
       if(!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
 
