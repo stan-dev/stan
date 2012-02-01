@@ -76,6 +76,24 @@ namespace stan {
       }
       return true;
     }
+
+    template <typename T_result, class Policy>
+    inline bool check_finite(const char* function,
+                             const unsigned int y,
+                             const char* name,
+                             T_result* result,
+                             const Policy& pol) {
+      using boost::math::policies::raise_domain_error;
+      if (boost::math::isinf(y)) {
+        std::string message(name);
+        message += " is %1%, but must be finite!";
+        *result = raise_domain_error<unsigned int>(function,
+                                                   message.c_str(), 
+                                                   y, Policy());
+        return false;
+      }
+      return true;
+    }
     
     template <typename T_y, typename T_result, class Policy>
     inline bool check_finite(const char* function,

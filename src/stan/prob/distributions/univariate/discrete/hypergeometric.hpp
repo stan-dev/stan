@@ -15,7 +15,8 @@ namespace stan {
     hypergeometric_log(const unsigned int n, const unsigned int N, 
                        const unsigned int a, const unsigned int b, const Policy& = Policy()) {
       static const char* function = "stan::prob::hypergeometric_log<%1%>(%1%)";
-      
+
+      using stan::maths::check_finite;      
       using stan::maths::check_bounded;
       using stan::maths::check_greater;
 
