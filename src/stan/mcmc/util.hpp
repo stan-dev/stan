@@ -6,6 +6,8 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/exception/diagnostic_information.hpp> 
+#include <boost/exception_ptr.hpp> 
 
 #include <stan/maths/util.hpp>
 #include <stan/mcmc/prob_grad.hpp>
