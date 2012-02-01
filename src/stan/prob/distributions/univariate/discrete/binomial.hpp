@@ -15,6 +15,7 @@ namespace stan {
     binomial_log(const T_n& n, const T_N& N, const T_prob& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::binomial_log<%1%>(%1%)";
       
+      using stan::maths::check_finite;
       using stan::maths::check_bounded;
       using stan::maths::check_nonnegative;
       using boost::math::tools::promote_args;
@@ -24,9 +25,17 @@ namespace stan {
                          "Successes, n,",
                          &lp, Policy()))
         return lp;
+      if (!check_finite(function, N,
+                        "Population size, N,",
+                        &lp, Policy()))
+        return lp;      
       if (!check_nonnegative(function, N,
                              "Population size, N,",
                              &lp, Policy()))
+        return lp;
+      if (!check_finite(function, theta,
+                        "Probability, theta,",
+                        &lp, Policy()))
         return lp;
       if (!check_bounded(function, theta, 0, 1,
                          "Probability, theta,",
