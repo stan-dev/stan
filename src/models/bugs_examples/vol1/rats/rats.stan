@@ -5,14 +5,7 @@ data {
   int(0,) T;
   double x[T];
   double y[N,T];
-}
-transformed data {
   double xbar;
-  double x_centered[T];
-
-  xbar <- mean(x);
-  for (t in 1:T) 
-    x_centered[t] <- x[t] - xbar;
 }
 parameters {
   double alpha[N];

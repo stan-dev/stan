@@ -14,18 +14,18 @@ parameters {
   double mu_alpha;
   double mu_beta;
 
-  double(0,) sigma_y;
-  double(0,) sigma_alpha;
-  double(0,) sigma_beta;
-}
-transformed parameters {
   double(0,) sigmasq_y;
   double(0,) sigmasq_alpha;
   double(0,) sigmasq_beta;
+}
+transformed parameters {
+  double(0,) sigma_y;
+  double(0,) sigma_alpha;
+  double(0,) sigma_beta;
 
-  sigmasq_y <- square(sigmasq_y);
-  sigmasq_alpha <- square(sigmasq_alpha);
-  sigmasq_beta <- square(sigmasq_beta);
+  sigma_y <- sqrt(sigmasq_y);
+  sigma_alpha <- sqrt(sigmasq_alpha);
+  sigma_beta <- sqrt(sigmasq_beta);
 }
 model {
   mu_alpha ~ normal(0, 100);
@@ -40,12 +40,12 @@ model {
       y[n,t] ~ normal(alpha[n] + beta[n] * (x[t] - xbar), sigma_y);
 
 }
-// generated quantities {
-//   double(,0) ll_y[N,T];
-// 
-//   for (n in 1:N)
-//    for (t in 1:T)
-//       ll_y[n,t] <- normal_log(y[n,t],
-//                              alpha[n] + beta[n] * (x[t] - xbar), 
-//                              sigma_y);
-//}
+generated quantities {
+   double(,0) ll_y[N,T];
+ 
+   for (n in 1:N)
+    for (t in 1:T)
+       ll_y[n,t] <- normal_log(y[n,t],
+                              alpha[n] + beta[n] * (x[t] - xbar), 
+                              sigma_y);
+}
