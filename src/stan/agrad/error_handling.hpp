@@ -6,6 +6,7 @@
 #include <stan/maths/error_handling.hpp>
 
 namespace boost {
+
   namespace math {
 
     /**
@@ -16,6 +17,7 @@ namespace boost {
      * @return Classification of value of the variable.
      */
     template <>
+    inline
     int fpclassify(const stan::agrad::var v) {
       return boost::math::fpclassify(v.val());
     }
@@ -28,6 +30,7 @@ namespace boost {
      * @return <code>true</code> if variable is finite.
      */
     template <>
+    inline
     bool isfinite(const stan::agrad::var v) {
       return boost::math::isfinite(v.val());
     }
@@ -40,6 +43,7 @@ namespace boost {
      * @return <code>true</code> if variable is infinite.
      */
     template <>
+    inline
     bool isinf(const stan::agrad::var v) {
       return boost::math::isinf(v.val());
     }
@@ -52,6 +56,7 @@ namespace boost {
      * @return <code>true</code> if variable is NaN.
      */
     template <>
+    inline
     bool isnan(const stan::agrad::var v) {
       return boost::math::isnan(v.val());
     }
@@ -64,11 +69,10 @@ namespace boost {
      * @return <code>true</code> if variable is NaN.
      */
     template <>
+    inline
     bool isnormal(const stan::agrad::var v) {
       return boost::math::isnormal(v.val());
     }
-
-
 
   }
 }

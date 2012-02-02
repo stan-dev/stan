@@ -1,29 +1,23 @@
 #ifndef __STAN__MATHS__ERROR_HANDLING_HPP__
 #define __STAN__MATHS__ERROR_HANDLING_HPP__
 
+********************************************************************************
+
 #include <limits>
 
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 
+#include <stan/maths/boost_error_handling.hpp>
 #include <stan/maths/special_functions.hpp>
+
 
 namespace stan { 
 
   namespace maths {
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
-
-    namespace {
-
-      
-      // doubly templated form of boost's raise_domain_error
-      // to deal with unsigned int nonsense, which would otherwise
-      // return 0 because there is no NaN value
-
-    }
-    
 
     /**
      * Default error-handling policy from Boost.
@@ -97,24 +91,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_result, class Policy>
-    inline bool check_finite(const char* function,
-                             const unsigned int y,
-                             const char* name,
-                             T_result* result,
-                             const Policy& pol) {
-      using boost::math::policies::raise_domain_error;
-      if ((boost::math::isinf)(y)) {
-        std::string message(name);
-        message += " is %1%, but must be finite!";
-        *result = raise_domain_error<unsigned int>(function,
-                                                   message.c_str(), 
-                                                   y, Policy());
-        return false;
-      }
-      return true;
-    }
-    
     template <typename T_y, typename T_result, class Policy>
     inline bool check_finite(const char* function,
                              const std::vector<T_y>& y,
@@ -189,6 +165,7 @@ namespace stan {
                               T_result* result,
                               const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
+      using boost::math::tools::promote_args;
       if (!(low <= x && x <= high)) {
         std::ostringstream msg;
         msg << name 
@@ -196,7 +173,7 @@ namespace stan {
             << low
             << " and "
             << high;
-        *result = raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >
+        *result = raise_domain_error<typename promote_args<T_x>::type >
           (function,
            msg.str().c_str(),
            x, Policy());
@@ -213,21 +190,14 @@ namespace stan {
                                   T_result* result,
                                   const Policy& /*pol*/) {
       using boost::math::policies::raise_domain_error;
+      using boost::math::tools::promote_args;
       if (!(x >= 0)) {
         std::string message(name);
         message += " is %1%, but must be >= 0!";
-        *result = raise_domain_error<typename boost::math::tools::promote_args<T_x>::type >(function,message.c_str(), x, Policy());
+        *result = raise_domain_error<typename promote_args<T_x>::type>(
+                      function,message.c_str(), x, Policy());
         return false;
       }
-      return true;
-    }
-
-    template <typename T_result, class Policy>
-    inline bool check_nonnegative(const char* function,
-                                  const unsigned int& x,
-                                  const char* name,
-                                  T_result* result,
-                                  const Policy& /*pol*/) {
       return true;
     }
 
@@ -237,12 +207,13 @@ namespace stan {
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
+      using boost::math::policies::raise_domain_error;
       if (!(x > 0)) {
         std::string message(name);
         message += " is %1%, but must be > 0";
-        *result = boost::math::policies::raise_domain_error<T_x>(function,
-                                                                 message.c_str(), 
-                                                                 x, Policy());
+        *result = raise_domain_error<T_x>(function,
+                                          message.c_str(), 
+                                          x, Policy());
         
         return false;
       }
