@@ -6,26 +6,29 @@
 #include <stan/prob/constants.hpp>
 
 namespace stan {
+
   namespace prob {
+
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
     template <bool propto = false,
               typename T_prob, 
               class Policy = stan::maths::default_policy> 
     inline typename boost::math::tools::promote_args<T_prob>::type
-    bernoulli_log(const unsigned int n, const T_prob& theta, const Policy& = Policy()) {
+    bernoulli_log(const int n, 
+                  const T_prob& theta, 
+                  const Policy& = Policy()) {
       static const char* function = "stan::prob::bernoulli_log<%1%>(%1%)";
 
       using stan::maths::check_finite;
       using stan::maths::check_bounded;
 
       T_prob lp;
-      if (!check_finite(function, n, "n", &lp, Policy()))
-        return lp;
       if (!check_bounded(function, n, 0, 1, "n", &lp, Policy()))
         return lp;
       if (!check_finite(function, theta, "Probability, theta,", &lp, Policy()))
         return lp;
-      if (!check_bounded(function, theta, 0.0, 1.0, "Probability, theta,", &lp, Policy()))
+      if (!check_bounded(function, theta, 0.0, 1.0,
+                         "Probability, theta,", &lp, Policy()))
         return lp;
 
       using stan::maths::log1m;

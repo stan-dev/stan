@@ -120,7 +120,7 @@ EXTENSIONS
 =================================================
 
 * add special op for multivariate norm:
-  -  trans_mult_mult(y,Sigma) 
+  -  wrapped_multiply(y,Sigma) 
      = y' * Sigma * y
      = SUM_{m in 1:K} SUM_{n in 1:K} y[m] * y[n] * Sigma[m,n]
   - check that my algebra's right

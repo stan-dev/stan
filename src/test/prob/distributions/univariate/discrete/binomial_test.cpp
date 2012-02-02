@@ -106,3 +106,5 @@ TEST(ProbDistributionsBinomial,ErrnoPolicy) {
   result = binomial_log(n,N,1.1, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
+
+// FIXME:  add propto test

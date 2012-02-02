@@ -3,7 +3,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/distributions/univariate/discrete/multinomial.hpp>
+#include <stan/prob/distributions/multivariate/discrete/multinomial.hpp>
 
 template <typename T_prob>
 void expect_propto(std::vector<int>& ns1, T_prob theta1, 

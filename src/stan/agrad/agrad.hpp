@@ -168,9 +168,19 @@ namespace stan {
 
     };
 
-    /*
-    #include <ostream>
-    void print_stack(ostream& o) {
+    /**
+     * Returns the current size of the stack of <code>vari</code>
+     * instances.
+     *
+     * @return Size of <code>vari</code> stack.
+     */
+    size_t stack_size() {
+      return var_stack_.size();
+    }
+      
+
+#include <ostream>
+    void print_stack(std::ostream& o) {
       o << "STACK, size=" << var_stack_.size() << std::endl;
       for (unsigned int i = 0; i < var_stack_.size(); ++i)
         o << i 
@@ -179,7 +189,6 @@ namespace stan {
           << " : " << ((vari*)var_stack_[i])->adj_
           << std::endl;
     }
-    */
 
 
     /**
