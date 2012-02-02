@@ -1,7 +1,19 @@
 TO DO
 =================================================
 
-* range checks for std::vector accesses in model
+* stop NUTS from running away without coming back
+
+* parallel RNG
+  - use L'Ecuyer
+  - specify chain id & num_chains to get offset
+  - make sure Boost's is efficient
+    - boost rng discard() method
+  - Ben's alternative reco:
+    http://numbercrunch.de/trng/
+
+* range checks for accesses
+  - std::vector accesses in model to better code gen
+  - Eigen vectors to use () like matrices
 
 * error/exception policy throughout
   - remove memory overhead from numeric_limits<stan::agrad::var>
@@ -46,6 +58,12 @@ TO DO
  - categorical
  - multinomial
 
+* add constants like PI to Stan as expressions
+  - perhaps just make them globally defined vars?
+
+* const declarations wherever possible
+  - work bottom up, but it's tricky at this late date
+
 * return log probability as parameter?
   - compute lp__ and sampling statements for output
 
@@ -54,11 +72,14 @@ TO DO
 * convert unsigned int return types to signed long
   or size_t
 
+* divide parser's grammar into multiple files to help compiler
+
 * clean up dependencies
   - only include as much as necessary
   - no namespace or file-level includes
   - typedefs for matrix, vector, row vector
   - simplify model includes with higher-level ones
+  - chart out remaining deps
 
 * remaining doc
   - API doc
@@ -72,8 +93,60 @@ TO DO
   - basic distro site
   - check cross-platform compilation
 
+* make sure we don't go up to generic new handler but
+  throw bad_alloc from our arena
+
+
+Stan-R
+=================================================
+
+* SPIN (smallest posterior interval)
+
+* plot(stan.object)
+
+* print(stan.object)
+
+* variogram ESS calcs
+
+* split R-hat convergence calcs
+
+* WAIC
+  - need p(y[i]|theta) for all "data" y[i]
+  - multivariate can be single point
+  - binomial one or more points depending on interp
+
+
 EXTENSIONS
 =================================================
+
+* add special op for multivariate norm:
+  -  trans_mult_mult(y,Sigma) 
+     = y' * Sigma * y
+     = SUM_{m in 1:K} SUM_{n in 1:K} y[m] * y[n] * Sigma[m,n]
+  - check that my algebra's right
+  - specialize to Cholesky factor instead of Sigma
+
+* figure out some way to have var constants
+  - const would prohibit many of their unwanted uses, like
+    assignment
+  - can't afford virtual function lookup on adjoint props
+
+* deal with autocorrelation model params where require
+  all roots of 1 - SUM_i rho[i]**i to be within unit
+  complex circle
+
+* convert for loops with size bounds to approp iterators
+
+* make sure std::less<T*> and std::swap<T*> 
+  does right thing for our types (like var and vari), as
+  these are used in "algorithms".
+
+* use our arena-based alloc as STL allocator
+  - http://www.cplusplus.com/reference/std/memory/allocator/
+  - what do we need to do for dtor to work?
+
+* Allow normal_log<true> and normal_log<false> to be accessed
+  directly;
 
 * Allow normal_log(y|0,1) as parser synonym for normal_log(y,0,1)
 
@@ -114,6 +187,20 @@ EXTENSIONS
 * reparameterize simplex transform using hyperspherical coordinates
   - use Weirstrass trick to avoid numerical trig
   - use log_sum_exp to prevent underflow in products
+  - use inverse logit to map back to full (-inf,inf)
+  - OR, use my own hack using logit with diagonal 
+       theta[1] = inv_logit(x[1]);
+       theta[2] = (1 - theta[1]) * inv_logit(x[2])
+       theta[3] = (1 - theta[1] - theta[2]) * inv_logit(x[3])
+       theta[N] = (1 - theta[1] - theta[2] - ... - theta[N-1])
+  - or better yet, adjust so that x[n] = 0 leads to uniform
+    just need to look at arity and shift first down by constants
+       theta[1] = inv_logit(logit(1/N) + x[1])
+       theta[2] = (1 - theta[1]) * inv_logit(logit(1/(N-1)) + x[2])
+    could easily store table of first 100 of these, say
+  - not sure what expected value is in last -- is it 1/N per entry
+    or does asymmetry of inv_logit cause problems?
+
 
 * special positive-definiteness-preserving operations
   - basic data type (or trait)
@@ -286,6 +373,31 @@ EXTENSIONS
 * bring back specialized auto-dif for densities
   - bring up to speed with new templates for densities & propto
   - last revision 549:  ag_distributions.hpp & test 
+
+* whole new auto-dif.  stack consists of entries per expression
+  containing
+  - adjoint for expression
+  - for each argument
+    + partial 
+    + ptr to subexpression  
+  - less space for constants, equal for unary, more for binary+
+  - no virtual ops
+
+* code gen auto-dif
+  - just for Stan GM models
+
+* could template stan::agrad::var with <unsigned int n>
+  indicating thread.  typedef var to var<0>
+  - runs in multiple threads with no speed overhead
+  - code bloat multiples code size by # of threads
+    + may in turn slow down everything due to mem traffic
+
+* lazy init for var
+  - if vari* is accessed and empty, return new var(0) equiv.
+  - can't afford test to see if it's defined
+
+* elim stan/maths/matrix lib by adding implicit ctor
+  for Matrix<var,...> based on Matrix<double,...>
 
 Stan GM MANUAL
 =================================================
