@@ -4,8 +4,15 @@ data {
   int(0,) N;
   int(0,) T;
   double x[T];
-  double xbar;
   double y[N,T];
+}
+transformed data {
+  double xbar;
+  double x_centered[T];
+
+  xbar <- mean(x);
+  for (t in 1:T) 
+    x_centered[t] <- x[t] - xbar;
 }
 parameters {
   double alpha[N];
@@ -14,18 +21,18 @@ parameters {
   double mu_alpha;
   double mu_beta;
 
+  double(0,) sigmasq_y;
+  double(0,) sigmasq_alpha;
+  double(0,) sigmasq_beta;
+}
+transformed parameters {
   double(0,) sigma_y;
   double(0,) sigma_alpha;
   double(0,) sigma_beta;
-}
-transformed parameters {
-  double sigmasq_y;
-  double sigmasq_alpha;
-  double sigmasq_beta;
 
-  sigmasq_y <- sigma_y * sigma_y;
-  sigmasq_alpha <- sigma_alpha * sigma_alpha;
-  sigmasq_beta <- sigma_beta * sigma_beta;
+  sigma_y <- sqrt(sigmasq_y);
+  sigma_alpha <- sqrt(sigmasq_alpha);
+  sigma_beta <- sqrt(sigmasq_beta);
 }
 model {
   mu_alpha ~ normal(0, 100);
