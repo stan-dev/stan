@@ -1,8 +1,6 @@
 #ifndef __STAN__MATHS__ERROR_HANDLING_HPP__
 #define __STAN__MATHS__ERROR_HANDLING_HPP__
 
-********************************************************************************
-
 #include <limits>
 
 #include <boost/math/policies/policy.hpp>
