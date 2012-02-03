@@ -249,7 +249,6 @@ namespace stan {
       return true;
     }
 
-    // FIXME: replace double with type of templated argument
     template <typename T_prob_vector, typename T_result, class Policy>
     inline bool check_simplex(const char* function,
                               const T_prob_vector& theta,
@@ -257,10 +256,11 @@ namespace stan {
                               T_result* result,
                               const Policy& /*pol*/) {
       using stan::maths::policies::raise_domain_error;
+      typename T_prob_vector::value_type T_prob;
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
-        *result = raise_domain_error<T_result,double>(function,
+        *result = raise_domain_error<T_result,T_prob>(function,
                                                       message.c_str(),
                                                       theta.size(),
                                                       Policy());
@@ -269,7 +269,7 @@ namespace stan {
         std::string message(name);
         message += " is not a valid simplex.";
         message += " The sum of the elements is %1%, but should be 1.0";
-        *result = raise_domain_error<T_result,double>(function, 
+        *result = raise_domain_error<T_result,T_prob>(function, 
                                                       message.c_str(), 
                                                       theta.sum(), 
                                                       Policy());
@@ -281,14 +281,13 @@ namespace stan {
           stream << name << " is not a valid simplex."
                  << " The element at " << n 
                  << " is %1%, but should be greater than or equal to 0";
-          *result = raise_domain_error<T_result,double>(function, 
+          *result = raise_domain_error<T_result,T_prob>(function, 
                                                         stream.str().c_str(), 
                                                         theta[n], 
                                                         Policy());
           return false;
         }
       }
-
       return true;
     }                         
     
