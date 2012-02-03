@@ -2,6 +2,8 @@
 #  http://www.openbugs.info/Examples/Jaws.html
 
 
+## status: not work (adaption hangs)
+
 data {
   int(0,) N; 
   int(0,) M; 

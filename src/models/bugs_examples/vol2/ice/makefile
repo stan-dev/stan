@@ -1,6 +1,6 @@
 STAN_HOME = ../../../../..
 PGM = pineapple_ice
-
+PGM = ice#
 
 $(PGM) :
 	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp

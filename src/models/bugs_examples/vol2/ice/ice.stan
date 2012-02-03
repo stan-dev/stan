@@ -2,7 +2,7 @@
 # Page 29: Ice: non-parametric smoothing in an age-cohort model
 
 // The model is the same specified here as in JAGS example, 
-// but this example's JAGS version is a different from that of 
+// but this example's JAGS version is different from that of 
 // WinBUGS because JAGS does not support some feature. 
 // TODO: 
 // Maybe we should check if we could specify 
