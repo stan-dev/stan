@@ -3,9 +3,9 @@
 
 #include <cstdlib>
 
-#include <stan/maths/matrix.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/matrix_error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
@@ -32,13 +32,15 @@ namespace stan {
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                         const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_student_t<%1%>(%1%)";
-      
-      using boost::math::tools::promote_args;
-      using std::isinf;
 
+      using stan::maths::check_size_match;
+      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
+      using stan::maths::check_cov_matrix;      
+      using stan::maths::check_positive;      
+      using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
-
       if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
         return lp;
       if (!check_size_match(function, y.size(), Sigma.rows(), &lp, Policy()))
@@ -53,12 +55,17 @@ namespace stan {
         return lp;
 
       // allows infinities
-      if (!check_positive<false>(function, nu, 
-                                 "Degrees of freedom, nu", &lp,
-                                 Policy()))
+      if (!check_not_nan(function, nu, 
+                         "Degrees of freedom, nu", &lp,
+                         Policy()))
+        return lp;
+      if (!check_positive(function, nu, 
+                          "Degrees of freedom, nu", &lp,
+                          Policy()))
         return lp;
       
       // FIXME: calls expensive (!) checks twice, here and in multi normal
+      using std::isinf;
 
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma,Policy());

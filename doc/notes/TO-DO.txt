@@ -16,7 +16,6 @@ TO DO
   - Eigen vectors to use () like matrices
 
 * error/exception policy throughout
-  - remove memory overhead from numeric_limits<stan::agrad::var>
   - maths
   - matrix
 
@@ -47,15 +46,6 @@ TO DO
    + plot.stan(fit)
    + dump.stan(fit)
    + read.stan(file_path)
-
-* refactor probability distributions to use stan/maths/error_handling. 
-  1) change include. 
-  2) use stan::maths::default_policy 
-  3) add usings for the error handling.
-  4) remove propto for cumulative function
- - multi_normal
- - categorical
- - multinomial
 
 * add constants like PI to Stan as expressions
   - perhaps just make them globally defined vars?

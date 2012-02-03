@@ -20,7 +20,7 @@ namespace stan {
       using stan::maths::check_simplex;
       using boost::math::tools::promote_args;
 
-      typename boost::math::tools::promote_args<T_prob>::type lp(0.0);
+      typename promote_args<T_prob>::type lp(0.0);
       if (!check_bounded(function, n, 0U, theta.size()-1,
                          "Number of items, n,",
                          &lp, Policy()))

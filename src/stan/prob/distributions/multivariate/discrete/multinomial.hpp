@@ -2,8 +2,10 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 
 #include <stan/prob/traits.hpp>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/matrix_error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/prob/constants.hpp>
+
 
 namespace stan {
 
@@ -18,7 +20,12 @@ namespace stan {
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::multinomial_log<%1%>(%1%)";
 
-      typename boost::math::tools::promote_args<T_prob>::type lp(0.0);
+      using stan::maths::check_positive;
+      using stan::maths::check_simplex;
+      using stan::maths::check_size_match;
+      using boost::math::tools::promote_args;
+
+      typename promote_args<T_prob>::type lp(0.0);
       if (!check_positive(function, ns, "Sample sizes, ns,", &lp, Policy()))
         return lp;
       if (!check_simplex(function, theta, "Probabilities, theta,", &lp, Policy()))
