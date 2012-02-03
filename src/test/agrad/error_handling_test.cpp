@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/prob/error_handling.hpp>
+#include <stan/maths/error_handling.hpp>
+#include <stan/maths/matrix_error_handling.hpp>
 #include <stan/agrad/agrad.hpp>
-//#include <limits>
 #include <stan/agrad/matrix.hpp>
 
 using Eigen::Dynamic;
@@ -16,7 +16,7 @@ typedef boost::math::policies::policy<
   > errno_policy;
 typedef boost::math::policies::policy<> default_policy;
 
-using namespace stan::prob;
+using namespace stan::maths;
 using stan::agrad::var;
 
 //---------- check_not_nan tests ----------

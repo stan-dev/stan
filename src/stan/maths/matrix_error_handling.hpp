@@ -60,45 +60,21 @@ namespace stan {
       return true;
     }
 
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_finite(const char* function,
-                             const typename 
-                             stan::maths::EigenType<T_y>::vector& y,
-                             const char* name,
-                             T_result* result,
-                             const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (!boost::math::isfinite(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must be finite!";
-          *result = raise_domain_error<T_result,T_y>(function,
-                                                     message.str().c_str(),
-                                                     y[i], 
-                                                     Policy());
-          return false;
-        }
-      }
-      return true;
-    }
-
     template <typename T_covar, typename T_result, class Policy>
     inline bool check_cov_matrix(const char* function,
-                                 const typename stan::maths::EigenType<T_covar>::matrix& Sigma,
+                                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                                  T_result* result,
                                  const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
       if (!stan::prob::cov_matrix_validate(Sigma)) {
         std::ostringstream stream;
-        stream << "Sigma is not a valid covariance matrix."
-               << " Sigma must be symmetric and positive semi-definite."
-               << " Sigma:" << std::endl
-               << Sigma << std::endl
-               << "Sigma(0,0): %1%";
-        *result = raise_domain_error<T_result,T_covar>(function,
-                                                       stream.str().c_str(), 
-                                                       Sigma(0,0),
-                                                       Policy());
+        stream << "Sigma is not a valid covariance matrix. "
+               << "Sigma must be symmetric and positive semi-definite. Sigma: \n" 
+               << Sigma
+               << "\nSigma(0,0): %1%";
+        *result = boost::math::policies::raise_domain_error<T_covar>(function,
+                                                                     stream.str().c_str(), 
+                                                                     Sigma(0,0),
+                                                                     Policy());
         return false;
       }
       return true;
@@ -124,25 +100,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_covar, typename T_result, class Policy>
-    inline bool check_cov_matrix(const char* function,
-                                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                                 T_result* result,
-                                 const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
-      if (!stan::prob::cov_matrix_validate(Sigma)) {
-        std::ostringstream stream;
-        stream << "Sigma is not a valid covariance matrix. Sigma must be symmetric and positive semi-definite. Sigma: \n" 
-               << Sigma
-               << "\nSigma(0,0): %1%";
-        *result = raise_domain_error<T_result,T_covar>(function,
-                                                       stream.str().c_str(), 
-                                                       Sigma(0,0),
-                                                       Policy());
-        return false;
-      }
-      return true;
-    }
 
     template <typename T_prob, typename T_result, class Policy>
     inline bool check_simplex(const char* function,
