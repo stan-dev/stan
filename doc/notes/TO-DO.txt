@@ -3,17 +3,14 @@ TO DO
 
 * stop NUTS from running away without coming back
 
-* error/exception policy throughout
-  - maths
-
 * HMC Sampler
   - set step size, number of steps
   - allowing random variation +/-%
   - tune step size (optional)
 
 * discrete samplers: 
-  - Gibbs for small intervals
-  - slice for others
+  - Gibbs for small intervals, tested
+  - slice for others (
   - what about multinomial with constraints?
 
 * R interface
@@ -89,6 +86,9 @@ Stan-R
 
 EXTENSIONS
 =================================================
+
+* error/exception policy throughout
+  - maths
 
 * parallel RNG
   - use L'Ecuyer
