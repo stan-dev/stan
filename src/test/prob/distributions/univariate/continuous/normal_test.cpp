@@ -25,6 +25,9 @@ TEST(ProbDistributionsNormal,DefaultPolicyScale) {
 
   sigma_d = 1.0;
   EXPECT_NO_THROW(stan::prob::normal_log(0.0,0.0,sigma_d));
+  
+  sigma_d = std::numeric_limits<double>::infinity();
+  EXPECT_NO_THROW(stan::prob::normal_log(0.0,0.0,sigma_d));
 }
 TEST(ProbDistributionsNormal,ErrnoPolicyScale) {
   double sigma_d = 0.0;
@@ -36,6 +39,10 @@ TEST(ProbDistributionsNormal,ErrnoPolicyScale) {
   sigma_d = -1.0;
   result = stan::prob::normal_log(0.0,0.0,sigma_d, errno_policy());
   EXPECT_TRUE (std::isnan (result));
+
+  sigma_d = std::numeric_limits<double>::infinity();
+  result = stan::prob::normal_log(0.0,0.0,sigma_d, errno_policy());
+  EXPECT_FALSE (std::isnan (result));
 }
 TEST(ProbDistributionsNormal,DefaultPolicyY) {
   double y = 0.0;
