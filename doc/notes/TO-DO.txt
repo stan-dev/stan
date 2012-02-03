@@ -3,24 +3,8 @@ TO DO
 
 * stop NUTS from running away without coming back
 
-* parallel RNG
-  - use L'Ecuyer
-  - specify chain id & num_chains to get offset
-  - make sure Boost's is efficient
-    - boost rng discard() method
-  - Ben's alternative reco:
-    http://numbercrunch.de/trng/
-
-* range checks for accesses
-  - std::vector accesses in model to better code gen
-  - Eigen vectors to use () like matrices
-
 * error/exception policy throughout
   - maths
-  - matrix
-
-* exceptions handled by samplers
-  - rejection or restart?
 
 * HMC Sampler
   - set step size, number of steps
@@ -55,8 +39,6 @@ TO DO
 
 * return log probability as parameter?
   - compute lp__ and sampling statements for output
-
-* multi-t propto code and tests, error tests
 
 * convert unsigned int return types to signed long
   or size_t
@@ -107,6 +89,17 @@ Stan-R
 
 EXTENSIONS
 =================================================
+
+* parallel RNG
+  - use L'Ecuyer
+  - specify chain id & num_chains to get offset
+  - make sure Boost's is efficient
+    - boost rng discard() method
+  - Ben's alternative reco:
+    http://numbercrunch.de/trng/
+
+* control decimal places in output 
+  - set a variable on the writer or stream
 
 * add special op for multivariate norm:
   -  wrapped_multiply(y,Sigma) 
