@@ -96,10 +96,10 @@ TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
   
   ns[1] = 0;
   result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+  EXPECT_TRUE(std::isnan(result));
   ns[1] = -1;
   result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+  EXPECT_TRUE(std::isnan(result));
   ns[1] = 1;
 
   theta(0) = 0.0;

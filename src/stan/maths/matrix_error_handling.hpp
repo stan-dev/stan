@@ -81,20 +81,20 @@ namespace stan {
     }
 
 
-    template <typename T_result, typename T_size, class Policy>
+    template <typename T_result, typename T_size1, typename T_size2, class Policy>
     inline bool check_size_match(const char* function,
-                                 T_size i,
-                                 T_size j,
+                                 T_size1 i,
+                                 T_size2 j,
                                  T_result* result,
                                  const Policy& /*pol*/) {
       using stan::maths::policies::raise_domain_error;
       if (i != j) {
         std::ostringstream msg;
         msg << "i and j must be same.  Found i=%1%, j=" << j;
-        *result = raise_domain_error<T_result,T_size>(function,
-                                                      msg.str().c_str(),
-                                                      i,
-                                                      Policy());
+        *result = raise_domain_error<T_result,T_size1>(function,
+                                                       msg.str().c_str(),
+                                                       i,
+                                                       Policy());
         return false;
       }
       return true;

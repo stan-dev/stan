@@ -2,6 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 
 #include <stan/prob/traits.hpp>
+#include <stan/maths/error_handling.hpp>
 #include <stan/maths/matrix_error_handling.hpp>
 #include <stan/maths/error_handling.hpp>
 #include <stan/prob/constants.hpp>
