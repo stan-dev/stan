@@ -3,7 +3,6 @@
 
 #include "stan/prob/constants.hpp"
 #include "stan/prob/distributions.hpp"
-#include "stan/prob/error_handling.hpp"
 #include "stan/prob/traits.hpp"
 #include "stan/prob/transform.hpp"
 
