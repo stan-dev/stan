@@ -124,7 +124,7 @@ doxygen: | dox
 
 .PHONY: clean clean-dox clean-all
 clean:
-	rm -rf demo test *.dSYM
+	rm -rf test *.dSYM
 
 clean-models:
 	rm -rf models
@@ -133,4 +133,4 @@ clean-dox:
 	rm -rf doc/api
 
 clean-all: clean clean-dox clean-models
-	rm -rf ar
+	rm -rf ar demo
