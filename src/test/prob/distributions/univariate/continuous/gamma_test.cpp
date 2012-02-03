@@ -23,6 +23,7 @@ TEST(ProbDistributionsGamma,Gamma) {
   EXPECT_FLOAT_EQ(-3.379803, stan::prob::gamma_log(2.0,0.25,0.75));
   EXPECT_FLOAT_EQ(-1, stan::prob::gamma_log(1,1,1));
   EXPECT_FLOAT_EQ(log(2.0), stan::prob::gamma_log(0.0,1.0,2.0));
+  EXPECT_FLOAT_EQ(log(0.0), stan::prob::gamma_log(-10.0,1.0,2.0));
 }
 TEST(ProbDistributionsGamma,Boundary) {
   double y;
@@ -45,8 +46,7 @@ TEST(ProbDistributionsGamma,DefaultPolicy) {
   double beta = 2.0;
   
   EXPECT_NO_THROW(stan::prob::gamma_log(y, alpha, beta));
-  EXPECT_THROW(stan::prob::gamma_log(-1.0, alpha, beta), std::domain_error) <<
-    "y < 0 should throw an exception. y = " << y;
+  EXPECT_NO_THROW(stan::prob::gamma_log(-1.0, alpha, beta));
   EXPECT_THROW (stan::prob::gamma_log(y, 0.0, beta), std::domain_error) <<
     "alpha = 0.0 should throw an exception";
   EXPECT_THROW (stan::prob::gamma_log(y, -1.0, beta), std::domain_error) <<
@@ -66,7 +66,7 @@ TEST(ProbDistributionsGamma,ErrnoPolicy) {
   EXPECT_FALSE(std::isnan(result));
   
   EXPECT_NO_THROW(result=stan::prob::gamma_log(-1.0, alpha, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_FALSE(std::isnan(result));
   
   EXPECT_NO_THROW(result=stan::prob::gamma_log(y, 0.0, beta, errno_policy()));
   EXPECT_TRUE(std::isnan(result));

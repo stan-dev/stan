@@ -31,14 +31,13 @@ namespace stan {
                   const Policy& = Policy()) {
       static const char* function = "stan::prob::inv_gamma_log<%1%>(%1%)";
       
+      using stan::maths::check_not_nan;
       using stan::maths::check_positive;
       using stan::maths::check_finite;
       using boost::math::tools::promote_args;
 
-      typename promote_args<T_y,T_shape,T_scale>::type lp(0.0);
-      if (!check_finite(function, y, "Random variate, y,", &lp, Policy()))
-        return lp;
-      if (!check_positive(function, y, "Random variate, y,", &lp, Policy()))
+      typename promote_args<T_y,T_shape,T_scale>::type lp;
+      if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       if (!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy())) 
         return lp;
@@ -49,9 +48,13 @@ namespace stan {
       if (!check_positive(function, beta, "Scale parameter, beta,", &lp, Policy())) 
         return lp;
 
+      if (y <= 0)
+	return LOG_ZERO;
+
       using boost::math::lgamma;
       using stan::maths::multiply_log;
-
+      
+      lp = 0.0;
       if (include_summand<propto,T_shape>::value)
         lp -= lgamma(alpha);
       if (include_summand<propto,T_shape,T_scale>::value)

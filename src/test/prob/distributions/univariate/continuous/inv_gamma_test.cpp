@@ -19,6 +19,7 @@ typedef policy<
 TEST(ProbDistributions,InvGamma) {
   EXPECT_FLOAT_EQ(-1, stan::prob::inv_gamma_log(1,1,1.0));
   EXPECT_FLOAT_EQ(-0.8185295, stan::prob::inv_gamma_log(0.5,2.9,3.1));
+  EXPECT_FLOAT_EQ(log(0.0), stan::prob::inv_gamma_log(0.0,2.9,3.1));
 }
 TEST(ProbDistributions,InvGammaPropto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::inv_gamma_log<true>(1,1,1.0));
@@ -30,10 +31,8 @@ TEST(ProbDistributions,InvGammaDefaultPolicy) {
   double beta = 2.0;
   
   EXPECT_NO_THROW(stan::prob::inv_gamma_log(y, alpha, beta));
-  EXPECT_THROW(stan::prob::inv_gamma_log(0.0, alpha, beta), std::domain_error)
-    << "exception expected when y = 0.0";
-  EXPECT_THROW(stan::prob::inv_gamma_log(-1, alpha, beta), std::domain_error)
-    << "exception expected when y < 0.";
+  EXPECT_NO_THROW(stan::prob::inv_gamma_log(0.0, alpha, beta));
+  EXPECT_NO_THROW(stan::prob::inv_gamma_log(-1, alpha, beta));
   EXPECT_THROW(stan::prob::inv_gamma_log(y, 0.0, beta), std::domain_error)
     << "exception expected when alpha = 0.0";
   EXPECT_THROW(stan::prob::inv_gamma_log(y, -1.0, beta), std::domain_error)
@@ -53,12 +52,10 @@ TEST(ProbDistributions,InvGammaErrnoPolicy) {
   EXPECT_FALSE(std::isnan(result)) << "this should work fine";
 
   EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(0.0, alpha, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result))
-    << "exception expected when y = 0.0";
+  EXPECT_FALSE(std::isnan(result));
   
   EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(-1.0, alpha, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result))
-    << "exception expected when y < 0.";
+  EXPECT_FALSE(std::isnan(result));
 
   EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(y, 0.0, beta, errno_policy()));
   EXPECT_TRUE(std::isnan(result))
