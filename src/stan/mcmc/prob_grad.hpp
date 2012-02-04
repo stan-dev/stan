@@ -131,6 +131,33 @@ namespace stan {
       }
 
 
+      /**
+       * Test the grad_log_prob() function's ability to produce
+       * accurate gradients using finite differences.  This shouldn't
+       * be necessary when using autodiff, but is useful for finding
+       * bugs in hand-written code (or agrad).
+       *
+       * @param params_r Real-valued parameter vector.
+       * @param params_i Integer-valued parameter vector.
+       * @param epsilon Real-valued scalar saying how much to perturb 
+       * params_r. Defaults to 1e-6.
+       */
+      void test_gradients(std::vector<double>& params_r,
+                          std::vector<int>& params_i,
+                          double epsilon = 1e-6) {
+	std::vector<double> gradient;
+	double logp = grad_log_prob(params_r, params_i, gradient);
+	std::vector<double> perturbed = params_r;
+	for (unsigned int k = 0; k < params_r.size(); k++) {
+	  perturbed[k] += epsilon;
+	  double logp2 = log_prob(perturbed, params_i);
+	  double gradest = (logp2 - logp) / epsilon;
+	  fprintf(stderr, "testing gradient[%d]:  %f computed vs. %f estimated (off by %e)\n",
+		  k, gradient[k], gradest, gradient[k] - gradest);
+	  perturbed[k] = params_r[k];
+	}
+      }
+
     };
   }
 }
