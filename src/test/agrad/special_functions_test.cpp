@@ -150,7 +150,7 @@ TEST(agrad_agrad_special_functions,inv_logit) {
   VEC grad_f;
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(exp(-2.0)/pow(1 + exp(-2.0),2.0),
-		  grad_f[0]);
+                  grad_f[0]);
 }
 
 TEST(agrad_agrad_special_functions,log1p) {
@@ -852,7 +852,7 @@ TEST(agrad_agrad_special_functions,log_sum_exp_vector) {
   f = log_sum_exp(x);
   double expected_log_sum_exp = std::log(std::exp(1) + std::exp(2) + std::exp(3) + std::exp(4) + std::exp(5));
   EXPECT_FLOAT_EQ (expected_log_sum_exp,
-		   f.val());
+                   f.val());
   
   grad_f.clear();
   f.grad(x,grad_f);
@@ -883,7 +883,7 @@ TEST(agrad_agrad_special_functions,log_sum_exp_vector) {
   f = log_sum_exp(x);
   expected_log_sum_exp = std::log(std::exp(0.0) + std::exp(-100) + std::exp(-890.0) + std::exp(-900.0) + std::exp(-1000.0)) + 900.0;
   EXPECT_FLOAT_EQ (expected_log_sum_exp, 
-		   f.val());
+                   f.val());
   
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ (std::exp ( 800.0 - expected_log_sum_exp), grad_f[0]);
@@ -905,7 +905,42 @@ TEST(agrad_agrad_special_functions,square) {
   EXPECT_FLOAT_EQ(14.0, grad_f[0]);
 }
 
-TEST(AgradAgrad,multiply_log_var_var){
+
+TEST(AgradAgrad,multiplyLogChainVV) {
+  AVAR a = 19.7;
+  AVAR b = 1299.1;
+  AVAR f = 2.0 * multiply_log(a,b);
+
+  AVEC x = createAVEC(a,b);
+  VEC grad_f;
+  f.grad(x,grad_f);
+
+  EXPECT_FLOAT_EQ(2.0 * log(b.val()), grad_f[0]);
+  EXPECT_FLOAT_EQ(2.0 * a.val() / b.val(), grad_f[1]);
+}
+TEST(AgradAgrad,multiplyLogChainDV) {
+  double a = 19.7;
+  AVAR b = 1299.1;
+  AVAR f = 2.0 * multiply_log(a,b);
+
+  AVEC x = createAVEC(b);
+  VEC grad_f;
+  f.grad(x,grad_f);
+
+  EXPECT_FLOAT_EQ(2.0 * a / b.val(), grad_f[0]);
+}
+TEST(AgradAgrad,multiplyLogChainVD) {
+  AVAR a = 19.7;
+  double b = 1299.1;
+  AVAR f = 2.0 * multiply_log(a,b);
+
+  AVEC x = createAVEC(a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+
+  EXPECT_FLOAT_EQ(2.0 * log(b), grad_f[0]);
+}
+TEST(AgradAgrad,multiply_log_var_var) {
   AVAR a = 2.2;
   AVAR b = 3.3;
   AVAR f = multiply_log(a,b);

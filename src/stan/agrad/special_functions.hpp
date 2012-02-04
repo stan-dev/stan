@@ -412,11 +412,11 @@ namespace stan {
         }
         void chain() {
           using std::log;
-          avi_->adj_ += log(bvi_->val_);
-          if (bvi_->val_==0 && avi_->val_==0)
-            bvi_->adj_ += std::numeric_limits<double>::infinity();
+          avi_->adj_ += adj_ * log(bvi_->val_);
+          if (bvi_->val_ == 0.0 && avi_->val_ == 0)
+            bvi_->adj_ += adj_ * std::numeric_limits<double>::infinity();
           else
-            bvi_->adj_ += avi_->val_ / bvi_->val_;
+            bvi_->adj_ += adj_ * avi_->val_ / bvi_->val_;
         }
       };
       class multiply_log_vd_vari : public op_vd_vari {
@@ -426,7 +426,7 @@ namespace stan {
         }
         void chain() {
           using std::log;
-          avi_->adj_ += log(bd_);
+          avi_->adj_ += adj_ * log(bd_);
         }
       };
       class multiply_log_dv_vari : public op_dv_vari {
@@ -435,10 +435,10 @@ namespace stan {
           op_dv_vari(stan::maths::multiply_log(a,bvi->val_),a,bvi) {
         }
         void chain() {
-          if (bvi_->val_==0 && ad_==0)
-            bvi_->adj_ += std::numeric_limits<double>::infinity();
+          if (bvi_->val_ == 0.0 && ad_ == 0.0)
+            bvi_->adj_ += adj_ * std::numeric_limits<double>::infinity();
           else
-            bvi_->adj_ += ad_ / bvi_->val_;
+            bvi_->adj_ += adj_ * ad_ / bvi_->val_;
         }
       };
 
