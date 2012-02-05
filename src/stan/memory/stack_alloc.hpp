@@ -36,6 +36,7 @@ namespace stan {
       // big fun to inline, but only called twice
       inline char* eight_byte_aligned_malloc(size_t size) {
         char* ptr = static_cast<char*>(malloc(size));
+        if (!ptr) return ptr; // malloc failed to alloc
         if (!is_aligned(ptr,8U)) {
           std::stringstream s;
           s << "invalid alignment to 8 bytes, ptr=" 
@@ -77,10 +78,10 @@ namespace stan {
      */
     class stack_alloc {
     private: 
-      std::vector<char*> blocks_;
+      std::vector<char*> blocks_; // storage for blocks, may be bigger than cur_block_
       std::vector<size_t> sizes_; // could store initial & shift for others
-      unsigned int cur_block_;
-      size_t used_;
+      unsigned int cur_block_;    // index into blocks_ for next alloc
+      size_t used_;               // how much of current block already used
     public:
 
 
@@ -98,6 +99,9 @@ namespace stan {
         sizes_(1,initial_nbytes),
         cur_block_(0),
         used_(0) {
+
+        if (!blocks_[0])
+          throw std::bad_alloc();  // no msg allowed in bad_alloc ctor
       }
 
       /**
@@ -108,8 +112,9 @@ namespace stan {
        */
       ~stack_alloc() { 
         // free ALL blocks
-        for (unsigned int i = 0; i < cur_block_; ++i)
-          free(blocks_[i]);
+        for (unsigned int i = 0; i < blocks_.size(); ++i)
+          if (blocks_[i])
+            free(blocks_[i]);
       }
 
       /**
@@ -139,9 +144,12 @@ namespace stan {
         if (cur_block_ >= sizes_.size()) {
           // malloc if can't reuse
           size_t newsize = sizes_.back() * 2;
-          if (newsize < len)
+          if (newsize < len) // could keep doubling until big enough
             newsize = len;
-          blocks_.push_back(eight_byte_aligned_malloc(newsize));
+          char* bytes = eight_byte_aligned_malloc(newsize);
+          if (!bytes)
+            throw std::bad_alloc(); // no msg allowed in bad_alloc ctor
+          blocks_.push_back(bytes);
           sizes_.push_back(newsize);
           used_ = 0;
         }
@@ -169,8 +177,9 @@ namespace stan {
        */
       inline void free_all() {
         // frees all BUT the first (index 0) block
-        for (unsigned int i = 1; i < cur_block_; ++i)
-          free(blocks_[i]);
+        for (unsigned int i = 1; i < blocks_.size(); ++i)
+          if (blocks_[i])
+            free(blocks_[i]);
         sizes_.resize(1);
         blocks_.resize(1); 
         recover_all();
