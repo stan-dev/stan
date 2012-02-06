@@ -21,7 +21,7 @@ parameters{
 } 
 
 transformed parameters {
-  double sigma; 
+  double(0,) sigma; 
   sigma <- sqrt(sigmasq);
 } 
 

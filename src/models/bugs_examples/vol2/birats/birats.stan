@@ -1,7 +1,6 @@
 # http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol2.pdf
 # Page 23: Birats
 ## 
-## not works yet for some multi_normal specification issue
 
 data {
   int(0,) N;

@@ -1,14 +1,13 @@
 // http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol2.pdf
 // Page 11: Eyes: Normal Mixture Model 
 // 
-// 
-// from bugs example now, (have not looked at JAGS version yet) 
 
 // FIXME vI: use beta-bernoulli rather than dirichlet-multinomial (done), no bernoulli now 
 // FIXME vII: marginalize out z[N] (done) 
 
 
-// not work yet 
+// works using the mixture distribution form instead of 
+// latent indicators 
 
 data {
   int(0,) N; 
