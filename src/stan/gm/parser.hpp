@@ -255,10 +255,12 @@ namespace stan {
                       const bool& declaration_ok,
                       const var_decl& var_decl,
                       std::stringstream& error_msgs) const {
-        if (allow_constraints)
-          return declaration_ok;
-        if (!declaration_ok)
+        if (!declaration_ok) {
+          error_msgs << "Problem with declaration." << std::endl;
           return false; // short-circuits test of constraints
+        }
+        if (allow_constraints)
+          return true;
         validate_no_constraints_vis vis(error_msgs);
         bool constraints_ok = boost::apply_visitor(vis,var_decl.decl_);
         return constraints_ok;
@@ -393,11 +395,16 @@ namespace stan {
     boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
     struct validate_expr_type {
-      template <typename T>
+      template <typename T1, typename T2>
       struct result { typedef bool type; };
 
-      bool operator()(const expression& expr) const {
-        return !expr.expression_type().is_ill_formed();
+      bool operator()(const expression& expr,
+                      std::ostream& error_msgs) const {
+        if (expr.expression_type().is_ill_formed()) {
+          error_msgs << "expression is ill formed" << std::endl;
+          return false;
+        }
+        return true;
       }
     };
     boost::phoenix::function<validate_expr_type> validate_expr_type_f;
@@ -474,10 +481,11 @@ namespace stan {
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
     struct validate_sample {
-      template <typename T>
+      template <typename T1, typename T2>
       struct result { typedef bool type; };
 
-      bool operator()(const sample& s) const {
+      bool operator()(const sample& s,
+                      std::ostream& error_msgs) const {
         std::vector<expr_type> arg_types;
         arg_types.push_back(s.expr_.expression_type());
         for (unsigned int i = 0; i < s.dist_.args_.size(); ++i)
@@ -487,21 +495,27 @@ namespace stan {
         expr_type result_type 
           = function_signatures::instance()
           .get_result_type(function_name,arg_types);
-        return result_type.is_primitive_double();
+        if (!result_type.is_primitive_double()) {
+          error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
+          return false;
+        }
+        return true;
+
       }
     };
     boost::phoenix::function<validate_sample> validate_sample_f;
 
-    struct validate_primitive_int_type {
-      template <typename T>
-      struct result { typedef bool type; };
+    // don't seem to be using this any more
+    // struct validate_primitive_int_type {
+    //   template <typename T>
+    //   struct result { typedef bool type; };
 
-      bool operator()(const expression& expr) const {
-        return expr.expression_type().is_primitive_int();
-      }
-    };
-    boost::phoenix::function<validate_primitive_int_type> 
-    validate_primitive_int_type_f;
+    //   bool operator()(const expression& expr) const {
+    //     return expr.expression_type().is_primitive_int();
+    //   }
+    // };
+    // boost::phoenix::function<validate_primitive_int_type> 
+    // validate_primitive_int_type_f;
 
     struct set_var_type {
       template <typename T1, typename T2, typename T3, typename T4>
@@ -553,17 +567,19 @@ namespace stan {
 
 
     struct add_var {
-      template <typename T1, typename T2, typename T3, typename T4>
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
       struct result { typedef T1 type; };
       // each type derived from base_var_decl gets own instance
       template <typename T>
       T operator()(const T& var_decl, 
                    variable_map& vm,
                    bool& pass,
-                   const var_origin& vo) const {
+                   const var_origin& vo,
+                   std::ostream& error_msgs) const {
         if (vm.exists(var_decl.name_)) {
           // variable already exists
           pass = false;
+          error_msgs << "variable already declared, name=" << var_decl.name_ << std::endl;
           return var_decl;
         }
         pass = true;  // probably don't need to set true
@@ -607,11 +623,16 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     struct set_indexed_factor_type {
-      template <typename T>
+      template <typename T1, typename T2>
       struct result { typedef bool type; };
-      bool operator()(index_op& io) const {
+      bool operator()(index_op& io,
+                      std::ostream& error_msgs) const {
         io.infer_type();
-        return !io.type_.is_ill_formed();
+        if (io.type_.is_ill_formed()) {
+          error_msgs << "indexes inappropriate for expression." << std::endl;
+          return false;
+        }
+        return true;
       }
     };
     boost::phoenix::function<set_indexed_factor_type> set_indexed_factor_type_f;
@@ -634,9 +655,6 @@ namespace stan {
       boost::spirit::qi::rule<Iterator> whitespace;
     };
 
-
-                              
-                              
 
     template <typename Iterator>
     struct expression_grammar 
@@ -666,8 +684,8 @@ namespace stan {
           >> *( (lit('+') > term_r        [_val += _1])
                 |   (lit('-') > term_r    [_val -= _1])
                 )
-          > eps[_pass = validate_expr_type_f(_val)];
-        ;
+          > eps[_pass = validate_expr_type_f(_val,boost::phoenix::ref(error_msgs_))]
+          ;
 
         term_r.name("term");
         term_r 
@@ -687,8 +705,10 @@ namespace stan {
         // two of these to put semantic action on this one w. index_op input
         indexed_factor_r.name("(optionally) indexed factor [sub]");
         indexed_factor_r 
-          %= indexed_factor_2_r [_pass = set_indexed_factor_type_f(_1)];
-
+          %= indexed_factor_2_r 
+             [_pass = set_indexed_factor_type_f(_1,
+                                                boost::phoenix::ref(error_msgs))];
+        
         indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
         indexed_factor_2_r 
           %= (factor_r >> *dims_r);
@@ -839,23 +859,32 @@ namespace stan {
         var_decl_r.name("variable declaration");
         var_decl_r 
           %= (int_decl_r             
-              [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+              [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                boost::phoenix::ref(error_msgs))]
               | double_decl_r        
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | vector_decl_r        
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | row_vector_decl_r    
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | matrix_decl_r        
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | simplex_decl_r       
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | pos_ordered_decl_r   
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | corr_matrix_decl_r   
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                  boost::phoenix::ref(error_msgs_))]
               | cov_matrix_decl_r    
-                [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2)]
+                 [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                                   boost::phoenix::ref(error_msgs_))]
               )
           > eps
             [_pass 
@@ -1126,7 +1155,8 @@ namespace stan {
             [_pass 
              = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
                                      boost::phoenix::ref(error_msgs_))]
-          | sample_r(_r1) [_pass = validate_sample_f(_1)]
+          | sample_r(_r1) [_pass = validate_sample_f(_1,
+                                                     boost::phoenix::ref(error_msgs_))]
           | no_op_statement_r
           ;
 
