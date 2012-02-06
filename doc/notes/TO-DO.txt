@@ -1,5 +1,9 @@
-TO DO
+TO DO FOR V1
 =================================================
+
+* return unnorm log probability as parameter?
+  - allow to be normalized (turn off propto?)
+  - compute lp__ and sampling statements for output
 
 * stop NUTS from running away without coming back
 
@@ -9,36 +13,28 @@ TO DO
   - tune step size (optional)
 
 * discrete samplers: 
-  - Gibbs for small intervals, tested
-  - slice for others (
+  - Gibbs for small intervals -- test
+  - slice for others -- Matt
   - what about multinomial with constraints?
 
-* R interface
- - simple process-level calls
-   + compile model
-   + dump data
-   + dump inits
-   + run model
-   + load results
- - built-in from Rcpp
- - functions
- - attach.stan(fit)
-   + traceplot(fit)
-   + plot.stan(fit)
-   + dump.stan(fit)
-   + read.stan(file_path)
+* remaining doc
+ - API doc
+ - reference manual
+ - getting started guide
+ - R interface
 
-* add constants like PI to Stan as expressions
-  - perhaps just make them globally defined vars?
-  - easiest way to do it as unary functions in special functions
-    like pi(), log2(), log10(), sqrt2(), NaN(), infinity()
-    they they won't conflict with user names, either   
+* distribution engineering
+ - eliminate tabs from code
+ - tarball
+ - basic distro site
+ - check cross-platform compilation
+
+
+CLEANUP (ONGOING)
+=================================================
 
 * const declarations wherever possible
   - work bottom up, but it's tricky at this late date
-
-* return log probability as parameter?
-  - compute lp__ and sampling statements for output
 
 * convert unsigned int return types to signed long
   or size_t
@@ -52,24 +48,23 @@ TO DO
   - simplify model includes with higher-level ones
   - chart out remaining deps
 
-* remaining doc
-  - API doc
-  - reference manual
-  - getting started guide
-  - R interface
-
-* distribution engineering
-  - eliminate tabs from code
-  - tarball
-  - basic distro site
-  - check cross-platform compilation
-
-* make sure we don't go up to generic new handler but
-  throw bad_alloc from our arena
-
-
 Stan-R
 =================================================
+
+* R interface
+- simple process-level calls
+  + compile model
+  + dump data
+  + dump inits
+  + run model
+  + load results
+- built-in from Rcpp
+- functions
+- attach.stan(fit)
+  + traceplot(fit)
+  + plot.stan(fit)
+  + dump.stan(fit)
+  + read.stan(file_path)
 
 * SPIN (smallest posterior interval)
 
