@@ -217,7 +217,18 @@ add_ternary("weibull_p");
 
 // MULTINOMIAL?  no vector<int> type
 
+// CONSTANTS
 
+add_nullary("e");
+add_nullary("pi");
+add_nullary("sqrt2");
+add_nullary("log2");
+add_nullary("log10");
+add_nullary("infinity");
+add_nullary("negative_infinity");
+add_nullary("nan");
+add_nullary("epsilon");
+add_nullary("negative_epsilon");
 
 
 

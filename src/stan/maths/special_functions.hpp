@@ -7,6 +7,8 @@
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
 
+#include <stan/maths/constants.hpp>
+
 namespace stan {
 
   namespace maths {
@@ -545,6 +547,99 @@ namespace stan {
       return max + log(sum);
     }
 
+
+    // CONSTANTS
+
+    /**
+     * Return the value of pi.
+     * 
+     * @return Pi.
+     */
+    double pi() {
+      return PI;
+    }
+
+    /**
+     * Return the base of the natural logarithm.
+     *
+     * @return Base of natural logarithm.
+     */
+    double e() {
+      return E;
+    }
+
+    /**
+     * Return the square root of two.
+     *
+     * @return Square root of two. 
+     */
+    double sqrt2() {
+      return SQRT_2;
+    }
+
+    /**
+     * Return natural logarithm of two.
+     *
+     * @return Natural logarithm of two.
+     */
+    double log2() {
+      return LOG_2;
+    }
+
+    /**
+     * Return natural logarithm of ten.
+     *
+     * @return Natural logarithm of ten.
+     */
+    double log10() {
+      return LOG_10;
+    }
+
+    /**
+     * Return positive infinity.
+     *
+     * @return Positive infinity.
+     */
+    double infinity() {
+      return INFTY;
+    }
+
+    /**
+     * Return negative infinity.
+     *
+     * @return Negative infinity.
+     */
+    double negative_infinity() {
+      return NEGATIVE_INFTY;
+    }
+
+    /**
+     * Return (quiet) not-a-number.
+     *
+     * @return Quiet not-a-number.
+     */
+    double nan() {
+      return NOT_A_NUMBER;
+    }
+
+    /**
+     * Return minimum positive number representable.
+     *
+     * @return Minimum positive number.
+     */
+    double epsilon() {
+      return EPSILON;
+    }
+
+    /**
+     * Return maximum negative number (i.e., negative
+     * number with smallest absolute value).
+     *
+     * @return Maximum negative number.
+     */
+    double negative_epsilon() {
+      return NEGATIVE_EPSILON;
+    }
 
   }
 

@@ -30,6 +30,9 @@ TO DO
 
 * add constants like PI to Stan as expressions
   - perhaps just make them globally defined vars?
+  - easiest way to do it as unary functions in special functions
+    like pi(), log2(), log10(), sqrt2(), NaN(), infinity()
+    they they won't conflict with user names, either   
 
 * const declarations wherever possible
   - work bottom up, but it's tricky at this late date

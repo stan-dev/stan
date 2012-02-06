@@ -282,6 +282,10 @@ namespace stan {
         add(name,result_type,arg_types);
       }
 
+      void add_nullary(const::std::string& name) {
+        add(name,DOUBLE_T);
+      }
+
       void add_unary(const::std::string& name) {
         add(name,DOUBLE_T,DOUBLE_T);
       }

@@ -205,4 +205,37 @@ TEST(MathsSpecialFunctions, multiply_log) {
     "log(b) with b < 0 should result in NaN";
 }
 
+TEST(MathsSpecialFunctions, pi_fun) {
+  EXPECT_FLOAT_EQ(4.0 * std::atan(1.0), stan::maths::pi());
+}
+TEST(MathsSpecialFunctions, e_fun) {
+  EXPECT_FLOAT_EQ(std::exp(1.0), stan::maths::e());
+}
+TEST(MathsSpecialFunctions, sqrt2_fun) {
+  EXPECT_FLOAT_EQ(std::sqrt(2.0), stan::maths::sqrt2());
+}
+TEST(MathsSpecialFunctions, log2_fun) {
+  EXPECT_FLOAT_EQ(std::log(2.0), stan::maths::log2());
+}
+TEST(MathsSpecialFunctions, log10_fun) {
+  EXPECT_FLOAT_EQ(std::log(10.0), stan::maths::log10());
+}
 
+TEST(MathsSpecialFunctions, infty) {
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::maths::infinity());
+}
+TEST(MathsSpecialFunctions, neg_infty) {
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), 
+                  stan::maths::negative_infinity());
+}
+TEST(MathsSpecialFunctions, nan) {
+  EXPECT_TRUE(std::isnan(stan::maths::nan()));
+}
+TEST(MathsSpecialFunctions, epsilon) {
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::epsilon(),
+                  stan::maths::epsilon());
+}
+TEST(MathsSpecialFunctions, negative_epsilon) {
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::epsilon(),
+                  stan::maths::negative_epsilon());
+}
