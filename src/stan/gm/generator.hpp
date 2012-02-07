@@ -723,45 +723,49 @@ namespace stan {
           o_ << ">";
         }
       }
+      // var_decl     -> type[0] name init_args[0] ;
+      // init_args[k] -> ctor_args  if no dims left
+      // init_args[k] -> ( dim[k] , ( type[k+1] init_args[k+1] ) )   
+      void generate_init_args(const std::string& type,
+                              const std::vector<expression>& ctor_args,
+                              const std::vector<expression>& dims,
+                              unsigned int dim) const {
+        if (dim < dims.size()) { // more dims left
+          o_ << '('; // open(1)
+          generate_expression(dims[dim],o_);
+          if ((dim + 1 < dims.size()) ||  ctor_args.size() > 0) {
+            o_ << ", ("; // open(2)
+            generate_type(type,dims.size() - dim - 1);
+            generate_init_args(type,ctor_args,dims,dim + 1);
+            o_ << ')'; // close(2)
+          }
+          o_ << ')'; // close(1)
+        } else {
+          if (ctor_args.size() == 1) {// vector
+            o_ << '(';
+            generate_expression(ctor_args[0],o_);
+            o_ << ')';
+          }
+          if (ctor_args.size() > 1) { // matrix
+            o_ << '(';
+            generate_expression(ctor_args[0],o_);
+            o_ << ',';
+            generate_expression(ctor_args[1],o_);
+            o_ << ')';
+          }
+        }
+      }
       void declare_array(const std::string& type, 
                          const std::vector<expression>& ctor_args,
                          const std::string& name, 
                          const std::vector<expression>& dims) const {
 
-        // require double parens to counter "most vexing parser
+        // require double parens to counter "most vexing parse" problem
 
-        for (int i = 0; i < indents_; ++i)
-          o_ << INDENT;
+        generate_indent(indents_,o_);
         generate_type(type,dims.size());
         o_ << ' '  << name;
-        if (dims.size() > 0 || ctor_args.size() > 0) 
-          o_ << "((";  // open (1)
-        for (unsigned int i = 0; i < dims.size(); ++i) {
-          if (i > 0U) {
-            o_ << ',';
-            generate_type(type,dims.size() - i);
-            o_ << "(("; // open (2)
-          }
-          generate_expression(dims[i].expr_,o_);
-        }
-        if (dims.size() > 0
-            && ctor_args.size() > 0) o_ << ','; // NEW
-        if (ctor_args.size() > 0) {
-          o_ << type;
-          o_ << "("; // open (3)
-          generate_expression(ctor_args[0],o_);
-          if (ctor_args.size() > 1) {
-            o_ << ',';
-            generate_expression(ctor_args[1],o_);
-          }
-          o_ << ")"; // close (3)
-        } else {
-          // o_ << "0"; // new to do nothing
-        }
-        if (dims.size() > 0 || ctor_args.size() > 0)
-          o_ << "))"; // close (1)
-        for (unsigned int i = 1; i < dims.size(); ++i)
-          o_ << "))"; // close (2)
+        generate_init_args(type,ctor_args,dims,0);
         o_ << ';' << EOL;
       }
     };
