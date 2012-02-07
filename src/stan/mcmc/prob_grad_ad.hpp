@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__PROB_GRAD_AD_H__
 #define __STAN__MCMC__PROB_GRAD_AD_H__
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
@@ -14,11 +15,11 @@ namespace stan {
     class prob_grad_ad : public prob_grad {
     public:
 
-      prob_grad_ad(unsigned int num_params_r)
+      prob_grad_ad(size_t num_params_r)
         : prob_grad::prob_grad(num_params_r) { 
       }
 
-      prob_grad_ad(unsigned int num_params_r,
+      prob_grad_ad(size_t num_params_r,
                    std::vector<std::pair<int,int> >& param_ranges_i)
         : prob_grad::prob_grad(num_params_r,
                                param_ranges_i) {
@@ -34,7 +35,7 @@ namespace stan {
                                    std::vector<int>& params_i, 
                                    std::vector<double>& gradient) {
         std::vector<agrad::var> ad_params_r;
-        for (unsigned int i = 0; i < num_params_r(); ++i) {
+        for (size_t i = 0; i < num_params_r(); ++i) {
           agrad::var var_i(params_r[i]);
           ad_params_r.push_back(var_i);
         }
@@ -47,7 +48,7 @@ namespace stan {
       virtual double log_prob(std::vector<double>& params_r,
                               std::vector<int>& params_i) {
         std::vector<agrad::var> ad_params_r;
-        for (unsigned int i = 0; i < num_params_r(); ++i) {
+        for (size_t i = 0; i < num_params_r(); ++i) {
           agrad::var var_i(params_r[i]);
           ad_params_r.push_back(var_i);
         }

@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__UTIL_HPP__
 #define __STAN__MCMC__UTIL_HPP__
 
-
+#include <cstddef>
 #include <stdexcept>
 
 #include <boost/random/uniform_01.hpp>
@@ -48,7 +48,7 @@ namespace stan {
                           boost::uniform_01<boost::mt19937&>& rand_uniform_01) {
       // linearize and scale, but don't norm
       double mx = stan::maths::max_vec(probs);
-      for (unsigned int k = 0; k < probs.size(); ++k)
+      for (size_t k = 0; k < probs.size(); ++k)
         probs[k] = exp(probs[k] - mx);
 
       // norm by scaling uniform sample

@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__VAR_CONTEXT_HPP__
 #define __STAN__IO__VAR_CONTEXT_HPP__
 
+#include <cstddef>
 #include <vector>
 #include <string>
 
@@ -60,7 +61,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Sequence of dimensions for the variable.
        */
-      virtual std::vector<unsigned int> dims_r(const std::string& name) const = 0;
+      virtual std::vector<size_t> dims_r(const std::string& name) const = 0;
 
       /**
        * Return <code>true</code> if the specified variable name has
@@ -90,7 +91,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Sequence of dimensions for the variable.
        */
-      virtual std::vector<unsigned int> dims_i(const std::string& name) const = 0;
+      virtual std::vector<size_t> dims_i(const std::string& name) const = 0;
 
       /**
        * Return a list of the names of the floating point variables in

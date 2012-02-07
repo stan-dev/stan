@@ -372,10 +372,10 @@ TEST(io_reader, corr_constrain_jacobian) {
 TEST(io_reader, std_vector) {
   std::vector<int> theta_i;
   std::vector<double> theta;
-  for (unsigned int i = 0; i < 100U; ++i)
+  for (size_t i = 0; i < 100U; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
-  for (unsigned int i = 0; i < 10U; ++i) {
+  for (size_t i = 0; i < 10U; ++i) {
     double x = reader.scalar();
     EXPECT_FLOAT_EQ(static_cast<double>(i),x);
   }
@@ -395,10 +395,10 @@ TEST(io_reader, std_vector) {
 TEST(io_reader, vector) {
   std::vector<int> theta_i;
   std::vector<double> theta;
-  for (unsigned int i = 0; i < 100U; ++i)
+  for (size_t i = 0; i < 100U; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
-  for (unsigned int i = 0; i < 7U; ++i) {
+  for (size_t i = 0; i < 7U; ++i) {
     double x = reader.scalar();
     EXPECT_FLOAT_EQ(static_cast<double>(i),x);
   }
@@ -418,10 +418,10 @@ TEST(io_reader, vector) {
 TEST(io_reader, row_vector) {
   std::vector<int> theta_i;
   std::vector<double> theta;
-  for (unsigned int i = 0; i < 100U; ++i)
+  for (size_t i = 0; i < 100U; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
-  for (unsigned int i = 0; i < 7U; ++i) {
+  for (size_t i = 0; i < 7U; ++i) {
     double x = reader.scalar();
     EXPECT_FLOAT_EQ(static_cast<double>(i),x);
   }
@@ -442,7 +442,7 @@ TEST(io_reader, row_vector) {
 TEST(io_reader, matrix) {
   std::vector<int> theta_i;
   std::vector<double> theta;
-  for (unsigned int i = 0; i < 100.0; ++i)
+  for (size_t i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   for (int i = 0; i < 7; ++i) {
@@ -681,9 +681,9 @@ TEST(io_reader,corr_matrix_constrain) {
   EXPECT_EQ(3U,R.cols());
   EXPECT_EQ(9U,R.size());
   EXPECT_EQ(4U,reader.available());
-  for (unsigned int i = 0; i < 3U; ++i) {
+  for (size_t i = 0; i < 3U; ++i) {
     EXPECT_FLOAT_EQ(1.0,R(i,i));
-    for (unsigned int j = i + 1; j < 3U; ++j)
+    for (size_t j = i + 1; j < 3U; ++j)
       EXPECT_FLOAT_EQ(R(i,j),R(j,i));
   }
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >
@@ -707,9 +707,9 @@ TEST(io_reader,corr_matrix_constrain_jacobian) {
   EXPECT_EQ(3U,R.cols());
   EXPECT_EQ(9U,R.size());
   EXPECT_EQ(4U,reader.available());
-  for (unsigned int i = 0; i < 3U; ++i) {
+  for (size_t i = 0; i < 3U; ++i) {
     EXPECT_FLOAT_EQ(1.0,R(i,i));
-    for (unsigned int j = i + 1; j < 3U; ++j)
+    for (size_t j = i + 1; j < 3U; ++j)
       EXPECT_FLOAT_EQ(R(i,j),R(j,i));
   }
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >
@@ -772,8 +772,8 @@ TEST(io_reader,cov_matrix_constrain) {
   EXPECT_EQ(3U,S.cols());
   EXPECT_EQ(9U,S.size());
   EXPECT_EQ(1U,reader.available());
-  for (unsigned int i = 0; i < 3U; ++i)
-    for (unsigned int j = i + 1; j < 3U; ++j)
+  for (size_t i = 0; i < 3U; ++i)
+    for (size_t j = i + 1; j < 3U; ++j)
       EXPECT_FLOAT_EQ(S(i,j),S(j,i));
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >
     solver(S,Eigen::EigenvaluesOnly);
@@ -798,8 +798,8 @@ TEST(io_reader,cov_matrix_constrain_jacobian) {
   EXPECT_EQ(3U,S.cols());
   EXPECT_EQ(9U,S.size());
   EXPECT_EQ(1U,reader.available());
-  for (unsigned int i = 0; i < 3U; ++i)
-    for (unsigned int j = i + 1; j < 3U; ++j)
+  for (size_t i = 0; i < 3U; ++i)
+    for (size_t j = i + 1; j < 3U; ++j)
       EXPECT_FLOAT_EQ(S(i,j),S(j,i));
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >
     solver(S,Eigen::EigenvaluesOnly);

@@ -2,6 +2,7 @@
 #define __STAN__MCMC__DUALAVERAGE_H__
 
 #include <cmath>
+#include <cstddef>
 
 #include <vector>
 #include <cstdio>
@@ -53,7 +54,7 @@ namespace stan {
         double avgeta = 1.0 / (_k + 10);
         double xbar_avgeta = pow(_k, -0.75);
         double muk = 0.5 * sqrt(_k) / _gamma;
-        for (unsigned int i = 0; i < _gbar.size(); ++i) {
+        for (size_t i = 0; i < _gbar.size(); ++i) {
           _gbar[i] = avgeta * g[i] + (1 - avgeta) * _gbar[i];
           xk[i] = _x0[i] - muk * _gbar[i];
 //           fprintf(stderr, "DUALAVERAGE update %d: g = %f, gbar = %f, lastx = %f",
@@ -136,10 +137,10 @@ namespace stan {
 
       void update(const std::vector<double>& g, std::vector<double>& xk) {
         _k++;
-        for (unsigned int i = 0; i < g.size(); ++i)
+        for (size_t i = 0; i < g.size(); ++i)
           _gbar[i] += g[i];
         if (_k == _nextk) {
-          for (unsigned int i = 0; i < g.size(); ++i) {
+          for (size_t i = 0; i < g.size(); ++i) {
             fprintf(stderr, "_lastx[%d] = %f, _gbar[%d] = %f\n", i, _lastx[i],
                     i, _gbar[i]);
             _lastx[i] -= _gamma * _gbar[i] / (_nextk - _lastk);
@@ -192,7 +193,7 @@ namespace stan {
         _k++;
         xk.resize(g.size());
         double eta = _a * pow(_k, -_gamma);
-        for (unsigned int i = 0; i < g.size(); ++i) {
+        for (size_t i = 0; i < g.size(); ++i) {
           xk[i] = _lastx[i] - eta * g[i];
           _lastx[i] = xk[i];
         }

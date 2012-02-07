@@ -2,6 +2,7 @@
 #define __STAN__MEMORY__STACK_ALLOC_HPP__
 
 #include <cstdlib>
+#include <cstddef>
 #include <sstream>
 #include <stdexcept>
 #include <stdint.h> // FIXME: replace with cstddef?
@@ -80,7 +81,7 @@ namespace stan {
     private: 
       std::vector<char*> blocks_; // storage for blocks, may be bigger than cur_block_
       std::vector<size_t> sizes_; // could store initial & shift for others
-      unsigned int cur_block_;    // index into blocks_ for next alloc
+      size_t cur_block_;          // index into blocks_ for next alloc
       size_t used_;               // how much of current block already used
     public:
 
@@ -112,7 +113,7 @@ namespace stan {
        */
       ~stack_alloc() { 
         // free ALL blocks
-        for (unsigned int i = 0; i < blocks_.size(); ++i)
+        for (size_t i = 0; i < blocks_.size(); ++i)
           if (blocks_[i])
             free(blocks_[i]);
       }
@@ -177,7 +178,7 @@ namespace stan {
        */
       inline void free_all() {
         // frees all BUT the first (index 0) block
-        for (unsigned int i = 1; i < blocks_.size(); ++i)
+        for (size_t i = 1; i < blocks_.size(); ++i)
           if (blocks_[i])
             free(blocks_[i]);
         sizes_.resize(1);

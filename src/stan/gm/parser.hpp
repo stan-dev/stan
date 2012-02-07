@@ -19,6 +19,7 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <istream>
@@ -331,7 +332,7 @@ namespace stan {
         return is_data;
       }
       bool operator()(const fun& x) const {
-        for (unsigned int i = 0; i < x.args_.size(); ++i)
+        for (size_t i = 0; i < x.args_.size(); ++i)
           if (!boost::apply_visitor(*this,x.args_[i].expr_))
             return false;
         return true;
@@ -339,8 +340,8 @@ namespace stan {
       bool operator()(const index_op& x) const {
         if (!boost::apply_visitor(*this,x.expr_.expr_))
           return false;
-        for (unsigned int i = 0; i < x.dimss_.size(); ++i)
-          for (unsigned int j = 0; j < x.dimss_[i].size(); ++j)
+        for (size_t i = 0; i < x.dimss_.size(); ++i)
+          for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             if (!boost::apply_visitor(*this,x.dimss_[i][j].expr_))
               return false;
         return true;
@@ -441,8 +442,8 @@ namespace stan {
 
         // validate types
         a.var_type_ = vm.get(name);
-        unsigned int lhs_var_num_dims = a.var_type_.dims_.size();
-        unsigned int num_index_dims = a.var_dims_.dims_.size();
+        size_t lhs_var_num_dims = a.var_type_.dims_.size();
+        size_t num_index_dims = a.var_dims_.dims_.size();
 
         expr_type lhs_type = infer_type_indexing(a.var_type_.base_type_,
                                                  lhs_var_num_dims,
@@ -488,7 +489,7 @@ namespace stan {
                       std::ostream& error_msgs) const {
         std::vector<expr_type> arg_types;
         arg_types.push_back(s.expr_.expression_type());
-        for (unsigned int i = 0; i < s.dist_.args_.size(); ++i)
+        for (size_t i = 0; i < s.dist_.args_.size(); ++i)
           arg_types.push_back(s.dist_.args_[i].expression_type());
         std::string function_name(s.dist_.family_);
         function_name += "_log";
@@ -543,7 +544,7 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(const std::vector<var_decl>& var_decls,
                       variable_map& vm) const {
-        for (unsigned int i = 0; i < var_decls.size(); ++i)
+        for (size_t i = 0; i < var_decls.size(); ++i)
           vm.remove(var_decls[i].name());
       }
     };
@@ -556,7 +557,7 @@ namespace stan {
 
       fun operator()(fun& fun) const {
         std::vector<expr_type> arg_types;
-        for (unsigned int i = 0; i < fun.args_.size(); ++i)
+        for (size_t i = 0; i < fun.args_.size(); ++i)
           arg_types.push_back(fun.args_[i].expression_type());
         fun.type_ = function_signatures::instance().get_result_type(fun.name_,
                                                                     arg_types);

@@ -2,6 +2,7 @@
 #define __STAN__GM__COMMAND_HPP__
 
 #include <cmath>
+#include <cstddef>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -28,7 +29,7 @@ namespace stan {
       command.val("sample_file",sample_file);
       std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
       
-      unsigned int num_iterations = 2000;
+      unsigned int num_iterations = 2000U;
       command.val("num_iterations",num_iterations);
       
       unsigned int num_burnin = num_iterations / 2;
@@ -195,7 +196,7 @@ namespace stan {
       command.val("samples",sample_file);
       std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
       
-      unsigned int num_iterations = 2000;
+      unsigned int num_iterations = 2000U;
       command.val("iter",num_iterations);
       
       unsigned int num_burnin = num_iterations / 2;
@@ -267,7 +268,7 @@ namespace stan {
 
         params_i = std::vector<int>(model.num_params_i(),0);
         params_r = std::vector<double>(model.num_params_r());
-        for (unsigned int i = 0; i < params_r.size(); ++i)
+        for (size_t i = 0; i < params_r.size(); ++i)
           params_r[i] = init_rng();
       }
 

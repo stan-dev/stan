@@ -1,6 +1,7 @@
 #ifndef __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS__H__
 #define __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS__H__
 
+#include <cstddef>
 #include <boost/math/special_functions.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/maths/special_functions.hpp>
@@ -342,11 +343,11 @@ namespace stan {
         using std::exp;
         using std::log;
         double max = -numeric_limits<double>::infinity();
-        for (unsigned int i = 0; i < x.size(); ++i) 
+        for (size_t i = 0; i < x.size(); ++i) 
           if (x[i] > max) 
             max = x[i].val();
         double sum = 0.0;
-        for (unsigned int i = 0; i < x.size(); ++i) 
+        for (size_t i = 0; i < x.size(); ++i) 
           if (x[i] != -numeric_limits<double>::infinity()) 
             sum += exp(x[i].val() - max);
         return max + log(sum);
@@ -389,7 +390,7 @@ namespace stan {
           op_vector_vari(log_sum_exp_as_double(x), x) {
         }
         void chain() {
-          for (unsigned int i = 0; i < size_; ++i) {
+          for (size_t i = 0; i < size_; ++i) {
             vis_[i]->adj_ += adj_ * calculate_chain(vis_[i]->val_, val_);
           }
         }

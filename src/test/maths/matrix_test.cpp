@@ -16,12 +16,12 @@ using stan::maths::row_vector_d;
 
 TEST(matrix_test, resize_double) {
   double x = 5;
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   stan::maths::resize(x,dims);
 }
 TEST(matrix_test, resize_svec_double) {
   std::vector<double> y;
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   EXPECT_EQ(0U, y.size());
 
   dims.push_back(4U);
@@ -34,7 +34,7 @@ TEST(matrix_test, resize_svec_double) {
 }
 TEST(matrix_test, resize_vec_double) {
   Matrix<double,Dynamic,1> v(2);
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   EXPECT_EQ(2U, v.size());
 
   dims.push_back(17U);
@@ -47,7 +47,7 @@ TEST(matrix_test, resize_vec_double) {
 }
 TEST(matrix_test, resize_rvec_double) {
   Matrix<double,1,Dynamic> rv(2);
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   EXPECT_EQ(2U, rv.size());
 
   dims.push_back(17U);
@@ -60,7 +60,7 @@ TEST(matrix_test, resize_rvec_double) {
 }
 TEST(matrix_test, resize_mat_double) {
   Matrix<double,Dynamic,Dynamic> m(2,3);
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   EXPECT_EQ(2U, m.rows());
   EXPECT_EQ(3U, m.cols());
 
@@ -73,7 +73,7 @@ TEST(matrix_test, resize_mat_double) {
 TEST(matrix_test, resize_svec_svec_double) {
   std::vector<std::vector<double> > xx;
   EXPECT_EQ(0U,xx.size());
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   dims.push_back(4U);
   dims.push_back(5U);
   stan::maths::resize(xx,dims);
@@ -89,7 +89,7 @@ TEST(matrix_test, resize_svec_svec_double) {
 TEST(matrix_test, resize_svec_v_double) {
   std::vector<Matrix<double,Dynamic,1> > xx;
   EXPECT_EQ(0U,xx.size());
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   dims.push_back(4U);
   dims.push_back(5U);
   stan::maths::resize(xx,dims);
@@ -105,7 +105,7 @@ TEST(matrix_test, resize_svec_v_double) {
 TEST(matrix_test, resize_svec_rv_double) {
   std::vector<Matrix<double,1,Dynamic> > xx;
   EXPECT_EQ(0U,xx.size());
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   dims.push_back(4U);
   dims.push_back(5U);
   stan::maths::resize(xx,dims);
@@ -120,7 +120,7 @@ TEST(matrix_test, resize_svec_rv_double) {
 }
 TEST(matrix_test, resize_svec_svec_matrix_double) {
   std::vector<std::vector<Matrix<double,Dynamic,Dynamic> > > mm;
-  std::vector<unsigned int> dims;
+  std::vector<size_t> dims;
   dims.push_back(4U);
   dims.push_back(5U);
   dims.push_back(6U);

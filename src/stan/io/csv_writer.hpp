@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__CSV_WRITER_HPP__
 #define __STAN__IO__CSV_WRITER_HPP__
 
+#include <cstddef>
 #include <iostream>
 #include <Eigen/Dense>
 
@@ -86,7 +87,7 @@ namespace stan {
        * @param v Vector of doubles to write.
        */
       void write(const Eigen::Matrix<double,Eigen::Dynamic,1>& v) {
-        for (unsigned int i = 0; i < v.size(); ++i)
+        for (size_t i = 0; i < v.size(); ++i)
           write(v[i]);
       }
       
@@ -97,7 +98,7 @@ namespace stan {
        * @param rv Row vector of doubles to write.
        */
       void write(const Eigen::Matrix<double,1,Eigen::Dynamic>& rv) {
-        for (unsigned int i = 0; i < rv.size(); ++i)
+        for (size_t i = 0; i < rv.size(); ++i)
           write(rv[i]);
       }
 
@@ -108,8 +109,8 @@ namespace stan {
        * @param m Matrix to write.
        */
       void write(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
-        for (unsigned int i = 0; i < m.rows(); ++i)
-          for (unsigned int j = 0; j < m.cols(); ++j)
+        for (size_t i = 0; i < m.rows(); ++i)
+          for (size_t j = 0; j < m.cols(); ++j)
             write(m(i,j));
       }
 
@@ -120,8 +121,8 @@ namespace stan {
        * @param m Matrix of doubles to write.
        */
       void write_col_major(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
-        for (unsigned int j = 0; j < m.cols(); ++j)
-          for (unsigned int i = 0; i < m.rows(); ++i)
+        for (size_t j = 0; j < m.cols(); ++j)
+          for (size_t i = 0; i < m.rows(); ++i)
             write(m(i,j));
       }
 
@@ -136,7 +137,7 @@ namespace stan {
         comma();
 
         o_ << '"';
-        for (unsigned int i = 0; i < s.size(); ++i) {
+        for (size_t i = 0; i < s.size(); ++i) {
           if (s.at(i) == '"') {
             o_ << '"' << '"'; // double quotes
           } else {

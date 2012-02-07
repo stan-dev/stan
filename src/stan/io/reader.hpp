@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__READER_HPP__
 #define __STAN__IO__READER_HPP__
 
+#include <cstddef>
 #include <exception>
 #include <stdexcept>
 #include <vector>
@@ -45,14 +46,14 @@ namespace stan {
 
       std::vector<T>& data_r_;
       std::vector<int>& data_i_;
-      unsigned int pos_;
-      unsigned int int_pos_;
+      size_t pos_;
+      size_t int_pos_;
       
       inline T& scalar_ptr() {
         return data_r_.at(pos_);
       }
       
-      inline T& scalar_ptr_increment(unsigned int m) {
+      inline T& scalar_ptr_increment(size_t m) {
         pos_ += m;
         return data_r_.at(pos_ - m);
       }
@@ -61,7 +62,7 @@ namespace stan {
         return data_i_.at(int_pos_);
       }
       
-      inline int& int_ptr_increment(unsigned int m) {
+      inline int& int_ptr_increment(size_t m) {
         int_pos_ += m;
         return data_i_.at(int_pos_ - m);
       }
@@ -106,7 +107,7 @@ namespace stan {
        *
        * @return Number of scalars left to read.
        */
-      inline unsigned int available() {
+      inline size_t available() {
         return data_r_.size() - pos_;
       }
 
@@ -115,7 +116,7 @@ namespace stan {
        *
        * @return Number of integers left to read.
        */
-      inline unsigned int available_i() {
+      inline size_t available_i() {
         return data_i_.size() - int_pos_;
       }
 
@@ -199,7 +200,7 @@ namespace stan {
        * @param m Size of vector.
        * @return Vector made up of the next scalars.
        */
-      std::vector<T> std_vector(unsigned int m) {
+      std::vector<T> std_vector(size_t m) {
         std::vector<T> vec;
         T& start = scalar_ptr_increment(m);
         vec.insert(vec.begin(), &start, &scalar_ptr());
@@ -213,7 +214,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      vector_t vector(unsigned int m) {
+      vector_t vector(size_t m) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -227,7 +228,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      vector_t vector_constrain(unsigned int m) {
+      vector_t vector_constrain(size_t m) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -239,7 +240,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      vector_t vector_constrain(unsigned int m, T& lp) {
+      vector_t vector_constrain(size_t m, T& lp) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -250,7 +251,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      row_vector_t row_vector(unsigned int m) {
+      row_vector_t row_vector(size_t m) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -261,7 +262,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      row_vector_t row_vector_constrain(unsigned int m) {
+      row_vector_t row_vector_constrain(size_t m) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -274,7 +275,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      row_vector_t row_vector_constrain(unsigned int m, T& lp) {
+      row_vector_t row_vector_constrain(size_t m, T& lp) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
       
@@ -295,21 +296,21 @@ namespace stan {
        * @param n Number of columns.
        * @return Eigen::Matrix made up of the next scalars.
        */
-      matrix_t matrix(unsigned int m, unsigned int n) {
+      matrix_t matrix(size_t m, size_t n) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
       /**
        * Return a matrix of the specified dimensionality made up of
        * the next scalars arranged in column-major order.  The
-       * constraint is a no-op.  See <code>matrix(unsigned int,
-       * unsigned int)</code> for more information.
+       * constraint is a no-op.  See <code>matrix(size_t,
+       * size_t)</code> for more information.
        *
        * @param m Number of rows.  
        * @param n Number of columns.
        * @return Matrix made up of the next scalars.
        */
-      matrix_t matrix_constrain(unsigned int m, unsigned int n) {
+      matrix_t matrix_constrain(size_t m, size_t n) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
@@ -317,7 +318,7 @@ namespace stan {
        * Return a matrix of the specified dimensionality made up of
        * the next scalars arranged in column-major order.  The
        * constraint is a no-op, hence the log probability is not
-       * incremented.  See <code>matrix(unsigned int, unsigned int)</code>
+       * incremented.  See <code>matrix(size_t, size_t)</code>
        * for more information.
        *
        * @param m Number of rows.  
@@ -325,7 +326,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
-      matrix_t matrix_constrain(unsigned int m, unsigned int n, T& lp) {
+      matrix_t matrix_constrain(size_t m, size_t n, T& lp) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
@@ -752,7 +753,7 @@ namespace stan {
        * @return Simplex read from the specified size number of scalars.
        * @throw std::runtime_error if the k values is not a simplex.
        */
-      vector_t simplex(unsigned int k) {
+      vector_t simplex(size_t k) {
         vector_t theta(vector(k));
         if(!stan::prob::simplex_validate(theta))
           BOOST_THROW_EXCEPTION(
@@ -770,7 +771,7 @@ namespace stan {
        * @param k Number of dimensions in resulting simplex.
        * @return Simplex derived from next <code>k-1</code> scalars.
        */
-      Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(unsigned int k) {
+      Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(size_t k) {
         return stan::prob::simplex_constrain(vector(k-1));
       }
 
@@ -786,7 +787,7 @@ namespace stan {
        * Jacobian determinant.
        * @return The next simplex of the specified size.
        */
-      vector_t simplex_constrain(unsigned int k, T& lp) {
+      vector_t simplex_constrain(size_t k, T& lp) {
         return stan::prob::simplex_constrain(vector(k-1),lp);
       }
 
@@ -800,7 +801,7 @@ namespace stan {
        * @return Vector of positive values in ascending order.
        * @throw std::runtime_error if the vector is not positive ordered
        */
-      vector_t pos_ordered(unsigned int k) {
+      vector_t pos_ordered(size_t k) {
         vector_t x(vector(k));
         if (!stan::prob::pos_ordered_validate(x)) 
           BOOST_THROW_EXCEPTION(
@@ -818,7 +819,7 @@ namespace stan {
        * @return Next positive, ordered vector of the specified
        * length.
        */
-      vector_t pos_ordered_constrain(unsigned int k) {
+      vector_t pos_ordered_constrain(size_t k) {
         return stan::prob::pos_ordered_constrain(vector(k));
       }
 
@@ -833,7 +834,7 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return Next positive ordered vector of the specified size.
        */
-      vector_t pos_ordered_constrain(unsigned int k, T& lp) {
+      vector_t pos_ordered_constrain(size_t k, T& lp) {
         return stan::prob::pos_ordered_constrain(vector(k),lp);
       }
 
@@ -846,7 +847,7 @@ namespace stan {
        * @return Next correlation matrix of the specified dimensionality.
        * @throw std::runtime_error if the matrix is not a correlation matrix
        */
-      matrix_t corr_matrix(unsigned int k) {
+      matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
         if (!stan::prob::corr_matrix_validate(x))
           BOOST_THROW_EXCEPTION(
@@ -863,7 +864,7 @@ namespace stan {
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
        */
-      matrix_t corr_matrix_constrain(unsigned int k) {
+      matrix_t corr_matrix_constrain(size_t k) {
         return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
       }
 
@@ -878,7 +879,7 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return The next correlation matrix of the specified dimensionality.
        */
-      matrix_t corr_matrix_constrain(unsigned int k, T& lp) {
+      matrix_t corr_matrix_constrain(size_t k, T& lp) {
         return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
                                                  k,lp);
       }
@@ -895,7 +896,7 @@ namespace stan {
        * @throw std::runtime_error if the matrix is not a valid
        *    covariance matrix
        */
-      matrix_t cov_matrix(unsigned int k) {
+      matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
         if (!stan::prob::cov_matrix_validate(y))
           BOOST_THROW_EXCEPTION(
@@ -913,7 +914,7 @@ namespace stan {
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
        */
-      matrix_t cov_matrix_constrain(unsigned int k) {
+      matrix_t cov_matrix_constrain(size_t k) {
         return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                                 k);
       }
@@ -929,7 +930,7 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return The next covariance matrix of the specified dimensionality.
        */
-      matrix_t cov_matrix_constrain(unsigned int k, T& lp) {
+      matrix_t cov_matrix_constrain(size_t k, T& lp) {
         return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                                 k,lp);
       }

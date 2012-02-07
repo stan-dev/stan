@@ -80,40 +80,40 @@ namespace stan {
 
       template <typename T>
       void resize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
-                  const std::vector<unsigned int>& dims, 
-                  unsigned int pos) {
+                  const std::vector<size_t>& dims, 
+                  size_t pos) {
         x.resize(dims[pos],dims[pos+1]);
       }
 
       template <typename T>
       void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                  const std::vector<unsigned int>& dims, 
-                  unsigned int pos) {
+                  const std::vector<size_t>& dims, 
+                  size_t pos) {
         x.resize(dims[pos]);
       }
 
       template <typename T>
       void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x, 
-                  const std::vector<unsigned int>& dims, 
-                  unsigned int pos) {
+                  const std::vector<size_t>& dims, 
+                  size_t pos) {
         x.resize(dims[pos]);
       }
 
 
       void resize(double x, 
-                  const std::vector<unsigned int>& dims, 
-                  unsigned int pos) {
+                  const std::vector<size_t>& dims, 
+                  size_t pos) {
         // no-op
       }
 
       template <typename T>
       void resize(std::vector<T>& x, 
-                  const std::vector<unsigned int>& dims, 
-                  unsigned int pos) {
+                  const std::vector<size_t>& dims, 
+                  size_t pos) {
         x.resize(dims[pos]);
         ++pos;
         if (pos >= dims.size()) return; // skips lowest loop to scalar
-        for (unsigned int i = 0; i < x.size(); ++i)
+        for (size_t i = 0; i < x.size(); ++i)
           resize(x[i],dims,pos);
       }
 
@@ -129,7 +129,7 @@ namespace stan {
      * @tparam T Type of object being resized.
      */
     template <typename T>
-    inline void resize(T& x, std::vector<unsigned int> dims) {
+    inline void resize(T& x, std::vector<size_t> dims) {
       resize(x,dims,0U);
     }
 
@@ -526,7 +526,7 @@ namespace stan {
      * @param v Specified vector.
      * @return Number of rows in the vector.
      */
-    inline unsigned int rows(const vector_d& v) {
+    inline size_t rows(const vector_d& v) {
       return v.size();
     }
     /**
@@ -535,7 +535,7 @@ namespace stan {
      * @param rv Specified vector.
      * @return Number of rows in the vector.
      */
-    inline unsigned int rows(const row_vector_d& rv) {
+    inline size_t rows(const row_vector_d& rv) {
       return 1;
     }
     /**
@@ -544,7 +544,7 @@ namespace stan {
      * @return Number of rows in the vector.
      * 
      */
-    inline unsigned int rows(const matrix_d& m) {
+    inline size_t rows(const matrix_d& m) {
       return m.rows();
     }
 
@@ -554,7 +554,7 @@ namespace stan {
      * @param v Specified vector.
      * @return Number of columns in the vector.
      */
-    inline unsigned int cols(const vector_d& v) {
+    inline size_t cols(const vector_d& v) {
       return 1;
     }
     /**
@@ -563,7 +563,7 @@ namespace stan {
      * @param rv Specified vector.
      * @return Number of columns in the vector.
      */
-    inline unsigned int cols(const row_vector_d& rv) {
+    inline size_t cols(const row_vector_d& rv) {
       return rv.size();
     }
     /**
@@ -571,7 +571,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Number of columns in the matrix.
      */
-    inline unsigned int cols(const matrix_d& m) {
+    inline size_t cols(const matrix_d& m) {
       return m.cols();
     }
     
@@ -693,7 +693,7 @@ namespace stan {
     template <typename T>
     inline double mean(const std::vector<T>& v) {
       double sum(0);
-      for (unsigned int i = 0; i < v.size(); ++i)
+      for (size_t i = 0; i < v.size(); ++i)
         sum += v[i];
       return sum / v.size();
     }
@@ -813,7 +813,7 @@ namespace stan {
     template <typename T>
     inline T sum(const std::vector<T>& xs) {
       T sum(0);
-      for (unsigned int i = 0; i < xs.size(); ++i)
+      for (size_t i = 0; i < xs.size(); ++i)
         sum += xs[i];
       return sum;
     }
@@ -1137,7 +1137,7 @@ namespace stan {
      * @param i Row index.
      * @return Specified row of the matrix.
      */
-    inline row_vector_d row(const matrix_d& m, unsigned int i) {
+    inline row_vector_d row(const matrix_d& m, size_t i) {
       return m.row(i);
     }
 
@@ -1147,7 +1147,7 @@ namespace stan {
      * @param j Column index.
      * @return Specified column of the matrix.
      */
-    inline vector_d col(const matrix_d& m, unsigned int j) {
+    inline vector_d col(const matrix_d& m, size_t j) {
       return m.col(j);
     }
 
@@ -1335,13 +1335,6 @@ namespace stan {
       return svd.singularValues();
     }      
 
-    namespace {
-
-      const unsigned int THIN_SVD_OPTIONS
-          = Eigen::ComputeThinU | Eigen::ComputeThinV;
-    
-    }
-
     /**
      * Assign the real components of a singular value decomposition
      * of the specified matrix to the specified references.  
@@ -1367,6 +1360,8 @@ namespace stan {
                     matrix_d& u,
                     matrix_d& v,
                     vector_d& s) {
+      static const unsigned int THIN_SVD_OPTIONS
+        = Eigen::ComputeThinU | Eigen::ComputeThinV;
       Eigen::JacobiSVD<matrix_d> svd(m, THIN_SVD_OPTIONS);
       u = svd.matrixU();
       v = svd.matrixV();

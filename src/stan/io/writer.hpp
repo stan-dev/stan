@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__WRITER_HPP__
 #define __STAN__IO__WRITER_HPP__
 
+#include <cstddef>
 #include <stdexcept>
 #include <vector>
 
@@ -219,7 +220,7 @@ namespace stan {
        * by <code>x[0] = log(y[0])</code> and by
        * <code>x[k] = log(y[k] - y[k-1])</code> for <code>k > 0</code>.  This
        * unconstraining transform inverts the constraining transform specified
-       * in <code>pos_ordered_constrain(unsigned int)</code>.
+       * in <code>pos_ordered_constrain(size_t)</code>.
        *
        * @param y Positive, ordered vector.
        * @return Unconstrained vector corresponding to the specified vector.
@@ -230,7 +231,7 @@ namespace stan {
         if(!stan::prob::pos_ordered_validate(y)) 
           BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
         data_r_.push_back(log(y[0]));
-        for (unsigned int i = 1; i < y.size(); ++i) {
+        for (size_t i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
         }
       }
@@ -242,7 +243,7 @@ namespace stan {
        * @param y Vector to write.
        */
       void vector_unconstrain(const vector_t& y) {
-        for (unsigned int i = 0; i < y.size(); ++i)
+        for (size_t i = 0; i < y.size(); ++i)
           data_r_.push_back(y[i]);
       }
 
@@ -252,7 +253,7 @@ namespace stan {
        * @param y Vector to write.
        */
       void row_vector_unconstrain(const vector_t& y) {
-        for (unsigned int i = 0; i < y.size(); ++i)
+        for (size_t i = 0; i < y.size(); ++i)
           data_r_.push_back(y[i]);
       }
 
@@ -262,8 +263,8 @@ namespace stan {
        * @param y Matrix to write.
        */
       void matrix_unconstrain(const matrix_t& y) {
-        for (unsigned int i = 0; i < y.rows(); ++i)
-          for (unsigned int j = 0; j < y.cols(); ++j) 
+        for (size_t i = 0; i < y.rows(); ++i)
+          for (size_t j = 0; j < y.cols(); ++j) 
             data_r_.push_back(y(i,j));
       }
 
@@ -278,7 +279,7 @@ namespace stan {
        * produces the unconstrained vector <code>x = log(y[1]) -
        * log(y[K]), ..., log(y[K-1]) - log(y[K])</code>.  This inverts
        * the constraining transform of
-       * <code>simplex_constrain(unsigned int)</code>.
+       * <code>simplex_constrain(size_t)</code>.
        *
        * @param y Simplex constrained value.
        * @return Unconstrained value.
@@ -287,9 +288,9 @@ namespace stan {
       void simplex_unconstrain(vector_t& y) {
         if (!stan::prob::simplex_validate(y))
           BOOST_THROW_EXCEPTION(std::runtime_error("y is not a simplex"));
-        unsigned int k_minus_1 = y.size() - 1;
+        size_t k_minus_1 = y.size() - 1;
         double log_y_k = log(y[k_minus_1]);
-        for (unsigned int i = 0; i < k_minus_1; ++i) {
+        for (size_t i = 0; i < k_minus_1; ++i) {
           data_r_.push_back(log(y[i]) - log_y_k);
         }
       }
@@ -312,19 +313,19 @@ namespace stan {
       void corr_matrix_unconstrain(matrix_t& y) {
         if (!stan::prob::corr_matrix_validate(y))
           BOOST_THROW_EXCEPTION(std::runtime_error ("y is not a valid correlation matrix"));
-        unsigned int k = y.rows();
-        unsigned int k_choose_2 = (k * (k-1)) / 2;
+        size_t k = y.rows();
+        size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
         bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
         if (!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("y cannot be factorized by factor_cov_matrix"));
-        for (unsigned int i = 0; i < k; ++i) {
+        for (size_t i = 0; i < k; ++i) {
           // sds on log scale unconstrained
           if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
             BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
         }
-        for (unsigned int i = 0; i < k_choose_2; ++i)
+        for (size_t i = 0; i < k_choose_2; ++i)
           data_r_.push_back(cpcs[i]);
       }
 
@@ -340,19 +341,19 @@ namespace stan {
        * @throw std::runtime_error if y has no elements or if it is not square
        */
       void cov_matrix_unconstrain(matrix_t& y) {
-        unsigned int k = y.rows();
+        size_t k = y.rows();
         if (k == 0 || y.cols() != k)
           BOOST_THROW_EXCEPTION(
               std::runtime_error ("y must have elements and y must be a square matrix"));
-        unsigned int k_choose_2 = (k * (k-1)) / 2;
+        size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
         bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
         if(!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
-        for (unsigned int i = 0; i < k_choose_2; ++i)
+        for (size_t i = 0; i < k_choose_2; ++i)
           data_r_.push_back(cpcs[i]);
-        for (unsigned int i = 0; i < k; ++i)
+        for (size_t i = 0; i < k; ++i)
           data_r_.push_back(sds[i]);
       }
     };

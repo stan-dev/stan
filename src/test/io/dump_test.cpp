@@ -10,26 +10,26 @@ void test_list3(stan::io::dump_reader& reader,
                const std::vector<double>& vals) {
   std::vector<double> vals2 = reader.double_values();
   EXPECT_EQ(vals.size(),vals2.size());
-  for (unsigned int i = 0; i < vals.size(); ++i)
+  for (size_t i = 0; i < vals.size(); ++i)
     EXPECT_FLOAT_EQ(vals[i],vals2[i]);
 }
 void test_list3(stan::io::dump_reader& reader,
                const std::vector<int>& vals) {
   std::vector<int> vals2 = reader.int_values();
   EXPECT_EQ(vals.size(),vals2.size());
-  for (unsigned int i = 0; i < vals.size(); ++i)
+  for (size_t i = 0; i < vals.size(); ++i)
     EXPECT_EQ(vals[i],vals2[i]);
 }
 template <typename T>
 void test_list2(stan::io::dump_reader& reader,
                 const std::string& name,
                 const std::vector<T>& vals,
-                const std::vector<unsigned int>& dims) {
+                const std::vector<size_t>& dims) {
   bool has_next = reader.next();
   EXPECT_EQ(true,has_next);
   EXPECT_EQ(name,reader.name());
   EXPECT_EQ(dims.size(), reader.dims().size());
-  for (unsigned int i = 0; i < dims.size(); ++i)
+  for (size_t i = 0; i < dims.size(); ++i)
     EXPECT_EQ(dims[i],reader.dims()[i]);
   test_list3(reader,vals);
 }
@@ -41,7 +41,7 @@ void test_list(const std::string& name,
                const std::string& s) {
   std::stringstream in(s);
   stan::io::dump_reader reader(in);
-  std::vector<unsigned int> expected_dims;
+  std::vector<size_t> expected_dims;
   expected_dims.push_back(vals.size());
   test_list2(reader,name,vals,expected_dims);
 }
@@ -53,7 +53,7 @@ void test_val(std::string name, T val, std::string s) {
   stan::io::dump_reader reader(in);
   std::vector<T> vals;
   vals.push_back(val);
-  std::vector<unsigned int> expected_dims;
+  std::vector<size_t> expected_dims;
   test_list2(reader,name,vals,expected_dims);
 }
 
@@ -122,7 +122,7 @@ TEST(io_dump, reader_vec_double) {
   expected_vals.push_back(5.0);
   expected_vals.push_back(3.0);
   expected_vals.push_back(6.0);
-  std::vector<unsigned int> expected_dims;
+  std::vector<size_t> expected_dims;
   expected_dims.push_back(2U);
   expected_dims.push_back(3U);
   std::string txt = "foo <- structure(c(1.0,4.0,2.0,5.0,3.0,6.0), .Dim = c(2,3))";
@@ -140,7 +140,7 @@ TEST(io_dump, reader_vec_int) {
   expected_vals.push_back(5);
   expected_vals.push_back(3);
   expected_vals.push_back(6);
-  std::vector<unsigned int> expected_dims;
+  std::vector<size_t> expected_dims;
   expected_dims.push_back(2U);
   expected_dims.push_back(3U);
   std::string txt = "foo <- structure(c(1,4,2,5,3,6), .Dim = c(2,3))";
@@ -264,7 +264,7 @@ TEST(io_dump, dump_abs_ref) {
 }
 
 TEST(io_dump, product) {
-  std::vector<unsigned int>dims;
+  std::vector<size_t>dims;
   dims.push_back(1);
   
   EXPECT_FLOAT_EQ(1.0, stan::io::product(dims));

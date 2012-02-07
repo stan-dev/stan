@@ -2,6 +2,7 @@
 #define __STAN__MCMC__NUTS_H__
 
 #include <ctime>
+#include <cstddef>
 #include <vector>
 
 #include <boost/random/normal_distribution.hpp>
@@ -169,7 +170,7 @@ namespace stan {
         _epsilon = 1;
         std::vector<double> x = _x;
         std::vector<double> m(_model.num_params_r());
-        for (unsigned int i = 0; i < m.size(); ++i)
+        for (size_t i = 0; i < m.size(); ++i)
           m[i] = _rand_unit_norm();
         std::vector<double> g = _g;
         double lastlogp = _logp;
@@ -181,7 +182,7 @@ namespace stan {
         while (1) {
           x = _x;
           g = _g;
-          for (unsigned int i = 0; i < m.size(); ++i)
+          for (size_t i = 0; i < m.size(); ++i)
             m[i] = _rand_unit_norm();
           logp = leapfrog(_model, _z, x, m, g, _epsilon);
           H = logp - lastlogp;
@@ -204,7 +205,7 @@ namespace stan {
       sample next() {
         // Initialize the algorithm
         std::vector<double> mminus(_model.num_params_r());
-        for (unsigned int i = 0; i < mminus.size(); ++i)
+        for (size_t i = 0; i < mminus.size(); ++i)
           mminus[i] = _rand_unit_norm();
         std::vector<double> mplus(mminus);
         // The log-joint probability of the momentum and position terms, i.e.

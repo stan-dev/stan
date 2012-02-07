@@ -2,6 +2,7 @@
 #define __STAN__MCMC__HMC_HPP__
 
 #include <ctime>
+#include <cstddef>
 #include <vector>
 
 #include <boost/random/mersenne_twister.hpp>
@@ -156,7 +157,7 @@ namespace stan {
       sample next() {
         // Gibbs for discrete
         std::vector<double> probs;
-        for (unsigned int m = 0; m < _model.num_params_i(); ++m) {
+        for (size_t m = 0; m < _model.num_params_i(); ++m) {
           probs.resize(0);
           for (int k = _model.param_range_i_lower(m); 
                k < _model.param_range_i_upper(m); 
@@ -167,7 +168,7 @@ namespace stan {
 
         // HMC for continuous
         std::vector<double> m(_model.num_params_r());
-        for (unsigned int i = 0; i < m.size(); ++i)
+        for (size_t i = 0; i < m.size(); ++i)
           m[i] = _rand_unit_norm();
         double H = -(stan::maths::dot_self(m) / 2.0) + _logp; 
         

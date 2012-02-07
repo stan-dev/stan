@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__CMD_LINE_HPP__
 #define __STAN__IO__CMD_LINE_HPP__
 
+#include <cstddef>
 #include <map>
 #include <set>
 #include <sstream>
@@ -52,7 +53,7 @@ namespace stan {
           bare_.push_back(s);
           return;
         }
-        for (unsigned int i = 2; i < s.size(); ++i) {
+        for (size_t i = 2; i < s.size(); ++i) {
           if (s[i] == '=') {
             key_val_[s.substr(2,i - 2)] = s.substr(i + 1,s.size() - i - 1);
             return;
@@ -134,7 +135,7 @@ namespace stan {
        *
        * @return Number of bare arguments.
        */
-      unsigned int bare_size() const {
+      size_t bare_size() const {
         return bare_.size();
       }
 
@@ -150,7 +151,7 @@ namespace stan {
        * @tparam T Type of value returned.
        */
       template <typename T>
-      bool bare(unsigned int n, T& x) const {
+      bool bare(size_t n, T& x) const {
         if (n >= bare_.size())
           return false;
         std::stringstream s(bare_[n]);
@@ -166,14 +167,14 @@ namespace stan {
        */
       void print(std::ostream& out) const {
         out << "COMMAND=" << cmd_ << '\n';
-        unsigned int flag_count = 0;
+        size_t flag_count = 0;
         for (std::set<std::string>::const_iterator it = flag_.begin();
              it != flag_.end();
              ++it) {
           out << "FLAG " << flag_count << "=" << (*it) << '\n';
           ++flag_count;
         }
-        unsigned int key_val_count = 0;
+        size_t key_val_count = 0;
         for (std::map<std::string,std::string>::const_iterator it = key_val_.begin();
              it != key_val_.end();
              ++it) {
@@ -181,8 +182,8 @@ namespace stan {
           out << " VAL " << key_val_count << "=" << (*it).second << '\n';
           ++key_val_count;
         }
-        unsigned int bare_count = 0;
-        for (unsigned int i = 0; i < bare_.size(); ++i) {
+        size_t bare_count = 0;
+        for (size_t i = 0; i < bare_.size(); ++i) {
           out << "BARE ARG " << bare_count << "=" << bare_[i] << '\n';
           ++bare_count;
         }

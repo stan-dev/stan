@@ -335,7 +335,7 @@ namespace stan {
      * @param v Specified vector.
      * @return Number of rows in the vector.
      */
-    inline unsigned int rows(const vector_v& v) {
+    inline size_t rows(const vector_v& v) {
       return v.size();
     }
     /**
@@ -344,7 +344,7 @@ namespace stan {
      * @param rv Specified vector.
      * @return Number of rows in the vector.
      */
-    inline unsigned int rows(const row_vector_v& rv) {
+    inline size_t rows(const row_vector_v& rv) {
       return 1;
     }
     /**
@@ -353,7 +353,7 @@ namespace stan {
      * @return Number of rows in the vector.
      * 
      */
-    inline unsigned int rows(const matrix_v& m) {
+    inline size_t rows(const matrix_v& m) {
       return m.rows();
     }
 
@@ -363,7 +363,7 @@ namespace stan {
      * @param v Specified vector.
      * @return Number of columns in the vector.
      */
-    inline unsigned int cols(const vector_v& v) {
+    inline size_t cols(const vector_v& v) {
       return 1;
     }
     /**
@@ -372,7 +372,7 @@ namespace stan {
      * @param rv Specified vector.
      * @return Number of columns in the vector.
      */
-    inline unsigned int cols(const row_vector_v& rv) {
+    inline size_t cols(const row_vector_v& rv) {
       return rv.size();
     }
     /**
@@ -380,7 +380,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Number of columns in the matrix.
      */
-    inline unsigned int cols(const matrix_v& m) {
+    inline size_t cols(const matrix_v& m) {
       return m.cols();
     }
 
@@ -1063,7 +1063,7 @@ namespace stan {
      * @param i Row index.
      * @return Specified row of the matrix.
      */
-    inline row_vector_v row(const matrix_v& m, unsigned int i) {
+    inline row_vector_v row(const matrix_v& m, size_t i) {
       return m.row(i);
     }
 
@@ -1073,7 +1073,7 @@ namespace stan {
      * @param j Column index.
      * @return Specified column of the matrix.
      */
-    inline vector_v col(const matrix_v& m, unsigned int j) {
+    inline vector_v col(const matrix_v& m, size_t j) {
       return m.col(j);
     }
 
@@ -1262,13 +1262,6 @@ namespace stan {
       return svd.singularValues();
     }      
 
-    namespace {
-
-      const unsigned int THIN_SVD_OPTIONS
-          = Eigen::ComputeThinU | Eigen::ComputeThinV;
-    
-    }
-
     /**
      * Assign the real components of a singular value decomposition
      * of the specified matrix to the specified references.  
@@ -1294,6 +1287,8 @@ namespace stan {
                     matrix_v& u,
                     matrix_v& v,
                     vector_v& s) {
+      static const unsigned int THIN_SVD_OPTIONS
+        = Eigen::ComputeThinU | Eigen::ComputeThinV;
       Eigen::JacobiSVD<matrix_v> svd(m, THIN_SVD_OPTIONS);
       u = svd.matrixU();
       v = svd.matrixV();

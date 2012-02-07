@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__DUMP_HPP__
 #define __STAN__IO__DUMP_HPP__
 
+#include <cstddef>
 #include <stdexcept>
 #include <map>
 #include <vector>
@@ -21,9 +22,9 @@ namespace stan {
   namespace io {
 
     namespace {
-       unsigned int product(std::vector<unsigned int> dims) {
-         unsigned int y = 1U;
-         for (unsigned int i = 0; i < dims.size(); ++i)
+       size_t product(std::vector<size_t> dims) {
+         size_t y = 1U;
+         for (size_t i = 0; i < dims.size(); ++i)
            y *= dims[i];
          return y;
        }
@@ -36,7 +37,7 @@ namespace stan {
 
       // checks doesn't contain quote char
       void write_name_equals(const std::string& name) {
-        for (unsigned int i = 0; i < name.size(); ++i)
+        for (size_t i = 0; i < name.size(); ++i)
           if (name.at(i) == '"')
             BOOST_THROW_EXCEPTION(
               std::invalid_argument ("name can not contain quote char"));
@@ -69,7 +70,7 @@ namespace stan {
       template <typename T>
       void write_list(T xs) {
         out_ << "c(";
-        for (unsigned int i = 0; i < xs.size(); ++i) {
+        for (size_t i = 0; i < xs.size(); ++i) {
           if (i > 0) out_ << ", ";
           write_val(xs[i]);
         }
@@ -78,7 +79,7 @@ namespace stan {
 
       template <typename T>
       void write_structure(std::vector<T> xs,
-                           std::vector<unsigned int> dims) {
+                           std::vector<size_t> dims) {
         out_ << "structure(";
         write_list(xs);
         out_ << ',' << '\n';
@@ -88,50 +89,50 @@ namespace stan {
       }
       
 
-      void dims(double x, std::vector<unsigned int> ds) {
+      void dims(double x, std::vector<size_t> ds) {
         // no op
       }
 
-      void dims(int x, std::vector<unsigned int> ds) {
+      void dims(int x, std::vector<size_t> ds) {
         // no op
       }
 
       template <typename T> 
       void dims(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> m, 
-                std::vector<unsigned int> ds) {
+                std::vector<size_t> ds) {
         ds.push_back(m.rows());
         ds.push_back(m.cols());
       }
 
       template <typename T> 
       void dims(Eigen::Matrix<T,Eigen::Dynamic,1> v, 
-                std::vector<unsigned int> ds) {
+                std::vector<size_t> ds) {
         ds.push_back(v.size());
       }
 
       template <typename T> 
       void dims(Eigen::Matrix<T,1,Eigen::Dynamic> rv, 
-                std::vector<unsigned int> ds) {
+                std::vector<size_t> ds) {
         ds.push_back(rv.size());
       }
 
       template <typename T> 
-      void dims(std::vector<T> x, std::vector<unsigned int> ds) {
+      void dims(std::vector<T> x, std::vector<size_t> ds) {
         ds.push_back(x.size());
         if (x.size() > 0)
           dims(x[0],ds);
       }
       
       template <typename T>
-      std::vector<unsigned int> dims(T x) {
-        std::vector<unsigned int> ds;
+      std::vector<size_t> dims(T x) {
+        std::vector<size_t> ds;
         dims(x,ds);
         return ds;
       }
 
-      bool increment(const std::vector<unsigned int>& dims,
-                     std::vector<unsigned int>& idx) {
-        for (unsigned int i = 0; i < dims.size(); ++i) {
+      bool increment(const std::vector<size_t>& dims,
+                     std::vector<size_t>& idx) {
+        for (size_t i = 0; i < dims.size(); ++i) {
           ++idx[i];
           if (idx[i] < dims[i]) return true;
           idx[i] = 0;
@@ -141,45 +142,45 @@ namespace stan {
 
       template <typename T>
       void write_stan_val(const std::vector<T>& x,
-                          const std::vector<unsigned int>& idx,
-                          const unsigned int pos) {
-        unsigned int next_pos = pos + 1;
+                          const std::vector<size_t>& idx,
+                          const size_t pos) {
+        size_t next_pos = pos + 1;
         write_stan_val(x[idx[pos]],idx,next_pos);
       }
       void write_stan_val(const std::vector<double>& x,
-                          const std::vector<unsigned int>& idx,
-                          const unsigned int pos) {
+                          const std::vector<size_t>& idx,
+                          const size_t pos) {
         write_val(x[idx[pos]]);
       }
       void write_stan_val(const std::vector<int>& x,
-                          const std::vector<unsigned int>& idx,
-                          const unsigned int pos) {
+                          const std::vector<size_t>& idx,
+                          const size_t pos) {
         write_val(x[idx[pos]]);
       }
       void write_stan_val(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x,
-                          const std::vector<unsigned int>& idx,
-                          const unsigned int pos) {
-        unsigned int next_pos = pos + 1;
+                          const std::vector<size_t>& idx,
+                          const size_t pos) {
+        size_t next_pos = pos + 1;
         write_val(x(idx[pos],idx[next_pos]));
       }
       void write_stan_val(const Eigen::Matrix<double,1,Eigen::Dynamic>& x,
-                          const std::vector<unsigned int>& idx,
-                          const unsigned int pos) {
+                          const std::vector<size_t>& idx,
+                          const size_t pos) {
         write_val(x[idx[pos]]);
       }
       void write_stan_val(const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-                          const std::vector<unsigned int>& idx,
-                          const unsigned int pos) {
+                          const std::vector<size_t>& idx,
+                          const size_t pos) {
         write_val(x[idx[pos]]);
       }
 
 
       template <typename T>
       void write_stan(const std::vector<T>& x) {
-        std::vector<unsigned int> dims = dims(x);
+        std::vector<size_t> dims = dims(x);
         out_ << "structure(c(";
-        std::vector<unsigned int> idx(dims.size(),0U);
-        for (unsigned int count = 0; true; ++count) {
+        std::vector<size_t> idx(dims.size(),0U);
+        for (size_t count = 0; true; ++count) {
           if (count > 0) out_ << ", ";
           write_stan_val(x,idx);
           if (!increment(dims,idx)) break;
@@ -210,8 +211,8 @@ namespace stan {
                                           Eigen::Dynamic,Eigen::Dynamic>& x) {
         out_ << "structure(c(";
         std::vector<double> vals;
-        for (unsigned int m = 0; m < x.cols(); ++m) {
-          for (unsigned int n = 0; n < x.rows(); ++n) {
+        for (size_t m = 0; m < x.cols(); ++m) {
+          for (size_t n = 0; n < x.rows(); ++n) {
             if (m > 0 || n > 0) out_ << ", ";
             write_val(x(m,n));
           }
@@ -277,7 +278,7 @@ namespace stan {
        */
       template <typename T>
       void dump_structure(std::string name,
-                          std::vector<unsigned int> dims,
+                          std::vector<size_t> dims,
                           std::vector<T> xs) {
         if (xs.size() != product(dims)) 
           BOOST_THROW_EXCEPTION(
@@ -371,7 +372,7 @@ namespace stan {
       std::string name_;
       std::vector<int> stack_i_;
       std::vector<double> stack_r_;
-      std::vector<unsigned int> dims_;
+      std::vector<size_t> dims_;
       std::istream& in_;
 
 
@@ -412,16 +413,16 @@ namespace stan {
       }
 
       bool scan_chars(std::string s) {
-        for (unsigned int i = 0; i < s.size(); ++i) {
+        for (size_t i = 0; i < s.size(); ++i) {
           char c;
           if (!(in_ >> c)) {
-            for (unsigned int j = 1; j < i; ++j) 
+            for (size_t j = 1; j < i; ++j) 
               in_.putback(s[i-j]);
             return false;
           }
           if (c != s[i]) {
             in_.putback(c);
-            for (unsigned int j = 1; j < i; ++j) 
+            for (size_t j = 1; j < i; ++j) 
               in_.putback(s[i-j]);
             return false;
           }
@@ -459,7 +460,7 @@ namespace stan {
             return false;
           stack_i_.push_back(n);
         } else {
-          for (unsigned int j = 0; j < stack_i_.size(); ++j)
+          for (size_t j = 0; j < stack_i_.size(); ++j)
             stack_r_.push_back(static_cast<double>(stack_i_[j]));
           stack_i_.clear();
           double x;
@@ -506,7 +507,7 @@ namespace stan {
         if (!scan_char('=')) return false;
         if (!scan_char('c')) return false;
         if (!scan_char('(')) return false;
-        unsigned int dim;
+        size_t dim;
         in_ >> dim;
         dims_.push_back(dim);
         while (scan_char(',')) {
@@ -562,7 +563,7 @@ namespace stan {
        *
        * @return Last dimensions.
        */
-      std::vector<unsigned int> dims() {
+      std::vector<size_t> dims() {
         return dims_;
       }
 
@@ -618,17 +619,17 @@ namespace stan {
       void print() {
         std::cout << "var name=|" << name_ << "|" << std::endl;
         std:: cout << "dims=(";
-        for (unsigned int i = 0; i < dims_.size(); ++i) {
+        for (size_t i = 0; i < dims_.size(); ++i) {
           if (i > 0)
             std::cout << ",";
           std::cout << dims_[i];
         }
         std::cout << ")" << std::endl;
         std::cout << "float stack:" << std::endl;
-        for (unsigned int i = 0; i < stack_r_.size(); ++i)
+        for (size_t i = 0; i < stack_r_.size(); ++i)
           std::cout << "  [" << i << "] " << stack_r_[i] << std::endl;
         std::cout << "int stack" << std::endl;
-        for (unsigned int i = 0; i < stack_i_.size(); ++i)
+        for (size_t i = 0; i < stack_i_.size(); ++i)
           std::cout << "  [" << i << "] " << stack_i_[i] << std::endl;
       }
 
@@ -654,13 +655,13 @@ namespace stan {
     private: 
       std::map<std::string, 
                std::pair<std::vector<double>,
-                         std::vector<unsigned int> > > vars_r_;
+                         std::vector<size_t> > > vars_r_;
       std::map<std::string, 
                std::pair<std::vector<int>, 
-                         std::vector<unsigned int> > > vars_i_;
+                         std::vector<size_t> > > vars_i_;
       std::vector<double> const empty_vec_r_;
       std::vector<int> const empty_vec_i_;
-      std::vector<unsigned int> const empty_vec_ui_;
+      std::vector<size_t> const empty_vec_ui_;
       /**
        * Return <code>true</code> if this dump contains the specified
        * variable name is defined in the real values. This method
@@ -688,13 +689,13 @@ namespace stan {
           if (reader.is_int()) {
             vars_i_[reader.name()] 
               = std::pair<std::vector<int>, 
-                          std::vector<unsigned int> >(reader.int_values(), 
+                          std::vector<size_t> >(reader.int_values(), 
                                                       reader.dims());
             
           } else {
             vars_r_[reader.name()] 
               = std::pair<std::vector<double>, 
-                          std::vector<unsigned int> >(reader.double_values(), 
+                          std::vector<size_t> >(reader.double_values(), 
                                                       reader.dims());
           }
         }
@@ -737,7 +738,7 @@ namespace stan {
         } else if (contains_i(name)) {
           std::vector<int> vec_int = (vars_i_.find(name)->second).first;
           std::vector<double> vec_r(vec_int.size());
-          for (unsigned int ii = 0; ii < vec_int.size(); ii++) {
+          for (size_t ii = 0; ii < vec_int.size(); ii++) {
             vec_r[ii] = vec_int[ii];
           }
           return vec_r;
@@ -752,7 +753,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Dimensions of variable.
        */
-      std::vector<unsigned int> dims_r(const std::string& name) const {
+      std::vector<size_t> dims_r(const std::string& name) const {
         if (contains_r_only(name)) {
           return (vars_r_.find(name)->second).second;
         } else if (contains_i(name)) {
@@ -782,7 +783,7 @@ namespace stan {
        * @param name Name of variable.
        * @return Dimensions of variable.
        */
-      std::vector<unsigned int> dims_i(const std::string& name) const {
+      std::vector<size_t> dims_i(const std::string& name) const {
         if (contains_i(name)) {
           return (vars_i_.find(name)->second).second;
         }
@@ -799,7 +800,7 @@ namespace stan {
         names.resize(0);        
         for (std::map<std::string, 
                       std::pair<std::vector<double>,
-                                std::vector<unsigned int> > >
+                                std::vector<size_t> > >
                  ::const_iterator it = vars_r_.begin();
              it != vars_r_.end(); ++it)
           names.push_back((*it).first);
@@ -815,7 +816,7 @@ namespace stan {
         names.resize(0);        
         for (std::map<std::string, 
                       std::pair<std::vector<int>, 
-                                std::vector<unsigned int> > >
+                                std::vector<size_t> > >
                  ::const_iterator it = vars_i_.begin();
              it != vars_i_.end(); ++it)
           names.push_back((*it).first);

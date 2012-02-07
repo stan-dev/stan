@@ -182,7 +182,7 @@ namespace stan {
 #include <ostream>
     void print_stack(std::ostream& o) {
       o << "STACK, size=" << var_stack_.size() << std::endl;
-      for (unsigned int i = 0; i < var_stack_.size(); ++i)
+      for (size_t i = 0; i < var_stack_.size(); ++i)
         o << i 
           << "  " << var_stack_[i]
           << "  " << ((vari*)var_stack_[i])->val_
@@ -404,7 +404,7 @@ namespace stan {
                 std::vector<double>& g) {
         stan::agrad::grad(vi_);
         g.resize(0);
-        for (size_t i = 0U; i < x.size(); ++i) 
+        for (size_t i = 0; i < x.size(); ++i) 
           g.push_back(x[i].vi_->adj_);
         recover_memory();
       }
@@ -727,20 +727,20 @@ namespace stan {
       // FIXME: memory leak -- copy vector to local memory
       class op_vector_vari : public vari {
       protected:
-        const unsigned int size_;
+        const size_t size_;
         vari** vis_;
       public:
         op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
           vari(f),
           size_(vs.size()) {
           vis_ = (vari**) operator new(sizeof(vari*[vs.size()]));
-          for (unsigned int i = 0; i < vs.size(); ++i)
+          for (size_t i = 0; i < vs.size(); ++i)
             vis_[i] = vs[i].vi_;
         }
-        vari* operator[](unsigned int n) const {
+        vari* operator[](size_t n) const {
           return vis_[n];
         }
-        unsigned int size() {
+        size_t size() {
           return size_;
         }
       };
@@ -2210,7 +2210,7 @@ namespace stan {
      * Reset all adjoint values in the stack to zero.
      */
     static void set_zero_all_adjoints() {
-      for (unsigned int i = 0; i < var_stack_.size(); ++i)
+      for (size_t i = 0; i < var_stack_.size(); ++i)
         var_stack_[i]->set_zero_adjoint();
     }
 
@@ -2244,13 +2244,13 @@ namespace stan {
                   std::vector<var>& independents,
                   std::vector<std::vector<double> >& jacobian) {
       jacobian.resize(dependents.size());
-      for (unsigned int i = 0U; i < dependents.size(); ++i) {
+      for (size_t i = 0; i < dependents.size(); ++i) {
         jacobian[i].resize(independents.size());
-        if (i > 0U) 
+        if (i > 0) 
           set_zero_all_adjoints();
-        jacobian.push_back(std::vector<double>(0U));
+        jacobian.push_back(std::vector<double>(0));
         grad(dependents[i].vi_);
-        for (unsigned int j = 0U; j < independents.size(); ++j)
+        for (size_t j = 0; j < independents.size(); ++j)
           jacobian[i][j] = independents[j].adj();
       }
     }

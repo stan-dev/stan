@@ -1,6 +1,7 @@
 #ifndef __STAN__PROB__TRANSFORM_HPP__
 #define __STAN__PROB__TRANSFORM_HPP__
 
+#include <cstddef>
 #include <stdexcept>
 #include <vector>
 #include <Eigen/Dense>
@@ -39,7 +40,7 @@ namespace stan {
                       Array<T,Dynamic,1>& sds,  // will fill this unbounded
                       const Matrix<T,Dynamic,Dynamic>& Sigma) {
 
-      unsigned int K = sds.rows();
+      size_t K = sds.rows();
 
       sds = Sigma.diagonal().array();
       if( (sds <= 0.0).any() ) return false;
@@ -56,8 +57,8 @@ namespace stan {
       if( !ldlt.isPositive() ) return false;
       Matrix<T,Dynamic,Dynamic> U = ldlt.matrixU();
 
-      unsigned int position = 0;
-      unsigned int pull = K - 1;
+      size_t position = 0;
+      size_t pull = K - 1;
 
       Array<T,Dynamic,1> temp = U.row(0).tail(pull);
       CPCs.head(pull) = temp;
@@ -65,7 +66,7 @@ namespace stan {
       Array<T,Dynamic,1> acc(K);
       acc(0) = -0.0;
       acc.tail(pull) = 1.0 - temp.square();
-      for(unsigned int i = 1; i < (K - 1); i++) {
+      for(size_t i = 1; i < (K - 1); i++) {
         position += pull;
         pull--;
         temp = U.row(i).tail(pull).array();
@@ -87,7 +88,7 @@ namespace stan {
      * correlation matrix itself when the determinant, inverse, etc. of the
      * correlation matrix is needed for some statistical calculation.
      *
-     * <p>See <code>read_corr_matrix(Array,unsigned int,T)</code>
+     * <p>See <code>read_corr_matrix(Array,size_t,T)</code>
      * for more information.
      *
      * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
@@ -99,20 +100,20 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
     read_corr_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-                const unsigned int K) {
+                const size_t K) {
       Array<T,Dynamic,1> temp;         // temporary holder
       Array<T,Dynamic,1> acc(K-1);     // accumlator of products
       acc.setOnes();
       Array<T,Dynamic,Dynamic> L(K,K); // Cholesky factor of correlation matrix
       L.setZero();
 
-      unsigned int position = 0;
-      unsigned int pull = K - 1;
+      size_t position = 0;
+      size_t pull = K - 1;
 
       L(0,0) = 1.0;
       L.col(0).tail(pull) = temp = CPCs.head(pull);
       acc.tail(pull) = 1.0 - temp.square();
-      for(unsigned int i = 1; i < (K - 1); i++) {
+      for(size_t i = 1; i < (K - 1); i++) {
         position += pull;
         pull--;
         temp = CPCs.segment(position, pull);
@@ -128,7 +129,7 @@ namespace stan {
      * Return the correlation matrix of the specified dimensionality 
      * corresponding to the specified canonical partial correlations.
      *
-     * <p>See <code>read_corr_matrix(Array,unsigned int,T)</code>
+     * <p>See <code>read_corr_matrix(Array,size_t,T)</code>
      * for more information.
      *
      * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
@@ -140,7 +141,7 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
     read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-                     const unsigned int K) {
+                     const size_t K) {
       Matrix<T,Dynamic,Dynamic> L = read_corr_L(CPCs, K);
       return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
     }
@@ -173,16 +174,16 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
     read_corr_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-                const unsigned int K,
+                const size_t K,
                 T& log_prob) {
 
-      unsigned int k = 0; 
-      unsigned int i = 0;
-      unsigned int counter = 0;
+      size_t k = 0; 
+      size_t i = 0;
+      size_t counter = 0;
       T log_1cpc2;
       T lead = K - 2.0;
       // no need to abs() because this Jacobian determinant is strictly positive (and triangular)
-      for (unsigned int j = 0; j < (CPCs.rows() - 1); j++) {
+      for (size_t j = 0; j < (CPCs.rows() - 1); j++) {
         // FIXME:  replace power 2
         log_1cpc2 = log(1.0 - pow(CPCs[counter], 2));
         log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
@@ -218,7 +219,7 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,Dynamic>
     read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-                     const unsigned int K,
+                     const size_t K,
                      T& log_prob) {
 
       Matrix<T,Dynamic,Dynamic> L = read_corr_L(CPCs, K, log_prob);
@@ -235,12 +236,12 @@ namespace stan {
     read_cov_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
                const Array<T,Dynamic,1>& sds,  // on (0,inf)
                T& log_prob) {
-      unsigned int K = sds.rows();
-      // unsigned int counter = 0;
+      size_t K = sds.rows();
+      // size_t counter = 0;
       const Array<T,Dynamic,1> log_sds = sds.log();
       // (diagonal and positive) Jacobian determinant for the mapping: correlations -> covariances
-      for (unsigned int i = 0; i < (K - 1); i++) {
-        for (unsigned int j = i + 1; j < K; j++) {
+      for (size_t i = 0; i < (K - 1); i++) {
+        for (size_t j = i + 1; j < K; j++) {
           // log_prob += log_sds(i,1) + log_sds(j,1); // throws assert trap
           log_prob += log_sds[i] + log_sds[j]; // OK
         }
@@ -276,7 +277,7 @@ namespace stan {
     read_cov_matrix(const Array<T,Dynamic,1>& CPCs,    // on (-1,1)
                     const Array<T,Dynamic,1>& sds) {   // on (0,inf)
 
-      unsigned int K = sds.rows();
+      size_t K = sds.rows();
       DiagonalMatrix<T,Dynamic> D(K);
       D.diagonal() = sds;
       Matrix<T,Dynamic,Dynamic> L = D * read_corr_L(CPCs, K);
@@ -292,7 +293,7 @@ namespace stan {
     template<typename T>
     const Array<T,Dynamic,1>
     make_nu(const T eta,             // hyperparameter on (0,inf), eta = 1 <-> correlation matrix is uniform
-            const unsigned int K) {  // number of variables in covariance matrix
+            const size_t K) {  // number of variables in covariance matrix
   
       Array<T,Dynamic,1> nu(K * (K - 1) / 2);
   
@@ -301,14 +302,14 @@ namespace stan {
       // distribution that generates a beta variate on (-1,1)
       T alpha2 = 2.0 * alpha; 
 
-      for (unsigned int j = 0; j < (K - 1); j++) {
+      for (size_t j = 0; j < (K - 1); j++) {
         nu(j) = alpha2;
       }
-      unsigned int counter = K - 1;
-      for (unsigned int i = 1; i < (K - 1); i++) {
+      size_t counter = K - 1;
+      for (size_t i = 1; i < (K - 1); i++) {
         alpha -= 0.5;
         alpha2 = 2.0 * alpha;
-        for (unsigned int j = i + 1; j < K; j++) {
+        for (size_t j = i + 1; j < K; j++) {
           nu(counter) = alpha2;
           counter++;
         }
@@ -932,7 +933,7 @@ namespace stan {
     Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& x) {
       Matrix<T,Dynamic,1> y(x.size() + 1);
       T max_x = x.maxCoeff();
-      for (unsigned int k = 0; k < x.size(); ++k)
+      for (size_t k = 0; k < x.size(); ++k)
         y[k] = exp(x[k] - max_x);
       y[x.size()] = exp(-max_x);
       return y / y.sum();
@@ -974,11 +975,11 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& x, T& lp) {
       Matrix<T,Dynamic,1> y(simplex_constrain(x));
-      unsigned int K_minus_1 = x.size();
+      size_t K_minus_1 = x.size();
       Matrix<T,Dynamic,Dynamic> J(K_minus_1,K_minus_1);
-      for (unsigned int m = 0; m < K_minus_1; ++m) {
+      for (size_t m = 0; m < K_minus_1; ++m) {
         J(m,m) = y[m] * (1.0 - y[m]);
-        for (unsigned int n = m+1; n < K_minus_1; ++n) {
+        for (size_t n = m+1; n < K_minus_1; ++n) {
           J(m,n) = (J(n,m) = y[m] * y[n]);
         }
       }
@@ -1004,7 +1005,7 @@ namespace stan {
         return false;
       if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
         return false;
-      for (unsigned int i = 0; i < y.size(); ++i) {
+      for (size_t i = 0; i < y.size(); ++i) {
         if (!(y[i] >= 0.0)) 
           return false;
       }
@@ -1037,10 +1038,10 @@ namespace stan {
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
       if(!simplex_validate(y))
         throw std::domain_error("y is not a valid simplex");
-      unsigned int k_minus_1 = y.size() - 1;
+      size_t k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
       Matrix<T,Dynamic,1> x(k_minus_1);
-      for (unsigned int i = 0; i < k_minus_1; ++i)
+      for (size_t i = 0; i < k_minus_1; ++i)
         x[i] = log(y[i]) - log_y_k_minus_1;
       return x;
     }
@@ -1064,11 +1065,11 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_constrain(const Matrix<T,Dynamic,1>& x) {
-      unsigned int k = x.size();
+      size_t k = x.size();
       Matrix<T,Dynamic,1> y(k);
       if (k > 0)
         y[0] = exp(x[0]);
-      for (unsigned int i = 1; i < k; ++i)
+      for (size_t i = 1; i < k; ++i)
         y[i] = y[i-1] + exp(x[i]);
       return y;
     }
@@ -1125,7 +1126,7 @@ namespace stan {
     bool pos_ordered_validate(const Matrix<T,Dynamic,1>& y) {
       if (y.size() == 0) return true;
       if (!(y[0] > 0.0)) return false;
-      for (unsigned int k = 1; k < y.size(); ++k) {
+      for (size_t k = 1; k < y.size(); ++k) {
         if (!(y[k] > y[k-1]))
           return false;
       }
@@ -1151,12 +1152,12 @@ namespace stan {
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
       if(!pos_ordered_validate(y)) 
         throw std::domain_error("y is not a vector of positive ordered scalars");
-      unsigned int k = y.size();
+      size_t k = y.size();
       Matrix<T,Dynamic,1> x(k);
       if (k == 0) 
         return x;
       x[0] = log(y[0]);
-      for (unsigned int i = 1; i < k; ++i)
+      for (size_t i = 1; i < k; ++i)
         x[i] = log(y[i] - y[i-1]);
       return x;
     }
@@ -1188,12 +1189,12 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x,
-                                                    unsigned int k) {
-      unsigned int k_choose_2 = (k * (k - 1)) / 2;
+                                                    size_t k) {
+      size_t k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
       Array<T,Dynamic,1> cpcs(k_choose_2);
-      for (unsigned int i = 0; i < k_choose_2; ++i)
+      for (size_t i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i]);
       return read_corr_matrix(cpcs,k); 
     }
@@ -1206,7 +1207,7 @@ namespace stan {
      * unconstrained (partial) correlations among the dimensions.
      *
      * <p>The transform is as specified for
-     * <code>corr_matrix_constrain(Matrix,unsigned int)</code>; the
+     * <code>corr_matrix_constrain(Matrix,size_t)</code>; the
      * paper it cites also defines the Jacobians for correlation inputs,
      * which are composed with the correlation constrained Jacobians 
      * defined in <code>corr_constrain(T,double)</code> for
@@ -1219,14 +1220,14 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-                                                    unsigned int k,
+                                                    size_t k,
                                                     T& lp) {
-      unsigned int k_choose_2 = (k * (k - 1)) / 2;
+      size_t k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
       
       Array<T,Dynamic,1> cpcs(k_choose_2);
-      for (unsigned int i = 0; i < k_choose_2; ++i)
+      for (size_t i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i],lp);
       return read_corr_matrix(cpcs,k,lp);
     }
@@ -1250,7 +1251,7 @@ namespace stan {
     bool corr_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
       if (!cov_matrix_validate(y))
         return false;
-      for (unsigned int k = 0; k < y.rows(); ++k) {
+      for (size_t k = 0; k < y.rows(); ++k) {
         if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
           return false;
       }
@@ -1262,7 +1263,7 @@ namespace stan {
      * specified correlation matrix when transformed.  
      *
      * <p>The constraining transform is defined as for
-     * <code>corr_matrix_constrain(Matrix,unsigned int)</code>.  The
+     * <code>corr_matrix_constrain(Matrix,size_t)</code>.  The
      * inverse transform in this function is simpler in that it only
      * needs to compute the \f$k \choose 2\f$ partial correlations
      * and then free those.
@@ -1279,16 +1280,16 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> corr_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
-      unsigned int k = y.rows();
+      size_t k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
-      unsigned int k_choose_2 = (k * (k-1)) / 2;
+      size_t k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> x(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(x,sds,y);
       if (!successful)
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
-      for (unsigned int i = 0; i < k; ++i) {
+      for (size_t i = 0; i < k; ++i) {
         // sds on log scale unconstrained
         if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
           BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
@@ -1308,7 +1309,7 @@ namespace stan {
      * \f$k\f$ are unconstrained standard deviations of the dimensions.
      *
      * <p>The transform scales the correlation matrix transform defined
-     * in <code>corr_matrix_constrain(Matrix,unsigned int)</code>
+     * in <code>corr_matrix_constrain(Matrix,size_t)</code>
      * with the constrained deviations.  
      * 
      * @param x Input vector of unconstrained partial correlations and
@@ -1320,14 +1321,14 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-                                                   unsigned int k) {
-      unsigned int k_choose_2 = (k * (k - 1)) / 2;
+                                                   size_t k) {
+      size_t k_choose_2 = (k * (k - 1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
-      for (unsigned int i = 0; i < k_choose_2; ++i)
+      for (size_t i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[pos++]);
       Array<T,Dynamic,1> sds(k);
-      for (unsigned int i = 0; i < k; ++i)
+      for (size_t i = 0; i < k; ++i)
         sds[i] = positive_constrain(x[pos++]);
       return read_cov_matrix(cpcs, sds);
     }
@@ -1338,12 +1339,12 @@ namespace stan {
      * values and increment the specified log probability reference
      * with the log absolute Jacobian determinant.  
      *
-     * <p>The transform is defined as for <code>cov_matrix_constrain(Matrix,unsigned int)</code>.
+     * <p>The transform is defined as for <code>cov_matrix_constrain(Matrix,size_t)</code>.
      *
      * <p>The log absolute Jacobian determinant is derived by
      * composing the log absolute Jacobian determinant for the
      * underlying correlation matrix as defined in
-     * <code>cov_matrix_constrain(Matrix,unsigned int,T&)</code> with
+     * <code>cov_matrix_constrain(Matrix,size_t,T&)</code> with
      * the Jacobian of the transfrom of the correlation matrix
      * into a covariance matrix by scaling by standard deviations.
      * 
@@ -1357,15 +1358,15 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-                                                   unsigned int k, 
+                                                   size_t k, 
                                                    T& lp) {
-      unsigned int k_choose_2 = (k * (k - 1)) / 2;
+      size_t k_choose_2 = (k * (k - 1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
-      for (unsigned int i = 0; i < k_choose_2; ++i)
+      for (size_t i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[pos++]);
       Array<T,Dynamic,1> sds(k);
-      for (unsigned int i = 0; i < k; ++i)
+      for (size_t i = 0; i < k; ++i)
         sds[i] = positive_constrain(x[pos++]);
       return read_cov_matrix(cpcs, sds, lp);
     }
@@ -1381,12 +1382,12 @@ namespace stan {
      */
     template <typename T>
     bool symmetry_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      unsigned int k = y.rows();
+      size_t k = y.rows();
       if (k == 1)
         return true;
       
-      for (unsigned int m = 0; m < k; ++m) {
-        for (unsigned int n = m + 1; n < k; ++n) {
+      for (size_t m = 0; m < k; ++m) {
+        for (size_t n = m + 1; n < k; ++n) {
           if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
             return false;
         }
@@ -1474,7 +1475,7 @@ namespace stan {
      * deviations that transform to the specified covariance matrix.
      *
      * <p>The constraining transform is defined as for
-     * <code>cov_matrix_constrain(Matrix,unsigned int)</code>.  The
+     * <code>cov_matrix_constrain(Matrix,size_t)</code>.  The
      * inverse first factors out the deviations, then applies the
      * freeing transfrom of <code>corr_matrix_free(Matrix&)</code>.
      *
@@ -1489,20 +1490,20 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> cov_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
-      unsigned int k = y.rows();
+      size_t k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
-      unsigned int k_choose_2 = (k * (k-1)) / 2;
+      size_t k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(cpcs,sds,y);
       if (!successful)
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       Matrix<T,Dynamic,1> x(k_choose_2 + k);
-      unsigned int pos = 0;
-      for (unsigned int i = 0; i < k_choose_2; ++i)
+      size_t pos = 0;
+      for (size_t i = 0; i < k_choose_2; ++i)
         x[pos++] = cpcs[i];
-      for (unsigned int i = 0; i < k; ++i)
+      for (size_t i = 0; i < k; ++i)
         x[pos++] = sds[i];
       return x;
     }

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <stdexcept>
 #include <complex>
 
@@ -1807,7 +1808,7 @@ TEST(agrad_matrix,transpose_vector) {
 
   row_vector_v a_tr = transpose(a);
   EXPECT_EQ(a.size(),a_tr.size());
-  for (unsigned int i = 0; i < 3; ++i)
+  for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
 
   VEC g = cgradvec(a_tr(1),x);
@@ -1823,7 +1824,7 @@ TEST(agrad_matrix,transpose_row_vector) {
 
   vector_v a_tr = transpose(a);
   EXPECT_EQ(a.size(),a_tr.size());
-  for (unsigned int i = 0; i < 3; ++i)
+  for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
 
   VEC g = cgradvec(a_tr(1),x);
@@ -1869,8 +1870,8 @@ TEST(agrad_matrix,inverse_val) {
 TEST(agrad_matrix,inverse_grad) {
   using stan::maths::inverse;
   
-  for (unsigned int k = 0; k < 2; ++k) {
-    for (unsigned int l = 0; l < 2; ++l) {
+  for (size_t k = 0; k < 2; ++k) {
+    for (size_t l = 0; l < 2; ++l) {
 
       matrix_v ad(2,2);
       ad << 2.0, 3.0, 
@@ -1914,7 +1915,7 @@ TEST(agrad_matrix,inverse_inverse_sum) {
 
   VEC g = cgradvec(a_inv_inv_sum,x);
 
-  for (unsigned int k = 0; k < x.size(); ++k)
+  for (size_t k = 0; k < x.size(); ++k)
     EXPECT_FLOAT_EQ(1.0,g[k]);
 }
 

@@ -20,17 +20,17 @@ namespace stan {
      */
     class prob_grad {
     protected:
-      unsigned int num_params_r__;
+      size_t num_params_r__;
       std::vector<std::pair<int,int> > param_ranges_i__;
 
     public:
 
-      prob_grad(unsigned int num_params_r)
+      prob_grad(size_t num_params_r)
         : num_params_r__(num_params_r),
           param_ranges_i__(std::vector<std::pair<int,int> >(0)) {
       }
 
-      prob_grad(unsigned int num_params_r,
+      prob_grad(size_t num_params_r,
                 std::vector<std::pair<int,int> >& param_ranges_i)
         : num_params_r__(num_params_r),
           param_ranges_i__(param_ranges_i) { 
@@ -38,7 +38,7 @@ namespace stan {
 
       virtual ~prob_grad() { }
 
-      void set_num_params_r(unsigned int num_params_r) {
+      void set_num_params_r(size_t num_params_r) {
         num_params_r__ = num_params_r;
       }
 
@@ -46,39 +46,39 @@ namespace stan {
         param_ranges_i__ = param_ranges_i;
       }
 
-      virtual unsigned int num_params_r() {
+      virtual size_t num_params_r() {
         return num_params_r__;
       }
 
-      virtual unsigned int num_params_i() {
+      virtual size_t num_params_i() {
         return param_ranges_i__.size();
       }
 
-      inline std::pair<int,int> param_range_i(unsigned int idx) {
+      inline std::pair<int,int> param_range_i(size_t idx) {
         return param_ranges_i__[idx];
       }
 
-      inline void set_param_range_i_lower(unsigned int idx, int low) {
+      inline void set_param_range_i_lower(size_t idx, int low) {
         param_ranges_i__[idx].first = low;
       }
 
-      inline void set_param_range_i_upper(unsigned int idx, int up) {
+      inline void set_param_range_i_upper(size_t idx, int up) {
         param_ranges_i__[idx].second = up;
       }
 
-      inline int param_range_i_lower(unsigned int idx) {
+      inline int param_range_i_lower(size_t idx) {
         return param_ranges_i__[idx].first;
       }
 
-      inline int param_range_i_upper(unsigned int idx) {
+      inline int param_range_i_upper(size_t idx) {
         return param_ranges_i__[idx].second;
       }
 
       virtual void init(std::vector<double>& params_r, 
                         std::vector<int>& params_i) {
-        for (unsigned int i = 0; i < num_params_r(); ++i)
+        for (size_t i = 0; i < num_params_r(); ++i)
           params_r[i] = 0.0;
-        for (unsigned int j = 0; j < num_params_i(); ++j)
+        for (size_t j = 0; j < num_params_i(); ++j)
           params_i[j] = param_range_i_lower(j);
       }
 
@@ -89,7 +89,7 @@ namespace stan {
       virtual double log_prob(std::vector<double>& params_r, 
                               std::vector<int>& params_i) = 0;
 
-      virtual double log_prob_star(unsigned int idx, 
+      virtual double log_prob_star(size_t idx, 
                                    int val,
                                    std::vector<double>& params_r,
                                    std::vector<int>& params_i) {
@@ -123,9 +123,9 @@ namespace stan {
                              std::vector<int>& params_i,
                              std::ostream& o) {
         stan::io::csv_writer writer(o);
-        for (unsigned int i = 0; i < params_i.size(); ++i)
+        for (size_t i = 0; i < params_i.size(); ++i)
           writer.write(params_i[i]);
-        for (unsigned int i = 0; i < params_r.size(); ++i)
+        for (size_t i = 0; i < params_r.size(); ++i)
           writer.write(params_r[i]);
         writer.newline();
       }
@@ -145,17 +145,17 @@ namespace stan {
       void test_gradients(std::vector<double>& params_r,
                           std::vector<int>& params_i,
                           double epsilon = 1e-6) {
-	std::vector<double> gradient;
-	double logp = grad_log_prob(params_r, params_i, gradient);
-	std::vector<double> perturbed = params_r;
-	for (unsigned int k = 0; k < params_r.size(); k++) {
-	  perturbed[k] += epsilon;
-	  double logp2 = log_prob(perturbed, params_i);
-	  double gradest = (logp2 - logp) / epsilon;
-	  fprintf(stderr, "testing gradient[%d]:  %f computed vs. %f estimated (off by %e)\n",
-		  k, gradient[k], gradest, gradient[k] - gradest);
-	  perturbed[k] = params_r[k];
-	}
+        std::vector<double> gradient;
+        double logp = grad_log_prob(params_r, params_i, gradient);
+        std::vector<double> perturbed = params_r;
+        for (size_t k = 0; k < params_r.size(); k++) {
+          perturbed[k] += epsilon;
+          double logp2 = log_prob(perturbed, params_i);
+          double gradest = (logp2 - logp) / epsilon;
+          fprintf(stderr, "testing gradient[%d]:  %f computed vs. %f estimated (off by %e)\n",
+                  k, gradient[k], gradest, gradient[k] - gradest);
+          perturbed[k] = params_r[k];
+        }
       }
 
     };

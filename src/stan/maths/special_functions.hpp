@@ -286,7 +286,7 @@ namespace stan {
         if(x.size() == 0)
           BOOST_THROW_EXCEPTION(std::invalid_argument ("x must have at least one element"));
         Scalar max_x(x[0]);
-        for (unsigned int i = 1; i < x.size(); ++i)
+        for (size_t i = 1; i < x.size(); ++i)
           if (x[i] < max_x)
             max_x = x[i];
         return max_x;
@@ -349,9 +349,9 @@ namespace stan {
         BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
       Scalar sum(0.0); 
       Scalar max_x = maximum<Vector,Scalar>(x);
-      for (unsigned int i = 0; i < x.size(); ++i)
+      for (size_t i = 0; i < x.size(); ++i)
         sum += (simplex[i] = exp(x[i]-max_x));
-      for (unsigned int i = 0; i < x.size(); ++i)
+      for (size_t i = 0; i < x.size(); ++i)
         simplex[i] /= sum;
     }
 
@@ -382,7 +382,7 @@ namespace stan {
     void inverse_softmax(const Vector& simplex, Vector& y) {
       if(simplex.size() != y.size())
         BOOST_THROW_EXCEPTION(std::invalid_argument ("simplex.size() != y.size()"));
-      for (unsigned int i = 0; i < simplex.size(); ++i)
+      for (size_t i = 0; i < simplex.size(); ++i)
         y[i] = log(simplex[i]);
     }
 
@@ -535,12 +535,12 @@ namespace stan {
       using std::log;
       using std::exp;
       double max = -numeric_limits<double>::infinity();
-      for (unsigned int ii = 0; ii < x.size(); ii++) 
+      for (size_t ii = 0; ii < x.size(); ii++) 
         if (x[ii] > max) 
           max = x[ii];
             
       double sum = 0.0;
-      for (unsigned int ii = 0; ii < x.size(); ii++) 
+      for (size_t ii = 0; ii < x.size(); ii++) 
         if (x[ii] != -numeric_limits<double>::infinity()) 
           sum += exp(x[ii] - max);
           

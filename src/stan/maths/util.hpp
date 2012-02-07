@@ -20,7 +20,7 @@ namespace stan {
     inline double dot(std::vector<double>& x,
                       std::vector<double>& y) {
       double sum = 0.0;
-      for (unsigned int i = 0; i < x.size(); ++i)
+      for (size_t i = 0; i < x.size(); ++i)
         sum += x[i] * y[i];
       return sum;
     }
@@ -28,7 +28,7 @@ namespace stan {
     // x' * x
     inline double dot_self(std::vector<double>& x) {
       double sum = 0.0;
-      for (unsigned int i = 0; i < x.size(); ++i)
+      for (size_t i = 0; i < x.size(); ++i)
         sum += x[i] * x[i];
       return sum;
     }
@@ -37,21 +37,21 @@ namespace stan {
     inline void scaled_add(std::vector<double>& x, 
                            std::vector<double>& y,
                            double lambda) {
-      for (unsigned int i = 0; i < x.size(); ++i)
+      for (size_t i = 0; i < x.size(); ++i)
         x[i] += lambda * y[i];
     }
 
     inline void sub(std::vector<double>& x, std::vector<double>& y,
                     std::vector<double>& result) {
       result.resize(x.size());
-      for (unsigned int i = 0; i < x.size(); ++i)
+      for (size_t i = 0; i < x.size(); ++i)
         result[i] = x[i] - y[i];
     }
 
     inline double dist(const std::vector<double>& x, const std::vector<double>& y) {
       using std::sqrt;
       double result = 0;
-      for (unsigned int i = 0; i < x.size(); ++i) {
+      for (size_t i = 0; i < x.size(); ++i) {
         double diff = x[i] - y[i];
         result += diff * diff;
       }
@@ -60,14 +60,14 @@ namespace stan {
 
     inline double sum_vec(std::vector<double> x) {
       double sum = x[0];
-      for (unsigned int i = 1; i < x.size(); ++i)
+      for (size_t i = 1; i < x.size(); ++i)
         sum += x[i];
       return sum;
     }
 
     inline double max_vec(std::vector<double> x) {
       double max = x[0];
-      for (unsigned int i = 1; i < x.size(); ++i)
+      for (size_t i = 1; i < x.size(); ++i)
         if (x[i] > max)
           max = x[i];
       return max;

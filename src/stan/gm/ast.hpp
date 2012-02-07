@@ -4,6 +4,8 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
+#include <cstddef>
+#include <limits>
 #include <climits>
 #include <iostream>
 #include <map>
@@ -88,7 +90,7 @@ namespace stan {
 
     struct expr_type {
       base_expr_type base_type_;
-      unsigned int num_dims_;
+      size_t num_dims_;
       expr_type() 
         : base_type_(ILL_FORMED_T),
           num_dims_(0) { 
@@ -98,7 +100,7 @@ namespace stan {
           num_dims_(0) {
       }
       expr_type(const base_expr_type base_type,
-                unsigned int num_dims) 
+                size_t num_dims) 
         : base_type_(base_type),
           num_dims_(num_dims) {
       }
@@ -127,7 +129,7 @@ namespace stan {
       base_expr_type type() const {
         return base_type_;
       }
-      unsigned int num_dims() const {
+      size_t num_dims() const {
         return num_dims_;
       }
     };
@@ -302,13 +304,13 @@ namespace stan {
         add(name,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
       }
 
-      unsigned int num_promotions(const std::vector<expr_type>& call_args,
-                                  const std::vector<expr_type>& sig_args) {
+      int num_promotions(const std::vector<expr_type>& call_args,
+                         const std::vector<expr_type>& sig_args) {
         if (call_args.size() != sig_args.size()) {
           return -1; // failure
         }
-        int num_promotions = 0U;
-        for (unsigned int i = 0; i < call_args.size(); ++i) {
+        int num_promotions = 0;
+        for (size_t i = 0; i < call_args.size(); ++i) {
           if (call_args[i] == sig_args[i]) {
             continue;
           } else if (call_args[i].is_primitive_int()
@@ -336,18 +338,18 @@ namespace stan {
                                 const std::vector<expr_type>& args) {
 
         std::vector<function_signature_t> signatures = sigs_map_[name];
-        unsigned int match_index = 0U; 
-        unsigned int min_promotions = UINT_MAX; 
-        unsigned int num_matches = 0U;
+        size_t match_index = 0; 
+        size_t min_promotions = std::numeric_limits<size_t>::max(); 
+        size_t num_matches = 0;
 
-        for (unsigned int i = 0; i < signatures.size(); ++i) {
+        for (size_t i = 0; i < signatures.size(); ++i) {
           int promotions = num_promotions(args,signatures[i].second);
           if (promotions < 0) continue; // no match
-          unsigned int promotions_ui = static_cast<unsigned int>(promotions);
+          size_t promotions_ui = static_cast<size_t>(promotions);
           if (promotions_ui < min_promotions) {
             min_promotions = promotions_ui;
             match_index = i;
-            num_matches = 1U;
+            num_matches = 1;
           } else if (promotions_ui == min_promotions) {
             ++num_matches;
           }
@@ -355,7 +357,7 @@ namespace stan {
 
         if (num_matches == 1) {
           return signatures[match_index].first;
-        } else if (num_matches == 0U) {
+        } else if (num_matches == 0) {
           std::cerr << "no matches for function name=\"" << name << "\"" 
                     << std::endl;
         } else {
@@ -363,7 +365,7 @@ namespace stan {
                     << min_promotions << " integer promotions "
                     << "for function name=\"" << name << "\"" << std::endl;
         }
-        for (unsigned int i = 0; i < args.size(); ++i)
+        for (size_t i = 0; i < args.size(); ++i)
           std::cerr << "    arg " << i << " type=" << args[i] << std::endl;
         return expr_type(); // ill-formed dummy
       }
@@ -513,7 +515,7 @@ namespace stan {
       variable() { }
       variable(std::string name) : name_(name) { }
       void set_type(const base_expr_type& base_type, 
-                    unsigned int num_dims) {
+                    size_t num_dims) {
         type_ = expr_type(base_type, num_dims);
       }
       std::string name_;
@@ -540,16 +542,16 @@ namespace stan {
       expr_type type_;
     };
     
-    unsigned int total_dims(const std::vector<std::vector<expression> >& dimss) {
-      unsigned int total = 0U;
-      for (unsigned int i = 0; i < dimss.size(); ++i)
+    size_t total_dims(const std::vector<std::vector<expression> >& dimss) {
+      size_t total = 0U;
+      for (size_t i = 0; i < dimss.size(); ++i)
         total += dimss[i].size();
       return total;
     }
 
     expr_type infer_type_indexing(const base_expr_type& expr_base_type,
-                                  unsigned int num_expr_dims,
-                                  unsigned int num_index_dims) {
+                                  size_t num_expr_dims,
+                                  size_t num_index_dims) {
       if (num_index_dims <= num_expr_dims)
         return expr_type(expr_base_type,num_expr_dims - num_index_dims);
       if (num_index_dims == (num_expr_dims + 1)) {
@@ -571,7 +573,7 @@ namespace stan {
     }
 
     expr_type infer_type_indexing(const expression& expr,
-                                  unsigned int num_index_dims) {
+                                  size_t num_index_dims) {
       return infer_type_indexing(expr.expression_type().base_type_,
                                  expr.expression_type().num_dims(),
                                  num_index_dims);
@@ -718,7 +720,7 @@ namespace stan {
       base_expr_type get_base_type(const std::string& name) const {
         return get(name).base_type_;
       }
-      unsigned int get_num_dims(const std::string& name) const {
+      size_t get_num_dims(const std::string& name) const {
         return get(name).dims_.size();
       }
       var_origin get_origin(const std::string& name) const {
