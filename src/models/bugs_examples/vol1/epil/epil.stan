@@ -4,8 +4,6 @@
 # 
 
 
-## status: not work (Mon Dec 19 18:08:33 EST 2011)
-##         error thrown out 
 data {
   int(0,) N; 
   int(0,) T; 
@@ -36,8 +34,8 @@ parameters {
 }
 
 transformed parameters {
-  double sigma_b; 
-  double sigma_b1; 
+  double(0,) sigma_b; 
+  double(0,) sigma_b1; 
   sigma_b <- sqrt(sigmasq_b); 
   sigma_b1 <- sqrt(sigmasq_b1); 
 } 
@@ -64,3 +62,12 @@ model {
     }
   }
 }
+
+generated quantities {
+  double alpha0; 
+  # re-calculate intercept on original scale:
+  alpha0 <- a0 - alpha_Base * log_Base4_bar - alpha_Trt * Trt_bar
+            - alpha_BT * BT_bar - alpha_Age * log_Age_bar - alpha_V4 * V4_bar; 
+
+} 
+
