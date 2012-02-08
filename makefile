@@ -30,7 +30,7 @@ endif
 ## --------------------------------
 
 # find all unit tests
-UNIT_TESTS := $(shell find src/test/ -type f -name '*_test.cpp')
+UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
 UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 
@@ -62,6 +62,12 @@ test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp
 	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
 	$@ --gtest_output="xml:$@.xml"
 
+test/models/basic_distributions/% : src/test/models/basic_distributions/%_test.cpp ar/libgtest.a
+	@echo '================================================================================'
+	@echo '================================================================================'
+	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
+	$@ --gtest_output="xml:$@.xml"
+
 # run all tests
 test-all: $(UNIT_TESTS_OBJ) #demo/gm
 	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
@@ -78,9 +84,14 @@ test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
 # =========================================================
 # find all bugs models
 BUGS_MODELS = $(subst src/,,$(wildcard src/models/bugs_examples/vol*/*/*.stan))
+BASIC_MODELS = $(subst src/,,$(wildcard src/models/basic_distributions/*.stan))
+.PHONY: test-bugs
+test-bugs: $(BUGS_MODELS) | demo/gm models
 
-.PHONY: test-models
-test-models: $(BUGS_MODELS) | demo/gm models
+.PHONY: test-basic
+test-basic: $(BASIC_MODELS) | demo/gm models
+	@echo $(BASIC_MODELS)
+
 
 models:
 	mkdir -p models

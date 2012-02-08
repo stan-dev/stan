@@ -732,6 +732,23 @@ namespace stan {
      * @param v Specified vector.
      * @return Sample variance of vector.
      */
+    template <typename T>
+    inline double variance(const std::vector<T>& v) {
+      T v_mean = mean(v);
+      T sum_sq_diff = 0;
+      for (int i = 0; i < v.size(); ++i) {
+        T diff = v[i] - v_mean;
+        sum_sq_diff += diff * diff;
+      }
+      return sum_sq_diff / (v.size() - 1);
+    }
+
+    /**
+     * Returns the sample variance (divide by length - 1) of the
+     * coefficients in the specified column vector.
+     * @param v Specified vector.
+     * @return Sample variance of vector.
+     */
     inline double variance(const vector_d& v) {
       double mean = v.mean();
       double sum_sq_diff = 0;
@@ -772,6 +789,17 @@ namespace stan {
         }
       }
       return sum_sq_diff / (m.size() - 1);
+    }
+
+    /**
+     * Returns the unbiased sample standard deviation of the
+     * coefficients in the specified column vector.
+     * @param v Specified vector.
+     * @return Sample variance of vector.
+     */
+    template <typename T>
+    inline double sd(const std::vector<T>& v) {
+      return sqrt(variance(v));
     }
 
     /**
