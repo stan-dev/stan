@@ -38,9 +38,9 @@ TO DO FOR V1
   - basic distro site
   - check cross-platform compilation:
      + goal: make OS={win,linux,mac} CC={clang++,g++} O=0
+     + remove useless warnings
 
-* speed tests relative to BUGS
-
+ * speed tests relative to BUGS
 
 
 CLEANUP (ONGOING)
