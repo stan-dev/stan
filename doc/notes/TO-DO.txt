@@ -6,8 +6,17 @@ TO DO FOR V1
   - compute lp__ and sampling statements for output
 
 * stop NUTS from running away without coming back
+  -- limit number of steps
+     + command-line param
+     + instrumenting NUTS loops (adaptation, leapfrog)
+  -- limit time
+     + start recording time at beginning, check loops inside
+  -- bomb with report if exceed these steps
+  -- print out adaptation phase step size 
+  -- print out number of steps (average and sd?)
+     (bring in Boost accumulator package)
 
-* HMC Sampler
+* ???? HMC Sampler ????
   - set step size, number of steps
   - allowing random variation +/-%
   - tune step size (optional)
@@ -18,16 +27,23 @@ TO DO FOR V1
   - what about multinomial with constraints?
 
 * remaining doc
- - API doc
- - reference manual
- - getting started guide
- - R interface
+  - API doc
+  - reference manual
+  - getting started guide
+  - R interface
 
 * distribution engineering
- - eliminate tabs from code
- - tarball
- - basic distro site
- - check cross-platform compilation
+  - eliminate tabs from code
+  - tarball
+  - basic distro site
+  - check cross-platform compilation
+
+* cumulative densities and derivatives for truncations
+  - Qijiang's getting started list:
+    Normal, Exponential, Weibull, Log-normal, Gamma.
+
+* speed tests relative to BUGS
+
 
 
 CLEANUP (ONGOING)
@@ -47,6 +63,9 @@ CLEANUP (ONGOING)
   - typedefs for matrix, vector, row vector
   - simplify model includes with higher-level ones
   - chart out remaining deps
+
+* convert for loops with size bounds to approp iterators
+
 
 Stan-R
 =================================================
@@ -85,6 +104,14 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* precompiled headers for model compilation speed
+
+* auto testing of sampler
+  - Cook/Gelman/Rubin-style interval tests
+  - needs effective sample size calc to bound intervals
+  - needs simulated parameters to test estimators
+  - push ESS "measurement error" through the interval tests
+
 * error/exception policy throughout
   - maths
 
@@ -106,16 +133,9 @@ EXTENSIONS
   - check that my algebra's right
   - specialize to Cholesky factor instead of Sigma
 
-* figure out some way to have var constants
-  - const would prohibit many of their unwanted uses, like
-    assignment
-  - can't afford virtual function lookup on adjoint props
-
 * deal with autocorrelation model params where require
   all roots of 1 - SUM_i rho[i]**i to be within unit
   complex circle
-
-* convert for loops with size bounds to approp iterators
 
 * make sure std::less<T*> and std::swap<T*> 
   does right thing for our types (like var and vari), as
@@ -149,20 +169,6 @@ EXTENSIONS
   analytic derivative
 
 * smallest posterior interval (SPIn) as default 
-
-* complement to the current foo<false> propto, so that
-  normal_log<false>(...)
-    = normal_log_adj_propto(...) + normal_log<true>(...)
-
-* merging and monitoring several threads/processes
-
-* remove all [] Eigen vector accesses and replace with ()
-  the range check for which is configurable through the -NDEBUG 
-  compiler option
-
-* precompiled headers for model compilation speed
-
-* cumulative densities and derivatives for truncations
 
 * reparameterize simplex transform using hyperspherical coordinates
   - use Weirstrass trick to avoid numerical trig
@@ -208,6 +214,7 @@ EXTENSIONS
 
 * threading
   - rewrite memory arena as thread-local object
+  - merging and monitoring several threads/processes
 
 * interface to Python
 
@@ -323,8 +330,6 @@ EXTENSIONS
 
 * auto convergence monitoring -- just keep doubling (or other ratio)
 
-* parallel random number generation necessary for MCMC?
-
 * cut out last derivative step in leapfrog if not nec.
   - only saves if very small number of leapfrog steps
 
@@ -363,14 +368,11 @@ EXTENSIONS
   - less space for constants, equal for unary, more for binary+
   - no virtual ops
 
+Longer-Term Ideas
+=================================================
+
 * code gen auto-dif
   - just for Stan GM models
-
-* could template stan::agrad::var with <unsigned int n>
-  indicating thread.  typedef var to var<0>
-  - runs in multiple threads with no speed overhead
-  - code bloat multiples code size by # of threads
-    + may in turn slow down everything due to mem traffic
 
 * lazy init for var
   - if vari* is accessed and empty, return new var(0) equiv.
@@ -378,6 +380,14 @@ EXTENSIONS
 
 * elim stan/maths/matrix lib by adding implicit ctor
   for Matrix<var,...> based on Matrix<double,...>
+
+* could template stan::agrad::var with <unsigned int n>
+  indicating thread.  typedef var to var<0>
+  - runs in multiple threads with no speed overhead
+  - code bloat multiples code size by # of threads
+    + may in turn slow down everything due to mem traffic
+
+
 
 Stan GM MANUAL
 =================================================
