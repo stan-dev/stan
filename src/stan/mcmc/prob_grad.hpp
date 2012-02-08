@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <stdio.h>
 
 #include <stan/io/csv_writer.hpp>
 
