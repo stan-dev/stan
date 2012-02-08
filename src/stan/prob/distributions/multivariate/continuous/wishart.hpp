@@ -7,7 +7,9 @@
 #include <stan/prob/traits.hpp>
 
 namespace stan {
+
   namespace prob {
+
     // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite; 
     //                          Sigma.dims() = Omega.dims();
     //                           n > Sigma.rows() - 1]
@@ -43,7 +45,8 @@ namespace stan {
               class Policy = stan::maths::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
-                const T_dof& nu,const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
+                const T_dof& nu,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                 const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
@@ -53,7 +56,8 @@ namespace stan {
 
       unsigned int k = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp;
-      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", &lp, Policy()))
+      if (!check_greater_or_equal(function, nu, k - 1, 
+                                  "Degrees of freedom, nu,", &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
         return lp;
@@ -71,19 +75,25 @@ namespace stan {
       using stan::maths::trace;
 
       lp = 0.0;
-      if (include_summand<propto,T_y,T_dof>::value)
+      if (include_summand<propto,T_dof>::value)
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;
-      if (include_summand<propto,T_y,T_dof>::value)
+
+      if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
+
       if (include_summand<propto,T_dof,T_scale>::value)
-        lp -= multiply_log(0.5*nu, determinant(S));
+        lp -= multiply_log(0.5 * nu, determinant(S)); 
+
       if (include_summand<propto,T_scale,T_y>::value)
         lp -= 0.5 * fabs(trace(multiply(inverse(S), W)));
-      if (include_summand<propto,T_y,T_dof,T_scale>::value) {
-        if (nu != (k + 1))
-          lp += 0.5 * multiply_log(nu-k-1.0, determinant(W));
+
+      if (include_summand<propto,T_y,T_dof>::value) {
+        if (nu != (k + 1)) {
+          lp += multiply_log(0.5 * (nu - (k + 1.0)), determinant(W));
+          // lp += 0.5 * (nu - (k + 1.0)) * log(determinant(W));
+        }
       }
-      
+
       return lp;
     }
 
