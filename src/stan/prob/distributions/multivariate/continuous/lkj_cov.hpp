@@ -24,22 +24,31 @@ namespace stan {
                 const typename stan::maths::EigenType<T_scale>::vector& sigma,
                 const T_shape& eta,
                 const Policy& = Policy()) {
-      static const std::string function = "lkj_cov_log<%1>";
+      static const char* function = "stan::prob::lkj_cov_log<%1%>(%1%)";
       
       using stan::maths::check_size_match;
       using stan::maths::check_finite;
+      using stan::maths::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
-      if (!check_size_match(function, y.rows(), mu.size(), &lp, Policy()))
+      if (!check_size_match(function, mu.rows(), sigma.rows(), &lp, Policy()))
         return lp;
+      if (!check_size_match(function, mu.rows(), y.rows(), &lp, Policy()))
+        return lp;
+      if (!check_positive(function, eta, "eta", &lp, Policy()))
+	return lp;
       if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, sigma, "Scale parameter, sigma", &lp, Policy()))
+        return lp;      
+      if (!check_finite(function, y, "Covariance matrix, y", &lp, Policy()))
         return lp;
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds = y.diagonal().array().sqrt();
       for(unsigned int k = 0; k < K; k++) {
-        lp += lognormal_log<propto>(log(sds(k,1)), mu(k,1), sigma(k,1));
+        lp += lognormal_log<propto>(sds(k), mu(k), sigma(k));
       }
       if(eta == 1.0) {
         // no need to rescale y into a correlation matrix
@@ -63,19 +72,24 @@ namespace stan {
                 const T_scale& sigma, 
                 const T_shape& eta, 
                 const Policy& = Policy()) {
-      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::lkj_cov_log<%1%>(%1%)";
 
       using stan::maths::check_finite;
+      using stan::maths::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
+      if (!check_positive(function, eta, "eta", &lp, Policy()))
+	return lp;
       if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, sigma, "Scale parameter, sigma", &lp, Policy()))
         return lp;
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds = y.diagonal().array().sqrt();
       for(unsigned int k = 0; k < K; k++) {
-        lp += lognormal_log<propto>(sds(k,1), mu, sigma);
+        lp += lognormal_log<propto>(sds(k), mu, sigma);
       }
       if(eta == 1.0) {
         lp += lkj_corr_log<propto>(y,eta); // no need to rescale y into a correlation matrix

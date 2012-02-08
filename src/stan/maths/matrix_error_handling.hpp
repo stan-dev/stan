@@ -38,6 +38,27 @@ namespace stan {
     }
 
 
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                              const char* name,
+                              T_result* result,
+                              const Policy& /*pol*/) {
+      for (int i = 0; i < y.rows(); i++) {
+	for (int j = 0; j < y.cols(); j++) {
+	  if (boost::math::isnan(y(i,j))) {
+	    std::ostringstream message;
+	    message << name << "[" << i << "," << j << "] is %1%, but must not be nan!";
+	    *result = policies::raise_domain_error<T_y>(function,
+                                              message.str().c_str(),
+                                              y(i,j), Policy());
+	    return false;
+	  }
+        }
+      }
+      return true;
+    }
+
 
     template <typename T_y, typename T_result, class Policy>
     inline bool check_finite(const char* function,
@@ -80,6 +101,25 @@ namespace stan {
       return true;
     }
 
+    template <typename T_covar, typename T_result, class Policy>
+    inline bool check_corr_matrix(const char* function,
+                                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+                                 T_result* result,
+                                 const Policy& /*pol*/) {
+      if (!stan::prob::corr_matrix_validate(Sigma)) {
+        std::ostringstream stream;
+        stream << "Sigma is not a valid correlation matrix."
+               << "Sigma must be symmetric and positive semi-definite with ones on its diagonal. Sigma: \n" 
+               << Sigma
+               << "\nSigma(0,0): %1%";
+        *result = policies::raise_domain_error<T_covar>(function,
+                                              stream.str().c_str(), 
+                                              Sigma(0,0),
+                                              Policy());
+        return false;
+      }
+      return true;
+    }
 
     template <typename T_result, typename T_size1, typename T_size2, class Policy>
     inline bool check_size_match(const char* function,
