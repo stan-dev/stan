@@ -88,3 +88,7 @@ TEST(ProbDistributionsLognormal,ErrnoPolicy) {
   result = lognormal_log(y,mu,inf, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
+TEST(ProbDistributionsLognormal,Cumulative) {
+  EXPECT_FLOAT_EQ(0.4687341, stan::prob::lognormal_p(1.2,0.3,1.5));
+  EXPECT_FLOAT_EQ(0.2835506, stan::prob::lognormal_p(12.0,3.0,0.9));
+}

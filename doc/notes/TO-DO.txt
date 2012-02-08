@@ -36,11 +36,8 @@ TO DO FOR V1
   - eliminate tabs from code
   - tarball
   - basic distro site
-  - check cross-platform compilation
-
-* cumulative densities and derivatives for truncations
-  - Qijiang's getting started list:
-    Normal, Exponential, Weibull, Log-normal, Gamma.
+  - check cross-platform compilation:
+     + goal: make OS={win,linux,mac} CC={clang++,g++} O=0
 
 * speed tests relative to BUGS
 
