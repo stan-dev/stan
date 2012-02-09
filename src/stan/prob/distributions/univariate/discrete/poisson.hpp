@@ -17,15 +17,15 @@ namespace stan {
 
       static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
       
-      using stan::maths::check_finite;
+      using stan::maths::check_not_nan;
       using stan::maths::check_nonnegative;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_rate>::type lp;
       if (!check_nonnegative(function, n, "Number n", &lp, Policy()))
         return lp;
-      if (!check_finite(function, lambda,
-                        "Rate parameter, lambda,", &lp, Policy()))
+      if (!check_not_nan(function, lambda,
+                         "Rate parameter, lambda,", &lp, Policy()))
         return lp;
       if (!check_nonnegative(function, lambda,
                              "Rate parameter, lambda,", &lp, Policy()))
@@ -35,7 +35,9 @@ namespace stan {
         return LOG_ZERO;
       
       using stan::maths::multiply_log;
-      
+      if (std::isinf(lambda))
+        return LOG_ZERO;
+
       lp = 0.0;
       if (include_summand<propto>::value)
         lp -= lgamma(n + 1.0);

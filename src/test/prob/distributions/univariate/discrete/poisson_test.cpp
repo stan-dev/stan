@@ -5,6 +5,7 @@ TEST(ProbDistributionsPoisson,Poisson) {
   EXPECT_FLOAT_EQ(-2.900934, stan::prob::poisson_log(17,13.0));
   EXPECT_FLOAT_EQ(-145.3547, stan::prob::poisson_log(192,42.0));
   EXPECT_FLOAT_EQ(-3.0, stan::prob::poisson_log(0, 3.0));
+  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log(0, std::numeric_limits<double>::infinity()));
   EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log (0, 0.0));
 }
 TEST(ProbDistributionsPoisson,Propto) {
@@ -38,13 +39,13 @@ TEST(ProbDistributionsPossion,DefaultPolicy) {
   unsigned int n = 4;
   double lambda = 3.0;
   
-  EXPECT_NO_THROW(poisson_log(n, lambda));
+  EXPECT_NO_THROW(poisson_log(n, lambda)); 
   EXPECT_NO_THROW(poisson_log(n, 0.0));
+  EXPECT_NO_THROW(poisson_log(n, inf));
   
   EXPECT_THROW(poisson_log(n, nan), std::domain_error);
   EXPECT_THROW(poisson_log(n, -1.0), std::domain_error);
   EXPECT_THROW(poisson_log(n, -inf), std::domain_error);
-  EXPECT_THROW(poisson_log(n, inf), std::domain_error);
 }
 TEST(ProbDistributionsPossion,ErrnoPolicy) {
   double nan = std::numeric_limits<double>::quiet_NaN();
@@ -58,13 +59,13 @@ TEST(ProbDistributionsPossion,ErrnoPolicy) {
   EXPECT_FALSE(std::isnan(result));
   result = poisson_log(n, 0.0, errno_policy());
   EXPECT_FALSE(std::isnan(result));
+  result = poisson_log(n, inf, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
   
   result = poisson_log(n, nan, errno_policy());
   EXPECT_TRUE(std::isnan(result));
   result = poisson_log(n, -1.0, errno_policy());
   EXPECT_TRUE(std::isnan(result));
   result = poisson_log(n, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = poisson_log(n, inf, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
