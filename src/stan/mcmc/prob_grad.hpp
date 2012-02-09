@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__PROB_GRAD_HPP__
 #define __STAN__MCMC__PROB_GRAD_HPP__
 
+#include <iomanip>
 #include <limits>
 #include <stdexcept>
 #include <utility>
