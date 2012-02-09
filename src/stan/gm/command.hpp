@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -111,8 +112,13 @@ namespace stan {
       std::cout << "Set random number generation seed" << std::endl;
       std::cout << std::endl;
 
-      pad_help_option("--inits=<file>");
-      std::cout << "Use initial values from specialized file"
+      pad_help_option("--chain_id=<int>");
+      std::cout << "Set chain identifier" << std::endl;
+      pad_help_option();
+      std::cout << "  (default = 1)" << std::endl;
+
+      pad_help_option("--init=<file>");
+      std::cout << "Use initial values from specified file or zero values if <file>=0"
                 << std::endl;
       pad_help_option();
       std::cout << "    (default is random initialization)" << std::endl;
@@ -183,11 +189,6 @@ namespace stan {
     }
 
     template <typename T_model>
-    void test_gradients(const T_model& model) {
-      
-    }
-
-    template <typename T_model>
     int nuts_command(int argc, const char* argv[]) {
 
       stan::io::cmd_line command(argc,argv);
@@ -205,14 +206,8 @@ namespace stan {
 
       T_model model(data_var_context);
 
-      if (command.has_flag("test_grad")) {
-        model.test_gradients_random(1e-6,std::cout);
-        return 0;
-      }
-
       std::string sample_file = "samples.csv";
       command.val("samples",sample_file);
-      std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
       
       unsigned int num_iterations = 2000U;
       command.val("iter",num_iterations);
@@ -237,17 +232,72 @@ namespace stan {
           std::string seed_val;
           command.val("seed",seed_val);
           std::cerr << "value for seed must be integer"
-                    << "found value=" << seed_val << std::endl;
+                    << "; found value=" << seed_val << std::endl;
           return -1;
         }
       } else {
         random_seed = std::time(0);
       }
 
-      boost::mt19937 base_rng(random_seed);
+      int chain_id = 1;
+      if (command.has_key("chain_id")) {
+        bool well_formed = command.val("chain_id",chain_id);
+        if (!well_formed || chain_id < 0) {
+          std::string chain_id_val;
+          command.val("chain_id",chain_id_val);
+          std::cerr << "value for chain_id must be positive integer"
+                    << "; found chain_id=" << chain_id_val
+                    << std::endl;
+          return -1;
+        }
+      }
+      
+      // FASTER, but no parallel guarantees
+      // typedef boost::mt19937 rng_t;
+      // rng_t base_rng(static_cast<unsigned int>(random_seed + chain_id - 1);
+
+      typedef boost::ecuyer1988 rng_t;
+      rng_t base_rng(chain_random_seed);
+      // (2**50 = 1T samples, 1000 chains)
+      static boost::uintmax_t DISCARD_STRIDE = 1 << 50;  
+      base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
+      
+      std::vector<int> params_i;
+      std::vector<double> params_r;
+
+      std::string init_val;
+      // parameter initialization
+      if (command.has_key("init")) {
+        command.val("init",init_val);
+        if (init_val == "0") {
+          params_i = std::vector<int>(model.num_params_i(),0);
+          params_r = std::vector<double>(model.num_params_r(),0.0);
+        } else {
+          std::cout << "init file=" << init_val << std::endl;
+        
+          std::fstream init_stream(init_val.c_str(),std::fstream::in);
+          stan::io::dump init_var_context(init_stream);
+          init_stream.close();
+          model.transform_inits(init_var_context,params_i,params_r);
+        }
+      } else {
+        init_val = "random initialization";
+        // init_rng generates uniformly from -2 to 2
+        boost::random::uniform_real_distribution<double> 
+          init_range_distribution(-2.0,2.0);
+        boost::variate_generator<rng_t&, 
+                       boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng,init_range_distribution);
+
+        params_i = std::vector<int>(model.num_params_i(),0);
+        params_r = std::vector<double>(model.num_params_r());
+        for (size_t i = 0; i < params_r.size(); ++i)
+          params_r[i] = init_rng();
+      }
 
       std::cout << "NUTS" << std::endl;
       std::cout << "sample_file=" << sample_file << std::endl;
+      std::cout << "init=" << init_val << std::endl;
       std::cout << "num_iterations=" << num_iterations << std::endl;
       std::cout << "num_burnin=" << num_burnin << std::endl;
       std::cout << "num_thin=" << num_thin << std::endl;
@@ -257,44 +307,24 @@ namespace stan {
                             ? "user specified"
                             : "randomly generated") << ")"
                 << std::endl;
+      std::cout << "chain id=" << chain_id
+                << " (" << (command.has_key("seed")
+                            ? "user specified"
+                            : "randomly generated") << ")"
+                << std::endl;
 
-      std::vector<int> params_i;
-      std::vector<double> params_r;
-
-      // parameter initialization
-      if (command.has_key("init")) {
-        std::string init_path;
-        command.val("init",init_path);
-        std::cout << "init file=" << init_path << std::endl;
-        
-        std::fstream init_stream(init_path.c_str(),std::fstream::in);
-        stan::io::dump init_var_context(init_stream);
-        init_stream.close();
-        model.transform_inits(init_var_context,params_i,params_r);
-
-      } else if (command.has_key("zero_init")) {
-        // FIXME:  default to random inits rather than 0s
-        params_i = std::vector<int>(model.num_params_i(),0);
-        params_r = std::vector<double>(model.num_params_r(),0.0);
-      } else {
-        // init_rng generates uniformly from -2 to 2
-        boost::random::uniform_real_distribution<double> 
-          init_range_distribution(-2.0,2.0);
-        boost::variate_generator<boost::mt19937&, 
-                                 boost::random::uniform_real_distribution<double> >
-          init_rng(base_rng,init_range_distribution);
-
-        params_i = std::vector<int>(model.num_params_i(),0);
-        params_r = std::vector<double>(model.num_params_r());
-        for (size_t i = 0; i < params_r.size(); ++i)
-          params_r[i] = init_rng();
+      if (command.has_flag("test_grad")) {
+        std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
+        model.test_gradients(params_r,params_i);
+        return 0;
       }
 
+      std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
       model.write_csv_header(sample_file_stream);
       int it_print_width = std::ceil(std::log10(num_iterations));
       std::cout << std::endl;
 
-      stan::mcmc::nuts<> sampler(model, delta, -1, base_rng);
+      stan::mcmc::nuts<rng_t> sampler(model, delta, -1, base_rng);
       sampler.adapt_on();
       for (unsigned int m = 0; m < num_iterations; ++m) {
         if (do_print(m,refresh)) {

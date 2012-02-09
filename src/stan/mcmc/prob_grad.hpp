@@ -180,13 +180,15 @@ namespace stan {
         finite_diff_grad(params_r,params_i,grad_fd,epsilon);
 
         o << std::endl
-          << std::setw(8) << "param k"
+          << std::setw(10) << "param idx"
+          << std::setw(16) << "value"
           << std::setw(16) << "model"
           << std::setw(16) << "finite diff"
           << std::setw(16) << "error" 
           << std::endl;
         for (size_t k = 0; k < params_r.size(); k++) {
-          o << std::setw(8) << k
+          o << std::setw(10) << k
+            << std::setw(16) << params_r[k]
             << std::setw(16) << grad[k]
             << std::setw(16) << grad_fd[k]
             << std::setw(16) << (grad[k] - grad_fd[k])
