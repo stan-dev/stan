@@ -3,15 +3,40 @@
 
 #include <cstddef>
 #include <map>
+#include <iostream>
+#include <ostream>
 #include <set>
 #include <sstream>
 #include <vector>
-#include <ostream>
 
 namespace stan {
 
   namespace io {
     
+    /**
+     * Print 2 spaces, the specified help option, then pad
+     * to the specified width with spaces.  If there is not
+     * room for at least 2 padding spaces, start a new line
+     * and pad out to width.
+     *
+     * @param option Option to print (default to empty string).
+     * @param width Width of option (defaults to 20).
+     * @param o Output stream (defaults to <code>std::cout</code>).
+     */
+    void pad_help_option(const std::string& option = "",
+                         unsigned int width = 20,
+                         std::ostream& o = std::cout) {
+      o << "  " << option;
+      int padding = width - option.size();
+      if (padding < 2) {
+        o << std::endl;
+        padding = width + 2; // 2 is 
+      }
+      for (int i = 0; i < padding; ++i)
+        o << ' ';
+    }
+
+
     /**
      * The <code>cmd_line</code> class parses and stores command-line
      * arguments.

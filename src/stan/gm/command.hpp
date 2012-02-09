@@ -78,13 +78,15 @@ namespace stan {
       sample_file_stream.close();
     }
 
-    void pad_help_option(std::string option) {
-      std::cout << "  " << option;
-      for (unsigned int i = option.size(); i < 20; ++i)
-        std::cout << ' ';
-    }
+    // void pad_help_option(std::string option) {
+    //   std::cout << "  " << option;
+    //   for (unsigned int i = option.size(); i < 20; ++i)
+    //     std::cout << ' ';
+    // }
 
     void print_nuts_help(std::string cmd) {
+      using stan::io::pad_help_option;
+
       std::cout << std::endl;
       std::cout << "Compiled Stan Graphical Model Command" << std::endl;
       std::cout << std::endl;
@@ -101,7 +103,7 @@ namespace stan {
 
       pad_help_option("--data=<file>");
       std::cout << "Read data from specified dump-format file" << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "  (required if model declares data)" << std::endl;
       std::cout << std::endl;
 
@@ -112,47 +114,47 @@ namespace stan {
       pad_help_option("--inits=<file>");
       std::cout << "Use initial values from specialized file"
                 << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default is random initialization)" << std::endl;
       std::cout << std::endl;
 
       pad_help_option("--iter=<+int>");
       std::cout << "Total number of iterations, including burn in"
                 << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default = 2000)" << std::endl;
       std::cout << std::endl;
       
       pad_help_option("--burnin=<+int>");
       std::cout << "Discard the specified number of initial samples"
                 << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default = iter / 2)" << std::endl;
       std::cout << std::endl;
 
       pad_help_option("--thin=<+int>");
       std::cout << "Period between saved samples after burn in" << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default = max(1, floor(iter - burnin) / 1000))"
                 << std::endl;
       std::cout << std::endl;
       
       pad_help_option("--delta=<+float>");
       std::cout << "Initial parameter for NUTS step-size tuning." << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default = 0.5)" << std::endl;
       std::cout << std::endl;
 
       pad_help_option("--samples=<file>");
       std::cout << "File into which samples are written." << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default = samples.csv)" << std::endl;
       std::cout << std::endl;
 
       pad_help_option("--append_samples");
       std::cout << "Append samples to existing samples file if it exists"
                 << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default erases existing samples file before writing)"
                 << std::endl;
       std::cout << std::endl;
@@ -160,8 +162,14 @@ namespace stan {
       pad_help_option("--refresh=<+int>");
       std::cout << "Period between samples producing progress output" 
                 << std::endl;
-      pad_help_option("");
+      pad_help_option();
       std::cout << "    (default = max(1,iter/200))" << std::endl;
+      std::cout << std::endl;
+
+      pad_help_option("--test_grad");
+      std::cout << "Test gradient calculations using finite differences"
+                << std::endl;
+      
       std::cout << std::endl;
     }
 
@@ -172,6 +180,11 @@ namespace stan {
     bool do_print(int n, int refresh) {
       return do_print(refresh)
         && ((n + 1) % refresh == 0);
+    }
+
+    template <typename T_model>
+    void test_gradients(const T_model& model) {
+      
     }
 
     template <typename T_model>
@@ -191,6 +204,11 @@ namespace stan {
       data_stream.close();
 
       T_model model(data_var_context);
+
+      if (command.has_flag("test_grad")) {
+        model.test_gradients_random(1e-6,std::cout);
+        return 0;
+      }
 
       std::string sample_file = "samples.csv";
       command.val("samples",sample_file);

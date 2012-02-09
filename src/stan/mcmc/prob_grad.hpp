@@ -133,6 +133,31 @@ namespace stan {
 
 
       /**
+       * Compute the gradient using finite differences for
+       * the specified parameters, writing the result into the
+       * specified gradient, using the specified perturbation.
+       *
+       * @param params_r Real-valued parameters.
+       * @param params_i Integer-valued parameters.
+       * @params grad Vector into which gradient is written.
+       */
+      void finite_diff_grad(std::vector<double>& params_r,
+                            std::vector<int>& params_i,
+                            std::vector<double>& grad,
+                            double epsilon = 1e-6) {
+        std::vector<double> perturbed(params_r);
+        double logp = grad_log_prob(params_r, params_i, grad);
+        grad.resize(params_r.size());
+        for (size_t k = 0; k < params_r.size(); k++) {
+          perturbed[k] += epsilon;
+          double logp2 = log_prob(perturbed, params_i);
+          double gradest = (logp2 - logp) / epsilon;
+          grad[k] = gradest;
+          perturbed[k] = params_r[k]; 
+        }
+      }
+
+      /**
        * Test the grad_log_prob() function's ability to produce
        * accurate gradients using finite differences.  This shouldn't
        * be necessary when using autodiff, but is useful for finding
@@ -145,19 +170,47 @@ namespace stan {
        */
       void test_gradients(std::vector<double>& params_r,
                           std::vector<int>& params_i,
-                          double epsilon = 1e-6) {
-        std::vector<double> gradient;
-        double logp = grad_log_prob(params_r, params_i, gradient);
-        std::vector<double> perturbed = params_r;
+                          double epsilon = 1e-6,
+                          std::ostream& o = std::cout) {
+        std::vector<double> grad;
+        grad_log_prob(params_r,params_i,grad);
+
+        std::vector<double> grad_fd;
+        finite_diff_grad(params_r,params_i,grad_fd,epsilon);
+
+        o << std::endl
+          << std::setw(8) << "param k"
+          << std::setw(16) << "model"
+          << std::setw(16) << "finite diff"
+          << std::setw(16) << "error" 
+          << std::endl;
         for (size_t k = 0; k < params_r.size(); k++) {
-          perturbed[k] += epsilon;
-          double logp2 = log_prob(perturbed, params_i);
-          double gradest = (logp2 - logp) / epsilon;
-          fprintf(stderr, "testing gradient[%d]:  %f computed vs. %f estimated (off by %e)\n",
-                  k, gradient[k], gradest, gradient[k] - gradest);
-          perturbed[k] = params_r[k];
+          o << std::setw(8) << k
+            << std::setw(16) << grad[k]
+            << std::setw(16) << grad_fd[k]
+            << std::setw(16) << (grad[k] - grad_fd[k])
+            << std::endl;
         }
       }
+
+      /**
+       * Test gradients computed by finite differences against those
+       * computed by the model, using random initialization for
+       * real and integer parameters.
+       *
+       * @param epsilon Finite d
+       */
+      void test_gradients_random(double epsilon = 1e-6,
+                                 std::ostream& o = std::cout) {
+        std::vector<double> params_r(num_params_r());
+        std::vector<int> params_i(num_params_i());
+        for (size_t i = 0; i < params_r.size(); ++i)
+          params_r[i] = 0.0; // FIXME:  randomize
+        for (size_t i = 0; i < params_i.size(); ++i)
+          params_i[i] = 0;   // FIXME:  randomize, keep in range
+        test_gradients(params_r,params_i,epsilon,o);
+      }
+                                 
 
     };
   }
