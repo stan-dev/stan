@@ -89,8 +89,7 @@ namespace stan {
 
       if (include_summand<propto,T_y,T_dof>::value) {
         if (nu != (k + 1)) {
-          lp += multiply_log(0.5 * (nu - (k + 1.0)), determinant(W));
-          // lp += 0.5 * (nu - (k + 1.0)) * log(determinant(W));
+          lp += multiply_log(0.5 * (nu - k - 1.0), determinant(W));
         }
       }
 

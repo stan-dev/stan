@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <sstream>
 #include <vector>
 #include <Eigen/Dense>
 #include <boost/multi_array.hpp>
@@ -179,13 +180,15 @@ namespace stan {
 
       size_t k = 0; 
       size_t i = 0;
-      size_t counter = 0;
       T log_1cpc2;
-      T lead = K - 2.0;
-      // no need to abs() because this Jacobian determinant is strictly positive (and triangular)
-      for (size_t j = 0; j < (CPCs.rows() - 1); j++) {
-        // FIXME:  replace power 2
-        log_1cpc2 = log(1.0 - pow(CPCs[counter], 2));
+      double lead = K - 2.0; 
+      // no need to abs() because this Jacobian determinant 
+      // is strictly positive (and triangular)
+      // skip last row (odd indexing) because it adds nothing by design
+      for (size_t j = 0; j < (CPCs.rows() - 1); ++j) {
+        using stan::maths::log1m;
+        using stan::maths::square;
+        log_1cpc2 = log1m(square(CPCs[j]));
         log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
         i++;
         if (i > K) {
@@ -193,7 +196,6 @@ namespace stan {
           i = k + 1;
           lead = K - k - 1.0;
         }
-        counter++;
       }
       return read_corr_L(CPCs, K);
     }
@@ -1292,8 +1294,12 @@ namespace stan {
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       for (size_t i = 0; i < k; ++i) {
         // sds on log scale unconstrained
-        if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
+        if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE) {
+          std::stringstream s;
+          s << "all standard deviations must be zero."
+            << " found log(sd[" << i << "])=" << sds[i] << std::endl;
+          BOOST_THROW_EXCEPTION(std::runtime_error(s.str()));
+        }
       }
       return x.matrix();
     }
@@ -1365,10 +1371,10 @@ namespace stan {
       Array<T,Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
       for (size_t i = 0; i < k_choose_2; ++i)
-        cpcs[i] = corr_constrain(x[pos++]);
+        cpcs[i] = corr_constrain(x[pos++],lp);
       Array<T,Dynamic,1> sds(k);
       for (size_t i = 0; i < k; ++i)
-        sds[i] = positive_constrain(x[pos++]);
+        sds[i] = positive_constrain(x[pos++],lp);
       return read_cov_matrix(cpcs, sds, lp);
     }
 
