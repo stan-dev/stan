@@ -246,6 +246,7 @@ namespace stan {
           log_prob += log_sds[i] + log_sds[j]; // OK
         }
       }
+      log_prob += 2.0 * log_sds[K - 1];
 
       DiagonalMatrix<T,Dynamic> D(K);
       D.diagonal() = sds;
