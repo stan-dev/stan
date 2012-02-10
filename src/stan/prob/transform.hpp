@@ -186,7 +186,7 @@ namespace stan {
       for (size_t j = 0; j < (CPCs.rows() - 1); j++) {
         // FIXME:  replace power 2
         log_1cpc2 = log(1.0 - pow(CPCs[counter], 2));
-        log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
+        log_prob -= lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
         i++;
         if (i > K) {
           k++;
