@@ -13,5 +13,5 @@ parameters {
   cov_matrix(3) W; 
 } 
 model {
-  W ~ wishart(4, S); 
+  W ~ wishart(5, S); 
 } 
