@@ -166,19 +166,3 @@ TEST(ProbDistributionsWishart,ErrnoPolicy) {
   result = wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
-
-TEST(ProbDistroWishart,chiSqEquiv) {
-  double s = 1.9;
-  double w = 2.5;
-  double nu = 2.0;
-
-  Matrix<double,Dynamic,Dynamic> Sigma(1,1);
-  Sigma(0,0) = s;
-  Matrix<double,Dynamic,Dynamic> W(1,1);
-  W(0,0) = w;
-
-  
-
-  EXPECT_FLOAT_EQ(stan::prob::chi_square_log<false>(w, nu/2.0, 1.0/(2.0 * w)),
-                  stan::prob::wishart_log(W,nu,Sigma));
-}
