@@ -241,7 +241,7 @@ namespace stan {
       const Array<T,Dynamic,1> log_sds = sds.log();
       // (diagonal and positive) Jacobian determinant for the mapping: correlations -> covariances
       for (size_t i = 0; i < (K - 1); i++) {
-        for (size_t j = i + 1; j < K; j++) {
+        for (size_t j = i; j < K; j++) {
           // log_prob += log_sds(i,1) + log_sds(j,1); // throws assert trap
           log_prob += log_sds[i] + log_sds[j]; // OK
         }
