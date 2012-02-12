@@ -58,7 +58,7 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 test/%$(EXE) : test/%.o
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(LINK.c) $(CFLAGS_GTEST) $(LIBGTEST) $(GTEST_MAIN) $(OUTPUT_OPTION) $< 
+	$(LINK.c) $(CFLAGS_GTEST) $(GTEST_MAIN) $(LIBGTEST) $(OUTPUT_OPTION) $< 
 	$@ --gtest_output="xml:$@.xml"
 
 .PRECIOUS: test/%.o
