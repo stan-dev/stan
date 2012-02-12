@@ -26,8 +26,9 @@ ifeq (clang++,$(CC_TYPE))
 endif
 
 CC_GM = cl
-CFLAGS_GM = /EHsc /I src /I lib /link
+CFLAGS_GM = /EHsc /I src /I lib
 OUTPUT_OPTION_GM = /OUT:$@
+LDFLAGS_GM = /link
 
 UNIT_TESTS_TO_EXCLUDE := test/agrad/matrix test/gm/parser 
 UNIT_TESTS_TO_EXCLUDE += $(subst _test.cpp,,$(shell cd src; find test/agrad/distributions -type f -name '*_test.cpp'))
