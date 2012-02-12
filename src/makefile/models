@@ -20,6 +20,7 @@ models/%.cpp : src/models/%.stan | demo/gm$(EXE)
 	@echo '--- Translating Stan graphical model to C++ code ---'
 	cat $^ | demo/gm$(EXE) > $@
 
+.PRECIOUS: models/%.o
 models/%.o : models/%.cpp
 	@mkdir -p $(dir $@)
 	@echo ''
