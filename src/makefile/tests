@@ -1,0 +1,87 @@
+##
+# LIBGTEST is the google test library
+# GTEST_MAIN is the file that contains the google test
+##
+LIBGTEST := test/libgtest.a
+GTEST_MAIN := lib/gtest/src/gtest_main.cc
+
+##
+# Target to build unit tests. All unit tests are in src/test 
+# and are named *_test.cpp
+##
+UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
+UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
+
+.PHONY: test-unit
+test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
+	set -e;\
+	$(foreach test,$(UNIT_TESTS), \
+	  echo '------------------------------------------------------------';\
+	  $(test) --gtest_output="xml:$(test).xml";)
+
+##
+# Target to build bugs models
+##
+BUGS_EXAMPLES := $(shell cd src; find models/bugs_examples -type f -name '*.stan')
+BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
+
+.PHONY: test-bugs
+test-bugs: $(BUGS_EXAMPLES)
+
+##
+# Target to build all tests
+##
+.PHONY: test-all
+test-all: test-unit
+
+
+##
+# Build the google test library.
+## 
+$(LIBGTEST): $(LIBGTEST)(test/gtest.o)
+
+test/gtest.o: lib/gtest/src/gtest-all.cc
+	@mkdir -p test
+	$(COMPILE.c) $(CFLAGS_GTEST) $(OUTPUT_OPTION) $<
+
+
+##
+# Generate autodependencies for test files.
+# Adapted from the gnu make manual.
+# http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
+##
+
+##
+# Builds a single test
+##
+test/%$(EXE) : test/%.o
+	@mkdir -p $(dir $@)
+	@echo '------------------------------------------------------------'
+	$(LINK.c) $(CFLAGS_GTEST) $(LIBGTEST) $(GTEST_MAIN) $(OUTPUT_OPTION) $< 
+	$@ --gtest_output="xml:$@.xml"
+
+.PRECIOUS: test/%.o
+test/%.o : src/test/%_test.cpp $(LIBGTEST)
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) $(CFLAGS_GTEST) $(OUTPUT_OPTION) $<
+
+##
+# Rule for generating dependencies.
+##
+test/%.d : src/test/%_test.cpp
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+##
+# If the target is a unit test, include .d. 
+# Will generate dependencies.
+##
+ifeq (test-unit,$(MAKECMDGOALS))
+  -include $(addsuffix .d,$(UNIT_TESTS))
+endif
+ifneq (,$(filter test/%,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
+endif

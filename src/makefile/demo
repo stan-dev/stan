@@ -1,0 +1,30 @@
+.PRECIOUS: demo/gm$(EXE)
+demo/gm.exe : src/demo/gm.cpp
+	@mkdir -p $(dir $@)
+	$(CC_GM) $(CFLAGS_GM) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION_GM) $<
+
+demo/%$(EXE) : demo/%.o
+	@mkdir -p $(dir $@)
+	$(LINK.c) $(OUTPUT_OPTION) $<
+
+demo/%.o : src/demo/%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+##
+# Rule for generating dependencies.
+##
+demo/%.d : src/demo/%.cpp
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+##
+# If the target is demo/, include .d. 
+# Will generate dependencies.
+##
+ifneq (,$(filter demo/%,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(filter demo/%,$(MAKECMDGOALS))))
+endif

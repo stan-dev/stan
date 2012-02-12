@@ -1,147 +1,105 @@
-CC = clang++
-EIGEN_OPT = -DNDEBUG
-O = 3
-OPTIMIZE_OPT = $(O)
-OPT = -O$(OPTIMIZE_OPT) -Wall $(EIGEN_OPT)
+##
+# Makefile for Stan.
+# This makefile relies heavily on the make defaults for
+# make 3.81.
+##
 
-INCLUDES = -I src -I lib
-INCLUDES_T = -I lib/gtest/include  -I lib/gtest
-CFLAGS = $(OPT) $(INCLUDES)
-ifneq (,$(filter g++%,$(CC)))
-	CFLAGS += -std=gnu++0x
-endif
-CFLAGS_T = $(CFLAGS) $(INCLUDES_T) -DGTEST_HAS_PTHREAD=0 
+# The default target of this Makefile is...
+help:
 
-## --- multiple platform section ---
-UNAME := $(shell uname)      # uname provides information about the platform
-ifneq (, $(filter CYGWIN%,$(UNAME))) # Windows under Cygwin
-	ifneq (,$(filter g++%,$(CC)))
-		CFLAGS += -static-libgcc -static-libstdc++
-	endif	
-else ifeq (Darwin, $(UNAME)) # Mac OS X
-	OPT += -g
-else ifeq (LINUX, $(UNAME))
-	OPT += -g
-	CFLAGS_T += -lpthread
-else # assume Linux
-	OPT += -g
-	CFLAGS_T += -lpthread
-endif
-## --------------------------------
+##
+# Users should only need to set these three variables for use.
+# - CC: The compiler to use. Expecting g++ or clang++.
+# - O: Optimization level. Valid values are {0, 1, 2, 3}.
+# - OS: {mac, win, linux}. 
+##
+CC = g++
+O = 0
+# OS is set automatically by this script
+-include src/makefile/detect_os
 
-# find all unit tests
-UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
-UNIT_TESTS_DIR := $(sort $(dir $(UNIT_TESTS)))
-UNIT_TESTS_OBJ := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
+##
+# Get information about the compiler used.
+# - CC_TYPE: {g++, clang++, other}
+# - CC_MAJOR: major version of CC
+# - CC_MINOR: minor version of CC
+##
+-include src/makefile/detect_cc
+# FIXME: verify compiler
 
-# DEFAULT
-# =========================================================
+##
+# Set default compiler options.
+## 
+CFLAGS = -I src -I lib
+CFLAGS += -O$O
+CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
+LIBGTEST = test/gtest.o
+GTEST_MAIN = lib/gtest/src/gtest_main.cc
+EXE = 
 
-.PHONY: all test-all test-unit
-all: test-all
+##
+# These includes should update the following variables
+# based on the OS:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - EXE
+##
+-include src/makefile/$(OS)
 
-# TEST
-# =========================================================
+#%.d : src/%.cpp
+#	@echo $(dir $@)
+#mkdir -p $(dir $@)
 
-test:
-	mkdir -p ar test 
-	$(foreach var,$(UNIT_TESTS_DIR:src/%/=%), mkdir -p $(var);)
+.PHONY: help
+help:
+	@echo '------------------------------------------------------------'
+	@echo 'Stan: makefile'
+	@echo '  Current configuration:'
+	@echo '  - OS (Operating System):' $(OS)
+	@echo '  - CC (Compiler):        ' $(CC)
+	@echo '  - O (Optimize Level):   ' $(O)
+	@echo 'Available targets: '
+	@echo '  Tests:'
+	@echo '  - test-unit:   Runs unit tests.'
+	@echo '  - test-models: Runs diagnostic models.'
+	@echo '  - test-bugs:   Runs the bugs examples'
+	@echo '  - test-all:    Runs all tests.'
+	@echo '  Clean:'
+	@echo '  - clean:       Basic clean. Leaves doc and compiled'
+	@echo '                 libraries intact.'
+	@echo '  - clean-all:   Cleans up all of Stan.'
+	@echo '------------------------------------------------------------'
 
-ar/libgtest.a:  | test
-	$(CC) $(CFLAGS_T) -c lib/gtest/src/gtest-all.cc -o ar/gtest-all.o
-	ar -rv ar/libgtest.a ar/gtest-all.o
+##
+# All testing related make commands.
+##
+-include src/makefile/tests
 
+##
+# All model building related make commands.
+##
+-include src/makefile/models
 
-# The last argument, $$(wildcard src/stan/$$(dir $$*)*.hpp), puts *.hpp files from the
-#   same directory as a prerequisite. For example, for test/prob/distributions, it will expand to
-#   all the hpp files in the src/stan/prob/ directory.
-.SECONDEXPANSION:
-test/% : src/test/%_test.cpp ar/libgtest.a $$(wildcard src/stan/$$(dir $$*)*.hpp)
-	@echo '================================================================================'
-	@echo '================================================================================'
-	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-	$@ --gtest_output="xml:$@.xml"
+##
+# All demo related make commands.
+##
+-include src/makefile/demo
 
-test/models/basic_distributions/% : src/test/models/basic_distributions/%_test.cpp ar/libgtest.a
-	@echo '================================================================================'
-	@echo '================================================================================'
-	$(CC) $(CFLAGS_T) src/$@_test.cpp lib/gtest/src/gtest_main.cc ar/libgtest.a -o $@
-	$@ --gtest_output="xml:$@.xml"
-
-# run all tests
-test-all: $(UNIT_TESTS_OBJ) #demo/gm
-	$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
-
-# run unit tests without having make fail
-test-all-no-fail: $(UNIT_TESTS_OBJ) #demo/gm
-	-$(foreach var,$(UNIT_TESTS_OBJ), $(var) --gtest_output="xml:$(var).xml";)
-
-## Attempt to build all unit tests as one.
-#$(CC) $(CFLAGS_T) $(UNIT_TESTS) lib/gtest/src/gtest_main.cc ar/libgtest.a -o test/unit
-#-test/unit --gtest_output="xml:test/unit.xml";)
-
-# MODELS (to be passed through demo/gm)
-# =========================================================
-# find all bugs models
-BUGS_MODELS = $(subst src/,,$(wildcard src/models/bugs_examples/vol*/*/*.stan))
-BASIC_MODELS = $(subst src/,,$(wildcard src/models/basic_distributions/*.stan))
-.PHONY: test-bugs
-test-bugs: $(BUGS_MODELS) | demo/gm models
-
-.PHONY: test-basic
-test-basic: $(BASIC_MODELS) | demo/gm models
-	@echo $(BASIC_MODELS)
-
-
-models:
-	mkdir -p models
-
-models/%.stan : | demo/gm models
-	mkdir -p $(dir $@)
-	@echo '--- translating Stan graphical model to C++ code ---'
-	cat src/$@ | demo/gm > $(basename $@).cpp
-	@echo '--- compiling C++ model ---'
-	$(CC) $(CFLAGS) $(basename $@).cpp -o $(basename $@)
-	@echo '--- run the model ---'
-	$(basename $@) --data=src/$(basename $@).Rdata --samples=$(basename $@).csv
-
-
-# DEMO
-# =========================================================
-
-demo:
-	mkdir -p demo
-
-demo/% : src/demo/%.cpp | demo
-	$(CC) $(CFLAGS) src/$@.cpp -c -o $@.o
-	$(CC) $(CFLAGS) $@.o -o $@
-
-demo-all: demo/bivar_norm demo/model1 demo/eight_schools
-
-
-# DOC
-# =========================================================
-
-.PHONY: dox doxygen
-dox:
-	mkdir -p doc/api
-
-doxygen: | dox
-	doxygen doc/doxygen.cfg
-
-
-# CLEAN
-# =========================================================
-
-.PHONY: clean clean-dox clean-all
+##
+# Clean up.
+##
+.PHONY: clean clean-models clean-dox clean-demo clean-all
 clean:
-	rm -rf test *.dSYM
+	$(RM) -r *.dSYM
 
 clean-models:
-	rm -rf models
+	$(RM) -r models
 
 clean-dox:
-	rm -rf doc/api
+	$(RM) -r doc/api
 
-clean-all: clean clean-dox clean-models
-	rm -rf ar demo
+clean-demo:
+	$(RM) -r demo
+
+clean-all: clean clean-models clean-dox clean-demo
+	$(RM) -r test 

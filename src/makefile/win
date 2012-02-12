@@ -1,0 +1,27 @@
+##
+# This file should modify the following variables
+# as appropriate:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - OPT
+#   - EXE
+# 
+# Additionally, set the following variables to build
+# demo/gm using the Microsoft Visual Studio compiler.
+#   - CC_GM
+#   - CFLAGS_GM
+#   - OUTPUT_OPTION_GM
+##
+
+EXE = .exe
+ifeq (g++,$(CC_TYPE))
+  CFLAGS += -std=gnu++0x
+  CFLAGS += -static-libgcc 
+  CFLAGS += -static-libstdc++
+endif
+ifeq (clang++,$(CC_TYPE))
+endif
+
+CC_GM = cl
+CFLAGS_GM = /EHsc /I src /I lib /link
+OUTPUT_OPTION_GM = /OUT:$@

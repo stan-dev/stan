@@ -1,0 +1,12 @@
+# Set OS if there is no default:
+uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
+ifeq ($(uname_S), Darwin)
+  OS = mac
+endif
+ifeq ($(uname_O), Cygwin)
+  OS = win
+endif
+ifeq ($(uname_S), Linux)
+  OS = linux
+endif
