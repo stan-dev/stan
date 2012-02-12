@@ -16,8 +16,8 @@
 EXE = .exe
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
-  LDFLAGS += -static-libgcc 
-  LDFLAGS += -static-libstdc++
+  #LDFLAGS += -static-libgcc 
+  #LDFLAGS += -static-libstdc++
 endif
 ifeq (clang++,$(CC_TYPE))
 endif
