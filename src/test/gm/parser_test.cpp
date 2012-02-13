@@ -25,9 +25,9 @@ TEST(gm_parser,bugs_1_kidney) {
 TEST(gm_parser,bugs_1_leuk) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/leuk/leuk.stan"));
 }
-TEST(gm_parser,bugs_1_leukfr) {
+/*TEST(gm_parser,bugs_1_leukfr) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/leukfr/leukfr.stan"));
-}
+}*/
 TEST(gm_parser,bugs_1_mice) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/mice/mice.stan"));
 }
