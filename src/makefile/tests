@@ -83,6 +83,9 @@ test/%.d : src/test/%_test.cpp
 ifeq (test-unit,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(UNIT_TESTS))
 endif
+ifeq (test-all,$(MAKECMDGOALS))
+  -include $(addsuffix .d,$(UNIT_TESTS))
+endif
 ifneq (,$(filter test/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
 endif
