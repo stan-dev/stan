@@ -1,6 +1,7 @@
 STAN_HOME = ../../../../..
 PGM = magnesium#
 CXX = g++ -std=c++0x 
+CXX = clang++ 
 
 $(PGM) :
 	cat $(PGM)_all.stan | $(STAN_HOME)/demo/gm > $(PGM).cpp 

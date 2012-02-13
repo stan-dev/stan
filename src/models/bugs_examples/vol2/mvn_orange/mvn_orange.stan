@@ -2,13 +2,16 @@
 // http://www.openbugs.info/Examples/OtreesMVN.html
 // and refer to ../orange 
 
+# FIXME: there are some discrepancy for parameters thetavar 
+# and the s.e. for some parameters
+
 data {
   int(0,) K;
   int(0,) N;
   int x[N];
   double Y[K, N]; 
-  cov_matrix(3) R;  // R should be positive definite: could cov_matrix be used? 
-  // matrix(3, 3) R; 
+  cov_matrix(3) invR;  
+  // matrix(3, 3) invR; 
   cov_matrix(3) mu_var_prior; 
   vector(3) mu_m_prior; 
 }
@@ -40,6 +43,6 @@ model {
       Y[k, n] ~ normal(phi[k, 1] / (1 + phi[k, 2] * exp(phi[k, 3] * x[n])), sigma); 
   }
   thetamu ~ multi_normal(mu_m_prior, mu_var_prior); 
-  thetavar ~ inv_wishart(3, R); 
+  thetavar ~ inv_wishart(3, invR); 
 }
 

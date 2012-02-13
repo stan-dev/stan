@@ -6,7 +6,7 @@ data {
   int(0,) M; 
   vector(M) Y[N]; 
   double age[M]; 
-  cov_matrix(M) R; 
+  cov_matrix(M) S; 
 } 
 
 transformed data {
@@ -30,7 +30,7 @@ transformed parameters {
 
 model {
   for (n in 1:N) Y[n] ~ multi_normal(mu, Sigma); 
-  Sigma ~ inv_wishart(4, R); 
+  Sigma ~ inv_wishart(4, S); 
   beta0 ~ normal(0, 32);
   beta1 ~ normal(0, 32);
 } 

@@ -8,13 +8,13 @@
 
 transformed data {
   vector(2) mu; 
-  matrix(2, 2) R; 
+  matrix(2, 2) S; 
   mu[1] <- 0; 
   mu[2] <- 0; 
-  R[1, 1] <- .001; 
-  R[1, 2] <- 0;
-  R[2, 1] <- 0;
-  R[2, 2] <- .001; 
+  S[1, 1] <- 1000; 
+  S[1, 2] <- 0;
+  S[2, 1] <- 0;
+  S[2, 2] <- 1000;
 } 
 
 parameters { 
@@ -31,8 +31,6 @@ parameters {
 
 transformed parameters {
   vector(2) Y[12]; 
-  # double rho; 
-  # rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
   Y[1, 1] <- 1; 
   Y[1, 2] <- 1; 
   Y[2, 1] <- 1; 
@@ -41,6 +39,7 @@ transformed parameters {
   Y[3, 2] <- 1; 
   Y[4, 1] <- -1; 
   Y[4, 2] <- -1; 
+
   Y[5, 1] <- 2; 
   Y[6, 1] <- 2; 
   Y[7, 1] <- -2; 
@@ -57,10 +56,15 @@ transformed parameters {
   Y[10, 2] <- 2; 
   Y[11, 2] <- -2; 
   Y[12, 2] <- -2; 
-
 } 
 
+
 model {
-  Sigma ~ inv_wishart(2, R); 
+  Sigma ~ inv_wishart(2, S); 
   for (n in 1:12) Y[n] ~ multi_normal(mu, Sigma); 
+} 
+
+generated quantities { 
+  double(-1, 1) rho; 
+  rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 

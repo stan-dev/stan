@@ -3,7 +3,7 @@
 # 
 # split the original data to censored data and right-censored data; 
 
-source('kidney.Rdata')
+source('kidney.old.Rdata')
 
 tv <- as.vector(t)
 agev <- as.vector(age) 
@@ -41,6 +41,6 @@ NP <- N;
 dump(c("NP", "N_uc", "N_rc", "t_uc", "t_rc", "age_uc", "age_rc", 
        "sex_uc", "sex_rc", 
        "patient_uc", "patient_rc", "disease_uc", "disease_rc"), 
-     file = "kidney2.Rdata") 
+     file = "kidney.Rdata") 
 
 

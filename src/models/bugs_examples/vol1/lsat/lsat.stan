@@ -27,33 +27,19 @@ parameters {
   double theta[N];
   double(0,) beta;
 }
-
-//transformed parameters {
-//  double mean_alpha;
-//  double a[T];
-//}
-
 model {
-  // priors
-  for (k in 1:T) {
-    alpha[k] ~ normal(0.0,1.0E2);
-  }
-
-//  for(k in 1:T) {
-//    mean_alpha <- mean(alpha);
-//    a[k] <- alpha[k] - mean_alpha;
-//   }
-  
-  for(j in 1:N) { 
-    theta[j] ~ normal(0,1);
-  }
-  
-  beta ~ normal(0.0,1.0E2);
-  // Rasch model
-  for (j in 1:N) {
-    for (k in 1:T) {
-      r[j,k] ~ bernoulli(inv_logit(beta*theta[j] - alpha[k]));
-    }
-  }
+  alpha ~ normal(0, 100.); 
+  theta ~ normal(0, 1); 
+  beta ~ normal(0.0, 100.); 
+  for (j in 1:N)  
+    for (k in 1:T) 
+      r[j, k] ~ bernoulli(inv_logit(beta * theta[j] - alpha[k]));
 }
+
+generated quantities {
+  double mean_alpha; 
+  double a[T]; 
+  mean_alpha <- mean(alpha);
+  for(t in 1:T) a[t] <- alpha[t] - mean_alpha;
+} 
 

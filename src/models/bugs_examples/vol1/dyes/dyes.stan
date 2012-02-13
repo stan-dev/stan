@@ -2,8 +2,6 @@
 #  http://www.openbugs.info/Examples/Dyes.html
 
 
-## status: not working 
-
 ## P.S. How to vectorize y? 
 
 data {
@@ -33,7 +31,7 @@ model {
     for (j in 1:SAMPLES) y[n, j] ~ normal(mu[n], sigma_within); 
     // y[n] ~ normal(nu[n], sigma_within); # for vector(SAMPLES) y[BATCHES] ?? 
 
-  theta ~ normal(0.0, 3.2); 
+  theta ~ normal(0.0, 1E5); 
   sigmasq_between ~ inv_gamma(.001, .001); 
   sigmasq_within ~ inv_gamma(.001, .001); 
 
