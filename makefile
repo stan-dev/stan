@@ -32,6 +32,7 @@ O = 0
 ## 
 CFLAGS = -I src -I lib
 CFLAGS += -O$O
+CFLAGS += -Wall
 CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
 LIBGTEST = test/gtest.o
 GTEST_MAIN = lib/gtest/src/gtest_main.cc
