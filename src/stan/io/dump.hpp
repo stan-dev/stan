@@ -209,10 +209,11 @@ namespace stan {
       }
       void write_stan(const Eigen::Matrix<double,
                                           Eigen::Dynamic,Eigen::Dynamic>& x) {
+	typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index Index;
         out_ << "structure(c(";
         std::vector<double> vals;
-        for (size_t m = 0; m < x.cols(); ++m) {
-          for (size_t n = 0; n < x.rows(); ++n) {
+	for (Index m = 0; m < x.cols(); ++m) {
+	  for (Index n = 0; n < x.rows(); ++n) {
             if (m > 0 || n > 0) out_ << ", ";
             write_val(x(m,n));
           }
