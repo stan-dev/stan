@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <Eigen/Dense>
+#include <stan/maths/matrix.hpp>
 
 #include <stan/version.hpp>
 #include <stan/gm/ast.hpp>
@@ -190,7 +190,6 @@ namespace stan {
       generate_include("sstream",o);
       generate_include("utility",o);
       generate_include("boost/exception/all.hpp",o);
-      generate_include("Eigen/Dense",o);
       generate_include("stan/agrad/agrad.hpp",o);
       generate_include("stan/agrad/special_functions.hpp",o);
       generate_include("stan/agrad/matrix.hpp",o);

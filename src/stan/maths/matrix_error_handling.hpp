@@ -9,9 +9,6 @@
 #include <stan/prob/transform.hpp>
 #include <stan/maths/matrix.hpp>
 
-#include <Eigen/Dense>
-
-
 namespace stan { 
 
   namespace maths {

@@ -13,8 +13,7 @@
 
 #include <boost/throw_exception.hpp>
 
-#include <Eigen/Dense>
-
+#include <stan/maths/matrix.hpp>
 #include <stan/io/var_context.hpp>
 
 namespace stan {
@@ -70,7 +69,7 @@ namespace stan {
       template <typename T>
       void write_list(T xs) {
         out_ << "c(";
-        for (size_t i = 0; i < xs.size(); ++i) {
+        for (typename T::size_type i = 0; i < xs.size(); ++i) {
           if (i > 0) out_ << ", ";
           write_val(xs[i]);
         }

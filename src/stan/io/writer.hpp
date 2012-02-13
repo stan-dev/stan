@@ -8,8 +8,6 @@
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <Eigen/Dense>
-
 #include <stan/maths/matrix.hpp>
 #include <stan/maths/special_functions.hpp>
 

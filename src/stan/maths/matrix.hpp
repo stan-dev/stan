@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
+#define EIGEN_DENSEBASE_PLUGIN "stan/maths/EigenDenseBaseAddons.hpp"
 #include <Eigen/Dense>
 
 
