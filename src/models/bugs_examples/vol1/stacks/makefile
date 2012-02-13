@@ -33,9 +33,9 @@ t2 :
 	./$(PGM)_t2 --data=$(PGM)2.Rdata --samples=samples_t.csv --iters=10000 --burnin=1000 
 
 clean :
-	rm $(PGM)_normal.cpp samples_normal.csv $(PGM)_normal
-	rm $(PGM)_normal2.cpp  $(PGM)_normal2
-	rm $(PGM)_dexp.cpp samples_dexp.csv $(PGM)_dexp
-	rm $(PGM)_dexp2.cpp  $(PGM)_dexp2
-	rm $(PGM)_t.cpp samples_t.csv $(PGM)_t
-	rm $(PGM)_t2.cpp  $(PGM)_t2
+	rm -f $(PGM)_normal.cpp samples_normal.csv $(PGM)_normal
+	rm -f $(PGM)_normal2.cpp  $(PGM)_normal2
+	rm -f $(PGM)_dexp.cpp samples_dexp.csv $(PGM)_dexp
+	rm -f $(PGM)_dexp2.cpp  $(PGM)_dexp2
+	rm -f $(PGM)_t.cpp samples_t.csv $(PGM)_t
+	rm -f $(PGM)_t2.cpp  $(PGM)_t2

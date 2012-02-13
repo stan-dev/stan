@@ -1,3 +1,5 @@
+## 
+##  http://www.openbugs.info/Examples/Seeds.html
 data {
     int(0,) I;
     int(0,) n[I];
@@ -14,7 +16,7 @@ parameters {
     double b[I];
 }
 transformed parameters {
-    double sigma;
+    double(0,) sigma;
     sigma  <- 1.0 / sqrt(tau);
 }
 model {
@@ -23,8 +25,10 @@ model {
    alpha2 ~ normal(0.0,1.0E3);
    alpha12 ~ normal(0.0,1.0E3);
    tau ~ gamma(1.0E-3,1.0E-3);
+
+   b ~ normal(0.0, sigma);
+
    for (i in 1:I) {
-      b[i] ~ normal(0.0, sigma);
       n[i] ~ binomial(N[i], inv_logit(alpha0 
                                       + alpha1 * x1[i] 
                                       + alpha2 * x2[i]

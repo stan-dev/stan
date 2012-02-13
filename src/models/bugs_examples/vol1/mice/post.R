@@ -1,24 +1,17 @@
-## take a look at the samples and compare with results computed 
-## in other program. 
-
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE); 
 
 M <- 4  
 
-## assuming the order of variables in samples.csv are the same as model
-## specification file 
-colnames(post) <- c(paste("beta", 1:M, sep = ''), "r"); 
-
-irr_control <- post[, "beta1"]; 
-veh_control <- post[, "beta2"] - post[, "beta1"]; 
-test_sub <- post[, "beta3"] - post[, "beta1"]; 
-post_control <- post[, "beta4"] - post[, "beta1"]; 
+irr_control <- post[, "beta.1"]; 
+veh_control <- post[, "beta.2"] - post[, "beta.1"]; 
+test_sub <- post[, "beta.3"] - post[, "beta.1"]; 
+post_control <- post[, "beta.4"] - post[, "beta.1"]; 
 
 medians <- matrix(0, ncol = M, nrow = nrow(post)) 
 
 for (j in 1:M) {
-    betaj <- paste("beta", j, sep = '')  
+    betaj <- paste("beta.", j, sep = '')  
     medians[, j] <- (log(2) * exp(-post[, betaj])) ^ (1 / post[, "r"])   
     names(medians[, j]) <- paste("median", j, sep = '')  
 } 
