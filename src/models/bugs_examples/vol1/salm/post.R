@@ -1,4 +1,3 @@
-
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE)
 summary(as.mcmc(post)) 
@@ -12,11 +11,15 @@ if (!is.element("BUGSExamples", installed.packages()[, 1])) {
         "the results from JAGS.", sep = '\n')
     quit();
 } 
-library(BUGSExamples)
 
-ex <- list(name = "Dogs", parameters = c("alpha", "beta"), 
-           nSample = 2000, nBurnin = 500, nThin = 1, 
-           nChain = 3)
 
-jagspost <- runExample(ex, engine = 'JAGS') 
-summary(jagspost$coda) 
+## For some reason, the package BUGSExamples could not 
+## run this example. 
+
+# library(BUGSExamples)
+# ex <- list(name = "Salm", parameters = c("alpha", "beta", "gamma", "tau", "sigma"), 
+#            nSample = 2000, nBurnin = 500, nThin = 1, 
+#            nChain = 3)
+# 
+# jagspost <- runExample(ex, engine = 'JAGS') 
+# summary(jagspost$coda) 

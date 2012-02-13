@@ -1,9 +1,11 @@
 STAN_HOME = ../../../../..
+PGM = salm2#
+CXX = clang++ 
 
-salm :
-	cat salm.stan | $(STAN_HOME)/demo/gm > salm.cpp
-	g++ -O0 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src salm.cpp -o salm
-	salm --data=salm.Rdata
+$(PGM) : 
+	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
+	$(CXX) -O0 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
+	./$(PGM) --data=$(PGM).Rdata
 
 clean :
-	rm salm.cpp samples.csv salm
+	rm -f $(PGM).cpp samples.csv $(PGM)

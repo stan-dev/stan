@@ -1,3 +1,5 @@
+##  http://www.openbugs.info/Examples/Salm.html
+
 data {
     int(0,) I;
     int(0,) J;
@@ -29,7 +31,7 @@ parameters {
     double lambda[I,J];
 }
 transformed parameters {
-    double sigma;
+    double(0,) sigma;
     double alpha;
 
     alpha <- alpha_star - beta * mean_logx - gamma * mean_x;
@@ -42,10 +44,10 @@ model {
    tau ~ gamma(1.0E-3,1.0E-3);
    for (i in 1:I) {
       for (j in 1:J) {
-         lambda[i,j] ~ normal(0.0,tau);
+         lambda[i,j] ~ normal(0.0, sigma); 
          y[i,j] ~ poisson(exp(alpha_star 
-                              + beta * centered_x[i]
-                              + gamma * centered_logx[i]
+                              + beta * centered_logx[i]
+                              + gamma * centered_x[i]
                               + lambda[i,j]) );
      }
    }
