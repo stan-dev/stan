@@ -4,12 +4,12 @@
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - OPT
-#  
 ##
 
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -g
+  CFLAGS += -Wno-unused-function
 endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-c++0x-extensions

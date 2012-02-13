@@ -1,6 +1,7 @@
 #ifndef __STAN__MATHS__ERROR_HANDLING_HPP__
 #define __STAN__MATHS__ERROR_HANDLING_HPP__
 
+#include <cstddef>
 #include <limits>
 
 #include <boost/math/policies/policy.hpp>
@@ -58,7 +59,7 @@ namespace stan {
                               T_result* result,
                               const Policy& /*pol*/) {
       using stan::maths::policies::raise_domain_error;
-      for (int i = 0; i < y.size(); i++) {
+      for (size_t i = 0; i < y.size(); i++) {
         if ((boost::math::isnan)(y[i])) {
           std::ostringstream msg_o;
           msg_o << name << "[" << i << "] is %1%, but must not be nan!";
@@ -100,7 +101,7 @@ namespace stan {
                              T_result* result,
                              const Policy& /*pol*/) {
       using stan::maths::policies::raise_domain_error;
-      for (int i = 0; i < y.size(); i++) {
+      for (size_t i = 0; i < y.size(); i++) {
         if (!(boost::math::isfinite)(y[i])) {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be finite!";
@@ -235,7 +236,7 @@ namespace stan {
                                T_result* result,
                                const Policy& /*pol*/) {
       using stan::maths::policies::raise_domain_error;
-      for (int i = 0; i < y.size(); i++) {
+      for (size_t i = 0; i < y.size(); i++) {
         if (!(y[i] > 0)) {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be > 0";
@@ -275,7 +276,7 @@ namespace stan {
                                                       Policy());
         return false;
       }
-      for (int n = 0; n < theta.size(); n++) {
+      for (size_t n = 0; n < theta.size(); n++) {
         if ((boost::math::isnan)(theta[n]) || !(theta[n] >= 0)) {
           std::ostringstream stream;
           stream << name << " is not a valid simplex."
