@@ -830,17 +830,17 @@ namespace stan {
     };
 
     template <typename Iterator>
-    struct var_decl_grammar 
+    struct var_decls_grammar 
       : boost::spirit::qi::grammar<Iterator,
                                    boost::spirit::qi::locals<bool>,
-                                   var_decl(bool,var_origin),
+                                   std::vector<var_decl>(bool,var_origin),
                                    whitespace_grammar<Iterator> > {
 
 
  
-      var_decl_grammar(variable_map& var_map,
-                       std::stringstream& error_msgs)
-        : var_decl_grammar::base_type(var_decl_r),
+      var_decls_grammar(variable_map& var_map,
+                        std::stringstream& error_msgs)
+        : var_decls_grammar::base_type(var_decls_r),
           var_map_(var_map),
           error_msgs_(error_msgs),
           expression_g(var_map,error_msgs) {
@@ -855,6 +855,10 @@ namespace stan {
         using boost::spirit::qi::labels::_a;
         using boost::spirit::qi::labels::_r1;
         using boost::spirit::qi::labels::_r2;
+
+        var_decls_r.name("variable declarations");
+        var_decls_r 
+          %= *var_decl_r(_r1,_r2);
 
         // _a = error state local, _r1 constraints allowed inherited
         var_decl_r.name("variable declaration");
@@ -1115,6 +1119,13 @@ namespace stan {
                whitespace_grammar<Iterator> > 
       var_decl_r;
 
+
+      boost::spirit::qi::rule<Iterator, 
+                              boost::spirit::qi::locals<bool>, 
+                              std::vector<var_decl>(bool,var_origin), 
+               whitespace_grammar<Iterator> > 
+      var_decls_r;
+
     };
 
     template <typename Iterator>
@@ -1131,7 +1142,7 @@ namespace stan {
           var_map_(var_map),
           error_msgs_(error_msgs),
           expression_g(var_map,error_msgs),
-          var_decl_g(var_map,error_msgs) {
+          var_decls_g(var_map,error_msgs) {
 
         using boost::spirit::qi::_1;
         using boost::spirit::qi::char_;
@@ -1172,7 +1183,7 @@ namespace stan {
           ;
 
         local_var_decls_r
-          %= *var_decl_g(false,local_origin); // - constants
+          %= var_decls_g(false,local_origin); // - constants
 
 
         // _r1, _r2 same as statement_r
@@ -1273,7 +1284,7 @@ namespace stan {
       
       // grammars
       expression_grammar<Iterator> expression_g;  
-      var_decl_grammar<Iterator> var_decl_g;
+      var_decls_grammar<Iterator> var_decls_g;
 
       // rules
       boost::spirit::qi::rule<Iterator, assignment(), 
@@ -1350,7 +1361,7 @@ namespace stan {
           var_map_(),
           error_msgs_(),
           expression_g(var_map_,error_msgs_),
-          var_decl_g(var_map_,error_msgs_),
+          var_decls_g(var_map_,error_msgs_),
           statement_g(var_map_,error_msgs_) {
 
         using boost::spirit::qi::eps;
@@ -1379,7 +1390,7 @@ namespace stan {
         data_var_decls_r
           %= lit("data")
           > lit('{')
-          > *var_decl_g(true,data_origin) // +constraints
+          > var_decls_g(true,data_origin) // +constraints
           > lit('}');
 
         derived_data_var_decls_r.name("transformed data block");
@@ -1387,7 +1398,7 @@ namespace stan {
           %= lit("transformed")
           >> lit("data")
           > lit('{')
-          > *var_decl_g(true,transformed_data_origin)  // -constraints
+          > var_decls_g(true,transformed_data_origin)  // -constraints
           > *statement_g(false,transformed_data_origin) // -sampling
           > lit('}');
 
@@ -1395,7 +1406,7 @@ namespace stan {
         param_var_decls_r
           %= lit("parameters")
           > lit('{')
-          > *var_decl_g(true,parameter_origin) // +constraints
+          > var_decls_g(true,parameter_origin) // +constraints
           > lit('}');
 
         derived_var_decls_r.name("derived variable declarations");
@@ -1403,7 +1414,7 @@ namespace stan {
           %= lit("transformed")
           >> lit("parameters")
           > lit('{')
-          > *var_decl_g(true,transformed_parameter_origin) // -constraints
+          > var_decls_g(true,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin) // -sampling
           > lit('}');
 
@@ -1412,7 +1423,7 @@ namespace stan {
           %= lit("generated")
           > lit("quantities")
           > lit('{')
-          > *var_decl_g(true,derived_origin) // -constraints
+          > var_decls_g(true,derived_origin) // -constraints
           > *statement_g(false,derived_origin) // -sampling
           > lit('}');
 
@@ -1432,7 +1443,7 @@ namespace stan {
 
       // grammars
       expression_grammar<Iterator> expression_g;
-      var_decl_grammar<Iterator> var_decl_g;
+      var_decls_grammar<Iterator> var_decls_g;
       statement_grammar<Iterator> statement_g;
 
       // rules

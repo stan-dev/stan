@@ -700,9 +700,9 @@ namespace stan {
       base_var_decl(const std::string& name,
                     const std::vector<expression>& dims,
                     const base_expr_type& base_type)
-      : name_(name),
-        dims_(dims),
-        base_type_(base_type) {
+        : name_(name),
+          dims_(dims),
+          base_type_(base_type) {
       }
     };
 
