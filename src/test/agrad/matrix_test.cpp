@@ -311,6 +311,7 @@ TEST(agrad_matrix,determinant3by3) {
     for (int j = 0; j < 9; ++j)
       Z(i,j) = i * j + 1;
   AVAR h = Z.determinant();
+  h = h; // supresses set but not used warning
 }
 
 // end determinant tests

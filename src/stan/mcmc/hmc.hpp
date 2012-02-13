@@ -174,7 +174,7 @@ namespace stan {
         
         std::vector<double> g_new(_g);
         std::vector<double> x_new(_x);
-        double epsilon_over_2 = _epsilon / 2.0;
+        //double epsilon_over_2 = _epsilon / 2.0;
 
         double logp_new = -1e100;
         for (unsigned int l = 0; l < _L; ++l)

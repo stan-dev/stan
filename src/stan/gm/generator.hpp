@@ -1900,7 +1900,7 @@ namespace stan {
       void operator()(const int_var_decl& x) const {
         generate_increment_i(x.dims_);
         // for loop for ranges
-        for (int i = 0; i < x.dims_.size(); ++i) {
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_indent(i + 2, o_);
           o_ << "for (size_t i_" << i << "__ = 0; ";
           o_ << "i_" << i << "__ < ";
@@ -1915,7 +1915,7 @@ namespace stan {
         generate_expression(x.range_.high_,o_);
         o_ << "));" << EOL;
         // close for loop
-        for (int i = 0; i < x.dims_.size(); ++i) {
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_indent(x.dims_.size() + 1 - i, o_);
           o_ << "}" << EOL;
         }

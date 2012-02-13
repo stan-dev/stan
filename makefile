@@ -87,6 +87,11 @@ help:
 -include src/makefile/demo
 
 ##
+# All doxygen related make commands
+##
+-include src/makefile/doxygen
+
+##
 # Clean up.
 ##
 .PHONY: clean clean-models clean-dox clean-demo clean-all
