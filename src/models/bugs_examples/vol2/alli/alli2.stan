@@ -19,7 +19,7 @@ parameters {
   real lambda[I, J]; 
 }
 
-transformed parameters {
+model {
   real yaalpha[K]; 
   real yabeta[I, K];
   real yagamma[J, K];
@@ -35,9 +35,7 @@ transformed parameters {
     for (i in 2:I)  yabeta[i, k] <- beta[i - 1, k - 1];
     for (j in 2:J)  yagamma[j, k] <- gamma[j - 1, k - 1];
   }
-} 
-
-model {
+ 
   for (k in 1:(K - 1)) { 
     alpha[k] ~ normal(0, 320);
     for (i in 1:(I - 1)) beta[i, k] ~ normal(0, 320);
