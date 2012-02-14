@@ -9,12 +9,8 @@ using Eigen::Matrix;
 
 
 typedef boost::math::policies::policy<
-  boost::math::policies::domain_error<boost::math::policies::errno_on_error>, 
-  boost::math::policies::pole_error<boost::math::policies::errno_on_error>,
-  boost::math::policies::overflow_error<boost::math::policies::errno_on_error>,
-  boost::math::policies::evaluation_error<boost::math::policies::errno_on_error> 
+  boost::math::policies::domain_error<boost::math::policies::errno_on_error>
   > errno_policy;
-typedef boost::math::policies::policy<> default_policy;
 
 using namespace stan::maths;
 using stan::agrad::var;
