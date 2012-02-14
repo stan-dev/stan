@@ -1450,7 +1450,7 @@ namespace stan {
         for (size_t i = 0; i < size; ++i) {
           size_t idx = size - i - 1;
           generate_indent(i + indent + extra_indent, o_);
-          o_ << "for (size_t i" << idx << "__ = 0U; i" << idx << "__ < ";
+          o_ << "for (int i" << idx << "__ = 0U; i" << idx << "__ < ";
           generate_expression(dims[idx].expr_,o_);
           o_ << "; ++i" << idx << "__)" << EOL;
         }
