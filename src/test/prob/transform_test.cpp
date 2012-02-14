@@ -1,7 +1,6 @@
 #include <vector>
 #include <cmath>
 #include <stdexcept>
-#include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include "stan/prob/transform.hpp"
 

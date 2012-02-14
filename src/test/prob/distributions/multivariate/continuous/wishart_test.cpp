@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <Eigen/Dense>
 #include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 

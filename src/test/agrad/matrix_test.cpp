@@ -4,8 +4,6 @@
 #include <stdexcept>
 #include <complex>
 
-#include <Eigen/Dense>
-
 #include <stan/agrad/matrix.hpp>
 
 using stan::agrad::var;

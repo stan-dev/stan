@@ -1,7 +1,6 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <Eigen/Dense>
 #include <stan/io/csv_writer.hpp>
 #include <gtest/gtest.h>
 
