@@ -12,7 +12,10 @@ typedef boost::math::policies::policy<
   boost::math::policies::domain_error<boost::math::policies::errno_on_error>
   > errno_policy;
 
-using namespace stan::maths;
+using stan::maths::default_policy;
+using stan::maths::check_not_nan;
+using stan::maths::check_bounded;
+using stan::maths::check_cov_matrix;
 using stan::agrad::var;
 
 //---------- check_not_nan tests ----------
