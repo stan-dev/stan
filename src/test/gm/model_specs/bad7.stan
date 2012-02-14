@@ -1,8 +1,8 @@
 data {
-  double y;
+  real y;
 }
 deriveved parameters {
-  double z;
+  real z;
 
   y <- 10.0;
 }

@@ -1,9 +1,9 @@
 data {
-   double y;
+   real y;
 }
 parameters {
    int N;
-   double z[N];
+   real z[N];
 }
 model {
 }

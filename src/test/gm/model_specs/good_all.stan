@@ -7,17 +7,17 @@ data {
   matrix(2,3) m;
   row_vector(2) rv;
   vector(3) v;
-  double s;
+  real s;
 
   matrix(2,3) m_a[5];
   row_vector(2) rv_a[5];
   vector(3) v_a[5];
-  double s_a[5];
+  real s_a[5];
 
   matrix(2,3) m_aa[5,10];
   row_vector(2) rv_aa[5,10];
   vector(3) v_aa[5,10];
-  double s_aa[5,10];
+  real s_aa[5,10];
 
 }
 

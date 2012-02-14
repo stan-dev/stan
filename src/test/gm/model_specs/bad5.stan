@@ -1,5 +1,5 @@
 derived data {
-  double y;
+  real y;
   y <- lp__;
 }
 model {

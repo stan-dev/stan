@@ -1,8 +1,8 @@
 data {
-   double y;
+   real y;
 }
 derived data {
-   double z;
+   real z;
    
    y <- 10.0;
 }

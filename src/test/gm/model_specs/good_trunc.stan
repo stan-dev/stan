@@ -1,5 +1,5 @@
 data {
-    double y;
+    real y;
 }
 
 model {
@@ -10,5 +10,5 @@ model {
 
     for (n in 1:5) ;
 
-    lp__ <- lp__ + 1.0; // lp__ is type double
+    lp__ <- lp__ + 1.0; // lp__ is type real
 }

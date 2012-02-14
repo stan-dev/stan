@@ -1,5 +1,5 @@
 data {
-   double y;
+   real y;
 }
 model {
     y <- 10.0;
