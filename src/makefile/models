@@ -7,18 +7,18 @@ models/%$(EXE) : models/%.o
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) $(OUTPUT_OPTION) $<
-	@echo ''
-	@echo '--- Running model ---'
-	cp src/$@.stan $@.stan
-	-cp src/$@.Rdata $@.Rdata
-	$@ --data=$@.Rdata --samples=$@.csv
+#	@echo ''
+#	@echo '--- Running model ---'
+#	cp src/$@.stan $@.stan
+#	-cp src/$@.Rdata $@.Rdata
+#	$@ --data=$@.Rdata --samples=$@.csv
 
 .PRECIOUS: models/%.cpp
-models/%.cpp : src/models/%.stan | demo/gm$(EXE)
+models/%.cpp : src/models/%.stan demo/gm$(EXE)
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
-	cat $^ | demo/gm$(EXE) > $@
+	cat $< | demo/gm$(EXE) > $@
 
 .PRECIOUS: models/%.o
 models/%.o : models/%.cpp
@@ -44,4 +44,5 @@ models/%.d : models/%.cpp
 ##
 ifneq (,$(filter models/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter models/%,$(MAKECMDGOALS))))
+  -include demo/gm.d
 endif

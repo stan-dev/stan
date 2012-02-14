@@ -489,7 +489,7 @@ namespace stan {
 
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(indents_+i,o_);
-          o_ << "for (size_t k" << i << "__ = 0;"
+          o_ << "for (int k" << i << "__ = 0;"
              << " k" << i << "__ < ";
           generate_expression(dims[i].expr_,o_);
           o_ << ";";
