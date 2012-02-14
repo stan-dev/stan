@@ -278,6 +278,10 @@ namespace stan {
         return s;
       }
 
+      virtual double log_prob() {
+        return _logp;
+      }
+
       /**
        * The core recursion in NUTS.
        *

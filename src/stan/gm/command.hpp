@@ -320,7 +320,10 @@ namespace stan {
       }
 
       std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
+
+      sample_file_stream << "lp__,"; // log probability first
       model.write_csv_header(sample_file_stream);
+
       int it_print_width = std::ceil(std::log10(num_iterations));
       std::cout << std::endl;
 
@@ -346,6 +349,9 @@ namespace stan {
             continue;
           } else {
             stan::mcmc::sample sample = sampler.next();
+
+            // FIXME: use csv_writer arg to make comma optional?
+            sample_file_stream << sample.log_prob() << ',';
             sample.params_r(params_r);
             sample.params_i(params_i);
             model.write_csv(params_r,params_i,sample_file_stream);
