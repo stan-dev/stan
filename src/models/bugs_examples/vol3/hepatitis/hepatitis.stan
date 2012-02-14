@@ -8,10 +8,8 @@
 
 
 ## note that we have missing data in the orignal data Y[N, T]; 
-## here, we turn Y[N, T] into Yvec and then remove the missing
-## data.  
-
-## status: not work; running into error immediately 
+## here, we turn Y[N, T] into Yvec with the missing
+## data removed.  
 
 
 data {
