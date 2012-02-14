@@ -13,16 +13,16 @@ data {
 } 
 
 parameters {
-  double alpha[K - 1]; 
-  double beta[I - 1, K - 1]; 
-  double gamma[J - 1, K - 1]; 
-  double lambda[I, J]; 
+  real alpha[K - 1]; 
+  real beta[I - 1, K - 1]; 
+  real gamma[J - 1, K - 1]; 
+  real lambda[I, J]; 
 }
 
 transformed parameters {
-  double yaalpha[K]; 
-  double yabeta[I, K];
-  double yagamma[J, K];
+  real yaalpha[K]; 
+  real yabeta[I, K];
+  real yagamma[J, K];
   yaalpha[1] <- 0; 
   for (k in 2:K)  yaalpha[k] <- alpha[k - 1];
   for (k in 1:K) {

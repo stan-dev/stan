@@ -10,24 +10,24 @@
 // status: not work 
 data {
   int(0,) N; 
-  double x[N];
+  real x[N];
 } 
 
 parameters {
-  double(0,) alpha;
-  double(0,) sigma; 
-  double(0,) theta;
+  real(0,) alpha;
+  real(0,) sigma; 
+  real(0,) theta;
 } 
 
 transformed parameters {
-  double mu;
+  real mu;
   mu <- log(theta) - alpha * sigma * sigma; 
 } 
 
 model { 
   for (i in 1:N) {  
-     double tmp; 
-     double r; 
+     real tmp; 
+     real r; 
      tmp <- sqrt(2 * 3.141592653589) * alpha * sigma * Phi(alpha * sigma) * exp(0.5 * pow(alpha * sigma, 2));
      r <- tmp / (1 + tmp); 
      lp__ <- lp__ + step(theta - x[i]) * (log(r) - log(Phi(alpha * sigma)) + lognormal_log(x[i], mu, sigma));

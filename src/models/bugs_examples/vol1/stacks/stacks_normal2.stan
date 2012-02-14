@@ -7,8 +7,8 @@
 # ------
 # use `make normal' or `make normal2' to build/run the model 
 
-# stacks_dexp.stan: double exponential error term 
-# stacks_dexp2.stan: double exponential error term with ridge ridge regression
+# stacks_dexp.stan: real exponential error term 
+# stacks_dexp2.stan: real exponential error term with ridge ridge regression
 # specification on coefficients 
 # ------
 # use `make dexp' or `make dexp2' to build/run the model 
@@ -21,20 +21,20 @@
 data {
   int(0,) N; 
   int(0,) p; 
-  double Y[N]; 
-  double z[N, p]; 
+  real Y[N]; 
+  real z[N, p]; 
 } 
 
 parameters {
-  double beta0; 
-  double beta[p]; 
-  double(0,) sigmasq; 
-  double(0,) sigmasq_beta; 
+  real beta0; 
+  real beta[p]; 
+  real(0,) sigmasq; 
+  real(0,) sigmasq_beta; 
 } 
 
 transformed parameters {
-  double sigma; 
-  double sigma_beta;
+  real sigma; 
+  real sigma_beta;
   sigma <- sqrt(sigmasq); 
   sigma_beta <- sqrt(sigmasq_beta); 
 } 

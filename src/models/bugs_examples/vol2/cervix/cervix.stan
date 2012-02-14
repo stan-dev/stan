@@ -28,10 +28,10 @@ data {
 } 
 
 parameters {
-  double(0, 1) phi[2, 2];
-  double(0, 1) q; 
-  double beta0C; 
-  double beta; 
+  real(0, 1) phi[2, 2];
+  real(0, 1) q; 
+  real beta0C; 
+  real beta; 
   # note that xi is discrete parameters with support {0, 1} 
   //int xi[Ni]; 
 } 

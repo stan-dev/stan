@@ -11,18 +11,18 @@ data {
 } 
 
 parameters {
-  double alpha; 
-  double delta; 
+  real alpha; 
+  real delta; 
   int(0,) state[N]; // these are discrete parameters. the support is 0 or 1 actually. ??
 } 
 
 transformed parameters {
-  double theta;
+  real theta;
   theta <- inv_logit(delta); 
 } 
 
 model {
-  double yap[2]; 
+  real yap[2]; 
   yap[1] <- inv_logit(alpha); 
   yap[2] <- 0;
 

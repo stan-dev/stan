@@ -10,32 +10,32 @@ data {
   int(0,) y[N, T]; 
   int(0,) Trt[N]; 
   int(0,) V4[T]; 
-  double  log_Base4[N];
-  double  log_Age[N]; 
-  double  BT[N]; 
-  double  log_Age_bar; 
-  double  Trt_bar; 
-  double  BT_bar; 
-  double  V4_bar; 
-  double  log_Base4_bar; 
+  real  log_Base4[N];
+  real  log_Age[N]; 
+  real  BT[N]; 
+  real  log_Age_bar; 
+  real  Trt_bar; 
+  real  BT_bar; 
+  real  V4_bar; 
+  real  log_Base4_bar; 
 } 
 
 parameters {
-  double  a0; 
-  double  alpha_Base; 
-  double  alpha_Trt; 
-  double  alpha_BT; 
-  double  alpha_Age;
-  double  alpha_V4;
-  double  b1[N]; 
-  double  b[N, T];
-  double(0,) sigmasq_b; 
-  double(0,) sigmasq_b1; 
+  real  a0; 
+  real  alpha_Base; 
+  real  alpha_Trt; 
+  real  alpha_BT; 
+  real  alpha_Age;
+  real  alpha_V4;
+  real  b1[N]; 
+  real  b[N, T];
+  real(0,) sigmasq_b; 
+  real(0,) sigmasq_b1; 
 }
 
 transformed parameters {
-  double(0,) sigma_b; 
-  double(0,) sigma_b1; 
+  real(0,) sigma_b; 
+  real(0,) sigma_b1; 
   sigma_b <- sqrt(sigmasq_b); 
   sigma_b1 <- sqrt(sigmasq_b1); 
 } 
@@ -64,7 +64,7 @@ model {
 }
 
 generated quantities {
-  double alpha0; 
+  real alpha0; 
   # re-calculate intercept on original scale:
   alpha0 <- a0 - alpha_Base * log_Base4_bar - alpha_Trt * Trt_bar
             - alpha_BT * BT_bar - alpha_Age * log_Age_bar - alpha_V4 * V4_bar; 

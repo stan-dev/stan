@@ -1,10 +1,10 @@
 transformed data {
 }
 transformed parameters {
-   double a;
-   double b[2];
-   double c[2,3];
-   double d[2,3,4];
+   real a;
+   real b[2];
+   real c[2,3];
+   real d[2,3,4];
    
    vector(2) e;
    vector(2) f[3];

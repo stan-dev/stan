@@ -8,12 +8,12 @@ data {
   int n[N];
 }
 parameters {
-   double b[N];
-   double mu;
-   double(0,) sigmasq;
+   real b[N];
+   real mu;
+   real(0,) sigmasq;
 }
 transformed parameters {
-  double(0,) sigma; 
+  real(0,) sigma; 
   sigma <- sqrt(sigmasq); 
 }
 model {
@@ -25,6 +25,6 @@ model {
 }
 
 generated quantities {
-  double pop_mean;
+  real pop_mean;
   pop_mean <- inv_logit(mu); 
 } 

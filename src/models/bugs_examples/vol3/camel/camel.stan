@@ -22,14 +22,14 @@ transformed data {
 
 parameters { 
   cov_matrix(2) Sigma; 
-  double y52; 
-  double y62; 
-  double y72; 
-  double y82; 
-  double y91; 
-  double y101; 
-  double y111; 
-  double y121; 
+  real y52; 
+  real y62; 
+  real y72; 
+  real y82; 
+  real y91; 
+  real y101; 
+  real y111; 
+  real y121; 
 } 
 
 transformed parameters {
@@ -71,6 +71,6 @@ model {
 } 
 
 generated quantities { 
-  double(-1, 1) rho; 
+  real(-1, 1) rho; 
   rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 

@@ -44,11 +44,11 @@ transformed data {
 } 
 
 parameters {
-  double beta; 
+  real beta; 
 } 
 
 transformed parameters {
-  double p[I, 2];
+  real p[I, 2];
   for (i in 1:I) {
     p[i, 1] <- exp(beta * est[i, 1]); 
     p[i, 2] <- exp(beta * est[i, 2]); 

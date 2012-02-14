@@ -9,12 +9,12 @@
 data {
   int(0,) N; 
   int(0,) M; 
-  double LRT[N]; 
+  real LRT[N]; 
   int school[N]; 
   int School_denom[N, 3]; 
   int School_gender[N, 2]; 
   int VR[N, 2]; 
-  double Y[N]; 
+  real Y[N]; 
   int Gender[N]; 
   cov_matrix(3) R; 
 } 
@@ -30,17 +30,17 @@ transformed data {
 } 
 
 parameters {
-  double beta[8]; 
+  real beta[8]; 
   vector(3) alpha[M]; 
   vector(3) gamma; 
   cov_matrix(3) Sigma; 
-  double theta; 
-  double phi; 
+  real theta; 
+  real phi; 
 } 
 
 
 transformed parameters {
-  double alpha1[M]; 
+  real alpha1[M]; 
   for (m in 1:M)  alpha1[m] <- alpha[m, 1]; 
 } 
 

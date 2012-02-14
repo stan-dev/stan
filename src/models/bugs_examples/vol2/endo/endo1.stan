@@ -82,7 +82,7 @@ transformed data {
 } 
 
 parameters {
-  double beta; 
+  real beta; 
 } 
 
 model {

@@ -7,8 +7,8 @@
 transformed data {
 
   vector(2) Y[4]; 
-  double Y1[4];  // missing y2 
-  double Y2[4];  // msising y1
+  real Y1[4];  // missing y2 
+  real Y2[4];  // msising y1
 
   vector(2) mu; 
   matrix(2, 2) S; 
@@ -45,7 +45,7 @@ parameters {
 } 
 
 transformed parameters {
-  double(-1, 1) rho; 
+  real(-1, 1) rho; 
   rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 
 

@@ -5,25 +5,25 @@
 data {
   int(0,) N;
   int(0,) T;
-  double x[T];
-  double xbar;
-  double y[N,T];
+  real x[T];
+  real xbar;
+  real y[N,T];
   cov_matrix(2) Omega; 
 }
 parameters {
   vector(2) beta[N];
   vector(2) mu_beta;
-  double(0,) sigmasq_y;
+  real(0,) sigmasq_y;
   cov_matrix(2) Sigma_beta; 
 }
 //  transformed parameters {
-//    double rho; 
-//    double alpha0; 
+//    real rho; 
+//    real alpha0; 
 //    //rho <- Sigma_beta[1, 2] / sqrt(Sigma_beta[1, 1] * Sigma_beta[2, 2]);
 //    //alpha0 <- mu_beta[1] - mu_beta[2] * xbar; 
 //  }
 transformed parameters {
-  double(0,) sigma_y; 
+  real(0,) sigma_y; 
   sigma_y <- sqrt(sigmasq_y); 
 } 
 model {

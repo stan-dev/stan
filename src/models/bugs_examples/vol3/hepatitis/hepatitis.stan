@@ -15,33 +15,33 @@
 data {
   int(0,) N1;              ## N1 is the length of the vector, Yvec1, that is 
   int(0,) N;               ## created from concatenate columns of matrix Y[N, T] 
-  double Yvec1[N1];        ## with NA's removed. 
-  double tvec1[N1];        ## N is the nrow of original matrix Y[N, T] 
+  real Yvec1[N1];        ## with NA's removed. 
+  real tvec1[N1];        ## N is the nrow of original matrix Y[N, T] 
   int(0,) idxn1[N1];       ## idxn1 maps Yvec to its orignal n index 
-  double y0[N]; 
+  real y0[N]; 
 } 
 
 transformed data {
-  double y0_mean; 
+  real y0_mean; 
   y0_mean <- mean(y0); 
 } 
 
 parameters {
-  double(0,) sigmasq_y; 
-  double(0,) sigmasq_alpha; 
-  double(0,) sigmasq_beta; 
-  double alpha[N]; 
-  double beta[N]; 
-  double gamma; 
-  double alpha0; 
-  double beta0; 
+  real(0,) sigmasq_y; 
+  real(0,) sigmasq_alpha; 
+  real(0,) sigmasq_beta; 
+  real alpha[N]; 
+  real beta[N]; 
+  real gamma; 
+  real alpha0; 
+  real beta0; 
 } 
 
   
 transformed parameters {
-  double sigma_y; 
-  double sigma_alpha; 
-  double sigma_beta; 
+  real sigma_y; 
+  real sigma_alpha; 
+  real sigma_beta; 
   sigma_y <- sqrt(sigmasq_y); 
   sigma_alpha <- sqrt(sigmasq_alpha); 
   sigma_beta <- sqrt(sigmasq_beta); 

@@ -42,8 +42,8 @@ transformed data {
 } 
 
 parameters {
-  double beta; 
-  double beta0[I];
+  real beta; 
+  real beta0[I];
 } 
 
 model {

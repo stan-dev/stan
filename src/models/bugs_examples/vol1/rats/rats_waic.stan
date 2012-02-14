@@ -3,25 +3,25 @@
 data {
   int(0,) N;
   int(0,) T;
-  double x[T];
-  double y[N,T];
-  double xbar;
+  real x[T];
+  real y[N,T];
+  real xbar;
 }
 parameters {
-  double alpha[N];
-  double beta[N];
+  real alpha[N];
+  real beta[N];
 
-  double mu_alpha;
-  double mu_beta;
+  real mu_alpha;
+  real mu_beta;
 
-  double(0,) sigmasq_y;
-  double(0,) sigmasq_alpha;
-  double(0,) sigmasq_beta;
+  real(0,) sigmasq_y;
+  real(0,) sigmasq_alpha;
+  real(0,) sigmasq_beta;
 }
 transformed parameters {
-  double(0,) sigma_y;
-  double(0,) sigma_alpha;
-  double(0,) sigma_beta;
+  real(0,) sigma_y;
+  real(0,) sigma_alpha;
+  real(0,) sigma_beta;
 
   sigma_y <- sqrt(sigmasq_y);
   sigma_alpha <- sqrt(sigmasq_alpha);
@@ -41,7 +41,7 @@ model {
 
 }
 generated quantities {
-   double(,0) ll_y[N,T];
+   real(,0) ll_y[N,T];
  
    for (n in 1:N)
     for (t in 1:T)

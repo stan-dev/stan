@@ -23,8 +23,8 @@ transformed data {
 } 
 
 parameters {
-  double(, -0.00001) alpha;
-  double(, -0.00001) beta;
+  real(, -0.00001) alpha;
+  real(, -0.00001) beta;
 } 
 
 model {

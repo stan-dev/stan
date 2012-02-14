@@ -11,14 +11,14 @@ data {
   int(0,) rc[N]; 
 } 
 parameters {
-  double d; 
-  double(0,) sigmasq_delta; 
-  double mu[N]; 
-  double delta[N]; 
+  real d; 
+  real(0,) sigmasq_delta; 
+  real mu[N]; 
+  real delta[N]; 
 } 
 
 transformed parameters {
-  double sigma_delta; 
+  real sigma_delta; 
   sigma_delta <- sqrt(sigmasq_delta); 
 } 
 

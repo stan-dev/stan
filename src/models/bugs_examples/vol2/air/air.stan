@@ -1,7 +1,7 @@
 data {
-  double alpha; 
-  double beta; 
-  double(0,) sigma2; 
+  real alpha; 
+  real beta; 
+  real(0,) sigma2; 
   int(0,) J; 
   int y[J]; 
   int Z[J]; 
@@ -9,14 +9,14 @@ data {
 } 
 
 transformed data {
-  double(0,) sigma; 
+  real(0,) sigma; 
   sigma <- sqrt(sigma2); 
 } 
 
 parameters {
-   double theta1; 
-   double theta2; 
-   double X[J]; 
+   real theta1; 
+   real theta2; 
+   real X[J]; 
 } 
 
 model {

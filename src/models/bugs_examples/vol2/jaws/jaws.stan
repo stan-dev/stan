@@ -5,19 +5,19 @@ data {
   int(0,) N; 
   int(0,) M; 
   vector(M) Y[N]; 
-  double age[M]; 
+  real age[M]; 
   cov_matrix(M) S; 
 } 
 
 transformed data {
-  double mean_age;
+  real mean_age;
   mean_age <- mean(age); 
 } 
 
 
 parameters {
-  double beta0; 
-  double beta1; 
+  real beta0; 
+  real beta1; 
   cov_matrix(M) Sigma; 
 } 
 

@@ -4,8 +4,8 @@
 ## status: not working (stan is hanging over there)
 
 parameters {
-  double(-1, 1) x; 
-  double(-1, 1) y; 
+  real(-1, 1) x; 
+  real(-1, 1) y; 
 } 
 
 model {

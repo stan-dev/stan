@@ -4,8 +4,8 @@
 
 data {
   int(0,) N; 
-  double x[N]; 
-  double Y[N]; 
+  real x[N]; 
+  real Y[N]; 
   
 } 
 
@@ -15,14 +15,14 @@ transformed data {
 } 
 
 parameters {
-  double alpha;
-  double beta[2]; 
-  double(0,) tau; 
+  real alpha;
+  real beta[2]; 
+  real(0,) tau; 
   int(0,) k;
 } 
 
 transformed parameters {
-  double sigma;
+  real sigma;
   sigma <- 1 / sqrt(tau); 
 } 
 

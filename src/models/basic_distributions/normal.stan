@@ -1,12 +1,12 @@
 transformed data {
-    double mu;
-    double sigma;
+    real mu;
+    real sigma;
     
     mu <- -20.0;
     sigma <- 10.0;
 }
 parameters {
-    double y;
+    real y;
 }
 model {
     y ~ normal(mu,sigma);

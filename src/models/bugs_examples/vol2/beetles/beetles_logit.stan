@@ -2,25 +2,25 @@ data {
     int(0,) N;
     int(0,) n[N];
     int(0,) r[N];
-    double x[N];
+    real x[N];
 }
 transformed data {
-    double mean_x;
-    double centered_x[N];
+    real mean_x;
+    real centered_x[N];
 
     mean_x <- mean(x);
     for (i in 1:N)
         centered_x[i] <- x[i] - mean_x;
 }
 parameters {
-    double alpha_star;
-    double beta;
+    real alpha_star;
+    real beta;
 }
 transformed parameters {
-    double p[N];
-    double llike[N];
-    double alpha;
-    double rhat[N];
+    real p[N];
+    real llike[N];
+    real alpha;
+    real rhat[N];
 
     alpha <- alpha_star - beta*mean_x;
     for (i in 1:N) {

@@ -15,12 +15,12 @@ transformed data {
     yearsq[i] <- year[i] * year[i]; 
 } 
 parameters {
-  double mu[K]; 
-  double alpha;
-  double beta1; 
-  double beta2;
-  double(0, 3) sigma; // Q: do we need 'double(0, 3)' or just 'double'? 
-  double b[K]; 
+  real mu[K]; 
+  real alpha;
+  real beta1; 
+  real beta2;
+  real(0, 3) sigma; // Q: do we need 'real(0, 3)' or just 'real'? 
+  real b[K]; 
 }
 model {
   for (i in 1:K) {

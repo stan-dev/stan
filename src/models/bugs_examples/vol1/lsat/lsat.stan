@@ -23,9 +23,9 @@ transformed data {
   } 
 }
 parameters {
-  double alpha[T];
-  double theta[N];
-  double(0,) beta;
+  real alpha[T];
+  real theta[N];
+  real(0,) beta;
 }
 model {
   alpha ~ normal(0, 100.); 
@@ -37,8 +37,8 @@ model {
 }
 
 generated quantities {
-  double mean_alpha; 
-  double a[T]; 
+  real mean_alpha; 
+  real a[T]; 
   mean_alpha <- mean(alpha);
   for(t in 1:T) a[t] <- alpha[t] - mean_alpha;
 } 

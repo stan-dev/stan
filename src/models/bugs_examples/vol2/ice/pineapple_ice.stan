@@ -13,7 +13,7 @@ data {
 }
 transformed data { # deterministic functions of data to be called only once
     int Nneighs[K];
-    double betasd[K];
+    real betasd[K];
 
     Nneighs[1] <- 1;
     Nneighs[2] <- 5;
@@ -29,12 +29,12 @@ transformed data { # deterministic functions of data to be called only once
     }
 }
 parameters {
-  double alpha[Nage - 1]; 
-  double beta[K];
-  double(0.05,) sigma;
+  real alpha[Nage - 1]; 
+  real beta[K];
+  real(0.05,) sigma;
 } 
 transformed parameters { # deterministic functions of parameters called every iteration
-    double betamean[K];
+    real betamean[K];
 
     betamean[1] <- 2.0 * beta[2] - beta[3];
     betamean[2] <- (2.0 * beta[1] + 4.0 * beta[3] - beta[4]) / 5.0;
@@ -45,9 +45,9 @@ transformed parameters { # deterministic functions of parameters called every it
     betamean[K] <- 2.0 * beta[K - 1] - beta[K - 2];
 }
 model {
-    double ln_mu;
+    real ln_mu;
 #   uncommenting these lines leads to an overflow in exp(ln_mu)
-#    double globalmean;
+#    real globalmean;
 
 #   alpha[1] is supposed to be constrained to zero 
 #   so we shorten alpha by one and split the loop for the likelihood
@@ -77,7 +77,7 @@ model {
     }
 }
 generated quantities {
-    double log_RR[K];
+    real log_RR[K];
     for (k in 1 : K) {
         log_RR[k] <- sigma * (beta[k] - beta[5]);
     }

@@ -6,8 +6,8 @@ data {
   int(0,) NP; 
   int(0,) N_uc;
   int(0,) N_rc;
-  double(0,) t_uc[N_uc]; 
-  double(0,) t_rc[N_rc]; 
+  real(0,) t_uc[N_uc]; 
+  real(0,) t_rc[N_rc]; 
   int disease_uc[N_uc]; 
   int disease_rc[N_rc]; 
   int patient_uc[N_uc]; 
@@ -18,20 +18,20 @@ data {
   int age_rc[N_rc]; 
 } 
 parameters {
-  double alpha; 
-  double beta_age;
-  double beta_sex;
-  double beta_disease2; 
-  double beta_disease3; 
-  double beta_disease4; 
-  double(0,) r; 
-  double(0,) tau;
-  double b[NP]; 
+  real alpha; 
+  real beta_age;
+  real beta_sex;
+  real beta_disease2; 
+  real beta_disease3; 
+  real beta_disease4; 
+  real(0,) r; 
+  real(0,) tau;
+  real b[NP]; 
 } 
 
 transformed parameters {
-  double sigma;
-  double yabeta_disease[4];
+  real sigma;
+  real yabeta_disease[4];
   yabeta_disease[1] <- 0; 
   yabeta_disease[2] <- beta_disease2;
   yabeta_disease[3] <- beta_disease3;

@@ -16,12 +16,12 @@ transformed data {
   S[2,2] <- 0.5;
 }
 parameters {
-  double(-1,1) rho;
-  double(0,) var1;
-  double(0,) var2;
+  real(-1,1) rho;
+  real(0,) var1;
+  real(0,) var2;
 }
 model {
-  double cov;
+  real cov;
   matrix(2,2) W;
 
   cov <- rho * sqrt(var1 * var2);

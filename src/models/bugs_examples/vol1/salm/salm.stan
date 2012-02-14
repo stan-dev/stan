@@ -4,14 +4,14 @@ data {
     int(0,) I;
     int(0,) J;
     int(0,) y[I,J];
-    double x[I];
+    real x[I];
 }
 transformed data {
-    double logx[I];
-    double mean_x;
-    double mean_logx;
-    double centered_x[I];
-    double centered_logx[I];
+    real logx[I];
+    real mean_x;
+    real mean_logx;
+    real centered_x[I];
+    real centered_logx[I];
 
     mean_x <- mean(x);
     for (i in 1:I)
@@ -24,15 +24,15 @@ transformed data {
         centered_logx[i] <- logx[i] - mean_logx;
 }
 parameters {
-    double alpha_star;
-    double beta;
-    double gamma;
-    double(0,) tau;
-    double lambda[I,J];
+    real alpha_star;
+    real beta;
+    real gamma;
+    real(0,) tau;
+    real lambda[I,J];
 }
 transformed parameters {
-    double(0,) sigma;
-    double alpha;
+    real(0,) sigma;
+    real alpha;
 
     alpha <- alpha_star - beta * mean_logx - gamma * mean_x;
     sigma <- 1.0 / sqrt(tau);

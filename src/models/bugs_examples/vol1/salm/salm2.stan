@@ -5,17 +5,17 @@ data {
     int(0,) I;
     int(0,) J;
     int(0,) y[I,J];
-    double x[I];
+    real x[I];
 }
 parameters {
-    double alpha; 
-    double beta;
-    double gamma;
-    double(0,) tau;
-    double lambda[I,J];
+    real alpha; 
+    real beta;
+    real gamma;
+    real(0,) tau;
+    real lambda[I,J];
 }
 transformed parameters {
-    double(0,) sigma;
+    real(0,) sigma;
     sigma <- 1.0 / sqrt(tau);
 }
 model {

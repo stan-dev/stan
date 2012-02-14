@@ -9,19 +9,19 @@
 
 data {
   int(0,) N; 
-  double x[N]; 
-  double Y[N]; 
+  real x[N]; 
+  real Y[N]; 
 } 
 parameters {
-  double alpha; 
-  double beta;  
-  double(.5, 1) lambda; // orginal gamma in the JAGS example  
-  double(0,) tau; 
+  real alpha; 
+  real beta;  
+  real(.5, 1) lambda; // orginal gamma in the JAGS example  
+  real(0,) tau; 
    
 } 
 transformed parameters {
-  double sigma; 
-  double U3; 
+  real sigma; 
+  real U3; 
   sigma <- 1 / sqrt(tau); 
   U3 <- logit(lambda);
 } 

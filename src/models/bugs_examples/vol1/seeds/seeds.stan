@@ -4,19 +4,19 @@ data {
     int(0,) I;
     int(0,) n[I];
     int(0,) N[I];
-    double x1[I];
-    double x2[I];
+    real x1[I];
+    real x2[I];
 }
 parameters {
-    double alpha0;
-    double alpha1;
-    double alpha2;
-    double alpha12;
-    double(0,) tau;
-    double b[I];
+    real alpha0;
+    real alpha1;
+    real alpha2;
+    real alpha12;
+    real(0,) tau;
+    real b[I];
 }
 transformed parameters {
-    double(0,) sigma;
+    real(0,) sigma;
     sigma  <- 1.0 / sqrt(tau);
 }
 model {

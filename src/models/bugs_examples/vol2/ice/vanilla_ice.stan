@@ -13,7 +13,7 @@ data {
 }
 transformed data { # deterministic functions of data to be called only once
     int Nneighs[K];
-    double shape;
+    real shape;
 
     Nneighs[1] <- 1;
     Nneighs[2] <- 5;
@@ -25,15 +25,15 @@ transformed data { # deterministic functions of data to be called only once
     shape <- 0.0001 + K / 2.0;
 }
 parameters {
-  double alpha[Nage - 1]; 
-  double beta[K]; 
-  double(0,) tau;
+  real alpha[Nage - 1]; 
+  real beta[K]; 
+  real(0,) tau;
 } 
 transformed parameters { # deterministic functions of parameters called every iteration
-    double betamean[K];
-    double betasd[K];
-    double tau_like[K];
-    double d;
+    real betamean[K];
+    real betasd[K];
+    real tau_like[K];
+    real d;
 
     betamean[1] <- 2.0 * beta[2] - beta[3];
     betamean[2] <- (2.0 * beta[1] + 4.0 * beta[3] - beta[4]) / 5.0;
@@ -49,13 +49,13 @@ transformed parameters { # deterministic functions of parameters called every it
     d <- 0.0001 + sum(tau_like) / 2.0;
 }
 generated quantities {
-    double log_RR[K];
+    real log_RR[K];
     for (k in 1 : K) {
         log_RR[k] <- beta[k] - beta[5];
     }
 }
 model {
-    double ln_mu;
+    real ln_mu;
     for(j in 1:(Nage-1)) {
         alpha[j] ~ normal(0.0, 1000.0);
     }

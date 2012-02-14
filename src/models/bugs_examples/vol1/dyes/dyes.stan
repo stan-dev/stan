@@ -7,21 +7,21 @@
 data {
   int BATCHES; 
   int SAMPLES; 
-  double y[BATCHES, SAMPLES]; 
+  real y[BATCHES, SAMPLES]; 
 
   // vector(SAMPLES) y[BATCHES]; 
 } 
 
 parameters {
-  double theta;
-  double(0,) sigmasq_within; 
-  double(0,) sigmasq_between;
-  double mu[BATCHES]; 
+  real theta;
+  real(0,) sigmasq_within; 
+  real(0,) sigmasq_between;
+  real mu[BATCHES]; 
 } 
 
 transformed parameters {
-  double sigma_within;
-  double sigma_between; 
+  real sigma_within;
+  real sigma_between; 
   sigma_between <- sqrt(sigmasq_between); 
   sigma_within <- sqrt(sigmasq_within); 
 } 

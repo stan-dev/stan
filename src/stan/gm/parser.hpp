@@ -735,7 +735,7 @@ namespace stan {
                    | lit('e')
                    | lit('E') );
 
-        double_literal_r.name("double literal");
+        double_literal_r.name("real literal");
         double_literal_r
           %= double_;
 
@@ -905,9 +905,9 @@ namespace stan {
           > opt_dims_r
           > lit(';');
 
-        double_decl_r.name("double declaration");
+        double_decl_r.name("real declaration");
         double_decl_r 
-          %= lit("double")
+          %= lit("real")
           > -range_brackets_double_r
           > identifier_r
           > opt_dims_r

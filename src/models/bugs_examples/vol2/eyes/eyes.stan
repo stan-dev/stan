@@ -11,20 +11,20 @@
 
 data {
   int(0,) N; 
-  double y[N]; 
+  real y[N]; 
 //  vector(2) alpha;
 } 
 parameters {
   // int(0,) z[N]; 
-  double(0,) sigmasq;
-  double(0,) theta;
-  double lambda_1; 
+  real(0,) sigmasq;
+  real(0,) theta;
+  real lambda_1; 
   // vector(2) p;
-  double(0, 1) p1; 
+  real(0, 1) p1; 
 } 
 transformed parameters {
-    double lambda[2];
-    double sigma; 
+    real lambda[2];
+    real sigma; 
     sigma <- sqrt(sigmasq); 
     lambda[1] <- lambda_1;
     lambda[2] <- lambda[1] + theta;

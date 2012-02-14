@@ -2,15 +2,15 @@
 
 data {
     int(0,) J;               // number of schools
-    double y[J];             // estimated treatment effect (school j)
-    double(0,) sigma_y[J];   // standard error of effect estimate (school j)
-    double sigma_xi;         // prior scale (coefficient)
+    real y[J];             // estimated treatment effect (school j)
+    real(0,) sigma_y[J];   // standard error of effect estimate (school j)
+    real sigma_xi;         // prior scale (coefficient)
 }
 parameters {
-    double mu;               // intercept coefficient (for y)
-    double xi;               // slope coefficient (for y)
-    double eta[J];           // predictor (school j)
-    double(0,) sigma_eta;    // deviation of eta
+    real mu;               // intercept coefficient (for y)
+    real xi;               // slope coefficient (for y)
+    real eta[J];           // predictor (school j)
+    real(0,) sigma_eta;    // deviation of eta
 }
 model {
     sigma_eta ~ cauchy(0,1);

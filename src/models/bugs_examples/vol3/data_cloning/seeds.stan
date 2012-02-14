@@ -15,8 +15,8 @@ data {
     int(0,) I;
     int(0,) n[I];
     int(0,) N[I];
-    double x1[I];
-    double x2[I];
+    real x1[I];
+    real x2[I];
 } 
 
 transformed data {
@@ -25,16 +25,16 @@ transformed data {
 } 
 
 parameters {
-    double alpha0;
-    double alpha1;
-    double alpha2;
-    double alpha12;
-    double(0,) tau;
-    double b[I, K];
+    real alpha0;
+    real alpha1;
+    real alpha2;
+    real alpha12;
+    real(0,) tau;
+    real b[I, K];
 } 
 
 transformed parameters {
-    double sigma; 
+    real sigma; 
     sigma <- 1 / sqrt(tau); 
 } 
 

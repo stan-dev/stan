@@ -14,8 +14,8 @@ data {
 } 
 
 transformed data {
-  double s0_sqrd; 
-  double psigma; 
+  real s0_sqrd; 
+  real psigma; 
   s0_sqrd <- 0.1272041; 
   psigma <- sqrt(s0_sqrd / Phi(.75)); 
 } 
@@ -23,15 +23,15 @@ transformed data {
 #   [1] 0.1272041
 
 parameters {
-  double(-10, 10) mu;
-  double(0, )  sigmasq; 
-  double(0, 1) pc[N]; 
-  double theta[N]; 
+  real(-10, 10) mu;
+  real(0, )  sigmasq; 
+  real(0, 1) pc[N]; 
+  real theta[N]; 
 } 
 
 transformed parameters {
-  double pt[N];
-  double sigma;
+  real pt[N];
+  real sigma;
   sigma <- sqrt(sigmasq); 
  
   for (n in 1:N) 

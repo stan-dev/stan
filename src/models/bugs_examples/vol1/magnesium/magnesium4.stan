@@ -14,22 +14,22 @@ data {
 } 
 
 transformed data {
-  double s0_sqrd; 
+  real s0_sqrd; 
   s0_sqrd <- 0.1272041; 
 } 
 #   > print(s0.sqrd);
 #   [1] 0.1272041
 
 parameters {
-  double(-10, 10) mu;
-  double(0, 1) B0; 
-  double(0, 1) pc[N]; 
-  double theta[N]; 
+  real(-10, 10) mu;
+  real(0, 1) B0; 
+  real(0, 1) pc[N]; 
+  real theta[N]; 
 } 
 
 transformed parameters {
-  double pt[N];
-  double sigma; 
+  real pt[N];
+  real sigma; 
 
   sigma <-  sqrt(s0_sqrd * (1 - B0) / B0); 
  

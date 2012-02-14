@@ -7,20 +7,20 @@ data {
   int(0,) K;
   int(0,) N;
   int x[N];
-  double Y[K, N]; 
+  real Y[K, N]; 
 }
 
 parameters{
-  double(0,) sigmasq;
-  double theta[K, 3];
-  double theta_mu[3]; 
-  double(0,) theta_sigmasq[3]; 
+  real(0,) sigmasq;
+  real theta[K, 3];
+  real theta_mu[3]; 
+  real(0,) theta_sigmasq[3]; 
 } 
 
 transformed parameters {
-  double phi[K, 3]; 
-  double theta_sigma[3];
-  double sigma;
+  real phi[K, 3]; 
+  real theta_sigma[3];
+  real sigma;
   for (k in 1:K) { 
     phi[k, 1] <- exp(theta[k, 1]);
     phi[k, 2] <- exp(theta[k, 2]) - 1;

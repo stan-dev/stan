@@ -14,14 +14,14 @@ data {
 } 
 
 parameters {
-  double(-10, 10) mu;
-  double(0, 50) sigma; 
-  double(0, 1) pc[N]; 
-  double theta[N]; 
+  real(-10, 10) mu;
+  real(0, 50) sigma; 
+  real(0, 1) pc[N]; 
+  real theta[N]; 
 } 
 
 transformed parameters {
-  double pt[N];
+  real pt[N];
  
   for (n in 1:N) 
     pt[n] <- inv_logit(theta[n] + logit(pc[n])); 

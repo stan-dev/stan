@@ -5,7 +5,7 @@ data {
   int(0,) P; 
   int(0,) N; 
   int group[N]; 
-  double Y[N, P]; 
+  real Y[N, P]; 
   int sign[2];
 
   int T[N, P]; 
@@ -17,22 +17,22 @@ data {
 #   transformed data {
 #     int T[N, P]; 
 #     for (n in 1:N) for (p in 1:P)  
-#       // (group[n] * (p - 1.5) + 1.5)  is 1/2, but of type double, 
+#       // (group[n] * (p - 1.5) + 1.5)  is 1/2, but of type real, 
 #       // using int_step as a workaround 
 #       T[n, p] <- int_step(group[n] * (p - 1.5) + .4) + 1; 
 #   } 
 
 parameters {
-  double mu;
-  double phi; 
-  double pi; 
-  double(0,) sigmasq; 
-  double(0,) sigmasq2;
-  double delta[N]; 
+  real mu;
+  real phi; 
+  real pi; 
+  real(0,) sigmasq; 
+  real(0,) sigmasq2;
+  real delta[N]; 
 } 
 
 transformed parameters {
-  double sigma; 
+  real sigma; 
   sigma <- sqrt(sigmasq); 
 } 
 

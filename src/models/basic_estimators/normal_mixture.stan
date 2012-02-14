@@ -3,15 +3,15 @@
 
 data {
   int(0,)  N;
-  double y[N];
+  real y[N];
 }
 parameters {
-  double(0,1) theta;
-  double mu[2];
+  real(0,1) theta;
+  real mu[2];
 }
 transformed parameters {
-  double(0,1) log_theta;
-  double(0,1) log_one_minus_theta;
+  real(0,1) log_theta;
+  real(0,1) log_one_minus_theta;
 
   log_theta <- log(theta);
   log_one_minus_theta <- log(1.0 - theta);

@@ -14,29 +14,29 @@ data {
 } 
 
 transformed data {
-  double s0_sqrd; 
-  double psigma; 
+  real s0_sqrd; 
+  real psigma; 
   s0_sqrd <- 0.1272041; 
   psigma <- sqrt(s0_sqrd / Phi(.75)); 
 } 
 
 parameters {
-  double(-10, 10) mu[6];
+  real(-10, 10) mu[6];
 
-  double(0,) sigmasq1; 
-  double(0, 50) sigmasq2; 
-  double(0,)  sigma3; 
-  double(0, 1) B04;
-  double(0, 1) D05; 
-  double(0, )  sigmasq6; 
+  real(0,) sigmasq1; 
+  real(0, 50) sigmasq2; 
+  real(0,)  sigma3; 
+  real(0, 1) B04;
+  real(0, 1) D05; 
+  real(0, )  sigmasq6; 
 
-  double(0, 1) pc[N, 6]; 
-  double theta[N, 6]; 
+  real(0, 1) pc[N, 6]; 
+  real theta[N, 6]; 
 } 
 
 transformed parameters {
-  double pt[N, 6];
-  double yasigma[6]; 
+  real pt[N, 6];
+  real yasigma[6]; 
  
   yasigma[1] <- sqrt(sigmasq1); 
   yasigma[2] <- sqrt(sigmasq2); 

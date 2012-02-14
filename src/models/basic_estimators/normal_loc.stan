@@ -1,5 +1,5 @@
 transformed data {
-    double y[5];
+    real y[5];
     y[1] <- 2.0;
     y[2] <- 1.0;
     y[3] <- -0.5;
@@ -7,7 +7,7 @@ transformed data {
     y[5] <- 0.25;
 }
 parameters {
-    double mu;
+    real mu;
 }
 model {
     for (n in 1:5)

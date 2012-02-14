@@ -18,18 +18,18 @@ data {
   int cases[N]; 
   int age[N]; 
   int pyr[N]; 
-  double alpha1; 
+  real alpha1; 
 } 
 
 parameters {
-  double alpha[Nage - 1]; 
-  double beta[K]; 
-  double(0,1) sigma; 
+  real alpha[Nage - 1]; 
+  real beta[K]; 
+  real(0,1) sigma; 
 } 
 
 transformed parameters {
-  double yaalpha[Nage]; 
-  // double logRR[K]; 
+  real yaalpha[Nage]; 
+  // real logRR[K]; 
   yaalpha[1] <- alpha1; 
   for (i in 2:Nage) 
     yaalpha[i] <- alpha[i - 1]; 

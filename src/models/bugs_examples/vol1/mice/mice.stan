@@ -11,16 +11,16 @@ data {
   int(0,) group_uc[N_uc];
   int(0,) group_rc[N_rc];
   int(0,) last_t_rc[N_rc]; 
-  double(0,) t_uc[N_uc]; 
+  real(0,) t_uc[N_uc]; 
 }
 
 parameters {
-  double beta[M]; 
-  double(0,) r; 
+  real beta[M]; 
+  real(0,) r; 
 } 
 
 transformed parameters {
-  double sigma[M]; 
+  real sigma[M]; 
   for (m in 1:M)  sigma[m] <- exp(-beta[m] / r);  
 } 
 
