@@ -259,7 +259,7 @@ namespace stan {
       typedef boost::ecuyer1988 rng_t;
       rng_t base_rng(random_seed);
       // (2**50 = 1T samples, 1000 chains)
-      static long unsigned int DISCARD_STRIDE = (1 << 50);
+      static long unsigned int DISCARD_STRIDE = (1UL << 50);
       base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
       
       std::vector<int> params_i;
