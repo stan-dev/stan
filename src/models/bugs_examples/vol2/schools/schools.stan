@@ -4,7 +4,7 @@
 #  http://www.openbugs.info/Examples/Schools.html
 
 ## status: not work (adaption hangs, but not sure it is 
-## code correctly). 
+## coded correctly). 
 
 data {
   int(0,) N; 
@@ -22,6 +22,8 @@ data {
 transformed data {
   vector(3) gamma_mu; 
   cov_matrix(3) gamma_Sigma; 
+  cov_matrix(3) invR; 
+  invR <- inverse(R); 
   gamma_mu[1] <- 0; 
   gamma_mu[2] <- 0; 
   gamma_mu[3] <- 0; 
@@ -68,7 +70,7 @@ model {
 
   # Hyper-priors:
   gamma ~ multi_normal(gamma_mu, gamma_Sigma); 
-  Sigma ~ inv_wishart(3, R); 
+  Sigma ~ inv_wishart(3, invR); 
 }
 
 

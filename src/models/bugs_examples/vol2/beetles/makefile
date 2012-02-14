@@ -1,4 +1,4 @@
-	STAN_HOME = ../../../../..
+STAN_HOME = ../../../../..
 
 beetles_logit :
 	cat beetles_logit.stan | $(STAN_HOME)/demo/gm > beetles_logit.cpp
@@ -16,4 +16,4 @@ beetles_cloglog :
 	./beetles_cloglog --data=beetles.Rdata
 
 clean :
-	rm beetles*.cpp samples.csv beetles_logit beetles_probit beetles_cloglog
+	rm -f beetles*.cpp samples.csv beetles_logit beetles_probit beetles_cloglog

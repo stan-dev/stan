@@ -1,10 +1,10 @@
 library(coda)
-post <- read.csv(file = 'samples3.csv', header = TRUE)[, 1]
-names(post)[1] <- c("beta");
+post <- read.csv(file = 'samples1.csv', header = TRUE)
+poi <- post[, 'beta'] 
 
-summary(as.mcmc(post)); 
+summary(as.mcmc(poi)); 
+quit('no')
 
-quit()
 
 library(BUGSExamples);
 pars <- c("beta"); 

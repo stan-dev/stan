@@ -1,7 +1,7 @@
 STAN_HOME = ../../../../..
 PGM = endo#
-CXX = clang++ -std=c++0x 
-CXX = g++-4.6.2 -std=c++0x 
+CXX = g++ -std=c++0x 
+CXX = clang++ 
 
 .PHONY : one two three 
 

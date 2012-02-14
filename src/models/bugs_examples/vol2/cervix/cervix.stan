@@ -11,11 +11,12 @@
 ##   rather pointless.'' 
 
 
-# status: (not work)
+# status: 
 #  1. there is discrete parameters 
-#  2. If we just the use complete data --- no discrete parameters needed, not work
 #     
 
+## For the time being, the discrete parameters part are commented 
+## out so the only part of the data are modeled in this example. 
 
 data {
   int(0,) Nc; 

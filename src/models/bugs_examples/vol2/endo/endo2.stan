@@ -5,8 +5,8 @@
 # model specifications are used for one equivalent
 # model. This is method 2. 
 
-# status: not work, multinomial specification error/problem?
 
+# FIXME: using the multinomial specification  
 
 data {
   int n10; 
@@ -52,7 +52,7 @@ transformed parameters {
   for (i in 1:I) {
     p[i, 1] <- exp(beta * est[i, 1]); 
     p[i, 2] <- exp(beta * est[i, 2]); 
-    p[i, 1] <- 1 / (p[i, 1] + p[i, 2]); 
+    p[i, 1] <- p[i, 1] / (p[i, 1] + p[i, 2]); 
     p[i, 2] <- 1 - p[i, 1];
   } 
 } 
@@ -60,5 +60,12 @@ transformed parameters {
 model {
   # METHOD 2 - conditional likelihoods
   beta ~ normal(0, 1000); 
-  for (i in 1:I)  Y[i] ~ multinomial(p[i]);
+
+  for (i in 1:I) {
+    // Y[i] ~ multinomial(p[i]);
+
+    // using the multinomial log-pmf explicitly 
+    lp__ <- lp__ + log(p[i, 1]) * Y[i, 1]; 
+    lp__ <- lp__ + log(p[i, 2]) * Y[i, 2]; 
+  } 
 } 

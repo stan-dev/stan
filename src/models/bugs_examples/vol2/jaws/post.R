@@ -17,7 +17,8 @@ summary(as.mcmc(invSigma))
 
 
 library(BUGSExamples);
-pars <- c("beta0", "beta1", "mu", "Omega"); 
+# Sigma <- inverse(Omega) 
+pars <- c("beta0", "beta1", "mu", "Omega", "Sigma"); 
 ex <- list(name = "Jaws", parameters = pars,
            nSample = 10000, nBurnin = 1000, nThin = 1,
            nChain = 3)
