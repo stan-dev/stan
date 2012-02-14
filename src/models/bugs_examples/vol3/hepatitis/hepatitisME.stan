@@ -3,7 +3,7 @@
 # error
 #  http://openbugs.info/Examples/Hepatitis.html
 
-# model the measurement eror heres (compared with hepatitis.stan) 
+# model the measurement eror here (compared with hepatitis.stan) 
 
 
 ## note that we have missing data in the orignal data Y[N, T]; 
@@ -30,7 +30,7 @@ parameters {
   double(0,) sigmasq_y0; 
   double(0,) sigmasq_alpha; 
   double(0,) sigmasq_beta; 
-  double(0,) sigmasq_mu0; 
+  double(0,) sigma_mu0; 
   double gamma; 
   double alpha0; 
   double beta0; 
@@ -57,7 +57,10 @@ model {
     Yvec1[n] ~ normal(alpha[oldn] + beta[oldn] * (tvec1[n] - 6.5) + gamma * (mu0[oldn] - y0_mean), sigma_y); 
   }
 
-  mu0 ~ normal(theta, sqrt(sigmasq_mu0)); 
+  mu0 ~ normal(theta, sigma_mu0); 
+  ## It is a bit weird that to specify gamma prior on sigma_mu0 instead on gamma_mu0^2
+  ## in the bugs example. 
+
   for (n in 1:N) y0[n] ~ normal(mu0[n], sigma_y); 
 
   alpha ~ normal(alpha0, sigma_alpha); 
@@ -66,7 +69,8 @@ model {
   sigmasq_y ~ inv_gamma(.001, .001); 
   sigmasq_alpha ~ inv_gamma(.001, .001); 
   sigmasq_beta ~ inv_gamma(.001, .001); 
-  sigmasq_mu0 ~ inv_gamma(.001, .001); 
+  sigma_mu0 ~ inv_gamma(.001, .001); 
+  
   alpha0 ~ normal(0, 1000); 
   beta0 ~ normal(0, 1000); 
   gamma ~ normal(0, 1000); 

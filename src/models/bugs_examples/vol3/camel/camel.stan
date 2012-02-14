@@ -6,6 +6,9 @@
 #     
 #   } 
 
+
+## status: results not verified with in those in bugs 
+
 transformed data {
   vector(2) mu; 
   matrix(2, 2) S; 
@@ -60,7 +63,10 @@ transformed parameters {
 
 
 model {
-  Sigma ~ inv_wishart(2, S); 
+  // Sigma ~ inv_wishart(2, S); 
+ 
+  // using the prior as in Tanner and Wong (1987) 
+  lp__ <- lp__ - 1.5 * log(determinant(Sigma));  
   for (n in 1:12) Y[n] ~ multi_normal(mu, Sigma); 
 } 
 

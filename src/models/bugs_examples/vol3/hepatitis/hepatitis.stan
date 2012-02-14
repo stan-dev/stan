@@ -3,8 +3,8 @@
 # error
 #  http://openbugs.info/Examples/Hepatitis.html
 
-# In current implementation, the measurement 
-# errors are not modeled.  
+# In this version the measurement errors are not modeled.  
+# See hepatisisME for the version with measurement errors. 
 
 
 ## note that we have missing data in the orignal data Y[N, T]; 
