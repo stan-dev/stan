@@ -190,6 +190,7 @@ namespace stan {
       generate_include("sstream",o);
       generate_include("utility",o);
       generate_include("boost/exception/all.hpp",o);
+      generate_include("stan/maths/matrix.hpp",o);
       generate_include("stan/agrad/agrad.hpp",o);
       generate_include("stan/agrad/special_functions.hpp",o);
       generate_include("stan/agrad/matrix.hpp",o);
