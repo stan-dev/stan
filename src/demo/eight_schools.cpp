@@ -18,7 +18,7 @@
 #include <stan/maths/special_functions.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/sampler.hpp>
-#include <stan/mcmc/prob_grad_ad.hpp>
+#include <stan/model/prob_grad_ad.hpp>
 #include <stan/prob/distributions.hpp>
 
 namespace test_model_namespace {

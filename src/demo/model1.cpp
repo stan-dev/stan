@@ -7,7 +7,7 @@
 #include <boost/math/special_functions.hpp>
 #include "stan/agrad/agrad.hpp"
 #include "stan/agrad/agrad_special_functions.hpp"
-#include "stan/mcmc/prob_grad_ad.hpp"
+#include "stan/model/prob_grad_ad.hpp"
 #include "stan/mcmc/hmc.hpp"
 #include "stan/mcmc/sampler.hpp"
 
@@ -67,7 +67,7 @@ public:
   }
 
   stan::agrad::var log_prob_ad(std::vector<stan::agrad::var>& params_r,
-		    std::vector<unsigned int>& params_i) {
+                    std::vector<unsigned int>& params_i) {
     return log_prob_ad_templated<stan::agrad::var>(params_r, params_i);
   }
 

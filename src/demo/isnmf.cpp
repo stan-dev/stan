@@ -9,7 +9,7 @@
 #include <boost/math/special_functions.hpp>
 #include "stan/agrad/agrad.hpp"
 #include "stan/agrad/agrad_special_functions.hpp"
-#include "stan/mcmc/prob_grad_ad.hpp"
+#include "stan/model/prob_grad_ad.hpp"
 #include "stan/mcmc/hmc.hpp"
 #include "stan/mcmc/adaptivehmc.hpp"
 #include "stan/optimize/gradient_based.hpp"
@@ -183,7 +183,7 @@ public:
   { }
 
   RV log_prob(std::vector<RV>& params_r,
-	      std::vector<unsigned int>& params_i) {
+              std::vector<unsigned int>& params_i) {
     Matrix<RV> W(M_, K_);
     Matrix<RV> H(K_, N_);
     for (int i = 0; i < M_*K_; i++)

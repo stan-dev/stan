@@ -204,7 +204,7 @@ namespace stan {
       generate_include("stan/maths/special_functions.hpp",o);
       generate_include("stan/mcmc/hmc.hpp",o);
       generate_include("stan/mcmc/sampler.hpp",o);
-      generate_include("stan/mcmc/prob_grad_ad.hpp",o);
+      generate_include("stan/model/prob_grad_ad.hpp",o);
       generate_include("stan/prob/distributions.hpp",o);
       o << EOL;
     }

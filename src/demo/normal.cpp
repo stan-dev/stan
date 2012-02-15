@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "demo/experiment.hpp"
 #include "stan/agrad/agrad.hpp"
-#include "stan/mcmc/prob_grad_ad.hpp"
+#include "stan/model/prob_grad_ad.hpp"
 #include "stan/mcmc/hmc.hpp"
 #include "stan/mcmc/adaptive_hmc.hpp"
 #include "stan/mcmc/adaptive_cdhmc.hpp"
@@ -39,7 +39,7 @@ public:
 
   // compute log prob using typedef for automatic gradient calc
   RV log_prob(std::vector<RV>& params_r,
-	      std::vector<int>& params_i) {
+              std::vector<int>& params_i) {
     RV result = 0;
     for (unsigned int i = 0; i < D; i++) {
       double* Ai = &A_[i*D];

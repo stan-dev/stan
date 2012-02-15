@@ -5,7 +5,7 @@
 #include "stan/agrad/agrad.hpp"
 #include "stan/mcmc/hmc.hpp"
 #include "stan/mcmc/sampler.hpp"
-#include "stan/mcmc/prob_grad_ad.hpp"
+#include "stan/model/prob_grad_ad.hpp"
 
 const double PI = std::atan(1.0)*4;
 
@@ -16,10 +16,10 @@ typedef stan::agrad::var RV;
 class bivar_norm_model : public stan::mcmc::prob_grad_ad {
 public:
   bivar_norm_model(double mu1, 
-		   double mu2,
-		   double sigma1, 
-		   double sigma2, 
-		   double rho)
+                   double mu2,
+                   double sigma1, 
+                   double sigma2, 
+                   double rho)
     : stan::mcmc::prob_grad_ad::prob_grad_ad(NUM_PARAMETERS_R),
       _mu1(mu1), 
       _mu2(mu2),
@@ -31,15 +31,15 @@ public:
   }
 
   RV log_prob(std::vector<RV>& params_r,
-	      std::vector<int>& params_i) {
+              std::vector<int>& params_i) {
     RV y1 = params_r[0];    
     RV y2 = params_r[1];
     RV z1 = (y1 - _mu1)/_sigma1;
     RV z2 = (y2 - _mu2)/_sigma2;
     RV result = _log_inv_z 
       - ( z1 * z1 
-	  + z2 * z2 
-	  - 2.0 * _rho * z1 * z2 )
+          + z2 * z2 
+          - 2.0 * _rho * z1 * z2 )
       / _two_times_one_minus_rho_sq;
     return result; 
   }
@@ -84,7 +84,7 @@ int main() {
     double y = sample.params_r(1);
     double log_prob = sample.log_prob();
     printf("sample %4d:  (%+5.3f, %+5.3f)  log prob=%+5.3f\n",
-	   m, x, y, log_prob);
+           m, x, y, log_prob);
   }
 
   std::clock_t t_end = std::clock();

@@ -4,7 +4,7 @@
 #include "stan/prob/distributions.hpp"
 #include "stan/maths/special_functions.hpp"
 #include "stan/mcmc/hmc.hpp"
-#include "stan/mcmc/prob_grad_ad.hpp"
+#include "stan/model/prob_grad_ad.hpp"
 #include <cmath>
 #include <ctime>
 #include <vector>
@@ -22,8 +22,8 @@ class logistic_regression  : public stan::mcmc::prob_grad_ad {
 public:
   
   logistic_regression(mat_double x,
-		      vec_int y,
-		      double scale) :
+                      vec_int y,
+                      double scale) :
     stan::mcmc::prob_grad_ad(y.rows()),
     x_(x),
     y_(y),
@@ -31,7 +31,7 @@ public:
   }
 
   rv log_prob(std::vector<rv>& params_r,
-	      std::vector<unsigned int>& params_i) {
+              std::vector<unsigned int>& params_i) {
 
     // marshal parameters
     vec_var beta(params_r.size());
@@ -49,7 +49,7 @@ public:
       mat_var beta_mat = beta;
       x_n_mat.transpose() * beta_mat;
       for (unsigned int k = 0; k < params_r.size(); ++k)
-	basis_n += beta[k] * x_n[k];
+        basis_n += beta[k] * x_n[k];
       log_prob += bernoulli_log(y_[n],inv_logit(basis_n));
     }
     

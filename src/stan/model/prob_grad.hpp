@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__PROB_GRAD_HPP__
-#define __STAN__MCMC__PROB_GRAD_HPP__
+#ifndef __STAN__MODEL__PROB_GRAD_HPP__
+#define __STAN__MODEL__PROB_GRAD_HPP__
 
 #include <iomanip>
 #include <limits>
@@ -12,7 +12,7 @@
 
 namespace stan {
 
-  namespace mcmc {
+  namespace model {
 
     /**
      * The <code>prob_grad</code> class represents densities with

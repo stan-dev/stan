@@ -7,7 +7,7 @@
 #include <boost/math/special_functions.hpp>
 #include "stan/agrad/agrad.hpp"
 #include "stan/agrad/agrad_special_functions.hpp"
-#include "stan/mcmc/prob_grad_ad.hpp"
+#include "stan/model/prob_grad_ad.hpp"
 #include "stan/mcmc/adaptivehmc.hpp"
 #include "stan/mcmc/nutsshort2.hpp"
 #include "stan/mcmc/sampler.hpp"
@@ -383,10 +383,10 @@ int main(int argc, char** argv) {
 //   model.testGradients(params_r, params_i, 1e-6);
 //   double logp = conjugate_gradient(params_r, 
 //     double conjugate_gradient(std::vector<double>& x,
-// 			      std::binary_function<vector<double>&, 
-// 						   vector<double>&, 
-// 						   double> grad_function,
-// 			      int niterations) {  fprintf(stderr, "params_r after cg:\n");
+//                            std::binary_function<vector<double>&, 
+//                                                 vector<double>&, 
+//                                                 double> grad_function,
+//                            int niterations) {  fprintf(stderr, "params_r after cg:\n");
 
   int random_seed = 100001;
   stan::mcmc::nutsshort2 sampler(model, 0.04, 200, 0.25, random_seed);

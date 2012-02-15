@@ -6,7 +6,7 @@
 #include <stan/mcmc/adaptive_hmc.hpp>
 #include <stan/mcmc/adaptive_cdhmc.hpp>
 #include <stan/mcmc/nuts.hpp>
-#include <stan/mcmc/prob_grad.hpp>
+#include <stan/model/prob_grad.hpp>
 
 struct ExperimentParams {
 public:

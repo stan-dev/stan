@@ -10,11 +10,12 @@
 #include <boost/exception_ptr.hpp> 
 
 #include <stan/maths/util.hpp>
-#include <stan/mcmc/prob_grad.hpp>
+#include <stan/model/prob_grad.hpp>
 
 namespace stan {
 
   namespace mcmc {
+    using stan::model::prob_grad;
 
     // Returns the new log probability of x and m
     // Catches domain errors and sets logp as -inf.

@@ -15,8 +15,8 @@
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
-#include <stan/mcmc/prob_grad_ad.hpp>
-#include <stan/mcmc/prob_grad.hpp>
+#include <stan/model/prob_grad_ad.hpp>
+#include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
 
 namespace stan {

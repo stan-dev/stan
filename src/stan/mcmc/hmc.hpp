@@ -10,7 +10,7 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/mcmc/prob_grad.hpp>
+#include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
 #include <stan/mcmc/util.hpp>
 #include <stan/maths/util.hpp>

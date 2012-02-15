@@ -1,16 +1,16 @@
-#ifndef __STAN__MCMC__PROB_GRAD_AD_H__
-#define __STAN__MCMC__PROB_GRAD_AD_H__
+#ifndef __STAN__MODEL__PROB_GRAD_AD_H__
+#define __STAN__MODEL__PROB_GRAD_AD_H__
 
 #include <cstddef>
 #include <utility>
 #include <vector>
 
 #include <stan/agrad/agrad.hpp>
-#include <stan/mcmc/prob_grad.hpp>
+#include <stan/model/prob_grad.hpp>
 
 namespace stan {
 
-  namespace mcmc {
+  namespace model {
 
     class prob_grad_ad : public prob_grad {
     public:
