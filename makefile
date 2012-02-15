@@ -16,7 +16,7 @@ help:
 CC = g++
 O = 0
 # OS is set automatically by this script
--include src/makefile/detect_os
+-include make/detect_os
 
 ##
 # Get information about the compiler used.
@@ -24,7 +24,7 @@ O = 0
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
--include src/makefile/detect_cc
+-include make/detect_cc
 # FIXME: verify compiler
 
 ##
@@ -45,7 +45,7 @@ EXE =
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include src/makefile/$(OS)
+-include make/$(OS)
 
 #%.d : src/%.cpp
 #	@echo $(dir $@)
@@ -74,22 +74,22 @@ help:
 ##
 # All testing related make commands.
 ##
--include src/makefile/tests
+-include make/tests
 
 ##
 # All model building related make commands.
 ##
--include src/makefile/models
+-include make/models
 
 ##
 # All demo related make commands.
 ##
--include src/makefile/demo
+-include make/demo
 
 ##
 # All doxygen related make commands
 ##
--include src/makefile/doxygen
+-include make/doxygen
 
 ##
 # Clean up.
