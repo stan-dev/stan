@@ -174,10 +174,15 @@ namespace stan {
                           double epsilon = 1e-6,
                           std::ostream& o = std::cout) {
         std::vector<double> grad;
-        grad_log_prob(params_r,params_i,grad);
-
+        double lp = grad_log_prob(params_r,params_i,grad);
+        
+        
         std::vector<double> grad_fd;
         finite_diff_grad(params_r,params_i,grad_fd,epsilon);
+        
+        o << std::endl
+          << " Log probability=" << lp
+          << std::endl;
 
         o << std::endl
           << std::setw(10) << "param idx"

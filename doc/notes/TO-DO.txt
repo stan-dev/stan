@@ -1,10 +1,6 @@
 TO DO FOR V1
 =================================================
 
-* return unnorm log probability as parameter?
-  - allow to be normalized (turn off propto?)
-  - compute lp__ and sampling statements for output
-
 * stop NUTS from running away without coming back
   -- limit number of steps
      + command-line param
@@ -30,7 +26,6 @@ TO DO FOR V1
   - API doc
   - reference manual
   - getting started guide
-  - R interface
 
 * distribution engineering
   - eliminate tabs from code
