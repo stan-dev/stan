@@ -15,7 +15,8 @@ UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
 
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
-	set -e;\
+	@echo '------------------------------------------------------------'
+	@set -e;\
 	$(foreach test,$(UNIT_TESTS), \
 	  echo '------------------------------------------------------------';\
 	  $(test) --gtest_output="xml:$(test).xml";)
