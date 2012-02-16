@@ -1,6 +1,17 @@
 #ifndef STAN__MODEL__MODEL__HEADER_HPP__
 #define STAN__MODEL__MODEL__HEADER_HPP__
 
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+#include <sstream>
+#include <utility>
+#include <boost/exception/all.hpp>
+
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
