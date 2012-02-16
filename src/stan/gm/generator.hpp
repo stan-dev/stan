@@ -148,7 +148,7 @@ namespace stan {
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
       generate_using("stan::agrad::var",o);
-      generate_using("stan::mcmc::prob_grad_ad",o);
+      generate_using("stan::model::prob_grad_ad",o);
       generate_using("stan::math::get_base1",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
