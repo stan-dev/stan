@@ -106,7 +106,6 @@ help:
 	rm -f $@.$$$$);\
 	fi
 
-
 ##
 # Clean up.
 ##
@@ -115,7 +114,7 @@ clean:
 	$(RM) -r *.dSYM
 
 clean-models:
-	$(RM) -r models
+	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch
 
 clean-dox:
 	$(RM) -r doc/api

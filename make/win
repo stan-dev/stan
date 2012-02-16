@@ -22,8 +22,10 @@ ifeq (g++,$(CC_TYPE))
   O = 3
   #LDFLAGS += -static-libgcc 
   #LDFLAGS += -static-libstdc++
+  PCH = .gch
 endif
 ifeq (clang++,$(CC_TYPE))
+  #PCH = .pch
 endif
 
 CC_GM = cl

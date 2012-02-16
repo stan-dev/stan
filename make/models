@@ -1,20 +1,22 @@
 ##
 # Models (to be passed through demo/gm)
-##m
+##
+MODEL_HEADER := src/stan/model/model_header.hpp
+
 .PRECIOUS: models/%$(EXE)
 models/%$(EXE) : models/%.o
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) $(OUTPUT_OPTION) $<
-#	@echo ''
-#	@echo '--- Running model ---'
-#	cp src/$@.stan $@.stan
-#	-cp src/$@.Rdata $@.Rdata
-#	$@ --data=$@.Rdata --samples=$@.csv
+	@echo ''
+	@echo '--- Running model ---'
+	cp src/$@.stan $@.stan
+	-cp src/$@.Rdata $@.Rdata
+	$@ --data=$@.Rdata --samples=$@.csv
 
 .PRECIOUS: models/%.cpp
-models/%.cpp : src/models/%.stan demo/gm$(EXE)
+models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) demo/gm$(EXE)
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
@@ -28,11 +30,29 @@ models/%.o : models/%.cpp
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 
+$(MODEL_HEADER).gch : $(MODEL_HEADER)
+	@echo ''
+	@echo '--- Precompiling model_header.hpp for g++ ---'
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(MODEL_HEADER).pch : $(MODEL_HEADER)
+	@echo ''
+	@echo '--- Precompiling model_header.hpp for clang++ ---'
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(MODEL_HEADER).d : $(MODEL_HEADER)
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
 ##
 # If the target is demo/, include .d. 
 # Will generate dependencies.
 ##
 ifneq (,$(filter models/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter models/%,$(MAKECMDGOALS))))
+  -include $(MODEL_HEADER).d
   -include demo/gm.d
 endif

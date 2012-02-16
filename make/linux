@@ -13,10 +13,12 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS_GTEST += -lpthread
   CFLAGS_GTEST += -g
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
+  PCH = .gch
 endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wc++0x-extensions
   CFLAGS += -Wunused-function
   CFLAGS += -g
   CFLAGS_GTEST += -lpthread
+  #PCH = .pch
 endif
