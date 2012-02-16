@@ -92,6 +92,22 @@ help:
 -include make/doxygen
 
 ##
+# Rule for generating dependencies.
+# Applies to all *.cpp files in src.
+# Test cpp files are handled slightly differently.
+##
+%.d : src/%.cpp
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$);\
+	fi
+
+
+##
 # Clean up.
 ##
 .PHONY: clean clean-models clean-dox clean-demo clean-all

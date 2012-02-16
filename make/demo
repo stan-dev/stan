@@ -12,16 +12,6 @@ demo/%.o : src/demo/%.cpp
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 ##
-# Rule for generating dependencies.
-##
-demo/%.d : src/demo/%.cpp
-	@set -e; \
-	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
-##
 # If the target is demo/, include .d. 
 # Will generate dependencies.
 ##

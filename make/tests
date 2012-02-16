@@ -71,11 +71,14 @@ test/%.o : src/test/%_test.cpp $(LIBGTEST)
 # Rule for generating dependencies.
 ##
 test/%.d : src/test/%_test.cpp
-	@set -e; \
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	rm -f $@.$$$$ ); \
+	fi
 
 ##
 # If the target is a unit test, include .d. 

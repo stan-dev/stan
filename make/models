@@ -29,16 +29,6 @@ models/%.o : models/%.cpp
 
 
 ##
-# Rule for generating dependencies.
-##
-models/%.d : models/%.cpp
-	@set -e; \
-	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
-##
 # If the target is demo/, include .d. 
 # Will generate dependencies.
 ##
