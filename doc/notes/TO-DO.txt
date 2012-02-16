@@ -41,11 +41,16 @@ TO DO FOR V1
 CLEANUP (ONGOING)
 =================================================
 
-* const declarations wherever possible
-  - work bottom up, but it's tricky at this late date
+* distributions: bounds checking
+  - weibull
 
 * convert unsigned int return types to signed long
   or size_t
+  - generated leuk.cpp: 168, 207
+  - change "zu" to "lu"
+
+* const declarations wherever possible
+  - work bottom up, but it's tricky at this late date
 
 * divide parser's grammar into multiple files to help compiler
 
