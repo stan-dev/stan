@@ -1,5 +1,5 @@
-#ifndef __STAN__MODEL__PROB_GRAD_AD_H__
-#define __STAN__MODEL__PROB_GRAD_AD_H__
+#ifndef __STAN__MODEL__PROB_GRAD_AD_HPP__
+#define __STAN__MODEL__PROB_GRAD_AD_HPP__
 
 #include <cstddef>
 #include <utility>

@@ -181,16 +181,6 @@ namespace stan {
    
     void generate_includes(std::ostream& o) {
       generate_include("stan/model/model_header.hpp",o);
-      generate_include("cassert",o);
-      generate_include("cmath",o);
-      generate_include("cstddef",o);
-      generate_include("vector",o);
-      generate_include("fstream",o);
-      generate_include("iostream",o);
-      generate_include("stdexcept",o);
-      generate_include("sstream",o);
-      generate_include("utility",o);
-      generate_include("boost/exception/all.hpp",o);
       o << EOL;
     }
 

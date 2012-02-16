@@ -656,7 +656,6 @@ namespace stan {
       boost::spirit::qi::rule<Iterator> whitespace;
     };
 
-
     template <typename Iterator>
     struct expression_grammar 
       : boost::spirit::qi::grammar<Iterator,
@@ -1486,9 +1485,10 @@ namespace stan {
     //                 /tracking-the-input-position-while-parsing/
     // http://boost-spirit.com/dl_more/parsing_tracking_position
     //                 /stream_iterator_errorposition_parsing.cpp
-    bool parse(std::istream& input, 
+    inline bool parse(std::istream& input, 
                const std::string& filename, 
                program& result) {
+		   namespace classic = boost::spirit::classic;
 
       using boost::spirit::classic::position_iterator2;
       using boost::spirit::multi_pass;
