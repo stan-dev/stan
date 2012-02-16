@@ -141,7 +141,7 @@ namespace stan {
           _gbar[i] += g[i];
         if (_k == _nextk) {
           for (size_t i = 0; i < g.size(); ++i) {
-            fprintf(stderr, "_lastx[%zu] = %f, _gbar[%zu] = %f\n", i, _lastx[i],
+            fprintf(stderr, "_lastx[%lu] = %f, _gbar[%lu] = %f\n", i, _lastx[i],
                     i, _gbar[i]);
             _lastx[i] -= _gamma * _gbar[i] / (_nextk - _lastk);
           }
