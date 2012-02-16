@@ -1,16 +1,16 @@
-#ifndef __STAN__MATHS__MATRIX_H__
-#define __STAN__MATHS__MATRIX_H__
+#ifndef __STAN__MATH__MATRIX_H__
+#define __STAN__MATH__MATRIX_H__
 
 #include <stdexcept>
 #include <vector>
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/maths/EigenDenseBaseAddons.hpp"
+#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
 #include <Eigen/Dense>
 
 
 namespace stan {
   
-  namespace maths {
+  namespace math {
 
     /**
      * This is a traits structure for Eigen matrix types.

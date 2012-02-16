@@ -4,8 +4,8 @@
 #include <cstdlib>
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
@@ -33,11 +33,11 @@ namespace stan {
                         const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_student_t<%1%>(%1%)";
 
-      using stan::maths::check_size_match;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
-      using stan::maths::check_cov_matrix;      
-      using stan::maths::check_positive;      
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_cov_matrix;      
+      using stan::math::check_positive;      
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
@@ -82,11 +82,11 @@ namespace stan {
         lp -= (0.5 * d) * LOG_PI;
 
       using std::fabs;
-      using stan::maths::determinant;
-      using stan::maths::inverse;
-      using stan::maths::multiply;
-      using stan::maths::subtract;
-      using stan::maths::transpose;
+      using stan::math::determinant;
+      using stan::math::inverse;
+      using stan::math::multiply;
+      using stan::math::subtract;
+      using stan::math::transpose;
 
       if (include_summand<propto,T_scale>::value) 
         lp -= 0.5 * log(fabs(determinant(Sigma)));

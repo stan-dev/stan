@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
-#include <stan/maths/matrix.hpp>
+#include <stan/math/matrix.hpp>
 
 /**
  * (Expert) Numerical traits for algorithmic differentiation variables.
@@ -134,19 +134,19 @@ namespace stan {
      * The type of a matrix holding <code>stan::agrad::var</code>
      * values.
      */
-    typedef stan::maths::EigenType<var>::matrix matrix_v;
+    typedef stan::math::EigenType<var>::matrix matrix_v;
 
     /**
      * The type of a (column) vector holding <code>stan::agrad::var</code>
      * values.
      */
-    typedef stan::maths::EigenType<var>::vector vector_v;
+    typedef stan::math::EigenType<var>::vector vector_v;
 
     /**
      * The type of a row vector holding <code>stan::agrad::var</code>
      * values.
      */
-    typedef stan::maths::EigenType<var>::row_vector row_vector_v;
+    typedef stan::math::EigenType<var>::row_vector row_vector_v;
 
     /**
      * Returns an automatic differentiation variable with the input value.
@@ -192,7 +192,7 @@ namespace stan {
      * @param m A Matrix with scalars
      * @return A Matrix with automatic differentiation variables
      */
-    inline matrix_v to_var(const stan::maths::matrix_d& m) {
+    inline matrix_v to_var(const stan::math::matrix_d& m) {
       matrix_v m_v(m.rows(), m.cols());
       for (int i = 0; i < m.rows(); ++i)
         for (int j = 0; j < m.cols(); ++j)
@@ -207,7 +207,7 @@ namespace stan {
      * @param m_v A Matrix with automatic differentiation variables
      *    assigned with values of m.
      */
-    inline matrix_v to_var (const stan::maths::matrix_d& m, matrix_v& m_v) {
+    inline matrix_v to_var (const stan::math::matrix_d& m, matrix_v& m_v) {
       m_v.resize(m.rows(), m.cols());
       for (int i = 0; i < m.rows(); ++i)
         for (int j = 0; j < m.cols(); ++j)
@@ -240,7 +240,7 @@ namespace stan {
      * @return A Vector of automatic differentiation variables with
      *   values of v
      */
-    inline vector_v to_var(const stan::maths::vector_d& v) {
+    inline vector_v to_var(const stan::math::vector_d& v) {
       vector_v v_v(v.size());
       for (int i = 0; i < v.size(); ++i)
         v_v[i] = v[i];
@@ -253,7 +253,7 @@ namespace stan {
      * @param v_v A Vector of automatic differentation variables with
      *   values of v.
      */
-    inline void to_var(const stan::maths::vector_d& v,
+    inline void to_var(const stan::math::vector_d& v,
                        vector_v& v_v) {
       v_v.resize(v.size());
       for (int i = 0; i < v.size(); ++i)
@@ -287,7 +287,7 @@ namespace stan {
      * @return A row vector of automatic differentation variables with 
      *   values of rv.
      */
-    inline row_vector_v to_var(const stan::maths::row_vector_d& rv) {
+    inline row_vector_v to_var(const stan::math::row_vector_d& rv) {
       row_vector_v rv_v(rv.size());
       for (int i = 0; i < rv.size(); ++i)
         rv_v[i] = rv[i];
@@ -300,7 +300,7 @@ namespace stan {
      * @param rv_v A row vector of automatic differentiation variables
      *   with values set to rv.
      */
-    inline void to_var(const stan::maths::row_vector_d& rv,
+    inline void to_var(const stan::math::row_vector_d& rv,
                        row_vector_v& rv_v) {
       rv_v.resize(rv.size());
       for (int i = 0; i < rv.size(); ++i)

@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <boost/math/special_functions.hpp>
 #include <stan/agrad/agrad.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/special_functions.hpp>
 
 namespace stan {
 
@@ -35,7 +35,7 @@ namespace stan {
       class log1p_vari : public op_v_vari {
       public:
         log1p_vari(vari* avi) :
-          op_v_vari(stan::maths::log1p(avi->val_),avi) {
+          op_v_vari(stan::math::log1p(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1 + avi_->val_);
@@ -45,7 +45,7 @@ namespace stan {
       class log1m_vari : public op_v_vari {
       public:
         log1m_vari(vari* avi) :
-          op_v_vari(stan::maths::log1p(-avi->val_),avi) {
+          op_v_vari(stan::math::log1p(-avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (avi_->val_ - 1);
@@ -65,7 +65,7 @@ namespace stan {
       class binary_log_loss_0_vari : public op_v_vari {
       public:
         binary_log_loss_0_vari(vari* avi) :
-          op_v_vari(-stan::maths::log1p(-avi->val_),avi) {
+          op_v_vari(-stan::math::log1p(-avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 - avi_->val_);
@@ -167,7 +167,7 @@ namespace stan {
       class inv_logit_vari : public op_v_vari {
       public:
         inv_logit_vari(vari* avi) :
-          op_v_vari(maths::inv_logit(avi->val_),avi) {
+          op_v_vari(math::inv_logit(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ +=  adj_ * val_ * (1.0 - val_);
@@ -278,7 +278,7 @@ namespace stan {
       class log2_vari : public op_v_vari {
       public:
         log2_vari(vari* avi) :
-          op_v_vari(stan::maths::log2(avi->val_),avi) {
+          op_v_vari(stan::math::log2(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (LOG2 * avi_->val_); 
@@ -314,7 +314,7 @@ namespace stan {
       class inv_cloglog_vari : public op_v_vari {
       public:
         inv_cloglog_vari(vari* avi) :
-          op_v_vari(stan::maths::inv_cloglog(avi->val_), avi) {
+          op_v_vari(stan::math::inv_cloglog(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ -= adj_ * std::exp(avi_->val_ - std::exp(avi_->val_));
@@ -324,7 +324,7 @@ namespace stan {
       class Phi_vari : public op_v_vari {
       public:
         Phi_vari(vari* avi) :
-          op_v_vari(stan::maths::Phi(avi->val_), avi) {
+          op_v_vari(stan::math::Phi(avi->val_), avi) {
         }
         void chain() {
           static const double NEG_HALF = -0.5;
@@ -356,7 +356,7 @@ namespace stan {
       class log_sum_exp_vv_vari : public op_vv_vari {
       public:
         log_sum_exp_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(stan::maths::log_sum_exp(avi->val_, bvi->val_),
+          op_vv_vari(stan::math::log_sum_exp(avi->val_, bvi->val_),
                      avi, bvi) {
         }
         void chain() {
@@ -367,7 +367,7 @@ namespace stan {
       class log_sum_exp_vd_vari : public op_vd_vari {
       public:
         log_sum_exp_vd_vari(vari* avi, double b) :
-          op_vd_vari(stan::maths::log_sum_exp(avi->val_, b),
+          op_vd_vari(stan::math::log_sum_exp(avi->val_, b),
                      avi, b) {
         }
         void chain() {
@@ -377,7 +377,7 @@ namespace stan {
       class log_sum_exp_dv_vari : public op_dv_vari {
       public:
         log_sum_exp_dv_vari(double a, vari* bvi) :
-          op_dv_vari(stan::maths::log_sum_exp(a, bvi->val_),
+          op_dv_vari(stan::math::log_sum_exp(a, bvi->val_),
                      a, bvi) {
         }
         void chain() {
@@ -409,7 +409,7 @@ namespace stan {
       class multiply_log_vv_vari : public op_vv_vari {
       public:
         multiply_log_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(stan::maths::multiply_log(avi->val_,bvi->val_),avi,bvi) {
+          op_vv_vari(stan::math::multiply_log(avi->val_,bvi->val_),avi,bvi) {
         }
         void chain() {
           using std::log;
@@ -423,7 +423,7 @@ namespace stan {
       class multiply_log_vd_vari : public op_vd_vari {
       public:
         multiply_log_vd_vari(vari* avi, double b) :
-          op_vd_vari(stan::maths::multiply_log(avi->val_,b),avi,b) {
+          op_vd_vari(stan::math::multiply_log(avi->val_,b),avi,b) {
         }
         void chain() {
           using std::log;
@@ -433,7 +433,7 @@ namespace stan {
       class multiply_log_dv_vari : public op_dv_vari {
       public:
         multiply_log_dv_vari(double a, vari* bvi) :
-          op_dv_vari(stan::maths::multiply_log(a,bvi->val_),a,bvi) {
+          op_dv_vari(stan::math::multiply_log(a,bvi->val_),a,bvi) {
         }
         void chain() {
           if (bvi_->val_ == 0.0 && ad_ == 0.0)
@@ -947,7 +947,7 @@ namespace stan {
     /**
      * Returns the base 2 logarithm of the specified variable (C99).
      *
-     * See stan::maths::log2() for the double-based version.
+     * See stan::math::log2() for the double-based version.
      *
      * The derivative is
      *
@@ -1015,7 +1015,7 @@ namespace stan {
      * Return the positive difference between the first variable's the value
      * and the second's (C99).
      *
-     * See stan::maths::fdim() for the double-based version.
+     * See stan::math::fdim() for the double-based version.
      *
      * The partial derivative with respect to the first argument is
      *
@@ -1113,7 +1113,7 @@ namespace stan {
      * Return the step, or heaviside, function applied to the
      * specified variable (stan).
      *
-     * See stan::maths::step() for the double-based version.
+     * See stan::math::step() for the double-based version.
      *
      * The derivative of the step function is zero everywhere
      * but at 0, so for convenience, it is taken to be everywhere
@@ -1133,7 +1133,7 @@ namespace stan {
      * Return the inverse complementary log-log function applied
      * specified variable (stan).
      *
-     * See stan::maths::inv_cloglog() for the double-based version.
+     * See stan::math::inv_cloglog() for the double-based version.
      *
      * The derivative is given by
      *
@@ -1150,7 +1150,7 @@ namespace stan {
     /**
      * The unit normal cumulative density function for variables (stan).
      *
-     * See stan::maths::Phi() for the double-based version.
+     * See stan::math::Phi() for the double-based version.
      *
      * The derivative is the unit normal density function,
      *
@@ -1166,7 +1166,7 @@ namespace stan {
     /**
      * The inverse logit function for variables (stan).
      *
-     * See stan::maths::inv_logit() for the double-based version.
+     * See stan::math::inv_logit() for the double-based version.
      *
      * The derivative of inverse logit is
      *
@@ -1182,7 +1182,7 @@ namespace stan {
     /**
      * The log loss function for variables (stan).
      *
-     * See stan::maths::log_loss() for the double-based version.
+     * See stan::math::log_loss() for the double-based version.
      *
      * The derivative with respect to the variable \f$\hat{y}\f$ is
      *
@@ -1242,7 +1242,7 @@ namespace stan {
       return var(new square_vari(x.vi_));
     }
 
-    // OTHER FUNCTIONS: stan/maths/special_functions.hpp implementations
+    // OTHER FUNCTIONS: stan/math/special_functions.hpp implementations
     /**
      * Return the value of a*log(b).
      *

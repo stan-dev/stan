@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__LOGNORMAL_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -10,14 +10,14 @@ namespace stan {
     // LogNormal(y|mu,sigma)  [y >= 0;  sigma > 0]
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
       static const char* function = "stan::prob::lognormal_log<%1%>(%1%)";
 
-      using stan::maths::check_not_nan;
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
+      using stan::math::check_not_nan;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_loc,T_scale>::type lp;
@@ -33,7 +33,7 @@ namespace stan {
       if (y <= 0)
         return LOG_ZERO;
       
-      using stan::maths::square;
+      using stan::math::square;
       using std::log;
       
       lp = 0.0;
@@ -49,14 +49,14 @@ namespace stan {
     }
 
     template <typename T_y, typename T_loc, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     lognormal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
       static const char* function = "stan::prob::lognormal_p<%1%>(%1%)";
 
-      using stan::maths::check_not_nan;
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
+      using stan::math::check_not_nan;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_loc,T_scale>::type lp;

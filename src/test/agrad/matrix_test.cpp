@@ -8,11 +8,11 @@
 
 using stan::agrad::var;
 
-using stan::maths::matrix_d;
+using stan::math::matrix_d;
 using stan::agrad::matrix_v;
-using stan::maths::vector_d;
+using stan::math::vector_d;
 using stan::agrad::vector_v;
-using stan::maths::row_vector_d;
+using stan::math::row_vector_d;
 using stan::agrad::row_vector_v;
 
 typedef stan::agrad::var AVAR;
@@ -1852,7 +1852,7 @@ TEST(agrad_matrix,mv_trace) {
 
 
 TEST(agrad_matrix,inverse_val) {
-  using stan::maths::inverse;
+  using stan::math::inverse;
   matrix_v a(2,2);
   a << 2.0, 3.0, 
        5.0, 7.0;
@@ -1867,7 +1867,7 @@ TEST(agrad_matrix,inverse_val) {
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
 TEST(agrad_matrix,inverse_grad) {
-  using stan::maths::inverse;
+  using stan::math::inverse;
   
   for (size_t k = 0; k < 2; ++k) {
     for (size_t l = 0; l < 2; ++l) {
@@ -1896,8 +1896,8 @@ TEST(agrad_matrix,inverse_grad) {
   }
 }
 TEST(agrad_matrix,inverse_inverse_sum) {
-  using stan::maths::sum;
-  using stan::maths::inverse;
+  using stan::math::sum;
+  using stan::math::inverse;
 
   matrix_v a(4,4);
   a << 2.0, 3.0, 4.0, 5.0, 
@@ -1921,8 +1921,8 @@ TEST(agrad_matrix,inverse_inverse_sum) {
 
 
 TEST(agrad_matrix,eigenval_sum) {
-  using stan::maths::eigenvalues;
-  using stan::maths::sum;
+  using stan::math::eigenvalues;
+  using stan::math::sum;
 
   matrix_v a(3,3);
   a << 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 13.0, 11.0, 19.0;

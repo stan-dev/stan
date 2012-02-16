@@ -8,8 +8,8 @@
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <stan/maths/matrix.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/special_functions.hpp>
 
 #include <stan/prob/transform.hpp>
 
@@ -36,9 +36,9 @@ namespace stan {
       std::vector<int> data_i_;
     public:
 
-      typedef typename stan::maths::EigenType<T>::matrix matrix_t;
-      typedef typename stan::maths::EigenType<T>::vector vector_t;
-      typedef typename stan::maths::EigenType<T>::row_vector row_vector_t;
+      typedef typename stan::math::EigenType<T>::matrix matrix_t;
+      typedef typename stan::math::EigenType<T>::vector vector_t;
+      typedef typename stan::math::EigenType<T>::row_vector row_vector_t;
       
       typedef Eigen::Array<T,Eigen::Dynamic,1> array_vec_t;
 
@@ -173,7 +173,7 @@ namespace stan {
       void scalar_lub_unconstrain(double lb, double ub, T& y) {
         if (y < lb || y > ub)
           BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between the lower and upper bounds"));
-        data_r_.push_back(stan::maths::logit((y - lb) / (ub - lb)));
+        data_r_.push_back(stan::math::logit((y - lb) / (ub - lb)));
       }
 
       /**
@@ -206,7 +206,7 @@ namespace stan {
       void prob_unconstrain(T& y) {
         if (y > 1.0 || y < 0.0)
           BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between 0.0 and 1.0"));
-        data_r_.push_back(stan::maths::logit(y));
+        data_r_.push_back(stan::math::logit(y));
       }
 
       /**

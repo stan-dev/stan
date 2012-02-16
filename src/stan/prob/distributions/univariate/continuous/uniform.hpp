@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__UNIFORM_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 
@@ -34,14 +34,14 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_low, typename T_high, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, const Policy& = Policy()) {
       static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
       
-      using stan::maths::check_not_nan;
-      using stan::maths::check_finite;
-      using stan::maths::check_greater;
+      using stan::math::check_not_nan;
+      using stan::math::check_finite;
+      using stan::math::check_greater;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_low,T_high>::type lp(0.0);

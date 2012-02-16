@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -10,15 +10,15 @@ namespace stan {
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
     template <bool propto = false,
               typename T_rate, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_rate>::type
     poisson_log(const unsigned int n, const T_rate& lambda, 
                 const Policy& = Policy()) {
 
       static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
       
-      using stan::maths::check_not_nan;
-      using stan::maths::check_nonnegative;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_rate>::type lp;
@@ -34,7 +34,7 @@ namespace stan {
       if (lambda == 0)
         return LOG_ZERO;
       
-      using stan::maths::multiply_log;
+      using stan::math::multiply_log;
       if (std::isinf(lambda))
         return LOG_ZERO;
 

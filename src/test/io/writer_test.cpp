@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 #include <stan/io/writer.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/special_functions.hpp>
 
 TEST(io_writer, scalar_pos_unconstrain_exception) {
   std::vector<int> theta_i;

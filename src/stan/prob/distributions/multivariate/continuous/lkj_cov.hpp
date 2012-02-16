@@ -2,9 +2,9 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/matrix.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
@@ -16,18 +16,18 @@ namespace stan {
     //                         mu vector, sigma > 0 vector, eta > 0 ]
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, typename T_shape, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type
-    lkj_cov_log(const typename stan::maths::EigenType<T_y>::matrix& y,
-                const typename stan::maths::EigenType<T_loc>::vector& mu,
-                const typename stan::maths::EigenType<T_scale>::vector& sigma,
+    lkj_cov_log(const typename stan::math::EigenType<T_y>::matrix& y,
+                const typename stan::math::EigenType<T_loc>::vector& mu,
+                const typename stan::math::EigenType<T_scale>::vector& sigma,
                 const T_shape& eta,
                 const Policy& = Policy()) {
       static const char* function = "stan::prob::lkj_cov_log<%1%>(%1%)";
       
-      using stan::maths::check_size_match;
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
@@ -64,7 +64,7 @@ namespace stan {
     //                         mu scalar, sigma > 0 scalar, eta > 0 ]
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, typename T_shape, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_shape>::type
     lkj_cov_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                 const T_loc& mu, 
@@ -73,8 +73,8 @@ namespace stan {
                 const Policy& = Policy()) {
       static const char* function = "stan::prob::lkj_cov_log<%1%>(%1%)";
 
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);

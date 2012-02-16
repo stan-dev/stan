@@ -14,7 +14,7 @@
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/util.hpp>
-#include <stan/maths/util.hpp>
+#include <stan/math/util.hpp>
 
 namespace stan {
 
@@ -231,7 +231,7 @@ namespace stan {
         std::vector<double> m(_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
           m[i] = _rand_unit_norm();
-        double H = -(stan::maths::dot_self(m) / 2.0) + _logp; 
+        double H = -(stan::math::dot_self(m) / 2.0) + _logp; 
         
         std::vector<double> g_new(_g);
         std::vector<double> x_new(_x);
@@ -240,7 +240,7 @@ namespace stan {
           logp_new = leapfrog(_model, _z, x_new, m, g_new, _epsilon);
         _nfevals += _L;
 
-        double H_new = -(stan::maths::dot_self(m) / 2.0) + logp_new;
+        double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;
         double dH = H_new - H;
         if (_rand_uniform_01() < exp(dH)) {
           _x = x_new;
@@ -249,7 +249,7 @@ namespace stan {
         }
 
         // Now we just have to update epsilon, if adaptation is on.
-        double adapt_stat = stan::maths::min(1, exp(dH));
+        double adapt_stat = stan::math::min(1, exp(dH));
         if (adapt_stat != adapt_stat)
           adapt_stat = 0;
         if (_adapt) {

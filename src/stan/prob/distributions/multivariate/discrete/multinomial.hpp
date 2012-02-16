@@ -2,9 +2,9 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 
 #include <stan/prob/traits.hpp>
-#include <stan/maths/error_handling.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
 
@@ -21,9 +21,9 @@ namespace stan {
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::multinomial_log<%1%>(%1%)";
 
-      using stan::maths::check_positive;
-      using stan::maths::check_simplex;
-      using stan::maths::check_size_match;
+      using stan::math::check_positive;
+      using stan::math::check_simplex;
+      using stan::math::check_size_match;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_prob>::type lp(0.0);
@@ -33,7 +33,7 @@ namespace stan {
         return lp;
       if (!check_size_match(function, ns.size(), theta.rows(), &lp, Policy()))
         return lp;
-      using stan::maths::multiply_log;
+      using stan::math::multiply_log;
 
       if (include_summand<propto>::value) {     
         double sum = 1.0;

@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__PARETO_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -11,14 +11,14 @@ namespace stan {
     // Pareto(y|y_m,alpha)  [y > y_m;  y_m > 0;  alpha > 0]
     template <bool propto = false,
               typename T_y, typename T_scale, typename T_shape, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha, const Policy& = Policy()) {
       static const char* function = "stan::prob::pareto_log<%1%>(%1%)";
       
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
-      using stan::maths::check_not_nan;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_scale,T_shape>::type lp;
@@ -36,7 +36,7 @@ namespace stan {
       if (y < y_min)
         return LOG_ZERO;
           
-      using stan::maths::multiply_log;
+      using stan::math::multiply_log;
 
       lp = 0.0;
       if (include_summand<propto,T_shape>::value)

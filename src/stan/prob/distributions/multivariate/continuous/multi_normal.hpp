@@ -1,8 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_HPP__
 
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
@@ -37,10 +37,10 @@ namespace stan {
                      const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
-      using stan::maths::check_size_match;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
-      using stan::maths::check_cov_matrix;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_cov_matrix;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_loc,T_covar>::type 
@@ -59,12 +59,12 @@ namespace stan {
       if (!check_cov_matrix(function, Sigma, &lp, Policy()))
         return lp;
       
-      using stan::maths::multiply_log;
-      using stan::maths::subtract;
-      using stan::maths::determinant;
-      using stan::maths::inverse;
-      using stan::maths::multiply;
-      using stan::maths::transpose;
+      using stan::math::multiply_log;
+      using stan::math::subtract;
+      using stan::math::determinant;
+      using stan::math::inverse;
+      using stan::math::multiply;
+      using stan::math::transpose;
 
       if (y.rows() == 0)
         return lp;
@@ -108,13 +108,13 @@ namespace stan {
                               const Policy& = Policy()) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
-      using stan::maths::multiply;
-      using stan::maths::subtract;
+      using stan::math::multiply;
+      using stan::math::subtract;
       
-      using stan::maths::check_size_match;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
-      using stan::maths::check_cov_matrix;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_cov_matrix;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);

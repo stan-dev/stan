@@ -8,8 +8,8 @@
 
 #include <boost/throw_exception.hpp>
 
-#include <stan/maths/matrix.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/special_functions.hpp>
 
 #include <stan/prob/transform.hpp>
 
@@ -69,9 +69,9 @@ namespace stan {
 
     public:
 
-      typedef typename stan::maths::EigenType<T>::matrix matrix_t;
-      typedef typename stan::maths::EigenType<T>::vector vector_t;
-      typedef typename stan::maths::EigenType<T>::row_vector row_vector_t;
+      typedef typename stan::math::EigenType<T>::matrix matrix_t;
+      typedef typename stan::math::EigenType<T>::vector vector_t;
+      typedef typename stan::math::EigenType<T>::row_vector row_vector_t;
 
       typedef Eigen::Map<matrix_t> map_matrix_t;
       typedef Eigen::Map<vector_t> map_vector_t;

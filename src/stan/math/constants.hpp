@@ -1,11 +1,11 @@
-#ifndef __STAN__MATHS__CONSTANTSS_HPP__
-#define __STAN__MATHS__CONSTANTSS_HPP__
+#ifndef __STAN__MATH__CONSTANTSS_HPP__
+#define __STAN__MATH__CONSTANTSS_HPP__
 
 #include <boost/math/constants/constants.hpp>
 
 namespace stan {
 
-  namespace maths {
+  namespace math {
 
     /**
      * The base of the natural logarithm, 

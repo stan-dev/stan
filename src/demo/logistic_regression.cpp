@@ -2,7 +2,7 @@
 #include "stan/agrad/matrix.hpp"
 #include "stan/agrad/agrad_special_functions.hpp"
 #include "stan/prob/distributions.hpp"
-#include "stan/maths/special_functions.hpp"
+#include "stan/math/special_functions.hpp"
 #include "stan/mcmc/hmc.hpp"
 #include "stan/model/prob_grad_ad.hpp"
 #include <cmath>
@@ -14,7 +14,7 @@ typedef stan::agrad::var rv;
 typedef Eigen::Matrix<int,Eigen::Dynamic,1> vec_int;
 
 using namespace stan::agrad;
-using namespace stan::maths;
+using namespace stan::math;
 using namespace stan::prob;
 
 class logistic_regression  : public stan::mcmc::prob_grad_ad {

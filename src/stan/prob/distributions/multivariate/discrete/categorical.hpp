@@ -2,8 +2,8 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP__
 
 #include <stan/prob/traits.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -11,13 +11,13 @@ namespace stan {
     // Categorical(n|theta)  [0 <= n < N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto = false, 
               typename T_prob, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(const unsigned int n, const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, const Policy& = Policy()) {
       static const char* function = "stan::prob::categorical_log<%1%>(%1%)";
 
-      using stan::maths::check_bounded;
-      using stan::maths::check_simplex;
+      using stan::math::check_bounded;
+      using stan::math::check_simplex;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_prob>::type lp(0.0);

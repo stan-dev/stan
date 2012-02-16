@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <stan/maths/matrix.hpp>
+#include <stan/math/matrix.hpp>
 
 #include <stan/version.hpp>
 #include <stan/gm/ast.hpp>
@@ -149,10 +149,10 @@ namespace stan {
       generate_using("std::stringstream",o);
       generate_using("stan::agrad::var",o);
       generate_using("stan::mcmc::prob_grad_ad",o);
-      generate_using("stan::maths::get_base1",o);
+      generate_using("stan::math::get_base1",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
-      generate_using_namespace("stan::maths",o);
+      generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
     }
@@ -190,7 +190,7 @@ namespace stan {
       generate_include("sstream",o);
       generate_include("utility",o);
       generate_include("boost/exception/all.hpp",o);
-      generate_include("stan/maths/matrix.hpp",o);
+      generate_include("stan/math/matrix.hpp",o);
       generate_include("stan/agrad/agrad.hpp",o);
       generate_include("stan/agrad/special_functions.hpp",o);
       generate_include("stan/agrad/matrix.hpp",o);
@@ -200,8 +200,8 @@ namespace stan {
       generate_include("stan/io/reader.hpp",o);
       generate_include("stan/io/writer.hpp",o);
       generate_include("stan/io/csv_writer.hpp",o);
-      generate_include("stan/maths/matrix.hpp",o);
-      generate_include("stan/maths/special_functions.hpp",o);
+      generate_include("stan/math/matrix.hpp",o);
+      generate_include("stan/math/special_functions.hpp",o);
       generate_include("stan/mcmc/hmc.hpp",o);
       generate_include("stan/mcmc/sampler.hpp",o);
       generate_include("stan/model/prob_grad_ad.hpp",o);

@@ -14,8 +14,8 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/reader.hpp>
 #include <stan/io/csv_writer.hpp>
-#include <stan/maths/matrix.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/special_functions.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/sampler.hpp>
 #include <stan/model/prob_grad_ad.hpp>
@@ -56,7 +56,7 @@ public:
         J = vals_i__[pos__++];
         std::vector<unsigned int> dims_y__;
         dims_y__.push_back(J);
-        stan::maths::resize(y,dims_y__);
+        stan::math::resize(y,dims_y__);
         assert(context__.contains_r("y"));
         vals_r__ = context__.vals_r("y");
         pos__ = 0;
@@ -66,7 +66,7 @@ public:
         }
         std::vector<unsigned int> dims_sigma_y__;
         dims_sigma_y__.push_back(J);
-        stan::maths::resize(sigma_y,dims_sigma_y__);
+        stan::math::resize(sigma_y,dims_sigma_y__);
         assert(context__.contains_r("sigma_y"));
         vals_r__ = context__.vals_r("sigma_y");
         pos__ = 0;
@@ -75,7 +75,7 @@ public:
             sigma_y[i_0__] = vals_r__[pos__++];
         }
         std::vector<unsigned int> dims_sigma_xi__;
-        stan::maths::resize(sigma_xi,dims_sigma_xi__);
+        stan::math::resize(sigma_xi,dims_sigma_xi__);
         assert(context__.contains_r("sigma_xi"));
         vals_r__ = context__.vals_r("sigma_xi");
         pos__ = 0;

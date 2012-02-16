@@ -2,8 +2,8 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -46,7 +46,7 @@ namespace stan {
     //                  eta > 0; eta == 1 <-> uniform]
     template <bool propto = false,
               typename T_covar, typename T_shape, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_covar, T_shape>::type
     lkj_corr_cholesky_log(const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
                           const T_shape& eta, 
@@ -54,7 +54,7 @@ namespace stan {
       static const char* function = "stan::prob::lkj_corr_cholesky_log<%1%>(%1%)";
 
       using boost::math::tools::promote_args;
-      using stan::maths::check_positive;
+      using stan::math::check_positive;
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
       if (!check_positive(function, eta, "eta", &lp, Policy()))
@@ -77,17 +77,17 @@ namespace stan {
     //                  eta > 0; eta == 1 <-> uniform]
     template <bool propto = false,
               typename T_y, typename T_shape, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
 		 const T_shape& eta, 
 		 const Policy& = Policy() ) {
       static const char* function = "stan::prob::lkj_corr_log<%1%>(%1%)";
 
-      using stan::maths::check_size_match;
-      using stan::maths::check_not_nan;
-      using stan::maths::check_positive;
-      using stan::maths::check_corr_matrix;
+      using stan::math::check_size_match;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_corr_matrix;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_shape>::type lp;

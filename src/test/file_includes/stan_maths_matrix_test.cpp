@@ -1,4 +1,4 @@
-#include <stan/maths/matrix.hpp>
+#include <stan/math/matrix.hpp>
 #include <gtest/gtest.h>
 
 TEST(stanMathsMatrix,headerParses) {

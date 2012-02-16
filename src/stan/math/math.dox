@@ -1,4 +1,4 @@
 /**
- * @namespace stan::maths   
+ * @namespace stan::math
  * Matrices and templated mathematical functions.
  */

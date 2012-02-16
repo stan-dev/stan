@@ -12,8 +12,8 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/reader.hpp>
 #include <stan/io/csv_writer.hpp>
-#include <stan/maths/matrix.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/special_functions.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/sampler.hpp>
 #include <stan/model/prob_grad_ad.hpp>

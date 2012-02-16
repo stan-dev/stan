@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <iostream>
-#include <stan/maths/matrix.hpp>
+#include <stan/math/matrix.hpp>
 
 namespace stan {
 

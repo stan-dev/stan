@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -34,15 +34,15 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy& = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
       
-      using stan::maths::check_positive;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
@@ -55,7 +55,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
 
-      using stan::maths::square;
+      using stan::math::square;
 
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
         lp -= square(y - mu) / (2.0 * square(sigma));
@@ -89,15 +89,15 @@ namespace stan {
      * @tparam Policy Error-handling policy.
      */
     template <typename T_y, typename T_loc, typename T_scale,
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
              const Policy& /* pol */ = Policy() ) {
       static const char* function = "stan::prob::normal_p(%1%)";
 
-      using stan::maths::check_positive;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
 
       using boost::math::tools::promote_args;
       typename promote_args<T_y, T_loc, T_scale>::type lp;
@@ -135,7 +135,7 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     normal_log(const std::vector<T_y>& y,
                const T_loc& mu,
@@ -143,9 +143,9 @@ namespace stan {
                const Policy& /* pol */ = Policy()) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
 
-      using stan::maths::check_positive;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
 
       using boost::math::tools::promote_args;
       typename promote_args<T_y,T_loc,T_scale>::type lp;
@@ -161,8 +161,8 @@ namespace stan {
       if (y.size() == 0)
         return 0.0;
       
-      using stan::maths::square;
-      using stan::maths::multiply_log;
+      using stan::math::square;
+      using stan::math::multiply_log;
       
       lp = 0.0;
       if (include_summand<propto,T_y,T_loc,T_scale>::value) {

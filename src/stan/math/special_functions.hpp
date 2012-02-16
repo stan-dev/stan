@@ -1,5 +1,5 @@
-#ifndef __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
-#define __STAN__MATHS__SPECIAL_FUNCTIONS_HPP__
+#ifndef __STAN__MATH__SPECIAL_FUNCTIONS_HPP__
+#define __STAN__MATH__SPECIAL_FUNCTIONS_HPP__
 
 #include <stdexcept>
 
@@ -7,11 +7,11 @@
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <stan/maths/constants.hpp>
+#include <stan/math/constants.hpp>
 
 namespace stan {
 
-  namespace maths {
+  namespace math {
 
 
     // C99 
@@ -184,7 +184,7 @@ namespace stan {
      * This function can be used to implement the inverse link function
      * for logistic regression.
      *
-     * The inverse to this function is <code>stan::maths::logit</code>.
+     * The inverse to this function is <code>stan::math::logit</code>.
      * 
      * @param a Argument.
      * @return Inverse logit of argument.
@@ -204,7 +204,7 @@ namespace stan {
      *
      * \f$\mbox{logit}(x) = \log \left( \frac{x}{1 - x} \right)\f$.
      *
-     * The inverse to this function is <code>stan::maths::inv_logit</code>.
+     * The inverse to this function is <code>stan::math::inv_logit</code>.
      *
      * @param a Argument.
      * @return Logit of the argument.
@@ -328,7 +328,7 @@ namespace stan {
      *
      * and so on.
      *
-     * The function <code>stan::maths::inverse_softmax</code> provides an
+     * The function <code>stan::math::inverse_softmax</code> provides an
      * inverse of this operation up to an additive constant.  Specifically,
      * if <code>x</code> is a simplex argument, then
      *
@@ -358,14 +358,14 @@ namespace stan {
     
     /**
      * Writes the inverse softmax of the simplex argument into the second
-     * argument.  See <code>stan::maths::softmax</code> for the inverse
+     * argument.  See <code>stan::math::softmax</code> for the inverse
      * function and a definition of the relation.
      *
      * The inverse softmax function is defined by
      *
      * \f$\mbox{inverse\_softmax}(x)[i] = \log x[i]\f$.
      *
-     * This function defines the inverse of <code>stan::maths::softmax</code>
+     * This function defines the inverse of <code>stan::math::softmax</code>
      * up to a scaling factor.
      *
      * Because of the definition, values of 0.0 in the simplex

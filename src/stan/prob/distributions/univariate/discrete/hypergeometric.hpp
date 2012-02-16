@@ -1,7 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP__
 
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 
@@ -13,7 +13,7 @@ namespace stan {
     // n: #white balls drawn;  N: #balls drawn;  
     // a: #white balls;  b: #black balls
     template <bool propto = false, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline double
     hypergeometric_log(const unsigned int n, 
                        const unsigned int N, 
@@ -22,9 +22,9 @@ namespace stan {
                        const Policy& = Policy()) {
       static const char* function = "stan::prob::hypergeometric_log<%1%>(%1%)";
 
-      using stan::maths::check_finite;      
-      using stan::maths::check_bounded;
-      using stan::maths::check_greater;
+      using stan::math::check_finite;      
+      using stan::math::check_bounded;
+      using stan::math::check_greater;
 
       double lp(0.0);
       if (!check_bounded(function, n, 0U, a, "Number, n,", &lp, Policy()))
@@ -38,9 +38,9 @@ namespace stan {
       
       
       if (include_summand<propto>::value)
-        lp += maths::binomial_coefficient_log(a,n)
-          + maths::binomial_coefficient_log(b,N-n)
-          - maths::binomial_coefficient_log(a+b,N);
+        lp += math::binomial_coefficient_log(a,n)
+          + math::binomial_coefficient_log(b,N-n)
+          - math::binomial_coefficient_log(a+b,N);
       return lp;
     }
 

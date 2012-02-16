@@ -1,5 +1,5 @@
-#ifndef __STAN__MATHS__UTIL_HPP__
-#define __STAN__MATHS__UTIL_HPP__
+#ifndef __STAN__MATH__UTIL_HPP__
+#define __STAN__MATH__UTIL_HPP__
 
 #include <cmath>
 #include <vector>
@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace maths {
+  namespace math {
 
     inline double max(double a, double b) { 
       return a > b ? a : b; 

@@ -7,8 +7,8 @@
 #include <vector>
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
-#include <stan/maths/matrix.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/special_functions.hpp>
 
 namespace stan {
   
@@ -186,8 +186,8 @@ namespace stan {
       // is strictly positive (and triangular)
       // skip last row (odd indexing) because it adds nothing by design
       for (size_t j = 0; j < (CPCs.rows() - 1); ++j) {
-        using stan::maths::log1m;
-        using stan::maths::square;
+        using stan::math::log1m;
+        using stan::math::square;
         log_1cpc2 = log1m(square(CPCs[j]));
         log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
         i++;
@@ -654,7 +654,7 @@ namespace stan {
      */
     template <typename T>
     T lub_constrain(const T x, double lb, double ub) {
-      using stan::maths::inv_logit;
+      using stan::math::inv_logit;
       return lb + (ub - lb) * inv_logit(x);
     }
 
@@ -741,7 +741,7 @@ namespace stan {
      */
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
-      using stan::maths::logit;
+      using stan::math::logit;
       if(!lub_validate(y,lb,ub)) 
         throw std::invalid_argument("require lb <= y <= ub");
       return logit((y - lb) / (ub - lb));
@@ -765,7 +765,7 @@ namespace stan {
      */
     template <typename T>
     T prob_constrain(const T x) {
-      using stan::maths::inv_logit;
+      using stan::math::inv_logit;
       return inv_logit(x);
     }
 
@@ -792,8 +792,8 @@ namespace stan {
      */
     template <typename T>
     T prob_constrain(const T x, T& lp) {
-      using stan::maths::inv_logit;
-      using stan::maths::log1m;
+      using stan::math::inv_logit;
+      using stan::math::log1m;
       T inv_logit_x = inv_logit(x);
       lp += log(inv_logit_x) + log1m(inv_logit_x);
       return inv_logit_x;
@@ -830,7 +830,7 @@ namespace stan {
      */
     template <typename T>
     T prob_free(const T y) {
-      using stan::maths::logit;
+      using stan::math::logit;
       if(!prob_validate(y))
         throw std::domain_error("y is not a probability");
       return logit(y);
@@ -869,7 +869,7 @@ namespace stan {
      */
     template <typename T>
     T corr_constrain(const T x, T& lp) {
-      using stan::maths::log1m;
+      using stan::math::log1m;
       T tanh_x = tanh(x);
       lp += log1m(tanh_x * tanh_x);
       return tanh_x;

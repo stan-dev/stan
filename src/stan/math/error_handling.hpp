@@ -1,18 +1,18 @@
-#ifndef __STAN__MATHS__ERROR_HANDLING_HPP__
-#define __STAN__MATHS__ERROR_HANDLING_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING_HPP__
+#define __STAN__MATH__ERROR_HANDLING_HPP__
 
 #include <cstddef>
 #include <limits>
 
 #include <boost/math/policies/policy.hpp>
 
-#include <stan/maths/boost_error_handling.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/boost_error_handling.hpp>
+#include <stan/math/special_functions.hpp>
 
 
 namespace stan { 
 
-  namespace maths {
+  namespace math {
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
 
@@ -40,7 +40,7 @@ namespace stan {
                               T_result* result,
                               const Policy& /* pol */) {
       if ((boost::math::isnan)(y)) {
-        using stan::maths::policies::raise_domain_error;
+        using stan::math::policies::raise_domain_error;
         std::string msg_str(name);
         msg_str += " is %1%, but must not be nan!";
         *result = raise_domain_error<T_result,T_y>(function,
@@ -58,7 +58,7 @@ namespace stan {
                               const char* name,
                               T_result* result,
                               const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       for (size_t i = 0; i < y.size(); i++) {
         if ((boost::math::isnan)(y[i])) {
           std::ostringstream msg_o;
@@ -82,7 +82,7 @@ namespace stan {
                              const char* name,
                              T_result* result,
                              const Policy& pol) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       if (!(boost::math::isfinite)(y)) {
         std::string message(name);
         message += " is %1%, but must be finite!";
@@ -100,7 +100,7 @@ namespace stan {
                              const char* name,
                              T_result* result,
                              const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       for (size_t i = 0; i < y.size(); i++) {
         if (!(boost::math::isfinite)(y[i])) {
           std::ostringstream message;
@@ -122,7 +122,7 @@ namespace stan {
                               const char* name,  
                               T_result* result,
                               const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x > low)) {
         std::ostringstream msg;
@@ -145,7 +145,7 @@ namespace stan {
                                        const char* name,  
                                        T_result* result,
                                        const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x >= low)) {
         std::ostringstream msg;
@@ -171,7 +171,7 @@ namespace stan {
                               const char* name,  
                               T_result* result,
                               const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(low <= x && x <= high)) {
         std::ostringstream msg;
@@ -196,7 +196,7 @@ namespace stan {
                                   const char* name,
                                   T_result* result,
                                   const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x >= 0)) {
         std::string message(name);
@@ -216,7 +216,7 @@ namespace stan {
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       if (!(x > 0)) {
         std::string message(name);
         message += " is %1%, but must be > 0";
@@ -235,7 +235,7 @@ namespace stan {
                                const char* name,
                                T_result* result,
                                const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       for (size_t i = 0; i < y.size(); i++) {
         if (!(y[i] > 0)) {
           std::ostringstream message;
@@ -256,7 +256,7 @@ namespace stan {
                               const char* name,
                               T_result* result,
                               const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       typename T_prob_vector::value_type T_prob;
       if (theta.size() == 0) {
         std::string message(name);

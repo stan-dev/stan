@@ -2,8 +2,8 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -36,7 +36,7 @@ namespace stan {
      */
     template <bool propto = false,
               typename T_prob, typename T_prior_sample_size, 
-              class Policy = stan::maths::default_policy> 
+              class Policy = stan::math::default_policy> 
     inline typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                   const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
@@ -45,7 +45,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
 
-      using stan::maths::multiply_log;
+      using stan::math::multiply_log;
       if (include_summand<propto,T_prior_sample_size>::value) {
         lp += lgamma(alpha.sum());
         for (int k = 0; k < alpha.rows(); ++k)

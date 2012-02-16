@@ -1,17 +1,17 @@
-#ifndef __STAN__MATHS__MATRIX_ERROR_HANDLING_HPP__
-#define __STAN__MATHS__MATRIX_ERROR_HANDLING_HPP__
+#ifndef __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
+#define __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
 
 #include <limits>
 
-#include <stan/maths/boost_error_handling.hpp>
-#include <stan/maths/special_functions.hpp>
+#include <stan/math/boost_error_handling.hpp>
+#include <stan/math/special_functions.hpp>
 
 #include <stan/prob/transform.hpp>
-#include <stan/maths/matrix.hpp>
+#include <stan/math/matrix.hpp>
 
 namespace stan { 
 
-  namespace maths {
+  namespace math {
 
     template <typename T_y, typename T_result, class Policy>
     inline bool check_not_nan(const char* function,
@@ -19,7 +19,7 @@ namespace stan {
                               const char* name,
                               T_result* result,
                               const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (boost::math::isnan(y[i])) {
           std::ostringstream message;
@@ -63,7 +63,7 @@ namespace stan {
                              const char* name,
                              T_result* result,
                              const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (!boost::math::isfinite(y[i])) {
           std::ostringstream message;
@@ -124,7 +124,7 @@ namespace stan {
                                  T_size2 j,
                                  T_result* result,
                                  const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       if (i != j) {
         std::ostringstream msg;
         msg << "i and j must be same.  Found i=%1%, j=" << j;
@@ -144,7 +144,7 @@ namespace stan {
                               const char* name,
                               T_result* result,
                               const Policy& /*pol*/) {
-      using stan::maths::policies::raise_domain_error;
+      using stan::math::policies::raise_domain_error;
       if (!stan::prob::simplex_validate(theta)) {
         std::ostringstream stream;
         stream << name

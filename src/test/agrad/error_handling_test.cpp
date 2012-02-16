@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <stan/maths/error_handling.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 
@@ -12,10 +12,10 @@ typedef boost::math::policies::policy<
   boost::math::policies::domain_error<boost::math::policies::errno_on_error>
   > errno_policy;
 
-using stan::maths::default_policy;
-using stan::maths::check_not_nan;
-using stan::maths::check_bounded;
-using stan::maths::check_cov_matrix;
+using stan::math::default_policy;
+using stan::math::check_not_nan;
+using stan::math::check_bounded;
+using stan::math::check_cov_matrix;
 using stan::agrad::var;
 
 //---------- check_not_nan tests ----------

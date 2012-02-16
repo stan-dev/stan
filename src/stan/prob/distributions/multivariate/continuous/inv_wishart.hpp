@@ -2,8 +2,8 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/matrix_error_handling.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -23,9 +23,9 @@ namespace stan {
      W &\sim& \mbox{\sf{Inv-Wishart}}_{\nu} (S) \\
      \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
      \times \left| S \right|^{\nu/2} \left| W \right|^{-(\nu + k + 1) / 2}
-     \times \exp (-\frac{1}{2} \mathsf{tr} (S W^{-1})) \right) \\
+     \times \exp (-\frac{1}{2} \mathf{tr} (S W^{-1})) \right) \\
      &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
-     +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \mathsf{tr}(S W^{-1})
+     +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \mathf{tr}(S W^{-1})
      \f}
      * 
      * @param W A scalar matrix
@@ -40,7 +40,7 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                     const T_dof& nu,
@@ -48,8 +48,8 @@ namespace stan {
                     const Policy& = Policy()) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
       
-      using stan::maths::check_greater_or_equal;
-      using stan::maths::check_size_match;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_size_match;
       using boost::math::tools::promote_args;
 
       unsigned int k = S.rows();
@@ -64,12 +64,12 @@ namespace stan {
         return lp;
       // FIXME: domain checks
         
-      using stan::maths::multiply_log;
-      using stan::maths::lmgamma;
-      using stan::maths::multiply;
-      using stan::maths::inverse;
-      using stan::maths::determinant;
-      using stan::maths::trace;
+      using stan::math::multiply_log;
+      using stan::math::lmgamma;
+      using stan::math::multiply;
+      using stan::math::inverse;
+      using stan::math::determinant;
+      using stan::math::trace;
 
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);

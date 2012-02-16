@@ -3,7 +3,7 @@
 
 // FIXME: fill in agrad-specific error handling
 
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 
 namespace boost {
 

@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -10,7 +10,7 @@ namespace stan {
     // BetaBinomial(n|alpha,beta) [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto = false,
               typename T_size, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_size>::type
     beta_binomial_log(const int n, 
                       const int N, 
@@ -19,9 +19,9 @@ namespace stan {
                       const Policy& = Policy()) {
       static const char* function = "stan::prob::beta_binomial_log<%1%>(%1%)";
 
-      using stan::maths::check_finite;
-      using stan::maths::check_nonnegative;
-      using stan::maths::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_size>::type lp;
@@ -43,8 +43,8 @@ namespace stan {
       if (n < 0 || n > N)
         return LOG_ZERO;
       
-      using stan::maths::lbeta;
-      using stan::maths::binomial_coefficient_log;
+      using stan::math::lbeta;
+      using stan::math::binomial_coefficient_log;
 
       lp = 0.0;
       if (include_summand<propto>::value)

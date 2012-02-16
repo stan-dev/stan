@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -10,13 +10,13 @@ namespace stan {
     // Weibull(y|sigma,alpha)     [y >= 0;  sigma > 0;  alpha > 0]
     template <bool propto = false,
               typename T_y, typename T_shape, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
     weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& = Policy()) {
       static const char* function = "stan::prob::weibull_log<%1%>(%1%)";
 
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_scale>::type lp;
@@ -34,7 +34,7 @@ namespace stan {
       if (y < 0)
         return LOG_ZERO;
       
-      using stan::maths::multiply_log;
+      using stan::math::multiply_log;
       
       lp = 0.0;
       if (include_summand<propto,T_shape>::value)
@@ -50,13 +50,13 @@ namespace stan {
     }
 
     template <typename T_y, typename T_shape, typename T_scale, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
     weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& = Policy()) {
       static const char* function = "stan::prob::weibull_p<%1%>(%1%)";
 
-      using stan::maths::check_finite;
-      using stan::maths::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_scale>::type lp;

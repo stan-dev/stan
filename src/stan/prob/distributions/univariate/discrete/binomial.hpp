@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BINOMIAL_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -12,7 +12,7 @@ namespace stan {
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <bool propto = false,
               typename T_prob, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_prob>::type
     binomial_log(const int n, 
                  const int N, 
@@ -21,9 +21,9 @@ namespace stan {
 
       static const char* function = "stan::prob::binomial_log<%1%>(%1%)";
       
-      using stan::maths::check_finite;
-      using stan::maths::check_bounded;
-      using stan::maths::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_prob>::type lp(0.0);
@@ -44,9 +44,9 @@ namespace stan {
                          &lp, Policy()))
         return lp;
 
-      using stan::maths::multiply_log;
-      using stan::maths::binomial_coefficient_log;
-      using stan::maths::log1m;
+      using stan::math::multiply_log;
+      using stan::math::binomial_coefficient_log;
+      using stan::math::log1m;
 
       if (include_summand<propto>::value)
         lp += binomial_coefficient_log(N,n);

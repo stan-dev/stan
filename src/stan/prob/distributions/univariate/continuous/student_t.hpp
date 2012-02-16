@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -38,15 +38,15 @@ namespace stan {
               typename T_dof, 
               typename T_loc, 
               typename T_scale,
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma, 
                   const Policy& = Policy()) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
 
-      using stan::maths::check_positive;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
             
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp;
@@ -63,7 +63,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
 
-      using stan::maths::square;
+      using stan::math::square;
       using boost::math::lgamma;
 
       lp = 0.0;

@@ -13,7 +13,7 @@
 
 #include <boost/throw_exception.hpp>
 
-#include <stan/maths/matrix.hpp>
+#include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
 
 namespace stan {

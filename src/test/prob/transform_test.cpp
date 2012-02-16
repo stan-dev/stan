@@ -111,7 +111,7 @@ TEST(prob_transform, ub_rt) {
 
 
 TEST(prob_transform, lub) {
-  EXPECT_FLOAT_EQ(2.0 + (5.0 - 2.0) * stan::maths::inv_logit(-1.0), 
+  EXPECT_FLOAT_EQ(2.0 + (5.0 - 2.0) * stan::math::inv_logit(-1.0), 
                   stan::prob::lub_constrain(-1.0,2.0,5.0));
 }
 TEST(prob_transform, lub_j) {
@@ -119,17 +119,17 @@ TEST(prob_transform, lub_j) {
   double L = 2.0;
   double U = 5.0;
   double x = -1.0;
-  EXPECT_FLOAT_EQ(L + (U - L) * stan::maths::inv_logit(x), 
+  EXPECT_FLOAT_EQ(L + (U - L) * stan::math::inv_logit(x), 
                   stan::prob::lub_constrain(x,L,U,lp));
-  EXPECT_FLOAT_EQ(-17.0 + log(U - L) + log(stan::maths::inv_logit(x)) 
-                  + log(1.0 - stan::maths::inv_logit(x)),
+  EXPECT_FLOAT_EQ(-17.0 + log(U - L) + log(stan::math::inv_logit(x)) 
+                  + log(1.0 - stan::math::inv_logit(x)),
                   lp);
 }
 TEST(prob_transform, lub_f) {
   double L = -10.0;
   double U = 27.0;
   double y = 3.0;
-  EXPECT_FLOAT_EQ(stan::maths::logit((y - L) / (U - L)),
+  EXPECT_FLOAT_EQ(stan::math::logit((y - L) / (U - L)),
                   stan::prob::lub_free(y,L,U));
 }
 TEST(prob_transform, lub_f_exception) {
@@ -151,7 +151,7 @@ TEST(prob_transform, lub_rt) {
 
 
 TEST(prob_transform, prob) {
-  EXPECT_FLOAT_EQ(stan::maths::inv_logit(-1.0), 
+  EXPECT_FLOAT_EQ(stan::math::inv_logit(-1.0), 
                   stan::prob::prob_constrain(-1.0));
 }
 TEST(prob_transform, prob_j) {
@@ -159,17 +159,17 @@ TEST(prob_transform, prob_j) {
   double L = 0.0;
   double U = 1.0;
   double x = -1.0;
-  EXPECT_FLOAT_EQ(L + (U - L) * stan::maths::inv_logit(x), 
+  EXPECT_FLOAT_EQ(L + (U - L) * stan::math::inv_logit(x), 
                   stan::prob::prob_constrain(x,lp));
-  EXPECT_FLOAT_EQ(-17.0 + log(U - L) + log(stan::maths::inv_logit(x)) 
-                  + log(1.0 - stan::maths::inv_logit(x)),
+  EXPECT_FLOAT_EQ(-17.0 + log(U - L) + log(stan::math::inv_logit(x)) 
+                  + log(1.0 - stan::math::inv_logit(x)),
                   lp);
 }
 TEST(prob_transform, prob_f) {
   double L = 0.0;
   double U = 1.0;
   double y = 0.4;
-  EXPECT_FLOAT_EQ(stan::maths::logit((y - L) / (U - L)),
+  EXPECT_FLOAT_EQ(stan::math::logit((y - L) / (U - L)),
                   stan::prob::prob_free(y));
 }
 TEST(prob_transform, prob_f_exception) {

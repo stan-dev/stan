@@ -1,5 +1,5 @@
-#ifndef __STAN__MATHS__BOOST_ERROR_HANDLING_HPP__
-#define __STAN__MATHS__BOOST_ERROR_HANDLING_HPP__
+#ifndef __STAN__MATH__BOOST_ERROR_HANDLING_HPP__
+#define __STAN__MATH__BOOST_ERROR_HANDLING_HPP__
 
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/policies/error_handling.hpp>
@@ -11,7 +11,7 @@
  * In boost, this is in namespace boost::math::policies and 
  * boost::math::policies:details. Since implementing these functions in
  * that namespace could lead to calls to ambiguous functions, they are
- * being placed in stan::maths::policies and stan::maths::policies::details.
+ * being placed in stan::math::policies and stan::math::policies::details.
  *
  * These still rely on boost::math::policies::detail::raise_error.
  *
@@ -19,7 +19,7 @@
  *   parameters.
  */ 
 namespace stan {
-  namespace maths {
+  namespace math {
     namespace policies {
       namespace detail {
         using boost::math::policies::detail::raise_error;

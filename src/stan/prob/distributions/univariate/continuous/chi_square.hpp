@@ -2,7 +2,7 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__CHI_SQUARE_HPP__
 
 #include <stan/prob/traits.hpp>
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -28,14 +28,14 @@ namespace stan {
      */
     template <bool propto = false, 
               typename T_y, typename T_dof, 
-              class Policy = stan::maths::default_policy>
+              class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu, const Policy& = Policy()) {
       static const char* function = "stan::prob::chi_square_log<%1%>(%1%)";
 
-      using stan::maths::check_positive;
-      using stan::maths::check_finite;
-      using stan::maths::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_dof>::type lp;
@@ -50,7 +50,7 @@ namespace stan {
         return LOG_ZERO;
       
       using boost::math::lgamma;
-      using stan::maths::multiply_log;
+      using stan::math::multiply_log;
       
       lp = 0.0;
       if (include_summand<propto,T_dof>::value)

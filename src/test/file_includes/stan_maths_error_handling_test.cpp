@@ -1,4 +1,4 @@
-#include <stan/maths/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
 #include <gtest/gtest.h>
 
 TEST(stanMathsErrorHandling,headerParses) {

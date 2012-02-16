@@ -1,4 +1,4 @@
-#include <stan/maths/util.hpp>
+#include <stan/math/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(stanMathsUtil,headerParses) {
