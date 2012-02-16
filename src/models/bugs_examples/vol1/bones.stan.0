@@ -1,0 +1,33 @@
+# Bones: latent trait model for multiple ordered 
+# categorical resp nses 
+## http://www.openbugs.info/Examples/Bones.html
+
+
+## status: not implemented  
+##  Since it is just the response that is 
+##   modelled as categorical distribution,
+##  we should be able to run the model now except handling 
+##  the missing. However, the data structure is a bit 
+##  difficult to deal with. 
+
+model { 
+  for(i in 1:nChild) {
+    theta[i] ~ normal(0.0, 36); 
+    for (j in 1:nInd) {
+      # Cumulative probability of > grade k given theta
+      for (k in 1: ncat[j] - 1)  
+        Q[i, j, k] <- inv_logit(delta[j] * (theta[i] - gamma[j, k])); 
+    }
+    # Probability of observing grade k given theta
+    for (j in 1:nInd) {
+      p[i, j, 1] <- 1 - Q[i, j, 1]
+      for (k in 2:(ncat[j] - 1))  
+        p[i, j, k] <- Q[i, j, k - 1] - Q[i, j, k]
+      p[i, j, ncat[j]] <- Q[i, j, ncat[j] - 1]
+      grade[i, j] ~ dcat(p[i, j, 1:ncat[j]])
+    }
+  }
+}
+
+
+

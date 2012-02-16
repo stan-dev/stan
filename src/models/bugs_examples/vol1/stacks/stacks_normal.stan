@@ -24,7 +24,25 @@ data {
   int(0,) p; 
   real Y[N]; 
   real z[N, p]; 
+  // matrix x[N, p]; 
 } 
+
+/*
+// to standardize the x's 
+transformed data {
+  // matrix(N, p) z; 
+  real z[N, p]; 
+  real m[p];
+  real s[p]; 
+  for (j in 1:p) { 
+    m[j] <- mean(col(x, j)); 
+    s[j] <- sd(col(x, j)); 
+  } 
+  for (i in 1:N) for (j in 1:p) 
+    z[i, j] <- (x[i, j] - m[j]) / s[j]; 
+} 
+*/
+
 
 parameters {
   real beta0; 
@@ -36,6 +54,7 @@ transformed parameters {
   real sigma; 
   sigma <- sqrt(sigmasq); 
 } 
+
 
 model {
   for (n in 1:N) Y[n] ~ normal(beta0 + beta[1] * z[n, 1] + beta[2] * z[n, 2] + beta[3] * z[n, 3], sigma); 
