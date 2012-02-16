@@ -180,6 +180,7 @@ namespace stan {
     }
    
     void generate_includes(std::ostream& o) {
+      generate_include("stan/model/model_header.hpp",o);
       generate_include("cassert",o);
       generate_include("cmath",o);
       generate_include("cstddef",o);
@@ -190,22 +191,6 @@ namespace stan {
       generate_include("sstream",o);
       generate_include("utility",o);
       generate_include("boost/exception/all.hpp",o);
-      generate_include("stan/math/matrix.hpp",o);
-      generate_include("stan/agrad/agrad.hpp",o);
-      generate_include("stan/agrad/special_functions.hpp",o);
-      generate_include("stan/agrad/matrix.hpp",o);
-      generate_include("stan/gm/command.hpp",o);
-      generate_include("stan/io/cmd_line.hpp",o);
-      generate_include("stan/io/dump.hpp",o);
-      generate_include("stan/io/reader.hpp",o);
-      generate_include("stan/io/writer.hpp",o);
-      generate_include("stan/io/csv_writer.hpp",o);
-      generate_include("stan/math/matrix.hpp",o);
-      generate_include("stan/math/special_functions.hpp",o);
-      generate_include("stan/mcmc/hmc.hpp",o);
-      generate_include("stan/mcmc/sampler.hpp",o);
-      generate_include("stan/model/prob_grad_ad.hpp",o);
-      generate_include("stan/prob/distributions.hpp",o);
       o << EOL;
     }
 
