@@ -1,4 +1,3 @@
-
 library(coda) 
 library(BUGSExamples) 
 post <- read.csv(file = "samples.csv", header = TRUE); 

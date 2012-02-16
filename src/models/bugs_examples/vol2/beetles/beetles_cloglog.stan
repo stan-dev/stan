@@ -19,10 +19,9 @@ parameters {
 transformed parameters {
     real p[N];
     real llike[N];
-    real alpha;
     real rhat[N];
 
-    alpha <- alpha_star - beta*mean_x;
+
     for (i in 1:N) {
         p[i] <- 1.0 - inv_cloglog(alpha_star + beta*centered_x[i]);
         // log likelihood for sample i & saturated log-likelihood:
@@ -40,4 +39,10 @@ model {
    for (i in 1:N)
       r[i] ~ binomial(n[i], p[i]);
 }
+
+
+generated quantities {
+  real alpha; 
+  alpha <- alpha_star - beta*mean_x;              
+} 
 
