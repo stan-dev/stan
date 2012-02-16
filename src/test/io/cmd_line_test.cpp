@@ -49,7 +49,7 @@ TEST(io_cmd_line, cmd_line_int) {
   EXPECT_TRUE(cl.bare<std::string>(0,z));
   EXPECT_EQ("ahoy", z);
   EXPECT_TRUE(cl.bare<unsigned int>(1,y));
-  EXPECT_EQ(17, y);
+  EXPECT_EQ(17U, y);
   double aaa;
   EXPECT_FALSE(cl.bare<double>(2,aaa));
 }

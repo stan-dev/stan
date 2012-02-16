@@ -1008,7 +1008,7 @@ namespace stan {
         return false;
       if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
         return false;
-      for (size_t i = 0; i < y.size(); ++i) {
+      for (typename Matrix<T,Dynamic,1>::size_type i = 0; i < y.size(); ++i) {
         if (!(y[i] >= 0.0)) 
           return false;
       }
