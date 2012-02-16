@@ -4,14 +4,14 @@ data {
   int(0,) obs_t[N]; 
   int(0,) t[NT + 1]; 
   int(0,) fail[N]; 
-  double Z[N]; 
+  real Z[N]; 
 }
 
 transformed data {
   int Y[N, NT];
   int dN[N, NT]; 
-  double c;
-  double r; 
+  real c;
+  real r; 
   for(i in 1:N) {
     for(j in 1:NT) {
       Y[i, j] <- int_step(obs_t[i] - t[j] + .000000001);
@@ -23,8 +23,8 @@ transformed data {
 }
 
 parameters {
-  double beta; 
-  double(0,) dL0[NT]; 
+  real beta; 
+  real(0,) dL0[NT]; 
 } 
 
 model {
