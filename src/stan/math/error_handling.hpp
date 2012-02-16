@@ -1,13 +1,12 @@
 #ifndef __STAN__MATH__ERROR_HANDLING_HPP__
 #define __STAN__MATH__ERROR_HANDLING_HPP__
 
-#include <cstddef>
-#include <limits>
-
-#include <boost/math/policies/policy.hpp>
-
 #include <stan/math/boost_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+
+#include <boost/math/policies/policy.hpp>
+#include <cstddef>
+#include <limits>
 
 
 namespace stan { 
@@ -198,7 +197,7 @@ namespace stan {
                                   const Policy& /*pol*/) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
-      if (!(x >= 0)) {
+      if (std::numeric_limits<T_x>::is_signed && !(x >= 0)) {
         std::string message(name);
         message += " is %1%, but must be >= 0!";
         *result = raise_domain_error<T_result,T_x>(function,
