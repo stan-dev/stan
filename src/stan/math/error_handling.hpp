@@ -197,7 +197,9 @@ namespace stan {
                                   const Policy& /*pol*/) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
-      if (std::numeric_limits<T_x>::is_signed && !(x >= 0)) {
+      // have to use not is_unsigned. is_signed will be false
+      // floating point types that have no unsigned versions.
+      if (!boost::is_unsigned<T_x>::value && !(x >= 0)) {
         std::string message(name);
         message += " is %1%, but must be >= 0!";
         *result = raise_domain_error<T_result,T_x>(function,

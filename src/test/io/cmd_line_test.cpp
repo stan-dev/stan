@@ -8,7 +8,6 @@ TEST(io_cmd_line, cmd_line_0) {
   const char* argv[1];
   argv[0] = "foo";
   stan::io::cmd_line cl(argc,argv);
-  int x;
   EXPECT_FALSE(cl.has_key("bar"));
   std::string y;
   EXPECT_FALSE(cl.val<std::string>("bar",y));
