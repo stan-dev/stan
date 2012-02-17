@@ -6,3 +6,7 @@
 
 # /doc/
 /doc/api
+
+# temporary files
+*~
+
