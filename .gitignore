@@ -1,0 +1,8 @@
+# /
+/demo
+/models
+/test
+/*.dSYM
+
+# /doc/
+/doc/api
