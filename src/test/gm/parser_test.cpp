@@ -68,9 +68,9 @@ TEST(gm_parser,bugs_2_eyes) {
 TEST(gm_parser,bugs_2_ice) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/ice/ice.stan"));
 }
-TEST(gm_parser,bugs_2_stagnant) {
+/*TEST(gm_parser,bugs_2_stagnant) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/stagnant/stagnant.stan"));
-}
+  }*/
 
 TEST(gm_parser,good_trunc) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_trunc.stan"));

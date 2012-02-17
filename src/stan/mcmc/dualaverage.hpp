@@ -7,6 +7,8 @@
 #include <vector>
 #include <cstdio>
 
+#include <sstream>
+
 namespace stan {
 
   namespace mcmc {
@@ -141,8 +143,10 @@ namespace stan {
           _gbar[i] += g[i];
         if (_k == _nextk) {
           for (size_t i = 0; i < g.size(); ++i) {
-            fprintf(stderr, "_lastx[%lu] = %f, _gbar[%lu] = %f\n", i, _lastx[i],
-                    i, _gbar[i]);
+            std::ostringstream os;
+            os << i;
+            fprintf(stderr, "_lastx[%s] = %f, _gbar[%s] = %f\n", os.str().c_str(),
+                    _lastx[i], os.str().c_str(), i, _gbar[i]);
             _lastx[i] -= _gamma * _gbar[i] / (_nextk - _lastk);
           }
           _gbar.assign(_gbar.size(), 0);
