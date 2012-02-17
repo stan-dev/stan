@@ -1,6 +1,22 @@
 # Inhaler: ordered categorical data 
 ## http://www.openbugs.info/Examples/Inhalers.html
 
+
+## FIXME i(?): 
+## Is there a way to specify say
+## real a[3] with the restriction that a[1] < a[2] < a[3]? 
+## 
+## Now, it is specify as 
+## a0 
+## a0 + delta1 
+## a0 + delta1 + delta2, with the restriction delta1 and delta > 0. 
+
+## FIXE ii: 
+## specify using categorical distribution directly 
+## done (but x ~ categorical[p], in which x starts
+## from 0). 
+
+
 data {
   int(0,) N; 
   int(0,) T; 
@@ -60,10 +76,12 @@ transformed parameters {
   a[1] <- a0; 
   a[2] <- a0 + delta1; 
   a[3] <- a0 + delta1 + delta2; 
+  sigma <- sqrt(sigmasq); 
 } 
 model {
   real Q[N, T, Ncut]; 
-  real p[N, T, Ncut + 1]; 
+  // real p[N, T, Ncut + 1]; 
+  vector(Ncut + 1) p[N, T]; 
   real mu[G, T]; 
 
   for (g in 1:G) {
@@ -84,8 +102,8 @@ model {
         p[i, t, j] <- Q[i, t, j - 1] - Q[i, t, j]; 
       p[i, t, (Ncut + 1)] <- Q[i, t, Ncut];
       
-      // response[i, t] ~ categorical(p[i, t, ]);
-      lp__ <- lp__ + log(p[i, t, response[i, t]]); 
+      response[i, t] - 1 ~ categorical(p[i, t]);
+      // lp__ <- lp__ + log(p[i, t, response[i, t]]); 
     }
   }
   b ~ normal(0, sigma);
@@ -98,5 +116,5 @@ model {
   delta1 ~ normal(0, 1000); 
   delta2 ~ normal(0, 1000); 
  
-  sigmasq ~ gamma(0.001, 0.001);
+  sigmasq ~ inv_gamma(0.001, 0.001);
 }
