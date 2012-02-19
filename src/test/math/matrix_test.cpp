@@ -14,6 +14,27 @@ using stan::math::row_vector_d;
 // typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
 // typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 
+TEST(matrixTest,col) {
+  matrix_d m(3,4);
+  m << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
+  vector_d c = m.col(0);
+  vector_d c2 = stan::math::col(m,1);
+  EXPECT_EQ(3,c.size());
+  EXPECT_EQ(3,c2.size());
+  for (size_t i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(c[i],c2[i]);
+}
+TEST(matrixTest,row) {
+  matrix_d m(3,4);
+  m << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
+  row_vector_d c = m.row(1);
+  row_vector_d c2 = stan::math::row(m,2);
+  EXPECT_EQ(4,c.size());
+  EXPECT_EQ(4,c2.size());
+  for (size_t i = 0; i < 4; ++i)
+    EXPECT_FLOAT_EQ(c[i],c2[i]);
+}
+
 TEST(matrix_test, resize_double) {
   double x = 5;
   std::vector<size_t> dims;

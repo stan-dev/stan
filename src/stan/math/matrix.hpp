@@ -1161,23 +1161,33 @@ namespace stan {
     }
 
     /**
-     * Return the specified row of the specified matrix.
+     * Return the specified row of the specified matrix, using
+     * start-at-1 indexing.  
+     *
+     * This is equivalent to calling <code>m.row(i - 1)</code> and
+     * assigning the resulting template expression to a row vector.
+     * 
      * @param m Matrix.
      * @param i Row index.
      * @return Specified row of the matrix.
      */
     inline row_vector_d row(const matrix_d& m, size_t i) {
-      return m.row(i);
+      return m.row(i - 1);
     }
 
     /**
-     * Return the specified column of the specified matrix.
+     * Return the specified column of the specified matrix
+     * using start-at-1 indexing.
+     *
+     * This is equivalent to calling <code>m.col(i - 1)</code> and
+     * assigning the resulting template expression to a column vector.
+     * 
      * @param m Matrix.
      * @param j Column index.
      * @return Specified column of the matrix.
      */
     inline vector_d col(const matrix_d& m, size_t j) {
-      return m.col(j);
+      return m.col(j - 1);
     }
 
     /**
