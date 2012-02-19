@@ -26,26 +26,43 @@ namespace stan {
      * to compute gradients, characterized as an instance of
      * <code>prob_grad</code>.  
      *
-     * Samples from the sampler are returned through the
-     * base class <code>sampler</code>.
      */
     template <typename BaseRNG = boost::mt19937>
-    class nuts : public adaptive_sampler {
-    protected:
+    class nuts {
+    private:
+
+      // brought in from what used to be in adaptive_sampler
+      // Should we adapt after each call to next()?
+      bool _adapt;
+
+      // How many calls to next() there have been where _adapt is true
+      int _n_adapt_steps;
+
+      // Mean of statistic we want to coerce to some target (if applicable)
+      double _mean_stat;
+
+      unsigned int _nfevals;
+
+      unsigned int _n_steps;
+
       // Provides the target distribution we're trying to sample from
       prob_grad& _model;
     
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
+
       // The most recent setting of the discrete parameters
       std::vector<int> _z;
+
       // The most recent gradient with respect to the real parameters
       std::vector<double> _g;
+
       // The most recent log-likelihood
       double _logp;
 
       // The step size used in the Hamiltonian simulation
       double _epsilon;
+
       // The desired value of E[number of states in slice in last doubling]
       double _delta;
 
@@ -59,20 +76,18 @@ namespace stan {
 
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
-      // Gamma parameter for dual averaging.
-      static double da_gamma() { return 0.05; }
 
       /**
        * Determine whether we've started to make a "U-turn" at either end
        * of the position-state trajectory beginning with {xminus, mminus}
        * and ending with {xplus, mplus}.
        *
-       * @return 0 if we've made a U-turn, 1 otherwise.
+       * @return false if we've made a U-turn, true otherwise.
        */
-      inline static int computeCriterion(std::vector<double>& xplus,
-                                         std::vector<double>& xminus,
-                                         std::vector<double>& mplus,
-                                         std::vector<double>& mminus) {
+      inline static bool compute_criterion(std::vector<double>& xplus,
+                                           std::vector<double>& xminus,
+                                           std::vector<double>& mplus,
+                                           std::vector<double>& mminus) {
         std::vector<double> total_direction;
         stan::math::sub(xplus, xminus, total_direction);
         return stan::math::dot(total_direction, mminus) > 0
@@ -82,6 +97,7 @@ namespace stan {
     public:
 
       double epsilon() { return _epsilon; }
+
       void setEpsilon(double epsilon) { _epsilon = epsilon; }
 
       /**
@@ -104,12 +120,21 @@ namespace stan {
        * If not specified, defaults to the usually reasonable value of 0.6.
        * @param random_seed Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
+       * @param da_gamma Gamma parameter for dual-averaging optimization of
+       * step size (default = 0.05).
        */
       nuts(prob_grad& model, 
            double delta = 0.6, 
            double epsilon = -1,
-           BaseRNG base_rng = BaseRNG(std::time(0)))
-        : _model(model),
+           BaseRNG base_rng = BaseRNG(std::time(0)),
+           double da_gamma = 0.05)
+        : _adapt(true), // from adaptive_sampler
+          _n_adapt_steps(0), 
+          _mean_stat(0),
+          _nfevals(0), 
+          _n_steps(0),
+
+          _model(model), // what used to be here
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r()),
@@ -124,7 +149,7 @@ namespace stan {
 
           _maxchange(-1000),
 
-          _da(da_gamma(), std::vector<double>(1, 0)) {
+          _da(da_gamma, std::vector<double>(1, 0)) {
         
         model.init(_x, _z);
         _logp = model.grad_log_prob(_x, _z, _g);
@@ -140,8 +165,7 @@ namespace stan {
        *
        * The implementation for this class is a no-op.
        */
-      virtual ~nuts() {
-      }
+      ~nuts() { }
 
       /**
        * Set the model real and integer parameters to the specified
@@ -222,7 +246,7 @@ namespace stan {
         int depth = 0;
         int nvalid = 1;
         int direction = 2 * (_rand_uniform_01() > 0.5) - 1;
-        int criterion = 1;
+        bool criterion = true;
 
         // Repeatedly double the set of points we've visited
         std::vector<double> newx, newgrad, dummy1, dummy2, dummy3;
@@ -242,10 +266,10 @@ namespace stan {
                        H0, dummy1, dummy2, dummy3, xplus, mplus, gradplus, 
                        newx, newgrad, newlogp, newnvalid, criterion, prob_sum,
                        n_considered);
-          // We can't look at the results of this last doubling if criterion==0
+          // We can't look at the results of this last doubling if criterion==false
           if (!criterion)
             break;
-          criterion = computeCriterion(xplus, xminus, mplus, mminus);
+          criterion = compute_criterion(xplus, xminus, mplus, mminus);
           // Metropolis-Hastings to determine if we can jump to a point in
           // the new half-tree
           if (_rand_uniform_01() < float(newnvalid) / (1e-100+float(nvalid))) {
@@ -313,7 +337,7 @@ namespace stan {
        * @param newlogp Returns the log-probability of the new sample selected
        * from this subtree.
        * @param n Returns the number of usable points in the subtree.
-       * @param criterion Returns 1 if the subtree is usable, 0 if not.
+       * @param criterion Returns true if the subtree is usable, false if not.
        * @param prob_sum Returns the sum of the HMC acceptance probabilities
        * at each point in the subtree.
        * @param n_considered Returns the number of states in the subtree.
@@ -335,7 +359,7 @@ namespace stan {
                       std::vector<double>& newgrad,
                       double& newlogp,
                       int& nvalid, 
-                      int& criterion, 
+                      bool& criterion, 
                       double& prob_sum, 
                       int& n_considered) {
         if (depth == 0) {   // base case
@@ -367,7 +391,7 @@ namespace stan {
             std::vector<double> newgrad2;
             double newlogp2;
             int nvalid2;
-            int criterion2;
+            bool criterion2;
             double prob_sum2;
             int n_considered2;
             if (direction == -1)
@@ -391,7 +415,7 @@ namespace stan {
             criterion &= criterion2;
             nvalid += nvalid2;
           }
-          criterion &= computeCriterion(xplus, xminus, mplus, mminus);
+          criterion &= compute_criterion(xplus, xminus, mplus, mminus);
         }
       }
 
@@ -403,7 +427,7 @@ namespace stan {
        * the optimal epsilon.
        */
       virtual void adapt_off() {
-        _adapt = 0;
+        _adapt = false;
         std::vector<double> result;
         _da.xbar(result);
         _epsilon = exp(result[0]);
@@ -417,7 +441,49 @@ namespace stan {
       virtual void get_parameters(std::vector<double>& params) {
         params.assign(1, _epsilon);
       }
+
+      /**
+       * Return the value of whatever statistic we're trying to
+       * coerce.  For example, if we're trying to set the average
+       * acceptance probability of HMC to 0.651 then this will return
+       * the realized acceptance probability averaged across all
+       * samples so far.
+       */
+      virtual double mean_stat() { return _mean_stat; }
+
+      /**
+       * Return the number of times that the (possibly unnormalized)
+       * log probability function has been evaluated by this sampler.
+       * This is a useful alternative to wall time in evaluating the
+       * relative performance of different algorithms. However, it's
+       * up to the sampler implementation to be sure to actually keep
+       * track of this.
+       *
+       * @return Number of log probability function evaluations.
+       */
+      unsigned int nfevals() { return _nfevals; }
+
+
+      /**
+       * Turn on parameter adaptation.
+       */
+      virtual void adapt_on() { _adapt = true; }
+
+      /**
+       * Return whether or not parameter adaptation is on.
+       *
+       * @return Whether or not parameter adaptation is on.
+       */
+      bool adapting() { return _adapt; }
+
+      /**
+       * Return how many iterations parameter adaptation has happened for.
+       *
+       * @return How many iterations parameter adaptation has happened for.
+       */
+      int n_adapt_steps() { return _n_adapt_steps; }
     };
+
 
   }
 

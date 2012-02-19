@@ -23,68 +23,6 @@ namespace stan {
 
   namespace gm {
 
-    void hmc_command(const stan::io::cmd_line& command,
-                     stan::mcmc::prob_grad& model) {
-
-      std::string sample_file = "samples.csv";
-      command.val("sample_file",sample_file);
-      std::fstream sample_file_stream(sample_file.c_str(), std::fstream::out);
-      
-      unsigned int num_iterations = 2000U;
-      command.val("num_iterations",num_iterations);
-      
-      unsigned int num_burnin = num_iterations / 2;
-      command.val("num_burnin",num_burnin);
-      
-      unsigned int calculated_thin = (num_iterations - num_burnin) / 1000U;
-      unsigned int num_thin = (calculated_thin > 1) ? calculated_thin : 1U;
-      command.val("num_thin",num_thin);
-      
-      double step_size = 0.01;
-      command.val("step_size",step_size);
-      
-      unsigned int num_steps = 50;
-      command.val("num_steps",num_steps);
-      
-      std::cout << "HMC" << std::endl;
-      std::cout << "sample_file=" << sample_file << std::endl;
-      std::cout << "num_iterations=" << num_iterations << std::endl;
-      std::cout << "num_burnin=" << num_burnin << std::endl;
-      std::cout << "num_thin=" << num_thin << std::endl;
-      std::cout << "step_size=" << step_size << std::endl;
-      std::cout << "num_steps=" << num_steps << std::endl;
-
-      stan::mcmc::hmc sampler(model,step_size,num_steps);
-
-      std::vector<double> params_r;
-      std::vector<int> params_i;
-      for (unsigned int m = 0; m < num_iterations; ++m) {
-        std::cout << "iteration=" << (m + 1);
-        if (m < num_burnin) {
-          std::cout << " burning in" << std::endl;
-          sampler.next();
-          continue;
-        }
-        if (((m - num_burnin) % num_thin) != 0) {
-          std::cout << " thinning" << std::endl;
-          sampler.next();
-          continue;
-        } 
-        std::cout << " saving" << std::endl;
-        stan::mcmc::sample sample = sampler.next();
-        sample.params_r(params_r);
-        sample.params_i(params_i);
-        model.write_csv(params_r,params_i,sample_file_stream);
-      }
-      sample_file_stream.close();
-    }
-
-    // void pad_help_option(std::string option) {
-    //   std::cout << "  " << option;
-    //   for (unsigned int i = option.size(); i < 20; ++i)
-    //     std::cout << ' ';
-    // }
-
     void print_nuts_help(std::string cmd) {
       using stan::io::pad_help_option;
 

@@ -33,11 +33,11 @@ namespace stan {
        * model.
        */
       sample(const std::vector<double>& params_r,
-	     const std::vector<int>& params_i,
-	     double log_prob) :
-	params_r_(params_r), 
-	params_i_(params_i),
-	_log_prob(log_prob) {
+             const std::vector<int>& params_i,
+             double log_prob) :
+        params_r_(params_r), 
+        params_i_(params_i),
+        _log_prob(log_prob) {
       }
       
       /**
@@ -54,7 +54,7 @@ namespace stan {
        * @return Number of real parameters.
        */
       inline int size_r() const {
-	return params_r_.size();
+        return params_r_.size();
       }
 
       /**
@@ -65,7 +65,7 @@ namespace stan {
        * @return Parameter at index.
        */
       inline double params_r(int k) const {
-	return params_r_[k];
+        return params_r_[k];
       }
 
       /**
@@ -75,7 +75,7 @@ namespace stan {
        * @param x Vector into which to write the parameters.
        */
       inline void params_r(std::vector<double>& x) const {
-	x = params_r_;
+        x = params_r_;
       }
 
       /**
@@ -85,7 +85,7 @@ namespace stan {
        *
        */
       inline const std::vector<double>& params_r() const {
-	return params_r_;
+        return params_r_;
       }
 
       /**
@@ -94,7 +94,7 @@ namespace stan {
        * @return Number of integer parameters.
        */
       inline int size_i() const {
-	return params_i_.size();
+        return params_i_.size();
       }
 
       /**
@@ -104,7 +104,7 @@ namespace stan {
        * @return Parameter at the specified index.
        */
       inline int params_i(int k) const {
-	return params_i_[k];
+        return params_i_[k];
       }
 
       /**
@@ -114,14 +114,14 @@ namespace stan {
        * @param n Vector into which to write parameters.
        */
       inline void params_i(std::vector<int>& n) const {
-	n = params_i_;
+        n = params_i_;
       }
 
       /**
        * Return the vector of integer parameters for this sample.
        */
       inline const std::vector<int>& params_i() const {
-	return params_i_;
+        return params_i_;
       }
   
       /**
@@ -131,70 +131,16 @@ namespace stan {
        * @return Log probability.
        */
       inline double log_prob() const {
-	return _log_prob;
+        return _log_prob;
       }
 
     };
 
-    /**
-     * A Markov Chain Monte Carlo (MCMC) sampler abstract base class.
-     */
-    class sampler {
-    protected:
-      unsigned int _nfevals, _n_steps;
 
-    public:
-
-      /**
-       * Construct a sampler.
-       *
-       * This just initializes nfevals=0, _n_steps=0 for this base class.
-       */
-      sampler() : _nfevals(0), _n_steps(0) { 
-      }
       
-      /**
-       * Destroy this sampler.
-       *
-       * This function is implemented as a no-op for this
-       * base class.
-       */
-      virtual ~sampler() { 
-      }
-      
-      /**
-       * Set the model real and integer parameters to the specified
-       * values.  
-       *
-       * This method will typically be used to set the parameters
-       * by the client of this class after initialization.  
-       *
-       * @param x Real parameters.
-       * @param z Integer parameters.
-       */
-      virtual void set_params(std::vector<double> x, 
-                              std::vector<int> z) = 0;
 
-      /**
-       * Return the next sample from this sampler.
-       *
-       * @return Next sample.
-       */
-      virtual sample next() = 0;
 
-      /**
-       * Return the number of times that the (possibly unnormalized)
-       * log probability function has been evaluated by this sampler.
-       * This is a useful alternative to wall time in evaluating the
-       * relative performance of different algorithms. However, it's
-       * up to the sampler implementation to be sure to actually keep
-       * track of this.
-       *
-       * @return Number of log probability function evaluations.
-       */
-      unsigned int nfevals() { return _nfevals; }
 
-    };
   }
 }
 

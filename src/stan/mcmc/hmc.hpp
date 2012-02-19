@@ -12,6 +12,7 @@
 
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
+#include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/util.hpp>
 #include <stan/math/util.hpp>
 
@@ -30,7 +31,7 @@ namespace stan {
      * Samples from the sampler are returned through the
      * base class <code>sampler</code>.
      */
-    class hmc : public sampler {
+    class hmc : public adaptive_sampler {
     private:
       mcmc::prob_grad& _model;
     
