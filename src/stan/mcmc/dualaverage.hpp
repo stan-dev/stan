@@ -8,6 +8,7 @@
 #include <cstdio>
 
 #include <sstream>
+#include <iostream>
 
 namespace stan {
 
