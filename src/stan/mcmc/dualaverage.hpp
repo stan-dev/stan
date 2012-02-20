@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdio>
 
-#include <sstream>
+#include <iostream>
 
 namespace stan {
 
