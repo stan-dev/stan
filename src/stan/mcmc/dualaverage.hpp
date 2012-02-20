@@ -143,10 +143,11 @@ namespace stan {
           _gbar[i] += g[i];
         if (_k == _nextk) {
           for (size_t i = 0; i < g.size(); ++i) {
-            std::ostringstream os;
-            os << i;
-            fprintf(stderr, "_lastx[%s] = %f, _gbar[%s] = %f\n", os.str().c_str(),
-                    _lastx[i], os.str().c_str(), i, _gbar[i]);
+            std::cerr << "_lastx[" << i << "]"
+                      << " = " << _lastx[i]
+                      << ", _gbar[" << i << "]"
+                      << " = " << _gbar[i]
+                      << std::endl;
             _lastx[i] -= _gamma * _gbar[i] / (_nextk - _lastk);
           }
           _gbar.assign(_gbar.size(), 0);

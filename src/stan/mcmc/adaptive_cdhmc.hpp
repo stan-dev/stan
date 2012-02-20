@@ -104,9 +104,12 @@ namespace stan {
        * specified, generate new seen based on system time.
        */
       adaptive_cdhmc(mcmc::prob_grad& model,
-                  double epsilonL, double delta = 0.651, double epsilon=-1, 
+                     double epsilonL, 
+                     double delta = 0.651, 
+                     double epsilon=-1, 
                   unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
-        : _model(model),
+        : adaptive_sampler(epsilon < 0.0),
+          _model(model),
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r()),
@@ -146,8 +149,8 @@ namespace stan {
        * @param x Real parameters.
        * @param z Integer parameters.
        */
-      virtual void set_params(std::vector<double> x,
-                              std::vector<int> z) {
+      virtual void set_params(const std::vector<double>& x,
+                              const std::vector<int>& z) {
         assert(x.size() == _x.size());
         assert(z.size() == _z.size());
         _x = x;
@@ -232,7 +235,7 @@ namespace stan {
        *
        * @return The next sample.
        */
-      sample next() {
+      virtual sample next_impl() {
         // Gibbs for discrete
         std::vector<double> probs;
         for (size_t m = 0; m < _model.num_params_i(); ++m) {
@@ -255,7 +258,7 @@ namespace stan {
         double logp_new = -1e100;
         for (unsigned int l = 0; l < _L; ++l)
           logp_new = leapfrog(_model, _z, x_new, m, g_new, _epsilon);
-        _nfevals += _L;
+        nfevals_plus_eq(_L);
 
         double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;
         double dH = H_new - H;
@@ -269,20 +272,18 @@ namespace stan {
         double adapt_stat = stan::math::min(1, exp(dH));
         if (adapt_stat != adapt_stat)
           adapt_stat = 0;
-        if (_adapt) {
+        if (adapting()) {
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
           std::vector<double> result;
           _da.update(gvec, result);
           set_epsilon(exp(result[0]));
-          ++_n_adapt_steps;
         }
         std::vector<double> result;
         _da.xbar(result);
 //         fprintf(stderr, "xbar = %f\n", exp(result[0]));
-        ++_n_steps;
-        double avg_eta = 1.0 / _n_steps;
-        _mean_stat = avg_eta * adapt_stat + (1 - avg_eta) * _mean_stat;
+        double avg_eta = 1.0 / n_steps();
+        update_mean_stat(avg_eta,adapt_stat);
 
         mcmc::sample s(_x, _z, _logp);
         return s;
@@ -296,7 +297,7 @@ namespace stan {
        * the optimal epsilon.
        */
       virtual void adapt_off() {
-        _adapt = 0;
+        adaptive_sampler::adapt_off(); 
         std::vector<double> result;
         _da.xbar(result);
         set_epsilon(exp(result[0]));

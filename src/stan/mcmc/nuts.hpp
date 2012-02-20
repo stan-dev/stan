@@ -28,22 +28,8 @@ namespace stan {
      *
      */
     template <typename BaseRNG = boost::mt19937>
-    class nuts {
+    class nuts : public adaptive_sampler {
     private:
-
-      // brought in from what used to be in adaptive_sampler
-      // Should we adapt after each call to next()?
-      bool _adapt;
-
-      // How many calls to next() there have been where _adapt is true
-      int _n_adapt_steps;
-
-      // Mean of statistic we want to coerce to some target (if applicable)
-      double _mean_stat;
-
-      unsigned int _nfevals;
-
-      unsigned int _n_steps;
 
       // Provides the target distribution we're trying to sample from
       prob_grad& _model;
@@ -128,11 +114,7 @@ namespace stan {
            double epsilon = -1,
            BaseRNG base_rng = BaseRNG(std::time(0)),
            double da_gamma = 0.05)
-        : _adapt(true), // from adaptive_sampler
-          _n_adapt_steps(0), 
-          _mean_stat(0),
-          _nfevals(0), 
-          _n_steps(0),
+        : adaptive_sampler(epsilon < 0.0), 
 
           _model(model), // what used to be here
           _x(model.num_params_r()),
@@ -177,8 +159,8 @@ namespace stan {
        * @param x Real parameters.
        * @param z Integer parameters.
        */
-      virtual void set_params(std::vector<double> x,
-                              std::vector<int> z) {
+      virtual void set_params(const std::vector<double>& x,
+                              const std::vector<int>& z) {
         assert(x.size() == _x.size());
         assert(z.size() == _z.size());
         _x = x;
@@ -226,7 +208,7 @@ namespace stan {
        *
        * @return The next sample.
        */
-      sample next() {
+      virtual sample next_impl() {
         // Initialize the algorithm
         std::vector<double> mminus(_model.num_params_r());
         for (size_t i = 0; i < mminus.size(); ++i)
@@ -283,20 +265,18 @@ namespace stan {
 
         // Now we just have to update epsilon, if adaptation is on.
         double adapt_stat = prob_sum / float(n_considered);
-        if (_adapt) {
+        if (adapting()) {
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
           std::vector<double> result;
           _da.update(gvec, result);
           _epsilon = exp(result[0]);
-          ++_n_adapt_steps;
         }
         std::vector<double> result;
         _da.xbar(result);
 //         fprintf(stderr, "xbar = %f\n", exp(result[0]));
-        ++_n_steps;
-        double avg_eta = 1.0 / _n_steps;
-        _mean_stat = avg_eta * adapt_stat + (1 - avg_eta) * _mean_stat;
+        double avg_eta = 1.0 / n_steps();
+        update_mean_stat(avg_eta,adapt_stat);
 
         mcmc::sample s(_x, _z, _logp);
         return s;
@@ -380,7 +360,7 @@ namespace stan {
           criterion = newH - u > _maxchange;
           prob_sum = stan::math::min(1, exp(newH - H0));
           n_considered = 1;
-          ++_nfevals;
+          nfevals_plus_eq(1);
         } else {            // depth >= 1
           build_tree(x, m, grad, u, direction, depth-1, H0, xminus, mminus,
                      gradminus, xplus, mplus, gradplus, newx, newgrad, newlogp,
@@ -420,14 +400,15 @@ namespace stan {
       }
 
       /**
-       * Turn off parameter adaptation. Because we're using
-       * primal-dual averaging, once we're done adapting we want to
-       * set epsilon=the _average_ value of epsilon over each
-       * adaptation step. This results in a lower-variance estimate of
-       * the optimal epsilon.
+       * Turn off parameter adaptation. 
+       *
+       * Because we're using primal-dual averaging, once we're done
+       * adapting we want to set epsilon=the _average_ value of
+       * epsilon over each adaptation step. This results in a
+       * lower-variance estimate of the optimal epsilon.
        */
       virtual void adapt_off() {
-        _adapt = false;
+        adaptive_sampler::adapt_off();
         std::vector<double> result;
         _da.xbar(result);
         _epsilon = exp(result[0]);
@@ -442,46 +423,8 @@ namespace stan {
         params.assign(1, _epsilon);
       }
 
-      /**
-       * Return the value of whatever statistic we're trying to
-       * coerce.  For example, if we're trying to set the average
-       * acceptance probability of HMC to 0.651 then this will return
-       * the realized acceptance probability averaged across all
-       * samples so far.
-       */
-      virtual double mean_stat() { return _mean_stat; }
-
-      /**
-       * Return the number of times that the (possibly unnormalized)
-       * log probability function has been evaluated by this sampler.
-       * This is a useful alternative to wall time in evaluating the
-       * relative performance of different algorithms. However, it's
-       * up to the sampler implementation to be sure to actually keep
-       * track of this.
-       *
-       * @return Number of log probability function evaluations.
-       */
-      unsigned int nfevals() { return _nfevals; }
 
 
-      /**
-       * Turn on parameter adaptation.
-       */
-      virtual void adapt_on() { _adapt = true; }
-
-      /**
-       * Return whether or not parameter adaptation is on.
-       *
-       * @return Whether or not parameter adaptation is on.
-       */
-      bool adapting() { return _adapt; }
-
-      /**
-       * Return how many iterations parameter adaptation has happened for.
-       *
-       * @return How many iterations parameter adaptation has happened for.
-       */
-      int n_adapt_steps() { return _n_adapt_steps; }
     };
 
 

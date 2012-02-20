@@ -69,7 +69,8 @@ namespace stan {
           double epsilon, 
           int L,
           unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
-        : _model(model),
+        : adaptive_sampler(false),
+          _model(model),
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r()),
@@ -106,8 +107,8 @@ namespace stan {
        * @throw std::invalid_argument if x or z do not match size 
        *    of parameters specified by the model.
        */
-      virtual void set_params(std::vector<double> x, 
-                              std::vector<int> z) {
+      virtual void set_params(const std::vector<double>& x, 
+                              const std::vector<int>& z) {
         if (x.size() != _x.size() || z.size() != _z.size())
           throw std::invalid_argument("x.size() or z.size() mismatch");
         _x = x;
@@ -155,7 +156,7 @@ namespace stan {
        *
        * @return The next sample.
        */
-      sample next() {
+      virtual sample next_impl() {
         // Gibbs for discrete
         std::vector<double> probs;
         for (size_t m = 0; m < _model.num_params_i(); ++m) {
@@ -180,7 +181,7 @@ namespace stan {
         double logp_new = -1e100;
         for (unsigned int l = 0; l < _L; ++l)
           logp_new = leapfrog(_model, _z, x_new, m, g_new, _epsilon);
-        _nfevals += _L;
+        nfevals_plus_eq(_L);
 
         double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;
         double dH = H_new - H;
