@@ -264,7 +264,7 @@ namespace stan {
         _da.xbar(result);
 //         fprintf(stderr, "xbar = %f\n", exp(result[0]));
         double avg_eta = 1.0 / n_steps();
-        set_mean_stat(avg_eta * adapt_stat + (1 - avg_eta) * mean_stat());
+        update_mean_stat(avg_eta,adapt_stat);
 
         mcmc::sample s(_x, _z, _logp);
         return s;
