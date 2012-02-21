@@ -67,7 +67,7 @@ TEST(ProbDistributionsLkjCorr,ErrnoPolicySigma) {
   Sigma.diagonal().setOnes();
   double eta = rand() / double(RAND_MAX) + 0.5;
     
-  double result;
+  double result(0);
   EXPECT_NO_THROW (result=stan::prob::lkj_corr_log(Sigma, eta, errno_policy()));
 
   // non-symmetric
