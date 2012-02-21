@@ -666,6 +666,8 @@ TEST(io_reader, corr_matrix_exception) {
   EXPECT_THROW (reader.corr_matrix(2), std::runtime_error);
 }
 TEST(io_reader,corr_matrix_constrain) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(-2.0);
@@ -676,7 +678,7 @@ TEST(io_reader,corr_matrix_constrain) {
   theta.push_back(2.0);
   theta.push_back(1.0);
   stan::io::reader<double> reader(theta,theta_i);
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> R(reader.corr_matrix_constrain(3U));
+  Matrix<double,Dynamic,Dynamic> R(reader.corr_matrix_constrain(3U));
   EXPECT_EQ(3U,R.rows());
   EXPECT_EQ(3U,R.cols());
   EXPECT_EQ(9U,R.size());

@@ -185,7 +185,7 @@ namespace stan {
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
       // skip last row (odd indexing) because it adds nothing by design
-      for (size_t j = 0; j < (CPCs.rows() - 1); ++j) {
+      for (typename Array<T,Dynamic,1>::size_type j = 0; j < (CPCs.rows() - 1); ++j) {
         using stan::math::log1m;
         using stan::math::square;
         log_1cpc2 = log1m(square(CPCs[j]));
@@ -936,7 +936,7 @@ namespace stan {
     Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& x) {
       Matrix<T,Dynamic,1> y(x.size() + 1);
       T max_x = x.maxCoeff();
-      for (size_t k = 0; k < x.size(); ++k)
+      for (typename Matrix<T,Dynamic,1>::size_type k = 0; k < x.size(); ++k)
         y[k] = exp(x[k] - max_x);
       y[x.size()] = exp(-max_x);
       return y / y.sum();
@@ -1068,11 +1068,11 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_constrain(const Matrix<T,Dynamic,1>& x) {
-      size_t k = x.size();
+      typename Matrix<T,Dynamic,1>::size_type k = x.size();
       Matrix<T,Dynamic,1> y(k);
       if (k > 0)
         y[0] = exp(x[0]);
-      for (size_t i = 1; i < k; ++i)
+      for (typename Matrix<T,Dynamic,1>::size_type i = 1; i < k; ++i)
         y[i] = y[i-1] + exp(x[i]);
       return y;
     }
@@ -1129,7 +1129,7 @@ namespace stan {
     bool pos_ordered_validate(const Matrix<T,Dynamic,1>& y) {
       if (y.size() == 0) return true;
       if (!(y[0] > 0.0)) return false;
-      for (size_t k = 1; k < y.size(); ++k) {
+      for (typename Matrix<T,Dynamic,1>::size_type k = 1; k < y.size(); ++k) {
         if (!(y[k] > y[k-1]))
           return false;
       }
@@ -1192,12 +1192,13 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x,
-                                                    size_t k) {
-      size_t k_choose_2 = (k * (k - 1)) / 2;
+                                                    typename Matrix<T,Dynamic,1>::size_type k) {
+      typedef typename Matrix<T,Dynamic,1>::size_type size_type;
+      size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
       Array<T,Dynamic,1> cpcs(k_choose_2);
-      for (size_t i = 0; i < k_choose_2; ++i)
+      for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i]);
       return read_corr_matrix(cpcs,k); 
     }
@@ -1223,14 +1224,15 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-                                                    size_t k,
+                                                    typename Matrix<T,Dynamic,1>::size_type k,
                                                     T& lp) {
-      size_t k_choose_2 = (k * (k - 1)) / 2;
+      typedef typename Matrix<T,Dynamic,1>::size_type size_type;
+      size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
       
       Array<T,Dynamic,1> cpcs(k_choose_2);
-      for (size_t i = 0; i < k_choose_2; ++i)
+      for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i],lp);
       return read_corr_matrix(cpcs,k,lp);
     }
@@ -1254,7 +1256,7 @@ namespace stan {
     bool corr_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
       if (!cov_matrix_validate(y))
         return false;
-      for (size_t k = 0; k < y.rows(); ++k) {
+      for (typename Matrix<T,Dynamic,Dynamic>::size_type k = 0; k < y.rows(); ++k) {
         if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
           return false;
       }
@@ -1497,20 +1499,21 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> cov_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
-      size_t k = y.rows();
+      typedef typename Matrix<T,Dynamic,Dynamic>::size_type size_type;
+      size_type k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
-      size_t k_choose_2 = (k * (k-1)) / 2;
+      size_type k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> cpcs(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(cpcs,sds,y);
       if (!successful)
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
       Matrix<T,Dynamic,1> x(k_choose_2 + k);
-      size_t pos = 0;
-      for (size_t i = 0; i < k_choose_2; ++i)
+      size_type pos = 0;
+      for (size_type i = 0; i < k_choose_2; ++i)
         x[pos++] = cpcs[i];
-      for (size_t i = 0; i < k; ++i)
+      for (size_type i = 0; i < k; ++i)
         x[pos++] = sds[i];
       return x;
     }
