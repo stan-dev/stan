@@ -224,33 +224,34 @@ TEST(io_dump, dump_safety) {
   EXPECT_FALSE(dump.contains_i("bing"));
   EXPECT_FALSE(dump.contains_r("bing"));
 
-  EXPECT_EQ(2,dump.vals_i("foo").size());
-  EXPECT_EQ(1,dump.dims_i("foo").size());
-  EXPECT_EQ(2,dump.dims_i("foo")[0]);
+  
+  EXPECT_EQ(2U,dump.vals_i("foo").size());
+  EXPECT_EQ(1U,dump.dims_i("foo").size());
+  EXPECT_EQ(2U,dump.dims_i("foo")[0]);
   EXPECT_EQ(1,dump.vals_i("foo")[0]);
   EXPECT_EQ(2,dump.vals_i("foo")[1]);
 
-  EXPECT_EQ(2,dump.vals_r("foo").size());
-  EXPECT_EQ(1,dump.dims_r("foo").size());
-  EXPECT_EQ(2,dump.dims_r("foo")[0]);
+  EXPECT_EQ(2U,dump.vals_r("foo").size());
+  EXPECT_EQ(1U,dump.dims_r("foo").size());
+  EXPECT_EQ(2U,dump.dims_r("foo")[0]);
   EXPECT_FLOAT_EQ(1.0,dump.vals_r("foo")[0]);
   EXPECT_FLOAT_EQ(2.0,dump.vals_r("foo")[1]);
 
-  EXPECT_EQ(1,dump.vals_r("bar").size());
-  EXPECT_EQ(0,dump.dims_r("bar").size());
+  EXPECT_EQ(1U,dump.vals_r("bar").size());
+  EXPECT_EQ(0U,dump.dims_r("bar").size());
   EXPECT_FLOAT_EQ(1.0,dump.vals_r("bar")[0]);
 
-  EXPECT_EQ(0,dump.vals_i("bar").size());
-  EXPECT_EQ(0,dump.dims_i("bar").size());
+  EXPECT_EQ(0U,dump.vals_i("bar").size());
+  EXPECT_EQ(0U,dump.dims_i("bar").size());
 
-  EXPECT_EQ(0,dump.vals_r("bing").size());
+  EXPECT_EQ(0U,dump.vals_r("bing").size());
   EXPECT_FALSE(dump.contains_r("bing"));
-  EXPECT_EQ(0,dump.vals_i("bing").size());
+  EXPECT_EQ(0U,dump.vals_i("bing").size());
   EXPECT_FALSE(dump.contains_i("bing"));
 
-  EXPECT_EQ(0,dump.dims_r("bing").size());
+  EXPECT_EQ(0U,dump.dims_r("bing").size());
   EXPECT_FALSE(dump.contains_r("bing"));
-  EXPECT_EQ(0,dump.dims_i("bing").size());
+  EXPECT_EQ(0U,dump.dims_i("bing").size());
   EXPECT_FALSE(dump.contains_i("bing"));
 }
 
