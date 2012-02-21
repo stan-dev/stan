@@ -32,6 +32,7 @@ namespace stan {
     private:
 
       // Provides the target distribution we're trying to sample from
+      // it's a ref only because it's heavy to copy
       prob_grad& _model;
     
       // The most recent setting of the real-valued parameters
@@ -100,21 +101,25 @@ namespace stan {
        * @param epsilon Optional (initial) Hamiltonian dynamics simulation
        * step size. If not specified or set < 0, find_reasonable_parameters()
        * will be called to initialize epsilon.
+       * @param epsilon_pm Plus/minus range for uniformly sampling epsilon around
+       * its value.
+       * @param adapt_epsilon True if epsilon is adapted during warmup.
        * @param delta Optional target value between 0 and 1 used to tune 
        * epsilon. Lower delta => higher epsilon => more efficiency, unless
        * epsilon gets _too_ big in which case efficiency suffers.
        * If not specified, defaults to the usually reasonable value of 0.6.
+       * @param da_gamma Gamma tuning parameter for dual averaging adaptation.
        * @param random_seed Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
-       * @param da_gamma Gamma parameter for dual-averaging optimization of
-       * step size (default = 0.05).
        */
       nuts(prob_grad& model, 
-           double delta = 0.6, 
            double epsilon = -1,
-           BaseRNG base_rng = BaseRNG(std::time(0)),
-           double da_gamma = 0.05)
-        : adaptive_sampler(epsilon < 0.0), 
+           double epsilon_pm = 0.0,
+           bool adapt_epsilon = true,
+           double delta = 0.6, 
+           double da_gamma = 0.05,
+           BaseRNG base_rng = BaseRNG(std::time(0)) )
+        : adaptive_sampler(adapt_epsilon),
 
           _model(model), // what used to be here
           _x(model.num_params_r()),
@@ -137,9 +142,11 @@ namespace stan {
         _logp = model.grad_log_prob(_x, _z, _g);
         if (_epsilon <= 0)
           find_reasonable_parameters();
-        // Err on the side of regularizing epsilon towards being too big;
-        // the logic is that it's cheaper to run NUTS when epsilon's large.
-        _da.setx0(std::vector<double>(1, log(_epsilon * 10)));
+        if (adapting()) {
+          // Err on the side of regularizing epsilon towards being too big;
+          // the logic is that it's cheaper to run NUTS when epsilon's large.
+          _da.setx0(std::vector<double>(1, log(_epsilon * 10)));
+        }
       }
 
       /**
@@ -185,7 +192,7 @@ namespace stan {
         int direction = H > log(0.5) ? 1 : -1;
 //         fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
 //                 _epsilon, lastlogp, logp);
-        while (1) {
+        while (true) {
           x = _x;
           g = _g;
           for (size_t i = 0; i < m.size(); ++i)
