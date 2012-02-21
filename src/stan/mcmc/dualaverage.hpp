@@ -72,7 +72,7 @@ namespace stan {
        *
        * @param x0 The point towards each iterate will be shrunk.
        */
-      void setx0(const std::vector<double>& x0) {
+      inline void setx0(const std::vector<double>& x0) {
         _x0.assign(x0.begin(), x0.end());
       }
 
@@ -83,7 +83,7 @@ namespace stan {
        * @param xbar Where to return the exponentially weighted moving
        * average of all previous iterates.
        */
-      void xbar(std::vector<double>& xbar) {
+      inline void xbar(std::vector<double>& xbar) {
         xbar.assign(_xbar.begin(), _xbar.end());
       }
       /**
@@ -91,7 +91,7 @@ namespace stan {
        *
        * @param gbar Where to return the average of all previous gradients.
        */
-      void gbar(std::vector<double>& gbar) {
+      inline void gbar(std::vector<double>& gbar) {
         gbar.assign(_gbar.begin(), _gbar.end());
       }
       /**
@@ -99,7 +99,7 @@ namespace stan {
        *
        * @param xk Where to return the current iterate.
        */
-      void xk(std::vector<double>& xk) {
+      inline void xk(std::vector<double>& xk) {
         xk.assign(_lastx.begin(), _lastx.end());
       }
       /**
@@ -108,7 +108,7 @@ namespace stan {
        * @param x0 Where to return the point towards which we're
        * shrinking the iterates.
        */
-      void x0(std::vector<double>& x0) {
+      inline void x0(std::vector<double>& x0) {
         x0.assign(_x0.begin(), _x0.end());
       }
       /**
@@ -116,13 +116,13 @@ namespace stan {
        *
        * @return how many iterations we've run for.
        */
-      int k() { return _k; }
+      inline int k() { return _k; }
       /**
        * Return the regularization parameter gamma.
        *
        * @return the regularization parameter gamma.
        */
-      double gamma() { return _gamma; }
+      inline double gamma() { return _gamma; }
     };
 
     class GrowingBatches {
@@ -166,20 +166,20 @@ namespace stan {
         fprintf(stderr, "_lastx[0] = %f\n", x0[0]);
       }
 
-      void xbar(std::vector<double>& xbar) {
+      inline void xbar(std::vector<double>& xbar) {
         xbar.assign(_xbar.begin(), _xbar.end());
       }
-      void gbar(std::vector<double>& gbar) {
+      inline void gbar(std::vector<double>& gbar) {
         gbar.assign(_gbar.begin(), _gbar.end());
       }
-      void xk(std::vector<double>& xk) {
+      inline void xk(std::vector<double>& xk) {
         xk.assign(_lastx.begin(), _lastx.end());
       }
-      void x0(std::vector<double>& x0) {
+      inline void x0(std::vector<double>& x0) {
         x0.assign(_x0.begin(), _x0.end());
       }
-      int k() { return _k; }
-      double gamma() { return _gamma; }
+      inline int k() { return _k; }
+      inline double gamma() { return _gamma; }
     };
 
     class StochasticGradient {

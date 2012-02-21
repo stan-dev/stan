@@ -33,11 +33,26 @@ namespace stan {
      * Samples from the sampler are returned through the
      * base class <code>sampler</code>.
      */
+    template <class BaseRNG = boost::mt19937>
     class adaptive_hmc : public adaptive_sampler {
     private:
       // Provides the target distribution we're trying to sample from
       mcmc::prob_grad& _model;
     
+      // The number of steps used in the Hamiltonian simulation
+      unsigned int _L;
+
+
+      // The step size used in the Hamiltonian simulation
+      double _epsilon;
+      // The +/- around epsilon
+      double _epsilon_pm;
+
+      // The desired value of E[acceptance probability]
+      double _delta;
+
+      double _gamma;
+
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
       // The most recent setting of the discrete parameters
@@ -47,21 +62,17 @@ namespace stan {
       // The most recent log-likelihood
       double _logp;
 
-      // The step size used in the Hamiltonian simulation
-      double _epsilon;
-      // The number of steps used in the Hamiltonian simulation
-      unsigned int _L;
-      // The desired value of E[acceptance probability]
-      double _delta;
 
-      boost::mt19937 _rand_int;
-      boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > _rand_unit_norm;
-      boost::uniform_01<boost::mt19937&> _rand_uniform_01;
+
+      BaseRNG _rand_int;
+      boost::variate_generator<BaseRNG&, boost::normal_distribution<> > _rand_unit_norm;
+      boost::uniform_01<BaseRNG&> _rand_uniform_01;
 
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
       // Gamma parameter for dual averaging.
       inline static double da_gamma() { return 0.05; }
+
 
     public:
 
@@ -88,24 +99,34 @@ namespace stan {
        * specified, generate new seen based on system time.
        */
       adaptive_hmc(mcmc::prob_grad& model,
-                  int L, double delta = 0.651, double epsilon=-1, 
-                  unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
-        : adaptive_sampler(epsilon < 0.0),
+                   int L, 
+                   double epsilon=-1,
+                   double epsilon_pm = 0.0,
+                   bool epsilon_adapt = true,
+                   double delta = 0.651,
+                   double gamma = 0.05,
+                   BaseRNG base_rng = BaseRNG(std::time(0)))
+        : adaptive_sampler(epsilon_adapt),
           _model(model),
+
+          _L(L),
+
+          _epsilon(epsilon),
+          _epsilon_pm(epsilon_pm),
+
+          _delta(delta),
+          _gamma(gamma),
+
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r()),
 
-          _epsilon(epsilon),
-          _L(L),
-          _delta(delta),
-
-          _rand_int(random_seed),
+          _rand_int(base_rng),
           _rand_unit_norm(_rand_int,
                           boost::normal_distribution<>()),
           _rand_uniform_01(_rand_int),
 
-          _da(da_gamma(), std::vector<double>(1, 0)) {
+          _da(gamma, std::vector<double>(1, 0)) {
         model.init(_x,_z);
         _logp = model.grad_log_prob(_x,_z,_g);
         if (_epsilon <= 0)
@@ -218,15 +239,15 @@ namespace stan {
        */
       virtual sample next_impl() {
         // Gibbs for discrete
-        std::vector<double> probs;
-        for (size_t m = 0; m < _model.num_params_i(); ++m) {
-          probs.resize(0);
-          for (int k = _model.param_range_i_lower(m); 
-               k < _model.param_range_i_upper(m); 
-               ++k)
-            probs.push_back(_model.log_prob_star(m,k,_x,_z));
-          _z[m] = sample_unnorm_log(probs,_rand_uniform_01);
-        }
+        // std::vector<double> probs;
+        // for (size_t m = 0; m < _model.num_params_i(); ++m) {
+        //   probs.resize(0);
+        //   for (int k = _model.param_range_i_lower(m); 
+        //        k < _model.param_range_i_upper(m); 
+        //        ++k)
+        //     probs.push_back(_model.log_prob_star(m,k,_x,_z));
+        //   _z[m] = sample_unnorm_log(probs,_rand_uniform_01);
+        // }
 
         // HMC for continuous
         std::vector<double> m(_model.num_params_r());
@@ -266,8 +287,7 @@ namespace stan {
         double avg_eta = 1.0 / n_steps();
         update_mean_stat(avg_eta,adapt_stat);
 
-        mcmc::sample s(_x, _z, _logp);
-        return s;
+        return mcmc::sample(_x, _z, _logp);
       }
 
       /**
