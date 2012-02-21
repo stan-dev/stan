@@ -50,8 +50,14 @@ namespace stan {
       // The step size used in the Hamiltonian simulation
       double _epsilon;
 
+      // The +/- around epsilon 
+      double _epsilon_pm; 
+
       // The desired value of E[number of states in slice in last doubling]
       double _delta;
+
+      // Tuning parameter for dual averaging
+      double _gamma; 
 
       // RNGs
       BaseRNG _rand_int;
@@ -108,7 +114,7 @@ namespace stan {
        * epsilon. Lower delta => higher epsilon => more efficiency, unless
        * epsilon gets _too_ big in which case efficiency suffers.
        * If not specified, defaults to the usually reasonable value of 0.6.
-       * @param da_gamma Gamma tuning parameter for dual averaging adaptation.
+       * @param gamma Gamma tuning parameter for dual averaging adaptation.
        * @param random_seed Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
@@ -117,7 +123,7 @@ namespace stan {
            double epsilon_pm = 0.0,
            bool adapt_epsilon = true,
            double delta = 0.6, 
-           double da_gamma = 0.05,
+           double gamma = 0.05,
            BaseRNG base_rng = BaseRNG(std::time(0)) )
         : adaptive_sampler(adapt_epsilon),
 
@@ -127,7 +133,10 @@ namespace stan {
           _g(model.num_params_r()),
 
           _epsilon(epsilon),
+          _epsilon_pm(epsilon_pm),
+          
           _delta(delta),
+          _gamma(gamma),
 
           _rand_int(base_rng),
           _rand_unit_norm(_rand_int,
@@ -136,7 +145,7 @@ namespace stan {
 
           _maxchange(-1000),
 
-          _da(da_gamma, std::vector<double>(1, 0)) {
+          _da(gamma, std::vector<double>(1, 0)) {
         
         model.init(_x, _z);
         _logp = model.grad_log_prob(_x, _z, _g);

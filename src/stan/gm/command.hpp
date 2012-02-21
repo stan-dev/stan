@@ -319,8 +319,8 @@ namespace stan {
       bool append_samples = command.has_flag("append_samples");
       std::ios_base::openmode samples_append_mode
         = append_samples
-        ? (std::fstream::in | std::fstream::app)
-        : std::fstream::in;
+        ? (std::fstream::out | std::fstream::app)
+        : std::fstream::out;
       
 
       std::cout << "STAN SAMPLING COMMAND" << std::endl;
@@ -377,8 +377,8 @@ namespace stan {
       } else {
         stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
                                                     leapfrog_steps,
-                                                    delta,
-                                                    epsilon,
+                                                    epsilon, epsilon_pm, epsilon_adapt,
+                                                    delta, gamma,
                                                     base_rng);
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
