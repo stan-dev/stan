@@ -229,7 +229,7 @@ namespace stan {
         if(!stan::prob::pos_ordered_validate(y)) 
           BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
         data_r_.push_back(log(y[0]));
-        for (size_t i = 1; i < y.size(); ++i) {
+        for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
         }
       }
@@ -339,19 +339,19 @@ namespace stan {
        * @throw std::runtime_error if y has no elements or if it is not square
        */
       void cov_matrix_unconstrain(matrix_t& y) {
-        size_t k = y.rows();
+        typename matrix_t::size_type k = y.rows();
         if (k == 0 || y.cols() != k)
           BOOST_THROW_EXCEPTION(
               std::runtime_error ("y must have elements and y must be a square matrix"));
-        size_t k_choose_2 = (k * (k-1)) / 2;
+        typename matrix_t::size_type k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
         bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
         if(!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
-        for (size_t i = 0; i < k_choose_2; ++i)
+        for (typename matrix_t::size_type i = 0; i < k_choose_2; ++i)
           data_r_.push_back(cpcs[i]);
-        for (size_t i = 0; i < k; ++i)
+        for (typename matrix_t::size_type i = 0; i < k; ++i)
           data_r_.push_back(sds[i]);
       }
     };
