@@ -16,6 +16,7 @@ namespace stan {
       static const char* function = "stan::prob::weibull_log<%1%>(%1%)";
 
       using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
@@ -26,7 +27,7 @@ namespace stan {
         return lp;
       if(!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
         return lp;
-      if(!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if(!check_not_nan(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
       if(!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
         return lp;
@@ -45,7 +46,6 @@ namespace stan {
         lp -= multiply_log(alpha, sigma);
       if (include_summand<propto,T_y,T_shape,T_scale>::value)
         lp -= pow(y / sigma, alpha);
-        
       return lp;
     }
 
