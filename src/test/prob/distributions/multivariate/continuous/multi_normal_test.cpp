@@ -55,11 +55,12 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicySigma) {
   Sigma << 9.0, -3.0, -3.0, 4.0;
   
   double result;
-  EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_NO_THROW(result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_FALSE(std::isnan(result));
 
   // non-symmetric
   Sigma(0, 1) = -2.5;
-  EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_NO_THROW(result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_TRUE(std::isnan(result)) << "non-symmetric Sigma should return nan.";
 }
 TEST(ProbDistributionsMultiNormal,DefaultPolicyMu) {
@@ -92,7 +93,7 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicyMu) {
   
   double result;
   EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
-
+  EXPECT_FALSE(std::isnan(result));
 
   mu(0) = std::numeric_limits<double>::infinity();
   EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
