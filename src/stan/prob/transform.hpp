@@ -1285,16 +1285,17 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> corr_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
-      size_t k = y.rows();
+      typedef typename Matrix<T,Dynamic,Dynamic>::size_type size_type;
+      size_type k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
-      size_t k_choose_2 = (k * (k-1)) / 2;
+      size_type k_choose_2 = (k * (k-1)) / 2;
       Array<T,Dynamic,1> x(k_choose_2);
       Array<T,Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(x,sds,y);
       if (!successful)
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
-      for (size_t i = 0; i < k; ++i) {
+      for (size_type i = 0; i < k; ++i) {
         // sds on log scale unconstrained
         if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE) {
           std::stringstream s;
