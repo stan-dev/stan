@@ -17,5 +17,6 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-c++0x-extensions
   CFLAGS += -Wno-unused-function
   CFLAGS += -g
+  CFLAGS += -Wno-tautological-compare
   #PCH = .pch
 endif
