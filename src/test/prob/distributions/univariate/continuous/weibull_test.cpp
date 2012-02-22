@@ -57,7 +57,7 @@ TEST(ProbDistributionsWeibull,DefaultPolicy) {
   EXPECT_THROW(weibull_log(y,alpha,nan), std::domain_error);
   EXPECT_THROW(weibull_log(y,alpha,0.0), std::domain_error);
   EXPECT_THROW(weibull_log(y,alpha,-inf), std::domain_error);
-  EXPECT_THROW(weibull_log(y,alpha,inf), std::domain_error);
+  EXPECT_NO_THROW(weibull_log(y,alpha,inf));
 }
 TEST(ProbDistributionsWeibull,ErrnoPolicy) {
   double nan = std::numeric_limits<double>::quiet_NaN();
@@ -94,5 +94,5 @@ TEST(ProbDistributionsWeibull,ErrnoPolicy) {
   result = weibull_log(y,alpha,-inf, errno_policy());
   EXPECT_TRUE(std::isnan(result));
   result = weibull_log(y,alpha,inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_FALSE(std::isnan(result));
 }
