@@ -4,6 +4,9 @@
 /test
 /*.dSYM
 
+# precompiled model header
+/src/stan/model/model_header.hpp.*ch
+
 # /doc/
 /doc/api
 
