@@ -288,7 +288,7 @@ TEST(prob_transform,simplex_rt) {
   Matrix<double,Dynamic,1> xrt = stan::prob::simplex_free(y);
   EXPECT_EQ(x.size()+1,y.size());
   EXPECT_EQ(x.size(),xrt.size());
-  for (size_t i = 0; i < x.size(); ++i) {
+  for (typename Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i],xrt[i]);
   }
 }
@@ -338,7 +338,7 @@ TEST(prob_transform,pos_ordered_rt) {
   Matrix<double,Dynamic,1> y = stan::prob::pos_ordered_constrain(x);
   Matrix<double,Dynamic,1> xrt = stan::prob::pos_ordered_free(y);
   EXPECT_EQ(x.size(), xrt.size());
-  for (size_t i = 0; i < x.size(); ++i) {
+  for (typename Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
@@ -353,7 +353,7 @@ TEST(prob_transform,corr_matrix_j) {
   // std::cout << "y=\n" << y;
   Matrix<double,Dynamic,1> xrt = stan::prob::corr_matrix_free(y);
   EXPECT_EQ(x.size(), xrt.size());
-  for (size_t i = 0; i < x.size(); ++i) {
+  for (typename Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
@@ -379,7 +379,7 @@ TEST(prob_transform,corr_matrix_rt) {
   // std::cout << "y=\n" << y;
   Matrix<double,Dynamic,1> xrt = stan::prob::corr_matrix_free(y);
   EXPECT_EQ(x.size(), xrt.size());
-  for (size_t i = 0; i < x.size(); ++i) {
+  for (typename Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
@@ -408,7 +408,7 @@ TEST(prob_transform,cov_matrix_rt) {
   // std::cout << "y=\n" << y;
   Matrix<double,Dynamic,1> xrt = stan::prob::cov_matrix_free(y);
   EXPECT_EQ(x.size(), xrt.size());
-  for (size_t i = 0; i < x.size(); ++i) {
+  for (typename Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
