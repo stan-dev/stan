@@ -9,7 +9,7 @@
 #include <stan/prob/transform.hpp>
 #include <stan/math/matrix.hpp>
 
-#include <boost/type_traits/make_unsigned.hpp>
+#include <boost/type_traits/common_type.hpp>
 
 namespace stan { 
 
@@ -127,28 +127,15 @@ namespace stan {
                                  T_result* result,
                                  const Policy& /*pol*/) {
       using stan::math::policies::raise_domain_error;
-      using boost::is_same; 
-      if (is_same<T_size1, T_size2>::value) {
-        if (i != j) {
-          std::ostringstream msg;
-          msg << "i and j must be same.  Found i=%1%, j=" << j;
-          *result = raise_domain_error<T_result,T_size1>(function,
-                                                         msg.str().c_str(),
-                                                         i,
-                                                         Policy());
-          return false;
-        }
-      } else {
-        using boost::make_unsigned;
-        if ((typename make_unsigned<T_size1>::type)i != (typename make_unsigned<T_size2>::type)j) {
-          std::ostringstream msg;
-          msg << "i and j must be same.  Found i=%1%, j=" << j;
-          *result = raise_domain_error<T_result,T_size1>(function,
-                                                         msg.str().c_str(),
-                                                         i,
-                                                         Policy());
-          return false;
-        } 
+      typedef typename boost::common_type<T_size1,T_size2>::type common_type;
+      if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
+        std::ostringstream msg;
+        msg << "i and j must be same.  Found i=%1%, j=" << j;
+        *result = raise_domain_error<T_result,T_size1>(function,
+                                                       msg.str().c_str(),
+                                                       i,
+                                                       Policy());
+        return false;
       }
       return true;
     }
