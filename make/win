@@ -19,6 +19,7 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -Wall
   CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-uninitialized
   O = 3
   #LDFLAGS += -static-libgcc 
   #LDFLAGS += -static-libstdc++
