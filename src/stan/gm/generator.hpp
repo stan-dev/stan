@@ -1562,7 +1562,7 @@ namespace stan {
 
         for (size_t i = 0; i < combo_dims.size(); ++i) {
           generate_indent(2 + i,o_);
-          o_ << "for (size_t k_" << i << "__ = 1;"
+          o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
           o_ << "; ++k_" << i << "__) {" << EOL; // begin (1)
