@@ -6,6 +6,7 @@
 #include <limits>
 #include <stdexcept>
 #include <vector>
+#include <ostream>
 
 #include <stan/memory/stack_alloc.hpp>
 
@@ -179,7 +180,7 @@ namespace stan {
     }
       
 
-#include <ostream>
+
     void print_stack(std::ostream& o) {
       o << "STACK, size=" << var_stack_.size() << std::endl;
       for (size_t i = 0; i < var_stack_.size(); ++i)
