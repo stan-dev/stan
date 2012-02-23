@@ -422,6 +422,7 @@ namespace stan {
        * bounds and lower bounds are not consistent, the next integer
        * value will be consumed.
        *
+       * @param lb Lower bound.
        * @param ub Upper bound.
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
@@ -445,6 +446,7 @@ namespace stan {
        * Return the next integer, checking that it is less than
        * or equal to the specified upper bound.
        * 
+       * @param lb Lower bound.
        * @param ub Upper bound.
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
@@ -457,6 +459,7 @@ namespace stan {
        * Return the next integer, checking that it is less than
        * or equal to the specified upper bound.
        * 
+       * @param lb Lower bound.
        * @param ub Upper bound.
        * @param lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
