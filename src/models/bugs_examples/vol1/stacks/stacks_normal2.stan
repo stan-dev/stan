@@ -18,12 +18,27 @@
 #  coefficients 
 # ------
 # use `make t' or `make t2' to build/run the model 
+
 data {
   int(0,) N; 
   int(0,) p; 
   real Y[N]; 
-  real z[N, p]; 
+  matrix(N,p) x; 
 } 
+
+// to standardize the x's 
+transformed data {
+  real z[N, p]; 
+  for (j in 1:p) { 
+    real mean_x; 
+    real sd_x; 
+    mean_x <- mean(col(x, j)); 
+    sd_x <- sd(col(x, j)); 
+    for (i in 1:N)  z[i, j] <- (x[i, j] - mean_x) / sd_x; 
+  } 
+} 
+
+
 
 parameters {
   real beta0; 

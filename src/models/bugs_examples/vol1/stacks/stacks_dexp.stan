@@ -23,18 +23,25 @@ data {
   int(0,) N; 
   int(0,) p; 
   real Y[N]; 
+  matrix(N,p) x; 
+} 
+
+// to standardize the x's 
+transformed data {
   real z[N, p]; 
+  for (j in 1:p) { 
+    real mean_x; 
+    real sd_x; 
+    mean_x <- mean(col(x, j)); 
+    sd_x <- sd(col(x, j)); 
+    for (i in 1:N)  z[i, j] <- (x[i, j] - mean_x) / sd_x; 
+  } 
 } 
 
 parameters {
   real beta0; 
   real beta[p]; 
-  real(0,) sigmasq; 
-} 
-
-transformed parameters {
-  real sigma; 
-  sigma <- sqrt(sigmasq); 
+  real(0,) sigma; 
 } 
 
 model {
@@ -42,6 +49,6 @@ model {
   for (n in 1:N) Y[n] ~ double_exponential(beta0 + beta[1] * z[n, 1] + beta[2] * z[n, 2] + beta[3] * z[n, 3], sigma); 
   beta0 ~ normal(0, 316); 
   beta ~ normal(0, 316); 
-  sigmasq ~ inv_gamma(.001, .001); 
+  sigma ~ inv_gamma(.001, .001); 
 } 
 

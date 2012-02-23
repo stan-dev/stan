@@ -23,25 +23,20 @@ data {
   int(0,) N; 
   int(0,) p; 
   real Y[N]; 
-  real z[N, p]; 
-  // matrix x[N, p]; 
+  matrix(N,p) x; 
 } 
 
-/*
 // to standardize the x's 
 transformed data {
-  // matrix(N, p) z; 
   real z[N, p]; 
-  real m[p];
-  real s[p]; 
   for (j in 1:p) { 
-    m[j] <- mean(col(x, j)); 
-    s[j] <- sd(col(x, j)); 
+    real mean_x; 
+    real sd_x; 
+    mean_x <- mean(col(x, j)); 
+    sd_x <- sd(col(x, j)); 
+    for (i in 1:N)  z[i, j] <- (x[i, j] - mean_x) / sd_x; 
   } 
-  for (i in 1:N) for (j in 1:p) 
-    z[i, j] <- (x[i, j] - m[j]) / s[j]; 
 } 
-*/
 
 
 parameters {
