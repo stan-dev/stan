@@ -115,7 +115,7 @@ namespace stan {
        * epsilon gets _too_ big in which case efficiency suffers.
        * If not specified, defaults to the usually reasonable value of 0.6.
        * @param gamma Gamma tuning parameter for dual averaging adaptation.
-       * @param random_seed Optional Seed for random number generator; if not
+       * @param base_rng Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
       nuts(prob_grad& model, 
@@ -314,8 +314,6 @@ namespace stan {
        * leapfrog steps.
        * @param H0 The joint probability of the position-momentum we started
        * from initially---used to compute statistic to adapt epsilon.
-       * @param newsample Returns the position of the new sample selected from
-       * this subtree.
        * @param xminus Returns the position of the backwardmost leaf of this
        * subtree.
        * @param mminus Returns the momentum of the backwardmost leaf of this
@@ -332,7 +330,7 @@ namespace stan {
        * this subtree.
        * @param newlogp Returns the log-probability of the new sample selected
        * from this subtree.
-       * @param n Returns the number of usable points in the subtree.
+       * @param nvalid Returns the number of usable points in the subtree.
        * @param criterion Returns true if the subtree is usable, false if not.
        * @param prob_sum Returns the sum of the HMC acceptance probabilities
        * at each point in the subtree.
