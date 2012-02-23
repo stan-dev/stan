@@ -8,7 +8,9 @@
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+
 
 namespace stan {
   
@@ -21,10 +23,6 @@ namespace stan {
     using Eigen::Array;
     using Eigen::DiagonalMatrix;
 
-    /**
-     * This is the tolerance for checking arithmetic bounds
-     * in rank and in simplexes.  The current value is <code>1E-8</code>.
-     */
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
 
@@ -991,31 +989,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified vector is simplex.
-     * To be a simplex, all values must be greater than or equal to 0
-     * and the values must sum to 1.
-     *
-     * <p>The test that the values sum to 1 is done to within the
-     * tolerance specified by <code>CONSTRAINT_TOLERANCE</code>.
-     *
-     * @param y Vector to test.
-     * @return <code>true</code> if the vector is a simplex.
-     */
-    template <typename T>
-    bool
-    simplex_validate(const Matrix<T,Dynamic,1>& y) {
-      if (y.size() == 0)
-        return false;
-      if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
-        return false;
-      for (typename Matrix<T,Dynamic,1>::size_type i = 0; i < y.size(); ++i) {
-        if (!(y[i] >= 0.0)) 
-          return false;
-      }
-      return true;
-    }
-
-    /**
      * Return an unconstrained vector that when transformed produces
      * the specified simplex.  It applies to a simplex of dimensionality
      * K and produces an unconstrained vector of dimensionality (K-1).
@@ -1039,7 +1012,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
-      if(!simplex_validate(y))
+      if(!stan::math::simplex_validate(y))
         throw std::domain_error("y is not a valid simplex");
       size_t k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
@@ -1237,32 +1210,6 @@ namespace stan {
       return read_corr_matrix(cpcs,k,lp);
     }
 
-    // forward declaration for corr_matrix
-    template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y); 
-
-    /**
-     * Return <code>true</code> if the specified matrix is a valid
-     * correlation matrix.  A valid correlation matrix is symmetric,
-     * has a unit diagonal (all 1 values), and has all values between
-     * -1 and 1 (inclussive).  
-     *
-     * @param y Matrix to test.
-     * @return <code>true</code> if the specified matrix is a valid
-     * correlation matrix.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool corr_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      if (!cov_matrix_validate(y))
-        return false;
-      for (typename Matrix<T,Dynamic,Dynamic>::size_type k = 0; k < y.rows(); ++k) {
-        if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
-          return false;
-      }
-      return true;
-    }
-
     /**
      * Return the vector of unconstrained partial correlations that define the
      * specified correlation matrix when transformed.  
@@ -1379,105 +1326,6 @@ namespace stan {
       for (size_t i = 0; i < k; ++i)
         sds[i] = positive_constrain(x[pos++]); // ,lp);
       return read_cov_matrix(cpcs, sds, lp);
-    }
-
-    /**
-     * Return <code>true</code> if the specified matrix is symmetric
-     * 
-     * NOTE: squareness is not checked by this function
-     *
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is symmetric.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool symmetry_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      size_t k = y.rows();
-      if (k == 1)
-        return true;
-      
-      for (size_t m = 0; m < k; ++m) {
-        for (size_t n = m + 1; n < k; ++n) {
-          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
-            return false;
-        }
-      }
-      return true;
-    }
-
-
-    /**
-     * Return <code>true</code> if the specified matrix is positive definite
-     *
-     * NOTE: symmetry is NOT checked by this function
-     * 
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is positive definite.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool pd_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      if (y.rows() == 1)
-        return y(0,0) > CONSTRAINT_TOLERANCE;
-      
-      LDLT< Matrix<T,Dynamic,Dynamic> > cholesky = y.ldlt();
-      if( (cholesky.vectorD().array() > CONSTRAINT_TOLERANCE).all() )
-        return true;
-      
-      return false;
-    }
-
-    /**
-     * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix.  A valid covariance matrix must be square,
-     * symmetric, and positive definite.
-     *
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is a valid covariance matrix.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      if (y.rows() != y.cols() || y.rows() == 0)
-        return false;
-
-      if (!symmetry_validate(y))
-        return false;
-
-      if (!pd_validate(y))
-        return false;
-
-      return true;
-    }
-
-    /**
-     * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix.  A valid covariance matrix must be symmetric
-     * and positive definite.
-     *
-     * @param y Matrix to test.
-     * @param err_msg Output stream for error messages.
-     * @return <code>true</code> if the matrix is a valid covariance matrix.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostream& err_msg) {
-      if (y.rows() != y.cols() || y.rows() == 0) {
-        err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
-        return false;
-      }
-
-      if (!symmetry_validate(y)) {
-        err_msg << "Matrix is not symmetric";
-        return false;
-      }
-
-      if (!pd_validate(y)) {
-        err_msg << "Matrix is not positive definite";
-        return false;
-      }
-      
-      return true;
     }
 
     /**

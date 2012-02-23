@@ -6,7 +6,6 @@
 #include <stan/math/boost_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 
-#include <stan/prob/transform.hpp>
 #include <stan/math/matrix.hpp>
 
 #include <boost/type_traits/common_type.hpp>
@@ -14,6 +13,11 @@
 namespace stan { 
 
   namespace math {
+    /**
+     * This is the tolerance for checking arithmetic bounds
+     * in rank and in simplexes.  The current value is <code>1E-8</code>.
+     */
+    const double CONSTRAINT_TOLERANCE = 1E-8;
 
     template <typename T_y, typename T_result, class Policy>
     inline bool check_not_nan(const char* function,
@@ -85,7 +89,7 @@ namespace stan {
                                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                                  T_result* result,
                                  const Policy& /*pol*/) {
-      if (!stan::prob::cov_matrix_validate(Sigma)) {
+      if (!cov_matrix_validate(Sigma)) {
         std::ostringstream stream;
         stream << "Sigma is not a valid covariance matrix. "
                << "Sigma must be symmetric and positive semi-definite. Sigma: \n" 
@@ -105,7 +109,7 @@ namespace stan {
                                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                                  T_result* result,
                                  const Policy& /*pol*/) {
-      if (!stan::prob::corr_matrix_validate(Sigma)) {
+      if (!corr_matrix_validate(Sigma)) {
         std::ostringstream stream;
         stream << "Sigma is not a valid correlation matrix."
                << "Sigma must be symmetric and positive semi-definite with ones on its diagonal. Sigma: \n" 
@@ -148,7 +152,7 @@ namespace stan {
                               T_result* result,
                               const Policy& /*pol*/) {
       using stan::math::policies::raise_domain_error;
-      if (!stan::prob::simplex_validate(theta)) {
+      if (!simplex_validate(theta)) {
         std::ostringstream stream;
         stream << name
                << "is not a valid simplex. The first element of the simplex is: %1%.";
@@ -160,6 +164,163 @@ namespace stan {
       }
       return true;
     }
+
+
+
+    // forward declaration for corr_matrix
+    //template <typename T>
+    //bool cov_matrix_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y); 
+
+    /**
+     * Return <code>true</code> if the specified matrix is symmetric
+     * 
+     * NOTE: squareness is not checked by this function
+     *
+     * @param y Matrix to test.
+     * @return <code>true</code> if the matrix is symmetric.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool symmetry_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      size_t k = y.rows();
+      if (k == 1)
+        return true;
+      
+      for (size_t m = 0; m < k; ++m) {
+        for (size_t n = m + 1; n < k; ++n) {
+          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
+            return false;
+        }
+      }
+      return true;
+    }
+
+
+    /**
+     * Return <code>true</code> if the specified matrix is positive definite
+     *
+     * NOTE: symmetry is NOT checked by this function
+     * 
+     * @param y Matrix to test.
+     * @return <code>true</code> if the matrix is positive definite.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool pd_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      if (y.rows() == 1)
+        return y(0,0) > CONSTRAINT_TOLERANCE;
+      
+      Eigen::LDLT< Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > cholesky = y.ldlt();
+      if( (cholesky.vectorD().array() > CONSTRAINT_TOLERANCE).all() )
+        return true;
+      
+      return false;
+    }
+
+
+
+    /**
+     * Return <code>true</code> if the specified matrix is a valid
+     * correlation matrix.  A valid correlation matrix is symmetric,
+     * has a unit diagonal (all 1 values), and has all values between
+     * -1 and 1 (inclussive).  
+     *
+     * @param y Matrix to test.
+     * @return <code>true</code> if the specified matrix is a valid
+     * correlation matrix.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool corr_matrix_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      if (!cov_matrix_validate(y))
+        return false;
+      for (typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type k = 0; k < y.rows(); ++k) {
+        if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
+          return false;
+      }
+      return true;
+    }
+
+    /**
+     * Return <code>true</code> if the specified matrix is a valid
+     * covariance matrix.  A valid covariance matrix must be square,
+     * symmetric, and positive definite.
+     *
+     * @param y Matrix to test.
+     * @return <code>true</code> if the matrix is a valid covariance matrix.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool cov_matrix_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      if (y.rows() != y.cols() || y.rows() == 0)
+        return false;
+
+      if (!symmetry_validate(y))
+        return false;
+
+      if (!pd_validate(y))
+        return false;
+
+      return true;
+    }
+
+    /**
+     * Return <code>true</code> if the specified matrix is a valid
+     * covariance matrix.  A valid covariance matrix must be symmetric
+     * and positive definite.
+     *
+     * @param y Matrix to test.
+     * @param err_msg Output stream for error messages.
+     * @return <code>true</code> if the matrix is a valid covariance matrix.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    bool cov_matrix_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y, std::ostream& err_msg) {
+      if (y.rows() != y.cols() || y.rows() == 0) {
+        err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
+        return false;
+      }
+
+      if (!symmetry_validate(y)) {
+        err_msg << "Matrix is not symmetric";
+        return false;
+      }
+
+      if (!pd_validate(y)) {
+        err_msg << "Matrix is not positive definite";
+        return false;
+      }
+      
+      return true;
+    }
+
+    /**
+     * Return <code>true</code> if the specified vector is simplex.
+     * To be a simplex, all values must be greater than or equal to 0
+     * and the values must sum to 1.
+     *
+     * <p>The test that the values sum to 1 is done to within the
+     * tolerance specified by <code>CONSTRAINT_TOLERANCE</code>.
+     *
+     * @param y Vector to test.
+     * @return <code>true</code> if the vector is a simplex.
+     */
+    template <typename T>
+    bool
+    simplex_validate(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      if (y.size() == 0)
+        return false;
+      if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
+        return false;
+      for (typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type i = 0; i < y.size(); ++i) {
+        if (!(y[i] >= 0.0)) 
+          return false;
+      }
+      return true;
+    }
+
+
+
 
   }
 }

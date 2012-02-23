@@ -9,6 +9,7 @@
 #include <boost/throw_exception.hpp>
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 
 #include <stan/prob/transform.hpp>
@@ -750,7 +751,7 @@ namespace stan {
        * Return a simplex of the specified size made up of the
        * next scalars.  
        *
-       * <p>See <code>stan::prob::simplex_validate(Eigen::Matrix)</code>.
+       * <p>See <code>stan::math::simplex_validate(Eigen::Matrix)</code>.
        *
        * @param k Size of returned simplex.
        * @return Simplex read from the specified size number of scalars.
@@ -758,7 +759,7 @@ namespace stan {
        */
       vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        if(!stan::prob::simplex_validate(theta))
+        if(!stan::math::simplex_validate(theta))
           BOOST_THROW_EXCEPTION(
               std::runtime_error("the k values is not a simplex"));
         return theta;
@@ -852,7 +853,7 @@ namespace stan {
        */
       matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        if (!stan::prob::corr_matrix_validate(x))
+        if (!stan::math::corr_matrix_validate(x))
           BOOST_THROW_EXCEPTION(
             std::runtime_error(
               "the matrix returned is not a valid correlation matrix"));
@@ -901,7 +902,7 @@ namespace stan {
        */
       matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        if (!stan::prob::cov_matrix_validate(y))
+        if (!stan::math::cov_matrix_validate(y))
           BOOST_THROW_EXCEPTION(
             std::runtime_error(
               "the matrix returned is not a valid covariance matrix"));
