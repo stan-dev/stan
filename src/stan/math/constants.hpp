@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__CONSTANTSS_HPP__
-#define __STAN__MATH__CONSTANTSS_HPP__
+#ifndef __STAN__MATH__CONSTANTS_HPP__
+#define __STAN__MATH__CONSTANTS_HPP__
 
 #include <boost/math/constants/constants.hpp>
 
@@ -15,13 +15,13 @@ namespace stan {
 
     /** 
      * The value of pi, 
-     * $\f \pi \f$.
+     * \f$ \pi \f$.
      */
     const double PI = boost::math::constants::pi<double>();
 
     /** 
      * The value of the square root of 2, 
-     * \$f \sqrt{2} \f$. 
+     * \f$ \sqrt{2} \f$. 
      */
     const double SQRT_2 = std::sqrt(2.0);
 
@@ -33,7 +33,7 @@ namespace stan {
 
     /**
      * The natural logarithm of 10, 
-     * $\f \log 10 \f$..
+     * \f$ \log 10 \f$.
      */
     const double LOG_10 = std::log(10.0);
 
