@@ -161,7 +161,7 @@ namespace stan {
 
       if (epsilon_adapt)
         sampler.adapt_on(); 
-      for (unsigned int m = 0; m < num_iterations; ++m) {
+      for (int m = 0; m < num_iterations; ++m) {
         if (do_print(m,refresh)) {
           std::cout << "\rIteration: ";
           std::cout << std::setw(it_print_width) << (m + 1)
