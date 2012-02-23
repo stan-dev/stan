@@ -13,3 +13,5 @@
 # temporary files
 *~
 
+# depedencies files
+**/*.d
