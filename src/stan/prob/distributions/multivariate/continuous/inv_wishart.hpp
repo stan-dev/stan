@@ -23,9 +23,9 @@ namespace stan {
      W &\sim& \mbox{\sf{Inv-Wishart}}_{\nu} (S) \\
      \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
      \times \left| S \right|^{\nu/2} \left| W \right|^{-(\nu + k + 1) / 2}
-     \times \exp (-\frac{1}{2} \mathf{tr} (S W^{-1})) \right) \\
+     \times \exp (-\frac{1}{2} \mbox{tr} (S W^{-1})) \right) \\
      &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
-     +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \mathf{tr}(S W^{-1})
+     +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \mbox{tr}(S W^{-1})
      \f}
      * 
      * @param W A scalar matrix
