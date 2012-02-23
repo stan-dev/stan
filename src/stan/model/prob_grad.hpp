@@ -140,7 +140,8 @@ namespace stan {
        *
        * @param params_r Real-valued parameters.
        * @param params_i Integer-valued parameters.
-       * @params grad Vector into which gradient is written.
+       * @param[out] grad Vector into which gradient is written.
+       * @param epsilon
        */
       void finite_diff_grad(std::vector<double>& params_r,
                             std::vector<int>& params_i,
@@ -167,6 +168,7 @@ namespace stan {
        * @param params_r Real-valued parameter vector.
        * @param params_i Integer-valued parameter vector.
        * @param epsilon Real-valued scalar saying how much to perturb 
+       * @param o Output stream for messages.
        * params_r. Defaults to 1e-6.
        */
       void test_gradients(std::vector<double>& params_r,
@@ -207,6 +209,7 @@ namespace stan {
        * real and integer parameters.
        *
        * @param epsilon Finite d
+       * @param o Output stream for messages.
        */
       void test_gradients_random(double epsilon = 1e-6,
                                  std::ostream& o = std::cout) {

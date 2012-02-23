@@ -95,7 +95,11 @@ namespace stan {
        * @param epsilon Hamiltonian dynamics simulation step size. Optional;
        * if not specified or set < 0, find_reasonable_parameters() will be 
        * called to initialize epsilon.
-       * @param random_seed Seed for random number generator; optional, if not
+       * @param epsilon_pm
+       * @param epsilon_adapt
+       * @param delta
+       * @param gamma
+       * @param base_rng Seed for random number generator; optional, if not
        * specified, generate new seen based on system time.
        */
       adaptive_hmc(mcmc::prob_grad& model,

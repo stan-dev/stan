@@ -85,7 +85,7 @@ namespace Eigen {
 
     /**
      * Return standard library's lowest for double-precision floating
-     * point, <code>-std::numeric_limits&lt;double&gt;::max()</code>.
+     * point, <code>&#45;std::numeric_limits&lt;double&gt;::max()</code>.
      *
      * @return Same lowest value as a <code>double</code>.
      */    

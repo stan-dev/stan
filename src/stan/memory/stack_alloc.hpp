@@ -49,15 +49,6 @@ namespace stan {
       }
     }
 
-    
-    /**
-     * Here's an example of how to use HMC for a simple model with
-     * strong parameter correlations.
-     *
-     * @example bivar_norm.cpp  Simple example of full HMC sampling.
-     */
-
-
     /**
      * An instance of this class provides a memory pool through
      * which blocks of raw memory may be allocated and then collected

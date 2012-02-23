@@ -423,7 +423,7 @@ namespace stan {
      a specified column.
      *
      * @param x Matrix from which to get a row
-     * @param i Index into matrix plus 1.
+     * @param m Index into matrix plus 1.
      * @param error_msg Error message if the index is out of range.
      * @param idx Nested index level to report in error message if
      * the index is out of range.
@@ -501,7 +501,7 @@ namespace stan {
      * specified error message and index indicated.
      *
      * @param x Row vector from which to get a value.
-     * @param m Column index plus 1.
+     * @param n Column index plus 1.
      * @param error_msg Error message if the index is out of range.
      * @param idx Nested index level to report in error message if
      * the index is out of range.
