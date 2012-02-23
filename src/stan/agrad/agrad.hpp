@@ -2237,9 +2237,9 @@ namespace stan {
      * with respect to <code>x</code>, and thus <code>J[m][n]</code> will be 
      * <code><i>d</i>y[m]/<i>d</i>x[n]</code>.
      *
-     * @param dependents Dependent (output) variables.
-     * @param independents Indepent (input) variables.
-     * @return Jacobian of the transform.  
+     * @param[in] dependents Dependent (output) variables.
+     * @param[in] independents Indepent (input) variables.
+     * @param[out] jacobian Jacobian of the transform.
      */
     void jacobian(std::vector<var>& dependents,
                   std::vector<var>& independents,
