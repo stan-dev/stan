@@ -437,10 +437,7 @@ namespace stan {
      */
     template <typename T>
     T positive_free(const T y) {
-      T result;
-      if (!stan::math::check_positive("stan::prob::positive_free<%1%>(%1%)",
-                                      y, "y", &result))
-        return result;
+      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "y");
       return log(y);
     }
 
@@ -499,10 +496,8 @@ namespace stan {
     template <typename T>
     inline
     T lb_free(const T y, const double lb) {
-      T result;
-      if (!stan::math::check_greater_or_equal("stan::prob::lb_free<%1%>(%1%)",
-                                              y, lb, "y", &result))
-        return result;
+      stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
+                                         y, lb, "y");
       return log(y - lb);
     }
     
@@ -570,10 +565,8 @@ namespace stan {
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      T result;
-      if (!stan::math::check_lesser_or_equal("stan::prob::ub_free<%1%>(%1%)",
-                                             y, ub, "y", &result))
-        return result;
+      stan::math::check_lesser_or_equal("stan::prob::ub_free(%1%)",
+                                        y, ub, "y");
       return log(ub - y);
     }
 
@@ -672,10 +665,8 @@ namespace stan {
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
       using stan::math::logit;
-      T result;
-      if (!stan::math::check_bounded("stan::prob::lub_free<%1%>(%1%)",
-                                     y, lb, ub, "y", &result))
-        return result;
+      stan::math::check_bounded("stan::prob::lub_free(%1%)",
+                                y, lb, ub, "y");
       return logit((y - lb) / (ub - lb));
     }
 
@@ -748,8 +739,8 @@ namespace stan {
     template <typename T>
     T prob_free(const T y) {
       using stan::math::logit;
-      if(!stan::math::prob_validate(y))
-        throw std::domain_error("y is not a probability");
+      stan::math::check_bounded("stan::prob::prob_free(%1%)",
+                                y, 0, 1, "y, a probability,");
       return logit(y);
     }
     
@@ -807,7 +798,8 @@ namespace stan {
      */
     template <typename T>
     T corr_free(const T y) {
-      stan::math::corr_validate(y);
+      stan::math::check_bounded("stan::prob::lub_free(%1%)",
+                                y, -1, 1, "y, a correlation,");
       return atanh(y);
     }
 
@@ -916,8 +908,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
-      if(!stan::math::simplex_validate(y))
-        throw std::domain_error("y is not a valid simplex");
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", y, "y");
       size_t k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
       Matrix<T,Dynamic,1> x(k_minus_1);
@@ -1010,8 +1001,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
-      if(!stan::math::pos_ordered_validate(y)) 
-        throw std::domain_error("y is not a vector of positive ordered scalars");
+      stan::math::check_pos_ordered("stan::prob::pos_ordered_free(%1%)", y, "y");
       size_t k = y.size();
       Matrix<T,Dynamic,1> x(k);
       if (k == 0) 
