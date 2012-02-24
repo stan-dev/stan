@@ -269,7 +269,6 @@ namespace stan {
           double range = high - low;
           epsilon = low + (range * _rand_uniform_01());
         }
-        std::cout << "epsilon=" << epsilon << std::endl;
 
         for (unsigned int l = 0; l < _L; ++l)
           logp_new = leapfrog(_model, _z, x_new, m, g_new, epsilon);
