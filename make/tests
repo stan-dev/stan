@@ -26,6 +26,7 @@ test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 ##
 BUGS_EXAMPLES := $(shell cd src; find models/bugs_examples -type f -name '*.stan')
 BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
+BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
 
 .PHONY: test-bugs
 test-bugs: $(BUGS_EXAMPLES)

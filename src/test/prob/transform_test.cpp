@@ -29,10 +29,6 @@ TEST(prob_transform,identity_rt) {
   double yfc = stan::prob::identity_constrain(yf);
   EXPECT_FLOAT_EQ(y,yfc);
 }
-TEST(prob_transform,identity_val) {
-  double x = 1.2;
-  EXPECT_EQ(true, stan::prob::identity_validate(x));
-}
 
 
 TEST(prob_transform, positive) {
@@ -72,7 +68,7 @@ TEST(prob_transform, lb_f) {
 }
 TEST(prob_transform, lb_f_exception) {
   double lb = 2.0;
-  EXPECT_THROW (stan::prob::lb_free(lb - 0.01, lb), std::invalid_argument);
+  EXPECT_THROW (stan::prob::lb_free(lb - 0.01, lb), std::domain_error);
 }
 TEST(prob_transform, lb_rt) {
   double x = -1.0;
@@ -98,7 +94,7 @@ TEST(prob_transform, ub_f) {
 }
 TEST(prob_transform, ub_f_exception) {
   double ub = 4.0;
-  EXPECT_THROW (stan::prob::ub_free(ub+0.01, ub), std::invalid_argument);
+  EXPECT_THROW (stan::prob::ub_free(ub+0.01, ub), std::domain_error);
 }
 TEST(prob_transform, ub_rt) {
   double x = -1.0;
@@ -135,10 +131,10 @@ TEST(prob_transform, lub_f) {
 TEST(prob_transform, lub_f_exception) {
   double L = -10.0;
   double U = 27.0;
-  EXPECT_THROW(stan::prob::lub_free (L-0.01,L,U), std::invalid_argument);
-  EXPECT_THROW(stan::prob::lub_free (U+0.01,L,U), std::invalid_argument);
+  EXPECT_THROW(stan::prob::lub_free (L-0.01,L,U), std::domain_error);
+  EXPECT_THROW(stan::prob::lub_free (U+0.01,L,U), std::domain_error);
 
-  EXPECT_THROW(stan::prob::lub_free ((L+U)/2,U,L), std::invalid_argument);
+  EXPECT_THROW(stan::prob::lub_free ((L+U)/2,U,L), std::domain_error);
 }
 TEST(prob_transform, lub_rt) {
   double x = -1.0;

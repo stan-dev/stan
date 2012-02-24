@@ -7,7 +7,7 @@ typedef boost::math::policies::policy<
 using namespace stan::math;
 
 //---------- check_not_nan tests ----------
-TEST(ProbDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
+TEST(MathErrorHandling,CheckNotNanDefaultPolicy) {
   const char* function = "check_not_nan(%1%)";
   double x = 0;
   double result;
@@ -22,7 +22,7 @@ TEST(ProbDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
   EXPECT_THROW(check_not_nan(function, x, "x", &result, default_policy()), std::domain_error) << "check_not_nan should throw exception on NaN: " << x;
 }
 
-TEST(ProbDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
+TEST(MathErrorHandling,CheckNotNanErrnoPolicy) {
   const char* function = "check_not_nan(%1%)";
   double x = 0;
   double result;
@@ -43,7 +43,7 @@ TEST(ProbDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
 
 
 //---------- check_finite tests ----------
-TEST(ProbDistributionsErrorHandling,CheckFiniteDefaultPolicy) {
+TEST(MathErrorHandling,CheckFiniteDefaultPolicy) {
   const char* function = "check_finite (%1%)";
   double x = 0;
   double result;
@@ -58,7 +58,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteDefaultPolicy) {
   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN: " << x;
 }
 
-TEST(ProbDistributionsErrorHandling,CheckFiniteErrnoPolicy) {
+TEST(MathErrorHandling,CheckFiniteErrnoPolicy) {
   const char* function = "check_finite (%1%)";
   double x = 0;
   double result;
@@ -79,7 +79,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteErrnoPolicy) {
 
 
 // ---------- check_finite: vector tests ----------
-TEST(ProbDistributionsErrorHandling,CheckFiniteVectorDefaultPolicy) {
+TEST(MathErrorHandling,CheckFiniteVectorDefaultPolicy) {
   const char* function = "check_finite (%1%)";
   double result;
   std::vector<double> x;
@@ -109,7 +109,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorDefaultPolicy) {
   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
 }
 
-TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
+TEST(MathErrorHandling,CheckFiniteVectorErrnoPolicy) {
   const char* function = "check_finite (%1%)";
   std::vector<double> x;
   x.push_back (-1);
@@ -148,7 +148,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
 }
 
 // // ---------- check_finite: matrix tests ----------
-// TEST(ProbDistributionsErrorHandling,CheckFiniteMatrixDefaultPolicy) {
+// TEST(MathErrorHandling,CheckFiniteMatrixDefaultPolicy) {
 //   const char* function = "check_finite (%1%)";
 //   double result;
 //   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -174,7 +174,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
 //   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
 // }
 
-// TEST(ProbDistributionsErrorHandling,CheckFiniteMatrixErrnoPolicy) {
+// TEST(MathErrorHandling,CheckFiniteMatrixErrnoPolicy) {
 //   const char* function = "check_finite (%1%)";
 //   double result;
 //   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -204,7 +204,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
 //   }
 
 // ---------- check_bounded tests ----------
-TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
+TEST(MathErrorHandling,CheckBoundedDefaultPolicyX) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -243,7 +243,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
+TEST(MathErrorHandling,CheckBoundedDefaultPolicyLow) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -265,7 +265,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
   EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
+TEST(MathErrorHandling,CheckBoundedDefaultPolicyHigh) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -290,7 +290,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
 }
 
 
-TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
+TEST(MathErrorHandling,CheckBoundedErrnoPolicyX) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -341,7 +341,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
+TEST(MathErrorHandling,CheckBoundedErrnoPolicyLow) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -369,7 +369,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
+TEST(MathErrorHandling,CheckBoundedErrnoPolicyHigh) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -399,4 +399,311 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
 }
 
 // ----------  ----------
-//TEST(ProbDistributionsErrorHandling,)
+//TEST(MathErrorHandling,)
+TEST(MathErrorHandling,identity_validate) {
+  double x = 1.2;
+  EXPECT_EQ(true, stan::math::identity_validate(x));
+}
+
+TEST(MathErrorHandling,CheckGreaterDefaultPolicy) {
+  const char* function = "check_greater(%1%)";
+  double x = 10.0;
+  double lb = 0.0;
+  double result;
+ 
+  EXPECT_TRUE(check_greater(function, x, lb, "x", &result, default_policy())) 
+    << "check_greater should be true with x > lb";
+  
+  x = -1.0;
+  EXPECT_THROW(check_greater(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_greater should throw an exception with x < lb";
+
+  x = lb;
+  EXPECT_THROW(check_greater(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_greater should throw an exception with x == lb";
+
+  x = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x, lb, "x", &result, default_policy()))
+    << "check_greater should be true with x == Inf and lb = 0.0";
+
+  x = 10.0;
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_greater should throw an exception with x == 10.0 and lb == Inf";
+
+  x = std::numeric_limits<double>::infinity();
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_greater should throw an exception with x == Inf and lb == Inf";
+}
+TEST(MathErrorHandling,CheckGreaterErrnoPolicy) {
+  const char* function = "check_greater(%1%)";
+  double x = 10.0;
+  double lb = 0.0;
+  double result;
+ 
+  result = 0;
+  EXPECT_TRUE(check_greater(function, x, lb, "x", &result, errno_policy())) 
+    << "check_greater should return true with x > lb";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;  
+  x = -1.0;
+  EXPECT_FALSE(check_greater(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x < lb";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = lb;
+  EXPECT_FALSE(check_greater(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x == lb";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return true with x == Inf and lb = 0.0";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;
+  x = 10.0;
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x == 10.0 and lb == Inf";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = std::numeric_limits<double>::infinity();
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x == Inf and lb == Inf";
+  EXPECT_TRUE(std::isnan(result));
+}
+
+TEST(MathErrorHandling,CheckGreaterOrEqualDefaultPolicy) {
+  const char* function = "check_greater_or_equal(%1%)";
+  double x = 10.0;
+  double lb = 0.0;
+  double result;
+ 
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, default_policy())) 
+    << "check_greater_or_equal should be true with x > lb";
+  
+  x = -1.0;
+  EXPECT_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_greater_or_equal should throw an exception with x < lb";
+
+  x = lb;
+  EXPECT_NO_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_greater_or_equal should not throw an exception with x == lb";
+
+  x = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_greater should be true with x == Inf and lb = 0.0";
+
+  x = 10.0;
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_greater should throw an exception with x == 10.0 and lb == Inf";
+
+  x = std::numeric_limits<double>::infinity();
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_NO_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_greater should not throw an exception with x == Inf and lb == Inf";
+}
+TEST(MathErrorHandling,CheckGreaterOrEqualErrnoPolicy) {
+  const char* function = "check_greater_or_equal(%1%)";
+  double x = 10.0;
+  double lb = 0.0;
+  double result;
+ 
+  result = 0;
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy())) 
+    << "check_greater should return true with x > lb";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;  
+  x = -1.0;
+  EXPECT_FALSE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x < lb";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = lb;
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return true with x == lb";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;
+  x = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return true with x == Inf and lb = 0.0";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;
+  x = 10.0;
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x == 10.0 and lb == Inf";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = std::numeric_limits<double>::infinity();
+  lb = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return false with x == Inf and lb == Inf";
+  EXPECT_FALSE(std::isnan(result));
+}
+
+
+TEST(MathErrorHandling,CheckLesserDefaultPolicy) {
+  const char* function = "check_lesser(%1%)";
+  double x = -10.0;
+  double lb = 0.0;
+  double result;
+ 
+  EXPECT_TRUE(check_lesser(function, x, lb, "x", &result, default_policy())) 
+    << "check_lesser should be true with x < lb";
+  
+  x = 1.0;
+  EXPECT_THROW(check_lesser(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_lesser should throw an exception with x > lb";
+
+  x = lb;
+  EXPECT_THROW(check_lesser(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_lesser should throw an exception with x == lb";
+
+  x = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_lesser(function, x, lb, "x", &result, default_policy()))
+    << "check_lesser should be true with x == -Inf and lb = 0.0";
+
+  x = -10.0;
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_lesser(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_lesser should throw an exception with x == -10.0 and lb == -Inf";
+
+  x = -std::numeric_limits<double>::infinity();
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_lesser(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_lesser should throw an exception with x == -Inf and lb == -Inf";
+}
+TEST(MathErrorHandling,CheckLesserErrnoPolicy) {
+  const char* function = "check_lesser(%1%)";
+  double x = -10.0;
+  double lb = 0.0;
+  double result;
+ 
+  result = 0;
+  EXPECT_TRUE(check_lesser(function, x, lb, "x", &result, errno_policy())) 
+    << "check_lesser should return true with x < lb";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;  
+  x = 1.0;
+  EXPECT_FALSE(check_lesser(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser should return false with x > lb";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = lb;
+  EXPECT_FALSE(check_lesser(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser should return false with x == lb";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_lesser(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser should return true with x == -Inf and lb = 0.0";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;
+  x = -10.0;
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_lesser(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser should return false with x == -10.0 and lb == -Inf";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = -std::numeric_limits<double>::infinity();
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_lesser(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser should return false with x == -Inf and lb == -Inf";
+  EXPECT_TRUE(std::isnan(result));
+}
+
+
+TEST(MathErrorHandling,CheckLesserOrEqualDefaultPolicy) {
+  const char* function = "check_lesser_or_equal(%1%)";
+  double x = -10.0;
+  double lb = 0.0;
+  double result;
+ 
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, default_policy())) 
+    << "check_lesser_or_equal should be true with x < lb";
+  
+  x = 1.0;
+  EXPECT_THROW(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_lesser_or_equal should throw an exception with x > lb";
+
+  x = lb;
+  EXPECT_NO_THROW(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_lesser_or_equal should not throw an exception with x == lb";
+
+  x = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_lesser should be true with x == -Inf and lb = 0.0";
+
+  x = -10.0;
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
+    << "check_lesser should throw an exception with x == -10.0 and lb == -Inf";
+
+  x = -std::numeric_limits<double>::infinity();
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_NO_THROW(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_lesser should not throw an exception with x == -Inf and lb == -Inf";
+}
+TEST(MathErrorHandling,CheckLesserOrEqualErrnoPolicy) {
+  const char* function = "check_lesser_or_equal(%1%)";
+  double x = -10.0;
+  double lb = 0.0;
+  double result;
+ 
+  result = 0;
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy())) 
+    << "check_lesser_or_equal should return true with x < lb";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;  
+  x = 1.0;
+  EXPECT_FALSE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser_or_equal should return false with x > lb";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = lb;
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser_or_equal should return false with x == lb";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;
+  x = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser_or_equal should return true with x == -Inf and lb = 0.0";
+  EXPECT_FALSE(std::isnan(result));
+
+  result = 0;
+  x = -10.0;
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser_or_equal should return false with x == -10.0 and lb == -Inf";
+  EXPECT_TRUE(std::isnan(result));
+
+  result = 0;
+  x = -std::numeric_limits<double>::infinity();
+  lb = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser_or_equal should return true with x == -Inf and lb == -Inf";
+  EXPECT_FALSE(std::isnan(result));
+}
+

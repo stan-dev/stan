@@ -492,7 +492,7 @@ namespace stan {
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(),o_);
-          o_ << "assert(stan::prob::lb_validate(";
+          o_ << "assert(stan::math::lb_validate(";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.low_.expr_,o_);
@@ -500,7 +500,7 @@ namespace stan {
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + x.dims_.size(),o_);
-          o_ << "assert(stan::prob::ub_validate(";
+          o_ << "assert(stan::math::ub_validate(";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ", ";
           generate_expression(x.range_.high_.expr_,o_);
@@ -528,7 +528,7 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "assert(stan::prob::" << type_name << "_validate(";
+        o_ << "assert(stan::math::" << type_name << "_validate(";
         generate_loop_var(x.name_,x.dims_.size());
         o_ << "));" << EOL;
         generate_end_for_dims(x.dims_.size());
