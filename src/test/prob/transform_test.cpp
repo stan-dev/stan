@@ -131,10 +131,10 @@ TEST(prob_transform, lub_f) {
 TEST(prob_transform, lub_f_exception) {
   double L = -10.0;
   double U = 27.0;
-  EXPECT_THROW(stan::prob::lub_free (L-0.01,L,U), std::invalid_argument);
-  EXPECT_THROW(stan::prob::lub_free (U+0.01,L,U), std::invalid_argument);
+  EXPECT_THROW(stan::prob::lub_free (L-0.01,L,U), std::domain_error);
+  EXPECT_THROW(stan::prob::lub_free (U+0.01,L,U), std::domain_error);
 
-  EXPECT_THROW(stan::prob::lub_free ((L+U)/2,U,L), std::invalid_argument);
+  EXPECT_THROW(stan::prob::lub_free ((L+U)/2,U,L), std::domain_error);
 }
 TEST(prob_transform, lub_rt) {
   double x = -1.0;

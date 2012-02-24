@@ -672,8 +672,10 @@ namespace stan {
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
       using stan::math::logit;
-      if(!stan::math::lub_validate(y,lb,ub)) 
-        throw std::invalid_argument("require lb <= y <= ub");
+      T result;
+      if (!stan::math::check_bounded("stan::prob::lub_free<%1%>(%1%)",
+                                     y, lb, ub, "y", &result))
+        return result;
       return logit((y - lb) / (ub - lb));
     }
 
