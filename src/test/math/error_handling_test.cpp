@@ -481,21 +481,21 @@ TEST(MathErrorHandling,CheckGreaterErrnoPolicy) {
 }
 
 TEST(MathErrorHandling,CheckGreaterOrEqualDefaultPolicy) {
-  const char* function = "check_greater(%1%)";
+  const char* function = "check_greater_or_equal(%1%)";
   double x = 10.0;
   double lb = 0.0;
   double result;
  
   EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, default_policy())) 
-    << "check_greater should be true with x > lb";
+    << "check_greater_or_equal should be true with x > lb";
   
   x = -1.0;
   EXPECT_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
-    << "check_greater should throw an exception with x < lb";
+    << "check_greater_or_equal should throw an exception with x < lb";
 
   x = lb;
-  EXPECT_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
-    << "check_greater should throw an exception with x == lb";
+  EXPECT_NO_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_greater_or_equal should not throw an exception with x == lb";
 
   x = std::numeric_limits<double>::infinity();
   EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, default_policy()))
@@ -508,11 +508,11 @@ TEST(MathErrorHandling,CheckGreaterOrEqualDefaultPolicy) {
 
   x = std::numeric_limits<double>::infinity();
   lb = std::numeric_limits<double>::infinity();
-  EXPECT_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
-    << "check_greater should throw an exception with x == Inf and lb == Inf";
+  EXPECT_NO_THROW(check_greater_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_greater should not throw an exception with x == Inf and lb == Inf";
 }
 TEST(MathErrorHandling,CheckGreaterOrEqualErrnoPolicy) {
-  const char* function = "check_greater(%1%)";
+  const char* function = "check_greater_or_equal(%1%)";
   double x = 10.0;
   double lb = 0.0;
   double result;
@@ -530,9 +530,9 @@ TEST(MathErrorHandling,CheckGreaterOrEqualErrnoPolicy) {
 
   result = 0;
   x = lb;
-  EXPECT_FALSE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
-    << "check_greater should return false with x == lb";
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_greater should return true with x == lb";
+  EXPECT_FALSE(std::isnan(result));
 
   result = 0;
   x = std::numeric_limits<double>::infinity();
@@ -550,9 +550,9 @@ TEST(MathErrorHandling,CheckGreaterOrEqualErrnoPolicy) {
   result = 0;
   x = std::numeric_limits<double>::infinity();
   lb = std::numeric_limits<double>::infinity();
-  EXPECT_FALSE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
+  EXPECT_TRUE(check_greater_or_equal(function, x, lb, "x", &result, errno_policy()))
     << "check_greater should return false with x == Inf and lb == Inf";
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_FALSE(std::isnan(result));
 }
 
 
@@ -633,7 +633,7 @@ TEST(MathErrorHandling,CheckLesserErrnoPolicy) {
 
 
 TEST(MathErrorHandling,CheckLesserOrEqualDefaultPolicy) {
-  const char* function = "check_lesser(%1%)";
+  const char* function = "check_lesser_or_equal(%1%)";
   double x = -10.0;
   double lb = 0.0;
   double result;
@@ -660,11 +660,11 @@ TEST(MathErrorHandling,CheckLesserOrEqualDefaultPolicy) {
 
   x = -std::numeric_limits<double>::infinity();
   lb = -std::numeric_limits<double>::infinity();
-  EXPECT_THROW(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()), std::domain_error)
-    << "check_lesser should throw an exception with x == -Inf and lb == -Inf";
+  EXPECT_NO_THROW(check_lesser_or_equal(function, x, lb, "x", &result, default_policy()))
+    << "check_lesser should not throw an exception with x == -Inf and lb == -Inf";
 }
 TEST(MathErrorHandling,CheckLesserOrEqualErrnoPolicy) {
-  const char* function = "check_lesser(%1%)";
+  const char* function = "check_lesser_or_equal(%1%)";
   double x = -10.0;
   double lb = 0.0;
   double result;
@@ -702,8 +702,8 @@ TEST(MathErrorHandling,CheckLesserOrEqualErrnoPolicy) {
   result = 0;
   x = -std::numeric_limits<double>::infinity();
   lb = -std::numeric_limits<double>::infinity();
-  EXPECT_FALSE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
-    << "check_lesser_or_equal should return false with x == -Inf and lb == -Inf";
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_TRUE(check_lesser_or_equal(function, x, lb, "x", &result, errno_policy()))
+    << "check_lesser_or_equal should return true with x == -Inf and lb == -Inf";
+  EXPECT_FALSE(std::isnan(result));
 }
 

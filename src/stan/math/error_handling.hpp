@@ -142,7 +142,7 @@ namespace stan {
     }
 
     template <typename T_x, typename T_low, typename T_result, class Policy = default_policy>
-    inline bool check_less_than_or_equal(const char* function,
+    inline bool check_greater_or_equal(const char* function,
                                        const T_x& x,
                                        const T_low& low,
                                        const char* name,  
@@ -153,7 +153,7 @@ namespace stan {
       if (!(x >= low)) {
         std::ostringstream msg;
         msg << name 
-            << " is %1%, but must be greater than or equal to "
+            << " is %1%, but must be greater or equal to "
             << low;
         *result = raise_domain_error<T_result,T_x>(function, 
                                                    msg.str().c_str(), 
