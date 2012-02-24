@@ -438,7 +438,7 @@ namespace stan {
     template <typename T>
     T positive_free(const T y) {
       T result;
-      if (!stan::math::check_positive("stan::math::positive_free<%1%>(%1%)",
+      if (!stan::math::check_positive("stan::prob::positive_free<%1%>(%1%)",
                                       y, "y", &result))
         return result;
       return log(y);
@@ -494,13 +494,15 @@ namespace stan {
      * @return Unconstrained value that produces the input when
      * constrained.
      * @tparam T Type of scalar.
-     * @throw std::invalid_argument if y is lower than the lower bound.
+     * @throw std::domain_error if y is lower than the lower bound.
      */
     template <typename T>
     inline
     T lb_free(const T y, const double lb) {
-      if (!stan::math::lb_validate(y,lb)) 
-        BOOST_THROW_EXCEPTION(std::invalid_argument ("y must be greater than the lower bound"));
+      T result;
+      if (!stan::math::check_greater_or_equal("stan::prob::lb_free<%1%>(%1%)",
+                                              y, lb, "y", &result))
+        return result;
       return log(y - lb);
     }
     

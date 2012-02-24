@@ -68,7 +68,7 @@ TEST(prob_transform, lb_f) {
 }
 TEST(prob_transform, lb_f_exception) {
   double lb = 2.0;
-  EXPECT_THROW (stan::prob::lb_free(lb - 0.01, lb), std::invalid_argument);
+  EXPECT_THROW (stan::prob::lb_free(lb - 0.01, lb), std::domain_error);
 }
 TEST(prob_transform, lb_rt) {
   double x = -1.0;
