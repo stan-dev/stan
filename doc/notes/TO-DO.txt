@@ -83,6 +83,7 @@ Stan-R
 
 * WAIC
   - need p(y[i]|theta) for all "data" y[i]
+  - just generate in "generated quantities" block; have all params
   - multivariate can be single point
   - binomial one or more points depending on interp
 
