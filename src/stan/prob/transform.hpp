@@ -497,7 +497,7 @@ namespace stan {
     inline
     T lb_free(const T y, const double lb) {
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
-					 y, lb, "y");
+                                         y, lb, "y");
       return log(y - lb);
     }
     
@@ -566,7 +566,7 @@ namespace stan {
     template <typename T>
     T ub_free(const T y, const double ub) {
       stan::math::check_lesser_or_equal("stan::prob::ub_free(%1%)",
-					y, ub, "y");
+                                        y, ub, "y");
       return log(ub - y);
     }
 
@@ -666,7 +666,7 @@ namespace stan {
     T lub_free(const T y, double lb, double ub) {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
-				y, lb, ub, "y");
+                                y, lb, ub, "y");
       return logit((y - lb) / (ub - lb));
     }
 
@@ -740,7 +740,7 @@ namespace stan {
     T prob_free(const T y) {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::prob_free(%1%)",
-				y, 0, 1, "y, a probability,");
+                                y, 0, 1, "y, a probability,");
       return logit(y);
     }
     
@@ -799,7 +799,7 @@ namespace stan {
     template <typename T>
     T corr_free(const T y) {
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
-				y, -1, 1, "y, a correlation,");
+                                y, -1, 1, "y, a correlation,");
       return atanh(y);
     }
 
@@ -908,8 +908,9 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
-      if(!stan::math::simplex_validate(y))
-        throw std::domain_error("y is not a valid simplex");
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", y, "y");
+      /*if(!stan::math::simplex_validate(y))
+        throw std::domain_error("y is not a valid simplex");*/
       size_t k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
       Matrix<T,Dynamic,1> x(k_minus_1);

@@ -46,12 +46,12 @@ namespace stan {
         using stan::math::policies::raise_domain_error;
         std::string msg_str(name);
         msg_str += " is %1%, but must not be nan!";
-	T_result tmp = raise_domain_error<T_result,T_y>(function,
-							msg_str.c_str(),
-							y,
-							Policy());
-	if (result != 0)
-	  *result = tmp;
+        T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                        msg_str.c_str(),
+                                                        y,
+                                                        Policy());
+        if (result != 0)
+          *result = tmp;
         return false;
       }
       return true;
@@ -69,12 +69,12 @@ namespace stan {
           std::ostringstream msg_o;
           msg_o << name << "[" << i << "] is %1%, but must not be nan!";
           T_result tmp = raise_domain_error<T_result,T_y>(function,
-							  msg_o.str().c_str(),
-							  y[i],
-							  Policy());
+                                                          msg_o.str().c_str(),
+                                                          y[i],
+                                                          Policy());
           if (result != 0)
-	    *result = tmp;
-	  return false;
+            *result = tmp;
+          return false;
         }
       }
       return true;
@@ -94,11 +94,11 @@ namespace stan {
         std::string message(name);
         message += " is %1%, but must be finite!";
         T_result tmp = raise_domain_error<T_result,T_y>(function,
-							message.c_str(), 
-							y, Policy());
+                                                        message.c_str(), 
+                                                        y, Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -115,11 +115,11 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be finite!";
           T_result tmp = raise_domain_error<T_result,T_y>(function,
-							  message.str().c_str(),
-							  y[i], Policy());
+                                                          message.str().c_str(),
+                                                          y[i], Policy());
           if (result != 0)
-	    *result = tmp;
-	  return false;
+            *result = tmp;
+          return false;
         }
       }
       return true;
@@ -141,12 +141,12 @@ namespace stan {
             << " is %1%, but must be greater than "
             << low;
         T_result tmp = raise_domain_error<T_result,T_x>(function, 
-							msg.str().c_str(), 
-							x, 
-							Policy());
+                                                        msg.str().c_str(), 
+                                                        x, 
+                                                        Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -166,12 +166,12 @@ namespace stan {
             << " is %1%, but must be greater or equal to "
             << low;
         T_result tmp = raise_domain_error<T_result,T_x>(function, 
-							msg.str().c_str(), 
-							x, 
-							Policy());
+                                                        msg.str().c_str(), 
+                                                        x, 
+                                                        Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -191,12 +191,12 @@ namespace stan {
             << " is %1%, but must be less than "
             << low;
         T_result tmp = raise_domain_error<T_result,T_x>(function, 
-							msg.str().c_str(), 
-							x, 
-							Policy());
+                                                        msg.str().c_str(), 
+                                                        x, 
+                                                        Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -216,12 +216,12 @@ namespace stan {
             << " is %1%, but must be less than or equal to "
             << low;
         T_result tmp = raise_domain_error<T_result,T_x>(function, 
-							msg.str().c_str(), 
-							x, 
-							Policy());
+                                                        msg.str().c_str(), 
+                                                        x, 
+                                                        Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -246,12 +246,12 @@ namespace stan {
             << " and "
             << high;
         T_result tmp = raise_domain_error<T_result,T_x>(function,
-							msg.str().c_str(),
-							x, 
-							Policy());
+                                                        msg.str().c_str(),
+                                                        x, 
+                                                        Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -271,12 +271,12 @@ namespace stan {
         std::string message(name);
         message += " is %1%, but must be >= 0!";
         T_result tmp = raise_domain_error<T_result,T_x>(function,
-							message.c_str(), 
-							x, 
-							Policy());
+                                                        message.c_str(), 
+                                                        x, 
+                                                        Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -292,12 +292,12 @@ namespace stan {
         std::string message(name);
         message += " is %1%, but must be > 0";
         T_result tmp = raise_domain_error<T_result,T_x>(function,
-							message.c_str(), 
-							x, Policy());
+                                                        message.c_str(), 
+                                                        x, Policy());
         
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
       return true;
     }
@@ -314,18 +314,18 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be > 0";
           T_result tmp = raise_domain_error<T_result,T_y>(function,
-							  message.str().c_str(),
-							  y[i], 
-							  Policy());
+                                                          message.str().c_str(),
+                                                          y[i], 
+                                                          Policy());
           if (result != 0)
-	    *result = tmp;
-	  return false;
+            *result = tmp;
+          return false;
         }
       }
       return true;
     }
 
-  template <typename T_prob_vector, typename T_result = typename T_prob_vector::value_type, class Policy = default_policy>
+    template <typename T_prob_vector, typename T_result = typename T_prob_vector::value_type, class Policy = default_policy>
     inline bool check_simplex(const char* function,
                               const T_prob_vector& theta,
                               const char* name,
@@ -337,35 +337,38 @@ namespace stan {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
         T_result tmp = raise_domain_error<T_result,T_prob>(function,
-							   message.c_str(),
-							   theta.size(),
-							   Policy());
+                                                           message.c_str(),
+                                                           theta.size(),
+                                                           Policy());
+        if (result != 0)
+          *result = tmp;
+        return false;
       }
       if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
         std::string message(name);
         message += " is not a valid simplex.";
         message += " The sum of the elements is %1%, but should be 1.0";
         T_result tmp = raise_domain_error<T_result,T_prob>(function, 
-							   message.c_str(), 
-							   theta.sum(), 
-							   Policy());
+                                                           message.c_str(), 
+                                                           theta.sum(), 
+                                                           Policy());
         if (result != 0)
-	  *result = tmp;
-	return false;
+          *result = tmp;
+        return false;
       }
-      for (size_t n = 0; n < theta.size(); n++) {
-        if ((boost::math::isnan)(theta[n]) || !(theta[n] >= 0)) {
+      for (typename T_prob_vector::size_type n = 0; n < theta.size(); n++) {
+        if ((boost::math::isnan)(theta(n)) || !(theta(n) >= 0)) {
           std::ostringstream stream;
           stream << name << " is not a valid simplex."
                  << " The element at " << n 
                  << " is %1%, but should be greater than or equal to 0";
           T_result tmp = raise_domain_error<T_result,T_prob>(function, 
-							     stream.str().c_str(), 
-							     theta[n], 
-							     Policy());
+                                                             stream.str().c_str(), 
+                                                             theta(n), 
+                                                             Policy());
           if (result != 0)
-	    *result = tmp;
-	  return false;
+            *result = tmp;
+          return false;
         }
       }
       return true;

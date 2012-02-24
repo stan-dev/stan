@@ -196,11 +196,11 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must not be nan!";
           T_result tmp = raise_domain_error<T_result,T_y>(function,
-							  message.str().c_str(),
-							  y[i],
-							  Policy());
-	  if (result != 0)
-	    *result = tmp;
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
           return false;
         }
       }
@@ -220,10 +220,10 @@ namespace stan {
             std::ostringstream message;
             message << name << "[" << i << "," << j << "] is %1%, but must not be nan!";
             T_result tmp = policies::raise_domain_error<T_y>(function,
-							     message.str().c_str(),
-							     y(i,j), Policy());
-	    if (result != 0)
-	      *result = tmp;
+                                                             message.str().c_str(),
+                                                             y(i,j), Policy());
+            if (result != 0)
+              *result = tmp;
             return false;
           }
         }
@@ -244,11 +244,11 @@ namespace stan {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be finite!";
           T_result tmp = raise_domain_error<T_result,T_y>(function,
-							  message.str().c_str(),
-							  y[i],
-							  Policy());
-	  if (result != 0)
-	    *result = tmp;
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
           return false;
         }
       }
@@ -267,11 +267,11 @@ namespace stan {
                << Sigma
                << "\nSigma(0,0): %1%";
         T_result tmp = boost::math::policies::raise_domain_error<T_covar>(function,
-									  stream.str().c_str(), 
-									  Sigma(0,0),
-									  Policy());
-	if (result != 0)
-	  *result = tmp;
+                                                                          stream.str().c_str(), 
+                                                                          Sigma(0,0),
+                                                                          Policy());
+        if (result != 0)
+          *result = tmp;
         return false;
       }
       return true;
@@ -289,11 +289,11 @@ namespace stan {
                << Sigma
                << "\nSigma(0,0): %1%";
         T_result tmp = policies::raise_domain_error<T_covar>(function,
-							     stream.str().c_str(), 
-							     Sigma(0,0),
-							     Policy());
-	if (result != 0)
-	  *result = tmp;
+                                                             stream.str().c_str(), 
+                                                             Sigma(0,0),
+                                                             Policy());
+        if (result != 0)
+          *result = tmp;
         return false;
       }
       return true;
@@ -311,11 +311,11 @@ namespace stan {
         std::ostringstream msg;
         msg << "i and j must be same.  Found i=%1%, j=" << j;
         T_result tmp = raise_domain_error<T_result,T_size1>(function,
-							    msg.str().c_str(),
-							    i,
-							    Policy());
-	if (result != 0)
-	  *result = tmp;
+                                                            msg.str().c_str(),
+                                                            i,
+                                                            Policy());
+        if (result != 0)
+          *result = tmp;
         return false;
       }
       return true;
@@ -329,22 +329,47 @@ namespace stan {
                               T_result* result = 0,
                               const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
-      if (!simplex_validate(theta)) {
-        std::ostringstream stream;
-        stream << name
-               << "is not a valid simplex. The first element of the simplex is: %1%.";
+      if (theta.size() == 0) {
+        std::string message(name);
+        message += " is not a valid simplex. %1% elements in the row vector (Eigen::Matrix).";
         T_result tmp = raise_domain_error<T_result,T_prob>(function,
-							   stream.str().c_str(), 
-							   theta(0),
-							   Policy());
-	if (result != 0)
-	  *result = tmp;
+                                                           message.c_str(),
+                                                           theta.size(),
+                                                           Policy());
+        if (result != 0)
+          *result = tmp;
         return false;
+      }
+      if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
+        std::string message(name);
+        message += " is not a valid simplex.";
+        message += " The sum of the elements is %1%, but should be 1.0";
+        T_result tmp = raise_domain_error<T_result,T_prob>(function, 
+                                                           message.c_str(), 
+                                                           theta.sum(), 
+                                                           Policy());
+        if (result != 0)
+          *result = tmp;
+        return false;
+      }
+      for (typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n = 0; 
+           n < theta.rows(); n++) {
+        if ((boost::math::isnan)(theta(n,0)) || !(theta(n,0) >= 0)) {
+          std::ostringstream stream;
+          stream << name << " is not a valid simplex."
+                 << " The element at (" << n 
+                 << ",0) is %1%, but should be greater than or equal to 0";
+          T_result tmp = raise_domain_error<T_result,T_prob>(function, 
+                                                             stream.str().c_str(), 
+                                                             theta(n,0), 
+                                                             Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
       }
       return true;
     }
-
-
 
   }
 }
