@@ -28,6 +28,10 @@
  * Stan may be invoked from <a href="http://www.r-project.org/">R</a>
  * following the pattern of 
  * <a href="http://cran.r-project.org/web/packages/R2WinBUGS/index.html">R2WinBugs</a>.
+ *
+ * @section policy Error Handling Policies
+ * 
+ * Describe the error handling policies for stan::prob here.
  *	
  * @section license Open-Source Licensing
  *
