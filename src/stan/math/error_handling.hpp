@@ -359,7 +359,7 @@ namespace stan {
         return false;
       }
       for (typename T_prob_vector::size_type n = 0; n < theta.size(); n++) {
-        if ((boost::math::isnan)(theta[n]) || !(theta[n] >= 0)) {
+        if (!(theta[n] >= 0)) {
           std::ostringstream stream;
           stream << name << " is not a valid simplex."
                  << " The element at " << n 
@@ -375,6 +375,50 @@ namespace stan {
       }
       return true;
     }                         
+
+
+    template <typename T_vector, typename T_result = typename T_vector::value_type, class Policy = default_policy>
+    inline bool check_pos_ordered(const char* function,
+                                  const T_vector& y,
+                                  const char* name,
+                                  T_result* result = 0,
+                                  const Policy& = Policy()) {
+      using stan::math::policies::raise_domain_error;
+      typedef typename T_vector::value_type T_y;
+      if (y.size() == 0) {
+        return true;
+      }
+      if (!(y[0] > 0.0)) {
+        std::string message(name);
+        message += " is not a valid positive ordered vector.";
+        message += " The first element is %1%, but should be greater than 0.0";
+        T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                        message.c_str(),
+                                                        y[0],
+                                                        Policy());
+        if (result != 0)
+          *result = tmp;
+        return false;
+      } 
+      for (typename T_vector::size_type n = 1; n < y.size(); n++) {
+        if (!(y[n] > y[n-1])) {
+          std::ostringstream stream;
+          stream << name << " is not a valid positive ordered vector."
+                 << " The element at " << n 
+                 << " is %1%, but should be greater than the previous element, "
+                 << y[n-1];
+          T_result tmp = raise_domain_error<T_result,T_y>(function, 
+                                                          stream.str().c_str(), 
+                                                          y[n], 
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }                         
+
 
     /**
      * Returns true if the specified value meets the constraint.

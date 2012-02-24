@@ -1001,8 +1001,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
-      if(!stan::math::pos_ordered_validate(y)) 
-        throw std::domain_error("y is not a vector of positive ordered scalars");
+      stan::math::check_pos_ordered("stan::prob::pos_ordered_free(%1%)", y, "y");
       size_t k = y.size();
       Matrix<T,Dynamic,1> x(k);
       if (k == 0) 
