@@ -1,26 +1,13 @@
 TO DO FOR V1
 =================================================
 
-* stop NUTS from running away without coming back
-  -- limit number of steps
-     + command-line param
-     + instrumenting NUTS loops (adaptation, leapfrog)
-  -- limit time
-     + start recording time at beginning, check loops inside
-  -- bomb with report if exceed these steps
-  -- print out adaptation phase step size 
-  -- print out number of steps (average and sd?)
-     (bring in Boost accumulator package)
-
-* ???? HMC Sampler ????
-  - set step size, number of steps
-  - allowing random variation +/-%
-  - tune step size (optional)
-
 * discrete samplers: 
   - Gibbs for small intervals -- test
   - slice for others -- Matt
   - what about multinomial with constraints?
+
+* NUTS II
+  - diagonal mass adaptation during warmup
 
 * remaining doc
   - API doc
@@ -32,10 +19,11 @@ TO DO FOR V1
   - tarball
   - basic distro site
   - check cross-platform compilation:
-     + goal: make OS={win,linux,mac} CC={clang++,g++} O=0
+     + goal: make OS={win,linux,mac} CC={clang++,g++} O={0,3}
      + remove useless warnings
+       * unused functions, specifically
 
- * speed tests relative to BUGS
+* speed tests relative to BUGS
 
  
 CLEANUP (ONGOING)
@@ -113,13 +101,17 @@ EXTENSIONS
 * error/exception policy throughout
   - maths
 
-* parallel RNG
-  - use L'Ecuyer
-  - specify chain id & num_chains to get offset
-  - make sure Boost's is efficient
-    - boost rng discard() method
-  - Ben's alternative reco:
-    http://numbercrunch.de/trng/
+* stop NUTS from running away without coming back
+ -- limit number of steps
+    + command-line param
+    + instrumenting NUTS loops (adaptation, leapfrog)
+ -- limit time
+    + start recording time at beginning, check loops inside
+ -- bomb with report if exceed these steps
+ -- print out adaptation phase step size 
+ -- print out number of steps (average and sd?)
+    (bring in Boost accumulator package)
+
 
 * control decimal places in output 
   - set a variable on the writer or stream
