@@ -739,8 +739,8 @@ namespace stan {
     template <typename T>
     T prob_free(const T y) {
       using stan::math::logit;
-      if(!stan::math::prob_validate(y))
-        throw std::domain_error("y is not a probability");
+      stan::math::check_bounded("stan::prob::prob_free(%1%)",
+				y, 0, 1, "y, a probability,");
       return logit(y);
     }
     
