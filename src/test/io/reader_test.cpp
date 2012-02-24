@@ -63,7 +63,7 @@ TEST(io_reader, scalar_pos_exception) {
   theta.push_back(-1.0);
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_NO_THROW (reader.scalar_pos());
-  EXPECT_THROW (reader.scalar_pos(), std::runtime_error);
+  EXPECT_THROW (reader.scalar_pos(), std::domain_error);
 }
 TEST(io_reader, scalar_pos_constrain) {
   std::vector<int> theta_i;

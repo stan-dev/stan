@@ -477,15 +477,14 @@ namespace stan {
        * Return the next scalar, checking that it is
        * positive.  
        *
-       * <p>See <code>stan::math::positive_validate(T)</code>.
+       * <p>See <code>stan::math::check_positive(T)</code>.
        *
        * @return Next positive scalar.
        * @throw std::runtime_error if x is not positive
        */
       T scalar_pos() {
         T x(scalar());
-        if(!stan::math::positive_validate(x))
-          BOOST_THROW_EXCEPTION(std::runtime_error ("x is not positive"));
+        stan::math::check_positive("stan::io::scalar_pos(%1%)", x, "x");
         return x;
       }
 
