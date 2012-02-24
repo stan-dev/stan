@@ -182,8 +182,6 @@ namespace stan {
       return true;
     }
 
-
-
     template <typename T_y, typename T_result = T_y, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
@@ -317,56 +315,6 @@ namespace stan {
         if (result != 0)
           *result = tmp;
         return false;
-      }
-      return true;
-    }
-
-
-    template <typename T_prob, typename T_result = T_prob, class Policy = default_policy>
-    inline bool check_simplex(const char* function,
-                              const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-                              const char* name,
-                              T_result* result = 0,
-                              const Policy& = Policy()) {
-      using stan::math::policies::raise_domain_error;
-      if (theta.size() == 0) {
-        std::string message(name);
-        message += " is not a valid simplex. %1% elements in the row vector (Eigen::Matrix).";
-        T_result tmp = raise_domain_error<T_result,T_prob>(function,
-                                                           message.c_str(),
-                                                           theta.size(),
-                                                           Policy());
-        if (result != 0)
-          *result = tmp;
-        return false;
-      }
-      if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
-        std::string message(name);
-        message += " is not a valid simplex.";
-        message += " The sum of the elements is %1%, but should be 1.0";
-        T_result tmp = raise_domain_error<T_result,T_prob>(function, 
-                                                           message.c_str(), 
-                                                           theta.sum(), 
-                                                           Policy());
-        if (result != 0)
-          *result = tmp;
-        return false;
-      }
-      for (typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n = 0; 
-           n < theta.rows(); n++) {
-        if ((boost::math::isnan)(theta(n,0)) || !(theta(n,0) >= 0)) {
-          std::ostringstream stream;
-          stream << name << " is not a valid simplex."
-                 << " The element at (" << n 
-                 << ",0) is %1%, but should be greater than or equal to 0";
-          T_result tmp = raise_domain_error<T_result,T_prob>(function, 
-                                                             stream.str().c_str(), 
-                                                             theta(n,0), 
-                                                             Policy());
-          if (result != 0)
-            *result = tmp;
-          return false;
-        }
       }
       return true;
     }

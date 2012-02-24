@@ -32,6 +32,6 @@ TEST(stanMathMatrixErrorHandling, checkSimplex) {
   EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y", &result), 
                std::domain_error);
   EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y"),
-               std::domain_error);
+  std::domain_error);
                   
 }

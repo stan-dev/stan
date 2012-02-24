@@ -332,13 +332,14 @@ namespace stan {
                               T_result* result = 0,
                               const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
-      typename T_prob_vector::value_type T_prob;
+      typedef typename T_prob_vector::value_type T_prob;
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
+        T_prob size = theta.size();
         T_result tmp = raise_domain_error<T_result,T_prob>(function,
                                                            message.c_str(),
-                                                           theta.size(),
+                                                           size,
                                                            Policy());
         if (result != 0)
           *result = tmp;
@@ -348,23 +349,24 @@ namespace stan {
         std::string message(name);
         message += " is not a valid simplex.";
         message += " The sum of the elements is %1%, but should be 1.0";
+        T_prob sum = theta.sum();
         T_result tmp = raise_domain_error<T_result,T_prob>(function, 
                                                            message.c_str(), 
-                                                           theta.sum(), 
+                                                           sum, 
                                                            Policy());
         if (result != 0)
           *result = tmp;
         return false;
       }
       for (typename T_prob_vector::size_type n = 0; n < theta.size(); n++) {
-        if ((boost::math::isnan)(theta(n)) || !(theta(n) >= 0)) {
+        if ((boost::math::isnan)(theta[n]) || !(theta[n] >= 0)) {
           std::ostringstream stream;
           stream << name << " is not a valid simplex."
                  << " The element at " << n 
                  << " is %1%, but should be greater than or equal to 0";
           T_result tmp = raise_domain_error<T_result,T_prob>(function, 
                                                              stream.str().c_str(), 
-                                                             theta(n), 
+                                                             theta[n], 
                                                              Policy());
           if (result != 0)
             *result = tmp;
