@@ -798,7 +798,8 @@ namespace stan {
      */
     template <typename T>
     T corr_free(const T y) {
-      stan::math::corr_validate(y);
+      stan::math::check_bounded("stan::prob::lub_free(%1%)",
+				y, -1, 1, "y, a correlation,");
       return atanh(y);
     }
 
