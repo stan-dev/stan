@@ -115,7 +115,7 @@ TEST(io_reader, scalar_lb_exception) {
   theta.push_back(2.0);
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_NO_THROW (reader.scalar_lb(-1.0));
-  EXPECT_THROW (reader.scalar_lb(3.0), std::runtime_error);
+  EXPECT_THROW (reader.scalar_lb(3.0), std::domain_error);
 }
 TEST(io_reader, scalar_lb_constrain) {
   std::vector<int> theta_i;
@@ -166,7 +166,7 @@ TEST(io_reader, scalar_ub_exception) {
   theta.push_back(2.0);
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_NO_THROW (reader.scalar_ub(-1.0));
-  EXPECT_THROW (reader.scalar_ub(1.0), std::runtime_error);
+  EXPECT_THROW (reader.scalar_ub(1.0), std::domain_error);
 }
 TEST(io_reader, scalar_ub_constrain) {
   std::vector<int> theta_i;
@@ -843,8 +843,8 @@ TEST(io_reader,lub_exception) {
     theta_i.push_back(i);
   stan::io::reader<double> reader(theta,theta_i);
 
-  EXPECT_THROW(reader.scalar_lb(10.0),std::runtime_error);
-  EXPECT_THROW(reader.scalar_ub(-2.0),std::runtime_error);
+  EXPECT_THROW(reader.scalar_lb(10.0),std::domain_error);
+  EXPECT_THROW(reader.scalar_ub(-2.0),std::domain_error);
   EXPECT_THROW(reader.scalar_lub(-20.0,-18.0),std::runtime_error);
   EXPECT_THROW(reader.scalar_lub(-18.0,-20.0),std::runtime_error);
   EXPECT_FLOAT_EQ(4.0, reader.scalar());

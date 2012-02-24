@@ -8,6 +8,7 @@
 
 #include <boost/throw_exception.hpp>
 
+#include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -516,7 +517,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * greater than or equal to the specified lower bound.
        *
-       * <p>See <code>stan::math::lb_validate(T,double)</code>.
+       * <p>See <code>stan::math::check_greater_or_equal(T,double)</code>.
        *
        * @param lb Lower bound.
        * @return Next scalar value.
@@ -525,9 +526,7 @@ namespace stan {
        */
       T scalar_lb(double lb) {
         T x(scalar());
-        if (!stan::math::lb_validate(x,lb))
-          BOOST_THROW_EXCEPTION(
-              std::runtime_error("x is less than the lower bound"));
+        stan::math::check_greater_or_equal("stan::io::scalar_lb(%1%)", x, lb, "x");
         return x;
       }
 
@@ -565,7 +564,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * less than or equal to the specified upper bound.
        *
-       * <p>See <code>stan::math::ub_validate(T,double)</code>.
+       * <p>See <code>stan::math::check_lesser_or_equal(T,double)</code>.
        *
        * @param ub Upper bound.
        * @return Next scalar value.
@@ -574,9 +573,7 @@ namespace stan {
        */
       T scalar_ub(double ub) {
         T x(scalar());
-        if(!stan::math::ub_validate(x,ub))
-          BOOST_THROW_EXCEPTION(
-              std::runtime_error("x is greater than the upper bound"));
+        stan::math::check_lesser_or_equal("stan::io::scalar_ub(%1%)", x, ub, "x");
         return x;
       }
 
