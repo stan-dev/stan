@@ -97,10 +97,10 @@ TEST(io_writer, pos_ordered_unconstrain_exception) {
   EXPECT_NO_THROW (writer.pos_ordered_unconstrain(y));
 
   y << -0.5, 1.0;
-  EXPECT_THROW (writer.pos_ordered_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.pos_ordered_unconstrain(y), std::domain_error);
 
   y << 1.0, 0.1;
-  EXPECT_THROW (writer.pos_ordered_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.pos_ordered_unconstrain(y), std::domain_error);
 }
 TEST(io_writer, simplex_unconstrain_exception) {
   std::vector<int> theta_i;

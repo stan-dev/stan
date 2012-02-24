@@ -226,8 +226,7 @@ namespace stan {
        */
       void pos_ordered_unconstrain(vector_t& y) {
         if (y.size() == 0) return;
-        if(!stan::math::pos_ordered_validate(y)) 
-          BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
+        stan::math::check_pos_ordered("stan::io::pos_ordered_unconstrain(%1%)", y, "y");
         data_r_.push_back(log(y[0]));
         for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
