@@ -437,10 +437,7 @@ namespace stan {
      */
     template <typename T>
     T positive_free(const T y) {
-      T result;
-      if (!stan::math::check_positive("stan::prob::positive_free<%1%>(%1%)",
-                                      y, "y", &result))
-        return result;
+      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "y");
       return log(y);
     }
 
@@ -499,10 +496,8 @@ namespace stan {
     template <typename T>
     inline
     T lb_free(const T y, const double lb) {
-      T result;
-      if (!stan::math::check_greater_or_equal("stan::prob::lb_free<%1%>(%1%)",
-                                              y, lb, "y", &result))
-        return result;
+      stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
+					 y, lb, "y");
       return log(y - lb);
     }
     
@@ -570,10 +565,8 @@ namespace stan {
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      T result;
-      if (!stan::math::check_lesser_or_equal("stan::prob::ub_free<%1%>(%1%)",
-                                             y, ub, "y", &result))
-        return result;
+      stan::math::check_lesser_or_equal("stan::prob::ub_free(%1%)",
+					y, ub, "y");
       return log(ub - y);
     }
 
@@ -672,10 +665,8 @@ namespace stan {
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
       using stan::math::logit;
-      T result;
-      if (!stan::math::check_bounded("stan::prob::lub_free<%1%>(%1%)",
-                                     y, lb, ub, "y", &result))
-        return result;
+      stan::math::check_bounded("stan::prob::lub_free(%1%)",
+				y, lb, ub, "y");
       return logit((y - lb) / (ub - lb));
     }
 
