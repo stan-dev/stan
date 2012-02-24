@@ -76,11 +76,12 @@ namespace stan {
                         "default is random initialization");
 
       print_help_option("samples","file",
-                        "File into which samples are written.",
+                        "File into which samples are written",
                         "default = samples.csv");
 
       print_help_option("append_samples","",
-                        "Append samples to existing file if it exists");
+                        "Append samples to existing file if it exists",
+                        "does not write header in append mode");
 
       print_help_option("seed","int",
                         "Random number generation seed",
@@ -273,7 +274,7 @@ namespace stan {
         }
       }
       
-      // FASTER, but no parallel guarantees
+      // FASTER, but no parallel guarantees:
       // typedef boost::mt19937 rng_t;
       // rng_t base_rng(static_cast<unsigned int>(random_seed + chain_id - 1);
 
@@ -361,9 +362,10 @@ namespace stan {
       std::fstream sample_file_stream(sample_file.c_str(), 
                                       samples_append_mode);
       
-      sample_file_stream << "lp__,"; // log probability first
-      model.write_csv_header(sample_file_stream);
-
+      if (!append_samples) {
+        sample_file_stream << "lp__,"; // log probability first
+        model.write_csv_header(sample_file_stream);
+      }
 
       if (leapfrog_steps < 0) {
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
