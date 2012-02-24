@@ -609,7 +609,7 @@ namespace stan {
        * Return the next scalar, checking that it is between
        * the specified lower and upper bound.
        *
-       * <p>See <code>stan::math::lub_validate(T,double,double)</code>.
+       * <p>See <code>stan::math::check_bounded(T,double,double)</code>.
        *
        * @param lb Lower bound.
        * @param ub Upper bound.
@@ -619,9 +619,7 @@ namespace stan {
        */
       T scalar_lub(double lb, double ub) {
         T x(scalar());
-        if(!stan::math::lub_validate(x,lb,ub))
-          BOOST_THROW_EXCEPTION(
-           std::runtime_error ("scalar is not between lower and upper bounds"));
+        stan::math::check_bounded("stan::io::scalar_lub(%1%)", x, lb, ub, "x");
         return x;
       }
 
@@ -658,13 +656,13 @@ namespace stan {
        * Return the next scalar, checking that it is a valid value for
        * a probability, between 0 (inclusive) and 1 (inclusive).
        *
-       * <p>See <code>stan::math::prob_validate(T)</code>.
+       * <p>See <code>stan::math::check_bounded(T)</code>.
        * 
        * @return Next probability value.
        */
       T prob() {
         T x(scalar());
-        stan::math::prob_validate(x);
+        stan::math::check_bounded("stan::io::prob(%1%)", x, 0, 1, "x");
         return x;
       }
 
@@ -702,7 +700,7 @@ namespace stan {
        * value for a correlation, between -1 (inclusive) and
        * 1 (inclusive).
        *
-       * <p>See <code>stan::math::corr_validate(T)</code>.
+       * <p>See <code>stan::math::check_bounded(T)</code>.
        *
        * @return Next correlation value.
        * @throw std::runtime_error if the value is not valid
@@ -710,9 +708,7 @@ namespace stan {
        */
       T corr() {
         T x(scalar());
-        if (!stan::math::corr_validate(x))
-          BOOST_THROW_EXCEPTION(
-            std::runtime_error ("x is not a valid correlation value"));
+        stan::math::check_bounded("stan::io::corr(%1%)", x, -1, 1, "x");
         return x;
       }
 
@@ -747,7 +743,7 @@ namespace stan {
        * Return a simplex of the specified size made up of the
        * next scalars.  
        *
-       * <p>See <code>stan::math::simplex_validate(Eigen::Matrix)</code>.
+       * <p>See <code>stan::math::check_simplex</code>.
        *
        * @param k Size of returned simplex.
        * @return Simplex read from the specified size number of scalars.
@@ -755,9 +751,7 @@ namespace stan {
        */
       vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        if(!stan::math::simplex_validate(theta))
-          BOOST_THROW_EXCEPTION(
-              std::runtime_error("the k values is not a simplex"));
+        stan::math::check_simplex("stan::io::simplex(%1%)", theta, "theta");
         return theta;
       }
 
@@ -795,7 +789,7 @@ namespace stan {
        * Return the next vector of specified size containing positive
        * values in order.  
        *
-       * <p>See <code>stan::math::pos_ordered_validate(T)</code>.
+       * <p>See <code>stan::math::check_pos_ordered(T)</code>.
        *
        * @param k Size of returned vector.
        * @return Vector of positive values in ascending order.
@@ -803,9 +797,7 @@ namespace stan {
        */
       vector_t pos_ordered(size_t k) {
         vector_t x(vector(k));
-        if (!stan::math::pos_ordered_validate(x)) 
-          BOOST_THROW_EXCEPTION(
-            std::runtime_error ("vector is not positive ordered"));
+        stan::math::check_pos_ordered("stan::io::pos_ordered(%1%)", x, "x");
         return x;
       }
 
