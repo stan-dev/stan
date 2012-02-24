@@ -184,21 +184,23 @@ namespace stan {
 
 
 
-    template <typename T_y, typename T_result, class Policy = default_policy>
+    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                               const char* name,
-                              T_result* result,
+                              T_result* result = 0,
                               const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (boost::math::isnan(y[i])) {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must not be nan!";
-          *result = raise_domain_error<T_result,T_y>(function,
-                                                     message.str().c_str(),
-                                                     y[i],
-                                                     Policy());
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+							  message.str().c_str(),
+							  y[i],
+							  Policy());
+	  if (result != 0)
+	    *result = tmp;
           return false;
         }
       }
@@ -206,20 +208,22 @@ namespace stan {
     }
 
 
-    template <typename T_y, typename T_result, class Policy = default_policy>
+    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                               const char* name,
-                              T_result* result,
+                              T_result* result = 0,
                               const Policy& = Policy()) {
       for (int i = 0; i < y.rows(); i++) {
         for (int j = 0; j < y.cols(); j++) {
           if (boost::math::isnan(y(i,j))) {
             std::ostringstream message;
             message << name << "[" << i << "," << j << "] is %1%, but must not be nan!";
-            *result = policies::raise_domain_error<T_y>(function,
-                                              message.str().c_str(),
-                                              y(i,j), Policy());
+            T_result tmp = policies::raise_domain_error<T_y>(function,
+							     message.str().c_str(),
+							     y(i,j), Policy());
+	    if (result != 0)
+	      *result = tmp;
             return false;
           }
         }
@@ -228,31 +232,33 @@ namespace stan {
     }
 
 
-    template <typename T_y, typename T_result, class Policy = default_policy>
+    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
     inline bool check_finite(const char* function,
                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                              const char* name,
-                             T_result* result,
+                             T_result* result = 0,
                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (!boost::math::isfinite(y[i])) {
           std::ostringstream message;
           message << name << "[" << i << "] is %1%, but must be finite!";
-          *result = raise_domain_error<T_result,T_y>(function,
-                                                     message.str().c_str(),
-                                                     y[i],
-                                                     Policy());
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+							  message.str().c_str(),
+							  y[i],
+							  Policy());
+	  if (result != 0)
+	    *result = tmp;
           return false;
         }
       }
       return true;
     }
 
-    template <typename T_covar, typename T_result, class Policy = default_policy>
+    template <typename T_covar, typename T_result = T_covar, class Policy = default_policy>
     inline bool check_cov_matrix(const char* function,
                                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                                 T_result* result,
+                                 T_result* result = 0,
                                  const Policy& = Policy()) {
       if (!cov_matrix_validate(Sigma)) {
         std::ostringstream stream;
@@ -260,19 +266,21 @@ namespace stan {
                << "Sigma must be symmetric and positive semi-definite. Sigma: \n" 
                << Sigma
                << "\nSigma(0,0): %1%";
-        *result = boost::math::policies::raise_domain_error<T_covar>(function,
-                                                                     stream.str().c_str(), 
-                                                                     Sigma(0,0),
-                                                                     Policy());
+        T_result tmp = boost::math::policies::raise_domain_error<T_covar>(function,
+									  stream.str().c_str(), 
+									  Sigma(0,0),
+									  Policy());
+	if (result != 0)
+	  *result = tmp;
         return false;
       }
       return true;
     }
 
-    template <typename T_covar, typename T_result, class Policy = default_policy>
+    template <typename T_covar, typename T_result = T_covar, class Policy = default_policy>
     inline bool check_corr_matrix(const char* function,
                                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                                 T_result* result,
+                                 T_result* result = 0,
                                  const Policy& = Policy()) {
       if (!corr_matrix_validate(Sigma)) {
         std::ostringstream stream;
@@ -280,51 +288,57 @@ namespace stan {
                << "Sigma must be symmetric and positive semi-definite with ones on its diagonal. Sigma: \n" 
                << Sigma
                << "\nSigma(0,0): %1%";
-        *result = policies::raise_domain_error<T_covar>(function,
-                                              stream.str().c_str(), 
-                                              Sigma(0,0),
-                                              Policy());
+        T_result tmp = policies::raise_domain_error<T_covar>(function,
+							     stream.str().c_str(), 
+							     Sigma(0,0),
+							     Policy());
+	if (result != 0)
+	  *result = tmp;
         return false;
       }
       return true;
     }
 
-    template <typename T_result, typename T_size1, typename T_size2, class Policy = default_policy>
+    template <typename T_size1, typename T_size2, typename T_result = T_size1, class Policy = default_policy>
     inline bool check_size_match(const char* function,
                                  T_size1 i,
                                  T_size2 j,
-                                 T_result* result,
+                                 T_result* result = 0,
                                  const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
       if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
         std::ostringstream msg;
         msg << "i and j must be same.  Found i=%1%, j=" << j;
-        *result = raise_domain_error<T_result,T_size1>(function,
-                                                       msg.str().c_str(),
-                                                       i,
-                                                       Policy());
+        T_result tmp = raise_domain_error<T_result,T_size1>(function,
+							    msg.str().c_str(),
+							    i,
+							    Policy());
+	if (result != 0)
+	  *result = tmp;
         return false;
       }
       return true;
     }
 
 
-    template <typename T_prob, typename T_result, class Policy = default_policy>
+    template <typename T_prob, typename T_result = T_prob, class Policy = default_policy>
     inline bool check_simplex(const char* function,
                               const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                               const char* name,
-                              T_result* result,
+                              T_result* result = 0,
                               const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       if (!simplex_validate(theta)) {
         std::ostringstream stream;
         stream << name
                << "is not a valid simplex. The first element of the simplex is: %1%.";
-        *result = raise_domain_error<T_result,T_prob>(function,
-                                                      stream.str().c_str(), 
-                                                      theta(0),
-                                                      Policy());
+        T_result tmp = raise_domain_error<T_result,T_prob>(function,
+							   stream.str().c_str(), 
+							   theta(0),
+							   Policy());
+	if (result != 0)
+	  *result = tmp;
         return false;
       }
       return true;
