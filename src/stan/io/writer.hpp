@@ -226,7 +226,7 @@ namespace stan {
        */
       void pos_ordered_unconstrain(vector_t& y) {
         if (y.size() == 0) return;
-        if(!stan::prob::pos_ordered_validate(y)) 
+        if(!stan::math::pos_ordered_validate(y)) 
           BOOST_THROW_EXCEPTION(std::runtime_error ("vector is not positive ordered"));
         data_r_.push_back(log(y[0]));
         for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
@@ -284,7 +284,7 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a simplex.
        */
       void simplex_unconstrain(vector_t& y) {
-        if (!stan::prob::simplex_validate(y))
+        if (!stan::math::simplex_validate(y))
           BOOST_THROW_EXCEPTION(std::runtime_error("y is not a simplex"));
         size_t k_minus_1 = y.size() - 1;
         double log_y_k = log(y[k_minus_1]);
@@ -309,7 +309,7 @@ namespace stan {
        *    on log scale are unconstrained.
        */
       void corr_matrix_unconstrain(matrix_t& y) {
-        if (!stan::prob::corr_matrix_validate(y))
+        if (!stan::math::corr_matrix_validate(y))
           BOOST_THROW_EXCEPTION(std::runtime_error ("y is not a valid correlation matrix"));
         size_t k = y.rows();
         size_t k_choose_2 = (k * (k-1)) / 2;

@@ -9,6 +9,7 @@
 #include <boost/throw_exception.hpp>
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 
 #include <stan/prob/transform.hpp>
@@ -476,14 +477,14 @@ namespace stan {
        * Return the next scalar, checking that it is
        * positive.  
        *
-       * <p>See <code>stan::prob::positive_validate(T)</code>.
+       * <p>See <code>stan::math::positive_validate(T)</code>.
        *
        * @return Next positive scalar.
        * @throw std::runtime_error if x is not positive
        */
       T scalar_pos() {
         T x(scalar());
-        if(!stan::prob::positive_validate(x))
+        if(!stan::math::positive_validate(x))
           BOOST_THROW_EXCEPTION(std::runtime_error ("x is not positive"));
         return x;
       }
@@ -516,7 +517,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * greater than or equal to the specified lower bound.
        *
-       * <p>See <code>stan::prob::lb_validate(T,double)</code>.
+       * <p>See <code>stan::math::lb_validate(T,double)</code>.
        *
        * @param lb Lower bound.
        * @return Next scalar value.
@@ -525,7 +526,7 @@ namespace stan {
        */
       T scalar_lb(double lb) {
         T x(scalar());
-        if (!stan::prob::lb_validate(x,lb))
+        if (!stan::math::lb_validate(x,lb))
           BOOST_THROW_EXCEPTION(
               std::runtime_error("x is less than the lower bound"));
         return x;
@@ -565,7 +566,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * less than or equal to the specified upper bound.
        *
-       * <p>See <code>stan::prob::ub_validate(T,double)</code>.
+       * <p>See <code>stan::math::ub_validate(T,double)</code>.
        *
        * @param ub Upper bound.
        * @return Next scalar value.
@@ -574,7 +575,7 @@ namespace stan {
        */
       T scalar_ub(double ub) {
         T x(scalar());
-        if(!stan::prob::ub_validate(x,ub))
+        if(!stan::math::ub_validate(x,ub))
           BOOST_THROW_EXCEPTION(
               std::runtime_error("x is greater than the upper bound"));
         return x;
@@ -612,7 +613,7 @@ namespace stan {
        * Return the next scalar, checking that it is between
        * the specified lower and upper bound.
        *
-       * <p>See <code>stan::prob::lub_validate(T,double,double)</code>.
+       * <p>See <code>stan::math::lub_validate(T,double,double)</code>.
        *
        * @param lb Lower bound.
        * @param ub Upper bound.
@@ -622,7 +623,7 @@ namespace stan {
        */
       T scalar_lub(double lb, double ub) {
         T x(scalar());
-        if(!stan::prob::lub_validate(x,lb,ub))
+        if(!stan::math::lub_validate(x,lb,ub))
           BOOST_THROW_EXCEPTION(
            std::runtime_error ("scalar is not between lower and upper bounds"));
         return x;
@@ -661,13 +662,13 @@ namespace stan {
        * Return the next scalar, checking that it is a valid value for
        * a probability, between 0 (inclusive) and 1 (inclusive).
        *
-       * <p>See <code>stan::prob::prob_validate(T)</code>.
+       * <p>See <code>stan::math::prob_validate(T)</code>.
        * 
        * @return Next probability value.
        */
       T prob() {
         T x(scalar());
-        stan::prob::prob_validate(x);
+        stan::math::prob_validate(x);
         return x;
       }
 
@@ -705,7 +706,7 @@ namespace stan {
        * value for a correlation, between -1 (inclusive) and
        * 1 (inclusive).
        *
-       * <p>See <code>stan::prob::corr_validate(T)</code>.
+       * <p>See <code>stan::math::corr_validate(T)</code>.
        *
        * @return Next correlation value.
        * @throw std::runtime_error if the value is not valid
@@ -713,7 +714,7 @@ namespace stan {
        */
       T corr() {
         T x(scalar());
-        if (!stan::prob::corr_validate(x))
+        if (!stan::math::corr_validate(x))
           BOOST_THROW_EXCEPTION(
             std::runtime_error ("x is not a valid correlation value"));
         return x;
@@ -750,7 +751,7 @@ namespace stan {
        * Return a simplex of the specified size made up of the
        * next scalars.  
        *
-       * <p>See <code>stan::prob::simplex_validate(Eigen::Matrix)</code>.
+       * <p>See <code>stan::math::simplex_validate(Eigen::Matrix)</code>.
        *
        * @param k Size of returned simplex.
        * @return Simplex read from the specified size number of scalars.
@@ -758,7 +759,7 @@ namespace stan {
        */
       vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        if(!stan::prob::simplex_validate(theta))
+        if(!stan::math::simplex_validate(theta))
           BOOST_THROW_EXCEPTION(
               std::runtime_error("the k values is not a simplex"));
         return theta;
@@ -798,7 +799,7 @@ namespace stan {
        * Return the next vector of specified size containing positive
        * values in order.  
        *
-       * <p>See <code>stan::prob::pos_ordered_validate(T)</code>.
+       * <p>See <code>stan::math::pos_ordered_validate(T)</code>.
        *
        * @param k Size of returned vector.
        * @return Vector of positive values in ascending order.
@@ -806,7 +807,7 @@ namespace stan {
        */
       vector_t pos_ordered(size_t k) {
         vector_t x(vector(k));
-        if (!stan::prob::pos_ordered_validate(x)) 
+        if (!stan::math::pos_ordered_validate(x)) 
           BOOST_THROW_EXCEPTION(
             std::runtime_error ("vector is not positive ordered"));
         return x;
@@ -844,7 +845,7 @@ namespace stan {
       /**
        * Returns the next correlation matrix of the specified dimensionality.
        *
-       * <p>See <code>stan::prob::corr_matrix_validate(Matrix)</code>.
+       * <p>See <code>stan::math::corr_matrix_validate(Matrix)</code>.
        *
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
@@ -852,7 +853,7 @@ namespace stan {
        */
       matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        if (!stan::prob::corr_matrix_validate(x))
+        if (!stan::math::corr_matrix_validate(x))
           BOOST_THROW_EXCEPTION(
             std::runtime_error(
               "the matrix returned is not a valid correlation matrix"));
@@ -892,7 +893,7 @@ namespace stan {
        * Return the next covariance matrix with the specified 
        * dimensionality.  
        *
-       * <p>See <code>stan::prob::cov_matrix_validate(Matrix)</code>.
+       * <p>See <code>stan::math::cov_matrix_validate(Matrix)</code>.
        *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
@@ -901,7 +902,7 @@ namespace stan {
        */
       matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        if (!stan::prob::cov_matrix_validate(y))
+        if (!stan::math::cov_matrix_validate(y))
           BOOST_THROW_EXCEPTION(
             std::runtime_error(
               "the matrix returned is not a valid covariance matrix"));

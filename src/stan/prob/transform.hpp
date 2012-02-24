@@ -8,7 +8,10 @@
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+
 
 namespace stan {
   
@@ -21,10 +24,6 @@ namespace stan {
     using Eigen::Array;
     using Eigen::DiagonalMatrix;
 
-    /**
-     * This is the tolerance for checking arithmetic bounds
-     * in rank and in simplexes.  The current value is <code>1E-8</code>.
-     */
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
 
@@ -379,21 +378,6 @@ namespace stan {
       return y;
     }
 
-    /**
-     * Returns true if the specified value meets the constraint.
-     *
-     * <p>Because the identity mapping imposes no constraints, thi
-     * method always returns <code>true</code>.
-     *
-     * @param x Value to validate.
-     */
-    template <typename T>
-    inline
-    bool identity_validate(const T x) {
-      return true;
-    }
-
-
 
     // POSITIVE
 
@@ -436,19 +420,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is positive.
-     *
-     * @param y Scalar input.
-     * @return <code>true</code> if the input is positive.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool positive_validate(const T y) {
-      return y >= 0.0;
-    }
-
-    /**
      * Return the unconstrained value corresponding to the specified
      * positive-constrained value.  
      *
@@ -457,7 +428,7 @@ namespace stan {
      *
      * <p>\f$f^{-1}(x) = \log(x)\f$.
      * 
-     * <p>The input is validated using <code>positive_validate(T)</code>.
+     * <p>The input is validated using <code>stan::math::check_positive()</code>.
      * 
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
@@ -466,12 +437,12 @@ namespace stan {
      */
     template <typename T>
     T positive_free(const T y) {
-      if (!positive_validate(y)) {
-        BOOST_THROW_EXCEPTION(std::domain_error ("y must be positive"));
-      }
+      T result;
+      if (!stan::math::check_positive("stan::math::positive_free<%1%>(%1%)",
+                                      y, "y", &result))
+        return result;
       return log(y);
     }
-
 
     // LOWER BOUND
 
@@ -515,22 +486,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is greater than
-     * or equal to the specified lower bound.
-     *
-     * @param y Scalar to test.
-     * @param lb Lower bound.
-     * @return <code>true</code> if the scalar is greater than or
-     * equal to the lower bound.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool lb_validate(const T y, const double lb) {
-      return y >= lb;
-    }
-
-    /**
      * Return the unconstrained value that produces the specified
      * lower-bound constrained value.
      * 
@@ -544,7 +499,7 @@ namespace stan {
     template <typename T>
     inline
     T lb_free(const T y, const double lb) {
-      if (!lb_validate(y,lb)) 
+      if (!stan::math::lb_validate(y,lb)) 
         BOOST_THROW_EXCEPTION(std::invalid_argument ("y must be greater than the lower bound"));
       return log(y - lb);
     }
@@ -595,20 +550,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is less
-     * than or equal to the specified upper bound.
-     *
-     * @param y Scalar to test.
-     * @param ub Upper bound.
-     * @return <code>true</code> if the specified scalar is less
-     * than or equal to the specified upper bound.
-     */
-    template <typename T>
-    bool ub_validate(const T y, const double ub) {
-      return y <= ub;
-    }
-
-    /**
      * Return the free scalar that corresponds to the specified
      * upper-bounded value with respect to the specified upper bound.
      *
@@ -627,7 +568,7 @@ namespace stan {
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      if(!ub_validate(y,ub))
+      if(!stan::math::ub_validate(y,ub))
         BOOST_THROW_EXCEPTION(std::invalid_argument ("y is greater than the upper bound"));
       return log(ub - y);
     }
@@ -702,21 +643,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is between the
-     * specified lower and upper bounds (inclusive).
-     *
-     * @param y Scalar to test.
-     * @param lb Lower bound.
-     * @param ub Upper bound.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool lub_validate(const T y, const double lb, const double ub) {
-      return lb <= y && y <= ub;
-    }
-
-    /**
      * Return the unconstrained scalar that transforms to the
      * specified lower- and upper-bounded scalar given the specified
      * bounds.
@@ -742,7 +668,7 @@ namespace stan {
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
       using stan::math::logit;
-      if(!lub_validate(y,lb,ub)) 
+      if(!stan::math::lub_validate(y,lb,ub)) 
         throw std::invalid_argument("require lb <= y <= ub");
       return logit((y - lb) / (ub - lb));
     }
@@ -800,21 +726,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is
-     * between 0 and 1 (inclusive).
-     *
-     * @param y Scalar to test.
-     * @return <code>true</code> if the specified scalar is
-     * between 0 and 1.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool prob_validate(const T y) {
-      return 0.0 <= y && y <= 1.0;
-    }
-
-    /**
      * Return the free scalar that when transformed to a probability
      * produces the specified scalar.
      *
@@ -831,7 +742,7 @@ namespace stan {
     template <typename T>
     T prob_free(const T y) {
       using stan::math::logit;
-      if(!prob_validate(y))
+      if(!stan::math::prob_validate(y))
         throw std::domain_error("y is not a probability");
       return logit(y);
     }
@@ -876,21 +787,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is
-     * a valid correlation value between -1 and 1 (inclusive).
-     *
-     * @param y Scalar to test.
-     * @return <code>true</code> if the specified scalar is
-     * between -1 and 1.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool corr_validate(const T y) {
-      return -1.0 <= y && y <= 1.0;
-    }
-
-    /**
      * Return the unconstrained scalar that when transformed to
      * a valid correlation produces the specified value.
      *
@@ -905,7 +801,7 @@ namespace stan {
      */
     template <typename T>
     T corr_free(const T y) {
-      corr_validate(y);
+      stan::math::corr_validate(y);
       return atanh(y);
     }
 
@@ -991,31 +887,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified vector is simplex.
-     * To be a simplex, all values must be greater than or equal to 0
-     * and the values must sum to 1.
-     *
-     * <p>The test that the values sum to 1 is done to within the
-     * tolerance specified by <code>CONSTRAINT_TOLERANCE</code>.
-     *
-     * @param y Vector to test.
-     * @return <code>true</code> if the vector is a simplex.
-     */
-    template <typename T>
-    bool
-    simplex_validate(const Matrix<T,Dynamic,1>& y) {
-      if (y.size() == 0)
-        return false;
-      if (fabs(1.0 - y.sum()) > CONSTRAINT_TOLERANCE)
-        return false;
-      for (typename Matrix<T,Dynamic,1>::size_type i = 0; i < y.size(); ++i) {
-        if (!(y[i] >= 0.0)) 
-          return false;
-      }
-      return true;
-    }
-
-    /**
      * Return an unconstrained vector that when transformed produces
      * the specified simplex.  It applies to a simplex of dimensionality
      * K and produces an unconstrained vector of dimensionality (K-1).
@@ -1039,7 +910,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
-      if(!simplex_validate(y))
+      if(!stan::math::simplex_validate(y))
         throw std::domain_error("y is not a valid simplex");
       size_t k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
@@ -1115,26 +986,6 @@ namespace stan {
     }
 
 
-    /**
-     * Return <code>true</code> if the specified vector contains
-     * only non-negative values and is sorted into increasing order.
-     * There may be duplicate values.
-     *
-     * @param y Vector to test.
-     * @return <code>true</code> if the vector has positive, ordered
-     * values.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool pos_ordered_validate(const Matrix<T,Dynamic,1>& y) {
-      if (y.size() == 0) return true;
-      if (!(y[0] > 0.0)) return false;
-      for (typename Matrix<T,Dynamic,1>::size_type k = 1; k < y.size(); ++k) {
-        if (!(y[k] > y[k-1]))
-          return false;
-      }
-      return true;
-    }
 
     /**
      * Return the vector of unconstrained scalars that transform to
@@ -1153,7 +1004,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
-      if(!pos_ordered_validate(y)) 
+      if(!stan::math::pos_ordered_validate(y)) 
         throw std::domain_error("y is not a vector of positive ordered scalars");
       size_t k = y.size();
       Matrix<T,Dynamic,1> x(k);
@@ -1235,32 +1086,6 @@ namespace stan {
       for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i],lp);
       return read_corr_matrix(cpcs,k,lp);
-    }
-
-    // forward declaration for corr_matrix
-    template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y); 
-
-    /**
-     * Return <code>true</code> if the specified matrix is a valid
-     * correlation matrix.  A valid correlation matrix is symmetric,
-     * has a unit diagonal (all 1 values), and has all values between
-     * -1 and 1 (inclussive).  
-     *
-     * @param y Matrix to test.
-     * @return <code>true</code> if the specified matrix is a valid
-     * correlation matrix.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool corr_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      if (!cov_matrix_validate(y))
-        return false;
-      for (typename Matrix<T,Dynamic,Dynamic>::size_type k = 0; k < y.rows(); ++k) {
-        if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE)
-          return false;
-      }
-      return true;
     }
 
     /**
@@ -1379,105 +1204,6 @@ namespace stan {
       for (size_t i = 0; i < k; ++i)
         sds[i] = positive_constrain(x[pos++]); // ,lp);
       return read_cov_matrix(cpcs, sds, lp);
-    }
-
-    /**
-     * Return <code>true</code> if the specified matrix is symmetric
-     * 
-     * NOTE: squareness is not checked by this function
-     *
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is symmetric.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool symmetry_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      size_t k = y.rows();
-      if (k == 1)
-        return true;
-      
-      for (size_t m = 0; m < k; ++m) {
-        for (size_t n = m + 1; n < k; ++n) {
-          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE)
-            return false;
-        }
-      }
-      return true;
-    }
-
-
-    /**
-     * Return <code>true</code> if the specified matrix is positive definite
-     *
-     * NOTE: symmetry is NOT checked by this function
-     * 
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is positive definite.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool pd_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      if (y.rows() == 1)
-        return y(0,0) > CONSTRAINT_TOLERANCE;
-      
-      LDLT< Matrix<T,Dynamic,Dynamic> > cholesky = y.ldlt();
-      if( (cholesky.vectorD().array() > CONSTRAINT_TOLERANCE).all() )
-        return true;
-      
-      return false;
-    }
-
-    /**
-     * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix.  A valid covariance matrix must be square,
-     * symmetric, and positive definite.
-     *
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is a valid covariance matrix.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y) {
-      if (y.rows() != y.cols() || y.rows() == 0)
-        return false;
-
-      if (!symmetry_validate(y))
-        return false;
-
-      if (!pd_validate(y))
-        return false;
-
-      return true;
-    }
-
-    /**
-     * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix.  A valid covariance matrix must be symmetric
-     * and positive definite.
-     *
-     * @param y Matrix to test.
-     * @param err_msg Output stream for error messages.
-     * @return <code>true</code> if the matrix is a valid covariance matrix.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool cov_matrix_validate(const Matrix<T,Dynamic,Dynamic>& y, std::ostream& err_msg) {
-      if (y.rows() != y.cols() || y.rows() == 0) {
-        err_msg << "Matrix is not square: [" << y.rows() << ", " << y.cols() << "]";
-        return false;
-      }
-
-      if (!symmetry_validate(y)) {
-        err_msg << "Matrix is not symmetric";
-        return false;
-      }
-
-      if (!pd_validate(y)) {
-        err_msg << "Matrix is not positive definite";
-        return false;
-      }
-      
-      return true;
     }
 
     /**
