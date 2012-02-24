@@ -5,7 +5,6 @@
 #include <cstddef>
 
 #include <vector>
-#include <cstdio>
 
 #include <iostream>
 
@@ -143,11 +142,11 @@ namespace stan {
           _gbar[i] += g[i];
         if (_k == _nextk) {
           for (size_t i = 0; i < g.size(); ++i) {
-            std::cerr << "_lastx[" << i << "]"
-                      << " = " << _lastx[i]
-                      << ", _gbar[" << i << "]"
-                      << " = " << _gbar[i]
-                      << std::endl;
+            // std::cerr << "_lastx[" << i << "]"
+            //           << " = " << _lastx[i]
+            //           << ", _gbar[" << i << "]"
+            //           << " = " << _gbar[i]
+            //           << std::endl;
             _lastx[i] -= _gamma * _gbar[i] / (_nextk - _lastk);
           }
           _gbar.assign(_gbar.size(), 0);
@@ -163,7 +162,7 @@ namespace stan {
         _x0 = x0;
         _lastx = x0;
         _xbar = x0;
-        fprintf(stderr, "_lastx[0] = %f\n", x0[0]);
+        // fprintf(stderr, "_lastx[0] = %f\n", x0[0]);
       }
 
       inline void xbar(std::vector<double>& xbar) {
