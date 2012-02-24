@@ -338,7 +338,7 @@ namespace stan {
       std::cout << "chain_id=" << chain_id
                 << " (" << (command.has_key("seed")
                             ? "user specified"
-                            : "randomly generated") << ")"
+                            : "default") << ")"
                 << std::endl;
 
       std::cout << "iter = " << num_iterations << std::endl;

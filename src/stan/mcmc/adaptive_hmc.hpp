@@ -106,7 +106,7 @@ namespace stan {
                    int L, 
                    double epsilon=-1,
                    double epsilon_pm = 0.0,
-                   bool epsilon_adapt = true,
+                   bool epsilon_adapt = true, 
                    double delta = 0.651,
                    double gamma = 0.05,
                    BaseRNG base_rng = BaseRNG(std::time(0)))
@@ -133,7 +133,7 @@ namespace stan {
           _da(gamma, std::vector<double>(1, 0)) {
         model.init(_x,_z);
         _logp = model.grad_log_prob(_x,_z,_g);
-        if (_epsilon <= 0)
+        if (_epsilon <= 0.0)
           find_reasonable_parameters();
         _da.setx0(std::vector<double>(1, log(_epsilon)));
       }
@@ -206,7 +206,7 @@ namespace stan {
        * setting of the step size epsilon.
        */
       virtual void find_reasonable_parameters() {
-        _epsilon = 1;
+        _epsilon = 1.0;
         std::vector<double> x = _x;
         std::vector<double> m(_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
@@ -232,7 +232,7 @@ namespace stan {
           else if ((direction == -1) && (H > log(0.5)))
             break;
           else
-            _epsilon = direction == 1 ? 2 * _epsilon : 0.5 * _epsilon;
+            _epsilon = (direction == 1) ? 2.0 * _epsilon : 0.5 * _epsilon;
         }
       }
 
@@ -262,8 +262,17 @@ namespace stan {
         std::vector<double> g_new(_g);
         std::vector<double> x_new(_x);
         double logp_new = -1e100;
+        double epsilon = _epsilon;
+        if (_epsilon_pm != 0.0) { // to adapt w/o randomizing, include "&& !adapting()"
+          double low = epsilon * (1.0 - _epsilon_pm);
+          double high = epsilon * (1.0 + _epsilon_pm);
+          double range = high - low;
+          epsilon = low + (range * _rand_uniform_01());
+        }
+        std::cout << "epsilon=" << epsilon << std::endl;
+
         for (unsigned int l = 0; l < _L; ++l)
-          logp_new = leapfrog(_model, _z, x_new, m, g_new, _epsilon);
+          logp_new = leapfrog(_model, _z, x_new, m, g_new, epsilon);
         nfevals_plus_eq(_L);
 
         double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;
