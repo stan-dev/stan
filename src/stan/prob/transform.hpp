@@ -8,6 +8,7 @@
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 
@@ -377,21 +378,6 @@ namespace stan {
       return y;
     }
 
-    /**
-     * Returns true if the specified value meets the constraint.
-     *
-     * <p>Because the identity mapping imposes no constraints, thi
-     * method always returns <code>true</code>.
-     *
-     * @param x Value to validate.
-     */
-    template <typename T>
-    inline
-    bool identity_validate(const T x) {
-      return true;
-    }
-
-
 
     // POSITIVE
 
@@ -434,19 +420,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is positive.
-     *
-     * @param y Scalar input.
-     * @return <code>true</code> if the input is positive.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool positive_validate(const T y) {
-      return y >= 0.0;
-    }
-
-    /**
      * Return the unconstrained value corresponding to the specified
      * positive-constrained value.  
      *
@@ -455,7 +428,7 @@ namespace stan {
      *
      * <p>\f$f^{-1}(x) = \log(x)\f$.
      * 
-     * <p>The input is validated using <code>positive_validate(T)</code>.
+     * <p>The input is validated using <code>stan::math::positive_validate(T)</code>.
      * 
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
@@ -464,7 +437,7 @@ namespace stan {
      */
     template <typename T>
     T positive_free(const T y) {
-      if (!positive_validate(y)) {
+      if (!stan::math::positive_validate(y)) {
         BOOST_THROW_EXCEPTION(std::domain_error ("y must be positive"));
       }
       return log(y);
@@ -513,22 +486,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is greater than
-     * or equal to the specified lower bound.
-     *
-     * @param y Scalar to test.
-     * @param lb Lower bound.
-     * @return <code>true</code> if the scalar is greater than or
-     * equal to the lower bound.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool lb_validate(const T y, const double lb) {
-      return y >= lb;
-    }
-
-    /**
      * Return the unconstrained value that produces the specified
      * lower-bound constrained value.
      * 
@@ -542,7 +499,7 @@ namespace stan {
     template <typename T>
     inline
     T lb_free(const T y, const double lb) {
-      if (!lb_validate(y,lb)) 
+      if (!stan::math::lb_validate(y,lb)) 
         BOOST_THROW_EXCEPTION(std::invalid_argument ("y must be greater than the lower bound"));
       return log(y - lb);
     }
@@ -593,20 +550,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is less
-     * than or equal to the specified upper bound.
-     *
-     * @param y Scalar to test.
-     * @param ub Upper bound.
-     * @return <code>true</code> if the specified scalar is less
-     * than or equal to the specified upper bound.
-     */
-    template <typename T>
-    bool ub_validate(const T y, const double ub) {
-      return y <= ub;
-    }
-
-    /**
      * Return the free scalar that corresponds to the specified
      * upper-bounded value with respect to the specified upper bound.
      *
@@ -625,7 +568,7 @@ namespace stan {
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      if(!ub_validate(y,ub))
+      if(!stan::math::ub_validate(y,ub))
         BOOST_THROW_EXCEPTION(std::invalid_argument ("y is greater than the upper bound"));
       return log(ub - y);
     }
@@ -700,21 +643,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is between the
-     * specified lower and upper bounds (inclusive).
-     *
-     * @param y Scalar to test.
-     * @param lb Lower bound.
-     * @param ub Upper bound.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool lub_validate(const T y, const double lb, const double ub) {
-      return lb <= y && y <= ub;
-    }
-
-    /**
      * Return the unconstrained scalar that transforms to the
      * specified lower- and upper-bounded scalar given the specified
      * bounds.
@@ -740,7 +668,7 @@ namespace stan {
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
       using stan::math::logit;
-      if(!lub_validate(y,lb,ub)) 
+      if(!stan::math::lub_validate(y,lb,ub)) 
         throw std::invalid_argument("require lb <= y <= ub");
       return logit((y - lb) / (ub - lb));
     }
@@ -798,21 +726,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is
-     * between 0 and 1 (inclusive).
-     *
-     * @param y Scalar to test.
-     * @return <code>true</code> if the specified scalar is
-     * between 0 and 1.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool prob_validate(const T y) {
-      return 0.0 <= y && y <= 1.0;
-    }
-
-    /**
      * Return the free scalar that when transformed to a probability
      * produces the specified scalar.
      *
@@ -829,7 +742,7 @@ namespace stan {
     template <typename T>
     T prob_free(const T y) {
       using stan::math::logit;
-      if(!prob_validate(y))
+      if(!stan::math::prob_validate(y))
         throw std::domain_error("y is not a probability");
       return logit(y);
     }
@@ -874,21 +787,6 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code> if the specified scalar is
-     * a valid correlation value between -1 and 1 (inclusive).
-     *
-     * @param y Scalar to test.
-     * @return <code>true</code> if the specified scalar is
-     * between -1 and 1.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    inline
-    bool corr_validate(const T y) {
-      return -1.0 <= y && y <= 1.0;
-    }
-
-    /**
      * Return the unconstrained scalar that when transformed to
      * a valid correlation produces the specified value.
      *
@@ -903,7 +801,7 @@ namespace stan {
      */
     template <typename T>
     T corr_free(const T y) {
-      corr_validate(y);
+      stan::math::corr_validate(y);
       return atanh(y);
     }
 
@@ -1088,26 +986,6 @@ namespace stan {
     }
 
 
-    /**
-     * Return <code>true</code> if the specified vector contains
-     * only non-negative values and is sorted into increasing order.
-     * There may be duplicate values.
-     *
-     * @param y Vector to test.
-     * @return <code>true</code> if the vector has positive, ordered
-     * values.
-     * @tparam T Type of scalar.
-     */
-    template <typename T>
-    bool pos_ordered_validate(const Matrix<T,Dynamic,1>& y) {
-      if (y.size() == 0) return true;
-      if (!(y[0] > 0.0)) return false;
-      for (typename Matrix<T,Dynamic,1>::size_type k = 1; k < y.size(); ++k) {
-        if (!(y[k] > y[k-1]))
-          return false;
-      }
-      return true;
-    }
 
     /**
      * Return the vector of unconstrained scalars that transform to
@@ -1126,7 +1004,7 @@ namespace stan {
      */
     template <typename T>
     Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
-      if(!pos_ordered_validate(y)) 
+      if(!stan::math::pos_ordered_validate(y)) 
         throw std::domain_error("y is not a vector of positive ordered scalars");
       size_t k = y.size();
       Matrix<T,Dynamic,1> x(k);

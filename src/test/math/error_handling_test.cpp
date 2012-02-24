@@ -7,7 +7,7 @@ typedef boost::math::policies::policy<
 using namespace stan::math;
 
 //---------- check_not_nan tests ----------
-TEST(ProbDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
+TEST(MathErrorHandling,CheckNotNanDefaultPolicy) {
   const char* function = "check_not_nan(%1%)";
   double x = 0;
   double result;
@@ -22,7 +22,7 @@ TEST(ProbDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
   EXPECT_THROW(check_not_nan(function, x, "x", &result, default_policy()), std::domain_error) << "check_not_nan should throw exception on NaN: " << x;
 }
 
-TEST(ProbDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
+TEST(MathErrorHandling,CheckNotNanErrnoPolicy) {
   const char* function = "check_not_nan(%1%)";
   double x = 0;
   double result;
@@ -43,7 +43,7 @@ TEST(ProbDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
 
 
 //---------- check_finite tests ----------
-TEST(ProbDistributionsErrorHandling,CheckFiniteDefaultPolicy) {
+TEST(MathErrorHandling,CheckFiniteDefaultPolicy) {
   const char* function = "check_finite (%1%)";
   double x = 0;
   double result;
@@ -58,7 +58,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteDefaultPolicy) {
   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN: " << x;
 }
 
-TEST(ProbDistributionsErrorHandling,CheckFiniteErrnoPolicy) {
+TEST(MathErrorHandling,CheckFiniteErrnoPolicy) {
   const char* function = "check_finite (%1%)";
   double x = 0;
   double result;
@@ -79,7 +79,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteErrnoPolicy) {
 
 
 // ---------- check_finite: vector tests ----------
-TEST(ProbDistributionsErrorHandling,CheckFiniteVectorDefaultPolicy) {
+TEST(MathErrorHandling,CheckFiniteVectorDefaultPolicy) {
   const char* function = "check_finite (%1%)";
   double result;
   std::vector<double> x;
@@ -109,7 +109,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorDefaultPolicy) {
   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
 }
 
-TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
+TEST(MathErrorHandling,CheckFiniteVectorErrnoPolicy) {
   const char* function = "check_finite (%1%)";
   std::vector<double> x;
   x.push_back (-1);
@@ -148,7 +148,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
 }
 
 // // ---------- check_finite: matrix tests ----------
-// TEST(ProbDistributionsErrorHandling,CheckFiniteMatrixDefaultPolicy) {
+// TEST(MathErrorHandling,CheckFiniteMatrixDefaultPolicy) {
 //   const char* function = "check_finite (%1%)";
 //   double result;
 //   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -174,7 +174,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
 //   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
 // }
 
-// TEST(ProbDistributionsErrorHandling,CheckFiniteMatrixErrnoPolicy) {
+// TEST(MathErrorHandling,CheckFiniteMatrixErrnoPolicy) {
 //   const char* function = "check_finite (%1%)";
 //   double result;
 //   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -204,7 +204,7 @@ TEST(ProbDistributionsErrorHandling,CheckFiniteVectorErrnoPolicy) {
 //   }
 
 // ---------- check_bounded tests ----------
-TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
+TEST(MathErrorHandling,CheckBoundedDefaultPolicyX) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -243,7 +243,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
+TEST(MathErrorHandling,CheckBoundedDefaultPolicyLow) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -265,7 +265,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
   EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
+TEST(MathErrorHandling,CheckBoundedDefaultPolicyHigh) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -290,7 +290,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
 }
 
 
-TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
+TEST(MathErrorHandling,CheckBoundedErrnoPolicyX) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -341,7 +341,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
+TEST(MathErrorHandling,CheckBoundedErrnoPolicyLow) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -369,7 +369,7 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
+TEST(MathErrorHandling,CheckBoundedErrnoPolicyHigh) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   double x = 0;
@@ -399,4 +399,8 @@ TEST(ProbDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
 }
 
 // ----------  ----------
-//TEST(ProbDistributionsErrorHandling,)
+//TEST(MathErrorHandling,)
+TEST(MathErrorHandling,identity_validate) {
+  double x = 1.2;
+  EXPECT_EQ(true, stan::math::identity_validate(x));
+}

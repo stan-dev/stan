@@ -29,10 +29,6 @@ TEST(prob_transform,identity_rt) {
   double yfc = stan::prob::identity_constrain(yf);
   EXPECT_FLOAT_EQ(y,yfc);
 }
-TEST(prob_transform,identity_val) {
-  double x = 1.2;
-  EXPECT_EQ(true, stan::prob::identity_validate(x));
-}
 
 
 TEST(prob_transform, positive) {
