@@ -36,12 +36,12 @@ namespace stan {
      * @tparam T_result Type of result returned.
      * @tparam Policy Error handling policy.
      */
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const T_y& y,
                               const char* name,
                               T_result* result,
-                              const Policy& /* pol */) {
+                              const Policy& = Policy()) {
       if ((boost::math::isnan)(y)) {
         using stan::math::policies::raise_domain_error;
         std::string msg_str(name);
@@ -55,12 +55,12 @@ namespace stan {
       return true;
     }
 
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const std::vector<T_y>& y,
                               const char* name,
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (size_t i = 0; i < y.size(); i++) {
         if ((boost::math::isnan)(y[i])) {
@@ -79,12 +79,12 @@ namespace stan {
     /**
      * Checks if the variable y is finite.
      */
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_finite(const char* function,
                              const T_y& y,
                              const char* name,
                              T_result* result,
-                             const Policy& pol) {
+                             const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       if (!(boost::math::isfinite)(y)) {
         std::string message(name);
@@ -97,12 +97,12 @@ namespace stan {
       return true;
     }
 
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_finite(const char* function,
                              const std::vector<T_y>& y,
                              const char* name,
                              T_result* result,
-                             const Policy& /*pol*/) {
+                             const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (size_t i = 0; i < y.size(); i++) {
         if (!(boost::math::isfinite)(y[i])) {
@@ -118,13 +118,13 @@ namespace stan {
     }
 
 
-    template <typename T_x, typename T_low, typename T_result, class Policy>
+    template <typename T_x, typename T_low, typename T_result, class Policy = default_policy>
     inline bool check_greater(const char* function,
                               const T_x& x,
                               const T_low& low,
                               const char* name,  
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x > low)) {
@@ -141,13 +141,13 @@ namespace stan {
       return true;
     }
 
-    template <typename T_x, typename T_low, typename T_result, class Policy>
+    template <typename T_x, typename T_low, typename T_result, class Policy = default_policy>
     inline bool check_greater_or_equal(const char* function,
                                        const T_x& x,
                                        const T_low& low,
                                        const char* name,  
                                        T_result* result,
-                                       const Policy& /*pol*/) {
+                                       const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x >= low)) {
@@ -166,14 +166,14 @@ namespace stan {
 
 
     template <typename T_x, typename T_low, typename T_high, typename T_result,
-              class Policy>
+              class Policy = default_policy>
     inline bool check_bounded(const char* function,
                               const T_x& x,
                               const T_low& low,
                               const T_high& high,
                               const char* name,  
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(low <= x && x <= high)) {
@@ -193,12 +193,12 @@ namespace stan {
     }
 
 
-    template <typename T_x, typename T_result, class Policy>
+    template <typename T_x, typename T_result, class Policy = default_policy>
     inline bool check_nonnegative(const char* function,
                                   const T_x& x,
                                   const char* name,
                                   T_result* result,
-                                  const Policy& /*pol*/) {
+                                  const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       // have to use not is_unsigned. is_signed will be false
@@ -215,12 +215,12 @@ namespace stan {
       return true;
     }
 
-    template <typename T_x, typename T_result, class Policy>
+    template <typename T_x, typename T_result, class Policy = default_policy>
     inline bool check_positive(const char* function,
                                const T_x& x,
                                const char* name,
                                T_result* result,
-                               const Policy& /*pol*/) {
+                               const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       if (!(x > 0)) {
         std::string message(name);
@@ -234,12 +234,12 @@ namespace stan {
       return true;
     }
     
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_positive(const char* function,
                                const std::vector<T_y>& y,
                                const char* name,
                                T_result* result,
-                               const Policy& /*pol*/) {
+                               const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (size_t i = 0; i < y.size(); i++) {
         if (!(y[i] > 0)) {
@@ -255,12 +255,12 @@ namespace stan {
       return true;
     }
 
-    template <typename T_prob_vector, typename T_result, class Policy>
+    template <typename T_prob_vector, typename T_result, class Policy = default_policy>
     inline bool check_simplex(const char* function,
                               const T_prob_vector& theta,
                               const char* name,
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       typename T_prob_vector::value_type T_prob;
       if (theta.size() == 0) {

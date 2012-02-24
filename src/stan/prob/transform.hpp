@@ -439,8 +439,7 @@ namespace stan {
     T positive_free(const T y) {
       T result;
       if (!stan::math::check_positive("stan::math::positive_free<%1%>(%1%)",
-                                      y, "y", &result, 
-                                      stan::math::default_policy()))
+                                      y, "y", &result))
         return result;
       return log(y);
     }

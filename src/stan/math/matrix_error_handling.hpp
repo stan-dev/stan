@@ -184,12 +184,12 @@ namespace stan {
 
 
 
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                               const char* name,
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (boost::math::isnan(y[i])) {
@@ -206,12 +206,12 @@ namespace stan {
     }
 
 
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_not_nan(const char* function,
                               const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                               const char* name,
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       for (int i = 0; i < y.rows(); i++) {
         for (int j = 0; j < y.cols(); j++) {
           if (boost::math::isnan(y(i,j))) {
@@ -228,12 +228,12 @@ namespace stan {
     }
 
 
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result, class Policy = default_policy>
     inline bool check_finite(const char* function,
                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                              const char* name,
                              T_result* result,
-                             const Policy& /*pol*/) {
+                             const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (!boost::math::isfinite(y[i])) {
@@ -249,11 +249,11 @@ namespace stan {
       return true;
     }
 
-    template <typename T_covar, typename T_result, class Policy>
+    template <typename T_covar, typename T_result, class Policy = default_policy>
     inline bool check_cov_matrix(const char* function,
                                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                                  T_result* result,
-                                 const Policy& /*pol*/) {
+                                 const Policy& = Policy()) {
       if (!cov_matrix_validate(Sigma)) {
         std::ostringstream stream;
         stream << "Sigma is not a valid covariance matrix. "
@@ -269,11 +269,11 @@ namespace stan {
       return true;
     }
 
-    template <typename T_covar, typename T_result, class Policy>
+    template <typename T_covar, typename T_result, class Policy = default_policy>
     inline bool check_corr_matrix(const char* function,
                                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                                  T_result* result,
-                                 const Policy& /*pol*/) {
+                                 const Policy& = Policy()) {
       if (!corr_matrix_validate(Sigma)) {
         std::ostringstream stream;
         stream << "Sigma is not a valid correlation matrix."
@@ -289,12 +289,12 @@ namespace stan {
       return true;
     }
 
-    template <typename T_result, typename T_size1, typename T_size2, class Policy>
+    template <typename T_result, typename T_size1, typename T_size2, class Policy = default_policy>
     inline bool check_size_match(const char* function,
                                  T_size1 i,
                                  T_size2 j,
                                  T_result* result,
-                                 const Policy& /*pol*/) {
+                                 const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
       if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
@@ -310,12 +310,12 @@ namespace stan {
     }
 
 
-    template <typename T_prob, typename T_result, class Policy>
+    template <typename T_prob, typename T_result, class Policy = default_policy>
     inline bool check_simplex(const char* function,
                               const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                               const char* name,
                               T_result* result,
-                              const Policy& /*pol*/) {
+                              const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       if (!simplex_validate(theta)) {
         std::ostringstream stream;
