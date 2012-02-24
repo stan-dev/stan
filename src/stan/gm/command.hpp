@@ -194,6 +194,11 @@ namespace stan {
       }
     }
 
+    void write_comment(std::ostream& o,
+                       const std::string& msg) {
+      o << "# " << msg << std::endl;
+    }
+
     template <typename T_model>
     int nuts_command(int argc, const char* argv[]) {
 
@@ -359,12 +364,19 @@ namespace stan {
         return 0;
       }
 
-      std::fstream sample_file_stream(sample_file.c_str(), 
-                                      samples_append_mode);
+      std::fstream sample_stream(sample_file.c_str(), 
+                                 samples_append_mode);
+      
+      write_comment(sample_stream,
+                    "STAN output");
+
+
+      write_comment(sample_stream,
+                    
       
       if (!append_samples) {
-        sample_file_stream << "lp__,"; // log probability first
-        model.write_csv_header(sample_file_stream);
+        sample_stream << "lp__,"; // log probability first
+        model.write_csv_header(sample_stream);
       }
 
       if (leapfrog_steps < 0) {
@@ -374,7 +386,7 @@ namespace stan {
                                              base_rng);
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
-                    sample_file_stream,params_r,params_i,
+                    sample_stream,params_r,params_i,
                     model);
       } else {
         stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
@@ -384,11 +396,11 @@ namespace stan {
                                                     base_rng);
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
-                    sample_file_stream,params_r,params_i,
+                    sample_stream,params_r,params_i,
                     model);
       }
       
-      sample_file_stream.close();
+      sample_stream.close();
       std::cout << std::endl << std::endl;
       return 0;
     }
