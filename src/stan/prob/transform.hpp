@@ -909,8 +909,6 @@ namespace stan {
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
       stan::math::check_simplex("stan::prob::simplex_free(%1%)", y, "y");
-      /*if(!stan::math::simplex_validate(y))
-        throw std::domain_error("y is not a valid simplex");*/
       size_t k_minus_1 = y.size() - 1;
       double log_y_k_minus_1 = log(y[k_minus_1]);
       Matrix<T,Dynamic,1> x(k_minus_1);
