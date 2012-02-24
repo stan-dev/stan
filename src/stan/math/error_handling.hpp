@@ -177,12 +177,12 @@ namespace stan {
     }
 
     template <typename T_x, typename T_low, typename T_result = T_x, class Policy = default_policy>
-    inline bool check_lesser(const char* function,
-                              const T_x& x,
-                              const T_low& low,
-                              const char* name,  
-                              T_result* result = 0,
-                              const Policy& = Policy()) {
+    inline bool check_less(const char* function,
+                           const T_x& x,
+                           const T_low& low,
+                           const char* name,  
+                           T_result* result = 0,
+                           const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x < low)) {
@@ -202,12 +202,12 @@ namespace stan {
     }
 
     template <typename T_x, typename T_low, typename T_result = T_x, class Policy = default_policy>
-    inline bool check_lesser_or_equal(const char* function,
-                                       const T_x& x,
-                                       const T_low& low,
-                                       const char* name,  
-                                       T_result* result = 0,
-                                       const Policy& = Policy()) {
+    inline bool check_less_or_equal(const char* function,
+                                    const T_x& x,
+                                    const T_low& low,
+                                    const char* name,  
+                                    T_result* result = 0,
+                                    const Policy& = Policy()) {
       using stan::math::policies::raise_domain_error;
       using boost::math::tools::promote_args;
       if (!(x <= low)) {

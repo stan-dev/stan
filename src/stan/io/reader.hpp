@@ -564,7 +564,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * less than or equal to the specified upper bound.
        *
-       * <p>See <code>stan::math::check_lesser_or_equal(T,double)</code>.
+       * <p>See <code>stan::math::check_less_or_equal(T,double)</code>.
        *
        * @param ub Upper bound.
        * @return Next scalar value.
@@ -573,7 +573,7 @@ namespace stan {
        */
       T scalar_ub(double ub) {
         T x(scalar());
-        stan::math::check_lesser_or_equal("stan::io::scalar_ub(%1%)", x, ub, "x");
+        stan::math::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, "x");
         return x;
       }
 

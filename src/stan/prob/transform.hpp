@@ -565,8 +565,8 @@ namespace stan {
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      stan::math::check_lesser_or_equal("stan::prob::ub_free(%1%)",
-                                        y, ub, "y");
+      stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
+                                      y, ub, "y");
       return log(ub - y);
     }
 
