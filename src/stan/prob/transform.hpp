@@ -570,8 +570,10 @@ namespace stan {
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
-      if(!stan::math::ub_validate(y,ub))
-        BOOST_THROW_EXCEPTION(std::invalid_argument ("y is greater than the upper bound"));
+      T result;
+      if (!stan::math::check_lesser_or_equal("stan::prob::ub_free<%1%>(%1%)",
+                                             y, ub, "y", &result))
+        return result;
       return log(ub - y);
     }
 
