@@ -428,7 +428,7 @@ namespace stan {
      *
      * <p>\f$f^{-1}(x) = \log(x)\f$.
      * 
-     * <p>The input is validated using <code>stan::math::positive_validate(T)</code>.
+     * <p>The input is validated using <code>stan::math::check_positive()</code>.
      * 
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
@@ -437,12 +437,13 @@ namespace stan {
      */
     template <typename T>
     T positive_free(const T y) {
-      if (!stan::math::positive_validate(y)) {
-        BOOST_THROW_EXCEPTION(std::domain_error ("y must be positive"));
-      }
+      T result;
+      if (!stan::math::check_positive("stan::math::positive_free<%1%>(%1%)",
+                                      y, "y", &result, 
+                                      stan::math::default_policy()))
+        return result;
       return log(y);
     }
-
 
     // LOWER BOUND
 
