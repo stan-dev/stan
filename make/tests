@@ -29,7 +29,7 @@ BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
 BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
 
 .PHONY: test-bugs
-test-bugs: $(BUGS_EXAMPLES)
+test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 
 ##
 # Target to build all tests

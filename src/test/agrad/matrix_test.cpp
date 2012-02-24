@@ -220,7 +220,7 @@ TEST(agrad_matrix,rows__rowvector) {
   EXPECT_EQ (1U, stan::agrad::rows(rv));
 
   rv.resize(0);
-  EXPECT_EQ (1, stan::agrad::rows(rv));
+  EXPECT_EQ (1U, stan::agrad::rows(rv));
 }
 TEST(agrad_matrix,rows__matrix) {
   matrix_v m(2,3);
