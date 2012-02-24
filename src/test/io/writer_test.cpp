@@ -113,13 +113,13 @@ TEST(io_writer, simplex_unconstrain_exception) {
   EXPECT_NO_THROW (writer.simplex_unconstrain(y));
   
   y << 1.1, -0.1;
-  EXPECT_THROW (writer.simplex_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.simplex_unconstrain(y), std::domain_error);
 
   y << 0.1, 0.1;
-  EXPECT_THROW (writer.simplex_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.simplex_unconstrain(y), std::domain_error);
   
   y.resize(0);
-  EXPECT_THROW (writer.simplex_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.simplex_unconstrain(y), std::domain_error);
 }
 TEST(io_writer, corr_matrix_unconstrain_exception) {
   std::vector<int> theta_i;

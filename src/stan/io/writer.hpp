@@ -283,11 +283,10 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a simplex.
        */
       void simplex_unconstrain(vector_t& y) {
-        if (!stan::math::simplex_validate(y))
-          BOOST_THROW_EXCEPTION(std::runtime_error("y is not a simplex"));
-        size_t k_minus_1 = y.size() - 1;
+        stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", y, "y");
+        typename vector_t::size_type k_minus_1 = y.size() - 1;
         double log_y_k = log(y[k_minus_1]);
-        for (size_t i = 0; i < k_minus_1; ++i) {
+        for (typename vector_t::size_type i = 0; i < k_minus_1; ++i) {
           data_r_.push_back(log(y[i]) - log_y_k);
         }
       }
