@@ -153,7 +153,53 @@ namespace stan {
       if (!(x >= low)) {
         std::ostringstream msg;
         msg << name 
-            << " is %1%, but must be greater than or equal to "
+            << " is %1%, but must be greater or equal to "
+            << low;
+        *result = raise_domain_error<T_result,T_x>(function, 
+                                                   msg.str().c_str(), 
+                                                   x, 
+                                                   Policy());
+        return false;
+      }
+      return true;
+    }
+
+    template <typename T_x, typename T_low, typename T_result, class Policy = default_policy>
+    inline bool check_lesser(const char* function,
+                              const T_x& x,
+                              const T_low& low,
+                              const char* name,  
+                              T_result* result,
+                              const Policy& = Policy()) {
+      using stan::math::policies::raise_domain_error;
+      using boost::math::tools::promote_args;
+      if (!(x < low)) {
+        std::ostringstream msg;
+        msg << name 
+            << " is %1%, but must be less than "
+            << low;
+        *result = raise_domain_error<T_result,T_x>(function, 
+                                                   msg.str().c_str(), 
+                                                   x, 
+                                                   Policy());
+        return false;
+      }
+      return true;
+    }
+
+    template <typename T_x, typename T_low, typename T_result, class Policy = default_policy>
+    inline bool check_lesser_or_equal(const char* function,
+                                       const T_x& x,
+                                       const T_low& low,
+                                       const char* name,  
+                                       T_result* result,
+                                       const Policy& = Policy()) {
+      using stan::math::policies::raise_domain_error;
+      using boost::math::tools::promote_args;
+      if (!(x <= low)) {
+        std::ostringstream msg;
+        msg << name 
+            << " is %1%, but must be less than or equal to "
             << low;
         *result = raise_domain_error<T_result,T_x>(function, 
                                                    msg.str().c_str(), 
