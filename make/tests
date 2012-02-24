@@ -12,6 +12,7 @@ GTEST_MAIN := lib/gtest/src/gtest_main.cc
 UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
+UNIT_TESTS := $(addsuffix $(EXE),$(UNIT_TESTS))
 
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
@@ -27,6 +28,7 @@ test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 BUGS_EXAMPLES := $(shell cd src; find models/bugs_examples -type f -name '*.stan')
 BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
 BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
+BUGS_EXAMPLES := $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 
 .PHONY: test-bugs
 test-bugs: $(BUGS_EXAMPLES)

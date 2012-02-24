@@ -11,9 +11,9 @@ models/%$(EXE) : models/%.o
 	$(LINK.c) $(OUTPUT_OPTION) $<
 	@echo ''
 	@echo '--- Running model ---'
-	cp src/$@.stan $@.stan
-	-cp src/$@.Rdata $@.Rdata
-	$@ --data=$@.Rdata --samples=$@.csv
+	cp src/$(basename $@).stan $(basename $@).stan
+	-cp src/$(basename $@).Rdata $(basename $@).Rdata
+	$@ --data=$(basename $@).Rdata --samples=$(basename $@).csv
 
 .PRECIOUS: models/%.cpp
 models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) demo/gm$(EXE)
