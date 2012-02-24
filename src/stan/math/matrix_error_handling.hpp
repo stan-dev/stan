@@ -167,10 +167,6 @@ namespace stan {
 
 
 
-    // forward declaration for corr_matrix
-    //template <typename T>
-    //bool cov_matrix_validate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y); 
-
     /**
      * Return <code>true</code> if the specified matrix is symmetric
      * 
