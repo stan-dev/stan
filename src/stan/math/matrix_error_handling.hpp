@@ -14,6 +14,37 @@
 namespace stan { 
 
   namespace math {
+    
+    /*template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    inline bool check_symmetric(const char* function,
+                                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                const char* name,
+                                T_result* result = 0,
+                                const Policy& = Policy()) {
+      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+      typename size_type k = y.rows();
+      if (k == 1)
+        return true;
+      
+      for (typename size_type m = 0; m < k; ++m) {
+        for (typename size_type n = m + 1; n < k; ++n) {
+          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
+            std::ostringstream message;
+            message << name << " is not symmetric. " 
+                    << name << "[" << m << "," << n << "] is %1%, but "
+                    << name << "[" << n << "," << m << "] element is " << y(n,m);
+            T_result tmp = policies::raise_domain_error<T_y>(function,
+                                                             message.str().c_str(),
+                                                             y(m,n), Policy());
+            if (result != 0)
+              *result = tmp;
+            return false;
+          }
+
+        }
+      }
+      return true;
+      }*/
 
     /**
      * Return <code>true</code> if the specified matrix is symmetric
