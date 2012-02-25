@@ -755,8 +755,8 @@ TEST(io_reader, cov_matrix_exception) {
   theta[2] = 0.6;
   theta[3] = 1.9;
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_THROW (reader.cov_matrix(2), std::runtime_error);
-  EXPECT_THROW (reader.cov_matrix(0), std::runtime_error);
+  EXPECT_THROW (reader.cov_matrix(2), std::domain_error);
+  EXPECT_THROW (reader.cov_matrix(0), std::domain_error);
 }
 TEST(io_reader,cov_matrix_constrain) {
   std::vector<int> theta_i;

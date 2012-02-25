@@ -878,7 +878,7 @@ namespace stan {
        * Return the next covariance matrix with the specified 
        * dimensionality.  
        *
-       * <p>See <code>stan::math::cov_matrix_validate(Matrix)</code>.
+       * <p>See <code>stan::math::check_cov_matrix(Matrix)</code>.
        *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
@@ -887,13 +887,9 @@ namespace stan {
        */
       matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        if (!stan::math::cov_matrix_validate(y))
-          BOOST_THROW_EXCEPTION(
-            std::runtime_error(
-              "the matrix returned is not a valid covariance matrix"));
+        stan::math::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "y");
         return y;
       }
-
 
       /**
        * Return the next covariance matrix of the specified dimensionality.
