@@ -32,6 +32,22 @@ TEST(stanMathMatrixErrorHandling, checkSimplex) {
   EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y", &result), 
                std::domain_error);
   EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y"),
-  std::domain_error);
-                  
+               std::domain_error);
+}
+TEST(stanMathMatrixErrorHandling, checkSymmetric) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  
+  y.resize(2,2);
+  y << 1, 3, 3, 1;
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+                                          y, "y", &result));
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+                                          y, "y"));
+
+  y(0,1) = 3.5;
+  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y", &result), 
+               std::domain_error);
+  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y"),
+               std::domain_error);
 }

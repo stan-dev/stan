@@ -15,19 +15,19 @@ namespace stan {
 
   namespace math {
     
-    /*template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
     inline bool check_symmetric(const char* function,
                                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                 const char* name,
                                 T_result* result = 0,
                                 const Policy& = Policy()) {
       typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
-      typename size_type k = y.rows();
+      size_type k = y.rows();
       if (k == 1)
         return true;
       
-      for (typename size_type m = 0; m < k; ++m) {
-        for (typename size_type n = m + 1; n < k; ++n) {
+      for (size_type m = 0; m < k; ++m) {
+        for (size_type n = m + 1; n < k; ++n) {
           if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
             std::ostringstream message;
             message << name << " is not symmetric. " 
@@ -44,7 +44,7 @@ namespace stan {
         }
       }
       return true;
-      }*/
+      }
 
     /**
      * Return <code>true</code> if the specified matrix is symmetric
