@@ -132,13 +132,13 @@ TEST(io_writer, corr_matrix_unconstrain_exception) {
   EXPECT_NO_THROW (writer.corr_matrix_unconstrain(y));
   
   y << 0.0, 1.0, 0.0, 0.0;
-  EXPECT_THROW (writer.corr_matrix_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.corr_matrix_unconstrain(y), std::domain_error);
 
   y.resize(0,0);
-  EXPECT_THROW (writer.corr_matrix_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.corr_matrix_unconstrain(y), std::domain_error);
 
   y.resize(1,2);
-  EXPECT_THROW (writer.corr_matrix_unconstrain(y), std::runtime_error);
+  EXPECT_THROW (writer.corr_matrix_unconstrain(y), std::domain_error);
 }
 TEST(io_writer, cov_matrix_unconstrain_exception) {
   std::vector<int> theta_i;

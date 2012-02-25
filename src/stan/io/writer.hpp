@@ -307,8 +307,7 @@ namespace stan {
        *    on log scale are unconstrained.
        */
       void corr_matrix_unconstrain(matrix_t& y) {
-        if (!stan::math::corr_matrix_validate(y))
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not a valid correlation matrix"));
+        stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", y, "y");
         size_t k = y.rows();
         size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
