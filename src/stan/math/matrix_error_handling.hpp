@@ -44,7 +44,7 @@ namespace stan {
         }
       }
       return true;
-      }
+    }
 
     /**
      * Return <code>true</code> if the specified matrix is symmetric
