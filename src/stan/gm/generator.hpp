@@ -492,19 +492,23 @@ namespace stan {
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(),o_);
-          o_ << "assert(stan::math::lb_validate(";
+          o_ << "check_greater_or_equal(function,";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.low_.expr_,o_);
-          o_ << "));" << EOL;
+          o_ << ",\"";
+          generate_loop_var(x.name_,x.dims_.size());
+          o_ << "\");" << EOL;
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + x.dims_.size(),o_);
-          o_ << "assert(stan::math::ub_validate(";
+          o_ << "check_less_or_equal(function,";
           generate_loop_var(x.name_,x.dims_.size());
-          o_ << ", ";
+          o_ << ",";
           generate_expression(x.range_.high_.expr_,o_);
-          o_ << "));" << EOL;
+          o_ << ",\"";
+          generate_loop_var(x.name_,x.dims_.size());
+          o_ << "\");" << EOL;
         }
         generate_end_for_dims(x.dims_.size());
       }
