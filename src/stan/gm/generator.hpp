@@ -532,9 +532,11 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "assert(stan::math::" << type_name << "_validate(";
+        o_ << "assert(stan::math::check_" << type_name << "(function,";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "));" << EOL;
+        o_ << ",\"";
+        generate_loop_var(x.name_,x.dims_.size());
+        o_ << "\");" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(simplex_var_decl const& x) const {
