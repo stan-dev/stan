@@ -492,7 +492,7 @@ namespace stan {
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(),o_);
-          o_ << "check_greater_or_equal(function,";
+          o_ << "check_greater_or_equal(function__,";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.low_.expr_,o_);
@@ -502,7 +502,7 @@ namespace stan {
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + x.dims_.size(),o_);
-          o_ << "check_less_or_equal(function,";
+          o_ << "check_less_or_equal(function__,";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.high_.expr_,o_);
@@ -532,7 +532,7 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "stan::math::check_" << type_name << "(function,";
+        o_ << "stan::math::check_" << type_name << "(function__,";
         generate_loop_var(x.name_,x.dims_.size());
         o_ << ",\"";
         generate_loop_var(x.name_,x.dims_.size());
@@ -1267,7 +1267,7 @@ namespace stan {
                               std::ostream& o) {
       o << INDENT << model_name << "(stan::io::var_context& context__)" << EOL;
       o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL; // resize 0 with var_resizing
-      o << INDENT2 << "static const char* function = \"" 
+      o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
@@ -1827,7 +1827,7 @@ namespace stan {
       o << INDENT << "               std::ostream& o__) {" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
-      o << INDENT2 << "static const char* function = \""
+      o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_csv(%1)\";" << EOL;
 
       // declares, reads, and writes parameters
