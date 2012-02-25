@@ -43,3 +43,4 @@ UNIT_TESTS_TO_EXCLUDE += test/file_includes/stan_gm_parser
 
 
 BUGS_EXAMPLES_TO_EXCLUDE := models/bugs_examples/vol1/inhalers/inhalers
+BUGS_EXAMPLES_TO_EXCLUDE += models/bugs_examples/vol2/birats/birats
