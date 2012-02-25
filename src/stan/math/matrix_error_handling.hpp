@@ -14,6 +14,27 @@
 namespace stan { 
 
   namespace math {
+    template <typename T_size1, typename T_size2, typename T_result = T_size1, class Policy = default_policy>
+    inline bool check_size_match(const char* function,
+                                 T_size1 i,
+                                 T_size2 j,
+                                 T_result* result = 0,
+                                 const Policy& = Policy()) {
+      using stan::math::policies::raise_domain_error;
+      typedef typename boost::common_type<T_size1,T_size2>::type common_type;
+      if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
+        std::ostringstream msg;
+        msg << "i and j must be same.  Found i=%1%, j=" << j;
+        T_result tmp = raise_domain_error<T_result,T_size1>(function,
+                                                            msg.str().c_str(),
+                                                            i,
+                                                            Policy());
+        if (result != 0)
+          *result = tmp;
+        return false;
+      }
+      return true;
+    }
     
     template <typename T_y, typename T_result = T_y, class Policy = default_policy>
     inline bool check_symmetric(const char* function,
@@ -123,6 +144,23 @@ namespace stan {
       return false;
     }
 
+    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    inline bool check_cov_matrix(const char* function,
+                                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                 const char* name,
+                                 T_result* result = 0,
+                                 const Policy& = Policy()) {
+      if (!check_size_match(function, y.rows(), y.cols(), result, Policy()))
+        return false;
+      if (!check_positive(function, y.rows(), "rows", result, Policy()))
+        return false;
+      if (!check_symmetric(function, y, "y", result, Policy()))
+        return false;
+      if (!check_pos_definite(function, y, "y", result, Policy()))
+        return false;
+      return true;
+    }
+
     /**
      * Return <code>true</code> if the specified matrix is a valid
      * covariance matrix.  A valid covariance matrix must be square,
@@ -145,6 +183,8 @@ namespace stan {
 
       return true;
     }
+
+    
 
     /**
      * Return <code>true</code> if the specified matrix is a valid
@@ -359,27 +399,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T_size1, typename T_size2, typename T_result = T_size1, class Policy = default_policy>
-    inline bool check_size_match(const char* function,
-                                 T_size1 i,
-                                 T_size2 j,
-                                 T_result* result = 0,
-                                 const Policy& = Policy()) {
-      using stan::math::policies::raise_domain_error;
-      typedef typename boost::common_type<T_size1,T_size2>::type common_type;
-      if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
-        std::ostringstream msg;
-        msg << "i and j must be same.  Found i=%1%, j=" << j;
-        T_result tmp = raise_domain_error<T_result,T_size1>(function,
-                                                            msg.str().c_str(),
-                                                            i,
-                                                            Policy());
-        if (result != 0)
-          *result = tmp;
-        return false;
-      }
-      return true;
-    }
 
   }
 }

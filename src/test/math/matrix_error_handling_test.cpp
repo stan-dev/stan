@@ -51,3 +51,23 @@ TEST(stanMathMatrixErrorHandling, checkSymmetric) {
   EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y"),
                std::domain_error);
 }
+TEST(stanMathMatrixErrorHandling, checkCovMatrix) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  
+  y.resize(3,3);
+  y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
+  EXPECT_TRUE(stan::math::check_cov_matrix("checkCovMatrix(%1%)",
+                                           y, "y", &result));
+  EXPECT_TRUE(stan::math::check_cov_matrix("checkCovMatrix(%1%)",
+                                           y, "y"));
+
+  y << 1, 2, 3, 2, 1, 2, 3, 2, 1;
+  EXPECT_THROW(stan::math::check_cov_matrix("checkCovMatrix(%1%)", y, "y", &result), 
+               std::domain_error);
+  EXPECT_THROW(stan::math::check_cov_matrix("checkCovMatrix(%1%)", y, "y"),
+               std::domain_error);
+
+}
+
+
