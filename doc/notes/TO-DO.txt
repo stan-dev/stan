@@ -25,6 +25,17 @@ TO DO FOR V1
 
 * speed tests relative to BUGS
 
+* doxygen list:
+  - stan/agrad
+  - stan/command
+  - stan/io
+  - stan/gm
+  - stan/math
+  - stan/mcmc
+  - stan/memory
+  - stan/meta
+  - stan/model
+  - stan/prob
  
 CLEANUP (ONGOING)
 =================================================
