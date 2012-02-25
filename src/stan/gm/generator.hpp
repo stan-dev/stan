@@ -1261,6 +1261,8 @@ namespace stan {
                               std::ostream& o) {
       o << INDENT << model_name << "(stan::io::var_context& context__)" << EOL;
       o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL; // resize 0 with var_resizing
+      o << INDENT2 << "static const char* function = \"" 
+        << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
@@ -1592,6 +1594,7 @@ namespace stan {
       write_csv_header_visgen vis(o);
       o << EOL << INDENT << "void write_csv_header(std::ostream& o__) {" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
+
       // parameters
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
         boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
@@ -1811,12 +1814,15 @@ namespace stan {
     };
 
     void generate_write_csv_method(const program& prog,
+                                   const std::string& model_name,
                                    std::ostream& o) {
       o << INDENT << "void write_csv(std::vector<double>& params_r__," << EOL;
       o << INDENT << "               std::vector<int>& params_i__," << EOL;
       o << INDENT << "               std::ostream& o__) {" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
+      o << INDENT2 << "static const char* function = \""
+        << model_name << "_namespace::write_csv(%1)\";" << EOL;
 
       // declares, reads, and writes parameters
       generate_comment("read-transform, write parameters",2,o);
@@ -2043,7 +2049,7 @@ namespace stan {
       generate_log_prob(prog,out);
       // FIXME: put back
       generate_write_csv_header_method(prog,out);
-      generate_write_csv_method(prog,out);
+      generate_write_csv_method(prog,model_name,out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
       generate_main(model_name,out);
