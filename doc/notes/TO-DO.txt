@@ -29,6 +29,9 @@ TO DO FOR V1
 CLEANUP (ONGOING)
 =================================================
 
+* math/error_handling
+  - generalize vector checks.
+
 * distributions: bounds checking
   - weibull
 
