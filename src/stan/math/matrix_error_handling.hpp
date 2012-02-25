@@ -70,7 +70,38 @@ namespace stan {
       return true;
     }
 
-
+    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    inline bool check_pos_definite(const char* function,
+                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                   const char* name,
+                                   T_result* result = 0,
+                                   const Policy& = Policy()) {
+      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+      if (y.rows() == 1 && y(0,0) <= CONSTRAINT_TOLERANCE) {
+        std::ostringstream message;
+        message << name << " is not positive definite. " 
+                << name << "(0,0) is %1%.";
+        T_result tmp = policies::raise_domain_error<T_y>(function,
+                                                         message.str().c_str(),
+                                                         y(0,0), Policy());
+        if (result != 0)
+          *result = tmp;
+        return false;
+      }
+      Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky = y.ldlt();
+      if((cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any())  {
+        std::ostringstream message;
+        message << name << " is not positive definite. " 
+                << name << "(0,0) is %1%.";
+        T_result tmp = policies::raise_domain_error<T_y>(function,
+                                                         message.str().c_str(),
+                                                         y(0,0), Policy());
+        if (result != 0)
+          *result = tmp;
+        return false;
+      }
+      return true;
+    }
     /**
      * Return <code>true</code> if the specified matrix is positive definite
      *
