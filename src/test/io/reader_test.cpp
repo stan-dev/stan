@@ -662,8 +662,8 @@ TEST(io_reader, corr_matrix_exception) {
   theta[3] = 0.0;
   theta[4] = 1.0;
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_THROW (reader.corr_matrix(1), std::runtime_error);
-  EXPECT_THROW (reader.corr_matrix(2), std::runtime_error);
+  EXPECT_THROW (reader.corr_matrix(1), std::domain_error);
+  EXPECT_THROW (reader.corr_matrix(2), std::domain_error);
 }
 TEST(io_reader,corr_matrix_constrain) {
   using Eigen::Matrix;

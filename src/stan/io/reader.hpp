@@ -833,7 +833,7 @@ namespace stan {
       /**
        * Returns the next correlation matrix of the specified dimensionality.
        *
-       * <p>See <code>stan::math::corr_matrix_validate(Matrix)</code>.
+       * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
        *
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
@@ -841,10 +841,7 @@ namespace stan {
        */
       matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        if (!stan::math::corr_matrix_validate(x))
-          BOOST_THROW_EXCEPTION(
-            std::runtime_error(
-              "the matrix returned is not a valid correlation matrix"));
+        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "x");
         return x;
       }
 
