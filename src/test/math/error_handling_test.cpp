@@ -413,11 +413,6 @@ TEST(MathErrorHandling,CheckBoundedErrnoPolicyHigh) {
 
 // ----------  ----------
 //TEST(MathErrorHandling,)
-TEST(MathErrorHandling,identity_validate) {
-  double x = 1.2;
-  EXPECT_EQ(true, stan::math::identity_validate(x));
-}
-
 TEST(MathErrorHandling,CheckGreaterDefaultPolicy) {
   const char* function = "check_greater(%1%)";
   double x = 10.0;

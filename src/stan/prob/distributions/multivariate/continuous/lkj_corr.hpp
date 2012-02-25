@@ -50,7 +50,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_covar, T_shape>::type
     lkj_corr_cholesky_log(const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
                           const T_shape& eta, 
-			  const Policy& = Policy() ) {
+                          const Policy& = Policy() ) {
       static const char* function = "stan::prob::lkj_corr_cholesky_log<%1%>(%1%)";
 
       using boost::math::tools::promote_args;
@@ -58,7 +58,7 @@ namespace stan {
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
       if (!check_positive(function, eta, "eta", &lp, Policy()))
-	return lp;      
+        return lp;      
 
       const unsigned int K = L.rows();
       if (K == 0)
@@ -80,8 +80,8 @@ namespace stan {
               class Policy = stan::math::default_policy>
     inline typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
-		 const T_shape& eta, 
-		 const Policy& = Policy() ) {
+                 const T_shape& eta, 
+                 const Policy& = Policy() ) {
       static const char* function = "stan::prob::lkj_corr_log<%1%>(%1%)";
 
       using stan::math::check_size_match;
@@ -92,13 +92,13 @@ namespace stan {
       
       typename promote_args<T_y,T_shape>::type lp;
       if (!check_positive(function, eta, "eta", &lp, Policy()))
-	return lp;      
+        return lp;      
       if (!check_size_match(function, y.rows(), y.cols(), &lp, Policy()))
         return lp;
       if (!check_not_nan(function, y, "y", &lp, Policy())) 
         return lp;
-      if (!check_corr_matrix(function, y, &lp, Policy())) {
-	return lp;
+      if (!check_corr_matrix(function, y, "y", &lp, Policy())) {
+        return lp;
       }
       
       const unsigned int K = y.rows();
