@@ -43,13 +43,8 @@ CLEANUP (ONGOING)
 * math/error_handling
   - generalize vector checks.
 
-* distributions: bounds checking
-  - weibull
-
 * convert unsigned int return types to signed long
   or size_t
-  - generated leuk.cpp: 168, 207
-  - change "zu" to "lu"
   - math/error_handling.hpp: 201. comparison of unsigned int.
 
 * const declarations wherever possible
