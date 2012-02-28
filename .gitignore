@@ -15,3 +15,6 @@
 
 # depedencies files
 *.d
+.Rproj.user
+stan.Rproj
+
