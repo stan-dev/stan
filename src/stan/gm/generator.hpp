@@ -1794,7 +1794,7 @@ namespace stan {
         }
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "for (size_t k_" << i << " = 0;"
+          o_ << "for (int k_" << i << " = 0;"
              << " k_" << i << " < ";
           generate_expression(dims[i],o_);
           o_ << "; ++k_" << i << ") {" << EOL;
