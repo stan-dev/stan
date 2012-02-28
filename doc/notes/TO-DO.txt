@@ -43,10 +43,6 @@ CLEANUP (ONGOING)
 * math/error_handling
   - generalize vector checks.
 
-* convert unsigned int return types to signed long
-  or size_t
-  - math/error_handling.hpp: 201. comparison of unsigned int.
-
 * const declarations wherever possible
   - work bottom up, but it's tricky at this late date
 
