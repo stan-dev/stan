@@ -1,0 +1,3 @@
+useDynLib(rstan)
+exportPattern("^[[:alpha:]]+")
+import( Rcpp )
