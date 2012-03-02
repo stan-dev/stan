@@ -27,7 +27,6 @@ transformed data {
 
 parameters {
   real(0,) sigmasq_y; 
-  real(0,) sigmasq_y0; 
   real(0,) sigmasq_alpha; 
   real(0,) sigmasq_beta; 
   real(0,) sigma_mu0; 
