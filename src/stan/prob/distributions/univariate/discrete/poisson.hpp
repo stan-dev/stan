@@ -6,14 +6,16 @@
 #include <stan/prob/traits.hpp>
 
 namespace stan {
+
   namespace prob {
+
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <bool propto = false,
+    template <bool propto,
               typename T_rate, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_rate>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_rate>::type
     poisson_log(const unsigned int n, const T_rate& lambda, 
-                const Policy& = Policy()) {
+                const Policy&) {
 
       static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
       
@@ -46,6 +48,31 @@ namespace stan {
       return lp;
     }
     
+    template <bool propto,
+              typename T_rate>
+    inline
+    typename boost::math::tools::promote_args<T_rate>::type
+    poisson_log(const unsigned int n, const T_rate& lambda) {
+      return poisson_log<propto>(n,lambda,stan::math::default_policy());
+    }
+
+
+    template <typename T_rate, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_rate>::type
+    poisson_log(const unsigned int n, const T_rate& lambda, 
+                const Policy&) {
+      return poisson_log<false>(n,lambda,Policy());
+    }
+
+
+    template <typename T_rate>
+    inline
+    typename boost::math::tools::promote_args<T_rate>::type
+    poisson_log(const unsigned int n, const T_rate& lambda) {
+      return poisson_log<false>(n,lambda,stan::math::default_policy());
+    }
 
 
   }

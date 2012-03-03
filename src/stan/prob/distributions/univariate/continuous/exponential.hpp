@@ -78,7 +78,7 @@ namespace stan {
      */
     template <typename T_y, 
               typename T_inv_scale, 
-              class Policy = boost::math::policies::policy<> >
+              class Policy>
     inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
     exponential_p(const T_y& y, 
                   const T_inv_scale& beta, 

@@ -7,9 +7,9 @@
 #include <stan/prob/traits.hpp>
 
 namespace stan {
+
   namespace prob {
-    // Dirichlet(theta|alpha)    [0 <= theta[n] <= 1;  SUM theta = 1;
-    //                            0 < alpha[n]]
+
     /**
      * The log of the Dirichlet density for the given theta and
      * a vector of prior sample sizes, alpha.
@@ -28,19 +28,20 @@ namespace stan {
      * @param theta A scalar vector.
      * @param alpha Prior sample sizes.
      * @return The log of the Dirichlet density.
-     * @throw std::domain_error if any element of alpha is less than or equal to 0.
+     * @throw std::domain_error if any element of alpha is less than
+     * or equal to 0.
      * @throw std::domain_error if any element of theta is less than 0.
      * @throw std::domain_error if the sum of theta is not 1.
      * @tparam T_prob Type of scalar.
      * @tparam T_prior_sample_size Type of prior sample sizes.
      */
-    template <bool propto = false,
+    template <bool propto,
               typename T_prob, typename T_prior_sample_size, 
-              class Policy = stan::math::default_policy> 
-    inline typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-                  const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
-                  const Policy& = Policy()) {
+              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
+              const Policy&) {
       // FIXME: parameter check
       using boost::math::tools::promote_args;
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
@@ -56,6 +57,35 @@ namespace stan {
           lp += multiply_log(alpha[k]-1, theta[k]);
       return lp;
     }
+
+    template <bool propto,
+              typename T_prob, typename T_prior_sample_size>
+    inline
+    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
+    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
+          const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
+      return dirichlet_log<propto>(theta,alpha,stan::math::default_policy());
+    }
+
+
+    template <typename T_prob, typename T_prior_sample_size, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
+    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
+              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
+              const Policy&) {
+      return dirichlet_log<false>(theta,alpha,Policy());
+    }
+
+    template <typename T_prob, typename T_prior_sample_size>
+    inline
+    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
+    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
+            const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
+      return dirichlet_log<false>(theta,alpha,stan::math::default_policy());
+    }
+
 
   }
 }

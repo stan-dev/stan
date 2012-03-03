@@ -13,12 +13,13 @@ namespace stan {
   namespace prob {
     // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;   
     //                            0 <= theta[n] <= 1;  SUM theta = 1]
-    template <bool propto = false,
-              typename T_prob, class Policy = boost::math::policies::policy<> >
-    inline typename boost::math::tools::promote_args<T_prob>::type
+    template <bool propto,
+              typename T_prob, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
-                    const Policy& = Policy()) {
+                    const Policy&) {
       static const char* function = "stan::prob::multinomial_log<%1%>(%1%)";
 
       using stan::math::check_positive;
@@ -29,7 +30,8 @@ namespace stan {
       typename promote_args<T_prob>::type lp(0.0);
       if (!check_positive(function, ns, "Sample sizes, ns,", &lp, Policy()))
         return lp;
-      if (!check_simplex(function, theta, "Probabilities, theta,", &lp, Policy()))
+      if (!check_simplex(function, theta, "Probabilities, theta,", 
+                         &lp, Policy()))
         return lp;
       if (!check_size_match(function, ns.size(), theta.rows(), &lp, Policy()))
         return lp;
@@ -49,6 +51,31 @@ namespace stan {
       return lp;
     }
 
+
+    template <bool propto,
+              typename T_prob>
+    typename boost::math::tools::promote_args<T_prob>::type
+    multinomial_log(const std::vector<int>& ns,
+                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+      return multinomial_log<propto>(ns,theta,stan::math::default_policy());
+    }
+
+    template <typename T_prob, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_prob>::type
+    multinomial_log(const std::vector<int>& ns,
+                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
+                    const Policy&) {
+      return multinomial_log<false>(ns,theta,Policy());
+    }
+
+
+    template <typename T_prob>
+    typename boost::math::tools::promote_args<T_prob>::type
+    multinomial_log(const std::vector<int>& ns,
+                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+      return multinomial_log<false>(ns,theta,stan::math::default_policy());
+    }
 
   }
 }

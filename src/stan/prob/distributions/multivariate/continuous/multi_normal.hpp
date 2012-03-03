@@ -27,14 +27,14 @@ namespace stan {
      * @tparam T_loc Type of location.
      * @tparam T_covar Type of scale.
      */
-    template <bool propto = false, 
+    template <bool propto,
               typename T_y, typename T_loc, typename T_covar, 
-              class Policy = boost::math::policies::policy<> > 
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                     const Policy& = Policy()) {
+             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+             const Policy&) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
       using stan::math::check_size_match;
@@ -73,12 +73,46 @@ namespace stan {
       if (include_summand<propto,T_covar>::value)
         lp -= multiply_log(0.5,determinant(Sigma));
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename boost::math::tools::promote_args<T_y,T_loc>::type, Eigen::Dynamic, 1> diff 
+        Eigen::Matrix<typename
+                      boost::math::tools::promote_args<T_y,T_loc>::type, 
+                      Eigen::Dynamic, 1> diff 
           = subtract(y,mu);
         lp -= 0.5 * multiply(multiply(transpose(diff),inverse(Sigma)),
                              diff);
       }
       return lp;
+    }
+
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_log<propto>(y,mu,Sigma,stan::math::default_policy());
+    }
+
+
+    template <typename T_y, typename T_loc, typename T_covar, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+             const Policy&) {
+      return multi_normal_log<false>(y,mu,Sigma,Policy());
+    }
+
+
+    template <typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_log<false>(y,mu,Sigma,stan::math::default_policy());
     }
 
     /**
@@ -98,14 +132,14 @@ namespace stan {
      * @tparam T_loc Type of location.
      * @tparam T_covar Type of scale.
      */
-    template <bool propto = false, 
+    template <bool propto,
               typename T_y, typename T_loc, typename T_covar, 
-              class Policy = boost::math::policies::policy<> > 
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                              const Policy& = Policy()) {
+                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
+                  const Policy&) {
       static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
 
       using stan::math::multiply;
@@ -145,16 +179,51 @@ namespace stan {
                 .solve(Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>
                        ::Identity(L.rows(),L.rows())));
         
-        Eigen::Matrix<typename boost::math::tools::promote_args<T_covar,T_loc,T_y>::type, Eigen::Dynamic, 1> 
+        Eigen::Matrix<typename 
+                      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+                      Eigen::Dynamic, 1> 
           half(multiply(L_inv,
                         subtract(y,mu)));
 
-        lp -= 0.5 * half.dot(half);  // FIXME:  add dot_self function + deriv, fold in half
+        lp -= 0.5 * half.dot(half);  
+        // FIXME:  add dot_self function + deriv, fold in half
 
       }
       return lp;
     }
-     
+
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      return multi_normal_cholesky_log<propto>(y,mu,L,
+                                               stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_loc, typename T_covar, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
+                  const Policy&) {
+      return multi_normal_cholesky_log<false>(y,mu,L,Policy());
+    }
+
+    template <typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      return multi_normal_cholesky_log<false>(y,mu,L,
+                                              stan::math::default_policy());
+    }
+
   }
 }
 
