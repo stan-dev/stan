@@ -5,8 +5,8 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 
-
 namespace stan {
+
   namespace prob {
 
     // Beta(y|alpha,beta)  [alpha > 0;  beta > 0;  0 <= y <= 1]
@@ -29,12 +29,13 @@ namespace stan {
      *    @li alpha must be positive and finite.
      *    @li beta must be positive and finite.
      */
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+              class Policy>
+    typename
+    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy& = Policy()) {
+             const Policy&) {
       static const char* function = "stan::prob::beta_log<%1%>(%1%)";
       
       using stan::math::check_positive;
@@ -80,6 +81,32 @@ namespace stan {
       if (include_summand<propto,T_y,T_scale_fail>::value)
         lp += (beta - 1.0) * log1m(y);
       return lp;
+    }
+
+    template <bool propto,
+              typename T_y, typename T_scale_succ, typename T_scale_fail>
+    inline 
+    typename 
+    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
+      return beta_log<propto>(y,alpha,beta,stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail,
+              class Policy>
+    typename 
+    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
+             const Policy&) {
+      return beta_log<false>(y,alpha,beta,Policy());
+    }
+
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
+    inline 
+    typename 
+    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
+      return beta_log<false>(y,alpha,beta,stan::math::default_policy());
     }
 
   }

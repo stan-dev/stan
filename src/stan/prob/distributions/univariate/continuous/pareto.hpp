@@ -9,11 +9,12 @@ namespace stan {
   namespace prob {
 
     // Pareto(y|y_m,alpha)  [y > y_m;  y_m > 0;  alpha > 0]
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_scale, typename T_shape, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
-    pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha, const Policy& = Policy()) {
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
+    pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha, 
+               const Policy&) {
       static const char* function = "stan::prob::pareto_log<%1%>(%1%)";
       
       using stan::math::check_finite;
@@ -24,13 +25,17 @@ namespace stan {
       typename promote_args<T_y,T_scale,T_shape>::type lp;
       if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
-      if (!check_finite(function, y_min, "Scale parameter, y_min,", &lp, Policy()))
+      if (!check_finite(function, y_min, "Scale parameter, y_min,",
+                        &lp, Policy()))
         return lp;
-      if (!check_positive(function, y_min, "Scale parameter, y_min,", &lp, Policy()))
+      if (!check_positive(function, y_min, "Scale parameter, y_min,", 
+                          &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if (!check_finite(function, alpha, "Shape parameter, alpha,", 
+                        &lp, Policy()))
         return lp;
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if (!check_positive(function, alpha, "Shape parameter, alpha,", 
+                          &lp, Policy()))
         return lp;
       
       if (y < y_min)
@@ -47,6 +52,32 @@ namespace stan {
         lp -= multiply_log(alpha+1.0, y);
       return lp;
     }
+
+
+    template <bool propto,
+              typename T_y, typename T_scale, typename T_shape>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
+    pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
+      return pareto_log<propto>(y,y_min,alpha,stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_scale, typename T_shape, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
+    pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha, 
+               const Policy&) {
+      return pareto_log<false>(y,y_min,alpha,Policy());
+    }
+
+    template <typename T_y, typename T_scale, typename T_shape>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
+    pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
+      return pareto_log<false>(y,y_min,alpha,stan::math::default_policy());
+    }
+
 
   }
 }

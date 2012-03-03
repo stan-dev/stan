@@ -7,12 +7,14 @@
 
 namespace stan {
   namespace prob {
+
     // LogNormal(y|mu,sigma)  [y >= 0;  sigma > 0]
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_loc, typename T_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+                  const Policy&) {
       static const char* function = "stan::prob::lognormal_log<%1%>(%1%)";
 
       using stan::math::check_not_nan;
@@ -23,11 +25,14 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_scale>::type lp;
       if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter, mu,", 
+                        &lp, Policy()))
         return lp;
-      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", 
+                        &lp, Policy()))
         return lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+                          &lp, Policy()))
         return lp;
       
       if (y <= 0)
@@ -48,10 +53,38 @@ namespace stan {
       return lp;
     }
 
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_scale>
+    inline 
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      return lognormal_log<propto>(y,mu,sigma,stan::math::default_policy());
+    }
+
     template <typename T_y, typename T_loc, typename T_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    lognormal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy& = Policy()) {
+              class Policy>
+    inline 
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+                  const Policy&) {
+      return lognormal_log<false>(y,mu,sigma,Policy());
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      return lognormal_log<false>(y,mu,sigma,stan::math::default_policy());
+    }
+
+
+
+
+    template <typename T_y, typename T_loc, typename T_scale, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    lognormal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+                const Policy&) {
       static const char* function = "stan::prob::lognormal_p<%1%>(%1%)";
 
       using stan::math::check_not_nan;
@@ -64,12 +97,21 @@ namespace stan {
         return lp;
       if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
         return lp;
-      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", 
+                        &lp, Policy()))
         return lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+                          &lp, Policy()))
         return lp;
 
       return 0.5 * erfc(-(log(y) - mu)/(sigma * SQRT_2));
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    lognormal_p(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      return lognormal_p(y,mu,sigma,stan::math::default_policy());
     }
     
   }

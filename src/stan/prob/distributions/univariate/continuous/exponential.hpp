@@ -6,7 +6,9 @@
 #include <stan/prob/constants.hpp>
 
 namespace stan {
+  
   namespace prob {
+
     /**
      * The log of an exponential density for y with the specified
      * inverse scale parameter.
@@ -33,12 +35,12 @@ namespace stan {
      * @tparam T_y Type of scalar.
      * @tparam T_inv_scale Type of inverse scale.
      */
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_inv_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta, 
-                    const Policy& = Policy()) {
+                    const Policy&) {
       static const char* function = "stan::prob::exponential_log<%1%>(%1%)";
 
       using stan::math::check_finite;
@@ -102,6 +104,33 @@ namespace stan {
 
       return 1.0 - exp(-beta * y);
     }
+
+
+    template <bool propto,
+              typename T_y, typename T_inv_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_log(const T_y& y, const T_inv_scale& beta) {
+      return exponential_log<propto>(y,beta,stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_inv_scale,
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_log(const T_y& y, const T_inv_scale& beta, const Policy&) {
+      return exponential_log<false>(y,beta,Policy());
+    }
+
+    template <typename T_y, typename T_inv_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_log(const T_y& y, const T_inv_scale& beta) {
+      return exponential_log<false>(y,beta,stan::math::default_policy());
+    }
+
+
+    
 
 
   }
