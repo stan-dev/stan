@@ -8,13 +8,13 @@
 ##
 
 ifeq (g++,$(CC_TYPE))
-  CFLAGS += -std=gnu++0x
+#  CFLAGS += -std=gnu++0x
   CFLAGS += -g
   CFLAGS += -Wno-unused-function
   PCH = .gch
 endif
 ifeq (clang++,$(CC_TYPE))
-  CFLAGS += -Wno-c++0x-extensions
+#  CFLAGS += -Wno-c++0x-extensions
   CFLAGS += -Wno-unused-function
   CFLAGS += -g
   CFLAGS += -Wno-tautological-compare

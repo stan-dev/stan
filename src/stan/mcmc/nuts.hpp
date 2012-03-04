@@ -27,7 +27,7 @@ namespace stan {
      * <code>prob_grad</code>.  
      *
      */
-    template <typename BaseRNG = boost::mt19937>
+    template <class BaseRNG = boost::mt19937>
     class nuts : public adaptive_sampler {
     private:
 
