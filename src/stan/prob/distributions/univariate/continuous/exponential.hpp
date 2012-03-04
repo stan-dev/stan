@@ -63,49 +63,6 @@ namespace stan {
       return lp;
     }
     
-    /**
-     * Calculates the exponential cumulative distribution function for
-     * the given y and beta.
-     *
-     * Inverse scale parameter must be greater than 0.
-     * y must be greater than or equal to 0.
-     * 
-     * @param y A scalar variable.
-     * @param beta Inverse scale parameter.
-     * @tparam T_y Type of scalar.
-     * @tparam T_inv_scale Type of inverse scale.
-     * @tparam Policy Error-handling policy.
-     */
-    template <typename T_y, 
-              typename T_inv_scale, 
-              class Policy>
-    inline typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
-    exponential_p(const T_y& y, 
-                  const T_inv_scale& beta, 
-                  const Policy& = Policy()) {
-
-      static const char* function = "stan::prob::exponential_p<%1%>(%1%)";
-
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using boost::math::tools::promote_args;
-
-      typename promote_args<T_y,T_inv_scale>::type lp;
-      if(!check_not_nan(function, y, "Random variate y", &lp, Policy()))
-        return lp;
-      if(!check_finite(function, beta, "Inverse scale", &lp, Policy()))
-        return lp;
-      if(!check_positive(function, beta, "Inverse scale", &lp, Policy()))
-        return lp;
-      
-      if (y < 0)
-        return 1.0;
-
-      return 1.0 - exp(-beta * y);
-    }
-
-
     template <bool propto,
               typename T_y, typename T_inv_scale>
     inline
@@ -130,6 +87,57 @@ namespace stan {
     }
 
 
+
+    /**
+     * Calculates the exponential cumulative distribution function for
+     * the given y and beta.
+     *
+     * Inverse scale parameter must be greater than 0.
+     * y must be greater than or equal to 0.
+     * 
+     * @param y A scalar variable.
+     * @param beta Inverse scale parameter.
+     * @tparam T_y Type of scalar.
+     * @tparam T_inv_scale Type of inverse scale.
+     * @tparam Policy Error-handling policy.
+     */
+    template <typename T_y, 
+              typename T_inv_scale, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_p(const T_y& y, 
+                  const T_inv_scale& beta, 
+                  const Policy&) {
+
+      static const char* function = "stan::prob::exponential_p<%1%>(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_not_nan;
+      using boost::math::tools::promote_args;
+
+      typename promote_args<T_y,T_inv_scale>::type lp;
+      if(!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+        return lp;
+      if(!check_finite(function, beta, "Inverse scale", &lp, Policy()))
+        return lp;
+      if(!check_positive(function, beta, "Inverse scale", &lp, Policy()))
+        return lp;
+      
+      if (y < 0)
+        return 1.0;
+
+      return 1.0 - exp(-beta * y);
+    }
+
+    template <typename T_y, 
+              typename T_inv_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    exponential_p(const T_y& y, 
+                  const T_inv_scale& beta) {
+      return exponential_p(y,beta,stan::math::default_policy());
+    }
     
 
 
