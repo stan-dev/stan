@@ -14,12 +14,14 @@
 namespace stan { 
 
   namespace math {
-    template <typename T_size1, typename T_size2, typename T_result = T_size1, class Policy = default_policy>
+
+    template <typename T_size1, typename T_size2, typename T_result,
+              class Policy>
     inline bool check_size_match(const char* function,
                                  T_size1 i,
                                  T_size2 j,
-                                 T_result* result = 0,
-                                 const Policy& = Policy()) {
+                                 T_result* result,
+                                 const Policy&) {
       using stan::math::policies::raise_domain_error;
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
       if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
@@ -35,7 +37,27 @@ namespace stan {
       }
       return true;
     }
+
+    template <typename T_size1, typename T_size2, typename T_result>
+    inline
+    bool check_size_match(const char* function,
+                          T_size1 i,
+                          T_size2 j,
+                          T_result* result) {
+      return check_size_match(function,i,j,result,default_policy());
+    }
+
+    template <typename T_size1, typename T_size2>
+    inline
+    bool check_size_match(const char* function,
+                          T_size1 i,
+                          T_size2 j,
+                          T_size1* result = 0) {
+      return check_size_match(function,i,j,result,default_policy());
+    }
     
+
+
     /**
      * Return <code>true</code> if the specified matrix is symmetric
      * 
@@ -45,38 +67,59 @@ namespace stan {
      * @return <code>true</code> if the matrix is symmetric.
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_symmetric(const char* function,
-                                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                const char* name,
-                                T_result* result = 0,
-                                const Policy& = Policy()) {
-      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                const char* name,
+                T_result* result,
+                const Policy&) {
+      typedef 
+        typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+        size_type;
       size_type k = y.rows();
       if (k == 1)
         return true;
-      
       for (size_type m = 0; m < k; ++m) {
         for (size_type n = m + 1; n < k; ++n) {
           if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
             std::ostringstream message;
             message << name << " is not symmetric. " 
                     << name << "[" << m << "," << n << "] is %1%, but "
-                    << name << "[" << n << "," << m << "] element is " << y(n,m);
-            T_result tmp = policies::raise_domain_error<T_y>(function,
-                                                             message.str().c_str(),
-                                                             y(m,n), Policy());
+                    << name << "[" << n << "," << m 
+                    << "] element is " << y(n,m);
+            T_result tmp 
+              = policies::raise_domain_error<T_y>(function,
+                                                  message.str().c_str(),
+                                                  y(m,n), Policy());
             if (result != 0)
               *result = tmp;
             return false;
           }
-
         }
       }
       return true;
     }
 
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+
+    template <typename T_y, typename T_result>
+    inline bool check_symmetric(const char* function,
+                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                const char* name,
+                T_result* result) {
+      return check_symmetric(function,y,name,result,default_policy());
+    }
+
+    template <typename T>
+    inline bool check_symmetric(const char* function,
+                const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                const char* name,
+                T* result = 0) {
+      return check_symmetric(function,y,name,result,default_policy());
+    }
+
+
+
+
     /**
      * Return <code>true</code> if the specified matrix is positive definite
      *
@@ -86,12 +129,15 @@ namespace stan {
      * @return <code>true</code> if the matrix is positive definite.
      * @tparam T Type of scalar.
      */
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_pos_definite(const char* function,
-                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                   const char* name,
-                                   T_result* result = 0,
-                                   const Policy& = Policy()) {
-      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result,
+                  const Policy&) {
+      typedef 
+        typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+        size_type;
       if (y.rows() == 1 && y(0,0) <= CONSTRAINT_TOLERANCE) {
         std::ostringstream message;
         message << name << " is not positive definite. " 
@@ -103,7 +149,8 @@ namespace stan {
           *result = tmp;
         return false;
       }
-      Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky = y.ldlt();
+      Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
+        = y.ldlt();
       if((cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any())  {
         std::ostringstream message;
         message << name << " is not positive definite. " 
@@ -118,6 +165,27 @@ namespace stan {
       return true;
     }
 
+
+    template <typename T_y, typename T_result>
+    inline bool check_pos_definite(const char* function,
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result) {
+      return check_pos_definite(function,y,name,result,default_policy());
+    }
+
+
+    template <typename T>
+    inline bool check_pos_definite(const char* function,
+                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T* result = 0) {
+      return check_pos_definite(function,y,name,result,default_policy());
+    }
+
+
+
+
     /**
      * Return <code>true</code> if the specified matrix is a valid
      * covariance matrix.  A valid covariance matrix must be square,
@@ -127,12 +195,12 @@ namespace stan {
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_cov_matrix(const char* function,
-                                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                 const char* name,
-                                 T_result* result = 0,
-                                 const Policy& = Policy()) {
+                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                 const char* name,
+                 T_result* result,
+                 const Policy&) {
       if (!check_size_match(function, y.rows(), y.cols(), result, Policy())) 
         return false;
       if (!check_positive(function, y.rows(), "rows", result, Policy()))
@@ -143,6 +211,24 @@ namespace stan {
         return false;
       return true;
     }
+
+    template <typename T_y, typename T_result>
+    inline bool check_cov_matrix(const char* function,
+                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                 const char* name,
+                 T_result* result) {
+      return check_cov_matrix(function,y,name,result,default_policy());
+    }
+
+
+    template <typename T>
+    inline bool check_cov_matrix(const char* function,
+                 const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                 const char* name,
+                 T* result = 0) {
+      return check_cov_matrix(function,y,name,result,default_policy());
+    }
+
 
 
     /**
@@ -156,26 +242,29 @@ namespace stan {
      * correlation matrix.
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_corr_matrix(const char* function,
-                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                  const char* name,
-                                  T_result* result = 0,
-                                  const Policy& = Policy()) {
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result,
+                  const Policy&) {
       if (!check_size_match(function, y.rows(), y.cols(), result, Policy())) 
         return false;
       if (!check_positive(function, y.rows(), "rows", result, Policy()))
         return false;
       if (!check_symmetric(function, y, "y", result, Policy()))
         return false;
-      for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type k = 0; k < y.rows(); ++k) {
+      for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type
+             k = 0; k < y.rows(); ++k) {
         if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE) {
           std::ostringstream message;
           message << name << " is not a valid correlation matrix. " 
-                  << name << "(" << k << "," << k << ") is %1%, but should be near 1.0";
-          T_result tmp = policies::raise_domain_error<T_y>(function,
-                                                           message.str().c_str(),
-                                                           y(k,k), Policy());
+                  << name << "(" << k << "," << k 
+                  << ") is %1%, but should be near 1.0";
+          T_result tmp 
+            = policies::raise_domain_error<T_y>(function,
+                                                message.str().c_str(),
+                                                y(k,k), Policy());
           if (result != 0)
             *result = tmp;
           return false;
@@ -185,12 +274,33 @@ namespace stan {
         return false;
       return true;
     }
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+
+
+    template <typename T_y, typename T_result>
+    inline bool check_corr_matrix(const char* function,
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result) {
+      return check_corr_matrix(function,y,name,result,default_policy());
+    }
+
+    template <typename T>
+    inline bool check_corr_matrix(const char* function,
+                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T* result = 0) {
+      return check_corr_matrix(function,y,name,result,default_policy());
+    }
+
+
+
+
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_not_nan(const char* function,
                               const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                               const char* name,
-                              T_result* result = 0,
-                              const Policy& = Policy()) {
+                              T_result* result,
+                              const Policy&) {
       using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (boost::math::isnan(y[i])) {
@@ -208,21 +318,39 @@ namespace stan {
       return true;
     }
 
-
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    template <typename T_y, typename T_result>
     inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                               const char* name,
-                              T_result* result = 0,
-                              const Policy& = Policy()) {
+                              T_result* result) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+
+    template <typename T>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
+                              const char* name,
+                              T* result = 0) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result,
+                  const Policy&) {
       for (int i = 0; i < y.rows(); i++) {
         for (int j = 0; j < y.cols(); j++) {
           if (boost::math::isnan(y(i,j))) {
             std::ostringstream message;
-            message << name << "[" << i << "," << j << "] is %1%, but must not be nan!";
-            T_result tmp = policies::raise_domain_error<T_y>(function,
-                                                             message.str().c_str(),
-                                                             y(i,j), Policy());
+            message << name << "[" << i << "," << j 
+                    << "] is %1%, but must not be nan!";
+            T_result tmp
+              = policies::raise_domain_error<T_y>(function,
+                                                  message.str().c_str(),
+                                                  y(i,j), Policy());
             if (result != 0)
               *result = tmp;
             return false;
@@ -232,13 +360,31 @@ namespace stan {
       return true;
     }
 
+    template <typename T_y, typename T_result>
+    inline bool check_not_nan(const char* function,
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
 
-    template <typename T_y, typename T_result = T_y, class Policy = default_policy>
+    template <typename T>
+    inline bool check_not_nan(const char* function,
+                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T* result = 0) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+
+
+
+
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_finite(const char* function,
                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                              const char* name,
-                             T_result* result = 0,
-                             const Policy& = Policy()) {
+                             T_result* result,
+                             const Policy&) {
       using stan::math::policies::raise_domain_error;
       for (int i = 0; i < y.rows(); i++) {
         if (!boost::math::isfinite(y[i])) {
@@ -256,6 +402,25 @@ namespace stan {
       return true;
     }
 
+    template <typename T_y, typename T_result>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T_result* result) {
+      return check_finite(function,y,name,result,default_policy());
+    }
+
+    template <typename T>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T* result = 0) {
+      return check_finite(function,y,name,result,default_policy());
+    }
+
+
+
+
     /**
      * Return <code>true</code> if the specified matrix is a valid
      * covariance matrix.  A valid covariance matrix must be symmetric
@@ -266,12 +431,13 @@ namespace stan {
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
-    template <typename T_covar, typename T_result = T_covar, class Policy = default_policy>
+    template <typename T_covar, typename T_result, class Policy>
     inline bool check_cov_matrix(const char* function,
-                                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                                 T_result* result = 0,
-                                 const Policy& = Policy()) {
-      if (!check_size_match(function, Sigma.rows(), Sigma.cols(), result, Policy())) 
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+         T_result* result,
+         const Policy&) {
+      if (!check_size_match(function, Sigma.rows(), Sigma.cols(),
+                            result, Policy())) 
         return false;
       if (!check_positive(function, Sigma.rows(), "rows", result, Policy()))
         return false;
@@ -280,6 +446,21 @@ namespace stan {
       return true;
     }
 
+    template <typename T_covar, typename T_result>
+    inline bool check_cov_matrix(const char* function,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+         T_result* result) {
+      return check_cov_matrix(function,Sigma,result,default_policy());
+      
+    }
+
+    template <typename T>
+    inline bool check_cov_matrix(const char* function,
+         const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+         T* result = 0) {
+      return check_cov_matrix(function,Sigma,result,default_policy());
+      
+    }
 
 
 
