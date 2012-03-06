@@ -1506,8 +1506,8 @@ namespace stan {
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
 
-      // o << INDENT2 << "params_r__ = writer.data_r();" << EOL;
-      // o << INDENT2 << "params_i__ = writer.data_i();" << EOL;
+      o << INDENT2 << "params_r__ = writer__.data_r();" << EOL;
+      o << INDENT2 << "params_i__ = writer__.data_i();" << EOL;
       o << INDENT << "}" << EOL;
     }
 
