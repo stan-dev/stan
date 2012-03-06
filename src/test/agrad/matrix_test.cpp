@@ -2030,3 +2030,427 @@ TEST(agrad_matrix,mv_lp_norm_inf) {
   EXPECT_FLOAT_EQ(0.0,g[3]); 
 }  
 
+TEST(agradMatrix,multiply_scalar_vector_cv) {
+  using stan::agrad::multiply;
+  vector_v x(3);
+  x << 1, 2, 3;
+  AVEC x_ind = createAVEC(x(0),x(1),x(2));
+  vector_v y = multiply(2.0,x);
+  EXPECT_FLOAT_EQ(2.0,y(0).val());
+  EXPECT_FLOAT_EQ(4.0,y(1).val());
+  EXPECT_FLOAT_EQ(6.0,y(2).val());
+
+  VEC g = cgradvec(y(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+}
+TEST(agradMatrix,multiply_scalar_vector_vv) {
+  using stan::agrad::multiply;
+  vector_v x(3);
+  x << 1, 4, 9;
+  AVAR two = 2.0;
+  AVEC x_ind = createAVEC(x(0),x(1),x(2),two);
+  vector_v y = multiply(two,x);
+  EXPECT_FLOAT_EQ(2.0,y(0).val());
+  EXPECT_FLOAT_EQ(8.0,y(1).val());
+  EXPECT_FLOAT_EQ(18.0,y(2).val());
+
+  VEC g = cgradvec(y(1),x_ind);
+  EXPECT_FLOAT_EQ(0.0,g[0]);
+  EXPECT_FLOAT_EQ(2.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+  EXPECT_FLOAT_EQ(4.0,g[3]);
+}
+TEST(agradMatrix,multiply_scalar_vector_vc) {
+  using stan::agrad::multiply;
+  vector_v x(3);
+  x << 1, 2, 3;
+  AVAR two = 2.0;
+  AVEC x_ind = createAVEC(two);
+  vector_v y = multiply(two,x);
+  EXPECT_FLOAT_EQ(2.0,y(0).val());
+  EXPECT_FLOAT_EQ(4.0,y(1).val());
+  EXPECT_FLOAT_EQ(6.0,y(2).val());
+
+  VEC g = cgradvec(y(2),x_ind);
+  EXPECT_FLOAT_EQ(3.0,g[0]);
+}
+
+TEST(agradMatrix,multiply_scalar_row_vector_cv) {
+  using stan::agrad::multiply;
+  row_vector_v x(3);
+  x << 1, 2, 3;
+  AVEC x_ind = createAVEC(x(0),x(1),x(2));
+  row_vector_v y = multiply(2.0,x);
+  EXPECT_FLOAT_EQ(2.0,y(0).val());
+  EXPECT_FLOAT_EQ(4.0,y(1).val());
+  EXPECT_FLOAT_EQ(6.0,y(2).val());
+
+  VEC g = cgradvec(y(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+}
+TEST(agradMatrix,multiply_scalar_row_vector_vv) {
+  using stan::agrad::multiply;
+  row_vector_v x(3);
+  x << 1, 4, 9;
+  AVAR two = 2.0;
+  AVEC x_ind = createAVEC(x(0),x(1),x(2),two);
+  row_vector_v y = multiply(two,x);
+  EXPECT_FLOAT_EQ(2.0,y(0).val());
+  EXPECT_FLOAT_EQ(8.0,y(1).val());
+  EXPECT_FLOAT_EQ(18.0,y(2).val());
+
+  VEC g = cgradvec(y(1),x_ind);
+  EXPECT_FLOAT_EQ(0.0,g[0]);
+  EXPECT_FLOAT_EQ(2.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+  EXPECT_FLOAT_EQ(4.0,g[3]);
+}
+TEST(agradMatrix,multiply_scalar_row_vector_vc) {
+  using stan::agrad::multiply;
+  row_vector_v x(3);
+  x << 1, 2, 3;
+  AVAR two = 2.0;
+  AVEC x_ind = createAVEC(two);
+  row_vector_v y = multiply(two,x);
+  EXPECT_FLOAT_EQ(2.0,y(0).val());
+  EXPECT_FLOAT_EQ(4.0,y(1).val());
+  EXPECT_FLOAT_EQ(6.0,y(2).val());
+
+  VEC g = cgradvec(y(2),x_ind);
+  EXPECT_FLOAT_EQ(3.0,g[0]);
+}
+
+TEST(agradMatrix,multiply_scalar_matrix_cv) {
+  using stan::agrad::multiply;
+  matrix_v x(2,3);
+  x << 1, 2, 3, 4, 5, 6;
+  AVEC x_ind = createAVEC(x(0,0),x(0,1),x(0,2),x(1,0));
+  matrix_v y = multiply(2.0,x);
+  EXPECT_FLOAT_EQ(2.0,y(0,0).val());
+  EXPECT_FLOAT_EQ(4.0,y(0,1).val());
+  EXPECT_FLOAT_EQ(6.0,y(0,2).val());
+
+  VEC g = cgradvec(y(0,0),x_ind);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+
+TEST(agradMatrix,multiply_scalar_matrix_vc) {
+  using stan::agrad::multiply;
+  matrix_d x(2,3);
+  x << 1, 2, 3, 4, 5, 6;
+  AVAR two = 2.0;
+  AVEC x_ind = createAVEC(two);
+
+  matrix_v y = multiply(two,x);
+  EXPECT_FLOAT_EQ(2.0,y(0,0).val());
+  EXPECT_FLOAT_EQ(4.0,y(0,1).val());
+  EXPECT_FLOAT_EQ(6.0,y(0,2).val());
+
+  VEC g = cgradvec(y(1,0),x_ind);
+  EXPECT_FLOAT_EQ(4.0,g[0]);
+}
+
+TEST(agradMatrix,elt_multiply_vec_vv) {
+  using stan::agrad::elt_multiply;
+  vector_v x(2);
+  x << 2, 5;
+  vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1),y(0),y(1));
+  vector_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0).val());
+  EXPECT_FLOAT_EQ(500.0,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(2.0,g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+TEST(agradMatrix,elt_multiply_vec_vd) {
+  using stan::agrad::elt_multiply;
+  vector_v x(2);
+  x << 2, 5;
+  vector_d y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1));
+  vector_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0).val());
+  EXPECT_FLOAT_EQ(500.0,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+TEST(agradMatrix,elt_multiply_vec_dv) {
+  using stan::agrad::elt_multiply;
+  vector_d x(2);
+  x << 2, 5;
+  vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(y(0),y(1));
+  vector_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0).val());
+  EXPECT_FLOAT_EQ(500.0,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+
+TEST(agradMatrix,elt_multiply_row_vec_vv) {
+  using stan::agrad::elt_multiply;
+  row_vector_v x(2);
+  x << 2, 5;
+  row_vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1),y(0),y(1));
+  row_vector_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0).val());
+  EXPECT_FLOAT_EQ(500.0,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(2.0,g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+TEST(agradMatrix,elt_multiply_row_vec_vd) {
+  using stan::agrad::elt_multiply;
+  row_vector_v x(2);
+  x << 2, 5;
+  row_vector_d y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1));
+  row_vector_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0).val());
+  EXPECT_FLOAT_EQ(500.0,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+TEST(agradMatrix,elt_multiply_row_vec_dv) {
+  using stan::agrad::elt_multiply;
+  row_vector_d x(2);
+  x << 2, 5;
+  row_vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(y(0),y(1));
+  row_vector_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0).val());
+  EXPECT_FLOAT_EQ(500.0,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+
+
+TEST(agradMatrix,elt_multiply_matrix_vv) {
+  using stan::agrad::elt_multiply;
+  matrix_v x(2,3);
+  x << 2, 5, 6, 9, 13, 29;
+  matrix_v y(2,3);
+  y << 10, 100, 1000, 10000, 100000, 1000000;
+  AVEC x_ind = createAVEC(x(0,0),x(0,1),x(0,2),y(0,0));
+  matrix_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0,0).val());
+  EXPECT_FLOAT_EQ(500.0,z(0,1).val());
+  EXPECT_FLOAT_EQ(29000000.0,z(1,2).val());
+
+  VEC g = cgradvec(z(0,0),x_ind);
+  EXPECT_FLOAT_EQ(10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+  EXPECT_FLOAT_EQ(2.0,g[3]);
+}
+TEST(agradMatrix,elt_multiply_matrix_vd) {
+  using stan::agrad::elt_multiply;
+  matrix_v x(2,3);
+  x << 2, 5, 6, 9, 13, 29;
+  matrix_d y(2,3);
+  y << 10, 100, 1000, 10000, 100000, 1000000;
+  AVEC x_ind = createAVEC(x(0,0),x(0,1),x(0,2),x(1,0));
+  matrix_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0,0).val());
+  EXPECT_FLOAT_EQ(500.0,z(0,1).val());
+  EXPECT_FLOAT_EQ(29000000.0,z(1,2).val());
+
+  VEC g = cgradvec(z(0,0),x_ind);
+  EXPECT_FLOAT_EQ(10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(0.0,g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+TEST(agradMatrix,elt_multiply_matrix_dv) {
+  using stan::agrad::elt_multiply;
+  matrix_d x(2,3);
+  x << 2, 5, 6, 9, 13, 29;
+  matrix_v y(2,3);
+  y << 10, 100, 1000, 10000, 100000, 1000000;
+  AVEC x_ind = createAVEC(y(0,0),y(0,1));
+  matrix_v z = elt_multiply(x,y);
+  EXPECT_FLOAT_EQ(20.0,z(0,0).val());
+  EXPECT_FLOAT_EQ(500.0,z(0,1).val());
+  EXPECT_FLOAT_EQ(29000000.0,z(1,2).val());
+
+  VEC g = cgradvec(z(0,0),x_ind);
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+
+TEST(agradMatrix,elt_divide_vec_vv) {
+  using stan::agrad::elt_divide;
+  vector_v x(2);
+  x << 2, 5;
+  vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1),y(0),y(1));
+  vector_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0).val());
+  EXPECT_FLOAT_EQ(0.05,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(1.0/10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+TEST(agradMatrix,elt_divide_vec_vd) {
+  using stan::agrad::elt_divide;
+  vector_v x(2);
+  x << 2, 5;
+  vector_d y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1));
+  vector_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0).val());
+  EXPECT_FLOAT_EQ(0.05,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(1.0/10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+TEST(agradMatrix,elt_divide_vec_dv) {
+  using stan::agrad::elt_divide;
+  vector_d x(2);
+  x << 2, 5;
+  vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(y(0),y(1));
+  vector_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0).val());
+  EXPECT_FLOAT_EQ(0.05,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+
+TEST(agradMatrix,elt_divide_rowvec_vv) {
+  using stan::agrad::elt_divide;
+  row_vector_v x(2);
+  x << 2, 5;
+  row_vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1),y(0),y(1));
+  row_vector_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0).val());
+  EXPECT_FLOAT_EQ(0.05,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(1.0/10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+TEST(agradMatrix,elt_divide_rowvec_vd) {
+  using stan::agrad::elt_divide;
+  row_vector_v x(2);
+  x << 2, 5;
+  row_vector_d y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(x(0),x(1));
+  row_vector_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0).val());
+  EXPECT_FLOAT_EQ(0.05,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(1.0/10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+TEST(agradMatrix,elt_divide_rowvec_dv) {
+  using stan::agrad::elt_divide;
+  row_vector_d x(2);
+  x << 2, 5;
+  row_vector_v y(2);
+  y << 10, 100;
+  AVEC x_ind = createAVEC(y(0),y(1));
+  row_vector_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0).val());
+  EXPECT_FLOAT_EQ(0.05,z(1).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+
+
+TEST(agradMatrix,elt_divide_mat_vv) {
+  using stan::agrad::elt_divide;
+  matrix_v x(2,3);
+  x << 2, 5, 7, 13, 29, 112;
+  matrix_v y(2,3);
+  y << 10, 100, 1000, 10000, 100000, 1000000;
+  AVEC x_ind = createAVEC(x(0,0),x(0,1),y(0,0),y(0,1));
+  matrix_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0,0).val());
+  EXPECT_FLOAT_EQ(0.05,z(0,1).val());
+  EXPECT_FLOAT_EQ(112.0/1000000.0,z(1,2).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(1.0/10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+  EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[2]);
+  EXPECT_FLOAT_EQ(0.0,g[3]);
+}
+TEST(agradMatrix,elt_divide_mat_vd) {
+  using stan::agrad::elt_divide;
+  matrix_v x(2,3);
+  x << 2, 5, 7, 13, 29, 112;
+  matrix_d y(2,3);
+  y << 10, 100, 1000, 10000, 100000, 1000000;
+  AVEC x_ind = createAVEC(x(0,0),x(0,1));
+  matrix_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0,0).val());
+  EXPECT_FLOAT_EQ(0.05,z(0,1).val());
+  EXPECT_FLOAT_EQ(112.0/1000000.0,z(1,2).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(1.0/10.0,g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+TEST(agradMatrix,elt_divide_mat_dv) {
+  using stan::agrad::elt_divide;
+  matrix_d x(2,3);
+  x << 2, 5, 7, 13, 29, 112;
+  matrix_v y(2,3);
+  y << 10, 100, 1000, 10000, 100000, 1000000;
+  AVEC x_ind = createAVEC(y(0,0),y(0,1));
+  matrix_v z = elt_divide(x,y);
+  EXPECT_FLOAT_EQ(0.2,z(0,0).val());
+  EXPECT_FLOAT_EQ(0.05,z(0,1).val());
+  EXPECT_FLOAT_EQ(112.0/1000000.0,z(1,2).val());
+
+  VEC g = cgradvec(z(0),x_ind);
+  EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[0]);
+  EXPECT_FLOAT_EQ(0.0,g[1]);
+}
