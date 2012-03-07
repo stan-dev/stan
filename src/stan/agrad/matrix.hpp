@@ -195,8 +195,8 @@ namespace stan {
      */
     inline matrix_v to_var(const stan::math::matrix_d& m) {
       matrix_v m_v(m.rows(), m.cols());
-      for (int i = 0; i < m.rows(); ++i)
-        for (int j = 0; j < m.cols(); ++j)
+      for (int j = 0; j < m.cols(); ++j)
+        for (int i = 0; i < m.rows(); ++i)
           m_v(i,j) = m(i,j);
       return m_v;
     }
@@ -210,8 +210,8 @@ namespace stan {
      */
     inline matrix_v to_var (const stan::math::matrix_d& m, matrix_v& m_v) {
       m_v.resize(m.rows(), m.cols());
-      for (int i = 0; i < m.rows(); ++i)
-        for (int j = 0; j < m.cols(); ++j)
+      for (int j = 0; j < m.cols(); ++j)
+        for (int i = 0; i < m.rows(); ++i)
           m_v(i,j) = m(i,j);
       return m_v;
     }
@@ -638,8 +638,8 @@ namespace stan {
         return to_var(0.0);
       T mean = m.mean();
       T sum_sq_diff = 0;
-      for (int i = 0; i < m.rows(); ++i) {
-        for (int j = 0; j < m.cols(); ++j) { 
+      for (int j = 0; j < m.cols(); ++j) { 
+        for (int i = 0; i < m.rows(); ++i) {
           T diff = m(i,j) - mean;
           sum_sq_diff += diff * diff;
         }
@@ -964,8 +964,8 @@ namespace stan {
                  const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
-      for (int i = 0; i < m1.rows(); ++i)
-        for (int j = 0; j < m1.cols(); ++j)
+      for (int j = 0; j < m1.cols(); ++j)
+        for (int i = 0; i < m1.rows(); ++i)
           result(i,j) = m1(i,j) * m2(i,j);
       return result;
     }
@@ -1013,8 +1013,8 @@ namespace stan {
                const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
-      for (int i = 0; i < m1.rows(); ++i)
-        for (int j = 0; j < m1.cols(); ++j)
+      for (int j = 0; j < m1.cols(); ++j)
+        for (int i = 0; i < m1.rows(); ++i)
           result(i,j) = m1(i,j) / m2(i,j);
       return result;
     }

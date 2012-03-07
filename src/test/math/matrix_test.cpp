@@ -548,8 +548,6 @@ TEST(matrixTest,eltMultiplyMatrix) {
   m2 << 10, 100, 1000, 10000, 100000, 1000000;
   matrix_d m = stan::math::elt_multiply(m1,m2);
   
-  std::cout << m << std::endl;
-
   EXPECT_EQ(2,m.rows());
   EXPECT_EQ(3,m.cols());
   EXPECT_FLOAT_EQ(10.0, m(0,0));
@@ -568,5 +566,66 @@ TEST(matrixTest,eltMultiplyMatrixException) {
   m3 << 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24;
   EXPECT_THROW(stan::math::elt_multiply(m1,m2),std::domain_error);
   EXPECT_THROW(stan::math::elt_multiply(m1,m3),std::domain_error);
+}
+
+TEST(matrixTest,eltDivideVec) {
+  vector_d v1(2);
+  vector_d v2(2);
+  v1 << 1, 2;
+  v2 << 10, 100;
+  vector_d v = stan::math::elt_divide(v1,v2);
+  EXPECT_FLOAT_EQ(0.1, v(0));
+  EXPECT_FLOAT_EQ(0.02, v(1));
+}
+TEST(matrixTest,eltDivideVecException) {
+  vector_d v1(2);
+  vector_d v2(3);
+  v1 << 1, 2;
+  v2 << 10, 100, 1000;
+  EXPECT_THROW(stan::math::elt_divide(v1,v2), std::domain_error);
+}
+TEST(matrixTest,eltDivideRowVec) {
+  row_vector_d v1(2);
+  row_vector_d v2(2);
+  v1 << 1, 2;
+  v2 << 10, 100;
+  row_vector_d v = stan::math::elt_divide(v1,v2);
+  EXPECT_FLOAT_EQ(0.1, v(0));
+  EXPECT_FLOAT_EQ(0.02, v(1));
+}
+TEST(matrixTest,eltDivideRowVecException) {
+  row_vector_d v1(2);
+  row_vector_d v2(3);
+  v1 << 1, 2;
+  v2 << 10, 100, 1000;
+  EXPECT_THROW(stan::math::elt_divide(v1,v2), std::domain_error);
+}
+TEST(matrixTest,eltDivideMatrix) {
+  matrix_d m1(2,3);
+  matrix_d m2(2,3);
+  m1 << 1, 2, 3, 4, 5, 6;
+  m2 << 10, 100, 1000, 10000, 100000, 1000000;
+  matrix_d m = stan::math::elt_divide(m1,m2);
+  
+  std::cout << m << std::endl;
+
+  EXPECT_EQ(2,m.rows());
+  EXPECT_EQ(3,m.cols());
+  EXPECT_FLOAT_EQ(0.1, m(0,0));
+  EXPECT_FLOAT_EQ(0.02, m(0,1));
+  EXPECT_FLOAT_EQ(0.003, m(0,2));
+  EXPECT_FLOAT_EQ(0.0004, m(1,0));
+  EXPECT_FLOAT_EQ(0.00005, m(1,1));
+  EXPECT_FLOAT_EQ(0.000006, m(1,2));
+}
+TEST(matrixTest,eltDivideMatrixException) {
+  matrix_d m1(2,3);
+  matrix_d m2(2,4);
+  matrix_d m3(4,3);
+  m1 << 1, 2, 3, 4, 5, 6;
+  m2 << -1, -2, -3, -4, -5, -6, -7, -8;
+  m3 << 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24;
+  EXPECT_THROW(stan::math::elt_divide(m1,m2),std::domain_error);
+  EXPECT_THROW(stan::math::elt_divide(m1,m3),std::domain_error);
 }
 

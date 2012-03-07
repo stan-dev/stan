@@ -783,8 +783,8 @@ namespace stan {
     inline double variance(const matrix_d& m) {
       double mean = m.mean();
       double sum_sq_diff = 0;
-      for (int i = 0; i < m.rows(); ++i) {
-        for (int j = 0; j < m.cols(); ++j) { 
+      for (int j = 0; j < m.cols(); ++j) { 
+        for (int i = 0; i < m.rows(); ++i) {
           double diff = m(i,j) - mean;
           sum_sq_diff += diff * diff;
         }
@@ -1115,8 +1115,8 @@ namespace stan {
           throw std::domain_error(msg.str());
       }
       matrix_d prod(m1.rows(),m1.cols());
-      for (int i = 0; i < m1.rows(); ++i)
-        for (int j = 0; j < m1.cols(); ++j)
+      for (int j = 0; j < m1.cols(); ++j)
+        for (int i = 0; i < m1.rows(); ++i)
           prod(i,j) = m1(i,j) * m2(i,j);
       return prod;
     }
@@ -1128,9 +1128,14 @@ namespace stan {
      * @param v2 Second vector.
      * @return Elementwise division of the vectors.
      */
-    inline vector_d elt_division(const vector_d& v1, const vector_d& v2) {
+    inline vector_d elt_divide(const vector_d& v1, const vector_d& v2) {
       if (v1.size() != v2.size()) {
-        // FIXME:  error ?
+        std::stringstream msg;
+        msg << "require vectors to be same size for element-wise division;"
+            << " found v1.size()=" << v1.size()
+            << ", v2.size()=" << v2.size()
+            << std::endl;
+        throw std::domain_error(msg.str());
       }
       vector_d prod(v1.size());
       for (int i = 0; i < v1.size(); ++i)
@@ -1145,7 +1150,12 @@ namespace stan {
      */
     inline vector_d elt_divide(const row_vector_d& v1, const row_vector_d& v2) {
       if (v1.size() != v2.size()) {
-        // FIXME:  error ?
+        std::stringstream msg;
+        msg << "require vectors to be same size for element-wise division;"
+            << " found v1.size()=" << v1.size()
+            << ", v2.size()=" << v2.size()
+            << std::endl;
+        throw std::domain_error(msg.str());
       }
       row_vector_d prod(v1.size());
       for (int i = 0; i < v1.size(); ++i)
@@ -1161,11 +1171,17 @@ namespace stan {
     inline matrix_d elt_divide(const matrix_d& m1, const matrix_d& m2) {
       if (m1.rows() != m2.rows() 
           || m1.cols() != m2.cols()) {
-        // FIXME:  what to do with errors?
+        std::stringstream msg;
+        msg << "require matrices to be same dimensions for element-wise division;"
+            << " found m1.rows()=" << m1.rows() << ", m1.cols()=" << m1.cols()
+            << "; m2.rows()=" << m2.rows() << ", m2.cols()=" << m2.cols()
+            << std::endl;
+        throw std::domain_error(msg.str());
+
       }
       matrix_d prod(m1.rows(),m1.cols());
-      for (int i = 0; i < m1.rows(); ++i)
-        for (int j = 0; j < m2.rows(); ++j)
+      for (int j = 0; j < m2.cols(); ++j)
+        for (int i = 0; i < m1.rows(); ++i)
           prod(i,j) = m1(i,j) / m2(i,j);
       return prod;
     }

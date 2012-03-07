@@ -1,7 +1,15 @@
 \documentclass[11pt]{report}
 
-\title{Stan Manual: \\[8pt] {\bf Directed Graphical Model Compiler}}
-\author{{\it The Stan Development Team}}
+\usepackage{xspace}
+\usepackage{times}
+
+\newcommand{\Stan}{Stan\xspace}
+\newcommand{\stanc}{stanc\xspace}
+\newcommand*{\Cpp}{C{\ensuremath{++}}\xspace}
+
+
+\title{\Stan Modeling Language Reference Manual}
+\author{\Stan Development Team}
 \date{\footnotesize \today}
 
 \begin{document}
@@ -9,36 +17,66 @@
 \maketitle
 
 \begin{abstract}
-  Stan's graphical model compiler converts a model specifying a joint
-  probability density into an executable sampler from that density.
-  The motivating use case is sampling from Bayesian posterior densities.
+  \Stan's modeling language allows users to write a model specifying a
+  probability function $p(y,\theta)$ with variables $y$ and $\theta$
+  corresponding to known and unknown values.  These values are
+  typically used for data (including size constants and fixed
+  paramters) and parameters (including missing data and posterior
+  simulations) in a Bayesian model.
+
+  The stanc compiler converts a Stan program to a \Cpp class.
+  Instances of the class are constructed from known values for
+  $y$.  The class provides methods to compute the log probability,
+  $\log p(y,\theta)$, and its gradient, $\nabla_{\theta} \log
+  p(y,\theta)$, as functions of $\theta$.  Gradients are computed using
+  accurate and efficient reverse-mode algorithmic differentiaton at a
+  small multiple of the cost of the log probability function itself
+  (independently of dimensionality).
   
-  This manual provides a getting-started guide and complete reference
-  for Stan's graphical model compiler.  The compiler converts a Stan
-  program specifying a directed graphical model into executable code
-  through the generation of a C++ program for the model written using
-  Stan's C++ modeling framework.  Stan's primary use is sampling
-  parameter values from the Bayesian posterior given a data set.
+  The C++ class can be plugged into Stan's continuous and discrete
+  samplers to draw a sequence of samples $\theta^{(m)}$ from the
+  posterior $p(\theta|y) \propto p(y,\theta)$.  These samples may be
+  used for full Bayesian inference, much of which can be done directly
+  within Stan.
 
-  Stan generates samples using the no-U-turn sampler (NUTS), a variant
-  of Hamiltonian Monte Carlo sampling (HMC) that automatically tunes
-  its step size and number of leapfrog steps.  Variables are declared
-  with types and automatically transformed for use with HMC.  Each
-  variable in the program is declared as being data, derived data, a
-  parameter, or a derived parameter.  The sampler producs sample from
-  the model's distribution over the parameters.  
+  For continuous variables, Stan uses Hamiltonian Monte Carlo (HMC)
+  sampling.  Stan implements the No-U-Turn Sampler (NUTS), an adaptive
+  version of HMC that automatically tunes step sizes and a diagonal
+  mass matrix during warmup and then adapts the number of leapfrog
+  integration steps during sampling.  Stan is expressive enough to
+  allow most discrete variables to be marginalized out.  For the remaining
+  discrete parameters, Stan uses Gibbs sampling if there are only a few
+  outcomes and adaptive slice sampling otherwise.
 
-  
+  Stan's language is more expressive than that of its predecessors,
+  BUGS and JAGS.  Variables and expressions are strongly typed.  Stan
+  supports many more arithmetic, matrix, and linear algebra operations
+  than its predecessors.  Users may also manipulate log probability
+  functions directly.
 
-
-  graphical model description into C++ code, which may then be
-  compiled to perform sampling.  
-
+  % Stan also supports optimization methods that are able to find
+  % a $\theta^{*}$ that (locally) optimizes $p(\theta|y)$.
 \end{abstract}
 
 \chapter{Getting Started}
 
-This section provides a quick demonstration of the end-to-end
-use of Stan's graphical model compiler.
+Here's a simple example of a Stan model for estimating a simple
+Bernoulli parameter.
+
+{\footnotesize
+\begin{verbatim}
+data {
+    int(0,) N;
+    int(0,1) y[N];
+}
+parameters {
+    real theta;
+}
+model {
+    for (n in 1:N)
+        y[n] ~ bernoulli(theta);
+}
+\end{verbatim}}
+
 
 \end{document}
