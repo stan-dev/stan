@@ -12,12 +12,11 @@ namespace stan {
     //                             W.dims() = S.dims();
     //                             n > S.rows() - 1]
     /**
-     * The log of the Inverse-Wishart density for the given W, degrees of freedom, 
-     * and scale matrix. 
+     * The log of the Inverse-Wishart density for the given W, degrees
+     * of freedom, and scale matrix. 
      * 
-     * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
-     * Dimension, k, is implicit.
-     * nu must be greater than k-1
+     * The scale matrix, S, must be k x k, symmetric, and semi-positive 
+     * definite.
      *
      * \f{eqnarray*}{
      W &\sim& \mbox{\sf{Inv-Wishart}}_{\nu} (S) \\
@@ -33,19 +32,20 @@ namespace stan {
      * @param S The scale matrix
      * @return The log of the Inverse-Wishart density at W given nu and S.
      * @throw std::domain_error if nu is not greater than k-1
-     * @throw std::domain_error if S is not square, not symmetric, or not semi-positive definite.
+     * @throw std::domain_error if S is not square, not symmetric, or not 
+     * semi-positive definite.
      * @tparam T_y Type of scalar.
      * @tparam T_dof Type of degrees of freedom.
      * @tparam T_scale Type of scale.
      */
-    template <bool propto = false, 
+    template <bool propto,
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
-                    const T_dof& nu,
-                    const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
-                    const Policy& = Policy()) {
+                const T_dof& nu,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
+                const Policy&) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
       
       using stan::math::check_greater_or_equal;
@@ -54,7 +54,8 @@ namespace stan {
 
       unsigned int k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", &lp, Policy()))
+      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", 
+                                 &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
         return lp;
@@ -83,6 +84,40 @@ namespace stan {
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       return lp;
     }
+
+    template <bool propto,
+              typename T_y, typename T_dof, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
+              const T_dof& nu,
+              const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
+      return inv_wishart_log<propto>(W,nu,S,stan::math::default_policy());
+    }
+
+
+    template <typename T_y, typename T_dof, typename T_scale, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
+                const T_dof& nu,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
+                const Policy&) {
+      return inv_wishart_log<false>(W,nu,S,Policy());
+    }
+
+
+    template <typename T_y, typename T_dof, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
+            const T_dof& nu,
+            const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
+      return inv_wishart_log<false>(W,nu,S,stan::math::default_policy());
+    }
+
+
   }
 }
 #endif

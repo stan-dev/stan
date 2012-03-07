@@ -1059,7 +1059,117 @@ namespace stan {
     inline matrix_d divide(const matrix_d& m, double c) {
       return m / c;
     }
-    
+
+    /**
+     * Return the element-wise product of the specified vectors.
+     * @param v1 First vector.
+     * @param v2 Second vector.
+     * @return Elementwise product of the vectors.
+     */
+    inline vector_d elt_multiply(const vector_d& v1, const vector_d& v2) {
+      if (v1.size() != v2.size()) {
+        std::stringstream msg;
+        msg << "vectors must have same dimensions, v1.size()=" << v1.size()
+            << ", v2.size()=" << v2.size() << std::endl;
+        throw std::domain_error(msg.str());
+      }
+      vector_d prod(v1.size());
+      for (int i = 0; i < v1.size(); ++i)
+        prod(i) = v1(i) * v2(i);
+      return prod;
+    }
+    /**
+     * Return the element-wise product of the specified row vectors.
+     * @param v1 First row vector.
+     * @param v2 Second row vector.
+     * @return Elementwise product of the vectors.
+     */
+    inline vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2) {
+      if (v1.size() != v2.size()) {
+        std::stringstream msg;
+        msg << "vectors must have same dimensions, v1.size()=" << v1.size()
+            << ", v2.size()=" << v2.size() << std::endl;
+        throw std::domain_error(msg.str());
+      }
+      row_vector_d prod(v1.size());
+      for (int i = 0; i < v1.size(); ++i)
+        prod(i) = v1(i) * v2(i);
+      return prod;
+    }
+    /**
+     * Return the element-wise product of the specified matrices.
+     * @param v1 First matrix.
+     * @param v2 Second matrix.
+     * @return Elementwise product of the matrices.
+     */
+    inline matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2) {
+      if (m1.rows() != m2.rows()
+          || m1.cols() != m2.cols()) {
+        std::stringstream msg;
+        msg << "vectors must have same dimensions"
+          << "; m1.rows()=" << m1.rows() 
+          << ", m2.rows()=" << m2.rows()
+          << ", m1.cols()=" << m1.cols()
+          << ", m2.cols()=" << m2.cols()
+          << std::endl;
+          throw std::domain_error(msg.str());
+      }
+      matrix_d prod(m1.rows(),m1.cols());
+      for (int i = 0; i < m1.rows(); ++i)
+        for (int j = 0; j < m1.cols(); ++j)
+          prod(i,j) = m1(i,j) * m2(i,j);
+      return prod;
+    }
+
+
+    /**
+     * Return the element-wise divsion of the specified vectors.
+     * @param v1 First vector.
+     * @param v2 Second vector.
+     * @return Elementwise division of the vectors.
+     */
+    inline vector_d elt_division(const vector_d& v1, const vector_d& v2) {
+      if (v1.size() != v2.size()) {
+        // FIXME:  error ?
+      }
+      vector_d prod(v1.size());
+      for (int i = 0; i < v1.size(); ++i)
+        prod(i) = v1(i) / v2(i);
+      return prod;
+    }
+    /**
+     * Return the element-wise division of the specified row vectors.
+     * @param v1 First row vector.
+     * @param v2 Second row vector.
+     * @return Elementwise division of the vectors.
+     */
+    inline vector_d elt_divide(const row_vector_d& v1, const row_vector_d& v2) {
+      if (v1.size() != v2.size()) {
+        // FIXME:  error ?
+      }
+      row_vector_d prod(v1.size());
+      for (int i = 0; i < v1.size(); ++i)
+        prod(i) = v1(i) / v2(i);
+      return prod;
+    }
+    /**
+     * Return the element-wise division of the specified matrices.
+     * @param v1 First matrix.
+     * @param v2 Second matrix.
+     * @return Elementwise division of the matrices.
+     */
+    inline matrix_d elt_divide(const matrix_d& m1, const matrix_d& m2) {
+      if (m1.rows() != m2.rows() 
+          || m1.cols() != m2.cols()) {
+        // FIXME:  what to do with errors?
+      }
+      matrix_d prod(m1.rows(),m1.cols());
+      for (int i = 0; i < m1.rows(); ++i)
+        for (int j = 0; j < m2.rows(); ++j)
+          prod(i,j) = m1(i,j) / m2(i,j);
+      return prod;
+    }
+
     /**
      * Return the product of the of the specified column
      * vector and specified scalar.
@@ -1159,6 +1269,36 @@ namespace stan {
         throw std::invalid_argument ("m1.cols() != m2.rows()");
       return m1 * m2;
     }
+
+    /**
+     * Return the product of the specified scalar and vector.
+     * @param c Scalar.
+     * @param v Vector.
+     * @return Product of scalar and vector.
+     */
+    inline vector_d multiply(double c, const vector_d& v) {
+      return c * v;
+    }
+    /**
+     * Return the product of the specified scalar and row vector.
+     * @param c Scalar.
+     * @param v Row vector.
+     * @return Product of scalar and row vector.
+     */
+    inline row_vector_d multiply(double c, const row_vector_d& rv) {
+      return c * rv;
+    }
+    /**
+     * Return the product of the specified scalar and matrix.
+     * @param c Scalar.
+     * @param m Matrix
+     * @return Product of scalar and matrix.
+     */
+    inline matrix_d multiply(double c, const matrix_d& m) {
+      return c * m;
+    }
+
+
 
     /**
      * Return the specified row of the specified matrix, using

@@ -157,6 +157,8 @@ namespace stan {
                      std::vector<double>& params_r,
                      std::vector<int>& params_i,
                      T_model& model) {
+
+      sampler.set_params(params_r,params_i);
      
       int it_print_width = std::ceil(std::log10(num_iterations));
       std::cout << std::endl;

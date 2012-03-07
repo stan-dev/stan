@@ -10,14 +10,14 @@ namespace stan {
   namespace prob {
 
     // NegBinomial(n|alpha,beta)  [alpha > 0;  beta > 0;  n >= 0]
-    template <bool propto = false,
+    template <bool propto,
               typename T_shape, typename T_inv_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
     neg_binomial_log(const int n, 
                      const T_shape& alpha, 
                      const T_inv_scale& beta, 
-                     const Policy& = Policy()) {
+                     const Policy&) {
 
       static const char* function = "stan::prob::neg_binomial_log<%1%>(%1%)";
 
@@ -50,6 +50,39 @@ namespace stan {
         lp += multiply_log(alpha, beta) - (alpha + n) * log1p(beta);
       return lp;
     }
+
+    template <bool propto,
+              typename T_shape, typename T_inv_scale>
+    inline
+    typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
+    neg_binomial_log(const int n, 
+                     const T_shape& alpha, 
+                     const T_inv_scale& beta) {
+      return neg_binomial_log<propto>(n,alpha,beta,
+                                      stan::math::default_policy());
+    }
+
+    template <typename T_shape, typename T_inv_scale, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
+    neg_binomial_log(const int n, 
+                     const T_shape& alpha, 
+                     const T_inv_scale& beta, 
+                     const Policy&) {
+      return neg_binomial_log<false>(n,alpha,beta,Policy());
+    }
+
+    template <typename T_shape, typename T_inv_scale>
+    inline
+    typename boost::math::tools::promote_args<T_shape, T_inv_scale>::type
+    neg_binomial_log(const int n, 
+                     const T_shape& alpha, 
+                     const T_inv_scale& beta) {
+      return neg_binomial_log<false>(n,alpha,beta,
+                                      stan::math::default_policy());
+    }
+
 
   }
 }

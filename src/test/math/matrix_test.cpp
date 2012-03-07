@@ -388,6 +388,34 @@ TEST(matrix_test,subtract_m_exception) {
   EXPECT_THROW(stan::math::subtract(d1, d2), std::invalid_argument);
 }
 
+TEST(matrixTest,multiply_c_v) {
+  vector_d v(3);
+  v << 1, 2, 3;
+  vector_d result = stan::math::multiply(2.0,v);
+  EXPECT_FLOAT_EQ(2.0,result(0));
+  EXPECT_FLOAT_EQ(4.0,result(1));
+  EXPECT_FLOAT_EQ(6.0,result(2));
+}
+TEST(matrixTest,multiply_c_rv) {
+  row_vector_d rv(3);
+  rv << 1, 2, 3;
+  row_vector_d result = stan::math::multiply(2.0,rv);
+  EXPECT_FLOAT_EQ(2.0,result(0));
+  EXPECT_FLOAT_EQ(4.0,result(1));
+  EXPECT_FLOAT_EQ(6.0,result(2));
+}
+TEST(matrixTest,multiply_c_m) {
+  matrix_d m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
+  matrix_d result = stan::math::multiply(2.0,m);
+  EXPECT_FLOAT_EQ(2.0,result(0,0));
+  EXPECT_FLOAT_EQ(4.0,result(0,1));
+  EXPECT_FLOAT_EQ(6.0,result(0,2));
+  EXPECT_FLOAT_EQ(8.0,result(1,0));
+  EXPECT_FLOAT_EQ(10.0,result(1,1));
+  EXPECT_FLOAT_EQ(12.0,result(1,2));
+}
+
 TEST(matrix_test,multiply_rv_v_exception) {
   row_vector_d rv;
   vector_d v;
@@ -481,4 +509,64 @@ TEST(matrix_test,std_vector_sum_int) {
   EXPECT_EQ(6,stan::math::sum(x));
 }
 
+TEST(matrixTest,eltMultiplyVec) {
+  vector_d v1(2);
+  vector_d v2(2);
+  v1 << 1, 2;
+  v2 << 10, 100;
+  vector_d v = stan::math::elt_multiply(v1,v2);
+  EXPECT_FLOAT_EQ(10.0, v(0));
+  EXPECT_FLOAT_EQ(200.0, v(1));
+}
+TEST(matrixTest,eltMultiplyVecException) {
+  vector_d v1(2);
+  vector_d v2(3);
+  v1 << 1, 2;
+  v2 << 10, 100, 1000;
+  EXPECT_THROW(stan::math::elt_multiply(v1,v2), std::domain_error);
+}
+TEST(matrixTest,eltMultiplyRowVec) {
+  row_vector_d v1(2);
+  row_vector_d v2(2);
+  v1 << 1, 2;
+  v2 << 10, 100;
+  row_vector_d v = stan::math::elt_multiply(v1,v2);
+  EXPECT_FLOAT_EQ(10.0, v(0));
+  EXPECT_FLOAT_EQ(200.0, v(1));
+}
+TEST(matrixTest,eltMultiplyRowVecException) {
+  row_vector_d v1(2);
+  row_vector_d v2(3);
+  v1 << 1, 2;
+  v2 << 10, 100, 1000;
+  EXPECT_THROW(stan::math::elt_multiply(v1,v2), std::domain_error);
+}
+TEST(matrixTest,eltMultiplyMatrix) {
+  matrix_d m1(2,3);
+  matrix_d m2(2,3);
+  m1 << 1, 2, 3, 4, 5, 6;
+  m2 << 10, 100, 1000, 10000, 100000, 1000000;
+  matrix_d m = stan::math::elt_multiply(m1,m2);
+  
+  std::cout << m << std::endl;
+
+  EXPECT_EQ(2,m.rows());
+  EXPECT_EQ(3,m.cols());
+  EXPECT_FLOAT_EQ(10.0, m(0,0));
+  EXPECT_FLOAT_EQ(200.0, m(0,1));
+  EXPECT_FLOAT_EQ(3000.0, m(0,2));
+  EXPECT_FLOAT_EQ(40000.0, m(1,0));
+  EXPECT_FLOAT_EQ(500000.0, m(1,1));
+  EXPECT_FLOAT_EQ(6000000.0, m(1,2));
+}
+TEST(matrixTest,eltMultiplyMatrixException) {
+  matrix_d m1(2,3);
+  matrix_d m2(2,4);
+  matrix_d m3(4,3);
+  m1 << 1, 2, 3, 4, 5, 6;
+  m2 << -1, -2, -3, -4, -5, -6, -7, -8;
+  m3 << 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24;
+  EXPECT_THROW(stan::math::elt_multiply(m1,m2),std::domain_error);
+  EXPECT_THROW(stan::math::elt_multiply(m1,m3),std::domain_error);
+}
 

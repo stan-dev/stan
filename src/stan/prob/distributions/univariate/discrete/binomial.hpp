@@ -10,14 +10,14 @@ namespace stan {
   namespace prob {
 
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
-    template <bool propto = false,
+    template <bool propto,
               typename T_prob, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_prob>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_prob>::type
     binomial_log(const int n, 
                  const int N, 
                  const T_prob& theta, 
-                 const Policy& = Policy()) {
+                 const Policy&) {
 
       static const char* function = "stan::prob::binomial_log<%1%>(%1%)";
       
@@ -55,6 +55,41 @@ namespace stan {
           + (N - n) * log1m(theta);
       return lp;
     }
+
+    template <bool propto,
+              typename T_prob>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    binomial_log(const int n, 
+                 const int N, 
+                 const T_prob& theta) {
+      return binomial_log<propto>(n,N,theta,stan::math::default_policy());
+    }
+
+
+    template <typename T_prob, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    binomial_log(const int n, 
+                 const int N, 
+                 const T_prob& theta, 
+                 const Policy&) {
+      return binomial_log<false>(n,N,theta,Policy());
+    }
+
+
+    template <typename T_prob>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    binomial_log(const int n, 
+                 const int N, 
+                 const T_prob& theta) {
+      return binomial_log<false>(n,N,theta,stan::math::default_policy());
+    }
+
+
+    
   }
 }
 #endif

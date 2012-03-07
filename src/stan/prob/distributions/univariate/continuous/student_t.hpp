@@ -6,8 +6,9 @@
 #include <stan/prob/traits.hpp>
 
 namespace stan {
+
   namespace prob {
-    // StudentT(y|nu,mu,sigma)  [nu > 0;   sigma > 0]
+
     /**
      * The log of the Student-t density for the given y, nu, mean, and
      * scale parameter.  The scale parameter must be greater
@@ -33,15 +34,13 @@ namespace stan {
      * @tparam T_loc Type of location.
      * @tparam T_scale Type of scale.
      */
-    template <bool propto = false,
-              typename T_y, 
-              typename T_dof, 
-              typename T_loc, 
-              typename T_scale,
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
-    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma, 
-                  const Policy& = Policy()) {
+    template <bool propto, typename T_y, typename T_dof, 
+              typename T_loc, typename T_scale,
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
+                  const T_scale& sigma, 
+                  const Policy&) {
       static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
 
       using stan::math::check_positive;
@@ -56,11 +55,14 @@ namespace stan {
         return lp;
       if(!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter, mu,", 
+                        &lp, Policy()))
         return lp;
-      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter, sigma,", 
+                        &lp, Policy()))
         return lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+                          &lp, Policy()))
         return lp;
 
       using stan::math::square;
@@ -79,6 +81,34 @@ namespace stan {
         lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
       return lp;
     }
+
+    template <bool propto, 
+              typename T_y, typename T_dof, typename T_loc, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
+                  const T_scale& sigma) {
+      return student_t_log<propto>(y,nu,mu,sigma,stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_dof, typename T_loc, typename T_scale,
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
+                  const T_scale& sigma, 
+                  const Policy&) {
+      return student_t_log<false>(y,nu,mu,sigma,Policy());
+    }
+
+    template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
+                  const T_scale& sigma) {
+      return student_t_log<false>(y,nu,mu,sigma,stan::math::default_policy());
+    }
+
     
   }
 }

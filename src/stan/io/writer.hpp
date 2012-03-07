@@ -74,7 +74,7 @@ namespace stan {
        * @return Values that have been written.
        */
       std::vector<T>& data_r() {
-        return &data_r_;
+        return data_r_;
       }
 
 
@@ -85,7 +85,7 @@ namespace stan {
        * @return Values that have been written.
        */
       std::vector<int>& data_i() {
-        return &data_i_;
+        return data_i_;
       }
 
       /**

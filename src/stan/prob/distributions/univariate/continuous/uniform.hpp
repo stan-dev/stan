@@ -32,11 +32,12 @@ namespace stan {
      * @tparam T_low Type of lower bound.
      * @tparam T_high Type of upper bound.
      */
-    template <bool propto = false, 
+    template <bool propto,
               typename T_y, typename T_low, typename T_high, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
-    uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, const Policy& = Policy()) {
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, 
+                const Policy&) {
       static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
       
       using stan::math::check_not_nan;
@@ -51,7 +52,8 @@ namespace stan {
         return lp;
       if (!check_finite(function, beta, "Upper bound, beta,", &lp, Policy()))
         return lp;
-      if (!check_greater(function, beta, alpha, "Upper bound, beta,", &lp, Policy()))
+      if (!check_greater(function, beta, alpha, "Upper bound, beta,",
+                         &lp, Policy()))
         return lp;
       
       if (y < alpha || y > beta)
@@ -61,6 +63,33 @@ namespace stan {
         lp -= log(beta - alpha);
       return lp;
     }
+
+
+    template <bool propto,
+              typename T_y, typename T_low, typename T_high>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
+      return uniform_log<propto>(y,alpha,beta,stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_low, typename T_high, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, 
+                const Policy&) {
+      return uniform_log<false>(y,alpha,beta,Policy());
+    }
+
+
+    template <typename T_y, typename T_low, typename T_high>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
+    uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
+      return uniform_log<false>(y,alpha,beta,stan::math::default_policy());
+    }
+
      
   }
 }

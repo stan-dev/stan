@@ -40,14 +40,14 @@ namespace stan {
      * @tparam T_dof Type of degrees of freedom.
      * @tparam T_scale Type of scale.
      */
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_dof, typename T_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
-                const Policy& = Policy()) {
+                const Policy&) {
       static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
 
       using stan::math::check_greater_or_equal;
@@ -95,6 +95,39 @@ namespace stan {
 
       return lp;
     }
+
+    template <bool propto,
+              typename T_y, typename T_dof, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
+                const T_dof& nu,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
+      return wishart_log<propto>(W,nu,S,stan::math::default_policy());
+    }
+
+
+    template <typename T_y, typename T_dof, typename T_scale, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
+                const T_dof& nu,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
+                const Policy&) {
+      return wishart_log<false>(W,nu,S,Policy());
+    }
+
+
+    template <typename T_y, typename T_dof, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
+                const T_dof& nu,
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
+      return wishart_log<false>(W,nu,S,stan::math::default_policy());
+    }
+
 
   }
 }

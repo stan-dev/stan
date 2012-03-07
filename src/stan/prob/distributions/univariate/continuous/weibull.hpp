@@ -6,13 +6,16 @@
 #include <stan/prob/traits.hpp>
 
 namespace stan {
+
   namespace prob {
+
     // Weibull(y|sigma,alpha)     [y >= 0;  sigma > 0;  alpha > 0]
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_shape, typename T_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& = Policy()) {
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma, 
+                const Policy&) {
       static const char* function = "stan::prob::weibull_log<%1%>(%1%)";
 
       using stan::math::check_finite;
@@ -23,13 +26,17 @@ namespace stan {
       typename promote_args<T_y,T_shape,T_scale>::type lp;
       if(!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
-      if(!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if(!check_finite(function, alpha, "Shape parameter, alpha,", 
+                       &lp, Policy()))
         return lp;
-      if(!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if(!check_positive(function, alpha, "Shape parameter, alpha,",
+                         &lp, Policy()))
         return lp;
-      if(!check_not_nan(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if(!check_not_nan(function, sigma, "Scale parameter, sigma,",
+                        &lp, Policy()))
         return lp;
-      if(!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if(!check_positive(function, sigma, "Scale parameter, sigma,", 
+                         &lp, Policy()))
         return lp;
 
       if (y < 0)
@@ -49,10 +56,42 @@ namespace stan {
       return lp;
     }
 
+
+    template <bool propto,
+              typename T_y, typename T_shape, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      return weibull_log<propto>(y,alpha,sigma,stan::math::default_policy());
+    }
+
+
     template <typename T_y, typename T_shape, typename T_scale, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma, const Policy& = Policy()) {
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma, 
+                const Policy&) {
+      return weibull_log<false>(y,alpha,sigma,Policy());
+    }
+
+
+    template <typename T_y, typename T_shape, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      return weibull_log<false>(y,alpha,sigma,stan::math::default_policy());
+    }
+
+
+
+
+    template <typename T_y, typename T_shape, typename T_scale, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma, 
+              const Policy&) {
+
       static const char* function = "stan::prob::weibull_p<%1%>(%1%)";
 
       using stan::math::check_finite;
@@ -62,18 +101,29 @@ namespace stan {
       typename promote_args<T_y,T_shape,T_scale>::type lp;
       if(!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
-      if(!check_finite(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if(!check_finite(function, alpha, "Shape parameter, alpha,", 
+                       &lp, Policy()))
         return lp;
-      if(!check_positive(function, alpha, "Shape parameter, alpha,", &lp, Policy()))
+      if(!check_positive(function, alpha, "Shape parameter, alpha,",
+                         &lp, Policy()))
         return lp;
-      if(!check_finite(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if(!check_finite(function, sigma, "Scale parameter, sigma,",
+                       &lp, Policy()))
         return lp;
-      if(!check_positive(function, sigma, "Scale parameter, sigma,", &lp, Policy()))
+      if(!check_positive(function, sigma, "Scale parameter, sigma,", 
+                         &lp, Policy()))
         return lp;
       
       if (y < 0.0)
         return 0.0;
       return 1.0 - exp(-pow(y / sigma, alpha));
+    }
+
+    template <typename T_y, typename T_shape, typename T_scale>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
+    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      return weibull_p(y,alpha,sigma,stan::math::default_policy());
     }
 
   }

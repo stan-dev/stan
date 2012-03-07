@@ -10,13 +10,13 @@ namespace stan {
   namespace prob {
 
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
-    template <bool propto = false,
+    template <bool propto,
               typename T_prob, 
-              class Policy = stan::math::default_policy> 
-    inline typename boost::math::tools::promote_args<T_prob>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_prob>::type
     bernoulli_log(const int n, 
                   const T_prob& theta, 
-                  const Policy& = Policy()) {
+                  const Policy&) {
       static const char* function = "stan::prob::bernoulli_log<%1%>(%1%)";
 
       using stan::math::check_finite;
@@ -40,6 +40,36 @@ namespace stan {
           return log1m(theta);
       }
       return 0.0;
+    }
+
+
+    template <bool propto,
+              typename T_prob>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_log(const int n, 
+                  const T_prob& theta) {
+      return bernoulli_log<propto>(n,theta,stan::math::default_policy());
+    }
+
+
+    template <typename T_prob, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_log(const int n, 
+                  const T_prob& theta, 
+                  const Policy&) {
+      return bernoulli_log<false>(n,theta,Policy());
+    }
+
+
+    template <typename T_prob>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_log(const int n, 
+                  const T_prob& theta) {
+      return bernoulli_log<false>(n,theta,stan::math::default_policy());
     }
 
 

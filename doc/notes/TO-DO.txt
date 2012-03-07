@@ -36,6 +36,12 @@ TO DO FOR V1
   - stan/meta
   - stan/model
   - stan/prob
+
+* acknowledgements section:
+  - Marcus A. Brubaker
+  - Michael Betancourt
+  - ??
+
  
 CLEANUP (ONGOING)
 =================================================
@@ -96,6 +102,12 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* more matrix ops:
+    left residuals:  A\b = inv(A) * b
+    right residual:  b/A  = b * inv(A)
+    matrix power:    A^n
+    matrix elementwise power:  A.^x
+  
 * precompiled headers for model compilation speed
 
 * auto testing of sampler
@@ -105,7 +117,7 @@ EXTENSIONS
   - push ESS "measurement error" through the interval tests
 
 * error/exception policy throughout
-  - maths
+  - math
 
 * stop NUTS from running away without coming back
  -- limit number of steps
@@ -117,7 +129,6 @@ EXTENSIONS
  -- print out adaptation phase step size 
  -- print out number of steps (average and sd?)
     (bring in Boost accumulator package)
-
 
 * control decimal places in output 
   - set a variable on the writer or stream

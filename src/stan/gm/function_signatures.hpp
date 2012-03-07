@@ -101,6 +101,17 @@ add("multiply",MATRIX_T,VECTOR_T,ROW_VECTOR_T);
 add("multiply",VECTOR_T,MATRIX_T,VECTOR_T);
 add("multiply",ROW_VECTOR_T,ROW_VECTOR_T,MATRIX_T);
 add("multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+add("multiply",VECTOR_T,DOUBLE_T,VECTOR_T);
+add("multiply",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
+add("multiply",MATRIX_T,DOUBLE_T,MATRIX_T);
+
+add("elt_multiply",VECTOR_T,VECTOR_T,VECTOR_T);
+add("elt_multiply",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("elt_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+
+add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
+add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
 
 add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);

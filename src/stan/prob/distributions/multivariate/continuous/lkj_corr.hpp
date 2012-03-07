@@ -44,14 +44,16 @@ namespace stan {
 
     // LKJ_Corr(L|eta) [ L Cholesky factor of correlation matrix
     //                  eta > 0; eta == 1 <-> uniform]
-    template <bool propto = false,
+    template <bool propto,
               typename T_covar, typename T_shape, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_covar, T_shape>::type
-    lkj_corr_cholesky_log(const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
-                          const T_shape& eta, 
-                          const Policy& = Policy() ) {
-      static const char* function = "stan::prob::lkj_corr_cholesky_log<%1%>(%1%)";
+              class Policy>
+    typename boost::math::tools::promote_args<T_covar, T_shape>::type
+    lkj_corr_cholesky_log(
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+             const T_shape& eta, 
+             const Policy&) {
+      static const char* function 
+        = "stan::prob::lkj_corr_cholesky_log<%1%>(%1%)";
 
       using boost::math::tools::promote_args;
       using stan::math::check_positive;
@@ -72,16 +74,48 @@ namespace stan {
       return lp;
     }
 
+    template <bool propto,
+              typename T_covar, typename T_shape>
+    inline
+    typename boost::math::tools::promote_args<T_covar, T_shape>::type
+    lkj_corr_cholesky_log(
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+             const T_shape& eta) {
+      return lkj_corr_cholesky_log<propto>(L,eta,stan::math::default_policy());
+    }
+
+
+    template <typename T_covar, typename T_shape, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_covar, T_shape>::type
+    lkj_corr_cholesky_log(
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+             const T_shape& eta, 
+             const Policy&) {
+      return lkj_corr_cholesky_log<false>(L,eta,Policy());
+    }
+
+    template <typename T_covar, typename T_shape>
+    inline
+    typename boost::math::tools::promote_args<T_covar, T_shape>::type
+    lkj_corr_cholesky_log(
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+             const T_shape& eta) {
+      return lkj_corr_cholesky_log<false>(L,eta,stan::math::default_policy());
+    }
+
+
 
     // LKJ_Corr(y|eta) [ y correlation matrix (not covariance matrix)
     //                  eta > 0; eta == 1 <-> uniform]
-    template <bool propto = false,
+    template <bool propto,
               typename T_y, typename T_shape, 
-              class Policy = stan::math::default_policy>
-    inline typename boost::math::tools::promote_args<T_y, T_shape>::type
+              class Policy>
+    typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
                  const T_shape& eta, 
-                 const Policy& = Policy() ) {
+                 const Policy&) {
       static const char* function = "stan::prob::lkj_corr_log<%1%>(%1%)";
 
       using stan::math::check_size_match;
@@ -106,11 +140,44 @@ namespace stan {
         return 0.0;
 
       LLT< Matrix<T_y, Dynamic, Dynamic> > Cholesky = y.llt();
-      if(Cholesky.info() == Eigen::NumericalIssue) // do we need a check_numerical_issue function?
+      // FIXME: check_numerical_issue function?
+      if (Cholesky.info() == Eigen::NumericalIssue)
         return lp;
 
       Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = Cholesky.matrixL();
       return lkj_corr_cholesky_log<propto>(L, eta, Policy());
+    }
+
+
+
+
+    template <bool propto,
+              typename T_y, typename T_shape>
+    inline
+    typename boost::math::tools::promote_args<T_y, T_shape>::type
+    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
+                 const T_shape& eta) {
+      return lkj_corr_log<propto>(y,eta,stan::math::default_policy());
+    }
+      
+
+    template <typename T_y, typename T_shape, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y, T_shape>::type
+    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
+                 const T_shape& eta, 
+                 const Policy&) {
+      return lkj_corr_log<false>(y,eta,Policy());
+    }
+
+
+    template <typename T_y, typename T_shape>
+    inline
+    typename boost::math::tools::promote_args<T_y, T_shape>::type
+    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
+                 const T_shape& eta) {
+      return lkj_corr_log<false>(y,eta,stan::math::default_policy());
     }
 
 
