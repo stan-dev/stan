@@ -2,10 +2,14 @@
 #define __STAN__AGRAD__MATRIX_H__
 
 // global include
+#include <sstream>
+
 #include <Eigen/Dense>
+
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
 #include <stan/math/matrix.hpp>
+
 
 /**
  * (Expert) Numerical traits for algorithmic differentiation variables.
@@ -1219,23 +1223,53 @@ namespace stan {
     }
     
     /**
-     * Return the specified row of the specified matrix.
+     * Return the specified row minus 1 of the specified matrix.  That is,
+     * indexing is from 1, not 0, so this function returns the same
+     * value as the Eigen matrix call <code>m.row(i - 1)</code>.
      * @param m Matrix.
-     * @param i Row index.
-     * @return Specified row of the matrix.
+     * @param i Row index (plus 1).
+     * @return Specified row of the matrix; between 1 and the number
+     * of rows of <code>m</code> inclusive.
+     * @throws std::invalid_argument If the index is 0 or
+     * greater than the number of columns.
      */
     inline row_vector_v row(const matrix_v& m, size_t i) {
-      return m.row(i);
+      if (i == 0U) {
+        throw std::invalid_argument("row() indexes from 1; found index i=0");
+      }
+      if (i > static_cast<size_t>(m.rows())) {
+        std::stringstream msg;
+        msg << "index must be less than or equal to number of rows"
+            << " found m.rows()=" << m.rows()
+            << "; i=" << i;
+        throw std::invalid_argument(msg.str());
+      }
+      return m.row(i - 1);
     }
 
     /**
-     * Return the specified column of the specified matrix.
+     * Return the specified column minus 1 of the specified matrix.  Thus
+     * indexing is from 1, not 0, and this method returns the equivalent of
+     * the Eigen matrix call <code>m.col(j - 1)</code>.
      * @param m Matrix.
-     * @param j Column index.
+     * @param j Column index (plus 1); between 1 and the number of
+     * columns of <code>m</code> inclusive.
      * @return Specified column of the matrix.
+     * @throws std::invalid_argument if the index is 0 or greater than
+     * the number of columns.
      */
     inline vector_v col(const matrix_v& m, size_t j) {
-      return m.col(j);
+      if (j == 0U) {
+        throw std::invalid_argument("row() indexes from 1; found index i=0");
+      }
+      if (j > static_cast<size_t>(m.cols())) {
+        std::stringstream msg;
+        msg << "index must be less than or equal to number of rows"
+            << " found m.cols()=" << m.cols()
+            << "; =" << j;
+        throw std::invalid_argument(msg.str());
+      }
+      return m.col(j - 1);
     }
 
     /**

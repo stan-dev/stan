@@ -303,7 +303,7 @@ TEST(agrad_matrix,determinant_grad) {
   EXPECT_FLOAT_EQ(2.0,g[3]);
 }
 TEST(agrad_matrix,determinant3by3) {
-   // just test it can handle it
+  // just test it can handle it
   matrix_v Z(9,9);
   for (int i = 0; i < 9; ++i)
     for (int j = 0; j < 9; ++j)
@@ -2453,4 +2453,58 @@ TEST(agradMatrix,elt_divide_mat_dv) {
   VEC g = cgradvec(z(0),x_ind);
   EXPECT_FLOAT_EQ(2.0 / (- 10.0 * 10.0), g[0]);
   EXPECT_FLOAT_EQ(0.0,g[1]);
+}
+TEST(agradMatrix,col_v) {
+  using stan::agrad::col;
+  matrix_v y(2,3);
+  y << 1, 2, 3, 4, 5, 6;
+  vector_v z = col(y,1);
+  EXPECT_EQ(2,z.size());
+  EXPECT_FLOAT_EQ(1.0,z[0].val());
+  EXPECT_FLOAT_EQ(4.0,z[1].val());
+
+  vector_v w = col(y,2);
+  EXPECT_EQ(2,w.size());
+  EXPECT_EQ(2.0,w[0].val());
+  EXPECT_EQ(5.0,w[1].val());
+}
+TEST(agradMatrix,col_v_exc0) {
+  using stan::agrad::col;
+  matrix_v y(2,3);
+  y << 1, 2, 3, 4, 5, 6;
+  EXPECT_THROW(col(y,0),std::invalid_argument);
+}
+TEST(agradMatrix,col_v_excHigh) {
+  using stan::agrad::col;
+  matrix_v y(2,3);
+  y << 1, 2, 3, 4, 5, 6;
+  EXPECT_THROW(col(y,5),std::invalid_argument);
+}
+TEST(agradMatrix,row_v) {
+  using stan::agrad::row;
+  matrix_v y(2,3);
+  y << 1, 2, 3, 4, 5, 6;
+  vector_v z = row(y,1);
+  EXPECT_EQ(3,z.size());
+  EXPECT_FLOAT_EQ(1.0,z[0].val());
+  EXPECT_FLOAT_EQ(2.0,z[1].val());
+  EXPECT_FLOAT_EQ(3.0,z[2].val());
+
+  vector_v w = row(y,2);
+  EXPECT_EQ(3,w.size());
+  EXPECT_EQ(4.0,w[0].val());
+  EXPECT_EQ(5.0,w[1].val());
+  EXPECT_EQ(6.0,w[2].val());
+}
+TEST(agradMatrix,row_v_exc0) {
+  using stan::agrad::row;
+  matrix_v y(2,3);
+  y << 1, 2, 3, 4, 5, 6;
+  EXPECT_THROW(row(y,0),std::invalid_argument);
+}
+TEST(agradMatrix,row_v_excHigh) {
+  using stan::agrad::row;
+  matrix_v y(2,3);
+  y << 1, 2, 3, 4, 5, 6;
+  EXPECT_THROW(row(y,5),std::invalid_argument);
 }
