@@ -1,20 +1,33 @@
 TO DO FOR V1
 =================================================
 
-* discrete samplers: 
-  - Gibbs for small intervals -- test
-  - slice for others -- Matt
+* discrete samplers (Matt)
+  - Gibbs for small outcome sets
+  - slice for larger outcome sets
   - what about multinomial with constraints?
 
-* NUTS II
+* NUTS II (Matt)
   - diagonal mass adaptation during warmup
 
 * remaining doc
-  - API doc
-  - reference manual
-  - getting started guide
+  - reference manual (Bob)
+  - getting started guide (Bob) 
+  - scale jumbo Stan logo in doxygen (Daniel)
+  - API doc (Daniel, Bob)
+    + stan/agrad
+    + stan/command
+    + stan/io
+    + stan/gm
+    + stan/math
+    + stan/mcmc
+    + stan/memory
+    + stan/meta
+    + stan/model
+    + stan/prob
+  - add acknowledgements section
+    + Michael Betancourt
 
-* distribution engineering
+* distribution engineering (Daniel)
   - eliminate tabs from code
   - tarball
   - basic distro site
@@ -25,22 +38,6 @@ TO DO FOR V1
 
 * speed tests relative to BUGS
 
-* doxygen list:
-  - stan/agrad
-  - stan/command
-  - stan/io
-  - stan/gm
-  - stan/math
-  - stan/mcmc
-  - stan/memory
-  - stan/meta
-  - stan/model
-  - stan/prob
-
-* acknowledgements section:
-  - Marcus A. Brubaker
-  - Michael Betancourt
-  - ??
 
  
 CLEANUP (ONGOING)
@@ -50,18 +47,16 @@ CLEANUP (ONGOING)
   - generalize vector checks.
 
 * const declarations wherever possible
-  - work bottom up, but it's tricky at this late date
+  - very very painful at this late date
+  - be careful that compiled code matches
 
 * divide parser's grammar into multiple files to help compiler
 
 * clean up dependencies
-  - only include as much as necessary
-  - no namespace or file-level includes
-  - typedefs for matrix, vector, row vector
-  - simplify model includes with higher-level ones
-  - chart out remaining deps
+  - remove namespace or file-level "using" statements
+  - only include as much as necessary per file
 
-* convert for loops with size bounds to approp iterators
+* convert for loops with size bounds to appropriate iterators
 
 
 Stan-R
@@ -101,6 +96,11 @@ Stan-R
 
 EXTENSIONS
 =================================================
+
+* user model library
+  - something we don't have to get too involved vetting
+  - ideally things hard to do with other systems
+  - or illustrate the unusual parts of our modeling language
 
 * more matrix ops:
     left residuals:  A\b = inv(A) * b
