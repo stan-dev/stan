@@ -961,6 +961,28 @@ namespace stan {
     }
 
     /**
+     * Return the element-wise logarithm of the matrix or vector.
+     *
+     * @param m The matrix or vector.
+     * @return ret(i,j) = log(m(i,j))
+     */
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> log(const Eigen::Matrix<double,Rows,Cols>& m) {
+      return m.array().log().matrix();
+    }
+
+    /**
+     * Return the element-wise exponentiation of the matrix or vector.
+     *
+     * @param m The matrix or vector.
+     * @return ret(i,j) = exp(m(i,j))
+     */
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> exp(const Eigen::Matrix<double,Rows,Cols>& m) {
+      return m.array().exp().matrix();
+    }
+
+    /**
      * Return the difference between the first specified column vector
      * and the second.  The two vectors must have the same size.
      * @param v1 First vector.

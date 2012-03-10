@@ -24,6 +24,14 @@ add_unary("ceil");
 add_binary("fmod");
 add_unary("abs");
 
+add("exp",VECTOR_T,VECTOR_T);
+add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
+add("exp",MATRIX_T,MATRIX_T);
+
+add("log",VECTOR_T,VECTOR_T);
+add("log",ROW_VECTOR_T,ROW_VECTOR_T);
+add("log",MATRIX_T,MATRIX_T);
+
 add("rows",INT_T,VECTOR_T);
 add("rows",INT_T,ROW_VECTOR_T);
 add("rows",INT_T,MATRIX_T);

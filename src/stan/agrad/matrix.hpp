@@ -764,7 +764,29 @@ namespace stan {
     inline var trace(const matrix_v& m) {
       return m.trace();
     }
-
+    
+   /**
+     * Return the element-wise logarithm of the matrix or vector.
+     *
+     * @param m The matrix or vector.
+     * @return ret(i,j) = log(m(i,j))
+     */
+    template<typename TM, int Rows, int Cols>
+    inline Eigen::Matrix<var,Rows,Cols> log(const Eigen::Matrix<TM,Rows,Cols>& m) {
+      return to_var(m).array().log().matrix();
+    }
+   
+    /**
+     * Return the element-wise exponentiation of the matrix or vector.
+     *
+     * @param m The matrix or vector.
+     * @return ret(i,j) = exp(m(i,j))
+     */
+    template<typename TM, int Rows, int Cols>
+    inline Eigen::Matrix<var,Rows,Cols> exp(const Eigen::Matrix<TM,Rows,Cols>& m) {
+      return to_var(m).array().exp().matrix();
+    }
+     
     /**
      * Return the sum of the specified column vectors.
      * The two vectors must have the same size.
