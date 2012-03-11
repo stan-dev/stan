@@ -13,6 +13,10 @@ namespace stan {
 
   namespace math {
 
+    using std::exp;
+    using std::log;
+
+
 
     // C99 
 

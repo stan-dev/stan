@@ -419,6 +419,36 @@ TEST(agrad_matrix, dot_product__rowvector_rowvector__exception) {
 }
 // end dot_product tests
 
+// exp tests
+TEST(agrad_matrix, exp__matrix) {
+  matrix_d expected_output(2,2);
+  matrix_v mv(2,2), output;
+  int i,j;
+
+  mv << 1, 2, 3, 4;
+  expected_output << std::exp(1), std::exp(2), std::exp(3), std::exp(4);
+  output = stan::agrad::exp(mv);
+
+  for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+      EXPECT_FLOAT_EQ(expected_output(i,j), output(i,j).val());
+}
+
+// log tests
+TEST(agrad_matrix, log__matrix) {
+  matrix_d expected_output(2,2);
+  matrix_v mv(2,2), output;
+  int i,j;
+
+  mv << 1, 2, 3, 4;
+  expected_output << std::log(1), std::log(2), std::log(3), std::log(4);
+  output = stan::agrad::log(mv);
+
+  for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+      EXPECT_FLOAT_EQ(expected_output(i,j), output(i,j).val());
+}
+
 // add tests
 TEST(agrad_matrix, add__vector_vector) {
   vector_v expected_output(5), output;

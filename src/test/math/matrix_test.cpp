@@ -296,6 +296,36 @@ TEST(matrix,get_base1_8) {
                                             "x8",1));
 }
 
+// exp tests
+TEST(matrix_test, exp__matrix) {
+  matrix_d expected_output(2,2);
+  matrix_d mv(2,2), output;
+  int i,j;
+
+  mv << 1, 2, 3, 4;
+  expected_output << std::exp(1), std::exp(2), std::exp(3), std::exp(4);
+  output = stan::math::exp(mv);
+
+  for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+      EXPECT_FLOAT_EQ(expected_output(i,j), output(i,j));
+}
+
+// log tests
+TEST(matrix_test, log__matrix) {
+  matrix_d expected_output(2,2);
+  matrix_d mv(2,2), output;
+  int i,j;
+
+  mv << 1, 2, 3, 4;
+  expected_output << std::log(1), std::log(2), std::log(3), std::log(4);
+  output = stan::math::log(mv);
+
+  for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+      EXPECT_FLOAT_EQ(expected_output(i,j), output(i,j));
+}
+
 TEST(matrix_test,add_v_exception) {
   vector_d d1, d2;
 
