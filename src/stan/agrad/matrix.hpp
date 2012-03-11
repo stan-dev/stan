@@ -10,7 +10,6 @@
 #include <stan/agrad/special_functions.hpp>
 #include <stan/math/matrix.hpp>
 
-
 /**
  * (Expert) Numerical traits for algorithmic differentiation variables.
  */
@@ -31,6 +30,21 @@ namespace Eigen {
       typedef stan::agrad::var ReturnType;
     };
 
+    template<> struct is_same<stan::agrad::var,double> { enum { value = 1}; };
+    template<> struct is_same<double,stan::agrad::var> { enum { value = 1}; };
+    template<> struct is_arithmetic<stan::agrad::var> { enum { value = true}; }; // possibly necessary but does not seem to do anything
+
+    template<> struct conj_helper<stan::agrad::var, double, false, false>
+    {
+      typedef stan::agrad::var Scalar;
+
+      EIGEN_STRONG_INLINE Scalar pmadd(const Scalar& x, const double& y, const Scalar& c) const
+      { return c + pmul(x,y); }
+
+      EIGEN_STRONG_INLINE Scalar pmul(const Scalar& x, const double& y) const
+      { return x*y; }
+
+    };
   }
 
   /**
