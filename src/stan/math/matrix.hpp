@@ -983,6 +983,27 @@ namespace stan {
     }
 
     /**
+     * Return the sum of a matrix or vector and a scalar.
+     * @param m Matrix or vector.
+     * @param c Scalar.
+     * @return The matrix or vector plus the scalar.
+     */
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> add(const Eigen::Matrix<double,Rows,Cols>& m, const double& c) {
+      return (m.array() + c).matrix();
+    }
+    /**
+     * Return the sum of a scalar and a matrix or vector.
+     * @param c Scalar.
+     * @param m Matrix or vector.
+     * @return Scalar plus the matrix or vector.
+     */
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> add(const double& c, const Eigen::Matrix<double,Rows,Cols>& m) {
+      return (c + m.array()).matrix();
+    }
+
+    /**
      * Return the difference between the first specified column vector
      * and the second.  The two vectors must have the same size.
      * @param v1 First vector.
@@ -991,7 +1012,7 @@ namespace stan {
      * @throw std::invalid_argument if v1 and v2 are not the same size.
      */
     inline vector_d subtract(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size()) 
+      if (v1.size() != v2.size())
         throw std::invalid_argument ("v1.size() != v2.size()");
       return v1 - v2;
     }
@@ -1003,9 +1024,9 @@ namespace stan {
      * @return First vector minus the second vector.
      * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
-    inline row_vector_d subtract(const row_vector_d& rv1, 
+    inline row_vector_d subtract(const row_vector_d& rv1,
                                  const row_vector_d& rv2) {
-      if (rv1.size() != rv2.size()) 
+      if (rv1.size() != rv2.size())
         throw std::invalid_argument ("rv1.size() != rv2.size()");
       return rv1 - rv2;
     }
@@ -1021,6 +1042,27 @@ namespace stan {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
         throw std::invalid_argument ("dimensions of m1 and m2 do not match");
       return m1 - m2;
+    }
+
+    /**
+     * Return the difference between a matrix or vector and a scalar.
+     * @param m Matrix or vector.
+     * @param c Scalar.
+     * @return The matrix or vector minus the scalar.
+     */
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> subtract(const Eigen::Matrix<double,Rows,Cols>& m, double c) {
+      return (m.array() - c).matrix();
+    }
+    /**
+     * Return the difference between a scalar and a matrix or vector.
+     * @param c Scalar.
+     * @param m Matrix or vector.
+     * @return Scalar minus the matrix or vector.
+     */
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> subtract(double c, const Eigen::Matrix<double,Rows,Cols>& m) {
+      return (c - m.array()).matrix();
     }
 
     /**

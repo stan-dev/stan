@@ -85,10 +85,22 @@ add("prod",DOUBLE_T,MATRIX_T);
 add("add",VECTOR_T,VECTOR_T,VECTOR_T);
 add("add",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("add",MATRIX_T,MATRIX_T,MATRIX_T);
+add("add",VECTOR_T,VECTOR_T,DOUBLE_T);
+add("add",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
+add("add",MATRIX_T,MATRIX_T,DOUBLE_T);
+add("add",VECTOR_T,DOUBLE_T,VECTOR_T);
+add("add",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
+add("add",MATRIX_T,DOUBLE_T,MATRIX_T);
 
 add("subtract",VECTOR_T,VECTOR_T,VECTOR_T);
 add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("subtract",MATRIX_T,MATRIX_T,MATRIX_T);
+add("subtract",VECTOR_T,VECTOR_T,DOUBLE_T);
+add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
+add("subtract",MATRIX_T,MATRIX_T,DOUBLE_T);
+add("subtract",VECTOR_T,DOUBLE_T,VECTOR_T);
+add("subtract",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
+add("subtract",MATRIX_T,DOUBLE_T,MATRIX_T);
 
 add("minus",DOUBLE_T,DOUBLE_T);
 add("minus",VECTOR_T,VECTOR_T);
