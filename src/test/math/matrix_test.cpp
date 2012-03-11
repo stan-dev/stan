@@ -421,25 +421,25 @@ TEST(matrix_test,subtract_m_exception) {
 TEST(matrixTest,subtract_c_m) {
   matrix_d v(2,2);
   v << 1, 2, 3, 4;
-  vector_d result;
+  matrix_d result;
 
   result = stan::math::subtract(2.0,v);
-  EXPECT_FLOAT_EQ(1.0,result(0));
-  EXPECT_FLOAT_EQ(0.0,result(1));
-  EXPECT_FLOAT_EQ(-1.0,result(2));
-  EXPECT_FLOAT_EQ(-2.0,result(3));
+  EXPECT_FLOAT_EQ(1.0,result(0,0));
+  EXPECT_FLOAT_EQ(0.0,result(0,1));
+  EXPECT_FLOAT_EQ(-1.0,result(1,0));
+  EXPECT_FLOAT_EQ(-2.0,result(1,1));
 
   result = stan::math::subtract(v,2.0);
-  EXPECT_FLOAT_EQ(-1.0,result(0));
-  EXPECT_FLOAT_EQ(0.0,result(1));
-  EXPECT_FLOAT_EQ(1.0,result(2));
-  EXPECT_FLOAT_EQ(2.0,result(3));
+  EXPECT_FLOAT_EQ(-1.0,result(0,0));
+  EXPECT_FLOAT_EQ(0.0,result(0,1));
+  EXPECT_FLOAT_EQ(1.0,result(1,0));
+  EXPECT_FLOAT_EQ(2.0,result(1,1));
 }
 
 TEST(matrixTest,subtract_c_rv) {
   row_vector_d v(3);
   v << 1, 2, 3;
-  vector_d result;
+  row_vector_d result;
 
   result = stan::math::subtract(2.0,v);
   EXPECT_FLOAT_EQ(1.0,result(0));
@@ -453,7 +453,7 @@ TEST(matrixTest,subtract_c_rv) {
 }
 
 
-TEST(matrixTest,add_c_v) {
+TEST(matrixTest,subtract_c_v) {
   vector_d v(3);
   v << 1, 2, 3;
   vector_d result;
@@ -472,25 +472,25 @@ TEST(matrixTest,add_c_v) {
 TEST(matrixTest,add_c_m) {
   matrix_d v(2,2);
   v << 1, 2, 3, 4;
-  vector_d result;
+  matrix_d result;
 
   result = stan::math::add(2.0,v);
-  EXPECT_FLOAT_EQ(3.0,result(0));
-  EXPECT_FLOAT_EQ(4.0,result(1));
-  EXPECT_FLOAT_EQ(5.0,result(2));
-  EXPECT_FLOAT_EQ(6.0,result(3));
+  EXPECT_FLOAT_EQ(3.0,result(0,0));
+  EXPECT_FLOAT_EQ(4.0,result(0,1));
+  EXPECT_FLOAT_EQ(5.0,result(1,0));
+  EXPECT_FLOAT_EQ(6.0,result(1,1));
 
   result = stan::math::add(v,2.0);
-  EXPECT_FLOAT_EQ(3.0,result(0));
-  EXPECT_FLOAT_EQ(4.0,result(1));
-  EXPECT_FLOAT_EQ(5.0,result(2));
-  EXPECT_FLOAT_EQ(6.0,result(3));
+  EXPECT_FLOAT_EQ(3.0,result(0,0));
+  EXPECT_FLOAT_EQ(4.0,result(0,1));
+  EXPECT_FLOAT_EQ(5.0,result(1,0));
+  EXPECT_FLOAT_EQ(6.0,result(1,1));
 }
 
 TEST(matrixTest,add_c_rv) {
   row_vector_d v(3);
   v << 1, 2, 3;
-  vector_d result;
+  row_vector_d result;
 
   result = stan::math::add(2.0,v);
   EXPECT_FLOAT_EQ(3.0,result(0));
