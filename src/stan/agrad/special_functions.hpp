@@ -1288,9 +1288,7 @@ namespace stan {
       return var(new multiply_log_dv_vari(a,b.vi_));
     }
 
-    inline const var& conj(const var& x) {return x;}
-    inline const var& real(const var& x) {return x;}
-    inline const var  imag(const var&  ) {return 0.0;}
+
 
   }
 }
