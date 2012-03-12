@@ -1416,17 +1416,17 @@ namespace stan {
         int extra_indent = is_matrix ? 2U : is_vector ? 1U : 0U;
         if (is_matrix) {
           generate_indent(indent,o_);
-          o_ << "for (size_t j2__ = 0U; j2__ < ";
+          o_ << "for (int j2__ = 0U; j2__ < ";
           generate_expression(dim2.expr_,o_);
           o_ << "; ++j2__)" << EOL;
 
           generate_indent(indent+1,o_);
-          o_ << "for (size_t j1__ = 0U; j1__ < ";
+          o_ << "for (int j1__ = 0U; j1__ < ";
           generate_expression(dim1.expr_,o_);
           o_ << "; ++j1__)" << EOL;
         } else if (is_vector) {
           generate_indent(indent,o_);
-          o_ << "for (size_t j1__ = 0U; j1__ < ";
+          o_ << "for (int j1__ = 0U; j1__ < ";
           generate_expression(dim1.expr_,o_);
           o_ << "; ++j1__)" << EOL;
         }

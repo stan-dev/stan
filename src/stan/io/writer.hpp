@@ -240,7 +240,7 @@ namespace stan {
        * @param y Vector to write.
        */
       void vector_unconstrain(const vector_t& y) {
-        for (size_t i = 0; i < y.size(); ++i)
+        for (typename vector_t::size_type i = 0; i < y.size(); ++i)
           data_r_.push_back(y[i]);
       }
 
@@ -250,7 +250,7 @@ namespace stan {
        * @param y Vector to write.
        */
       void row_vector_unconstrain(const vector_t& y) {
-        for (size_t i = 0; i < y.size(); ++i)
+        for (typename vector_t::size_type i = 0; i < y.size(); ++i)
           data_r_.push_back(y[i]);
       }
 
@@ -260,8 +260,8 @@ namespace stan {
        * @param y Matrix to write.
        */
       void matrix_unconstrain(const matrix_t& y) {
-        for (size_t i = 0; i < y.rows(); ++i)
-          for (size_t j = 0; j < y.cols(); ++j) 
+        for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
+          for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
             data_r_.push_back(y(i,j));
       }
 
