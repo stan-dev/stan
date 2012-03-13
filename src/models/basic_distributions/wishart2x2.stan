@@ -16,25 +16,36 @@ transformed data {
   S[2,2] <- 0.5;
 }
 parameters {
-  real(-1,1) rho;
-  real(0,) var1;
-  real(0,) var2;
+  real x;
+  real(0,) sd1;
+  real(0,) sd2;
 }
-model {
+transformed parameters {
+  real rho;
   real cov;
   matrix(2,2) W;
 
-  cov <- rho * sqrt(var1 * var2);
+  rho <- tanh(x);
+  cov <- rho * sd1 * sd2;
 
-  W[1,1] <- var1;
-  W[2,2] <- var2;
+  W[1,1] <- sd1 * sd1;
+  W[2,2] <- sd2 * sd2;
   W[1,2] <- cov;
   W[2,1] <- cov;
-
+}
+model {
   // apply log Jacobian determinant of transform
-  // (var1,var2,rho) -> (W[1,1],W[2,2],W[1,2])
+  // (sd1,sd2,x) -> (W[1,1],W[2,2],W[1,2])
+  //     | d W[1,1] / d sd1   d W[1,1] / d sd2   d W[1,1] / d x |
+  // J = | d W[2,2] / d sd1   d W[2,2] / d sd2   d W[2,2] / d x |
+  //     | d W[1,2] / d sd1   d W[1,2] / d sd2   d W[1,2] / d x |
+  //
+  //     | 2 * sd1                     0                0                     |
+  //   = | 0                         2 * sd2            0                     |
+  //     | rho * sd2               rho * sd1        sd1 * sd2 * (1 - rho^2)   |
 
-  lp__ <- lp__ + 0.5 * (log(var1) + log(var2));   
+  lp__ <- lp__ + log(2.0 * sd1) + log(2.0 * sd2) + log(sd1 * sd2 * (1.0 - rho * rho));
 
   W ~ wishart(4, S);
 }
+
