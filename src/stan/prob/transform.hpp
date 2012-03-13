@@ -12,7 +12,6 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 
-
 namespace stan {
   
   namespace prob {
@@ -238,20 +237,9 @@ namespace stan {
                const Array<T,Dynamic,1>& sds,  // on (0,inf)
                T& log_prob) {
       size_t K = sds.rows();
-      // size_t counter = 0;
-      const Array<T,Dynamic,1> log_sds = sds.log();
-      // (diagonal and positive) Jacobian determinant for the mapping: correlations -> covariances
-      for (size_t i = 0; i < (K - 1); i++) {
-        for (size_t j = i; j < K; j++) {
-          // log_prob += log_sds(i,1) + log_sds(j,1); // throws assert trap
-          log_prob += log_sds[i] + log_sds[j]; // OK
-        }
-      }
-      log_prob += 2.0 * log_sds[K - 1];
-
-      DiagonalMatrix<T,Dynamic> D(K);
-      D.diagonal() = sds;
-      return D * read_corr_L(CPCs, K, log_prob);
+      // adjust due to transformation from correlations to covariances
+      log_prob += (sds.log().sum() + log(2.0)) * K;
+      return sds.matrix().asDiagonal() * read_corr_L(CPCs, K, log_prob);
     }
 
     /** a generally worse alternative to call prior to evaluating the density
