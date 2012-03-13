@@ -1195,10 +1195,10 @@ namespace stan {
       Array<T,Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
       for (size_t i = 0; i < k_choose_2; ++i)
-        cpcs[i] = corr_constrain(x[pos++]); // ,lp);
+        cpcs[i] = corr_constrain(x[pos++], lp);
       Array<T,Dynamic,1> sds(k);
       for (size_t i = 0; i < k; ++i)
-        sds[i] = positive_constrain(x[pos++]); // ,lp);
+        sds[i] = positive_constrain(x[pos++],lp);
       return read_cov_matrix(cpcs, sds, lp);
     }
 
