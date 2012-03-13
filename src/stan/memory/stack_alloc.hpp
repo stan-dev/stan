@@ -8,6 +8,9 @@
 #include <stdint.h> // FIXME: replace with cstddef?
 #include <vector>
 
+#define likely(x) (__builtin_expect(!!(x),1))
+#define unlikely(x) (__builtin_expect(!!(x),0))
+
 namespace stan { 
 
   namespace memory { 
@@ -122,6 +125,9 @@ namespace stan {
        * @return A pointer to the allocated memory.
        */
       inline void* alloc(size_t len) {
+        const size_t cur_nblocks = blocks_.size();
+        char *result;
+
         // not enough space in current block
         if (sizes_[cur_block_] < used_ + len) {
           ++cur_block_;
@@ -129,26 +135,28 @@ namespace stan {
         }
 
         // continue skipping blocks that are too small
-        while (cur_block_ < blocks_.size() && sizes_[cur_block_] < len)
+        while (cur_block_ < cur_nblocks && sizes_[cur_block_] < len)
           ++cur_block_;
                    
         // alloc block if necessary
-        if (cur_block_ >= sizes_.size()) {
+        if (unlikely(cur_block_ >= cur_nblocks)) {
           // malloc if can't reuse
           size_t newsize = sizes_.back() * 2;
           if (newsize < len) // could keep doubling until big enough
             newsize = len;
-          char* bytes = eight_byte_aligned_malloc(newsize);
-          if (!bytes)
+          result = eight_byte_aligned_malloc(newsize);
+          if (!result)
             throw std::bad_alloc(); // no msg allowed in bad_alloc ctor
-          blocks_.push_back(bytes);
+          blocks_.push_back(result);
           sizes_.push_back(newsize);
-          used_ = 0;
+          used_ = len;
+          return (void*)result;
         }
-
-        void* result = &blocks_[cur_block_][used_];
-        used_ += len;
-        return result;
+        else {
+          result = blocks_[cur_block_] + used_;
+          used_ += len;
+          return (void*)result;
+        }
       }
 
       /**
