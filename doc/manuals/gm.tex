@@ -8,6 +8,11 @@
 \newcommand{\stanc}{stanc\xspace}
 \newcommand*{\Cpp}{C{\ensuremath{++}}\xspace}
 
+\newcommand{\code}[1]{{\tt #1}}
+\newcommand{\mycaption}[2]{\caption{{\it #2}\label{#1.fig}}}
+
+\newcommand{\reffig}[1]{Figure~\ref{#1.fig}}
+
 
 \title{\Stan Modeling Language Reference Manual}
 \author{\Stan Development Team}
@@ -18,66 +23,129 @@
 \maketitle
 
 \begin{abstract}
-  \Stan's modeling language allows users to write a model specifying a
-  probability function $p(y,\theta)$, where $y$ is for known values
-  (e.g., constants, hyperparameters, and modeled data) and $\theta$ is
-  for unknown values (e.g., estimated parameters, missing data, or
-  simulated values).
-
-  The stanc compiler converts a Stan program to a \Cpp class.
-  Instances of the class are constructed given values for
-  $y$.  The class provides methods to compute the log probability,
-  $\log p(y,\theta)$, and its gradient, $\nabla_{\theta} \log
-  p(y,\theta)$, as functions of $\theta$.  Gradients are computed using
-  accurate and efficient reverse-mode algorithmic differentiaton at a
-  small multiple of the cost of the log probability function itself
-  (independently of dimensionality).
-  
-  The C++ class can be plugged into Stan's continuous and discrete
-  samplers to draw a sequence of samples $\theta^{(m)}$ from the
-  posterior $p(\theta|y) \propto p(y,\theta)$.  These samples may be
-  used for full Bayesian inference, much of which can be done directly
-  within Stan.
-
-  For continuous variables, Stan uses Hamiltonian Monte Carlo (HMC)
-  sampling.  Stan implements the No-U-Turn Sampler (NUTS), an adaptive
-  version of HMC that automatically tunes step sizes and a diagonal
-  mass matrix during warmup and then adapts the number of leapfrog
-  integration steps during sampling.  Stan is expressive enough to
-  allow most discrete variables to be marginalized out.  For the remaining
-  discrete parameters, Stan uses Gibbs sampling if there are only a few
-  outcomes and adaptive slice sampling otherwise.
-
-  Stan's language is more expressive than that of its predecessors,
-  BUGS and JAGS.  Most strikingly, variables and expressions are
-  strongly typed and declared as data or parameters in the model.
-  Stan also supports a broader range of arithmetic, matrix, and linear
-  algebra operations than BUGS or JAGS.  Users may manipulate
-  log probability functions directly and are not required to use
-  proper priors.
-
-  % Stan also supports optimization methods that are able to find
-  % a $\theta^{*}$ that (locally) optimizes $p(\theta|y)$.
+  The \Stan package provides efficient and scalable full Bayesian
+  inference implemented with Markov Chain Monte Carlo (MCMC) sampling.
+  \Stan's modeling language allows users to write down a Bayesian
+  modeling specification, compile it to efficient C++ code which
+  samples unknown parameters from the posterior given known data.
 \end{abstract}
+
+\chapter{Introduction}
+
+\Stan's modeling language allows users to write a model specifying a
+probability function $p(y,\theta)$, where $y$ is for known values
+(e.g., constants, hyperparameters, and modeled data) and $\theta$ is
+for unknown values (e.g., estimated parameters, missing data, or
+simulated values).
+
+The stanc compiler converts a Stan program to a \Cpp class.
+Instances of the class are constructed given values for $y$.  The
+class provides methods to compute the log probability, $\log
+p(y,\theta)$, and its gradient with respect to the parameters,
+$\nabla_{\theta} \log p(y,\theta)$.  Gradients are computed using
+accurate and efficient reverse-mode algorithmic differentiaton at a
+small multiple of the cost of the log probability function itself
+(independently of dimensionality).
+
+The \Cpp class can be plugged into Stan's continuous and discrete
+samplers to draw a sequence of samples $\theta^{(m)}$ whose
+distribution is that of the posterior, $p(\theta|y) \propto
+p(y,\theta)$.  The samples may be used for full Bayesian
+inference, much of which can be carried out directly within Stan.
+
+For continuous variables, Stan uses Hamiltonian Monte Carlo (HMC)
+sampling.  In addition to basic HMC, Stan implements an adaptive
+version of HMC, the No-U-Turn Sampler (NUTS).  NUTS automatically
+tunes step sizes and a diagonal mass matrix during warmup and then
+adapts the number of leapfrog integration steps during sampling.
+Stan is expressive enough to allow most discrete variables to be
+marginalized out.  For the remaining discrete parameters, Stan uses
+Gibbs sampling if there are only a few outcomes and adaptive slice
+sampling otherwise.
+
+Stan's language is more imperative than its declarative
+predecessors, BUGS and JAGS.  Statements are execute din the order
+they are specified and variables and expressions are strongly typed
+and declared as data or parameters in the model rather than by a
+calling function.  Stan also supports a broader range of arithmetic,
+matrix, and linear algebra operations than BUGS or JAGS.  Users may
+manipulate log probability functions directly and are not required
+to use proper priors.
+
+% Stan also supports optimization methods that are able to find
+% a $\theta^{*}$ that (locally) optimizes $p(\theta|y)$.
 
 \chapter{Getting Started}
 
-Here's a simple example of a Stan model for estimating a simple
-Bernoulli parameter.
-
+\begin{figure}
+\begin{center}
 \begin{verbatim}
 data {
-    int(0,) N;
-    int(0,1) y[N];
+  int(0,) N;
+  int(0,1) y[N];
 }
 parameters {
-    real theta;
+  real theta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ bernoulli(theta);
+  for (n in 1:N)
+    y[n] ~ bernoulli(theta);
 }
 \end{verbatim}
+\end{center}
+\mycaption{bernoulli-est}{Simple \Stan model for estimating the
+  parameter \code{theta} of a Bernoulli distribution given data
+  \code{y}.}
+\end{figure}
+
+The simplest model that actually does something is illustrated
+in \reffig{bernoulli-est}.
+
+\chapter{Modeling Language Reference}
+
+\Stan's modeling language is more procedural than what users may be
+familiar with from BUGS and JAGS, both of which are declarative.  For
+instance, \Stan statements are executed in the order they are written
+in model specifications and local variables may be reassigned as in a
+procedural programming language.  Furthermore, variables must be
+declared before they are use.  
+
+Like most programming languages, \Stan is defined syntactically in
+terms of expressions, which denote values, and statements, which
+denote an action to be taken.
+
+The purpose of \Stan's modeling language is to allow users to write
+down a probability function up to a multiplicative normalizing
+constant.  
+
+
+\section{Expressions}
+
+The top-level grammar for expressions is provided in \reffig{expression-grammar}.
+
+\begin{figure}
+\begin{center}
+\begin{verbatim}
+expression ::= literal
+             | variable
+             | expression infixOp expression
+             | prefixOp expression
+             | expression postfixOp
+             | expression '[' expressions ']'
+             | function '(' expressions ')'
+             | '(' expression ')'
+\end{verbatim}
+\end{center}
+\mycaption{expression-grammar}
+          {The top-level expression grammar for Stan model specifications.}
+\end{figure}
+
+Valid \Stan expresions include simple numerical literals (e.g.,
+\code{2}, \code{32.7}), identifiers representing variables (e.g.,
+\code{theta}), 
+
+The simplest form of expression is a literal denoting a
+value, such as \code{32.7}.  Expressions may also consist of
 
 
 \end{document}
