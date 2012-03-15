@@ -67,6 +67,9 @@ namespace stan {
       // Stop immediately if H < u - _maxchange
       const double _maxchange;
 
+      // Limit tree depth
+      const int _maxdepth;
+
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
 
@@ -144,6 +147,7 @@ namespace stan {
           _rand_uniform_01(_rand_int),
 
           _maxchange(-1000),
+          _maxdepth(12),
 
           _da(gamma, std::vector<double>(1, 0)) {
         
@@ -252,7 +256,7 @@ namespace stan {
         double prob_sum = -1;
         int newnvalid = -1;
         int n_considered = 0;
-        while (criterion) {
+        while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
           direction = 2 * (_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
             build_tree(xminus, mminus, gradminus, u, direction, depth,
@@ -276,6 +280,7 @@ namespace stan {
             _logp = newlogp;
           }
           nvalid += newnvalid;
+//          fprintf(stderr, "depth = %d, _logp = %g\n", depth, _logp);
           ++depth;
         }
 
