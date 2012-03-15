@@ -121,7 +121,8 @@ namespace stan {
        * @param base_rng Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
-      nuts(prob_grad& model, 
+      nuts(prob_grad& model,
+           int maxdepth = 12, 
            double epsilon = -1,
            double epsilon_pm = 0.0,
            bool adapt_epsilon = true,
@@ -147,7 +148,7 @@ namespace stan {
           _rand_uniform_01(_rand_int),
 
           _maxchange(-1000),
-          _maxdepth(12),
+          _maxdepth(maxdepth),
 
           _da(gamma, std::vector<double>(1, 0)) {
         

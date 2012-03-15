@@ -112,6 +112,10 @@ namespace stan {
                         "Number of leapfrog steps; -1 for No-U-Turn adaptation",
                         "default = -1");
 
+      print_help_option("max_treedepth","int",
+                        "Maximum depth of the tree in NUTS, set to -1 for no limit.  Limits the number of simulation steps that NUTS can take to 2^max_treedepth.",
+                        "default = 12");
+      
       print_help_option("epsilon","float",
                         "Initial value for step size, or -1 to set automatically",
                         "default = -1");
@@ -250,6 +254,9 @@ namespace stan {
       double epsilon = -1.0;
       command.val("epsilon",epsilon);
 
+      int max_treedepth = 12;
+      command.val("max_treedepth",max_treedepth);
+
       double epsilon_pm = 0.0;
       command.val("epsilon_pm",epsilon_pm);
 
@@ -365,6 +372,7 @@ namespace stan {
       std::cout << "thin = " << num_thin << std::endl;
 
       std::cout << "leapfrog_steps = " << leapfrog_steps << std::endl;
+      std::cout << "max_treedepth = " << max_treedepth << std::endl;;
       std::cout << "epsilon = " << epsilon << std::endl;;
       std::cout << "epsilon_pm = " << epsilon_pm << std::endl;;
       std::cout << "epsilon_adapt_off = " << epsilon_adapt_off << std::endl;;
@@ -394,6 +402,7 @@ namespace stan {
       write_comment_property(sample_stream,"warmup",num_warmup);
       write_comment_property(sample_stream,"thin",num_thin);
       write_comment_property(sample_stream,"leapfrog_steps",leapfrog_steps);
+      write_comment_property(sample_stream,"max_treedepth",max_treedepth);
       write_comment_property(sample_stream,"epsilon",epsilon);
       write_comment_property(sample_stream,"epsilon_pm",epsilon_pm);
       write_comment_property(sample_stream,"delta",delta);
@@ -407,7 +416,7 @@ namespace stan {
 
       if (leapfrog_steps < 0) {
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
-                                             epsilon, epsilon_pm, epsilon_adapt,
+                                             max_treedepth, epsilon, epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
                                              base_rng);
         sample_from(nuts_sampler,epsilon_adapt,refresh,
