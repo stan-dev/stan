@@ -150,8 +150,8 @@ namespace stan {
         && ((n + 1) % refresh == 0);
     }
 
-    template <typename T_model>
-    void sample_from(stan::mcmc::adaptive_sampler& sampler,
+    template <class Sampler, class Model>
+    void sample_from(Sampler& sampler,
                      bool epsilon_adapt,
                      int refresh,
                      int num_iterations,
@@ -160,7 +160,7 @@ namespace stan {
                      std::ostream& sample_file_stream,
                      std::vector<double>& params_r,
                      std::vector<int>& params_i,
-                     T_model& model) {
+                     Model& model) {
 
       sampler.set_params(params_r,params_i);
      
@@ -193,6 +193,7 @@ namespace stan {
 
             // FIXME: use csv_writer arg to make comma optional?
             sample_file_stream << sample.log_prob() << ',';
+            sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
             model.write_csv(params_r,params_i,sample_file_stream);
@@ -216,7 +217,7 @@ namespace stan {
       o << "# " << key << "=" << val << std::endl;
     }
 
-    template <typename T_model>
+    template <class Model>
     int nuts_command(int argc, const char* argv[]) {
 
       stan::io::cmd_line command(argc,argv);
@@ -233,7 +234,7 @@ namespace stan {
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
 
-      T_model model(data_var_context);
+      Model model(data_var_context);
 
       std::string sample_file = "samples.csv";
       command.val("samples",sample_file);
@@ -409,16 +410,20 @@ namespace stan {
       write_comment_property(sample_stream,"gamma",gamma);
       write_comment(sample_stream);
 
-      if (!append_samples) {
-        sample_stream << "lp__,"; // log probability first
-        model.write_csv_header(sample_stream);
-      }
-
       if (leapfrog_steps < 0) {
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
-                                             max_treedepth, epsilon, epsilon_pm, epsilon_adapt,
+                                             max_treedepth, epsilon, 
+                                             epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
                                              base_rng);
+
+        // cut & paste (see below) to enable sample-specific params
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          nuts_sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,
@@ -429,6 +434,14 @@ namespace stan {
                                                     epsilon, epsilon_pm, epsilon_adapt,
                                                     delta, gamma,
                                                     base_rng);
+
+        // cut & paste (see above) to enable sample-specific params
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          hmc_sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,

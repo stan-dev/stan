@@ -205,6 +205,42 @@ namespace stan {
         return _adapt;
       }
 
+      /**
+       * Write out any sampler-specific parameters for output.
+       *
+       * This method must
+       * match<code>write_sampler_param_names(std::ostream&)</code> in
+       * terms of number of parameters written.
+       *
+       * Params should be writte starting with a comma, then
+       * the first parameter, then a comma, then the second
+       * parameter, ending on the final parameter.
+       *
+       * The base class implementation is a no-op.
+       *
+       * @param o Output stream to which params are written.
+       */
+      virtual void write_sampler_params(std::ostream& o) { 
+      }
+
+      /**
+       * Write out any sampler-specific parameter names for output.
+       *
+       * This method must
+       * match<code>write_sampler_params(std::ostream&)</code> in
+       * terms of number of parameters written.
+       *
+       * Params should be writte starting with a comma, then the first
+       * parameter, then a comma, then the second parameter, ending on
+       * the final parameter.
+       *
+       * The base class implementation is a no-op.
+       *
+       * @param o Output stream to which param names are written.
+       */
+      virtual void write_sampler_param_names(std::ostream& o) { 
+      }
+                                
 
     };
 
