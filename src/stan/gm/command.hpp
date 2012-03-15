@@ -114,7 +114,7 @@ namespace stan {
 
       print_help_option("max_treedepth","int",
                         "Maximum depth of the tree in NUTS, set to -1 for no limit.  Limits the number of simulation steps that NUTS can take to 2^max_treedepth.",
-                        "default = 12");
+                        "default = 10");
       
       print_help_option("epsilon","float",
                         "Initial value for step size, or -1 to set automatically",
@@ -254,7 +254,7 @@ namespace stan {
       double epsilon = -1.0;
       command.val("epsilon",epsilon);
 
-      int max_treedepth = 12;
+      int max_treedepth = 10;
       command.val("max_treedepth",max_treedepth);
 
       double epsilon_pm = 0.0;

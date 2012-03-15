@@ -122,7 +122,7 @@ namespace stan {
        * specified, generate new seed based on system time.
        */
       nuts(prob_grad& model,
-           int maxdepth = 12, 
+           int maxdepth = 10, 
            double epsilon = -1,
            double epsilon_pm = 0.0,
            bool adapt_epsilon = true,
