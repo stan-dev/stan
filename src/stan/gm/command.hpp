@@ -27,33 +27,9 @@ namespace stan {
 
   namespace gm {
 
-    void print_help_2(const std::string& key_val,
-                      const std::string& msg,
-                      const std::string& note = "") {
-      stan::io::pad_help_option(key_val);
-      std::cout << msg 
-                << std::endl;
-      if (note.size() > 0) {
-        stan::io::pad_help_option("");
-        std::cout << "    (" << note << ")" 
-                  << std::endl;
-      }
-      std::cout << std::endl;
-    }
-
-    void print_help_option(const std::string& key,
-                           const std::string& value_type,
-                           const std::string& msg,
-                           const std::string& note = "") {
-      std::stringstream ss;
-      ss << "--" << key;
-      if (value_type.size() > 0)
-        ss << "=<" << value_type << ">";
-      print_help_2(ss.str(),msg,note);
-    }
         
     void print_nuts_help(std::string cmd) {
-      using stan::io::pad_help_option;
+      using stan::io::print_help_option;
 
       std::cout << std::endl;
       std::cout << "Compiled Stan Graphical Model Command" << std::endl;
@@ -104,7 +80,7 @@ namespace stan {
                         "Period between saved samples after warm up",
                         "default = max(1, floor(iter - warmup) / 1000)");
 
-      print_help_option("refresh","+int"
+      print_help_option("refresh","+int",
                         "Period between samples updating progress report print",
                         "default = max(1,iter/200))");
 
@@ -113,7 +89,7 @@ namespace stan {
                         "default = -1");
 
       print_help_option("max_treedepth","int",
-                        "Maximum depth of the tree in NUTS, set to -1 for no limit.  Limits the number of simulation steps that NUTS can take to 2^max_treedepth.",
+                        "Limit NUTS leapfrog steps to 2^max_tree_depth; -1 for no limit",
                         "default = 10");
       
       print_help_option("epsilon","float",
@@ -128,12 +104,12 @@ namespace stan {
                         "Turn off step size adaptation (default is on)");
 
       print_help_option("delta","+float",
-                        "Initial parameter for NUTS step-size tuning.",
+                        "Initial step size for step-size adaptation",
                         "default = 0.5");
 
       print_help_option("gamma","+float",
-                        "Gamma parameter for dual averaging step-size adaptation.",
-                        "default = 0.05");
+                    "Gamma parameter for dual averaging step-size adaptation",
+                    "default = 0.05");
 
       print_help_option("test_grad","",
                         "Test gradient calculations using finite differences");
