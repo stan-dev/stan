@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <cstddef>
+#include <iostream>
 #include <vector>
 
 #include <boost/random/normal_distribution.hpp>
