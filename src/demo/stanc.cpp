@@ -1,3 +1,4 @@
+#include <stan/version.hpp>
 #include <stan/gm/compiler.hpp>
 
 #include <exception>
@@ -8,11 +9,19 @@
 
 #include <stan/io/cmd_line.hpp>
 
+void print_version() {
+  std::cout << "stanc version "
+            << stan::MAJOR_VERSION
+            << "."
+            << stan::MINOR_VERSION
+            << std::endl;
+}
+
 void print_stanc_help() {
   using stan::io::print_help_option;
 
   std::cout << std::endl;
-  std::cout << "Stan Compiler" << std::endl;
+  print_version();
   std::cout << std::endl;
 
   std::cout << "USAGE:  " << "stanc [options] <model_file>" << std::endl;
@@ -22,6 +31,8 @@ void print_stanc_help() {
   std::cout << std::endl;
   
   print_help_option("help","","Display this information");
+
+  print_help_option("version","","Display stanc version number");
 
   print_help_option("name","string",
                     "Model name",
@@ -46,6 +57,11 @@ int main(int argc, const char* argv[]) {
     return SUCCESS_RC;
   }
 
+  if (cmd.has_flag("version")) {
+    print_version();
+    return SUCCESS_RC;
+  }
+
   
 
   stan::gm::program prog;
@@ -59,19 +75,32 @@ int main(int argc, const char* argv[]) {
     }
     
     if (cmd.bare_size() != 1) {
-      std::string msg("require file name to compile as input");
+      std::string msg("require file name to compile as input. "
+                      "execute \"stanc --help\" for more information");
       throw std::invalid_argument(msg);
     }
     std::string in_file_name;
     cmd.bare(0,in_file_name);
     std::fstream in(in_file_name.c_str());
 
-    std::string out_file_name = model_name;
-    out_file_name += ".cpp";
-    std::fstream out(out_file_name.c_str());
+    std::string out_file_name;
+    if (cmd.has_key("o")) {
+      cmd.val("o",out_file_name);
+    } else {
+      out_file_name = model_name;
+      out_file_name += ".cpp";
+    }
+    std::fstream out(out_file_name.c_str(),
+                     std::fstream::out);
+
+    std::cout << "Model name=" << model_name << std::endl;
+    std::cout << "Input file=" << in_file_name << std::endl;
+    std::cout << "Output file=" << out_file_name << std::endl;
 
     bool valid_model 
       = stan::gm::compile(in,out,model_name);
+    
+    out.close();
 
     if (!valid_model) {
       std::cout << "PARSING FAILED." << std::endl;

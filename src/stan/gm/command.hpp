@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_01.hpp>

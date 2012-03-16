@@ -6,6 +6,7 @@
 #include <iostream>
 #include <ostream>
 #include <set>
+#include <string>
 #include <sstream>
 #include <vector>
 
@@ -39,7 +40,7 @@ namespace stan {
     void print_help_helper(const std::string& key_val,
                       const std::string& msg,
                       const std::string& note = "") {
-      stan::io::pad_help_option(key_val);
+      pad_help_option(key_val);
       std::cout << msg 
                 << std::endl;
       if (note.size() > 0) {
