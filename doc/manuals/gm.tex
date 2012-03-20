@@ -17,7 +17,7 @@
 \newcommand{\acronym}[1]{{\sc #1}\xspace}
 
 \newcommand{\R}{\acronym{r}}
-\newcommand{\SPLUS}{\acronym{s-plus}}
+\newcommand{\SPLUS}{\acronym{s}}
 \newcommand{\BUGS}{\acronym{bugs}}
 \newcommand{\JAGS}{\acronym{jags}}
 \newcommand{\MCMC}{\acronym{mcmc}}
@@ -475,7 +475,7 @@ way.  This time, the output model gets an explicitly specified name.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-stanc --name=bern src/models/basic_estimators/bernoulli.stan 
+> stanc --name=bern src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \begin{Verbatim}
 Model name=bern
@@ -489,7 +489,7 @@ generated file.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-clang++ -O3 -I src -I lib -o bern bern.cpp
+> clang++ -O3 -I src -I lib -o bern bern.cpp
 \end{Verbatim}
 \end{quote}
 %
@@ -502,7 +502,7 @@ specified.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-./bern --data=src/models/basic_estimators/bernoulli.Rdata
+> ./bern --data=src/models/basic_estimators/bernoulli.Rdata
 \end{Verbatim}
 \end{quote}
 
@@ -546,7 +546,214 @@ in \refchapter{optimization}
 
 \chapter{Compiling C++}\label{compiling-cpp.chapter}
 
+
 \chapter{Dump Data Format}\label{dump.chapter}
+
+For representing structured data in files, \Stan uses the dump format
+introduced in \SPLUS and used in \R and \JAGS (and in \BUGS, but with
+a different ordering).   A dump file is structured as a sequence of
+variable definitions.  Each variable is defined in terms of its
+dimensionality and its values.   There are three kinds of variable
+declarations, one for scalars, one for sequences, and one for general
+arrays.
+
+\section{Scalar Variables}
+
+A simple scalar value can be thought of as having an empty list of
+dimensions.  Its declaration in the dump format follows the \SPLUS
+assignment syntax.  For example, the following would constitute a
+valid dump file defining a single scalar variable \code{y} with value
+17.2.
+%
+\begin{quote}
+\begin{Verbatim}
+y <- 
+17.2
+\end{Verbatim}
+\end{quote}
+%
+A scalar value is just a zero-dimensional array value.
+
+\section{Sequence Variables}
+
+One-dimensional arrays may be specified directly using the \SPLUS
+sequence notation.  The following example defines an integer-value and
+a real-valued sequence.
+%
+\begin{quote}
+\begin{Verbatim}
+n <- c(1,2,3)
+y <- c(2.0,3.0,9.7)
+\end{Verbatim}
+\end{quote}
+%
+It is possible to define an array without a declaration of
+dimensionality because the reader just counts the number of entries to
+determine the size of the array.
+
+\section{Array Variables}
+
+For more than one dimension, the dump format uses a dimensionality
+specification.  For example,
+%
+\begin{quote}
+\begin{verbatim}
+y <- structure(c(1,2,3,4,5,6), .Dim = c(2,3))
+\end{verbatim}
+\end{quote}
+%
+This defines a $2 \times 3$ array.  Data is stored in column-major
+order, meaning the values for \code{y} will be as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+y[1,1] = 1     y[2,1] = 3     y[3,1] = 5    
+y[2,1] = 2     y[2,2] = 4     y[3,2] = 6
+\end{Verbatim}
+\end{quote}
+%
+The \code{structure} keyword just wraps a sequence of values and a
+dimensionality declaration, which is itself just a sequence of
+non-negative integer values.  The product of the dimensions must equal
+the length of the array.
+
+
+\section{Integer- and Real-Valued Variables}
+
+There is no declaration in a dump file that distinguishes integer
+versus real values.  If a value in a dump file's definition of a
+variable contains a decimal point, \Stan assumes that the values are
+real.  If there are no decimal points in a variable's defined value, 
+the value may be assigned to variables declared as integer or real
+in \Stan.
+
+The following dump file declares an integer value for \code{y}.
+%
+\begin{quote}
+\begin{Verbatim} 
+y <- 
+2
+\end{Verbatim}
+\end{quote}
+% 
+This definition can be used for a \Stan variable \code{y} declared as
+\code{real} or as \code{int}.  Assigning an integer value to a real
+variable automatically promotes the integer value to a real value.
+
+The following dump file provides a real value for \code{y}.
+%
+\begin{quote}
+\begin{Verbatim}
+y <-
+2.0
+\end{Verbatim}
+\end{quote}
+%
+Even though this is a round value, the occurrence of the decimal
+point in the value, \code{2.0}, causes \Stan to infer that \code{y} is
+real valued.  This dump file may only be used for variables \code{y}
+delcared as real in \Stan.
+
+
+\section{Quoted Variable Names}
+
+In order to support \JAGS data file, variables may be double quoted.
+For instance, the following definition is legal in a dump file.
+%
+\begin{quote}
+\begin{Verbatim}
+"y" <-
+c(1,2,3)
+\end{Verbatim}
+\end{quote}
+
+\section{Line Breaks}
+
+The line breaks in a dump file are required to be consistent with
+the way \R reads in data.  Both of the following declarations are
+legal.
+%
+\begin{quote}
+\begin{Verbatim}
+y <- 2
+y <-
+3
+\end{Verbatim}
+\end{quote}
+%
+Breaking before the assignment, as in \R, is not allowed.
+%
+\begin{quote}
+\begin{Verbatim}
+y
+<- 2
+\end{Verbatim}
+\end{quote}
+
+Lines may also be broken in the middle of sequences declared
+using the \code{c(...)} notation., as well as between the comma
+following a sequence definition and the dimensionality declaration.
+For example, the following declaration of a $2 \times 3 \times 4$
+array is valid.
+%
+\begin{quote}
+\begin{Verbatim}
+y <-
+structure(c(1,2,3,
+4,5,6,7,8,9,10,11,
+12), .Dim = c(2,3,
+4))
+\end{Verbatim}
+\end{quote}
+
+\section{General R Sequence Syntax}
+
+Sometimes, \R will use shorthand for its output. For example,
+starting \R,
+
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> R
+\end{Verbatim}
+\end{quote}
+%
+and then within \R, executing the following commands,
+
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+R> e <- matrix(c(1,2,3,4,5,6),nrow=2,ncol=3)
+R> dump("e")
+\end{Verbatim}
+\end{quote}
+%
+leads to a \code{dumpdata.R} file being created with
+the following contents.
+%
+\begin{quote}
+\begin{Verbatim}
+e <-
+structure(c(1, 2, 3, 4, 5, 6), .Dim = 2:3)
+\end{Verbatim}
+\end{quote}
+%
+\R has used the fact that it allows a contiguous
+sequence to be specified with its start and end point
+using the notation \code{2:3}.  \Stan cannot currently
+parse this format of input.  
+
+Alternatively, \R is prone to include long-integer specifiers.
+For instance, a $2 \times 2$ matrix is dumped as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+f <-
+structure(c(1, 2, 3, 4), .Dim = c(2L, 2L))
+\end{Verbatim}
+\end{quote}
+%
+Here the dimensions are defined to be \code{c(2L,~2L)}.  \Stan 
+always treats these dimesions as \code{L}.
+
 
 
 
@@ -664,5 +871,6 @@ value, such as \code{32.7}.  Expressions may also consist of
 
 \chapter{Installation}\label{install.appendix}
 
+\chapter*{References}
 
 \end{document}
