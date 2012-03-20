@@ -29,11 +29,6 @@ ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
 
-CC_GM = cl
-CFLAGS_GM = /EHsc /I src /I lib
-OUTPUT_OPTION_GM = /OUT:$@
-LDFLAGS_GM = /link
-
 CC_STANC = cl
 CFLAGS_STANC = /EHsc /I src /I lib
 OUTPUT_OPTION_STANC = /OUT:$@
