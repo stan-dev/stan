@@ -42,7 +42,6 @@ LDFLAGS_STANC = /link
 
 UNIT_TESTS_TO_EXCLUDE := test/agrad/matrix test/gm/parser 
 UNIT_TESTS_TO_EXCLUDE += $(subst _test.cpp,,$(shell cd src; find test/agrad/distributions/multivariate -type f -name '*_test.cpp'))
-UNIT_TESTS_TO_EXCLUDE += test/agrad/error_handling
 UNIT_TESTS_TO_EXCLUDE += test/file_includes/stan test/file_includes/stan_gm
 UNIT_TESTS_TO_EXCLUDE += test/file_includes/stan_agrad_matrix
 UNIT_TESTS_TO_EXCLUDE += test/file_includes/stan_gm_parser
