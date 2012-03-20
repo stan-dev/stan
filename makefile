@@ -87,6 +87,11 @@ help:
 -include make/demo
 
 ##
+# All command related make commands.
+##
+-include make/command
+
+##
 # All doxygen related make commands
 ##
 -include make/doxygen
@@ -123,4 +128,4 @@ clean-demo:
 	$(RM) -r demo
 
 clean-all: clean clean-models clean-dox clean-demo
-	$(RM) -r test 
+	$(RM) -r test bin

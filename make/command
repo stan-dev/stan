@@ -1,0 +1,10 @@
+.PRECIOUS: stanc$(EXE)
+
+bin/stanc.exe : src/stan/command/stanc.cpp
+	@mkdir -p $(dir $@)
+	$(CC_STANC) $(CFLAGS_STANC) $(CPPFLAGS) $< $(LDFLAGS_STANC) $(TARGET_ARCH) $(OUTPUT_OPTION_STANC) 
+
+bin/stanc : src/stan/command/stanc.cpp
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $< $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION) 
+

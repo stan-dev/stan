@@ -1,8 +1,3 @@
-.PRECIOUS: demo/gm$(EXE)
-demo/gm.exe : src/demo/gm.cpp
-	@mkdir -p $(dir $@)
-	$(CC_GM) $(CFLAGS_GM) $(CPPFLAGS) $< $(LDFLAGS_GM) $(TARGET_ARCH) $(OUTPUT_OPTION_GM) 
-
 demo/%$(EXE) : demo/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(OUTPUT_OPTION) $<

@@ -1,5 +1,5 @@
 ##
-# Models (to be passed through demo/gm)
+# Models (to be passed through stanc)
 ##
 MODEL_HEADER := src/stan/model/model_header.hpp
 
@@ -16,11 +16,11 @@ models/%$(EXE) : models/%.o
 	$@ --data=$(basename $@).Rdata --samples=$(basename $@).csv
 
 .PRECIOUS: models/%.cpp
-models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) demo/gm$(EXE)
+models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
-	cat $< | demo/gm$(EXE) > $@
+	bin/stanc$(EXE) $< --o=$@
 
 .PRECIOUS: models/%.o
 models/%.o : models/%.cpp
@@ -48,11 +48,9 @@ $(MODEL_HEADER).d : $(MODEL_HEADER)
 	rm -f $@.$$$$
 
 ##
-# If the target is demo/, include .d. 
 # Will generate dependencies.
 ##
 ifneq (,$(filter models/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter models/%,$(MAKECMDGOALS))))
   -include $(MODEL_HEADER).d
-  -include demo/gm.d
 endif

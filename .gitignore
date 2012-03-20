@@ -3,6 +3,7 @@
 /models
 /test
 /*.dSYM
+/bin
 
 # precompiled model header
 /src/stan/model/model_header.hpp.*ch
