@@ -423,3 +423,44 @@ TEST(prob_transform,cov_matrix_free_exception) {
   y << 0, 0, 0, 0;
   EXPECT_THROW(stan::prob::cov_matrix_free(y), std::runtime_error);
 }
+
+TEST(prob_transform,simplex2_rt0) {
+  Matrix<double,Dynamic,1> x(4);
+  x << 0.0, 0.0, 0.0, 0.0;
+  Matrix<double,Dynamic,1> y = stan::prob::simplex_constrain2(x);
+  EXPECT_FLOAT_EQ(1.0 / 2.0, y(0));
+  EXPECT_FLOAT_EQ(1.0 / 4.0, y(1));
+  EXPECT_FLOAT_EQ(1.0 / 8.0, y(2));
+  EXPECT_FLOAT_EQ(1.0 / 16.0, y(3));
+  EXPECT_FLOAT_EQ(1.0 / 16.0, y(4));
+
+
+  Matrix<double,Dynamic,1> xrt = stan::prob::simplex_free2(y);
+  EXPECT_EQ(x.size()+1,y.size());
+  EXPECT_EQ(x.size(),xrt.size());
+  for (Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
+    EXPECT_FLOAT_EQ(x[i],xrt[i]);
+  }
+}
+TEST(prob_transform,simplex2_rt) {
+  Matrix<double,Dynamic,1> x(3);
+  x << 1.0, -1.0, 2.0;
+  Matrix<double,Dynamic,1> y = stan::prob::simplex_constrain2(x);
+  Matrix<double,Dynamic,1> xrt = stan::prob::simplex_free2(y);
+  EXPECT_EQ(x.size()+1,y.size());
+  EXPECT_EQ(x.size(),xrt.size());
+  for (Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
+    EXPECT_FLOAT_EQ(x[i],xrt[i]);
+  }
+}
+TEST(prob_transform,simplex2_f_exception) {
+  Matrix<double,Dynamic,1> y(2);
+  y << 0.5, 0.55;
+  EXPECT_THROW(stan::prob::simplex_free2(y), std::domain_error);
+  y << 1.1, -0.1;
+  EXPECT_THROW(stan::prob::simplex_free2(y), std::domain_error);
+  //y.resize(0);
+  //EXPECT_THROW(stan::prob::simplex_free(y), std::domain_error);
+}
+
+
