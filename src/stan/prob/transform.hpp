@@ -905,6 +905,54 @@ namespace stan {
       return x;
     }
 
+    template <typename T>
+    Matrix<T,Dynamic,1> simplex_free2(const Matrix<T,Dynamic,1>& x) {
+      using stan::math::logit;
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
+      Matrix<T,Dynamic,1> y(x.size() - 1);
+      T stick_len = x(x.size() - 1);
+      for (int k = y.size(); --k >= 0; ) {
+        stick_len += x(k);
+        T z_k = x(k) / stick_len;
+        y(k) = logit(z_k);
+      }
+      return y;
+    }
+
+    template <typename T>
+    Matrix<T,Dynamic,1> simplex_constrain2(const Matrix<T,Dynamic,1>& y, 
+                                           T& lp) {
+      using stan::math::inv_logit;
+      using stan::math::log1m;
+      Matrix<T,Dynamic,1> x(y.size() + 1);
+      T stick_len(1.0);
+      for (int k = 0; k < y.size(); ++k) {
+        T z_k(inv_logit(y(k)));
+        x(k) = stick_len * z_k;
+        lp += log(x(k)) + log1m(z_k);
+        stick_len -= x(k); // equivalently *= (1 - z_k);
+      }
+      x(y.size()) = stick_len; // no Jacobian contrib for last dim
+      return x;
+    }
+
+    template <typename T>
+    Matrix<T,Dynamic,1> simplex_constrain2(const Matrix<T,Dynamic,1>& y) {
+      using stan::math::inv_logit;
+      using stan::math::log1m;
+      Matrix<T,Dynamic,1> x(y.size() + 1);
+      T stick_len(1.0);
+      for (int k = 0; k < y.size(); ++k) {
+        T z_k(inv_logit(y(k)));
+        x(k) = stick_len * z_k;
+        stick_len -= x(k); // equivalently *= (1 - z_k);
+      }
+      x(y.size()) = stick_len; // no Jacobian contrib for last dim
+      return x;
+    }
+
+
+
 
     // POSITIVE ORDERED 
     
