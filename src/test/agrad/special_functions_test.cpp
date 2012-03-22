@@ -1006,3 +1006,216 @@ TEST(AgradAgrad,multiply_log_double_var){
   f.grad(x,g);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),g[0]);
 }
+
+void test_log_sum_exp_2_vv(stan::agrad::var a, 
+                           stan::agrad::var b) {
+  using stan::math::exp;
+  using stan::math::log;
+  using stan::math::log_sum_exp;
+
+  using stan::agrad::exp;
+  using stan::agrad::log;
+  using stan::agrad::log_sum_exp;
+
+  AVEC x = createAVEC(a,b);
+  AVAR f = log_sum_exp(a,b);
+  VEC g;
+  f.grad(x,g);
+  
+  double f_val = f.val();
+
+  stan::agrad::var a2(a.val());
+  stan::agrad::var b2(b.val());
+  AVEC x2 = createAVEC(a2,b2);
+  AVAR f2 = log(exp(a2) + exp(b2));
+  VEC g2;
+  f2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(f2.val(), f_val);
+  EXPECT_EQ(2,g.size());
+  EXPECT_EQ(2,g2.size());
+  EXPECT_FLOAT_EQ(g2[0],g[0]);
+  EXPECT_FLOAT_EQ(g2[1],g[1]);
+}
+void test_log_sum_exp_2_vd(stan::agrad::var a, 
+                         double b) {
+  using stan::math::exp;
+  using stan::math::log;
+  using stan::math::log_sum_exp;
+
+  using stan::agrad::exp;
+  using stan::agrad::log;
+  using stan::agrad::log_sum_exp;
+
+  AVEC x = createAVEC(a);
+  AVAR f = log_sum_exp(a,b);
+  VEC g;
+  f.grad(x,g);
+  
+  double f_val = f.val();
+
+  stan::agrad::var a2(a.val());
+  AVEC x2 = createAVEC(a2);
+  AVAR f2 = log(exp(a2) + exp(b));
+  VEC g2;
+  f2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(f2.val(), f_val);
+  EXPECT_EQ(1,g.size());
+  EXPECT_EQ(1,g2.size());
+  EXPECT_FLOAT_EQ(g2[0],g[0]);
+  
+}
+void test_log_sum_exp_2_dv(double a,
+                           stan::agrad::var b) {
+  using stan::math::exp;
+  using stan::math::log;
+  using stan::math::log_sum_exp;
+
+  using stan::agrad::exp;
+  using stan::agrad::log;
+  using stan::agrad::log_sum_exp;
+
+  AVEC x = createAVEC(b);
+  AVAR f = log_sum_exp(a,b);
+  VEC g;
+  f.grad(x,g);
+  
+  double f_val = f.val();
+
+  AVAR b2(b.val());
+  AVEC x2 = createAVEC(b2);
+  AVAR f2 = log(exp(a) + exp(b2));
+  VEC g2;
+  f2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(f2.val(), f_val);
+  EXPECT_EQ(1,g.size());
+  EXPECT_EQ(1,g2.size());
+  EXPECT_FLOAT_EQ(g2[0],g[0]);
+  
+}
+
+void test_log_sum_exp_2(double a, double b) {
+  test_log_sum_exp_2_vv(a,b);
+  test_log_sum_exp_2_vd(a,b);
+  test_log_sum_exp_2_dv(a,b);
+}
+
+TEST(AgradSpecialFunctions,log_sum_exp_2) {
+  test_log_sum_exp_2(0.0,0.0);
+  test_log_sum_exp_2(1.0,2.0);
+  test_log_sum_exp_2(2.0,1.0);
+  test_log_sum_exp_2(-2.0,15.0);
+  test_log_sum_exp_2(2.0,-15.0);
+}
+
+void test_log1p_exp(double val) {
+  using stan::math::log1p_exp;
+  using stan::agrad::log1p_exp;
+  AVAR a(val);   
+  AVEC x = createAVEC(a);
+  AVAR f = log1p_exp(a);
+  EXPECT_FLOAT_EQ(log1p_exp(val), f.val());
+  VEC g;
+  f.grad(x,g);
+  double f_val = f.val();
+  
+  AVAR a2(val);
+  AVEC x2 = createAVEC(a2);
+  AVAR f2 = log(1.0 + exp(a2));
+  VEC g2;
+  f2.grad(x2,g2);
+
+  EXPECT_EQ(1,g.size());
+  EXPECT_EQ(1,g2.size());
+  EXPECT_FLOAT_EQ(g2[0],g[0]);
+  EXPECT_FLOAT_EQ(f2.val(),f_val);
+}
+
+TEST(AgradSpecialFunctions, log1p_exp) {
+  test_log1p_exp(-15.0);
+  test_log1p_exp(-5.0);
+  test_log1p_exp(-1.0);
+  test_log1p_exp(0.0);
+  test_log1p_exp(2.0);
+  test_log1p_exp(32.0);
+  test_log1p_exp(64.0);
+}
+
+
+TEST(AgradSpecialFunctions, log_sum_exp_vec_1) {
+  using stan::math::log_sum_exp;
+  using stan::agrad::log_sum_exp;
+  AVAR a(5.0);
+  AVEC as = createAVEC(a);
+  AVEC x = createAVEC(a);
+  AVAR f = log_sum_exp(as);
+  EXPECT_FLOAT_EQ(5.0, f.val());
+  VEC g;
+  f.grad(x,g);
+  EXPECT_EQ(1,g.size());
+  EXPECT_FLOAT_EQ(1.0,g[0]);
+}
+
+
+TEST(AgradSpecialFunctions, log_sum_exp_vec_2) {
+  using stan::math::log_sum_exp;
+  using stan::agrad::log_sum_exp;
+  AVAR a(5.0);
+  AVAR b(-7.0);
+  AVEC as = createAVEC(a,b);
+  AVEC x = createAVEC(a,b);
+  AVAR f = log_sum_exp(as);
+  EXPECT_FLOAT_EQ(log(exp(5.0) + exp(-7.0)), f.val());
+  VEC g;
+  f.grad(x,g);
+
+  double f_val = f.val();
+
+  AVAR a2(5.0);
+  AVAR b2(-7.0);
+  AVEC as2 = createAVEC(a2,b2);
+  AVEC x2 = createAVEC(a2,b2);
+  AVAR f2 = log(exp(a2) + exp(b2));
+  VEC g2;
+  f2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(f2.val(), f_val);
+  EXPECT_EQ(2,g.size());
+  EXPECT_EQ(2,g2.size());
+  EXPECT_FLOAT_EQ(g[0],g2[0]);
+  EXPECT_FLOAT_EQ(g[1],g2[1]);
+}
+
+TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
+  using stan::math::log_sum_exp;
+  using stan::agrad::log_sum_exp;
+  AVAR a(5.0);
+  AVAR b(-7.0);
+  AVAR c(2.3);
+  AVEC as = createAVEC(a,b,c);
+  AVEC x = createAVEC(a,b,c);
+  AVAR f = log_sum_exp(as);
+  EXPECT_FLOAT_EQ(log(exp(5.0) + exp(-7.0) + exp(2.3)), f.val());
+  VEC g;
+  f.grad(x,g);
+
+  double f_val = f.val();
+
+  AVAR a2(5.0);
+  AVAR b2(-7.0);
+  AVAR c2(2.3);
+  AVEC as2 = createAVEC(a2,b2,c2);
+  AVEC x2 = createAVEC(a2,b2,c2);
+  AVAR f2 = log(exp(a2) + exp(b2) + exp(c2));
+  VEC g2;
+  f2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(f2.val(), f_val);
+  EXPECT_EQ(3,g.size());
+  EXPECT_EQ(3,g2.size());
+  EXPECT_FLOAT_EQ(g[0],g2[0]);
+  EXPECT_FLOAT_EQ(g[1],g2[1]);
+  EXPECT_FLOAT_EQ(g[2],g2[2]);
+}

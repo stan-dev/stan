@@ -508,6 +508,27 @@ namespace stan {
     }
 
     /**
+     * Calculates the log of 1 plus the exponential of the specified
+     * value without overflow.                  
+     *
+     * This function is related to other special functions by:
+     *
+     * <code>log_1p_exp(x) 
+     *
+     * <code> = log1p(exp(a))</code>
+     *
+     * <code> = log(1 + exp(x))</code>
+
+     * <code> = log_sum_exp(0,x)</code>.
+     */
+    inline double log1p_exp(const double& a) {
+      // like log_sum_exp below with b=0.0
+      if (a > 0.0)
+        return a + log1p(exp(-a));
+      return log1p(exp(a));
+    }
+
+    /**
      * Calculates the log sum of exponetials without overflow.
      *
      * \f$\log (\exp(a) + \exp(b)) = m + \log(\exp(a-m) + \exp(b-m))\f$,
