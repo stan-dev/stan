@@ -73,6 +73,10 @@ namespace stan {
         out_ << n;
       }
 
+      void write_val(const unsigned short& n) {
+        out_ << n;
+      }
+
       void write_val(const long long& n) {
         out_ << n;
       }
@@ -82,6 +86,14 @@ namespace stan {
       }
 
       void write_val(const int& n) {
+        out_ << n;
+      }
+
+      void write_val(const short& n) {
+        out_ << n;
+      }
+
+      void write_val(const char& n) {
         out_ << n;
       }
 
