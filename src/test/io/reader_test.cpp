@@ -465,29 +465,15 @@ TEST(io_reader, matrix) {
 
 
 TEST(io_reader, simplex) {
-  std::vector<int> theta_i;
-  std::vector<double> theta;
-  for (int i = 0; i < 100.0; ++i)
-    theta.push_back(static_cast<double>(i));
+  std::vector<int> theta_i(0);
+  std::vector<double> theta(4,0.25);
   stan::io::reader<double> reader(theta,theta_i);
-  theta[1] = 0.29;
-  theta[2] = 0.70;
-  theta[3] = 0.01;
-  theta[5] = 1.0;
-  EXPECT_FLOAT_EQ(0.0,reader.scalar()); // throw away theta[0]
-  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.simplex(3);
-  EXPECT_EQ(3U,y.size());
-  EXPECT_FLOAT_EQ(0.29,y[0]);
-  EXPECT_FLOAT_EQ(0.70,y[1]);
-  EXPECT_FLOAT_EQ(0.01,y[2]);
-  y *= 3;
-  EXPECT_FLOAT_EQ(0.03,y[2]);
-  EXPECT_FLOAT_EQ(0.7,theta[2]);
-  EXPECT_FLOAT_EQ(4.0,reader.scalar());
-  Eigen::Matrix<double,Eigen::Dynamic,1> z = reader.simplex(1);
-  EXPECT_EQ(1U,z.size());
-  EXPECT_FLOAT_EQ(1.0,z[0]);
-  EXPECT_FLOAT_EQ(6.0,reader.scalar());
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.simplex(4);
+  EXPECT_EQ(4U,y.size());
+  EXPECT_FLOAT_EQ(0.25,y[0]);
+  EXPECT_FLOAT_EQ(0.25,y[1]);
+  EXPECT_FLOAT_EQ(0.25,y[2]);
+  EXPECT_FLOAT_EQ(0.25,y[3]);
 }
 TEST(io_reader, simplex_exception) {
   std::vector<int> theta_i;
@@ -504,61 +490,6 @@ TEST(io_reader, simplex_exception) {
   EXPECT_NO_THROW (reader.simplex(4));
   EXPECT_THROW (reader.simplex(2), std::domain_error);
   EXPECT_THROW (reader.simplex(0), std::domain_error);
-}
-TEST(io_reader, simplex_constrain) {
-  std::vector<int> theta_i;
-  std::vector<double> theta;
-  theta.push_back(3.0);
-  theta.push_back(-1.0);
-  theta.push_back(-2.0);
-  double pp0 = exp(3.0);
-  double pp1 = exp(-1.0);
-  double pp2 = exp(-2.0);
-  double pp3 = exp(0.0); // fixed 0 w/o read
-  double sum = pp0 + pp1 + pp2 + pp3;
-  double p0 = pp0 / sum;
-  double p1 = pp1 / sum;
-  double p2 = pp2 / sum;
-  double p3 = pp3 / sum;
-  stan::io::reader<double> reader(theta,theta_i);
-  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.simplex_constrain(4));
-  EXPECT_FLOAT_EQ(p0, phi[0]);
-  EXPECT_FLOAT_EQ(p1, phi[1]);
-  EXPECT_FLOAT_EQ(p2, phi[2]);
-  EXPECT_FLOAT_EQ(p3, phi[3]);
-}
-TEST(io_reader, simplex_constrain_jacobian) {
-  std::vector<int> theta_i;
-  std::vector<double> theta;
-  theta.push_back(3.0);
-  theta.push_back(-1.0);
-  theta.push_back(-2.0);
-  double pp0 = exp(3.0);
-  double pp1 = exp(-1.0);
-  double pp2 = exp(-2.0);
-  double pp3 = exp(0.0);
-  double sum = pp0 + pp1 + pp2 + pp3;
-  double p0 = pp0 / sum;
-  double p1 = pp1 / sum;
-  double p2 = pp2 / sum;
-  double p3 = pp3 / sum;
-  stan::io::reader<double> reader(theta,theta_i);
-  double lp = -1.9;
-  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.simplex_constrain(4,lp));
-  EXPECT_FLOAT_EQ(p0, phi[0]);
-  EXPECT_FLOAT_EQ(p1, phi[1]);
-  EXPECT_FLOAT_EQ(p2, phi[2]);
-  EXPECT_FLOAT_EQ(p3, phi[3]);
-  double expected_lp = -1.9;
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> J(3,3);
-  J(0,0) = p0 * (1 - p0);
-  J(1,1) = p1 * (1 - p1);
-  J(2,2) = p2 * (1 - p2);
-  J(0,1) = (J(1,0) = p0 * p1);
-  J(0,2) = (J(2,0) = p0 * p2);
-  J(1,2) = (J(2,1) = p1 * p2);
-  expected_lp += log(fabs(J.determinant()));
-  EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
 

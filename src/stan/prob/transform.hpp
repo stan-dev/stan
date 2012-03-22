@@ -794,34 +794,35 @@ namespace stan {
     
     // SIMPLEX
 
+
     /**
      * Return the simplex corresponding to the specified free vector.  
      * A simplex is a vector containing values greater than or equal
      * to 0 that sum to 1.  A vector with (K-1) unconstrained values
      * will produce a simplex of size K.
      *
-     * <p>The vector transform used is softmax, which takes the probability
-     * to be proportional to the exponentiation of the free value.
-     * The K-th value is implicitly set to 0.  The transform applied
-     * to a \f$(K-1)\f$-dimensional input \f$ x \f$ produces a \f$K\f$-dimensional output with
-     * dimension \f$k\f$ defined by
-     *
-     * <p>\f$ f(x)[k] = \exp(x[k]) / Z \mbox{ if } k < K - 1\f$, and
-     *
-     * <p>\f$ f(x)[k] = \exp(0) / Z \mbox{ if } k = K - 1\f$, and
+     * The transform is based on a centered stick-breaking process.
      *
      * @param x Free vector input of dimensionality K - 1.
      * @return Simplex of dimensionality K.
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& x) {
-      Matrix<T,Dynamic,1> y(x.size() + 1);
-      T max_x = x.maxCoeff();
-      for (typename Matrix<T,Dynamic,1>::size_type k = 0; k < x.size(); ++k)
-        y[k] = exp(x[k] - max_x);
-      y[x.size()] = exp(-max_x);
-      return y / y.sum();
+    Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& y) {
+      // cut and paste from  simplex_constrain(Matrix,T) w/o Jacobian
+      using stan::math::logit;
+      using stan::math::inv_logit;
+      using stan::math::log1m;
+      int Km1 = y.size();
+      Matrix<T,Dynamic,1> x(Km1 + 1);
+      T stick_len(1.0);
+      for (int k = 0; k < Km1; ++k) {
+        T z_k(inv_logit(y(k) - log(Km1 - k))); 
+        x(k) = stick_len * z_k;
+        stick_len -= x(k); 
+      }
+      x(Km1) = stick_len;
+      return x;
     }
 
     /**
@@ -829,28 +830,8 @@ namespace stan {
      * and increment the specified log probability reference with 
      * the log absolute Jacobian determinant of the transform. 
      *
-     * <p>The vector transform is as defined for
-     * <code>simplex_constrain(Matrix<T,Dynamic,1>)</code>.  Given the
-     * constraining vector transform \f$f(x) = y\f$, the log absolute
-     * Jacobian determinant is
-     *
-     * <p>\f$\log \left| J \right| 
-     * = \log \left| \begin{array}{c} \nabla f(x)[0] \\ \vdots \\ \nabla f(x)[K-1] \end{array}\right| 
-     * = \log \left| \begin{array}{cccc} y[1] (1 - y[1]) & y[1] y[2] & \cdots & y[1] y[K-1]
-     *          \\ y[2] y[1] & y[2] (1 - y[2]) & \cdots & y[2] y[K-1]
-     * \\ \vdots & \vdots & \vdots & \vdots 
-     * \\ y[K-1] y[1] & y[K-1] y[2] & \cdots & y[K-1] (1 - y[K-1])
-     *  \end{array} \right| \f$.
-     *
-     * <p>In other words, the Jacobian is defined by 
-     *
-     * <p>\f$J(k,k) = y[k] (1 - y[k])\f$, and 
-     *
-     * <p>\f$J(k,k') = y[k] y[k']\f$ for \f$k \neq k'\f$.
-     *
-     * <p>For the simplex constraint, the Jacobian determinant
-     * \f$|J|\f$ is not available in closed form and must be
-     * calculated with a linear algebra library call.
+     * The simplex transform is defined through a centered stick-breaking
+     * process.
      * 
      * @param x Free vector input of dimensionality K - 1.
      * @param lp Log probability reference to increment.
@@ -858,18 +839,28 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& x, T& lp) {
-      Matrix<T,Dynamic,1> y(simplex_constrain(x));
-      size_t K_minus_1 = x.size();
-      Matrix<T,Dynamic,Dynamic> J(K_minus_1,K_minus_1);
-      for (size_t m = 0; m < K_minus_1; ++m) {
-        J(m,m) = y[m] * (1.0 - y[m]);
-        for (size_t n = m+1; n < K_minus_1; ++n) {
-          J(m,n) = (J(n,m) = y[m] * y[n]);
-        }
+    Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& y, 
+                                          T& lp) {
+      using stan::math::logit;
+      using stan::math::inv_logit;
+      using stan::math::log1p_exp;
+      using stan::math::log1m;
+      int Km1 = y.size(); // K = Km1 + 1
+      Matrix<T,Dynamic,1> x(Km1 + 1);
+      T stick_len(1.0);
+      for (int k = 0; k < Km1; ++k) {
+        double eq_share = -log(Km1 - k); // = logit(1.0/(Km1 + 1 - k));
+        T adj_y_k(y(k) + eq_share);
+        T z_k(inv_logit(adj_y_k));
+        x(k) = stick_len * z_k;
+        lp += log(stick_len);
+        lp -= log1p_exp(-adj_y_k);
+        lp -= log1p_exp(adj_y_k);
+        // lp += log(x(k)) + log1m(z_k);
+        stick_len -= x(k); // equivalently *= (1 - z_k);
       }
-      lp += log(fabs(J.determinant()));
-      return y;
+      x(Km1) = stick_len; // no Jacobian contrib for last dim
+      return x;
     }
 
     /**
@@ -877,16 +868,8 @@ namespace stan {
      * the specified simplex.  It applies to a simplex of dimensionality
      * K and produces an unconstrained vector of dimensionality (K-1).
      *
-     * <p>The simplex transform is as specified for
-     * <code>simplex_constrain(Matrix<T,Dynamic,1>)</code>.  The inverse
-     * transform is defined for an input simplex of dimensionality
-     * and for dimensions \f$0 \leq k < K - 1\f$ by
-     *
-     * <p>\f$f^{-1}(y)[k] = \log y[k] - \log y[K-1]\f$
-     *
-     * <p>Because the log of the last value, \f$\log y[K-1]\f$, is
-     * subtracted from each value, the last value of the free basis is
-     * implicitly zero as it is required to be for the transform.
+     * <p>The simplex transform is defined through a centered stick-breaking
+     * process.
      * 
      * @param y Simplex of dimensionality K.
      * @return Free vector of dimensionality (K-1) that transfroms to
@@ -895,59 +878,17 @@ namespace stan {
      * @throw std::domain_error if y is not a valid simplex
      */
     template <typename T>
-    Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& y) {
-      stan::math::check_simplex("stan::prob::simplex_free(%1%)", y, "y");
-      size_t k_minus_1 = y.size() - 1;
-      double log_y_k_minus_1 = log(y[k_minus_1]);
-      Matrix<T,Dynamic,1> x(k_minus_1);
-      for (size_t i = 0; i < k_minus_1; ++i)
-        x[i] = log(y[i]) - log_y_k_minus_1;
-      return x;
-    }
-
-    template <typename T>
-    Matrix<T,Dynamic,1> simplex_constrain2(const Matrix<T,Dynamic,1>& y, 
-                                           T& lp) {
-      using stan::math::inv_logit;
-      using stan::math::log1m;
-      Matrix<T,Dynamic,1> x(y.size() + 1);
-      T stick_len(1.0);
-      for (int k = 0; k < y.size(); ++k) {
-        T z_k(inv_logit(y(k)));
-        x(k) = stick_len * z_k;
-        lp += log(x(k)) + log1m(z_k);
-        // log1m(z_k) = - log_sum_exp(0,y(k))
-        stick_len -= x(k); // equivalently *= (1 - z_k);
-      }
-      x(y.size()) = stick_len; // no Jacobian contrib for last dim
-      return x;
-    }
-
-    template <typename T>
-    Matrix<T,Dynamic,1> simplex_constrain2(const Matrix<T,Dynamic,1>& y) {
-      using stan::math::inv_logit;
-      using stan::math::log1m;
-      Matrix<T,Dynamic,1> x(y.size() + 1);
-      T stick_len(1.0);
-      for (int k = 0; k < y.size(); ++k) {
-        T z_k(inv_logit(y(k)));
-        x(k) = stick_len * z_k;
-        stick_len -= x(k); // equivalently *= (1 - z_k);
-      }
-      x(y.size()) = stick_len; // no Jacobian contrib for last dim
-      return x;
-    }
-
-    template <typename T>
-    Matrix<T,Dynamic,1> simplex_free2(const Matrix<T,Dynamic,1>& x) {
+    Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& x) {
       using stan::math::logit;
       stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
-      Matrix<T,Dynamic,1> y(x.size() - 1);
-      T stick_len = x(x.size() - 1);
-      for (int k = y.size(); --k >= 0; ) {
+      int Km1 = x.size() - 1;
+      Matrix<T,Dynamic,1> y(Km1);
+      T stick_len(x(Km1));
+      for (int k = Km1; --k >= 0; ) {
         stick_len += x(k);
-        T z_k = x(k) / stick_len;
-        y(k) = logit(z_k);
+        T z_k(x(k) / stick_len);
+        y(k) = logit(z_k) + log(Km1 - k); 
+        // log(Km-k) = logit(1.0 / (Km1 + 1 - k));
       }
       return y;
     }

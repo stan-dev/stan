@@ -1224,3 +1224,5 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
   EXPECT_FLOAT_EQ(g[1],g2[1]);
   EXPECT_FLOAT_EQ(g[2],g2[2]);
 }
+
+
