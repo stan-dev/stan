@@ -17,6 +17,7 @@ namespace stan {
      * The value of pi, 
      * \f$ \pi \f$.
      */
+    // FIXME:  conflict with R macro
     const double PI = boost::math::constants::pi<double>();
 
     /** 

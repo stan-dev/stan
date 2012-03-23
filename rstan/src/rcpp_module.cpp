@@ -11,6 +11,7 @@ std::string hello(Rcpp::Environment env) {
   return "done";
 }
 
+/*
 class r_reader : stan::io::var_context { 
 private: 
   Rcpp::Environment env;
@@ -40,7 +41,7 @@ public:
     return dims;
   }
 }
-
+*/
 
 // class World {
 // public:
@@ -49,7 +50,7 @@ public:
 //     std::string greet() { 
 //       void* h = dlopen("hello.so",RTLD_LAZY);
 //       if (!h) {
-// 	return("did not load so");
+//      return("did not load so");
 //       }
 //       typedef std::string* (*hello_t)(std::string*);
 //       hello_t hello = (hello_t) dlsym(h, "hello");
@@ -65,29 +66,29 @@ public:
 
 
 RCPP_MODULE(yada){
-	using namespace Rcpp ;
-	                  
-	function( "hello" , &hello  , List::create( _["env"]), "documentation for hello " ) ;
-	function( "bla"   , &bla    , "documentation for bla " ) ;
-	function( "bla1"  , &bla1   , "documentation for bla1 " ) ;
-	function( "bla2"  , &bla2   , "documentation for bla2 " ) ;
-	
-	// with formal arguments specification
-	function( "bar"   , &bar    , 
-	    List::create( _["x"] = 0.0 ), 
-	    "documentation for bar " ) ;
-	function( "foo"   , &foo    , 
-	    List::create( _["x"] = 1, _["y"] = 1.0 ),
-	    "documentation for foo " ) ;	
-	
-	// class_<World>( "World" )
-	
-	//     // expose the default constructor
-	//     .constructor()    
-	    
-	// 	.method( "greet", &World::greet , "get the message" )
-	// 	.method( "set", &World::set     , "set the message" )
-	// ;
+        using namespace Rcpp ;
+                          
+        function( "hello" , &hello  , List::create( _["env"]), "documentation for hello " ) ;
+        function( "bla"   , &bla    , "documentation for bla " ) ;
+        function( "bla1"  , &bla1   , "documentation for bla1 " ) ;
+        function( "bla2"  , &bla2   , "documentation for bla2 " ) ;
+        
+        // with formal arguments specification
+        function( "bar"   , &bar    , 
+            List::create( _["x"] = 0.0 ), 
+            "documentation for bar " ) ;
+        function( "foo"   , &foo    , 
+            List::create( _["x"] = 1, _["y"] = 1.0 ),
+            "documentation for foo " ) ;        
+        
+        // class_<World>( "World" )
+        
+        //     // expose the default constructor
+        //     .constructor()    
+            
+        //      .method( "greet", &World::greet , "get the message" )
+        //      .method( "set", &World::set     , "set the message" )
+        // ;
 }                     
 
 

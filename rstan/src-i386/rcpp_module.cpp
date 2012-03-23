@@ -11,25 +11,37 @@ std::string hello(Rcpp::Environment env) {
   return "done";
 }
 
-int bar( int x){
-	return x*2 ;
-}
-        
-double foo( int x, double y){
-	return x * y ;
-}
+/*
+class r_reader : stan::io::var_context { 
+private: 
+  Rcpp::Environment env;
 
-void bla( ){
-	Rprintf( "hello\\n" ) ;
+public:
+  bool contains_r(std::string name) {
+    return env.exists(name);
+    // does not test if it is a double
+  }
+  std::vector<double> vals_r(std::string name) {
+    // real values of param 'name' in env
+  }
+  std::vector<unsigned int> dims_r(std::string name) {
+    // dimension from env.get("name")
+  }
+  bool contains_i(std::string name) {
+    return env.exists(name);
+    // does not test if it is an int
+  }
+  std::vector<int> vals_i(std::string name) {
+    std::vector<int> vals = env[name];
+    return vals;
+  }
+  std::vector<unsigned int> dims_i(std::string name) {
+    Rcpp::RObject obj = env.get(name);
+    std::vector<unsigned int> dims = obj.Dimensions();
+    return dims;
+  }
 }
-
-void bla1( int x){
-	Rprintf( "hello (x = %d)\\n", x ) ;
-}
-  
-void bla2( int x, double y){
-	Rprintf( "hello (x = %d, y = %5.2f)\\n", x, y ) ;
-}
+*/
 
 // class World {
 // public:
@@ -38,7 +50,7 @@ void bla2( int x, double y){
 //     std::string greet() { 
 //       void* h = dlopen("hello.so",RTLD_LAZY);
 //       if (!h) {
-// 	return("did not load so");
+//      return("did not load so");
 //       }
 //       typedef std::string* (*hello_t)(std::string*);
 //       hello_t hello = (hello_t) dlsym(h, "hello");
@@ -54,29 +66,29 @@ void bla2( int x, double y){
 
 
 RCPP_MODULE(yada){
-	using namespace Rcpp ;
-	                  
-	function( "hello" , &hello  , List::create( _["env"]), "documentation for hello " ) ;
-	function( "bla"   , &bla    , "documentation for bla " ) ;
-	function( "bla1"  , &bla1   , "documentation for bla1 " ) ;
-	function( "bla2"  , &bla2   , "documentation for bla2 " ) ;
-	
-	// with formal arguments specification
-	function( "bar"   , &bar    , 
-	    List::create( _["x"] = 0.0 ), 
-	    "documentation for bar " ) ;
-	function( "foo"   , &foo    , 
-	    List::create( _["x"] = 1, _["y"] = 1.0 ),
-	    "documentation for foo " ) ;	
-	
-	// class_<World>( "World" )
-	
-	//     // expose the default constructor
-	//     .constructor()    
-	    
-	// 	.method( "greet", &World::greet , "get the message" )
-	// 	.method( "set", &World::set     , "set the message" )
-	// ;
+        using namespace Rcpp ;
+                          
+        function( "hello" , &hello  , List::create( _["env"]), "documentation for hello " ) ;
+        function( "bla"   , &bla    , "documentation for bla " ) ;
+        function( "bla1"  , &bla1   , "documentation for bla1 " ) ;
+        function( "bla2"  , &bla2   , "documentation for bla2 " ) ;
+        
+        // with formal arguments specification
+        function( "bar"   , &bar    , 
+            List::create( _["x"] = 0.0 ), 
+            "documentation for bar " ) ;
+        function( "foo"   , &foo    , 
+            List::create( _["x"] = 1, _["y"] = 1.0 ),
+            "documentation for foo " ) ;        
+        
+        // class_<World>( "World" )
+        
+        //     // expose the default constructor
+        //     .constructor()    
+            
+        //      .method( "greet", &World::greet , "get the message" )
+        //      .method( "set", &World::set     , "set the message" )
+        // ;
 }                     
 
 
