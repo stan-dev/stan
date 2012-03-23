@@ -871,11 +871,11 @@ namespace stan {
      * <p>The simplex transform is defined through a centered stick-breaking
      * process.
      * 
-     * @param y Simplex of dimensionality K.
+     * @param x Simplex of dimensionality K.
      * @return Free vector of dimensionality (K-1) that transfroms to
      * the simplex.
      * @tparam T Type of scalar.
-     * @throw std::domain_error if y is not a valid simplex
+     * @throw std::domain_error if x is not a valid simplex
      */
     template <typename T>
     Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& x) {
