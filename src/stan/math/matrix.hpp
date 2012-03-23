@@ -1362,7 +1362,7 @@ namespace stan {
     /**
      * Return the product of the specified scalar and row vector.
      * @param c Scalar.
-     * @param v Row vector.
+     * @param rv Row vector.
      * @return Product of scalar and row vector.
      */
     inline row_vector_d multiply(double c, const row_vector_d& rv) {

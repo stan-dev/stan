@@ -112,6 +112,7 @@ namespace stan {
        * called from the <code>ctime</code> library.
        * 
        * @param model Probability model with gradients.
+       * @param maxdepth 
        * @param epsilon Optional (initial) Hamiltonian dynamics simulation
        * step size. If not specified or set < 0, find_reasonable_parameters()
        * will be called to initialize epsilon.
@@ -127,7 +128,7 @@ namespace stan {
        * specified, generate new seed based on system time.
        */
       nuts(prob_grad& model,
-           int maxdepth = 10, 
+           int maxdepth = 10,
            double epsilon = -1,
            double epsilon_pm = 0.0,
            bool adapt_epsilon = true,
