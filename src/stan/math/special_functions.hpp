@@ -581,7 +581,7 @@ namespace stan {
      * @return Pi.
      */
     double pi() {
-      return PI;
+      return boost::math::constants::pi<double>();
     }
 
     /**

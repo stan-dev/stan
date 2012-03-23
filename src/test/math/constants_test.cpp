@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/constants.hpp"
 
-TEST(MathsConstants, pi) {
-  EXPECT_FLOAT_EQ(4.0 * std::atan(1.0), stan::math::PI);
-}
 TEST(MathsConstants, e) {
   EXPECT_FLOAT_EQ(std::exp(1.0), stan::math::E);
 }
