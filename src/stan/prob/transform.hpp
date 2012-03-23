@@ -803,7 +803,7 @@ namespace stan {
      *
      * The transform is based on a centered stick-breaking process.
      *
-     * @param x Free vector input of dimensionality K - 1.
+     * @param y Free vector input of dimensionality K - 1.
      * @return Simplex of dimensionality K.
      * @tparam T Type of scalar.
      */
