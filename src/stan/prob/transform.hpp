@@ -833,7 +833,7 @@ namespace stan {
      * The simplex transform is defined through a centered stick-breaking
      * process.
      * 
-     * @param x Free vector input of dimensionality K - 1.
+     * @param y Free vector input of dimensionality K - 1.
      * @param lp Log probability reference to increment.
      * @return Simplex of dimensionality K.
      * @tparam T Type of scalar.
