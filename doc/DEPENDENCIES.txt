@@ -44,7 +44,7 @@ home:    http://eigen.tuxfamily.org
 license: LGPL3+
          http://www.gnu.org/licenses/lgpl.html
 unpack:  lib/Eigen/{Array,...}
-version  3.0.4
+version  3.0.5
 
 
 4. boost
@@ -53,7 +53,7 @@ home:    http://www.boost.org/
 license: Boost
          http://www.boost.org/users/license.html
 unpack:  lib/boost/{accumulators,algorithm,...}
-version: 1.48.0
+version: 1.49.0
 
 
 
