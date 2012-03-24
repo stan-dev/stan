@@ -8,16 +8,21 @@
 \usepackage{xspace}
 \usepackage{fancyvrb}
 \usepackage{titlesec}
-\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
-%\titlespacing{\section}{0pt}{12pt}{6pt}
+
 \titleformat{\chapter}[hang]{\bfseries\huge}{\thechapter.}{1.5pc}{}{}
 %\titlespacing{\chapter}{0pt}{-12pt}{18pt}{}
+%
+\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
+%\titlespacing{\section}{0pt}{12pt}{6pt}
+%
+\titleformat{\subsection}{\it}{}{0em}{}
+%\titlespacing{\subsection}{-1em}{12pt}{6pt}
 
 \newcommand{\Stan}{Stan\xspace}
-\newcommand{\stanc}{{\tt stanc}\xspace}
+\newcommand{\stanc}{{\ttfamily stanc}\xspace}
 \newcommand*{\Cpp}{C\raise.2ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
-\newcommand{\clang}{{\tt clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
-\newcommand{\gpp}{{\tt g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+\newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+\newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 
 \newcommand{\acronym}[1]{{\sc #1}\xspace}
 
@@ -562,7 +567,85 @@ Preparing a \Stan program to be run involves two compilation steps,
 This chapter discusses the first step; the second step is discussed in
 \refchapter{compiling-cpp}.
 
+\section{The \stanc Compiler}
 
+The \stanc compiler converts \Stan programs to \Cpp programs.  
+
+The first thing it does is parse the \Stan program.  If the parser is
+successful, it then generates \Cpp code.  If the parser fails, it will
+provide an error message indicating where and why the error occurred.
+
+The following example illustrates a fully qualified call to \stanc.
+%
+\begin{verbatim}
+> stanc --name=binary_normal --o=binorm.cpp binormal.stan 
+\end{verbatim}
+%
+This call specifies the name of the model, here {\tt binary\_normal}.
+This will determine the name of the class implementing the model in
+the \Cpp code.  The \Cpp code implementing the class is written to
+\code{binorm.cpp}.  The final argument, \code{binormal.stan}, is
+the file from which to read the \Stan program.
+
+
+\section{Command-Line Options}
+
+\begin{description}
+%
+\item[\tt --help] 
+Displays the manual page for \stanc.  If this option is selected,
+nothing else is done.
+%
+\item[\tt --version]
+Prints the version of \stanc.  This is useful for bug reporting
+and asking for help on the mailing lists.
+%
+\item[\tt --name={\slshape class\_name}]
+Specify the name of the class used for the implementation of the
+\Stan model in the generated \Cpp code.  
+\\[6pt]
+Default: {\tt {\slshape class\_name = anon\_model}}
+%
+\item[\tt -o={\slshape cpp\_file\_name}]
+Specify the name of the file into which the generated \Cpp is written.
+\\[6pt]
+Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.cpp}
+%
+\end{description}
+
+
+\chapter{The C++ Model Class}
+
+The generated \Cpp class extends a built-in \Stan abstract
+base class for probability models.  Instances of the class are
+constructed from a specified data vector $y$.  The data vector $y$
+determines the dimensionality $K$ of the parameter vector $\theta$,
+which in general may depend on size constants in $y$.  The class
+implements a method that takes a parameter $K$-vector $\theta$ as
+argument and returns the (unnormalized) total log probabilty,
+\[
+\theta 
+\mapsto 
+\log p(y,\theta) 
+\]
+The second method returns the gradient of the (unnormalized) total
+probability as a function of a parameter $K$-vector $\theta$,
+\[
+\theta
+\mapsto
+\nabla_{\theta} \log p(y,\theta)
+= ( \frac{\partial}{\partial\theta_1} \log p(y,\theta),
+   \ldots, 
+   \frac{\partial}{\partial\theta_K} \log p(y,\theta) ),
+\]
+
+The class computes gradients using accurate and efficient reverse-mode
+algorithmic differentiaton.  The cost of computing the gradient is
+a small multiple of the cost of computing the log probability.  The
+cost inovlves a bounded amount of extra bookkeeping for each 
+subexpression involved in computing the log probability.  Unlike
+in the calculation of finite differences, the extra bookkeeping is
+not dependent on the dimensionality of the parameter vector.
 
 
 
@@ -918,68 +1001,214 @@ always treats these dimesions as \code{L}.
 
 
 
-\chapter{Optimization}\label{optimization.chapter}
+\chapter{Variable Transforms}
 
-\chapter{Unconstraining Variable Transforms}
+To avoid having to deal with constraints while simulating the
+Hamiltonian dynamics during sampling, every (multivariate) parameter
+in a \Stan model is transformed to an unconstrained variable behind
+the scenes by the model compiler.  The transform is based on any
+constraints in the parameter's definition.  Constraints that may be
+placed on variables include upper and lower bounds, positive ordered
+vectors, simplex vectors, correlation matrices and covariance
+matrices.  This chapter provides a definition of the transforms used
+for each type of variable.
 
-Specifically, the generated class implements the total log 
-probability as a function of a transformed parameter 
-vector $\phi = f(\theta)$, such that
-\[ 
-p_{\phi,Y}(\phi,y) 
-= p_{\theta,Y}(f^{-1}(\phi),y) \ \left| J(f^{-1})(\phi) \right|
-\] 
-where $J(f^{-1})(\theta)$ is the Jacobian of the inverse $f^{-1}$ of 
-the transform evaluated at $\theta$.
+Once the model is compiled, it has support on all of
+$\mathbb{R}^K$, where $K$ is the number of unconstrained parameters
+needed to define the actual parameters defined in the model.
+
+The details of section need not be understood in order to use
+\Stan for well-behaved models.  Understanding the sampling behavior
+of \Stan fully requires understanding these transforms.
+
+
+\section{Changes of Variables}
+
+The support of a random variable $X$ with density $p_X(x)$ is that
+subset of values for which it has non-zero density,
+%
+\[
+\mbox{support}(X) = \{ x | p_X(x) > 0 \}.
+\]
+
+If $f$ is a total function defined on the support of $X$, then $Y =
+f(X)$ is a new random variable.  This section shows how to compute the
+probability density function of $Y$ in cases of well-behaved $f$.
+
+
+\subsection{Univariate Changes of Variables}
+
+Suppose $X$ is one dimensional and $f: \mbox{support}(X) \rightarrow
+\mathbb{R}$ is a one-to-one, monotonic function with a differentiable
+inverse $f^{-1}$.  Then the density of $Y$ is given by
+%
+\[
+p_Y(y) = p_X(f^{-1}(y))  
+         \,
+         \left| \, \frac{d}{dy} f^{-1}(y)\, \right|.
+\]
+
+
+\subsection{Multivariate Changes of Variables}
+
+
+Suppose $X$ is a $K$-dimensional random variable with probability
+density function $p_X(x)$.  A new random variable $Y = f(X)$ may be
+defined by transforming $X$ with a suitably well-behaved function $f$.
+It suffices for what follows to note that if $f$ is one-to-one
+and its inverse $f^{-1}$ has a well-defined Jacobian, then the
+density of $Y$ is
+%
+\[
+p_Y(y) = p_X(g(y)) \, \left| \, \det \, J_g(y) \, \right|,
+\]
+%
+where $\det{}$ is the matrix determinant operation and $J_{f^{-1}}(y)$ is
+the Jacobian of $f^{-1}$ evaluated at $y$.  The latter is defined by
+\[
+J_{f^{-1}}(y) = 
+\left[
+\begin{array}{ccc}\displaystyle
+\frac{\partial y_1}{\partial x_1}
+& \cdots
+& \displaystyle \frac{\partial y_1}{\partial x_{K}}
+\\[6pt]
+\vdots & \vdots & \vdots
+\\
+\displaystyle\frac{\partial y_{K}}{\partial x_1}
+& \cdots
+& \displaystyle\frac{\partial y_{K}}{\partial x_{K}}
+\end{array}
+\right].
+\]
+%
+If the Jacobian is a triangular matrix, the determinant reduces to the
+product of the diagonal entries,
+%
+\[
+\det \, J_{f^{-1}}(y)
+= \prod_{k=1}^K \frac{\partial y_k}{\partial x_k}.
+\]
+%
+Triangular matrices naturally arise in situations where the variables
+are ordered, for instance by dimension, and each variable's
+transformed value depends on the previous variable's transformed
+values.  Diagonal matrices, a simple form of triangular matrix,
+arise if each transformed variable only depends on a single raw
+variable.
+
+\section{Lower Bounds}
+
+\Stan uses a logarithmic transform for lower and upper bounds.  If a
+variable $X$ is declared to have lower bound $c$, it is transformed to
+a new variable $Y$, where
+%
+\[
+Y = \log(X - c),
+\]
+%
+the inverse transform is
+%
+\[
+f^{-1}(y) = \exp(y) + c,
+\]
+%
+and the density of $Y$ is
+%
+\begin{eqnarray*}
+p_Y(y) 
+& = & p_X\!\left( \exp(y) + c \right) \cdot \left| \frac{d}{dy} \left(
+    \exp(y) + c \right) \right|
+\\[6pt]      
+& = & p_X\!\left( \exp(y) + c \right) \cdot \exp(y).
+\end{eqnarray*}
+
+\section{Upper Bounds}
+
+\Stan treats upper bounds in the same way as lower bounds, with a
+logarithmic transform.  Only this time the result must be negated.  If
+a variable $X$ is declared to have an upper bound $d$, it is
+transformed to a new variable $Y$, where
+%
+\[
+Y = \log(d - X)
+\]
+%
+the inverse transform is
+%
+\[
+f^{-1}(y) = d - \exp(y)
+\]
+%
+and the density of $Y$ is
+%
+\begin{eqnarray*}
+p_Y(y) 
+& = & p_X \!\left( d - \exp(y) \right) \cdot \left| \frac{d}{dy} \left( d
+    - \exp(y) \right) \right|
+\\[6pt]      
+& = &  p_X \!\left( d - \exp(y) \right) \cdot \exp(y).
+\end{eqnarray*}
+
+
+\section{Lower and Upper Bounds}
+
+For lower and upper-bounded variables, \Stan uses the log-odds
+transform.  It scales and translates from the basic log-odds function
+defined for $u \in (0,1)$ by
+%
+\[
+\mbox{logit}(u) = \log \frac{u}{1 - u}.
+\]
+% 
+The inverse of the log odds function is the logistic sigmoid, defined 
+for $v \in (-\infty,\infty)$ by
+%
+\[
+\mbox{logit}^{-1}(v) = \frac{1}{1 + \exp(-v)}.
+\]
+% 
+The derivative of the logistic sigmoid is
+%
+\[
+\frac{d}{dy} \mbox{logit}^{-1}(y) 
+= \mbox{logit}^{-1}(y) \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
+\]
  
-The generated \Cpp class extends a built-in \Stan abstract
-base class for probability models.  Instances of the class are
-constructed from a specified data vector $y$.  The data vector $y$
-determines the dimensionality $K$ of the parameter vector $\theta$,
-which in general may depend on size constants in $y$.  The class
-implements a method that takes a parameter $K$-vector $\theta$ as
-argument and returns the (unnormalized) total log probabilty,
+For variables constrained to be in the open interval $(a,b)$, \Stan
+uses a scaled and translated log-odds transform.  If variable $X$ is
+declared to have lower bound $a$ and upper bound $b$, then it is
+transformed to a new variable $Y$, where
+%
 \[
-\theta 
-\mapsto 
-\log p(y,\theta) 
+Y = \mbox{logit} \left( \frac{X - a}{b - a} \right).
 \]
-The second method returns the gradient of the (unnormalized) total
-probability as a function of a parameter $K$-vector $\theta$,
+%
+The inverse of this transform is
+%
 \[
-\theta
-\mapsto
-\nabla_{\theta} \log p(y,\theta)
-= ( \frac{\partial}{\partial\theta_1} \log p(y,\theta),
-    \ldots, 
-    \frac{\partial}{\partial\theta_K} \log p(y,\theta) ),
+X = a + (b - a) \cdot \mbox{logit}^{-1}(Y)
 \]
-
-The class computes gradients using accurate and efficient reverse-mode
-algorithmic differentiaton.  The cost of computing the gradient is
-a small multiple of the cost of computing the log probability.  The
-cost inovlves a bounded amount of extra bookkeeping for each 
-subexpression involved in computing the log probability.  Unlike
-in the calculation of finite differences, the extra bookkeeping is
-not dependent on the dimensionality of the parameter vector.
-
-The variables used to define the model are transformed based on their
-type to guarantee that the log probability function has support on all
-of $\mathbb{R}^K$.  The methods described above operate on the
-transformed parameters and their return values take account of the log
-of the appropriate absolute Jacobian determinants.  Despite the log
-probabilities being unconstrained, chains may be initialized with
-constrained values in the samplers.  Similarly, output values are
-generated in their natural (constrained) form as written in the
-\Stan model specifications.
-
+%
+and the density of the transformed variable is
+%
+\begin{eqnarray*}
+p_Y(y) 
+& = & p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
+    \left|  \frac{d}{dy} a + (b - a) \cdot \mbox{logit}^{-1}(y)
+    \right| .
+\\[8pt]
+& = & p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
+    \cdot (b - a)
+    \cdot \mbox{logit}^{-1}(y)
+    \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
+\end{eqnarray*}
+%
+Despite its apparent complexity, $\mbox{logit}^{-1}(y)$, and hence
+$\exp(-y)$, need only be evaluated once.
 
 
-% Stan also supports optimization methods that are able to find
-% a $\theta^{*}$ that (locally) optimizes $p(\theta|y)$.
-
-
-\chapter{Modeling Language Reference}
+\chapter{Modeling Language Reference}\label{model-ref.chapter}
 
 \Stan's modeling language is more procedural than what users may be
 familiar with from BUGS and JAGS, both of which are declarative.  For
@@ -1027,6 +1256,12 @@ Valid \Stan expresions include simple numerical literals (e.g.,
 
 The simplest form of expression is a literal denoting a
 value, such as \code{32.7}.  Expressions may also consist of
+
+
+\chapter{Optimizing \Stan Code}\label{optimization.chapter}
+
+
+
 
 \appendix
 
