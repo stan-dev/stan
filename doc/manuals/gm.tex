@@ -593,20 +593,24 @@ the file from which to read the \Stan program.
 \begin{description}
 %
 \item[\tt --help] 
+\mbox{ } \\ 
 Displays the manual page for \stanc.  If this option is selected,
 nothing else is done.
 %
 \item[\tt --version]
+\mbox{ } \\ 
 Prints the version of \stanc.  This is useful for bug reporting
 and asking for help on the mailing lists.
 %
 \item[\tt --name={\slshape class\_name}]
+\mbox{ } \\ 
 Specify the name of the class used for the implementation of the
 \Stan model in the generated \Cpp code.  
 \\[6pt]
 Default: {\tt {\slshape class\_name = anon\_model}}
 %
 \item[\tt -o={\slshape cpp\_file\_name}]
+\mbox{ } \\ 
 Specify the name of the file into which the generated \Cpp is written.
 \\[6pt]
 Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.cpp}
@@ -1033,7 +1037,8 @@ subset of values for which it has non-zero density,
 
 If $f$ is a total function defined on the support of $X$, then $Y =
 f(X)$ is a new random variable.  This section shows how to compute the
-probability density function of $Y$ in cases of well-behaved $f$.
+probability density function of $Y$ for a few useful and well-behaved
+transforms $f$.
 
 
 \subsection{Univariate Changes of Variables}
@@ -1123,6 +1128,7 @@ p_Y(y)
 & = & p_X\!\left( \exp(y) + c \right) \cdot \exp(y).
 \end{eqnarray*}
 
+
 \section{Upper Bounds}
 
 \Stan treats upper bounds in the same way as lower bounds, with a
@@ -1206,6 +1212,251 @@ p_Y(y)
 %
 Despite its apparent complexity, $\mbox{logit}^{-1}(y)$, and hence
 $\exp(-y)$, need only be evaluated once.
+
+
+\section{Positive Ordered}
+
+For some modeling tasks, a vector-valued random variable $X$ is
+required with support on positive, ordered sequences.  One example is
+the set of cut points in ordinal logistic regression.  
+
+In constraint terms, a positive, ordered vector $x \in \mathbb{R}^K$
+is a vector that satisfies
+\[
+0 < x_1
+\]
+%
+and for $2 \leq k \leq K$,
+\[
+x_{k-1} < x_k
+\]
+%
+
+\Stan's transform follows the constraint directly.  It maps a vector
+$x \in \mathbb{R}^{K}$ to a vector $f(x) = y \in \mathbb{R}^K$ by setting
+%
+\[
+y_1 = f_1(x) = \log x_1
+\] 
+%
+and for $2 \leq k \leq K$,
+\[
+y_k = f_k(x) = \log \left( x_{k} - x_{k-1} \right).
+\]
+
+The inverse transform $x = f^{-1}(y)$ satisfies
+%
+\[
+x_1 = \exp(y_1)
+\]
+%
+and for $2 \leq k \leq K$, 
+\[
+x_k = x_{k-1} + \exp(y_k) = \sum_{k' =1}^{k} \exp(y_{k'}).
+\]
+
+The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
+with diagonal elements
+\[
+J_{1,1} = \frac{\partial}{\partial y_1} f_1^{-1}(y) = \exp(y_1)
+\]
+and for $2 \leq k \leq K$,
+\[
+J_{k,k} = \frac{\partial}{\partial y_k} f_k^{-1}(y) = \exp(y_k).
+\]
+%
+Because of the triangularity and the positivivity of the $x_k$ and
+their differences, the absolute determinant of the Jacobian is
+%
+\[
+\left| \, \det\, J \, \right|
+= \prod_{k=1}^K \exp(y_k)
+\]
+
+
+Putting this all together, if $p_X$ is the density of $X$, then the
+transformed variable $Y$ has density $p_Y$ given by
+%
+\[
+p_Y(y)
+= p_X(f^{-1}(y)) 
+\
+\prod_{k=1}^K \exp(y_k).
+\]
+
+
+\section{Unit Simplex}
+
+The parameter of the $K$-dimensional categorical distribution must lie
+in the $K$-simplex.  Consequently, simplex-constrained variables show
+up in multivariate discrete models of all kinds.  
+
+The $K$-simplex is the set of points $x \in \mathbb{R}^K$ such that
+for $1 \leq k \leq K$, 
+\[ 
+x_k > 0,
+\] 
+and
+\[
+\sum_{k=1}^K x_k = 1.
+\]
+%   
+
+A point $x$ in the $K$-simplex is fully determined by its first $K-1$
+dimensions, because rearranging terms in the constraint yields
+%
+\[
+x_K = 1 - \sum_{k=1}^{K-1} x_k.
+\]
+%
+
+Stan employs a transform whose inverse may be understood using a
+stick-breaking metaphor.  A simplex is determined by taking a stick of
+unit length, breaking a piece off, the length of which is $x_1$.  Then
+$x_2$ is determined by breaking a piece from what's left.  A total of
+$K-1$ pieces are broken off, determining $x_1,\ldots,x_{K-1}$.  To
+complete the metaphor, the length of the remaining piece after $K-1$
+pieces are broken off determines $x_K$.
+
+The simplex transform $f$ is most easily understood in terms of its
+inverse $x = f^{-1}(y)$, which maps a point in $y \in
+\mathbb{R}^{K-1}$ to a point $x$ in the $K$-simplex.  An intermediate
+vector $z \in \mathbb{R}^{K-1}$, whose coordinates $z_k$ represent 
+the proportion of the stick broken off in step $k$, is defined
+elementwise for $1 \leq k < K$ by
+%
+\[
+z_k = \mbox{logit}^{-1} \left( y_k 
+                             - \mbox{logit} \left( \frac{1}{K - k + 1}
+                                            \right)
+                       \right).
+\]
+%
+The logit term in the above definition adjusts the transform so that a
+zero vector $y$ is mapped to $(1/K,\ldots,1/K)$.  For instance, if
+$y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
+if $z_{K-1} = 0$, then $z_{K-1} = 1/2$.  This ensures that random
+initializations for categorical distribution parameters are
+initialized around a parameter value when $y = 0$ representing the
+uniform distribution.
+
+The break proportions $z$ are applied to determine the stick sizes and
+resulting value of $x_k$ for $1 \leq k < K$ by
+%
+\[
+x_k = 
+\left( 1 - \sum_{k'=1}^{k-1} x_{k'} \right) z_k.
+\]
+%
+The summation term represents the length of stick left at stage $k$.
+This is multiplied by the break proportion $z_k$ to yield $x_k$.
+Because $x$ lines in a $K$-simplex, $x_K$ is determined from
+$x_1,\ldots,x_{K-1}$.
+
+The Jacobian $J$ of the inverse transform $f^{-1}$ is
+lower-triangular, with diagonal entries
+\[
+J_{k,k}
+=
+\frac{\partial x_k}{\partial y_k}
+=
+\frac{\partial x_k}{\partial z_k} \,
+\frac{\partial z_k}{\partial y_k},
+\]
+%
+where
+\[
+\frac{\partial z_k}{\partial y_K} 
+= \frac{\partial}{\partial z_k} 
+   \mbox{logit}^{-1} \left(
+                       y_k - \mbox{logit} \left( \frac{1}{K-k+1}
+                                          \right)
+                    \right)
+= z_k (1 - z_k),
+\]
+%
+and
+%
+\[
+\frac{\partial x_k}{\partial z_k}
+=
+\left( 
+  1 - \sum_{k' = 1}^{k-1} x_{k'}
+   \right)
+.
+\]
+%
+Note that the definition is recursive, definining $x_k$ in terms of
+$x_{k'}$ where $k' < k$.
+
+Because the Jacobian $J$ of $f^{-1}$ is lower triangular and positve, its
+absolute determinant reduces to
+%
+\[
+\left| \, \det J \, \right|
+\ = \
+\prod_{k=1}^{K-1} J_{k,k}
+\ = \
+\prod_{k=1}^{K-1} 
+z_k
+\, 
+(1 - z_k)
+\
+\left(
+1 - \sum_{k'=1}^{k-1} x_{k'}
+\right)
+.
+\]
+%
+Thus the transformed variable $Y = f(X)$ has a density given by
+%
+\[
+p_Y(y) 
+= p_X(f^{-1}(y))
+\,
+\prod_{k=1}^{K-1} 
+z_k
+\, 
+(1 - z_k)
+\
+\left(
+1 - \sum_{k'=1}^{k-1} x_{k'}
+\right)
+.
+\]
+%
+This formula looks more complicated than it is.  It only involves a
+single exponential function evaluation involved (in the logistic
+sigmoid applied to $y_k$ to produce $z_k$);  everything else is just
+basic arithmetic and keeping track of the remaing stick length.
+
+The transform $Y = f(X)$ can be derived by reversing the stages of the
+inverse transform.  Working backwards, given the break proportions
+$z$, $y$ is defined elementwise by
+%
+\[
+y_k 
+= \mbox{logit}(z_k)
++ \mbox{logit}\left(
+   \frac{1}{K-k+1}
+   \right)
+.
+\]
+%
+The break proportions $z_k$ are defined to be the ratio of $x_k$ to
+the length of stick left after the first $k-1$ pieces have been broken
+off, 
+%
+\[
+z_k 
+= \frac{x_k}
+       {1 - \sum_{k' = 1}^{k-1} x_k}
+.
+\]
+
+
+
+
 
 
 \chapter{Modeling Language Reference}\label{model-ref.chapter}
