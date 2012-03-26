@@ -67,4 +67,4 @@ Compile the two translation units, link, and run:
   > clang++ -c inst_demo.cpp
   > clang++ -c foo_inst.cpp
   > clang++ inst_demo.o foo_inst.o -o inst_demo
-  > ./run_foo
+  > ./inst_demo
