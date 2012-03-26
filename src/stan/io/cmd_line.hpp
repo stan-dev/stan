@@ -37,9 +37,16 @@ namespace stan {
         o << ' ';
     }
 
+    /** 
+     * Prints single print option to std::cout.
+     * 
+     * @param key_val 
+     * @param msg 
+     * @param note 
+     */
     void print_help_helper(const std::string& key_val,
-                      const std::string& msg,
-                      const std::string& note = "") {
+                           const std::string& msg,
+                           const std::string& note = "") {
       pad_help_option(key_val);
       std::cout << msg 
                 << std::endl;
@@ -51,6 +58,14 @@ namespace stan {
       std::cout << std::endl;
     }
 
+    /** 
+     * Prints single print option to std::cout.
+     * 
+     * @param key 
+     * @param value_type 
+     * @param msg 
+     * @param note 
+     */
     void print_help_option(const std::string& key,
                            const std::string& value_type,
                            const std::string& msg,
@@ -61,8 +76,6 @@ namespace stan {
         ss << "=<" << value_type << ">";
       print_help_helper(ss.str(),msg,note);
     }
-
-
 
     /**
      * The <code>cmd_line</code> class parses and stores command-line
