@@ -2325,6 +2325,12 @@ namespace stan {
 
 namespace std {
 
+  /** 
+   * Specialization of numeric limits for var objects.
+   *
+   * This implementation of std::numeric_limits<stan::agrad::var>
+   * is used to treat var objects like doubles.
+   */
   template<> 
   struct numeric_limits<stan::agrad::var> {
     static const bool is_specialized = true;
