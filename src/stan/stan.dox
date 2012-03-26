@@ -29,10 +29,6 @@
  * following the pattern of 
  * <a href="http://cran.r-project.org/web/packages/R2WinBUGS/index.html">R2WinBugs</a>.
  *
- * @section policy Error Handling Policies
- * 
- * Describe the error handling policies for stan::prob here.
- *	
  * @section license Open-Source Licensing
  *
  * Stan is released under the 
@@ -49,7 +45,10 @@
  * (<a href="http://www.gnu.org/copyleft/gpl.html">Gnu Public License, version 3</a>).  R must be
  * downloaded and installed separately.  The combination of Stan and R is then governed under the
  * Gnu Public License, version 3, as required by the Gnu Public License's compatibility terms.
- *	
+ *
+ * @section policy Error Handling Policies
+ * For error handling polices, see @ref policy_page.
+ * 
  * @section team Project Team
  *
  * <a href="http://colloquial.com/carp">Bob Carpenter</a>, Columbia University, Department of Statistics

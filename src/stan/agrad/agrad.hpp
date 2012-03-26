@@ -163,6 +163,15 @@ namespace stan {
         adj_ = 0.0;
       }
 
+      /** 
+       * Insertion operator for vari. Prints the current value and
+       * the adjoint value.
+       * 
+       * @param os [in,out] ostream to modify
+       * @param v [in] vari object to print.
+       * 
+       * @return The modified ostream.
+       */
       friend std::ostream& operator<<(std::ostream& os, const vari* v) {
         return os << v << "  " << v->val_ << " : " << v->adj_;
       }
@@ -180,7 +189,12 @@ namespace stan {
     }
       
 
-
+    /** 
+     * Prints the auto-dif variable stack. This function
+     * is used for debugging purposes.
+     * 
+     * @param o ostream to modify
+     */
     void print_stack(std::ostream& o) {
       o << "STACK, size=" << var_stack_.size() << std::endl;
       for (size_t i = 0; i < var_stack_.size(); ++i)
@@ -2309,8 +2323,17 @@ namespace stan {
 }
 
 
+/** 
+ * Template specification of functions in std for Stan.
+ */
 namespace std {
 
+  /** 
+   * Specialization of numeric limits for var objects.
+   *
+   * This implementation of std::numeric_limits<stan::agrad::var>
+   * is used to treat var objects like doubles.
+   */
   template<> 
   struct numeric_limits<stan::agrad::var> {
     static const bool is_specialized = true;
