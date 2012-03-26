@@ -63,7 +63,10 @@ namespace stan {
      * 
      * NOTE: squareness is not checked by this function
      *
+     * @param function 
      * @param y Matrix to test.
+     * @param name
+     * @param result
      * @return <code>true</code> if the matrix is symmetric.
      * @tparam T Type of scalar.
      */
@@ -484,7 +487,10 @@ namespace stan {
      * <p>The test that the values sum to 1 is done to within the
      * tolerance specified by <code>CONSTRAINT_TOLERANCE</code>.
      *
-     * @param y Vector to test.
+     * @param function
+     * @param theta Vector to test.
+     * @param name
+     * @param result
      * @return <code>true</code> if the vector is a simplex.
      */
     template <typename T_prob,
