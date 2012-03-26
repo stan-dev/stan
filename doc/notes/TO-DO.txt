@@ -14,7 +14,6 @@ TO DO FOR V1
   - getting started guide (Bob) 
   - scale jumbo Stan logo in doxygen (Daniel)
   - API doc (Daniel, Bob)
-    + stan/io
     + stan/gm
     + stan/math
     + stan/mcmc
