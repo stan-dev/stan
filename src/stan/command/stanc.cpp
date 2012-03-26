@@ -9,6 +9,10 @@
 
 #include <stan/io/cmd_line.hpp>
 
+/** 
+ * Prints the Stan version to std::cout.
+ * 
+ */
 void print_version() {
   std::cout << "stanc version "
             << stan::MAJOR_VERSION
@@ -17,6 +21,11 @@ void print_version() {
             << std::endl;
 }
 
+/** 
+ * Prints the Stan compiler (stanc) help 
+ * to std::cout.
+ * 
+ */
 void print_stanc_help() {
   using stan::io::print_help_option;
 
@@ -44,6 +53,14 @@ void print_stanc_help() {
   
 }
 
+/** 
+ * The Stan compiler (stanc).
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * 
+ * @return 0 for success, -1 for exception, -2 for parser failure
+ */
 int main(int argc, const char* argv[]) {
 
   static const int SUCCESS_RC = 0;
