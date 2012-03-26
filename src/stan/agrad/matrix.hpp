@@ -1047,8 +1047,8 @@ namespace stan {
     }
     /**
      * Return the elementwise product of the specified vectors.
-     * @param m1 First vector.
-     * @param m2 Second vector.
+     * @param v1 First vector.
+     * @param v2 Second vector.
      * @return Elementwise product of the vectors.
      */
     template <typename T1, typename T2>
@@ -1062,8 +1062,8 @@ namespace stan {
     }
     /**
      * Return the elementwise product of the specified row vectors.
-     * @param m1 First row vector.
-     * @param m2 Second row vector.
+     * @param v1 First row vector.
+     * @param v2 Second row vector.
      * @return Elementwise product of the row vectors.
      */
     template <typename T1, typename T2>
@@ -1096,8 +1096,8 @@ namespace stan {
     }
     /**
      * Return the elementwise division of the specified vectors.
-     * @param m1 First vector.
-     * @param m2 Second vector.
+     * @param v1 First vector.
+     * @param v2 Second vector.
      * @return Elementwise division of the vectors.
      */
     template <typename T1, typename T2>
@@ -1111,8 +1111,8 @@ namespace stan {
     }
     /**
      * Return the elementwise division of the specified row vectors.
-     * @param m1 First row vector.
-     * @param m2 Second row vector.
+     * @param v1 First row vector.
+     * @param v2 Second row vector.
      * @return Elementwise division of the row vectors.
      */
     template <typename T1, typename T2>
