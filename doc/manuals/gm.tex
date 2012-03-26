@@ -43,6 +43,9 @@
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
 
+\newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ } \\[4pt] #4}
+\newcommand{\farg}[1]{{\tt\slshape #1}}
+
 \usepackage{url}
 
 \newcommand\thicktilde
@@ -50,39 +53,43 @@
 \newcommand{\samp}{{\lower.78ex\hbox{\texttt{\char`\~}}}}%
 %{{\lower1.1ex\hbox{\Large\texttt{\char`\~}}}}
 
-\title{\Huge\bf \Stan's Modeling Language}
+\setcounter{tocdepth}{0}
+
+\title{\Huge\bf \Stan Modeling Language}
 \author{\Stan's Development Team}
-\date{Version 1.0} % \footnotesize \today}
+\date{\vspace*{36pt} Version 1.0 \\[4pt] {\small \today}} % \footnotesize \today}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-  \Stan is a general-purpose \Cpp probabilistic modeling framework
-  designed to support full Bayesian inference.  This document
-  describes \Stan's modeling language for specifying the joint
-  probability of observed data and unobserved parameters.  \Stan's
-  modeling language is based on \BUGS and \JAGS, and like them, allows
-  users to develop, fit, and evaluate Bayesian models without knowing
-  \Cpp.  \Stan's compiler parses model specifications and generates
-  \Cpp code.
+  \Stan is a general-purpose probabilistic modeling framework designed
+  to support full Bayesian inference.  This document describes \Stan's
+  modeling language for specifying the joint probability of observed
+  data and unobserved parameters.  \Stan's compiler parses model
+  specifications and generates \Cpp code.  \Stan's modeling language
+  is based on \BUGS and \JAGS, and like them, allows users to develop,
+  fit, and evaluate Bayesian models without knowing \Cpp.
 
   \Stan performs inference by Markov chain Monte Carlo (\MCMC)
-  simulation, which in this case, samples parameter values from the
-  posterior distribution of parameters given the observed data.  \Stan
-  employs the no-U-turn sampler (\NUTS), an adaptive form of
-  Hamiltonian Monte Carlo (\HMC) that alleviates the need for user
-  tuning of \HMC's rather sensitive parameters.  By making effective
-  use of the gradient of the log posterior, \HMC converges and
-  explores the parameter distribution faster than Gibbs sampling or
-  random-walk Metropolis-Hastings.  The improved sampling algorithm
-  and tighter compiled coding allows \Stan to operate on data of
-  larger scales and models of more complex structure than \BUGS or
-  \JAGS.
+  sampling of parameter values from the posterior distribution of
+  parameters given the observed data.  \Stan employs the no-U-turn
+  sampler (\NUTS), an adaptive form of Hamiltonian Monte Carlo (\HMC)
+  that alleviates the need for user tuning of \HMC's rather sensitive
+  parameters.  By making effective use of the gradient of the log
+  posterior, \HMC converges and explores the parameter distribution
+  faster than Gibbs sampling or random-walk Metropolis-Hastings.  The
+  improved sampling algorithm and more compact and efficient compiled
+  code allows \Stan to operate on data of larger scales and models of
+  more complex structure than \BUGS or \JAGS.
 \end{abstract}
 
-\chapter{Introduction}
+\tableofcontents
+
+\part{Introduction}
+
+\chapter{What is \Stan?}
 
 This document is a reference manual and getting started guide for
 using \Stan's probabilistic modeling language.  After describing the
@@ -229,10 +236,10 @@ sample a single unit normal variate.
 
 \section{Whitespace and Semicolons}
 
-In Stan, every variable declaration and statement must be terminated
-by a semicolon (\code{;}).  This is the convention followed by
-programming languages such as \Cpp.  It is not the convention followed
-by the statistical languages \R, \BUGS, or \JAGS.  
+In Stan, every variable declaration and atomic statement must be
+terminated by a semicolon (\code{;}).  This is the convention followed
+by programming languages such as \Cpp.  It is not the convention
+followed by the statistical languages \R, \BUGS, or \JAGS.
 
 The reason for the \Cpp convention is to ensure that differences in
 whitespace are not meaningful.  In \R, \BUGS, and \JAGS, the following
@@ -555,6 +562,8 @@ them eliminated.  There is further discussion of \Stan optimization
 in \refchapter{optimization}
 
 
+\part{Commands and Data Formats}
+
 \chapter{Compiling Stan Programs to C++}\label{stanc.chapter}
 
 Preparing a \Stan program to be run involves two compilation steps,
@@ -592,24 +601,24 @@ the file from which to read the \Stan program.
 
 \begin{description}
 %
-\item[\tt --help] 
+\item[\tt {-}-help] 
 \mbox{ } \\ 
 Displays the manual page for \stanc.  If this option is selected,
 nothing else is done.
 %
-\item[\tt --version]
+\item[\tt {-}-version]
 \mbox{ } \\ 
 Prints the version of \stanc.  This is useful for bug reporting
 and asking for help on the mailing lists.
 %
-\item[\tt --name={\slshape class\_name}]
+\item[\tt {-}-name={\slshape class\_name}]
 \mbox{ } \\ 
 Specify the name of the class used for the implementation of the
 \Stan model in the generated \Cpp code.  
 \\[6pt]
 Default: {\tt {\slshape class\_name = anon\_model}}
 %
-\item[\tt -o={\slshape cpp\_file\_name}]
+\item[\tt {-}-o={\slshape cpp\_file\_name}]
 \mbox{ } \\ 
 Specify the name of the file into which the generated \Cpp is written.
 \\[6pt]
@@ -618,38 +627,6 @@ Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.cpp}
 \end{description}
 
 
-\chapter{The C++ Model Class}
-
-The generated \Cpp class extends a built-in \Stan abstract
-base class for probability models.  Instances of the class are
-constructed from a specified data vector $y$.  The data vector $y$
-determines the dimensionality $K$ of the parameter vector $\theta$,
-which in general may depend on size constants in $y$.  The class
-implements a method that takes a parameter $K$-vector $\theta$ as
-argument and returns the (unnormalized) total log probabilty,
-\[
-\theta 
-\mapsto 
-\log p(y,\theta) 
-\]
-The second method returns the gradient of the (unnormalized) total
-probability as a function of a parameter $K$-vector $\theta$,
-\[
-\theta
-\mapsto
-\nabla_{\theta} \log p(y,\theta)
-= ( \frac{\partial}{\partial\theta_1} \log p(y,\theta),
-   \ldots, 
-   \frac{\partial}{\partial\theta_K} \log p(y,\theta) ),
-\]
-
-The class computes gradients using accurate and efficient reverse-mode
-algorithmic differentiaton.  The cost of computing the gradient is
-a small multiple of the cost of computing the log probability.  The
-cost inovlves a bounded amount of extra bookkeeping for each 
-subexpression involved in computing the log probability.  Unlike
-in the calculation of finite differences, the extra bookkeeping is
-not dependent on the dimensionality of the parameter vector.
 
 
 
@@ -929,19 +906,20 @@ y <-
 \end{Verbatim}
 \end{quote}
 %
-Breaking before the assignment, as in \R, is not allowed.
+Following its roots in \R, breaking before the assignment arrow is not
+allowed.
 %
 \begin{quote}
 \begin{Verbatim}
 y
-<- 2
+<- 2  # Syntax Error
 \end{Verbatim}
 \end{quote}
 
 Lines may also be broken in the middle of sequences declared
 using the \code{c(...)} notation., as well as between the comma
 following a sequence definition and the dimensionality declaration.
-For example, the following declaration of a $2 \times 3 \times 4$
+For example, the following declaration of a $1 \times 2 \times 3$
 array is valid.
 %
 \begin{quote}
@@ -1005,6 +983,582 @@ always treats these dimesions as \code{L}.
 
 
 
+
+
+
+\part{Modeling Language Reference}
+
+\chapter{Data Types}
+
+\section{Basic Data Types}
+
+There are two basic data types in \Stan, integers and reals,
+declared as \code{int} and \code{real}.
+
+\subsection{Integers}
+
+Stan uses 64-bit (8-byte) integers for all of its integer
+representations.  The maximum value that can be represented
+as an integer is $2^{63}-1$; the minimum value is $-(2^{63})$.
+
+When integers overflow, their values wrap.  Thus it is up to
+the \Stan programmer to make sure the integer values in their programs
+stay in range.  In particular, every intermediate expression must have
+an integer value that is in range.
+
+\subsection{Reals}
+
+\Stan uses 64-bit (8-byte) floating point representations of real
+numbers.  \Stan roughly%
+%
+\footnote{\Stan compiles integers to \code{long int} and reals to
+  \code{double} types in \Cpp.  Precise details of rounding wil depend
+  on the compiler and hardware architecture on which the code is run.}
+%
+follows the {\sc ieee} 754 standard for floating-point computation.
+The range of a 64-bit number is roughly $\pm 2^{1022}$, which is
+slightly larger than $\pm 10^{307}$.  It is a good idea to stay well
+away from such extreme values in \Stan models as they are prone to
+cause overflow.
+
+There are three special real values used to represent (1) error
+conditions, (2) positive infinity, and (3) negative infinity.  The
+error value is referred to as ``not a number.''
+
+\subsection{Promoting Integers to Reals}
+
+\Stan automatically promotes integer values to real values if
+necessary, but does not automatically demote real values to integers.
+For examples, real values may only be assigned to real variables, but
+integer values may be assigned to either integer variables or real
+variables.  What happens interally is that the integer representation
+is converted to a floating-point representation.  This operation is
+not free and is thus best avoided if possible.
+
+
+\section{Vector Data Type}
+
+\Stan supports a basic real-valued vector data type.  Vectors are
+taken to be column vectors unless specified as row vectors.  
+
+There are two subtypes of the basic vector data for vectors of data
+meeting constraints.
+
+\subsection{Simplex}
+
+\subsection{Positive Ordered}
+
+
+\section{Array Data Types}
+
+If {\tt T} is a data type, then {\tt T[N]} is the type of an ordered
+sequence of {\tt N} objects of type {\tt T}.  
+
+\Stan supports arrays of data of arbitrary dimensionality.
+Conceptually, multi-dimensional arrays are 
+
+
+
+
+
+\chapter{Modeling Language Reference}\label{model-ref.chapter}
+
+\Stan's modeling language is more procedural than what users may be
+familiar with from BUGS and JAGS, both of which are declarative.  For
+instance, \Stan statements are executed in the order they are written
+in model specifications and local variables may be reassigned as in a
+procedural programming language.  Furthermore, variables must be
+declared before they are use.  
+
+Like most programming languages, \Stan is defined syntactically in
+terms of expressions, which denote values, and statements, which
+denote an action to be taken.
+
+The purpose of \Stan's modeling language is to allow users to write
+down a probability function up to a multiplicative normalizing
+constant.  
+
+
+\section{Expressions}
+
+The top-level grammar for expressions is provided in
+\reffigure{expression-grammar}.
+
+\begin{figure}
+\begin{center}
+{%\footnotesize
+\begin{Verbatim}
+expression ::= literal
+             | variable
+             | expression infixOp expression
+             | prefixOp expression
+             | expression postfixOp
+             | expression '[' expressions ']'
+             | function '(' expressions ')'
+             | '(' expression ')'
+\end{Verbatim}
+}
+\end{center}
+\mycaption{expression-grammar}
+          {The top-level expression grammar for \Stan model specifications.}
+\end{figure}
+
+Valid \Stan expresions include simple numerical literals (e.g.,
+\code{2}, \code{32.7}), identifiers representing variables (e.g.,
+\code{theta}), 
+
+The simplest form of expression is a literal denoting a
+value, such as \code{32.7}.  Expressions may also consist of
+
+
+\part{Built-In Functions} 
+
+\chapter{Built-in Functions}
+
+\Stan supports a wide range of built-in functions.  These functions
+operate over and return values spanning the complete range of data
+types.  
+
+The following chapters in this part describe basic functions returning
+integers and returning real values, array and matrix functions, and
+probability functions and cumulative distributions.
+
+\section{Function Signatures}
+
+The documentation of the special functions begins with a function
+signature.  This determines the type of arguments taken by the
+function and the type of value returned.  
+
+\subsection{Overloading}
+
+\Stan relies on function overloading, which means there can be several
+different functions with the same name.  Functions are determined
+uniquely by the combination of their name and the type of their
+arguments.
+
+For example, \Stan includes two built-in functions named \code{max}, one that
+operates on integers to return an integer, with signature
+%
+\begin{quote}
+\begin{Verbatim}
+int max(int m, int n)
+\end{Verbatim}
+\end{quote}
+%
+and one that operates over reals, with signature
+%
+\begin{quote}
+\begin{Verbatim}
+real max(real x, real y)
+\end{Verbatim}
+\end{quote}
+%
+The appropriate instance is called based on the arguments provided.
+
+The two functions named \code{max} are distinguished by their argument
+types.  It would not be legal to add a third function with signature
+\code{real max(int,int)}, as it would lead to a conflict with the
+existing function of name \code{max} and argument types
+\code{(int,int)}, even though it has a different return type.
+
+
+\section{Integer-to-Real Type Promotion}
+
+Integer values may be passed to functions requiring real values.  This
+is not unrelated to the fact that integer values may be assigned to
+real variables.  In both cases, the underlying \Cpp code handles the
+promotion of the underlying integer type to the underlying
+floating-point type.
+
+Consider again the two functions \code{max(int,int)} and
+\code{max(real,real}), and suppose these are the only two functions
+named \code{max} (they are the only two of that name built into
+\Stan).  If \code{m} is an integer variable and \code{x} a real
+variable, the call \code{max(m,x)} must be resolved as referring to
+\code{max(double,double)}, because integers can be promoted to real
+values, but not vice-versa.  
+
+If \code{n} is another integer variable, a call to \code{max(m,n)}
+could conceivably call either function named \code{max}.  The function
+\code{max(int,int)} requires no promotions, whereas
+\code{max(double,double)} requires two, so the first is invoked.  The
+general rule is that the function call matches the function requiring
+the fewest promotions.
+
+Even this simple disambiguation scheme leads to possible ambiguity
+(though \Stan's built-in functions avoid it).  If there were two functions,
+\code{foo(int,real)} and \code{foo(real,int)} and if \code{m} and
+\code{n} were integer variales, a call to \code{foo(m,n)} would be
+ambiguous.  Either function could be matched with one promotion and
+there is no better-matching function.  In such cases, the call will
+not compile.  This could be resolved by assigning one variable to a
+temporary, as in the following example.
+%
+\begin{quote}
+\begin{Verbatim}
+int m;  int n;  real x;  real y;  
+x <- m;  y <- n;
+# foo(m,n);  // illegal!
+foo(x,n);    // calls foo(double,int)
+foo(m,y);    // calls foo(int,double)
+\end{Verbatim}
+\end{quote}
+
+
+
+
+
+\chapter{Integer-Valued Basic Functions}
+
+This chapter describes \Stan's built-in function that operate on real
+and integer arguments and return results of type integer.
+
+\section{Absolute Function}
+
+\begin{description}
+%
+\fitem{int}{abs}{int \farg{x}}{
+The absolute value of \farg{x}}
+%
+\end{description}
+%
+
+\section{Bound Functions}
+%
+\begin{description}
+\fitem{int}{min}{int \farg{x}, int \farg{y}}{
+The minimum of \farg{x} and \farg{y}}
+%
+\fitem{int}{max}{int \farg{x}, int \farg{y}}{
+The maximum of \farg{x} and \farg{y}}
+%
+\end{description}
+
+
+\chapter{Real-Valued Basic Functions}
+
+This chapter describes built-in functions that take zero or more real
+or integer arguments and return real values.  Constants are
+represented as functions with no arguments and must be called as such.
+
+\section{Mathematical Constants}
+
+%
+\begin{description}
+%
+\fitem{real}{pi}{}{
+  $\pi$, the ratio of a circle's circumference to its diameter}
+%
+\fitem{real}{e}{}{
+ $e$, the base of the natural logarithm}
+%
+\fitem{real}{sqrt2}{}{
+The square root of 2}
+%
+\fitem{real}{log2}{}{
+The natural logarithm of 2}
+%
+\fitem{real}{log10}{}{
+The natural logarithm of 10}
+%
+\end{description}
+
+\section{Special Values}
+
+\begin{description}
+\fitem{real}{nan}{}{
+Not-a-number, a special non-finite real value returned to signal an error}
+%
+\fitem{real}{infinity}{}{
+ Positive infinity, a special non-finite real value larger than all
+  finite numbers}
+%
+\fitem{real}{negative\_infinity}{}{ 
+ Negative infinity, a special non-finite real value smaller than all
+  finite numbers}
+%
+\fitem{real}{epsilon}{}{
+The smallest positive real value representable}
+%
+\fitem{real}{negative\_epsilon}{}{
+The largest negative real value representable}
+%
+\end{description}
+
+\section{Logical Functions}
+
+\begin{description}
+%
+\fitem{real}{if\_else}{int cond, real \farg{x}, real \farg{y}}{
+\farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise}
+%
+\fitem{real}{step}{real \farg{x}}{
+0 if \farg{x} is negative and 1 otherwise}
+%
+\end{description}
+
+
+\section{Absolute Functions}
+
+\begin{description}
+%
+\fitem{real}{abs}{real \farg{x}}{
+The absolute value of \farg{x}}
+%
+\fitem{real}{fabs}{real \farg{x}}{
+The absolute value of \farg{x}}
+%
+\fitem{real}{fdim}{real \farg{x}, 
+                 real \farg{y}}{
+The positive difference between \farg{x} and \farg{y}, which is
+\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0 otherwise}
+%
+\end{description}
+
+\section{Bounds Functions}
+
+\begin{description}
+%
+\fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
+The minimum of \farg{x} and \farg{y}}
+%
+\fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
+The maximum of \farg{x} and \farg{y}}
+%
+\end{description}
+
+\section{Arithmetic Functions}
+%
+\begin{description}
+\fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
+The real value remainder after dividing \farg{x} by \farg{y}}
+%
+\end{description}
+
+\section{Rounding Functions}
+
+\begin{description}
+%
+\fitem{real}{floor}{real \farg{x}}{
+The floor of \farg{x}, which is the largest integer less
+than or equal to \farg{x}, converted to a real value}
+%
+\fitem{real}{ceil}{real \farg{x}}{
+The ceiling of \farg{x}, which is the smallest integer greater
+than or equal to \farg{x}, converted to a real value}
+%
+\fitem{real}{round}{real \farg{x}}{
+The nearest integer to \farg{x}, converted to a real value}
+%
+\fitem{real}{trunc}{real \farg{x}}{
+The integer nearest to but no larger in magnitude than \farg{x},
+converted to a double value}
+%
+\end{description}
+
+\section{Power and Logarithm Functions}
+
+\begin{description}
+%
+\fitem{real}{sqrt}{real \farg{x}}{
+The square root of \farg{x}}
+%
+\fitem{real}{cbrt}{real \farg{x}}{
+The cube root of \farg{x}}
+%
+\fitem{real}{square}{real \farg{x}}{
+The square of \farg{x}}
+%
+\fitem{real}{exp}{real \farg{x}}{
+The natural exponential of \farg{x}}
+%
+\fitem{real}{exp2}{real \farg{x}}{
+The base-2 exponential of \farg{x}}
+%
+\fitem{real}{expm1}{real \farg{x}}{
+The natural exponential of \farg{x} minus 1}
+%
+\fitem{real}{log}{real \farg{x}}{
+The natural logarithm of \farg{x}}
+%
+\fitem{real}{log2}{real \farg{x}}{
+The base-2 logarithm of \farg{x}}
+%
+\fitem{real}{log10}{real \farg{x}}{
+The base-10 logarithm of \farg{x}}
+%
+\fitem{real}{pow}{real \farg{x}, real \farg{y}}{
+\farg{x} raised to the power of \farg{y}}
+%
+\end{description}
+
+
+
+
+\section{Link Functions}
+
+\begin{description}
+%
+\fitem{real}{logit}{real \farg{x}}{
+The log odds, or logit, function applied to \farg{x}}
+%
+\fitem{real}{inv\_logit}{real \farg{x}}{
+The logistic sigmoid function applied to \farg{x}}
+%
+\fitem{real}{inv\_cloglog}{real \farg{x}}{
+The inverse of the complement log-log function applied to \farg{x}}
+%
+\end{description}
+
+
+\section{Trigonometric Functions}
+
+\begin{description}
+%
+\fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
+The length of the hypoteneuse of a right triangle with sides of
+length \farg{x} and \farg{y}}
+%
+\fitem{real}{cos}{real \farg{x}}{
+The cosine of the angle \farg{x} (in radians)}
+%
+\fitem{real}{sin}{real \farg{x}}{
+The sine of the angle \farg{x} (in radians)}
+%
+\fitem{real}{tan}{real \farg{x}}{
+The tangent of the angle \farg{x} (in radians)}
+%
+\fitem{real}{acos}{real \farg{x}}{
+The princpipal arc (inverse) cosine (in radians) of \farg{x}}
+%
+\fitem{real}{asin}{real \farg{x}}{
+The principal arc (inverse) sine (in radians) of \farg{x}}
+%
+\fitem{real}{atan}{real \farg{x}}{
+The principal arc (inverse) tangent (in radians) of \farg{x}}
+%
+\fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
+The principal arc (inverse) tangent (in radians) of \farg{x} divided
+by \farg{y}}
+%
+\end{description}
+
+\section{Hyperbolic Trigonometric Functions}
+
+\begin{description}
+%
+\fitem{real}{cosh}{real \farg{x}}{
+The hyperbolic cosine of \farg{x} (in radians)}
+%
+\fitem{real}{sinh}{real \farg{x}}{
+The hyperbolic sine of \farg{x} (in radians)}
+%
+\fitem{real}{tanh}{real \farg{x}}{
+The hyperbolic tangent of \farg{x} (in radians)}
+%
+\fitem{real}{acosh}{real \farg{x}}{
+The inverse hyperbolic cosine (in radians) of \farg{x}}
+%
+\fitem{real}{asinh}{real \farg{x}}{
+The inverse hyperbolic sine (in radians) of \farg{x}}
+%
+\fitem{real}{atanh}{real \farg{x}}{
+The inverse hyperbolic tangent (in radians) of \farg{x}}
+%
+\end{description}
+
+\section{Probability-Related Functions}
+
+\begin{description}
+%
+\fitem{real}{erf}{real \farg{x}}{
+The error function of \farg{x}}
+%
+\fitem{real}{erfc}{real \farg{x}}{
+The complementary error function of \farg{x}}
+%
+\fitem{real}{Phi}{real \farg{x}}{
+The cumulative normal density function of \farg{x}}
+%
+\fitem{real}{log\_loss}{int \farg{y}, real \farg{y\_hat}}{
+The log loss of predicting probabilty \farg{y\_hat} for 
+binary outcome \farg{y}}
+%
+\end{description}
+
+
+
+
+\section{Combinatorial Functions}
+
+\begin{description}
+%
+\fitem{real}{tgamma}{real \farg{x}}{
+The gamma function applied to \farg{x}}
+%
+\fitem{real}{lgamma}{real \farg{x}}{
+The natural log of the gamma function applied to \farg{x}}
+%
+\fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
+The natural logarithm of the multinomial gamma function with \farg{n}
+dimensions applied to \farg{x}}
+%
+\fitem{real}{lbeta}{real \farg{x}, real \farg{y}}{
+The natural log of the beta function applied to \farg{x}}
+%
+\fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real \farg{y}}{
+The natural logarithm of the binomial coefficient of \farg{x} choose
+\farg{y}, generalized to real values via the gamma function}
+%
+\end{description}
+
+
+\section{Composed Functions}
+
+\begin{description}
+%
+\fitem{real}{fma}{real \farg{x}, 
+               real \farg{y},
+               real \farg{z}}{
+\farg{z} plus the result of \farg{x} multiplied by \farg{y}}
+%
+\fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
+The product of \farg{x} and the natural logarithm of \farg{y}}
+%
+\fitem{real}{log1p}{real \farg{x}}{
+The natural logarithm of 1 plus \farg{x}}
+%
+\fitem{real}{log1m}{real \farg{x}}{
+The natural logarithm of 1 minus \farg{x}}
+%
+\fitem{real}{log1p\_exp}{real \farg{x}}{ 
+The natural logarithm of one plus the natural exponentiation of
+\farg{x}}
+%
+\fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
+The natural logarithm of the sum of the natural exponentiation
+of \farg{x} and the natural exponentiation of \farg{y}}
+%
+\end{description}
+
+
+
+
+\chapter{Array Operations}
+
+\chapter{Matrix Operations}
+
+\chapter{Discrete Probability Functions}
+
+\chapter{Continuous Probability Functions} 
+
+\chapter{Cumulative Distributions}
+
+
+
+\part{Advanced Topics}
+
+
 \chapter{Variable Transforms}
 
 To avoid having to deal with constraints while simulating the
@@ -1037,8 +1591,9 @@ subset of values for which it has non-zero density,
 
 If $f$ is a total function defined on the support of $X$, then $Y =
 f(X)$ is a new random variable.  This section shows how to compute the
-probability density function of $Y$ for a few useful and well-behaved
-transforms $f$.
+probability density function of $Y$ for well-behaved transforms $f$
+and the rest of the chapter details the transforms used by \Stan.
+
 
 
 \subsection{Univariate Changes of Variables}
@@ -1256,11 +1811,7 @@ x_k = x_{k-1} + \exp(y_k) = \sum_{k' =1}^{k} \exp(y_{k'}).
 \]
 
 The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
-with diagonal elements
-\[
-J_{1,1} = \frac{\partial}{\partial y_1} f_1^{-1}(y) = \exp(y_1)
-\]
-and for $2 \leq k \leq K$,
+with diagonal elements for $1 \leq k \leq K$ of
 \[
 J_{k,k} = \frac{\partial}{\partial y_k} f_k^{-1}(y) = \exp(y_k).
 \]
@@ -1269,8 +1820,11 @@ Because of the triangularity and the positivivity of the $x_k$ and
 their differences, the absolute determinant of the Jacobian is
 %
 \[
-\left| \, \det\, J \, \right|
-= \prod_{k=1}^K \exp(y_k)
+\left| \, \det \, J \, \right|
+\ = \ 
+\prod_{k=1}^K J_{k,k}
+\ = \ 
+\prod_{k=1}^K \exp(y_k).
 \]
 
 
@@ -1288,7 +1842,7 @@ p_Y(y)
 \section{Unit Simplex}
 
 The parameter of the $K$-dimensional categorical distribution must lie
-in the $K$-simplex.  Consequently, simplex-constrained variables show
+in the unit $K$-simplex.  Consequently, simplex-constrained variables show
 up in multivariate discrete models of all kinds.  
 
 The $K$-simplex is the set of points $x \in \mathbb{R}^K$ such that
@@ -1301,6 +1855,14 @@ and
 \sum_{k=1}^K x_k = 1.
 \]
 %   
+An alternative definition is to take the hull of the convex closure of
+the vertices.  For instance, in 2-dimensions, the basis points are the
+extreme values $(0,1)$, and $(1,0)$ and the unit 2-simplex is interval
+with these as the end points.  In 3-dimensions, the basis is
+$(0,0,1)$, $(0,1,0)$ and $(1,0,0)$ and the unit 3-simplex is the
+triangle with these vertices.  As these examples illustrate, the
+simplex always picks out a subspace of $K-1$ dimensions from
+$\mathbb{R}^K$.
 
 A point $x$ in the $K$-simplex is fully determined by its first $K-1$
 dimensions, because rearranging terms in the constraint yields
@@ -1387,7 +1949,7 @@ and
 \]
 %
 Note that the definition is recursive, definining $x_k$ in terms of
-$x_{k'}$ where $k' < k$.
+$x_{1},\ldots,x_{k-1}$.
 
 Because the Jacobian $J$ of $f^{-1}$ is lower triangular and positve, its
 absolute determinant reduces to
@@ -1455,69 +2017,52 @@ z_k
 \]
 
 
+\chapter{The C++ Model Class}
 
+The generated \Cpp class extends a built-in \Stan abstract
+base class for probability models.  Instances of the class are
+constructed from a specified data vector $y$.  The data vector $y$
+determines the dimensionality $K$ of the parameter vector $\theta$,
+which in general may depend on size constants in $y$.  The class
+implements a method that takes a parameter $K$-vector $\theta$ as
+argument and returns the (unnormalized) total log probabilty,
+\[
+\theta 
+\mapsto 
+\log p(y,\theta) 
+\]
+The second method returns the gradient of the (unnormalized) total
+probability as a function of a parameter $K$-vector $\theta$,
+\[
+\theta
+\mapsto
+\nabla_{\theta} \log p(y,\theta)
+= ( \frac{\partial}{\partial\theta_1} \log p(y,\theta),
+  \ldots, 
+  \frac{\partial}{\partial\theta_K} \log p(y,\theta) ),
+\]
 
-
-
-\chapter{Modeling Language Reference}\label{model-ref.chapter}
-
-\Stan's modeling language is more procedural than what users may be
-familiar with from BUGS and JAGS, both of which are declarative.  For
-instance, \Stan statements are executed in the order they are written
-in model specifications and local variables may be reassigned as in a
-procedural programming language.  Furthermore, variables must be
-declared before they are use.  
-
-Like most programming languages, \Stan is defined syntactically in
-terms of expressions, which denote values, and statements, which
-denote an action to be taken.
-
-The purpose of \Stan's modeling language is to allow users to write
-down a probability function up to a multiplicative normalizing
-constant.  
-
-
-\section{Expressions}
-
-The top-level grammar for expressions is provided in
-\reffigure{expression-grammar}.
-
-\begin{figure}
-\begin{center}
-{%\footnotesize
-\begin{Verbatim}
-expression ::= literal
-             | variable
-             | expression infixOp expression
-             | prefixOp expression
-             | expression postfixOp
-             | expression '[' expressions ']'
-             | function '(' expressions ')'
-             | '(' expression ')'
-\end{Verbatim}
-}
-\end{center}
-\mycaption{expression-grammar}
-          {The top-level expression grammar for \Stan model specifications.}
-\end{figure}
-
-Valid \Stan expresions include simple numerical literals (e.g.,
-\code{2}, \code{32.7}), identifiers representing variables (e.g.,
-\code{theta}), 
-
-The simplest form of expression is a literal denoting a
-value, such as \code{32.7}.  Expressions may also consist of
+The class computes gradients using accurate and efficient reverse-mode
+algorithmic differentiaton.  The cost of computing the gradient is
+a small multiple of the cost of computing the log probability.  The
+cost inovlves a bounded amount of extra bookkeeping for each 
+subexpression involved in computing the log probability.  Unlike
+in the calculation of finite differences, the extra bookkeeping is
+not dependent on the dimensionality of the parameter vector.
 
 
 \chapter{Optimizing \Stan Code}\label{optimization.chapter}
 
 
-
-
 \appendix
+
+\part*{Appendices}
+\addcontentsline{toc}{part}{Appendices}
+
 
 \chapter{Installation}\label{install.appendix}
 
 \chapter*{References}
+\addcontentsline{toc}{chapter}{References}
 
 \end{document}
