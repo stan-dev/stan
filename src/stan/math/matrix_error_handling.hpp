@@ -125,7 +125,10 @@ namespace stan {
      *
      * NOTE: symmetry is NOT checked by this function
      * 
+     * @param function
      * @param y Matrix to test.
+     * @param name
+     * @param result
      * @return <code>true</code> if the matrix is positive definite.
      * @tparam T Type of scalar.
      */
@@ -191,7 +194,10 @@ namespace stan {
      * covariance matrix.  A valid covariance matrix must be square,
      * symmetric, and positive definite.
      *
+     * @param function
      * @param y Matrix to test.
+     * @param name
+     * @param result
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
@@ -237,7 +243,11 @@ namespace stan {
      * has a unit diagonal (all 1 values), and has all values between
      * -1 and 1 (inclussive).  
      *
+     * @param function 
      * @param y Matrix to test.
+     * @param name 
+     * @param result 
+     * 
      * @return <code>true</code> if the specified matrix is a valid
      * correlation matrix.
      * @tparam T Type of scalar.
@@ -426,8 +436,9 @@ namespace stan {
      * covariance matrix.  A valid covariance matrix must be symmetric
      * and positive definite.
      *
-     * @param y Matrix to test.
-     * @param err_msg Output stream for error messages.
+     * @param function
+     * @param Sigma Matrix to test.
+     * @param result
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
@@ -555,7 +566,10 @@ namespace stan {
      * only non-negative values and is sorted into increasing order.
      * There may be duplicate values.
      *
+     * @param function
      * @param y Vector to test.
+     * @param name
+     * @param result
      * @return <code>true</code> if the vector has positive, ordered
      * values.
      */
