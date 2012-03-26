@@ -485,10 +485,10 @@ namespace stan {
      *
      * <p>\f$\mbox{square}(x) = x^2\f$.
      *
-     * <p>The implementation of <code>square(x)</code> is just <code>x
-     * * x</code>.  Given this, this method is mainly useful in cases
-     * where <code>x</code> is not a simple primitive type, particularly
-     * when it is an auto-dif type.
+     * <p>The implementation of <code>square(x)</code> is just 
+     * <code>x * x</code>.  Given this, this method is mainly useful 
+     * in cases where <code>x</code> is not a simple primitive type, 
+     * particularly when it is an auto-dif type.
      *
      * @param x Input to square.
      * @return Square of input.
