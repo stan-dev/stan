@@ -5,22 +5,23 @@
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/distributions/detail/common_error_handling.hpp>
 
-/**
- * Reimplementing raise_domain_error to handle two template parameters.
- * 
- * In boost, this is in namespace boost::math::policies and 
- * boost::math::policies:details. Since implementing these functions in
- * that namespace could lead to calls to ambiguous functions, they are
- * being placed in stan::math::policies and stan::math::policies::details.
- *
- * These still rely on boost::math::policies::detail::raise_error.
- *
- * TODO: user_error may need to be refactored to include the two template
- *   parameters.
- */ 
 namespace stan {
   namespace math {
     namespace policies {
+      
+      /**
+       * @namespace stan::math::policies::detail Reimplementing raise_domain_error to handle two template parameters.
+       * 
+       * In boost, this is in namespace boost::math::policies and 
+       * boost::math::policies:details. Since implementing these functions in
+       * that namespace could lead to calls to ambiguous functions, they are
+       * being placed in stan::math::policies and stan::math::policies::details.
+       *
+       * These still rely on boost::math::policies::detail::raise_error.
+       *
+       * TODO: user_error may need to be refactored to include the two template
+       *   parameters.
+       */ 
       namespace detail {
         using boost::math::policies::detail::raise_error;
         template <class T_result, class T_val>
