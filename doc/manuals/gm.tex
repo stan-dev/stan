@@ -34,7 +34,8 @@
 \newcommand{\HMC}{\acronym{hmc}}
 \newcommand{\NUTS}{\acronym{nuts}}
 \newcommand{\MSVC}{\acronym{msvc}}
-
+\newcommand{\LKJ}{\acronym{lkj}}
+\newcommand{\CPC}{\acronym{cpc}}
 
 \newcommand{\code}[1]{{\tt #1}}
 \newcommand{\mycaption}[2]{\caption{{\it #2}\label{#1.figure}}}
@@ -2015,6 +2016,114 @@ z_k
        {1 - \sum_{k' = 1}^{k-1} x_k}
 .
 \]
+
+\section{Correlation Matrices}
+
+A correlation matirx is a symmetric, positive-definite matrix with a
+unit diagonal.  To deal with this rather complicated constraint, \Stan
+implements the transform of \cite{LewandowskiKurowickaJoe:2009},
+henceforth the \LKJ-transform.  The number of free parameters required
+to specify a $K \times K$ correlation matrix is $K \choose 2$.
+
+It is easiest to specify this transform in reverse, going from its $K
+\choose 2$ parameter basis to a correlation matrix.  The basis will
+actually be broken down into two steps.  To start, suppose $y$
+consists of $K \choose 2$ unconstrained values.  Next, define a $K
+\times K$ matrix $z$ by first transforming $y$ using the $\tanh$ function.
+%
+\[
+z_{i,j}
+= \tanh y_{j(j - 1)/2 + i}
+\]
+%
+where, $\tanh : \mathbb{R} \rightarrow (-1,1)$ by
+%
+\[
+\tanh u = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
+\]
+%
+For example, in the $4 \times 4$ case, there are ${4 \choose 2}$
+non-zero values arranged as
+%
+\[
+z 
+=
+\left[
+\begin{array}{cccc}
+0 & \tanh y_1 & \tanh y_2 & \tanh y_3
+\\
+0 & 0 & \tanh y_4 & \tanh y_5
+\\
+0 & 0 & 0 & \tanh y_6
+\\
+0 & 0 & 0 & 0
+\end{array}
+\right]
+.
+\]
+%
+This mapping is one to one, resulting in $z_{i,j} \in (-1,1)$.
+Lewandowski et al.\ show how to map the matrix $z$ to a correlation
+matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
+canonical partial correlation (\CPC) between $i$ and $j$, which is
+the correlation between $i$'s residuals and $j$'s residuals when both
+$i$ and $j$ are regressed on all variales before. In the case of
+$i=1$, there are no earlier variables, so $z_{i,j}$ is just the plain
+correlation between $i$ and $j$.
+
+Although Lewandowski et al.\ provided a recursive formula,
+the \LKJ transform can be formulated in terms of a Cholesky
+factor $w$ of the final correlation matrix, defined for $1 \leq i,j
+\leq K$ by
+%
+\[
+w_{i,j} = 
+\left\{
+\begin{array}{cl}
+%
+0 & \mbox{if } i < j
+\\[4pt]
+1 & \mbox{if } 1 = i = j
+\\[12pt]
+\sqrt{\prod_{m=1}^{i - 1} \left( i - z_{m,j}^2 \right) }
+& \mbox{if } 1 < i = j
+\\[12pt]
+z_{i,j} & \mbox{if } 1 = i < j
+\\[12pt]
+z_{i,j} \, \sqrt{\prod_{m=1}^{i-1} \left( 1 - z_{m,j}^2 \right) }
+& \mbox{ if } 1 < i < j
+%
+\end{array}
+\right.
+.
+\]
+%
+Given the Cholesky factor, the final correlation matrix is
+\[
+x = w w^{\top}.
+\]
+
+The final stage of the transform reverses the tanh transform, defining
+\[
+y_{j(j-1)/2 + i} = \tanh^{-1} z_{i,j}
+\]
+%
+for $i < j$, where the inverse of tanh is given by
+\[
+\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
+\]
+
+
+
+
+
+
+\section{Covariance Matrices}
+
+Covariance matrices are just scaled correlation matrices.  Thus a
+scaling transform composed with the correlation matrix transform in
+the previous section provides a covariance matrix transform.
+
 
 
 \chapter{The C++ Model Class}
