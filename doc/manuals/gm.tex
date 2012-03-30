@@ -2025,6 +2025,8 @@ implements the transform of \cite{LewandowskiKurowickaJoe:2009},
 henceforth the \LKJ-transform.  The number of free parameters required
 to specify a $K \times K$ correlation matrix is $K \choose 2$.
 
+\subsection{Correlation Matrix Inverse Transform}
+
 It is easiest to specify this transform in reverse, going from its $K
 \choose 2$ parameter basis to a correlation matrix.  The basis will
 actually be broken down into two steps.  To start, suppose $y$
@@ -2071,37 +2073,66 @@ $i$ and $j$ are regressed on all variales before. In the case of
 $i=1$, there are no earlier variables, so $z_{i,j}$ is just the plain
 correlation between $i$ and $j$.
 
-Although Lewandowski et al.\ provided a recursive formula,
-the \LKJ transform can be formulated in terms of a Cholesky
-factor $w$ of the final correlation matrix, defined for $1 \leq i,j
-\leq K$ by
+The \LKJ transform can be formulated in terms of a Cholesky factor $w$
+of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
 %
 \[
 w_{i,j} = 
 \left\{
 \begin{array}{cl}
 %
-0 & \mbox{if } i < j
+0 & \mbox{if } i > j
 \\[4pt]
 1 & \mbox{if } 1 = i = j
 \\[12pt]
-\sqrt{\prod_{m=1}^{i - 1} \left( i - z_{m,j}^2 \right) }
+\prod_{m=1}^{i - 1} \left( 1 - z_{m,j}^2 \right)^{1/2}
 & \mbox{if } 1 < i = j
 \\[12pt]
 z_{i,j} & \mbox{if } 1 = i < j
 \\[12pt]
-z_{i,j} \, \sqrt{\prod_{m=1}^{i-1} \left( 1 - z_{m,j}^2 \right) }
-& \mbox{ if } 1 < i < j
+z_{i,j} \, \prod_{m=1}^{i-1} \left( 1 - z_{m,j}^2 \right)^{1/2}
+& \mbox{ if } 1 < i < j.
 %
 \end{array}
 \right.
-.
 \]
 %
+This does not require as much computation per matrix entry as it may appear; 
+calculating the rows in terms of earlier rows yields the more manageable
+%
+\[
+w_{i,j} = 
+\left\{
+\begin{array}{cl}
+%
+0 & \mbox{if } i > j
+\\[4pt]
+1 & \mbox{if } 1 = i = j
+\\[8pt]
+z_{i,j} & \mbox{if } 1 = i < j
+\\[8pt]
+w_{i-1,j} \left( 1 - z_{i-1,j}^2 \right)^{1/2}
+& \mbox{ if } 1 < i \leq j.
+%
+\end{array}
+\right.
+\]
+
 Given the Cholesky factor, the final correlation matrix is
 \[
 x = w w^{\top}.
 \]
+
+Lewandowski et al.\ show that the determinant of the correlation
+matrix can be defined in terms of the Cholesky factor $w$ as
+%
+\[
+\mbox{det} \, x = \prod_{i=1}^{K-1} \ \prod_{j=i+1}^K \ (1 - w_{i,j}^2)
+ = \prod_{1 \leq i < j \leq K} (1 - w_{i,j}^2).
+\]
+
+
+\subsection{Correlation Transform}
 
 The final stage of the transform reverses the tanh transform, defining
 \[
@@ -2120,11 +2151,33 @@ for $i < j$, where the inverse of tanh is given by
 
 \section{Covariance Matrices}
 
-Covariance matrices are just scaled correlation matrices.  Thus a
-scaling transform composed with the correlation matrix transform in
-the previous section provides a covariance matrix transform.
+Covariance matrices are just scaled correlation matrices.  This
+requires an additional $K$ positive scaling parameters, for a total
+requirement of $K + {K \choose 2}$ parameters to specify a covariance
+matrix.  
 
+\subsection{Covariance Matrix Inverse Transform}
 
+Suppose $y$ is a $K \choose 2$-dimensional array specifying the $K
+\times K$ correlation matrix $x$ as specified by the correlation
+matrix inverse transform described in the previous section.  
+
+Let $y'$ be a $K$-dimensional vector of unconstrained scaling
+parameters.  An exponential transform converts these to positive
+values component-wise, by
+%
+\[
+u = \exp(y').
+\]
+%
+The covariance matrix is the scaled version of the correlation matrix
+$x$,
+\[
+v \ = \ \mbox{diag}(u) \ x \ \mbox{diag}(u)
+  \ = \ \left(\mbox{diag}(u) \, z\right) \left(\mbox{diag}(u) \, z)\right)^{\top},
+\]
+%
+where $\mbox{diag}(u)$ is the diagonal matrix with diagonal $u$.
 
 \chapter{The C++ Model Class}
 
