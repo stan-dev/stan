@@ -41,8 +41,8 @@
 #include <boost/variant/recursive_variant.hpp>
 
 #include <stan/gm/ast.hpp>
-#include <stan/gm/parser/whitespace_grammar.hpp>
-#include <stan/gm/parser/expression_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (stan::gm::expression, expr_)

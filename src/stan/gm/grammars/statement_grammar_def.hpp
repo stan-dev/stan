@@ -41,11 +41,11 @@
 #include <boost/variant/recursive_variant.hpp>
 
 #include <stan/gm/ast.hpp>
-#include <stan/gm/parser/whitespace_grammar.hpp>
-#include <stan/gm/parser/expression_grammar.hpp>
-#include <stan/gm/parser/var_decls_grammar.hpp>
-#include <stan/gm/parser/statement_grammar.hpp>
-#include <stan/gm/parser/common_adaptors_def.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/var_decls_grammar.hpp>
+#include <stan/gm/grammars/statement_grammar.hpp>
+#include <stan/gm/grammars/common_adaptors_def.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
                           (stan::gm::variable_dims, var_dims_)
