@@ -41,8 +41,8 @@
 #include <boost/variant/recursive_variant.hpp>
 
 #include <stan/gm/ast.hpp>
-#include <stan/gm/parser/whitespace_grammar.hpp>
-#include <stan/gm/parser/expression_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (stan::gm::expression, expr_)
@@ -291,7 +291,7 @@ namespace stan {
     };
     boost::phoenix::function<set_var_type> set_var_type_f;
 
-    struct validate_int_expr {
+    struct validate_int_expr3 {
       template <typename T1, typename T2>
       struct result { typedef bool type; };
 
@@ -305,7 +305,7 @@ namespace stan {
         return true;
       }
     };
-    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+    boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
 
 
     struct validate_expr_type {
@@ -435,7 +435,7 @@ namespace stan {
       dims_r 
         %= lit('[') 
         > (expression_r 
-           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+           [_pass = validate_int_expr3_f(_1,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
         ;

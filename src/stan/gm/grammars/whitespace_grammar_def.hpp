@@ -3,7 +3,7 @@
 
 #include <boost/spirit/include/qi.hpp>
 
-#include <stan/gm/parser/whitespace_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
 
 namespace stan { 
 

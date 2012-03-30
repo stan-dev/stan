@@ -41,9 +41,10 @@
 #include <boost/variant/recursive_variant.hpp>
 
 #include <stan/gm/ast.hpp>
-#include <stan/gm/parser/whitespace_grammar.hpp>
-#include <stan/gm/parser/expression_grammar.hpp>
-#include <stan/gm/parser/var_decls_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/var_decls_grammar.hpp>
+#include <stan/gm/grammars/common_adaptors_def.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
                           (stan::gm::range, range_)
@@ -90,10 +91,6 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::corr_matrix_var_decl,
                           (stan::gm::expression, K_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::range,
-                          (stan::gm::expression, low_)
-                          (stan::gm::expression, high_) )
 
 namespace stan {
 
