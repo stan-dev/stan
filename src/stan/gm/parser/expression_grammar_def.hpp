@@ -291,7 +291,7 @@ namespace stan {
     };
     boost::phoenix::function<set_var_type> set_var_type_f;
 
-    struct validate_int_expr {
+    struct validate_int_expr3 {
       template <typename T1, typename T2>
       struct result { typedef bool type; };
 
@@ -305,7 +305,7 @@ namespace stan {
         return true;
       }
     };
-    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+    boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
 
 
     struct validate_expr_type {
@@ -435,7 +435,7 @@ namespace stan {
       dims_r 
         %= lit('[') 
         > (expression_r 
-           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+           [_pass = validate_int_expr3_f(_1,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
         ;
