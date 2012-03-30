@@ -20,7 +20,7 @@ models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
-	bin/stanc$(EXE) $< --o=$@
+	$(CURRENT)$(SEP)bin/stanc$(EXE) $< --o=$@
 
 .PRECIOUS: models/%.o
 models/%.o : models/%.cpp

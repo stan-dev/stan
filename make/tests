@@ -15,6 +15,7 @@ UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
 
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
+	$(addprefix $(CURRENT)$(SEP),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
 	set -e;\
 	$(foreach test,$(UNIT_TESTS), \
@@ -61,7 +62,7 @@ test/%$(EXE) : test/%.o
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(LINK.c) $(CFLAGS_GTEST) $(GTEST_MAIN) $(LIBGTEST) $(OUTPUT_OPTION) $< 
-	$@ --gtest_output="xml:$(basename $@).xml"
+	$(addpath $(CURRENT),$@) --gtest_output="xml:$(basename $@).xml"
 
 .PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)

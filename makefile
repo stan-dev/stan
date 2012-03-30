@@ -15,7 +15,9 @@ help:
 ##
 CC = g++
 O = 0
-# OS is set automatically by this script
+# OS is set automatically by this script (SEP becomes / on Windows)
+CURRENT = $(realpath ./)
+SEP = /
 -include make/detect_os
 
 ##
