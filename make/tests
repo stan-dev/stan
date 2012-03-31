@@ -19,7 +19,7 @@ test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	set -e;\
 	$(foreach test,$(UNIT_TESTS), \
 	  echo '------------------------------------------------------------';\
-	  $(addprefix $(CURRENT)$(SEP),$(test)) --gtest_output="xml:$(test).xml";)
+	  $(test) --gtest_output="xml:$(test).xml";)
 
 ##
 # Target to build bugs models
