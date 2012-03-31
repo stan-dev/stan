@@ -61,7 +61,7 @@ test/%$(EXE) : test/%.o
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(LINK.c) $(CFLAGS_GTEST) $(GTEST_MAIN) $(LIBGTEST) $(OUTPUT_OPTION) $< 
-	$(addprefix $(CURRENT),$@) --gtest_output="xml:$(basename $@).xml"
+	$(addprefix $(CURRENT)$(SEP),$@) --gtest_output="xml:$(basename $@).xml"
 
 .PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
