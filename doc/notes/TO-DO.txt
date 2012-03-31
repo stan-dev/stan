@@ -56,39 +56,56 @@ CLEANUP (ONGOING)
 * convert for loops with size bounds to appropriate iterators
 
 
+Convergence Diagnostics, CODA-like object
+=================================================
+
+* Name the class?  Epilogue?
+
+* Object for collection of chains
+  - like CODA object
+  - store the samples
+  - names of variables (dimensionalities?)
+
+* Effective Sample Size (ESS)
+  - variogram "second estimator" n_{eff}^{(2)}
+
+* Smallest Posterior INtervals (SPIN)
+
+* Split R-hat
+
+* WAIC (?? wait until dust settles)
+  - need p(y[i]|theta) for all "data" y[i]
+  - just generate in "generated quantities" block; have all params
+  - multivariate can be single point
+  - binomial one or more points depending on interp
+
+
 Stan-R
 =================================================
 
-* R interface
-- simple process-level calls
+* Example call:
+   fit <- rstan(model_file,inits, ....);
+
+* simple process-level calls
   + compile model
   + dump data
   + dump inits
   + run model
   + load results
-- built-in from Rcpp
-- functions
-- attach.stan(fit)
+
+* built-in from Rcpp
+
+* functions from Coda object
+
+* attach.stan(fit)
+  + print(fit)
   + traceplot(fit)
   + plot.stan(fit)
   + dump.stan(fit)
   + read.stan(file_path)
 
-* SPIN (smallest posterior interval)
+* access things from Convergence Diagnostics object
 
-* plot(stan.object)
-
-* print(stan.object)
-
-* variogram ESS calcs
-
-* split R-hat convergence calcs
-
-* WAIC
-  - need p(y[i]|theta) for all "data" y[i]
-  - just generate in "generated quantities" block; have all params
-  - multivariate can be single point
-  - binomial one or more points depending on interp
 
 
 EXTENSIONS
