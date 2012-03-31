@@ -17,7 +17,7 @@ O = 0
 # OS is set automatically by this script (SEP becomes \ on Windows)
 SEP = /
 -include make/detect_os
-CURRENT = $(realpath .$(SEP))
+CURRENT = $(PWD)
 
 ##
 # Get information about the compiler used.
