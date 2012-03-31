@@ -23,7 +23,7 @@ ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS_GTEST += -g
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   PCH = .gch
-#  EXE = .exe
+  EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wc++0x-extensions
