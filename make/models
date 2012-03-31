@@ -13,7 +13,7 @@ models/%$(EXE) : models/%.o
 	@echo '--- Running model ---'
 	cp src/$(basename $@).stan $(basename $@).stan
 	-cp src/$(basename $@).Rdata $(basename $@).Rdata
-	$@ --data=$(basename $@).Rdata --samples=$(basename $@).csv
+	$(addprefix $(CURRENT)$(SEP),$@) --data=$(basename $@).Rdata --samples=$(basename $@).csv
 
 .PRECIOUS: models/%.cpp
 models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)

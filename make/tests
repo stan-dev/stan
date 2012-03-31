@@ -15,12 +15,11 @@ UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
 
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
-	$(addprefix $(CURRENT)$(SEP),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
 	set -e;\
 	$(foreach test,$(UNIT_TESTS), \
 	  echo '------------------------------------------------------------';\
-	  $(test) --gtest_output="xml:$(test).xml";)
+	  $(addprefix $(CURRENT)$(SEP),$(test)) --gtest_output="xml:$(test).xml";)
 
 ##
 # Target to build bugs models
