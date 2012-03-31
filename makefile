@@ -15,14 +15,14 @@ help:
 ##
 CC = g++
 O = 0
-# OS is set automatically by this script (SEP becomes / on Windows)
+# OS is set automatically by this script (SEP becomes \ on Windows)
 CURRENT = $(realpath ./)
 SEP = /
 -include make/detect_os
 
 ##
 # Get information about the compiler used.
-# - CC_TYPE: {g++, clang++, other}
+# - CC_TYPE: {g++, clang++, mingw32-g++, other}
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
@@ -131,3 +131,4 @@ clean-demo:
 
 clean-all: clean clean-models clean-dox clean-demo
 	$(RM) -r test bin
+

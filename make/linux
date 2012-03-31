@@ -14,7 +14,7 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   PCH = .gch
 endif
-ifeq (mingw-g++,$(CC_TYPE))
+ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -g
   CFLAGS += -static-libgcc
@@ -23,7 +23,7 @@ ifeq (mingw-g++,$(CC_TYPE))
   CFLAGS_GTEST += -g
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   PCH = .gch
-  EXE = .exe
+#  EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wc++0x-extensions
@@ -33,3 +33,4 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS_GTEST += -lpthread
   #PCH = .pch
 endif
+

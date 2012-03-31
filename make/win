@@ -25,6 +25,14 @@ ifeq (g++,$(CC_TYPE))
   #LDFLAGS += -static-libstdc++
   #PCH = .gch
 endif
+ifeq (mingw32-g++,$(CC_TYPE))
+  CFLAGS += -std=gnu++0x
+  CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-uninitialized
+  CFLAGS += -static-libgcc
+  CFLAGS += -static-libstdc++
+  #PCH = .gch
+endif
 ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
