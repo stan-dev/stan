@@ -1,4 +1,3 @@
-##
 # Makefile for Stan.
 # This makefile relies heavily on the make defaults for
 # make 3.81.
@@ -16,9 +15,9 @@ help:
 CC = g++
 O = 0
 # OS is set automatically by this script (SEP becomes \ on Windows)
-CURRENT = $(realpath ./)
 SEP = /
 -include make/detect_os
+CURRENT = $(realpath .$(SEP))
 
 ##
 # Get information about the compiler used.
