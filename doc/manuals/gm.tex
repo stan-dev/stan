@@ -26,6 +26,7 @@
 
 \newcommand{\acronym}[1]{{\sc #1}\xspace}
 
+\newcommand{\MATLAB}{\acronym{matlab}}
 \newcommand{\R}{\acronym{r}}
 \newcommand{\SPLUS}{\acronym{s}}
 \newcommand{\BUGS}{\acronym{bugs}}
@@ -991,10 +992,26 @@ always treats these dimesions as \code{L}.
 
 \chapter{Data Types}
 
-\section{Basic Data Types}
+Every expression in \Stan has a type that is uniquely determined at
+compile time.  The basic \Stan data types are real and integer, vector
+of real, row vector of real, and matrix of real.  
 
-There are two basic data types in \Stan, integers and reals,
-declared as \code{int} and \code{real}.
+Integer or real types may be constrained with lower bounds, upper
+bounds, or both.  Vector data types may be constrained to increasing
+positive values or simplexes.  Matrix data types may be constrained to
+correlation matrices or covariance matrices.
+
+\Stan supports arrays of arbitrary order of any of the basic data
+types or constrained basic data types.  This includes
+three-dimensional arrays of integers, one-dimensional arrays of
+positive reals, four-dimensional arrays of simplexes, one-dimensional
+arrays of row vectors, and so on.
+
+\section{Finite-Precision Arithmetic}
+
+Unfortunately, the lovely mathematical abstraction of integers and
+real numbers is only partially supported by finite-precision computer
+arithmetic.  
 
 \subsection{Integers}
 
@@ -1013,7 +1030,7 @@ an integer value that is in range.
 numbers.  \Stan roughly%
 %
 \footnote{\Stan compiles integers to \code{long int} and reals to
-  \code{double} types in \Cpp.  Precise details of rounding wil depend
+  \code{double} types in \Cpp.  Precise details of rounding will depend
   on the compiler and hardware architecture on which the code is run.}
 %
 follows the {\sc ieee} 754 standard for floating-point computation.
@@ -1021,6 +1038,11 @@ The range of a 64-bit number is roughly $\pm 2^{1022}$, which is
 slightly larger than $\pm 10^{307}$.  It is a good idea to stay well
 away from such extreme values in \Stan models as they are prone to
 cause overflow.
+
+64-bit floating point representations have roughly 16 digits of
+accuracy.  But when they are combined, the result often has less
+accuracy.  In some cases, the difference in accuracy between two
+operands and their result is large.  
 
 There are three special real values used to represent (1) error
 conditions, (2) positive infinity, and (3) negative infinity.  The
@@ -1030,39 +1052,421 @@ error value is referred to as ``not a number.''
 
 \Stan automatically promotes integer values to real values if
 necessary, but does not automatically demote real values to integers.
-For examples, real values may only be assigned to real variables, but
-integer values may be assigned to either integer variables or real
-variables.  What happens interally is that the integer representation
-is converted to a floating-point representation.  This operation is
-not free and is thus best avoided if possible.
+This will cause rounding errors for very large integers .
+
+Real values are not demoted to integers.  For examples, real values
+may only be assigned to real variables, but integer values may be
+assigned to either integer variables or real variables.  What happens
+interally is that the integer representation is converted to a
+floating-point representation.  This operation is not free and is thus
+best avoided if possible.
 
 
-\section{Vector Data Type}
+\section{Univariate Data Types and Variable Declarations}
 
-\Stan supports a basic real-valued vector data type.  Vectors are
-taken to be column vectors unless specified as row vectors.  
+All variables used in a \Stan program must have an explicitly declared
+data type.  The form of a declaration includes the type and the name
+of a variable.  This secton covers univariate types, the next section
+vector and matrix types, and the following section array types.
 
-There are two subtypes of the basic vector data for vectors of data
-meeting constraints.
+\subsection{Unconstrained Integer}
 
-\subsection{Simplex}
+Unconstrained integers are declared using the \code{int} keyword.
+For example, the variable \code{N} is declared to be an integer using
+%
+\begin{quote}
+\begin{Verbatim} 
+int N;
+\end{Verbatim}
+\end{quote}
+% 
+As in this example, all variable declarations must end with semicolon.
 
-\subsection{Positive Ordered}
+\subsection{Constrained Integer}
+
+Integer data types may be constrained to allow values only in a
+specified interval by providing a lower bound, an upper bound, or
+both.  For instance, to declare \code{N} to be a positive integer, use
+%
+\begin{quote}
+\begin{Verbatim}
+int(1,) N;
+\end{Verbatim}
+\end{quote}
+%
+This illustrates that the bounds are inclusive for integers.
+
+To declare an integer variable \code{cond} to take only binary values,
+that is 0 or 1, a lower and upper bound must be provided, as in
+%
+\begin{quote}
+\begin{Verbatim} 
+int(0,1) cond;
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{Unconstrained Real}
+
+Unconstrained real variables are declared using the keyword
+\code{real}.  For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real theta;
+\end{Verbatim}
+\end{quote}
+%
+declares a real valued variable \code{theta}.
+
+\subsection{Constrained Real}
+
+Real variables may be bounded using the same syntax as integers.  In
+theory (that is, with arbitrary-precision arithmetic), the bounds on
+real values would be exclusive.  Unfortunately, finite-precision
+arithmetic rounding errors will often lead to values on the
+boundaries, so they are allowed in \Stan.
+ 
+The variable \code{sigma} may be declared to be non-negative by
+%
+\begin{quote}
+\begin{Verbatim}
+real(0,) sigma;
+\end{Verbatim}
+\end{quote}
+%
+The variable \code{x} may be declared to be less than -1 by
+%
+\begin{quote}
+\begin{Verbatim} 
+real(,-1) x;
+\end{Verbatim}
+\end{quote}
+% 
+To ensure \code{rho} takes on values between -1 and 1, use
+%
+\begin{quote}
+\begin{Verbatim}
+real(-1,1) rho;
+\end{Verbatim}
+\end{quote}
+%
+
+
+\subsection{Expressions as Bounds}
+
+Bounds for integer or real variables may be arbitrary expressions, the
+only requirement being that they do not include non-data variables.
+That is, any variable used in an expression declaring a bound must be
+declared in the data block or the transformed data block.  For
+example, it is acceptable to have the following
+%
+\begin{quote}
+\begin{Verbatim}
+data { 
+ real lb;
+}
+parameters {
+ real(lb,) phi;
+}
+\end{Verbatim}
+\end{quote}
+%
+This declares a real-valued parameter \code{phi} to take values
+greater than the value of the real-valued data variable \code{lb}.
+Constraints may involve arbitrary expressions so long as the result is
+of type integer and the only variables involved are data or
+transformed data variables.  For instance,
+\begin{quote}
+\begin{Verbatim}
+data { 
+ int(1,) N;
+ real y[N];
+}
+parameters {
+ real(min(y),max(y)) phi;
+}
+\end{Verbatim}
+\end{quote}
+%
+This declares a positive integer data variable \code{N}, an array \code{y} of
+real-valued data of length \code{N}, and then a parameter ranging
+between the minimum and maximum value of \code{y}.
+
+
+\section{Vector and Matrix Data Types}
+
+\subsection{Indexing}
+
+Vectors and matrices, as well as arrays, are indexed starting from 1
+in \Stan.  This follows the convention in statistics and linear
+algebra as well as their implementations in the statistical software
+packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
+languages, on the other hand, such as \Cpp and Python, index from 0.
+
+
+\subsection{Unconstrained Vectors}
+
+Vectors in \Stan are column vectors; see the next subsection for
+information on row vectors.  Vectors are declared with a size (i.e., a
+dimensionality).  For example, a 3-dimensional vector is declared with
+the keyword \code{vector}, as in 
+%
+\begin{quote}
+\begin{Verbatim}
+vector(3) u;
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Unit Simplices}
+
+A unit simplex is a vector with non-negative values whose entries sum
+to 1.  For instance, $(0.2,0.3,0.4,0.1)^{\top}$ is a unit 4-simplex.
+Unit simplexes are most often used as parameters in categorical
+or multinomial distributions, and they are also the sampled variate in
+a Dirichlet distribution.  Simplices are declared with their full
+dimensionality.  For instance, \code{theta} is declared to
+be a unit $5$-simplex by
+%
+\begin{quote}
+\begin{Verbatim} 
+simplex(5) theta;
+\end{Verbatim}
+\end{quote}
+% 
+
+Unit simplices are implemented as vectors and may be assigned to other
+vectors.  
+
+
+\subsection{Positive, Ordered Vectors}
+
+A positive ordered vector is a vector whose positive entries are
+sorted in ascending order.  For instance, $(1.0,2.7,2.71)^{\top}$ is a
+positive, ordered vector.  Positive ordered vectors are most often
+employed as cut points in ordinal logistic regression models.  
+
+The variable \code{c} is declared as an ordered 5-vector of positive
+values by
+%
+\begin{quote}
+\begin{Verbatim}
+pos_ordered(5) c;
+\end{Verbatim}
+\end{quote}
+%
+
+After their declaration, positive, ordered vectors, like unit
+simplices, may be assigned to other vectors and other vectors may be
+assigned to them.  
+
+\subsection{Unconstrained Row Vectors}
+
+Row vectors are declared with the keyword \code{row\_vector}.
+Like (column) vectors, they are declared with a size.  For example,
+a 1093-dimensional row vector \code{u} would be declared as
+%
+\begin{quote}
+\begin{Verbatim}
+row_vector(1093) u;
+\end{Verbatim}
+\end{quote}
+%
+
+Row vectors may not be assigned to column vectors, nor may column
+vectors be assigned to row vectors.  If assignments are required, they
+may be done element-wise in a loop or by using the transpose operator.
+
+\subsection{Unconstrained Matrices}
+
+Matrices are declared with the keyword \code{matrix} along with a
+number of rows and number of columns.  For example, 
+%
+\begin{quote}
+\begin{Verbatim}  
+matrix(3,3) A;  
+matrix(M,N) B;
+\end{Verbatim}
+\end{quote}
+%  
+declares \code{A} to be a $3 \times 3$ matrix and \code{B} to be a $M
+\times N$ matrix.  For the second declaration to be well formed, the
+variables \code{M} and \code{N} must be declared as integers in either
+the data or transformed data block.
+
+\subsection{Correlation Matrices}
+
+Matrix variables may be constrained to represent correlation matrices.
+A matrix is a correlation matrix if it is positive definite (and hence
+square and symmetric), has entries between -1 and 1, and has a unit
+diagonal.  Because correlation matrices are square, they only need one
+dimension declared.  For example,
+%
+\begin{quote}
+\begin{Verbatim} 
+corr_matrix(3) Sigma;
+\end{Verbatim}
+\end{quote}
+% 
+declares \code{Sigma} to be a $3 \times 3$ correlation matrix.
+
+Correlation matrices may be assigned to other matrices, including
+unconstrained matrices, if their dimensions match, and vice-versa.
+
+\subsection{Covariance Matrices}
+
+Matrix variables may be constrained to represent covariance matrices.
+A matrix is a covariance matrix if it is positive definite (and hence
+square and symmetric with positive diagonal entries).  Like
+correlation matrices, covariance matrices only need a single dimension
+in their declaration.  For instance,
+%
+\begin{quote}
+\begin{Verbatim} 
+cov_matrix(K) Omega;
+\end{Verbatim}
+\end{quote}
+% 
+declares \code{Omega} to be a $K \times K$ correlation matrix, where
+$K$ is the value of the data variable \code{K}.
+
+\subsection{Accessing Vector and Matrix Elements}
+
+If \code{v} is a column vector or row vector, then \code{v[2]} is the
+second element in the vector.  If \code{m} is a matrix, then
+\code{m[2,3]} is the value in the second row and third column.
+
+Providing a matrix with a single index returns the specified row.  For
+instance, if \code{m} is a matrix, then \code{m[2]} is the second row.
+This allows \Stan blocks such as
+%
+\begin{quote}
+\begin{Verbatim} 
+matrix(M,N) a;    
+row_vector(N) v;    
+real x;
+...
+v <- m[2];   
+x <- v[3];   // x == m[2][3] == m[2,3]
+\end{Verbatim}
+\end{quote}
+% 
+The type of \code{m[2]} is \code{row\_vector} because it is the second
+row of \code{m}.  Thus it is possible to write \code{m[2][3]} instead
+of \code{m[2,3]} to access the third element in the second row.  When
+given a choice, the form \code{m[2,3]} is preferred.%
+%
+\footnote{As of the beta version of \Stan version 1.0, the form
+  \code{m[2,3]} is more efficient because it does not require the
+  creation and use of an intermediate expression template for
+  \code{m[2]}.  In later versions, explicit calls to \code{m[2][3]}
+  may be optimized to be as efficient as \code{m[2,3]} by the \Stan
+  compiler.}
 
 
 \section{Array Data Types}
 
-If {\tt T} is a data type, then {\tt T[N]} is the type of an ordered
-sequence of {\tt N} objects of type {\tt T}.  
+\Stan supports arrays of arbitrary dimension.  An array's elements may
+be any of the basic data types, that is univariate integers,
+univariate reals, vectors, row vectors matrices, including all of the
+constrained forms.
 
-\Stan supports arrays of data of arbitrary dimensionality.
-Conceptually, multi-dimensional arrays are 
+\subsection{Declaring Array Variables}
 
+Arrays are declared by enclosing the dimensions in square brackets
+following the name of the variable.
 
+The variable \code{n} is declared as an array of 5 integers by
+%
+\begin{quote}
+\begin{Verbatim}  
+int n[5];
+\end{Verbatim}
+\end{quote}
+% 
+A 2-dimensional array of real values with 3 rows and 4 columns is
+delcared with
+%
+\begin{quote}
+\begin{Verbatim}  
+real a[3,4];
+\end{Verbatim}
+\end{quote}
+% 
+A 3-dimensional array \code{z} of positive reals with 5 rows, 4
+columns, and 2 shelfs is declared by
+%
+\begin{quote}
+\begin{Verbatim} 
+real(0,) z[5,4,2];
+\end{Verbatim}
+\end{quote}
+%
 
+Arrays may also be declared to contain vectors.  For example,
+%
+\begin{quote}
+\begin{Verbatim}  
+vector(7) mu[3];
+\end{Verbatim}
+\end{quote}
+% 
+declares \code{mu} to be a 3-dimensional array of 7-vectors.  
+Arrays may also contain matrices.  The example
+%
+\begin{quote}
+\begin{Verbatim} 
+matrix(7,2) mu[15,12];
+\end{Verbatim}
+\end{quote}
+%
+declares a $15 \times 12$-dimensional array of $7 \times 2$ matrices.
+Any of the constrained types may also be used in arrays, as in the
+declaration
+%
+\begin{quote}
+\begin{Verbatim}  
+cov_matrix(5) mu[2,3,4];
+\end{Verbatim}
+\end{quote}
+% 
+of a $2 \times 3 \times 4$ array of $5 \times 5$ covariance matrices.
 
+\subsection{Accessing Array Elements and Subarrays}
 
-\chapter{Modeling Language Reference}\label{model-ref.chapter}
+If \code{x} is a 1-dimensional array of length 5, then \code{x[1]} is
+the first element in the array and \code{x[5]} is the last.  For a $3
+\times 4$ array \code{y} of 2-dimesions, \code{y[1,1]} is the first
+element and \code{y[3,4]} the last element.  For a 3-dimensional
+array \code{z}, the first element is \code{z[1,1,1]}, and so on.
+
+Slices of arrays may be accessed by providing fewer than the full
+number of indexes.  For example, suppose \code{y} is a 2-dimensional
+array with 3 rows and 4 columns.  Then \code{y[3]} is 1-dimensional
+array of length 4.  This means that \code{y[3][1]} may be used instead
+of \code{y[3,1]} to access the value of the first column of the third
+row of \code{y}.  The form \code{y[3,1]} is the preferred form.
+
+Subarrays may be manipulated and assigned just like any other
+variables.  Similar to the behavior of matrices, \Stan allows blocks
+such as 
+%
+\begin{quote}
+\begin{Verbatim} 
+real w[9,10,11];
+real x[10,11];
+real y[11];
+real z;
+...
+x <- w[5];
+y <- x[4];  // y == w[5][4] == w[5,4]
+z <- y[3];  // z == w[5][4][3] == w[5,4,3]
+\end{Verbatim}
+\end{quote}
+%
+
+\chapter{Expressions}
 
 \Stan's modeling language is more procedural than what users may be
 familiar with from BUGS and JAGS, both of which are declarative.  For
@@ -1612,6 +2016,13 @@ p_Y(y) = p_X(f^{-1}(y))
 
 \subsection{Multivariate Changes of Variables}
 
+An absolute derivative measures how the scale of the transformed
+variable changes with respect to the underlying variable.  The
+multivariate generalization of absolute derivatives is the absolute
+Jacobian determinants.  The Jacobian measures the change of each
+output variable relative to every input variable and the absolute
+determinant uses that to determine the differential change in volume
+at a given point in the parameter space.
 
 Suppose $X$ is a $K$-dimensional random variable with probability
 density function $p_X(x)$.  A new random variable $Y = f(X)$ may be
@@ -1660,64 +2071,92 @@ variable.
 
 \section{Lower Bounds}
 
-\Stan uses a logarithmic transform for lower and upper bounds.  If a
-variable $X$ is declared to have lower bound $c$, it is transformed to
-a new variable $Y$, where
+\Stan uses a logarithmic transform for lower and upper bounds.  
+
+\subsection{Lower Bound Transform}
+
+If a variable $X$ is declared to have lower bound $a$, it is
+transformed to an unbounded variable $Y$, where
 %
 \[
-Y = \log(X - c),
+Y = \log(X - a).
 \]
+
+\subsection{Lower Bound Inverse Transform}
 %
-the inverse transform is
+The inverse of the the lower-bound transform maps an unbounded
+variable $Y$ to a variable $X$ that is bounded below by $a$ by
 %
 \[
-f^{-1}(y) = \exp(y) + c,
+X = \exp(Y) + a.
 \]
+
+\subsection{Absolute Derivative of the Lower Bound Inverse Transform}
+
+The absolute derivative of the inverse transform is
+\[
+\left| \,
+\frac{d}{dy} \left( \exp(y) + a \right)
+\, \right|
+= \exp(y).
+\]
+Therefore, given the density $p_X$ of $X$, the density of $Y$ is 
 %
-and the density of $Y$ is
-%
-\begin{eqnarray*}
+\[
 p_Y(y) 
-& = & p_X\!\left( \exp(y) + c \right) \cdot \left| \frac{d}{dy} \left(
-    \exp(y) + c \right) \right|
-\\[6pt]      
-& = & p_X\!\left( \exp(y) + c \right) \cdot \exp(y).
-\end{eqnarray*}
+= p_X\!\left( \exp(y) + a \right) \cdot \exp(y).
+\]
 
 
 \section{Upper Bounds}
 
-\Stan treats upper bounds in the same way as lower bounds, with a
-logarithmic transform.  Only this time the result must be negated.  If
-a variable $X$ is declared to have an upper bound $d$, it is
-transformed to a new variable $Y$, where
+\Stan uses a negated logarithmic transform for upper bounds.
+
+\subsection{Upper Bound Transform}
+
+If a variable $X$ is declared to have an upper bound $b$, it is
+transformed to the unbounded variable $Y$ by
 %
 \[
-Y = \log(d - X)
+Y = \log(b - X).
 \]
+
+\subsection{Inverse Upper Bound Transform}
 %
-the inverse transform is
+The inverse of the upper bound transform converts the unbounded
+variable $Y$ to the variable $X$ bounded above by $b$ through
 %
 \[
-f^{-1}(y) = d - \exp(y)
+X = b - \exp(Y).
+\]
+
+\subsection{Absolute Derivative of the Inverse Upper Bound Transform}
+
+The absolute derivative of the inverse upper bound transform is 
+\[
+\left| \,
+\frac{d}{dy} \left( b - \exp(y) \right)
+\, \right|
+= \exp(y).
 \]
 %
-and the density of $Y$ is
+Therefore, the density of the unconstrained variable $Y$ is defined in
+terms of the density of the variable $X$ with an upper bound of $b$ by
 %
-\begin{eqnarray*}
+\[
 p_Y(y) 
-& = & p_X \!\left( d - \exp(y) \right) \cdot \left| \frac{d}{dy} \left( d
-    - \exp(y) \right) \right|
-\\[6pt]      
-& = &  p_X \!\left( d - \exp(y) \right) \cdot \exp(y).
-\end{eqnarray*}
+ =   p_X \!\left( b - \exp(y) \right) \cdot \exp(y).
+\]
 
 
 \section{Lower and Upper Bounds}
 
-For lower and upper-bounded variables, \Stan uses the log-odds
-transform.  It scales and translates from the basic log-odds function
-defined for $u \in (0,1)$ by
+For lower and upper-bounded variables, \Stan uses a scaled and
+translated log-odds transform.
+
+\subsection{Log Odds and the Logistic Sigmoid}
+
+The log-odds function is defined for $u \in (0,1)$ by
 %
 \[
 \mbox{logit}(u) = \log \frac{u}{1 - u}.
@@ -1736,7 +2175,9 @@ The derivative of the logistic sigmoid is
 \frac{d}{dy} \mbox{logit}^{-1}(y) 
 = \mbox{logit}^{-1}(y) \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
 \]
- 
+
+\subsection{ }
+
 For variables constrained to be in the open interval $(a,b)$, \Stan
 uses a scaled and translated log-odds transform.  If variable $X$ is
 declared to have lower bound $a$ and upper bound $b$, then it is
@@ -2031,14 +2472,16 @@ It is easiest to specify this transform in reverse, going from its $K
 \choose 2$ parameter basis to a correlation matrix.  The basis will
 actually be broken down into two steps.  To start, suppose $y$
 consists of $K \choose 2$ unconstrained values.  Next, define a $K
-\times K$ matrix $z$ by first transforming $y$ using the $\tanh$ function.
+\times K$ matrix $z$ by first transforming $y$ using the $\tanh$
+function, then filling in
+the triangle above the diagonal in column-major order with the results,
 %
 \[
 z_{i,j}
-= \tanh y_{j(j - 1)/2 + i}
+= \tanh y_{i + (j - 1)(j - 2)/2}.
 \]
 %
-where, $\tanh : \mathbb{R} \rightarrow (-1,1)$ by
+The bijective function $\tanh : \mathbb{R} \rightarrow (0,1)$ is defined by
 %
 \[
 \tanh u = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
@@ -2052,9 +2495,9 @@ z
 =
 \left[
 \begin{array}{cccc}
-0 & \tanh y_1 & \tanh y_2 & \tanh y_3
+0 & \tanh y_1 & \tanh y_2 & \tanh y_4
 \\
-0 & 0 & \tanh y_4 & \tanh y_5
+0 & 0 & \tanh y_3 & \tanh y_5
 \\
 0 & 0 & 0 & \tanh y_6
 \\
@@ -2064,14 +2507,14 @@ z
 .
 \]
 %
-This mapping is one to one, resulting in $z_{i,j} \in (-1,1)$.
 Lewandowski et al.\ show how to map the matrix $z$ to a correlation
 matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
-canonical partial correlation (\CPC) between $i$ and $j$, which is
-the correlation between $i$'s residuals and $j$'s residuals when both
-$i$ and $j$ are regressed on all variales before. In the case of
-$i=1$, there are no earlier variables, so $z_{i,j}$ is just the plain
-correlation between $i$ and $j$.
+canonical partial correlation (\CPC) between $i$ and $j$, which is the
+correlation between $i$'s residuals and $j$'s residuals when both $i$
+and $j$ are regressed on all earlier variables $i'$ and $j'$ such that
+$i'< i$ and $j' < j$. In the case of $i=1$, there are no earlier
+variables, so $z_{i,j}$ is just the plain correlation between $i$ and
+$j$.
 
 The \LKJ transform can be formulated in terms of a Cholesky factor $w$
 of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
@@ -2081,16 +2524,16 @@ w_{i,j} =
 \left\{
 \begin{array}{cl}
 %
-0 & \mbox{if } i > j
+0 & \mbox{if } i > j,
 \\[4pt]
-1 & \mbox{if } 1 = i = j
+1 & \mbox{if } 1 = i = j,
 \\[12pt]
-\prod_{m=1}^{i - 1} \left( 1 - z_{m,j}^2 \right)^{1/2}
-& \mbox{if } 1 < i = j
+\prod_{i'=1}^{i - 1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
+& \mbox{if } 1 < i = j,
 \\[12pt]
-z_{i,j} & \mbox{if } 1 = i < j
+z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \\[12pt]
-z_{i,j} \, \prod_{m=1}^{i-1} \left( 1 - z_{m,j}^2 \right)^{1/2}
+z_{i,j} \, \prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
 & \mbox{ if } 1 < i < j.
 %
 \end{array}
@@ -2105,22 +2548,22 @@ w_{i,j} =
 \left\{
 \begin{array}{cl}
 %
-0 & \mbox{if } i > j
+0 & \mbox{if } i > j,
 \\[4pt]
-1 & \mbox{if } 1 = i = j
+1 & \mbox{if } 1 = i = j, 
 \\[8pt]
-z_{i,j} & \mbox{if } 1 = i < j
+z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \\[8pt]
-w_{i-1,j} \left( 1 - z_{i-1,j}^2 \right)^{1/2}
+z_{i,j} \ w_{i-1,j} \left( 1 - z_{i-1,j}^2 \right)^{1/2}
 & \mbox{ if } 1 < i \leq j.
 %
 \end{array}
 \right.
 \]
-
-Given the Cholesky factor, the final correlation matrix is
+Given the upper-triangular Cholesky factor $w$, the final correlation
+matrix is
 \[
-x = w w^{\top}.
+x = w^{\top} w.
 \]
 
 Lewandowski et al.\ show that the determinant of the correlation
@@ -2131,10 +2574,42 @@ matrix can be defined in terms of the Cholesky factor $w$ as
  = \prod_{1 \leq i < j \leq K} (1 - w_{i,j}^2).
 \]
 
+\subsection{Jacobian Determinant of the Inverse Correlation Transform}
 
 \subsection{Correlation Transform}
 
-The final stage of the transform reverses the tanh transform, defining
+The correlation transform is defined by reversing the steps of the
+inverse transform defined in the previous section.  
+
+Starting with a correlation matrix $x$, the first step is to find the
+unique upper triangular $w$ such that $x = w w^{\top}$.  Because $x$
+is positive definite, this can be done by applying the Cholesky
+decomposition,
+\[
+w = \mbox{cholesky}(x).
+\]
+
+
+The next step from the Cholesky factor $w$ back to the matrix $z$ of
+{\CPC}s is simplified by the ordering of the elements in the
+definition of of $w$, which when inverted yields
+%
+\[
+z_{i,j} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } i \leq j,
+\\[8pt]
+w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\[8pt]
+{w_{i,j}}
+\
+\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-2}
+& \mbox{if } 1 < i < j.
+\end{array}
+\right.
+\]
+XThe final stage of the transform reverses the tanh transform, defining
 \[
 y_{j(j-1)/2 + i} = \tanh^{-1} z_{i,j}
 \]
