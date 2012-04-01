@@ -13,14 +13,14 @@ models/%$(EXE) : models/%.o
 	@echo '--- Running model ---'
 	cp src/$(basename $@).stan $(basename $@).stan
 	-cp src/$(basename $@).Rdata $(basename $@).Rdata
-	$(addprefix $(CURRENT)$(SEP),$@) --data=$(basename $@).Rdata --samples=$(basename $@).csv
+	$@ --data=$(basename $@).Rdata --samples=$(basename $@).csv
 
 .PRECIOUS: models/%.cpp
 models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
-	$(CURRENT)$(SEP)bin/stanc$(EXE) $< --o=$@
+	bin/stanc$(EXE) $< --o=$@
 
 .PRECIOUS: models/%.o
 models/%.o : models/%.cpp
