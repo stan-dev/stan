@@ -6,5 +6,5 @@ bin/stanc.exe : src/stan/command/stanc.cpp
 
 bin/stanc : src/stan/command/stanc.cpp
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $< $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION) 
+	$(CC) $(CFLAGS) $(CPPFLAGS) $< $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION)$(EXE)
 
