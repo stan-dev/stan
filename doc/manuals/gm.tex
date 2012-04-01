@@ -2511,12 +2511,11 @@ Lewandowski et al.\ show how to map the matrix $z$ to a correlation
 matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
 canonical partial correlation (\CPC) between $i$ and $j$, which is the
 correlation between $i$'s residuals and $j$'s residuals when both $i$
-and $j$ are regressed on all earlier variables $i'$ and $j'$ such that
-$i'< i$ and $j' < j$. In the case of $i=1$, there are no earlier
-variables, so $z_{i,j}$ is just the plain correlation between $i$ and
-$j$.
+and $j$ are regressed on all variables $i'$ such that $i'< i$.
+In the case of $i=1$, there are no earlier variables, 
+so $z_{i,j}$ is just the Pearson correlation between $i$ and $j$.
 
-The \LKJ transform can be formulated in terms of a Cholesky factor $w$
+In \Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
 of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
 %
 \[
@@ -2567,12 +2566,13 @@ x = w^{\top} w.
 \]
 
 Lewandowski et al.\ show that the determinant of the correlation
-matrix can be defined in terms of the Cholesky factor $w$ as
+matrix can be defined in terms of the CPCs as
 %
 \[
-\mbox{det} \, x = \prod_{i=1}^{K-1} \ \prod_{j=i+1}^K \ (1 - w_{i,j}^2)
- = \prod_{1 \leq i < j \leq K} (1 - w_{i,j}^2).
+\mbox{det} \, x = \prod_{i=1}^{K-1} \ \prod_{j=i+1}^K \ (1 - z_{i,j}^2)
+ = \prod_{1 \leq i < j \leq K} (1 - z_{i,j}^2),
 \]
+which is also the square of the determinant of the triangular $w$.
 
 \subsection{Jacobian Determinant of the Inverse Correlation Transform}
 
