@@ -1,11 +1,10 @@
 \documentclass[10pt]{report}
 
-\usepackage{times}
-\newcommand{\mathbb}{\mathbf}
-%\usepackage[%romanfamily=times,
-%            scale=0.875,
-%            stdmathitalics=true,
-%            stdmathdigits=true]{lucimatx}
+%\usepackage{times}
+\usepackage[%romanfamily=times,
+           scale=0.875,
+           stdmathitalics=true,
+           stdmathdigits=true]{lucimatx}
 \usepackage{xspace}
 \usepackage{fancyvrb}
 \usepackage{titlesec}
@@ -2517,7 +2516,7 @@ In the case of $i=1$, there are no earlier variables,
 so $z_{i,j}$ is just the Pearson correlation between $i$ and $j$.
 
 In \Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
-of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
+of the final correlation matrix (REMIND BEN TO GIVE YOU A CITE), defined for $1 \leq i,j \leq K$ by
 %
 \[
 w_{i,j} = 
