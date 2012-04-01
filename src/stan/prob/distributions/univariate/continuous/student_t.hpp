@@ -48,7 +48,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
             
-      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp;
+      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp = 0.0;
       if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
         return lp;
       if(!check_finite(function, nu, "Degrees of freedom", &lp, Policy()))
@@ -68,7 +68,6 @@ namespace stan {
       using stan::math::square;
       using boost::math::lgamma;
 
-      lp = 0.0;
       if (include_summand<propto,T_dof>::value)
         lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
       if (include_summand<propto>::value)

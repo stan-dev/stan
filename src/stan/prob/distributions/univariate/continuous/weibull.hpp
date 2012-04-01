@@ -23,7 +23,7 @@ namespace stan {
       using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
-      typename promote_args<T_y,T_shape,T_scale>::type lp;
+      typename promote_args<T_y,T_shape,T_scale>::type lp = 0.0;
       if(!check_finite(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       if(!check_finite(function, alpha, "Shape parameter, alpha,", 
@@ -44,7 +44,6 @@ namespace stan {
       
       using stan::math::multiply_log;
       
-      lp = 0.0;
       if (include_summand<propto,T_shape>::value)
         lp += log(alpha);
       if (include_summand<propto,T_y,T_shape>::value)
