@@ -46,7 +46,7 @@ TEST(ProbDistributionsNormal,ErrnoPolicyScale) {
 }
 TEST(ProbDistributionsNormal,DefaultPolicyY) {
   double y = 0.0;
-  double result;
+  double result = 0;
   EXPECT_NO_THROW (stan::prob::normal_log(y,0.0,1.0));
   
   y = std::numeric_limits<double>::quiet_NaN();

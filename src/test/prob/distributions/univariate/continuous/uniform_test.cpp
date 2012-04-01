@@ -80,7 +80,7 @@ TEST(ProbDistributionsUniform,DefaultPolicyBounds) {
 }
 TEST(ProbDistributionsUniform,ErrnoPolicyBounds) {
   double y = 0;
-  double result;
+  double result = 0;
   // lower and uppper bounds same
   EXPECT_NO_THROW(result = stan::prob::uniform_log(y, 0.0, 0.0, errno_policy()));
   EXPECT_TRUE(std::isnan(result));
