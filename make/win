@@ -19,7 +19,7 @@ CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -Wno-unused-function
-  CFLAGS += -Wno-uninitialized
+#  CFLAGS += -Wno-uninitialized
   O = 0
   CFLAGS += -static-libgcc 
 #  LDFLAGS += -static-libstdc++
