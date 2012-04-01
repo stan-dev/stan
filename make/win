@@ -20,7 +20,7 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  O = 1
+  O = 0
   CFLAGS += -static-libgcc 
 #  LDFLAGS += -static-libstdc++
   #PCH = .gch
