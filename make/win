@@ -8,9 +8,9 @@
 # 
 # Additionally, set the following variables to build
 # demo/gm using the Microsoft Visual Studio compiler.
-#   - CC_GM
-#   - CFLAGS_GM
-#   - OUTPUT_OPTION_GM
+#   - CC_STANC
+#   - CFLAGS_STANC
+#   - OUTPUT_OPTION_STANC
 ##
 
 EXE = .exe
