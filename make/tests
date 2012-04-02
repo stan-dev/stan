@@ -35,7 +35,7 @@ test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 # Target to build all tests
 ##
 .PHONY: test-all
-test-all: test-unit
+test-all: test-unit test-bugs
 
 
 ##
