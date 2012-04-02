@@ -104,7 +104,11 @@ Stan's modeling language.
 that of its progenitors, \BUGS and \JAGS.  It differs in many
 particulars of the modeling language, which is more like an
 impertative programming language than the declarative specifications
-of \BUGS and \JAGS.
+of \BUGS and \JAGS.  For instance, \Stan statements are executed in
+the order they are written in model specifications and local variables
+may be reassigned as in a procedural programming language.
+Furthermore, variables must be declared before they are used.
+
 
 \section{\Stan's Modeling Language}
 
@@ -1466,32 +1470,46 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{quote}
 %
 
-\chapter{Expressions}
+\chapter{Variable Declarations}
 
-\Stan's modeling language is more procedural than what users may be
-familiar with from BUGS and JAGS, both of which are declarative.  For
-instance, \Stan statements are executed in the order they are written
-in model specifications and local variables may be reassigned as in a
-procedural programming language.  Furthermore, variables must be
-declared before they are use.  
+\Stan's grammar for variable declarations is
+%
+\begin{quote}
+\begin{Verbatim}
+var_decl ::= var_type var_name ?dims
+
+var_type ::= int ?int_range
+          | real ?real_range
+          | vector '(' int_expression ')'
+          | pos_ordered '(' int_expression ')'
+          | simplex '(' int_expression ')'
+          | row_vector '(' int_expression ')'
+          | matrix '(' int_expression ',' int_expression ')'
+          | corr_matrix '(' int_expression ')'
+          | cov_matrix '(' int_expression ')'
+
+int_range ::= '(' int_expression ',' ?int_expression ')'
+          | '('  ','  int_expression ')'
+
+real_range ::= '(' real_expression ',' ?real_expression ')'
+          | '('  ','  real_expression ')'
+
+
+dims ::= '['  int_expression (',' int_expression)*  ']'
+\end{Verbatim}
+\end{quote}
+
+
+\chapter{Expressions}
 
 Like most programming languages, \Stan is defined syntactically in
 terms of expressions, which denote values, and statements, which
 denote an action to be taken.
 
-The purpose of \Stan's modeling language is to allow users to write
-down a probability function up to a multiplicative normalizing
-constant.  
-
-
-\section{Expressions}
-
 The top-level grammar for expressions is provided in
 \reffigure{expression-grammar}.
 
-\begin{figure}
-\begin{center}
-{%\footnotesize
+\begin{quote}
 \begin{Verbatim}
 expression ::= literal
              | variable
@@ -1502,11 +1520,8 @@ expression ::= literal
              | function '(' expressions ')'
              | '(' expression ')'
 \end{Verbatim}
-}
-\end{center}
-\mycaption{expression-grammar}
-          {The top-level expression grammar for \Stan model specifications.}
-\end{figure}
+\end{quote}
+
 
 Valid \Stan expresions include simple numerical literals (e.g.,
 \code{2}, \code{32.7}), identifiers representing variables (e.g.,
