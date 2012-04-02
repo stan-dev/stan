@@ -17,11 +17,11 @@ endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -g
-  CFLAGS += -static-libgcc
-  CFLAGS += -static-libstdc++
 #  CFLAGS += -m32
   CFLAGS_GTEST += -g
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
+  LDFLAGS += -static-libgcc
+  LDFLAGS += -static-libstdc++
   PCH = .gch
   EXE = .exe
 endif
