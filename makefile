@@ -14,8 +14,7 @@ help:
 ##
 CC = g++
 O = 0
-# OS is set automatically by this script (SEP becomes \ on Windows)
-SEP = /
+# OS is set automatically by this script
 -include make/detect_os
 
 ##
