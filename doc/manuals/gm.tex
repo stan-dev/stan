@@ -1516,6 +1516,42 @@ The simplest form of expression is a literal denoting a
 value, such as \code{32.7}.  Expressions may also consist of
 
 
+\chapter{Blocks}
+
+A \Stan program is organized into a sequence of named blocks, the
+bodies of which consist of variable declarations followed by
+statements.  The full set of blocks is exemplified in the following
+skeletal \Stan program.
+%
+\begin{quote}
+\begin{Verbatim} 
+data { 
+  ... declarations ...
+}
+transformed data { 
+   ... declarations ... statements ... 
+}
+parameters { 
+   ... declarations ... 
+}
+transformed parameters { 
+   ... declarations ...
+   ... statements ...
+}
+model { 
+   ... statements ...
+}
+derived quantities {
+   ... declarations ...
+   ... statements ...
+}
+\end{Verbatim}
+\end{quote}
+%
+All of the blocks other than the \code{model} block are optional.  Any
+blocks that appear must be in the order above.
+
+
 \part{Built-In Functions} 
 
 \chapter{Built-in Functions}
@@ -1950,6 +1986,24 @@ of \farg{x} and the natural exponentiation of \farg{y}}
 
 
 \chapter{Array Operations}
+
+
+\begin{description}
+\fitem{real}{sum}{real \farg{x}[]}
+The sum of the array of arguments
+%
+\fitem{real}{mean}{real \farg{x}[]}
+The sample mean of the array of arguments
+%
+\fitem{real}{variance}{real \farg{x}[]}
+The unbiased sample variance (divide by length - 1)
+%
+\fitem{real}{sd}{real \farg{x}[]}
+The unbiased sample standard deviation (divide by length - 1)
+%
+\fitem{real}{log\_sum\_exp}{real \farg{x}[]}
+The log of the sum of the exponentials of the array elements
+\end{description}
 
 \chapter{Matrix Operations}
 
