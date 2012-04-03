@@ -2568,29 +2568,22 @@ implements the transform of \cite{LewandowskiKurowickaJoe:2009},
 henceforth the \LKJ-transform.  The number of free parameters required
 to specify a $K \times K$ correlation matrix is $K \choose 2$.
 
-\subsection{Inverse Correlation Matrix Transform}
+\subsection{Correlation Matrix Inverse Transform}
 
 It is easiest to specify this transform in reverse, going from its $K
 \choose 2$ parameter basis to a correlation matrix.  The basis will
 actually be broken down into two steps.  To start, suppose $y$
-consists of $K \choose 2$ unconstrained values.  Next, define a $K
-\times K$ matrix $z$ by first transforming $y$ using the $\tanh$
-function, then filling in
-the triangle above the diagonal in column-major order with the results,
+consists of $K \choose 2$ unconstrained values that are transformed via
+the bijective function $\tanh : \mathbb{R} \rightarrow (0,1)$ 
 %
 \[
-z_{i,j}
-= \tanh y_{i + (j - 1)(j - 2)/2}.
+\tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
 \]
 %
-The bijective function $\tanh : \mathbb{R} \rightarrow (0,1)$ is defined by
-%
-\[
-\tanh u = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
-\]
-%
-For example, in the $4 \times 4$ case, there are ${4 \choose 2}$
-non-zero values arranged as
+Then, define a $K \times K$ array $z$ whose strict upper triangle is 
+filled from left-to-right, top-to-bottom with the transformed parameters.
+For example, in the $4 \times 4$ case, there are ${4 \choose 2}$ values
+arranged as
 %
 \[
 z 
@@ -2609,7 +2602,7 @@ z
 .
 \]
 %
-Lewandowski et al.\ show how to map the matrix $z$ to a correlation
+Lewandowski et al.\ show how to bijectively map the array $z$ to a correlation
 matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
 canonical partial correlation (\CPC) between $i$ and $j$, which is the
 correlation between $i$'s residuals and $j$'s residuals when both $i$
@@ -2676,8 +2669,8 @@ matrix can be defined in terms of the CPCs as
 \]
 which is also the square of the determinant of the triangular $w$.
 
-\subsection{Absolute Jacobian Determinant of the Inverse Correlation
-  Matrix Transform}
+\subsection{Absolute Jacobian Determinant of the Correlation
+  Matrix Inverse Transform}
 
 \subsection{Correlation Matrix Transform}
 
@@ -2693,7 +2686,7 @@ w = \mbox{cholesky}(x).
 \]
 
 
-The next step from the Cholesky factor $w$ back to the matrix $z$ of
+The next step from the Cholesky factor $w$ back to the array $z$ of
 {\CPC}s is simplified by the ordering of the elements in the
 definition of of $w$, which when inverted yields
 %
@@ -2712,16 +2705,12 @@ w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \end{array}
 \right.
 \]
-The final stage of the transform reverses the tanh transform, defining
+The final stage of the transform reverses the tanh transform, which
+is given by
 \[
-y_{j(j-1)/2 + i} = \tanh^{-1} z_{i,j}
+\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right),
 \]
-%
-for $i < j$, where the inverse of tanh is given by
-\[
-\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
-\]
-
+and is also known as the Fisher transformation.
 
 
 
@@ -2757,11 +2746,21 @@ v \ = \ \mbox{diag}(u) \ x \ \mbox{diag}(u)
 %
 where $\mbox{diag}(u)$ is the diagonal matrix with diagonal $u$.
 
-\subsection{Absolute Jacobian Determinant of the Inverse Covariance
-  Matrix Transform}
+\subsection{Absolute Jacobian Determinant of the Covariance
+  Matrix Inverse Transform}
 
-Without writing everything out again, the Jacobian determinant is
-multiplied by the exponential transforms and the multipliers.
+Each covariance is equal to the correlation between two variables, 
+times the product of their standard deviations. Thus, the Jacobian
+matrix for the transform from $K \choose 2$ correlations to 
+$K \choose 2$ covariances is diagonal, and each diagonal cell is
+the product of a pair of standard deviations. The determinant of
+this Jacobian is strictly positive and is the product of every
+unique pair of standard deviations. This Jacobian determinant can
+be combined with the Jacobian determinant of the correlation matrix
+inverse transform and the Jacobian determinants for the transformations
+from unbounded parameters to bounded CPCs and unbound parameters to
+bounded standard deviations to yield the absolute Jacobian determinant
+of the covariance matrix inverse transform. 
 
 \subsection{Covariance Matrix Transform}
 
@@ -2775,7 +2774,7 @@ recovered componentwise through
 u_k = \sqrt{v_{k,k}}.
 \]
 %
-The unconstrained scaling factors themselves are then recoverd by
+The unconstrained scaling factors themselves are then recovered by
 reversing the exponentiation that created them, with
 %
 \[
