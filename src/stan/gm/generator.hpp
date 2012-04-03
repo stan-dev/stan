@@ -1845,6 +1845,7 @@ namespace stan {
 
       o << EOL;
       generate_comment("declare and define transformed parameters",2,o);
+      o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
