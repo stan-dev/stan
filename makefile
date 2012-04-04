@@ -13,7 +13,7 @@ help:
 # - OS: {mac, win, linux}. 
 ##
 CC = g++
-O = 0
+O = 3
 # OS is set automatically by this script
 -include make/detect_os
 
@@ -55,9 +55,9 @@ help:
 	@echo '------------------------------------------------------------'
 	@echo 'Stan: makefile'
 	@echo '  Current configuration:'
-	@echo '  - OS (Operating System):' $(OS)
-	@echo '  - CC (Compiler):        ' $(CC)
-	@echo '  - O (Optimize Level):   ' $(O)
+	@echo '  - OS (Operating System):   ' $(OS)
+	@echo '  - CC (Compiler):           ' $(CC)
+	@echo '  - O (Optimize Level):      ' $(O)
 	@echo 'Available targets: '
 	@echo '  Tests:'
 	@echo '  - test-unit:   Runs unit tests.'

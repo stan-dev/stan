@@ -19,9 +19,8 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  O = 0
   LDFLAGS += -static-libgcc 
-  #PCH = .gch
+  PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
@@ -35,10 +34,10 @@ ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
 
-CC_STANC = cl
-CFLAGS_STANC = /EHsc /I src /I lib
-OUTPUT_OPTION_STANC = /OUT:$@
-LDFLAGS_STANC = /link
+#CC_STANC = cl
+#CFLAGS_STANC = /EHsc /I src /I lib
+#OUTPUT_OPTION_STANC = /OUT:$@
+#LDFLAGS_STANC = /link
 
 
 UNIT_TESTS_TO_EXCLUDE := test/gm/parser 
