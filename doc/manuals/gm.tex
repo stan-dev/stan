@@ -16,6 +16,8 @@
 \usepackage{fancyvrb}
 \usepackage{titlesec}
 
+\usepackage{url}
+
 \titleformat{\chapter}[hang]{\bfseries\huge}{\thechapter.}{1.5pc}{}{}
 %\titlespacing{\chapter}{0pt}{-12pt}{18pt}{}
 %
@@ -33,6 +35,7 @@
 
 \newcommand{\acronym}[1]{{\sc #1}\xspace}
 
+\newcommand{\BNF}{\acronym{bnf}}
 \newcommand{\MATLAB}{\acronym{matlab}}
 \newcommand{\R}{\acronym{r}}
 \newcommand{\SPLUS}{\acronym{s}}
@@ -55,9 +58,8 @@
 \newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ } \\[4pt] #4}
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
-\usepackage{url}
-
-\newcommand\thicktilde
+\newcommand{\cmdflag}[3]{\item[\tt {-}-#1] \mbox{ } \\ #2 \\ \hspace*{24pt}(#3)}
+\newcommand{\cmdarg}[4]{\item[\tt {-}-#1={\slshape <#2>}] \mbox{ } \\ #3 \\ \hspace*{24pt}(#4)}
 
 \newcommand{\samp}{{\lower.78ex\hbox{\texttt{\char`\~}}}}%
 %{{\lower1.1ex\hbox{\Large\texttt{\char`\~}}}}
@@ -577,7 +579,9 @@ in \refchapter{optimization}
 
 \part{Commands and Data Formats}
 
-\chapter{Compiling Stan Programs to C++}\label{stanc.chapter}
+
+\chapter{Compiling Stan Programs 
+\\ to C++ Programs}\label{stanc.chapter}
 
 Preparing a \Stan program to be run involves two compilation steps,
 %
@@ -650,6 +654,27 @@ Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.cpp}
 \Stan has also been compiled using \MSVC, a Windows-specific compiler
 from Microsoft.
 
+\section{Overview}
+
+This section provides a complete example based on the \clang compiler
+using optimizations; see the rest of the chapter for other compiler
+options.
+
+Suppose the \Cpp program for the model produced by \Stan resides in a
+file called \code{my\_model.cpp} in the current working directory.
+The following command will produce an executable in the file
+\code{my\_model} in the current working directory.
+%
+\begin{quote}
+\begin{Verbatim}
+> clang++ -I $stan/src -I $stan/lib my_model.cpp -o my_model
+\end{Verbatim}
+\end{quote}
+%
+In the command, \code{\$stan} is used to denote the path to the
+top-level \Stan directory, which contains the \Cpp source code of the
+\Stan library itself (in \code{\$stan/src}) as well as the libraries
+on which it depends (in \code{\$stan/lib}).
 
 \section{Which Compiler?}
 
@@ -775,7 +800,122 @@ To put the executable in a different location, the \code{-o {\slshape
 
 \chapter{Running a \Stan Program}\label{stan-cmd.chapter}
 
-Once a \Stan program has been compiled (see \refchapter{stanc}), 
+Once a \Stan program defining a model has been converted to a \Cpp
+program for that model (see \refchapter{stanc}) and the resulting \Cpp
+program compiled to a platform-specific executable (see
+\refchapter{compiling-cpp}), the model is ready to be run.
+
+\section{Simple Example}
+
+Supposing the executable is in file \code{mymodel} and the data
+is in file \code{mydata}, both in the current working directory.
+Then the \Stan executable may be run using
+%
+\begin{quote}
+\begin{Verbatim}
+> mymodel --data=mydata
+\end{Verbatim}
+\end{quote}
+%
+This will read the data from file \code{mydata}, run the default
+fully-adaptive \NUTS sampler for 2000 iterations, discard the first
+1000 iterations, writing the remainder to the file \code{samples.csv}
+in the current working directory.  A random number generation seed
+will be generated from the system time automatically.
+
+\section{Command-Line Options}
+
+The executable \Stan program is highly configurable.  At the highest
+level, it may be configured for type of sampler (basic \HMC or \NUTS,
+with or without step size adaptation), it may be provided with
+data, initializations, a file to which to send the output, random
+number generation seeds, etc.  
+
+The full set of options is as follows.  The next section provides
+some typical use-case examples.
+%
+\begin{description}
+\cmdflag{help}
+{Display help information including the command call and
+  options.}
+{default = \code{false}}
+%
+\cmdarg{data}{file}
+{Read data from specified dump formatted
+  file}
+{required if model declares data}
+%
+\cmdarg{init}{file}
+{Use initial values from specified file or zero
+  values if <file>=0}
+{default is random initialization}
+%
+\cmdarg{samples}{file}
+{File into which samples are written}
+{default = \code{samples.csv}}
+%
+\cmdflag{append\_samples}
+{Append samples to existing file if it exists}
+{does not write header in append mode}
+%
+\cmdarg{seed}{int}
+{Random number generation seed}
+{default is to randomly generate from time}
+%
+\cmdarg{chain\_id}{int}
+{Markov chain identifier}
+{default = \code{1}}
+%
+\cmdarg{iter}{+int}
+{Total number of iterations, including warmup}
+{default = \code{2000}}
+%
+\cmdarg{warmup}{+int}
+{Discard the specified number of initial samples}
+{default = \code{iter / 2}}
+%
+\cmdarg{thin}{+int}
+{Period between saved samples after warm up}
+{default = \code{max(1, floor(iter - warmup) / 1000)}}
+%
+\cmdarg{refresh}{+int}
+{Period between samples updating progress report print}
+{default = \code{max(1, iter / 200)}}
+%
+\cmdarg{leapfrog\_steps}{int}
+{Number of leapfrog steps; \code{-1} for No-U-Turn adaptation}
+{default = \code{-1}}
+%
+\cmdarg{max\_treedepth}{int}
+{Limit \NUTS leapfrog steps to \code{pow(2,max\_tree\_depth)}; \code{-1} for no limit}
+{default = \code{10}}
+%
+\cmdarg{epsilon}{float}
+{Initial value for step size, or \code{-1} to set automatically}
+{default = \code{-1}}
+%
+\cmdarg{epsilon}{[0,1]}
+{Sample epsilon \code{+/- epsilon * epsilon\_pm}}
+{default = \code{0.0}}
+%
+\cmdflag{epsilon\_adapt\_off}
+{Turn off step size adaptation}
+{default = \code{false}, i.e., step size adaptation is on by default}
+%
+\cmdarg{delta}{+float}
+{Initial step size for step-size adaptation}
+{default = \code{0.5}}
+%
+\cmdarg{gamma}{+float}
+{Gamma parameter for dual averaging step-size adaptation}
+{default = \code{0.05}}
+%
+\cmdflag{test\_grad}
+{Test gradient calculations using finite differences; if this option
+  is chosen, only the gradient tests are done.}
+{default = \code{false}, i.e., no gradient tests}
+%
+\end{description}
 
 
 
@@ -1001,7 +1141,7 @@ always treats these dimesions as \code{L}.
 
 \part{Modeling Language Reference}
 
-\chapter{Data Types}
+\chapter{Data Types \\ and Variable Declarations}
 
 Every expression in \Stan has a type that is uniquely determined at
 compile time.  The basic \Stan data types are real and integer, vector
@@ -1477,58 +1617,13 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{quote}
 %
 
-\chapter{Variable Declarations}
-
-\Stan's grammar for variable declarations is
-%
-\begin{quote}
-\begin{Verbatim}
-var_decl ::= var_type var_name ?dims
-
-var_type ::= int ?int_range
-          | real ?real_range
-          | vector '(' int_expression ')'
-          | pos_ordered '(' int_expression ')'
-          | simplex '(' int_expression ')'
-          | row_vector '(' int_expression ')'
-          | matrix '(' int_expression ',' int_expression ')'
-          | corr_matrix '(' int_expression ')'
-          | cov_matrix '(' int_expression ')'
-
-int_range ::= '(' int_expression ',' ?int_expression ')'
-          | '('  ','  int_expression ')'
-
-real_range ::= '(' real_expression ',' ?real_expression ')'
-          | '('  ','  real_expression ')'
-
-
-dims ::= '['  int_expression (',' int_expression)*  ']'
-\end{Verbatim}
-\end{quote}
-
 
 \chapter{Expressions}
 
 Like most programming languages, \Stan is defined syntactically in
 terms of expressions, which denote values, and statements, which
-denote an action to be taken.
-
-The top-level grammar for expressions is provided in
-\reffigure{expression-grammar}.
-
-\begin{quote}
-\begin{Verbatim}
-expression ::= literal
-             | variable
-             | expression infixOp expression
-             | prefixOp expression
-             | expression postfixOp
-             | expression '[' expressions ']'
-             | function '(' expressions ')'
-             | '(' expression ')'
-\end{Verbatim}
-\end{quote}
-
+denote an action to be taken.  This chapter describes \Stan expressions
+and the next covers statements.  
 
 Valid \Stan expresions include simple numerical literals (e.g.,
 \code{2}, \code{32.7}), identifiers representing variables (e.g.,
@@ -1536,6 +1631,10 @@ Valid \Stan expresions include simple numerical literals (e.g.,
 
 The simplest form of expression is a literal denoting a
 value, such as \code{32.7}.  Expressions may also consist of
+
+
+\chapter{Statements}
+
 
 
 \chapter{Blocks}
@@ -2962,6 +3061,64 @@ not dependent on the dimensionality of the parameter vector.
 
 
 \chapter{Installation}\label{install.appendix}
+
+\chapter{BNF Grammars for \Stan}
+
+This appendix provides a modular Backus-Naur form (\BNF) grammar for
+the Stan modeling language.
+
+\section{Variable Declarations}
+
+\Stan's grammar for variable declarations is
+%
+\begin{quote}
+\begin{Verbatim}
+var_decl ::= var_type var_name ?dims
+
+var_type ::= int ?int_range
+          | real ?real_range
+          | vector '(' int_expression ')'
+          | pos_ordered '(' int_expression ')'
+          | simplex '(' int_expression ')'
+          | row_vector '(' int_expression ')'
+          | matrix '(' int_expression ',' int_expression ')'
+          | corr_matrix '(' int_expression ')'
+          | cov_matrix '(' int_expression ')'
+
+int_range ::= '(' int_expression ',' ?int_expression ')'
+          | '('  ','  int_expression ')'
+
+real_range ::= '(' real_expression ',' ?real_expression ')'
+          | '('  ','  real_expression ')'
+
+
+dims ::= '['  int_expression (',' int_expression)*  ']'
+\end{Verbatim}
+\end{quote}
+
+\section{Expressions}
+
+\Stan's grammar for expressions is 
+%
+\begin{quote}
+\begin{Verbatim}
+expression ::= literal
+             | variable
+             | expression infixOp expression
+             | prefixOp expression
+             | expression postfixOp
+             | expression '[' expressions ']'
+             | function '(' expressions ')'
+             | '(' expression ')'
+\end{Verbatim}
+\end{quote}
+
+
+
+
+
+
+
 
 \chapter*{References}
 \addcontentsline{toc}{chapter}{References}
