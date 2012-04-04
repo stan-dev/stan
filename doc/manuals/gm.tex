@@ -2713,83 +2713,206 @@ is given by
 and is also known as the Fisher transformation.
 
 
-
-
-
 \section{Covariance Matrices}
 
-Covariance matrices are just scaled correlation matrices.  This
-requires an additional $K$ positive scaling parameters, for a total
-requirement of $K + {K \choose 2}$ parameters to specify a covariance
-matrix.  
-
-\subsection{Inverse Covariance Matrix Transform}
-
-Suppose $y$ is a $K \choose 2$-dimensional array specifying the $K
-\times K$ correlation matrix $x$ as specified by the correlation
-matrix inverse transform described in the previous section.  
-
-Let $y'$ be a $K$-dimensional vector of unconstrained scaling
-parameters.  An exponential transform converts these to positive
-values component-wise, by
+In order for a $K \times K$ matrix to be used as a covariance matrix,
+it must be symmetric and positive definite.  A $K \times K$ matrix $x$ 
+is positive definite if for every $K$-vector $a$,
 %
 \[
-u = \exp(y').
+a^{\top} x \,  a > 0.
 \]
 %
-The covariance matrix is the scaled version of the correlation matrix
-$x$,
-\[
-v \ = \ \mbox{diag}(u) \ x \ \mbox{diag}(u)
-  \ = \ \left(\mbox{diag}(u) \, z\right) \left(\mbox{diag}(u) \, z)\right)^{\top},
-\]
-%
-where $\mbox{diag}(u)$ is the diagonal matrix with diagonal $u$.
-
-\subsection{Absolute Jacobian Determinant of the Covariance
-  Matrix Inverse Transform}
-
-Each covariance is equal to the correlation between two variables, 
-times the product of their standard deviations. Thus, the Jacobian
-matrix for the transform from $K \choose 2$ correlations to 
-$K \choose 2$ covariances is diagonal, and each diagonal cell is
-the product of a pair of standard deviations. The determinant of
-this Jacobian is strictly positive and is the product of every
-unique pair of standard deviations. This Jacobian determinant can
-be combined with the Jacobian determinant of the correlation matrix
-inverse transform and the Jacobian determinants for the transformations
-from unbounded parameters to bounded CPCs and unbound parameters to
-bounded standard deviations to yield the absolute Jacobian determinant
-of the covariance matrix inverse transform. 
+A matrix $x$ is said to be positive semi-definite if the constraint
+is relaxed to $a^{\top} x \, a \geq 0$.
 
 \subsection{Covariance Matrix Transform}
 
-The covariance matrix transform just reverses the steps of the inverse
-transform.  The first steps here are to derive the scaling factors $u$
-and the correlation matrix $x$ from the covariance matrix $v$.
-The correlation matrix $x$ has a unit diagonal, allowing $u$ to be
-recovered componentwise through
+\Stan's covariance transform is based on a Cholesky decomposition
+composed with a log transform of the positive-constrained diagonal
+elements.  
+
+If $x$ is a covariance matrix (i.e., a symmetric, positive definite
+matrix), then there is a unique lower-triangular matrix $z =
+\mbox{cholesky}(x)$ with positive diagonal entries, called a Cholesky
+factor, such that
+\[
+x = z \, z^{\top}.
+\]
+The off-diagonal entries of the Cholesky factor $z$ are unconstrained,
+but the diagonal entries $z_{k,k}$ nmust be positive for $1 \leq k
+\leq K$.
+
+To complete the transform, the diagonal is log-transformed to produce
+a fully unconstrained lower-triangular matrix $y$ defined by
+\[
+y_{m,n} = 
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\log z_{m,m} & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+z_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+\subsection{Inverse Covariance Matrix Transform}
+
+The inverse transform must reverses the two steps of the transform.
+Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
+first step is to recover the intermediate matrix $z$ by reversing the
+log transform,
+\[
+z_{m,n} = 
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\exp(y_{m,m}) & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+y_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+The covariance matrix $x$ is recovered from its Cholesky factor $z$ by
+taking
 %
 \[
-u_k = \sqrt{v_{k,k}}.
+x = z \, z^{\top}.
 \]
-%
-The unconstrained scaling factors themselves are then recovered by
-reversing the exponentiation that created them, with
+
+\subsection{Absolute Jacobian Determinant of the Inverse Covariance
+  Matrix Transform}
+
+The Jacobian determinant is the product of the Jacobian determinants
+of the exponential transform from the unconstrained lower-triangular
+matrix $y$ to matrix $z$ with positive diagonals and the product
+transform from the Cholesky factor $z$ to $x$.
+
+The transform from unconstrained $y$ to Cholesky factor $z$ has a
+diagonal Jacobian, so its Jacobian determinant is
 %
 \[
-y'_k = \log u_k.
+\prod_{k=1}^K \left| \, \frac{d}{d_{z_{k,k}}} \, \exp(z_{k,k}) \right|
+\ = \ 
+\prod_{k=1}^K \exp(z_{k,k}).
 \]
-%
-Given the scaling factors $u$, it is straightforward to recover the
-correlation matrix $x$ from the covariance matrix $v$ by reversing the
-multiplications by diagonals
-%
+
+The Jacobian of the second transform from the Cholesky factor $z$ to
+the covariance matrix $x$ is also triangular, with diagonal entries
+corresponding to pairs $m,n$ with $m \geq n$, defined by
 \[
-x = \mbox{diag}(u)^{-1} \ v \ \mbox{diag}(u)^{-1}.
+\frac{\partial}{\partial z_{m,n}}
+\left( z \, z^{\top} \right)_{m,n}
+\ = \
+\frac{\partial}{\partial z_{m,n}}
+\left( \sum_{k=1}^K z_{m,k} \, z_{n,k} \right)
+\ = \
+\left\{
+\begin{array}{cl}
+2 \, z_{n,n} & \mbox{if } m = n \mbox{ and }
+\\[4pt]
+z_{n,n} & \mbox{if } m > n.
+\end{array}
+\right.
+.
 \]
-The matrix $\mbox{diag}(u)$ is invertible because it is diagonal and
-the entries are positive.  
+%
+The absolute Jacobian determinant of the second transform is thus
+\[
+2^{K} 
+\
+\prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}.
+\]
+Finally, the full absolute Jacobian determinant of the inverse
+covariance matrix transform from the unconstrained lower-triangular 
+$y$ to a symmetric, positive definite matrix $x$ is
+\[
+2^{K} 
+\
+\left( \prod_{k=1}^K \exp(z_{k,k}) \right)
+\left( \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n} \right).
+\]
+
+
+
+% \section{Covariance Matrices}
+
+% Covariance matrices are just scaled correlation matrices.  This
+% requires an additional $K$ positive scaling parameters, for a total
+% requirement of $K + {K \choose 2}$ parameters to specify a covariance
+% matrix.  
+
+% \subsection{Inverse Covariance Matrix Transform}
+
+% Suppose $y$ is a $K \choose 2$-dimensional array specifying the $K
+% \times K$ correlation matrix $x$ as specified by the correlation
+% matrix inverse transform described in the previous section.  
+
+% Let $y'$ be a $K$-dimensional vector of unconstrained scaling
+% parameters.  An exponential transform converts these to positive
+% values component-wise, by
+% %
+% \[
+% u = \exp(y').
+% \]
+% %
+% The covariance matrix is the scaled version of the correlation matrix
+% $x$,
+% \[
+% v \ = \ \mbox{diag}(u) \ x \ \mbox{diag}(u)
+%   \ = \ \left(\mbox{diag}(u) \, z\right) \left(\mbox{diag}(u) \, z)\right)^{\top},
+% \]
+% %
+% where $\mbox{diag}(u)$ is the diagonal matrix with diagonal $u$.
+
+% \subsection{Absolute Jacobian Determinant of the Covariance
+%   Matrix Inverse Transform}
+
+% Each covariance is equal to the correlation between two variables, 
+% times the product of their standard deviations. Thus, the Jacobian
+% matrix for the transform from $K \choose 2$ correlations to 
+% $K \choose 2$ covariances is diagonal, and each diagonal cell is
+% the product of a pair of standard deviations. The determinant of
+% this Jacobian is strictly positive and is the product of every
+% unique pair of standard deviations. This Jacobian determinant can
+% be combined with the Jacobian determinant of the correlation matrix
+% inverse transform and the Jacobian determinants for the transformations
+% from unbounded parameters to bounded CPCs and unbound parameters to
+% bounded standard deviations to yield the absolute Jacobian determinant
+% of the covariance matrix inverse transform. 
+
+% \subsection{Covariance Matrix Transform}
+
+% The covariance matrix transform just reverses the steps of the inverse
+% transform.  The first steps here are to derive the scaling factors $u$
+% and the correlation matrix $x$ from the covariance matrix $v$.
+% The correlation matrix $x$ has a unit diagonal, allowing $u$ to be
+% recovered componentwise through
+% %
+% \[
+% u_k = \sqrt{v_{k,k}}.
+% \]
+% %
+% The unconstrained scaling factors themselves are then recovered by
+% reversing the exponentiation that created them, with
+% %
+% \[
+% y'_k = \log u_k.
+% \]
+% %
+% Given the scaling factors $u$, it is straightforward to recover the
+% correlation matrix $x$ from the covariance matrix $v$ by reversing the
+% multiplications by diagonals
+% %
+% \[
+% x = \mbox{diag}(u)^{-1} \ v \ \mbox{diag}(u)^{-1}.
+% \]
+% The matrix $\mbox{diag}(u)$ is invertible because it is diagonal and
+% the entries are positive.  
 
 
 \chapter{The C++ Model Class}
