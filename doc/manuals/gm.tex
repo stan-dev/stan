@@ -2145,7 +2145,7 @@ values.  Diagonal matrices, a simple form of triangular matrix,
 arise if each transformed variable only depends on a single raw
 variable.
 
-\section{Lower Bounds}
+\section{Lower Bounded Scalar}
 
 \Stan uses a logarithmic transform for lower and upper bounds.  
 
@@ -2184,7 +2184,7 @@ p_Y(y)
 \]
 
 
-\section{Upper Bounds}
+\section{Upper Bounded Scalar}
 
 \Stan uses a negated logarithmic transform for upper bounds.
 
@@ -2225,7 +2225,7 @@ p_Y(y)
 \]
 
 
-\section{Lower and Upper Bounds}
+\section{Lower and Upper Bounded Scalar}
 
 For lower and upper-bounded variables, \Stan uses a scaled and
 translated log-odds transform.
@@ -2252,7 +2252,7 @@ The derivative of the logistic sigmoid is
 = \mbox{logit}^{-1}(y) \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
 \]
 
-\subsection{ }
+\subsection{Lower and Upper Bounds Transform}
 
 For variables constrained to be in the open interval $(a,b)$, \Stan
 uses a scaled and translated log-odds transform.  If variable $X$ is
@@ -2263,31 +2263,43 @@ transformed to a new variable $Y$, where
 Y = \mbox{logit} \left( \frac{X - a}{b - a} \right).
 \]
 %
+
+\subsection{Lower and Upper Bounds Inverse Transform}
+
 The inverse of this transform is
 %
 \[
-X = a + (b - a) \cdot \mbox{logit}^{-1}(Y)
+X = a + (b - a) \cdot \mbox{logit}^{-1}(Y).
 \]
 %
-and the density of the transformed variable is
+
+\subsection{Absolute Derivative of the Lower and Upper Bounds Inverse
+  Transform}
+
+The absolute derivative of the inverse transform is given by
+\[
+\left|  \frac{d}{dy} a + (b - a) \cdot \mbox{logit}^{-1}(y)
+    \right|
+= (b - a)
+    \cdot \mbox{logit}^{-1}(y)
+    \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
+\]
+Therefore, the density of the transformed variable $Y$ is
 %
-\begin{eqnarray*}
+\[
 p_Y(y) 
-& = & p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
-    \left|  \frac{d}{dy} a + (b - a) \cdot \mbox{logit}^{-1}(y)
-    \right| .
-\\[8pt]
-& = & p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
+= 
+ p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
     \cdot (b - a)
     \cdot \mbox{logit}^{-1}(y)
     \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
-\end{eqnarray*}
+\]
 %
 Despite its apparent complexity, $\mbox{logit}^{-1}(y)$, and hence
 $\exp(-y)$, need only be evaluated once.
 
 
-\section{Positive Ordered}
+\section{Positive Ordered Vector}
 
 For some modeling tasks, a vector-valued random variable $X$ is
 required with support on positive, ordered sequences.  One example is
@@ -2305,6 +2317,8 @@ x_{k-1} < x_k
 \]
 %
 
+\subsection{Positive Ordered Transform}
+
 \Stan's transform follows the constraint directly.  It maps a vector
 $x \in \mathbb{R}^{K}$ to a vector $f(x) = y \in \mathbb{R}^K$ by setting
 %
@@ -2317,6 +2331,8 @@ and for $2 \leq k \leq K$,
 y_k = f_k(x) = \log \left( x_{k} - x_{k-1} \right).
 \]
 
+\subsection{Positive Ordered Inverse Transform}
+
 The inverse transform $x = f^{-1}(y)$ satisfies
 %
 \[
@@ -2327,6 +2343,9 @@ and for $2 \leq k \leq K$,
 \[
 x_k = x_{k-1} + \exp(y_k) = \sum_{k' =1}^{k} \exp(y_{k'}).
 \]
+
+\subsection{Absolute Jacobian Determinant of the Positive Ordered
+  Inverse Transform}
 
 The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
 with diagonal elements for $1 \leq k \leq K$ of
@@ -2390,6 +2409,8 @@ x_K = 1 - \sum_{k=1}^{K-1} x_k.
 \]
 %
 
+\subsection{Inverse Unit Simplex Transform}
+
 Stan employs a transform whose inverse may be understood using a
 stick-breaking metaphor.  A simplex is determined by taking a stick of
 unit length, breaking a piece off, the length of which is $x_1$.  Then
@@ -2432,6 +2453,9 @@ The summation term represents the length of stick left at stage $k$.
 This is multiplied by the break proportion $z_k$ to yield $x_k$.
 Because $x$ lines in a $K$-simplex, $x_K$ is determined from
 $x_1,\ldots,x_{K-1}$.
+
+\subsection{Absolute Jacobian Determinant of the Inverse Unit Simplex
+  Transform}
 
 The Jacobian $J$ of the inverse transform $f^{-1}$ is
 lower-triangular, with diagonal entries
@@ -2510,6 +2534,8 @@ single exponential function evaluation involved (in the logistic
 sigmoid applied to $y_k$ to produce $z_k$);  everything else is just
 basic arithmetic and keeping track of the remaing stick length.
 
+\subsection{Unit Simplex Transform}
+
 The transform $Y = f(X)$ can be derived by reversing the stages of the
 inverse transform.  Working backwards, given the break proportions
 $z$, $y$ is defined elementwise by
@@ -2547,24 +2573,17 @@ to specify a $K \times K$ correlation matrix is $K \choose 2$.
 It is easiest to specify this transform in reverse, going from its $K
 \choose 2$ parameter basis to a correlation matrix.  The basis will
 actually be broken down into two steps.  To start, suppose $y$
-consists of $K \choose 2$ unconstrained values.  Next, define a $K
-\times K$ matrix $z$ by first transforming $y$ using the $\tanh$
-function, then filling in
-the triangle above the diagonal in column-major order with the results,
+consists of $K \choose 2$ unconstrained values that are transformed via
+the bijective function $\tanh : \mathbb{R} \rightarrow (0,1)$ 
 %
 \[
-z_{i,j}
-= \tanh y_{i + (j - 1)(j - 2)/2}.
+\tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
 \]
 %
-The bijective function $\tanh : \mathbb{R} \rightarrow (0,1)$ is defined by
-%
-\[
-\tanh u = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
-\]
-%
-For example, in the $4 \times 4$ case, there are ${4 \choose 2}$
-non-zero values arranged as
+Then, define a $K \times K$ array $z$ whose strict upper triangle is 
+filled from left-to-right, top-to-bottom with the transformed parameters.
+For example, in the $4 \times 4$ case, there are ${4 \choose 2}$ values
+arranged as
 %
 \[
 z 
@@ -2583,7 +2602,7 @@ z
 .
 \]
 %
-Lewandowski et al.\ show how to map the matrix $z$ to a correlation
+Lewandowski et al.\ show how to bijectively map the array $z$ to a correlation
 matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
 canonical partial correlation (\CPC) between $i$ and $j$, which is the
 correlation between $i$'s residuals and $j$'s residuals when both $i$
@@ -2650,9 +2669,10 @@ matrix can be defined in terms of the CPCs as
 \]
 which is also the square of the determinant of the triangular $w$.
 
-\subsection{Jacobian Determinant of the Inverse Correlation Transform}
+\subsection{Absolute Jacobian Determinant of the Correlation
+  Matrix Inverse Transform}
 
-\subsection{Correlation Transform}
+\subsection{Correlation Matrix Transform}
 
 The correlation transform is defined by reversing the steps of the
 inverse transform defined in the previous section.  
@@ -2666,7 +2686,7 @@ w = \mbox{cholesky}(x).
 \]
 
 
-The next step from the Cholesky factor $w$ back to the matrix $z$ of
+The next step from the Cholesky factor $w$ back to the array $z$ of
 {\CPC}s is simplified by the ordering of the elements in the
 definition of of $w$, which when inverted yields
 %
@@ -2685,16 +2705,12 @@ w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \end{array}
 \right.
 \]
-XThe final stage of the transform reverses the tanh transform, defining
+The final stage of the transform reverses the tanh transform, which
+is given by
 \[
-y_{j(j-1)/2 + i} = \tanh^{-1} z_{i,j}
+\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right),
 \]
-%
-for $i < j$, where the inverse of tanh is given by
-\[
-\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
-\]
-
+and is also known as the Fisher transformation.
 
 
 
@@ -2707,7 +2723,7 @@ requires an additional $K$ positive scaling parameters, for a total
 requirement of $K + {K \choose 2}$ parameters to specify a covariance
 matrix.  
 
-\subsection{Covariance Matrix Inverse Transform}
+\subsection{Inverse Covariance Matrix Transform}
 
 Suppose $y$ is a $K \choose 2$-dimensional array specifying the $K
 \times K$ correlation matrix $x$ as specified by the correlation
@@ -2729,6 +2745,52 @@ v \ = \ \mbox{diag}(u) \ x \ \mbox{diag}(u)
 \]
 %
 where $\mbox{diag}(u)$ is the diagonal matrix with diagonal $u$.
+
+\subsection{Absolute Jacobian Determinant of the Covariance
+  Matrix Inverse Transform}
+
+Each covariance is equal to the correlation between two variables, 
+times the product of their standard deviations. Thus, the Jacobian
+matrix for the transform from $K \choose 2$ correlations to 
+$K \choose 2$ covariances is diagonal, and each diagonal cell is
+the product of a pair of standard deviations. The determinant of
+this Jacobian is strictly positive and is the product of every
+unique pair of standard deviations. This Jacobian determinant can
+be combined with the Jacobian determinant of the correlation matrix
+inverse transform and the Jacobian determinants for the transformations
+from unbounded parameters to bounded CPCs and unbound parameters to
+bounded standard deviations to yield the absolute Jacobian determinant
+of the covariance matrix inverse transform. 
+
+\subsection{Covariance Matrix Transform}
+
+The covariance matrix transform just reverses the steps of the inverse
+transform.  The first steps here are to derive the scaling factors $u$
+and the correlation matrix $x$ from the covariance matrix $v$.
+The correlation matrix $x$ has a unit diagonal, allowing $u$ to be
+recovered componentwise through
+%
+\[
+u_k = \sqrt{v_{k,k}}.
+\]
+%
+The unconstrained scaling factors themselves are then recovered by
+reversing the exponentiation that created them, with
+%
+\[
+y'_k = \log u_k.
+\]
+%
+Given the scaling factors $u$, it is straightforward to recover the
+correlation matrix $x$ from the covariance matrix $v$ by reversing the
+multiplications by diagonals
+%
+\[
+x = \mbox{diag}(u)^{-1} \ v \ \mbox{diag}(u)^{-1}.
+\]
+The matrix $\mbox{diag}(u)$ is invertible because it is diagonal and
+the entries are positive.  
+
 
 \chapter{The C++ Model Class}
 

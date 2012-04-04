@@ -1,5 +1,5 @@
-#include <stan/gm/grammar/program_grammar_def.hpp>
-#include <stan/gm/grammar/iterator_typedefs.hpp>
+#include <stan/gm/grammars/program_grammar_def.hpp>
+#include <stan/gm/grammars/iterator_typedefs.hpp>
 
 namespace stan {
   namespace gm {
