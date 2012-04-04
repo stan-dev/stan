@@ -2776,7 +2776,7 @@ y_{m,n} & \mbox{if } m > n.
 \end{array}
 \right.
 \]
-
+%
 The covariance matrix $x$ is recovered from its Cholesky factor $z$ by
 taking
 %
@@ -2796,10 +2796,13 @@ The transform from unconstrained $y$ to Cholesky factor $z$ has a
 diagonal Jacobian, so its Jacobian determinant is
 %
 \[
-\prod_{k=1}^K \left| \, \frac{d}{d_{z_{k,k}}} \, \exp(z_{k,k}) \right|
+\prod_{k=1}^K  \frac{d}{d_{y_{k,k}}} \, \exp(y_{k,k})
 \ = \ 
-\prod_{k=1}^K \exp(z_{k,k}).
+\prod_{k=1}^K \exp(y_{k,k})
+\ = \
+\prod_{k=1}^K z_{k,k},
 \]
+which is always positive.
 
 The Jacobian of the second transform from the Cholesky factor $z$ to
 the covariance matrix $x$ is also triangular, with diagonal entries
@@ -2833,7 +2836,7 @@ $y$ to a symmetric, positive definite matrix $x$ is
 \[
 2^{K} 
 \
-\left( \prod_{k=1}^K \exp(z_{k,k}) \right)
+\left( \prod_{k=1}^K z_{k,k} \right)
 \left( \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n} \right).
 \]
 
