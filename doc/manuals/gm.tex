@@ -53,6 +53,7 @@
 
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
+\newcommand{\refsection}[1]{Section~\ref{#1.section}}
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
 
 \newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ } \\[4pt] #4}
@@ -1775,6 +1776,70 @@ foo(m,y);    // calls foo(int,double)
 This chapter describes \Stan's built-in function that operate on real
 and integer arguments and return results of type integer.
 
+
+\section{Integer-Valued Arithmetic Operators}
+
+\Stan's arithmetic is based on standard double-precision \Cpp integer and
+floating-point arithmetic.  If the arguments to an arithmetic operator
+are both integers, as in \code{2+2}, integer arithmetic is used.  If
+one argument is an integer and the other a floating-point value, as in
+\code{2.0+2}, \code{2+2.0}, then the integer is promoted to a floating
+point value and floating-point arithmetic is used.
+
+Integer arithmetic behaves slightly differently than floating point
+arithmetic.  The first difference is how overflow is treated.  If the
+sum or product of two integers overflows the maximum integer
+representable, the result is an undesirable wraparound behavior at the
+bit level.  If the integers were first promoted to real numbers, they
+would not overlflow a floating-point representation.  There are no
+extra checks in \Stan to flag overflows, so it is up to the user to
+make sure it does not occur.
+
+Secondly, because the set of integers is not closed under division and
+there is no special infinite value for integers, integer division
+behaves differently.  For integer division by values other than zero,
+the result is rounded toward 0.  For instance, positive results are
+rounded down, as in \code{1/2 = 0} and \code{5/3 = 1}, whereas
+negative results are rounded up, as in \code{(-1)/2 = 0} and
+\code{(-5)/33 = -1}.
+
+Unlike floating point division, where \code{1.0/0.0} produces the
+special positive infinite value, integer division by zero, as in
+\code{1/0}, has undefined behavior in the \Cpp standard.  For example,
+the \clang compiler on Mac OS X returns 3764, whereas the \gpp
+compiler throws a floating-point exception and aborts the program with
+a warning.  As with overflow, it is up to the user to make sure
+integer divide-by-zero does not occur.
+
+\subsection{Binary Infix Operators}
+
+\begin{description}
+%
+\fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+The sum of the addends \farg{x} and \farg{y}}
+%
+\fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+The difference between the minuend \farg{x} and subtrahend \farg{y}}
+%
+\fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+The product of the factors \farg{x} and \farg{y}}
+%
+\fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+The integer quotiont of the dividend \farg{x} and divisor \farg{y}}
+%
+\end{description}
+
+\subsection{Unary Prefix Operators}
+
+\begin{description}
+\fitem{real}{operator-}{real \farg{x}}{
+The negation of the the subtrahend \farg{x}}
+
+\fitem{real}{operator+}{real \farg{x}}{
+The promotion of addend \farg{x} to a real, which is a no-op
+for real inputs}
+\end{description}
+
 \section{Absolute Function}
 
 \begin{description}
@@ -1857,6 +1922,44 @@ The largest negative real value representable}
 \fitem{real}{step}{real \farg{x}}{
 0 if \farg{x} is negative and 1 otherwise}
 %
+\end{description}
+
+
+\section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
+
+The arithmetic operators are presented using \Cpp notation.  For
+instance \code{operator+(x,y)} refers to the binary addition operator
+and \code{operator-(x)} to the unary negation operator.  In \Stan
+programs, these are written using the usual infix and prefix notations
+as \code{x~+~y} and \code{-x}, respectively.
+
+\subsection{Binary Infix Operators}
+
+\begin{description}
+%
+\fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+The sum of the addends \farg{x} and \farg{y}}
+%
+\fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+The difference between the minuend \farg{x} and subtrahend \farg{y}}
+%
+\fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+The product of the factors \farg{x} and \farg{y}}
+%
+\fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+The quotiont of the dividend \farg{x} and divisor \farg{y}}
+%
+\end{description}
+
+\subsection{Unary Prefix Operators}
+
+\begin{description}
+\fitem{real}{operator-}{real \farg{x}}{
+The negation of the the subtrahend \farg{x}}
+
+\fitem{real}{operator+}{real \farg{x}}{
+The promotion of addend \farg{x} to a real, which is a no-op
+for real inputs}
 \end{description}
 
 
@@ -2111,29 +2214,217 @@ of \farg{x} and the natural exponentiation of \farg{y}}
 
 \begin{description}
 \fitem{real}{sum}{real \farg{x}[]}
-The sum of the array of arguments
+The sum of the elements in \farg{x}
 %
 \fitem{real}{mean}{real \farg{x}[]}
-The sample mean of the array of arguments
+The sample mean of the elements in \farg{x}
 %
 \fitem{real}{variance}{real \farg{x}[]}
-The unbiased sample variance (divide by length - 1)
+The sample variance of the elements in \farg{x} (based on
+dividing by \code{length - 1})
 %
-\fitem{real}{sd}{real \farg{x}[]}
-The unbiased sample standard deviation (divide by length - 1)
+\fitem{real}{sd}{real \farg{x}[]} The sample standard deviation of
+elements in \farg{x} (divide by \code{length - 1})
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}
-The log of the sum of the exponentials of the array elements
+The log of the sum of the exponentials of the elements in \farg{x}
 \end{description}
 
 \chapter{Matrix Operations}
 
-\chapter{Discrete Probability Functions}
+\section{Matrix Arithmetic Operators}
 
-\chapter{Continuous Probability Functions} 
+\Stan supports the basic matrix operations using infix, prefix and
+postfix operations.  This section lists the operations supported by
+\Stan along with their argument and result types.
 
-\chapter{Cumulative Distributions}
+\subsection{Infix Matrix Operators}
 
+\begin{description}
+%
+\fitem{vector}{operator+}{vector \farg{x}, vector \farg{y}}{The sum of
+the vectors \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{operator+}{row\_vector \farg{x}, row\_vector \farg{y}}{The sum of
+the row vectors \farg{x} and \farg{y}}
+%
+\fitem{matrix}{operator+}{matrix \farg{x}, matrix \farg{y}}{The sum of
+the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+\fitem{vector}{operator-}{vector \farg{x}, vector \farg{y}}{The difference between
+the vectors \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+  difference between the the row vectors \farg{x} and \farg{y}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}, matrix \farg{y}}{The difference between
+  the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator*}{real \farg{x}, vector \farg{y}}{The product of
+the scalar \farg{x} and vector \farg{y}}
+%
+\fitem{row\_vector}{operator*}{real \farg{x}, row\_vector \farg{y}}{The product of
+the scalar \farg{x} and the row vector \farg{y}}
+%
+\fitem{matrix}{operator*}{real \farg{x}, matrix \farg{y}}{The product of
+the scalar \farg{x} and the matrix \farg{y}}
+%
+%
+\fitem{vector}{operator*}{vector \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and vector \farg{x}}
+%
+\fitem{matrix}{operator*}{vector \farg{x}, row\_vector \farg{y}}{The product
+of the row vector \farg{x} and vector \farg{y}}
+%
+%
+\fitem{row\_vector}{operator*}{row\_vector \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and row vector \farg{x}}
+%
+\fitem{real}{operator*}{row\_vector \farg{x}, vector \farg{y}}{The product
+of the row vector \farg{x} and vector \farg{y}}
+%
+\fitem{row\_vector}{operator*}{row\_vector \farg{x}, matrix \farg{y}}{The product
+of the row vector \farg{x} and matrix \farg{y}}
+%
+%
+\fitem{matrix}{operator*}{matrix \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and matrix \farg{x}}
+%
+\fitem{vector}{operator*}{matrix \farg{x}, vector \farg{y}}{The
+  product of the matrix \farg{x} and vector \farg{y}}
+%
+\fitem{matrix}{operator*}{matrix \farg{x}, matrix \farg{y}}{The product of 
+  the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+
+\subsection{Elementwise Infix Operators}
+
+\begin{description}
+%
+\fitem{matrix}{operator+}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the vector \farg{y}}
+%
+\fitem{matrix}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the row vector \farg{y}}
+%
+\fitem{matrix}{operator+}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in the matrix \farg{y}}
+%
+\fitem{matrix}{operator+}{vector \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the vector \farg{x}}
+%
+\fitem{matrix}{operator+}{row\_vector \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the row vector \farg{x}}
+%
+\fitem{matrix}{operator+}{matrix \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the matrix \farg{x}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the vector \farg{x}}
+%
+\fitem{vector}{operator-}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the negation of the vector \farg{y}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the row vector \farg{x}}
+%
+\fitem{row\_vector}{operator-}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the negation of the row vector \farg{y}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the matrix \farg{x}}
+%
+\fitem{matrix}{operator-}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in negation of the matrix \farg{y}}
+%
+\end{description}
+
+
+\subsection{Prefix Matrix Operators}
+
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}}{The negation of the vector
+  \farg{x}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}}{The negation of the row
+  vector \farg{x}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}}{The negation of the matrix
+    \farg{x}}
+%
+\end{description}
+
+
+\subsection{Postfix Matrix Operators}
+
+\begin{description}
+%
+\fitem{matrix}{operator'}{matrix \farg{x}}{The transpose of the matrix
+  \farg{x}, written as \code{x'}}
+%
+\fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
+  \farg{x}, written as \code{x'}}
+%
+\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the vector
+  \farg{x}, written as \code{x'}}
+%
+\end{description}
+
+
+\section{Integer-Valued Matrix Size Functions}
+
+\begin{description}
+%
+\fitem{int}{rows}{vector \farg{x}}{The number of
+rows in the vector \farg{x}}
+%
+\fitem{int}{rows}{row\_vector \farg{x}}{The number of
+rows in the row vector \farg{x}, namely 1}
+%
+\fitem{int}{rows}{matrix \farg{x}}{The number of
+rows in the matrix \farg{x}}
+%
+\fitem{int}{cols}{vector \farg{x}}{The number of columns
+in the vector \farg{x}, namely 1}
+%
+\fitem{int}{cols}{row\_vector \farg{x}}{The number of columns
+in the row vector \farg{x}}
+%
+\fitem{int}{cols}{matrix \farg{x}}{The number of columns
+in the matrix \farg{x}}
+\end{description}
+
+\section{Slice and Package Functions}
+
+\begin{description}
+%
+\fitem{vector}{diagonal}{matrix \farg{x}}{The diagonal
+of the matrix as a vector}
+%
+\end{description}
+
+
+
+\section{Linear Algebra Functions and Solvers}
+
+
+
+\chapter{Discrete Probabilities}
+
+\chapter{Continuous Probabilities}
 
 
 \part{Advanced Topics}
