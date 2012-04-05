@@ -628,6 +628,30 @@ namespace stan {
                               const row_vector_d& rv2) {
       return rv1.dot(rv2);
     }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     * @param length Length of both arrays.
+     */
+    inline double dot_product(const double* v1, const double* v2, 
+                              size_t length) {
+      double result = 0;
+      for (size_t i = 0; i < length; i++)
+        result += v1[i] * v2[i];
+      return result;
+    }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     */
+    inline double dot_product(const std::vector<double>& v1,
+                              const std::vector<double>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      return dot_product(&v1[0], &v2[0], v1.size());
+    }
 
     /**
      * Returns the minimum coefficient in the specified

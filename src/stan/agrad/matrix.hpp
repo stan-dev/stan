@@ -462,6 +462,152 @@ namespace stan {
       return to_var(v1).dot(to_var(v2));
     }
 
+    class dot_product_vv_vari : public vari {
+    protected:
+      vari** v1_;
+      vari** v2_;
+      size_t length_;
+      inline static double var_dot(const var* v1, const var* v2,
+                                   size_t length) {
+        double result = 0;
+        for (size_t i = 0; i < length; i++)
+          result += v1[i].vi_->val_ * v2[i].vi_->val_;
+        return result;
+      }
+    public:
+      dot_product_vv_vari(const var* v1, const var* v2, size_t length) : 
+        vari(var_dot(v1, v2, length)), length_(length) {
+        v1_ = (vari**)memalloc_.alloc(2*length*sizeof(vari*));
+        v2_ = v1_ + length;
+        for (size_t i = 0; i < length; i++)
+          v1_[i] = v1[i].vi_;
+        for (size_t i = 0; i < length; i++)
+          v2_[i] = v2[i].vi_;
+      }
+      void chain() {
+        for (size_t i = 0; i < length_; i++) {
+          v1_[i]->adj_ += adj_ * v2_[i]->val_;
+          v2_[i]->adj_ += adj_ * v1_[i]->val_;
+        }
+      }
+    };
+    class dot_product_vd_vari : public vari {
+    protected:
+      vari** v1_;
+      double* v2_;
+      size_t length_;
+      inline static double var_dot(const var* v1, const double* v2,
+                                   size_t length) {
+        double result = 0;
+        for (size_t i = 0; i < length; i++)
+          result += v1[i].vi_->val_ * v2[i];
+        return result;
+      }
+    public:
+      dot_product_vd_vari(const var* v1, const double* v2, size_t length) : 
+        vari(var_dot(v1, v2, length)), length_(length) {
+        v1_ = (vari**)memalloc_.alloc(length*sizeof(vari*));
+        v2_ = (double*)memalloc_.alloc(length*sizeof(double));
+        for (size_t i = 0; i < length; i++)
+          v1_[i] = v1[i].vi_;
+        for (size_t i = 0; i < length; i++)
+          v2_[i] = v2[i];
+      }
+      void chain() {
+        for (size_t i = 0; i < length_; i++) {
+          v1_[i]->adj_ += adj_ * v2_[i];
+        }
+      }
+    };
+    class dot_product_dv_vari : public vari {
+    protected:
+      double* v1_;
+      vari** v2_;
+      size_t length_;
+      inline static double var_dot(const double* v1, const var* v2,
+                                   size_t length) {
+        double result = 0;
+        for (size_t i = 0; i < length; i++)
+          result += v1[i] * v2[i].vi_->val_;
+        return result;
+      }
+    public:
+      dot_product_dv_vari(const double* v1, const var* v2, size_t length) : 
+        vari(var_dot(v1, v2, length)), length_(length) {
+        v1_ = (double*)memalloc_.alloc(length*sizeof(double));
+        v2_ = (vari**)memalloc_.alloc(length*sizeof(vari*));
+        for (size_t i = 0; i < length; i++)
+          v1_[i] = v1[i];
+        for (size_t i = 0; i < length; i++)
+          v2_[i] = v2[i].vi_;
+      }
+      void chain() {
+        for (size_t i = 0; i < length_; i++) {
+          v2_[i]->adj_ += adj_ * v1_[i];
+        }
+      }
+    };
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     * @param length Length of both arrays.
+     */
+    inline var dot_product(const var* v1, const var* v2, size_t length) {
+      return var(new dot_product_vv_vari(v1, v2, length));
+    }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     * @param length Length of both arrays.
+     */
+    inline var dot_product(const var* v1, const double* v2, size_t length) {
+      return var(new dot_product_vd_vari(v1, v2, length));
+    }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     * @param length Length of both arrays.
+     */
+    inline var dot_product(const double* v1, const var* v2, size_t length) {
+      return var(new dot_product_dv_vari(v1, v2, length));
+    }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     */
+    inline var dot_product(const std::vector<var>& v1,
+                           const std::vector<var>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      return var(new dot_product_vv_vari(&v1[0], &v2[0], v1.size()));
+    }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     */
+    inline var dot_product(const std::vector<var>& v1,
+                           const std::vector<double>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      return var(new dot_product_vd_vari(&v1[0], &v2[0], v1.size()));
+    }
+    /**
+     * Returns the dot product of the specified arrays of doubles.
+     * @param v1 First array.
+     * @param v2 Second array.
+     */
+    inline var dot_product(const std::vector<double>& v1,
+                           const std::vector<var>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      return var(new dot_product_dv_vari(&v1[0], &v2[0], v1.size()));
+    }
+
     /**
      * Returns the minimum coefficient in the specified
      * column vector.

@@ -760,4 +760,3 @@ TEST(matrixTest,eltDivideMatrixException) {
   EXPECT_THROW(stan::math::elt_divide(m1,m2),std::domain_error);
   EXPECT_THROW(stan::math::elt_divide(m1,m3),std::domain_error);
 }
-
