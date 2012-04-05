@@ -47,6 +47,7 @@ add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 
 add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("min",DOUBLE_T,VECTOR_T);

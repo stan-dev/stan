@@ -2575,3 +2575,113 @@ TEST(agradMatrix,row_v_excHigh) {
   y << 1, 2, 3, 4, 5, 6;
   EXPECT_THROW(row(y,5),std::invalid_argument);
 }
+TEST(agradMatrix, dot_product_vv) {
+  std::vector<var> a, b;
+  var c;
+  for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
+    a.push_back(i);
+    b.push_back(i + 2);
+  }
+  c = dot_product(&a[0], &b[0], 3);
+  EXPECT_EQ(2, c);
+  std::vector<var> ab;
+  std::vector<double> grad;
+  for (size_t i = 0; i < 3; i++) {
+    ab.push_back(a[i]);
+    ab.push_back(b[i]);
+  }
+  c.grad(ab, grad);
+  EXPECT_EQ(grad[0], 1);
+  EXPECT_EQ(grad[1], -1);
+  EXPECT_EQ(grad[2], 2);
+  EXPECT_EQ(grad[3], 0);
+  EXPECT_EQ(grad[4], 3);
+  EXPECT_EQ(grad[5], 1);
+}
+TEST(agradMatrix, dot_product_dv) {
+  std::vector<double> a;
+  std::vector<var> b;
+  var c;
+  for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
+    a.push_back(i);
+    b.push_back(i + 2);
+  }
+  c = dot_product(&a[0], &b[0], 3);
+  EXPECT_EQ(2, c);
+  std::vector<double> grad;
+  c.grad(b, grad);
+  EXPECT_EQ(grad[0], -1);
+  EXPECT_EQ(grad[1], 0);
+  EXPECT_EQ(grad[2], 1);
+}
+TEST(agradMatrix, dot_product_vd) {
+  std::vector<var> a;
+  std::vector<double> b;
+  var c;
+  for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
+    a.push_back(i);
+    b.push_back(i + 2);
+  }
+  c = dot_product(&a[0], &b[0], 3);
+  EXPECT_EQ(2, c);
+  std::vector<double> grad;
+  c.grad(a, grad);
+  EXPECT_EQ(grad[0], 1);
+  EXPECT_EQ(grad[1], 2);
+  EXPECT_EQ(grad[2], 3);
+}
+TEST(agradMatrix, dot_product_vv_vec) {
+  std::vector<var> a, b;
+  var c;
+  for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
+    a.push_back(i);
+    b.push_back(i + 2);
+  }
+  c = dot_product(a, b);
+  EXPECT_EQ(2, c);
+  std::vector<var> ab;
+  std::vector<double> grad;
+  for (size_t i = 0; i < 3; i++) {
+    ab.push_back(a[i]);
+    ab.push_back(b[i]);
+  }
+  c.grad(ab, grad);
+  EXPECT_EQ(grad[0], 1);
+  EXPECT_EQ(grad[1], -1);
+  EXPECT_EQ(grad[2], 2);
+  EXPECT_EQ(grad[3], 0);
+  EXPECT_EQ(grad[4], 3);
+  EXPECT_EQ(grad[5], 1);
+}
+TEST(agradMatrix, dot_product_dv_vec) {
+  std::vector<double> a;
+  std::vector<var> b;
+  var c;
+  for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
+    a.push_back(i);
+    b.push_back(i + 2);
+  }
+  c = dot_product(a, b);
+  EXPECT_EQ(2, c);
+  std::vector<double> grad;
+  c.grad(b, grad);
+  EXPECT_EQ(grad[0], -1);
+  EXPECT_EQ(grad[1], 0);
+  EXPECT_EQ(grad[2], 1);
+}
+TEST(agradMatrix, dot_product_vd_vec) {
+  std::vector<var> a;
+  std::vector<double> b;
+  var c;
+  for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
+    a.push_back(i);
+    b.push_back(i + 2);
+  }
+  c = dot_product(a, b);
+  EXPECT_EQ(2, c);
+  std::vector<double> grad;
+  c.grad(a, grad);
+  EXPECT_EQ(grad[0], 1);
+  EXPECT_EQ(grad[1], 2);
+  EXPECT_EQ(grad[2], 3);
+}
