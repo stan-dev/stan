@@ -130,14 +130,7 @@ public:
             lp__ += stan::prob::normal_log<true>(get_base1(beta,d,"beta",1), 0, 100);
         }
         for (int n = 1; n <= N; ++n) {
-            {
-                var temp;
-                temp = 0;
-                for (int d = 1; d <= D; ++d) {
-                    temp = (temp + (get_base1(beta,d,"beta",1) * get_base1(get_base1(x,n,"x",1),d,"x",2)));
-                }
-                lp__ += stan::prob::bernoulli_log<true>(get_base1(y,n,"y",1), inv_logit(temp));
-            }
+            lp__ += stan::prob::bernoulli_logit_log<true>(get_base1(y,n,"y",1), dot_product(beta,get_base1(x,n,"x",1)));
         }
 
         return lp__;

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/univariate/discrete/bernoulli.hpp"
+#include "stan/math/special_functions.hpp"
 
 TEST(ProbDistributionsBernoulli,Bernoulli) {
   EXPECT_FLOAT_EQ(std::log(0.25), stan::prob::bernoulli_log(1,0.25));
@@ -72,4 +73,75 @@ TEST(ProbDistributionsBernoulli,ErrnoPolicy) {
   EXPECT_TRUE(std::isnan(result));
   result = bernoulli_log(k, 2.0, errno_policy());
   EXPECT_TRUE(std::isnan(result));
+}
+
+// Same tests as above, but for bernoulli_logit.
+const static double logit_025 = stan::math::logit(0.25);
+TEST(ProbDistributionsBernoulliLogit,Bernoulli) {
+  EXPECT_FLOAT_EQ(std::log(0.25), stan::prob::bernoulli_logit_log(1,logit_025));
+  EXPECT_FLOAT_EQ(std::log(1.0 - 0.25), stan::prob::bernoulli_logit_log(0,logit_025));
+  EXPECT_FLOAT_EQ(-std::exp(-25), stan::prob::bernoulli_logit_log(1, 25));
+  EXPECT_FLOAT_EQ(-25, stan::prob::bernoulli_logit_log(0, 25));
+  EXPECT_FLOAT_EQ(-25, stan::prob::bernoulli_logit_log(1, -25));
+  EXPECT_FLOAT_EQ(-std::exp(-25), stan::prob::bernoulli_logit_log(0, -25));
+}
+TEST(ProbDistributionsBernoulliLogit,Propto) {
+  EXPECT_FLOAT_EQ(0.0, stan::prob::bernoulli_logit_log<true>(1,logit_025));
+  EXPECT_FLOAT_EQ(0.0, stan::prob::bernoulli_logit_log<true>(0,logit_025));
+}
+
+typedef policy<
+  domain_error<errno_on_error>, 
+  pole_error<errno_on_error>,
+  overflow_error<errno_on_error>,
+  evaluation_error<errno_on_error> 
+  > errno_policy;
+
+using stan::prob::bernoulli_logit_log;
+
+TEST(ProbDistributionsBernoulliLogit,DefaultPolicy) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double inf = std::numeric_limits<double>::infinity();
+  
+  unsigned int k = 1;
+  double theta = 0.75;
+
+  EXPECT_NO_THROW(bernoulli_logit_log(k, theta));
+  EXPECT_NO_THROW(bernoulli_logit_log(k, 0.0));
+  EXPECT_NO_THROW(bernoulli_logit_log(k, 1.0));
+    
+  EXPECT_THROW(bernoulli_logit_log(2U, theta), std::domain_error);
+  EXPECT_THROW(bernoulli_logit_log(k, nan), std::domain_error);
+  EXPECT_NO_THROW(bernoulli_logit_log(k, inf));
+  EXPECT_NO_THROW(bernoulli_logit_log(k, -inf));
+  EXPECT_NO_THROW(bernoulli_logit_log(k, -1.0));
+  EXPECT_NO_THROW(bernoulli_logit_log(k, 2.0));
+}
+TEST(ProbDistributionsBernoulliLogit,ErrnoPolicy) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double inf = std::numeric_limits<double>::infinity();
+  
+  double result;
+  unsigned int k = 1;
+  double theta = 0.75;
+
+  result = bernoulli_logit_log(k, theta, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+  result = bernoulli_logit_log(k, -inf, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+  result = bernoulli_logit_log(k, inf, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+    
+  result = bernoulli_logit_log(2U, theta, errno_policy());
+  EXPECT_TRUE(std::isnan(result));
+  result = bernoulli_logit_log(k, nan, errno_policy());
+  EXPECT_TRUE(std::isnan(result));
+  result = bernoulli_logit_log(k, inf, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+  result = bernoulli_logit_log(k, -inf, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+  result = bernoulli_logit_log(k, -1.0, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
+  result = bernoulli_logit_log(k, 2.0, errno_policy());
+  EXPECT_FALSE(std::isnan(result));
 }

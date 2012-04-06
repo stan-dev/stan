@@ -211,6 +211,7 @@ add_binary("log_sum_exp");
 add_unary("square");
 
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
+add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add_ternary("beta_log");
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
