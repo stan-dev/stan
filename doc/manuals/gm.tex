@@ -35,6 +35,7 @@
 
 \newcommand{\acronym}[1]{{\sc #1}\xspace}
 
+\newcommand{\ASCII}{\acronym{ascii}}
 \newcommand{\BNF}{\acronym{bnf}}
 \newcommand{\MATLAB}{\acronym{matlab}}
 \newcommand{\R}{\acronym{r}}
@@ -1142,16 +1143,36 @@ always treats these dimesions as \code{L}.
 
 \part{Modeling Language Reference}
 
-\chapter{Data Types \\ and Variable Declarations}
+\chapter{Data Types \\ and Variable Declarations}\label{data-types.chapter}
 
-Every expression in \Stan has a type that is uniquely determined at
-compile time.  The basic \Stan data types are real and integer, vector
-of real, row vector of real, and matrix of real.  
+This chapter covers the data types that values may have in \Stan.
+Every variable used in a \Stan program must have a declared data type.
+Only values of that type will be assignable to the variable.  This
+follows the convention of programming languages like \Cpp, not the
+conventions of scripting languages like Python or statistical
+languages such as \R or \BUGS.  The motivation for strong, static
+typing is twofold.  First, it forces the programmer's intent to be
+declared with the variable, making programs easier to comprehend and
+hence debug and maintain.  Second, it catches programming errors
+relative to that intent to be caught sooner (at compile time) rather
+than later (at run time).  The \Stan compiler (see \refchapter{stanc})
+will flag any type errors and indicate the offending expressions
+quickly when the program is compiled.
+
+\section{Overview of Data Types}
+
+The primitive \Stan data types are \code{real} for continuous scalar
+quantities and \code{int} for integer values.  The compound data
+types include \code{vector} (of real values), \code{row\_vector} (of
+real values), and \code{matrix} (of real values).
 
 Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  Vector data types may be constrained to increasing
-positive values or simplexes.  Matrix data types may be constrained to
-correlation matrices or covariance matrices.
+bounds, or both.  There are two specialized vector data types,
+\code{simplex} for simplices and \code{pos\_ordered} for positive,
+ordered sequences of scalars.  There are two specialized matrix data
+types, \code{corr\_matrix} and \code{cov\_matrix}, for correlation
+matrices (symmetric, positive definite, unit diagonal) and covariance
+matrices (symmetric, positive definite). 
 
 \Stan supports arrays of arbitrary order of any of the basic data
 types or constrained basic data types.  This includes
@@ -1159,13 +1180,15 @@ three-dimensional arrays of integers, one-dimensional arrays of
 positive reals, four-dimensional arrays of simplexes, one-dimensional
 arrays of row vectors, and so on.
 
-\section{Finite-Precision Arithmetic}
+
+
+\section{Primitive Numerical Data Types}
 
 Unfortunately, the lovely mathematical abstraction of integers and
 real numbers is only partially supported by finite-precision computer
 arithmetic.  
 
-\subsection{Integers}
+\subsection{Integers}\label{int-data-type.section}
 
 Stan uses 64-bit (8-byte) integers for all of its integer
 representations.  The maximum value that can be represented
@@ -1176,7 +1199,7 @@ the \Stan programmer to make sure the integer values in their programs
 stay in range.  In particular, every intermediate expression must have
 an integer value that is in range.
 
-\subsection{Reals}
+\subsection{Reals}\label{real-data-type.section}
 
 \Stan uses 64-bit (8-byte) floating point representations of real
 numbers.  \Stan roughly%
@@ -1618,20 +1641,275 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{quote}
 %
 
+\section{Types versus Sizes}
+
+The size associated with a given variable is not part of its data
+type.  The sizes may determined dynamically (at run time) and thus
+cannot be type-checked statically.  
+
+\subsection{Type Naming Notation}
+
+In order to refer to data types, it is convenient to have a way to
+refer to them.  The type naming notation outlined in this section is
+not part of the \Stan programming language, but rather a convention
+adopted in this document to enable a concise description of a type.
+
+Because size information is not part of a data type, data
+types will be written without size information.  For instance,
+\code{real[]} is the type of one-dimensional array of reals and
+\code{matrix} is the type of matrices.  The three-dimensional integer
+array type is written as \code{int[,,]}, indicating the number slots
+available for indexing.  Similarly, \code{vector[,]} is the type of a
+two-dimensional array of vectors.
+
+
+
+
 
 \chapter{Expressions}
 
-Like most programming languages, \Stan is defined syntactically in
-terms of expressions, which denote values, and statements, which
-denote an action to be taken.  This chapter describes \Stan expressions
-and the next covers statements.  
+An expression is the basic syntactic unit in a \Stan program that
+denotes a value.  Every expression in a well-formed \Stan program has
+a type that is determined statically (at compile time).  If an
+otherwise well-formed program has an expression whose type cannot be
+determined statically, the \Stan compiler (see \refchapter{stanc})
+will report the location of the ill-formed expression.
 
-Valid \Stan expresions include simple numerical literals (e.g.,
-\code{2}, \code{32.7}), identifiers representing variables (e.g.,
-\code{theta}), 
+This chapter covers the syntax, typing, and usage of the various forms
+of expressions in \Stan. 
 
-The simplest form of expression is a literal denoting a
-value, such as \code{32.7}.  Expressions may also consist of
+\section{Numeric Literals}
+
+The simplest form of expression is a literal that denotes a primitive
+numerical value.   
+
+\subsection{Integer Literals}
+
+A number written without a period is assigned the integer numeric type
+\code{int}.
+
+Integer literals are written in base 10 without any separators.
+Integer literals may contain a single negative sign.  (The expression
+\code{--1} is interpreted as the negation of the literal \code{-1}.)
+
+The following list contains well-formed integer literals.
+%
+\begin{quote}
+\code{0}, \ \code{1}, \ \code{-1}, \ \code{256}, 
+\ \code{-127098}, \ \code{24567898765}
+\end{quote}
+%
+Integer literals must have values that fall within the bounds for
+integer values (\refsection{int-data-type}).
+
+\subsection{Real Literals}
+
+A number written with a period or with scientific notation is assigned
+to a the continuous numeric type \code{real}.  Real literals are
+written in base 10 with a period (\code{.}) as a separator.  Examples
+of well-formed double literals include the following.
+%
+\begin{quote}
+\code{0.0}, \ \code{1.0}, \ \code{3.14}, \ \code{-217.9387}, \ 
+\code{2.7e3}, \ \code{-2E-5}
+\end{quote}
+%
+The notation \code{e} or \code{E} followed by a positive or negative
+integer denotes a power of 10 to multiply.  For instance \code{2.7e3}
+denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
+10^{-5}$.
+
+
+\section{Variables}
+
+A variable by itself is a well-formed expression of the same type as
+the variable.  Variables in \Stan consist of \ASCII strings containing
+only the basic lower-case and upper-case Roman letters, digits, and
+the underscore (\code{\_}) character.   Examples of legal variable
+identifiers are as follows.
+\begin{quote}
+\code{a}, 
+\ \code{a3}, 
+\ \code{a\_3},
+\ \code{Sigma}, 
+\ \code{my\_cpp\_style\_variable},
+\ \code{myCamelCaseVariable}
+\end{quote}
+%
+Unlike in \R and \BUGS, variable identifiers in \Stan may not contain
+a period character.
+
+\subsection{Legal Characters}
+
+The legal variable characters have the same \ASCII code points in the
+range 0--127 as in Unicode.
+%
+\begin{center}
+\begin{tabular}{cc}
+Characters  & \ASCII (Unicode) Code Points
+\\ \hline
+\code{a -- z} & \code{{}~97 -- 122}
+\\
+\code{A -- Z} & \code{{}~65 -- {}~90}
+\\
+\code{0 -- 9} & \code{{}~48 -- {}~57}\
+\\
+\code{\_} & \code{95}
+\end{tabular}
+\end{center}
+%
+Although not the most expressive character set, \ASCII is the most
+portable and least prone to corruption through improper character
+encodings or decodings.
+
+\section{Arithmetic and Matrix Expressions}
+
+For integer and real-valued expression, \Stan supports the basic
+binary arithmetic operations of addition (\code{+}), subtraction
+(\code{-}), multiplication (\code{*}) and division (\code{/}) in the
+usual ways.  \Stan also supports the unary operation of negation for
+integer and real-valued expressions.  For example, assuming \code{n}
+and \code{m} are integer variables and \code{x} and \code{y} real
+variables, the following expressions are legal.
+\begin{quote}
+\code{3.0 + 0.14}, 
+\ \ \code{-15},
+\ \ \code{2 * 3 + 1}, 
+\ \ \code{(x - y) / 2.0},
+\\
+\ \ \code{(n * (n + 1)) / 2},
+\ \ \code{x / n}
+\end{quote}
+%
+The negation, addition, subtraction, and multiplication operations are
+extended to matrices, vectors, and row vectors.  The transpose
+operation, written using an apostrophe (\code{'}) is also supported
+for vectors, row vectors, and matrices.  Return types for matrix
+operations are the smallest types that can be statically guaranteed to
+contain the result.  The full set of allowable input types and
+corresponding return types is detailed in
+\refchapter{matrix-operations}.
+
+For example, if \code{y} and \code{mu} are variables of type
+\code{vector} and \code{Sigma} is a variable of type \code{matrix},
+then
+%
+\begin{quote}
+\code{(y - mu) * Sigma * (y - mu)'}
+\end{quote}
+%
+is a well-formed expression of type \code{real}.  The type of the
+complete expression is inferred working outward from the
+subexpressions.  The subexpression(s) \code{y - mu} are of type
+\code{vector} because the variables \code{y} and \code{mu} are of type
+\code{vector}.  The transpose of this expression, the subexpression
+\code{(y - mu)'} is of type \code{row\_vector}.  Multiplication is
+left associative and transpose has higher precedence than
+multiplication, so the above expression is equivalent to the following
+well-formed, fully specified form.
+%
+\begin{quote}
+\code{((y - mu) * Sigma) * ((y - mu)')}
+\end{quote}
+%
+The type of subexpression \code{(y - mu) * Sigma} is inferred to be
+\code{vector}, being the result of multiplying a (column) vector by a
+matrix.  The whole expression's type is thus the type of a vector
+multiplied by a column vector, which produces a \code{real} value.
+
+
+
+\subsection{Operator Precedence and Associativity}
+
+The arithmetic operators have the following precedence and
+associativity.
+%
+\begin{center}
+\begin{tabular}{c|ccl|l}
+{\it Operator} & {\it Precedence} & {\it Associativity} & {\it
+  Placement} & {\it Description}
+\\ \hline \hline
+\code{+} & 0 & left & binary infix & addition
+\\
+\code{-} & 0 & left & binary infix & subtraction
+\\ \hline
+\code{*} & 1 & left & binary infix & multiplication
+\\
+\code{/} & 1 & left & binary infix & division
+\\ \hline
+\code{-} & 2 & n/a & unary prefix & negation
+\\ \hline
+\code{'} & 3 & n/a & unary posfix & transposition
+\end{tabular}
+\end{center}
+%
+Other expression-forming operations, such as function application and
+subscripting bind more tightly than any of the arithmetic.  
+
+The precedence and associativity determine how expressions are
+interpreted.  Because addition is left associative, the expression
+\code{a+b+c} is interpreted as \code{(a+b)+c}.  Similarly,
+\code{a/b*c} is interpreted as \code{(a/b)*c}.  
+
+Because multiplication has higher precedence than addition, the
+expression \code{a*b+c} is interpreted as \code{(a*b)+c} and the
+expression \code{a+b*c} is interpreted as \code{a+(b*c)}.  Similarly,
+\code{2*x+3*-y} is interpreted as \code{(2*x)+(3*(-y))}.
+
+Transposition binds tighter than all other operations, so that
+\code{u*v'} is interpeted as \code{u*(v')} and \code{u'*v} as
+\code{(u')*v}.
+
+\section{Subscripting}
+
+\Stan arrays, matrices, vectors, and row vectors are all accessed
+using the same array-like notation.  For instance, if \code{x} is a
+variable of type \code{real[]} (a one-dimensional array of reals)
+then \code{x[1]} is the value of the first element of the
+array.  
+
+Subscripting has higher precedence than any of the arithmetic
+operations.  For example, \code{alpha*x[1]} is equivalent to
+\code{alpha*(x[1])}.  
+
+Multiple subscripts may be provided within a single pair of square
+brackets.  If \code{x} is of type \code{real[,]}, a two-dimensional
+array, then \code{x[2,501]} is of type \code{real}.
+
+\subsection{Accessing Subarrays}
+
+The subscripting operator also returns subarrays of arrays.  For
+example, if \code{x} is of type \code{real[,,]}, then \code{x[2]}
+is of type \code{real[,]}, and \code{x[2,3]} is of type
+\code{real[]}.  As a result, the expressions \code{x[2,3]} and
+\code{x[2][3]} have the same meaning.  
+
+\subsection{Accessing Matrix Rows}
+
+If \code{Sigma} is a variable of type \code{matrix}, then
+\code{Sigma[1]} denotes the first row of \code{Sigma} and has the
+type \code{row\_vector}.  
+
+\subsection{Mixing Array and Vector/Matrix Indexes}
+
+\Stan supports mixed indexing of arrays and their vector, row vector
+or matrix values.  For example, if \code{m} is of type
+\code{matrix[,]}, a two-dimensional array of matrices, then
+\code{m[1]} refers to the first row of the array, which is a
+one-dimensional array of matrices.  More than one index may be used,
+so that \code{m[1,2]} is of type \code{matrix} and denotes the matrix
+in the first rwo and second column of the array.  Continuing to add
+indices, \code{m[1,2,3]} is of type \code{row\_vector} and denotes
+the third row of the matrix denoted by \code{m[1,2]}.  Finally,
+\code{m[1,2,3,4]} is of type \code{real} and denotes the value in the
+third row and fourth column of the matrix that is found at the first
+row and second column of the array \code{m}.
+
+\section{Function Application}
+
+
+\section{Parentheses for Grouping}
+
 
 
 \chapter{Statements}
@@ -2230,7 +2508,7 @@ elements in \farg{x} (divide by \code{length - 1})
 The log of the sum of the exponentials of the elements in \farg{x}
 \end{description}
 
-\chapter{Matrix Operations}
+\chapter{Matrix Operations}\label{matrix-operations.chapter}
 
 \section{Matrix Arithmetic Operators}
 
