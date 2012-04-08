@@ -53,6 +53,7 @@
 \newcommand{\mycaption}[2]{\caption{{\it #2}\label{#1.figure}}}
 
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
+\newcommand{\refpart}[1]{Part~\ref{#1.part}}
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
 \newcommand{\refsection}[1]{Section~\ref{#1.section}}
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
@@ -1907,16 +1908,538 @@ row and second column of the array \code{m}.
 
 \section{Function Application}
 
+\Stan provides a broad-range of built in mathematical and statistical
+functions, which are documented in \refpart{built-in-functions}.
+
+Expressions in \Stan may consist of the name of function followed by a
+sequence of zero or more argument expressions.  For instance,
+\code{log(2.0)} is the expression of type \code{real} denoting the
+result of applying the natural logarithm to the value of the real
+literal \code{2.0}.
+
+Syntactically, function application has higher precedence than any of
+the other operators, so that \code{y + log(x)} is interpreted as
+\code{y + (log(x))}.
+
+\subsection{Type Signatures and Result Type Inference}
+
+Each function has a type signature which determines the allowable type
+of its arguments and its return type.  For instance, the function
+signature for the logarithm function can be expressed as
+%
+\begin{quote}
+\code{real log(real);}
+\end{quote}
+%
+and the signature for the \code{multiply\_log} function is
+%
+\begin{quote}
+\code{real multiply\_log(real,real);}
+\end{quote}
+%
+A function is uniquely determined by its name and its sequence of
+argument types.  For instance, the following two functions are
+different functions.
+%
+\begin{quote}
+\code{real mean(real[]);}
+\\
+\code{real mean(vector);}
+\end{quote}
+%
+The first applies to a one-dimensional array of real values and the
+second to a vector.
+
+The identity conditions for functions explicitly forbids having two
+functions with the same name and argument types but different return
+types.  This restriction also makes it possible to infer the type of a
+function expression compositionally by only examining the type of its
+subexpressions. 
+
+\subsection{Constants}
+
+Constants in \Stan are nothing more than nullary (no-argument)
+functions.  For instance, the mathematical constants $\pi$ and $e$ are
+represented as nullary functions named \code{pi()} and \code{e()}.
+
+\subsection{Type Promotion and Function Resolution}
+
+Because of integer to real type promotion, rules must be established
+for which function is called given a sequence of argument types.  The
+scheme employed by \Stan is the same as that used by \Cpp, which
+resolves a function call to the function requiring the minimum number
+of type promotions.  
+
+For example, consider a situation in which the following two function
+signatures have been registered for \code{foo}.
+%
+\begin{quote}
+\code{real foo(real,real);}
+\\
+\code{int foo(int,int);}
+\end{quote}
+%
+The use of \code{foo} in the expression \code{foo(1.0,1.0)} resolves
+to \code{foo(real,real)}, and thus the expression \code{foo(1.0,1.0)}
+itself is assigned a type of \code{real}.  
+
+Because integers may be promoted to real values, the expression
+\code{foo(1,1)} could potentially match either \code{foo(real,real)}
+or \code{foo(int,int)}.  The former requires two type promotions and
+the latter requires none, so \code{foo(1,1)} is resolved to function
+\code{foo(int,int)} and is thus assigned the type \code{int}.
+
+The expression \code{foo(1,1.0)} has argument types \code{(int,real)}
+and thus does not explicitly match either function signature.  By
+promoting the integer expression \code{1} to type \code{real}, it is
+able to match \code{foo(real,real)}, and hence the type of the
+function expression \code{foo(1,1.0)} is \code{real}.
+
+In some cases (though not for any built-in \Stan functions), a
+situation may resolve in which the function referred to by an
+expression remains ambiguous.  For example, consider a situation in
+which there are exactly two functions named \code{bar} with the
+following signatures.
+%
+\begin{quote}
+\code{real bar(real,int);}
+\\
+\code{real bar(int,real);}
+\end{quote}
+%
+With these signatures, the expression \code{bar(1.0,1)} and
+\code{bar(1,1.0)} resolve to the first and second of the above
+functions, respectively.  The expression \code{bar(1.0,1.0)} is
+illegal because real values may not be demoted to integers.  
+
+The expression \code{bar(1,1)} is illegal for a different reason.
+Both of the function signatures above have consistent argument types.
+If the first argument is promoted to a real value, it matches the
+first signature, whereas if the second argument is promoted to a real
+value, it matches the second signature.  The problem is that these
+both require one promotion, so the function name \code{bar} is
+ambiguous.  In these situations where there is no function requiring
+fewer promotions than all others, the \Stan compiler will flag the
+epression \code{bar(1,1)} as illegal and list the potentially matching
+ambiguous functions.
+
+
+\subsection{Extending \Stan with User-Defined Functions}
+
+\Stan enables users to add their own functions by defining appropirate
+\Cpp functions and registering their signatures with the \Stan
+compiler.  Details are provided in \refappendix{user-defined-functions}.
+
 
 \section{Parentheses for Grouping}
+
+Any expression wrapped in parentheses is also an expression. Like in
+\Cpp, but unlike in \R, only the round parentheses, \code{(} and
+\code{)}, are allowed.  The square bracketes \code{[} and \code{]} are
+reserve for array indexing and the curly braces \code{\{} and
+\code{\}} for grouping statements.
+
+With parentheses it is possible to explicitly group subexpressions
+with operators.  Without parentheses, the expression \code{1 + 2 * 3}
+has a subexpression \code{2 * 3} and evaluates to 7.  With
+parentheses, this grouping may be made explicit with the expression
+\code{1 + (2 * 3)}.  More importantly, the alternative evaluate order
+becomes possible with \code{(1 + 2) * 3}, which evaluates to 6.
 
 
 
 \chapter{Statements}
 
+The blocks of a \Stan program (see \refchapter{blocks}) are made up of
+variable declarations and statements.  Unlike programs in \BUGS or
+\JAGS, the declarations and statments making up a \Stan program are
+executed in the order in which they are written.  Thus variables need
+to be defined before they are used, or there will be undefiend
+behavior.  Like \BUGS and \JAGS, \Stan has two kinds of atomic
+statements, assignment statements and probability statements.  Also
+like those other languages, statements may be grouped into sequences
+and into for loops.  In addition, \Stan allows local variables to be
+declared in blocks and also allows an empty statement consisting only
+of a semicolon.
+
+\section{Assignment Statement}
+
+An assignment statement consists of a variable (possibly multivariate
+with indexing information) and an expressions.  Executing an
+assignment statement evaluates the expression on the right-hand side
+and assigns it to the (indexed) variable on the left-hand side.  An
+example of a simple assignment is
+%
+\begin{quote}
+\code{n <- 0;}
+\end{quote}
+%
+Executing this statement assigns the value of the expression \code{0},
+which is the integer zero, the variable \code{n}.  For an assignment
+to be well-formed, the type of the expression on the right-hand side
+should be compatible with the type of the (indexed) variable on the
+left-hand side.  For the above example, because \code{0} is an
+expression of type \code{int}, the variable \code{n} must be declared
+as being of type \code{int} or of type \code{real}.  If the variable
+is of type \code{real}, the integer zero is promoted to a
+floating-point zero and assigned to the variable.  After the
+assignment statement executes, the variable \code{n} will have the
+value zero (either as an integer or a continuous value, depending on
+its type).
+
+Syntactically, every assignment statement must be followed by a
+semicolon.  Otherwise, whitespace between the tokens does not matter
+(the tokens here being the left-hand-side (indexed) variable, the
+assignment operator, the right-hand-side expression and the
+semicolon).
+
+Because the right-hand side is evaluated first, it is possible to
+increment a variable in \Stan just as in \Cpp and other programming
+languages by writing
+%
+\begin{quote}
+\code{n <- n + 1;}
+\end{quote}
+
+The left-hand side may contain indices for array, matrix, or vector
+data structures.  For instance, if \code{Sigma} is of type
+\code{matrix}, then 
+%
+\begin{quote}
+\code{Sigma[1,1] <- 1.0;}
+\end{quote}
+%
+sets the value of the first row and first column of \code{Sigma} to one.
+
+Assignments can involve complex objects of any type.  If \code{Sigma}
+and \code{Omega} are matrices and \code{sigma} is a vector, then the
+following assignment statement, in which the expression and variable
+are both of type \code{matrix}, is well formed.
+%
+\begin{quote}
+\begin{Verbatim}
+Sigma
+  <- diag_matrix(sigma) 
+     * Omega 
+     * diag_matrix(sigma);
+\end{Verbatim}
+\end{quote}
+%
+This example also illustrates the preferred form of splitting a
+complex assignment statement and its expression across lines.
+
+Assignments to slices of larger multi-variate data structures is
+supported by \Stan.  For example, \code{a} is an array of type
+\code{real[,]} and \code{b} is an array of type \code{real[]}, then
+the following two statements are both well-formed.
+%
+\begin{quote}
+\begin{Verbatim}
+a[3] <- b;
+b <- a[4];
+\end{Verbatim}
+\end{quote}
+%
+Similarly, if \code{x} is variable declared to have type
+\code{row\_vector} and \code{Y} is a variable declared as type
+\code{matrix}, then the following sequence of statements to swap the
+first two rows of \code{Y} is well formed.
+%
+\begin{quote}
+\begin{Verbatim}
+x <- Y[1];
+Y[1] <- Y[2];
+Y[2] <- x;
+\end{Verbatim}
+\end{quote}
+
+\section{Sampling Statements}
+
+Like \BUGS and \JAGS, \Stan supports probability statements in
+sampling notation, such as
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+The name ``sampling statement'' is meant to be suggestive, not
+interpreted literally.  Conceptually, the variable \code{y}, which may
+be an unobserved parameter or modeled observed data, is being declared
+to have the distribution indicated by the right-hand side of the
+sampling statement.
+
+Executing such a statement does not perform any sampling.  In \Stan, a
+sampling statement is merely a notational convenenience.  The above
+sampling statement could be written as an assignment statement using
+the reserved variable \code{lp\_\_} as
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + normal_log(y,mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+The variable \code{lp\_\_} acts as an accumulator for the log
+(proportional) probability defined by the model as a function of the
+parameters and data.
+
+In general, a sampling statement of the form
+%
+\begin{quote}
+\begin{Verbatim}
+ex0 ~ dist(ex1,...,exN);
+\end{Verbatim}
+\end{quote}
+%
+involving subexpressions \code{ex0} through \code{exN} (including the
+case where \code{N} is zero) will be well formed if and only if the
+corresponding assignment statement is well-formed,
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + dist_log(ex0,ex1,...,exN);
+\end{Verbatim}
+\end{quote}
+%
+This will be well formed if and only if
+\code{dist\_log(ex0,ex1,...,exN)} is a well-formed function expression
+of type \code{real}.
+
+\subsection{User-Transformed Variables}
+
+The left-hand side of a sampling statement may be a complex
+expression.  For instance, it is legal syntactically to write
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    double(0,) y;
+}
+model {
+    ....
+    log(y) ~ normal(mu,sigma);
+    ...
+}
+\end{Verbatim}
+\end{quote}
+%
+Unfortunately, this is not enough to properly model \code{y} as having
+a lognormal distribution.  The differential change in scale resulting
+for the transformation, in general given by the log absolute Jacobian
+determinant, must be accounted for (see
+\refsection{change-of-variables} for full definitions).  For the case
+above, the following adjustment will account for the above log
+transform.%
+%
+\footnote{Because $\log | d/dy \log y | = \log | 1/y | = - \log
+  |y|$;  see \refsection{change-of-variables}.}
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(fabs(y));
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Truncated Distributions}
+
+A density function $p(x)$ may be truncated to an interval $(a,b)$ to
+define a new density $p_{(a,b)}(x)$ by setting
+%
+\[ 
+p_{\!(a,b)\!}(x) = \frac{p(x)}
+                  {\int_a^b p(x') \, dx'}.
+\] 
+As in \BUGS and \JAGS, \Stan allows probability functions to be
+truncated.  For example, a truncated unit normal distribution
+restricted to $(-0.5,2.1)$ is encoded as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+y ~ normal(0,1) T(-0.5,2.1);
+\end{Verbatim}
+\end{quote}
+% 
+Truncated distributions are translated as an addition summation for
+the accumulated log probability.  For instance, this example has the
+same translation as
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(normal_p(2.1,0,1) - normal_p(-0.5,0,1));
+\end{Verbatim}
+\end{quote}
+%
+The function \code{normal\_p} represents the cumulative normal
+distribution function.  For example, \code{normal\_p(2.1,0,1)} evaluates to 
+\[
+\int_{-\infty}^{2.1} \mbox{\sf Norm}(x|0,1) \, dx,
+\]
+%
+which is the probability a unit normal variable takes on values less
+than 2.1, or about 0.95.
+
+As with constrained variable declarations, truncation can be one
+sided.  The density $p(x)$ can be truncated below by $a$ to define a
+density $p_{(a,)}(x)$ with support $(a,\infty)$ by setting
+%
+\[
+p_{(a,)}(x) = \frac{p(x)}
+                 {\int_a^{\infty} p(x') \, dx'}.
+\]
+For example, the unit normal distribution truncated below at 0.5 would
+be represented as
+%
+\begin{quote}
+\begin{Verbatim} 
+y ~ normal(0,1) T(-0.5,);
+\end{Verbatim}
+\end{quote}
+% 
+The truncation has the same effect as the following direct update to
+the accumulated log probability.
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(1 - normal_p(-0.5,0,1));
+\end{Verbatim}
+\end{quote}
+
+The density $p(x)$ can be truncated above by $b$ to define a density
+$p_{(,b)}(x)$ with support $(-\infty,a)$ by setting
+\[
+p_{(,b)}(x) = \frac{p(x)}
+                    {\int_{-\infty}^b p(x') \, dx'}.
+\]
+For example, the unit normal distribution truncated above at 2.1 would
+be represented as
+%
+\begin{quote}
+\begin{Verbatim} 
+y ~ normal(0,1) T(,2.1);
+\end{Verbatim}
+\end{quote}
+% 
+The truncation has the same effect as the following direct update to
+the accumulated log probability.
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(normal_p(2.1,0,1));
+\end{Verbatim}
+\end{quote}
+
+In all cases, the truncation is only well formed if there is an
+appropriate cumulative distribution function defined.
+\refchapter{discrete-prob-functions} and
+\refchapter{continuous-prob-functions} document the available discrete
+and continuous cumulative distribution functions.
+
+For continuous distributions, truncation points must be expressions of
+type \code{int} or \code{real}.  For discrete distributions, truncation
+points must be expressions of type \code{int}.
 
 
-\chapter{Blocks}
+\subsection{Scope of\, \code{lp\_\_}}
+
+The variable \code{lp\_\_} is only defined in the \code{parameter},
+\code{transformed parameter}, and \code{model} blocks (see
+\refchapter{blocks}).  The variable \code{lp\_\_} is undefined (and
+may not be declared by the user) in the \code{data}, \code{transformed
+  data} and \code{generated quantity} blocks.
+
+\subsection{User-Defined Distributions}
+
+Users may add their own probability functions and cumulative
+distribution by adding functions of the appropriate type.  If the
+appropriate cumulative distribution is available to match a
+probability function, truncated versions of that probabilty function
+may be used. 
+
+See \refappendix{user-defined-functions} for details on how to add
+user-defined functions to \Stan.
+
+
+\section{For Loops}
+
+Like \BUGS, \JAGS and \R, \Stan supports bounded for loops.  Suppose
+\code{N} is a variable of type \code{int}, \code{y} is a
+one-dimensional array of type \code{real[]}, and \code{mu} and
+\code{sigma} are variables of type \code{real}.  Furthermore, suppose
+that \code{n} has not been defined as a variable. Then the following
+is a well-formed for-loop statement.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+   y[n] ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The loop variable is \code{n}, the loop bounds are the values in the
+range \code{1:N}, and the body is the statement following the
+loop bounds.  
+
+\subsection{Loop Variable Typing and Scope}
+
+The bounds in a for loop must be integers.  Unlike in \R, the loop is
+always interpreted as an upward counting loop.  The range \code{L:H}
+will cause the loop to execute the loop with the loop variable taking
+on all integer values greater than or equal to \code{L} and less than
+or equal to \code{H}.  For example, the loop \code{for (n in 2:5)}
+will cause the body of the for loop to be executed with \code{n} equal
+to 2, 3, 4, and 5, in order.  The variable and bound \code{for (n in
+  5:2)} will not execute anything because there are no integers
+greater than or equal to 5 and less than or equal to 2.
+
+\subsection{Brackets in For Loops}
+
+The body of a for loop can be any statement.  Stan thus allows the
+brackets in a single-statement for loop to be dropped. Whitespace is
+optional, as usual, so that the following example is the same as the
+one above.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) 
+ y[n] ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+For loops bind more tightly than statement sequencing, so that the
+misleadingly indented program fragment
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) 
+  y[n] ~ normal(mu,sigma);
+  z[n] ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+behaves the same way as the properly indented and bracketed version
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  y[n] ~ normal(mu,sigma);
+}
+z[n] ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+Neither of these programs will compile because the variable \code{n}
+indexing \code{z} in \code{z[n]} is defined in the for loop and hence
+out of scope outside the for loop.
+
+
+
+
+
+\chapter{Blocks}\label{blocks.chapter}
 
 A \Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations followed by
@@ -1952,7 +2475,7 @@ All of the blocks other than the \code{model} block are optional.  Any
 blocks that appear must be in the order above.
 
 
-\part{Built-In Functions} 
+\part{Built-In Functions}\label{built-in-functions.part}
 
 \chapter{Built-in Functions}
 
@@ -2700,9 +3223,9 @@ of the matrix as a vector}
 
 
 
-\chapter{Discrete Probabilities}
+\chapter{Discrete Probabilities}\label{discrete-prob-functions.chapter}
 
-\chapter{Continuous Probabilities}
+\chapter{Continuous Probabilities}\label{continuous-prob-functions.chapter}
 
 
 \part{Advanced Topics}
@@ -2729,7 +3252,7 @@ The details of section need not be understood in order to use
 of \Stan fully requires understanding these transforms.
 
 
-\section{Changes of Variables}
+\section{Changes of Variables}\label{change-of-variables.section}
 
 The support of a random variable $X$ with density $p_X(x)$ is that
 subset of values for which it has non-zero density,
@@ -3232,7 +3755,7 @@ z_k
 
 A correlation matirx is a symmetric, positive-definite matrix with a
 unit diagonal.  To deal with this rather complicated constraint, \Stan
-implements the transform of \cite{LewandowskiKurowickaJoe:2009},
+implements the transform of (Lewandowski, Kurowicka, and Joe 2009),
 henceforth the \LKJ-transform.  The number of free parameters required
 to specify a $K \times K$ correlation matrix is $K \choose 2$.
 
@@ -3677,14 +4200,40 @@ expression ::= literal
              | prefixOp expression
              | expression postfixOp
              | expression '[' expressions ']'
-             | function '(' expressions ')'
+             | function '(' ?expressions ')'
              | '(' expression ')'
+
+expressions ::= 
+              | expression
+              | expression ',' expressions
+\end{Verbatim}
+\end{quote}
+
+\section{Statements}
+
+\Stan's grammar for statements is
+%
+\begin{quote}
+\begin{Verbatim}
+statement 
+::= 
+ | lhs '<-' expression ';'
+  | expression '~' identifier '(' ?expressions ')' ?truncation ';'
+  | 'for' '(' identifier 'in' expression ':' expression ')' statement
+  | '{' var_decl* statement+ '}'
+  | ';'
+
+truncation ::= 'T' '(' ?expression ',' ?expression ')' 
+
+lhs ::= identifier
+      | identifier '[' expressions ']'
+
 \end{Verbatim}
 \end{quote}
 
 
 
-
+\chapter{User-Defined Functions and Gradients}\label{user-defined-functions.appendix}
 
 
 
