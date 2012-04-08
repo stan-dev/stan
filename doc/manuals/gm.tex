@@ -1845,7 +1845,7 @@ associativity.
 \end{center}
 %
 Other expression-forming operations, such as function application and
-subscripting bind more tightly than any of the arithmetic.  
+subscripting bind more tightly than any of the arithmetic operations.  
 
 The precedence and associativity determine how expressions are
 interpreted.  Because addition is left associative, the expression
@@ -2364,7 +2364,7 @@ user-defined functions to \Stan.
 
 \section{For Loops}
 
-Like \BUGS, \JAGS and \R, \Stan supports bounded for loops.  Suppose
+Suppose
 \code{N} is a variable of type \code{int}, \code{y} is a
 one-dimensional array of type \code{real[]}, and \code{mu} and
 \code{sigma} are variables of type \code{real}.  Furthermore, suppose
@@ -2395,51 +2395,225 @@ to 2, 3, 4, and 5, in order.  The variable and bound \code{for (n in
   5:2)} will not execute anything because there are no integers
 greater than or equal to 5 and less than or equal to 2.
 
-\subsection{Brackets in For Loops}
+\subsection{Order Sensitivity and Repeated Variables}
 
-The body of a for loop can be any statement.  Stan thus allows the
-brackets in a single-statement for loop to be dropped. Whitespace is
-optional, as usual, so that the following example is the same as the
-one above.
+In \BUGS and \JAGS, for loops are declarative.  They define plates in
+directed graphical model notation, which can be thought of as repeated
+substructures in a large graphical model.  Therefore, it is illegal in
+\BUGS or \JAGS to have a for loop that repeatedly reassigns a value to
+a value like \code{theta}.  So while the following code snippet would
+is legal in \Stan, it is prohibited in \BUGS or \JAGS (unless \code{N}
+is equal to 1).
+%
+\begin{quote}
+\begin{Verbatim} 
+for (n in 1:N) {
+   theta <- inv_logit(alpha + x[n] * beta);
+   y[n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+% 
+The problem is that it defines the variable \code{theta} a total of
+\code{N} different times.  One idiom seen in \BUGS and \JAGS code is
+to hack a local variable by replacing \code{theta} in the above with
+\code{theta[n]}, effectively creating \code{N} different variables,
+\code{theta[1]}, \ldots, \code{theta[N]}.  Of course, this is not a
+hack if the value of \code{theta[n]} is required for all \code{n}.
+\Stan supports either version, the one that reuses \code{theta}, or
+the one that uses a different \code{theta[n]} for every loop variable
+instantiation.  
+
+In \Stan, the loop can be written either way.  A different variable
+\code{theta[n]} can be used for each body execution, or a single
+variable \code{theta} may be reused. Either way, the assignment
+statement is guaranteed to be executed in the order it is encountered.
+As a consequence, the following \Stan program has a very different
+interpretation than the previous one.
 %
 \begin{quote}
 \begin{Verbatim}
+for (n in 1:N) {
+   y[n] ~ bernoulli(theta);
+   theta <- inv_logit(alpha + x[n] * beta);
+}
+\end{Verbatim}
+\end{quote}
+%
+In this program, \code{theta} is assigned after it is used in the
+probablity statement.  This presupposes it was defined before the
+first loop iteration, and then each loop uses the assignment from the
+previous iteration.  In \BUGS and \JAGS, the order does not matter.
+The execution order is determined by unfolding the loops into one big
+graphical model.
+
+This is not necessary in \Stan, where the above for loop will behave
+imperatively, with a new value being assigned to \code{theta} in each
+pass through the loop before the probability statement is executed.
+
+\Stan loops may be used to accumulate values.  Thus it is possible to
+sum the values of an array using code such as the following.
+%
+\begin{quote}
+\begin{Verbatim}
+sum <- 0.0;
+for (n in 1:N) 
+   sum <- sum + x[n];
+\end{Verbatim}
+\end{quote}
+%
+After the for loop is executed, the variable \code{sum} will hold the
+sum of the elements in the array \code{x}.
+
+A variable inside (or outside) a loop may even be reassigned multiple
+times, as in the following legal code.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:100) {
+    y <- y + y * epsilon;
+    epsilon <- epsilon / 2.0;
+    y <- y + y * epsilon;
+}
+\end{Verbatim}
+\end{quote}
+%
+
+
+\section{Statement Blocks and Local Variable Declarations}
+
+Just as parentheses may be used to group expressions, curly brackets
+may be used to group a sequence of zero or more statements into a
+statement block.  At the beginning of each block, local variables may be
+declared that are scoped over the rest of the statements in the block.
+
+\subsection{Blocks in For Loops}
+
+Blocks are often used to group a sequence of statements together to be
+used in the body of a for loop.  Because the body of a for loop can be
+any statement, for loops with bodies consisting of a single statement
+can be written as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
 for (n in 1:N) 
  y[n] ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
+% 
+To put multiple statements inside the body of a for loop, a block is
+used, as in the following example.
 %
-For loops bind more tightly than statement sequencing, so that the
-misleadingly indented program fragment
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  lambda[n] ~ gamma(alpha,beta);
+  y[n] ~ poisson(lambda[n]);
+}
+\end{Verbatim}
+\end{quote}
+%
+The open curly bracket (\code{\{}) is the first character of the block
+and the close curly bracket (\code{\}}) is the last character.
+
+Because whitespace is ignored in \Stan, the following program will
+not compile.
 %
 \begin{quote}
 \begin{Verbatim}
 for (n in 1:N) 
   y[n] ~ normal(mu,sigma);
-  z[n] ~ normal(mu,sigma);
+  z[n] ~ normal(mu,sigma); // ERROR!
 \end{Verbatim}
 \end{quote}
 %
-behaves the same way as the properly indented and bracketed version
+The problem is that the body of the for loop is taken to be the next
+statement, and that is \code{y[n] ~ normal(mu,sigma)}.  This leaves
+the probabilty statement for \code{z[n]} hanging, as is clear from
+the following equivalent program.
 %
 \begin{quote}
 \begin{Verbatim}
 for (n in 1:N) {
   y[n] ~ normal(mu,sigma);
 }
-z[n] ~ normal(mu,sigma);
+z[n] ~ normal(mu,sigma); // ERROR!
 \end{Verbatim}
 \end{quote}
 %
-Neither of these programs will compile because the variable \code{n}
-indexing \code{z} in \code{z[n]} is defined in the for loop and hence
-out of scope outside the for loop.
+Neither of these programs will compile. If the loop variable \code{n}
+was defined before the for loop, the for-loop declaration will raise
+an error.  If the loop variable \code{n} was not defined before the
+for loop, then the use of the expression \code{z[n]} will raise an
+error. 
+
+\subsection{Local Variable Declarations}
+
+A for loop has a statement as a body.  If a block is used 
+It is often convenenient in writing programs to be able to define a
+local variable that will be used temporarily and then forgotten.  
+For instance, the for loop example of repeated assignment should
+use a local variable for maximum clarity and efficiency, as in the
+following example.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  real theta;
+  theta <- inv_logit(alpha + x[n] * beta);
+  y[n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+The local variable \code{theta} is declared here inside the for loop.
+The scope of a local variable is just the block in which it is
+defined.  Thus \code{theta} is available for use inside the for loop,
+but not outside of it.  As in other situations, \Stan does not allow
+variable hiding.  So it is illegal to declare a local variable
+\code{theta} if the variable theta is already defined in the scope of
+the for loop.  For instance, the following is not legal.
+%
+\begin{quote}
+\begin{Verbatim}
+for (m in 1:M) {
+    real theta;
+    for (n in 1:N) {
+      real theta; // ERROR!
+      theta <- inv_logit(alpha + x[m,n] * beta);
+      y[m,n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+The compiler will flag the second declaration of \code{theta} with a
+message that it is already defined.
+
+\subsection{Blocks within Blocks}
+
+A block is itself a statement, so anywhere a sequence of statements is
+allowed, one or more of the statements may be a block.  For instance,
+in a for loop, it is legal to have.
+%
+\begin{quote}
+\begin{Verbatim}
+for (m in 1:M) {
+   { int n;  n <- 2 * m; sum <- sum + n }
+   for (n in 1:N) sum <- sum + x[m,n];
+}
+\end{Verbatim}
+\end{quote}
+%
+In this pointless example, the variable declaration \code{int n;} is
+the first element of an embedded block.  This instance of the variable
+\code{n} only has scope within the local block, so it is legal to have
+an embedded for loop (also a statement) with loop variable \code{n};
+as far as \Stan is concerned, these are completely different
+variables.
 
 
 
-
-
-\chapter{Blocks}\label{blocks.chapter}
+\chapter{Program Blocks}\label{blocks.chapter}
 
 A \Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations followed by
@@ -2473,6 +2647,8 @@ derived quantities {
 %
 All of the blocks other than the \code{model} block are optional.  Any
 blocks that appear must be in the order above.
+
+
 
 
 \part{Built-In Functions}\label{built-in-functions.part}
