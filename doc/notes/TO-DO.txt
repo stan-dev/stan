@@ -35,7 +35,7 @@ TO DO FOR V1
 
 * speed tests relative to BUGS/JAGS
 
-
+* disallow varialbe declarations ending with "__"
  
 CLEANUP (ONGOING)
 =================================================
