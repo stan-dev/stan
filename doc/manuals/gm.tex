@@ -2648,8 +2648,67 @@ derived quantities {
 All of the blocks other than the \code{model} block are optional.  Any
 blocks that appear must be in the order above.
 
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|c|l}
+{\it Block} & {\it Stmt} & {\it Action / Period} 
+\\\hline\hline
+\code{data} & no & read / chain  
+\\
+\code{transformed data} & yes & evaluate / chain  
+\\ \hline
+\code{parameters} & no & inverse transform, Jacobian / leapfrog step  \\
+& & inverse transform, write / sample 
+\\[3pt]
+\code{transformed parameters} & yes & evaluate / leapfrog step \\
+& & write / sample 
+\\\hline
+\code{model} & yes & evaluate / leapfrog step 
+\\\hline
+\code{generated quantities} & yes & eval / sample \\
+& & write / sample
+\\\hline\hline
+\code{\slshape (initialization)} & n/a & read, transform / chain
+\end{tabular}
+\end{center}
+\caption{\it The read, write, transform, and evaluate actions and
+  periodicities listed in the last column correspond to the \Stan
+  program blocks in the first column.  The middle column indicates
+  whether the block allows statements.  The last row indicates that 
+  parameter initialization requires a read and transform operation.}
+\label{block-actions.fig}
+\end{figure}
 
-
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it Variable Kind} & {\it Declaration Block}
+\\ \hline\hline
+constants & \code{transformed data}
+\\ \hline
+modeled data & \code{data}, \code{transformed data}
+\\
+unmodeled data & \code{data}, \code{transformed data}
+\\ \hline
+missing data & \code{parameters}, \code{transformed parameters}
+\\
+modeled parameters & \code{parameters}, \code{transformed parameters}
+\\
+unmodeled parameters & \code{data}, \code{transformed data}
+\\[2pt] \hline
+derived quantities & \code{transformed data}, \code{transformed parameters}, 
+\\ 
+& \code{derived quantities}
+\\ \hline\hline
+loop indices & loop statement
+\\ 
+\end{tabular}
+\end{center}
+\caption{\it Variables of the kind indicated in the left column must
+  be declared in one of the blocks declared in the right
+  column (see Gelman and Hill 2006,
+  p.~366).}\label{data-kinds.figure}
+\end{figure}
 
 \part{Built-In Functions}\label{built-in-functions.part}
 

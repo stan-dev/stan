@@ -33,12 +33,15 @@ TO DO FOR V1
      + remove useless warnings
        * unused functions, specifically
 
-* speed tests relative to BUGS
+* speed tests relative to BUGS/JAGS
 
 
  
 CLEANUP (ONGOING)
 =================================================
+
+* make sure -a[x] parses as (-(a[x])) (old note to self)
+  -- add example to doc, because (-a) is legal if a vector
 
 * math/error_handling
   - generalize vector checks.
@@ -83,6 +86,9 @@ Convergence Diagnostics, CODA-like object
 Stan-R
 =================================================
 
+* break out into own project with its own license
+  - leave top of Stan BSD and flag this one w/o new project?
+
 * Example call:
    fit <- rstan(model_file,inits, ....);
 
@@ -111,6 +117,21 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* figure out way to have vari elements that are NOT on the stack
+  - useful for numeric_limits<var>
+  - stack_vari ==> vari ==> chainable
+    local_vari ==^
+    (stack_vari has operator new; local_vari uses dtor)
+
+* convert memory for vari to singleton & allow thread locality
+  for thread safety
+
+* unit K-hyperball complement for stationary AR(K) parameters
+  - what should the prior be?
+
+* generate templated log_prob function so that you don't
+  need to evaluate auto-dif when just evaluating function
+
 * user model library
   - something we don't have to get too involved vetting
   - ideally things hard to do with other systems
@@ -121,6 +142,10 @@ EXTENSIONS
     right residual:  b/A  = b * inv(A)
     matrix power:    A^n
     matrix elementwise power:  A.^x
+
+* more functions
+  - z_score()
+  - 
   
 * precompiled headers for model compilation speed
 
@@ -132,6 +157,11 @@ EXTENSIONS
 
 * error/exception policy throughout
   - math
+
+* add printf statement for debugging purposes
+  - really format or just list params?
+
+* control significant digits in output through command line
 
 * stop NUTS from running away without coming back
  -- limit number of steps
@@ -189,25 +219,23 @@ EXTENSIONS
 * Ben's implicit function idea -- iterative solver,
   analytic derivative
 
-* smallest posterior interval (SPIn) as default 
+* smallest posterior interval (SPIn) as default, also central intervals
 
-* reparameterize simplex transform using hyperspherical coordinates
-  - use Weirstrass trick to avoid numerical trig
-  - use log_sum_exp to prevent underflow in products
-  - use inverse logit to map back to full (-inf,inf)
-  - OR, use my own hack using logit with diagonal 
-       theta[1] = inv_logit(x[1]);
-       theta[2] = (1 - theta[1]) * inv_logit(x[2])
-       theta[3] = (1 - theta[1] - theta[2]) * inv_logit(x[3])
-       theta[N] = (1 - theta[1] - theta[2] - ... - theta[N-1])
-  - or better yet, adjust so that x[n] = 0 leads to uniform
-    just need to look at arity and shift first down by constants
-       theta[1] = inv_logit(logit(1/N) + x[1])
-       theta[2] = (1 - theta[1]) * inv_logit(logit(1/(N-1)) + x[2])
-    could easily store table of first 100 of these, say
-  - not sure what expected value is in last -- is it 1/N per entry
-    or does asymmetry of inv_logit cause problems?
+* triangular matrix type
+  - how to implement in Eigen?
+    + triangular view?
 
+* symmetric matrix type 
+  - how to implement in Eigen?  
+  - what ops to allow? 
+    + sets are symmetric
+    + but this'll get products wrong as
+      everything but diagonal will get set twice
+ 
+* Cholesky factor type
+
+* dot_self(x) == x' * x operation
+  wrap_multiply(u,v) = u' * v * u
 
 * special positive-definiteness-preserving operations
   - basic data type (or trait)
@@ -313,6 +341,15 @@ EXTENSIONS
 
 * declare and assign
   - e.g., double x = 5.0;
+    double b[5];
+    double a[5] = b; // odd, eh?
+   
+* full type prefix notation   
+  - e.g.,  double[5] b;
+           double[5] a;
+           double[5] c <- a;
+  - ugly with simplex, etc.
+           simplex(5)[2] c <- ...
 
 * extensions
   - declare file paths to #include
@@ -340,12 +377,17 @@ EXTENSIONS
 * compound op-assigns in StanGM
   - +=, *=, etc.
 
-* blocking updates
-  - only update subset of parameters
-  - use more than one instance per sampler
-  - specify blocks in program?
-
 * complete math robustness and limits review
+  - want domain boundaries to be right (usually
+    -inf, 0 and inf, etc.)
+
+* more diagnostics during warmup of where epsilon is going
+
+* refactor finite diff derivative calcs to functor
+ template <class F, typename S>
+ bool finite_diffs(const vector<S>& x,
+                   const F& f,
+                   vector<S>& df_dx);
 
 * restart from where command left off a la R2jags
 
@@ -355,6 +397,7 @@ EXTENSIONS
   - only saves if very small number of leapfrog steps
 
 * precompiled headers to speed up model compiles
+  - doesn't seem to help much
 
 * speed measurement
   - to converge
@@ -363,9 +406,7 @@ EXTENSIONS
     parameters theta[k] and theta[k]*theta[k]
   - discarding first half of samples too many if fast to converge
 
-* automatic Jacobians
-  - just specify transform
-  - requires 2nd-order diff
+* 
 
 * check each parameter shows up on LHS of ~
   - true check is run-time based on data, etc.
@@ -389,6 +430,16 @@ EXTENSIONS
   - less space for constants, equal for unary, more for binary+
   - no virtual ops
 
+* Stan safe mode to compile BUGS/JAGS-compliant models
+
+* Speed test pass-by-const-ref and pass-by-val for stan::agrad::var
+
+* could multi-thread agrad by copying all code; use var<1>, var<2>,
+  etc., with var typedefed to var<1>.  Each would then have its
+  own memory pool to read from.  How to specify by client?  Could
+  generate templated code
+  
+
 Longer-Term Ideas
 =================================================
 
@@ -408,7 +459,16 @@ Longer-Term Ideas
   - code bloat multiples code size by # of threads
     + may in turn slow down everything due to mem traffic
 
+* some notion of momentum for discrete variables a la HMC
+  for continuous variables (at least accelerate metropolis-hastings)
+  some densities generalize 
 
+* blocking updates
+  - only update subset of parameters
+  - specify blocks in program?
+  - allow Gibbs on some variables
+  - split HMC into blocks (aka batches)
+  - in the limit do conditional with HMC!
 
 Stan GM MANUAL
 =================================================
@@ -431,6 +491,11 @@ Stan GM MANUAL
     a.  auto-dif
 A.  Examples 
     References
+
+++ doc how to do WAIC for RATS
+   generated quantities {
+   for (i in 1:I) for (j in 1:J) ll_y[i,j] <- normal_log(y[i,j]...)
+
 
 MODELS
 =================================================
