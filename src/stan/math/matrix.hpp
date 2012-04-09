@@ -588,45 +588,22 @@ namespace stan {
     inline double determinant(const matrix_d& m) {
       return m.determinant();
     }
-
     /**
-     * Returns the dot product of the specified column vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Dot product of the vectors.
-     */
-    inline double dot_product(vector_d v1, vector_d v2) {
-      return v1.dot(v2);
-    }
-    /**
-     * Returns the dot product of the specified column vector
-     * and row vector.
-     * @param v First vector.
-     * @param rv Second vector.
-     * @return Dot product of the vectors.
-     */
-    inline double dot_product(const vector_d& v, const row_vector_d& rv) {
-      return v.dot(rv);
-    }
-    /**
-     * Returns the dot product of the specified row vector
-     * and column vector.
-     * @param rv First vector.
-     * @param v Second vector.
-     * @return Dot product of the vectors.
-     */
-    inline double dot_product(const row_vector_d& rv, const vector_d& v) {
-      return rv.dot(v);
-    }
-    /**
-     * Returns the dot product of the specified row vectors.
+     * Returns the dot product of the specified vectors.
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return Dot product of the vectors.
      */
-    inline double dot_product(const row_vector_d& rv1, 
-                              const row_vector_d& rv2) {
-      return rv1.dot(rv2);
+    template<int R1,int C1,int R2, int C2>
+    inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+                              const Eigen::Matrix<double, R2, C2>& v2) {
+      if (v1.rows() != 1 && v1.cols() != 1)
+        throw std::invalid_argument("v1 must be a vector");
+      if (v2.rows() != 1 && v2.cols() != 1)
+        throw std::invalid_argument("v2 must be a vector");
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      return v1.dot(v2);
     }
     /**
      * Returns the dot product of the specified arrays of doubles.
@@ -1305,60 +1282,6 @@ namespace stan {
       return c * m;
     }
     /**
-     * Return the scalar product of the specified row vector and
-     * specified column vector.  The return is the same as the dot
-     * product.  The two vectors must be the same size.
-     * @param rv Row vector.
-     * @param v Column vector.
-     * @return Scalar result of multiplying row vector by column vector.
-     * @throw std::invalid_argument if rv and v are not the same size.
-     */
-    inline double multiply(const row_vector_d& rv, const vector_d& v) {
-      if (rv.size() != v.size()) 
-        throw std::invalid_argument ("rv.size() != v.size()");
-      return rv.dot(v);
-    }
-    /**
-     * Return the product of the specified column vector
-     * and specified row vector.  The two vectors may be of any size.
-     * @param v Column vector.
-     * @param rv Row vector.
-     * @return Product of column vector and row vector.
-     */
-    inline matrix_d multiply(const vector_d& v, const row_vector_d& rv) {
-      return v * rv;
-    }
-    /**
-     * Return the product of the specified matrix and
-     * column vector.  The number of cols of the matrix must be
-     * the same as the size of the vector.
-     * @param m Matrix.
-     * @param v Column vector.
-     * @return Product of matrix and vector.
-     * @throw std::invalid_argument if number of columns of the matrix
-     *    is not the same size as the vector.
-     */
-    inline vector_d multiply(const matrix_d& m, const vector_d& v) {
-      if (m.cols() != v.size())
-        throw std::invalid_argument ("m.cols() != v.size()");
-      return m * v;
-    }
-    /**
-     * Return the product of the specifieid row vector and specified
-     * matrix.  The number of rows of the matrix must be the same
-     * as the size of the vector.
-     * @param rv Row vector.
-     * @param m Matrix.
-     * @return Product of vector and matrix.
-     * @throw std::invalid_argument if size of the row vector is not the
-     *    number of rows of the matrix.
-     */
-    inline row_vector_d multiply(const row_vector_d& rv, const matrix_d& m) {
-      if (rv.size() != m.rows())
-        throw std::invalid_argument ("rv.size() != m.rows()");
-      return rv * m;
-    }
-    /**
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
      * in the second matrix.
@@ -1368,12 +1291,30 @@ namespace stan {
      * @throw std::invalid_argument if the number of columns of m1 does not match
      *   the number of rows of m2.
      */
-    inline matrix_d multiply(const matrix_d& m1, const matrix_d& m2) {
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<double,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
+                                                const Eigen::Matrix<double,R2,C2>& m2) {
+      
       if (m1.cols() != m2.rows())
-        throw std::invalid_argument ("m1.cols() != m2.rows()");
-      return m1 * m2;
+        throw std::invalid_argument("m1.cols() != m2.rows()");
+      return m1*m2;
     }
-
+    /**
+     * Return the scalar product of the specified row vector and
+     * specified column vector.  The return is the same as the dot
+     * product.  The two vectors must be the same size.
+     * @param rv Row vector.
+     * @param v Column vector.
+     * @return Scalar result of multiplying row vector by column vector.
+     * @throw std::invalid_argument if rv and v are not the same size.
+     */
+    template<int C1,int R2>
+    inline double multiply(const Eigen::Matrix<double,1,C1>& rv,
+                           const Eigen::Matrix<double,R2,1>& v) {
+      if (rv.size() != v.size()) 
+        throw std::invalid_argument ("rv.size() != v.size()");
+      return rv.dot(v);
+    }
     /**
      * Return the product of the specified scalar and vector.
      * @param c Scalar.
@@ -1489,6 +1430,31 @@ namespace stan {
     inline matrix_d inverse(const matrix_d& m) {
       return m.inverse();
     }
+
+    /**
+     * Returns the solution of the system Ax=b when A is triangular
+     * @param A Triangular matrix.  Specify upper or lower with TriView
+     * being Eigen::Upper or Eigen::Lower.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     */
+    template<int TriView,int R, int C>
+    inline Eigen::Matrix<double,R,C> trisolve(const Eigen::Matrix<double,R,R> &A,
+                                              const Eigen::Matrix<double,R,C> &b) {
+      return A.template triangularView<TriView>().solve(b);
+    }
+    /**
+     * Returns the solution of the system Ax=b.
+     * @param A Matrix.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     */
+    template<int R, int C>
+    inline Eigen::Matrix<double,R,C> solve(const Eigen::Matrix<double,R,R> &A,
+                                           const Eigen::Matrix<double,R,C> &b) {
+      return A.solve(b);
+    }
+
 
     /**
      * Return the real component of the eigenvalues of the specified
