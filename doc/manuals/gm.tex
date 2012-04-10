@@ -2957,8 +2957,81 @@ variable violates its constraints, \Stan will stop with a warning.
 
 \section{Program Block: \code{parameters}}
 
+The variables declared in the \code{parameters} program block
+correspond directly to the variables being sampled by \Stan's samplers
+(\HMC and \NUTS).  From a user's perspective, the parameters in the
+program block \emph{are} the parameters being sampled by \Stan.  
 
+Variables declared as parameters cannot be directly assigned values.
+So there is no block of statements in the \code{parameters} program
+block.  Variable quantities derived from parameters may be declared in
+the \code{transformed parameters} or \code{derived quantities} blocks,
+or may be defined as local variables in any statement blocks following
+their declaration.
 
+There is a substantial amount of computation involved for parameter
+variables in a \Stan program at each leapfrog step within the
+\HMC or \NUTS samplers, and a bit more computation along with writes
+involved for saving the parameter values corresponding to a sample.
+
+\subsection{Constraining Inverse Transform}
+
+Stan's two samplers, basic Hamiltonian Monte Carlo (\HMC) and the
+adaptive no-U-turn sampler (\NUTS), are most easily (and often most
+effectively) implemented over a multivariate probabilty density that
+has support on all of $\mathbb{R}^n$.  To do this, the parameters
+defined in the \code{parameters} block must be transformed so they are
+unconstrained. 
+
+In practice, the samplers keep an unconstrained parameter vector in
+memory representing the current state of the sampler.  The model
+defined by the compiled \Stan program defines an (unnormalized) log
+probability function over the unconstrained parameters.  In order to
+do this, the log probability function must apply the inverse transform
+to the unconstrained parameters to calculate the constrained
+parameters defined in \Stan's \code{parameters} program block.  The
+log absolute Jacobian determinant of the inverse transform is then
+added to the accumulated log probability function.  This then allows
+the \Stan model to be defined in terms of the constrained parameters.
+
+In some cases, the number of parameters is reduced in the
+unconstrained space.  For instance, a $K$-simplex only requires $K-1$
+unconstrained parameters, and a $K$-correlation matrix only requires
+${K \choose 2}$ unconstrained parameters.  This means that the
+probability function defined by the compiled \Stan program may have
+fewer parameters than it would appear from looking at the declarations
+in the \code{parameters} program block. 
+
+The probabilty function on the unconstrained parameters is defined in
+such a way that the order of the parameters in the vector corresponds
+to the order of the variables defined in the \code{parameters} program
+block.  The details of the specific transformations are provided in
+\refchapter{variable-transforms}.
+
+\subsection{Gradient Calculation}
+
+Hamiltonian Monte Carlo requires the gradient of the (unnormalized)
+log probability function with respect to the unconstrained parameters
+to be evlauated at every leapfrog step.  In general, there may be a
+handful or even hundreds of leapfrog steps per sample, with more
+leapfrog steps required for models with more complex posterior distributions.
+
+Gradients are calculated behind the scenes using \Stan's algorithmic
+differentiation library.  The time to compute the gradient does not
+depend directly on the number of parameters, only on the number of
+subexpressions in the calculation of the log probability.  This
+includes the expressions added from the transforms' Jacobians.  
+
+The amount of work done by the sampler does depend on the number of
+unconstrained parameters, but this is usually dwarfed by the gradient
+calculations.
+
+\subsection{Writing Samples}
+
+In the basic \Stan compiled program, the values of variables are
+written to a file for each sample.  The constrained versions of the
+variables are written, again in the order they are defined in the
+\code{parameters} block.  In order to do this, 
 
 
 \section{Reserved Variable Name Mangling}
@@ -3741,7 +3814,7 @@ of the matrix as a vector}
 \part{Advanced Topics}
 
 
-\chapter{Variable Transforms}
+\chapter{Variable Transforms}\label{variable-transforms.chapter}
 
 To avoid having to deal with constraints while simulating the
 Hamiltonian dynamics during sampling, every (multivariate) parameter
