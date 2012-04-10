@@ -35,7 +35,7 @@ namespace stan {
                   const Policy&) {
       static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
 
-      using stan::math::trisolve;
+      using stan::math::mdivide_left_tri;
       using stan::math::dot_product;
       using stan::math::multiply;
       using stan::math::subtract;
@@ -72,7 +72,7 @@ namespace stan {
         Eigen::Matrix<typename 
                       boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
                       Eigen::Dynamic, 1> 
-          half(trisolve<Eigen::Lower>(L,subtract(y,mu)));
+          half(mdivide_left_tri<Eigen::Lower>(L,subtract(y,mu)));
 
         lp -= 0.5 * dot_product(half,half);
         // FIXME:  add dot_self function + deriv, fold in half

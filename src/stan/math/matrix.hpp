@@ -1437,10 +1437,16 @@ namespace stan {
      * being Eigen::Upper or Eigen::Lower.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
      */
-    template<int TriView,int R, int C>
-    inline Eigen::Matrix<double,R,C> trisolve(const Eigen::Matrix<double,R,R> &A,
-                                              const Eigen::Matrix<double,R,C> &b) {
+    template<int TriView,int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<double,R1,C2> mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
+                                                        const Eigen::Matrix<double,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
       return A.template triangularView<TriView>().solve(b);
     }
     /**
@@ -1448,10 +1454,16 @@ namespace stan {
      * @param A Matrix.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
      */
-    template<int R, int C>
-    inline Eigen::Matrix<double,R,C> solve(const Eigen::Matrix<double,R,R> &A,
-                                           const Eigen::Matrix<double,R,C> &b) {
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<double,R1,C2> mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
+                                                    const Eigen::Matrix<double,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
       return A.solve(b);
     }
 
