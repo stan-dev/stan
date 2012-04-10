@@ -1,10 +1,16 @@
 .PRECIOUS: stanc$(EXE)
 
-#bin/stanc.exe : src/stan/command/stanc.cpp
+bin/stanc$(EXE) : src/stan/command/stanc.cpp $(TEMPLATE_INSTANTIATION)
+	@echo 'here'
+	@echo $(TEMPLATE_INSTANTIATION)
 #	@mkdir -p $(dir $@)
-#	$(CC_STANC) $(CFLAGS_STANC) $(CPPFLAGS) $< $(LDFLAGS_STANC) $(TARGET_ARCH) $(OUTPUT_OPTION_STANC) 
+#	$(CC) $(CFLAGS) $(CPPFLAGS) $< $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION)
 
-bin/stanc$(EXE) : src/stan/command/stanc.cpp
+bin/%.o : src/%.cpp
+	@echo 'here'
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $< $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION)
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+TEMPLATE_INSTANTIATION := $(shell find src/stan -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
 
