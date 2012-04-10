@@ -1,16 +1,14 @@
-.PRECIOUS: stanc$(EXE)
+TEMPLATE_INSTANTIATION := $(shell find src/stan/gm -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION += $(shell find src/stan/gm -type f -name '*_def.cpp')
+TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
 
-bin/stanc$(EXE) : src/stan/command/stanc.cpp $(TEMPLATE_INSTANTIATION)
-	@echo 'here'
-	@echo $(TEMPLATE_INSTANTIATION)
-#	@mkdir -p $(dir $@)
-#	$(CC) $(CFLAGS) $(CPPFLAGS) $< $(LDFLAGS) $(TARGET_ARCH) $(OUTPUT_OPTION)
+.PRECIOUS: bin/stanc$(EXE)
+bin/stanc$(EXE) : $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o
+	@mkdir -p $(dir $@)
+	$(LINK.c) $(LDFLAGS) $(OUTPUT_OPTION) $^
 
-bin/%.o : src/%.cpp
-	@echo 'here'
+bin/stan/%.o : src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
-TEMPLATE_INSTANTIATION := $(shell find src/stan -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
 
