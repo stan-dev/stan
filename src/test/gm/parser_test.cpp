@@ -5,8 +5,14 @@
 #include <exception>
 #include <stdexcept>
 
-#include "stan/gm/ast.hpp"
+#include "stan/gm/ast_def.cpp"
 #include "stan/gm/parser.hpp"
+#include <stan/gm/grammars/program_grammar_def.hpp>
+#include <stan/gm/grammars/whitespace_grammar_def.hpp>
+#include <stan/gm/grammars/expression_grammar_def.hpp>
+#include <stan/gm/grammars/statement_grammar_def.hpp>
+#include <stan/gm/grammars/var_decls_grammar_def.hpp>
+
 
 bool is_parsable(const std::string& file_name) {
   stan::gm::program prog;
