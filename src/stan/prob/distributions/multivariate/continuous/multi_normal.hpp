@@ -35,6 +35,8 @@ namespace stan {
                   const Policy&) {
       static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
 
+      using stan::math::mdivide_left_tri;
+      using stan::math::dot_product;
       using stan::math::multiply;
       using stan::math::subtract;
       
@@ -67,20 +69,12 @@ namespace stan {
         lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        
-        Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> 
-          L_inv(L
-                .template triangularView<Eigen::Lower>()
-                .solve(Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>
-                       ::Identity(L.rows(),L.rows())));
-        
         Eigen::Matrix<typename 
                       boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
                       Eigen::Dynamic, 1> 
-          half(multiply(L_inv,
-                        subtract(y,mu)));
+          half(mdivide_left_tri<Eigen::Lower>(L,subtract(y,mu)));
 
-        lp -= 0.5 * half.dot(half);  
+        lp -= 0.5 * dot_product(half,half);
         // FIXME:  add dot_self function + deriv, fold in half
 
       }

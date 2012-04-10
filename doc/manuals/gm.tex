@@ -57,6 +57,7 @@
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
 \newcommand{\refsection}[1]{Section~\ref{#1.section}}
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
+\newcommand{\refnote}[1]{Footnote~\ref{#1.figure}}
 
 \newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ } \\[4pt] #4}
 \newcommand{\farg}[1]{{\tt\slshape #1}}
@@ -2616,8 +2617,12 @@ variables.
 \chapter{Program Blocks}\label{blocks.chapter}
 
 A \Stan program is organized into a sequence of named blocks, the
-bodies of which consist of variable declarations followed by
-statements.  The full set of blocks is exemplified in the following
+bodies of which consist of variable declarations, followed in the case
+of some blocks with statements.  
+
+\section{Overview of \Stan's Program Blocks}
+
+The full set of named program blocks is exemplified in the following
 skeletal \Stan program.
 %
 \begin{quote}
@@ -2632,22 +2637,86 @@ parameters {
    ... declarations ... 
 }
 transformed parameters { 
-   ... declarations ...
-   ... statements ...
+   ... declarations ... statements ...
 }
 model { 
    ... statements ...
 }
 derived quantities {
-   ... declarations ...
-   ... statements ...
+   ... declarations ... statements ...
 }
 \end{Verbatim}
 \end{quote}
 %
-All of the blocks other than the \code{model} block are optional.  Any
-blocks that appear must be in the order above.
 
+\subsection{Optionality and Ordering}
+
+All of the blocks other than the \code{model} block are optional.  The
+blocks that occur must occur in the order presented in the skeletal
+program above.  Within each block, both declarations and statements
+are optional, subject to the restriction that the declarations come
+before the statements.
+
+\subsection{Variable Scope}
+
+The variables declared in each block have scope over all subsequent
+statements.  Thus a variable declared in the transformed data block
+may be used in the model block.  But a variable declared in the
+derived quantities block may not be used in any earlier block,
+including the model block.
+
+\subsection{Automatic Variable Definitions}
+
+The variables declared in the \code{data} and \code{parameters} block
+are treated differently than other variables in that they are
+automatically defined by the context in which they are used.  This is
+why there are no statements allowed in the data or parameters block.
+
+The variables in the \code{data} block are read from an external input
+source such as a file or a designated \R data structure.  The
+variables in the \code{parameters} block are read from the sampler's
+current parameter values (either basic \HMC or \NUTS).  The initial
+values may be provided through an external input source, which is also
+typically a file or a designated \R data structure.  In each case, the
+parameters are instantiated to the values for which the model defines
+a log probability function.
+
+\subsection{Transformed Variables}
+
+The \code{transformed data} and \code{transformed parameters} block
+behave similarly.  Both allow new variables to be declared and then
+defined through a sequence of statements.  Because variables scope
+over every statement that follows them, transformed data variables may
+be defined in terms of the data variables.  
+
+Before generating any samples, data variables are read in, then the
+transformed data variables are declared and the associated statements
+executed to define them.  This means the statements in the transformed
+data block are only ever evaluated once per chain (or even once if
+multi-threaded evaluation of multiple chains is used).
+
+Transformed parameters work the same way, being defined in terms of
+the parameters, transformed data, and data variables.  The difference
+is the frequency of evaluation.  Parameters are read in and (inverse)
+transformed to constrained representations on their natural scales
+once per leapfrog step.  This means the inverse transforms and their
+log absolute Jacobian determinants are evaluated once per leapfrog
+step.  Transformed parameters are then declared and their defining
+statements executed once per leapfrog step.
+
+\subsection{Derived Quantities}
+
+The derived quantity variables are defined once per sample after all
+the leapfrog steps have been completed.  These may be random
+quantities, so the block must be rerun even if the Metropolis
+adjustment of \HMC or \NUTS rejects the update proposal.  
+
+
+\subsection{Variable Read, Write, and Definition Summary}
+
+A table summarizing the point at which variables are read, written and
+defined is given in \reffigure{block-actions}.
+%
 \begin{figure}
 \begin{center}
 \begin{tabular}{l|c|l}
@@ -2657,10 +2726,10 @@ blocks that appear must be in the order above.
 \\
 \code{transformed data} & yes & evaluate / chain  
 \\ \hline
-\code{parameters} & no & inverse transform, Jacobian / leapfrog step  \\
-& & inverse transform, write / sample 
+\code{parameters} & no & inv.\ transform, Jacobian / leapfrog  \\
+& & inv.\ transform, write / sample 
 \\[3pt]
-\code{transformed parameters} & yes & evaluate / leapfrog step \\
+\code{transformed parameters} & yes & evaluate / leapfrog \\
 & & write / sample 
 \\\hline
 \code{model} & yes & evaluate / leapfrog step 
@@ -2676,19 +2745,30 @@ blocks that appear must be in the order above.
   program blocks in the first column.  The middle column indicates
   whether the block allows statements.  The last row indicates that 
   parameter initialization requires a read and transform operation.}
-\label{block-actions.fig}
+\label{block-actions.figure}
 \end{figure}
+%
+The rest of this chapter provides full details on when and how the
+variables and statements in each block are executed.
 
+
+\section{Statistical Variable Taxonomy}
+
+Gelman and Hill (2006, p.~366) provide a taxonomy of the kinds of
+variables used in Bayesian models, which is expanded with a missing
+data type and the loations of declarations and definitions in \Stan in
+\reffigure{variable-kinds}.
+%
 \begin{figure}
 \begin{center}
 \begin{tabular}{l|l}
 {\it Variable Kind} & {\it Declaration Block}
 \\ \hline\hline
-constants & \code{transformed data}
-\\ \hline
-modeled data & \code{data}, \code{transformed data}
-\\
+% constants & \code{transformed data}
+% \\ \hline
 unmodeled data & \code{data}, \code{transformed data}
+\\ 
+modeled data & \code{data}, \code{transformed data}
 \\ \hline
 missing data & \code{parameters}, \code{transformed parameters}
 \\
@@ -2707,8 +2787,203 @@ loop indices & loop statement
 \caption{\it Variables of the kind indicated in the left column must
   be declared in one of the blocks declared in the right
   column (see Gelman and Hill 2006,
-  p.~366).}\label{data-kinds.figure}
+  p.~366).}\label{variable-kinds.figure}
 \end{figure}
+%
+
+% A constant is a piece of data whose value is built into the model.  In
+% \Stan, constants should be declared and defined in the
+% \code{transformed data} block.  As a consequence,
+% Unforuntately, this means constants
+% can't be used to determine sizes of elements in the \code{data} block,
+% since transformed data only appears after data.  
+
+It will help to have a program in mind which illustrates the various
+usages.  
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(0,) N;                // unmodeled data
+  real y[N];                // modeled data
+  double mu_mu;             // config. unmodeled param
+  double(0,) sigma_mu;      // config. unmodeled param
+}
+derived data {
+  double(0,) alpha;         // const. unmodeled param
+  double(0,) beta;          // const. unmodeled param
+  alpha <- 0.1;       
+  beta <- 0.1;
+} 
+parameters {
+  real mu_y;                // modeled param
+  real(0,) tau_y;           // modeled param
+} 
+transformed parameters {
+  double(0,) sigma_y;       // derived quantity (param)
+  sigma_y <- pow(tau_y,-2);
+}
+model {
+  tau_y ~ gamma(alpha,beta);
+  mu_y ~ normal(mu_mu,sigma_mu);
+  for (n in 1:N)
+    y[n] ~ normal(mu_y,sigma_y);
+}
+derived quantities {
+  double y_rep[N];          // derived quantity (replic)
+  for (n in 1:N)
+    y_rep[n] <- rand_normal(mu_y,sigma_y);
+}
+\end{Verbatim}
+\end{quote}
+%
+In this example, \code{y[N]} is a modeled data vector.  Although it is
+specified in the \code{data} block, and thus must have a known value
+before the program may be run, it is modeled as if it were generated
+randomly as described by the model.  
+
+The variable \code{N} is a typical example of unmodeled data.  It is
+used to indicate a size that is not part of the model itself.
+
+The other variables declared in the data and derived data block are
+examples of unmodeled parameters, also known as hyperparameters.
+Unmodeled parameters are parameters to probability densities that are
+not themselves modeled probabilistically.  In \Stan, unmodeled
+parameters that appear in the \code{data} block may be specified on a
+per-model execution basis as part of the data read.  In the above
+model, \code{mu\_mu} and \code{sigma\_mu} are configurable unmodeled
+parameters.  
+
+Unmodeled parameters that are hard coded in the model must 
+be declared in the \code{derived data} block.  For example, the
+unmodeled parameters \code{alpha} and \code{beta} are both hard coded
+to the value 0.1. 
+
+This program declares two modeled parameters, \code{mu} and
+\code{tau\_y}.  These are the scales and precision used in the normal
+model of the values in \code{y}.  The heart of the model will be
+sampling the values of these parameters from their posterior
+distribution.
+
+The modeled parameter \code{tau\_y} is transformed from a precision to
+a scale parameter and assigned to the variable \code{sigma\_y} in the
+\code{transformed parameters} block. Thus the variable \code{sigma\_y}
+is considered a derived quantity --- its value is entirely determined
+by the values of other variables.  
+
+The \code{derived quantities} block defines a second array of \code{N}
+entries, \code{y\_rep}, for replicated data.  The vector \code{y\_rep}
+has its values filled in by randomly generating normal variates given
+the parameters \code{mu\_y} and \code{sigma\_y}.  This kind of derived
+quantity may be used for model checking.
+
+Finally, the variables \code{n} is used as a loop index in two for
+loops, one in the \code{model} block and one in the \code{derived
+  quantities} block.
+
+
+\section{Program Block: \code{data}}
+
+The rest of this chapter will lay out the details of each block in
+order, starting with the \code{data} block in this section.
+
+\subsection{Variable Reads and Transformations}
+
+The \code{data} block is for the declaration of variables that are
+read in as data.  With the current model executable, each Markov chain
+of samples will be executed in a different process, and each such
+process will read the data exactly once.%
+%
+\footnote{With multiple threads, or even running chains sequentially
+  in a single thread, data could be read only once per set of
+  chains. \Stan was designed to be thread safe and future versions 
+  will provide a multithreading option for Markov chains.\label{thread.footnote}}
+%
+
+Data variables are not transformed in any way.  The format for data
+files is provided in \refchapter{dump}.
+
+\subsection{Statments}
+
+The \code{data} block does not allow statements.
+
+\subsection{Variable Constraint Checking}
+
+Each variable's value is validated against its declaration as it is
+read.  For example, if a variable \code{sigma} is declared as
+\code{real(0,)}, then trying to assign it a negative value will raise
+an error.  As a result, data type errors will be caught as early as
+possible.  Similarly, attempts to provide data of the wrong size for a
+compound data structure will also raise an error.
+
+
+\section{Program Block: \code{transformed data}}
+
+The \code{transformed data} block is for declaring and defining
+variables that do not need to be changed when running the program.  
+
+\subsection{Variable Reads and Transformations}
+
+For the \code{transformed data} block, variables are all declared in
+the variable declarations and defined in the statements.  There is no
+reading from external sources and no transformations performed.
+
+Variables declared in the \code{data} block may be used to declare
+transformed variables.
+
+\subsection{Statements}
+
+The statements in a \code{transformed data} block are used to define
+(provide values for) variables declared in the \code{transformed data}
+block.  The special variable \code{lp\_\_} is not defined for the
+statements in the \code{transformed data} block.  Consequently,
+probability statements, which implicitly access \code{lp\_\_}, may not
+be used.  Furthermore, assignments are only allowed to variable
+declared in the \code{transformed data} block.
+
+These statements are executed once, in order, right after the data is
+read into the data variables.  This means they are executed once per
+chain (though see \refnote{thread} in this chapter).
+
+Variables declared in the \code{data} block may be used in statements
+in the \code{transformed data} block.
+
+\subsection{Variable Constraint Checking}
+
+Any constraints on variables declared in the \code{transformed data}
+block are checked after the statements are executed.  If any defined
+variable violates its constraints, \Stan will stop with a warning.
+
+
+\section{Program Block: \code{parameters}}
+
+
+
+
+
+\section{Reserved Variable Name Mangling}
+
+\Stan prohibits programs from declaring variables that end in two
+underscore characters (\code{\_\_}.  Variables ending in two (or more)
+underscores are reserved for \Stan's internal use.
+
+The special variable \code{lp\_\_} is reserved for the accumulator of
+the total log probability of a model.  It is defined to have scope
+over the \code{transformed parameters} and \code{model} blocks, but is
+not available in the other blocks.  
+
+may be used in the transformed parameter and model blocks, but not
+esle
+
+User-defined variables with names ending may not be delcared
+
+ may not end in two underscores.  Variables
+with two underscores are reserved for use in \Stan for internal
+purposes and using them may conflict with \Stan's uses.  The exception
+is the special variable \code{lp\_\_} which may be used, but not declared.
+
+
+
 
 \part{Built-In Functions}\label{built-in-functions.part}
 
