@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-#include <stan/gm/ast.hpp>
+#include <stan/gm/ast_header_unused_attempt.hpp>
 
 namespace stan {
 
@@ -251,11 +251,31 @@ namespace stan {
     expr_type expression_type_vis::operator()(const nil& e) const {
       return expr_type();
     }
-    template <typename T>
-    expr_type expression_type_vis::operator()(const T& e) const {
+    // template <typename T>
+    // expr_type expression_type_vis::operator()(const T& e) const {
+    //   return e.type_;
+    // }
+    expr_type expression_type_vis::operator()(const int_literal& e) const {
       return e.type_;
     }
-
+    expr_type expression_type_vis::operator()(const double_literal& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const variable& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const fun& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const index_op& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const binary_op& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const unary_op& e) const {
+      return e.type_;
+    }
 
     expression::expression()
       : expr_(nil()) {
@@ -267,10 +287,10 @@ namespace stan {
       expression_type_vis vis;
       return boost::apply_visitor(vis,expr_);
     }
-    template <typename Expr>
-    expression::expression(const Expr& expr)
-      : expr_(expr) {
-    }
+    // template <typename Expr>
+    // expression::expression(const Expr& expr)
+    // : expr_(expr) {
+    // }
 
     bool is_nil_op::operator()(nil const& x) const { return true; }
       

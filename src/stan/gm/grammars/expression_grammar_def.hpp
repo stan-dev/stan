@@ -404,6 +404,34 @@ namespace stan {
             > lit(')') )
         ;
 
+      // add case to factor_r
+      // | matrix_or_vector_r
+
+
+      // matrix_or_vector_r 
+      //   %= lit('[')
+      //   > (matrix_r | vector_r)
+      //   > lit(']')
+      //   ;
+
+      // matrix_r %= matrix2_r;
+
+      // matrix2_r.name("matrix expression");
+      // matrix2_r
+      //   %= vector2_r % ',';
+      
+      // vector_r %= vector2_r;
+
+      // vector2_r.name("vector expression");
+      // vector2_r
+      //   %=  ( expression_r 
+      //         [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+      //         % ',' 
+      //         )
+      //   ;
+      
+
+        
       int_literal_r.name("integer literal");
       int_literal_r
         %= int_ 
