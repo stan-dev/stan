@@ -84,6 +84,7 @@ namespace stan {
       using stan::math::determinant;
       using stan::math::inverse;
       using stan::math::multiply;
+      using stan::math::dot_product;
       using stan::math::subtract;
       using stan::math::transpose;
 
@@ -97,7 +98,7 @@ namespace stan {
         
         lp -= 0.5 
           * (nu + d) 
-          * log(1.0 + (multiply(multiply(transpose(y_minus_mu),
+          * log(1.0 + (dot_product(multiply(transpose(y_minus_mu),
                                          inverse(Sigma)),
                                 y_minus_mu)
                        / nu));

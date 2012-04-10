@@ -405,63 +405,6 @@ namespace stan {
       return to_var(m.determinant());
     }
 
-    /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First column vector.
-     * @param v2 Second column vector.
-     * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
-     */
-    template <typename T1, typename T2>
-    inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
-                           const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
-      return to_var(v1).dot(to_var(v2));
-    }
-    /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First row vector.
-     * @param v2 Second row vector.
-     * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
-     */
-    template <typename T1, typename T2>
-    inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1, 
-                           const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
-      return to_var(v1).dot(to_var(v2));
-    }
-    /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First column vector.
-     * @param v2 Second row vector.
-     * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
-     */
-    template <typename T1, typename T2>
-    inline var dot_product(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
-                           const Eigen::Matrix<T2, 1, Eigen::Dynamic>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
-      return to_var(v1).dot(to_var(v2));
-    }
-    /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First row vector.
-     * @param v2 Second column vector.
-     * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
-     */
-    template <typename T1, typename T2>
-    inline var dot_product(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& v1,
-                           const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
-      return to_var(v1).dot(to_var(v2));
-    }
-
     class dot_product_vv_vari : public vari {
     protected:
       vari** v1_;
@@ -474,14 +417,33 @@ namespace stan {
           result += v1[i].vi_->val_ * v2[i].vi_->val_;
         return result;
       }
+      template<int R1,int C1,int R2,int C2>
+      inline static double var_dot(const Eigen::Matrix<var,R1,C1> &v1,
+                                   const Eigen::Matrix<var,R2,C2> &v2) {
+        double result = 0;
+        for (int i = 0; i < v1.size(); i++)
+          result += v1[i].vi_->val_ * v2[i].vi_->val_;
+        return result;
+      }
     public:
       dot_product_vv_vari(const var* v1, const var* v2, size_t length) : 
         vari(var_dot(v1, v2, length)), length_(length) {
-        v1_ = (vari**)memalloc_.alloc(2*length*sizeof(vari*));
-        v2_ = v1_ + length;
-        for (size_t i = 0; i < length; i++)
+        v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
+        v2_ = v1_ + length_;
+        for (size_t i = 0; i < length_; i++)
           v1_[i] = v1[i].vi_;
-        for (size_t i = 0; i < length; i++)
+        for (size_t i = 0; i < length_; i++)
+          v2_[i] = v2[i].vi_;
+      }
+      template<int R1,int C1,int R2,int C2>
+      dot_product_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                          const Eigen::Matrix<var,R2,C2> &v2) : 
+        vari(var_dot(v1, v2)), length_(v1.size()) {
+        v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
+        v2_ = v1_ + length_;
+        for (size_t i = 0; i < length_; i++)
+          v1_[i] = v1[i].vi_;
+        for (size_t i = 0; i < length_; i++)
           v2_[i] = v2[i].vi_;
       }
       void chain() {
@@ -503,14 +465,33 @@ namespace stan {
           result += v1[i].vi_->val_ * v2[i];
         return result;
       }
+      template<int R1,int C1,int R2,int C2>
+      inline static double var_dot(const Eigen::Matrix<var,R1,C1> &v1,
+                                   const Eigen::Matrix<double,R2,C2> &v2) {
+        double result = 0;
+        for (int i = 0; i < v1.size(); i++)
+          result += v1[i].vi_->val_ * v2[i];
+        return result;
+      }
     public:
       dot_product_vd_vari(const var* v1, const double* v2, size_t length) : 
         vari(var_dot(v1, v2, length)), length_(length) {
-        v1_ = (vari**)memalloc_.alloc(length*sizeof(vari*));
-        v2_ = (double*)memalloc_.alloc(length*sizeof(double));
-        for (size_t i = 0; i < length; i++)
+        v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+        v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+        for (size_t i = 0; i < length_; i++)
           v1_[i] = v1[i].vi_;
-        for (size_t i = 0; i < length; i++)
+        for (size_t i = 0; i < length_; i++)
+          v2_[i] = v2[i];
+      }
+      template<int R1,int C1,int R2,int C2>
+      dot_product_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                          const Eigen::Matrix<double,R2,C2> &v2) : 
+        vari(var_dot(v1, v2)), length_(v1.size()) {
+        v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+        v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+        for (size_t i = 0; i < length_; i++)
+          v1_[i] = v1[i].vi_;
+        for (size_t i = 0; i < length_; i++)
           v2_[i] = v2[i];
       }
       void chain() {
@@ -519,34 +500,82 @@ namespace stan {
         }
       }
     };
-    class dot_product_dv_vari : public vari {
-    protected:
-      double* v1_;
-      vari** v2_;
-      size_t length_;
-      inline static double var_dot(const double* v1, const var* v2,
-                                   size_t length) {
-        double result = 0;
-        for (size_t i = 0; i < length; i++)
-          result += v1[i] * v2[i].vi_->val_;
-        return result;
-      }
-    public:
-      dot_product_dv_vari(const double* v1, const var* v2, size_t length) : 
-        vari(var_dot(v1, v2, length)), length_(length) {
-        v1_ = (double*)memalloc_.alloc(length*sizeof(double));
-        v2_ = (vari**)memalloc_.alloc(length*sizeof(vari*));
-        for (size_t i = 0; i < length; i++)
-          v1_[i] = v1[i];
-        for (size_t i = 0; i < length; i++)
-          v2_[i] = v2[i].vi_;
-      }
-      void chain() {
-        for (size_t i = 0; i < length_; i++) {
-          v2_[i]->adj_ += adj_ * v1_[i];
-        }
-      }
-    };
+    
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First column vector.
+     * @param v2 Second column vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
+     */
+    template<int R1,int C1,int R2, int C2>
+    inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
+                           const Eigen::Matrix<var, R2, C2>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      if (v1.rows() != 1 && v1.cols() != 1)
+        throw std::invalid_argument("v1 must be a vector");
+      if (v2.rows() != 1 && v2.cols() != 1)
+        throw std::invalid_argument("v2 must be a vector");
+      return var(new dot_product_vv_vari(v1,v2));
+    }
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First column vector.
+     * @param v2 Second column vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2
+     * or either v1 or v2 are not vectors.
+     */
+    template<int R1,int C1,int R2, int C2>
+    inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
+                           const Eigen::Matrix<double, R2, C2>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      if (v1.rows() != 1 && v1.cols() != 1)
+        throw std::invalid_argument("v1 must be a vector");
+      if (v2.rows() != 1 && v2.cols() != 1)
+        throw std::invalid_argument("v2 must be a vector");
+      return var(new dot_product_vd_vari(v1,v2));
+    }
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First column vector.
+     * @param v2 Second column vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2
+     * or either v1 or v2 are not vectors.
+     */
+    template<int R1,int C1,int R2, int C2>
+    inline var dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+                           const Eigen::Matrix<var, R2, C2>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      if (v1.rows() != 1 && v1.cols() != 1)
+        throw std::invalid_argument("v1 must be a vector");
+      if (v2.rows() != 1 && v2.cols() != 1)
+        throw std::invalid_argument("v2 must be a vector");
+      return var(new dot_product_vd_vari(v2,v1));
+    }
+    /**
+     * Returns the dot product of the specified vectors.
+     * @param v1 First column vector.
+     * @param v2 Second column vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if length of v1 is not equal to length of v2
+     * or either v1 or v2 are not vectors.
+     */
+    template<int R1,int C1,int R2, int C2>
+    inline var dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+                           const Eigen::Matrix<double, R2, C2>& v2) {
+      if (v1.rows() != 1 && v1.cols() != 1)
+        throw std::invalid_argument("v1 must be a vector");
+      if (v2.rows() != 1 && v2.cols() != 1)
+        throw std::invalid_argument("v2 must be a vector");
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
+      return to_var(stan::math::dot_product(v1,v2));
+    }
     /**
      * Returns the dot product of the specified arrays of doubles.
      * @param v1 First array.
@@ -572,7 +601,7 @@ namespace stan {
      * @param length Length of both arrays.
      */
     inline var dot_product(const double* v1, const var* v2, size_t length) {
-      return var(new dot_product_dv_vari(v1, v2, length));
+      return var(new dot_product_vd_vari(v2, v1, length));
     }
     /**
      * Returns the dot product of the specified arrays of doubles.
@@ -605,7 +634,7 @@ namespace stan {
                            const std::vector<var>& v2) {
       if (v1.size() != v2.size())
         throw std::invalid_argument("v1.size() must equal v2.size()");
-      return var(new dot_product_dv_vari(&v1[0], &v2[0], v1.size()));
+      return var(new dot_product_vd_vari(&v2[0], &v1[0], v1.size()));
     }
 
     /**
@@ -1270,9 +1299,7 @@ namespace stan {
         result(i) = v1(i) / v2(i);
       return result;
     }
-                   
 
-                   
     /**
      * Return the product of two scalars.
      * @param v First scalar.
@@ -1283,80 +1310,43 @@ namespace stan {
     inline var multiply(const T1& v, const T2& c) {
       return to_var(v) * to_var(c);
     }
-    /**
-     * Return the product of the of the specified column
-     * vector and specified scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    template <typename T1, typename T2>
-    inline vector_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const T2& c) {
-      return to_var(v) * to_var(c);
-    }
 
-    /**
-     * Return the product of the of the specified row
-     * vector and specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    template <typename T1, typename T2>
-    inline row_vector_v multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, 
-                                 const T2& c) {
-      return to_var(rv) * to_var(c);
-    }
-
-    /**
-     * Return the product of the of the specified matrix
-     * and specified scalar.
-     * @param m Matrix.
-     * @param c Scalar.
-     * @return Product of matrix and scalar.
-     */
-    template <typename T1, typename T2>
-    inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, 
-                             const T2& c) {
+    template<typename T1,typename T2,int R2,int C2>
+    inline Eigen::Matrix<var,R2,C2> multiply(const T1& c, 
+                                             const Eigen::Matrix<T2, R2, C2>& m) {
       return to_var(m) * to_var(c);
     }
-    /**
-     * Return the product of the of the specified scalar
-     * and vetor.
-     * @param c Specified scalar.
-     * @param v Specified vector.
-     * @return Product of scalar and vector.
-     */
-    template <typename T1, typename T2>
-    inline vector_v multiply(const T1& c,
-                             const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
-      return to_var(c) * to_var(v);
-    }
-    /**
-     * Return the product of the of the specified scalar
-     * and row vector.
-     * @param c Specified scalar.
-     * @param rv Specified vector.
-     * @return Product of scalar and row vector.
-     */
-    template <typename T1, typename T2>
-    inline row_vector_v multiply(const T1& c,
-                                 const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv) {
-      return to_var(c) * to_var(rv);
-    }
 
-    /**
-     * Return the product of the of the specified scalar and specified matrix.
-     * @param c Scalar.
-     * @param m Matrix.
-     * @return Product of matrix and scalar.
-     */
-    template <typename T1, typename T2>
-    inline matrix_v multiply(const T1& c,
-                             const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      return to_var(c) * to_var(m);
+    template<typename T1,int R1,int C1,typename T2>
+    inline Eigen::Matrix<var,R1,C1> multiply(const Eigen::Matrix<T1, R1, C1>& m, 
+                                             const T2& c) {
+      return to_var(m) * to_var(c);
     }
-
+    
+    /**
+     * Return the product of the specified matrices.  The number of
+     * columns in the first matrix must be the same as the number of rows
+     * in the second matrix.
+     * @param m1 First matrix.
+     * @param m2 Second matrix.
+     * @return The product of the first and second matrices.
+     * @throw std::invalid_argument if the number of columns of m1 does not match
+     *   the number of rows of m2.
+     */
+    template<typename T1,int R1,int C1,typename T2,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<T1,R1,C1>& m1,
+                                             const Eigen::Matrix<T2,R2,C2>& m2) {
+      if (m1.cols() != m2.rows())
+        throw std::invalid_argument("m1.cols() != m2.rows()");
+      Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
+      for (int i = 0; i < m1.rows(); i++) {
+        Eigen::Matrix<T1,C1,1> crow = m1.row(i).transpose();
+        for (int j = 0; j < m2.cols(); j++) {
+          result(i,j) = dot_product(crow,m2.col(j).eval());
+        }
+      }
+      return result;
+    }
     /**
      * Return the scalar product of the specified row vector and
      * specified column vector.  The return is the same as the dot
@@ -1366,80 +1356,14 @@ namespace stan {
      * @return Scalar result of multiplying row vector by column vector.
      * @throw std::invalid_argument if rv and v are not the same size
      */
-    template <typename T1, typename T2>
-    inline var multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv, 
-                        const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
+    template <typename T1, int C1, typename T2, int R2>
+    inline var multiply(const Eigen::Matrix<T1, 1, C1>& rv, 
+                        const Eigen::Matrix<T2, R2, 1>& v) {
       if (rv.size() != v.size())
         throw std::invalid_argument("rv.size() != v.size()");
       return dot_product(rv, v);
     }
 
-    /**
-     * Return the product of the specified column vector
-     * and specified row vector.  The two vectors may be of any size.
-     * @param v Column vector.
-     * @param rv Row vector.
-     * @return Product of column vector and row vector.
-     */
-    template <typename T1, typename T2>
-    inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, 
-                             const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv) {
-      return to_var(v) * to_var(rv);
-    }
-    /**
-     * Return the product of the specified matrix and
-     * column vector.  The number of cols of the matrix must be
-     * the same as the size of the vector.
-     * @param m Matrix.
-     * @param v Column vector.
-     * @return Product of matrix and vector.
-     * @throw std::invalid_argument if the number of columns of the matrix does not 
-     * match the size of the vector
-     */
-    template <typename T1, typename T2>
-    inline vector_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, 
-                             const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v) {
-      if (m.cols() != v.size())
-        throw std::invalid_argument("m.cols() != v.size()");
-      return to_var(m) * to_var(v);
-    }
-    /**
-     * Return the product of the specifieid row vector and specified
-     * matrix.  The number of rows of the matrix must be the same
-     * as the size of the vector.
-     * @param rv Row vector.
-     * @param m Matrix.
-     * @return Product of vector and matrix.
-     * @throw std::invalid_argument if the size of the row vector does not match the 
-     * number of rows of the matrix
-     */
-    template <typename T1, typename T2>
-    inline row_vector_v
-    multiply(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv,
-             const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (rv.size() !=  m.rows())
-        throw std::invalid_argument("rv.size() != m.rows()");
-      return to_var(rv) * to_var(m);
-    }
-    /**
-     * Return the product of the specified matrices.  The number of
-     * columns in the first matrix must be the same as the number of rows
-     * in the second matrix.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return The product of the first and second matrices.
-     * @throw std::invalid_argument if the number of columns in the first vector 
-     * does not match the
-     *    number of rows in the second vector
-     */
-    template <typename T1, typename T2>
-    inline matrix_v multiply(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
-                             const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      if (m1.cols() !=  m2.rows())
-        throw std::invalid_argument("m1.cols() != m2.rows()");
-      return to_var(m1) * to_var(m2);
-    }
-    
     /**
      * Return the specified row minus 1 of the specified matrix.  That is,
      * indexing is from 1, not 0, so this function returns the same
@@ -1544,6 +1468,113 @@ namespace stan {
      */
     inline matrix_v inverse(const matrix_v& m) {
       return m.inverse();
+    }
+
+    /**
+     * Returns the solution of the system Ax=b when A is triangular.
+     * @param A Triangular matrix.  Upper or lower is defined by TriView being
+     * either Eigen::Upper or Eigen::Lower.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int TriView,int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
+                                                     const Eigen::Matrix<var,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.template triangularView<TriView>().solve(b);
+    }
+    /**
+     * Returns the solution of the system Ax=b when A is triangular.
+     * @param A Triangular matrix.  Upper or lower is defined by TriView being
+     * either Eigen::Upper or Eigen::Lower.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int TriView,int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
+                                                     const Eigen::Matrix<double,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.template triangularView<TriView>().solve(to_var(b));
+    }
+    /**
+     * Returns the solution of the system Ax=b when A is triangular.
+     * @param A Triangular matrix.  Upper or lower is defined by TriView being
+     * either Eigen::Upper or Eigen::Lower.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int TriView,int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
+                                                     const Eigen::Matrix<var,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return to_var(A).template triangularView<TriView>().solve(b);
+    }
+
+    /**
+     * Returns the solution of the system Ax=b.
+     * @param A Matrix.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
+                                                 const Eigen::Matrix<var,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.solve(b);
+    }
+    /**
+     * Returns the solution of the system Ax=b.
+     * @param A Matrix.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int R1, int C1, int R2, int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
+                                                 const Eigen::Matrix<var,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return to_var(A).solve(b);
+    }
+    /**
+     * Returns the solution of the system Ax=b.
+     * @param A Matrix.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int R1, int C1, int R2, int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
+                                                 const Eigen::Matrix<double,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.solve(to_var(b));
     }
 
     /**
