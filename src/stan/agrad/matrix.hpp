@@ -1340,9 +1340,10 @@ namespace stan {
         throw std::invalid_argument("m1.cols() != m2.rows()");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
-        Eigen::Matrix<T1,C1,1> crow = m1.row(i).transpose();
+        Eigen::Matrix<T1,1,C1> crow = m1.row(i);
         for (int j = 0; j < m2.cols(); j++) {
-          result(i,j) = dot_product(crow,m2.col(j).eval());
+          Eigen::Matrix<T2,R2,1> ccol = m2.col(j);
+          result(i,j) = dot_product(crow,ccol);
         }
       }
       return result;
