@@ -77,21 +77,9 @@ TEST(ProbDistributionsBinomial,ErrnoPolicy) {
   result = binomial_log(N,N,prob, errno_policy());
   EXPECT_FALSE(std::isnan(result));
 
-  result = binomial_log(nan,N,prob, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = binomial_log(inf,N,prob, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = binomial_log(-inf,N,prob, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
   result = binomial_log(-1,N,prob, errno_policy());
   EXPECT_TRUE(std::isnan(result));
   
-  result = binomial_log(n,nan,prob, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = binomial_log(n,inf,prob, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = binomial_log(n,-inf,prob, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
   result = binomial_log(n,3,prob, errno_policy());
   EXPECT_TRUE(std::isnan(result));
   

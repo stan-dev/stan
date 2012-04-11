@@ -1340,9 +1340,10 @@ namespace stan {
         throw std::invalid_argument("m1.cols() != m2.rows()");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
-        Eigen::Matrix<T1,C1,1> crow = m1.row(i).transpose();
+        Eigen::Matrix<T1,1,C1> crow = m1.row(i);
         for (int j = 0; j < m2.cols(); j++) {
-          result(i,j) = dot_product(crow,m2.col(j).eval());
+          Eigen::Matrix<T2,R2,1> ccol = m2.col(j);
+          result(i,j) = dot_product(crow,ccol);
         }
       }
       return result;
@@ -1540,7 +1541,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return A.solve(b);
+      return A.lu().solve(b);
     }
     /**
      * Returns the solution of the system Ax=b.
@@ -1557,7 +1558,8 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return to_var(A).solve(b);
+      // FIXME: it would be much faster to do LU, then convert to var
+      return to_var(A).lu().solve(b);
     }
     /**
      * Returns the solution of the system Ax=b.
@@ -1574,9 +1576,60 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return A.solve(to_var(b));
+      return A.lu().solve(to_var(b));
     }
 
+    /**
+     * Returns the solution x of the system xA = b.
+     * @param b Right hand side matrix or vector.
+     * @param A Matrix.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
+    											  const Eigen::Matrix<var,R2,C2> &A) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.rows() != b.cols())
+        throw std::invalid_argument("A.rows() != b.cols()");
+      return A.transpose().lu().solve(b.transpose()).transpose();
+    }
+    /**
+     * Returns the solution x of the system xA = b.
+     * @param b Right hand side matrix or vector.
+     * @param A Matrix.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
+    											  const Eigen::Matrix<var,R2,C2> &A) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.rows() != b.cols())
+        throw std::invalid_argument("A.rows() != b.cols()");
+      return A.transpose().lu().solve(to_var(b).transpose()).transpose();
+    }
+    /**
+     * Returns the solution x of the system xA = b.
+     * @param b Right hand side matrix or vector.
+     * @param A Matrix.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
+    											  const Eigen::Matrix<double,R2,C2> &A) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.rows() != b.cols())
+        throw std::invalid_argument("A.rows() != b.cols()");
+      return to_var(A).transpose().lu().solve(b.transpose()).transpose();
+    }
     /**
      * Return the real component of the eigenvalues of the specified
      * matrix in descending order of magnitude.
