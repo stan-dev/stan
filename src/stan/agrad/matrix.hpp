@@ -1541,7 +1541,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return A.solve(b);
+      return A.lu().solve(b);
     }
     /**
      * Returns the solution of the system Ax=b.
@@ -1558,7 +1558,8 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return to_var(A).solve(b);
+      // FIXME: it would be much faster to do LU, then convert to var
+      return to_var(A).lu().solve(b);
     }
     /**
      * Returns the solution of the system Ax=b.
@@ -1575,7 +1576,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return A.solve(to_var(b));
+      return A.lu().solve(to_var(b));
     }
 
     /**
@@ -1593,7 +1594,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
         throw std::invalid_argument("A.rows() != b.cols()");
-      return A.transpose().solve(b.transpose()).transpose();
+      return A.transpose().lu().solve(b.transpose()).transpose();
     }
     /**
      * Returns the solution x of the system xA = b.
@@ -1610,7 +1611,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
         throw std::invalid_argument("A.rows() != b.cols()");
-      return A.transpose().solve(to_var(b).transpose()).transpose();
+      return A.transpose().lu().solve(to_var(b).transpose()).transpose();
     }
     /**
      * Returns the solution x of the system xA = b.
@@ -1627,7 +1628,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
         throw std::invalid_argument("A.rows() != b.cols()");
-      return to_var(A).transpose().solve(b.transpose()).transpose();
+      return to_var(A).transpose().lu().solve(b.transpose()).transpose();
     }
     /**
      * Return the real component of the eigenvalues of the specified

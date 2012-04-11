@@ -1464,7 +1464,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.cols() != b.rows())
         throw std::invalid_argument("A.cols() != b.rows()");
-      return A.solve(b);
+      return A.lu().solve(b);
     }
     /**
      * Returns the solution of the system Ax=b.
@@ -1481,7 +1481,7 @@ namespace stan {
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
         throw std::invalid_argument("A.rows() != b.cols()");
-      return A.transpose().solve(b.transpose()).transpose();
+      return A.transpose().lu().solve(b.transpose()).transpose();
     }
 
     /**
