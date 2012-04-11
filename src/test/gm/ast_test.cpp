@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <vector>
-#include "stan/gm/ast.hpp"
+#include "stan/gm/ast_def.cpp"
 
 using stan::gm::function_signatures;
 using stan::gm::expr_type;
@@ -64,15 +64,15 @@ std::vector<expr_type> expr_type_vec(const expr_type& t1) {
   return etv;
 }
 std::vector<expr_type> expr_type_vec(const expr_type& t1,
-				     const expr_type& t2) {
+                                     const expr_type& t2) {
   std::vector<expr_type> etv;
   etv.push_back(t1);
   etv.push_back(t2);
   return etv;
 }
 std::vector<expr_type> expr_type_vec(const expr_type& t1,
-				     const expr_type& t2,
-				     const expr_type& t3) {
+                                     const expr_type& t2,
+                                     const expr_type& t3) {
   std::vector<expr_type> etv;
   etv.push_back(t1);
   etv.push_back(t2);
@@ -83,23 +83,23 @@ std::vector<expr_type> expr_type_vec(const expr_type& t1,
 TEST(gm_ast,function_signatures_log_sum_exp_1) {
   stan::gm::function_signatures& fs = stan::gm::function_signatures::instance();
   EXPECT_EQ(expr_type(DOUBLE_T),
-	    fs.get_result_type("log_sum_exp",
-			       expr_type_vec(expr_type(DOUBLE_T,1U))));
+            fs.get_result_type("log_sum_exp",
+                               expr_type_vec(expr_type(DOUBLE_T,1U))));
 }
 
 TEST(gm_ast,function_signatures_log_sum_exp_2) {
   stan::gm::function_signatures& fs = stan::gm::function_signatures::instance();
   EXPECT_EQ(expr_type(DOUBLE_T),
-	    fs.get_result_type("log_sum_exp",
-			       expr_type_vec(expr_type(DOUBLE_T),
-					     expr_type(DOUBLE_T))));
+            fs.get_result_type("log_sum_exp",
+                               expr_type_vec(expr_type(DOUBLE_T),
+                                             expr_type(DOUBLE_T))));
 }
 
 TEST(gm_ast,function_signatures_add) {
   stan::gm::function_signatures& fs = stan::gm::function_signatures::instance();
 
   EXPECT_EQ(expr_type(DOUBLE_T), 
-	    fs.get_result_type("sqrt",expr_type_vec(expr_type(DOUBLE_T))));
+            fs.get_result_type("sqrt",expr_type_vec(expr_type(DOUBLE_T))));
   EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec()));
   EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec(expr_type(DOUBLE_T))));
 
@@ -107,12 +107,12 @@ TEST(gm_ast,function_signatures_add) {
   fs.add("bar__",expr_type(DOUBLE_T),expr_type(INT_T),expr_type(DOUBLE_T));
   fs.add("bar__",expr_type(DOUBLE_T),expr_type(DOUBLE_T),expr_type(INT_T));
   EXPECT_EQ(expr_type(), 
-	    fs.get_result_type("bar__",expr_type_vec(expr_type(INT_T),expr_type(INT_T))));
+            fs.get_result_type("bar__",expr_type_vec(expr_type(INT_T),expr_type(INT_T))));
 
   // after this, should be resolvable
   fs.add("bar__",expr_type(INT_T), expr_type(INT_T), expr_type(INT_T));
   EXPECT_EQ(expr_type(INT_T), 
-	    fs.get_result_type("bar__",expr_type_vec(INT_T,INT_T))); // expr_type(INT_T),expr_type(INT_T))));
+            fs.get_result_type("bar__",expr_type_vec(INT_T,INT_T))); // expr_type(INT_T),expr_type(INT_T))));
   
 }
 

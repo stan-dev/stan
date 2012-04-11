@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 
-#include <stan/math/matrix.hpp>
-
 #include <stan/version.hpp>
 #include <stan/gm/ast.hpp>
 
@@ -92,7 +90,7 @@ namespace stan {
       void operator()(const int_literal& n) const { o_ << n.val_; }
       void operator()(const double_literal& x) const { o_ << x.val_; }
       void operator()(const variable& v) const { o_ << v.name_; }
-      void operator()(int n) const { o_ << n; }
+      void operator()(int n) const { o_ << static_cast<long>(n); }
       void operator()(double x) const { o_ << x; }
       void operator()(const std::string& x) const { o_ << x; } // identifiers
       void operator()(const index_op& x) const {

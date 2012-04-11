@@ -90,8 +90,8 @@ namespace stan {
     }
 
     std::ostream& operator<<(std::ostream& o, const expr_type& et) {
-      o << et.type()
-        << '[' << et.num_dims() << ']';
+      write_base_expr_type(o,et.type());
+      o << '[' << et.num_dims() << ']';
       return o;
     }
 
@@ -251,11 +251,31 @@ namespace stan {
     expr_type expression_type_vis::operator()(const nil& e) const {
       return expr_type();
     }
-    template <typename T>
-    expr_type expression_type_vis::operator()(const T& e) const {
+    // template <typename T>
+    // expr_type expression_type_vis::operator()(const T& e) const {
+    //   return e.type_;
+    // }
+    expr_type expression_type_vis::operator()(const int_literal& e) const {
       return e.type_;
     }
-
+    expr_type expression_type_vis::operator()(const double_literal& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const variable& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const fun& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const index_op& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const binary_op& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const unary_op& e) const {
+      return e.type_;
+    }
 
     expression::expression()
       : expr_(nil()) {
@@ -267,15 +287,30 @@ namespace stan {
       expression_type_vis vis;
       return boost::apply_visitor(vis,expr_);
     }
-    template <typename Expr>
-    expression::expression(const Expr& expr)
-      : expr_(expr) {
-    }
+    // template <typename Expr>
+    // expression::expression(const Expr& expr) : expr_(expr) {  }
 
-    bool is_nil_op::operator()(nil const& x) const { return true; }
+    expression::expression(const expression_t& expr) : expr_(expr) { }
+    expression::expression(const nil& expr) : expr_(expr) { }
+    expression::expression(const int_literal& expr) : expr_(expr) { }
+    expression::expression(const double_literal& expr) : expr_(expr) { }
+    expression::expression(const variable& expr) : expr_(expr) { }
+    expression::expression(const fun& expr) : expr_(expr) { }
+    expression::expression(const index_op& expr) : expr_(expr) { }
+    expression::expression(const binary_op& expr) : expr_(expr) { }
+    expression::expression(const unary_op& expr) : expr_(expr) { }
+
+    bool is_nil_op::operator()(const nil& x) const { return true; }
+    bool is_nil_op::operator()(const int_literal& x) const { return false; }
+    bool is_nil_op::operator()(const double_literal& x) const { return false; }
+    bool is_nil_op::operator()(const variable& x) const { return false; }
+    bool is_nil_op::operator()(const fun& x) const { return false; }
+    bool is_nil_op::operator()(const index_op& x) const { return false; }
+    bool is_nil_op::operator()(const binary_op& x) const { return false; }
+    bool is_nil_op::operator()(const unary_op& x) const { return false; }
       
-    template <typename T>
-    bool is_nil_op::operator()(const T& x) const { return false; }
+    // template <typename T>
+    // bool is_nil_op::operator()(const T& x) const { return false; }
 
     bool is_nil(const expression& e) {
       is_nil_op ino;
@@ -365,7 +400,9 @@ namespace stan {
         if (expr_base_type == MATRIX_T)
           return expr_type(DOUBLE_T,0U);
       
-      std::cerr << "expression base type=" << expr_base_type << std::endl;
+      std::cerr << "expression base type=";
+      write_base_expr_type(std::cerr,expr_base_type);
+      std::cerr << std::endl;
       std::cerr << "too many index dimensions;"
                 << " require at most " << num_expr_dims
                 << " found " << num_index_dims
@@ -613,25 +650,43 @@ namespace stan {
 
 
 
+    var_decl::var_decl(const var_decl_t& decl) : decl_(decl) { }
     var_decl::var_decl() : decl_(nil()) { }
+    var_decl::var_decl(const nil& decl) : decl_(decl) { }
+    var_decl::var_decl(const int_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const double_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const vector_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const row_vector_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const matrix_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const simplex_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const pos_ordered_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const cov_matrix_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const corr_matrix_var_decl& decl) : decl_(decl) { }
 
-    template <typename Decl>
-    var_decl::var_decl(Decl const& decl) : decl_(decl) { }
+    // template <typename Decl>
+    // var_decl::var_decl(Decl const& decl) : decl_(decl) { }
+
+
 
     std::string var_decl::name() const {
       return boost::apply_visitor(name_vis(),decl_);
     }
 
     statement::statement() : statement_(nil()) { }
+    statement::statement(const statement_t& st) : statement_(st) { }
     
-    statement::statement(const nil& nil) 
-      : statement_(nil) { 
-    }
+    statement::statement(const nil& st) : statement_(st) { }
+    statement::statement(const assignment& st) : statement_(st) { }
+    statement::statement(const sample& st) : statement_(st) { }
+    statement::statement(const statements& st) : statement_(st) { }
+    statement::statement(const for_statement& st) : statement_(st) { }
+    statement::statement(const no_op_statement& st) : statement_(st) { }
 
-    template <typename Statement>
-    statement::statement(const Statement& statement)
-      : statement_(statement) {
-    }
+    // template <typename Statement>
+    // statement::statement(const Statement& statement)
+    // : statement_(statement) {
+    // }
+
 
 
 

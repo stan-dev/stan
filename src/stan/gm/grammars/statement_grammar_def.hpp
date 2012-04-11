@@ -100,8 +100,9 @@ namespace stan {
         if (lhs_origin != local_origin
             && lhs_origin != origin_allowed) {
           error_msgs << "attempt to assign variable in wrong block."
-                     << " left-hand-side variable origin=" << lhs_origin
-                     << std::endl;
+                     << " left-hand-side variable origin=";
+          print_var_origin(error_msgs,lhs_origin);
+          error_msgs << std::endl;
           return false;
         }
 
@@ -136,9 +137,11 @@ namespace stan {
         if (!types_compatible) {
           error_msgs << "base type mismatch in assignment"
                      << "; left variable=" << a.var_dims_.name_
-                     << "; left base type=" << lhs_base_type
-                     << "; right base type=" << rhs_base_type
-                     << std::endl;
+                     << "; left base type=";
+          write_base_expr_type(error_msgs,lhs_base_type);
+          error_msgs << "; right base type=";
+          write_base_expr_type(error_msgs,rhs_base_type);
+          error_msgs << std::endl;
           return false;
         }
         return true;

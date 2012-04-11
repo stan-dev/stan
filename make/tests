@@ -88,10 +88,10 @@ test/%.d : src/test/%_test.cpp
 ifeq (test-unit,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(UNIT_TESTS))
 endif
-ifeq (test-bugs,$(MAKECMDGOALS))
-  -include $(addsuffix .d,$(UNIT_TESTS))
-  -include demo/gm.d
-endif
+#ifeq (test-bugs,$(MAKECMDGOALS))
+#  -include $(addsuffix .d,$(UNIT_TESTS))
+#  -include demo/gm.d
+#endif
 ifeq (test-all,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(UNIT_TESTS))
 endif
