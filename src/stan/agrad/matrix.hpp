@@ -1579,6 +1579,57 @@ namespace stan {
     }
 
     /**
+     * Returns the solution x of the system xA = b.
+     * @param b Right hand side matrix or vector.
+     * @param A Matrix.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
+    											  const Eigen::Matrix<var,R2,C2> &A) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.rows() != b.cols())
+        throw std::invalid_argument("A.rows() != b.cols()");
+      return A.transpose().solve(b.transpose()).transpose();
+    }
+    /**
+     * Returns the solution x of the system xA = b.
+     * @param b Right hand side matrix or vector.
+     * @param A Matrix.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
+    											  const Eigen::Matrix<var,R2,C2> &A) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.rows() != b.cols())
+        throw std::invalid_argument("A.rows() != b.cols()");
+      return A.transpose().solve(to_var(b).transpose()).transpose();
+    }
+    /**
+     * Returns the solution x of the system xA = b.
+     * @param b Right hand side matrix or vector.
+     * @param A Matrix.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
+    											  const Eigen::Matrix<double,R2,C2> &A) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.rows() != b.cols())
+        throw std::invalid_argument("A.rows() != b.cols()");
+      return to_var(A).transpose().solve(b.transpose()).transpose();
+    }
+    /**
      * Return the real component of the eigenvalues of the specified
      * matrix in descending order of magnitude.
      * <p>See <code>eigen_decompose()</code> for more information.
