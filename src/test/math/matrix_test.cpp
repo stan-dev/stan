@@ -838,3 +838,4 @@ TEST(matrixTest,mdivide_right_tri_val) {
   EXPECT_NEAR(0.0,I(1,0),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1),1.0e-12);
 }
+
