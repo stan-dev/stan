@@ -3,6 +3,7 @@
 # 
 
 ## status: not work (there are discrete parameters) 
+## see hearts.stan 
 data {
   int(0,) N;
   int(0,) x[N];
@@ -17,7 +18,7 @@ parameters {
 } 
 
 transformed parameters {
-  real theta;
+  real(0,1) theta;
   theta <- inv_logit(delta); 
 } 
 

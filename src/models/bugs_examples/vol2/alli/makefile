@@ -1,18 +1,18 @@
 STAN_HOME = ../../../../..
 PGM = alli#
-CXX = g++ -std=c++0x 
+CXX = g++  
 CXX = clang++ 
 
 .PHONY : one two 
 
 
 two : 
-	cat $(PGM)2.stan | $(STAN_HOME)/demo/gm > $(PGM)2.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)2  $(PGM)2.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)2.cpp -o $(PGM)2
 	./$(PGM)2 --data=$(PGM)2.Rdata --samples=samples.csv 
 
 one : 
-	cat $(PGM)1.stan | $(STAN_HOME)/demo/gm > $(PGM)1.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)1  $(PGM)1.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)1.cpp -o $(PGM)1
 	./$(PGM)1 --data=$(PGM).Rdata --samples=samples1.csv 
 
