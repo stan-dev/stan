@@ -97,10 +97,12 @@ namespace stan {
      * The integer step, or Heaviside, function.  
      *
      * @param y Value to test.
-     * @return 1 if value is greater than 0.0 and 0 otherwise.
+     * @return 1 if value is greater than 0 and 0 otherwise
+     * @tparam T Scalar argument type.
      */
-    unsigned int int_step(double y) {
-      return y > 0.0;
+    template <typename T>
+    unsigned int int_step(T y) {
+      return y > 0;
     }
 
     /**
