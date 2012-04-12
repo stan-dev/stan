@@ -1,5 +1,5 @@
 library(coda)
-post <- read.csv(file = 'samples.csv', header = TRUE) 
+post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#') 
 
 beginwith <- function(vstr, patterns, sort = TRUE) {
   patterns <- paste(patterns, ".*", sep = ''); 

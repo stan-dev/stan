@@ -1,5 +1,5 @@
 library(coda) 
-post <- read.csv(file = 'samples.csv', header = TRUE)
+post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#')
 
 
 pars <- c("gamma", "alpha0", "beta0", "sigma_y", "sigma_alpha", "sigma_beta"); 

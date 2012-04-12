@@ -5,7 +5,7 @@
 library(coda) 
 logit <- function(x) log(x / (1 - x)); 
 
-post <- read.csv(file = "samples.csv", header = TRUE); 
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 U3 <- logit(post[, 'lambda']) 
 names(U3) <- "U3"; 

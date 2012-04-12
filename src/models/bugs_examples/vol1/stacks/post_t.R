@@ -1,7 +1,7 @@
 library(coda)
 source('stacks.Rdata')
 z <- apply(x, 2, FUN = function(x) { (x - mean(x)) / sd(x); })
-post <- read.csv(file = "samples_t.csv", header = TRUE)
+post <- read.csv(file = "samples_t.csv", header = TRUE, comment.char = '#')
 
 # the degree of freedom specified for the student_t 
 # dsn in the model 

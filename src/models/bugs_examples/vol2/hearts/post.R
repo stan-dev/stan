@@ -1,5 +1,5 @@
 library(coda)
-post <- read.csv(file = "samples.csv", header = TRUE, skip = 19);
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#', skip = 19);
 
 pars <- c("alpha", "delta", "theta"); 
 

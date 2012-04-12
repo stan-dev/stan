@@ -1,6 +1,6 @@
 library(coda) 
 # library(BUGSExamples)
-post <- read.csv(file = 'samples.csv', header = TRUE) 
+post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#') 
 
 pars <- c("a.1", "a.2", "a.3", "beta", "pi", "kappa", "sigma"); 
 poi <- post[, pars]; 
