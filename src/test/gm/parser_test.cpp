@@ -82,6 +82,10 @@ TEST(gm_parser,good_trunc) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_trunc.stan"));
 }
 
+TEST(gm_parser,good_const) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_const.stan"));
+}
+
 TEST(gm_parser,triangle_lp) {
   EXPECT_TRUE(is_parsable("src/models/basic_distributions/triangle.stan"));
 }
