@@ -11,6 +11,7 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -std=gnu++0x
   CFLAGS += -g
   CFLAGS_GTEST += -g
+  CFLAGS_GTEST += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   PCH = .gch
 endif
