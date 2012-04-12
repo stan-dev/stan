@@ -558,25 +558,6 @@ namespace stan {
       return var(new dot_product_vd_vari(v2,v1));
     }
     /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First column vector.
-     * @param v2 Second column vector.
-     * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2
-     * or either v1 or v2 are not vectors.
-     */
-    template<int R1,int C1,int R2, int C2>
-    inline var dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
-                           const Eigen::Matrix<double, R2, C2>& v2) {
-      if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::invalid_argument("v1 must be a vector");
-      if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::invalid_argument("v2 must be a vector");
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
-      return to_var(stan::math::dot_product(v1,v2));
-    }
-    /**
      * Returns the dot product of the specified arrays of doubles.
      * @param v1 First array.
      * @param v2 Second array.
@@ -1333,20 +1314,89 @@ namespace stan {
      * @throw std::invalid_argument if the number of columns of m1 does not match
      *   the number of rows of m2.
      */
-    template<typename T1,int R1,int C1,typename T2,int R2,int C2>
-    inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<T1,R1,C1>& m1,
-                                             const Eigen::Matrix<T2,R2,C2>& m2) {
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<var,R1,C1>& m1,
+                                             const Eigen::Matrix<var,R2,C2>& m2) {
       if (m1.cols() != m2.rows())
         throw std::invalid_argument("m1.cols() != m2.rows()");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
-        Eigen::Matrix<T1,1,C1> crow = m1.row(i);
+        Eigen::Matrix<var,1,C1> crow(m1.row(i));
         for (int j = 0; j < m2.cols(); j++) {
-          Eigen::Matrix<T2,R2,1> ccol = m2.col(j);
+          Eigen::Matrix<var,R2,1> ccol(m2.col(j));
           result(i,j) = dot_product(crow,ccol);
         }
       }
       return result;
+    }
+
+    /**
+     * Return the product of the specified matrices.  The number of
+     * columns in the first matrix must be the same as the number of rows
+     * in the second matrix.
+     * @param m1 First matrix.
+     * @param m2 Second matrix.
+     * @return The product of the first and second matrices.
+     * @throw std::invalid_argument if the number of columns of m1 does not match
+     *   the number of rows of m2.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
+                                             const Eigen::Matrix<var,R2,C2>& m2) {
+      if (m1.cols() != m2.rows())
+        throw std::invalid_argument("m1.cols() != m2.rows()");
+      Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
+      for (int i = 0; i < m1.rows(); i++) {
+        Eigen::Matrix<double,1,C1> crow(m1.row(i));
+        for (int j = 0; j < m2.cols(); j++) {
+          Eigen::Matrix<var,R2,1> ccol(m2.col(j));
+          result(i,j) = dot_product(crow,ccol);
+        }
+      }
+      return result;
+    }
+    
+    /**
+     * Return the product of the specified matrices.  The number of
+     * columns in the first matrix must be the same as the number of rows
+     * in the second matrix.
+     * @param m1 First matrix.
+     * @param m2 Second matrix.
+     * @return The product of the first and second matrices.
+     * @throw std::invalid_argument if the number of columns of m1 does not match
+     *   the number of rows of m2.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<var,R1,C1>& m1,
+                                             const Eigen::Matrix<double,R2,C2>& m2) {
+      if (m1.cols() != m2.rows())
+        throw std::invalid_argument("m1.cols() != m2.rows()");
+      Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
+      for (int i = 0; i < m1.rows(); i++) {
+        Eigen::Matrix<var,1,C1> crow(m1.row(i));
+        for (int j = 0; j < m2.cols(); j++) {
+          Eigen::Matrix<double,R2,1> ccol(m2.col(j));
+          result(i,j) = dot_product(crow,ccol);
+        }
+      }
+      return result;
+    }
+
+    /**
+     * Return the scalar product of the specified row vector and
+     * specified column vector.  The return is the same as the dot
+     * product.  The two vectors must be the same size.
+     * @param rv Row vector.
+     * @param v Column vector.
+     * @return Scalar result of multiplying row vector by column vector.
+     * @throw std::invalid_argument if rv and v are not the same size
+     */
+    template <int C1,int R2>
+    inline var multiply(const Eigen::Matrix<var, 1, C1>& rv, 
+                        const Eigen::Matrix<var, R2, 1>& v) {
+      if (rv.size() != v.size())
+        throw std::invalid_argument("rv.size() != v.size()");
+      return dot_product(rv, v);
     }
     /**
      * Return the scalar product of the specified row vector and
@@ -1357,9 +1407,25 @@ namespace stan {
      * @return Scalar result of multiplying row vector by column vector.
      * @throw std::invalid_argument if rv and v are not the same size
      */
-    template <typename T1, int C1, typename T2, int R2>
-    inline var multiply(const Eigen::Matrix<T1, 1, C1>& rv, 
-                        const Eigen::Matrix<T2, R2, 1>& v) {
+    template <int C1,int R2>
+    inline var multiply(const Eigen::Matrix<double, 1, C1>& rv, 
+                        const Eigen::Matrix<var, R2, 1>& v) {
+      if (rv.size() != v.size())
+        throw std::invalid_argument("rv.size() != v.size()");
+      return dot_product(rv, v);
+    }
+    /**
+     * Return the scalar product of the specified row vector and
+     * specified column vector.  The return is the same as the dot
+     * product.  The two vectors must be the same size.
+     * @param rv Row vector.
+     * @param v Column vector.
+     * @return Scalar result of multiplying row vector by column vector.
+     * @throw std::invalid_argument if rv and v are not the same size
+     */
+    template <int C1,int R2>
+    inline var multiply(const Eigen::Matrix<var, 1, C1>& rv, 
+                        const Eigen::Matrix<double, R2, 1>& v) {
       if (rv.size() != v.size())
         throw std::invalid_argument("rv.size() != v.size()");
       return dot_product(rv, v);

@@ -8,7 +8,6 @@
 ##
 
 ifeq (g++,$(CC_TYPE))
-  CFLAGS += -std=gnu++0x
   CFLAGS += -g
   CFLAGS_GTEST += -g
   CFLAGS_GTEST += -lpthread
@@ -16,7 +15,6 @@ ifeq (g++,$(CC_TYPE))
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
-  CFLAGS += -std=gnu++0x
   CFLAGS += -g
 #  CFLAGS += -m32
   CFLAGS_GTEST += -g
@@ -27,7 +25,6 @@ ifeq (mingw32-g++,$(CC_TYPE))
   EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
-  CFLAGS += -Wc++0x-extensions
   CFLAGS += -Wunused-function
   CFLAGS += -g
   CFLAGS += -Wno-tautological-compare
