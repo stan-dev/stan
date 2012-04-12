@@ -455,10 +455,12 @@ namespace stan {
 
       args_r.name("function argument expressions");
       args_r 
-        %= lit('(') 
-        >> (expression_r % ',')
-        > lit(')');
-
+        %= (lit('(') >> lit(')'))
+        | ( lit('(')
+            >> (expression_r % ',')
+            > lit(')') )
+        ;
+      
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 

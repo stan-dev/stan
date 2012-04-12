@@ -1,4 +1,5 @@
 // included from constructor for function_signatures() in src/stan/gm/ast.hpp
+
 add_unary("exp");
 add_unary("log");
 add_unary("log10");
