@@ -249,6 +249,9 @@ add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
 add_ternary("weibull_p");
 
+add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
+add_binary("binomial_coefficient_log");
+
 
 // MULTINOMIAL?  no vector<int> type
 

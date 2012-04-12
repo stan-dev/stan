@@ -1,5 +1,5 @@
 transformed data {
-  real(0,1) y;
+  real y;
   y <- pi();
 }
 model {
