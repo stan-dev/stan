@@ -17,7 +17,7 @@ parameters {
 } 
 
 transformed parameters {
-  real theta;
+  real(0,1) theta;
   theta <- inv_logit(delta); 
 } 
 

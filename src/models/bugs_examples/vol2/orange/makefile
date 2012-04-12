@@ -1,11 +1,11 @@
 STAN_HOME = ../../../../..
 PGM = orange
-CXX = g++ -std=c++0x 
+CXX = g++ 
 
 $(PGM) :
-	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM) $(PGM).stan  
 	$(CXX) -O0 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
 	./$(PGM) --data=$(PGM).Rdata
 
 clean :
-	rm $(PGM).cpp samples.csv $(PGM) 
+	rm -f $(PGM).cpp samples.csv $(PGM) 

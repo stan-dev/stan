@@ -1,10 +1,10 @@
 STAN_HOME = ../../../../..
 PGM = camel#
-CC = g++ -std=c++0x 
+CC = g++ 
 CC = clang++ 
 
 $(PGM) :
-	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
+	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan 
 	$(CC) -O0 -DNDEBUG -g -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
 	./$(PGM) # --data=$(PGM).Rdata
 

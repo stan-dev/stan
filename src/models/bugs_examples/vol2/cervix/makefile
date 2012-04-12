@@ -1,11 +1,11 @@
 STAN_HOME = ../../../../..
 PGM = cervix#
 PGM = cervix2#
-CC = g++  -std=c++0x 
+CC = g++   
 
 $(PGM) :
-	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
-	$(CC) -O3 -DNDEBUG  -std=c++0x -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
+	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan 
+	$(CC) -O3 -DNDEBUG   -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
 	./$(PGM) --data=$(PGM).Rdata --iter=10000 --thin=1
 
 clean :

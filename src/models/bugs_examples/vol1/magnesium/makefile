@@ -1,10 +1,10 @@
 STAN_HOME = ../../../../..
 PGM = magnesium#
-CXX = g++ -std=c++0x 
+CXX = g++  
 CXX = clang++ 
 
 $(PGM) :
-	cat $(PGM)_all.stan | $(STAN_HOME)/demo/gm > $(PGM).cpp 
+	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM)_all.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM) 
 	./$(PGM) --data=$(PGM).Rdata --burnin=1000 --iters=10000 # --samples=samples.csv 
 
@@ -13,32 +13,32 @@ $(PGM) :
 all : one two three four five six
 
 one : 
-	cat $(PGM)1.stan | $(STAN_HOME)/demo/gm > $(PGM)1.cpp 
+	$(STAN_HOME)/bin/stanc --name=$(PGM)1  $(PGM)1.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)1.cpp -o $(PGM)1 
 	./$(PGM)1 --data=$(PGM).Rdata --burnin=1000 --iters=2000 --samples=samples1.csv 
 
 two :
-	cat $(PGM)2.stan | $(STAN_HOME)/demo/gm > $(PGM)2.cpp 
+	$(STAN_HOME)/bin/stanc --name=$(PGM)2  $(PGM)2.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)2.cpp -o $(PGM)2 
 	./$(PGM)2 --data=$(PGM).Rdata --burnin=1000 --iters=10000 --samples=samples2.csv 
 
 three :
-	cat $(PGM)3.stan | $(STAN_HOME)/demo/gm > $(PGM)3.cpp 
+	$(STAN_HOME)/bin/stanc -name=$(PGM)3  $(PGM)3.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)3.cpp -o $(PGM)3 
 	./$(PGM)3 --data=$(PGM).Rdata --burnin=1000 --iters=10000 --samples=samples3.csv 
 
 four : 
-	cat $(PGM)4.stan | $(STAN_HOME)/demo/gm > $(PGM)4.cpp 
+	$(STAN_HOME)/bin/stanc --name=$(PGM)4  $(PGM)4.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)4.cpp -o $(PGM)4 
 	./$(PGM)4 --data=$(PGM).Rdata --burnin=1000 --iters=10000 --samples=samples4.csv 
 
 five : 
-	cat $(PGM)5.stan | $(STAN_HOME)/demo/gm > $(PGM)5.cpp 
+	$(STAN_HOME)/bin/stanc --name=$(PGM)5  $(PGM)5.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)5.cpp -o $(PGM)5 
 	./$(PGM)5 --data=$(PGM).Rdata --burnin=1000 --iters=10000 --samples=samples5.csv 
 
 six : 
-	cat $(PGM)6.stan | $(STAN_HOME)/demo/gm > $(PGM)6.cpp 
+	$(STAN_HOME)/bin/stanc --name=$(PGM)6  $(PGM)6.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)6.cpp -o $(PGM)6 
 	./$(PGM)6 --data=$(PGM).Rdata --burnin=1000 --iters=10000 --samples=samples6.csv 
 
