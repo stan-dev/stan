@@ -34,7 +34,8 @@ model {
     # p(y_i | t_i) = (1 - theta) * PMF_OF_BINOMIAL(t_i, y_i, p) for y_i = 1,2,...,t_i 
     
     lp__ <- lp__ + if_else(y[i], 
-                           log(1 - theta) + binomial_coefficient_log(t[i], y[i]) + y[i] * log(p) + x[i] * log(1 - p), 
+    #                      log(1 - theta) + binomial_coefficient_log(t[i], y[i]) + y[i] * log(p) + x[i] * log(1 - p), 
+                           log(1 - theta) + binomial_log(y[i], t[i], p),
                            log(theta + (1 - theta) * pow(1 - p, t[i])));  
   }
 }
