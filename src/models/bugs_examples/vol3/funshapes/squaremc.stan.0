@@ -9,5 +9,5 @@ parameters {
 } 
 
 model {
-  lp__ <- log(fmax(x * x + y * y - 1, 0)); 
+  lp__ <- lp__ + log(fmax(x * x + y * y - 1, 0)); 
 } 
