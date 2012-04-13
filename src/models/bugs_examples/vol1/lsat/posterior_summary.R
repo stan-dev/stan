@@ -1,5 +1,5 @@
 library(coda) 
-library(BUGSExamples) 
+# library(BUGSExamples) 
 post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 poi <- post[, c(paste("alpha.", 1:5, sep = ''), paste('a.', 1:5, sep = ''), "beta")] 
