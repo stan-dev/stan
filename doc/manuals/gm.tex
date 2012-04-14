@@ -3863,11 +3863,52 @@ The log of the sum of the exponentials of the elements in \farg{x}
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 
+
+\section{Integer-Valued Matrix Size Functions}
+
+\begin{description}
+%
+\fitem{int}{rows}{vector \farg{x}}{The number of
+rows in the vector \farg{x}}
+%
+\fitem{int}{rows}{row\_vector \farg{x}}{The number of
+rows in the row vector \farg{x}, namely 1}
+%
+\fitem{int}{rows}{matrix \farg{x}}{The number of
+rows in the matrix \farg{x}}
+%
+\fitem{int}{cols}{vector \farg{x}}{The number of columns
+in the vector \farg{x}, namely 1}
+%
+\fitem{int}{cols}{row\_vector \farg{x}}{The number of columns
+in the row vector \farg{x}}
+%
+\fitem{int}{cols}{matrix \farg{x}}{The number of columns
+in the matrix \farg{x}}
+\end{description}
+
+
 \section{Matrix Arithmetic Operators}
 
 \Stan supports the basic matrix operations using infix, prefix and
 postfix operations.  This section lists the operations supported by
 \Stan along with their argument and result types.
+
+\subsection{Negation Prefix Operators}
+
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}}{The negation of the vector
+\farg{x}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}}{The negation of the row
+vector \farg{x}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}}{The negation of the matrix
+  \farg{x}}
+%
+\end{description}
+
 
 \subsection{Infix Matrix Operators}
 
@@ -3935,8 +3976,11 @@ the scalar \farg{y} and matrix \farg{x}}
   the matrices \farg{x} and \farg{y}}
 %
 \end{description}
+%
 
-\subsection{Elementwise Infix Operators}
+
+
+\subsection{Broadcast Infix Operators}
 
 \begin{description}
 %
@@ -3982,37 +4026,265 @@ adding \farg{x} to every entry in negation of the matrix \farg{y}}
 %
 \end{description}
 
-
-\subsection{Prefix Matrix Operators}
+\subsection{Elementwise Products}
 
 \begin{description}
 %
-\fitem{vector}{operator-}{vector \farg{x}}{The negation of the vector
-  \farg{x}}
+\fitem{vector}{operator.*}{vector \farg{x}, vector \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
 %
-\fitem{row\_vector}{operator-}{row\_vector \farg{x}}{The negation of the row
-  vector \farg{x}}
+\fitem{row\_vector}{operator.*}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
 %
-\fitem{matrix}{operator-}{matrix \farg{x}}{The negation of the matrix
-    \farg{x}}
+\fitem{matrix}{operator.*}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+\fitem{vector}{operator./}{vector \farg{x}, vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator./}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\end{description}
+\vspace*{-4pt}
+
+\subsection{Elementwise Logarithms}
+
+\begin{description}
+%
+\fitem{vector}{log}{vector \farg{x}}{
+The elementwise natural logarithm of \farg{x}}
+%
+\fitem{row\_vector}{log}{row\_vector \farg{x}}{
+The elementwise natural logarithm of \farg{x}}
+%
+\fitem{matrix}{log}{matrix \farg{x}}{
+The elementwise natural logarithm of \farg{x}}
+%
+\fitem{vector}{exp}{vector \farg{x}}{
+The elementwise exponential of \farg{x}}
+%
+\fitem{row\_vector}{exp}{row\_vector \farg{x}}{
+The elementwise exponential of \farg{x}}
+%
+\fitem{matrix}{exp}{matrix \farg{x}}{
+The elementwise exponential of \farg{x}}
+\end{description}
+
+
+
+\subsection{Dot Products}
+
+\begin{description}
+%
+\fitem{real}{dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{vector \farg{x}, row\_vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{row\_vector \farg{x}, vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
 %
 \end{description}
 
 
-\subsection{Postfix Matrix Operators}
+\section{Reductions}
+
+\subsection{Minimum and Maximum}
+
+\begin{description}
+%
+\fitem{real}{min}{vector \farg{x}}{
+The minimum value in \farg{x}}
+%
+\fitem{real}{min}{row\_vector \farg{x}}{
+The minimum value in \farg{x}}
+%
+\fitem{real}{min}{matrix \farg{x}}{
+The minimum value in \farg{x}}
+%
+\fitem{real}{max}{vector \farg{x}}{
+The maximum value in \farg{x}}
+%
+\fitem{real}{max}{row\_vector \farg{x}}{
+The maximum value in \farg{x}}
+%
+\fitem{real}{max}{matrix \farg{x}}{
+The maximum value in \farg{x}}
+%
+\end{description}
+
+\subsection{Sums and Products}
+
+\begin{description}
+%
+\fitem{real}{sum}{vector \farg{x}}{
+The sum of the values in \farg{x} (zero if size zero)}
+%
+\fitem{real}{sum}{row\_vector \farg{x}}{
+The sum of the values in \farg{x} (zero if size zero)}
+%
+\fitem{real}{sum}{matrix \farg{x}}{
+The sum of the values in \farg{x} (zero if size zero)}
+%
+%
+\fitem{real}{prod}{vector \farg{x}}{
+The product of the values in \farg{x} (one if size zero)}
+%
+\fitem{real}{prod}{row\_vector \farg{x}}{
+The product of the values in \farg{x} (one if size zero)}
+%
+\fitem{real}{prod}{matrix \farg{x}}{
+The product of the values in \farg{x} (one if size zero)}
+%
+\end{description}
+
+
+
+\subsection{Sample Moments}
+
+\begin{description}
+%
+\fitem{real}{mean}{vector \farg{x}}{
+The sample mean of the values in \farg{x}}
+%
+\fitem{real}{mean}{row\_vector \farg{x}}{
+The sample mean of the values in \farg{x}}
+%
+\fitem{real}{mean}{matrix \farg{x}}{
+The sample mean of the values in \farg{x}
+(divide by length minus 1)}
+%
+\vspace*{4pt}
+%
+\fitem{real}{variance}{vector \farg{x}}{
+The sample variance of the values in \farg{x}
+(divide by size minus 1)}
+%
+\fitem{real}{variance}{row\_vector \farg{x}}{ 
+The sample variance of the
+values in \farg{x} (divide by size minus 1)}
+%
+\fitem{real}{variance}{matrix \farg{x}}{
+The sample variance of the values in 
+farg{x} (divide by size minus 1)}
+%
+\vspace*{4pt}
+%
+\fitem{real}{sd}{vector \farg{x}}{
+The sample standard deviation of the values in \farg{x}
+(divide by size minus 1)}
+%
+\fitem{real}{sd}{row\_vector \farg{x}}{ 
+The sample standard deviation of the
+values in \farg{x} (divide by size minus 1)}
+%
+\fitem{real}{sd}{matrix \farg{x}}{
+The sample standard deviation of the values in 
+\farg{x} (divide by size minus 1)}
+%
+\end{description}
+
+
+\section{Slice and Package Functions}
+
+\subsection{Diagonal Matrices}
+
+\begin{description}
+%
+\fitem{vector}{diagonal}{matrix \farg{x}}{The diagonal
+of the matrix \farg{x}}
+%
+\fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
+matrix with diagonal \farg{x}}
+%
+\fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
+of matrix \farg{x}}
+%
+\fitem{row\_vector}{row}{matrix \farg{x}, int \farg{m}}{The \farg{m}-th row
+of matrix \farg{x}}
+%
+\end{description}
+
+
+\subsection{Transposition Postfix Operator}
 
 \begin{description}
 %
 \fitem{matrix}{operator'}{matrix \farg{x}}{The transpose of the matrix
-  \farg{x}, written as \code{x'}}
+ \farg{x}, written as \code{x'}}
 %
 \fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
-  \farg{x}, written as \code{x'}}
+ \farg{x}, written as \code{x'}}
 %
 \fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the vector
-  \farg{x}, written as \code{x'}}
+ \farg{x}, written as \code{x'}}
 %
 \end{description}
+
+
+\section{Linear Algebra Functions and Solvers}
+
+\subsection{Matrix Division Infix Operators}
+%
+\begin{description}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inv(\farg{A})}}
+%
+\fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inv(\farg{A}) * \farg{b}}
+%
+\end{description}
+
+\subsection{Linear Algebra Functions}
+
+\begin{description}
+%
+\fitem{real}{trace}{matrix \farg{A}}{
+The trace of \farg{A}}
+%
+\fitem{real}{determinant}{matrix \farg{A}}{
+The determinant of \farg{A}}
+%
+\fitem{matrix}{inverse}{matrix \farg{A}}{
+The inverse of \farg{A}}
+%
+\fitem{vector}{eigenvalues}{matrix \farg{A}}{
+The vector of eigenvalues of \farg{A} in descending order}
+%
+\fitem{matrix}{eigenvalues}{matrix \farg{A}}{
+The matrix with the eigenvectors of \farg{A} as columns}
+%
+\fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
+The vector of eigenvalues of a symmetric view of \farg{A} 
+in descending order}
+%
+\fitem{vector}{eigenvectors\_sym}{matrix \farg{A}}{
+The matrix with the eigenvectors of a symmetric view of
+\farg{A}}
+%
+\fitem{matrix}{cholesky}{matrix \farg{A}}{
+The lower-triangular Cholesky factor of \farg{A}}
+%
+\fitem{vector}{singular\_values}{matrix \farg{A}}{
+The singular values of \farg{A} in descending order}
+%
+
+
+\end{description}
+
 
 
 \section{Integer-Valued Matrix Size Functions}
@@ -4037,19 +4309,6 @@ in the row vector \farg{x}}
 \fitem{int}{cols}{matrix \farg{x}}{The number of columns
 in the matrix \farg{x}}
 \end{description}
-
-\section{Slice and Package Functions}
-
-\begin{description}
-%
-\fitem{vector}{diagonal}{matrix \farg{x}}{The diagonal
-of the matrix as a vector}
-%
-\end{description}
-
-
-
-\section{Linear Algebra Functions and Solvers}
 
 
 
