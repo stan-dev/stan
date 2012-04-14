@@ -135,6 +135,9 @@ add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
 
+add("mdivide_left",VECTOR_T,MATRIX_T,VECTOR_T);
+add("mdivide_right",ROW_VECTOR_T,ROW_VECTOR_T,MATRIX_T);
+
 add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("diagonal",VECTOR_T,MATRIX_T);

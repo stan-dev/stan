@@ -3935,6 +3935,22 @@ the scalar \farg{y} and matrix \farg{x}}
   the matrices \farg{x} and \farg{y}}
 %
 \end{description}
+%
+\vspace*{-4pt}
+%
+\begin{description}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inv(\farg{A})}}
+%
+\fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inv(\farg{A}) * \farg{b}}
+%
+\end{description}
+
+
 
 \subsection{Elementwise Infix Operators}
 
@@ -4043,10 +4059,18 @@ in the matrix \farg{x}}
 \begin{description}
 %
 \fitem{vector}{diagonal}{matrix \farg{x}}{The diagonal
-of the matrix as a vector}
+of the matrix \farg{x}}
+%
+\fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
+matrix with diagonal \farg{x}}
+%
+\fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
+of matrix \farg{x}}
+%
+\fitem{row\_vector}{row}{matrix \farg{x}, int \farg{m}}{The \farg{m}-th row
+of matrix \farg{x}}
 %
 \end{description}
-
 
 
 \section{Linear Algebra Functions and Solvers}
