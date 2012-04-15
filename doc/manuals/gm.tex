@@ -52,6 +52,10 @@
 \newcommand{\code}[1]{{\tt #1}}
 \newcommand{\mycaption}[2]{\caption{{\it #2}\label{#1.figure}}}
 
+\newcommand{\distro}[1]{\mbox{\sf #1}}
+\newcommand{\Betafun}{\mbox{B}}
+\newcommand{\setlist}[1]{\{ #1 \}}
+
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
 \newcommand{\refpart}[1]{Part~\ref{#1.part}}
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
@@ -4319,11 +4323,23 @@ support.
 
 \section{Binary Discrete Probabilities}
 
-Binary probability functions have support on $\{0,1\}$, where 1
+Binary probability functions have support on $\setlist{0,1}$, where 1
 represents the value true and 0 the value false.
 
 \subsection{Bernoulli Distribution}
 
+If $\theta \in [0,1]$ and $c \in \setlist{0,1}$, then
+\[
+\distro{Bernoulli}(c|\theta)
+=
+\left\{
+\begin{array}{ll}
+\theta & \mbox{if } y = 1, \mbox{ and}
+\\
+1 - \theta & \mbox{if } y = 0.
+\end{array}
+\right.
+\]
 \begin{description}
 %
  \fitem{real}{bernoulli\_log}{int \farg{y}, real \farg{theta}}{The
@@ -4334,10 +4350,17 @@ represents the value true and 0 the value false.
 
 \section{Bounded Discrete Probabilities}
 
-Bounded discrete probability functions have support on $1:N$ for some
-upper bound $N$.
+Bounded discrete probability functions have support on
+$\setlist{0,\ldots,N}$ for some upper bound $N$.
 
 \subsection{Binomial Distribution}
+
+If $N \in \{0,1,\ldots\}$, $n \in \{0,\ldots,N\}$, and $\theta \in
+[0,1]$, then
+\[
+\distro{Binomial}(n|N,\theta)
+= {N \choose n} \theta^n (1 - \theta)^{N - n}.
+\]
 
 \begin{description}
 %
@@ -4349,6 +4372,23 @@ upper bound $N$.
 
 
 \subsection{Beta-Binomial Distribution}
+
+If $N \in \setlist{0,1,\ldots}$, $n \in \setlist{0,\ldots,N}$, 
+$\alpha \in (0,\infty)$, and $\beta \in (0,\infty)$, then
+\[
+\distro{BetaBinomial}(n|N,\alpha,\beta)
+= 
+{N \choose n} \frac{\Betafun(n+\alpha, N -n +
+  \beta)}{\Betafun(\alpha,\beta)},
+\]
+%
+where the beta function $\Betafun(x,y)$ is defined for $x \in
+(0,\infty)$ and $y \in (0,\infty)$ by
+%
+\[
+\Betafun(x,y)
+= \frac{\Gamma(x) \Gamma(y)}{\Gamma(x + y)}.
+\]
 
 \begin{description}
 %
@@ -4363,6 +4403,16 @@ upper bound $N$.
 
 \subsection{Hypergeometric Distribution}
 
+If $a \in \setlist{0,1,\ldots}$, $b \in \setlist{0,1,\ldots}$,
+$N \in \setlist{0,\ldots,a+b}$, and
+$n \in \setlist{0,\ldots,\min(a,N)}$, then
+\[
+\distro{Hypergeometric}(n|N,a,b)
+=
+\frac{\normalsize{a \choose n} {b \choose {N - n}}}
+     {\normalsize{{m + n} \choose N}}.
+\]
+
 \begin{description}
 %
   \fitem{real}{hypergeometric\_log}{int \farg{n}, int \farg{N}, int
@@ -4374,6 +4424,12 @@ upper bound $N$.
 \end{description}
 
 \subsection{Categorical Distribution}
+
+If $N \in \setlist{1,\ldots}$, $\theta \in \mbox{$N$-simplex}$, and $n
+\in \setlist{1,\ldots,N}$, then
+\[
+\distro{Categorical}(n|\theta) = \theta_n.
+\]
 
 \begin{description}
 %
@@ -4391,6 +4447,18 @@ numbers (i.e., the non-negative integers).
 
 \subsection{Negative Binomial Distribution}
 
+If $n \in \setlist{0,1,\ldots}$, $\alpha \in (0,\infty)$, and $\beta
+\in (0,\infty)$, then
+\[
+\distro{NegativeBinomial}(n|\alpha,\beta)
+= 
+{{n + \alpha - 1} \choose {\alpha - 1}}
+\,
+\left( \frac{\beta}{\beta+1} \right)^{\alpha}
+\,
+\left( \frac{1}{\beta + 1} \right)^n .
+\]
+
 \begin{description}
 %
  \fitem{real}{negative\_binomial\_log}{int \farg{n}, real
@@ -4401,6 +4469,16 @@ numbers (i.e., the non-negative integers).
 
 
 \subsection{Poisson Distribution}
+
+If $n \in \setlist{0,1,\ldots}$ and $\lambda \in (0,\infty)$, then
+\[
+\distro{Poisson}(n|\lambda)
+= 
+\frac{\exp(-\lambda)}{\lambda!}
+\,
+\lambda^n.
+\]
+
 
 \begin{description}
 %
@@ -4416,13 +4494,31 @@ numbers (i.e., the non-negative integers).
 
 \subsection{Multinomial Distribution}
 
+If $K \in \setlist{0,1,\ldots}$, 
+$N \in \setlist{0,1,\ldots}$, 
+$\theta \in \mbox{$K$-simplex}$, and
+$y \in \mathbb{N}^K$ such $\sum_{k=1}^K y_k = N$, then
+%
+\[
+\distro{Multinomial}(y|\theta,N)
+= {N \choose {y_1,\ldots,y_K}} 
+\prod_{k=1}^K \theta_k^{y_k},
+\]
+where the multinomial coefficient is defined by
+\[
+{N \choose {y_1,\ldots,y_k}}
+= \frac{N!}{\prod_{k=1}^K y_k!}.
+\]
+
+
+
 \begin{description}
 %
   \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
     \farg{theta}}{The multinomial probability mass function with
     outcome array \code{y} of size $K$ given the $K$-simplex
     distribution parameter \farg{theta} and (implicit) total count
-    \code{sum(\farg{y})}}
+    \code{N = sum(\farg{y})}}
 %
 \end{description}
 
