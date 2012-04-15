@@ -57,7 +57,7 @@
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
 \newcommand{\refsection}[1]{Section~\ref{#1.section}}
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
-\newcommand{\refnote}[1]{Footnote~\ref{#1.figure}}
+\newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
 
 \newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ } \\[4pt] #4}
 \newcommand{\farg}[1]{{\tt\slshape #1}}
@@ -4314,7 +4314,427 @@ in the matrix \farg{x}}
 
 \chapter{Discrete Probabilities}\label{discrete-prob-functions.chapter}
 
+The various discrete probability functions are organized by their
+support.
+
+\section{Binary Discrete Probabilities}
+
+Binary probability functions have support on $\{0,1\}$, where 1
+represents the value true and 0 the value false.
+
+\subsection{Bernoulli Distribution}
+
+\begin{description}
+%
+ \fitem{real}{bernoulli\_log}{int \farg{y}, real \farg{theta}}{The
+   Bernoulli probability mass of \farg{y} given chance of success
+   \farg{theta}}
+%
+\end{description}
+
+\section{Bounded Discrete Probabilities}
+
+Bounded discrete probability functions have support on $1:N$ for some
+upper bound $N$.
+
+\subsection{Binomial Distribution}
+
+\begin{description}
+%
+  \fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
+    \farg{theta}}{The binomial probability mass of \farg{n}
+    successes in \farg{N} trials given chance of success \farg{theta}}
+%
+\end{description}
+
+
+\subsection{Beta-Binomial Distribution}
+
+\begin{description}
+%
+\fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
+  \farg{alpha}, real \farg{beta}}{The beta-binomial probability mass
+  of \farg{n} successes in \farg{N} trials given prior success count
+  (plus one) of \farg{alpha} and prior failure count (plus one) of
+  \farg{beta}}
+%
+\end{description}
+
+
+\subsection{Hypergeometric Distribution}
+
+\begin{description}
+%
+  \fitem{real}{hypergeometric\_log}{int \farg{n}, int \farg{N}, int
+    \farg{a}, int \farg{b}}{The hypergeometric probability mass of
+    \farg{n} successes in \farg{N} trials given total success count of
+    \farg{a} and total failure count of \farg{b}}
+
+%
+\end{description}
+
+\subsection{Categorical Distribution}
+
+\begin{description}
+%
+\fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
+ categorical probability mass function with outcome \farg{y} in 
+$1:N$ given $N$-simplex distribution parameter \farg{theta}}
+%
+\end{description}
+
+
+\section{Unbounded Discrete Distributions}
+
+The unbounded discrete distributions have support over the natural
+numbers (i.e., the non-negative integers).
+
+\subsection{Negative Binomial Distribution}
+
+\begin{description}
+%
+ \fitem{real}{negative\_binomial\_log}{int \farg{n}, real
+   \farg{alpha}, real \farg{beta}}{The negative binomial probability
+   mass of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
+%
+\end{description}
+
+
+\subsection{Poisson Distribution}
+
+\begin{description}
+%
+  \fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
+    Poisson probability mass of \farg{n} given rate \farg{lambda}}
+%
+\end{description}
+
+
+
+
+\section{Multivariate Discrete Probabilities}
+
+\subsection{Multinomial Distribution}
+
+\begin{description}
+%
+  \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
+    \farg{theta}}{The multinomial probability mass function with
+    outcome array \code{y} of size $K$ given the $K$-simplex
+    distribution parameter \farg{theta} and (implicit) total count
+    \code{sum(\farg{y})}}
+%
+\end{description}
+
+
 \chapter{Continuous Probabilities}\label{continuous-prob-functions.chapter}
+
+The various continuous probability functions are organized by their
+support.
+
+\section{Univariate Continuous Probabilities}
+
+The univariate continous probability distributions have support on all
+real numbers.
+
+\subsection{Normal Distribution}
+
+\begin{description}
+\fitem{real}{normal\_log}{real \farg{y}, real \farg{mu}, real
+\farg{sigma}}{The normal density of \farg{y} given location
+\farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{normal\_log}{real[] \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The product for \code{n} from 1 to
+  \code{size(\farg{y})} of the normal density of
+  \code{\farg{y}[n]} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{normal\_p}{real \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The cumulative normal distribution of \farg{y}
+  given location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+
+\subsection{Student-$t$ Distribution}
+
+\begin{description}
+  \fitem{real}{student\_t\_log}{real \farg{y}, real \farg{nu}, real
+    \farg{mu}, real \farg{sigma}}{The Student-$t$ density of \farg{y}
+    given degrees of freedom \farg{nu}, location \farg{mu}, and scale
+    \farg{sigma}}
+\end{description}
+
+\subsection{Cauchy Distribution}
+
+\begin{description}
+%
+\fitem{real}{cauchy\_log}{real \farg{y}, real \farg{mu}, real
+ \farg{sigma}}{ The Cauchy density of \farg{y} given location
+ \farg{mu} and scale \farg{sigma}}
+%
+\end{description}
+
+\subsection{Double Exponential Distribution}
+
+\begin{description}
+\fitem{real}{double\_exponential\_log}{real \farg{y}, real \farg{mu},
+real \farg{sigma}}{ The double exponential density of \farg{y} given
+location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+\subsection{Logistic Distribution}
+
+\begin{description}
+\fitem{real}{logistic\_log}{real \farg{y}, real \farg{mu},
+real \farg{sigma}}{ The logistic density of \farg{y} given
+location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+
+\section{Positive Continuous Probabilities}
+
+The positive continuous probability functions have support on the
+positive real numbers.
+
+\subsection{Lognormal Distribution}
+
+\begin{description}
+ \fitem{real}{lognormal\_log}{real \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The lognormal density of \farg{y} given location
+  \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{lognormal\_p}{real \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The cumulative lognormal distribution of \farg{y}
+  given location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+\subsection{Chi-Square Distribution}
+
+\begin{description}
+\fitem{real}{chi\_square\_log}{real \farg{y}, real \farg{nu}}{The
+  Chi-square density of \farg{y} given degrees of freedom
+  \farg{nu}}
+\end{description}
+
+\subsection{Inverse Chi-Square Distribution}
+
+\begin{description}
+\fitem{real}{inv\_chi\_square\_log}{real \farg{y}, real
+  \farg{nu}}{The inverse Chi-square density of \farg{y} given
+  degrees of freedom \farg{nu}}
+\end{description}
+
+\subsection{Scaled Inverse Chi-Square Distribution}
+
+\begin{description}
+ \fitem{real}{scaled\_inv\_chi\_square\_log}{real \farg{y}, real
+   \farg{nu}, real \farg{s}}{The inverse Chi-square density of \farg{y} given
+   degrees of freedom \farg{nu} and scale \farg{s}}
+\end{description}
+
+\subsection{Exponential Distribution}
+
+\begin{description}
+  \fitem{real}{exponential\_log}{real \farg{y}, real \farg{beta}}{The
+    exponential density of \farg{y} given inverse scale \farg{beta}}
+%
+\fitem{real}{exponential\_p}{real \farg{y}, real \farg{beta}}{The
+  cumulative distribution function of \farg{y} given inverse scale
+  \farg{beta}}
+\end{description}
+
+\subsection{Gamma Distribution}
+
+\begin{description}
+ \fitem{real}{gamma\_log}{real \farg{y}, real \farg{alpha}, real
+  \farg{beta}}{The gamma density of \farg{y} given shape
+  \farg{alpha} and inverse scale \farg{beta}}
+%
+  \fitem{real}{gamma\_p}{real \farg{y}, real \farg{alpha}, real
+   \farg{beta}}{The cumulative distribution function of \farg{y} given shape
+   \farg{alpha} and inverse scale \farg{beta}}
+\end{description}
+
+\subsection{Inverse Gamma Distribution}
+
+\begin{description}
+\fitem{real}{inv\_gamma\_log}{real \farg{y}, real \farg{alpha}, real
+\farg{beta}}{The inverse gamma density of \farg{y} given shape
+\farg{alpha} and scale \farg{beta}}
+\end{description}
+
+\subsection{Weibull Distribution}
+
+\begin{description}
+\fitem{real}{weibull\_log}{real \farg{y}, real \farg{alpha}, real
+\farg{sigma}}{The Weibull density of \farg{y} given shape
+\farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{weibull\_p}{real \farg{y}, real \farg{alpha}, real
+\farg{sigma}}{The Weibull cumulative distribution of \farg{y} given shape
+\farg{alpha} and scale \farg{sigma}}
+\end{description}
+
+
+
+\section{Positive Lower-Bounded Probabilities}
+
+The positive lower-bounded probabilities have support on real values
+above some positive minimum value.
+
+\subsection{Pareto Distribution}
+
+\begin{description}
+  \fitem{real}{pareto\_log}{real \farg{y}, real \farg{y\_min}, real
+    \farg{alph}}{The Pareto density of \farg{y} given positive minimum
+    value \farg{y\_min} and shape \farg{alpha}}
+\end{description}
+
+
+
+\section{$[0,1]$ Continuous Probabilities}
+
+\subsection{Beta Distribution}
+
+\begin{description}
+%
+  \fitem{real}{beta\_log}{real \farg{theta}, real \farg{alpha}, real
+    \farg{beta}}{The beta density of \code{theta} in $[0,1]$
+    given positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}}
+%
+\end{description}
+
+\section{Bounded Continuous Probabilities}
+
+The bounded continuous probabilities have support on a finite interval
+of real numbers.
+
+\subsection{Uniform Distribution}
+
+\begin{description}
+\fitem{real}{uniform\_log}{real \farg{y}, real \farg{alpha}, real
+  \farg{beta}}{The uniform density of \farg{y} given lower bound
+  \farg{alpha} and upper bound \farg{beta}}
+\end{description}
+
+\section{Simplex Probabilities}
+
+The simplex probabilities have support on the $K$-simplex for a
+specified $K$.
+
+\subsection{Dirichlet Distribution}
+
+\begin{description}
+%
+\fitem{real}{dirichlet\_log}{vector \farg{theta}, vector
+ \farg{alpha}}{
+The Dirichlet density for simplex \farg{theta} given prior counts (plus
+one) \farg{alpha}}
+%
+\end{description}
+
+
+\section{Vector Probabilities}
+
+The vector probability distributions have support on all of
+$\mathbb{R}^K$ for some fixed $K$.
+
+\subsection{Multivariate Normal Distribution}
+
+\begin{description}
+%
+\fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
+ matrix \farg{S}}{Multivariate normal density of vector \farg{y}
+ given location \farg{mu} and covariance matrix \farg{S}}
+%
+\end{description}
+
+\subsection{Multivariate Normal Distribution (Cholesky Factor Parameterization)}
+\begin{description}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{vector \farg{y}, vector
+  \farg{mu}, matrix \farg{L}}{Multivariate normal density of vector
+  \farg{y} given location \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\end{description}
+
+
+\subsection{Multivariate Student-$t$ Distribution}
+
+\begin{description}
+%
+\fitem{real}{multi\_student\_t\_log}{vector \farg{y}, real \farg{nu},
+  vector \farg{mu}, matrix \farg{S}}{Multivariate Student-$t$
+  density of vector \farg{y} given degrees of freedom \farg{nu},
+  location \farg{mu}, and scale matrix \farg{S}}
+%
+\end{description}
+
+
+
+\section{Covariance Matrix Distributions}
+
+The covariance matrix distirbutions have support on symmetric,
+positive-definite $K \times K$ matrices.
+
+\subsection{Wishart Distribution}
+
+\begin{description}
+%
+\fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+ \farg{S}}{Wishart density for positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{S}}
+%
+\end{description}
+
+
+\subsection{Inverse Wishart Distribution}
+
+\begin{description}
+%
+\fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+ \farg{S}}{Inverse Wishart density for positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{S}}
+%
+\end{description}
+
+\subsection{LKJ Covariance Distribution}
+
+\begin{description}
+%
+\fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
+\farg{sigma}, real \farg{eta}}{LKJ density for covariance matrix
+\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
+and shape \farg{eta}}
+%
+\end{description}
+
+
+
+\section{Correlation Matrix Distributions}
+
+The correlation matrix distributions have support on the (Cholesky
+factors of) correlation matrices.  A Cholesky factor $L$ for a $K
+\times K$ covariance matrix of dimensions $K$ has rows of unit length
+so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
+
+\subsection{LKJ Cholesky Distribution}
+
+\begin{description}
+%
+\fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+  \farg{eta}}{LKJ density for the lower-triangular Cholesky factor
+  \farg{L} of a correlation matrix given shape \farg{eta}}
+%
+\end{description}
+
+
+
+
 
 
 \part{Advanced Topics}
