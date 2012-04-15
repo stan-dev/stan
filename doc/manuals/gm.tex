@@ -21,10 +21,10 @@
 \titleformat{\chapter}[hang]{\bfseries\huge}{\thechapter.}{1.5pc}{}{}
 %\titlespacing{\chapter}{0pt}{-12pt}{18pt}{}
 %
-\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
+\titleformat{\section}{\bfseries\Large}{\thesection.}{1em}{}
 %\titlespacing{\section}{0pt}{12pt}{6pt}
 %
-\titleformat{\subsection}{\it}{}{0em}{}
+\titleformat{\subsection}{\large\bfseries}{}{0em}{}
 %\titlespacing{\subsection}{-1em}{12pt}{6pt}
 
 \newcommand{\Stan}{Stan\xspace}
@@ -55,6 +55,9 @@
 \newcommand{\distro}[1]{\mbox{\sf #1}}
 \newcommand{\Betafun}{\mbox{B}}
 \newcommand{\setlist}[1]{\{ #1 \}}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\posreals}{\mathbb{R}^+}
+\newcommand{\nats}{\mathbb{N}}
 
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
 \newcommand{\refpart}[1]{Part~\ref{#1.part}}
@@ -169,7 +172,7 @@ to use proper priors.
 language and generates a \Cpp class implementing the model specified
 by that program.  \Stan automatically applies a multivariate transform
 (and its Jacobian determinant) to free any constrained parameters,
-such as deviations (constrained to be positive), simplexes (a vector
+such as deviations (constrained to be positive), unit simplexes (a vector
 constrained to be positive and to sum to 1), and covariance matrices
 (positive definiteness).  The result is an unconstrained sampling (or
 optimization) problem from the perspective of the sampler.  From the
@@ -1344,7 +1347,7 @@ real values), and \code{matrix} (of real values).
 
 Integer or real types may be constrained with lower bounds, upper
 bounds, or both.  There are two specialized vector data types,
-\code{simplex} for simplices and \code{pos\_ordered} for positive,
+\code{simplex} for unit simplices and \code{pos\_ordered} for positive,
 ordered sequences of scalars.  There are two specialized matrix data
 types, \code{corr\_matrix} and \code{cov\_matrix}, for correlation
 matrices (symmetric, positive definite, unit diagonal) and covariance
@@ -3162,7 +3165,7 @@ involved for saving the parameter values corresponding to a sample.
 Stan's two samplers, basic Hamiltonian Monte Carlo (\HMC) and the
 adaptive no-U-turn sampler (\NUTS), are most easily (and often most
 effectively) implemented over a multivariate probabilty density that
-has support on all of $\mathbb{R}^n$.  To do this, the parameters
+has support on all of $\reals^n$.  To do this, the parameters
 defined in the \code{parameters} block must be transformed so they are
 unconstrained. 
 
@@ -4328,7 +4331,7 @@ represents the value true and 0 the value false.
 
 \subsection{Bernoulli Distribution}
 
-If $\theta \in [0,1]$ and $c \in \setlist{0,1}$, then
+If $\theta \in [0,1]$, then for $c \in \setlist{0,1}$, 
 \[
 \distro{Bernoulli}(c|\theta)
 =
@@ -4348,15 +4351,15 @@ If $\theta \in [0,1]$ and $c \in \setlist{0,1}$, then
 %
 \end{description}
 
-\section{Bounded Discrete Probabilities}
+\section{Bounded Discrete Probabilities}\label{betafun.section}
 
 Bounded discrete probability functions have support on
 $\setlist{0,\ldots,N}$ for some upper bound $N$.
 
 \subsection{Binomial Distribution}
 
-If $N \in \{0,1,\ldots\}$, $n \in \{0,\ldots,N\}$, and $\theta \in
-[0,1]$, then
+If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
+\{0,\ldots,N\}$,
 \[
 \distro{Binomial}(n|N,\theta)
 = {N \choose n} \theta^n (1 - \theta)^{N - n}.
@@ -4373,8 +4376,8 @@ If $N \in \{0,1,\ldots\}$, $n \in \{0,\ldots,N\}$, and $\theta \in
 
 \subsection{Beta-Binomial Distribution}
 
-If $N \in \setlist{0,1,\ldots}$, $n \in \setlist{0,\ldots,N}$, 
-$\alpha \in (0,\infty)$, and $\beta \in (0,\infty)$, then
+If $N \in \nats$, $\alpha \in \posreals$, and $\beta \in \posreals$,
+then for $n \in \setlist{0,\ldots,N}$,
 \[
 \distro{BetaBinomial}(n|N,\alpha,\beta)
 = 
@@ -4383,11 +4386,11 @@ $\alpha \in (0,\infty)$, and $\beta \in (0,\infty)$, then
 \]
 %
 where the beta function $\Betafun(x,y)$ is defined for $x \in
-(0,\infty)$ and $y \in (0,\infty)$ by
+\posreals$ and $y \in \posreals$ by
 %
 \[
 \Betafun(x,y)
-= \frac{\Gamma(x) \Gamma(y)}{\Gamma(x + y)}.
+= \frac{\Gamma(x) \ \Gamma(y)}{\Gamma(x + y)}.
 \]
 
 \begin{description}
@@ -4403,9 +4406,8 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
 
 \subsection{Hypergeometric Distribution}
 
-If $a \in \setlist{0,1,\ldots}$, $b \in \setlist{0,1,\ldots}$,
-$N \in \setlist{0,\ldots,a+b}$, and
-$n \in \setlist{0,\ldots,\min(a,N)}$, then
+If $a \in \nats$, $b \in \nats$, and $N \in \setlist{0,\ldots,a+b}$,
+then for $n \in \setlist{0,\ldots,\min(a,N)}$, 
 \[
 \distro{Hypergeometric}(n|N,a,b)
 =
@@ -4425,8 +4427,8 @@ $n \in \setlist{0,\ldots,\min(a,N)}$, then
 
 \subsection{Categorical Distribution}
 
-If $N \in \setlist{1,\ldots}$, $\theta \in \mbox{$N$-simplex}$, and $n
-\in \setlist{1,\ldots,N}$, then
+If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $n \in
+\setlist{1,\ldots,N}$, 
 \[
 \distro{Categorical}(n|\theta) = \theta_n.
 \]
@@ -4447,16 +4449,16 @@ numbers (i.e., the non-negative integers).
 
 \subsection{Negative Binomial Distribution}
 
-If $n \in \setlist{0,1,\ldots}$, $\alpha \in (0,\infty)$, and $\beta
-\in (0,\infty)$, then
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
+\nats$,
 \[
 \distro{NegativeBinomial}(n|\alpha,\beta)
 = 
 {{n + \alpha - 1} \choose {\alpha - 1}}
 \,
-\left( \frac{\beta}{\beta+1} \right)^{\alpha}
+\left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
 \,
-\left( \frac{1}{\beta + 1} \right)^n .
+\left( \frac{1}{\beta + 1} \right)^{\!n} \!.
 \]
 
 \begin{description}
@@ -4470,7 +4472,7 @@ If $n \in \setlist{0,1,\ldots}$, $\alpha \in (0,\infty)$, and $\beta
 
 \subsection{Poisson Distribution}
 
-If $n \in \setlist{0,1,\ldots}$ and $\lambda \in (0,\infty)$, then
+If $\lambda \in \posreals$, then for $n \in \nats$,
 \[
 \distro{Poisson}(n|\lambda)
 = 
@@ -4479,12 +4481,9 @@ If $n \in \setlist{0,1,\ldots}$ and $\lambda \in (0,\infty)$, then
 \lambda^n.
 \]
 
-
 \begin{description}
-%
-  \fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
+ \fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
     Poisson probability mass of \farg{n} given rate \farg{lambda}}
-%
 \end{description}
 
 
@@ -4494,10 +4493,8 @@ If $n \in \setlist{0,1,\ldots}$ and $\lambda \in (0,\infty)$, then
 
 \subsection{Multinomial Distribution}
 
-If $K \in \setlist{0,1,\ldots}$, 
-$N \in \setlist{0,1,\ldots}$, 
-$\theta \in \mbox{$K$-simplex}$, and
-$y \in \mathbb{N}^K$ such $\sum_{k=1}^K y_k = N$, then
+If $K \in \nats$, $N \in \nats$, and $\theta \in \mbox{$K$-simplex}$,
+then for $y \in \nats^K$ such that $\sum_{k=1}^K y_k = N$,
 %
 \[
 \distro{Multinomial}(y|\theta,N)
@@ -4510,16 +4507,12 @@ where the multinomial coefficient is defined by
 = \frac{N!}{\prod_{k=1}^K y_k!}.
 \]
 
-
-
 \begin{description}
-%
-  \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
+ \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
     \farg{theta}}{The multinomial probability mass function with
     outcome array \code{y} of size $K$ given the $K$-simplex
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
-%
 \end{description}
 
 
@@ -4534,6 +4527,18 @@ The univariate continous probability distributions have support on all
 real numbers.
 
 \subsection{Normal Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
+\reals$,
+\[
+\distro{Normal}(y|\mu,\sigma)
+=
+\frac{1}{\sqrt{2 \pi} \ \sigma}
+\exp\left( - \, \frac{1}{2}
+           \left(  \frac{\theta - \mu}{\sigma} \right)^2
+    \right)
+\!.
+\]
 
 \begin{description}
 \fitem{real}{normal\_log}{real \farg{y}, real \farg{mu}, real
@@ -4553,6 +4558,22 @@ real numbers.
 
 \subsection{Student-$t$ Distribution}
 
+If $\nu \in \posreals$, $\mu \in \reals$, and $\sigma \in \posreals$,
+then for $y \in \reals$,
+\[
+\distro{StudentT}(y|\nu,\mu,\sigma)
+=
+\frac{\Gamma\left((\nu + 1)/2\right)}
+     {\Gamma(\nu/2)}
+\
+\frac{1}{\sqrt{\nu \pi} \ \sigma}
+\
+\left(
+1 + \frac{1}{\nu} \left(\frac{\theta - \mu}{\sigma}\right)^2
+\right)^{-(\nu + 1)/2}
+\! .
+\]
+
 \begin{description}
   \fitem{real}{student\_t\_log}{real \farg{y}, real \farg{nu}, real
     \farg{mu}, real \farg{sigma}}{The Student-$t$ density of \farg{y}
@@ -4561,6 +4582,16 @@ real numbers.
 \end{description}
 
 \subsection{Cauchy Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
+\[
+\distro{Cauchy}(y|\mu,\sigma)
+= 
+\frac{1}{\pi \sigma}
+\
+\frac{1}{1 + \left((y - \mu)/\sigma\right)^2}
+.
+\]
 
 \begin{description}
 %
@@ -4572,6 +4603,14 @@ real numbers.
 
 \subsection{Double Exponential Distribution}
 
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$, 
+\[
+\distro{DoubleExponential}(y|\mu,\sigma)
+= \frac{1}{2\sigma} 
+  \exp \left( - \, \frac{|y - \mu|}{\sigma} \right)
+.
+\]
+
 \begin{description}
 \fitem{real}{double\_exponential\_log}{real \farg{y}, real \farg{mu},
 real \farg{sigma}}{ The double exponential density of \farg{y} given
@@ -4579,6 +4618,18 @@ location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
 \subsection{Logistic Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
+\[
+\distro{Logistic}(y|\mu,\sigma)
+=
+\frac{1}{\sigma}
+\
+\exp\!\left( - \, \frac{y - \mu}{\sigma} \right)
+\
+\left(1 + \exp \!\left( - \, \frac{y - \mu}{\sigma} \right) \right)^{\!-2}
+\! .
+\]
 
 \begin{description}
 \fitem{real}{logistic\_log}{real \farg{y}, real \farg{mu},
@@ -4592,7 +4643,23 @@ location \farg{mu} and scale \farg{sigma}}
 The positive continuous probability functions have support on the
 positive real numbers.
 
-\subsection{Lognormal Distribution}
+\subsection{Log-Normal Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$, 
+\[
+\distro{LogNormal}(y|\mu,\sigma)
+=
+\frac{1}{\sqrt{2 \pi} \ \sigma}
+\,
+\frac{1}{y}
+\
+\exp \! \left(
+       - \, \frac{1}{2}
+       \, \left( \frac{\log y - \mu}{\sigma} \right)^2
+     \right)
+.
+\]
 
 \begin{description}
  \fitem{real}{lognormal\_log}{real \farg{y}, real \farg{mu}, real
@@ -4606,6 +4673,19 @@ positive real numbers.
 
 \subsection{Chi-Square Distribution}
 
+If $\nu \in \posreals$, then for $y \in \posreals$,
+\[
+\distro{ChiSquare}(y|\nu)
+=
+\frac{2^{-\nu/2}}
+    {\Gamma(\nu / 2)}
+\,
+y^{\nu/2 - 1}
+\,
+\exp \! \left( -\, \frac{1}{2} \, y \right)
+.
+\]
+
 \begin{description}
 \fitem{real}{chi\_square\_log}{real \farg{y}, real \farg{nu}}{The
   Chi-square density of \farg{y} given degrees of freedom
@@ -4613,6 +4693,19 @@ positive real numbers.
 \end{description}
 
 \subsection{Inverse Chi-Square Distribution}
+
+If $\nu \in \posreals$, then for $y \in \posreals$,
+\[
+\distro{InvChiSquare}(y|\nu)
+= 
+\frac{2^{-\nu/2}}
+   {\Gamma(\nu / 2)}
+\,
+y^{-(\nu/2 - 1)}
+\,
+\exp\! \left( \! - \, \frac{1}{2} \, \frac{1}{y} \right)
+.
+\]
 
 \begin{description}
 \fitem{real}{inv\_chi\_square\_log}{real \farg{y}, real
@@ -4622,6 +4715,25 @@ positive real numbers.
 
 \subsection{Scaled Inverse Chi-Square Distribution}
 
+If $\nu \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$,
+\[
+\distro{ScaledInvChiSquare}(y|\nu)
+= 
+\frac{(\nu / 2)^{\nu/2}}
+     {\Gamma(\nu / 2)}
+\,
+\sigma^{\nu}
+\,
+y^{-(\nu/2 + 1)}
+\,
+\exp \! \left( \!
+   - \, \frac{1}{2} \, \nu \, \sigma^2 \, \frac{1}{y}
+\right)
+.
+\]
+
+
 \begin{description}
  \fitem{real}{scaled\_inv\_chi\_square\_log}{real \farg{y}, real
    \farg{nu}, real \farg{s}}{The inverse Chi-square density of \farg{y} given
@@ -4629,6 +4741,15 @@ positive real numbers.
 \end{description}
 
 \subsection{Exponential Distribution}
+
+If $\beta \in \posreals$, then for $y \in \posreals$,
+\[
+\distro{Exponential}(y|\beta)
+= 
+\beta \, 
+\exp ( - \beta \, y )
+.
+\]
 
 \begin{description}
   \fitem{real}{exponential\_log}{real \farg{y}, real \farg{beta}}{The
@@ -4640,6 +4761,19 @@ positive real numbers.
 \end{description}
 
 \subsection{Gamma Distribution}
+
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
+\posreals$,
+\[
+\distro{Gamma}(y|\alpha,\beta)
+=
+\frac{\beta^{\alpha}}
+     {\Gamma(\alpha)}
+\,
+y^{\alpha - 1}
+\exp(-\beta \, y)
+.
+\]
 
 \begin{description}
  \fitem{real}{gamma\_log}{real \farg{y}, real \farg{alpha}, real
@@ -4653,6 +4787,20 @@ positive real numbers.
 
 \subsection{Inverse Gamma Distribution}
 
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
+\posreals$,
+\[
+\distro{InvGamma}(y|\alpha,\beta)
+= 
+\frac{\beta^{\alpha}}
+     {\Gamma(\alpha)}
+\
+y^{-(\alpha + 1)}
+\,
+\exp \! \left( \! - \beta \, \frac{1}{y} \right)
+.
+\]
+
 \begin{description}
 \fitem{real}{inv\_gamma\_log}{real \farg{y}, real \farg{alpha}, real
 \farg{beta}}{The inverse gamma density of \farg{y} given shape
@@ -4660,6 +4808,20 @@ positive real numbers.
 \end{description}
 
 \subsection{Weibull Distribution}
+
+% k = alpha   lambda = sigma
+If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
+\posreals$, 
+\[
+\distro{Weibull}(y|\alpha,\sigma)
+= 
+\frac{\alpha}{\sigma}
+\,
+\left( \frac{y}{\sigma} \right)^{\alpha - 1}
+\,
+\exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{\alpha}  \right)
+.
+\]
 
 \begin{description}
 \fitem{real}{weibull\_log}{real \farg{y}, real \farg{alpha}, real
@@ -4678,11 +4840,23 @@ positive real numbers.
 The positive lower-bounded probabilities have support on real values
 above some positive minimum value.
 
+
 \subsection{Pareto Distribution}
+
+If $y_0 \in \posreals$ and $\alpha \in \posreals$, then for
+$y \in \posreals$,
+\[
+\distro{Pareto}(y|y_0,\alpha)
+=
+\alpha 
+\ y_0
+\, \left( \frac{1}{y} \right)^{\!\alpha+1}
+\! .
+\]
 
 \begin{description}
   \fitem{real}{pareto\_log}{real \farg{y}, real \farg{y\_min}, real
-    \farg{alph}}{The Pareto density of \farg{y} given positive minimum
+    \farg{alpha}}{The Pareto density of \farg{y} given positive minimum
     value \farg{y\_min} and shape \farg{alpha}}
 \end{description}
 
@@ -4691,6 +4865,21 @@ above some positive minimum value.
 \section{$[0,1]$ Continuous Probabilities}
 
 \subsection{Beta Distribution}
+
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
+\in [0,1]$,
+\[
+\distro{Beta}(\theta|\alpha,\beta)
+=
+\frac{1}{\Betafun(\alpha,\beta)}
+\,
+\theta^{\alpha - 1}
+\,
+(1 - \theta)^{\beta - 1}
+,
+\] 
+where the beta function $\Betafun()$ is as defined in \refsection{betafun}
+
 
 \begin{description}
 %
@@ -4708,6 +4897,15 @@ of real numbers.
 
 \subsection{Uniform Distribution}
 
+If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
+\in [\alpha,\beta]$,
+\[
+\distro{Uniform}(y|\alpha,\beta)
+= 
+\frac{1}{\beta - \alpha}
+.
+\]
+
 \begin{description}
 \fitem{real}{uniform\_log}{real \farg{y}, real \farg{alpha}, real
   \farg{beta}}{The uniform density of \farg{y} given lower bound
@@ -4716,10 +4914,22 @@ of real numbers.
 
 \section{Simplex Probabilities}
 
-The simplex probabilities have support on the $K$-simplex for a
+The simplex probabilities have support on the unit $K$-simplex for a
 specified $K$.
 
 \subsection{Dirichlet Distribution}
+
+If $K \in \nats$ and $\alpha \in (\posreals)^{K}$, then for
+$\theta \in \mbox{$K$-simplex}$, 
+\[
+\distro{Dirichlet}(\theta|\alpha)
+= 
+\frac{\Gamma \! \left( \sum_{k=1}^K \alpha_k \right)}
+     {\prod_{k=1}^K \Gamma(\alpha_k)}
+\
+\prod_{k=1}^K \theta_k^{\alpha_k - 1}
+.
+\]
 
 \begin{description}
 %
@@ -4734,9 +4944,28 @@ one) \farg{alpha}}
 \section{Vector Probabilities}
 
 The vector probability distributions have support on all of
-$\mathbb{R}^K$ for some fixed $K$.
+$\reals^K$ for some fixed $K$.
 
 \subsection{Multivariate Normal Distribution}
+
+If $K \in \nats$, $\mu \in \reals^K$, and $\Sigma \in \reals^{K \times
+  K}$ is symmetric and positive definite, then for $y \in \reals^K$,
+\[
+\distro{MultiNormal}(y|\mu,\Sigma)
+=
+\frac{1}{\left( 2 \pi \right)^{K/2}}
+\
+\frac{1}{\sqrt{|\Sigma|}}
+\
+\exp \! \left( \!
+- 
+\frac{1}{2}
+(y - \mu)^{\top} \, \Sigma^{-1} \, (y - \mu)
+\right)
+\! ,
+\]
+%
+where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
 \begin{description}
 %
@@ -4746,7 +4975,17 @@ $\mathbb{R}^K$ for some fixed $K$.
 %
 \end{description}
 
-\subsection{Multivariate Normal Distribution (Cholesky Factor Parameterization)}
+\subsection{Multivariate Normal Distribution (Cholesky)}
+
+If $K \in \nats$, $\mu \in \reals^K$, and $L \in \reals^{K \times K}$ is lower
+triangular and such that $LL^{\top}$ is positive definite, then for $y
+\in \reals^K$,
+\[
+\distro{MultiNormalCholesky}(y|\mu,L)
+=
+\distro{MultiNormal}(y|\mu,LL^{\top}).
+\]
+
 \begin{description}
 %
 \fitem{real}{multi\_normal\_cholesky\_log}{vector \farg{y}, vector
@@ -4758,6 +4997,33 @@ $\mathbb{R}^K$ for some fixed $K$.
 
 
 \subsection{Multivariate Student-$t$ Distribution}
+
+If $K \in \nats$, $\nu \in \posreals$, $\mu \in \reals^K$, and $\Sigma
+\in \reals^{K \times K}$ is symmetric and positive definite, then for
+$y \in \reals^K$,
+\[
+\begin{array}{l}
+\distro{MultiStudentT}(y|\nu,\mu,\Sigma)
+\\[8pt]
+\displaystyle
+\hspace*{8pt}
+=
+\frac{1}{\pi^{K/2}}
+\
+\frac{1}{\nu^{K/2}}
+\
+\frac{\Gamma\!x\left((\nu + K)/2\right)}
+     {\Gamma(\nu/2)}
+\
+\frac{1}{\sqrt{\left| \Sigma \right|}}
+\
+\left(
+1 + \frac{1}{\nu} \, \left(y - \mu\right)^{\top} \, \Sigma^{-1} \, \left(y - \mu\right)
+\right)^{-(\nu + K)/2}
+\! .
+\end{array}
+\]
+\vspace*{4pt}
 
 \begin{description}
 %
@@ -4777,6 +5043,34 @@ positive-definite $K \times K$ matrices.
 
 \subsection{Wishart Distribution}
 
+If $K \in \nats$, $\nu \in (K-1,\infty)$, and $S \in \reals^{K \times K}$ is symmetric
+and positive definite, then for symmetric and positive-definite $W \in
+\reals^{K \times K}$,
+\[
+\distro{Wishart}(W|\nu,S)
+=
+\frac{1}{2^{\nu K / 2}}
+\
+\frac{1}{\Gamma_K \! \left( \frac{\nu}{2} \right)}
+\
+\left| S \right|^{-\nu/2}
+\
+\left| W \right|^{(\nu - K - 1)/2}
+\
+\exp \! \left(\frac{1}{2} \ \mbox{tr}\left( S^{-1} W \right) \right)
+\! ,
+\]
+%
+where $\mbox{tr}()$ is the matrix trace function, and $\Gamma_K()$ is
+the multivariate Gamma function,
+\[
+\Gamma_K(x) = 
+\frac{1}{\pi^{K(K-1)/4}}
+\
+\prod_{k=1}^K \Gamma \left( x + \frac{1 - k}{2} \right)
+\!.
+\]
+
 \begin{description}
 %
 \fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, real
@@ -4788,6 +5082,28 @@ positive-definite $K \times K$ matrices.
 
 
 \subsection{Inverse Wishart Distribution}
+
+If $K \in \nats$, $\nu \in (K-1,\infty)$, and $S \in \reals^{K \times
+  K}$ is symmetric and positive definite, then for symmetric and
+positive-definite $W \in \reals^{K \times K}$,
+\[
+\distro{InvWishart}(W|\nu,S)
+= 
+\frac{1}{2^{\nu K / 2}}
+\
+\frac{1}{\Gamma_K \! \left( \frac{\nu}{2} \right)}
+\
+\left| S \right|^{\nu/2}
+\
+\left| W \right|^{-(\nu - K - 1)/2}
+\
+\exp \! \left( 
+- \frac{1}{2}
+\
+\mbox{tr}(SW^{-1})
+\right)
+\! .
+\]
 
 \begin{description}
 %
@@ -4849,7 +5165,7 @@ matrices.  This chapter provides a definition of the transforms used
 for each type of variable.
 
 Once the model is compiled, it has support on all of
-$\mathbb{R}^K$, where $K$ is the number of unconstrained parameters
+$\reals^K$, where $K$ is the number of unconstrained parameters
 needed to define the actual parameters defined in the model.
 
 The details of section need not be understood in order to use
@@ -4876,7 +5192,7 @@ and the rest of the chapter details the transforms used by \Stan.
 \subsection{Univariate Changes of Variables}
 
 Suppose $X$ is one dimensional and $f: \mbox{support}(X) \rightarrow
-\mathbb{R}$ is a one-to-one, monotonic function with a differentiable
+\reals$ is a one-to-one, monotonic function with a differentiable
 inverse $f^{-1}$.  Then the density of $Y$ is given by
 %
 \[
@@ -5101,7 +5417,7 @@ For some modeling tasks, a vector-valued random variable $X$ is
 required with support on positive, ordered sequences.  One example is
 the set of cut points in ordinal logistic regression.  
 
-In constraint terms, a positive, ordered vector $x \in \mathbb{R}^K$
+In constraint terms, a positive, ordered vector $x \in \reals^K$
 is a vector that satisfies
 \[
 0 < x_1
@@ -5116,7 +5432,7 @@ x_{k-1} < x_k
 \subsection{Positive Ordered Transform}
 
 \Stan's transform follows the constraint directly.  It maps a vector
-$x \in \mathbb{R}^{K}$ to a vector $f(x) = y \in \mathbb{R}^K$ by setting
+$x \in \reals^{K}$ to a vector $f(x) = y \in \reals^K$ by setting
 %
 \[
 y_1 = f_1(x) = \log x_1
@@ -5178,7 +5494,7 @@ The parameter of the $K$-dimensional categorical distribution must lie
 in the unit $K$-simplex.  Consequently, simplex-constrained variables show
 up in multivariate discrete models of all kinds.  
 
-The $K$-simplex is the set of points $x \in \mathbb{R}^K$ such that
+The $K$-simplex is the set of points $x \in \reals^K$ such that
 for $1 \leq k \leq K$, 
 \[ 
 x_k > 0,
@@ -5195,7 +5511,7 @@ with these as the end points.  In 3-dimensions, the basis is
 $(0,0,1)$, $(0,1,0)$ and $(1,0,0)$ and the unit 3-simplex is the
 triangle with these vertices.  As these examples illustrate, the
 simplex always picks out a subspace of $K-1$ dimensions from
-$\mathbb{R}^K$.
+$\reals^K$.
 
 A point $x$ in the $K$-simplex is fully determined by its first $K-1$
 dimensions, because rearranging terms in the constraint yields
@@ -5217,8 +5533,8 @@ pieces are broken off determines $x_K$.
 
 The simplex transform $f$ is most easily understood in terms of its
 inverse $x = f^{-1}(y)$, which maps a point in $y \in
-\mathbb{R}^{K-1}$ to a point $x$ in the $K$-simplex.  An intermediate
-vector $z \in \mathbb{R}^{K-1}$, whose coordinates $z_k$ represent 
+\reals^{K-1}$ to a point $x$ in the $K$-simplex.  An intermediate
+vector $z \in \reals^{K-1}$, whose coordinates $z_k$ represent 
 the proportion of the stick broken off in step $k$, is defined
 elementwise for $1 \leq k < K$ by
 %
@@ -5370,7 +5686,7 @@ It is easiest to specify this transform in reverse, going from its $K
 \choose 2$ parameter basis to a correlation matrix.  The basis will
 actually be broken down into two steps.  To start, suppose $y$
 consists of $K \choose 2$ unconstrained values that are transformed via
-the bijective function $\tanh : \mathbb{R} \rightarrow (0,1)$ 
+the bijective function $\tanh : \reals \rightarrow (0,1)$ 
 %
 \[
 \tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
