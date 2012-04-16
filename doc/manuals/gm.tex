@@ -18,13 +18,27 @@
 
 \usepackage{url}
 
-\titleformat{\chapter}[hang]{\bfseries\huge}{\thechapter.}{1.5pc}{}{}
+
+\usepackage[titles]{tocloft}
+\setlength{\cftbeforechapskip}{2ex}
+\setlength{\cftbeforesecskip}{0.5ex}
+\renewcommand{\cftchapfont}{\normalsize\rm}
+\renewcommand{\cftchappagefont}{\normalsize\rm}
+\renewcommand{\cftpartfont}{\normalsize\rm\bfseries}
+\renewcommand{\cftpartpagefont}{\normalsize\rm\bfseries}
+\renewcommand{\cftchapaftersnum}{.\hspace*{12pt}}
+\renewcommand{\cftchapaftersnumb}{\hspace*{8pt}}
+%  \fontsize{11}{13}\usefont{OT1}{phv}{bc}{n}\selectfont}
+
+\setcounter{tocdepth}{0}
+
+\titleformat{\chapter}[hang]{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}
 %\titlespacing{\chapter}{0pt}{-12pt}{18pt}{}
 %
-\titleformat{\section}{\bfseries\Large}{\thesection.}{1em}{}
+\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
 %\titlespacing{\section}{0pt}{12pt}{6pt}
 %
-\titleformat{\subsection}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\bfseries}{}{0em}{}
 %\titlespacing{\subsection}{-1em}{12pt}{6pt}
 
 \newcommand{\Stan}{Stan\xspace}
@@ -75,11 +89,10 @@
 \newcommand{\samp}{{\lower.78ex\hbox{\texttt{\char`\~}}}}%
 %{{\lower1.1ex\hbox{\Large\texttt{\char`\~}}}}
 
-\setcounter{tocdepth}{0}
 
 \title{\Huge\bf \Stan Modeling Language}
 \author{\Stan's Development Team}
-\date{\vspace*{36pt} Version 1.0 \\[4pt] {\small \today}} % \footnotesize \today}
+\date{\vspace*{36pt} \Stan Version 1.0 \\[4pt] {\small \today}} % \footnotesize \today}
 
 \begin{document}
 
@@ -552,6 +565,29 @@ specified.
 \end{quote}
 
 
+\section{Custom Distributions}
+
+\Stan programming language supports the definition of custom
+distributions in two ways.  
+
+\subsection{Extending \Stan with C++ Distributions}
+
+The most efficient way to implement a custom distribution is by
+extending \Stan with \Cpp code for the distribution.  Then the
+signature of the function must be registered with \Stan.  After that,
+as long as the source code for the function is included for the
+compiler, the custom distribution may be used like any other
+distribution.
+
+\subsection{Custom Distributions within \Stan}
+
+
+
+\Cpp and then their function signature ma be registered with the
+parser and then they can be used just like any other distribution in
+Stan.
+
+distributions within its programming language.
 
 \section{Proper and Improper Priors}
 
@@ -592,7 +628,7 @@ in \refchapter{optimization}
 
 
 \chapter{Compiling \Stan Programs 
-\\ to C++ Programs}\label{stanc.chapter}
+to C++}\label{stanc.chapter}
 
 Preparing a \Stan program to be run involves two compilation steps,
 %
@@ -1322,7 +1358,7 @@ forms, that is the form that is used in the model definitions.
 
 
 
-\chapter{Data Types \\ and Variable Declarations}\label{data-types.chapter}
+\chapter{Data Types and Variable Declarations}\label{data-types.chapter}
 
 This chapter covers the data types that values may have in \Stan.
 Every variable used in a \Stan program must have a declared data type.
