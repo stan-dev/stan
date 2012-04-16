@@ -3,9 +3,9 @@ TEMPLATE_INSTANTIATION += $(shell find src/stan/gm -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
 
 .PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o
+bin/stanc$(EXE) : $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(LDFLAGS) $(OUTPUT_OPTION) $^
+	$(LINK.c) $(LDFLAGS) $(OUTPUT_OPTION) $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o
 
 bin/stan/%.o : src/stan/%.cpp
 	@mkdir -p $(dir $@)

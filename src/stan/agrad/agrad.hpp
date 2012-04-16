@@ -17,11 +17,9 @@ namespace stan {
     class chainable;
     class vari;
 
-    namespace {
-      // FIXME: manage all this as a single singleton (thread local)
-      std::vector<chainable*> var_stack_; 
-      memory::stack_alloc memalloc_;
-    }
+    // FIXME: manage all this as a single singleton (thread local)
+    extern std::vector<chainable*> var_stack_; 
+    extern memory::stack_alloc memalloc_;
 
     static void recover_memory();
 
@@ -184,7 +182,7 @@ namespace stan {
      *
      * @return Size of <code>vari</code> stack.
      */
-    size_t stack_size() {
+    inline size_t stack_size() {
       return var_stack_.size();
     }
       
@@ -195,7 +193,7 @@ namespace stan {
      * 
      * @param o ostream to modify
      */
-    void print_stack(std::ostream& o) {
+    inline void print_stack(std::ostream& o) {
       o << "STACK, size=" << var_stack_.size() << std::endl;
       for (size_t i = 0; i < var_stack_.size(); ++i)
         o << i 
@@ -1159,7 +1157,7 @@ namespace stan {
      * @tparam T Type of variable.
      */
     template <typename T>
-    double as_double(T x) { return (double)x; }
+    inline double as_double(T x) { return (double)x; }
 
     /**
      * Cast variable to double. Useful for templated functions where a
@@ -1172,7 +1170,7 @@ namespace stan {
      * @tparam T Type of variable.
      */
     template <>
-    double as_double<agrad::var>(agrad::var x) { return x.vi_->val_; }
+    inline double as_double<agrad::var>(agrad::var x) { return x.vi_->val_; }
 
     // COMPARISON OPERATORS
 
@@ -2255,9 +2253,9 @@ namespace stan {
      * @param[in] independents Indepent (input) variables.
      * @param[out] jacobian Jacobian of the transform.
      */
-    void jacobian(std::vector<var>& dependents,
-                  std::vector<var>& independents,
-                  std::vector<std::vector<double> >& jacobian) {
+    inline void jacobian(std::vector<var>& dependents,
+                         std::vector<var>& independents,
+                         std::vector<std::vector<double> >& jacobian) {
       jacobian.resize(dependents.size());
       for (size_t i = 0; i < dependents.size(); ++i) {
         jacobian[i].resize(independents.size());
@@ -2379,7 +2377,7 @@ namespace std {
    * @param a Variable to test.
    * @return <code>true</code> if value is not a number.
    */
-  int isnan(const stan::agrad::var& a) {
+  inline int isnan(const stan::agrad::var& a) {
     return isnan(a.val());
   }
 
@@ -2390,7 +2388,7 @@ namespace std {
    * @param a Variable to test.
    * @return <code>true</code> if value is infinite.
    */
-  int isinf(const stan::agrad::var& a) {
+  inline int isinf(const stan::agrad::var& a) {
     return isinf(a.val());
   }
 

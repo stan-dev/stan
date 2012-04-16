@@ -10,7 +10,6 @@
 #include <stan/agrad/special_functions.hpp>
 #include <stan/math/matrix.hpp>
 
-
 /**
  * (Expert) Numerical traits for algorithmic differentiation variables.
  */
@@ -399,11 +398,7 @@ namespace stan {
      * @throw std::domain_error if m is not a square matrix
      */
     template <typename T>
-    inline var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.rows() != m.cols())
-        throw std::domain_error ("m must be a square matrix");
-      return to_var(m.determinant());
-    }
+    var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m);
 
     class dot_product_vv_vari : public vari {
     protected:
@@ -1442,19 +1437,7 @@ namespace stan {
      * @throws std::invalid_argument If the index is 0 or
      * greater than the number of columns.
      */
-    inline row_vector_v row(const matrix_v& m, size_t i) {
-      if (i == 0U) {
-        throw std::invalid_argument("row() indexes from 1; found index i=0");
-      }
-      if (i > static_cast<size_t>(m.rows())) {
-        std::stringstream msg;
-        msg << "index must be less than or equal to number of rows"
-            << " found m.rows()=" << m.rows()
-            << "; i=" << i;
-        throw std::invalid_argument(msg.str());
-      }
-      return m.row(i - 1);
-    }
+    row_vector_v row(const matrix_v& m, size_t i);
 
     /**
      * Return the specified column minus 1 of the specified matrix.  Thus
@@ -1467,19 +1450,7 @@ namespace stan {
      * @throws std::invalid_argument if the index is 0 or greater than
      * the number of columns.
      */
-    inline vector_v col(const matrix_v& m, size_t j) {
-      if (j == 0U) {
-        throw std::invalid_argument("row() indexes from 1; found index i=0");
-      }
-      if (j > static_cast<size_t>(m.cols())) {
-        std::stringstream msg;
-        msg << "index must be less than or equal to number of rows"
-            << " found m.cols()=" << m.cols()
-            << "; =" << j;
-        throw std::invalid_argument(msg.str());
-      }
-      return m.col(j - 1);
-    }
+    vector_v col(const matrix_v& m, size_t j);
 
     /**
      * Return a column vector of the diagonal elements of the
@@ -1487,9 +1458,7 @@ namespace stan {
      * @param m Specified matrix.  
      * @return Diagonal of the matrix.
      */
-    inline vector_v diagonal(const matrix_v& m) {
-      return m.diagonal();
-    }
+    vector_v diagonal(const matrix_v& m);
 
     /**
      * Return a square diagonal matrix with the specified vector of
@@ -1497,9 +1466,7 @@ namespace stan {
      * @param v Specified vector.
      * @return Diagonal matrix with vector as diagonal values.
      */
-    inline matrix_v diag_matrix(const vector_v& v) {
-      return v.asDiagonal();
-    }
+    matrix_v diag_matrix(const vector_v& v);
 
     /**
      * Return the transposition of the specified column
@@ -1507,35 +1474,27 @@ namespace stan {
      * @param v Specified vector.
      * @return Transpose of the vector.
      */
-    inline row_vector_v transpose(const vector_v& v) {
-      return v.transpose();
-    }
+    row_vector_v transpose(const vector_v& v);
     /**
      * Return the transposition of the specified row
      * vector.
      * @param rv Specified vector.
      * @return Transpose of the vector.
      */
-    inline vector_v transpose(const row_vector_v& rv) {
-      return rv.transpose();
-    }
+    vector_v transpose(const row_vector_v& rv);
     /**
      * Return the transposition of the specified matrix.
      * @param m Specified matrix.
      * @return Transpose of the matrix.
      */
-    inline matrix_v transpose(const matrix_v& m) {
-      return m.transpose();
-    }
+    matrix_v transpose(const matrix_v& m);
 
     /**
      * Returns the inverse of the specified matrix.
      * @param m Specified matrix.
      * @return Inverse of the matrix.
      */
-    inline matrix_v inverse(const matrix_v& m) {
-      return m.inverse();
-    }
+    matrix_v inverse(const matrix_v& m);
 
     /**
      * Returns the solution of the system Ax=b when A is triangular.
@@ -1703,12 +1662,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvalues of matrix.
      */
-    inline vector_v eigenvalues(const matrix_v& m) {
-      // false == no vectors
-      Eigen::EigenSolver<matrix_v> solver(m,false);
-      // FIXME: test imag() all 0?
-      return solver.eigenvalues().real();
-    }
+    vector_v eigenvalues(const matrix_v& m);
 
     /**
      * Return a matrix whose columns are the real components of the
@@ -1717,10 +1671,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvectors of matrix.
      */
-    inline matrix_v eigenvectors(const matrix_v& m) {
-      Eigen::EigenSolver<matrix_v> solver(m);
-      return solver.eigenvectors().real();
-    }
+    matrix_v eigenvectors(const matrix_v& m);
     /**
      * Assign the real components of the eigenvalues and eigenvectors
      * of the specified matrix to the specified references.
@@ -1738,13 +1689,9 @@ namespace stan {
      * @param eigenvectors Matrix reference into which eigenvectors
      * are written.
      */
-    inline void eigen_decompose(const matrix_v& m,
-                                vector_v& eigenvalues,
-                                matrix_v& eigenvectors) {
-      Eigen::EigenSolver<matrix_v> solver(m);
-      eigenvalues = solver.eigenvalues().real();
-      eigenvectors = solver.eigenvectors().real();
-    }
+    void eigen_decompose(const matrix_v& m,
+                         vector_v& eigenvalues,
+                         matrix_v& eigenvectors);
 
     /**
      * Return the eigenvalues of the specified symmetric matrix
@@ -1755,10 +1702,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvalues of matrix.
      */
-    inline vector_v eigenvalues_sym(const matrix_v& m) {
-      Eigen::SelfAdjointEigenSolver<matrix_v> solver(m,Eigen::EigenvaluesOnly);
-      return solver.eigenvalues().real();
-    }
+    vector_v eigenvalues_sym(const matrix_v& m);
     /**
      * Return a matrix whose rows are the real components of the
      * eigenvectors of the specified symmetric matrix.  This function
@@ -1768,10 +1712,7 @@ namespace stan {
      * @param m Symmetric matrix.
      * @return Eigenvectors of matrix.
      */
-    inline matrix_v eigenvectors_sym(const matrix_v& m) {
-      Eigen::SelfAdjointEigenSolver<matrix_v> solver(m);
-      return solver.eigenvectors().real();
-    }
+    matrix_v eigenvectors_sym(const matrix_v& m);
     /**
      * Assign the real components of the eigenvalues and eigenvectors
      * of the specified symmetric matrix to the specified references.
@@ -1784,14 +1725,9 @@ namespace stan {
      * @param eigenvectors Matrix reference into which eigenvectors
      * are written.
      */
-    inline void eigen_decompose_sym(const matrix_v& m,
-                                    vector_v& eigenvalues,
-                                    matrix_v& eigenvectors) {
-      Eigen::SelfAdjointEigenSolver<matrix_v> solver(m);
-      eigenvalues = solver.eigenvalues().real();
-      eigenvectors = solver.eigenvectors().real();
-    }
-
+    void eigen_decompose_sym(const matrix_v& m,
+                             vector_v& eigenvalues,
+                             matrix_v& eigenvectors);
 
     /**
      * Return the lower-triangular Cholesky factor (i.e., matrix
@@ -1803,14 +1739,7 @@ namespace stan {
      * @return Square root of matrix.
      * @throw std::domain_error if m is not a square matrix
      */
-    inline matrix_v cholesky_decompose(const matrix_v& m) {
-      if (m.rows() != m.cols()) {
-        throw std::domain_error ("m must be a square matrix");
-      }
-      Eigen::LLT<matrix_v> llt(m.rows());
-      llt.compute(m);
-      return llt.matrixL();
-    }
+    matrix_v cholesky_decompose(const matrix_v& m);
 
     /**
      * Return the vector of the singular values of the specified matrix
@@ -1820,10 +1749,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Singular values of the matrix.
      */
-    inline vector_v singular_values(const matrix_v& m) {
-      Eigen::JacobiSVD<matrix_v> svd(m); // no U or V
-      return svd.singularValues();
-    }      
+    vector_v singular_values(const matrix_v& m);
 
     /**
      * Assign the real components of a singular value decomposition
@@ -1846,17 +1772,10 @@ namespace stan {
      * @param v Right singular vectors.
      * @param s Singular values.
      */
-    inline void svd(const matrix_v& m,
-                    matrix_v& u,
-                    matrix_v& v,
-                    vector_v& s) {
-      static const unsigned int THIN_SVD_OPTIONS
-        = Eigen::ComputeThinU | Eigen::ComputeThinV;
-      Eigen::JacobiSVD<matrix_v> svd(m, THIN_SVD_OPTIONS);
-      u = svd.matrixU();
-      v = svd.matrixV();
-      s = svd.singularValues();
-    }
+    void svd(const matrix_v& m,
+             matrix_v& u,
+             matrix_v& v,
+             vector_v& s);
   }
 }
 #endif

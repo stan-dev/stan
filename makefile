@@ -36,6 +36,13 @@ CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
 LIBGTEST = test/gtest.o
 GTEST_MAIN = lib/gtest/src/gtest_main.cc
 EXE = 
+LDFLAGS = -Lbin -lstan
+
+##
+# Tell make the default way to compile a .o file.
+##
+%.o : %.cpp
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 ##
 # These includes should update the following variables
@@ -69,6 +76,8 @@ help:
 	@echo '                 libraries intact.'
 	@echo '  - clean-all:   Cleans up all of Stan.'
 	@echo '------------------------------------------------------------'
+
+-include make/libstan
 
 ##
 # All testing related make commands.

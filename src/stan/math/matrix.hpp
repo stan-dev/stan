@@ -7,7 +7,6 @@
 #define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
 #include <Eigen/Dense>
 
-
 namespace stan {
   
   namespace math {
@@ -74,8 +73,6 @@ namespace stan {
      * Type for (row) vector of double values.
      */
     typedef EigenType<double>::row_vector row_vector_d;
-
-
 
     namespace {
 
@@ -585,9 +582,9 @@ namespace stan {
      * @param m Specified matrix.
      * @return Determinant of the matrix.
      */
-    inline double determinant(const matrix_d& m) {
-      return m.determinant();
-    }
+    double determinant(const matrix_d& m);
+
+
     /**
      * Returns the dot product of the specified vectors.
      * @param rv1 First vector.
@@ -928,11 +925,7 @@ namespace stan {
      * @return Sum of the two vectors.
      * @throw std::invalid_argument if v1 and v2 are not the same size.
      */
-    inline vector_d add(const vector_d& v1, vector_d& v2) {
-      if (v1.size() != v2.size()) 
-        throw std::invalid_argument ("v1.size() != v2.size()");
-      return v1 + v2;
-    }
+    vector_d add(const vector_d& v1, const vector_d& v2);
     /**
      * Return the sum of the specified row vectors.  The
      * two vectors must have the same size.
@@ -941,12 +934,8 @@ namespace stan {
      * @return Sum of the two vectors.
      * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
-    inline row_vector_d add(const row_vector_d& rv1, 
-                            const row_vector_d& rv2) {
-      if (rv1.size() != rv2.size()) 
-        throw std::invalid_argument ("rv1.size() != rv2.size()");
-      return rv1 + rv2;
-    }
+    row_vector_d add(const row_vector_d& rv1, 
+                            const row_vector_d& rv2);
     /**
      * Return the sum of the specified matrices.  The two matrices
      * must have the same dimensions.
@@ -955,11 +944,7 @@ namespace stan {
      * @return Sum of the two vectors.
      * @throw std::invalid_argument if m1 and m2 are not the same size.
      */
-    inline matrix_d add(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::invalid_argument ("dimensions of m1 and m2 do not match");
-      return m1 + m2;
-    }
+    matrix_d add(const matrix_d& m1, const matrix_d& m2);
 
     /**
      * Return the element-wise logarithm of the matrix or vector.
@@ -1012,11 +997,7 @@ namespace stan {
      * @return First vector minus the second vector.
      * @throw std::invalid_argument if v1 and v2 are not the same size.
      */
-    inline vector_d subtract(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument ("v1.size() != v2.size()");
-      return v1 - v2;
-    }
+    vector_d subtract(const vector_d& v1, const vector_d& v2);
     /**
      * Return the difference between the first specified row vector and
      * the second.  The two vectors must have the same size.
@@ -1025,12 +1006,7 @@ namespace stan {
      * @return First vector minus the second vector.
      * @throw std::invalid_argument if rv1 and rv2 are not the same size.
      */
-    inline row_vector_d subtract(const row_vector_d& rv1,
-                                 const row_vector_d& rv2) {
-      if (rv1.size() != rv2.size())
-        throw std::invalid_argument ("rv1.size() != rv2.size()");
-      return rv1 - rv2;
-    }
+    row_vector_d subtract(const row_vector_d& rv1, const row_vector_d& rv2);
     /**
      * Return the difference between the first specified matrix and
      * the second.  The two matrices must have the same dimensions.
@@ -1039,11 +1015,7 @@ namespace stan {
      * @return First matrix minus the second matrix.
      * @throw std::invalid_argument if m1 and m2 are not the same size.
      */
-    inline matrix_d subtract(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::invalid_argument ("dimensions of m1 and m2 do not match");
-      return m1 - m2;
-    }
+    matrix_d subtract(const matrix_d& m1, const matrix_d& m2);
 
     /**
      * Return the difference between a matrix or vector and a scalar.
@@ -1072,27 +1044,21 @@ namespace stan {
      * @param v Specified vector.  
      * @return The negation of the vector.
      */
-    inline vector_d minus(const vector_d& v) {
-      return -v;
-    }
+    vector_d minus(const vector_d& v);
     /**
      * Return the negation of the specified row vector.  The result is
      * the same as multiplying by the scalar <code>-1</code>.
      * @param rv Specified vector.
      * @return The negation of the vector.
      */
-    inline row_vector_d minus(const row_vector_d& rv) {
-      return -rv;
-    }
+    row_vector_d minus(const row_vector_d& rv);
     /**
      * Return the negation of the specified matrix.  The result is the same
      * as multiplying by the scalar <code>-1</code>.
      * @param m Specified matrix.
      * @return The negation of the matrix.
      */
-    inline matrix_d minus(const matrix_d& m) {
-      return -m;
-    }
+    matrix_d minus(const matrix_d& m);
 
     /**
      * Return the division of the specified column vector by
@@ -1101,9 +1067,7 @@ namespace stan {
      * @param c Specified scalar.
      * @return Vector divided by the scalar.
      */
-    inline vector_d divide(const vector_d& v, double c) {
-      return v / c;
-    }
+    vector_d divide(const vector_d& v, double c);
     /**
      * Return the division of the specified row vector by
      * the specified scalar.
@@ -1111,9 +1075,7 @@ namespace stan {
      * @param c Specified scalar.
      * @return Vector divided by the scalar.
      */
-    inline row_vector_d divide(const row_vector_d& rv, double c) {
-      return rv / c;
-    }
+    row_vector_d divide(const row_vector_d& rv, double c);
     /**
      * Return the division of the specified matrix by the specified
      * scalar.
@@ -1121,9 +1083,7 @@ namespace stan {
      * @param c Specified scalar.
      * @return Matrix divided by the scalar.
      */
-    inline matrix_d divide(const matrix_d& m, double c) {
-      return m / c;
-    }
+    matrix_d divide(const matrix_d& m, double c);
 
     /**
      * Return the element-wise product of the specified vectors.
@@ -1131,60 +1091,21 @@ namespace stan {
      * @param v2 Second vector.
      * @return Elementwise product of the vectors.
      */
-    inline vector_d elt_multiply(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "vectors must have same dimensions, v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size() << std::endl;
-        throw std::domain_error(msg.str());
-      }
-      vector_d prod(v1.size());
-      for (int i = 0; i < v1.size(); ++i)
-        prod(i) = v1(i) * v2(i);
-      return prod;
-    }
+    vector_d elt_multiply(const vector_d& v1, const vector_d& v2);
     /**
      * Return the element-wise product of the specified row vectors.
      * @param v1 First row vector.
      * @param v2 Second row vector.
      * @return Elementwise product of the vectors.
      */
-    inline vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "vectors must have same dimensions, v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size() << std::endl;
-        throw std::domain_error(msg.str());
-      }
-      row_vector_d prod(v1.size());
-      for (int i = 0; i < v1.size(); ++i)
-        prod(i) = v1(i) * v2(i);
-      return prod;
-    }
+    row_vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2);
     /**
      * Return the element-wise product of the specified matrices.
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return Elementwise product of the matrices.
      */
-    inline matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows()
-          || m1.cols() != m2.cols()) {
-        std::stringstream msg;
-        msg << "vectors must have same dimensions"
-          << "; m1.rows()=" << m1.rows() 
-          << ", m2.rows()=" << m2.rows()
-          << ", m1.cols()=" << m1.cols()
-          << ", m2.cols()=" << m2.cols()
-          << std::endl;
-          throw std::domain_error(msg.str());
-      }
-      matrix_d prod(m1.rows(),m1.cols());
-      for (int j = 0; j < m1.cols(); ++j)
-        for (int i = 0; i < m1.rows(); ++i)
-          prod(i,j) = m1(i,j) * m2(i,j);
-      return prod;
-    }
+    matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2);
 
 
     /**
@@ -1193,63 +1114,21 @@ namespace stan {
      * @param v2 Second vector.
      * @return Elementwise division of the vectors.
      */
-    inline vector_d elt_divide(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "require vectors to be same size for element-wise division;"
-            << " found v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size()
-            << std::endl;
-        throw std::domain_error(msg.str());
-      }
-      vector_d prod(v1.size());
-      for (int i = 0; i < v1.size(); ++i)
-        prod(i) = v1(i) / v2(i);
-      return prod;
-    }
+    vector_d elt_divide(const vector_d& v1, const vector_d& v2);
     /**
      * Return the element-wise division of the specified row vectors.
      * @param v1 First row vector.
      * @param v2 Second row vector.
      * @return Elementwise division of the vectors.
      */
-    inline vector_d elt_divide(const row_vector_d& v1, const row_vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "require vectors to be same size for element-wise division;"
-            << " found v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size()
-            << std::endl;
-        throw std::domain_error(msg.str());
-      }
-      row_vector_d prod(v1.size());
-      for (int i = 0; i < v1.size(); ++i)
-        prod(i) = v1(i) / v2(i);
-      return prod;
-    }
+    row_vector_d elt_divide(const row_vector_d& v1, const row_vector_d& v2);
     /**
      * Return the element-wise division of the specified matrices.
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return Elementwise division of the matrices.
      */
-    inline matrix_d elt_divide(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows() 
-          || m1.cols() != m2.cols()) {
-        std::stringstream msg;
-        msg << "require matrices to be same dimensions for element-wise division;"
-            << " found m1.rows()=" << m1.rows() << ", m1.cols()=" << m1.cols()
-            << "; m2.rows()=" << m2.rows() << ", m2.cols()=" << m2.cols()
-            << std::endl;
-        throw std::domain_error(msg.str());
-
-      }
-      matrix_d prod(m1.rows(),m1.cols());
-      for (int j = 0; j < m2.cols(); ++j)
-        for (int i = 0; i < m1.rows(); ++i)
-          prod(i,j) = m1(i,j) / m2(i,j);
-      return prod;
-    }
+    matrix_d elt_divide(const matrix_d& m1, const matrix_d& m2);
 
     /**
      * Return the product of the of the specified column
@@ -1258,9 +1137,7 @@ namespace stan {
      * @param c Specified scalar.
      * @return Product of vector and scalar.
      */
-    inline vector_d multiply(const vector_d& v, double c) {
-      return c * v;
-    }
+    vector_d multiply(const vector_d& v, double c);
     /**
      * Return the product of the of the specified row
      * vector and specified scalar.
@@ -1268,9 +1145,7 @@ namespace stan {
      * @param c Specified scalar.
      * @return Product of vector and scalar.
      */
-    inline row_vector_d multiply(const row_vector_d& rv, double c) {
-      return c * rv;
-    }
+    row_vector_d multiply(const row_vector_d& rv, double c);
     /**
      * Return the product of the of the specified matrix
      * and specified scalar.
@@ -1278,9 +1153,7 @@ namespace stan {
      * @param c Scalar.
      * @return Product of matrix and scalar.
      */
-    inline matrix_d multiply(const matrix_d& m, double c) {
-      return c * m;
-    }
+    matrix_d multiply(const matrix_d& m, double c);
     /**
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
@@ -1321,27 +1194,21 @@ namespace stan {
      * @param v Vector.
      * @return Product of scalar and vector.
      */
-    inline vector_d multiply(double c, const vector_d& v) {
-      return c * v;
-    }
+    vector_d multiply(double c, const vector_d& v);
     /**
      * Return the product of the specified scalar and row vector.
      * @param c Scalar.
      * @param rv Row vector.
      * @return Product of scalar and row vector.
      */
-    inline row_vector_d multiply(double c, const row_vector_d& rv) {
-      return c * rv;
-    }
+    row_vector_d multiply(double c, const row_vector_d& rv);
     /**
      * Return the product of the specified scalar and matrix.
      * @param c Scalar.
      * @param m Matrix
      * @return Product of scalar and matrix.
      */
-    inline matrix_d multiply(double c, const matrix_d& m) {
-      return c * m;
-    }
+    matrix_d multiply(double c, const matrix_d& m);
 
 
 
@@ -1356,9 +1223,7 @@ namespace stan {
      * @param i Row index.
      * @return Specified row of the matrix.
      */
-    inline row_vector_d row(const matrix_d& m, size_t i) {
-      return m.row(i - 1);
-    }
+    row_vector_d row(const matrix_d& m, size_t i);
 
     /**
      * Return the specified column of the specified matrix
@@ -1371,9 +1236,7 @@ namespace stan {
      * @param j Column index.
      * @return Specified column of the matrix.
      */
-    inline vector_d col(const matrix_d& m, size_t j) {
-      return m.col(j - 1);
-    }
+    vector_d col(const matrix_d& m, size_t j);
 
     /**
      * Return a column vector of the diagonal elements of the
@@ -1381,9 +1244,7 @@ namespace stan {
      * @param m Specified matrix.  
      * @return Diagonal of the matrix.
      */
-    inline vector_d diagonal(const matrix_d& m) {
-      return m.diagonal();
-    }
+    vector_d diagonal(const matrix_d& m);
 
     /**
      * Return a square diagonal matrix with the specified vector of
@@ -1391,9 +1252,7 @@ namespace stan {
      * @param v Specified vector.
      * @return Diagonal matrix with vector as diagonal values.
      */
-    inline matrix_d diag_matrix(const vector_d& v) {
-      return v.asDiagonal();
-    }
+    matrix_d diag_matrix(const vector_d& v);
 
     /**
      * Return the transposition of the specified column
@@ -1401,35 +1260,27 @@ namespace stan {
      * @param v Specified vector.
      * @return Transpose of the vector.
      */
-    inline row_vector_d transpose(const vector_d& v) {
-      return v.transpose();
-    }
+    row_vector_d transpose(const vector_d& v);
     /**
      * Return the transposition of the specified row
      * vector.
      * @param rv Specified vector.
      * @return Transpose of the vector.
      */
-    inline vector_d transpose(const row_vector_d& rv) {
-      return rv.transpose();
-    }
+    vector_d transpose(const row_vector_d& rv);
     /**
      * Return the transposition of the specified matrix.
      * @param m Specified matrix.
      * @return Transpose of the matrix.
      */
-    inline matrix_d transpose(const matrix_d& m) {
-      return m.transpose();
-    }
+    matrix_d transpose(const matrix_d& m);
 
     /**
      * Returns the inverse of the specified matrix.
      * @param m Specified matrix.
      * @return Inverse of the matrix.
      */
-    inline matrix_d inverse(const matrix_d& m) {
-      return m.inverse();
-    }
+    matrix_d inverse(const matrix_d& m);
 
     /**
      * Returns the solution of the system Ax=b when A is triangular
@@ -1509,12 +1360,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvalues of matrix.
      */
-    inline vector_d eigenvalues(const matrix_d& m) {
-      // false == no vectors
-      Eigen::EigenSolver<matrix_d> solver(m,false);
-      // FIXME: test imag() all 0?
-      return solver.eigenvalues().real();
-    }
+    vector_d eigenvalues(const matrix_d& m);
 
     /**
      * Return a matrix whose columns are the real components of the
@@ -1523,10 +1369,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvectors of matrix.
      */
-    inline matrix_d eigenvectors(const matrix_d& m) {
-      Eigen::EigenSolver<matrix_d> solver(m);
-      return solver.eigenvectors().real();
-    }
+    matrix_d eigenvectors(const matrix_d& m);
     /**
      * Assign the real components of the eigenvalues and eigenvectors
      * of the specified matrix to the specified references.
@@ -1544,13 +1387,9 @@ namespace stan {
      * @param eigenvectors Matrix reference into which eigenvectors
      * are written.
      */
-    inline void eigen_decompose(const matrix_d& m,
-                                vector_d& eigenvalues,
-                                matrix_d& eigenvectors) {
-      Eigen::EigenSolver<matrix_d> solver(m);
-      eigenvalues = solver.eigenvalues().real();
-      eigenvectors = solver.eigenvectors().real();
-    }
+    void eigen_decompose(const matrix_d& m,
+                         vector_d& eigenvalues,
+                         matrix_d& eigenvectors);
 
     /**
      * Return the eigenvalues of the specified symmetric matrix
@@ -1561,10 +1400,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvalues of matrix.
      */
-    inline vector_d eigenvalues_sym(const matrix_d& m) {
-      Eigen::SelfAdjointEigenSolver<matrix_d> solver(m,Eigen::EigenvaluesOnly);
-      return solver.eigenvalues().real();
-    }
+    vector_d eigenvalues_sym(const matrix_d& m);
     /**
      * Return a matrix whose rows are the real components of the
      * eigenvectors of the specified symmetric matrix.  This function
@@ -1574,10 +1410,7 @@ namespace stan {
      * @param m Symmetric matrix.
      * @return Eigenvectors of matrix.
      */
-    inline matrix_d eigenvectors_sym(const matrix_d& m) {
-      Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
-      return solver.eigenvectors().real();
-    }
+    matrix_d eigenvectors_sym(const matrix_d& m);
     /**
      * Assign the real components of the eigenvalues and eigenvectors
      * of the specified symmetric matrix to the specified references.
@@ -1590,13 +1423,9 @@ namespace stan {
      * @param eigenvectors Matrix reference into which eigenvectors
      * are written.
      */
-    inline void eigen_decompose_sym(const matrix_d& m,
+    void eigen_decompose_sym(const matrix_d& m,
                                     vector_d& eigenvalues,
-                                    matrix_d& eigenvectors) {
-      Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
-      eigenvalues = solver.eigenvalues().real();
-      eigenvectors = solver.eigenvectors().real();
-    }
+                                    matrix_d& eigenvectors);
 
 
     /**
@@ -1609,13 +1438,7 @@ namespace stan {
      * @return Square root of matrix.
      * @throw std::invalid_argument if m is not a square matrix
      */
-    inline matrix_d cholesky_decompose(const matrix_d& m) {
-      if (m.rows() != m.cols())
-        throw std::invalid_argument ("m must be a square matrix");
-      Eigen::LLT<matrix_d> llt(m.rows());
-      llt.compute(m);
-      return llt.matrixL();
-    }
+    matrix_d cholesky_decompose(const matrix_d& m);
 
     /**
      * Return the vector of the singular values of the specified matrix
@@ -1625,10 +1448,7 @@ namespace stan {
      * @param m Specified matrix.
      * @return Singular values of the matrix.
      */
-    inline vector_d singular_values(const matrix_d& m) {
-      Eigen::JacobiSVD<matrix_d> svd(m); // no U or V
-      return svd.singularValues();
-    }      
+    vector_d singular_values(const matrix_d& m);
 
     /**
      * Assign the real components of a singular value decomposition
@@ -1651,17 +1471,7 @@ namespace stan {
      * @param v Right singular vectors.
      * @param s Singular values.
      */
-    inline void svd(const matrix_d& m,
-                    matrix_d& u,
-                    matrix_d& v,
-                    vector_d& s) {
-      static const unsigned int THIN_SVD_OPTIONS
-        = Eigen::ComputeThinU | Eigen::ComputeThinV;
-      Eigen::JacobiSVD<matrix_d> svd(m, THIN_SVD_OPTIONS);
-      u = svd.matrixU();
-      v = svd.matrixV();
-      s = svd.singularValues();
-    }
+    void svd(const matrix_d& m, matrix_d& u, matrix_d& v, vector_d& s);
 
   }
 

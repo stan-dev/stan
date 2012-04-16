@@ -57,10 +57,10 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 ##
 # Builds a single test
 ##
-test/%$(EXE) : test/%.o
+test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(LINK.c) $(CFLAGS_GTEST) $(GTEST_MAIN) $(LIBGTEST) $(OUTPUT_OPTION) $< 
+	$(LINK.c) $(CFLAGS_GTEST) $(GTEST_MAIN) $(LIBGTEST) $(OUTPUT_OPTION) $<
 	$@ --gtest_output="xml:$(basename $@).xml"
 
 .PRECIOUS: test/%.o
