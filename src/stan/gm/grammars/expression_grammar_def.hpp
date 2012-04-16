@@ -161,7 +161,8 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
-        if (expr1.expression_type().type() == ROW_VECTOR_T
+        if ((expr1.expression_type().type() == MATRIX_T
+             || expr1.expression_type().type() == ROW_VECTOR_T)
             && expr2.expression_type().type() == MATRIX_T) {
           fun f("mdivide_right",args);
           sft(f);
@@ -190,7 +191,8 @@ namespace stan {
         args.push_back(expr2);
         set_fun_type sft;
         if (expr1.expression_type().type() == MATRIX_T
-            && expr2.expression_type().type() == VECTOR_T) {
+            && (expr2.expression_type().type() == VECTOR_T
+                || expr2.expression_type().type() == MATRIX_T)) {
           fun f("mdivide_left",args);
           sft(f);
           return expression(f);
