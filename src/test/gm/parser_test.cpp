@@ -86,6 +86,10 @@ TEST(gm_parser,good_const) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_const.stan"));
 }
 
+TEST(gm_parser,good_matrix_ops) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_matrix_ops.stan"));
+}
+
 TEST(gm_parser,good_funs) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_funs.stan"));
 }
