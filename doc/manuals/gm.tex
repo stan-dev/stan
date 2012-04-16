@@ -574,20 +574,55 @@ distributions in two ways.
 
 The most efficient way to implement a custom distribution is by
 extending \Stan with \Cpp code for the distribution.  Then the
-signature of the function must be registered with \Stan.  After that,
-as long as the source code for the function is included for the
-compiler, the custom distribution may be used like any other
+signature of the function must be registered with \Stan's parser.
+After that, as long as the source code for the function is included
+for the compiler, the custom distribution may be used like any other
 distribution.
 
 \subsection{Custom Distributions within \Stan}
 
+Custom distributions may also be implemented directly within \Stan's
+programming language.  A simple example is the triangle distribution,
+which if $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, assigns
+the density to $y \in (\alpha,\beta)$ of
+\[
+\distro{Triangle}(y | \alpha,\beta)
+= 
+\frac{2}{\beta - \alpha}
+\
+\left(
+1 - 
+\left|
+y - \frac{\alpha + \beta}{\beta - \alpha}
+\right|
+\right)
+\]
+%
+In the case where $\alpha = -1$ and $\beta = 1$, for $y \in (-1,1)$, 
+\[
+\distro{Triangle}(y,-1,1) = 1 - |y|.
+\]
+Therefore, the $\distro{Triangle}(-1,1)$ distribution may be coded as
+follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+    real(-1,1) y;
+}
+model {
+    lp__ <- log(fmax(0.0,1.0 - fabs(y))); 
+}
+\end{Verbatim}
+\end{quote}
+%
+The single scalar parameter \code{y} is declared as lying in the
+interval \code{(-1,1)}.  The model block sets the log probability to
+value of $\log \distro{Triangle}(y|-1,1)$.
 
 
-\Cpp and then their function signature ma be registered with the
-parser and then they can be used just like any other distribution in
-Stan.
 
-distributions within its programming language.
+
 
 \section{Proper and Improper Priors}
 
