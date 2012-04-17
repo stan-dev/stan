@@ -35,10 +35,13 @@ TO DO FOR V1
 
 * speed tests relative to BUGS/JAGS
 
-* disallow varialbe declarations ending with "__"
+* disallow variable declarations ending with "__"
  
+
 CLEANUP (ONGOING)
 =================================================
+
+* get rid of (double,double) -> var functions
 
 * make sure -a[x] parses as (-(a[x])) (old note to self)
   -- add example to doc, because (-a) is legal if a vector
@@ -48,9 +51,7 @@ CLEANUP (ONGOING)
 
 * const declarations wherever possible
   - very very painful at this late date
-  - be careful that compiled code matches
-
-* divide parser's grammar into multiple files to help compiler
+  - be careful that compiled code matches const declarations
 
 * clean up dependencies
   - remove namespace or file-level "using" statements
@@ -116,6 +117,10 @@ Stan-R
 
 EXTENSIONS
 =================================================
+
+* build unit tests from the BUGS models that just check
+  the gradients are right (this'll also cover parsing and
+  being able to fire up the models)
 
 * figure out way to have vari elements that are NOT on the stack
   - useful for numeric_limits<var>
