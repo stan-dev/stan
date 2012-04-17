@@ -10,6 +10,46 @@
 #include <stan/agrad/special_functions.hpp>
 #include <stan/math/matrix.hpp>
 
+namespace stan {
+namespace agrad {
+class gevv_vvv_vari : public stan::agrad::vari {
+protected:
+  stan::agrad::vari* alpha_;
+  stan::agrad::vari** v1_;
+  stan::agrad::vari** v2_;
+  size_t length_;
+  inline static double eval_gevv(const stan::agrad::var* alpha,
+		                         const stan::agrad::var* v1, int stride1,
+		  	  	  	  	  	     const stan::agrad::var* v2, int stride2,
+                                 size_t length) {
+    double result = 0;
+    for (size_t i = 0; i < length; i++)
+      result += alpha->vi_->val_ * v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
+    return result;
+  }
+public:
+  gevv_vvv_vari(const stan::agrad::var* alpha, 
+		        const stan::agrad::var* v1, int stride1, 
+		        const stan::agrad::var* v2, int stride2, size_t length) : 
+    vari(eval_gevv(alpha, v1, stride1, v2, stride2, length)), length_(length) {
+	alpha_ = alpha->vi_;
+    v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
+    v2_ = v1_ + length_;
+    for (size_t i = 0; i < length_; i++)
+      v1_[i] = v1[i*stride1].vi_;
+    for (size_t i = 0; i < length_; i++)
+      v2_[i] = v2[i*stride2].vi_;
+  }
+  void chain() {
+    for (size_t i = 0; i < length_; i++) {
+      v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
+      v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
+      alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
+    }
+  }
+};
+} /* namespace agrad */
+} /* namespace stan */
 /**
  * (Expert) Numerical traits for algorithmic differentiation variables.
  */
@@ -30,6 +70,44 @@ namespace Eigen {
       typedef stan::agrad::var ReturnType;
     };
 
+    template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
+    struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
+    {
+    	typedef stan::agrad::var LhsScalar;
+    	typedef stan::agrad::var RhsScalar;
+    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+    	enum { LhsStorageOrder = ColMajor };
+
+    	EIGEN_DONT_INLINE static void run(
+    			Index rows, Index cols,
+    			const LhsScalar* lhs, Index lhsStride,
+    			const RhsScalar* rhs, Index rhsIncr,
+    			ResScalar* res, Index resIncr, const ResScalar &alpha)
+    	{
+    		for (Index i = 0; i < rows; i++) {
+    			res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
+    		}
+    	}
+    };
+    template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
+    struct general_matrix_vector_product<Index,stan::agrad::var,RowMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
+    {
+    	typedef stan::agrad::var LhsScalar;
+    	typedef stan::agrad::var RhsScalar;
+    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+    	enum { LhsStorageOrder = RowMajor };
+
+    	EIGEN_DONT_INLINE static void run(
+    			Index rows, Index cols,
+    			const LhsScalar* lhs, Index lhsStride,
+    			const RhsScalar* rhs, Index rhsIncr,
+    			ResScalar* res, Index resIncr, const RhsScalar &alpha)
+    	{
+    		for (Index i = 0; i < rows; i++) {
+    			res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
+    		}
+    	}
+    };
   }
 
   /**
