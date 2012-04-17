@@ -125,6 +125,7 @@ help:
 .PHONY: clean clean-models clean-dox clean-demo clean-all
 clean:
 	$(RM) -r *.dSYM
+	$(RM) $(OFILES) bin/libstan.a
 
 clean-models:
 	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch
