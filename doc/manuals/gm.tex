@@ -582,9 +582,9 @@ distribution.
 \subsection{Custom Distributions within \Stan}
 
 Custom distributions may also be implemented directly within \Stan's
-programming language.  A simple example is the triangle distribution,
-which if $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, assigns
-the density to $y \in (\alpha,\beta)$ of
+programming language.  A simple example is the triangle distribution.
+If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then
+$y \in (\alpha,\beta)$ has a density defined as follows.
 \[
 \distro{Triangle}(y | \alpha,\beta)
 = 
@@ -598,12 +598,13 @@ y - \frac{\alpha + \beta}{\beta - \alpha}
 \right)
 \]
 %
-In the case where $\alpha = -1$ and $\beta = 1$, for $y \in (-1,1)$, 
+If $\alpha = -1$, $\beta = 1$, and $y \in (-1,1)$, this reduces to
 \[
 \distro{Triangle}(y,-1,1) = 1 - |y|.
 \]
-Therefore, the $\distro{Triangle}(-1,1)$ distribution may be coded as
-follows.
+The file \url{src/models/basic_distributions/triangle.stan} contains
+the following \Stan implementation of a sampler from 
+$\distro{Triangle}(-1,1)$.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -611,17 +612,62 @@ parameters {
     real(-1,1) y;
 }
 model {
-    lp__ <- log(fmax(0.0,1.0 - fabs(y))); 
+    lp__ <- log1m(fabs(y));
 }
 \end{Verbatim}
 \end{quote}
 %
 The single scalar parameter \code{y} is declared as lying in the
-interval \code{(-1,1)}.  The model block sets the log probability to
-value of $\log \distro{Triangle}(y|-1,1)$.
+interval \code{(-1,1)}.  The log probability variable \code{lp\_\_} is
+set to the joint log probabilty of all parameters, i.e., $\log
+\distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
+\code{log1m(fabs(y))}.  The function \code{log1m} is is defined
+so that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but
+the computation is faster, more accurate, and more stable.
 
+Typically, the log probabilty variable \code{lp\_\_} would be
+incremented for the probability of each variable so that at the end of
+the program block it was equal to the log joint probability of all
+parameters.  The variable \code{lp\_\_} is initialized with the value
+0, so an equivalent, though less efficient coding for the above model
+statement is the following.
+%
+\begin{quote}
+\begin{Verbatim}
+    lp__ <- lp__ + log1m(fabs(y));
+\end{Verbatim}
+\end{quote}
 
+The constraint declarations are critical for correct run-time
+behavior.  If the constraint on \code{y} is removed from the program,
+it would compile, but produce arithmetic exceptions at run time when
+the sampler explored values of \code{y} outside of $(-1,1)$.
 
+Now suppose the log probability function were extended to all of
+$\reals$ as follows by defining the probability to be \code{log(0.0)},
+i.e., $-\infty$, for values outside of $(-1,1)$.
+%
+\begin{quote}
+\begin{Verbatim}
+    lp__ <- log(fmax(0.0,1 - fabs(y)));
+\end{Verbatim}
+\end{quote}
+%
+With the constraint on \code{y} in place, this is just a less
+efficient, slower, and less arithmetically stable version of the
+original program.  But if the constraint on \code{y} is removed, 
+the model will compile and run without arithmetic errors, but will not
+sample properly.%
+%
+\footnote{The problem is the (extremely!) light tails of the triangle
+  distribution.  The basic \HMC and \NUTS samplers cannot get into the
+  corners of the triangle properly.  Because the actual code declares
+  \code{y} to be of type \code{real(-1,1)}, the inverse logit
+  transform is applied to the unconstrained variable and its log
+  absolute derivative added to the log probability.  The resulting
+  distribution on the logit-transformed \code{y} is well behaved.  See
+  \refchapter{variable-transforms} for more information on the actual
+  transforms used.}
 
 
 \section{Proper and Improper Priors}
