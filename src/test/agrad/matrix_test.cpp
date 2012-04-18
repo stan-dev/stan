@@ -262,22 +262,16 @@ TEST(agrad_matrix,cols__matrix) {
 // determinant tests
 TEST(agrad_matrix,determinant) {
   matrix_v v(2,2);
-  matrix_d d(2,2);
   v << 0, 1, 2, 3;
-  d << 0, 1, 2, 3;
 
   var det;
   det = stan::agrad::determinant(v);
   EXPECT_FLOAT_EQ(-2, det.val());
-  det = stan::agrad::determinant(d);
-  EXPECT_FLOAT_EQ(-2, det.val());
 }
 TEST(agrad_matrix,deteriminant__exception) {
   matrix_v v(2,3);
-  matrix_d d(2,3);
 
   var det;
-  EXPECT_THROW (det = stan::agrad::determinant(d), std::domain_error);
   EXPECT_THROW (det = stan::agrad::determinant(v), std::domain_error);
 }
 TEST(agrad_matrix,determinant_grad) {
