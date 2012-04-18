@@ -8,6 +8,10 @@
 # precompiled model header
 /src/stan/model/model_header.hpp.*ch
 
+# other binary
+*.o
+*.exe
+
 # /doc/
 /doc/api
 
