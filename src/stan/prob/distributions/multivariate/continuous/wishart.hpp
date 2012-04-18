@@ -87,8 +87,7 @@ namespace stan {
       Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L_W = LLT_W.matrixL();
       Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> L_S = LLT_S.matrixL();
 
-      using stan::math::multiply;
-//      using stan::math::elt_multiply;
+      using stan::math::elt_multiply;
       using stan::math::mdivide_left_tri;
       using stan::math::lmgamma;
       lp = 0.0;
@@ -106,8 +105,7 @@ namespace stan {
 	I.setIdentity();
 	L_S = mdivide_left_tri<Eigen::Lower>(L_S, I);
 	L_S = L_S.transpose() * L_S.template triangularView<Eigen::Lower>();
-	lp -= 0.5 * multiply(L_S, W).diagonal().array().sum();	
-// 	lp -= 0.5 * elt_multiply(L_S, S).array().sum(); // FIXME: this way would be better but does not build
+	lp -= 0.5 * elt_multiply(L_S, W).array().sum(); // trace(S^-1 * W)
       }
 
       if (include_summand<propto,T_y,T_dof>::value && nu != (k + 1))
