@@ -116,7 +116,9 @@ TEST(ProbDistributionsWishart,DefaultPolicy) {
   EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
 
   Sigma.resize(3,3);
+  Sigma.setIdentity();
   Y.resize(3,3);
+  Y.setIdentity();
   nu = 2;
   EXPECT_NO_THROW(wishart_log(Y, nu, Sigma));
   nu = 1;
