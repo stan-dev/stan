@@ -18,4 +18,5 @@
 *.d
 .Rproj.user
 stan.Rproj
-
+.kdev4/
+stan.kdev4
