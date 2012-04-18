@@ -475,8 +475,7 @@ namespace stan {
      * @return Determinant of the matrix.
      * @throw std::domain_error if m is not a square matrix
      */
-    template <typename T>
-    var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m);
+    var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
 
     class dot_product_vv_vari : public vari {
     protected:
