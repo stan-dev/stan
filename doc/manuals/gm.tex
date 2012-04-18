@@ -564,112 +564,6 @@ specified.
 \end{Verbatim}
 \end{quote}
 
-
-\section{Custom Distributions}
-
-\Stan programming language supports the definition of custom
-distributions in two ways.  
-
-\subsection{Extending \Stan with C++ Distributions}
-
-The most efficient way to implement a custom distribution is by
-extending \Stan with \Cpp code for the distribution.  Then the
-signature of the function must be registered with \Stan's parser.
-After that, as long as the source code for the function is included
-for the compiler, the custom distribution may be used like any other
-distribution.
-
-\subsection{Custom Distributions within \Stan}
-
-Custom distributions may also be implemented directly within \Stan's
-programming language.  A simple example is the triangle distribution.
-If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then
-$y \in (\alpha,\beta)$ has a density defined as follows.
-\[
-\distro{Triangle}(y | \alpha,\beta)
-= 
-\frac{2}{\beta - \alpha}
-\
-\left(
-1 - 
-\left|
-y - \frac{\alpha + \beta}{\beta - \alpha}
-\right|
-\right)
-\]
-%
-If $\alpha = -1$, $\beta = 1$, and $y \in (-1,1)$, this reduces to
-\[
-\distro{Triangle}(y,-1,1) = 1 - |y|.
-\]
-The file \url{src/models/basic_distributions/triangle.stan} contains
-the following \Stan implementation of a sampler from 
-$\distro{Triangle}(-1,1)$.
-%
-\begin{quote}
-\begin{Verbatim}
-parameters {
-    real(-1,1) y;
-}
-model {
-    lp__ <- log1m(fabs(y));
-}
-\end{Verbatim}
-\end{quote}
-%
-The single scalar parameter \code{y} is declared as lying in the
-interval \code{(-1,1)}.  The log probability variable \code{lp\_\_} is
-set to the joint log probabilty of all parameters, i.e., $\log
-\distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
-\code{log1m(fabs(y))}.  The function \code{log1m} is is defined
-so that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but
-the computation is faster, more accurate, and more stable.
-
-Typically, the log probabilty variable \code{lp\_\_} would be
-incremented for the probability of each variable so that at the end of
-the program block it was equal to the log joint probability of all
-parameters.  The variable \code{lp\_\_} is initialized with the value
-0, so an equivalent, though less efficient coding for the above model
-statement is the following.
-%
-\begin{quote}
-\begin{Verbatim}
-    lp__ <- lp__ + log1m(fabs(y));
-\end{Verbatim}
-\end{quote}
-
-The constraint declarations are critical for correct run-time
-behavior.  If the constraint on \code{y} is removed from the program,
-it would compile, but produce arithmetic exceptions at run time when
-the sampler explored values of \code{y} outside of $(-1,1)$.
-
-Now suppose the log probability function were extended to all of
-$\reals$ as follows by defining the probability to be \code{log(0.0)},
-i.e., $-\infty$, for values outside of $(-1,1)$.
-%
-\begin{quote}
-\begin{Verbatim}
-    lp__ <- log(fmax(0.0,1 - fabs(y)));
-\end{Verbatim}
-\end{quote}
-%
-With the constraint on \code{y} in place, this is just a less
-efficient, slower, and less arithmetically stable version of the
-original program.  But if the constraint on \code{y} is removed, 
-the model will compile and run without arithmetic errors, but will not
-sample properly.%
-%
-\footnote{The problem is the (extremely!) light tails of the triangle
-  distribution.  The basic \HMC and \NUTS samplers cannot get into the
-  corners of the triangle properly.  Because the actual code declares
-  \code{y} to be of type \code{real(-1,1)}, the inverse logit
-  transform is applied to the unconstrained variable and its log
-  absolute derivative added to the log probability.  The resulting
-  distribution on the logit-transformed \code{y} is well behaved.  See
-  \refchapter{variable-transforms} for more information on the actual
-  transforms used.}
-
-
 \section{Proper and Improper Priors}
 
 The model in the previous section does not contain a sampling
@@ -703,6 +597,219 @@ are equally efficient in \Stan's sampler, because their uniformity
 can be determined at compile time and thus computations related to
 them eliminated.  There is further discussion of \Stan optimization
 in \refchapter{optimization}
+
+
+
+
+\section{User-Defined Distributions}
+
+\Stan programming language supports the definition of custom
+distributions in two ways.  
+
+\subsection{Extending \Stan with C++ Distributions}
+
+The most efficient way to implement a custom distribution is by
+extending \Stan with \Cpp code for the distribution.  Then the
+signature of the function must be registered with \Stan's parser.
+After that, as long as the source code for the function is included
+for the compiler, the custom distribution may be used like any other
+distribution.
+
+\subsection{User-Defined Distributions within \Stan}
+
+Custom distributions may also be implemented directly within \Stan's
+programming language.  A simple example is the triangle distribution.
+If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then
+$y \in (\alpha,\beta)$ has a density defined as follows.
+\[
+\distro{Triangle}(y | \alpha,\beta)
+= 
+\frac{2}{\beta - \alpha}
+\
+\left(
+1 - 
+\left|
+y - \frac{\alpha + \beta}{\beta - \alpha}
+\right|
+\right)
+\]
+%
+If $\alpha = -1$, $\beta = 1$, and $y \in (-1,1)$, this reduces to
+\[
+\distro{Triangle}(y,-1,1) = 1 - |y|.
+\]
+The file \url{src/models/basic_distributions/triangle.stan} contains
+the following \Stan implementation of a sampler from 
+$\distro{Triangle}(-1,1)$.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+    real(-1,1) y;
+}
+model {
+    lp__ <- lp__ + log1m(fabs(y));
+}
+\end{Verbatim}
+\end{quote}
+%
+The single scalar parameter \code{y} is declared as lying in the
+interval \code{(-1,1)}.  The log probability variable \code{lp\_\_} is
+incremented with the joint log probabilty of all parameters, i.e.,
+$\log \distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
+\code{log1m(fabs(y))}.  The function \code{log1m} is is defined so
+that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but the
+computation is faster, more accurate, and more stable.
+
+The log probability variable \code{lp\_\_} is incremented in this
+program rather than being set.  This is because the transform involved
+for the bounded variable \code{y} of type \code{real(-1,1)} implicitly
+adds a term to \code{lp\_\_} to adjust the log probability for the
+transform (adding the log absolute derivative of the inverse
+transform).
+
+The constrained type \code{real(-1,1)} declared for \code{y} is
+critical for correct sampling behavior.  If the constraint on \code{y}
+is removed from the program, say by declaring \code{y} as having the
+unconstrained scalar type \code{real}, the program would compile, but
+it would produce arithmetic exceptions at run time when the sampler
+explored values of \code{y} outside of $(-1,1)$.
+
+Now suppose the log probability function were extended to all of
+$\reals$ as follows by defining the probability to be \code{log(0.0)},
+i.e., $-\infty$, for values outside of $(-1,1)$.
+%
+\begin{quote}
+\begin{Verbatim}
+    lp__ <- log(fmax(0.0,1 - fabs(y)));
+\end{Verbatim}
+\end{quote}
+%
+With the constraint on \code{y} in place, this is just a less
+efficient, slower, and less arithmetically stable version of the
+original program.  But if the constraint on \code{y} is removed, 
+the model will compile and run without arithmetic errors, but will not
+sample properly.%
+%
+\footnote{The problem is the (extremely!) light tails of the triangle
+  distribution.  The basic \HMC and \NUTS samplers cannot get into the
+  corners of the triangle properly.  Because the actual code declares
+  \code{y} to be of type \code{real(-1,1)}, the inverse logit
+  transform is applied to the unconstrained variable and its log
+  absolute derivative added to the log probability.  The resulting
+  distribution on the logit-transformed \code{y} is well behaved.  See
+  \refchapter{variable-transforms} for more information on the actual
+  transforms used.}
+
+
+\section{Mixture Models}
+
+Finite mixture distributions can be coded in \Stan as custom
+distributions combining the mixture with the built-in probability
+functions.  
+
+In the simplest case, consider a random variable $Y$ whose
+distirbution the mixture of two normal distributions, with a 0.3
+weight on $\distro{Normal}(-1,2)$ and a 0.7 weight on
+$\distro{Normal}(3,1)$.  Mathematically, the densities are mixed, with
+the density of $Y$ given by
+\[
+p_Y(y) = 0.3 \times \distro{Normal}(y|-1,2) \, + \, 0.7 \times \distro{Normal}(y|3,1).
+\]
+%
+The \Stan model with parameter $Y$ is coded as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real y;
+}
+model {
+   lp__ <- log_sum_exp(log(0.3) + normal_log(y,-1,2),
+                       log(0.7) + normal_log(y,3,1));
+}
+\end{Verbatim}
+\end{quote}
+%
+The log probability term is derived by taking
+\begin{eqnarray*}
+\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Norm}(y|-1,2) \, + \,
+  0.7 \times
+  \distro{Norm}(y|3,1) \, \right)
+\\[2pt]
+& = & \log(\! \begin{array}[t]{l}
+                 \exp(\log(0.3 \times \distro{Norm}(y|-1,2))) \\
+                 + \exp(\log(0.7 \times \distro{Norm}(y|3,1))) \ )
+              \end{array}
+% \\[4pt]
+% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Norm}(y|-1,2))
+%             \\
+%            + \exp(\log(0.7) + \log \distro{Norm}(y|3,1)) \ )
+%             \end{array}
+\\[2pt]
+& = & \mbox{logSumExp}(\! \begin{array}[t]{l}
+                         \log(0.3) + \log \distro{Norm}(y|-1,2),
+                         \\                  
+                         \log(0.7) + \log \distro{Norm}(y|3,1) \ ).
+                       \end{array}
+\end{eqnarray*}
+
+Given the scheme for representing mixtures, it may be moved to an
+estimation setting, where the locations, scales, and mixture
+components are unknown.  Further generalizing to an arbitrary number
+of mixture components yields the following model.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(1,) K;           // number of mixture components
+  int(1,) N;           // number of data points
+  real y[N];           // observations
+}
+parameters {
+  simplex(K) theta;    // mixing proportions
+  real mu[K];          // locations of mixture components
+  real(0,) sigma[K];   // scales of mixture components
+}
+model {
+  real ps[K];          // temp for log component densities
+  for (k in 1:K) {
+    mu[k] ~ normal(0,10);
+    sigma[k] ~ uniform(0,10);
+  }
+  for (n in 1:N) {
+    for (k in 1:K) {
+      ps[k] <- log(theta[k]) 
+               + normal_log(y[n],mu[k],sigma[k]);
+    }
+    lp__ <- lp__ + log_sum_exp(ps);    
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The model involves \code{K} mixture components and \code{N} data
+points.  The mixing proportions are defined to be a unit $K$-simplex
+using \code{simplex(K)}, the components distributions locations
+\code{mu[k]} are unconstrained and their scales \code{sigma[k]}
+constrained to be positive.  The model declares a local variable
+\code{ps} of type \code{real[K]}, which is used to accumulate the
+contributions by each mixture component.
+
+The locations and scales are drawn from simple priors for the sake of
+this example, but could be anything supported by \Stan in general,
+including a hierarchical model.  
+
+The main action is in the loop over data points \code{n}.  For each
+such point, the log of $\theta_k \times
+\distro{Normal}(y_n|\mu_k,\sigma_k)$ is calculated and added to the
+array \code{ps}.  Then the log probability is incremented with the log
+sum of exponentials of those values.
+
+
+
+
+
 
 
 \part{Commands and Data Formats}
@@ -6191,6 +6298,46 @@ not dependent on the dimensionality of the parameter vector.
 
 
 \chapter{Installation}\label{install.appendix}
+
+Before running \Stan, it is necessary to have a fairly complete \Cpp
+environment.
+
+\section{Mac OS X}
+
+\subsection{Install Xcode}
+
+Apple's Xcode contains both compilers and make all of the tools needed 
+to work with \Stan as a user.  Which version you need depends on your
+operating system version.
+
+\begin{description}
+\item[Mac OS X ``Snow Leopard'' or earlier]
+Xcode 3: Good luck; we couldn't find it
+\item[Mac OS X ``Lion'' or lateter]
+Xcode 4: \url{https://developer.apple.com/xcode/}
+\end{description}
+
+Then, once you've installed Xcode, you need to start it, then open
+menu option \code{Xcode}, select \code{Preferences}, then click on the
+\code{Downloads} icon and then click on the \code{Install} button next
+to the option labeled ``Command Line Tools.''
+
+At this point, you should have the make system \code{make}, the two
+\Cpp compilers/linkers \code{g++}, and \code{clang++} installed, which
+is all you need to run \Stan.  You should also have the \code{git}
+version control system at this point.
+
+
+\subsection{Git Installer}
+
+If you want to download a standalone version of Git, use
+
+\begin{quote}
+\url{http://code.google.com/p/git-osx-installer/}
+\end{quote}
+
+Although (at the time of this writing) there were only versions listed
+up to OS X version ``Snow Leopard,'' they work on ``Lion''.
 
 \chapter{BNF Grammars for \Stan}
 
