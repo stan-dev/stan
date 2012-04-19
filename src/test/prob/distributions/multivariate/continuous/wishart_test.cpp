@@ -98,6 +98,8 @@ TEST(ProbDistributionsWishart,DefaultPolicy) {
   
   Sigma.resize(1,1);
   Y.resize(1,1);
+  Sigma.setIdentity();
+  Y.setIdentity();
   nu = 1;
   EXPECT_NO_THROW(wishart_log(Y, nu, Sigma));
   
