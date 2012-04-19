@@ -8,8 +8,7 @@ TO DO FOR V1
 
 * remaining doc
   - reference manual (Bob)
-  - scale jumbo Stan logo in doxygen (Daniel)
-  - API doc (Daniel, Bob)
+ - API doc (Daniel, Bob)
     + stan/gm
     + stan/math
     + stan/mcmc
