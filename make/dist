@@ -10,5 +10,5 @@ dist: clean-all
 	@-rm -rf stan-src-$(VERSION_STRING)
 	mkdir stan-src-$(VERSION_STRING)
 	rsync -avz --exclude ".git" --exclude stan-src-$(VERSION_STRING)  ./ stan-src-$(VERSION_STRING)
-	tar --gzip -chf stan-src-$(VERSION_STRING).tar.gz stan-src-$(VERSION_STRING)
+	tar --gzip -chf stan-src-$(VERSION_STRING).tgz stan-src-$(VERSION_STRING)
 	-rm -rf stan-src-$(VERSION_STRING) .fname
