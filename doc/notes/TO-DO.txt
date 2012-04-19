@@ -6,12 +6,8 @@ TO DO FOR V1
   - slice for larger outcome sets
   - what about multinomial with constraints?
 
-* NUTS II (Matt)
-  - diagonal mass adaptation during warmup
-
 * remaining doc
   - reference manual (Bob)
-  - getting started guide (Bob) 
   - scale jumbo Stan logo in doxygen (Daniel)
   - API doc (Daniel, Bob)
     + stan/gm
@@ -28,18 +24,46 @@ TO DO FOR V1
   - eliminate tabs from code
   - tarball
   - basic distro site
-  - check cross-platform compilation:
-     + goal: make OS={win,linux,mac} CC={clang++,g++} O={0,3}
-     + remove useless warnings
-       * unused functions, specifically
 
 * speed tests relative to BUGS/JAGS
 
 * disallow variable declarations ending with "__"
  
 
+HOME PAGE
+=================================================
+
+* Download:
+  - latest code tarball (named as such)
+    (no git info, but everything else)
+
+     + stan-src-1.0.0.tgz
+
+  - latest doc pdf (ditto)
+
+    *stan-doc-1.0.pdf
+
+  - older versions (with numbers)
+
+  - executables
+    + 
+    + bin/stanc
+
+* API doc online
+
+
+* How to Cite Stan
+  now: Arxiv paper NUTS, doc for Stan
+  
+* Groups
+
+
+
+
 CLEANUP (ONGOING)
 =================================================
+
+* g++ 4.7 not compiling bin/stanc, but OK with models
 
 * get rid of (double,double) -> var functions
 
