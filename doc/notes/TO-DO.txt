@@ -82,10 +82,8 @@ CLEANUP (ONGOING)
 * convert for loops with size bounds to appropriate iterators
 
 
-Convergence Diagnostics, CODA-like object
+Convergence Diagnostics, CODA-like object: mcmc_output
 =================================================
-
-* Name the class?  Epilogue?
 
 * Object for collection of chains
   - like CODA object
