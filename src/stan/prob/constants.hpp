@@ -10,12 +10,6 @@ namespace stan {
     
     namespace {
 
-      // FIXME:  get rid of these global using statements
-      
-      using std::log;
-
-      using std::sqrt;
-   
       const double LOG_PI = std::log(boost::math::constants::pi<double>());
 
       const double LOG_ZERO = std::log(0.0);
@@ -25,12 +19,12 @@ namespace stan {
       const double NEG_LOG_TWO = - LOG_TWO;
 
       const double NEG_LOG_SQRT_TWO_PI 
-      = - std::log(sqrt(2.0 * boost::math::constants::pi<double>()));
+      = - std::log(std::sqrt(2.0 * boost::math::constants::pi<double>()));
 
       const double NEG_LOG_PI = - LOG_PI;
 
       const double NEG_LOG_SQRT_PI 
-      = -std::log(sqrt(boost::math::constants::pi<double>()));
+      = -std::log(std::sqrt(boost::math::constants::pi<double>()));
       
       const double NEG_LOG_TWO_OVER_TWO = - LOG_TWO / 2.0;
 

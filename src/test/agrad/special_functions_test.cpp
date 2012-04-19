@@ -1009,13 +1009,9 @@ TEST(AgradAgrad,multiply_log_double_var){
 
 void test_log_sum_exp_2_vv(double a_val, 
                            double b_val) {
-  using stan::math::exp;
-  using stan::math::log;
+  using std::exp;
+  using std::log;
   using stan::math::log_sum_exp;
-
-  using stan::agrad::exp;
-  using stan::agrad::log;
-  using stan::agrad::log_sum_exp;
 
   AVAR a(a_val);
   AVAR b(b_val);
@@ -1042,13 +1038,9 @@ void test_log_sum_exp_2_vv(double a_val,
 }
 void test_log_sum_exp_2_vd(double a_val,
                            double b) {
-  using stan::math::exp;
-  using stan::math::log;
+  using std::exp;
+  using std::log;
   using stan::math::log_sum_exp;
-
-  using stan::agrad::exp;
-  using stan::agrad::log;
-  using stan::agrad::log_sum_exp;
 
   AVAR a(a_val);
   AVEC x = createAVEC(a);
@@ -1072,13 +1064,9 @@ void test_log_sum_exp_2_vd(double a_val,
 }
 void test_log_sum_exp_2_dv(double a,
                            double b_val) {
-  using stan::math::exp;
-  using stan::math::log;
+  using std::exp;
+  using std::log;
   using stan::math::log_sum_exp;
-
-  using stan::agrad::exp;
-  using stan::agrad::log;
-  using stan::agrad::log_sum_exp;
 
   AVAR b(b_val);
   AVEC x = createAVEC(b);
