@@ -201,7 +201,8 @@ namespace stan {
     }
     expr_type function_signatures::get_result_type(
                                          const std::string& name,
-                                         const std::vector<expr_type>& args) {
+                                         const std::vector<expr_type>& args,
+                                         std::ostream& error_msgs) {
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t match_index = 0; 
       size_t min_promotions = std::numeric_limits<size_t>::max(); 
@@ -223,15 +224,15 @@ namespace stan {
       if (num_matches == 1) {
         return signatures[match_index].first;
       } else if (num_matches == 0) {
-        std::cerr << "no matches for function name=\"" << name << "\"" 
-                  << std::endl;
+        error_msgs << "no matches for function name=\"" << name << "\"" 
+                   << std::endl;
       } else {
-        std::cerr << num_matches << " matches with " 
-                  << min_promotions << " integer promotions "
-                  << "for function name=\"" << name << "\"" << std::endl;
+        error_msgs << num_matches << " matches with " 
+                   << min_promotions << " integer promotions "
+                   << "for function name=\"" << name << "\"" << std::endl;
       }
       for (size_t i = 0; i < args.size(); ++i)
-        std::cerr << "    arg " << i << " type=" << args[i] << std::endl;
+        error_msgs << "    arg " << i << " type=" << args[i] << std::endl;
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 

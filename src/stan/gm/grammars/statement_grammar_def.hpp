@@ -163,7 +163,7 @@ namespace stan {
         function_name += "_log";
         expr_type result_type 
           = function_signatures::instance()
-          .get_result_type(function_name,arg_types);
+          .get_result_type(function_name,arg_types,error_msgs);
         if (!result_type.is_primitive_double()) {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
