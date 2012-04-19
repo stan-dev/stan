@@ -34,7 +34,7 @@ namespace stan {
 
       // Provides the target distribution we're trying to sample from
       // it's a ref only because it's heavy to copy
-      prob_grad& _model;
+      stan::model::prob_grad& _model;
     
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
@@ -127,7 +127,7 @@ namespace stan {
        * @param base_rng Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
-      nuts(prob_grad& model,
+      nuts(stan::model::prob_grad& model,
            int maxdepth = 10,
            double epsilon = -1,
            double epsilon_pm = 0.0,

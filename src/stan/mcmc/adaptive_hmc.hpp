@@ -38,7 +38,7 @@ namespace stan {
     class adaptive_hmc : public adaptive_sampler {
     private:
       // Provides the target distribution we're trying to sample from
-      mcmc::prob_grad& _model;
+      stan::model::prob_grad& _model;
     
       // The number of steps used in the Hamiltonian simulation
       unsigned int _L;
@@ -103,7 +103,7 @@ namespace stan {
        * @param base_rng Seed for random number generator; optional, if not
        * specified, generate new seen based on system time.
        */
-      adaptive_hmc(mcmc::prob_grad& model,
+      adaptive_hmc(stan::model::prob_grad& model,
                    int L, 
                    double epsilon=-1,
                    double epsilon_pm = 0.0,
