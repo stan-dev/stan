@@ -22,8 +22,7 @@ TO DO FOR V1
 
 * distribution engineering (Daniel)
   - eliminate tabs from code
-  - tarball
-  - basic distro site
+ - basic distro site
 
 * speed tests relative to BUGS/JAGS
 
@@ -36,8 +35,8 @@ HOME PAGE
 * Download:
   - latest code tarball (named as such)
     (no git info, but everything else)
-
-     + stan-src-1.0.0.tgz
+   + stan-src-1.0.0.tgz
+   + created by 'make dist'
 
   - latest doc pdf (ditto)
 

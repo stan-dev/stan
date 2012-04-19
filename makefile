@@ -107,6 +107,11 @@ help:
 -include make/doxygen
 
 ##
+# All distribution related make commands
+##
+-include make/dist
+
+##
 # Rule for generating dependencies.
 # Applies to all *.cpp files in src.
 # Test cpp files are handled slightly differently.
