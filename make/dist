@@ -3,6 +3,7 @@ MAJOR_VERSION := $(shell grep MAJOR_VERSION src/stan/version.hpp | sed -e 's/.*\
 MINOR_VERSION := $(shell grep MINOR_VERSION src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 PATCH_VERSION := $(shell grep PATCH_VERSION src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
+
 dist: clean-all
 	@echo HERE
 	@echo 'version: ' $(VERSION_STRING)
