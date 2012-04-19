@@ -45,7 +45,7 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: lib/gtest/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) $(CFLAGS_GTEST) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
 
 
 ##
@@ -57,16 +57,16 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 ##
 # Builds a single test
 ##
-test/%$(EXE) : test/%.o
+test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(LINK.c) $(CFLAGS_GTEST) $(GTEST_MAIN) $(LIBGTEST) $(OUTPUT_OPTION) $< 
+	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(LDFLAGS) $(LIBGTEST) $(OUTPUT_OPTION) 
 	$@ --gtest_output="xml:$(basename $@).xml"
 
 .PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(CFLAGS_GTEST) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
 
 ##
 # Rule for generating dependencies.
@@ -88,10 +88,10 @@ test/%.d : src/test/%_test.cpp
 ifeq (test-unit,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(UNIT_TESTS))
 endif
-ifeq (test-bugs,$(MAKECMDGOALS))
-  -include $(addsuffix .d,$(UNIT_TESTS))
-  -include demo/gm.d
-endif
+#ifeq (test-bugs,$(MAKECMDGOALS))
+#  -include $(addsuffix .d,$(UNIT_TESTS))
+#  -include demo/gm.d
+#endif
 ifeq (test-all,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(UNIT_TESTS))
 endif

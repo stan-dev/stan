@@ -46,11 +46,12 @@ namespace stan {
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                 const Policy&) {
-      static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
+      static const char* function = "stan::prob::inv_wishart_log<%1%>(%1%)";
       
       using stan::math::check_greater_or_equal;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
+      using Eigen::Array;
 
       unsigned int k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
@@ -65,21 +66,34 @@ namespace stan {
         return lp;
       // FIXME: domain checks
         
-      using stan::math::multiply_log;
-      using stan::math::lmgamma;
-      using stan::math::multiply;
-      using stan::math::inverse;
-      using stan::math::determinant;
-      using stan::math::trace;
+      Eigen::LLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > LLT_W = W.llt();
+      if (LLT_W.info() != Eigen::Success) {
+        lp = stan::math::policies::raise_domain_error<T_y>(function,
+                                              "W is not positive definite (%1%)",
+                                              0,Policy());
+        return lp;
+      }
+      Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = LLT_W.matrixL();
 
+      using stan::math::elt_multiply;
+      using stan::math::mdivide_left_tri;
+      using stan::math::lmgamma;
+      
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
-      if (include_summand<propto,T_dof,T_scale>::value)
-        lp += multiply_log(0.5*nu, determinant(S));
-      if (include_summand<propto,T_y,T_dof,T_scale>::value)
-        lp -= multiply_log(0.5*(nu+k+1.0), determinant(W));
-      if (include_summand<propto,T_y,T_scale>::value)
-        lp -= 0.5 * trace(multiply(S, inverse(W)));
+      if (include_summand<propto,T_dof,T_scale>::value) {
+        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
+      }
+      if (include_summand<propto,T_y,T_dof,T_scale>::value) {
+        lp -= (nu + k + 1.0) * L.diagonal().array().log().sum();
+      }
+      if (include_summand<propto,T_y,T_scale>::value) {
+	Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
+	I.setIdentity();
+	L = mdivide_left_tri<Eigen::Lower>(L, I);
+	L = L.transpose() * L.template triangularView<Eigen::Lower>();
+	lp -= 0.5 * elt_multiply(S, L).array().sum(); // trace(S * W^-1)
+      }
       if (include_summand<propto,T_dof,T_scale>::value)
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       return lp;

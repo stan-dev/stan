@@ -2,7 +2,7 @@
 ## in other program. 
 
 library(coda) 
-post <- read.csv(file = "samples.csv", header = TRUE); 
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 NT <- 17
 

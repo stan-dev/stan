@@ -61,6 +61,8 @@ TEST(ProbDistributionsInvWishart,DefaultPolicy) {
   
   Sigma.resize(1,1);
   Y.resize(1,1);
+  Sigma.setIdentity();
+  Y.setIdentity();
   nu = 1;
   EXPECT_NO_THROW(inv_wishart_log(Y, nu, Sigma));
   
@@ -79,7 +81,9 @@ TEST(ProbDistributionsInvWishart,DefaultPolicy) {
   EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
 
   Sigma.resize(3,3);
+  Sigma.setIdentity();
   Y.resize(3,3);
+  Y.setIdentity();
   nu = 2;
   EXPECT_NO_THROW(inv_wishart_log(Y, nu, Sigma));
   nu = 1;

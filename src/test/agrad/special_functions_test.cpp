@@ -1225,4 +1225,16 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
   EXPECT_FLOAT_EQ(g[2],g2[2]);
 }
 
+TEST(AgradSpecialFunctions,int_step) {
+  
+  using stan::math::int_step;
 
+  AVAR a(5.0);
+  AVAR b(0.0);
+  AVAR c(-1.0);
+  
+  EXPECT_EQ(1,int_step(a));
+  EXPECT_EQ(0,int_step(b));
+  EXPECT_EQ(0,int_step(c));
+
+}

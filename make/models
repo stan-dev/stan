@@ -4,7 +4,7 @@
 MODEL_HEADER := src/stan/model/model_header.hpp
 
 .PRECIOUS: models/%$(EXE)
-models/%$(EXE) : models/%.o
+models/%$(EXE) : models/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Linking C++ model ---'

@@ -97,10 +97,12 @@ namespace stan {
      * The integer step, or Heaviside, function.  
      *
      * @param y Value to test.
-     * @return 1 if value is greater than 0.0 and 0 otherwise.
+     * @return 1 if value is greater than 0 and 0 otherwise
+     * @tparam T Scalar argument type.
      */
-    unsigned int int_step(double y) {
-      return y > 0.0;
+    template <typename T>
+    unsigned int int_step(T y) {
+      return y > 0;
     }
 
     /**
@@ -580,7 +582,7 @@ namespace stan {
      * 
      * @return Pi.
      */
-    double pi() {
+    inline double pi() {
       return boost::math::constants::pi<double>();
     }
 
@@ -589,7 +591,7 @@ namespace stan {
      *
      * @return Base of natural logarithm.
      */
-    double e() {
+    inline double e() {
       return E;
     }
 
@@ -598,7 +600,7 @@ namespace stan {
      *
      * @return Square root of two. 
      */
-    double sqrt2() {
+    inline double sqrt2() {
       return SQRT_2;
     }
 
@@ -607,7 +609,7 @@ namespace stan {
      *
      * @return Natural logarithm of two.
      */
-    double log2() {
+    inline double log2() {
       return LOG_2;
     }
 
@@ -616,7 +618,7 @@ namespace stan {
      *
      * @return Natural logarithm of ten.
      */
-    double log10() {
+    inline double log10() {
       return LOG_10;
     }
 
@@ -625,7 +627,7 @@ namespace stan {
      *
      * @return Positive infinity.
      */
-    double infinity() {
+    inline double infinity() {
       return INFTY;
     }
 
@@ -634,7 +636,7 @@ namespace stan {
      *
      * @return Negative infinity.
      */
-    double negative_infinity() {
+    inline double negative_infinity() {
       return NEGATIVE_INFTY;
     }
 
@@ -643,7 +645,7 @@ namespace stan {
      *
      * @return Quiet not-a-number.
      */
-    double nan() {
+    inline double nan() {
       return NOT_A_NUMBER;
     }
 
@@ -652,7 +654,7 @@ namespace stan {
      *
      * @return Minimum positive number.
      */
-    double epsilon() {
+    inline double epsilon() {
       return EPSILON;
     }
 
@@ -662,7 +664,7 @@ namespace stan {
      *
      * @return Maximum negative number.
      */
-    double negative_epsilon() {
+    inline double negative_epsilon() {
       return NEGATIVE_EPSILON;
     }
 

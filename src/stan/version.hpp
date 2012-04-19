@@ -6,10 +6,13 @@
 namespace stan {
 
   /** Major version number for Stan package. */
-  const std::string MAJOR_VERSION = "alpha";
+  const std::string MAJOR_VERSION = "1";
 
   /** Minor version number for Stan package. */
   const std::string MINOR_VERSION = "0";
+
+  /** Patch version for Stan package. */
+  const std::string PATCH_VERSION = "0";
 
 }
 

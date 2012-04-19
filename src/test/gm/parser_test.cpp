@@ -5,8 +5,14 @@
 #include <exception>
 #include <stdexcept>
 
-#include "stan/gm/ast.hpp"
+#include "stan/gm/ast_def.cpp"
 #include "stan/gm/parser.hpp"
+#include <stan/gm/grammars/program_grammar_def.hpp>
+#include <stan/gm/grammars/whitespace_grammar_def.hpp>
+#include <stan/gm/grammars/expression_grammar_def.hpp>
+#include <stan/gm/grammars/statement_grammar_def.hpp>
+#include <stan/gm/grammars/var_decls_grammar_def.hpp>
+
 
 bool is_parsable(const std::string& file_name) {
   stan::gm::program prog;
@@ -74,6 +80,18 @@ TEST(gm_parser,bugs_2_ice) {
 
 TEST(gm_parser,good_trunc) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_trunc.stan"));
+}
+
+TEST(gm_parser,good_const) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_const.stan"));
+}
+
+TEST(gm_parser,good_matrix_ops) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_matrix_ops.stan"));
+}
+
+TEST(gm_parser,good_funs) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_funs.stan"));
 }
 
 TEST(gm_parser,triangle_lp) {

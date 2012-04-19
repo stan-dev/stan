@@ -8,6 +8,10 @@
 # precompiled model header
 /src/stan/model/model_header.hpp.*ch
 
+# other binary
+*.o
+*.exe
+
 # /doc/
 /doc/api
 
@@ -18,4 +22,5 @@
 *.d
 .Rproj.user
 stan.Rproj
-
+.kdev4/
+stan.kdev4

@@ -10,10 +10,12 @@ help:
 # Users should only need to set these three variables for use.
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
+# - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
 ##
 CC = g++
 O = 3
+AR = ar
 # OS is set automatically by this script
 -include make/detect_os
 
@@ -36,6 +38,13 @@ CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
 LIBGTEST = test/gtest.o
 GTEST_MAIN = lib/gtest/src/gtest_main.cc
 EXE = 
+LDFLAGS = -Lbin -lstan
+
+##
+# Tell make the default way to compile a .o file.
+##
+%.o : %.cpp
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 ##
 # These includes should update the following variables
@@ -70,6 +79,8 @@ help:
 	@echo '  - clean-all:   Cleans up all of Stan.'
 	@echo '------------------------------------------------------------'
 
+-include make/libstan
+
 ##
 # All testing related make commands.
 ##
@@ -96,6 +107,11 @@ help:
 -include make/doxygen
 
 ##
+# All distribution related make commands
+##
+-include make/dist
+
+##
 # Rule for generating dependencies.
 # Applies to all *.cpp files in src.
 # Test cpp files are handled slightly differently.
@@ -116,6 +132,7 @@ help:
 .PHONY: clean clean-models clean-dox clean-demo clean-all
 clean:
 	$(RM) -r *.dSYM
+	$(RM) $(OFILES) bin/libstan.a
 
 clean-models:
 	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch

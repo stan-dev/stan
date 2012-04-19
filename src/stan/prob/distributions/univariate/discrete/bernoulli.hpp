@@ -72,6 +72,72 @@ namespace stan {
       return bernoulli_log<false>(n,theta,stan::math::default_policy());
     }
 
+    // Bernoulli(n|inv_logit(theta))   [0 <= n <= 1;   -inf <= theta <= inf]
+    template <bool propto,
+              typename T_prob, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_logit_log(const int n, 
+                        const T_prob& theta, 
+                        const Policy&) {
+      static const char* function = "stan::prob::bernoulli_logit_log<%1%>(%1%)";
+
+      using stan::math::check_not_nan;
+      using stan::math::check_bounded;
+
+      T_prob lp;
+      if (!check_bounded(function, n, 0, 1, "n", &lp, Policy()))
+        return lp;
+      if (!check_not_nan(function, theta, "logit(probability), theta",
+                         &lp, Policy()))
+        return lp;
+
+      using stan::math::log1m;
+
+      if (include_summand<propto,T_prob>::value) {
+        T_prob ntheta = (2*n-1) * theta;
+        // Handle extreme values gracefully using Taylor approximations.
+        const static double cutoff = 20.0;
+        if (ntheta > cutoff)
+          return -exp(-ntheta);
+        else if (ntheta < -cutoff)
+          return ntheta;
+        else
+          return -log(1 + exp(-ntheta));
+      }
+      return 0.0;
+    }
+
+
+    template <bool propto,
+              typename T_prob>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_logit_log(const int n, 
+                        const T_prob& theta) {
+      return bernoulli_logit_log<propto>(n,theta,stan::math::default_policy());
+    }
+
+
+    template <typename T_prob, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_logit_log(const int n, 
+                        const T_prob& theta, 
+                        const Policy&) {
+      return bernoulli_logit_log<false>(n,theta,Policy());
+    }
+
+
+    template <typename T_prob>
+    inline
+    typename boost::math::tools::promote_args<T_prob>::type
+    bernoulli_logit_log(const int n, 
+                        const T_prob& theta) {
+      return bernoulli_logit_log<false>(n,theta,stan::math::default_policy());
+    }
+
 
   }
 }

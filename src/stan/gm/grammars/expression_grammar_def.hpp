@@ -161,12 +161,48 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
+        if ((expr1.expression_type().type() == MATRIX_T
+             || expr1.expression_type().type() == ROW_VECTOR_T)
+            && expr2.expression_type().type() == MATRIX_T) {
+          fun f("mdivide_right",args);
+          sft(f);
+          return expression(f);
+        }
+        
         fun f("divide",args);
         sft(f);
         return expression(f);
       }
     };
     boost::phoenix::function<division_expr> division;
+
+    struct left_division_expr {
+      template <typename T1, typename T2>
+      struct result { typedef expression type; };
+
+      expression operator()(expression& expr1,
+                            const expression& expr2) const {
+        if (expr1.expression_type().is_primitive()
+            && expr2.expression_type().is_primitive()) {
+          return expr1 /= expr2;
+        }
+        std::vector<expression> args;
+        args.push_back(expr1);
+        args.push_back(expr2);
+        set_fun_type sft;
+        if (expr1.expression_type().type() == MATRIX_T
+            && (expr2.expression_type().type() == VECTOR_T
+                || expr2.expression_type().type() == MATRIX_T)) {
+          fun f("mdivide_left",args);
+          sft(f);
+          return expression(f);
+        }
+        fun f("divide_left",args);
+        sft(f);
+        return expression(f);
+      }
+    };
+    boost::phoenix::function<left_division_expr> left_division;
 
     struct elt_multiplication_expr {
       template <typename T1, typename T2>
@@ -358,6 +394,7 @@ namespace stan {
         %= ( negated_factor_r                       [_val = _1]
              >> *( (lit('*') > negated_factor_r     [_val = multiplication(_val,_1)])
                    | (lit('/') > negated_factor_r   [_val = division(_val,_1)])
+                   | (lit('\\') > negated_factor_r   [_val = left_division(_val,_1)])
                    | (lit(".*") > negated_factor_r   
                       [_val = elt_multiplication(_val,_1)])
                    | (lit("./") > negated_factor_r   
@@ -404,6 +441,34 @@ namespace stan {
             > lit(')') )
         ;
 
+      // add case to factor_r
+      // | matrix_or_vector_r
+
+
+      // matrix_or_vector_r 
+      //   %= lit('[')
+      //   > (matrix_r | vector_r)
+      //   > lit(']')
+      //   ;
+
+      // matrix_r %= matrix2_r;
+
+      // matrix2_r.name("matrix expression");
+      // matrix2_r
+      //   %= vector2_r % ',';
+      
+      // vector_r %= vector2_r;
+
+      // vector2_r.name("vector expression");
+      // vector2_r
+      //   %=  ( expression_r 
+      //         [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+      //         % ',' 
+      //         )
+      //   ;
+      
+
+        
       int_literal_r.name("integer literal");
       int_literal_r
         %= int_ 
@@ -427,10 +492,12 @@ namespace stan {
 
       args_r.name("function argument expressions");
       args_r 
-        %= lit('(') 
-        >> (expression_r % ',')
-        > lit(')');
-
+        %= (lit('(') >> lit(')'))
+        | ( lit('(')
+            >> (expression_r % ',')
+            > lit(')') )
+        ;
+      
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 

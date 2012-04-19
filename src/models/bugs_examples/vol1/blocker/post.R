@@ -6,7 +6,7 @@ library(coda)
 
 N <- 22; 
 
-post <- read.csv(file = "samples.csv", header = TRUE); 
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 colnames(post) <- c("d", "sigmasq_delta", 
                     paste("mu", 1:N, sep = ''), 
                     paste("delta", 1:N, sep = '')); 

@@ -38,7 +38,7 @@ namespace stan {
     class adaptive_cdhmc : public adaptive_sampler {
     private:
       // Provides the target distribution we're trying to sample from
-      mcmc::prob_grad& _model;
+      stan::model::prob_grad& _model;
     
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
@@ -103,7 +103,7 @@ namespace stan {
        * @param random_seed Seed for random number generator; optional, if not
        * specified, generate new seen based on system time.
        */
-      adaptive_cdhmc(mcmc::prob_grad& model,
+      adaptive_cdhmc(stan::model::prob_grad& model,
                      double epsilonL, 
                      double delta = 0.651, 
                      double epsilon=-1, 

@@ -35,7 +35,7 @@ namespace stan {
       using stan::math::check_size_match;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
-      using stan::math::check_cov_matrix;      
+      using stan::math::check_symmetric;
       using stan::math::check_positive;      
       using boost::math::tools::promote_args;
 
@@ -50,7 +50,7 @@ namespace stan {
         return lp;
       if (!check_not_nan(function, y, "y", &lp, Policy())) 
         return lp;
-      if (!check_cov_matrix(function, Sigma, &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Sigma", &lp, Policy()))
         return lp;
 
       // allows infinities
@@ -63,12 +63,20 @@ namespace stan {
                           Policy()))
         return lp;
       
-      // FIXME: calls expensive (!) checks twice, here and in multi normal
       using std::isinf;
 
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma,Policy());
 
+      Eigen::LLT< Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
+      if (LLT.info() != Eigen::Success) {
+        lp = stan::math::policies::raise_domain_error<T_scale>(function,
+                                              "Sigma is not positive definite (%1%)",
+                                              0,Policy());
+        return lp;
+      }
+      Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> L = LLT.matrixL();
+      
       double d = y.size();
 
       if (include_summand<propto,T_dof>::value) {
@@ -80,27 +88,29 @@ namespace stan {
       if (include_summand<propto>::value) 
         lp -= (0.5 * d) * LOG_PI;
 
-      using std::fabs;
-      using stan::math::determinant;
-      using stan::math::inverse;
       using stan::math::multiply;
+      using stan::math::dot_product;
       using stan::math::subtract;
-      using stan::math::transpose;
+      using Eigen::Array;
+      using stan::math::mdivide_left_tri;
 
-      if (include_summand<propto,T_scale>::value) 
-        lp -= 0.5 * log(fabs(determinant(Sigma)));
+
+      if (include_summand<propto,T_scale>::value)
+	lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
+// 	Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(d,d);
+// 	I.setIdentity();
+	
         Eigen::Matrix<typename promote_args<T_y,T_loc>::type,
                       Eigen::Dynamic,
                       1> y_minus_mu = subtract(y,mu);
-        
+        Eigen::Matrix<typename promote_args<T_scale,T_y,T_loc>::type,
+                      Eigen::Dynamic,
+                      1> half = L = mdivide_left_tri<Eigen::Lower>(L, y_minus_mu);
         lp -= 0.5 
-          * (nu + d) 
-          * log(1.0 + (multiply(multiply(transpose(y_minus_mu),
-                                         inverse(Sigma)),
-                                y_minus_mu)
-                       / nu));
+          * (nu + d)
+	  * log(1.0 + dot_product(half,half) / nu); // FIXME: write sum_of_squares()
       }
       return lp;
     }

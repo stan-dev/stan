@@ -176,8 +176,9 @@ namespace stan {
           error_msgs_ << "non-data variables not allowed in dimension declarations."
                       << std::endl
                       << "     found variable=" << x.name_
-                      << "; declared in block=" << origin
-                      << std::endl;
+                      << "; declared in block=";
+          print_var_origin(error_msgs_,origin);
+          error_msgs_ << std::endl;
         }
         return is_data;
       }

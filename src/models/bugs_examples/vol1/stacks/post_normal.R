@@ -1,7 +1,7 @@
 library(coda)
 source('stacks.Rdata')
 z <- apply(x, 2, FUN = function(x) { (x - mean(x)) / sd(x); })
-post <- read.csv(file = "samples_normal.csv", header = TRUE)
+post <- read.csv(file = "samples_normal.csv", header = TRUE, comment.char = '#')
 print(colnames(post)) 
 
 sigma <- post[, "sigma"]

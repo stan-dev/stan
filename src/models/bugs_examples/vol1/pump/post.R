@@ -2,7 +2,7 @@
 ## in other program. 
 
 library(coda) 
-post <- read.csv(file = "samples.csv", header = TRUE); 
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 N <- 10;
 names(post) <- c("alpha", "beta", paste("theta", 1:N, sep = ''))  

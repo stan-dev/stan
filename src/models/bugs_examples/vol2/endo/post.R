@@ -1,5 +1,5 @@
 library(coda)
-post <- read.csv(file = 'samples1.csv', header = TRUE)
+post <- read.csv(file = 'samples1.csv', header = TRUE, comment.char = '#')
 poi <- post[, 'beta'] 
 
 summary(as.mcmc(poi)); 

@@ -1,4 +1,4 @@
-demo/%$(EXE) : demo/%.o
+demo/%$(EXE) : demo/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(OUTPUT_OPTION) $<
 

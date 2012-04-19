@@ -1,34 +1,34 @@
 STAN_HOME = ../../../../..
 PGM = stacks#
-CXX = g++ -std=c++0x 
+CXX = g++  
 
 normal :
-	cat $(PGM)_normal.stan | $(STAN_HOME)/demo/gm > $(PGM)_normal.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)_normal  $(PGM)_normal.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)_normal.cpp -o $(PGM)_normal 
 	./$(PGM)_normal --data=$(PGM).Rdata  --samples=samples_normal.csv 
 
 normal2 :
-	cat $(PGM)_normal2.stan | $(STAN_HOME)/demo/gm > $(PGM)_normal2.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)_normal2  $(PGM)_normal2.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)_normal2.cpp -o $(PGM)_normal2 
 	./$(PGM)_normal2 --data=$(PGM).Rdata  --samples=samples_normal.csv 
 
 dexp :
-	cat $(PGM)_dexp.stan | $(STAN_HOME)/demo/gm > $(PGM)_dexp.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)_dexp  $(PGM)_dexp.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)_dexp.cpp -o $(PGM)_dexp 
 	./$(PGM)_dexp --data=$(PGM).Rdata --samples=samples_dexp.csv 
 
 dexp2 :
-	cat $(PGM)_dexp2.stan | $(STAN_HOME)/demo/gm > $(PGM)_dexp2.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)_dexp2  $(PGM)_dexp2.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)_dexp2.cpp -o $(PGM)_dexp2 
 	./$(PGM)_dexp2 --data=$(PGM).Rdata --samples=samples_dexp.csv 
 
 t :
-	cat $(PGM)_t.stan | $(STAN_HOME)/demo/gm > $(PGM)_t.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)_t  $(PGM)_t.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)_t.cpp -o $(PGM)_t 
 	./$(PGM)_t --data=$(PGM).Rdata --samples=samples_t.csv 
 
 t2 :
-	cat $(PGM)_t2.stan | $(STAN_HOME)/demo/gm > $(PGM)_t2.cpp
+	$(STAN_HOME)/bin/stanc --name=$(PGM)_t2  $(PGM)_t2.stan 
 	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)_t2.cpp -o $(PGM)_t2 
 	./$(PGM)_t2 --data=$(PGM).Rdata --samples=samples_t.csv --iters=10000 --burnin=1000 
 

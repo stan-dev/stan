@@ -15,11 +15,10 @@
 namespace stan {
 
   namespace mcmc {
-    using stan::model::prob_grad;
 
     // Returns the new log probability of x and m
     // Catches domain errors and sets logp as -inf.
-    double leapfrog(prob_grad& model, 
+    double leapfrog(stan::model::prob_grad& model, 
                     std::vector<int> z,
                     std::vector<double>& x, std::vector<double>& m,
                     std::vector<double>& g, double epsilon) {

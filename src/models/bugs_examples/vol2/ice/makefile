@@ -1,10 +1,12 @@
 STAN_HOME = ../../../../..
 PGM = pineapple_ice
 PGM = ice#
+CXX = g++ 
+CXX = clang++ 
 
 $(PGM) :
-	cat $(PGM).stan | $(STAN_HOME)/demo/gm > $(PGM).cpp
-	g++ -O3 -std=gnu++0x -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
+	$(STAN_HOME)/bin/stanc --name=$(PGM) $(PGM).stan 
+	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM)
 	./$(PGM) --data=$(PGM).Rdata
 
 clean :

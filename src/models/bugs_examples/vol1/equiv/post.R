@@ -4,7 +4,7 @@
 library(coda) 
 
 N <- 10; 
-post <- read.csv(file = "samples.csv", header = TRUE); 
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 mystep <- function(x) ifelse(x >= 0, 1, 0); 
 colnames(post) <- c("mu", "phi", "pi", "sigmasq", "sigmasq2", paste("delta", 1:N, sep = '')); 

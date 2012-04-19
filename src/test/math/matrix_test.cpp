@@ -761,3 +761,80 @@ TEST(matrixTest,eltDivideMatrixException) {
   EXPECT_THROW(stan::math::elt_divide(m1,m3),std::domain_error);
 }
 
+TEST(matrixTest,mdivide_left_val) {
+  using stan::math::mdivide_left;
+  matrix_d Ad(2,2);
+  matrix_d I;
+
+  Ad << 2.0, 3.0, 
+        5.0, 7.0;
+
+  I = mdivide_left(Ad,Ad);
+  EXPECT_NEAR(1.0,I(0,0),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1),1.0e-12);
+}
+
+TEST(matrixTest,mdivide_right_val) {
+  using stan::math::mdivide_right;
+  matrix_d Ad(2,2);
+  matrix_d I;
+
+  Ad << 2.0, 3.0, 
+        5.0, 7.0;
+
+  I = mdivide_right(Ad,Ad);
+  EXPECT_NEAR(1.0,I(0,0),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1),1.0e-12);
+}
+
+TEST(matrixTest,mdivide_left_tri_val) {
+  using stan::math::mdivide_left_tri;
+  matrix_d Ad(2,2);
+  matrix_d I;
+
+  Ad << 2.0, 0.0, 
+        5.0, 7.0;
+
+  I = mdivide_left_tri<Eigen::Lower>(Ad,Ad);
+  EXPECT_NEAR(1.0,I(0,0),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1),1.0e-12);
+
+  Ad << 2.0, 3.0, 
+        0.0, 7.0;
+
+  I = mdivide_left_tri<Eigen::Upper>(Ad,Ad);
+  EXPECT_NEAR(1.0,I(0,0),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1),1.0e-12);
+}
+
+TEST(matrixTest,mdivide_right_tri_val) {
+  using stan::math::mdivide_right_tri;
+  matrix_d Ad(2,2);
+  matrix_d I;
+
+  Ad << 2.0, 0.0, 
+        5.0, 7.0;
+
+  I = mdivide_right_tri<Eigen::Lower>(Ad,Ad);
+  EXPECT_NEAR(1.0,I(0,0),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1),1.0e-12);
+
+  Ad << 2.0, 3.0, 
+        0.0, 7.0;
+
+  I = mdivide_right_tri<Eigen::Upper>(Ad,Ad);
+  EXPECT_NEAR(1.0,I(0,0),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1),1.0e-12);
+}

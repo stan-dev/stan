@@ -1,7 +1,7 @@
 library(coda)
 source('stacks.Rdata')
 z <- apply(x, 2, FUN = function(x) { (x - mean(x)) / sd(x); })
-post <- read.csv(file = "samples_dexp.csv", header = TRUE)
+post <- read.csv(file = "samples_dexp.csv", header = TRUE, comment.char = '#')
 
 mystep <- function(i) ifelse(i >= 0, 1, 0)
 

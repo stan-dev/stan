@@ -3,14 +3,14 @@
 
 
 library(coda) 
-post <- read.csv(file = "samples.csv", header = TRUE)
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')
 poi <- as.mcmc(post)
 summary(poi)
 q(save = "no")
 
 # The rest is for the ice example from JAGS
 
-post <- read.csv(file = "samples.csv", header = TRUE); 
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 Nage <- 13
 K <- 11

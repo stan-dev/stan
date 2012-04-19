@@ -3,8 +3,8 @@
 # multivariate hierarcical models 
 #  http://www.openbugs.info/Examples/Schools.html
 
-## status: not work (adaption hangs, but not sure it is 
-## coded correctly). 
+## status: not work (adaption hangs or it takes very long, 
+## but not that sure it is coded correctly). 
 
 data {
   int(0,) N; 

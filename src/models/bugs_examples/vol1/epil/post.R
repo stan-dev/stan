@@ -1,6 +1,6 @@
 
 library(coda)
-post <- read.csv(file = 'samples.csv', header = TRUE) 
+post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#') 
 
 pars <- c("alpha_Age", "alpha_BT", "alpha_Base", "alpha_Trt", "alpha_V4", "alpha0", "sigma_b", "sigma_b1"); 
 

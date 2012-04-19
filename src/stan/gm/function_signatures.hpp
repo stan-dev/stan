@@ -1,4 +1,5 @@
 // included from constructor for function_signatures() in src/stan/gm/ast.hpp
+
 add_unary("exp");
 add_unary("log");
 add_unary("log10");
@@ -47,6 +48,7 @@ add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 
 add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("min",DOUBLE_T,VECTOR_T);
@@ -133,6 +135,12 @@ add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
 
+add("mdivide_left",VECTOR_T,MATRIX_T,VECTOR_T);
+add("mdivide_left",MATRIX_T,MATRIX_T,MATRIX_T);
+
+add("mdivide_right",ROW_VECTOR_T,ROW_VECTOR_T,MATRIX_T);
+add("mdivide_right",MATRIX_T,MATRIX_T,MATRIX_T);
+
 add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("diagonal",VECTOR_T,MATRIX_T);
@@ -210,6 +218,7 @@ add_binary("log_sum_exp");
 add_unary("square");
 
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
+add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add_ternary("beta_log");
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
@@ -245,6 +254,9 @@ add_ternary("weibull_log");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
 add_ternary("weibull_p");
+
+add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
+add_binary("binomial_coefficient_log");
 
 
 // MULTINOMIAL?  no vector<int> type
