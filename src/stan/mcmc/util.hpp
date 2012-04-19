@@ -45,6 +45,39 @@ namespace stan {
       return logp;
     }
 
+    // Returns the new log probability of x and m
+    // Catches domain errors and sets logp as -inf.
+    // Uses a different step size for each variable in x and m.
+    double rescaled_leapfrog(prob_grad& model, 
+                             std::vector<int> z, 
+                             const std::vector<double>& step_sizes,
+                             std::vector<double>& x, std::vector<double>& m,
+                             std::vector<double>& g, double epsilon) {
+      for (size_t i = 0; i < m.size(); i++)
+        m[i] += 0.5 * epsilon * step_sizes[i] * g[i];
+      for (size_t i = 0; i < x.size(); i++)
+        x[i] += epsilon * step_sizes[i] * m[i];
+      double logp;
+      try {
+        logp = model.grad_log_prob(x, z, g);
+      } catch (std::domain_error e) {
+        // FIXME: remove output
+        std::cerr << std::endl
+                  << "****************************************" 
+                  << "****************************************" 
+                  << std::endl
+                  << "Error in model.grad_log_prob:" 
+                  << std::endl
+                  << boost::diagnostic_information(e)
+                  << std::endl
+                  << std::endl;
+        logp = -std::numeric_limits<double>::infinity();
+      }
+      for (size_t i = 0; i < m.size(); i++)
+        m[i] += 0.5 * epsilon * step_sizes[i] * g[i];
+      return logp;
+    }
+
     int sample_unnorm_log(std::vector<double> probs, 
                           boost::uniform_01<boost::mt19937&>& rand_uniform_01) {
       // linearize and scale, but don't norm
