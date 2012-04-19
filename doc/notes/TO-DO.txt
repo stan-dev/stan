@@ -62,7 +62,7 @@ HOME PAGE
 CLEANUP (ONGOING)
 =================================================
 
-* g++ 4.7 not compiling bin/stanc, but OK with models
+* g++ 4.7 compiling bin/stanc, balking on some models
 
 * get rid of (double,double) -> var functions
 
@@ -77,7 +77,6 @@ CLEANUP (ONGOING)
   - be careful that compiled code matches const declarations
 
 * clean up dependencies
-  - remove namespace or file-level "using" statements
   - only include as much as necessary per file
 
 * convert for loops with size bounds to appropriate iterators
