@@ -33,7 +33,7 @@ namespace stan {
      */
     class hmc : public adaptive_sampler {
     private:
-      mcmc::prob_grad& _model;
+      stan::model::prob_grad& _model;
     
       std::vector<double> _x;
       std::vector<int> _z;
@@ -65,7 +65,7 @@ namespace stan {
        * @param random_seed Seed for random number generator; optional, if not
        * specified, generate new seen based on system time.
        */
-      hmc(mcmc::prob_grad& model,
+      hmc(stan::model::prob_grad& model,
           double epsilon, 
           int L,
           unsigned int random_seed = static_cast<unsigned int>(std::time(0)))

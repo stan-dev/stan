@@ -11,17 +11,12 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/agrad/special_functions.hpp>
 
 namespace stan {
   
   namespace prob {
 
-    using Eigen::Array;
-    using Eigen::Dynamic;
-    using Eigen::LDLT;
-    using Eigen::Matrix;
-    using Eigen::Array;
-    using Eigen::DiagonalMatrix;
 
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
@@ -35,9 +30,9 @@ namespace stan {
      */
     template<typename T>
     bool
-    factor_cov_matrix(Array<T,Dynamic,1>& CPCs, // will fill this unbounded
-                      Array<T,Dynamic,1>& sds,  // will fill this unbounded
-                      const Matrix<T,Dynamic,Dynamic>& Sigma) {
+    factor_cov_matrix(Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // will fill this unbounded
+                      Eigen::Array<T,Eigen::Dynamic,1>& sds,  // will fill this unbounded
+                      const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
 
       size_t K = sds.rows();
 
@@ -45,24 +40,24 @@ namespace stan {
       if( (sds <= 0.0).any() ) return false;
       sds = sds.sqrt();
   
-      DiagonalMatrix<T,Dynamic> D(K);
+      Eigen::DiagonalMatrix<T,Eigen::Dynamic> D(K);
       D.diagonal() = sds.inverse();
       sds = sds.log(); // now unbounded
   
-      Matrix<T,Dynamic,Dynamic> R = D * Sigma * D;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> R = D * Sigma * D;
       R.diagonal().setOnes(); // to hopefully prevent pivoting due to floating point error
-      LDLT<Matrix<T,Dynamic,Dynamic> > ldlt;
+      Eigen::LDLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt;
       ldlt = R.ldlt();
       if( !ldlt.isPositive() ) return false;
-      Matrix<T,Dynamic,Dynamic> U = ldlt.matrixU();
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
 
       size_t position = 0;
       size_t pull = K - 1;
 
-      Array<T,Dynamic,1> temp = U.row(0).tail(pull);
+      Eigen::Array<T,Eigen::Dynamic,1> temp = U.row(0).tail(pull);
       CPCs.head(pull) = temp;
   
-      Array<T,Dynamic,1> acc(K);
+      Eigen::Array<T,Eigen::Dynamic,1> acc(K);
       acc(0) = -0.0;
       acc.tail(pull) = 1.0 - temp.square();
       for(size_t i = 1; i < (K - 1); i++) {
@@ -97,13 +92,13 @@ namespace stan {
      * @author Ben Goodrich
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_corr_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                 const size_t K) {
-      Array<T,Dynamic,1> temp;         // temporary holder
-      Array<T,Dynamic,1> acc(K-1);     // accumlator of products
+      Eigen::Array<T,Eigen::Dynamic,1> temp;         // temporary holder
+      Eigen::Array<T,Eigen::Dynamic,1> acc(K-1);     // accumlator of products
       acc.setOnes();
-      Array<T,Dynamic,Dynamic> L(K,K); // Cholesky factor of correlation matrix
+      Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K); // Cholesky factor of correlation matrix
       L.setZero();
 
       size_t position = 0;
@@ -138,10 +133,10 @@ namespace stan {
      * @author Ben Goodrich
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_corr_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                      const size_t K) {
-      Matrix<T,Dynamic,Dynamic> L = read_corr_L(CPCs, K);
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = read_corr_L(CPCs, K);
       return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
     }
     
@@ -171,8 +166,8 @@ namespace stan {
      * @author Ben Goodrich
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_corr_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                 const size_t K,
                 T& log_prob) {
 
@@ -183,7 +178,7 @@ namespace stan {
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
       // skip last row (odd indexing) because it adds nothing by design
-      for (typename Array<T,Dynamic,1>::size_type j = 0; j < (CPCs.rows() - 1); ++j) {
+      for (typename Eigen::Array<T,Eigen::Dynamic,1>::size_type j = 0; j < (CPCs.rows() - 1); ++j) {
         using stan::math::log1m;
         using stan::math::square;
         log_1cpc2 = log1m(square(CPCs[j]));
@@ -217,12 +212,12 @@ namespace stan {
      * @author Ben Goodrich
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_corr_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_corr_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                      const size_t K,
                      T& log_prob) {
 
-      Matrix<T,Dynamic,Dynamic> L = read_corr_L(CPCs, K, log_prob);
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = read_corr_L(CPCs, K, log_prob);
       return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
     }
     
@@ -232,13 +227,13 @@ namespace stan {
      * @author Ben Goodrich
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_cov_L(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-               const Array<T,Dynamic,1>& sds,  // on (0,inf)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_cov_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
+               const Eigen::Array<T,Eigen::Dynamic,1>& sds,  // on (0,inf)
                T& log_prob) {
       size_t K = sds.rows();
       // adjust due to transformation from correlations to covariances
-      log_prob += (sds.log().sum() + log(2.0)) * K;
+      log_prob += (sds.log().sum() + agrad::LOG2) * K;
       return sds.matrix().asDiagonal() * read_corr_L(CPCs, K, log_prob);
     }
 
@@ -248,12 +243,12 @@ namespace stan {
      * @author Ben Goodrich
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_cov_matrix(const Array<T,Dynamic,1>& CPCs, // on (-1,1)
-                    const Array<T,Dynamic,1>& sds,  // on (0,inf)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_cov_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
+                    const Eigen::Array<T,Eigen::Dynamic,1>& sds,  // on (0,inf)
                     T& log_prob) {
 
-      Matrix<T,Dynamic,Dynamic> L = read_cov_L(CPCs, sds, log_prob);
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = read_cov_L(CPCs, sds, log_prob);
       return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
     }
 
@@ -263,14 +258,14 @@ namespace stan {
      * @author Ben Goodrich
      */
     template<typename T>
-    Matrix<T,Dynamic,Dynamic>
-    read_cov_matrix(const Array<T,Dynamic,1>& CPCs,    // on (-1,1)
-                    const Array<T,Dynamic,1>& sds) {   // on (0,inf)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    read_cov_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,    // on (-1,1)
+                    const Eigen::Array<T,Eigen::Dynamic,1>& sds) {   // on (0,inf)
 
       size_t K = sds.rows();
-      DiagonalMatrix<T,Dynamic> D(K);
+      Eigen::DiagonalMatrix<T,Eigen::Dynamic> D(K);
       D.diagonal() = sds;
-      Matrix<T,Dynamic,Dynamic> L = D * read_corr_L(CPCs, K);
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = D * read_corr_L(CPCs, K);
       return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
     }
 
@@ -281,11 +276,11 @@ namespace stan {
      * @author Ben Goodrich
      */
     template<typename T>
-    const Array<T,Dynamic,1>
+    const Eigen::Array<T,Eigen::Dynamic,1>
     make_nu(const T eta,             // hyperparameter on (0,inf), eta = 1 <-> correlation matrix is uniform
             const size_t K) {  // number of variables in covariance matrix
   
-      Array<T,Dynamic,1> nu(K * (K - 1) / 2);
+      Eigen::Array<T,Eigen::Dynamic,1> nu(K * (K - 1) / 2);
   
       T alpha = eta + (K - 2.0) / 2.0; // from Lewandowski et. al.
       // Best (1978) implies nu = 2 * alpha for the dof in a t 
@@ -808,13 +803,13 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& y) {
-      // cut and paste from  simplex_constrain(Matrix,T) w/o Jacobian
+    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      // cut and paste from  simplex_constrain(Eigen::Matrix,T) w/o Jacobian
       using stan::math::logit;
       using stan::math::inv_logit;
       using stan::math::log1m;
       int Km1 = y.size();
-      Matrix<T,Dynamic,1> x(Km1 + 1);
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
       T stick_len(1.0);
       for (int k = 0; k < Km1; ++k) {
         T z_k(inv_logit(y(k) - log(Km1 - k))); 
@@ -839,14 +834,14 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> simplex_constrain(const Matrix<T,Dynamic,1>& y, 
+    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, 
                                           T& lp) {
       using stan::math::logit;
       using stan::math::inv_logit;
       using stan::math::log1p_exp;
       using stan::math::log1m;
       int Km1 = y.size(); // K = Km1 + 1
-      Matrix<T,Dynamic,1> x(Km1 + 1);
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
       T stick_len(1.0);
       for (int k = 0; k < Km1; ++k) {
         double eq_share = -log(Km1 - k); // = logit(1.0/(Km1 + 1 - k));
@@ -878,11 +873,11 @@ namespace stan {
      * @throw std::domain_error if x is not a valid simplex
      */
     template <typename T>
-    Matrix<T,Dynamic,1> simplex_free(const Matrix<T,Dynamic,1>& x) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
       int Km1 = x.size() - 1;
-      Matrix<T,Dynamic,1> y(Km1);
+      Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
       for (int k = Km1; --k >= 0; ) {
         stick_len += x(k);
@@ -912,12 +907,12 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> pos_ordered_constrain(const Matrix<T,Dynamic,1>& x) {
-      typename Matrix<T,Dynamic,1>::size_type k = x.size();
-      Matrix<T,Dynamic,1> y(k);
+    Eigen::Matrix<T,Eigen::Dynamic,1> pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+      typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k = x.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> y(k);
       if (k > 0)
         y[0] = exp(x[0]);
-      for (typename Matrix<T,Dynamic,1>::size_type i = 1; i < k; ++i)
+      for (typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type i = 1; i < k; ++i)
         y[i] = y[i-1] + exp(x[i]);
       return y;
     }
@@ -929,7 +924,7 @@ namespace stan {
      * of the transform.  The returned constrained vector
      * will have the same dimensionality as the specified free vector.
      *
-     * <p>The transform is defined as for <code>pos_ordered_constrain(Matrix<T,Dynamic,1>)</code>.
+     * <p>The transform is defined as for <code>pos_ordered_constrain(Eigen::Matrix<T,Eigen::Dynamic,1>)</code>.
      * The log absolute Jacobian determinant reduces neatly because the Jacobian
      * is lower triangular, 
      *
@@ -954,7 +949,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> pos_ordered_constrain(const Matrix<T,Dynamic,1>& x, T& lp) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
       lp += x.sum();
       return pos_ordered_constrain(x);
     }
@@ -977,10 +972,10 @@ namespace stan {
      *   ordered scalars.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> pos_ordered_free(const Matrix<T,Dynamic,1>& y) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> pos_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_pos_ordered("stan::prob::pos_ordered_free(%1%)", y, "y");
       size_t k = y.size();
-      Matrix<T,Dynamic,1> x(k);
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
       if (k == 0) 
         return x;
       x[0] = log(y[0]);
@@ -1015,13 +1010,13 @@ namespace stan {
      * @throw std::invalid_argument if x is not a valid correlation matrix.
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x,
-                                                    typename Matrix<T,Dynamic,1>::size_type k) {
-      typedef typename Matrix<T,Dynamic,1>::size_type size_type;
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                                                    typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
-      Array<T,Dynamic,1> cpcs(k_choose_2);
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i]);
       return read_corr_matrix(cpcs,k); 
@@ -1047,15 +1042,15 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic> corr_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
-                                                    typename Matrix<T,Dynamic,1>::size_type k,
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                                                    typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k,
                                                     T& lp) {
-      typedef typename Matrix<T,Dynamic,1>::size_type size_type;
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
       
-      Array<T,Dynamic,1> cpcs(k_choose_2);
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i],lp);
       return read_corr_matrix(cpcs,k,lp);
@@ -1082,14 +1077,14 @@ namespace stan {
      *    on log scale are unconstrained.
      */
     template <typename T>
-    Matrix<T,Dynamic,1> corr_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
-      typedef typename Matrix<T,Dynamic,Dynamic>::size_type size_type;
+    Eigen::Matrix<T,Eigen::Dynamic,1> corr_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
       size_type k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
       size_type k_choose_2 = (k * (k-1)) / 2;
-      Array<T,Dynamic,1> x(k_choose_2);
-      Array<T,Dynamic,1> sds(k);
+      Eigen::Array<T,Eigen::Dynamic,1> x(k_choose_2);
+      Eigen::Array<T,Eigen::Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(x,sds,y);
       if (!successful)
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
@@ -1128,14 +1123,14 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
                                                    size_t k) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
-      Array<T,Dynamic,1> cpcs(k_choose_2);
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
       for (size_t i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[pos++]);
-      Array<T,Dynamic,1> sds(k);
+      Eigen::Array<T,Eigen::Dynamic,1> sds(k);
       for (size_t i = 0; i < k; ++i)
         sds[i] = positive_constrain(x[pos++]);
       return read_cov_matrix(cpcs, sds);
@@ -1165,15 +1160,15 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Matrix<T,Dynamic,Dynamic> cov_matrix_constrain(const Matrix<T,Dynamic,1>& x, 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
                                                    size_t k, 
                                                    T& lp) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
-      Array<T,Dynamic,1> cpcs(k_choose_2);
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
       for (size_t i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[pos++], lp);
-      Array<T,Dynamic,1> sds(k);
+      Eigen::Array<T,Eigen::Dynamic,1> sds(k);
       for (size_t i = 0; i < k; ++i)
         sds[i] = positive_constrain(x[pos++],lp);
       return read_cov_matrix(cpcs, sds, lp);
@@ -1198,18 +1193,18 @@ namespace stan {
      *    by factor_cov_matrix()
      */
     template <typename T>
-    Matrix<T,Dynamic,1> cov_matrix_free(const Matrix<T,Dynamic,Dynamic>& y) {
-      typedef typename Matrix<T,Dynamic,Dynamic>::size_type size_type;
+    Eigen::Matrix<T,Eigen::Dynamic,1> cov_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
       size_type k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
       size_type k_choose_2 = (k * (k-1)) / 2;
-      Array<T,Dynamic,1> cpcs(k_choose_2);
-      Array<T,Dynamic,1> sds(k);
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+      Eigen::Array<T,Eigen::Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(cpcs,sds,y);
       if (!successful)
         throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
-      Matrix<T,Dynamic,1> x(k_choose_2 + k);
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(k_choose_2 + k);
       size_type pos = 0;
       for (size_type i = 0; i < k_choose_2; ++i)
         x[pos++] = cpcs[i];

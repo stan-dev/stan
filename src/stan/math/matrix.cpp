@@ -7,7 +7,7 @@ namespace stan {
 
   namespace math {
 
-    double determinant(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m) {
+    double determinant(const matrix_d &m) {
       return m.determinant();
     }
 

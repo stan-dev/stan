@@ -168,7 +168,8 @@ namespace stan {
       int num_promotions(const std::vector<expr_type>& call_args,
                          const std::vector<expr_type>& sig_args);
       expr_type get_result_type(const std::string& name,
-                                const std::vector<expr_type>& args);
+                                const std::vector<expr_type>& args,
+                                std::ostream& error_msgs);
     private:
       function_signatures(); 
       function_signatures(const function_signatures& fs);

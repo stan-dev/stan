@@ -7,15 +7,11 @@ namespace stan {
 
   namespace agrad {
 
-    template <typename T>
-    var determinant(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+    var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m) {
       if (m.rows() != m.cols())
         throw std::domain_error ("m must be a square matrix");
-      return to_var(m.determinant());
+      return m.determinant();
     }
-
-    template var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
-    template var determinant(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& m);
 
     row_vector_v row(const matrix_v& m, size_t i) {
       if (i == 0U) {

@@ -6,12 +6,8 @@ TO DO FOR V1
   - slice for larger outcome sets
   - what about multinomial with constraints?
 
-* NUTS II (Matt)
-  - diagonal mass adaptation during warmup
-
 * remaining doc
   - reference manual (Bob)
-  - getting started guide (Bob) 
   - scale jumbo Stan logo in doxygen (Daniel)
   - API doc (Daniel, Bob)
     + stan/gm
@@ -26,19 +22,49 @@ TO DO FOR V1
 
 * distribution engineering (Daniel)
   - eliminate tabs from code
-  - tarball
-  - basic distro site
-  - check cross-platform compilation:
-     + goal: make OS={win,linux,mac} CC={clang++,g++} O={0,3}
-     + remove useless warnings
-       * unused functions, specifically
+ - basic distro site
 
 * speed tests relative to BUGS/JAGS
 
-* disallow varialbe declarations ending with "__"
+* disallow variable declarations ending with "__"
  
+
+HOME PAGE
+=================================================
+
+* Download:
+  - latest code tarball (named as such)
+    (no git info, but everything else)
+   + stan-src-1.0.0.tgz
+   + created by 'make dist'
+
+  - latest doc pdf (ditto)
+
+    *stan-doc-1.0.pdf
+
+  - older versions (with numbers)
+
+  - executables
+    + 
+    + bin/stanc
+
+* API doc online
+
+
+* How to Cite Stan
+  now: Arxiv paper NUTS, doc for Stan
+  
+* Groups
+
+
+
+
 CLEANUP (ONGOING)
 =================================================
+
+* g++ 4.7 not compiling bin/stanc, but OK with models
+
+* get rid of (double,double) -> var functions
 
 * make sure -a[x] parses as (-(a[x])) (old note to self)
   -- add example to doc, because (-a) is legal if a vector
@@ -48,9 +74,7 @@ CLEANUP (ONGOING)
 
 * const declarations wherever possible
   - very very painful at this late date
-  - be careful that compiled code matches
-
-* divide parser's grammar into multiple files to help compiler
+  - be careful that compiled code matches const declarations
 
 * clean up dependencies
   - remove namespace or file-level "using" statements
@@ -116,6 +140,10 @@ Stan-R
 
 EXTENSIONS
 =================================================
+
+* build unit tests from the BUGS models that just check
+  the gradients are right (this'll also cover parsing and
+  being able to fire up the models)
 
 * figure out way to have vari elements that are NOT on the stack
   - useful for numeric_limits<var>

@@ -10,10 +10,12 @@ help:
 # Users should only need to set these three variables for use.
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
+# - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
 ##
 CC = g++
 O = 3
+AR = ar
 # OS is set automatically by this script
 -include make/detect_os
 
@@ -103,6 +105,11 @@ help:
 # All doxygen related make commands
 ##
 -include make/doxygen
+
+##
+# All distribution related make commands
+##
+-include make/dist
 
 ##
 # Rule for generating dependencies.
