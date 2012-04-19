@@ -39,18 +39,15 @@ const double stanMcmc::r_[100] =
      1.29931230256343,-0.873262111744435,0.00837095999603331,-0.880871723252545,0.59625901661066,
      0.119717641289537,-0.282173877322451,1.45598840106634,0.229019590694692,0.996543928544126};
 
-TEST_F(stanMcmc, varPlus) {
-  double varPlus = mcmc_output.getVarPlus();
-  
-  EXPECT_FLOAT_EQ(0.7712822, varPlus);
-}
-
 
 TEST_F(stanMcmc, effectiveSize)  {
-  std::vector<double> ess = mcmc_output.effectiveSize();
+  double ess = mcmc_output.effectiveSize();
   
-  ASSERT_FLOAT_EQ(2, ess.size());
-  EXPECT_FLOAT_EQ(43.44363, ess[0]);
-  EXPECT_FLOAT_EQ(41.56244, ess[1]);
+  EXPECT_FLOAT_EQ(78.42269, ess);
 }
 
+TEST_F(stanMcmc, splitRHat) {
+  double splitRHat = mcmc_output.splitRHat();
+  
+  EXPECT_FLOAT_EQ(0.9892759, splitRHat);
+}
