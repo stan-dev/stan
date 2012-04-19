@@ -13,11 +13,6 @@ namespace stan {
 
   namespace math {
 
-    using std::exp;
-    using std::log;
-
-
-
     // C99 
 
     /**
@@ -33,6 +28,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     exp2(T y) {
+      using std::pow;
       return pow(2.0,y);
     }
 
@@ -84,6 +80,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log2(T a) {
+      using std::log;
       const static double LOG2 = std::log(2.0);
       return log(a) / LOG2;
     }
@@ -198,6 +195,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     inv_logit(T a) {
+      using std::exp;
       return 1.0 / (1.0 + exp(-a));
     }
 
@@ -218,6 +216,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     logit(T a) {
+      using std::log;
       return log(a / (1.0 - a));
     }
 
@@ -261,7 +260,8 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     inv_cloglog(T x) {
-      return std::exp(-std::exp(x));
+      using std::exp;
+      return exp(-exp(x));
     }
 
     /**
@@ -282,6 +282,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     binary_log_loss(int y, T y_hat) {
+      using std::log;
       return -log(y ? y_hat : (1.0 - y_hat));
     }
 
@@ -351,6 +352,7 @@ namespace stan {
      */
     template <typename Vector, typename Scalar>
     void softmax(const Vector& x, Vector& simplex) {
+      using std::exp;
       if(x.size() != simplex.size()) 
         BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
       Scalar sum(0.0); 
@@ -386,6 +388,7 @@ namespace stan {
      */
     template <typename Vector>
     void inverse_softmax(const Vector& simplex, Vector& y) {
+      using std::log;
       if(simplex.size() != y.size())
         BOOST_THROW_EXCEPTION(std::invalid_argument ("simplex.size() != y.size()"));
       for (size_t i = 0; i < simplex.size(); ++i)
@@ -404,6 +407,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log1p(T x) {
+      using std::log;
       if (x < -1.0)
         BOOST_THROW_EXCEPTION(std::domain_error ("x can not be less than -1"));
 
@@ -431,7 +435,7 @@ namespace stan {
     }
 
     namespace {
-      const double LOG_PI_OVER_FOUR = log(boost::math::constants::pi<double>()) / 4.0;
+      const double LOG_PI_OVER_FOUR = std::log(boost::math::constants::pi<double>()) / 4.0;
     }
 
     /**
@@ -504,6 +508,7 @@ namespace stan {
     template <typename T_a, typename T_b>
     inline typename boost::math::tools::promote_args<T_a,T_b>::type
     multiply_log(T_a a, T_b b) {
+      using std::log;
       if (b == 0.0 && a == 0.0)
         return 0.0;
       return a * log(b);
@@ -524,6 +529,7 @@ namespace stan {
      * <code> = log_sum_exp(0,x)</code>.
      */
     inline double log1p_exp(const double& a) {
+      using std::exp;
       // like log_sum_exp below with b=0.0
       if (a > 0.0)
         return a + log1p(exp(-a));
@@ -541,6 +547,7 @@ namespace stan {
      * @param b the second variable
      */
     inline double log_sum_exp(const double& a, const double& b) {
+      using std::exp;
       if (a > b)
         return a + log1p(exp(b - a));
       return b + log1p(exp(a - b));
