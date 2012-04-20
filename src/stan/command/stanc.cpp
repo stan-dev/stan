@@ -18,6 +18,8 @@ void print_version() {
             << stan::MAJOR_VERSION
             << "."
             << stan::MINOR_VERSION
+            << "."
+            << stan::PATCH_VERSION
             << std::endl;
 }
 
