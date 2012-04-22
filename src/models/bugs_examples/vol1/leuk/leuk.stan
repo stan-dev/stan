@@ -31,11 +31,17 @@ parameters {
 } 
 
 model {
+  real zero; 
+  zero <- 0;
   beta ~ normal(0, 1000);
   for(j in 1:NT) {
     dL0[j] ~ gamma(r * (t[j + 1] - t[j]) * c, c);
     for(i in 1:N) {
-      dN[i, j] ~ poisson(Y[i, j] * exp(beta * Z[i]) * dL0[j]); 
+      // dN[i, j] ~ poisson(Y[i, j] * exp(beta * Z[i]) * dL0[j]); 
+      lp__ <- lp__ + if_else(Y[i, j], poisson_log(dN[i, j], Y[i, j] * exp(beta * Z[i]) * dL0[j]), zero); 
+      ## how about if_else(a, poisson_log(...), 0)? 
+      // lp__ <- lp__ + if_else(Y[i, j], poisson_log(dN[i, j], Y[i, j] * exp(beta * Z[i]) * dL0[j]), 0); 
+
     }     
     // Survivor function = exp(-Integral{l0(u)du})^exp(beta*z)    
     // S.treat[j] <- pow(exp(-sum(dL0[1:j])), exp(beta * -0.5));
