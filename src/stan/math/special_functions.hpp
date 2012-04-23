@@ -498,7 +498,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    T square(T x) {
+    inline T square(T x) {
       return x * x;
     }
     

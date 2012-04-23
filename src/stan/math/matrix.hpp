@@ -586,10 +586,30 @@ namespace stan {
 
 
     /**
+     * Returns the dot product of the specified vector with itself.
+     * @param v Vector.
+     * @tparam R number of rows or <code>Eigen::Dynamic</code> for dynamic
+     * @tparam C number of rows or <code>Eigen::Dyanmic</code> for dynamic
+     * @throw std::invalid_argument If v is not vector dimensioned.
+     */
+    template <int R, int C>
+    inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
+      if (v.rows() != 1 && v.cols() != 1)
+        throw std::invalid_argument("v must be a vector");
+      double sum;
+      for (size_t i = 0; i < v.size(); ++i)
+        sum += v[i] * v[i];
+      return sum;
+    }
+
+    /**
      * Returns the dot product of the specified vectors.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
+     *
+     * @param v1 First vector.
+     * @param v2 Second vector.
      * @return Dot product of the vectors.
+     * @throw std::invalid_argument If the vectors are not the same
+     * size or if they are both not vector dimensioned.
      */
     template<int R1,int C1,int R2, int C2>
     inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
@@ -600,7 +620,10 @@ namespace stan {
         throw std::invalid_argument("v2 must be a vector");
       if (v1.size() != v2.size())
         throw std::invalid_argument("v1.size() must equal v2.size()");
-      return v1.dot(v2);
+      double sum = 0.0;
+      for (size_t i = 0; i < v1.size(); ++i)
+        sum += v1[i] * v2[i]; 
+      return sum;
     }
     /**
      * Returns the dot product of the specified arrays of doubles.
