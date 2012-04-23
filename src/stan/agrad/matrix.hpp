@@ -477,6 +477,31 @@ namespace stan {
      */
     var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
 
+    class dot_self_vari : public vari {
+    protected:
+      vari** v_;
+      size_t size_;
+    public:
+      template <int R, int C>
+      dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
+        vari(var_dot_self(v)), size_(v.size()) {
+        v_ = (vari**) memalloc_.alloc(size_ * sizeof(vari*));
+        for (size_t i = 0; i < size_; ++i)
+          v_[i] = v[i].vi_;
+      }
+      inline static double square(double x) { return x * x; }
+      template <int R, int C>
+      inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
+        double sum = 0.0;
+        for (size_t i = 0; i < v.size(); ++i)
+          sum += square(v[i].vi_->val_);
+      }
+      void chain() {
+        for (size_t i = 0; i < size_; ++i) 
+          v_[i]->adj_ += adj_ * 2.0 * v_[i]->val_;
+      }
+    };
+
     class dot_product_vv_vari : public vari {
     protected:
       vari** v1_;
@@ -572,6 +597,20 @@ namespace stan {
         }
       }
     };
+
+
+    /**
+     * Returns the dot product of the specified vector with itself.
+     * @param v Vector.
+     * @tparam R number of rows or <code>Eigen::Dynamic</code> for dynamic; one of R or C must be 1
+     * @tparam C number of rows or <code>Eigen::Dyanmic</code> for dynamic; one of R or C must be 1
+     */
+    template<int R, int C>
+    inline var dot_self(const Eigen::Matrix<var, R, C>& v) {
+      if (v.rows() != 1 && v.cols() != 1)
+        throw std::invalid_argument("v must be a vector");
+      return var(new dot_self_vari(v));
+    }
     
     /**
      * Returns the dot product of the specified vectors.
@@ -583,12 +622,12 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
                            const Eigen::Matrix<var, R2, C2>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
       if (v1.rows() != 1 && v1.cols() != 1)
         throw std::invalid_argument("v1 must be a vector");
       if (v2.rows() != 1 && v2.cols() != 1)
         throw std::invalid_argument("v2 must be a vector");
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
       return var(new dot_product_vv_vari(v1,v2));
     }
     /**
@@ -602,12 +641,12 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
                            const Eigen::Matrix<double, R2, C2>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
       if (v1.rows() != 1 && v1.cols() != 1)
         throw std::invalid_argument("v1 must be a vector");
       if (v2.rows() != 1 && v2.cols() != 1)
         throw std::invalid_argument("v2 must be a vector");
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
       return var(new dot_product_vd_vari(v1,v2));
     }
     /**
@@ -621,12 +660,12 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                            const Eigen::Matrix<var, R2, C2>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
       if (v1.rows() != 1 && v1.cols() != 1)
         throw std::invalid_argument("v1 must be a vector");
       if (v2.rows() != 1 && v2.cols() != 1)
         throw std::invalid_argument("v2 must be a vector");
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() must equal v2.size()");
       return var(new dot_product_vd_vari(v2,v1));
     }
     /**
