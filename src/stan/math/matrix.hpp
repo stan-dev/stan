@@ -598,7 +598,7 @@ namespace stan {
         throw std::invalid_argument("v must be a vector");
       double sum;
       for (size_t i = 0; i < v.size(); ++i)
-        sum += v[i] * v[i];
+        sum += v(i) * v(i);
       return sum;
     }
 

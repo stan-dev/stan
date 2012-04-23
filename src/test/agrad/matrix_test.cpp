@@ -2675,3 +2675,7 @@ TEST(agradMatrix, dot_product_vd_vec) {
   EXPECT_EQ(grad[1], 2);
   EXPECT_EQ(grad[2], 3);
 }
+
+TEST(agradMatrix, dot_self_vec) {
+
+}

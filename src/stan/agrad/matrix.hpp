@@ -487,14 +487,14 @@ namespace stan {
         vari(var_dot_self(v)), size_(v.size()) {
         v_ = (vari**) memalloc_.alloc(size_ * sizeof(vari*));
         for (size_t i = 0; i < size_; ++i)
-          v_[i] = v[i].vi_;
+          v_[i] = v(i).vi_;
       }
       inline static double square(double x) { return x * x; }
       template <int R, int C>
       inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
         double sum = 0.0;
         for (size_t i = 0; i < v.size(); ++i)
-          sum += square(v[i].vi_->val_);
+          sum += square(v(i).vi_->val_);
       }
       void chain() {
         for (size_t i = 0; i < size_; ++i) 
