@@ -495,6 +495,7 @@ namespace stan {
         double sum = 0.0;
         for (size_t i = 0; i < v.size(); ++i)
           sum += square(v(i).vi_->val_);
+        return sum;
       }
       void chain() {
         for (size_t i = 0; i < size_; ++i) 
