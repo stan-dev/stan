@@ -52,7 +52,6 @@ model {
   for(i in 1:nChild) {
     # Probability of observing grade k given theta
     for (j in 1:nInd) {
-      int tmpidx; 
       p[i, j, 1] <- 1 - Q[i, j, 1];
       for (k in 2:(ncat[j] - 1))  
         p[i, j, k] <- Q[i, j, k - 1] - Q[i, j, k];
@@ -63,6 +62,10 @@ model {
       // with variable dimension. 
       // if grade[i, j] = -1, it is missing, zero term then for the 
       // log-posterior. 
+
+      // when grade[i, j] = -1, however, log(...) still needs to be 
+      // evaluated. So I am adding the following term: 
+      // 2 * int_step(-1 * grade[i, j]) 
 
       lp__ <- lp__ + if_else(grade[i, j] + 1, log(p[i, j, grade[i, j] + 2 * int_step(-1 * grade[i, j])]), zero); 
     }
