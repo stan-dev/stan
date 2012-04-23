@@ -2229,7 +2229,7 @@ associativity.
 %
 \begin{center}
 \begin{tabular}{c|ccl|l}
-{\it Operator} & {\it Precedence} & {\it Associativity} & {\it
+{\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
   Placement} & {\it Description}
 \\ \hline \hline
 \code{+} & 0 & left & binary infix & addition
@@ -2239,6 +2239,10 @@ associativity.
 \code{*} & 1 & left & binary infix & multiplication
 \\
 \code{/} & 1 & left & binary infix & division
+\\ \hline
+\code{.*} & 1 & left & binary infix & elementwise multiplication
+\\
+\code{./} & 1 & left & binary infix & elementwise division
 \\ \hline
 \code{-} & 2 & n/a & unary prefix & negation
 \\ \hline
