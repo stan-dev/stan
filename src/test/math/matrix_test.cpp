@@ -861,4 +861,14 @@ TEST(MathMatrix,dot_self) {
   rv3 << 2.0, 3.0, 4.0;
   EXPECT_NEAR(29.0,dot_self(rv3),1E-12);
 
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m1(1,1);
+  m1 << 2.0;
+  EXPECT_NEAR(4.0,dot_self(m1),1E-12);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m2(2,1);
+  m2 << 2.0, 3.0;
+  EXPECT_NEAR(13.0,dot_self(m2),1E-12);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m3(3,1);
+  m3 << 2.0, 3.0, 4.0;
+  EXPECT_NEAR(29.0,dot_self(m3),1E-12);
+
 }
