@@ -1,5 +1,5 @@
 STAN_HOME = ../../../../..
-PGM = leuk
+PGM = bones#
 CXX = clang++ 
 
 $(PGM) :

@@ -1,17 +1,13 @@
-## take a look at the samples and compare with results computed 
-## in other program. 
 
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
+theta_idx <- grep("theta.[:digits:]*", colnames(post))
+summary(as.mcmc(post[, theta_idx])) 
 
-pars <- c("beta", "sigma"); 
-poi <- post[, pars]; 
-
-summary(as.mcmc(poi)) 
-
+pars <- c('theta') 
 library(BUGSExamples);
-ex <- list(name = "Leukfr", parameters = pars,
+ex <- list(name = "Bones", parameters = pars,
            nSample = 10000, nBurnin = 1000, nThin = 1,
            nChain = 3)
 

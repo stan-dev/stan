@@ -15,10 +15,12 @@ S_placebo <- matrix(0, ncol = NT, nrow = nrow(post))
 
 pow <- function(x, y) x^y; 
 
+dL0_idx <- grep("dL0.[:digits:]*", colnames(post))
+
 # the Survior function for in iteration 
 Sfun <- function(p) { 
-    beta <- p[1]; 
-    dL0 <- p[-1]; 
+    beta <- p["beta"]; 
+    dL0 <- p[dL0_idx]; 
     NT <- length(dL0) 
     S.treat <- numeric(NT)  
     S.placebo <- numeric(NT)  

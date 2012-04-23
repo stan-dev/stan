@@ -478,11 +478,8 @@ namespace stan {
      * @param c Boolean condition value.
      * @param y_true Value to return if condition is true.
      * @param y_false Value to return if condition is false.
-     * @tparam B Type of conditional.
-     * @tparam T Type of scalar.
      */
-    template <typename B, typename T>
-    T if_else(B c, T y_true, T y_false) {
+    inline double if_else(bool c, double y_true, double y_false) {
       return c ? y_true : y_false;
     }
 
@@ -501,7 +498,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    T square(T x) {
+    inline T square(T x) {
       return x * x;
     }
     

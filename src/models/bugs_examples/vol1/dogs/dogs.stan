@@ -32,8 +32,8 @@ model {
   // beta ~ normal_trunc_h_propto(0, 316, -0.00001); 
   // alpha ~ normal_trunc_h(0, 316, -0.00001); 
   // beta ~ normal_trunc_h(0, 316, -0.00001); 
-  alpha ~ normal(0, 316); 
-  beta  ~ normal(0, 316); 
+  alpha ~ normal(0.0, 316.0); 
+  beta  ~ normal(0.0, 316.0); 
   for(i in 1:Ndogs)  
     for (j in 2:Ntrials)  
       1 - Y[i, j] ~ bernoulli(exp(alpha * xa[i, j] + beta * xs[i, j]));

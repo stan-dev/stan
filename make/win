@@ -18,24 +18,19 @@ CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  LDFLAGS += -static-libgcc 
+  LDLIBS += -static-libgcc 
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  LDFLAGS += -static-libgcc
-  LDFLAGS += -static-libstdc++
+  LDLIBS += -static-libgcc
+  LDLIBS += -static-libstdc++
   #PCH = .gch
 endif
 ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
-
-#CC_STANC = cl
-#CFLAGS_STANC = /EHsc /I src /I lib
-#OUTPUT_OPTION_STANC = /OUT:$@
-#LDFLAGS_STANC = /link
 
 
 UNIT_TESTS_TO_EXCLUDE := test/gm/parser 

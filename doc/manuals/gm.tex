@@ -2229,7 +2229,7 @@ associativity.
 %
 \begin{center}
 \begin{tabular}{c|ccl|l}
-{\it Operator} & {\it Precedence} & {\it Associativity} & {\it
+{\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
   Placement} & {\it Description}
 \\ \hline \hline
 \code{+} & 0 & left & binary infix & addition
@@ -2239,6 +2239,10 @@ associativity.
 \code{*} & 1 & left & binary infix & multiplication
 \\
 \code{/} & 1 & left & binary infix & division
+\\ \hline
+\code{.*} & 1 & left & binary infix & elementwise multiplication
+\\
+\code{./} & 1 & left & binary infix & elementwise division
 \\ \hline
 \code{-} & 2 & n/a & unary prefix & negation
 \\ \hline
@@ -6297,12 +6301,224 @@ not dependent on the dimensionality of the parameter vector.
 \addcontentsline{toc}{part}{Appendices}
 
 
-\chapter{Installation}\label{install.appendix}
+\chapter{Licensing}
 
-Before running \Stan, it is necessary to have a fairly complete \Cpp
-environment.
+\Stan is licensed under the 3-clause BSD License.  This license has
+been approved by the Open Source Initiative.  For more information,
+see
+%
+\begin{quote}
+\url{http://opensource.org/licenses/BSD-3-Clause}
+\end{quote}
+%
+\Stan's 3-clause BSD license is the following.
+\vspace*{6pt}
 
-\section{Mac OS X}
+\noindent
+\rule{\textwidth}{1pt}
+
+\noindent
+Copyright \copyright 2011--2012, Columbia University
+\\
+All rights reserved.
+\\[12pt]
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+\begin{itemize}
+\item Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+\item Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following
+  disclaimer in the documentation and/or other materials provided with
+  the distribution.
+\item Neither the name of Columbia University nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+\end{itemize}
+
+{\small \noindent
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS
+  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+  OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+}
+\noindent
+\rule{\textwidth}{1pt}
+
+
+\chapter{Installation and Compatibility}\label{install.appendix}
+
+Running \Stan requires the \Stan source code along with fairly
+complete \Cpp environment.  This appendix describes the hardware and
+software required to run \Stan.  
+
+\Stan requires a computer powerful enough to compile and run \Cpp
+code.  A 64-bit computer with multiple cores is preferable.  64-bit
+machines process double-precision floating-point arithmetic faster and
+multiple cores allow several Markov chains to be simulated in parallel.
+
+\section{Operating System}
+
+\Stan is written in portable \Cpp without {\Cpp}11 features, as are the
+libraries on which it depends.  Therefore, \Stan should run on any machine
+for which a suitable \Cpp compiler is avaialble.  In practice, \Stan,
+like the Boost and Eigen libraries on which it depends, is very hard
+on the compiler and linker.
+
+\Stan is tested on and maintained for
+%
+\begin{itemize}
+\item Linux (Debian, Ubuntu), 
+\item Mac OS X (Snow Leopard, Lion), and
+\item Windows (7).
+\end{itemize}
+%
+
+\section{Software}
+
+The only two absolute requirements for running \Stan are the
+\Stan source code (and dependent libraries) and a \Cpp compiler.
+
+\subsection{\Stan Source Code}
+
+In order to compile \Stan models, the \Stan source code is required.
+The latest version of \Stan can be downloaded from the following link.
+%
+\begin{quote}
+\url{http://code.google.com/p/stan/}
+\end{quote}
+%
+The \Stan source code distribution includes \Stan's source code,
+documentation, build tools, unit tests, demo models, documentation and
+the source for the libraries Eigen and Boost.
+
+\subsection{googletest C++ Testing Framework}
+
+\Stan's unit testing is based on the Google's googletest \Cpp testing
+framework.  
+%
+\begin{itemize}
+\item
+Home: \url{http://code.google.com/p/googletest/}
+\item
+License: BSD
+\item
+Tested Version(s): 1.6.0
+\end{itemize}
+%
+The googletest framework is distributed with \Stan.
+
+\subsection{Eigen Matirx and Linear Algebra Library}
+
+\Stan's matrix algebra depends on the Eigen \Cpp matrix and linear
+algebra library.  
+%
+\begin{itemize}
+\item Home: \url{http://eigen.tuxfamily.org}
+\item License: LGPL3+
+\item Tested Version: 3.0.5
+\end{itemize}
+%
+The Eigen library is distributed with \Stan.
+
+\subsection{Boost C++ Library}
+
+\Stan's parser and some of its mathematical functions and 
+template metaprogramming facilities are implemented with the Boost
+\Cpp Library.  
+%
+\begin{itemize}
+\item Home: http://www.boost.org/users/license.html
+\item License: Boost Software License
+\item Version: 1.49.0
+\end{itemize}
+%
+The Boost source code is distributed with \Stan.
+
+\subsection{C++ Compiler}
+
+Compiling \Stan models requires a \Cpp compiler.  \Stan has been
+primarily developed with \clang and \gpp.  The full set of compilers
+for which \Stan has been tested is
+%
+\begin{itemize}
+%
+\item \gpp, Mac versions 4.2, 4.6, Linux versions 4.4--4.7
+\\
+Home: \url{http://gcc.gnu.org/}
+\\
+License: GPL3+
+%
+\item \clang, Mac and Linux versions 2.9--3.0
+\\
+Home: \url{http://clang.llvm.org/}
+\\
+License: BSD
+%
+\item mingw-64, version 2.0 (Windows 7, cross-compiled from Debian Linux)
+%
+\item Intel \Cpp, Linux version 12.1.3
+%
+\end{itemize}
+%
+
+\section{Optional Components for Developers}
+
+\Stan is developed using the following set of tools.  For convenience,
+the executables may be made accessible from the \code{PATH}
+environment variable.  If they are not directly accessible, their
+executables must be referenced with a fully qualified path.
+
+
+\subsection{GNU Make Build Tool}
+
+\Stan automates the build, test, documentation and deployment tasks
+using scripts in the form of makefiles.  These can be run using the
+GNU make tool, which may be downloaded from the following
+location.
+\begin{itemize}
+\item Home: \url{http://www.gnu.org/software/make/}
+\item License: GPL3+
+\item Tested Versions: 3.81 (Mac OS X)
+\end{itemize}
+%
+
+
+\subsection{Doxygen Documentation Generator}
+
+\Stan's API documentation is generated using the Doxygen Tool.
+%
+\begin{itemize}
+\item Home: \url{http://www.stack.nl/~dimitri/doxygen/index.html}
+\item License: GPL2
+\item Tested Version(s): 1.7.3
+\end{itemize}
+
+
+\subsection{Git Version Control System}
+
+\Stan uses the Git version control system for its software, libraries,
+and documentations.  
+% 
+\begin{itemize}
+\item Home: \url{http://git-scm.com/}
+\item License: GPL2
+\item Tested Version(s): 1.7.8.4
+\end{itemize}
+
+
+
+\section{Tips for Mac OS X}
 
 \subsection{Install Xcode}
 
@@ -6339,10 +6555,37 @@ If you want to download a standalone version of Git, use
 Although (at the time of this writing) there were only versions listed
 up to OS X version ``Snow Leopard,'' they work on ``Lion''.
 
-\chapter{BNF Grammars for \Stan}
+\chapter{User-Defined Functions and Gradients}\label{user-defined-functions.appendix}
+
+
+\chapter{BNF Grammars}
 
 This appendix provides a modular Backus-Naur form (\BNF) grammar for
-the \Stan modeling language.
+the \Stan modeling language.  Literal strings are indicated in single
+quotes (\code{'}).  Grammar non-terminals are unquoted strings.  A
+prefix question mark (\code{?}) indicates optionality.  A postfixed
+Kleene star (\code{*}) indicates zero or more occurrences.
+Parentheses are used for grouping.
+
+\section{Programs}
+
+\Stan's grammar for programs is
+%
+\begin{quote}
+\begin{Verbatim}
+program ::= ?data ?tdata ?params ?tparams model ?generated
+
+data ::= 'data' var_decls
+tdata ::= 'transformed data' var_decls_statements
+params ::= 'parameters' var_decls
+tparams ::= 'transformed parameters' var_decls_statements
+model ::= 'model' statement
+generated ::= 'generated quantities' var_decls_statements
+
+var_decls ::= '{' var_decl* '}'
+var_decls_statements ::= '{' var_decl* statement* '}'
+\end{Verbatim}
+\end{quote}
 
 \section{Variable Declarations}
 
@@ -6353,20 +6596,20 @@ the \Stan modeling language.
 var_decl ::= var_type var_name ?dims
 
 var_type ::= int ?int_range
-          | real ?real_range
-          | vector '(' int_expression ')'
-          | pos_ordered '(' int_expression ')'
-          | simplex '(' int_expression ')'
-          | row_vector '(' int_expression ')'
-          | matrix '(' int_expression ',' int_expression ')'
-          | corr_matrix '(' int_expression ')'
-          | cov_matrix '(' int_expression ')'
+           | real ?real_range
+           | vector '(' int_expression ')'
+           | pos_ordered '(' int_expression ')'
+           | simplex '(' int_expression ')'
+           | row_vector '(' int_expression ')'
+           | matrix '(' int_expression ',' int_expression ')'
+           | corr_matrix '(' int_expression ')'
+           | cov_matrix '(' int_expression ')'
 
 int_range ::= '(' int_expression ',' ?int_expression ')'
-          | '('  ','  int_expression ')'
+            | '('  ','  int_expression ')'
 
 real_range ::= '(' real_expression ',' ?real_expression ')'
-          | '('  ','  real_expression ')'
+             | '('  ','  real_expression ')'
 
 
 dims ::= '['  int_expression (',' int_expression)*  ']'
@@ -6388,8 +6631,7 @@ expression ::= literal
              | function '(' ?expressions ')'
              | '(' expression ')'
 
-expressions ::= 
-              | expression
+expressions ::= expression
               | expression ',' expressions
 \end{Verbatim}
 \end{quote}
@@ -6401,8 +6643,7 @@ expressions ::=
 \begin{quote}
 \begin{Verbatim}
 statement 
-::= 
- | lhs '<-' expression ';'
+::= lhs '<-' expression ';'
   | expression '~' identifier '(' ?expressions ')' ?truncation ';'
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
   | '{' var_decl* statement+ '}'
@@ -6418,7 +6659,6 @@ lhs ::= identifier
 
 
 
-\chapter{User-Defined Functions and Gradients}\label{user-defined-functions.appendix}
 
 
 
