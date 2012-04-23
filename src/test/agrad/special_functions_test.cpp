@@ -1214,7 +1214,6 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
 }
 
 TEST(AgradSpecialFunctions,int_step) {
-  
   using stan::math::int_step;
 
   AVAR a(5.0);
@@ -1224,5 +1223,20 @@ TEST(AgradSpecialFunctions,int_step) {
   EXPECT_EQ(1,int_step(a));
   EXPECT_EQ(0,int_step(b));
   EXPECT_EQ(0,int_step(c));
+}
+
+TEST(AgradSpecialFunctions,if_else) {
+  using stan::agrad::var;
+  using stan::math::if_else;
+  using stan::agrad::if_else;
+  
+  EXPECT_FLOAT_EQ(1.0,if_else(true,var(1.0),var(2.0)).val());
+  EXPECT_FLOAT_EQ(2.0,if_else(false,var(1.0),var(2.0)).val());
+
+  EXPECT_FLOAT_EQ(1.0,if_else(true,1.0,var(2.0)).val());
+  EXPECT_FLOAT_EQ(2.0,if_else(false,1.0,var(2.0)).val());
+
+  EXPECT_FLOAT_EQ(1.0,if_else(true,var(1.0),2.0).val());
+  EXPECT_FLOAT_EQ(2.0,if_else(false,var(1.0),2.0).val());
 
 }

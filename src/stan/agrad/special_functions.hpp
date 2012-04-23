@@ -1307,6 +1307,51 @@ namespace stan {
     }
 
 
+    /**
+     * Return the second argument if the first argument is true
+     * and otherwise return the second argument.
+     *
+     * <p>This is just a convenience method to provide a function
+     * with the same behavior as the built-in ternary operator.
+     * In general, this function behaves as if defined by
+     *
+     * <p><code>if_else(c,y1,y0) = c ? y1 : y0</code>.
+     *
+     * @param c Boolean condition value.
+     * @param y_true Value to return if condition is true.
+     * @param y_false Value to return if condition is false.
+     */
+    inline var if_else(bool c, const var& y_true, const var&y_false) {
+      return c ? y_true : y_false;
+    }
+    /**
+     * Return the second argument if the first argument is true
+     * and otherwise return the second argument.
+     *
+     * <p>This is just a convenience method to provide a function
+     * with the same behavior as the built-in ternary operator.
+     * In general, this function behaves as if defined by
+     *
+     * <p><code>if_else(c,y1,y0) = c ? y1 : y0</code>.
+     *
+     * @param c Boolean condition value.
+     * @param y_true Value to return if condition is true.
+     * @param y_false Value to return if condition is false.
+     * @tparam B Type of conditional.
+     */
+    inline var if_else(bool c, double y_true, const var& y_false) {
+      if (c) 
+        return var(y_true);
+      else 
+        return y_false;
+    }
+
+    inline var if_else(bool c, const var& y_true, const double y_false) {
+      if (c) 
+        return y_true;
+      else 
+        return var(y_false);
+    }
 
   }
 }
