@@ -38,7 +38,7 @@ CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
 LIBGTEST = test/gtest.o
 GTEST_MAIN = lib/gtest/src/gtest_main.cc
 EXE = 
-LDFLAGS = -Lbin -lstan
+LDLIBS = -Lbin -lstan
 
 ##
 # Tell make the default way to compile a .o file.

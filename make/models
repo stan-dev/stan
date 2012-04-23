@@ -8,7 +8,7 @@ models/%$(EXE) : models/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.c) $(OUTPUT_OPTION) $<
+	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
 	@echo ''
 	@echo '--- Running model ---'
 	cp src/$(basename $@).stan $(basename $@).stan
