@@ -5,7 +5,7 @@ TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
 .PRECIOUS: bin/stanc$(EXE)
 bin/stanc$(EXE) : $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(LDFLAGS) $(OUTPUT_OPTION) $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o
+	$(LINK.c) $(OUTPUT_OPTION) $(TEMPLATE_INSTANTIATION) bin/stan/command/stanc.o $(LDFLAGS) 
 
 bin/stan/%.o : src/stan/%.cpp
 	@mkdir -p $(dir $@)

@@ -47,7 +47,6 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
 
-
 ##
 # Generate autodependencies for test files.
 # Adapted from the gnu make manual.
@@ -60,7 +59,7 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(LDFLAGS) $(LIBGTEST) $(OUTPUT_OPTION) 
+	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) 
 	$@ --gtest_output="xml:$(basename $@).xml"
 
 .PRECIOUS: test/%.o
