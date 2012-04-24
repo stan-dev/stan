@@ -5537,7 +5537,7 @@ transformed to the unbounded variable $Y$ by
 Y = \log(b - X).
 \]
 
-\subsection{Inverse Upper Bound Transform}
+\subsection{Upper Bound Inverse Transform}
 %
 The inverse of the upper bound transform converts the unbounded
 variable $Y$ to the variable $X$ bounded above by $b$ through
@@ -5546,9 +5546,9 @@ variable $Y$ to the variable $X$ bounded above by $b$ through
 X = b - \exp(Y).
 \]
 
-\subsection{Absolute Derivative of the Inverse Upper Bound Transform}
+\subsection{Absolute Derivative of the Upper Bound Inverse Transform}
 
-The absolute derivative of the inverse upper bound transform is 
+The absolute derivative of the inverse of the upper bound transform is 
 \[
 \left| \,
 \frac{d}{dy} \left( b - \exp(y) \right)
@@ -5749,7 +5749,7 @@ x_K = 1 - \sum_{k=1}^{K-1} x_k.
 \]
 %
 
-\subsection{Inverse Unit Simplex Transform}
+\subsection{Unit Simplex Inverse Transform}
 
 Stan employs a transform whose inverse may be understood using a
 stick-breaking metaphor.  A simplex is determined by taking a stick of
@@ -5794,8 +5794,8 @@ This is multiplied by the break proportion $z_k$ to yield $x_k$.
 Because $x$ lines in a $K$-simplex, $x_K$ is determined from
 $x_1,\ldots,x_{K-1}$.
 
-\subsection{Absolute Jacobian Determinant of the Inverse Unit Simplex
-  Transform}
+\subsection{Absolute Jacobian Determinant of the Unit-Simplex
+  Inverse Transform}
 
 The Jacobian $J$ of the inverse transform $f^{-1}$ is
 lower-triangular, with diagonal entries
@@ -6097,7 +6097,7 @@ z_{m,n} & \mbox{if } m > n.
 \right.
 \]
 
-\subsection{Inverse Covariance Matrix Transform}
+\subsection{Covariance Matrix Inverse Transform}
 
 The inverse transform reverses the two steps of the transform.
 Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
@@ -6123,8 +6123,8 @@ taking
 x = z \, z^{\top}.
 \]
 
-\subsection{Absolute Jacobian Determinant of the Inverse Covariance
-  Matrix Transform}
+\subsection{Absolute Jacobian Determinant of the Covariance
+  Matrix Inverse Transform}
 
 The Jacobian determinant is the product of the Jacobian determinants
 of the exponential transform from the unconstrained lower-triangular
@@ -6169,7 +6169,7 @@ The absolute Jacobian determinant of the second transform is thus
 \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}.
 \]
 Finally, the full absolute Jacobian determinant of the inverse
-covariance matrix transform from the unconstrained lower-triangular 
+of the covariance matrix transform from the unconstrained lower-triangular 
 $y$ to a symmetric, positive definite matrix $x$ is the product of the
 Jacobian determinants of the exponentiation and product transforms,
 \[
@@ -6191,7 +6191,7 @@ Jacobian determinants of the exponentiation and product transforms,
 % requirement of $K + {K \choose 2}$ parameters to specify a covariance
 % matrix.  
 
-% \subsection{Inverse Covariance Matrix Transform}
+% \subsection{Covariance Matrix Inverse Transform}
 
 % Suppose $y$ is a $K \choose 2$-dimensional array specifying the $K
 % \times K$ correlation matrix $x$ as specified by the correlation
