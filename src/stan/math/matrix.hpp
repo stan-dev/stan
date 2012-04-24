@@ -597,7 +597,7 @@ namespace stan {
       if (v.rows() != 1 && v.cols() != 1)
         throw std::invalid_argument("v must be a vector");
       double sum;
-      for (size_t i = 0; i < v.size(); ++i)
+      for (int i = 0; i < v.size(); ++i)
         sum += v(i) * v(i);
       return sum;
     }
@@ -621,7 +621,7 @@ namespace stan {
       if (v1.size() != v2.size())
         throw std::invalid_argument("v1.size() must equal v2.size()");
       double sum = 0.0;
-      for (size_t i = 0; i < v1.size(); ++i)
+      for (int i = 0; i < v1.size(); ++i)
         sum += v1[i] * v2[i]; 
       return sum;
     }
@@ -758,7 +758,7 @@ namespace stan {
     inline double variance(const std::vector<T>& v) {
       T v_mean = mean(v);
       T sum_sq_diff = 0;
-      for (int i = 0; i < v.size(); ++i) {
+      for (size_t i = 0; i < v.size(); ++i) {
         T diff = v[i] - v_mean;
         sum_sq_diff += diff * diff;
       }

@@ -493,7 +493,7 @@ namespace stan {
       template <int R, int C>
       inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
         double sum = 0.0;
-        for (size_t i = 0; i < v.size(); ++i)
+        for (int i = 0; i < v.size(); ++i)
           sum += square(v(i).vi_->val_);
         return sum;
       }

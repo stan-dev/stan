@@ -93,7 +93,7 @@ namespace stan {
         
         std::vector<double> rho_hat_t;
         double rho_hat = 0;
-        for (size_t t = 1; t < n & rho_hat >= 0; t++) {
+        for (size_t t = 1; (t < n && rho_hat >= 0); t++) {
           double variogram = 0;
           for (size_t chain = 0; chain < m; chain++) {
             for (size_t ii = 0; ii < n-t; ii++) {
