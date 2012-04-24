@@ -6161,7 +6161,6 @@ corresponding to pairs $m,n$ with $m \geq n$, defined by
 z_{n,n} & \mbox{if } m > n.
 \end{array}
 \right.
-.
 \]
 %
 The absolute Jacobian determinant of the second transform is thus
@@ -6177,7 +6176,10 @@ $y$ to a symmetric, positive definite matrix $x$ is
 2^{K} 
 \
 \left( \prod_{k=1}^K z_{k,k} \right)
-\left( \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n} \right).
+\left( \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n} \right)
+\ = \
+2^K
+\, \prod_{k=1}^K z_{k,k}^{K-k+2}.
 \]
 
 
