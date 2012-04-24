@@ -6045,26 +6045,25 @@ w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \end{array}
 \right.
 \]
-The final stage of the transform reverses the tanh transform, which
-is given by
+The final stage of the transform reverses the hyperbolic tangent
+transform by setting 
 \[
-\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right),
+\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
 \]
-and is also known as the Fisher transformation.
+The inverse hyperbolic tangent function is also called the Fisher
+transformation.
 
 
 \section{Covariance Matrices}
 
 In order for a $K \times K$ matrix to be used as a covariance matrix,
 it must be symmetric and positive definite.  A $K \times K$ matrix $x$ 
-is positive definite if for every $K$-vector $a$,
+is positive definite if for every non-zero $K$-vector $a$,
 %
 \[
 a^{\top} x \,  a > 0.
 \]
 %
-A matrix $x$ is said to be positive semi-definite if the constraint
-is relaxed to $a^{\top} x \, a \geq 0$.
 
 \subsection{Covariance Matrix Transform}
 
@@ -6100,7 +6099,7 @@ z_{m,n} & \mbox{if } m > n.
 
 \subsection{Inverse Covariance Matrix Transform}
 
-The inverse transform must reverses the two steps of the transform.
+The inverse transform reverses the two steps of the transform.
 Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
 first step is to recover the intermediate matrix $z$ by reversing the
 log transform,
@@ -6171,7 +6170,8 @@ The absolute Jacobian determinant of the second transform is thus
 \]
 Finally, the full absolute Jacobian determinant of the inverse
 covariance matrix transform from the unconstrained lower-triangular 
-$y$ to a symmetric, positive definite matrix $x$ is
+$y$ to a symmetric, positive definite matrix $x$ is the product of the
+Jacobian determinants of the exponentiation and product transforms,
 \[
 2^{K} 
 \
