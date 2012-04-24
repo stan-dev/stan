@@ -1,12 +1,14 @@
 #ifndef __STAN__PROB__TRANSFORM_HPP__
 #define __STAN__PROB__TRANSFORM_HPP__
 
+#include <cmath>
 #include <cstddef>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
@@ -25,7 +27,6 @@ namespace stan {
      * This function is intended to make starting values, given a covariance matrix Sigma
      * The transformations are hard coded as log for standard deviations and Fisher
      * transformations (atanh()) of CPCs
-     * @author Ben Goodrich
      * @return false if any of the diagonals of Sigma are 0
      */
     template<typename T>
@@ -89,7 +90,6 @@ namespace stan {
      * @param K Dimensionality of correlation matrix.
      * @return Cholesky factor of correlation matrix for specified canonical partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -130,7 +130,6 @@ namespace stan {
      * @param K Dimensionality of correlation matrix.
      * @return Cholesky factor of correlation matrix for specified canonical partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -163,7 +162,6 @@ namespace stan {
      * Jacobian determinant.
      * @return Cholesky factor of correlation matrix for specified partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -209,7 +207,6 @@ namespace stan {
      * Jacobian determinant.
      * @return Correlation matrix for specified partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -224,7 +221,6 @@ namespace stan {
     /** this is the function that should be called prior to evaluating the
      * density of any elliptical distribution
      * @return Cholesky factor of covariance matrix for specified partial correlations.
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -240,7 +236,6 @@ namespace stan {
     /** a generally worse alternative to call prior to evaluating the density
      * of an elliptical distribution
      * @return Covariance matrix for specified partial correlations.
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -255,7 +250,6 @@ namespace stan {
     /** 
      *
      * Builds a covariance matrix from CPCs and standard deviations
-     * @author Ben Goodrich
      */
     template<typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -273,7 +267,6 @@ namespace stan {
     /** 
      * This function calculates the degrees of freedom for the t distribution
      * that corresponds to the shape parameter in the Lewandowski et. al. distribution
-     * @author Ben Goodrich
      */
     template<typename T>
     const Eigen::Array<T,Eigen::Dynamic,1>
@@ -873,7 +866,8 @@ namespace stan {
      * @throw std::domain_error if x is not a valid simplex
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
       int Km1 = x.size() - 1;
@@ -887,7 +881,6 @@ namespace stan {
       }
       return y;
     }
-
 
 
     // POSITIVE ORDERED 
@@ -1103,6 +1096,62 @@ namespace stan {
 
     // COVARIANCE MATRIX
 
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain2(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                          size_t K) {
+      using std::exp;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
+      int i = 0;
+      for (int m = 0; m < K; ++m) {
+        L(m,m) = exp(x(i++));
+        for (int n = m + 1; n < K; ++n) 
+          L(m,n) = x(i++);
+      }
+      return L * L.transpose();
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain2(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                          size_t K,
+                          T& lp) {
+      using std::exp;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
+      int i = 0;
+      for (int m = 0; m < K; ++m) {
+        L(m,m) = exp(x(i++));
+        for (int n = m + 1; n < K; ++n) 
+          L(m,n) = x(i++);
+      }
+      // Jacobian for complete transform, including exp() above
+      lp += (K * stan::math::LOG_2); // needless constant; want propto
+      for (int k = 0; k < K; ++k)
+        lp += (K - k + 1) * log(L(k,k)); // only +1 because index from 0
+      return L * L.transpose();
+      // return tri_multiply_transpose(L); // partial eval derivs like dot_prod
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    cov_matrix_free2(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      using std::log;
+      int K = y.rows();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x((K * (K + 1)) / 2);
+      // FIXME: see Eigen LDLT for rank-revealing version -- use that
+      // even if less efficient?
+      Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > llt(y.rows());
+      llt.compute(y);
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = llt.matrixL();
+      int i = 0;
+      for (int m = 0; m < K; ++m) {
+        x(i++) = log(L(m,m));
+        for (int n = m + 1; n < K; ++n)
+          x(i++) = L(m,n);
+      }
+      return x;
+    }
+
     /**
      * Return the covariance matrix of the specified dimensionality
      * derived from constraining the specified vector of unconstrained
@@ -1123,8 +1172,9 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                                                   size_t k) {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                         size_t k) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
@@ -1160,9 +1210,10 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                                                   size_t k, 
-                                                   T& lp) {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                         size_t k, 
+                         T& lp) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
@@ -1193,8 +1244,11 @@ namespace stan {
      *    by factor_cov_matrix()
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> cov_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      typedef typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    cov_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      typedef 
+        typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+        size_type;
       size_type k = y.rows();
       if (y.cols() != k || k == 0)
         throw std::domain_error("y is not a square matrix or there are no elements");
