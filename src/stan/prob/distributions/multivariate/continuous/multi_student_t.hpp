@@ -96,12 +96,12 @@ namespace stan {
 
 
       if (include_summand<propto,T_scale>::value)
-	lp -= L.diagonal().array().log().sum();
+        lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
-// 	Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(d,d);
-// 	I.setIdentity();
-	
+//      Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(d,d);
+//      I.setIdentity();
+        
         Eigen::Matrix<typename promote_args<T_y,T_loc>::type,
                       Eigen::Dynamic,
                       1> y_minus_mu = subtract(y,mu);
@@ -110,7 +110,7 @@ namespace stan {
                       1> half = L = mdivide_left_tri<Eigen::Lower>(L, y_minus_mu);
         lp -= 0.5 
           * (nu + d)
-	  * log(1.0 + dot_product(half,half) / nu); // FIXME: write sum_of_squares()
+          * log(1.0 + dot_product(half,half) / nu); // FIXME: write sum_of_squares()
       }
       return lp;
     }
