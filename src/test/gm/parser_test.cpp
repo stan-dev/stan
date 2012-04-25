@@ -143,3 +143,7 @@ TEST(gm_parser,parsable_test_bad9) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad9.stan"),
                std::invalid_argument);
 }
+TEST(gm_parser,parsable_test_bad10) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad9.stan"),
+               std::invalid_argument);
+}

@@ -220,7 +220,9 @@ namespace stan {
         if (vm.exists(var_decl.name_)) {
           // variable already exists
           pass = false;
-          error_msgs << "variable already declared, name=" << var_decl.name_ << std::endl;
+          error_msgs << "variable already declared, name="
+                     << var_decl.name_ 
+                     << std::endl;
           return var_decl;
         }
         pass = true;  // probably don't need to set true
@@ -251,6 +253,25 @@ namespace stan {
     };
     boost::phoenix::function<validate_decl_constraints> 
     validate_decl_constraints_f;
+
+    struct validate_identifier {
+      template <typename T1, typename T2>
+      struct result { typedef bool type; };
+
+      bool operator()(const std::string& identifier,
+                      std::stringstream& error_msgs) const {
+        int len = identifier.size();
+        if (len >= 2
+            && identifier[len-1] == '_'
+            && identifier[len-2] == '_') {
+          error_msgs << "identifiers cannot end in double underscore (__)"
+                     << "; found identifer=" << identifier;
+          return false;
+        }
+        return true;
+      }
+    };
+    boost::phoenix::function<validate_identifier> validate_identifier_f;
 
     struct validate_int_expr {
       template <typename T1, typename T2>
@@ -502,8 +523,17 @@ namespace stan {
 
       identifier_r.name("identifier");
       identifier_r
-        %= (lexeme[char_("a-zA-Z") 
-                   >> *char_("a-zA-Z0-9_.")]);
+        %= identifier_name_r
+          [_pass = validate_identifier_f(_1,boost::phoenix::ref(error_msgs_))]
+
+        ;
+
+      identifier_name_r.name("identifier subrule");
+      identifier_name_r
+        %= lexeme[char_("a-zA-Z") 
+                  >> *char_("a-zA-Z0-9_.")]
+        ;
+        
 
       range_r.name("range expression pair, colon");
       range_r 
