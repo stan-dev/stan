@@ -598,7 +598,24 @@ can be determined at compile time and thus computations related to
 them eliminated.  There is further discussion of \Stan optimization
 in \refchapter{optimization}
 
+\section{Comments}
 
+\Stan supports the three major style of comments.  
+
+If the character \code{#} appears on a line, that character and every
+character up to but not including the end of line is ignored.  This is
+the style of comments used in Python, R, and the shell.  
+
+If the character pair \code{//} appears on a line, that pair and every
+character up to but not including the end of line is ignored.  This is
+the style of comments used in C.  This is the preferred commenting
+style for line-based comments and for commenting out code.
+
+\Stan also supports \Cpp comment style in which any content placed
+between \code{/*} and \code{*/} is ignored along with the boundary
+markers.  This is the preferred style for long documentation comments.
+It is difficult to use this method to comment out code, because 
+an internal close comment sequence, \code{*/}, may take precedence.
 
 
 \section{User-Defined Distributions}
@@ -6544,6 +6561,54 @@ At this point, you should have the make system \code{make}, the two
 \Cpp compilers/linkers \code{g++}, and \code{clang++} installed, which
 is all you need to run \Stan.  You should also have the \code{git}
 version control system at this point.
+
+\subsection{Use Macports}
+
+\begin{Verbatim}
+How to install MacPorts g++
+
+1.  From the download page:
+
+https://distfiles.macports.org/MacPorts/
+
+2.  Snow Leopard:
+
+    MacPorts-2.0.3-10.6-SnowLeopard.dmg
+
+3.  Click on .dmg file
+
+4.  Double click on the .pkg file.
+
+5.  Click through menus (you'll need to enter your password)
+
+6.  Pull up a NEW terminal and run from anywhere:
+
+    > sudo port install gcc46
+
+    You'll need to enter your password again
+
+    NOTE:  On my notebook, I got a lot of errors like:
+
+               Error: Target org.macports.activate returned: Image
+	       error: /opt/local/include/gmp.h already exists and does
+	       not belong to a registered port.  Unable to activate
+	       port gmp. Use 'port -f activate gmp' to force the
+	       activation.
+
+           and had to do what it suggested for several packages:
+
+           >  sudo port -f activate gmp
+
+7.  Installed as:
+
+    > g++-mp-4.6
+
+8.  Run Stan with
+
+    > make CC=g++-mp-4.6
+
+    (or make a link)
+\end{Verbatim}
 
 
 \subsection{Git Installer}
