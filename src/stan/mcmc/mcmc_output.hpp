@@ -1,9 +1,10 @@
-
 #ifndef __STAN__MCMC__MCMC_OUTPUT_HPP__
 #define __STAN__MCMC__MCMC_OUTPUT_HPP__
 
 #include <vector>
+#include <string>
 #include <stdexcept>
+#include <fstream>
 #include <stan/math/matrix.hpp>
 
 /*#include <boost/accumulators/accumulators.hpp>
@@ -19,6 +20,7 @@
 
 namespace stan {
   namespace mcmc {
+
     
     /** 
      * mcmc_output
@@ -156,10 +158,59 @@ namespace stan {
       std::vector< std::vector<double> > samples_;
       size_t nChains_;
       size_t nSamplesPerChain_;
-
-      
-
     };
+
+
+    class mcmc_output_factory {
+    public:
+      mcmc_output_factory() {
+      }
+      void addFile(std::string filename) {
+	filenames_.push_back(filename);
+      }
+      mcmc_output create(std::string variable) {
+	mcmc_output var;
+	// loop over all files
+	for (size_t ii = 0; ii < filenames_.size(); ii++) {
+	  std::vector<double> samples;
+	  
+	  	  
+	  // 1. open file: filenames_[ii];
+	  std::fstream in(filenames_[ii].c_str(), std::fstream::in);
+	  
+	  // 1.1. Strip header
+	  char c = '#';
+	  while (c == '#') {
+	    in.ignore(10000, '\n');
+	    in >> c;
+	  }
+	  // 1.2 count number of commas to skip
+	  int commas = 0;
+	  std::stringstream currvar;
+	  while (currvar.str() != variable) {
+	    currvar.str("");
+	    if (c == ',') {
+	      commas++;
+	      in.get(c);
+	    }
+	    while (c != ',' && c != '\n') {
+	      currvar << c;
+	      in.get(c);
+	    }
+	  }
+	  // 2. read the column with the variable listed
+	  
+
+	  in.close();
+	  // 3. add samples to mcmc_output
+	  var.add_chain(samples);
+	}
+	return var;
+      }
+    private:
+      std::vector<std::string> filenames_;
+    };
+
    
   }
 }
