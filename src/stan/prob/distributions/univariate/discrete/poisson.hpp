@@ -34,8 +34,8 @@ namespace stan {
         return lp;
       
       if (lambda == 0)
-        return LOG_ZERO;
-      
+        return n == 0 ? 0 : LOG_ZERO;
+
       using stan::math::multiply_log;
       if (std::isinf(lambda))
         return LOG_ZERO;
