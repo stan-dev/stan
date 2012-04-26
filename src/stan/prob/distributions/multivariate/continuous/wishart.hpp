@@ -98,18 +98,18 @@ namespace stan {
         lp -= lmgamma(k, 0.5 * nu);
 
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp -= nu * L_S.diagonal().array().log().sum();
+        lp -= nu * L_S.diagonal().array().log().sum();
 
       if (include_summand<propto,T_scale,T_y>::value) {
-	Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
-	I.setIdentity();
-	L_S = mdivide_left_tri<Eigen::Lower>(L_S, I);
-	L_S = L_S.transpose() * L_S.template triangularView<Eigen::Lower>();
-	lp -= 0.5 * elt_multiply(L_S, W).array().sum(); // trace(S^-1 * W)
+        Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
+        I.setIdentity();
+        L_S = mdivide_left_tri<Eigen::Lower>(L_S, I);
+        L_S = L_S.transpose() * L_S.template triangularView<Eigen::Lower>();
+        lp -= 0.5 * elt_multiply(L_S, W).array().sum(); // trace(S^-1 * W)
       }
 
       if (include_summand<propto,T_y,T_dof>::value && nu != (k + 1))
-	lp += (nu - k - 1.0) * L_W.diagonal().array().log().sum();
+        lp += (nu - k - 1.0) * L_W.diagonal().array().log().sum();
 
       return lp;
     }

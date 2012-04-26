@@ -20,7 +20,6 @@ TO DO FOR V1
     + Michael Betancourt
 
 * distribution engineering (Daniel)
-  - eliminate tabs from code
  - basic distro site
 
 * speed tests relative to BUGS/JAGS

@@ -60,6 +60,11 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              std::string(), 
+                              whitespace_grammar<Iterator> > 
+      identifier_name_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               int_var_decl(), 
                               whitespace_grammar<Iterator> > 
       int_decl_r;

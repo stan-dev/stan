@@ -1,12 +1,14 @@
 #ifndef __STAN__PROB__TRANSFORM_HPP__
 #define __STAN__PROB__TRANSFORM_HPP__
 
+#include <cmath>
 #include <cstddef>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
@@ -22,17 +24,21 @@ namespace stan {
 
 
     /**
-     * This function is intended to make starting values, given a covariance matrix Sigma
-     * The transformations are hard coded as log for standard deviations and Fisher
-     * transformations (atanh()) of CPCs
-     * @author Ben Goodrich
+     * This function is intended to make starting values, given a
+     * covariance matrix Sigma
+     *
+     * The transformations are hard coded as log for standard
+     * deviations and Fisher transformations (atanh()) of CPCs
+     *
+     * @param CPCs fill this unbounded
+     * @param sds fill this unbounded
      * @return false if any of the diagonals of Sigma are 0
      */
     template<typename T>
     bool
-    factor_cov_matrix(Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // will fill this unbounded
-                      Eigen::Array<T,Eigen::Dynamic,1>& sds,  // will fill this unbounded
-                      const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+    factor_cov_matrix(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
+              Eigen::Array<T,Eigen::Dynamic,1>& sds, 
+              const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
 
       size_t K = sds.rows();
 
@@ -45,7 +51,8 @@ namespace stan {
       sds = sds.log(); // now unbounded
   
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> R = D * Sigma * D;
-      R.diagonal().setOnes(); // to hopefully prevent pivoting due to floating point error
+      // to hopefully prevent pivoting due to floating point error
+      R.diagonal().setOnes(); 
       Eigen::LDLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt;
       ldlt = R.ldlt();
       if( !ldlt.isPositive() ) return false;
@@ -75,30 +82,35 @@ namespace stan {
     // MATRIX TRANSFORMS +/- JACOBIANS
 
     /**
-     * Return the Cholesky factor of the correlation matrix of the specified
-     * dimensionality corresponding to the specified canonical partial correlations.
+     * Return the Cholesky factor of the correlation matrix of the
+     * specified dimensionality corresponding to the specified
+     * canonical partial correlations.
      * 
-     * It is generally better to work with the Cholesky factor rather than the
-     * correlation matrix itself when the determinant, inverse, etc. of the
-     * correlation matrix is needed for some statistical calculation.
+     * It is generally better to work with the Cholesky factor rather
+     * than the correlation matrix itself when the determinant,
+     * inverse, etc. of the correlation matrix is needed for some
+     * statistical calculation.
      *
      * <p>See <code>read_corr_matrix(Array,size_t,T)</code>
      * for more information.
      *
-     * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
+     * @param CPCs The (K choose 2) canonical partial correlations in
+     * (-1,1).
      * @param K Dimensionality of correlation matrix.
-     * @return Cholesky factor of correlation matrix for specified canonical partial correlations.
+     * @return Cholesky factor of correlation matrix for specified
+     * canonical partial correlations.
+
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                 const size_t K) {
-      Eigen::Array<T,Eigen::Dynamic,1> temp;         // temporary holder
-      Eigen::Array<T,Eigen::Dynamic,1> acc(K-1);     // accumlator of products
+      Eigen::Array<T,Eigen::Dynamic,1> temp;         
+      Eigen::Array<T,Eigen::Dynamic,1> acc(K-1);  
       acc.setOnes();
-      Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K); // Cholesky factor of correlation matrix
+      // Cholesky factor of correlation matrix
+      Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K); 
       L.setZero();
 
       size_t position = 0;
@@ -128,46 +140,49 @@ namespace stan {
      *
      * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
      * @param K Dimensionality of correlation matrix.
-     * @return Cholesky factor of correlation matrix for specified canonical partial correlations.
+     * @return Cholesky factor of correlation matrix for specified
+     * canonical partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    read_corr_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
+    read_corr_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, 
                      const size_t K) {
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = read_corr_L(CPCs, K);
-      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
+        = read_corr_L(CPCs, K);
+      return L.template triangularView<Eigen::Lower>() 
+        * L.matrix().transpose();
     }
     
     /**
-     * Return the Cholesky factor of the correlation matrix of the specified
-     * dimensionality corresponding to the specified canonical partial correlations,
-     * incrementing the specified scalar reference with the log
-     * absolute determinant of the Jacobian of the transformation.
+     * Return the Cholesky factor of the correlation matrix of the
+     * specified dimensionality corresponding to the specified
+     * canonical partial correlations, incrementing the specified
+     * scalar reference with the log absolute determinant of the
+     * Jacobian of the transformation.
      *
      * <p>The implementation is Ben Goodrich's Cholesky
      * factor-based approach to the C-vine method of:
      * 
-     * <ul><li>
-     * Daniel Lewandowski, Dorota Kurowicka, and Harry Joe, 
-     * Generating random correlation matrices based on vines and extended onion method
-     * Journal of Multivariate Analysis 100 (2009) 1989–2001
-     * </li></ul>
+     * <ul><li> Daniel Lewandowski, Dorota Kurowicka, and Harry Joe,
+     * Generating random correlation matrices based on vines and
+     * extended onion method Journal of Multivariate Analysis 100
+     * (2009) 1989–2001 </li></ul>
      *
      * // FIXME: explain which CPCs we're dealing with
      * 
-     * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
+     * @param CPCs The (K choose 2) canonical partial correlations in
+     * (-1,1).
      * @param K Dimensionality of correlation matrix.
      * @param log_prob Reference to variable to increment with the log
      * Jacobian determinant.
-     * @return Cholesky factor of correlation matrix for specified partial correlations.
+     * @return Cholesky factor of correlation matrix for specified
+     * partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
+    read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
                 const size_t K,
                 T& log_prob) {
 
@@ -178,11 +193,14 @@ namespace stan {
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
       // skip last row (odd indexing) because it adds nothing by design
-      for (typename Eigen::Array<T,Eigen::Dynamic,1>::size_type j = 0; j < (CPCs.rows() - 1); ++j) {
+      for (typename Eigen::Array<T,Eigen::Dynamic,1>::size_type j = 0; 
+           j < (CPCs.rows() - 1);
+           ++j) {
         using stan::math::log1m;
         using stan::math::square;
         log_1cpc2 = log1m(square(CPCs[j]));
-        log_prob += lead / 2.0 * log_1cpc2; // derivative of correlation wrt CPC
+        // derivative of correlation wrt CPC
+        log_prob += lead / 2.0 * log_1cpc2; 
         i++;
         if (i > K) {
           k++;
@@ -203,33 +221,39 @@ namespace stan {
      * the Cholesky factor of the correlation matrix rather than the
      * correlation matrix itself in statistical calculations.
      * 
-     * @param CPCs The (K choose 2) canonical partial correlations in (-1,1).
+     * @param CPCs The (K choose 2) canonical partial correlations in
+     * (-1,1).
      * @param K Dimensionality of correlation matrix.
      * @param log_prob Reference to variable to increment with the log
      * Jacobian determinant.
      * @return Correlation matrix for specified partial correlations.
      * @tparam T Type of underlying scalar.  
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    read_corr_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
+    read_corr_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
                      const size_t K,
                      T& log_prob) {
 
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = read_corr_L(CPCs, K, log_prob);
-      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
+        = read_corr_L(CPCs, K, log_prob);
+      return L.template triangularView<Eigen::Lower>()
+        * L.matrix().transpose();
     }
     
-    /** this is the function that should be called prior to evaluating the
-     * density of any elliptical distribution
-     * @return Cholesky factor of covariance matrix for specified partial correlations.
-     * @author Ben Goodrich
+    /** 
+     * This is the function that should be called prior to evaluating
+     * the density of any elliptical distribution
+     *
+     * @param CPCs on (-1,1)
+     * @param sds on (0,inf)
+     * @return Cholesky factor of covariance matrix for specified
+     * partial correlations.
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    read_cov_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
-               const Eigen::Array<T,Eigen::Dynamic,1>& sds,  // on (0,inf)
+    read_cov_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
+               const Eigen::Array<T,Eigen::Dynamic,1>& sds, 
                T& log_prob) {
       size_t K = sds.rows();
       // adjust due to transformation from correlations to covariances
@@ -237,52 +261,65 @@ namespace stan {
       return sds.matrix().asDiagonal() * read_corr_L(CPCs, K, log_prob);
     }
 
-    /** a generally worse alternative to call prior to evaluating the density
-     * of an elliptical distribution
+    /** 
+     * A generally worse alternative to call prior to evaluating the
+     * density of an elliptical distribution
+     *
+     * @param CPCs on (-1,1)
+     * @param sds on (0,inf)
      * @return Covariance matrix for specified partial correlations.
-     * @author Ben Goodrich
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    read_cov_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
-                    const Eigen::Array<T,Eigen::Dynamic,1>& sds,  // on (0,inf)
+    read_cov_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
+                    const Eigen::Array<T,Eigen::Dynamic,1>& sds, 
                     T& log_prob) {
 
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = read_cov_L(CPCs, sds, log_prob);
-      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
+        = read_cov_L(CPCs, sds, log_prob);
+      return L.template triangularView<Eigen::Lower>() 
+        * L.matrix().transpose();
     }
 
     /** 
      *
      * Builds a covariance matrix from CPCs and standard deviations
-     * @author Ben Goodrich
+     *
+     * @param CPCs in (-1,1)
+     * @param sds in (0,inf)
      */
     template<typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    read_cov_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,    // on (-1,1)
-                    const Eigen::Array<T,Eigen::Dynamic,1>& sds) {   // on (0,inf)
+    read_cov_matrix(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, 
+                    const Eigen::Array<T,Eigen::Dynamic,1>& sds) {
 
       size_t K = sds.rows();
       Eigen::DiagonalMatrix<T,Eigen::Dynamic> D(K);
       D.diagonal() = sds;
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = D * read_corr_L(CPCs, K);
-      return L.template triangularView<Eigen::Lower>() * L.matrix().transpose();
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
+        = D * read_corr_L(CPCs, K);
+      return L.template triangularView<Eigen::Lower>() 
+        * L.matrix().transpose();
     }
 
 
     /** 
-     * This function calculates the degrees of freedom for the t distribution
-     * that corresponds to the shape parameter in the Lewandowski et. al. distribution
-     * @author Ben Goodrich
+     * This function calculates the degrees of freedom for the t
+     * distribution that corresponds to the shape parameter in the
+     * Lewandowski et. al. distribution 
+     *
+     * @param eta hyperparameter on (0,inf), eta = 1 <-> correlation
+     * matrix is uniform
+     * @param K number of variables in covariance matrix
      */
     template<typename T>
     const Eigen::Array<T,Eigen::Dynamic,1>
-    make_nu(const T eta,             // hyperparameter on (0,inf), eta = 1 <-> correlation matrix is uniform
-            const size_t K) {  // number of variables in covariance matrix
+    make_nu(const T eta, const size_t K) {
   
       Eigen::Array<T,Eigen::Dynamic,1> nu(K * (K - 1) / 2);
   
       T alpha = eta + (K - 2.0) / 2.0; // from Lewandowski et. al.
+
       // Best (1978) implies nu = 2 * alpha for the dof in a t 
       // distribution that generates a beta variate on (-1,1)
       T alpha2 = 2.0 * alpha; 
@@ -388,7 +425,8 @@ namespace stan {
      * <p>See <code>positive_constrain(T)</code> for details
      * of the transform.  The log absolute Jacobian determinant is
      *
-     * <p>\f$\log | \frac{d}{dx} \mbox{exp}(x) | = \log | \mbox{exp}(x) | =  x\f$.
+     * <p>\f$\log | \frac{d}{dx} \mbox{exp}(x) | 
+     *    = \log | \mbox{exp}(x) | =  x\f$.
      * 
      * @param x Arbitrary input scalar.
      * @param lp Log probability reference.
@@ -448,9 +486,10 @@ namespace stan {
     }
 
     /**
-     * Return the lower-bounded value for the speicifed unconstrained input
-     * and specified lower bound, incrementing the specified reference
-     * with the log absolute Jacobian determinant of the transform.
+     * Return the lower-bounded value for the speicifed unconstrained
+     * input and specified lower bound, incrementing the specified
+     * reference with the log absolute Jacobian determinant of the
+     * transform.
      *
      * @param x Unconstrained scalar input.
      * @param lb Lower-bound on output.
@@ -509,13 +548,16 @@ namespace stan {
 
     /**
      * Return the upper-bounded value for the specified unconstrained
-     * scalar and upper bound and increment the specified log probability
-     * reference with the log absolute Jacobian determinant of the transform.
+     * scalar and upper bound and increment the specified log
+     * probability reference with the log absolute Jacobian
+     * determinant of the transform.
      *
-     * <p>The transform is as specified for <code>ub_constrain(T,double)</code>.
-     * The log absolute Jacobian determinant is
+     * <p>The transform is as specified for
+     * <code>ub_constrain(T,double)</code>.  The log absolute Jacobian
+     * determinant is
      *
-     * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | = \log | -\mbox{exp}(x) + 0 | = x\f$.
+     * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | 
+     *     = \log | -\mbox{exp}(x) + 0 | = x\f$.
      *
      * @param x Free scalar.
      * @param ub Upper bound.
@@ -533,8 +575,8 @@ namespace stan {
      * Return the free scalar that corresponds to the specified
      * upper-bounded value with respect to the specified upper bound.
      *
-     * <p>The transform is the reverse of the <code>ub_constrain(T,double)</code>
-     * transform, 
+     * <p>The transform is the reverse of the
+     * <code>ub_constrain(T,double)</code> transform,
      *
      * <p>\f$f^{-1}(y) = \log -(y - U)\f$
      *
@@ -544,7 +586,8 @@ namespace stan {
      * @param ub Upper bound.
      * @return Free scalar corresponding to upper-bounded scalar.
      * @tparam T Type of scalar.
-     * @throw std::invalid_argument if y is greater than the upper bound.
+     * @throw std::invalid_argument if y is greater than the upper
+     * bound.
      */
     template <typename T>
     T ub_free(const T y, const double ub) {
@@ -585,12 +628,21 @@ namespace stan {
      * lower and upper bounds and increment the specified log
      * probability with the log absolute Jacobian determinant.
      *
-     * <p>The transform is as defined in <code>lub_constrain(T,double,double)</code>.
-     * The log absolute Jacobian determinant is given by
+     * <p>The transform is as defined in
+     * <code>lub_constrain(T,double,double)</code>.  The log absolute
+     * Jacobian determinant is given by
      * 
-     * <p>\f$\log \left| \frac{d}{dx} \left( L + (U-L) \mbox{logit}^{-1}(x) \right) \right|\f$
-     * <p>\f$ {} = \log | (U-L) \, (\mbox{logit}^{-1}(x)) \, (1 - \mbox{logit}^{-1}(x)) |\f$
-     * <p>\f$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x)) + \log (1 - \mbox{logit}^{-1}(x))\f$
+     * <p>\f$\log \left| \frac{d}{dx} \left(
+     *                L + (U-L) \mbox{logit}^{-1}(x) \right) 
+     *            \right|\f$
+     *
+     * <p>\f$ {} = \log |
+     *         (U-L)
+     *         \, (\mbox{logit}^{-1}(x)) 
+     *         \, (1 - \mbox{logit}^{-1}(x)) |\f$
+     *
+     * <p>\f$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x)) 
+                                        + \log (1 - \mbox{logit}^{-1}(x))\f$
      *
      * @param x Free scalar to transform.
      * @param lb Lower bound.
@@ -609,14 +661,17 @@ namespace stan {
         inv_logit_x = 1.0 / (1.0 + exp_minus_x);
         lp += log(ub - lb) - x - 2 * log1p(exp_minus_x);
         // Prevent x from reaching one unless it really really should.
-        if ((x < std::numeric_limits<double>::infinity()) && (inv_logit_x==1))
+        if ((x < std::numeric_limits<double>::infinity()) 
+            && (inv_logit_x == 1))
+
             inv_logit_x = 1 - 1e-15;
       } else {
         T exp_x = exp(x);
         inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
         lp += log(ub - lb) + x - 2 * log1p(exp_x);
         // Prevent x from reaching zero unless it really really should.
-        if ((x > -std::numeric_limits<double>::infinity()) && (inv_logit_x==0))
+        if ((x > -std::numeric_limits<double>::infinity()) 
+            && (inv_logit_x== 0))
             inv_logit_x = 1e-100;
       }
       return lb + (ub - lb) * inv_logit_x;
@@ -634,16 +689,15 @@ namespace stan {
      *
      * where \f$U\f$ and \f$L\f$ are the lower and upper bounds.
      *
+     * @tparam T Type of scalar.
      * @param y Scalar input.
      * @param lb Lower bound.
      * @param ub Upper bound.
      * @return The free scalar that transforms to the input scalar
      * given the bounds.
-     *
-     * @tparam T Type of scalar.
-     * @throw std::invalid_argument if the lower bound is greater than the upper bound,
-     *   y is less than the lower bound, or
-     *   y is greater than the upper bound
+     * @throw std::invalid_argument if the lower bound is greater than
+     *   the upper bound, y is less than the lower bound, or y is
+     *   greater than the upper bound
      */
     template <typename T>
     T lub_free(const T y, double lb, double ub) {
@@ -751,8 +805,9 @@ namespace stan {
      * Return the result of transforming the specified scalar to have
      * a valid correlation value between -1 and 1 (inclusive).
      *
-     * <p>The transform used is as specified for <code>corr_constrain(T)</code>.
-     * The log absolute Jacobian determinant is
+     * <p>The transform used is as specified for
+     * <code>corr_constrain(T)</code>.  The log absolute Jacobian
+     * determinant is
      *
      * <p>\f$\log | \frac{d}{dx} \tanh x  | = \log (1 - \tanh^2 x)\f$.
      * 
@@ -771,9 +826,12 @@ namespace stan {
      * a valid correlation produces the specified value.
      *
      * <p>This function inverts the transform defined for
-     * <code>corr_constrain(T)</code>, which is the inverse hyperbolic tangent,
+     * <code>corr_constrain(T)</code>, which is the inverse hyperbolic
+     * tangent,
      *
-     * <p>\f$f^{-1}(y) = \mbox{atanh}\, y = \frac{1}{2} \log \frac{y + 1}{y - 1}\f$.
+     * <p>\f$ f^{-1}(y)
+     *          = \mbox{atanh}\, y
+     *          = \frac{1}{2} \log \frac{y + 1}{y - 1}\f$.
      *
      * @param y Correlation scalar input.
      * @return Free scalar that transforms to the specified input.
@@ -803,8 +861,9 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
-      // cut and paste from  simplex_constrain(Eigen::Matrix,T) w/o Jacobian
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      // cut & paste simplex_constrain(Eigen::Matrix,T) w/o Jacobian
       using stan::math::logit;
       using stan::math::inv_logit;
       using stan::math::log1m;
@@ -825,8 +884,8 @@ namespace stan {
      * and increment the specified log probability reference with 
      * the log absolute Jacobian determinant of the transform. 
      *
-     * The simplex transform is defined through a centered stick-breaking
-     * process.
+     * The simplex transform is defined through a centered
+     * stick-breaking process.
      * 
      * @param y Free vector input of dimensionality K - 1.
      * @param lp Log probability reference to increment.
@@ -834,8 +893,9 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, 
-                                          T& lp) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, 
+                      T& lp) {
       using stan::math::logit;
       using stan::math::inv_logit;
       using stan::math::log1p_exp;
@@ -851,7 +911,6 @@ namespace stan {
         lp += log(stick_len);
         lp -= log1p_exp(-adj_y_k);
         lp -= log1p_exp(adj_y_k);
-        // lp += log(x(k)) + log1m(z_k);
         stick_len -= x(k); // equivalently *= (1 - z_k);
       }
       x(Km1) = stick_len; // no Jacobian contrib for last dim
@@ -863,8 +922,8 @@ namespace stan {
      * the specified simplex.  It applies to a simplex of dimensionality
      * K and produces an unconstrained vector of dimensionality (K-1).
      *
-     * <p>The simplex transform is defined through a centered stick-breaking
-     * process.
+     * <p>The simplex transform is defined through a centered
+     * stick-breaking process.
      * 
      * @param x Simplex of dimensionality K.
      * @return Free vector of dimensionality (K-1) that transfroms to
@@ -873,7 +932,8 @@ namespace stan {
      * @throw std::domain_error if x is not a valid simplex
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
       int Km1 = x.size() - 1;
@@ -887,7 +947,6 @@ namespace stan {
       }
       return y;
     }
-
 
 
     // POSITIVE ORDERED 
@@ -907,12 +966,15 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k = x.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> y(k);
       if (k > 0)
         y[0] = exp(x[0]);
-      for (typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type i = 1; i < k; ++i)
+      for (typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type i = 1; 
+           i < k; 
+           ++i)
         y[i] = y[i-1] + exp(x[i]);
       return y;
     }
@@ -924,13 +986,15 @@ namespace stan {
      * of the transform.  The returned constrained vector
      * will have the same dimensionality as the specified free vector.
      *
-     * <p>The transform is defined as for <code>pos_ordered_constrain(Eigen::Matrix<T,Eigen::Dynamic,1>)</code>.
-     * The log absolute Jacobian determinant reduces neatly because the Jacobian
-     * is lower triangular, 
+     * <p>The transform is defined as for
+     * <code>pos_ordered_constrain(Eigen::Matrix<T,Eigen::Dynamic,1>)</code>.
+     * The log absolute Jacobian determinant reduces neatly because
+     * the Jacobian is lower triangular,
      *
      * <p>\f$\log \left| J \right| \f$
      *
-     * <p>\f$= \log \left| \begin{array}{c} \nabla f(x)[0] \\ \vdots \\ \nabla f(x)[K-1] \end{array}\right|\f$
+     * <p>\f$= \log \left| \begin{array}{c} \nabla f(x)[0] 
+     *                     \\ \vdots \\ \nabla f(x)[K-1] \end{array}\right|\f$
      * 
      * <p>\f${} = \log \left| \begin{array}{cccc}
      * \exp(x[0]) & 0 & \cdots & 0
@@ -949,7 +1013,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
       lp += x.sum();
       return pos_ordered_constrain(x);
     }
@@ -972,8 +1037,10 @@ namespace stan {
      *   ordered scalars.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> pos_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
-      stan::math::check_pos_ordered("stan::prob::pos_ordered_free(%1%)", y, "y");
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    pos_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      stan::math::check_pos_ordered("stan::prob::pos_ordered_free(%1%)", 
+                                    y, "y");
       size_t k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
       if (k == 0) 
@@ -993,13 +1060,13 @@ namespace stan {
      * \frac{k(k-1)}{2}\f$.  The values in the input vector represent
      * unconstrained (partial) correlations among the dimensions.
      *
-     * <p>The transform based on partial correlations is as specified in 
+     * <p>The transform based on partial correlations is as specified
+     * in
      *
-     * <ul><li>
-     * Lewandowski, Daniel, Dorota Kurowicka, and Harry Joe. 2009.
-     * Generating random correlation matrices based on vines and extended onion method.
-     * <i>Journal of Multivariate Analysis</i> <b>100</b>:1989–-2001.
-     * </li></ul>
+     * <ul><li> Lewandowski, Daniel, Dorota Kurowicka, and Harry
+     * Joe. 2009.  Generating random correlation matrices based on
+     * vines and extended onion method.  <i>Journal of Multivariate
+     * Analysis</i> <b>100</b>:1989–-2001.  </li></ul>
      *
      * <p>The free vector entries are first constrained to be
      * valid correlation values using <code>corr_constrain(T)</code>.
@@ -1007,11 +1074,13 @@ namespace stan {
      * @param x Vector of unconstrained partial correlations.
      * @param k Dimensionality of returned correlation matrix.
      * @tparam T Type of scalar.
-     * @throw std::invalid_argument if x is not a valid correlation matrix.
+     * @throw std::invalid_argument if x is not a valid correlation
+     * matrix.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-                                                    typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k) {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                 typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
@@ -1042,9 +1111,10 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                                                    typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k,
-                                                    T& lp) {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                    typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k,
+                    T& lp) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
@@ -1057,8 +1127,8 @@ namespace stan {
     }
 
     /**
-     * Return the vector of unconstrained partial correlations that define the
-     * specified correlation matrix when transformed.  
+     * Return the vector of unconstrained partial correlations that
+     * define the specified correlation matrix when transformed.
      *
      * <p>The constraining transform is defined as for
      * <code>corr_matrix_constrain(Matrix,size_t)</code>.  The
@@ -1067,27 +1137,31 @@ namespace stan {
      * and then free those.
      * 
      * @param y The correlation matrix to free.
-     * @return Vector of unconstrained values that produce the specified
-     * correlation matrix when transformed.
+     * @return Vector of unconstrained values that produce the
+     * specified correlation matrix when transformed.
      * @tparam T Type of scalar.
-     * @throw std::domain_error if the correlation matrix has no elements or
-     *    is not a square matrix.
-     * @throw std::runtime_error if the correlation matrix cannot be factorized
-     *    by factor_cov_matrix() or if the sds returned by factor_cov_matrix()
-     *    on log scale are unconstrained.
+     * @throw std::domain_error if the correlation matrix has no
+     *    elements or is not a square matrix.
+     * @throw std::runtime_error if the correlation matrix cannot be
+     *    factorized by factor_cov_matrix() or if the sds returned by
+     *    factor_cov_matrix() on log scale are unconstrained.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> corr_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      typedef typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    corr_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      typedef typename 
+        Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
       size_type k = y.rows();
-      if (y.cols() != k || k == 0)
-        throw std::domain_error("y is not a square matrix or there are no elements");
+      if (y.cols() != k)
+        throw std::domain_error("y is not a square matrix");
+      if (k == 0)
+        throw std::domain_error("y has no elements");
       size_type k_choose_2 = (k * (k-1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> x(k_choose_2);
       Eigen::Array<T,Eigen::Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(x,sds,y);
       if (!successful)
-        throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
+        throw std::runtime_error("factor_cov_matrix failed on y");
       for (size_type i = 0; i < k; ++i) {
         // sds on log scale unconstrained
         if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE) {
@@ -1102,6 +1176,126 @@ namespace stan {
 
 
     // COVARIANCE MATRIX
+
+    /**
+     * Return the symmetric, positive-definite matrix of dimensions K
+     * by K resulting from transforming the specified finite vector of
+     * size K plus (K choose 2).
+     *
+     * <p>See <code>cov_matrix_free()</code> for the inverse transform.
+     *
+     * @param x The vector to convert to a covariance matrix.
+     * @param K The number of rows and columns of the resulting
+     * covariance matrix.
+     * @throws std::domain_error if (x.size() != K + (K choose 2)).
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                          size_t K) {
+      using std::exp;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
+      if (x.size() != (K * (K + 1)) / 2) 
+        throw std::domain_error("x.size() != K + (K choose 2)");
+      int i = 0;
+      for (int m = 0; m < K; ++m) {
+        for (int n = 0; n < m; ++n)
+          L(m,n) = x(i++);
+        L(m,m) = exp(x(i++));
+        for (int n = m + 1; n < K; ++n) 
+          L(m,n) = 0.0;
+      }
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> M = L * L.transpose();
+      return L * L.transpose();
+    }
+
+    
+    /**
+     * Return the symmetric, positive-definite matrix of dimensions K
+     * by K resulting from transforming the specified finite vector of
+     * size K plus (K choose 2).
+     *
+     * <p>See <code>cov_matrix_free()</code> for the inverse transform.
+     *
+     * @param x The vector to convert to a covariance matrix.
+     * @param K The dimensions of the resulting covariance matrix.
+     * @param lp Reference
+     * @throws std::domain_error if (x.size() != K + (K choose 2)).
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                          size_t K,
+                          T& lp) {
+      using std::exp;
+      if (x.size() != (K * (K + 1)) / 2) 
+        throw std::domain_error("x.size() != K + (K choose 2)");
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
+      int i = 0;
+      for (int m = 0; m < K; ++m) {
+        for (int n = 0; n < m; ++n)
+          L(m,n) = x(i++);
+        L(m,m) = exp(x(i++));
+        for (int n = m + 1; n < K; ++n) 
+          L(m,n) = 0.0;
+      }
+      // Jacobian for complete transform, including exp() above
+      lp += (K * stan::math::LOG_2); // needless constant; want propto
+      for (int k = 0; k < K; ++k)
+        lp += (K - k + 1) * log(L(k,k)); // only +1 because index from 0
+      return L * L.transpose();
+      // return tri_multiply_transpose(L); 
+    }
+
+    /**
+     * The covariance matrix derived from the symmetric view of the
+     * lower-triangular view of the K by K specified matrix is freed
+     * to return a vector of size K + (K choose 2).  
+     *
+     * This is the inverse of the <code>cov_matrix_constrain()</code>
+     * function so that for any finite vector <code>x</code> of size K
+     * + (K choose 2),
+     *
+     * <code>x == cov_matrix_free(cov_matrix_constrain(x,K))</code>.
+     *
+     * In order for this round-trip to work (and really for this
+     * function to work), the symmetric view of its lower-triangular
+     * view must be positive definite.
+     * 
+     * @param y Matrix of dimensions K by K such that he symmetric
+     * view of the lower-triangular view is positive definite.
+     * @return Vector of size K plus (K choose 2) in (-inf,inf)
+     * that produces
+     * @throw std::domain_error if <code>y</code> is not square, 
+     * has zero dimensionality, or has a non-positive diagonal element.
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    cov_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      using std::log;
+      int K = y.rows();
+      if (y.cols() != K)
+        throw std::domain_error("y is not a square matrix");
+      if (K == 0)
+        throw std::domain_error("y has no elements");
+      for (int k = 0; k < K; ++k)
+        if (!(y(k,k) > 0.0)) 
+          throw std::domain_error("y has non-positive diagonal");
+      Eigen::Matrix<T,Eigen::Dynamic,1> x((K * (K + 1)) / 2);
+      // FIXME: see Eigen LDLT for rank-revealing version -- use that
+      // even if less efficient?
+      Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > 
+        llt(y.rows());
+      llt.compute(y);
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L = llt.matrixL();
+      int i = 0;
+      for (int m = 0; m < K; ++m) {
+        for (int n = 0; n < m; ++n)
+          x(i++) = L(m,n);
+        x(i++) = log(L(m,m));
+      }
+      return x;
+    }
 
     /**
      * Return the covariance matrix of the specified dimensionality
@@ -1123,8 +1317,9 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                                                   size_t k) {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain_lkj(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                         size_t k) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
@@ -1142,7 +1337,8 @@ namespace stan {
      * values and increment the specified log probability reference
      * with the log absolute Jacobian determinant.  
      *
-     * <p>The transform is defined as for <code>cov_matrix_constrain(Matrix,size_t)</code>.
+     * <p>The transform is defined as for
+     * <code>cov_matrix_constrain(Matrix,size_t)</code>.
      *
      * <p>The log absolute Jacobian determinant is derived by
      * composing the log absolute Jacobian determinant for the
@@ -1160,9 +1356,10 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                                                   size_t k, 
-                                                   T& lp) {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    cov_matrix_constrain_lkj(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+                         size_t k, 
+                         T& lp) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       int pos = 0;
@@ -1187,23 +1384,28 @@ namespace stan {
      * @return Vector of unconstrained values that transforms to the
      * specified covariance matrix.
      * @tparam T Type of scalar.
-     * @throw std::domain_error if the correlation matrix has no elements or
-     *    is not a square matrix.
-     * @throw std::runtime_error if the correlation matrix cannot be factorized
-     *    by factor_cov_matrix()
+     * @throw std::domain_error if the correlation matrix has no
+     *    elements or is not a square matrix.
+     * @throw std::runtime_error if the correlation matrix cannot be
+     *    factorized by factor_cov_matrix()
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> cov_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      typedef typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    cov_matrix_free_lkj(
+            const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      typedef typename
+        Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
       size_type k = y.rows();
-      if (y.cols() != k || k == 0)
-        throw std::domain_error("y is not a square matrix or there are no elements");
+      if (y.cols() != k)
+        throw std::domain_error("y is not a square matrix");
+      if (k == 0)
+        throw std::domain_error("y has no elements");
       size_type k_choose_2 = (k * (k-1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       Eigen::Array<T,Eigen::Dynamic,1> sds(k);
       bool successful = factor_cov_matrix(cpcs,sds,y);
       if (!successful)
-        throw std::runtime_error ("y cannot be factorized by factor_cov_matrix");
+        throw std::runtime_error ("factor_cov_matrix failed on y");
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k_choose_2 + k);
       size_type pos = 0;
       for (size_type i = 0; i < k_choose_2; ++i)
