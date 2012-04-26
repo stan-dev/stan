@@ -8,7 +8,8 @@ TO DO FOR V1
 
 * remaining doc
   - reference manual (Bob)
- - API doc (Daniel, Bob)
+  - API manual (Bob)
+  - API Doxygen doc (Daniel, Bob)
     + stan/gm
     + stan/math
     + stan/mcmc
@@ -24,8 +25,6 @@ TO DO FOR V1
 
 * speed tests relative to BUGS/JAGS
 
-* disallow variable declarations ending with "__"
- 
 
 BUGS MODELS
 =================================================
