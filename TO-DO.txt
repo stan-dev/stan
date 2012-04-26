@@ -101,6 +101,8 @@ Convergence Diagnostics, CODA-like object: mcmc_output
   - multivariate can be single point
   - binomial one or more points depending on interp
 
+* add keyword restrictions on identifiers + doc
+
 
 Stan-R
 =================================================
