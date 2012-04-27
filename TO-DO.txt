@@ -8,7 +8,8 @@ TO DO FOR V1
 
 * remaining doc
   - reference manual (Bob)
- - API doc (Daniel, Bob)
+  - API manual (Bob)
+  - API Doxygen doc (Daniel, Bob)
     + stan/gm
     + stan/math
     + stan/mcmc
@@ -24,8 +25,48 @@ TO DO FOR V1
 
 * speed tests relative to BUGS/JAGS
 
-* disallow variable declarations ending with "__"
- 
+
+BUGS MODELS
+=================================================
+
+./vol3/fire/fire.stan.0
+./vol2/schools/schools.stan.0
+--- it takes NUTS too long to adapt / sample. 
+
+./vol3/funshapes/hsquare.stan.0
+./vol3/funshapes/ring.stan.0
+./vol3/funshapes/squaremc.stan.0
+--- the sampler hangs. 
+
+./vol3/jama/jama.stan.0
+./vol2/ice/vanilla_ice.stan.0
+./vol2/ice/pineapple_ice.stan.0
+--- we could not specify the joint posterior as BUGS 
+specifies the model with circles in terms of DAG, which is 
+not supported by JAGS either.  (Note that JAGS does not 
+support all functionality of OpenBUGS). 
+
+./vol2/asia/asia.stan.0
+./vol2/t_df/estdof2.stan.0
+./vol2/biopsies/biopsies.stan.0
+./vol2/stagnant/stagnant.stan.0
+--- discrete parameters, for example, categorical distribution. 
+Some of them are not implemented at all. 
+
+./vol2/hearts/hearts.stan.0
+./vol2/cervix/cervix.stan.0
+-- discrete parameters: binary distributed parameters, in other versions for 
+the same model that working, discrete parameters are integrated out. 
+
+./vol1/bones/bones.stan.0
+--- it is fine for stan to draw samples, but the data structure is a 
+bit difficult to deal with.  I will see if I can figure it out later. 
+
+./vol1/leuk/leuk.stan.0
+./vol1/leukfr/leukfr.stan.0
+-- we have 0 ~ Poisson(0 * parameters), which seems to 
+cause the sampler hang. 
+
 
 HOME PAGE
 =================================================
@@ -100,6 +141,8 @@ Convergence Diagnostics, CODA-like object: mcmc_output
   - just generate in "generated quantities" block; have all params
   - multivariate can be single point
   - binomial one or more points depending on interp
+
+* add keyword restrictions on identifiers + doc
 
 
 Stan-R

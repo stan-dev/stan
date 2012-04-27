@@ -596,7 +596,7 @@ namespace stan {
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
       if (v.rows() != 1 && v.cols() != 1)
         throw std::invalid_argument("v must be a vector");
-      double sum;
+      double sum = 0.0;
       for (int i = 0; i < v.size(); ++i)
         sum += v(i) * v(i);
       return sum;

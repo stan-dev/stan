@@ -13,7 +13,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/special_functions.hpp>
-#include <stan/agrad/special_functions.hpp>
+// #include <stan/agrad/special_functions.hpp>
 
 namespace stan {
   
@@ -257,7 +257,7 @@ namespace stan {
                T& log_prob) {
       size_t K = sds.rows();
       // adjust due to transformation from correlations to covariances
-      log_prob += (sds.log().sum() + agrad::LOG2) * K;
+      log_prob += (sds.log().sum() + stan::math::LOG_2) * K;
       return sds.matrix().asDiagonal() * read_corr_L(CPCs, K, log_prob);
     }
 

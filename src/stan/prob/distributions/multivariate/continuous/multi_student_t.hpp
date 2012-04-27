@@ -89,7 +89,7 @@ namespace stan {
         lp -= (0.5 * d) * LOG_PI;
 
       using stan::math::multiply;
-      using stan::math::dot_product;
+      using stan::math::dot_self;
       using stan::math::subtract;
       using Eigen::Array;
       using stan::math::mdivide_left_tri;
@@ -110,7 +110,7 @@ namespace stan {
                       1> half = L = mdivide_left_tri<Eigen::Lower>(L, y_minus_mu);
         lp -= 0.5 
           * (nu + d)
-          * log(1.0 + dot_product(half,half) / nu); // FIXME: write sum_of_squares()
+          * log(1.0 + dot_self(half) / nu);
       }
       return lp;
     }
