@@ -175,7 +175,7 @@ namespace stan {
        *
        * @return Next scalar.
        */
-      T scalar_constrain() {
+      inline T scalar_constrain() {
         return scalar();
       }
 
@@ -202,7 +202,7 @@ namespace stan {
        * @param m Size of vector.
        * @return Vector made up of the next scalars.
        */
-      std::vector<T> std_vector(size_t m) {
+      inline std::vector<T> std_vector(size_t m) {
         std::vector<T> vec;
         T& start = scalar_ptr_increment(m);
         vec.insert(vec.begin(), &start, &scalar_ptr());
@@ -216,7 +216,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      vector_t vector(size_t m) {
+      inline vector_t vector(size_t m) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -230,7 +230,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      vector_t vector_constrain(size_t m) {
+      inline vector_t vector_constrain(size_t m) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -242,7 +242,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      vector_t vector_constrain(size_t m, T& lp) {
+      inline vector_t vector_constrain(size_t m, T& lp) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -253,7 +253,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      row_vector_t row_vector(size_t m) {
+      inline row_vector_t row_vector(size_t m) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -264,7 +264,7 @@ namespace stan {
        * @param m Number of rows in the vector to read.
        * @return Column vector made up of the next scalars.
        */
-      row_vector_t row_vector_constrain(size_t m) {
+      inline row_vector_t row_vector_constrain(size_t m) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -277,7 +277,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      row_vector_t row_vector_constrain(size_t m, T& lp) {
+      inline row_vector_t row_vector_constrain(size_t m, T& lp) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
       
@@ -298,7 +298,7 @@ namespace stan {
        * @param n Number of columns.
        * @return Eigen::Matrix made up of the next scalars.
        */
-      matrix_t matrix(size_t m, size_t n) {
+      inline matrix_t matrix(size_t m, size_t n) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
@@ -312,7 +312,7 @@ namespace stan {
        * @param n Number of columns.
        * @return Matrix made up of the next scalars.
        */
-      matrix_t matrix_constrain(size_t m, size_t n) {
+      inline matrix_t matrix_constrain(size_t m, size_t n) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
@@ -328,7 +328,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
-      matrix_t matrix_constrain(size_t m, size_t n, T& lp) {
+      inline matrix_t matrix_constrain(size_t m, size_t n, T& lp) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
@@ -342,7 +342,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * greater than or equal to the lower bound.
        */
-      int integer_lb(int lb) {
+      inline int integer_lb(int lb) {
         int i = integer();
         if (!(i >= lb))
           BOOST_THROW_EXCEPTION(
@@ -358,7 +358,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * greater than or equal to the lower bound.
        */
-      int integer_lb_constrain(int lb) {
+      inline int integer_lb_constrain(int lb) {
         return integer_lb(lb);
       }
       /**
@@ -371,7 +371,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * greater than or equal to the lower bound.
        */
-      int integer_lb_constrain(int lb, T& lp) {
+      inline int integer_lb_constrain(int lb, T& lp) {
         return integer_lb(lb);
       }
 
@@ -385,7 +385,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      int integer_ub(int ub) {
+      inline int integer_ub(int ub) {
         int i = integer();
         if (!(i <= ub))
           BOOST_THROW_EXCEPTION(
@@ -401,7 +401,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      int integer_ub_constrain(int ub) {
+      inline int integer_ub_constrain(int ub) {
         return integer_ub(ub);
       }
       /**
@@ -430,7 +430,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      int integer_lub(int lb, int ub) {
+      inline int integer_lub(int lb, int ub) {
         // read first to make position deterministic [arbitrary choice]
         int i = integer(); 
         if (lb > ub)
@@ -454,7 +454,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      int integer_lub_constrain(int lb, int ub) {
+      inline int integer_lub_constrain(int lb, int ub) {
         return integer_lub(lb,ub);
       }
       /**
@@ -468,7 +468,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      int integer_lub_constrain(int lb, int ub, T& lp) {
+      inline int integer_lub_constrain(int lb, int ub, T& lp) {
         return integer_lub(lb,ub);
       }
       
@@ -483,7 +483,7 @@ namespace stan {
        * @return Next positive scalar.
        * @throw std::runtime_error if x is not positive
        */
-      T scalar_pos() {
+      inline T scalar_pos() {
         T x(scalar());
         stan::math::check_positive("stan::io::scalar_pos(%1%)", x, "x");
         return x;
@@ -496,20 +496,21 @@ namespace stan {
        *
        * @return The next scalar transformed to be positive.
        */
-      T scalar_pos_constrain() {
+      inline T scalar_pos_constrain() {
         return stan::prob::positive_constrain(scalar());
       }
 
       /**
-       * Return the next scalar transformed to be positive, incrementing
-       * the specified reference with the log absolute determinant of the Jacobian.
+       * Return the next scalar transformed to be positive,
+       * incrementing the specified reference with the log absolute
+       * determinant of the Jacobian.
        *
        * <p>See <code>stan::prob::positive_constrain(T,T&)</code>.
        * 
        * @param lp Reference to log probability variable to increment.
        * @return The next scalar transformed to be positive.
        */
-      T scalar_pos_constrain(T& lp) {
+      inline T scalar_pos_constrain(T& lp) {
         return stan::prob::positive_constrain(scalar(),lp);
       }
 
@@ -521,12 +522,15 @@ namespace stan {
        *
        * @param lb Lower bound.
        * @return Next scalar value.
+       * @tparam TL Type of lower bound.
        * @throw std::runtime_error if the scalar is less than the
        *    specified lower bound
        */
-      T scalar_lb(double lb) {
+      template <typename TL>
+      inline T scalar_lb(const TL lb) {
         T x(scalar());
-        stan::math::check_greater_or_equal("stan::io::scalar_lb(%1%)", x, lb, "x");
+        stan::math::check_greater_or_equal("stan::io::scalar_lb(%1%)",
+                                           x, lb, "x");
         return x;
       }
 
@@ -536,11 +540,13 @@ namespace stan {
        *
        * <p>See <code>stan::prob::lb_constrain(T,double)</code>.
        *
+       * @tparam TL Type of lower bound.
        * @param lb Lower bound on values.
        * @return Next scalar transformed to have the specified
        * lower bound.
        */
-      T scalar_lb_constrain(double lb) {
+      template <typename TL>
+      inline T scalar_lb_constrain(const TL lb) {
         return stan::prob::lb_constrain(scalar(),lb);
       }
 
@@ -551,10 +557,12 @@ namespace stan {
        *
        * <p>See <code>stan::prob::lb_constrain(T,double,T&)</code>.
        *
+       * @tparam TL Type of lower bound.
        * @param lb Lower bound on result.
        * @param lp Reference to log probability variable to increment.
        */
-      T scalar_lb_constrain(double lb, T& lp) {
+      template <typename TL>
+      inline T scalar_lb_constrain(const TL lb, T& lp) {
         return stan::prob::lb_constrain(scalar(),lb,lp);
       }
 
@@ -566,12 +574,14 @@ namespace stan {
        *
        * <p>See <code>stan::math::check_less_or_equal(T,double)</code>.
        *
+       * @tparam TU Type of upper bound.
        * @param ub Upper bound.
        * @return Next scalar value.
        * @throw std::runtime_error if the scalar is greater than the
        *    specified upper bound
        */
-      T scalar_ub(double ub) {
+      template <typename TU>
+      inline T scalar_ub(TU ub) {
         T x(scalar());
         stan::math::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, "x");
         return x;
@@ -583,11 +593,13 @@ namespace stan {
        *
        * <p>See <code>stan::prob::ub_constrain(T,double)</code>.
        *
+       * @tparam TU Type of upper bound.
        * @param ub Upper bound on values.
        * @return Next scalar transformed to have the specified
        * upper bound.
        */
-      T scalar_ub_constrain(double ub) {
+      template <typename TU>
+      inline T scalar_ub_constrain(const TU ub) {
         return stan::prob::ub_constrain(scalar(),ub);
       }
 
@@ -598,10 +610,12 @@ namespace stan {
        *
        * <p>See <code>stan::prob::ub_constrain(T,double,T&)</code>.
        *
+       * @tparam TU Type of upper bound.
        * @param ub Upper bound on result.
        * @param lp Reference to log probability variable to increment.
        */
-      T scalar_ub_constrain(double ub, T& lp) {
+      template <typename TU>
+      inline T scalar_ub_constrain(const TU ub, T& lp) {
         return stan::prob::ub_constrain(scalar(),ub,lp);
       }
 
@@ -611,13 +625,16 @@ namespace stan {
        *
        * <p>See <code>stan::math::check_bounded(T,double,double)</code>.
        *
+       * @tparam TL Type of lower bound.
+       * @tparam TU Type of upper bound.
        * @param lb Lower bound.
        * @param ub Upper bound.
        * @return Next scalar value.
        * @throw std::runtime_error if the scalar is not between the specified
        *    lower and upper bounds.
        */
-      T scalar_lub(double lb, double ub) {
+      template <typename TL, typename TU>
+      inline T scalar_lub(const TL lb, const TU ub) {
         T x(scalar());
         stan::math::check_bounded("stan::io::scalar_lub(%1%)", x, lb, ub, "x");
         return x;
@@ -629,12 +646,15 @@ namespace stan {
        *
        * <p>See <code>stan::prob::lub_constrain(T,double,double)</code>.
        *
+       * @tparam TL Type of lower bound.
+       * @tparam TU Type of upper bound.
        * @param lb Lower bound.
        * @param ub Upper bound.
        * @return Next scalar transformed to fall between the specified
        * bounds.
        */
-      T scalar_lub_constrain(double lb, double ub) {
+      template <typename TL, typename TU>
+      inline T scalar_lub_constrain(const TL lb, const TU ub) {
         return stan::prob::lub_constrain(scalar(),lb,ub);
       }
 
@@ -649,10 +669,10 @@ namespace stan {
        * @param lp Reference to log probability variable to increment.
        * @tparam T Type of scalar.
        * @tparam TL Type of lower bound.
-       * @tparam TH Type of upper bound.
+       * @tparam TU Type of upper bound.
        */
       template <typename TL, typename TU>
-      T scalar_lub_constrain(TL lb, TU ub, T& lp) {
+      inline T scalar_lub_constrain(TL lb, TU ub, T& lp) {
         return stan::prob::lub_constrain(scalar(),lb,ub,lp);
       }
 
@@ -664,7 +684,7 @@ namespace stan {
        * 
        * @return Next probability value.
        */
-      T prob() {
+      inline T prob() {
         T x(scalar());
         stan::math::check_bounded("stan::io::prob(%1%)", x, 0, 1, "x");
         return x;
@@ -678,7 +698,7 @@ namespace stan {
        *
        * @return The next scalar transformed to a probability.
        */
-      T prob_constrain() {
+      inline T prob_constrain() {
         return stan::prob::prob_constrain(scalar());
       }
 
@@ -692,7 +712,7 @@ namespace stan {
        * @param lp Reference to log probability variable to increment.
        * @return The next scalar transformed to a probability.
        */
-      T prob_constrain(T& lp) {
+      inline T prob_constrain(T& lp) {
         return stan::prob::prob_constrain(scalar(),lp);
       }
 
@@ -710,7 +730,7 @@ namespace stan {
        * @throw std::runtime_error if the value is not valid
        *   for a correlation
        */
-      T corr() {
+      inline T corr() {
         T x(scalar());
         stan::math::check_bounded("stan::io::corr(%1%)", x, -1, 1, "x");
         return x;
@@ -724,7 +744,7 @@ namespace stan {
        *
        * @return The next scalar transformed to a correlation.
        */
-      T corr_constrain() {
+      inline T corr_constrain() {
         return stan::prob::corr_constrain(scalar());
       }
 
@@ -739,7 +759,7 @@ namespace stan {
        * probability to increment.
        * @return The next scalar transformed to a correlation.
        */
-      T corr_constrain(T& lp) {
+      inline T corr_constrain(T& lp) {
         return stan::prob::corr_constrain(scalar(),lp);
       }
 
@@ -753,7 +773,7 @@ namespace stan {
        * @return Simplex read from the specified size number of scalars.
        * @throw std::runtime_error if the k values is not a simplex.
        */
-      vector_t simplex(size_t k) {
+      inline vector_t simplex(size_t k) {
         vector_t theta(vector(k));
         stan::math::check_simplex("stan::io::simplex(%1%)", theta, "theta");
         return theta;
@@ -769,6 +789,7 @@ namespace stan {
        * @param k Number of dimensions in resulting simplex.
        * @return Simplex derived from next <code>k-1</code> scalars.
        */
+      inline 
       Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(size_t k) {
         return stan::prob::simplex_constrain(vector(k-1));
       }
@@ -785,7 +806,7 @@ namespace stan {
        * Jacobian determinant.
        * @return The next simplex of the specified size.
        */
-      vector_t simplex_constrain(size_t k, T& lp) {
+      inline vector_t simplex_constrain(size_t k, T& lp) {
         return stan::prob::simplex_constrain(vector(k-1),lp);
       }
 
@@ -799,7 +820,7 @@ namespace stan {
        * @return Vector of positive values in ascending order.
        * @throw std::runtime_error if the vector is not positive ordered
        */
-      vector_t pos_ordered(size_t k) {
+      inline vector_t pos_ordered(size_t k) {
         vector_t x(vector(k));
         stan::math::check_pos_ordered("stan::io::pos_ordered(%1%)", x, "x");
         return x;
@@ -815,7 +836,7 @@ namespace stan {
        * @return Next positive, ordered vector of the specified
        * length.
        */
-      vector_t pos_ordered_constrain(size_t k) {
+      inline vector_t pos_ordered_constrain(size_t k) {
         return stan::prob::pos_ordered_constrain(vector(k));
       }
 
@@ -830,7 +851,7 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return Next positive ordered vector of the specified size.
        */
-      vector_t pos_ordered_constrain(size_t k, T& lp) {
+      inline vector_t pos_ordered_constrain(size_t k, T& lp) {
         return stan::prob::pos_ordered_constrain(vector(k),lp);
       }
 
@@ -843,7 +864,7 @@ namespace stan {
        * @return Next correlation matrix of the specified dimensionality.
        * @throw std::runtime_error if the matrix is not a correlation matrix
        */
-      matrix_t corr_matrix(size_t k) {
+      inline matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
         stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "x");
         return x;
@@ -857,7 +878,7 @@ namespace stan {
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
        */
-      matrix_t corr_matrix_constrain(size_t k) {
+      inline matrix_t corr_matrix_constrain(size_t k) {
         return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
       }
 
@@ -872,7 +893,7 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return The next correlation matrix of the specified dimensionality.
        */
-      matrix_t corr_matrix_constrain(size_t k, T& lp) {
+      inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
         return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
                                                  k,lp);
       }
@@ -889,7 +910,7 @@ namespace stan {
        * @throw std::runtime_error if the matrix is not a valid
        *    covariance matrix
        */
-      matrix_t cov_matrix(size_t k) {
+      inline matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
         stan::math::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "y");
         return y;
@@ -903,7 +924,7 @@ namespace stan {
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
        */
-      matrix_t cov_matrix_constrain(size_t k) {
+      inline matrix_t cov_matrix_constrain(size_t k) {
         return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                                 k);
       }
@@ -919,7 +940,7 @@ namespace stan {
        * @param lp Log probability reference to increment.
        * @return The next covariance matrix of the specified dimensionality.
        */
-      matrix_t cov_matrix_constrain(size_t k, T& lp) {
+      inline matrix_t cov_matrix_constrain(size_t k, T& lp) {
         return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                                 k,lp);
       }
