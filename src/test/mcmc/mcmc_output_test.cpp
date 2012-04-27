@@ -51,3 +51,10 @@ TEST_F(stanMcmc, splitRHat) {
   
   EXPECT_FLOAT_EQ(0.9892759, splitRHat);
 }
+
+TEST_F(stanMcmc, factory) {
+  stan::mcmc::mcmc_output_factory f;
+  f.addFile("src/test/mcmc/mcmc_output/blocker.csv");
+  f.create("mu.1");
+}
+

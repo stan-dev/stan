@@ -8,6 +8,7 @@
 #include <vector>
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/math/tools/promotion.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
@@ -457,6 +458,7 @@ namespace stan {
      * @throw std::domain_error if the variable is negative.
      */
     template <typename T>
+    inline
     T positive_free(const T y) {
       stan::math::check_positive("stan::prob::positive_free(%1%)", y, "y");
       return log(y);
@@ -478,10 +480,11 @@ namespace stan {
      * @param lb Lower-bound on constrained ouptut.
      * @return Lower-bound constrained value correspdonding to inputs.
      * @tparam T Type of scalar.
+     * @tparam TL Type of lower bound.
      */
-    template <typename T>
+    template <typename T, typename TL>
     inline
-    T lb_constrain(const T x, const double lb) {
+    T lb_constrain(const T x, const TL lb) {
       return exp(x) + lb;
     }
 
@@ -496,10 +499,12 @@ namespace stan {
      * @param lp Reference to log probability to increment.
      * @return Loer-bound constrained value corresponding to inputs.
      * @tparam T Type of scalar.
+     * @tparam TL Type of lower bound.
      */
-    template <typename T>
+    template <typename T, typename TL>
     inline
-    T lb_constrain(const T x, const double lb, T& lp) {
+    typename boost::math::tools::promote_args<T,TL>::type
+    lb_constrain(const T x, const TL lb, T& lp) {
       lp += x;
       return exp(x) + lb;
     }
@@ -513,11 +518,13 @@ namespace stan {
      * @return Unconstrained value that produces the input when
      * constrained.
      * @tparam T Type of scalar.
+     * @tparam TL Type of lower bound.
      * @throw std::domain_error if y is lower than the lower bound.
      */
-    template <typename T>
+    template <typename T, typename TL>
     inline
-    T lb_free(const T y, const double lb) {
+    typename boost::math::tools::promote_args<T,TL>::type
+    lb_free(const T y, const TL lb) {
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
                                          y, lb, "y");
       return log(y - lb);
@@ -540,9 +547,12 @@ namespace stan {
      * @param ub Upper bound.
      * @return Transformed scalar with specified upper bound.
      * @tparam T Type of scalar.
+     * @tparam TU Type of upper bound.
      */
-    template <typename T>
-    T ub_constrain(const T x, const double ub) {
+    template <typename T, typename TU>
+    inline
+    typename boost::math::tools::promote_args<T,TU>::type
+    ub_constrain(const T x, const TU ub) {
       return ub - exp(x);
     }
 
@@ -564,9 +574,12 @@ namespace stan {
      * @param lp Log probability reference.
      * @return Transformed scalar with specified upper bound.
      * @tparam T Type of scalar.
+     * @tparam TU Type of upper bound.
      */
-    template <typename T>
-    T ub_constrain(const T x, const double ub, T& lp) {
+    template <typename T, typename TU>
+    inline
+    typename boost::math::tools::promote_args<T,TU>::type
+    ub_constrain(const T x, const TU ub, T& lp) {
       lp -= x;
       return ub - exp(x);
     }
@@ -586,11 +599,14 @@ namespace stan {
      * @param ub Upper bound.
      * @return Free scalar corresponding to upper-bounded scalar.
      * @tparam T Type of scalar.
+     * @tparam TU Type of upper bound.
      * @throw std::invalid_argument if y is greater than the upper
      * bound.
      */
-    template <typename T>
-    T ub_free(const T y, const double ub) {
+    template <typename T, typename TU>
+    inline
+    typename boost::math::tools::promote_args<T,TU>::type
+    ub_free(const T y, const TU ub) {
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
                                       y, ub, "y");
       return log(ub - y);
@@ -613,11 +629,14 @@ namespace stan {
      * @param ub Upper bound.
      * @return Lower- and upper-bounded scalar derived from transforming
      * the free scalar.
-     * 
      * @tparam T Type of scalar.
+     * @tparam TL Type of lower bound.
+     * @tparam TU Type of upper bound.
      */
-    template <typename T>
-    T lub_constrain(const T x, double lb, double ub) {
+    template <typename T, typename TL, typename TU>
+    inline
+    typename boost::math::tools::promote_args<T,TL,TU>::type
+    lub_constrain(const T x, TL lb, TU ub) {
       using stan::math::inv_logit;
       return lb + (ub - lb) * inv_logit(x);
     }
@@ -651,10 +670,12 @@ namespace stan {
      * @return Lower- and upper-bounded scalar derived from transforming
      * the free scalar.
      * @tparam T Type of scalar.
+     * @tparam TL Type of lower bound.
+     * @tparam TU Type of upper bound.
      */
-    template <typename T>
-    T lub_constrain(const T x, const double lb, const double ub, T& lp) {
-
+    template <typename T, typename TL, typename TU>
+    typename boost::math::tools::promote_args<T,TL,TU>::type
+    lub_constrain(const T x, const TL lb, const TU ub, T& lp) {
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -699,8 +720,10 @@ namespace stan {
      *   the upper bound, y is less than the lower bound, or y is
      *   greater than the upper bound
      */
-    template <typename T>
-    T lub_free(const T y, double lb, double ub) {
+    template <typename T, typename TL, typename TU>
+    inline
+    typename boost::math::tools::promote_args<T,TL,TU>::type
+    lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
                                 y, lb, ub, "y");
@@ -724,6 +747,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
+    inline
     T prob_constrain(const T x) {
       using stan::math::inv_logit;
       return inv_logit(x);
@@ -751,6 +775,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
+    inline
     T prob_constrain(const T x, T& lp) {
       using stan::math::inv_logit;
       using stan::math::log1m;
@@ -774,6 +799,7 @@ namespace stan {
      * @throw std::domain_error if y is less than 0 or greater than 1.
      */
     template <typename T>
+    inline
     T prob_free(const T y) {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::prob_free(%1%)",
@@ -797,6 +823,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
+    inline
     T corr_constrain(const T x) {
       return tanh(x);
     }
@@ -814,6 +841,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
+    inline
     T corr_constrain(const T x, T& lp) {
       using stan::math::log1m;
       T tanh_x = tanh(x);
@@ -838,6 +866,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
+    inline
     T corr_free(const T y) {
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
                                 y, -1, 1, "y, a correlation,");
@@ -1013,6 +1042,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
+    inline
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
       lp += x.sum();

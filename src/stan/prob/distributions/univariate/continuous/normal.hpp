@@ -1,8 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
-#include <stan/prob/constants.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
