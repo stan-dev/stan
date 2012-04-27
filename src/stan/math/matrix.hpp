@@ -603,6 +603,17 @@ namespace stan {
     }
 
     /**
+     * Returns the dot product of each column of a matrix with itself.
+     * @param x Matrix.
+     * @tparam T scalar type
+     */
+    template<typename T>
+    inline Eigen::Matrix<T,Eigen::Dynamic,1> 
+    columns_dot_self(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
+      return x.colwise().squaredNorm();
+    }
+
+    /**
      * Returns the dot product of the specified vectors.
      *
      * @param v1 First vector.
