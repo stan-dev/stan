@@ -647,8 +647,12 @@ namespace stan {
        * @param lb Lower bound.
        * @param ub Upper bound.
        * @param lp Reference to log probability variable to increment.
+       * @tparam T Type of scalar.
+       * @tparam TL Type of lower bound.
+       * @tparam TH Type of upper bound.
        */
-      T scalar_lub_constrain(double lb, double ub, T& lp) {
+      template <typename TL, typename TU>
+      T scalar_lub_constrain(TL lb, TU ub, T& lp) {
         return stan::prob::lub_constrain(scalar(),lb,ub,lp);
       }
 

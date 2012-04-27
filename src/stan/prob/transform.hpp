@@ -651,9 +651,11 @@ namespace stan {
      * @return Lower- and upper-bounded scalar derived from transforming
      * the free scalar.
      * @tparam T Type of scalar.
+     * @tparam TL Type of lower bound.
+     * @tparam TH Type of upper bound.
      */
-    template <typename T>
-    T lub_constrain(const T x, const double lb, const double ub, T& lp) {
+    template <typename T, typename TL, typename TH>
+    T lub_constrain(const T x, const TL lb, const TH ub, T& lp) {
 
       T inv_logit_x;
       if (x > 0) {
