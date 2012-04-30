@@ -270,6 +270,7 @@ namespace stan {
      *
      * @param CPCs on (-1,1)
      * @param sds on (0,inf)
+     * @param log_prob the log probability value to increment with the Jacobian
      * @return Covariance matrix for specified partial correlations.
      */
     template <typename T>
