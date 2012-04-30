@@ -129,7 +129,7 @@ namespace stan {
       }
 
       /**
-       * Update mean statistic given the specified adaptation statistic
+       * Updates the mean statistic given the specified adaptation statistic
        * and weighting.  The behavior is equivalent to doing
        *
        * <code>mean_stat += avg_eta * adapt_stat + (1 - avg_eta) * mean_stat</code>.
@@ -143,10 +143,10 @@ namespace stan {
       }
 
       /**
-       * Return the number of times that the (possibly unnormalized)
+       * Returns the number of times that the (possibly unnormalized)
        * log probability function has been evaluated by this sampler.
        * This is a useful alternative to wall time in evaluating the
-       * relative performance of different algorithms. However, it's
+       * relative performance of different algorithms. However, it is
        * up to the sampler implementation to be sure to actually keep
        * track of this.
        *
@@ -220,7 +220,7 @@ namespace stan {
        *
        * The base class implementation is a no-op.
        *
-       * @param o Output stream to which params are written.
+       * @param[out] o Output stream to which params are written.
        */
       virtual void write_sampler_params(std::ostream& o) { 
       }
@@ -238,7 +238,7 @@ namespace stan {
        *
        * The base class implementation is a no-op.
        *
-       * @param o Output stream to which param names are written.
+       * @param[out] o Output stream to which param names are written.
        */
       virtual void write_sampler_param_names(std::ostream& o) { 
       }
