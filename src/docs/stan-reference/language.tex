@@ -1,0 +1,2159 @@
+\part{Modeling Language Reference}
+
+\chapter{Execution of a \Stan Program}
+
+The following is a sketch of how a compiled \Stan model is executed.
+Details of the language for variable declarations, statements, and
+blocks are given in the following chapters of this part.
+
+\section{Before Sampling}
+
+\subsection{Read Data}
+
+The first step of execution is to read data into memory. 
+For the \Stan command, data is read from files in the
+dump format; for calls from \R, it will be done directly from
+the \R environment in memory.
+
+Any declared constraints on data are validated.  
+
+\subsection{Define Transformed Data}
+
+Next, the transformed data variable statements are executed
+in order to define the transformed data variales.  
+
+Any declared constraints on the transformed data variables are
+validated after the statements execute.
+
+\subsection{Initialization}
+
+If there are user-supplied initial values for parameters, these are
+read using the same input source as data reads (file for the \Stan
+command, the \R environment when called from \R).  Any constraints
+declared on the parameters are validated for the initial values.
+These values are then transformed to unconstrained values in order to
+perform the initialization.
+
+If there are no user-supplied initial values, the unconstrained
+initial values are generated uniformly from the interval $(-2,2)$.
+
+\section{Sampling}
+
+Sampling is based on simulating the Hamiltonian of a particle with a
+starting position equal to the current parameter values and an initial
+momentum (kinetic energy) generated randomly.  The force at work on
+the particle is the negative log (unnormalized) total probability
+function defined by the model.  Under the usual \HMC approach, the
+particle is simulated using the leapfrog integrator, which discretizes
+the smooth path of the particle into a number of small time steps called
+leapfrog steps.
+
+\subsection{Leapfrog Steps}
+
+For each leapfrog step, the negative log probability function and its
+gradient need to be evaluated twice at different values (a more
+detailed sketch is provided in the next section).  The first
+evaluation is used to update the momentum a half step size based on
+the gradient.  Then the position (that is, parameter values) are
+updated a full step based on the momentum.  Finally, the second
+evaluation of the log probabilty and graident are used to update the
+momentum another half step.
+
+For simple models, only a few leapfrog steps with large step sizes are
+needed.  For complex models, many small leapfrog steps may be needed
+to navigate a complex posterior.
+
+If the user has specified the number of leapfrog steps (i.e., chosen
+to use basic \HMC), the specified number of leapfrog steps are
+simulated.  If the user has not specified the number of leapfrog
+steps, the no-U-turn sampler (\NUTS) will determine the number of
+leapfrog steps adaptively.
+
+\subsection{Log Probability and Gradient Calculation}
+
+Twice during each leapfrog step, the log probability function and its
+gradient must be calculated.  This is where most of the time in the
+\Stan algorithm is spent.
+
+The first step of the calculation requires the inverse transform of
+the unconstrained parameter values visible to \HMC back to the
+constrained parameters in terms of which the model is defined.  There
+is no error checking required because the inverse transform is 
+a total function every point in whose range satisfies the constraints.
+
+Because the probability statements in the model are defined in terms
+of constrained parameters, the log absolute Jacobian determinant of
+the inverse transform must be added to the accumulated log
+probability.
+
+Next, the transformed parameter statements are executed.  After they
+complete, any constraints declared for the transformed parameters are
+checked.  
+
+The final step in the log probability funcition calculation is to
+execute the statements defined in the model block.  
+
+As the log probabilty function executes, it accumulates an in-memory
+representation of the expression tree used to calculate the value.
+This includes all of the transformed parameter operations and all of
+the Jacobian adjustments.  This tree is then used to evaluate the
+gradients by propagating partial derivatives backward along the
+expression graph.  The gradient calculations account for the majority
+of the cycles consumed by a \Stan program.
+
+\section{Metropolis Accept/Reject}
+
+A standard Metrpolis accept/reject step is required to retain detailed
+balance and ensure samples represent the posterior.  This step is
+based on comparing log probabilities plus momenta and rejection is
+based on how well the discrete leapfrog integrator has approximated
+the true path.  
+
+If step sizes are small, very few updates will be rejected, but many
+steps will be required, and vice-versa.  If the user has not specified
+a step size, \Stan will adaptively tune the step size during warmup
+sampling to achieve a desired rejection rate (thus balancing rejection
+versus number of steps).  
+
+If the proposal is accepted, the parameters are updated to their new
+values.  Otherwise, the sample is the current set of parameter values.
+
+
+\section{Output}
+
+For each final sample (not counting samples during warmup or samples
+that are thinned), there is an output stage of writing the samples.
+The write is to a file for the \Stan command, but will be to \R's memory
+for the \R interface.
+
+\subsection{Derived Quantities} 
+
+Before generating any output, the statements in the derived quantities 
+block are executed.  This can be used for any forward simulation based
+on parameters of the model.  Or it may be used to transform parameters
+to an appropriate form for output.  
+
+After the derived quantities statements execute, the constraints
+declared on derived quantities variables are validated.  
+
+\subsection{Write}
+
+The final step is to write the actual values.  The values of all
+variables declared as parameters, transformed parameters, or derived
+quantities are written.  Local variables are not written, nor is the
+data or transformed data.  All values are written in their constrained
+forms, that is the form that is used in the model definitions.
+
+% PSEUDOCODE FOR STAN MODEL
+% \begin{verbatim}
+% read data into memory
+% validate data constraints
+% execute transformed data statements
+% validate transformed data constraints
+% read and inverse transform initial parameter values 
+%     (OR randomly initialize)
+% for each sample desired:
+%     if warming up and adapting, adapt step size
+%     randomly initialize momentum
+%     for each leapfrog step:
+%         calculate log probabilty and gradient
+%         increment momentum by half step-size times gradient
+%         increment parameters by step-size times momentum
+%         calculate log probabilty and gradient
+%         increment momentum by half step-size times gradient
+%     if not rejected by Metropolis condition:
+%         update parameters to new values
+%         execute derived quantities statement
+%         validate transformed quantities constraints
+%         write parameters, transformed parameters, derived quantities
+% \end{verbatim}
+
+
+
+\chapter{Data Types and Variable Declarations}\label{data-types.chapter}
+
+This chapter covers the data types that values may have in \Stan.
+Every variable used in a \Stan program must have a declared data type.
+Only values of that type will be assignable to the variable.  This
+follows the convention of programming languages like \Cpp, not the
+conventions of scripting languages like Python or statistical
+languages such as \R or \BUGS.  The motivation for strong, static
+typing is twofold.  First, it forces the programmer's intent to be
+declared with the variable, making programs easier to comprehend and
+hence debug and maintain.  Second, it catches programming errors
+relative to that intent to be caught sooner (at compile time) rather
+than later (at run time).  The \Stan compiler (see \refchapter{stanc})
+will flag any type errors and indicate the offending expressions
+quickly when the program is compiled.
+
+\section{Overview of Data Types}
+
+The primitive \Stan data types are \code{real} for continuous scalar
+quantities and \code{int} for integer values.  The compound data
+types include \code{vector} (of real values), \code{row\_vector} (of
+real values), and \code{matrix} (of real values).
+
+Integer or real types may be constrained with lower bounds, upper
+bounds, or both.  There are two specialized vector data types,
+\code{simplex} for unit simplices and \code{pos\_ordered} for positive,
+ordered sequences of scalars.  There are two specialized matrix data
+types, \code{corr\_matrix} and \code{cov\_matrix}, for correlation
+matrices (symmetric, positive definite, unit diagonal) and covariance
+matrices (symmetric, positive definite). 
+
+\Stan supports arrays of arbitrary order of any of the basic data
+types or constrained basic data types.  This includes
+three-dimensional arrays of integers, one-dimensional arrays of
+positive reals, four-dimensional arrays of simplexes, one-dimensional
+arrays of row vectors, and so on.
+
+
+
+\section{Primitive Numerical Data Types}
+
+Unfortunately, the lovely mathematical abstraction of integers and
+real numbers is only partially supported by finite-precision computer
+arithmetic.  
+
+\subsection{Integers}\label{int-data-type.section}
+
+Stan uses 64-bit (8-byte) integers for all of its integer
+representations.  The maximum value that can be represented
+as an integer is $2^{63}-1$; the minimum value is $-(2^{63})$.
+
+When integers overflow, their values wrap.  Thus it is up to
+the \Stan programmer to make sure the integer values in their programs
+stay in range.  In particular, every intermediate expression must have
+an integer value that is in range.
+
+\subsection{Reals}\label{real-data-type.section}
+
+\Stan uses 64-bit (8-byte) floating point representations of real
+numbers.  \Stan roughly%
+%
+\footnote{\Stan compiles integers to \code{long int} and reals to
+  \code{double} types in \Cpp.  Precise details of rounding will depend
+  on the compiler and hardware architecture on which the code is run.}
+%
+follows the {\sc ieee} 754 standard for floating-point computation.
+The range of a 64-bit number is roughly $\pm 2^{1022}$, which is
+slightly larger than $\pm 10^{307}$.  It is a good idea to stay well
+away from such extreme values in \Stan models as they are prone to
+cause overflow.
+
+64-bit floating point representations have roughly 16 digits of
+accuracy.  But when they are combined, the result often has less
+accuracy.  In some cases, the difference in accuracy between two
+operands and their result is large.  
+
+There are three special real values used to represent (1) error
+conditions, (2) positive infinity, and (3) negative infinity.  The
+error value is referred to as ``not a number.''
+
+\subsection{Promoting Integers to Reals}
+
+\Stan automatically promotes integer values to real values if
+necessary, but does not automatically demote real values to integers.
+This will cause rounding errors for very large integers .
+
+Real values are not demoted to integers.  For examples, real values
+may only be assigned to real variables, but integer values may be
+assigned to either integer variables or real variables.  What happens
+interally is that the integer representation is converted to a
+floating-point representation.  This operation is not free and is thus
+best avoided if possible.
+
+
+\section{Univariate Data Types and Variable Declarations}
+
+All variables used in a \Stan program must have an explicitly declared
+data type.  The form of a declaration includes the type and the name
+of a variable.  This secton covers univariate types, the next section
+vector and matrix types, and the following section array types.
+
+\subsection{Unconstrained Integer}
+
+Unconstrained integers are declared using the \code{int} keyword.
+For example, the variable \code{N} is declared to be an integer using
+%
+\begin{quote}
+\begin{Verbatim} 
+int N;
+\end{Verbatim}
+\end{quote}
+% 
+As in this example, all variable declarations must end with semicolon.
+
+\subsection{Constrained Integer}
+
+Integer data types may be constrained to allow values only in a
+specified interval by providing a lower bound, an upper bound, or
+both.  For instance, to declare \code{N} to be a positive integer, use
+%
+\begin{quote}
+\begin{Verbatim}
+int(1,) N;
+\end{Verbatim}
+\end{quote}
+%
+This illustrates that the bounds are inclusive for integers.
+
+To declare an integer variable \code{cond} to take only binary values,
+that is 0 or 1, a lower and upper bound must be provided, as in
+%
+\begin{quote}
+\begin{Verbatim} 
+int(0,1) cond;
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{Unconstrained Real}
+
+Unconstrained real variables are declared using the keyword
+\code{real}.  For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real theta;
+\end{Verbatim}
+\end{quote}
+%
+declares a real valued variable \code{theta}.
+
+\subsection{Constrained Real}
+
+Real variables may be bounded using the same syntax as integers.  In
+theory (that is, with arbitrary-precision arithmetic), the bounds on
+real values would be exclusive.  Unfortunately, finite-precision
+arithmetic rounding errors will often lead to values on the
+boundaries, so they are allowed in \Stan.
+ 
+The variable \code{sigma} may be declared to be non-negative by
+%
+\begin{quote}
+\begin{Verbatim}
+real(0,) sigma;
+\end{Verbatim}
+\end{quote}
+%
+The variable \code{x} may be declared to be less than -1 by
+%
+\begin{quote}
+\begin{Verbatim} 
+real(,-1) x;
+\end{Verbatim}
+\end{quote}
+% 
+To ensure \code{rho} takes on values between -1 and 1, use
+%
+\begin{quote}
+\begin{Verbatim}
+real(-1,1) rho;
+\end{Verbatim}
+\end{quote}
+%
+
+
+\subsection{Expressions as Bounds}
+
+Bounds for integer or real variables may be arbitrary expressions, the
+only requirement being that they do not include non-data variables.
+That is, any variable used in an expression declaring a bound must be
+declared in the data block or the transformed data block.  For
+example, it is acceptable to have the following
+%
+\begin{quote}
+\begin{Verbatim}
+data { 
+ real lb;
+}
+parameters {
+ real(lb,) phi;
+}
+\end{Verbatim}
+\end{quote}
+%
+This declares a real-valued parameter \code{phi} to take values
+greater than the value of the real-valued data variable \code{lb}.
+Constraints may involve arbitrary expressions so long as the result is
+of type integer and the only variables involved are data or
+transformed data variables.  For instance,
+\begin{quote}
+\begin{Verbatim}
+data { 
+ int(1,) N;
+ real y[N];
+}
+parameters {
+ real(min(y),max(y)) phi;
+}
+\end{Verbatim}
+\end{quote}
+%
+This declares a positive integer data variable \code{N}, an array \code{y} of
+real-valued data of length \code{N}, and then a parameter ranging
+between the minimum and maximum value of \code{y}.
+
+
+\section{Vector and Matrix Data Types}
+
+\subsection{Indexing}
+
+Vectors and matrices, as well as arrays, are indexed starting from 1
+in \Stan.  This follows the convention in statistics and linear
+algebra as well as their implementations in the statistical software
+packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
+languages, on the other hand, such as \Cpp and Python, index from 0.
+
+
+\subsection{Unconstrained Vectors}
+
+Vectors in \Stan are column vectors; see the next subsection for
+information on row vectors.  Vectors are declared with a size (i.e., a
+dimensionality).  For example, a 3-dimensional vector is declared with
+the keyword \code{vector}, as in 
+%
+\begin{quote}
+\begin{Verbatim}
+vector(3) u;
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Unit Simplices}
+
+A unit simplex is a vector with non-negative values whose entries sum
+to 1.  For instance, $(0.2,0.3,0.4,0.1)^{\top}$ is a unit 4-simplex.
+Unit simplexes are most often used as parameters in categorical
+or multinomial distributions, and they are also the sampled variate in
+a Dirichlet distribution.  Simplices are declared with their full
+dimensionality.  For instance, \code{theta} is declared to
+be a unit $5$-simplex by
+%
+\begin{quote}
+\begin{Verbatim} 
+simplex(5) theta;
+\end{Verbatim}
+\end{quote}
+% 
+
+Unit simplices are implemented as vectors and may be assigned to other
+vectors.  
+
+
+\subsection{Positive, Ordered Vectors}
+
+A positive ordered vector is a vector whose positive entries are
+sorted in ascending order.  For instance, $(1.0,2.7,2.71)^{\top}$ is a
+positive, ordered vector.  Positive ordered vectors are most often
+employed as cut points in ordinal logistic regression models.  
+
+The variable \code{c} is declared as an ordered 5-vector of positive
+values by
+%
+\begin{quote}
+\begin{Verbatim}
+pos_ordered(5) c;
+\end{Verbatim}
+\end{quote}
+%
+
+After their declaration, positive, ordered vectors, like unit
+simplices, may be assigned to other vectors and other vectors may be
+assigned to them.  
+
+\subsection{Unconstrained Row Vectors}
+
+Row vectors are declared with the keyword \code{row\_vector}.
+Like (column) vectors, they are declared with a size.  For example,
+a 1093-dimensional row vector \code{u} would be declared as
+%
+\begin{quote}
+\begin{Verbatim}
+row_vector(1093) u;
+\end{Verbatim}
+\end{quote}
+%
+
+Row vectors may not be assigned to column vectors, nor may column
+vectors be assigned to row vectors.  If assignments are required, they
+may be done element-wise in a loop or by using the transpose operator.
+
+\subsection{Unconstrained Matrices}
+
+Matrices are declared with the keyword \code{matrix} along with a
+number of rows and number of columns.  For example, 
+%
+\begin{quote}
+\begin{Verbatim}  
+matrix(3,3) A;  
+matrix(M,N) B;
+\end{Verbatim}
+\end{quote}
+%  
+declares \code{A} to be a $3 \times 3$ matrix and \code{B} to be a $M
+\times N$ matrix.  For the second declaration to be well formed, the
+variables \code{M} and \code{N} must be declared as integers in either
+the data or transformed data block.
+
+\subsection{Correlation Matrices}
+
+Matrix variables may be constrained to represent correlation matrices.
+A matrix is a correlation matrix if it is positive definite (and hence
+square and symmetric), has entries between -1 and 1, and has a unit
+diagonal.  Because correlation matrices are square, they only need one
+dimension declared.  For example,
+%
+\begin{quote}
+\begin{Verbatim} 
+corr_matrix(3) Sigma;
+\end{Verbatim}
+\end{quote}
+% 
+declares \code{Sigma} to be a $3 \times 3$ correlation matrix.
+
+Correlation matrices may be assigned to other matrices, including
+unconstrained matrices, if their dimensions match, and vice-versa.
+
+\subsection{Covariance Matrices}
+
+Matrix variables may be constrained to represent covariance matrices.
+A matrix is a covariance matrix if it is positive definite (and hence
+square and symmetric with positive diagonal entries).  Like
+correlation matrices, covariance matrices only need a single dimension
+in their declaration.  For instance,
+%
+\begin{quote}
+\begin{Verbatim} 
+cov_matrix(K) Omega;
+\end{Verbatim}
+\end{quote}
+% 
+declares \code{Omega} to be a $K \times K$ correlation matrix, where
+$K$ is the value of the data variable \code{K}.
+
+\subsection{Accessing Vector and Matrix Elements}
+
+If \code{v} is a column vector or row vector, then \code{v[2]} is the
+second element in the vector.  If \code{m} is a matrix, then
+\code{m[2,3]} is the value in the second row and third column.
+
+Providing a matrix with a single index returns the specified row.  For
+instance, if \code{m} is a matrix, then \code{m[2]} is the second row.
+This allows \Stan blocks such as
+%
+\begin{quote}
+\begin{Verbatim} 
+matrix(M,N) a;    
+row_vector(N) v;    
+real x;
+...
+v <- m[2];   
+x <- v[3];   // x == m[2][3] == m[2,3]
+\end{Verbatim}
+\end{quote}
+% 
+The type of \code{m[2]} is \code{row\_vector} because it is the second
+row of \code{m}.  Thus it is possible to write \code{m[2][3]} instead
+of \code{m[2,3]} to access the third element in the second row.  When
+given a choice, the form \code{m[2,3]} is preferred.%
+%
+\footnote{As of the beta version of \Stan version 1.0, the form
+  \code{m[2,3]} is more efficient because it does not require the
+  creation and use of an intermediate expression template for
+  \code{m[2]}.  In later versions, explicit calls to \code{m[2][3]}
+  may be optimized to be as efficient as \code{m[2,3]} by the \Stan
+  compiler.}
+
+
+\section{Array Data Types}
+
+\Stan supports arrays of arbitrary dimension.  An array's elements may
+be any of the basic data types, that is univariate integers,
+univariate reals, vectors, row vectors matrices, including all of the
+constrained forms.
+
+\subsection{Declaring Array Variables}
+
+Arrays are declared by enclosing the dimensions in square brackets
+following the name of the variable.
+
+The variable \code{n} is declared as an array of 5 integers by
+%
+\begin{quote}
+\begin{Verbatim}  
+int n[5];
+\end{Verbatim}
+\end{quote}
+% 
+A 2-dimensional array of real values with 3 rows and 4 columns is
+delcared with
+%
+\begin{quote}
+\begin{Verbatim}  
+real a[3,4];
+\end{Verbatim}
+\end{quote}
+% 
+A 3-dimensional array \code{z} of positive reals with 5 rows, 4
+columns, and 2 shelfs is declared by
+%
+\begin{quote}
+\begin{Verbatim} 
+real(0,) z[5,4,2];
+\end{Verbatim}
+\end{quote}
+%
+
+Arrays may also be declared to contain vectors.  For example,
+%
+\begin{quote}
+\begin{Verbatim}  
+vector(7) mu[3];
+\end{Verbatim}
+\end{quote}
+% 
+declares \code{mu} to be a 3-dimensional array of 7-vectors.  
+Arrays may also contain matrices.  The example
+%
+\begin{quote}
+\begin{Verbatim} 
+matrix(7,2) mu[15,12];
+\end{Verbatim}
+\end{quote}
+%
+declares a $15 \times 12$-dimensional array of $7 \times 2$ matrices.
+Any of the constrained types may also be used in arrays, as in the
+declaration
+%
+\begin{quote}
+\begin{Verbatim}  
+cov_matrix(5) mu[2,3,4];
+\end{Verbatim}
+\end{quote}
+% 
+of a $2 \times 3 \times 4$ array of $5 \times 5$ covariance matrices.
+
+\subsection{Accessing Array Elements and Subarrays}
+
+If \code{x} is a 1-dimensional array of length 5, then \code{x[1]} is
+the first element in the array and \code{x[5]} is the last.  For a $3
+\times 4$ array \code{y} of 2-dimesions, \code{y[1,1]} is the first
+element and \code{y[3,4]} the last element.  For a 3-dimensional
+array \code{z}, the first element is \code{z[1,1,1]}, and so on.
+
+Slices of arrays may be accessed by providing fewer than the full
+number of indexes.  For example, suppose \code{y} is a 2-dimensional
+array with 3 rows and 4 columns.  Then \code{y[3]} is 1-dimensional
+array of length 4.  This means that \code{y[3][1]} may be used instead
+of \code{y[3,1]} to access the value of the first column of the third
+row of \code{y}.  The form \code{y[3,1]} is the preferred form.
+
+Subarrays may be manipulated and assigned just like any other
+variables.  Similar to the behavior of matrices, \Stan allows blocks
+such as 
+%
+\begin{quote}
+\begin{Verbatim} 
+real w[9,10,11];
+real x[10,11];
+real y[11];
+real z;
+...
+x <- w[5];
+y <- x[4];  // y == w[5][4] == w[5,4]
+z <- y[3];  // z == w[5][4][3] == w[5,4,3]
+\end{Verbatim}
+\end{quote}
+%
+
+\section{Types versus Sizes}
+
+The size associated with a given variable is not part of its data
+type.  The sizes may determined dynamically (at run time) and thus
+cannot be type-checked statically.  
+
+\subsection{Type Naming Notation}
+
+In order to refer to data types, it is convenient to have a way to
+refer to them.  The type naming notation outlined in this section is
+not part of the \Stan programming language, but rather a convention
+adopted in this document to enable a concise description of a type.
+
+Because size information is not part of a data type, data
+types will be written without size information.  For instance,
+\code{real[]} is the type of one-dimensional array of reals and
+\code{matrix} is the type of matrices.  The three-dimensional integer
+array type is written as \code{int[,,]}, indicating the number slots
+available for indexing.  Similarly, \code{vector[,]} is the type of a
+two-dimensional array of vectors.
+
+
+
+
+
+\chapter{Expressions}
+
+An expression is the basic syntactic unit in a \Stan program that
+denotes a value.  Every expression in a well-formed \Stan program has
+a type that is determined statically (at compile time).  If an
+otherwise well-formed program has an expression whose type cannot be
+determined statically, the \Stan compiler (see \refchapter{stanc})
+will report the location of the ill-formed expression.
+
+This chapter covers the syntax, typing, and usage of the various forms
+of expressions in \Stan. 
+
+\section{Numeric Literals}
+
+The simplest form of expression is a literal that denotes a primitive
+numerical value.   
+
+\subsection{Integer Literals}
+
+A number written without a period is assigned the integer numeric type
+\code{int}.
+
+Integer literals are written in base 10 without any separators.
+Integer literals may contain a single negative sign.  (The expression
+\code{--1} is interpreted as the negation of the literal \code{-1}.)
+
+The following list contains well-formed integer literals.
+%
+\begin{quote}
+\code{0}, \ \code{1}, \ \code{-1}, \ \code{256}, 
+\ \code{-127098}, \ \code{24567898765}
+\end{quote}
+%
+Integer literals must have values that fall within the bounds for
+integer values (\refsection{int-data-type}).
+
+\subsection{Real Literals}
+
+A number written with a period or with scientific notation is assigned
+to a the continuous numeric type \code{real}.  Real literals are
+written in base 10 with a period (\code{.}) as a separator.  Examples
+of well-formed double literals include the following.
+%
+\begin{quote}
+\code{0.0}, \ \code{1.0}, \ \code{3.14}, \ \code{-217.9387}, \ 
+\code{2.7e3}, \ \code{-2E-5}
+\end{quote}
+%
+The notation \code{e} or \code{E} followed by a positive or negative
+integer denotes a power of 10 to multiply.  For instance \code{2.7e3}
+denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
+10^{-5}$.
+
+
+\section{Variables}
+
+A variable by itself is a well-formed expression of the same type as
+the variable.  Variables in \Stan consist of \ASCII strings containing
+only the basic lower-case and upper-case Roman letters, digits, and
+the underscore (\code{\_}) character.   Examples of legal variable
+identifiers are as follows.
+\begin{quote}
+\code{a}, 
+\ \code{a3}, 
+\ \code{a\_3},
+\ \code{Sigma}, 
+\ \code{my\_cpp\_style\_variable},
+\ \code{myCamelCaseVariable}
+\end{quote}
+%
+Unlike in \R and \BUGS, variable identifiers in \Stan may not contain
+a period character.
+
+\subsection{Legal Characters}
+
+The legal variable characters have the same \ASCII code points in the
+range 0--127 as in Unicode.
+%
+\begin{center}
+\begin{tabular}{cc}
+Characters  & \ASCII (Unicode) Code Points
+\\ \hline
+\code{a -- z} & \code{{}~97 -- 122}
+\\
+\code{A -- Z} & \code{{}~65 -- {}~90}
+\\
+\code{0 -- 9} & \code{{}~48 -- {}~57}\
+\\
+\code{\_} & \code{95}
+\end{tabular}
+\end{center}
+%
+Although not the most expressive character set, \ASCII is the most
+portable and least prone to corruption through improper character
+encodings or decodings.
+
+\section{Arithmetic and Matrix Expressions}
+
+For integer and real-valued expression, \Stan supports the basic
+binary arithmetic operations of addition (\code{+}), subtraction
+(\code{-}), multiplication (\code{*}) and division (\code{/}) in the
+usual ways.  \Stan also supports the unary operation of negation for
+integer and real-valued expressions.  For example, assuming \code{n}
+and \code{m} are integer variables and \code{x} and \code{y} real
+variables, the following expressions are legal.
+\begin{quote}
+\code{3.0 + 0.14}, 
+\ \ \code{-15},
+\ \ \code{2 * 3 + 1}, 
+\ \ \code{(x - y) / 2.0},
+\\
+\ \ \code{(n * (n + 1)) / 2},
+\ \ \code{x / n}
+\end{quote}
+%
+The negation, addition, subtraction, and multiplication operations are
+extended to matrices, vectors, and row vectors.  The transpose
+operation, written using an apostrophe (\code{'}) is also supported
+for vectors, row vectors, and matrices.  Return types for matrix
+operations are the smallest types that can be statically guaranteed to
+contain the result.  The full set of allowable input types and
+corresponding return types is detailed in
+\refchapter{matrix-operations}.
+
+For example, if \code{y} and \code{mu} are variables of type
+\code{vector} and \code{Sigma} is a variable of type \code{matrix},
+then
+%
+\begin{quote}
+\code{(y - mu) * Sigma * (y - mu)'}
+\end{quote}
+%
+is a well-formed expression of type \code{real}.  The type of the
+complete expression is inferred working outward from the
+subexpressions.  The subexpression(s) \code{y - mu} are of type
+\code{vector} because the variables \code{y} and \code{mu} are of type
+\code{vector}.  The transpose of this expression, the subexpression
+\code{(y - mu)'} is of type \code{row\_vector}.  Multiplication is
+left associative and transpose has higher precedence than
+multiplication, so the above expression is equivalent to the following
+well-formed, fully specified form.
+%
+\begin{quote}
+\code{((y - mu) * Sigma) * ((y - mu)')}
+\end{quote}
+%
+The type of subexpression \code{(y - mu) * Sigma} is inferred to be
+\code{vector}, being the result of multiplying a (column) vector by a
+matrix.  The whole expression's type is thus the type of a vector
+multiplied by a column vector, which produces a \code{real} value.
+
+
+
+\subsection{Operator Precedence and Associativity}
+
+The arithmetic operators have the following precedence and
+associativity.
+%
+\begin{center}
+\begin{tabular}{c|ccl|l}
+{\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
+  Placement} & {\it Description}
+\\ \hline \hline
+\code{+} & 0 & left & binary infix & addition
+\\
+\code{-} & 0 & left & binary infix & subtraction
+\\ \hline
+\code{*} & 1 & left & binary infix & multiplication
+\\
+\code{/} & 1 & left & binary infix & division
+\\ \hline
+\code{.*} & 1 & left & binary infix & elementwise multiplication
+\\
+\code{./} & 1 & left & binary infix & elementwise division
+\\ \hline
+\code{-} & 2 & n/a & unary prefix & negation
+\\ \hline
+\code{'} & 3 & n/a & unary posfix & transposition
+\end{tabular}
+\end{center}
+%
+Other expression-forming operations, such as function application and
+subscripting bind more tightly than any of the arithmetic operations.  
+
+The precedence and associativity determine how expressions are
+interpreted.  Because addition is left associative, the expression
+\code{a+b+c} is interpreted as \code{(a+b)+c}.  Similarly,
+\code{a/b*c} is interpreted as \code{(a/b)*c}.  
+
+Because multiplication has higher precedence than addition, the
+expression \code{a*b+c} is interpreted as \code{(a*b)+c} and the
+expression \code{a+b*c} is interpreted as \code{a+(b*c)}.  Similarly,
+\code{2*x+3*-y} is interpreted as \code{(2*x)+(3*(-y))}.
+
+Transposition binds tighter than all other operations, so that
+\code{u*v'} is interpeted as \code{u*(v')} and \code{u'*v} as
+\code{(u')*v}.
+
+\section{Subscripting}
+
+\Stan arrays, matrices, vectors, and row vectors are all accessed
+using the same array-like notation.  For instance, if \code{x} is a
+variable of type \code{real[]} (a one-dimensional array of reals)
+then \code{x[1]} is the value of the first element of the
+array.  
+
+Subscripting has higher precedence than any of the arithmetic
+operations.  For example, \code{alpha*x[1]} is equivalent to
+\code{alpha*(x[1])}.  
+
+Multiple subscripts may be provided within a single pair of square
+brackets.  If \code{x} is of type \code{real[,]}, a two-dimensional
+array, then \code{x[2,501]} is of type \code{real}.
+
+\subsection{Accessing Subarrays}
+
+The subscripting operator also returns subarrays of arrays.  For
+example, if \code{x} is of type \code{real[,,]}, then \code{x[2]}
+is of type \code{real[,]}, and \code{x[2,3]} is of type
+\code{real[]}.  As a result, the expressions \code{x[2,3]} and
+\code{x[2][3]} have the same meaning.  
+
+\subsection{Accessing Matrix Rows}
+
+If \code{Sigma} is a variable of type \code{matrix}, then
+\code{Sigma[1]} denotes the first row of \code{Sigma} and has the
+type \code{row\_vector}.  
+
+\subsection{Mixing Array and Vector/Matrix Indexes}
+
+\Stan supports mixed indexing of arrays and their vector, row vector
+or matrix values.  For example, if \code{m} is of type
+\code{matrix[,]}, a two-dimensional array of matrices, then
+\code{m[1]} refers to the first row of the array, which is a
+one-dimensional array of matrices.  More than one index may be used,
+so that \code{m[1,2]} is of type \code{matrix} and denotes the matrix
+in the first rwo and second column of the array.  Continuing to add
+indices, \code{m[1,2,3]} is of type \code{row\_vector} and denotes
+the third row of the matrix denoted by \code{m[1,2]}.  Finally,
+\code{m[1,2,3,4]} is of type \code{real} and denotes the value in the
+third row and fourth column of the matrix that is found at the first
+row and second column of the array \code{m}.
+
+\section{Function Application}
+
+\Stan provides a broad-range of built in mathematical and statistical
+functions, which are documented in \refpart{built-in-functions}.
+
+Expressions in \Stan may consist of the name of function followed by a
+sequence of zero or more argument expressions.  For instance,
+\code{log(2.0)} is the expression of type \code{real} denoting the
+result of applying the natural logarithm to the value of the real
+literal \code{2.0}.
+
+Syntactically, function application has higher precedence than any of
+the other operators, so that \code{y + log(x)} is interpreted as
+\code{y + (log(x))}.
+
+\subsection{Type Signatures and Result Type Inference}
+
+Each function has a type signature which determines the allowable type
+of its arguments and its return type.  For instance, the function
+signature for the logarithm function can be expressed as
+%
+\begin{quote}
+\code{real log(real);}
+\end{quote}
+%
+and the signature for the \code{multiply\_log} function is
+%
+\begin{quote}
+\code{real multiply\_log(real,real);}
+\end{quote}
+%
+A function is uniquely determined by its name and its sequence of
+argument types.  For instance, the following two functions are
+different functions.
+%
+\begin{quote}
+\code{real mean(real[]);}
+\\
+\code{real mean(vector);}
+\end{quote}
+%
+The first applies to a one-dimensional array of real values and the
+second to a vector.
+
+The identity conditions for functions explicitly forbids having two
+functions with the same name and argument types but different return
+types.  This restriction also makes it possible to infer the type of a
+function expression compositionally by only examining the type of its
+subexpressions. 
+
+\subsection{Constants}
+
+Constants in \Stan are nothing more than nullary (no-argument)
+functions.  For instance, the mathematical constants $\pi$ and $e$ are
+represented as nullary functions named \code{pi()} and \code{e()}.
+
+\subsection{Type Promotion and Function Resolution}
+
+Because of integer to real type promotion, rules must be established
+for which function is called given a sequence of argument types.  The
+scheme employed by \Stan is the same as that used by \Cpp, which
+resolves a function call to the function requiring the minimum number
+of type promotions.  
+
+For example, consider a situation in which the following two function
+signatures have been registered for \code{foo}.
+%
+\begin{quote}
+\code{real foo(real,real);}
+\\
+\code{int foo(int,int);}
+\end{quote}
+%
+The use of \code{foo} in the expression \code{foo(1.0,1.0)} resolves
+to \code{foo(real,real)}, and thus the expression \code{foo(1.0,1.0)}
+itself is assigned a type of \code{real}.  
+
+Because integers may be promoted to real values, the expression
+\code{foo(1,1)} could potentially match either \code{foo(real,real)}
+or \code{foo(int,int)}.  The former requires two type promotions and
+the latter requires none, so \code{foo(1,1)} is resolved to function
+\code{foo(int,int)} and is thus assigned the type \code{int}.
+
+The expression \code{foo(1,1.0)} has argument types \code{(int,real)}
+and thus does not explicitly match either function signature.  By
+promoting the integer expression \code{1} to type \code{real}, it is
+able to match \code{foo(real,real)}, and hence the type of the
+function expression \code{foo(1,1.0)} is \code{real}.
+
+In some cases (though not for any built-in \Stan functions), a
+situation may resolve in which the function referred to by an
+expression remains ambiguous.  For example, consider a situation in
+which there are exactly two functions named \code{bar} with the
+following signatures.
+%
+\begin{quote}
+\code{real bar(real,int);}
+\\
+\code{real bar(int,real);}
+\end{quote}
+%
+With these signatures, the expression \code{bar(1.0,1)} and
+\code{bar(1,1.0)} resolve to the first and second of the above
+functions, respectively.  The expression \code{bar(1.0,1.0)} is
+illegal because real values may not be demoted to integers.  
+
+The expression \code{bar(1,1)} is illegal for a different reason.
+Both of the function signatures above have consistent argument types.
+If the first argument is promoted to a real value, it matches the
+first signature, whereas if the second argument is promoted to a real
+value, it matches the second signature.  The problem is that these
+both require one promotion, so the function name \code{bar} is
+ambiguous.  In these situations where there is no function requiring
+fewer promotions than all others, the \Stan compiler will flag the
+epression \code{bar(1,1)} as illegal and list the potentially matching
+ambiguous functions.
+
+
+\subsection{Extending \Stan with User-Defined Functions}
+
+\Stan enables users to add their own functions by defining appropirate
+\Cpp functions and registering their signatures with the \Stan
+compiler.  Details are provided in \refappendix{user-defined-functions}.
+
+
+\section{Parentheses for Grouping}
+
+Any expression wrapped in parentheses is also an expression. Like in
+\Cpp, but unlike in \R, only the round parentheses, \code{(} and
+\code{)}, are allowed.  The square bracketes \code{[} and \code{]} are
+reserve for array indexing and the curly braces \code{\{} and
+\code{\}} for grouping statements.
+
+With parentheses it is possible to explicitly group subexpressions
+with operators.  Without parentheses, the expression \code{1 + 2 * 3}
+has a subexpression \code{2 * 3} and evaluates to 7.  With
+parentheses, this grouping may be made explicit with the expression
+\code{1 + (2 * 3)}.  More importantly, the alternative evaluate order
+becomes possible with \code{(1 + 2) * 3}, which evaluates to 6.
+
+
+
+\chapter{Statements}
+
+The blocks of a \Stan program (see \refchapter{blocks}) are made up of
+variable declarations and statements.  Unlike programs in \BUGS or
+\JAGS, the declarations and statments making up a \Stan program are
+executed in the order in which they are written.  Thus variables need
+to be defined before they are used, or there will be undefiend
+behavior.  Like \BUGS and \JAGS, \Stan has two kinds of atomic
+statements, assignment statements and probability statements.  Also
+like those other languages, statements may be grouped into sequences
+and into for loops.  In addition, \Stan allows local variables to be
+declared in blocks and also allows an empty statement consisting only
+of a semicolon.
+
+\section{Assignment Statement}
+
+An assignment statement consists of a variable (possibly multivariate
+with indexing information) and an expressions.  Executing an
+assignment statement evaluates the expression on the right-hand side
+and assigns it to the (indexed) variable on the left-hand side.  An
+example of a simple assignment is
+%
+\begin{quote}
+\code{n <- 0;}
+\end{quote}
+%
+Executing this statement assigns the value of the expression \code{0},
+which is the integer zero, the variable \code{n}.  For an assignment
+to be well-formed, the type of the expression on the right-hand side
+should be compatible with the type of the (indexed) variable on the
+left-hand side.  For the above example, because \code{0} is an
+expression of type \code{int}, the variable \code{n} must be declared
+as being of type \code{int} or of type \code{real}.  If the variable
+is of type \code{real}, the integer zero is promoted to a
+floating-point zero and assigned to the variable.  After the
+assignment statement executes, the variable \code{n} will have the
+value zero (either as an integer or a continuous value, depending on
+its type).
+
+Syntactically, every assignment statement must be followed by a
+semicolon.  Otherwise, whitespace between the tokens does not matter
+(the tokens here being the left-hand-side (indexed) variable, the
+assignment operator, the right-hand-side expression and the
+semicolon).
+
+Because the right-hand side is evaluated first, it is possible to
+increment a variable in \Stan just as in \Cpp and other programming
+languages by writing
+%
+\begin{quote}
+\code{n <- n + 1;}
+\end{quote}
+
+The left-hand side may contain indices for array, matrix, or vector
+data structures.  For instance, if \code{Sigma} is of type
+\code{matrix}, then 
+%
+\begin{quote}
+\code{Sigma[1,1] <- 1.0;}
+\end{quote}
+%
+sets the value of the first row and first column of \code{Sigma} to one.
+
+Assignments can involve complex objects of any type.  If \code{Sigma}
+and \code{Omega} are matrices and \code{sigma} is a vector, then the
+following assignment statement, in which the expression and variable
+are both of type \code{matrix}, is well formed.
+%
+\begin{quote}
+\begin{Verbatim}
+Sigma
+  <- diag_matrix(sigma) 
+     * Omega 
+     * diag_matrix(sigma);
+\end{Verbatim}
+\end{quote}
+%
+This example also illustrates the preferred form of splitting a
+complex assignment statement and its expression across lines.
+
+Assignments to slices of larger multi-variate data structures is
+supported by \Stan.  For example, \code{a} is an array of type
+\code{real[,]} and \code{b} is an array of type \code{real[]}, then
+the following two statements are both well-formed.
+%
+\begin{quote}
+\begin{Verbatim}
+a[3] <- b;
+b <- a[4];
+\end{Verbatim}
+\end{quote}
+%
+Similarly, if \code{x} is variable declared to have type
+\code{row\_vector} and \code{Y} is a variable declared as type
+\code{matrix}, then the following sequence of statements to swap the
+first two rows of \code{Y} is well formed.
+%
+\begin{quote}
+\begin{Verbatim}
+x <- Y[1];
+Y[1] <- Y[2];
+Y[2] <- x;
+\end{Verbatim}
+\end{quote}
+
+\section{Sampling Statements}
+
+Like \BUGS and \JAGS, \Stan supports probability statements in
+sampling notation, such as
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+The name ``sampling statement'' is meant to be suggestive, not
+interpreted literally.  Conceptually, the variable \code{y}, which may
+be an unobserved parameter or modeled observed data, is being declared
+to have the distribution indicated by the right-hand side of the
+sampling statement.
+
+Executing such a statement does not perform any sampling.  In \Stan, a
+sampling statement is merely a notational convenenience.  The above
+sampling statement could be written as an assignment statement using
+the reserved variable \code{lp\_\_} as
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + normal_log(y,mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+The variable \code{lp\_\_} acts as an accumulator for the log
+(proportional) probability defined by the model as a function of the
+parameters and data.
+
+In general, a sampling statement of the form
+%
+\begin{quote}
+\begin{Verbatim}
+ex0 ~ dist(ex1,...,exN);
+\end{Verbatim}
+\end{quote}
+%
+involving subexpressions \code{ex0} through \code{exN} (including the
+case where \code{N} is zero) will be well formed if and only if the
+corresponding assignment statement is well-formed,
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + dist_log(ex0,ex1,...,exN);
+\end{Verbatim}
+\end{quote}
+%
+This will be well formed if and only if
+\code{dist\_log(ex0,ex1,...,exN)} is a well-formed function expression
+of type \code{real}.
+
+\subsection{User-Transformed Variables}
+
+The left-hand side of a sampling statement may be a complex
+expression.  For instance, it is legal syntactically to write
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    double(0,) y;
+}
+model {
+    ....
+    log(y) ~ normal(mu,sigma);
+    ...
+}
+\end{Verbatim}
+\end{quote}
+%
+Unfortunately, this is not enough to properly model \code{y} as having
+a lognormal distribution.  The differential change in scale resulting
+for the transformation, in general given by the log absolute Jacobian
+determinant, must be accounted for (see
+\refsection{change-of-variables} for full definitions).  For the case
+above, the following adjustment will account for the above log
+transform.%
+%
+\footnote{Because $\log | d/dy \log y | = \log | 1/y | = - \log
+  |y|$;  see \refsection{change-of-variables}.}
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(fabs(y));
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Truncated Distributions}
+
+A density function $p(x)$ may be truncated to an interval $(a,b)$ to
+define a new density $p_{(a,b)}(x)$ by setting
+%
+\[ 
+p_{\!(a,b)\!}(x) = \frac{p(x)}
+                  {\int_a^b p(x') \, dx'}.
+\] 
+As in \BUGS and \JAGS, \Stan allows probability functions to be
+truncated.  For example, a truncated unit normal distribution
+restricted to $(-0.5,2.1)$ is encoded as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+y ~ normal(0,1) T(-0.5,2.1);
+\end{Verbatim}
+\end{quote}
+% 
+Truncated distributions are translated as an addition summation for
+the accumulated log probability.  For instance, this example has the
+same translation as
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(normal_p(2.1,0,1) - normal_p(-0.5,0,1));
+\end{Verbatim}
+\end{quote}
+%
+The function \code{normal\_p} represents the cumulative normal
+distribution function.  For example, \code{normal\_p(2.1,0,1)} evaluates to 
+\[
+\int_{-\infty}^{2.1} \mbox{\sf Norm}(x|0,1) \, dx,
+\]
+%
+which is the probability a unit normal variable takes on values less
+than 2.1, or about 0.95.
+
+As with constrained variable declarations, truncation can be one
+sided.  The density $p(x)$ can be truncated below by $a$ to define a
+density $p_{(a,)}(x)$ with support $(a,\infty)$ by setting
+%
+\[
+p_{(a,)}(x) = \frac{p(x)}
+                 {\int_a^{\infty} p(x') \, dx'}.
+\]
+For example, the unit normal distribution truncated below at 0.5 would
+be represented as
+%
+\begin{quote}
+\begin{Verbatim} 
+y ~ normal(0,1) T(-0.5,);
+\end{Verbatim}
+\end{quote}
+% 
+The truncation has the same effect as the following direct update to
+the accumulated log probability.
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(1 - normal_p(-0.5,0,1));
+\end{Verbatim}
+\end{quote}
+
+The density $p(x)$ can be truncated above by $b$ to define a density
+$p_{(,b)}(x)$ with support $(-\infty,a)$ by setting
+\[
+p_{(,b)}(x) = \frac{p(x)}
+                    {\int_{-\infty}^b p(x') \, dx'}.
+\]
+For example, the unit normal distribution truncated above at 2.1 would
+be represented as
+%
+\begin{quote}
+\begin{Verbatim} 
+y ~ normal(0,1) T(,2.1);
+\end{Verbatim}
+\end{quote}
+% 
+The truncation has the same effect as the following direct update to
+the accumulated log probability.
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ - log(normal_p(2.1,0,1));
+\end{Verbatim}
+\end{quote}
+
+In all cases, the truncation is only well formed if there is an
+appropriate cumulative distribution function defined.
+\refchapter{discrete-prob-functions} and
+\refchapter{continuous-prob-functions} document the available discrete
+and continuous cumulative distribution functions.
+
+For continuous distributions, truncation points must be expressions of
+type \code{int} or \code{real}.  For discrete distributions, truncation
+points must be expressions of type \code{int}.
+
+
+\subsection{Scope of\, \code{lp\_\_}}
+
+The variable \code{lp\_\_} is only defined in the \code{parameter},
+\code{transformed parameter}, and \code{model} blocks (see
+\refchapter{blocks}).  The variable \code{lp\_\_} is undefined (and
+may not be declared by the user) in the \code{data}, \code{transformed
+  data} and \code{generated quantity} blocks.
+
+\subsection{User-Defined Distributions}
+
+Users may add their own probability functions and cumulative
+distribution by adding functions of the appropriate type.  If the
+appropriate cumulative distribution is available to match a
+probability function, truncated versions of that probabilty function
+may be used. 
+
+See \refappendix{user-defined-functions} for details on how to add
+user-defined functions to \Stan.
+
+
+\section{For Loops}
+
+Suppose
+\code{N} is a variable of type \code{int}, \code{y} is a
+one-dimensional array of type \code{real[]}, and \code{mu} and
+\code{sigma} are variables of type \code{real}.  Furthermore, suppose
+that \code{n} has not been defined as a variable. Then the following
+is a well-formed for-loop statement.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+   y[n] ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The loop variable is \code{n}, the loop bounds are the values in the
+range \code{1:N}, and the body is the statement following the
+loop bounds.  
+
+\subsection{Loop Variable Typing and Scope}
+
+The bounds in a for loop must be integers.  Unlike in \R, the loop is
+always interpreted as an upward counting loop.  The range \code{L:H}
+will cause the loop to execute the loop with the loop variable taking
+on all integer values greater than or equal to \code{L} and less than
+or equal to \code{H}.  For example, the loop \code{for (n in 2:5)}
+will cause the body of the for loop to be executed with \code{n} equal
+to 2, 3, 4, and 5, in order.  The variable and bound \code{for (n in
+  5:2)} will not execute anything because there are no integers
+greater than or equal to 5 and less than or equal to 2.
+
+\subsection{Order Sensitivity and Repeated Variables}
+
+In \BUGS and \JAGS, for loops are declarative.  They define plates in
+directed graphical model notation, which can be thought of as repeated
+substructures in a large graphical model.  Therefore, it is illegal in
+\BUGS or \JAGS to have a for loop that repeatedly reassigns a value to
+a value like \code{theta}.  So while the following code snippet would
+is legal in \Stan, it is prohibited in \BUGS or \JAGS (unless \code{N}
+is equal to 1).
+%
+\begin{quote}
+\begin{Verbatim} 
+for (n in 1:N) {
+   theta <- inv_logit(alpha + x[n] * beta);
+   y[n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+% 
+The problem is that it defines the variable \code{theta} a total of
+\code{N} different times.  One idiom seen in \BUGS and \JAGS code is
+to hack a local variable by replacing \code{theta} in the above with
+\code{theta[n]}, effectively creating \code{N} different variables,
+\code{theta[1]}, \ldots, \code{theta[N]}.  Of course, this is not a
+hack if the value of \code{theta[n]} is required for all \code{n}.
+\Stan supports either version, the one that reuses \code{theta}, or
+the one that uses a different \code{theta[n]} for every loop variable
+instantiation.  
+
+In \Stan, the loop can be written either way.  A different variable
+\code{theta[n]} can be used for each body execution, or a single
+variable \code{theta} may be reused. Either way, the assignment
+statement is guaranteed to be executed in the order it is encountered.
+As a consequence, the following \Stan program has a very different
+interpretation than the previous one.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+   y[n] ~ bernoulli(theta);
+   theta <- inv_logit(alpha + x[n] * beta);
+}
+\end{Verbatim}
+\end{quote}
+%
+In this program, \code{theta} is assigned after it is used in the
+probablity statement.  This presupposes it was defined before the
+first loop iteration, and then each loop uses the assignment from the
+previous iteration.  In \BUGS and \JAGS, the order does not matter.
+The execution order is determined by unfolding the loops into one big
+graphical model.
+
+This is not necessary in \Stan, where the above for loop will behave
+imperatively, with a new value being assigned to \code{theta} in each
+pass through the loop before the probability statement is executed.
+
+\Stan loops may be used to accumulate values.  Thus it is possible to
+sum the values of an array using code such as the following.
+%
+\begin{quote}
+\begin{Verbatim}
+sum <- 0.0;
+for (n in 1:N) 
+   sum <- sum + x[n];
+\end{Verbatim}
+\end{quote}
+%
+After the for loop is executed, the variable \code{sum} will hold the
+sum of the elements in the array \code{x}.
+
+A variable inside (or outside) a loop may even be reassigned multiple
+times, as in the following legal code.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:100) {
+    y <- y + y * epsilon;
+    epsilon <- epsilon / 2.0;
+    y <- y + y * epsilon;
+}
+\end{Verbatim}
+\end{quote}
+%
+
+
+\section{Statement Blocks and Local Variable Declarations}
+
+Just as parentheses may be used to group expressions, curly brackets
+may be used to group a sequence of zero or more statements into a
+statement block.  At the beginning of each block, local variables may be
+declared that are scoped over the rest of the statements in the block.
+
+\subsection{Blocks in For Loops}
+
+Blocks are often used to group a sequence of statements together to be
+used in the body of a for loop.  Because the body of a for loop can be
+any statement, for loops with bodies consisting of a single statement
+can be written as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+for (n in 1:N) 
+ y[n] ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+% 
+To put multiple statements inside the body of a for loop, a block is
+used, as in the following example.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  lambda[n] ~ gamma(alpha,beta);
+  y[n] ~ poisson(lambda[n]);
+}
+\end{Verbatim}
+\end{quote}
+%
+The open curly bracket (\code{\{}) is the first character of the block
+and the close curly bracket (\code{\}}) is the last character.
+
+Because whitespace is ignored in \Stan, the following program will
+not compile.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) 
+  y[n] ~ normal(mu,sigma);
+  z[n] ~ normal(mu,sigma); // ERROR!
+\end{Verbatim}
+\end{quote}
+%
+The problem is that the body of the for loop is taken to be the next
+statement, and that is \code{y[n] ~ normal(mu,sigma)}.  This leaves
+the probabilty statement for \code{z[n]} hanging, as is clear from
+the following equivalent program.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  y[n] ~ normal(mu,sigma);
+}
+z[n] ~ normal(mu,sigma); // ERROR!
+\end{Verbatim}
+\end{quote}
+%
+Neither of these programs will compile. If the loop variable \code{n}
+was defined before the for loop, the for-loop declaration will raise
+an error.  If the loop variable \code{n} was not defined before the
+for loop, then the use of the expression \code{z[n]} will raise an
+error. 
+
+\subsection{Local Variable Declarations}
+
+A for loop has a statement as a body.  If a block is used 
+It is often convenenient in writing programs to be able to define a
+local variable that will be used temporarily and then forgotten.  
+For instance, the for loop example of repeated assignment should
+use a local variable for maximum clarity and efficiency, as in the
+following example.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  real theta;
+  theta <- inv_logit(alpha + x[n] * beta);
+  y[n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+The local variable \code{theta} is declared here inside the for loop.
+The scope of a local variable is just the block in which it is
+defined.  Thus \code{theta} is available for use inside the for loop,
+but not outside of it.  As in other situations, \Stan does not allow
+variable hiding.  So it is illegal to declare a local variable
+\code{theta} if the variable theta is already defined in the scope of
+the for loop.  For instance, the following is not legal.
+%
+\begin{quote}
+\begin{Verbatim}
+for (m in 1:M) {
+    real theta;
+    for (n in 1:N) {
+      real theta; // ERROR!
+      theta <- inv_logit(alpha + x[m,n] * beta);
+      y[m,n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+The compiler will flag the second declaration of \code{theta} with a
+message that it is already defined.
+
+\subsection{No Constraints on Local Variables}
+
+Local variables may not have constraints on their declaration.  The
+only types that may be used are
+\begin{quote}
+\code{int}, \code{real}, 
+\code{vector(K)}, \code{row\_vector(K)}, and \code{matrix(M,N)}
+\end{quote}
+
+\subsection{Blocks within Blocks}
+
+A block is itself a statement, so anywhere a sequence of statements is
+allowed, one or more of the statements may be a block.  For instance,
+in a for loop, it is legal to have.
+%
+\begin{quote}
+\begin{Verbatim}
+for (m in 1:M) {
+   { int n;  n <- 2 * m; sum <- sum + n }
+   for (n in 1:N) sum <- sum + x[m,n];
+}
+\end{Verbatim}
+\end{quote}
+%
+In this pointless example, the variable declaration \code{int n;} is
+the first element of an embedded block.  This instance of the variable
+\code{n} only has scope within the local block, so it is legal to have
+an embedded for loop (also a statement) with loop variable \code{n};
+as far as \Stan is concerned, these are completely different
+variables.
+
+
+
+\chapter{Program Blocks}\label{blocks.chapter}
+
+A \Stan program is organized into a sequence of named blocks, the
+bodies of which consist of variable declarations, followed in the case
+of some blocks with statements.  
+
+\section{Overview of \Stan's Program Blocks}
+
+The full set of named program blocks is exemplified in the following
+skeletal \Stan program.
+%
+\begin{quote}
+\begin{Verbatim} 
+data { 
+  ... declarations ...
+}
+transformed data { 
+   ... declarations ... statements ... 
+}
+parameters { 
+   ... declarations ... 
+}
+transformed parameters { 
+   ... declarations ... statements ...
+}
+model { 
+   ... statements ...
+}
+derived quantities {
+   ... declarations ... statements ...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Optionality and Ordering}
+
+All of the blocks other than the \code{model} block are optional.  The
+blocks that occur must occur in the order presented in the skeletal
+program above.  Within each block, both declarations and statements
+are optional, subject to the restriction that the declarations come
+before the statements.
+
+\subsection{Variable Scope}
+
+The variables declared in each block have scope over all subsequent
+statements.  Thus a variable declared in the transformed data block
+may be used in the model block.  But a variable declared in the
+derived quantities block may not be used in any earlier block,
+including the model block.
+
+\subsection{Automatic Variable Definitions}
+
+The variables declared in the \code{data} and \code{parameters} block
+are treated differently than other variables in that they are
+automatically defined by the context in which they are used.  This is
+why there are no statements allowed in the data or parameters block.
+
+The variables in the \code{data} block are read from an external input
+source such as a file or a designated \R data structure.  The
+variables in the \code{parameters} block are read from the sampler's
+current parameter values (either basic \HMC or \NUTS).  The initial
+values may be provided through an external input source, which is also
+typically a file or a designated \R data structure.  In each case, the
+parameters are instantiated to the values for which the model defines
+a log probability function.
+
+\subsection{Transformed Variables}
+
+The \code{transformed data} and \code{transformed parameters} block
+behave similarly.  Both allow new variables to be declared and then
+defined through a sequence of statements.  Because variables scope
+over every statement that follows them, transformed data variables may
+be defined in terms of the data variables.  
+
+Before generating any samples, data variables are read in, then the
+transformed data variables are declared and the associated statements
+executed to define them.  This means the statements in the transformed
+data block are only ever evaluated once per chain (or even once if
+multi-threaded evaluation of multiple chains is used).
+
+Transformed parameters work the same way, being defined in terms of
+the parameters, transformed data, and data variables.  The difference
+is the frequency of evaluation.  Parameters are read in and (inverse)
+transformed to constrained representations on their natural scales
+once per leapfrog step.  This means the inverse transforms and their
+log absolute Jacobian determinants are evaluated once per leapfrog
+step.  Transformed parameters are then declared and their defining
+statements executed once per leapfrog step.
+
+\subsection{Derived Quantities}
+
+The derived quantity variables are defined once per sample after all
+the leapfrog steps have been completed.  These may be random
+quantities, so the block must be rerun even if the Metropolis
+adjustment of \HMC or \NUTS rejects the update proposal.  
+
+
+\subsection{Variable Read, Write, and Definition Summary}
+
+A table summarizing the point at which variables are read, written and
+defined is given in \reffigure{block-actions}.
+%
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|c|l}
+{\it Block} & {\it Stmt} & {\it Action / Period} 
+\\\hline\hline
+\code{data} & no & read / chain  
+\\
+\code{transformed data} & yes & evaluate / chain  
+\\ \hline
+\code{parameters} & no & inv.\ transform, Jacobian / leapfrog  \\
+& & inv.\ transform, write / sample 
+\\[3pt]
+\code{transformed parameters} & yes & evaluate / leapfrog \\
+& & write / sample 
+\\\hline
+\code{model} & yes & evaluate / leapfrog step 
+\\\hline
+\code{generated quantities} & yes & eval / sample \\
+& & write / sample
+\\\hline\hline
+\code{\slshape (initialization)} & n/a & read, transform / chain
+\end{tabular}
+\end{center}
+\caption{\it The read, write, transform, and evaluate actions and
+  periodicities listed in the last column correspond to the \Stan
+  program blocks in the first column.  The middle column indicates
+  whether the block allows statements.  The last row indicates that 
+  parameter initialization requires a read and transform operation.}
+\label{block-actions.figure}
+\end{figure}
+%
+The rest of this chapter provides full details on when and how the
+variables and statements in each block are executed.
+
+
+\section{Statistical Variable Taxonomy}
+
+Gelman and Hill (2006, p.~366) provide a taxonomy of the kinds of
+variables used in Bayesian models, which is expanded with a missing
+data type and the loations of declarations and definitions in \Stan in
+\reffigure{variable-kinds}.
+%
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it Variable Kind} & {\it Declaration Block}
+\\ \hline\hline
+% constants & \code{transformed data}
+% \\ \hline
+unmodeled data & \code{data}, \code{transformed data}
+\\ 
+modeled data & \code{data}, \code{transformed data}
+\\ \hline
+missing data & \code{parameters}, \code{transformed parameters}
+\\
+modeled parameters & \code{parameters}, \code{transformed parameters}
+\\
+unmodeled parameters & \code{data}, \code{transformed data}
+\\[2pt] \hline
+derived quantities & \code{transformed data}, \code{transformed parameters}, 
+\\ 
+& \code{derived quantities}
+\\ \hline\hline
+loop indices & loop statement
+\\ 
+\end{tabular}
+\end{center}
+\caption{\it Variables of the kind indicated in the left column must
+  be declared in one of the blocks declared in the right
+  column (see Gelman and Hill 2006,
+  p.~366).}\label{variable-kinds.figure}
+\end{figure}
+%
+
+% A constant is a piece of data whose value is built into the model.  In
+% \Stan, constants should be declared and defined in the
+% \code{transformed data} block.  As a consequence,
+% Unforuntately, this means constants
+% can't be used to determine sizes of elements in the \code{data} block,
+% since transformed data only appears after data.  
+
+It will help to have a program in mind which illustrates the various
+usages.  
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(0,) N;                // unmodeled data
+  real y[N];                // modeled data
+  double mu_mu;             // config. unmodeled param
+  double(0,) sigma_mu;      // config. unmodeled param
+}
+derived data {
+  double(0,) alpha;         // const. unmodeled param
+  double(0,) beta;          // const. unmodeled param
+  alpha <- 0.1;       
+  beta <- 0.1;
+} 
+parameters {
+  real mu_y;                // modeled param
+  real(0,) tau_y;           // modeled param
+} 
+transformed parameters {
+  double(0,) sigma_y;       // derived quantity (param)
+  sigma_y <- pow(tau_y,-2);
+}
+model {
+  tau_y ~ gamma(alpha,beta);
+  mu_y ~ normal(mu_mu,sigma_mu);
+  for (n in 1:N)
+    y[n] ~ normal(mu_y,sigma_y);
+}
+derived quantities {
+  double y_rep[N];          // derived quantity (replic)
+  for (n in 1:N)
+    y_rep[n] <- rand_normal(mu_y,sigma_y);
+}
+\end{Verbatim}
+\end{quote}
+%
+In this example, \code{y[N]} is a modeled data vector.  Although it is
+specified in the \code{data} block, and thus must have a known value
+before the program may be run, it is modeled as if it were generated
+randomly as described by the model.  
+
+The variable \code{N} is a typical example of unmodeled data.  It is
+used to indicate a size that is not part of the model itself.
+
+The other variables declared in the data and derived data block are
+examples of unmodeled parameters, also known as hyperparameters.
+Unmodeled parameters are parameters to probability densities that are
+not themselves modeled probabilistically.  In \Stan, unmodeled
+parameters that appear in the \code{data} block may be specified on a
+per-model execution basis as part of the data read.  In the above
+model, \code{mu\_mu} and \code{sigma\_mu} are configurable unmodeled
+parameters.  
+
+Unmodeled parameters that are hard coded in the model must 
+be declared in the \code{derived data} block.  For example, the
+unmodeled parameters \code{alpha} and \code{beta} are both hard coded
+to the value 0.1. 
+
+This program declares two modeled parameters, \code{mu} and
+\code{tau\_y}.  These are the scales and precision used in the normal
+model of the values in \code{y}.  The heart of the model will be
+sampling the values of these parameters from their posterior
+distribution.
+
+The modeled parameter \code{tau\_y} is transformed from a precision to
+a scale parameter and assigned to the variable \code{sigma\_y} in the
+\code{transformed parameters} block. Thus the variable \code{sigma\_y}
+is considered a derived quantity --- its value is entirely determined
+by the values of other variables.  
+
+The \code{derived quantities} block defines a second array of \code{N}
+entries, \code{y\_rep}, for replicated data.  The vector \code{y\_rep}
+has its values filled in by randomly generating normal variates given
+the parameters \code{mu\_y} and \code{sigma\_y}.  This kind of derived
+quantity may be used for model checking.
+
+Finally, the variables \code{n} is used as a loop index in two for
+loops, one in the \code{model} block and one in the \code{derived
+  quantities} block.
+
+
+\section{Program Block: \code{data}}
+
+The rest of this chapter will lay out the details of each block in
+order, starting with the \code{data} block in this section.
+
+\subsection{Variable Reads and Transformations}
+
+The \code{data} block is for the declaration of variables that are
+read in as data.  With the current model executable, each Markov chain
+of samples will be executed in a different process, and each such
+process will read the data exactly once.%
+%
+\footnote{With multiple threads, or even running chains sequentially
+  in a single thread, data could be read only once per set of
+  chains. \Stan was designed to be thread safe and future versions 
+  will provide a multithreading option for Markov chains.\label{thread.footnote}}
+%
+
+Data variables are not transformed in any way.  The format for data
+files is provided in \refchapter{dump}.
+
+\subsection{Statments}
+
+The \code{data} block does not allow statements.
+
+\subsection{Variable Constraint Checking}
+
+Each variable's value is validated against its declaration as it is
+read.  For example, if a variable \code{sigma} is declared as
+\code{real(0,)}, then trying to assign it a negative value will raise
+an error.  As a result, data type errors will be caught as early as
+possible.  Similarly, attempts to provide data of the wrong size for a
+compound data structure will also raise an error.
+
+
+\section{Program Block: \code{transformed data}}
+
+The \code{transformed data} block is for declaring and defining
+variables that do not need to be changed when running the program.  
+
+\subsection{Variable Reads and Transformations}
+
+For the \code{transformed data} block, variables are all declared in
+the variable declarations and defined in the statements.  There is no
+reading from external sources and no transformations performed.
+
+Variables declared in the \code{data} block may be used to declare
+transformed variables.
+
+\subsection{Statements}
+
+The statements in a \code{transformed data} block are used to define
+(provide values for) variables declared in the \code{transformed data}
+block.  The special variable \code{lp\_\_} is not defined for the
+statements in the \code{transformed data} block.  Consequently,
+probability statements, which implicitly access \code{lp\_\_}, may not
+be used.  Furthermore, assignments are only allowed to variable
+declared in the \code{transformed data} block.
+
+These statements are executed once, in order, right after the data is
+read into the data variables.  This means they are executed once per
+chain (though see \refnote{thread} in this chapter).
+
+Variables declared in the \code{data} block may be used in statements
+in the \code{transformed data} block.
+
+\subsection{Variable Constraint Checking}
+
+Any constraints on variables declared in the \code{transformed data}
+block are checked after the statements are executed.  If any defined
+variable violates its constraints, \Stan will stop with a warning.
+
+
+\section{Program Block: \code{parameters}}
+
+The variables declared in the \code{parameters} program block
+correspond directly to the variables being sampled by \Stan's samplers
+(\HMC and \NUTS).  From a user's perspective, the parameters in the
+program block \emph{are} the parameters being sampled by \Stan.  
+
+Variables declared as parameters cannot be directly assigned values.
+So there is no block of statements in the \code{parameters} program
+block.  Variable quantities derived from parameters may be declared in
+the \code{transformed parameters} or \code{derived quantities} blocks,
+or may be defined as local variables in any statement blocks following
+their declaration.
+
+There is a substantial amount of computation involved for parameter
+variables in a \Stan program at each leapfrog step within the
+\HMC or \NUTS samplers, and a bit more computation along with writes
+involved for saving the parameter values corresponding to a sample.
+
+\subsection{Constraining Inverse Transform}
+
+Stan's two samplers, basic Hamiltonian Monte Carlo (\HMC) and the
+adaptive no-U-turn sampler (\NUTS), are most easily (and often most
+effectively) implemented over a multivariate probabilty density that
+has support on all of $\reals^n$.  To do this, the parameters
+defined in the \code{parameters} block must be transformed so they are
+unconstrained. 
+
+In practice, the samplers keep an unconstrained parameter vector in
+memory representing the current state of the sampler.  The model
+defined by the compiled \Stan program defines an (unnormalized) log
+probability function over the unconstrained parameters.  In order to
+do this, the log probability function must apply the inverse transform
+to the unconstrained parameters to calculate the constrained
+parameters defined in \Stan's \code{parameters} program block.  The
+log absolute Jacobian determinant of the inverse transform is then
+added to the accumulated log probability function.  This then allows
+the \Stan model to be defined in terms of the constrained parameters.
+
+In some cases, the number of parameters is reduced in the
+unconstrained space.  For instance, a $K$-simplex only requires $K-1$
+unconstrained parameters, and a $K$-correlation matrix only requires
+${K \choose 2}$ unconstrained parameters.  This means that the
+probability function defined by the compiled \Stan program may have
+fewer parameters than it would appear from looking at the declarations
+in the \code{parameters} program block. 
+
+The probabilty function on the unconstrained parameters is defined in
+such a way that the order of the parameters in the vector corresponds
+to the order of the variables defined in the \code{parameters} program
+block.  The details of the specific transformations are provided in
+\refchapter{variable-transforms}.
+
+\subsection{Gradient Calculation}
+
+Hamiltonian Monte Carlo requires the gradient of the (unnormalized)
+log probability function with respect to the unconstrained parameters
+to be evlauated at every leapfrog step.  In general, there may be a
+handful or even hundreds of leapfrog steps per sample, with more
+leapfrog steps required for models with more complex posterior distributions.
+
+Gradients are calculated behind the scenes using \Stan's algorithmic
+differentiation library.  The time to compute the gradient does not
+depend directly on the number of parameters, only on the number of
+subexpressions in the calculation of the log probability.  This
+includes the expressions added from the transforms' Jacobians.  
+
+The amount of work done by the sampler does depend on the number of
+unconstrained parameters, but this is usually dwarfed by the gradient
+calculations.
+
+\subsection{Writing Samples}
+
+In the basic \Stan compiled program, the values of variables are
+written to a file for each sample.  The constrained versions of the
+variables are written, again in the order they are defined in the
+\code{parameters} block.  In order to do this, 
+
+
+\section{Program Block: \code{transformed parameters}}
+
+The \code{transformed parameters} program block consists of optional
+variable declarations followed by statements.  
+
+After the statements are executed, the constraints on the 
+transformed parameters are validated. 
+
+Any variable declared as a transformed parameter is part of the output
+produced for samples.
+
+Any variable that is defined wholly in terms of data or transformed
+data should be declared and defined in the transformed data block.
+Defining such quantities in the transformed parameters block is
+well-defined, but less efficient than defining them as transformed
+data.
+
+\section{Program Block: \code{model}}
+
+The \code{model} program block consists of optional variable
+declarations followed by statements.  The variables in the model block
+are local variables and are not written as part of the output.  
+
+Local variables may not be defined with constraints because there is
+no well-defined way to have them be both flexible and easy to
+validate.
+
+The statements in the model block typically define the model.  This is
+the block in which probability (sampling notation) statements are
+allowed.  These are typically used when programming in the \BUGS idiom
+to define the probability model.  
+
+
+\section{Program Block: \code{derived quantities}}
+
+The \code{derived quantities} program block is rather different than
+the other blocks.  Nothing in the derived quantities block affects the
+sampled parameter values.  The block is executed only after a sample
+has been generated.  Its intended use is to do forward sampling, such
+as generating simulated data replicates, or to do variable transforms
+for reporting that are not needed in the actual model.
+
+Within the derived quantities block, the values of all other variables
+declared in earlier program blocks (other than local variables) are
+available for use in the derived quantities block.
+
+It is more efficient to define a variable in the derived quantities
+block instead of the transformed parameters block.  Therefore, if a
+quantity does not play a role in the model, it should be defined in
+the derived quantities block.  
+
+After the derived quantities statements are executed, the constraints
+on the declared derived quantity variables are validated.
+
+All variables declared as derived quantities are printed as part of
+the output. 
+
+
+
+
+
+
+
+
+
+\section{Reserved Variable Name Mangling}
+
+\Stan prohibits programs from declaring variables that end in two
+underscore characters (\code{\_\_}.  Variables ending in two (or more)
+underscores are reserved for \Stan's internal use.
+
+The special variable \code{lp\_\_} is reserved for the accumulator of
+the total log probability of a model.  It is defined to have scope
+over the \code{transformed parameters} and \code{model} blocks, but is
+not available in the other blocks.  
+
+may be used in the transformed parameter and model blocks, but not
+esle
+
+User-defined variables with names ending may not be delcared
+
+ may not end in two underscores.  Variables
+with two underscores are reserved for use in \Stan for internal
+purposes and using them may conflict with \Stan's uses.  The exception
+is the special variable \code{lp\_\_} which may be used, but not declared.
