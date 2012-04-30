@@ -20,17 +20,18 @@ namespace stan {
   namespace mcmc {
 
     /**
-     * Adaptive "constant distance" Hamiltonian Monte Carlo (CDHMC)
-     * sampler. Adapts the step size epsilon automatically to try to
-     * coerce the average acceptance probability to some value
-     * delta. Where adaptive_hmc requires you to specify the number of
-     * steps L, adaptive_cdhmc requires you to specify the trajectory
-     * length epsilon*L, and chooses L given epsilon to make epsilon*L
-     * as close as possible to the target.
+     * Adaptive "constant distance" Hamiltonian Monte Carlo 
+     * sampler (CDHMC).
+     * 
+     * adaptive_cdhmc requires specification of the trajectory length,
+     * epsilon*L. CDHMC automatically tries to coerce the average
+     * acceptance probability to some value, delta, by choosing the 
+     * number of steps, L, given the step size, epsilon, to make the
+     * trajectory length as close as possible to the target.
      *
      * The CDHMC sampler requires a probability model with the ability
      * to compute gradients, characterized as an instance of
-     * <code>prob_grad</code>.  
+     * <code>stan::model::prob_grad</code>.  
      *
      * Samples from the sampler are returned through the
      * base class <code>sampler</code>.

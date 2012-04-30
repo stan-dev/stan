@@ -32,7 +32,7 @@ namespace stan {
      * <code>prob_grad</code>.  
      *
      * Samples from the sampler are returned through the
-     * base class <code>sampler</code>.
+     * base class <code>stan::mcmc::sample</code>.
      */
     template <class BaseRNG = boost::mt19937>
     class adaptive_hmc : public adaptive_sampler {
