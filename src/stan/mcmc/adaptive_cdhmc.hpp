@@ -21,7 +21,7 @@ namespace stan {
 
     /**
      * Adaptive "constant distance" Hamiltonian Monte Carlo 
-     * sampler (CDHMC).
+     * (CDHMC) sampler.
      * 
      * adaptive_cdhmc requires specification of the trajectory length,
      * epsilon*L. CDHMC automatically tries to coerce the average
@@ -83,9 +83,9 @@ namespace stan {
       }
 
       /**
-       * Construct an adaptive Hamiltonian Monte Carlo (HMC) sampler
-       * for the specified model, using the specified step size and
-       * number of leapfrog steps, with the specified random seed for
+       * Constructs an adaptive "constant distance" Hamiltonian Monte Carlo
+       * (CDHMC) sampler for the specified model, using the specified 
+       * trajectory length, epsilonL, with the specified random seed for
        * randomization.
        *
        * If the same seed is used twice, the series of samples should
@@ -94,21 +94,21 @@ namespace stan {
        * called from the <code>ctime</code> library.
        * 
        * @param model Probability model with gradients.
-       * @param epsilonL Number of leapfrog steps per simulation.
-       * @param delta Target value of E[acceptance probability]. Optional;
-       * defaults to the value of 0.651, which has some theoretical
-       * justification.
+       * @param epsilonL Specified trajectory length, epsilon*L.
+       * @param delta Target value of E[acceptance probability]. 
+       * Optional; defaults to the value of 0.651, which has some 
+       * theoretical justification.
        * @param epsilon Hamiltonian dynamics simulation step size. Optional;
        * if not specified or set < 0, find_reasonable_parameters() will be 
        * called to initialize epsilon.
-       * @param random_seed Seed for random number generator; optional, if not
-       * specified, generate new seen based on system time.
+       * @param random_seed Seed for random number generator. Optional; 
+       * if not specified, generate new seen based on system time.
        */
       adaptive_cdhmc(stan::model::prob_grad& model,
                      double epsilonL, 
                      double delta = 0.651, 
-                     double epsilon=-1, 
-                  unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
+                     double epsilon = -1, 
+                     unsigned int random_seed = static_cast<unsigned int>(std::time(0)))
         : adaptive_sampler(epsilon < 0.0),
           _model(model),
           _x(model.num_params_r()),
@@ -133,15 +133,13 @@ namespace stan {
       }
 
       /**
-       * Destroy this sampler.
-       *
-       * The implementation for this class is a no-op.
+       * Destructor. The implementation for this class is a no-op.
        */
       virtual ~adaptive_cdhmc() {
       }
 
       /**
-       * Set the model real and integer parameters to the specified
+       * Sets the model's real and integer parameters to the specified
        * values.  
        *
        * This method will typically be used to set the parameters
@@ -160,7 +158,7 @@ namespace stan {
       }
 
       /**
-       * Set the model real parameters to the specified values
+       * Sets the model's real parameters to the specified values
        * and update gradients and log probability to match.
        *
        * This method will typically be used to set the parameters
@@ -172,13 +170,13 @@ namespace stan {
        */
       void set_params_r(const std::vector<double>& x) {
         if (x.size() != _model.num_params_r())
-          throw std::invalid_argument ("x.size() must match the number of parameters of the model.");
+          throw std::invalid_argument("x.size() must match the number of parameters of the model.");
         _x = x;
         _logp = _model.grad_log_prob(_x,_z,_g);
       }
 
       /**
-       * Set the model integer parameters to the specified values
+       * Sets the model integer parameters to the specified values
        * and update gradients and log probability to match.
        *
        * This method will typically be used to set the parameters
@@ -196,7 +194,7 @@ namespace stan {
       }
 
       /**
-       * Search for a roughly reasonable (within a factor of 2)
+       * Searches for a roughly reasonable (within a factor of 2)
        * setting of the step size epsilon.
        */
       virtual void find_reasonable_parameters() {
@@ -210,8 +208,8 @@ namespace stan {
         double logp = leapfrog(_model, _z, x, m, g, _epsilon);
         double H = logp - lastlogp;
         int direction = H > log(0.5) ? 1 : -1;
-//         fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                 _epsilon, lastlogp, logp);
+        // fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
+        //   _epsilon, lastlogp, logp);
         while (1) {
           x = _x;
           g = _g;
@@ -232,7 +230,7 @@ namespace stan {
       }
 
       /**
-       * Return the next sample.
+       * Returns the next sample.
        *
        * @return The next sample.
        */
@@ -305,7 +303,7 @@ namespace stan {
       }
 
       /**
-       * Return the value of epsilon.
+       * Returns the value of epsilon.
        *
        * @param params Where to store epsilon.
        */
