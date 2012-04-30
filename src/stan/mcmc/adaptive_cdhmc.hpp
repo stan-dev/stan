@@ -305,7 +305,7 @@ namespace stan {
       /**
        * Returns the value of epsilon.
        *
-       * @param params Where to store epsilon.
+       * @param[out] params Where to store epsilon.
        */
       virtual void get_parameters(std::vector<double>& params) {
         params.assign(1, _epsilon);

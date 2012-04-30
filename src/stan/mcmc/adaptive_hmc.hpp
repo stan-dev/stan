@@ -23,13 +23,15 @@ namespace stan {
 
 
     /**
-     * Adaptive Hamiltonian Monte Carlo (HMC) sampler. Adapts the step
-     * size epsilon automatically to try to coerce the average
-     * acceptance probability to some value delta.
+     * Adaptive Hamiltonian Monte Carlo (HMC) sampler. 
+     *
+     * adaptive_hmc automatically adapts the step size, epsilon,
+     * to try to coerce the average acceptance probability to
+     * some value, delta.
      *
      * The HMC sampler requires a probability model with the ability
      * to compute gradients, characterized as an instance of
-     * <code>prob_grad</code>.  
+     * <code>stan::model::prob_grad</code>.  
      *
      * Samples from the sampler are returned through the
      * base class <code>stan::mcmc::sample</code>.
@@ -43,7 +45,6 @@ namespace stan {
       // The number of steps used in the Hamiltonian simulation
       unsigned int _L;
 
-
       // The step size used in the Hamiltonian simulation
       double _epsilon;
       // The +/- around epsilon
@@ -51,8 +52,6 @@ namespace stan {
 
       // The desired value of E[acceptance probability]
       double _delta;
-
-      double _gamma;
 
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
@@ -71,9 +70,6 @@ namespace stan {
 
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
-      // Gamma parameter for dual averaging.
-      inline static double da_gamma() { return 0.05; }
-
 
     public:
 
@@ -98,8 +94,11 @@ namespace stan {
        * called to initialize epsilon.
        * @param epsilon_pm
        * @param epsilon_adapt
-       * @param delta
-       * @param gamma
+       * @param delta Target value of E[acceptance probability]. 
+       * Optional; defaults to the value of 0.651, which has some 
+       * theoretical justification.
+       * @param gamma Regularization parameter. See 
+       * <code>stan::mcmc::DualAverage</code>.
        * @param base_rng Seed for random number generator; optional, if not
        * specified, generate new seen based on system time.
        */
@@ -120,8 +119,7 @@ namespace stan {
           _epsilon_pm(epsilon_pm),
 
           _delta(delta),
-          _gamma(gamma),
-
+          
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r()),
@@ -140,15 +138,13 @@ namespace stan {
       }
 
       /**
-       * Destroy this sampler.
-       *
-       * The implementation for this class is a no-op.
+       * Destructor. The implementation for this class is a no-op.
        */
       virtual ~adaptive_hmc() {
       }
 
       /**
-       * Set the model real and integer parameters to the specified
+       * Sets the model real and integer parameters to the specified
        * values.  
        *
        * This method will typically be used to set the parameters
@@ -167,7 +163,7 @@ namespace stan {
       }
 
       /**
-       * Set the model real parameters to the specified values
+       * Sets the model real parameters to the specified values
        * and update gradients and log probability to match.
        *
        * This method will typically be used to set the parameters
@@ -185,7 +181,7 @@ namespace stan {
       }
 
       /**
-       * Set the model integer parameters to the specified values
+       * Sets the model integer parameters to the specified values
        * and update gradients and log probability to match.
        *
        * This method will typically be used to set the parameters
@@ -217,8 +213,8 @@ namespace stan {
         double logp = leapfrog(_model, _z, x, m, g, _epsilon);
         double H = logp - lastlogp;
         int direction = H > log(0.5) ? 1 : -1;
-//         fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                 _epsilon, lastlogp, logp);
+        // fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
+        //   _epsilon, lastlogp, logp);
         while (1) {
           x = _x;
           g = _g;
@@ -226,8 +222,8 @@ namespace stan {
             m[i] = _rand_unit_norm();
           logp = leapfrog(_model, _z, x, m, g, _epsilon);
           H = logp - lastlogp;
-//           fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                   _epsilon, lastlogp, logp);
+          // fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
+          //   _epsilon, lastlogp, logp);
           if ((direction == 1) && (H < log(0.5)))
             break;
           else if ((direction == -1) && (H > log(0.5)))
@@ -238,7 +234,7 @@ namespace stan {
       }
 
       /**
-       * Return the next sample.
+       * Returns the next sample.
        *
        * @return The next sample.
        */
@@ -253,7 +249,6 @@ namespace stan {
         //     probs.push_back(_model.log_prob_star(m,k,_x,_z));
         //   _z[m] = sample_unnorm_log(probs,_rand_uniform_01);
         // }
-
         // HMC for continuous
         std::vector<double> m(_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
@@ -296,7 +291,7 @@ namespace stan {
         }
         std::vector<double> result;
         _da.xbar(result);
-//         fprintf(stderr, "xbar = %f\n", exp(result[0]));
+        // fprintf(stderr, "xbar = %f\n", exp(result[0]));
         double avg_eta = 1.0 / n_steps();
         update_mean_stat(avg_eta,adapt_stat);
 
@@ -318,9 +313,9 @@ namespace stan {
       }
 
       /**
-       * Return the value of epsilon.
+       * Returns the value of epsilon.
        *
-       * @param params Where to store epsilon.
+       * @param[out] params Where to store epsilon.
        */
       virtual void get_parameters(std::vector<double>& params) {
         params.assign(1, _epsilon);
