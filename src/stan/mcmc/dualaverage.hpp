@@ -13,8 +13,9 @@ namespace stan {
   namespace mcmc {
 
     /**
-     * Class implementing Nesterov's dual average algorithm.  Use by
-     * repeatedly calling update() with the gradient evaluated at
+     * Implements Nesterov's dual average algorithm.
+     *
+     * Use by repeatedly calling update() with the gradient evaluated at
      * xk(). When finished, use the average value of all the xk's by
      * calling xbar().
      *
@@ -46,8 +47,8 @@ namespace stan {
       /**
        * Produces the next iterate xk given the current gradient g.
        *
-       * @param g The new subgradient/stochastic gradient.
-       * @param xk The next iterate produced by the algorithm.
+       * @param[in]  g The new subgradient/stochastic gradient.
+       * @param[out] xk The next iterate produced by the algorithm.
        */
       void update(const std::vector<double>& g, std::vector<double>& xk) {
         _k++;
@@ -58,12 +59,12 @@ namespace stan {
         for (size_t i = 0; i < _gbar.size(); ++i) {
           _gbar[i] = avgeta * g[i] + (1 - avgeta) * _gbar[i];
           xk[i] = _x0[i] - muk * _gbar[i];
-//           fprintf(stderr, "DUALAVERAGE update %d: g = %f, gbar = %f, lastx = %f",
-//                   _k, g[0], _gbar[0], _lastx[0]);
+          // fprintf(stderr, "DUALAVERAGE update %d: g = %f, gbar = %f, lastx = %f",
+          //   _k, g[0], _gbar[0], _lastx[0]);
           _lastx[i] = xk[i];
           _xbar[i] = xbar_avgeta * xk[i] + (1 - xbar_avgeta) * _xbar[i];
         }
-//         fprintf(stderr, ", xk = %f\n", xk[0]);
+        // fprintf(stderr, ", xk = %f\n", xk[0]);
       }
 
       /**
@@ -79,7 +80,7 @@ namespace stan {
        * Get the exponentially weighted moving average of all previous
        * iterates.
        *
-       * @param xbar Where to return the exponentially weighted moving
+       * @param[out] xbar Where to return the exponentially weighted moving
        * average of all previous iterates.
        */
       inline void xbar(std::vector<double>& xbar) {
@@ -88,7 +89,7 @@ namespace stan {
       /**
        * Get the average of all previous gradients.
        *
-       * @param gbar Where to return the average of all previous gradients.
+       * @param[out] gbar Where to return the average of all previous gradients.
        */
       inline void gbar(std::vector<double>& gbar) {
         gbar.assign(_gbar.begin(), _gbar.end());
@@ -96,7 +97,7 @@ namespace stan {
       /**
        * Get the current iterate.
        *
-       * @param xk Where to return the current iterate.
+       * @param[out] xk Where to return the current iterate.
        */
       inline void xk(std::vector<double>& xk) {
         xk.assign(_lastx.begin(), _lastx.end());
