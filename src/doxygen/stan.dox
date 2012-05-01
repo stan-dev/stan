@@ -24,14 +24,19 @@
  */
 
 /**
- * @namespace stan::math::policies::detail Reimplementing raise_domain_error to handle two template parameters.
+ * @namespace stan::math::policies
+ * Extending boost functionality.
+ */
+
+/**
+ * @namespace stan::math::policies::detail 
+ * Reimplementing boost::math::policies::detail::raise_domain_error to handle two template parameters.
  * 
- * In boost, this is in namespace boost::math::policies and 
- * boost::math::policies:details. Since implementing these functions in
- * that namespace could lead to calls to ambiguous functions, they are
- * being placed in stan::math::policies and stan::math::policies::details.
+ * In boost, these functions are in namespace boost::math::policies:details. 
+ * Since reimplementing these functions in that namespace could lead to 
+ * ambiguous functions calls, they are placed in stan::math::policies::details.
  *
- * These still rely on boost::math::policies::detail::raise_error.
+ * These functions still rely on boost::math::policies::detail::raise_error.
  *
  * TODO: user_error may need to be refactored to include the two template
  *   parameters.
@@ -45,6 +50,11 @@
 /**
  * @namespace stan::memory 
  * (Expert) Allocate, free, and manage underlying system memory.
+ */
+
+/**
+ * @namespace stan::model
+ * For compiling models.
  */
 
 /**
