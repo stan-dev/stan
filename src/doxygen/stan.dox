@@ -30,7 +30,10 @@
 
 /**
  * @namespace stan::math::policies::detail 
- * Reimplementing boost::math::policies::detail::raise_domain_error to handle two template parameters.
+ * Reimplementing boost::math::policies::detail::raise_domain_error.
+ *
+ * For error handling, Stan requires raise_domain_error to handle two template 
+ * parameters, one for the return type and the other for the input type.
  * 
  * In boost, these functions are in namespace boost::math::policies:details. 
  * Since reimplementing these functions in that namespace could lead to 
