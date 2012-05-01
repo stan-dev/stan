@@ -43,11 +43,13 @@ TEST(ProbDistributions,ordered_logistic_vals) {
     sum += theta(k);
   EXPECT_FLOAT_EQ(1.0,sum);
 
-  for (int k = 0; k < K; ++k)
-    EXPECT_FLOAT_EQ(log(theta(k)),
-                     ordered_logistic_log(k,lambda,c));
+  EXPECT_THROW(ordered_logistic_log(0,lambda,c),std::domain_error);
+  EXPECT_FLOAT_EQ(log(theta(1)),ordered_logistic_log(1,lambda,c));
+  EXPECT_FLOAT_EQ(log(theta(2)),ordered_logistic_log(2,lambda,c));
+  EXPECT_FLOAT_EQ(log(theta(3)),ordered_logistic_log(3,lambda,c));
+  EXPECT_FLOAT_EQ(log(theta(4)),ordered_logistic_log(4,lambda,c));
+  EXPECT_THROW(ordered_logistic_log(5,lambda,c),std::domain_error);
 }
-
 
 TEST(ProbDistributions,ordered_logistic_vals_2) {
   using Eigen::Matrix;
@@ -68,9 +70,12 @@ TEST(ProbDistributions,ordered_logistic_vals_2) {
     sum += theta(k);
   EXPECT_FLOAT_EQ(1.0,sum);
 
-  for (int k = 0; k < K; ++k)
-    EXPECT_FLOAT_EQ(log(theta(k)),
-                     ordered_logistic_log(k,lambda,c));
+  EXPECT_THROW(ordered_logistic_log(0,lambda,c),std::domain_error);
+  EXPECT_FLOAT_EQ(log(theta(1)),
+		  ordered_logistic_log(1,lambda,c));
+  EXPECT_FLOAT_EQ(log(theta(2)),
+		  ordered_logistic_log(2,lambda,c));
+  EXPECT_THROW(ordered_logistic_log(3,lambda,c),std::domain_error);
 }
 
 TEST(ProbDistributions,ordered_logistic_default_policy) {
@@ -80,3 +85,4 @@ TEST(ProbDistributions,ordered_logistic_default_policy) {
   EXPECT_THROW(stan::prob::ordered_logistic_log(-1,lambda,c),
                std::domain_error);
 }
+
