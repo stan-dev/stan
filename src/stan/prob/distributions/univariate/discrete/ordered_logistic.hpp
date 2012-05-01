@@ -22,6 +22,33 @@ namespace stan {
     }
  
     // y in 0,...,K-1;   c.size()==K-2,  c increasing,  lambda finite
+    /**
+     * Returns the (natural) log probability of the specified integer
+     * outcome given the continuous location and specified cutpoints
+     * in an ordered logistic model.  
+     *
+     * <p>Typically the continous location
+     * will be the dot product of a vector of regression coefficients
+     * and a vector of predictors for the outcome.
+     *
+     * @tparam propto True if calculating up to a proportion.
+     * @tparam T_loc Location type.
+     * @tparam T_cut Cut-point type.
+     * @tparam Policy 
+
+     * @param y Outcome.
+     * @param lambda Location.
+     * @param c Positive increasing vector of cutpoints.
+     * @param Policy Error policy (only its type matters).
+     * @return Log probability of outcome given location and
+     * cutpoints.
+     
+     * @throw std::domain_error If the outcome is not between 1 and
+     * the number of cutpoints plus 2; if the cutpoint vector is
+     * empty; if the cutpoint vector contains a non-positive,
+     * non-finite value; or if the cutpoint vector is not sorted in
+     * ascending order.
+     */
     template <bool propto,
               typename T_lambda,
               typename T_cut,
@@ -40,21 +67,24 @@ namespace stan {
 
       static const char* function = "stan::prob::ordered_logistic<%1%>(%1%)";
       
+      using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_nonnegative;
       using stan::math::check_less;
+      using stan::math::check_less_or_equal;
       using stan::math::check_greater;
       using stan::math::check_bounded;
 
       int K = c.size() + 2;
 
       typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
-      if (!check_bounded(function,
-                         y,
-                         1,
-                         c.size()+2,
-                         "y",
-                         &lp,Policy()))
+      if (!check_bounded(function, y, 1, K,
+                         "y must be between 1 and K", 
+                         &lp, Policy()))
+        return lp;
+
+      if (!check_finite(function, lambda, 
+                        "location must be finite", &lp, Policy()))
         return lp;
 
       if (!check_greater(function, c.size(), 0,
@@ -73,27 +103,33 @@ namespace stan {
                            &lp, Policy()))
           return lp;
 
-      if (!check_less(function, y, K,
-                       "outcome y too large for number of cutpoints",
-                      &lp, Policy()))
+      if (!check_finite(function, c(c.size()-1), 
+                        "the last cut point must be finite",
+                        &lp, Policy()))
+        return lp;
+      
+      if (!check_finite(function, c(0),
+                        "the first cut point must be finite",
+                        &lp, Policy())) 
         return lp;
 
       // log(1 - inv_logit(lambda))
-      if (y == 0)
+      if (y == 1)
         return -log1p_exp(lambda); 
 
       // log(inv_logit(lambda) - inv_logit(lambda - c(0)))
-      if (y == 1)
+      if (y == 2)
         return log_inv_logit_diff(-lambda, c(0) - lambda);
 
       // log(inv_logit(lambda - c(K-3)));
-      if (y == (K - 1)) {
+      if (y == K) {
         return -log1p_exp(c(K-3) - lambda);
       }
 
-      // if (1 < y < (K-1)) { ... }
+      // if (2 < y < K) { ... }
       // log(inv_logit(lambda - c(y-2)) - inv_logit(lambda - c(y-1)))
-      return log_inv_logit_diff(c(y-2)-lambda, c(y-1) - lambda);
+      return log_inv_logit_diff(c(y-3) - lambda, 
+                                c(y-2) - lambda);
 
     }
 
@@ -105,7 +141,7 @@ namespace stan {
     ordered_logistic_log(int y,  
                          const T_lambda& lambda,  
                          const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
-      return ordered_logistic_log(y,lambda,c,stan::math::default_policy());
+      return ordered_logistic_log<propto>(y,lambda,c,stan::math::default_policy());
     }
 
 
@@ -116,7 +152,7 @@ namespace stan {
     ordered_logistic_log(int y,  
                          const T_lambda& lambda,  
                          const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c,
-                         Policy&) {
+                         const Policy&) {
       return ordered_logistic_log<false>(y,lambda,c,Policy());
     }
 

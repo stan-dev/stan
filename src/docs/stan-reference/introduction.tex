@@ -3,28 +3,39 @@
 
 \chapter{What is \Stan?}
 
-This document is a reference manual and getting started guide for
-using \Stan's probabilistic modeling language.  After describing the
-overall system in this introduction and providing a hands-on
-quick-start guide in the following chapter, the remainder of the
-document is devoted to fully documenting the behavior of
-Stan's modeling language.
+% START CUT & PASTE FROM abstract.tex
+\Stan provides a strongly typed, imperative language for specifying
+joint probability models.  Model specifications are converted to \Cpp
+code for reading data, transforming parameters, and calculating the
+log probability function and its gradient.  This \Cpp code is then
+compiled to an executable for performing full Bayesian inference by
+sampling from the posterior.  \Stan programs use automatically tuned,
+adaptive Hamiltonian Monte Carlo for sampling.
+% END CUT & PASTE
 
-\Stan's modeling language and its execution behavior are similar to
-that of its progenitors, \BUGS and \JAGS.  It differs in many
-particulars of the modeling language, which is more like an
-impertative programming language than the declarative specifications
-of \BUGS and \JAGS.  For instance, \Stan statements are executed in
-the order they are written in model specifications and local variables
-may be reassigned as in a procedural programming language.
-Furthermore, variables must be declared before they are used.
+This document is both a user's guide and a reference manual for using
+\Stan's probabilistic modeling language.  This introductory chapter
+provides a high-level view of \Stan's approach to Bayesian inference.
+The next chapter provides a hands-on quick-start guide showing how
+\Stan works in practice.  The remainder of this document contains a
+practically-oriented user's guide for programming models in \Stan
+along with a detailed reference manual for how \Stan and its
+associated programs operate.
 
 
 \section{\Stan's Modeling Language}
 
-\noindent
+\Stan's modeling language and its execution behavior are similar to
+that of \BUGS and \JAGS.  It differs in many particulars of the
+modeling language, which is more like an impertative programming
+language than the declarative specifications of \BUGS and \JAGS.  For
+instance, \Stan statements are executed in the order they are written
+in model specifications and local variables may be reassigned as in a
+procedural programming language.  Furthermore, variables must be
+declared before they are used.
+
 \Stan's modeling language allows users to code a Bayesian model
-specifying a joint probability function
+by specifying a joint probability function
 \[
 p(y,\theta),
 \]
@@ -47,27 +58,19 @@ posterior to the specified joint probability,
 p(\theta|y) \propto p(y,\theta) = p(\theta|y) \, p(y).
 \]
 
-Stan's language is more imperative than its declarative 
-predecessors, \BUGS and \JAGS.  Statements are executed in the order 
-they are specified and variables and expressions are strongly typed 
-and declared as data or parameters in the model rather than by a 
-calling function.  \Stan also supports a broader range of arithmetic, 
-matrix, and linear algebra operations than \BUGS or \JAGS.  Users may 
-manipulate log probability functions directly and are not required 
-to use proper priors.
-
 \section{\Stan's Compiler}
 
 \Stan's compiler, \stanc, reads a user program in \Stan's modeling
 language and generates a \Cpp class implementing the model specified
 by that program.  \Stan automatically applies a multivariate transform
 (and its Jacobian determinant) to free any constrained parameters,
-such as deviations (constrained to be positive), unit simplexes (a vector
-constrained to be positive and to sum to 1), and covariance matrices
-(positive definiteness).  The result is an unconstrained sampling (or
-optimization) problem from the perspective of the sampler.  From the
-user's perspective, this transform happens behind the scenes, driven
-by the types declared for each of the parameters.
+such as deviations (constrained to be positive), unit simplexes (a
+vector constrained to be positive and to sum to 1), and covariance
+matrices (symmetric and positive definite).  The result is an
+unconstrained sampling (or optimization) problem from the perspective
+of the sampler.  From the user's perspective, this transform happens
+behind the scenes, driven by the types declared for each of the
+parameters.
 
 The generated \Cpp class can be plugged into \Stan's continuous and
 discrete samplers to read the data $y$ and then draw a sequence of
@@ -96,12 +99,7 @@ of the Hamiltonian as an auxiliary variable, and the only reason for
 rejecting a sample will be discretization error in computing the
 Hamiltonian.
 
-\HMC treats the position of a particle, 
-log probability as a negative potential
-energy function, then samples by adding random kinetic energy and
-simulating the 
-
-In addition to basic \HMC, \Stan implements an adaptive
+In addition to standard \HMC, \Stan implements an adaptive
 version of \HMC, the No-U-Turn Sampler (\NUTS).  \NUTS automatically
 tunes step sizes and a diagonal mass matrix during warmup and then
 adapts the number of leapfrog integration steps during sampling.
@@ -195,7 +193,7 @@ as follows.
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd $stan
-> stanc src/models/basic_distributions/normal.stan
+> bin/stanc src/models/basic_distributions/normal.stan
 \end{Verbatim}
 %
 \begin{Verbatim}
@@ -220,7 +218,7 @@ uses the \clang compiler for \Cpp.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> clang++ -I src -I lib anon_model.cpp 
+> g++ -I src -I lib anon_model.cpp 
 \end{Verbatim}
 \end{quote}
 %
@@ -278,6 +276,7 @@ are comments about aspects of the run.
 #
 # stan_version_major=alpha
 # stan_version_minor=0
+# stan_version_patch=0
 # data=
 # init=random initialization
 # append_samples=0
@@ -373,7 +372,7 @@ value.  The \code{N} individual binary values in the array \code{y}
 are accessed using standard array notation, indexing from 1, as \code{y[1]},
 \code{y[2]}, ..., \code{y[N]}.
 
-The \code{parametes} block declares a single parameter, \code{theta}.
+The \code{parameters} block declares a single parameter, \code{theta}.
 Its type is given as \code{real(0,1)}, meaning it takes on continuous
 values between 0 and 1 inclusive.  The constraint is necessary in
 order to ensure that \code{theta} takes on a legal value as the
@@ -410,7 +409,7 @@ way.  This time, the output model gets an explicitly specified name.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> stanc --name=bern src/models/basic_estimators/bernoulli.stan 
+> bin/stanc --name=bern src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \begin{Verbatim}
 Model name=bern
@@ -424,7 +423,7 @@ generated file.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> clang++ -O3 -I src -I lib -o bern bern.cpp
+> g++ -O3 -I src -I lib -o bern bern.cpp
 \end{Verbatim}
 \end{quote}
 %
@@ -473,7 +472,7 @@ these three approaches, no prior, uniform prior, and beta prior,
 are equally efficient in \Stan's sampler, because their uniformity
 can be determined at compile time and thus computations related to
 them eliminated.  There is further discussion of \Stan optimization
-in \refchapter{optimization}
+in \refchapter{optimization}.
 
 \section{Comments}
 
@@ -498,7 +497,7 @@ an internal close comment sequence, \code{*/}, may take precedence.
 \section{User-Defined Distributions and Functions}
 
 \Stan allows new distributions to be coded directly in its modeling
-language, as described in \refsection{custom-prob-functions}. 
+language, as described in \refchapter{custom-probability-functions}. 
 
 Extending \Stan's underlying \Cpp API provides a way to add new
 functions that may be implemented efficiently and used across

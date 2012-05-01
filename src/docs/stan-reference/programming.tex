@@ -41,24 +41,24 @@ model {
 %
 The log probability term is derived by taking
 \begin{eqnarray*}
-\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Norm}(y|-1,2) \, + \,
+\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
-  \distro{Norm}(y|3,1) \, \right)
+  \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
 & = & \log(\! \begin{array}[t]{l}
-                 \exp(\log(0.3 \times \distro{Norm}(y|-1,2))) \\
-                 + \exp(\log(0.7 \times \distro{Norm}(y|3,1))) \ )
+                 \exp(\log(0.3 \times \distro{Normal}(y|-1,2))) \\
+                 + \exp(\log(0.7 \times \distro{Normal}(y|3,1))) \ )
               \end{array}
 % \\[4pt]
-% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Norm}(y|-1,2))
+% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Normal}(y|-1,2))
 %             \\
-%            + \exp(\log(0.7) + \log \distro{Norm}(y|3,1)) \ )
+%            + \exp(\log(0.7) + \log \distro{Normal}(y|3,1)) \ )
 %             \end{array}
 \\[2pt]
 & = & \mbox{logSumExp}(\! \begin{array}[t]{l}
-                         \log(0.3) + \log \distro{Norm}(y|-1,2),
+                         \log(0.3) + \log \distro{Normal}(y|-1,2),
                          \\                  
-                         \log(0.7) + \log \distro{Norm}(y|3,1) \ ).
+                         \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
                        \end{array}
 \end{eqnarray*}
 
@@ -119,7 +119,7 @@ sum of exponentials of those values.
 \chapter{Order Constraints}
 
 \chapter{Custom Probability
-  Functions}\label{custom-probability-functions.section}
+  Functions}\label{custom-probability-functions.chapter}
 
 
 
@@ -198,7 +198,7 @@ the model will compile and run without arithmetic errors, but will not
 sample properly.%
 %
 \footnote{The problem is the (extremely!) light tails of the triangle
-  distribution.  The basic \HMC and \NUTS samplers cannot get into the
+  distribution.  The standard \HMC and \NUTS samplers cannot get into the
   corners of the triangle properly.  Because the actual code declares
   \code{y} to be of type \code{real(-1,1)}, the inverse logit
   transform is applied to the unconstrained variable and its log
