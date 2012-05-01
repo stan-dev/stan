@@ -38,17 +38,23 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::log1p_exp;
 
-      static const char* function = "stan::prob::ordered_logistic<%1>(%1)";
+      static const char* function = "stan::prob::ordered_logistic<%1%>(%1%)";
       
       using stan::math::check_positive;
       using stan::math::check_nonnegative;
       using stan::math::check_less;
       using stan::math::check_greater;
+      using stan::math::check_bounded;
 
       int K = c.size() + 2;
 
       typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
-      if (!check_nonnegative(function,y,"outcome y must be non-negative",&lp,Policy()))
+      if (!check_bounded(function,
+                         y,
+                         1,
+                         c.size()+2,
+                         "y",
+                         &lp,Policy()))
         return lp;
 
       if (!check_greater(function, c.size(), 0,

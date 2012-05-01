@@ -72,3 +72,11 @@ TEST(ProbDistributions,ordered_logistic_vals_2) {
     EXPECT_FLOAT_EQ(log(theta(k)),
                      ordered_logistic_log(k,lambda,c));
 }
+
+TEST(ProbDistributions,ordered_logistic_default_policy) {
+  Eigen::Matrix<double,Eigen::Dynamic,1> c(2);
+  c << 0.1, 1.2;
+  double lambda = 0.5;
+  EXPECT_THROW(stan::prob::ordered_logistic_log(-1,lambda,c),
+               std::domain_error);
+}
