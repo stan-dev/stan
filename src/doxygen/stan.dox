@@ -1,0 +1,37 @@
+/** 
+ * @namespace stan 
+ * Probability, optimization and sampling library.
+ */ 
+
+/**
+ * @namespace stan::agrad 
+ * Function gradients via reverse-mode automatic differentiation.
+ */
+
+/**
+ * @namespace stan::io
+ * Input/output utilities.
+ */
+
+/**
+ * @namespace stan::math
+ * Matrices and templated mathematical functions.
+ */
+
+/**
+ * @namespace stan::mcmc 
+ * Markov chain Monte Carlo samplers.
+ */
+
+/**
+ * @namespace stan::memory 
+ * (Expert) Allocate, free, and manage underlying system memory.
+ */
+
+/**
+ * @namespace stan::prob 
+ * Templated probability distributions. 
+ *
+ * All paramaterizations are based on Bayesian Data Analysis.
+ * Error handling for the distributions is described in @ref policy_page.
+ */
