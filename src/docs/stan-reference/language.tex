@@ -43,10 +43,10 @@ Sampling is based on simulating the Hamiltonian of a particle with a
 starting position equal to the current parameter values and an initial
 momentum (kinetic energy) generated randomly.  The force at work on
 the particle is the negative log (unnormalized) total probability
-function defined by the model.  Under the usual \HMC approach, the
-particle is simulated using the leapfrog integrator, which discretizes
-the smooth path of the particle into a number of small time steps called
-leapfrog steps.
+function defined by the model.  In the usual approach to implementing
+\HMC, the Hamiltonian dynamics of the particle is simulated using the
+leapfrog integrator, which discretizes the smooth path of the particle
+into a number of small time steps called leapfrog steps.
 
 \subsection{Leapfrog Steps}
 
@@ -64,7 +64,7 @@ needed.  For complex models, many small leapfrog steps may be needed
 to navigate a complex posterior.
 
 If the user has specified the number of leapfrog steps (i.e., chosen
-to use basic \HMC), the specified number of leapfrog steps are
+to use standard \HMC), the specified number of leapfrog steps are
 simulated.  If the user has not specified the number of leapfrog
 steps, the no-U-turn sampler (\NUTS) will determine the number of
 leapfrog steps adaptively.
@@ -172,34 +172,40 @@ forms, that is the form that is used in the model definitions.
 
 \chapter{Data Types and Variable Declarations}\label{data-types.chapter}
 
-This chapter covers the data types that values may have in \Stan.
-Every variable used in a \Stan program must have a declared data type.
-Only values of that type will be assignable to the variable.  This
-follows the convention of programming languages like \Cpp, not the
-conventions of scripting languages like Python or statistical
-languages such as \R or \BUGS.  The motivation for strong, static
-typing is twofold.  First, it forces the programmer's intent to be
-declared with the variable, making programs easier to comprehend and
-hence debug and maintain.  Second, it catches programming errors
-relative to that intent to be caught sooner (at compile time) rather
-than later (at run time).  The \Stan compiler (see \refchapter{stanc})
-will flag any type errors and indicate the offending expressions
-quickly when the program is compiled.
+This chapter covers the data types for expressions in \Stan.  Every
+variable used in a \Stan program must have a declared data type.  Only
+values of that type will be assignable to the variable.  This follows
+the convention of programming languages like \Cpp, not the conventions
+of scripting languages like Python or statistical languages such as \R
+or \BUGS.  The motivation for strong, static typing is twofold.
+First, it forces the programmer's intent to be declared with the
+variable, making programs easier to comprehend and hence debug and
+maintain.  Second, it catches programming errors relative to that
+intent to be caught sooner (at compile time) rather than later (at run
+time).  The \Stan compiler (see \refchapter{stanc}) will flag any type
+errors and indicate the offending expressions quickly when the program
+is compiled.
 
 \section{Overview of Data Types}
+
+\subsection{Basic Data Types}
 
 The primitive \Stan data types are \code{real} for continuous scalar
 quantities and \code{int} for integer values.  The compound data
 types include \code{vector} (of real values), \code{row\_vector} (of
 real values), and \code{matrix} (of real values).
 
+\subsection{Constrained Data Types}
+
 Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  There are two specialized vector data types,
+bounds, or both.  There are two constrained vector data types,
 \code{simplex} for unit simplices and \code{pos\_ordered} for positive,
 ordered sequences of scalars.  There are two specialized matrix data
 types, \code{corr\_matrix} and \code{cov\_matrix}, for correlation
 matrices (symmetric, positive definite, unit diagonal) and covariance
 matrices (symmetric, positive definite). 
+
+\subsection{Arrays}
 
 \Stan supports arrays of arbitrary order of any of the basic data
 types or constrained basic data types.  This includes
@@ -256,12 +262,12 @@ error value is referred to as ``not a number.''
 necessary, but does not automatically demote real values to integers.
 This will cause rounding errors for very large integers .
 
-Real values are not demoted to integers.  For examples, real values
-may only be assigned to real variables, but integer values may be
-assigned to either integer variables or real variables.  What happens
-interally is that the integer representation is converted to a
-floating-point representation.  This operation is not free and is thus
-best avoided if possible.
+Unlike in \Cpp, real values are never demoted to integers.  Therefore,
+real values may only be assigned to real variables, but integer values
+may be assigned to either integer variables or real variables.
+Interally, the integer representation is cast to a floating-point
+representation.  This operation is not without overhead and should
+thus be avoided where possible.
 
 
 \section{Univariate Data Types and Variable Declarations}
@@ -282,7 +288,6 @@ int N;
 \end{Verbatim}
 \end{quote}
 % 
-As in this example, all variable declarations must end with semicolon.
 
 \subsection{Constrained Integer}
 
@@ -376,9 +381,10 @@ parameters {
 %
 This declares a real-valued parameter \code{phi} to take values
 greater than the value of the real-valued data variable \code{lb}.
-Constraints may involve arbitrary expressions so long as the result is
-of type integer and the only variables involved are data or
-transformed data variables.  For instance,
+Constraints may be complex expressions, but must be of type \code{int}
+for integer variables and of type \code{real} for real variables.
+Variables used in constraints can be any variable that has been
+defined at the point the constraint is used.  For instance,
 \begin{quote}
 \begin{Verbatim}
 data { 
@@ -397,6 +403,13 @@ between the minimum and maximum value of \code{y}.
 
 
 \section{Vector and Matrix Data Types}
+
+\subsection{Values}
+
+Vectors, row vectors, and matrices contain real values.  Arrays, on
+the other hand, may contain any kind of value, including integers and
+structured values like vectors.
+
 
 \subsection{Indexing}
 
@@ -439,7 +452,7 @@ simplex(5) theta;
 % 
 
 Unit simplices are implemented as vectors and may be assigned to other
-vectors.  
+vectors and vice-versa.  
 
 
 \subsection{Positive, Ordered Vectors}
@@ -500,10 +513,10 @@ the data or transformed data block.
 \subsection{Correlation Matrices}
 
 Matrix variables may be constrained to represent correlation matrices.
-A matrix is a correlation matrix if it is positive definite (and hence
-square and symmetric), has entries between -1 and 1, and has a unit
-diagonal.  Because correlation matrices are square, they only need one
-dimension declared.  For example,
+A matrix is a correlation matrix if it is symmetric and positive
+definite, has entries between -1 and 1, and has a unit diagonal.
+Because correlation matrices are square, they only need one dimension
+declared.  For example,
 %
 \begin{quote}
 \begin{Verbatim} 
@@ -519,10 +532,9 @@ unconstrained matrices, if their dimensions match, and vice-versa.
 \subsection{Covariance Matrices}
 
 Matrix variables may be constrained to represent covariance matrices.
-A matrix is a covariance matrix if it is positive definite (and hence
-square and symmetric with positive diagonal entries).  Like
-correlation matrices, covariance matrices only need a single dimension
-in their declaration.  For instance,
+A matrix is a covariance matrix if it is symmetric and positive
+definite.  Like correlation matrices, covariance matrices only need a
+single dimension in their declaration.  For instance,
 %
 \begin{quote}
 \begin{Verbatim} 
@@ -671,7 +683,7 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \section{Types versus Sizes}
 
 The size associated with a given variable is not part of its data
-type.  The sizes may determined dynamically (at run time) and thus
+type.  The sizes are determined dynamically (at run time) and thus
 cannot be type-checked statically.  
 
 \subsection{Type Naming Notation}
@@ -1713,7 +1725,7 @@ why there are no statements allowed in the data or parameters block.
 The variables in the \code{data} block are read from an external input
 source such as a file or a designated \R data structure.  The
 variables in the \code{parameters} block are read from the sampler's
-current parameter values (either basic \HMC or \NUTS).  The initial
+current parameter values (either standard \HMC or \NUTS).  The initial
 values may be provided through an external input source, which is also
 typically a file or a designated \R data structure.  In each case, the
 parameters are instantiated to the values for which the model defines
