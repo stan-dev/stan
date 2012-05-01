@@ -1,0 +1,4 @@
+/**
+ * @namespace stan::memory 
+ * (Expert) Allocate, free, and manage underlying system memory.
+ */

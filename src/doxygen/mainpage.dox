@@ -65,7 +65,3 @@
  * The development of Stan was partly supported by the U.&nbsp;S. Department
  * of Energy (DE-SC0002099).
  */
-
-/** 
- * @namespace stan Probability, optimization and sampling library.
- */ 

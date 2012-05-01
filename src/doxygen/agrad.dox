@@ -1,3 +1,0 @@
-/**
- * @namespace stan::agrad Function gradients via reverse-mode automatic differentiation.
- */
