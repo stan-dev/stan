@@ -46,29 +46,19 @@
  * downloaded and installed separately.  The combination of Stan and R is then governed under the
  * Gnu Public License, version 3, as required by the Gnu Public License's compatibility terms.
  *
- * @section policy Error Handling Policies
- * For error handling polices, see @ref policy_page.
- * 
  * @section team Project Team
  *
- * <a href="http://colloquial.com/carp">Bob Carpenter</a>, Columbia University, Department of Statistics
- *
- * <a href="http://www.stat.columbia.edu/visitor-postdoc-bios/lee/postdoc.html">Daniel Lee</a>, Columbia University, Department of Statistics
- *
- * <a href="http://www.cs.princeton.edu/~mdhoffma/">Matt Hoffman</a>, Columbia University, Department of Statistics
- *
- * <a href="http://www.columbia.edu/~bg2382/">Ben Goodrich</a>, Columbia University, Departments of Statistics and Political Science
- *
- * <a href="http://www.linkedin.com/pub/jiqiang-guo/9/4b2/a54">Jiqiang Guo</a>, Columbia University, Department of Statistics
- *
- * <a href="http://malecki.wustl.edu/">Michael Malecki</a>, Columbia University, Departments of Statistics;  YouGov
- *
- * <a href="http://www.cs.toronto.edu/~mbrubake/">Marcus A. Brubaker</a>, University of Toronto, Department of Computer Science; Toyota Technical Institute
- *
- * <a href="http://www.stat.columbia.edu/~gelman/">Andrew Gelman</a>, Columbia University, Departments of Statistics and Political Science
- *
- * <a href="http://statistics.columbia.edu/people-full/106">Wei Wang</a>, Columbia University, Department of Statistics
- *  
+ * <ul>
+ * <li><a href="http://colloquial.com/carp">Bob Carpenter</a>, Columbia University, Department of Statistics
+ * <li><a href="http://www.stat.columbia.edu/visitor-postdoc-bios/lee/postdoc.html">Daniel Lee</a>, Columbia University, Department of Statistics
+ * <li><a href="http://www.cs.princeton.edu/~mdhoffma/">Matt Hoffman</a>, Columbia University, Department of Statistics
+ * <li><a href="http://www.columbia.edu/~bg2382/">Ben Goodrich</a>, Columbia University, Departments of Statistics and Political Science
+ * <li><a href="http://www.linkedin.com/pub/jiqiang-guo/9/4b2/a54">Jiqiang Guo</a>, Columbia University, Department of Statistics
+ * <li><a href="http://malecki.wustl.edu/">Michael Malecki</a>, Columbia University, Departments of Statistics;  YouGov
+ * <li><a href="http://www.cs.toronto.edu/~mbrubake/">Marcus A. Brubaker</a>, University of Toronto, Department of Computer Science; Toyota Technical Institute
+ * <li><a href="http://www.stat.columbia.edu/~gelman/">Andrew Gelman</a>, Columbia University, Departments of Statistics and Political Science
+ * <li><a href="http://statistics.columbia.edu/people-full/106">Wei Wang</a>, Columbia University, Department of Statistics
+ * </ul>
  *	
  * @section Acknowledgements
  *
