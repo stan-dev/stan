@@ -8,6 +8,8 @@ namespace stan {
   namespace mcmc {
 
     /**
+     * Representation of a MCMC sample.
+     *
      * A sample consists of real parameters, integer parameters, and a
      * log probability.
      */
@@ -72,7 +74,7 @@ namespace stan {
        * Set the specified parameter vector's value to the
        * parameters in this sample.
        * 
-       * @param x Vector into which to write the parameters.
+       * @param[out] x Vector into which to write the parameters.
        */
       inline void params_r(std::vector<double>& x) const {
         x = params_r_;
@@ -111,7 +113,7 @@ namespace stan {
        * Set the specified parameter vector's value to
        * the parameters in this sample.
        *
-       * @param n Vector into which to write parameters.
+       * @param[out] n Vector into which to write parameters.
        */
       inline void params_i(std::vector<int>& n) const {
         n = params_i_;
