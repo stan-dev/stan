@@ -33,6 +33,7 @@ namespace stan {
      *
      * @param CPCs fill this unbounded
      * @param sds fill this unbounded
+     * @param Sigma covariance matrix
      * @return false if any of the diagonals of Sigma are 0
      */
     template<typename T>
@@ -248,6 +249,7 @@ namespace stan {
      *
      * @param CPCs on (-1,1)
      * @param sds on (0,inf)
+     * @param log_prob the log probability value to increment with the Jacobian
      * @return Cholesky factor of covariance matrix for specified
      * partial correlations.
      */
@@ -268,6 +270,7 @@ namespace stan {
      *
      * @param CPCs on (-1,1)
      * @param sds on (0,inf)
+     * @param log_prob the log probability value to increment with the Jacobian
      * @return Covariance matrix for specified partial correlations.
      */
     template <typename T>
