@@ -21,7 +21,6 @@ namespace stan {
 
   namespace mcmc {
 
-
     /**
      * Adaptive Hamiltonian Monte Carlo (HMC) sampler. 
      *
