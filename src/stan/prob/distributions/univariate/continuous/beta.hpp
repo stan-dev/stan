@@ -25,7 +25,7 @@ namespace stan {
      * @tparam T_y Type of scalar outcome.
      * @tparam T_scale_succ Type of prior scale for successes.
      * @tparam T_scale_fail Type of prior scale for failures.
-     * @domain_error 
+     * @error_policy
      *    @li alpha must be positive and finite.
      *    @li beta must be positive and finite.
      */
