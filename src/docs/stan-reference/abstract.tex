@@ -1,21 +1,11 @@
 \begin{abstract}
-  \Stan is a general-purpose probabilistic modeling framework designed
-  to support full Bayesian inference.  This document describes \Stan's
-  modeling language for specifying the joint probability of observed
-  data and unobserved parameters.  \Stan's compiler parses model
-  specifications and generates \Cpp code.  \Stan's modeling language
-  is based on \BUGS and \JAGS, and like them, allows users to develop,
-  fit, and evaluate Bayesian models without knowing \Cpp.
 
-  \Stan performs inference by Markov chain Monte Carlo (\MCMC)
-  sampling of parameter values from the posterior distribution of
-  parameters given the observed data.  \Stan employs the no-U-turn
-  sampler (\NUTS), an adaptive form of Hamiltonian Monte Carlo (\HMC)
-  that alleviates the need for user tuning of \HMC's rather sensitive
-  parameters.  By making effective use of the gradient of the log
-  posterior, \HMC converges and explores the parameter distribution
-  faster than Gibbs sampling or random-walk Metropolis-Hastings.  The
-  improved sampling algorithm and more compact and efficient compiled
-  code allows \Stan to operate on data of larger scales and models of
-  more complex structure than \BUGS or \JAGS.
+  \Stan provides a strongly typed, imperative language for specifying
+  joint probability models.  Model specifications are converted to
+  \Cpp code for reading data, transforming parameters, and calculating
+  the log probability function and its gradient.  This \Cpp code is
+  then compiled to an executable for performing full Bayesian
+  inference by sampling from the posterior.  \Stan programs use
+  automatically tuned, adaptive Hamiltonian Monte Carlo for sampling.
+
 \end{abstract}

@@ -223,6 +223,7 @@ add_ternary("beta_log");
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
 add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
+add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_ternary("cauchy_log");
 add_binary("chi_square_log");
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
