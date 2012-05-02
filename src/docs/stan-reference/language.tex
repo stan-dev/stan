@@ -764,8 +764,12 @@ denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
 A variable by itself is a well-formed expression of the same type as
 the variable.  Variables in \Stan consist of \ASCII strings containing
 only the basic lower-case and upper-case Roman letters, digits, and
-the underscore (\code{\_}) character.   Examples of legal variable
-identifiers are as follows.
+the underscore (\code{\_}) character.  Variables must start with a
+letter (\code{a--z} and \code{A--Z}) and may not end with two underscores
+(\code{\_\_}).
+
+Examples of legal variable identifiers are as follows.
+%
 \begin{quote}
 \code{a}, 
 \ \code{a3}, 
@@ -776,7 +780,34 @@ identifiers are as follows.
 \end{quote}
 %
 Unlike in \R and \BUGS, variable identifiers in \Stan may not contain
-a period character.
+a period character.  
+
+The following list contains reserved words for \Stan's programming
+language.  Not all of these features are implemented, but the tokens
+are reserved for future use.
+%
+\begin{quote}
+\code{for},
+\code{in},
+\code{while},
+\code{repeat},
+\code{until},
+\code{if},
+\code{then},
+\code{else},
+\end{quote}
+%
+Variable names will not conflict with block identifiers,
+%
+\begin{quote}
+\code{model},
+\code{data},
+\code{parameters},
+\code{quantities},
+\code{transformed}
+\end{quote}
+%
+or with the names of predefined functions or distributions.
 
 \subsection{Legal Characters}
 
@@ -800,6 +831,22 @@ Characters  & \ASCII (Unicode) Code Points
 Although not the most expressive character set, \ASCII is the most
 portable and least prone to corruption through improper character
 encodings or decodings.
+
+\section{Parentheses for Grouping}
+
+Any expression wrapped in parentheses is also an expression. Like in
+\Cpp, but unlike in \R, only the round parentheses, \code{(} and
+\code{)}, are allowed.  The square bracketes \code{[} and \code{]} are
+reserve for array indexing and the curly braces \code{\{} and
+\code{\}} for grouping statements.
+
+With parentheses it is possible to explicitly group subexpressions
+with operators.  Without parentheses, the expression \code{1 + 2 * 3}
+has a subexpression \code{2 * 3} and evaluates to 7.  With
+parentheses, this grouping may be made explicit with the expression
+\code{1 + (2 * 3)}.  More importantly, the alternative evaluate order
+becomes possible with \code{(1 + 2) * 3}, which evaluates to 6.
+
 
 \section{Arithmetic and Matrix Expressions}
 
@@ -834,7 +881,7 @@ For example, if \code{y} and \code{mu} are variables of type
 then
 %
 \begin{quote}
-\code{(y - mu) * Sigma * (y - mu)'}
+\code{(y - mu)' * Sigma * (y - mu)}
 \end{quote}
 %
 is a well-formed expression of type \code{real}.  The type of the
@@ -848,13 +895,13 @@ multiplication, so the above expression is equivalent to the following
 well-formed, fully specified form.
 %
 \begin{quote}
-\code{((y - mu) * Sigma) * ((y - mu)')}
+\code{((y - mu)' * Sigma) * (y - mu)}
 \end{quote}
 %
-The type of subexpression \code{(y - mu) * Sigma} is inferred to be
-\code{vector}, being the result of multiplying a (column) vector by a
-matrix.  The whole expression's type is thus the type of a vector
-multiplied by a column vector, which produces a \code{real} value.
+The type of subexpression \code{(y - mu)' * Sigma} is inferred to be
+\code{row\_vector}, being the result of multiplying a row vector by a
+matrix.  The whole expression's type is thus the type of a row vector
+multiplied by a (column) vector, which produces a \code{real} value.
 
 
 
@@ -941,7 +988,7 @@ or matrix values.  For example, if \code{m} is of type
 \code{m[1]} refers to the first row of the array, which is a
 one-dimensional array of matrices.  More than one index may be used,
 so that \code{m[1,2]} is of type \code{matrix} and denotes the matrix
-in the first rwo and second column of the array.  Continuing to add
+in the first row and second column of the array.  Continuing to add
 indices, \code{m[1,2,3]} is of type \code{row\_vector} and denotes
 the third row of the matrix denoted by \code{m[1,2]}.  Finally,
 \code{m[1,2,3,4]} is of type \code{real} and denotes the value in the
@@ -1003,6 +1050,7 @@ subexpressions.
 Constants in \Stan are nothing more than nullary (no-argument)
 functions.  For instance, the mathematical constants $\pi$ and $e$ are
 represented as nullary functions named \code{pi()} and \code{e()}.
+See \refsection{built-in-constants} for a list of built-in constants.
 
 \subsection{Type Promotion and Function Resolution}
 
@@ -1073,20 +1121,6 @@ ambiguous functions.
 compiler.  Details are provided in \refappendix{user-defined-functions}.
 
 
-\section{Parentheses for Grouping}
-
-Any expression wrapped in parentheses is also an expression. Like in
-\Cpp, but unlike in \R, only the round parentheses, \code{(} and
-\code{)}, are allowed.  The square bracketes \code{[} and \code{]} are
-reserve for array indexing and the curly braces \code{\{} and
-\code{\}} for grouping statements.
-
-With parentheses it is possible to explicitly group subexpressions
-with operators.  Without parentheses, the expression \code{1 + 2 * 3}
-has a subexpression \code{2 * 3} and evaluates to 7.  With
-parentheses, this grouping may be made explicit with the expression
-\code{1 + (2 * 3)}.  More importantly, the alternative evaluate order
-becomes possible with \code{(1 + 2) * 3}, which evaluates to 6.
 
 
 
@@ -1317,7 +1351,7 @@ lp__ <- lp__ - log(normal_p(2.1,0,1) - normal_p(-0.5,0,1));
 The function \code{normal\_p} represents the cumulative normal
 distribution function.  For example, \code{normal\_p(2.1,0,1)} evaluates to 
 \[
-\int_{-\infty}^{2.1} \mbox{\sf Norm}(x|0,1) \, dx,
+\int_{-\infty}^{2.1} \mbox{\sf Normal}(x|0,1) \, dx,
 \]
 %
 which is the probability a unit normal variable takes on values less
@@ -1570,7 +1604,7 @@ for (n in 1:N)
 \end{quote}
 %
 The problem is that the body of the for loop is taken to be the next
-statement, and that is \code{y[n] ~ normal(mu,sigma)}.  This leaves
+statement, and that is \Verb@y[n] ~ normal(mu,sigma)@.  This leaves
 the probabilty statement for \code{z[n]} hanging, as is clear from
 the following equivalent program.
 %
@@ -1591,12 +1625,11 @@ error.
 
 \subsection{Local Variable Declarations}
 
-A for loop has a statement as a body.  If a block is used 
-It is often convenenient in writing programs to be able to define a
-local variable that will be used temporarily and then forgotten.  
-For instance, the for loop example of repeated assignment should
-use a local variable for maximum clarity and efficiency, as in the
-following example.
+A for loop has a statement as a body.  It is often convenenient in
+writing programs to be able to define a local variable that will be
+used temporarily and then forgotten.  For instance, the for loop
+example of repeated assignment should use a local variable for maximum
+clarity and efficiency, as in the following example.
 %
 \begin{quote}
 \begin{Verbatim}
