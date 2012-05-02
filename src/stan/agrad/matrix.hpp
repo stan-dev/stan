@@ -810,7 +810,8 @@ namespace stan {
     /**
      * Returns the minimum coefficient in the specified
      * column vector.
-     * @param v Specified vector.
+     *
+     * @param[in] v Specified vector.
      * @return Minimum coefficient value in the vector.
      * @throw std::domain_error if v has no elements
      */
@@ -823,7 +824,8 @@ namespace stan {
     /**
      * Returns the minimum coefficient in the specified
      * row vector.
-     * @param rv Specified vector.
+     *
+     * @param[in] rv Specified vector.
      * @return Minimum coefficient value in the vector.
      * @throw std::domain_error if rv has no elements
      */
@@ -836,7 +838,8 @@ namespace stan {
     /**
      * Returns the minimum coefficient in the specified
      * matrix.
-     * @param m Specified matrix.
+     *
+     * @param[in] m Specified matrix.
      * @return Minimum coefficient value in the matrix.
      * @throw std::domain_error if m has no elements
      */
@@ -850,7 +853,8 @@ namespace stan {
     /**
      * Returns the maximum coefficient in the specified
      * column vector.
-     * @param v Specified vector.
+     *
+     * @param[in] v Specified vector.
      * @return Maximum coefficient value in the vector.
      * @throw std::domain_error if v has no elements
      */
@@ -863,7 +867,7 @@ namespace stan {
     /**
      * Returns the maximum coefficient in the specified
      * row vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Maximum coefficient value in the vector.
      * @throw std::domain_error if rv has no elements
      */
@@ -876,7 +880,7 @@ namespace stan {
     /**
      * Returns the maximum coefficient in the specified
      * matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Maximum coefficient value in the matrix.
      * @throw std::domain_error if m has no elements
      */
@@ -890,7 +894,7 @@ namespace stan {
     /**
      * Returns the sample mean (i.e., average) of the coefficients
      * in the specified column vector.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Sample mean of vector coefficients.
      * @throw std::domain_error if v has no elements
      */
@@ -903,7 +907,7 @@ namespace stan {
     /**
      * Returns the sample mean (i.e., average) of the coefficients
      * in the specified row vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Sample mean of vector coefficients.
      * @throw std::domain_error if rv has no elements
      */
@@ -916,7 +920,7 @@ namespace stan {
     /**
      * Returns the sample mean (i.e., average) of the coefficients
      * in the specified matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Sample mean of matrix coefficients.
      * @throw std::domain_error if m has no elements
      */
@@ -930,9 +934,9 @@ namespace stan {
     /**
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified column vector.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Sample variance of vector. If there is only one element, returns 0.0
-     * @throw std::domain_error if v has 0 elements
+     * @throw std::domain_error if v has no elements
      */
     template <typename T>
     inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
@@ -954,9 +958,9 @@ namespace stan {
     /**
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified row vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Sample variance of vector. If there is only one element, returns 0.0
-     * @throw std::domain_error if rv has 0 elements
+     * @throw std::domain_error if rv has no elements
      */
     template <typename T>
     inline var variance(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
@@ -975,9 +979,9 @@ namespace stan {
     /**
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Sample variance of vector. If there is only one element, returns 0.0
-     * @throw std::domain_error if v has 0 elements
+     * @throw std::domain_error if v has no elements
      */
     template <typename T>
     inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
@@ -999,10 +1003,10 @@ namespace stan {
     /**
      * Returns the unbiased sample standard deviation of the
      * coefficients in the specified column vector.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Sample standard deviation of vector. If there is only one element, 
      * returns 0.0
-     * @throw std::domain_error if v has 0 elements
+     * @throw std::domain_error if v has no elements
      */
     template <typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
@@ -1013,10 +1017,10 @@ namespace stan {
     /**
      * Returns the unbiased sample standard deviation of the
      * coefficients in the specified row vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Sample standard deviation of vector. If there is only one element, 
      * returns 0.0
-     * @throw std::domain_error if rv has 0 elements
+     * @throw std::domain_error if rv has no elements
      */
     template <typename T>
     inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
@@ -1027,10 +1031,10 @@ namespace stan {
     /**
      * Returns the unbiased sample standard deviation of the
      * coefficients in the specified matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Sample standard deviation of a matrix. If there is only one element, 
      * returns 0.0
-     * @throw std::domain_error if m has 0 elements
+     * @throw std::domain_error if m has no elements
      */
     template <typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
@@ -1042,7 +1046,7 @@ namespace stan {
     /**
      * Returns the sum of the coefficients of the specified
      * column vector.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Sum of coefficients of vector.
      */
     template <typename T>
@@ -1052,7 +1056,7 @@ namespace stan {
     /**
      * Returns the sum of the coefficients of the specified
      * row vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Sum of coefficients of vector.
      */
     template <typename T>
@@ -1062,7 +1066,7 @@ namespace stan {
     /**
      * Returns the sum of the coefficients of the specified
      * matrix
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Sum of coefficients of matrix.
      */
     template <typename T>
@@ -1073,7 +1077,7 @@ namespace stan {
     /**
      * Returns the product of the coefficients of the specified
      * column vector.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Product of coefficients of vector.
      */
     inline var prod(const vector_v& v) {
@@ -1082,7 +1086,7 @@ namespace stan {
     /**
      * Returns the product of the coefficients of the specified
      * row vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Product of coefficients of vector.
      */
     inline var prod(const row_vector_v& rv) {
@@ -1091,7 +1095,7 @@ namespace stan {
     /**
      * Returns the product of the coefficients of the specified
      * matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Product of coefficients of matrix.
      */
     inline var prod(const matrix_v& m) {
@@ -1103,7 +1107,7 @@ namespace stan {
      * is defined as the sum of the elements on the diagonal.
      * The matrix is not required to be square.
      *
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Trace of the matrix.
      */
     inline var trace(const matrix_v& m) {
@@ -1113,7 +1117,7 @@ namespace stan {
     /**
      * Return the element-wise logarithm of the matrix or vector.
      *
-     * @param m The matrix or vector.
+     * @param[in] m The matrix or vector.
      * @return ret(i,j) = log(m(i,j))
      */
     template<typename TM, int Rows, int Cols>
@@ -1124,7 +1128,7 @@ namespace stan {
     /**
      * Return the element-wise exponentiation of the matrix or vector.
      *
-     * @param m The matrix or vector.
+     * @param[in] m The matrix or vector.
      * @return ret(i,j) = exp(m(i,j))
      */
     template<typename TM, int Rows, int Cols>
@@ -1135,10 +1139,11 @@ namespace stan {
     /**
      * Return the sum of the specified column vectors.
      * The two vectors must have the same size.
-     * @param v1 First vector.
-     * @param v2 Second vector.
+     *
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
+     * @throw std::invalid_argument if size of v1 is not equal to size of v2.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, 1> 
@@ -1151,10 +1156,11 @@ namespace stan {
     /**
      * Return the sum of the specified row vectors.  The
      * two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
+     *
+     * @param[in] rv1 First vector.
+     * @param[in] rv2 Second vector.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if length of rv1 is not equal to length of rv2.
+     * @throw std::invalid_argument if size of rv1 is not equal to size of rv2.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, 1, Eigen::Dynamic>
@@ -1168,8 +1174,9 @@ namespace stan {
     /**
      * Return the sum of the specified matrices.  The two matrices
      * must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     *
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return Sum of the two vectors.
      * @throw std::invalid_argument if dimension of m1 and m2 do not match.
      */
@@ -1184,8 +1191,8 @@ namespace stan {
 
     /**
      * Return the sum of a matrix or vector and a scalar.
-     * @param m Matrix or vector.
-     * @param c Scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
      * @return Matrix or Vector plus the scalar.
      */
     template <typename T1, typename T2, int Rows, int Cols>
@@ -1197,8 +1204,8 @@ namespace stan {
 
     /**
      * Return the sum of a scalar and a matrix or vector.
-     * @param c Scalar.
-     * @param m Matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
      * @return Scalar plus vector.
      */
     template <typename T1, typename T2, int Rows, int Cols>
@@ -1210,8 +1217,8 @@ namespace stan {
 
     /**
      * Return the difference between a matrix or vector  and a scalar.
-     * @param m Matrix or vector.
-     * @param c Scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
      * @return Vector minus the scalar.
      */
     template <typename T1, typename T2, int Rows, int Cols>
@@ -1222,8 +1229,8 @@ namespace stan {
     }
     /**
      * Return the difference between a scalar and a matrix or vector.
-     * @param c Scalar.
-     * @param m Matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
      * @return Scalar minus vector.
      */
     template <typename T1, typename T2, int Rows, int Cols>
@@ -1235,8 +1242,8 @@ namespace stan {
     /**
      * Return the difference between the first specified column vector
      * and the second.  The two vectors must have the same size.
-     * @param v1 First vector.
-     * @param v2 Second vector.
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
      * @return First vector minus the second vector.
      * @throw std::invalid_argument if size of v1 does not match size of v2.
      */
@@ -1251,8 +1258,8 @@ namespace stan {
     /**
      * Return the difference between the first specified row vector
      * and the second.  The two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
+     * @param[in] rv1 First vector.
+     * @param[in] rv2 Second vector.
      * @return First vector minus the second vector.
      * @throw std::invalid_argument if size of rv1 does not match size of rv2.
      */
@@ -1268,8 +1275,8 @@ namespace stan {
     /**
      * Return the difference between the first specified matrix and
      * the second.  The two matrices must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return First matrix minus the second matrix.
      * @throw std::invalid_argument if dimension of m1 and m2 do not match.
      */
@@ -1286,7 +1293,7 @@ namespace stan {
     /**
      * Return the negation of the specified variable.  The result
      * is the same as multiplying by the scalar <code>-1</code>.
-     * @param v Specified variable.  
+     * @param[in] v Specified variable.  
      * @return The negation of the variable.
      */
     template <typename T>
@@ -1296,7 +1303,7 @@ namespace stan {
     /**
      * Return the negation of the specified column vector.  The result
      * is the same as multiplying by the scalar <code>-1</code>.
-     * @param v Specified vector.  
+     * @param[in] v Specified vector.  
      * @return The negation of the vector.
      */
     template <typename T>
@@ -1306,7 +1313,7 @@ namespace stan {
     /**
      * Return the negation of the specified row vector.  The result is
      * the same as multiplying by the scalar <code>-1</code>.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return The negation of the vector.
      */
     template <typename T>
@@ -1316,7 +1323,7 @@ namespace stan {
     /**
      * Return the negation of the specified matrix.  The result is the same
      * as multiplying by the scalar <code>-1</code>.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return The negation of the matrix.
      */
     template <typename T>
@@ -1327,8 +1334,8 @@ namespace stan {
     /**
      * Return the division of the first scalar by
      * the second scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
+     * @param[in] v Specified vector.
+     * @param[in] c Specified scalar.
      * @return Vector divided by the scalar.
      */
     template <typename T1, typename T2>
@@ -1339,8 +1346,8 @@ namespace stan {
     /**
      * Return the division of the specified column vector by
      * the specified scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
+     * @param[in] v Specified vector.
+     * @param[in] c Specified scalar.
      * @return Vector divided by the scalar.
      */
     template <typename T1, typename T2>
@@ -1351,8 +1358,8 @@ namespace stan {
     /**
      * Return the division of the specified row vector by
      * the specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
+     * @param[in] rv Specified vector.
+     * @param[in] c Specified scalar.
      * @return Vector divided by the scalar.
      */
     template <typename T1, typename T2>
@@ -1363,8 +1370,8 @@ namespace stan {
     /**
      * Return the division of the specified matrix by the specified
      * scalar.
-     * @param m Specified matrix.
-     * @param c Specified scalar.
+     * @param[in] m Specified matrix.
+     * @param[in] c Specified scalar.
      * @return Matrix divided by the scalar.
      */
     template <typename T1, typename T2>
@@ -1375,8 +1382,8 @@ namespace stan {
 
     /**
      * Return the elementwise product of the specified matrices.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return Elementwise product of the matrices.
      */
     template <typename T1, typename T2>
@@ -1392,8 +1399,8 @@ namespace stan {
     }
     /**
      * Return the elementwise product of the specified vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
      * @return Elementwise product of the vectors.
      */
     template <typename T1, typename T2>
@@ -1407,8 +1414,8 @@ namespace stan {
     }
     /**
      * Return the elementwise product of the specified row vectors.
-     * @param v1 First row vector.
-     * @param v2 Second row vector.
+     * @param[in] v1 First row vector.
+     * @param[in] v2 Second row vector.
      * @return Elementwise product of the row vectors.
      */
     template <typename T1, typename T2>
@@ -1424,8 +1431,8 @@ namespace stan {
 
     /**
      * Return the elementwise division of the specified matrices.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return Elementwise division of the matrices.
      */
     template <typename T1, typename T2>
@@ -1441,8 +1448,8 @@ namespace stan {
     }
     /**
      * Return the elementwise division of the specified vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
      * @return Elementwise division of the vectors.
      */
     template <typename T1, typename T2>
@@ -1456,8 +1463,8 @@ namespace stan {
     }
     /**
      * Return the elementwise division of the specified row vectors.
-     * @param v1 First row vector.
-     * @param v2 Second row vector.
+     * @param[in] v1 First row vector.
+     * @param[in] v2 Second row vector.
      * @return Elementwise division of the row vectors.
      */
     template <typename T1, typename T2>
@@ -1472,8 +1479,8 @@ namespace stan {
 
     /**
      * Return the product of two scalars.
-     * @param v First scalar.
-     * @param c Specified scalar.
+     * @param[in] v First scalar.
+     * @param[in] c Specified scalar.
      * @return Product of vector and scalar.
      */
     template <typename T1, typename T2>
