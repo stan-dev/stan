@@ -13,20 +13,6 @@
 
 namespace Eigen {
 
-  namespace internal {
-    
-    template <>  
-    struct scalar_product_traits<stan::agrad::var,double> {
-      typedef stan::agrad::var ReturnType;
-    };
-
-    template <>  
-    struct scalar_product_traits<double,stan::agrad::var> {
-      typedef stan::agrad::var ReturnType;
-    };
-    
-  }
-
   /**
    * Numerical traits template override for Eigen for automatic
    * gradient variables.
@@ -120,6 +106,24 @@ namespace Eigen {
         return cast<double,int>(ceil(-log(NumTraits<stan::agrad::var>::epsilon().val())
                                      /log(10.0)));
       }
+    };
+
+    /**
+     * Scalar product traits override for Eigen for automatic
+     * gradient variables.
+     */
+    template <>  
+    struct scalar_product_traits<stan::agrad::var,double> {
+      typedef stan::agrad::var ReturnType;
+    };
+
+    /**
+     * Scalar product traits override for Eigen for automatic
+     * gradient variables.
+     */
+    template <>  
+    struct scalar_product_traits<double,stan::agrad::var> {
+      typedef stan::agrad::var ReturnType;
     };
 
   }
@@ -444,7 +448,8 @@ namespace stan {
      * @throw std::domain_error if m is not a square matrix
      */
     var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
-
+    
+    namespace {
     // FIXME: move to anonymous namespace?
     class dot_self_vari : public vari {
     protected:
@@ -606,7 +611,7 @@ namespace stan {
 	}
       }
     };
-
+    }
 
     /**
      * Returns the dot product of a vector with itself.
@@ -1935,6 +1940,7 @@ namespace stan {
 namespace Eigen {
 
   namespace internal {
+
     // FIXME: untested
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
