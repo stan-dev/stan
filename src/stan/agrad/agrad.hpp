@@ -2321,9 +2321,6 @@ namespace stan {
 }
 
 
-/** 
- * Template specification of functions in std for Stan.
- */
 namespace std {
 
   /** 
