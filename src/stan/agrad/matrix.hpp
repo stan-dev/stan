@@ -450,7 +450,6 @@ namespace stan {
     var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
     
     namespace {
-      // FIXME: move to anonymous namespace?
       class dot_self_vari : public vari {
       protected:
 	vari** v_;
@@ -477,7 +476,6 @@ namespace stan {
 	}
       };
 
-      // FIXME: move to anonymous namespace?
       class dot_product_vv_vari : public vari {
       protected:
 	vari** v1_;
@@ -526,7 +524,7 @@ namespace stan {
 	  }
 	}
       };
-      // FIXME: move to anonymous namespace?
+
       class dot_product_vd_vari : public vari {
       protected:
 	vari** v1_;
@@ -574,6 +572,7 @@ namespace stan {
 	  }
 	}
       };
+
       // FIXME: untested
       class gevv_vvv_vari : public stan::agrad::vari {
       protected:
@@ -1444,12 +1443,24 @@ namespace stan {
       return to_var(v) * to_var(c);
     }
 
+    /**
+     * Return the product of scalar and matrix.
+     * @param[in] c Specified scalar.
+     * @param[in] m Matrix.
+     * @return Product of scalar and matrix.
+     */
     template<typename T1,typename T2,int R2,int C2>
     inline Eigen::Matrix<var,R2,C2> multiply(const T1& c, 
                                              const Eigen::Matrix<T2, R2, C2>& m) {
       return to_var(m) * to_var(c);
     }
 
+    /**
+     * Return the product of scalar and matrix.
+     * @param[in] m Matrix.
+     * @param[in] c Specified scalar.
+     * @return Product of scalar and matrix.
+     */
     template<typename T1,int R1,int C1,typename T2>
     inline Eigen::Matrix<var,R1,C1> multiply(const Eigen::Matrix<T1, R1, C1>& m, 
                                              const T2& c) {
