@@ -1,0 +1,5 @@
+/** 
+ * @namespace std
+ * Template specification of functions in std for Stan.
+ */
+
