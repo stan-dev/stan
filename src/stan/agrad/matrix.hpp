@@ -630,8 +630,8 @@ namespace stan {
     /**
      * Returns the dot product.
      *
-     * @param v1[in] First column vector.
-     * @param v2[in] Second column vector.
+     * @param[in] v1 First column vector.
+     * @param[in] v2 Second column vector.
      * @return Dot product of the vectors.
      * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
@@ -649,8 +649,8 @@ namespace stan {
     /**
      * Returns the dot product.
      *
-     * @param v1[in] First column vector.
-     * @param v2[in] Second column vector.
+     * @param[in] v1 First column vector.
+     * @param[in] v2 Second column vector.
      * @return Dot product of the vectors.
      * @throw std::invalid_argument if length of v1 is not equal to length of v2
      * or either v1 or v2 are not vectors.
@@ -1471,8 +1471,8 @@ namespace stan {
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
      * in the second matrix.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return The product of the first and second matrices.
      * @throw std::invalid_argument if the number of columns of m1 does not match
      *   the number of rows of m2.
@@ -1497,8 +1497,8 @@ namespace stan {
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
      * in the second matrix.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return The product of the first and second matrices.
      * @throw std::invalid_argument if the number of columns of m1 does not match
      *   the number of rows of m2.
@@ -1523,8 +1523,8 @@ namespace stan {
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
      * in the second matrix.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
+     * @param[in] m1 First matrix.
+     * @param[in] m2 Second matrix.
      * @return The product of the first and second matrices.
      * @throw std::invalid_argument if the number of columns of m1 does not match
      *   the number of rows of m2.
@@ -1549,8 +1549,8 @@ namespace stan {
      * Return the scalar product of the specified row vector and
      * specified column vector.  The return is the same as the dot
      * product.  The two vectors must be the same size.
-     * @param rv Row vector.
-     * @param v Column vector.
+     * @param[in] rv Row vector.
+     * @param[in] v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
      * @throw std::invalid_argument if rv and v are not the same size
      */
@@ -1565,8 +1565,8 @@ namespace stan {
      * Return the scalar product of the specified row vector and
      * specified column vector.  The return is the same as the dot
      * product.  The two vectors must be the same size.
-     * @param rv Row vector.
-     * @param v Column vector.
+     * @param[in] rv Row vector.
+     * @param[in] v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
      * @throw std::invalid_argument if rv and v are not the same size
      */
@@ -1581,8 +1581,8 @@ namespace stan {
      * Return the scalar product of the specified row vector and
      * specified column vector.  The return is the same as the dot
      * product.  The two vectors must be the same size.
-     * @param rv Row vector.
-     * @param v Column vector.
+     * @param[in] rv Row vector.
+     * @param[in] v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
      * @throw std::invalid_argument if rv and v are not the same size
      */
@@ -1598,8 +1598,8 @@ namespace stan {
      * Return the specified row minus 1 of the specified matrix.  That is,
      * indexing is from 1, not 0, so this function returns the same
      * value as the Eigen matrix call <code>m.row(i - 1)</code>.
-     * @param m Matrix.
-     * @param i Row index (plus 1).
+     * @param[in] m Matrix.
+     * @param[in] i Row index (plus 1).
      * @return Specified row of the matrix; between 1 and the number
      * of rows of <code>m</code> inclusive.
      * @throws std::invalid_argument If the index is 0 or
@@ -1611,8 +1611,8 @@ namespace stan {
      * Return the specified column minus 1 of the specified matrix.  Thus
      * indexing is from 1, not 0, and this method returns the equivalent of
      * the Eigen matrix call <code>m.col(j - 1)</code>.
-     * @param m Matrix.
-     * @param j Column index (plus 1); between 1 and the number of
+     * @param[in] m Matrix.
+     * @param[in] j Column index (plus 1); between 1 and the number of
      * columns of <code>m</code> inclusive.
      * @return Specified column of the matrix.
      * @throws std::invalid_argument if the index is 0 or greater than
@@ -1623,7 +1623,7 @@ namespace stan {
     /**
      * Return a column vector of the diagonal elements of the
      * specified matrix.  The matrix is not required to be square.
-     * @param m Specified matrix.  
+     * @param[in] m Specified matrix.  
      * @return Diagonal of the matrix.
      */
     vector_v diagonal(const matrix_v& m);
@@ -1631,7 +1631,7 @@ namespace stan {
     /**
      * Return a square diagonal matrix with the specified vector of
      * coefficients as the diagonal values.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Diagonal matrix with vector as diagonal values.
      */
     matrix_v diag_matrix(const vector_v& v);
@@ -1639,36 +1639,36 @@ namespace stan {
     /**
      * Return the transposition of the specified column
      * vector.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Transpose of the vector.
      */
     row_vector_v transpose(const vector_v& v);
     /**
      * Return the transposition of the specified row
      * vector.
-     * @param rv Specified vector.
+     * @param[in] rv Specified vector.
      * @return Transpose of the vector.
      */
     vector_v transpose(const row_vector_v& rv);
     /**
      * Return the transposition of the specified matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Transpose of the matrix.
      */
     matrix_v transpose(const matrix_v& m);
 
     /**
      * Returns the inverse of the specified matrix.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Inverse of the matrix.
      */
     matrix_v inverse(const matrix_v& m);
 
     /**
      * Returns the solution of the system Ax=b when A is triangular.
-     * @param A Triangular matrix.  Upper or lower is defined by TriView being
+     * @param[in] A Triangular matrix.  Upper or lower is defined by TriView being
      * either Eigen::Upper or Eigen::Lower.
-     * @param b Right hand side matrix or vector.
+     * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the rows of b don't
      * match the size of A.
@@ -1684,9 +1684,9 @@ namespace stan {
     }
     /**
      * Returns the solution of the system Ax=b when A is triangular.
-     * @param A Triangular matrix.  Upper or lower is defined by TriView being
+     * @param[in] A Triangular matrix.  Upper or lower is defined by TriView being
      * either Eigen::Upper or Eigen::Lower.
-     * @param b Right hand side matrix or vector.
+     * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the rows of b don't
      * match the size of A.
@@ -1702,9 +1702,9 @@ namespace stan {
     }
     /**
      * Returns the solution of the system Ax=b when A is triangular.
-     * @param A Triangular matrix.  Upper or lower is defined by TriView being
+     * @param[in] A Triangular matrix.  Upper or lower is defined by TriView being
      * either Eigen::Upper or Eigen::Lower.
-     * @param b Right hand side matrix or vector.
+     * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the rows of b don't
      * match the size of A.
@@ -1721,8 +1721,8 @@ namespace stan {
 
     /**
      * Returns the solution of the system Ax=b.
-     * @param A Matrix.
-     * @param b Right hand side matrix or vector.
+     * @param[in] A Matrix.
+     * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the rows of b don't
      * match the size of A.
@@ -1738,8 +1738,8 @@ namespace stan {
     }
     /**
      * Returns the solution of the system Ax=b.
-     * @param A Matrix.
-     * @param b Right hand side matrix or vector.
+     * @param[in] A Matrix.
+     * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the rows of b don't
      * match the size of A.
@@ -1756,8 +1756,8 @@ namespace stan {
     }
     /**
      * Returns the solution of the system Ax=b.
-     * @param A Matrix.
-     * @param b Right hand side matrix or vector.
+     * @param[in] A Matrix.
+     * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the rows of b don't
      * match the size of A.
@@ -1774,8 +1774,8 @@ namespace stan {
 
     /**
      * Returns the solution x of the system xA = b.
-     * @param b Right hand side matrix or vector.
-     * @param A Matrix.
+     * @param[in] b Right hand side matrix or vector.
+     * @param[in] A Matrix.
      * @return x = b A^-1, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the cols of b don't
      * match the size of A.
@@ -1791,8 +1791,8 @@ namespace stan {
     }
     /**
      * Returns the solution x of the system xA = b.
-     * @param b Right hand side matrix or vector.
-     * @param A Matrix.
+     * @param[in] b Right hand side matrix or vector.
+     * @param[in] A Matrix.
      * @return x = b A^-1, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the cols of b don't
      * match the size of A.
@@ -1808,8 +1808,8 @@ namespace stan {
     }
     /**
      * Returns the solution x of the system xA = b.
-     * @param b Right hand side matrix or vector.
-     * @param A Matrix.
+     * @param[in] b Right hand side matrix or vector.
+     * @param[in] A Matrix.
      * @return x = b A^-1, solution of the linear system.
      * @throws std::invalid_argument if A is not square or the cols of b don't
      * match the size of A.
@@ -1827,7 +1827,7 @@ namespace stan {
      * Return the real component of the eigenvalues of the specified
      * matrix in descending order of magnitude.
      * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Eigenvalues of matrix.
      */
     vector_v eigenvalues(const matrix_v& m);
@@ -1836,7 +1836,7 @@ namespace stan {
      * Return a matrix whose columns are the real components of the
      * eigenvectors of the specified matrix.
      * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Eigenvectors of matrix.
      */
     matrix_v eigenvectors(const matrix_v& m);
@@ -1851,10 +1851,10 @@ namespace stan {
      $ \f$\mbox{\rm diag}(D)\f$ is the square diagonal matrix with
      * diagonal elements \f$D\f$ and \f$V^{-1}\f$ is the inverse of
      * \f$V\f$.
-     * @param m Specified matrix.
-     * @param eigenvalues Column vector reference into which
+     * @param[in] m Specified matrix.
+     * @param[out] eigenvalues Column vector reference into which
      * eigenvalues are written.
-     * @param eigenvectors Matrix reference into which eigenvectors
+     * @param[out] eigenvectors Matrix reference into which eigenvectors
      * are written.
      */
     void eigen_decompose(const matrix_v& m,
@@ -1867,7 +1867,7 @@ namespace stan {
      * efficient than the general eigenvalues function for symmetric
      * matrices.
      * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Eigenvalues of matrix.
      */
     vector_v eigenvalues_sym(const matrix_v& m);
@@ -1877,7 +1877,7 @@ namespace stan {
      * is more efficient than the general eigenvectors function for
      * symmetric matrices.
      * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Symmetric matrix.
+     * @param[in] m Symmetric matrix.
      * @return Eigenvectors of matrix.
      */
     matrix_v eigenvectors_sym(const matrix_v& m);
@@ -1886,11 +1886,11 @@ namespace stan {
      * of the specified symmetric matrix to the specified references.
      * <p>See <code>eigen_decompose()</code> for more information on the
      * values.
-     * @param m Symmetric matrix.  This function is more efficient
+     * @param[in] m Symmetric matrix.  This function is more efficient
      * than the general decomposition method for symmetric matrices.
-     * @param eigenvalues Column vector reference into which
+     * @param[out] eigenvalues Column vector reference into which
      * eigenvalues are written.
-     * @param eigenvectors Matrix reference into which eigenvectors
+     * @param[out] eigenvectors Matrix reference into which eigenvectors
      * are written.
      */
     void eigen_decompose_sym(const matrix_v& m,
@@ -1903,7 +1903,7 @@ namespace stan {
      * value \f$L\f$ will be a lower-traingular matrix such that the
      * original matrix \f$A\f$ is given by
      * <p>\f$A = L \times L^T\f$.
-     * @param m Symmetrix matrix.
+     * @param[in] m Symmetrix matrix.
      * @return Square root of matrix.
      * @throw std::domain_error if m is not a square matrix
      */
@@ -1914,7 +1914,7 @@ namespace stan {
      * in decreasing order of magnitude.
      * <p>See the documentation for <code>svd()</code> for
      * information on the signular values.
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Singular values of the matrix.
      */
     vector_v singular_values(const matrix_v& m);
@@ -1935,10 +1935,10 @@ namespace stan {
      * then \f$U\f$ is an \f$M \times K\f$ matrix,  
      * \f$S\f$ is a length \f$K\f$ column vector, and 
      * \f$V\f$ is an \f$N \times K\f$ matrix.
-     * @param m Matrix to decompose.
-     * @param u Left singular vectors.
-     * @param v Right singular vectors.
-     * @param s Singular values.
+     * @param[in] m Matrix to decompose.
+     * @param[out] u Left singular vectors.
+     * @param[out] v Right singular vectors.
+     * @param[out] s Singular values.
      */
     void svd(const matrix_v& m,
              matrix_v& u,
@@ -1953,6 +1953,9 @@ namespace Eigen {
   namespace internal {
 
     // FIXME: untested
+    /**
+     * Template specification of general_matrix_vector_product for stan::agrad::var.
+     */
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
@@ -1972,7 +1975,11 @@ namespace Eigen {
 	}
       }
     };
+    
     // FIXME: untested
+    /**
+     * Template specification of general_matrix_vector_product for stan::agrad::var.
+     */
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,RowMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
