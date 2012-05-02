@@ -74,9 +74,12 @@ namespace boost {
 
   namespace math {   
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -86,10 +89,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -97,10 +103,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -108,8 +116,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -120,9 +131,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -132,10 +146,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -143,10 +160,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -154,8 +173,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -166,9 +188,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -178,10 +203,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -189,10 +217,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -200,8 +230,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -212,9 +245,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -224,10 +260,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -235,10 +274,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -246,8 +287,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -258,9 +302,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -270,10 +317,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -281,10 +331,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -292,8 +344,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -304,9 +359,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -316,10 +374,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -327,10 +388,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -338,8 +401,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -350,9 +416,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -362,10 +431,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -373,10 +445,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -384,8 +458,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -396,9 +473,12 @@ namespace boost {
     }
 
 
-    /** 
-     * Return <code>true</code> for all arguments.
+    /**
+     * Checks if the given number has finite value.
+     *
      * Integer values are always finite.
+     * Returns <code>true</code> for all arguments.
+     * 
      * @param n Value to test.
      * @return <code>true</code>
      */
@@ -408,10 +488,13 @@ namespace boost {
       return true;
     }
     /** 
-     * Return <code>false</code> for all arguments.
-     * Integer values are never infinite.
+     * Checks if the given number is infinite.
+     * 
+     * Integer values are never infinite. 
+     * Returns <code>false</code> for all arguments.
+     * 
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -419,10 +502,12 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>false</code> for all arguments.
+     * Checks if the given number is NaN
+     * 
      * Integer values are never NaN.
+     * Returns <code>false</code> for all arguments.
      * @param n Value to test.
-     * @return <code>true</code>
+     * @return <code>false</code>
      */
     template <>
     inline
@@ -430,8 +515,11 @@ namespace boost {
       return false;
     }
     /** 
-     * Return <code>true</code> for all arguments.
+     * Checks if the given number is normal.
+     * 
      * Integer values are always normal.
+     * Return <code>true</code> for all arguments.
+     *
      * @param n Value to test.
      * @return <code>true</code>
      */

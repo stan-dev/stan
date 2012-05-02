@@ -34,12 +34,11 @@ namespace stan {
      * @tparam propto True if calculating up to a proportion.
      * @tparam T_loc Location type.
      * @tparam T_cut Cut-point type.
-     * @tparam Policy 
+     * @tparam Policy Error policy (only its type matters). 
 
      * @param y Outcome.
      * @param lambda Location.
      * @param c Positive increasing vector of cutpoints.
-     * @param Policy Error policy (only its type matters).
      * @return Log probability of outcome given location and
      * cutpoints.
      
