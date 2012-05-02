@@ -11,44 +11,45 @@
 #include <stan/math/matrix.hpp>
 
 namespace stan {
-namespace agrad {
-class gevv_vvv_vari : public stan::agrad::vari {
-protected:
-  stan::agrad::vari* alpha_;
-  stan::agrad::vari** v1_;
-  stan::agrad::vari** v2_;
-  size_t length_;
-  inline static double eval_gevv(const stan::agrad::var* alpha,
-                                 const stan::agrad::var* v1, int stride1,
-                                 const stan::agrad::var* v2, int stride2,
-                                 size_t length) {
-    double result = 0;
-    for (size_t i = 0; i < length; i++)
-      result += alpha->vi_->val_ * v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
-    return result;
-  }
-public:
-  gevv_vvv_vari(const stan::agrad::var* alpha, 
-                const stan::agrad::var* v1, int stride1, 
-                const stan::agrad::var* v2, int stride2, size_t length) : 
-    vari(eval_gevv(alpha, v1, stride1, v2, stride2, length)), length_(length) {
+  namespace agrad {
+    // FIXME: untested
+    class gevv_vvv_vari : public stan::agrad::vari {
+    protected:
+      stan::agrad::vari* alpha_;
+      stan::agrad::vari** v1_;
+      stan::agrad::vari** v2_;
+      size_t length_;
+      inline static double eval_gevv(const stan::agrad::var* alpha,
+				     const stan::agrad::var* v1, int stride1,
+				     const stan::agrad::var* v2, int stride2,
+				     size_t length) {
+	double result = 0;
+	for (size_t i = 0; i < length; i++)
+	  result += alpha->vi_->val_ * v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
+	return result;
+      }
+    public:
+      gevv_vvv_vari(const stan::agrad::var* alpha, 
+		    const stan::agrad::var* v1, int stride1, 
+		    const stan::agrad::var* v2, int stride2, size_t length) : 
+	vari(eval_gevv(alpha, v1, stride1, v2, stride2, length)), length_(length) {
         alpha_ = alpha->vi_;
-    v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
-    v2_ = v1_ + length_;
-    for (size_t i = 0; i < length_; i++)
-      v1_[i] = v1[i*stride1].vi_;
-    for (size_t i = 0; i < length_; i++)
-      v2_[i] = v2[i*stride2].vi_;
-  }
-  void chain() {
-    for (size_t i = 0; i < length_; i++) {
-      v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
-      v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
-      alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
-    }
-  }
-};
-} /* namespace agrad */
+	v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
+	v2_ = v1_ + length_;
+	for (size_t i = 0; i < length_; i++)
+	  v1_[i] = v1[i*stride1].vi_;
+	for (size_t i = 0; i < length_; i++)
+	  v2_[i] = v2[i*stride2].vi_;
+      }
+      void chain() {
+	for (size_t i = 0; i < length_; i++) {
+	  v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
+	  v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
+	  alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
+	}
+      }
+    };
+  } /* namespace agrad */
 } /* namespace stan */
 /**
  * (Expert) Numerical traits for algorithmic differentiation variables.
@@ -59,7 +60,7 @@ namespace Eigen {
    * (Expert) Product traits for algorithmic differentiation variables.
    */
   namespace internal {
-
+    
     template <>  
     struct scalar_product_traits<stan::agrad::var,double> {
       typedef stan::agrad::var ReturnType;
@@ -69,44 +70,46 @@ namespace Eigen {
     struct scalar_product_traits<double,stan::agrad::var> {
       typedef stan::agrad::var ReturnType;
     };
-
+    
+    // FIXME: untested
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
-        typedef stan::agrad::var LhsScalar;
-        typedef stan::agrad::var RhsScalar;
-        typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-        enum { LhsStorageOrder = ColMajor };
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      enum { LhsStorageOrder = ColMajor };
 
-        EIGEN_DONT_INLINE static void run(
-                        Index rows, Index cols,
-                        const LhsScalar* lhs, Index lhsStride,
-                        const RhsScalar* rhs, Index rhsIncr,
-                        ResScalar* res, Index resIncr, const ResScalar &alpha)
-        {
-                for (Index i = 0; i < rows; i++) {
-                        res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
-                }
-        }
+      EIGEN_DONT_INLINE static void run(
+					Index rows, Index cols,
+					const LhsScalar* lhs, Index lhsStride,
+					const RhsScalar* rhs, Index rhsIncr,
+					ResScalar* res, Index resIncr, const ResScalar &alpha)
+      {
+	for (Index i = 0; i < rows; i++) {
+	  res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
+	}
+      }
     };
+    // FIXME: untested
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,RowMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
-        typedef stan::agrad::var LhsScalar;
-        typedef stan::agrad::var RhsScalar;
-        typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-        enum { LhsStorageOrder = RowMajor };
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      enum { LhsStorageOrder = RowMajor };
 
-        EIGEN_DONT_INLINE static void run(
-                        Index rows, Index cols,
-                        const LhsScalar* lhs, Index lhsStride,
-                        const RhsScalar* rhs, Index rhsIncr,
-                        ResScalar* res, Index resIncr, const RhsScalar &alpha)
-        {
-                for (Index i = 0; i < rows; i++) {
-                        res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
-                }
-        }
+      EIGEN_DONT_INLINE static void run(
+					Index rows, Index cols,
+					const LhsScalar* lhs, Index lhsStride,
+					const RhsScalar* rhs, Index rhsIncr,
+					ResScalar* res, Index resIncr, const RhsScalar &alpha)
+      {
+	for (Index i = 0; i < rows; i++) {
+	  res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
+	}
+      }
     };
   }
 
@@ -231,47 +234,57 @@ namespace stan {
     typedef stan::math::EigenType<var>::row_vector row_vector_v;
 
     /**
-     * Returns an automatic differentiation variable with the input value.
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param x A scalar value
+     * Returns a stan::agrad::var variable with the input value.
+     *
+     * @param[in] x A scalar value
      * @return An automatic differentiation variable with the input value.
      */
     inline var to_var(const double& x) {
       return var(x);
     }
     /**
+     * Converts argument to an automatic differentiation variable.
+     * 
      * Sets an automatic differentiation variable with the input value.
      *
-     * @param x A scalar value
-     * @param var_x A reference to an automatic differentiation variable
+     * @param[in] x A scalar value
+     * @param[out] var_x A reference to an automatic differentiation variable
      *   which will have the value of x.
      */
     inline void to_var(const double& x, var& var_x) {
       var_x = x;
     }
     /**
-     * Returns an automatic differentiation variable with the input value.
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param x An automatic differentiation variable.
+     * Returns a stan::agrad::var variable with the input value.
+     *
+     * @param[in] x An automatic differentiation variable.
      * @return An automatic differentiation variable with the input value.
      */    
     inline var to_var(const var& x) {
       return x;
     }
     /**
+     * Converts argument to an automatic differentiation variable.
+     *
      * Sets an automatic differentiation variable with the input value.
      *
-     * @param var_in An automatic differentiation variable.
-     * @param var_out A reference to an automatic differentiation variable
+     * @param[in] var_in An automatic differentiation variable.
+     * @param[out] var_out A reference to an automatic differentiation variable
      *   which will be set to the input value.
      */
     inline void to_var(const var& var_in, var& var_out) {
       var_out = var_in;
     }
     /**
-     * Returns a Matrix with automatic differentiation variables.
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param m A Matrix with scalars
+     * Returns a stan::agrad::var variable with the input value.
+     *
+     * @param[in] m A Matrix with scalars
      * @return A Matrix with automatic differentiation variables
      */
     inline matrix_v to_var(const stan::math::matrix_d& m) {
@@ -283,32 +296,38 @@ namespace stan {
     }
     
     /**
+     * Converts argument to an automatic differentiation variable.
+     *
      * Sets a Matrix with automatic differentiation variables.
      *
-     * @param m A Matrix of scalars.
-     * @param m_v A Matrix with automatic differentiation variables
+     * @param[in] m A Matrix of scalars.
+     * @param[out] m_v A Matrix with automatic differentiation variables
      *    assigned with values of m.
      */
-    inline matrix_v to_var (const stan::math::matrix_d& m, matrix_v& m_v) {
+    inline void to_var (const stan::math::matrix_d& m, matrix_v& m_v) {
       m_v.resize(m.rows(), m.cols());
       for (int j = 0; j < m.cols(); ++j)
         for (int i = 0; i < m.rows(); ++i)
           m_v(i,j) = m(i,j);
-      return m_v;
     }
     /**
-     * Returns a Matrix with automatic differentiation variables.
+     * Converts argument to an automatic differentiation variable.
+     *
+     * Returns a stan::agrad::var variable with the input value.
      * 
-     * @param m A Matrix with automatic differentiation variables.
+     * @param[in] m A Matrix with automatic differentiation variables.
+     * @return A Matrix with automatic differentiation variables.
      */
     inline matrix_v to_var(const matrix_v& m) {
       return m;
     }
     /**
-     * Sets a Matirx with automatic differentiation variables.
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param m_in A Matrix of automatic differentiation variables.
-     * @param m_out A Matrix of automatic differentiation variables
+     * Sets a Matrix with automatic differentiation variables.
+     *
+     * @param[in] m_in A Matrix of automatic differentiation variables.
+     * @param[out] m_out A Matrix of automatic differentiation variables
      *    assigned with values of m_in.
      */
     inline void to_var(const matrix_v& m_in,
@@ -316,9 +335,11 @@ namespace stan {
       m_out = m_in;
     }
     /**
-     * Returns a Vector with automatic differentiation variables
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param v A Vector of scalars
+     * Returns a stan::agrad::var variable with the input value.     
+     *
+     * @param[in] v A Vector of scalars
      * @return A Vector of automatic differentiation variables with
      *   values of v
      */
@@ -329,10 +350,12 @@ namespace stan {
       return v_v;
     }
     /**
+     * Converts argument to an automatic differentiation variable.
+     *
      * Sets a Vector with automatic differentation variables.
      *
-     * @param v A Vector of scalars.
-     * @param v_v A Vector of automatic differentation variables with
+     * @param[in] v A Vector of scalars.
+     * @param[out] v_v A Vector of automatic differentation variables with
      *   values of v.
      */
     inline void to_var(const stan::math::vector_d& v,
@@ -342,9 +365,11 @@ namespace stan {
         v_v[i] = v[i];
     }
     /**
-     * Returns a Vector with automatic differentiation variables
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param v A Vector of automatic differentiation variables
+     * Returns a stan::agrad::var variable with the input value.     
+     *
+     * @param[in] v A Vector of automatic differentiation variables
      * @return A Vector of automatic differentiation variables with
      *   values of v
      */
@@ -352,20 +377,24 @@ namespace stan {
       return v;
     }
     /**
+     * Converts argument to an automatic differentiation variable.
+     *
      * Sets a Vector with automatic differentiation variables
      *
-     * @param v_in A Vector of automatic differentiation variables
-     * @param v_out A Vector of automatic differentiation variables
+     * @param[in] v_in A Vector of automatic differentiation variables
+     * @param[out] v_out A Vector of automatic differentiation variables
      *    with values of v_in
      */
     inline void to_var(const vector_v& v_in,
-                         vector_v& v_out) {
+		       vector_v& v_out) {
       v_out = v_in;
     }
     /**
-     * Returns a row vector with automatic differentiation variables
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param rv A row vector of scalars
+     * Returns a stan::agrad::var variable with the input value.     
+     *
+     * @param[in] rv A row vector of scalars
      * @return A row vector of automatic differentation variables with 
      *   values of rv.
      */
@@ -376,10 +405,12 @@ namespace stan {
       return rv_v;
     }
     /**
+     * Converts argument to an automatic differentiation variable.
+     *
      * Sets a row vector with automatic differentiation variables
      *
-     * @param rv A row vector of scalars
-     * @param rv_v A row vector of automatic differentiation variables
+     * @param[in] rv A row vector of scalars
+     * @param[out] rv_v A row vector of automatic differentiation variables
      *   with values set to rv.
      */
     inline void to_var(const stan::math::row_vector_d& rv,
@@ -389,9 +420,11 @@ namespace stan {
         rv_v[i] = rv[i];
     }
     /**
-     * Returns a row vector with automatic differentiation variables
+     * Converts argument to an automatic differentiation variable.
      *
-     * @param rv A row vector with automatic differentiation variables
+     * Returns a stan::agrad::var variable with the input value.     
+     *
+     * @param[in] rv A row vector with automatic differentiation variables
      * @return A row vector with automatic differentiation variables
      *    with values of rv.
      */
@@ -399,10 +432,12 @@ namespace stan {
       return rv;
     }
     /**
+     * Converts argument to an automatic differentiation variable.
+     *
      * Sets a row vector with automatic differentiation variables
      *
-     * @param rv_in A row vector with automatic differentiation variables
-     * @param rv_out A row vector with automatic differentiation variables
+     * @param[in] rv_in A row vector with automatic differentiation variables
+     * @param[out] rv_out A row vector with automatic differentiation variables
      *    with values of rv_in
      */
     inline void to_var(const row_vector_v& rv_in,
@@ -410,10 +445,12 @@ namespace stan {
       rv_out = rv_in;
     }
 
-    // int returns
     /**
-     * Return the number of rows in the specified 
+     * Return number of rows.
+     *
+     * Returns the number of rows in the specified 
      * column vector.
+     *
      * @param v Specified vector.
      * @return Number of rows in the vector.
      */
@@ -421,8 +458,11 @@ namespace stan {
       return v.size();
     }
     /**
-     * Return the number of rows in the specified 
+     * Return number of rows.
+     *
+     * Returns the number of rows in the specified 
      * row vector.  The return value is always 1.
+     *
      * @param rv Specified vector.
      * @return Number of rows in the vector.
      */
@@ -430,18 +470,23 @@ namespace stan {
       return 1;
     }
     /**
-     * Return the number of rows in the specified matrix.
+     * Return number of rows.
+     * 
+     * Returns the number of rows in the specified matrix.
+     * 
      * @param m Specified matrix.
      * @return Number of rows in the vector.
-     * 
      */
     inline size_t rows(const matrix_v& m) {
       return m.rows();
     }
 
     /**
-     * Return the number of columns in the specified
+     * Return number of columns.
+     *
+     * Returns the number of columns in the specified
      * column vector.  The return value is always 1.
+     *
      * @param v Specified vector.
      * @return Number of columns in the vector.
      */
@@ -449,8 +494,11 @@ namespace stan {
       return 1;
     }
     /**
-     * Return the number of columns in the specified
+     * Return number of columns.
+     *
+     * Returns the number of columns in the specified
      * row vector.  
+     *
      * @param rv Specified vector.
      * @return Number of columns in the vector.
      */
@@ -458,7 +506,10 @@ namespace stan {
       return rv.size();
     }
     /**
+     * Return number of columns.
+     *
      * Return the number of columns in the specified matrix.
+     *
      * @param m Specified matrix.
      * @return Number of columns in the matrix.
      */
@@ -469,14 +520,18 @@ namespace stan {
     // scalar returns
 
     /**
+     * Determinant of the matrix.
+     *
      * Returns the determinant of the specified
      * square matrix.
+     *
      * @param m Specified matrix.
      * @return Determinant of the matrix.
      * @throw std::domain_error if m is not a square matrix
      */
     var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
 
+    // FIXME: move to anonymous namespace?
     class dot_self_vari : public vari {
     protected:
       vari** v_;
@@ -503,6 +558,7 @@ namespace stan {
       }
     };
 
+    // FIXME: move to anonymous namespace?
     class dot_product_vv_vari : public vari {
     protected:
       vari** v1_;
@@ -551,6 +607,7 @@ namespace stan {
         }
       }
     };
+    // FIXME: move to anonymous namespace?
     class dot_product_vd_vari : public vari {
     protected:
       vari** v1_;
@@ -601,8 +658,10 @@ namespace stan {
 
 
     /**
-     * Returns the dot product of the specified vector with itself.
-     * @param v Vector.
+     * Returns the dot product of a vector with itself.
+     *
+     * @param[in] v Vector.
+     * @return Dot product of the vector with itself.
      * @tparam R number of rows or <code>Eigen::Dynamic</code> for dynamic; one of R or C must be 1
      * @tparam C number of rows or <code>Eigen::Dyanmic</code> for dynamic; one of R or C must be 1
      */
@@ -614,9 +673,10 @@ namespace stan {
     }
     
     /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First column vector.
-     * @param v2 Second column vector.
+     * Returns the dot product.
+     *
+     * @param v1[in] First column vector.
+     * @param v2[in] Second column vector.
      * @return Dot product of the vectors.
      * @throw std::invalid_argument if length of v1 is not equal to length of v2.
      */
@@ -632,9 +692,10 @@ namespace stan {
       return var(new dot_product_vv_vari(v1,v2));
     }
     /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First column vector.
-     * @param v2 Second column vector.
+     * Returns the dot product.
+     *
+     * @param v1[in] First column vector.
+     * @param v2[in] Second column vector.
      * @return Dot product of the vectors.
      * @throw std::invalid_argument if length of v1 is not equal to length of v2
      * or either v1 or v2 are not vectors.
@@ -651,9 +712,10 @@ namespace stan {
       return var(new dot_product_vd_vari(v1,v2));
     }
     /**
-     * Returns the dot product of the specified vectors.
-     * @param v1 First column vector.
-     * @param v2 Second column vector.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First column vector.
+     * @param[in] v2 Second column vector.
      * @return Dot product of the vectors.
      * @throw std::invalid_argument if length of v1 is not equal to length of v2
      * or either v1 or v2 are not vectors.
@@ -670,36 +732,45 @@ namespace stan {
       return var(new dot_product_vd_vari(v2,v1));
     }
     /**
-     * Returns the dot product of the specified arrays of doubles.
-     * @param v1 First array.
-     * @param v2 Second array.
-     * @param length Length of both arrays.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First array.
+     * @param[in] v2 Second array.
+     * @param[in] length Length of both arrays.
+     * @return Dot product of the arrays.
      */
     inline var dot_product(const var* v1, const var* v2, size_t length) {
       return var(new dot_product_vv_vari(v1, v2, length));
     }
     /**
-     * Returns the dot product of the specified arrays of doubles.
-     * @param v1 First array.
-     * @param v2 Second array.
-     * @param length Length of both arrays.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First array.
+     * @param[in] v2 Second array.
+     * @param[in] length Length of both arrays.
+     * @return Dot product of the arrays.
      */
     inline var dot_product(const var* v1, const double* v2, size_t length) {
       return var(new dot_product_vd_vari(v1, v2, length));
     }
     /**
-     * Returns the dot product of the specified arrays of doubles.
-     * @param v1 First array.
-     * @param v2 Second array.
-     * @param length Length of both arrays.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First array.
+     * @param[in] v2 Second array.
+     * @param[in] length Length of both arrays.
+     * @return Dot product of the arrays.
      */
     inline var dot_product(const double* v1, const var* v2, size_t length) {
       return var(new dot_product_vd_vari(v2, v1, length));
     }
     /**
-     * Returns the dot product of the specified arrays of doubles.
-     * @param v1 First array.
-     * @param v2 Second array.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if sizes of v1 and v2 do not match.
      */
     inline var dot_product(const std::vector<var>& v1,
                            const std::vector<var>& v2) {
@@ -708,9 +779,12 @@ namespace stan {
       return var(new dot_product_vv_vari(&v1[0], &v2[0], v1.size()));
     }
     /**
-     * Returns the dot product of the specified arrays of doubles.
-     * @param v1 First array.
-     * @param v2 Second array.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if sizes of v1 and v2 do not match.
      */
     inline var dot_product(const std::vector<var>& v1,
                            const std::vector<double>& v2) {
@@ -719,9 +793,12 @@ namespace stan {
       return var(new dot_product_vd_vari(&v1[0], &v2[0], v1.size()));
     }
     /**
-     * Returns the dot product of the specified arrays of doubles.
-     * @param v1 First array.
-     * @param v2 Second array.
+     * Returns the dot product.
+     *
+     * @param[in] v1 First vector.
+     * @param[in] v2 Second vector.
+     * @return Dot product of the vectors.
+     * @throw std::invalid_argument if sizes of v1 and v2 do not match.
      */
     inline var dot_product(const std::vector<double>& v1,
                            const std::vector<var>& v2) {
@@ -1033,7 +1110,7 @@ namespace stan {
       return m.trace();
     }
     
-   /**
+    /**
      * Return the element-wise logarithm of the matrix or vector.
      *
      * @param m The matrix or vector.
@@ -1105,7 +1182,7 @@ namespace stan {
       return to_var(m1) + to_var(m2);
     }
 
-   /**
+    /**
      * Return the sum of a matrix or vector and a scalar.
      * @param m Matrix or vector.
      * @param c Scalar.
@@ -1118,7 +1195,7 @@ namespace stan {
       return (to_var(m).array() + c).matrix();
     }
 
-   /**
+    /**
      * Return the sum of a scalar and a matrix or vector.
      * @param c Scalar.
      * @param m Matrix or vector.
@@ -1131,7 +1208,7 @@ namespace stan {
       return (c + to_var(m).array()).matrix();
     }
 
-   /**
+    /**
      * Return the difference between a matrix or vector  and a scalar.
      * @param m Matrix or vector.
      * @param c Scalar.
@@ -1143,7 +1220,7 @@ namespace stan {
              const T2& c) {
       return (to_var(m).array() - c).matrix();
     }
-   /**
+    /**
      * Return the difference between a scalar and a matrix or vector.
      * @param c Scalar.
      * @param m Matrix or vector.
@@ -1731,7 +1808,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
-                                                                                          const Eigen::Matrix<var,R2,C2> &A) {
+						  const Eigen::Matrix<var,R2,C2> &A) {
       if (A.cols() != A.rows())
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
@@ -1748,7 +1825,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
-                                                                                          const Eigen::Matrix<var,R2,C2> &A) {
+						  const Eigen::Matrix<var,R2,C2> &A) {
       if (A.cols() != A.rows())
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
@@ -1765,7 +1842,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
-                                                                                          const Eigen::Matrix<double,R2,C2> &A) {
+						  const Eigen::Matrix<double,R2,C2> &A) {
       if (A.cols() != A.rows())
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
