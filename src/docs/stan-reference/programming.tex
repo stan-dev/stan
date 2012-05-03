@@ -228,6 +228,75 @@ sum of exponentials of those values.
 \chapter{Order Constraints}
 
 
+\chapter{Regression Modeling}
+
+\Stan supports the full range of regression models from simple linear
+regressions to multilevel generalized linear models.  Coding
+regression models in \Stan is very much like coding them in \BUGS.
+
+\section{Regression}
+
+The simplest linear regression model is the following, with a single
+predictor and intercept term.
+
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    real x[N];
+}
+parameters {
+    real alpha;
+    real beta;
+    real(0,) epsilon;
+}
+model {
+    for (n in 1:N)
+        y[n] ~ normal(beta * x[n] + alpha, epsilon);
+}
+\end{Verbatim}
+\end{quote}
+%
+This model has improper priors for the two regression coefficients
+(intercept \code{alpha} and slope \code{beta}) and the noise term.
+
+There are several ways in which this model can be generalized.  
+For example, weak priors can be assigned to the coefficients as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+    alpha ~ normal(0,100);
+    beta ~ normal(0,100);
+    epsilon ~ uniform(0,100);
+\end{Verbatim}
+\end{quote}
+%
+More informative priors based the (half) Cauchy distribution are coded
+as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+    alpha ~ cauchy(0,2.5);
+    beta ~ cauchy(0,2.5);
+    epsilon ~ cauchy(0,2.5);
+\end{Verbatim}
+\end{quote}
+%
+The regression coefficients \code{alpha} and \code{beta} are
+unconstrained, but \code{epsilon} must be positive and properly
+requires the half-Cauchy distribution, which would be expressed in
+\Stan using truncation as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+    epsilon ~ cauchy(0,2.5) T(0,);
+\end{Verbatim}
+\end{quote}
+%
+Because the log probability function need not be normalized, the extra
+factor of 2 is not needed in the model, so the simpler un-truncated
+distribution suffices.
+
 
 
 \chapter{Custom Probability  Functions}%
