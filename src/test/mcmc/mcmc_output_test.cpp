@@ -54,7 +54,7 @@ TEST_F(stanMcmc, splitRHat) {
 
 TEST_F(stanMcmc, factory) {
   stan::mcmc::mcmc_output_factory f;
-  f.addFile("src/test/mcmc/mcmc_output/blocker.csv");
+  f.addFile("src/test/mcmc/mcmc_output/blocker1.csv");
   f.create("mu.1");
 }
 
