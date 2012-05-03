@@ -228,13 +228,13 @@ sum of exponentials of those values.
 \chapter{Order Constraints}
 
 
-\chapter{Regression Modeling}
+\chapter{Regression Models}
 
 \Stan supports the full range of regression models from simple linear
 regressions to multilevel generalized linear models.  Coding
 regression models in \Stan is very much like coding them in \BUGS.
 
-\section{Regression}
+\section{Linear Regression}
 
 The simplest linear regression model is the following, with a single
 predictor and intercept term.
@@ -242,8 +242,9 @@ predictor and intercept term.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int(0,) N;
-    real x[N];
+   int(0,) N;
+   real x[N];
+   real y[N];
 }
 parameters {
     real alpha;
@@ -259,6 +260,8 @@ model {
 %
 This model has improper priors for the two regression coefficients
 (intercept \code{alpha} and slope \code{beta}) and the noise term.
+
+\section{Coefficient and Noise Priors}
 
 There are several ways in which this model can be generalized.  
 For example, weak priors can be assigned to the coefficients as follows.
@@ -296,6 +299,106 @@ requires the half-Cauchy distribution, which would be expressed in
 Because the log probability function need not be normalized, the extra
 factor of 2 is not needed in the model, so the simpler un-truncated
 distribution suffices.
+
+\section{Robust Noise Models}
+
+The standard approach to linear regression is to model the noise
+term $\epsilon$ as having a normal distribution.  From \Stan's
+perspective, there is nothing special about normally distributed
+noise.  For instance, robust regression can be accomodated by giving
+the noise term a Student-$t$ distribution.  To code this in \Stan, the
+sampling distribution is changed, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    ...
+    real(0,) nu;
+}
+...
+model {
+    for (n in 1:N)
+        y[n] ~ student_t(nu,0,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The degrees of freedom constant \code{nu} is specified as data.
+Alternatively, it could be hard coded into the model.
+
+\section{Logistic and Probit Regression}
+
+For binary outcomes, logistic or probit regression can be used.  A
+logistic regression with one predictor and an intercept is coded as
+follows. 
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    real x[N];
+    int(0,1) y[N];
+}
+parameters {
+    real alpha;
+    real beta;
+}
+model {
+    for (n in 1:N)
+        y[n] ~ bernoulli(inv_logit(beta * x[n] + alpha));
+} 
+\end{Verbatim}
+\end{quote}
+%
+The noise parameter is built into the Bernoulli here.  
+
+Logistic regression is a kind of generalized linear model with binary
+outcomes and the log odds (logit) link function.  The inverse of the
+link function appears in the model.  
+
+Other link functions may be used in the same way.  For example, probit
+regression uses the cumulative normal density function, which is
+typically written as 
+\[
+\Phi(x) = \int_{-\infty}^x \distro{Normal}(y|0,1) \, dy.
+\]
+%
+The cumulative unit density function $\Phi$ is also known as the
+error function and written \code{erf(x)} in programming languages.  
+The probit regression model may be coded in \Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+        y[n] ~ bernoulli(erf(beta * x[n] + alpha));
+\end{Verbatim}
+\end{quote}
+
+\section{Multiple Logistic Regression}
+
+Multiple outcome forms of logistic regression can be coded directly in
+\Stan.  For instance, suppose there are $K$ possible outcomes for each
+output variable $y_n$.  Also suppose that there is a $D$-dimensional
+vector $x_n$ of predictors for $y_n$.  The multi-logit model with
+improper flat priors on the coefficients is coded as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    int(1,K) y[N];
+    row_vector(K) x[N];
+}
+parameters {
+    matrix(N,K) beta;
+}
+model {
+    for (n in 1:N)
+        y[n] ~ categorical(softmax(x[n] * beta));
+}
+\end{Verbatim}
+\end{quote}
+%
+
 
 
 
