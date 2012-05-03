@@ -814,15 +814,15 @@ namespace stan {
        * Return the next vector of specified size containing positive
        * values in order.  
        *
-       * <p>See <code>stan::math::check_pos_ordered(T)</code>.
+       * <p>See <code>stan::math::check_ordered(T)</code>.
        *
        * @param k Size of returned vector.
        * @return Vector of positive values in ascending order.
        * @throw std::runtime_error if the vector is not positive ordered
        */
-      inline vector_t pos_ordered(size_t k) {
+      inline vector_t ordered(size_t k) {
         vector_t x(vector(k));
-        stan::math::check_pos_ordered("stan::io::pos_ordered(%1%)", x, "x");
+        stan::math::check_ordered("stan::io::ordered(%1%)", x, "x");
         return x;
       }
 
@@ -830,14 +830,14 @@ namespace stan {
        * Return the next positive, ordered vector of the specified
        * length.  
        *
-       * <p>See <code>stan::prob::pos_ordered_constrain(Matrix)</code>.
+       * <p>See <code>stan::prob::ordered_constrain(Matrix)</code>.
        * 
        * @param k Length of returned vector.
        * @return Next positive, ordered vector of the specified
        * length.
        */
-      inline vector_t pos_ordered_constrain(size_t k) {
-        return stan::prob::pos_ordered_constrain(vector(k));
+      inline vector_t ordered_constrain(size_t k) {
+        return stan::prob::ordered_constrain(vector(k));
       }
 
       /**
@@ -845,14 +845,14 @@ namespace stan {
        * size, incrementing the specified reference with the log
        * absolute Jacobian of the determinant.
        *
-       * <p>See <code>stan::prob::pos_ordered_constrain(Matrix,T&)</code>.
+       * <p>See <code>stan::prob::ordered_constrain(Matrix,T&)</code>.
        *
        * @param k Size of vector.
        * @param lp Log probability reference to increment.
        * @return Next positive ordered vector of the specified size.
        */
-      inline vector_t pos_ordered_constrain(size_t k, T& lp) {
-        return stan::prob::pos_ordered_constrain(vector(k),lp);
+      inline vector_t ordered_constrain(size_t k, T& lp) {
+        return stan::prob::ordered_constrain(vector(k),lp);
       }
 
       /**

@@ -15,8 +15,8 @@ data {
   int(0,) K;
   int(0,) I;
   int(0,) J;
-  pos_ordered(K) calBP;
-  pos_ordered(K) C14BP;
+  ordered(K) calBP;
+  ordered(K) C14BP;
   int(0,) N;
   real(0,) theta_min;
   real(theta_min,) theta_max;
@@ -40,8 +40,8 @@ parameters {
   real(beta6,theta_max) beta7;
 }
 transformed parameters {
-  pos_ordered(7) alpha;
-  pos_ordered(7) beta;
+  ordered(7) alpha;
+  ordered(7) beta;
 
   // alpha <- [ alpha1, alpha2, alpha3, alpha4, alpha5, alpha6, beta6 ];
   // beta <- [ beta1, beta2, beta3, beta4, beta5, beta6, beta7 ];

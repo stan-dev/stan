@@ -999,7 +999,7 @@ namespace stan {
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1> 
-    pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+    ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k = x.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> y(k);
       if (k > 0)
@@ -1019,7 +1019,7 @@ namespace stan {
      * will have the same dimensionality as the specified free vector.
      *
      * <p>The transform is defined as for
-     * <code>pos_ordered_constrain(Eigen::Matrix<T,Eigen::Dynamic,1>)</code>.
+     * <code>ordered_constrain(Eigen::Matrix<T,Eigen::Dynamic,1>)</code>.
      * The log absolute Jacobian determinant reduces neatly because
      * the Jacobian is lower triangular,
      *
@@ -1047,9 +1047,9 @@ namespace stan {
     template <typename T>
     inline
     Eigen::Matrix<T,Eigen::Dynamic,1> 
-    pos_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
+    ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
       lp += x.sum();
-      return pos_ordered_constrain(x);
+      return ordered_constrain(x);
     }
 
 
@@ -1059,7 +1059,7 @@ namespace stan {
      * the specified positive ordered vector.
      *
      * <p>This function inverts the constraining operation defined in 
-     * <code>pos_ordered_constrain(Matrix)</code>,
+     * <code>ordered_constrain(Matrix)</code>,
      *
      * <p>\f$f^{-1}(y)[k] = \log y[k] - \sum_{k' = 0}^{k-1} \log y[k]\f$
      *
@@ -1071,9 +1071,9 @@ namespace stan {
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1> 
-    pos_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
-      stan::math::check_pos_ordered("stan::prob::pos_ordered_free(%1%)", 
-                                    y, "y");
+    ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      stan::math::check_ordered("stan::prob::ordered_free(%1%)", 
+                                y, "y");
       size_t k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
       if (k == 0) 

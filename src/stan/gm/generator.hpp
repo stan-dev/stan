@@ -273,7 +273,7 @@ namespace stan {
       void operator()(simplex_var_decl const& x) const {
         generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.K_);
       }
-      void operator()(pos_ordered_var_decl const& x) const {
+      void operator()(ordered_var_decl const& x) const {
         generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.K_);
       }
       void operator()(matrix_var_decl const& x) const {
@@ -350,10 +350,10 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array("vector_v","simplex",read_args,x.name_,x.dims_);
       }
-      void operator()(const pos_ordered_var_decl& x) const {
+      void operator()(const ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("vector_v","pos_ordered",read_args,x.name_,x.dims_);
+        generate_initialize_array("vector_v","ordered",read_args,x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
@@ -540,8 +540,8 @@ namespace stan {
       void operator()(simplex_var_decl const& x) const {
         nonbasic_validate(x,"simplex");
       }
-      void operator()(pos_ordered_var_decl const& x) const {
-        nonbasic_validate(x,"pos_ordered");
+      void operator()(ordered_var_decl const& x) const {
+        nonbasic_validate(x,"ordered");
       }
       void operator()(corr_matrix_var_decl const& x) const {
         nonbasic_validate(x,"corr_matrix");
@@ -584,7 +584,7 @@ namespace stan {
       void operator()(simplex_var_decl const& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(pos_ordered_var_decl const& x) const {
+      void operator()(ordered_var_decl const& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
       void operator()(cov_matrix_var_decl const& x) const {
@@ -674,7 +674,7 @@ namespace stan {
         declare_array(is_var_ ? "vector_v" : "vector_d", 
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(pos_ordered_var_decl const& x) const {
+      void operator()(ordered_var_decl const& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_var_ ? "vector_v" : "vector_d", 
@@ -1105,7 +1105,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // same as simplex
-      void operator()(pos_ordered_var_decl const& x) const {
+      void operator()(ordered_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
         o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
@@ -1345,11 +1345,11 @@ namespace stan {
         generate_buffer_loop("r",x.name_,x.dims_,x.K_);
         generate_write_loop("simplex_unconstrain(",x.name_,x.dims_);
       }
-      void operator()(pos_ordered_var_decl const& x) const {
+      void operator()(ordered_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 1);
         generate_declaration(x.name_,"vector_d",x.dims_,x.K_);
         generate_buffer_loop("r",x.name_,x.dims_,x.K_);
-        generate_write_loop("pos_ordered_unconstrain(",x.name_,x.dims_);
+        generate_write_loop("ordered_unconstrain(",x.name_,x.dims_);
       }
       void operator()(matrix_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 2);
@@ -1542,7 +1542,7 @@ namespace stan {
         matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
-      void operator()(const pos_ordered_var_decl& x) const {
+      void operator()(const ordered_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
@@ -1672,10 +1672,10 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array("vector_d","simplex",read_args,x.name_,x.dims_);
       }
-      void operator()(const pos_ordered_var_decl& x) const {
+      void operator()(const ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("vector_d","pos_ordered",read_args,x.name_,x.dims_);
+        generate_initialize_array("vector_d","ordered",read_args,x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
@@ -1778,7 +1778,7 @@ namespace stan {
       void operator()(const simplex_var_decl& x) const {
         write_array(x.name_,x.dims_);
       }
-      void operator()(const pos_ordered_var_decl& x) const {
+      void operator()(const ordered_var_decl& x) const {
         write_array(x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -1932,7 +1932,7 @@ namespace stan {
         }
         o_ << ";" << EOL;
       }
-      void operator()(const pos_ordered_var_decl& x) const {
+      void operator()(const ordered_var_decl& x) const {
         generate_increment(x.K_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {

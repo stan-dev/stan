@@ -580,11 +580,11 @@ namespace stan {
      * values.
      */
     template <typename T_y, typename T_result, class Policy>
-    bool check_pos_ordered(const char* function,
-                           const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                           const char* name,
-                           T_result* result,
-                           const Policy&) {
+    bool check_ordered(const char* function,
+                       const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                       const char* name,
+                       T_result* result,
+                       const Policy&) {
       using stan::math::policies::raise_domain_error;
       typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,1>::size_type size_t;
       if (y.size() == 0) {
@@ -622,19 +622,19 @@ namespace stan {
     }                         
 
     template <typename T_y, typename T_result>
-    bool check_pos_ordered(const char* function,
-                           const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                           const char* name,
+    bool check_ordered(const char* function,
+                       const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                       const char* name,
                            T_result* result) {
-      return check_pos_ordered(function,y,name,result,default_policy());
+      return check_ordered(function,y,name,result,default_policy());
     }
 
     template <typename T>
-    bool check_pos_ordered(const char* function,
-                           const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
-                           const char* name,
-                           T* result = 0) {
-      return check_pos_ordered(function,y,name,result,default_policy());
+    bool check_ordered(const char* function,
+                       const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
+                       const char* name,
+                       T* result = 0) {
+      return check_ordered(function,y,name,result,default_policy());
     }
 
 

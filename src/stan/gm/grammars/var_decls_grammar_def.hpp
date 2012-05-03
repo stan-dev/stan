@@ -77,7 +77,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::simplex_var_decl,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::pos_ordered_var_decl,
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::ordered_var_decl,
                           (stan::gm::expression, K_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
@@ -135,9 +135,9 @@ namespace stan {
                     << " found simplex." << std::endl;
         return false;
       }
-      bool operator()(const pos_ordered_var_decl& x) const {
+      bool operator()(const ordered_var_decl& x) const {
         error_msgs_ << "require unconstrained variable declaration."
-                    << " found pos_ordered." << std::endl;
+                    << " found ordered." << std::endl;
         return false;
       }
       bool operator()(const cov_matrix_var_decl& x) const {
@@ -373,7 +373,7 @@ namespace stan {
             | simplex_decl_r       
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
-            | pos_ordered_decl_r   
+            | ordered_decl_r   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
             | corr_matrix_decl_r   
@@ -452,9 +452,9 @@ namespace stan {
         > opt_dims_r
         > lit(';'); 
 
-      pos_ordered_decl_r.name("positive ordered declaration");
-      pos_ordered_decl_r 
-        %= lit("pos_ordered")
+      ordered_decl_r.name("positive ordered declaration");
+      ordered_decl_r 
+        %= lit("ordered")
         > lit('(')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
