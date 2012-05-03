@@ -10,11 +10,15 @@ namespace boost {
   namespace math {
 
     /**
-     * Return <code>true</code> the floating point type
-     * for the specified variable's value.
+     * Categorizes the given stan::agrad::var value.
+     * 
+     * Categorizes the stan::agrad::var value, v, into the following categories:
+     * zero, subnormal, normal, infinite, or NAN.
      *
      * @param v Variable to classify.
-     * @return Classification of value of the variable.
+     * @return One of <code>FP_ZERO</code>, <code>FP_NORMAL</code>, 
+     *   <code>FP_FINITE</code>, <code>FP_INFINITE</code>, <code>FP_NAN</code>,
+     *   or <code>FP_SUBZERO</code>, specifying the category of v.
      */
     template <>
     inline
@@ -23,6 +27,8 @@ namespace boost {
     }
 
     /**
+     * Checks if the given number has finite value.
+     *
      * Return <code>true</code> if the specified variable's
      * value is finite.
      *
@@ -36,6 +42,8 @@ namespace boost {
     }
 
     /**
+     * Checks if the given number is infinite.
+     *
      * Return <code>true</code> if the specified variable's
      * value is infinite.
      *
@@ -49,6 +57,8 @@ namespace boost {
     }
 
     /**
+     * Checks if the given number is NaN
+     *
      * Return <code>true</code> if the specified variable
      * has a value that is NaN.
      *
@@ -62,11 +72,13 @@ namespace boost {
     }
 
     /**
+     * Checks if the given number is normal.
+     *
      * Return <code>true</code> if the specified variable
-     * has a value that is NaN.
+     * has a value that is normal.
      *
      * @param v Variable to test.
-     * @return <code>true</code> if variable is NaN.
+     * @return <code>true</code> if variable is normal.
      */
     template <>
     inline

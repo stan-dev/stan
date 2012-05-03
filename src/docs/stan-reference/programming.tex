@@ -6,9 +6,116 @@
 
 \part{Programming Techniques}\label{programming-techniques.part}
 
+
+
 \chapter{Missing Data}
 
+\section{Known and Unknown Quantities}
+
+\BUGS and \R support mixed arrays of known and missing data.  In
+\BUGS, known and unknown values may be mixed as long as every unknown
+variable appears on the left-hand side of either an assignment or
+sampling statement.  
+
+\Stan treats variables declared in the \code{data} and
+\code{transformed data} blocks as known and the variables in the
+\code{parameters} block as unknown.
+
+\subsection{Mixing Known and Unknown Quantities}
+
+The \code{transformed parameters} block may be used to combine known
+and unknown values.  The following program skeleton provides an example.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int K;   
+  int N_obs;               
+  int N_miss;
+  real y_obs[N_obs];
+}
+transformed data {
+  int N;   
+  N <- N_obs + N_miss;
+}
+parameters {
+  real beta[K];
+  real(0,) sigma;
+  real y_miss[N_miss];
+}
+transformed parameters {
+  real y[N];
+  for (n in 1:N_obs)  
+    y[n] <- y_obs[n];
+  for (n in 1:N_miss) 
+      y[n + N_obs] <- y_miss[n];
+}
+model {
+  for (n in 1:N)
+    y[n] ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The transformed parameter array \code{y} is declared to be of size
+\code{N}, the combined size of the observed and missing data arrays,
+and then defined by copying the observed data array \code{y\_obs}
+followed by the missing parameter array \code{y\_miss}.  In the model
+block, the resulting mixed array \code{y} may be used like any other
+variable.
+
+Running the resulting program will sample values for the the missing
+data \code{y\_miss} just like the other parameters \code{mu} and
+\code{sigma}.
+
+\subsection{Missing Data}
+
+Although useful in some situations, creating a mixed transformed
+parameter array is not the recommended way to program missing data
+problems in \Stan.  The behavior is correct, but the computation is
+wasteful.  Each parameter, be it declared in the \code{parameters} or
+\code{transformed parameters} block, uses an algorithmic
+differentiation variable which is more expensive in terms of memory
+and gradient-calculation time than a simple data variable.
+Furthermore, the copy takes up extra space, and the copy takes extra
+time.
+
+The recommended approach keeps the same \code{data} and
+\code{parameters} blocks to define the observed and missing data.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int N_obs;
+  int N_miss;
+  real y_obs[N_obs];
+}
+parameters {
+  real mu;
+  real(0,) sigma;
+  real y_miss[N_miss];
+}
+model {
+  for (n in 1:N_obs)
+    y_obs[n] ~ normal(mu,sigma);
+  for (n in 1:N_miss)
+    y_miss[n] ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+There is no longer any transformed data.  Instead, the model contains
+one loop over the observed data and one over the missing data.  This
+model will more efficiently compute the same samples over the
+distribution parameters and the missing data (it differs slightly in
+not also providing the combined array \code{y} of transformed parameters).
+
+
+
+
 \chapter{Truncated or Censored Data}
+
+
 
 \chapter{Mixture Modeling}
 
@@ -41,24 +148,24 @@ model {
 %
 The log probability term is derived by taking
 \begin{eqnarray*}
-\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Norm}(y|-1,2) \, + \,
+\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
-  \distro{Norm}(y|3,1) \, \right)
+  \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
 & = & \log(\! \begin{array}[t]{l}
-                 \exp(\log(0.3 \times \distro{Norm}(y|-1,2))) \\
-                 + \exp(\log(0.7 \times \distro{Norm}(y|3,1))) \ )
+                 \exp(\log(0.3 \times \distro{Normal}(y|-1,2))) \\
+                 + \exp(\log(0.7 \times \distro{Normal}(y|3,1))) \ )
               \end{array}
 % \\[4pt]
-% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Norm}(y|-1,2))
+% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Normal}(y|-1,2))
 %             \\
-%            + \exp(\log(0.7) + \log \distro{Norm}(y|3,1)) \ )
+%            + \exp(\log(0.7) + \log \distro{Normal}(y|3,1)) \ )
 %             \end{array}
 \\[2pt]
 & = & \mbox{logSumExp}(\! \begin{array}[t]{l}
-                         \log(0.3) + \log \distro{Norm}(y|-1,2),
+                         \log(0.3) + \log \distro{Normal}(y|-1,2),
                          \\                  
-                         \log(0.7) + \log \distro{Norm}(y|3,1) \ ).
+                         \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
                        \end{array}
 \end{eqnarray*}
 
@@ -116,11 +223,15 @@ sum of exponentials of those values.
 
 \chapter{Summing Out Discrete Parameters}
 
+
+
 \chapter{Order Constraints}
 
-\chapter{Custom Probability
-  Functions}\label{custom-probability-functions.section}
 
+
+
+\chapter{Custom Probability  Functions}%
+\label{custom-probability-functions.chapter}
 
 
 Custom distributions may also be implemented directly within \Stan's
@@ -198,7 +309,7 @@ the model will compile and run without arithmetic errors, but will not
 sample properly.%
 %
 \footnote{The problem is the (extremely!) light tails of the triangle
-  distribution.  The basic \HMC and \NUTS samplers cannot get into the
+  distribution.  The standard \HMC and \NUTS samplers cannot get into the
   corners of the triangle properly.  Because the actual code declares
   \code{y} to be of type \code{real(-1,1)}, the inverse logit
   transform is applied to the unconstrained variable and its log

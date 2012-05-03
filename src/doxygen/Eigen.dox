@@ -1,0 +1,9 @@
+/**
+ * @namespace Eigen
+ * (Expert) Numerical traits for algorithmic differentiation variables.
+ */
+
+ /**
+  * @namespace Eigen::internal
+  * (Expert) Product traits for algorithmic differentiation variables.
+  */

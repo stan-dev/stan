@@ -198,7 +198,7 @@ This chapter describes built-in functions that take zero or more real
 or integer arguments and return real values.  Constants are
 represented as functions with no arguments and must be called as such.
 
-\section{Mathematical Constants}
+\section{Mathematical Constants}\label{built-in-constants.section}
 
 %
 \begin{description}
@@ -1133,6 +1133,37 @@ $1:N$ given $N$-simplex distribution parameter \farg{theta}}
 %
 \end{description}
 
+\subsection{Ordered Logistic Distribution}
+
+If $K \in \nats$ with $K > 2$, $c \in \reals^{K-2}$ such that $0 \leq
+c_1 \leq c_2 \leq \cdots \leq c_{K-2}$, and $\lambda \in \reals$, then
+for $k \in \setlist{1,\ldots,K}$,
+\[
+\distro{OrderedLogistic}(k|\lambda,c)
+=
+\left\{
+\begin{array}{ll}
+1 - \mbox{logit}^{-1}(\lambda) & \mbox{if } k = 1
+\\[4pt]
+\mbox{logit}^{-1}(\lambda) - \mbox{logit}^{-1}(\lambda - c_1)
+& \mbox{if } k = 2
+\\[4pt]
+\mbox{logit}^{-1}(\lambda - c_{k-1}) - \mbox{logit}^{-1}(\lambda -
+c_k)
+& \mbox{if } 2 < k < K
+\\[4pt]
+\mbox{logit}^{-1}(\lambda - c_K)
+& \mbox{if } k = K
+\end{array}
+\right.
+\]
+
+\begin{description}
+  \fitem{real}{ordered\_logistic\_log}{int \farg{k}, real
+    \farg{lambda}, vector \farg{c}}{The ordered logistic probability mass of
+    \farg{k} given linear basis \farg{lambda} and cutpoints \farg{c}.}
+\end{description}
+
 
 \section{Unbounded Discrete Distributions}
 
@@ -1174,9 +1205,11 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \]
 
 \begin{description}
- \fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
-    Poisson probability mass of \farg{n} given rate \farg{lambda}}
+\fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
+   Poisson probability mass of \farg{n} given rate \farg{lambda}}
 \end{description}
+
+
 
 
 

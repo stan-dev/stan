@@ -16,8 +16,24 @@ namespace stan {
 
   namespace mcmc {
 
-    // Returns the new log probability of x and m
-    // Catches domain errors and sets logp as -inf.
+    /**
+     * Computes the log probability for a single leapfrog step 
+     * in Hamiltonian Monte Carlo.
+     *
+     * If a domain error occurs when calling the model's grad_log_prob(), 
+     * this function returns -inf. Domain errors
+     * can occur when distribution functions are called with parameters
+     * out of support.
+     *
+     * @param[in] model Probability model with gradients.
+     * @param[in] z Integer parameters.
+     * @param[in] x Real parameters
+     * @param[in,out] m Momentum.
+     * @param[in,out] g Gradient at x, z.
+     * @param[in] epsilon Step size used in Hamiltonian dynamics
+     * 
+     * @return the log probability of x and m.
+     */
     double leapfrog(stan::model::prob_grad& model, 
                     std::vector<int> z,
                     std::vector<double>& x, std::vector<double>& m,

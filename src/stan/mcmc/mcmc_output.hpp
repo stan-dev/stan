@@ -23,24 +23,32 @@ namespace stan {
 
     
     /** 
-     * mcmc_output
+     * Post-processing for MCMC samples.
      *   
-     * currently assuming we do everything in batch.
+     * This class calculates
+     * <ul>
+     * <li> effective sample size
+     * <li> split R-hat
+     * </ul>
+     * for MCMC samples in multiple chains.
+     *
+     * Currently, the implementation assumes everything
+     * is done in batch.
      */
     class mcmc_output {
     public:
       /** 
        * Default constructor
-       * 
        */
       mcmc_output() :
         nChains_(0), nSamplesPerChain_(0) {
       }
       
       /** 
-       * Construct mcmc_output with samples.
+       * Constructs mcmc_output with samples.
        * 
-       * @param samples 
+       * @param samples MCMC samples. Each vector of doubles represents
+       *   a chain. Each chain must be the same length.
        */
       mcmc_output(std::vector< std::vector<double> > samples) : 
         samples_(samples),
@@ -58,9 +66,10 @@ namespace stan {
       }
       
       /** 
-       * Add samples
+       * Add samples.
        * 
-       * @param chain 
+       * @param chain A single chain to add to the existing chains in the
+       *  object.
        */
       void add_chain(std::vector<double> chain) {
         // check chain
@@ -77,9 +86,9 @@ namespace stan {
       /** 
        * Effective sample size calculation.
        *
-       * Implementation matches BDA3's effective size implementation
+       * Implementation matches BDA3's effective size description.
        * 
-       * @return the effective size
+       * @return the effective sample size.
        */
       double effectiveSize() {
         size_t m = nChains_;
@@ -115,7 +124,15 @@ namespace stan {
         }
         return ess;
       }
-      
+
+      /**
+       * Convergence monitoring: calculates R-hat on split chains.
+       *
+       * Implementation matches BDA3's R-hat on split chains. Each
+       * chain is split into halves.
+       *
+       * @return the split R-hat value.
+       */
       double splitRHat() {
         //using namespace boost::accumulators;
         size_t m = nChains_*2;
@@ -139,9 +156,20 @@ namespace stan {
         return sqrt((var_between/var_within + n-1)/n);
       }
 
+      /**
+       * Number of chains in the mcmc_object.
+       *
+       * @return number of chains
+       */
       size_t nChains() {
         return nChains_;
       }
+
+      /**
+       * Number of samples per chain.
+       *
+       * @return number of samples per chain.
+       */
       size_t nSamplesPerChain() {
         return nSamplesPerChain_;
       }

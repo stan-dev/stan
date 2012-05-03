@@ -13,8 +13,9 @@ namespace stan {
   namespace mcmc {
 
     /**
-     * Class implementing Nesterov's dual average algorithm.  Use by
-     * repeatedly calling update() with the gradient evaluated at
+     * Implements Nesterov's dual average algorithm.
+     *
+     * Use by repeatedly calling update() with the gradient evaluated at
      * xk(). When finished, use the average value of all the xk's by
      * calling xbar().
      *
@@ -46,8 +47,8 @@ namespace stan {
       /**
        * Produces the next iterate xk given the current gradient g.
        *
-       * @param g The new subgradient/stochastic gradient.
-       * @param xk The next iterate produced by the algorithm.
+       * @param[in]  g The new subgradient/stochastic gradient.
+       * @param[out] xk The next iterate produced by the algorithm.
        */
       void update(const std::vector<double>& g, std::vector<double>& xk) {
         _k++;
@@ -58,12 +59,12 @@ namespace stan {
         for (size_t i = 0; i < _gbar.size(); ++i) {
           _gbar[i] = avgeta * g[i] + (1 - avgeta) * _gbar[i];
           xk[i] = _x0[i] - muk * _gbar[i];
-//           fprintf(stderr, "DUALAVERAGE update %d: g = %f, gbar = %f, lastx = %f",
-//                   _k, g[0], _gbar[0], _lastx[0]);
+          // fprintf(stderr, "DUALAVERAGE update %d: g = %f, gbar = %f, lastx = %f",
+          //   _k, g[0], _gbar[0], _lastx[0]);
           _lastx[i] = xk[i];
           _xbar[i] = xbar_avgeta * xk[i] + (1 - xbar_avgeta) * _xbar[i];
         }
-//         fprintf(stderr, ", xk = %f\n", xk[0]);
+        // fprintf(stderr, ", xk = %f\n", xk[0]);
       }
 
       /**
@@ -79,7 +80,7 @@ namespace stan {
        * Get the exponentially weighted moving average of all previous
        * iterates.
        *
-       * @param xbar Where to return the exponentially weighted moving
+       * @param[out] xbar Where to return the exponentially weighted moving
        * average of all previous iterates.
        */
       inline void xbar(std::vector<double>& xbar) {
@@ -88,7 +89,7 @@ namespace stan {
       /**
        * Get the average of all previous gradients.
        *
-       * @param gbar Where to return the average of all previous gradients.
+       * @param[out] gbar Where to return the average of all previous gradients.
        */
       inline void gbar(std::vector<double>& gbar) {
         gbar.assign(_gbar.begin(), _gbar.end());
@@ -96,7 +97,7 @@ namespace stan {
       /**
        * Get the current iterate.
        *
-       * @param xk Where to return the current iterate.
+       * @param[out] xk Where to return the current iterate.
        */
       inline void xk(std::vector<double>& xk) {
         xk.assign(_lastx.begin(), _lastx.end());
@@ -124,101 +125,6 @@ namespace stan {
       inline double gamma() { return _gamma; }
     };
 
-    class GrowingBatches {
-    protected:
-      std::vector<double> _gbar, _xbar, _x0, _lastx;
-      int _k, _lastk, _nextk;
-      double _gamma;
-
-    public:
-      GrowingBatches(double gamma, const std::vector<double>& x0) 
-        : _gbar(x0.size(), 0), _xbar(x0.size(), 0), _x0(x0), _lastx(x0),
-          _k(0), _lastk(0), _nextk(1), _gamma(gamma){
-      }
-
-      void update(const std::vector<double>& g, std::vector<double>& xk) {
-        _k++;
-        for (size_t i = 0; i < g.size(); ++i)
-          _gbar[i] += g[i];
-        if (_k == _nextk) {
-          for (size_t i = 0; i < g.size(); ++i) {
-            // std::cerr << "_lastx[" << i << "]"
-            //           << " = " << _lastx[i]
-            //           << ", _gbar[" << i << "]"
-            //           << " = " << _gbar[i]
-            //           << std::endl;
-            _lastx[i] -= _gamma * _gbar[i] / (_nextk - _lastk);
-          }
-          _gbar.assign(_gbar.size(), 0);
-          int temp = _lastk;
-          _lastk = _nextk;
-          _nextk = _lastk + (_nextk - temp + 1);
-        }
-        xk = _lastx;
-        _xbar = _lastx;
-      }
-
-      void setx0(const std::vector<double>& x0) {
-        _x0 = x0;
-        _lastx = x0;
-        _xbar = x0;
-        // fprintf(stderr, "_lastx[0] = %f\n", x0[0]);
-      }
-
-      inline void xbar(std::vector<double>& xbar) {
-        xbar.assign(_xbar.begin(), _xbar.end());
-      }
-      inline void gbar(std::vector<double>& gbar) {
-        gbar.assign(_gbar.begin(), _gbar.end());
-      }
-      inline void xk(std::vector<double>& xk) {
-        xk.assign(_lastx.begin(), _lastx.end());
-      }
-      inline void x0(std::vector<double>& x0) {
-        x0.assign(_x0.begin(), _x0.end());
-      }
-      inline int k() { return _k; }
-      inline double gamma() { return _gamma; }
-    };
-
-    class StochasticGradient {
-    protected:
-      std::vector<double> _lastx;
-      int _k;
-      double _gamma, _a;
-
-    public:
-      StochasticGradient(const std::vector<double>& x0, double gamma = 0.5, 
-                         double a = 1.0)
-        : _lastx(x0), _k(0), _gamma(gamma), _a(a) {
-      }
-
-      void update(const std::vector<double>& g, std::vector<double>& xk) {
-        _k++;
-        xk.resize(g.size());
-        double eta = _a * pow(_k, -_gamma);
-        for (size_t i = 0; i < g.size(); ++i) {
-          xk[i] = _lastx[i] - eta * g[i];
-          _lastx[i] = xk[i];
-        }
-      }
-
-      void setlastx(const std::vector<double>& lastx) {
-        _lastx.assign(lastx.begin(), lastx.end());
-      }
-      void setx0(const std::vector<double>& lastx) {
-        _lastx.assign(lastx.begin(), lastx.end());
-      }
-
-      void xk(std::vector<double>& xk) {
-        xk.assign(_lastx.begin(), _lastx.end());
-      }
-      void xbar(std::vector<double>& xk) {
-        xk.assign(_lastx.begin(), _lastx.end());
-      }
-      int k() { return _k; }
-      double gamma() { return _gamma; }
-    };
   }
 }
 
