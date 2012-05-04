@@ -74,7 +74,7 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::check_bounded;
 
-      int K = c.size() + 2;
+      int K = c.size() + 1;
 
       typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
       if (!check_bounded(function, y, 1, K,
@@ -91,16 +91,13 @@ namespace stan {
                          &lp, Policy()))
         return lp;
 
-      if (!check_positive(function, c(0),
-                           "first cut point must be positive",
-                           &lp, Policy()))
-        return lp;
 
-      for (int i = 1; i < c.size(); ++i)
+      for (int i = 1; i < c.size(); ++i) {
         if (!check_greater(function, c(i), c(i - 1),
                            "cut points must be positie increasing",
                            &lp, Policy()))
           return lp;
+      }
 
       if (!check_finite(function, c(c.size()-1), 
                         "the last cut point must be finite",
@@ -114,21 +111,17 @@ namespace stan {
 
       // log(1 - inv_logit(lambda))
       if (y == 1)
-        return -log1p_exp(lambda); 
-
-      // log(inv_logit(lambda) - inv_logit(lambda - c(0)))
-      if (y == 2)
-        return log_inv_logit_diff(-lambda, c(0) - lambda);
+        return -log1p_exp(lambda - c(0)); 
 
       // log(inv_logit(lambda - c(K-3)));
       if (y == K) {
-        return -log1p_exp(c(K-3) - lambda);
+        return -log1p_exp(c(K-2) - lambda);
       }
 
       // if (2 < y < K) { ... }
       // log(inv_logit(lambda - c(y-2)) - inv_logit(lambda - c(y-1)))
-      return log_inv_logit_diff(c(y-3) - lambda, 
-                                c(y-2) - lambda);
+      return log_inv_logit_diff(c(y-2) - lambda, 
+                                c(y-1) - lambda);
 
     }
 

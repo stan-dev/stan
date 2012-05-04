@@ -80,9 +80,9 @@ namespace stan {
       opt_dims_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              pos_ordered_var_decl(), 
+                              ordered_var_decl(), 
                               whitespace_grammar<Iterator> > 
-      pos_ordered_decl_r;
+      ordered_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
                               range(),

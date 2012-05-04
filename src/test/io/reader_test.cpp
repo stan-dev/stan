@@ -494,35 +494,35 @@ TEST(io_reader, simplex_exception) {
 
 
 
-TEST(io_reader, pos_ordered) {
+TEST(io_reader, ordered) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_FLOAT_EQ(0.0,reader.scalar()); // throw away theta[0]
-  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.pos_ordered(5);
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.ordered(5);
   EXPECT_EQ(5U,y.size());
   EXPECT_FLOAT_EQ(1.0,y[0]);
   EXPECT_FLOAT_EQ(2.0,y[1]);
   EXPECT_FLOAT_EQ(5.0,y[4]);
   EXPECT_FLOAT_EQ(6.0,reader.scalar());
 }
-TEST(io_reader, pos_ordered_exception) {
+TEST(io_reader, ordered_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_FLOAT_EQ(0.0,reader.scalar()); // throw away theta[0]
-  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.pos_ordered(5);
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.ordered(5);
   EXPECT_EQ(5U,y.size());
   EXPECT_FLOAT_EQ(1.0,y[0]);
   EXPECT_FLOAT_EQ(2.0,y[1]);
   EXPECT_FLOAT_EQ(5.0,y[4]);
   EXPECT_FLOAT_EQ(6.0,reader.scalar());
 }
-TEST(io_reader, pos_ordered_constrain) {
+TEST(io_reader, ordered_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(3.0);
@@ -534,13 +534,13 @@ TEST(io_reader, pos_ordered_constrain) {
   double v2 = v1 + exp(-2.0);
   double v3 = v2 + exp(0.0);
   stan::io::reader<double> reader(theta,theta_i);
-  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.pos_ordered_constrain(4));
+  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.ordered_constrain(4));
   EXPECT_FLOAT_EQ(v0, phi[0]);
   EXPECT_FLOAT_EQ(v1, phi[1]);
   EXPECT_FLOAT_EQ(v2, phi[2]);
   EXPECT_FLOAT_EQ(v3, phi[3]);
 }
-TEST(io_reader, pos_ordered_constrain_jacobian) {
+TEST(io_reader, ordered_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(3.0);
@@ -553,7 +553,7 @@ TEST(io_reader, pos_ordered_constrain_jacobian) {
   double v3 = v2 + exp(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -101.1;
-  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.pos_ordered_constrain(4,lp));
+  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.ordered_constrain(4,lp));
   EXPECT_FLOAT_EQ(v0, phi[0]);
   EXPECT_FLOAT_EQ(v1, phi[1]);
   EXPECT_FLOAT_EQ(v2, phi[2]);

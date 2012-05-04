@@ -1317,6 +1317,14 @@ namespace stan {
     matrix_d inverse(const matrix_d& m);
 
     /**
+     * Return the softmax of the specified vector.
+     * @param x Vector to transform
+     * @return Unit simplex result of the softmax transform of the vector.
+     */
+    vector_d softmax(const vector_d& y);
+    
+
+    /**
      * Returns the solution of the system Ax=b when A is triangular
      * @param A Triangular matrix.  Specify upper or lower with TriView
      * being Eigen::Upper or Eigen::Lower.

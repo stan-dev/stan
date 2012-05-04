@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX_CPP__
 
 #include "stan/math/matrix.hpp"
+#include "stan/math/special_functions.hpp"
 
 namespace stan {
 
@@ -218,6 +219,13 @@ namespace stan {
 
     matrix_d inverse(const matrix_d& m) {
       return m.inverse();
+    }
+
+    vector_d
+    softmax(const vector_d& x) {
+      vector_d theta(x.size());
+      stan::math::softmax<vector_d,double>(x,theta);
+      return theta;
     }
 
     vector_d eigenvalues(const matrix_d& m) {

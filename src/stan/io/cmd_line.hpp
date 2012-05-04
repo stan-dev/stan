@@ -15,6 +15,8 @@ namespace stan {
   namespace io {
     
     /**
+     * Print help option with padding.
+     * 
      * Print 2 spaces, the specified help option, then pad
      * to the specified width with spaces.  If there is not
      * room for at least 2 padding spaces, start a new line
@@ -78,8 +80,7 @@ namespace stan {
     }
 
     /**
-     * The <code>cmd_line</code> class parses and stores command-line
-     * arguments.
+     * Parses and stores command-line arguments.
      *
      * <p>Command-line arguments are organized into four types.
      *
@@ -162,6 +163,8 @@ namespace stan {
       }
 
       /**
+       * Returns the value for the key provided. 
+       *
        * If the specified key is defined, write the value of the key
        * into the specified reference and return <code>true</code>,
        * otherwise do not modify the reference and return
@@ -172,8 +175,8 @@ namespace stan {
        * type.  Thus this method will work as long as <code>operator>>()</code>
        * is defined for the specified type.
        *
-       * @param key Key whose value is returned.
-       * @param x Reference to value.
+       * @param[in] key Key whose value is returned.
+       * @param[out] x Reference to value.
        * @return Value for key, or empty string if it's not defined.
        * @tparam Type of value.
        */
@@ -205,13 +208,15 @@ namespace stan {
       }
 
       /**
+       * Returns the bare argument.
+       * 
        * If the specified index is valid for bare arguments,
        * write the bare argument at the specified index into 
        * the specified reference, and otherwise return false
        * without modifying the reference.
        *
-       * @param n Bare argument position.
-       * @param x Reference to result.
+       * @param[in] n Bare argument position.
+       * @param[out] x Reference to result.
        * @return <code>true</code> if there were enough bare arguments.
        * @tparam T Type of value returned.
        */
@@ -228,7 +233,7 @@ namespace stan {
        * Print a human readable parsed form of the command-line
        * arguments to the specified output stream.
        *
-       * @param out Output stream.
+       * @param[out] out Output stream.
        */
       void print(std::ostream& out) const {
         out << "COMMAND=" << cmd_ << '\n';

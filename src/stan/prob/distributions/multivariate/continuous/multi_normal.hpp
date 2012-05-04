@@ -111,6 +111,101 @@ namespace stan {
                                               stan::math::default_policy());
     }
 
+    /** y can have multiple rows (observations) and columns (on variables)
+     */
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_covar, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
+                  const Policy&) {
+      static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
+
+      using stan::math::mdivide_left_tri;
+      using stan::math::columns_dot_self;
+      using stan::math::multiply;
+      using stan::math::subtract;
+      
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_cov_matrix;
+      using boost::math::tools::promote_args;
+
+      typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+
+      if (!check_size_match(function, y.cols(), mu.rows(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, y.cols(), L.rows(), &lp, Policy()))
+        return lp;
+      if (!check_size_match(function, y.cols(), L.cols(), &lp, Policy()))
+        return lp;
+      if (!check_finite(function, mu, "mu", &lp, Policy())) 
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp, Policy())) 
+        return lp;
+
+      if (y.cols() == 0)
+        return lp;
+
+      if (include_summand<propto>::value) 
+        lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
+
+      if (include_summand<propto,T_covar>::value)
+        lp -= L.diagonal().array().log().sum() * y.rows();
+
+      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+        Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
+        for(size_t i = 0; i < y.rows(); i++)
+          MU.row(i) = mu;
+        
+        Eigen::Matrix<typename 
+                      boost::math::tools::promote_args<T_loc,T_y>::type,
+                      Eigen::Dynamic,Eigen::Dynamic> z = subtract(y,MU).transpose();
+                
+        Eigen::Matrix<typename 
+                      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+                      Eigen::Dynamic,Eigen::Dynamic> half(mdivide_left_tri<Eigen::Lower>(L,z));
+          
+        lp -= 0.5 * columns_dot_self(half).sum();
+      }
+      return lp;
+    }
+
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      return multi_normal_cholesky_log<propto>(y,mu,L,
+                                               stan::math::default_policy());
+    }
+
+    template <typename T_y, typename T_loc, typename T_covar, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
+                  const Policy&) {
+      return multi_normal_cholesky_log<false>(y,mu,L,Policy());
+    }
+
+    template <typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      return multi_normal_cholesky_log<false>(y,mu,L,
+                                              stan::math::default_policy());
+    }
+    
     // MultiNormal(y|mu,Sigma)   [y.rows() = mu.rows() = Sigma.rows();
     //                            y.cols() = mu.cols() = 0;
     //                            Sigma symmetric, non-negative, definite]
@@ -193,6 +288,73 @@ namespace stan {
          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       return multi_normal_log<false>(y,mu,Sigma,stan::math::default_policy());
     }
+    
+    /**
+     * y can have multiple rows (observations) and columns (on variables)
+     */
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_covar, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+             const Policy&) {
+      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+
+      using stan::math::check_size_match;
+      using stan::math::check_positive;
+      using stan::math::check_symmetric;
+
+      if (!check_size_match(function, Sigma.rows(), Sigma.cols(), &lp, Policy()))
+        return lp;
+      if (!check_positive(function, Sigma.rows(), "rows", &lp, Policy()))
+        return lp;
+      if (!check_symmetric(function, Sigma, "Sigma", &lp, Policy()))
+        return lp;
+      Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
+      if (LLT.info() != Eigen::Success) {
+        lp = stan::math::policies::raise_domain_error<T_covar>(function,
+                                              "Sigma is not positive definite (%1%)",
+                                              0,Policy());
+        return lp;
+      }
+      Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> L(LLT.matrixL());
+      return multi_normal_cholesky_log<propto>(y,mu,L,Policy());
+    }
+
+    template <bool propto,
+              typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_log<propto>(y,mu,Sigma,stan::math::default_policy());
+    }
+
+
+    template <typename T_y, typename T_loc, typename T_covar, 
+              class Policy>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+             const Policy&){
+      return multi_normal_log<false>(y,mu,Sigma,Policy());
+    }
+
+    template <typename T_y, typename T_loc, typename T_covar>
+    inline
+    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
+    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_log<false>(y,mu,Sigma,stan::math::default_policy());
+    }
+    
   }
 }
 
