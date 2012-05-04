@@ -409,20 +409,150 @@ improper flat priors on the coefficients is coded as follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int(0,) N;
-    int(1,K) y[N];
-    row_vector(K) x[N];
+   int(0,) N;
+   int(1,K) y[N];
+   row_vector(K) x[N];
 }
 parameters {
-    matrix(N,K) beta;
+   matrix(N,K) beta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ categorical(softmax(x[n] * beta));
+   for (n in 1:N)
+       y[n] ~ categorical(softmax(x[n] * beta));
 }
 \end{Verbatim}
 \end{quote}
 %
+
+\section{Ordered Logistic Regression}
+
+Ordered logistic regression for an outcome $y_n \in
+\setlist{1,\ldots,K}$ with predictors $x_n \in \reals^D$ is determined
+by a single coefficient vector $\beta \in \reals^D$ along with a
+sequence of cutpoints $c \in \reals^{D-1}$ sorted so that $c_d <
+c_{d+1}$.  The discrete output is $k$ if the linear predictor $x_n
+\beta$ falls between $c_{k-1}$ and $c_k$, assuming $c_0 = -\infty$ and
+$c_K = \infty$.
+
+The ordinal logistic model can be coded in \Stan using the
+\code{ordered} data type for the cutpoints and the built-in
+\code{ordered\_logistic} distribution.
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+  int(1,) D;
+  int(2,) K;
+  int(0,) N;
+  int(1,K) y[N];
+  row_vector(D) x[N];
+} 
+parameters {
+  matrix(D) beta;
+  ordered(K-1) c;
+} 
+model {
+  for (n in 1:N)
+      y[n] ~ ordered_logistic(x[n] * beta, c);
+}
+\end{Verbatim}
+\end{quote}
+% 
+The vector of cutpoints \code{c} is declared as \code{ordered(D-1)},
+which guarantees that \code{c[k]} is less than \code{c[k+1]}.
+
+An ordered probit model could be coded in a manner similar to the
+\BUGS encoding of an ordered logistic model.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(1,) D;
+  int(2,) K;
+  int(0,) N;
+  int(1,K) y[N];
+  row_vector(D) x[N];
+}
+parameters {
+  matrix(D) beta;
+  ordered(K-1) c;
+}
+model {
+  vector(K) theta;
+  for (n in 1:N) {
+      real eta;
+      eta <- x[n] * beta;
+      theta[1] = 1 - erf(eta - c(1));
+      for (k in 2:(K-1))
+          theta[k] = erf(eta - c(k-1)) - erf(eta - c(k));
+      theta[K] = erf(eta - c(K-1));
+      y[n] ~ categorical(theta);
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The logistic model could be coded this way by replacing \code{erf}
+with \code{inv\_logit}, though the built-in encoding is more efficient
+and more numerically stable.  A small efficiency gain could be
+achieved by computing the values \code{1 - erf(eta - c(d))} once and
+storing them for re-use.
+
+\section{Hierarchical Logistic Regression}
+
+The simplest multilevel model is a hierarchical model in which the
+data is grouped into $L$ levels.  An extreme approach would be to
+completely pool all the data and estimate a common vector of
+regression coefficients $\beta$.  At the other extreme, an approach
+would no pooling assigns each level $l$ its own coefficient vector
+$\beta_l$ that is estimated separately from the other levels.  A
+hierarchical model is an intermediate solution where the degree of
+pooling is determined by the data and a prior on the amount of
+pooling.
+
+Suppose each binary outcome $y_n \in \setlist{0,1}$ has an associated
+level, $ll_n \in \setlist{1,\ldots,L}$.  Each outcome will also have
+an associated predictor vector $x_n \in \reals^D$.  Each level $l$
+gets its own coefficient vector $\beta_l \in \reals^D$.  The
+hierarchical structure involves drawing the coefficients $\beta_{l,d}
+\in \reals$ from a prior that is also estimated with the data.  This
+hierarchically estimated prior determines the amount of pooling; if
+the data in each level are very similar, the pooling will be strong,
+but if it is very dissimilar, the pooling will be weak.
+
+The following model encodes a hierarchical logistic regression model
+with a hierarchical prior on the regression coefficients.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(1,) D;
+    int(0,) N;
+    int(1,) L;
+    int(0,1) y[N];
+    int(1,L) ll[N];
+}
+parameters {
+    real mu[D];
+    real(0,) sigma[D];
+    vector(D) beta[L];
+}
+model {
+    for (d in 1:D) {
+        mu[d] ~ normal(0,100);
+        sigma[d] ~ uniform(0,1000);
+        for (l in 1:L)
+            beta[l,d] ~ normal(mu[d],sigma[d]);
+    }
+    for (n in 1:N)
+        y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
+}
+\end{Verbatim}
+\end{quote}   
+
+
+
+
 
 
 \chapter{Order Constraints}

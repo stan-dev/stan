@@ -11,14 +11,12 @@ vector_d
 get_simplex(double lambda, 
            const vector_d& c) {
   using stan::math::inv_logit;
-  int K = c.size() + 2;
+  int K = c.size() + 1;
   vector_d theta(K);
-  // see p. 119, Gelman and Hill
-  theta(0) = 1.0 - inv_logit(lambda);
-  theta(1) = inv_logit(lambda) - inv_logit(lambda - c(0));
-  for (int k = 2; k < (K - 1); ++k)
-    theta(k) = inv_logit(lambda - c(k - 2)) - inv_logit(lambda - c(k - 1));
-  theta(K-1) = inv_logit(lambda - c(K-3)); // - 0.0
+  theta(0) = 1.0 - inv_logit(lambda - c(0));
+  for (int k = 1; k < (K - 1); ++k)
+    theta(k) = inv_logit(lambda - c(k - 1)) - inv_logit(lambda - c(k));
+  theta(K-1) = inv_logit(lambda - c(K-2)); // - 0.0
   return theta;
 }
 
@@ -32,8 +30,8 @@ TEST(ProbDistributions,ordered_logistic_vals) {
   using stan::math::inv_logit;
 
   int K = 5;
-  Matrix<double,Dynamic,1> c(K-2);
-  c << 0.9, 1.2, 2.6;
+  Matrix<double,Dynamic,1> c(K-1);
+  c << -1.7, -0.3, 1.2, 2.6;
   double lambda = 1.1;
   
   vector_d theta = get_simplex(lambda,c);
@@ -59,8 +57,8 @@ TEST(ProbDistributions,ordered_logistic_vals_2) {
   using stan::math::inv_logit;
 
   int K = 3;
-  Matrix<double,Dynamic,1> c(K-2);
-  c << 0.4;
+  Matrix<double,Dynamic,1> c(K-1);
+  c << -0.2, 4;
   double lambda = -0.9;
   
   vector_d theta = get_simplex(lambda,c);
@@ -80,8 +78,8 @@ TEST(ProbDistributions,ordered_logistic_vals_2) {
 TEST(ProbDistributions,ordered_logistic_default_policy) {
   using stan::prob::ordered_logistic_log;
   int K = 4;
-  Eigen::Matrix<double,Eigen::Dynamic,1> c(2);
-  c << 0.1, 1.2;
+  Eigen::Matrix<double,Eigen::Dynamic,1> c(K-1);
+  c << -0.3, 0.1, 1.2;
   double lambda = 0.5;
   EXPECT_THROW(ordered_logistic_log(-1,lambda,c),std::domain_error);
   EXPECT_THROW(ordered_logistic_log(0,lambda,c),std::domain_error);
@@ -93,15 +91,15 @@ TEST(ProbDistributions,ordered_logistic_default_policy) {
   EXPECT_EQ(0,c_zero.size());
   EXPECT_THROW(ordered_logistic_log(1,lambda,c_zero),std::domain_error);
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_neg(1); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_neg(1);
   c_neg << -13.7;
-  EXPECT_THROW(ordered_logistic_log(1,lambda,c_neg),std::domain_error);
+  EXPECT_NO_THROW(ordered_logistic_log(1,lambda,c_neg));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord(3); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord(3);
   c_unord << 1.0, 0.4, 2.0;
   EXPECT_THROW(ordered_logistic_log(1,lambda,c_unord),std::domain_error);
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord_2(3); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord_2(3); 
   c_unord_2 << 1.0, 2.0, 0.4;
   EXPECT_THROW(ordered_logistic_log(1,lambda,c_unord_2),std::domain_error);
 
@@ -111,19 +109,19 @@ TEST(ProbDistributions,ordered_logistic_default_policy) {
   EXPECT_THROW(ordered_logistic_log(1,nan,c),std::domain_error);
   EXPECT_THROW(ordered_logistic_log(1,inf,c),std::domain_error);
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> cbad(2); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> cbad(2); 
   cbad << 0.2, inf;
   EXPECT_THROW(ordered_logistic_log(1,1.0,cbad),std::domain_error);
   cbad[1] = nan;
   EXPECT_THROW(ordered_logistic_log(1,1.0,cbad),std::domain_error);
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> cbad1(1); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> cbad1(1); 
   cbad1 <<  inf;
   EXPECT_THROW(ordered_logistic_log(1,1.0,cbad1),std::domain_error);
   cbad1[0] = nan;
   EXPECT_THROW(ordered_logistic_log(1,1.0,cbad1),std::domain_error);
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> cbad3(3); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> cbad3(3); 
   cbad3 <<  0.5, inf, 1.0;
   EXPECT_THROW(ordered_logistic_log(1,1.0,cbad3),std::domain_error);
   cbad3[1] = nan;
@@ -153,8 +151,8 @@ void expect_nan(double x) {
 TEST(ProbDistributions,ordered_logistic_errno_policy) {
   using stan::prob::ordered_logistic_log;
   int K = 4;
-  Eigen::Matrix<double,Eigen::Dynamic,1> c(2);
-  c << 0.1, 1.2;
+  Eigen::Matrix<double,Eigen::Dynamic,1> c(K-1);
+  c << -2.1, 0.1, 1.2;
   double lambda = 0.5;
 
   expect_nan(ordered_logistic_log(-1,lambda,c, errno_policy()));
@@ -164,19 +162,19 @@ TEST(ProbDistributions,ordered_logistic_errno_policy) {
   for (int k = 1; k <= K; ++k)
     EXPECT_NO_THROW(ordered_logistic_log(k,lambda,c));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_zero; // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_zero; 
   EXPECT_EQ(0,c_zero.size());
   expect_nan(ordered_logistic_log(1,lambda,c_zero,errno_policy()));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_neg(1); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_neg(1); 
   c_neg << -13.7;
-  expect_nan(ordered_logistic_log(1,lambda,c_neg,errno_policy()));
+  EXPECT_NO_THROW(ordered_logistic_log(1,lambda,c_neg,errno_policy()));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord(3); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord(3); 
   c_unord << 1.0, 0.4, 2.0;
   expect_nan(ordered_logistic_log(1,lambda,c_unord,errno_policy()));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord_2(3); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> c_unord_2(3); 
   c_unord_2 << 1.0, 2.0, 0.4;
   expect_nan(ordered_logistic_log(1,lambda,c_unord_2,errno_policy()));
 
@@ -186,19 +184,19 @@ TEST(ProbDistributions,ordered_logistic_errno_policy) {
   expect_nan(ordered_logistic_log(1,nan,c,errno_policy()));
   expect_nan(ordered_logistic_log(1,inf,c,errno_policy()));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> cbad(2); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> cbad(2); 
   cbad << 0.2, inf;
   expect_nan(ordered_logistic_log(1,1.0,cbad,errno_policy()));
   cbad[1] = nan;
   expect_nan(ordered_logistic_log(1,1.0,cbad,errno_policy()));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> cbad1(1); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> cbad1(1); 
   cbad1 <<  inf;
   expect_nan(ordered_logistic_log(1,1.0,cbad1,errno_policy()));
   cbad1[0] = nan;
   expect_nan(ordered_logistic_log(1,1.0,cbad1,errno_policy()));
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> cbad3(3); // init size zero
+  Eigen::Matrix<double,Eigen::Dynamic,1> cbad3(3); 
   cbad3 <<  0.5, inf, 1.0;
   expect_nan(ordered_logistic_log(1,1.0,cbad3,errno_policy()));
   cbad3[1] = nan;

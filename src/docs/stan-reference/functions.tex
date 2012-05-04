@@ -1153,33 +1153,34 @@ $1:N$ given $N$-simplex distribution parameter \farg{theta}}
 
 \subsection{Ordered Logistic Distribution}
 
-If $K \in \nats$ with $K > 2$, $c \in \reals^{K-2}$ such that $0 \leq
-c_1 \leq c_2 \leq \cdots \leq c_{K-2}$, and $\lambda \in \reals$, then
-for $k \in \setlist{1,\ldots,K}$,
+If $K \in \nats$ with $K > 2$, $c \in \reals^{K-1}$ such that $c_k <
+c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k \in
+\setlist{1,\ldots,K}$,
 \[
-\distro{OrderedLogistic}(k|\lambda,c)
+\distro{OrderedLogistic}(k|\eta,c)
 =
 \left\{
 \begin{array}{ll}
-1 - \mbox{logit}^{-1}(\lambda) & \mbox{if } k = 1
+1 - \mbox{logit}^{-1}(\eta - c_1) & \mbox{if } k = 1
 \\[4pt]
-\mbox{logit}^{-1}(\lambda) - \mbox{logit}^{-1}(\lambda - c_1)
-& \mbox{if } k = 2
+\mbox{logit}^{-1}(\eta - c_{k-1}) - \mbox{logit}^{-1}(\eta -
+c_{k})
+& \mbox{if } 1 < k < K
 \\[4pt]
-\mbox{logit}^{-1}(\lambda - c_{k-1}) - \mbox{logit}^{-1}(\lambda -
-c_k)
-& \mbox{if } 2 < k < K
-\\[4pt]
-\mbox{logit}^{-1}(\lambda - c_K)
+\mbox{logit}^{-1}(\eta - c_{K-1}) - 0
 & \mbox{if } k = K
 \end{array}
 \right.
 \]
-
+%
+The $k=1$ and $k=K$ edge cases can be subsumed into the general definition
+by setting $c_0 = -\infty$ and $c_K = +\infty$ with
+$\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
+%
 \begin{description}
   \fitem{real}{ordered\_logistic\_log}{int \farg{k}, real
-    \farg{lambda}, vector \farg{c}}{The ordered logistic probability mass of
-    \farg{k} given linear basis \farg{lambda} and cutpoints \farg{c}.}
+    \farg{eta}, vector \farg{c}}{The ordered logistic probability mass of
+    \farg{k} given linear predictor \farg{eta} and cutpoints \farg{c}.}
 \end{description}
 
 
