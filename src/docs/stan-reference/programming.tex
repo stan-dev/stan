@@ -115,6 +115,182 @@ not also providing the combined array \code{y} of transformed parameters).
 
 \chapter{Truncated or Censored Data}
 
+Data in which measurements have been truncated or censored can be
+coded in \Stan following their respective probability models.
+
+\section{Truncated Data}
+
+Truncated data is data for which measurements are only reported if
+they fall above a lower bound, below an upper bound, or between a
+lower and upper bound.  
+
+Truncated data may be modeled in \Stan using truncated distributions.
+For example, suppose the truncated data is $y_n$ with an upper
+truncation point of $U = 300$ so that $y_n < 300$.  In \Stan, this
+data can be modeled as following a truncated normal distribution for
+the observations as follows. 
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+   int(0,) N;
+   real U;
+   real(,U) y[N];
+} 
+parameters
+   real mu;
+   real(0,) sigma;
+} 
+model {
+  for (n in 1:N)
+       y[n] ~ normal(mu,sigma) T(,U);
+}
+\end{Verbatim}
+\end{quote}
+% 
+The model declares an upper bound \code{U} as data and constrains
+the data for \code{y} to respect the constraint;  this will be checked
+when the data is loaded into the model before sampling begins.
+
+This model implicitly uses an improper flat prior on the scale and
+location parameters; these could be given priors in the model.
+
+\subsection{Unknown Truncation Points}
+
+Nothing prevents the truncation points from being estimated as
+parameters.  This can be done with a slight rearrangement of the
+variable declarations from the model for known truncation points.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(1,) N;
+   real y[N];
+}
+parameters
+   real(,min(y)) L; 
+   real(max(y),) U;
+   real mu;
+   real(0,) sigma;
+}
+model {
+  L ~ ...;  
+  U ~ ...;
+  for (n in 1:N)
+       y[n] ~ normal(mu,sigma) T(L,U);
+}
+\end{Verbatim}
+\end{quote}
+%
+Here there is a lower truncation point \code{L} which is declared to
+be less than or equal to the minimum value of \code{y}.  The upper
+truncation point \code{U} is declared to be larger than the maximum
+value of \code{y}.  This declaration, although dependent on the data,
+only enforces the constraint that the data fall within the
+truncation bounds.  With the constraint that there is at least one
+data point \code{y[n]}, the constraint that \code{L} is less than
+\code{U} is enforced indirectly.
+
+The ellipses where the priors for the bounds \code{L} and \code{U}
+should go should be filled in with a an informative prior in
+order for this model to not concentrate \code{L} strongly around 
+\code{min(y)} and \code{U} strongly around \code{max(y)}.
+
+
+\section{Censored Data}
+
+Censoring hides values from points that are too large, too small, or
+both.  Unlike with truncated data, the number of data points that were
+censored is known.  The textbook example is the household scale which
+does not report values above 300 pounds.  
+
+\subsection{Imputing Censored Values}
+
+One way to model censored data is to treat the censored data as
+missing data that is constrained to fall in the censored range of
+values.  Because \Stan does not allow unknown values in its arrays or
+matrices, the censored values must be represented explicitly.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(0,) N_obs;
+   int(0,) N_cens;
+   real(0,) y_obs[N_obs];
+   real(max(y_obs),) U;
+}
+parameters {
+  real(U,) y[N_cens];
+  real mu;
+  real(0,) sigma;
+}
+model {
+   for (n in 1:N_obs)
+       y_obs[n] ~ normal(mu,sigma);
+   for (y in 1:N_cens)
+       y_cens[n] ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+Because the censored data array \code{y} is declared to be a parameter, it
+will be sampled along with the location and scale parameters \code{mu}
+and \code{sigma}.  Because the censored data array \code{y} is
+declared to have values of type \code{real(U,)}, all imputed values
+for censored data will be greater than \code{U}.  The imputed censored
+data affects the location and scale parameters through the last
+sampling statement in the model.  
+
+\subsection{Integrating out Censored Values}
+
+Although it is wrong to ignore the censored values in estimating
+location and scale, it is not necessary to impute values.  Instead,
+the values can be integrated out.  Each censored data point has a
+probability of
+%
+\[
+\mbox{Pr}[y > U] 
+= \int_U^{\infty} \distro{Normal}(y|\mu,\sigma) \, dy
+= 1 - \Phi\left(\frac{y - \mu}{\sigma}\right).
+\]
+%
+With $M$ censored observations, the total probability on the log scale
+is
+\[
+\log \prod_{m=1}^M \mbox{Pr}[y_m > U]
+= \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
+= M \, \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)
+\]
+
+% 
+This can be implemented directly in \Stan using the cumulative normal
+distribution function \code{normal\_p} as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(0,) N_obs;
+   int(0,) N_cens;
+   real(0,) y_obs[N_obs];
+   real(max(y_obs),) U;
+}
+parameters {
+  real mu;
+  real(0,) sigma;
+}
+model {
+   for (n in 1:N_obs)
+       y_obs[n] ~ normal(mu,sigma);
+   lp__ <- lp__ + N_cens * log1m(normal_p(U,mu,sigma));
+}
+\end{Verbatim}
+\end{quote}
+
+
+
+
+
+
 
 
 \chapter{Mixture Modeling}
@@ -424,7 +600,7 @@ model {
 \end{quote}
 %
 
-\section{Ordered Logistic Regression}
+\section{Ordered Logistic Regression}\label{ordered-logistic.section}
 
 Ordered logistic regression for an outcome $y_n \in
 \setlist{1,\ldots,K}$ with predictors $x_n \in \reals^D$ is determined
@@ -552,10 +728,6 @@ model {
 
 
 
-
-
-
-\chapter{Order Constraints}
 
 
 
