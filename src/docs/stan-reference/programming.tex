@@ -119,20 +119,48 @@ not also providing the combined array \code{y} of transformed parameters).
 
 \chapter{Mixture Modeling}
 
-Finite mixture distributions can be coded in \Stan as custom
-distributions combining the mixture with the built-in probability
-functions.  
+Mixture models of an outcome assume that the outcome is drawn from one
+of several distributions, the identity of which is controlled by a
+categorical mixing distribution.  Mixture models typically have
+multimodal densities with modes around the modes of the mixture
+components.  
 
-In the simplest case, consider a random variable $Y$ whose
-distirbution the mixture of two normal distributions, with a 0.3
-weight on $\distro{Normal}(-1,2)$ and a 0.7 weight on
-$\distro{Normal}(3,1)$.  Mathematically, the densities are mixed, with
-the density of $Y$ given by
+\section{Latent Discrete Parameterization}
+
+One way to parameterize a mixture model is with a latent categorical
+variable indicating which mixture component was responsible for the
+outcome. For example, consider $K$ normal distributions with locations
+$\mu_k \in \reals$ and scales $\sigma_k \in (0,\infty)$ mixed in the
+proportions $\theta$ in the $K$-simplex.  For each outcome $y_n$ there
+is a latent variable $z_n$ in $\setlist{1,\ldots,K}$,
+%
 \[
-p_Y(y) = 0.3 \times \distro{Normal}(y|-1,2) \, + \, 0.7 \times \distro{Normal}(y|3,1).
+z_n \sim \distro{Categorical}(\theta).
 \]
 %
-The \Stan model with parameter $Y$ is coded as follows.
+The variable $y_n$ is distributed according to the parameters
+of the mixture component $z_n$, 
+\[
+y_n \sim \distro{Normal}(\mu_{z[n]},\sigma_{z[n]}).
+\]
+%
+This model is not directly supported by \Stan because it involves a
+discrete parameter $z$.  
+
+\section{Summing out the Responsibility Parameter}
+
+To implement the normal mixture model outlined in the previous
+section in \Stan, the discrete parameters can be summed out of the
+model. If $Y$ is a mixture of $K$ normal distributions with 
+locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
+$\theta$ in the $K$-simplex, then 
+\[
+p_Y(y) = \sum_{k=1}^K \distro{Normal}(\mu_k,\sigma_k).
+\]
+
+For example, the mixture of $\code{Normal}(-1,2)$ and
+$\code{Normal}(3,1)$ with mixing proportion $\theta =
+(0.3,0.7)^{\top}$ can be implemented in \Stan as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -221,11 +249,8 @@ such point, the log of $\theta_k \times
 array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
-\chapter{Summing Out Discrete Parameters}
 
 
-
-\chapter{Order Constraints}
 
 
 \chapter{Regression Models}
@@ -357,15 +382,15 @@ outcomes and the log odds (logit) link function.  The inverse of the
 link function appears in the model.  
 
 Other link functions may be used in the same way.  For example, probit
-regression uses the cumulative normal density function, which is
+regression uses the cumulative normal distribution function, which is
 typically written as 
 \[
 \Phi(x) = \int_{-\infty}^x \distro{Normal}(y|0,1) \, dy.
 \]
 %
-The cumulative unit density function $\Phi$ is also known as the
-error function and written \code{erf(x)} in programming languages.  
-The probit regression model may be coded in \Stan as follows.
+The cumulative unit normal distribution function $\Phi$ is also known
+as the error function and written as \code{erf(x)}.  The probit
+regression model may be coded in \Stan as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -373,7 +398,7 @@ The probit regression model may be coded in \Stan as follows.
 \end{Verbatim}
 \end{quote}
 
-\section{Multiple Logistic Regression}
+\section{Multi-Logit Regression}
 
 Multiple outcome forms of logistic regression can be coded directly in
 \Stan.  For instance, suppose there are $K$ possible outcomes for each
@@ -399,6 +424,8 @@ model {
 \end{quote}
 %
 
+
+\chapter{Order Constraints}
 
 
 

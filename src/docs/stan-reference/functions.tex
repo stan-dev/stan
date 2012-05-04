@@ -950,10 +950,20 @@ The left division of \farg{b} by \farg{A}; equivalently
 
 \subsection{Special Matrix Functions}
 
+The softmax function maps $\reals^K$ to the $K$-simplex by
+\[
+\mbox{softmax}(y)
+ = \frac{\exp(y)}
+        {\sum_{k=1}^K \exp(y_k)},
+\]
+%
+where $\exp(y)$ is the componentwise exponentiation of $y$.
+
 \begin{description}
 \fitem{vector}{softmax}{vector \farg{x}}{
 The softmax of \farg{x}}
 \end{description}
+%
 
 \subsection{Linear Algebra Functions}
 
