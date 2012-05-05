@@ -211,7 +211,7 @@ namespace stan {
 
       /**
        * Write the unconstrained vector that corresponds to the specified
-       * positive ordered vector.
+       * ascendingly ordered vector.
        * 
        * <p>The unconstraining transform is defined for input vector <code>y</code>
        * to produce an output vector <code>x</code> of the same size, defined
@@ -220,9 +220,9 @@ namespace stan {
        * unconstraining transform inverts the constraining transform specified
        * in <code>ordered_constrain(size_t)</code>.
        *
-       * @param y Positive, ordered vector.
+       * @param y Ascendingly ordered vector.
        * @return Unconstrained vector corresponding to the specified vector.
-       * @throw std::runtime_error if vector is not positive ordered
+       * @throw std::runtime_error if vector is not in ascending order.
        */
       void ordered_unconstrain(vector_t& y) {
         if (y.size() == 0) return;

@@ -570,12 +570,14 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified vector contains
      * only non-negative values and is sorted into increasing order.
-     * There may be duplicate values.
+     * There may be duplicate values.  Otherwise, raise a domain
+     * error according to the specified policy.
      *
      * @param function
      * @param y Vector to test.
      * @param name
      * @param result
+     * @param Policy Only the policy's type matters.
      * @return <code>true</code> if the vector has positive, ordered
      * values.
      */
@@ -590,22 +592,10 @@ namespace stan {
       if (y.size() == 0) {
         return true;
       }
-      if (!(y[0] > 0.0)) {
-        std::string message(name);
-        message += " is not a valid positive ordered vector.";
-        message += " The first element is %1%, but should be greater than 0.0";
-        T_result tmp = raise_domain_error<T_result,T_y>(function,
-                                                        message.c_str(),
-                                                        y[0],
-                                                        Policy());
-        if (result != 0)
-          *result = tmp;
-        return false;
-      } 
       for (size_t n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
           std::ostringstream stream;
-          stream << name << " is not a valid positive ordered vector."
+          stream << name << " is not a valid ordered vector."
                  << " The element at " << n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];

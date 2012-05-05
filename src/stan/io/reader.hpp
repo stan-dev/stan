@@ -811,14 +811,14 @@ namespace stan {
       }
 
       /**
-       * Return the next vector of specified size containing positive
-       * values in order.  
+       * Return the next vector of specified size containing
+       * values in ascending order.  
        *
-       * <p>See <code>stan::math::check_ordered(T)</code>.
+       * <p>See <code>stan::math::check_ordered(T)</code> for
+       * behavior on failure.
        *
        * @param k Size of returned vector.
        * @return Vector of positive values in ascending order.
-       * @throw std::runtime_error if the vector is not positive ordered
        */
       inline vector_t ordered(size_t k) {
         vector_t x(vector(k));
@@ -827,13 +827,12 @@ namespace stan {
       }
 
       /**
-       * Return the next positive, ordered vector of the specified
-       * length.  
+       * Return the next ordered vector of the specified length.
        *
        * <p>See <code>stan::prob::ordered_constrain(Matrix)</code>.
        * 
        * @param k Length of returned vector.
-       * @return Next positive, ordered vector of the specified
+       * @return Next ordered vector of the specified
        * length.
        */
       inline vector_t ordered_constrain(size_t k) {
@@ -841,7 +840,7 @@ namespace stan {
       }
 
       /**
-       * Return the next positive ordered vector of the specified
+       * Return the next ordered vector of the specified
        * size, incrementing the specified reference with the log
        * absolute Jacobian of the determinant.
        *
@@ -849,7 +848,7 @@ namespace stan {
        *
        * @param k Size of vector.
        * @param lp Log probability reference to increment.
-       * @return Next positive ordered vector of the specified size.
+       * @return Next ordered vector of the specified size.
        */
       inline vector_t ordered_constrain(size_t k, T& lp) {
         return stan::prob::ordered_constrain(vector(k),lp);
