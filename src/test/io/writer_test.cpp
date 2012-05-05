@@ -97,7 +97,7 @@ TEST(io_writer, ordered_unconstrain_exception) {
   EXPECT_NO_THROW (writer.ordered_unconstrain(y));
 
   y << -0.5, 1.0;
-  EXPECT_THROW (writer.ordered_unconstrain(y), std::domain_error);
+  EXPECT_NO_THROW (writer.ordered_unconstrain(y));
 
   y << 1.0, 0.1;
   EXPECT_THROW (writer.ordered_unconstrain(y), std::domain_error);

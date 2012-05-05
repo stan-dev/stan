@@ -12,7 +12,7 @@ Hamiltonian dynamics during sampling, every (multivariate) parameter
 in a \Stan model is transformed to an unconstrained variable behind
 the scenes by the model compiler.  The transform is based on any
 constraints in the parameter's definition.  Constraints that may be
-placed on variables include upper and lower bounds, positive ordered
+placed on variables include upper and lower bounds, ordered
 vectors, simplex vectors, correlation matrices and covariance
 matrices.  This chapter provides a definition of the transforms used
 for each type of variable.
@@ -264,69 +264,84 @@ Despite its apparent complexity, $\mbox{logit}^{-1}(y)$, and hence
 $\exp(-y)$, need only be evaluated once.
 
 
-\section{Positive Ordered Vector}
+\section{Ordered Vector}
 
 For some modeling tasks, a vector-valued random variable $X$ is
-required with support on positive, ordered sequences.  One example is
-the set of cut points in ordinal logistic regression.  
+required with support on ordered sequences.  One example is the set of
+cut points in ordered logistic regression (see \refsection{ordered-logistic}).
 
-In constraint terms, a positive, ordered vector $x \in \reals^K$
-is a vector that satisfies
+In constraint terms, an ordered $K$-vector $x \in \reals^K$ satisfies
 \[
-0 < x_1
+x_k < x_{k+1}
 \]
 %
-and for $2 \leq k \leq K$,
-\[
-x_{k-1} < x_k
-\]
-%
+for $k \in \setlist{1,\ldots,K-1}$.
 
-\subsection{Positive Ordered Transform}
 
-\Stan's transform follows the constraint directly.  It maps a vector
-$x \in \reals^{K}$ to a vector $f(x) = y \in \reals^K$ by setting
+\subsection{Ordered Transform}
+
+\Stan's transform follows the constraint directly.  It maps an
+increasing vector $x \in \reals^{K}$ to an unconstrained vector $y \in
+\reals^K$ by setting
 %
 \[
-y_1 = f_1(x) = \log x_1
+y_k
+= 
+\left\{
+\begin{array}{ll}
+x_1 & \mbox{if } k = 1, \mbox{ and}
+\\[4pt]
+\log \left( x_{k} - x_{k-1} \right) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
 \] 
-%
-and for $2 \leq k \leq K$,
-\[
-y_k = f_k(x) = \log \left( x_{k} - x_{k-1} \right).
-\]
 
-\subsection{Positive Ordered Inverse Transform}
+\subsection{Ordered Inverse Transform}
 
-The inverse transform $x = f^{-1}(y)$ satisfies
+The inverse transform for an unconstrained $y \in \reals^K$ to an
+ordered sequence $x \in \reals^K$ is defined by
 %
 \[
-x_1 = \exp(y_1)
+x_k
+= 
+\left\{
+\begin{array}{ll} 
+y_1 & \mbox{if } k = 1, \mbox{ and}
+\\[4pt]
+x_{k-1} + \exp(y_k) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
 \]
 %
-and for $2 \leq k \leq K$, 
+This can also be expressed compactly as
 \[
-x_k = x_{k-1} + \exp(y_k) = \sum_{k' =1}^{k} \exp(y_{k'}).
+x_k = y_1 + \sum_{k'=2}^k \exp(y_{k'}).
 \]
 
-\subsection{Absolute Jacobian Determinant of the Positive Ordered
+\subsection{Absolute Jacobian Determinant of the Ordered
   Inverse Transform}
 
 The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
 with diagonal elements for $1 \leq k \leq K$ of
 \[
-J_{k,k} = \frac{\partial}{\partial y_k} f_k^{-1}(y) = \exp(y_k).
+J_{k,k} = 
+\left\{
+\begin{array}{ll} 
+1 & \mbox{if } k = 1, \mbox{ and}
+\\[4pt]
+\exp(y_k) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
 \]
 %
-Because of the triangularity and the positivivity of the $x_k$ and
-their differences, the absolute determinant of the Jacobian is
+The absolute Jacobian determinant is thus
 %
 \[
 \left| \, \det \, J \, \right|
 \ = \ 
-\prod_{k=1}^K J_{k,k}
+\left| \, \prod_{k=1}^K J_{k,k} \, \right|
 \ = \ 
-\prod_{k=1}^K \exp(y_k).
+\prod_{k=2}^K \exp(y_k).
 \]
 
 
@@ -337,7 +352,7 @@ transformed variable $Y$ has density $p_Y$ given by
 p_Y(y)
 = p_X(f^{-1}(y)) 
 \
-\prod_{k=1}^K \exp(y_k).
+\prod_{k=2}^K \exp(y_k).
 \]
 
 
