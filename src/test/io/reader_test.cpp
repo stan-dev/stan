@@ -529,7 +529,7 @@ TEST(io_reader, ordered_constrain) {
   theta.push_back(-1.0);
   theta.push_back(-2.0);
   theta.push_back(0.0);
-  double v0 = exp(3.0);
+  double v0 = 3.0;
   double v1 = v0 + exp(-1.0);
   double v2 = v1 + exp(-2.0);
   double v3 = v2 + exp(0.0);
@@ -547,19 +547,19 @@ TEST(io_reader, ordered_constrain_jacobian) {
   theta.push_back(-1.0);
   theta.push_back(-2.0);
   theta.push_back(0.0);
-  double v0 = exp(3.0);
+  double v0 = 3.0;
   double v1 = v0 + exp(-1.0);
   double v2 = v1 + exp(-2.0);
   double v3 = v2 + exp(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -101.1;
+  double expected_lp = lp
+    - 1.0 - 2.0 + 0.0;
   Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.ordered_constrain(4,lp));
   EXPECT_FLOAT_EQ(v0, phi[0]);
   EXPECT_FLOAT_EQ(v1, phi[1]);
   EXPECT_FLOAT_EQ(v2, phi[2]);
   EXPECT_FLOAT_EQ(v3, phi[3]);
-  double expected_lp = lp
-    + 3.0 - 1.0 - 2.0 + 0.0;
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 

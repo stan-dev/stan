@@ -304,7 +304,7 @@ namespace stan {
      *    with values of v_in
      */
     inline void to_var(const vector_v& v_in,
-		       vector_v& v_out) {
+                       vector_v& v_out) {
       v_out = v_in;
     }
     /**
@@ -452,163 +452,163 @@ namespace stan {
     namespace {
       class dot_self_vari : public vari {
       protected:
-	vari** v_;
-	size_t size_;
+        vari** v_;
+        size_t size_;
       public:
-	template <int R, int C>
-	dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
-	  vari(var_dot_self(v)), size_(v.size()) {
-	  v_ = (vari**) memalloc_.alloc(size_ * sizeof(vari*));
-	  for (size_t i = 0; i < size_; ++i)
-	    v_[i] = v(i).vi_;
-	}
-	inline static double square(double x) { return x * x; }
-	template <int R, int C>
-	inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
-	  double sum = 0.0;
-	  for (int i = 0; i < v.size(); ++i)
-	    sum += square(v(i).vi_->val_);
-	  return sum;
-	}
-	void chain() {
-	  for (size_t i = 0; i < size_; ++i) 
-	    v_[i]->adj_ += adj_ * 2.0 * v_[i]->val_;
-	}
+        template <int R, int C>
+        dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
+          vari(var_dot_self(v)), size_(v.size()) {
+          v_ = (vari**) memalloc_.alloc(size_ * sizeof(vari*));
+          for (size_t i = 0; i < size_; ++i)
+            v_[i] = v(i).vi_;
+        }
+        inline static double square(double x) { return x * x; }
+        template <int R, int C>
+        inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
+          double sum = 0.0;
+          for (int i = 0; i < v.size(); ++i)
+            sum += square(v(i).vi_->val_);
+          return sum;
+        }
+        void chain() {
+          for (size_t i = 0; i < size_; ++i) 
+            v_[i]->adj_ += adj_ * 2.0 * v_[i]->val_;
+        }
       };
 
       class dot_product_vv_vari : public vari {
       protected:
-	vari** v1_;
-	vari** v2_;
-	size_t length_;
-	inline static double var_dot(const var* v1, const var* v2,
-				     size_t length) {
-	  double result = 0;
-	  for (size_t i = 0; i < length; i++)
-	    result += v1[i].vi_->val_ * v2[i].vi_->val_;
-	  return result;
-	}
-	template<int R1,int C1,int R2,int C2>
-	inline static double var_dot(const Eigen::Matrix<var,R1,C1> &v1,
-				     const Eigen::Matrix<var,R2,C2> &v2) {
-	  double result = 0;
-	  for (int i = 0; i < v1.size(); i++)
-	    result += v1[i].vi_->val_ * v2[i].vi_->val_;
-	  return result;
-	}
+        vari** v1_;
+        vari** v2_;
+        size_t length_;
+        inline static double var_dot(const var* v1, const var* v2,
+                                     size_t length) {
+          double result = 0;
+          for (size_t i = 0; i < length; i++)
+            result += v1[i].vi_->val_ * v2[i].vi_->val_;
+          return result;
+        }
+        template<int R1,int C1,int R2,int C2>
+        inline static double var_dot(const Eigen::Matrix<var,R1,C1> &v1,
+                                     const Eigen::Matrix<var,R2,C2> &v2) {
+          double result = 0;
+          for (int i = 0; i < v1.size(); i++)
+            result += v1[i].vi_->val_ * v2[i].vi_->val_;
+          return result;
+        }
       public:
-	dot_product_vv_vari(const var* v1, const var* v2, size_t length) : 
-	  vari(var_dot(v1, v2, length)), length_(length) {
-	  v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
-	  v2_ = v1_ + length_;
-	  for (size_t i = 0; i < length_; i++)
-	    v1_[i] = v1[i].vi_;
-	  for (size_t i = 0; i < length_; i++)
-	    v2_[i] = v2[i].vi_;
-	}
-	template<int R1,int C1,int R2,int C2>
-	dot_product_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
-			    const Eigen::Matrix<var,R2,C2> &v2) : 
-	  vari(var_dot(v1, v2)), length_(v1.size()) {
-	  v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
-	  v2_ = v1_ + length_;
-	  for (size_t i = 0; i < length_; i++)
-	    v1_[i] = v1[i].vi_;
-	  for (size_t i = 0; i < length_; i++)
-	    v2_[i] = v2[i].vi_;
-	}
-	void chain() {
-	  for (size_t i = 0; i < length_; i++) {
-	    v1_[i]->adj_ += adj_ * v2_[i]->val_;
-	    v2_[i]->adj_ += adj_ * v1_[i]->val_;
-	  }
-	}
+        dot_product_vv_vari(const var* v1, const var* v2, size_t length) : 
+          vari(var_dot(v1, v2, length)), length_(length) {
+          v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
+          v2_ = v1_ + length_;
+          for (size_t i = 0; i < length_; i++)
+            v1_[i] = v1[i].vi_;
+          for (size_t i = 0; i < length_; i++)
+            v2_[i] = v2[i].vi_;
+        }
+        template<int R1,int C1,int R2,int C2>
+        dot_product_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                            const Eigen::Matrix<var,R2,C2> &v2) : 
+          vari(var_dot(v1, v2)), length_(v1.size()) {
+          v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
+          v2_ = v1_ + length_;
+          for (size_t i = 0; i < length_; i++)
+            v1_[i] = v1[i].vi_;
+          for (size_t i = 0; i < length_; i++)
+            v2_[i] = v2[i].vi_;
+        }
+        void chain() {
+          for (size_t i = 0; i < length_; i++) {
+            v1_[i]->adj_ += adj_ * v2_[i]->val_;
+            v2_[i]->adj_ += adj_ * v1_[i]->val_;
+          }
+        }
       };
 
       class dot_product_vd_vari : public vari {
       protected:
-	vari** v1_;
-	double* v2_;
-	size_t length_;
-	inline static double var_dot(const var* v1, const double* v2,
-				     size_t length) {
-	  double result = 0;
-	  for (size_t i = 0; i < length; i++)
-	    result += v1[i].vi_->val_ * v2[i];
-	  return result;
-	}
-	template<int R1,int C1,int R2,int C2>
-	inline static double var_dot(const Eigen::Matrix<var,R1,C1> &v1,
-				     const Eigen::Matrix<double,R2,C2> &v2) {
-	  double result = 0;
-	  for (int i = 0; i < v1.size(); i++)
-	    result += v1[i].vi_->val_ * v2[i];
-	  return result;
-	}
+        vari** v1_;
+        double* v2_;
+        size_t length_;
+        inline static double var_dot(const var* v1, const double* v2,
+                                     size_t length) {
+          double result = 0;
+          for (size_t i = 0; i < length; i++)
+            result += v1[i].vi_->val_ * v2[i];
+          return result;
+        }
+        template<int R1,int C1,int R2,int C2>
+        inline static double var_dot(const Eigen::Matrix<var,R1,C1> &v1,
+                                     const Eigen::Matrix<double,R2,C2> &v2) {
+          double result = 0;
+          for (int i = 0; i < v1.size(); i++)
+            result += v1[i].vi_->val_ * v2[i];
+          return result;
+        }
       public:
-	dot_product_vd_vari(const var* v1, const double* v2, size_t length) : 
-	  vari(var_dot(v1, v2, length)), length_(length) {
-	  v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
-	  v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
-	  for (size_t i = 0; i < length_; i++)
-	    v1_[i] = v1[i].vi_;
-	  for (size_t i = 0; i < length_; i++)
-	    v2_[i] = v2[i];
-	}
-	template<int R1,int C1,int R2,int C2>
-	dot_product_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
-			    const Eigen::Matrix<double,R2,C2> &v2) : 
-	  vari(var_dot(v1, v2)), length_(v1.size()) {
-	  v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
-	  v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
-	  for (size_t i = 0; i < length_; i++)
-	    v1_[i] = v1[i].vi_;
-	  for (size_t i = 0; i < length_; i++)
-	    v2_[i] = v2[i];
-	}
-	void chain() {
-	  for (size_t i = 0; i < length_; i++) {
-	    v1_[i]->adj_ += adj_ * v2_[i];
-	  }
-	}
+        dot_product_vd_vari(const var* v1, const double* v2, size_t length) : 
+          vari(var_dot(v1, v2, length)), length_(length) {
+          v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+          for (size_t i = 0; i < length_; i++)
+            v1_[i] = v1[i].vi_;
+          for (size_t i = 0; i < length_; i++)
+            v2_[i] = v2[i];
+        }
+        template<int R1,int C1,int R2,int C2>
+        dot_product_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                            const Eigen::Matrix<double,R2,C2> &v2) : 
+          vari(var_dot(v1, v2)), length_(v1.size()) {
+          v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+          for (size_t i = 0; i < length_; i++)
+            v1_[i] = v1[i].vi_;
+          for (size_t i = 0; i < length_; i++)
+            v2_[i] = v2[i];
+        }
+        void chain() {
+          for (size_t i = 0; i < length_; i++) {
+            v1_[i]->adj_ += adj_ * v2_[i];
+          }
+        }
       };
 
       // FIXME: untested
       class gevv_vvv_vari : public stan::agrad::vari {
       protected:
-	stan::agrad::vari* alpha_;
-	stan::agrad::vari** v1_;
-	stan::agrad::vari** v2_;
-	size_t length_;
-	inline static double eval_gevv(const stan::agrad::var* alpha,
-				       const stan::agrad::var* v1, int stride1,
-				       const stan::agrad::var* v2, int stride2,
-				       size_t length) {
-	  double result = 0;
-	  for (size_t i = 0; i < length; i++)
-	    result += alpha->vi_->val_ * v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
-	  return result;
-	}
+        stan::agrad::vari* alpha_;
+        stan::agrad::vari** v1_;
+        stan::agrad::vari** v2_;
+        size_t length_;
+        inline static double eval_gevv(const stan::agrad::var* alpha,
+                                       const stan::agrad::var* v1, int stride1,
+                                       const stan::agrad::var* v2, int stride2,
+                                       size_t length) {
+          double result = 0;
+          for (size_t i = 0; i < length; i++)
+            result += alpha->vi_->val_ * v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
+          return result;
+        }
       public:
-	gevv_vvv_vari(const stan::agrad::var* alpha, 
-		      const stan::agrad::var* v1, int stride1, 
-		      const stan::agrad::var* v2, int stride2, size_t length) : 
-	  vari(eval_gevv(alpha, v1, stride1, v2, stride2, length)), length_(length) {
-	  alpha_ = alpha->vi_;
-	  v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
-	  v2_ = v1_ + length_;
-	  for (size_t i = 0; i < length_; i++)
-	    v1_[i] = v1[i*stride1].vi_;
-	  for (size_t i = 0; i < length_; i++)
-	    v2_[i] = v2[i*stride2].vi_;
-	}
-	void chain() {
-	  for (size_t i = 0; i < length_; i++) {
-	    v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
-	    v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
-	    alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
-	  }
-	}
+        gevv_vvv_vari(const stan::agrad::var* alpha, 
+                      const stan::agrad::var* v1, int stride1, 
+                      const stan::agrad::var* v2, int stride2, size_t length) : 
+          vari(eval_gevv(alpha, v1, stride1, v2, stride2, length)), length_(length) {
+          alpha_ = alpha->vi_;
+          v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
+          v2_ = v1_ + length_;
+          for (size_t i = 0; i < length_; i++)
+            v1_[i] = v1[i*stride1].vi_;
+          for (size_t i = 0; i < length_; i++)
+            v2_[i] = v2[i*stride2].vi_;
+        }
+        void chain() {
+          for (size_t i = 0; i < length_; i++) {
+            v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
+            v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
+            alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
+          }
+        }
       };
     }
 
@@ -1665,6 +1665,13 @@ namespace stan {
     matrix_v inverse(const matrix_v& m);
 
     /**
+     * Return the softmax of the specified vector.
+     * @param x Vector to transform
+     * @return Unit simplex result of the softmax transform of the vector.
+     */
+    vector_v softmax(const vector_v& v);
+
+    /**
      * Returns the solution of the system Ax=b when A is triangular.
      * @param[in] A Triangular matrix.  Upper or lower is defined by TriView being
      * either Eigen::Upper or Eigen::Lower.
@@ -1782,7 +1789,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
-						  const Eigen::Matrix<var,R2,C2> &A) {
+                                                  const Eigen::Matrix<var,R2,C2> &A) {
       if (A.cols() != A.rows())
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
@@ -1799,7 +1806,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
-						  const Eigen::Matrix<var,R2,C2> &A) {
+                                                  const Eigen::Matrix<var,R2,C2> &A) {
       if (A.cols() != A.rows())
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
@@ -1816,7 +1823,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
-						  const Eigen::Matrix<double,R2,C2> &A) {
+                                                  const Eigen::Matrix<double,R2,C2> &A) {
       if (A.cols() != A.rows())
         throw std::invalid_argument("A is not square");
       if (A.rows() != b.cols())
@@ -1965,14 +1972,14 @@ namespace Eigen {
       enum { LhsStorageOrder = ColMajor };
 
       EIGEN_DONT_INLINE static void run(
-					Index rows, Index cols,
-					const LhsScalar* lhs, Index lhsStride,
-					const RhsScalar* rhs, Index rhsIncr,
-					ResScalar* res, Index resIncr, const ResScalar &alpha)
+                                        Index rows, Index cols,
+                                        const LhsScalar* lhs, Index lhsStride,
+                                        const RhsScalar* rhs, Index rhsIncr,
+                                        ResScalar* res, Index resIncr, const ResScalar &alpha)
       {
-	for (Index i = 0; i < rows; i++) {
-	  res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
-	}
+        for (Index i = 0; i < rows; i++) {
+          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
+        }
       }
     };
     
@@ -1989,14 +1996,14 @@ namespace Eigen {
       enum { LhsStorageOrder = RowMajor };
 
       EIGEN_DONT_INLINE static void run(
-					Index rows, Index cols,
-					const LhsScalar* lhs, Index lhsStride,
-					const RhsScalar* rhs, Index rhsIncr,
-					ResScalar* res, Index resIncr, const RhsScalar &alpha)
+                                        Index rows, Index cols,
+                                        const LhsScalar* lhs, Index lhsStride,
+                                        const RhsScalar* rhs, Index rhsIncr,
+                                        ResScalar* res, Index resIncr, const RhsScalar &alpha)
       {
-	for (Index i = 0; i < rows; i++) {
-	  res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
-	}
+        for (Index i = 0; i < rows; i++) {
+          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(int(LhsStorageOrder) == int(ColMajor))?(&lhs[i]):(&lhs[i*lhsStride]),(int(LhsStorageOrder) == int(ColMajor))?(lhsStride):(1),rhs,rhsIncr,cols));
+        }
       }
     };
   }

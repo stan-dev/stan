@@ -981,18 +981,13 @@ namespace stan {
     }
 
 
-    // POSITIVE ORDERED 
+    // ORDERED 
     
     /**
-     * Return a positive valued, increasing ordered vector derived
-     * from the specified free vector.  The returned constrained vector
-     * will have the same dimensionality as the specified free vector.
+     * Return an increasing ordered vector derived from the specified
+     * free vector.  The returned constrained vector will have the
+     * same dimensionality as the specified free vector.
      *
-     * <p>The transform is defined using sums of exponentiations, where for
-     * each dimension \f$k\f$,
-     *
-     * <p>\f$ f(x)[k] = \sum_{k' = 0}^{k} \exp(x[k])\f$
-     *  
      * @param x Free vector of scalars.
      * @return Positive, increasing ordered vector.
      * @tparam T Type of scalar.
@@ -1002,8 +997,9 @@ namespace stan {
     ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k = x.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> y(k);
-      if (k > 0)
-        y[0] = exp(x[0]);
+      if (k == 0)
+        return y;
+      y[0] = x[0];
       for (typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type i = 1; 
            i < k; 
            ++i)
@@ -1018,27 +1014,6 @@ namespace stan {
      * of the transform.  The returned constrained vector
      * will have the same dimensionality as the specified free vector.
      *
-     * <p>The transform is defined as for
-     * <code>ordered_constrain(Eigen::Matrix<T,Eigen::Dynamic,1>)</code>.
-     * The log absolute Jacobian determinant reduces neatly because
-     * the Jacobian is lower triangular,
-     *
-     * <p>\f$\log \left| J \right| \f$
-     *
-     * <p>\f$= \log \left| \begin{array}{c} \nabla f(x)[0] 
-     *                     \\ \vdots \\ \nabla f(x)[K-1] \end{array}\right|\f$
-     * 
-     * <p>\f${} = \log \left| \begin{array}{cccc}
-     * \exp(x[0]) & 0 & \cdots & 0
-     * \\ \exp(x[0]) & \exp(x[1]) & \cdots & 0
-     * \\ \vdots & \vdots & \vdots & \vdots 
-     * \\ \exp(x[0]) & \exp(x[1]) & \cdots & \exp(x[K-1])
-     * \end{array} \right|\f$
-     * 
-     * <p>\f${} = \log \prod_{k=0}^{K-1} \exp(x[k])\f$
-     *
-     * <p>\f${} = \sum_{k=0}^{K-1} x[k]\f$.
-     *  
      * @param x Free vector of scalars.
      * @param lp Log probability reference.
      * @return Positive, increasing ordered vector. 
@@ -1048,7 +1023,8 @@ namespace stan {
     inline
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
-      lp += x.sum();
+      for (int i = 1; i < x.size(); ++i)
+        lp += x(i);
       return ordered_constrain(x);
     }
 
@@ -1060,8 +1036,6 @@ namespace stan {
      *
      * <p>This function inverts the constraining operation defined in 
      * <code>ordered_constrain(Matrix)</code>,
-     *
-     * <p>\f$f^{-1}(y)[k] = \log y[k] - \sum_{k' = 0}^{k-1} \log y[k]\f$
      *
      * @param y Vector of positive, ordered scalars.
      * @return Free vector that transforms into the input vector.
@@ -1078,7 +1052,7 @@ namespace stan {
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
       if (k == 0) 
         return x;
-      x[0] = log(y[0]);
+      x[0] = y[0];
       for (size_t i = 1; i < k; ++i)
         x[i] = log(y[i] - y[i-1]);
       return x;

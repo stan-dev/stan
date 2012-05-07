@@ -9,13 +9,14 @@
 % -------------- end if------------------------
 
 \usepackage{amsmath}
-
 \usepackage{xspace}
 \usepackage{fancyvrb}
+%\usepackage{fancyhdr}
 \usepackage{titlesec}
 
 \usepackage{url}
 
+% \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 
 \usepackage[titles]{tocloft}
 \setlength{\cftbeforechapskip}{2ex}
@@ -30,8 +31,8 @@
 
 \setcounter{tocdepth}{0}
 
-\titleformat{\chapter}[hang]{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}
-%\titlespacing{\chapter}{0pt}{-12pt}{18pt}{}
+\titleformat{\chapter}{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}%{1.5pc}{}{}
+\titlespacing{\chapter}{0pt}{-24pt}{24pt}{}
 %
 \titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
 %\titlespacing{\section}{0pt}{12pt}{6pt}
@@ -86,3 +87,21 @@
 
 \newcommand{\samp}{{\lower.78ex\hbox{\texttt{\char`\~}}}}%
 %{{\lower1.1ex\hbox{\Large\texttt{\char`\~}}}}
+
+% iPad: 3w x 4h, 
+
+\setlength{\paperwidth}{6in} % {6.6in}
+\setlength{\paperheight}{8in} %{8.8in}
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
+
+\setlength{\textwidth}{5in} %{5.5in}
+\setlength{\textheight}{6.675in} %{7.25in}
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\evensidemargin}{-0.5in}
+\setlength{\topmargin}{-0.75in}
+\setlength{\headsep}{18pt}
+
+\raggedbottom
+
+\sloppy % no line overruns

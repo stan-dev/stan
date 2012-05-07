@@ -1,13 +1,14 @@
-\documentclass[10pt]{report}
+\documentclass[10pt,openany]{book}
 \usepackage{stan-manuals}
 
 \begin{document}
-
+\pagestyle{empty}
 \include{title}
-\include{abstract}
+%\include{abstract}
 
 \tableofcontents
 
+\pagestyle{headings}
 \include{introduction}
 \include{commands}
 \include{programming}

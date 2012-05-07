@@ -289,7 +289,7 @@ namespace stan {
     // hide helper for now; could use Eigen here
     namespace {
       template <typename Vector, typename Scalar>
-      int maximum(const Vector& x) {
+      Scalar maximum(const Vector& x) {
         if(x.size() == 0)
           BOOST_THROW_EXCEPTION(std::invalid_argument ("x must have at least one element"));
         Scalar max_x(x[0]);
@@ -363,7 +363,6 @@ namespace stan {
         simplex[i] /= sum;
     }
 
-    
     /**
      * Writes the inverse softmax of the simplex argument into the second
      * argument.  See <code>stan::math::softmax</code> for the inverse

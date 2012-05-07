@@ -115,24 +115,228 @@ not also providing the combined array \code{y} of transformed parameters).
 
 \chapter{Truncated or Censored Data}
 
+Data in which measurements have been truncated or censored can be
+coded in \Stan following their respective probability models.
+
+\section{Truncated Data}
+
+Truncated data is data for which measurements are only reported if
+they fall above a lower bound, below an upper bound, or between a
+lower and upper bound.  
+
+Truncated data may be modeled in \Stan using truncated distributions.
+For example, suppose the truncated data is $y_n$ with an upper
+truncation point of $U = 300$ so that $y_n < 300$.  In \Stan, this
+data can be modeled as following a truncated normal distribution for
+the observations as follows. 
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+   int(0,) N;
+   real U;
+   real(,U) y[N];
+} 
+parameters
+   real mu;
+   real(0,) sigma;
+} 
+model {
+  for (n in 1:N)
+       y[n] ~ normal(mu,sigma) T(,U);
+}
+\end{Verbatim}
+\end{quote}
+% 
+The model declares an upper bound \code{U} as data and constrains
+the data for \code{y} to respect the constraint;  this will be checked
+when the data is loaded into the model before sampling begins.
+
+This model implicitly uses an improper flat prior on the scale and
+location parameters; these could be given priors in the model.
+
+\subsection{Unknown Truncation Points}
+
+Nothing prevents the truncation points from being estimated as
+parameters.  This can be done with a slight rearrangement of the
+variable declarations from the model for known truncation points.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(1,) N;
+   real y[N];
+}
+parameters
+   real(,min(y)) L; 
+   real(max(y),) U;
+   real mu;
+   real(0,) sigma;
+}
+model {
+  L ~ ...;  
+  U ~ ...;
+  for (n in 1:N)
+       y[n] ~ normal(mu,sigma) T(L,U);
+}
+\end{Verbatim}
+\end{quote}
+%
+Here there is a lower truncation point \code{L} which is declared to
+be less than or equal to the minimum value of \code{y}.  The upper
+truncation point \code{U} is declared to be larger than the maximum
+value of \code{y}.  This declaration, although dependent on the data,
+only enforces the constraint that the data fall within the
+truncation bounds.  With the constraint that there is at least one
+data point \code{y[n]}, the constraint that \code{L} is less than
+\code{U} is enforced indirectly.
+
+The ellipses where the priors for the bounds \code{L} and \code{U}
+should go should be filled in with a an informative prior in
+order for this model to not concentrate \code{L} strongly around 
+\code{min(y)} and \code{U} strongly around \code{max(y)}.
+
+
+\section{Censored Data}
+
+Censoring hides values from points that are too large, too small, or
+both.  Unlike with truncated data, the number of data points that were
+censored is known.  The textbook example is the household scale which
+does not report values above 300 pounds.  
+
+\subsection{Imputing Censored Values}
+
+One way to model censored data is to treat the censored data as
+missing data that is constrained to fall in the censored range of
+values.  Because \Stan does not allow unknown values in its arrays or
+matrices, the censored values must be represented explicitly.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(0,) N_obs;
+   int(0,) N_cens;
+   real(0,) y_obs[N_obs];
+   real(max(y_obs),) U;
+}
+parameters {
+  real(U,) y[N_cens];
+  real mu;
+  real(0,) sigma;
+}
+model {
+   for (n in 1:N_obs)
+       y_obs[n] ~ normal(mu,sigma);
+   for (y in 1:N_cens)
+       y_cens[n] ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+Because the censored data array \code{y} is declared to be a parameter, it
+will be sampled along with the location and scale parameters \code{mu}
+and \code{sigma}.  Because the censored data array \code{y} is
+declared to have values of type \code{real(U,)}, all imputed values
+for censored data will be greater than \code{U}.  The imputed censored
+data affects the location and scale parameters through the last
+sampling statement in the model.  
+
+\subsection{Integrating out Censored Values}
+
+Although it is wrong to ignore the censored values in estimating
+location and scale, it is not necessary to impute values.  Instead,
+the values can be integrated out.  Each censored data point has a
+probability of
+%
+\[
+\mbox{Pr}[y > U] 
+= \int_U^{\infty} \distro{Normal}(y|\mu,\sigma) \, dy
+= 1 - \Phi\left(\frac{y - \mu}{\sigma}\right).
+\]
+%
+With $M$ censored observations, the total probability on the log scale
+is
+\[
+\log \prod_{m=1}^M \mbox{Pr}[y_m > U]
+= \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
+= M \, \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)
+\]
+
+% 
+This can be implemented directly in \Stan using the cumulative normal
+distribution function \code{normal\_p} as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(0,) N_obs;
+   int(0,) N_cens;
+   real(0,) y_obs[N_obs];
+   real(max(y_obs),) U;
+}
+parameters {
+  real mu;
+  real(0,) sigma;
+}
+model {
+   for (n in 1:N_obs)
+       y_obs[n] ~ normal(mu,sigma);
+   lp__ <- lp__ + N_cens * log1m(normal_p(U,mu,sigma));
+}
+\end{Verbatim}
+\end{quote}
+
+
+
+
+
+
 
 
 \chapter{Mixture Modeling}
 
-Finite mixture distributions can be coded in \Stan as custom
-distributions combining the mixture with the built-in probability
-functions.  
+Mixture models of an outcome assume that the outcome is drawn from one
+of several distributions, the identity of which is controlled by a
+categorical mixing distribution.  Mixture models typically have
+multimodal densities with modes around the modes of the mixture
+components.  
 
-In the simplest case, consider a random variable $Y$ whose
-distirbution the mixture of two normal distributions, with a 0.3
-weight on $\distro{Normal}(-1,2)$ and a 0.7 weight on
-$\distro{Normal}(3,1)$.  Mathematically, the densities are mixed, with
-the density of $Y$ given by
+\section{Latent Discrete Parameterization}
+
+One way to parameterize a mixture model is with a latent categorical
+variable indicating which mixture component was responsible for the
+outcome. For example, consider $K$ normal distributions with locations
+$\mu_k \in \reals$ and scales $\sigma_k \in (0,\infty)$ mixed in the
+proportions $\theta$ in the $K$-simplex.  For each outcome $y_n$ there
+is a latent variable $z_n$ in $\setlist{1,\ldots,K}$,
+%
 \[
-p_Y(y) = 0.3 \times \distro{Normal}(y|-1,2) \, + \, 0.7 \times \distro{Normal}(y|3,1).
+z_n \sim \distro{Categorical}(\theta).
 \]
 %
-The \Stan model with parameter $Y$ is coded as follows.
+The variable $y_n$ is distributed according to the parameters
+of the mixture component $z_n$, 
+\[
+y_n \sim \distro{Normal}(\mu_{z[n]},\sigma_{z[n]}).
+\]
+%
+This model is not directly supported by \Stan because it involves a
+discrete parameter $z$.  
+
+\section{Summing out the Responsibility Parameter}
+
+To implement the normal mixture model outlined in the previous
+section in \Stan, the discrete parameters can be summed out of the
+model. If $Y$ is a mixture of $K$ normal distributions with 
+locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
+$\theta$ in the $K$-simplex, then 
+\[
+p_Y(y) = \sum_{k=1}^K \distro{Normal}(\mu_k,\sigma_k).
+\]
+
+For example, the mixture of $\code{Normal}(-1,2)$ and
+$\code{Normal}(3,1)$ with mixing proportion $\theta =
+(0.3,0.7)^{\top}$ can be implemented in \Stan as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -221,20 +425,17 @@ such point, the log of $\theta_k \times
 array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
-\chapter{Summing Out Discrete Parameters}
 
 
 
-\chapter{Order Constraints}
 
-
-\chapter{Regression Modeling}
+\chapter{Regression Models}
 
 \Stan supports the full range of regression models from simple linear
 regressions to multilevel generalized linear models.  Coding
 regression models in \Stan is very much like coding them in \BUGS.
 
-\section{Regression}
+\section{Linear Regression}
 
 The simplest linear regression model is the following, with a single
 predictor and intercept term.
@@ -242,8 +443,9 @@ predictor and intercept term.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int(0,) N;
-    real x[N];
+   int(0,) N;
+   real x[N];
+   real y[N];
 }
 parameters {
     real alpha;
@@ -259,6 +461,8 @@ model {
 %
 This model has improper priors for the two regression coefficients
 (intercept \code{alpha} and slope \code{beta}) and the noise term.
+
+\section{Coefficient and Noise Priors}
 
 There are several ways in which this model can be generalized.  
 For example, weak priors can be assigned to the coefficients as follows.
@@ -296,6 +500,234 @@ requires the half-Cauchy distribution, which would be expressed in
 Because the log probability function need not be normalized, the extra
 factor of 2 is not needed in the model, so the simpler un-truncated
 distribution suffices.
+
+\section{Robust Noise Models}
+
+The standard approach to linear regression is to model the noise
+term $\epsilon$ as having a normal distribution.  From \Stan's
+perspective, there is nothing special about normally distributed
+noise.  For instance, robust regression can be accomodated by giving
+the noise term a Student-$t$ distribution.  To code this in \Stan, the
+sampling distribution is changed, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    ...
+    real(0,) nu;
+}
+...
+model {
+    for (n in 1:N)
+        y[n] ~ student_t(nu,0,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The degrees of freedom constant \code{nu} is specified as data.
+Alternatively, it could be hard coded into the model.
+
+\section{Logistic and Probit Regression}
+
+For binary outcomes, logistic or probit regression can be used.  A
+logistic regression with one predictor and an intercept is coded as
+follows. 
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    real x[N];
+    int(0,1) y[N];
+}
+parameters {
+    real alpha;
+    real beta;
+}
+model {
+    for (n in 1:N)
+        y[n] ~ bernoulli(inv_logit(beta * x[n] + alpha));
+} 
+\end{Verbatim}
+\end{quote}
+%
+The noise parameter is built into the Bernoulli here.  
+
+Logistic regression is a kind of generalized linear model with binary
+outcomes and the log odds (logit) link function.  The inverse of the
+link function appears in the model.  
+
+Other link functions may be used in the same way.  For example, probit
+regression uses the cumulative normal distribution function, which is
+typically written as 
+\[
+\Phi(x) = \int_{-\infty}^x \distro{Normal}(y|0,1) \, dy.
+\]
+%
+The cumulative unit normal distribution function $\Phi$ is also known
+as the error function and written as \code{erf(x)}.  The probit
+regression model may be coded in \Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+        y[n] ~ bernoulli(erf(beta * x[n] + alpha));
+\end{Verbatim}
+\end{quote}
+
+\section{Multi-Logit Regression}
+
+Multiple outcome forms of logistic regression can be coded directly in
+\Stan.  For instance, suppose there are $K$ possible outcomes for each
+output variable $y_n$.  Also suppose that there is a $D$-dimensional
+vector $x_n$ of predictors for $y_n$.  The multi-logit model with
+improper flat priors on the coefficients is coded as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+   int(0,) N;
+   int(1,K) y[N];
+   row_vector(K) x[N];
+}
+parameters {
+   matrix(N,K) beta;
+}
+model {
+   for (n in 1:N)
+       y[n] ~ categorical(softmax(x[n] * beta));
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\section{Ordered Logistic Regression}\label{ordered-logistic.section}
+
+Ordered logistic regression for an outcome $y_n \in
+\setlist{1,\ldots,K}$ with predictors $x_n \in \reals^D$ is determined
+by a single coefficient vector $\beta \in \reals^D$ along with a
+sequence of cutpoints $c \in \reals^{D-1}$ sorted so that $c_d <
+c_{d+1}$.  The discrete output is $k$ if the linear predictor $x_n
+\beta$ falls between $c_{k-1}$ and $c_k$, assuming $c_0 = -\infty$ and
+$c_K = \infty$.
+
+The ordinal logistic model can be coded in \Stan using the
+\code{ordered} data type for the cutpoints and the built-in
+\code{ordered\_logistic} distribution.
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+  int(1,) D;
+  int(2,) K;
+  int(0,) N;
+  int(1,K) y[N];
+  row_vector(D) x[N];
+} 
+parameters {
+  matrix(D) beta;
+  ordered(K-1) c;
+} 
+model {
+  for (n in 1:N)
+      y[n] ~ ordered_logistic(x[n] * beta, c);
+}
+\end{Verbatim}
+\end{quote}
+% 
+The vector of cutpoints \code{c} is declared as \code{ordered(D-1)},
+which guarantees that \code{c[k]} is less than \code{c[k+1]}.
+
+An ordered probit model could be coded in a manner similar to the
+\BUGS encoding of an ordered logistic model.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(1,) D;
+  int(2,) K;
+  int(0,) N;
+  int(1,K) y[N];
+  row_vector(D) x[N];
+}
+parameters {
+  matrix(D) beta;
+  ordered(K-1) c;
+}
+model {
+  vector(K) theta;
+  for (n in 1:N) {
+      real eta;
+      eta <- x[n] * beta;
+      theta[1] = 1 - erf(eta - c(1));
+      for (k in 2:(K-1))
+          theta[k] = erf(eta - c(k-1)) - erf(eta - c(k));
+      theta[K] = erf(eta - c(K-1));
+      y[n] ~ categorical(theta);
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The logistic model could be coded this way by replacing \code{erf}
+with \code{inv\_logit}, though the built-in encoding is more efficient
+and more numerically stable.  A small efficiency gain could be
+achieved by computing the values \code{1 - erf(eta - c(d))} once and
+storing them for re-use.
+
+\section{Hierarchical Logistic Regression}
+
+The simplest multilevel model is a hierarchical model in which the
+data is grouped into $L$ levels.  An extreme approach would be to
+completely pool all the data and estimate a common vector of
+regression coefficients $\beta$.  At the other extreme, an approach
+would no pooling assigns each level $l$ its own coefficient vector
+$\beta_l$ that is estimated separately from the other levels.  A
+hierarchical model is an intermediate solution where the degree of
+pooling is determined by the data and a prior on the amount of
+pooling.
+
+Suppose each binary outcome $y_n \in \setlist{0,1}$ has an associated
+level, $ll_n \in \setlist{1,\ldots,L}$.  Each outcome will also have
+an associated predictor vector $x_n \in \reals^D$.  Each level $l$
+gets its own coefficient vector $\beta_l \in \reals^D$.  The
+hierarchical structure involves drawing the coefficients $\beta_{l,d}
+\in \reals$ from a prior that is also estimated with the data.  This
+hierarchically estimated prior determines the amount of pooling; if
+the data in each level are very similar, the pooling will be strong,
+but if it is very dissimilar, the pooling will be weak.
+
+The following model encodes a hierarchical logistic regression model
+with a hierarchical prior on the regression coefficients.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(1,) D;
+    int(0,) N;
+    int(1,) L;
+    int(0,1) y[N];
+    int(1,L) ll[N];
+}
+parameters {
+    real mu[D];
+    real(0,) sigma[D];
+    vector(D) beta[L];
+}
+model {
+    for (d in 1:D) {
+        mu[d] ~ normal(0,100);
+        sigma[d] ~ uniform(0,1000);
+        for (l in 1:L)
+            beta[l,d] ~ normal(mu[d],sigma[d]);
+    }
+    for (n in 1:N)
+        y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
+}
+\end{Verbatim}
+\end{quote}   
+
+
+
 
 
 
