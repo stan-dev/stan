@@ -86,3 +86,9 @@ TEST_F(stanMcmc, mu1) {
   EXPECT_FLOAT_EQ(13.599755, mu1.effectiveSize());
   EXPECT_FLOAT_EQ(1.187, mu1.splitRHat());
 }
+
+TEST_F(stanMcmc, delta22) {
+  stan::mcmc::mcmc_output delta22 = factory.create("delta.22");
+  EXPECT_FLOAT_EQ(43.58981, delta22.effectiveSize());
+  EXPECT_FLOAT_EQ(1.03715, delta22.splitRHat());
+}
