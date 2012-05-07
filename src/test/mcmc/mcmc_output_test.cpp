@@ -84,4 +84,5 @@ TEST_F(stanMcmc, factoryAvailableVariables) {
 TEST_F(stanMcmc, mu1) {
   stan::mcmc::mcmc_output mu1 = factory.create("mu.1");
   EXPECT_FLOAT_EQ(13.599755, mu1.effectiveSize());
+  EXPECT_FLOAT_EQ(1.187, mu1.splitRHat());
 }
