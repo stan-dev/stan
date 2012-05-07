@@ -190,53 +190,158 @@ namespace stan {
 
 
     class mcmc_output_factory {
+    private:
+      // List of filenames
+      std::vector<std::string> filenames_;
+      
+      /** 
+       * Strips the header from a Stan samples file.
+       *
+       * The file is advanced past the header. Each line of the header
+       * is assumed to start with the character #.
+       * 
+       * @param[in,out] file Input file stream.
+       * @return Number of lines stripped from the output.
+       */
+      int stripHeader(std::fstream& file) {
+        int n = 0;
+        while (file.peek() == '#') {
+          file.ignore(10000, '\n');
+          n++;
+        }
+        return n;
+      }
+      
+      /** 
+       * Indentifies the column number of the variable.
+       *
+       * The file must be at the header of file. After this function, file is
+       * moved to the next line.
+       * 
+       * @param[in,out] file The filestream.
+       * @param variable The variable to find in the file.
+       * @return Zero-indexed column index of the variable.
+       * @exception std::runtime_error if the variable is not found in the file.
+       */
+      int identifyColumnNumber(std::fstream& file, std::string variable) {
+        int column = 0;
+        std::stringstream currvar("");
+        char c;
+        file.get(c);
+        
+        while (currvar.str() != variable) {
+          currvar.str("");
+          if (c == ',') {
+            column++;
+            file.get(c);
+          } else if (c == '\n') {
+            throw std::runtime_error("variable could not be found in file");
+          }
+          while (c != ',' && c != '\n') {
+            currvar << c;
+            file.get(c);
+          }
+        }
+        if (c != '\n') {
+          file.ignore(10000, '\n');
+        }
+        return column;
+      }
+      
+      double getSample(std::fstream &file, int column) {
+        char c;
+        double sample;
+        file >> sample;
+        for (int ii = 1; ii <= column; ii++) {
+          file.get(c);
+          file >> sample;
+        }
+        if (c != '\n') {
+          file.ignore(10000, '\n');
+        }
+        return sample;
+      }
+      
+      std::vector<double> getSamples(std::fstream &file, int column) {
+        std::vector<double> samples;
+        while (file.peek() != std::istream::traits_type::eof()) {
+          samples.push_back(getSample(file, column));
+        }
+        return samples;
+      }
+      
     public:
       mcmc_output_factory() {
       }
       void addFile(std::string filename) {
-	filenames_.push_back(filename);
+        filenames_.push_back(filename);
       }
+      
+      /** 
+       * Returns the variables available.
+       *
+       * Defaults to the first file. If file is beyond the size number
+       * of files, throws an exception.
+       * 
+       * @param fileNumber File to return available variables
+       * @return Vector of available variables.
+       * @throws std::runtime_error if called with an unavailable fileNumber
+       */
+      std::vector<std::string> availableVariables(int fileNumber=0) {
+        if (fileNumber >= filenames_.size()) {
+          throw std::runtime_error("availableVariables called with fileNumber greater than number of files");
+        }
+        std::vector<std::string> vars;
+        std::fstream file(filenames_[fileNumber].c_str(), std::fstream::in);
+        stripHeader(file);
+        
+        std::stringstream currvar("");
+        char c;
+        file.get(c);
+        while (c != '\n') {
+          currvar.str("");
+          if (c == ',') {
+            file.get(c);
+          }
+          while (c != ',' && c != '\n') {
+            currvar << c;
+            file.get(c);
+          }
+          vars.push_back(currvar.str());
+        }
+        file.close();
+        return vars;
+      }
+      
+      /** 
+       * Creates an <code>stan::mcmc::mcmc_output</code> variable for the variable
+       * specified.
+       *
+       * If the variable is not a part of the files attached, should throw an exception.
+       * 
+       * @param variable Variable to create the mcmc_output for.
+       * @return An mcmc_output variable.
+       */
       mcmc_output create(std::string variable) {
-	mcmc_output var;
-	// loop over all files
-	for (size_t ii = 0; ii < filenames_.size(); ii++) {
-	  std::vector<double> samples;
-	  
-	  	  
-	  // 1. open file: filenames_[ii];
-	  std::fstream in(filenames_[ii].c_str(), std::fstream::in);
-	  
-	  // 1.1. Strip header
-	  char c = '#';
-	  while (c == '#') {
-	    in.ignore(10000, '\n');
-	    in >> c;
-	  }
-	  // 1.2 count number of commas to skip
-	  int commas = 0;
-	  std::stringstream currvar;
-	  while (currvar.str() != variable) {
-	    currvar.str("");
-	    if (c == ',') {
-	      commas++;
-	      in.get(c);
-	    }
-	    while (c != ',' && c != '\n') {
-	      currvar << c;
-	      in.get(c);
-	    }
-	  }
-	  // 2. read the column with the variable listed
-	  
-
-	  in.close();
-	  // 3. add samples to mcmc_output
-	  var.add_chain(samples);
-	}
-	return var;
+        mcmc_output var;
+        // loop over all files
+        for (size_t ii = 0; ii < filenames_.size(); ii++) {
+          // 1. open file: filenames_[ii];
+          std::fstream in(filenames_[ii].c_str(), std::fstream::in);
+          
+          // 1.1. Strip header
+          stripHeader(in);
+          // 1.2 count number of commas to skip
+          int column = identifyColumnNumber(in, variable);
+          // 2. read the column with the variable listed
+          std::vector<double> samples = getSamples(in, column);
+          in.close();
+          
+          // 3. add samples to mcmc_output
+          var.add_chain(samples);
+        }
+        return var;
       }
-    private:
-      std::vector<std::string> filenames_;
     };
 
    

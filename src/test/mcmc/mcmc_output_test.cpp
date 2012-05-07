@@ -55,6 +55,30 @@ TEST_F(stanMcmc, splitRHat) {
 TEST_F(stanMcmc, factory) {
   stan::mcmc::mcmc_output_factory f;
   f.addFile("src/test/mcmc/mcmc_output/blocker1.csv");
-  f.create("mu.1");
+  f.addFile("src/test/mcmc/mcmc_output/blocker2.csv");
+  stan::mcmc::mcmc_output mu1 = f.create("mu.1");
+}
+
+TEST_F(stanMcmc, factoryAvailableVariables) {
+  stan::mcmc::mcmc_output_factory f;
+  f.addFile("src/test/mcmc/mcmc_output/blocker1.csv");
+  f.addFile("src/test/mcmc/mcmc_output/blocker2.csv");
+  std::vector<std::string> vars;
+  EXPECT_NO_THROW(vars = f.availableVariables());
+  EXPECT_FLOAT_EQ(49, vars.size());
+  EXPECT_EQ("lp__", vars[0]);
+  EXPECT_EQ("mu.1", vars[4]);
+
+  EXPECT_NO_THROW(vars = f.availableVariables(0));
+  EXPECT_FLOAT_EQ(49, vars.size());
+  EXPECT_EQ("lp__", vars[0]);
+  EXPECT_EQ("d", vars[2]);
+
+  EXPECT_NO_THROW(vars = f.availableVariables(1));
+  EXPECT_FLOAT_EQ(49, vars.size());
+  EXPECT_EQ("lp__", vars[0]);
+  EXPECT_EQ("delta.1", vars[26]);
+
+  EXPECT_THROW(vars = f.availableVariables(2), std::runtime_error);
 }
 
