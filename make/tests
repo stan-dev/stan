@@ -30,6 +30,18 @@ BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
 
 .PHONY: test-bugs
 test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
+	@echo '------------------- Running bugs models --------------------'
+	set -e;\
+	$(foreach test,$(BUGS_EXAMPLES), \
+		echo '--- $(test) ---';\
+		$(addsuffix $(EXE),$(test)) --data=$(test).Rdata --samples=$(test).csv;)
+
+BASIC_DISTRIBUTIONS := $(shell cd src; find models/basic_distributions -type f -name '*.stan')
+BASIC_DISTRIBUTIONS := $(BASIC_DISTRIBUTIONS:%.stan=%)
+.PHONY: test-basic-distributions
+test-basic-distributions: $(addsuffix $(EXE),$(BASIC_DISTRIBUTIONS))
+	@echo $(BASIC_DISTRIBUTIONS)
+
 
 ##
 # Target to build all tests
