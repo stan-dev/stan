@@ -179,6 +179,18 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* more general generic initializations
+  -  normal or student-t w. params
+  -  or even extend uniform
+
+* add a parameter initialization block
+  - ? override if user supplies inits?
+  - fill in values not given randomly or report error?
+  - use "beta[n] ~ normal(0,10)" to mean 
+    "beta[n] <- random_normal(0,10)" in the parameter init
+    block (and derived quantity block and elsewhere true
+    sampling is not allowed?)
+
 * build unit tests from the BUGS models that just check
   the gradients are right (this'll also cover parsing and
   being able to fire up the models)
@@ -456,7 +468,9 @@ EXTENSIONS
                    vector<S>& df_dx);
 
 * restart from where command left off a la R2jags
-
+  - this will require writing dump output or a converter
+    for the CSV output to dump output
+  
 * auto convergence monitoring -- just keep doubling (or other ratio)
 
 * cut out last derivative step in leapfrog if not nec.
