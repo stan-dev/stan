@@ -1,0 +1,158 @@
+\chapter*{Preface for Version 1}
+
+We did not set out to build \Stan as it currently exists.%
+%
+\footnote{In Fall 2010, the ``we'' consisted of Andrew Gelman and his
+  crew of Ph.D.\ students (Wei Wang and Vince Dorie), post-docs (Ben
+  Goodrich, Matt Hoffman and Michael Malecki), and research staff (Bob
+  Carpenter and Daniel Lee).  Previous post-docs whose work directly
+  contributed to \Stan included Matt Schofield, Kenny Shirley, and
+  Aleks Jakulin.  Jiqiang Guo joined as a post-doc in Fall 2011, and
+  Marcus Brubaker, a post-doc at University of Toronto joined the
+  development team in early 2012.  Michael Betancourt, a
+  recently-minted physics Ph.D., joined our weekly meetings in early
+  2012 and helped immensely with our understanding of differential
+  geometry and Riemann manifold \HMC.}
+%
+We set out to apply full Bayesian inference to the sort of multilevel
+generalized linear models of the sort discussed in Part II of
+\cite{GelmanHill:2007}.  These models are
+structured with grouped and interacted predictors at multiple levels,
+hierarchical covariance priors, nonconjugate coefficient priors,
+latent effects as in item-response models, and varying output link
+functions and distributions.
+
+These models are a challenge for current general-purpose software to
+fit.  A direct encoding of these models in \BUGS or \JAGS can grind
+these tools to a halt.  For example, one of Andrew Gelman's previous
+post-docs, Matthew Schofield, found that a multilevel time-series
+regression (of climate on tree-ring measurements for retrodiction)
+didn't converge even after hundreds of thousands of iterations.
+
+Initially, Aleks Jakulin spent some time working on extending the
+Gibbs sampler in the Hierarchical Bayesian Compiler
+\cite{DaumeIII:2007}, which as it's name suggests, is compiled
+rather than interpreted.  But even an efficient and scalable
+implementation does not solve the underlying problem that Gibbs
+sampling does not fare well with highly correlated posteriors.  We
+needed a better sampler, not a more efficient implementation.
+
+We briefly considered trying to tune proposals for a random-walk
+Metropolis-Hastings sampler, but that seemed rather complex.  We were
+at the same time starting to hear more and more about Hamiltonian
+Monte Carlo (\HMC) and its ability to overcome the problems inherent
+in Gibbs sampling.  Matt Schofield had managed to fit the tree-ring
+data using a hand-coded implementation of \HMC, finding it converged
+in a few hundred iterations.  
+
+\HMC appeared promising but was also problematic in that the
+Hamiltonian dynamics simulation requires the gradient of the log
+posterior.  Although it's possible to do this by hand, it is very
+tedious and error prone.  That's when we discovered reverse-mode
+algorithmic differentiation, which lets you write down a templated
+\Cpp function for the log posterior and automatically compute a proper
+analytic gradient up to machine precision accuracy in only a few
+multiples of the cost to evaluate the log probability function itself.
+We explored existing algorithmic differentiation packages with open
+licenses such as {\sc rad} \cite{Gay:2005} and its repackaging in the
+Sacado module of the Trilinos toolkit and the {\small CppAD} package in the
+{\sc coin-or} toolkit.  But neither package supported very many
+special functions (e.g., densities, log gamma, inverse logit) or
+linear algebra operations (e.g., Cholesky decomposition) and were not
+easily and modularly extensible.  
+
+So we built our own reverse-mode algorithmic differentiation package.
+But once we'd built our own reverse-mode algorithmic differentiation
+package, the problem was that we could not just plug in the
+probability functions from a package like Boost because they weren't
+templated on all the arguments.  We only needed algorithmic
+differentiation variables for parameters, not data or transformed
+data, and promotion is very inefficient in both time and memory.  So
+we wrote our own fully templated probability functions.  
+
+Next, we integrated the Eigen \Cpp package for matrix operations and
+linear algebra functions.  Eigen makes extensive use of expression
+templates for lazy evaluation and the curiously recurring template
+pattern to implement concepts without virtual function calls.  But we
+ran into problems ran into similar problems with mixed data/parameter
+operations which we have still not, as of \Stan version 1, fully
+optimized away.
+
+The next problem we ran into is that Hamiltonian Monte Carlo works
+best with unconstrained parameters.  But many probabilty functions
+involve support or parameterizations with constraints (e.g.,
+covariance matrices must be positive definite and success parameters
+must fall in $(0,1)$.  To get around this problem, we introduced typed
+variables and automatically transformed variables with suitable
+adjustments to the log probabilty from the log absolute Jacobian
+determinant of the transform.
+
+At this point (Spring 2011), we were happily fitting models coded
+directly in \Cpp on top of the pre-release versions of the \Stan API.
+Seeing how well this all worked, we set our sights on the generality
+and ease of use of \BUGS.  So we designed a modeling language in which
+statisticians could write their models in familiar notation that could
+be transformed to efficient \Cpp code and then compiled intto an
+efficient executable program.
+
+Even with the prototype compiler generating odels, we still faced a
+major hurdle to ease of use.  \HMC requires two tuning parameters
+(step size and number of steps) and is very sensitive to how they are
+set.  The step size parameter could be tuned during warmup based on
+Metropolis rejection rates, but the number of steps was not so easy to
+tune while maintaining detailed balance of the sampler.  The solution
+we found was the no-U-turn sampler (\NUTS) \cite{Hoffman-Gelman:2012},
+which takes an ever increasing number of steps until the direction of
+the simulation turns around, then uses slice sampling to select a
+point on the simulated trajectory.  
+
+We thought we were home free at this point.  But when we measured the
+speed of some \BUGS examples versus \Stan, we were very disappointed.
+The problem, as it turns out, is that while \HMC is rotation invariant
+(why it can handle high correlations), it is not scale invariant.
+Gibbs sampling, on the other hand, is scale invariant, but not
+rotation invariant.  When we tried out simple \BUGS examples like the
+very first model in their examples, Rats, we found \JAGS was almost
+two orders of magnitude faster than \Stan.  Rats is a tough test case
+because the conjugate priors and lack of posterior correlations make
+it an ideal candidate for efficient Gibbs sampling.  At the same time,
+we were trying to fit some other time-series models that did not use
+normalized data.  We found normalizing the data in these cases led
+to order-of-magnitude speedups in \Stan.   
+
+At ths time, we were still using a unit mass matrix in the simulated
+Hamiltonian dynamics.  The last tweak to \Stan before version 1.0 was
+to estimate a diagonal mass matrix during warmup.  This is beyond the
+published \NUTS paper, so we've been calling it \NUTS II.  This sped
+up the unscaled data models by an order of magnitude, though it 
+breaks the nice theoretical property of rotation invariance.
+
+There's still an enormous amount of work to do to improve \Stan.  Our
+to-do list is kept at the top level of the release in the file
+\code{TO-DO.txt}.  Our top priorities going forward are (1) sample
+analysis in \Cpp (effective sample size, split-$\hat{R}$ convergence
+monitoring, smallest and central posterior intervals, etc.), and (2)
+an \R interface along the lines of {\small R2WinBUGS}.  We will also
+continue to work on speeding up algorithmic differentiation through
+partial evaluation, especially for matrix and probability functions.
+Another immediate to-do item is adding a richer set of
+parameterizations to existing probability functions (e.g.,
+precision-based parameterizations of elliptical distributions and
+logit-based parameterizations of discrete models), along with a
+broader set of cumulative distribution functions for truncated and
+censored data.  Although it is very expensive (cubic in
+dimensionality) and limited in applicability (log concave probability
+functions), we are still interested in approaches like that of Riemann
+manifold \HMC \cite{GirolamiCalderhead:2011}; if this work pans out,
+it will appear in \NUTS III.
+
+Let us know if you have suggestions or would like to volunteer to
+help.  \Stan is an open-source project and we love to collaborate.  If
+you just want to follow the development, there's a developer's mailing
+list.  If you just want to use \Stan, there's also a user's mailing
+list and an announcements mailing list (the latter is just for releases).
+
+\vspace*{12pt}
+\mbox{ } \hfill {\it The \Stan Development Team}
+\\
+\mbox{ } \hfill {\it May 2012}
