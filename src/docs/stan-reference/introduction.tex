@@ -37,15 +37,15 @@ where
 \begin{itemize}
 \item $y$ is a vector of known data values with a probabilistic model,
 \item $x$ is a vector of known data values without a probabilistic
-  model, such as size constants, predictors, and fixed
-  (hyper)parameters, and
+  model, such as size constants, predictors, fixed
+  parameters, and fixed hyperparameters, and
 \item $\theta$ is a vector of unknown values, such as estimated
   parameters, missing data, predictions, and simulated values.
 \end{itemize}
 %
 A compiled \Stan model is then given fixed values for the data $y$ and
 $x$, and returns a sequence of samples from the conditional
-distribution $p(\theta|y)$ of the parameters given the data.
+distribution $p(\theta|y;x)$ of the parameters given the data.
 
 \subsection{Normalization}
 
@@ -62,20 +62,11 @@ $x$ such that
 or equivalently
 %
 \[
-p(\theta|y;x) = \exp \! \big( \, f(\theta,y,x) \big)  \, \frac{1}{Z_{y,x}}
+p(\theta|y;x) = \exp \! \big( \, f(\theta,y,x) \big)  \, \frac{1}{Z_{y,x}}.
 \]
 %
 \Stan's samplers do not need to compute the normalizing term
 $Z_{y,x}$, so it need not be included in the model.
-
-An equivalent way of viewing a \Stan program is as defining the
-conditional distribution $\log p(\theta|y)$ up to a normalizing
-constant, because
-\[
-p(\theta|y) = \frac{1}{p(y)} p(y,\theta).
-\]
-Consequently, any or all of the normalizing constant may be included
-in the \Stan function $f(y,\theta)$.  
 
 \subsection{Bayesian Inference}
 
@@ -86,21 +77,21 @@ sampling.  Bayes's rule,
 p(\theta|y;x) 
 = \frac{p(y|\theta;x) \, p(\theta;x)}{p(y;x)}
 = \frac{p(y|\theta;x) \, p(\theta;x)}
-       {\int_{\Theta} p(y|\theta';x) \,  p(\theta';x) \ d\theta'}.
+       {\int_{\Theta} p(y|\theta';x) \,  p(\theta';x) \ d\theta'},
 \]
 %
 derives a formula for the posterior 
 probability function $p(\theta|y;x)$ in terms of the sampling 
 probability function $p(y|\theta;x)$ and the prior probability 
 function $p(\theta;x)$ (which may depend on constants in $x$, but not 
-modeled data $y$) by
+modeled data $y$).
  
 The denominator is a normalizing term depending only on $y$ and $x$,
-so that the \Stan model may define a function
+so that the \Stan model may define the model through the function
 \[
-f(\theta,y,x) = \log p(y|\theta;x) + \log p(\theta;x).
+f(\theta,y,x) = \log p(y|\theta;x) + \log p(\theta;x),
 \]
-because the normalizing constant is given by $Z_{y,x} = p(y;x)$.
+with implicit normalizing constant $Z_{y,x} = p(y;x)$.
 
 
 \subsection{Pure Simulation}
@@ -116,9 +107,10 @@ then the \Stan program defined by the function
 \[
 f(\theta;x) = \sum_{n=1}^N \log \distro{Normal}(\theta_n;\mu,\sigma)
 \]
-will result in $\theta$ being a vector of $N$ samples from 
-$\distro{Normal}(\mu,\sigma)$.  In fact, the normalizing terms can be
-dropped and $f$ defined instead by
+will result in $\theta$ being a vector of $N$ samples from
+$\distro{Normal}(\mu,\sigma)$.  For more efficient sampling from the
+same distribution, the normalizing terms can be dropped and the model
+defined by setting
 \[
 f(\theta;x) \, = \, -\frac{1}{2} \ \sum_{n=1}^N \left( \frac{\theta_n -
     \mu}{\sigma}\right)^2.
