@@ -2,13 +2,16 @@
 \usepackage{stan-manuals}
 
 \begin{document}
-\pagestyle{empty}
+\pagestyle{plain}
+
+\frontmatter
 \include{title}
 %\include{abstract}
-
 \tableofcontents
+\include{preface}
+\include{acknowledgements}
 
-\pagestyle{headings}
+\mainmatter
 \include{introduction}
 \include{commands}
 \include{programming}
@@ -19,5 +22,7 @@
 \appendix
 \include{appendices}
 \include{references}
+
+\backmatter % goes here, o.w. messes up appendices
 
 \end{document}

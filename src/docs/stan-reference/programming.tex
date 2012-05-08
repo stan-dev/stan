@@ -727,6 +727,106 @@ model {
 \end{quote}   
 
 
+\section{Autoregressive Models}
+
+A first-order autoregressive model (AR(1)) with normal noise takes
+each point $y_n$ in a sequence $y$ to be generated according to
+%
+\[
+y_n \sim \distro{Normal}(\alpha + \beta y_{n-1}, \sigma).
+\]
+%
+That is, the expected value of $y_n$ is $\alpha + \beta y_{n-1}$, with
+noise scaled as $\sigma$.
+
+\subsection{AR(1) Models}
+
+With improper flat priors on the regression coefficients for slope
+($\beta$), intercept ($\alpha$), and noise scale ($\sigma$),
+the \Stan program for the AR(1) model is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    real y[N];
+}
+parameters {
+    real alpha;
+    real beta;
+    real sigma;
+}
+model {
+    for (n in 2:N)
+       y[n] ~ normal(alpha + beta * y[n-1], sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Extensions to the Model} 
+
+Proper priors of a range of different families may be added for the
+regression coefficients and noise scale.  The normal noise model can
+be changed to a Student-$t$ distribution or any other distribution
+with unbounded support.  The model could also be made hierarchical if
+multiple series of observations are available.  
+
+To enforce the estimation of a stationary AR(1) process, the slope
+coefficient \code{beta} may be constrained with bounds as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+    real(-1,1) beta;
+\end{Verbatim}
+\end{quote}
+%
+In practice, such a constraint is not recommended.  If the data is not
+stationary, it is best to discover this while fitting the model.
+Stationary parameter estimates can be encouraged with a prior favoring
+values of \code{beta} near zero.
+
+
+\subsection{AR(2) Models}
+
+Extending the order of the model is also straightforward.  For
+example, an AR(2) model could be coded with the second-order
+coefficient \code{gamma} and the following model statement.
+%
+\begin{quote}
+\begin{Verbatim}
+    for (n in 3:N)
+       y[n] ~ normal(alpha + beta * y[n-1] + gamma * y[n-2], sigma);
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{AR($K$) Models}
+
+A general model where the order is itself given as data can be coded
+by putting the coefficients in an array and computing the linear
+predictor in a loop.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) K;
+    ...
+parameters {
+    real beta[K];
+    ...
+model {
+    for (n in (K+1):N)
+        real mu;
+        mu <- alpha;
+        for (k in 1:K)
+            mu <- mu + beta[k] * x[n-k];
+        y[n] ~ normal(mu,sigma);
+    }
+}
+\end{Verbatim}
+\end{quote}
+
 
 
 
