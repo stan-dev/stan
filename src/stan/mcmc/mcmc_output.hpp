@@ -156,6 +156,7 @@ namespace stan {
         return sqrt((var_between/var_within + n-1)/n);
       }
 
+
       /**
        * Number of chains in the mcmc_object.
        *
