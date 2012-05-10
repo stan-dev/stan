@@ -72,8 +72,7 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 ##
 # Builds a single test with a stan model dependency
 ##
-test/models/%$(EXE): models/%$(EXE) test/models/%.o bin/libstan.a 
-	@echo '************************************************************'
+test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
