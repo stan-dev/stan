@@ -5,12 +5,10 @@
 LIBGTEST := test/libgtest.a
 GTEST_MAIN := lib/gtest/src/gtest_main.cc
 
-BASIC_DISTRIBUTIONS := $(shell cd src; find models/basic_distributions -type f -name '*.stan')
-BASIC_DISTRIBUTIONS := $(BASIC_DISTRIBUTIONS:%.stan=%)
 MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
 MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
 .PHONY: test-models
-test-models: $(addsuffix $(EXE),$(MODEL_TESTS)) $(addsuffix $(EXE),$(BASIC_DISTRIBUTIONS))
+test-models: $(addsuffix $(EXE),$(MODEL_TESTS))
 	@echo '------------------------------------------------------------'
 	set -e;\
 	$(foreach test,$(MODEL_TESTS), \
@@ -72,6 +70,15 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 ##
 
 ##
+# Builds a single test with a stan model dependency
+##
+test/models/%$(EXE): models/%$(EXE) test/%.o bin/libstan.a
+	@mkdir -p $(dir $@)
+	@echo '------------------------------------------------------------'
+	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
+	$@ --gtest_output="xml:$(basename $@).xml"
+
+##
 # Builds a single test
 ##
 test/%$(EXE) : test/%.o bin/libstan.a
@@ -79,6 +86,7 @@ test/%$(EXE) : test/%.o bin/libstan.a
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
 	$@ --gtest_output="xml:$(basename $@).xml"
+
 
 .PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
