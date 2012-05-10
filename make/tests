@@ -5,6 +5,18 @@
 LIBGTEST := test/libgtest.a
 GTEST_MAIN := lib/gtest/src/gtest_main.cc
 
+BASIC_DISTRIBUTIONS := $(shell cd src; find models/basic_distributions -type f -name '*.stan')
+BASIC_DISTRIBUTIONS := $(BASIC_DISTRIBUTIONS:%.stan=%)
+MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
+MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
+.PHONY: test-models
+test-models: $(addsuffix $(EXE),$(MODEL_TESTS)) $(addsuffix $(EXE),$(BASIC_DISTRIBUTIONS))
+	@echo '------------------------------------------------------------'
+	set -e;\
+	$(foreach test,$(MODEL_TESTS), \
+	  echo '------------------------------------------------------------';\
+	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
+
 ##
 # Target to build unit tests. All unit tests are in src/test 
 # and are named *_test.cpp
@@ -35,17 +47,6 @@ test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 		echo '--- $(test) ---';\
 		$(addsuffix $(EXE),$(test)) --data=$(test).Rdata --samples=$(test).csv;)
 
-BASIC_DISTRIBUTIONS := $(shell cd src; find models/basic_distributions -type f -name '*.stan')
-BASIC_DISTRIBUTIONS := $(BASIC_DISTRIBUTIONS:%.stan=%)
-MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
-MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
-.PHONY: test-models
-test-models: $(addsuffix $(EXE),$(MODEL_TESTS)) $(addsuffix $(EXE),$(BASIC_DISTRIBUTIONS))
-	@echo '------------------------------------------------------------'
-	set -e;\
-	$(foreach test,$(MODEL_TESTS), \
-	  echo '------------------------------------------------------------';\
-	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 
 
 ##
