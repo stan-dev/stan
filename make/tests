@@ -13,7 +13,6 @@ UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
 UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
-
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
@@ -28,7 +27,6 @@ test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 BUGS_EXAMPLES := $(shell cd src; find models/bugs_examples -type f -name '*.stan')
 BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
 BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
-
 .PHONY: test-bugs
 test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 	@echo '------------------- Running bugs models --------------------'
@@ -39,7 +37,6 @@ test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 
 BASIC_DISTRIBUTIONS := $(shell cd src; find models/basic_distributions -type f -name '*.stan')
 BASIC_DISTRIBUTIONS := $(BASIC_DISTRIBUTIONS:%.stan=%)
-
 MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
 MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
 .PHONY: test-models
