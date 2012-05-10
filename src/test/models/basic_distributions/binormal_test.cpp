@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <cstdio>
 
+#include <boost/math/distributions/students_t.hpp>
+
 
 class binormal : public ::testing::Test {
 protected:
@@ -12,12 +14,17 @@ protected:
     output2 = model + "2.csv";
     factory.addFile(output1);
     factory.addFile(output2);
+    
+    expected_y1 = 0.0;
+    expected_y2 = 0.0;
   }
   std::string model;
   std::string output1;
   std::string output2;
-    
+  
   stan::mcmc::mcmc_output_factory factory;
+  double expected_y1;
+  double expected_y2;
 };
 
 TEST_F(binormal,runModel) {
@@ -35,14 +42,19 @@ TEST_F(binormal,runModel) {
 
 TEST_F(binormal, y1) {
   stan::mcmc::mcmc_output y1 = factory.create("y.1");
-  double neff = y1.effectiveSize();
-  double rHat = y1.splitRHat();
   
-  //EXPECT_NEAR(0, ); FIXME: need mean, variance
-  EXPECT_NEAR(1, rHat, 0.01);
+  boost::math::students_t t(y1.effectiveSize()-1.0);
+  double T = boost::math::quantile(t, 0.975);
+  
+  EXPECT_NEAR(expected_y1, y1.mean(), T*y1.variance());
 }
 
 TEST_F(binormal, y2) {
-  stan::mcmc::mcmc_output y1 = factory.create("y.2");
+  stan::mcmc::mcmc_output y2 = factory.create("y.2");
+
+  boost::math::students_t t(y2.effectiveSize()-1.0);
+  double T = boost::math::quantile(t, 0.975);
+  
+  EXPECT_NEAR(expected_y2, y2.mean(), T*y2.variance());
 }
 
