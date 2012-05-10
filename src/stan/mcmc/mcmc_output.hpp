@@ -156,6 +156,45 @@ namespace stan {
         return sqrt((var_between/var_within + n-1)/n);
       }
 
+      /** 
+       * Returns all samples as a vector.
+       * 
+       * 
+       * @return all samples as a single vector
+       */
+      std::vector<double> allSamples() {
+        std::vector<double> samples;
+        for (size_t chain = 0; chain < nChains_; chain++) {
+          samples.insert(samples.end(), samples_[chain].begin(), samples_[chain].end());
+        }
+        return samples;
+      }
+
+      /**
+       * Mean across all chains.
+       *
+       * @return the mean of the samples.
+       */
+      double mean() {
+        /*std::vector<double> samples;
+        for (size_t chain = 0; chain < nChains_; chain++) {
+          
+        }
+        std::vector<double> chain_mean;
+        for (size_t chain = 0; chain < nChains_; chain++) {
+          chain_mean.push_back(stan::math::mean(samples_[chain]));
+        }*/
+        return (stan::math::mean(this->allSamples()));
+      }
+      
+      /**
+       * Variance across all chains.
+       *
+       * @return the variance of the samples.
+       */
+      double variance() {
+        return (stan::math::variance(this->allSamples()));
+      }
 
       /**
        * Number of chains in the mcmc_object.

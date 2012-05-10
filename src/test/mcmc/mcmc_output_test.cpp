@@ -56,6 +56,18 @@ TEST_F(stanMcmc, splitRHat) {
   EXPECT_FLOAT_EQ(0.9892759, splitRHat);
 }
 
+TEST_F(stanMcmc, mean) {
+  double mean = mcmc_output.mean();
+  
+  EXPECT_FLOAT_EQ(0.02266845, mean);
+}
+
+TEST_F(stanMcmc, variance) {
+  double variance = mcmc_output.variance();
+  
+  EXPECT_FLOAT_EQ(0.7790714, variance);
+}
+
 TEST_F(stanMcmc, factory) {
   stan::mcmc::mcmc_output mu1;
   EXPECT_NO_THROW(mu1 = factory.create("mu.1"));
