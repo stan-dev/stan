@@ -368,7 +368,10 @@ namespace stan {
         for (size_t ii = 0; ii < filenames_.size(); ii++) {
           // 1. open file: filenames_[ii];
           std::fstream in(filenames_[ii].c_str(), std::fstream::in);
-          
+          if (!in.is_open()) {
+            std::cerr << "mcmc_output warning: " << filenames_[ii] << " can not be open." << std::endl;
+            continue;
+          }
           // 1.1. Strip header
           stripHeader(in);
           // 1.2 count number of commas to skip

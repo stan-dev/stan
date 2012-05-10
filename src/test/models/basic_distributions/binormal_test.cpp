@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <cstdlib>
 #include <cstdio>
-
+#include <cmath>
 #include <boost/math/distributions/students_t.hpp>
 
 
@@ -32,29 +32,36 @@ TEST_F(binormal,runModel) {
   command = model;
   command += " --samples=";
   command += output1;
-  system(command.c_str());
+  EXPECT_EQ(0, system(command.c_str())) 
+    << "Can not execute command: " << command << std::endl;
+            
   
   command = model;
   command += " --samples=";
   command += output2;
-  system(command.c_str());
+  EXPECT_EQ(0, system(command.c_str()))
+    << "Can not execute command: " << command << std::endl;
 }
 
 TEST_F(binormal, y1) {
   stan::mcmc::mcmc_output y1 = factory.create("y.1");
-  
-  boost::math::students_t t(y1.effectiveSize()-1.0);
+  double neff = y1.effectiveSize();
+
+
+  boost::math::students_t t(neff-1.0);
   double T = boost::math::quantile(t, 0.975);
   
-  EXPECT_NEAR(expected_y1, y1.mean(), T*y1.variance());
+  EXPECT_NEAR(expected_y1, y1.mean(), T*sqrt(y1.variance()/neff));
 }
 
 TEST_F(binormal, y2) {
   stan::mcmc::mcmc_output y2 = factory.create("y.2");
+  double neff = y2.effectiveSize();  
 
-  boost::math::students_t t(y2.effectiveSize()-1.0);
+  boost::math::students_t t(neff-1.0);
   double T = boost::math::quantile(t, 0.975);
   
-  EXPECT_NEAR(expected_y2, y2.mean(), T*y2.variance());
+  EXPECT_NEAR(expected_y2, y2.mean(), T*sqrt(y2.variance()/neff));
 }
+
 
