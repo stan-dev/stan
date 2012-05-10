@@ -4,11 +4,20 @@
 #include <cstdio>
 #include <cmath>
 #include <boost/math/distributions/students_t.hpp>
+#include <stdio.h>
 
 class binormal : public ::testing::Test {
 protected:
   virtual void SetUp() {
-    model = "models/basic_distributions/binormal";
+    FILE *in;
+    if(!(in = popen("make path_separator", "r")))
+      throw std::runtime_error("\"make path_separator\" has failed.");
+    path_separator += fgetc(in);
+
+    model.append("models").append(path_separator);
+    model.append("basic_distributions").append(path_separator);
+    model.append("binormal");
+
     output1 = model + "1.csv";
     output2 = model + "2.csv";
     factory.addFile(output1);
@@ -17,6 +26,7 @@ protected:
     expected_y1 = 0.0;
     expected_y2 = 0.0;
   }
+  std::string path_separator;
   std::string model;
   std::string output1;
   std::string output2;
