@@ -120,3 +120,16 @@ endif
 ifneq (,$(filter test/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
 endif
+
+
+##
+# target path_separator for use in some tests that need to 
+# call executables.
+##
+PATH_SEPARATOR = /
+ifeq ($(OS),win)
+	PATH_SEPARATOR = \\
+endif
+.PHONY: path_separator
+path_separator :
+	@echo $(PATH_SEPARATOR)
