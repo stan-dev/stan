@@ -9,11 +9,14 @@
 class binormal : public ::testing::Test {
 protected:
   virtual void SetUp() {
+    std::cout << "&&&&&&" << std::endl;
     FILE *in;
-    if(!(in = popen("make path_separator", "r")))
+    if(!(in = popen("make path_separator --no-print-directory", "r")))
       throw std::runtime_error("\"make path_separator\" has failed.");
     path_separator += fgetc(in);
-
+    pclose(in);
+    std::cout << "***** path_separator: " << path_separator << std::endl;
+    
     model.append("models").append(path_separator);
     model.append("basic_distributions").append(path_separator);
     model.append("binormal");
