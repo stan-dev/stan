@@ -5,7 +5,6 @@
 #include <cmath>
 #include <boost/math/distributions/students_t.hpp>
 
-
 class binormal : public ::testing::Test {
 protected:
   virtual void SetUp() {
