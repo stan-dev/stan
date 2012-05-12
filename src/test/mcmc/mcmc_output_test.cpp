@@ -11,9 +11,13 @@ protected:
     std::vector<double> y2(&r_[50], &r_[100]);
     mcmc_output.add_chain(y1);
     mcmc_output.add_chain(y2);
+
+    factory.addFile("src/test/mcmc/mcmc_output/blocker1.csv");
+    factory.addFile("src/test/mcmc/mcmc_output/blocker2.csv");
   }
 
   stan::mcmc::mcmc_output mcmc_output;
+  stan::mcmc::mcmc_output_factory factory;
   static const double r_[100];
 };
 
@@ -52,9 +56,51 @@ TEST_F(stanMcmc, splitRHat) {
   EXPECT_FLOAT_EQ(0.9892759, splitRHat);
 }
 
-TEST_F(stanMcmc, factory) {
-  stan::mcmc::mcmc_output_factory f;
-  f.addFile("src/test/mcmc/mcmc_output/blocker.csv");
-  f.create("mu.1");
+TEST_F(stanMcmc, mean) {
+  double mean = mcmc_output.mean();
+  
+  EXPECT_FLOAT_EQ(0.02266845, mean);
 }
 
+TEST_F(stanMcmc, variance) {
+  double variance = mcmc_output.variance();
+  
+  EXPECT_FLOAT_EQ(0.7790714, variance);
+}
+
+TEST_F(stanMcmc, factory) {
+  stan::mcmc::mcmc_output mu1;
+  EXPECT_NO_THROW(mu1 = factory.create("mu.1"));
+}
+
+TEST_F(stanMcmc, factoryAvailableVariables) {
+  std::vector<std::string> vars;
+  EXPECT_NO_THROW(vars = factory.availableVariables());
+  EXPECT_FLOAT_EQ(49, vars.size());
+  EXPECT_EQ("lp__", vars[0]);
+  EXPECT_EQ("mu.1", vars[4]);
+
+  EXPECT_NO_THROW(vars = factory.availableVariables(0));
+  EXPECT_FLOAT_EQ(49, vars.size());
+  EXPECT_EQ("lp__", vars[0]);
+  EXPECT_EQ("d", vars[2]);
+
+  EXPECT_NO_THROW(vars = factory.availableVariables(1));
+  EXPECT_FLOAT_EQ(49, vars.size());
+  EXPECT_EQ("lp__", vars[0]);
+  EXPECT_EQ("delta.1", vars[26]);
+
+  EXPECT_THROW(vars = factory.availableVariables(2), std::runtime_error);
+}
+
+TEST_F(stanMcmc, mu1) {
+  stan::mcmc::mcmc_output mu1 = factory.create("mu.1");
+  EXPECT_FLOAT_EQ(13.599755, mu1.effectiveSize());
+  EXPECT_FLOAT_EQ(1.187, mu1.splitRHat());
+}
+
+TEST_F(stanMcmc, delta22) {
+  stan::mcmc::mcmc_output delta22 = factory.create("delta.22");
+  EXPECT_FLOAT_EQ(43.58981, delta22.effectiveSize());
+  EXPECT_FLOAT_EQ(1.03715, delta22.splitRHat());
+}

@@ -1,5 +1,9 @@
 
 
-\chapter*{References}
-\addcontentsline{toc}{chapter}{References}
+\addcontentsline{toc}{chapter}{Bibliography}
 
+\bibliographystyle{apalike} % like}
+\makeatletter
+\renewcommand\@biblabel[1]{}
+\makeatother
+\bibliography{../bibtex/all.bib}

@@ -199,7 +199,7 @@ real values), and \code{matrix} (of real values).
 
 Integer or real types may be constrained with lower bounds, upper
 bounds, or both.  There are two constrained vector data types,
-\code{simplex} for unit simplices and \code{pos\_ordered} for positive,
+\code{simplex} for unit simplexes and \code{pos\_ordered} for positive,
 ordered sequences of scalars.  There are two specialized matrix data
 types, \code{corr\_matrix} and \code{cov\_matrix}, for correlation
 matrices (symmetric, positive definite, unit diagonal) and covariance
@@ -434,13 +434,13 @@ vector(3) u;
 \end{quote}
 %
 
-\subsection{Unit Simplices}
+\subsection{Unit Simplexes}
 
 A unit simplex is a vector with non-negative values whose entries sum
 to 1.  For instance, $(0.2,0.3,0.4,0.1)^{\top}$ is a unit 4-simplex.
 Unit simplexes are most often used as parameters in categorical
 or multinomial distributions, and they are also the sampled variate in
-a Dirichlet distribution.  Simplices are declared with their full
+a Dirichlet distribution.  Simplexes are declared with their full
 dimensionality.  For instance, \code{theta} is declared to
 be a unit $5$-simplex by
 %
@@ -451,7 +451,7 @@ simplex(5) theta;
 \end{quote}
 % 
 
-Unit simplices are implemented as vectors and may be assigned to other
+Unit simplexes are implemented as vectors and may be assigned to other
 vectors and vice-versa.  
 
 
@@ -473,7 +473,7 @@ ordered(5) c;
 %
 
 After their declaration, positive, ordered vectors, like unit
-simplices, may be assigned to other vectors and other vectors may be
+simplexes, may be assigned to other vectors and other vectors may be
 assigned to them.  
 
 \subsection{Unconstrained Row Vectors}
@@ -1837,7 +1837,7 @@ variables and statements in each block are executed.
 
 \section{Statistical Variable Taxonomy}
 
-Gelman and Hill (2006, p.~366) provide a taxonomy of the kinds of
+\cite[p.~366]{GelmanHill:2007} provides a taxonomy of the kinds of
 variables used in Bayesian models, which is expanded with a missing
 data type and the loations of declarations and definitions in \Stan in
 \reffigure{variable-kinds}.
@@ -1869,8 +1869,7 @@ loop indices & loop statement
 \end{center}
 \caption{\it Variables of the kind indicated in the left column must
   be declared in one of the blocks declared in the right
-  column (see Gelman and Hill 2006,
-  p.~366).}\label{variable-kinds.figure}
+  column.}\label{variable-kinds.figure}
 \end{figure}
 %
 
