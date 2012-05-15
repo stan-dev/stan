@@ -201,8 +201,6 @@ EXTENSIONS
   - z_score()
   - 
   
-* precompiled headers for model compilation speed
-
 * auto testing of sampler
   - Cook/Gelman/Rubin-style interval tests
   - needs effective sample size calc to bound intervals
