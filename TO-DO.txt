@@ -155,6 +155,42 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* cumulative distribution functions
+  - to add:
+     + calculation of cdf
+     + tests
+  - uni/cont/beta
+  - uni/cont/cauchy
+  - uni/cont/chi_square
+  - uni/cont/double_exponential
+  - uni/cont/exponential
+  - uni/cont/gamma
+  - uni/cont/inv_chi_square
+  - uni/cont/inv_gamma
+  - uni/cont/logisitic
+  - uni/cont/normal
+  - uni/cont/pareto
+  - uni/cont/scaled_inv_chi_square
+  - uni/cont/student_t
+  - uni/cont/uniform
+  - uni/cont/weibull
+  - uni/disc/bernoulli
+  - uni/disc/beta_binomial
+  - uni/disc/binomial
+  - uni/disc/hypergeometric
+  - uni/disc/neg_binomial
+  - uni/disc/ordered_logisitic
+  - uni/disc/poisson
+  - multi/cont/dirichlet
+  - multi/cont/inv_wishart
+  - multi/cont/lkj_corr
+  - multi/cont/lkj_cov
+  - multi/cont/multi_normal
+  - multi/cont/multi_student_t
+  - multi/cont/wishart
+  - multi/disc/categorical
+  - multi/disc/multinomial
+
 * more general generic initializations
   -  normal or student-t w. params
   -  or even extend uniform
