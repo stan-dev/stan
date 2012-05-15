@@ -158,7 +158,9 @@ EXTENSIONS
 * cumulative distribution functions
   - to add:
      + calculation of cdf
-     + tests
+     + two functions: 1) with templated policy, 2) with no policy,
+        calling templated function with stan::math::default_policy()
+     + tests: only need non-agrad tests.
   - uni/cont/beta
   - uni/cont/cauchy
   - uni/cont/chi_square
