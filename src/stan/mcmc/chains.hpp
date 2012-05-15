@@ -94,7 +94,8 @@ namespace stan {
       const size_t _num_params; // total
       const std::vector<size_t> _starts;
       const std::map<std::string,size_t> _name_to_index;
-      std::vector<std::vector<std::vector<double > > > _samples; // [chain,param,sample]
+      // [chain,param,sample]
+      std::vector<std::vector<std::vector<double > > > _samples; 
 
       static size_t calc_num_params(const std::vector<size_t>& dims) {
         size_t num_params = 1;
@@ -103,7 +104,8 @@ namespace stan {
         return num_params;
       }
 
-      static size_t calc_total_num_params(const std::vector<std::vector<size_t> >& dimss) {
+      static size_t 
+      calc_total_num_params(const std::vector<std::vector<size_t> >& dimss) {
         int num_params = 0;
         for (size_t i = 0; i < dimss.size(); ++i)
           num_params += calc_num_params(dimss[i]);
@@ -164,7 +166,8 @@ namespace stan {
           msg << "require sample index below number of samples"
               << "; sample index m=" << m
               << "; chain index k=" << k
-              << "; num samples in chain" << k << "=" << _samples[k][0].size();
+              << "; num samples in chain" << k << "=" 
+              << _samples[k][0].size();
           throw std::out_of_range(msg.str());
         }
       }
@@ -241,9 +244,10 @@ namespace stan {
       // WARNING: not yet propagated to getters of samples!
 
       /**
-       * <p><b>Synchronization</b>: Non-chain-specific write method.  This
-       * method may be called concurrently with <code>add_sample</code>, but
-       * not with any read method accessing all chains relative to warmup.
+       * <p><b>Synchronization</b>: Non-chain-specific write method.
+       * This method may be called concurrently with
+       * <code>add_sample</code>, but not with any read method
+       * accessing all chains relative to warmup.
        *
        * @param warmup_iterations Number of warmup iterations.
        */
@@ -275,12 +279,13 @@ add       */
       /**
        * Add the specified sample to the end of the specified chain.
        *
-       * <p><b>Synchronization:</b> This is a chain-specific write method.
+       * <p><b>Synchronization:</b> This is a chain-specific write
+       * method.
        *
        * @param chain Markov chain identifier.
        * @param theta Parameter values.
-       * @throws std::invalid_argument if the size of the sample vector
-       * does not match the number of parameters.
+       * @throws std::invalid_argument if the size of the sample
+       * vector does not match the number of parameters.
        */
       void add_sample(size_t chain,
                       std::vector<double> theta) {
@@ -593,11 +598,12 @@ add       */
        * @param n Index of parameter.
        * @param m Index of iteration.
        * @return Sample for parameter at iteration in chain.
-       * @throw std::out_of_range If the specified chain index i
-       * greater than or equal to the number of chains, if the specified
-       * parameter index is greater than or equal to the total number of parameters,
-       * or if the iteration index is greater than or equal to the number of
-       * samples in the specified chain.
+       * @throw std::out_of_range If the specified chain index is
+       * greater than or equal to the number of chains, if the
+       * specified parameter index is greater than or equal to the
+       * total number of parameters, or if the iteration index is
+       * greater than or equal to the number of samples in the
+       * specified chain.
        */
       double
       get_sample(size_t k, 
