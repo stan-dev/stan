@@ -1,0 +1,9 @@
+1. Currently, the installation of rstan needs 
+   a. to set environment variable STAN_HOME, which is used in 
+      * rstan/R/inline.R 
+      * rstan/src/Makevars 
+      * rstan/src/Makevars.win  
+      We might come up with more intelligent solutions later. 
+   b. libstan, used for compiling stanc and models in the system library path,
+      say, /usr/lib in linux 
+      

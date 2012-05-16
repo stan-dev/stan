@@ -1,7 +1,7 @@
 ## Use the R_HOME indirection to support installations of multiple R version
 # STAN_HOME = `echo $STAN_HOME`
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -lstan 
-PKG_CPPFLAGS = -I$(STAN_HOME)/lib -I$(STAN_HOME)/src -I./src/ 
+PKG_CPPFLAGS = -I$(STAN_HOME)/lib -I$(STAN_HOME)/src -I./include/ 
 
 ## As an alternative, one can also add this code in a file 'configure'
 ##
