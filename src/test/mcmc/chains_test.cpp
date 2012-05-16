@@ -1,7 +1,74 @@
 #include <stan/mcmc/chains.hpp>
 #include <gtest/gtest.h>
 
-TEST(McmcChains,ctor) {
+TEST(McmcChains,get_offset) {
+  using stan::mcmc::get_offset;
+  using std::vector;
+  vector<size_t> idxs(3);
+  idxs[0] = 0;
+  idxs[1] = 0;
+  idxs[2] = 0;
+  vector<size_t> dims(3);
+  dims[0] = 2;
+  dims[1] = 3;
+  dims[2] = 4;
+  size_t offset = 0;
+  for (size_t c = 0; c < 4; ++c) {
+    for (size_t b = 0; b < 3; ++b) {
+      for (size_t a = 0; a < 2; ++a) {
+        idxs[0] = a;
+        idxs[1] = b;
+        idxs[2] = c;
+        EXPECT_EQ(offset,get_offset(dims,idxs));
+        ++offset;
+      }
+    }
+  }
+}
+
+
+TEST(McmcChains,increment_indexes) {
+  using std::vector;
+  using stan::mcmc::increment_indexes;
+  vector<size_t> idxs(3);
+  idxs[0] = 0;
+  idxs[1] = 0;
+  idxs[2] = 0;
+  vector<size_t> dims(3);
+  dims[0] = 2;
+  dims[1] = 3;
+  dims[2] = 4;
+  for (size_t c = 0; c < 4; ++c) {
+    for (size_t b = 0; b < 3; ++b) {
+      for (size_t a = 0; a < 2; ++a) {
+        EXPECT_FLOAT_EQ(a,idxs[0]);
+        EXPECT_FLOAT_EQ(b,idxs[1]);
+        EXPECT_FLOAT_EQ(c,idxs[2]);
+        if (a != 1 || b != 2 || c != 3)
+          increment_indexes(dims,idxs);
+      }
+    }
+  }
+
+  increment_indexes(dims,idxs);
+  EXPECT_FLOAT_EQ(0.0,idxs[0]);
+  EXPECT_FLOAT_EQ(0.0,idxs[1]);
+  EXPECT_FLOAT_EQ(0.0,idxs[2]);
+  
+  vector<size_t> dims4(4,5);
+  vector<size_t> idxs4(4,0); 
+  EXPECT_THROW(increment_indexes(dims4,idxs),
+               std::invalid_argument);
+  EXPECT_THROW(increment_indexes(dims,idxs4),
+               std::invalid_argument);
+  EXPECT_NO_THROW(increment_indexes(dims4,idxs4));
+
+  idxs4[3] = 12; // now out of range
+  EXPECT_THROW(increment_indexes(dims4,idxs4),
+               std::out_of_range);
+}
+
+TEST(McmcChains,ctor_and_getters) {
   using std::vector;
   using std::string;
   using stan::mcmc::chains;
@@ -35,6 +102,7 @@ TEST(McmcChains,ctor) {
   dimss.push_back(a_dims);
   dimss.push_back(d_dims);
   dimss.push_back(c_dims);
+
   chains c(K,names,dimss);
 
   EXPECT_EQ(4U, c.num_chains());
@@ -92,79 +160,23 @@ TEST(McmcChains,ctor) {
   
 
   EXPECT_THROW(c.param_dims(5), std::out_of_range);
+}
+TEST(McmcChains,warmup_get_set) {
+  using std::vector;
+  using std::string;
+  using stan::mcmc::chains;
+
+  chains c(2,
+           vector<string>(1,"a"), 
+           vector<vector<size_t> >(1,vector<size_t>(0)));
 
   EXPECT_EQ(0U, c.warmup());
   c.set_warmup(1000U);
   EXPECT_EQ(1000U,c.warmup());
 }
 
-TEST(McmcChains,get_offset) {
-  using std::vector;
-  vector<size_t> idxs(3);
-  idxs[0] = 0;
-  idxs[1] = 0;
-  idxs[2] = 0;
-  vector<size_t> dims(3);
-  dims[0] = 2;
-  dims[1] = 3;
-  dims[2] = 4;
-  size_t offset = 0;
-  for (size_t c = 0; c < 4; ++c) {
-    for (size_t b = 0; b < 3; ++b) {
-      for (size_t a = 0; a < 2; ++a) {
-        idxs[0] = a;
-        idxs[1] = b;
-        idxs[2] = c;
-        EXPECT_EQ(offset,
-                  stan::mcmc::chains::get_offset(dims,idxs));
-        ++offset;
-      }
-    }
-  }
-}
 
-
-TEST(McmcChains,increment_indexes) {
-  using std::vector;
-  vector<size_t> idxs(3);
-  idxs[0] = 0;
-  idxs[1] = 0;
-  idxs[2] = 0;
-  vector<size_t> dims(3);
-  dims[0] = 2;
-  dims[1] = 3;
-  dims[2] = 4;
-  for (size_t c = 0; c < 4; ++c) {
-    for (size_t b = 0; b < 3; ++b) {
-      for (size_t a = 0; a < 2; ++a) {
-        EXPECT_FLOAT_EQ(a,idxs[0]);
-        EXPECT_FLOAT_EQ(b,idxs[1]);
-        EXPECT_FLOAT_EQ(c,idxs[2]);
-        if (a != 1 || b != 2 || c != 3)
-          stan::mcmc::chains::increment_indexes(dims,idxs);
-      }
-    }
-  }
-
-  stan::mcmc::chains::increment_indexes(dims,idxs);
-  EXPECT_FLOAT_EQ(0.0,idxs[0]);
-  EXPECT_FLOAT_EQ(0.0,idxs[1]);
-  EXPECT_FLOAT_EQ(0.0,idxs[2]);
-  
-  vector<size_t> dims4(4,5);
-  vector<size_t> idxs4(4,0); 
-  EXPECT_THROW(stan::mcmc::chains::increment_indexes(dims4,idxs),
-               std::invalid_argument);
-  EXPECT_THROW(stan::mcmc::chains::increment_indexes(dims,idxs4),
-               std::invalid_argument);
-  EXPECT_NO_THROW(stan::mcmc::chains::increment_indexes(dims4,idxs4));
-
-  idxs4[3] = 12; // now out of range
-  EXPECT_THROW(stan::mcmc::chains::increment_indexes(dims4,idxs4),
-               std::out_of_range);
-}
-
-TEST(McmcChains,add_samples) {
+TEST(McmcChains,add) {
   using std::vector;
   using std::string;
   using stan::mcmc::chains;
@@ -202,7 +214,7 @@ TEST(McmcChains,add_samples) {
   EXPECT_EQ(0U,c.num_samples(0));
   EXPECT_EQ(0U,c.num_samples(1));
 
-  c.add_sample(0,theta);
+  c.add(0,theta);
   
   EXPECT_EQ(1U,c.num_samples());
   EXPECT_EQ(1U,c.num_samples(0));
@@ -211,13 +223,13 @@ TEST(McmcChains,add_samples) {
   for (size_t n = 0; n < N; ++n)
     theta[n] *= 2.0;
 
-  c.add_sample(0,theta);
+  c.add(0,theta);
 
   EXPECT_EQ(2U,c.num_samples());
   EXPECT_EQ(2U,c.num_samples(0));
   EXPECT_EQ(0U,c.num_samples(1));
 
-  c.add_sample(1,theta);
+  c.add(1,theta);
 
   EXPECT_EQ(3U,c.num_samples());
   EXPECT_EQ(2U,c.num_samples(0));
