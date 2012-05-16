@@ -15,10 +15,19 @@ namespace stan {
 
   namespace mcmc {
 
-
-    void 
-    validate_dims_idxs(const std::vector<size_t>& dims,
-                       const std::vector<size_t>& idxs) {
+    /**
+     * Validate the specified indexes with respect to the
+     * specified dimensions.
+     *
+     * @param dims Dimensions of array.
+     * @param idxs Indexes into array.
+     * @throw std::invalid_argument If the two arrays are different
+     * sizes.
+     * @throw std::out_of_range If any of the indexes is greater than
+     * or equal to its correpsonding dimension.
+     */
+    void validate_dims_idxs(const std::vector<size_t>& dims,
+                            const std::vector<size_t>& idxs) {
       if (idxs.size() != dims.size()) {
         std::stringstream msg;
         msg << "index vector and dims vector must be same size."
@@ -506,6 +515,30 @@ namespace stan {
       }
 
 
+      /**
+       * Set the warmup cutoff to the specified number of
+       * iterations.  The first samples in each chain up to
+       * this number will be treated as warmup samples.
+       * 
+       * <p><b>Synchronization</b>: Warmup write method. 
+       *
+       * @param warmup_iterations Number of warmup iterations.
+       */
+      void set_warmup(size_t warmup_iterations) {
+        _warmup = warmup_iterations;
+      }
+
+
+      /**
+       * Return the warmup iteration cutoff.
+       * 
+       * <p><b>Synchronization</b>: Warmup read method.
+       *
+       * @return Number of warmup iterations.
+       */
+      inline size_t warmup() {
+        return _warmup;
+      }
 
 
       /**
@@ -535,32 +568,6 @@ namespace stan {
       
 
 
-
-
-      /**
-       * Set the warmup cutoff to the specified number of
-       * iterations.  The first samples in each chain up to
-       * this number will be treated as warmup samples.
-       * 
-       * <p><b>Synchronization</b>: Warmup write method. 
-       *
-       * @param warmup_iterations Number of warmup iterations.
-       */
-      void set_warmup(size_t warmup_iterations) {
-        _warmup = warmup_iterations;
-      }
-
-
-      /**
-       * Return the warmup iteration cutoff.
-       * 
-       * <p><b>Synchronization</b>: Warmup read method.
-       *
-       * @return Number of warmup iterations.
-       */
-      inline size_t warmup() {
-        return _warmup;
-      }
 
       /**
        * Return the number of warmup samples in the
@@ -599,7 +606,9 @@ namespace stan {
        * @return Number of warmup samples availabe in chain.
        */
       size_t num_kept_samples(size_t k) {
-        return std::max<size_t>(0, num_samples(k) - warmup());
+        if (num_samples(k) > warmup())
+          return num_samples(k) - warmup();
+        return 0U;
       }
 
 
@@ -614,7 +623,7 @@ namespace stan {
       size_t num_kept_samples() {
         size_t total = 0;
         for (size_t k = 0; k < num_chains(); ++k)
-          total += num_samples(k);
+          total += num_kept_samples(k);
         return total;
       }
 
@@ -650,29 +659,13 @@ namespace stan {
       }
 
 
-
-
-
       /**
-       * Return the total number of samples across
-       * all chains.
+       * Write into the specified vector the warmup and kept samples
+       * for the scalar parameter with the specified index.  The order
+       * of samples is by chain, then by order in which the sample was
+       * added to the chain.
        *
-       * <p><b>Synchronization</b> This is a cross-chain read method.
-       * 
-       * @return The total number of samples.
-       */
-      size_t total_samples() {
-        size_t total(0);
-        for (size_t k = 0; k < num_chains(); ++k)
-          total += num_samples(k);
-        return total;
-      }
-
-      /**
-       * Write the samples for the scalar parameter with the specified
-       * index into the specified vector.
-       *
-       * <p><b>Synchronization</b>: This is a cross-chain read method.
+       * <p><b>Synchronization</b>: Cross-chain read.
        * 
        * @param n Index of parameter.
        * @param samples Vector into which samples are written.
@@ -684,62 +677,178 @@ namespace stan {
                   std::vector<double>& samples) {
         validate_param_idx(n);
         samples.resize(0);
-        samples.reserve(total_samples());
+        samples.reserve(num_samples());
         for (size_t k = 0; k < num_chains(); ++k)
           samples.insert(samples.end(),
                          _samples[k][n].begin(), 
                          _samples[k][n].end());
       }
 
-
-
       /**
-       * Return the samples for the parameters with the specified index
-       * in the chain with the specified index.
+       * Write into the specified vector the warmup and kept samples
+       * for the scalar parameter with the specified index in the
+       * chain with the specified index.  The order of samples is the
+       * order in which they were added.
        *
-       * <p><b>Synchronization</b>: This is a single-chain read method.
+       * <p><b>Synchronization</b>: Chain-specific read.
        *
        * @param k Index of chain.
        * @param n Index of parameter.
-       * @return Samples for parameter in chain.
+       * @param samples Vector into which to write samples
        * @throw std::out_of_range If the specified chain index is greater
        * than or equal to the number of chains, or if the specified parameter
        * index is greater than or equal to the total number of parameters.
        */
-      const std::vector<double>&
-      get_samples(size_t k,     // chain id
-                  size_t n) {   // param id
+      void get_samples(size_t k, 
+                       size_t n, 
+                       std::vector<double>& samples) {  
         validate_chain_idx(k);
         validate_param_idx(n); 
-        return _samples[k][n];
+        samples.resize(0);
+        samples.reserve(num_samples(k));
+        samples.insert(samples.end(),
+                       _samples[k][n].begin(),
+                       _samples[k][n].end());
+      }
+
+
+      /**
+       * Write into the specified vector the kept samples for the
+       * scalar parameter with the specified index.  The order of
+       * samples is permuted, but as long as no samples have been
+       * added in the interim, subsequent calls to this method will
+       * use the same permutation for all parameter indexes.
+       *
+       * <p><b>Synchronization</b>: Cross-chain read.
+       * 
+       * @param n Index of parameter.
+       * @param samples Vector into which samples are written.
+       * @throw std::out_of_range If the parameter index is greater
+       * than or equal to the total number of scalar parameters.
+       */
+      void
+      get_kept_samples_permuted(size_t n,
+                                std::vector<double>& samples) {
+        validate_param_idx(n);
+        samples.resize(0);
+        samples.reserve(num_kept_samples());
+        for (size_t k = 0; k < num_chains(); ++k)
+          if (num_kept_samples(k) > 0)
+            samples.insert(samples.end(),
+                           _samples[k][n].begin() + warmup(),
+                           _samples[k][n].end());
       }
 
       /**
-       * Return the scalar sample for the specified parameter index
-       * in the specified iteration of the specified chain.
-       * 
-       * <p><b>Synchronization</b>: This is a single-chain read method.
+       * Write into the specified vector the kept samples for the
+       * scalar parameter with the specified index in the chain with
+       * the specified index.  The order of samples is the order in
+       * which they were added.
+       *
+       * <p><b>Synchronization</b>: Chain-specific read.
        *
        * @param k Index of chain.
        * @param n Index of parameter.
-       * @param m Index of iteration.
-       * @return Sample for parameter at iteration in chain.
-       * @throw std::out_of_range If the specified chain index is
-       * greater than or equal to the number of chains, if the
-       * specified parameter index is greater than or equal to the
-       * total number of parameters, or if the iteration index is
-       * greater than or equal to the number of samples in the
-       * specified chain.
+       * @param samples Vector into which to write samples
+       * @throw std::out_of_range If the specified chain index is greater
+       * than or equal to the number of chains, or if the specified parameter
+       * index is greater than or equal to the total number of parameters.
        */
-      double
-      get_sample(size_t k, 
-                 size_t n, 
-                 size_t m) {
+      void
+      get_kept_samples(size_t k,
+                       size_t n,
+                       std::vector<double>& samples) {
         validate_param_idx(n);
-        validate_iteration(k,m);
-        return get_samples(k,n)[m];
+        samples.resize(0);
+        samples.reserve(num_kept_samples(k));
+        samples.insert(samples.end(),
+                       _samples[k][n].begin() + warmup(),
+                       _samples[k][n].end());
       }
 
+
+
+      /**
+       * Write into the specified vector the warmup samples for the
+       * scalar parameter with the specified index.  The order of
+       * samples is by chain, then by order in which the sample was
+       * added to the chain.
+       *
+       * <p><b>Synchronization</b>: Cross-chain read.
+       * 
+       * @param n Index of parameter.
+       * @param samples Vector into which samples are written.
+       * @throw std::out_of_range If the parameter index is greater
+       * than or equal to the total number of scalar parameters.
+       */
+      void
+      get_warmup_samples(size_t n,
+                         std::vector<double>& samples) {
+        validate_param_idx(n);
+        samples.resize(0);
+        samples.reserve(num_warmup_samples());
+        for (size_t k = 0; k < num_chains(); ++k) {
+          if (num_warmup_samples(k) < warmup())
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].end());
+          else
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].begin() + warmup());
+        }
+      }
+
+      /**
+       * Write into the specified vector the warmup samples for the
+       * parameter with the specified index in the chain with the
+       * specified index.  The order of samples is the order in which
+       * they were added.
+       *
+       * <p><b>Synchronization</b>: Chain-specific read.
+       *
+       * @param k Index of chain.
+       * @param n Index of parameter.
+       * @param samples Vector into which to write samples
+       * @throw std::out_of_range If the specified chain index is greater
+       * than or equal to the number of chains, or if the specified parameter
+       * index is greater than or equal to the total number of parameters.
+       */
+      void
+      get_warmup_samples(size_t k,
+                         size_t n,
+                         std::vector<double>& samples) {
+        validate_param_idx(n);
+        samples.resize(0);
+        samples.reserve(num_warmup_samples(k));
+        if (num_warmup_samples(k) < warmup())
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].end());
+        else
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].begin() + warmup());
+      }
+
+      /**
+       * Fill the specified sample array with the structure
+       * corresponding to the specified parameter.  
+       *
+       * @param j Named parameter index.
+       * @param samples Vector into which to write structured samples
+       * @throw std::out_of_range If the parameter index is greater
+       * than or equal to the number of named parameters.
+       */
+      template <typename T>
+      void
+      get_structured_permuted_samples(size_t j,
+                                      std::vector<T>& samples) {
+        validate_param_name_idx(j);
+        samples.resize(0);
+        samples.reserve(num_kept_samples());
+      }
+                                      
 
     };
 
