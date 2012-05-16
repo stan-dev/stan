@@ -16,6 +16,109 @@ namespace stan {
   namespace mcmc {
 
     /**
+     * Validate the specified indexes with respect to the
+     * specified dimensions.
+     *
+     * @param dims Dimensions of array.
+     * @param idxs Indexes into array.
+     * @throw std::invalid_argument If the two arrays are different
+     * sizes.
+     * @throw std::out_of_range If any of the indexes is greater than
+     * or equal to its correpsonding dimension.
+     */
+    void validate_dims_idxs(const std::vector<size_t>& dims,
+                            const std::vector<size_t>& idxs) {
+      if (idxs.size() != dims.size()) {
+        std::stringstream msg;
+        msg << "index vector and dims vector must be same size."
+            << "; idxs.size()=" << idxs.size()
+            << "; dims.size()=" << dims.size();
+        throw std::invalid_argument(msg.str());
+      }
+      for (size_t i = 0; i < idxs.size(); ++i) {
+        if (idxs[i] >= dims[i]) {
+          std::stringstream msg;
+          msg << "indexes must be within bounds."
+              << "; idxs[" << i << "]=" << idxs[i]
+              << "; dims[" << i << "]=" << dims[i];
+          throw std::out_of_range(msg.str());
+        }
+      }
+    }
+
+    /**
+     * Return the offset in last-index major indexing for the
+     * specified indexes given the specified number of dimensions.
+     * If both sequences are empty, the index returned is 0.
+     *
+     * @param dims Sequence of dimensions.
+     * @param idxs Sequence of inndexes.
+     * @return Offset of indexes given dimensions.
+     * @throw std::invalid_argument If the sizes of the index
+     * and dimension sequences is different.
+     * @throw std::out_of_range If one of the indexes is greater
+     * than or equal to the corresponding index.
+     */
+    size_t get_offset(const std::vector<size_t>& dims, 
+                      const std::vector<size_t>& idxs) {
+      validate_dims_idxs(dims,idxs);
+      if (idxs.size() == 0)
+        return 0;
+      if (idxs.size() == 1)
+        return idxs[0];
+      size_t pos(0);
+      // OK, stop at 1
+      for (size_t i = idxs.size(); --i != 0; ) {
+        pos += idxs[i];
+        pos  *= dims[i-1];
+      }
+      return pos + idxs[0];
+    }
+
+    /**
+     * Increments the specified indexes to refer to the next value
+     * in an array given by the specified dimensions.  The indexing
+     * is in last-index major order, which is column-major for
+     * matrices.
+     *
+     * <p>The first index in the sequence is all zeroes.
+     * Incrementing the last index, whose values are the dimensions
+     * minus one, returns the all-zero matrix.
+     *
+     * <p>Given <code>dims == (2,2,2)</code>, the sequence of
+     * indexes are 
+     *
+     * <code>[0 0 0]</code>, 
+     * <code>[1 0 0]</code>, 
+     * <code>[0 1 0]</code>, 
+     * <code>[1 1 0]</code>, 
+     * <code>[0 0 1]</code>, 
+     * <code>[1 0 1]</code>, 
+     * <code>[0 1 1]</code>, 
+     * <code>[1 1 1]</code>,
+     * <code>[0 0 0]</code>, 
+     * <code>[1 0 0]</code>, ...
+     *
+     * @param dims Dimensions of array.
+     * @param idxs Indexes into array.
+     * @throws std::invalid_argument If the dimensions and indexes
+     * are not the same size.
+     * @throws std::out_of_range If an index is greater than or equal
+     * to the corresponding dimension.
+     */
+    void
+    increment_indexes(const std::vector<size_t>& dims,
+                      std::vector<size_t>& idxs) {
+      validate_dims_idxs(dims,idxs);
+      for (size_t i = 0; i < dims.size(); ++i) {
+        ++idxs[i];
+        if (idxs[i] < dims[i]) 
+          return;
+        idxs[i] = 0;
+      }
+    }
+
+    /**
      * Write a permutation into the specified vector of the specified
      * size using the specified Boost random number generator.  The
      * vector will be resized to the specified size.
@@ -26,9 +129,9 @@ namespace stan {
      * @param rng Random-number generator.
      */
     template <class RNG>
-    static void permutation(std::vector<size_t>& x,
-                            size_t n,
-                            RNG& rng) {
+    void permutation(std::vector<size_t>& x,
+                     size_t n,
+                     RNG& rng) {
       x.resize(n);
       for (size_t i = 0; i < n; ++i)
         x[i] = i;
@@ -56,9 +159,9 @@ namespace stan {
      * source vector from which to copy are not the same size.
      */
     template <typename T>
-    static void permute(const std::vector<size_t>& pi,
-                        const std::vector<T>& x_from,
-                        std::vector<T>& x_to) {
+    void permute(const std::vector<size_t>& pi,
+                 const std::vector<T>& x_from,
+                 std::vector<T>& x_to) {
       size_t N = pi.size();
       if (N != x_from.size()) {
         std::stringstream msg;
@@ -70,6 +173,7 @@ namespace stan {
       for (size_t i = 0; i < N; ++i)
         x_to[i] = x_from[pi[i]];
     }
+
     
     /**
      * An <code>mcmc::chains</code> object stores parameter names and
@@ -94,7 +198,8 @@ namespace stan {
       const size_t _num_params; // total
       const std::vector<size_t> _starts;
       const std::map<std::string,size_t> _name_to_index;
-      std::vector<std::vector<std::vector<double > > > _samples; // [chain,param,sample]
+      // [chain,param,sample]
+      std::vector<std::vector<std::vector<double > > > _samples; 
 
       static size_t calc_num_params(const std::vector<size_t>& dims) {
         size_t num_params = 1;
@@ -103,7 +208,8 @@ namespace stan {
         return num_params;
       }
 
-      static size_t calc_total_num_params(const std::vector<std::vector<size_t> >& dimss) {
+      static size_t 
+      calc_total_num_params(const std::vector<std::vector<size_t> >& dimss) {
         int num_params = 0;
         for (size_t i = 0; i < dimss.size(); ++i)
           num_params += calc_num_params(dimss[i]);
@@ -164,32 +270,12 @@ namespace stan {
           msg << "require sample index below number of samples"
               << "; sample index m=" << m
               << "; chain index k=" << k
-              << "; num samples in chain" << k << "=" << _samples[k][0].size();
+              << "; num samples in chain" << k << "=" 
+              << _samples[k][0].size();
           throw std::out_of_range(msg.str());
         }
       }
 
-      static void 
-      validate_dims_idxs(const std::vector<size_t>& dims,
-                         const std::vector<size_t>& idxs) {
-        if (idxs.size() != dims.size()) {
-          std::stringstream msg;
-          msg << "index vector and dims vector must be same size."
-              << "; idxs.size()=" << idxs.size()
-              << "; dims.size()=" << dims.size();
-          throw std::invalid_argument(msg.str());
-        }
-        for (size_t i = 0; i < idxs.size(); ++i) {
-          if (idxs[i] >= dims[i]) {
-            std::stringstream msg;
-            msg << "indexes must be within bounds."
-                << "; idxs[" << i << "]=" << idxs[i]
-                << "; dims[" << i << "]=" << dims[i];
-            throw std::out_of_range(msg.str());
-          }
-        }
-      }
-      
     public:
 
       /**
@@ -234,74 +320,10 @@ namespace stan {
       }
       
       
-      // WRITE METHODS (need read/write synch externally)
-
-
-      // warmup logic -- may just get rid of this
-      // WARNING: not yet propagated to getters of samples!
-
-      /**
-       * <p><b>Synchronization</b>: Non-chain-specific write method.  This
-       * method may be called concurrently with <code>add_sample</code>, but
-       * not with any read method accessing all chains relative to warmup.
-       *
-       * @param warmup_iterations Number of warmup iterations.
-       */
-      void set_warmup(size_t warmup_iterations) {
-        _warmup = warmup_iterations;
-      }
-
-
-      /**
-       * <p><b>Synchronization</b>: This is a read method that only
-       * interferes with <code>set_warmup</code>.
-       *
-       * @return Number of warmup iterations.
-add       */
-      inline size_t warmup() {
-        return _warmup;
-      }
-
-      size_t num_warmup_samples(size_t k) {
-        return std::min<size_t>(num_samples(k), warmup());
-      }
-
-      size_t num_saved_samples(size_t k) {
-        return std::max<size_t>(0, num_samples(k) - warmup());
-      }
-
-
-
-      /**
-       * Add the specified sample to the end of the specified chain.
-       *
-       * <p><b>Synchronization:</b> This is a chain-specific write method.
-       *
-       * @param chain Markov chain identifier.
-       * @param theta Parameter values.
-       * @throws std::invalid_argument if the size of the sample vector
-       * does not match the number of parameters.
-       */
-      void add_sample(size_t chain,
-                      std::vector<double> theta) {
-        validate_chain_idx(chain);
-        if (theta.size() != _num_params) {
-          std::stringstream msg;
-          msg << "parameter vector size must match num params"
-              << "; num params=" << _num_params
-              << "; theta.size()=" << theta.size();
-          throw std::invalid_argument(msg.str());
-        }
-        for (size_t i = 0; i < theta.size(); ++i)
-          _samples[chain][i].push_back(theta[i]); // _samples very non-local
-      }
-      
-      
-
       /**
        * Return the number of chains.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        * 
        * @return The number of chains.
        */
@@ -315,7 +337,7 @@ add       */
        * <p>This is not the number of parameter names, but the total
        * number of scalar parameters.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        * 
        * @return The total number of parameters.
        */
@@ -326,42 +348,12 @@ add       */
       /**
        * Return the total number of parameter names.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        * 
        * @return The total number of parameter names.
        */
       inline size_t num_param_names() {
         return _names.size();
-      }
-
-      /**
-       * Return the total number of samples across chains.
-       *
-       * <p><b>Synchronization</b>: This is a cross-chain read method.
-       *
-       * @return Total number of samples.
-       */
-      size_t num_samples() {
-        size_t M = 0;
-        for (size_t k = 0; k < num_chains(); ++k)
-          M += num_samples(k);
-        return M;
-      }
-
-      /**
-       * Return the number of samples in the chain with the specified
-       * index.
-       *
-       * <p><b>Synchronization</b>: This is a chain-specific read method.
-       *
-       * @param k Markov chain index.
-       * @return Number of samples in the specified chain.
-       * @throw std::out_of_range If the identifier is greater than
-       * or equal to the number of chains.
-       */
-      size_t num_samples(size_t k) {
-        validate_chain_idx(k);
-        return _samples[k][0].size();
       }
 
       /**
@@ -378,7 +370,7 @@ add       */
       /**
        * Return the name of the parameter with the specified index.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        * 
        * @param j Index of parameter.
        * @return The parameter with the specified index.
@@ -405,7 +397,7 @@ add       */
        * Return the dimensions of the parameter name with the
        * specified index.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        *
        * @param j Index of a parameter name.
        * @return The dimensions of the parameter name with the specified
@@ -422,7 +414,7 @@ add       */
        * Return the sequence of starting indexes for the named
        * parameters in the underlying sequence of scalar parameters.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        *
        * @return The sequence of named parameter start indexes.
        */
@@ -434,7 +426,7 @@ add       */
        * Return the starting position of the named parameter with the
        * specified index in the underlying sequence of scalar parameters.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        *
        * @param j The parameter name index.
        * @return The start index of the specified parameter.
@@ -450,7 +442,7 @@ add       */
        * Return a copy of the sequence of named parameter sizes.  The
        * size of a named parameter is the prouct of its dimensions.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        *
        * @return The sequence of named parameter sizes.
        */
@@ -483,7 +475,7 @@ add       */
        * Return the named parameter index for the specified parameter
        * name.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        *
        * @param name Parameter name.
        * @return Index of parameter name.
@@ -507,7 +499,7 @@ add       */
        * for the parameter with the specified name index and
        * indexes.
        *
-       * <p><b>Synchronization</b>: Thread safe after construction.
+       * <p><b>Synchronization</b>: Thread safe.
        *
        * @param j Index of parameter name.
        * @param idxs Indexes into parameter.
@@ -522,26 +514,158 @@ add       */
           + param_start(j);
       }
 
+
       /**
-       * Return the total number of samples across
-       * all chains.
-       *
-       * <p><b>Synchronization</b> This is a cross-chain read method.
+       * Set the warmup cutoff to the specified number of
+       * iterations.  The first samples in each chain up to
+       * this number will be treated as warmup samples.
        * 
-       * @return The total number of samples.
+       * <p><b>Synchronization</b>: Warmup write method. 
+       *
+       * @param warmup_iterations Number of warmup iterations.
        */
-      size_t total_samples() {
-        size_t total(0);
+      void set_warmup(size_t warmup_iterations) {
+        _warmup = warmup_iterations;
+      }
+
+
+      /**
+       * Return the warmup iteration cutoff.
+       * 
+       * <p><b>Synchronization</b>: Warmup read method.
+       *
+       * @return Number of warmup iterations.
+       */
+      inline size_t warmup() {
+        return _warmup;
+      }
+
+
+      /**
+       * Add the specified sample to the end of the specified chain.
+       *
+       * <p><b>Synchronization:</b> Chain-specific write.
+       *
+       * @param chain Markov chain identifier.
+       * @param theta Parameter values.
+       * @throws std::invalid_argument if the size of the sample
+       * vector does not match the number of parameters.
+       */
+      void add(size_t chain,
+               std::vector<double> theta) {
+        validate_chain_idx(chain);
+        if (theta.size() != _num_params) {
+          std::stringstream msg;
+          msg << "parameter vector size must match num params"
+              << "; num params=" << _num_params
+              << "; theta.size()=" << theta.size();
+          throw std::invalid_argument(msg.str());
+        }
+        for (size_t i = 0; i < theta.size(); ++i)
+          _samples[chain][i].push_back(theta[i]); // _samples very non-local
+      }
+      
+      
+
+
+
+      /**
+       * Return the number of warmup samples in the
+       * specified chain.
+       *
+       * <p><b>Synchronization</b>:  Warmup and chain-specific read.
+       *
+       * @param k Chain index.
+       * @return Number of warmup samples availabe in chain.
+       */
+      size_t num_warmup_samples(size_t k) {
+        return std::min<size_t>(num_samples(k), warmup());
+      }
+
+      /**
+       * Return the total number of warmup samples across chains.
+       *
+       * <p><b>Synchronization</b>:  Warmup and cross-chain read.
+       *
+       * @return The total number of warmup samples.
+       */
+      size_t num_warmup_samples() {
+        size_t total = 0;
         for (size_t k = 0; k < num_chains(); ++k)
-          total += num_samples(k);
+          total += num_warmup_samples(k);
         return total;
       }
 
       /**
-       * Write the samples for the scalar parameter with the specified
-       * index into the specified vector.
+       * Return the number of samples in the specified chain not
+       * including warmup samples.
        *
-       * <p><b>Synchronization</b>: This is a cross-chain read method.
+       * <p><b>Synchronization</b>:  Warmup and chain-specific read.
+       *
+       * @param k Chain index.
+       * @return Number of warmup samples availabe in chain.
+       */
+      size_t num_kept_samples(size_t k) {
+        if (num_samples(k) > warmup())
+          return num_samples(k) - warmup();
+        return 0U;
+      }
+
+
+      /**
+       * Return the total number of samples in all chains not
+       * including warmup samples.
+       *
+       * <p><b>Synchronization</b>:  Warmup and cross-chain read.
+       *
+       * @return Total number of warmup samples
+       */
+      size_t num_kept_samples() {
+        size_t total = 0;
+        for (size_t k = 0; k < num_chains(); ++k)
+          total += num_kept_samples(k);
+        return total;
+      }
+
+      /**
+       * Return the total number of samples across chains including
+       * warmup and kept samples.
+       *
+       * <p><b>Synchronization</b>: Cross-chain read.
+       *
+       * @return Total number of samples.
+       */
+      size_t num_samples() {
+        size_t M = 0;
+        for (size_t k = 0; k < num_chains(); ++k)
+          M += num_samples(k);
+        return M;
+      }
+
+      /**
+       * Return the number of samples including warmup and kept samples
+       * in the specified chain.
+       *
+       * <p><b>Synchronization</b>: Chain-specific read.
+       *
+       * @param k Markov chain index.
+       * @return Number of samples in the specified chain.
+       * @throw std::out_of_range If the identifier is greater than
+       * or equal to the number of chains.
+       */
+      size_t num_samples(size_t k) {
+        validate_chain_idx(k);
+        return _samples[k][0].size();
+      }
+
+
+      /**
+       * Write into the specified vector the warmup and kept samples
+       * for the scalar parameter with the specified index.  The order
+       * of samples is by chain, then by order in which the sample was
+       * added to the chain.
+       *
+       * <p><b>Synchronization</b>: Cross-chain read.
        * 
        * @param n Index of parameter.
        * @param samples Vector into which samples are written.
@@ -553,132 +677,178 @@ add       */
                   std::vector<double>& samples) {
         validate_param_idx(n);
         samples.resize(0);
-        samples.reserve(total_samples());
+        samples.reserve(num_samples());
         for (size_t k = 0; k < num_chains(); ++k)
           samples.insert(samples.end(),
                          _samples[k][n].begin(), 
                          _samples[k][n].end());
       }
 
-
-
       /**
-       * Return the samples for the parameters with the specified index
-       * in the chain with the specified index.
+       * Write into the specified vector the warmup and kept samples
+       * for the scalar parameter with the specified index in the
+       * chain with the specified index.  The order of samples is the
+       * order in which they were added.
        *
-       * <p><b>Synchronization</b>: This is a single-chain read method.
+       * <p><b>Synchronization</b>: Chain-specific read.
        *
        * @param k Index of chain.
        * @param n Index of parameter.
-       * @return Samples for parameter in chain.
+       * @param samples Vector into which to write samples
        * @throw std::out_of_range If the specified chain index is greater
        * than or equal to the number of chains, or if the specified parameter
        * index is greater than or equal to the total number of parameters.
        */
-      const std::vector<double>&
-      get_samples(size_t k,     // chain id
-                  size_t n) {   // param id
+      void get_samples(size_t k, 
+                       size_t n, 
+                       std::vector<double>& samples) {  
         validate_chain_idx(k);
         validate_param_idx(n); 
-        return _samples[k][n];
+        samples.resize(0);
+        samples.reserve(num_samples(k));
+        samples.insert(samples.end(),
+                       _samples[k][n].begin(),
+                       _samples[k][n].end());
+      }
+
+
+      /**
+       * Write into the specified vector the kept samples for the
+       * scalar parameter with the specified index.  The order of
+       * samples is permuted, but as long as no samples have been
+       * added in the interim, subsequent calls to this method will
+       * use the same permutation for all parameter indexes.
+       *
+       * <p><b>Synchronization</b>: Cross-chain read.
+       * 
+       * @param n Index of parameter.
+       * @param samples Vector into which samples are written.
+       * @throw std::out_of_range If the parameter index is greater
+       * than or equal to the total number of scalar parameters.
+       */
+      void
+      get_kept_samples_permuted(size_t n,
+                                std::vector<double>& samples) {
+        validate_param_idx(n);
+        samples.resize(0);
+        samples.reserve(num_kept_samples());
+        for (size_t k = 0; k < num_chains(); ++k)
+          if (num_kept_samples(k) > 0)
+            samples.insert(samples.end(),
+                           _samples[k][n].begin() + warmup(),
+                           _samples[k][n].end());
       }
 
       /**
-       * Return the scalar sample for the specified parameter index
-       * in the specified iteration of the specified chain.
-       * 
-       * <p><b>Synchronization</b>: This is a single-chain read method.
+       * Write into the specified vector the kept samples for the
+       * scalar parameter with the specified index in the chain with
+       * the specified index.  The order of samples is the order in
+       * which they were added.
+       *
+       * <p><b>Synchronization</b>: Chain-specific read.
        *
        * @param k Index of chain.
        * @param n Index of parameter.
-       * @param m Index of iteration.
-       * @return Sample for parameter at iteration in chain.
-       * @throw std::out_of_range If the specified chain index i
-       * greater than or equal to the number of chains, if the specified
-       * parameter index is greater than or equal to the total number of parameters,
-       * or if the iteration index is greater than or equal to the number of
-       * samples in the specified chain.
+       * @param samples Vector into which to write samples
+       * @throw std::out_of_range If the specified chain index is greater
+       * than or equal to the number of chains, or if the specified parameter
+       * index is greater than or equal to the total number of parameters.
        */
-      double
-      get_sample(size_t k, 
-                 size_t n, 
-                 size_t m) {
+      void
+      get_kept_samples(size_t k,
+                       size_t n,
+                       std::vector<double>& samples) {
         validate_param_idx(n);
-        validate_iteration(k,m);
-        return get_samples(k,n)[m];
+        samples.resize(0);
+        samples.reserve(num_kept_samples(k));
+        samples.insert(samples.end(),
+                       _samples[k][n].begin() + warmup(),
+                       _samples[k][n].end());
+      }
+
+
+
+      /**
+       * Write into the specified vector the warmup samples for the
+       * scalar parameter with the specified index.  The order of
+       * samples is by chain, then by order in which the sample was
+       * added to the chain.
+       *
+       * <p><b>Synchronization</b>: Cross-chain read.
+       * 
+       * @param n Index of parameter.
+       * @param samples Vector into which samples are written.
+       * @throw std::out_of_range If the parameter index is greater
+       * than or equal to the total number of scalar parameters.
+       */
+      void
+      get_warmup_samples(size_t n,
+                         std::vector<double>& samples) {
+        validate_param_idx(n);
+        samples.resize(0);
+        samples.reserve(num_warmup_samples());
+        for (size_t k = 0; k < num_chains(); ++k) {
+          if (num_warmup_samples(k) < warmup())
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].end());
+          else
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].begin() + warmup());
+        }
       }
 
       /**
-       * Return the offset in last-index major indexing for the
-       * specified indexes given the specified number of dimensions.
-       * If both sequences are empty, the index returned is 0.
+       * Write into the specified vector the warmup samples for the
+       * parameter with the specified index in the chain with the
+       * specified index.  The order of samples is the order in which
+       * they were added.
        *
-       * @param dims Sequence of dimensions.
-`       * @param idxs Sequence of inndexes.
-       * @return Offset of indexes given dimensions.
-       * @throw std::invalid_argument If the sizes of the index
-       * and dimension sequences is different.
-       * @throw std::out_of_range If one of the indexes is greater
-       * than or equal to the corresponding index.
+       * <p><b>Synchronization</b>: Chain-specific read.
+       *
+       * @param k Index of chain.
+       * @param n Index of parameter.
+       * @param samples Vector into which to write samples
+       * @throw std::out_of_range If the specified chain index is greater
+       * than or equal to the number of chains, or if the specified parameter
+       * index is greater than or equal to the total number of parameters.
        */
-      static size_t get_offset(const std::vector<size_t>& dims, 
-                               const std::vector<size_t>& idxs) {
-        validate_dims_idxs(dims,idxs);
-        if (idxs.size() == 0)
-          return 0;
-        if (idxs.size() == 1)
-          return idxs[0];
-        size_t pos(0);
-        // OK, stop at 1
-        for (size_t i = idxs.size(); --i != 0; ) {
-          pos += idxs[i];
-          pos  *= dims[i-1];
-        }
-        return pos + idxs[0];
+      void
+      get_warmup_samples(size_t k,
+                         size_t n,
+                         std::vector<double>& samples) {
+        validate_param_idx(n);
+        samples.resize(0);
+        samples.reserve(num_warmup_samples(k));
+        if (num_warmup_samples(k) < warmup())
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].end());
+        else
+            samples.insert(samples.end(),
+                           _samples[k][n].begin(),
+                           _samples[k][n].begin() + warmup());
       }
 
       /**
-       * Increments the specified indexes to refer to the next value
-       * in an array given by the specified dimensions.  The indexing
-       * is in last-index major order, which is column-major for
-       * matrices.
+       * Fill the specified sample array with the structure
+       * corresponding to the specified parameter.  
        *
-       * <p>The first index in the sequence is all zeroes.
-       * Incrementing the last index, whose values are the dimensions
-       * minus one, returns the all-zero matrix.
-       *
-       * <p>Given <code>dims == (2,2,2)</code>, the sequence of
-       * indexes are 
-       *
-       * <code>[0 0 0]</code>, 
-       * <code>[1 0 0]</code>, 
-       * <code>[0 1 0]</code>, 
-       * <code>[1 1 0]</code>, 
-       * <code>[0 0 1]</code>, 
-       * <code>[1 0 1]</code>, 
-       * <code>[0 1 1]</code>, 
-       * <code>[1 1 1]</code>,
-       * <code>[0 0 0]</code>, 
-       * <code>[1 0 0]</code>, ...
-       *
-       * @param dims Dimensions of array.
-       * @param idxs Indexes into array.
-       * @throws std::invalid_argument If the dimensions and indexes
-       * are not the same size.
-       * @throws std::out_of_range If an index is greater than or equal
-       * to the corresponding dimension.
+       * @param j Named parameter index.
+       * @param samples Vector into which to write structured samples
+       * @throw std::out_of_range If the parameter index is greater
+       * than or equal to the number of named parameters.
        */
-      static void
-      increment_indexes(const std::vector<size_t>& dims,
-                        std::vector<size_t>& idxs) {
-        validate_dims_idxs(dims,idxs);
-        for (size_t i = 0; i < dims.size(); ++i) {
-          ++idxs[i];
-          if (idxs[i] < dims[i]) 
-            return;
-          idxs[i] = 0;
-        }
+      template <typename T>
+      void
+      get_structured_permuted_samples(size_t j,
+                                      std::vector<T>& samples) {
+        validate_param_name_idx(j);
+        samples.resize(0);
+        samples.reserve(num_kept_samples());
       }
+                                      
 
     };
 
@@ -687,3 +857,110 @@ add       */
 
 
 #endif
+
+
+/*
+// k: chain index
+// n: parameter index
+// j: parameter name index
+
+
+chains(size_t num_chains,
+       const vector<string>& names,
+       const vector<vector<size_t> >& dims);
+
+size_t num_chains();
+
+size_t num_params();
+
+size_t num_param_names();
+
+const vector<string>& param_names();
+const string& param_name(size_t n);
+
+const vector<vector<size_t> >& param_dimss();
+const vector<size_t>& param_dims(size_t j);
+
+const vector<size_t>& param_starts();
+size_t param_start(size_t j);
+
+const vector<size_t>& param_sizes();
+size_t param_size(size_t j);
+
+size_t param_name_to_index(const string& name);
+
+size_t get_total_param_index(size_t j, 
+                             const vector<size_t>& idxs);
+
+void add(size_t chain,
+         vector<double> theta);
+
+void set_warmup(size_t warmup);
+size_t get_warmup();
+
+size_t num_warmup_samples(size_t k);
+size_t num_warmup_samples();
+
+size_t num_kept_samples(size_t k);
+size_t num_kept_samples();
+
+size_t num_total_samples(size_t k);
+size_t num_total_samples();
+
+// all kept samples scrambled consistently
+void get_samples_permuted(size_t n,
+                          vector<double>& samples);
+
+// all kept samples, in original order
+void get_samples(size_t n,
+                 size_t k, 
+                 vector<double>& samples);
+
+void get_warmup_samples(size_t n,
+                        size_t k,
+                        vector<double>& samples);
+
+template <typename T>
+void get_struct_samples(size_t j,
+                        vector<T>& samples);
+
+template <typename T>
+void get_struct_samples(size_t j,
+                        size_t k,
+                        vector<T>& samples);
+
+double mean(size_t n);
+
+double sd(size_t n);
+
+void quantiles(size_t n,
+               const vector<double>& probs,
+               vector<double>& quantiles);
+double quantile(size_t n,
+                double prob);
+
+pair<double,double> central_interval(size_t n,
+                                     double prob);
+
+pair<double,double> smallest_interval(size_t n,
+                                      double prob);
+
+double potential_scale_reduction(size_t n)
+
+double split_potential_scale_reduction(size_t n);
+
+double effective_sample_size(size_t n);
+
+double mcmc_error_mean(size_t n);
+
+double autocorrelation(size_t n, 
+                       size_t k);
+                   
+
+
+
+
+void print(ostream&);
+
+ostream& operator<<(ostream&, const chains&);
+*/
