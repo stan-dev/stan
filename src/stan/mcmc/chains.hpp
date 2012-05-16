@@ -9,11 +9,79 @@
 #include <sstream>
 #include <vector>
 
+#include <Eigen/Dense>
+
 #include <boost/random/uniform_int_distribution.hpp>
 
 namespace stan {  
 
   namespace mcmc {
+
+    /*
+    template <typename T>
+    void resize(std::vector<T>& x, 
+                const std::vector<size_t>& dims,
+                size_t pos) {
+      if (pos >= dims.size()) return;
+      x.resize(dims[pos]);
+      for (size_t i = 0; i < dims[pos]; ++i)
+        resize(x,dims,pos+1);
+    }
+
+    template <typename T>
+    void resize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+                const std::vector<size_t>& dims,
+                size_t pos) {
+      if ((dims.size() - pos) != 2U) {
+        stringstream msg;
+        msg << "attempt to resize matrix with wrong args."
+            << "; pos=" << pos
+            << "; dims.size()=" << dims.size()
+            << "; but difference must be 2.";
+        throw std::invalid_argument(msg.str());
+      }
+      x.resize(dims[pos],dims[pos+1]);
+    }
+
+
+    template <typename T>
+    void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                const std::vector<size_t>& dims,
+                size_t pos) {
+      if ((dims.size() - pos) != 1U) {
+        stringstream msg;
+        msg << "attempt to resize vector with wrong number of dims."
+            << "; pos=" << pos
+            << "; dims.size()=" << dims.size()
+            << "; but difference must be 1.";
+        throw std::invalid_argument(msg.str());
+      }
+      x.resize(dims[pos]);
+    }
+
+    template <typename T>
+    void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
+                const std::vector<size_t>& dims,
+                size_t pos) {
+      if ((dims.size() - pos) != 1U) {
+        stringstream msg;
+        msg << "attempt to resize row vector with wrong number of dims."
+            << "; pos=" << pos
+            << "; dims.size()=" << dims.size()
+            << "; but difference must be 1.";
+        throw std::invalid_argument(msg.str());
+      }
+      x.resize(dims[pos]);
+    }
+
+
+    template <typename T>
+    inline void resize(T& t, 
+                       const std::vector<size_t>& dims) {
+      resize(t,dims,0);
+    }
+    */
+
 
     /**
      * Validate the specified indexes with respect to the
