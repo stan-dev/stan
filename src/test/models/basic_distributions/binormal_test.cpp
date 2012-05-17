@@ -52,7 +52,7 @@ TEST_F(binormal,runModel) {
   EXPECT_EQ(0, system(command.c_str()))
     << "Can not execute command: " << command << std::endl;
 }
-
+/*
 TEST_F(binormal, y1) {
   stan::mcmc::mcmc_output y1 = factory.create("y.1");
   double neff = y1.effectiveSize();
@@ -73,5 +73,4 @@ TEST_F(binormal, y2) {
   
   EXPECT_NEAR(expected_y2, y2.mean(), T*sqrt(y2.variance()/neff));
 }
-
-
+*/
