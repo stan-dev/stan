@@ -73,7 +73,7 @@ test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
-	$@ --gtest_output="xml:$(basename $@).xml"
+#	$@ --gtest_output="xml:$(basename $@).xml"
 
 ##
 # Builds a single test
@@ -82,7 +82,7 @@ test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
-	$@ --gtest_output="xml:$(basename $@).xml"
+#	$@ --gtest_output="xml:$(basename $@).xml"
 
 
 .PRECIOUS: test/%.o
