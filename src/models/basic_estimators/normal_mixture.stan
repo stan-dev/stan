@@ -17,7 +17,7 @@ transformed parameters {
   log_one_minus_theta <- log(1.0 - theta);
 }
 model {
-  theta ~ uniform(0,1); // equivilanetly, ~ beta(1,1);
+  theta ~ uniform(0,1); // equivalently, ~ beta(1,1);
   for (k in 1:2)
     mu[k] ~ normal(0,10);
   for (n in 1:N) {
