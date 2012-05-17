@@ -155,6 +155,45 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* cumulative distribution functions
+  - to add:
+     + calculation of cdf
+     + two functions: 1) with templated policy, 2) with no policy,
+        calling templated function with stan::math::default_policy()
+     + tests: only need non-agrad tests.
+     + dox: add doxygen.
+  - uni/cont/beta
+  - uni/cont/cauchy
+  - uni/cont/chi_square
+  - uni/cont/double_exponential
+  - uni/cont/exponential
+  - uni/cont/gamma
+  - uni/cont/inv_chi_square
+  - uni/cont/inv_gamma
+  - uni/cont/logisitic
+  - uni/cont/normal
+  - uni/cont/pareto
+  - uni/cont/scaled_inv_chi_square
+  - uni/cont/student_t
+  - uni/cont/uniform
+  - uni/cont/weibull
+  - uni/disc/bernoulli
+  - uni/disc/beta_binomial
+  - uni/disc/binomial
+  - uni/disc/hypergeometric
+  - uni/disc/neg_binomial
+  - uni/disc/ordered_logisitic
+  - uni/disc/poisson
+  - multi/cont/dirichlet
+  - multi/cont/inv_wishart
+  - multi/cont/lkj_corr
+  - multi/cont/lkj_cov
+  - multi/cont/multi_normal
+  - multi/cont/multi_student_t
+  - multi/cont/wishart
+  - multi/disc/categorical
+  - multi/disc/multinomial
+
 * more general generic initializations
   -  normal or student-t w. params
   -  or even extend uniform
@@ -201,8 +240,6 @@ EXTENSIONS
   - z_score()
   - 
   
-* precompiled headers for model compilation speed
-
 * auto testing of sampler
   - Cook/Gelman/Rubin-style interval tests
   - needs effective sample size calc to bound intervals
@@ -571,137 +608,7 @@ basically to test second moment estimation.
 I think these should be available just about everywhere
 the first order stuff is available.
 
-QUESTIONS
----------
-What to do if M[k] != M[k']?  
-  - cut to minimum?
-  - generalize R-hat, ESS calcs
 
-Is there bias in stopping when you hit
-an ESS estimate of 40?  What's expected
-number of samples and pattern of variance?
-
-Do we store the warmup samples in here?
-
-R2WinBUGS does what when giving data to Coda?
-Does it throw away first half?  Should we?
--- We'll just use the post-burnin samples.
-
-Should we do DIC or something like it? 
-Need:
-   deviance(theta) = - 2 log p(y|theta) + C
-   deviance(mean(theta))
-How to get deviance(mean(theta))?  In fact, how to
-get the log likelihood -- there's not a term for it
-in Stan -- need to know what data is and exclude terms
-that only depend on the prior!  (Maybe we could reverse
-the templating in our function calls for probability
-functions?)
-
-Randomize samples across iterations?  Why?
-
-Keep # burnin samples?
-
-K: # chains
-M[k]: # samples
-N: # total params
-L: # named params
-
-class chains
-------------
-
-member variables
-----------------
-vector<vector<vector<double > > > _theta;  // N x K x M[k]
-vector<vector<uint> > _dims;               // L x ragged
-vector<string> _names;                     // L
-vector<uint> _starts;                      // L
-
-constructor
------------
-chains(vector<vector<uint>> dims,
-       vector<string> names,
-       uint num_chains);
-
-chains(vector<string> csv_file_names);
-
-write methods
--------------
-add_sample(uint chain,
-           vector<double> theta);
-
-read methods
-------------
-
-print(ostream& out);
-
-// optionally w. headers?
-print_csv(ostream& out);
-print_csv(ostream& out, uint n);
-print_csv(ostream& out, uint n, uint k);
-print_cvs_chain(ostream& out, uint k);
-
-
-\\ symbol table for param names
-uint get_param_id(string name, vector<uint> idx);
-pair<string,vector<uint>> get_param_name_dims(uint n);
-
-uint num_chains();  // K
-  
-uint num_samples(uint k);  // M[k]
-
-uint num_params();  // N
-
-uint num_param_names(); // L
-
-
-double theta(uint n, uint k, uint m);
-vector<double> theta(uint n, uint k); // all values for chain k (use for traceplot)
-vector<double> theta(uint n); // all values for all chains
-? vector<vector<double>> theta2(uint n); // all values for all chains
-
-double mean(uint n);  
-
-double sd(uint n);  
-
-vector<double> quantile(uint n, vector<double> prob);  
-
-? double quantile(uint n, double prob);
-
-pair<double,double>  
-smallest_interval(uint n, double prob);
-
-pair<double,double>  
-central_interval(uint n, double prob);
-
-double
-potential_scale_reduction(uint n); // no k version
-
-double
-split_potential_scale_reduction(uint n); // no k version
-
-double
-effective_sample_size(uint n); // no k version
-
-double
-mcmc_error_mean(uint n); // no k version
-
-double
-autocorrelation(uint n, uint k, uint lag);
-
-vector<double>
-autocorrelations(uint n, uint k, uint max_lag);
-
-// per chain-methods, e.g.
-double mean(uint n, uint k);
-
-
-// vectorized forms, eg.
-vector<double> mean();
-
-OUTSIDE OF CLASS
-----------------
-ostream& operator<<(ostream&, const chains&)
 
 
        

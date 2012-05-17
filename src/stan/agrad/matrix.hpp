@@ -1,10 +1,8 @@
-#ifndef __STAN__AGRAD__MATRIX_H__
-#define __STAN__AGRAD__MATRIX_H__
+#ifndef __STAN__AGRAD__MATRIX_HPP__
+#define __STAN__AGRAD__MATRIX_HPP__
 
 // global include
 #include <sstream>
-
-#include <Eigen/Dense>
 
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>

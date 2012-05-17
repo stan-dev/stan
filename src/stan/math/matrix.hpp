@@ -1,11 +1,12 @@
-#ifndef __STAN__MATH__MATRIX_H__
-#define __STAN__MATH__MATRIX_H__
+#ifndef __STAN__MATH__MATRIX_HPP__
+#define __STAN__MATH__MATRIX_HPP__
+
+#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
+#include <Eigen/Dense>
 
 #include <stdexcept>
 #include <vector>
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
-#include <Eigen/Dense>
 
 namespace stan {
   

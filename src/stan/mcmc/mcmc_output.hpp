@@ -327,7 +327,7 @@ namespace stan {
        * @return Vector of available variables.
        * @throws std::runtime_error if called with an unavailable fileNumber
        */
-      std::vector<std::string> availableVariables(int fileNumber=0) {
+      std::vector<std::string> availableVariables(typename std::vector<std::string>::size_type fileNumber=0) {
         if (fileNumber >= filenames_.size()) {
           throw std::runtime_error("availableVariables called with fileNumber greater than number of files");
         }
