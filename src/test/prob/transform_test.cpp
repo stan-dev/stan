@@ -438,8 +438,8 @@ TEST(prob_transform,cov_matrix_jacobian) {
   var lp = 0.0;
   Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::cov_matrix_constrain(X,K,lp);
   std::vector<var> y;
-  for (int m = 0; m < K; ++m)
-    for (int n = 0; n <= m; ++n)
+  for (Matrix<var,Dynamic,Dynamic>::size_type m = 0; m < K; ++m)
+    for (Matrix<var,Dynamic,Dynamic>::size_type n = 0; n <= m; ++n)
       y.push_back(Sigma(m,n));
 
   std::vector<std::vector<double> > j;

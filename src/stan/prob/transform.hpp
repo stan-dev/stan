@@ -195,7 +195,8 @@ namespace stan {
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
       // skip last row (odd indexing) because it adds nothing by design
-      for (typename Eigen::Array<T,Eigen::Dynamic,1>::size_type j = 0; 
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      for (size_type j = 0; 
            j < (CPCs.rows() - 1);
            ++j) {
         using stan::math::log1m;
@@ -328,14 +329,15 @@ namespace stan {
       // distribution that generates a beta variate on (-1,1)
       T alpha2 = 2.0 * alpha; 
 
-      for (size_t j = 0; j < (K - 1); j++) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      for (size_type j = 0; j < (K - 1); j++) {
         nu(j) = alpha2;
       }
       size_t counter = K - 1;
-      for (size_t i = 1; i < (K - 1); i++) {
+      for (size_type i = 1; i < (K - 1); i++) {
         alpha -= 0.5;
         alpha2 = 2.0 * alpha;
-        for (size_t j = i + 1; j < K; j++) {
+        for (size_type j = i + 1; j < K; j++) {
           nu(counter) = alpha2;
           counter++;
         }
@@ -896,13 +898,14 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       // cut & paste simplex_constrain(Eigen::Matrix,T) w/o Jacobian
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       using stan::math::logit;
       using stan::math::inv_logit;
       using stan::math::log1m;
       int Km1 = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
       T stick_len(1.0);
-      for (int k = 0; k < Km1; ++k) {
+      for (size_type k = 0; k < Km1; ++k) {
         T z_k(inv_logit(y(k) - log(Km1 - k))); 
         x(k) = stick_len * z_k;
         stick_len -= x(k); 
@@ -932,10 +935,11 @@ namespace stan {
       using stan::math::inv_logit;
       using stan::math::log1p_exp;
       using stan::math::log1m;
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       int Km1 = y.size(); // K = Km1 + 1
       Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
       T stick_len(1.0);
-      for (int k = 0; k < Km1; ++k) {
+      for (size_type k = 0; k < Km1; ++k) {
         double eq_share = -log(Km1 - k); // = logit(1.0/(Km1 + 1 - k));
         T adj_y_k(y(k) + eq_share);
         T z_k(inv_logit(adj_y_k));
@@ -967,11 +971,12 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
-      for (int k = Km1; --k >= 0; ) {
+      for (size_type k = Km1; --k >= 0; ) {
         stick_len += x(k);
         T z_k(x(k) / stick_len);
         y(k) = logit(z_k) + log(Km1 - k); 
@@ -995,12 +1000,13 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
-      typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type k = x.size();
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      size_type k = x.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> y(k);
       if (k == 0)
         return y;
       y[0] = x[0];
-      for (typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type i = 1; 
+      for (size_type i = 1; 
            i < k; 
            ++i)
         y[i] = y[i-1] + exp(x[i]);
@@ -1023,7 +1029,8 @@ namespace stan {
     inline
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
-      for (int i = 1; i < x.size(); ++i)
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      for (size_type i = 1; i < x.size(); ++i)
         lp += x(i);
       return ordered_constrain(x);
     }
@@ -1048,12 +1055,13 @@ namespace stan {
     ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_ordered("stan::prob::ordered_free(%1%)", 
                                 y, "y");
-      size_t k = y.size();
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      size_type k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
       if (k == 0) 
         return x;
       x[0] = y[0];
-      for (size_t i = 1; i < k; ++i)
+      for (size_type i = 1; i < k; ++i)
         x[i] = log(y[i] - y[i-1]);
       return x;
     }
@@ -1199,17 +1207,18 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
     cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                          size_t K) {
+                         typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type K) {
       using std::exp;
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
       if (x.size() != (K * (K + 1)) / 2) 
         throw std::domain_error("x.size() != K + (K choose 2)");
       int i = 0;
-      for (int m = 0; m < K; ++m) {
+      for (size_type m = 0; m < K; ++m) {
         for (int n = 0; n < m; ++n)
           L(m,n) = x(i++);
         L(m,m) = exp(x(i++));
-        for (int n = m + 1; n < K; ++n) 
+        for (size_type n = m + 1; n < K; ++n) 
           L(m,n) = 0.0;
       }
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> M = L * L.transpose();
@@ -1232,18 +1241,19 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
     cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                          size_t K,
-                          T& lp) {
+                         typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type K,
+                         T& lp) {
       using std::exp;
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       if (x.size() != (K * (K + 1)) / 2) 
         throw std::domain_error("x.size() != K + (K choose 2)");
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
       int i = 0;
-      for (int m = 0; m < K; ++m) {
-        for (int n = 0; n < m; ++n)
+      for (size_type m = 0; m < K; ++m) {
+        for (size_type n = 0; n < m; ++n)
           L(m,n) = x(i++);
         L(m,m) = exp(x(i++));
-        for (int n = m + 1; n < K; ++n) 
+        for (size_type n = m + 1; n < K; ++n) 
           L(m,n) = 0.0;
       }
       // Jacobian for complete transform, including exp() above
