@@ -1829,7 +1829,7 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
       o << INDENT2 << "static const char* function__ = \""
-        << model_name << "_namespace::write_csv(%1)\";" << EOL;
+        << model_name << "_namespace::write_csv(%1%)\";" << EOL;
 
       // declares, reads, and writes parameters
       generate_comment("read-transform, write parameters",2,o);

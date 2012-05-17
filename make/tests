@@ -68,12 +68,14 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 
 ##
 # Builds a single test with a stan model dependency
+#
+# Using a static pattern rule to make these tests depend on
+# missing models.
 ##
-test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
+$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
-#	$@ --gtest_output="xml:$(basename $@).xml"
 
 ##
 # Builds a single test
@@ -82,8 +84,9 @@ test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
-#	$@ --gtest_output="xml:$(basename $@).xml"
-
+ifeq ($(findstring test-,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
 
 .PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
