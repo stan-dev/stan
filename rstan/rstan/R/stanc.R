@@ -2,6 +2,7 @@ stanc <- function(stan_model_code, model_name = "anon_model") {
   .Call("stanc", stan_model_code, model_name, PACKAGE = "rstan");
 }
 
+
 version <- function() {
   .Call("version", PACKAGE = "rstan");
 }
