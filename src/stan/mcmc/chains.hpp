@@ -12,75 +12,11 @@
 #include <Eigen/Dense>
 
 #include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/additive_combine.hpp>
 
 namespace stan {  
 
   namespace mcmc {
-
-    /*
-    template <typename T>
-    void resize(std::vector<T>& x, 
-                const std::vector<size_t>& dims,
-                size_t pos) {
-      if (pos >= dims.size()) return;
-      x.resize(dims[pos]);
-      for (size_t i = 0; i < dims[pos]; ++i)
-        resize(x,dims,pos+1);
-    }
-
-    template <typename T>
-    void resize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
-                const std::vector<size_t>& dims,
-                size_t pos) {
-      if ((dims.size() - pos) != 2U) {
-        stringstream msg;
-        msg << "attempt to resize matrix with wrong args."
-            << "; pos=" << pos
-            << "; dims.size()=" << dims.size()
-            << "; but difference must be 2.";
-        throw std::invalid_argument(msg.str());
-      }
-      x.resize(dims[pos],dims[pos+1]);
-    }
-
-
-    template <typename T>
-    void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-                const std::vector<size_t>& dims,
-                size_t pos) {
-      if ((dims.size() - pos) != 1U) {
-        stringstream msg;
-        msg << "attempt to resize vector with wrong number of dims."
-            << "; pos=" << pos
-            << "; dims.size()=" << dims.size()
-            << "; but difference must be 1.";
-        throw std::invalid_argument(msg.str());
-      }
-      x.resize(dims[pos]);
-    }
-
-    template <typename T>
-    void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
-                const std::vector<size_t>& dims,
-                size_t pos) {
-      if ((dims.size() - pos) != 1U) {
-        stringstream msg;
-        msg << "attempt to resize row vector with wrong number of dims."
-            << "; pos=" << pos
-            << "; dims.size()=" << dims.size()
-            << "; but difference must be 1.";
-        throw std::invalid_argument(msg.str());
-      }
-      x.resize(dims[pos]);
-    }
-
-
-    template <typename T>
-    inline void resize(T& t, 
-                       const std::vector<size_t>& dims) {
-      resize(t,dims,0);
-    }
-    */
 
 
     /**
@@ -257,6 +193,7 @@ namespace stan {
      *
      * <p><b>Storage Order</b>: Storage is column/last-index major.
      */
+    template <typename RNG = boost::random::ecuyer1988>
     class chains {
     private:
 
@@ -268,6 +205,8 @@ namespace stan {
       const std::map<std::string,size_t> _name_to_index;
       // [chain,param,sample]
       std::vector<std::vector<std::vector<double > > > _samples; 
+      std::vector<size_t> _permutation;
+      RNG _rng; // defaults to time-based init
 
       static size_t calc_num_params(const std::vector<size_t>& dims) {
         size_t num_params = 1;
@@ -342,6 +281,11 @@ namespace stan {
               << _samples[k][0].size();
           throw std::out_of_range(msg.str());
         }
+      }
+
+      void resize_permutation(size_t K) {
+        if (_permutation.size() != K) 
+          permutation(_permutation,K,_rng);
       }
 
     public:
@@ -798,13 +742,18 @@ namespace stan {
       get_kept_samples_permuted(size_t n,
                                 std::vector<double>& samples) {
         validate_param_idx(n);
-        samples.resize(0);
-        samples.reserve(num_kept_samples());
-        for (size_t k = 0; k < num_chains(); ++k)
-          if (num_kept_samples(k) > 0)
-            samples.insert(samples.end(),
-                           _samples[k][n].begin() + warmup(),
-                           _samples[k][n].end());
+        size_t M = num_kept_samples();
+        samples.resize(M);
+        resize_permutation(M);
+        // const std::vector<size_t>& permutation = _permutation;
+        size_t pos = 0;
+        for (size_t k = 0; k < num_chains(); ++k) {
+          // const std::vector<double>& samples_k_n = _samples[k][n];
+          for (size_t m = warmup(); m < num_samples(k); ++m) {
+            samples[_permutation[pos]] = _samples[k][n][m]; // _samples_k_n[m];
+            ++pos;
+          }
+        }
       }
 
       /**
@@ -899,25 +848,7 @@ namespace stan {
                            _samples[k][n].begin() + warmup());
       }
 
-      /**
-       * Fill the specified sample array with the structure
-       * corresponding to the specified parameter.  
-       *
-       * @param j Named parameter index.
-       * @param samples Vector into which to write structured samples
-       * @throw std::out_of_range If the parameter index is greater
-       * than or equal to the number of named parameters.
-       */
-      template <typename T>
-      void
-      get_structured_permuted_samples(size_t j,
-                                      std::vector<T>& samples) {
-        validate_param_name_idx(j);
-        samples.resize(0);
-        samples.reserve(num_kept_samples());
-      }
-                                      
-
+    
     };
 
   }
@@ -928,74 +859,6 @@ namespace stan {
 
 
 /*
-// k: chain index
-// n: parameter index
-// j: parameter name index
-
-
-chains(size_t num_chains,
-       const vector<string>& names,
-       const vector<vector<size_t> >& dims);
-
-size_t num_chains();
-
-size_t num_params();
-
-size_t num_param_names();
-
-const vector<string>& param_names();
-const string& param_name(size_t n);
-
-const vector<vector<size_t> >& param_dimss();
-const vector<size_t>& param_dims(size_t j);
-
-const vector<size_t>& param_starts();
-size_t param_start(size_t j);
-
-const vector<size_t>& param_sizes();
-size_t param_size(size_t j);
-
-size_t param_name_to_index(const string& name);
-
-size_t get_total_param_index(size_t j, 
-                             const vector<size_t>& idxs);
-
-void add(size_t chain,
-         vector<double> theta);
-
-void set_warmup(size_t warmup);
-size_t get_warmup();
-
-size_t num_warmup_samples(size_t k);
-size_t num_warmup_samples();
-
-size_t num_kept_samples(size_t k);
-size_t num_kept_samples();
-
-size_t num_total_samples(size_t k);
-size_t num_total_samples();
-
-// all kept samples scrambled consistently
-void get_samples_permuted(size_t n,
-                          vector<double>& samples);
-
-// all kept samples, in original order
-void get_samples(size_t n,
-                 size_t k, 
-                 vector<double>& samples);
-
-void get_warmup_samples(size_t n,
-                        size_t k,
-                        vector<double>& samples);
-
-template <typename T>
-void get_struct_samples(size_t j,
-                        vector<T>& samples);
-
-template <typename T>
-void get_struct_samples(size_t j,
-                        size_t k,
-                        vector<T>& samples);
 
 double mean(size_t n);
 

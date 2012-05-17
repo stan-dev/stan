@@ -1,6 +1,7 @@
 #include <stan/mcmc/chains.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/additive_combine.hpp>
+#include <set>
 
 TEST(McmcChains, validate_dim_idxs) {
   using stan::mcmc::validate_dims_idxs;
@@ -27,12 +28,12 @@ void test_permutation(size_t N) {
   EXPECT_EQ(N,pi.size());
   for (size_t i = 0; i < N; ++i)
     EXPECT_TRUE(pi[i] < N);
-  int match_count = 0;
+  size_t match_count = 0;
   for (size_t i = 0; i < N; ++i)
     for (size_t j = 0; j < N; ++j)
       if (pi[j] == i) ++match_count;
   EXPECT_EQ(N,match_count);
-
+  
 }
 
 TEST(McmcChains,permutation) {
@@ -187,11 +188,11 @@ TEST(McmcChains,ctor_and_immutable_getters) {
   dimss.push_back(d_dims);
   dimss.push_back(c_dims);
 
-  chains c(K,names,dimss);
+  chains<> c(K,names,dimss);
 
   EXPECT_EQ(4U, c.num_chains());
 
-  EXPECT_EQ(1 + 2 + 3*4*5 + 6*7, c.num_params());
+  EXPECT_EQ(size_t(1 + 2 + 3*4*5 + 6*7), c.num_params());
 
   EXPECT_EQ(4U, c.num_param_names());
 
@@ -206,14 +207,14 @@ TEST(McmcChains,ctor_and_immutable_getters) {
   EXPECT_EQ("c", c.param_name(3));
   EXPECT_THROW(c.param_name(5), std::out_of_range);
 
-  EXPECT_EQ(0, c.param_start(0));
-  EXPECT_EQ(1, c.param_start(1));
-  EXPECT_EQ(3, c.param_start(2));
-  EXPECT_EQ(63, c.param_start(3));
-  EXPECT_EQ(0, c.param_starts()[0]);
-  EXPECT_EQ(1, c.param_starts()[1]);
-  EXPECT_EQ(3, c.param_starts()[2]);
-  EXPECT_EQ(63, c.param_starts()[3]);
+  EXPECT_EQ(0U, c.param_start(0));
+  EXPECT_EQ(1U, c.param_start(1));
+  EXPECT_EQ(3U, c.param_start(2));
+  EXPECT_EQ(63U, c.param_start(3));
+  EXPECT_EQ(0U, c.param_starts()[0]);
+  EXPECT_EQ(1U, c.param_starts()[1]);
+  EXPECT_EQ(3U, c.param_starts()[2]);
+  EXPECT_EQ(63U, c.param_starts()[3]);
   EXPECT_THROW(c.param_start(5), std::out_of_range);
 
   EXPECT_EQ(1U, c.param_size(0));
@@ -297,9 +298,9 @@ TEST(McmcChains,warmup_get_set) {
   using std::string;
   using stan::mcmc::chains;
 
-  chains c(2,
-           vector<string>(1,"a"), 
-           vector<vector<size_t> >(1,vector<size_t>(0)));
+  chains<> c(2,
+             vector<string>(1,"a"), 
+             vector<vector<size_t> >(1,vector<size_t>(0)));
 
   EXPECT_EQ(0U, c.warmup());
   c.set_warmup(1000U);
@@ -332,7 +333,7 @@ TEST(McmcChains,add) {
   dimss.push_back(b_dims);
   dimss.push_back(a_dims);
   dimss.push_back(c_dims);
-  chains c(K,names,dimss);
+  chains<> c(K,names,dimss);
 
   size_t N = 1 + 2*3 + 4;
 
@@ -433,7 +434,7 @@ TEST(McmcChains,get_samples) {
   dimss.push_back(a_dims);
   dimss.push_back(c_dims);
 
-  chains c(K,names,dimss);
+  chains<> c(K,names,dimss);
 
   size_t N = 1 + 2*3 + 4;
   vector<double> theta(N);
@@ -543,4 +544,51 @@ TEST(McmcChains,get_samples) {
   EXPECT_EQ(2U, rho.size());
   EXPECT_THROW(c.get_kept_samples(27,0,rho), std::out_of_range);
   EXPECT_THROW(c.get_kept_samples(0,1012,rho), std::out_of_range);
+}
+
+TEST(McmcChains, get_kept_samples_permuted) {
+  using std::vector;
+  using std::string;
+  using stan::mcmc::chains;
+
+  size_t K = 3; // num chains
+
+  vector<string> names; // dims
+  names.push_back("b"); // ()
+  names.push_back("a"); // ()
+
+  vector<vector<size_t> > dimss(2,vector<size_t>(0));
+
+  chains<> c(K,names,dimss);
+
+  std::set<double> expected;
+  std::set<double> found;
+
+  for (size_t k = 0; k < K; ++k) {
+    for (size_t n = 0; n < 20U + k; ++n) {
+      double val = (k + 1) * 100 + n; // all distinct
+      c.add(k,vector<double>(2,val));
+      if (n >= 10U)
+        expected.insert(val);
+    }
+  }
+  c.set_warmup(10U);
+
+  vector<double> samples0;
+  vector<double> samples1;
+
+  EXPECT_EQ(33U, c.num_kept_samples()); // 3 * 10 + (0 + 1 + 2)
+  
+  c.get_kept_samples_permuted(0,samples0);
+  c.get_kept_samples_permuted(1,samples1);
+
+  
+  EXPECT_EQ(samples0.size(), samples1.size());
+  for (size_t m = 0; m < samples0.size(); ++m)
+    EXPECT_FLOAT_EQ(samples0[m], samples1[m]);
+
+  for (size_t m = 0; m < samples0.size(); ++m)
+    found.insert(samples0[m]);
+  EXPECT_EQ(expected,found);
+ 
 }
