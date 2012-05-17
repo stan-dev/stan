@@ -112,9 +112,9 @@ namespace stan {
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy>
-    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
     beta_p(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy&) {
+           const Policy&) {
       static const char* function = "stan::prob::beta_p(%1%)";
 
       using stan::math::check_positive;
@@ -142,14 +142,16 @@ namespace stan {
       if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
         return lp;
       
-      if (y < 0.0 || y > 1.0)
-        return LOG_ZERO;
+      if (y < 0.0)
+        return 0;
+      if (y > 1.0)
+        return 1.0;
       
-      return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
+      return stan::math::ibeta(alpha, beta, y);
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
     beta_p(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       return beta_p(y,alpha,beta,stan::math::default_policy());
     }
