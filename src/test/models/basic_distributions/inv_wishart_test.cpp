@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 
-class inv_wishart : public ::testing::Test {
+class Models_BasicDistributions_InvWishart : public ::testing::Test {
 protected:
   virtual void SetUp() {
     FILE *in;
@@ -23,7 +23,7 @@ protected:
   std::string output2;
 };
 
-TEST_F(inv_wishart,runModel) {
+TEST_F(Models_BasicDistributions_InvWishart,RunModel) {
   std::string command;
   command = model;
   command += " --samples=";

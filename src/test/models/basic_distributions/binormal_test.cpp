@@ -6,7 +6,7 @@
 #include <boost/math/distributions/students_t.hpp>
 #include <stdio.h>
 
-class binormal : public ::testing::Test {
+class Models_BasicDistributions_Binormal : public ::testing::Test {
 protected:
   virtual void SetUp() {
     FILE *in;
@@ -37,7 +37,7 @@ protected:
   double expected_y2;
 };
 
-TEST_F(binormal,runModel) {
+TEST_F(Models_BasicDistributions_Binormal,RunModel) {
   std::string command;
   command = model;
   command += " --samples=";
@@ -53,7 +53,7 @@ TEST_F(binormal,runModel) {
     << "Can not execute command: " << command << std::endl;
 }
 /*
-TEST_F(binormal, y1) {
+TEST_F(Models_BasicDistributions_Binormal, y1) {
   stan::mcmc::mcmc_output y1 = factory.create("y.1");
   double neff = y1.effectiveSize();
 
@@ -64,7 +64,7 @@ TEST_F(binormal, y1) {
   EXPECT_NEAR(expected_y1, y1.mean(), T*sqrt(y1.variance()/neff));
 }
 
-TEST_F(binormal, y2) {
+TEST_F(Models_BasicDistributions_Binormal, y2) {
   stan::mcmc::mcmc_output y2 = factory.create("y.2");
   double neff = y2.effectiveSize();  
 
