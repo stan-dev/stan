@@ -1,9 +1,5 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
-#include <stdio.h>
 
 class inv_wishart : public ::testing::Test {
 protected:
