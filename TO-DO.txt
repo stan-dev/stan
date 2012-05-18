@@ -19,6 +19,8 @@ TO DO FOR V1
     + stan/prob
   - add acknowledgements section
     + Michael Betancourt
+  - getting started for Windows (Daniel)
+    + include make targets
 
 * distribution engineering (Daniel)
  - basic distro site
