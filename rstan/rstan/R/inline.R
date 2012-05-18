@@ -12,10 +12,10 @@ rstanplugin <- function() {
                   PKG_CPPFLAGS = paste(Rcpp_plugin$env$PKG_CPPFLAGS, PKG_CPPFLAGS_env))); 
 } 
 
-registerPlugin("rstan", rstanplugin); 
+# registerPlugin("rstan", rstanplugin); 
 
 inlineCxxPlugin <- function(...) {
-  settings <- rstanplugin(); 
-  settings
+   settings <- rstanplugin(); 
+   settings
 }
 

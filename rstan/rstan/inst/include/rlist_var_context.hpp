@@ -78,7 +78,7 @@ namespace rstan {
       rlist_var_context() {} 
 
       /**
-       * Construct a rlist_var_context object from the specified two R list.
+       * Construct a rlist_var_context object from the specified R list.
        *
        * @param in Input of R list (represented by Rcpp::List) 
        * from which to read.

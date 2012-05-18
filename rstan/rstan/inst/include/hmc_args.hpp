@@ -65,15 +65,19 @@
 
 
 #include <Rcpp.h>
+#include <rlist_util.hpp>
+#include <Rinternals.h> 
+
 namespace rstan {
-  // wrap the args for running a model 
+  // wrap the arguments for hmc (including nuts) samplers 
   // from Rcpp::List 
-  class hmcargs {
+  class hmc_args {
   private:
-    std::string samples; // the file for outputing the samples 
+    std::string sample_file; // the file for outputing the samples 
     unsigned int iter;   // number of iterations 
     unsigned int warmup; // number of warmup 
     unsigned int thin; 
+    unsigned int refresh; 
     int leapfrog_steps; 
     double epsilon; 
     int max_treedepth; 
@@ -88,11 +92,12 @@ namespace rstan {
     std::string init; 
    
   public:
-    hmcargs(): 
-      samples("samples.csv"),  
+    hmc_args(): 
+      sample_file("samples.csv"),  
       iter(2000U), 
       warmup(1000U), 
       thin(1U), 
+      refresh(1U), 
       leapfrog_steps(-1), 
       epsilon(-1.0), 
       max_treedepth(10), 
@@ -106,16 +111,91 @@ namespace rstan {
       test_grad(true), 
       init("random") {
     } 
-    hmcargs(Rcpp ::List) {
+    hmc_args(Rcpp::List &in) {
+      /*
+      std::vector<std::string> argnames 
+        = Rcpp::as<std::vector<std::string> >(in.names()); 
+      */
+   
+      SEXP tsexp = get_list_element_by_name(in, "sample_file"); 
+      if (Rf_isNull(tsexp)) sample_file = "samples.csv"; 
+      else sample_file = Rcpp::as<std::string>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "iter"); 
+      if (Rf_isNull(tsexp)) iter = 2000U;  
+      else iter = Rcpp::as<unsigned int>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "warmup"); 
+      if (Rf_isNull(tsexp)) warmup = iter / 2; 
+      else warmup = Rcpp::as<unsigned int>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "thin"); 
+      unsigned int calculated_thin = (iter - warmup) / 1000U;
+      if (Rf_isNull(tsexp)) thin = (calculated_thin > 1) ? calculated_thin : 1U;
+      else thin = Rcpp::as<unsigned int>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "leapfrog_steps");
+      if (Rf_isNull(tsexp)) leapfrog_steps = -1; 
+      else leapfrog_steps = Rcpp::as<int>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "epsilon"); 
+      if (Rf_isNull(tsexp)) epsilon = -1.0; 
+      else epsilon = Rcpp::as<double>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "epsilon_pm"); 
+      if (Rf_isNull(tsexp)) epsilon_pm = 0.0; 
+      else epsilon_pm = Rcpp::as<double>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "max_treedepth"); 
+      if (Rf_isNull(tsexp))  max_treedepth = 10; 
+      else max_treedepth = Rcpp::as<int>(tsexp); 
+     
+      tsexp = get_list_element_by_name(in, "epsilon_adapt"); 
+      if (Rf_isNull(tsexp)) epsilon_adapt = true; 
+      else epsilon_adapt = Rcpp::as<bool>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "delta"); 
+      if (Rf_isNull(tsexp))  delta = 0.5;
+      else delta = Rcpp::as<double>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "gamma"); 
+      if (Rf_isNull(tsexp)) gamma = 0.05; 
+      else gamma = Rcpp::as<double>(tsexp); 
+      
+      tsexp = get_list_element_by_name(in, "refresh"); 
+      if (Rf_isNull(tsexp))  refresh = 1; 
+      else refresh = Rcpp::as<unsigned int>(tsexp); 
+
+
+      tsexp = get_list_element_by_name(in, "seed"); 
+      if (Rf_isNull(tsexp)) random_seed = std::time(0); 
+      else random_seed = Rcpp::as<unsigned int>(tsexp); 
+
+      tsexp = get_list_element_by_name(in, "chain_id"); 
+      if (Rf_isNull(tsexp)) chain_id = 1; 
+      else chain_id = Rcpp::as<unsigned int>(tsexp); 
+
+      
+      tsexp = get_list_element_by_name(in, "init"); 
+      if (Rf_isNull(tsexp)) init = "random"; 
+      else init = Rcpp::as<std::string>(tsexp); // "0", "user", or "random"
+
+      tsexp = get_list_element_by_name(in, "append_samples"); 
+      if (Rf_isNull(tsexp)) append_samples = false; 
+      else append_samples = Rcpp::as<bool>(tsexp); 
+
     } 
     int get_iter() {
       return iter; 
     } 
-    std::string& get_samples() {
-      return samples; 
+    std::string& get_sample_file() {
+      return sample_file; 
     } 
     unsigned int get_warmup() {
       return warmup; 
+    } 
+    unsigned int get_refresh() { 
+      return refresh; 
     } 
     unsigned int get_thin() {
       return thin;

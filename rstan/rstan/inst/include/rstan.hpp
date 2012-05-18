@@ -2,7 +2,7 @@
 #ifndef __RSTAN__RSTAN_HPP__
 #define __RSTAN__RSTAN_HPP__
 #include <rlist_var_context.hpp> 
-#include <hmcargs.hpp> 
+#include <hmc_args.hpp> 
 
 #include <cmath>
 #include <cstddef>
@@ -49,7 +49,7 @@ namespace rstan {
   template <class Sampler, class Model>
   void sample_from(Sampler& sampler,
                    bool epsilon_adapt,
-                   // int refresh,
+                   int refresh,
                    int num_iterations,
                    int num_warmup,
                    int num_thin,
@@ -61,7 +61,9 @@ namespace rstan {
     sampler.set_params(params_r,params_i);
    
     int it_print_width = std::ceil(std::log10(num_iterations));
+    /*
     std::cout << std::endl;
+    */
 
     if (epsilon_adapt)
       sampler.adapt_on(); 
@@ -102,14 +104,8 @@ namespace rstan {
 
 
   template <class Model> class rstan {
-  private:
-    io::rlist_var_context data_; 
-    io::rlist_var_context inits_; 
-    hmcargs args_; 
-    // std::map<std::string, std::string> sampler_prop_; 
-   
   public: 
-    rstan(Rcpp::List data) : data_(data) {
+    rstan() { 
     } 
  
     /*
@@ -119,14 +115,13 @@ namespace rstan {
     } 
     */
 
-    int nuts_command() { // Rcpp::List data, Rcpp::List conf) { 
+    int nuts_command(Rcpp::List &data, Rcpp::List &args) { //, Rcpp::List &init) { 
 
       // data_ = io::rlist_var_context(data); 
-      Model model(data_); 
-      // args_ = hmcargs(conf); 
-      args_ = hmcargs(); 
+      Model model(io::rlist_var_context(data)); 
+      hmc_args args_(args); 
 
-      std::string sample_file = args_.get_samples(); 
+      std::string sample_file = args_.get_sample_file(); 
       
       unsigned int num_iterations = args_.get_iter(); 
       unsigned int num_warmup = args_.get_warmup(); 
@@ -145,6 +140,7 @@ namespace rstan {
       double gamma = args_.get_gamma(); 
 
       int random_seed = args_.get_random_seed(); 
+      unsigned int refresh = args_.get_refresh(); 
 
       int chain_id = args_.get_chain_id(); 
 
@@ -235,7 +231,7 @@ namespace rstan {
           model.write_csv_header(sample_stream);
         }
 
-        sample_from(nuts_sampler,epsilon_adapt,// refresh,
+        sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,
                     model);
@@ -253,7 +249,7 @@ namespace rstan {
           model.write_csv_header(sample_stream);
         }
 
-        sample_from(hmc_sampler,epsilon_adapt,// refresh,
+        sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,
                     model);
