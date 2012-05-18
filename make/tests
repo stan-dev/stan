@@ -5,16 +5,6 @@
 LIBGTEST := test/libgtest.a
 GTEST_MAIN := lib/gtest/src/gtest_main.cc
 
-MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
-MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
-.PHONY: test-models
-test-models: $(addsuffix $(EXE),$(MODEL_TESTS))
-	@echo '------------------------------------------------------------'
-	set -e;\
-	$(foreach test,$(MODEL_TESTS), \
-	  echo '------------------------------------------------------------';\
-	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
-
 ##
 # Target to build unit tests. All unit tests are in src/test 
 # and are named *_test.cpp
@@ -31,19 +21,39 @@ test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	  echo '------------------------------------------------------------';\
 	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 
+
+MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
+MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
+
+MISSING_MODEL_TESTS := $(shell find src/models -type f -name '*.stan')
+MISSING_MODEL_TESTS := $(MISSING_MODEL_TESTS:src/models/%.stan=models/%)
+MISSING_MODEL_TESTS := $(filter-out $(MODEL_TESTS:test/%=%),$(MISSING_MODEL_TESTS))
+.PHONY: test-models
+test-models: $(addsuffix $(EXE),$(MODEL_TESTS))
+	@echo '------------------------------------------------------------'
+	set -e;\
+	$(foreach test,$(MODEL_TESTS), \
+	  echo '------------------------------------------------------------';\
+	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
+ifneq ($(MISSING_MODEL_TESTS),)
+	@echo 
+	@echo '-------------------- Missing $(words $(MISSING_MODEL_TESTS)) tests --------------------'
+	@$(foreach missing,$(MISSING_MODEL_TESTS),\
+	   echo '  $(missing)';)
+endif
+
 ##
 # Target to build bugs models
 ##
-BUGS_EXAMPLES := $(shell cd src; find models/bugs_examples -type f -name '*.stan')
-BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
-BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
+BUGS_TESTS := $(shell find src/test/models/bugs_examples -type f -name '*_test.cpp')
+BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
 .PHONY: test-bugs
-test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
-	@echo '------------------- Running bugs models --------------------'
+test-bugs: $(addsuffix $(EXE),$(BUGS_TESTS))
+	@echo '-------------------- Running bugs examples --------------------------'
 	set -e;\
-	$(foreach test,$(BUGS_EXAMPLES), \
-		echo '--- $(test) ---';\
-		$(addsuffix $(EXE),$(test)) --data=$(test).Rdata --samples=$(test).csv;)
+	$(foreach test,$(BUGS_TESTS), \
+	  echo '------------------------------------------------------------';\
+	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 
 ##
 # Target to build all tests
