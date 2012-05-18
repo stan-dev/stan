@@ -91,12 +91,14 @@ new versions of these operating systems and gradually phase out
 testing on older versions.
 
 
-\section{Software}
+\section{Requirements}
 
 The only two absolute requirements for running \Stan are the
 \Stan source code (and dependent libraries) and a \Cpp compiler.
 
-\subsection{\Stan Source Code}
+\subsection{Source Code}
+
+\subsubsection{\Stan source code}
 
 In order to compile \Stan models, the \Stan source code is required.
 The latest version of \Stan can be downloaded from the following link.
@@ -109,7 +111,7 @@ The \Stan source code distribution includes \Stan's source code,
 documentation, build tools, unit tests, demo models, documentation and
 the source for the libraries Eigen and Boost.
 
-\subsection{googletest C++ Testing Framework}
+\subsubsection{googletest C++ Testing Framework}
 
 \Stan's unit testing is based on the Google's googletest \Cpp testing
 framework.  
@@ -125,7 +127,7 @@ Tested Version(s): 1.6.0
 %
 The googletest framework is distributed with \Stan.
 
-\subsection{Eigen Matirx and Linear Algebra Library}
+\subsubsection{Eigen Matrix and Linear Algebra Library}
 
 \Stan's matrix algebra depends on the Eigen \Cpp matrix and linear
 algebra library.  
@@ -138,7 +140,7 @@ algebra library.
 %
 The Eigen library is distributed with \Stan.
 
-\subsection{Boost C++ Library}
+\subsubsection{Boost C++ Library}
 
 \Stan's parser and some of its mathematical functions and 
 template metaprogramming facilities are implemented with the Boost
@@ -152,7 +154,7 @@ template metaprogramming facilities are implemented with the Boost
 %
 The Boost source code is distributed with \Stan.
 
-\subsection{C++ Compiler}
+\subsection{\Cpp Compiler}
 
 Compiling \Stan models requires a \Cpp compiler.  \Stan has been
 primarily developed with \clang and \gpp.  The full set of compilers
@@ -160,7 +162,8 @@ for which \Stan has been tested is
 %
 \begin{itemize}
 %
-\item \gpp, Mac versions 4.2, 4.6, Linux versions 4.4--4.7
+\item \gpp, Mac versions 4.2, 4.6, Linux versions 4.4--4.7, Windows
+  version 4.6.3
 \\
 Home: \url{http://gcc.gnu.org/}
 \\
@@ -196,7 +199,7 @@ location.
 \begin{itemize}
 \item Home: \url{http://www.gnu.org/software/make/}
 \item License: GPL3+
-\item Tested Versions: 3.81 (Mac OS X)
+\item Tested Versions: 3.81 (Mac OS X), 3.79 (Windows 7)
 \end{itemize}
 %
 
@@ -208,7 +211,7 @@ location.
 \begin{itemize}
 \item Home: \url{http://www.stack.nl/~dimitri/doxygen/index.html}
 \item License: GPL2
-\item Tested Version(s): 1.7.3
+\item Tested Version(s): Mac versions 1.7.3, 1.7.4, Windows version 1.8.0
 \end{itemize}
 
 
@@ -220,7 +223,7 @@ and documentations.
 \begin{itemize}
 \item Home: \url{http://git-scm.com/}
 \item License: GPL2
-\item Tested Version(s): 1.7.8.4
+\item Tested Version(s): Mac version 1.7.8.4, Windows version 1.7.9
 \end{itemize}
 
 
@@ -309,6 +312,42 @@ If you want to download a standalone version of Git, use
 
 Although (at the time of this writing) there were only versions listed
 up to OS X version ``Snow Leopard,'' they work on ``Lion''.
+
+
+\section{Tips for Windows}
+
+\subsection{Install Rtools}
+
+If you do not have a \Cpp compiler, the easiest way to get started
+with Stan is to install Rtools 2.15. Rtools is distributed as a
+Windows installer and includes the necessary tools to use Stan.
+
+\begin{itemize}
+  \item Download Rtools 2.15 from
+    \url{http://cran.r-project.org/bin/windows/Rtools/}.
+  \item Install Rtools 2.15. Note: allow Rtools to edit your PATH
+    environment variable.
+  \item Verify installation.
+    \begin{itemize}
+      \item Open a command window. This can be found under Start ->
+        Accessories -> Command Prompt.
+      \item Verify \Gpp is installed. Type: \verb|g++ -v|
+        You should see version information for \Gpp.
+     \item Verify make is installed. Type: \verb|make -v|
+       You should see version information for make.
+    \end{itemize}
+\end{itemize}
+
+Rtools 2.15 includes the \Gpp 4.6.3 (pre-release) compiler and many
+command line tools including: basename, cat, cmp, comm, cp, cut, date,
+diff, du, echo, expr, gzip, ls, make, makeinfo, mkdir, mv, rm, rsync,
+sed, sh, sort, tar, texindex, touch and uniq.
+
+\subsection{Install Git}
+
+The official Git installer for Windows can be found at
+\url{http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git}. Alternatively,
+there are a number of Git clients for Windows that will work.
 
 \chapter{User-Defined Functions and Gradients}\label{user-defined-functions.appendix}
 
