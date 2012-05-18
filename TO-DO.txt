@@ -162,7 +162,6 @@ EXTENSIONS
         calling templated function with stan::math::default_policy()
      + tests: only need non-agrad tests.
      + dox: add doxygen.
-  - uni/cont/beta
   - uni/cont/cauchy
   - uni/cont/chi_square
   - uni/cont/double_exponential
