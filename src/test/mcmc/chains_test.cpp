@@ -310,6 +310,8 @@ TEST(McmcChains,warmup_get_set) {
 }
 
 
+
+
 TEST(McmcChains,add) {
   using std::vector;
   using std::string;
@@ -594,7 +596,7 @@ TEST(McmcChains, get_kept_samples_permuted) {
   EXPECT_EQ(expected,found);
 }
 
-TEST(McmcChains, quantiles) {
+TEST(McmcChains, quantiles_means) {
   using std::vector;
   using std::string;
   using stan::mcmc::chains;
@@ -686,5 +688,20 @@ TEST(McmcChains, quantiles) {
 
   EXPECT_THROW(c.central_interval(2,0.8), std::out_of_range);
   EXPECT_THROW(c.central_interval(0,1.2), std::invalid_argument);
+
+  std::vector<double> samps;
+  c.get_kept_samples(0,0,samps);
+  EXPECT_FLOAT_EQ(stan::math::mean(samps),
+                  c.mean(0,0));
+  EXPECT_FLOAT_EQ(stan::math::sd(samps),
+                  c.sd(0,0));
+
+  c.get_kept_samples_permuted(0,samps);
+  EXPECT_FLOAT_EQ(stan::math::mean(samps),
+                  c.mean(0));
+  EXPECT_FLOAT_EQ(stan::math::sd(samps),
+                  c.sd(0));
+
+  
   
 }
