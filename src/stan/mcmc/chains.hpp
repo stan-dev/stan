@@ -7,13 +7,111 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <utility>
 #include <vector>
 
+#include <Eigen/Dense>
+
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/moment.hpp>
+#include <boost/accumulators/statistics/tail_quantile.hpp>
+
 #include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/additive_combine.hpp>
+
+#include <stan/math/matrix.hpp>
 
 namespace stan {  
 
   namespace mcmc {
+
+    const std::vector<std::string>& 
+    test_match_return_names(const std::vector<std::string>& names,
+                            const std::vector<std::vector<size_t> >& dimss) {
+      if (names.size() == dimss.size())
+        return names;
+      std::stringstream msg;
+      msg << "names and dimss mismatch in size"
+          << " names.size()=" << names.size()
+          << " dimss.size()=" << dimss.size();
+      throw std::invalid_argument(msg.str());
+    }
+
+    void validate_prob(double p) {
+      // test this way so NaN fails
+      if (p >= 0.0 && p <= 1.0) 
+        return;
+      std::stringstream msg;
+      msg << "require probabilities to be finite between 0 and 1 inclusive."
+          << " found p=" << p;
+      throw std::invalid_argument(msg.str());
+    }
+
+    void calc_quantiles(const std::vector<double>& ys,
+                        const std::vector<double>& probs,
+                        std::vector<double>& quantiles) {
+      using boost::accumulators::accumulator_set;
+      using boost::accumulators::quantile;
+      using boost::accumulators::quantile_probability;
+      using boost::accumulators::right;
+      using boost::accumulators::stats;
+      using boost::accumulators::tag::tail;
+      using boost::accumulators::tag::tail_quantile;
+
+      for (size_t i = 0; i < probs.size(); ++i)
+        validate_prob(probs[i]);
+      quantiles.resize(probs.size());
+
+      // keeps all (more efficient to have two for (min,0.5) and (0.5,max))
+      typedef accumulator_set<double, stats<tail_quantile<right> > >
+        accum_high;
+      accum_high accum(tail<right>::cache_size = ys.size());
+
+      for (size_t i = 0; i < ys.size(); ++i)
+        accum(ys[i]);
+        
+      for (size_t i = 0; i < probs.size(); ++i)
+        quantiles[i] = quantile(accum, quantile_probability = probs[i]);
+    }
+
+    double calc_quantile(const std::vector<double>& ys,
+                         double prob) {
+      using namespace boost::accumulators;
+
+      if (prob < 0.5) {
+        // need 2+ for interpolation
+        std::size_t cs(2 + prob * ys.size()); // cache size
+        accumulator_set<double, stats<tag::tail_quantile<left> > > 
+          acc(tag::tail<left>::cache_size = cs);
+        for (size_t i = 0; i < ys.size(); ++i)
+          acc(ys[i]);
+        return quantile(acc, quantile_probability = prob);
+      } else {
+        // need 2+ for interpolation
+        std::size_t cs(2 + (1.0 - prob) * ys.size()); // cache size
+        accumulator_set<double, stats<tag::tail_quantile<right> > > 
+          acc(tag::tail<right>::cache_size = cs);
+        for (size_t i = 0; i < ys.size(); ++i)
+          acc(ys[i]);
+        return quantile(acc, quantile_probability = prob);
+      }
+      
+    }
+
+    inline std::pair<double,double>
+    calc_central_interval(const std::vector<double>& samples,
+                          double prob) {
+      validate_prob(prob);
+      double low_prob = (1.0 - prob) / 2.0;
+      double high_prob = 1.0 - low_prob;
+      // better to use  calc_quantiles?  not if big!
+      double low_quantile = calc_quantile(samples,low_prob);
+      double high_quantile = calc_quantile(samples,high_prob);
+      return std::pair<double,double>(low_quantile,high_quantile);
+    }
+
 
     /**
      * Validate the specified indexes with respect to the
@@ -189,6 +287,7 @@ namespace stan {
      *
      * <p><b>Storage Order</b>: Storage is column/last-index major.
      */
+    template <typename RNG = boost::random::ecuyer1988>
     class chains {
     private:
 
@@ -200,6 +299,8 @@ namespace stan {
       const std::map<std::string,size_t> _name_to_index;
       // [chain,param,sample]
       std::vector<std::vector<std::vector<double > > > _samples; 
+      std::vector<size_t> _permutation;
+      RNG _rng; // defaults to time-based init
 
       static size_t calc_num_params(const std::vector<size_t>& dims) {
         size_t num_params = 1;
@@ -276,6 +377,11 @@ namespace stan {
         }
       }
 
+      void resize_permutation(size_t K) {
+        if (_permutation.size() != K) 
+          permutation(_permutation,K,_rng);
+      }
+
     public:
 
       /**
@@ -303,22 +409,14 @@ namespace stan {
              const std::vector<std::string>& names,
              const std::vector<std::vector<size_t> >& dimss) 
         : _warmup(0),
-          _names(names),
+          // function call tests dimensionality match & returns names
+          _names(names), // test_match_return_names(names,dimss)),
           _dimss(dimss),
           _num_params(calc_total_num_params(dimss)),
           _starts(calc_starts(dimss)),               // copy
           _name_to_index(calc_name_to_index(names)), // copy
           _samples(num_chains,std::vector<std::vector<double> >(_num_params))
-      {
-        if (names.size() != dimss.size()) {
-          std::stringstream msg;
-          msg << "names and dimss mismatch in size"
-              << " names.size()=" << names.size()
-              << " dimss.size()=" << dimss.size();
-          throw std::invalid_argument(msg.str());
-        }
-      }
-      
+      {  }
       
       /**
        * Return the number of chains.
@@ -730,13 +828,18 @@ namespace stan {
       get_kept_samples_permuted(size_t n,
                                 std::vector<double>& samples) {
         validate_param_idx(n);
-        samples.resize(0);
-        samples.reserve(num_kept_samples());
-        for (size_t k = 0; k < num_chains(); ++k)
-          if (num_kept_samples(k) > 0)
-            samples.insert(samples.end(),
-                           _samples[k][n].begin() + warmup(),
-                           _samples[k][n].end());
+        size_t M = num_kept_samples();
+        samples.resize(M);
+        resize_permutation(M);
+        // const std::vector<size_t>& permutation = _permutation;
+        size_t pos = 0;
+        for (size_t k = 0; k < num_chains(); ++k) {
+          // const std::vector<double>& samples_k_n = _samples[k][n];
+          for (size_t m = warmup(); m < num_samples(k); ++m) {
+            samples[_permutation[pos]] = _samples[k][n][m]; // _samples_k_n[m];
+            ++pos;
+          }
+        }
       }
 
       /**
@@ -831,25 +934,216 @@ namespace stan {
                            _samples[k][n].begin() + warmup());
       }
 
-      /**
-       * Fill the specified sample array with the structure
-       * corresponding to the specified parameter.  
-       *
-       * @param j Named parameter index.
-       * @param samples Vector into which to write structured samples
-       * @throw std::out_of_range If the parameter index is greater
-       * than or equal to the number of named parameters.
-       */
-      template <typename T>
-      void
-      get_structured_permuted_samples(size_t j,
-                                      std::vector<T>& samples) {
-        validate_param_name_idx(j);
-        samples.resize(0);
-        samples.reserve(num_kept_samples());
-      }
-                                      
 
+      /**
+       * Return the sample mean of the kept samples in the
+       * specified chain for the specified parameter.
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @return Sample mean of parameter in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double mean(size_t k,
+                  size_t n) {
+        // validation in get_samples
+        std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        return stan::math::mean(samples);
+      }
+
+      /**
+       * Return the sample mean of the kept samples in all
+       * chains for the specified parameter.
+       *
+       * @param n Parameter index.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double mean(size_t n) {
+        std::vector<double> samples;
+        get_kept_samples(n,samples);
+        return stan::math::mean(samples);
+      }
+
+      /**
+       * Return the sample standard deviation of the kept samples in
+       * the specified chain for the specified parameter.  This method
+       * divides by number of kept samples minus 1 (and is thus based
+       * on an unbiased variance estimate from the samples).
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @return Sample mean of parameter in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double sd(size_t k,
+                size_t n) {
+                std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        return stan::math::sd(samples);
+      }
+
+      /**
+       * Return the sample standard deviation of the kept samples in
+       * all chains for the specified parameter.  This method divides
+       * by the number of kept samples minus 1 (and is htus based on
+       * an unbiased variance estimate from the samples).
+       *
+       * @param n Parameter index.
+       * @return Sample standard deviation of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double sd(size_t n) {
+        std::vector<double> samples;
+        get_kept_samples(n,samples);
+        return stan::math::sd(samples);
+      }
+
+      /**
+       * Return the specified sample quantile for kept samples for the
+       * specified parameter in the specified chain.
+       *
+       * @param k Chain index
+       * @param n Parameter index
+       * @param prob Quantile probability
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or if the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the probabilty is not between
+       * 0 and 1 inclusive.
+       */
+      double quantile(size_t k,
+                      size_t n,
+                      double prob) {
+
+        std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        return calc_quantile(samples,prob);
+      }
+
+      /**
+       * Return the specified sample quantile for kept samples for the
+       * specified parameter across all chains.
+       *
+       * @param n Parameter index
+       * @param prob Quantile probability
+       * @throw std::out_of_range If the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the probabilty is not between
+       * 0 and 1 inclusive.
+       */
+      double quantile(size_t n,
+                      double prob) {
+        std::vector<double> samples;
+        get_kept_samples_permuted(n,samples);
+        return calc_quantile(samples,prob);
+      }
+
+      /**
+       * Write the specified sample quantiles into the specified
+       * vector for the kept samples for the specified parameter
+       * in the specified chain.
+       *
+       * @param k Chain index
+       * @param n Parameter index
+       * @param probs Quantile probabilities
+       * @param quantiles Vector into which to write sample quantiles
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or if the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the any quantile probabilty is 
+       * not between 0 and 1 inclusive.
+       */
+      void quantiles(size_t k,
+                     size_t n,
+                     const std::vector<double>& probs,
+                     std::vector<double>& quantiles) {
+        std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        calc_quantiles(samples,probs,quantiles);
+      }
+
+      /**
+       * Write the specified sample quantiles into the specified
+       * vector for the kept samples for the specified parameter
+       * across all chains.
+       *
+       * @param n Parameter index
+       * @param probs Quantile probabilities
+       * @param quantiles Vector into which to write sample quantiles
+       * @throw std::out_of_range If the parameter index is greater
+       * than the number of parameters
+       * @throw std::invalid_argument If the any quantile probabilty is 
+       * not between 0 and 1 inclusive.
+       */
+      void quantiles(size_t n,
+                     const std::vector<double>& probs,
+                     std::vector<double>& quantiles) {
+        std::vector<double> samples;
+        get_kept_samples_permuted(n,samples);
+        calc_quantiles(samples,probs,quantiles);
+      }
+
+      /**
+       * Return the specified sample central interval for the specified
+       * parameter in the kept samples in the specified chain.  
+       *
+       * <p>The central interval of width p is defined to be (ql,qh)
+       * where ql is the (1-p)/2 quantile and qh is the 1 - ql
+       * quantile.
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @param prob Width of central interval.
+       * @return Pair consisting of low and high quantile.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or if the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the the interval width is not
+       * between 0 and 1 inclusive.
+       */
+      std::pair<double,double>
+      central_interval(size_t k,
+                       size_t n,
+                       double prob) {
+        std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        return calc_central_interval(samples,prob);
+      }
+
+      /**
+       * Return the specified central interval for the specified
+       * parameter in the kept samples of all chains.
+       *
+       * <p>The central interval of width p is defined to be (ql,qh)
+       * where ql is the (1 - p) / 2 quantile and qh is the 1 - ql
+       * quantile.
+       *
+       * @param n Parameter index.
+       * @param prob Width of central interval.
+       * @return Pair consisting of low and high quantile.
+       * @throw std::out_of_range If the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the the interval width is not
+       * between 0 and 1 inclusive.
+       */
+      std::pair<double,double>
+      central_interval(size_t n,
+                       double prob) {
+        std::vector<double> samples;
+        get_kept_samples_permuted(n,samples);
+        return calc_central_interval(samples,prob);
+      }
+
+
+    
     };
 
   }
@@ -860,87 +1154,7 @@ namespace stan {
 
 
 /*
-// k: chain index
-// n: parameter index
-// j: parameter name index
 
-
-chains(size_t num_chains,
-       const vector<string>& names,
-       const vector<vector<size_t> >& dims);
-
-size_t num_chains();
-
-size_t num_params();
-
-size_t num_param_names();
-
-const vector<string>& param_names();
-const string& param_name(size_t n);
-
-const vector<vector<size_t> >& param_dimss();
-const vector<size_t>& param_dims(size_t j);
-
-const vector<size_t>& param_starts();
-size_t param_start(size_t j);
-
-const vector<size_t>& param_sizes();
-size_t param_size(size_t j);
-
-size_t param_name_to_index(const string& name);
-
-size_t get_total_param_index(size_t j, 
-                             const vector<size_t>& idxs);
-
-void add(size_t chain,
-         vector<double> theta);
-
-void set_warmup(size_t warmup);
-size_t get_warmup();
-
-size_t num_warmup_samples(size_t k);
-size_t num_warmup_samples();
-
-size_t num_kept_samples(size_t k);
-size_t num_kept_samples();
-
-size_t num_total_samples(size_t k);
-size_t num_total_samples();
-
-// all kept samples scrambled consistently
-void get_samples_permuted(size_t n,
-                          vector<double>& samples);
-
-// all kept samples, in original order
-void get_samples(size_t n,
-                 size_t k, 
-                 vector<double>& samples);
-
-void get_warmup_samples(size_t n,
-                        size_t k,
-                        vector<double>& samples);
-
-template <typename T>
-void get_struct_samples(size_t j,
-                        vector<T>& samples);
-
-template <typename T>
-void get_struct_samples(size_t j,
-                        size_t k,
-                        vector<T>& samples);
-
-double mean(size_t n);
-
-double sd(size_t n);
-
-void quantiles(size_t n,
-               const vector<double>& probs,
-               vector<double>& quantiles);
-double quantile(size_t n,
-                double prob);
-
-pair<double,double> central_interval(size_t n,
-                                     double prob);
 
 pair<double,double> smallest_interval(size_t n,
                                       double prob);

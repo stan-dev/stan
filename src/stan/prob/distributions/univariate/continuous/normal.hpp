@@ -98,8 +98,6 @@ namespace stan {
       return normal_log<false>(y,mu,sigma,stan::math::default_policy());
     }
 
-
-
     /**
      * Calculates the normal cumulative distribution function for the given
      * variate, location, and scale.
