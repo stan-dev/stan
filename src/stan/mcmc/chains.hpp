@@ -2,6 +2,7 @@
 #define __STAN__MCMC__CHAINS_HPP__
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -15,8 +16,9 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/moment.hpp>
+// #include <boost/accumulators/statistics/moment.hpp>
 #include <boost/accumulators/statistics/tail_quantile.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -48,70 +50,6 @@ namespace stan {
           << " found p=" << p;
       throw std::invalid_argument(msg.str());
     }
-
-    void calc_quantiles(const std::vector<double>& ys,
-                        const std::vector<double>& probs,
-                        std::vector<double>& quantiles) {
-      using boost::accumulators::accumulator_set;
-      using boost::accumulators::quantile;
-      using boost::accumulators::quantile_probability;
-      using boost::accumulators::right;
-      using boost::accumulators::stats;
-      using boost::accumulators::tag::tail;
-      using boost::accumulators::tag::tail_quantile;
-
-      for (size_t i = 0; i < probs.size(); ++i)
-        validate_prob(probs[i]);
-      quantiles.resize(probs.size());
-
-      // keeps all (more efficient to have two for (min,0.5) and (0.5,max))
-      typedef accumulator_set<double, stats<tail_quantile<right> > >
-        accum_high;
-      accum_high accum(tail<right>::cache_size = ys.size());
-
-      for (size_t i = 0; i < ys.size(); ++i)
-        accum(ys[i]);
-        
-      for (size_t i = 0; i < probs.size(); ++i)
-        quantiles[i] = quantile(accum, quantile_probability = probs[i]);
-    }
-
-    double calc_quantile(const std::vector<double>& ys,
-                         double prob) {
-      using namespace boost::accumulators;
-
-      if (prob < 0.5) {
-        // need 2+ for interpolation
-        std::size_t cs(2 + prob * ys.size()); // cache size
-        accumulator_set<double, stats<tag::tail_quantile<left> > > 
-          acc(tag::tail<left>::cache_size = cs);
-        for (size_t i = 0; i < ys.size(); ++i)
-          acc(ys[i]);
-        return quantile(acc, quantile_probability = prob);
-      } else {
-        // need 2+ for interpolation
-        std::size_t cs(2 + (1.0 - prob) * ys.size()); // cache size
-        accumulator_set<double, stats<tag::tail_quantile<right> > > 
-          acc(tag::tail<right>::cache_size = cs);
-        for (size_t i = 0; i < ys.size(); ++i)
-          acc(ys[i]);
-        return quantile(acc, quantile_probability = prob);
-      }
-      
-    }
-
-    inline std::pair<double,double>
-    calc_central_interval(const std::vector<double>& samples,
-                          double prob) {
-      validate_prob(prob);
-      double low_prob = (1.0 - prob) / 2.0;
-      double high_prob = 1.0 - low_prob;
-      // better to use  calc_quantiles?  not if big!
-      double low_quantile = calc_quantile(samples,low_prob);
-      double high_quantile = calc_quantile(samples,high_prob);
-      return std::pair<double,double>(low_quantile,high_quantile);
-    }
-
 
     /**
      * Validate the specified indexes with respect to the
@@ -843,6 +781,46 @@ namespace stan {
       }
 
       /**
+       * Apply the specified functor to each kept sample for the
+       * specified parameter in the specified chain.  The samples are
+       * visited in the order they were added.
+       *
+       * @tparam F Type of functor to apply
+       * @param k Chain index
+       * @param n Parameter index
+       * @param f Functor to apply to kept samples
+       */
+      template <typename F>
+      void
+      apply_kept_samples(size_t k,
+                         size_t n,
+                         F& f) {
+        using std::vector;
+        for (vector<double>::const_iterator it = _samples[k][n].begin() + warmup();
+             it != _samples[k][n].end();
+             ++it)
+          f(*it);
+      }
+
+      /**
+       * Apply the specified functor to each kept sample for the
+       * specified parameter across all chains.  The samples are
+       * visited in the order of chain index, and within a chain, in
+       * the order they were added.
+       *
+       * @tparam F Type of functor to apply
+       * @param n Parameter index
+       * @param f Functor to apply to kept samples
+       */
+      template <typename F>
+      void
+      apply_kept_samples(size_t n,
+                         F& f) {
+        for (size_t k = 0; k < num_chains(); ++k)
+          apply_kept_samples(k,n,f);
+      }
+
+      /**
        * Write into the specified vector the kept samples for the
        * scalar parameter with the specified index in the chain with
        * the specified index.  The order of samples is the order in
@@ -948,10 +926,14 @@ namespace stan {
        */
       double mean(size_t k,
                   size_t n) {
-        // validation in get_samples
-        std::vector<double> samples;
-        get_kept_samples(k,n,samples);
-        return stan::math::mean(samples);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::mean;
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        accumulator_set<double, stats<mean> > acc;
+        apply_kept_samples(k,n,acc);
+        return boost::accumulators::mean(acc);
       }
 
       /**
@@ -963,16 +945,20 @@ namespace stan {
        * greater than or equal to the number of parameters.
        */
       double mean(size_t n) {
-        std::vector<double> samples;
-        get_kept_samples(n,samples);
-        return stan::math::mean(samples);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::mean;
+        validate_param_idx(n);
+        accumulator_set<double, stats<mean> > acc;
+        apply_kept_samples(n,acc);
+        return boost::accumulators::mean(acc);
       }
 
       /**
        * Return the sample standard deviation of the kept samples in
        * the specified chain for the specified parameter.  This method
-       * divides by number of kept samples minus 1 (and is thus based
-       * on an unbiased variance estimate from the samples).
+       * uses the unbiased variance estimator (and thus divides by M-1
+       * rather than M in the denominator)
        *
        * @param k Chain index.
        * @param n Parameter index.
@@ -983,9 +969,15 @@ namespace stan {
        */
       double sd(size_t k,
                 size_t n) {
-                std::vector<double> samples;
-        get_kept_samples(k,n,samples);
-        return stan::math::sd(samples);
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(k,n,acc);
+        double M = num_kept_samples(k);
+        return std::sqrt((M / (M-1)) * boost::accumulators::variance(acc));
       }
 
       /**
@@ -1001,9 +993,14 @@ namespace stan {
        * greater than or equal to the number of parameters.
        */
       double sd(size_t n) {
-        std::vector<double> samples;
-        get_kept_samples(n,samples);
-        return stan::math::sd(samples);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(n,acc);
+        double M = num_kept_samples();
+        return std::sqrt((M / (M-1)) * boost::accumulators::variance(acc));
       }
 
       /**
@@ -1022,10 +1019,29 @@ namespace stan {
       double quantile(size_t k,
                       size_t n,
                       double prob) {
-
-        std::vector<double> samples;
-        get_kept_samples(k,n,samples);
-        return calc_quantile(samples,prob);
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::left;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        double size = num_kept_samples(k);
+        if (prob < 0.5) {
+          std::size_t cs(2 + prob * size); // 2+ for interpolation
+          accumulator_set<double, stats<tail_quantile<left> > > 
+            acc(tail<left>::cache_size = cs);
+          apply_kept_samples(k,n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        } else {
+          std::size_t cs(2 + (1.0 - prob) * size);
+          accumulator_set<double, stats<tail_quantile<right> > > 
+            acc(tail<right>::cache_size = cs);
+          apply_kept_samples(k,n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        }
       }
 
       /**
@@ -1041,9 +1057,28 @@ namespace stan {
        */
       double quantile(size_t n,
                       double prob) {
-        std::vector<double> samples;
-        get_kept_samples_permuted(n,samples);
-        return calc_quantile(samples,prob);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::left;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        double size = num_kept_samples();
+        if (prob < 0.5) {
+          std::size_t cs(2 + prob * size); // 2+ for interpolation
+          accumulator_set<double, stats<tail_quantile<left> > > 
+            acc(tail<left>::cache_size = cs);
+          apply_kept_samples(n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        } else {
+          std::size_t cs(2 + (1.0 - prob) * size);
+          accumulator_set<double, stats<tail_quantile<right> > > 
+            acc(tail<right>::cache_size = cs);
+          apply_kept_samples(n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        }
       }
 
       /**
@@ -1065,9 +1100,26 @@ namespace stan {
                      size_t n,
                      const std::vector<double>& probs,
                      std::vector<double>& quantiles) {
-        std::vector<double> samples;
-        get_kept_samples(k,n,samples);
-        calc_quantiles(samples,probs,quantiles);
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        for (size_t i = 0; i < probs.size(); ++i)
+          validate_prob(probs[i]);
+        quantiles.resize(probs.size());
+
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::quantile;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        // keeps all (more efficient to have two for (min,0.5) and (0.5,max))
+        accumulator_set<double, stats<tail_quantile<right> > >
+          acc(tail<right>::cache_size = num_kept_samples(k));
+        apply_kept_samples(k,n,acc);
+        
+        for (size_t i = 0; i < probs.size(); ++i)
+          quantiles[i] = quantile(acc, quantile_probability = probs[i]);
       }
 
       /**
@@ -1086,9 +1138,23 @@ namespace stan {
       void quantiles(size_t n,
                      const std::vector<double>& probs,
                      std::vector<double>& quantiles) {
-        std::vector<double> samples;
-        get_kept_samples_permuted(n,samples);
-        calc_quantiles(samples,probs,quantiles);
+        validate_param_idx(n);
+        for (size_t i = 0; i < probs.size(); ++i)
+          validate_prob(probs[i]);
+        quantiles.resize(probs.size());
+
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::quantile;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        accumulator_set<double, stats<tail_quantile<right> > >
+          acc(tail<right>::cache_size = num_kept_samples());
+        apply_kept_samples(n,acc);
+        for (size_t i = 0; i < probs.size(); ++i)
+          quantiles[i] = quantile(acc, quantile_probability = probs[i]);
       }
 
       /**
@@ -1113,9 +1179,13 @@ namespace stan {
       central_interval(size_t k,
                        size_t n,
                        double prob) {
-        std::vector<double> samples;
-        get_kept_samples(k,n,samples);
-        return calc_central_interval(samples,prob);
+        // validate k,n in calls to quantile
+        validate_prob(prob);
+        double low_prob = (1.0 - prob) / 2.0;
+        double high_prob = 1.0 - low_prob;
+        double low_quantile = quantile(k,n,low_prob);
+        double high_quantile = quantile(k,n,high_prob);
+        return std::pair<double,double>(low_quantile,high_quantile);
       }
 
       /**
@@ -1137,9 +1207,13 @@ namespace stan {
       std::pair<double,double>
       central_interval(size_t n,
                        double prob) {
-        std::vector<double> samples;
-        get_kept_samples_permuted(n,samples);
-        return calc_central_interval(samples,prob);
+        // validate n in calls to quantile
+        validate_prob(prob);
+        double low_prob = (1.0 - prob) / 2.0;
+        double high_prob = 1.0 - low_prob;
+        double low_quantile = quantile(n,low_prob);
+        double high_quantile = quantile(n,high_prob);
+        return std::pair<double,double>(low_quantile,high_quantile);
       }
 
 
