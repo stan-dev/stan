@@ -39,7 +39,7 @@ ifneq ($(MISSING_MODEL_TESTS),)
 	@echo 
 	@echo '-------------------- Missing $(words $(MISSING_MODEL_TESTS)) tests --------------------'
 	@$(foreach missing,$(MISSING_MODEL_TESTS),\
-	   echo '  $(missing)';)
+	   echo '  src/$(missing).stan';)
 endif
 
 ##
