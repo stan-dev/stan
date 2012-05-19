@@ -65,7 +65,7 @@ test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 # Target to build all tests
 ##
 .PHONY: test-all
-test-all: test-unit test-models test-bugs
+test-all: test-unit test-models
 
 ##
 # Build the google test library.
