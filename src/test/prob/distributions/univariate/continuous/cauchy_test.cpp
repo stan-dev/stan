@@ -98,3 +98,9 @@ TEST(ProbDistributionsCauchy,ErrnoPolicy) {
   result = cauchy_log(y, mu, inf, errno_policy()); 
   EXPECT_TRUE(std::isnan(result));
 }
+TEST(ProbDistributionsCauchy,Cumulative) {
+  using stan::prob::cauchy_p;
+  EXPECT_FLOAT_EQ(0.75, cauchy_p(1.0, 0.0, 1.0));
+  EXPECT_FLOAT_EQ(0.187167, cauchy_p(-1.5, 0.0, 1.0));
+  EXPECT_FLOAT_EQ(0.187167, cauchy_p(-2.5, -1.0, 1.0));
+}

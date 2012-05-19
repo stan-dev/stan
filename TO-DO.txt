@@ -162,10 +162,9 @@ EXTENSIONS
      + calculation of cdf
      + two functions: 1) with templated policy, 2) with no policy,
         calling templated function with stan::math::default_policy()
-     + tests: only need non-agrad tests.
+     + TODO: test derivatives?
      + dox: add doxygen.
-  - uni/cont/cauchy
-  - uni/cont/chi_square
+ - uni/cont/chi_square
   - uni/cont/double_exponential
   - uni/cont/inv_chi_square
   - uni/cont/inv_gamma
