@@ -164,7 +164,6 @@ EXTENSIONS
         calling templated function with stan::math::default_policy()
      + TODO: test derivatives?
      + dox: add doxygen.
-  - uni/cont/double_exponential
   - uni/cont/inv_chi_square
   - uni/cont/inv_gamma
   - uni/cont/logisitic
