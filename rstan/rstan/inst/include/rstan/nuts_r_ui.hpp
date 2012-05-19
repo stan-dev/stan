@@ -1,6 +1,6 @@
 
-#ifndef __RSTAN__RSTAN_HPP__
-#define __RSTAN__RSTAN_HPP__
+#ifndef __RSTAN__NUTS_R_UI_HPP__
+#define __RSTAN__NUTS_R_UI_HPP__
 
 #include <cmath>
 #include <cstddef>
@@ -26,101 +26,105 @@
 #include <stan/mcmc/sampler.hpp>
 
 #include <rstan/io/rlist_var_context.hpp> 
-#include <rstan/io/hmc_args.hpp> 
+#include <rstan/nuts_args.hpp> 
 #include <rstan/io/r_ostream.hpp> 
 
+#include <Rcpp.h>
+#include <Rinternals.h>
 
 
 namespace rstan {
-  void write_comment(std::ostream& o) {
-    o << "#" << std::endl;
-  }
-  template <typename M>
-  void write_comment(std::ostream& o,
-                     const M& msg) {
-    o << "# " << msg << std::endl;
-  }
-  template <typename K, typename V>
-  void write_comment_property(std::ostream& o,
-                              const K& key,
-                              const V& val) {
-    o << "# " << key << "=" << val << std::endl;
-  }
-
-  template <class Sampler, class Model>
-  void sample_from(Sampler& sampler,
-                   bool epsilon_adapt,
-                   int refresh,
-                   int num_iterations,
-                   int num_warmup,
-                   int num_thin,
-                   std::ostream& sample_file_stream,
-                   std::vector<double>& params_r,
-                   std::vector<int>& params_i,
-                   Model& model) {
-
-    sampler.set_params(params_r,params_i);
-   
-    int it_print_width = std::ceil(std::log10(num_iterations));
-    /*
-    std::cout << std::endl;
-    */
-
-    if (epsilon_adapt)
-      sampler.adapt_on(); 
-    for (int m = 0; m < num_iterations; ++m) {
-      /*
-      if (do_print(m,refresh)) {
-        std::cout << "\rIteration: ";
-        std::cout << std::setw(it_print_width) << (m + 1)
-                  << " / " << num_iterations;
-        std::cout << " [" << std::setw(3) 
-                  << static_cast<int>((100.0 * (m + 1))/num_iterations)
-                  << "%] ";
-        std::cout << ((m < num_warmup) ? " (Adapting)" : " (Sampling)");
-        std::cout.flush();
-      } */
-      if (m < num_warmup) {
-        sampler.next(); // discard
-      } else {
-        if (epsilon_adapt)
-          sampler.adapt_off();
-        if (((m - num_warmup) % num_thin) != 0) {
-          sampler.next();
-          continue;
+  
+  namespace { 
+    bool do_print(int refresh) {
+      return refresh > 0;
+    }
+  
+    bool do_print(int n, int refresh) {
+      return do_print(refresh)
+        && ((n + 1) % refresh == 0);
+    }
+  
+    void write_comment(std::ostream& o) {
+      o << "#" << std::endl;
+    }
+  
+    template <typename M>
+    void write_comment(std::ostream& o,
+                       const M& msg) {
+      o << "# " << msg << std::endl;
+    }
+  
+    template <typename K, typename V>
+    void write_comment_property(std::ostream& o,
+                                const K& key,
+                                const V& val) {
+      o << "# " << key << "=" << val << std::endl;
+    }
+  
+    template <class Sampler, class Model>
+    void sample_from(Sampler& sampler,
+                     bool epsilon_adapt,
+                     int refresh,
+                     int num_iterations,
+                     int num_warmup,
+                     int num_thin,
+                     std::ostream& sample_file_stream,
+                     std::vector<double>& params_r,
+                     std::vector<int>& params_i,
+                     Model& model) {
+  
+      sampler.set_params(params_r,params_i);
+     
+      int it_print_width = std::ceil(std::log10(num_iterations));
+      rstan::io::rcout << std::endl;
+  
+      // rstan::io::rcout << "in sample_from." << std::endl; 
+      if (epsilon_adapt)
+        sampler.adapt_on(); 
+      for (int m = 0; m < num_iterations; ++m) {
+        if (do_print(m,refresh)) {
+          rstan::io::rcout << "\rIteration: ";
+          rstan::io::rcout << std::setw(it_print_width) << (m + 1)
+                           << " / " << num_iterations;
+          rstan::io::rcout << " [" << std::setw(3)
+                           << static_cast<int>((100.0 * (m + 1))/num_iterations)
+                           << "%] ";
+          rstan::io::rcout << ((m < num_warmup) ? " (Adapting)" : " (Sampling)");
+          rstan::io::rcout.flush();
+        } 
+        if (m < num_warmup) {
+          sampler.next(); // discard
         } else {
-          stan::mcmc::sample sample = sampler.next();
-
-          // FIXME: use csv_writer arg to make comma optional?
-          sample_file_stream << sample.log_prob() << ',';
-          sampler.write_sampler_params(sample_file_stream);
-          sample.params_r(params_r);
-          sample.params_i(params_i);
-          model.write_csv(params_r,params_i,sample_file_stream);
+          if (epsilon_adapt)
+            sampler.adapt_off();
+          if (((m - num_warmup) % num_thin) != 0) {
+            sampler.next();
+            continue;
+          } else {
+            stan::mcmc::sample sample = sampler.next();
+  
+            // FIXME: use csv_writer arg to make comma optional?
+            sample_file_stream << sample.log_prob() << ',';
+            sampler.write_sampler_params(sample_file_stream);
+            sample.params_r(params_r);
+            sample.params_i(params_i);
+            model.write_csv(params_r,params_i,sample_file_stream);
+          }
         }
       }
     }
-  }
+  } 
 
 
+  template <class Model> 
+  class nuts_r_ui {
+  private: 
+    int nuts_command(SEXP data, SEXP args) { 
 
-  template <class Model> class rstan {
-  public: 
-    rstan() { 
-    } 
- 
-    /*
-    bool init(Rcpp::List in, Rcpp::List conf) {
-      data_ = io::rlist_var_context(in); 
-      return true; 
-    } 
-    */
-
-    // int nuts_command(const Rcpp::List &data, Rcpp::List args) { //, Rcpp::List &init) { 
-    int nuts_command(SEXP data, SEXP args) { //, Rcpp::List &init) { 
-
+      // rstan::io::rcout << "in nuts_command" << std::endl; 
       io::rlist_var_context data_(Rcpp::as<Rcpp::List>(data)); 
-      hmc_args args_(Rcpp::as<Rcpp::List>(args)); 
+      nuts_args args_(Rcpp::as<Rcpp::List>(args)); 
 
       Model model(data_); 
 
@@ -167,14 +171,9 @@ namespace rstan {
           params_i = std::vector<int>(model.num_params_i(),0);
           params_r = std::vector<double>(model.num_params_r(),0.0);
       } else if (init_val == "user") {
-          /*
-          std::cout << "init file=" << init_val << std::endl;
-        
-          std::fstream init_stream(init_val.c_str(),std::fstream::in);
-          stan::io::dump init_var_context(init_stream);
-          init_stream.close();
+          Rcpp::List init_lst(args_.get_init_list()); 
+          rstan::io::rlist_var_context init_var_context(init_lst); 
           model.transform_inits(init_var_context,params_i,params_r);
-          */ 
       } else {
         init_val = "random initialization";
         // init_rng generates uniformly from -2 to 2
@@ -259,8 +258,31 @@ namespace rstan {
       }
       
       sample_stream.close();
+      rstan::io::rcout << std::endl << std::endl; 
       return 0;
     }
+
+  public: 
+    nuts_r_ui() { 
+    } 
+ 
+    /*
+    bool init(Rcpp::List in, Rcpp::List conf) {
+      data_ = io::rlist_var_context(in); 
+      return true; 
+    } 
+    */
+    SEXP call_nuts(SEXP data, SEXP args) {
+      try {
+        nuts_command(data, args); 
+     
+      } catch (std::exception& e) {
+        rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
+        rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
+        return Rcpp::wrap(false); 
+      }
+      return Rcpp::wrap(true);  
+    } 
 
   };
 } 

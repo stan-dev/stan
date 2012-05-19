@@ -1,6 +1,6 @@
 
-#ifndef __RSTAN__IO__HMC_ARGS_HPP__
-#define __RSTAN__IO__HMC_ARGS_HPP__
+#ifndef __RSTAN__IO__NUTS_ARGS_HPP__
+#define __RSTAN__IO__NUTS_ARGS_HPP__
 
 
 /* output from `anon_model --help' */
@@ -65,13 +65,16 @@
 
 
 #include <Rcpp.h>
-#include <rlist_util.hpp>
+#include <R.h>
 #include <Rinternals.h> 
+
+#include <rstan/io/rlist_util.hpp>
+#include <rstan/io/r_ostream.hpp> 
 
 namespace rstan {
   // wrap the arguments for hmc (including nuts) samplers 
   // from Rcpp::List 
-  class hmc_args {
+  class nuts_args {
   private:
     std::string sample_file; // the file for outputing the samples 
     unsigned int iter;   // number of iterations 
@@ -86,13 +89,16 @@ namespace rstan {
     double delta; 
     double gamma; 
     int random_seed; 
+    std::string random_seed_src; // "user" or "default" 
     unsigned int chain_id; 
+    std::string chain_id_src; // "user" or "default" 
     bool append_samples; 
     bool test_grad; 
     std::string init; 
+    SEXP init_lst;  
    
   public:
-    hmc_args(): 
+    nuts_args(): 
       sample_file("samples.csv"),  
       iter(2000U), 
       warmup(1000U), 
@@ -106,12 +112,15 @@ namespace rstan {
       delta(0.5), 
       gamma(0.05), 
       random_seed(std::time(0)), 
+      random_seed_src("default"), 
       chain_id(1), 
+      chain_id_src("default"), 
       append_samples(false), 
       test_grad(true), 
-      init("random") {
+      init("random"),
+      init_lst(R_NilValue) {
     } 
-    hmc_args(const Rcpp::List &in) {
+    nuts_args(const Rcpp::List &in) {
       /*
       std::vector<std::string> argnames 
         = Rcpp::as<std::vector<std::string> >(in.names()); 
@@ -168,72 +177,98 @@ namespace rstan {
 
 
       tsexp = get_list_element_by_name(in, "seed"); 
-      if (Rf_isNull(tsexp)) random_seed = std::time(0); 
-      else random_seed = Rcpp::as<unsigned int>(tsexp); 
+      if (Rf_isNull(tsexp)) {
+        random_seed = std::time(0); 
+        random_seed_src = "random"; 
+      } else {
+        random_seed = Rcpp::as<unsigned int>(tsexp); 
+        random_seed_src = "user"; 
+      }
 
       tsexp = get_list_element_by_name(in, "chain_id"); 
-      if (Rf_isNull(tsexp)) chain_id = 1; 
-      else chain_id = Rcpp::as<unsigned int>(tsexp); 
-
+      if (Rf_isNull(tsexp)) { 
+        chain_id = 1; 
+        chain_id_src = "default"; 
+      } else {
+        chain_id = Rcpp::as<unsigned int>(tsexp); 
+        chain_id_src = "user"; 
+      }
       
       tsexp = get_list_element_by_name(in, "init"); 
       if (Rf_isNull(tsexp)) init = "random"; 
       else init = Rcpp::as<std::string>(tsexp); // "0", "user", or "random"
+
+      if (init == "user") init_lst = get_list_element_by_name(in, "init_lst"); 
+      else  init_lst = R_NilValue; 
+
+      // rstan::io::rcout << "init=" << init << std::endl;  
+      // std::string yesorno = Rf_isNull(init_lst) ? "yes" : "no";
+      // rstan::io::rcout << "init_list is null: " << yesorno << std::endl; 
 
       tsexp = get_list_element_by_name(in, "append_samples"); 
       if (Rf_isNull(tsexp)) append_samples = false; 
       else append_samples = Rcpp::as<bool>(tsexp); 
 
     } 
-    int get_iter() {
+    const std::string& get_random_seed_src() const {
+      return random_seed_src; 
+    } 
+    const std::string& get_chain_id_src() const {
+      return chain_id_src; 
+    } 
+
+    SEXP get_init_list() const {
+      return init_lst; 
+    } 
+    int get_iter() const {
       return iter; 
     } 
-    std::string& get_sample_file() {
+    const std::string& get_sample_file() const {
       return sample_file; 
     } 
-    unsigned int get_warmup() {
+    unsigned int get_warmup() const {
       return warmup; 
     } 
-    unsigned int get_refresh() { 
+    unsigned int get_refresh() const { 
       return refresh; 
     } 
-    unsigned int get_thin() {
+    unsigned int get_thin() const {
       return thin;
     } 
-    int get_leapfrog_steps() {
+    int get_leapfrog_steps() const {
       return leapfrog_steps; 
     } 
-    double get_epsilon() {
+    double get_epsilon() const {
       return epsilon; 
     } 
-    int get_max_treedepth() {
+    int get_max_treedepth() const {
       return max_treedepth; 
     } 
-    double get_epsilon_pm() {
+    double get_epsilon_pm() const {
       return epsilon; 
     } 
-    bool get_epsilon_adapt() {
+    bool get_epsilon_adapt() const {
       return epsilon_adapt; 
     } 
-    double get_delta() {  
+    double get_delta() const {  
       return delta;
     } 
-    double get_gamma() { 
+    double get_gamma() const { 
       return gamma;
     } 
-    bool get_append_samples() {
+    bool get_append_samples() const {
       return append_samples; 
     } 
-    bool get_test_grad() {
+    bool get_test_grad() const {
       return test_grad; 
     } 
-    int get_random_seed() {
+    int get_random_seed() const {
       return random_seed; 
     } 
-   std::string get_init() {
+   std::string get_init() const {
       return init;
     } 
-    unsigned int get_chain_id() {
+    unsigned int get_chain_id() const {
       return chain_id; 
     } 
   }; 

@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <stanc.hpp>
+#include "stanc.hpp"
 
 SEXP version() {
   BEGIN_RCPP;

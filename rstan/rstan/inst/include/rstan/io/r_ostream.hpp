@@ -24,9 +24,7 @@ namespace rstan {
     protected:
       virtual int_type overflow(int_type c) {
         if (c != EOF) {
-          char z = c;
-          Rprintf("%c", c);
-          return EOF;
+          Rprintf("%.1s", &c);
         }
         return c;
       }
@@ -44,9 +42,7 @@ namespace rstan {
     protected:
       virtual int_type overflow(int_type c) {
         if (c != EOF) {
-          char z = c;
-          REprintf("%c", c);
-          return EOF;
+          REprintf("%.1s", &c);
         }
         return c;
       }
