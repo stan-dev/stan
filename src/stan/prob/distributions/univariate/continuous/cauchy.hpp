@@ -73,12 +73,28 @@ namespace stan {
       return cauchy_log<false>(y,mu,sigma,stan::math::default_policy());
     }
 
+
+    /** 
+     * Calculates the cauchy cumulative distribution function for
+     * the given variate, location, and scale.
+     *
+     * \f$\frac{1}{\pi}\arctan\left(\frac{y-\mu}{\sigma}\right) + \frac{1}{2}\f$ 
+     *
+     * Errors are configured by policy.  All variables must be finite
+     * and the scale must be strictly greater than zero.
+     *
+     * @param y A scalar variate.
+     * @param mu The location parameter.
+     * @param sigma The scale parameter.
+     * 
+     * @return 
+     */
     template <typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
     cauchy_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy&) {
-      static const char* function = "stan::prob::cauchy_log<%1%>(%1%)";
+      static const char* function = "stan::prob::cauchy_p<%1%>(%1%)";
       
       using stan::math::check_positive;
       using stan::math::check_finite;
