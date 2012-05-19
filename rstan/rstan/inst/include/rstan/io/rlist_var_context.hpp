@@ -83,7 +83,7 @@ namespace rstan {
        * @param in Input of R list (represented by Rcpp::List) 
        * from which to read.
        */
-      rlist_var_context(Rcpp::List &in) {
+      rlist_var_context(const Rcpp::List &in) {
         // should I use iterators? 
         std::vector<std::string> varnames 
           = Rcpp::as<std::vector<std::string> >(in.names()); 

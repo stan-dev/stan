@@ -2,7 +2,6 @@
 // #include <Rcpp.h>
 // #include <string>
 // #include <iostream>
-#include "stanc.h"
 #include <stan/version.hpp>
 #include <stan/gm/compiler.hpp>
 
@@ -10,6 +9,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+
+#include <stanc.hpp>
 
 SEXP version() {
   BEGIN_RCPP;

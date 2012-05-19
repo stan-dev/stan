@@ -1,6 +1,6 @@
 
-#ifndef __RSTAN__HMCARGS_HPP__
-#define __RSTAN__HMCARGS_HPP__
+#ifndef __RSTAN__IO__HMC_ARGS_HPP__
+#define __RSTAN__IO__HMC_ARGS_HPP__
 
 
 /* output from `anon_model --help' */
@@ -111,7 +111,7 @@ namespace rstan {
       test_grad(true), 
       init("random") {
     } 
-    hmc_args(Rcpp::List &in) {
+    hmc_args(const Rcpp::List &in) {
       /*
       std::vector<std::string> argnames 
         = Rcpp::as<std::vector<std::string> >(in.names()); 

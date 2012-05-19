@@ -1,8 +1,6 @@
 
 #ifndef __RSTAN__RSTAN_HPP__
 #define __RSTAN__RSTAN_HPP__
-#include <rlist_var_context.hpp> 
-#include <hmc_args.hpp> 
 
 #include <cmath>
 #include <cstddef>
@@ -27,6 +25,9 @@
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
 
+#include <rstan/io/rlist_var_context.hpp> 
+#include <rstan/io/hmc_args.hpp> 
+#include <rstan/io/r_ostream.hpp> 
 
 
 
@@ -115,11 +116,13 @@ namespace rstan {
     } 
     */
 
-    int nuts_command(Rcpp::List &data, Rcpp::List &args) { //, Rcpp::List &init) { 
+    // int nuts_command(const Rcpp::List &data, Rcpp::List args) { //, Rcpp::List &init) { 
+    int nuts_command(SEXP data, SEXP args) { //, Rcpp::List &init) { 
 
-      // data_ = io::rlist_var_context(data); 
-      Model model(io::rlist_var_context(data)); 
-      hmc_args args_(args); 
+      io::rlist_var_context data_(Rcpp::as<Rcpp::List>(data)); 
+      hmc_args args_(Rcpp::as<Rcpp::List>(args)); 
+
+      Model model(data_); 
 
       std::string sample_file = args_.get_sample_file(); 
       

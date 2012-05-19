@@ -1,5 +1,5 @@
-#ifndef __RSTAN_RLIST_UTIL_HPP__ 
-#define __RSTAN_RLIST_UTIL_HPP__ 
+#ifndef __RSTAN__IO__RLIST_UTIL_HPP__ 
+#define __RSTAN__IO__RLIST_UTIL_HPP__ 
 
 namespace rstan {
 
