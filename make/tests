@@ -20,7 +20,7 @@ MISSING_MODEL_TESTS := $(filter-out $(MODEL_TESTS:test/%=%),$(MISSING_MODEL_TEST
 test-models: $(addsuffix $(EXE),$(MODEL_TESTS))
 	@echo '------------------------------------------------------------'
 	set -e;\
-	$(foreach test,$(MODEL_TESTS), \
+	@$(foreach test,$(MODEL_TESTS), \
 	  echo '------------------------------------------------------------';\
 	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 ifneq ($(MISSING_MODEL_TESTS),)
@@ -39,7 +39,7 @@ BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
 test-bugs: $(addsuffix $(EXE),$(BUGS_TESTS))
 	@echo '-------------------- Running bugs examples --------------------------'
 	set -e;\
-	$(foreach test,$(BUGS_TESTS), \
+	@$(foreach test,$(BUGS_TESTS), \
 	  echo '------------------------------------------------------------';\
 	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 
@@ -55,8 +55,8 @@ UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
-	@set -e;\
-	$(foreach test,$(UNIT_TESTS), \
+	set -e;\
+	@$(foreach test,$(UNIT_TESTS), \
 	  echo '------------------------------------------------------------';\
 	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 
