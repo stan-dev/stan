@@ -55,7 +55,7 @@ UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
-	set -e;\
+	@set -e;\
 	$(foreach test,$(UNIT_TESTS), \
 	  echo '------------------------------------------------------------';\
 	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
@@ -101,7 +101,6 @@ endif
 ##
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
 ifeq ($(findstring test-,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
