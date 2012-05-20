@@ -6,11 +6,6 @@
 /* output from `anon_model --help' */
 /*
 
-  --data=<file>       Read data from specified dump-format file
-                          (required if model declares data)
-
-  --init=<file>       Use initial values from specified file or zero values if <file>=0
-                          (default is random initialization)
 
   --samples=<file>    File into which samples are written
                           (default = samples.csv)
@@ -72,8 +67,41 @@
 #include <rstan/io/r_ostream.hpp> 
 
 namespace rstan {
-  // wrap the arguments for hmc (including nuts) samplers 
-  // from Rcpp::List 
+  /**
+   * Wrap the available arguments for nuts sampler (and other samplers) from
+   * Rcpp::List and set the defaults if not available. 
+   *
+   *
+   * The following arguments could be in the names lists
+   *
+   * <ul>
+   * <li> sample_file: into which samples are written (default: samples.csv)
+   * <li> iter: total number of iterations, including warmup (default: 2000)  
+   * <li> warmup: 
+   * <li> thin 
+   * <li> refresh 
+   * <li> leapfrog_steps
+   * <li> epsilon
+   * <li> max_treedepth 
+   * <li> epsilon_pm
+   * <li> epsilon_adapt
+   * <li> delta 
+   * <li> gamma 
+   * <li> random_seed 
+   * <li> append_samples 
+   * <li> test_grad 
+   * <li> init 
+   * <li> init_lst 
+   * </ul>
+   *
+   * In addition, the following keep a record of how the arguments are set: by
+   * user or default. 
+   * <ul> 
+   * <li> random_seed_src 
+   * <li> chain_id_src 
+   * </ul> 
+   *
+   */ 
   class nuts_args {
   private:
     std::string sample_file; // the file for outputing the samples 

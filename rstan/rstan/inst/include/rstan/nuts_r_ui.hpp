@@ -116,6 +116,10 @@ namespace rstan {
     }
   } 
 
+  /**
+   * <p> To implement a Rcpp class module for R's user interface with NUTS. 
+   * Adapted from <code> stan/src/stan/gm/command.hpp</code>. 
+   */
 
   template <class Model> 
   class nuts_r_ui {
@@ -272,6 +276,20 @@ namespace rstan {
       return true; 
     } 
     */
+    /**
+     * This function would be exposed (using Rcpp module, see
+     * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call NUTS. 
+     *
+     * @param data The data for the model. From R's perspective, 
+     *  it is a named list. 
+     *
+     * @param args The arguments for configuring nuts. For example, number of
+     * iterations, warmup, etc. In addition, the user specified initial
+     * values for all the parameters here. Also, R should pass a list here. 
+     *
+     * @return TRUE if there is no exception; FALSE otherwise. 
+     *
+     */
     SEXP call_nuts(SEXP data, SEXP args) {
       try {
         nuts_command(data, args); 
