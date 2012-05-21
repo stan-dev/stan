@@ -37,14 +37,14 @@ list.data.preprocess <- function(x) {
 } 
 
 
-#   print(lst1)
-#   list.data.preprocess(lst1) 
-#   print(lst1)
+read.model.from.con <- function(con) {
+  lines <- readLines(con, n = -1L, warn = FALSE);
+  paste(lines, collapse = '\n') 
+} 
 
-#   lst1$e <- "hello"
-#   list.data.preprocess(lst1) 
-#   lst1$f <- c(3, NA) 
-#   lst1$f <- matrix(c(3, NA, NA, NA, 3, 4), ncol = 3) 
-#   lst1$f <- array(c(3, NA, NA, NA, 3, 4, 5, 6, 9, 8, NA, 2), dim = c(2, 2, 3)) 
-#   list.data.preprocess(lst1) 
+
+#
+# model.code <- read.model.from.con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan');
+# cat(model.code)
+
 

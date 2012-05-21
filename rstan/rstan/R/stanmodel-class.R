@@ -1,7 +1,9 @@
 require(methods) 
 
 setClass(Class = "stanmodel",
-         representation = representation(model.name =, .modelData = "list"),  
+         representation = representation(
+           model.name = "character", .modelData = "list"
+         ),  
          validity = function(object) {
            return(TRUE) 
          }); 
