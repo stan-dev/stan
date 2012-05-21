@@ -112,6 +112,12 @@ help:
 -include make/dist
 
 ##
+# All manual related make commands
+##
+-include make/manual
+
+
+##
 # Rule for generating dependencies.
 # Applies to all *.cpp files in src.
 # Test cpp files are handled slightly differently.
@@ -129,19 +135,23 @@ help:
 ##
 # Clean up.
 ##
-.PHONY: clean clean-models clean-dox clean-demo clean-all
+.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) -r *.dSYM
 	$(RM) $(OFILES) bin/libstan.a
 
-clean-models:
-	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch
+clean-demo:
+	$(RM) -r demo
 
 clean-dox:
 	$(RM) -r doc/api
 
-clean-demo:
-	$(RM) -r demo
+clean-manual:
+	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf
+	$(RM) doc/stan-reference.pdf
+
+clean-models:
+	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch
 
 clean-all: clean clean-models clean-dox clean-demo
 	$(RM) -r test bin
