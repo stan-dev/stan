@@ -56,40 +56,40 @@ TEST(matrix_test, resize_svec_double) {
 TEST(matrix_test, resize_vec_double) {
   Matrix<double,Dynamic,1> v(2);
   std::vector<size_t> dims;
-  EXPECT_EQ(2U, v.size());
+  EXPECT_EQ(2, v.size());
 
   dims.push_back(17U);
   stan::math::resize(v,dims);
-  EXPECT_EQ(17U, v.size());
+  EXPECT_EQ(17, v.size());
 
   dims[0] = 3U;
   stan::math::resize(v,dims);
-  EXPECT_EQ(3U, v.size());
+  EXPECT_EQ(3, v.size());
 }
 TEST(matrix_test, resize_rvec_double) {
   Matrix<double,1,Dynamic> rv(2);
   std::vector<size_t> dims;
-  EXPECT_EQ(2U, rv.size());
+  EXPECT_EQ(2, rv.size());
 
   dims.push_back(17U);
   stan::math::resize(rv,dims);
-  EXPECT_EQ(17U, rv.size());
+  EXPECT_EQ(17, rv.size());
 
   dims[0] = 3U;
   stan::math::resize(rv,dims);
-  EXPECT_EQ(3U, rv.size());
+  EXPECT_EQ(3, rv.size());
 }
 TEST(matrix_test, resize_mat_double) {
   Matrix<double,Dynamic,Dynamic> m(2,3);
   std::vector<size_t> dims;
-  EXPECT_EQ(2U, m.rows());
-  EXPECT_EQ(3U, m.cols());
+  EXPECT_EQ(2, m.rows());
+  EXPECT_EQ(3, m.cols());
 
   dims.push_back(7U);
   dims.push_back(17U);
   stan::math::resize(m,dims);
-  EXPECT_EQ(7U, m.rows());
-  EXPECT_EQ(17U, m.cols());
+  EXPECT_EQ(7, m.rows());
+  EXPECT_EQ(17, m.cols());
 }
 TEST(matrix_test, resize_svec_svec_double) {
   std::vector<std::vector<double> > xx;
@@ -115,13 +115,13 @@ TEST(matrix_test, resize_svec_v_double) {
   dims.push_back(5U);
   stan::math::resize(xx,dims);
   EXPECT_EQ(4U,xx.size());
-  EXPECT_EQ(5U,xx[0].size());
+  EXPECT_EQ(5,xx[0].size());
 
   dims[0] = 3U;
   dims[1] = 7U;
   stan::math::resize(xx,dims);
   EXPECT_EQ(3U,xx.size());
-  EXPECT_EQ(7U,xx[1].size());  
+  EXPECT_EQ(7,xx[1].size());  
 }
 TEST(matrix_test, resize_svec_rv_double) {
   std::vector<Matrix<double,1,Dynamic> > xx;
@@ -131,13 +131,13 @@ TEST(matrix_test, resize_svec_rv_double) {
   dims.push_back(5U);
   stan::math::resize(xx,dims);
   EXPECT_EQ(4U,xx.size());
-  EXPECT_EQ(5U,xx[0].size());
+  EXPECT_EQ(5,xx[0].size());
 
   dims[0] = 3U;
   dims[1] = 7U;
   stan::math::resize(xx,dims);
   EXPECT_EQ(3U,xx.size());
-  EXPECT_EQ(7U,xx[1].size());  
+  EXPECT_EQ(7,xx[1].size());  
 }
 TEST(matrix_test, resize_svec_svec_matrix_double) {
   std::vector<std::vector<Matrix<double,Dynamic,Dynamic> > > mm;
@@ -149,8 +149,8 @@ TEST(matrix_test, resize_svec_svec_matrix_double) {
   stan::math::resize(mm,dims);
   EXPECT_EQ(4U,mm.size());
   EXPECT_EQ(5U,mm[0].size());
-  EXPECT_EQ(6U,mm[1][2].rows());
-  EXPECT_EQ(3U,mm[3][4].cols());
+  EXPECT_EQ(6,mm[1][2].rows());
+  EXPECT_EQ(3,mm[3][4].cols());
 }
 
 TEST(matrix,get_base1_vec1) {

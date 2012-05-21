@@ -1220,9 +1220,9 @@ TEST(AgradSpecialFunctions,int_step) {
   AVAR b(0.0);
   AVAR c(-1.0);
   
-  EXPECT_EQ(1,int_step(a));
-  EXPECT_EQ(0,int_step(b));
-  EXPECT_EQ(0,int_step(c));
+  EXPECT_EQ(1U,int_step(a));
+  EXPECT_EQ(0U,int_step(b));
+  EXPECT_EQ(0U,int_step(c));
 }
 
 TEST(AgradSpecialFunctions,if_else) {

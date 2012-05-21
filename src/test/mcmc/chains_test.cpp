@@ -644,7 +644,7 @@ TEST(McmcChains, quantiles_means) {
   probs[4] = 0.975;
   c.quantiles(0,0, probs, qs);
 
-  EXPECT_EQ(5,qs.size());
+  EXPECT_EQ(5U,qs.size());
   EXPECT_FLOAT_EQ(0.025,qs[0]);
   EXPECT_FLOAT_EQ(0.25,qs[1]);
   EXPECT_FLOAT_EQ(0.5,qs[2]);
@@ -659,7 +659,7 @@ TEST(McmcChains, quantiles_means) {
   // multi quantiles, cross chains
   c.quantiles(0, probs, qs);
 
-  EXPECT_EQ(5,qs.size());
+  EXPECT_EQ(5U,qs.size());
   EXPECT_FLOAT_EQ(0.025,qs[0]);
   EXPECT_FLOAT_EQ(0.25,qs[1]);
   EXPECT_FLOAT_EQ(0.5,qs[2]);
