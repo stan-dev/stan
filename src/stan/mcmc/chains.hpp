@@ -2,22 +2,54 @@
 #define __STAN__MCMC__CHAINS_HPP__
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include <Eigen/Dense>
 
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+// #include <boost/accumulators/statistics/moment.hpp>
+#include <boost/accumulators/statistics/tail_quantile.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
+
+#include <stan/math/matrix.hpp>
 
 namespace stan {  
 
   namespace mcmc {
 
+    const std::vector<std::string>& 
+    test_match_return_names(const std::vector<std::string>& names,
+                            const std::vector<std::vector<size_t> >& dimss) {
+      if (names.size() == dimss.size())
+        return names;
+      std::stringstream msg;
+      msg << "names and dimss mismatch in size"
+          << " names.size()=" << names.size()
+          << " dimss.size()=" << dimss.size();
+      throw std::invalid_argument(msg.str());
+    }
+
+    void validate_prob(double p) {
+      // test this way so NaN fails
+      if (p >= 0.0 && p <= 1.0) 
+        return;
+      std::stringstream msg;
+      msg << "require probabilities to be finite between 0 and 1 inclusive."
+          << " found p=" << p;
+      throw std::invalid_argument(msg.str());
+    }
 
     /**
      * Validate the specified indexes with respect to the
@@ -315,22 +347,14 @@ namespace stan {
              const std::vector<std::string>& names,
              const std::vector<std::vector<size_t> >& dimss) 
         : _warmup(0),
-          _names(names),
+          // function call tests dimensionality match & returns names
+          _names(names), // test_match_return_names(names,dimss)),
           _dimss(dimss),
           _num_params(calc_total_num_params(dimss)),
           _starts(calc_starts(dimss)),               // copy
           _name_to_index(calc_name_to_index(names)), // copy
           _samples(num_chains,std::vector<std::vector<double> >(_num_params))
-      {
-        if (names.size() != dimss.size()) {
-          std::stringstream msg;
-          msg << "names and dimss mismatch in size"
-              << " names.size()=" << names.size()
-              << " dimss.size()=" << dimss.size();
-          throw std::invalid_argument(msg.str());
-        }
-      }
-      
+      {  }
       
       /**
        * Return the number of chains.
@@ -757,6 +781,46 @@ namespace stan {
       }
 
       /**
+       * Apply the specified functor to each kept sample for the
+       * specified parameter in the specified chain.  The samples are
+       * visited in the order they were added.
+       *
+       * @tparam F Type of functor to apply
+       * @param k Chain index
+       * @param n Parameter index
+       * @param f Functor to apply to kept samples
+       */
+      template <typename F>
+      void
+      apply_kept_samples(size_t k,
+                         size_t n,
+                         F& f) {
+        using std::vector;
+        for (vector<double>::const_iterator it = _samples[k][n].begin() + warmup();
+             it != _samples[k][n].end();
+             ++it)
+          f(*it);
+      }
+
+      /**
+       * Apply the specified functor to each kept sample for the
+       * specified parameter across all chains.  The samples are
+       * visited in the order of chain index, and within a chain, in
+       * the order they were added.
+       *
+       * @tparam F Type of functor to apply
+       * @param n Parameter index
+       * @param f Functor to apply to kept samples
+       */
+      template <typename F>
+      void
+      apply_kept_samples(size_t n,
+                         F& f) {
+        for (size_t k = 0; k < num_chains(); ++k)
+          apply_kept_samples(k,n,f);
+      }
+
+      /**
        * Write into the specified vector the kept samples for the
        * scalar parameter with the specified index in the chain with
        * the specified index.  The order of samples is the order in
@@ -848,6 +912,311 @@ namespace stan {
                            _samples[k][n].begin() + warmup());
       }
 
+
+      /**
+       * Return the sample mean of the kept samples in the
+       * specified chain for the specified parameter.
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @return Sample mean of parameter in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double mean(size_t k,
+                  size_t n) {
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::mean;
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        accumulator_set<double, stats<mean> > acc;
+        apply_kept_samples(k,n,acc);
+        return boost::accumulators::mean(acc);
+      }
+
+      /**
+       * Return the sample mean of the kept samples in all
+       * chains for the specified parameter.
+       *
+       * @param n Parameter index.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double mean(size_t n) {
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::mean;
+        validate_param_idx(n);
+        accumulator_set<double, stats<mean> > acc;
+        apply_kept_samples(n,acc);
+        return boost::accumulators::mean(acc);
+      }
+
+      /**
+       * Return the sample standard deviation of the kept samples in
+       * the specified chain for the specified parameter.  This method
+       * uses the unbiased variance estimator (and thus divides by M-1
+       * rather than M in the denominator)
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @return Sample mean of parameter in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double sd(size_t k,
+                size_t n) {
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(k,n,acc);
+        double M = num_kept_samples(k);
+        return std::sqrt((M / (M-1)) * boost::accumulators::variance(acc));
+      }
+
+      /**
+       * Return the sample standard deviation of the kept samples in
+       * all chains for the specified parameter.  This method divides
+       * by the number of kept samples minus 1 (and is htus based on
+       * an unbiased variance estimate from the samples).
+       *
+       * @param n Parameter index.
+       * @return Sample standard deviation of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double sd(size_t n) {
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(n,acc);
+        double M = num_kept_samples();
+        return std::sqrt((M / (M-1)) * boost::accumulators::variance(acc));
+      }
+
+      /**
+       * Return the specified sample quantile for kept samples for the
+       * specified parameter in the specified chain.
+       *
+       * @param k Chain index
+       * @param n Parameter index
+       * @param prob Quantile probability
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or if the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the probabilty is not between
+       * 0 and 1 inclusive.
+       */
+      double quantile(size_t k,
+                      size_t n,
+                      double prob) {
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::left;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        double size = num_kept_samples(k);
+        if (prob < 0.5) {
+          std::size_t cs(2 + prob * size); // 2+ for interpolation
+          accumulator_set<double, stats<tail_quantile<left> > > 
+            acc(tail<left>::cache_size = cs);
+          apply_kept_samples(k,n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        } else {
+          std::size_t cs(2 + (1.0 - prob) * size);
+          accumulator_set<double, stats<tail_quantile<right> > > 
+            acc(tail<right>::cache_size = cs);
+          apply_kept_samples(k,n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        }
+      }
+
+      /**
+       * Return the specified sample quantile for kept samples for the
+       * specified parameter across all chains.
+       *
+       * @param n Parameter index
+       * @param prob Quantile probability
+       * @throw std::out_of_range If the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the probabilty is not between
+       * 0 and 1 inclusive.
+       */
+      double quantile(size_t n,
+                      double prob) {
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::left;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        double size = num_kept_samples();
+        if (prob < 0.5) {
+          std::size_t cs(2 + prob * size); // 2+ for interpolation
+          accumulator_set<double, stats<tail_quantile<left> > > 
+            acc(tail<left>::cache_size = cs);
+          apply_kept_samples(n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        } else {
+          std::size_t cs(2 + (1.0 - prob) * size);
+          accumulator_set<double, stats<tail_quantile<right> > > 
+            acc(tail<right>::cache_size = cs);
+          apply_kept_samples(n,acc);
+          return boost::accumulators::quantile(acc, quantile_probability = prob);
+        }
+      }
+
+      /**
+       * Write the specified sample quantiles into the specified
+       * vector for the kept samples for the specified parameter
+       * in the specified chain.
+       *
+       * @param k Chain index
+       * @param n Parameter index
+       * @param probs Quantile probabilities
+       * @param quantiles Vector into which to write sample quantiles
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or if the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the any quantile probabilty is 
+       * not between 0 and 1 inclusive.
+       */
+      void quantiles(size_t k,
+                     size_t n,
+                     const std::vector<double>& probs,
+                     std::vector<double>& quantiles) {
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        for (size_t i = 0; i < probs.size(); ++i)
+          validate_prob(probs[i]);
+        quantiles.resize(probs.size());
+
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::quantile;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        // keeps all (more efficient to have two for (min,0.5) and (0.5,max))
+        accumulator_set<double, stats<tail_quantile<right> > >
+          acc(tail<right>::cache_size = num_kept_samples(k));
+        apply_kept_samples(k,n,acc);
+        
+        for (size_t i = 0; i < probs.size(); ++i)
+          quantiles[i] = quantile(acc, quantile_probability = probs[i]);
+      }
+
+      /**
+       * Write the specified sample quantiles into the specified
+       * vector for the kept samples for the specified parameter
+       * across all chains.
+       *
+       * @param n Parameter index
+       * @param probs Quantile probabilities
+       * @param quantiles Vector into which to write sample quantiles
+       * @throw std::out_of_range If the parameter index is greater
+       * than the number of parameters
+       * @throw std::invalid_argument If the any quantile probabilty is 
+       * not between 0 and 1 inclusive.
+       */
+      void quantiles(size_t n,
+                     const std::vector<double>& probs,
+                     std::vector<double>& quantiles) {
+        validate_param_idx(n);
+        for (size_t i = 0; i < probs.size(); ++i)
+          validate_prob(probs[i]);
+        quantiles.resize(probs.size());
+
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::quantile;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        accumulator_set<double, stats<tail_quantile<right> > >
+          acc(tail<right>::cache_size = num_kept_samples());
+        apply_kept_samples(n,acc);
+        for (size_t i = 0; i < probs.size(); ++i)
+          quantiles[i] = quantile(acc, quantile_probability = probs[i]);
+      }
+
+      /**
+       * Return the specified sample central interval for the specified
+       * parameter in the kept samples in the specified chain.  
+       *
+       * <p>The central interval of width p is defined to be (ql,qh)
+       * where ql is the (1-p)/2 quantile and qh is the 1 - ql
+       * quantile.
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @param prob Width of central interval.
+       * @return Pair consisting of low and high quantile.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or if the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the the interval width is not
+       * between 0 and 1 inclusive.
+       */
+      std::pair<double,double>
+      central_interval(size_t k,
+                       size_t n,
+                       double prob) {
+        // validate k,n in calls to quantile
+        validate_prob(prob);
+        double low_prob = (1.0 - prob) / 2.0;
+        double high_prob = 1.0 - low_prob;
+        double low_quantile = quantile(k,n,low_prob);
+        double high_quantile = quantile(k,n,high_prob);
+        return std::pair<double,double>(low_quantile,high_quantile);
+      }
+
+      /**
+       * Return the specified central interval for the specified
+       * parameter in the kept samples of all chains.
+       *
+       * <p>The central interval of width p is defined to be (ql,qh)
+       * where ql is the (1 - p) / 2 quantile and qh is the 1 - ql
+       * quantile.
+       *
+       * @param n Parameter index.
+       * @param prob Width of central interval.
+       * @return Pair consisting of low and high quantile.
+       * @throw std::out_of_range If the parameter index is
+       * greater than the number of parameters
+       * @throw std::invalid_argument If the the interval width is not
+       * between 0 and 1 inclusive.
+       */
+      std::pair<double,double>
+      central_interval(size_t n,
+                       double prob) {
+        // validate n in calls to quantile
+        validate_prob(prob);
+        double low_prob = (1.0 - prob) / 2.0;
+        double high_prob = 1.0 - low_prob;
+        double low_quantile = quantile(n,low_prob);
+        double high_quantile = quantile(n,high_prob);
+        return std::pair<double,double>(low_quantile,high_quantile);
+      }
+
+
     
     };
 
@@ -860,18 +1229,6 @@ namespace stan {
 
 /*
 
-double mean(size_t n);
-
-double sd(size_t n);
-
-void quantiles(size_t n,
-               const vector<double>& probs,
-               vector<double>& quantiles);
-double quantile(size_t n,
-                double prob);
-
-pair<double,double> central_interval(size_t n,
-                                     double prob);
 
 pair<double,double> smallest_interval(size_t n,
                                       double prob);

@@ -427,7 +427,8 @@ TEST(prob_transform,cov_matrix_jacobian) {
   using std::log;
   using std::fabs;
 
-  unsigned int K = 4;
+  Matrix<var,Dynamic,Dynamic>::size_type K = 4;
+  //unsigned int K = 4;
   unsigned int K_choose_2 = 6;
   Matrix<var,Dynamic,1> X(K_choose_2 + K);
   X << 1.0, 2.0, -3.0, 1.7, 9.8, 
@@ -489,8 +490,8 @@ TEST(prob_transform,simplex_match) {
   Matrix<double,Dynamic,1> y = stan::prob::simplex_constrain(x);
   Matrix<double,Dynamic,1> y2 = stan::prob::simplex_constrain(x,lp);
 
-  EXPECT_EQ(4U,y.size());
-  EXPECT_EQ(4U,y2.size());
+  EXPECT_EQ(4,y.size());
+  EXPECT_EQ(4,y2.size());
   for (Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i)
     EXPECT_FLOAT_EQ(y[i],y2[i]);
 }

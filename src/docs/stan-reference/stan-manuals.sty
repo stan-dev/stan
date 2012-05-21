@@ -1,12 +1,14 @@
-% ------ if Lucida not available --------------
-% \usepackage{times}
-% \usepackage{amssymb}
-% ----- if Lucida availalable------------------
-\usepackage[%romanfamily=times,
-            scale=0.875,
-            stdmathitalics=true,
-            stdmathdigits=true]{lucimatx}
-% -------------- end if------------------------
+\IfFileExists{lucimatx.sty}{
+  % ----- if Lucida availalable------------------
+  \usepackage[%romanfamily=times,
+  scale=0.875,
+  stdmathitalics=true,
+  stdmathdigits=true]{lucimatx}
+}{
+  % ------ if Lucida not available --------------
+  \usepackage{times}
+  \usepackage{amssymb}
+}
 
 \usepackage{amsmath}
 \usepackage{xspace}

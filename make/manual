@@ -1,0 +1,7 @@
+.PHONY: manual
+manual: src/docs/stan-reference/stan-reference.pdf
+	cp src/docs/stan-reference/stan-reference.pdf doc/
+
+%.pdf: %.tex
+	cd $(dir $@); pdflatex $(notdir $^); bibtex $(notdir $(basename $@)); pdflatex $(notdir $^);
+

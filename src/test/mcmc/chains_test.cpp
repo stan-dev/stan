@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <boost/random/additive_combine.hpp>
 #include <set>
+#include <exception>
+#include <utility>
 
 TEST(McmcChains, validate_dim_idxs) {
   using stan::mcmc::validate_dims_idxs;
@@ -308,6 +310,8 @@ TEST(McmcChains,warmup_get_set) {
 }
 
 
+
+
 TEST(McmcChains,add) {
   using std::vector;
   using std::string;
@@ -590,5 +594,114 @@ TEST(McmcChains, get_kept_samples_permuted) {
   for (size_t m = 0; m < samples0.size(); ++m)
     found.insert(samples0[m]);
   EXPECT_EQ(expected,found);
- 
+}
+
+TEST(McmcChains, quantiles_means) {
+  using std::vector;
+  using std::string;
+  using stan::mcmc::chains;
+  unsigned int K = 2;
+  chains<> c(K,
+             vector<std::string>(1,"a"),
+             vector<vector<size_t> >(1, vector<size_t>(0)));
+  for (size_t k = 0; k < K; ++k)
+    for (size_t i = 0; i < 100; ++i)
+      c.add(k,std::vector<double>(1,100000)); 
+  c.set_warmup(100); // discard above, keep below
+  for (size_t k = 0; k < K; ++k)
+    for (size_t i = 0; i <= 1000; ++i)
+      c.add(k,std::vector<double>(1,i/1000.0));
+
+  // test low, middle and high branches
+
+  // single quantile, single chain
+  EXPECT_FLOAT_EQ(0.1, c.quantile(0,0,0.1));
+  EXPECT_FLOAT_EQ(0.5, c.quantile(0,0,0.5));
+  EXPECT_FLOAT_EQ(0.9, c.quantile(0,0,0.9));
+
+  EXPECT_FLOAT_EQ(0.1, c.quantile(1,0,0.1));
+  EXPECT_FLOAT_EQ(0.5, c.quantile(1,0,0.5));
+  EXPECT_FLOAT_EQ(0.9, c.quantile(1,0,0.9));
+
+  EXPECT_THROW(c.quantile(2,0,0.9), std::out_of_range);
+  EXPECT_THROW(c.quantile(0,2,0.9), std::out_of_range);
+
+
+  // single quantile, cross chain
+  EXPECT_FLOAT_EQ(0.1, c.quantile(0,0.1));
+  EXPECT_FLOAT_EQ(0.5, c.quantile(0,0.5));
+  EXPECT_FLOAT_EQ(0.9, c.quantile(0,0.9));
+  
+  EXPECT_THROW(c.quantile(2,0.9), std::out_of_range);
+
+  // multi quantiles, single chain
+  vector<double> qs;
+  vector<double> probs(5);
+  probs[0] = 0.025;  
+  probs[1] = 0.25; 
+  probs[2] = 0.5;
+  probs[3] = 0.75;
+  probs[4] = 0.975;
+  c.quantiles(0,0, probs, qs);
+
+  EXPECT_EQ(5U,qs.size());
+  EXPECT_FLOAT_EQ(0.025,qs[0]);
+  EXPECT_FLOAT_EQ(0.25,qs[1]);
+  EXPECT_FLOAT_EQ(0.5,qs[2]);
+  EXPECT_FLOAT_EQ(0.75,qs[3]);
+  EXPECT_FLOAT_EQ(0.975,qs[4]);
+  
+  
+  EXPECT_THROW(c.quantiles(5,0,probs,qs), std::out_of_range);
+  EXPECT_THROW(c.quantiles(0,10,probs,qs), std::out_of_range);
+
+
+  // multi quantiles, cross chains
+  c.quantiles(0, probs, qs);
+
+  EXPECT_EQ(5U,qs.size());
+  EXPECT_FLOAT_EQ(0.025,qs[0]);
+  EXPECT_FLOAT_EQ(0.25,qs[1]);
+  EXPECT_FLOAT_EQ(0.5,qs[2]);
+  EXPECT_FLOAT_EQ(0.75,qs[3]);
+  EXPECT_FLOAT_EQ(0.975,qs[4]);
+  
+  
+  EXPECT_THROW(c.quantiles(5,probs,qs), std::out_of_range);
+
+  // bad prob test within and across
+  probs[1] = 1.2;
+  EXPECT_THROW(c.quantiles(0,probs,qs), std::invalid_argument);
+  EXPECT_THROW(c.quantiles(0,0,probs,qs), std::invalid_argument);
+
+  // central interval, single chain
+  EXPECT_FLOAT_EQ(0.10,c.central_interval(0,0,0.8).first);
+  EXPECT_FLOAT_EQ(0.90,c.central_interval(0,0,0.8).second);
+
+  EXPECT_THROW(c.central_interval(2,0,0.8), std::out_of_range);
+  EXPECT_THROW(c.central_interval(0,3,0.8), std::out_of_range);
+  EXPECT_THROW(c.central_interval(0,0,1.2), std::invalid_argument);
+
+  // central interval, cross chains
+  EXPECT_FLOAT_EQ(0.10,c.central_interval(0,0,0.8).first);
+  EXPECT_FLOAT_EQ(0.90,c.central_interval(0,0,0.8).second);
+
+  EXPECT_THROW(c.central_interval(2,0.8), std::out_of_range);
+  EXPECT_THROW(c.central_interval(0,1.2), std::invalid_argument);
+
+  std::vector<double> samps;
+  c.get_kept_samples(0,0,samps);
+  EXPECT_FLOAT_EQ(stan::math::mean(samps),
+                  c.mean(0,0));
+  EXPECT_FLOAT_EQ(stan::math::sd(samps),
+                  c.sd(0,0));
+
+  c.get_kept_samples_permuted(0,samps);
+  EXPECT_FLOAT_EQ(stan::math::mean(samps),
+                  c.mean(0));
+  EXPECT_FLOAT_EQ(stan::math::sd(samps),
+                  c.sd(0));
+
+  
+  
 }
