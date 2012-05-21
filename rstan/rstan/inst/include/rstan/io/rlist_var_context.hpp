@@ -40,7 +40,7 @@ namespace rstan {
      * A rlist_var_context implements var_context from
      * a R list (Rcpp::List) --- named variables (scalar,
      * vector, array) with dimensions.  The values for
-     * an array are typed to doulbe or int.  However,
+     * an array are typed to double or int.  However,
      * it is R's job to pass data with correct types
      * though R uses double as the default atomic type. 
      * 

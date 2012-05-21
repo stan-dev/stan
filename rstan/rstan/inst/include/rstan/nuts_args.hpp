@@ -3,65 +3,9 @@
 #define __RSTAN__IO__NUTS_ARGS_HPP__
 
 
-/* output from `anon_model --help' */
-/*
-
-
-  --samples=<file>    File into which samples are written
-                          (default = samples.csv)
-
-  --append_samples    Append samples to existing file if it exists
-                          (does not write header in append mode)
-
-  --seed=<int>        Random number generation seed
-                          (default = randomly generated from time)
-
-  --chain_id=<int>    Markov chain identifier
-                          (default = 1)
-
-  --iter=<+int>       Total number of iterations, including warmup
-                          (default = 2000)
-
-  --warmup=<+int>     Discard the specified number of initial samples
-                          (default = iter / 2)
-
-  --thin=<+int>       Period between saved samples after warm up
-                          (default = max(1, floor(iter - warmup) / 1000))
-
-  --refresh=<+int>    Period between samples updating progress report print
-                          (default = max(1,iter/200)))
-
-  --leapfrog_steps=<int>
-                      Number of leapfrog steps; -1 for No-U-Turn adaptation
-                          (default = -1)
-
-  --max_treedepth=<int>
-                      Limit NUTS leapfrog steps to 2^max_tree_depth; -1 for no limit
-                          (default = 10)
-
-  --epsilon=<float>   Initial value for step size, or -1 to set automatically
-                          (default = -1)
-
-  --epsilon_pm=<[0,1]>
-                      Sample epsilon +/- epsilon * epsilon_pm
-                          (default = 0.0)
-
-  --epsilon_adapt_off
-                      Turn off step size adaptation (default is on)
-
-  --delta=<+float>    Initial step size for step-size adaptation
-                          (default = 0.5)
-
-  --gamma=<+float>    Gamma parameter for dual averaging step-size adaptation
-                          (default = 0.05)
-
-  --test_grad         Test gradient calculations using finite differences
-*/
-
-
 #include <Rcpp.h>
-#include <R.h>
-#include <Rinternals.h> 
+// #include <R.h>
+// #include <Rinternals.h> 
 
 #include <rstan/io/rlist_util.hpp>
 #include <rstan/io/r_ostream.hpp> 
@@ -104,7 +48,7 @@ namespace rstan {
    */ 
   class nuts_args {
   private:
-    std::string sample_file; // the file for outputing the samples 
+    std::string sample_file; // the file for outputting the samples 
     unsigned int iter;   // number of iterations 
     unsigned int warmup; // number of warmup 
     unsigned int thin; 
@@ -150,7 +94,7 @@ namespace rstan {
     } 
     nuts_args(const Rcpp::List &in) {
       /*
-      std::vector<std::string> argnames 
+      std::vector<std::string> argsnames 
         = Rcpp::as<std::vector<std::string> >(in.names()); 
       */
    

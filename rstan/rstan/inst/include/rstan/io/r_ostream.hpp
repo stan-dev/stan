@@ -4,17 +4,23 @@
 
 #include <streambuf>
 #include <ostream>
-#include <Rinternals.h>
+// #include <Rinternals.h>
+#include <R_ext/Print.h>
 
-/*
- * Since Rcpp only provides a std::cout, similar version
- * of both std::cout and std::cerr are implemented 
- * for stan to write to cout and cerr of R.
+/**
+ * Similar version of both std::cout and std::cerr are implemented for Stan to
+ * write to cout and cerr of R.
  *
- * see http://goo.gl/mKmeP (or http://goo.gl/1AB66) 
+ * See 
+ * http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt11ch25.html#io.streambuf.derived
+ * http://goo.gl/mKmeP 
+ * and http://www.cplusplus.com/reference/iostream/streambuf/overflow/
+ * 
+ * 
  */ 
 
 namespace rstan {
+
   namespace io {
 
     class r_cout_streambuf : public std::streambuf {
@@ -22,14 +28,18 @@ namespace rstan {
       r_cout_streambuf() {} 
 
     protected:
-      virtual int_type overflow(int_type c) {
-        if (c != EOF) {
-          Rprintf("%.1s", &c);
-        }
-        return c;
+      /**
+       * @param  c  An additional character to consume.
+       * @return  EOF to indicate failure, something else (usually
+       *          @a c, or not_eof())
+       */ 
+      virtual int_type overflow(int_type  c) {
+        if (c != EOF) 
+          Rprintf("%c", c);
+        return c; 
       }
 
-      virtual std::streamsize xsputn(const char* s, std::streamsize n) {
+      virtual std::streamsize xsputn(const char_type* s, std::streamsize n) {
         Rprintf("%.*s", n, s);
         return n;
       }
@@ -41,29 +51,40 @@ namespace rstan {
 
     protected:
       virtual int_type overflow(int_type c) {
-        if (c != EOF) {
-          REprintf("%.1s", &c);
-        }
+        if (c != EOF) 
+          REprintf("%c", c);
         return c;
       }
 
-      virtual std::streamsize xsputn(const char* s, std::streamsize n) {
+      virtual std::streamsize xsputn(const char_type* s, std::streamsize n) {
         REprintf("%.*s", n, s);
         return n;
       }
     };
 
 
-    template <class T> class r_ostream : public std::ostream {
-      protected:
-        T buf;
-      public:
-        r_ostream() : std::ostream(&buf) {}
-    }; 
+    template <class T>
+    class r_ostream : public std::ostream {
+    protected:
+      T buf;
+    public:
+      r_ostream(bool u) : std::ostream(&buf) {
+        if (u)
+          setf(std::ios_base::unitbuf);
+      }
+    };
 
-    r_ostream<r_cout_streambuf> rcout; 
-    r_ostream<r_cerr_streambuf> rcerr; 
+    /**
+     * Define global rstan::io::rcout and rstan::io::rcerr,
+     * which can be used similarly as std::cout and std::cerr.  
+     * 
+     */
+    // extern 
+    r_ostream<r_cout_streambuf> rcout(false); 
+    // extern 
+    r_ostream<r_cerr_streambuf> rcerr(true); 
   }
 
 } 
+
 #endif 

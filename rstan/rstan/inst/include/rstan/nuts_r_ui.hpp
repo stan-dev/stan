@@ -24,13 +24,14 @@
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
+#include <stan/mcmc/chains.hpp>
 
 #include <rstan/io/rlist_var_context.hpp> 
 #include <rstan/nuts_args.hpp> 
 #include <rstan/io/r_ostream.hpp> 
 
 #include <Rcpp.h>
-#include <Rinternals.h>
+// #include <Rinternals.h>
 
 
 namespace rstan {
