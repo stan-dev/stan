@@ -147,7 +147,7 @@ clean-dox:
 	$(RM) -r doc/api
 
 clean-manual:
-	cd src/docs/stan-reference; $(RM) *.aux *.log *.toc *.pdf
+	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf
 	$(RM) doc/stan-reference.pdf
 
 clean-models:

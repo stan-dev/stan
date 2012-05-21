@@ -14,6 +14,7 @@
 
 # /doc/
 /doc/api
+/doc/*.pdf
 
 # temporary files
 *~
