@@ -53,6 +53,7 @@ b <- new(modelhmc) # , dat, list(a = 3))
 ##      from given R function's parameters, which should be more friendly. 
 ##   4. s4 class for stan object to do print, plot, etc. 
 ##   5. include chain object into the c++ code. 
+##   6. R doc (Rd) 
 
 b$call_nuts(dat, 
             list(iter = 2012, 
