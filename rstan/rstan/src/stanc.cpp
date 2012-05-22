@@ -12,7 +12,7 @@
 
 #include "stanc.hpp"
 
-SEXP version() {
+SEXP stanc_version() {
   BEGIN_RCPP;
   std::string stan_version 
     = stan::MAJOR_VERSION + "." +

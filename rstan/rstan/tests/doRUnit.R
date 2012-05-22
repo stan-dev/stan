@@ -13,6 +13,6 @@ path <- system.file(package = pkg, "unitTests")
 
 
 
-source(file.path(path, "runTests.R"), echo = TRUE)
+source(file.path(path, "runRunitTests.R"), echo = TRUE)
  
 

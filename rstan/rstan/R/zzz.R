@@ -1,6 +1,6 @@
 
 .onLoad <- function(libname, pkgname) {
-    require("methods", character=TRUE, quietly=TRUE)
+    # require("methods", character = TRUE, quietly = TRUE)
     loadRcppModules()
 }
 

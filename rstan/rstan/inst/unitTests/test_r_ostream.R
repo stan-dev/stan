@@ -24,7 +24,7 @@ RCPP_MODULE(rstantest){
 ' 
 
 fx <- cxxfunction(signature(), body = 'return R_NilValue;\n',
-                  include = inc,
+                  includes = inc,
                   plugin = "rstan", verbose = TRUE) 
 
 mod <- Module("rstantest", getDynLib(fx)) 

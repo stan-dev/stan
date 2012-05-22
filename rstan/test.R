@@ -56,6 +56,10 @@ colMeans(post)
 ### this should not work since in the list of initial values, 
 ### mu does not exist. 
 ### 
+stan.samples(b, dat, n.chains = 1, n.iter = 2012, 
+             init.t = 'user', init.v = list(mu1 = 2)) 
+
+
 b$call_nuts(dat, 
             list(iter = 2012, 
                  seed = 3, 

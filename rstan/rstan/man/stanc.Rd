@@ -9,7 +9,7 @@ Stanc: compile model in Stan language to C++ code
 \description{
 }
 \usage{
-stanc(stan_modol_code, model_name) 
+stanc(model.code, model.name = "anon_model", verbose = FALSE) {
 }
 \examples{
 stanmodelcode <- '

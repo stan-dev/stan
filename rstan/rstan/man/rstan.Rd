@@ -38,5 +38,5 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 }
 \examples{
 %% ~~ simple examples of the most important functions ~~
-cat("Stan version: ", version(), sep = ''); 
+cat("Stan version: ", stanc.version(), sep = ''); 
 }

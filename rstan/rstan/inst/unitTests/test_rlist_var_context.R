@@ -4,7 +4,7 @@ require(rstan)
 
 inc <- paste(readLines('test_rlist_var_context.cpp'), collapse = '\n')
 
-fx <- cxxfunction(signature(), "" , include = inc, 
+fx <- cxxfunction(signature(), "" , includes = inc, 
                   # settings = myplugin, verbose = TRUE); 
                   plugin = "rstan", verbose = TRUE)
 mod <- Module("rstantest", getDynLib(fx))

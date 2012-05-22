@@ -1,8 +1,8 @@
-#ifndef  _myrstanpkg_STAN2CPP_H
-#define  _myrstanpkg_STAN2CPP_H
+#ifndef  __STANC_HPP__ 
+#define  __STANC_HPP__ 
 
 #include <Rcpp.h>
 RcppExport SEXP stanc(SEXP model_stancode, SEXP model_name);
-RcppExport SEXP version(); 
+RcppExport SEXP stanc_version(); 
 #endif 
 

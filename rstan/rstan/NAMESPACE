@@ -1,3 +1,13 @@
 useDynLib(rstan)
-exportPattern("^[[:alpha:]]+")
-import( Rcpp )
+# exportPattern("^[[:alpha:]]+")
+export (
+  stan.model,
+  stan.samples,
+  stanc, 
+  stanc.version 
+)
+
+exportClasses (
+  stanmodel 
+) 
+import(Rcpp)
