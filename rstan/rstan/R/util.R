@@ -42,6 +42,25 @@ read.model.from.con <- function(con) {
   paste(lines, collapse = '\n') 
 } 
 
+get.model.code <- function(file, model.code = '') {
+  if (!missing(file)) {
+    if (is.character(file)) {
+      fname <- file
+      file <- try(file(fname, "rt"))
+      if (inherits(file, "try-error")) {
+        stop(paste("Cannot open model file \"", fname, "\"", sep = ""))
+      }
+      on.exit(close(file))
+    } else if (!inherits(file, "connection")) {
+      stop("'File' must be a character string or connection")
+    }
+    model.code <- paste(readLines(file, warn = FALSE), collapse = '\n') 
+  } else if (model.code == '') {  
+    stop("Missing model file missing and empty model.code")
+  } 
+  model.code 
+} 
+
 
 #
 # model.code <- read.model.from.con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan');

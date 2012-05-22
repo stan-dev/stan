@@ -1,27 +1,29 @@
-stanc <- function(stan_model_code, model_name = "anon_model") {
-  .Call("stanc", stan_model_code, model_name, PACKAGE = "rstan");
+stanc <- function(stan_model_code, model_name = "anon_model", verbose = FALSE) {
+  SUCCESS_RC <- 0 
+  EXCEPTION_RC <- -1
+  PARSE_FAIL_RC <- -2 
+  r <- .Call("stanc", stan_model_code, model_name, PACKAGE = "rstan");
+  if (is.null(r)) {
+    stop(paste("Failed to run stanc for model '", model_name, 
+               "' and no error message provided", sep = '')) 
+  } else if (r$status == PARSE_FAIL_RC) {
+    stop(paste("Failed to parse Stan model '", model_name, 
+               "' and no error message provided"), sep = '') 
+  } else if (r$status == EXCEPTION_RC) {
+    stop(paste("Failed to parse Stan model '", model_name, 
+               "' and error message provided as:\n", 
+               r$msg, sep = '')) 
+  } 
+
+  if (r$status != SUCCESS_RC) {
+    if (verbose)  
+      cat("Successful of parsing the Stan model '", model_name, "'.\n") 
+  } 
+  r
 }
 
 
-version <- function() {
-  .Call("version", PACKAGE = "rstan");
+stanc.version <- function() {
+  .Call("stanc version", PACKAGE = "rstan");
 }
 
-## test examples 
-#   stanc("hello", "hellomodel")
-
-#   stanmodel <- "
-#   data {
-#     int(0,) N; 
-#     real y[N];
-#   } 
-#   parameters {
-#     real mu;
-#   } 
-#   model {
-#     y ~ normal(mu, 1); 
-#   } 
-#   "
-
-#   a <- stanc(stanmodel, 'stdnormal')
-#   cat("stan ver: ", version(), sep = ''); 

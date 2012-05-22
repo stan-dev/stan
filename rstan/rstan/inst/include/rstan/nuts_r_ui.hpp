@@ -125,6 +125,7 @@ namespace rstan {
   template <class Model> 
   class nuts_r_ui {
   private: 
+    // stan::mcmc::chains _chains; 
     int nuts_command(SEXP data, SEXP args) { 
 
       // rstan::io::rcout << "in nuts_command" << std::endl; 

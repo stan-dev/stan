@@ -24,7 +24,10 @@ test.util <- function() {
   model.code <- "model { \n y ~ normal(0, 1); \n}"  
   # cat(model.code, file = 'tmp.stan')  
   checkEquals(model.code, read.model.from.con('tmp.stan'), 
-              msg = "read stan model from file") 
+              msg = "Read stan model from file") 
+  checkEquals(model.code, get.model.code('tmp.stan'), "Read stan model from file") 
+  checkEquals(model.code, get.model.code(model.code = model.code), "Read stan model from model.code") 
+  checkException(get.model.code(), "Read stan model from model.code") 
 } 
 
 .tearDown <- function() {
