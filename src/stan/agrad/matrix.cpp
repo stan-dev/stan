@@ -65,6 +65,12 @@ namespace stan {
       return m.inverse();
     }
 
+    vector_v softmax(const vector_v& x) {
+      vector_v theta(x.size());
+      stan::math::softmax<vector_v,stan::agrad::var>(x,theta);
+      return theta;
+    }
+
     vector_v eigenvalues(const matrix_v& m) {
       // false == no vectors
       Eigen::EigenSolver<matrix_v> solver(m,false);

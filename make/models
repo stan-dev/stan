@@ -8,12 +8,12 @@ models/%$(EXE) : models/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.c) $(OUTPUT_OPTION) $<
+	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
 	@echo ''
-	@echo '--- Running model ---'
+	@echo '--- Copying model ---'
 	cp src/$(basename $@).stan $(basename $@).stan
+	@echo '--- Copying data ---'
 	-cp src/$(basename $@).Rdata $(basename $@).Rdata
-	$@ --data=$(basename $@).Rdata --samples=$(basename $@).csv
 
 .PRECIOUS: models/%.cpp
 models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)

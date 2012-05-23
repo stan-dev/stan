@@ -1,3 +1,6 @@
+# Leuk: Cox regression 
+# URL of OpenBugs' implementation: 
+#   http://www.openbugs.info/Examples/Leuk.html
 data {
   int(0,) N;
   int(0,) NT;

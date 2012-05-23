@@ -2321,9 +2321,6 @@ namespace stan {
 }
 
 
-/** 
- * Template specification of functions in std for Stan.
- */
 namespace std {
 
   /** 
@@ -2371,8 +2368,10 @@ namespace std {
   };
 
   /**
+   * Checks if the given number is NaN.
+   * 
    * Return <code>true</code> if the value of the
-   * specivied variable is not a number.
+   * specified variable is not a number.
    *
    * @param a Variable to test.
    * @return <code>true</code> if value is not a number.
@@ -2382,6 +2381,8 @@ namespace std {
   }
 
   /**
+   * Checks if the given number is infinite.
+   * 
    * Return <code>true</code> if the value of the
    * a is positive or negative infinity.
    *
@@ -2392,11 +2393,6 @@ namespace std {
     return isinf(a.val());
   }
 
-
-
 }
-
-
-
 
 #endif

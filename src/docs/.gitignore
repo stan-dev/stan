@@ -1,0 +1,6 @@
+*.aux
+*.bbl
+*.blg
+*.log
+*.toc
+stan-reference/stan-reference.pdf

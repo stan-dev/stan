@@ -371,6 +371,7 @@ namespace stan {
       write_comment(sample_stream);
       write_comment_property(sample_stream,"stan_version_major",stan::MAJOR_VERSION);
       write_comment_property(sample_stream,"stan_version_minor",stan::MINOR_VERSION);
+      write_comment_property(sample_stream,"stan_version_patch",stan::PATCH_VERSION);
       write_comment_property(sample_stream,"data",data_file);
       write_comment_property(sample_stream,"init",init_val);
       write_comment_property(sample_stream,"append_samples",append_samples);

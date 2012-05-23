@@ -1,0 +1,1890 @@
+
+
+
+\part{Built-In Functions}\label{built-in-functions.part}
+
+\chapter{Built-in Functions}
+
+\Stan supports a wide range of built-in functions.  These functions
+operate over and return values spanning the complete range of data
+types.  
+
+The following chapters in this part describe basic functions returning
+integers and returning real values, array and matrix functions, and
+probability functions and cumulative distributions.
+
+\section{Function Signatures}
+
+The documentation of the special functions begins with a function
+signature.  This determines the type of arguments taken by the
+function and the type of value returned.  
+
+\subsection{Overloading}
+
+\Stan relies on function overloading, which means there can be several
+different functions with the same name.  Functions are determined
+uniquely by the combination of their name and the type of their
+arguments.
+
+For example, \Stan includes two built-in functions named \code{max}, one that
+operates on integers to return an integer, with signature
+%
+\begin{quote}
+\begin{Verbatim}
+int max(int m, int n)
+\end{Verbatim}
+\end{quote}
+%
+and one that operates over reals, with signature
+%
+\begin{quote}
+\begin{Verbatim}
+real max(real x, real y)
+\end{Verbatim}
+\end{quote}
+%
+The appropriate instance is called based on the arguments provided.
+
+The two functions named \code{max} are distinguished by their argument
+types.  It would not be legal to add a third function with signature
+\code{real max(int,int)}, as it would lead to a conflict with the
+existing function of name \code{max} and argument types
+\code{(int,int)}, even though it has a different return type.
+
+
+\section{Integer-to-Real Type Promotion}
+
+Integer values may be passed to functions requiring real values.  This
+is not unrelated to the fact that integer values may be assigned to
+real variables.  In both cases, the underlying \Cpp code handles the
+promotion of the underlying integer type to the underlying
+floating-point type.
+
+Consider again the two functions \code{max(int,int)} and
+\code{max(real,real}), and suppose these are the only two functions
+named \code{max} (they are the only two of that name built into
+\Stan).  If \code{m} is an integer variable and \code{x} a real
+variable, the call \code{max(m,x)} must be resolved as referring to
+\code{max(double,double)}, because integers can be promoted to real
+values, but not vice-versa.  
+
+If \code{n} is another integer variable, a call to \code{max(m,n)}
+could conceivably call either function named \code{max}.  The function
+\code{max(int,int)} requires no promotions, whereas
+\code{max(double,double)} requires two, so the first is invoked.  The
+general rule is that the function call matches the function requiring
+the fewest promotions.
+
+Even this simple disambiguation scheme leads to possible ambiguity
+(though \Stan's built-in functions avoid it).  If there were two functions,
+\code{foo(int,real)} and \code{foo(real,int)} and if \code{m} and
+\code{n} were integer variales, a call to \code{foo(m,n)} would be
+ambiguous.  Either function could be matched with one promotion and
+there is no better-matching function.  In such cases, the call will
+not compile.  This could be resolved by assigning one variable to a
+temporary, as in the following example.
+%
+\begin{quote}
+\begin{Verbatim}
+int m;  int n;  real x;  real y;  
+x <- m;  y <- n;
+# foo(m,n);  // illegal!
+foo(x,n);    // calls foo(double,int)
+foo(m,y);    // calls foo(int,double)
+\end{Verbatim}
+\end{quote}
+
+
+
+
+
+\chapter{Integer-Valued Basic Functions}
+
+This chapter describes \Stan's built-in function that operate on real
+and integer arguments and return results of type integer.
+
+
+\section{Integer-Valued Arithmetic Operators}
+
+\Stan's arithmetic is based on standard double-precision \Cpp integer and
+floating-point arithmetic.  If the arguments to an arithmetic operator
+are both integers, as in \code{2+2}, integer arithmetic is used.  If
+one argument is an integer and the other a floating-point value, as in
+\code{2.0+2}, \code{2+2.0}, then the integer is promoted to a floating
+point value and floating-point arithmetic is used.
+
+Integer arithmetic behaves slightly differently than floating point
+arithmetic.  The first difference is how overflow is treated.  If the
+sum or product of two integers overflows the maximum integer
+representable, the result is an undesirable wraparound behavior at the
+bit level.  If the integers were first promoted to real numbers, they
+would not overlflow a floating-point representation.  There are no
+extra checks in \Stan to flag overflows, so it is up to the user to
+make sure it does not occur.
+
+Secondly, because the set of integers is not closed under division and
+there is no special infinite value for integers, integer division
+behaves differently.  For integer division by values other than zero,
+the result is rounded toward 0.  For instance, positive results are
+rounded down, as in \code{1/2 = 0} and \code{5/3 = 1}, whereas
+negative results are rounded up, as in \code{(-1)/2 = 0} and
+\code{(-5)/33 = -1}.
+
+Unlike floating point division, where \code{1.0/0.0} produces the
+special positive infinite value, integer division by zero, as in
+\code{1/0}, has undefined behavior in the \Cpp standard.  For example,
+the \clang compiler on Mac OS X returns 3764, whereas the \gpp
+compiler throws a floating-point exception and aborts the program with
+a warning.  As with overflow, it is up to the user to make sure
+integer divide-by-zero does not occur.
+
+\subsection{Binary Infix Operators}
+
+\begin{description}
+%
+\fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+The sum of the addends \farg{x} and \farg{y}}
+%
+\fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+The difference between the minuend \farg{x} and subtrahend \farg{y}}
+%
+\fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+The product of the factors \farg{x} and \farg{y}}
+%
+\fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+The integer quotiont of the dividend \farg{x} and divisor \farg{y}}
+%
+\end{description}
+
+\subsection{Unary Prefix Operators}
+
+\begin{description}
+\fitem{real}{operator-}{real \farg{x}}{
+The negation of the the subtrahend \farg{x}}
+
+\fitem{real}{operator+}{real \farg{x}}{
+The promotion of addend \farg{x} to a real, which is a no-op
+for real inputs}
+\end{description}
+
+\section{Absolute Functions}
+
+\begin{description}
+%
+\fitem{int}{abs}{int \farg{x}}{
+The absolute value of \farg{x}}
+%
+\fitem{int}{int\_step}{real \farg{x}}
+1 if \farg{x} is strictly greater than 0, and 0 otherwise
+%
+\end{description}
+%
+
+\section{Bound Functions}
+%
+\begin{description}
+\fitem{int}{min}{int \farg{x}, int \farg{y}}{
+The minimum of \farg{x} and \farg{y}}
+%
+\fitem{int}{max}{int \farg{x}, int \farg{y}}{
+The maximum of \farg{x} and \farg{y}}
+%
+\end{description}
+
+
+\chapter{Real-Valued Basic Functions}
+
+This chapter describes built-in functions that take zero or more real
+or integer arguments and return real values.  Constants are
+represented as functions with no arguments and must be called as such.
+
+\section{Mathematical Constants}\label{built-in-constants.section}
+
+%
+\begin{description}
+%
+\fitem{real}{pi}{}{
+  $\pi$, the ratio of a circle's circumference to its diameter}
+%
+\fitem{real}{e}{}{
+ $e$, the base of the natural logarithm}
+%
+\fitem{real}{sqrt2}{}{
+The square root of 2}
+%
+\fitem{real}{log2}{}{
+The natural logarithm of 2}
+%
+\fitem{real}{log10}{}{
+The natural logarithm of 10}
+%
+\end{description}
+
+\section{Special Values}
+
+\begin{description}
+\fitem{real}{nan}{}{
+Not-a-number, a special non-finite real value returned to signal an error}
+%
+\fitem{real}{infinity}{}{
+ Positive infinity, a special non-finite real value larger than all
+  finite numbers}
+%
+\fitem{real}{negative\_infinity}{}{ 
+ Negative infinity, a special non-finite real value smaller than all
+  finite numbers}
+%
+\fitem{real}{epsilon}{}{
+The smallest positive real value representable}
+%
+\fitem{real}{negative\_epsilon}{}{
+The largest negative real value representable}
+%
+\end{description}
+
+\section{Logical Functions}
+
+\begin{description}
+%
+\fitem{real}{if\_else}{int cond, real \farg{x}, real \farg{y}}{
+\farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise}
+%
+\fitem{real}{step}{real \farg{x}}{
+0 if \farg{x} is negative and 1 otherwise}
+%
+\end{description}
+
+
+\section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
+
+The arithmetic operators are presented using \Cpp notation.  For
+instance \code{operator+(x,y)} refers to the binary addition operator
+and \code{operator-(x)} to the unary negation operator.  In \Stan
+programs, these are written using the usual infix and prefix notations
+as \code{x~+~y} and \code{-x}, respectively.
+
+\subsection{Binary Infix Operators}
+
+\begin{description}
+%
+\fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+The sum of the addends \farg{x} and \farg{y}}
+%
+\fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+The difference between the minuend \farg{x} and subtrahend \farg{y}}
+%
+\fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+The product of the factors \farg{x} and \farg{y}}
+%
+\fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+The quotiont of the dividend \farg{x} and divisor \farg{y}}
+%
+\end{description}
+
+\subsection{Unary Prefix Operators}
+
+\begin{description}
+\fitem{real}{operator-}{real \farg{x}}{
+The negation of the the subtrahend \farg{x}}
+
+\fitem{real}{operator+}{real \farg{x}}{
+The promotion of addend \farg{x} to a real, which is a no-op
+for real inputs}
+\end{description}
+
+
+\section{Absolute Functions}
+
+\begin{description}
+%
+\fitem{real}{abs}{real \farg{x}}{
+The absolute value of \farg{x}}
+%
+\fitem{real}{fabs}{real \farg{x}}{
+The absolute value of \farg{x}}
+%
+\fitem{real}{fdim}{real \farg{x}, 
+                 real \farg{y}}{
+The positive difference between \farg{x} and \farg{y}, which is
+\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0 otherwise}
+%
+\end{description}
+
+\section{Bounds Functions}
+
+\begin{description}
+%
+\fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
+The minimum of \farg{x} and \farg{y}}
+%
+\fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
+The maximum of \farg{x} and \farg{y}}
+%
+\end{description}
+
+\section{Arithmetic Functions}
+%
+\begin{description}
+\fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
+The real value remainder after dividing \farg{x} by \farg{y}}
+%
+\end{description}
+
+\section{Rounding Functions}
+
+\begin{description}
+%
+\fitem{real}{floor}{real \farg{x}}{
+The floor of \farg{x}, which is the largest integer less
+than or equal to \farg{x}, converted to a real value}
+%
+\fitem{real}{ceil}{real \farg{x}}{
+The ceiling of \farg{x}, which is the smallest integer greater
+than or equal to \farg{x}, converted to a real value}
+%
+\fitem{real}{round}{real \farg{x}}{
+The nearest integer to \farg{x}, converted to a real value}
+%
+\fitem{real}{trunc}{real \farg{x}}{
+The integer nearest to but no larger in magnitude than \farg{x},
+converted to a double value}
+%
+\end{description}
+
+\section{Power and Logarithm Functions}
+
+\begin{description}
+%
+\fitem{real}{sqrt}{real \farg{x}}{
+The square root of \farg{x}}
+%
+\fitem{real}{cbrt}{real \farg{x}}{
+The cube root of \farg{x}}
+%
+\fitem{real}{square}{real \farg{x}}{
+The square of \farg{x}}
+%
+\fitem{real}{exp}{real \farg{x}}{
+The natural exponential of \farg{x}}
+%
+\fitem{real}{exp2}{real \farg{x}}{
+The base-2 exponential of \farg{x}}
+%
+\fitem{real}{expm1}{real \farg{x}}{
+The natural exponential of \farg{x} minus 1}
+%
+\fitem{real}{log}{real \farg{x}}{
+The natural logarithm of \farg{x}}
+%
+\fitem{real}{log2}{real \farg{x}}{
+The base-2 logarithm of \farg{x}}
+%
+\fitem{real}{log10}{real \farg{x}}{
+The base-10 logarithm of \farg{x}}
+%
+\fitem{real}{pow}{real \farg{x}, real \farg{y}}{
+\farg{x} raised to the power of \farg{y}}
+%
+\end{description}
+
+
+
+
+\section{Link Functions}
+
+\begin{description}
+%
+\fitem{real}{logit}{real \farg{x}}{
+The log odds, or logit, function applied to \farg{x}}
+%
+\fitem{real}{inv\_logit}{real \farg{x}}{
+The logistic sigmoid function applied to \farg{x}}
+%
+\fitem{real}{inv\_cloglog}{real \farg{x}}{
+The inverse of the complement log-log function applied to \farg{x}}
+%
+\end{description}
+
+
+\section{Trigonometric Functions}
+
+\begin{description}
+%
+\fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
+The length of the hypoteneuse of a right triangle with sides of
+length \farg{x} and \farg{y}}
+%
+\fitem{real}{cos}{real \farg{x}}{
+The cosine of the angle \farg{x} (in radians)}
+%
+\fitem{real}{sin}{real \farg{x}}{
+The sine of the angle \farg{x} (in radians)}
+%
+\fitem{real}{tan}{real \farg{x}}{
+The tangent of the angle \farg{x} (in radians)}
+%
+\fitem{real}{acos}{real \farg{x}}{
+The princpipal arc (inverse) cosine (in radians) of \farg{x}}
+%
+\fitem{real}{asin}{real \farg{x}}{
+The principal arc (inverse) sine (in radians) of \farg{x}}
+%
+\fitem{real}{atan}{real \farg{x}}{
+The principal arc (inverse) tangent (in radians) of \farg{x}}
+%
+\fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
+The principal arc (inverse) tangent (in radians) of \farg{x} divided
+by \farg{y}}
+%
+\end{description}
+
+\section{Hyperbolic Trigonometric Functions}
+
+\begin{description}
+%
+\fitem{real}{cosh}{real \farg{x}}{
+The hyperbolic cosine of \farg{x} (in radians)}
+%
+\fitem{real}{sinh}{real \farg{x}}{
+The hyperbolic sine of \farg{x} (in radians)}
+%
+\fitem{real}{tanh}{real \farg{x}}{
+The hyperbolic tangent of \farg{x} (in radians)}
+%
+\fitem{real}{acosh}{real \farg{x}}{
+The inverse hyperbolic cosine (in radians) of \farg{x}}
+%
+\fitem{real}{asinh}{real \farg{x}}{
+The inverse hyperbolic sine (in radians) of \farg{x}}
+%
+\fitem{real}{atanh}{real \farg{x}}{
+The inverse hyperbolic tangent (in radians) of \farg{x}}
+%
+\end{description}
+
+\section{Probability-Related Functions}
+
+\begin{description}
+%
+\fitem{real}{erf}{real \farg{x}}{
+The error function of \farg{x}}
+%
+\fitem{real}{erfc}{real \farg{x}}{
+The complementary error function of \farg{x}}
+%
+\fitem{real}{Phi}{real \farg{x}}{
+The cumulative normal density function of \farg{x}}
+%
+\fitem{real}{log\_loss}{int \farg{y}, real \farg{y\_hat}}{
+The log loss of predicting probabilty \farg{y\_hat} for 
+binary outcome \farg{y}}
+%
+\end{description}
+
+
+
+
+\section{Combinatorial Functions}
+
+\begin{description}
+%
+\fitem{real}{tgamma}{real \farg{x}}{
+The gamma function applied to \farg{x}}
+%
+\fitem{real}{lgamma}{real \farg{x}}{
+The natural log of the gamma function applied to \farg{x}}
+%
+\fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
+The natural logarithm of the multinomial gamma function with \farg{n}
+dimensions applied to \farg{x}}
+%
+\fitem{real}{lbeta}{real \farg{x}, real \farg{y}}{
+The natural log of the beta function applied to \farg{x}}
+%
+\fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real \farg{y}}{
+The natural logarithm of the binomial coefficient of \farg{x} choose
+\farg{y}, generalized to real values via the gamma function}
+%
+\end{description}
+
+
+\section{Composed Functions}
+
+\begin{description}
+%
+\fitem{real}{fma}{real \farg{x}, 
+               real \farg{y},
+               real \farg{z}}{
+\farg{z} plus the result of \farg{x} multiplied by \farg{y}}
+%
+\fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
+The product of \farg{x} and the natural logarithm of \farg{y}}
+%
+\fitem{real}{log1p}{real \farg{x}}{
+The natural logarithm of 1 plus \farg{x}}
+%
+\fitem{real}{log1m}{real \farg{x}}{
+The natural logarithm of 1 minus \farg{x}}
+%
+\fitem{real}{log1p\_exp}{real \farg{x}}{ 
+The natural logarithm of one plus the natural exponentiation of
+\farg{x}}
+%
+\fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
+The natural logarithm of the sum of the natural exponentiation
+of \farg{x} and the natural exponentiation of \farg{y}}
+%
+\end{description}
+
+
+
+
+\chapter{Array Operations}
+
+
+\begin{description}
+\fitem{real}{sum}{real \farg{x}[]}
+The sum of the elements in \farg{x}
+%
+\fitem{real}{mean}{real \farg{x}[]}
+The sample mean of the elements in \farg{x}
+%
+\fitem{real}{variance}{real \farg{x}[]}
+The sample variance of the elements in \farg{x} (based on
+dividing by \code{length - 1})
+%
+\fitem{real}{sd}{real \farg{x}[]} The sample standard deviation of
+elements in \farg{x} (divide by \code{length - 1})
+%
+\fitem{real}{log\_sum\_exp}{real \farg{x}[]}
+The log of the sum of the exponentials of the elements in \farg{x}
+\end{description}
+
+
+\chapter{Matrix Operations}\label{matrix-operations.chapter}
+
+
+\section{Integer-Valued Matrix Size Functions}
+
+\begin{description}
+%
+\fitem{int}{rows}{vector \farg{x}}{The number of
+rows in the vector \farg{x}}
+%
+\fitem{int}{rows}{row\_vector \farg{x}}{The number of
+rows in the row vector \farg{x}, namely 1}
+%
+\fitem{int}{rows}{matrix \farg{x}}{The number of
+rows in the matrix \farg{x}}
+%
+\fitem{int}{cols}{vector \farg{x}}{The number of columns
+in the vector \farg{x}, namely 1}
+%
+\fitem{int}{cols}{row\_vector \farg{x}}{The number of columns
+in the row vector \farg{x}}
+%
+\fitem{int}{cols}{matrix \farg{x}}{The number of columns
+in the matrix \farg{x}}
+\end{description}
+
+
+\section{Matrix Arithmetic Operators}
+
+\Stan supports the basic matrix operations using infix, prefix and
+postfix operations.  This section lists the operations supported by
+\Stan along with their argument and result types.
+
+\subsection{Negation Prefix Operators}
+
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}}{The negation of the vector
+\farg{x}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}}{The negation of the row
+vector \farg{x}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}}{The negation of the matrix
+  \farg{x}}
+%
+\end{description}
+
+
+\subsection{Infix Matrix Operators}
+
+\begin{description}
+%
+\fitem{vector}{operator+}{vector \farg{x}, vector \farg{y}}{The sum of
+the vectors \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{operator+}{row\_vector \farg{x}, row\_vector \farg{y}}{The sum of
+the row vectors \farg{x} and \farg{y}}
+%
+\fitem{matrix}{operator+}{matrix \farg{x}, matrix \farg{y}}{The sum of
+the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+\fitem{vector}{operator-}{vector \farg{x}, vector \farg{y}}{The difference between
+the vectors \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+  difference between the the row vectors \farg{x} and \farg{y}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}, matrix \farg{y}}{The difference between
+  the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator*}{real \farg{x}, vector \farg{y}}{The product of
+the scalar \farg{x} and vector \farg{y}}
+%
+\fitem{row\_vector}{operator*}{real \farg{x}, row\_vector \farg{y}}{The product of
+the scalar \farg{x} and the row vector \farg{y}}
+%
+\fitem{matrix}{operator*}{real \farg{x}, matrix \farg{y}}{The product of
+the scalar \farg{x} and the matrix \farg{y}}
+%
+%
+\fitem{vector}{operator*}{vector \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and vector \farg{x}}
+%
+\fitem{matrix}{operator*}{vector \farg{x}, row\_vector \farg{y}}{The product
+of the row vector \farg{x} and vector \farg{y}}
+%
+%
+\fitem{row\_vector}{operator*}{row\_vector \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and row vector \farg{x}}
+%
+\fitem{real}{operator*}{row\_vector \farg{x}, vector \farg{y}}{The product
+of the row vector \farg{x} and vector \farg{y}}
+%
+\fitem{row\_vector}{operator*}{row\_vector \farg{x}, matrix \farg{y}}{The product
+of the row vector \farg{x} and matrix \farg{y}}
+%
+%
+\fitem{matrix}{operator*}{matrix \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and matrix \farg{x}}
+%
+\fitem{vector}{operator*}{matrix \farg{x}, vector \farg{y}}{The
+  product of the matrix \farg{x} and vector \farg{y}}
+%
+\fitem{matrix}{operator*}{matrix \farg{x}, matrix \farg{y}}{The product of 
+  the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+%
+
+
+
+\subsection{Broadcast Infix Operators}
+
+\begin{description}
+%
+\fitem{matrix}{operator+}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the vector \farg{y}}
+%
+\fitem{matrix}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the row vector \farg{y}}
+%
+\fitem{matrix}{operator+}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in the matrix \farg{y}}
+%
+\fitem{matrix}{operator+}{vector \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the vector \farg{x}}
+%
+\fitem{matrix}{operator+}{row\_vector \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the row vector \farg{x}}
+%
+\fitem{matrix}{operator+}{matrix \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the matrix \farg{x}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the vector \farg{x}}
+%
+\fitem{vector}{operator-}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the negation of the vector \farg{y}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the row vector \farg{x}}
+%
+\fitem{row\_vector}{operator-}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the negation of the row vector \farg{y}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the matrix \farg{x}}
+%
+\fitem{matrix}{operator-}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in negation of the matrix \farg{y}}
+%
+\end{description}
+
+\subsection{Elementwise Products}
+
+\begin{description}
+%
+\fitem{vector}{operator.*}{vector \farg{x}, vector \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator.*}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator.*}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+\fitem{vector}{operator./}{vector \farg{x}, vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator./}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\end{description}
+\vspace*{-4pt}
+
+\subsection{Elementwise Logarithms}
+
+\begin{description}
+%
+\fitem{vector}{log}{vector \farg{x}}{
+The elementwise natural logarithm of \farg{x}}
+%
+\fitem{row\_vector}{log}{row\_vector \farg{x}}{
+The elementwise natural logarithm of \farg{x}}
+%
+\fitem{matrix}{log}{matrix \farg{x}}{
+The elementwise natural logarithm of \farg{x}}
+%
+\fitem{vector}{exp}{vector \farg{x}}{
+The elementwise exponential of \farg{x}}
+%
+\fitem{row\_vector}{exp}{row\_vector \farg{x}}{
+The elementwise exponential of \farg{x}}
+%
+\fitem{matrix}{exp}{matrix \farg{x}}{
+The elementwise exponential of \farg{x}}
+\end{description}
+
+
+
+\subsection{Dot Products}
+
+\begin{description}
+%
+\fitem{real}{dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{vector \farg{x}, row\_vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{row\_vector \farg{x}, vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\end{description}
+
+
+\section{Reductions}
+
+\subsection{Minimum and Maximum}
+
+\begin{description}
+%
+\fitem{real}{min}{vector \farg{x}}{
+The minimum value in \farg{x}}
+%
+\fitem{real}{min}{row\_vector \farg{x}}{
+The minimum value in \farg{x}}
+%
+\fitem{real}{min}{matrix \farg{x}}{
+The minimum value in \farg{x}}
+%
+\fitem{real}{max}{vector \farg{x}}{
+The maximum value in \farg{x}}
+%
+\fitem{real}{max}{row\_vector \farg{x}}{
+The maximum value in \farg{x}}
+%
+\fitem{real}{max}{matrix \farg{x}}{
+The maximum value in \farg{x}}
+%
+\end{description}
+
+\subsection{Sums and Products}
+
+\begin{description}
+%
+\fitem{real}{sum}{vector \farg{x}}{
+The sum of the values in \farg{x} (zero if size zero)}
+%
+\fitem{real}{sum}{row\_vector \farg{x}}{
+The sum of the values in \farg{x} (zero if size zero)}
+%
+\fitem{real}{sum}{matrix \farg{x}}{
+The sum of the values in \farg{x} (zero if size zero)}
+%
+%
+\fitem{real}{prod}{vector \farg{x}}{
+The product of the values in \farg{x} (one if size zero)}
+%
+\fitem{real}{prod}{row\_vector \farg{x}}{
+The product of the values in \farg{x} (one if size zero)}
+%
+\fitem{real}{prod}{matrix \farg{x}}{
+The product of the values in \farg{x} (one if size zero)}
+%
+\end{description}
+
+
+
+\subsection{Sample Moments}
+
+\begin{description}
+%
+\fitem{real}{mean}{vector \farg{x}}{
+The sample mean of the values in \farg{x}}
+%
+\fitem{real}{mean}{row\_vector \farg{x}}{
+The sample mean of the values in \farg{x}}
+%
+\fitem{real}{mean}{matrix \farg{x}}{
+The sample mean of the values in \farg{x}
+(divide by length minus 1)}
+%
+\vspace*{4pt}
+%
+\fitem{real}{variance}{vector \farg{x}}{
+The sample variance of the values in \farg{x}
+(divide by size minus 1)}
+%
+\fitem{real}{variance}{row\_vector \farg{x}}{ 
+The sample variance of the
+values in \farg{x} (divide by size minus 1)}
+%
+\fitem{real}{variance}{matrix \farg{x}}{
+The sample variance of the values in 
+farg{x} (divide by size minus 1)}
+%
+\vspace*{4pt}
+%
+\fitem{real}{sd}{vector \farg{x}}{
+The sample standard deviation of the values in \farg{x}
+(divide by size minus 1)}
+%
+\fitem{real}{sd}{row\_vector \farg{x}}{ 
+The sample standard deviation of the
+values in \farg{x} (divide by size minus 1)}
+%
+\fitem{real}{sd}{matrix \farg{x}}{
+The sample standard deviation of the values in 
+\farg{x} (divide by size minus 1)}
+%
+\end{description}
+
+
+\section{Slice and Package Functions}
+
+\subsection{Diagonal Matrices}
+
+\begin{description}
+%
+\fitem{vector}{diagonal}{matrix \farg{x}}{The diagonal
+of the matrix \farg{x}}
+%
+\fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
+matrix with diagonal \farg{x}}
+%
+\fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
+of matrix \farg{x}}
+%
+\fitem{row\_vector}{row}{matrix \farg{x}, int \farg{m}}{The \farg{m}-th row
+of matrix \farg{x}}
+%
+\end{description}
+
+
+\subsection{Transposition Postfix Operator}
+
+\begin{description}
+%
+\fitem{matrix}{operator'}{matrix \farg{x}}{The transpose of the matrix
+ \farg{x}, written as \code{x'}}
+%
+\fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
+ \farg{x}, written as \code{x'}}
+%
+\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the vector
+ \farg{x}, written as \code{x'}}
+%
+\end{description}
+
+
+\section{Linear Algebra Functions and Solvers}
+
+\subsection{Matrix Division Infix Operators}
+%
+\begin{description}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inv(\farg{A})}}
+%
+\fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inv(\farg{A}) * \farg{b}}
+%
+\end{description}
+
+\subsection{Special Matrix Functions}
+
+The softmax function maps $\reals^K$ to the $K$-simplex by
+\[
+\mbox{softmax}(y)
+ = \frac{\exp(y)}
+        {\sum_{k=1}^K \exp(y_k)},
+\]
+%
+where $\exp(y)$ is the componentwise exponentiation of $y$.
+
+\begin{description}
+\fitem{vector}{softmax}{vector \farg{x}}{
+The softmax of \farg{x}}
+\end{description}
+%
+
+\subsection{Linear Algebra Functions}
+
+\begin{description}
+%
+\fitem{real}{trace}{matrix \farg{A}}{
+The trace of \farg{A}}
+%
+\fitem{real}{determinant}{matrix \farg{A}}{
+The determinant of \farg{A}}
+%
+\fitem{matrix}{inverse}{matrix \farg{A}}{
+The inverse of \farg{A}}
+%
+\fitem{vector}{eigenvalues}{matrix \farg{A}}{
+The vector of eigenvalues of \farg{A} in descending order}
+%
+\fitem{matrix}{eigenvalues}{matrix \farg{A}}{
+The matrix with the eigenvectors of \farg{A} as columns}
+%
+\fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
+The vector of eigenvalues of a symmetric view of \farg{A} 
+in descending order}
+%
+\fitem{vector}{eigenvectors\_sym}{matrix \farg{A}}{
+The matrix with the eigenvectors of a symmetric view of
+\farg{A}}
+%
+\fitem{matrix}{cholesky}{matrix \farg{A}}{
+The lower-triangular Cholesky factor of \farg{A}}
+%
+\fitem{vector}{singular\_values}{matrix \farg{A}}{
+The singular values of \farg{A} in descending order}
+%
+
+
+\end{description}
+
+
+
+\section{Integer-Valued Matrix Size Functions}
+
+\begin{description}
+%
+\fitem{int}{rows}{vector \farg{x}}{The number of
+rows in the vector \farg{x}}
+%
+\fitem{int}{rows}{row\_vector \farg{x}}{The number of
+rows in the row vector \farg{x}, namely 1}
+%
+\fitem{int}{rows}{matrix \farg{x}}{The number of
+rows in the matrix \farg{x}}
+%
+\fitem{int}{cols}{vector \farg{x}}{The number of columns
+in the vector \farg{x}, namely 1}
+%
+\fitem{int}{cols}{row\_vector \farg{x}}{The number of columns
+in the row vector \farg{x}}
+%
+\fitem{int}{cols}{matrix \farg{x}}{The number of columns
+in the matrix \farg{x}}
+\end{description}
+
+
+
+\chapter{Discrete Probabilities}\label{discrete-prob-functions.chapter}
+
+The various discrete probability functions are organized by their
+support.
+
+\section{Binary Discrete Probabilities}
+
+Binary probability functions have support on $\setlist{0,1}$, where 1
+represents the value true and 0 the value false.
+
+\subsection{Bernoulli Distribution}
+
+If $\theta \in [0,1]$, then for $c \in \setlist{0,1}$, 
+\[
+\distro{Bernoulli}(c|\theta)
+=
+\left\{
+\begin{array}{ll}
+\theta & \mbox{if } y = 1, \mbox{ and}
+\\
+1 - \theta & \mbox{if } y = 0.
+\end{array}
+\right.
+\]
+\begin{description}
+%
+ \fitem{real}{bernoulli\_log}{int \farg{y}, real \farg{theta}}{The
+   Bernoulli probability mass of \farg{y} given chance of success
+   \farg{theta}}
+%
+\end{description}
+
+\section{Bounded Discrete Probabilities}\label{betafun.section}
+
+Bounded discrete probability functions have support on
+$\setlist{0,\ldots,N}$ for some upper bound $N$.
+
+\subsection{Binomial Distribution}
+
+If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
+\{0,\ldots,N\}$,
+\[
+\distro{Binomial}(n|N,\theta)
+= {N \choose n} \theta^n (1 - \theta)^{N - n}.
+\]
+
+\begin{description}
+%
+  \fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
+    \farg{theta}}{The binomial probability mass of \farg{n}
+    successes in \farg{N} trials given chance of success \farg{theta}}
+%
+\end{description}
+
+
+\subsection{Beta-Binomial Distribution}
+
+If $N \in \nats$, $\alpha \in \posreals$, and $\beta \in \posreals$,
+then for $n \in \setlist{0,\ldots,N}$,
+\[
+\distro{BetaBinomial}(n|N,\alpha,\beta)
+= 
+{N \choose n} \frac{\Betafun(n+\alpha, N -n +
+  \beta)}{\Betafun(\alpha,\beta)},
+\]
+%
+where the beta function $\Betafun(x,y)$ is defined for $x \in
+\posreals$ and $y \in \posreals$ by
+%
+\[
+\Betafun(x,y)
+= \frac{\Gamma(x) \ \Gamma(y)}{\Gamma(x + y)}.
+\]
+
+\begin{description}
+%
+\fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
+  \farg{alpha}, real \farg{beta}}{The beta-binomial probability mass
+  of \farg{n} successes in \farg{N} trials given prior success count
+  (plus one) of \farg{alpha} and prior failure count (plus one) of
+  \farg{beta}}
+%
+\end{description}
+
+
+\subsection{Hypergeometric Distribution}
+
+If $a \in \nats$, $b \in \nats$, and $N \in \setlist{0,\ldots,a+b}$,
+then for $n \in \setlist{0,\ldots,\min(a,N)}$, 
+\[
+\distro{Hypergeometric}(n|N,a,b)
+=
+\frac{\normalsize{a \choose n} {b \choose {N - n}}}
+     {\normalsize{{m + n} \choose N}}.
+\]
+
+\begin{description}
+%
+  \fitem{real}{hypergeometric\_log}{int \farg{n}, int \farg{N}, int
+    \farg{a}, int \farg{b}}{The hypergeometric probability mass of
+    \farg{n} successes in \farg{N} trials given total success count of
+    \farg{a} and total failure count of \farg{b}}
+
+%
+\end{description}
+
+\subsection{Categorical Distribution}
+
+If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $n \in
+\setlist{1,\ldots,N}$, 
+\[
+\distro{Categorical}(n|\theta) = \theta_n.
+\]
+
+\begin{description}
+%
+\fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
+ categorical probability mass function with outcome \farg{y} in 
+$1:N$ given $N$-simplex distribution parameter \farg{theta}}
+%
+\end{description}
+
+\subsection{Ordered Logistic Distribution}
+
+If $K \in \nats$ with $K > 2$, $c \in \reals^{K-1}$ such that $c_k <
+c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k \in
+\setlist{1,\ldots,K}$,
+\[
+\distro{OrderedLogistic}(k|\eta,c)
+=
+\left\{
+\begin{array}{ll}
+1 - \mbox{logit}^{-1}(\eta - c_1) & \mbox{if } k = 1
+\\[4pt]
+\mbox{logit}^{-1}(\eta - c_{k-1}) - \mbox{logit}^{-1}(\eta -
+c_{k})
+& \mbox{if } 1 < k < K
+\\[4pt]
+\mbox{logit}^{-1}(\eta - c_{K-1}) - 0
+& \mbox{if } k = K
+\end{array}
+\right.
+\]
+%
+The $k=1$ and $k=K$ edge cases can be subsumed into the general definition
+by setting $c_0 = -\infty$ and $c_K = +\infty$ with
+$\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
+%
+\begin{description}
+  \fitem{real}{ordered\_logistic\_log}{int \farg{k}, real
+    \farg{eta}, vector \farg{c}}{The ordered logistic probability mass of
+    \farg{k} given linear predictor \farg{eta} and cutpoints \farg{c}.}
+\end{description}
+
+
+\section{Unbounded Discrete Distributions}
+
+The unbounded discrete distributions have support over the natural
+numbers (i.e., the non-negative integers).
+
+\subsection{Negative Binomial Distribution}
+
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
+\nats$,
+\[
+\distro{NegativeBinomial}(n|\alpha,\beta)
+= 
+{{n + \alpha - 1} \choose {\alpha - 1}}
+\,
+\left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
+\,
+\left( \frac{1}{\beta + 1} \right)^{\!n} \!.
+\]
+
+\begin{description}
+%
+ \fitem{real}{negative\_binomial\_log}{int \farg{n}, real
+   \farg{alpha}, real \farg{beta}}{The negative binomial probability
+   mass of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
+%
+\end{description}
+
+
+\subsection{Poisson Distribution}
+
+If $\lambda \in \posreals$, then for $n \in \nats$,
+\[
+\distro{Poisson}(n|\lambda)
+= 
+\frac{\exp(-\lambda)}{\lambda!}
+\,
+\lambda^n.
+\]
+
+\begin{description}
+\fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
+   Poisson probability mass of \farg{n} given rate \farg{lambda}}
+\end{description}
+
+
+
+
+
+
+\section{Multivariate Discrete Probabilities}
+
+\subsection{Multinomial Distribution}
+
+If $K \in \nats$, $N \in \nats$, and $\theta \in \mbox{$K$-simplex}$,
+then for $y \in \nats^K$ such that $\sum_{k=1}^K y_k = N$,
+%
+\[
+\distro{Multinomial}(y|\theta,N)
+= {N \choose {y_1,\ldots,y_K}} 
+\prod_{k=1}^K \theta_k^{y_k},
+\]
+where the multinomial coefficient is defined by
+\[
+{N \choose {y_1,\ldots,y_k}}
+= \frac{N!}{\prod_{k=1}^K y_k!}.
+\]
+
+\begin{description}
+ \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
+    \farg{theta}}{The multinomial probability mass function with
+    outcome array \code{y} of size $K$ given the $K$-simplex
+    distribution parameter \farg{theta} and (implicit) total count
+    \code{N = sum(\farg{y})}}
+\end{description}
+
+
+\chapter{Continuous Probabilities}\label{continuous-prob-functions.chapter}
+
+The various continuous probability functions are organized by their
+support.
+
+\section{Univariate Continuous Probabilities}
+
+The univariate continous probability distributions have support on all
+real numbers.
+
+\subsection{Normal Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
+\reals$,
+\[
+\distro{Normal}(y|\mu,\sigma)
+=
+\frac{1}{\sqrt{2 \pi} \ \sigma}
+\exp\left( - \, \frac{1}{2}
+           \left(  \frac{\theta - \mu}{\sigma} \right)^2
+    \right)
+\!.
+\]
+
+\begin{description}
+\fitem{real}{normal\_log}{real \farg{y}, real \farg{mu}, real
+\farg{sigma}}{The normal density of \farg{y} given location
+\farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{normal\_log}{real[] \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The product for \code{n} from 1 to
+  \code{size(\farg{y})} of the normal density of
+  \code{\farg{y}[n]} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{normal\_p}{real \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The cumulative normal distribution of \farg{y}
+  given location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+
+\subsection{Student-$t$ Distribution}
+
+If $\nu \in \posreals$, $\mu \in \reals$, and $\sigma \in \posreals$,
+then for $y \in \reals$,
+\[
+\distro{StudentT}(y|\nu,\mu,\sigma)
+=
+\frac{\Gamma\left((\nu + 1)/2\right)}
+     {\Gamma(\nu/2)}
+\
+\frac{1}{\sqrt{\nu \pi} \ \sigma}
+\
+\left(
+1 + \frac{1}{\nu} \left(\frac{\theta - \mu}{\sigma}\right)^2
+\right)^{-(\nu + 1)/2}
+\! .
+\]
+
+\begin{description}
+  \fitem{real}{student\_t\_log}{real \farg{y}, real \farg{nu}, real
+    \farg{mu}, real \farg{sigma}}{The Student-$t$ density of \farg{y}
+    given degrees of freedom \farg{nu}, location \farg{mu}, and scale
+    \farg{sigma}}
+\end{description}
+
+\subsection{Cauchy Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
+\[
+\distro{Cauchy}(y|\mu,\sigma)
+= 
+\frac{1}{\pi \sigma}
+\
+\frac{1}{1 + \left((y - \mu)/\sigma\right)^2}
+.
+\]
+
+\begin{description}
+%
+\fitem{real}{cauchy\_log}{real \farg{y}, real \farg{mu}, real
+ \farg{sigma}}{ The Cauchy density of \farg{y} given location
+ \farg{mu} and scale \farg{sigma}}
+%
+\end{description}
+
+\subsection{Double Exponential Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$, 
+\[
+\distro{DoubleExponential}(y|\mu,\sigma)
+= \frac{1}{2\sigma} 
+  \exp \left( - \, \frac{|y - \mu|}{\sigma} \right)
+.
+\]
+
+\begin{description}
+\fitem{real}{double\_exponential\_log}{real \farg{y}, real \farg{mu},
+real \farg{sigma}}{ The double exponential density of \farg{y} given
+location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+\subsection{Logistic Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
+\[
+\distro{Logistic}(y|\mu,\sigma)
+=
+\frac{1}{\sigma}
+\
+\exp\!\left( - \, \frac{y - \mu}{\sigma} \right)
+\
+\left(1 + \exp \!\left( - \, \frac{y - \mu}{\sigma} \right) \right)^{\!-2}
+\! .
+\]
+
+\begin{description}
+\fitem{real}{logistic\_log}{real \farg{y}, real \farg{mu},
+real \farg{sigma}}{ The logistic density of \farg{y} given
+location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+
+\section{Positive Continuous Probabilities}
+
+The positive continuous probability functions have support on the
+positive real numbers.
+
+\subsection{Log-Normal Distribution}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$, 
+\[
+\distro{LogNormal}(y|\mu,\sigma)
+=
+\frac{1}{\sqrt{2 \pi} \ \sigma}
+\,
+\frac{1}{y}
+\
+\exp \! \left(
+       - \, \frac{1}{2}
+       \, \left( \frac{\log y - \mu}{\sigma} \right)^2
+     \right)
+.
+\]
+
+\begin{description}
+ \fitem{real}{lognormal\_log}{real \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The lognormal density of \farg{y} given location
+  \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{lognormal\_p}{real \farg{y}, real \farg{mu}, real
+  \farg{sigma}}{The cumulative lognormal distribution of \farg{y}
+  given location \farg{mu} and scale \farg{sigma}}
+\end{description}
+
+\subsection{Chi-Square Distribution}
+
+If $\nu \in \posreals$, then for $y \in \posreals$,
+\[
+\distro{ChiSquare}(y|\nu)
+=
+\frac{2^{-\nu/2}}
+    {\Gamma(\nu / 2)}
+\,
+y^{\nu/2 - 1}
+\,
+\exp \! \left( -\, \frac{1}{2} \, y \right)
+.
+\]
+
+\begin{description}
+\fitem{real}{chi\_square\_log}{real \farg{y}, real \farg{nu}}{The
+  Chi-square density of \farg{y} given degrees of freedom
+  \farg{nu}}
+\end{description}
+
+\subsection{Inverse Chi-Square Distribution}
+
+If $\nu \in \posreals$, then for $y \in \posreals$,
+\[
+\distro{InvChiSquare}(y|\nu)
+= 
+\frac{2^{-\nu/2}}
+   {\Gamma(\nu / 2)}
+\,
+y^{-(\nu/2 - 1)}
+\,
+\exp\! \left( \! - \, \frac{1}{2} \, \frac{1}{y} \right)
+.
+\]
+
+\begin{description}
+\fitem{real}{inv\_chi\_square\_log}{real \farg{y}, real
+  \farg{nu}}{The inverse Chi-square density of \farg{y} given
+  degrees of freedom \farg{nu}}
+\end{description}
+
+\subsection{Scaled Inverse Chi-Square Distribution}
+
+If $\nu \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$,
+\[
+\distro{ScaledInvChiSquare}(y|\nu)
+= 
+\frac{(\nu / 2)^{\nu/2}}
+     {\Gamma(\nu / 2)}
+\,
+\sigma^{\nu}
+\,
+y^{-(\nu/2 + 1)}
+\,
+\exp \! \left( \!
+   - \, \frac{1}{2} \, \nu \, \sigma^2 \, \frac{1}{y}
+\right)
+.
+\]
+
+
+\begin{description}
+ \fitem{real}{scaled\_inv\_chi\_square\_log}{real \farg{y}, real
+   \farg{nu}, real \farg{s}}{The inverse Chi-square density of \farg{y} given
+   degrees of freedom \farg{nu} and scale \farg{s}}
+\end{description}
+
+\subsection{Exponential Distribution}
+
+If $\beta \in \posreals$, then for $y \in \posreals$,
+\[
+\distro{Exponential}(y|\beta)
+= 
+\beta \, 
+\exp ( - \beta \, y )
+.
+\]
+
+\begin{description}
+  \fitem{real}{exponential\_log}{real \farg{y}, real \farg{beta}}{The
+    exponential density of \farg{y} given inverse scale \farg{beta}}
+%
+\fitem{real}{exponential\_p}{real \farg{y}, real \farg{beta}}{The
+  cumulative distribution function of \farg{y} given inverse scale
+  \farg{beta}}
+\end{description}
+
+\subsection{Gamma Distribution}
+
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
+\posreals$,
+\[
+\distro{Gamma}(y|\alpha,\beta)
+=
+\frac{\beta^{\alpha}}
+     {\Gamma(\alpha)}
+\,
+y^{\alpha - 1}
+\exp(-\beta \, y)
+.
+\]
+
+\begin{description}
+ \fitem{real}{gamma\_log}{real \farg{y}, real \farg{alpha}, real
+  \farg{beta}}{The gamma density of \farg{y} given shape
+  \farg{alpha} and inverse scale \farg{beta}}
+%
+  \fitem{real}{gamma\_p}{real \farg{y}, real \farg{alpha}, real
+   \farg{beta}}{The cumulative distribution function of \farg{y} given shape
+   \farg{alpha} and inverse scale \farg{beta}}
+\end{description}
+
+\subsection{Inverse Gamma Distribution}
+
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
+\posreals$,
+\[
+\distro{InvGamma}(y|\alpha,\beta)
+= 
+\frac{\beta^{\alpha}}
+     {\Gamma(\alpha)}
+\
+y^{-(\alpha + 1)}
+\,
+\exp \! \left( \! - \beta \, \frac{1}{y} \right)
+.
+\]
+
+\begin{description}
+\fitem{real}{inv\_gamma\_log}{real \farg{y}, real \farg{alpha}, real
+\farg{beta}}{The inverse gamma density of \farg{y} given shape
+\farg{alpha} and scale \farg{beta}}
+\end{description}
+
+\subsection{Weibull Distribution}
+
+% k = alpha   lambda = sigma
+If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
+\posreals$, 
+\[
+\distro{Weibull}(y|\alpha,\sigma)
+= 
+\frac{\alpha}{\sigma}
+\,
+\left( \frac{y}{\sigma} \right)^{\alpha - 1}
+\,
+\exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{\alpha}  \right)
+.
+\]
+
+\begin{description}
+\fitem{real}{weibull\_log}{real \farg{y}, real \farg{alpha}, real
+\farg{sigma}}{The Weibull density of \farg{y} given shape
+\farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{weibull\_p}{real \farg{y}, real \farg{alpha}, real
+\farg{sigma}}{The Weibull cumulative distribution of \farg{y} given shape
+\farg{alpha} and scale \farg{sigma}}
+\end{description}
+
+
+
+\section{Positive Lower-Bounded Probabilities}
+
+The positive lower-bounded probabilities have support on real values
+above some positive minimum value.
+
+
+\subsection{Pareto Distribution}
+
+If $y_0 \in \posreals$ and $\alpha \in \posreals$, then for
+$y \in \posreals$,
+\[
+\distro{Pareto}(y|y_0,\alpha)
+=
+\alpha 
+\ y_0
+\, \left( \frac{1}{y} \right)^{\!\alpha+1}
+\! .
+\]
+
+\begin{description}
+  \fitem{real}{pareto\_log}{real \farg{y}, real \farg{y\_min}, real
+    \farg{alpha}}{The Pareto density of \farg{y} given positive minimum
+    value \farg{y\_min} and shape \farg{alpha}}
+\end{description}
+
+
+
+\section{$[0,1]$ Continuous Probabilities}
+
+\subsection{Beta Distribution}
+
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
+\in [0,1]$,
+\[
+\distro{Beta}(\theta|\alpha,\beta)
+=
+\frac{1}{\Betafun(\alpha,\beta)}
+\,
+\theta^{\alpha - 1}
+\,
+(1 - \theta)^{\beta - 1}
+,
+\] 
+where the beta function $\Betafun()$ is as defined in \refsection{betafun}
+
+
+\begin{description}
+%
+  \fitem{real}{beta\_log}{real \farg{theta}, real \farg{alpha}, real
+    \farg{beta}}{The beta density of \code{theta} in $[0,1]$
+    given positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}}
+%
+\end{description}
+
+\section{Bounded Continuous Probabilities}
+
+The bounded continuous probabilities have support on a finite interval
+of real numbers.
+
+\subsection{Uniform Distribution}
+
+If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
+\in [\alpha,\beta]$,
+\[
+\distro{Uniform}(y|\alpha,\beta)
+= 
+\frac{1}{\beta - \alpha}
+.
+\]
+
+\begin{description}
+\fitem{real}{uniform\_log}{real \farg{y}, real \farg{alpha}, real
+  \farg{beta}}{The uniform density of \farg{y} given lower bound
+  \farg{alpha} and upper bound \farg{beta}}
+\end{description}
+
+\section{Simplex Probabilities}
+
+The simplex probabilities have support on the unit $K$-simplex for a
+specified $K$.
+
+\subsection{Dirichlet Distribution}
+
+If $K \in \nats$ and $\alpha \in (\posreals)^{K}$, then for
+$\theta \in \mbox{$K$-simplex}$, 
+\[
+\distro{Dirichlet}(\theta|\alpha)
+= 
+\frac{\Gamma \! \left( \sum_{k=1}^K \alpha_k \right)}
+     {\prod_{k=1}^K \Gamma(\alpha_k)}
+\
+\prod_{k=1}^K \theta_k^{\alpha_k - 1}
+.
+\]
+
+\begin{description}
+%
+\fitem{real}{dirichlet\_log}{vector \farg{theta}, vector
+ \farg{alpha}}{
+The Dirichlet density for simplex \farg{theta} given prior counts (plus
+one) \farg{alpha}}
+%
+\end{description}
+
+
+\section{Vector Probabilities}
+
+The vector probability distributions have support on all of
+$\reals^K$ for some fixed $K$.
+
+\subsection{Multivariate Normal Distribution}
+
+If $K \in \nats$, $\mu \in \reals^K$, and $\Sigma \in \reals^{K \times
+  K}$ is symmetric and positive definite, then for $y \in \reals^K$,
+\[
+\distro{MultiNormal}(y|\mu,\Sigma)
+=
+\frac{1}{\left( 2 \pi \right)^{K/2}}
+\
+\frac{1}{\sqrt{|\Sigma|}}
+\
+\exp \! \left( \!
+- 
+\frac{1}{2}
+(y - \mu)^{\top} \, \Sigma^{-1} \, (y - \mu)
+\right)
+\! ,
+\]
+%
+where $|\Sigma|$ is the absolute determinant of $\Sigma$.
+
+\begin{description}
+%
+\fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
+ matrix \farg{S}}{Multivariate normal density of vector \farg{y}
+ given location \farg{mu} and covariance matrix \farg{S}}
+%
+\end{description}
+
+\subsection{Multivariate Normal Distribution (Cholesky)}
+
+If $K \in \nats$, $\mu \in \reals^K$, and $L \in \reals^{K \times K}$ is lower
+triangular and such that $LL^{\top}$ is positive definite, then for $y
+\in \reals^K$,
+\[
+\distro{MultiNormalCholesky}(y|\mu,L)
+=
+\distro{MultiNormal}(y|\mu,LL^{\top}).
+\]
+
+\begin{description}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{vector \farg{y}, vector
+  \farg{mu}, matrix \farg{L}}{Multivariate normal density of vector
+  \farg{y} given location \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\end{description}
+
+
+\subsection{Multivariate Student-$t$ Distribution}
+
+If $K \in \nats$, $\nu \in \posreals$, $\mu \in \reals^K$, and $\Sigma
+\in \reals^{K \times K}$ is symmetric and positive definite, then for
+$y \in \reals^K$,
+\[
+\begin{array}{l}
+\distro{MultiStudentT}(y|\nu,\mu,\Sigma)
+\\[8pt]
+\displaystyle
+\hspace*{8pt}
+=
+\frac{1}{\pi^{K/2}}
+\
+\frac{1}{\nu^{K/2}}
+\
+\frac{\Gamma\!x\left((\nu + K)/2\right)}
+     {\Gamma(\nu/2)}
+\
+\frac{1}{\sqrt{\left| \Sigma \right|}}
+\
+\left(
+1 + \frac{1}{\nu} \, \left(y - \mu\right)^{\top} \, \Sigma^{-1} \, \left(y - \mu\right)
+\right)^{-(\nu + K)/2}
+\! .
+\end{array}
+\]
+\vspace*{4pt}
+
+\begin{description}
+%
+\fitem{real}{multi\_student\_t\_log}{vector \farg{y}, real \farg{nu},
+  vector \farg{mu}, matrix \farg{S}}{Multivariate Student-$t$
+  density of vector \farg{y} given degrees of freedom \farg{nu},
+  location \farg{mu}, and scale matrix \farg{S}}
+%
+\end{description}
+
+
+
+\section{Covariance Matrix Distributions}
+
+The covariance matrix distirbutions have support on symmetric,
+positive-definite $K \times K$ matrices.
+
+\subsection{Wishart Distribution}
+
+If $K \in \nats$, $\nu \in (K-1,\infty)$, and $S \in \reals^{K \times K}$ is symmetric
+and positive definite, then for symmetric and positive-definite $W \in
+\reals^{K \times K}$,
+\[
+\distro{Wishart}(W|\nu,S)
+=
+\frac{1}{2^{\nu K / 2}}
+\
+\frac{1}{\Gamma_K \! \left( \frac{\nu}{2} \right)}
+\
+\left| S \right|^{-\nu/2}
+\
+\left| W \right|^{(\nu - K - 1)/2}
+\
+\exp \! \left(\frac{1}{2} \ \mbox{tr}\left( S^{-1} W \right) \right)
+\! ,
+\]
+%
+where $\mbox{tr}()$ is the matrix trace function, and $\Gamma_K()$ is
+the multivariate Gamma function,
+\[
+\Gamma_K(x) = 
+\frac{1}{\pi^{K(K-1)/4}}
+\
+\prod_{k=1}^K \Gamma \left( x + \frac{1 - k}{2} \right)
+\!.
+\]
+
+\begin{description}
+%
+\fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+ \farg{S}}{Wishart density for positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{S}}
+%
+\end{description}
+
+
+\subsection{Inverse Wishart Distribution}
+
+If $K \in \nats$, $\nu \in (K-1,\infty)$, and $S \in \reals^{K \times
+  K}$ is symmetric and positive definite, then for symmetric and
+positive-definite $W \in \reals^{K \times K}$,
+\[
+\distro{InvWishart}(W|\nu,S)
+= 
+\frac{1}{2^{\nu K / 2}}
+\
+\frac{1}{\Gamma_K \! \left( \frac{\nu}{2} \right)}
+\
+\left| S \right|^{\nu/2}
+\
+\left| W \right|^{-(\nu - K - 1)/2}
+\
+\exp \! \left( 
+- \frac{1}{2}
+\
+\mbox{tr}(SW^{-1})
+\right)
+\! .
+\]
+
+\begin{description}
+%
+\fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+ \farg{S}}{Inverse Wishart density for positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{S}}
+%
+\end{description}
+
+\subsection{LKJ Covariance Distribution}
+
+\begin{description}
+%
+\fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
+\farg{sigma}, real \farg{eta}}{LKJ density for covariance matrix
+\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
+and shape \farg{eta}}
+%
+\end{description}
+
+
+
+\section{Correlation Matrix Distributions}
+
+The correlation matrix distributions have support on the (Cholesky
+factors of) correlation matrices.  A Cholesky factor $L$ for a $K
+\times K$ covariance matrix of dimensions $K$ has rows of unit length
+so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
+
+\subsection{LKJ Cholesky Distribution}
+
+\begin{description}
+%
+\fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+  \farg{eta}}{LKJ density for the lower-triangular Cholesky factor
+  \farg{L} of a correlation matrix given shape \farg{eta}}
+%
+\end{description}
+

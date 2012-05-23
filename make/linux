@@ -19,8 +19,8 @@ ifeq (mingw32-g++,$(CC_TYPE))
 #  CFLAGS += -m32
   CFLAGS_GTEST += -g
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
-  LDFLAGS += -static-libgcc
-  LDFLAGS += -static-libstdc++
+  LDLIBS += -static-libgcc
+  LDLIBS += -static-libstdc++
   PCH = .gch
   EXE = .exe
 endif

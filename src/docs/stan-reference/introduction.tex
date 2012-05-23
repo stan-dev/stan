@@ -1,0 +1,561 @@
+\part{Introduction}
+
+
+\chapter{Overview}
+
+This document is both a user's guide and a reference manual for
+\Stan's probabilistic modeling language.  This introductory chapter
+provides a high-level overview of \Stan.  The next chapter provides a
+hands-on quick-start guide showing how \Stan works in practice.  The
+remaining parts of this document include a practically-oriented user's
+guide for programming models and a detailed reference manual for
+\Stan's modeling language and associated programs and data formats.
+
+\section{\Stan Programs}
+
+A \Stan program defines a statistical model through a conditional
+probability function $p(\theta|y;x)$, where $\theta$ is a sequence of
+unknown values, $y$ is a sequence of known, modeled data variables,
+and $x$ is a sequence of predictors and constants.
+
+\Stan programs consist of variable type declarations and statments.
+Variable types include constrained and unconstrained integer, scalar,
+vector, and matrix types, as well as (multidimensional) arrays of
+other types.  Variables are declared in blocks corresponding to the
+variable's use: data, transformed data, parameter, transformed
+parameter, or generated quantity.  Unconstrained local variables may
+be declared within statement blocks.
+
+Statements in \Stan are interpreted imperatively, so their order
+matters.  Atomic statements involve the assignment of a value to a
+variable.  Sequences of statements (and optionally local variable
+declarations) may be organized into a block.  \Stan also provides bounded
+for-each loops of the sort used in \R and \BUGS.
+
+The transformed data, transformed parameter, and generated quantities
+blocks contain statements defining the variables declared in their
+blocks.  A special model block consists of statements defining the log
+probability for the model.
+
+Within the model block, \BUGS-style sampling notation may be used as
+shorthand for incrementing an underlying log probablity variable, the
+value of which defines the log probability function.  The log
+probability variable may also be accessed directly, allowing
+user-defined probability functions and Jacobians of transforms.
+
+
+\section{Compiling and Running \Stan Programs}
+
+A \Stan program is first compiled to a \Cpp program by the \Stan
+compiler \stanc, then the \Cpp program compiled to a self-contained
+platform-specific executable.  \Stan can generate executables for
+various flavors of Windows, Mac OS X, and Linux.%
+%
+\footnote{A \Stan program may also be compiled to a dynamically
+  linkable object file for use in a higher-level scripting language
+  such as \R or Python.}
+%
+Running the \Stan executable for a model first reads in and validates
+the known values $y$ and $x$, then generates a sequence of
+(non-independent) identically distributed samples $\theta^{(1)},
+\theta^{(2)}, \ldots$, each of which has the marginal distribution
+$p(\theta|y;x)$.
+
+
+\section{\Stan's Samplers}
+
+For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
+sampling.  \Stan 1.0 can only sample discrete parameters on which no
+other parameters depend, such as simulated values.
+\refchapter{mixture-modeling} discusses how finite discrete parameters
+can be summed out of models.
+
+\HMC is a form of Markov chain Monte Carlo (\MCMC) sampling.  \HMC
+accelerates both convergence to the stationary distribution and
+subsequent parameter exploration by using the gradient of the log
+probabilty function.  The unknown quantity vector $\theta$ is
+interpreted as the position of a fictional particle.  Each iteration
+generates a random momentum and simulates the path of the particle
+with potential energy determined the (negative) log probability
+function evaluated at position of $\theta$.  Hamilton's decomposition
+shows that the gradient of this potential determines change in
+momentum and the momentum determines the change in position.  These
+continuous changes over time are approximated using the leapfrog
+algorithm, which breaks the time into discrete steps which are easily
+simulated.  A Metropolis reject step is then applied to correct for
+any simulation error and ensure detailed balance of the resulting
+Markov chain transitions.
+
+Standard \HMC involves three ``tuning'' parameters to which its
+behavior is quite sensitive.  \Stan's samplers allow these parameters
+to be set by hand or set automatically without user intervention.
+
+The first tuning parameter is a mass matrix for the fictional
+particle.  \Stan can be set to use a unit mass matrix, a user-defined
+diagonal mass matrix, or to estimate a diagonal mass matrix during
+warmup.  The latter has the effect of normalizing the scale of each
+element $\theta_k$ of the unknown variable sequence $\theta$.
+
+The other two tuning parameters set the temporal step size of the
+discretization of the Hamiltonian and the total number of steps taken
+per iteration.  \Stan can be set to use a user-specified step size
+or it can estimate an optimal step size during warmup.  In either case,
+additional randomization may be applied to draw the step size from
+an interval of possible step sizes.  
+
+\Stan can be set to use a specified number of steps, or it can
+automatically adapt the number of steps during sampling using the
+no-U-turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+
+
+\section{Convergence Monitoring and Effective Sample Size}
+
+Samples in a Markov chain are only drawn with the marginal
+distribution $p(\theta|y;x)$ after the chain has converged to its
+stationary distribution.  There are several methods to test whether an
+\MCMC method has failed to converge (unforunately, passing the tests
+does not guarantee convergence).  The recommended method for \Stan is to
+run multiple Markov chains, discard the warmup samples, then split the
+remainder of each chain in half and compute the potential scale
+reduction statistic, $\hat{R}$ \citep{GelmanRubin:1992}.
+
+When estimating a mean based on $M$ independent samples, the
+estimation error is proportional to $1/\sqrt{M}$.  If the samples are
+positively correlated, as they typically are when drawn using \MCMC
+methods, the error is proportional to $1/\sqrt{\mbox{\sc ess}}$, where
+{\sc ess} is the effective sample size.  Thus it is standard practice
+to also monitor (an estimate of) the effective sample size of
+parameters of interest to gauge the error of any inferences based on
+the samples.
+
+
+
+
+\section{Bayesian Inference and Monte Carlo Methods}
+
+\Stan was developed to support full Bayesian inference.  Bayesian
+inference is based in part on Bayes's rule,
+\[
+p(\theta|y;x) \propto p(y|\theta;x) \, p(\theta;x),
+\]
+which, in this unnormalized form, states that the posterior
+probability $p(\theta|y;x)$ of parameters $\theta$ given data $y$ (and
+constants $x$) is proportional (for fixed $y$ and $x$) to the
+product of the likelihood function $p(y|\theta;x)$ and prior
+$p(\theta;x)$.
+
+For \Stan, Bayesian modeling involves coding the posterior probability
+function up to a proportion, which Bayes's rule shows is equivalent to
+modeling the product of the likelihood function and prior up to a
+proportion.
+
+Full Bayesian inference involves propagating the uncertainty in the
+value of parameters $\theta$ modeled by the posterior $p(\theta|y;x)$.
+This can be accomplished by basing inference on a sequence of samples
+from the posterior using plug-in estimates for quantities of interest
+such as posterior means, posterior intervals, predictions based on the
+posterior such as event outcomes or the values of as yet unobserved
+data.
+
+
+
+\chapter{Getting Started}
+
+This chapter is designed to help users get acquainted with the overall
+design of the \Stan language and calling \Stan from the command line.
+For installation information, see \refappendix{install}.
+Later chapters are devoted to expanding on the material in this
+chapter with full reference documentation.
+
+
+\section{A Minimal Program}
+
+Stan is distributed with several working models.  The simplest of
+these is found in the following location relative to the top-level
+distribution.
+%
+\begin{quote}
+\begin{Verbatim}
+src/models/basic_distributions/normal.stan
+\end{Verbatim}
+\end{quote}
+%
+The contents of this file are as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real y;
+}
+model {
+  y ~ normal(0,1);
+}
+\end{Verbatim}
+\end{quote}
+%
+The model's single parameter \code{y} is declared to take real values.
+The probability model specifies that \code{y} has a normal
+distribution with location 0 and scale 1.  Basically, this model will
+sample a single unit normal variate.  
+
+\section{Whitespace and Semicolons}
+
+In \Stan, every variable declaration and atomic statement must be
+terminated by a semicolon (\code{;}).  This is the convention followed
+by programming languages such as \Cpp.  It is not the convention
+followed by the statistical languages \R, \BUGS, or \JAGS.
+
+The reason for the \Cpp convention is to ensure that differences in
+whitespace are not meaningful.  In \R, \BUGS, and \JAGS, the following
+is a complete, legal statement.
+%
+\begin{quote}
+\begin{Verbatim}
+a <- b +
+     c
+\end{Verbatim}
+\end{quote}
+%
+In contrast, the usual way of typesetting mathematics and laying out
+code in programming languages, with the operator continuing the
+expression beginning a new line, is invalid.
+%
+\begin{quote}
+\begin{Verbatim}
+a <- b
+     + c
+\end{Verbatim}
+\end{quote}
+%
+The only difference is in the kind of whitespace between \code{b} and
+\code{+} and between \code{+} and \code{c}.  In \Stan, there is no
+whitespace-dependent behavior.  Neither of these is a complete
+statement, whereas either one terminated with a semicolon is.  The
+second form is recommended for \Cpp and \Stan.
+
+
+\section{Compiling  with {\tt\bfseries stanc}}
+
+Starting at \Stan's home directory, written here as {\tt \$stan},
+the model may be compiled by the \Stan compiler, \stanc, into \Cpp code
+as follows.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd $stan
+> bin/stanc src/models/basic_distributions/normal.stan
+\end{Verbatim}
+%
+\begin{Verbatim}
+Model name=anon_model
+Input file=src/models/basic_distributions/normal.stan
+Output file=anon_model.cpp
+\end{Verbatim}
+\end{quote}
+%
+The output indicates the name of the model, here the default value
+\code{anon\_model}, the input file from which the \Stan program is
+read, here \code{normal.stan}, and the output file to which the
+generated \Cpp code is written, here \code{anon\_model.cpp}.  See
+\refchapter{stanc} for more documentation on the \stanc compiler.
+
+\section{Compiling the Generated Code}
+
+The file generated by \stanc must next be compiled with a \Cpp
+compiler by linking to \Stan's source and library directories using
+the {\tt -I} option of the compiler.  The following example 
+uses the \clang compiler for \Cpp.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> g++ -I src -I lib anon_model.cpp 
+\end{Verbatim}
+\end{quote}
+%
+This command invokes the \clang compiler for \Cpp to create a
+platform-specific executable in the default location, which is {\tt
+  a.out} by convention.  If all goes well, as above, there is no
+output to the console.  More information about compiling the \Cpp code
+generated by \Stan may be found in \refchapter{compiling-cpp}.
+Installation information for \Cpp compilers may be found in
+\refappendix{install}.
+
+\section{Running the Sampler}
+
+The executable resulting from compiling the generated \Cpp may be run
+as follows.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./a.out
+\end{Verbatim}
+%
+\begin{Verbatim}
+STAN SAMPLING COMMAND
+data = 
+init = random initialization
+samples = samples.csv
+append_samples = 0
+seed = 1331941513 (randomly generated)
+chain_id=1 (default)
+iter = 2000
+warmup = 1000
+thin = 1
+leapfrog_steps = -1
+max_treedepth = 10
+epsilon = -1
+epsilon_pm = 0
+epsilon_adapt_off = 0
+delta = 0.5
+gamma = 0.05
+
+Iteration: 2000 / 2000 [100%]  (Sampling)
+\end{Verbatim}
+\end{quote}
+%
+The program indicates to the standard output that the samples are
+written to \code{samples.csv}.  The first few lines of this file
+are comments about aspects of the run.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cat samples.csv
+\end{Verbatim}
+\begin{Verbatim}
+# Samples Generated by Stan
+#
+# stan_version_major=alpha
+# stan_version_minor=0
+# stan_version_patch=0
+# data=
+# init=random initialization
+# append_samples=0
+# seed=1331941796
+# chain_id=1
+# iter=2000
+# warmup=1000
+# thin=1
+# leapfrog_steps=-1
+# max_treedepth=10
+# epsilon=-1
+# epsilon_pm=0
+# delta=0.5
+# gamma=0.05
+...
+\end{Verbatim}
+\end{quote}
+%
+The ellipses notation, {\tt ...}, indicates that the output continues
+beyond what's shown.  Here, what follows is the data in standard
+comma-separate value ({\sc csv}) notation.
+%
+\begin{quote}
+\begin{Verbatim}
+...
+lp__,treedepth__,y
+-0.0126699,1,0.159185
+-0.222796,1,-0.667527
+-0.222796,1,-0.667527
+-0.404457,1,-0.899397
+...
+\end{Verbatim}
+\end{quote}
+%
+The first line consists of a header indicating the names of the
+variables on the lines to follow, and each following line indicates a
+single sampled value of the parameters.  The first column is reserved
+for the (unnormalized) log probability (density) of the parameters,
+with name {\tt lp\_\_} (the underscores are to prevent name conflicts
+with user-defined model parameters).  The next values are for
+reporting the behavior of the sampler.  In this case, the \NUTS
+sampler was used, so there is a report of the depth of tree it
+explored, with variable name {\tt treedepth\_\_}.  The remaining
+values are parameters.  Here, the model has only one parameter, {\tt
+  y}.  The first sampled value for {\tt y} is 0.159185, the second is
+-0.667527, and so on.  
+
+Note that the second sampled value is repeated.  This is not a bug.
+Rather, it is the behavior to expect from a sampler using a Metropolis
+acceptance step for proposals, as \Stan's samplers \HMC and \NUTS do.
+
+\section{Data}
+
+\Stan allows data to be specified in programs, used in models, and
+read into compiled \Stan programs. This section provides an example of
+coding and running a \Stan program with data stored in a file in the
+\SPLUS/\R dump format.
+
+The \Stan program in 
+\begin{quote}
+\begin{Verbatim}
+src/models/basic_estimators/bernoulli.stan
+\end{Verbatim}
+\end{quote}
+can be used to estimate a Bernoulli parameter \code{theta} from
+\code{N} binary observations.  The file contains the following code.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(0,) N;
+  int(0,1) y[N];
+}
+parameters {
+  real(0,1) theta;
+}
+model {
+  theta ~ beta(1,1);
+  for (n in 1:N)
+    y[n] ~ bernoulli(theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+This program declares two data variables in its \code{data} block.
+The first data variable, \code{N}, is an integer encoding the number
+of observations.  The declaration \code{int(0,)} indicates that
+\code{N} must take on non-negative values.  The second data variable,
+\code{y}, is declared as \code{y[N]}, specifying that it is an array
+of \code{N} values.  Each of these values has the declared type,
+\code{int(0,1)}, an integer between 0 and 1 inclusive, i.e., a binary
+value.  The \code{N} individual binary values in the array \code{y}
+are accessed using standard array notation, indexing from 1, as \code{y[1]},
+\code{y[2]}, ..., \code{y[N]}.
+
+The \code{parameters} block declares a single parameter, \code{theta}.
+Its type is given as \code{real(0,1)}, meaning it takes on continuous
+values between 0 and 1 inclusive.  The constraint is necessary in
+order to ensure that \code{theta} takes on a legal value as the
+success parameter in the Bernoulli distribution in which it is used in
+the \code{model} block of the program.
+
+The \code{model} block consists of a for-loop for the data.   The loop is
+specified so that the body is executed for values of \code{n} between
+\code{1} and \code{N} inclusive.  The body here is a sampling
+statement specifying that the variable \code{y[n]} is modeled as
+having a Bernoulli distribution with parameter \code{theta}.  
+
+A sample data file for this program can be found in the file
+\code{bernoulli.Rdata} in the same directory.  This data file has
+the following contents.
+%
+\begin{quote}
+\begin{Verbatim}
+N <- 10
+y <- c(0,1,0,0,0,0,0,0,0,1)
+\end{Verbatim}
+\end{quote}
+%
+A data file must contain appropriate values for all of the data
+variables declared in the \Stan program's \code{data} block.  Here there
+is a non-negative integer value for \code{N} and an array of length
+\code{N} (i.e., 10) integer values between 0 and 1 inclusive.  The
+array is coded using the \SPLUS sequence notation \code{c(...)}.
+The dump format supported by \Stan is documented in \refchapter{dump}.
+
+The program is compiled by \stanc and the \Cpp compiler in the same
+way.  This time, the output model gets an explicitly specified name.
+%
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> bin/stanc --name=bern src/models/basic_estimators/bernoulli.stan 
+\end{Verbatim}
+\begin{Verbatim}
+Model name=bern
+Input file=src/models/basic_estimators/bernoulli.stan
+Output file=bern.cpp
+\end{Verbatim}
+\end{quote}
+%
+As before, the \Cpp compiler needs to be given the name of
+generated file.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> g++ -O3 -I src -I lib -o bern bern.cpp
+\end{Verbatim}
+\end{quote}
+%
+There are two new compiler options here.  The option \code{-O3} sets
+optimization to level 3, which generates much faster executable
+code at the expense of slower compilation.  The name of the
+executable is also specified, using the option \code{-o~bern}.  Now
+the code may be executed by calling its executable with the data file
+specified. 
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./bern --data=src/models/basic_estimators/bernoulli.Rdata
+\end{Verbatim}
+\end{quote}
+
+\section{Proper and Improper Priors}
+
+The model in the previous section does not contain a sampling
+statement for \code{theta}.  The default behavior is to give
+\code{theta} a uniform prior.  In this case, a uniform prior is proper
+because \code{theta} is bounded to a finite interval.  Improper priors
+are also allowed in \Stan programs; they arise from unconstrained
+parameters without sampling statements.  The uniform prior could have
+also been added explicitly by adding the following statement to the
+\code{model} block of the program.
+%
+\begin{quote}
+\begin{Verbatim} 
+theta ~ uniform(0,1);
+\end{Verbatim}
+\end{quote}
+% 
+A third way to specify that \code{theta} has a uniform distribution
+between 0 and 1 is with the beta distribution.
+%
+\begin{quote}
+\begin{Verbatim}
+theta ~ beta(1,1);
+\end{Verbatim}
+\end{quote}
+%
+The beta distribution is conjugate to the Bernoulli, but \Stan (at
+least as of yet) does not make use of this information.  On the other hand,
+these three approaches, no prior, uniform prior, and beta prior,
+are equally efficient in \Stan's sampler, because their uniformity
+can be determined at compile time and thus computations related to
+them eliminated.  There is further discussion of \Stan optimization
+in \refchapter{optimization}.
+
+\section{Comments}
+
+\Stan supports the three major style of comments.  
+
+If the character \code{\#} appears on a line, that character and every
+character up to but not including the end of line is ignored.  This is
+the style of comments used in Python, R, and the shell.  
+
+If the character pair \code{//} appears on a line, that pair and every
+character up to but not including the end of line is ignored.  This is
+the style of comments used in C.  This is the preferred commenting
+style for line-based comments and for commenting out code.
+
+\Stan also supports \Cpp comment style in which any content placed
+between \code{/*} and \code{*/} is ignored along with the boundary
+markers.  This is the preferred style for long documentation comments.
+It is difficult to use this method to comment out code, because 
+an internal close comment sequence, \code{*/}, may take precedence.
+
+
+\section{User-Defined Distributions and Functions}
+
+\Stan allows new distributions to be coded directly in its modeling
+language, as described in \refchapter{custom-probability-functions}. 
+
+Extending \Stan's underlying \Cpp API provides a way to add new
+functions that may be implemented efficiently and used across
+different \Stan programs.
+
+\refappendix{user-defined-functions} documents the way in which new
+basic functions may be added to \Stan.  The new functions may use
+algorithmic differentiation to compute the partial derivatives of
+their output with respect to the input variables, or the user may
+directly specify the partials for increased efficiency.
+

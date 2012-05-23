@@ -71,9 +71,58 @@ namespace stan {
       return double_exponential_log<false>(y,mu,sigma,
                                            stan::math::default_policy());
     }
-    
-    
 
+    /** 
+     * Calculates the double exponential cumulative density function.
+     *
+     * \f$ f(y|\mu,\sigma) = \begin{cases} \
+           \frac{1}{2} \exp\left(\frac{y-\mu}{\sigma}\right), \mbox{if } y < \mu \\ 
+           1 - \frac{1}{2} \exp\left(-\frac{y-\mu}{\sigma}\right), \mbox{if } y \ge \mu \
+           \end{cases}\f$
+     * 
+     * @param y A scalar variate.
+     * @param mu The location parameter.
+     * @param sigma The scale parameter.
+     * 
+     * @return The cumulative density function.
+     */
+    template <typename T_y, typename T_loc, typename T_scale, 
+              class Policy>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    double_exponential_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+                         const Policy&) {
+      static const char* function
+        = "stan::prob::double_exponential_p<%1%>(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using boost::math::tools::promote_args;
+
+      typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
+      if(!check_finite(function, y, "Random variate, y,", &lp, Policy()))
+        return lp;
+      if(!check_finite(function, mu, "Location parameter, mu,", 
+                       &lp, Policy()))
+        return lp;
+      if(!check_finite(function, sigma, "Scale parameter, sigma,", 
+                       &lp, Policy()))
+        return lp;
+      if(!check_positive(function, sigma, "Scale parameter, sigma,", 
+                         &lp, Policy()))
+        return lp;
+      
+      if (y < mu)
+        return exp((y-mu)/sigma)/2;
+      else
+        return 1 - exp((mu-y)/sigma)/2;
+    }
+    
+    template <typename T_y, typename T_loc, typename T_scale>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    double_exponential_p(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      return double_exponential_p(y,mu,sigma,stan::math::default_policy());
+    }
+    
   }
 }
 #endif

@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/beta.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
 
@@ -289,11 +290,11 @@ namespace stan {
     // hide helper for now; could use Eigen here
     namespace {
       template <typename Vector, typename Scalar>
-      int maximum(const Vector& x) {
+      Scalar maximum(const Vector& x) {
         if(x.size() == 0)
           BOOST_THROW_EXCEPTION(std::invalid_argument ("x must have at least one element"));
         Scalar max_x(x[0]);
-        for (size_t i = 1; i < x.size(); ++i)
+        for (typename Vector::size_type i = 1; i < x.size(); ++i)
           if (x[i] < max_x)
             max_x = x[i];
         return max_x;
@@ -357,13 +358,12 @@ namespace stan {
         BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
       Scalar sum(0.0); 
       Scalar max_x = maximum<Vector,Scalar>(x);
-      for (size_t i = 0; i < x.size(); ++i)
+      for (typename Vector::size_type i = 0; i < x.size(); ++i)
         sum += (simplex[i] = exp(x[i]-max_x));
-      for (size_t i = 0; i < x.size(); ++i)
+      for (typename Vector::size_type i = 0; i < x.size(); ++i)
         simplex[i] /= sum;
     }
 
-    
     /**
      * Writes the inverse softmax of the simplex argument into the second
      * argument.  See <code>stan::math::softmax</code> for the inverse
@@ -478,11 +478,8 @@ namespace stan {
      * @param c Boolean condition value.
      * @param y_true Value to return if condition is true.
      * @param y_false Value to return if condition is false.
-     * @tparam B Type of conditional.
-     * @tparam T Type of scalar.
      */
-    template <typename B, typename T>
-    T if_else(B c, T y_true, T y_false) {
+    inline double if_else(bool c, double y_true, double y_false) {
       return c ? y_true : y_false;
     }
 
@@ -501,7 +498,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    T square(T x) {
+    inline T square(T x) {
       return x * x;
     }
     
@@ -552,6 +549,26 @@ namespace stan {
         return a + log1p(exp(b - a));
       return b + log1p(exp(a - b));
     }
+
+    /** 
+     * The normalized incomplete beta function of a, b, and x.
+     *
+     * Used to compute the cumulative density function for the beta
+     * distribution.
+     * 
+     * @param a Shape parameter.
+     * @param b Shape parameter.
+     * @param x Random variate.
+     * 
+     * @return The normalized incomplete beta function.
+     */
+    inline double ibeta(const double& a,
+                        const double& b,
+                        const double& x) {
+      return boost::math::ibeta(a, b, x);
+    }
+
+
 
     /**
      * Return the log of the sum of the exponentiated values of the specified

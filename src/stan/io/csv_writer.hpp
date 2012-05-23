@@ -10,8 +10,8 @@ namespace stan {
   namespace io {
 
     /**
-     * The <code>csv_writer</code> class is used to write Stan variables
-     * in comma-separated-value format to an output stream.
+     * Writes Stan variables in comma-separated-value format to
+     * an output stream.
      *
      * <p>All output is written to the same line and separated by commas.
      * Use the <code>newline()</code> method to advance to the next line
@@ -25,6 +25,8 @@ namespace stan {
     public: 
 
       /**
+       * Write a comma.
+       *
        * On the first call do nothing, subsequently write
        * a comma.
        */
@@ -48,6 +50,8 @@ namespace stan {
       }
 
       /**
+       * Write a newline character.
+       *
        * End a line of output and start a new line.  This
        * method needs to be called rather than writing 
        * a newline to the output stream because it resets
@@ -59,6 +63,8 @@ namespace stan {
       }
 
       /**
+       * Write a value.
+       * 
        * Write the specified integer to the output stream
        * on the current line.
        *
@@ -70,6 +76,8 @@ namespace stan {
       }
 
       /**
+       * Write a value.
+       * 
        * Write the specified double to the output stream
        * on the current line.
        *
@@ -81,6 +89,8 @@ namespace stan {
       }
 
       /**
+       * Write a value.
+       * 
        * Write the specified vector to the output stream
        * on the current line.
        *
@@ -93,6 +103,8 @@ namespace stan {
       }
       
       /**
+       * Write a value.
+       * 
        * Write the specified row vector to the output stream
        * on the current line.
        *
@@ -105,6 +117,8 @@ namespace stan {
       }
 
       /**
+       * Write a value.
+       * 
        * Write the specified matrix to the output stream in
        * row-major order.
        *
@@ -118,6 +132,8 @@ namespace stan {
       }
 
       /**
+       * Write a value in column-major order.
+       * 
        * Write the specified matrix to the output stream in
        * column-major order.
        *
@@ -131,6 +147,8 @@ namespace stan {
       }
 
       /**
+       * Write a value.
+       * 
        * Write the specified string to the output stream with
        * quotes around it and quotes inside escaped to double
        * quotes.

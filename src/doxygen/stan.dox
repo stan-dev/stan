@@ -1,0 +1,69 @@
+/** 
+ * @namespace stan 
+ * Probability, optimization and sampling library.
+ */ 
+
+/**
+ * @namespace stan::agrad 
+ * Function gradients via reverse-mode automatic differentiation.
+ */
+
+/**
+ * @namespace stan::gm
+ * Directed graphical model compiler
+ */
+
+/**
+ * @namespace stan::io
+ * Input/output utilities.
+ */
+
+/**
+ * @namespace stan::math
+ * Matrices and templated mathematical functions.
+ */
+
+/**
+ * @namespace stan::math::policies
+ * Extending boost functionality.
+ */
+
+/**
+ * @namespace stan::math::policies::detail 
+ * Reimplementing boost::math::policies::detail::raise_domain_error.
+ *
+ * For error handling, Stan requires raise_domain_error to handle two template 
+ * parameters, one for the return type and the other for the input type.
+ * 
+ * In boost, these functions are in namespace boost::math::policies:details. 
+ * Since reimplementing these functions in that namespace could lead to 
+ * ambiguous functions calls, they are placed in stan::math::policies::details.
+ *
+ * These functions still rely on boost::math::policies::detail::raise_error.
+ *
+ * TODO: user_error may need to be refactored to include the two template
+ *   parameters.
+ */ 
+
+/**
+ * @namespace stan::mcmc 
+ * Markov chain Monte Carlo samplers.
+ */
+
+/**
+ * @namespace stan::memory 
+ * (Expert) Allocate, free, and manage underlying system memory.
+ */
+
+/**
+ * @namespace stan::model
+ * For compiling models.
+ */
+
+/**
+ * @namespace stan::prob 
+ * Templated probability distributions. 
+ *
+ * All paramaterizations are based on Bayesian Data Analysis.
+ * Error handling for the distributions is described in @ref policy_page.
+ */

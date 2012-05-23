@@ -60,6 +60,11 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              std::string(), 
+                              whitespace_grammar<Iterator> > 
+      identifier_name_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               int_var_decl(), 
                               whitespace_grammar<Iterator> > 
       int_decl_r;
@@ -75,9 +80,9 @@ namespace stan {
       opt_dims_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              pos_ordered_var_decl(), 
+                              ordered_var_decl(), 
                               whitespace_grammar<Iterator> > 
-      pos_ordered_decl_r;
+      ordered_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
                               range(),

@@ -5,38 +5,67 @@
 LIBGTEST := test/libgtest.a
 GTEST_MAIN := lib/gtest/src/gtest_main.cc
 
+
+##
+# Target to build all models and test them. This needs to be before 
+# the test-unit target.
+##
+MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
+MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
+
+MISSING_MODEL_TESTS := $(shell find src/models -type f -name '*.stan')
+MISSING_MODEL_TESTS := $(MISSING_MODEL_TESTS:src/models/%.stan=models/%)
+MISSING_MODEL_TESTS := $(filter-out $(MODEL_TESTS:test/%=%),$(MISSING_MODEL_TESTS))
+.PHONY: test-models
+test-models: $(addsuffix $(EXE),$(MODEL_TESTS))
+	@echo '------------------------------------------------------------'
+	@set -e;\
+	$(foreach test,$(MODEL_TESTS), \
+	  echo '------------------------------------------------------------';\
+	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
+ifneq ($(MISSING_MODEL_TESTS),)
+	@echo 
+	@echo '-------------------- Missing $(words $(MISSING_MODEL_TESTS)) tests --------------------'
+	@$(foreach missing,$(MISSING_MODEL_TESTS),\
+	   echo '  src/$(missing).stan';)
+endif
+
+##
+# Target to build bugs models
+##
+BUGS_TESTS := $(shell find src/test/models/bugs_examples -type f -name '*_test.cpp')
+BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
+.PHONY: test-bugs
+test-bugs: $(addsuffix $(EXE),$(BUGS_TESTS))
+	@echo '-------------------- Running bugs examples --------------------------'
+	@set -e;\
+	$(foreach test,$(BUGS_TESTS), \
+	  echo '------------------------------------------------------------';\
+	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
+
+
 ##
 # Target to build unit tests. All unit tests are in src/test 
 # and are named *_test.cpp
 ##
 UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
+UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
 UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
-
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
-	set -e;\
+	@set -e;\
 	$(foreach test,$(UNIT_TESTS), \
 	  echo '------------------------------------------------------------';\
 	  $(addsuffix $(EXE),$(test)) --gtest_output="xml:$(test).xml";)
 
-##
-# Target to build bugs models
-##
-BUGS_EXAMPLES := $(shell cd src; find models/bugs_examples -type f -name '*.stan')
-BUGS_EXAMPLES := $(BUGS_EXAMPLES:%.stan=%)
-BUGS_EXAMPLES := $(filter-out $(BUGS_EXAMPLES_TO_EXCLUDE),$(BUGS_EXAMPLES))
-
-.PHONY: test-bugs
-test-bugs: $(addsuffix $(EXE),$(BUGS_EXAMPLES))
 
 ##
 # Target to build all tests
 ##
 .PHONY: test-all
-test-all: test-unit test-bugs
-
+test-all: test-unit test-models
 
 ##
 # Build the google test library.
@@ -47,7 +76,6 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
 
-
 ##
 # Generate autodependencies for test files.
 # Adapted from the gnu make manual.
@@ -55,13 +83,28 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 ##
 
 ##
+# Builds a single test with a stan model dependency
+#
+# Using a static pattern rule to make these tests depend on
+# missing models.
+##
+$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
+	@mkdir -p $(dir $@)
+	@echo '------------------------------------------------------------'
+	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
+ifeq ($(findstring test-,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+##
 # Builds a single test
 ##
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	@echo '------------------------------------------------------------'
-	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(LDFLAGS) $(LIBGTEST) $(OUTPUT_OPTION) 
+	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
+ifeq ($(findstring test-,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
+endif
 
 .PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
@@ -98,3 +141,16 @@ endif
 ifneq (,$(filter test/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
 endif
+
+
+##
+# target path_separator for use in some tests that need to 
+# call executables.
+##
+PATH_SEPARATOR = /
+ifeq ($(OS),win)
+	PATH_SEPARATOR = \\
+endif
+.PHONY: path_separator
+path_separator :
+	@echo $(PATH_SEPARATOR)

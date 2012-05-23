@@ -211,22 +211,22 @@ namespace stan {
 
       /**
        * Write the unconstrained vector that corresponds to the specified
-       * positive ordered vector.
+       * ascendingly ordered vector.
        * 
        * <p>The unconstraining transform is defined for input vector <code>y</code>
        * to produce an output vector <code>x</code> of the same size, defined
        * by <code>x[0] = log(y[0])</code> and by
        * <code>x[k] = log(y[k] - y[k-1])</code> for <code>k > 0</code>.  This
        * unconstraining transform inverts the constraining transform specified
-       * in <code>pos_ordered_constrain(size_t)</code>.
+       * in <code>ordered_constrain(size_t)</code>.
        *
-       * @param y Positive, ordered vector.
+       * @param y Ascendingly ordered vector.
        * @return Unconstrained vector corresponding to the specified vector.
-       * @throw std::runtime_error if vector is not positive ordered
+       * @throw std::runtime_error if vector is not in ascending order.
        */
-      void pos_ordered_unconstrain(vector_t& y) {
+      void ordered_unconstrain(vector_t& y) {
         if (y.size() == 0) return;
-        stan::math::check_pos_ordered("stan::io::pos_ordered_unconstrain(%1%)", y, "y");
+        stan::math::check_ordered("stan::io::ordered_unconstrain(%1%)", y, "y");
         data_r_.push_back(log(y[0]));
         for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));

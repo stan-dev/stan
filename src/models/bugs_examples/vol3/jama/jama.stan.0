@@ -11,3 +11,69 @@
 #  * Defining autoregressive priors
 #  * Defining ordered priors
 
+data {
+  int(0,) K;
+  int(0,) I;
+  int(0,) J;
+  ordered(K) calBP;
+  ordered(K) C14BP;
+  int(0,) N;
+  real(0,) theta_min;
+  real(theta_min,) theta_max;
+  real(0,) X[N];
+  real(0,) sigma[N];
+  int(1,7) phase[N];
+}
+parameters {
+  real(theta_min,theta_max) alpha1;
+  real(alpha1,theta_max) beta1;
+  real(beta1,theta_max) alpha2;
+  real(alpha2,theta_max) beta2;
+  real(beta2,theta_max) alpha3;
+  real(beta3,theta_max) beta3;
+  real(beta3,theta_max) alpha4;
+  real(alpha4,theta_max) beta4;
+  real(alpha4,theta_max) alpha5;
+  real(min(alpha5,beta4),theta_max) beta5;
+  real(alpha5,theta_max) alpha6;
+  real(min(alpha6,beta5) beta6;
+  real(beta6,theta_max) beta7;
+}
+transformed parameters {
+  ordered(7) alpha;
+  ordered(7) beta;
+
+  // alpha <- [ alpha1, alpha2, alpha3, alpha4, alpha5, alpha6, beta6 ];
+  // beta <- [ beta1, beta2, beta3, beta4, beta5, beta6, beta7 ];
+
+  alpha[1] <- alpha1;  
+  alpha[2] <- alpha2;
+  alpha[3] <- alpha3;
+  alpha[4] <- alpha4;
+  alpha[5] <- alpha5;
+  alpha[6] <- alpha6;
+  alpha[7] <- beta6;
+  beta[1] <- beta1;
+  beta[2] <- beta2;
+  beta[3] <- beta3;
+  beta[4] <- beta4;
+  beta[5] <- beta5;
+  beta[6] <- beta6;
+  beta[7] <- beta7;
+ 
+}
+model {
+  for (n in 1:N) {
+    theta[n] ~ uniform(beta[phase[n]], alpha[phase[n]]);
+    X[n] ~ normal(mu[n], sigma[n]);
+  }
+}
+generated quantities {
+  int(0,) alpha_desc[7];
+  int(0,) beta_desc[7];
+  for (m in 1:7) {
+     // round to nearest 10
+     alpha_desc[m] <- 10 * round(alpha[m] / 10.0);  
+     beta_desc[m] <- 10 * round(beta[m] / 10.0);    
+  }
+}

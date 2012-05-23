@@ -26,7 +26,6 @@ namespace stan {
      * The NUTS sampler requires a probability model with the ability
      * to compute gradients, characterized as an instance of
      * <code>prob_grad</code>.  
-     *
      */
     template <class BaseRNG = boost::mt19937>
     class nuts : public adaptive_sampler {
@@ -112,7 +111,7 @@ namespace stan {
        * called from the <code>ctime</code> library.
        * 
        * @param model Probability model with gradients.
-       * @param maxdepth 
+       * @param maxdepth Maximum depth for searching for a U-Turn. Default is 10.
        * @param epsilon Optional (initial) Hamiltonian dynamics simulation
        * step size. If not specified or set < 0, find_reasonable_parameters()
        * will be called to initialize epsilon.
@@ -171,7 +170,7 @@ namespace stan {
       }
 
       /**
-       * Destroy this sampler.
+       * Destructor.
        *
        * The implementation for this class is a no-op.
        */
@@ -333,36 +332,36 @@ namespace stan {
       /**
        * The core recursion in NUTS.
        *
-       * @param x The position value to start from.
-       * @param m The momentum value to start from.
-       * @param grad The gradient at the initial position.
-       * @param u The slice variable.
-       * @param direction Simulate backwards if -1, forwards if 1.
-       * @param depth The depth of the tree to build---we'll run 2^depth
+       * @param[in] x The position value to start from.
+       * @param[in] m The momentum value to start from.
+       * @param[in] grad The gradient at the initial position.
+       * @param[in] u The slice variable.
+       * @param[in] direction Simulate backwards if -1, forwards if 1.
+       * @param[in] depth The depth of the tree to build---we'll run 2^depth
        * leapfrog steps.
-       * @param H0 The joint probability of the position-momentum we started
+       * @param[in] H0 The joint probability of the position-momentum we started
        * from initially---used to compute statistic to adapt epsilon.
-       * @param xminus Returns the position of the backwardmost leaf of this
+       * @param[out] xminus Returns the position of the backwardmost leaf of this
        * subtree.
-       * @param mminus Returns the momentum of the backwardmost leaf of this
+       * @param[out] mminus Returns the momentum of the backwardmost leaf of this
        * subtree.
-       * @param gradminus Returns the gradient at xminus.
-       * @param xplus Returns the position of the forwardmost leaf of this
+       * @param[out] gradminus Returns the gradient at xminus.
+       * @param[out] xplus Returns the position of the forwardmost leaf of this
        * subtree.
-       * @param mplus Returns the momentum of the forwardmost leaf of this
+       * @param[out] mplus Returns the momentum of the forwardmost leaf of this
        * subtree.
-       * @param gradplus Returns the gradient at xplus.
-       * @param newx Returns the new position sample selected from
+       * @param[out] gradplus Returns the gradient at xplus.
+       * @param[out] newx Returns the new position sample selected from
        * this subtree.
-       * @param newgrad Returns the gradient at the new sample selected from
+       * @param[out] newgrad Returns the gradient at the new sample selected from
        * this subtree.
-       * @param newlogp Returns the log-probability of the new sample selected
+       * @param[out] newlogp Returns the log-probability of the new sample selected
        * from this subtree.
-       * @param nvalid Returns the number of usable points in the subtree.
-       * @param criterion Returns true if the subtree is usable, false if not.
-       * @param prob_sum Returns the sum of the HMC acceptance probabilities
+       * @param[out] nvalid Returns the number of usable points in the subtree.
+       * @param[out] criterion Returns true if the subtree is usable, false if not.
+       * @param[out] prob_sum Returns the sum of the HMC acceptance probabilities
        * at each point in the subtree.
-       * @param n_considered Returns the number of states in the subtree.
+       * @param[out] n_considered Returns the number of states in the subtree.
        */
       void build_tree(const std::vector<double>& x, 
                       const std::vector<double>& m,
@@ -457,9 +456,9 @@ namespace stan {
       }
 
       /**
-       * Return the value of epsilon.
+       * Return the step size, epsilon.
        *
-       * @param params Where to store epsilon.
+       * @param[out] params Where to store epsilon.
        */
       virtual void get_parameters(std::vector<double>& params) {
         params.assign(1, _epsilon);

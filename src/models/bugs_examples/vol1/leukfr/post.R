@@ -4,9 +4,17 @@
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
-sigma <- 1 / sqrt(post[, 2]) 
 
-poi <- cbind(post[, 1], sigma); 
-colnames(poi) <- c("beta", "sigma")
+pars <- c("beta", "sigma"); 
+poi <- post[, pars]; 
 
 summary(as.mcmc(poi)) 
+
+library(BUGSExamples);
+ex <- list(name = "Leukfr", parameters = pars,
+           nSample = 10000, nBurnin = 1000, nThin = 1,
+           nChain = 3)
+
+jagspost <- runExample(ex, engine = 'JAGS')
+summary(jagspost$coda)
+plot(jagspost$coda);

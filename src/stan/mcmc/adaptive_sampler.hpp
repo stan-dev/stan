@@ -9,8 +9,9 @@ namespace stan {
   namespace mcmc {
 
     /**
-     * The <code>adaptive_sampler</code> abstract base class provides
-     * a basis on which to build adaptive samplers.  This class
+     * An abstract base class for adaptive samplers.
+     *
+     * The <code>adaptive_sampler</code> abstract base class
      * maintains the adaptation status, number of steps, as well as
      * recording function evals and the mean statistic being
      * optimized.
@@ -27,7 +28,7 @@ namespace stan {
     public:
 
       /**
-       * Construct an adaptive sampler with specified adaptation
+       * Constructs an adaptive sampler with specified adaptation
        * status.
        *
        * @param adapt Initial adaptation status.
@@ -41,14 +42,14 @@ namespace stan {
       }
 
       /**
-       * Destroy this sampler.
+       * Destructor.
        */
       virtual ~adaptive_sampler() { 
       }
 
       /**
        * Set the model real and integer parameters to the specified
-       * values.  
+       * values.
        *
        * This method will typically be used to set the parameters
        * by the client of this class after initialization.  
@@ -60,9 +61,9 @@ namespace stan {
                               const std::vector<int>& z) = 0;
 
       /**
-       * Return the next sample from this sampler.  This
+       * Returns the next sample from this sampler.  This
        * method increments the count of steps with and without
-       * adaptaiton and calls the virtual <code>next_impl()</code> 
+       * adaptation and calls the virtual <code>next_impl()</code> 
        * to produce a result.
        *
        * @return Next sample.
@@ -75,7 +76,7 @@ namespace stan {
       }
 
       /**
-       * Return the next sample from this sampler.  This pure virtual method
+       * Returns the next sample from this sampler.  This pure virtual method
        * must be implemented by concrete subclasses to produce the next
        * sample.
        *
@@ -94,22 +95,22 @@ namespace stan {
       };
 
       /**
-       * Set the specified parameter vector to the sequence of tunable
+       * Sets the specified parameter vector to the sequence of tunable
        * parameters for this sampler.
        *
        * The default implementation sets the specified vector to empty.
        *
-       * @param params Where to store the returned parameters.
+       * @param[out] params Where to store the returned parameters.
        */
       virtual void get_parameters(std::vector<double>& params) { 
         params.resize(0);
       }
 
       /**
-       * Return the value of whatever statistic we're trying to
-       * coerce.  For example, if we're trying to set the average
-       * acceptance probability of HMC to 0.651 then this will return
-       * the realized acceptance probability averaged across all
+       * Returns the value of the statistic we are trying to
+       * coerce.  For example, if we are trying to set the average
+       * acceptance probability of HMC to 0.651 then this method will
+       * return the realized acceptance probability averaged across all
        * samples so far.
        *
        * @return Mean observed target statistic for adaptation.
@@ -119,7 +120,7 @@ namespace stan {
       }
       
       /**
-       * Set the mean statistic to the specified value.
+       * Sets the mean statistic to the specified value.
        *
        * @param v New value of mean statistic.
        */
@@ -128,7 +129,7 @@ namespace stan {
       }
 
       /**
-       * Update mean statistic given the specified adaptation statistic
+       * Updates the mean statistic given the specified adaptation statistic
        * and weighting.  The behavior is equivalent to doing
        *
        * <code>mean_stat += avg_eta * adapt_stat + (1 - avg_eta) * mean_stat</code>.
@@ -142,10 +143,10 @@ namespace stan {
       }
 
       /**
-       * Return the number of times that the (possibly unnormalized)
+       * Returns the number of times that the (possibly unnormalized)
        * log probability function has been evaluated by this sampler.
        * This is a useful alternative to wall time in evaluating the
-       * relative performance of different algorithms. However, it's
+       * relative performance of different algorithms. However, it is
        * up to the sampler implementation to be sure to actually keep
        * track of this.
        *
@@ -219,7 +220,7 @@ namespace stan {
        *
        * The base class implementation is a no-op.
        *
-       * @param o Output stream to which params are written.
+       * @param[out] o Output stream to which params are written.
        */
       virtual void write_sampler_params(std::ostream& o) { 
       }
@@ -237,7 +238,7 @@ namespace stan {
        *
        * The base class implementation is a no-op.
        *
-       * @param o Output stream to which param names are written.
+       * @param[out] o Output stream to which param names are written.
        */
       virtual void write_sampler_param_names(std::ostream& o) { 
       }

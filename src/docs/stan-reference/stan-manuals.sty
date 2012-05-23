@@ -1,0 +1,112 @@
+\IfFileExists{lucimatx.sty}{
+  % ----- if Lucida availalable------------------
+  \usepackage[
+    scale=0.875,
+    stdmathitalics=true,
+    stdmathdigits=true]{lucimatx}
+%  \linespread{1.05}
+}{
+  % ------ if Lucida not available --------------
+  \usepackage{times}
+  \usepackage{amssymb}
+}
+
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage{fancyvrb}
+%\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{natbib}
+
+\usepackage{url}
+
+% \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
+
+\usepackage[titles]{tocloft}
+\setlength{\cftbeforechapskip}{2ex}
+\setlength{\cftbeforesecskip}{0.5ex}
+\renewcommand{\cftchapfont}{\normalsize\rm}
+\renewcommand{\cftchappagefont}{\normalsize\rm}
+\renewcommand{\cftpartfont}{\normalsize\rm\bfseries}
+\renewcommand{\cftpartpagefont}{\normalsize\rm\bfseries}
+\renewcommand{\cftchapaftersnum}{.\hspace*{12pt}}
+\renewcommand{\cftchapaftersnumb}{\hspace*{8pt}}
+%  \fontsize{11}{13}\usefont{OT1}{phv}{bc}{n}\selectfont}
+
+\setcounter{tocdepth}{0}
+
+\titleformat{\chapter}{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}%{1.5pc}{}{}
+\titlespacing{\chapter}{0pt}{-24pt}{24pt}{}
+%
+\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
+%\titlespacing{\section}{0pt}{12pt}{6pt}
+%
+\titleformat{\subsection}{\bfseries}{}{0em}{}
+%\titlespacing{\subsection}{-1em}{12pt}{6pt}
+
+\newcommand{\Stan}{Stan\xspace}
+\newcommand{\stanc}{{\ttfamily stanc}\xspace}
+\newcommand*{\Cpp}{C\raise.2ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
+\newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+\newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+
+\newcommand{\acronym}[1]{{\sc #1}\xspace}
+
+\newcommand{\ASCII}{\acronym{ascii}}
+\newcommand{\BNF}{\acronym{bnf}}
+\newcommand{\MATLAB}{\acronym{matlab}}
+\newcommand{\R}{\acronym{r}}
+\newcommand{\SPLUS}{\acronym{s}}
+\newcommand{\BUGS}{\acronym{bugs}}
+\newcommand{\JAGS}{\acronym{jags}}
+\newcommand{\MCMC}{\acronym{mcmc}}
+\newcommand{\HMC}{\acronym{hmc}}
+\newcommand{\NUTS}{\acronym{nuts}}
+\newcommand{\MSVC}{\acronym{msvc}}
+\newcommand{\LKJ}{\acronym{lkj}}
+\newcommand{\CPC}{\acronym{cpc}}
+
+\newcommand{\code}[1]{{\tt #1}}
+\newcommand{\mycaption}[2]{\caption{{\it #2}\label{#1.figure}}}
+
+\newcommand{\distro}[1]{\mbox{\sf #1}}
+\newcommand{\Betafun}{\mbox{B}}
+\newcommand{\setlist}[1]{\{ #1 \}}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\posreals}{\mathbb{R}^+}
+\newcommand{\nats}{\mathbb{N}}
+
+\newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
+\newcommand{\refpart}[1]{Part~\ref{#1.part}}
+\newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
+\newcommand{\refsection}[1]{Section~\ref{#1.section}}
+\newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
+\newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
+
+\newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ } \\[4pt] #4}
+\newcommand{\farg}[1]{{\tt\slshape #1}}
+
+\newcommand{\cmdflag}[3]{\item[\tt {-}-#1] \mbox{ } \\ #2 \\ \hspace*{24pt}(#3)}
+\newcommand{\cmdarg}[4]{\item[\tt {-}-#1={\slshape <#2>}] \mbox{ } \\ #3 \\ \hspace*{24pt}(#4)}
+
+\newcommand{\samp}{{\lower.78ex\hbox{\texttt{\char`\~}}}}%
+%{{\lower1.1ex\hbox{\Large\texttt{\char`\~}}}}
+
+% iPad: 3w x 4h, 
+
+\setlength{\paperwidth}{6in} % {6.6in}
+\setlength{\paperheight}{8in} %{8.8in}
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
+
+\setlength{\textwidth}{5in} %{5.5in}
+\setlength{\textheight}{6.675in} %{7.25in}
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\evensidemargin}{-0.5in}
+\setlength{\topmargin}{-0.75in}
+\setlength{\headsep}{18pt}
+
+\raggedbottom
+
+\sloppy % no line overruns

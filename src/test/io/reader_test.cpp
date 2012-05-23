@@ -403,9 +403,9 @@ TEST(io_reader, vector) {
     EXPECT_FLOAT_EQ(static_cast<double>(i),x);
   }
   Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.vector(4);
-  EXPECT_EQ(4U,y.rows());
-  EXPECT_EQ(1U,y.cols());
-  EXPECT_EQ(4U,y.size());
+  EXPECT_EQ(4,y.rows());
+  EXPECT_EQ(1,y.cols());
+  EXPECT_EQ(4,y.size());
   EXPECT_EQ(7.0,y[0]);
   EXPECT_EQ(8.0,y[1]);
   EXPECT_EQ(9.0,y[2]);
@@ -426,9 +426,9 @@ TEST(io_reader, row_vector) {
     EXPECT_FLOAT_EQ(static_cast<double>(i),x);
   }
   Eigen::Matrix<double,1,Eigen::Dynamic> y = reader.row_vector(4);
-  EXPECT_EQ(4U,y.cols());
-  EXPECT_EQ(1U,y.rows());
-  EXPECT_EQ(4U,y.size());
+  EXPECT_EQ(4,y.cols());
+  EXPECT_EQ(1,y.rows());
+  EXPECT_EQ(4,y.size());
   EXPECT_EQ(7.0,y[0]);
   EXPECT_EQ(8.0,y[1]);
   EXPECT_EQ(9.0,y[2]);
@@ -450,8 +450,8 @@ TEST(io_reader, matrix) {
     EXPECT_FLOAT_EQ(static_cast<double>(i),x);
   }
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix(3,2);
-  EXPECT_EQ(3U,y.rows());
-  EXPECT_EQ(2U,y.cols());
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
   EXPECT_EQ(7.0,y(0,0));
   EXPECT_EQ(8.0,y(1,0));
   EXPECT_EQ(9.0,y(2,0));
@@ -469,7 +469,7 @@ TEST(io_reader, simplex) {
   std::vector<double> theta(4,0.25);
   stan::io::reader<double> reader(theta,theta_i);
   Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.simplex(4);
-  EXPECT_EQ(4U,y.size());
+  EXPECT_EQ(4,y.size());
   EXPECT_FLOAT_EQ(0.25,y[0]);
   EXPECT_FLOAT_EQ(0.25,y[1]);
   EXPECT_FLOAT_EQ(0.25,y[2]);
@@ -494,72 +494,72 @@ TEST(io_reader, simplex_exception) {
 
 
 
-TEST(io_reader, pos_ordered) {
+TEST(io_reader, ordered) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_FLOAT_EQ(0.0,reader.scalar()); // throw away theta[0]
-  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.pos_ordered(5);
-  EXPECT_EQ(5U,y.size());
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.ordered(5);
+  EXPECT_EQ(5,y.size());
   EXPECT_FLOAT_EQ(1.0,y[0]);
   EXPECT_FLOAT_EQ(2.0,y[1]);
   EXPECT_FLOAT_EQ(5.0,y[4]);
   EXPECT_FLOAT_EQ(6.0,reader.scalar());
 }
-TEST(io_reader, pos_ordered_exception) {
+TEST(io_reader, ordered_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_FLOAT_EQ(0.0,reader.scalar()); // throw away theta[0]
-  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.pos_ordered(5);
-  EXPECT_EQ(5U,y.size());
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.ordered(5);
+  EXPECT_EQ(5,y.size());
   EXPECT_FLOAT_EQ(1.0,y[0]);
   EXPECT_FLOAT_EQ(2.0,y[1]);
   EXPECT_FLOAT_EQ(5.0,y[4]);
   EXPECT_FLOAT_EQ(6.0,reader.scalar());
 }
-TEST(io_reader, pos_ordered_constrain) {
+TEST(io_reader, ordered_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(3.0);
   theta.push_back(-1.0);
   theta.push_back(-2.0);
   theta.push_back(0.0);
-  double v0 = exp(3.0);
+  double v0 = 3.0;
   double v1 = v0 + exp(-1.0);
   double v2 = v1 + exp(-2.0);
   double v3 = v2 + exp(0.0);
   stan::io::reader<double> reader(theta,theta_i);
-  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.pos_ordered_constrain(4));
+  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.ordered_constrain(4));
   EXPECT_FLOAT_EQ(v0, phi[0]);
   EXPECT_FLOAT_EQ(v1, phi[1]);
   EXPECT_FLOAT_EQ(v2, phi[2]);
   EXPECT_FLOAT_EQ(v3, phi[3]);
 }
-TEST(io_reader, pos_ordered_constrain_jacobian) {
+TEST(io_reader, ordered_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(3.0);
   theta.push_back(-1.0);
   theta.push_back(-2.0);
   theta.push_back(0.0);
-  double v0 = exp(3.0);
+  double v0 = 3.0;
   double v1 = v0 + exp(-1.0);
   double v2 = v1 + exp(-2.0);
   double v3 = v2 + exp(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -101.1;
-  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.pos_ordered_constrain(4,lp));
+  double expected_lp = lp
+    - 1.0 - 2.0 + 0.0;
+  Eigen::Matrix<double,Eigen::Dynamic,1> phi(reader.ordered_constrain(4,lp));
   EXPECT_FLOAT_EQ(v0, phi[0]);
   EXPECT_FLOAT_EQ(v1, phi[1]);
   EXPECT_FLOAT_EQ(v2, phi[2]);
   EXPECT_FLOAT_EQ(v3, phi[3]);
-  double expected_lp = lp
-    + 3.0 - 1.0 - 2.0 + 0.0;
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
@@ -610,9 +610,9 @@ TEST(io_reader,corr_matrix_constrain) {
   theta.push_back(1.0);
   stan::io::reader<double> reader(theta,theta_i);
   Matrix<double,Dynamic,Dynamic> R(reader.corr_matrix_constrain(3U));
-  EXPECT_EQ(3U,R.rows());
-  EXPECT_EQ(3U,R.cols());
-  EXPECT_EQ(9U,R.size());
+  EXPECT_EQ(3,R.rows());
+  EXPECT_EQ(3,R.cols());
+  EXPECT_EQ(9,R.size());
   EXPECT_EQ(4U,reader.available());
   for (size_t i = 0; i < 3U; ++i) {
     EXPECT_FLOAT_EQ(1.0,R(i,i));
@@ -636,9 +636,9 @@ TEST(io_reader,corr_matrix_constrain_jacobian) {
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -9.2;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> R(reader.corr_matrix_constrain(3U,lp));
-  EXPECT_EQ(3U,R.rows());
-  EXPECT_EQ(3U,R.cols());
-  EXPECT_EQ(9U,R.size());
+  EXPECT_EQ(3,R.rows());
+  EXPECT_EQ(3,R.cols());
+  EXPECT_EQ(9,R.size());
   EXPECT_EQ(4U,reader.available());
   for (size_t i = 0; i < 3U; ++i) {
     EXPECT_FLOAT_EQ(1.0,R(i,i));
@@ -701,9 +701,9 @@ TEST(io_reader,cov_matrix_constrain) {
   theta.push_back(1.0);
   stan::io::reader<double> reader(theta,theta_i);
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S(reader.cov_matrix_constrain(3U));
-  EXPECT_EQ(3U,S.rows());
-  EXPECT_EQ(3U,S.cols());
-  EXPECT_EQ(9U,S.size());
+  EXPECT_EQ(3,S.rows());
+  EXPECT_EQ(3,S.cols());
+  EXPECT_EQ(9,S.size());
   EXPECT_EQ(1U,reader.available());
   for (size_t i = 0; i < 3U; ++i)
     for (size_t j = i + 1; j < 3U; ++j)
@@ -727,9 +727,9 @@ TEST(io_reader,cov_matrix_constrain_jacobian) {
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S(reader.cov_matrix_constrain(3U,lp));
 
-  EXPECT_EQ(3U,S.rows());
-  EXPECT_EQ(3U,S.cols());
-  EXPECT_EQ(9U,S.size());
+  EXPECT_EQ(3,S.rows());
+  EXPECT_EQ(3,S.cols());
+  EXPECT_EQ(9,S.size());
   EXPECT_EQ(1U,reader.available());
   for (size_t i = 0; i < 3U; ++i)
     for (size_t j = i + 1; j < 3U; ++j)

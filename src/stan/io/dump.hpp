@@ -30,6 +30,8 @@ namespace stan {
     }
 
     /**
+     * Writes data into the S-plus dump format.
+     * 
      * A <code>dump_writer</code> writes data into the S-plus dump
      * format, a human-readable ASCII representation of arbitrarily
      * dimensioned arrays of integers and arrays of floating point
@@ -356,6 +358,8 @@ namespace stan {
     };
 
     /**
+     * Reads data from S-plus dump format.
+     *
      * A <code>dump_reader</code> parses data from the S-plus dump
      * format, a human-readable ASCII representation of arbitrarily
      * dimensioned arrays of integers and arrays of floating point
@@ -565,6 +569,28 @@ namespace stan {
         return scan_number();
       }
 
+
+      /**
+       * Helper function prints diagnostic information to std::cout.
+       */
+      void print() {
+        std::cout << "var name=|" << name_ << "|" << std::endl;
+        std:: cout << "dims=(";
+        for (size_t i = 0; i < dims_.size(); ++i) {
+          if (i > 0)
+            std::cout << ",";
+          std::cout << dims_[i];
+        }
+        std::cout << ")" << std::endl;
+        std::cout << "float stack:" << std::endl;
+        for (size_t i = 0; i < stack_r_.size(); ++i)
+          std::cout << "  [" << i << "] " << stack_r_[i] << std::endl;
+        std::cout << "int stack" << std::endl;
+        for (size_t i = 0; i < stack_i_.size(); ++i)
+          std::cout << "  [" << i << "] " << stack_i_[i] << std::endl;
+      }
+
+
     public:
       /**
        * Construct a reader for standard input.
@@ -604,6 +630,8 @@ namespace stan {
       }
 
       /**
+       * Checks if the last item read is integer.
+       *
        * Return <code>true</code> if the value(s) in the most recently
        * read item are integer values and <code>false</code> if
        * they are floating point.
@@ -651,30 +679,14 @@ namespace stan {
         if (!scan_value()) return false;
         return true;
       }
-
-      void print() {
-        std::cout << "var name=|" << name_ << "|" << std::endl;
-        std:: cout << "dims=(";
-        for (size_t i = 0; i < dims_.size(); ++i) {
-          if (i > 0)
-            std::cout << ",";
-          std::cout << dims_[i];
-        }
-        std::cout << ")" << std::endl;
-        std::cout << "float stack:" << std::endl;
-        for (size_t i = 0; i < stack_r_.size(); ++i)
-          std::cout << "  [" << i << "] " << stack_r_[i] << std::endl;
-        std::cout << "int stack" << std::endl;
-        for (size_t i = 0; i < stack_i_.size(); ++i)
-          std::cout << "  [" << i << "] " << stack_i_[i] << std::endl;
-      }
-
   
     };
 
 
 
     /**
+     * Represents named arrays with dimensions.
+     *
      * A dump object represents a dump of named arrays with dimensions.
      * The arrays may have any dimensionality.  The values for an array
      * are typed to double or int.  
@@ -858,6 +870,13 @@ namespace stan {
           names.push_back((*it).first);
       }
 
+      /** 
+       * Remove variable from the object.
+       * 
+       * @param name Name of the variable to remove.
+       * @return If variable is removed returns <code>true</code>, else
+       *   returns <code>false</code>.
+       */
       bool remove(const std::string& name) {
         return (vars_i_.erase(name) > 0) 
           || (vars_r_.erase(name) > 0);
@@ -865,11 +884,7 @@ namespace stan {
       
     };
     
-
   }
 
-
 }
-
-
 #endif

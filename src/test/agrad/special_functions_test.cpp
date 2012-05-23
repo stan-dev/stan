@@ -1214,15 +1214,228 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
 }
 
 TEST(AgradSpecialFunctions,int_step) {
-  
   using stan::math::int_step;
 
   AVAR a(5.0);
   AVAR b(0.0);
   AVAR c(-1.0);
   
-  EXPECT_EQ(1,int_step(a));
-  EXPECT_EQ(0,int_step(b));
-  EXPECT_EQ(0,int_step(c));
+  EXPECT_EQ(1U,int_step(a));
+  EXPECT_EQ(0U,int_step(b));
+  EXPECT_EQ(0U,int_step(c));
+}
 
+TEST(AgradSpecialFunctions,if_else) {
+  using stan::agrad::var;
+  using stan::math::if_else;
+  using stan::agrad::if_else;
+  
+  EXPECT_FLOAT_EQ(1.0,if_else(true,var(1.0),var(2.0)).val());
+  EXPECT_FLOAT_EQ(2.0,if_else(false,var(1.0),var(2.0)).val());
+
+  EXPECT_FLOAT_EQ(1.0,if_else(true,1.0,var(2.0)).val());
+  EXPECT_FLOAT_EQ(2.0,if_else(false,1.0,var(2.0)).val());
+
+  EXPECT_FLOAT_EQ(1.0,if_else(true,var(1.0),2.0).val());
+  EXPECT_FLOAT_EQ(2.0,if_else(false,var(1.0),2.0).val());
+}
+
+TEST(AgradSpecialFunctions,ibeta_vvv) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  AVAR a = 0.6;
+  AVAR b = 0.3;
+  AVAR c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(a,b,c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.436993,grad_f[0]);
+  EXPECT_FLOAT_EQ(0.7779751,grad_f[1]);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b.val(), c.val()),grad_f[2]);
+
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(a,b,c);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
+  EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b.val(), c.val()),grad_f[2]);
+}
+TEST(AgradSpecialFunctions,ibeta_vvd) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  AVAR a = 0.6;
+  AVAR b = 0.3;
+  double c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(a,b);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.436993,grad_f[0]);
+  EXPECT_FLOAT_EQ(0.7779751,grad_f[1]);
+  
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(a,b);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
+  EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
+}
+TEST(AgradSpecialFunctions,ibeta_vdv) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  AVAR a = 0.6;
+  double b = 0.3;
+  AVAR c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(a,c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.436993,grad_f[0]);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b, c.val()),grad_f[1]);
+
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(a,c);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b, c.val()),grad_f[1]);
+}
+TEST(AgradSpecialFunctions,ibeta_vdd) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  AVAR a = 0.6;
+  double b = 0.3;
+  double c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.436993,grad_f[0]);
+
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(a);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
+}
+TEST(AgradSpecialFunctions,ibeta_dvv) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  double a = 0.6;
+  AVAR b = 0.3;
+  AVAR c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(b,c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.7779751,grad_f[0]);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a, b.val(), c.val()),grad_f[1]);
+
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(b,c);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a, b.val(), c.val()),grad_f[1]);
+}
+TEST(AgradSpecialFunctions,ibeta_dvd) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  double a = 0.6;
+  AVAR b = 0.3;
+  double c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(b);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.7779751,grad_f[0]);
+
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(b);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
+}
+TEST(AgradSpecialFunctions,ibeta_ddv) {
+  using stan::agrad::var;
+  using stan::math::ibeta;
+  using stan::agrad::ibeta;
+  
+  using boost::math::ibeta_derivative;
+
+  double a = 0.6;
+  double b = 0.3;
+  AVAR c = 0.5;
+  AVAR f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.3121373, f.val());
+  
+  AVEC x = createAVEC(c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a, b, c.val()),grad_f[0]);
+
+  a = 3;
+  b = 2;
+  c = 0.2;
+  f = ibeta(a,b,c);
+  EXPECT_FLOAT_EQ(0.0272, f.val());
+  x = createAVEC(c);
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(ibeta_derivative(a, b, c.val()),grad_f[0]);
 }

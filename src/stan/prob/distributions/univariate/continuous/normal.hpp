@@ -1,8 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
-#include <stan/prob/constants.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -97,8 +97,6 @@ namespace stan {
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_log<false>(y,mu,sigma,stan::math::default_policy());
     }
-
-
 
     /**
      * Calculates the normal cumulative distribution function for the given

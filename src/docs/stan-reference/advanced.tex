@@ -1,0 +1,1162 @@
+\part{Additional Topics}
+
+
+
+\chapter{Markov Chain Monte Carlo Sampling}
+
+Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
+generate the samples.  The particular techniques are discussed in the
+following this section in \refsection{intro-samplers}.
+
+\section{Bayesian Inference}
+
+The generated \Cpp class can be plugged into \Stan's continuous and
+discrete samplers to read the data vectors $x$ and $y$ and then draw a
+sequence of sample parameter vectors $\theta^{(m)}$ according to the
+posterior $p(\theta|y;x)$.  
+
+The resulting samples may be used for full Bayesian inference, much of
+which can be carried out within \Stan itself.  For instance,
+predictions for unknown future observations may be made directly
+within \Stan.  For instance, if $\tilde{y}$ consists of unknown values
+of future observations with predictors and constants $\tilde{x}$, then
+the posterior predictive distribution is
+%
+\[
+p(\tilde{y}|y;x,\tilde{x})
+= \int_\Theta p(\tilde{y}|\theta;\tilde{x})
+  \, p(\theta|y;x) \, d\theta
+\]
+%
+Given $M$ samples from the posterior $p(\theta|y;x)$, the posterior
+predictive distribution can be calculated by taking
+\[
+p(\tilde{y}|y;x,\tilde{x})
+\approx
+\frac{1}{M} \sum_{m=1}^M P(\tilde{y}|\theta^{(m)};\tilde{x}).
+\]
+%
+In the limit as $M \rightarrow \infty$, the approximation approaches
+the true value $p(\tilde{y}|y;x,\tilde{x})$.
+
+Other quantities dependent on the posterior may be computed in the
+same way.  For instance, fake data simulations from the fitted model
+can be generated directly within \Stan and compared to the actual data
+for model checking.
+
+\section{Autocorrelation of Samples}
+
+\MCMC methods, including \Stan's, do not typically draw independent
+samples from the posterior $p(\theta|y;x)$.  They are not even
+guaranteed to draw samples from the posterior until the chain becomes
+stationary, which is only guaranteed in the limit.  This presents two
+problems, which can be addressed in practice as follows.
+
+\section{Initialization and Convergence Monitoring}
+
+The issue of initial parameter values to start the chain is related to
+the issue of determining when the Markov chain has converged to a
+stationary sense (i.e., when draws begin to be drawn from the
+posterior distribution).
+
+A Markov chain generates (not necessarily independent) samples from
+the posterior only after it has converged to a stationary state.
+Unfortunately, this is only guaranteed in the limit in theory.  In
+practice, diagnostics must be applied to monitor whether the Markov chain(s)
+have converged.
+
+Convergence monitoring may be approached several ways, most of which
+are hypothesis tests with a null hypothesis that the chains have
+converged.  If null hypothesis of stationary samples is rejected by
+the test, the chains are unlikely to have converged. 
+
+\section{Potential Scale Reduction}
+
+One commonly applied test is the \cite{GelmanRubin:1992} potential
+scale reduction statistic (written $\hat{R}$).  The $\hat{R}$
+statistic applies to multiple parallel Markov chains, comparing the
+variance of samples within each chain to the variance of the pooled
+samples across chains; at convergence these should be the same and
+$\hat{R}$ will approach 1.  Gelman and Rubin's recommendation is that
+the independent Markov chains be initialized with diffuse starting
+values for the parameters.  \Stan allows users to specify initial
+values for parameters or can draw diffuse random initializations
+itself.
+
+The $\hat{R}$ statistic is defined for a set of $K$ Markov chains,
+$\theta_k$, each of which has $N$ samples $\theta^{(n)}_k$.  The
+between-sample variance is
+\[
+B
+= \frac{N}{K-1} \, \sum_{k=1}^K (\bar{\theta}^{(\bullet)}_{k} - \bar{\theta}^{(\bullet)}_{\bullet})^2,
+\]
+%
+where
+%
+\[
+\bar{\theta}^{(k)}_{\bullet}
+= \frac{1}{N} \sum_{n = 1}^N \theta^{(k)}_n
+\ \ \ \ \
+\mbox{and}
+\ \ \ \ \
+\bar{\theta}^{(\bullet)}_{\bullet}
+= \frac{1}{K} \, \sum_{k=1}^K \bar{\theta}^{(k)}_{\bullet}.
+\]
+%
+The within-sample variance is
+\[
+W 
+= \frac{1}{K} \, \sum_{k=1}^K s_k^2,
+\]
+where
+\[
+s_k^2 = \frac{1}{N-1} \, \sum_{n=1}^N (\theta^{(n)}_k - \bar{\theta}^{(\bullet)}_k)^2.
+\]
+%
+The variance estimator is
+\[
+\widehat{\mbox{var}}^{+}\!(\theta|y)
+= \frac{N-1}{N}\, W \, + \, \frac{1}{N} \, B.
+\]
+%
+Finally, the potential scale reduction statistic is defined by
+\[
+\hat{R} 
+\, = \,
+\sqrt{\frac{\widehat{\mbox{var}}^{+}\!(\theta|y)}{W}}.
+\]
+
+\subsection{Generalized $\hat{R}$ for Ragged Chains}
+
+Now suppose that each chain may have a different number of samples.
+Let $N_k$ be the number of samples in chain $k$.  The definitions
+above are generalized as follows.
+\[
+B
+= \frac{1}{K-1} \, \sum_{k=1}^K N_k \, (\bar{\theta}^{(\bullet)}_{k} - \bar{\theta}^{(\bullet)}_{\bullet})^2,
+\]
+%
+\[
+\bar{\theta}^{(k)}_{\bullet}
+= \frac{1}{N_k} \sum_{n = 1}^N \theta^{(k)}_n.
+\]
+Or should the second term be the overall mean, as follows?
+\[
+\bar{\theta}^{(\bullet)}_{\bullet}
+= \frac{1}{K} \, \sum_{k=1}^K \bar{\theta}^{(k)}_{\bullet}.
+\ \ \ \ \ \mbox{\Large\bf or} \ \ \ \ \
+\bar{\theta}^{(k)}_{\bullet}
+= \frac{1}{\sum_{k=1}^K N_k} \sum_{k=1}^K \sum_{n=1}^{N_k} \theta^{(k)}_n.
+\]
+%
+\[
+W 
+= \frac{1}{\sum_{k=1}^K N_k} \, \sum_{k=1}^K N_k \, s_k^2,
+\]
+Or should that just be as before?
+\[ 
+W 
+= \frac{1}{K} \, \sum_{k=1}^K s_k^2,
+\]
+\[
+s_k^2 = \frac{1}{N-1} \, \sum_{n=1}^N (\theta^{(n)}_k - \bar{\theta}^{(\bullet)}_k)^2.
+\]
+%
+\[
+\widehat{\mbox{var}}^{+}\!(\theta|y)
+= \frac{N-1}{N}\, W \, + \, \frac{1}{N} \, B.
+\]
+%
+\[
+\hat{R} 
+\, = \,
+\sqrt{\frac{\widehat{\mbox{var}}^{+}\!(\theta|y)}{W}}.
+\]
+
+
+
+
+
+
+
+\section{Effective Sample Size}
+
+The second issue with \MCMC methods is that the samples tend to be
+autocorrelated (i.e., not independent).  This will affect the
+estimation of posterior quantities of interest, such as means,
+variances or quantiles.
+
+Given a sequence of uncorrelated samples, estimation follows the usual
+theory for independent identically distributed (i.i.d.) data.  For
+instance, sampling error in the estimate of the mean is easily
+characterized as shrinking at a rate of ${\mathcal O}(1/\sqrt{n})$,
+where $n$ is the number of samples.
+
+With correlated samples, the number of independent samples in the
+denominator, $n$, must be replaced with what is known as the
+``effective sample size'' ({\sc ess}).  Because the autocorrelation in
+the posterior samples is rarely known analytically, further estimates
+must be made of the effective sample size based on the empirical
+autocorrelations observed in the samples.  
+
+
+
+
+\section{Stan's Hamiltonian Monte Carlo Samplers}\label{intro-samplers.section}
+
+For continuous variables, \Stan uses Hamiltonian Monte Carlo (\HMC)
+sampling. \HMC is a Markov chain Monte Carlo (\MCMC) method based on
+simulating the Hamiltonian dynamics of a fictional physical system in
+which the parameter vector $\theta$ represents the position of a
+particle in $K$-dimensional space and potential energy is defined to
+be the negative (unnormalized) log probability.  Each sample in the
+Markov chain is generated by starting at the last sample, applying a
+random momentum to determine initial kinetic energy, then simulating
+the path of the particle in the field.  Standard \HMC runs the
+simulation for a fixed number of discrete steps of a fixed step size
+and uses a Metropolis adjustment to ensure detailed balance of the
+resulting Markovian system.  This adjustment treats the momentum term
+of the Hamiltonian as an auxiliary variable, and the only reason for
+rejecting a sample will be discretization error in computing the
+Hamiltonian.
+
+In addition to standard \HMC, \Stan implements an adaptive
+version of \HMC, the No-U-Turn Sampler (\NUTS).  \NUTS automatically
+tunes step sizes and a diagonal mass matrix during warmup and then
+adapts the number of leapfrog integration steps during sampling.
+Stan is expressive enough to allow most discrete variables to be
+marginalized out.  For the remaining discrete parameters, \Stan uses
+Gibbs sampling if there are only a few outcomes and adaptive slice
+sampling otherwise.
+
+
+\chapter{Variable Transforms}\label{variable-transforms.chapter}
+
+To avoid having to deal with constraints while simulating the
+Hamiltonian dynamics during sampling, every (multivariate) parameter
+in a \Stan model is transformed to an unconstrained variable behind
+the scenes by the model compiler.  The transform is based on any
+constraints in the parameter's definition.  Constraints that may be
+placed on variables include upper and lower bounds, ordered
+vectors, simplex vectors, correlation matrices and covariance
+matrices.  This chapter provides a definition of the transforms used
+for each type of variable.
+
+Once the model is compiled, it has support on all of
+$\reals^K$, where $K$ is the number of unconstrained parameters
+needed to define the actual parameters defined in the model.
+
+The details of section need not be understood in order to use
+\Stan for well-behaved models.  Understanding the sampling behavior
+of \Stan fully requires understanding these transforms.
+
+
+\section{Changes of Variables}\label{change-of-variables.section}
+
+The support of a random variable $X$ with density $p_X(x)$ is that
+subset of values for which it has non-zero density,
+%
+\[
+\mbox{support}(X) = \{ x | p_X(x) > 0 \}.
+\]
+
+If $f$ is a total function defined on the support of $X$, then $Y =
+f(X)$ is a new random variable.  This section shows how to compute the
+probability density function of $Y$ for well-behaved transforms $f$
+and the rest of the chapter details the transforms used by \Stan.
+
+
+
+\subsection{Univariate Changes of Variables}
+
+Suppose $X$ is one dimensional and $f: \mbox{support}(X) \rightarrow
+\reals$ is a one-to-one, monotonic function with a differentiable
+inverse $f^{-1}$.  Then the density of $Y$ is given by
+%
+\[
+p_Y(y) = p_X(f^{-1}(y))  
+         \,
+         \left| \, \frac{d}{dy} f^{-1}(y)\, \right|.
+\]
+
+
+\subsection{Multivariate Changes of Variables}
+
+An absolute derivative measures how the scale of the transformed
+variable changes with respect to the underlying variable.  The
+multivariate generalization of absolute derivatives is the absolute
+Jacobian determinants.  The Jacobian measures the change of each
+output variable relative to every input variable and the absolute
+determinant uses that to determine the differential change in volume
+at a given point in the parameter space.
+
+Suppose $X$ is a $K$-dimensional random variable with probability
+density function $p_X(x)$.  A new random variable $Y = f(X)$ may be
+defined by transforming $X$ with a suitably well-behaved function $f$.
+It suffices for what follows to note that if $f$ is one-to-one
+and its inverse $f^{-1}$ has a well-defined Jacobian, then the
+density of $Y$ is
+%
+\[
+p_Y(y) = p_X(g(y)) \, \left| \, \det \, J_g(y) \, \right|,
+\]
+%
+where $\det{}$ is the matrix determinant operation and $J_{f^{-1}}(y)$ is
+the Jacobian of $f^{-1}$ evaluated at $y$.  The latter is defined by
+\[
+J_{f^{-1}}(y) = 
+\left[
+\begin{array}{ccc}\displaystyle
+\frac{\partial y_1}{\partial x_1}
+& \cdots
+& \displaystyle \frac{\partial y_1}{\partial x_{K}}
+\\[6pt]
+\vdots & \vdots & \vdots
+\\
+\displaystyle\frac{\partial y_{K}}{\partial x_1}
+& \cdots
+& \displaystyle\frac{\partial y_{K}}{\partial x_{K}}
+\end{array}
+\right].
+\]
+%
+If the Jacobian is a triangular matrix, the determinant reduces to the
+product of the diagonal entries,
+%
+\[
+\det \, J_{f^{-1}}(y)
+= \prod_{k=1}^K \frac{\partial y_k}{\partial x_k}.
+\]
+%
+Triangular matrices naturally arise in situations where the variables
+are ordered, for instance by dimension, and each variable's
+transformed value depends on the previous variable's transformed
+values.  Diagonal matrices, a simple form of triangular matrix,
+arise if each transformed variable only depends on a single raw
+variable.
+
+\section{Lower Bounded Scalar}
+
+\Stan uses a logarithmic transform for lower and upper bounds.  
+
+\subsection{Lower Bound Transform}
+
+If a variable $X$ is declared to have lower bound $a$, it is
+transformed to an unbounded variable $Y$, where
+%
+\[
+Y = \log(X - a).
+\]
+
+\subsection{Lower Bound Inverse Transform}
+%
+The inverse of the the lower-bound transform maps an unbounded
+variable $Y$ to a variable $X$ that is bounded below by $a$ by
+%
+\[
+X = \exp(Y) + a.
+\]
+
+\subsection{Absolute Derivative of the Lower Bound Inverse Transform}
+
+The absolute derivative of the inverse transform is
+\[
+\left| \,
+\frac{d}{dy} \left( \exp(y) + a \right)
+\, \right|
+= \exp(y).
+\]
+Therefore, given the density $p_X$ of $X$, the density of $Y$ is 
+%
+\[
+p_Y(y) 
+= p_X\!\left( \exp(y) + a \right) \cdot \exp(y).
+\]
+
+
+\section{Upper Bounded Scalar}
+
+\Stan uses a negated logarithmic transform for upper bounds.
+
+\subsection{Upper Bound Transform}
+
+If a variable $X$ is declared to have an upper bound $b$, it is
+transformed to the unbounded variable $Y$ by
+%
+\[
+Y = \log(b - X).
+\]
+
+\subsection{Upper Bound Inverse Transform}
+%
+The inverse of the upper bound transform converts the unbounded
+variable $Y$ to the variable $X$ bounded above by $b$ through
+%
+\[
+X = b - \exp(Y).
+\]
+
+\subsection{Absolute Derivative of the Upper Bound Inverse Transform}
+
+The absolute derivative of the inverse of the upper bound transform is 
+\[
+\left| \,
+\frac{d}{dy} \left( b - \exp(y) \right)
+\, \right|
+= \exp(y).
+\]
+%
+Therefore, the density of the unconstrained variable $Y$ is defined in
+terms of the density of the variable $X$ with an upper bound of $b$ by
+%
+\[
+p_Y(y) 
+ =   p_X \!\left( b - \exp(y) \right) \cdot \exp(y).
+\]
+
+
+\section{Lower and Upper Bounded Scalar}
+
+For lower and upper-bounded variables, \Stan uses a scaled and
+translated log-odds transform.
+
+\subsection{Log Odds and the Logistic Sigmoid}
+
+The log-odds function is defined for $u \in (0,1)$ by
+%
+\[
+\mbox{logit}(u) = \log \frac{u}{1 - u}.
+\]
+% 
+The inverse of the log odds function is the logistic sigmoid, defined 
+for $v \in (-\infty,\infty)$ by
+%
+\[
+\mbox{logit}^{-1}(v) = \frac{1}{1 + \exp(-v)}.
+\]
+% 
+The derivative of the logistic sigmoid is
+%
+\[
+\frac{d}{dy} \mbox{logit}^{-1}(y) 
+= \mbox{logit}^{-1}(y) \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
+\]
+
+\subsection{Lower and Upper Bounds Transform}
+
+For variables constrained to be in the open interval $(a,b)$, \Stan
+uses a scaled and translated log-odds transform.  If variable $X$ is
+declared to have lower bound $a$ and upper bound $b$, then it is
+transformed to a new variable $Y$, where
+%
+\[
+Y = \mbox{logit} \left( \frac{X - a}{b - a} \right).
+\]
+%
+
+\subsection{Lower and Upper Bounds Inverse Transform}
+
+The inverse of this transform is
+%
+\[
+X = a + (b - a) \cdot \mbox{logit}^{-1}(Y).
+\]
+%
+
+\subsection{Absolute Derivative of the Lower and Upper Bounds Inverse
+  Transform}
+
+The absolute derivative of the inverse transform is given by
+\[
+\left|  \frac{d}{dy} a + (b - a) \cdot \mbox{logit}^{-1}(y)
+    \right|
+= (b - a)
+    \cdot \mbox{logit}^{-1}(y)
+    \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
+\]
+Therefore, the density of the transformed variable $Y$ is
+%
+\[
+p_Y(y) 
+= 
+ p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
+    \cdot (b - a)
+    \cdot \mbox{logit}^{-1}(y)
+    \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
+\]
+%
+Despite its apparent complexity, $\mbox{logit}^{-1}(y)$, and hence
+$\exp(-y)$, need only be evaluated once.
+
+
+\section{Ordered Vector}
+
+For some modeling tasks, a vector-valued random variable $X$ is
+required with support on ordered sequences.  One example is the set of
+cut points in ordered logistic regression (see \refsection{ordered-logistic}).
+
+In constraint terms, an ordered $K$-vector $x \in \reals^K$ satisfies
+\[
+x_k < x_{k+1}
+\]
+%
+for $k \in \setlist{1,\ldots,K-1}$.
+
+
+\subsection{Ordered Transform}
+
+\Stan's transform follows the constraint directly.  It maps an
+increasing vector $x \in \reals^{K}$ to an unconstrained vector $y \in
+\reals^K$ by setting
+%
+\[
+y_k
+= 
+\left\{
+\begin{array}{ll}
+x_1 & \mbox{if } k = 1, \mbox{ and}
+\\[4pt]
+\log \left( x_{k} - x_{k-1} \right) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
+\] 
+
+\subsection{Ordered Inverse Transform}
+
+The inverse transform for an unconstrained $y \in \reals^K$ to an
+ordered sequence $x \in \reals^K$ is defined by
+%
+\[
+x_k
+= 
+\left\{
+\begin{array}{ll} 
+y_1 & \mbox{if } k = 1, \mbox{ and}
+\\[4pt]
+x_{k-1} + \exp(y_k) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
+\]
+%
+This can also be expressed compactly as
+\[
+x_k = y_1 + \sum_{k'=2}^k \exp(y_{k'}).
+\]
+
+\subsection{Absolute Jacobian Determinant of the Ordered
+  Inverse Transform}
+
+The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
+with diagonal elements for $1 \leq k \leq K$ of
+\[
+J_{k,k} = 
+\left\{
+\begin{array}{ll} 
+1 & \mbox{if } k = 1, \mbox{ and}
+\\[4pt]
+\exp(y_k) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
+\]
+%
+The absolute Jacobian determinant is thus
+%
+\[
+\left| \, \det \, J \, \right|
+\ = \ 
+\left| \, \prod_{k=1}^K J_{k,k} \, \right|
+\ = \ 
+\prod_{k=2}^K \exp(y_k).
+\]
+
+
+Putting this all together, if $p_X$ is the density of $X$, then the
+transformed variable $Y$ has density $p_Y$ given by
+%
+\[
+p_Y(y)
+= p_X(f^{-1}(y)) 
+\
+\prod_{k=2}^K \exp(y_k).
+\]
+
+
+\section{Unit Simplex}
+
+The parameter of the $K$-dimensional categorical distribution must lie
+in the unit $K$-simplex.  Consequently, simplex-constrained variables show
+up in multivariate discrete models of all kinds.  
+
+The $K$-simplex is the set of points $x \in \reals^K$ such that
+for $1 \leq k \leq K$, 
+\[ 
+x_k > 0,
+\] 
+and
+\[
+\sum_{k=1}^K x_k = 1.
+\]
+%   
+An alternative definition is to take the hull of the convex closure of
+the vertices.  For instance, in 2-dimensions, the basis points are the
+extreme values $(0,1)$, and $(1,0)$ and the unit 2-simplex is interval
+with these as the end points.  In 3-dimensions, the basis is
+$(0,0,1)$, $(0,1,0)$ and $(1,0,0)$ and the unit 3-simplex is the
+triangle with these vertices.  As these examples illustrate, the
+simplex always picks out a subspace of $K-1$ dimensions from
+$\reals^K$.
+
+A point $x$ in the $K$-simplex is fully determined by its first $K-1$
+dimensions, because rearranging terms in the constraint yields
+%
+\[
+x_K = 1 - \sum_{k=1}^{K-1} x_k.
+\]
+%
+
+\subsection{Unit Simplex Inverse Transform}
+
+Stan employs a transform whose inverse may be understood using a
+stick-breaking metaphor.  A simplex is determined by taking a stick of
+unit length, breaking a piece off, the length of which is $x_1$.  Then
+$x_2$ is determined by breaking a piece from what's left.  A total of
+$K-1$ pieces are broken off, determining $x_1,\ldots,x_{K-1}$.  To
+complete the metaphor, the length of the remaining piece after $K-1$
+pieces are broken off determines $x_K$.
+
+The simplex transform $f$ is most easily understood in terms of its
+inverse $x = f^{-1}(y)$, which maps a point in $y \in
+\reals^{K-1}$ to a point $x$ in the $K$-simplex.  An intermediate
+vector $z \in \reals^{K-1}$, whose coordinates $z_k$ represent 
+the proportion of the stick broken off in step $k$, is defined
+elementwise for $1 \leq k < K$ by
+%
+\[
+z_k = \mbox{logit}^{-1} \left( y_k 
+                             - \mbox{logit} \left( \frac{1}{K - k + 1}
+                                            \right)
+                       \right).
+\]
+%
+The logit term in the above definition adjusts the transform so that a
+zero vector $y$ is mapped to $(1/K,\ldots,1/K)$.  For instance, if
+$y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
+if $z_{K-1} = 0$, then $z_{K-1} = 1/2$.  This ensures that random
+initializations for categorical distribution parameters are
+initialized around a parameter value when $y = 0$ representing the
+uniform distribution.
+
+The break proportions $z$ are applied to determine the stick sizes and
+resulting value of $x_k$ for $1 \leq k < K$ by
+%
+\[
+x_k = 
+\left( 1 - \sum_{k'=1}^{k-1} x_{k'} \right) z_k.
+\]
+%
+The summation term represents the length of stick left at stage $k$.
+This is multiplied by the break proportion $z_k$ to yield $x_k$.
+Because $x$ lines in a $K$-simplex, $x_K$ is determined from
+$x_1,\ldots,x_{K-1}$.
+
+\subsection{Absolute Jacobian Determinant of the Unit-Simplex
+  Inverse Transform}
+
+The Jacobian $J$ of the inverse transform $f^{-1}$ is
+lower-triangular, with diagonal entries
+\[
+J_{k,k}
+=
+\frac{\partial x_k}{\partial y_k}
+=
+\frac{\partial x_k}{\partial z_k} \,
+\frac{\partial z_k}{\partial y_k},
+\]
+%
+where
+\[
+\frac{\partial z_k}{\partial y_K} 
+= \frac{\partial}{\partial z_k} 
+   \mbox{logit}^{-1} \left(
+                       y_k - \mbox{logit} \left( \frac{1}{K-k+1}
+                                          \right)
+                    \right)
+= z_k (1 - z_k),
+\]
+%
+and
+%
+\[
+\frac{\partial x_k}{\partial z_k}
+=
+\left( 
+  1 - \sum_{k' = 1}^{k-1} x_{k'}
+   \right)
+.
+\]
+%
+Note that the definition is recursive, definining $x_k$ in terms of
+$x_{1},\ldots,x_{k-1}$.
+
+Because the Jacobian $J$ of $f^{-1}$ is lower triangular and positve, its
+absolute determinant reduces to
+%
+\[
+\left| \, \det J \, \right|
+\ = \
+\prod_{k=1}^{K-1} J_{k,k}
+\ = \
+\prod_{k=1}^{K-1} 
+z_k
+\, 
+(1 - z_k)
+\
+\left(
+1 - \sum_{k'=1}^{k-1} x_{k'}
+\right)
+.
+\]
+%
+Thus the transformed variable $Y = f(X)$ has a density given by
+%
+\[
+p_Y(y) 
+= p_X(f^{-1}(y))
+\,
+\prod_{k=1}^{K-1} 
+z_k
+\, 
+(1 - z_k)
+\
+\left(
+1 - \sum_{k'=1}^{k-1} x_{k'}
+\right)
+.
+\]
+%
+This formula looks more complicated than it is.  It only involves a
+single exponential function evaluation involved (in the logistic
+sigmoid applied to $y_k$ to produce $z_k$);  everything else is just
+basic arithmetic and keeping track of the remaing stick length.
+
+\subsection{Unit Simplex Transform}
+
+The transform $Y = f(X)$ can be derived by reversing the stages of the
+inverse transform.  Working backwards, given the break proportions
+$z$, $y$ is defined elementwise by
+%
+\[
+y_k 
+= \mbox{logit}(z_k)
++ \mbox{logit}\left(
+   \frac{1}{K-k+1}
+   \right)
+.
+\]
+%
+The break proportions $z_k$ are defined to be the ratio of $x_k$ to
+the length of stick left after the first $k-1$ pieces have been broken
+off, 
+%
+\[
+z_k 
+= \frac{x_k}
+       {1 - \sum_{k' = 1}^{k-1} x_k}
+.
+\]
+
+\section{Correlation Matrices}
+
+A correlation matirx is a symmetric, positive-definite matrix with a
+unit diagonal.  To deal with this rather complicated constraint, \Stan
+implements the transform of (Lewandowski, Kurowicka, and Joe 2009),
+henceforth the \LKJ-transform.  The number of free parameters required
+to specify a $K \times K$ correlation matrix is $K \choose 2$.
+
+\subsection{Correlation Matrix Inverse Transform}
+
+It is easiest to specify this transform in reverse, going from its $K
+\choose 2$ parameter basis to a correlation matrix.  The basis will
+actually be broken down into two steps.  To start, suppose $y$
+consists of $K \choose 2$ unconstrained values that are transformed via
+the bijective function $\tanh : \reals \rightarrow (0,1)$ 
+%
+\[
+\tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
+\]
+%
+Then, define a $K \times K$ array $z$ whose strict upper triangle is 
+filled from left-to-right, top-to-bottom with the transformed parameters.
+For example, in the $4 \times 4$ case, there are ${4 \choose 2}$ values
+arranged as
+%
+\[
+z 
+=
+\left[
+\begin{array}{cccc}
+0 & \tanh y_1 & \tanh y_2 & \tanh y_4
+\\
+0 & 0 & \tanh y_3 & \tanh y_5
+\\
+0 & 0 & 0 & \tanh y_6
+\\
+0 & 0 & 0 & 0
+\end{array}
+\right]
+.
+\]
+%
+Lewandowski et al.\ show how to bijectively map the array $z$ to a correlation
+matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
+canonical partial correlation (\CPC) between $i$ and $j$, which is the
+correlation between $i$'s residuals and $j$'s residuals when both $i$
+and $j$ are regressed on all variables $i'$ such that $i'< i$.
+In the case of $i=1$, there are no earlier variables, 
+so $z_{i,j}$ is just the Pearson correlation between $i$ and $j$.
+
+In \Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
+of the final correlation matrix (REMIND BEN TO GIVE YOU A CITE), defined for $1 \leq i,j \leq K$ by
+%
+\[
+w_{i,j} = 
+\left\{
+\begin{array}{cl}
+%
+0 & \mbox{if } i > j,
+\\[4pt]
+1 & \mbox{if } 1 = i = j,
+\\[12pt]
+\prod_{i'=1}^{i - 1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
+& \mbox{if } 1 < i = j,
+\\[12pt]
+z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\[12pt]
+z_{i,j} \, \prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
+& \mbox{ if } 1 < i < j.
+%
+\end{array}
+\right.
+\]
+%
+This does not require as much computation per matrix entry as it may appear; 
+calculating the rows in terms of earlier rows yields the more manageable
+%
+\[
+w_{i,j} = 
+\left\{
+\begin{array}{cl}
+%
+0 & \mbox{if } i > j,
+\\[4pt]
+1 & \mbox{if } 1 = i = j, 
+\\[8pt]
+z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\[8pt]
+z_{i,j} \ w_{i-1,j} \left( 1 - z_{i-1,j}^2 \right)^{1/2}
+& \mbox{ if } 1 < i \leq j.
+%
+\end{array}
+\right.
+\]
+Given the upper-triangular Cholesky factor $w$, the final correlation
+matrix is
+\[
+x = w^{\top} w.
+\]
+
+Lewandowski et al.\ show that the determinant of the correlation
+matrix can be defined in terms of the CPCs as
+%
+\[
+\mbox{det} \, x = \prod_{i=1}^{K-1} \ \prod_{j=i+1}^K \ (1 - z_{i,j}^2)
+ = \prod_{1 \leq i < j \leq K} (1 - z_{i,j}^2),
+\]
+which is also the square of the determinant of the triangular $w$.
+
+\subsection{Absolute Jacobian Determinant of the Correlation
+  Matrix Inverse Transform}
+
+\subsection{Correlation Matrix Transform}
+
+The correlation transform is defined by reversing the steps of the
+inverse transform defined in the previous section.  
+
+Starting with a correlation matrix $x$, the first step is to find the
+unique upper triangular $w$ such that $x = w w^{\top}$.  Because $x$
+is positive definite, this can be done by applying the Cholesky
+decomposition,
+\[
+w = \mbox{cholesky}(x).
+\]
+
+
+The next step from the Cholesky factor $w$ back to the array $z$ of
+{\CPC}s is simplified by the ordering of the elements in the
+definition of of $w$, which when inverted yields
+%
+\[
+z_{i,j} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } i \leq j,
+\\[8pt]
+w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\[8pt]
+{w_{i,j}}
+\
+\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-2}
+& \mbox{if } 1 < i < j.
+\end{array}
+\right.
+\]
+The final stage of the transform reverses the hyperbolic tangent
+transform by setting 
+\[
+\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
+\]
+The inverse hyperbolic tangent function is also called the Fisher
+transformation.
+
+
+\section{Covariance Matrices}
+
+In order for a $K \times K$ matrix to be used as a covariance matrix,
+it must be symmetric and positive definite.  A $K \times K$ matrix $x$ 
+is positive definite if for every non-zero $K$-vector $a$,
+%
+\[
+a^{\top} x \,  a > 0.
+\]
+%
+
+\subsection{Covariance Matrix Transform}
+
+\Stan's covariance transform is based on a Cholesky decomposition
+composed with a log transform of the positive-constrained diagonal
+elements.  
+
+If $x$ is a covariance matrix (i.e., a symmetric, positive definite
+matrix), then there is a unique lower-triangular matrix $z =
+\mbox{cholesky}(x)$ with positive diagonal entries, called a Cholesky
+factor, such that
+\[
+x = z \, z^{\top}.
+\]
+The off-diagonal entries of the Cholesky factor $z$ are unconstrained,
+but the diagonal entries $z_{k,k}$ nmust be positive for $1 \leq k
+\leq K$.
+
+To complete the transform, the diagonal is log-transformed to produce
+a fully unconstrained lower-triangular matrix $y$ defined by
+\[
+y_{m,n} = 
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\log z_{m,m} & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+z_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+\subsection{Covariance Matrix Inverse Transform}
+
+The inverse transform reverses the two steps of the transform.
+Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
+first step is to recover the intermediate matrix $z$ by reversing the
+log transform,
+\[
+z_{m,n} = 
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\exp(y_{m,m}) & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+y_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+%
+The covariance matrix $x$ is recovered from its Cholesky factor $z$ by
+taking
+%
+\[
+x = z \, z^{\top}.
+\]
+
+\subsection{Absolute Jacobian Determinant of the Covariance
+  Matrix Inverse Transform}
+
+The Jacobian determinant is the product of the Jacobian determinants
+of the exponential transform from the unconstrained lower-triangular
+matrix $y$ to matrix $z$ with positive diagonals and the product
+transform from the Cholesky factor $z$ to $x$.
+
+The transform from unconstrained $y$ to Cholesky factor $z$ has a
+diagonal Jacobian, so its Jacobian determinant is
+%
+\[
+\prod_{k=1}^K  \frac{d}{d_{y_{k,k}}} \, \exp(y_{k,k})
+\ = \ 
+\prod_{k=1}^K \exp(y_{k,k})
+\ = \
+\prod_{k=1}^K z_{k,k},
+\]
+which is always positive.
+
+The Jacobian of the second transform from the Cholesky factor $z$ to
+the covariance matrix $x$ is also triangular, with diagonal entries
+corresponding to pairs $m,n$ with $m \geq n$, defined by
+\[
+\frac{\partial}{\partial z_{m,n}}
+\left( z \, z^{\top} \right)_{m,n}
+\ = \
+\frac{\partial}{\partial z_{m,n}}
+\left( \sum_{k=1}^K z_{m,k} \, z_{n,k} \right)
+\ = \
+\left\{
+\begin{array}{cl}
+2 \, z_{n,n} & \mbox{if } m = n \mbox{ and }
+\\[4pt]
+z_{n,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+%
+The absolute Jacobian determinant of the second transform is thus
+\[
+2^{K} 
+\
+\prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}.
+\]
+Finally, the full absolute Jacobian determinant of the inverse
+of the covariance matrix transform from the unconstrained lower-triangular 
+$y$ to a symmetric, positive definite matrix $x$ is the product of the
+Jacobian determinants of the exponentiation and product transforms,
+\[
+2^{K} 
+\
+\left( \prod_{k=1}^K z_{k,k} \right)
+\left( \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n} \right)
+\ = \
+2^K
+\, \prod_{k=1}^K z_{k,k}^{K-k+2}.
+\]
+
+
+
+% \section{Covariance Matrices}
+
+% Covariance matrices are just scaled correlation matrices.  This
+% requires an additional $K$ positive scaling parameters, for a total
+% requirement of $K + {K \choose 2}$ parameters to specify a covariance
+% matrix.  
+
+% \subsection{Covariance Matrix Inverse Transform}
+
+% Suppose $y$ is a $K \choose 2$-dimensional array specifying the $K
+% \times K$ correlation matrix $x$ as specified by the correlation
+% matrix inverse transform described in the previous section.  
+
+% Let $y'$ be a $K$-dimensional vector of unconstrained scaling
+% parameters.  An exponential transform converts these to positive
+% values component-wise, by
+% %
+% \[
+% u = \exp(y').
+% \]
+% %
+% The covariance matrix is the scaled version of the correlation matrix
+% $x$,
+% \[
+% v \ = \ \mbox{diag}(u) \ x \ \mbox{diag}(u)
+%   \ = \ \left(\mbox{diag}(u) \, z\right) \left(\mbox{diag}(u) \, z)\right)^{\top},
+% \]
+% %
+% where $\mbox{diag}(u)$ is the diagonal matrix with diagonal $u$.
+
+% \subsection{Absolute Jacobian Determinant of the Covariance
+%   Matrix Inverse Transform}
+
+% Each covariance is equal to the correlation between two variables, 
+% times the product of their standard deviations. Thus, the Jacobian
+% matrix for the transform from $K \choose 2$ correlations to 
+% $K \choose 2$ covariances is diagonal, and each diagonal cell is
+% the product of a pair of standard deviations. The determinant of
+% this Jacobian is strictly positive and is the product of every
+% unique pair of standard deviations. This Jacobian determinant can
+% be combined with the Jacobian determinant of the correlation matrix
+% inverse transform and the Jacobian determinants for the transformations
+% from unbounded parameters to bounded CPCs and unbound parameters to
+% bounded standard deviations to yield the absolute Jacobian determinant
+% of the covariance matrix inverse transform. 
+
+% \subsection{Covariance Matrix Transform}
+
+% The covariance matrix transform just reverses the steps of the inverse
+% transform.  The first steps here are to derive the scaling factors $u$
+% and the correlation matrix $x$ from the covariance matrix $v$.
+% The correlation matrix $x$ has a unit diagonal, allowing $u$ to be
+% recovered componentwise through
+% %
+% \[
+% u_k = \sqrt{v_{k,k}}.
+% \]
+% %
+% The unconstrained scaling factors themselves are then recovered by
+% reversing the exponentiation that created them, with
+% %
+% \[
+% y'_k = \log u_k.
+% \]
+% %
+% Given the scaling factors $u$, it is straightforward to recover the
+% correlation matrix $x$ from the covariance matrix $v$ by reversing the
+% multiplications by diagonals
+% %
+% \[
+% x = \mbox{diag}(u)^{-1} \ v \ \mbox{diag}(u)^{-1}.
+% \]
+% The matrix $\mbox{diag}(u)$ is invertible because it is diagonal and
+% the entries are positive.  
+
+
+\chapter{The C++ Model Class}
+
+The generated \Cpp class extends a built-in \Stan abstract
+base class for probability models.  Instances of the class are
+constructed from a specified data vector $y$.  The data vector $y$
+determines the dimensionality $K$ of the parameter vector $\theta$,
+which in general may depend on size constants in $y$.  The class
+implements a method that takes a parameter $K$-vector $\theta$ as
+argument and returns the (unnormalized) total log probabilty,
+\[
+\theta 
+\mapsto 
+\log p(y,\theta) 
+\]
+The second method returns the gradient of the (unnormalized) total
+probability as a function of a parameter $K$-vector $\theta$,
+\[
+\theta
+\mapsto
+\nabla_{\theta} \log p(y,\theta)
+= ( \frac{\partial}{\partial\theta_1} \log p(y,\theta),
+  \ldots, 
+  \frac{\partial}{\partial\theta_K} \log p(y,\theta) ),
+\]
+
+The class computes gradients using accurate and efficient reverse-mode
+algorithmic differentiaton.  The cost of computing the gradient is
+a small multiple of the cost of computing the log probability.  The
+cost inovlves a bounded amount of extra bookkeeping for each 
+subexpression involved in computing the log probability.  Unlike
+in the calculation of finite differences, the extra bookkeeping is
+not dependent on the dimensionality of the parameter vector.
+
+
+\chapter{Optimizing \Stan Code}\label{optimization.chapter}
