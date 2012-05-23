@@ -1510,6 +1510,103 @@ namespace stan {
     }
 
     // see write_csv_visgen for similar structure
+    struct write_dims_visgen : public visgen {
+      write_dims_visgen(std::ostream& o)
+        : visgen(o) {
+      }
+      void operator()(const nil& x) const  { }
+      void operator()(const int_var_decl& x) const {
+        generate_dims_array(EMPTY_EXP_VECTOR,x.dims_);
+      }
+      void operator()(const double_var_decl& x) const {
+        generate_dims_array(EMPTY_EXP_VECTOR,x.dims_);
+      }
+      void operator()(const vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.M_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.N_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.M_);
+        matrix_args.push_back(x.N_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void operator()(const simplex_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void operator()(const ordered_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
+      void 
+      generate_dims_array(const std::vector<expression>& matrix_dims_exprs, 
+                          const std::vector<expression>& array_dims_exprs) 
+        const {
+
+        o_ << INDENT2 << "dims__.resize(0);" << EOL;
+        for (size_t i = 0; i < array_dims_exprs.size(); ++i) {
+          o_ << INDENT2 << "dims__.push_back(";
+          generate_expression(array_dims_exprs[i].expr_, o_);
+          o_ << ");" << EOL;
+        }
+        // cut and paste above with matrix_dims_exprs
+        for (size_t i = 0; i < matrix_dims_exprs.size(); ++i) {
+          o_ << INDENT2 << "dims__.push_back(";
+          generate_expression(matrix_dims_exprs[i].expr_, o_);
+          o_ << ");" << EOL;
+        }
+        o_ << INDENT2 << "dimss__.push_back(dims__);" << EOL;
+      }
+
+    };
+
+    void generate_dims_method(const program& prog,
+                              std::ostream& o) {
+      write_dims_visgen vis(o);
+      o << EOL << INDENT 
+        << "void write_dims(std::vector<std::vector<size_t> >& dimss__) {" 
+        << EOL;
+
+      o << INDENT2 << "dimss__.resize(0);" << EOL;
+      o << INDENT2 << "std::vector<size_t> dims__;" << EOL;
+
+      // parameters
+      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
+        boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
+      }
+      // transformed parameters
+      for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
+        boost::apply_visitor(vis,prog.derived_decl_.first[i].decl_);
+      }
+      // generated quantities
+      for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
+        boost::apply_visitor(vis,prog.generated_decl_.first[i].decl_);
+      }
+      o << INDENT << "}" << EOL2;
+    }
+
+    // see write_csv_visgen for similar structure
     struct write_csv_header_visgen : public visgen {
       write_csv_header_visgen(std::ostream& o)
         : visgen(o) {
@@ -2056,7 +2153,7 @@ namespace stan {
       generate_set_param_ranges(prog.parameter_decl_,out);
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
-      // FIXME: put back
+      generate_dims_method(prog,out);
       generate_write_csv_header_method(prog,out);
       generate_write_csv_method(prog,model_name,out);
       generate_end_class_decl(out);
