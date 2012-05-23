@@ -23,12 +23,13 @@ namespace stan {
      */
     bool compile(std::istream& stan_gm_in,
                  std::ostream& cpp_out,
-                 const std::string& model_name) {
+                 const std::string& model_name,
+                 bool include_main = true) {
       program prog;
       bool parsed_ok = parse(stan_gm_in,"input",prog);
       if (!parsed_ok) 
         return false; // syntax error in program
-      generate_cpp(prog,model_name,cpp_out);
+      generate_cpp(prog,model_name,cpp_out,include_main);
       return true;
     }
     

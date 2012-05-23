@@ -5,272 +5,158 @@
 
 This document is both a user's guide and a reference manual for
 \Stan's probabilistic modeling language.  This introductory chapter
-provides a high-level view of \Stan's approach to Bayesian inference.
-The next chapter provides a hands-on quick-start guide showing how
-\Stan works in practice.  The remainder of this document contains a
-practically-oriented user's guide for programming models in \Stan
-followed by a detailed reference manual for \Stan and its associated
-programs.
+provides a high-level overview of \Stan.  The next chapter provides a
+hands-on quick-start guide showing how \Stan works in practice.  The
+remaining parts of this document include a practically-oriented user's
+guide for programming models and a detailed reference manual for
+\Stan's modeling language and associated programs and data formats.
 
-\section{What is \Stan?}
+\section{\Stan Programs}
 
-\Stan is a software package providing a strongly typed, imperative
-language for specifying conditional probability models.  These models
-define a conditional probability function of unknown variables given
-some known variables.  
+A \Stan program defines a statistical model through a conditional
+probability function $p(\theta|y;x)$, where $\theta$ is a sequence of
+unknown values, $y$ is a sequence of known, modeled data variables,
+and $x$ is a sequence of predictors and constants.
 
-Model specifications are converted by \Stan to \Cpp code for reading
-data, transforming parameters, and calculating the conditional log
-probability function and its gradient.  This \Cpp code is then
-compiled to an executable for performing full Bayesian inference by
-sampling from the posterior.  
+\Stan programs consist of variable type declarations and statments.
+Variable types include constrained and unconstrained integer, scalar,
+vector, and matrix types, as well as (multidimensional) arrays of
+other types.  Variables are declared in blocks corresponding to the
+variable's use: data, transformed data, parameter, transformed
+parameter, or generated quantity.  Unconstrained local variables may
+be declared within statement blocks.
 
-\Stan programs use automatically tuned and adaptive Hamiltonian Monte
-Carlo for sampling.
+Statements in \Stan are interpreted imperatively, so their order
+matters.  Atomic statements involve the assignment of a value to a
+variable.  Sequences of statements (and optionally local variable
+declarations) may be organized into a block.  \Stan also provides bounded
+for-each loops of the sort used in \R and \BUGS.
+
+The transformed data, transformed parameter, and generated quantities
+blocks contain statements defining the variables declared in their
+blocks.  A special model block consists of statements defining the log
+probability for the model.
+
+Within the model block, \BUGS-style sampling notation may be used as
+shorthand for incrementing an underlying log probablity variable, the
+value of which defines the log probability function.  The log
+probability variable may also be accessed directly, allowing
+user-defined probability functions and Jacobians of transforms.
 
 
-\section{\Stan's Models}
+\section{Compiling and Running \Stan Programs}
 
-A \Stan program specifies a conditional probability function
-\[
-p(\theta|y;x),
-\]
-where
+A \Stan program is first compiled to a \Cpp program by the \Stan
+compiler \stanc, then the \Cpp program compiled to a self-contained
+platform-specific executable.  \Stan can generate executables for
+various flavors of Windows, Mac OS X, and Linux.%
 %
-\begin{itemize}
-\item $y$ is a vector of known values with a probabilistic model,
-  such as observed outcomes,
-\item $x$ is a vector of known values without a probabilistic
-  model, such as size constants, predictors, fixed
-  parameters, and fixed hyperparameters, and
-\item $\theta$ is a vector of unknown values, such as estimated
-  parameters, missing data, predictions, and simulated values.
-\end{itemize}
+\footnote{A \Stan program may also be compiled to a dynamically
+  linkable object file for use in a higher-level scripting language
+  such as \R or Python.}
 %
-Following the convention introduced by \BUGS, the elements of $x$ and
-$y$ will be called ``data'' and the elements of $\theta$ called
-``parameters.''  A compiled \Stan model is then given fixed values for
-the data $x$ and $y$ from which it simulates a sequence of samples of
-the parameters $\theta$ from the conditional distribution
-$p(\theta|y;x)$.  See \refsection{intro-samplers} later in this
-chapter for an introduction to \Stan's samplers.
+Running the \Stan executable for a model first reads in and validates
+the known values $y$ and $x$, then generates a sequence of
+(non-independent) identically distributed samples $\theta^{(1)},
+\theta^{(2)}, \ldots$, each of which has the marginal distribution
+$p(\theta|y;x)$.
 
-\subsection{Normalization}
 
-\Stan only requires the conditional probability function to be defined
-up to an additive constant on the log scale.  A \Stan program defines
-a function $f(\theta,y,x)$ such that for every legal data vector $y$
-and $x$, there exists a normalizing constant $Z_{y,x}$ depending only
-on $y$ and $x$, such that
-%
+\section{\Stan's Samplers}
+
+For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
+sampling.  \Stan 1.0 can only sample discrete parameters on which no
+other parameters depend, such as simulated values.
+\refchapter{mixture-modeling} discusses how finite discrete parameters
+can be summed out of models.
+
+\HMC is a form of Markov chain Monte Carlo (\MCMC) sampling.  \HMC
+accelerates both convergence to the stationary distribution and
+subsequent parameter exploration by using the gradient of the log
+probabilty function.  The unknown quantity vector $\theta$ is
+interpreted as the position of a fictional particle.  Each iteration
+generates a random momentum and simulates the path of the particle
+with potential energy determined the (negative) log probability
+function evaluated at position of $\theta$.  Hamilton's decomposition
+shows that the gradient of this potential determines change in
+momentum and the momentum determines the change in position.  These
+continuous changes over time are approximated using the leapfrog
+algorithm, which breaks the time into discrete steps which are easily
+simulated.  A Metropolis reject step is then applied to correct for
+any simulation error and ensure detailed balance of the resulting
+Markov chain transitions.
+
+Standard \HMC involves three ``tuning'' parameters to which its
+behavior is quite sensitive.  \Stan's samplers allow these parameters
+to be set by hand or set automatically without user intervention.
+
+The first tuning parameter is a mass matrix for the fictional
+particle.  \Stan can be set to use a unit mass matrix, a user-defined
+diagonal mass matrix, or to estimate a diagonal mass matrix during
+warmup.  The latter has the effect of normalizing the scale of each
+element $\theta_k$ of the unknown variable sequence $\theta$.
+
+The other two tuning parameters set the temporal step size of the
+discretization of the Hamiltonian and the total number of steps taken
+per iteration.  \Stan can be set to use a user-specified step size
+or it can estimate an optimal step size during warmup.  In either case,
+additional randomization may be applied to draw the step size from
+an interval of possible step sizes.  
+
+\Stan can be set to use a specified number of steps, or it can
+automatically adapt the number of steps during sampling using the
+no-U-turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+
+
+\section{Convergence Monitoring and Effective Sample Size}
+
+Samples in a Markov chain are only drawn with the marginal
+distribution $p(\theta|y;x)$ after the chain has converged to its
+stationary distribution.  There are several methods to test whether an
+\MCMC method has failed to converge (unforunately, passing the tests
+does not guarantee convergence).  The recommended method for \Stan is to
+run multiple Markov chains, discard the warmup samples, then split the
+remainder of each chain in half and compute the potential scale
+reduction statistic, $\hat{R}$ \citep{GelmanRubin:1992}.
+
+When estimating a mean based on $M$ independent samples, the
+estimation error is proportional to $1/\sqrt{M}$.  If the samples are
+positively correlated, as they typically are when drawn using \MCMC
+methods, the error is proportional to $1/\sqrt{\mbox{\sc ess}}$, where
+{\sc ess} is the effective sample size.  Thus it is standard practice
+to also monitor (an estimate of) the effective sample size of
+parameters of interest to gauge the error of any inferences based on
+the samples.
+
+
+
+
+\section{Bayesian Inference and Monte Carlo Methods}
+
+\Stan was developed to support full Bayesian inference.  Bayesian
+inference is based in part on Bayes's rule,
 \[
-\log p(\theta|y;x) = f(\theta,y,x) - \log Z_{y,x},
+p(\theta|y;x) \propto p(y|\theta;x) \, p(\theta;x),
 \]
-%
-or equivalently
-%
-\[
-p(\theta|y;x) = \exp \! \big( \, f(\theta,y,x) \big)  \, \frac{1}{Z_{y,x}}.
-\]
-%
-The normalizing term, when it exists, must be
-\[
-Z_{y,x} = \int_{\Theta} \, f(\theta,y,x) \, d\theta.
-\]
-\Stan's samplers do not need to compute the normalizing term
-$Z_{y,x}$, so it is not part of the model specification.
+which, in this unnormalized form, states that the posterior
+probability $p(\theta|y;x)$ of parameters $\theta$ given data $y$ (and
+constants $x$) is proportional (for fixed $y$ and $x$) to the
+product of the likelihood function $p(y|\theta;x)$ and prior
+$p(\theta;x)$.
 
+For \Stan, Bayesian modeling involves coding the posterior probability
+function up to a proportion, which Bayes's rule shows is equivalent to
+modeling the product of the likelihood function and prior up to a
+proportion.
 
-\subsection{Bayesian Inference}
+Full Bayesian inference involves propagating the uncertainty in the
+value of parameters $\theta$ modeled by the posterior $p(\theta|y;x)$.
+This can be accomplished by basing inference on a sequence of samples
+from the posterior using plug-in estimates for quantities of interest
+such as posterior means, posterior intervals, predictions based on the
+posterior such as event outcomes or the values of as yet unobserved
+data.
 
-\Stan was developed to enable Bayesian inference through posterior
-sampling.  Bayes's rule can be expressed as
-%
-\[
-p(\theta|y;x) 
-= \frac{p(y|\theta;x) \, p(\theta;x)}{p(y;x)}
-= \frac{p(y|\theta;x) \, p(\theta;x)}
-       {\int_{\Theta} p(y|\theta';x) \,  p(\theta';x) \ d\theta'} \, 
-\propto p(y|\theta;x) \, p(\theta;x).
-\]
-%
-It shows that the posterior probability function $p(\theta|y;x)$ is
-proportional to the product of the sampling probability function
-$p(y|\theta;x)$ and the prior probability function $p(\theta;x)$.  The
-prior may depend on the unmodeled data elements of $x$, but not on the
-modeled data elements in $y$.  The denominator is a normalizing term
-which Bayes's rule shows can be reduced to a formula (albeit an
-integral) involving only the sampling function and prior.
-
-Bayes's rule therefore allows \Stan to define a model to sample from
-the the posterior $p(\theta|y;x)$ using a function defined by
-\[
-f(\theta,y,x) = \log p(y|\theta;x) + \log p(\theta;x),
-\]
-in which the implicit normalizing constant reduces to $Z_{y,x} =
-p(y;x)$.
-
-
-\subsection{Pure Simulation}
-
-\Stan programs can be used purely for simulation.  If $y$ is empty,
-$\theta$ will consist of simulated values from $p(\theta;x)$.  For
-example, if $x = (\mu,\sigma)^{\top}$, $\theta =
-(\theta_1,\ldots,\theta_N)$, and 
-\[
-p(\theta;x) =  \prod_{n=1}^N \distro{Normal}(\theta_n;\mu,\sigma),
-\]
-then the \Stan program defined by the function
-\[
-f(\theta;x) = \sum_{n=1}^N \log \distro{Normal}(\theta_n;\mu,\sigma)
-\]
-will result in $\theta$ being a vector of $N$ samples from
-$\distro{Normal}(\mu,\sigma)$.  For more efficient sampling from the
-same distribution, the normalizing terms can be dropped and the model
-defined by
-\[
-f(\theta;x) \, = \, -\frac{1}{2} \ \sum_{n=1}^N \left( \frac{\theta_n -
-    \mu}{\sigma}\right)^2.
-\]
-
-
-\section{\Stan's Compiler}
-
-\Stan's compiler, \stanc, reads a user program in \Stan's modeling
-language and generates a \Cpp class implementing the model specified
-by that program.  
-
-\subsection{Variable Transforms}
-
-\Stan automatically applies a multivariate transform (and its Jacobian
-determinant) to free any constrained parameters, such as deviations
-(constrained to be positive), unit simplexes (a vector constrained to
-be positive and to sum to 1), and covariance matrices (symmetric and
-positive definite).  From the user's perspective, this 
-transform happens behind the scenes, driven by the types declared for 
-each of the parameters. 
-
-\section{Markov Chain Monte Carlo Sampling}
-
-Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
-generate the samples.  The particular techniques are discussed in the
-following this section in \refsection{intro-samplers}.
-
-\subsection{Bayesian Inference}
-
-The generated \Cpp class can be plugged into \Stan's continuous and
-discrete samplers to read the data vectors $x$ and $y$ and then draw a
-sequence of sample parameter vectors $\theta^{(m)}$ according to the
-posterior $p(\theta|y;x)$.  
-
-The resulting samples may be used for full Bayesian inference, much of
-which can be carried out within \Stan itself.  For instance,
-predictions for unknown future observations may be made directly
-within \Stan.  For instance, if $\tilde{y}$ consists of unknown values
-of future observations with predictors and constants $\tilde{x}$, then
-the posterior predictive distribution is
-%
-\[
-p(\tilde{y}|y;x,\tilde{x})
-= \int_\Theta p(\tilde{y}|\theta;\tilde{x})
-  \, p(\theta|y;x) \, d\theta
-\]
-%
-Given $M$ samples from the posterior $p(\theta|y;x)$, the posterior
-predictive distribution can be calculated by taking
-\[
-p(\tilde{y}|y;x,\tilde{x})
-\approx
-\frac{1}{M} \sum_{m=1}^M P(\tilde{y}|\theta^{(m)};\tilde{x}).
-\]
-%
-In the limit as $M \rightarrow \infty$, the approximation approaches
-the true value $p(\tilde{y}|y;x,\tilde{x})$.
-
-Other quantities dependent on the posterior may be computed in the
-same way.  For instance, fake data simulations from the fitted model
-can be generated directly within \Stan and compared to the actual data
-for model checking.
-
-\subsection{Autocorrelation of Samples}
-
-\MCMC methods, including \Stan's, do not typically draw independent
-samples from the posterior $p(\theta|y;x)$.  They are not even
-guaranteed to draw samples from the posterior until the chain becomes
-stationary, which is only guaranteed in the limit.  This presents two
-problems, which can be addressed in practice as follows.
-
-\subsection{Initialization and Convergence Monitoring}
-
-A Markov chain generates (not necessarily independent) samples from
-the posterior only after it has converged to a stationary state.
-Unfortunately, this is only guaranteed in the limit in theory.  In
-practice, diagnostics must be applied to monitor whether the Markov chain(s)
-have converged.
-
-Convergence monitoring may be approached several ways, most of which
-are hypothesis tests with a null hypothesis that the chains have
-converged.  If null hypothesis of stationary samples is rejected by
-the test, the chains are unlikely to have converged. 
-
-One commonly applied test is the \cite{GelmanRubin:1992} potential
-scale reduction statistic (written $\hat{R}$).  The $\hat{R}$
-statistic applies to multiple parallel Markov chains, comparing the
-variance of samples within each chain to the variance of the pooled
-samples across chains; at convergence these should be the same and
-$\hat{R}$ will approach 1.  Gelman and Rubin's recommendation is that
-the independent Markov chains be initialized with diffuse starting
-values for the parameters.  \Stan allows users to specify initial
-values for parameters or can draw diffuse random initializations
-itself.
-
-\subsection{Effective Sample Size}
-
-The second issue with \MCMC methods is that the samples tend to be
-autocorrelated (i.e., not independent).  This will affect the
-estimation of posterior quantities of interest, such as means,
-variances or quantiles.
-
-Given a sequence of uncorrelated samples, estimation follows the usual
-theory for independent identically distributed (i.i.d.) data.  For
-instance, sampling error in the estimate of the mean is easily
-characterized as shrinking at a rate of ${\mathcal O}(1/\sqrt{n})$,
-where $n$ is the number of samples.
-
-With correlated samples, the number of independent samples in the
-denominator, $n$, must be replaced with what is known as the
-``effective sample size'' ({\sc ess}).  Because the autocorrelation in
-the posterior samples is rarely known analytically, further estimates
-must be made of the effective sample size based on the empirical
-autocorrelations observed in the samples.  
-
-
-\section{Stan's Hamiltonian Monte Carlo Samplers}\label{intro-samplers.section}
-
-For continuous variables, \Stan uses Hamiltonian Monte Carlo (\HMC)
-sampling. \HMC is a Markov chain Monte Carlo (\MCMC) method based on
-simulating the Hamiltonian dynamics of a fictional physical system in
-which the parameter vector $\theta$ represents the position of a
-particle in $K$-dimensional space and potential energy is defined to
-be the negative (unnormalized) log probability.  Each sample in the
-Markov chain is generated by starting at the last sample, applying a
-random momentum to determine initial kinetic energy, then simulating
-the path of the particle in the field.  Standard \HMC runs the
-simulation for a fixed number of discrete steps of a fixed step size
-and uses a Metropolis adjustment to ensure detailed balance of the
-resulting Markovian system.  This adjustment treats the momentum term
-of the Hamiltonian as an auxiliary variable, and the only reason for
-rejecting a sample will be discretization error in computing the
-Hamiltonian.
-
-In addition to standard \HMC, \Stan implements an adaptive
-version of \HMC, the No-U-Turn Sampler (\NUTS).  \NUTS automatically
-tunes step sizes and a diagonal mass matrix during warmup and then
-adapts the number of leapfrog integration steps during sampling.
-Stan is expressive enough to allow most discrete variables to be
-marginalized out.  For the remaining discrete parameters, \Stan uses
-Gibbs sampling if there are only a few outcomes and adaptive slice
-sampling otherwise.
 
 
 \chapter{Getting Started}
