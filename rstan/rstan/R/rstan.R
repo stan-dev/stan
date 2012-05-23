@@ -21,7 +21,7 @@ stan.model <- function(file, verbose = FALSE,
   # modelnuts <- do.call("$", list(mod, model.name))
   modelnuts <- eval(call("$", mod, model.name))
   new("stanmodel", model.name = model.name, 
-      .modelData = list(nuts = modelnuts))  
+      .modelmod = list(nuts = modelnuts))  
 
 } 
 
@@ -29,31 +29,42 @@ stan.model <- function(file, verbose = FALSE,
 ## @param init.t: '0', 'user', any other values indicate `random' 
 stan.samples <- function(stan.m, 
                          data, 
-                         n.chains = 1, # chain.id ?? 
-                         n.iter = 2000, 
-                         seed, 
-                         thin = 1, 
+                         n.chains = 1L, # chain.id ?? 
+                         n.iter = 2000L, 
+                         thin = 1L, 
                          init.t = 'random', 
-                         init.v = NULL, ...,
+                         init.v = NULL, 
+                         seed, 
+                         sample_file, ...,
                          verbose = FALSE) {
 
    # check data and preprocess 
    data <- data.preprocess(data) 
-   if (missing(init.t) || is.na(init.t)) {
-     init_t <- "random"
-   } else if (init.t == 0 || init.t == '0')  { 
-     init_t <- "0"; 
-   } else if (init.t != 'user') {
-     init_t <= 'random' 
-   } 
 
-   args <- list(iter = n.iter, init = init.t, init_lst = init.v) 
+   # assemble init and init_lst 
+   # init: how to set up the initial values (0, user, random)
+   # init_lst: user specified initial values list  
+   if (init.t == 0) 
+     init.t <- "0"; 
+
+   if (!init.t %in% c("0", "user", "random")) 
+     init.t <- "random"; 
+    
+   args <- list(init = init.t, iter = n.iter, thin = thin) 
+
+   if (init.t == 'user' && is.list(init.v)) 
+     args$init_lst <- init.v 
+
    if (!missing(seed)) 
-     args$seed = seed  
+     args$seed <- seed  
+
+   if (!missing(sample_file)) 
+     args$sample_file <- sample_file  
                 
    # check inits and construct inits 
    # call stan.m's nuts_command 
 
    # check if stan.m is valid? (How?)
-   stan.m$call_nuts(data, args) 
+   nuts <- new(stan.m@.modelmod$nuts) 
+   invisible(nuts$call_nuts(data, args)) 
 }  
