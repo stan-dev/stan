@@ -1,7 +1,8 @@
 .PHONY: manual
 manual: src/docs/stan-reference/stan-reference.pdf
+	mkdir -p doc/
 	cp src/docs/stan-reference/stan-reference.pdf doc/
 
 %.pdf: %.tex
-	cd $(dir $@); pdflatex $(notdir $^); bibtex $(notdir $(basename $@)); pdflatex $(notdir $^);
+	cd $(dir $@); pdflatex $(notdir $^); bibtex $(notdir $(basename $@)); pdflatex $(notdir $^); pdflatex $(notdir $^);
 
