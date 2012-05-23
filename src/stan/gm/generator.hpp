@@ -1585,7 +1585,7 @@ namespace stan {
                               std::ostream& o) {
       write_dims_visgen vis(o);
       o << EOL << INDENT 
-        << "void write_dims(std::vector<std::vector<size_t> >& dimss__) {" 
+        << "void get_dims(std::vector<std::vector<size_t> >& dimss__) {" 
         << EOL;
 
       o << INDENT2 << "dimss__.resize(0);" << EOL;
@@ -1605,6 +1605,79 @@ namespace stan {
       }
       o << INDENT << "}" << EOL2;
     }
+
+
+
+    // see write_csv_visgen for similar structure
+    struct write_param_names_visgen : public visgen {
+      write_param_names_visgen(std::ostream& o)
+        : visgen(o) {
+      }
+      void operator()(const nil& x) const  { }
+      void operator()(const int_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const double_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const vector_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const simplex_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const ordered_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void 
+      generate_param_names(const std::string& name) const {
+        o_ << INDENT2 
+           << "names__.push_back(\"" << name << "\");"
+           << EOL;
+      }
+    };
+
+
+    void generate_param_names_method(const program& prog,
+                                          std::ostream& o) {
+      write_param_names_visgen vis(o);
+      o << EOL << INDENT
+        << "void get_param_names(std::vector<std::string>& names__) {"
+        << EOL;
+
+      o << INDENT2
+        << "names__.resize(0);"
+        << EOL;
+      
+      // parameters
+      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
+        boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
+      }
+      // transformed parameters
+      for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
+        boost::apply_visitor(vis,prog.derived_decl_.first[i].decl_);
+      }
+      // generated quantities
+      for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
+        boost::apply_visitor(vis,prog.generated_decl_.first[i].decl_);
+      }
+
+      o << INDENT << "}" << EOL2;
+    }
+
+
 
     // see write_csv_visgen for similar structure
     struct write_csv_header_visgen : public visgen {
@@ -2153,6 +2226,7 @@ namespace stan {
       generate_set_param_ranges(prog.parameter_decl_,out);
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
+      generate_param_names_method(prog,out);
       generate_dims_method(prog,out);
       generate_write_csv_header_method(prog,out);
       generate_write_csv_method(prog,model_name,out);
