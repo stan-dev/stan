@@ -2040,7 +2040,8 @@ namespace stan {
 
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
-                      std::ostream& out) {
+                      std::ostream& out,
+                      bool include_main = true) {
       generate_version_comment(out);
       generate_includes(out);
       generate_start_namespace(model_name,out);
@@ -2060,7 +2061,8 @@ namespace stan {
       generate_write_csv_method(prog,model_name,out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
-      generate_main(model_name,out);
+      if (include_main) 
+        generate_main(model_name,out);
     }
 
   }

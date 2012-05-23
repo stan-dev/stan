@@ -116,8 +116,10 @@ int main(int argc, const char* argv[]) {
     std::cout << "Input file=" << in_file_name << std::endl;
     std::cout << "Output file=" << out_file_name << std::endl;
 
+    bool include_main = !cmd.has_flag("no_main");
+
     bool valid_model 
-      = stan::gm::compile(in,out,model_name);
+      = stan::gm::compile(in,out,model_name,include_main);
     
     out.close();
 
