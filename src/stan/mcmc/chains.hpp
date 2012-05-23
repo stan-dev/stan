@@ -1220,6 +1220,18 @@ namespace stan {
     
     };
 
+    
+    std::pair<std::vector<std::string>,
+	      std::vector<std::vector<size_t> > >
+    read_csv_header(std::string file_name) {
+      std::vector<std::string> names;
+      std::vector<std::vector<size_t> > dimss;
+      
+      return std::pair<std::vector<std::string>,
+		       std::vector<std::vector<size_t> > >
+      (names, dimss);
+    }
+
   }
 }
 

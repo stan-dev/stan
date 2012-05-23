@@ -705,3 +705,35 @@ TEST(McmcChains, quantiles_means) {
   
   
 }
+/*TEST(McmcChains,read_csv_header) {
+  //"src/test/mcmc/test_csv_files/blocker1.csv"
+  //"src/test/mcmc/test_csv_files/blocker1.csv"
+  std::vector<std::string> expected_names;
+  std::vector<std::vector<size_t> > expected_dimss;
+  expected_names.push_back("lp__");
+  expected_names.push_back("treedepth__");
+  expected_names.push_back("alpha");
+  expected_names.push_back("beta");
+  expected_names.push_back("gamma");
+  expected_names.push_back("tau");
+  expected_names.push_back("lambda");
+  expected_names.push_back("sigma");
+
+  std::vector<size_t> dims;
+  dims.push_back(1);
+  expected_dimss.push_back(dims);
+  expected_dimss.push_back(dims);
+  expected_dimss.push_back(dims);
+  expected_dimss.push_back(dims);
+  expected_dimss.push_back(dims);
+  expected_dimss.push_back(dims);
+  dims.clear();
+  dims.push_back(6);
+  dims.push_back(3);
+  expected_dimss.push_back(dims);
+  dims.clear();
+  dims.push_back(1);
+  expected_dimss.push_back(dims);
+  
+}
+*/
