@@ -33,11 +33,9 @@ dogsdat_y <-
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); 
 
-dogsdat_y <- as.integer(dogsdat_y); 
-
-dogsdat <- list(Ndogs = 30L, 
-                Ntrials = 25L,
-                Y =  structure(as.integer(dogsdat_y), .Dim = c(30, 25))); 
+dogsdat <- list(Ndogs = 30, 
+                Ntrials = 25,
+                Y =  structure(dogsdat_y, .Dim = c(30, 25))); 
 
 dogsstan <- "
 data {
@@ -76,11 +74,9 @@ model {
 model_name <- "dogs"; 
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
-print(dogsrr@model.name)
 
-dogsb <- new(dogsrr@.modelData[["nuts"]]) 
-
-dogsb$call_nuts(dogsdat, list(sample_file = "dogs.csv")); 
+samples(dogsrr, data = dogsdat, n.iter = 2012, sample_file = 'dogs.csv')
+# stan.samples(dogsrr, dogsdat, verbose = TRUE) 
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
 colMeans(post)

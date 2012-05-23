@@ -27,6 +27,8 @@ SEXP stanc(SEXP model_stancode, SEXP model_name) {
   static const int SUCCESS_RC = 0;
   static const int EXCEPTION_RC = -1;
   static const int PARSE_FAIL_RC = -2;
+  
+  static const bool INCLUDE_MAIN = false; 
   /*
   std::string stan_version 
     = stan::MAJOR_VERSION + "." +
@@ -41,7 +43,7 @@ SEXP stanc(SEXP model_stancode, SEXP model_name) {
   std::istringstream in(mcode_); 
   try {
     bool valid_model
-      = stan::gm::compile(in,out,mname_);
+      = stan::gm::compile(in,out,mname_,INCLUDE_MAIN);
     if (!valid_model) {
       return Rcpp::List::create(Rcpp::Named("status") = PARSE_FAIL_RC); 
 
