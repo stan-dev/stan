@@ -1996,7 +1996,8 @@ namespace stan {
       o << INDENT << "void write_csv(std::vector<double>& params_r__," << EOL;
       o << INDENT << "               std::vector<int>& params_i__," << EOL;
       o << INDENT << "               std::ostream& o__) {" << EOL;
-      o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
+      o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
+        << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_csv(%1%)\";" << EOL;
@@ -2007,6 +2008,7 @@ namespace stan {
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
         boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
 
+      // this is for all other values
       write_csv_vars_visgen vis_writer(o);
 
       // transformed parameters guaranteed to satisfy constraints
