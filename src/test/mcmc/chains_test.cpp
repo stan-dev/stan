@@ -769,6 +769,8 @@ TEST(McmcChains,add_chain){
     std::vector<std::vector<size_t> > > variables = 
     stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2);
 
-  stan::mcmc::chains<> c(1, variables.first(), variables.second());
-  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker1.csv");
+  stan::mcmc::chains<> c(2, variables.first, variables.second);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv");
+  EXPECT_EQ(1000, c.num_samples(0));
+  EXPECT_EQ(0, c.num_samples(1));
 }

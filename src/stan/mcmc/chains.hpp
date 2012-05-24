@@ -1395,7 +1395,7 @@ namespace stan {
       if (!csv_output_file.is_open()) {
         throw new std::runtime_error("Could not open" + filename);
       }
-      std::vector<std::vector<std::string> > thetas =
+      std::vector<std::vector<double> > thetas =
         read_values(csv_output_file, chains.num_params());
       csv_output_file.close();
 
