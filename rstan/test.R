@@ -27,12 +27,12 @@ y <- rnorm(20)
 mean(y) 
 sd(y)
 dat <- list(N = 20, y = y); 
-samples(rr, data = dat, n.iter = 2012, sample_file = 'norm1.csv')
+samples(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
 
 
 samples(rr, data = dat, n.iter = 2012, init.t = 'user', 
         init.v = list(mu = 2), seed = 3, thin = 1, 
-        sample_file = 'norm1.csv')
+        sample.file = 'norm1.csv')
 
 post <- read.csv(file = 'norm1.csv', header = TRUE, skip = 19) 
 colMeans(post)
@@ -45,7 +45,7 @@ colMeans(post)
 
 samples(rr, data = dat, n.iter = 2012, init.t = 'user', 
         init.v = list(mu2 = 2), seed = 3, thin = 1, 
-        sample_file = 'norm1.csv')
+        sample.file = 'norm1.csv')
 
 # stan.samples(b, dat, n.chains = 1, n.iter = 2012, 
 #              init.t = 'user', init.v = list(mu1 = 2)) 
@@ -55,7 +55,7 @@ yasfile <- paste(model_name, ".csv", sep = '')
 
 samples(rr, data = dat, n.iter = 2012, init.t = 'random', 
         seed = 3, thin = 1, 
-        sample_file = yasfile) 
+        sample.file = yasfile) 
 
 post <- read.csv(file = yasfile, header = TRUE, skip = 19) 
 colMeans(post)

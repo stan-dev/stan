@@ -75,7 +75,7 @@ model_name <- "dogs";
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-samples(dogsrr, data = dogsdat, n.iter = 2012, sample_file = 'dogs.csv')
+samples(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
 # stan.samples(dogsrr, dogsdat, verbose = TRUE) 
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
