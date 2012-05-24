@@ -736,7 +736,7 @@ TEST(McmcChains,read_variables) {
 
   std::pair<std::vector<std::string>,
     std::vector<std::vector<size_t> > > variables;
-  variables = stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv");
+  variables = stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv");  
 
   // check names
   ASSERT_EQ(expected_names.size(), variables.first.size());
