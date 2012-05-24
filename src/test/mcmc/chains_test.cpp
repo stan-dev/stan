@@ -724,43 +724,31 @@ TEST(McmcChains,read_variables) {
   expected_dimss.push_back(dims);
   expected_dimss.push_back(dims);
   expected_dimss.push_back(dims);
-  expected_dimss.push_back(dims);
+  dims.clear();
+  dims.push_back(22);
   expected_dimss.push_back(dims);
   dims.clear();
-  dims.push_back(6);
-  dims.push_back(3);
+  dims.push_back(22);
   expected_dimss.push_back(dims);
   dims.clear();
   dims.push_back(1);
   expected_dimss.push_back(dims);
 
-  for (size_t i = 0; i < expected_names.size(); i++) {
-    std::cout << expected_names[i] << ": ";
-    for (size_t j = 0; j < expected_dimss[i].size(); j++) {
-      std::cout << expected_dimss[i][j] << " ";
-    }
-    std::cout << std::endl;
-  }
-
-  
   std::pair<std::vector<std::string>,
     std::vector<std::vector<size_t> > > variables;
   variables = stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv");
 
-  for (size_t i = 0; i < variables.first.size(); i++) {
-    std::cout << variables.first[i] << ": ";
-    //for (size_t j = 0; j < expected_dimss[i].size(); j++) {
-    //std::cout << expected_dimss[i][j] << " ";
-    //}
-    std::cout << std::endl;
-  }
-
-
+  // check names
   ASSERT_EQ(expected_names.size(), variables.first.size());
   for (size_t i = 0; i < expected_names.size(); i++) {
     EXPECT_EQ(expected_names[i], variables.first[i]);
   }
-  // check names
-  
+  // check dims
+  ASSERT_EQ(expected_dimss.size(), variables.second.size());
+  for (size_t i = 0; i < expected_dimss.size(); i++) {
+    for (size_t j = 0; j < expected_dimss[i].size(); j++) {
+      EXPECT_EQ(expected_dimss[i][j], variables.second[i][j]);
+    }
+  }
 }
 

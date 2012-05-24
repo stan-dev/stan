@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 #include <fstream>
+#include <cstdlib>
 
 #include <Eigen/Dense>
 
@@ -1252,7 +1253,7 @@ namespace stan {
         std::stringstream stream(line);
         std::vector<std::string> tokens;
         std::string token;
-        while (std::getline(stream,token,',')) {
+        while (std::getline(stream,token,delimiter)) {
           tokens.push_back(token);
         }
         return tokens;
@@ -1277,8 +1278,36 @@ namespace stan {
         }
         return names;
       }
-    }
 
+      /** 
+       * Get dims from a list of tokens.
+       * 
+       * @param tokens a vector of tokens from the header.
+       * 
+       * @return a vector of dims.
+       */
+      std::vector<std::vector<size_t> > 
+      get_dimss(std::vector<std::string> tokens) {
+        std::string last_name;
+        std::vector<std::vector<size_t> > dimss;
+        for (int i = tokens.size()-1; i >= 0; --i) {
+          std::vector<std::string> split = tokenize(tokens[i],'.');
+          
+          std::vector<size_t> dims;
+          if (split.size() == 1) {
+            dims.push_back(1);
+            dimss.insert(dimss.begin(), dims);
+          } else if (split.front() != last_name) {
+            for (size_t j = 1; j < split.size(); j++) {
+              dims.push_back((size_t)atol(split[j].c_str()));
+            }
+            dimss.insert(dimss.begin(), dims);
+          }
+          last_name = split.front();
+        }
+        return dimss;
+      }
+    }
 
     /** 
      * Reads variable names and dims from a csv
@@ -1303,6 +1332,7 @@ namespace stan {
 
       std::vector<std::string> tokens = tokenize(header);
       names = get_names(tokens);
+      dimss = get_dimss(tokens);
 
       return std::pair<std::vector<std::string>,
                        std::vector<std::vector<size_t> > >
