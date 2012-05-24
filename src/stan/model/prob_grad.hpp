@@ -148,12 +148,14 @@ namespace stan {
                             std::vector<double>& grad,
                             double epsilon = 1e-6) {
         std::vector<double> perturbed(params_r);
-        double logp = grad_log_prob(params_r, params_i, grad);
+        grad_log_prob(params_r, params_i, grad);
         grad.resize(params_r.size());
         for (size_t k = 0; k < params_r.size(); k++) {
           perturbed[k] += epsilon;
-          double logp2 = log_prob(perturbed, params_i);
-          double gradest = (logp2 - logp) / epsilon;
+          double logp_plus = log_prob(perturbed, params_i);
+          perturbed[k] = params_r[k] - epsilon;
+          double logp_minus = log_prob(perturbed, params_i);
+          double gradest = (logp_plus - logp_minus) / (2*epsilon);
           grad[k] = gradest;
           perturbed[k] = params_r[k]; 
         }

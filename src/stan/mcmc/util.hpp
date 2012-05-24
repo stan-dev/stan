@@ -63,7 +63,7 @@ namespace stan {
     // Returns the new log probability of x and m
     // Catches domain errors and sets logp as -inf.
     // Uses a different step size for each variable in x and m.
-    double rescaled_leapfrog(prob_grad& model, 
+    double rescaled_leapfrog(stan::model::prob_grad& model, 
                              std::vector<int> z, 
                              const std::vector<double>& step_sizes,
                              std::vector<double>& x, std::vector<double>& m,
