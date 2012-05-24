@@ -712,12 +712,11 @@ TEST(McmcChains,read_variables) {
   std::vector<std::vector<size_t> > expected_dimss;
   expected_names.push_back("lp__");
   expected_names.push_back("treedepth__");
-  expected_names.push_back("alpha");
-  expected_names.push_back("beta");
-  expected_names.push_back("gamma");
-  expected_names.push_back("tau");
-  expected_names.push_back("lambda");
-  expected_names.push_back("sigma");
+  expected_names.push_back("d");
+  expected_names.push_back("sigmasq_delta");
+  expected_names.push_back("mu");
+  expected_names.push_back("delta");
+  expected_names.push_back("sigma_delta");
 
   std::vector<size_t> dims;
   dims.push_back(1);
@@ -742,6 +741,26 @@ TEST(McmcChains,read_variables) {
     }
     std::cout << std::endl;
   }
+
+  
+  std::pair<std::vector<std::string>,
+    std::vector<std::vector<size_t> > > variables;
+  variables = stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv");
+
+  for (size_t i = 0; i < variables.first.size(); i++) {
+    std::cout << variables.first[i] << ": ";
+    //for (size_t j = 0; j < expected_dimss[i].size(); j++) {
+    //std::cout << expected_dimss[i][j] << " ";
+    //}
+    std::cout << std::endl;
+  }
+
+
+  ASSERT_EQ(expected_names.size(), variables.first.size());
+  for (size_t i = 0; i < expected_names.size(); i++) {
+    EXPECT_EQ(expected_names[i], variables.first[i]);
+  }
+  // check names
   
 }
 

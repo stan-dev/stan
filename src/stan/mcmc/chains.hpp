@@ -1232,7 +1232,50 @@ namespace stan {
        */
       std::string read_header(std::fstream& file) {
         std::string header = "";
+        // strip comments
+        while (file.peek() == '#') {
+          file.ignore(10000, '\n');
+        }
+        std::getline(file, header, '\n');
         return header;
+      }
+      
+      /** 
+       * Tokenize line by delimiter.
+       * 
+       * @param stream String to tokenize.
+       * @param delimiter Delimiter.
+       * 
+       * @return vector of tokens.
+       */
+      std::vector<std::string> tokenize(std::string line, char delimiter=',') {
+        std::stringstream stream(line);
+        std::vector<std::string> tokens;
+        std::string token;
+        while (std::getline(stream,token,',')) {
+          tokens.push_back(token);
+        }
+        return tokens;
+      }
+
+      /** 
+       * Get names from a list of tokens.
+       * 
+       * @param tokens a vector of tokens from the header.
+       * 
+       * @return a vector of names
+       */
+      std::vector<std::string> get_names(std::vector<std::string> tokens) {
+        std::vector<std::string> names;
+        for (size_t i = 0; i < tokens.size(); i++) {
+          std::stringstream token(tokens[i]);
+          std::string name;
+          std::getline(token,name,'.');
+          if (names.size() == 0 || names.back()!=name) {
+            names.push_back(name);
+          }
+        }
+        return names;
       }
     }
 
@@ -1256,10 +1299,11 @@ namespace stan {
         throw new std::runtime_error("Could not open" + filename);
       }
       std::string header = read_header(csv_output_file);
-      std::cout << "header: " << std::endl;
-      std::cout << header << std::endl;
       csv_output_file.close();
-      
+
+      std::vector<std::string> tokens = tokenize(header);
+      names = get_names(tokens);
+
       return std::pair<std::vector<std::string>,
                        std::vector<std::vector<size_t> > >
       (names, dimss);
