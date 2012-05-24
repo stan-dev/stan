@@ -710,8 +710,6 @@ TEST(McmcChains,read_variables) {
   //"src/test/mcmc/test_csv_files/blocker1.csv"
   std::vector<std::string> expected_names;
   std::vector<std::vector<size_t> > expected_dimss;
-  expected_names.push_back("lp__");
-  expected_names.push_back("treedepth__");
   expected_names.push_back("d");
   expected_names.push_back("sigmasq_delta");
   expected_names.push_back("mu");
@@ -720,8 +718,6 @@ TEST(McmcChains,read_variables) {
 
   std::vector<size_t> dims;
   dims.push_back(1);
-  expected_dimss.push_back(dims);
-  expected_dimss.push_back(dims);
   expected_dimss.push_back(dims);
   expected_dimss.push_back(dims);
   dims.clear();
@@ -750,5 +746,23 @@ TEST(McmcChains,read_variables) {
       EXPECT_EQ(expected_dimss[i][j], variables.second[i][j]);
     }
   }
+}
+
+TEST(McmcChains,read_values) {
+  std::fstream file("src/test/mcmc/test_csv_files/blocker1.csv", 
+                    std::fstream::in);
+  std::vector<std::vector<double> > thetas;
+  thetas = stan::mcmc::read_values(file, 3);
+  file.close();
+  EXPECT_EQ(1000, thetas.size());
+  EXPECT_EQ(3, thetas[0].size());
+  
+  EXPECT_FLOAT_EQ(-0.272311,  thetas[0][0]);
+  EXPECT_FLOAT_EQ(-0.0884699, thetas[0][1]);
+  EXPECT_FLOAT_EQ(0.183328,   thetas[0][2]);
+  
+  EXPECT_FLOAT_EQ(-0.0652107,thetas[999][0]);
+  EXPECT_FLOAT_EQ(-0.291459, thetas[999][1]);
+  EXPECT_FLOAT_EQ(0.123128,  thetas[999][2]);
 }
 

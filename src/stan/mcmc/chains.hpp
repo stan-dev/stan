@@ -1263,10 +1263,12 @@ namespace stan {
        * Get names from a list of tokens.
        * 
        * @param tokens a vector of tokens from the header.
+       * @param skip number of variables to skip
        * 
        * @return a vector of names
        */
-      std::vector<std::string> get_names(std::vector<std::string> tokens) {
+      std::vector<std::string> get_names(std::vector<std::string> tokens, 
+                                         size_t skip) {
         std::vector<std::string> names;
         for (size_t i = 0; i < tokens.size(); i++) {
           std::stringstream token(tokens[i]);
@@ -1276,6 +1278,7 @@ namespace stan {
             names.push_back(name);
           }
         }
+        names.erase(names.begin(), names.begin()+skip);
         return names;
       }
 
@@ -1283,11 +1286,13 @@ namespace stan {
        * Get dims from a list of tokens.
        * 
        * @param tokens a vector of tokens from the header.
+       * @param number of variables to skip
        * 
        * @return a vector of dims.
        */
       std::vector<std::vector<size_t> > 
-      get_dimss(std::vector<std::string> tokens) {
+      get_dimss(std::vector<std::string> tokens, 
+                size_t skip) {
         std::string last_name;
         std::vector<std::vector<size_t> > dimss;
         for (int i = tokens.size()-1; i >= 0; --i) {
@@ -1305,7 +1310,39 @@ namespace stan {
           }
           last_name = split.front();
         }
+        dimss.erase(dimss.begin(), dimss.begin()+skip);
         return dimss;
+      }
+      
+      /** 
+       * Reads values from a csv file. Reads the last variables in
+       * each file.
+       * 
+       * @param file csv output file.
+       * @param num_values number of values to read per line
+       * 
+       * @return the values in the file
+       */
+      std::vector<std::vector<double> >
+      read_values(std::fstream& file, size_t num_values) {
+        std::vector<std::vector<double> > thetas;
+        
+        read_header(file); // ignore header
+        std::vector<double> theta;
+        std::string line;
+        std::vector<std::string> tokens;
+        while (file.peek() != std::istream::traits_type::eof()) {
+          std::getline(file, line, '\n');
+          tokens = tokenize(line, ',');
+          theta.clear();
+          for (size_t i = tokens.size()-num_values; i < tokens.size(); i++) {
+            theta.push_back(atof(tokens[i].c_str()));
+          }
+          if (theta.size() > 0) {
+            thetas.push_back(theta);
+          }
+        }
+        return thetas;
       }
     }
 
@@ -1314,12 +1351,13 @@ namespace stan {
      * output file.
      * 
      * @param filename Name of a csv output file.
+     * @param skip number of variables to skip
      * 
      * @return Pair containing names and dims of the variables.
      */
     std::pair<std::vector<std::string>,
               std::vector<std::vector<size_t> > >
-    read_variables(std::string filename) {
+    read_variables(std::string filename, size_t skip=2) {
       std::vector<std::string> names;
       std::vector<std::vector<size_t> > dimss;
       
@@ -1331,12 +1369,41 @@ namespace stan {
       csv_output_file.close();
 
       std::vector<std::string> tokens = tokenize(header);
-      names = get_names(tokens);
-      dimss = get_dimss(tokens);
+      names = get_names(tokens, skip);
+      dimss = get_dimss(tokens, skip);
 
       return std::pair<std::vector<std::string>,
                        std::vector<std::vector<size_t> > >
       (names, dimss);
+    }
+    
+    /** 
+     * Adds a chain from a csv file.
+     * 
+     * @param[in,out] chains The chains object to modify
+     * @param chain chain number
+     * @param filename file name of a csv output file
+     * @param skip number of variables to skip
+     * 
+     * @return number of samples added
+     */
+    template <typename RNG>
+    size_t add_chain(stan::mcmc::chains<RNG>& chains, const size_t chain, 
+                     const std::string filename,
+                     const size_t skip=2) {
+      std::fstream csv_output_file(filename.c_str(), std::fstream::in);
+      if (!csv_output_file.is_open()) {
+        throw new std::runtime_error("Could not open" + filename);
+      }
+      std::vector<std::vector<std::string> > thetas =
+        read_values(csv_output_file, chains.num_params());
+      csv_output_file.close();
+
+      for (size_t i = 0; i < thetas.size(); i++) {
+        chains.add(chain, thetas[i]);
+      }
+      
+      return thetas.size();
     }
 
   }
