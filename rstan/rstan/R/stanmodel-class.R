@@ -35,27 +35,52 @@ setMethod("show", "stanmodel",
 
 
 setGeneric(name = "samples",
-           def = function(object, data, n.chains = 1L, iter = 2000L, 
+           def = function(object, data, n.chains = 1L, n.iter = 2000L, 
+                          n.warmup = as.integer(n.iter / 2), 
                           thin = 1L, init.t = 'random', init.v = NULL, seed, 
-                          sample_file, ...,
+                          sample.file, ...,
                           verbose = FALSE) { standardGeneric("samples")}) 
 
 setMethod("samples", "stanmodel", 
           function(object, data, n.chains = 1L, n.iter = 2000L, 
-                   thin = 1L, init.t = 'random', init.v = NULL, seed,
-                   sample_file, ..., verbose = FALSE) {
+                   n.warmup = as.integer(n.iter / 2), 
+                   thin = 1L, init.t = "random", init.v = NULL, seed,
+                   sample.file, ..., verbose = FALSE) {
+
+            # check data and preprocess 
+            data <- data.preprocess(data) 
+ 
+            # assemble init and init_lst 
+            # init: how to set up the initial values (0, user, random)
+            # init_lst: user specified initial values list  
+ 
+            init.t <- as.character(init.t)
             # cat("[in samples]: init.t=", init.t, "\n")
+ 
+            if (!init.t %in% c("0", "user"))  
+              init.t <- "random"; 
+             
+            args <- list(init = init.t, iter = n.iter, thin = thin) 
+ 
+            if (init.t == 'user' && is.list(init.v)) 
+              args$init_lst <- init.v 
+ 
+            if (!missing(seed)) 
+              args$seed <- seed  
+ 
+            if (!missing(n.warmup)) 
+              args$warmup <- n.warmup 
+ 
+            if (!missing(sample.file)) 
+              args$sample_file <- sample.file  
+                         
+            # check inits and construct inits 
+            # call the modules's nuts_command 
+ 
+            # check if object is valid? (How?)
 
-            stan.samples(object, data, n.chains, n.iter, 
-                         thin, init.t, init.v, seed, 
-                         sample_file = sample_file, ...,
-                         verbose) 
-            # cat("call nuts to draw samples from the model. \n") 
+            nuts <- new(object@.modelmod$nuts) 
+            invisible(nuts$call_nuts(data, args)) 
+ 
           })  
-
-
-# z <- new("stanmodel", .xData = list())
-# print(z)
-# extract(z) 
-
 

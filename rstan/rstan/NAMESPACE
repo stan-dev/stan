@@ -2,7 +2,7 @@ useDynLib(rstan)
 # exportPattern("^[[:alpha:]]+")
 export (
   stan.model,
-  stan.samples,
+# stan.samples,
   stanc, 
   stanc.version 
 )

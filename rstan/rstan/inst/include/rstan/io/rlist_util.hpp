@@ -17,9 +17,10 @@ namespace rstan {
       return lst[name]; 
     } catch (Rcpp::index_out_of_bounds &e) {
       return R_NilValue; 
-    } catch (...) { 
+    } /* catch (...) { 
       throw; 
     } 
+    */ // redundant 
   } 
 
 } 
