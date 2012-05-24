@@ -705,7 +705,7 @@ TEST(McmcChains, quantiles_means) {
   
   
 }
-/*TEST(McmcChains,read_csv_header) {
+TEST(McmcChains,read_variables) {
   //"src/test/mcmc/test_csv_files/blocker1.csv"
   //"src/test/mcmc/test_csv_files/blocker1.csv"
   std::vector<std::string> expected_names;
@@ -734,6 +734,14 @@ TEST(McmcChains, quantiles_means) {
   dims.clear();
   dims.push_back(1);
   expected_dimss.push_back(dims);
+
+  for (size_t i = 0; i < expected_names.size(); i++) {
+    std::cout << expected_names[i] << ": ";
+    for (size_t j = 0; j < expected_dimss[i].size(); j++) {
+      std::cout << expected_dimss[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
   
 }
-*/
+

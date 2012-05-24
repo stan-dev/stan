@@ -10,6 +10,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <fstream>
 
 #include <Eigen/Dense>
 
@@ -1221,14 +1222,46 @@ namespace stan {
     };
 
     
+    namespace {
+      /** 
+       * Returns the header from a csv output file
+       * 
+       * @param file csv output file
+       * 
+       * @return csv header
+       */
+      std::string read_header(std::fstream& file) {
+        std::string header = "";
+        return header;
+      }
+    }
+
+
+    /** 
+     * Reads variable names and dims from a csv
+     * output file.
+     * 
+     * @param filename Name of a csv output file.
+     * 
+     * @return Pair containing names and dims of the variables.
+     */
     std::pair<std::vector<std::string>,
-	      std::vector<std::vector<size_t> > >
-    read_csv_header(std::string file_name) {
+              std::vector<std::vector<size_t> > >
+    read_variables(std::string filename) {
       std::vector<std::string> names;
       std::vector<std::vector<size_t> > dimss;
       
+      std::fstream csv_output_file(filename.c_str(), std::fstream::in);
+      if (!csv_output_file.is_open()) {
+        throw new std::runtime_error("Could not open" + filename);
+      }
+      std::string header = read_header(csv_output_file);
+      std::cout << "header: " << std::endl;
+      std::cout << header << std::endl;
+      csv_output_file.close();
+      
       return std::pair<std::vector<std::string>,
-		       std::vector<std::vector<size_t> > >
+                       std::vector<std::vector<size_t> > >
       (names, dimss);
     }
 
