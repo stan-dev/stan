@@ -747,7 +747,6 @@ TEST(McmcChains,read_variables) {
     }
   }
 }
-
 TEST(McmcChains,read_values) {
   std::fstream file("src/test/mcmc/test_csv_files/blocker1.csv", 
                     std::fstream::in);
@@ -765,4 +764,11 @@ TEST(McmcChains,read_values) {
   EXPECT_FLOAT_EQ(-0.291459, thetas[999][1]);
   EXPECT_FLOAT_EQ(0.123128,  thetas[999][2]);
 }
+TEST(McmcChains,add_chain){
+  std::pair<std::vector<std::string>,
+    std::vector<std::vector<size_t> > > variables = 
+    stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2);
 
+  stan::mcmc::chains<> c(1, variables.first(), variables.second());
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker1.csv");
+}
