@@ -1,6 +1,6 @@
 demo/%$(EXE) : demo/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(OUTPUT_OPTION) $<
+	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
 
 demo/%.o : src/demo/%.cpp
 	@mkdir -p $(dir $@)

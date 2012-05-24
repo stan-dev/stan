@@ -1,4 +1,4 @@
-.PHONY: manual
+.PHONY: manual src/docs/stan-reference/stan-reference.tex
 manual: src/docs/stan-reference/stan-reference.pdf
 	mkdir -p doc/
 	cp src/docs/stan-reference/stan-reference.pdf doc/

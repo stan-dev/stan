@@ -18,7 +18,7 @@ namespace stan {
      */
     class adaptive_sampler {
 
-    private: 
+    protected: 
       bool _adapt;
       unsigned int _n_steps;
       int _n_adapt_steps;
