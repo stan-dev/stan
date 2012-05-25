@@ -1924,6 +1924,9 @@ namespace stan {
       }
     };
 
+
+
+
     struct write_csv_vars_visgen : public visgen {
       write_csv_vars_visgen(std::ostream& o)
         : visgen(o) {
@@ -1990,6 +1993,7 @@ namespace stan {
       }
     };
 
+
     void generate_write_csv_method(const program& prog,
                                    const std::string& model_name,
                                    std::ostream& o) {
@@ -2051,6 +2055,285 @@ namespace stan {
       o << INDENT2 << "writer__.newline();" << EOL;
       o << INDENT << "}" << EOL2;
     }
+
+
+    // see init_member_var_visgen for cut & paste
+    struct write_array_visgen : public visgen {
+      write_array_visgen(std::ostream& o)
+        : visgen(o) {
+      }
+      void operator()(const nil& x) const { }
+      void operator()(const int_var_decl& x) const {
+        generate_initialize_array("int","integer",EMPTY_EXP_VECTOR,
+                                  x.name_,x.dims_);
+      }      
+      void operator()(const double_var_decl& x) const {
+        if (!is_nil(x.range_.low_.expr_)) {
+          if (!is_nil(x.range_.high_.expr_)) {
+            std::vector<expression> read_args;
+            read_args.push_back(x.range_.low_);
+            read_args.push_back(x.range_.high_);
+            generate_initialize_array("double","scalar_lub",read_args,
+                                      x.name_,x.dims_);
+          } else {
+            std::vector<expression> read_args;
+            read_args.push_back(x.range_.low_);
+            generate_initialize_array("double","scalar_lb",read_args,x.name_,x.dims_);
+          }
+        } else {
+          if (!is_nil(x.range_.high_.expr_)) {
+            std::vector<expression> read_args;
+            read_args.push_back(x.range_.high_);
+            generate_initialize_array("double","scalar_ub",read_args,x.name_,x.dims_);
+          } else {
+            generate_initialize_array("double","scalar",EMPTY_EXP_VECTOR,x.name_,x.dims_);
+          }
+        }
+      }
+      void operator()(const vector_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.M_);
+        generate_initialize_array("vector_d","vector",read_args,x.name_,x.dims_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.N_);
+        generate_initialize_array("row_vector_d","row_vector",read_args,x.name_,x.dims_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.M_);
+        read_args.push_back(x.N_);
+        generate_initialize_array("matrix_d","matrix",read_args,x.name_,x.dims_);
+      }
+      void operator()(const simplex_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_d","simplex",read_args,x.name_,x.dims_);
+      }
+      void operator()(const ordered_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_d","ordered",read_args,x.name_,x.dims_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("matrix_d","cov_matrix",read_args,x.name_,x.dims_);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("matrix_d","corr_matrix",read_args,x.name_,x.dims_);
+      }
+      void generate_initialize_array(const std::string& var_type,
+                                     const std::string& read_type,
+                                     const std::vector<expression>& read_args,
+                                     const std::string& name,
+                                     const std::vector<expression>& dims) const {
+        if (dims.size() == 0) {
+          generate_indent(2,o_);
+          o_ << var_type << " ";
+          o_ << name << " = in__." << read_type  << "_constrain(";
+          for (size_t j = 0; j < read_args.size(); ++j) {
+            if (j > 0) o_ << ",";
+            generate_expression(read_args[j],o_);
+          }
+          o_ << ");" << EOL;
+          o_ << INDENT2 << "writer__.write(" << name << ");" << EOL;
+          return;
+        }
+        o_ << INDENT2;
+        for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
+        o_ << var_type;
+        for (size_t i = 0; i < dims.size(); ++i) o_ << "> ";
+        o_ << name << ";" << EOL;
+        std::string name_dims(name);
+        for (size_t i = 0; i < dims.size(); ++i) {
+          generate_indent(i + 2, o_);
+          o_ << "size_t dim_"  << name << "_" << i << " = ";
+          generate_expression(dims[i],o_);
+          o_ << ";" << EOL;
+          if (i < dims.size() - 1) {  
+            generate_indent(i + 2, o_);
+            o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << ");" 
+               << EOL;
+            name_dims.append("[k_").append(to_string(i)).append("]");
+          }
+          generate_indent(i + 2, o_);
+          o_ << "for (size_t k_" << i << " = 0;"
+             << " k_" << i << " < dim_" << name << "_" << i << ";"
+             << " ++k_" << i << ") {" << EOL;
+          if (i == dims.size() - 1) {
+            generate_indent(i + 3, o_);
+            o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
+            for (size_t j = 0; j < read_args.size(); ++j) {
+              if (j > 0) o_ << ",";
+              generate_expression(read_args[j],o_);
+            }
+            o_ << "));" << EOL;
+          }
+        }
+        
+        // cut from write_csv: need to reverse order, just used write_array_vars!
+        // generate_indent(dims.size() + 2, o_);
+        // o_ << "vars__.push_back(" << name;
+        // if (dims.size() > 0) {
+        //   o_ << '[';
+        //   for (size_t i = 0; i < dims.size(); ++i) {
+        //     if (i > 0) o_ << "][";
+        //     o_ << "k_" << i;
+        //   }
+        //   o_ << ']';
+        // }
+        // o_ << ");" << EOL;
+        
+        for (size_t i = dims.size(); i > 0; --i) {
+          generate_indent(i + 1, o_);
+          o_ << "}" << EOL;
+        }
+
+
+      }
+    };
+
+
+
+
+    struct write_array_vars_visgen : public visgen {
+      write_array_vars_visgen(std::ostream& o)
+        : visgen(o) {
+      }
+      void operator()(const nil& x) const { }
+      // FIXME: template these out
+      void operator()(const int_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const double_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const vector_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const simplex_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const ordered_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void write_array(const std::string& name,
+                       const std::vector<expression>& dims) const {
+        if (dims.size() == 0) {
+          o_ << INDENT2 << "writer__.write(" << name << ");" << EOL;
+          return;
+        }
+        // for (size_t i = 0; i < dims.size(); ++i) {
+        for (size_t i = dims.size(); i > 0; ) {
+          --i;
+          generate_indent((dims.size() - i) + 1, o_);
+          o_ << "for (int k_" << i << " = 0;"
+             << " k_" << i << " < ";
+          generate_expression(dims[i],o_);
+          o_ << "; ++k_" << i << ") {" << EOL;
+        }
+
+        generate_indent(dims.size() + 2, o_);
+        o_ << "vars__.push_back(" << name;
+        if (dims.size() > 0) {
+          o_ << '[';
+          for (size_t i = 0; i < dims.size(); ++i) {
+            if (i > 0) o_ << "][";
+            o_ << "k_" << i;
+          }
+          o_ << ']';
+        }
+        o_ << ");" << EOL;
+        
+        for (size_t i = dims.size(); i > 0; --i) {
+          generate_indent(i + 1, o_);
+          o_ << "}" << EOL;
+        }
+      }
+    };
+
+
+    void generate_write_array_method(const program& prog,
+                                     const std::string& model_name,
+                                     std::ostream& o) {
+      o << INDENT << "void write_array(std::vector<double>& params_r__," << EOL;
+      o << INDENT << "                 std::vector<int>& params_i__," << EOL;
+      o << INDENT << "                 std::vector<double>& vars__) {" << EOL;
+      o << INDENT2 << "vars__.resize(0);" << EOL;
+      o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
+      o << INDENT2 << "static const char* function__ = \""
+        << model_name << "_namespace::write_array(%1%)\";" << EOL;
+
+      // declares, reads, and sets parameters
+      generate_comment("read-transform, write parameters",2,o);
+      write_array_visgen vis(o);
+      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
+        boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
+
+      // this is for all other values
+      write_array_vars_visgen vis_writer(o);
+
+      // writes parameters
+      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
+        boost::apply_visitor(vis_writer,prog.parameter_decl_[i].decl_);
+
+
+      // transformed parameters guaranteed to satisfy constraints
+
+      o << EOL;
+      generate_comment("declare and define transformed parameters",2,o);
+      o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
+      static bool is_var = false;
+      generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
+      o << EOL;
+      static bool include_sampling = false;
+      generate_statements(prog.derived_decl_.second,2,o,include_sampling,is_var); 
+      o << EOL;
+
+      generate_comment("validate transformed parameters",2,o);
+      generate_validate_var_decls(prog.derived_decl_.first,2,o);
+      o << EOL;
+
+      generate_comment("write transformed parameters",2,o);
+      for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
+        boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
+      o << EOL;
+
+      generate_comment("declare and define generated quantities",2,o);
+      generate_local_var_decls(prog.generated_decl_.first,2,o,is_var); 
+      o << EOL;
+      generate_statements(prog.generated_decl_.second,2,o,include_sampling,is_var); 
+      o << EOL;
+
+      generate_comment("validate generated quantities",2,o);
+      generate_validate_var_decls(prog.generated_decl_.first,2,o);
+      o << EOL;
+
+      generate_comment("write generated quantities",2,o);
+      for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
+        boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
+      if (prog.generated_decl_.first.size() > 0)
+        o << EOL;
+
+      o << INDENT << "}" << EOL2;
+    }
+
     
     // know all data is set and range expressions only depend on data
     struct set_param_ranges_visgen : public visgen {
@@ -2230,6 +2513,7 @@ namespace stan {
       generate_log_prob(prog,out);
       generate_param_names_method(prog,out);
       generate_dims_method(prog,out);
+      generate_write_array_method(prog,model_name,out);
       generate_write_csv_header_method(prog,out);
       generate_write_csv_method(prog,model_name,out);
       generate_end_class_decl(out);
