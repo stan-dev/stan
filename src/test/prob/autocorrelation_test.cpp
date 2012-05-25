@@ -23,7 +23,7 @@ TEST(ProbAutocorrelation,test1) {
 
    size_t ITS = 1;  // only need one for test
    for (size_t n = 0; n < ITS; ++n) {
-     stan::prob::auto_correlation(y,ac);
+     stan::prob::autocorrelation(y,ac);
    }
 
    EXPECT_EQ(1000, ac.size());
