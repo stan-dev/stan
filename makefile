@@ -47,6 +47,7 @@ LIBGTEST = test/gtest.o
 GTEST_MAIN = lib/gtest/src/gtest_main.cc
 EXE = 
 LDLIBS = -Lbin -lstan
+LDLIBS_STANC = -Lbin -lstanc
 
 ##
 # Tell make the default way to compile a .o file.
@@ -60,6 +61,21 @@ LDLIBS = -Lbin -lstan
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+##
+# Rule for generating dependencies.
+# Applies to all *.cpp files in src.
+# Test cpp files are handled slightly differently.
+##
+bin/%.d : src/%.cpp
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$);\
+	fi
 
 
 .PHONY: help
@@ -93,9 +109,6 @@ help:
 -include make/demo     # for building demos
 
 
-#%.d : src/%.cpp
-#	@echo $(dir $@)
-#mkdir -p $(dir $@)
 
 ##
 # Clean up.
@@ -104,9 +117,6 @@ help:
 clean:
 	$(RM) -r *.dSYM
 	$(RM) $(LIBSTAN_OFILES) bin/libstan.a
-
-clean-demo:
-	$(RM) -r demo
 
 clean-dox:
 	$(RM) -r doc/api
@@ -118,6 +128,12 @@ clean-manual:
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch
 
+
+clean-demo:
+	$(RM) -r demo
+
+
+
 clean-all: clean clean-models clean-dox clean-demo
-	$(RM) -r test bin
+	$(RM) -r test bin doc
 

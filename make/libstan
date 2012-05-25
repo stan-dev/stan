@@ -1,28 +1,22 @@
 LIBSTAN_OFILES = bin/stan/agrad/agrad.o bin/stan/math/matrix.o bin/stan/agrad/matrix.o
-
 bin/libstan.a : $(LIBSTAN_OFILES)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstan.a $(LIBSTAN_OFILES)
 
-##
-# Rule for generating dependencies.
-# Applies to all *.cpp files in src.
-# Test cpp files are handled slightly differently.
-##
-bin/%.d : src/%.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
-	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$);\
-	fi
+TEMPLATE_INSTANTIATION := $(shell find src/stan/gm -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION += $(shell find src/stan/gm -type f -name '*_def.cpp')
+TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
+bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
+	@mkdir -p $(dir $@)
+	$(AR) -rs bin/libstanc.a $(TEMPLATE_INSTANTIATION)
+
 
 ##
-# If the target is a unit test, include .d. 
-# Will generate dependencies.
+# Generate dependencies for libraries
 ##
 ifeq (bin/libstan.a,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(basename $(LIBSTAN_OFILES)))
+endif
+ifeq (bin/libstanc.a,$(MAKECMDGOALS))
+  -include $(addsuffix .d,$(basename $(TEMPLATE_INSTANTIATION)))
 endif
