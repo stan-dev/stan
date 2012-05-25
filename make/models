@@ -22,30 +22,50 @@ models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@echo '--- Translating Stan graphical model to C++ code ---'
 	bin/stanc$(EXE) $< --o=$@
 
-.PRECIOUS: models/%.o
-models/%.o : models/%.cpp
-	@mkdir -p $(dir $@)
-	@echo ''
-	@echo '--- Compiling C++ model ---'
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+#.PRECIOUS: models/%.o
+#models/%.o : models/%.cpp
+#	@mkdir -p $(dir $@)
+#	@echo ''
+#	@echo '--- Compiling C++ model ---'
+#	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 
 $(MODEL_HEADER).gch : $(MODEL_HEADER)
 	@echo ''
-	@echo '--- Precompiling model_header.hpp for g++ ---'
+	@echo '--- Precompiling $(MODEL_HEADER) for g++ ---'
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).pch : $(MODEL_HEADER)
 	@echo ''
-	@echo '--- Precompiling model_header.hpp for clang++ ---'
+	@echo '--- Precompiling $(MODEL_HEADER) for clang++ ---'
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
-	@set -e; \
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	rm -f $@.$$$$ ); \
+	fi
+
+##
+# Rule for generating dependencies.
+# Applies to all *.cpp files in src.
+# Test cpp files are handled slightly differently.
+##
+models/%.d : models/%.cpp
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$);\
+	fi
+
+
 
 ##
 # Will generate dependencies.

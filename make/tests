@@ -51,7 +51,6 @@ test-bugs: $(addsuffix $(EXE),$(BUGS_TESTS))
 UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
-UNIT_TESTS := $(filter-out $(UNIT_TESTS_TO_EXCLUDE),$(UNIT_TESTS))
 .PHONY: test-unit
 test-unit: $(addsuffix $(EXE),$(UNIT_TESTS))
 	@echo '------------------------------------------------------------'
@@ -128,16 +127,6 @@ test/%.d : src/test/%_test.cpp
 # If the target is a unit test, include .d. 
 # Will generate dependencies.
 ##
-ifeq (test-unit,$(MAKECMDGOALS))
-  -include $(addsuffix .d,$(UNIT_TESTS))
-endif
-#ifeq (test-bugs,$(MAKECMDGOALS))
-#  -include $(addsuffix .d,$(UNIT_TESTS))
-#  -include demo/gm.d
-#endif
-ifeq (test-all,$(MAKECMDGOALS))
-  -include $(addsuffix .d,$(UNIT_TESTS))
-endif
 ifneq (,$(filter test/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
 endif

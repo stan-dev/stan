@@ -14,3 +14,10 @@ endif
 ifeq ($(uname_S), Linux)
   OS = linux
 endif
+# These includes should update the following variables
+# based on the OS:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - EXE
+##
+-include make/os_$(OS)
