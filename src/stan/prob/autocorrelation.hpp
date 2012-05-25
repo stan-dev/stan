@@ -2,11 +2,6 @@
 #define __STAN__PROB__AUTOCORRELATION_HPP__
 
 #include <vector>
-
-#include <kiss_fft/kiss_fftr.h>
-#include <vector>
-#include <stan/prob/autocorrelation.hpp>
-
 #include <complex>
 #include <Eigen/FFT>
 
