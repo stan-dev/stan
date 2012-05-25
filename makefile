@@ -47,6 +47,14 @@ LDLIBS = -Lbin -lstan
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 ##
+# Tell make the default way to compile a .o file.
+##
+bin/%.o : src/%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+
+##
 # These includes should update the following variables
 # based on the OS:
 #   - CFLAGS
@@ -54,10 +62,6 @@ LDLIBS = -Lbin -lstan
 #   - EXE
 ##
 -include make/$(OS)
-
-#%.d : src/%.cpp
-#	@echo $(dir $@)
-#mkdir -p $(dir $@)
 
 .PHONY: help
 help:
@@ -79,43 +83,20 @@ help:
 	@echo '  - clean-all:   Cleans up all of Stan.'
 	@echo '------------------------------------------------------------'
 
--include make/libstan
 
-##
-# All testing related make commands.
-##
--include make/tests
+-include make/libstan  # libstan.a
+-include make/tests    # tests: test-all, test-unit, test-models
+-include make/models   # models
+-include make/command  # bin/stanc
+-include make/doxygen  # doxygen
+-include make/dist     # dist: for distribution
+-include make/manual   # manual: manual, doc/stan-reference.pdf
+-include make/demo     # for building demos
 
-##
-# All model building related make commands.
-##
--include make/models
 
-##
-# All demo related make commands.
-##
--include make/demo
-
-##
-# All command related make commands.
-##
--include make/command
-
-##
-# All doxygen related make commands
-##
--include make/doxygen
-
-##
-# All distribution related make commands
-##
--include make/dist
-
-##
-# All manual related make commands
-##
--include make/manual
-
+#%.d : src/%.cpp
+#	@echo $(dir $@)
+#mkdir -p $(dir $@)
 
 ##
 # Rule for generating dependencies.
@@ -151,7 +132,7 @@ clean-manual:
 	$(RM) doc/stan-reference.pdf
 
 clean-models:
-	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch
+	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch
 
 clean-all: clean clean-models clean-dox clean-demo
 	$(RM) -r test bin

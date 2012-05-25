@@ -1,4 +1,4 @@
-OFILES = src/stan/agrad/agrad.o src/stan/math/matrix.o src/stan/agrad/matrix.o
+OFILES = bin/stan/agrad/agrad.o bin/stan/math/matrix.o bin/stan/agrad/matrix.o
 
 bin/libstan.a : $(OFILES)
 	@mkdir -p $(dir $@)
