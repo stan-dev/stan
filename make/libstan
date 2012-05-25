@@ -1,7 +1,5 @@
 OFILES = src/stan/agrad/agrad.o src/stan/math/matrix.o src/stan/agrad/matrix.o
 
 bin/libstan.a : $(OFILES)
-	$(CC) $(CFLAGS) -c -o lib/kiss_fft/kiss_fft.o lib/kiss_fft/kiss_fft.c
-	$(CC) $(CFLAGS) -c -o lib/kiss_fft/kiss_fftr.o lib/kiss_fft/kiss_fftr.c
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstan.a $(OFILES) lib/kiss_fft/kiss_fft.o lib/kiss_fft/kiss_fftr.o
