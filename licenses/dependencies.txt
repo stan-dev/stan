@@ -55,21 +55,13 @@ unpack:  lib/boost/{accumulators,algorithm,...}
 version: 1.49.0
 
 
-5. kiss fft
-----------------------------------------
-home:    http://kissfft.sourceforge.net/
-license: New BSD (3 clause)
-unpack:  lib/kiss_fft/{kiss_fft.h, ...}
-version: 1.2.9
-
-
 DEVELOPMENT LIBS
 ========================================
 
 These libs are only necessary for developing the system itself.
 Googltest is included with the distribution, but doxygen is not.
 
-6. googletest
+5. googletest
 ----------------------------------------
 home:    http://code.google.com/p/googletest/
 license: New BSD
@@ -78,7 +70,7 @@ unpack:  lib/gtest/{CHANGES,CMakeLists.txt,...,test,xcode}
 version: 1.6.0
 
 
-7. doxygen
+6. doxygen
 ----------------------------------------
 home:    http://www.stack.nl/~dimitri/doxygen/index.html
 license: GPL2
