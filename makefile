@@ -16,8 +16,16 @@ help:
 CC = g++
 O = 3
 AR = ar
+
 # OS is set automatically by this script
--include make/detect_os
+##
+# These includes should update the following variables
+# based on the OS:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - EXE
+##
+-include make/os_detect
 
 ##
 # Get information about the compiler used.
@@ -53,15 +61,6 @@ bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
-
-##
-# These includes should update the following variables
-# based on the OS:
-#   - CFLAGS
-#   - CFLAGS_GTEST
-#   - EXE
-##
--include make/$(OS)
 
 .PHONY: help
 help:
