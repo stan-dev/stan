@@ -22,7 +22,7 @@ models/%.cpp : src/models/%.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@echo '--- Translating Stan graphical model to C++ code ---'
 	bin/stanc$(EXE) $< --o=$@
 
-.PRECIOUS: models/%.o
+#.PRECIOUS: models/%.o
 #models/%.o : models/%.cpp
 #	@mkdir -p $(dir $@)
 #	@echo ''
@@ -41,11 +41,14 @@ $(MODEL_HEADER).pch : $(MODEL_HEADER)
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
-	@set -e; \
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	rm -f $@.$$$$ ); \
+	fi
 
 ##
 # Will generate dependencies.
