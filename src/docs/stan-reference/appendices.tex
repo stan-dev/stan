@@ -109,7 +109,7 @@ The latest version of \Stan can be downloaded from the following link.
 %
 The \Stan source code distribution includes \Stan's source code,
 documentation, build tools, unit tests, demo models, documentation and
-the source for the libraries Eigen and Boost.
+the source for the libraries Eigen, Boost, and Kiss FFT.
 
 \subsubsection{googletest C++ Testing Framework}
 
@@ -153,6 +153,23 @@ template metaprogramming facilities are implemented with the Boost
 \end{itemize}
 %
 The Boost source code is distributed with \Stan.
+
+\subsubsection{Kiss FFT}
+
+\Stan's autocorrelation functionality, including effective sample size
+calculations, depend on the fast fourier transform implementation in
+Kiss FFT.
+%
+\begin{itemize}
+\item Home: http://kissfft.sourceforge.net/
+\item License: New BSD (3 clause)
+\item Version: 1.2.9
+\end{itemize}
+%
+Unlike for the other libraries, there are slight modifications to the
+Kiss FFT for \Stan.  The default type is changed to \code{double}
+and the include of \code{malloc.h} is removed.
+
 
 \subsection{\Cpp Compiler}
 
