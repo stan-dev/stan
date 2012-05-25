@@ -396,19 +396,19 @@ namespace stan {
         std::string name_dims(name);
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "size_t dim_"  << name << "_" << i << " = ";
+          o_ << "size_t dim_"  << name << "_" << i << "__ = ";
           generate_expression(dims[i],o_);
           o_ << ";" << EOL;
           if (i < dims.size() - 1) {  
             generate_indent(i + 2, o_);
-            o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << ");" 
+            o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << "__);" 
                << EOL;
-            name_dims.append("[k_").append(to_string(i)).append("]");
+            name_dims.append("[k_").append(to_string(i)).append("__]");
           }
           generate_indent(i + 2, o_);
-          o_ << "for (size_t k_" << i << " = 0;"
-             << " k_" << i << " < dim_" << name << "_" << i << ";"
-             << " ++k_" << i << ") {" << EOL;
+          o_ << "for (size_t k_" << i << "__ = 0;"
+             << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
+             << " ++k_" << i << "__) {" << EOL;
           if (i == dims.size() - 1) {
             generate_indent(i + 3, o_);
             o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
@@ -974,7 +974,7 @@ namespace stan {
       void operator()(double_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1003,7 +1003,7 @@ namespace stan {
       void operator()(vector_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1038,7 +1038,7 @@ namespace stan {
       void operator()(row_vector_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1073,7 +1073,7 @@ namespace stan {
       void operator()(simplex_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1108,7 +1108,7 @@ namespace stan {
       void operator()(ordered_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1143,7 +1143,7 @@ namespace stan {
       void operator()(matrix_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1182,7 +1182,7 @@ namespace stan {
       void operator()(corr_matrix_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -1218,7 +1218,7 @@ namespace stan {
       void operator()(cov_matrix_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
-        o_ << INDENT2 << "if(!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
         o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -2140,7 +2140,6 @@ namespace stan {
             generate_expression(read_args[j],o_);
           }
           o_ << ");" << EOL;
-          o_ << INDENT2 << "writer__.write(" << name << ");" << EOL;
           return;
         }
         o_ << INDENT2;
@@ -2207,36 +2206,54 @@ namespace stan {
       void operator()(const nil& x) const { }
       // FIXME: template these out
       void operator()(const int_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        write_array(x.name_,x.dims_,EMPTY_EXP_VECTOR);
       }
       void operator()(const double_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        write_array(x.name_,x.dims_,EMPTY_EXP_VECTOR);
       }
       void operator()(const vector_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.M_);
+        write_array(x.name_,dims, EMPTY_EXP_VECTOR);
       }
       void operator()(const row_vector_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.N_);
+        write_array(x.name_,dims, EMPTY_EXP_VECTOR);
       }
       void operator()(const matrix_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> matdims;
+        matdims.push_back(x.M_);
+        matdims.push_back(x.N_);
+        write_array(x.name_,x.dims_,matdims);
       }
       void operator()(const simplex_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        write_array(x.name_,dims,EMPTY_EXP_VECTOR);
       }
       void operator()(const ordered_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        write_array(x.name_,dims,EMPTY_EXP_VECTOR);
       }
       void operator()(const cov_matrix_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> matdims;
+        matdims.push_back(x.K_);
+        matdims.push_back(x.K_);
+        write_array(x.name_,x.dims_,matdims);
       }
       void operator()(const corr_matrix_var_decl& x) const {
-        write_array(x.name_,x.dims_);
+        std::vector<expression> matdims;
+        matdims.push_back(x.K_);
+        matdims.push_back(x.K_);
+        write_array(x.name_,x.dims_,matdims);
       }
       void write_array(const std::string& name,
-                       const std::vector<expression>& dims) const {
+                       const std::vector<expression>& dims,
+                       const std::vector<expression>& matdims) const {
         if (dims.size() == 0) {
-          o_ << INDENT2 << "writer__.write(" << name << ");" << EOL;
+          o_ << INDENT2 << "vars__.push_back(" << name << ");" << EOL;
           return;
         }
         // for (size_t i = 0; i < dims.size(); ++i) {
@@ -2258,6 +2275,15 @@ namespace stan {
             o_ << "k_" << i;
           }
           o_ << ']';
+        }
+        if (matdims.size() > 0) {
+          o_ << "(";
+          generate_expression(matdims[0],o_);
+          if (matdims.size() > 1) {
+            o_ << ",";
+            generate_expression(matdims[1],o_);
+          }
+          o_ << ")";
         }
         o_ << ");" << EOL;
         
