@@ -20,6 +20,7 @@
 #include <stan/mcmc/adaptive_hmc.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
+#include <stan/mcmc/nuts_diag.hpp>
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
@@ -389,11 +390,11 @@ namespace stan {
       write_comment(sample_stream);
 
       if (leapfrog_steps < 0) {
-        stan::mcmc::nuts<rng_t> nuts_sampler(model, 
-                                             max_treedepth, epsilon, 
-                                             epsilon_pm, epsilon_adapt,
-                                             delta, gamma, 
-                                             base_rng);
+        stan::mcmc::nuts_diag<rng_t> nuts_sampler(model, 
+                                                  max_treedepth, epsilon, 
+                                                  epsilon_pm, epsilon_adapt,
+                                                  delta, gamma, 
+                                                  base_rng);
 
         // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {

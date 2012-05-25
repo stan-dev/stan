@@ -10,6 +10,8 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <fstream>
+#include <cstdlib>
 
 #include <Eigen/Dense>
 
@@ -1219,6 +1221,190 @@ namespace stan {
 
     
     };
+
+    
+    namespace {
+      /** 
+       * Returns the header from a csv output file
+       * 
+       * @param file csv output file
+       * 
+       * @return csv header
+       */
+      std::string read_header(std::fstream& file) {
+        std::string header = "";
+        // strip comments
+        while (file.peek() == '#') {
+          file.ignore(10000, '\n');
+        }
+        std::getline(file, header, '\n');
+        return header;
+      }
+      
+      /** 
+       * Tokenize line by delimiter.
+       * 
+       * @param stream String to tokenize.
+       * @param delimiter Delimiter.
+       * 
+       * @return vector of tokens.
+       */
+      std::vector<std::string> tokenize(std::string line, char delimiter=',') {
+        std::stringstream stream(line);
+        std::vector<std::string> tokens;
+        std::string token;
+        while (std::getline(stream,token,delimiter)) {
+          tokens.push_back(token);
+        }
+        return tokens;
+      }
+
+      /** 
+       * Get names from a list of tokens.
+       * 
+       * @param tokens a vector of tokens from the header.
+       * @param skip number of variables to skip
+       * 
+       * @return a vector of names
+       */
+      std::vector<std::string> get_names(std::vector<std::string> tokens, 
+                                         size_t skip) {
+        std::vector<std::string> names;
+        for (size_t i = 0; i < tokens.size(); i++) {
+          std::stringstream token(tokens[i]);
+          std::string name;
+          std::getline(token,name,'.');
+          if (names.size() == 0 || names.back()!=name) {
+            names.push_back(name);
+          }
+        }
+        names.erase(names.begin(), names.begin()+skip);
+        return names;
+      }
+
+      /** 
+       * Get dims from a list of tokens.
+       * 
+       * @param tokens a vector of tokens from the header.
+       * @param number of variables to skip
+       * 
+       * @return a vector of dims.
+       */
+      std::vector<std::vector<size_t> > 
+      get_dimss(std::vector<std::string> tokens, 
+                size_t skip) {
+        std::string last_name;
+        std::vector<std::vector<size_t> > dimss;
+        for (int i = tokens.size()-1; i >= 0; --i) {
+          std::vector<std::string> split = tokenize(tokens[i],'.');
+          
+          std::vector<size_t> dims;
+          if (split.size() == 1) {
+            dims.push_back(1);
+            dimss.insert(dimss.begin(), dims);
+          } else if (split.front() != last_name) {
+            for (size_t j = 1; j < split.size(); j++) {
+              dims.push_back((size_t)atol(split[j].c_str()));
+            }
+            dimss.insert(dimss.begin(), dims);
+          }
+          last_name = split.front();
+        }
+        dimss.erase(dimss.begin(), dimss.begin()+skip);
+        return dimss;
+      }
+      
+      /** 
+       * Reads values from a csv file. Reads the last variables in
+       * each file.
+       * 
+       * @param file csv output file.
+       * @param num_values number of values to read per line
+       * 
+       * @return the values in the file
+       */
+      std::vector<std::vector<double> >
+      read_values(std::fstream& file, size_t num_values) {
+        std::vector<std::vector<double> > thetas;
+        
+        read_header(file); // ignore header
+        std::vector<double> theta;
+        std::string line;
+        std::vector<std::string> tokens;
+        while (file.peek() != std::istream::traits_type::eof()) {
+          std::getline(file, line, '\n');
+          tokens = tokenize(line, ',');
+          theta.clear();
+          for (size_t i = tokens.size()-num_values; i < tokens.size(); i++) {
+            theta.push_back(atof(tokens[i].c_str()));
+          }
+          if (theta.size() > 0) {
+            thetas.push_back(theta);
+          }
+        }
+        return thetas;
+      }
+    }
+
+    /** 
+     * Reads variable names and dims from a csv
+     * output file.
+     * 
+     * @param filename Name of a csv output file.
+     * @param skip number of variables to skip
+     * 
+     * @return Pair containing names and dims of the variables.
+     */
+    std::pair<std::vector<std::string>,
+              std::vector<std::vector<size_t> > >
+    read_variables(std::string filename, size_t skip=2) {
+      std::vector<std::string> names;
+      std::vector<std::vector<size_t> > dimss;
+      
+      std::fstream csv_output_file(filename.c_str(), std::fstream::in);
+      if (!csv_output_file.is_open()) {
+        throw new std::runtime_error("Could not open" + filename);
+      }
+      std::string header = read_header(csv_output_file);
+      csv_output_file.close();
+
+      std::vector<std::string> tokens = tokenize(header);
+      names = get_names(tokens, skip);
+      dimss = get_dimss(tokens, skip);
+
+      return std::pair<std::vector<std::string>,
+                       std::vector<std::vector<size_t> > >
+      (names, dimss);
+    }
+    
+    /** 
+     * Adds a chain from a csv file.
+     * 
+     * @param[in,out] chains The chains object to modify
+     * @param chain chain number
+     * @param filename file name of a csv output file
+     * @param skip number of variables to skip
+     * 
+     * @return number of samples added
+     */
+    template <typename RNG>
+    size_t add_chain(stan::mcmc::chains<RNG>& chains, const size_t chain, 
+                     const std::string filename,
+                     const size_t skip=2) {
+      std::fstream csv_output_file(filename.c_str(), std::fstream::in);
+      if (!csv_output_file.is_open()) {
+        throw new std::runtime_error("Could not open" + filename);
+      }
+      std::vector<std::vector<double> > thetas =
+        read_values(csv_output_file, chains.num_params());
+      csv_output_file.close();
+
+      for (size_t i = 0; i < thetas.size(); i++) {
+        chains.add(chain, thetas[i]);
+      }
+      
+      return thetas.size();
+    }
 
   }
 }
