@@ -1366,6 +1366,47 @@ namespace stan {
         }
       }
 
+      /** 
+       * Calculates the reordering necessary to change variables
+       * from row major order to column major order.
+       * 
+       * @param[in]  dimss The dimension sizes of the variables
+       * @param[out] from Index locations of where to move from (row-major)
+       * @param[out] to Index locations of where to move to (col-major)
+       */
+      void
+      get_reordering(const std::vector<std::vector<size_t> >& dimss,
+                     std::vector<size_t>& from,
+                     std::vector<size_t>& to) {
+        from.clear();
+        to.clear();
+        
+        size_t offset = 0;
+        for (size_t ii = 0; ii < dimss.size(); ii++) {
+          size_t curr_size = dimss[ii][0];
+          if (dimss[ii].size() > 1) {
+            for (size_t jj = 1; jj < dimss[ii].size(); jj++)
+              curr_size *= dimss[ii][jj];
+            
+            std::vector<size_t> idxs;
+            for (size_t jj = 0; jj < dimss[ii].size(); jj++) {
+              idxs.push_back(0);
+            }
+            for (size_t from_index = 0; from_index < curr_size; from_index++) {
+              size_t to_index = idxs[0];
+              for (size_t kk = 1; kk < idxs.size(); kk++) {
+                to_index += to_index * dimss[ii][kk-1] + idxs[kk];
+              }
+              if (from_index != to_index) {
+                from.push_back(offset+from_index);
+                to.push_back(offset+to_index);
+              }
+              increment_indexes(dimss[ii], idxs);
+            }
+          }
+          offset += curr_size;
+        }
+      }
     }
 
     /** 

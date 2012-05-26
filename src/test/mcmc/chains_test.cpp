@@ -869,6 +869,34 @@ TEST(McmcChains,reorder_values) {
   EXPECT_FLOAT_EQ(6, thetas[1][2]);
   EXPECT_FLOAT_EQ(4, thetas[1][3]);
 }
+TEST(McmcChains,get_reordering) {
+  std::vector<std::vector<size_t> > dimss;
+  std::vector<size_t> dims;
+  dims.push_back(1);
+  dimss.push_back(dims);
+  dims.clear();
+  dims.push_back(2);
+  dims.push_back(3);
+  dimss.push_back(dims);
+  dims.clear();
+  dims.push_back(4);
+  dimss.push_back(dims);
+  
+  std::vector<size_t> from, to;
+  stan::mcmc::get_reordering(dimss, from, to);
+  ASSERT_EQ(4, from.size());
+  ASSERT_EQ(from.size(), to.size());
+  
+  EXPECT_EQ(2, from[0]);
+  EXPECT_EQ(3, from[1]);
+  EXPECT_EQ(4, from[2]);
+  EXPECT_EQ(5, from[3]);
+  
+  EXPECT_EQ(4, to[0]);
+  EXPECT_EQ(2, to[1]);
+  EXPECT_EQ(5, to[2]);
+  EXPECT_EQ(3, to[3]);
+}
 TEST(McmcChains,add_chain){
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;
