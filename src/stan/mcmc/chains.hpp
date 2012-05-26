@@ -1360,7 +1360,7 @@ namespace stan {
           for (size_t jj = 0; jj < from.size(); jj++) {
             temp[jj] = thetas[ii][from[jj]];
           }
-          for (size_t jj = 0; jj < from.size(); jj++) {
+          for (size_t jj = 0; jj < to.size(); jj++) {
             thetas[ii][to[jj]] = temp[jj];
           }
         }
@@ -1392,10 +1392,13 @@ namespace stan {
             for (size_t jj = 0; jj < dimss[ii].size(); jj++) {
               idxs.push_back(0);
             }
-            for (size_t from_index = 0; from_index < curr_size; from_index++) {
-              size_t to_index = idxs[0];
-              for (size_t kk = 1; kk < idxs.size(); kk++) {
-                to_index += to_index * dimss[ii][kk-1] + idxs[kk];
+            size_t from_index = 0;
+            for (size_t to_index = 0; to_index < curr_size; to_index++) {
+              from_index = 0;
+              size_t offset_temp = 1;
+              for (size_t kk = idxs.size(); kk > 0; --kk) {
+                from_index += idxs[kk-1] * offset_temp;
+                offset_temp *= dimss[ii][kk-1];
               }
               if (from_index != to_index) {
                 from.push_back(offset+from_index);
@@ -1448,9 +1451,10 @@ namespace stan {
      * @return number of samples added
      */
     template <typename RNG>
-    size_t add_chain(stan::mcmc::chains<RNG>& chains, const size_t chain, 
+    size_t add_chain(stan::mcmc::chains<RNG>& chains, 
+                     const size_t chain, 
                      const std::string filename,
-                     const size_t skip=2) {
+                     const size_t skip) {
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
         throw new std::runtime_error("Could not open" + filename);
@@ -1465,7 +1469,6 @@ namespace stan {
       for (size_t i = 0; i < thetas.size(); i++) {
         chains.add(chain, thetas[i]);
       }
-      
       return thetas.size();
     }
 

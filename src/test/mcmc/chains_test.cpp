@@ -886,16 +886,16 @@ TEST(McmcChains,get_reordering) {
   stan::mcmc::get_reordering(dimss, from, to);
   ASSERT_EQ(4, from.size());
   ASSERT_EQ(from.size(), to.size());
-  
-  EXPECT_EQ(2, from[0]);
-  EXPECT_EQ(3, from[1]);
-  EXPECT_EQ(4, from[2]);
-  EXPECT_EQ(5, from[3]);
-  
-  EXPECT_EQ(4, to[0]);
-  EXPECT_EQ(2, to[1]);
-  EXPECT_EQ(5, to[2]);
-  EXPECT_EQ(3, to[3]);
+   
+  EXPECT_EQ(4, from[0]);
+  EXPECT_EQ(2, from[1]);
+  EXPECT_EQ(5, from[2]);
+  EXPECT_EQ(3, from[3]);
+
+  EXPECT_EQ(2, to[0]);
+  EXPECT_EQ(3, to[1]);
+  EXPECT_EQ(4, to[2]);
+  EXPECT_EQ(5, to[3]);
 }
 TEST(McmcChains,add_chain_blocker){
   std::vector<std::string> names;
@@ -904,7 +904,7 @@ TEST(McmcChains,add_chain_blocker){
                              names, dimss);
 
   stan::mcmc::chains<> c(2, names, dimss);
-  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv");
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
   EXPECT_EQ(1000, c.num_samples(0));
   EXPECT_EQ(0, c.num_samples(1));
   
@@ -923,15 +923,48 @@ TEST(McmcChains,add_chain_blocker){
   EXPECT_FLOAT_EQ(-2.18117, samples[8]);
   EXPECT_FLOAT_EQ(-1.70432, samples[9]);
 }
-/*TEST(McmcChains,add_chain_epil){
+TEST(McmcChains,add_chain_epil){
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;
   stan::mcmc::read_variables("src/test/mcmc/test_csv_files/epil1.csv", 2,
                              names, dimss);
+  
+  std::vector<size_t> from, to;
+  stan::mcmc::get_reordering(dimss, from, to);
 
   stan::mcmc::chains<> c(2, names, dimss);
-  add_chain(c, 0, "src/test/mcmc/test_csv_files/epil1.csv");
-  EXPECT_EQ(1000, c.num_samples(0));
-  EXPECT_EQ(0, c.num_samples(1));
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/epil1.csv", 2);
+
+  EXPECT_EQ(0, c.num_samples(0));
+  EXPECT_EQ(1000, c.num_samples(1));
+
+  std::vector<double> samples;
+  c.get_samples(1, 6, samples); // b1.1
+  EXPECT_FLOAT_EQ(-0.2471360, samples[0]);
+  EXPECT_FLOAT_EQ(0.1692730, samples[1]);  
+  EXPECT_FLOAT_EQ(0.0416239, samples[2]); 
+  EXPECT_FLOAT_EQ(-0.0336843, samples[3]);  
+  EXPECT_FLOAT_EQ(0.1142810, samples[4]);
+
+  c.get_samples(1, 65, samples); // b.1.1
+  EXPECT_FLOAT_EQ(0.8527490, samples[0]);
+  EXPECT_FLOAT_EQ(-0.0965670, samples[1]);  
+  EXPECT_FLOAT_EQ(-0.0645587, samples[2]); 
+  EXPECT_FLOAT_EQ(0.5508860, samples[3]);  
+  EXPECT_FLOAT_EQ(-0.0437883, samples[4]);
+
+  c.get_samples(1, 66, samples); // b.2.1
+  EXPECT_FLOAT_EQ(-0.50478600, samples[0]);
+  EXPECT_FLOAT_EQ(-0.05057350, samples[1]);  
+  EXPECT_FLOAT_EQ(-0.33083700, samples[2]); 
+  EXPECT_FLOAT_EQ(0.00132672, samples[3]);  
+  EXPECT_FLOAT_EQ(0.01302100, samples[4]);
+
+  c.get_samples(1, 124, samples); // b.1.2
+  EXPECT_FLOAT_EQ(0.110787, samples[0]);
+  EXPECT_FLOAT_EQ(-0.484066, samples[1]);  
+  EXPECT_FLOAT_EQ(0.575406, samples[2]); 
+  EXPECT_FLOAT_EQ(-0.115558, samples[3]);  
+  EXPECT_FLOAT_EQ(0.346112, samples[4]);
 }
-*/
+
