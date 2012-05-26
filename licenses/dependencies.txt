@@ -33,10 +33,9 @@ version: gnumake 3.81 [cygwin]
 RUNTIME LIBS
 ========================================
 
-These must be installed to compile and run the system.
-The relevant bits of Trilinos and Eigen have been
-checked into version control, but you'll still need
-to get the relevant bits of Boost.
+These must be installed to compile and run the stanc compiler and to
+compile and run models.  The relevant bits of Boost and Eigen have
+been checked into version control.
 
 3. eigen
 ----------------------------------------
@@ -54,7 +53,6 @@ license: Boost
          http://www.boost.org/users/license.html
 unpack:  lib/boost/{accumulators,algorithm,...}
 version: 1.49.0
-
 
 
 DEVELOPMENT LIBS
