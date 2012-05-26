@@ -130,6 +130,9 @@ test/%.d : src/test/%_test.cpp
 ifneq (,$(filter test/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
 endif
+ifneq (,$(filter test/models/%,$(MAKECMDGOALS)))
+  -include bin/stan/command/stanc.d
+endif
 
 
 ##
