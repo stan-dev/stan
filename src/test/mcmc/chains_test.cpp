@@ -823,8 +823,8 @@ TEST(McmcChains,read_values) {
   std::vector<std::vector<double> > thetas;
   stan::mcmc::read_values(file, 3, thetas);
   file.close();
-  EXPECT_EQ(1000, thetas.size());
-  EXPECT_EQ(3, thetas[0].size());
+  EXPECT_EQ(1000U, thetas.size());
+  EXPECT_EQ(3U, thetas[0].size());
   
   EXPECT_FLOAT_EQ(-0.272311,  thetas[0][0]);
   EXPECT_FLOAT_EQ(-0.0884699, thetas[0][1]);
@@ -884,18 +884,18 @@ TEST(McmcChains,get_reordering) {
   
   std::vector<size_t> from, to;
   stan::mcmc::get_reordering(dimss, from, to);
-  ASSERT_EQ(4, from.size());
+  ASSERT_EQ(4U, from.size());
   ASSERT_EQ(from.size(), to.size());
    
-  EXPECT_EQ(4, from[0]);
-  EXPECT_EQ(2, from[1]);
-  EXPECT_EQ(5, from[2]);
-  EXPECT_EQ(3, from[3]);
+  EXPECT_EQ(4U, from[0]);
+  EXPECT_EQ(2U, from[1]);
+  EXPECT_EQ(5U, from[2]);
+  EXPECT_EQ(3U, from[3]);
 
-  EXPECT_EQ(2, to[0]);
-  EXPECT_EQ(3, to[1]);
-  EXPECT_EQ(4, to[2]);
-  EXPECT_EQ(5, to[3]);
+  EXPECT_EQ(2U, to[0]);
+  EXPECT_EQ(3U, to[1]);
+  EXPECT_EQ(4U, to[2]);
+  EXPECT_EQ(5U, to[3]);
 }
 TEST(McmcChains,add_chain_blocker){
   std::vector<std::string> names;
@@ -905,13 +905,13 @@ TEST(McmcChains,add_chain_blocker){
 
   stan::mcmc::chains<> c(2, names, dimss);
   add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
-  EXPECT_EQ(1000, c.num_samples(0));
-  EXPECT_EQ(0, c.num_samples(1));
+  EXPECT_EQ(1000U, c.num_samples(0));
+  EXPECT_EQ(0U, c.num_samples(1));
   
   std::vector<double> samples;
   c.get_samples(0, 10, samples); // read mu.9 variable
   
-  EXPECT_EQ(1000, samples.size());
+  EXPECT_EQ(1000U, samples.size());
   EXPECT_FLOAT_EQ(-1.83165, samples[0]);
   EXPECT_FLOAT_EQ(-1.74223, samples[1]);
   EXPECT_FLOAT_EQ(-1.82474, samples[2]);
@@ -935,8 +935,8 @@ TEST(McmcChains,add_chain_epil){
   stan::mcmc::chains<> c(2, names, dimss);
   add_chain(c, 1, "src/test/mcmc/test_csv_files/epil1.csv", 2);
 
-  EXPECT_EQ(0, c.num_samples(0));
-  EXPECT_EQ(1000, c.num_samples(1));
+  EXPECT_EQ(0U, c.num_samples(0));
+  EXPECT_EQ(1000U, c.num_samples(1));
 
   std::vector<double> samples;
   c.get_samples(1, 6, samples); // b1.1
