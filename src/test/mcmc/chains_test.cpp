@@ -897,7 +897,7 @@ TEST(McmcChains,get_reordering) {
   EXPECT_EQ(5, to[2]);
   EXPECT_EQ(3, to[3]);
 }
-TEST(McmcChains,add_chain){
+TEST(McmcChains,add_chain_blocker){
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;
   stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
@@ -907,4 +907,31 @@ TEST(McmcChains,add_chain){
   add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv");
   EXPECT_EQ(1000, c.num_samples(0));
   EXPECT_EQ(0, c.num_samples(1));
+  
+  std::vector<double> samples;
+  c.get_samples(0, 10, samples); // read mu.9 variable
+  
+  EXPECT_EQ(1000, samples.size());
+  EXPECT_FLOAT_EQ(-1.83165, samples[0]);
+  EXPECT_FLOAT_EQ(-1.74223, samples[1]);
+  EXPECT_FLOAT_EQ(-1.82474, samples[2]);
+  EXPECT_FLOAT_EQ(-1.73014, samples[3]);
+  EXPECT_FLOAT_EQ(-2.00418, samples[4]);
+  EXPECT_FLOAT_EQ(-2.02338, samples[5]);
+  EXPECT_FLOAT_EQ(-1.97366, samples[6]);
+  EXPECT_FLOAT_EQ(-2.01551, samples[7]);
+  EXPECT_FLOAT_EQ(-2.18117, samples[8]);
+  EXPECT_FLOAT_EQ(-1.70432, samples[9]);
 }
+/*TEST(McmcChains,add_chain_epil){
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/epil1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/epil1.csv");
+  EXPECT_EQ(1000, c.num_samples(0));
+  EXPECT_EQ(0, c.num_samples(1));
+}
+*/
