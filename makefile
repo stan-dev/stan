@@ -16,8 +16,16 @@ help:
 CC = g++
 O = 3
 AR = ar
+
 # OS is set automatically by this script
--include make/detect_os
+##
+# These includes should update the following variables
+# based on the OS:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - EXE
+##
+-include make/os_detect
 
 ##
 # Get information about the compiler used.
@@ -39,6 +47,7 @@ LIBGTEST = test/gtest.o
 GTEST_MAIN = lib/gtest/src/gtest_main.cc
 EXE = 
 LDLIBS = -Lbin -lstan
+LDLIBS_STANC = -Lbin -lstanc
 
 ##
 # Tell make the default way to compile a .o file.
@@ -47,17 +56,27 @@ LDLIBS = -Lbin -lstan
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 ##
-# These includes should update the following variables
-# based on the OS:
-#   - CFLAGS
-#   - CFLAGS_GTEST
-#   - EXE
+# Tell make the default way to compile a .o file.
 ##
--include make/$(OS)
+bin/%.o : src/%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
-#%.d : src/%.cpp
-#	@echo $(dir $@)
-#mkdir -p $(dir $@)
+##
+# Rule for generating dependencies.
+# Applies to all *.cpp files in src.
+# Test cpp files are handled slightly differently.
+##
+bin/%.d : src/%.cpp
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$);\
+	fi
+
 
 .PHONY: help
 help:
@@ -79,58 +98,17 @@ help:
 	@echo '  - clean-all:   Cleans up all of Stan.'
 	@echo '------------------------------------------------------------'
 
--include make/libstan
 
-##
-# All testing related make commands.
-##
--include make/tests
-
-##
-# All model building related make commands.
-##
--include make/models
-
-##
-# All demo related make commands.
-##
--include make/demo
-
-##
-# All command related make commands.
-##
--include make/command
-
-##
-# All doxygen related make commands
-##
--include make/doxygen
-
-##
-# All distribution related make commands
-##
--include make/dist
-
-##
-# All manual related make commands
-##
--include make/manual
+-include make/libstan  # libstan.a
+-include make/tests    # tests: test-all, test-unit, test-models
+-include make/models   # models
+-include make/command  # bin/stanc
+-include make/doxygen  # doxygen
+-include make/dist     # dist: for distribution
+-include make/manual   # manual: manual, doc/stan-reference.pdf
+-include make/demo     # for building demos
 
 
-##
-# Rule for generating dependencies.
-# Applies to all *.cpp files in src.
-# Test cpp files are handled slightly differently.
-##
-%.d : src/%.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
-	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$);\
-	fi
 
 ##
 # Clean up.
@@ -138,10 +116,7 @@ help:
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) -r *.dSYM
-	$(RM) $(OFILES) bin/libstan.a
-
-clean-demo:
-	$(RM) -r demo
+	$(RM) $(LIBSTAN_OFILES) bin/libstan.a
 
 clean-dox:
 	$(RM) -r doc/api
@@ -151,8 +126,14 @@ clean-manual:
 	$(RM) doc/stan-reference.pdf
 
 clean-models:
-	$(RM) -r models src/stan/model/model_header.hpp.gch src/stan/model/model_header.hpp.pch
+	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch
+
+
+clean-demo:
+	$(RM) -r demo
+
+
 
 clean-all: clean clean-models clean-dox clean-demo
-	$(RM) -r test bin
+	$(RM) -r test bin doc
 

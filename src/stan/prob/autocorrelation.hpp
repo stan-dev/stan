@@ -80,7 +80,7 @@ namespace stan {
     template <typename T>
     void autocorrelation(const std::vector<T>& y,
                          std::vector<T>& ac) {
-      Eigen::FFT<double> fft;
+      Eigen::FFT<T> fft;
       return autocorrelation(y,ac,fft);
     }
 
