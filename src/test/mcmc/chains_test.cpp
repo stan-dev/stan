@@ -834,6 +834,41 @@ TEST(McmcChains,read_values) {
   EXPECT_FLOAT_EQ(-0.291459, thetas[999][1]);
   EXPECT_FLOAT_EQ(0.123128,  thetas[999][2]);
 }
+TEST(McmcChains,reorder_values) {
+  std::vector<std::vector<double> > thetas;
+  std::vector<double> theta;
+  theta.clear();
+  theta.push_back(0);
+  theta.push_back(1);
+  theta.push_back(2);
+  theta.push_back(3);
+  thetas.push_back(theta);
+  theta.clear();
+  theta.push_back(4);
+  theta.push_back(5);
+  theta.push_back(6);
+  theta.push_back(7);
+  thetas.push_back(theta);
+  
+  std::vector<size_t> from, to;
+  from.push_back(0);
+  from.push_back(3);
+  from.push_back(2);
+  to.push_back(3);
+  to.push_back(0);
+  to.push_back(1);
+  
+  stan::mcmc::reorder_values(thetas, from, to);
+  EXPECT_FLOAT_EQ(3, thetas[0][0]);
+  EXPECT_FLOAT_EQ(2, thetas[0][1]);
+  EXPECT_FLOAT_EQ(2, thetas[0][2]);
+  EXPECT_FLOAT_EQ(0, thetas[0][3]);
+
+  EXPECT_FLOAT_EQ(7, thetas[1][0]);
+  EXPECT_FLOAT_EQ(6, thetas[1][1]);
+  EXPECT_FLOAT_EQ(6, thetas[1][2]);
+  EXPECT_FLOAT_EQ(4, thetas[1][3]);
+}
 TEST(McmcChains,add_chain){
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;

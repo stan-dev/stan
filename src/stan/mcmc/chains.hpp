@@ -1342,6 +1342,30 @@ namespace stan {
           }
         }
       }
+      
+      /** 
+       * Reorders the values in thetas. Each vector has the elements in the
+       * index in from placed in the location to.
+       * 
+       * @param[in,out] thetas Values to reorder
+       * @param[in] from Indexes of the elements to move.
+       * @param[in] to Indexes of the locations to move.
+       */
+      void
+      reorder_values(std::vector<std::vector<double> >& thetas,
+                     const std::vector<size_t>& from,
+                     const std::vector<size_t>& to) {
+        std::vector<double> theta(from.size());
+        for (size_t ii = 0; ii < thetas.size(); ii++) {
+          for (size_t jj = 0; jj < from.size(); jj++) {
+            theta[jj] = thetas[ii][from[jj]];
+          }
+          for (size_t jj = 0; jj < from.size(); jj++) {
+            thetas[ii][to[jj]] = theta[jj];
+          }
+        }
+      }
+
     }
 
     /** 
