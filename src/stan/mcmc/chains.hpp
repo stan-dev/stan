@@ -1355,13 +1355,13 @@ namespace stan {
       reorder_values(std::vector<std::vector<double> >& thetas,
                      const std::vector<size_t>& from,
                      const std::vector<size_t>& to) {
-        std::vector<double> theta(from.size());
+        std::vector<double> temp(from.size());
         for (size_t ii = 0; ii < thetas.size(); ii++) {
           for (size_t jj = 0; jj < from.size(); jj++) {
-            theta[jj] = thetas[ii][from[jj]];
+            temp[jj] = thetas[ii][from[jj]];
           }
           for (size_t jj = 0; jj < from.size(); jj++) {
-            thetas[ii][to[jj]] = theta[jj];
+            thetas[ii][to[jj]] = temp[jj];
           }
         }
       }
@@ -1458,7 +1458,10 @@ namespace stan {
       std::vector<std::vector<double> > thetas;
       read_values(csv_output_file, chains.num_params(), thetas);
       csv_output_file.close();
-
+      
+      std::vector<size_t> from, to;
+      get_reordering(chains.param_dimss(), from, to);
+      reorder_values(thetas, from, to);
       for (size_t i = 0; i < thetas.size(); i++) {
         chains.add(chain, thetas[i]);
       }
