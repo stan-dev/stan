@@ -345,7 +345,7 @@ namespace stan {
        * @throws std::invalid_argument If the name and dimensions
        * sequences are not the same size.
        */
-      chains(size_t num_chains,
+      chains(const size_t num_chains,
              const std::vector<std::string>& names,
              const std::vector<std::vector<size_t> >& dimss) 
         : _warmup(0),
@@ -1262,14 +1262,15 @@ namespace stan {
       /** 
        * Get names from a list of tokens.
        * 
-       * @param tokens a vector of tokens from the header.
-       * @param skip number of variables to skip
-       * 
-       * @return a vector of names
+       * @param[in] tokens a vector of tokens from the header.
+       * @param[in] skip number of variables to skip
+       * @param[out] names names of the variables in the tokens.
        */
-      std::vector<std::string> get_names(std::vector<std::string> tokens, 
-                                         size_t skip) {
-        std::vector<std::string> names;
+      void
+      get_names(const std::vector<std::string>& tokens, 
+                const size_t skip,
+                std::vector<std::string>& names) {
+        names.clear();
         for (size_t i = 0; i < tokens.size(); i++) {
           std::stringstream token(tokens[i]);
           std::string name;
@@ -1279,22 +1280,21 @@ namespace stan {
           }
         }
         names.erase(names.begin(), names.begin()+skip);
-        return names;
       }
 
       /** 
-       * Get dims from a list of tokens.
+       * Get dimensions of variables from a list of tokens.
        * 
-       * @param tokens a vector of tokens from the header.
-       * @param number of variables to skip
-       * 
-       * @return a vector of dims.
+       * @param[in] tokens a vector of tokens from the header.
+       * @param[in] number number of variables to skip
+       * @param[out] dimss a vector of dims
        */
-      std::vector<std::vector<size_t> > 
-      get_dimss(std::vector<std::string> tokens, 
-                size_t skip) {
+      void
+      get_dimss(const std::vector<std::string>& tokens, 
+                const size_t skip, 
+                std::vector<std::vector<size_t> >& dimss) {
+        dimss.clear();
         std::string last_name;
-        std::vector<std::vector<size_t> > dimss;
         for (int i = tokens.size()-1; i >= 0; --i) {
           std::vector<std::string> split = tokenize(tokens[i],'.');
           
@@ -1311,7 +1311,6 @@ namespace stan {
           last_name = split.front();
         }
         dimss.erase(dimss.begin(), dimss.begin()+skip);
-        return dimss;
       }
       
       /** 
@@ -1350,17 +1349,17 @@ namespace stan {
      * Reads variable names and dims from a csv
      * output file.
      * 
-     * @param filename Name of a csv output file.
-     * @param skip number of variables to skip
-     * 
-     * @return Pair containing names and dims of the variables.
+     * @param[in] filename Name of a csv output file.
+     * @param[in] skip Number of variables to skip
+     * @param[out] names Names of the variables 
+     * @param[out] dimss Dimensions of the variables
      */
-    std::pair<std::vector<std::string>,
-              std::vector<std::vector<size_t> > >
-    read_variables(std::string filename, size_t skip=2) {
-      std::vector<std::string> names;
-      std::vector<std::vector<size_t> > dimss;
-      
+    void
+    read_variables(const std::string filename, const size_t skip, 
+                   std::vector<std::string>& names,
+                   std::vector<std::vector<size_t> >& dimss) {
+      names.clear();
+      dimss.clear();
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
         throw new std::runtime_error("Could not open" + filename);
@@ -1369,12 +1368,8 @@ namespace stan {
       csv_output_file.close();
 
       std::vector<std::string> tokens = tokenize(header);
-      names = get_names(tokens, skip);
-      dimss = get_dimss(tokens, skip);
-
-      return std::pair<std::vector<std::string>,
-                       std::vector<std::vector<size_t> > >
-      (names, dimss);
+      get_names(tokens, skip, names);
+      get_dimss(tokens, skip, dimss);
     }
     
     /** 

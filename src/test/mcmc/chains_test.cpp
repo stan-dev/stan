@@ -701,10 +701,78 @@ TEST(McmcChains, quantiles_means) {
                   c.mean(0));
   EXPECT_FLOAT_EQ(stan::math::sd(samps),
                   c.sd(0));
-
-  
-  
 }
+TEST(McmcChains,get_names) {
+  std::vector<std::string> tokens;
+  tokens.push_back("skip1");
+  tokens.push_back("skip2.1");
+  tokens.push_back("skip2.2");
+  tokens.push_back("skip2.3");
+  tokens.push_back("d");
+  tokens.push_back("sigmasq_delta");
+  tokens.push_back("mu.1");
+  tokens.push_back("mu.2");
+  tokens.push_back("mu.3");
+  tokens.push_back("delta.1.1");
+  tokens.push_back("delta.1.2");
+  tokens.push_back("delta.1.3");
+  tokens.push_back("sigma_delta");
+
+  std::vector<std::string> expected_names;
+  expected_names.push_back("d");
+  expected_names.push_back("sigmasq_delta");
+  expected_names.push_back("mu");
+  expected_names.push_back("delta");
+  expected_names.push_back("sigma_delta");
+  
+
+  std::vector<std::string> names;
+  stan::mcmc::get_names(tokens, 2, names);
+  ASSERT_EQ(expected_names.size(), names.size());
+  for (size_t ii = 0; ii < expected_names.size(); ii++) {
+    EXPECT_EQ(expected_names[ii], names[ii]);
+  }
+}
+TEST(McmcChains,get_dimss) {
+  std::vector<std::string> tokens;
+  tokens.push_back("skip1");
+  tokens.push_back("skip2.1");
+  tokens.push_back("skip2.2");
+  tokens.push_back("skip2.3");
+  tokens.push_back("d");
+  tokens.push_back("sigmasq_delta");
+  tokens.push_back("mu.1");
+  tokens.push_back("mu.2");
+  tokens.push_back("mu.3");
+  tokens.push_back("delta.1.1");
+  tokens.push_back("delta.1.2");
+  tokens.push_back("delta.1.3");
+  tokens.push_back("sigma_delta");
+
+  std::vector<std::vector<size_t> > expected_dimss;
+  std::vector<size_t> dims;
+  dims.clear(); dims.push_back(1);
+  expected_dimss.push_back(dims);
+  dims.clear(); dims.push_back(1);
+  expected_dimss.push_back(dims);
+  dims.clear(); dims.push_back(3);
+  expected_dimss.push_back(dims);
+  dims.clear(); dims.push_back(1); dims.push_back(3);
+  expected_dimss.push_back(dims);
+  dims.clear(); dims.push_back(1);
+  expected_dimss.push_back(dims);
+
+  std::vector<std::vector <size_t> > dimss;
+  stan::mcmc::get_dimss(tokens, 2, dimss);
+  ASSERT_EQ(expected_dimss.size(), dimss.size());
+  for (size_t ii = 0; ii < expected_dimss.size(); ii++) {
+    ASSERT_EQ(expected_dimss[ii].size(), dimss[ii].size());
+    for (size_t jj = 0; jj < expected_dimss[ii].size(); jj++) {
+      EXPECT_EQ(expected_dimss[ii][jj], dimss[ii][jj]);
+    }
+  }
+}
+
 TEST(McmcChains,read_variables) {
   //"src/test/mcmc/test_csv_files/blocker1.csv"
   //"src/test/mcmc/test_csv_files/blocker1.csv"
@@ -730,20 +798,22 @@ TEST(McmcChains,read_variables) {
   dims.push_back(1);
   expected_dimss.push_back(dims);
 
-  std::pair<std::vector<std::string>,
-    std::vector<std::vector<size_t> > > variables;
-  variables = stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv");  
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2, 
+                             names, dimss);  
 
   // check names
-  ASSERT_EQ(expected_names.size(), variables.first.size());
+  ASSERT_EQ(expected_names.size(), names.size());
   for (size_t i = 0; i < expected_names.size(); i++) {
-    EXPECT_EQ(expected_names[i], variables.first[i]);
+    EXPECT_EQ(expected_names[i], names[i]);
   }
   // check dims
-  ASSERT_EQ(expected_dimss.size(), variables.second.size());
-  for (size_t i = 0; i < expected_dimss.size(); i++) {
-    for (size_t j = 0; j < expected_dimss[i].size(); j++) {
-      EXPECT_EQ(expected_dimss[i][j], variables.second[i][j]);
+  ASSERT_EQ(expected_dimss.size(), dimss.size());
+  for (size_t ii = 0; ii < expected_dimss.size(); ii++) {
+    ASSERT_EQ(expected_dimss[ii].size(), dimss[ii].size());
+    for (size_t jj = 0; jj < expected_dimss[ii].size(); jj++) {
+      EXPECT_EQ(expected_dimss[ii][jj], dimss[ii][jj]);
     }
   }
 }
@@ -765,11 +835,12 @@ TEST(McmcChains,read_values) {
   EXPECT_FLOAT_EQ(0.123128,  thetas[999][2]);
 }
 TEST(McmcChains,add_chain){
-  std::pair<std::vector<std::string>,
-    std::vector<std::vector<size_t> > > variables = 
-    stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
 
-  stan::mcmc::chains<> c(2, variables.first, variables.second);
+  stan::mcmc::chains<> c(2, names, dimss);
   add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv");
   EXPECT_EQ(1000, c.num_samples(0));
   EXPECT_EQ(0, c.num_samples(1));
