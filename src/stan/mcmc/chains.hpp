@@ -1244,19 +1244,19 @@ namespace stan {
       /** 
        * Tokenize line by delimiter.
        * 
-       * @param stream String to tokenize.
-       * @param delimiter Delimiter.
-       * 
-       * @return vector of tokens.
+       * @param[in]  stream String to tokenize.
+       * @param[in]  delimiter Delimiter.
+       * @param[out] tokens Output vector of tokens.
        */
-      std::vector<std::string> tokenize(std::string line, char delimiter=',') {
+      void
+      tokenize(const std::string& line, const char delimiter, 
+               std::vector<std::string>& tokens) {
+        tokens.clear();
         std::stringstream stream(line);
-        std::vector<std::string> tokens;
         std::string token;
         while (std::getline(stream,token,delimiter)) {
           tokens.push_back(token);
         }
-        return tokens;
       }
 
       /** 
@@ -1295,8 +1295,9 @@ namespace stan {
                 std::vector<std::vector<size_t> >& dimss) {
         dimss.clear();
         std::string last_name;
+        std::vector<std::string> split;
         for (int i = tokens.size()-1; i >= 0; --i) {
-          std::vector<std::string> split = tokenize(tokens[i],'.');
+          tokenize(tokens[i], '.', split);
           
           std::vector<size_t> dims;
           if (split.size() == 1) {
@@ -1317,22 +1318,21 @@ namespace stan {
        * Reads values from a csv file. Reads the last variables in
        * each file.
        * 
-       * @param file csv output file.
-       * @param num_values number of values to read per line
-       * 
-       * @return the values in the file
+       * @param[in,out] file csv output file.
+       * @param[in] num_values number of values to read per line
+       * @param[out] values Values from csv file. Order has not been altered.
        */
-      std::vector<std::vector<double> >
-      read_values(std::fstream& file, size_t num_values) {
-        std::vector<std::vector<double> > thetas;
-        
+      void
+      read_values(std::fstream& file, const size_t num_values,
+                  std::vector<std::vector<double> >& thetas) {
+        thetas.clear();
         read_header(file); // ignore header
         std::vector<double> theta;
         std::string line;
         std::vector<std::string> tokens;
         while (file.peek() != std::istream::traits_type::eof()) {
           std::getline(file, line, '\n');
-          tokens = tokenize(line, ',');
+          tokenize(line, ',', tokens);
           theta.clear();
           for (size_t i = tokens.size()-num_values; i < tokens.size(); i++) {
             theta.push_back(atof(tokens[i].c_str()));
@@ -1341,7 +1341,6 @@ namespace stan {
             thetas.push_back(theta);
           }
         }
-        return thetas;
       }
     }
 
@@ -1367,7 +1366,8 @@ namespace stan {
       std::string header = read_header(csv_output_file);
       csv_output_file.close();
 
-      std::vector<std::string> tokens = tokenize(header);
+      std::vector<std::string> tokens;
+      tokenize(header, ',', tokens);
       get_names(tokens, skip, names);
       get_dimss(tokens, skip, dimss);
     }
@@ -1390,8 +1390,8 @@ namespace stan {
       if (!csv_output_file.is_open()) {
         throw new std::runtime_error("Could not open" + filename);
       }
-      std::vector<std::vector<double> > thetas =
-        read_values(csv_output_file, chains.num_params());
+      std::vector<std::vector<double> > thetas;
+      read_values(csv_output_file, chains.num_params(), thetas);
       csv_output_file.close();
 
       for (size_t i = 0; i < thetas.size(); i++) {

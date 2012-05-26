@@ -821,7 +821,7 @@ TEST(McmcChains,read_values) {
   std::fstream file("src/test/mcmc/test_csv_files/blocker1.csv", 
                     std::fstream::in);
   std::vector<std::vector<double> > thetas;
-  thetas = stan::mcmc::read_values(file, 3);
+  stan::mcmc::read_values(file, 3, thetas);
   file.close();
   EXPECT_EQ(1000, thetas.size());
   EXPECT_EQ(3, thetas[0].size());
