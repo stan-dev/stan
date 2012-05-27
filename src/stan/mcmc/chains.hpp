@@ -345,7 +345,7 @@ namespace stan {
        * @throws std::invalid_argument If the name and dimensions
        * sequences are not the same size.
        */
-      chains(size_t num_chains,
+      chains(const size_t num_chains,
              const std::vector<std::string>& names,
              const std::vector<std::vector<size_t> >& dimss) 
         : _warmup(0),
@@ -1244,32 +1244,33 @@ namespace stan {
       /** 
        * Tokenize line by delimiter.
        * 
-       * @param stream String to tokenize.
-       * @param delimiter Delimiter.
-       * 
-       * @return vector of tokens.
+       * @param[in]  stream String to tokenize.
+       * @param[in]  delimiter Delimiter.
+       * @param[out] tokens Output vector of tokens.
        */
-      std::vector<std::string> tokenize(std::string line, char delimiter=',') {
+      void
+      tokenize(const std::string& line, const char delimiter, 
+               std::vector<std::string>& tokens) {
+        tokens.clear();
         std::stringstream stream(line);
-        std::vector<std::string> tokens;
         std::string token;
         while (std::getline(stream,token,delimiter)) {
           tokens.push_back(token);
         }
-        return tokens;
       }
 
       /** 
        * Get names from a list of tokens.
        * 
-       * @param tokens a vector of tokens from the header.
-       * @param skip number of variables to skip
-       * 
-       * @return a vector of names
+       * @param[in] tokens a vector of tokens from the header.
+       * @param[in] skip number of variables to skip
+       * @param[out] names names of the variables in the tokens.
        */
-      std::vector<std::string> get_names(std::vector<std::string> tokens, 
-                                         size_t skip) {
-        std::vector<std::string> names;
+      void
+      get_names(const std::vector<std::string>& tokens, 
+                const size_t skip,
+                std::vector<std::string>& names) {
+        names.clear();
         for (size_t i = 0; i < tokens.size(); i++) {
           std::stringstream token(tokens[i]);
           std::string name;
@@ -1279,24 +1280,24 @@ namespace stan {
           }
         }
         names.erase(names.begin(), names.begin()+skip);
-        return names;
       }
 
       /** 
-       * Get dims from a list of tokens.
+       * Get dimensions of variables from a list of tokens.
        * 
-       * @param tokens a vector of tokens from the header.
-       * @param number of variables to skip
-       * 
-       * @return a vector of dims.
+       * @param[in] tokens a vector of tokens from the header.
+       * @param[in] number number of variables to skip
+       * @param[out] dimss a vector of dims
        */
-      std::vector<std::vector<size_t> > 
-      get_dimss(std::vector<std::string> tokens, 
-                size_t skip) {
+      void
+      get_dimss(const std::vector<std::string>& tokens, 
+                const size_t skip, 
+                std::vector<std::vector<size_t> >& dimss) {
+        dimss.clear();
         std::string last_name;
-        std::vector<std::vector<size_t> > dimss;
+        std::vector<std::string> split;
         for (int i = tokens.size()-1; i >= 0; --i) {
-          std::vector<std::string> split = tokenize(tokens[i],'.');
+          tokenize(tokens[i], '.', split);
           
           std::vector<size_t> dims;
           if (split.size() == 1) {
@@ -1311,29 +1312,27 @@ namespace stan {
           last_name = split.front();
         }
         dimss.erase(dimss.begin(), dimss.begin()+skip);
-        return dimss;
       }
       
       /** 
        * Reads values from a csv file. Reads the last variables in
        * each file.
        * 
-       * @param file csv output file.
-       * @param num_values number of values to read per line
-       * 
-       * @return the values in the file
+       * @param[in,out] file csv output file.
+       * @param[in] num_values number of values to read per line
+       * @param[out] values Values from csv file. Order has not been altered.
        */
-      std::vector<std::vector<double> >
-      read_values(std::fstream& file, size_t num_values) {
-        std::vector<std::vector<double> > thetas;
-        
+      void
+      read_values(std::fstream& file, const size_t num_values,
+                  std::vector<std::vector<double> >& thetas) {
+        thetas.clear();
         read_header(file); // ignore header
         std::vector<double> theta;
         std::string line;
         std::vector<std::string> tokens;
         while (file.peek() != std::istream::traits_type::eof()) {
           std::getline(file, line, '\n');
-          tokens = tokenize(line, ',');
+          tokenize(line, ',', tokens);
           theta.clear();
           for (size_t i = tokens.size()-num_values; i < tokens.size(); i++) {
             theta.push_back(atof(tokens[i].c_str()));
@@ -1342,7 +1341,74 @@ namespace stan {
             thetas.push_back(theta);
           }
         }
-        return thetas;
+      }
+      
+      /** 
+       * Reorders the values in thetas. Each vector has the elements in the
+       * index in from placed in the location to.
+       * 
+       * @param[in,out] thetas Values to reorder
+       * @param[in] from Indexes of the elements to move.
+       * @param[in] to Indexes of the locations to move.
+       */
+      void
+      reorder_values(std::vector<std::vector<double> >& thetas,
+                     const std::vector<size_t>& from,
+                     const std::vector<size_t>& to) {
+        std::vector<double> temp(from.size());
+        for (size_t ii = 0; ii < thetas.size(); ii++) {
+          for (size_t jj = 0; jj < from.size(); jj++) {
+            temp[jj] = thetas[ii][from[jj]];
+          }
+          for (size_t jj = 0; jj < to.size(); jj++) {
+            thetas[ii][to[jj]] = temp[jj];
+          }
+        }
+      }
+
+      /** 
+       * Calculates the reordering necessary to change variables
+       * from row major order to column major order.
+       * 
+       * @param[in]  dimss The dimension sizes of the variables
+       * @param[out] from Index locations of where to move from (row-major)
+       * @param[out] to Index locations of where to move to (col-major)
+       */
+      void
+      get_reordering(const std::vector<std::vector<size_t> >& dimss,
+                     std::vector<size_t>& from,
+                     std::vector<size_t>& to) {
+        from.clear();
+        to.clear();
+        
+        size_t offset = 0;
+        for (size_t ii = 0; ii < dimss.size(); ii++) {
+          size_t curr_size = dimss[ii][0];
+          if (dimss[ii].size() > 1) {
+            for (size_t jj = 1; jj < dimss[ii].size(); jj++)
+              curr_size *= dimss[ii][jj];
+            
+            std::vector<size_t> idxs;
+            for (size_t jj = 0; jj < dimss[ii].size(); jj++) {
+              idxs.push_back(0);
+            }
+            size_t from_index = 0;
+            for (size_t to_index = 0; to_index < curr_size; to_index++) {
+              from_index = 0;
+              size_t offset_temp = 1;
+              for (size_t kk = idxs.size(); kk > 0; --kk) {
+                from_index += idxs[kk-1] * offset_temp;
+                offset_temp *= dimss[ii][kk-1];
+              }
+              if (from_index != to_index) {
+                from.push_back(offset+from_index);
+                to.push_back(offset+to_index);
+              }
+              increment_indexes(dimss[ii], idxs);
+            }
+          }
+          offset += curr_size;
+        }
       }
     }
 
@@ -1350,17 +1416,17 @@ namespace stan {
      * Reads variable names and dims from a csv
      * output file.
      * 
-     * @param filename Name of a csv output file.
-     * @param skip number of variables to skip
-     * 
-     * @return Pair containing names and dims of the variables.
+     * @param[in] filename Name of a csv output file.
+     * @param[in] skip Number of variables to skip
+     * @param[out] names Names of the variables 
+     * @param[out] dimss Dimensions of the variables
      */
-    std::pair<std::vector<std::string>,
-              std::vector<std::vector<size_t> > >
-    read_variables(std::string filename, size_t skip=2) {
-      std::vector<std::string> names;
-      std::vector<std::vector<size_t> > dimss;
-      
+    void
+    read_variables(const std::string filename, const size_t skip, 
+                   std::vector<std::string>& names,
+                   std::vector<std::vector<size_t> >& dimss) {
+      names.clear();
+      dimss.clear();
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
         throw new std::runtime_error("Could not open" + filename);
@@ -1368,13 +1434,10 @@ namespace stan {
       std::string header = read_header(csv_output_file);
       csv_output_file.close();
 
-      std::vector<std::string> tokens = tokenize(header);
-      names = get_names(tokens, skip);
-      dimss = get_dimss(tokens, skip);
-
-      return std::pair<std::vector<std::string>,
-                       std::vector<std::vector<size_t> > >
-      (names, dimss);
+      std::vector<std::string> tokens;
+      tokenize(header, ',', tokens);
+      get_names(tokens, skip, names);
+      get_dimss(tokens, skip, dimss);
     }
     
     /** 
@@ -1388,21 +1451,24 @@ namespace stan {
      * @return number of samples added
      */
     template <typename RNG>
-    size_t add_chain(stan::mcmc::chains<RNG>& chains, const size_t chain, 
+    size_t add_chain(stan::mcmc::chains<RNG>& chains, 
+                     const size_t chain, 
                      const std::string filename,
-                     const size_t skip=2) {
+                     const size_t skip) {
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
         throw new std::runtime_error("Could not open" + filename);
       }
-      std::vector<std::vector<double> > thetas =
-        read_values(csv_output_file, chains.num_params());
+      std::vector<std::vector<double> > thetas;
+      read_values(csv_output_file, chains.num_params(), thetas);
       csv_output_file.close();
-
+      
+      std::vector<size_t> from, to;
+      get_reordering(chains.param_dimss(), from, to);
+      reorder_values(thetas, from, to);
       for (size_t i = 0; i < thetas.size(); i++) {
         chains.add(chain, thetas[i]);
       }
-      
       return thetas.size();
     }
 
