@@ -62,8 +62,22 @@ namespace rstan {
                                 const V& val) {
       o << "# " << key << "=" << val << std::endl;
     }
+
+    template <class Model>
+    std::vector<std::string> get_param_names(Model& m) { 
+      std::vector<std::string> names;
+      m.get_param_names(names);
+      return names; // copy for return
+    }
+
+    template <class Model>
+    std::vector<std::vector<size_t> > get_param_dims(Model& m) {
+      std::vector<std::vector<size_t> > dimss; 
+      m.get_dims(dimss); 
+      return dimss; 
+    } 
   
-    template <class Sampler, class Model>
+    template <class Sampler, class Model, class RNG>
     void sample_from(Sampler& sampler,
                      bool epsilon_adapt,
                      int refresh,
@@ -73,7 +87,9 @@ namespace rstan {
                      std::ostream& sample_file_stream,
                      std::vector<double>& params_r,
                      std::vector<int>& params_i,
-                     Model& model) {
+                     Model& model,
+                     stan::mcmc::chains<RNG>& chains,
+                     size_t chain_id) {
   
       sampler.set_params(params_r,params_i);
      
@@ -83,6 +99,7 @@ namespace rstan {
       // rstan::io::rcout << "in sample_from." << std::endl; 
       if (epsilon_adapt)
         sampler.adapt_on(); 
+      std::vector<double> params_ir; 
       for (int m = 0; m < num_iterations; ++m) {
         if (do_print(m,refresh)) {
           rstan::io::rcout << "\rIteration: ";
@@ -111,51 +128,47 @@ namespace rstan {
             sample.params_r(params_r);
             sample.params_i(params_i);
             model.write_csv(params_r,params_i,sample_file_stream);
+            model.write_array(params_r,params_i,params_ir); 
+            chains.add(chain_id, params_ir); 
+
           }
         }
       }
     }
-  } 
+    /**
+     * @tparam Model 
+     * @tparam RNG RNG for stan::mcmc::chains 
+     */
+    
+    template <class Model, class RNG> 
+    int nuts_command(const io::rlist_var_context& data, 
+                     const nuts_args& args, 
+                     Model& model, 
+                     stan::mcmc::chains<RNG>& chains_) {
+    
 
-  /**
-   * <p> To implement a Rcpp class module for R's user interface with NUTS. 
-   * Adapted from <code> stan/src/stan/gm/command.hpp</code>. 
-   */
-
-  template <class Model> 
-  class nuts_r_ui {
-  private: 
-    // stan::mcmc::chains _chains; 
-    int nuts_command(SEXP data, SEXP args) { 
-
-      // rstan::io::rcout << "in nuts_command" << std::endl; 
-      io::rlist_var_context data_(Rcpp::as<Rcpp::List>(data)); 
-      nuts_args args_(Rcpp::as<Rcpp::List>(args)); 
-
-      Model model(data_); 
-
-      std::string sample_file = args_.get_sample_file(); 
+      std::string sample_file = args.get_sample_file(); 
       
-      unsigned int num_iterations = args_.get_iter(); 
-      unsigned int num_warmup = args_.get_warmup(); 
-      unsigned int num_thin = args_.get_thin(); 
-      int leapfrog_steps = args_.get_leapfrog_steps(); 
+      unsigned int num_iterations = args.get_iter(); 
+      unsigned int num_warmup = args.get_warmup(); 
+      unsigned int num_thin = args.get_thin(); 
+      int leapfrog_steps = args.get_leapfrog_steps(); 
 
-      double epsilon = args_.get_epsilon(); 
+      double epsilon = args.get_epsilon(); 
 
-      int max_treedepth = args_.get_max_treedepth(); 
+      int max_treedepth = args.get_max_treedepth(); 
 
-      double epsilon_pm = args_.get_epsilon_pm(); 
-      bool epsilon_adapt = args_.get_epsilon_adapt(); 
+      double epsilon_pm = args.get_epsilon_pm(); 
+      bool epsilon_adapt = args.get_epsilon_adapt(); 
 
-      double delta = args_.get_delta(); 
+      double delta = args.get_delta(); 
 
-      double gamma = args_.get_gamma(); 
+      double gamma = args.get_gamma(); 
 
-      int random_seed = args_.get_random_seed(); 
-      unsigned int refresh = args_.get_refresh(); 
+      int random_seed = args.get_random_seed(); 
+      unsigned int refresh = args.get_refresh(); 
 
-      int chain_id = args_.get_chain_id(); 
+      int chain_id = args.get_chain_id(); 
 
       // FASTER, but no parallel guarantees:
       // typedef boost::mt19937 rng_t;
@@ -171,13 +184,13 @@ namespace rstan {
       std::vector<int> params_i;
       std::vector<double> params_r;
 
-      std::string init_val = args_.get_init();
+      std::string init_val = args.get_init();
       // parameter initialization
       if (init_val == "0") {
           params_i = std::vector<int>(model.num_params_i(),0);
           params_r = std::vector<double>(model.num_params_r(),0.0);
       } else if (init_val == "user") {
-          Rcpp::List init_lst(args_.get_init_list()); 
+          Rcpp::List init_lst(args.get_init_list()); 
           rstan::io::rlist_var_context init_var_context(init_lst); 
           model.transform_inits(init_var_context,params_i,params_r);
       } else {
@@ -191,11 +204,12 @@ namespace rstan {
 
         params_i = std::vector<int>(model.num_params_i(),0);
         params_r = std::vector<double>(model.num_params_r());
+
         for (size_t i = 0; i < params_r.size(); ++i)
           params_r[i] = init_rng();
       }
 
-      bool append_samples = args_.get_append_samples(); 
+      bool append_samples = args.get_append_samples(); 
       std::ios_base::openmode samples_append_mode
         = append_samples
         ? (std::fstream::out | std::fstream::app)
@@ -242,7 +256,7 @@ namespace rstan {
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,
-                    model);
+                    model,chains_,0); 
       } else {
         stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
                                                     leapfrog_steps,
@@ -260,28 +274,36 @@ namespace rstan {
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,
-                    model);
+                    model,chains_,0);
       }
       
       sample_stream.close();
       rstan::io::rcout << std::endl << std::endl; 
       return 0;
     }
+  } 
 
-  public: 
-    nuts_r_ui() { 
-    } 
- 
-    /*
-    bool init(Rcpp::List in, Rcpp::List conf) {
-      data_ = io::rlist_var_context(in); 
-      return true; 
-    } 
-    */
+  /**
+   * <p> To implement a Rcpp class module for R's user interface with NUTS. 
+   * Adapted from <code> stan/src/stan/gm/command.hpp</code>. 
+   * 
+   * @tparam Model The model translated from the Stan language.
+   * @RNG RNG for stan::mcmc::chains 
+   *
+   */
+
+  template <class Model, class RNG> 
+  class nuts_r_ui {
+
+  private:
+    io::rlist_var_context data_;
+    Model model_;
+    nuts_args args_;
+    stan::mcmc::chains<RNG> chains_; 
+
+  public:
+
     /**
-     * This function would be exposed (using Rcpp module, see
-     * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call NUTS. 
-     *
      * @param data The data for the model. From R's perspective, 
      *  it is a named list. 
      *
@@ -289,12 +311,30 @@ namespace rstan {
      * iterations, warmup, etc. In addition, the user specified initial
      * values for all the parameters here. Also, R should pass a list here. 
      *
+     * FIXME: 
+     *  num_of chains here and in nuts_args
+     *  chain_id 
+     */ 
+
+    nuts_r_ui(SEXP data, SEXP args) : 
+      data_(Rcpp::as<Rcpp::List>(data)), 
+      model_(data_), 
+      args_(Rcpp::as<Rcpp::List>(args)), 
+      chains_(args_.get_num_chains(), get_param_names(model_), get_param_dims(model_)) 
+    { }
+
+    /**
+     * This function would be exposed (using Rcpp module, see
+     * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call NUTS. 
+     *
+     *
      * @return TRUE if there is no exception; FALSE otherwise. 
      *
      */
-    SEXP call_nuts(SEXP data, SEXP args) {
+    SEXP call_nuts() { 
       try {
-        nuts_command(data, args); 
+        for (size_t i = 0; i < args_.get_num_chains(); i++) 
+          nuts_command(data_, args_, model_, chains_); 
      
       } catch (std::exception& e) {
         rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
@@ -302,6 +342,12 @@ namespace rstan {
         return Rcpp::wrap(false); 
       }
       return Rcpp::wrap(true);  
+    } 
+    // just a test
+    SEXP get_first_p() {
+      std::vector<double> s; 
+      chains_.get_samples(0, s);
+      return Rcpp::wrap(s);    
     } 
 
   };

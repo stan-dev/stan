@@ -36,6 +36,7 @@ namespace rstan {
    * <li> test_grad 
    * <li> init 
    * <li> init_lst 
+   * <li> num_chains 
    * </ul>
    *
    * In addition, the following keep a record of how the arguments are set: by
@@ -68,6 +69,7 @@ namespace rstan {
     bool test_grad; 
     std::string init; 
     SEXP init_lst;  
+    size_t num_chains;
    
   public:
     nuts_args(): 
@@ -90,7 +92,8 @@ namespace rstan {
       append_samples(false), 
       test_grad(true), 
       init("random"),
-      init_lst(R_NilValue) {
+      init_lst(R_NilValue),
+      num_chains(1) {
     } 
     nuts_args(const Rcpp::List &in) {
       /*
@@ -181,6 +184,13 @@ namespace rstan {
       if (Rf_isNull(tsexp)) append_samples = false; 
       else append_samples = Rcpp::as<bool>(tsexp); 
 
+      tsexp = get_list_element_by_name(in, "num_chains"); 
+      if (Rf_isNull(tsexp)) num_chains = 1;
+      else num_chains = Rcpp::as<size_t>(tsexp); 
+
+    } 
+    size_t get_num_chains() const {
+      return num_chains; 
     } 
     const std::string& get_random_seed_src() const {
       return random_seed_src; 

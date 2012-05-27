@@ -79,8 +79,8 @@ setMethod("samples", "stanmodel",
  
             # check if object is valid? (How?)
 
-            nuts <- new(object@.modelmod$nuts) 
-            invisible(nuts$call_nuts(data, args)) 
+            nuts <- new(object@.modelmod$nuts, data, args) 
+            invisible(nuts$call_nuts()) 
  
           })  
 
