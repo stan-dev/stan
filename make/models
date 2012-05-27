@@ -72,5 +72,6 @@ models/%.d : models/%.cpp
 ##
 ifneq (,$(filter models/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter models/%,$(MAKECMDGOALS))))
+  -include bin/stan/command/stanc.d
   -include $(MODEL_HEADER).d
 endif

@@ -1882,19 +1882,19 @@ namespace stan {
         std::string name_dims(name);
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "size_t dim_"  << name << "_" << i << " = ";
+          o_ << "size_t dim_"  << name << "_" << i << "__ = ";
           generate_expression(dims[i],o_);
           o_ << ";" << EOL;
           if (i < dims.size() - 1) {  
             generate_indent(i + 2, o_);
-            o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << ");" 
+            o_ << name_dims << ".resize(dim_" << name << "_" << i << "__);" 
                << EOL;
-            name_dims.append("[k_").append(to_string(i)).append("]");
+            name_dims.append("[k_").append(to_string(i)).append("__]");
           }
           generate_indent(i + 2, o_);
-          o_ << "for (size_t k_" << i << " = 0;"
-             << " k_" << i << " < dim_" << name << "_" << i << ";"
-             << " ++k_" << i << ") {" << EOL;
+          o_ << "for (size_t k_" << i << "__ = 0;"
+             << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
+             << " ++k_" << i << "__) {" << EOL;
           if (i == dims.size() - 1) {
             generate_indent(i + 3, o_);
             o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
@@ -1911,7 +1911,7 @@ namespace stan {
           o_ << '[';
           for (size_t i = 0; i < dims.size(); ++i) {
             if (i > 0) o_ << "][";
-            o_ << "k_" << i;
+            o_ << "k_" << i << "__";
           }
           o_ << ']';
         }
@@ -1968,10 +1968,10 @@ namespace stan {
         }
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "for (int k_" << i << " = 0;"
-             << " k_" << i << " < ";
+          o_ << "for (int k_" << i << "__ = 0;"
+             << " k_" << i << "__ < ";
           generate_expression(dims[i],o_);
-          o_ << "; ++k_" << i << ") {" << EOL;
+          o_ << "; ++k_" << i << "__) {" << EOL;
         }
 
         generate_indent(dims.size() + 2, o_);
@@ -1980,7 +1980,7 @@ namespace stan {
           o_ << '[';
           for (size_t i = 0; i < dims.size(); ++i) {
             if (i > 0) o_ << "][";
-            o_ << "k_" << i;
+            o_ << "k_" << i << "__";
           }
           o_ << ']';
         }
@@ -2150,19 +2150,19 @@ namespace stan {
         std::string name_dims(name);
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "size_t dim_"  << name << "_" << i << " = ";
+          o_ << "size_t dim_"  << name << "_" << i << "__ = ";
           generate_expression(dims[i],o_);
           o_ << ";" << EOL;
           if (i < dims.size() - 1) {  
             generate_indent(i + 2, o_);
-            o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << ");" 
+            o_ << name_dims << ".resize(dim_" << name << "_" << i << "__);" 
                << EOL;
-            name_dims.append("[k_").append(to_string(i)).append("]");
+            name_dims.append("[k_").append(to_string(i)).append("__]");
           }
           generate_indent(i + 2, o_);
-          o_ << "for (size_t k_" << i << " = 0;"
-             << " k_" << i << " < dim_" << name << "_" << i << ";"
-             << " ++k_" << i << ") {" << EOL;
+          o_ << "for (size_t k_" << i << "__ = 0;"
+             << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
+             << " ++k_" << i << "__) {" << EOL;
           if (i == dims.size() - 1) {
             generate_indent(i + 3, o_);
             o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
@@ -2250,39 +2250,42 @@ namespace stan {
         write_array(x.name_,x.dims_,matdims);
       }
       void write_array(const std::string& name,
-                       const std::vector<expression>& dims,
+                       const std::vector<expression>& arraydims,
                        const std::vector<expression>& matdims) const {
+
+        std::vector<expression> dims(arraydims);
+        for (size_t i = 0; i < matdims.size(); ++i)
+          dims.push_back(matdims[i]);
+
         if (dims.size() == 0) {
           o_ << INDENT2 << "vars__.push_back(" << name << ");" << EOL;
           return;
         }
+        
         // for (size_t i = 0; i < dims.size(); ++i) {
         for (size_t i = dims.size(); i > 0; ) {
           --i;
           generate_indent((dims.size() - i) + 1, o_);
-          o_ << "for (int k_" << i << " = 0;"
-             << " k_" << i << " < ";
+          o_ << "for (int k_" << i << "__ = 0;"
+             << " k_" << i << "__ < ";
           generate_expression(dims[i],o_);
-          o_ << "; ++k_" << i << ") {" << EOL;
+          o_ << "; ++k_" << i << "__) {" << EOL;
         }
 
         generate_indent(dims.size() + 2, o_);
         o_ << "vars__.push_back(" << name;
-        if (dims.size() > 0) {
+        if (arraydims.size() > 0) {
           o_ << '[';
-          for (size_t i = 0; i < dims.size(); ++i) {
+          for (size_t i = 0; i < arraydims.size(); ++i) {
             if (i > 0) o_ << "][";
-            o_ << "k_" << i;
+            o_ << "k_" << i << "__";
           }
           o_ << ']';
         }
         if (matdims.size() > 0) {
-          o_ << "(";
-          generate_expression(matdims[0],o_);
-          if (matdims.size() > 1) {
-            o_ << ",";
-            generate_expression(matdims[1],o_);
-          }
+          o_ << "(k_" << arraydims.size() << "__";
+          if (matdims.size() > 1) 
+            o_ << ", k_" << (arraydims.size() + 1) << "__";
           o_ << ")";
         }
         o_ << ");" << EOL;

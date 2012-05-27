@@ -3,6 +3,14 @@ bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
+##
+# Generate dependencies for bin/stanc
+##
+ifneq (,$(filter bin/stanc,$(MAKECMDGOALS)))
+  -include bin/stan/command/stanc.d
+endif
+
+
 #bin/stan/%.o : src/stan/%.cpp
 #	@mkdir -p $(dir $@)
 #	$(COMPILE.c) $(OUTPUT_OPTION) $<
