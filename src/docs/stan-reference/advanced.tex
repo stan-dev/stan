@@ -4,6 +4,7 @@
 
 \chapter{Markov Chain Monte Carlo Sampling}
 
+\noindent
 Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
 generate the samples.  The particular techniques are discussed in the
 following this section in \refsection{intro-samplers}.
@@ -232,6 +233,7 @@ sampling otherwise.
 
 \chapter{Variable Transforms}\label{variable-transforms.chapter}
 
+\noindent
 To avoid having to deal with constraints while simulating the
 Hamiltonian dynamics during sampling, every (multivariate) parameter
 in a \Stan model is transformed to an unconstrained variable behind
@@ -1127,6 +1129,7 @@ Jacobian determinants of the exponentiation and product transforms,
 
 \chapter{The C++ Model Class}
 
+\noindent
 The generated \Cpp class extends a built-in \Stan abstract
 base class for probability models.  Instances of the class are
 constructed from a specified data vector $y$.  The data vector $y$
@@ -1160,6 +1163,7 @@ not dependent on the dimensionality of the parameter vector.
 
 
 \chapter{Optimizing \Stan Code}\label{optimization.chapter}
+\noindent
 
 \section{Exploiting Sufficient Statistics}
 

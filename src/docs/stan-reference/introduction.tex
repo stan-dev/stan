@@ -3,6 +3,7 @@
 
 \chapter{Overview}
 
+\noindent
 This document is both a user's guide and a reference manual for
 \Stan's probabilistic modeling language.  This introductory chapter
 provides a high-level overview of \Stan.  The next chapter provides a
@@ -160,6 +161,7 @@ data.
 
 \chapter{Getting Started}
 
+\noindent
 This chapter is designed to help users get acquainted with the overall
 design of the \Stan language and calling \Stan from the command line.
 Later chapters are devoted to expanding on the material in this
@@ -607,16 +609,15 @@ statistics and conjugate priors directly in \Stan to speed this model up.
 
 \section{Comments}
 
-\Stan supports the three major style of comments.  
-
 If the character \code{\#} appears on a line, that character and every
 character up to but not including the end of line is ignored.  This is
 the style of comments used in Python, R, and the shell.  
 
-If the character pair \code{//} appears on a line, that pair and every
-character up to but not including the end of line is ignored.  This is
-the style of comments used in C.  This is the preferred commenting
-style for line-based comments and for commenting out code.
+If the character pair \code{//} appears together on a line, that pair
+and every character up to but not including the end of line is
+ignored.  This is the style of comments used in C.  This is the
+preferred commenting style for line-based comments and for commenting
+out code.
 
 \Stan also supports \Cpp comment style in which any content placed
 between \code{/*} and \code{*/} is ignored along with the boundary
@@ -627,15 +628,10 @@ an internal close comment sequence, \code{*/}, may take precedence.
 
 \section{User-Defined Distributions and Functions}
 
-\Stan allows new distributions to be coded directly in its modeling
-language, as described in \refchapter{custom-probability-functions}. 
-
-Extending \Stan's underlying \Cpp API provides a way to add new
-functions that may be implemented efficiently and used across
-different \Stan programs.  \refappendix{user-defined-functions}
-documents the way in which new basic functions may be added to \Stan.
-The new functions may use algorithmic differentiation to compute the
-partial derivatives of their output with respect to the input
-variables, or the user may directly specify the partials for increased
-efficiency.
+\Stan allows new distributions to be coded in one of two ways, either
+directly in its modeling language (see
+\refchapter{custom-probability-functions}), or by extending the
+modeling language using \Cpp (see
+\refappendix{user-defined-functions}).  The latter is more efficient
+and also portable across models.
 
