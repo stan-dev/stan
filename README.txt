@@ -1,37 +1,48 @@
 STAN README
-========================================
- 
-STAN is a C++ library for probability, optimization and sampling.
+======================================================================
+
+Stan is a C++ library for probability, optimization and sampling.
 
  
-Licesning
-------------------- 
-STAN is licensed under the new BSD license.  See
-doc/LICENSE.txt
+License
+----------------------------------------------------------------------
+Stan is licensed under the new BSD license (3 clause):
 
- 
-Header-Only Package
-------------------- 
-It is distributed as a header-only lib, so there's nothing 
-to install.  Just unpack into a directory we'll call $STAN.
- 
-External Dependencies
-------------------- 
-These are listed in doc/DEPEDENCIES.txt.  These should be 
-resolved before continuing. Note that if you are compiling
-with clang++ on Linux, make sure have the development files
-installed, which on Debian are in the libclang-dev package.
+  $STAN/licenses/stan-license.txt
 
- 
-Unit Tests
-------------------- 
-There is a top-level makefile. 
- 
-% cd $STAN 
-% make test-all
+The test, build, run-time dependencies and their licenses are in:
 
- 
+  $STAN/licenses/dependencies.txt
+
+
+Documentation
+----------------------------------------------------------------------
+Stan's user's guide and reference manual, including installation 
+instructions and a quick start guide, are in:
+
+  $STAN/doc/stan-reference.pdf
+
+Stan's C++ API guide is in:
+
+  $STAN/doc/api/html/index.html
+
+
+Building Stan
+----------------------------------------------------------------------
+Stan uses GNU make for builds, with top-level makefile:
+
+  $STAN/makefile
+
+The make targets for building and testing are displayed by:
+
+  > cd $STAN
+  > make help
+
+
 Demos
 ------------------- 
-Coming soon.
- 
+For examples of Stan models, including implementations of the BUGS demos:
+
+  $STAN/src/models
+
+
