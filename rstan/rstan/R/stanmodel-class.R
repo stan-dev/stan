@@ -50,9 +50,9 @@ setMethod("samples", "stanmodel",
             # check data and preprocess 
             data <- data.preprocess(data) 
  
-            # assemble init and init_lst 
+            # assemble init and init_list 
             # init: how to set up the initial values (0, user, random)
-            # init_lst: user specified initial values list  
+            # init_list: user specified initial values list  
  
             init.t <- as.character(init.t)
             # cat("[in samples]: init.t=", init.t, "\n")
@@ -63,7 +63,7 @@ setMethod("samples", "stanmodel",
             args <- list(init = init.t, iter = n.iter, thin = thin) 
  
             if (init.t == 'user' && is.list(init.v)) 
-              args$init_lst <- init.v 
+              args$init_list <- init.v 
  
             if (!missing(seed)) 
               args$seed <- seed  

@@ -7,10 +7,24 @@
 // #include <R.h>
 // #include <Rinternals.h> 
 
-#include <rstan/io/rlist_util.hpp>
 #include <rstan/io/r_ostream.hpp> 
 
 namespace rstan {
+
+  namespace {
+    /** 
+     * Find the index of an element in a vector. 
+     * @param v the vector in which an element are searched. 
+     * @param e the element that we are looking for. 
+     * @return If e is in v, return the index (0 to size - 1);
+     *  otherwise, return the size. 
+     */
+   
+    template <class T>
+    size_t find_index(std::vector<T> v, const T& e) {
+      return std::distance(v.begin(), std::find(v.begin(), v.end(), e));  
+    } 
+  } 
   /**
    * Wrap the available arguments for nuts sampler (and other samplers) from
    * Rcpp::List and set the defaults if not available. 
@@ -35,7 +49,7 @@ namespace rstan {
    * <li> append_samples 
    * <li> test_grad 
    * <li> init 
-   * <li> init_lst 
+   * <li> init_list 
    * <li> num_chains 
    * </ul>
    *
@@ -68,10 +82,11 @@ namespace rstan {
     bool append_samples; 
     bool test_grad; 
     std::string init; 
-    SEXP init_lst;  
+    SEXP init_list;  
     size_t num_chains;
    
   public:
+    /**
     nuts_args(): 
       sample_file("samples.csv"),  
       iter(2000U), 
@@ -92,101 +107,101 @@ namespace rstan {
       append_samples(false), 
       test_grad(true), 
       init("random"),
-      init_lst(R_NilValue),
+      init_list(R_NilValue),
       num_chains(1) {
     } 
-    nuts_args(const Rcpp::List &in) {
-      /*
-      std::vector<std::string> argsnames 
+    */
+    nuts_args(const Rcpp::List& in) {
+      std::vector<std::string> args_names 
         = Rcpp::as<std::vector<std::string> >(in.names()); 
-      */
    
-      SEXP tsexp = get_list_element_by_name(in, "sample_file"); 
-      if (Rf_isNull(tsexp)) sample_file = "samples.csv"; 
-      else sample_file = Rcpp::as<std::string>(tsexp); 
+      size_t idx = find_index(args_names, std::string("sample_file")); 
+      if (idx == args_names.size()) sample_file = "samples.csv"; 
+      else sample_file = Rcpp::as<std::string>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "iter"); 
-      if (Rf_isNull(tsexp)) iter = 2000U;  
-      else iter = Rcpp::as<unsigned int>(tsexp); 
+      idx = find_index(args_names, std::string("iter")); 
+      if (idx == args_names.size()) iter = 2000U;  
+      else iter = Rcpp::as<unsigned int>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "warmup"); 
-      if (Rf_isNull(tsexp)) warmup = iter / 2; 
-      else warmup = Rcpp::as<unsigned int>(tsexp); 
+      idx = find_index(args_names, std::string("warmup")); 
+      if (idx == args_names.size()) warmup = iter / 2; 
+      else warmup = Rcpp::as<unsigned int>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "thin"); 
+      idx = find_index(args_names, std::string("thin")); 
       unsigned int calculated_thin = (iter - warmup) / 1000U;
-      if (Rf_isNull(tsexp)) thin = (calculated_thin > 1) ? calculated_thin : 1U;
-      else thin = Rcpp::as<unsigned int>(tsexp); 
+      if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1U;
+      else thin = Rcpp::as<unsigned int>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "leapfrog_steps");
-      if (Rf_isNull(tsexp)) leapfrog_steps = -1; 
-      else leapfrog_steps = Rcpp::as<int>(tsexp); 
+      idx = find_index(args_names, std::string("leapfrog_steps"));
+      if (idx == args_names.size()) leapfrog_steps = -1; 
+      else leapfrog_steps = Rcpp::as<int>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "epsilon"); 
-      if (Rf_isNull(tsexp)) epsilon = -1.0; 
-      else epsilon = Rcpp::as<double>(tsexp); 
+      idx = find_index(args_names, std::string("epsilon")); 
+      if (idx == args_names.size()) epsilon = -1.0; 
+      else epsilon = Rcpp::as<double>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "epsilon_pm"); 
-      if (Rf_isNull(tsexp)) epsilon_pm = 0.0; 
-      else epsilon_pm = Rcpp::as<double>(tsexp); 
+      idx = find_index(args_names, std::string("epsilon_pm")); 
+      if (idx == args_names.size()) epsilon_pm = 0.0; 
+      else epsilon_pm = Rcpp::as<double>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "max_treedepth"); 
-      if (Rf_isNull(tsexp))  max_treedepth = 10; 
-      else max_treedepth = Rcpp::as<int>(tsexp); 
+      idx = find_index(args_names, std::string("max_treedepth")); 
+      if (idx == args_names.size())  max_treedepth = 10; 
+      else max_treedepth = Rcpp::as<int>(in[idx]); 
      
-      tsexp = get_list_element_by_name(in, "epsilon_adapt"); 
-      if (Rf_isNull(tsexp)) epsilon_adapt = true; 
-      else epsilon_adapt = Rcpp::as<bool>(tsexp); 
+      idx = find_index(args_names, std::string("epsilon_adapt")); 
+      if (idx == args_names.size()) epsilon_adapt = true; 
+      else epsilon_adapt = Rcpp::as<bool>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "delta"); 
-      if (Rf_isNull(tsexp))  delta = 0.5;
-      else delta = Rcpp::as<double>(tsexp); 
+      idx = find_index(args_names, std::string("delta")); 
+      if (idx == args_names.size())  delta = 0.5;
+      else delta = Rcpp::as<double>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "gamma"); 
-      if (Rf_isNull(tsexp)) gamma = 0.05; 
-      else gamma = Rcpp::as<double>(tsexp); 
+      idx = find_index(args_names, std::string("gamma")); 
+      if (idx == args_names.size()) gamma = 0.05; 
+      else gamma = Rcpp::as<double>(in[idx]); 
       
-      tsexp = get_list_element_by_name(in, "refresh"); 
-      if (Rf_isNull(tsexp))  refresh = 1; 
-      else refresh = Rcpp::as<unsigned int>(tsexp); 
+      idx = find_index(args_names, std::string("refresh")); 
+      if (idx == args_names.size())  refresh = 1; 
+      else refresh = Rcpp::as<unsigned int>(in[idx]); 
 
 
-      tsexp = get_list_element_by_name(in, "seed"); 
-      if (Rf_isNull(tsexp)) {
+      idx = find_index(args_names, std::string("seed")); 
+      if (idx == args_names.size()) {
         random_seed = std::time(0); 
         random_seed_src = "random"; 
       } else {
-        random_seed = Rcpp::as<unsigned int>(tsexp); 
+        random_seed = Rcpp::as<unsigned int>(in[idx]); 
         random_seed_src = "user"; 
       }
 
-      tsexp = get_list_element_by_name(in, "chain_id"); 
-      if (Rf_isNull(tsexp)) { 
+      idx = find_index(args_names, std::string("chain_id")); 
+      if (idx == args_names.size()) { 
         chain_id = 1; 
         chain_id_src = "default"; 
       } else {
-        chain_id = Rcpp::as<unsigned int>(tsexp); 
+        chain_id = Rcpp::as<unsigned int>(in[idx]); 
         chain_id_src = "user"; 
       }
       
-      tsexp = get_list_element_by_name(in, "init"); 
-      if (Rf_isNull(tsexp)) init = "random"; 
-      else init = Rcpp::as<std::string>(tsexp); // "0", "user", or "random"
+      idx = find_index(args_names, std::string("init")); 
+      if (idx == args_names.size()) init = "random"; 
+      else init = Rcpp::as<std::string>(in[idx]); // "0", "user", or "random"
 
-      if (init == "user") init_lst = get_list_element_by_name(in, "init_lst"); 
-      else  init_lst = R_NilValue; 
+      idx = find_index(args_names, std::string("init_list")); 
+      if (idx == args_names.size()) init_list = R_NilValue; 
+      else init_list = in[idx]; 
 
       // rstan::io::rcout << "init=" << init << std::endl;  
-      // std::string yesorno = Rf_isNull(init_lst) ? "yes" : "no";
+      // std::string yesorno = Rf_isNull(init_list) ? "yes" : "no";
       // rstan::io::rcout << "init_list is null: " << yesorno << std::endl; 
 
-      tsexp = get_list_element_by_name(in, "append_samples"); 
-      if (Rf_isNull(tsexp)) append_samples = false; 
-      else append_samples = Rcpp::as<bool>(tsexp); 
+      idx = find_index(args_names, std::string("append_samples")); 
+      if (idx == args_names.size()) append_samples = false; 
+      else append_samples = Rcpp::as<bool>(in[idx]); 
 
-      tsexp = get_list_element_by_name(in, "num_chains"); 
-      if (Rf_isNull(tsexp)) num_chains = 1;
-      else num_chains = Rcpp::as<size_t>(tsexp); 
+      idx = find_index(args_names, std::string("num_chains")); 
+      if (idx == args_names.size()) num_chains = 1;
+      else num_chains = Rcpp::as<size_t>(in[idx]); 
 
     } 
     size_t get_num_chains() const {
@@ -200,7 +215,7 @@ namespace rstan {
     } 
 
     SEXP get_init_list() const {
-      return init_lst; 
+      return init_list; 
     } 
     int get_iter() const {
       return iter; 
@@ -247,7 +262,7 @@ namespace rstan {
     int get_random_seed() const {
       return random_seed; 
     } 
-   std::string get_init() const {
+    const std::string& get_init() const {
       return init;
     } 
     unsigned int get_chain_id() const {

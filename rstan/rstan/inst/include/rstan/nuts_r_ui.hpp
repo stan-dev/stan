@@ -26,7 +26,7 @@
 #include <stan/mcmc/sampler.hpp>
 #include <stan/mcmc/chains.hpp>
 
-#include <rstan/io/rlist_var_context.hpp> 
+#include <rstan/io/rlist_ref_var_context.hpp> 
 #include <rstan/nuts_args.hpp> 
 #include <rstan/io/r_ostream.hpp> 
 
@@ -141,7 +141,7 @@ namespace rstan {
      */
     
     template <class Model, class RNG> 
-    int nuts_command(const io::rlist_var_context& data, 
+    int nuts_command(const io::rlist_ref_var_context& data, 
                      const nuts_args& args, 
                      Model& model, 
                      stan::mcmc::chains<RNG>& chains_) {
@@ -191,7 +191,7 @@ namespace rstan {
           params_r = std::vector<double>(model.num_params_r(),0.0);
       } else if (init_val == "user") {
           Rcpp::List init_lst(args.get_init_list()); 
-          rstan::io::rlist_var_context init_var_context(init_lst); 
+          rstan::io::rlist_ref_var_context init_var_context(init_lst); 
           model.transform_inits(init_var_context,params_i,params_r);
       } else {
         init_val = "random initialization";
@@ -296,7 +296,7 @@ namespace rstan {
   class nuts_r_ui {
 
   private:
-    io::rlist_var_context data_;
+    io::rlist_ref_var_context data_;
     Model model_;
     nuts_args args_;
     stan::mcmc::chains<RNG> chains_; 
@@ -316,12 +316,19 @@ namespace rstan {
      *  chain_id 
      */ 
 
-    nuts_r_ui(SEXP data, SEXP args) : 
+    nuts_r_ui(SEXP data, SEXP args) : // try : 
       data_(Rcpp::as<Rcpp::List>(data)), 
       model_(data_), 
       args_(Rcpp::as<Rcpp::List>(args)), 
       chains_(args_.get_num_chains(), get_param_names(model_), get_param_dims(model_)) 
-    { }
+    { 
+    }/* catch (std::exception& e) {
+      rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
+      rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
+      throw; 
+    } */ 
+    // not really helpful of using try---catch though it could throw
+    // exception in the ctor.
 
     /**
      * This function would be exposed (using Rcpp module, see

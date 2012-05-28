@@ -82,5 +82,5 @@ dogsrr <- stan.model(model.code = dogsstan, model.name = model_name,
   nuts$call_nuts() 
   t <- nuts$get_first_p() 
 
-# post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
-# colMeans(post)
+post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
+colMeans(post)
