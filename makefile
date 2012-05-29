@@ -24,6 +24,7 @@ CFLAGS = -I src -I lib -O$O -Wall
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
+PATH_SEPARATOR = /
 
 # OS is set automatically by this script
 ##
@@ -74,27 +75,62 @@ bin/%.d : src/%.cpp
 	rm -f $@.$$$$);\
 	fi
 
+%.d : %.cpp
+	@if test -d $(dir $@); \
+	then \
+	(set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$);\
+	fi
+
 
 .PHONY: help
 help:
-	@echo '------------------------------------------------------------'
+	@echo '--------------------------------------------------------------------------------'
 	@echo 'Stan: makefile'
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
 	@echo '  - O (Optimize Level):      ' $(O)
-#	@echo '  - EXE (Executable posfix): ' $(EXE)
-	@echo 'Available targets: '
+	@echo ''
+	@echo 'Build a Stan model:'
+	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
+	@echo '  - foo/bar$(EXE)'
+	@echo ''
+	@echo '  This target will:'
+	@echo '  1. Build the Stan compiler: bin/stanc$(EXE).'
+	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp.'
+	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
+	@echo ''
+	@echo '  Example - Sample from a normal:'
+	@echo '    1. Copy src/models/basic_distributions/normal.stan to foo/normal.stan:'
+	@echo '       mkdir foo'
+	@echo '       cp src/models/basic_distributions/normal.stan foo'
+	@echo '    2. Build the model foo/normal$(EXE):'
+	@echo '       make foo/normal$(EXE)'
+	@echo '    3. Run the model:'
+	@echo '       foo'$(PATH_SEPARATOR)'normal$(EXE) --samples=foo/normal.csv'
+	@echo '    4. Look at the samples:'
+	@echo '       more foo/normal.csv'
+	@echo ''
+	@echo 'Common targets:'
+	@echo '  Model related:'
+	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '  - *$(EXE)        : Build '
+	@echo '  - models/*$(EXE):  If a Stan model exists at src/models/*.stan, this target'
+	@echo '                     will copy the Stan model to models/*.stan, then build the'
+	@echo '                     Stan model.'
 	@echo '  Tests:'
 	@echo '  - test-unit:   Runs unit tests.'
 	@echo '  - test-models: Runs diagnostic models.'
-	@echo '  - test-bugs:   Runs the bugs examples'
+	@echo '  - test-bugs:   Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all:    Runs all tests.'
 	@echo '  Clean:'
-	@echo '  - clean:       Basic clean. Leaves doc and compiled'
-	@echo '                 libraries intact.'
+	@echo '  - clean:       Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all:   Cleans up all of Stan.'
-	@echo '------------------------------------------------------------'
+	@echo '--------------------------------------------------------------------------------'
 
 
 -include make/libstan  # libstan.a
@@ -114,7 +150,6 @@ help:
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) -r *.dSYM
-	$(RM) $(LIBSTAN_OFILES) bin/libstan.a
 
 clean-dox:
 	$(RM) -r doc/api
@@ -129,8 +164,6 @@ clean-models:
 
 clean-demo:
 	$(RM) -r demo
-
-
 
 clean-all: clean clean-models clean-dox clean-demo
 	$(RM) -r test bin doc

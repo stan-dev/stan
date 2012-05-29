@@ -141,8 +141,4 @@ endif
 ##
 .PHONY: path_separator
 path_separator :
-ifeq ($(OS),win)
-	@echo '\'
-else
-	@echo '/'
-endif
+	@echo $(PATH_SEPARATOR)
