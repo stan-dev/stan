@@ -20,15 +20,10 @@ AR = ar
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I lib
-CFLAGS += -O$O
-CFLAGS += -Wall
-CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
-LIBGTEST = test/gtest.o
-GTEST_MAIN = lib/gtest/src/gtest_main.cc
-EXE = 
+CFLAGS = -I src -I lib -O$O -Wall
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
+EXE = 
 
 # OS is set automatically by this script
 ##
@@ -37,6 +32,7 @@ LDLIBS_STANC = -Lbin -lstanc
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - EXE
+#   - PCH
 ##
 -include make/os_detect
 

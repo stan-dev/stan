@@ -3,7 +3,6 @@
 # as appropriate:
 #   - CFLAGS
 #   - CFLAGS_GTEST
-#   - OPT
 #   - PCH
 ##
 

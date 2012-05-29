@@ -18,6 +18,7 @@ CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+  CFLAGS += -g
   LDLIBS += -static-libgcc 
   PCH = .gch
 endif
