@@ -17,6 +17,19 @@ CC = g++
 O = 3
 AR = ar
 
+##
+# Set default compiler options.
+## 
+CFLAGS = -I src -I lib
+CFLAGS += -O$O
+CFLAGS += -Wall -g
+CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
+LIBGTEST = test/gtest.o
+GTEST_MAIN = lib/gtest/src/gtest_main.cc
+EXE = 
+LDLIBS = -Lbin -lstan
+LDLIBS_STANC = -Lbin -lstanc
+
 # OS is set automatically by this script
 ##
 # These includes should update the following variables
@@ -36,18 +49,6 @@ AR = ar
 -include make/detect_cc
 # FIXME: verify compiler
 
-##
-# Set default compiler options.
-## 
-CFLAGS = -I src -I lib
-CFLAGS += -O$O
-CFLAGS += -Wall
-CFLAGS_GTEST = -I lib/gtest/include -I lib/gtest
-LIBGTEST = test/gtest.o
-GTEST_MAIN = lib/gtest/src/gtest_main.cc
-EXE = 
-LDLIBS = -Lbin -lstan
-LDLIBS_STANC = -Lbin -lstanc
 
 ##
 # Tell make the default way to compile a .o file.
@@ -86,6 +87,7 @@ help:
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
 	@echo '  - O (Optimize Level):      ' $(O)
+#	@echo '  - EXE (Executable posfix): ' $(EXE)
 	@echo 'Available targets: '
 	@echo '  Tests:'
 	@echo '  - test-unit:   Runs unit tests.'
