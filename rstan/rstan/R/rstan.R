@@ -8,7 +8,7 @@ stan.model <- function(file, verbose = FALSE,
 
   model.code <- get.model.code(file, model.code)  
   r <- stanc(model.code, model.name); 
-  inc <- paste("#include <rstan/nuts_r_ui.hpp>\n", 
+  inc <- paste("#include <rstan/rstaninc.hpp>\n", 
                r$cppcode, 
                get_Rcpp_module_def_code(model.name), 
                sep = ''); 

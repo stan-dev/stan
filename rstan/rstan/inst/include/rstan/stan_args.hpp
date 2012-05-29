@@ -8,10 +8,29 @@
 // #include <Rinternals.h> 
 
 #include <rstan/io/r_ostream.hpp> 
+#include <stan/version.hpp>
 
 namespace rstan {
 
   namespace {
+
+    void write_comment(std::ostream& o) {
+      o << "#" << std::endl;
+    }
+  
+    template <typename M>
+    void write_comment(std::ostream& o,
+                       const M& msg) {
+      o << "# " << msg << std::endl;
+    }
+  
+    template <typename K, typename V>
+    void write_comment_property(std::ostream& o,
+                                const K& key,
+                                const V& val) {
+      o << "# " << key << "=" << val << std::endl;
+    }
+
     /** 
      * Find the index of an element in a vector. 
      * @param v the vector in which an element are searched. 
@@ -26,7 +45,7 @@ namespace rstan {
     } 
   } 
   /**
-   * Wrap the available arguments for nuts sampler (and other samplers) from
+   * Wrap the available arguments for Stan's sampler, say NUTS, from
    * Rcpp::List and set the defaults if not available. 
    *
    *
@@ -61,8 +80,9 @@ namespace rstan {
    * </ul> 
    *
    */ 
-  class nuts_args {
+  class stan_args {
   private:
+    bool sample_file_flag; // true: write out to a file; false, do not 
     std::string sample_file; // the file for outputting the samples 
     unsigned int iter;   // number of iterations 
     unsigned int warmup; // number of warmup 
@@ -87,7 +107,7 @@ namespace rstan {
    
   public:
     /**
-    nuts_args(): 
+    stan_args(): 
       sample_file("samples.csv"),  
       iter(2000U), 
       warmup(1000U), 
@@ -111,13 +131,16 @@ namespace rstan {
       num_chains(1) {
     } 
     */
-    nuts_args(const Rcpp::List& in) {
+    stan_args(const Rcpp::List& in) {
       std::vector<std::string> args_names 
         = Rcpp::as<std::vector<std::string> >(in.names()); 
    
       size_t idx = find_index(args_names, std::string("sample_file")); 
-      if (idx == args_names.size()) sample_file = "samples.csv"; 
-      else sample_file = Rcpp::as<std::string>(in[idx]); 
+      if (idx == args_names.size()) sample_file_flag = false; 
+      else {
+        sample_file = Rcpp::as<std::string>(in[idx]); 
+        sample_file_flag = true; 
+      }
 
       idx = find_index(args_names, std::string("iter")); 
       if (idx == args_names.size()) iter = 2000U;  
@@ -207,6 +230,9 @@ namespace rstan {
     size_t get_num_chains() const {
       return num_chains; 
     } 
+    void set_random_seed(unsigned int seed) {
+      random_seed = seed;
+    } 
     const std::string& get_random_seed_src() const {
       return random_seed_src; 
     } 
@@ -223,6 +249,9 @@ namespace rstan {
     const std::string& get_sample_file() const {
       return sample_file; 
     } 
+    bool get_sample_file_flag() const { 
+      return sample_file_flag; 
+    }
     unsigned int get_warmup() const {
       return warmup; 
     } 
@@ -268,6 +297,25 @@ namespace rstan {
     unsigned int get_chain_id() const {
       return chain_id; 
     } 
+    void write_args_as_comment(std::ostream& ostream) const { 
+        // write_comment(ostream);
+        // write_comment_property(ostream,"data",data_file);
+        write_comment_property(ostream,"init",init);
+        write_comment_property(ostream,"append_samples",append_samples);
+        write_comment_property(ostream,"seed",random_seed);
+        write_comment_property(ostream,"chain_id",chain_id);
+        write_comment_property(ostream,"chain_id_src",chain_id_src);
+        write_comment_property(ostream,"iter",iter); 
+        write_comment_property(ostream,"warmup",warmup);
+        write_comment_property(ostream,"thin",thin);
+        write_comment_property(ostream,"leapfrog_steps",leapfrog_steps);
+        write_comment_property(ostream,"max_treedepth",max_treedepth);
+        write_comment_property(ostream,"epsilon",epsilon);
+        write_comment_property(ostream,"epsilon_pm",epsilon_pm);
+        write_comment_property(ostream,"delta",delta);
+        write_comment_property(ostream,"gamma",gamma);
+        write_comment(ostream);
+    }
   }; 
 } 
 

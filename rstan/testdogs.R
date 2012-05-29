@@ -76,10 +76,11 @@ dogsrr <- stan.model(model.code = dogsstan, model.name = model_name,
                      verbose = TRUE) 
 
 # samples(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
-  args <- list(init = 'random', sample_file = 'dogs.csv', iter = 2012)
+  args <- list(init.t = 'random', sample_file = 'dogs.csv', n.iter = 2012)
   dogsdat <- rstan:::data.preprocess(dogsdat)
-  nuts <- new(dogsrr@.modelmod$nuts, dogsdat, args)
-  nuts$call_nuts() 
+  nuts <- new(dogsrr@.modelmod$nuts, dogsdat, 1)
+  nuts$call_sampler(args) 
+  nuts$call_sampler(args) 
   t <- nuts$get_first_p() 
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 

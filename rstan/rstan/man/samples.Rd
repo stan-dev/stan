@@ -12,7 +12,7 @@
 \usage{
   %% samples(object, \dots)  
   \S4method{samples}{stanmodel}(object, data, n.chains = 1L, n.iter = 2000L, 
-    n.warmup = as.integer(n.iter / 2), 
+    n.warmup = floor(n.iter / 2), 
     thin = 1L, init.t = 'random', init.v = NULL, seed, 
     sample.file, \dots, verbose = FALSE)   
 } 

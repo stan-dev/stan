@@ -114,8 +114,105 @@ get.model.code <- function(file, model.code = '') {
 } 
 
 
+
+check.args <- function(argss) {
+  if (FALSE) stop() 
+} 
+
 #
 # model.code <- read.model.from.con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan');
 # cat(model.code)
 
 
+append.id <- function(file, id, suffix = '.csv') {
+  fname <- basename(file)
+  fpath <- dirname(file)
+  fname2 <- gsub("\\.csv[[:space:]]*$", 
+                 paste("_", id, ".csv", sep = ''), 
+                 fname)
+  if (fname2 == fname) 
+    fname2 <- paste(fname, "_", id, ".csv", sep = '')
+  file.path(fpath, fname2)
+}
+
+
+
+config.argss <- function(n.chains, n.iter, n.warmup, n.thin, 
+                        init.t, init.v,
+                        seed, sample.file, ...) {
+
+  ## seed: only one seed is needed by virtue of the RNG 
+
+  n.iters <- rep(n.iter, n.chains)   
+  n.thins <- rep(n.thin, n.chains)  
+  n.warmups <- rep(n.warmup, n.chains) 
+
+  init.t <- as.character(init.t)
+  init.t[which(!init.t %in% c("0", "user"))] <- 'random'
+
+  init.ts <- rep(init.t, n.chains)  
+  
+  init.vs <- vector("list", n.chains) 
+
+  if (!missing(init.v) && !is.null(init.v)) {
+    if (is.function(init.v)) {
+      ## the function could take an argument named by chain.id 
+      ## from 1 to num.chains. 
+      if (any(names(formals(init.v)) == "chain.id")) {
+        for (i in 1:n.chains)  
+          init.vs[[i]] <- init.v(chain.id = i)
+      } else {
+        for (i in 1:n.chains)  
+          init.vs[[i]] <- init.v() 
+      } 
+    } else if (is.list(init.v)) {
+      if (length(init.v) != n.chains) 
+        stop("Initial value list mismatch number of chains") 
+      if (!any(sapply(init.v, is.list))) {
+        # print(init.v)
+        stop("Initial value list is not a list of lists") 
+      }
+      init.vs <- init.v 
+    } else { 
+        stop("Wrong specification of initial values")
+    } 
+  } 
+
+  argss <- vector("list", n.chains)  
+  ## the name of arguments in the list need to 
+  ## match those in include/rstan/nuts_args.hpp 
+  for (i in 1:n.chains)  
+    argss[[i]] <- list(chain_id = i, 
+                       iter = n.iters[i], thin = n.thins[i], 
+                       warmup = n.warmups[i], init = init.ts[i]) 
+                
+    
+  if (!missing(init.v) && !is.null(init.v))  
+    for (i in 1:n.chains) 
+      argss[[i]]$init_list = init.vs[[i]]   
+
+  if (!missing(seed))  
+      argss[[i]]$seed <- seed; 
+
+  if (!missing(sample.file) && n.chains > 1) 
+    for (i in 1:n.chains) 
+      argss[[i]]$sample_file <- append.id(sample.file, i) 
+
+  check.args(argss) 
+  
+  argss 
+} 
+
+
+#### temporary test code 
+#  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
+#  print(a) 
+#  
+#  fun1 <- function(chain.id) {
+#    cat("chain.id=", chain.id)
+#    return(list(mu = chain.id));
+#  } 
+#  b <- config.argss(3, c(100, 200), 10, 1, c("user", 1), fun1, seed = 3) 
+#  print(b)
+#  
+#  

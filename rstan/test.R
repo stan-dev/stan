@@ -31,7 +31,7 @@ samples(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
 
 
 samples(rr, data = dat, n.iter = 2012, init.t = 'user', 
-        init.v = list(mu = 2), seed = 3, thin = 1, 
+        init.v = list(list(mu = 2)), seed = 3, n.thin = 1, 
         sample.file = 'norm1.csv')
 
 post <- read.csv(file = 'norm1.csv', header = TRUE, skip = 19) 
@@ -44,17 +44,19 @@ colMeans(post)
 ### 
 
 samples(rr, data = dat, n.iter = 2012, init.t = 'user', 
-        init.v = list(mu2 = 2), seed = 3, thin = 1, 
+        init.v = list(list(mu2 = 2)), seed = 3, thin = 1, 
         sample.file = 'norm1.csv')
 
 # stan.samples(b, dat, n.chains = 1, n.iter = 2012, 
 #              init.t = 'user', init.v = list(mu1 = 2)) 
 
 
+
 yasfile <- paste(model_name, ".csv", sep = '')  
 
 samples(rr, data = dat, n.iter = 2012, init.t = 'random', 
-        seed = 3, thin = 1, 
+        n.chains = 4,
+        seed = 3, n.thin = 1, 
         sample.file = yasfile) 
 
 post <- read.csv(file = yasfile, header = TRUE, skip = 19) 
@@ -66,7 +68,7 @@ colMeans(post)
 ##   1. add data check and as.integer for dat
 ##   2. check args list, for example postiveness of 
 ##      some arguments.  
-##   3. wrap b$call_nuts to a R function: creating the hmc_args list 
+##   3. wrap b$call_sampler to a R function: creating the hmc_args list 
 ##      from given R function's parameters, which should be more friendly. 
 ##   4. s4 class for stan object to do print, plot, etc. 
 ##   5. include chain object into the c++ code. 
