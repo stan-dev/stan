@@ -157,6 +157,9 @@ Stan-R
 EXTENSIONS
 =================================================
 
+* figure out how to include error handling for std lib functions
+  like log(double).  
+
 * cumulative distribution functions
   - to add:
      + calculation of cdf
