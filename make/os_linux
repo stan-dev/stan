@@ -3,13 +3,12 @@
 # as appropriate:
 #   - CFLAGS
 #   - CFLAGS_GTEST
-#   - OPT
 #   - EXE
+#   - PCH
 ##
 
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -g
-  CFLAGS_GTEST += -g
   CFLAGS_GTEST += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   PCH = .gch
@@ -17,7 +16,6 @@ endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -g
 #  CFLAGS += -m32
-  CFLAGS_GTEST += -g
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
