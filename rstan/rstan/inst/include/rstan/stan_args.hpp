@@ -1,6 +1,6 @@
 
-#ifndef __RSTAN__IO__NUTS_ARGS_HPP__
-#define __RSTAN__IO__NUTS_ARGS_HPP__
+#ifndef __RSTAN__STAN_ARGS_HPP__
+#define __RSTAN__STAN_ARGS_HPP__
 
 
 #include <Rcpp.h>
@@ -52,10 +52,11 @@ namespace rstan {
    * The following arguments could be in the names lists
    *
    * <ul>
-   * <li> sample_file: into which samples are written (default: samples.csv)
+   * <li> sample_file: into which samples are written 
    * <li> iter: total number of iterations, including warmup (default: 2000)  
    * <li> warmup: 
    * <li> thin 
+   * <li> chain_id: it should be from 1 to number of chains  
    * <li> refresh 
    * <li> leapfrog_steps
    * <li> epsilon
@@ -97,7 +98,7 @@ namespace rstan {
     double gamma; 
     int random_seed; 
     std::string random_seed_src; // "user" or "default" 
-    unsigned int chain_id; 
+    size_t chain_id; 
     std::string chain_id_src; // "user" or "default" 
     bool append_samples; 
     bool test_grad; 
@@ -294,7 +295,7 @@ namespace rstan {
     const std::string& get_init() const {
       return init;
     } 
-    unsigned int get_chain_id() const {
+    size_t get_chain_id() const {
       return chain_id; 
     } 
     void write_args_as_comment(std::ostream& ostream) const { 

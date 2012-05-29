@@ -1,6 +1,6 @@
 
-#ifndef __RSTAN__NUTS_R_UI_HPP__
-#define __RSTAN__NUTS_R_UI_HPP__
+#ifndef __RSTAN__STAN_FIT_HPP__
+#define __RSTAN__STAN_FIT_HPP__
 
 #include <cmath>
 #include <cstddef>
@@ -93,7 +93,7 @@ namespace rstan {
                      std::vector<int>& params_i,
                      Model& model,
                      stan::mcmc::chains<RNG>& chains,
-                     unsigned int chain_id) {
+                     size_t chain_id) {
   
       sampler.set_params(params_r,params_i);
 
@@ -176,7 +176,7 @@ namespace rstan {
 
       unsigned int refresh = args.get_refresh(); 
 
-      unsigned int chain_id = args.get_chain_id(); 
+      size_t chain_id = args.get_chain_id(); 
 
       // FASTER, but no parallel guarantees:
       // typedef boost::mt19937 rng_t;

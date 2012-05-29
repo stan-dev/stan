@@ -4,6 +4,7 @@
 
 \chapter{Markov Chain Monte Carlo Sampling}
 
+\noindent
 Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
 generate the samples.  The particular techniques are discussed in the
 following this section in \refsection{intro-samplers}.
@@ -232,6 +233,7 @@ sampling otherwise.
 
 \chapter{Variable Transforms}\label{variable-transforms.chapter}
 
+\noindent
 To avoid having to deal with constraints while simulating the
 Hamiltonian dynamics during sampling, every (multivariate) parameter
 in a \Stan model is transformed to an unconstrained variable behind
@@ -1127,6 +1129,7 @@ Jacobian determinants of the exponentiation and product transforms,
 
 \chapter{The C++ Model Class}
 
+\noindent
 The generated \Cpp class extends a built-in \Stan abstract
 base class for probability models.  Instances of the class are
 constructed from a specified data vector $y$.  The data vector $y$
@@ -1160,3 +1163,81 @@ not dependent on the dimensionality of the parameter vector.
 
 
 \chapter{Optimizing \Stan Code}\label{optimization.chapter}
+\noindent
+
+\section{Exploiting Sufficient Statistics}
+
+In some cases, the model may be rewritten to exploit the conjugacy.
+For instance, consider a simple Bernoulli sampling model.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    int(0,1) y[N];
+    real(0,) alpha;
+    real(0,) beta;
+}
+parameters {
+    real(0,1) theta;
+}
+model {
+    theta ~ beta(alpha,beta);
+    for (n in 1:N) 
+        y[n] ~ bernoulli(theta);
+\end{Verbatim}
+\end{quote}
+%
+In this model, the sum of positive outcomes in \code{y} is a
+sufficient statistic for the chance of success \code{theta}.  The
+model may be recoded using the binomial distribution as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+    theta ~ beta(alpha,beta);
+    sum(y) ~ binomial(size(y),theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\section{Exploiting Conjugacy}
+
+
+Continuing the model from the previous section, the conjugacy of the
+beta prior and binomial sampling distribution allow the model to be
+further optimized to the following equivalent form.
+%
+\begin{quote}
+\begin{Verbatim}
+   theta ~ beta(alpha + sum(y), beta + N - sum(y));
+\end{Verbatim}
+\end{quote}
+%
+
+% \section{Using Forward Sampling}
+
+% In fact, at this point, simple (non Markov chain) Monte Carlo may be
+% used because the parameters to the beta distribution are specified and
+% there are no variables that depend on \code{theta}.  Thus this model
+% could be even further optimized by replacing the declaration of
+% \code{theta} as a parameter with a declaration as a generated quantity
+% and then generating the quantity directly.
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% generated quantities {
+%     real(0,1) theta;
+%     theta ~ random_beta(alpha + sum(y), beta + N - sum(y));
+% }
+% \end{Verbatim}
+% \end{quote}
+% %
+% When used in the generated quantities block, sampling statements such
+% as that for \code{theta} are executed by taking a sample from the
+% specified distribution directly. The result is a Monte Carlo estimate
+% of \code{theta} in which every sample is independent (up to the limits
+% of the pseudorandom number generator, of course).  Thus the effective
+% sample size should be estimated as being roughly equal to the sample
+% size.

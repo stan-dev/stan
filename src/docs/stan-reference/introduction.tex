@@ -3,6 +3,7 @@
 
 \chapter{Overview}
 
+\noindent
 This document is both a user's guide and a reference manual for
 \Stan's probabilistic modeling language.  This introductory chapter
 provides a high-level overview of \Stan.  The next chapter provides a
@@ -65,43 +66,42 @@ $p(\theta|y;x)$.
 \section{\Stan's Samplers}
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
-sampling.  \Stan 1.0 can only sample discrete parameters on which no
-other parameters depend, such as simulated values.
-\refchapter{mixture-modeling} discusses how finite discrete parameters
-can be summed out of models.
+sampling, a form of Markov chain Monte Carlo (\MCMC) sampling.  \Stan
+1.0 can only sample discrete parameters on which no other parameters
+depend, such as simulated values.  \refchapter{mixture-modeling}
+discusses how finite discrete parameters can be summed out of models.
 
-\HMC is a form of Markov chain Monte Carlo (\MCMC) sampling.  \HMC
-accelerates both convergence to the stationary distribution and
+\HMC accelerates both convergence to the stationary distribution and
 subsequent parameter exploration by using the gradient of the log
 probabilty function.  The unknown quantity vector $\theta$ is
 interpreted as the position of a fictional particle.  Each iteration
 generates a random momentum and simulates the path of the particle
 with potential energy determined the (negative) log probability
-function evaluated at position of $\theta$.  Hamilton's decomposition
-shows that the gradient of this potential determines change in
-momentum and the momentum determines the change in position.  These
-continuous changes over time are approximated using the leapfrog
-algorithm, which breaks the time into discrete steps which are easily
-simulated.  A Metropolis reject step is then applied to correct for
-any simulation error and ensure detailed balance of the resulting
-Markov chain transitions.
+function.  Hamilton's decomposition shows that the gradient of this
+potential determines change in momentum and the momentum determines
+the change in position.  These continuous changes over time are
+approximated using the leapfrog algorithm, which breaks the time into
+discrete steps which are easily simulated.  A Metropolis reject step
+is then applied to correct for any simulation error and ensure
+detailed balance of the resulting Markov chain transitions.
 
 Standard \HMC involves three ``tuning'' parameters to which its
 behavior is quite sensitive.  \Stan's samplers allow these parameters
 to be set by hand or set automatically without user intervention.
 
 The first tuning parameter is a mass matrix for the fictional
-particle.  \Stan can be set to use a unit mass matrix, a user-defined
+particle.  \Stan can be configured to use a unit mass matrix, a user-defined
 diagonal mass matrix, or to estimate a diagonal mass matrix during
 warmup.  The latter has the effect of normalizing the scale of each
 element $\theta_k$ of the unknown variable sequence $\theta$.
 
 The other two tuning parameters set the temporal step size of the
 discretization of the Hamiltonian and the total number of steps taken
-per iteration.  \Stan can be set to use a user-specified step size
-or it can estimate an optimal step size during warmup.  In either case,
-additional randomization may be applied to draw the step size from
-an interval of possible step sizes.  
+per iteration.  \Stan can be configured with a user-specified step
+size or it can estimate an optimal step size during warmup using dual
+averaging \citep{Hoffman-Gelman:2012}.  In either case, additional
+randomization may be applied to draw the step size from an interval of
+possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
@@ -113,10 +113,10 @@ no-U-turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.
 Samples in a Markov chain are only drawn with the marginal
 distribution $p(\theta|y;x)$ after the chain has converged to its
 stationary distribution.  There are several methods to test whether an
-\MCMC method has failed to converge (unforunately, passing the tests
-does not guarantee convergence).  The recommended method for \Stan is to
-run multiple Markov chains, discard the warmup samples, then split the
-remainder of each chain in half and compute the potential scale
+\MCMC method has failed to converge; unforunately, passing the tests
+does not guarantee convergence.  The recommended method for \Stan is
+to run multiple Markov chains, discard the warmup samples, then split
+the remainder of each chain in half and compute the potential scale
 reduction statistic, $\hat{R}$ \citep{GelmanRubin:1992}.
 
 When estimating a mean based on $M$ independent samples, the
@@ -161,11 +161,16 @@ data.
 
 \chapter{Getting Started}
 
+\noindent
 This chapter is designed to help users get acquainted with the overall
 design of the \Stan language and calling \Stan from the command line.
-For installation information, see \refappendix{install}.
 Later chapters are devoted to expanding on the material in this
 chapter with full reference documentation.
+
+\section{Installation}
+
+For installation information for the tools needed for Stan on Windows,
+Mac, and Linux platforms, see \refappendix{install}.
 
 
 \section{A Minimal Program}
@@ -202,12 +207,12 @@ sample a single unit normal variate.
 
 In \Stan, every variable declaration and atomic statement must be
 terminated by a semicolon (\code{;}).  This is the convention followed
-by programming languages such as \Cpp.  It is not the convention
-followed by the statistical languages \R, \BUGS, or \JAGS.
+by programming languages such as \Cpp, but not the convention followed
+by the statistical languages \R and \BUGS.
 
 The reason for the \Cpp convention is to ensure that differences in
-whitespace are not meaningful.  In \R, \BUGS, and \JAGS, the following
-is a complete, legal statement.
+whitespace are not meaningful.  The following is a complete, legal
+statement in \R and \BUGS.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -216,9 +221,7 @@ a <- b +
 \end{Verbatim}
 \end{quote}
 %
-In contrast, the usual way of typesetting mathematics and laying out
-code in programming languages, with the operator continuing the
-expression beginning a new line, is invalid.
+In contrast, the following is illegal in \R and \BUGS.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -227,14 +230,56 @@ a <- b
 \end{Verbatim}
 \end{quote}
 %
-The only difference is in the kind of whitespace between \code{b} and
-\code{+} and between \code{+} and \code{c}.  In \Stan, there is no
-whitespace-dependent behavior.  Neither of these is a complete
-statement, whereas either one terminated with a semicolon is.  The
-second form is recommended for \Cpp and \Stan.
+The only difference is in the placement of whitespace.  In \Stan,
+there is no whitespace-dependent behavior.  Neither of these is a
+complete statement, whereas either one terminated with a semicolon is.
+The second form is recommended for \Cpp and \Stan; it is the
+convention adopted by most programming languages and in typesetting
+mathematics because it allows easier visual identification of
+continued lines.
 
 
-\section{Compiling  with {\tt\bfseries stanc}}
+\section{Unpacking \Stan}
+
+The first step in using \Stan is unpacking the gzipped tar file into
+its own directory.  This can be done with a system tool, or on the
+command line with the \code{tar} command as follows.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> tar -xzf stan-1.0.0.tgz
+...
+> cd stan-1.0.0
+\end{Verbatim}
+\end{quote}
+%
+Throughout the documentation, \code{\$stan} will be used as a
+placeholder for the top-level directory, \code{stan-1.0.0}, containing
+\Stan.
+
+
+\section{Building \Stan's Libraries}
+
+Once all the tools required for \Stan are installed (see
+\refappendix{install}), \Stan's libraries must be built.  There is a
+makefile supplied so that this can be done with one commad.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd $stan
+> make CC=g++ O=3 bin/libstan.a bin/stanc
+\end{Verbatim}
+\end{quote}
+%
+This will make the \Stan library archive, \code{libstan.a}, and the
+model compiler \code{stanc}.  The two options specify to use the
+\code{g++} compiler for \Cpp and optimization level 3.  For a list
+of compatible compilers and versions, see \refappendix{install}.
+
+
+
+
+\section{Compiling  with \code{stanc}}
 
 Starting at \Stan's home directory, written here as {\tt \$stan},
 the model may be compiled by the \Stan compiler, \stanc, into \Cpp code
@@ -268,17 +313,22 @@ uses the \clang compiler for \Cpp.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> g++ -I src -I lib anon_model.cpp 
+> g++ -O3 -Lbin -lstan -Isrc  -Ilib anon_model.cpp 
 \end{Verbatim}
 \end{quote}
 %
-This command invokes the \clang compiler for \Cpp to create a
+This command invokes the \code{g++} compiler for \Cpp to create a
 platform-specific executable in the default location, which is {\tt
-  a.out} by convention.  If all goes well, as above, there is no
-output to the console.  More information about compiling the \Cpp code
-generated by \Stan may be found in \refchapter{compiling-cpp}.
-Installation information for \Cpp compilers may be found in
-\refappendix{install}.
+  a.out} by convention.  The \code{-O} option is for optimization
+level 3, \code{-L} option specifies where to look for compiled
+libraries, the \code{-l} option specifies the library to look for, and
+the two \code{-I} libraries point to header files for \Stan and its
+dependencies.
+
+If all goes well, as above, there is no output to the console.  More
+information about compiling the \Cpp code generated by \Stan may be
+found in \refchapter{compiling-cpp}.  Installation information for
+\Cpp compilers may be found in \refappendix{install}.
 
 \section{Running the Sampler}
 
@@ -313,9 +363,16 @@ Iteration: 2000 / 2000 [100%]  (Sampling)
 \end{Verbatim}
 \end{quote}
 %
+For more information on configuring the compiled sampler, see
+\refchapter{stan-cmd}.
+
+\section{Inspecting the Output}
+
 The program indicates to the standard output that the samples are
-written to \code{samples.csv}.  The first few lines of this file
-are comments about aspects of the run.
+written to \code{samples.csv}.  The first few lines of this file are
+comments about aspects of the run; see \refchapter{stan-cmd} for more
+information on these settings, most of which are user configurable
+from the command line.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -377,6 +434,9 @@ values are parameters.  Here, the model has only one parameter, {\tt
 Note that the second sampled value is repeated.  This is not a bug.
 Rather, it is the behavior to expect from a sampler using a Metropolis
 acceptance step for proposals, as \Stan's samplers \HMC and \NUTS do.
+The reduction in inferential power due to the repetition is accounted
+for in the effective sample size calculation, which adjusts for
+autocorrelation in the sample sequence.
 
 \section{Data}
 
@@ -397,16 +457,15 @@ can be used to estimate a Bernoulli parameter \code{theta} from
 \begin{quote}
 \begin{Verbatim}
 data {
-  int(0,) N;
-  int(0,1) y[N];
+   int(0,) N;
+   int(0,1) y[N];
 }
 parameters {
-  real(0,1) theta;
+   real(0,1) theta;
 }
 model {
-  theta ~ beta(1,1);
-  for (n in 1:N)
-    y[n] ~ bernoulli(theta);
+   for (n in 1:N)
+      y[n] ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
@@ -423,20 +482,19 @@ are accessed using standard array notation, indexing from 1, as \code{y[1]},
 \code{y[2]}, ..., \code{y[N]}.
 
 The \code{parameters} block declares a single parameter, \code{theta}.
-Its type is given as \code{real(0,1)}, meaning it takes on continuous
-values between 0 and 1 inclusive.  The constraint is necessary in
-order to ensure that \code{theta} takes on a legal value as the
-success parameter in the Bernoulli distribution in which it is used in
-the \code{model} block of the program.
+The parameter \code{theta} is declared as type \code{real(0,1)},
+contstraining it to continuous values between zero and one inclusive,
+to ensure it satisfies the constraint placed on it by the probability
+function \code{bernoulli} in the \code{model} block.
 
 The \code{model} block consists of a for-loop for the data.   The loop is
 specified so that the body is executed for values of \code{n} between
 \code{1} and \code{N} inclusive.  The body here is a sampling
 statement specifying that the variable \code{y[n]} is modeled as
-having a Bernoulli distribution with parameter \code{theta}.  
+having a Bernoulli distribution with chance of success \code{theta}.  
 
 A sample data file for this program can be found in the file
-\code{bernoulli.Rdata} in the same directory.  This data file has
+\code{bernoulli.Rdata} in the same directory as the model.  This data file has
 the following contents.
 %
 \begin{quote}
@@ -450,56 +508,75 @@ A data file must contain appropriate values for all of the data
 variables declared in the \Stan program's \code{data} block.  Here there
 is a non-negative integer value for \code{N} and an array of length
 \code{N} (i.e., 10) integer values between 0 and 1 inclusive.  The
-array is coded using the \SPLUS sequence notation \code{c(...)}.
+array is coded using the same sequence notation as used by \R,  \code{c(...)}.
 The dump format supported by \Stan is documented in \refchapter{dump}.
 
-The program is compiled by \stanc and the \Cpp compiler in the same
-way.  This time, the output model gets an explicitly specified name.
+The data is not part of the compiled model.  Thus, the \Stan program
+is compiled by \stanc and the \Cpp compiler in the same way as the
+program in the previous section.  This time, the output model gets an
+explicitly specified name.
 %
 %
-\begin{quote}
+\begin{center}
 \begin{Verbatim}[fontshape=sl]
-> bin/stanc --name=bern src/models/basic_estimators/bernoulli.stan 
+ > bin/stanc --name=bern src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \begin{Verbatim}
-Model name=bern
-Input file=src/models/basic_estimators/bernoulli.stan
-Output file=bern.cpp
+ Model name=bern
+ Input file=src/models/basic_estimators/bernoulli.stan
+ Output file=bern.cpp
 \end{Verbatim}
-\end{quote}
+\end{center}
 %
 As before, the \Cpp compiler needs to be given the name of
 generated file.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> g++ -O3 -I src -I lib -o bern bern.cpp
+> g++ -O3 -Lbin -lstan -Isrc -Ilib -o bern bern.cpp
 \end{Verbatim}
 \end{quote}
 %
-There are two new compiler options here.  The option \code{-O3} sets
-optimization to level 3, which generates much faster executable
-code at the expense of slower compilation.  The name of the
-executable is also specified, using the option \code{-o~bern}.  Now
-the code may be executed by calling its executable with the data file
-specified. 
+The new compiler option, \code{-o~bern}, specifies the name of the
+executable file.  Now the code may be executed by calling its
+executable with the data file specified.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./bern --data=src/models/basic_estimators/bernoulli.Rdata
 \end{Verbatim}
 \end{quote}
+%
+The command-line option \code{--data=} provides the location of the
+data file.
 
 \section{Proper and Improper Priors}
 
+Priors are not required for variables in \Stan.  That is, not every
+parameter need not show up on the left-hand side of a sampling
+statement in the model.  
+
+\subsection{Implicit Uniform Priors}
+
 The model in the previous section does not contain a sampling
-statement for \code{theta}.  The default behavior is to give
-\code{theta} a uniform prior.  In this case, a uniform prior is proper
-because \code{theta} is bounded to a finite interval.  Improper priors
-are also allowed in \Stan programs; they arise from unconstrained
-parameters without sampling statements.  The uniform prior could have
-also been added explicitly by adding the following statement to the
-\code{model} block of the program.
+statement for \code{theta}.  Not specifying a prior is equivalent to
+specifying a uniform prior.  
+
+A uniform prior is only proper if the parameter is bounded, as was the
+case for \code{theta} in the previous section.  In this case, the
+implicit uniform prior is proper because \code{theta} is bounded to a
+finite interval.
+
+Improper priors are also allowed in \Stan programs; they arise from
+unconstrained parameters without sampling statements.  In some cases,
+an improper prior may lead to a proper posterior, but it is up to the
+user to guarantee that constraints on the parameter(s) or the data
+ensure the propriety of the posterior.
+
+\subsection{Explicit Priors}
+
+The uniform prior could have also been added explicitly by adding the
+following statement to the \code{model} block of the program.
 %
 \begin{quote}
 \begin{Verbatim} 
@@ -507,8 +584,11 @@ theta ~ uniform(0,1);
 \end{Verbatim}
 \end{quote}
 % 
-A third way to specify that \code{theta} has a uniform distribution
-between 0 and 1 is with the beta distribution.
+
+\subsection{Conjugate Priors}
+
+Because $\distro{Beta}(1,1)$ is the uniform distribution on $(0,1)$,
+a uniform prior on \code{theta} may also be specified as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -516,26 +596,28 @@ theta ~ beta(1,1);
 \end{Verbatim}
 \end{quote}
 %
-The beta distribution is conjugate to the Bernoulli, but \Stan (at
-least as of yet) does not make use of this information.  On the other hand,
-these three approaches, no prior, uniform prior, and beta prior,
-are equally efficient in \Stan's sampler, because their uniformity
-can be determined at compile time and thus computations related to
-them eliminated.  There is further discussion of \Stan optimization
-in \refchapter{optimization}.
+The beta distribution is conjugate to the Bernoulli, meaning that the
+posterior is also a beta distribution.  In theory, the closed form of
+the posterior would allow for more efficient sampling, but \Stan,
+least as of yet, does not make use of this information.  See
+\refchapter{optimization} for information on how to code sufficient
+statistics and conjugate priors directly in \Stan to speed this model up.
+
+
+
+
 
 \section{Comments}
-
-\Stan supports the three major style of comments.  
 
 If the character \code{\#} appears on a line, that character and every
 character up to but not including the end of line is ignored.  This is
 the style of comments used in Python, R, and the shell.  
 
-If the character pair \code{//} appears on a line, that pair and every
-character up to but not including the end of line is ignored.  This is
-the style of comments used in C.  This is the preferred commenting
-style for line-based comments and for commenting out code.
+If the character pair \code{//} appears together on a line, that pair
+and every character up to but not including the end of line is
+ignored.  This is the style of comments used in C.  This is the
+preferred commenting style for line-based comments and for commenting
+out code.
 
 \Stan also supports \Cpp comment style in which any content placed
 between \code{/*} and \code{*/} is ignored along with the boundary
@@ -546,16 +628,10 @@ an internal close comment sequence, \code{*/}, may take precedence.
 
 \section{User-Defined Distributions and Functions}
 
-\Stan allows new distributions to be coded directly in its modeling
-language, as described in \refchapter{custom-probability-functions}. 
-
-Extending \Stan's underlying \Cpp API provides a way to add new
-functions that may be implemented efficiently and used across
-different \Stan programs.
-
-\refappendix{user-defined-functions} documents the way in which new
-basic functions may be added to \Stan.  The new functions may use
-algorithmic differentiation to compute the partial derivatives of
-their output with respect to the input variables, or the user may
-directly specify the partials for increased efficiency.
+\Stan allows new distributions to be coded in one of two ways, either
+directly in its modeling language (see
+\refchapter{custom-probability-functions}), or by extending the
+modeling language using \Cpp (see
+\refappendix{user-defined-functions}).  The latter is more efficient
+and also portable across models.
 
