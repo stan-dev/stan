@@ -113,7 +113,7 @@ help:
 	@echo '    3. Run the model:'
 	@echo '       foo'$(PATH_SEPARATOR)'normal$(EXE) --samples=foo/normal.csv'
 	@echo '    4. Look at the samples:'
-	@echo '       more foo/normal.csv'
+	@echo '       more foo'$(PATH_SEPARATOR)'normal.csv'
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
