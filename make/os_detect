@@ -17,7 +17,7 @@ endif
 # These includes should update the following variables
 # based on the OS:
 #   - CFLAGS
-#   - CFLAGS_GTEST
 #   - EXE
+#   - PCH
 ##
 -include make/os_$(OS)
