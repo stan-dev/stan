@@ -1,93 +1,38 @@
-
-
-
-
-
-
 \part{Programming Techniques}\label{programming-techniques.part}
 
 
 
-\chapter{Missing Data}
+\chapter{Missing Data \& Partially Known Parameters}
 
-\section{Known and Unknown Quantities}
-
+\noindent
 \BUGS and \R support mixed arrays of known and missing data.  In
 \BUGS, known and unknown values may be mixed as long as every unknown
 variable appears on the left-hand side of either an assignment or
 sampling statement.  
 
+\section{Missing Data}
+
+
 \Stan treats variables declared in the \code{data} and
 \code{transformed data} blocks as known and the variables in the
 \code{parameters} block as unknown.
 
-\subsection{Mixing Known and Unknown Quantities}
-
-The \code{transformed parameters} block may be used to combine known
-and unknown values.  The following program skeleton provides an example.
+The next section shows how to create a mixed array of known and
+unknown values as in \BUGS.  The recommended approach to missing data
+in \Stan is slightly different than in \BUGS.  An example involving
+missing normal observations%
+%
+\footnote{A more meaningful estimation example would involve a
+  regression of the observed and missing observations using predictors
+  that were known for each and specified in the \code{data} block.}
+%
+could be coded as follows.
 %
 \begin{quote}
 \begin{Verbatim}
 data {
-  int K;   
-  int N_obs;               
-  int N_miss;
-  real y_obs[N_obs];
-}
-transformed data {
-  int N;   
-  N <- N_obs + N_miss;
-}
-parameters {
-  real beta[K];
-  real(0,) sigma;
-  real y_miss[N_miss];
-}
-transformed parameters {
-  real y[N];
-  for (n in 1:N_obs)  
-    y[n] <- y_obs[n];
-  for (n in 1:N_miss) 
-      y[n + N_obs] <- y_miss[n];
-}
-model {
-  for (n in 1:N)
-    y[n] ~ normal(mu,sigma);
-}
-\end{Verbatim}
-\end{quote}
-%
-The transformed parameter array \code{y} is declared to be of size
-\code{N}, the combined size of the observed and missing data arrays,
-and then defined by copying the observed data array \code{y\_obs}
-followed by the missing parameter array \code{y\_miss}.  In the model
-block, the resulting mixed array \code{y} may be used like any other
-variable.
-
-Running the resulting program will sample values for the the missing
-data \code{y\_miss} just like the other parameters \code{mu} and
-\code{sigma}.
-
-\subsection{Missing Data}
-
-Although useful in some situations, creating a mixed transformed
-parameter array is not the recommended way to program missing data
-problems in \Stan.  The behavior is correct, but the computation is
-wasteful.  Each parameter, be it declared in the \code{parameters} or
-\code{transformed parameters} block, uses an algorithmic
-differentiation variable which is more expensive in terms of memory
-and gradient-calculation time than a simple data variable.
-Furthermore, the copy takes up extra space, and the copy takes extra
-time.
-
-The recommended approach keeps the same \code{data} and
-\code{parameters} blocks to define the observed and missing data.
-%
-\begin{quote}
-\begin{Verbatim}
-data {
-  int N_obs;
-  int N_miss;
+  int(0,) N_obs;
+  int(0,) N_miss;
   real y_obs[N_obs];
 }
 parameters {
@@ -104,17 +49,86 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-There is no longer any transformed data.  Instead, the model contains
-one loop over the observed data and one over the missing data.  This
-model will more efficiently compute the same samples over the
-distribution parameters and the missing data (it differs slightly in
-not also providing the combined array \code{y} of transformed parameters).
+The number of observed and missing data points are coded as data with
+non-negative integer variables \code{N\_obs} and \code{N\_miss}.  The
+observed data is provided as an array data variable \code{y\_obs}.
+The missing data is coded as an array parameter, \code{y\_miss}.  The
+ordinary parameters being estimated, the location \code{mu} and scale
+\code{sigma}, are also coded as parameters.
+
+The model contains one loop over the observed data and one over the
+missing data.  This slight redundancy in specification leads to much
+more efficient sampling for missing data problems in \Stan than the
+more general technique described in the next section.
 
 
+\section{Partially Known Parameters}\label{partially-known-parameters.section}
+
+In some situations, such as when a multivariate probability function
+has partially observed outcomes or parameters, it will be necessary to
+create a vector mixing known (data) and unknown (parameter) values.
+This can be done directly in \Stan by creating a vector or array in the
+\code{transformed parameter} block and assigning to it.
+
+The following example involves a bivariate covariance matrix in which the
+variances are known, but the covariance is not.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int(0,) N;
+  vector(2) y[N];
+  double(0,) var1;  double(0,) var2;
+}
+transformed data {
+  double(0,) max_cov;  double(0,) min_cov;   
+  max_cov <- sqrt(var1 * var2);  
+  min_cov <- -max_cov;
+}
+parameters {
+  vector(2) mu;
+  real(min_cov, max_cov) cov;
+}
+transformed parameters {
+  matrix(2,2) sigma;
+  sigma[1,1] <- var1;     sigma[1,2] <- cov;
+  sigma[2,1] <- cov;      sigma[2,2] <- var2;
+}  
+model {
+ for (n in 1:N)
+   y[n] ~ multi_normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The variances are defined as data in variables \code{var1} and
+\code{var2}, whereas the covariance is defined as a parameter in
+variable \code{cov}.  The $2 \times 2$ covariance matrix
+\code{sigma} is defined as a transformed parameter, with the variances
+assigned to the two diagonal elements and the covariance to the two
+off-diagonal elements.
+
+The constraint on the covariance declaration ensures that the
+resulting covariance matrix \code{sigma} is positive definite.  The
+bound, plus or minus the square root of the product of the variances,
+is defined as transformed data so that it is only calculated once.
+
+\section{Efficiency Note}
+
+The missing-data example in the first section could be programmed with
+a mixed data and parameter array following the approach of the
+partially known parameter example in the second section.  The behavior
+will be correct, but the computation is wasteful.  Each parameter, be
+it declared in the \code{parameters} or \code{transformed parameters}
+block, uses an algorithmic differentiation variable which is more
+expensive in terms of memory and gradient-calculation time than a
+simple data variable.  Furthermore, the copy takes up extra space and
+extra time.
 
 
 \chapter{Truncated or Censored Data}
 
+\noindent
 Data in which measurements have been truncated or censored can be
 coded in \Stan following their respective probability models.
 
@@ -159,7 +173,8 @@ location parameters; these could be given priors in the model.
 
 Nothing prevents the truncation points from being estimated as
 parameters.  This can be done with a slight rearrangement of the
-variable declarations from the model for known truncation points.
+variable declarations from the model in the previous section with known
+truncation points.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -168,8 +183,8 @@ data {
    real y[N];
 }
 parameters
-   real(,min(y)) L; 
-   real(max(y),) U;
+   real(, min(y)) L; 
+   real(max(y), ) U;
    real mu;
    real(0,) sigma;
 }
@@ -204,7 +219,7 @@ both.  Unlike with truncated data, the number of data points that were
 censored is known.  The textbook example is the household scale which
 does not report values above 300 pounds.  
 
-\subsection{Imputing Censored Values}
+\subsection{Estmating Censored Values}
 
 One way to model censored data is to treat the censored data as
 missing data that is constrained to fall in the censored range of
@@ -264,7 +279,8 @@ is
 
 % 
 This can be implemented directly in \Stan using the cumulative normal
-distribution function \code{normal\_p} as follows.
+distribution function \code{normal\_p}.  The following model assumes
+that the censoring point is known, so it is declared as data.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -280,35 +296,47 @@ parameters {
 }
 model {
    for (n in 1:N_obs)
-       y_obs[n] ~ normal(mu,sigma);
+       y_obs[n] ~ normal(mu,sigma); 
    lp__ <- lp__ + N_cens * log1m(normal_p(U,mu,sigma));
 }
 \end{Verbatim}
 \end{quote}
+%
+For the observed values in \Verb|y_obs|, the normal sampling model is
+used directly (without truncation).  The log probability accumulator
+\Verb|lp__| is directly incremented using the calculated log
+cumulative normal probability of the censored data items.  The
+built-in function \code{log1m} is used, which maps $x$ to $\log (1 -
+x)$ in an arithmetically stable way for values of $x$ near zero.
 
-
-
-
-
+To deal with situations where the censoring point variable \code{U} is
+unknown, the declaration of \code{U} should be moved from the data
+block to the parameters block.
 
 
 
 \chapter{Mixture Modeling}\label{mixture-modeling.chapter}
 
+\noindent
 Mixture models of an outcome assume that the outcome is drawn from one
 of several distributions, the identity of which is controlled by a
-categorical mixing distribution.  Mixture models typically have
+categorical mixing distribution. Mixture models typically have
 multimodal densities with modes around the modes of the mixture
-components.  
+components.  Mixture models may be parameterized in several ways,
+as described in the following sections.
+
 
 \section{Latent Discrete Parameterization}
 
 One way to parameterize a mixture model is with a latent categorical
 variable indicating which mixture component was responsible for the
 outcome. For example, consider $K$ normal distributions with locations
-$\mu_k \in \reals$ and scales $\sigma_k \in (0,\infty)$ mixed in the
-proportions $\theta$ in the $K$-simplex.  For each outcome $y_n$ there
-is a latent variable $z_n$ in $\setlist{1,\ldots,K}$,
+$\mu_k \in \reals$ and scales $\sigma_k \in (0,\infty)$.  Now consider
+mixing them in proportion $\theta$, where $\theta_k \geq 0$ and
+$\sum_{k=1}^K \theta_k = 1$ (i.e., $\theta$ lies in the unit $K$-simplex).
+For each outcome $y_n$ there is a latent variable $z_n$ in
+$\setlist{1,\ldots,K}$ with a categorical distribution parameterized
+by $\theta$,
 %
 \[
 z_n \sim \distro{Categorical}(\theta).
@@ -320,8 +348,9 @@ of the mixture component $z_n$,
 y_n \sim \distro{Normal}(\mu_{z[n]},\sigma_{z[n]}).
 \]
 %
-This model is not directly supported by \Stan because it involves a
-discrete parameter $z$.  
+This model is not directly supported by \Stan because it involves
+discrete parameters $z_n$, but it may be implemented as described in
+the next section.
 
 \section{Summing out the Responsibility Parameter}
 
@@ -329,9 +358,9 @@ To implement the normal mixture model outlined in the previous
 section in \Stan, the discrete parameters can be summed out of the
 model. If $Y$ is a mixture of $K$ normal distributions with 
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
-$\theta$ in the $K$-simplex, then 
+$\theta$ in the unit $K$-simplex, then 
 \[
-p_Y(y) = \sum_{k=1}^K \distro{Normal}(\mu_k,\sigma_k).
+p_Y(y) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
 \]
 
 For example, the mixture of $\code{Normal}(-1,2)$ and
@@ -366,7 +395,7 @@ The log probability term is derived by taking
 %            + \exp(\log(0.7) + \log \distro{Normal}(y|3,1)) \ )
 %             \end{array}
 \\[2pt]
-& = & \mbox{logSumExp}(\! \begin{array}[t]{l}
+& = & \mbox{log\_sum\_exp}(\! \begin{array}[t]{l}
                          \log(0.3) + \log \distro{Normal}(y|-1,2),
                          \\                  
                          \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
@@ -375,8 +404,8 @@ The log probability term is derived by taking
 
 Given the scheme for representing mixtures, it may be moved to an
 estimation setting, where the locations, scales, and mixture
-components are unknown.  Further generalizing to an arbitrary number
-of mixture components yields the following model.
+components are unknown.  Further generalizing to a number of mixture
+components specified as data yields the following model.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -416,8 +445,8 @@ constrained to be positive.  The model declares a local variable
 contributions by each mixture component.
 
 The locations and scales are drawn from simple priors for the sake of
-this example, but could be anything supported by \Stan in general,
-including a hierarchical model.  
+this example, but could be anything supported by \Stan.  The mixture
+components  could even be modeled hierarchically.
 
 The main action is in the loop over data points \code{n}.  For each
 such point, the log of $\theta_k \times
@@ -431,15 +460,35 @@ sum of exponentials of those values.
 
 \chapter{Regression Models}
 
-\Stan supports the full range of regression models from simple linear
-regressions to multilevel generalized linear models.  Coding
-regression models in \Stan is very much like coding them in \BUGS.
+\noindent
+\Stan supports regression models from simple linear regressions to
+multilevel generalized linear models.  Coding regression models in
+\Stan is very much like coding them in \BUGS.
 
 \section{Linear Regression}
 
 The simplest linear regression model is the following, with a single
-predictor and intercept term.
-
+predictor and a slope and intercept coefficient, and normally
+distributed noise.  This model can be written using standard
+regression notation as
+%
+\[
+Y_n = \alpha + \beta x_n + \epsilon_n
+\ \ \ \mbox{where} \ \ \ 
+\epsilon_n \sim \distro{Normal}(0,\sigma).
+\]
+This is equivalent to the following sampling involving the
+residual,
+\[
+Y_n - (\alpha + \beta X_n) \sim \distro{Normal}(0,\sigma),
+\]
+and reducing still further, to
+\[
+Y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
+\]
+%
+This latter form of the model is coded in \Stan as follows.
+%
 \begin{quote}
 \begin{Verbatim}
 data {
@@ -450,17 +499,20 @@ data {
 parameters {
     real alpha;
     real beta;
-    real(0,) epsilon;
+    real(0,) sigma;
 }
 model {
     for (n in 1:N)
-        y[n] ~ normal(beta * x[n] + alpha, epsilon);
+        y[n] ~ normal(beta * x[n] + alpha, sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
-This model has improper priors for the two regression coefficients
-(intercept \code{alpha} and slope \code{beta}) and the noise term.
+There are \code{N} observations, each with predictor \code{x[n]} and
+outcome \code{y[n]}.  The slope and intercept parameters are
+\code{beta} and \code{alpha}.  The model assumes a normally
+distributed noise term with scale \code{sigma}.  This model has
+improper priors for the two regression coefficients.
 
 \section{Coefficient and Noise Priors}
 
@@ -508,7 +560,7 @@ term $\epsilon$ as having a normal distribution.  From \Stan's
 perspective, there is nothing special about normally distributed
 noise.  For instance, robust regression can be accomodated by giving
 the noise term a Student-$t$ distribution.  To code this in \Stan, the
-sampling distribution is changed, as follows.
+sampling distribution is changed to the following.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -525,7 +577,6 @@ model {
 \end{quote}
 %
 The degrees of freedom constant \code{nu} is specified as data.
-Alternatively, it could be hard coded into the model.
 
 \section{Logistic and Probit Regression}
 
@@ -551,7 +602,8 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The noise parameter is built into the Bernoulli here.  
+The noise parameter is built into the Bernoulli formulation here
+rather than specified directly.
 
 Logistic regression is a kind of generalized linear model with binary
 outcomes and the log odds (logit) link function.  The inverse of the
@@ -587,30 +639,61 @@ improper flat priors on the coefficients is coded as follows.
 data {
    int(0,) N;
    int(1,K) y[N];
-   row_vector(K) x[N];
+   vector(D) x[N];
 }
 parameters {
-   matrix(N,K) beta;
+   matrix(K,D) beta;
 }
 model {
-   for (n in 1:N)
-       y[n] ~ categorical(softmax(x[n] * beta));
+  for (k in 1:K)
+    for (d in 1:D)
+      beta[k,d] ~ normal(0,5);
+  for (n in 1:N)
+     y[n] ~ categorical(softmax(beta * x[n]));
 }
 \end{Verbatim}
 \end{quote}
 %
+The sofmax function is defined for a $K$-vector $\gamma \in \reals^K$ by
+\[
+\mbox{softmax}(\gamma) = 
+\left(
+ \frac{\exp(\gamma_1)}
+      {\sum_{k=1}^K \exp(\gamma_k)},
+  \ldots,
+  \frac{\exp(\gamma_K)}
+       {\sum_{k=1}^K \exp(\gamma_k)}
+\right).
+\]
+%
+The result is in the unit $K$-simplex and thus appropriate to use as
+the parameter for a categorical distribution.
 
-\section{Ordered Logistic Regression}\label{ordered-logistic.section}
+\subsection{Identifiability}
 
-Ordered logistic regression for an outcome $y_n \in
-\setlist{1,\ldots,K}$ with predictors $x_n \in \reals^D$ is determined
-by a single coefficient vector $\beta \in \reals^D$ along with a
-sequence of cutpoints $c \in \reals^{D-1}$ sorted so that $c_d <
-c_{d+1}$.  The discrete output is $k$ if the linear predictor $x_n
-\beta$ falls between $c_{k-1}$ and $c_k$, assuming $c_0 = -\infty$ and
-$c_K = \infty$.
+Because softmax is invariant under adding a constant to each component
+of its input, the model is typically only identified if there is a
+suitable prior on the coefficients.
 
-The ordinal logistic model can be coded in \Stan using the
+An alternative is to use $K-1$ vectors by fixing one of them to be
+zero.  See \refsection{partially-known-parameters} for an example of
+how to mix known quantities and unknown quantities in a vector.
+
+
+\section{Ordered Logistic and Probit Regression}\label{ordered-logistic.section}
+
+Ordered regression for an outcome $y_n \in \setlist{1,\ldots,K}$ with
+predictors $x_n \in \reals^D$ is determined by a single coefficient
+vector $\beta \in \reals^D$ along with a sequence of cutpoints $c \in
+\reals^{D-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
+$k$ if the linear predictor $x_n \beta$ falls between $c_{k-1}$ and
+$c_k$, assuming $c_0 = -\infty$ and $c_K = \infty$.  The noise term is
+fixed by the form of regression, with examples for ordered logistic
+and ordered probit models.  
+
+\subsection{Ordered Logistic Regression}
+
+The ordered logistic model can be coded in \Stan using the
 \code{ordered} data type for the cutpoints and the built-in
 \code{ordered\_logistic} distribution.
 %
@@ -634,8 +717,10 @@ model {
 \end{Verbatim}
 \end{quote}
 % 
-The vector of cutpoints \code{c} is declared as \code{ordered(D-1)},
+The vector of cutpoints \code{c} is declared as \code{ordered(K-1)},
 which guarantees that \code{c[k]} is less than \code{c[k+1]}.
+
+\subsubsection{Ordered Probit}
 
 An ordered probit model could be coded in a manner similar to the
 \BUGS encoding of an ordered logistic model.
@@ -668,7 +753,7 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The logistic model could be coded this way by replacing \code{erf}
+The logistic model could also be coded this way by replacing \code{erf}
 with \code{inv\_logit}, though the built-in encoding is more efficient
 and more numerically stable.  A small efficiency gain could be
 achieved by computing the values \code{1 - erf(eta - c(d))} once and
@@ -677,7 +762,7 @@ storing them for re-use.
 \section{Hierarchical Logistic Regression}
 
 The simplest multilevel model is a hierarchical model in which the
-data is grouped into $L$ levels.  An extreme approach would be to
+data is grouped into $L$ distinct categories (or levels).  An extreme approach would be to
 completely pool all the data and estimate a common vector of
 regression coefficients $\beta$.  At the other extreme, an approach
 would no pooling assigns each level $l$ its own coefficient vector
@@ -763,6 +848,7 @@ model {
 \end{Verbatim}
 \end{quote}
 %
+The first observed data point, \code{y[n]}, is not modeled here.  
 
 \subsection{Extensions to the Model} 
 
@@ -795,8 +881,8 @@ coefficient \code{gamma} and the following model statement.
 %
 \begin{quote}
 \begin{Verbatim}
-    for (n in 3:N)
-       y[n] ~ normal(alpha + beta * y[n-1] + gamma * y[n-2], sigma);
+for (n in 3:N)
+  y[n] ~ normal(alpha + beta * y[n-1] + gamma * y[n-2], sigma);
 \end{Verbatim}
 \end{quote}
 
@@ -834,11 +920,14 @@ model {
 \chapter{Custom Probability  Functions}%
 \label{custom-probability-functions.chapter}
 
-
+\noindent
 Custom distributions may also be implemented directly within \Stan's
-programming language.  A simple example is the triangle distribution.
-If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then
-$y \in (\alpha,\beta)$ has a density defined as follows.
+programming language.  A simple example is the triangle distribution,
+whose density is shaped like an Isosceles triangle with corners at
+specified bounds and height determined by the constraint that a
+density integrate to 1.  If $\alpha \in \reals$ and $\beta \in \reals$
+are the bounds, with $\alpha < \beta$, then $y \in (\alpha,\beta)$ has
+a density defined as follows.
 \[
 \distro{Triangle}(y | \alpha,\beta)
 = 
@@ -854,7 +943,7 @@ y - \frac{\alpha + \beta}{\beta - \alpha}
 %
 If $\alpha = -1$, $\beta = 1$, and $y \in (-1,1)$, this reduces to
 \[
-\distro{Triangle}(y,-1,1) = 1 - |y|.
+\distro{Triangle}(y|-1,1) = 1 - |y|.
 \]
 The file \url{src/models/basic_distributions/triangle.stan} contains
 the following \Stan implementation of a sampler from 
