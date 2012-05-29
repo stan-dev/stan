@@ -321,6 +321,10 @@ some typical use-case examples.
 {Period between samples updating progress report print}
 {default = \code{max(1, iter / 200)}}
 %
+\cmdflag{unit\_mass\_matrix}
+{Use unit mass matrix for \NUTS}
+{\NUTS default is to estimate a diagonal mass matrix}
+%
 \cmdarg{leapfrog\_steps}{int}
 {Number of leapfrog steps; \code{-1} for No-U-Turn adaptation}
 {default = \code{-1}}
@@ -336,10 +340,6 @@ some typical use-case examples.
 \cmdarg{epsilon}{[0,1]}
 {Sample epsilon \code{+/- epsilon * epsilon\_pm}}
 {default = \code{0.0}}
-%
-\cmdflag{epsilon\_adapt\_off}
-{Turn off step size adaptation}
-{step size adaptation is on by default}
 %
 \cmdarg{delta}{+float}
 {Initial step size for step-size adaptation}
