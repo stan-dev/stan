@@ -26,12 +26,6 @@ models/%.stan : src/models/%.stan
 		cp $(addsuffix .Rdata,$(basename $<)) $(addsuffix .Rdata,$(basename $@));\
 		echo 'cp $(addsuffix .Rdata,$(basename $<)) $(addsuffix .Rdata,$(basename $@))';\
 	fi;
-#	@echo '******** $(wildcard $(patsubst src/models/%.stan,src/models/%.Rdata,$<)) ********'
-#ifneq ('','$(wildcard $(patsubst src/models/%.stan,src/models/%.Rdata,$<))')
-#	@echo ''
-#	@echo '--- Copying data ---'
-#	cp $(addsuffix .Rdata,$(basename $<)) $(addsuffix .Rdata,$(basename $@))
-#endif
 
 $(MODEL_HEADER).gch : $(MODEL_HEADER)
 	@echo ''
