@@ -19,7 +19,6 @@ PATH_SEPARATOR = '\'
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  CFLAGS += -g
   LDLIBS += -static-libgcc 
   PCH = .gch
 endif
