@@ -98,6 +98,7 @@ endif
 ##
 # Builds a single test
 ##
+.PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
@@ -105,7 +106,6 @@ ifeq ($(findstring test-,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-.PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
@@ -131,6 +131,22 @@ ifneq (,$(filter test/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
 endif
 ifneq (,$(filter test/models/%,$(MAKECMDGOALS)))
+  -include bin/stan/command/stanc.d
+endif
+ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(UNIT_TESTS)) 
+endif
+ifneq (,$(filter test-models,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(MODEL_TESTS)) 
+  -include bin/stan/command/stanc.d
+endif
+ifneq (,$(filter test-bugs,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(BUGS_TESTS)) 
+  -include bin/stan/command/stanc.d
+endif
+ifneq (,$(filter test-all,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(UNIT_TESTS)) 
+  -include $(addsuffix .d, $(MODEL_TESTS)) 
   -include bin/stan/command/stanc.d
 endif
 
