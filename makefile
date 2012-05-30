@@ -26,16 +26,6 @@ LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 PATH_SEPARATOR = /
 
-# OS is set automatically by this script
-##
-# These includes should update the following variables
-# based on the OS:
-#   - CFLAGS
-#   - CFLAGS_GTEST
-#   - EXE
-#   - PCH
-##
--include make/os_detect
 
 ##
 # Get information about the compiler used.
@@ -46,6 +36,16 @@ PATH_SEPARATOR = /
 -include make/detect_cc
 # FIXME: verify compiler
 
+# OS is set automatically by this script
+##
+# These includes should update the following variables
+# based on the OS:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - EXE
+#   - PCH
+##
+-include make/os_detect
 
 ##
 # Tell make the default way to compile a .o file.
