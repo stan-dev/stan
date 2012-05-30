@@ -26,6 +26,7 @@
 #include <boost/random/additive_combine.hpp>
 
 #include <stan/math/matrix.hpp>
+#include <stan/prob/autocorrelation.hpp>
 
 namespace stan {  
 
@@ -1218,7 +1219,21 @@ namespace stan {
         return std::pair<double,double>(low_quantile,high_quantile);
       }
 
-
+      /** 
+       * Return the autocorrelation for the specified parameter in the
+       * kept samples of the chain specified.
+       * 
+       * @param[in] k Chain index
+       * @param[in] n Parameter index
+       * @param[out] ac Autocorrelations
+       */
+      void autocorrelation(const size_t k, const size_t n, 
+                           std::vector<double>& ac) {
+        std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        stan::prob::autocorrelation(samples,
+                                    ac);
+      }
     
     };
 
@@ -1492,14 +1507,7 @@ double split_potential_scale_reduction(size_t n);
 double effective_sample_size(size_t n);
 
 double mcmc_error_mean(size_t n);
-
-double autocorrelation(size_t n, 
-                       size_t k);
                    
-
-
-
-
 void print(ostream&);
 
 ostream& operator<<(ostream&, const chains&);

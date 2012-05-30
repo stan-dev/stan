@@ -4,6 +4,7 @@
 #include <set>
 #include <exception>
 #include <utility>
+#include <fstream>
 
 TEST(McmcChains, validate_dim_idxs) {
   using stan::mcmc::validate_dims_idxs;
@@ -968,3 +969,36 @@ TEST(McmcChains,add_chain_epil){
   EXPECT_FLOAT_EQ(0.346112, samples[4]);
 }
 
+TEST(McmcChains,autocorrelation) {
+  // duplicating test from stan::prob::autocorrelation
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  std::vector<size_t> dims;
+
+  names.push_back("param");
+  dims.push_back(1);
+  dimss.push_back(dims);
+  stan::mcmc::chains<> c(2, names, dimss);
+
+  std::fstream f("src/test/prob/ar1.csv");
+  std::vector<double> y;
+  for (size_t i = 0; i < 1000; ++i) {
+     double temp;
+     f >> temp;
+     y.clear();
+     y.push_back(temp);
+     c.add(0U, y);
+   }
+  
+   std::vector<double> ac;
+   c.autocorrelation(0U, 0U, ac);
+
+   EXPECT_EQ(1000, ac.size());
+
+   EXPECT_NEAR(1.0,ac[0],0.001);
+   EXPECT_NEAR(0.81, ac[1], 0.01);
+   EXPECT_NEAR(0.65, ac[2], 0.01);
+   EXPECT_NEAR(0.52, ac[3], 0.01);
+   EXPECT_NEAR(0.42, ac[4], 0.01);
+   EXPECT_NEAR(0.34, ac[5], 0.01);
+}
