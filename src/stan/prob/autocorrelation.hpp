@@ -27,7 +27,7 @@ namespace stan {
      *
      * @tparam T Scalar type.
      * @param y Input sequence.
-     * @param ac Auto-correlations.
+     * @param ac Autocorrelations.
      * @param fft FFT engine instance.
      */
     template <typename T>
@@ -75,7 +75,7 @@ namespace stan {
      *
      * @tparam T Scalar type.
      * @param y Input sequence.
-     * @param ac Auto-correlations.
+     * @param ac Autocorrelations.
      */
     template <typename T>
     void autocorrelation(const std::vector<T>& y,
