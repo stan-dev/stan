@@ -3,12 +3,13 @@
 ##
 MODEL_HEADER := src/stan/model/model_header.hpp
 
-.PRECIOUS: %.cpp
+.PRECIOUS: %.cpp %.o
 %$(EXE): %.o bin/libstan.a
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
 
+.PRECIOUS: %.cpp
 %.cpp : %.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
@@ -27,15 +28,22 @@ models/%.stan : src/models/%.stan
 		echo 'cp $(addsuffix .Rdata,$(basename $<)) $(addsuffix .Rdata,$(basename $@))';\
 	fi;
 
+#.PRECIOUS: %.cpp
+#models/%$(EXE): models/%.o bin/libstan.a
+#	@echo ''
+#	@echo '--- Linking C++ model ---'
+#	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+
+
 $(MODEL_HEADER).gch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for g++ ---'
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) $(CFLAGS) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).pch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for clang++ ---'
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) $(CFLAGS) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
 	@if test -d $(dir $@); \
