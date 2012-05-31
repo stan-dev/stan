@@ -1291,6 +1291,7 @@ namespace stan {
        * 
        * @return the effective sample size.
        */
+      // FIXME: reimplement using autocorrelation.
       double effective_sample_size(size_t n) {
         validate_param_idx(n);
         size_t m = this->num_chains();
