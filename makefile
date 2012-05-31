@@ -132,7 +132,6 @@ help:
 	@echo '  - clean-all:   Cleans up all of Stan.'
 	@echo '--------------------------------------------------------------------------------'
 
-
 -include make/libstan  # libstan.a
 -include make/tests    # tests: test-all, test-unit, test-models
 -include make/models   # models
@@ -142,6 +141,9 @@ help:
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
 
+ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+endif
 
 
 ##

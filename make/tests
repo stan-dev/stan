@@ -123,33 +123,19 @@ test/%.d : src/test/%_test.cpp
 	rm -f $@.$$$$ ); \
 	fi
 
-##
-# If the target is a unit test, include .d. 
-# Will generate dependencies.
-##
-ifneq (,$(filter test/%,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
-endif
-ifneq (,$(filter test/models/%,$(MAKECMDGOALS)))
-  -include bin/stan/command/stanc.d
-endif
 ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(UNIT_TESTS)) 
 endif
 ifneq (,$(filter test-models,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(MODEL_TESTS)) 
-  -include bin/stan/command/stanc.d
 endif
 ifneq (,$(filter test-bugs,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(BUGS_TESTS)) 
-  -include bin/stan/command/stanc.d
 endif
 ifneq (,$(filter test-all,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(UNIT_TESTS)) 
   -include $(addsuffix .d, $(MODEL_TESTS)) 
-  -include bin/stan/command/stanc.d
 endif
-
 
 ##
 # target path_separator for use in some tests that need to 

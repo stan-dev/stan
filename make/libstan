@@ -14,9 +14,7 @@ bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 ##
 # Generate dependencies for libraries
 ##
-ifeq (bin/libstan.a,$(MAKECMDGOALS))
+ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(basename $(LIBSTAN_OFILES)))
-endif
-ifeq (bin/libstanc.a,$(MAKECMDGOALS))
   -include $(addsuffix .d,$(basename $(TEMPLATE_INSTANTIATION)))
 endif
