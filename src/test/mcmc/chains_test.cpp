@@ -696,6 +696,9 @@ TEST(McmcChains, quantiles_means) {
                   c.mean(0,0));
   EXPECT_FLOAT_EQ(stan::math::sd(samps),
                   c.sd(0,0));
+  EXPECT_FLOAT_EQ(stan::math::variance(samps),
+                  c.variance(0,0));
+
 
   c.get_kept_samples_permuted(0,samps);
   EXPECT_FLOAT_EQ(stan::math::mean(samps),
@@ -993,7 +996,7 @@ TEST(McmcChains,autocorrelation) {
    std::vector<double> ac;
    c.autocorrelation(0U, 0U, ac);
 
-   EXPECT_EQ(1000, ac.size());
+   EXPECT_EQ(1000U, ac.size());
 
    EXPECT_NEAR(1.0,ac[0],0.001);
    EXPECT_NEAR(0.81, ac[1], 0.01);
@@ -1001,4 +1004,28 @@ TEST(McmcChains,autocorrelation) {
    EXPECT_NEAR(0.52, ac[3], 0.01);
    EXPECT_NEAR(0.42, ac[4], 0.01);
    EXPECT_NEAR(0.34, ac[5], 0.01);
+}
+TEST(McmcChains,effective_sample_size) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
+
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(13.599755, c.effective_sample_size(index)) <<
+    "mu.1 sample size should be 13.6";
+  idxs.clear();
+  idxs.push_back(21);
+  index = c.get_total_param_index(c.param_name_to_index("delta"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(43.58981,  c.effective_sample_size(index)) <<
+    "delta.22 sample size should be 43.6";
 }
