@@ -20,8 +20,6 @@ protected:
 
     output1 = model + "1.csv";
     output2 = model + "2.csv";
-    factory.addFile(output1);
-    factory.addFile(output2);
     
     expected_y1 = 0.0;
     expected_y2 = 0.0;
@@ -31,7 +29,6 @@ protected:
   std::string output1;
   std::string output2;
   
-  stan::mcmc::mcmc_output_factory factory;
   double expected_y1;
   double expected_y2;
 };
