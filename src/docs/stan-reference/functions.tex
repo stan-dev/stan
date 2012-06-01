@@ -3,107 +3,12 @@
 
 \part{Built-In Functions}\label{built-in-functions.part}
 
-\chapter{Built-in Functions}
-
-\noindent
-\Stan supports a wide range of built-in functions.  These functions
-operate over and return values spanning the complete range of data
-types.  
-
-The following chapters in this part describe basic functions returning
-integers and returning real values, array and matrix functions, and
-probability functions and cumulative distributions.
-
-\section{Function Signatures}
-
-The documentation of the special functions begins with a function
-signature.  This determines the type of arguments taken by the
-function and the type of value returned.  
-
-\subsection{Overloading}
-
-\Stan relies on function overloading, which means there can be several
-different functions with the same name.  Functions are determined
-uniquely by the combination of their name and the type of their
-arguments.
-
-For example, \Stan includes two built-in functions named \code{max}, one that
-operates on integers to return an integer, with signature
-%
-\begin{quote}
-\begin{Verbatim}
-int max(int m, int n)
-\end{Verbatim}
-\end{quote}
-%
-and one that operates over reals, with signature
-%
-\begin{quote}
-\begin{Verbatim}
-real max(real x, real y)
-\end{Verbatim}
-\end{quote}
-%
-The appropriate instance is called based on the arguments provided.
-
-The two functions named \code{max} are distinguished by their argument
-types.  It would not be legal to add a third function with signature
-\code{real max(int,int)}, as it would lead to a conflict with the
-existing function of name \code{max} and argument types
-\code{(int,int)}, even though it has a different return type.
-
-
-\section{Integer-to-Real Type Promotion}
-
-Integer values may be passed to functions requiring real values.  This
-is not unrelated to the fact that integer values may be assigned to
-real variables.  In both cases, the underlying \Cpp code handles the
-promotion of the underlying integer type to the underlying
-floating-point type.
-
-Consider again the two functions \code{max(int,int)} and
-\code{max(real,real}), and suppose these are the only two functions
-named \code{max} (they are the only two of that name built into
-\Stan).  If \code{m} is an integer variable and \code{x} a real
-variable, the call \code{max(m,x)} must be resolved as referring to
-\code{max(double,double)}, because integers can be promoted to real
-values, but not vice-versa.  
-
-If \code{n} is another integer variable, a call to \code{max(m,n)}
-could conceivably call either function named \code{max}.  The function
-\code{max(int,int)} requires no promotions, whereas
-\code{max(double,double)} requires two, so the first is invoked.  The
-general rule is that the function call matches the function requiring
-the fewest promotions.
-
-Even this simple disambiguation scheme leads to possible ambiguity
-(though \Stan's built-in functions avoid it).  If there were two functions,
-\code{foo(int,real)} and \code{foo(real,int)} and if \code{m} and
-\code{n} were integer variales, a call to \code{foo(m,n)} would be
-ambiguous.  Either function could be matched with one promotion and
-there is no better-matching function.  In such cases, the call will
-not compile.  This could be resolved by assigning one variable to a
-temporary, as in the following example.
-%
-\begin{quote}
-\begin{Verbatim}
-int m;  int n;  real x;  real y;  
-x <- m;  y <- n;
-# foo(m,n);  // illegal!
-foo(x,n);    // calls foo(double,int)
-foo(m,y);    // calls foo(int,double)
-\end{Verbatim}
-\end{quote}
-
-
-
-
 
 \chapter{Integer-Valued Basic Functions}
 
 \noindent
-This chapter describes \Stan's built-in function that operate on real
-and integer arguments and return results of type integer.
+This chapter describes \Stan's built-in function that take various
+types of arguments and return results of type integer.
 
 
 \section{Integer-Valued Arithmetic Operators}
@@ -142,18 +47,23 @@ integer divide-by-zero does not occur.
 
 \subsection{Binary Infix Operators}
 
+Operators are described using the \Cpp syntax.  For instance, the
+binary operator of addition, written \code{X + Y}, would have the
+\Stan signature \code{int operator+(int,int)} indicating it takes
+two real arguments and returns a real value.
+
 \begin{description}
 %
-\fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+\fitem{int}{operator+}{int \farg{x}, int \farg{y}}{
 The sum of the addends \farg{x} and \farg{y}}
 %
-\fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+\fitem{int}{operator-}{int \farg{x}, int \farg{y}}{
 The difference between the minuend \farg{x} and subtrahend \farg{y}}
 %
-\fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+\fitem{int}{operator*}{int \farg{x}, int \farg{y}}{
 The product of the factors \farg{x} and \farg{y}}
 %
-\fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+\fitem{int}{operator/}{int \farg{x}, int \farg{y}}{
 The integer quotiont of the dividend \farg{x} and divisor \farg{y}}
 %
 \end{description}
@@ -161,12 +71,12 @@ The integer quotiont of the dividend \farg{x} and divisor \farg{y}}
 \subsection{Unary Prefix Operators}
 
 \begin{description}
-\fitem{real}{operator-}{real \farg{x}}{
+\fitem{int}{operator-}{int \farg{x}}{
 The negation of the the subtrahend \farg{x}}
 
-\fitem{real}{operator+}{real \farg{x}}{
-The promotion of addend \farg{x} to a real, which is a no-op
-for real inputs}
+\fitem{int}{operator+}{int \farg{x}}{
+The promotion of addend \farg{x} to a int, which is a no-op
+for int inputs}
 \end{description}
 
 \section{Absolute Functions}
@@ -176,7 +86,7 @@ for real inputs}
 \fitem{int}{abs}{int \farg{x}}{
 The absolute value of \farg{x}}
 %
-\fitem{int}{int\_step}{real \farg{x}}
+\fitem{int}{int\_step}{int \farg{x}}
 1 if \farg{x} is strictly greater than 0, and 0 otherwise
 %
 \end{description}
@@ -476,7 +386,7 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitem{real}{Phi}{real \farg{x}}{
-The cumulative normal density function of \farg{x}}
+The cumulative unit normal density function of \farg{x}}
 %
 \fitem{real}{log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probabilty \farg{y\_hat} for 
@@ -495,14 +405,14 @@ binary outcome \farg{y}}
 The gamma function applied to \farg{x}}
 %
 \fitem{real}{lgamma}{real \farg{x}}{
-The natural log of the gamma function applied to \farg{x}}
+The natural logarithm of the gamma function applied to \farg{x}}
 %
 \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
 The natural logarithm of the multinomial gamma function with \farg{n}
 dimensions applied to \farg{x}}
 %
 \fitem{real}{lbeta}{real \farg{x}, real \farg{y}}{
-The natural log of the beta function applied to \farg{x}}
+The natural logarithm of the beta function applied to \farg{x}}
 %
 \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real \farg{y}}{
 The natural logarithm of the binomial coefficient of \farg{x} choose
@@ -560,7 +470,7 @@ dividing by \code{length - 1})
 elements in \farg{x} (divide by \code{length - 1})
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}
-The log of the sum of the exponentials of the elements in \farg{x}
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}
 \end{description}
 
 
@@ -1059,9 +969,39 @@ If $\theta \in [0,1]$, then for $c \in \setlist{0,1}$,
 \]
 \begin{description}
 %
- \fitem{real}{bernoulli\_log}{int \farg{y}, real \farg{theta}}{The
-   Bernoulli probability mass of \farg{y} given chance of success
-   \farg{theta}}
+\fitem{real}{bernoulli\_log}{int \farg{y}, real \farg{theta}}{The
+  log Bernoulli probability mass of \farg{y} given chance of success
+  \farg{theta}}
+%
+\end{description}
+
+\subsection{Bernoulli Distribution, Logit Parameterization}
+
+\Stan also supplies a direct parameterization in terms of a
+logit-transformed chance-of-success parameter.  This parameterization
+is more numerically stable if the chance-of-success parameter is on
+the logit scale, as with the linear predictor in a logistic
+regression.  
+
+If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
+\[
+\distro{BernoulliLogit}(c|\alpha)
+=
+\distro{Bernoulli}(c|\mbox{logit}^{-1}(\alpha))
+= 
+\left\{
+\begin{array}{ll}
+\mbox{logit}^{-1}(\alpha) & \mbox{if } y = 1, \mbox{ and}
+\\
+1 - \mbox{logit}^{-1}(\alpha) & \mbox{if } y = 0.
+\end{array}
+\right.
+\]
+\begin{description}
+%
+\fitem{real}{bernoulli\_logit\_log}{int \farg{y}, real \farg{theta}}{The
+  log Bernoulli probability mass of \farg{y} given logit chance of success
+  \farg{theta}}
 %
 \end{description}
 
@@ -1082,7 +1022,7 @@ If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
 \begin{description}
 %
   \fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
-    \farg{theta}}{The binomial probability mass of \farg{n}
+    \farg{theta}}{The log binomial probability mass of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
 %
 \end{description}
@@ -1110,7 +1050,7 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
 \begin{description}
 %
 \fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
-  \farg{alpha}, real \farg{beta}}{The beta-binomial probability mass
+  \farg{alpha}, real \farg{beta}}{The log beta-binomial probability mass
   of \farg{n} successes in \farg{N} trials given prior success count
   (plus one) of \farg{alpha} and prior failure count (plus one) of
   \farg{beta}}
@@ -1132,7 +1072,7 @@ then for $n \in \setlist{0,\ldots,\min(a,N)}$,
 \begin{description}
 %
   \fitem{real}{hypergeometric\_log}{int \farg{n}, int \farg{N}, int
-    \farg{a}, int \farg{b}}{The hypergeometric probability mass of
+    \farg{a}, int \farg{b}}{The log hypergeometric probability mass of
     \farg{n} successes in \farg{N} trials given total success count of
     \farg{a} and total failure count of \farg{b}}
 
@@ -1150,7 +1090,7 @@ If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $n \in
 \begin{description}
 %
 \fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
- categorical probability mass function with outcome \farg{y} in 
+  log categorical probability mass function with outcome \farg{y} in 
 $1:N$ given $N$-simplex distribution parameter \farg{theta}}
 %
 \end{description}
@@ -1165,14 +1105,14 @@ c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k 
 =
 \left\{
 \begin{array}{ll}
-1 - \mbox{logit}^{-1}(\eta - c_1) & \mbox{if } k = 1
+1 - \mbox{logit}^{-1}(\eta - c_1) & \mbox{if } k = 1,
 \\[4pt]
 \mbox{logit}^{-1}(\eta - c_{k-1}) - \mbox{logit}^{-1}(\eta -
 c_{k})
-& \mbox{if } 1 < k < K
+& \mbox{if } 1 < k < K, \mbox{and}
 \\[4pt]
 \mbox{logit}^{-1}(\eta - c_{K-1}) - 0
-& \mbox{if } k = K
+& \mbox{if } k = K.
 \end{array}
 \right.
 \]
@@ -1182,9 +1122,10 @@ by setting $c_0 = -\infty$ and $c_K = +\infty$ with
 $\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
 %
 \begin{description}
-  \fitem{real}{ordered\_logistic\_log}{int \farg{k}, real
-    \farg{eta}, vector \farg{c}}{The ordered logistic probability mass of
-    \farg{k} given linear predictor \farg{eta} and cutpoints \farg{c}.}
+  \fitem{real}{ordered\_logistic\_log}{int \farg{k}, real \farg{eta},
+    vector \farg{c}}{The log ordered logistic probability mass of
+    \farg{k} given linear predictor \farg{eta} and cutpoints
+    \farg{c}.}
 \end{description}
 
 
@@ -1210,7 +1151,7 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
 \begin{description}
 %
  \fitem{real}{negative\_binomial\_log}{int \farg{n}, real
-   \farg{alpha}, real \farg{beta}}{The negative binomial probability
+   \farg{alpha}, real \farg{beta}}{The log negative binomial probability
    mass of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
 %
 \end{description}
@@ -1229,11 +1170,8 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 
 \begin{description}
 \fitem{real}{poisson\_log}{int \farg{n}, real \farg{lambda}}{ The
-   Poisson probability mass of \farg{n} given rate \farg{lambda}}
+  log Poisson probability mass of \farg{n} given rate \farg{lambda}}
 \end{description}
-
-
-
 
 
 
@@ -1257,7 +1195,7 @@ where the multinomial coefficient is defined by
 
 \begin{description}
  \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
-    \farg{theta}}{The multinomial probability mass function with
+    \farg{theta}}{The log multinomial probability mass function with
     outcome array \code{y} of size $K$ given the $K$-simplex
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
@@ -1290,13 +1228,13 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \]
 
 \begin{description}
-\fitem{real}{normal\_log}{real \farg{y}, real \farg{mu}, real
-\farg{sigma}}{The normal density of \farg{y} given location
-\farg{mu} and scale \farg{sigma}}
+  \fitem{real}{normal\_log}{real \farg{y}, real \farg{mu}, real
+    \farg{sigma}}{The log of the normal density of \farg{y} given
+    location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{normal\_log}{real[] \farg{y}, real \farg{mu}, real
-  \farg{sigma}}{The product for \code{n} from 1 to
-  \code{size(\farg{y})} of the normal density of
+  \farg{sigma}}{The sum for \code{n} from 1 to
+  \code{size(\farg{y})} of the log of the normal density of
   \code{\farg{y}[n]} given location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{normal\_p}{real \farg{y}, real \farg{mu}, real
@@ -1325,7 +1263,7 @@ then for $y \in \reals$,
 
 \begin{description}
   \fitem{real}{student\_t\_log}{real \farg{y}, real \farg{nu}, real
-    \farg{mu}, real \farg{sigma}}{The Student-$t$ density of \farg{y}
+    \farg{mu}, real \farg{sigma}}{The log of the Student-$t$ density of \farg{y}
     given degrees of freedom \farg{nu}, location \farg{mu}, and scale
     \farg{sigma}}
 \end{description}
@@ -1345,12 +1283,12 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \begin{description}
 %
 \fitem{real}{cauchy\_log}{real \farg{y}, real \farg{mu}, real
- \farg{sigma}}{ The Cauchy density of \farg{y} given location
+ \farg{sigma}}{ The log of the Cauchy density of \farg{y} given location
  \farg{mu} and scale \farg{sigma}}
 %
 \end{description}
 
-\subsection{Double Exponential Distribution}
+\subsection{Double Exponential (Laplace) Distribution}
 
 If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$, 
 \[
@@ -1362,7 +1300,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 
 \begin{description}
 \fitem{real}{double\_exponential\_log}{real \farg{y}, real \farg{mu},
-real \farg{sigma}}{ The double exponential density of \farg{y} given
+real \farg{sigma}}{ The log of the double exponential density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
@@ -1382,7 +1320,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 
 \begin{description}
 \fitem{real}{logistic\_log}{real \farg{y}, real \farg{mu},
-real \farg{sigma}}{ The logistic density of \farg{y} given
+real \farg{sigma}}{ The log of the logistic density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
@@ -1412,7 +1350,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 
 \begin{description}
  \fitem{real}{lognormal\_log}{real \farg{y}, real \farg{mu}, real
-  \farg{sigma}}{The lognormal density of \farg{y} given location
+  \farg{sigma}}{The log of the lognormal density of \farg{y} given location
   \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{lognormal\_p}{real \farg{y}, real \farg{mu}, real
@@ -1437,7 +1375,7 @@ y^{\nu/2 - 1}
 
 \begin{description}
 \fitem{real}{chi\_square\_log}{real \farg{y}, real \farg{nu}}{The
-  Chi-square density of \farg{y} given degrees of freedom
+  log of the Chi-square density of \farg{y} given degrees of freedom
   \farg{nu}}
 \end{description}
 
@@ -1458,7 +1396,7 @@ y^{-(\nu/2 - 1)}
 
 \begin{description}
 \fitem{real}{inv\_chi\_square\_log}{real \farg{y}, real
-  \farg{nu}}{The inverse Chi-square density of \farg{y} given
+  \farg{nu}}{The log of the inverse Chi-square density of \farg{y} given
   degrees of freedom \farg{nu}}
 \end{description}
 
@@ -1484,10 +1422,12 @@ y^{-(\nu/2 + 1)}
 
 
 \begin{description}
- \fitem{real}{scaled\_inv\_chi\_square\_log}{real \farg{y}, real
-   \farg{nu}, real \farg{s}}{The inverse Chi-square density of \farg{y} given
-   degrees of freedom \farg{nu} and scale \farg{s}}
+  \fitem{real}{scaled\_inv\_chi\_square\_log}{real \farg{y}, real
+    \farg{nu}, real \farg{s}}{The log of the scaled inverse Chi-square
+    density of \farg{y} given degrees of freedom \farg{nu} and scale
+    \farg{s}}
 \end{description}
+
 
 \subsection{Exponential Distribution}
 
@@ -1502,7 +1442,7 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
 
 \begin{description}
   \fitem{real}{exponential\_log}{real \farg{y}, real \farg{beta}}{The
-    exponential density of \farg{y} given inverse scale \farg{beta}}
+    log of the exponential density of \farg{y} given inverse scale \farg{beta}}
 %
 \fitem{real}{exponential\_p}{real \farg{y}, real \farg{beta}}{The
   cumulative distribution function of \farg{y} given inverse scale
@@ -1526,7 +1466,7 @@ y^{\alpha - 1}
 
 \begin{description}
  \fitem{real}{gamma\_log}{real \farg{y}, real \farg{alpha}, real
-  \farg{beta}}{The gamma density of \farg{y} given shape
+  \farg{beta}}{The log of the gamma density of \farg{y} given shape
   \farg{alpha} and inverse scale \farg{beta}}
 %
   \fitem{real}{gamma\_p}{real \farg{y}, real \farg{alpha}, real
@@ -1552,7 +1492,7 @@ y^{-(\alpha + 1)}
 
 \begin{description}
 \fitem{real}{inv\_gamma\_log}{real \farg{y}, real \farg{alpha}, real
-\farg{beta}}{The inverse gamma density of \farg{y} given shape
+\farg{beta}}{The log of the inverse gamma density of \farg{y} given shape
 \farg{alpha} and scale \farg{beta}}
 \end{description}
 
@@ -1574,7 +1514,7 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 
 \begin{description}
 \fitem{real}{weibull\_log}{real \farg{y}, real \farg{alpha}, real
-\farg{sigma}}{The Weibull density of \farg{y} given shape
+\farg{sigma}}{The log of the Weibull density of \farg{y} given shape
 \farg{alpha} and scale \farg{sigma}}
 %
 \fitem{real}{weibull\_p}{real \farg{y}, real \farg{alpha}, real
@@ -1605,8 +1545,8 @@ $y \in \posreals$,
 
 \begin{description}
   \fitem{real}{pareto\_log}{real \farg{y}, real \farg{y\_min}, real
-    \farg{alpha}}{The Pareto density of \farg{y} given positive minimum
-    value \farg{y\_min} and shape \farg{alpha}}
+    \farg{alpha}}{The log of the Pareto density of \farg{y} given
+    positive minimum value \farg{y\_min} and shape \farg{alpha}}
 \end{description}
 
 
@@ -1633,7 +1573,7 @@ where the beta function $\Betafun()$ is as defined in \refsection{betafun}
 \begin{description}
 %
   \fitem{real}{beta\_log}{real \farg{theta}, real \farg{alpha}, real
-    \farg{beta}}{The beta density of \code{theta} in $[0,1]$
+    \farg{beta}}{The log of the beta density of \code{theta} in $[0,1]$
     given positive prior successes (plus one)
     \farg{alpha} and prior failures (plus one) \farg{beta}}
 %
@@ -1657,14 +1597,16 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 
 \begin{description}
 \fitem{real}{uniform\_log}{real \farg{y}, real \farg{alpha}, real
-  \farg{beta}}{The uniform density of \farg{y} given lower bound
+  \farg{beta}}{The log of the uniform density of \farg{y} given lower bound
   \farg{alpha} and upper bound \farg{beta}}
 \end{description}
 
 \section{Simplex Probabilities}
 
 The simplex probabilities have support on the unit $K$-simplex for a
-specified $K$.
+specified $K$.  A $K$-dimensional vector $\theta$ is a unit
+$K$-simplex if $\theta_k \geq 0$ for $k \in \setlist{1,\ldots,K}$ and
+$\sum_{k = 1}^K \theta_k = 1$.
 
 \subsection{Dirichlet Distribution}
 
@@ -1682,10 +1624,9 @@ $\theta \in \mbox{$K$-simplex}$,
 
 \begin{description}
 %
-\fitem{real}{dirichlet\_log}{vector \farg{theta}, vector
- \farg{alpha}}{
-The Dirichlet density for simplex \farg{theta} given prior counts (plus
-one) \farg{alpha}}
+  \fitem{real}{dirichlet\_log}{vector \farg{theta}, vector
+    \farg{alpha}}{ The log of the Dirichlet density for simplex
+    \farg{theta} given prior counts (plus one) \farg{alpha}}
 %
 \end{description}
 
@@ -1719,12 +1660,12 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 \begin{description}
 %
 \fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
- matrix \farg{S}}{Multivariate normal density of vector \farg{y}
+  matrix \farg{S}}{The log of the multivariate normal density of vector \farg{y}
  given location \farg{mu} and covariance matrix \farg{S}}
 %
 \end{description}
 
-\subsection{Multivariate Normal Distribution (Cholesky)}
+\subsection{Multivariate Normal Distribution (Cholesky Parameterization)}
 
 If $K \in \nats$, $\mu \in \reals^K$, and $L \in \reals^{K \times K}$ is lower
 triangular and such that $LL^{\top}$ is positive definite, then for $y
@@ -1738,7 +1679,7 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 \begin{description}
 %
 \fitem{real}{multi\_normal\_cholesky\_log}{vector \farg{y}, vector
-  \farg{mu}, matrix \farg{L}}{Multivariate normal density of vector
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector
   \farg{y} given location \farg{mu} and lower-triangular Cholesky
   factor of the covariance matrix \farg{L}}
 %
@@ -1777,7 +1718,7 @@ $y \in \reals^K$,
 \begin{description}
 %
 \fitem{real}{multi\_student\_t\_log}{vector \farg{y}, real \farg{nu},
-  vector \farg{mu}, matrix \farg{S}}{Multivariate Student-$t$
+  vector \farg{mu}, matrix \farg{S}}{The log of the multivariate Student-$t$
   density of vector \farg{y} given degrees of freedom \farg{nu},
   location \farg{mu}, and scale matrix \farg{S}}
 %
@@ -1823,7 +1764,7 @@ the multivariate Gamma function,
 \begin{description}
 %
 \fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, real
- \farg{S}}{Wishart density for positive-definite matrix
+ \farg{S}}{The log of the Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
  \farg{S}}
 %
@@ -1857,7 +1798,7 @@ positive-definite $W \in \reals^{K \times K}$,
 \begin{description}
 %
 \fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, real
- \farg{S}}{Inverse Wishart density for positive-definite matrix
+ \farg{S}}{The log of the inverse Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
  \farg{S}}
 %
@@ -1868,9 +1809,9 @@ positive-definite $W \in \reals^{K \times K}$,
 \begin{description}
 %
 \fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
-\farg{sigma}, real \farg{eta}}{LKJ density for covariance matrix
+\farg{sigma}, real \farg{eta}}{The log of the LKJ density for covariance matrix
 \farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
-and shape \farg{eta}}
+and shape \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
 %
 \end{description}
 
@@ -1887,9 +1828,10 @@ so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
 
 \begin{description}
 %
-\fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
-  \farg{eta}}{LKJ density for the lower-triangular Cholesky factor
-  \farg{L} of a correlation matrix given shape \farg{eta}}
+  \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+    \farg{eta}}{The log of the LKJ density for the lower-triangular
+    Cholesky factor \farg{L} of a correlation matrix given shape
+    \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
 %
 \end{description}
 
