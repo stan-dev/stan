@@ -21,6 +21,9 @@
 // #include <boost/accumulators/statistics/moment.hpp>
 #include <boost/accumulators/statistics/tail_quantile.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
+#include <boost/accumulators/statistics/covariance.hpp>
+#include <boost/accumulators/statistics/variates/covariate.hpp>
+
 
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -1064,19 +1067,26 @@ namespace stan {
        * greater than or equal to the number of parameters.
        */
       double covariance(size_t k,
-                      size_t n1,
-                      size_t n2) {
+                        size_t n1,
+                        size_t n2) {
         validate_chain_idx(k);
         validate_param_idx(n1);
         validate_param_idx(n2);
-        return 0;
-        /*using boost::accumulators::accumulator_set;
+        using boost::accumulators::accumulator_set;
         using boost::accumulators::stats;
         using boost::accumulators::tag::variance;
-        accumulator_set<double, stats<variance> > acc;
-        apply_kept_samples(k,n,acc);
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+        
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+        std::vector<double> samples1, samples2;
+        this->get_kept_samples(k, n1, samples1);
+        this->get_kept_samples(k, n2, samples2);
+        for (size_t kk = 0; kk < this->num_kept_samples(k); kk++) {
+          acc(samples1[kk], boost::accumulators::covariate1 = samples2[kk]);
+        }
         double M = num_kept_samples(k);
-        return (M / (M-1)) *boost::accumulators::variance(acc);*/
+        return (M / (M-1)) * boost::accumulators::covariance(acc);
       }
 
       /**
@@ -1093,14 +1103,23 @@ namespace stan {
       double covariance(size_t n1, size_t n2) {
         validate_param_idx(n1);
         validate_param_idx(n2);
-        return 0;
-        /*using boost::accumulators::accumulator_set;
+        using boost::accumulators::accumulator_set;
         using boost::accumulators::stats;
         using boost::accumulators::tag::variance;
-        accumulator_set<double, stats<variance> > acc;
-        apply_kept_samples(n,acc);
-        double M = num_kept_samples(n);
-        return (M / (M-1)) *boost::accumulators::variance(acc);*/
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+        
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+        for (size_t chain = 0; chain < this->num_chains(); chain++) {
+          std::vector<double> samples1, samples2;
+          this->get_kept_samples(chain, n1, samples1);
+          this->get_kept_samples(chain, n2, samples2);
+          for (size_t kk = 0; kk < this->num_kept_samples(chain); kk++) {
+            acc(samples1[kk], boost::accumulators::covariate1 = samples2[kk]);
+          }
+        }
+        double M = this->num_kept_samples();
+        return (M / (M-1)) * boost::accumulators::covariance(acc);
       }
       
       
