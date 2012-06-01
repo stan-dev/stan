@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <test/models/model_test_fixture.hpp>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -7,15 +9,16 @@
 
 #include <stan/mcmc/chains.hpp>
 
-class Models_BasicDistributions_Binormal : public ::testing::Test {
+class Models_BasicDistributions_Binormal : public ::testing::Model_Test_Fixture {
 protected:
+  std::string model;
+  std::string output1;
+  std::string output2;
+
+  double expected_y1;
+  double expected_y2;
+
   virtual void SetUp() {
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    path_separator += fgetc(in);
-    pclose(in);
-    
     model.append("models").append(path_separator);
     model.append("basic_distributions").append(path_separator);
     model.append("binormal");
@@ -26,13 +29,6 @@ protected:
     expected_y1 = 0.0;
     expected_y2 = 0.0;
   }
-  std::string path_separator;
-  std::string model;
-  std::string output1;
-  std::string output2;
-  
-  double expected_y1;
-  double expected_y2;
 };
 
 TEST_F(Models_BasicDistributions_Binormal,RunModel) {
