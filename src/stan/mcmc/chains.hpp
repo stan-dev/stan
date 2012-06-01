@@ -1287,6 +1287,9 @@ namespace stan {
        *
        * The implementation matches BDA3's effective size description.
        * 
+       * Current implementation takes the minimum number of samples
+       * across chains as the number of samples per chain.
+       *
        * @param[in] n Parameter index
        * 
        * @return the effective sample size.
@@ -1297,6 +1300,9 @@ namespace stan {
         size_t m = this->num_chains();
         // need to generalize to each jagged samples per chain
         size_t n_samples = this->num_kept_samples(0U);
+        for (size_t chain = 1; chain < m; chain++) {
+          n_samples = std::min(n_samples, this->num_kept_samples(chain));
+        }
 
         std::vector<double> chain_mean;
         std::vector<double> chain_var;
@@ -1314,6 +1320,7 @@ namespace stan {
           for (size_t chain = 0; chain < m; chain++) {
             std::vector<double> samples;
             this->get_kept_samples(chain,n,samples);
+            samples.resize(n_samples);
             for (size_t ii = 0; ii < n_samples-t; ii++) {
               double diff = samples[ii] - samples[ii+t]; 
               variogram += diff * diff;
@@ -1331,9 +1338,51 @@ namespace stan {
         }
         return ess;
       }
-
+      
+      /** 
+       * Return the split potential scale reduction (split R hat)
+       * for the specified parameter.
+       *
+       * Current implementation takes the minimum number of samples
+       * across chains as the number of samples per chain.
+       * 
+       * @param[in] n Parameter index
+       * 
+       * @return split R hat.
+       */
       double split_potential_scale_reduction(size_t n) {
-        return 0;
+        size_t n_chains = this->num_chains();
+        size_t n_samples = this->num_kept_samples(0U);
+        for (size_t chain = 1; chain < n_chains; chain++) {
+          n_samples = std::min(n_samples, this->num_kept_samples(chain));
+        }
+        if (n_samples % 2 == 1)
+          n_samples--;
+        
+        std::vector<double> split_chain_mean;
+        std::vector<double> split_chain_var;
+
+        for (size_t chain = 0; chain < n_chains; chain++) {
+          std::vector<double> samples(n_samples);
+          this->get_kept_samples(chain, n, samples);
+          
+          std::vector<double> split_chain(n_samples/2);
+          split_chain.assign(samples.begin(),
+                             samples.begin()+n_samples/2);
+          split_chain_mean.push_back(stan::math::mean(split_chain));
+          split_chain_var.push_back(stan::math::variance(split_chain));
+          
+          split_chain.assign(samples.end()-n_samples/2, 
+                             samples.end());
+          split_chain_mean.push_back(stan::math::mean(split_chain));
+          split_chain_var.push_back(stan::math::variance(split_chain));
+        }
+
+        double var_between = n_samples/2 * stan::math::variance(split_chain_mean);
+        double var_within = stan::math::mean(split_chain_var);
+        
+        // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
+        return sqrt((var_between/var_within + n_samples/2 -1)/(n_samples/2));
       }
 
     };
