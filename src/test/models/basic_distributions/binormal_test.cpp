@@ -1,4 +1,3 @@
-#include <stan/mcmc/mcmc_output.hpp>
 #include <gtest/gtest.h>
 #include <cstdlib>
 #include <cstdio>
