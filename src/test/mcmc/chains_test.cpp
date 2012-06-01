@@ -4,6 +4,7 @@
 #include <set>
 #include <exception>
 #include <utility>
+#include <fstream>
 
 TEST(McmcChains, validate_dim_idxs) {
   using stan::mcmc::validate_dims_idxs;
@@ -695,6 +696,9 @@ TEST(McmcChains, quantiles_means) {
                   c.mean(0,0));
   EXPECT_FLOAT_EQ(stan::math::sd(samps),
                   c.sd(0,0));
+  EXPECT_FLOAT_EQ(stan::math::variance(samps),
+                  c.variance(0,0));
+
 
   c.get_kept_samples_permuted(0,samps);
   EXPECT_FLOAT_EQ(stan::math::mean(samps),
@@ -968,3 +972,85 @@ TEST(McmcChains,add_chain_epil){
   EXPECT_FLOAT_EQ(0.346112, samples[4]);
 }
 
+TEST(McmcChains,autocorrelation) {
+  // duplicating test from stan::prob::autocorrelation
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  std::vector<size_t> dims;
+
+  names.push_back("param");
+  dims.push_back(1);
+  dimss.push_back(dims);
+  stan::mcmc::chains<> c(2, names, dimss);
+
+  std::fstream f("src/test/prob/ar1.csv");
+  std::vector<double> y;
+  for (size_t i = 0; i < 1000; ++i) {
+     double temp;
+     f >> temp;
+     y.clear();
+     y.push_back(temp);
+     c.add(0U, y);
+   }
+  
+   std::vector<double> ac;
+   c.autocorrelation(0U, 0U, ac);
+
+   EXPECT_EQ(1000U, ac.size());
+
+   EXPECT_NEAR(1.0,ac[0],0.001);
+   EXPECT_NEAR(0.81, ac[1], 0.01);
+   EXPECT_NEAR(0.65, ac[2], 0.01);
+   EXPECT_NEAR(0.52, ac[3], 0.01);
+   EXPECT_NEAR(0.42, ac[4], 0.01);
+   EXPECT_NEAR(0.34, ac[5], 0.01);
+}
+TEST(McmcChains,effective_sample_size) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
+
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(13.599755, c.effective_sample_size(index)) <<
+    "mu.1 sample size should be 13.6";
+  idxs.clear();
+  idxs.push_back(21);
+  index = c.get_total_param_index(c.param_name_to_index("delta"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(43.58981,  c.effective_sample_size(index)) <<
+    "delta.22 sample size should be 43.6";
+}
+TEST(McmcChains,split_potential_scale_reduction) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
+
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(1.187, c.split_potential_scale_reduction(index)) <<
+    "mu.1 split R hat should be around 1.19";
+
+  idxs.clear();
+  idxs.push_back(21);
+  index = c.get_total_param_index(c.param_name_to_index("delta"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(1.03715,  c.split_potential_scale_reduction(index)) <<
+    "delta.22 split R hat should be near 1.04";
+}

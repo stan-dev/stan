@@ -1,10 +1,11 @@
-#include <stan/mcmc/mcmc_output.hpp>
 #include <gtest/gtest.h>
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
 #include <boost/math/distributions/students_t.hpp>
 #include <stdio.h>
+
+#include <stan/mcmc/chains.hpp>
 
 class Models_BasicDistributions_Binormal : public ::testing::Test {
 protected:
@@ -21,8 +22,6 @@ protected:
 
     output1 = model + "1.csv";
     output2 = model + "2.csv";
-    factory.addFile(output1);
-    factory.addFile(output2);
     
     expected_y1 = 0.0;
     expected_y2 = 0.0;
@@ -32,7 +31,6 @@ protected:
   std::string output1;
   std::string output2;
   
-  stan::mcmc::mcmc_output_factory factory;
   double expected_y1;
   double expected_y2;
 };
@@ -52,25 +50,49 @@ TEST_F(Models_BasicDistributions_Binormal,RunModel) {
   EXPECT_EQ(0, system(command.c_str()))
     << "Can not execute command: " << command << std::endl;
 }
-/*
 TEST_F(Models_BasicDistributions_Binormal, y1) {
-  stan::mcmc::mcmc_output y1 = factory.create("y.1");
-  double neff = y1.effectiveSize();
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables(output1, 2,
+                             names, dimss);
 
+  stan::mcmc::chains<> c(2, names, dimss);
+  stan::mcmc::add_chain(c, 0U, output1, 2U);
+  stan::mcmc::add_chain(c, 1U, output2, 2U);
 
-  boost::math::students_t t(neff-1.0);
-  double T = boost::math::quantile(t, 0.975);
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index = c.get_total_param_index(c.param_name_to_index("y"), 
+                                  idxs);
+
+  double neff = c.effective_sample_size(index);
+
+  boost::math::students_t t_dist(neff-1.0);  
+  double T = boost::math::quantile(t_dist, 0.975);
   
-  EXPECT_NEAR(expected_y1, y1.mean(), T*sqrt(y1.variance()/neff));
+  EXPECT_NEAR(expected_y1, c.mean(index), T*sqrt(c.variance(index)/neff));
 }
-
 TEST_F(Models_BasicDistributions_Binormal, y2) {
-  stan::mcmc::mcmc_output y2 = factory.create("y.2");
-  double neff = y2.effectiveSize();  
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables(output1, 2,
+                             names, dimss);
 
-  boost::math::students_t t(neff-1.0);
-  double T = boost::math::quantile(t, 0.975);
+  stan::mcmc::chains<> c(2, names, dimss);
+  stan::mcmc::add_chain(c, 0U, output1, 2U);
+  stan::mcmc::add_chain(c, 1U, output2, 2U);
+
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(1);
+  index = c.get_total_param_index(c.param_name_to_index("y"), 
+                                  idxs);
+
+  double neff = c.effective_sample_size(index);
+
+  boost::math::students_t t_dist(neff-1.0);  
+  double T = boost::math::quantile(t_dist, 0.975);
   
-  EXPECT_NEAR(expected_y2, y2.mean(), T*sqrt(y2.variance()/neff));
+  EXPECT_NEAR(expected_y1, c.mean(index), T*sqrt(c.variance(index)/neff));
 }
-*/

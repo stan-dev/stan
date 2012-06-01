@@ -2,9 +2,9 @@
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
 ##
-LIBGTEST := test/libgtest.a
-GTEST_MAIN := lib/gtest/src/gtest_main.cc
-
+LIBGTEST = test/libgtest.a
+GTEST_MAIN = lib/gtest/src/gtest_main.cc
+CFLAGS_GTEST += -I lib/gtest/include -I lib/gtest
 
 ##
 # Target to build all models and test them. This needs to be before 
@@ -98,6 +98,7 @@ endif
 ##
 # Builds a single test
 ##
+.PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
@@ -105,7 +106,6 @@ ifeq ($(findstring test-,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-.PRECIOUS: test/%.o
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
@@ -123,17 +123,19 @@ test/%.d : src/test/%_test.cpp
 	rm -f $@.$$$$ ); \
 	fi
 
-##
-# If the target is a unit test, include .d. 
-# Will generate dependencies.
-##
-ifneq (,$(filter test/%,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
+ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(UNIT_TESTS)) 
 endif
-ifneq (,$(filter test/models/%,$(MAKECMDGOALS)))
-  -include bin/stan/command/stanc.d
+ifneq (,$(filter test-models,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(MODEL_TESTS)) 
 endif
-
+ifneq (,$(filter test-bugs,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(BUGS_TESTS)) 
+endif
+ifneq (,$(filter test-all,$(MAKECMDGOALS)))
+  -include $(addsuffix .d, $(UNIT_TESTS)) 
+  -include $(addsuffix .d, $(MODEL_TESTS)) 
+endif
 
 ##
 # target path_separator for use in some tests that need to 
@@ -141,8 +143,4 @@ endif
 ##
 .PHONY: path_separator
 path_separator :
-ifeq ($(OS),win)
-	@echo '\'
-else
-	@echo '/'
-endif
+	@echo $(PATH_SEPARATOR)

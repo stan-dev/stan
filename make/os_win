@@ -15,6 +15,7 @@
 
 EXE = .exe
 CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
+PATH_SEPARATOR = '\'
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
