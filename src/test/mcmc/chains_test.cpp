@@ -1029,3 +1029,28 @@ TEST(McmcChains,effective_sample_size) {
   EXPECT_FLOAT_EQ(43.58981,  c.effective_sample_size(index)) <<
     "delta.22 sample size should be 43.6";
 }
+TEST(McmcChains,split_potential_scale_reduction) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
+
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(1.187, c.split_potential_scale_reduction(index)) <<
+    "mu.1 split R hat should be around 1.19";
+
+  idxs.clear();
+  idxs.push_back(21);
+  index = c.get_total_param_index(c.param_name_to_index("delta"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(1.03715,  c.split_potential_scale_reduction(index)) <<
+    "delta.22 split R hat should be near 1.04";
+}

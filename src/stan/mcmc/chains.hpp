@@ -1331,6 +1331,11 @@ namespace stan {
         }
         return ess;
       }
+
+      double split_potential_scale_reduction(size_t n) {
+        return 0;
+      }
+
     };
 
     
