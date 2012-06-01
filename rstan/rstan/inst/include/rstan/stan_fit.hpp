@@ -24,11 +24,11 @@
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
-#include <stan/mcmc/chains.hpp>
 
 #include <rstan/io/rlist_ref_var_context.hpp> 
-#include <rstan/stan_args.hpp> 
 #include <rstan/io/r_ostream.hpp> 
+#include <rstan/stan_args.hpp> 
+#include <rstan/chains_for_R.hpp>
 
 #include <Rcpp.h>
 // #include <Rinternals.h>
@@ -37,6 +37,17 @@
 namespace rstan {
 
   namespace { 
+  
+    size_t product(std::vector<size_t> dims) {
+      size_t y = 1U;
+      for (size_t i = 0; i < dims.size(); ++i)
+        y *= dims[i];
+      return y;
+    }
+
+    
+
+
 
     bool do_print(int refresh) {
       return refresh > 0;
@@ -79,6 +90,91 @@ namespace rstan {
       m.get_dims(dimss); 
       return dimss; 
     } 
+
+
+
+    /**
+     * Get the names for an array of given dimensions 
+     * in the way of column majored. 
+     * For exmaple, if we know an array named `a`, with
+     * dimensions of [2, 3, 4], the names then are (starting
+     * from 0):
+     * a[0, 0, 0]
+     * a[1, 0, 0]
+     * a[0, 1, 0]
+     * a[1, 1, 0]
+     * a[0, 2, 0]
+     * a[1, 2, 0]
+     * a[0, 0, 1]
+     * a[1, 0, 1]
+     * a[0, 1, 1]
+     * a[1, 1, 1]
+     * a[0, 2, 1]
+     * a[1, 2, 1]
+     * a[0, 0, 2]
+     * a[1, 0, 2]
+     * a[0, 1, 2]
+     * a[1, 1, 2]
+     * a[0, 2, 2]
+     * a[1, 2, 2]
+     * a[0, 0, 3]
+     * a[1, 0, 3]
+     * a[0, 1, 3]
+     * a[1, 1, 3]
+     * a[0, 2, 3]
+     * a[1, 2, 3]
+     *
+     * @param name The name of the array variable 
+     * @param dims The dimensions of the array 
+     * @param first_is_one[true] Where to start for the first index: 0 or 1. 
+     * @return All the names for the array 
+     *
+     */
+    std::vector<std::string>
+    get_col_major_names(std::string name,
+                        std::vector<size_t> dims,
+                        bool first_is_one = true) {
+
+      size_t s = dims.size();
+      if (0 == s) return std::vector<std::string>(1, name);
+      std::vector<size_t> steps(1, 1);
+      for (size_t i = 0; i < (s - 1); i++)
+        steps.push_back(steps.back() * dims[i]);
+
+      /*
+      for (tyepname std::vector<size_t>::const_iterator i = steps.begin(); 
+           i != steps.end();
+           ++i) {
+        std::cout << *i << std::endl;
+      } 
+      */
+
+      size_t total = product(dims);
+      // std::cout << "total = " << total << std::endl;
+      std::vector<size_t> idx(s);
+
+      std::vector<std::string> allnames;
+
+      for (size_t i = 0; i < total; ++i) {
+        size_t ii = i;
+        for (size_t j = s - 1; j > 0; --j) {
+          idx[j] = ii / steps[j];
+          ii -= idx[j] * steps[j];
+        }
+        idx[0] = ii;
+
+        std::stringstream stri;
+        stri << name << "[";
+
+        size_t first =  first_is_one ? 1 : 0;
+        for (size_t j = 0; j < s - 1 ; ++j)
+          stri << idx[j] + first << ", ";
+        stri << idx[s - 1] + first << "]";
+        allnames.push_back(stri.str());
+      }
+      return allnames;
+    }
+
   
     template <class Sampler, class Model, class RNG>
     void sample_from(Sampler& sampler,
@@ -134,8 +230,8 @@ namespace rstan {
               sample.params_r(params_r);
               sample.params_i(params_i);
               model.write_csv(params_r,params_i,sample_file_stream);
-              model.write_array(params_r,params_i,params_ir); 
             }
+            model.write_array(params_r,params_i,params_ir); 
             chains.add(chain_id - 1, params_ir); 
 
           }
@@ -302,7 +398,8 @@ namespace rstan {
     unsigned int num_chains_; 
     unsigned int seed_; // unique need for all the chains 
     std::vector<stan_args> argss_;
-    stan::mcmc::chains<RNG> chains_; 
+    // stan::mcmc::chains<RNG> chains_; 
+    chains_for_R<RNG> chains_; 
 
   public:
 
@@ -363,11 +460,85 @@ namespace rstan {
       }
       return Rcpp::wrap(true);  
     } 
-    // just a test
-    SEXP get_first_p() {
+
+    /**
+     * Obtain samples by index from a chain
+     *
+     * @param k Index of chain (starting from 0).
+     * @param n Index of parameters (starting from 0). 
+     @ @return A vector of samples in form of R's numeric vector. 
+     *
+     */
+    SEXP get_samples_(size_t k, size_t n) {
       std::vector<double> s; 
-      chains_.get_samples(0, s);
+      chains_.get_samples(k, n, s);
       return Rcpp::wrap(s);    
+    } 
+
+
+
+    /**
+     * Get all the parameter names that are in the chains object 
+     * @return A R vector of names of the parameters.
+     */
+    SEXP param_names() {
+      std::vector<std::string> names(chains_.param_names());
+      return Rcpp::wrap(names); 
+    } 
+
+    /** 
+     * Print out a std::vector 
+     */
+    /**
+    template <typename T>
+    void printv(std::ostream& o, const std::vector<T>& v) {
+      for (typename std::vector<T>::const_iterator it = v.begin(); it != v.end(); ++it)
+        o << *it << std::endl;
+    }
+    */
+
+    
+    /** 
+     * Obtain samples by name
+     * @param chain_id  The chain id starting from 1.
+     * @param name The parameter name 
+     * @return A list for R, each element of which includes the samples of one
+     * parameter
+     */
+    
+    SEXP get_samples(SEXP k_, SEXP names_) {
+      size_t k = Rcpp::as<size_t>(k_) - 1;  // making it start from 0
+      std::vector<SEXP> params; 
+      std::vector<std::string> names 
+        = Rcpp::as<std::vector<std::string> >(names_);
+
+      std::vector<std::string> names2; // names for the returned samples 
+    
+      for (typename std::vector<std::string>::const_iterator it = names.begin(); 
+           it != names.end(); 
+           ++it) {
+        size_t j = chains_.param_name_to_index(*it);
+        std::vector<size_t> j_dims = chains_.param_dims(j); 
+        size_t j_size = chains_.param_size(j); 
+        std::vector<std::string> j_names = get_col_major_names(*it, j_dims);
+        names2.insert(names2.end(), j_names.begin(), j_names.end()); 
+   
+        // rstan::io::rcout << "j=" << j 
+        //                  << ", j_size.size() = " << j_dims.size() 
+        //                  << std::endl;
+        size_t j_start = chains_.param_start(j); 
+        for (size_t i = j_start; i < j_start + j_size; i++)  
+          params.push_back(get_samples_(k, i));
+         
+      } 
+      Rcpp::List lst(params.begin(), params.end());
+      // rstan::io::rcout << "names2" << std::endl;
+      // printv(rstan::io::rcout, names2);
+      lst.names() = names2; 
+      // rstan::io::rcout << "lst.names()" << std::endl;
+      // std::vector<std::string> yanames2 = lst.names(); 
+      // printv(rstan::io::rcout, yanames2);
+      return Rcpp::wrap(lst);
     } 
 
   };

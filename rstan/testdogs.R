@@ -61,6 +61,19 @@ parameters {
   real(, -0.00001) beta;
 }
 
+transformed parameters {
+  real p[2];
+  real q[2, 2];
+  p[1] <- alpha;
+  p[2] <- beta;
+  q[1, 1] <- beta;
+  q[2, 2] <- alpha;
+  q[1, 2] <- 0;
+  q[2, 1] <- 1;
+} 
+
+
+
 model {
   alpha ~ normal(0.0, 316.0);
   beta  ~ normal(0.0, 316.0);
@@ -81,7 +94,9 @@ dogsrr <- stan.model(model.code = dogsstan, model.name = model_name,
   nuts <- new(dogsrr@.modelmod$nuts, dogsdat, 1)
   nuts$call_sampler(args) 
   nuts$call_sampler(args) 
-  t <- nuts$get_first_p() 
+  t <- do.call(cbind, nuts$get_samples(1, c("alpha", "beta", "p", "q"))) 
+  head(t)
+  pnames <- nuts$param_names() 
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
 colMeans(post)

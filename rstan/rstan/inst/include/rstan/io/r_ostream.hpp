@@ -8,8 +8,8 @@
 #include <R_ext/Print.h>
 
 /**
- * Similar version of both std::cout and std::cerr are implemented for let
- * RStan write to cout and cerr of R.
+ * Similar version of both std::cout and std::cerr are implemented for 
+ * RStan to write to cout and cerr of R.
  *
  * See 
  * http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt11ch25.html#io.streambuf.derived
