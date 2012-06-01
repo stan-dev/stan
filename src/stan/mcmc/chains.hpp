@@ -1051,6 +1051,59 @@ namespace stan {
         return (M / (M-1)) *boost::accumulators::variance(acc);
       }
 
+      /**
+       * Return the covariance of the kept samples in
+       * the specified chain for the specified parameters.  
+       *
+       * @param k Chain index.
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Covariance of parameters in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double covariance(size_t k,
+                      size_t n1,
+                      size_t n2) {
+        validate_chain_idx(k);
+        validate_param_idx(n1);
+        validate_param_idx(n2);
+        return 0;
+        /*using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(k,n,acc);
+        double M = num_kept_samples(k);
+        return (M / (M-1)) *boost::accumulators::variance(acc);*/
+      }
+
+      /**
+       * Return the covariance of the kept samples for
+       * the specified parameters.  
+       *
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Variance of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double covariance(size_t n1, size_t n2) {
+        validate_param_idx(n1);
+        validate_param_idx(n2);
+        return 0;
+        /*using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(n,acc);
+        double M = num_kept_samples(n);
+        return (M / (M-1)) *boost::accumulators::variance(acc);*/
+      }
+      
+      
 
       /**
        * Return the specified sample quantile for kept samples for the
