@@ -1652,8 +1652,6 @@ pair<double,double> smallest_interval(size_t n,
 
 double potential_scale_reduction(size_t n)
 
-double split_potential_scale_reduction(size_t n);
-
 double mcmc_error_mean(size_t n);
                    
 void print(ostream&);
