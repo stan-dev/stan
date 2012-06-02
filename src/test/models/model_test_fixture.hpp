@@ -25,14 +25,14 @@ namespace testing {
    *   bool has_data: indicates whether the model has data
    *   size_t chains: number of chains to run
    */
-  template <class Derived>
+  template <class Derived,
+            bool has_data = false>
   class Model_Test_Fixture : public ::testing::Test {
   
   protected:
     static char path_separator;
     static std::string base_name;
     static const size_t chains = 2;
-    static const bool has_data = false;
 
     static void SetUpTestCase() {
       set_path_separator();
@@ -91,10 +91,10 @@ namespace testing {
     
   };
   
-  template<class Derived> 
-  char Model_Test_Fixture<Derived>::path_separator;
+  template<class Derived, bool has_data> 
+  char Model_Test_Fixture<Derived, has_data>::path_separator;
   
-  template<class Derived> 
-  std::string Model_Test_Fixture<Derived>::base_name;
+  template<class Derived, has_data> 
+  std::string Model_Test_Fixture<Derived, has_data>::base_name;
 }
 #endif
