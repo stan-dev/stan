@@ -26,17 +26,18 @@ namespace testing {
    *   size_t chains: number of chains to run
    */
   template <class Derived,
-            bool has_data = false>
+            bool has_data = false,
+            size_t chains = 2>
   class Model_Test_Fixture : public ::testing::Test {
   
   protected:
     static char path_separator;
     static std::string base_name;
-    static const size_t chains = 2;
 
     static void SetUpTestCase() {
       set_path_separator();
       set_base_name(get_model_path());
+      run_models();
     }
 
     static void set_path_separator() {
@@ -63,13 +64,13 @@ namespace testing {
       std::stringstream command;
       command << base_name;
       command << " --samples=" << base_name << "." << chain << ".csv";
-      //if (Model_Test_Fixture::has_data) {
-      //command << " --data=" << base_name << ".Rdata";
-      //}
+      if (has_data) {
+        command << " --data=" << base_name << ".Rdata";
+      }
       return command.str();
     }
     
-    static void run() {
+    static void run_models() {
       for (size_t chain = 0; chain < chains; chain++) {
         std::string command = get_command(chain);
         EXPECT_EQ(0, system(command.c_str()))
@@ -91,10 +92,11 @@ namespace testing {
     
   };
   
-  template<class Derived, bool has_data> 
-  char Model_Test_Fixture<Derived, has_data>::path_separator;
+template<class Derived, bool has_data, size_t chains> 
+  char Model_Test_Fixture<Derived, has_data, chains>::path_separator;
   
-  template<class Derived, has_data> 
-  std::string Model_Test_Fixture<Derived, has_data>::base_name;
+  template<class Derived, bool has_data, size_t chains> 
+  std::string Model_Test_Fixture<Derived, has_data, chains>::base_name;
 }
 #endif
+

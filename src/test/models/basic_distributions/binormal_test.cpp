@@ -4,20 +4,13 @@
 #include <boost/math/distributions/students_t.hpp>
 
 class Models_BasicDistributions_Binormal : 
-  public ::testing::Model_Test_Fixture<Models_BasicDistributions_Binormal> {
+  public ::testing::Model_Test_Fixture<Models_BasicDistributions_Binormal,
+                                       false> {
 protected:
-  std::string output1;
-  std::string output2;
-
   double expected_y1;
   double expected_y2;
-
-  
   
   virtual void SetUp() {
-    //output1 = base_name + "1.csv";
-    //output2 = base_name + "2.csv";
-    
     expected_y1 = 0.0;
     expected_y2 = 0.0;
   }
@@ -34,20 +27,9 @@ public:
 };
 
 TEST_F(Models_BasicDistributions_Binormal,RunModel) {
-  /*std::string command;
-  command = base_name;
-  command += " --samples=";
-  command += output1;
-  EXPECT_EQ(0, system(command.c_str())) 
-    << "Can not execute command: " << command << std::endl;
-            
-  
-  command = base_name;
-  command += " --samples=";
-  command += output2;
-  EXPECT_EQ(0, system(command.c_str()))
-  << "Can not execute command: " << command << std::endl;*/
+  run_models();
 }
+
 /*TEST_F(Models_BasicDistributions_Binormal, y1) {
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;
