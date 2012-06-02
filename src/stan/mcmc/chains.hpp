@@ -21,6 +21,9 @@
 // #include <boost/accumulators/statistics/moment.hpp>
 #include <boost/accumulators/statistics/tail_quantile.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
+#include <boost/accumulators/statistics/covariance.hpp>
+#include <boost/accumulators/statistics/variates/covariate.hpp>
+
 
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -442,7 +445,7 @@ namespace stan {
        * @return The dimensions of the parameter name with the specified
        * index.
        * @throw std::out_of_range If the index is greater than or equal
-       * to the numberof parameter names.
+       * to the number of parameter names.
        */
       const std::vector<size_t>& param_dims(size_t j) {
         validate_param_name_idx(j);
@@ -1007,6 +1010,162 @@ namespace stan {
       }
 
       /**
+       * Return the variance of the kept samples in
+       * the specified chain for the specified parameter.  
+       *
+       * @param k Chain index.
+       * @param n Parameter index.
+       * @return Variance of parameter in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double variance(size_t k,
+                      size_t n) {
+        validate_chain_idx(k);
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(k,n,acc);
+        double M = num_kept_samples(k);
+        return (M / (M-1)) *boost::accumulators::variance(acc);
+      }
+
+      /**
+       * Return the variance of the kept samples in
+       * all chains for the specified parameter.  
+       *
+       * @param n Parameter index.
+       * @return Variance of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double variance(size_t n) {
+        validate_param_idx(n);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        accumulator_set<double, stats<variance> > acc;
+        apply_kept_samples(n,acc);
+        double M = num_kept_samples(n);
+        return (M / (M-1)) *boost::accumulators::variance(acc);
+      }
+
+      /**
+       * Return the covariance of the kept samples in
+       * the specified chain for the specified parameters.  
+       *
+       * @param k Chain index.
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Covariance of parameters in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double covariance(size_t k,
+                        size_t n1,
+                        size_t n2) {
+        validate_chain_idx(k);
+        validate_param_idx(n1);
+        validate_param_idx(n2);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+        
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+        std::vector<double> samples1, samples2;
+        this->get_kept_samples(k, n1, samples1);
+        this->get_kept_samples(k, n2, samples2);
+        for (size_t kk = 0; kk < this->num_kept_samples(k); kk++) {
+          acc(samples1[kk], boost::accumulators::covariate1 = samples2[kk]);
+        }
+        double M = num_kept_samples(k);
+        return (M / (M-1)) * boost::accumulators::covariance(acc);
+      }
+
+      /**
+       * Return the covariance of the kept samples for
+       * the specified parameters.  
+       *
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Covariance of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double covariance(size_t n1, size_t n2) {
+        validate_param_idx(n1);
+        validate_param_idx(n2);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+        
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+        for (size_t chain = 0; chain < this->num_chains(); chain++) {
+          std::vector<double> samples1, samples2;
+          this->get_kept_samples(chain, n1, samples1);
+          this->get_kept_samples(chain, n2, samples2);
+          for (size_t kk = 0; kk < this->num_kept_samples(chain); kk++) {
+            acc(samples1[kk], boost::accumulators::covariate1 = samples2[kk]);
+          }
+        }
+        double M = this->num_kept_samples();
+        return (M / (M-1)) * boost::accumulators::covariance(acc);
+      }
+      
+
+      /**
+       * Return the correlation of the kept samples in
+       * the specified chain for the specified parameters.  
+       *
+       * @param k Chain index.
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Correlation of parameters in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double correlation(size_t k,
+                        size_t n1,
+                        size_t n2) {
+        double cov = covariance(k, n1, n2);
+        double sd1 = sd(k, n1);
+        double sd2 = sd(k, n2);
+                
+        return cov / sd1 / sd2;
+      }
+
+      /**
+       * Return the correlation of the kept samples for
+       * the specified parameters.  
+       *
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Correlation of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double correlation(size_t n1, size_t n2) {
+        double cov = covariance(n1, n2);
+        double sd1 = sd(n1);
+        double sd2 = sd(n2);
+
+        return cov / sd1 / sd2;
+      }
+      
+
+      /**
        * Return the specified sample quantile for kept samples for the
        * specified parameter in the specified chain.
        *
@@ -1220,7 +1379,7 @@ namespace stan {
       }
 
       /** 
-       * Return the autocorrelation for the specified parameter in the
+       * Returns the autocorrelations for the specified parameter in the
        * kept samples of the chain specified.
        * 
        * @param[in] k Chain index
@@ -1234,7 +1393,111 @@ namespace stan {
         stan::prob::autocorrelation(samples,
                                     ac);
       }
-    
+      
+      /** 
+       * Returns the effective sample size for the specified parameter
+       * across all kept samples.
+       *
+       * The implementation matches BDA3's effective size description.
+       * 
+       * Current implementation takes the minimum number of samples
+       * across chains as the number of samples per chain.
+       *
+       * @param[in] n Parameter index
+       * 
+       * @return the effective sample size.
+       */
+      // FIXME: reimplement using autocorrelation.
+      double effective_sample_size(size_t n) {
+        validate_param_idx(n);
+        size_t m = this->num_chains();
+        // need to generalize to each jagged samples per chain
+        size_t n_samples = this->num_kept_samples(0U);
+        for (size_t chain = 1; chain < m; chain++) {
+          n_samples = std::min(n_samples, this->num_kept_samples(chain));
+        }
+
+        std::vector<double> chain_mean;
+        std::vector<double> chain_var;
+        for (size_t chain = 0; chain < m; chain++) {
+          chain_mean.push_back(this->mean(chain,n));
+          chain_var.push_back(this->variance(chain,n));
+        }
+        double var_plus = stan::math::mean(chain_var)*(n_samples-1)/n_samples + 
+          stan::math::variance(chain_mean);
+
+        std::vector<double> rho_hat_t;
+        double rho_hat = 0;
+        for (size_t t = 1; (t < n_samples && rho_hat >= 0); t++) {
+          double variogram = 0;
+          for (size_t chain = 0; chain < m; chain++) {
+            std::vector<double> samples;
+            this->get_kept_samples(chain,n,samples);
+            samples.resize(n_samples);
+            for (size_t ii = 0; ii < n_samples-t; ii++) {
+              double diff = samples[ii] - samples[ii+t]; 
+              variogram += diff * diff;
+            }
+          }
+          variogram /= m * (n_samples-t);
+          rho_hat = 1 - variogram / (2 * var_plus);
+          if (rho_hat >= 0)
+            rho_hat_t.push_back(rho_hat);
+        }        
+      
+        double ess = m*n_samples;
+        if (rho_hat_t.size() > 0) {
+          ess /= 1 + 2 * stan::math::sum(rho_hat_t);
+        }
+        return ess;
+      }
+      
+      /** 
+       * Return the split potential scale reduction (split R hat)
+       * for the specified parameter.
+       *
+       * Current implementation takes the minimum number of samples
+       * across chains as the number of samples per chain.
+       * 
+       * @param[in] n Parameter index
+       * 
+       * @return split R hat.
+       */
+      double split_potential_scale_reduction(size_t n) {
+        size_t n_chains = this->num_chains();
+        size_t n_samples = this->num_kept_samples(0U);
+        for (size_t chain = 1; chain < n_chains; chain++) {
+          n_samples = std::min(n_samples, this->num_kept_samples(chain));
+        }
+        if (n_samples % 2 == 1)
+          n_samples--;
+        
+        std::vector<double> split_chain_mean;
+        std::vector<double> split_chain_var;
+
+        for (size_t chain = 0; chain < n_chains; chain++) {
+          std::vector<double> samples(n_samples);
+          this->get_kept_samples(chain, n, samples);
+          
+          std::vector<double> split_chain(n_samples/2);
+          split_chain.assign(samples.begin(),
+                             samples.begin()+n_samples/2);
+          split_chain_mean.push_back(stan::math::mean(split_chain));
+          split_chain_var.push_back(stan::math::variance(split_chain));
+          
+          split_chain.assign(samples.end()-n_samples/2, 
+                             samples.end());
+          split_chain_mean.push_back(stan::math::mean(split_chain));
+          split_chain_var.push_back(stan::math::variance(split_chain));
+        }
+
+        double var_between = n_samples/2 * stan::math::variance(split_chain_mean);
+        double var_within = stan::math::mean(split_chain_var);
+        
+        // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
+        return sqrt((var_between/var_within + n_samples/2 -1)/(n_samples/2));
+      }
+
     };
 
     
@@ -1501,10 +1764,6 @@ pair<double,double> smallest_interval(size_t n,
                                       double prob);
 
 double potential_scale_reduction(size_t n)
-
-double split_potential_scale_reduction(size_t n);
-
-double effective_sample_size(size_t n);
 
 double mcmc_error_mean(size_t n);
                    

@@ -87,7 +87,8 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 # Using a static pattern rule to make these tests depend on
 # missing models.
 ##
-$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
+.PRECIOUS: test/models/%.o models/%$(EXE)
+$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
@@ -123,33 +124,19 @@ test/%.d : src/test/%_test.cpp
 	rm -f $@.$$$$ ); \
 	fi
 
-##
-# If the target is a unit test, include .d. 
-# Will generate dependencies.
-##
-ifneq (,$(filter test/%,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(filter test/%,$(MAKECMDGOALS))))
-endif
-ifneq (,$(filter test/models/%,$(MAKECMDGOALS)))
-  -include bin/stan/command/stanc.d
-endif
 ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(UNIT_TESTS)) 
 endif
 ifneq (,$(filter test-models,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(MODEL_TESTS)) 
-  -include bin/stan/command/stanc.d
 endif
 ifneq (,$(filter test-bugs,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(BUGS_TESTS)) 
-  -include bin/stan/command/stanc.d
 endif
 ifneq (,$(filter test-all,$(MAKECMDGOALS)))
   -include $(addsuffix .d, $(UNIT_TESTS)) 
   -include $(addsuffix .d, $(MODEL_TESTS)) 
-  -include bin/stan/command/stanc.d
 endif
-
 
 ##
 # target path_separator for use in some tests that need to 

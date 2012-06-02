@@ -1,49 +1,23 @@
 #include <gtest/gtest.h>
-#include <stdexcept>
+#include <test/models/model_test_fixture.hpp>
 
-class Models_BugsExamples_Vol3_Camel2 : public ::testing::Test {
+class Models_BugsExamples_Vol3_Camel2 : 
+  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol3_Camel2,
+                                       true> {
 protected:
-  virtual void SetUp() {
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    path_separator += fgetc(in);
-    pclose(in);
-    
-    model.append("models").append(path_separator);
-    model.append("bugs_examples").append(path_separator);
-    model.append("vol3").append(path_separator);
-    model.append("camel").append(path_separator);
-    model.append("camel2");
-
-    output1 = model + "1.csv";
-    output2 = model + "2.csv";
-
-    data = model + ".Rdata";
+  virtual void SetUp() {}
+public:
+  static std::vector<std::string> get_model_path() {
+    std::vector<std::string> model_path;
+    model_path.push_back("models");
+    model_path.push_back("bugs_examples");
+    model_path.push_back("vol3");
+    model_path.push_back("camel");
+    model_path.push_back("camel2");
+    return model_path;
   }
-  std::string path_separator;
-  std::string model;
-  std::string output1;
-  std::string output2;
-  std::string data;
 };
 
 TEST_F(Models_BugsExamples_Vol3_Camel2,RunModel) {
-  std::string command;
-  command = model;
-  command += " --samples=";
-  command += output1;
-  command += " --data=";
-  command += data;
-  EXPECT_EQ(0, system(command.c_str())) 
-    << "Can not execute command: " << command << std::endl;
-            
-  
-  command = model;
-  command += " --samples=";
-  command += output2;
-  command += " --data=";
-  command += data;
-  EXPECT_EQ(0, system(command.c_str()))
-    << "Can not execute command: " << command << std::endl;
+  run_model();
 }

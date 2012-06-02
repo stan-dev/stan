@@ -56,27 +56,8 @@ $(MODEL_HEADER).d : $(MODEL_HEADER)
 	fi
 
 ##
-# Rule for generating dependencies.
-# Applies to all *.cpp files in src.
-# Test cpp files are handled slightly differently.
-##
-#models/%.d : models/%.cpp
-#	@if test -d $(dir $@); \
-#	then \
-#	(set -e; \
-#	rm -f $@; \
-#	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-#	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-#	rm -f $@.$$$$);\
-#	fi
-
-
-
-##
 # Will generate dependencies.
 ##
-ifneq (,$(filter models/%,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(filter models/%,$(MAKECMDGOALS))))
-  -include bin/stan/command/stanc.d
+ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
   -include $(MODEL_HEADER).d
 endif
