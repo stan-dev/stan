@@ -2,14 +2,6 @@
 #define __TEST__MODELS__MODEL_TEST_FIXTURE_HPP__
 
 #include <gtest/gtest.h>
-#include <stdexcept>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
-#include <stdio.h>
-
 #include <stan/mcmc/chains.hpp>
 
 namespace testing {
