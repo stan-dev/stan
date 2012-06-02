@@ -27,7 +27,7 @@ public:
 };
 
 TEST_F(Models_BasicDistributions_Binormal,RunModel) {
-  run_models();
+  run_model();
 }
 TEST_F(Models_BasicDistributions_Binormal, y1) {
   using boost::math::students_t;
