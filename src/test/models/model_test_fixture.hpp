@@ -37,7 +37,6 @@ namespace testing {
     static void SetUpTestCase() {
       set_path_separator();
       set_base_name(get_model_path());
-      run_models();
     }
 
     static void set_path_separator() {
