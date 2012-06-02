@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
-
 #include <boost/math/distributions/students_t.hpp>
 
 class Models_BasicDistributions_Binormal : 
