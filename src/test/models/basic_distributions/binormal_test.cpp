@@ -29,51 +29,37 @@ public:
 TEST_F(Models_BasicDistributions_Binormal,RunModel) {
   run_models();
 }
-
-/*TEST_F(Models_BasicDistributions_Binormal, y1) {
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables(output1, 2,
-                             names, dimss);
-
-  stan::mcmc::chains<> c(2, names, dimss);
-  stan::mcmc::add_chain(c, 0U, output1, 2U);
-  stan::mcmc::add_chain(c, 1U, output2, 2U);
-
+TEST_F(Models_BasicDistributions_Binormal, y1) {
+  using boost::math::students_t;
+  using boost::math::quantile;
+  
   size_t index;
   std::vector<size_t> idxs;
   idxs.push_back(0);
-  index = c.get_total_param_index(c.param_name_to_index("y"), 
-                                  idxs);
+  index = chains->get_total_param_index
+    (chains->param_name_to_index("y"),idxs);
 
-  double neff = c.effective_sample_size(index);
+  double neff = chains->effective_sample_size(index);
 
-  boost::math::students_t t_dist(neff-1.0);  
-  double T = boost::math::quantile(t_dist, 0.975);
-  
-  EXPECT_NEAR(expected_y1, c.mean(index), T*sqrt(c.variance(index)/neff));
+  double y1_mean = chains->mean(index);
+  double se = quantile(students_t(neff-1.0), 0.975) *  
+    std::sqrt(chains->variance(index)/neff);
+  EXPECT_NEAR(expected_y1, y1_mean, se);
 }
 TEST_F(Models_BasicDistributions_Binormal, y2) {
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables(output1, 2,
-                             names, dimss);
-
-  stan::mcmc::chains<> c(2, names, dimss);
-  stan::mcmc::add_chain(c, 0U, output1, 2U);
-  stan::mcmc::add_chain(c, 1U, output2, 2U);
-
+  using boost::math::students_t;
+  using boost::math::quantile;
+  
   size_t index;
   std::vector<size_t> idxs;
   idxs.push_back(1);
-  index = c.get_total_param_index(c.param_name_to_index("y"), 
-                                  idxs);
+  index = chains->get_total_param_index
+    (chains->param_name_to_index("y"),idxs);
 
-  double neff = c.effective_sample_size(index);
+  double neff = chains->effective_sample_size(index);
 
-  boost::math::students_t t_dist(neff-1.0);  
-  double T = boost::math::quantile(t_dist, 0.975);
-  
-  EXPECT_NEAR(expected_y1, c.mean(index), T*sqrt(c.variance(index)/neff));
+  double y2_mean = chains->mean(index);
+  double se = quantile(students_t(neff-1.0), 0.975) *  
+    std::sqrt(chains->variance(index)/neff);
+  EXPECT_NEAR(expected_y2, y2_mean, se);
 }
-*/
