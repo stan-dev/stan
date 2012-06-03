@@ -72,7 +72,7 @@ namespace rstan {
        * real values of the rlist_var_context.
        */
       bool contains_r_only(const std::string& name) const {
-        return vars_r_.find(name) != vars_r_.end();
+        return vars_r_.count(name) > 0; 
       }
     public: 
 
@@ -97,38 +97,50 @@ namespace rstan {
           // are thinking they are integers, but Rf_isInteger would return
           // FALSE. One solution is use L suffix. Anyway, the R code should
           // change the data to integers when it is convertible. 
+          typedef std::map<std::string, 
+                          std::pair<std::vector<double>,
+                                    std::vector<size_t> > >::value_type 
+            pspdd_v_t;  // pair of string and a pair of double and dimensions
+          typedef std::map<std::string, 
+                          std::pair<std::vector<int>,
+                                    std::vector<size_t> > >::value_type 
+            pspid_v_t;  // pair of string and a pair of int and dimensions
+
+
           if (Rf_isInteger(ee)) {
             if (Rf_length(dim) > 0) { 
-              vars_i_[varnames[i]] 
-                = std::pair<std::vector<int>, std::vector<size_t> >(
+              vars_i_.insert(pspid_v_t(varnames[i], 
+                std::pair<std::vector<int>, std::vector<size_t> >(
                   Rcpp::as<std::vector<int> >(ee), 
-                  Rcpp::as<std::vector<size_t> >(dim)); 
+                  Rcpp::as<std::vector<size_t> >(dim)))); 
             } else {
               if (1 == eelen) {  // scalar 
-                vars_i_[varnames[i]] 
-                  = std::pair<std::vector<int>, std::vector<size_t> >(
-                    Rcpp::as<std::vector<int> >(ee), empty_vec_ui_); 
+                vars_i_.insert(pspid_v_t(varnames[i], 
+                  std::pair<std::vector<int>, std::vector<size_t> >(
+                    Rcpp::as<std::vector<int> >(ee), empty_vec_ui_))); 
               } else { // vector 
-                vars_i_[varnames[i]] 
-                  = std::pair<std::vector<int>, std::vector<size_t> >(
-                    Rcpp::as<std::vector<int> >(ee), std::vector<size_t>(1, eelen));
+                vars_i_.insert(pspid_v_t(varnames[i], 
+                  std::pair<std::vector<int>, std::vector<size_t> >(
+                    Rcpp::as<std::vector<int> >(ee), 
+                    std::vector<size_t>(1, eelen))));
               }
             } 
           } else if(Rf_isNumeric(ee)) {
             if (Rf_length(dim) > 0) { 
-              vars_r_[varnames[i]] 
-                = std::pair<std::vector<double>, std::vector<size_t> >(
+              vars_r_.insert(pspdd_v_t(varnames[i], 
+                std::pair<std::vector<double>, std::vector<size_t> >(
                   Rcpp::as<std::vector<double> >(ee), 
-                  Rcpp::as<std::vector<size_t> >(dim)); 
+                  Rcpp::as<std::vector<size_t> >(dim)))); 
             } else {
               if (1 == eelen) { 
-                vars_r_[varnames[i]] 
-                  = std::pair<std::vector<double>, std::vector<size_t> >(
-                    Rcpp::as<std::vector<double> >(ee), empty_vec_ui_); 
+                vars_r_.insert(pspdd_v_t(varnames[i], 
+                  std::pair<std::vector<double>, std::vector<size_t> >(
+                  Rcpp::as<std::vector<double> >(ee), empty_vec_ui_))); 
               } else {
-                vars_r_[varnames[i]] 
-                  = std::pair<std::vector<double>, std::vector<size_t> >(
-                    Rcpp::as<std::vector<double> >(ee), std::vector<size_t>(1, eelen));
+                vars_r_.insert(pspdd_v_t(varnames[i], 
+                  std::pair<std::vector<double>, std::vector<size_t> >(
+                  Rcpp::as<std::vector<double> >(ee), 
+                  std::vector<size_t>(1, eelen))));
               }
             }
           } else {
@@ -159,7 +171,7 @@ namespace rstan {
        * array value.
        */
       bool contains_i(const std::string& name) const {
-        return vars_i_.find(name) != vars_i_.end();
+        return vars_i_.count(name) > 0; 
       }
 
       /**

@@ -75,7 +75,7 @@ namespace rstan {
        * real values of the rlist_ref_var_context.
        */
       bool contains_r_only(const std::string& name) const {
-        return vars_r_dim_.find(name) != vars_r_dim_.end();
+        return vars_r_dim_.count(name) > 0; 
       }
     public: 
 
@@ -102,24 +102,32 @@ namespace rstan {
           // are thinking they are integers, but Rf_isInteger would return
           // FALSE. One solution is use L suffix. Anyway, the R code should
           // change the data to integers when it is convertible. 
+
+          typedef std::map<std::string, std::vector<size_t> >::value_type 
+            psd_v_t; // a Pair of String and Dimensions
+
           if (Rf_isInteger(ee)) {
             if (Rf_length(dim) > 0) { 
-              vars_i_dim_[varnames[i]] = Rcpp::as<std::vector<size_t> >(dim); 
+              vars_i_dim_.insert(psd_v_t(varnames[i], 
+                                         Rcpp::as<std::vector<size_t> >(dim))); 
             } else {
               if (1 == eelen) {  // scalar 
-                vars_i_dim_[varnames[i]] = empty_vec_ui_; 
+                vars_i_dim_.insert(psd_v_t(varnames[i], empty_vec_ui_)); 
               } else { // vector 
-                vars_i_dim_[varnames[i]] = std::vector<size_t>(1, eelen); 
+                vars_i_dim_.insert(psd_v_t(varnames[i], 
+                                           std::vector<size_t>(1, eelen)));
               }
             } 
           } else if(Rf_isNumeric(ee)) {
             if (Rf_length(dim) > 0) { 
-              vars_r_dim_[varnames[i]] = Rcpp::as<std::vector<size_t> >(dim); 
+              vars_r_dim_.insert(psd_v_t(varnames[i], 
+                                         Rcpp::as<std::vector<size_t> >(dim))); 
             } else {
               if (1 == eelen) {  // scalar 
-                vars_r_dim_[varnames[i]] = empty_vec_ui_; 
+                vars_r_dim_.insert(psd_v_t(varnames[i], empty_vec_ui_)); 
               } else {
-                vars_r_dim_[varnames[i]] = std::vector<size_t>(1, eelen);
+                vars_r_dim_.insert(psd_v_t(varnames[i], 
+                                           std::vector<size_t>(1, eelen)));
               }
             }
           } else {
@@ -150,7 +158,7 @@ namespace rstan {
        * array value.
        */
       bool contains_i(const std::string& name) const {
-        return vars_i_dim_.find(name) != vars_i_dim_.end();
+        return vars_i_dim_.count(name) > 0; 
       }
 
       /**
