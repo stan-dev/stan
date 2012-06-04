@@ -63,6 +63,10 @@ CODE CLEANUP
 
 * convert for loops with size bounds to appropriate iterators
 
+* reduce massive code duplication in
+  - mcmc samplers
+  - gm generator
+
 
 
 Stan-R
@@ -110,7 +114,10 @@ Sampling
 * discrete samplers (Matt)
   - Gibbs for small outcome sets
   - slice for larger outcome sets
-  - what about multinomial with constraints?
+    + only makes sense for ordinals/counts
+  - what about multinomial with constraints
+    + need at least two varying params
+  - adaptive Metropolis style?
 
 * more general built-in initializations
   -  normal or student-t w. params
@@ -132,9 +139,38 @@ Sampling
 Modeling Language
 ----------------------------------------------------------------------
 
+* convert all int values to long to match doc!
+
+* add asserts or something to throw exceptions
+  - even a general logger with debug levels?
+
+* need to pass in randomizer to repeat generated quantities
+  - where to do this? 
+    + model ctor defeats thread safety
+    + pass into generated quantities eval is safest
+
+* explicit var types, useful for single expression for types
+  e.g. vector(5)[2] x;
+  vs.  vector(5) x[2];
+
+
+* write model text into output in a comment in output
+  - optional?
+
+* make sure no aliasing issues for Eigen,
+  - e.g.  A <- A * B;  A <- A';
+  - shouldn't be problem with our matrix lib's returns
+
+* make sure assignments only allowed to var in blocks
+  (documented in manual?)
+
 * triangular matrix type
   - how to implement in Eigen?
     + triangular view?
+  - upper and lower
+  - strict (zero diagonal) and non-strict
+
+* diagonal matrix type (?)
 
 * symmetric matrix type 
  - how to implement in Eigen?  
@@ -144,6 +180,11 @@ Modeling Language
      everything but diagonal will get set twice
 
 * Cholesky factor type
+
+* point on hypersphere type 
+  - like simplex, but 2-norm is 1
+  - trickier for generating last point as only sign
+    is undetermined
 
 * special positive-definiteness-preserving operations
   - basic data type (or trait)
@@ -191,12 +232,24 @@ Modeling Language
   - range-indexes :, a:, :b, a:b
   - e.g., matrix(M,N) m; vector(M) v;  m[,1] = v;
 
+* conditional expressions
+  - binary operators on int or double
+    + bool op(int,int);
+    + bool op(double,double); // allows promotion
+    + usual comparisons:  ==,  !=,  <=,  <,  >=,  >
+  - operators on conditions
+    (!cond),  (cond && cond),  (cond || cond),  (cond)
+
 * conditionals
   - conditional expression
   - ternary op: cond ? x : y
   - if (cond) statement else if (cond) statement ... else statement;
   - while (cond) statement;
   - repeat statement until cond;
+  - for (statement; condition; statement) statement;
+
+* for-each
+  - foreach (variable : expression) statement;
   
 * multi-returns and array literals
   - (a,b,c) = foo();  // function returns array
@@ -230,9 +283,8 @@ Modeling Language
 * check each parameter shows up on LHS of ~
   - true check is run-time based on data, etc.
 
-
-
-
+* use normal(y|mu,sigma) as shorthand for 
+  normal_log(y,mu,sigma).
 
 
 
@@ -254,14 +306,31 @@ Command-line
 * restart from where command left off a la R2jags
   - this will require writing dump output or a converter
     for the CSV output to dump output
+  - easiest to save unconstrained params
+  - also need to save adaptation states, etc.
+  - need to save seed and type of randomizer
 
 * auto convergence monitoring -- just keep doubling (or other ratio)
+  - doubling reduces total calc to at most double the end
+  - easy to monitor averages and variances online using accumulators
 
-  
+* add chain ID to output as first column
+
+* ? add sample ID within chain as output 
+  - should be reconstructible
+
+* track rejection rate 
+  - coda just uses equality of samples, which is probably good enough
+    for us, too
+
+* multi-thread or at least multi-process
+  - need to merge results back together
 
 
 C++ API
 ----------------------------------------------------------------------
+
+* make sure still possible to use header-only ad
 
 * as much partial eval for gradients as possible
   - matrices
@@ -316,6 +385,54 @@ C++ API
 
 Special Functions, Probability Functions and Distributions
 ----------------------------------------------------------------------
+* beta distro with mean plus "precision" params
+  - beta_mean_log(theta|phi,kappa)
+    = beta_log(theta|phi*kappa, (1-phi)*kappa)
+  - Jacobian from:
+        alpha <- phi * k
+        beta  <- (1 - phi) * k
+    determinant = k  (det [[a,b],[c,d]] = ad - bc)
+
+* pow special cases
+  - inv(x) = pow(x,-1) = 1/x
+  - inv_square(x) = pow(x,-2)
+  - inv_sqrt(x) = pow(x,-1/2)
+
+* signum function
+  int signum(real); 
+
+* signed sqrt
+  signed_sqrt(x) = -sqrt(-x) if x < 0
+                 = sqrt(x)   if x > 0
+
+* log logits
+  - log_logit(u) = log(logit(u)) 
+                 = -log(1 + exp(-u))
+                 = -log1p_exp(-u)
+  - log_1mlogit(u) = log(1 - logit(u))
+                   = log(logit(-u))
+                   = -log1p_exp(u)
+
+* lower triangular times self-transposed
+
+* add general mixture model
+  - modeling language side
+    simplex(K) lambda;
+    vector(K) mu;
+    vector(K) sigma;
+    y ~ mixture(lambda,     // mixing
+                (mu,sigma), // param vecs
+                "normal");  // distro
+ - C++ impl
+    std::vector<double> log_ps;
+    for (k in 1:K)
+      log_ps.push_back(log lambda[k] + normal_log(y,mu[k],sigma[k]));
+    return log_sum_exp(log_ps);
+
+
+
+* generalize vector ops to conforming matrices 
+  -- I (Bob) don't like this as it confuses return types
 
 * alternative distribution parameterizations
   - e.g., precision for (multi) normal
@@ -337,6 +454,10 @@ Special Functions, Probability Functions and Distributions
 * dot_self(x) == x' * x operation
 
 * wrap_multiply(u,v) = u' * v * u
+
+* for square matrices,
+  d/dx det(x' * A * x) = 2 det(x' * A * x) inv(x)'
+  d/dx det(A) = det(A) inv(A)'
 
 * More matrix functions from Eigen:
   - norm()
@@ -439,6 +560,18 @@ Models
 New Stuff
 ----------------------------------------------------------------------
 
+* override operator*, etc. in Eigen for efficiency?
+  - ideally push expressions for gradients through along with vals
+
+* "non-parametric" models
+  - approximate a la BUGS vol 3
+  - merge reversible jump and HMC somehow?
+
+* built-ins to facilitate cross-validation
+  - especially on hierarchical models
+
+* use plain old optimization to get close to a mode
+
 * forward mode auto-dif
   - last revision 548: 
   - src/stan/agrad/ad.hpp
@@ -481,7 +614,6 @@ New Stuff
   - less space for constants, equal for unary, more for binary+
   - no virtual ops
 
-
 * code gen auto-dif
   - just for Stan GM models
 
@@ -496,12 +628,32 @@ New Stuff
   for continuous variables (at least accelerate metropolis-hastings)
   some densities generalize 
 
-* blocking updates
+* blocking updates on parameters
   - only update subset of parameters
   - specify blocks in program?
   - allow Gibbs on some variables
   - split HMC into blocks (aka batches)
   - in the limit do conditional with HMC!
+
+* blocking updates on data
+  - subsample data and update as before
+  - works best if data is large and redundant
+
+* stepwise debugger for Stan
+  - print adaptation params
+  - print gradients
+  - just a mode on command to print more out per sample?
+  - ideally link runtime errors back to lines of Stan code
+
+* allow random generation in model
+  - are derivatives just same as basic, so that
+      y[n] <- random_normal(mu,sigma);
+    gets same grad as:
+      y[n] ~ normal(mu,sigma);
+    ?
+
+
+
 
 
 
@@ -560,9 +712,16 @@ for the following, categorized by issue.
 MODELING LANGUAGE MANUAL
 ======================================================================
 
+* performance tips
+  - compute once and re-use if possible
+  - pull out constants from loops
+  - pull out terms from looped probabilities
+
 * add example calculating log likelihood for DIC
+  - how to specify likelihood terms in model?
 
 * add example on individual log likelihoods for WAIC
+  - how to specify individual likelihood terms in model?
 
    generated quantities {
     for (i in 1:I) 
@@ -573,12 +732,15 @@ MODELING LANGUAGE MANUAL
 
 * Index
 
+* Description of reverse-mode auto-dif or too C++-like?
+
 
 
 C++ API MANUAL
 ======================================================================
 
 * Enough doc to use agrad w. matrices and probability functions
+  - basic description of reverse-mode AD
 
 * Goes along with cleaning up API doc and privatizing
 
