@@ -38,9 +38,15 @@ The following example illustrates a fully qualified call to \stanc.
 %
 This call specifies the name of the model, here {\tt binary\_normal}.
 This will determine the name of the class implementing the model in
-the \Cpp code.  The \Cpp code implementing the class is written to
-\code{binorm.cpp}.  The final argument, \code{binormal.stan}, is
-the file from which to read the \Stan program.
+the \Cpp code.  Because this name is the name of a \Cpp class, it must
+start with an alphabetic character (\code{a--z} or \code{A--Z}) and
+contain only alphanumeric characters (\code{a--z}, \code{A--Z}, and
+\code{0--9}) and underscores (\code{\_}) and should not conflict with
+any \Cpp reserved keyword.  
+
+The \Cpp code implementing the class is written to \code{binorm.cpp}.
+The final argument, \code{binormal.stan}, is the file from which to
+read the \Stan program.
 
 
 \section{Command-Line Options}
