@@ -343,7 +343,7 @@ namespace stan {
                             : "randomly generated") << ")"
                 << std::endl;
       std::cout << "chain_id=" << chain_id
-                << " (" << (command.has_key("seed")
+                << " (" << (command.has_key("chain_id")
                             ? "user specified"
                             : "default") << ")"
                 << std::endl;
