@@ -88,7 +88,8 @@ namespace rstan {
       rlist_ref_var_context(const Rcpp::List& in) :
         rlist_(const_cast<Rcpp::List&>(in)) 
       {
-        // should I use iterators? 
+
+        if (0 == in.size()) return;
         std::vector<std::string> varnames 
           = Rcpp::as<std::vector<std::string> >(in.names()); 
         // Rprintf("in.size()=%d.\n", in.size()); 
