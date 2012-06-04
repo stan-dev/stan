@@ -3,7 +3,8 @@
 
 #include <cmath>
 #include <cstddef>
-#include <ctime>
+//#include <ctime>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -253,7 +254,7 @@ namespace stan {
       int refresh = 1;
       command.val("refresh",refresh);
 
-      int random_seed = 0;
+      unsigned int random_seed = 0;
       if (command.has_key("seed")) {
         bool well_formed = command.val("seed",random_seed);
         if (!well_formed) {
@@ -264,7 +265,10 @@ namespace stan {
           return -1;
         }
       } else {
-        random_seed = std::time(0);
+        random_seed = (boost::posix_time::microsec_clock::universal_time() -
+                       boost::posix_time::ptime(boost::posix_time::min_date_time))
+          .total_milliseconds();
+        //random_seed = std::time(0);
       }
 
       int chain_id = 1;
