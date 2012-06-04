@@ -89,14 +89,22 @@ dogsrr <- stan.model(model.code = dogsstan, model.name = model_name,
                      verbose = TRUE) 
 
 # samples(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
-  args <- list(init.t = 'random', sample_file = 'dogs.csv', n.iter = 2012)
+  args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
   dogsdat <- rstan:::data.preprocess(dogsdat)
-  nuts <- new(dogsrr@.modelmod$nuts, dogsdat, 1)
+  nuts <- new(dogsrr@.modelmod$nuts, dogsdat, 3)
   nuts$call_sampler(args) 
+  args$chain_id <- 2;
   nuts$call_sampler(args) 
-  t <- do.call(cbind, nuts$get_samples(1, c("alpha", "beta", "p", "q"))) 
-  head(t)
+  args$chain_id <- 3;
+  nuts$call_sampler(args) 
+  t1 <- do.call(cbind, nuts$get_samples(1, c("alpha", "beta", "p", "q"))) 
+  t2 <- do.call(cbind, nuts$get_samples(2, c("alpha", "beta", "p", "q"))) 
+  t3 <- do.call(cbind, nuts$get_samples(3, c("alpha", "beta", "p", "q"))) 
+  head(t1)
   pnames <- nuts$param_names() 
+
+  warmup <- nuts$warmup()
+  
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
 colMeans(post)

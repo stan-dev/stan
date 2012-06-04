@@ -1,48 +1,23 @@
 #include <gtest/gtest.h>
-#include <stdexcept>
+#include <test/models/model_test_fixture.hpp>
 
-class Models_Misc_EightSchools : public ::testing::Test {
+class Models_Misc_EightSchools : 
+  public ::testing::Model_Test_Fixture<Models_Misc_EightSchools,
+                                       true> {
 protected:
   virtual void SetUp() {
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    path_separator += fgetc(in);
-    pclose(in);
-    
-    model.append("models").append(path_separator);
-    model.append("misc").append(path_separator);
-    model.append("eight_schools").append(path_separator);
-    model.append("eight_schools");
-
-    output1 = model + "1.csv";
-    output2 = model + "2.csv";
-    
-    data = model + ".Rdata";
   }
-  std::string path_separator;
-  std::string model;
-  std::string output1;
-  std::string output2;
-  std::string data;
+public:
+  static std::vector<std::string> get_model_path() {
+    std::vector<std::string> model_path;
+    model_path.push_back("models");
+    model_path.push_back("misc");
+    model_path.push_back("eight_schools");
+    model_path.push_back("eight_schools");
+    return model_path;
+  }
 };
 
 TEST_F(Models_Misc_EightSchools,RunModel) {
-  std::string command;
-  command = model;
-  command += " --samples=";
-  command += output1;
-  command += " --data=";
-  command += data;
-  EXPECT_EQ(0, system(command.c_str())) 
-    << "Can not execute command: " << command << std::endl;
-            
-  
-  command = model;
-  command += " --samples=";
-  command += output2;
-  command += " --data=";
-  command += data;
-  EXPECT_EQ(0, system(command.c_str()))
-    << "Can not execute command: " << command << std::endl;
+  run_model();
 }

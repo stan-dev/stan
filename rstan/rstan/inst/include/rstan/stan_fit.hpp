@@ -29,6 +29,7 @@
 #include <rstan/io/r_ostream.hpp> 
 #include <rstan/stan_args.hpp> 
 #include <rstan/chains_for_R.hpp>
+// #include <stan/mcmc/chains.hpp>
 
 #include <Rcpp.h>
 // #include <Rinternals.h>
@@ -107,6 +108,8 @@ namespace rstan {
       // rstan::io::rcout << "in sample_from." << std::endl; 
       if (epsilon_adapt)
         sampler.adapt_on(); 
+      else 
+        sampler.adapt_off(); 
       std::vector<double> params_inr; 
       for (int m = 0; m < num_iterations; ++m) {
         if (do_print(m,refresh)) {
@@ -119,32 +122,30 @@ namespace rstan {
           rstan::io::rcout << ((m < num_warmup) ? " (Adapting)" : " (Sampling)");
           rstan::io::rcout.flush();
         } 
-        if (m < num_warmup) {
-          sampler.next(); // discard
-        } else {
-          if (epsilon_adapt)
-            sampler.adapt_off();
-          if (((m - num_warmup) % num_thin) != 0) {
-            sampler.next();
-            continue;
-          } else {
-            stan::mcmc::sample sample = sampler.next();
-  
-            // FIXME: use csv_writer arg to make comma optional?
-            if (sample_file_flag) { 
-              sample_file_stream << sample.log_prob() << ',';
-              sampler.write_sampler_params(sample_file_stream);
-              sample.params_r(params_r);
-              sample.params_i(params_i);
-              model.write_csv(params_r,params_i,sample_file_stream);
-            }
-            model.write_array(params_r,params_i,params_inr); 
-            chains.add(chain_id - 1, params_inr); 
 
-          }
+        if (m == num_warmup && epsilon_adapt) 
+          sampler.adapt_off();
+
+        if ((m % num_thin) != 0) {
+          sampler.next();
+          continue;
         }
+
+        stan::mcmc::sample sample = sampler.next();
+  
+        // FIXME: use csv_writer arg to make comma optional?
+        if (sample_file_flag) { 
+          sample_file_stream << sample.log_prob() << ',';
+          sampler.write_sampler_params(sample_file_stream);
+          sample.params_r(params_r);
+          sample.params_i(params_i);
+          model.write_csv(params_r,params_i,sample_file_stream);
+        }
+        model.write_array(params_r,params_i,params_inr); 
+        chains.add(chain_id - 1, params_inr); 
       }
     }
+
     /**
      * @tparam Model 
      * @tparam RNG RNG for stan::mcmc::chains 
@@ -348,12 +349,12 @@ namespace rstan {
      *
      */
     SEXP call_sampler(SEXP args) { 
-      stan_args t(Rcpp::as<Rcpp::List>(args)); 
 
+      stan_args t(Rcpp::as<Rcpp::List>(args)); 
       // set the seeds to be the same for all chains
       if (!argss_.empty()) 
         t.set_random_seed((argss_.begin() -> second).get_random_seed()); 
-        
+
       size_t c_id = t.get_chain_id(); 
       // rstan::io::rcout << "chain id = " << c_id << std::endl;
       if (c_id > num_chains_) { 
@@ -369,6 +370,11 @@ namespace rstan {
         return Rcpp::wrap(false);
       } 
       argss_.insert(std::map<size_t, stan_args>::value_type(c_id, t));
+     
+      // assuming that the warmup are set all the same for 
+      // all the chains or simply here we only use one
+      if (1 == argss_.size())
+        chains_.set_warmup(t.get_warmup() / t.get_thin()); 
 
       try {
         sampler_command(data_, t, model_, chains_); 
@@ -395,16 +401,6 @@ namespace rstan {
       return Rcpp::wrap(s);    
     } 
 
-
-
-    /**
-     * Get all the parameter names that are in the chains object 
-     * @return A R vector of names of the parameters.
-     */
-    SEXP param_names() {
-      std::vector<std::string> names(chains_.param_names());
-      return Rcpp::wrap(names); 
-    } 
 
     /** 
      * Print out a std::vector 
@@ -460,6 +456,39 @@ namespace rstan {
       // printv(rstan::io::rcout, yanames3);
       return Rcpp::wrap(lst);
     } 
+
+    /**
+     * Get all the parameter names that are in the chains object 
+     * @return A R vector of names of the parameters.
+     */
+    SEXP param_names() {
+      std::vector<std::string> names(chains_.param_names());
+      return Rcpp::wrap(names); 
+    } 
+
+    /**
+     * Return the warmup for the stored samples. 
+     *
+     * @return Number of warmup iterations. 
+     */
+    SEXP warmup() {
+      return Rcpp::wrap(chains_.warmup()); 
+    } 
+
+    /**
+     * Return the number of samples including warmup and kept samples
+     * in the specified chain.
+     *
+     * @param k Markov chain index, starting from 1.
+     * @return Number of samples in the specified chain.
+     * @throw std::out_of_range If the identifier is greater than
+     * or equal to the number of chains.
+     */
+    
+    SEXP num_samples(size_t k) {
+      return Rcpp::wrap(chains_.num_samples(k - 1)); 
+    } 
+
 
   };
 } 

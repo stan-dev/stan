@@ -9,6 +9,7 @@ RCPP_MODULE(%model_name%){
     .method("call_sampler", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::call_sampler) 
+
     .method("get_samples", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_samples) 
@@ -16,6 +17,14 @@ RCPP_MODULE(%model_name%){
     .method("param_names", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::param_names) 
+
+    .method("warmup", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::warmup) 
+
+    .method("num_samples", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::num_samples) 
 
     ;
 }

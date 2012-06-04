@@ -1054,3 +1054,55 @@ TEST(McmcChains,split_potential_scale_reduction) {
   EXPECT_FLOAT_EQ(1.03715,  c.split_potential_scale_reduction(index)) <<
     "delta.22 split R hat should be near 1.04";
 }
+TEST(McmcChains,covariance) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
+
+  size_t index1, index2;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index1 = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  idxs.clear();
+  idxs.push_back(1);
+  index2 = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(0.03349357,   c.covariance(0U, index1, index2)) <<
+    "covariance of chain 0";
+  EXPECT_FLOAT_EQ(-0.007968091, c.covariance(1U, index1, index2)) <<
+    "covariance of chain 1";
+  EXPECT_FLOAT_EQ(0.02145364,   c.covariance(index1, index2)) <<
+    "covariance";
+}
+TEST(McmcChains,correlation) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
+
+  size_t index1, index2;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index1 = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  idxs.clear();
+  idxs.push_back(1);
+  index2 = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_FLOAT_EQ(0.3615289,   c.correlation(0U, index1, index2)) <<
+    "correlation of chain 0";
+  EXPECT_FLOAT_EQ(-0.06527095, c.correlation(1U, index1, index2)) <<
+    "correlation of chain 1";
+  EXPECT_FLOAT_EQ(0.1845687,   c.correlation(index1, index2)) <<
+    "correlation";
+}

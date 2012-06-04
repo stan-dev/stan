@@ -21,6 +21,9 @@
 // #include <boost/accumulators/statistics/moment.hpp>
 #include <boost/accumulators/statistics/tail_quantile.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
+#include <boost/accumulators/statistics/covariance.hpp>
+#include <boost/accumulators/statistics/variates/covariate.hpp>
+
 
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -1051,6 +1054,116 @@ namespace stan {
         return (M / (M-1)) *boost::accumulators::variance(acc);
       }
 
+      /**
+       * Return the covariance of the kept samples in
+       * the specified chain for the specified parameters.  
+       *
+       * @param k Chain index.
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Covariance of parameters in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double covariance(size_t k,
+                        size_t n1,
+                        size_t n2) {
+        validate_chain_idx(k);
+        validate_param_idx(n1);
+        validate_param_idx(n2);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+        
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+        std::vector<double> samples1, samples2;
+        this->get_kept_samples(k, n1, samples1);
+        this->get_kept_samples(k, n2, samples2);
+        for (size_t kk = 0; kk < this->num_kept_samples(k); kk++) {
+          acc(samples1[kk], boost::accumulators::covariate1 = samples2[kk]);
+        }
+        double M = num_kept_samples(k);
+        return (M / (M-1)) * boost::accumulators::covariance(acc);
+      }
+
+      /**
+       * Return the covariance of the kept samples for
+       * the specified parameters.  
+       *
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Covariance of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double covariance(size_t n1, size_t n2) {
+        validate_param_idx(n1);
+        validate_param_idx(n2);
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+        
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+        for (size_t chain = 0; chain < this->num_chains(); chain++) {
+          std::vector<double> samples1, samples2;
+          this->get_kept_samples(chain, n1, samples1);
+          this->get_kept_samples(chain, n2, samples2);
+          for (size_t kk = 0; kk < this->num_kept_samples(chain); kk++) {
+            acc(samples1[kk], boost::accumulators::covariate1 = samples2[kk]);
+          }
+        }
+        double M = this->num_kept_samples();
+        return (M / (M-1)) * boost::accumulators::covariance(acc);
+      }
+      
+
+      /**
+       * Return the correlation of the kept samples in
+       * the specified chain for the specified parameters.  
+       *
+       * @param k Chain index.
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Correlation of parameters in chain.
+       * @throw std::out_of_range If the chain index is greater than
+       * or equal to the number of chains or the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double correlation(size_t k,
+                        size_t n1,
+                        size_t n2) {
+        double cov = covariance(k, n1, n2);
+        double sd1 = sd(k, n1);
+        double sd2 = sd(k, n2);
+                
+        return cov / sd1 / sd2;
+      }
+
+      /**
+       * Return the correlation of the kept samples for
+       * the specified parameters.  
+       *
+       * @param n1 Parameter index 1.
+       * @param n2 Parameter index 2.
+       * @return Correlation of kept samples for
+       * parameter.
+       * @throw std::out_of_range If the parameter index is
+       * greater than or equal to the number of parameters.
+       */
+      double correlation(size_t n1, size_t n2) {
+        double cov = covariance(n1, n2);
+        double sd1 = sd(n1);
+        double sd2 = sd(n2);
+
+        return cov / sd1 / sd2;
+      }
+      
 
       /**
        * Return the specified sample quantile for kept samples for the

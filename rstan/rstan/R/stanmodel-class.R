@@ -51,7 +51,10 @@ setMethod("samples", "stanmodel",
               stop("The number of chains (n.chains) must be postive") 
 
             # check data and preprocess 
-            data <- data.preprocess(data) 
+            if (!missing(data)) 
+              data <- data.preprocess(data) 
+            else 
+              data <- list()
 
             nuts <- new(object@.modelmod$nuts, data, n.chains)
 

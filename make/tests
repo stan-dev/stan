@@ -87,7 +87,8 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 # Using a static pattern rule to make these tests depend on
 # missing models.
 ##
-$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o bin/libstan.a models/%$(EXE)
+.PRECIOUS: test/models/%.o models/%$(EXE)
+$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)

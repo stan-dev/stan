@@ -305,6 +305,7 @@ namespace stan {
        * the optimal epsilon.
        */
       virtual void adapt_off() {
+        if (!adapting()) return;
         adaptive_sampler::adapt_off();
         std::vector<double> result;
         _da.xbar(result);
