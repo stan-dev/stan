@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2012-05-15
 Author: Who wrote it
 Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Description: R interface to Stan 
 License: GPL-3
 Depends: methods, Rcpp (>= 0.9.10), inline
 LinkingTo: Rcpp

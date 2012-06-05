@@ -61,5 +61,6 @@
 
   y <- rnorm(20) 
   dat <- list(N = 20, y = y); 
-  samples(rr, data = dat, n.iter = 2012, sample.file = 'norm1.csv')
+  s <- sampling(rr, data = dat, n.iter = 2012, n.chains = 3, sample.file = 'norm1.csv')
+  print(summary(s)) 
 } 

@@ -13,7 +13,7 @@
   %% sampling(object, \dots)  
   \S4method{sampling}{stanmodel}(object, data, n.chains = 1L, n.iter = 2000L, 
     n.warmup = floor(n.iter / 2), 
-    thin = 1L, init.t = 'random', init.v = NULL, seed, 
+    n.thin = 1L, init.t = 'random', init.v = NULL, seed, 
     sample.file, \dots, verbose = FALSE)   
 } 
 
@@ -42,8 +42,8 @@
  \item{n.warmup}{A positive integer specifying number of initial samples to be
                  discarded. The default is \code{"n.iter / 2"}.}
 
- \item{thin}{A positive integer specifying the period between saved samples
-   after warmup. The default is \code{"max(1, floor(n.iter - n.warmup) / 1000)"}.}
+ \item{n.thin}{A positive integer specifying the period between saved samples
+   after warmup. The default is 1.} 
 
  \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
    indicating how the initial values of parameters are specified. \code{"0"}: 

@@ -110,7 +110,8 @@ model_name <- "dogs";
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-# sampling(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
+ss <- sampling(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
+
   args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
   dogsdat <- rstan:::data.preprocess(dogsdat)
   sampler <- new(dogsrr@.modelmod$sampler, dogsdat, 3)
@@ -127,12 +128,19 @@ dogsrr <- stan.model(model.code = dogsstan, model.name = model_name,
 
   warmup <- sampler$warmup()
 
-  tall <- sampler$get_samples(c("alpha", "beta"))
+  pars <- c("alpha", "beta")
 
-s <- sampler$get_summary(c("alpha", "beta")) 
-s2 <- do.call(rbind, s);
-colnames(s2) <- sampler$get_summary_item_names()  
-print(s2)
+  tall <- sampler$get_samples(pars)
+
+probs_oi <- c(0.025, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975)
+
+sq <- sampler$get_quantiles(pars, probs_oi)  
+sq2 <- do.call(rbind, sq);
+
+mnsd <- sampler$get_mean_and_sd(pars) 
+mnsd1 <- sampler$get_chain_mean_and_sd(1, pars) 
+mnsd2 <- sampler$get_chain_mean_and_sd(2, pars) 
+mnsd3 <- sampler$get_chain_mean_and_sd(3, pars) 
 
   tall2 <- lapply(tall, FUN = function(x) do.call(cbind, x)) 
   tall3 <- to.mcmc.list(tall) 
@@ -144,3 +152,5 @@ gelman.diag(tall3)
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
 colMeans(post)
+
+summary(ss)

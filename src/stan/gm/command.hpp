@@ -241,7 +241,7 @@ namespace stan {
       double epsilon_pm = 0.0;
       command.val("epsilon_pm",epsilon_pm);
 
-      bool epsilon_adapt = (epsilon > 0.0);
+      bool epsilon_adapt = epsilon <= 0.0;
 
       bool unit_mass_matrix = command.has_flag("unit_mass_matrix");
 

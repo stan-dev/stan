@@ -38,13 +38,30 @@ RCPP_MODULE(%model_name%){
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::num_samples) 
 
-    .method("get_summary", 
+    .method("get_mean_and_sd", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
-                             boost::random::ecuyer1988>::get_summary) 
+                             boost::random::ecuyer1988>::get_mean_and_sd) 
 
-    .method("get_summary_item_names", 
+    .method("get_chain_mean_and_sd", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
-                             boost::random::ecuyer1988>::get_summary_item_names) 
+                             boost::random::ecuyer1988>::get_chain_mean_and_sd) 
+
+    .method("get_quantiles", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_quantiles)   
+
+    .method("get_chain_quantiles", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_chain_quantiles)   
+
+    .method("get_ess", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_ess) 
+
+    .method("get_rhat", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_rhat) 
+
 
     ;
 }

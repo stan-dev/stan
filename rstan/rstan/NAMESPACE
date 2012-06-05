@@ -8,11 +8,11 @@ export (
 )
 
 exportClasses (
-  stanmodel 
+  stanmodel, stanfit 
 ) 
 exportMethods (
 #   print, plot, 
 #   extract, 
-  show, sampling
+  show, sampling, summary
 )
 import(Rcpp)

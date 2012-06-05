@@ -1009,3 +1009,91 @@ sample properly.%
   transforms used.}
 
 
+
+\chapter{Optimizing \Stan Code}\label{optimization.chapter}
+\noindent
+
+\section{Exploiting Sufficient Statistics}
+
+In some cases, models can be recoded to exploit sufficient statistics
+in estimation.  This can lead to large efficiency gains compared to an
+expanded model.  For example, consider the following Bernoulli
+sampling model.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(0,) N;
+    int(0,1) y[N];
+    real(0,) alpha;
+    real(0,) beta;
+}
+parameters {
+    real(0,1) theta;
+}
+model {
+    theta ~ beta(alpha,beta);
+    for (n in 1:N) 
+        y[n] ~ bernoulli(theta);
+\end{Verbatim}
+\end{quote}
+%
+In this model, the sum of positive outcomes in \code{y} is a
+sufficient statistic for the chance of success \code{theta}.  The
+model may be recoded using the binomial distribution as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+    theta ~ beta(alpha,beta);
+    sum(y) ~ binomial(N,theta);
+\end{Verbatim}
+\end{quote}
+%
+Because truth is represented as one and falsehood as zero, the sum
+\code{sum(y)} of a binary vector \code{y} is equal to the number of
+positive outcomes out of a total of \code{N} trials.  
+
+
+
+\section{Exploiting Conjugacy}
+
+
+Continuing the model from the previous section, the conjugacy of the
+beta prior and binomial sampling distribution allow the model to be
+further optimized to the following equivalent form.
+%
+\begin{quote}
+\begin{Verbatim}
+    theta ~ beta(alpha + sum(y), beta + N - sum(y));
+\end{Verbatim}
+\end{quote}
+%
+To make the model even more efficient, a transformed data variable
+defined to be \code{sum(y)} could be used in the place of \code{sum(y)}.
+
+
+% \section{Using Forward Sampling}
+
+% In fact, at this point, simple (non Markov chain) Monte Carlo may be
+% used because the parameters to the beta distribution are specified and
+% there are no variables that depend on \code{theta}.  Thus this model
+% could be even further optimized by replacing the declaration of
+% \code{theta} as a parameter with a declaration as a generated quantity
+% and then generating the quantity directly.
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% generated quantities {
+%     real(0,1) theta;
+%     theta ~ random_beta(alpha + sum(y), beta + N - sum(y));
+% }
+% \end{Verbatim}
+% \end{quote}
+% %
+% When used in the generated quantities block, sampling statements such
+% as that for \code{theta} are executed by taking a sample from the
+% specified distribution directly. The result is a Monte Carlo estimate
+% of \code{theta} in which every sample is independent (up to the limits
+% of the pseudorandom number generator, of course).  Thus the effective
+% sample size should be estimated as being roughly equal to the sample
+% size.

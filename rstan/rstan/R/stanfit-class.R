@@ -9,7 +9,7 @@ setClass(Class = "stanfit",
          ),  
          validity = function(object) {
            return(TRUE) 
-         }); 
+         })
 
 
 setMethod("show", "stanfit",
@@ -28,12 +28,46 @@ setMethod("print", "stanfit",
             cat("print method of class stanfit.\n")  
           })  
 
-## add extract to the list of the methods that R knows.
-#   setGeneric(name = "extract",
-#              def = function(object, x) { standardGeneric("extract")}) 
+setGeneric(name = "extract",
+           def = function(object, x) { standardGeneric("extract")}) 
 
-#   setMethod("extract", "stanfit", 
-#             function(object, x) {
-#               cat("intend to return samples for parameters x.\n") 
-#             })  
+setMethod("extract", "stanfit", 
+          function(object, x) {
+            cat("intend to return samples for parameters x.\n") 
+          })  
+
+#   if (!isGeneric('summary')) {
+#     setGeneric(name = "summary",
+#                def = function(object, ...) { 
+#                        standardGeneric("summary")
+#                      }) 
+#   } 
+
+setMethod("summary", signature = (object = "stanfit"), 
+          function(object, probs, ...) { 
+
+           if (missing(probs)) 
+             probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
+
+            sampleshandle <- object@.fit$sampleshandle  
+            vnames <- sampleshandle$param_names() 
+            mnsd <- sampleshandle$get_mean_and_sd(vnames) 
+            qs <- sampleshandle$get_quantiles(vnames, probs)  
+            rhat <- sampleshandle$get_rhat(vnames) 
+            ess <- sampleshandle$get_ess(vnames) 
+         
+            prob_in_percent <- paste(formatC(probs * 100,  
+                                             digits = 1, 
+                                             format = 'f', 
+                                             drop0trailing = TRUE), 
+                                     "%", sep = '')
+            
+            mqre <- cbind(do.call(rbind, mnsd), 
+                          do.call(rbind, qs), 
+                          do.call(rbind, rhat), 
+                          do.call(rbind, ess)) 
+            colnames(mqre) <- c("Mean", "SD", prob_in_percent, "Rhat", "ESS")
+            mqre 
+          })  
+
 
