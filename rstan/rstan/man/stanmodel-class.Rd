@@ -4,7 +4,7 @@
 
 \docType{class}
 \alias{stanmodel-class}
-%% \alias{samples,stanmodel-method}
+%% \alias{sampling,stanmodel-method}
 \alias{show,stanmodel-method}
 
 \title{Class \code{"stanmodel"}}
@@ -32,8 +32,8 @@
 \section{Methods}{
   \describe{
     \item{show}{\code{signature(object = "stanmodel")}: prints the class. }
-    \item{samples}{\code{signature(object = "stanmodel")}: draw samples from
-      the model (see \code{\link{samples}}).}
+    \item{sampling}{\code{signature(object = "stanmodel")}: draw samples from
+      the model (see \code{\link{samplng}}).}
   }
 }
 

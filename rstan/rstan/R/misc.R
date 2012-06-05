@@ -180,7 +180,7 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
 
   argss <- vector("list", n.chains)  
   ## the name of arguments in the list need to 
-  ## match those in include/rstan/nuts_args.hpp 
+  ## match those in include/rstan/stan_args.hpp 
   for (i in 1:n.chains)  
     argss[[i]] <- list(chain_id = i, 
                        iter = n.iters[i], thin = n.thins[i], 

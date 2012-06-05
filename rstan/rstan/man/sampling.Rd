@@ -1,17 +1,17 @@
-\name{samples-methods}
+\name{sampling-methods}
 \docType{methods}
-\alias{samples} 
-\alias{samples-methods}
-\alias{samples,stanmodel-method}
+\alias{sampling} 
+\alias{sampling-methods}
+\alias{sampling,stanmodel-method}
 
-\title{\code{samples}: draws samples from Stan model}
+\title{\code{sampling}: draws samples from Stan model}
 \description{
   Draw samples from the model defined by class \code{stanmodel}. 
 }
 
 \usage{
-  %% samples(object, \dots)  
-  \S4method{samples}{stanmodel}(object, data, n.chains = 1L, n.iter = 2000L, 
+  %% sampling(object, \dots)  
+  \S4method{sampling}{stanmodel}(object, data, n.chains = 1L, n.iter = 2000L, 
     n.warmup = floor(n.iter / 2), 
     thin = 1L, init.t = 'random', init.v = NULL, seed, 
     sample.file, \dots, verbose = FALSE)   
@@ -19,7 +19,7 @@
 
 \section{Methods}{
   \describe{
-    \item{samples}{\code{signature(object = "stanmodel")}}{
+    \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
       Call NUTS to draw samples from the model defined by class \code{"stanmodel"} 
       given the data, init values, etc. 

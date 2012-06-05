@@ -27,12 +27,12 @@ y <- rnorm(20)
 mean(y) 
 sd(y)
 dat <- list(N = 20, y = y); 
-samples(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
+sampling(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
 
 
-samples(rr, data = dat, n.iter = 2012, init.t = 'user', 
-        init.v = list(list(mu = 2)), seed = 3, n.thin = 1, 
-        sample.file = 'norm1.csv')
+sampling(rr, data = dat, n.iter = 2012, init.t = 'user', 
+         init.v = list(list(mu = 2)), seed = 3, n.thin = 1, 
+         sample.file = 'norm1.csv')
 
 post <- read.csv(file = 'norm1.csv', header = TRUE, skip = 19) 
 colMeans(post)
@@ -43,9 +43,9 @@ colMeans(post)
 ### mu does not exist. 
 ### 
 
-samples(rr, data = dat, n.iter = 2012, init.t = 'user', 
-        init.v = list(list(mu2 = 2)), seed = 3, thin = 1, 
-        sample.file = 'norm1.csv')
+sampling(rr, data = dat, n.iter = 2012, init.t = 'user', 
+         init.v = list(list(mu2 = 2)), seed = 3, thin = 1, 
+         sample.file = 'norm1.csv')
 
 # stan.samples(b, dat, n.chains = 1, n.iter = 2012, 
 #              init.t = 'user', init.v = list(mu1 = 2)) 
@@ -54,10 +54,10 @@ samples(rr, data = dat, n.iter = 2012, init.t = 'user',
 
 yasfile <- paste(model_name, ".csv", sep = '')  
 
-samples(rr, data = dat, n.iter = 2012, init.t = 'random', 
-        n.chains = 4,
-        seed = 3, n.thin = 1, 
-        sample.file = yasfile) 
+sampling(rr, data = dat, n.iter = 2012, init.t = 'random', 
+         n.chains = 4,
+         seed = 3, n.thin = 1, 
+         sample.file = yasfile) 
 
 post <- read.csv(file = yasfile, header = TRUE, skip = 19) 
 colMeans(post)
@@ -65,12 +65,7 @@ colMeans(post)
 
 
 ## TODO(mav): 
-##   1. add data check and as.integer for dat
-##   2. check args list, for example postiveness of 
-##      some arguments.  
-##   3. wrap b$call_sampler to a R function: creating the hmc_args list 
-##      from given R function's parameters, which should be more friendly. 
-##   4. s4 class for stan object to do print, plot, etc. 
-##   5. include chain object into the c++ code. 
-##   6. R doc (Rd) 
+##   1. s4 class for stan object to do print, plot, etc. 
+##   2. include chain object into the c++ code. 
+##   3. R doc (Rd) 
 

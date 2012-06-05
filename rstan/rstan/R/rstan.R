@@ -18,9 +18,9 @@ stan.model <- function(file, verbose = FALSE,
                
 
   mod <- Module(model.name, getDynLib(fx)) 
-  # modelnuts <- do.call("$", list(mod, model.name))
-  modelnuts <- eval(call("$", mod, model.name))
+  # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
+  stan_fit_cpp_module <- eval(call("$", mod, model.name))
   new("stanmodel", model.name = model.name, 
-      .modelmod = list(nuts = modelnuts))  
+      .modelmod = list(sampler = stan_fit_cpp_module)) 
 
 } 

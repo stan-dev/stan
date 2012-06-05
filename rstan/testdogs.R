@@ -1,4 +1,20 @@
+
+
+
+
+Sys.setenv(STAN_HOME = '/home/jq/Desktop/stan') 
+LD_LIBRARY_PATH = paste(Sys.getenv("LD_LIBRARY_PATH"), 
+                        ":/home/jq/Desktop/stan/bin", 
+                        sep = '')
+
+Sys.setenv(LD_LIBRARY_PATH = LD_LIBRARY_PATH)
+
+cat("STAN_HOME=", Sys.getenv("STAN_HOME"), "\n")
+cat("LD_LIBRARY_PATH=", Sys.getenv("LD_LIBRARY_PATH"), "\n")
+
 library(rstan) 
+
+
 ###########
 ### dogs example in bugs vol1 
 
@@ -83,27 +99,47 @@ model {
 }
 " 
 
+require(coda) 
+
+to.mcmc.list <- function(lst) {
+  as.mcmc.list(lapply(lst, FUN = function(x) as.mcmc(do.call(cbind, x))))  
+} 
+
 
 model_name <- "dogs"; 
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-# samples(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
+# sampling(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
   args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
   dogsdat <- rstan:::data.preprocess(dogsdat)
-  nuts <- new(dogsrr@.modelmod$nuts, dogsdat, 3)
-  nuts$call_sampler(args) 
+  sampler <- new(dogsrr@.modelmod$sampler, dogsdat, 3)
+  sampler$call_sampler(args) 
   args$chain_id <- 2;
-  nuts$call_sampler(args) 
+  sampler$call_sampler(args) 
   args$chain_id <- 3;
-  nuts$call_sampler(args) 
-  t1 <- do.call(cbind, nuts$get_samples(1, c("alpha", "beta", "p", "q"))) 
-  t2 <- do.call(cbind, nuts$get_samples(2, c("alpha", "beta", "p", "q"))) 
-  t3 <- do.call(cbind, nuts$get_samples(3, c("alpha", "beta", "p", "q"))) 
+  sampler$call_sampler(args) 
+  t1 <- do.call(cbind, sampler$get_chain_samples(1, c("alpha", "beta", "p", "q"))) 
+  t2 <- do.call(cbind, sampler$get_chain_samples(2, c("alpha", "beta", "p", "q"))) 
+  t3 <- do.call(cbind, sampler$get_chain_samples(3, c("alpha", "beta", "p", "q"))) 
   head(t1)
-  pnames <- nuts$param_names() 
+  pnames <- sampler$param_names() 
 
-  warmup <- nuts$warmup()
+  warmup <- sampler$warmup()
+
+  tall <- sampler$get_samples(c("alpha", "beta"))
+
+s <- sampler$get_summary(c("alpha", "beta")) 
+s2 <- do.call(rbind, s);
+colnames(s2) <- sampler$get_summary_item_names()  
+print(s2)
+
+  tall2 <- lapply(tall, FUN = function(x) do.call(cbind, x)) 
+  tall3 <- to.mcmc.list(tall) 
+
+summary(tall3)
+effectiveSize(tall3)
+gelman.diag(tall3)
   
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 

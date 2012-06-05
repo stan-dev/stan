@@ -34,14 +34,14 @@ setMethod("show", "stanmodel",
 #             })  
 
 
-setGeneric(name = "samples",
+setGeneric(name = "sampling",
            def = function(object, data, n.chains = 1L, n.iter = 2000L, 
                           n.warmup = floor(n.iter / 2), 
                           n.thin = 1L, init.t = 'random', init.v = NULL, seed, 
                           sample.file, ...,
-                          verbose = FALSE) { standardGeneric("samples")}) 
+                          verbose = FALSE) { standardGeneric("sampling")}) 
 
-setMethod("samples", "stanmodel", 
+setMethod("sampling", "stanmodel", 
           function(object, data, n.chains = 1L, n.iter = 2000L, 
                    n.warmup = floor(n.iter / 2), 
                    n.thin = 1L, init.t = "random", init.v = NULL, seed,
@@ -56,18 +56,23 @@ setMethod("samples", "stanmodel",
             else 
               data <- list()
 
-            nuts <- new(object@.modelmod$nuts, data, n.chains)
+            sampler <- new(object@.modelmod$sampler, data, n.chains)
 
             args.list <- config.argss(n.chains, n.iter, n.warmup, n.thin,
                                       init.t, init.v, seed, sample.file, ...)
 
             for (i in 1:n.chains) { 
               # print(args.list[[i]])
-              nuts$call_sampler(args.list[[i]]) 
+              sampler$call_sampler(args.list[[i]]) 
             }
-  
-  
-            ## TODO, thinking about return nuts for this function. 
+            # Once the call_sampler has been called, 
+            # we have samples in the C++ stan_fit object. 
+
+            new("stanfit", 
+                model.name = object@model.name, 
+                model.pars = sampler$param_names(),
+                num.chains = n.chains, 
+                .fit = list(sampleshandle = sampler)) 
               
           })  
 

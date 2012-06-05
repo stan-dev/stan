@@ -108,12 +108,32 @@ namespace rstan {
   // placeholder for the time being 
   template <typename RNG = boost::random::ecuyer1988>
   class chains_for_R : public stan::mcmc::chains<RNG> {
+  private: 
+    // names for the parameters with dimensions:
+    // for example, `a' is `a';
+    // `b' (vector of length 3) is `b[1]', `b[2]', `b[3].'
+    // std::vector<std::string > _flatnames;  
+
   public:
+
     chains_for_R(const size_t num_chains,
                  const std::vector<std::string>& names,
                  const std::vector<std::vector<size_t> >& dimss) : 
-      stan::mcmc::chains<RNG>(num_chains, names, dimss) 
-    { } 
+      stan::mcmc::chains<RNG>(num_chains, names, dimss)
+    { 
+      /*
+      for (std::vector<std::string>::const_iterator it = names.begin(); 
+           it != names.end();
+           ++it) {
+        size_t j = this -> param_name_to_index(*it);
+        std::vector<std::string> names2 
+          = get_col_major_names(*it, this -> param_dims(j));
+        _flatnames.insert(_flatnames.end(), names2.begin(), names2.end()); 
+      }
+      if (_flatnames.size() != this -> num_params()) 
+        throw(std::out_of_range("construct flat names wrong")); 
+      */
+    } 
   };
 }
 
