@@ -1,164 +1,472 @@
-TO DO FOR V1
-=================================================
+STAN V1.0
+======================================================================
 
-* discrete samplers (Matt)
-  - Gibbs for small outcome sets
-  - slice for larger outcome sets
-  - what about multinomial with constraints?
-
-* remaining doc
-  - reference manual (Bob)
-  - API manual (Bob)
-  - API Doxygen doc (Daniel, Bob)
-    + stan/gm
-    + stan/math
-    + stan/mcmc
-    + stan/memory
-    + stan/meta
-    + stan/model
-    + stan/prob
-  - add acknowledgements section
-    + Michael Betancourt
-  - getting started for Windows (Daniel)
-    + include make targets
+* debug potential issue with NUTS II (Matt)
 
 * distribution engineering (Daniel)
- - basic distro site
+  download:  tarballs, doc
+  tarball:  Stan repository (+ binaries?)
 
-* speed tests relative to BUGS/JAGS
+* speed tests relative to JAGS
 
-
-BUGS MODELS
-=================================================
-
-./vol3/fire/fire.stan.0
-./vol2/schools/schools.stan.0
---- it takes NUTS too long to adapt / sample. 
-
-./vol3/funshapes/hsquare.stan.0
-./vol3/funshapes/ring.stan.0
-./vol3/funshapes/squaremc.stan.0
---- the sampler hangs. 
-
-./vol3/jama/jama.stan.0
-./vol2/ice/vanilla_ice.stan.0
-./vol2/ice/pineapple_ice.stan.0
---- we could not specify the joint posterior as BUGS 
-specifies the model with circles in terms of DAG, which is 
-not supported by JAGS either.  (Note that JAGS does not 
-support all functionality of OpenBUGS). 
-
-./vol2/asia/asia.stan.0
-./vol2/t_df/estdof2.stan.0
-./vol2/biopsies/biopsies.stan.0
-./vol2/stagnant/stagnant.stan.0
---- discrete parameters, for example, categorical distribution. 
-Some of them are not implemented at all. 
-
-./vol2/hearts/hearts.stan.0
-./vol2/cervix/cervix.stan.0
--- discrete parameters: binary distributed parameters, in other versions for 
-the same model that working, discrete parameters are integrated out. 
-
-./vol1/bones/bones.stan.0
---- it is fine for stan to draw samples, but the data structure is a 
-bit difficult to deal with.  I will see if I can figure it out later. 
-
-./vol1/leuk/leuk.stan.0
-./vol1/leukfr/leukfr.stan.0
--- we have 0 ~ Poisson(0 * parameters), which seems to 
-cause the sampler hang. 
+* revise home page (see below)
 
 
 HOME PAGE
-=================================================
+======================================================================
+Why does someone show up on the home page?
 
-* Download:
-  - latest code tarball (named as such)
-    (no git info, but everything else)
-   + stan-src-1.0.0.tgz
-   + created by 'make dist'
+* Find out what Stan is
+ - short description right up top
+ - link to manual
 
-  - latest doc pdf (ditto)
+* Download latest
+ - clear license link
+ - big link to latest code tarball:
+     stan-src-1.0.0.tgz
+ - link to latest Git repository
 
-    *stan-doc-1.0.pdf
+* Find/join User Group
+ - big link to gorups
 
-  - older versions (with numbers)
+* Contact / issue tracker
+ - big link up top
 
-  - executables
-    + 
-    + bin/stanc
-
-* API doc online
-
-
-* How to Cite Stan
-  now: Arxiv paper NUTS, doc for Stan
-  
-* Groups
-
-
+* Maybe they also want:
+- executables
+   + bin/stanc
+   + pre-built versions for certain OS/compilers
+- browse Git source archive
+ - API doc online
+ - How to cite Stan
+   now: Arxiv/JMLR paper NUTS, manual/web site for Stan
+ - older versions
 
 
-CLEANUP (ONGOING)
-=================================================
 
-* g++ 4.7 compiling bin/stanc, balking on some models
-
-* get rid of (double,double) -> var functions
-
-* make sure -a[x] parses as (-(a[x])) (old note to self)
-  -- add example to doc, because (-a) is legal if a vector
-
-* math/error_handling
-  - generalize vector checks.
+CODE CLEANUP
+======================================================================
 
 * const declarations wherever possible
-  - very very painful at this late date
-  - be careful that compiled code matches const declarations
 
-* clean up dependencies
-  - only include as much as necessary per file
+* more care with size_t, etc.
+
+* API doc for doxygen
+
+* privatize API parts not needed
+
+* stan::math and stan::agrad configurable error handling
+  - how to configure std::log(), etc. for error handling?
+    need our own versions?
+
+* remove unnecessary dependencies/includes
 
 * convert for loops with size bounds to appropriate iterators
 
+* reduce massive code duplication in
+  - mcmc samplers
+  - gm generator
+
+
 
 Stan-R
-=================================================
+======================================================================
 
-* break out into own project with its own license
-  - leave top of Stan BSD and flag this one w/o new project?
+* break out into own project with its own license (GPL)
+  - still include on Stan page, just flag license, or
+  - break out into own project
+
+* use Rcpp to call C from R and vice-versa
 
 * Example call:
+
    fit <- rstan(model_file,inits, ....);
 
-* simple process-level calls
-  + compile model
-  + dump data
-  + dump inits
-  + run model
-  + load results
+   + compile model
+   + read dump data OR from R
+   + read dump inits OR from R
+   + run model
+   + load results to file OR R
 
-* built-in from Rcpp
+* access data from samples object in C++
 
-* functions from Coda object
-
-* attach.stan(fit)
+* Run pre-built analyses on fit:
+  + attach.stan(fit)
   + print(fit)
   + traceplot(fit)
   + plot.stan(fit)
   + dump.stan(fit)
   + read.stan(file_path)
 
-* access things from Convergence Diagnostics object
+* Get data from fit 
+  - structured
+  - chains optionally merged w. permutation
+  - individual chains
 
 
 
 EXTENSIONS
-=================================================
+======================================================================
 
-* figure out how to include error handling for std lib functions
-  like log(double).  
+Sampling
+----------------------------------------------------------------------
+
+* discrete samplers (Matt)
+  - Gibbs for small outcome sets
+  - slice for larger outcome sets
+    + only makes sense for ordinals/counts
+  - what about multinomial with constraints
+    + need at least two varying params
+  - adaptive Metropolis style?
+
+* more general built-in initializations
+  -  normal or student-t w. params
+  -  or even set uniform boundaries
+  -  e.g., uniform(-1,1), normal(0,1), t(0,2.5)
+
+* stop NUTS from running away without coming back
+  - limit number of steps
+    + command-line param
+    + instrumenting NUTS loops (adaptation, leapfrog)
+  - limit time
+    + start recording time at beginning, check loops inside
+  - bomb with report if exceed these steps
+
+* print more info during adaptation
+  - adapted step size
+
+
+Modeling Language
+----------------------------------------------------------------------
+
+* convert all int values to long to match doc!
+
+* add asserts or something to throw exceptions
+  - even a general logger with debug levels?
+
+* need to pass in randomizer to repeat generated quantities
+  - where to do this? 
+    + model ctor defeats thread safety
+    + pass into generated quantities eval is safest
+
+* explicit var types, useful for single expression for types
+  e.g. vector(5)[2] x;
+  vs.  vector(5) x[2];
+
+
+* write model text into output in a comment in output
+  - optional?
+
+* make sure no aliasing issues for Eigen,
+  - e.g.  A <- A * B;  A <- A';
+  - shouldn't be problem with our matrix lib's returns
+
+* make sure assignments only allowed to var in blocks
+  (documented in manual?)
+
+* triangular matrix type
+  - how to implement in Eigen?
+    + triangular view?
+  - upper and lower
+  - strict (zero diagonal) and non-strict
+
+* diagonal matrix type (?)
+
+* symmetric matrix type 
+ - how to implement in Eigen?  
+ - what ops to allow? 
+   + sets are symmetric
+   + but this'll get products wrong as
+     everything but diagonal will get set twice
+
+* Cholesky factor type
+
+* point on hypersphere type 
+  - like simplex, but 2-norm is 1
+  - trickier for generating last point as only sign
+    is undetermined
+
+* special positive-definiteness-preserving operations
+  - basic data type (or trait)
+  - operations that preserve well-formedness, perhaps
+    by fudging boundary conditions
+
+* add a parameter initialization block
+  - fill in values not given randomly or report error?
+  - needs randomization
+
+* syntactic sugar sampling notation
+  - blocks where sampling not allowed (all but model)
+  - generated quantities, parameter init block:
+      beta[n] ~ normal(0,10);
+    means 
+      beta[n] <- random_normal(0,10);
+  - right-hand side must all be defined here
+
+* matrix power operations
+  -  matrix power:    A^n
+  - matrix elementwise power:  A.^x
+
+* add printf statement for debugging purposes
+  - really format or just list params?
+
+* Allow normal_log<true> and normal_log<false> to be accessed
+  directly
+
+* Allow normal_log(y|0,1) as parser synonym for normal_log(y,0,1)
+
+* warnings
+  - a <- foo(theta) if LHS contains variable: overwrite var
+  - a ~ foo(theta)  if LHS is complex expression: need Jacobian
+
+* integer subtypes
+  - integer(-inf,inf), count(1,inf), natural(0,inf)
+  - boolean(0,1), categorical(1,K), ordinal(1,K),
+
+* double subtypes
+  - probability(0,1), correlation(-1,1)
+  - positive(0,inf), negative(-inf,0)
+
+* matrix slice and assign
+  - index m
+  - range-indexes :, a:, :b, a:b
+  - e.g., matrix(M,N) m; vector(M) v;  m[,1] = v;
+
+* conditional expressions
+  - binary operators on int or double
+    + bool op(int,int);
+    + bool op(double,double); // allows promotion
+    + usual comparisons:  ==,  !=,  <=,  <,  >=,  >
+  - operators on conditions
+    (!cond),  (cond && cond),  (cond || cond),  (cond)
+
+* conditionals
+  - conditional expression
+  - ternary op: cond ? x : y
+  - if (cond) statement else if (cond) statement ... else statement;
+  - while (cond) statement;
+  - repeat statement until cond;
+  - for (statement; condition; statement) statement;
+
+* for-each
+  - foreach (variable : expression) statement;
+  
+* multi-returns and array literals
+  - (a,b,c) = foo();  // function returns array
+  - (m,n,p) = (1,2,3);   // (1,2,3) is array literal
+
+* multiple declarations
+  - e.g., double a, b, c[N];
+
+* declare and assign
+  - e.g., double x = 5.0;
+    double b[5];
+    double a[5] <- b; // odd, eh?
+    simplex(5)[2] c <- ... // even odder
+
+* extensions
+  - declare file paths to #include
+  - declare namespace usings
+  - declare function sigs for parser
+
+* ragged arrays
+  - ready to use with vec<...<vec<x>...> pattern
+  - not clear how to declare (follow C?)
+
+* subroutines
+  - user-defined functions in StanGM
+  - user-defined densities (how much to require?)
+
+* compound op-assigns in StanGM
+  - +=, *=, etc.
+
+* check each parameter shows up on LHS of ~
+  - true check is run-time based on data, etc.
+
+* use normal(y|mu,sigma) as shorthand for 
+  normal_log(y,mu,sigma).
+
+
+
+Stanc Compiler
+----------------------------------------------------------------------
+
+* generate templated log_prob function so that you don't
+  need to evaluate auto-dif when just evaluating function
+
+* Stan safe mode to compile BUGS/JAGS-compliant models
+
+
+
+Command-line
+----------------------------------------------------------------------
+
+* control significant digits in output through command line
+
+* restart from where command left off a la R2jags
+  - this will require writing dump output or a converter
+    for the CSV output to dump output
+  - easiest to save unconstrained params
+  - also need to save adaptation states, etc.
+  - need to save seed and type of randomizer
+
+* auto convergence monitoring -- just keep doubling (or other ratio)
+  - doubling reduces total calc to at most double the end
+  - easy to monitor averages and variances online using accumulators
+
+* add chain ID to output as first column
+
+* ? add sample ID within chain as output 
+  - should be reconstructible
+
+* track rejection rate 
+  - coda just uses equality of samples, which is probably good enough
+    for us, too
+
+* multi-thread or at least multi-process
+  - need to merge results back together
+
+
+C++ API
+----------------------------------------------------------------------
+
+* make sure still possible to use header-only ad
+
+* as much partial eval for gradients as possible
+  - matrices
+  - probability functions
+
+* cut out last derivative step in leapfrog if not nec.
+  - only saves if very small number of leapfrog steps
+
+* threading
+  - rewrite memory arena as thread-local object
+  - merging and monitoring several threads/processes
+
+* could multi-thread agrad by copying all code; use var<1>, var<2>,
+  etc., with var typedefed to var<1>.  Each would then have its
+  own memory pool to read from.  How to specify by client?  Could
+  generate templated code
+
+* figure out way to have vari elements that are NOT on the stack
+  - useful for numeric_limits<var>
+  - stack_vari ==> vari ==> chainable
+    local_vari ==^
+    (stack_vari has operator new; local_vari uses dtor)
+
+* convert memory for vari to singleton & allow thread locality
+  for thread safety
+
+* make sure std::less<T*> and std::swap<T*> 
+ does right thing for our types (like var and vari), as
+ these are used in "algorithms".
+
+* use our arena-based alloc as STL allocator for auto-dif
+  - already doing this for dot products
+  - http://www.cplusplus.com/reference/std/memory/allocator/
+  - what do we need to do for dtor to work?
+
+* Watanabe's WAIC: Widely applicable information criterion
+
+* Ben's implicit function idea -- iterative solver,
+ analytic derivative
+
+* refactor finite diff derivative calcs to functor
+      template <class F, typename S>
+      bool finite_diffs(const vector<S>& x,
+                        const F& f,
+                        vector<S>& df_dx);
+
+* Speed test pass-by-const-ref and pass-by-val for stan::agrad::var
+
+* Convergence monitoring of higher moments
+
+
+
+Special Functions, Probability Functions and Distributions
+----------------------------------------------------------------------
+* beta distro with mean plus "precision" params
+  - beta_mean_log(theta|phi,kappa)
+    = beta_log(theta|phi*kappa, (1-phi)*kappa)
+  - Jacobian from:
+        alpha <- phi * k
+        beta  <- (1 - phi) * k
+    determinant = k  (det [[a,b],[c,d]] = ad - bc)
+
+* pow special cases
+  - inv(x) = pow(x,-1) = 1/x
+  - inv_square(x) = pow(x,-2)
+  - inv_sqrt(x) = pow(x,-1/2)
+
+* signum function
+  int signum(real); 
+
+* signed sqrt
+  signed_sqrt(x) = -sqrt(-x) if x < 0
+                 = sqrt(x)   if x > 0
+
+* log logits
+  - log_logit(u) = log(logit(u)) 
+                 = -log(1 + exp(-u))
+                 = -log1p_exp(-u)
+  - log_1mlogit(u) = log(1 - logit(u))
+                   = log(logit(-u))
+                   = -log1p_exp(u)
+
+* lower triangular times self-transposed
+
+* add general mixture model
+  - modeling language side
+    simplex(K) lambda;
+    vector(K) mu;
+    vector(K) sigma;
+    y ~ mixture(lambda,     // mixing
+                (mu,sigma), // param vecs
+                "normal");  // distro
+ - C++ impl
+    std::vector<double> log_ps;
+    for (k in 1:K)
+      log_ps.push_back(log lambda[k] + normal_log(y,mu[k],sigma[k]));
+    return log_sum_exp(log_ps);
+
+
+
+* generalize vector ops to conforming matrices 
+  -- I (Bob) don't like this as it confuses return types
+
+* alternative distribution parameterizations
+  - e.g., precision for (multi) normal
+  - inverse_sqrt_gamma(...)
+
+* random generation functions
+  - rnorm(),...
+
+* special functions
+  - inv(x) = 1/x
+  - inv_square(x) = 1/(x * x)
+  - dot_self(vector v);  dot_self(row_vector v);  
+  - log_sum_exp_ratio(vector<double> log_ratios, 
+                      vector<double> log_probs);
+  - rank(v,s): number of components of v less than v[s]
+  - ranked(v,s): s-th smallest component of v
+  - interp_ln(e,v1,v2) from BUGS (whatever for?)
+
+* dot_self(x) == x' * x operation
+
+* wrap_multiply(u,v) = u' * v * u
+
+* for square matrices,
+  d/dx det(x' * A * x) = 2 det(x' * A * x) inv(x)'
+  d/dx det(A) = det(A) inv(A)'
+
+* More matrix functions from Eigen:
+  - norm()
+  - squaredNorm()
+  - lpNorm<1>
+  - lpNorm<Eigen::Infinity>
+
+* z-score function
+  - normalize sample to zero sample mean, unit sample variance
 
 * cumulative distribution functions
   - to add:
@@ -167,6 +475,7 @@ EXTENSIONS
         calling templated function with stan::math::default_policy()
      + TODO: test derivatives?
      + dox: add doxygen.
+     + add to Stan Modeling Language Reference Manual function list
   - uni/cont/inv_chi_square
   - uni/cont/inv_gamma
   - uni/cont/logisitic
@@ -191,303 +500,40 @@ EXTENSIONS
   - multi/disc/categorical
   - multi/disc/multinomial
 
-* more general generic initializations
-  -  normal or student-t w. params
-  -  or even extend uniform
 
-* add a parameter initialization block
-  - ? override if user supplies inits?
-  - fill in values not given randomly or report error?
-  - use "beta[n] ~ normal(0,10)" to mean 
-    "beta[n] <- random_normal(0,10)" in the parameter init
-    block (and derived quantity block and elsewhere true
-    sampling is not allowed?)
+Error Handling
+----------------------------------------------------------------------
+
+* some kind of error handling for std lib functions
+  like log(double).  
+
+
+Testing
+----------------------------------------------------------------------
 
 * build unit tests from the BUGS models that just check
   the gradients are right (this'll also cover parsing and
   being able to fire up the models)
 
-* figure out way to have vari elements that are NOT on the stack
-  - useful for numeric_limits<var>
-  - stack_vari ==> vari ==> chainable
-    local_vari ==^
-    (stack_vari has operator new; local_vari uses dtor)
-
-* convert memory for vari to singleton & allow thread locality
-  for thread safety
-
-* unit K-hyperball complement for stationary AR(K) parameters
-  - what should the prior be?
-
-* generate templated log_prob function so that you don't
-  need to evaluate auto-dif when just evaluating function
-
-* user model library
-  - something we don't have to get too involved vetting
-  - ideally things hard to do with other systems
-  - or illustrate the unusual parts of our modeling language
-
-* more matrix ops:
-    left residuals:  A\b = inv(A) * b
-    right residual:  b/A  = b * inv(A)
-    matrix power:    A^n
-    matrix elementwise power:  A.^x
-
-* more functions
-  - z_score()
-  - 
-  
 * auto testing of sampler
   - Cook/Gelman/Rubin-style interval tests
   - needs effective sample size calc to bound intervals
   - needs simulated parameters to test estimators
   - push ESS "measurement error" through the interval tests
 
-* error/exception policy throughout
-  - math
-
-* add printf statement for debugging purposes
-  - really format or just list params?
-
-* control significant digits in output through command line
-
-* stop NUTS from running away without coming back
- -- limit number of steps
-    + command-line param
-    + instrumenting NUTS loops (adaptation, leapfrog)
- -- limit time
-    + start recording time at beginning, check loops inside
- -- bomb with report if exceed these steps
- -- print out adaptation phase step size 
- -- print out number of steps (average and sd?)
-    (bring in Boost accumulator package)
-
-* control decimal places in output 
-  - set a variable on the writer or stream
-
-* add special op for multivariate norm:
-  -  wrapped_multiply(y,Sigma) 
-     = y' * Sigma * y
-     = SUM_{m in 1:K} SUM_{n in 1:K} y[m] * y[n] * Sigma[m,n]
-  - check that my algebra's right
-  - specialize to Cholesky factor instead of Sigma
-
-* deal with autocorrelation model params where require
-  all roots of 1 - SUM_i rho[i]**i to be within unit
-  complex circle
-
-* make sure std::less<T*> and std::swap<T*> 
-  does right thing for our types (like var and vari), as
-  these are used in "algorithms".
-
-* use our arena-based alloc as STL allocator
-  - http://www.cplusplus.com/reference/std/memory/allocator/
-  - what do we need to do for dtor to work?
-
-* Allow normal_log<true> and normal_log<false> to be accessed
-  directly;
-
-* Allow normal_log(y|0,1) as parser synonym for normal_log(y,0,1)
-
-* Add matrix/vector/scalar operators to compiler
-  - binary (*,/,+,-), unary (+,-)
-  - translate down to our overloaded promotion-based lib
-  - find operator for transpose? 
-
 * more matrix tests (for all ops w. gradients)
-
-* More matrix functions from Eigen:
-  - norm()
-  - squaredNorm()
-  - lpNorm<1>
-  - lpNorm<Eigen::Infinity>
-
-* Watanabe's WAIC: Widely applicable information criterion
-
-* Ben's implicit function idea -- iterative solver,
-  analytic derivative
-
-* smallest posterior interval (SPIn) as default, also central intervals
-
-* triangular matrix type
-  - how to implement in Eigen?
-    + triangular view?
-
-* symmetric matrix type 
-  - how to implement in Eigen?  
-  - what ops to allow? 
-    + sets are symmetric
-    + but this'll get products wrong as
-      everything but diagonal will get set twice
- 
-* Cholesky factor type
-
-* dot_self(x) == x' * x operation
-  wrap_multiply(u,v) = u' * v * u
-
-* special positive-definiteness-preserving operations
-  - basic data type (or trait)
-  - operations that preserve well-formedness, perhaps
-    by fudging boundary conditions
-
-* optimization
-  - functor-based concept design with templates 
-  - easily pluggable with log prob in model for MAP 
-
-* convergence monitoring
-  - R-hat
-  - n.eff (variogram, at least)
-  - mean and variance of samples (per chain & across)
-
-* forward-mode simulation
-  - use when nodes can be ordered and sampled with
-    all parents in graphical model defined
 
 * benchmarks
   - agrad vs. RAD/Sacado, CppAD, ... ?
   - stan vs. MCMCpack, R, BUGS, JAGS, OpenBUGS, ...
 
-* compiler for R's linear model notation
-
-* threading
-  - rewrite memory arena as thread-local object
-  - merging and monitoring several threads/processes
-
-* interface to Python
-
-* interface to MATLAB
-
-* Riemannian manifold sampling
- - Girolami's method with auto-diff Hessians
-
-* mapped distributions
-  - foo(x|theta) ==> foo(xs|theta)
-  - C style: x*, int size
-  - iterator concept: (x.start(),x.end())
-  - array concept: (x[n], x.size())
-
-* special functions
-  - inv(x) = 1/x
-  - inv_square(x) = 1/(x * x)
-  - dot_self(vector v);  dot_self(row_vector v);  
-  - log_sum_exp_ratio(vector<double> log_ratios, 
-                      vector<double> log_probs);
-  - rank(v,s): number of components of v less than v[s]
-  - ranked(v,s): s-th smallest component of v
-  - interp_ln(e,v1,v2) from BUGS (whatever for?)
-  
-* random generation functions
-  - rnorm(),...
-
-* type inference & propagation
-  - variable vs. constant
-  - local/nuisance vs. written
-
-* multiple imputation
-  - can't do each leapfrog step
-  - generated quantitities before leapfrogs
-
-* warnings
-  - a <- foo(theta) if LHS contains variable: overwrite var
-  - a ~ foo(theta)  if LHS is complex expression: need Jacobian
-
-* integer subtypes
-  - integer(-inf,inf), count(1,inf), natural(0,inf)
-  - boolean(0,1), categorical(1,K), ordinal(1,K),
-
-* double subtypes
-  - probability(0,1), correlation(-1,1)
-  - positive(0,inf), negative(-inf,0)
-
-* vector subtypes
-  - ordered (vs. positive ordered)
-
-* monitor/sampler interface
-  - sampler, filter, aggregator, buffer
-  - online means and variances
-  - rHat, and split rHat
-  - run in second process as we go?
-
-* matrix slice and assign
-  - index m
-  - range-indexes :, a:, :b, a:b
-  - e.g., matrix(M,N) m; vector(M) v;  m[,1] = v;
-  
-* conditionals
-  - conditional expression
-  - ternary op: cond ? x : y
-  - if (cond) statement else if (cond) statement ... else statement;
-  - while (cond) statement;
-  - repeat statement until cond;
-  
-* multi-returns and array literals
-  - (a,b,c) = foo();  // function returns array
-  - (m,n,p) = (1,2,3);   // (1,2,3) is array literal
-
-* multiple declarations
-  - e.g., double a, b, c[N];
-
-* declare and assign
-  - e.g., double x = 5.0;
-    double b[5];
-    double a[5] = b; // odd, eh?
-   
-* full type prefix notation   
-  - e.g.,  double[5] b;
-           double[5] a;
-           double[5] c <- a;
-  - ugly with simplex, etc.
-           simplex(5)[2] c <- ...
-
-* extensions
-  - declare file paths to #include
-  - declare namespace usings
-  - declare function sigs for parser
-
-* ragged arrays
-  - ready to use with vec<...<vec<x>...> pattern
-  - not clear how to declare (follow C?)
-
-* constant vari values
-  - avoid placing on stack
-  - how to deal with adjoints?
-  - use for numeric traits
-  - units 0 and 1 (scalar, vector, matrix)
-
-* alternative distribution parameterizations
-  - e.g., precision for (multi) normal
-  - inverse_sqrt_gamma(...)
-
-* subroutines
-  - user-defined functions in StanGM
-  - user-defined densities (how much to require?)
-
-* compound op-assigns in StanGM
-  - +=, *=, etc.
+* profile running models w. various operations
 
 * complete math robustness and limits review
   - want domain boundaries to be right (usually
     -inf, 0 and inf, etc.)
 
 * more diagnostics during warmup of where epsilon is going
-
-* refactor finite diff derivative calcs to functor
- template <class F, typename S>
- bool finite_diffs(const vector<S>& x,
-                   const F& f,
-                   vector<S>& df_dx);
-
-* restart from where command left off a la R2jags
-  - this will require writing dump output or a converter
-    for the CSV output to dump output
-  
-* auto convergence monitoring -- just keep doubling (or other ratio)
-
-* cut out last derivative step in leapfrog if not nec.
-  - only saves if very small number of leapfrog steps
-
-* precompiled headers to speed up model compiles
-  - doesn't seem to help much
 
 * speed measurement
   - to converge
@@ -496,20 +542,68 @@ EXTENSIONS
     parameters theta[k] and theta[k]*theta[k]
   - discarding first half of samples too many if fast to converge
 
-* 
 
-* check each parameter shows up on LHS of ~
-  - true check is run-time based on data, etc.
 
-* allow +/- propto flag in densities in Stan-GM
+
+Models
+----------------------------------------------------------------------
+
+* unit K-hyperball complement for stationary AR(K) parameters
+  - what should the prior be?
+
+* user model library
+  - something we don't have to get too involved vetting
+  - ideally things hard to do with other systems
+  - or illustrate the unusual parts of our modeling language
+ 
+
+New Stuff
+----------------------------------------------------------------------
+
+* override operator*, etc. in Eigen for efficiency?
+  - ideally push expressions for gradients through along with vals
+
+* "non-parametric" models
+  - approximate a la BUGS vol 3
+  - merge reversible jump and HMC somehow?
+
+* built-ins to facilitate cross-validation
+  - especially on hierarchical models
+
+* use plain old optimization to get close to a mode
 
 * forward mode auto-dif
   - last revision 548: 
   - src/stan/agrad/ad.hpp
 
-* bring back specialized auto-dif for densities
-  - bring up to speed with new templates for densities & propto
-  - last revision 549:  ag_distributions.hpp & test 
+* optimization
+  - functor-based concept design with templates 
+  - easily pluggable with log prob in model for MAP 
+
+* compiler for R's linear model notation
+
+* interface to Python
+
+* interface to MATLAB
+
+* Riemannian manifold sampling
+ - Girolami's method with auto-diff Hessians
+
+* multiple imputation
+  - when to run it?
+  - how to model it?
+
+* mapped distributions
+  - foo(x|theta) ==> foo(xs|theta)
+  - C style: x*, int size
+  - iterator concept: (x.start(),x.end())
+  - array concept: (x[n], x.size())
+
+* monitor/sampler interface
+  - sampler, filter, aggregator, buffer
+  - online means and variances
+  - rHat, and split rHat
+  - run in second process as we go?
 
 * whole new auto-dif.  stack consists of entries per expression
   containing
@@ -519,19 +613,6 @@ EXTENSIONS
     + ptr to subexpression  
   - less space for constants, equal for unary, more for binary+
   - no virtual ops
-
-* Stan safe mode to compile BUGS/JAGS-compliant models
-
-* Speed test pass-by-const-ref and pass-by-val for stan::agrad::var
-
-* could multi-thread agrad by copying all code; use var<1>, var<2>,
-  etc., with var typedefed to var<1>.  Each would then have its
-  own memory pool to read from.  How to specify by client?  Could
-  generate templated code
-  
-
-Longer-Term Ideas
-=================================================
 
 * code gen auto-dif
   - just for Stan GM models
@@ -543,72 +624,125 @@ Longer-Term Ideas
 * elim stan/maths/matrix lib by adding implicit ctor
   for Matrix<var,...> based on Matrix<double,...>
 
-* could template stan::agrad::var with <unsigned int n>
-  indicating thread.  typedef var to var<0>
-  - runs in multiple threads with no speed overhead
-  - code bloat multiples code size by # of threads
-    + may in turn slow down everything due to mem traffic
-
 * some notion of momentum for discrete variables a la HMC
   for continuous variables (at least accelerate metropolis-hastings)
   some densities generalize 
 
-* blocking updates
+* blocking updates on parameters
   - only update subset of parameters
   - specify blocks in program?
   - allow Gibbs on some variables
   - split HMC into blocks (aka batches)
   - in the limit do conditional with HMC!
 
-Stan GM MANUAL
-=================================================
+* blocking updates on data
+  - subsample data and update as before
+  - works best if data is large and redundant
 
-1.  Intro
-2.  Modeling Language
-    a.  basic organization
-    b.  variable types
-    c.  expressions: operator precedence, associativity
-    d.  statements: precedence, associativity
-    e.  programs
-    f.  full BNF
-3.  Reference
-    a.  special functions
-    b.  distributions
-    c.  built-in variable transforms
-4.  Stan Command Line 
-5.  Extending Stan
-6.  C++ Code Generated
-    a.  auto-dif
-A.  Examples 
-    References
+* stepwise debugger for Stan
+  - print adaptation params
+  - print gradients
+  - just a mode on command to print more out per sample?
+  - ideally link runtime errors back to lines of Stan code
 
-++ doc how to do WAIC for RATS
-   generated quantities {
-   for (i in 1:I) for (j in 1:J) ll_y[i,j] <- normal_log(y[i,j]...)
+* allow random generation in model
+  - are derivatives just same as basic, so that
+      y[n] <- random_normal(mu,sigma);
+    gets same grad as:
+      y[n] ~ normal(mu,sigma);
+    ?
+
+
+
+
 
 
 MODELS
-=================================================
+======================================================================
 
-http://stat-athens.aueb.gr/~jbn/winbugs_book/
+* Online book with models based on BUGS:
+  http://stat-athens.aueb.gr/~jbn/winbugs_book/
 
-
-
-
-
-
-Coda-like Object Design
-========================
-
-One thing we didn't discuss -- ESS for pow(X,2),
-basically to test second moment estimation.
-I think these should be available just about everywhere
-the first order stuff is available.
+* deal with autocorrelation model params where require
+  all roots of 1 - SUM_i rho[i]**i to be within unit
+  complex circle
 
 
+BUGS Models
+----------------------------------------------------------------------
+All of the vol1 -- vol3 models are implemented except
+for the following, categorized by issue.
+
+* Sampler too slow
+  - vol2/schools/schools.stan.0
+  - vol3/fire/fire.stan.0
+
+* Sampler hangs
+  - vol3/funshapes/hsquare.stan.0
+  - vol3/funshapes/ring.stan.0
+  - vol3/funshapes/squaremc.stan.0
+
+* Zero Poisson, 0 ~ Poisson(0 * parameters) hangs the following:
+  Isn't this one fixed?
+  - vol1/leuk/leuk.stan.0
+  - vol1/leukfr/leukfr.stan.0
+
+* Cyclic DAGs
+  Can probably do these in Stan (not supported in JAGS).
+  - vol2/ice/pineapple_ice.stan.0
+  - vol2/ice/vanilla_ice.stan.0
+  - vol3/jama/jama.stan.0
+
+* Discrete parameters
+  - vol2/asia/asia.stan.0
+  - vol2/biopsies/biopsies.stan.0
+  - vol2/stagnant/stagnant.stan.0
+  - vol2/t_df/estdof2.stan.0
+
+* Binary parameters
+  Other versions of model working integrating out discretes.
+  - vol2/cervix/cervix.stan.0 
+  - vol2/hearts/hearts.stan.0
+
+* Works, but data structure difficult to deal with
+  - vol1/bones/bones.stan.0
 
 
-       
+
+MODELING LANGUAGE MANUAL
+======================================================================
+
+* performance tips
+  - compute once and re-use if possible
+  - pull out constants from loops
+  - pull out terms from looped probabilities
+
+* add example calculating log likelihood for DIC
+  - how to specify likelihood terms in model?
+
+* add example on individual log likelihoods for WAIC
+  - how to specify individual likelihood terms in model?
+
+   generated quantities {
+    for (i in 1:I) 
+      for (j in 1:J) 
+        ll_y[i,j] <- normal_log(y[i,j]...)
+
+* C++ model class
+
+* Index
+
+* Description of reverse-mode auto-dif or too C++-like?
+
+
+
+C++ API MANUAL
+======================================================================
+
+* Enough doc to use agrad w. matrices and probability functions
+  - basic description of reverse-mode AD
+
+* Goes along with cleaning up API doc and privatizing
 
 
 
