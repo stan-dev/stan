@@ -170,15 +170,12 @@ clean-dox:
 
 clean-manual:
 	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf
-	$(RM) doc/stan-reference.pdf
 
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch
 
-
 clean-demo:
 	$(RM) -r demo
 
-clean-all: clean clean-models clean-dox clean-demo
+clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
-
