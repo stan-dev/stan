@@ -4,12 +4,20 @@ MINOR_VERSION := $(shell grep MINOR_VERSION src/stan/version.hpp | sed -e 's/.*\
 PATCH_VERSION := $(shell grep PATCH_VERSION src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
-dist: clean-all
-	@echo HERE
-	@echo 'version: ' $(VERSION_STRING)
+dist: clean-all doxygen manual clean-manual
+	@echo ''
+	@echo 'Building distribution tarball for version: ' $(VERSION_STRING)
 	@echo stan-src-$(VERSION_STRING) > .fname
-	@-rm -rf stan-src-$(VERSION_STRING)
-	mkdir stan-src-$(VERSION_STRING)
-	rsync -avz --exclude ".git" --exclude stan-src-$(VERSION_STRING)  ./ stan-src-$(VERSION_STRING)
+	@-rm -rf stan-src-$(VERSION_STRING) stan-src-$(VERSION_STRING).tgz
+	@echo ''
+	@echo '- making directory: stan-src-$(VERSION_STRING)'
+	@mkdir stan-src-$(VERSION_STRING)
+	@echo ''
+	@echo '- copying files (takes a few minutes)'
+	rsync -avz --exclude ".git*" --exclude stan-src-$(VERSION_STRING) --exclude "*.tgz" ./ stan-src-$(VERSION_STRING) > /dev/null
+	@echo ''
+	@echo '- creating the tarball'
 	tar --gzip -chf stan-src-$(VERSION_STRING).tgz stan-src-$(VERSION_STRING)
+	@echo ''
+	@echo '- cleanup'
 	-rm -rf stan-src-$(VERSION_STRING) .fname
