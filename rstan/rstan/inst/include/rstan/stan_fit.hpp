@@ -98,9 +98,6 @@ namespace rstan {
       return dimss; 
     } 
 
-
-
-  
     template <class Sampler, class Model, class RNG>
     void sample_from(Sampler& sampler,
                      bool epsilon_adapt,
@@ -297,7 +294,8 @@ namespace rstan {
       }
       
       if (sample_file_flag) {
-        rstan::io::rcout << std::endl << "Samples of chain " << chain_id 
+        rstan::io::rcout << std::endl << "Samples of chain " 
+                         << chain_id 
                          << " is written to file " << sample_file;
 
         sample_stream.close();
@@ -308,11 +306,12 @@ namespace rstan {
   } 
 
   /**
-   * <p> To implement a Rcpp class module for R's user interface with NUTS. 
+   * <p> To implement a Rcpp class module for R's user interface with 
+   * samplers in stan (HMC, NUTS-I, NUTS-II).  
    * Adapted from <code> stan/src/stan/gm/command.hpp</code>. 
    * 
    * @tparam Model The model translated from the Stan language.
-   * @RNG RNG for stan::mcmc::chains 
+   * @tparam RNG RNG for stan::mcmc::chains 
    *
    */
 
@@ -324,7 +323,6 @@ namespace rstan {
     std::vector<std::string>  names_;
     Model model_;
     size_t num_chains_; 
-    size_t seed_; // unique need for all the chains 
     std::map<size_t, stan_args> argss_; 
     // std::vector<stan_args> argss_;
     // stan::mcmc::chains<RNG> chains_; 
@@ -339,8 +337,9 @@ namespace rstan {
      * samples. Note the index here is not the index in
      * <code>param_name_to_index</code>.  
     
-     * @param flatnames[out] Flatnames for all the names. That is, if parameter
-     * a is of length 3, it would be added as a[1], a[2], a[3]. 
+     * @param flatnames[out] Flatnames for all the names. That is, 
+     * if parameter a is of length 3, it would be added as 
+     * a[1], a[2], a[3]. 
      *
      */
     void param_names_to_indices_and_flatnames(
@@ -372,9 +371,6 @@ namespace rstan {
      *
      * @param n_chains The number of chains. 
      *
-     * FIXME: 
-     *  num_of chains here and in stan_args
-     *  chain_id 
      */ 
 
     stan_fit(SEXP data, SEXP n_chains) : // try : 
@@ -385,21 +381,23 @@ namespace rstan {
       chains_(num_chains_, names_, get_param_dims(model_)) 
     {  
 
-
-      for (std::vector<std::string>::const_iterator it = names_.begin();
-           it != names_.end(); 
+      std::vector<std::string> names = chains_.param_names();
+      for (std::vector<std::string>::const_iterator it = names.begin();
+           it != names.end(); 
            ++it) {
         size_t j = chains_.param_name_to_index(*it);
         std::vector<size_t> j_dims = chains_.param_dims(j); 
         size_t j_size = chains_.param_size(j); 
-        std::vector<std::string> j_names = get_col_major_names(*it, j_dims);
-        flatnames_.insert(flatnames_.end(), j_names.begin(), j_names.end()); 
+        std::vector<std::string> j_n = get_col_major_names(*it, j_dims);
+        flatnames_.insert(flatnames_.end(), j_n.begin(), j_n.end()); 
       }
 
       // argss_.resize(0); 
     }/* catch (std::exception& e) {
-      rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
-      rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
+      rstan::io::rcerr << std::endl << "Exception: " 
+                       << e.what() << std::endl;
+      rstan::io::rcerr << "Diagnostic information: " << std::endl
+                       << boost::diagnostic_information(e) << std::endl;
       throw; 
     } */ 
     // not really helpful of using try---catch though it could throw
@@ -407,7 +405,8 @@ namespace rstan {
 
     /**
      * This function would be exposed (using Rcpp module, see
-     * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call NUTS. 
+     * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call 
+     * methods defined here. 
      *
      *
      * @param args The arguments for nuts in form of R's list. 
@@ -424,15 +423,15 @@ namespace rstan {
       size_t c_id = t.get_chain_id(); 
       // rstan::io::rcout << "chain id = " << c_id << std::endl;
       if (c_id > num_chains_) { 
-        rstan::io::rcerr << "chain id could not be larger than number of chains. "
-                         << "chain_id = " << c_id 
-                         << "; num_chains = " << num_chains_ 
+        rstan::io::rcerr << "chain id cannot be larger than # of chains"
+                         << "; chain_id = " << c_id 
+                         << ", num_chains = " << num_chains_  << "."
                          << std::endl;
         return Rcpp::wrap(false);
       } 
       if (argss_.count(c_id)) {
         rstan::io::rcerr << "chain of id " << c_id 
-                         << " was done before." << std::endl;
+                         << " was sampled before." << std::endl;
         return Rcpp::wrap(false);
       } 
       argss_.insert(std::map<size_t, stan_args>::value_type(c_id, t));
@@ -482,8 +481,6 @@ namespace rstan {
     } 
 
 
-
-
     /** 
      * Obtain samples by names from a chain  
      * 
@@ -529,7 +526,7 @@ namespace rstan {
       std::vector<SEXP> params; 
 
       std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; // names for the returned samples 
+      std::vector<std::string> flatnames;  
       param_names_to_indices_and_flatnames(
         Rcpp::as<std::vector<std::string> >(names),
         indices, 
@@ -685,6 +682,16 @@ namespace rstan {
 
     } 
 
+    /**
+     * Get the mean and standard deviation for samples of one chain
+     * 
+     * @param names An R vector of names specifying parameters of 
+     *  interest
+     * @param chain_id The chain id starting from 1. 
+     * @return An R list, each element of which contains a vector for 
+     *  a parameter. The fist element of the vector is mean and the 
+     *  second is the SD. 
+     */
     SEXP get_chain_mean_and_sd(SEXP chain_id, SEXP names) {
       size_t k = Rcpp::as<size_t>(chain_id) - 1;  // make it start from 0
 
@@ -710,6 +717,15 @@ namespace rstan {
       return Rcpp::wrap(lst);
     } 
 
+    /**
+     * Get the mean and standard deviation for samples of all chains
+     * 
+     * @param names An R vector of names specifying parameters of 
+     *  interest
+     * @return An R list, each element of which contains a vector for 
+     *  a parameter. The fist element of the vector is mean and the 
+     *  second is the SD. 
+     */
     SEXP get_mean_and_sd(SEXP names) {
       std::vector<size_t> indices; 
       std::vector<std::string> flatnames; 
@@ -767,7 +783,7 @@ namespace rstan {
      * @return The R hat's for all the paramemters in form of an R list, every
      *  element of which is the ESS for a paramemter. 
      */
-    SEXP get_rhat(SEXP names) {
+    SEXP get_split_rhat(SEXP names) {
       std::vector<size_t> indices; 
       std::vector<std::string> flatnames; 
       param_names_to_indices_and_flatnames(

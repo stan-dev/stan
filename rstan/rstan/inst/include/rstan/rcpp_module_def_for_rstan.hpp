@@ -58,9 +58,9 @@ RCPP_MODULE(%model_name%){
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_ess) 
 
-    .method("get_rhat", 
+    .method("get_split_rhat", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
-                             boost::random::ecuyer1988>::get_rhat) 
+                             boost::random::ecuyer1988>::get_split_rhat) 
 
 
     ;

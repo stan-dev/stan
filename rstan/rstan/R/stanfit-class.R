@@ -53,7 +53,7 @@ setMethod("summary", signature = (object = "stanfit"),
             vnames <- sampleshandle$param_names() 
             mnsd <- sampleshandle$get_mean_and_sd(vnames) 
             qs <- sampleshandle$get_quantiles(vnames, probs)  
-            rhat <- sampleshandle$get_rhat(vnames) 
+            rhat <- sampleshandle$get_split_rhat(vnames) 
             ess <- sampleshandle$get_ess(vnames) 
          
             prob_in_percent <- paste(formatC(probs * 100,  

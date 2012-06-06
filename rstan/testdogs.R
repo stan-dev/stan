@@ -110,7 +110,9 @@ model_name <- "dogs";
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-ss <- sampling(dogsrr, data = dogsdat, n.iter = 2012, sample.file = 'dogs.csv')
+ss <- sampling(dogsrr, data = dogsdat, n.chains = 3, 
+               n.iter = 2012, sample.file = 'dogs.csv')
+
 
   args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
   dogsdat <- rstan:::data.preprocess(dogsdat)
