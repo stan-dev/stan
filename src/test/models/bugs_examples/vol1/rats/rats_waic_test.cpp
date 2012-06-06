@@ -14,7 +14,7 @@ public:
     model_path.push_back("bugs_examples");
     model_path.push_back("vol1");
     model_path.push_back("rats");
-    model_path.push_back("ratswaic");
+    model_path.push_back("rats_waic");
     return model_path;
   }
 

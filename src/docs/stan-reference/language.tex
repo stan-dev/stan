@@ -1235,11 +1235,11 @@ epression \code{bar(1,1)} as illegal and list the potentially matching
 ambiguous functions.
 
 
-\subsection{Extending \Stan with User-Defined Functions}
+% \subsection{Extending \Stan with User-Defined Functions}
 
-\Stan enables users to add their own functions by defining appropriate
-\Cpp functions and registering their signatures with the \Stan
-compiler.  Details are provided in \refappendix{user-defined-functions}.
+% \Stan enables users to add their own functions by defining appropriate
+% \Cpp functions and registering their signatures with the \Stan
+% compiler.  Details are provided in \refappendix{user-defined-functions}.
 
 
 
@@ -1561,16 +1561,16 @@ The variable \code{lp\_\_} is only defined in the \code{parameter},
 may not be declared by the user) in the \code{data}, \code{transformed
   data} and \code{generated quantity} blocks.
 
-\subsection{User-Defined Distributions}
+% \subsection{User-Defined Distributions}
 
-Users may add their own probability functions and cumulative
-distribution by adding functions of the appropriate type.  If the
-appropriate cumulative distribution is available to match a
-probability function, truncated versions of that probabilty function
-may be used. 
+% Users may add their own probability functions and cumulative
+% distribution by adding functions of the appropriate type.  If the
+% appropriate cumulative distribution is available to match a
+% probability function, truncated versions of that probabilty function
+% may be used. 
 
-See \refappendix{user-defined-functions} for details on how to add
-user-defined functions to \Stan.
+% See \refappendix{user-defined-functions} for details on how to add
+% user-defined functions to \Stan.
 
 
 \section{For Loops}
@@ -2312,3 +2312,97 @@ on the declared derived quantity variables are validated.
 
 All variables declared as derived quantities are printed as part of
 the output. 
+
+\chapter{BNF Grammars}
+
+\noindent
+This appendix provides a Backus-Naur form (\BNF) grammar for the \Stan
+modeling language.  Literal strings are indicated in single quotes
+(\code{'}).  Grammar non-terminals are unquoted strings.  A prefix
+question mark (\code{?}) indicates optionality.  A postfixed Kleene
+star (\code{*}) indicates zero or more occurrences. 
+
+\section{Programs}
+
+{\small
+\begin{Verbatim}
+program ::= ?data ?tdata ?params ?tparams model ?generated
+
+data ::= 'data' var_decls
+tdata ::= 'transformed data' var_decls_statements
+params ::= 'parameters' var_decls
+tparams ::= 'transformed parameters' var_decls_statements
+model ::= 'model' statement
+generated ::= 'generated quantities' var_decls_statements
+
+var_decls ::= '{' var_decl* '}'
+var_decls_statements ::= '{' var_decl* statement* '}'
+\end{Verbatim}
+}
+
+\section{Variable Declarations}
+
+{
+\small
+\begin{Verbatim}
+var_decl ::= var_type var_name ?dims
+
+var_type ::= int ?int_range
+           | real ?real_range
+           | vector '(' int_expression ')'
+           | ordered '(' int_expression ')'
+           | simplex '(' int_expression ')'
+           | row_vector '(' int_expression ')'
+           | matrix '(' int_expression ',' int_expression ')'
+           | corr_matrix '(' int_expression ')'
+           | cov_matrix '(' int_expression ')'
+
+int_range ::= '(' int_expression ',' ?int_expression ')'
+            | '('  ','  int_expression ')'
+
+real_range ::= '(' real_expression ',' ?real_expression ')'
+             | '('  ','  real_expression ')'
+
+
+dims ::= '['  int_expression (',' int_expression)*  ']'
+\end{Verbatim}
+}
+
+\section{Expressions}
+
+{
+\small
+\begin{Verbatim}
+expression ::= literal
+             | variable
+             | expression infixOp expression
+             | prefixOp expression
+             | expression postfixOp
+             | expression '[' expressions ']'
+             | function '(' ?expressions ')'
+             | '(' expression ')'
+
+expressions ::= expression
+              | expression ',' expressions
+\end{Verbatim}
+}
+
+\section{Statements}
+
+{
+\small
+\begin{Verbatim}
+statement 
+::= lhs '<-' expression ';'
+  | expression '~' identifier '(' ?expressions ')' ?truncation ';'
+  | 'for' '(' identifier 'in' expression ':' expression ')' statement
+  | '{' var_decl* statement+ '}'
+  | ';'
+
+truncation ::= 'T' '(' ?expression ',' ?expression ')' 
+
+lhs ::= identifier
+      | identifier '[' expressions ']'
+
+\end{Verbatim}
+}

@@ -13,7 +13,7 @@ public:
     model_path.push_back("models");
     model_path.push_back("bugs_examples");
     model_path.push_back("vol1");
-    model_path.push_back("leuk");
+    model_path.push_back("leukfr");
     model_path.push_back("leukfr");
     return model_path;
   }

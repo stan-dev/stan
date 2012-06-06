@@ -90,10 +90,11 @@ behavior is quite sensitive.  \Stan's samplers allow these parameters
 to be set by hand or set automatically without user intervention.
 
 The first tuning parameter is a mass matrix for the fictional
-particle.  \Stan can be configured to use a unit mass matrix, a user-defined
-diagonal mass matrix, or to estimate a diagonal mass matrix during
-warmup.  The latter has the effect of normalizing the scale of each
-element $\theta_k$ of the unknown variable sequence $\theta$.
+particle.  \Stan can be configured to use a unit mass matrix, a
+user-defined diagonal mass matrix, or to estimate a diagonal mass
+matrix during warmup.  The latter has the effect of normalizing the
+scale of each element $\theta_k$ of the unknown variable sequence
+$\theta$.
 
 The other two tuning parameters set the temporal step size of the
 discretization of the Hamiltonian and the total number of steps taken
@@ -626,12 +627,15 @@ It is difficult to use this method to comment out code, because
 an internal close comment sequence, \code{*/}, may take precedence.
 
 
-\section{User-Defined Distributions and Functions}
+% \section{User-Defined Distributions and Functions}
 
-\Stan allows new distributions to be coded in one of two ways, either
-directly in its modeling language (see
-\refchapter{custom-probability-functions}), or by extending the
-modeling language using \Cpp (see
-\refappendix{user-defined-functions}).  The latter is more efficient
-and also portable across models.
+% \Stan allows new distributions to be coded directly in the modeling
+% language.  
+
+%  in one of two ways, either
+% directly in its modeling language (see
+% \refchapter{custom-probability-functions}), or by extending the
+% modeling language using \Cpp (see
+% \refappendix{user-defined-functions}).  The latter is more efficient
+% and also portable across models.
 
