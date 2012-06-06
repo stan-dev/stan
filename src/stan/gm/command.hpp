@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <cstddef>
-//#include <ctime>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <iomanip>
 #include <iostream>
@@ -229,6 +229,8 @@ namespace stan {
       unsigned int num_thin = (calculated_thin > 1) ? calculated_thin : 1U;
       command.val("thin",num_thin);
 
+      bool user_supplied_thin = command.has_key("thin");
+
       int leapfrog_steps = -1;
       command.val("leapfrog_steps",leapfrog_steps);
 
@@ -265,10 +267,10 @@ namespace stan {
           return -1;
         }
       } else {
-        random_seed = (boost::posix_time::microsec_clock::universal_time() -
-                       boost::posix_time::ptime(boost::posix_time::min_date_time))
+        random_seed 
+          = (boost::posix_time::microsec_clock::universal_time() -
+             boost::posix_time::ptime(boost::posix_time::min_date_time))
           .total_milliseconds();
-        //random_seed = std::time(0);
       }
 
       int chain_id = 1;
@@ -300,7 +302,9 @@ namespace stan {
 
       std::string init_val;
       // parameter initialization
+      int num_init_tries = 1;
       if (command.has_key("init")) {
+        num_init_tries = -1;
         command.val("init",init_val);
         if (init_val == "0") {
           params_i = std::vector<int>(model.num_params_i(),0);
@@ -314,7 +318,7 @@ namespace stan {
           model.transform_inits(init_var_context,params_i,params_r);
         }
       } else {
-        init_val = "random initialization";
+        init_val = "random initialization";  // for I/O
         // init_rng generates uniformly from -2 to 2
         boost::random::uniform_real_distribution<double> 
           init_range_distribution(-2.0,2.0);
@@ -324,8 +328,30 @@ namespace stan {
 
         params_i = std::vector<int>(model.num_params_i(),0);
         params_r = std::vector<double>(model.num_params_r());
-        for (size_t i = 0; i < params_r.size(); ++i)
-          params_r[i] = init_rng();
+
+        // retry inits until get a finite log prob value
+        std::vector<double> init_grad;
+        static size_t MAX_INIT_TRIES = 100;
+        for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
+          for (size_t i = 0; i < params_r.size(); ++i)
+            params_r[i] = init_rng();
+          double init_log_prob = model.grad_log_prob(params_r,params_i,init_grad);
+          if (!boost::math::isfinite(init_log_prob))
+            continue;
+          for (size_t i = 0; i < init_grad.size(); ++i)
+            if (!boost::math::isfinite(init_grad[i]))
+              continue;
+          break;
+        }
+        if (num_init_tries == MAX_INIT_TRIES) {
+          std::cout << "Initialization failed after " << MAX_INIT_TRIES 
+                    << " attempts. "
+                    << " Try specifying initial values,"
+                    << " reducing ranges of constrianed values,"
+                    << " or reparameterizing the model."
+                    << std::endl;
+          return -1;
+        }
       }
 
       bool append_samples = command.has_flag("append_samples");
@@ -336,8 +362,15 @@ namespace stan {
       
 
       std::cout << "STAN SAMPLING COMMAND" << std::endl;
-      std::cout << "data = " << data_file << std::endl;
+      if (data_file == "")
+        std::cout << "data = (specified model requires no data)" << std::endl;
+      else 
+        std::cout << "data = " << data_file << std::endl;
+
       std::cout << "init = " << init_val << std::endl;
+      if (num_init_tries > 0)
+        std::cout << "init tries = " << num_init_tries << std::endl;
+
       std::cout << "samples = " << sample_file << std::endl;
       std::cout << "append_samples = " << append_samples << std::endl;
 
@@ -346,7 +379,7 @@ namespace stan {
                             ? "user specified"
                             : "randomly generated") << ")"
                 << std::endl;
-      std::cout << "chain_id=" << chain_id
+      std::cout << "chain_id = " << chain_id
                 << " (" << (command.has_key("chain_id")
                             ? "user specified"
                             : "default") << ")"
@@ -354,7 +387,9 @@ namespace stan {
 
       std::cout << "iter = " << num_iterations << std::endl;
       std::cout << "warmup = " << num_warmup << std::endl;
-      std::cout << "thin = " << num_thin << std::endl;
+      std::cout << "thin = " << num_thin
+                << (user_supplied_thin ? " (user supplied)" : " (default)")
+                << std::endl;
 
       std::cout << "unit_mass_matrix = " << unit_mass_matrix << std::endl;
       std::cout << "leapfrog_steps = " << leapfrog_steps << std::endl;
@@ -363,7 +398,6 @@ namespace stan {
       std::cout << "epsilon_pm = " << epsilon_pm << std::endl;;
       std::cout << "delta = " << delta << std::endl;
       std::cout << "gamma = " << gamma << std::endl;
-
 
       if (command.has_flag("test_grad")) {
         std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
