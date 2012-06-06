@@ -1907,7 +1907,57 @@ TEST(agrad_matrix,mdivide_right_val) {
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
+TEST(matrixTest,mdivide_left_tri_val) {
+  matrix_v Av(2,2);
+  matrix_d Ad(2,2);
+  matrix_v I;
+  
+  Av << 2.0, 0.0, 
+        5.0, 7.0;
+  Ad << 2.0, 0.0, 
+        5.0, 7.0;
 
+  I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Av,Av);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Av,Ad);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Ad,Av);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  Av << 2.0, 3.0, 
+        0.0, 7.0;
+  Ad << 2.0, 3.0, 
+        0.0, 7.0;
+
+  I = stan::agrad::mdivide_left_tri<Eigen::Upper>(Av,Av);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  I = stan::agrad::mdivide_left_tri<Eigen::Upper>(Av,Ad);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  I = stan::agrad::mdivide_left_tri<Eigen::Upper>(Ad,Av);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+}
 TEST(agrad_matrix,inverse_val) {
   using stan::math::inverse;
   matrix_v a(2,2);
@@ -2715,8 +2765,6 @@ TEST(agradMatrix, dot_self_vec) {
 
   Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> vvvv(1,3);
   assert_val_grad(vvvv);
-
-  
 }
 
 

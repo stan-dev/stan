@@ -46,8 +46,8 @@ setMethod("extract", "stanfit",
 setMethod("summary", signature = (object = "stanfit"), 
           function(object, probs, ...) { 
 
-           if (missing(probs)) 
-             probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
+            if (missing(probs)) 
+              probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
 
             sampleshandle <- object@.fit$sampleshandle  
             vnames <- sampleshandle$param_names() 
