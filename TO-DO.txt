@@ -1,8 +1,6 @@
 STAN V1.0
 ======================================================================
 
-* debug potential issue with NUTS II (Matt)
-
 * distribution engineering (Daniel)
   download:  tarballs, doc
   tarball:  Stan repository (+ binaries?)
