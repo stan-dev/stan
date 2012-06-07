@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 
+
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/tools/promotion.hpp>
@@ -27,18 +28,11 @@ namespace stan {
      * @param y Value.
      * @return Exponent base 2 of value.
      */
-    template <typename T,
-	      class Policy>
-    inline typename boost::math::tools::promote_args<T>::type
-    exp2(T y, const Policy&) {
-      using std::pow;
-      return pow(2.0,y);
-    }
-
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     exp2(T y) {
-      return exp2(y, stan::math::default_policy());
+      using std::pow;
+      return pow(2.0,y);
     }
 
     /** 
