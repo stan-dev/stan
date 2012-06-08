@@ -14,7 +14,7 @@ public:
     model_path.push_back("bugs_examples");
     model_path.push_back("vol1");
     model_path.push_back("stacks");
-    model_path.push_back("stacks_dexp2_test");
+    model_path.push_back("stacks_dexp2");
     return model_path;
   }
 
