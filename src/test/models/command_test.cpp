@@ -4,6 +4,7 @@
  */
 #include <gtest/gtest.h>
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
 class ModelCommand : public ::testing::TestWithParam<int> {
 public:
@@ -76,11 +77,18 @@ public:
     return output;
   }
 
-  std::vector<std::string> get_help_options(const std::string& help_output) {
+  std::vector<std::string> get_help_options(const std::string& help_output) {    
     std::vector<std::string> help_options;
-    
-    //std::cout << "help_output: " << help_output << std::endl;
-    
+
+    size_t option_start = help_output.find("--");
+    while (option_start != std::string::npos) {
+      // find the option name (skip two characters for "--")
+      option_start += 2;
+      size_t option_end = help_output.find_first_of("= ", option_start);
+      help_options.push_back(help_output.substr(option_start, option_end-option_start));
+      option_start = help_output.find("--", option_start+1);
+    }
+        
     return help_options;
   }
 };
@@ -94,7 +102,8 @@ TEST_F(ModelCommand, HelpMatchesArguments) {
 
   std::vector<std::string> help_options = 
     get_help_options(run_command(help_command));
-  //std::cout << "Command output: " << run_command(command) << std::endl;
+
+  
 }
 
 /*TEST_P(ModelCommand, PTest) {
