@@ -4,7 +4,6 @@
  */
 #include <gtest/gtest.h>
 #include <stdexcept>
-#include <boost/algorithm/string.hpp>
 
 class ModelCommand : public ::testing::TestWithParam<int> {
 public:
