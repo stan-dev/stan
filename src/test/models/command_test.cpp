@@ -46,13 +46,55 @@ public:
     model_path.append(1, get_path_separator());
     model_path.append("command");
   }
+
+  /** 
+   * Runs the command provided and returns the system output
+   * as a string.
+   * 
+   * @param command A command that can be run from the shell
+   * @return the system output of the command
+   */  
+  std::string run_command(const std::string& command) {
+    FILE *in;
+    if(!(in = popen(command.c_str(), "r"))) {
+      std::string err_msg;
+      err_msg = "Could not run: \"";
+      err_msg+= command;
+      err_msg+= "\"";
+      throw std::runtime_error(err_msg.c_str());
+    }
+
+    std::string output;
+    char buf[1024];
+    size_t count = fread(&buf, 1, 1024, in);
+    while (count > 0) {
+      output += std::string(&buf[0], &buf[count]);
+      count = fread(&buf, 1, 1024, in);
+    }
+    pclose(in);
+    
+    return output;
+  }
+
+  std::vector<std::string> get_help_options(const std::string& help_output) {
+    std::vector<std::string> help_options;
+    
+    //std::cout << "help_output: " << help_output << std::endl;
+    
+    return help_options;
+  }
 };
 
 std::vector<std::string> ModelCommand::arguments;
 std::string ModelCommand::model_path;
 
-TEST_F(ModelCommand, Arguments) {
-  //  std::cout << "model_path: " << model_path << std::endl;
+TEST_F(ModelCommand, HelpMatchesArguments) {
+  std::string help_command = model_path;
+  help_command.append(" --help");
+
+  std::vector<std::string> help_options = 
+    get_help_options(run_command(help_command));
+  //std::cout << "Command output: " << run_command(command) << std::endl;
 }
 
 /*TEST_P(ModelCommand, PTest) {
