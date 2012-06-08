@@ -324,10 +324,16 @@ namespace stan {
               _step_sizes[i] = sqrt(Exsq - Ex*Ex);
               step_size_sq_sum += _step_sizes[i] * _step_sizes[i];
             }
-            _x_sum_n = 0;
-            double normalizer = 1.0 / sqrt(step_size_sq_sum);
-            for (size_t i = 0; i < _step_sizes.size(); i++)
-              _step_sizes[i] *= normalizer;
+            if (step_size_sq_sum > 0.0) {
+              _x_sum_n = 0;
+              double normalizer = sqrt((double)_step_sizes.size())
+                / sqrt(step_size_sq_sum);
+              for (size_t i = 0; i < _step_sizes.size(); i++)
+                _step_sizes[i] *= normalizer;
+            } else {
+              for (size_t i = 0; i < _step_sizes.size(); i++)
+                _step_sizes[i] = 1.0;
+            }
           }
         }
         std::vector<double> result;
