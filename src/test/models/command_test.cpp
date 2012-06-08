@@ -8,7 +8,7 @@
 
 class ModelCommand : public ::testing::TestWithParam<int> {
 public:
-  static std::vector<std::string> arguments;
+  static std::vector<std::string> expected_help_options;
   static std::string model_path;
 
   static char get_path_separator() {
@@ -23,25 +23,25 @@ public:
   
   
   void static SetUpTestCase() {
-    arguments.push_back("help");
-    arguments.push_back("data");
-    arguments.push_back("init");
-    arguments.push_back("samples");
-    arguments.push_back("append_samples");
-    arguments.push_back("seed");
-    arguments.push_back("chain_id");
-    arguments.push_back("iter");
-    arguments.push_back("warmup");
-    arguments.push_back("thin");
-    arguments.push_back("refresh");
-    arguments.push_back("leapfrog_steps");
-    arguments.push_back("max_treedepth");
-    arguments.push_back("epsilon");
-    arguments.push_back("epsilon_pm");
-    arguments.push_back("unit_mass_matrix");
-    arguments.push_back("delta");
-    arguments.push_back("gamma");
-    arguments.push_back("test_grad");
+    expected_help_options.push_back("help");
+    expected_help_options.push_back("data");
+    expected_help_options.push_back("init");
+    expected_help_options.push_back("samples");
+    expected_help_options.push_back("append_samples");
+    expected_help_options.push_back("seed");
+    expected_help_options.push_back("chain_id");
+    expected_help_options.push_back("iter");
+    expected_help_options.push_back("warmup");
+    expected_help_options.push_back("thin");
+    expected_help_options.push_back("refresh");
+    expected_help_options.push_back("leapfrog_steps");
+    expected_help_options.push_back("max_treedepth");
+    expected_help_options.push_back("epsilon");
+    expected_help_options.push_back("epsilon_pm");
+    expected_help_options.push_back("unit_mass_matrix");
+    expected_help_options.push_back("delta");
+    expected_help_options.push_back("gamma");
+    expected_help_options.push_back("test_grad");
 
     model_path.append("models");
     model_path.append(1, get_path_separator());
@@ -93,17 +93,20 @@ public:
   }
 };
 
-std::vector<std::string> ModelCommand::arguments;
+std::vector<std::string> ModelCommand::expected_help_options;
 std::string ModelCommand::model_path;
 
-TEST_F(ModelCommand, HelpMatchesArguments) {
+TEST_F(ModelCommand, HelpOptionsMatch) {
   std::string help_command = model_path;
   help_command.append(" --help");
 
   std::vector<std::string> help_options = 
     get_help_options(run_command(help_command));
 
-  
+  ASSERT_EQ(expected_help_options.size(), help_options.size());
+  for (size_t i = 0; i < expected_help_options.size(); i++) {
+    EXPECT_EQ(expected_help_options[i], help_options[i]);
+  }
 }
 
 /*TEST_P(ModelCommand, PTest) {
