@@ -79,7 +79,7 @@ public:
   std::vector<std::string> get_help_options(const std::string& help_output) {
     std::vector<std::string> help_options;
     
-    //std::cout << "help_output: " << help_output << std::endl;
+    std::cout << "help_output: " << help_output << std::endl;
     
     return help_options;
   }
