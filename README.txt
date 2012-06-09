@@ -1,15 +1,18 @@
-STAN README
+STAN VERSION 1.0.0 README
 ======================================================================
 
 Stan is a C++ library for probability, optimization and sampling.
 
  
-License
+Stan License
 ----------------------------------------------------------------------
 Stan is licensed under the new BSD license (3 clause):
 
   $STAN/licenses/stan-license.txt
 
+
+Dependencies
+----------------------------------------------------------------------
 The test, build, run-time dependencies and their licenses are in:
 
   $STAN/licenses/dependencies.txt

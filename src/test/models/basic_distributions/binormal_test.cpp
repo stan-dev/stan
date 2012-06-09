@@ -41,9 +41,10 @@ TEST_F(Models_BasicDistributions_Binormal, y1) {
   double neff = chains->effective_sample_size(index);
 
   double y1_mean = chains->mean(index);
-  double se = quantile(students_t(neff-1.0), 0.975) *  
-    std::sqrt(chains->variance(index)/neff);
-  EXPECT_NEAR(expected_y1, y1_mean, se);
+  double se = std::sqrt(chains->variance(index)/neff);
+  double T = quantile(students_t(neff-1.0), 0.975);
+  EXPECT_NEAR(expected_y1, y1_mean, T*se)
+    << "T is: " << T << " and se is: " << se << std::endl;
 }
 TEST_F(Models_BasicDistributions_Binormal, y2) {
   using boost::math::students_t;
@@ -58,7 +59,8 @@ TEST_F(Models_BasicDistributions_Binormal, y2) {
   double neff = chains->effective_sample_size(index);
 
   double y2_mean = chains->mean(index);
-  double se = quantile(students_t(neff-1.0), 0.975) *  
-    std::sqrt(chains->variance(index)/neff);
-  EXPECT_NEAR(expected_y2, y2_mean, se);
+  double se = std::sqrt(chains->variance(index)/neff);
+  double T = quantile(students_t(neff-1.0), 0.975);
+  EXPECT_NEAR(expected_y2, y2_mean, T*se)
+    << "T is: " << T << " and se is: " << se << std::endl;
 }

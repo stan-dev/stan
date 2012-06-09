@@ -152,6 +152,7 @@ namespace stan {
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
+      generate_using_namespace("stan::agrad",o);
       o << EOL;
     }
 

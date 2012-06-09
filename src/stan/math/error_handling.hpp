@@ -67,6 +67,7 @@ namespace stan {
       return check_not_nan(function,y,name,result,default_policy());
     }
 
+    // need this sig to infer types for result
     template <typename T>
     inline bool check_not_nan(const char* function,
                               const T& y,
