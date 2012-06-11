@@ -331,7 +331,7 @@ namespace stan {
 
         // retry inits until get a finite log prob value
         std::vector<double> init_grad;
-        static size_t MAX_INIT_TRIES = 100;
+        static int MAX_INIT_TRIES = 100;
         for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
           for (size_t i = 0; i < params_r.size(); ++i)
             params_r[i] = init_rng();
