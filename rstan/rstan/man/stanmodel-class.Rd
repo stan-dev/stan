@@ -34,7 +34,7 @@
   \describe{
     \item{show}{\code{signature(object = "stanmodel")}: prints the class. }
     \item{sampling}{\code{signature(object = "stanmodel")}: draw samples from
-      the model (see \code{\link{samplng}}).}
+      the model (see \code{\link{sampling}}).}
   }
 }
 

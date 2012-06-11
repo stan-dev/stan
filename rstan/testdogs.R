@@ -114,6 +114,7 @@ ss <- sampling(dogsrr, data = dogsdat, n.chains = 3,
                n.iter = 2012, sample.file = 'dogs.csv')
 
 
+
   args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
   dogsdat <- rstan:::data.preprocess(dogsdat)
   sampler <- new(dogsrr@.modelmod$sampler, dogsdat, 3)
@@ -129,10 +130,15 @@ ss <- sampling(dogsrr, data = dogsdat, n.chains = 3,
   pnames <- sampler$param_names() 
 
   warmup <- sampler$warmup()
+  num.s  <- sampler$num_samples() 
+  print(sampler$num_chain_samples(1)) 
+  k.num.s  <- sampler$num_kept_samples() 
+  print(sampler$num_chain_kept_samples(1)) 
 
   pars <- c("alpha", "beta")
 
   tall <- sampler$get_samples(pars)
+  kepttall <- sampler$get_kept_samples(pars)
 
 probs_oi <- c(0.025, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975)
 
@@ -156,3 +162,7 @@ post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19)
 colMeans(post)
 
 summary(ss)
+summary(ss, probs = c(0.25, .5, .75), pars = c('alpha'))
+ex <- extract(ss) 
+print(ss, pars = c('alpha', 'beta')) 
+print(ss, pars = c('alpha', 'beta1')) # error

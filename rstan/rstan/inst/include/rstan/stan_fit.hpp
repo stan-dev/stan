@@ -552,7 +552,7 @@ namespace rstan {
     /** 
      * Obtain samples for all the chains 
      *
-     * @return A list, each element of which are samples for a chain. 
+     * @return A list, each element of which are samples of a chain. 
      *  The element is also a list, whose element is a vector 
      *  of samples for a parameter (or other quantity of interest). 
      *
@@ -831,10 +831,56 @@ namespace rstan {
      * or equal to the number of chains.
      */
     
-    SEXP num_samples(size_t k) {
+    SEXP num_chain_samples(size_t k) {
       return Rcpp::wrap(chains_.num_samples(k - 1)); 
     } 
 
+    SEXP num_chain_kept_samples(size_t k) {
+      return Rcpp::wrap(chains_.num_kept_samples(k - 1)); 
+    } 
+
+    SEXP num_samples() { 
+      return Rcpp::wrap(chains_.num_samples()); 
+    } 
+
+    SEXP num_kept_samples() {
+      return Rcpp::wrap(chains_.num_kept_samples()); 
+    } 
+
+    /* return the kept samples permuted for one parameter
+     * @param n The index of parameter. 
+     * @return An R vector of samples that are permuted. 
+     */
+    SEXP get_kept_samples_permuted_0(size_t n) {
+      std::vector<double> samples; 
+      chains_.get_kept_samples_permuted(n, samples);
+      return Rcpp::wrap(samples); 
+    }
+    
+    /* return the kept samples permuted for parameters
+     * 
+     * @param names The names of parameters of interest. 
+     * @return An R list, every element of which is a the 
+     *  R vector of samples that are permuted for one parameter. 
+     */
+    SEXP get_kept_samples_permuted(SEXP names) {
+      std::vector<size_t> indices; 
+      std::vector<std::string> flatnames; 
+      param_names_to_indices_and_flatnames(
+        Rcpp::as<std::vector<std::string> >(names),
+        indices, 
+        flatnames); 
+
+      std::vector<SEXP> p_samples;  
+      for (std::vector<size_t>::const_iterator it = indices.begin(); 
+        it != indices.end(); 
+        ++it) {
+        p_samples.push_back(get_kept_samples_permuted_0(*it)); 
+      } 
+      Rcpp::List lst(p_samples.begin(), p_samples.end());
+      lst.names() = flatnames; 
+      return Rcpp::wrap(lst);
+    } 
 
   };
 } 

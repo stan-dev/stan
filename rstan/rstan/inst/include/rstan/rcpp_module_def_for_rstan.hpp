@@ -38,6 +38,18 @@ RCPP_MODULE(%model_name%){
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::num_samples) 
 
+    .method("num_kept_samples", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::num_kept_samples) 
+
+    .method("num_chain_samples", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::num_chain_samples) 
+
+    .method("num_chain_kept_samples", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::num_chain_kept_samples) 
+
     .method("get_mean_and_sd", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_mean_and_sd) 
@@ -61,7 +73,10 @@ RCPP_MODULE(%model_name%){
     .method("get_split_rhat", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_split_rhat) 
-
+    
+    .method("get_kept_samples_permuted", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_kept_samples_permuted) 
 
     ;
 }
