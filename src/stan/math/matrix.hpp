@@ -140,7 +140,7 @@ namespace stan {
       inline
       void check_range(size_t max,
                        size_t i, 
-                       const std::string& msg,
+                       const char* msg,
                        size_t idx) {
         if (i < 1 || i > max) {
           std::stringstream s;
@@ -175,7 +175,7 @@ namespace stan {
     inline
     T& get_base1(std::vector<T>& x, 
                  size_t i, 
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i,error_msg,idx);
       return x[i - 1];
@@ -201,7 +201,7 @@ namespace stan {
     T& get_base1(std::vector<std::vector<T> >& x, 
                  size_t i1, 
                  size_t i2,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,error_msg,idx+1);
@@ -229,7 +229,7 @@ namespace stan {
                  size_t i1, 
                  size_t i2,
                  size_t i3,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,error_msg,idx+1);
@@ -259,7 +259,7 @@ namespace stan {
                  size_t i2,
                  size_t i3,
                  size_t i4,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,error_msg,idx+1);
@@ -291,7 +291,7 @@ namespace stan {
                  size_t i3,
                  size_t i4,
                  size_t i5,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,error_msg,idx+1);
@@ -325,7 +325,7 @@ namespace stan {
                  size_t i4,
                  size_t i5,
                  size_t i6,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,error_msg,idx+1);
@@ -362,7 +362,7 @@ namespace stan {
                  size_t i5,
                  size_t i6,
                  size_t i7,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,i7,error_msg,idx+1);
@@ -401,7 +401,7 @@ namespace stan {
                  size_t i6,
                  size_t i7,
                  size_t i8,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,i7,i8,error_msg,idx+1);
@@ -433,7 +433,7 @@ namespace stan {
     Eigen::Matrix<T,1,Eigen::Dynamic>
     get_base1(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
               size_t m,
-              const std::string& error_msg,
+              const char* error_msg,
               size_t idx) {
       check_range(x.rows(),m,error_msg,idx);
       return x.row(m - 1);
@@ -460,7 +460,7 @@ namespace stan {
     T& get_base1(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
                  size_t m,
                  size_t n,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.rows(),m,error_msg,idx);
       check_range(x.cols(),n,error_msg,idx + 1);
@@ -485,7 +485,7 @@ namespace stan {
     inline
     T& get_base1(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                  size_t m,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),m,error_msg,idx);
       return x(m - 1);
@@ -510,7 +510,7 @@ namespace stan {
     inline
     T& get_base1(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
                  size_t n,
-                 const std::string& error_msg,
+                 const char* error_msg,
                  size_t idx) {
       check_range(x.size(),n,error_msg,idx);
       return x(n - 1);
