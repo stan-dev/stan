@@ -1,23 +1,29 @@
 /** 
  * This test tries out different command line options for a 
  * generated model.
+ *
  */
 #include <gtest/gtest.h>
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
 class ModelCommand : public ::testing::TestWithParam<int> {
+private:
+  static char path_separator;
 public:
   static std::vector<std::string> expected_help_options;
   static std::string model_path;
+  static std::string samples_option;
 
   static char get_path_separator() {
-    char c;
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    c = fgetc(in);
-    pclose(in);
-    return c;
+    if (path_separator == 0) {
+      FILE *in;
+      if(!(in = popen("make path_separator --no-print-directory", "r")))
+        throw std::runtime_error("\"make path_separator\" has failed.");
+      path_separator = fgetc(in);
+      pclose(in);
+    }
+    return path_separator;
   }
   
   
@@ -45,6 +51,10 @@ public:
     model_path.append("models");
     model_path.append(1, get_path_separator());
     model_path.append("command");
+
+    samples_option = " --samples=";
+    samples_option.append(model_path);
+    samples_option.append(".csv");
   }
 
   /** 
@@ -76,6 +86,13 @@ public:
     return output;
   }
 
+  /** 
+   * Returns the help options from the string provide.
+   * Help options start with "--".
+   * 
+   * @param help_output output from "model/command --help"
+   * @return a vector of strings of the help options
+   */
   std::vector<std::string> get_help_options(const std::string& help_output) {    
     std::vector<std::string> help_options;
 
@@ -90,10 +107,44 @@ public:
         
     return help_options;
   }
+  
+  std::vector<std::pair<std::string, std::string> > 
+  parse_output(const std::string& command_output) {
+    std::vector<std::pair<std::string, std::string> > output;
+
+    std::string option, value;
+    size_t start = 0, end = command_output.find("\n", start);
+    
+    EXPECT_EQ("STAN SAMPLING COMMAND", 
+              command_output.substr(start, end))
+      << "command could not be run. output is: \n" 
+      << command_output;
+    if ("STAN SAMPLING COMMAND" != command_output.substr(start, end)) {
+      return output;
+    }
+    start = end+1;
+    end = command_output.find("\n", start);
+    size_t equal_pos = command_output.find("=", start);
+
+    while (equal_pos != std::string::npos) {
+      using boost::trim;
+      option = command_output.substr(start, equal_pos-start);
+      value = command_output.substr(equal_pos+1, end - equal_pos - 1);
+      trim(option);
+      trim(value);
+      output.push_back(std::pair<std::string, std::string>(option, value));
+      start = end+1;
+      end = command_output.find("\n", start);
+      equal_pos = command_output.find("=", start);
+    }
+    return output;
+  }
 };
 
 std::vector<std::string> ModelCommand::expected_help_options;
 std::string ModelCommand::model_path;
+std::string ModelCommand::samples_option;
+char ModelCommand::path_separator = 0;
 
 TEST_F(ModelCommand, HelpOptionsMatch) {
   std::string help_command = model_path;
@@ -108,6 +159,53 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
   }
 }
 
+TEST_F(ModelCommand, DataOption) {
+  std::string data_file_base;
+  data_file_base.append("src");
+  data_file_base.append(1, get_path_separator());
+  data_file_base.append("test");
+  data_file_base.append(1, get_path_separator());
+  data_file_base.append(model_path);
+
+  std::string data_command1 = model_path;
+  data_command1.append(" --data=");
+  data_command1.append(data_file_base);
+  data_command1.append("1.Rdata");
+  data_command1.append(samples_option);
+
+  std::vector<std::pair<std::string, std::string> > output = 
+    parse_output(run_command(data_command1));
+  ASSERT_EQ(expected_help_options.size()-2, output.size()) 
+    << "Should have the same options without \"help\" and \"append_samples\"";
+  for (size_t i = 0; i < output.size(); i++) {
+    if (output[i].first == "data") {
+      std::string csv_file_name = data_file_base;
+      csv_file_name.append("1.Rdata");
+      EXPECT_EQ(csv_file_name, output[i].second);
+    }
+  }
+
+
+  std::string data_command2 = model_path;
+  data_command2.append(" --data=");
+  data_command2.append(data_file_base);
+  data_command2.append("2.Rdata");
+  data_command2.append(samples_option);
+
+  output = parse_output(run_command(data_command2));
+  ASSERT_EQ(expected_help_options.size()-2, output.size()) 
+    << "Should have the same options without \"help\" and \"append_samples\"";
+  for (size_t i = 0; i < output.size(); i++) {
+    if (output[i].first == "data") {
+      std::string csv_file_name = data_file_base;
+      csv_file_name.append("2.Rdata");
+      EXPECT_EQ(csv_file_name, output[i].second);
+    }
+  }
+
+  
+  
+}
 /*TEST_P(ModelCommand, PTest) {
 std::cout << "PTest: " << GetParam() << std::endl;
 
