@@ -214,6 +214,18 @@ public:
         }
       }
     }
+    for (size_t i = 0; i < changed_options.size(); i++) {
+      if (changed_options[i].first == "init") {
+        size_t j;
+        for (j = 0; j < expected_output.size(); j++) {
+          if (expected_output[j].first == "init tries") {
+            break;
+          }
+        }
+        expected_output.erase(expected_output.begin() + j);
+      }
+    }
+    
     
     vector<pair<string, string> > output = parse_output(command_output);
     ASSERT_EQ(expected_output.size(), output.size());
@@ -296,13 +308,13 @@ TEST_P(ModelCommand, OptionsTest) {
   if (get<1>(options) != "") {
     command << " --init="
             << get<1>(options);
+    changed_options.push_back(pair<string,string>("init", get<1>(options)));
   }
   command << " --samples="
           << model_path 
           << ".csv";
   
   //std::cout << "command: \n" << command.str() << "\n\n";
-  
   check_output(run_command(command.str()), changed_options);
 
   //std::cout << "command: \n" << command.str() << "\n\n";

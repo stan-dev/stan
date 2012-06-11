@@ -310,8 +310,6 @@ namespace stan {
           params_i = std::vector<int>(model.num_params_i(),0);
           params_r = std::vector<double>(model.num_params_r(),0.0);
         } else {
-          std::cout << "init file=" << init_val << std::endl;
-        
           std::fstream init_stream(init_val.c_str(),std::fstream::in);
           stan::io::dump init_var_context(init_stream);
           init_stream.close();
