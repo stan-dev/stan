@@ -6,14 +6,19 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
+#include <stan/mcmc/chains.hpp>
+
+using std::vector;
+using std::string;
+using std::pair;
 
 class ModelCommand : public ::testing::TestWithParam<int> {
 private:
   static char path_separator;
-public:
-  static std::vector<std::string> expected_help_options;
-  static std::string model_path;
-  static std::string samples_option;
+public:  
+  static vector<string> expected_help_options;
+  static string model_path;
+  static string samples_option;
 
   static char get_path_separator() {
     if (path_separator == 0) {
@@ -64,21 +69,21 @@ public:
    * @param command A command that can be run from the shell
    * @return the system output of the command
    */  
-  std::string run_command(const std::string& command) {
+  string run_command(const string& command) {
     FILE *in;
     if(!(in = popen(command.c_str(), "r"))) {
-      std::string err_msg;
+      string err_msg;
       err_msg = "Could not run: \"";
       err_msg+= command;
       err_msg+= "\"";
       throw std::runtime_error(err_msg.c_str());
     }
 
-    std::string output;
+    string output;
     char buf[1024];
     size_t count = fread(&buf, 1, 1024, in);
     while (count > 0) {
-      output += std::string(&buf[0], &buf[count]);
+      output += string(&buf[0], &buf[count]);
       count = fread(&buf, 1, 1024, in);
     }
     pclose(in);
@@ -93,11 +98,11 @@ public:
    * @param help_output output from "model/command --help"
    * @return a vector of strings of the help options
    */
-  std::vector<std::string> get_help_options(const std::string& help_output) {    
-    std::vector<std::string> help_options;
+  vector<string> get_help_options(const string& help_output) {    
+    vector<string> help_options;
 
     size_t option_start = help_output.find("--");
-    while (option_start != std::string::npos) {
+    while (option_start != string::npos) {
       // find the option name (skip two characters for "--")
       option_start += 2;
       size_t option_end = help_output.find_first_of("= ", option_start);
@@ -108,11 +113,11 @@ public:
     return help_options;
   }
   
-  std::vector<std::pair<std::string, std::string> > 
-  parse_output(const std::string& command_output) {
-    std::vector<std::pair<std::string, std::string> > output;
+  vector<pair<string, string> > 
+  parse_output(const string& command_output) {
+    vector<pair<string, string> > output;
 
-    std::string option, value;
+    string option, value;
     size_t start = 0, end = command_output.find("\n", start);
     
     EXPECT_EQ("STAN SAMPLING COMMAND", 
@@ -126,31 +131,103 @@ public:
     end = command_output.find("\n", start);
     size_t equal_pos = command_output.find("=", start);
 
-    while (equal_pos != std::string::npos) {
+    while (equal_pos != string::npos) {
       using boost::trim;
       option = command_output.substr(start, equal_pos-start);
       value = command_output.substr(equal_pos+1, end - equal_pos - 1);
       trim(option);
       trim(value);
-      output.push_back(std::pair<std::string, std::string>(option, value));
+      output.push_back(pair<string, string>(option, value));
       start = end+1;
       end = command_output.find("\n", start);
       equal_pos = command_output.find("=", start);
     }
     return output;
   }
+
+  void check_output(const string& command_output,
+                    const vector<pair<string, string> >& defaults) {
+    vector<pair<string, string> > expected_output;
+    expected_output.push_back(pair<string,string>("data", 
+                                                  "(specified model requires no data)"));
+    expected_output.push_back(pair<string,string>("init", 
+                                                  "random initialization"));
+    expected_output.push_back(pair<string,string>("init tries", 
+                                                  "1"));
+    expected_output.push_back(pair<string,string>("samples", 
+                                                  model_path+".csv"));    
+    expected_output.push_back(pair<string,string>("append_samples",
+                                                  "0"));    
+    expected_output.push_back(pair<string,string>("seed", 
+                                                  ""));    
+    expected_output.push_back(pair<string,string>("chain_id", 
+                                                  "1 (default)"));    
+    expected_output.push_back(pair<string,string>("iter", 
+                                                  "2000"));    
+    expected_output.push_back(pair<string,string>("warmup", 
+                                                  "1000"));    
+    expected_output.push_back(pair<string,string>("thin", 
+                                                  "1 (default)"));    
+    expected_output.push_back(pair<string,string>("unit_mass_matrix", 
+                                                  "0"));    
+    expected_output.push_back(pair<string,string>("leapfrog_steps", 
+                                                  "-1"));    
+    expected_output.push_back(pair<string,string>("max_treedepth", 
+                                                  "10"));    
+    expected_output.push_back(pair<string,string>("epsilon", 
+                                                  "-1"));    
+    expected_output.push_back(pair<string,string>("epsilon_pm", 
+                                                  "0"));    
+    expected_output.push_back(pair<string,string>("delta", 
+                                                  "0.5"));
+    expected_output.push_back(pair<string,string>("gamma", 
+                                                  "0.05"));    
+
+    for (size_t i = 0; i < defaults.size(); i++) {
+      for (size_t j = 0; j < expected_output.size(); j++) {
+        if (expected_output[j].first == defaults[i].first) {
+          expected_output[j].second = defaults[i].second;
+          break;
+        }
+      }
+    }
+    
+    vector<pair<string, string> > output = parse_output(command_output);
+    ASSERT_EQ(expected_output.size(), output.size());
+    for (size_t i = 0; i < expected_output.size(); i++) {
+      EXPECT_EQ(expected_output[i].first, output[i].first) <<
+        "Order of output should match";
+      if (expected_output[i].first == "seed" && expected_output[i].second == "") {
+        // when seed is default, check to see that it is randomly generated
+        if (boost::algorithm::ends_with(output[i].second, "(randomly generated)"))
+          SUCCEED();
+        else
+          ADD_FAILURE() <<
+            output[i].first << " is not randomly generated: " << output[i].second;
+      } else {
+        EXPECT_EQ(expected_output[i].second, output[i].second)
+          << "Option " << expected_output[i].first << " returned unexpected value";
+      }
+        
+    }
+
+  }
+  void check_output(const string& command_output) {
+    vector<pair<string, string> > defaults;
+    check_output(command_output, defaults);
+  }
 };
 
-std::vector<std::string> ModelCommand::expected_help_options;
-std::string ModelCommand::model_path;
-std::string ModelCommand::samples_option;
+vector<string> ModelCommand::expected_help_options;
+string ModelCommand::model_path;
+string ModelCommand::samples_option;
 char ModelCommand::path_separator = 0;
 
 TEST_F(ModelCommand, HelpOptionsMatch) {
-  std::string help_command = model_path;
+  string help_command = model_path;
   help_command.append(" --help");
 
-  std::vector<std::string> help_options = 
+  vector<string> help_options = 
     get_help_options(run_command(help_command));
 
   ASSERT_EQ(expected_help_options.size(), help_options.size());
@@ -160,51 +237,34 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
 }
 
 TEST_F(ModelCommand, DataOption) {
-  std::string data_file_base;
+  string data_file_base;
   data_file_base.append("src");
   data_file_base.append(1, get_path_separator());
   data_file_base.append("test");
   data_file_base.append(1, get_path_separator());
   data_file_base.append(model_path);
 
-  std::string data_command1 = model_path;
+  string data_command1 = model_path;
   data_command1.append(" --data=");
   data_command1.append(data_file_base);
   data_command1.append("1.Rdata");
   data_command1.append(samples_option);
 
-  std::vector<std::pair<std::string, std::string> > output = 
-    parse_output(run_command(data_command1));
-  ASSERT_EQ(expected_help_options.size()-2, output.size()) 
-    << "Should have the same options without \"help\" and \"append_samples\"";
-  for (size_t i = 0; i < output.size(); i++) {
-    if (output[i].first == "data") {
-      std::string csv_file_name = data_file_base;
-      csv_file_name.append("1.Rdata");
-      EXPECT_EQ(csv_file_name, output[i].second);
-    }
-  }
+  vector<pair<string, string> > defaults;
+  string data_file = data_file_base;
+  data_file.append("1.Rdata");
 
-
-  std::string data_command2 = model_path;
-  data_command2.append(" --data=");
-  data_command2.append(data_file_base);
-  data_command2.append("2.Rdata");
-  data_command2.append(samples_option);
-
-  output = parse_output(run_command(data_command2));
-  ASSERT_EQ(expected_help_options.size()-2, output.size()) 
-    << "Should have the same options without \"help\" and \"append_samples\"";
-  for (size_t i = 0; i < output.size(); i++) {
-    if (output[i].first == "data") {
-      std::string csv_file_name = data_file_base;
-      csv_file_name.append("2.Rdata");
-      EXPECT_EQ(csv_file_name, output[i].second);
-    }
-  }
-
-  
-  
+  defaults.push_back(pair<string, string>("data", data_file));
+  check_output(run_command(data_command1), defaults);
+  // test sampled values
+  vector<string> names;
+  vector<vector<size_t> > dimss;
+  stan::mcmc::read_variables(model_path+".csv", 2U,
+                             names, dimss);
+      
+  stan::mcmc::chains<> c(1U, names, dimss);
+  stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
+  EXPECT_NEAR(c.mean(0U), 0, 1);
 }
 /*TEST_P(ModelCommand, PTest) {
 std::cout << "PTest: " << GetParam() << std::endl;
