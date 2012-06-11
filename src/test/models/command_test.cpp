@@ -301,7 +301,7 @@ TEST_P(ModelCommand, OptionsTest) {
           << model_path 
           << ".csv";
   
-  std::cout << "command: \n" << command.str() << "\n\n";
+  //std::cout << "command: \n" << command.str() << "\n\n";
   
   check_output(run_command(command.str()), changed_options);
 
