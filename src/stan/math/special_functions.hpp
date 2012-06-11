@@ -3,12 +3,14 @@
 
 #include <stdexcept>
 
+
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
 
 #include <stan/math/constants.hpp>
+#include <stan/math/error_handling.hpp>
 
 namespace stan {
 

@@ -26,8 +26,10 @@ model {
    for (i in 1:I) {
       for (j in 1:J) {
          lambda[i, j] ~ normal(0.0, sigma); 
-         y[i, j] ~ poisson(exp(alpha + beta * log(x[i] + 10) 
-                               + gamma * x[i] + lambda[i, j]) );
+         y[i, j] ~ poisson(exp(alpha 
+                               + beta * log(x[i] + 10) 
+                               + gamma * x[i] 
+                               + lambda[i, j]) );
      }
    }
 }

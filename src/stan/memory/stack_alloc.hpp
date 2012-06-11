@@ -81,9 +81,42 @@ namespace stan {
       std::vector<char*> blocks_; // storage for blocks, may be bigger than cur_block_
       std::vector<size_t> sizes_; // could store initial & shift for others
       size_t cur_block_;          // index into blocks_ for next alloc
-      size_t used_;               // how much of current block already used
-    public:
+      char* cur_block_end_;       // ptr to cur_block_ptr_ + sizes_[cur_block_]
+      char* next_loc_;            // ptr to next available spot in cur block
 
+      /**
+       * Moves us to the next block of memory, allocating that block
+       * if necessary, and allocates len bytes of memory within that
+       * block.
+       *
+       * @param size_t $len Number of bytes to allocate.
+       * @return A pointer to the allocated memory.
+       */
+      char* move_to_next_block(size_t len) {
+        char* result;
+        ++cur_block_;
+        // Find the next block (if any) containing at least len bytes.
+        while ((cur_block_ < blocks_.size()) && (sizes_[cur_block_] < len))
+          ++cur_block_;
+        // Allocate a new block if necessary.
+        if (unlikely(cur_block_ >= blocks_.size())) {
+          // New block should be max(2*size of last block, len) bytes.
+          size_t newsize = sizes_.back() * 2;
+          if (newsize < len)
+            newsize = len;
+          blocks_.push_back(eight_byte_aligned_malloc(newsize));
+          if (!blocks_.back())
+            throw std::bad_alloc();
+          sizes_.push_back(newsize);
+        }
+        result = blocks_[cur_block_];
+        // Get the object's state back in order.
+        next_loc_ = result + len;
+        cur_block_end_ = result + sizes_[cur_block_];
+        return result;
+      }
+
+    public:
 
       /**
        * Construct a resizable stack allocator initially holding the
@@ -98,7 +131,8 @@ namespace stan {
         blocks_(1, eight_byte_aligned_malloc(initial_nbytes)),
         sizes_(1,initial_nbytes),
         cur_block_(0),
-        used_(0) {
+        cur_block_end_(blocks_[0] + initial_nbytes),
+        next_loc_(blocks_[0]) {
 
         if (!blocks_[0])
           throw std::bad_alloc();  // no msg allowed in bad_alloc ctor
@@ -130,38 +164,13 @@ namespace stan {
        * @return A pointer to the allocated memory.
        */
       inline void* alloc(size_t len) {
-        const size_t cur_nblocks = blocks_.size();
-        char *result;
-
-        // not enough space in current block
-        if (sizes_[cur_block_] < used_ + len) {
-          ++cur_block_;
-          used_ = 0; // not using anything in next blocks
-        }
-
-        // continue skipping blocks that are too small
-        while (cur_block_ < cur_nblocks && sizes_[cur_block_] < len)
-          ++cur_block_;
-                   
-        // alloc block if necessary
-        if (unlikely(cur_block_ >= cur_nblocks)) {
-          // malloc if can't reuse
-          size_t newsize = sizes_.back() * 2;
-          if (newsize < len) // could keep doubling until big enough
-            newsize = len;
-          result = eight_byte_aligned_malloc(newsize);
-          if (!result)
-            throw std::bad_alloc(); // no msg allowed in bad_alloc ctor
-          blocks_.push_back(result);
-          sizes_.push_back(newsize);
-          used_ = len;
-          return (void*)result;
-        }
-        else {
-          result = blocks_[cur_block_] + used_;
-          used_ += len;
-          return (void*)result;
-        }
+        // Typically, just return and increment the next location.
+        char* result = next_loc_;
+        next_loc_ += len;
+        // Occasionally, we have to switch blocks.
+        if (unlikely(next_loc_ >= cur_block_end_))
+          result = move_to_next_block(len);
+        return (void*)result;
       }
 
       /**
@@ -172,7 +181,8 @@ namespace stan {
        */
       inline void recover_all() {
         cur_block_ = 0;
-        used_ = 0;
+        next_loc_ = blocks_[0];
+        cur_block_end_ = next_loc_ + sizes_[0];
       }
     
       /**

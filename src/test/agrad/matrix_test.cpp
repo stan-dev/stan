@@ -1958,6 +1958,18 @@ TEST(matrixTest,mdivide_left_tri_val) {
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
+// FIXME:  Fails in g++ 4.2 -- can't find agrad version of mdivide_left_tri
+//         Works in clang++ and later g++
+// TEST(agrad_matrix,mdivide_left_tri2) {
+//   using stan::math::mdivide_left_tri;
+//   using stan::agrad::mdivide_left_tri;
+//   int k = 3;
+//   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> L(k,k);
+//   L << 1, 2, 3, 4, 5, 6, 7, 8, 9;
+//   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
+//   I.setIdentity();
+//   L = mdivide_left_tri<Eigen::Lower>(L, I);
+// }
 TEST(agrad_matrix,inverse_val) {
   using stan::math::inverse;
   matrix_v a(2,2);

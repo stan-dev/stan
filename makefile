@@ -118,18 +118,30 @@ help:
 	@echo 'Common targets:'
 	@echo '  Model related:'
 	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
-	@echo '  - *$(EXE)        : Build '
-	@echo '  - models/*$(EXE):  If a Stan model exists at src/models/*.stan, this target'
+	@echo '  - lib/libstan.a  : Build the Stan static library (used in linking models).'
+	@echo '  - lib/libstanc.a : Build the Stan compiler static library (used in linking'
+	@echo '                     bin/stanc$(EXE))'
+	@echo '  - models/*$(EXE) : If a Stan model exists at src/models/*.stan, this target'
 	@echo '                     will copy the Stan model to models/*.stan, then build the'
 	@echo '                     Stan model.'
+	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
+	@echo '                     the Stan model as an executable.'
 	@echo '  Tests:'
-	@echo '  - test-unit:   Runs unit tests.'
-	@echo '  - test-models: Runs diagnostic models.'
-	@echo '  - test-bugs:   Runs the bugs examples (subset of test-models).'
-	@echo '  - test-all:    Runs all tests.'
+	@echo '  - test-unit      : Runs unit tests.'
+	@echo '  - test-models    : Runs diagnostic models.'
+	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
+	@echo '  - test-all       : Runs all tests.'
+	@echo '  Documentation:'
+	@echo '  - manual         : Builds the reference manual. Copies built manual to'
+	@echo '                     doc/stan-reference.pdf'
+	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
+	@echo '                     doc/api/'
+	@echo '  Distribution:'
+	@echo '  - dist           : Creates a tarball for distribution. The resulting tarball is'
+	@echo '                     created at the top level as stan-src-<version>.tgz.'
 	@echo '  Clean:'
-	@echo '  - clean:       Basic clean. Leaves doc and compiled libraries intact.'
-	@echo '  - clean-all:   Cleans up all of Stan.'
+	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
+	@echo '  - clean-all      : Cleans up all of Stan.'
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
@@ -158,15 +170,12 @@ clean-dox:
 
 clean-manual:
 	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf
-	$(RM) doc/stan-reference.pdf
 
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch
 
-
 clean-demo:
 	$(RM) -r demo
 
-clean-all: clean clean-models clean-dox clean-demo
+clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
-

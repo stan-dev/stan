@@ -476,10 +476,10 @@ effective sample size.
 
 Because of the noise in the correlation estimates $\hat{\rho}_t$ as $t$
 increases, typically only the initial estimates of $\hat{\rho}_t$
-where $\hat{\rho}_t < 0.05$ will be used.  Setting $T'$ to be the
-first lag such that $\rho_{T' + 1} < 0.05$, 
+where $\hat{\rho}_t < 0$ will be used.  Setting $T'$ to be the
+first lag such that $\rho_{T' + 1} < 0$, 
 \[
-T' = \arg\min_t \ \hat{\rho}_{t+1} < 0.05,
+T' = \arg\min_t \ \hat{\rho}_{t+1} < 0,
 \]
 the effective sample size estimator is defined as
 \[
