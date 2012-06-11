@@ -251,10 +251,8 @@ TEST_F(ModelCommand, DataOption) {
   data_command1.append(samples_option);
 
   vector<pair<string, string> > defaults;
-  string data_file = data_file_base;
-  data_file.append("1.Rdata");
 
-  defaults.push_back(pair<string, string>("data", data_file));
+  defaults.push_back(pair<string, string>("data", data_file_base+"1.Rdata"));
   check_output(run_command(data_command1), defaults);
   // test sampled values
   vector<string> names;
@@ -262,9 +260,26 @@ TEST_F(ModelCommand, DataOption) {
   stan::mcmc::read_variables(model_path+".csv", 2U,
                              names, dimss);
       
-  stan::mcmc::chains<> c(1U, names, dimss);
-  stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
-  EXPECT_NEAR(c.mean(0U), 0, 1);
+  stan::mcmc::chains<> c1(1U, names, dimss);
+  stan::mcmc::add_chain(c1, 0, model_path+".csv", 2U);
+  EXPECT_NEAR(c1.mean(0U), 0, 1);
+
+
+  string data_command2 = model_path;
+  data_command2.append(" --data=");
+  data_command2.append(data_file_base);
+  data_command2.append("2.Rdata");
+  data_command2.append(samples_option);
+
+  
+  defaults.clear();
+  defaults.push_back(pair<string, string>("data", data_file_base+"2.Rdata"));
+  check_output(run_command(data_command2), defaults);
+  // test sampled values
+  stan::mcmc::chains<> c2(1U, names, dimss);
+  stan::mcmc::add_chain(c2, 0, model_path+".csv", 2U);
+  EXPECT_NEAR(c2.mean(0U), 100, 1);
+
 }
 /*TEST_P(ModelCommand, PTest) {
 std::cout << "PTest: " << GetParam() << std::endl;
