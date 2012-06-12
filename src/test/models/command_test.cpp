@@ -1,35 +1,36 @@
-#include <gtest/gtest.h>
-
-#if GTEST_HAS_COMBINE
 /** 
  * This test tries out different command line options for a 
  * generated model.
  *
  */
+#include <gtest/gtest.h>
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
 #include <stan/mcmc/chains.hpp>
+#include <bitset>
 
 using std::stringstream;
 using std::vector;
 using std::string;
 using std::pair;
-
-using std::tr1::tuple;
-using std::tr1::get;
+using std::make_pair;
+using std::bitset;
 
 using testing::Combine;
-using testing::ValuesIn;
-using testing::Bool;
+using testing::Range;
+
+enum options {
+  append_samples, // should be first
+  data,
+  init,
+  seed,
+  chain_id,
+  options_count
+  };
+
 
 class ModelCommand : 
-  public ::testing::TestWithParam<
-  tuple<int,    // data
-        string, // init
-        string, // seed
-        string, // chain_id 
-        bool    // append_samples (should be last to check number of samples)
-        > > {
+  public ::testing::TestWithParam<int> {
 private:
   static char path_separator;
 public:
@@ -37,14 +38,9 @@ public:
   static string model_path;
   static vector<string> expected_help_options;
   static vector<pair<string, string> > expected_output;
-
-  enum options {
-    data,
-    init,
-    seed,
-    chain_id,
-    append_samples
-  };
+  static vector<string> option_name;
+  static vector<pair<string, string> > command_changes;
+  static vector<pair<string, string> > output_changes;
 
   static char get_path_separator() {
     if (path_separator == 0) {
@@ -116,23 +112,60 @@ public:
     expected_help_options.push_back("gamma");
     expected_help_options.push_back("test_grad");
 
-    expected_output.push_back(pair<string,string>("data","(specified model requires no data)"));
-    expected_output.push_back(pair<string,string>("init", "random initialization"));
-    expected_output.push_back(pair<string,string>("init tries", "1"));
-    expected_output.push_back(pair<string,string>("samples", model_path+".csv"));
-    expected_output.push_back(pair<string,string>("append_samples", "0"));
-    expected_output.push_back(pair<string,string>("seed", ""));
-    expected_output.push_back(pair<string,string>("chain_id", "1 (default)"));
-    expected_output.push_back(pair<string,string>("iter", "2000"));
-    expected_output.push_back(pair<string,string>("warmup", "1000"));
-    expected_output.push_back(pair<string,string>("thin", "1 (default)"));
-    expected_output.push_back(pair<string,string>("unit_mass_matrix", "0"));
-    expected_output.push_back(pair<string,string>("leapfrog_steps", "-1"));
-    expected_output.push_back(pair<string,string>("max_treedepth", "10"));
-    expected_output.push_back(pair<string,string>("epsilon", "-1"));
-    expected_output.push_back(pair<string,string>("epsilon_pm", "0"));
-    expected_output.push_back(pair<string,string>("delta", "0.5"));
-    expected_output.push_back(pair<string,string>("gamma", "0.05"));
+    expected_output.push_back(make_pair("data","(specified model requires no data)"));
+    expected_output.push_back(make_pair("init", "random initialization"));
+    expected_output.push_back(make_pair("init tries", "1"));
+    expected_output.push_back(make_pair("samples", model_path+".csv"));
+    expected_output.push_back(make_pair("append_samples", "0"));
+    expected_output.push_back(make_pair("seed", ""));
+    expected_output.push_back(make_pair("chain_id", "1 (default)"));
+    expected_output.push_back(make_pair("iter", "2000"));
+    expected_output.push_back(make_pair("warmup", "1000"));
+    expected_output.push_back(make_pair("thin", "1 (default)"));
+    expected_output.push_back(make_pair("unit_mass_matrix", "0"));
+    expected_output.push_back(make_pair("leapfrog_steps", "-1"));
+    expected_output.push_back(make_pair("max_treedepth", "10"));
+    expected_output.push_back(make_pair("epsilon", "-1"));
+    expected_output.push_back(make_pair("epsilon_pm", "0"));
+    expected_output.push_back(make_pair("delta", "0.5"));
+    expected_output.push_back(make_pair("gamma", "0.05"));
+    
+    option_name.resize(options_count);    
+    command_changes.resize(options_count);
+    output_changes.resize(options_count);
+
+    option_name[data] = "data";
+    command_changes[data] = make_pair(" --data="+data_file_base+"1.Rdata",
+                                      " --data="+data_file_base+"2.Rdata");
+    output_changes [data] = make_pair(data_file_base+"1.Rdata",
+                                      data_file_base+"2.Rdata");
+
+    option_name[init] = "init";
+    command_changes[init] = make_pair("",
+                                      " --init=" + data_file_base + "_init.Rdata");
+    output_changes [init] = make_pair("",
+                                      data_file_base + "_init.Rdata");
+
+
+    option_name[seed] = "seed";
+    command_changes[seed] = make_pair("",
+                                      " --seed=100");
+    output_changes [seed] = make_pair("",
+                                      "100 (user specified)");
+
+
+    option_name[chain_id] = "chain_id";
+    command_changes[chain_id] = make_pair("",
+                                          " --chain_id=2");
+    output_changes [chain_id] = make_pair("",
+                                          "2 (user specified)");
+    
+    option_name[append_samples] = "append_samples";
+    command_changes[append_samples] = make_pair("",
+                                                " --append_samples");
+    output_changes [append_samples] = make_pair("",
+                                                "1");
+
 
   }
 
@@ -264,9 +297,33 @@ public:
     }
 
   }
+  
   void check_output(const string& command_output) {
     vector<pair<string, string> > changed_options;
     check_output(command_output, changed_options);
+  }
+  
+  string get_command(const bitset<options_count> options, 
+                     vector<pair<string, string> > &changed_options) {
+    stringstream command;
+    command << model_path;
+    command << " --samples=" + model_path + ".csv";
+
+    for (int i = 0; i < options_count; i++) {
+      string output_option;
+      if (!options[i]) {
+        command << command_changes[i].first;
+        output_option = output_changes[i].first;
+      } else {
+        command << command_changes[i].second;
+        output_option = output_changes[i].second;
+      }
+      if (output_option != "") {
+        changed_options.push_back(make_pair(option_name[i], 
+                                            output_option));
+      }
+    }
+    return command.str();
   }
 };
 
@@ -275,6 +332,10 @@ string ModelCommand::model_path;
 string ModelCommand::data_file_base;
 char ModelCommand::path_separator = 0;
 vector<pair<string, string> > ModelCommand::expected_output;
+vector<pair<string, string> > ModelCommand::command_changes;
+vector<pair<string, string> > ModelCommand::output_changes;
+vector<string> ModelCommand::option_name;
+
 
 TEST_F(ModelCommand, HelpOptionsMatch) {
   string help_command = model_path;
@@ -289,90 +350,61 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
   }
 }
 
-vector<int> DataOptions() {
-  vector<int> options;
-  options.push_back(1);
-  options.push_back(2);
-  return (options);
+void test_data(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+  double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
+  EXPECT_NEAR(expected_mean, c.mean(0U), 3)
+    << "Test that data file is being used";
 }
 
-vector<string> InitOptions() {
-  const char* path_array[] = {"src", "test", "models", "command"};
-  string base = ModelCommand::get_path(path_array, 4U);
-  
-  vector<string> options;
-  options.push_back("");
-  options.push_back(base + "_init.Rdata");
-  return (options);
+void test_append_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+  size_t expected_num_samples = options[append_samples] ? 2000 : 1000;
+  EXPECT_EQ(expected_num_samples, c.num_samples())
+    << "Test that samples are being appended";
 }
 
- vector<string> SeedOptions() {
-   vector<string> options;
-   options.push_back("");
-   options.push_back("100");
-   return(options);
- }
+void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+  // seed / chain_id test
+  double expected_first_y;
+  if (options[seed] && !options[append_samples]) {
+    if (options[data]) {
+      expected_first_y = options[init] ? 100.564 : 100.523;
+    } else { 
+      expected_first_y = options[init] ? 0.265544 : 1.76413;
+    }
 
- vector<string> ChainIdOptions() {
-   vector<string> options;
-   options.push_back("");
-   options.push_back("2");
-   return(options);
- }
+    
+    vector<double> sampled_y;
+    c.get_samples(0U, 0U, sampled_y);
+    if (options[chain_id]) {
+      if (expected_first_y == sampled_y[0]) {
+        ADD_FAILURE()
+          << "chain_id is not default. "
+          << "sampled_y[0] should not be drawn from the same seed";
+      } else {
+        SUCCEED()
+          << "chain_id is the default. "
+          << "The samples are not drawn from the same seed";
+      }
+    } else {
+      EXPECT_EQ(expected_first_y, sampled_y[0])
+        << "Test for first sample when chain_id == 1";
+    }
+  }
+}
 
- 
+
 TEST_P(ModelCommand, OptionsTest) {
-    tuple<int,    // data
-      string, // init
-      string, // seed
-      string, // chain_id 
-      bool    // append_samples (should be last to check number of samples)
-      > options = GetParam();
+  bitset<options_count> options(GetParam());
   vector<pair<string, string> > changed_options;
-
-  // build command
-  stringstream command;
-  command << model_path;
-  {
-    stringstream data_file;
-    data_file << data_file_base
-              << get<data>(options)
-              << ".Rdata";
-    command << " --data="
-            << data_file.str();
-    changed_options.push_back(pair<string,string>("data", data_file.str()));
-  }
-  if (get<init>(options) != "") {
-    command << " --init="
-            << get<init>(options);
-    changed_options.push_back(pair<string,string>("init", get<init>(options)));
-  }
-  if (get<seed>(options) != "") {
-    command << " --seed="
-            << get<seed>(options);
-    changed_options.push_back(pair<string,string>("seed", 
-                                                  get<seed>(options) + " (user specified)"));
-  }
-  if (get<chain_id>(options) != "") {
-    command << " --chain_id="
-            << get<chain_id>(options);
-    changed_options.push_back(pair<string,string>("chain_id", 
-                                                  get<chain_id>(options) + " (user specified)"));
-  }
-  if (get<append_samples>(options)) {
-    command << " --append_samples";
-    changed_options.push_back(pair<string,string>("append_samples", "1"));
-  }
-  command << " --samples="
-          << model_path 
-          << ".csv";
   
+  std::string command = get_command(options, changed_options);
+  std::cout << command << std::endl;
+  for (int i = 0; i < changed_options.size(); i++) {
+    std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
+  }
+
   // check_output
-  check_output(run_command(command.str()), changed_options);
-
-  //std::cout << "command: \n" << command.str() << "\n\n";
-  //std::cout << "output : \n" << run_command(command.str()) << "\n\n";
-  
+  check_output(run_command(command), changed_options);
 
   // test sampled values
   vector<string> names;
@@ -383,61 +415,10 @@ TEST_P(ModelCommand, OptionsTest) {
   stan::mcmc::chains<> c(1U, names, dimss);
   stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
   
-  // data test
-  double expected_mean = (get<data>(options)-1)*100.0; // 1: mean = 0, 2: mean = 100
-  EXPECT_NEAR(expected_mean, c.mean(0U), 3)
-    << "Test that data file is being used";
-  
-  // append_samples test
-  size_t expected_num_samples = get<append_samples>(options) ? 2000 : 1000;
-  EXPECT_EQ(expected_num_samples, c.num_samples())
-    << "Test that samples are being appended";
-
-  // seed / chain_id test
-  if (!get<append_samples>(options) && get<seed>(options) != "") {
-    double expected_first_y;
-    if (get<data>(options) == 1) {
-      if (get<init>(options) == "") 
-        expected_first_y = 1.76413;
-      else
-        expected_first_y = 0.265544;
-    } else { // data == 2
-      if (get<init>(options) == "")
-        expected_first_y = 100.523;
-      else
-        expected_first_y = 100.564;
-    }
-    vector<double> sampled_y;
-    c.get_samples(0U, 0U, sampled_y);
-    if (get<chain_id>(options) == "")
-      EXPECT_EQ(expected_first_y, sampled_y[0])
-        << "Test for first sample when chain_id == 1";
-    else {
-      if (expected_first_y == sampled_y[0]) {
-        ADD_FAILURE()
-          << "chain_id is not default. "
-          << "sampled_y[0] should not be drawn from the same seed";
-      } else {
-        SUCCEED()
-          << "chain_id is the default. "
-          << "The samples are not drawn from the same seed";
-      }
-    }
-      
-  }
+  test_data(options, c);
+  test_append_samples(options, c);
+  test_seed(options, c);
 }
-
-INSTANTIATE_TEST_CASE_P(, 
-                        ModelCommand, 
-                        Combine(ValuesIn(DataOptions()),
-                                ValuesIn(InitOptions()),
-                                ValuesIn(SeedOptions()),
-                                ValuesIn(ChainIdOptions()),
-                                Bool()
-                                ));
-
-#else
-
-TEST(ModelCommand, CombineIsNotSupportedOnThisPlatform) {}
-
-#endif
+INSTANTIATE_TEST_CASE_P(,
+                        ModelCommand,
+                        Range(0, 1<<options_count));
