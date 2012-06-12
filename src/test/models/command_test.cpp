@@ -330,9 +330,9 @@ TEST_P(ModelCommand, OptionsTest) {
       > options = GetParam();
   vector<pair<string, string> > changed_options;
 
+  // build command
   stringstream command;
   command << model_path;
-  // data
   {
     stringstream data_file;
     data_file << data_file_base
@@ -367,6 +367,7 @@ TEST_P(ModelCommand, OptionsTest) {
           << model_path 
           << ".csv";
   
+  // check_output
   check_output(run_command(command.str()), changed_options);
 
   //std::cout << "command: \n" << command.str() << "\n\n";
@@ -382,14 +383,17 @@ TEST_P(ModelCommand, OptionsTest) {
   stan::mcmc::chains<> c(1U, names, dimss);
   stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
   
+  // data test
   double expected_mean = (get<data>(options)-1)*100.0; // 1: mean = 0, 2: mean = 100
   EXPECT_NEAR(expected_mean, c.mean(0U), 3)
     << "Test that data file is being used";
-
+  
+  // append_samples test
   size_t expected_num_samples = get<append_samples>(options) ? 2000 : 1000;
   EXPECT_EQ(expected_num_samples, c.num_samples())
     << "Test that samples are being appended";
 
+  // seed / chain_id test
   if (!get<append_samples>(options) && get<seed>(options) != "") {
     double expected_first_y;
     if (get<data>(options) == 1) {
