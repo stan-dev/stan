@@ -25,8 +25,9 @@ enum options {
   init,
   seed,
   chain_id,
-  options_count
-  };
+  iter,
+  options_count   // should be last. will hold the number of tested options
+};
 
 
 class ModelCommand : 
@@ -134,6 +135,12 @@ public:
     command_changes.resize(options_count);
     output_changes.resize(options_count);
 
+    option_name[append_samples] = "append_samples";
+    command_changes[append_samples] = make_pair("",
+                                                " --append_samples");
+    output_changes [append_samples] = make_pair("",
+                                                "1");
+
     option_name[data] = "data";
     command_changes[data] = make_pair(" --data="+data_file_base+"1.Rdata",
                                       " --data="+data_file_base+"2.Rdata");
@@ -160,13 +167,11 @@ public:
     output_changes [chain_id] = make_pair("",
                                           "2 (user specified)");
     
-    option_name[append_samples] = "append_samples";
-    command_changes[append_samples] = make_pair("",
-                                                " --append_samples");
-    output_changes [append_samples] = make_pair("",
-                                                "1");
-
-
+    option_name[iter] = "iter";
+    command_changes[iter] = make_pair("",
+                                      " --iter=100");
+    output_changes [iter] = make_pair("",
+                                      "100");
   }
 
   /** 
@@ -323,6 +328,9 @@ public:
                                             output_option));
       }
     }
+    if (options[iter])// && !options[warmup]
+      changed_options.push_back(make_pair("warmup",
+                                          "50"));
     return command.str();
   }
 };
@@ -357,12 +365,22 @@ void test_data(const bitset<options_count>& options, stan::mcmc::chains<> c) {
 }
 
 void test_append_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
-  size_t expected_num_samples = options[append_samples] ? 2000 : 1000;
-  EXPECT_EQ(expected_num_samples, c.num_samples())
-    << "Test that samples are being appended";
+  if (!options[iter]) {
+    size_t expected_num_samples = options[append_samples] ? 2000 : 1000;
+    EXPECT_EQ(expected_num_samples, c.num_samples())
+      << "Test that samples are being appended";
+  } else {
+    if (!options[append_samples]) {
+      size_t expected_num_samples = 50;
+      EXPECT_EQ(expected_num_samples, c.num_samples())
+        << "Test that samples are being appended";
+    }
+  }
 }
 
 void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+  if (options[iter])
+    return;
   // seed / chain_id test
   double expected_first_y;
   if (options[seed] && !options[append_samples]) {
@@ -371,7 +389,6 @@ void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
     } else { 
       expected_first_y = options[init] ? 0.265544 : 1.76413;
     }
-
     
     vector<double> sampled_y;
     c.get_samples(0U, 0U, sampled_y);
@@ -392,13 +409,16 @@ void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   }
 }
 
+void test_iter(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+}
 
 TEST_P(ModelCommand, OptionsTest) {
   bitset<options_count> options(GetParam());
   vector<pair<string, string> > changed_options;
   
   std::string command = get_command(options, changed_options);
-  std::cout << command << std::endl;
+  SCOPED_TRACE(command);
+  //std::cout << command << std::endl;
   for (int i = 0; i < changed_options.size(); i++) {
     std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
   }
@@ -418,6 +438,7 @@ TEST_P(ModelCommand, OptionsTest) {
   test_data(options, c);
   test_append_samples(options, c);
   test_seed(options, c);
+  test_iter(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
