@@ -23,7 +23,12 @@ using testing::ValuesIn;
 using testing::Bool;
 
 class ModelCommand : 
-  public ::testing::TestWithParam<tuple<int, string, bool> > {
+  public ::testing::TestWithParam<
+  tuple<int,    // data
+        string, // init
+        string,  // seed
+        bool   // append_samples (should be last to check number of samples)
+        > > {
 private:
   static char path_separator;
 public:
@@ -35,6 +40,7 @@ public:
   enum options {
     data,
     init,
+    seed,
     append_samples
   };
 
@@ -218,6 +224,8 @@ public:
       for (size_t j = 0; j < expected_output.size(); j++) {
         if (expected_output[j].first == changed_options[i].first) {
           expected_output[j].second = changed_options[i].second;
+          if (expected_output[j].first == "seed")
+            expected_output[j].second += " (user specified)";
           break;
         }
       }
@@ -296,9 +304,16 @@ vector<string> InitOptions() {
   options.push_back(base + "_init.Rdata");
   return (options);
 }
+
+ vector<string> SeedOptions() {
+   vector<string> options;
+   options.push_back("");
+   options.push_back("100");
+   return(options);
+ }
  
 TEST_P(ModelCommand, OptionsTest) {
-  tuple<int, string, bool> options = GetParam();
+  tuple<int, string, string, bool> options = GetParam();
   vector<pair<string, string> > changed_options;
 
   stringstream command;
@@ -317,6 +332,11 @@ TEST_P(ModelCommand, OptionsTest) {
     command << " --init="
             << get<init>(options);
     changed_options.push_back(pair<string,string>("init", get<init>(options)));
+  }
+  if (get<seed>(options) != "") {
+    command << " --seed="
+            << get<seed>(options);
+    changed_options.push_back(pair<string,string>("seed", get<seed>(options)));
   }
   if (get<append_samples>(options)) {
     command << " --append_samples";
@@ -348,12 +368,31 @@ TEST_P(ModelCommand, OptionsTest) {
   size_t expected_num_samples = get<append_samples>(options) ? 2000 : 1000;
   EXPECT_EQ(expected_num_samples, c.num_samples())
     << "Test that samples are being appended";
+
+  if (!get<append_samples>(options) && get<seed>(options) != "") {
+    double expected_first_y;
+    if (get<data>(options) == 1) {
+      if (get<init>(options) == "") 
+        expected_first_y = 1.76413;
+      else
+        expected_first_y = 0.265544;
+    } else { // data == 2
+      if (get<init>(options) == "")
+        expected_first_y = 100.523;
+      else
+        expected_first_y = 100.564;
+    }
+    vector<double> sampled_y;
+    c.get_samples(0U, 0U, sampled_y);
+    EXPECT_EQ(expected_first_y, sampled_y[0]);
+  }
 }
 
 INSTANTIATE_TEST_CASE_P(, 
                         ModelCommand, 
                         Combine(ValuesIn(DataOptions()),
                                 ValuesIn(InitOptions()),
+                                ValuesIn(SeedOptions()),
                                 Bool()
                                 ));
 
