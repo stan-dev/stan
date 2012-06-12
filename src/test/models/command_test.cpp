@@ -14,13 +14,16 @@ using std::stringstream;
 using std::vector;
 using std::string;
 using std::pair;
-using testing::Combine;
-using testing::ValuesIn;
+
 using std::tr1::tuple;
 using std::tr1::get;
 
+using testing::Combine;
+using testing::ValuesIn;
+using testing::Bool;
+
 class ModelCommand : 
-  public ::testing::TestWithParam<tuple<int, string> > {
+  public ::testing::TestWithParam<tuple<int, string, bool> > {
 private:
   static char path_separator;
 public:
@@ -31,7 +34,8 @@ public:
 
   enum options {
     data,
-    init
+    init,
+    append_samples
   };
 
   static char get_path_separator() {
@@ -294,7 +298,7 @@ vector<string> InitOptions() {
 }
  
 TEST_P(ModelCommand, OptionsTest) {
-  tuple<int, string> options = GetParam();
+  tuple<int, string, bool> options = GetParam();
   vector<pair<string, string> > changed_options;
 
   stringstream command;
@@ -313,6 +317,10 @@ TEST_P(ModelCommand, OptionsTest) {
     command << " --init="
             << get<init>(options);
     changed_options.push_back(pair<string,string>("init", get<init>(options)));
+  }
+  if (get<append_samples>(options)) {
+    command << " --append_samples";
+    changed_options.push_back(pair<string,string>("append_samples", "1"));
   }
   command << " --samples="
           << model_path 
@@ -334,13 +342,20 @@ TEST_P(ModelCommand, OptionsTest) {
   stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
   
   double expected_mean = (get<data>(options)-1)*100.0; // 1: mean = 0, 2: mean = 100
-  EXPECT_NEAR(expected_mean, c.mean(0U), 3);
+  EXPECT_NEAR(expected_mean, c.mean(0U), 3)
+    << "Test that data file is being used";
+
+  size_t expected_num_samples = get<append_samples>(options) ? 2000 : 1000;
+  EXPECT_EQ(expected_num_samples, c.num_samples())
+    << "Test that samples are being appended";
 }
 
 INSTANTIATE_TEST_CASE_P(, 
                         ModelCommand, 
                         Combine(ValuesIn(DataOptions()),
-                                ValuesIn(InitOptions())));
+                                ValuesIn(InitOptions()),
+                                Bool()
+                                ));
 
 #else
 
