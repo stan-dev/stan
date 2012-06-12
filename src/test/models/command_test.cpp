@@ -15,7 +15,6 @@ using std::vector;
 using std::string;
 using std::pair;
 using testing::Combine;
-using testing::Values;
 using testing::ValuesIn;
 using std::tr1::tuple;
 using std::tr1::get;
@@ -29,6 +28,11 @@ public:
   static string model_path;
   static vector<string> expected_help_options;
   static vector<pair<string, string> > expected_output;
+
+  enum options {
+    data,
+    init
+  };
 
   static char get_path_separator() {
     if (path_separator == 0) {
@@ -299,22 +303,21 @@ TEST_P(ModelCommand, OptionsTest) {
   {
     stringstream data_file;
     data_file << data_file_base
-              << get<0>(options)
+              << get<data>(options)
               << ".Rdata";
     command << " --data="
             << data_file.str();
     changed_options.push_back(pair<string,string>("data", data_file.str()));
   }
-  if (get<1>(options) != "") {
+  if (get<init>(options) != "") {
     command << " --init="
-            << get<1>(options);
-    changed_options.push_back(pair<string,string>("init", get<1>(options)));
+            << get<init>(options);
+    changed_options.push_back(pair<string,string>("init", get<init>(options)));
   }
   command << " --samples="
           << model_path 
           << ".csv";
   
-  //std::cout << "command: \n" << command.str() << "\n\n";
   check_output(run_command(command.str()), changed_options);
 
   //std::cout << "command: \n" << command.str() << "\n\n";
@@ -330,7 +333,7 @@ TEST_P(ModelCommand, OptionsTest) {
   stan::mcmc::chains<> c(1U, names, dimss);
   stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
   
-  double expected_mean = (get<0>(options)-1)*100.0; // 1: mean = 0, 2: mean = 100
+  double expected_mean = (get<data>(options)-1)*100.0; // 1: mean = 0, 2: mean = 100
   EXPECT_NEAR(expected_mean, c.mean(0U), 3);
 }
 
@@ -340,6 +343,7 @@ INSTANTIATE_TEST_CASE_P(,
                                 ValuesIn(InitOptions())));
 
 #else
+
 TEST(ModelCommand, CombineIsNotSupportedOnThisPlatform) {}
 
 #endif
