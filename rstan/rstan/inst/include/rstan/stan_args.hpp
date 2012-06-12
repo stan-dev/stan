@@ -70,7 +70,6 @@ namespace rstan {
    * <li> test_grad 
    * <li> init 
    * <li> init_list 
-   * <li> num_chains 
    * </ul>
    *
    * In addition, the following keep a record of how the arguments are set: by
@@ -104,9 +103,9 @@ namespace rstan {
     bool test_grad; 
     std::string init; 
     SEXP init_list;  
-    size_t num_chains;
-   
+
   public:
+   
     /**
     stan_args(): 
       sample_file("samples.csv"),  
@@ -128,8 +127,7 @@ namespace rstan {
       append_samples(false), 
       test_grad(true), 
       init("random"),
-      init_list(R_NilValue),
-      num_chains(1) {
+      init_list(R_NilValue) {
     } 
     */
     stan_args(const Rcpp::List& in) {
@@ -222,15 +220,33 @@ namespace rstan {
       idx = find_index(args_names, std::string("append_samples")); 
       if (idx == args_names.size()) append_samples = false; 
       else append_samples = Rcpp::as<bool>(in[idx]); 
-
-      idx = find_index(args_names, std::string("num_chains")); 
-      if (idx == args_names.size()) num_chains = 1;
-      else num_chains = Rcpp::as<size_t>(in[idx]); 
-
     } 
-    size_t get_num_chains() const {
-      return num_chains; 
+
+    /**
+     * return all the arguments used as an R list
+     * @return An R list containing all the arguments for a chain. 
+     */ 
+    SEXP get_stan_args() const {
+      Rcpp::List lst; 
+      if (sample_file_flag) 
+        lst["sample_file"] = sample_file; 
+      else 
+        lst["sample_file_flag"] = false;
+      lst["n.iter"] = iter;                     // 2 
+      lst["n.warmup"] = warmup;                 // 3 
+      lst["n.thin"] = thin;                     // 4 
+      lst["leapfrog_steps"] = leapfrog_steps;   // 5 
+      lst["epsilon"] = epsilon;                 // 6 
+      lst["max_treedepth"] = max_treedepth;     // 7 
+      lst["delta"] = delta;                     // 8 
+      lst["gamma"] = gamma;                     // 9 
+      lst["random_seed"] = random_seed;         // 10
+      lst["chain_id"] = chain_id;               // 11
+      lst["init.t"] = init;                     // 12
+      lst["init.v"] = init_list;                // 13 
+      return lst; 
     } 
+
     void set_random_seed(size_t seed) {
       random_seed = seed;
     } 

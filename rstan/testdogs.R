@@ -150,6 +150,11 @@ mnsd1 <- sampler$get_chain_mean_and_sd(1, pars)
 mnsd2 <- sampler$get_chain_mean_and_sd(2, pars) 
 mnsd3 <- sampler$get_chain_mean_and_sd(3, pars) 
 
+args <- sampler$get_stan_args(); 
+print(args)
+args1 <- sampler$get_chain_stan_args(1); 
+print(args1)
+
   tall2 <- lapply(tall, FUN = function(x) do.call(cbind, x)) 
   tall3 <- to.mcmc.list(tall) 
 

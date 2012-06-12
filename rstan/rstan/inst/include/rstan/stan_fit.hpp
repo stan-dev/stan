@@ -403,6 +403,48 @@ namespace rstan {
     // not really helpful of using try---catch though it could throw
     // exception in the ctor.
 
+
+    /**
+     * Get the arguments used for sampling a chain. 
+     * 
+     * @param chain_id The chain ID stariting from 1.
+     * @return An R list providing the arguments used for the chain.
+  
+     */ 
+  
+    SEXP get_chain_stan_args(SEXP chain_id) {
+      size_t k = Rcpp::as<size_t>(chain_id); 
+      std::map<size_t, stan_args>::const_iterator it
+        = argss_.find(k);  
+      if (it != argss_.end()) 
+        return (it -> second).get_stan_args(); 
+      rstan::io::rcerr << "error: chain id " << chain_id 
+                       << " not found." << std::endl;
+      return R_NilValue;
+    }
+     
+    /**
+     * Get the arguments used for sampling all the chains. 
+     * 
+     * @return An R list providing the arguments used for all the chain.
+     *  each element of the R list is an R list for one chain. 
+  
+     */ 
+
+    SEXP get_stan_args() { 
+      Rcpp::List lst; 
+      std::vector<std::string> cnames(num_chains_, "chain."); 
+
+      std::string cname("chain."); 
+      for (std::map<size_t, stan_args>::const_iterator it = argss_.begin(); 
+           it != argss_.end(); 
+           ++it)   
+        lst[cname + to_string(it -> first)] = (it -> second).get_stan_args(); 
+
+      return lst;
+    }
+     
+
     /**
      * This function would be exposed (using Rcpp module, see
      * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call 

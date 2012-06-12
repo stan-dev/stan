@@ -78,5 +78,13 @@ RCPP_MODULE(%model_name%){
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_kept_samples_permuted) 
 
+    .method("get_chain_stan_args", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_chain_stan_args) 
+
+    .method("get_stan_args", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_stan_args) 
+
     ;
 }
