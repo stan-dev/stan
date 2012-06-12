@@ -26,8 +26,9 @@ class ModelCommand :
   public ::testing::TestWithParam<
   tuple<int,    // data
         string, // init
-        string,  // seed
-        bool   // append_samples (should be last to check number of samples)
+        string, // seed
+        string, // chain_id 
+        bool    // append_samples (should be last to check number of samples)
         > > {
 private:
   static char path_separator;
@@ -41,6 +42,7 @@ public:
     data,
     init,
     seed,
+    chain_id,
     append_samples
   };
 
@@ -224,8 +226,6 @@ public:
       for (size_t j = 0; j < expected_output.size(); j++) {
         if (expected_output[j].first == changed_options[i].first) {
           expected_output[j].second = changed_options[i].second;
-          if (expected_output[j].first == "seed")
-            expected_output[j].second += " (user specified)";
           break;
         }
       }
@@ -253,11 +253,12 @@ public:
         if (boost::algorithm::ends_with(output[i].second, "(randomly generated)"))
           SUCCEED();
         else
-          ADD_FAILURE() <<
-            output[i].first << " is not randomly generated: " << output[i].second;
+          ADD_FAILURE() 
+            << "'" << output[i].first 
+            << "' is not randomly generated: " << output[i].second;
       } else {
         EXPECT_EQ(expected_output[i].second, output[i].second)
-          << "Option " << expected_output[i].first << " returned unexpected value";
+          << "Option '" << expected_output[i].first << "' returned unexpected value";
       }
         
     }
@@ -311,9 +312,22 @@ vector<string> InitOptions() {
    options.push_back("100");
    return(options);
  }
+
+ vector<string> ChainIdOptions() {
+   vector<string> options;
+   options.push_back("");
+   options.push_back("2");
+   return(options);
+ }
+
  
 TEST_P(ModelCommand, OptionsTest) {
-  tuple<int, string, string, bool> options = GetParam();
+    tuple<int,    // data
+      string, // init
+      string, // seed
+      string, // chain_id 
+      bool    // append_samples (should be last to check number of samples)
+      > options = GetParam();
   vector<pair<string, string> > changed_options;
 
   stringstream command;
@@ -336,7 +350,14 @@ TEST_P(ModelCommand, OptionsTest) {
   if (get<seed>(options) != "") {
     command << " --seed="
             << get<seed>(options);
-    changed_options.push_back(pair<string,string>("seed", get<seed>(options)));
+    changed_options.push_back(pair<string,string>("seed", 
+                                                  get<seed>(options) + " (user specified)"));
+  }
+  if (get<chain_id>(options) != "") {
+    command << " --chain_id="
+            << get<chain_id>(options);
+    changed_options.push_back(pair<string,string>("chain_id", 
+                                                  get<chain_id>(options) + " (user specified)"));
   }
   if (get<append_samples>(options)) {
     command << " --append_samples";
@@ -384,7 +405,21 @@ TEST_P(ModelCommand, OptionsTest) {
     }
     vector<double> sampled_y;
     c.get_samples(0U, 0U, sampled_y);
-    EXPECT_EQ(expected_first_y, sampled_y[0]);
+    if (get<chain_id>(options) == "")
+      EXPECT_EQ(expected_first_y, sampled_y[0])
+        << "Test for first sample when chain_id == 1";
+    else {
+      if (expected_first_y == sampled_y[0]) {
+        ADD_FAILURE()
+          << "chain_id is not default. "
+          << "sampled_y[0] should not be drawn from the same seed";
+      } else {
+        SUCCEED()
+          << "chain_id is the default. "
+          << "The samples are not drawn from the same seed";
+      }
+    }
+      
   }
 }
 
@@ -393,6 +428,7 @@ INSTANTIATE_TEST_CASE_P(,
                         Combine(ValuesIn(DataOptions()),
                                 ValuesIn(InitOptions()),
                                 ValuesIn(SeedOptions()),
+                                ValuesIn(ChainIdOptions()),
                                 Bool()
                                 ));
 
