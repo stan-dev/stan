@@ -742,7 +742,3 @@ C++ API MANUAL
 
 * Goes along with cleaning up API doc and privatizing
 
-
-
-
-
