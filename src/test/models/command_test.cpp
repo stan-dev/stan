@@ -358,13 +358,14 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
   }
 }
 
-void test_data(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
   EXPECT_NEAR(expected_mean, c.mean(0U), 3)
     << "Test that data file is being used";
 }
 
-void test_append_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+
+void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   if (!options[iter]) {
     size_t expected_num_samples = options[append_samples] ? 2000 : 1000;
     EXPECT_EQ(expected_num_samples, c.num_samples())
@@ -378,7 +379,7 @@ void test_append_samples(const bitset<options_count>& options, stan::mcmc::chain
   }
 }
 
-void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   if (options[iter])
     return;
   // seed / chain_id test
@@ -419,9 +420,9 @@ TEST_P(ModelCommand, OptionsTest) {
   std::string command = get_command(options, changed_options);
   SCOPED_TRACE(command);
   //std::cout << command << std::endl;
-  for (int i = 0; i < changed_options.size(); i++) {
-    std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
-  }
+  //for (int i = 0; i < changed_options.size(); i++) {
+  //  std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
+  //}
 
   // check_output
   check_output(run_command(command), changed_options);
@@ -435,9 +436,9 @@ TEST_P(ModelCommand, OptionsTest) {
   stan::mcmc::chains<> c(1U, names, dimss);
   stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
   
-  test_data(options, c);
-  test_append_samples(options, c);
-  test_seed(options, c);
+  test_sampled_mean(options, c);
+  test_number_of_samples(options, c);
+  test_specific_sample_values(options, c);
   test_iter(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
