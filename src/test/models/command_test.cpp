@@ -30,6 +30,11 @@ enum options {
   thin,
   leapfrog_steps,
   max_treedepth,
+  epsilon,
+  // epsilon_pm
+  // unit_max_matrix
+  // delta
+  // gamma
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -203,6 +208,12 @@ public:
 					       " --max_treedepth=2");
     output_changes [max_treedepth] = make_pair("",
 					       "2");
+    
+    option_name[epsilon] = "epsilon";
+    command_changes[epsilon] = make_pair("",
+					 " --epsilon=1.5");
+    output_changes [epsilon] = make_pair("",
+					 "1.5");
     
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
@@ -427,7 +438,9 @@ void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::ch
 }
 
 void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<> c) {
-  if (options[iter] || options[leapfrog_steps])
+  if (options[iter] || 
+      options[leapfrog_steps] || 
+      options[epsilon])
     return;
   // seed / chain_id test
   double expected_first_y;
