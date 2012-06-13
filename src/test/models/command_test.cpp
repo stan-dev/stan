@@ -27,6 +27,7 @@ enum options {
   chain_id,
   iter,
   warmup,
+  thin,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -180,6 +181,11 @@ public:
     output_changes [warmup] = make_pair("",
                                         "60");
 
+    option_name[thin] = "thin";
+    command_changes[thin] = make_pair("",
+                                        " --thin=3");
+    output_changes [thin] = make_pair("",
+                                        "3 (user supplied)");
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
     //}
@@ -382,11 +388,13 @@ void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<
     << "Test that data file is being used";
 }
 
-
 void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   int num_iter = options[iter] ? 100 : 2000;
   int num_warmup = options[warmup] ? 60 : num_iter/2;
   size_t expected_num_samples = num_iter - num_warmup;
+  if (options[thin]) {
+    expected_num_samples = ceil(expected_num_samples / 3.0);
+  }
   if (options[append_samples]) {
     EXPECT_EQ(2*expected_num_samples, c.num_samples())
       << "Test number of samples when appending samples";
@@ -427,9 +435,6 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
   }
 }
 
-void test_iter(const bitset<options_count>& options, stan::mcmc::chains<> c) {
-}
-
 TEST_P(ModelCommand, OptionsTest) {
   bitset<options_count> options(GetParam());
   vector<pair<string, string> > changed_options;
@@ -456,7 +461,6 @@ TEST_P(ModelCommand, OptionsTest) {
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);
   test_specific_sample_values(options, c);
-  //test_iter(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
