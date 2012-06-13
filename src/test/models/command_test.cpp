@@ -33,7 +33,7 @@ enum options {
   epsilon,
   epsilon_pm,
   unit_mass_matrix,
-  // delta
+  delta,
   // gamma
   options_count   // should be last. will hold the number of tested options
 };
@@ -227,6 +227,13 @@ public:
 						  " --unit_mass_matrix");
     output_changes [unit_mass_matrix] = make_pair("",
 						  "1");
+
+    option_name[delta] = "delta";
+    command_changes[delta] = make_pair("",
+				       " --delta=0.75");
+    output_changes [delta] = make_pair("",
+				       "0.75");
+    
     
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
@@ -453,7 +460,8 @@ void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::ch
 void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   if (options[iter] || 
       options[leapfrog_steps] || 
-      options[epsilon])
+      options[epsilon] ||
+      options[delta])
     return;
   // seed / chain_id test
   double expected_first_y;
