@@ -28,6 +28,7 @@ enum options {
   iter,
   warmup,
   thin,
+  leapfrog_steps,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -186,6 +187,16 @@ public:
                                         " --thin=3");
     output_changes [thin] = make_pair("",
                                         "3 (user supplied)");
+
+
+
+    option_name[leapfrog_steps] = "leapfrog_steps";
+    command_changes[leapfrog_steps] = make_pair("",
+						" --leapfrog_steps=1");
+    output_changes [leapfrog_steps] = make_pair("",
+						"1");
+    
+
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
     //}
@@ -213,10 +224,14 @@ public:
     size_t count = fread(&buf, 1, 1024, in);
     while (count > 0) {
       output += string(&buf[0], &buf[count]);
+      //std::cout << "intermediate output: " << output << std::endl;
       count = fread(&buf, 1, 1024, in);
     }
     pclose(in);
     
+    //std::cout << "ran command: " << command << std::endl;
+    //std::cout << "output : \n";
+    //std::cout << output << std::endl << std::endl;
     return output;
   }
 
@@ -405,7 +420,7 @@ void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::ch
 }
 
 void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<> c) {
-  if (options[iter])
+  if (options[iter] || options[leapfrog_steps])
     return;
   // seed / chain_id test
   double expected_first_y;
@@ -452,11 +467,12 @@ TEST_P(ModelCommand, OptionsTest) {
   // test sampled values
   vector<string> names;
   vector<vector<size_t> > dimss;
-  stan::mcmc::read_variables(model_path+".csv", 2U,
+  size_t skip = options[leapfrog_steps] ? 1U : 2U;
+  stan::mcmc::read_variables(model_path+".csv", skip,
                              names, dimss);
       
   stan::mcmc::chains<> c(1U, names, dimss);
-  stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
+  stan::mcmc::add_chain(c, 0, model_path+".csv", skip);
   
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);
