@@ -32,7 +32,7 @@ enum options {
   max_treedepth,
   epsilon,
   epsilon_pm,
-  // unit_max_matrix
+  unit_mass_matrix,
   // delta
   // gamma
   options_count   // should be last. will hold the number of tested options
@@ -221,6 +221,12 @@ public:
 					    " --epsilon_pm=0.5");
     output_changes [epsilon_pm] = make_pair("",
 					    "0.5");
+    
+    option_name[unit_mass_matrix] = "unit_mass_matrix";
+    command_changes[unit_mass_matrix] = make_pair("",
+						  " --unit_mass_matrix");
+    output_changes [unit_mass_matrix] = make_pair("",
+						  "1");
     
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
