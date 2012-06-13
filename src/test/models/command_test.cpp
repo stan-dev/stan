@@ -34,7 +34,7 @@ enum options {
   epsilon_pm,
   unit_mass_matrix,
   delta,
-  // gamma
+  gamma,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -234,7 +234,12 @@ public:
     output_changes [delta] = make_pair("",
 				       "0.75");
     
-    
+    option_name[gamma] = "gamma";
+    command_changes[gamma] = make_pair("",
+				       " --gamma=0.025");
+    output_changes [gamma] = make_pair("",
+				       "0.025");
+
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
     //}
@@ -437,7 +442,7 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
 
 void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
-  EXPECT_NEAR(expected_mean, c.mean(0U), 3)
+  EXPECT_NEAR(expected_mean, c.mean(0U), 20)
     << "Test that data file is being used";
 }
 
@@ -461,7 +466,8 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
   if (options[iter] || 
       options[leapfrog_steps] || 
       options[epsilon] ||
-      options[delta])
+      options[delta] ||
+      options[gamma])
     return;
   // seed / chain_id test
   double expected_first_y;
