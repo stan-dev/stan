@@ -31,7 +31,7 @@ enum options {
   leapfrog_steps,
   max_treedepth,
   epsilon,
-  // epsilon_pm
+  epsilon_pm,
   // unit_max_matrix
   // delta
   // gamma
@@ -214,6 +214,13 @@ public:
 					 " --epsilon=1.5");
     output_changes [epsilon] = make_pair("",
 					 "1.5");
+    
+
+    option_name[epsilon_pm] = "epsilon_pm";
+    command_changes[epsilon_pm] = make_pair("",
+					    " --epsilon_pm=0.5");
+    output_changes [epsilon_pm] = make_pair("",
+					    "0.5");
     
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
