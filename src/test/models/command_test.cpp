@@ -29,6 +29,7 @@ enum options {
   warmup,
   thin,
   leapfrog_steps,
+  max_treedepth,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -197,6 +198,12 @@ public:
 						"1");
     
 
+    option_name[max_treedepth] = "max_treedepth";
+    command_changes[max_treedepth] = make_pair("",
+					       " --max_treedepth=2");
+    output_changes [max_treedepth] = make_pair("",
+					       "2");
+    
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
     //}
