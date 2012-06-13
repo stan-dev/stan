@@ -34,10 +34,10 @@ setMethod("print", signature = (x = "stanfit"),
           })  
 
 setGeneric(name = "extract",
-           def = function(object, pars) { standardGeneric("extract")}) 
+           def = function(object, pars, ...) { standardGeneric("extract")}) 
 
-setMethod("extract", "stanfit", 
-          function(object, pars) {
+setMethod("extract", signature(object = "stanfit", pars = "character"), 
+          function(object, pars, ...) {
             # Obtain the samples of all chains from the C++ mcmc::chain object 
             #
             # Args:

@@ -5,7 +5,7 @@
 \docType{class}
 \alias{stanfit-class}
 \alias{summary,stanfit-method}
-\alias{extract,stanfit-method}
+%% \alias{extract,stanfit-method}
 \alias{print,stanfit-method}
 \alias{show,stanfit-method}
 
@@ -46,7 +46,7 @@
       and the split Rhat (split potential split potential scale reduction).}
     \item{extract}{\code{signature(object = "stanfit", pars = "character")}: 
       get the samples for all chains for specified parameters specified by
-      \code{pars}.}
+      \code{pars}. (see \code{\link{extract}}).}
   }
 }
 
