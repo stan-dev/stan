@@ -1308,7 +1308,7 @@ namespace stan {
 
     /**
      * Return the softmax of the specified vector.
-     * @param x Vector to transform
+     * @param y Vector to transform
      * @return Unit simplex result of the softmax transform of the vector.
      */
     vector_d softmax(const vector_d& y);
