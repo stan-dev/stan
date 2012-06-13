@@ -20,12 +20,13 @@ using testing::Combine;
 using testing::Range;
 
 enum options {
-  append_samples, // should be first
+  append_samples, // should be first option
   data,
   init,
   seed,
   chain_id,
   iter,
+  warmup,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -172,6 +173,16 @@ public:
                                       " --iter=100");
     output_changes [iter] = make_pair("",
                                       "100");
+
+    option_name[warmup] = "warmup";
+    command_changes[warmup] = make_pair("",
+                                        " --warmup=60");
+    output_changes [warmup] = make_pair("",
+                                        "60");
+
+    //for (int i = 0; i < options_count; i++) {
+    //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
+    //}
   }
 
   /** 
@@ -314,6 +325,7 @@ public:
     command << model_path;
     command << " --samples=" + model_path + ".csv";
 
+    //for (int i = options_count-1; i > -1; i--) {
     for (int i = 0; i < options_count; i++) {
       string output_option;
       if (!options[i]) {
@@ -328,9 +340,15 @@ public:
                                             output_option));
       }
     }
-    if (options[iter])// && !options[warmup]
+    if (!options[warmup]) {
+      int num_iter = options[iter] ? 100 : 2000;
+      int num_warmup = options[warmup] ? 60 : num_iter/2;
+      stringstream warmup;
+      warmup << num_iter - num_warmup;
       changed_options.push_back(make_pair("warmup",
-                                          "50"));
+                                          warmup.str()));
+    }
+    
     return command.str();
   }
 };
@@ -366,16 +384,15 @@ void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<
 
 
 void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
-  if (!options[iter]) {
-    size_t expected_num_samples = options[append_samples] ? 2000 : 1000;
-    EXPECT_EQ(expected_num_samples, c.num_samples())
-      << "Test that samples are being appended";
+  int num_iter = options[iter] ? 100 : 2000;
+  int num_warmup = options[warmup] ? 60 : num_iter/2;
+  size_t expected_num_samples = num_iter - num_warmup;
+  if (options[append_samples]) {
+    EXPECT_EQ(2*expected_num_samples, c.num_samples())
+      << "Test number of samples when appending samples";
   } else {
-    if (!options[append_samples]) {
-      size_t expected_num_samples = 50;
-      EXPECT_EQ(expected_num_samples, c.num_samples())
-        << "Test that samples are being appended";
-    }
+    EXPECT_EQ(expected_num_samples, c.num_samples())
+      << "Test number of samples when not appending samples";
   }
 }
 
@@ -384,7 +401,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
     return;
   // seed / chain_id test
   double expected_first_y;
-  if (options[seed] && !options[append_samples]) {
+  if (options[seed] && !options[append_samples] && !options[warmup]) {
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 
@@ -439,7 +456,7 @@ TEST_P(ModelCommand, OptionsTest) {
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);
   test_specific_sample_values(options, c);
-  test_iter(options, c);
+  //test_iter(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
