@@ -163,7 +163,7 @@ effectiveSize(tall3)
 gelman.diag(tall3)
   
 
-post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19) 
+post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19, comment = "#") 
 colMeans(post)
 
 summary(ss)

@@ -34,10 +34,10 @@ setMethod("print", signature = (x = "stanfit"),
           })  
 
 setGeneric(name = "extract",
-           def = function(object, pars, ...) { standardGeneric("extract")}) 
+           def = function(object, ...) { standardGeneric("extract")}) 
 
-setMethod("extract", signature(object = "stanfit", pars = "character"), 
-          function(object, pars, ...) {
+setMethod("extract", signature(object = "stanfit"), # , pars = "character"), 
+          definition = function(object, pars, ...) {
             # Obtain the samples of all chains from the C++ mcmc::chain object 
             #
             # Args:
@@ -69,6 +69,41 @@ setMethod("extract", signature(object = "stanfit", pars = "character"),
 #                        standardGeneric("summary")
 #                      }) 
 #   } 
+
+chain.summary <- function(object, chain.id, 
+                          probs = c(0.025, 0.25, 0.50, 0.75, 0.975),  
+                          pars, ...) {
+  if (chain.id < 0 && chain.id > object@num.chains) {
+    stop("error: chain.id should be postive and less than the", 
+         "number of chains.") 
+  } 
+
+  sampleshandle <- object@.fit$sampleshandle  
+  if (missing(pars)) {
+    pars <- object@model.pars
+  } else {
+    m <- which(match(pars, object@model.pars, nomatch = 0) == 0)
+    if (length(m) > 0) 
+      stop("error no parameter ", paste(pars[m], collapse = ', ')) 
+  } 
+
+  if (missing(probs)) 
+    probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
+  
+  mnsd <- sampleshandle$get_chain_mean_and_sd(pars) 
+  qs <- sampleshandle$get_chain_quantiles(pars, probs)  
+  
+  mq <- cbind(do.call(rbind, mnsd), do.call(rbind, qs)) 
+  colnames(mq) <- c("Mean", "SD", probs2str(probs)) 
+  mq 
+} 
+
+setMethod("chain.summary", 
+          signature(object = "stanfit", 
+                    chain.id = "numeric", 
+                    probs = "numeric", 
+                    pars = "character"), 
+          chain.summary) 
 
 
 setMethod("summary", signature = (object = "stanfit"), 
@@ -105,7 +140,7 @@ setMethod("summary", signature = (object = "stanfit"),
                           do.call(rbind, qs), 
                           do.call(rbind, rhat), 
                           do.call(rbind, ess)) 
-            colnames(mqre) <- c("Mean", "SD", prob_in_percent, "Rhat", "ESS")
+            colnames(mqre) <- c("Mean", "SD", probs2str(probs), "Rhat", "ESS")
             mqre 
           })  
   

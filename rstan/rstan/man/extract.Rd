@@ -2,6 +2,7 @@
 \docType{methods}
 \alias{extract} 
 \alias{extract-methods}
+\alias{extract,stanfit-method}
 \alias{extract,stanfit,character-method}
 
 \title{\code{extract}: extract samples from fitted Stan model}
@@ -10,7 +11,7 @@
 }
 
 \usage{
-  %% extract(object, pars, \dots)  
+  %% extract(object, \dots)  
   \S4method{extract}{stanfit,character}(object, pars, ...) 
 } 
 
@@ -26,7 +27,9 @@
   \item{object}{An object of class \code{"\linkS4class{stanfit}"}.}
 
   \item{pars}{An object of class \code{"character"} providing the parameter
-              names (or other quantity names) of interest.} 
+              names (or other quantity names) of interest. If not specified,
+              all parameters would be used.
+             } 
   \item{...}{FIXME. To be added.} 
 }
 

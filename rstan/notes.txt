@@ -4,6 +4,11 @@
       * rstan/src/Makevars 
       * rstan/src/Makevars.win  
       We might come up with more intelligent solutions later. 
-   b. libstan, used for compiling stanc and models in the system library path,
+   b. libstan, libstanc, used for compiling stanc and models in the system
+      library path, or in $STAN_HOME/bin 
       say, /usr/lib in linux 
+
+      [For the time being, the libstan.a and libstanc.a could not be used. 
+       Instead, the dynamic shared object needs to be used, which needs
+       further investigation..] 
       

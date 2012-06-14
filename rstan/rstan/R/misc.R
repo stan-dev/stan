@@ -204,6 +204,14 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
 } 
 
 
+probs2str <- function(probs) {
+  paste(formatC(probs * 100,  
+                digits = 1, 
+                format = 'f', 
+                drop0trailing = TRUE), 
+        "%", sep = '')
+} 
+
 #### temporary test code 
 #  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
 #  print(a) 

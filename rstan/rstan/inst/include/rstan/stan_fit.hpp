@@ -21,6 +21,7 @@
 #include <stan/mcmc/adaptive_hmc.hpp>
 #include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
+#include <stan/mcmc/nuts_diag.hpp>
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/sampler.hpp>
@@ -33,6 +34,8 @@
 
 #include <Rcpp.h>
 // #include <Rinternals.h>
+
+// REF: stan/gm/command.hpp 
 
 
 namespace rstan {
@@ -182,11 +185,14 @@ namespace rstan {
       size_t random_seed = args.get_random_seed();
 
       double epsilon = args.get_epsilon(); 
+      bool epsilon_adapt = epsilon <= 0.0; 
+
+      bool unit_mass_matrix = args.get_unit_mass_matrix();
 
       int max_treedepth = args.get_max_treedepth(); 
 
       double epsilon_pm = args.get_epsilon_pm(); 
-      bool epsilon_adapt = args.get_epsilon_adapt(); 
+
 
       double delta = args.get_delta(); 
 
@@ -255,7 +261,29 @@ namespace rstan {
         args.write_args_as_comment(sample_stream); 
       } 
 
-      if (leapfrog_steps < 0) {
+      if (0 > leapfrog_steps && !unit_mass_matrix) {
+        // NUTS II (with diagonal mass matrix estimation during warmup)
+        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
+                                                   max_treedepth, epsilon, 
+                                                   epsilon_pm, epsilon_adapt,
+                                                   delta, gamma, 
+                                                   base_rng);
+
+        // cut & paste (see below) to enable sample-specific params
+        if (sample_file_flag && !append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          nuts2_sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+        sample_from(nuts2_sampler,epsilon_adapt,refresh,
+                    num_iterations,num_warmup,num_thin,
+                    sample_stream,sample_file_flag,params_r,params_i,
+                    model,chains_,chain_id); 
+
+  
+      } else if (0 > leapfrog_steps && unit_mass_matrix) {
+        // NUTS I (unit mass matrix)
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
@@ -274,6 +302,7 @@ namespace rstan {
                     sample_stream,sample_file_flag,params_r,params_i,
                     model,chains_,chain_id); 
       } else {
+        // Stardard HMC
         stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,

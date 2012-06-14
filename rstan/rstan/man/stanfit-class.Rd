@@ -44,9 +44,9 @@
       (for example, 2.5\%, 50\%, 97.5\%, which could be specified), 
       the mean, the standard deviation (SD), the effective sample size (ESS),
       and the split Rhat (split potential split potential scale reduction).}
-    \item{extract}{\code{signature(object = "stanfit", pars = "character")}: 
-      get the samples for all chains for specified parameters specified by
-      \code{pars}. (see \code{\link{extract}}).}
+    \item{extract}{\code{signature(object = "stanfit")}: 
+      get the samples for all chains for all (or specified ) parameters. 
+      (see \code{\link{extract}}).}
   }
 }
 

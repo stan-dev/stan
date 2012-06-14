@@ -62,7 +62,7 @@ namespace rstan {
    * <li> epsilon
    * <li> max_treedepth 
    * <li> epsilon_pm
-   * <li> epsilon_adapt
+   * <li> unit_mass_matrix (bool)
    * <li> delta 
    * <li> gamma 
    * <li> random_seed 
@@ -92,7 +92,7 @@ namespace rstan {
     double epsilon; 
     int max_treedepth; 
     double epsilon_pm; 
-    bool epsilon_adapt; 
+    bool unit_mass_matrix;  // default: false 
     double delta; 
     double gamma; 
     int random_seed; 
@@ -117,7 +117,6 @@ namespace rstan {
       epsilon(-1.0), 
       max_treedepth(10), 
       epsilon_pm(0.0), 
-      epsilon_adapt(true), 
       delta(0.5), 
       gamma(0.05), 
       random_seed(std::time(0)), 
@@ -169,11 +168,11 @@ namespace rstan {
       idx = find_index(args_names, std::string("max_treedepth")); 
       if (idx == args_names.size())  max_treedepth = 10; 
       else max_treedepth = Rcpp::as<int>(in[idx]); 
-     
-      idx = find_index(args_names, std::string("epsilon_adapt")); 
-      if (idx == args_names.size()) epsilon_adapt = true; 
-      else epsilon_adapt = Rcpp::as<bool>(in[idx]); 
 
+      idx = find_index(args_names, std::string("unit_mass_matrix")); 
+      if (idx == args_names.size()) unit_mass_matrix = false; 
+      else unit_mass_matrix = Rcpp::as<bool>(in[idx]); 
+     
       idx = find_index(args_names, std::string("delta")); 
       if (idx == args_names.size())  delta = 0.5;
       else delta = Rcpp::as<double>(in[idx]); 
@@ -290,9 +289,6 @@ namespace rstan {
     double get_epsilon_pm() const {
       return epsilon; 
     } 
-    bool get_epsilon_adapt() const {
-      return epsilon_adapt; 
-    } 
     double get_delta() const {  
       return delta;
     } 
@@ -314,24 +310,28 @@ namespace rstan {
     size_t get_chain_id() const {
       return chain_id; 
     } 
+    bool get_unit_mass_matrix() const {
+      return unit_mass_matrix; 
+    } 
     void write_args_as_comment(std::ostream& ostream) const { 
-        // write_comment(ostream);
-        // write_comment_property(ostream,"data",data_file);
-        write_comment_property(ostream,"init",init);
-        write_comment_property(ostream,"append_samples",append_samples);
-        write_comment_property(ostream,"seed",random_seed);
-        write_comment_property(ostream,"chain_id",chain_id);
-        write_comment_property(ostream,"chain_id_src",chain_id_src);
-        write_comment_property(ostream,"iter",iter); 
-        write_comment_property(ostream,"warmup",warmup);
-        write_comment_property(ostream,"thin",thin);
-        write_comment_property(ostream,"leapfrog_steps",leapfrog_steps);
-        write_comment_property(ostream,"max_treedepth",max_treedepth);
-        write_comment_property(ostream,"epsilon",epsilon);
-        write_comment_property(ostream,"epsilon_pm",epsilon_pm);
-        write_comment_property(ostream,"delta",delta);
-        write_comment_property(ostream,"gamma",gamma);
-        write_comment(ostream);
+      // write_comment(ostream);
+      // write_comment_property(ostream,"data",data_file);
+      write_comment_property(ostream,"init",init);
+      write_comment_property(ostream,"append_samples",append_samples);
+      write_comment_property(ostream,"seed",random_seed);
+      write_comment_property(ostream,"chain_id",chain_id);
+      write_comment_property(ostream,"chain_id_src",chain_id_src);
+      write_comment_property(ostream,"iter",iter); 
+      write_comment_property(ostream,"warmup",warmup);
+      write_comment_property(ostream,"thin",thin);
+      write_comment_property(ostream,"leapfrog_steps",leapfrog_steps);
+      write_comment_property(ostream,"max_treedepth",max_treedepth);
+      write_comment_property(ostream,"epsilon",epsilon);
+      write_comment_property(ostream,"unit_mass_matrix",unit_mass_matrix); 
+      write_comment_property(ostream,"epsilon_pm",epsilon_pm);
+      write_comment_property(ostream,"delta",delta);
+      write_comment_property(ostream,"gamma",gamma);
+      write_comment(ostream);
     }
   }; 
 } 

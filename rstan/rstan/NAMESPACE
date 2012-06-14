@@ -13,6 +13,6 @@ exportClasses (
 exportMethods (
 #   print, plot, 
 #   extract, 
-  show, sampling, summary, print, extract 
+  show, sampling, summary, print, extract, chain.summary
 )
 import(Rcpp)
