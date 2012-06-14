@@ -98,7 +98,7 @@ init.v = NULL, seed, sample.file, stan.home, verbose = FALSE, ...)
   } 
   model {
     y[1] ~ normal(0, 1);
-    y[2] ~ exponential(2);
+    y[2] ~ double_exponential(0, 2);
   } 
   "
 
