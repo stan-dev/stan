@@ -20,13 +20,23 @@ using testing::Combine;
 using testing::Range;
 
 enum options {
-  append_samples, // should be first
+  append_samples, // should be first option
   data,
   init,
   seed,
   chain_id,
-  options_count
-  };
+  iter,
+  warmup,
+  thin,
+  leapfrog_steps,
+  max_treedepth,
+  epsilon,
+  epsilon_pm,
+  unit_mass_matrix,
+  delta,
+  gamma,
+  options_count   // should be last. will hold the number of tested options
+};
 
 
 class ModelCommand : 
@@ -134,6 +144,12 @@ public:
     command_changes.resize(options_count);
     output_changes.resize(options_count);
 
+    option_name[append_samples] = "append_samples";
+    command_changes[append_samples] = make_pair("",
+                                                " --append_samples");
+    output_changes [append_samples] = make_pair("",
+                                                "1");
+
     option_name[data] = "data";
     command_changes[data] = make_pair(" --data="+data_file_base+"1.Rdata",
                                       " --data="+data_file_base+"2.Rdata");
@@ -160,13 +176,73 @@ public:
     output_changes [chain_id] = make_pair("",
                                           "2 (user specified)");
     
-    option_name[append_samples] = "append_samples";
-    command_changes[append_samples] = make_pair("",
-                                                " --append_samples");
-    output_changes [append_samples] = make_pair("",
-                                                "1");
+    option_name[iter] = "iter";
+    command_changes[iter] = make_pair("",
+                                      " --iter=100");
+    output_changes [iter] = make_pair("",
+                                      "100");
+
+    option_name[warmup] = "warmup";
+    command_changes[warmup] = make_pair("",
+                                        " --warmup=60");
+    output_changes [warmup] = make_pair("",
+                                        "60");
+
+    option_name[thin] = "thin";
+    command_changes[thin] = make_pair("",
+                                        " --thin=3");
+    output_changes [thin] = make_pair("",
+                                        "3 (user supplied)");
 
 
+
+    option_name[leapfrog_steps] = "leapfrog_steps";
+    command_changes[leapfrog_steps] = make_pair("",
+						" --leapfrog_steps=1");
+    output_changes [leapfrog_steps] = make_pair("",
+						"1");
+    
+
+    option_name[max_treedepth] = "max_treedepth";
+    command_changes[max_treedepth] = make_pair("",
+					       " --max_treedepth=2");
+    output_changes [max_treedepth] = make_pair("",
+					       "2");
+    
+    option_name[epsilon] = "epsilon";
+    command_changes[epsilon] = make_pair("",
+					 " --epsilon=1.5");
+    output_changes [epsilon] = make_pair("",
+					 "1.5");
+    
+
+    option_name[epsilon_pm] = "epsilon_pm";
+    command_changes[epsilon_pm] = make_pair("",
+					    " --epsilon_pm=0.5");
+    output_changes [epsilon_pm] = make_pair("",
+					    "0.5");
+    
+    option_name[unit_mass_matrix] = "unit_mass_matrix";
+    command_changes[unit_mass_matrix] = make_pair("",
+						  " --unit_mass_matrix");
+    output_changes [unit_mass_matrix] = make_pair("",
+						  "1");
+
+    option_name[delta] = "delta";
+    command_changes[delta] = make_pair("",
+				       " --delta=0.75");
+    output_changes [delta] = make_pair("",
+				       "0.75");
+    
+    option_name[gamma] = "gamma";
+    command_changes[gamma] = make_pair("",
+				       " --gamma=0.025");
+    output_changes [gamma] = make_pair("",
+				       "0.025");
+
+    //for (int i = 0; i < options_count; i++) {
+    //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
+    //}
   }
 
   /** 
@@ -191,10 +267,14 @@ public:
     size_t count = fread(&buf, 1, 1024, in);
     while (count > 0) {
       output += string(&buf[0], &buf[count]);
+      //std::cout << "intermediate output: " << output << std::endl;
       count = fread(&buf, 1, 1024, in);
     }
     pclose(in);
     
+    //std::cout << "ran command: " << command << std::endl;
+    //std::cout << "output : \n";
+    //std::cout << output << std::endl << std::endl;
     return output;
   }
 
@@ -309,6 +389,7 @@ public:
     command << model_path;
     command << " --samples=" + model_path + ".csv";
 
+    //for (int i = options_count-1; i > -1; i--) {
     for (int i = 0; i < options_count; i++) {
       string output_option;
       if (!options[i]) {
@@ -323,6 +404,15 @@ public:
                                             output_option));
       }
     }
+    if (!options[warmup]) {
+      int num_iter = options[iter] ? 100 : 2000;
+      int num_warmup = options[warmup] ? 60 : num_iter/2;
+      stringstream warmup;
+      warmup << num_iter - num_warmup;
+      changed_options.push_back(make_pair("warmup",
+                                          warmup.str()));
+    }
+    
     return command.str();
   }
 };
@@ -350,28 +440,43 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
   }
 }
 
-void test_data(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
-  EXPECT_NEAR(expected_mean, c.mean(0U), 3)
+  EXPECT_NEAR(expected_mean, c.mean(0U), 20)
     << "Test that data file is being used";
 }
 
-void test_append_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
-  size_t expected_num_samples = options[append_samples] ? 2000 : 1000;
-  EXPECT_EQ(expected_num_samples, c.num_samples())
-    << "Test that samples are being appended";
+void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+  int num_iter = options[iter] ? 100 : 2000;
+  int num_warmup = options[warmup] ? 60 : num_iter/2;
+  size_t expected_num_samples = num_iter - num_warmup;
+  if (options[thin]) {
+    expected_num_samples = ceil(expected_num_samples / 3.0);
+  }
+  if (options[append_samples]) {
+    EXPECT_EQ(2*expected_num_samples, c.num_samples())
+      << "Test number of samples when appending samples";
+  } else {
+    EXPECT_EQ(expected_num_samples, c.num_samples())
+      << "Test number of samples when not appending samples";
+  }
 }
 
-void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+  if (options[iter] || 
+      options[leapfrog_steps] || 
+      options[epsilon] ||
+      options[delta] ||
+      options[gamma])
+    return;
   // seed / chain_id test
   double expected_first_y;
-  if (options[seed] && !options[append_samples]) {
+  if (options[seed] && !options[append_samples] && !options[warmup]) {
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 
       expected_first_y = options[init] ? 0.265544 : 1.76413;
     }
-
     
     vector<double> sampled_y;
     c.get_samples(0U, 0U, sampled_y);
@@ -392,16 +497,16 @@ void test_seed(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   }
 }
 
-
 TEST_P(ModelCommand, OptionsTest) {
   bitset<options_count> options(GetParam());
   vector<pair<string, string> > changed_options;
   
   std::string command = get_command(options, changed_options);
-  std::cout << command << std::endl;
-  for (int i = 0; i < changed_options.size(); i++) {
-    std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
-  }
+  SCOPED_TRACE(command);
+  //std::cout << command << std::endl;
+  //for (int i = 0; i < changed_options.size(); i++) {
+  //  std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
+  //}
 
   // check_output
   check_output(run_command(command), changed_options);
@@ -409,15 +514,16 @@ TEST_P(ModelCommand, OptionsTest) {
   // test sampled values
   vector<string> names;
   vector<vector<size_t> > dimss;
-  stan::mcmc::read_variables(model_path+".csv", 2U,
+  size_t skip = options[leapfrog_steps] ? 1U : 2U;
+  stan::mcmc::read_variables(model_path+".csv", skip,
                              names, dimss);
       
   stan::mcmc::chains<> c(1U, names, dimss);
-  stan::mcmc::add_chain(c, 0, model_path+".csv", 2U);
+  stan::mcmc::add_chain(c, 0, model_path+".csv", skip);
   
-  test_data(options, c);
-  test_append_samples(options, c);
-  test_seed(options, c);
+  test_sampled_mean(options, c);
+  test_number_of_samples(options, c);
+  test_specific_sample_values(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,

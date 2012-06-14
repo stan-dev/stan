@@ -25,7 +25,7 @@ Why does someone show up on the home page?
  - link to latest Git repository
 
 * Find/join User Group
- - big link to gorups
+ - big link to groups
 
 * Contact / issue tracker
  - big link up top
