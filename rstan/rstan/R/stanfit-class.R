@@ -29,7 +29,11 @@ setMethod("print", signature = (x = "stanfit"),
                    pars, 
                    digits.summary = 3, 
                    ...) { 
-            s <- summary(x, probs, pars, ...); 
+            if (missing(pars)) {
+              s <- summary(x, probs, x@model.pars, ...)  
+            } else {
+              s <- summary(x, probs, pars, ...)  
+            }
             print(round(s, digits.summary), ...) 
           })  
 
@@ -141,6 +145,6 @@ setMethod("summary", signature = (object = "stanfit"),
                           do.call(rbind, rhat), 
                           do.call(rbind, ess)) 
             colnames(mqre) <- c("Mean", "SD", probs2str(probs), "Rhat", "ESS")
-            mqre 
+            invisible(mqre) 
           })  
   

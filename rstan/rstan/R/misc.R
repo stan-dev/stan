@@ -115,6 +115,7 @@ get.model.code <- function(file, model.code = '') {
 
 
 
+# FIXEME: implement more check on the arguments 
 check.args <- function(argss) {
   if (FALSE) stop() 
 } 
@@ -194,9 +195,14 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
   if (!missing(seed))  
       argss[[i]]$seed <- seed; 
 
-  if (!missing(sample.file) && n.chains > 1) 
-    for (i in 1:n.chains) 
-      argss[[i]]$sample_file <- append.id(sample.file, i) 
+  if (!missing(sample.file)) {
+    if (n.chains == 1) 
+        argss[[1]]$sample_file <- sample.file
+    if (n.chains > 1) {
+      for (i in 1:n.chains) 
+        argss[[i]]$sample_file <- append.id(sample.file, i) 
+    }
+  }
 
   check.args(argss) 
   
@@ -211,6 +217,26 @@ probs2str <- function(probs) {
                 drop0trailing = TRUE), 
         "%", sep = '')
 } 
+
+stan.dump <- function(data, file) {
+  # Dump an R list or environment for a model data 
+  # to the R dump file that Stan supports.
+  #
+  # Args:
+  #   data: the data, an object of list of environment.
+  #   file: the output file for dumping the variables. 
+  # 
+  # Retrun:
+ 
+  if (missing(data)) 
+    stop("error: stan.dump needs argument 'data'") 
+  if (missing(file)) 
+    stop("error: stan.dump needs argument 'file', ",
+         "into which the data are dumped.") 
+
+  ### FIXEME, to be implemented. 
+} 
+
 
 #### temporary test code 
 #  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 

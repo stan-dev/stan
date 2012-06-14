@@ -27,14 +27,15 @@ y <- rnorm(20)
 mean(y) 
 sd(y)
 dat <- list(N = 20, y = y); 
-sampling(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
+f <- sampling(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
+
 
 
 sampling(rr, data = dat, n.iter = 2012, init.t = 'user', 
          init.v = list(list(mu = 2)), seed = 3, n.thin = 1, 
          sample.file = 'norm1.csv')
 
-post <- read.csv(file = 'norm1.csv', header = TRUE, skip = 19) 
+post <- read.csv(file = 'norm1.csv', header = TRUE, skip = 19, comment = '#') 
 colMeans(post)
 
 
@@ -58,10 +59,6 @@ sampling(rr, data = dat, n.iter = 2012, init.t = 'random',
          n.chains = 4,
          seed = 3, n.thin = 1, 
          sample.file = yasfile) 
-
-post <- read.csv(file = yasfile, header = TRUE, skip = 19) 
-colMeans(post)
-
 
 
 ## TODO(mav): 

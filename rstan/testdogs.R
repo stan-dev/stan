@@ -113,6 +113,9 @@ dogsrr <- stan.model(model.code = dogsstan, model.name = model_name,
 ss <- sampling(dogsrr, data = dogsdat, n.chains = 3, 
                n.iter = 2012, sample.file = 'dogs.csv')
 
+ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, 
+                n.iter = 2012, sample.file = 'dogs.csv')
+
 
 
   args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
@@ -166,6 +169,7 @@ gelman.diag(tall3)
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19, comment = "#") 
 colMeans(post)
 
+print(ss1)
 summary(ss)
 summary(ss, probs = c(0.25, .5, .75), pars = c('alpha'))
 ex <- extract(ss) 

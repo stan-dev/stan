@@ -62,6 +62,7 @@ setMethod("sampling", "stanmodel",
                                       init.t, init.v, seed, sample.file, ...)
 
             for (i in 1:n.chains) { 
+              # cat("[sampling:] i=", i, "\n")
               # print(args.list[[i]])
               sampler$call_sampler(args.list[[i]]) 
             }

@@ -4,7 +4,9 @@ export (
   stan.model,
 # stan.samples,
   stanc, 
-  stanc.version 
+  stanc.version, 
+  stan,
+  stan.dump
 )
 
 exportClasses (
