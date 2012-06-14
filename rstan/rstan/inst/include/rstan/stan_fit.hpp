@@ -149,17 +149,17 @@ namespace rstan {
         }
 
         stan::mcmc::sample sample = sampler.next();
+        sample.params_r(params_r);
+        sample.params_i(params_i);
+        model.write_array(params_r,params_i,params_inr); 
+        chains.add(chain_id - 1, params_inr); 
   
         // FIXME: use csv_writer arg to make comma optional?
         if (sample_file_flag) { 
           sample_file_stream << sample.log_prob() << ',';
           sampler.write_sampler_params(sample_file_stream);
-          sample.params_r(params_r);
-          sample.params_i(params_i);
           model.write_csv(params_r,params_i,sample_file_stream);
         }
-        model.write_array(params_r,params_i,params_inr); 
-        chains.add(chain_id - 1, params_inr); 
       }
     }
 
@@ -811,7 +811,9 @@ namespace rstan {
            ++it) {
         Rcpp::NumericVector v(2); 
         v[0] = chains_.mean(*it);
+        // rstan::io::rcout << "v[0] = " << v[0] << std::endl;
         v[1] = chains_.sd(*it);
+        // rstan::io::rcout << "v[1] = " << v[1] << std::endl;
         mnsds.push_back(Rcpp::wrap(v)); 
          
       } 
