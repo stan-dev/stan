@@ -1609,6 +1609,9 @@ namespace stan {
         std::string line;
         std::vector<std::string> tokens;
         while (file.peek() != std::istream::traits_type::eof()) {
+          while (file.peek() == '#') { // ignore comments
+            file.ignore(10000, '\n');
+          }
           std::getline(file, line, '\n');
           tokenize(line, ',', tokens);
           theta.clear();

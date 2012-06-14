@@ -577,7 +577,7 @@ namespace stan {
      * @param y Vector to test.
      * @param name
      * @param result
-     * @param Policy Only the policy's type matters.
+     * @tparam Policy Only the policy's type matters.
      * @return <code>true</code> if the vector has positive, ordered
      * values.
      */
