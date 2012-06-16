@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol2_Eyes : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol2_Eyes,
+  public Model_Test_Fixture<Models_BugsExamples_Vol2_Eyes,
                                        true> {
 protected:
   virtual void SetUp() {}

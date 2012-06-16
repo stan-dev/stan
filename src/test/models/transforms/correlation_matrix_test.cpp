@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_Transforms_CorrelationMatrix : 
-  public ::testing::Model_Test_Fixture<Models_Transforms_CorrelationMatrix,
+  public Model_Test_Fixture<Models_Transforms_CorrelationMatrix,
                                        false> {
 protected:
   virtual void SetUp() {

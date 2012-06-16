@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Equiv : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol1_Equiv,
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Equiv,
                                        true> {
 protected:
   virtual void SetUp() {

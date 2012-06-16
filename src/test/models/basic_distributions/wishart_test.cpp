@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_Wishart :
-  public ::testing::Model_Test_Fixture<Models_BasicDistributions_Wishart,
+  public Model_Test_Fixture<Models_BasicDistributions_Wishart,
                                        false> {
 protected:
   virtual void SetUp() {

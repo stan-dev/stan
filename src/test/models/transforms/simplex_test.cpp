@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_Transforms_Simplex : 
-  public ::testing::Model_Test_Fixture<Models_Transforms_Simplex,
+  public Model_Test_Fixture<Models_Transforms_Simplex,
                                        false> {
 protected:
   virtual void SetUp() {
