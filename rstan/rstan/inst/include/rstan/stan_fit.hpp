@@ -381,6 +381,18 @@ namespace rstan {
       for (std::vector<std::string>::const_iterator it = names.begin();
            it != names.end(); 
            ++it) {
+        if (it -> find('[') != it -> npos && 
+            it -> find(']') != it -> npos) { // already a flatname 
+          size_t ts = std::distance(flatnames_.begin(),
+                                    std::find(flatnames_.begin(), 
+                                              flatnames_.end(), *it));       
+          if (ts == flatnames_.size()) 
+            continue; 
+          flatnames.push_back(*it); 
+          indices.push_back(ts); 
+          continue;
+        } 
+
         size_t j = chains_.param_name_to_index(*it);
         std::vector<size_t> j_dims = chains_.param_dims(j); 
         size_t j_size = chains_.param_size(j); 
@@ -878,11 +890,22 @@ namespace rstan {
 
     /**
      * Get all the parameter names that are in the chains object 
-     * @return A R vector of names of the parameters.
+     * @return An R vector of names of the parameters.
      */
     SEXP param_names() {
       std::vector<std::string> names(chains_.param_names());
       return Rcpp::wrap(names); 
+    } 
+
+    /**
+     * Get all the parameter names in forms of `flat names`,
+     * i.e., beta of length 3 would be beta[1], beta[2], beta[3]
+     *
+     * @return An R vector of names of the parameters.
+     */
+
+    SEXP param_flat_names() {
+      return Rcpp::wrap(flatnames_); 
     } 
 
     /**

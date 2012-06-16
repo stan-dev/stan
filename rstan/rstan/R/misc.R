@@ -229,9 +229,9 @@ stan.dump <- function(data, file) {
   # Retrun:
  
   if (missing(data)) 
-    stop("error: stan.dump needs argument 'data'") 
+    stop("stan.dump needs argument 'data'") 
   if (missing(file)) 
-    stop("error: stan.dump needs argument 'file', ",
+    stop("stan.dump needs argument 'file', ",
          "into which the data are dumped.") 
 
   ### FIXEME, to be implemented. 
