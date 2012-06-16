@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_NormalMixture  : 
-  public ::testing::Model_Test_Fixture<Models_BasicDistributions_NormalMixture,
+  public Model_Test_Fixture<Models_BasicDistributions_NormalMixture,
                                        false> {
 protected:
   virtual void SetUp() {

@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Magnesium5 : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol1_Magnesium5,
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Magnesium5,
                                        true> {
 protected:
   virtual void SetUp() {

@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol3_Hepatitis : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol3_Hepatitis,
+  public Model_Test_Fixture<Models_BugsExamples_Vol3_Hepatitis,
                                        true> {
 protected:
   virtual void SetUp() {}

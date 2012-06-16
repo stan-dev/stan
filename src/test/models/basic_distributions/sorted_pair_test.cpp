@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_SortedPair : 
-  public ::testing::Model_Test_Fixture<Models_BasicDistributions_SortedPair,
+  public Model_Test_Fixture<Models_BasicDistributions_SortedPair,
                                        false> {
 protected:
   virtual void SetUp() {

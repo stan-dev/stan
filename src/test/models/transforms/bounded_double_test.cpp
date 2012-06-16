@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_Transforms_BoundedDouble : 
-  public ::testing::Model_Test_Fixture<Models_Transforms_BoundedDouble,
+  public Model_Test_Fixture<Models_Transforms_BoundedDouble,
                                        false> {
 protected:
   virtual void SetUp() {

@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_Misc_EightSchools : 
-  public ::testing::Model_Test_Fixture<Models_Misc_EightSchools,
+  public Model_Test_Fixture<Models_Misc_EightSchools,
                                        true> {
 protected:
   virtual void SetUp() {

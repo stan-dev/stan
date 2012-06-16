@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicEstimators_Bernoulli : 
-  public ::testing::Model_Test_Fixture<Models_BasicEstimators_Bernoulli,
+  public Model_Test_Fixture<Models_BasicEstimators_Bernoulli,
                                        true> {
 protected:
   virtual void SetUp() {
