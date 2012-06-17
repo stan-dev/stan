@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Rats : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol1_Rats,
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Rats,
                                        true> {
 protected:
   virtual void SetUp() {

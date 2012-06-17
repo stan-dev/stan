@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicEstimators_NormalLoc : 
-  public ::testing::Model_Test_Fixture<Models_BasicEstimators_NormalLoc,
+  public Model_Test_Fixture<Models_BasicEstimators_NormalLoc,
                                        true> {
 protected:
   virtual void SetUp() {

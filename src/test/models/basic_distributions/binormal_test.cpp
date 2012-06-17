@@ -3,7 +3,7 @@
 #include <boost/math/distributions/students_t.hpp>
 
 class Models_BasicDistributions_Binormal : 
-  public ::testing::Model_Test_Fixture<Models_BasicDistributions_Binormal,
+  public Model_Test_Fixture<Models_BasicDistributions_Binormal,
                                        false> {
 protected:
   double expected_y1;

@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol2_Birats : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol2_Birats,
+  public Model_Test_Fixture<Models_BugsExamples_Vol2_Birats,
                                        true> {
 protected:
   virtual void SetUp() {}

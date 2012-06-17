@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol3_Parallelagram : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol3_Parallelagram,
+  public Model_Test_Fixture<Models_BugsExamples_Vol3_Parallelagram,
                                        true> {
 protected:
   virtual void SetUp() {}

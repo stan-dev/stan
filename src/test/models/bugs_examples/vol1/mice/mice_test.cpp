@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Mice : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol1_Mice,
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Mice,
                                        true> {
 protected:
   virtual void SetUp() {

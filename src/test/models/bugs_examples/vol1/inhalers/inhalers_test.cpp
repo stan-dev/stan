@@ -2,7 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Inhalers : 
-  public ::testing::Model_Test_Fixture<Models_BugsExamples_Vol1_Inhalers,
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Inhalers,
                                        true> {
 protected:
   virtual void SetUp() {
