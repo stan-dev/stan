@@ -21,7 +21,13 @@ stan.model <- function(file, verbose = FALSE,
   # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
   stan_fit_cpp_module <- eval(call("$", mod, model.name))
   new("stanmodel", model.name = model.name, 
-      .modelmod = list(sampler = stan_fit_cpp_module)) 
+      .modelmod = list(sampler = stan_fit_cpp_module, 
+                       cxxfun = fx)) # keep a reference of fx
+
+  ## We keep a reference to *fx* above to avoid fx to be 
+  ## deleted by R's garbage collection. Note that if fx 
+  ## is freed, we lost the compiled shared object, which
+  ## then cause segfault later. 
 
 } 
 

@@ -29,11 +29,10 @@ setMethod("print", signature = (x = "stanfit"),
                    pars, 
                    digits.summary = 3, 
                    ...) { 
-            if (missing(pars)) {
-              s <- summary(x, probs, x@model.pars, ...)  
-            } else {
-              s <- summary(x, probs, pars, ...)  
-            }
+            if (missing(pars))  
+              pars <- x@model.pars
+
+            s <- summary(x, probs, pars, ...)  
             print(round(s, digits.summary), ...) 
           })  
 
@@ -61,7 +60,7 @@ check.pars <- function(object, pars) {
 } 
   
 
-get_all_chain_samples <- function(object, pars = object@model.pars) {
+get.all.chain.samples <- function(object, pars = object@model.pars) {
   
   # Get all the samples for all the chains
   # 
@@ -190,7 +189,6 @@ setMethod("summary", signature = (object = "stanfit"),
           })  
 
 
-
 traceplot <- function(object, pars) {
 
   if (missing(pars)) {
@@ -199,27 +197,32 @@ traceplot <- function(object, pars) {
     pars <- check.pars(pars) 
   }
   
-  ss <- get_all_chain_samples(object, pars) 
+  sampleshandle <- object@.fit$sampleshandle  
+  ss <- get.all.chain.samples(object, pars) 
 
-  Index <- 1:nrow(ss[[1]]) 
+  ## use the n.warmup and n.thin for the first chain 
+  chain1_args <- sampleshandle$get_chain_stan_args(1) 
 
   pars <- colnames(ss[[1]]) 
 
   # using tmpnames without '[' and ']', which seems to be 
   # difficult to deal with. 
-  tmpnames <- c(paste("par", 1:length(pars), sep = ''), "Iteraion")
+  tmpnames <- c(paste("par", 1:length(pars), sep = ''), "Iterations")
    
   ss <- lapply(ss, FUN = function(x) {
-                     x2 <- cbind(x, Index)
+                     x2 <- cbind(x, 1:nrow(x) * chain1_args$n.thin) 
                      colnames(x2) <- tmpnames 
                      data.frame(x2) }) 
 
-  # FIXME: how to deal with warmup and thin 
-  n.warmup <- 500
-  
-  rects <- data.frame(xs = c(-Inf, 500),  # FIXME, warmup 
-                      xe = c(500, Inf), 
-                      col = c('blue', 'red')) # FIXME, color 
+  tplot.b.col <- 
+    do.call(c, get.rstan.options(c("plot.warmup.color", "plot.kept.color"))) 
+  tplot.l.cols <- get.rstan.options("plot.chains.colors") 
+
+
+  rects <- data.frame(xs = c(-Inf, chain1_args$n.warmup),  
+                      xe = c(chain1_args$n.warmup, Inf), 
+                      col = tplot.b.col) 
+
 
   for (i in 1:length(pars)) {
     p <- ggplot() + 
@@ -229,23 +232,21 @@ traceplot <- function(object, pars) {
     vname <- paste("par", i, sep = '')
 
     for (k in 1:object@num.chains) {
-    
       p <- p + 
-        geom_line(data = ss[[k]], aes_string(x = "Iteraions", y = vname)) + 
+        geom_line(data = ss[[k]], 
+                  aes_string(x = "Iterations", y = vname), 
+                  color = tplot.l.cols[k]) + 
         opts(legend.position = "none") + 
         ylab(pars[i])   
         # FIXME: 
         # need points as well?  # geom_point() 
         # layout 
-        # warmup + thin + total # of iters
-        # color options 
     }
+    
     print(p)
   } 
 } 
 
-
-      
 
 setMethod("traceplot", 
           signature(object = "stanfit", 

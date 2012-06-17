@@ -458,7 +458,7 @@ namespace rstan {
       std::map<size_t, stan_args>::const_iterator it
         = argss_.find(k);  
       if (it != argss_.end()) 
-        return (it -> second).get_stan_args(); 
+        return (it -> second).stan_args_to_rlist(); 
       rstan::io::rcerr << "error: chain id " << chain_id 
                        << " not found." << std::endl;
       return R_NilValue;
@@ -480,7 +480,7 @@ namespace rstan {
       for (std::map<size_t, stan_args>::const_iterator it = argss_.begin(); 
            it != argss_.end(); 
            ++it)   
-        lst[cname + to_string(it -> first)] = (it -> second).get_stan_args(); 
+        lst[cname + to_string(it -> first)] = (it -> second).stan_args_to_rlist(); 
 
       return lst;
     }

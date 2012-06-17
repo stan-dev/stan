@@ -73,7 +73,10 @@ setMethod("sampling", "stanmodel",
                 model.name = object@model.name, 
                 model.pars = sampler$param_names(),
                 num.chains = n.chains, 
-                .fit = list(sampleshandle = sampler)) 
+                .fit = list(sampleshandle = sampler, 
+                            stanmodel = object)) 
+                            # keep a ref to avoid garbage collection
+                            # (see comments in fun stan.model) 
               
           })  
 

@@ -225,7 +225,7 @@ namespace rstan {
      * return all the arguments used as an R list
      * @return An R list containing all the arguments for a chain. 
      */ 
-    SEXP get_stan_args() const {
+    SEXP stan_args_to_rlist() const {
       Rcpp::List lst; 
       if (sample_file_flag) 
         lst["sample_file"] = sample_file; 

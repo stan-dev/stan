@@ -210,13 +210,14 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
 } 
 
 
-probs2str <- function(probs) {
+probs2str <- function(probs, digits = 1) {
   paste(formatC(probs * 100,  
-                digits = 1, 
+                digits = digits, 
                 format = 'f', 
                 drop0trailing = TRUE), 
         "%", sep = '')
 } 
+
 
 stan.dump <- function(data, file) {
   # Dump an R list or environment for a model data 
@@ -236,7 +237,6 @@ stan.dump <- function(data, file) {
 
   ### FIXEME, to be implemented. 
 } 
-
 
 #### temporary test code 
 #  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
