@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__PARTIALS_VARI_HPP__
 
 #include <stan/agrad/agrad.hpp>
+#include <stan/agrad/special_functions.hpp>
 
 namespace stan {
 
@@ -128,11 +129,11 @@ namespace stan {
      * @param y3 Third operand.
      * @param dy3 Derivative of variable with respect to third operand.
      */
-    inline var simple_var(double v, 
-                          const var& y1, double dy1, 
-                          const var& y2, double dy2,
-                          const var& y3, double dy3) {
-      return var(new partials3_vari(v,
+    inline agrad::var simple_var(double v, 
+                                 const agrad::var& y1, double dy1, 
+                                 const agrad::var& y2, double dy2,
+                                 const agrad::var& y3, double dy3) {
+      return agrad::var(new agrad::partials3_vari(v,
                                     y1.vi_, dy1,
                                     y2.vi_, dy2,
                                     y3.vi_, dy3));
@@ -149,11 +150,11 @@ namespace stan {
      * @param y2 Second operand.
      * @param dy2 Derivative of variable with respect to second operand.
      */
-    inline var simple_var(double v, 
-                          const var& y1, double dy1, 
-                          const var& y2, double dy2,
+    inline agrad::var simple_var(double v, 
+                          const agrad::var& y1, double dy1, 
+                          const agrad::var& y2, double dy2,
                           double /*y3*/, double /*dy3*/) {
-      return var(new partials2_vari(v,
+      return agrad::var(new agrad::partials2_vari(v,
                                     y1.vi_, dy1,
                                     y2.vi_, dy2));
     }
@@ -169,11 +170,11 @@ namespace stan {
      * @param y3 Third operand.
      * @param dy3 Derivative of variable with respect to third operand.
      */
-    inline var simple_var(double v, 
-                          const var& y1, double dy1, 
+    inline agrad::var simple_var(double v, 
+                          const agrad::var& y1, double dy1, 
                           double /*y2*/, double /*dy2*/,
-                          const var& y3, double dy3) {
-      return var(new partials2_vari(v,
+                          const agrad::var& y3, double dy3) {
+      return agrad::var(new agrad::partials2_vari(v,
                                     y1.vi_, dy1,
                                     y3.vi_, dy3));
     }
@@ -187,11 +188,11 @@ namespace stan {
      * @param y1 First operand.
      * @param dy1 Derivative of variable with respect to first operand.
      */
-    inline var simple_var(double v, 
-                          const var& y1, double dy1, 
+    inline agrad::var simple_var(double v, 
+                          const agrad::var& y1, double dy1, 
                           double /*y2*/, double /*dy2*/,
                           double y3, double dy3) {
-      return var(new partials1_vari(v,
+      return agrad::var(new agrad::partials1_vari(v,
                                     y1.vi_, dy1));
     }
 
@@ -206,11 +207,11 @@ namespace stan {
      * @param y3 Third operand.
      * @param dy3 Derivative of variable with respect to third operand.
      */
-    inline var simple_var(double v, 
+    inline agrad::var simple_var(double v, 
                           double /*y1*/, double /*dy*/, 
-                          const var& y2, double dy2,
-                          const var& y3, double dy3) {
-      return var(new partials2_vari(v,
+                          const agrad::var& y2, double dy2,
+                          const agrad::var& y3, double dy3) {
+      return agrad::var(new agrad::partials2_vari(v,
                                     y2.vi_, dy2,
                                     y3.vi_, dy3));
     }
@@ -224,11 +225,11 @@ namespace stan {
      * @param y2 Second operand.
      * @param dy2 Derivative of variable with respect to second operand.
      */
-    inline var simple_var(double v, 
+    inline agrad::var simple_var(double v, 
                           double /*y1*/, double /*dy1*/, 
-                          const var& y2, double dy2,
+                          const agrad::var& y2, double dy2,
                           double /*y3*/, double /*dy3*/) {
-      return var(new partials1_vari(v,
+      return agrad::var(new agrad::partials1_vari(v,
                                     y2.vi_, dy2));
     }
 
@@ -241,11 +242,11 @@ namespace stan {
      * @param y3 Third operand.
      * @param dy3 Derivative of variable with respect to third operand.
      */
-    inline var simple_var(double v, 
+    inline agrad::var simple_var(double v, 
                           double /*y1*/, double /*dy1*/, 
                           double /*y2*/, double /*dy2*/,
-                          const var& y3, double dy3) {
-      return var(new partials1_vari(v,
+                          const agrad::var& y3, double dy3) {
+      return agrad::var(new agrad::partials1_vari(v,
                                     y3.vi_, dy3));
     }
 
