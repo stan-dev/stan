@@ -756,3 +756,39 @@ C++ API MANUAL
 
 * Goes along with cleaning up API doc and privatizing
 
+
+Speed Comparisons (vs. JAGS)
+======================================================================
+
+* Run JAGS compiled with g++ -O3
+
+* Look at models where Stan performs well
+  e.g.  logistic or linear regression w. Cauchy and Normal prior
+  - varying model shapes (step up exponentially)
+    + number of data items
+    + number of parameters
+    + correlation of parameters (multi-variate Cauchy or Normal)
+    + interaction of params (? need this with correlation ?)
+    + conjugate vs. non-conjugate priors
+      (well and misspecified -- more stats than speed issue)
+
+* Single threaded
+
+* Run 4 chains (each of same length) of each system (Stan and JAGS)
+  - until convergence by split R-hat (all params under 1.05)
+  - total (across all chains) ESS is > 100 (and < 150 or something?)
+    (e.g., 25/25/25/25, or 15/35/20/30)
+  - report time in effective samples/second
+
+* Report multiple runs of each (10? 100?)
+  - histograms/densities or mean/sd of multiple runs
+  - how much will it vary by seed
+
+* Throw away first half of each run?
+  - to start, until split convergence/sample speeds
+
+* Ideally, measure:
+  - time to converge to equilibrium
+  - ESS rate at equilibrium
+
+
