@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Blocker : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_Blocker,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Blocker> {
 protected:
   virtual void SetUp() {
   }
@@ -16,6 +15,9 @@ public:
     model_path.push_back("blocker");
     model_path.push_back("blocker");
     return model_path;
+  }
+  static bool has_data() {
+    return true;
   }
 };
 

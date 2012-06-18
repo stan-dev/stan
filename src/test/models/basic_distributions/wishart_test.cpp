@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_Wishart :
-  public Model_Test_Fixture<Models_BasicDistributions_Wishart,
-                                       false> {
+  public Model_Test_Fixture<Models_BasicDistributions_Wishart> {
 protected:
   virtual void SetUp() {
   }
@@ -14,6 +13,9 @@ public:
     model_path.push_back("basic_distributions");
     model_path.push_back("wishart");
     return model_path;
+  }
+  static bool has_data() {
+    return false;
   }
 };
 

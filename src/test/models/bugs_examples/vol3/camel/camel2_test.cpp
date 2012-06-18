@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol3_Camel2 : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol3_Camel2,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol3_Camel2> {
 protected:
   virtual void SetUp() {}
 public:
@@ -15,6 +14,9 @@ public:
     model_path.push_back("camel");
     model_path.push_back("camel2");
     return model_path;
+  }
+  static bool has_data() {
+    return true;
   }
 };
 

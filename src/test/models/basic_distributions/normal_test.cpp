@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_Normal : 
-  public Model_Test_Fixture<Models_BasicDistributions_Normal,
-                                       false> {
+  public Model_Test_Fixture<Models_BasicDistributions_Normal> {
 protected:
   virtual void SetUp() {
   }
@@ -14,6 +13,9 @@ public:
     model_path.push_back("basic_distributions");
     model_path.push_back("normal");
     return model_path;
+  }
+  static bool has_data() {
+    return false;
   }
 };
 

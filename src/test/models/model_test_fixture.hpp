@@ -11,13 +11,10 @@
  *
  * Derived classes must define:
  *   static std::vector<std::string> get_model_path()
- * 
- * Template parameters:
- *   bool has_data: indicates whether the model has data
- *   size_t chains: number of chains to run
+ *   static bool has_data()
+ *   - indicates whether the model has data
  */
-template <class Derived,
-          bool has_data = false>
+template <class Derived>
 class Model_Test_Fixture : public ::testing::Test {
   
 public:
@@ -114,11 +111,24 @@ public:
     std::stringstream command;
     command << model_path;
     command << " --samples=" << get_csv_file(chain);
-    if (has_data) {
+    if (has_data()) {
       command << " --data=" << model_path << ".Rdata";
     }
     return command.str();
   }
+
+
+  /** 
+   * Populates the chains object with data from csv files.
+   */
+  static void populate_chains() {
+    if (chains->num_kept_samples() == 0U) {
+      for (size_t chain = 0U; chain < num_chains; chain++) {
+        stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), 2U);
+      }
+    }
+  }
+  
     
   /** 
    * Runs the model num_chains times.
@@ -155,16 +165,6 @@ public:
     return (new stan::mcmc::chains<>(num_chains, names, dimss));
   }
 
-  /** 
-   * Populates the chains object with data from csv files.
-   */
-  static void populate_chains() {
-    if (chains->num_kept_samples() == 0U) {
-      for (size_t chain = 0U; chain < num_chains; chain++) {
-        stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), 2U);
-      }
-    }
-  }
 
   /** 
    * Return the path to the model (without the extension) as
@@ -175,24 +175,32 @@ public:
   static std::vector<std::string> get_model_path() {
     return Derived::get_model_path();
   }
+  
+  /**
+   * Return true if the model has data.
+   *
+   * @return true if the model has data;
+   *         false otherwise.
+   */
+  static bool has_data() {
+    return Derived::has_data();
+  }
     
 };
   
-template<class Derived, bool has_data> 
-char Model_Test_Fixture<Derived, 
-                        has_data>::path_separator;
-  
-template<class Derived, bool has_data> 
-std::string Model_Test_Fixture<Derived, 
-                               has_data>::model_path;
+template<class Derived> 
+char Model_Test_Fixture<Derived>::path_separator;
 
-template<class Derived, bool has_data> 
-stan::mcmc::chains<> *Model_Test_Fixture<Derived,
-                                         has_data>::chains;
+template<class Derived> 
+stan::mcmc::chains<> *Model_Test_Fixture<Derived>::chains;
 
-template<class Derived, bool has_data>
-size_t Model_Test_Fixture<Derived,
-			  has_data>::num_chains = 2;
-  
+template<class Derived>
+size_t Model_Test_Fixture<Derived>::num_chains = 2;
+
+template<class Derived>
+std::string Model_Test_Fixture<Derived>::model_path;
+
+
+
 #endif
 

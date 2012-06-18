@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicEstimators_Bernoulli : 
-  public Model_Test_Fixture<Models_BasicEstimators_Bernoulli,
-                                       true> {
+  public Model_Test_Fixture<Models_BasicEstimators_Bernoulli> {
 protected:
   virtual void SetUp() {
   }
@@ -14,6 +13,9 @@ public:
     model_path.push_back("basic_estimators");
     model_path.push_back("bernoulli");
     return model_path;
+  }
+  static bool has_data() {
+    return true;
   }
 };
 

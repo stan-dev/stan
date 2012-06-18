@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_InvWishart : 
-  public Model_Test_Fixture<Models_BasicDistributions_InvWishart,
-                                       false> {
+  public Model_Test_Fixture<Models_BasicDistributions_InvWishart> {
 protected:
   virtual void SetUp() {
   }
@@ -16,6 +15,9 @@ public:
     return model_path;
   }
 
+  static bool has_data() {
+    return false;
+  }
 };
 
 TEST_F(Models_BasicDistributions_InvWishart,RunModel) {

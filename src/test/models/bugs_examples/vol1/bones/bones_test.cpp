@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Bones : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_Bones,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Bones> {
 protected:
   virtual void SetUp() {
   }
@@ -16,6 +15,9 @@ public:
     model_path.push_back("bones");
     model_path.push_back("bones");
     return model_path;
+  }
+  static bool has_data() {
+    return true;
   }
 };
 

@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol2_Endo3 : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol2_Endo3,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol2_Endo3> {
 protected:
   virtual void SetUp() {}
 public:
@@ -17,6 +16,9 @@ public:
     return model_path;
   }
 
+  static bool has_data() {
+    return true;
+  }
 };
 
 TEST_F(Models_BugsExamples_Vol2_Endo3,RunModel) {

@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_Transforms_BoundedDouble : 
-  public Model_Test_Fixture<Models_Transforms_BoundedDouble,
-                                       false> {
+  public Model_Test_Fixture<Models_Transforms_BoundedDouble> {
 protected:
   virtual void SetUp() {
   }
@@ -14,6 +13,9 @@ public:
     model_path.push_back("transforms");
     model_path.push_back("bounded_double");
     return model_path;
+  }
+  static bool has_data() {
+    return false;
   }
 };
 
