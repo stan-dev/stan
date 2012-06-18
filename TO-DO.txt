@@ -775,10 +775,11 @@ Speed Comparisons (vs. JAGS)
 * Single threaded
 
 * Run 4 chains (each of same length) of each system (Stan and JAGS)
+  - diffuse initializations (hand generate for each)
   - until convergence by split R-hat (all params under 1.05)
   - total (across all chains) ESS is > 100 (and < 150 or something?)
     (e.g., 25/25/25/25, or 15/35/20/30)
-  - report time in effective samples/second
+  - report time in effective samples/second for min ESS parameter
 
 * Report multiple runs of each (10? 100?)
   - histograms/densities or mean/sd of multiple runs
