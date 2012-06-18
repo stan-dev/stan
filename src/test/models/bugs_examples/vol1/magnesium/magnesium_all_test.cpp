@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_MagnesiumAll : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_MagnesiumAll,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_MagnesiumAll> {
 protected:
   virtual void SetUp() {
   }
@@ -18,8 +17,11 @@ public:
     return model_path;
   }
 
+  static bool has_data() {
+    return true;
+  }
 };
 
-TEST_F(Models_BugsExamples_Vol1_MagnesiumAll,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_MagnesiumAll,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol1_MagnesiumAll);

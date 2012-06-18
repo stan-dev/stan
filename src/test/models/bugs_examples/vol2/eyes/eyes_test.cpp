@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol2_Eyes : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol2_Eyes,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol2_Eyes> {
 protected:
   virtual void SetUp() {}
 public:
@@ -17,8 +16,11 @@ public:
     return model_path;
   }
 
+  static bool has_data() {
+    return true;
+  }
 };
 
-TEST_F(Models_BugsExamples_Vol2_Eyes,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Eyes,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol2_Eyes);

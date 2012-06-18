@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_Triangle : 
-  public Model_Test_Fixture<Models_BasicDistributions_Triangle,
-                                       false> {
+  public Model_Test_Fixture<Models_BasicDistributions_Triangle> {
 protected:
   virtual void SetUp() {
   }
@@ -15,8 +14,11 @@ public:
     model_path.push_back("triangle");
     return model_path;
   }
+  static bool has_data() {
+    return false;
+  }
 };
 
-TEST_F(Models_BasicDistributions_Triangle,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Triangle,
+			      Model_Test_Fixture,
+			      Models_BasicDistributions_Triangle);
