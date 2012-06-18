@@ -321,3 +321,9 @@ TEST(MathsSpecialFunctions, ibeta) {
   EXPECT_FLOAT_EQ(1.0, ibeta(0.1, 1.5, 1.0))  << "reasonable values for a, b, x";
 }
 
+TEST(MathsSpecialFunctions, value_of) {
+  using stan::math::value_of;
+  double x = 5.0;
+  EXPECT_FLOAT_EQ(5.0,value_of(x));
+  EXPECT_FLOAT_EQ(5.0,value_of(5));
+}

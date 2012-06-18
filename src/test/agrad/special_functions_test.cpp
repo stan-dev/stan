@@ -1439,3 +1439,13 @@ TEST(AgradSpecialFunctions,ibeta_ddv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b, c.val()),grad_f[0]);
 }
+
+TEST(AgradSpecialFunctions,value_of) {
+  using stan::agrad::var;
+  using stan::math::value_of;
+
+  var a = 5.0;
+  EXPECT_FLOAT_EQ(5.0, value_of(a));
+  EXPECT_FLOAT_EQ(5.0, value_of(5.0)); // make sure all work together
+  EXPECT_FLOAT_EQ(5.0, value_of(5));
+}
