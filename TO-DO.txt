@@ -70,6 +70,20 @@ CODE CLEANUP
 Stan-R
 ======================================================================
 
+* stan-dump (write a better dump reader in C++)
+
+* order of plots should match declaration order
+
+* include greyed out warmup in traceplot
+
+* color highlight bad R-hat values (red / orange ?)
+  -- need enough contrast
+
+* do variable-at-a-time traceplot
+  -- traceplot(fit) -- array of traceplots for all vals (truncated)
+  -- traceplot(fit,"a") -- array of traceplots for a (truncated)
+  -- traceplot(fit,"a[5,3]") -- traceplot for a[5,3]
+
 * break out into own project with its own license (GPL)
   - still include on Stan page, just flag license, or
   - break out into own project
