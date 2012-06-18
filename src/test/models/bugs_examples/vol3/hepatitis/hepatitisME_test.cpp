@@ -20,6 +20,6 @@ public:
   }
 };
 
-TEST_F(Models_BugsExamples_Vol3_HepatitisME,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_HepatitisME,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol3_HepatitisME);

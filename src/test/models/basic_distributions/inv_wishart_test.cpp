@@ -20,6 +20,6 @@ public:
   }
 };
 
-TEST_F(Models_BasicDistributions_InvWishart,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_InvWishart,
+			      Model_Test_Fixture,
+			      Models_BasicDistributions_InvWishart);

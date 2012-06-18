@@ -19,6 +19,6 @@ public:
   }
 };
 
-TEST_F(Models_Transforms_Simplex,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_Transforms_Simplex,
+			      Model_Test_Fixture,
+			      Models_Transforms_Simplex);

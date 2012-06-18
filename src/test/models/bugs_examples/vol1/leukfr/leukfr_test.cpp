@@ -22,6 +22,6 @@ public:
   }
 };
 
-TEST_F(Models_BugsExamples_Vol1_Leukfr,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Leukfr,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol1_Leukfr);

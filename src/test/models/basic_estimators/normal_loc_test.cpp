@@ -20,6 +20,6 @@ public:
   }
 };
 
-TEST_F(Models_BasicEstimators_NormalLoc,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicEstimators_NormalLoc,
+			      Model_Test_Fixture,
+			      Models_BasicEstimators_NormalLoc);

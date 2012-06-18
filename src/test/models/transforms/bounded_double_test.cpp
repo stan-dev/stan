@@ -19,6 +19,6 @@ public:
   }
 };
 
-TEST_F(Models_Transforms_BoundedDouble,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_Transforms_BoundedDouble,
+			      Model_Test_Fixture,
+			      Models_Transforms_BoundedDouble);

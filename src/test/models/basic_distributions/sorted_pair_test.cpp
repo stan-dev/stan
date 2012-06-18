@@ -20,6 +20,6 @@ public:
   }
 };
 
-TEST_F(Models_BasicDistributions_SortedPair,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_SortedPair,
+			      Model_Test_Fixture,
+			      Models_BasicDistributions_SortedPair);

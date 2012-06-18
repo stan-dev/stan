@@ -202,5 +202,13 @@ std::string Model_Test_Fixture<Derived>::model_path;
 
 
 
-#endif
+TYPED_TEST_CASE_P(Model_Test_Fixture);
 
+TYPED_TEST_P(Model_Test_Fixture, RunModel) {
+  TypeParam::run_model();
+}
+
+REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
+			   RunModel);
+
+#endif

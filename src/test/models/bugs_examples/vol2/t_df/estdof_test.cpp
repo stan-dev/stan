@@ -21,6 +21,6 @@ public:
   }
 };
 
-TEST_F(Models_BugsExamples_Vol2_Estdof,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Estdof,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol2_Estdof);

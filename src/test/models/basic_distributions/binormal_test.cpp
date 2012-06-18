@@ -27,7 +27,11 @@ public:
   }
 };
 
-TEST_F(Models_BasicDistributions_Binormal,RunModel) {
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Binormal,
+			      Model_Test_Fixture,
+			      Models_BasicDistributions_Binormal);
+
+/*TEST_F(Models_BasicDistributions_Binormal,RunModel) {
   run_model();
 }
 TEST_F(Models_BasicDistributions_Binormal, y1) {
@@ -66,3 +70,4 @@ TEST_F(Models_BasicDistributions_Binormal, y2) {
   EXPECT_NEAR(expected_y2, y2_mean, T*se)
     << "T is: " << T << " and se is: " << se << std::endl;
 }
+*/

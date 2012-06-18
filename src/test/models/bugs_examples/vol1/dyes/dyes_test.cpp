@@ -21,6 +21,6 @@ public:
   }
 };
 
-TEST_F(Models_BugsExamples_Vol1_Dyes,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Dyes,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol1_Dyes);
