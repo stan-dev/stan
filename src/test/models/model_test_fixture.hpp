@@ -17,14 +17,14 @@
  *   size_t chains: number of chains to run
  */
 template <class Derived,
-          bool has_data = false,
-          size_t num_chains = 2>
+          bool has_data = false>
 class Model_Test_Fixture : public ::testing::Test {
   
-protected:
+public:
   static char path_separator;
   static std::string model_path;
   static stan::mcmc::chains<> *chains;
+  static size_t num_chains;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -166,8 +166,6 @@ protected:
     }
   }
 
-public:
-    
   /** 
    * Return the path to the model (without the extension) as
    * a vector.
@@ -180,20 +178,21 @@ public:
     
 };
   
-template<class Derived, bool has_data, size_t num_chains> 
+template<class Derived, bool has_data> 
 char Model_Test_Fixture<Derived, 
-                        has_data, 
-                        num_chains>::path_separator;
+                        has_data>::path_separator;
   
-template<class Derived, bool has_data, size_t num_chains> 
+template<class Derived, bool has_data> 
 std::string Model_Test_Fixture<Derived, 
-                               has_data, 
-                               num_chains>::model_path;
+                               has_data>::model_path;
 
-template<class Derived, bool has_data, size_t num_chains> 
+template<class Derived, bool has_data> 
 stan::mcmc::chains<> *Model_Test_Fixture<Derived,
-                                         has_data,
-                                         num_chains>::chains;
+                                         has_data>::chains;
+
+template<class Derived, bool has_data>
+size_t Model_Test_Fixture<Derived,
+			  has_data>::num_chains = 2;
   
 #endif
 
