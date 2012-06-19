@@ -47,6 +47,9 @@ PATH_SEPARATOR = /
 ##
 -include make/os_detect
 
+%$(EXE) : %.o %.cpp bin/libstan.a
+	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+
 ##
 # Tell make the default way to compile a .o file.
 ##

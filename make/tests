@@ -70,7 +70,7 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: lib/gtest/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
+	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Generate autodependencies for test files.
@@ -88,7 +88,7 @@ test/gtest.o: lib/gtest/src/gtest-all.cc
 $(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
+	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 ifeq ($(findstring test-,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
@@ -99,14 +99,14 @@ endif
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	$(CC) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LDFLAGS) $(LIBGTEST) $(LDLIBS)
+	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 ifeq ($(findstring test-,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION)
+	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for generating dependencies.
