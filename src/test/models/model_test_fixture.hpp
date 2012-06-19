@@ -114,6 +114,7 @@ public:
     if (has_data()) {
       command << " --data=" << model_path << ".Rdata";
     }
+    command << " --refresh=2000";
     return command.str();
   }
 
