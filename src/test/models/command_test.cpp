@@ -119,7 +119,7 @@ public:
     expected_help_options.push_back("epsilon_pm");
     expected_help_options.push_back("unit_mass_matrix");
     expected_help_options.push_back("delta");
-    expected_help_options.push_back("gamma_opt");
+    expected_help_options.push_back("gamma");
     expected_help_options.push_back("test_grad");
 
     expected_output.push_back(make_pair("data","(specified model requires no data)"));
@@ -138,7 +138,7 @@ public:
     expected_output.push_back(make_pair("epsilon", "-1"));
     expected_output.push_back(make_pair("epsilon_pm", "0"));
     expected_output.push_back(make_pair("delta", "0.5"));
-    expected_output.push_back(make_pair("gamma_opt", "0.05"));
+    expected_output.push_back(make_pair("gamma", "0.05"));
     
     option_name.resize(options_count);    
     command_changes.resize(options_count);
@@ -234,9 +234,9 @@ public:
     output_changes [delta] = make_pair("",
                                        "0.75");
     
-    option_name[gamma_opt] = "gamma_opt";
+    option_name[gamma_opt] = "gamma";
     command_changes[gamma_opt] = make_pair("",
-                                       " --gamma_opt=0.025");
+                                       " --gamma=0.025");
     output_changes [gamma_opt] = make_pair("",
                                        "0.025");
 
