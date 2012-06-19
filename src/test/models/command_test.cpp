@@ -19,7 +19,7 @@ using std::bitset;
 using testing::Combine;
 using testing::Range;
 
-enum options {
+enum cl_options {
   append_samples, // should be first option
   data,
   init,
@@ -34,7 +34,7 @@ enum options {
   epsilon_pm,
   unit_mass_matrix,
   delta,
-  gamma,
+  gamma_opt,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -119,7 +119,7 @@ public:
     expected_help_options.push_back("epsilon_pm");
     expected_help_options.push_back("unit_mass_matrix");
     expected_help_options.push_back("delta");
-    expected_help_options.push_back("gamma");
+    expected_help_options.push_back("gamma_opt");
     expected_help_options.push_back("test_grad");
 
     expected_output.push_back(make_pair("data","(specified model requires no data)"));
@@ -138,7 +138,7 @@ public:
     expected_output.push_back(make_pair("epsilon", "-1"));
     expected_output.push_back(make_pair("epsilon_pm", "0"));
     expected_output.push_back(make_pair("delta", "0.5"));
-    expected_output.push_back(make_pair("gamma", "0.05"));
+    expected_output.push_back(make_pair("gamma_opt", "0.05"));
     
     option_name.resize(options_count);    
     command_changes.resize(options_count);
@@ -234,10 +234,10 @@ public:
     output_changes [delta] = make_pair("",
                                        "0.75");
     
-    option_name[gamma] = "gamma";
-    command_changes[gamma] = make_pair("",
-                                       " --gamma=0.025");
-    output_changes [gamma] = make_pair("",
+    option_name[gamma_opt] = "gamma_opt";
+    command_changes[gamma_opt] = make_pair("",
+                                       " --gamma_opt=0.025");
+    output_changes [gamma_opt] = make_pair("",
                                        "0.025");
 
     //for (int i = 0; i < options_count; i++) {
@@ -467,11 +467,13 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
       options[leapfrog_steps] || 
       options[epsilon] ||
       options[delta] ||
-      options[gamma])
+      options[gamma_opt])
     return;
   // seed / chain_id test
   double expected_first_y;
-  if (options[seed] && !options[append_samples] && !options[warmup]) {
+  if (options[seed] 
+      && !options[append_samples] 
+      && !options[warmup]) {
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 
