@@ -66,6 +66,7 @@ TEST(io_dump, reader_double) {
 TEST(io_dump, reader_int) {
   test_val("a",5,"a <- 5");
   test_val("a",-1,"a <- -1");
+  test_val("a",8,"a <- 8L");
 }
 
 TEST(io_dump, reader_doubles) {
@@ -111,7 +112,20 @@ TEST(io_dump, reader_ints) {
   vs.push_back(-2);
   vs.push_back(3);
   vs.push_back(0);
-  test_list("b12",vs,"b12 <- c(-5, -2, 3, 0)");
+  test_list("b12",vs,"b12 <- c(-5, -2L, 3, 0l)");
+
+  vs.clear();
+  vs.push_back(1);
+  vs.push_back(2);
+  vs.push_back(3);
+  vs.push_back(4);
+  vs.push_back(5);
+  test_list("z98",vs,"z98 <- 1:5");
+  
+  vs.clear();
+  vs.push_back(9);
+  vs.push_back(8);
+  test_list("iroc",vs,"iroc <- 9:8");
 }
 
 TEST(io_dump, reader_vec_double) {
@@ -130,6 +144,39 @@ TEST(io_dump, reader_vec_double) {
   stan::io::dump_reader reader(in);
   test_list2(reader,"foo",expected_vals,expected_dims);
 }
+TEST(io_dump, reader_vec_double_dots) {
+  std::vector<double> expected_vals;
+  expected_vals.push_back(1.0);
+  expected_vals.push_back(4.0);
+  expected_vals.push_back(2.0);
+  expected_vals.push_back(5.0);
+  expected_vals.push_back(3.0);
+  expected_vals.push_back(6.0);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2U);
+  expected_dims.push_back(3U);
+  std::string txt = "foo <- structure(c(1.0,4.0,2.0,5.0,3.0,6.0), .Dim = 2:3))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+}
+TEST(io_dump, reader_vec_double_dots_rev) {
+  std::vector<double> expected_vals;
+  expected_vals.push_back(1.0);
+  expected_vals.push_back(4.0);
+  expected_vals.push_back(2.0);
+  expected_vals.push_back(5.0);
+  expected_vals.push_back(3.0);
+  expected_vals.push_back(6.0);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(3U);
+  expected_dims.push_back(2U);
+  std::string txt = "foo <- structure(c(1.0,4.0,2.0,5.0,3.0,6.0), .Dim = 3:2))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+}
+
 
 
 TEST(io_dump, reader_vec_int) {
