@@ -32,3 +32,6 @@ endif
 ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
+ifeq ($(uname_S), MINGW32_NT-6.1)
+  PATH_SEPARATOR = '/'
+endif
