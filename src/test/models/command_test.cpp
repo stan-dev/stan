@@ -19,7 +19,7 @@ using std::bitset;
 using testing::Combine;
 using testing::Range;
 
-enum options {
+enum cl_options {
   append_samples, // should be first option
   data,
   init,
@@ -34,7 +34,7 @@ enum options {
   epsilon_pm,
   unit_mass_matrix,
   delta,
-  gamma,
+  gamma_opt,
   options_count   // should be last. will hold the number of tested options
 };
 
@@ -198,47 +198,47 @@ public:
 
     option_name[leapfrog_steps] = "leapfrog_steps";
     command_changes[leapfrog_steps] = make_pair("",
-						" --leapfrog_steps=1");
+                                                " --leapfrog_steps=1");
     output_changes [leapfrog_steps] = make_pair("",
-						"1");
+                                                "1");
     
 
     option_name[max_treedepth] = "max_treedepth";
     command_changes[max_treedepth] = make_pair("",
-					       " --max_treedepth=2");
+                                               " --max_treedepth=2");
     output_changes [max_treedepth] = make_pair("",
-					       "2");
+                                               "2");
     
     option_name[epsilon] = "epsilon";
     command_changes[epsilon] = make_pair("",
-					 " --epsilon=1.5");
+                                         " --epsilon=1.5");
     output_changes [epsilon] = make_pair("",
-					 "1.5");
+                                         "1.5");
     
 
     option_name[epsilon_pm] = "epsilon_pm";
     command_changes[epsilon_pm] = make_pair("",
-					    " --epsilon_pm=0.5");
+                                            " --epsilon_pm=0.5");
     output_changes [epsilon_pm] = make_pair("",
-					    "0.5");
+                                            "0.5");
     
     option_name[unit_mass_matrix] = "unit_mass_matrix";
     command_changes[unit_mass_matrix] = make_pair("",
-						  " --unit_mass_matrix");
+                                                  " --unit_mass_matrix");
     output_changes [unit_mass_matrix] = make_pair("",
-						  "1");
+                                                  "1");
 
     option_name[delta] = "delta";
     command_changes[delta] = make_pair("",
-				       " --delta=0.75");
+                                       " --delta=0.75");
     output_changes [delta] = make_pair("",
-				       "0.75");
+                                       "0.75");
     
-    option_name[gamma] = "gamma";
-    command_changes[gamma] = make_pair("",
-				       " --gamma=0.025");
-    output_changes [gamma] = make_pair("",
-				       "0.025");
+    option_name[gamma_opt] = "gamma";
+    command_changes[gamma_opt] = make_pair("",
+                                       " --gamma=0.025");
+    output_changes [gamma_opt] = make_pair("",
+                                       "0.025");
 
     //for (int i = 0; i < options_count; i++) {
     //  std::cout << "\t" << i << ": " << option_name[i] << std::endl;
@@ -442,7 +442,7 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
 
 void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<> c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
-  EXPECT_NEAR(expected_mean, c.mean(0U), 20)
+  EXPECT_NEAR(expected_mean, c.mean(0U), 50)
     << "Test that data file is being used";
 }
 
@@ -467,11 +467,13 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
       options[leapfrog_steps] || 
       options[epsilon] ||
       options[delta] ||
-      options[gamma])
+      options[gamma_opt])
     return;
   // seed / chain_id test
   double expected_first_y;
-  if (options[seed] && !options[append_samples] && !options[warmup]) {
+  if (options[seed] 
+      && !options[append_samples] 
+      && !options[warmup]) {
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 

@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_Transforms_Simplex : 
-  public Model_Test_Fixture<Models_Transforms_Simplex,
-                                       false> {
+  public Model_Test_Fixture<Models_Transforms_Simplex> {
 protected:
   virtual void SetUp() {
   }
@@ -15,8 +14,11 @@ public:
     model_path.push_back("simplex");
     return model_path;
   }
+  static bool has_data() {
+    return false;
+  }
 };
 
-TEST_F(Models_Transforms_Simplex,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_Transforms_Simplex,
+			      Model_Test_Fixture,
+			      Models_Transforms_Simplex);

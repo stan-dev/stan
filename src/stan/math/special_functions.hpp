@@ -600,6 +600,26 @@ namespace stan {
       return max + log(sum);
     }
 
+    /** 
+     * Return the scalar value and ignore the remaining
+     * arguments.
+     *
+     * <p>This function provides a <code>double</code>-only overload
+     * of <code>simple_var</code> to use with pure floating-point
+     * implementations.  The other overloads are for
+     * <code>stan::agrad::var</code> arguments; the definitions can be
+     * found in <code>stan/agrad/partials_vari.hpp</code>.
+     * 
+     * @param v Value to return.
+     * @return Value.
+     */
+    inline double simple_var(double v, 
+                             double /*y1*/, double /*dy1*/, 
+                             double /*y2*/, double /*dy2*/,
+                             double /*y3*/, double /*dy3*/) {
+      return v;
+    }
+
     /**
      * Return the value of the specified scalar argument
      * converted to a double value.
@@ -630,7 +650,7 @@ namespace stan {
      */
     template <>
     inline double value_of<double>(double x) {
-      return x; // static_cast<double>(x);
+      return x; 
     }
 
     // CONSTANTS

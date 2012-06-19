@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol1_Dogs : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_Dogs,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Dogs> {
 protected:
   virtual void SetUp() {
   }
@@ -17,8 +16,11 @@ public:
     model_path.push_back("dogs");
     return model_path;
   }
+  static bool has_data() {
+    return true;
+  }
 };
 
-TEST_F(Models_BugsExamples_Vol1_Dogs,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Dogs,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol1_Dogs);

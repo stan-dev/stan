@@ -47,6 +47,9 @@ PATH_SEPARATOR = /
 ##
 -include make/os_detect
 
+%$(EXE) : %.o %.cpp bin/libstan.a
+	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+
 ##
 # Tell make the default way to compile a .o file.
 ##
@@ -153,10 +156,9 @@ help:
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
 
-ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
+ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
-
 
 ##
 # Clean up.

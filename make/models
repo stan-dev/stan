@@ -38,12 +38,12 @@ models/%.stan : src/models/%.stan
 $(MODEL_HEADER).gch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for g++ ---'
-	$(COMPILE.c) $(CFLAGS) $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).pch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for clang++ ---'
-	$(COMPILE.c) $(CFLAGS) $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
 	@if test -d $(dir $@); \

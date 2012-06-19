@@ -1,5 +1,113 @@
 #include <gtest/gtest.h>
+
 #include <stan/agrad/partials_vari.hpp>
+#include <stan/math/special_functions.hpp>
+
+
+TEST(AgradPartialsVari,simple_var_vvv) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  var a = 1.0;  double da = 5.0;
+  var b = 2.0;  double db = 7.0;
+  var c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(5.0,a.adj());
+  EXPECT_FLOAT_EQ(7.0,b.adj());
+  EXPECT_FLOAT_EQ(11.0,c.adj());
+}
+TEST(AgradPartialsVari,simple_var_vvd) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  var a = 1.0;  double da = 5.0;
+  var b = 2.0;  double db = 7.0;
+  double c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(5.0,a.adj());
+  EXPECT_FLOAT_EQ(7.0,b.adj());
+}
+TEST(AgradPartialsVari,simple_var_vdv) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  var a = 1.0;  double da = 5.0;
+  double b = 2.0;  double db = 7.0;
+  var c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(5.0,a.adj());
+  EXPECT_FLOAT_EQ(11.0,c.adj());
+}
+TEST(AgradPartialsVari,simple_var_vdd) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  var a = 1.0;  double da = 5.0;
+  double b = 2.0;  double db = 7.0;
+  double c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(5.0,a.adj());
+}
+TEST(AgradPartialsVari,simple_var_dvv) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  double a = 1.0;  double da = 5.0;
+  var b = 2.0;  double db = 7.0;
+  var c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(7.0,b.adj());
+  EXPECT_FLOAT_EQ(11.0,c.adj());
+}
+TEST(AgradPartialsVari,simple_var_dvd) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  double a = 1.0;  double da = 5.0;
+  var b = 2.0;  double db = 7.0;
+  double c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(7.0,b.adj());
+}
+TEST(AgradPartialsVari,simple_var_ddv) {
+  using stan::agrad::var;
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  double y = -1.0;
+  double a = 1.0;  double da = 5.0;
+  double b = 2.0;  double db = 7.0;
+  var c = 3.0;  double dc = 11.0;
+  var v = simple_var(y,a,da,b,db,c,dc);
+  stan::agrad::grad(v.vi_);
+  EXPECT_FLOAT_EQ(-1.0,v.val());
+  EXPECT_FLOAT_EQ(11.0,c.adj());
+}
+TEST(AgradPartialsVari,simple_var_ddd) {
+  using stan::math::simple_var;
+  using stan::agrad::simple_var;
+  EXPECT_FLOAT_EQ(-1.0,simple_var(-1.0,1,2,3,4,5,6));
+}
+
+
+
 
 TEST(AgradPartialsVari,partials1_vari) {
   using stan::agrad::var;
