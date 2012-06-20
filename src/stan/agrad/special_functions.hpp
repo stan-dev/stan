@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <boost/math/special_functions.hpp>
 #include <stan/agrad/agrad.hpp>
+#include <stan/agrad/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 
 namespace stan {
@@ -638,6 +639,9 @@ namespace stan {
       };
     }
 
+
+    using stan::math::check_not_nan;
+
     /**
      * The inverse hyperbolic cosine function for variables (C99).
      * 
@@ -730,8 +734,30 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::agrad::var& a) {
+    template <class Policy>
+    inline var exp2(const stan::agrad::var& a,
+		    const Policy&) {
+      static const char* function = "stan::math::exp2(%1%)";
+      double result;
+      if (!check_not_nan(function, a.val(), "a", &result, Policy()))
+        return result;
       return var(new exp2_vari(a.vi_));
+    }
+
+    /**
+     * Exponentiation base 2 function for variables (C99).
+     *
+     * For non-variable function, see boost::math::exp2().
+     *
+     * The derivatie is
+     *
+     * \f$\frac{d}{dx} 2^x = (\log 2) 2^x\f$.
+     * 
+     * @param a The variable.
+     * @return Two to the power of the specified variable.
+     */
+    inline var exp2(const stan::agrad::var& a) {
+      return exp2(a, stan::math::default_policy());
     }
 
     /**

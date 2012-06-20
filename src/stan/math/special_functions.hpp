@@ -26,13 +26,38 @@ namespace stan {
      * <code>exp2(y) = pow(2.0,y)</code>.
      *
      * @param y Value.
+     * @tparam T Type of scalar.
+     * @tparam Policy Type of policy.
+     * @error_policy
+     *    @li y must not be NaN.
+     * @return Exponent base 2 of value.
+     */
+    template <typename T, class Policy>
+    inline typename boost::math::tools::promote_args<T>::type
+    exp2(T y, const Policy&) {
+      static const char* function = "stan::math::exp2(%1%)";
+      T result;
+      if (!check_not_nan(function, y, "y", &result, Policy()))
+        return result;
+      using std::pow;
+      return pow(2.0,y);
+    }
+
+    /**
+     * Return the exponent base 2 of the specified argument (C99).
+     *
+     * The exponent base 2 function is defined by
+     *
+     * <code>exp2(y) = pow(2.0,y)</code>.
+     *
+     * @param y Value.
+     * @tparam T Type of scalar.
      * @return Exponent base 2 of value.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     exp2(T y) {
-      using std::pow;
-      return pow(2.0,y);
+      return exp2(y, stan::math::default_policy());
     }
 
     /** 
