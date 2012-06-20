@@ -2,7 +2,6 @@
 #define __STAN__MATH__ERROR_HANDLING_HPP__
 
 #include <stan/math/boost_error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 
 #include <boost/math/policies/policy.hpp>
 #include <cstddef>

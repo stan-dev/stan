@@ -37,7 +37,7 @@ namespace stan {
     exp2(T y, const Policy&) {
       static const char* function = "stan::math::exp2(%1%)";
       T result;
-      if (!check_not_nan(function, y, "Random variate, y,", &result, Policy()))
+      if (!check_not_nan(function, y, "y", &result, Policy()))
         return result;
       using std::pow;
       return pow(2.0,y);
@@ -59,7 +59,6 @@ namespace stan {
     exp2(T y) {
       return exp2(y, stan::math::default_policy());
     }
-
 
     /** 
      * The positive difference function (C99).  
