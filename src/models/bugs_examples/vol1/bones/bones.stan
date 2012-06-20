@@ -32,26 +32,20 @@ parameters {
   real theta[nChild]; 
 }
 
-transformed parameters {
-  real Q[nChild, nInd, 4];
-  for(i in 1:nChild) {
-    for (j in 1:nInd) {
-      # Cumulative probability of > grade k given theta
-      for (k in 1:(ncat[j] - 1)) { 
-        Q[i, j, k] <- inv_logit(delta[j] * (theta[i] - gamma[j, k])); 
-      } 
-    }
-  } 
-} 
-
 model { 
   real p[nChild, nInd, 5];
   real zero; 
+  real Q[nChild, nInd, 4];
   zero <- 0; 
   theta ~ normal(0.0, 36); 
   for(i in 1:nChild) {
     # Probability of observing grade k given theta
     for (j in 1:nInd) {
+      # Cumulative probability of > grade k given theta
+      for (k in 1:(ncat[j] - 1)) { 
+        Q[i, j, k] <- inv_logit(delta[j] * (theta[i] - gamma[j, k])); 
+      } 
+
       p[i, j, 1] <- 1 - Q[i, j, 1];
       for (k in 2:(ncat[j] - 1))  
         p[i, j, k] <- Q[i, j, k - 1] - Q[i, j, k];
