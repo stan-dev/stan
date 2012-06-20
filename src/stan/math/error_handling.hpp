@@ -6,7 +6,7 @@
 #include <boost/math/policies/policy.hpp>
 #include <cstddef>
 #include <limits>
-
+#include <boost/type_traits/is_unsigned.hpp>
 
 namespace stan { 
 
