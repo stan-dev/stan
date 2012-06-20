@@ -579,7 +579,6 @@ namespace stan {
             dims_.push_back(dim);
           }
           if (!scan_char(')')) return false;
-          return true;
         } else {
           size_t start;
           in_ >> start;
