@@ -215,6 +215,16 @@ TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
 }
 
+TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
+  stan::mcmc::chains<> *c = TypeParam::chains;
+  size_t num_params = c->num_params();
+  for (size_t i = 0; i < num_params; i++) {
+    EXPECT_TRUE(c->effective_sample_size(i) > 0)
+      << "For variable " << i << " expected sample size ("
+      << c->effective_sample_size(i) << ") to be greater than 0";
+  }
+}
+
 TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using boost::math::students_t;
   using boost::math::quantile;
@@ -223,7 +233,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using std::pair;
   
   vector<pair<size_t, double> > expected_values = TypeParam::get_expected_values();
-  std::cout << "testing " << expected_values.size() << " values" << std::endl;
+  //std::cout << "testing " << expected_values.size() << " values" << std::endl;
   for (size_t i = 0; i < expected_values.size(); i++) {
     size_t index = expected_values[i].first;
     double e_val = expected_values[i].second;
@@ -240,6 +250,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
 			   RunModel,
+			   ChainsTest,
 			   ExpectedValuesTest);
 
 #endif
