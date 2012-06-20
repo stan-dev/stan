@@ -75,7 +75,7 @@ $(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-ifeq ($(findstring test-,$(MAKECMDGOALS)),)
+ifeq ($(filter (test- runtest/),$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
@@ -86,7 +86,7 @@ endif
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-ifeq ($(findstring test-,$(MAKECMDGOALS)),)
+ifeq ($(filter (test- runtest/),$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
