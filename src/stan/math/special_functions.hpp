@@ -103,14 +103,40 @@ namespace stan {
      * <code>log2(a) = log(a) / std::log(2.0)</code>.
      *
      * @param a Value.
+     * @tparam T type of scalar
+     * @tparam Policy Type of policy
+     * @error_policy
+          @li y must not be NaN or less than zero
+     * @return Base 2 logarithm of the value.
+     */
+    template <typename T, class Policy>
+    inline typename boost::math::tools::promote_args<T>::type
+    log2(T a, const Policy&) {
+      static const char* function = "stan::math::exp2(%1%)";
+      T result;
+      if(!check_not_nan(function,a, "a", &result, Policy()))
+	return result;
+      if(!check_greater_or_equal(function,a,0.0,"a", &result, Policy()))
+	return result;
+      using std::log;
+      const static double LOG2 = std::log(2.0);
+      return log(a) / LOG2;
+    }
+/**
+     * Returns the base 2 logarithm of the argument (C99).
+     *
+     * The function is defined by:
+     *
+     * <code>log2(a) = log(a) / std::log(2.0)</code>.
+     *
+     * @param a Value.
+     * @tparam T type of scalar
      * @return Base 2 logarithm of the value.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log2(T a) {
-      using std::log;
-      const static double LOG2 = std::log(2.0);
-      return log(a) / LOG2;
+      return log2(a, stan::math::default_policy());
     }
 
 

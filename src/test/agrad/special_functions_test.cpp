@@ -585,7 +585,7 @@ TEST(agrad_agrad_special_functions,hypot_dv) {
   EXPECT_FLOAT_EQ(4.0/5.0,grad_f[0]);
 }  
 
-TEST(agrad_agrad_special_functions,log2) {
+TEST(agrad_agrad_special_functions,log2_defaultpolicy) {
   AVAR a = 3.0;
   AVAR f = log2(a);
   EXPECT_FLOAT_EQ(std::log(3.0)/std::log(2.0), f.val());
@@ -594,6 +594,40 @@ TEST(agrad_agrad_special_functions,log2) {
   VEC grad_f;
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(1.0 / 3.0 / std::log(2.0), grad_f[0]);
+
+  a = std::numeric_limits<AVAR>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::log2(a).val());
+
+  a = std::numeric_limits<AVAR>::quiet_NaN();
+  EXPECT_THROW(stan::math::log2(a), std::domain_error);
+ 
+  a = -1;
+  EXPECT_THROW(stan::math::log2(a), std::domain_error);
+}
+
+TEST(agrad_agrad_special_functions,log2_errnopolicy) {
+  AVAR a = 3.0;
+  AVAR f = log2(a);
+  EXPECT_FLOAT_EQ(std::log(3.0)/std::log(2.0), f.val());
+  
+  AVEC x = createAVEC(a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(1.0 / 3.0 / std::log(2.0), grad_f[0]);
+
+  a = std::numeric_limits<AVAR>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::log2(a, errno_policy()).val());
+
+  a = std::numeric_limits<AVAR>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::log2(a, errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+
+  a = -1;
+  EXPECT_NO_THROW(f = stan::math::log2(a, errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+
 }
 
 TEST(agrad_agrad_special_functions,cbrt) {
