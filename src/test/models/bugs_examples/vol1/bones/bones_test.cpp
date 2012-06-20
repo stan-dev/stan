@@ -22,7 +22,23 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+
     std::vector<std::pair<size_t, double> > expected_values;
+    expected_values.push_back(make_pair( 0U, 0.3244));
+    expected_values.push_back(make_pair( 1U, 1.366));
+    expected_values.push_back(make_pair( 2U, 2.357));
+    expected_values.push_back(make_pair( 3U, 2.902));
+    expected_values.push_back(make_pair( 4U, 5.535));
+    expected_values.push_back(make_pair( 5U, 6.751));
+    expected_values.push_back(make_pair( 6U, 6.451));
+    expected_values.push_back(make_pair( 7U, 8.93));
+    expected_values.push_back(make_pair( 8U, 8.981));
+    expected_values.push_back(make_pair( 9U, 11.94));
+    expected_values.push_back(make_pair(10U, 11.58));
+    expected_values.push_back(make_pair(11U, 15.79));
+    expected_values.push_back(make_pair(12U, 16.96));
+
     return expected_values;
   }
 
