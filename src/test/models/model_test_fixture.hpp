@@ -217,11 +217,14 @@ TYPED_TEST_P(Model_Test_Fixture, RunModel) {
 
 TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   stan::mcmc::chains<> *c = TypeParam::chains;
+  size_t num_chains = c->num_chains();
   size_t num_params = c->num_params();
-  for (size_t i = 0; i < num_params; i++) {
-    EXPECT_TRUE(c->effective_sample_size(i) > 0)
-      << "For variable " << i << " expected sample size ("
-      << c->effective_sample_size(i) << ") to be greater than 0";
+  for (size_t chain = 0; chain < num_chains; chain++) {
+    for (size_t param = 0; param < num_params; param++) {
+      EXPECT_TRUE(c->variance(chain, param) > 0)
+	<< "Chain " << chain << ", param " << param
+	<< ": variance is 0";
+    }
   }
 }
 
@@ -240,11 +243,13 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 
     double neff = TypeParam::chains->effective_sample_size(index);
     double mean = TypeParam::chains->mean(index);
-    double se = std::sqrt(TypeParam::chains->variance(index)/neff);
+    // FIXME: chains->variance(index) crashes.
+    double se = TypeParam::chains->sd(index) / std::sqrt(neff);
     double T = quantile(students_t(neff-1.0), 0.975);
     EXPECT_NEAR(e_val, mean, T*se)
       << "For variable " << index << ", "
       << "T is: " << T << " and se is: " << se << std::endl;
+    // FIXME: better error message
   }
 }
 
