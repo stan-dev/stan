@@ -70,8 +70,6 @@ CODE CLEANUP
 Stan-R
 ======================================================================
 
-* stan-dump (write a better dump reader in C++)
-
 * order of plots should match declaration order
 
 * include greyed out warmup in traceplot

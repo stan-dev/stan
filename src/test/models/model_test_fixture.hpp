@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <stan/mcmc/chains.hpp>
+#include <utility>
+#include <boost/math/distributions/students_t.hpp>
 
 
 /** 
@@ -186,7 +188,11 @@ public:
   static bool has_data() {
     return Derived::has_data();
   }
-    
+  
+  static std::vector<std::pair<size_t, double> >
+  get_expected_values() {
+    return Derived::get_expected_values();
+  }
 };
   
 template<class Derived> 
@@ -209,7 +215,31 @@ TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
 }
 
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
+  using boost::math::students_t;
+  using boost::math::quantile;
+
+  using std::vector;
+  using std::pair;
+  
+  vector<pair<size_t, double> > expected_values = TypeParam::get_expected_values();
+  std::cout << "testing " << expected_values.size() << " values" << std::endl;
+  for (size_t i = 0; i < expected_values.size(); i++) {
+    size_t index = expected_values[i].first;
+    double e_val = expected_values[i].second;
+
+    double neff = TypeParam::chains->effective_sample_size(index);
+    double mean = TypeParam::chains->mean(index);
+    double se = std::sqrt(TypeParam::chains->variance(index)/neff);
+    double T = quantile(students_t(neff-1.0), 0.975);
+    EXPECT_NEAR(e_val, mean, T*se)
+      << "For variable " << index << ", "
+      << "T is: " << T << " and se is: " << se << std::endl;
+  }
+}
+
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
-			   RunModel);
+			   RunModel,
+			   ExpectedValuesTest);
 
 #endif

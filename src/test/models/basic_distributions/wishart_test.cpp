@@ -17,6 +17,13 @@ public:
   static bool has_data() {
     return false;
   }
+
+  static std::vector<std::pair<size_t, double> >
+  get_expected_values() {
+    std::vector<std::pair<size_t, double> > expected_values;
+    return expected_values;
+  }
+
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Wishart,

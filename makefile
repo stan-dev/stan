@@ -160,6 +160,11 @@ ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
+ifneq (,$(filter runtest/%,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst runtest/,,$(MAKECMDGOALS)))
+endif
+
+
 ##
 # Clean up.
 ##
