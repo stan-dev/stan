@@ -18,10 +18,19 @@ setMethod("show", "stanfit",
                 object@num.chains, " chains.\n", sep = '')  
           })  
 
+stanplot <- function(object, pars = object@model.pars) {
+  
+  cs <- chain.summary(object, chain.id = 1:object@num.chains, pars = pars)
+  ss <- summary(object, pars = pars) 
+} 
+
+
 setMethod("plot", "stanfit",
-          function(x, y, ...) { 
-            cat("plot method of class stanfit.\n")  
-          })  
+          function(x, y, ...) {
+            if (missing(y)) 
+              y <- object@model.pars 
+            stanplot(object = x, pars = y, ...)
+          }) 
 
 setMethod("print", signature = (x = "stanfit"),
           function(x, 
@@ -117,10 +126,10 @@ setMethod("extract", signature(object = "stanfit"), # , pars = "character"),
 #                      }) 
 #   } 
 
-chain.summary <- function(object, chain.id, 
+chain.summary <- function(object, chain.id = 1:object@num.chains, 
                           probs = c(0.025, 0.25, 0.50, 0.75, 0.975),  
                           pars, ...) {
-  if (chain.id < 0 && chain.id > object@num.chains) {
+  if (any(chain.id < 0) && any(chain.id > object@num.chains)) {
     stop("chain.id should be postive and less than the", 
          "number of chains.") 
   } 
@@ -134,14 +143,19 @@ chain.summary <- function(object, chain.id,
 
   if (missing(probs)) 
     probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
-  
-  ## FIXEME, chain id for the get_chain_***
-  mnsd <- sampleshandle$get_chain_mean_and_sd(pars) 
-  qs <- sampleshandle$get_chain_quantiles(pars, probs)  
-  
-  mq <- cbind(do.call(rbind, mnsd), do.call(rbind, qs)) 
-  colnames(mq) <- c("Mean", "SD", probs2str(probs)) 
-  mq 
+
+  num.cid <- length(chain.id) 
+  r <- vector("list", num.cid) 
+
+  for (i in 1:num.cid) { 
+    k <- chain.id[i] 
+    mnsd <- sampleshandle$get_chain_mean_and_sd(k, pars) 
+    qs <- sampleshandle$get_chain_quantiles(k, pars, probs)  
+    r[[i]] <- cbind(do.call(rbind, mnsd), do.call(rbind, qs)) 
+    colnames(r[[i]]) <- c("Mean", "SD", probs2str(probs)) 
+  }
+  names(r) <- paste("chain.", chain.id, sep = '')
+  r 
 } 
 
 setMethod("chain.summary", 
@@ -208,11 +222,15 @@ traceplot <- function(object, pars) {
   # using tmpnames without '[' and ']', which seems to be 
   # difficult to deal with. 
   tmpnames <- c(paste("par", 1:length(pars), sep = ''), "Iterations")
+
+  it.idx <- seq(from = 1, by = chain1_args$n.thin, length.out = nrow(ss[[1]]))
    
-  ss <- lapply(ss, FUN = function(x) {
-                     x2 <- cbind(x, 1:nrow(x) * chain1_args$n.thin) 
-                     colnames(x2) <- tmpnames 
-                     data.frame(x2) }) 
+  ss <- lapply(ss, 
+               FUN = function(x) {
+                 x2 <- cbind(x, it.idx) 
+                 colnames(x2) <- tmpnames 
+                 data.frame(x2) 
+               }) 
 
   tplot.b.col <- 
     do.call(c, get.rstan.options(c("plot.warmup.color", "plot.kept.color"))) 

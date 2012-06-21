@@ -238,6 +238,72 @@ stan.dump <- function(data, file) {
   ### FIXEME, to be implemented. 
 } 
 
+
+plot.a.par <- function(mlu, cms, srhat, par.name, mcol = 'black', 
+                       ccols = 1 + 1:length(cms)) {
+                       
+  # Plot one parameter with median, confidence interval
+  # and medians from seprate chains. 
+  # 
+  # Args:
+  #   mlu: median, le, and ue, computed from samples of all the chains
+  #   cms: median of separate chains
+  #   srhat: split r hat
+  #   vname: varianbve name 
+  # Returns:
+  # 
+  # References:
+  #   http://wiki.stdout.org/rcookbook/Graphs/Axes%20(ggplot2)/
+  #   ggplot color: http://wiki.stdout.org/rcookbook/Graphs/Colors%20(ggplot2)/
+  #   opts list: https://github.com/hadley/ggplot2/wiki/-opts%28%29-List
+ 
+  n.c <- length(cms)
+  d <- data.frame(x = 1, le = mlu[2], ue = mlu[3])
+  d2 <- data.frame(x = rep(1, 1 + n.c), 
+                   y = c(mlu[1], cms), 
+                   col = c(mcol, ccols))
+  p1 <- 
+    ggplot() +
+    geom_linerange(data = d, aes(x = x, ymin = le, ymax = ue), colour = mcol) + 
+    opts(axis.title.y = theme_blank()) +
+    xlab(par.name) +
+    scale_x_discrete(breaks = NULL) 
+ 
+    p1 <- p1 + geom_point(data = d2, aes(x = x, y = y, color = col), size = 2) + 
+           opts(legend.position = "none")
+      
+    # geom_point(data = d2, aes(x = x, y = y, color = col))
+    # opts(axis.text.x = theme_blank(),
+    #   axis.ticks.x = theme_blank(),
+    #   axis.title.x = theme_blank(),
+    #   axis.line.x = theme_blank())        
+
+  ## TODO:
+  ##  ADD split R hat  
+    
+  return(p1)
+}
+
+
+read.rdump <- function(f) {
+  # Read variables defined in an R dump file to an R list
+  # 
+  # Args:
+  #   f: the file to be sourced
+  # 
+  # Returns:
+  #   A list
+  e <- new.env() 
+  source(file = f, local = e)
+  as.list(e)
+} 
+
+## test for plot.a.par. 
+## plot.a.par(c(2,1, 3), c(1.5, 2.5), 1.2, 'h', ccols = c("red", "green"))
+
+
+
+
 #### temporary test code 
 #  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
 #  print(a) 

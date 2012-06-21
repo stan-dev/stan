@@ -2,15 +2,16 @@
 
 
 
-Sys.setenv(STAN_HOME = '/home/jq/Desktop/stan') 
-LD_LIBRARY_PATH = paste(Sys.getenv("LD_LIBRARY_PATH"), 
-                        ":/home/jq/Desktop/stan/bin", 
-                        sep = '')
+## not working???
+#   Sys.setenv(STAN_HOME = '/home/jq/Desktop/stan') 
+#   LD_LIBRARY_PATH = paste(Sys.getenv("LD_LIBRARY_PATH"), 
+#                           ":/home/jq/Desktop/stan/bin", 
+#                           sep = '')
 
-Sys.setenv(LD_LIBRARY_PATH = LD_LIBRARY_PATH)
+#   Sys.setenv(LD_LIBRARY_PATH = LD_LIBRARY_PATH)
 
-cat("STAN_HOME=", Sys.getenv("STAN_HOME"), "\n")
-cat("LD_LIBRARY_PATH=", Sys.getenv("LD_LIBRARY_PATH"), "\n")
+#   cat("STAN_HOME=", Sys.getenv("STAN_HOME"), "\n")
+#   cat("LD_LIBRARY_PATH=", Sys.getenv("LD_LIBRARY_PATH"), "\n")
 
 library(rstan) 
 
@@ -99,12 +100,6 @@ model {
 }
 " 
 
-require(coda) 
-
-to.mcmc.list <- function(lst) {
-  as.mcmc.list(lapply(lst, FUN = function(x) as.mcmc(do.call(cbind, x))))  
-} 
-
 
 model_name <- "dogs"; 
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
@@ -158,12 +153,8 @@ print(args)
 args1 <- sampler$get_chain_stan_args(1); 
 print(args1)
 
-  tall2 <- lapply(tall, FUN = function(x) do.call(cbind, x)) 
-  tall3 <- to.mcmc.list(tall) 
+tall2 <- lapply(tall, FUN = function(x) do.call(cbind, x)) 
 
-summary(tall3)
-effectiveSize(tall3)
-gelman.diag(tall3)
   
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19, comment = "#") 
@@ -174,4 +165,26 @@ summary(ss)
 summary(ss, probs = c(0.25, .5, .75), pars = c('alpha'))
 ex <- extract(ss) 
 print(ss, pars = c('alpha', 'beta')) 
-print(ss, pars = c('alpha', 'beta1')) # error
+# print(ss, pars = c('alpha', 'beta1')) # error
+
+
+library(ggplot2)
+
+sf <- stan(model.code = dogsstan, data = dogsdat, verbose = TRUE, n.chains = 3)
+traceplot(sf)
+
+cs <- chain.summary(sf)
+
+print(cs, digits = 3) 
+print(sf)
+
+require(coda) 
+
+to.mcmc.list <- function(lst) {
+  as.mcmc.list(lapply(lst, FUN = function(x) as.mcmc(do.call(cbind, x))))  
+} 
+
+tall3 <- to.mcmc.list(tall) 
+summary(tall3)
+effectiveSize(tall3)
+gelman.diag(tall3)

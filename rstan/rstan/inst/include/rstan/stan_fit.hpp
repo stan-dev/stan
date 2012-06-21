@@ -673,7 +673,7 @@ namespace rstan {
     /**
      * @param n The parameter index.
      * @param probs Probabilities specifying quantiles of interest.
-     * @return A R vector of quantiles.  
+     * @return An R vector of quantiles.  
      */
 
     SEXP get_quantiles_0(size_t n, const std::vector<double>& probs) {

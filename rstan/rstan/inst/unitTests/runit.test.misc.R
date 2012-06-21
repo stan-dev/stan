@@ -2,6 +2,11 @@
 .setUp <- function() {
   model.code <- "model { \n y ~ normal(0, 1); \n}"  
   cat(model.code, file = 'tmp.stan')  
+
+  a <- c(1, 3, 5)
+  b <- matrix(1:10, ncol = 2)
+  c <- array(1:18, dim = c(2, 3, 3)) 
+  dump(c("a", "b", "c"), file = 'dumpabc.R')
 } 
 
 
@@ -34,8 +39,16 @@ test.util <- function() {
                  msg = "Read stan model from model.code") 
 } 
 
-.tearDown <- function() {
-  unlink('tmp.stan') 
+
+test.read.rdump <- function() {
+  l <- rstan:::read.rdump("dumpabc.R")
+  checkEquals(l$a, c(1, 3, 5)) 
+  checkEquals(l$b, matrix(1:10, ncol = 2))
+  checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
 } 
 
+.tearDown <- function() {
+  unlink('tmp.stan') 
+  unlink('dumpabc.R') 
+} 
 

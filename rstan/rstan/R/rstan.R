@@ -37,7 +37,7 @@ stan.model <- function(file, verbose = FALSE,
 
 stan <- function(file, model.name = "anon_model", 
                  model.code = '', 
-                 data, n.chains = 1L, n.iter = 2000L, 
+                 data = list(), n.chains = 1L, n.iter = 2000L, 
                  n.warmup = floor(n.iter / 2), 
                  n.thin = 1L, 
                  init.t = "random", 
