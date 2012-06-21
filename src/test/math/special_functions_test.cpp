@@ -88,10 +88,38 @@ TEST(MathsSpecialFunctions, exp2_errnopolicy) {
 }
 
 
-TEST(MathsSpecialFunctions, log2) {
+TEST(MathsSpecialFunctions, log2_defaultpolicy) {
   EXPECT_FLOAT_EQ(0.0, stan::math::log2(1.0));
   EXPECT_FLOAT_EQ(3.0, stan::math::log2(8.0));
   EXPECT_FLOAT_EQ(std::log(5.0)/std::log(2.0), stan::math::log2(5.0));
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::log2(std::numeric_limits<double>::infinity()));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::log2(nan), std::domain_error);
+  
+  double lessThanZero = -1;
+  EXPECT_THROW(stan::math::log2(lessThanZero), std::domain_error);
+}
+
+TEST(MathsSpecialFunctions, log2_errnopolicy) {
+  EXPECT_FLOAT_EQ(0.0, stan::math::log2(1.0));
+  EXPECT_FLOAT_EQ(3.0, stan::math::log2(8.0));
+  EXPECT_FLOAT_EQ(std::log(5.0)/std::log(2.0), stan::math::log2(5.0));
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::log2(std::numeric_limits<double>::infinity(),
+				   errno_policy()));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double result = 0;
+  EXPECT_NO_THROW(result = stan::math::log2(nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  
+  double lessThanZero = -1;
+  EXPECT_NO_THROW(result = stan::math::log2(lessThanZero, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
 }
 
 TEST(MathsSpecialFunctions, fdim) {

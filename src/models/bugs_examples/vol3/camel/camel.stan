@@ -32,7 +32,7 @@ parameters {
   real y121; 
 } 
 
-transformed parameters {
+model {
   vector(2) Y[12]; 
   Y[1, 1] <- 1; 
   Y[1, 2] <- 1; 
@@ -59,10 +59,7 @@ transformed parameters {
   Y[10, 2] <- 2; 
   Y[11, 2] <- -2; 
   Y[12, 2] <- -2; 
-} 
 
-
-model {
   // Sigma ~ inv_wishart(2, S); 
  
   // using the prior as in Tanner and Wong (1987) 

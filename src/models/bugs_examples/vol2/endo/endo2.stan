@@ -47,21 +47,18 @@ parameters {
   real beta; 
 } 
 
-transformed parameters {
+model {
   real p[I, 2];
+
+  # METHOD 2 - conditional likelihoods
+  beta ~ normal(0, 1000); 
+
   for (i in 1:I) {
     p[i, 1] <- exp(beta * est[i, 1]); 
     p[i, 2] <- exp(beta * est[i, 2]); 
     p[i, 1] <- p[i, 1] / (p[i, 1] + p[i, 2]); 
     p[i, 2] <- 1 - p[i, 1];
-  } 
-} 
 
-model {
-  # METHOD 2 - conditional likelihoods
-  beta ~ normal(0, 1000); 
-
-  for (i in 1:I) {
     // Y[i] ~ multinomial(p[i]);
 
     // using the multinomial log-pmf explicitly 

@@ -215,6 +215,19 @@ TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
 }
 
+TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
+  stan::mcmc::chains<> *c = TypeParam::chains;
+  size_t num_chains = c->num_chains();
+  size_t num_params = c->num_params();
+  for (size_t chain = 0; chain < num_chains; chain++) {
+    for (size_t param = 0; param < num_params; param++) {
+      EXPECT_TRUE(c->variance(chain, param) > 0)
+	<< "Chain " << chain << ", param " << param
+	<< ": variance is 0";
+    }
+  }
+}
+
 TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using boost::math::students_t;
   using boost::math::quantile;
@@ -223,23 +236,26 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using std::pair;
   
   vector<pair<size_t, double> > expected_values = TypeParam::get_expected_values();
-  std::cout << "testing " << expected_values.size() << " values" << std::endl;
+  //std::cout << "testing " << expected_values.size() << " values" << std::endl;
   for (size_t i = 0; i < expected_values.size(); i++) {
     size_t index = expected_values[i].first;
     double e_val = expected_values[i].second;
 
     double neff = TypeParam::chains->effective_sample_size(index);
     double mean = TypeParam::chains->mean(index);
-    double se = std::sqrt(TypeParam::chains->variance(index)/neff);
+    // FIXME: chains->variance(index) crashes.
+    double se = TypeParam::chains->sd(index) / std::sqrt(neff);
     double T = quantile(students_t(neff-1.0), 0.975);
     EXPECT_NEAR(e_val, mean, T*se)
       << "For variable " << index << ", "
       << "T is: " << T << " and se is: " << se << std::endl;
+    // FIXME: better error message
   }
 }
 
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
 			   RunModel,
+			   ChainsTest,
 			   ExpectedValuesTest);
 
 #endif
