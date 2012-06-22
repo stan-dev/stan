@@ -117,6 +117,153 @@ namespace stan {
       }
     };
 
+    class partials1s_2_vari : public vari {
+    private:
+      const size_t N_;
+      vari** operands1_;   const double* partials1_;
+      vari* operand2_;     const double partial2_;
+      vari* operand3_;     const double partial3_;
+    public: 
+      partials1s_2_vari(double value,
+                        size_t N,
+                        vari** operands1, double* partials1,
+                        vari* operand2, double partial2,
+                        vari* operand3, double partial3)
+        : vari(value),
+          N_(N),
+          operands1_(operands1), partials1_(partials1),
+          operand2_(operand2), partial2_(partial2),
+          operand3_(operand3), partial3_(partial3) {
+      }
+      void chain() {
+        for (size_t n = 0; n < N_; ++n)
+          operands1_[n]->adj_ += adj_ * partials1_[n];
+        operand2_->adj_ += adj_ * partial2_;
+        operand3_->adj_ += adj_ * partial3_;
+      }
+    };
+
+    class partials1s_1_vari : public vari {
+    private:
+      const size_t N_;
+      vari** operands1_;   const double* partials1_;
+      vari* operand2_;     const double partial2_;
+    public: 
+      partials1s_1_vari(double value,
+                        size_t N,
+                        vari** operands1, double* partials1,
+                        vari* operand2, double partial2)
+        : vari(value),
+          N_(N),
+          operands1_(operands1), partials1_(partials1),
+          operand2_(operand2), partial2_(partial2) {
+      }
+      void chain() {
+        for (size_t n = 0; n < N_; ++n)
+          operands1_[n]->adj_ += adj_ * partials1_[n];
+        operand2_->adj_ += adj_ * partial2_;
+      }
+    };
+
+    class partials1s_vari : public vari {
+    private:
+      const size_t N_;
+      vari** operands1_;   const double* partials1_;
+    public: 
+      partials1s_vari(double value,
+                        size_t N,
+                        vari** operands1, double* partials1,
+                        vari* operand2, double partial2)
+        : vari(value),
+          N_(N),
+          operands1_(operands1), partials1_(partials1) {
+      }
+      void chain() {
+        for (size_t n = 0; n < N_; ++n)
+          operands1_[n]->adj_ += adj_ * partials1_[n];
+      }
+    };
+
+ class partials2s_1_vari : public vari {
+    private:
+      const size_t N_;
+      vari** operands1_;   const double* partials1_;
+      vari** operands2_;   const double* partials2_;
+      vari* operand3_;     const double partial3_;
+    public: 
+      partials2s_1_vari(double value,
+                        size_t N,
+                        vari** operands1, double* partials1,
+                        vari** operands2, double* partials2,
+                        vari* operand3, double partial3)
+        : vari(value),
+          N_(N),
+          operands1_(operands1), partials1_(partials1),
+          operands2_(operands2), partials2_(partials2),
+          operand3_(operand3), partial3_(partial3) {
+      }
+      void chain() {
+        for (size_t n = 0; n < N_; ++n)
+          operands1_[n]->adj_ += adj_ * partials1_[n];
+        for (size_t n = 0; n < N_; ++n)
+          operands2_[n]->adj_ += adj_ * partials2_[n];
+        operand3_->adj_ += adj_ * partial3_;
+      }
+    };
+
+    class partials2s_vari : public vari {
+    private:
+      const size_t N_;
+      vari** operands1_;   const double* partials1_;
+      vari** operands2_;   const double* partials2_;
+    public: 
+      partials2s_vari(double value,
+                      size_t N,
+                      vari** operands1, double* partials1,
+                      vari** operands2, double* partials2)
+        : vari(value),
+          N_(N),
+          operands1_(operands1), partials1_(partials1),
+          operands2_(operands2), partials2_(partials2) {
+        }
+        void chain() {
+          for (size_t n = 0; n < N_; ++n)
+            operands1_[n]->adj_ += adj_ * partials1_[n];
+          for (size_t n = 0; n < N_; ++n)
+            operands2_[n]->adj_ += adj_ * partials2_[n];
+        }
+    };
+
+ class partials3s_vari : public vari {
+    private:
+      const size_t N_;
+      vari** operands1_;   const double* partials1_;
+      vari** operands2_;   const double* partials2_;
+      vari** operands3_;   const double* partials3_;
+    public: 
+      partials3s_vari(double value,
+                      size_t N,
+                      vari** operands1, double* partials1,
+                      vari** operands2, double* partials2,
+                      vari** operands3, double* partials3)
+        : vari(value),
+          N_(N),
+          operands1_(operands1), partials1_(partials1),
+          operands2_(operands2), partials2_(partials2),
+          operands3_(operands3), partials3_(partials3) {
+        }
+        void chain() {
+          for (size_t n = 0; n < N_; ++n)
+            operands1_[n]->adj_ += adj_ * partials1_[n];
+          for (size_t n = 0; n < N_; ++n)
+            operands2_[n]->adj_ += adj_ * partials2_[n];
+          for (size_t n = 0; n < N_; ++n)
+            operands3_[n]->adj_ += adj_ * partials3_[n];
+        }
+    };
+
+
+
     /**
      * Return an instance of <code>partials3_vari</code> with the
      * specified values, operands and partial derivatives.
