@@ -5,7 +5,7 @@
 #include <stan/mcmc/chains.hpp>
 #include <utility>
 #include <boost/math/distributions/students_t.hpp>
-
+#include <boost/math/distributions/binomial.hpp>
 
 /** 
  * Model_Test_Fixture is a test fixture for google test
@@ -222,40 +222,79 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   for (size_t chain = 0; chain < num_chains; chain++) {
     for (size_t param = 0; param < num_params; param++) {
       EXPECT_TRUE(c->variance(chain, param) > 0)
-	<< "Chain " << chain << ", param " << param
-	<< ": variance is 0";
+        << "Chain " << chain << ", param " << param
+        << ": variance is 0";
     }
   }
 }
 
-TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
-  using boost::math::students_t;
-  using boost::math::quantile;
 
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using std::vector;
   using std::pair;
+  using std::sqrt;
+  using std::abs;
+  using std::setw;
+
+  using boost::math::students_t;
+  using boost::math::binomial;
+  using boost::math::quantile;
   
   vector<pair<size_t, double> > expected_values = TypeParam::get_expected_values();
-  //std::cout << "testing " << expected_values.size() << " values" << std::endl;
-  for (size_t i = 0; i < expected_values.size(); i++) {
-    size_t index = expected_values[i].first;
-    double e_val = expected_values[i].second;
+  size_t n = expected_values.size();
+  if (n == 0)
+    return;
 
-    double neff = TypeParam::chains->effective_sample_size(index);
-    double mean = TypeParam::chains->mean(index);
-    // FIXME: chains->variance(index) crashes.
-    double se = TypeParam::chains->sd(index) / std::sqrt(neff);
-    double T = quantile(students_t(neff-1.0), 0.975);
-    EXPECT_NEAR(e_val, mean, T*se)
-      << "For variable " << index << ", "
-      << "T is: " << T << " and se is: " << se << std::endl;
-    // FIXME: better error message
+  stan::mcmc::chains<> *c = TypeParam::chains;
+  double alpha = 0.05;
+  if (n < 3)
+    alpha = 0.01;
+
+  
+  int failed = 0;
+  std::stringstream err_message;
+  for (size_t i = 0; i < n; i++) {
+    size_t index = expected_values[i].first;
+    double expected_mean = expected_values[i].second;
+
+    double neff = c->effective_sample_size(index);
+    double sample_mean = c->mean(index);
+    double se = c->sd(index) / sqrt(neff);
+    double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
+
+    if (abs(expected_mean - sample_mean) > z*se) {
+      failed++;
+      // want the error message to have which, what, how
+      err_message << "parameter index: " << index
+                  << "\n\texpected:    " << setw(10) << expected_mean
+                  << "\n\tsampled:     " << setw(10) << sample_mean
+                  << "\n\tneff:        " << setw(10) << neff
+                  << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
+                  << "\n\tz:           " << setw(10) << z
+                  << "\n\tse:          " << setw(10) << se
+                  << "\n\n\tabs(diff) > z * se: " 
+                  << abs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
+    }
+  }
+  
+  if (failed == 0)
+    return;
+  
+
+  double p = 1 - cdf(binomial(n, alpha), failed);
+  // this test should fail less than 0.1% of the time.
+  if (p < 0.001) {
+    EXPECT_EQ(0, failed)
+      << "Failed " << failed << " of " << expected_values.size() << " comparisons\n"
+      << "p: " << p << std::endl
+      << "------------------------------------------------------------\n"
+      << err_message.str();
   }
 }
 
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
-			   RunModel,
-			   ChainsTest,
-			   ExpectedValuesTest);
+                           RunModel,
+                           ChainsTest,
+                           ExpectedValuesTest);
 
 #endif

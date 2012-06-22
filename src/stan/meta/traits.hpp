@@ -1,6 +1,7 @@
 #ifndef __STAN__META__TRAITS_HPP__
 #define __STAN__META__TRAITS_HPP__
 
+#include <vector>
 #include <boost/type_traits.hpp>
 
 namespace stan {
@@ -26,6 +27,37 @@ namespace stan {
      */
     enum { value = boost::is_convertible<T,double>::value };
   };
+
+  // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
+
+  /**
+   * Metaprogram structure to determine the base scalar type
+   * of a template argument.
+   *
+   * <p>This base class should be specialized for structured types.
+   *
+   * @tparam T Type of object.
+   */
+  template <typename T>
+  struct scalar_type {
+    /** 
+     * Base scalar type for object.
+     */
+    typedef T type;
+  };
+
+  /**
+   * Metaprogram specialization extracting the base type of
+   * a standard vector recursively.
+   *
+   * @tparam Scalar type of vector.
+   */
+  template <typename T>
+  struct scalar_type<std::vector<T> > {
+    typedef typename scalar_type<T>::type type;
+  };
+      
+
 
 }
 
