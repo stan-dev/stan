@@ -1,6 +1,7 @@
 #ifndef __STAN__META__TRAITS_HPP__
 #define __STAN__META__TRAITS_HPP__
 
+#include <vector>
 #include <boost/type_traits.hpp>
 
 namespace stan {
