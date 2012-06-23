@@ -115,9 +115,9 @@ namespace stan {
       static const char* function = "stan::math::exp2(%1%)";
       T result;
       if(!check_not_nan(function,a, "a", &result, Policy()))
-	return result;
+        return result;
       if(!check_greater_or_equal(function,a,0.0,"a", &result, Policy()))
-	return result;
+        return result;
       using std::log;
       const static double LOG2 = std::log(2.0);
       return log(a) / LOG2;
@@ -655,19 +655,24 @@ namespace stan {
      * Return the scalar value and ignore the remaining
      * arguments.
      *
-     * <p>This function provides a <code>double</code>-only overload
-     * of <code>simple_var</code> to use with pure floating-point
-     * implementations.  The other overloads are for
-     * <code>stan::agrad::var</code> arguments; the definitions can be
-     * found in <code>stan/agrad/partials_vari.hpp</code>.
+     * <p>This function provides an overload of
+     * <code>simple_var</code> to use with primitive values for which
+     * the type and derivative type are the same.  The other overloads
+     * are for <code>stan::agrad::var</code> arguments; the
+     * definitions can be found in
+     * <code>stan/agrad/partials_vari.hpp</code>.
      * 
+     * @tparam T1 Type of first dummy argument and derivative.
+     * @tparam T2 Type of second dummy argument and derivative.
+     * @tparam T3 Type of third dummy argument and derivative.
      * @param v Value to return.
      * @return Value.
      */
+    template <typename T1, typename T2, typename T3>
     inline double simple_var(double v, 
-                             double /*y1*/, double /*dy1*/, 
-                             double /*y2*/, double /*dy2*/,
-                             double /*y3*/, double /*dy3*/) {
+                             const T1& /*y1*/, const T1& /*dy1*/, 
+                             const T2& /*y2*/, const T2& /*dy2*/,
+                             const T3& /*y3*/, const T3& /*dy3*/) {
       return v;
     }
 
