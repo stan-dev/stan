@@ -18,30 +18,54 @@ setMethod("show", "stanfit",
                 object@num.chains, " chains.\n", sep = '')  
           })  
 
-## TODO: use get_chain_quantiles and get_quantiles
-## in stanplot instead of summary 
 ##  refactor traceplot 
-stanplot <- function(object, pars = object@model.pars) {
+stanplot <- function(object, pars = object@model.pars, 
+                     prob = 0.8, plot = FALSE) {
   
-  probs = c(0.1, 0.5, 0.9)   
-  cs <- chain.summary(object, chain.id = 1:object@num.chains, pars = pars, probs = probs)
-  ss <- summary(object, pars = pars) 
+  if (missing(pars)) {
+    pars <- object@model.pars
+  } else {
+    pars <- check.pars(object, pars) 
+  } 
+  sampleshandle <- object@.fit$sampleshandle  
+
+  probs = c(0.5, 0.5 + c(-prob, prob) * 0.5) 
 
   num.par <- length(pars)
+  chains.v <- 1:object@num.chains 
+
   ps <- vector("list", num.par) 
   for (i in 1:num.par) {
-    cs <- chain.summary(object, chain.id = 1:Object@num.chains, pars = pars[i], probs = probs)
-    ss <- summary(object, pars = pars[i], probs = probs) 
-    # mlu <- list(median = cs[["50%"]]
+    par <- pars[i] 
+    rhats <- sampleshandle$get_split_rhat(par) 
+    mlu0 <- do.call(rbind, sampleshandle$get_quantiles(par, probs)) 
+    cms <- lapply(chains.v, 
+                  FUN = function(k) {
+                    z <- sampleshandle$get_chain_quantiles(k, par, .5)
+                    do.call(cbind, z) 
+                  })
+    cms <- data.frame(do.call(rbind, cms)) 
+    # print(cms) 
+    mlu <- list(median = mlu0[, 1], le = mlu0[, 2], ue = mlu0[, 3]) 
+    par.idx <- gsub(par, "", names(rhats)) 
+    rhats <- do.call(c, rhats) 
+    # cat("rhats=", rhats, "\n") 
+    ps[[i]] <- plot.pars0(mlu, cms, rhats, par, par.idx, prob = prob)
+    
   } 
+  if (plot) multi.print.plots(ps) 
+  invisible(ps) 
 } 
 
+if (!isGeneric("plot")) 
+  setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
 
-setMethod("plot", "stanfit",
-          function(x, y, ...) {
+setMethod("plot", signature = (x = "stanfit"), 
+          function(x, y, prob = 0.8, ...) {
             if (missing(y)) 
-              y <- object@model.pars 
-            stanplot(object = x, pars = y, ...)
+              y <- x@model.pars 
+            check.plot.pkgs() 
+            invisible(stanplot(object = x, pars = y, prob = prob, plot = TRUE))
           }) 
 
 setMethod("print", signature = (x = "stanfit"),
@@ -146,12 +170,12 @@ chain.summary <- function(object, chain.id = 1:object@num.chains,
          "number of chains.") 
   } 
 
-  sampleshandle <- object@.fit$sampleshandle  
   if (missing(pars)) {
     pars <- object@model.pars
   } else {
     pars <- check.pars(object, pars) 
   } 
+  sampleshandle <- object@.fit$sampleshandle  
 
   if (missing(probs)) 
     probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
@@ -215,7 +239,7 @@ setMethod("summary", signature = (object = "stanfit"),
           })  
 
 
-traceplot <- function(object, pars) {
+traceplot <- function(object, pars, plot = TRUE) {
 
   if (missing(pars)) {
     pars <- object@model.pars
@@ -244,21 +268,28 @@ traceplot <- function(object, pars) {
                  data.frame(x2) 
                }) 
 
-  tplot.b.col <- 
-    do.call(c, get.rstan.options(c("plot.warmup.color", "plot.kept.color"))) 
-  tplot.l.cols <- get.rstan.options("plot.chains.colors") 
+  n.warmup <- data.frame(x = chain1_args$n.warmup) 
+  colw <- get.rstan.options("plot.warmup.col") 
+  colk<- get.rstan.options("plot.kept.col") 
+
+  tplot.l.cols <- get.rstan.options("plot.chains.cols") 
 
 
-  rects <- data.frame(xs = c(-Inf, chain1_args$n.warmup),  
-                      xe = c(chain1_args$n.warmup, Inf), 
-                      col = tplot.b.col) 
+  num.par <- length(pars) 
+  ps <- vector("list", num.par) 
+  for (i in 1:num.par) {
+    p <- ggplot()  
+    if (!is.na(colw)) {
+      p <- p + geom_rect(data = n.warmup, 
+                         aes(xmin = -Inf, xmax = x, 
+                             ymin = -Inf, ymax = Inf), fill = colw, alpha = 0.1)
+    }
+    if (!is.na(colk)) {
+      p <- p + geom_rect(data = n.warmup, 
+                         aes(xmax = Inf, xmin = x, 
+                             ymin = -Inf, ymax = Inf, fill = colk), alpha = 0.1)
+    }
 
-
-  for (i in 1:length(pars)) {
-    p <- ggplot() + 
-      geom_rect(data = rects, 
-                aes(xmin = xs, xmax = xe, ymin = -Inf, ymax = Inf, fill = col), 
-                alpha = 0.1)
     vname <- paste("par", i, sep = '')
 
     for (k in 1:object@num.chains) {
@@ -267,14 +298,15 @@ traceplot <- function(object, pars) {
                   aes_string(x = "Iterations", y = vname), 
                   color = tplot.l.cols[k]) + 
         opts(legend.position = "none") + 
-        ylab(pars[i])   
+        ylab(pars[i]) +
+        opts(title = paste("Trace of ", pars[i])) 
         # FIXME: 
         # need points as well?  # geom_point() 
-        # layout 
     }
-    
-    print(p)
+    ps[[i]] <- p
   } 
+  if (plot) multi.print.plots(ps) 
+  return(invisible(ps)) 
 } 
 
 

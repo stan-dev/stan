@@ -7,7 +7,7 @@
 
 .init.rstan.opt.env <- function(e) {
   assign("plot.warmup.col", 19, e)
-  assign("plot.kept.col", 20, e)
+  # assign("plot.kept.col", 20, e)
   assign("plot.chains.cols", 1:10, e)
 
   assign("plot.rhat.breaks", c(1.1, 1.2, 1.5, 2), e)
@@ -18,14 +18,21 @@
   # when R-hat is large than max(rhat.breaks) 
   assign("plot.rhat.large.col", "red", e)
 
+  # how many plots (traceplot and plots) for 
+  # each page 
+  assign("plot.nrow", 4, e) 
+  assign("plot.ncol", 1, e) 
+
   # for plot(stanfit)
   # the color for indicating the median of 
   # for samples from all the chains or 
   # separate chains
-  assign("plot.chain.median.col", "black", e)
+  assign("plot.chain.median.cols", 
+         c("green", "red", "yellow", "blue", "brown", "purple",
+           "chocolate", "cyan", "coral"), e)
 
   # cat(".init.rstan.opt.env called.\n")
-  return(e)
+  invisible(e)
 }
 
 .init.rstan.opt.env(.rstan.opt.env)
@@ -45,7 +52,7 @@ get.rstan.options <- function(opt.name) {
     .init.rstan.opt.env(e)
   r <- mget(opt.name, envir = e, ifnotfound = NA)
   if (length(opt.name) == 1) return(r[[1]])
-  r
+  invisible(r)
 }
 
 
@@ -61,7 +68,7 @@ rstan.options <- function(...) {
     return(e) 
   a.names <- names(a) 
   lapply(1:len, FUN = function(i) assign(a.names[i], a[[i]], e)) 
-  e
+  invisible(e)
 } 
 
 ## test code 

@@ -172,6 +172,7 @@ library(ggplot2)
 
 sf <- stan(model.code = dogsstan, data = dogsdat, verbose = TRUE, n.chains = 3, seed = 1340384924, sample.file = 'dogsb.csv')
 traceplot(sf)
+plot(sf)
 
 cs <- chain.summary(sf)
 

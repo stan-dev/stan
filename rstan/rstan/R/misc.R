@@ -10,14 +10,18 @@
 #       storage.mode(y) <- "integer"  
 #     return(y) 
 #   } 
-
-
-## @param x is a list 
-## 
-## Ignore non-numeric vectors since we ignore
-## them in rlist_var_context 
-## 
+ 
 list.as.integer.if.doable <- function(x) {
+  # change the storage mode from 'real' to 'integer' 
+  # if applicable since by default R use real.
+  #
+  # Args:
+  #  x: A list 
+  # 
+  # Note:
+  # Ignore non-numeric vectors since we ignore
+  # them in rlist_var_context 
+  #
   lapply(x, 
          FUN = function(y) { 
            if (!is.numeric(y)) return(y) 
@@ -28,13 +32,16 @@ list.as.integer.if.doable <- function(x) {
          });  
 } 
 
-## Preprocess the data (list or env) to list for stan
-## @param data A list or environment: 
-##  1 stop if there is NA; no-name lists; duplicate names  
-##  2 remove NULL, non-numeric elements 
-##  3 change to integers when applicable 
+
 
 data.preprocess <- function(data) { # , varnames) {
+  # Preprocess the data (list or env) to list for stan
+  # 
+  # Args:
+  #  data A list or environment: 
+  #   * stop if there is NA; no-name lists; duplicate names  
+  #   * remove NULL, non-numeric elements 
+  #   * change to integers when applicable 
 
   # 
   # if (is.environment(data)) {
@@ -104,11 +111,11 @@ get.model.code <- function(file, model.code = '') {
       }
       on.exit(close(file))
     } else if (!inherits(file, "connection")) {
-      stop("'File' must be a character string or connection")
+      stop("file must be a character string or connection")
     }
     model.code <- paste(readLines(file, warn = FALSE), collapse = '\n') 
   } else if (model.code == '') {  
-    stop("Missing model file missing and empty model.code")
+    stop("Model file missing and empty model.code")
   } 
   model.code 
 } 
@@ -292,8 +299,58 @@ stan.dump <- function(list, file, append = FALSE,
 # d <- array(1:90, dim = c(9, 2, 5))
 # stan.dump(c('a', 'b', 'c', 'd'), file = 'a.txt')
 
+get.rhat.cols <- function(rhats) {
+  # 
+  # Args:
+  #   rhat: a scale 
+  #
+  rhat.na.col <- get.rstan.options("plot.rhat.na.col")
+  rhat.breaks <- get.rstan.options("plot.rhat.breaks")
+  # print(rhat.breaks)
+  rhat.colors <- get.rstan.options("plot.rhat.cols")
+  
+  sapply(rhats, 
+         FUN = function(x) {
+           if (is.na(x) || is.nan(x) || is.infinite(x))
+             return(rhat.na.col)           
+           for (i in 1:length(rhat.breaks)) {
+             # cat("i=", i, "\n")
+             if (x >= rhat.breaks[i]) 
+               next;
+             return(rhat.colors[i])
+           }  
+           get.rstan.options("plot.rhat.large.col")
+		 })  
+}
 
-plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {                
+
+multi.print.plots <- function(ps, nrow = get.rstan.options("plot.nrow"), 
+                                  ncol = get.rstan.options("plot.ncol")) {
+  # plots a list of plots using grid.arrange 
+  # 
+  # Args:
+  #  ps A list of plots obtained from ggplot or 
+  #  those supported by grid.arrange 
+  num.p <- length(ps)
+  if (num.p < 1) return(NULL) 
+  if (nrow == 1 && ncol == 1) {
+    for (i in 1:num.p)
+      print(ps[[i]])
+  }
+  stopifnot(require(gridExtra))
+  start <- seq(1, num.p, by = nrow * ncol)
+  end <- c(start[-1] - 1, num.p)
+  for (i in 1:length(start)) {
+    args <- c(ps[start[i]:end[i]], list(ncol = ncol, nrow = nrow))
+    do.call(grid.arrange, args)
+  }
+  # virtualGrob
+}
+
+
+
+plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, 
+                       plot = FALSE, prob = 0.8) {                
   # Plot a parameter (scale, vector, or array) with median, 
   # credible interval, and medians from separate chains, 
   # where par.name provides the parameter name and par.idx 
@@ -311,26 +368,37 @@ plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {
   #   par.name: parameter name, for example, beta.
   #   par.idx: parameter indices, for example, [1], [2], [3].
   #   plot: TRUE -- render the plot; FALSE -- not. 
+  #   prob: The probability of the interval, only used in 
+  #         the title. So the caller should set prob 
+  #         match what are in mlu
   # 
   # Returns: 
   #   A grob of ggplot
 
   num.par <- length(mlu[[1]])
   
-  m.col <- get.rstan.options("plot.chain.median.col")
-  srhat.cols = sapply(srhats, FUN = function(x) get.rhat.col(x))
+  m.cols <- get.rstan.options("plot.chain.median.cols")
+  srhat.cols = get.rhat.cols(srhats)
+  # cat("srhat.cols=", srhat.cols, "\n")
   
   d <- data.frame(x = 1:num.par, 
                   y = mlu$median, 
                   le = mlu$le, 
                   ue = mlu$ue, 
                   cs = srhat.cols)
+  # print(d)
   
-  d2 <- lapply(1:length(cms), 
-               FUN = function(i) {
-                 cbind(rep(i, length(cms[[i]])), cms[[i]])})
-  d2 <- as.data.frame(do.call(rbind, d2))
-  names(d2) <- c("x", "y")
+  ## for later setting up all the colors manually
+  cols.manual <- unique(c(srhat.cols, m.cols))
+  names(cols.manual) <- cols.manual;
+
+  lens <- sapply(cms, function(x) length(x))
+  m.cols <- rep(m.cols, max(lens)) # in case m.cols's length is not enough
+  colidx <- do.call(c, lapply(lens, function(n) 1:n)) 
+  par.id <- do.call(c, lapply(1:length(lens), function(i) rep(i, lens[i])))
+  d2 <- data.frame(x = par.id, 
+                   y = do.call(c, cms),
+                   col = m.cols[colidx])
 
   p1 <- ggplot() +
     geom_linerange(data = d, 
@@ -338,21 +406,26 @@ plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {
                    size = 2, alpha = .6) +
     geom_point(data = d, 
                aes(x = x, y = y, colour = cs), 
-               shape = 15, size = 4) + 
+               shape = 15, size = 3) + 
     geom_point(data = d2, 
-               aes(x = x, y = y), 
-               shape = 16, color = m.col, size = 4) +
+               aes(x = x, y = y, colour = col), 
+               shape = 4, size = 3) +
+    scale_colour_manual(values = cols.manual) +
     ylab(par.name) + 
     opts(legend.position = "none", axis.title.x = theme_blank()) + 
+    opts(title = paste0("Medians and ", probs2str(prob), " intervals")) +  
     scale_x_discrete(labels = par.idx)
   
-  if (plot) {
-    print(p1)
-    return(invisible(p1))
-  } 
-  return(p1)
+  if (plot) print(p1)
+  return(invisible(p1))
 }
 
+## test plot.pars0
+# df <- data.frame(median = c(1,2,3), le = c(0.5, 1, 2), ue = c(2, 3, 4))
+# cms <- list(c(1,2,3), c(4,5))
+# p <- plot.pars0(df, cms, srhats = c(1.1,1.5,2), 
+#                 par.name = "beta", 
+#                 par.idx = c("[1]", "[2]", "[3]"))
 
 read.rdump <- function(f) {
   # Read variables defined in an R dump file to an R list
@@ -371,6 +444,13 @@ read.rdump <- function(f) {
 } 
 
 
+## FIXME: a better way to check grid and ggplot2, 
+## 
+check.plot.pkgs <- function() {
+   stopifnot(require("ggplot2"))
+   stopifnot(require("grid"))    
+   # stopifnot(require("gridExtra"))
+} 
 
 #### temporary test code 
 #  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
