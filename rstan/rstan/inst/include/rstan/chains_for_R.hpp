@@ -15,6 +15,59 @@ namespace rstan {
     }
 
     /**
+     *  Get the parameter indices for a vector(array) parameter.
+     *  For example, we have parameter beta, which has 
+     *  dimension [2,3]. Then this function gets 
+     *  the indices as (if col_major = false)
+     *  [0,0], [0,1], [0,2] 
+     *  [1,0], [1,1], [1,2] 
+     *  or (if col_major = true) 
+     *  [0,0], [1,0] 
+     *  [0,1], [1,1] 
+     *  [0,2], [121] 
+     *
+     *  @param dim[in] the dimension of parameter
+     *  @param idx[out] for keeping all the indices
+     *
+     *  <p> when idx is empty (size = 0), idx 
+     *  would be inserted an empty vector. 
+     * 
+     *
+     */
+    
+    void expand_indices(std::vector<size_t> dim,
+                        std::vector<std::vector<size_t> >& idx,
+                        bool col_major = false) {
+    
+      size_t len = dim.size();
+    
+      idx.resize(0);
+      size_t total = product(dim);
+    
+      std::vector<size_t> loopj;
+      for (size_t i = 1; i <= len; ++i)
+        loopj.push_back(len - i);
+    
+      if (col_major)
+        for (size_t i = 0; i < len; ++i)
+          loopj[i] = len - 1 - loopj[i];
+    
+      idx.push_back(std::vector<size_t>(len, 0));
+      for (size_t i = 1; i < total; i++) {
+        std::vector<size_t>  v(idx.back());
+        for (size_t j = 0; j < len; ++j) {
+          size_t k = loopj[j];
+          if (v[k] < dim[k] - 1) {
+            v[k] += 1;
+            break;
+          }
+          v[k] = 0;
+        }
+        idx.push_back(v);
+      }
+    }
+
+    /**
      * Get the names for an array of given dimensions 
      * in the way of column majored. 
      * For exmaple, if we know an array named `a`, with
@@ -47,57 +100,41 @@ namespace rstan {
      *
      * @param name The name of the array variable 
      * @param dims The dimensions of the array 
+     * @param allnames[out] Where the names would be pushed. 
      * @param first_is_one[true] Where to start for the first index: 0 or 1. 
-     * @return All the names for the array 
      *
      */
-    std::vector<std::string>
-    get_col_major_names(std::string name,
-                        std::vector<size_t> dims,
+    void
+    get_col_major_names(const std::string& name,
+                        const std::vector<size_t>& dims,
+                        std::vector<std::string>& allnames,
                         bool first_is_one = true) {
 
-      size_t s = dims.size();
-      if (0 == s) return std::vector<std::string>(1, name);
-      std::vector<size_t> steps(1, 1);
-      for (size_t i = 0; i < (s - 1); i++)
-        steps.push_back(steps.back() * dims[i]);
+      allnames.resize(0);
 
-      /*
-      for (tyepname std::vector<size_t>::const_iterator i = steps.begin(); 
-           i != steps.end();
-           ++i) {
-        std::cout << *i << std::endl;
-      } 
-      */
+      if (0 == dims.size()) {
+        allnames.push_back(name);
+        return;
+      }
 
-      size_t total = product(dims);
-      // std::cout << "total = " << total << std::endl;
-      std::vector<size_t> idx(s);
-
-      std::vector<std::string> allnames;
-
-      for (size_t i = 0; i < total; ++i) {
-        size_t ii = i;
-        for (size_t j = s - 1; j > 0; --j) {
-          idx[j] = ii / steps[j];
-          ii -= idx[j] * steps[j];
-        }
-        idx[0] = ii;
-
+      std::vector<std::vector<size_t> > idx;
+      expand_indices(dims, idx, true);
+      size_t first = first_is_one ? 1 : 0;
+      for (std::vector<std::vector<size_t> >::const_iterator it = idx.begin();
+           it != idx.end();
+           ++it) {
         std::stringstream stri;
         stri << name << "[";
 
-        size_t first =  first_is_one ? 1 : 0;
-        for (size_t j = 0; j < s - 1 ; ++j)
-          stri << idx[j] + first << ",";
-        stri << idx[s - 1] + first << "]";
+        size_t lenm1 = it -> size() - 1;
+        for (size_t i = 0; i < lenm1; i++)
+          stri << ((*it)[i] + first) << ",";
+        stri << ((*it)[lenm1] + first) << "]";
         allnames.push_back(stri.str());
       }
-      return allnames;
     }
+  }
 
-
-  } 
   /**
    * 
    * Improve efficiency (for example less copying) and 

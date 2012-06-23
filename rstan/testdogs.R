@@ -105,15 +105,15 @@ model_name <- "dogs";
 dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-ss <- sampling(dogsrr, data = dogsdat, n.chains = 3, 
+ss <- sampling(dogsrr, data = dogsdat, n.chains = 3, seed = 1340338046,
                n.iter = 2012, sample.file = 'dogs.csv')
 
-ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, 
+ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
                 n.iter = 2012, sample.file = 'dogs.csv')
 
 
 
-  args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012)
+  args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012, seed = 1340384924)
   dogsdat <- rstan:::data.preprocess(dogsdat)
   sampler <- new(dogsrr@.modelmod$sampler, dogsdat, 3)
   sampler$call_sampler(args) 
@@ -170,7 +170,7 @@ print(ss, pars = c('alpha', 'beta'))
 
 library(ggplot2)
 
-sf <- stan(model.code = dogsstan, data = dogsdat, verbose = TRUE, n.chains = 3)
+sf <- stan(model.code = dogsstan, data = dogsdat, verbose = TRUE, n.chains = 3, seed = 1340384924, sample.file = 'dogsb.csv')
 traceplot(sf)
 
 cs <- chain.summary(sf)

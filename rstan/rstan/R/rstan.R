@@ -6,6 +6,17 @@ stan.model <- function(file, verbose = FALSE,
                        model.name = "anon_model", 
                        model.code = '', stan.home) {
 
+  # Construct a stan model from stan code 
+  # 
+  # Args: 
+  #   file: the file that has the model in Stan model language.
+  #   model.name: a character for naming the model. Note that
+  #     the name needs to be a valid C++ name. So 
+  #   model.code: if file is not specified, we can used 
+  #     a character to specify the model.   
+  #   stan.home: not used now, it mighted be needed
+  #     if Rstan is packaged differently. 
+
   model.code <- get.model.code(file, model.code)  
   r <- stanc(model.code, model.name); 
   inc <- paste("#include <rstan/rstaninc.hpp>\n", 

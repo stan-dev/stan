@@ -27,9 +27,8 @@
   # cat(".init.rstan.opt.env called.\n")
   return(e)
 }
-.rstan.opt.env <- new.env()
-.init.rstan.opt.env(.rstan.opt.env)
 
+.init.rstan.opt.env(.rstan.opt.env)
 
 get.rstan.options <- function(opt.name) {
   # Get an RStan option by name
@@ -37,7 +36,9 @@ get.rstan.options <- function(opt.name) {
   #   opt.name: the name of the options 
   # Return:
   #   A named list of option values. If the name 
-  #   is not found, the value is NA. 
+  #   is not found, the value is NA. If opt.name 
+  #   is just one name, the object is returned (not
+  #   in a list). 
 
   e <- .rstan.opt.env
   if (length(as.list(e)) == 0)

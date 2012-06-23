@@ -1,4 +1,6 @@
 stanc <- function(model.code, model.name = "anon_model", verbose = FALSE) {
+  # Call stanc, which is written in C++
+  # 
   SUCCESS_RC <- 0 
   EXCEPTION_RC <- -1
   PARSE_FAIL_RC <- -2 

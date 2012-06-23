@@ -6,32 +6,44 @@ Dump the data for a Stan model to R dump file
 that Stan supports
 %%  ~~function to do ... ~~
 }
+
+
 \description{
-Dump the data for a Stan model to R dump file
-that Stan supports
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  This function takes a vector of names of \R objects and produces
+  text representations of the objects on a file or connection.
+  A \code{stan.dump} can usually be used as data input of the 
+  Stan package (\url{http://stan.googlecode.com}) or 
+  \code{\link{source}}d into another \R session.
 }
+
 \usage{
-stan.dump(data, file)
+stan.dump(list, file, append = FALSE, 
+          envir = parent.frame(),
+          width = options("width")$width)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{data}{
-%%     ~~Describe \code{data} here~~
+  \item{list}{character.  The names of one or more \R objects to be dumped.}
+
+  \item{file}{either a character string naming a file or a
+    \link{connection}.  \code{""} indicates output to the console.}
+
+  \item{append}{if \code{TRUE} and \code{file} is a character string,
+    output will be appended to \code{file}; otherwise, it will overwrite
+    the contents of \code{file}.}
+
+  \item{envir}{the environment to search for objects.}
+  \item{width}{the width for maximum characters on a line.  
+    The output is broken into lines with \code{width.}}
 }
-  \item{file}{
-%%     ~~Describe \code{file} here~~
-}
-}
+
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
+
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  An invisible character vector containing the names of the objects
+  which were dumped.
 }
 \references{
 %% ~put references to the literature/web site here ~
@@ -40,12 +52,15 @@ stan.dump(data, file)
 %%  ~~who you are~~
 }
 \note{
+  \code{stan.dump} only dumps numeric data, which could be 
+  scale, vector, array, or matrix.  
 %%  ~~further notes~~
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
+\code{\link{dump}} 
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{

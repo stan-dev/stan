@@ -51,7 +51,7 @@ setMethod("sampling", "stanmodel",
               stop("The number of chains (n.chains) must be postive") 
 
             # check data and preprocess 
-            if (!missing(data)) 
+            if (!missing(data) && length(data) > 0) 
               data <- data.preprocess(data) 
             else 
               data <- list()

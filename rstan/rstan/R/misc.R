@@ -69,7 +69,7 @@ data.preprocess <- function(data) { # , varnames) {
  
                    ## Now we stop whenever we have NA in the data
                    ## since we do not know what variables are needed
-                   ## at this pointi.
+                   ## at this point.
                    if (any(is.na(x))) {
                      stop("Stan does not support NA in the data.\n");
                    } 
@@ -79,7 +79,7 @@ data.preprocess <- function(data) { # , varnames) {
  
                    if (is.integer(x)) return(x) 
          
-                   # change those integers in form of real to integers 
+                   # change those integers stored as reals to integers 
                    if (isTRUE(all.equal(x, round(x), check.attributes = FALSE))) 
                      storage.mode(x) <- "integer"  
                    return(x) 
@@ -219,68 +219,137 @@ probs2str <- function(probs, digits = 1) {
 } 
 
 
-stan.dump <- function(data, file) {
+stan.dump <- function(list, file, append = FALSE, 
+                      envir = parent.frame(),
+                      width = options("width")$width) {
   # Dump an R list or environment for a model data 
   # to the R dump file that Stan supports.
   #
   # Args:
-  #   data: the data, an object of list of environment.
+  #   list: a vector of character for all variables interested 
+  #         (the same as in R's dump function) 
   #   file: the output file for dumping the variables. 
+  #   append: then TRUE, the file is opened with 
+  #           mode of appending; otherwise, a new file
+  #           is created.  
   # 
-  # Retrun:
+  # Return:
  
-  if (missing(data)) 
-    stop("stan.dump needs argument 'data'") 
   if (missing(file)) 
     stop("stan.dump needs argument 'file', ",
          "into which the data are dumped.") 
 
-  ### FIXEME, to be implemented. 
+  if (is.character(file)) {
+    ex <- sapply(list, exists, envir = envir)
+    if (!any(ex)) 
+      return(invisible(character()))
+
+    if (nzchar(file)) {
+      file <- file(file, ifelse(append, "a", "w"))
+      on.exit(close(file), add = TRUE)
+    } else {
+      file <- stdout()
+    }
+  }
+
+  l2 <- NULL; 
+  addnlpat <- paste0("(.{1,", width, "})(\\s|$)")
+  for (v in list) {
+    vv <- get(v, envir) 
+
+    if (!is.numeric(vv))  next; 
+
+    if (is.vector(vv)) {
+      if (length(vv) == 1) {
+        cat(v, " <- ", vv, "\n", file = file, sep = '')
+        next;
+      }
+      str <- paste0(v, " <- \nc(", paste(vv, collapse = ', '), ")") 
+      str <-  gsub(addnlpat, '\\1\n', str)
+      cat(str, file = file) 
+      l2 <- c(l2, v) 
+      next; 
+    }    
+
+    if (is.matrix(vv) || is.array(vv)) { 
+      l2 <- c(l2, v) 
+      vvdim <- dim(vv)
+      cat(v, " <- \n", file = file, sep = '')
+      str <- paste0("structure(c(", paste(as.vector(vv), collapse = ', '), "),") 
+      str <- gsub(addnlpat, '\\1\n', str)
+      cat(str, 
+          ".Dim = c(", paste(vvdim, collapse = ', '), "))\n", file = file, sep = '')
+      next; 
+    }
+  }
+  invisible(l2) 
 } 
 
+## test stan.dump simply
+# a <- 1:3
+# b <- 3
+# c <- matrix(1:9, ncol = 3)
+# d <- array(1:90, dim = c(9, 2, 5))
+# stan.dump(c('a', 'b', 'c', 'd'), file = 'a.txt')
 
-plot.a.par <- function(mlu, cms, srhat, par.name, mcol = 'black', 
-                       ccols = 1 + 1:length(cms)) {
-                       
-  # Plot one parameter with median, confidence interval
-  # and medians from seprate chains. 
+
+plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {                
+  # Plot a parameter (scale, vector, or array) with median, 
+  # credible interval, and medians from separate chains, 
+  # where par.name provides the parameter name and par.idx 
+  # the indices. par.idx could be empty for plotting a scale
+  # parameter
   # 
   # Args:
-  #   mlu: median, le, and ue, computed from samples of all the chains
-  #   cms: median of separate chains
-  #   srhat: split r hat
-  #   vname: varianbve name 
-  # Returns:
+  #   mlu: a list with elements of median, le, and ue, 
+  #        computed from samples of all the chains for 
+  #        all parameters.  For example, mlu$median
+  #        is a vector of median for 5 parameters.
+  #   cms: a list, each element of which is the medians of 
+  #        separate chains for a parameter.
+  #   srhats: a vector of split R hats for all parameters.
+  #   par.name: parameter name, for example, beta.
+  #   par.idx: parameter indices, for example, [1], [2], [3].
+  #   plot: TRUE -- render the plot; FALSE -- not. 
   # 
-  # References:
-  #   http://wiki.stdout.org/rcookbook/Graphs/Axes%20(ggplot2)/
-  #   ggplot color: http://wiki.stdout.org/rcookbook/Graphs/Colors%20(ggplot2)/
-  #   opts list: https://github.com/hadley/ggplot2/wiki/-opts%28%29-List
- 
-  n.c <- length(cms)
-  d <- data.frame(x = 1, le = mlu[2], ue = mlu[3])
-  d2 <- data.frame(x = rep(1, 1 + n.c), 
-                   y = c(mlu[1], cms), 
-                   col = c(mcol, ccols))
-  p1 <- 
-    ggplot() +
-    geom_linerange(data = d, aes(x = x, ymin = le, ymax = ue), colour = mcol) + 
-    opts(axis.title.y = theme_blank()) +
-    xlab(par.name) +
-    scale_x_discrete(breaks = NULL) 
- 
-    p1 <- p1 + geom_point(data = d2, aes(x = x, y = y, color = col), size = 2) + 
-           opts(legend.position = "none")
-      
-    # geom_point(data = d2, aes(x = x, y = y, color = col))
-    # opts(axis.text.x = theme_blank(),
-    #   axis.ticks.x = theme_blank(),
-    #   axis.title.x = theme_blank(),
-    #   axis.line.x = theme_blank())        
+  # Returns: 
+  #   A grob of ggplot
 
-  ## TODO:
-  ##  ADD split R hat  
-    
+  num.par <- length(mlu[[1]])
+  
+  m.col <- get.rstan.options("plot.chain.median.col")
+  srhat.cols = sapply(srhats, FUN = function(x) get.rhat.col(x))
+  
+  d <- data.frame(x = 1:num.par, 
+                  y = mlu$median, 
+                  le = mlu$le, 
+                  ue = mlu$ue, 
+                  cs = srhat.cols)
+  
+  d2 <- lapply(1:length(cms), 
+               FUN = function(i) {
+                 cbind(rep(i, length(cms[[i]])), cms[[i]])})
+  d2 <- as.data.frame(do.call(rbind, d2))
+  names(d2) <- c("x", "y")
+
+  p1 <- ggplot() +
+    geom_linerange(data = d, 
+                   aes(x = x, ymin = le, ymax = ue, colour = cs), 
+                   size = 2, alpha = .6) +
+    geom_point(data = d, 
+               aes(x = x, y = y, colour = cs), 
+               shape = 15, size = 4) + 
+    geom_point(data = d2, 
+               aes(x = x, y = y), 
+               shape = 16, color = m.col, size = 4) +
+    ylab(par.name) + 
+    opts(legend.position = "none", axis.title.x = theme_blank()) + 
+    scale_x_discrete(labels = par.idx)
+  
+  if (plot) {
+    print(p1)
+    return(invisible(p1))
+  } 
   return(p1)
 }
 
@@ -293,14 +362,13 @@ read.rdump <- function(f) {
   # 
   # Returns:
   #   A list
+
+  if (missing(f)) 
+    stop("No file specified.")
   e <- new.env() 
   source(file = f, local = e)
   as.list(e)
 } 
-
-## test for plot.a.par. 
-## plot.a.par(c(2,1, 3), c(1.5, 2.5), 1.2, 'h', ccols = c("red", "green"))
-
 
 
 

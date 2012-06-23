@@ -363,8 +363,10 @@ namespace rstan {
     /* Obtain the indices and flatnames for a vector of parameter names. 
      * @param names[in] Names of parameters of interests 
      * @param indices[out] The indices for all parameters in the overall
-     * samples. Note the index here is not the index in
-     * <code>param_name_to_index</code>.  
+     * samples. Note the index here is the index as in 
+     * <code>stan::mcmc::chains::get_total_param_index</code>; 
+     * but not the index in 
+     * <code>stan::mcmc::chains::param_name_to_index</code>.  
     
      * @param flatnames[out] Flatnames for all the names. That is, 
      * if parameter a is of length 3, it would be added as 
@@ -386,7 +388,7 @@ namespace rstan {
           size_t ts = std::distance(flatnames_.begin(),
                                     std::find(flatnames_.begin(), 
                                               flatnames_.end(), *it));       
-          if (ts == flatnames_.size()) 
+          if (ts == flatnames_.size()) // not found 
             continue; 
           flatnames.push_back(*it); 
           indices.push_back(ts); 
@@ -395,12 +397,17 @@ namespace rstan {
 
         size_t j = chains_.param_name_to_index(*it);
         std::vector<size_t> j_dims = chains_.param_dims(j); 
-        size_t j_size = chains_.param_size(j); 
-        size_t j_start = chains_.param_start(j); 
-        for (size_t i = j_start; i < j_start + j_size; i++) {
-          indices.push_back(i); 
-          flatnames.push_back(flatnames_[i]); 
-        }
+
+        std::vector<std::vector<size_t> > j_idx;  
+        expand_indices(j_dims, j_idx); // col_major = false 
+
+        for (std::vector<std::vector<size_t> >::const_iterator it = j_idx.begin(); 
+             it != j_idx.end(); 
+             ++it) { 
+          size_t total_idx = chains_.get_total_param_index(j, *it); 
+          indices.push_back(total_idx); 
+          flatnames.push_back(flatnames_[total_idx]); 
+        } 
       }
     }
 
@@ -429,7 +436,8 @@ namespace rstan {
         size_t j = chains_.param_name_to_index(*it);
         std::vector<size_t> j_dims = chains_.param_dims(j); 
         size_t j_size = chains_.param_size(j); 
-        std::vector<std::string> j_n = get_col_major_names(*it, j_dims);
+        std::vector<std::string> j_n;  
+        get_col_major_names(*it, j_dims, j_n);
         flatnames_.insert(flatnames_.end(), j_n.begin(), j_n.end()); 
       }
 

@@ -7,6 +7,7 @@
   b <- matrix(1:10, ncol = 2)
   c <- array(1:18, dim = c(2, 3, 3)) 
   dump(c("a", "b", "c"), file = 'dumpabc.R')
+  rstan:::stan.dump(c("a", "b", "c"), file = 'standumpabc.R')
 } 
 
 
@@ -47,8 +48,15 @@ test.read.rdump <- function() {
   checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
 } 
 
+test.stan.dump <- function() {
+  l <- rstan:::read.rdump("standumpabc.R")
+  checkEquals(l$a, c(1, 3, 5)) 
+  checkEquals(l$b, matrix(1:10, ncol = 2))
+  checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
+} 
+
 .tearDown <- function() {
   unlink('tmp.stan') 
-  unlink('dumpabc.R') 
+  # unlink('dumpabc.R') 
 } 
 

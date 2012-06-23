@@ -18,10 +18,22 @@ setMethod("show", "stanfit",
                 object@num.chains, " chains.\n", sep = '')  
           })  
 
+## TODO: use get_chain_quantiles and get_quantiles
+## in stanplot instead of summary 
+##  refactor traceplot 
 stanplot <- function(object, pars = object@model.pars) {
   
-  cs <- chain.summary(object, chain.id = 1:object@num.chains, pars = pars)
+  probs = c(0.1, 0.5, 0.9)   
+  cs <- chain.summary(object, chain.id = 1:object@num.chains, pars = pars, probs = probs)
   ss <- summary(object, pars = pars) 
+
+  num.par <- length(pars)
+  ps <- vector("list", num.par) 
+  for (i in 1:num.par) {
+    cs <- chain.summary(object, chain.id = 1:Object@num.chains, pars = pars[i], probs = probs)
+    ss <- summary(object, pars = pars[i], probs = probs) 
+    # mlu <- list(median = cs[["50%"]]
+  } 
 } 
 
 
