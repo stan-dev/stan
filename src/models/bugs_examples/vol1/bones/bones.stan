@@ -12,11 +12,9 @@
 ##    in the transformed parameters (Q here), the model
 ##    is fine in Stan. 
 ## 2. The missing data is recoded as `-1`, which is 
-##    not used for `gamma` as in the OpenBUGS example
+##    not modeled for `gamma` as in the OpenBUGS example
 ##    and not modeled for `grade`. 
 
-## FIXME:
-##  if_else(ind, log(..), 0) ?? 
 
 data {
   int(0,) nChild; 
@@ -32,26 +30,18 @@ parameters {
   real theta[nChild]; 
 }
 
-transformed parameters {
+model { 
+  real p[nChild, nInd, 5];
   real Q[nChild, nInd, 4];
+  theta ~ normal(0.0, 36); 
   for(i in 1:nChild) {
+    # Probability of observing grade k given theta
     for (j in 1:nInd) {
       # Cumulative probability of > grade k given theta
       for (k in 1:(ncat[j] - 1)) { 
         Q[i, j, k] <- inv_logit(delta[j] * (theta[i] - gamma[j, k])); 
       } 
-    }
-  } 
-} 
 
-model { 
-  real p[nChild, nInd, 5];
-  real zero; 
-  zero <- 0; 
-  theta ~ normal(0.0, 36); 
-  for(i in 1:nChild) {
-    # Probability of observing grade k given theta
-    for (j in 1:nInd) {
       p[i, j, 1] <- 1 - Q[i, j, 1];
       for (k in 2:(ncat[j] - 1))  
         p[i, j, k] <- Q[i, j, k - 1] - Q[i, j, k];
@@ -59,7 +49,7 @@ model {
       // grade[i, j] - 1 ~ categorical(p[i, j, 1:ncat[j]])
       
       // We use lp__ instead, since grade[i, j] has categorical distribution
-      // with variable dimension. 
+      // with varying dimension. 
       // if grade[i, j] = -1, it is missing, zero term then for the 
       // log-posterior. 
 
@@ -67,7 +57,7 @@ model {
       // evaluated. So I am adding the following term: 
       // 2 * int_step(-1 * grade[i, j]) 
 
-      lp__ <- lp__ + if_else(grade[i, j] + 1, log(p[i, j, grade[i, j] + 2 * int_step(-1 * grade[i, j])]), zero); 
+      lp__ <- lp__ + if_else(grade[i, j] + 1, log(p[i, j, grade[i, j] + 2 * int_step(-1 * grade[i, j])]), 0); 
     }
   }
 }

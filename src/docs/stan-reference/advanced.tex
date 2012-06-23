@@ -447,18 +447,24 @@ variogram-based estimator for autocorrelations, and hence effective sample
 size, based on multiple chains. For simplicity, each chain
 $\theta_m$ will be assumed to be of length $N$.
 
-One way to estimate the effective sample size is based on the variogram
-at each lag, $V_t$, defined by
+One way to estimate the effective sample size is based on the
+variograms $V_t$ at lag $t \in \setlist{0,1\ldots}$.  The variograms are
+defined as follows for (univariate) samples $\theta_m^{(n)}$, where $m \in
+\setlist{1,\ldots,M}$ is the chain, and $N_m$ is the number of samples
+in chain $m$.
 \[
 V_t = 
-\frac{1}{M(N - t)} 
+\frac{1}{M}
 \,
 \sum_{m=1}^M 
 \
-\sum_{n=t+1}^N 
+\left(
+\frac{1}{N_m}
+\sum_{n=t+1}^{N^m}
 \left(
 \theta_m^{(n)} - \theta_m^{(n-t)}
-\right)^2.
+\right)^2
+\right).
 \]
 %
 The variogram along with the multi-chain variance estimate

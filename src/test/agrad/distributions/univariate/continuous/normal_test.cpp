@@ -1,8 +1,13 @@
 #include <gtest/gtest.h>
+#include <cmath>
+
 #include "test/agrad/distributions/expect_eq_diffs.hpp"
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
 #include "stan/agrad/agrad.hpp"
+#include "stan/math/special_functions.hpp"
 #include "stan/meta/traits.hpp"
+#include "stan/agrad/partials_vari.hpp"
+#include <stan/prob/traits.hpp>
 
 
 template <typename T_y, typename T_loc, typename T_scale>
@@ -240,4 +245,76 @@ TEST(agrad_agrad,norm_grad_small_example) {
   for (unsigned int n = 0; n < N; ++n)
     dsigma += grad_sigma(x[n], 0.0, 1.0);
   EXPECT_FLOAT_EQ(dsigma,g[1]);
+}
+
+template <bool propto, typename T_y, typename T_loc, typename T_scale>
+var test_normal_log(const T_y& y,
+                    const T_loc& mu,
+                    const T_scale& sigma) {
+  using stan::prob::include_summand;
+  using stan::math::pi;
+  using stan::math::square;
+  var lp(0.0);
+  if (include_summand<propto,T_y,T_loc,T_scale>::value)
+    lp -= 0.5 * (y - mu) * (y - mu) / (sigma * sigma);
+  if (include_summand<propto,T_scale>::value)
+    lp -= log(sigma);
+  if (include_summand<propto>::value)
+    lp -= log(sqrt(2.0 * pi()));
+  return lp;
+}
+
+template <bool propto, typename T_y, typename T_loc, typename T_scale>
+void test_gradients(double y, double mu, double sigma) {
+  using stan::prob::normal_log;
+  using stan::is_constant;
+  T_y y1 = y;
+  T_loc mu1 = mu;
+  T_scale sigma1 = sigma;
+  var lp1 = normal_log<true>(y1,mu1,sigma1);
+  stan::agrad::grad(lp1.vi_);
+  double lp1_val = lp1.val();
+
+  double dy1 = 0.0;
+  double dmu1 = 0.0;
+  double dsigma1 = 0.0;
+  if (!is_constant<T_y>::value)
+    dy1 = var(y1).adj();
+  if (!is_constant<T_loc>::value)
+    dmu1 = var(mu1).adj();
+  if (!is_constant<T_scale>::value)
+    dsigma1 = var(sigma1).adj();
+
+  T_y y2 = y;
+  T_loc mu2 = mu;
+  T_scale sigma2 = sigma;
+  var lp2 = test_normal_log<true>(y2,mu2,sigma2);
+  stan::agrad::grad(lp2.vi_);
+  
+  EXPECT_FLOAT_EQ(lp2.val(), lp1_val);
+  if (!is_constant<T_y>::value)
+    EXPECT_FLOAT_EQ(var(y2).adj(), dy1);
+  if (!is_constant<T_loc>::value)
+    EXPECT_FLOAT_EQ(var(mu2).adj(), dmu1);
+  if (!is_constant<T_scale>::value)
+    EXPECT_FLOAT_EQ(var(sigma2).adj(), dsigma1);
+}
+
+TEST(AgradDistributions,gradients_all) {
+  using stan::agrad::var;
+  test_gradients<true,var,var,var>(-2.7, -1.1, 1.3);
+  test_gradients<true,var,var,double>(-2.7, -1.1, 1.3);
+  test_gradients<true,var,double,var>(-2.7, -1.1, 1.3);
+  test_gradients<true,var,double,double>(-2.7, -1.1, 1.3);
+  test_gradients<true,double,var,var>(-2.7, -1.1, 1.3);
+  test_gradients<true,double,var,double>(-2.7, -1.1, 1.3);
+  test_gradients<true,double,double,var>(-2.7, -1.1, 1.3);
+
+  test_gradients<false,var,var,var>(-2.7, -1.1, 1.3);
+  test_gradients<false,var,var,double>(-2.7, -1.1, 1.3);
+  test_gradients<false,var,double,var>(-2.7, -1.1, 1.3);
+  test_gradients<false,var,double,double>(-2.7, -1.1, 1.3);
+  test_gradients<false,double,var,var>(-2.7, -1.1, 1.3);
+  test_gradients<false,double,var,double>(-2.7, -1.1, 1.3);
+  test_gradients<false,double,double,var>(-2.7, -1.1, 1.3);
 }

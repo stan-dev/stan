@@ -3,6 +3,22 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
+using boost::math::policies::policy;
+using boost::math::policies::evaluation_error;
+using boost::math::policies::domain_error;
+using boost::math::policies::overflow_error;
+using boost::math::policies::domain_error;
+using boost::math::policies::pole_error;
+using boost::math::policies::errno_on_error;
+
+typedef policy<
+  domain_error<errno_on_error>, 
+  pole_error<errno_on_error>,
+  overflow_error<errno_on_error>,
+  evaluation_error<errno_on_error> 
+  > errno_policy;
+
+
 TEST(MathsSpecialFunctions, int_step) {
   EXPECT_EQ(0U, stan::math::int_step(-1.0));
   EXPECT_EQ(0U, stan::math::int_step(0.0));
@@ -46,15 +62,64 @@ TEST(MathsSpecialFunctions, log_loss) {
   EXPECT_FLOAT_EQ(-log(0.75), stan::math::binary_log_loss(1,0.75));
 }
 
-TEST(MathsSpecialFunctions, exp2) {
+TEST(MathsSpecialFunctions, exp2_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::pow(2.0,3.0), stan::math::exp2(3.0));
   EXPECT_FLOAT_EQ(1, stan::math::exp2(0.0));
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::exp2(std::numeric_limits<double>::infinity()));
+
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::exp2(nan), std::domain_error);
 }
 
-TEST(MathsSpecialFunctions, log2) {
+TEST(MathsSpecialFunctions, exp2_errnopolicy) {
+  EXPECT_FLOAT_EQ(std::pow(2.0,3.0), stan::math::exp2(3.0, errno_policy()));
+  EXPECT_FLOAT_EQ(1, stan::math::exp2(0.0, errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::exp2(std::numeric_limits<double>::infinity(),
+				   errno_policy()));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double result = 0;
+  EXPECT_NO_THROW(result = stan::math::exp2(nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+}
+
+
+TEST(MathsSpecialFunctions, log2_defaultpolicy) {
   EXPECT_FLOAT_EQ(0.0, stan::math::log2(1.0));
   EXPECT_FLOAT_EQ(3.0, stan::math::log2(8.0));
   EXPECT_FLOAT_EQ(std::log(5.0)/std::log(2.0), stan::math::log2(5.0));
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::log2(std::numeric_limits<double>::infinity()));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::log2(nan), std::domain_error);
+  
+  double lessThanZero = -1;
+  EXPECT_THROW(stan::math::log2(lessThanZero), std::domain_error);
+}
+
+TEST(MathsSpecialFunctions, log2_errnopolicy) {
+  EXPECT_FLOAT_EQ(0.0, stan::math::log2(1.0));
+  EXPECT_FLOAT_EQ(3.0, stan::math::log2(8.0));
+  EXPECT_FLOAT_EQ(std::log(5.0)/std::log(2.0), stan::math::log2(5.0));
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
+		  stan::math::log2(std::numeric_limits<double>::infinity(),
+				   errno_policy()));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double result = 0;
+  EXPECT_NO_THROW(result = stan::math::log2(nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  
+  double lessThanZero = -1;
+  EXPECT_NO_THROW(result = stan::math::log2(lessThanZero, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
 }
 
 TEST(MathsSpecialFunctions, fdim) {
@@ -321,3 +386,9 @@ TEST(MathsSpecialFunctions, ibeta) {
   EXPECT_FLOAT_EQ(1.0, ibeta(0.1, 1.5, 1.0))  << "reasonable values for a, b, x";
 }
 
+TEST(MathsSpecialFunctions, value_of) {
+  using stan::math::value_of;
+  double x = 5.0;
+  EXPECT_FLOAT_EQ(5.0,value_of(x));
+  EXPECT_FLOAT_EQ(5.0,value_of(5));
+}

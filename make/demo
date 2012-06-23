@@ -4,7 +4,7 @@ demo/%$(EXE) : demo/%.o bin/libstan.a
 
 demo/%.o : src/demo/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) $(OUTPUT_OPTION) $<
 
 ##
 # If the target is demo/, include .d. 

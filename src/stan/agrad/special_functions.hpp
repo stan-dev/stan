@@ -4,7 +4,9 @@
 #include <cstddef>
 #include <boost/math/special_functions.hpp>
 #include <stan/agrad/agrad.hpp>
+#include <stan/agrad/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/math/error_handling.hpp>
 
 namespace stan {
 
@@ -638,6 +640,10 @@ namespace stan {
       };
     }
 
+
+    using stan::math::check_not_nan;
+    using stan::math::check_greater_or_equal;
+
     /**
      * The inverse hyperbolic cosine function for variables (C99).
      * 
@@ -730,8 +736,30 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::agrad::var& a) {
+    template <class Policy>
+    inline var exp2(const stan::agrad::var& a,
+		    const Policy&) {
+      static const char* function = "stan::math::exp2(%1%)";
+      double result;
+      if (!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
       return var(new exp2_vari(a.vi_));
+    }
+
+    /**
+     * Exponentiation base 2 function for variables (C99).
+     *
+     * For non-variable function, see boost::math::exp2().
+     *
+     * The derivatie is
+     *
+     * \f$\frac{d}{dx} 2^x = (\log 2) 2^x\f$.
+     * 
+     * @param a The variable.
+     * @return Two to the power of the specified variable.
+     */
+    inline var exp2(const stan::agrad::var& a) {
+      return exp2(a, stan::math::default_policy());
     }
 
     /**
@@ -1149,8 +1177,31 @@ namespace stan {
      * @param a Specified variable.
      * @return Base 2 logarithm of the variable.
      */
-    inline var log2(const stan::agrad::var& a) {
+    template <class Policy>
+    inline var log2(const stan::agrad::var& a,
+		    const Policy&) {
+      static const char* function = "stan::math::log2(%1%)";
+      double result;
+      if (!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_greater_or_equal(function,a,0.0,"a", &result, Policy()))
+	return result;
       return var(new log2_vari(a.vi_));
+    }
+ /**
+     * Returns the base 2 logarithm of the specified variable (C99).
+     *
+     * See stan::math::log2() for the double-based version.
+     *
+     * The derivative is
+     *
+     * \f$\frac{d}{dx} \log_2 x = \frac{1}{x \log 2}\f$.
+     *
+     * @param a Specified variable.
+     * @return Base 2 logarithm of the variable.
+     */
+    inline var log2(const stan::agrad::var& a) {
+      return log2(a, stan::math::default_policy());
     }
 
     /**
@@ -1554,8 +1605,27 @@ namespace stan {
                      const var& x) {
       return var(new ibeta_vvv_vari(a.vi_, b.vi_, x.vi_));
     }
-    
-  }
-}
+
+    /**
+     * Return the value of the specified variable.  
+     *
+     * <p>This function is used internally by auto-dif functions along
+     * with <code>stan::math::value_of(T x)</code> to extract the
+     * <code>double</code> value of either a scalar or an auto-dif
+     * variable.  This function will be called when the argument is a
+     * <code>stan::agrad::var</code> even if the function is not
+     * referred to by namespace because of argument-dependent lookup.
+     *
+     * @param v Variable.
+     * @return Value of variable.
+     */
+    inline double value_of(const agrad::var& v) {
+      return v.vi_->val_;
+    }
+
+  } // namespace math
+
+} // namespace stan
+
 
 #endif

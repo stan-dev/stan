@@ -396,7 +396,7 @@ namespace stan {
      * three-dimensional array <code>x</code> with dimensions
      * <code>[2,2,2]</code>, then there are 8 values, provided in the
      * order
-     *
+     * 
      * <p><code>[0,0,0]</code>, 
      * <code>[1,0,0]</code>, 
      * <code>[0,1,0]</code>, 
@@ -406,6 +406,27 @@ namespace stan {
      * <code>[0,1,1]</code>, 
      * <code>[1,1,1]</code>.
      *
+     * definitions ::= definition+
+     *
+     * definition ::= name ("->" | '=') value optional_semicolon
+     *
+     * name ::= char* 
+     *        | ''' char* ''' 
+     *        | '"' char* '"'
+     *
+     * value ::= value<int> | value<double>
+     *
+     * value<T> ::= T 
+     *            | seq<T>
+     *            | 'struct' '(' seq<T> ',' ".Dim" '=' seq<int> ')'
+     *
+     * seq<int> ::= int ':' int
+     *            | cseq<int>
+     *
+     * seq<double> ::= cseq<double>
+     *
+     * cseq<T> ::= 'c' '(' T % ',' ')'
+     *
      */
     class dump_reader {
     private:
@@ -414,7 +435,6 @@ namespace stan {
       std::vector<double> stack_r_;
       std::vector<size_t> dims_;
       std::istream& in_;
-
 
       bool scan_char(char c_expected) {
         char c;
@@ -446,6 +466,9 @@ namespace stan {
         if (scan_char('"')) {
           if (!scan_name_unquoted()) return false;
           if (!scan_char('"')) return false;
+        } else if (scan_char('\'')) {
+          if (!scan_name_unquoted()) return false;
+          if (!scan_char('\'')) return false;
         } else {
           if (!scan_name_unquoted()) return false;
         }
@@ -499,6 +522,7 @@ namespace stan {
           if (!(std::stringstream(buf) >> n))
             return false;
           stack_i_.push_back(n);
+          scan_char('L') || scan_char('l'); // allow optional L/l
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
             stack_r_.push_back(static_cast<double>(stack_i_[j]));
@@ -545,16 +569,31 @@ namespace stan {
         if (!scan_char('.')) return false;
         if (!scan_chars("Dim")) return false;
         if (!scan_char('=')) return false;
-        if (!scan_char('c')) return false;
-        if (!scan_char('(')) return false;
-        size_t dim;
-        in_ >> dim;
-        dims_.push_back(dim);
-        while (scan_char(',')) {
+        if (scan_char('c')) {
+          if (!scan_char('(')) return false;
+          size_t dim;
           in_ >> dim;
           dims_.push_back(dim);
+          while (scan_char(',')) {
+            in_ >> dim;
+            dims_.push_back(dim);
+          }
+          if (!scan_char(')')) return false;
+        } else {
+          size_t start;
+          in_ >> start;
+          if (!scan_char(':'))
+            return false;
+          size_t end;
+          in_ >> end;
+          if (start < end) {
+            for (int i = start; i <= end; ++i)
+              dims_.push_back(i);
+          } else {
+            for (int i = start; i >= end; --i)
+              dims_.push_back(i);
+          }
         }
-        if (!scan_char(')')) return false;
         if (!scan_char(')')) return false;
         return true;
       }
@@ -566,9 +605,29 @@ namespace stan {
           return scan_seq_value();
         if (scan_chars("structure"))
           return scan_struct_value();
-        return scan_number();
+        if (!scan_number()) 
+          return false;
+        if (!scan_char(':'))
+          return true;
+        if (stack_i_.size() != 1)
+          return false;
+        if (!scan_number())
+          return false; 
+        if (stack_i_.size() != 2)
+          return false;
+        int start = stack_i_[0];
+        int end = stack_i_[1];
+        stack_i_.clear();
+        if (start <= end) {
+          for (int i = start; i <= end; ++i)
+            stack_i_.push_back(i);
+        } else {
+          for (int i = start; i >= end; --i) 
+            stack_i_.push_back(i);
+        }
+        dims_.push_back(stack_i_.size());
+        return true;
       }
-
 
       /**
        * Helper function prints diagnostic information to std::cout.
@@ -673,10 +732,14 @@ namespace stan {
         stack_i_.clear();
         dims_.clear();
         name_.erase();
-        if (!scan_name()) return false;
-        if (!scan_char('<')) return false;
-        if (!scan_char('-')) return false;
-        if (!scan_value()) return false;
+        if (!scan_name())  // set name
+          return false;
+        if (!scan_char('<')) // set <- 
+          return false;
+        if (!scan_char('-')) 
+          return false;
+        if (!scan_value()) // set stack_r_, stack_i_, dims_
+          return false;
         return true;
       }
   

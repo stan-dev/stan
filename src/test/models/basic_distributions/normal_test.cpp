@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BasicDistributions_Normal : 
-  public Model_Test_Fixture<Models_BasicDistributions_Normal,
-                                       false> {
+  public Model_Test_Fixture<Models_BasicDistributions_Normal> {
 protected:
   virtual void SetUp() {
   }
@@ -15,8 +14,18 @@ public:
     model_path.push_back("normal");
     return model_path;
   }
+  static bool has_data() {
+    return false;
+  }
+
+  static std::vector<std::pair<size_t, double> >
+  get_expected_values() {
+    std::vector<std::pair<size_t, double> > expected_values;
+    return expected_values;
+  }
+
 };
 
-TEST_F(Models_BasicDistributions_Normal,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Normal,
+			      Model_Test_Fixture,
+			      Models_BasicDistributions_Normal);

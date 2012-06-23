@@ -2,8 +2,7 @@
 #include <test/models/model_test_fixture.hpp>
 
 class Models_BugsExamples_Vol3_Camel2 : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol3_Camel2,
-                                       true> {
+  public Model_Test_Fixture<Models_BugsExamples_Vol3_Camel2> {
 protected:
   virtual void SetUp() {}
 public:
@@ -16,8 +15,18 @@ public:
     model_path.push_back("camel2");
     return model_path;
   }
+  static bool has_data() {
+    return true;
+  }
+
+  static std::vector<std::pair<size_t, double> >
+  get_expected_values() {
+    std::vector<std::pair<size_t, double> > expected_values;
+    return expected_values;
+  }
+
 };
 
-TEST_F(Models_BugsExamples_Vol3_Camel2,RunModel) {
-  run_model();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_Camel2,
+			      Model_Test_Fixture,
+			      Models_BugsExamples_Vol3_Camel2);

@@ -26,13 +26,38 @@ namespace stan {
      * <code>exp2(y) = pow(2.0,y)</code>.
      *
      * @param y Value.
+     * @tparam T Type of scalar.
+     * @tparam Policy Type of policy.
+     * @error_policy
+     *    @li y must not be NaN.
+     * @return Exponent base 2 of value.
+     */
+    template <typename T, class Policy>
+    inline typename boost::math::tools::promote_args<T>::type
+    exp2(T y, const Policy&) {
+      static const char* function = "stan::math::exp2(%1%)";
+      T result;
+      if (!check_not_nan(function, y, "y", &result, Policy()))
+        return result;
+      using std::pow;
+      return pow(2.0,y);
+    }
+
+    /**
+     * Return the exponent base 2 of the specified argument (C99).
+     *
+     * The exponent base 2 function is defined by
+     *
+     * <code>exp2(y) = pow(2.0,y)</code>.
+     *
+     * @param y Value.
+     * @tparam T Type of scalar.
      * @return Exponent base 2 of value.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     exp2(T y) {
-      using std::pow;
-      return pow(2.0,y);
+      return exp2(y, stan::math::default_policy());
     }
 
     /** 
@@ -78,14 +103,40 @@ namespace stan {
      * <code>log2(a) = log(a) / std::log(2.0)</code>.
      *
      * @param a Value.
+     * @tparam T type of scalar
+     * @tparam Policy Type of policy
+     * @error_policy
+          @li y must not be NaN or less than zero
+     * @return Base 2 logarithm of the value.
+     */
+    template <typename T, class Policy>
+    inline typename boost::math::tools::promote_args<T>::type
+    log2(T a, const Policy&) {
+      static const char* function = "stan::math::exp2(%1%)";
+      T result;
+      if(!check_not_nan(function,a, "a", &result, Policy()))
+        return result;
+      if(!check_greater_or_equal(function,a,0.0,"a", &result, Policy()))
+        return result;
+      using std::log;
+      const static double LOG2 = std::log(2.0);
+      return log(a) / LOG2;
+    }
+/**
+     * Returns the base 2 logarithm of the argument (C99).
+     *
+     * The function is defined by:
+     *
+     * <code>log2(a) = log(a) / std::log(2.0)</code>.
+     *
+     * @param a Value.
+     * @tparam T type of scalar
      * @return Base 2 logarithm of the value.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log2(T a) {
-      using std::log;
-      const static double LOG2 = std::log(2.0);
-      return log(a) / LOG2;
+      return log2(a, stan::math::default_policy());
     }
 
 
@@ -600,6 +651,63 @@ namespace stan {
       return max + log(sum);
     }
 
+    /** 
+     * Return the scalar value and ignore the remaining
+     * arguments.
+     *
+     * <p>This function provides an overload of
+     * <code>simple_var</code> to use with primitive values for which
+     * the type and derivative type are the same.  The other overloads
+     * are for <code>stan::agrad::var</code> arguments; the
+     * definitions can be found in
+     * <code>stan/agrad/partials_vari.hpp</code>.
+     * 
+     * @tparam T1 Type of first dummy argument and derivative.
+     * @tparam T2 Type of second dummy argument and derivative.
+     * @tparam T3 Type of third dummy argument and derivative.
+     * @param v Value to return.
+     * @return Value.
+     */
+    template <typename T1, typename T2, typename T3>
+    inline double simple_var(double v, 
+                             const T1& /*y1*/, const T1& /*dy1*/, 
+                             const T2& /*y2*/, const T2& /*dy2*/,
+                             const T3& /*y3*/, const T3& /*dy3*/) {
+      return v;
+    }
+
+    /**
+     * Return the value of the specified scalar argument
+     * converted to a double value.
+     *
+     * This function is meant to cover the primitive types. For
+     * types requiring pass-by-reference, this template function
+     * should be specialized.
+     *
+     * @tparam T Type of scalar.
+     * @param x Scalar to convert to double.
+     * @return Value of scalar cast to a double.
+     */
+    template <typename T>
+    inline double value_of(T x) {
+      return static_cast<double>(x);
+    }
+
+    /**
+     * Return the specified argument. 
+     *
+     * <p>See <code>value_of(T)</code> for a polymorphic
+     * implementation using static casts.
+     * 
+     * <p>This inline pass-through no-op should be compiled away.
+     *
+     * @param x Specified value.
+     * @return Specified value.
+     */
+    template <>
+    inline double value_of<double>(double x) {
+      return x; 
+    }
 
     // CONSTANTS
 
