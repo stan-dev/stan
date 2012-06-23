@@ -18,22 +18,41 @@ setMethod("show", "stanfit",
                 object@num.chains, " chains.\n", sep = '')  
           })  
 
-## TODO: use get_chain_quantiles and get_quantiles
-## in stanplot instead of summary 
 ##  refactor traceplot 
-stanplot <- function(object, pars = object@model.pars) {
+stanplot <- function(object, pars = object@model.pars, prob = 0.8) {
   
-  probs = c(0.1, 0.5, 0.9)   
-  cs <- chain.summary(object, chain.id = 1:object@num.chains, pars = pars, probs = probs)
-  ss <- summary(object, pars = pars) 
+  if (missing(pars)) {
+    pars <- object@model.pars
+  } else {
+    pars <- check.pars(object, pars) 
+  } 
+  sampleshandle <- object@.fit$sampleshandle  
+
+  probs = c(0.5, 0.5 + c(-prob, prob) * 0.5) 
 
   num.par <- length(pars)
+  chains.v <- 1:object@num.chains 
+
   ps <- vector("list", num.par) 
   for (i in 1:num.par) {
-    cs <- chain.summary(object, chain.id = 1:Object@num.chains, pars = pars[i], probs = probs)
-    ss <- summary(object, pars = pars[i], probs = probs) 
-    # mlu <- list(median = cs[["50%"]]
+    par <- pars[i] 
+    rhats <- sampleshandle$get_split_rhat(par) 
+    mlu0 <- do.call(rbind, sampleshandle$get_quantiles(par, probs)) 
+    cms <- lapply(chains.v, 
+                  FUN = function(k) {
+                    z <- sampleshandle$get_chain_quantiles(k, par, .5)
+                    do.call(cbind, z) 
+                  })
+    cms <- data.frame(do.call(rbind, cms)) 
+print(cms) 
+    mlu <- list(median = mlu0[, 1], le = mlu0[, 2], ue = mlu0[, 3]) 
+    par.idx <- gsub(par, "", names(rhats)) 
+    rhats <- do.call(c, rhats) 
+cat("rhats=", rhats, "\n") 
+    ps[[i]] <- plot.pars0(mlu, cms, rhats, par, par.idx)
+    
   } 
+  do.call(print, ps)
 } 
 
 
@@ -41,7 +60,7 @@ setMethod("plot", "stanfit",
           function(x, y, ...) {
             if (missing(y)) 
               y <- object@model.pars 
-            stanplot(object = x, pars = y, ...)
+            stanplot(object = x, pars = y, prob = 0.8, ...)
           }) 
 
 setMethod("print", signature = (x = "stanfit"),
@@ -146,12 +165,12 @@ chain.summary <- function(object, chain.id = 1:object@num.chains,
          "number of chains.") 
   } 
 
-  sampleshandle <- object@.fit$sampleshandle  
   if (missing(pars)) {
     pars <- object@model.pars
   } else {
     pars <- check.pars(object, pars) 
   } 
+  sampleshandle <- object@.fit$sampleshandle  
 
   if (missing(probs)) 
     probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  

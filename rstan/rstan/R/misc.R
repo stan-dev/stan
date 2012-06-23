@@ -293,6 +293,28 @@ stan.dump <- function(list, file, append = FALSE,
 # stan.dump(c('a', 'b', 'c', 'd'), file = 'a.txt')
 
 
+get.rhat.col <- function(rhat) {
+  # 
+  # Args:
+  #   rhat: a scale 
+  #
+  rhat.na.col <- get.rstan.options("plot.rhat.na.col")
+  if (is.na(rhat) || is.nan(rhat) || is.infinite(rhat))
+    return(rhat.na.col)
+  rhat.breaks <- get.rstan.options("plot.rhat.breaks")
+  # print(rhat.breaks)
+  rhat.colors <- get.rstan.options("plot.rhat.cols")
+  for (i in 1:length(rhat.breaks)) {
+    # cat("i=", i, "\n")
+    if (rhat >= rhat.breaks[i]) 
+      next;
+    return(rhat.colors[i])
+  }  
+  get.rstan.options("plot.rhat.large.col")
+}
+
+
+
 plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {                
   # Plot a parameter (scale, vector, or array) with median, 
   # credible interval, and medians from separate chains, 
@@ -319,12 +341,14 @@ plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {
   
   m.col <- get.rstan.options("plot.chain.median.col")
   srhat.cols = sapply(srhats, FUN = function(x) get.rhat.col(x))
+cat("srhat.cols=", srhat.cols, "\n")
   
   d <- data.frame(x = 1:num.par, 
                   y = mlu$median, 
                   le = mlu$le, 
                   ue = mlu$ue, 
                   cs = srhat.cols)
+print(d)
   
   d2 <- lapply(1:length(cms), 
                FUN = function(i) {
@@ -334,10 +358,10 @@ plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {
 
   p1 <- ggplot() +
     geom_linerange(data = d, 
-                   aes(x = x, ymin = le, ymax = ue, colour = cs), 
+                   aes(x = x, ymin = le, ymax = ue, color = cs), 
                    size = 2, alpha = .6) +
     geom_point(data = d, 
-               aes(x = x, y = y, colour = cs), 
+               aes(x = x, y = y, color = cs), 
                shape = 15, size = 4) + 
     geom_point(data = d2, 
                aes(x = x, y = y), 
@@ -346,11 +370,8 @@ plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, plot = FALSE) {
     opts(legend.position = "none", axis.title.x = theme_blank()) + 
     scale_x_discrete(labels = par.idx)
   
-  if (plot) {
-    print(p1)
-    return(invisible(p1))
-  } 
-  return(p1)
+  if (plot) print(p1)
+  return(invisible(p1))
 }
 
 
