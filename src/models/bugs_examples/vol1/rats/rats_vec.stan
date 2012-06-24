@@ -41,6 +41,10 @@ transformed parameters {
 model {
   real pred[N*T];
 
+  for (n in 1:N)
+    for (t in 1:T)
+      pred[(n-1)*T + t] <- fma(beta[n], x_minus_xbar[t], alpha[n]);
+
   mu_alpha ~ normal(0, 100);
   mu_beta ~ normal(0, 100);
   sigmasq_y ~ inv_gamma(0.001, 0.001);
@@ -49,8 +53,5 @@ model {
   alpha ~ normal(mu_alpha, sigma_alpha); // vectorized
   beta ~ normal(mu_beta, sigma_beta);  // vectorized
 
-  for (n in 1:N)
-    for (t in 1:T)
-      pred[(n-1)*T + t] <- fma(beta[n], x_minus_xbar[t], alpha[n]);
   y_linear ~ normal(pred, sigma_y);  // vectorized
 }

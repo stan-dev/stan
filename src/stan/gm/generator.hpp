@@ -407,6 +407,10 @@ namespace stan {
             name_dims.append("[k_").append(to_string(i)).append("__]");
           }
           generate_indent(i + 2, o_);
+          if (i == dims.size() - 1) {
+            o_ << name_dims << ".reserve(dim_" << name << "_" << i << "__);" << EOL;
+            generate_indent(i + 2, o_);
+          }
           o_ << "for (size_t k_" << i << "__ = 0;"
              << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
              << " ++k_" << i << "__) {" << EOL;
