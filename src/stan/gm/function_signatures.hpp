@@ -246,6 +246,12 @@ add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add_ternary("normal_log");
 add_quaternary("normal_trunc_l_log");
 add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T,DOUBLE_T); // vectorized
+add("normal_log",DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T); // vectorized
+add("normal_log",DOUBLE_T,DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U)); // vectorized
+add("normal_log",DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
+add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T,expr_type(DOUBLE_T,1U)); // vectorized
+add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U),DOUBLE_T); // vectorized
+add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 add_ternary("pareto_log");
 add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_ternary("scaled_inv_chi_square_log");

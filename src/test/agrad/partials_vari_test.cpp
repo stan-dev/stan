@@ -6,7 +6,6 @@
 
 TEST(AgradPartialsVari,simple_var_vvv) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   var a = 1.0;  double da = 5.0;
@@ -21,7 +20,6 @@ TEST(AgradPartialsVari,simple_var_vvv) {
 }
 TEST(AgradPartialsVari,simple_var_vvd) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   var a = 1.0;  double da = 5.0;
@@ -35,7 +33,6 @@ TEST(AgradPartialsVari,simple_var_vvd) {
 }
 TEST(AgradPartialsVari,simple_var_vdv) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   var a = 1.0;  double da = 5.0;
@@ -49,7 +46,6 @@ TEST(AgradPartialsVari,simple_var_vdv) {
 }
 TEST(AgradPartialsVari,simple_var_vdd) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   var a = 1.0;  double da = 5.0;
@@ -62,7 +58,6 @@ TEST(AgradPartialsVari,simple_var_vdd) {
 }
 TEST(AgradPartialsVari,simple_var_dvv) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   double a = 1.0;  double da = 5.0;
@@ -76,7 +71,6 @@ TEST(AgradPartialsVari,simple_var_dvv) {
 }
 TEST(AgradPartialsVari,simple_var_dvd) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   double a = 1.0;  double da = 5.0;
@@ -89,7 +83,6 @@ TEST(AgradPartialsVari,simple_var_dvd) {
 }
 TEST(AgradPartialsVari,simple_var_ddv) {
   using stan::agrad::var;
-  using stan::math::simple_var;
   using stan::agrad::simple_var;
   double y = -1.0;
   double a = 1.0;  double da = 5.0;
@@ -100,13 +93,6 @@ TEST(AgradPartialsVari,simple_var_ddv) {
   EXPECT_FLOAT_EQ(-1.0,v.val());
   EXPECT_FLOAT_EQ(11.0,c.adj());
 }
-TEST(AgradPartialsVari,simple_var_ddd) {
-  using stan::math::simple_var;
-  using stan::agrad::simple_var;
-  EXPECT_FLOAT_EQ(-1.0,simple_var(-1.0,1,2,3,4,5,6));
-}
-
-
 
 
 TEST(AgradPartialsVari,partials1_vari) {
@@ -120,20 +106,22 @@ TEST(AgradPartialsVari,partials1_vari) {
 }
 TEST(AgradPartialsVari,partials2_vari) {
   using stan::agrad::var;
+  using stan::agrad::vari;
   using stan::agrad::partials2_vari;
   var x1 = 2.0;
   var x2 = 3.0;
   var z1 = -5.0 * x1; // dz1/dx1 = -5
   var z2 = -7.0 * x2; // dz2/dx2 = -7
-  var y(new partials2_vari(-1.0,
-                           z1.vi_,11.0,   // dy/dz1 = 11.0
-                           z2.vi_,13.0)); // dy/dz2 = 13.0
+  var y(new partials2_vari<vari*, vari*>(-1.0,
+                                         z1.vi_,11.0,   // dy/dz1 = 11.0
+                                         z2.vi_,13.0)); // dy/dz2 = 13.0
   stan::agrad::grad(y.vi_);
   EXPECT_FLOAT_EQ(-55.0, x1.adj());  // dy/dx1 = -55
   EXPECT_FLOAT_EQ(-91.0, x2.adj());  // dy/dx2 = -91
 }
 TEST(AgradPartialsVari,partials3_vari) {
   using stan::agrad::var;
+  using stan::agrad::vari;
   using stan::agrad::partials3_vari;
   var x1 = 2.0;
   var x2 = 3.0;
@@ -141,10 +129,10 @@ TEST(AgradPartialsVari,partials3_vari) {
   var z1 = -7.0 * x1;  // dz1/dx1 = -5
   var z2 = -9.0 * x2;  // dz2/dx2 = -7
   var z3 = -11.0 * x3; // dz3/dx3 = -11
-  var y(new partials3_vari(-1.0,
-                           z1.vi_,17.0,   // dy/dz1 = 17.0
-                           z2.vi_,19.0,   // dy/dz2 = 19.0
-                           z3.vi_,23.0)); // dy/dz3 = 23.0
+  var y(new partials3_vari<vari*, vari*, vari*>(-1.0,
+                                                z1.vi_,17.0,   // dy/dz1 = 17.0
+                                                z2.vi_,19.0,   // dy/dz2 = 19.0
+                                                z3.vi_,23.0)); // dy/dz3 = 23.0
   stan::agrad::grad(y.vi_);
   EXPECT_FLOAT_EQ(-119.0, x1.adj());  // dy/dx1 = -119
   EXPECT_FLOAT_EQ(-171.0, x2.adj());  // dy/dx2 = -133
