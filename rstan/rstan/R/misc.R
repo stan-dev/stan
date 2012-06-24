@@ -348,7 +348,6 @@ multi.print.plots <- function(ps, nrow = get.rstan.options("plot.nrow"),
 }
 
 
-
 plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, 
                        plot = FALSE, prob = 0.8) {                
   # Plot a parameter (scale, vector, or array) with median, 
@@ -402,14 +401,14 @@ plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx,
 
   p1 <- ggplot() +
     geom_linerange(data = d, 
-                   aes(x = x, ymin = le, ymax = ue, colour = cs), 
-                   size = 2, alpha = .6) +
+                   aes(x = x, ymin = le, ymax = ue, color = cs), 
+                   size = 1, alpha = .8) +
     geom_point(data = d, 
                aes(x = x, y = y, colour = cs), 
                shape = 15, size = 3) + 
     geom_point(data = d2, 
                aes(x = x, y = y, colour = col), 
-               shape = 4, size = 3) +
+               shape = 4, size = 4) +
     scale_colour_manual(values = cols.manual) +
     ylab(par.name) + 
     opts(legend.position = "none", axis.title.x = theme_blank()) + 

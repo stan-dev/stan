@@ -18,7 +18,6 @@ setMethod("show", "stanfit",
                 object@num.chains, " chains.\n", sep = '')  
           })  
 
-##  refactor traceplot 
 stanplot <- function(object, pars = object@model.pars, 
                      prob = 0.8, plot = FALSE) {
   
