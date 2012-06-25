@@ -395,6 +395,8 @@ C++ API
 
 Special Functions, Probability Functions and Distributions
 ----------------------------------------------------------------------
+* break out body of error handling to get isnan if/else inlined
+
 * beta distro with mean plus "precision" params
   - beta_mean_log(theta|phi,kappa)
     = beta_log(theta|phi*kappa, (1-phi)*kappa)
