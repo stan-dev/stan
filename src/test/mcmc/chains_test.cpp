@@ -998,13 +998,47 @@ TEST(McmcChains,autocorrelation) {
 
    EXPECT_EQ(1000U, ac.size());
 
-   EXPECT_NEAR(1.0,ac[0],0.001);
-   EXPECT_NEAR(0.81, ac[1], 0.01);
-   EXPECT_NEAR(0.65, ac[2], 0.01);
-   EXPECT_NEAR(0.52, ac[3], 0.01);
-   EXPECT_NEAR(0.42, ac[4], 0.01);
-   EXPECT_NEAR(0.34, ac[5], 0.01);
+   EXPECT_NEAR(1.00, ac[0],0.001);
+   EXPECT_NEAR(0.80, ac[1], 0.01);
+   EXPECT_NEAR(0.64, ac[2], 0.01);
+   EXPECT_NEAR(0.51, ac[3], 0.01);
+   EXPECT_NEAR(0.41, ac[4], 0.01);
+   EXPECT_NEAR(0.33, ac[5], 0.01);
 }
+TEST(McmcChains,autocovariance) {
+  // duplicating test from stan::prob::autocovariance
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  std::vector<size_t> dims;
+
+  names.push_back("param");
+  dims.push_back(1);
+  dimss.push_back(dims);
+  stan::mcmc::chains<> c(2, names, dimss);
+
+  std::fstream f("src/test/prob/ar1.csv");
+  std::vector<double> y;
+  for (size_t i = 0; i < 1000; ++i) {
+     double temp;
+     f >> temp;
+     y.clear();
+     y.push_back(temp);
+     c.add(0U, y);
+   }
+  
+   std::vector<double> ac;
+   c.autocovariance(0U, 0U, ac);
+
+   EXPECT_EQ(1000U, ac.size());
+
+   EXPECT_NEAR(2.69, ac[0], 0.01);
+   EXPECT_NEAR(2.16, ac[1], 0.01);
+   EXPECT_NEAR(1.73, ac[2], 0.01);
+   EXPECT_NEAR(1.38, ac[3], 0.01);
+   EXPECT_NEAR(1.10, ac[4], 0.01);
+   EXPECT_NEAR(0.90, ac[5], 0.01);
+}
+
 TEST(McmcChains,effective_sample_size) {
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;
