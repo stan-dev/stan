@@ -31,6 +31,7 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/prob/autocorrelation.hpp>
+#include <stan/prob/autocovariance.hpp>
 
 namespace stan {  
 
@@ -1396,6 +1397,22 @@ namespace stan {
       }
       
       /** 
+       * Returns the autocovariance for the specified parameter in the
+       * kept samples of the chain specified.
+       * 
+       * @param[in] k Chain index
+       * @param[in] n Parameter index
+       * @param[out] acov Autocovariances
+       */
+      void autocovariance(const size_t k, const size_t n, 
+                           std::vector<double>& acov) {
+        std::vector<double> samples;
+        get_kept_samples(k,n,samples);
+        stan::prob::autocovariance(samples,
+                                   acov);
+      }
+      
+      /** 
        * Returns the effective sample size for the specified parameter
        * across all kept samples.
        *
@@ -1418,24 +1435,21 @@ namespace stan {
           n_samples = std::min(n_samples, this->num_kept_samples(chain));
         }
 
-	using std::vector;
+	/*using std::vector;
 	vector< vector<double> > acov;
 	for (size_t chain = 0; chain < m; chain++) {
-	  vector<double> ac;
-	  autocorrelation(chain, n, ac);
-	  ac.resize(n_samples+1);
-	  acov.push_back(ac * variance(chain,n));
-	  std::cout << "var for chain " << m << "?: " << ac[0] << std::endl;
-	}
+	  vector<double> acov_chain;
+	  autocovariance(chain, n, acov_chain);
+	  acov.push_back(acov_chain);
+	  std::cout << "var for chain " << m << "?: " << acov_chain[0]*n_samples/(n_samples-1) << std::endl;
+	  }*/
 	
-	
-
         std::vector<double> chain_mean;
         std::vector<double> chain_var;
         for (size_t chain = 0; chain < m; chain++) {
           chain_mean.push_back(this->mean(chain,n));
           chain_var.push_back(this->variance(chain,n));
-	  std::cout << "var for chain " << m << "!: " << this->variance(chain, n) << std::endl;
+	  //std::cout << "var for chain " << m << "!: " << this->variance(chain, n) << std::endl;
         }
         double var_plus = stan::math::mean(chain_var)*(n_samples-1)/n_samples + 
           stan::math::variance(chain_mean);
