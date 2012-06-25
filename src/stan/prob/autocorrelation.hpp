@@ -5,6 +5,8 @@
 #include <complex>
 #include <Eigen/FFT>
 
+#include <stan/math/matrix.hpp>
+
 namespace stan {
   
   namespace prob {
@@ -38,27 +40,44 @@ namespace stan {
       using std::vector;
       using std::complex;
 
-
       size_t N = y.size();
       size_t Nt2 = 2 * N;
 
-      // y_padded = y followed by N zeroes
-      vector<T> y_padded(y);
-      y_padded.insert(y_padded.end(),N,0.0);
-      
-      // Eigen::FFT<T> fft;
-      vector<complex<T> > freqvec;
-      fft.fwd(freqvec,y_padded);
 
+      vector<complex<T> > freqvec;
+      
+      // centered_signal = y-mean(y) followed by N zeroes
+      vector<T> centered_signal(y);
+      centered_signal.insert(centered_signal.end(),N,0.0);
+      T mean = stan::math::mean(y);
+      for (size_t i = 0; i < N; i++)
+	centered_signal[i] -= mean;
+      
+      fft.fwd(freqvec,centered_signal);
       for (size_t i = 0; i < Nt2; ++i)
         freqvec[i] = complex<T>(norm(freqvec[i]), 0.0);
-
+      
       fft.inv(ac,freqvec);
-
       ac.resize(N);
-      T var = ac[0];
+
+      vector<T> mask_correction_factors;      
+      vector<T> mask;
+      mask.insert(mask.end(),N,1.0);
+      mask.insert(mask.end(),N,0.0);
+      
+      freqvec.resize(0);
+      fft.fwd(freqvec,mask);
+      for (size_t i = 0; i < Nt2; ++i)
+        freqvec[i] = complex<T>(norm(freqvec[i]), 0.0);
+      
+      fft.inv(mask_correction_factors, freqvec);
+
+      for (size_t i = 0; i < N; ++i) {
+	ac[i] /= mask_correction_factors[i];
+      }
+      T var = ac[0];      
       for (size_t i = 0; i < N; ++i)
-        ac[i] /= var;
+	ac[i] /= var;
     }
 
     /**

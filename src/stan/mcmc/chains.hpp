@@ -1,3 +1,4 @@
+
 #ifndef __STAN__MCMC__CHAINS_HPP__
 #define __STAN__MCMC__CHAINS_HPP__
 
@@ -1417,11 +1418,24 @@ namespace stan {
           n_samples = std::min(n_samples, this->num_kept_samples(chain));
         }
 
+	using std::vector;
+	vector< vector<double> > acov;
+	for (size_t chain = 0; chain < m; chain++) {
+	  vector<double> ac;
+	  autocorrelation(chain, n, ac);
+	  ac.resize(n_samples+1);
+	  acov.push_back(ac * variance(chain,n));
+	  std::cout << "var for chain " << m << "?: " << ac[0] << std::endl;
+	}
+	
+	
+
         std::vector<double> chain_mean;
         std::vector<double> chain_var;
         for (size_t chain = 0; chain < m; chain++) {
           chain_mean.push_back(this->mean(chain,n));
           chain_var.push_back(this->variance(chain,n));
+	  std::cout << "var for chain " << m << "!: " << this->variance(chain, n) << std::endl;
         }
         double var_plus = stan::math::mean(chain_var)*(n_samples-1)/n_samples + 
           stan::math::variance(chain_mean);
