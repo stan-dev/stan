@@ -122,34 +122,30 @@ namespace stan {
     T x_;
   public:
     VectorView(T x) : x_(x) { }
-    T& operator[](int /*i*/) { return x_; }
-  };
-
-  template<typename T, bool is_vec>
-  class VectorView<std::vector<T>, is_vec> {
-  private:
-    std::vector<T>* x_;
-  public:
-    VectorView(std::vector<T>& x) : x_(&x) { }
-    T& operator[](int i) { 
-      if (is_vec)
-        return (*x_)[i];
-      else
-        return (*x_)[0];
+    T& operator[](int /*i*/) { 
+      return x_; 
     }
   };
 
-  template<typename T, bool is_vec>
-  class VectorView<const std::vector<T>, is_vec> {
+  template<typename T>
+  class VectorView<std::vector<T>, true> {
   private:
-    const std::vector<T>* x_;
+    std::vector<T>& x_;
   public:
-    VectorView(const std::vector<T>& x) : x_(&x) { }
+    VectorView(std::vector<T>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+
+  template<typename T>
+  class VectorView<const std::vector<T>, true> {
+  private:
+    const std::vector<T>& x_;
+  public:
+    VectorView(const std::vector<T>& x) : x_(x) { }
     const T& operator[](int i) const { 
-      if (is_vec)
-        return (*x_)[i];
-      else
-        return (*x_)[0];
+      return x_[i];
     }
   };
 
