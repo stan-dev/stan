@@ -73,23 +73,23 @@ namespace stan {
       // set up return value accumulator
       double logp(0.0);
 
+      // validate args (here done over var, which should be OK)
+      if (!check_not_nan(function, y, "Random variate y", &logp, Policy()))
+	return logp;
+      if (!check_finite(function, mu, "Location parameter, mu,", 
+			&logp, Policy()))
+	return logp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+			  &logp, Policy()))
+	return logp;
+
       for (size_t n = 0; n < N; n++) {
 
 	// pull out values of arguments
 	const double y_dbl = value_of(y_vec[n]);
 	const double mu_dbl = value_of(mu_vec[n]);
-	const double sigma_dbl = value_of(sigma_vec[n]);
+	// const double sigma_dbl = value_of(sigma_vec[n]); // not used
       
-	// validate args
-	if (!check_not_nan(function, y_dbl, "Random variate y", &logp, Policy()))
-	  return logp;
-	if (!check_finite(function, mu_dbl, "Location parameter, mu,", 
-			  &logp, Policy()))
-	  return logp;
-	if (!check_positive(function, sigma_dbl, "Scale parameter, sigma,", 
-			    &logp, Policy()))
-	  return logp;
-
 	// reusable subexpression values
 	const double y_minus_mu_over_sigma 
 	  = (y_dbl - mu_dbl) * inv_sigma[n];
