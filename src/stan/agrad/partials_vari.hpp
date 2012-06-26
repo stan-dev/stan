@@ -203,9 +203,11 @@ namespace stan {
           all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*[nvaris]))),
           all_partials((double*)agrad::chainable::operator new(sizeof(double[nvaris]))),
           d_x1(all_partials),
-          d_x2(all_partials + (!is_constant<typename is_vector<T1>::type>::value) * length(x1)),
-          d_x3(all_partials + (!is_constant<typename is_vector<T1>::type>::value) * length(x1) +
-               (!is_constant<typename is_vector<T2>::type>::value) * length(x2))
+          d_x2(all_partials 
+	       + (!is_constant<typename is_vector<T1>::type>::value) * length(x1)),
+          d_x3(all_partials 
+	       + (!is_constant<typename is_vector<T1>::type>::value) * length(x1)
+               + (!is_constant<typename is_vector<T2>::type>::value) * length(x2))
       {
         size_t base = 0;
         if (!is_constant<typename is_vector<T1>::type>::value) {

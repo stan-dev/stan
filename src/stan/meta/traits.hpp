@@ -93,7 +93,8 @@ namespace stan {
     return result;
   }
 
-  template <typename T, bool is_vec=0>
+  // AmbiguousVector is the simple VectorView for writing doubles into
+  template <typename T, bool is_vec = 0>
   class AmbiguousVector {
   private:
     T x_;
@@ -102,6 +103,7 @@ namespace stan {
     T& operator[](int /*i*/) { return x_; }
     size_t size() { return 1; }
   };
+
   template <typename T>
   class AmbiguousVector<T, 1> {
   private:
@@ -112,7 +114,9 @@ namespace stan {
     size_t size() { return x_.size(); }
   };
 
-  template<typename T, bool is_vec>
+
+  // two template params for use in partials_vari OperandsAndPartials
+  template<typename T, bool is_vec = stan::is_vector<T>::value>
   class VectorView {
   private:
     T x_;
@@ -120,6 +124,7 @@ namespace stan {
     VectorView(T x) : x_(x) { }
     T& operator[](int /*i*/) { return x_; }
   };
+
   template<typename T, bool is_vec>
   class VectorView<std::vector<T>, is_vec> {
   private:
@@ -133,6 +138,7 @@ namespace stan {
         return (*x_)[0];
     }
   };
+
   template<typename T, bool is_vec>
   class VectorView<const std::vector<T>, is_vec> {
   private:
@@ -146,6 +152,7 @@ namespace stan {
         return (*x_)[0];
     }
   };
+
   template<typename T, bool is_vec>
   class VectorView<T*, is_vec> {
   private:

@@ -54,9 +54,9 @@ namespace stan {
 	    && stan::length(sigma)))
 	return 0.0;
 
-      VectorView<const T_y, is_vector<T_y>::value> y_vec(y);
-      VectorView<const T_loc, is_vector<T_loc>::value> mu_vec(mu);
-      VectorView<const T_scale, is_vector<T_scale>::value> sigma_vec(sigma);
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
       agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma, y_vec, mu_vec, sigma_vec);
@@ -75,46 +75,46 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
 
-      // pull out values of arguments
-      const double y_dbl = value_of(y_vec[n]);
-      const double mu_dbl = value_of(mu_vec[n]);
-      const double sigma_dbl = value_of(sigma_vec[n]);
+	// pull out values of arguments
+	const double y_dbl = value_of(y_vec[n]);
+	const double mu_dbl = value_of(mu_vec[n]);
+	const double sigma_dbl = value_of(sigma_vec[n]);
       
-      // validate args
-      if (!check_not_nan(function, y_dbl, "Random variate y", &logp, Policy()))
-        return logp;
-      if (!check_finite(function, mu_dbl, "Location parameter, mu,", 
-                        &logp, Policy()))
-        return logp;
-      if (!check_positive(function, sigma_dbl, "Scale parameter, sigma,", 
-                          &logp, Policy()))
-        return logp;
+	// validate args
+	if (!check_not_nan(function, y_dbl, "Random variate y", &logp, Policy()))
+	  return logp;
+	if (!check_finite(function, mu_dbl, "Location parameter, mu,", 
+			  &logp, Policy()))
+	  return logp;
+	if (!check_positive(function, sigma_dbl, "Scale parameter, sigma,", 
+			    &logp, Policy()))
+	  return logp;
 
-      // reusable subexpression values
-      const double y_minus_mu_over_sigma 
-        = (y_dbl - mu_dbl) * inv_sigma[n];
-      const double y_minus_mu_over_sigma_squared 
-        = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
+	// reusable subexpression values
+	const double y_minus_mu_over_sigma 
+	  = (y_dbl - mu_dbl) * inv_sigma[n];
+	const double y_minus_mu_over_sigma_squared 
+	  = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
-      static double NEGATIVE_HALF = - 0.5;
+	static double NEGATIVE_HALF = - 0.5;
 
-      // log probability
-      if (include_summand<Prop>::value)
-        logp += NEG_LOG_SQRT_TWO_PI;
-      if (include_summand<Prop,T_scale>::value)
-        logp -= log_sigma[n];
-      if (include_summand<Prop,T_y,T_loc,T_scale>::value)
-        logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
+	// log probability
+	if (include_summand<Prop>::value)
+	  logp += NEG_LOG_SQRT_TWO_PI;
+	if (include_summand<Prop,T_scale>::value)
+	  logp -= log_sigma[n];
+	if (include_summand<Prop,T_y,T_loc,T_scale>::value)
+	  logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
 
-      // gradients
-      double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
-      if (!is_constant<typename is_vector<T_y>::type>::value)
-        operands_and_partials.d_x1[n] -= scaled_diff;
-      if (!is_constant<typename is_vector<T_loc>::type>::value)
-        operands_and_partials.d_x2[n] += scaled_diff;
-      if (!is_constant<typename is_vector<T_scale>::type>::value)
-        operands_and_partials.d_x3[n] 
-	  += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
+	// gradients
+	double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
+	if (!is_constant<typename is_vector<T_y>::type>::value)
+	  operands_and_partials.d_x1[n] -= scaled_diff;
+	if (!is_constant<typename is_vector<T_loc>::type>::value)
+	  operands_and_partials.d_x2[n] += scaled_diff;
+	if (!is_constant<typename is_vector<T_scale>::type>::value)
+	  operands_and_partials.d_x3[n] 
+	    += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
 
       }
 
