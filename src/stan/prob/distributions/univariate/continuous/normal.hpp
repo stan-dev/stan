@@ -31,7 +31,7 @@ namespace stan {
     template <bool Prop, 
               typename T_y, typename T_loc, typename T_scale,
               class Policy>
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                const Policy& /*policy*/) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
@@ -121,7 +121,7 @@ namespace stan {
     template <bool propto,
               typename T_y, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_log<propto>(y,mu,sigma,stan::math::default_policy());
     }
@@ -129,7 +129,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     inline
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy&) {
       return normal_log<false>(y,mu,sigma,Policy());
@@ -137,7 +137,7 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_log<false>(y,mu,sigma,stan::math::default_policy());
     }
@@ -164,7 +164,7 @@ namespace stan {
      */
     template <typename T_y, typename T_loc, typename T_scale,
               class Policy>
-    typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
              const Policy&) {
       static const char* function = "stan::prob::normal_p(%1%)";
