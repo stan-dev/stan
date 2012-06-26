@@ -896,6 +896,7 @@ TEST(MathMatrix,columns_dot_self) {
   x = columns_dot_self(m3);
   EXPECT_NEAR(20.0,x(0,0),1E-12);
   EXPECT_NEAR(34.0,x(1,0),1E-12);
+}
 TEST(MathMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
