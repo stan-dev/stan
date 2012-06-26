@@ -208,13 +208,14 @@ TEST(io_dump, reader_sequence) {
 }
 
 TEST(io_dump,dump) {
-  std::string txt = "foo <- c(1,2)\nbar<-1.0\n\"bing\"<-\nstructure(c(1.0,4.0,2.0,5.0,3.0,6.0), .Dim = c(2,3))\nqux <- 2.0";
+  std::string txt = "foo <- c(1,2)\nbar<-1.0\n\"bing\"<-\nstructure(c(1.0,4.0,2.0,5.0,3.0,6.0), .Dim = c(2,3))\nqux <- 2.0\nquux<-structure(c(1.0,2.0,3.0,4.0), .Dim = c(2L, 2L))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
   EXPECT_TRUE(dump.contains_i("foo"));
   EXPECT_TRUE(dump.contains_r("foo"));
   EXPECT_TRUE(dump.contains_r("bar"));
   EXPECT_TRUE(dump.contains_r("qux"));
+  EXPECT_TRUE(dump.contains_r("quux"));
   EXPECT_FALSE(dump.contains_r("baz"));
   EXPECT_FALSE(dump.contains_i("bingz"));
 
@@ -228,10 +229,16 @@ TEST(io_dump,dump) {
   EXPECT_EQ(6U,dump.vals_r("bing").size());
   EXPECT_FLOAT_EQ(2.0,dump.vals_r("bing")[2]);
   EXPECT_EQ(1U,dump.vals_r("qux").size());
+  EXPECT_EQ(4U,dump.vals_r("quux").size());
+  EXPECT_FLOAT_EQ(4.0,dump.vals_r("quux")[3]);
   
   EXPECT_EQ(2U, dump.dims_r("bing").size());
   EXPECT_EQ(2U, dump.dims_r("bing")[0]);
   EXPECT_EQ(3U, dump.dims_r("bing")[1]);
+
+  EXPECT_EQ(2U, dump.dims_r("quux").size());
+  EXPECT_EQ(2U, dump.dims_r("quux")[0]);
+  EXPECT_EQ(2U, dump.dims_r("quux")[1]);
 
   EXPECT_TRUE(dump.remove("bing"));
   EXPECT_FALSE(dump.remove("bing"));

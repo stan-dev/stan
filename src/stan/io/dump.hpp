@@ -573,9 +573,11 @@ namespace stan {
           if (!scan_char('(')) return false;
           size_t dim;
           in_ >> dim;
+          scan_char('L') || scan_char('l'); // allow optional L/l
           dims_.push_back(dim);
           while (scan_char(',')) {
             in_ >> dim;
+            scan_char('L') || scan_char('l'); // allow optional L/l
             dims_.push_back(dim);
           }
           if (!scan_char(')')) return false;
