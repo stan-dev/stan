@@ -193,6 +193,7 @@ public:
   get_expected_values() {
     return Derived::get_expected_values();
   }
+
 };
   
 template<class Derived> 

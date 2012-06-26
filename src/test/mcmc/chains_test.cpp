@@ -1054,14 +1054,14 @@ TEST(McmcChains,effective_sample_size) {
   idxs.push_back(0);
   index = c.get_total_param_index(c.param_name_to_index("mu"), 
                                   idxs);
-  EXPECT_FLOAT_EQ(13.599755, c.effective_sample_size(index)) <<
-    "mu.1 sample size should be 13.6";
+  EXPECT_NEAR(13.08, c.effective_sample_size(index), 0.01) <<
+    "mu.1 sample size should be 13.1";
   idxs.clear();
   idxs.push_back(21);
   index = c.get_total_param_index(c.param_name_to_index("delta"), 
                                   idxs);
-  EXPECT_FLOAT_EQ(43.58981,  c.effective_sample_size(index)) <<
-    "delta.22 sample size should be 43.6";
+  EXPECT_NEAR(43.02,  c.effective_sample_size(index), 0.01) <<
+    "delta.22 sample size should be 43.0";
 }
 TEST(McmcChains,split_potential_scale_reduction) {
   std::vector<std::string> names;
