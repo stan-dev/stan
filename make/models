@@ -21,11 +21,11 @@ models/speed/%.stan : src/models/speed/%.stan
 	@echo ''
 	@echo '--- Copying model ---'
 	cp $< $@ 
-        ifneq (,'$(wildcard $(basename $<)*.Rdata)')
-	   @echo 
-	   @echo '--- Copying data ---'
-	   cp $(wildcard $(basename $<)*.Rdata) $(dir $@)
-        endif
+ifneq (,$(wildcard $(basename $<)*.Rdata))
+	@echo 
+	@echo '--- Copying data ---'
+	cp $(wildcard $(basename $<)*.Rdata) $(dir $@)
+endif
 
 .PRECIOUS: models/%.stan models/%.Rdata
 models/%.stan : src/models/%.stan
