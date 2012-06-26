@@ -34,10 +34,10 @@ namespace stan {
       virtual double grad_log_prob(std::vector<double>& params_r, 
                                    std::vector<int>& params_i, 
                                    std::vector<double>& gradient) {
-        std::vector<agrad::var> ad_params_r;
+        std::vector<agrad::var> ad_params_r(num_params_r());
         for (size_t i = 0; i < num_params_r(); ++i) {
           agrad::var var_i(params_r[i]);
-          ad_params_r.push_back(var_i);
+          ad_params_r[i] = var_i;
         }
         agrad::var adLogProb = log_prob(ad_params_r,params_i);
         double val = adLogProb.val();
