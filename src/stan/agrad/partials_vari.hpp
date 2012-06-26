@@ -9,6 +9,7 @@ namespace stan {
 
   namespace agrad {
 
+
     /**
      * A variable implementation that stores a single operand and its
      * derivative with respect to the variable.
@@ -141,10 +142,10 @@ namespace stan {
     inline agrad::var simple_var(double v,
                                  const T1& y1, double dy1,
                                  const T2& y2, double dy2) {
-      return agrad::var(new agrad::partials2_vari<typename stan::var_to_vi<T1>::type,
-                        typename stan::var_to_vi<T2>::type>(v,
-                                                   extract_vari(y1), dy1,
-                                                   extract_vari(y2), dy2));
+      return agrad::var(new agrad::partials2_vari<typename var_to_vi<T1>::type,
+                        typename var_to_vi<T2>::type>(v,
+						      extract_vari(y1), dy1,
+						      extract_vari(y2), dy2));
     }
 
     template <typename T1, typename T2, typename T3>
@@ -152,12 +153,12 @@ namespace stan {
                                  const T1& y1, double dy1,
                                  const T2& y2, double dy2,
                                  const T3& y3, double dy3) {
-      return agrad::var(new agrad::partials3_vari<typename stan::var_to_vi<T1>::type,
-                        typename stan::var_to_vi<T2>::type,
-                        typename stan::var_to_vi<T3>::type>(v,
-                                                   extract_vari(y1), dy1,
-                                                   extract_vari(y2), dy2,
-                                                   extract_vari(y3), dy3));
+      return agrad::var(new agrad::partials3_vari<typename var_to_vi<T1>::type,
+                        typename var_to_vi<T2>::type,
+                        typename var_to_vi<T3>::type>(v,
+						      extract_vari(y1), dy1,
+						      extract_vari(y2), dy2,
+						      extract_vari(y3), dy3));
     }
 
     inline agrad::var simple_var(double v, size_t N, vari** operands,

@@ -6,11 +6,6 @@
 
 namespace stan {
 
-  namespace agrad {
-    class var;
-    class vari;
-  }
-
   /**
    * Metaprogramming struct to detect whether a given type is constant
    * in the mathematical sense (not the C++ <code>const</code>
@@ -62,14 +57,6 @@ namespace stan {
     typedef typename scalar_type<T>::type type;
   };
       
-  template <typename T>
-  struct var_to_vi {
-    typedef T type;
-  };
-  template <>
-  struct var_to_vi<stan::agrad::var> {
-    typedef stan::agrad::vari* type;
-  };
 
   template <typename T>
   struct is_vector {

@@ -22,7 +22,8 @@ namespace stan {
      * @param y (Sequence of) scalar(s).
      * @param mu (Sequence of) location parameter(s)
      * for the normal distribution.
-     * @param sigma (Sequence of) scale parameters for the normal distribution.
+     * @param sigma (Sequence of) scale parameters for the normal
+     * distribution.
      * @return The log of the product of the densities.
      * @throw std::domain_error if the scale is not positive.
      * @tparam T_y Underlying type of scalar in sequence.
@@ -60,8 +61,10 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma, y_vec, mu_vec, sigma_vec);
 
-      AmbiguousVector<double, is_vector<T_scale>::value> inv_sigma(length(sigma));
-      AmbiguousVector<double, is_vector<T_scale>::value> log_sigma(length(sigma));
+      AmbiguousVector<double, is_vector<T_scale>::value> 
+	inv_sigma(length(sigma));
+      AmbiguousVector<double, is_vector<T_scale>::value> 
+	log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         log_sigma[i] = log(value_of(sigma_vec[i]));
@@ -110,7 +113,8 @@ namespace stan {
       if (!is_constant<typename is_vector<T_loc>::type>::value)
         operands_and_partials.d_x2[n] += scaled_diff;
       if (!is_constant<typename is_vector<T_scale>::type>::value)
-        operands_and_partials.d_x3[n] += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
+        operands_and_partials.d_x3[n] 
+	  += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
 
       }
 
@@ -141,6 +145,7 @@ namespace stan {
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_log<false>(y,mu,sigma,stan::math::default_policy());
     }
+
 
     /**
      * Calculates the normal cumulative distribution function for the given
@@ -197,15 +202,7 @@ namespace stan {
     }
 
 
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline 
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
-    normal_log(const std::vector<T_y>& y,
-               const T_loc& mu,
-               const T_scale& sigma) {
-      return normal_log<false>(y,mu,sigma,stan::math::default_policy());
-    }
-
+ 
   }
 }
 #endif
