@@ -201,7 +201,18 @@ namespace stan {
 	return do_domain_error(function,x,name," is %1%, but must be greater than ",low,result,Policy());
       return true;
     }
-    // FIXME: NEED VECTORIZED VERSION
+    template <typename T_x, typename T_low, typename T_result, class Policy>
+    inline bool check_greater(const char* function,
+			      const std::vector<T_x>& x,
+                              const T_low& low,
+                              const char* name,  
+                              T_result* result,
+                              const Policy&) {
+      for (size_t i = 0; i < x.size(); ++i)
+	if (!(x[i] > low))
+	  return do_domain_error_vec(i,function,x,name," is %1%, but must be greater than ",low,result,Policy());
+      return true;
+    }
     template <typename T_x, typename T_low, typename T_result>
     inline bool check_greater(const char* function,
                               const T_x& x,
@@ -228,10 +239,23 @@ namespace stan {
                                        T_result* result,
                                        const Policy&) {
       if (!(x >= low))
-	return do_domain_error(function,x,name," is %1%, but must be greater or equal to ",low,result,Policy());
+	return do_domain_error(function,x,name," is %1%, but must be greater than or equal to ",
+			       low,result,Policy());
       return true;
     }
-    // FIXME: NEED VECTORIZED VERSION
+    template <typename T_x, typename T_low, typename T_result, class Policy>
+    inline bool check_greater_or_equal(const char* function,
+				       const std::vector<T_x>& x,
+				       const T_low& low,
+				       const char* name,  
+				       T_result* result,
+				       const Policy&) {
+      for (size_t i = 0; i < x.size(); ++i)
+	if (!(x[i] >= low))
+	  return do_domain_error_vec(i,function,x,name,
+				     " is %1%, but must be greater than or equal to",low,result,Policy());
+      return true;
+    }
     template <typename T_x, typename T_low, typename T_result>
     inline bool check_greater_or_equal(const char* function,
                                        const T_x& x,
@@ -264,7 +288,19 @@ namespace stan {
 	return do_domain_error(function,x,name," is %1%, but must be less than ",high,result,Policy());
       return true;
     }
-    // FIXME: NEED VECTORIZED VERSION
+    template <typename T_x, typename T_high, typename T_result, class Policy>
+    inline bool check_less(const char* function,
+			   const std::vector<T_x>& x,
+			   const T_high& high,
+			   const char* name,  
+			   T_result* result,
+			   const Policy&) {
+      for (size_t i = 0; i < x.size(); ++i)
+	if (!(x[i] < high))
+	  return do_domain_error_vec(i,function,x,name,
+				     " is %1%, but must be less than",high,result,Policy());
+      return true;
+    }
     template <typename T_x, typename T_high, typename T_result>
     inline bool check_less(const char* function,
                            const T_x& x,
@@ -295,7 +331,19 @@ namespace stan {
 	return do_domain_error(function,x,name," is %1%, but must be less than or equal to ",high,result,Policy());
       return true;
     }
-    // FIXME: NEED VECTORIZED VERSION
+    template <typename T_x, typename T_high, typename T_result, class Policy>
+    inline bool check_less_or_equal(const char* function,
+				    const std::vector<T_x>& x,
+				    const T_high& high,
+				    const char* name,  
+				    T_result* result,
+				    const Policy&) {
+      for (size_t i = 0; i < x.size(); ++i)
+	if (!(x[i] <= high))
+	  return do_domain_error_vec(i,function,x,name,
+				     " is %1%, but must be less than or equal to",high,result,Policy());
+      return true;
+    }
     template <typename T_x, typename T_high, typename T_result>
     inline bool check_less_or_equal(const char* function,
                                     const T_x& x,
@@ -326,10 +374,25 @@ namespace stan {
                               T_result* result,
                               const Policy&) {
       if (!(low <= x && x <= high))
-	return do_domain_error(function,x,name," is %1%, but must be between ",std::pair<T_low,T_high>(low,high),result,Policy());
+    	return do_domain_error(function,x,name," is %1%, but must be between ",
+    			       std::pair<T_low,T_high>(low,high),result,Policy());
       return true;
     }
-    // FIXME: NEED VECTORIZED VERSION
+    template <typename T_x, typename T_low, typename T_high, typename T_result,
+              class Policy>
+    inline bool check_bounded(const char* function,
+                              const std::vector<T_x>& x,
+                              const T_low& low,
+                              const T_high& high,
+                              const char* name,  
+                              T_result* result,
+                              const Policy&) {
+      for (size_t i = 0; i < x.size(); ++i)
+    	if (!(low <= x[i] && x[i] <= high))
+    	  return do_domain_error_vec(i,function,x,name," is %1%, but must be between ",
+				     std::pair<T_low,T_high>(low,high),result,Policy());
+      return true;
+    }
     template <typename T_x, typename T_low, typename T_high, typename T_result>
     inline bool check_bounded(const char* function,
                               const T_x& x,
@@ -365,7 +428,18 @@ namespace stan {
 	return do_domain_error(function,x,name," is %1%, but must be >= 0!","",result,Policy());
       return true;
     }
-    // FIXME: NEED VECTORIZED VERSION
+    template <typename T_x, typename T_result, 
+              class Policy>
+    inline bool check_nonnegative(const char* function,
+                                  const std::vector<T_x>& x,
+                                  const char* name,
+                                  T_result* result,
+                                  const Policy&) {
+      for (size_t i = 0; i < x.size(); ++i)
+	if (!boost::is_unsigned<T_x>::value && !(x[i] >= 0)) 
+	  return do_domain_error_vec(i,function,x,name," is %1%, but must be >= 0!","",result,Policy());
+      return true;
+    }
     template <typename T_x, typename T_result>
     inline bool check_nonnegative(const char* function,
                                   const T_x& x,
