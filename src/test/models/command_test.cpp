@@ -41,10 +41,7 @@ enum cl_options {
 };
 
 
-class ModelCommand : 
-  public ::testing::TestWithParam<int> {
-private:
-  static char path_separator;
+class ModelCommand : public ::testing::TestWithParam<int> {
 public:
   static string data_file_base;
   static string model_path;
@@ -53,17 +50,6 @@ public:
   static vector<string> option_name;
   static vector<pair<string, string> > command_changes;
   static vector<pair<string, string> > output_changes;
-
-  static char get_path_separator() {
-    if (path_separator == 0) {
-      FILE *in;
-      if(!(in = popen("make path_separator --no-print-directory", "r")))
-        throw std::runtime_error("\"make path_separator\" has failed.");
-      path_separator = fgetc(in);
-      pclose(in);
-    }
-    return path_separator;
-  }
   
   static std::string get_path(const char* path_array[], size_t length) {
     std::string path;
@@ -422,7 +408,6 @@ public:
 vector<string> ModelCommand::expected_help_options;
 string ModelCommand::model_path;
 string ModelCommand::data_file_base;
-char ModelCommand::path_separator = 0;
 vector<pair<string, string> > ModelCommand::expected_output;
 vector<pair<string, string> > ModelCommand::command_changes;
 vector<pair<string, string> > ModelCommand::output_changes;
