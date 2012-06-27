@@ -1148,10 +1148,36 @@ namespace stan {
      * @param[in] c Scalar.
      * @return Matrix or Vector plus the scalar.
      */
-    template <typename T1, typename T2, int Rows, int Cols>
+    template <int Rows, int Cols>
     inline Eigen::Matrix<var, Rows, Cols>
-    add(const Eigen::Matrix<T1, Rows, Cols>& m,
-        const T2& c) {
+    add(const Eigen::Matrix<var, Rows, Cols>& m,
+        const var& c) {
+      return (m.array() + c).matrix();
+    }
+
+    /**
+     * Return the sum of a matrix or vector and a scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
+     * @return Matrix or Vector plus the scalar.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const Eigen::Matrix<var, Rows, Cols>& m,
+        const double& c) {
+      return (m.array() + to_var(c)).matrix();
+    }
+
+    /**
+     * Return the sum of a matrix or vector and a scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
+     * @return Matrix or Vector plus the scalar.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const Eigen::Matrix<double, Rows, Cols>& m,
+        const var& c) {
       return (to_var(m).array() + c).matrix();
     }
 
@@ -1161,11 +1187,37 @@ namespace stan {
      * @param[in] m Matrix or vector.
      * @return Scalar plus vector.
      */
-    template <typename T1, typename T2, int Rows, int Cols>
+    template <int Rows, int Cols>
     inline Eigen::Matrix<var, Rows, Cols>
-    add(const T1& c,
-        const Eigen::Matrix<T2, Rows, Cols>& m) {
+    add(const var& c,
+        const Eigen::Matrix<var, Rows, Cols>& m) {
+      return (c + m.array()).matrix();
+    }
+
+    /**
+     * Return the sum of a scalar and a matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
+     * @return Scalar plus vector.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const var& c,
+        const Eigen::Matrix<double, Rows, Cols>& m) {
       return (c + to_var(m).array()).matrix();
+    }
+
+    /**
+     * Return the sum of a scalar and a matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
+     * @return Scalar plus vector.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const double& c,
+        const Eigen::Matrix<var, Rows, Cols>& m) {
+      return (c + m.array()).matrix();
     }
 
     /**
