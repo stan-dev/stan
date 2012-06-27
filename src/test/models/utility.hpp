@@ -2,6 +2,7 @@
 #define __TEST__MODELS__UTILITY_HPP__
 
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
 /** 
  * Gets the path separator for the OS.
@@ -71,6 +72,69 @@ std::string run_command(const std::string& command) {
   return output;
 }
 
+/** 
+ * Returns the help options from the string provided.
+ * Help options start with "--".
+ * 
+ * @param help_output output from "model/command --help"
+ * @return a vector of strings of the help options
+ */
+std::vector<std::string> parse_help_options(const std::string& help_output) {
+  std::vector<std::string> help_options;
+  
+  size_t option_start = help_output.find("--");
+  while (option_start != std::string::npos) {
+    // find the option name (skip two characters for "--")
+    option_start += 2;
+    size_t option_end = help_output.find_first_of("= ", option_start);
+    help_options.push_back(help_output.substr(option_start, option_end-option_start));
+    option_start = help_output.find("--", option_start+1);
+  }
+        
+  return help_options;
+}
 
+/** 
+ * Parses output from a Stan model run from the command line.
+ * Returns option, value pairs.
+ * 
+ * @param command_output The output from a Stan model run from the command line.
+ * 
+ * @return Option, value pairs as indicated by the Stan model.
+ */
+std::vector<std::pair<std::string, std::string> > 
+parse_command_output(const std::string& command_output) {
+  using std::vector;
+  using std::pair;
+  using std::string;
+  vector<pair<string, string> > output;
+  
+  string option, value;
+  size_t start = 0, end = command_output.find("\n", start);
+  
+  EXPECT_EQ("STAN SAMPLING COMMAND", 
+            command_output.substr(start, end))
+    << "command could not be run. output is: \n" 
+    << command_output;
+  if ("STAN SAMPLING COMMAND" != command_output.substr(start, end)) {
+    return output;
+  }
+  start = end+1;
+  end = command_output.find("\n", start);
+  size_t equal_pos = command_output.find("=", start);
+  
+  while (equal_pos != string::npos) {
+    using boost::trim;
+    option = command_output.substr(start, equal_pos-start);
+    value = command_output.substr(equal_pos+1, end - equal_pos - 1);
+    trim(option);
+    trim(value);
+    output.push_back(pair<string, string>(option, value));
+    start = end+1;
+    end = command_output.find("\n", start);
+    equal_pos = command_output.find("=", start);
+  }
+  return output;
+}
 
 #endif

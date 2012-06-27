@@ -7,7 +7,6 @@
 #include <test/models/utility.hpp>
 
 #include <stdexcept>
-#include <boost/algorithm/string.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <bitset>
 
@@ -205,60 +204,6 @@ public:
     //}
   }
 
-  /** 
-   * Returns the help options from the string provide.
-   * Help options start with "--".
-   * 
-   * @param help_output output from "model/command --help"
-   * @return a vector of strings of the help options
-   */
-  vector<string> get_help_options(const string& help_output) {    
-    vector<string> help_options;
-
-    size_t option_start = help_output.find("--");
-    while (option_start != string::npos) {
-      // find the option name (skip two characters for "--")
-      option_start += 2;
-      size_t option_end = help_output.find_first_of("= ", option_start);
-      help_options.push_back(help_output.substr(option_start, option_end-option_start));
-      option_start = help_output.find("--", option_start+1);
-    }
-        
-    return help_options;
-  }
-  
-  vector<pair<string, string> > 
-  parse_output(const string& command_output) {
-    vector<pair<string, string> > output;
-
-    string option, value;
-    size_t start = 0, end = command_output.find("\n", start);
-    
-    EXPECT_EQ("STAN SAMPLING COMMAND", 
-              command_output.substr(start, end))
-      << "command could not be run. output is: \n" 
-      << command_output;
-    if ("STAN SAMPLING COMMAND" != command_output.substr(start, end)) {
-      return output;
-    }
-    start = end+1;
-    end = command_output.find("\n", start);
-    size_t equal_pos = command_output.find("=", start);
-
-    while (equal_pos != string::npos) {
-      using boost::trim;
-      option = command_output.substr(start, equal_pos-start);
-      value = command_output.substr(equal_pos+1, end - equal_pos - 1);
-      trim(option);
-      trim(value);
-      output.push_back(pair<string, string>(option, value));
-      start = end+1;
-      end = command_output.find("\n", start);
-      equal_pos = command_output.find("=", start);
-    }
-    return output;
-  }
-
   void check_output(const string& command_output,
                     const vector<pair<string, string> >& changed_options) {
     vector<pair<string, string> > expected_output(this->expected_output);
@@ -283,7 +228,7 @@ public:
     }
     
     
-    vector<pair<string, string> > output = parse_output(command_output);
+    vector<pair<string, string> > output = parse_command_output(command_output);
     ASSERT_EQ(expected_output.size(), output.size());
     for (size_t i = 0; i < expected_output.size(); i++) {
       EXPECT_EQ(expected_output[i].first, output[i].first) <<
@@ -354,11 +299,13 @@ vector<string> ModelCommand::option_name;
 
 
 TEST_F(ModelCommand, HelpOptionsMatch) {
+  using std::string;
+  using std::vector;
   string help_command = model_path;
   help_command.append(" --help");
 
   vector<string> help_options = 
-    get_help_options(run_command(help_command));
+    parse_help_options(run_command(help_command));
 
   ASSERT_EQ(expected_help_options.size(), help_options.size());
   for (size_t i = 0; i < expected_help_options.size(); i++) {
