@@ -4,6 +4,8 @@
  *
  */
 #include <gtest/gtest.h>
+#include <test/models/utility.hpp>
+
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
 #include <stan/mcmc/chains.hpp>

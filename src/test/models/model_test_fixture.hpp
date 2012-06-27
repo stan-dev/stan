@@ -2,6 +2,7 @@
 #define __TEST__MODELS__MODEL_TEST_FIXTURE_HPP__
 
 #include <gtest/gtest.h>
+#include <test/models/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <utility>
 #include <boost/math/distributions/students_t.hpp>
@@ -50,21 +51,6 @@ public:
    */
   static void TearDownTestCase() {
     delete chains;
-  }
-
-  /** 
-   * Gets the path separator for the OS.
-   * 
-   * @return '\' for Windows, '/' otherwise.
-   */
-  static char get_path_separator() {
-    char c;
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    c = fgetc(in);
-    pclose(in);
-    return c;
   }
 
   /** 
