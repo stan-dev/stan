@@ -21,11 +21,18 @@ models/speed/%.stan : src/models/speed/%.stan
 	@echo ''
 	@echo '--- Copying model ---'
 	cp $< $@ 
-ifneq (,$(wildcard $(basename $<)*.Rdata))
-	@echo 
-	@echo '--- Copying data ---'
-	cp $(wildcard $(basename $<)*.Rdata) $(dir $@)
-endif
+	@if test -f $(basename $<)*.R; then \
+		echo '';\
+		echo '--- Copying generate script ---';\
+		cp $(wildcard $(basename $<)*.R) $(dir $@);\
+		echo 'cp $(wildcard $(basename $<)*.R) $(dir $@)';\
+	fi;
+	@if test -f $(basename $<)*.Rdata; then \
+		echo '';\
+		echo '--- Copying data ---';\
+		cp $(wildcard $(basename $<)*.Rdata) $(dir $@);\
+		echo 'cp $(wildcard $(basename $<)*.Rdata) $(dir $@)';\
+	fi;
 
 .PRECIOUS: models/%.stan models/%.Rdata
 models/%.stan : src/models/%.stan
