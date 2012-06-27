@@ -50,8 +50,9 @@ std::string convert_model_path(const std::vector<std::string>& model_path) {
  * @param command A command that can be run from the shell
  * @return the system output of the command
  */  
-std::string run_command(const std::string& command) {
+std::string run_command(std::string command) {
   FILE *in;
+  command += " 2>&1"; // capture stderr
   if(!(in = popen(command.c_str(), "r"))) {
     std::string err_msg;
     err_msg = "Could not run: \"";
@@ -67,7 +68,14 @@ std::string run_command(const std::string& command) {
     output += std::string(&buf[0], &buf[count]);
     count = fread(&buf, 1, 1024, in);
   }
-  pclose(in);
+  
+  if (pclose(in) != 0) {
+    std::string err_msg;
+    err_msg = "Could not run: \"";
+    err_msg+= command;
+    err_msg+= "\"";
+    throw std::runtime_error(err_msg.c_str());
+  }
 
   return output;
 }
