@@ -2,6 +2,7 @@
 #define __TEST__MODELS__MODEL_TEST_FIXTURE_HPP__
 
 #include <gtest/gtest.h>
+#include <test/models/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <utility>
 #include <boost/math/distributions/students_t.hpp>
@@ -24,6 +25,7 @@ public:
   static std::string model_path;
   static stan::mcmc::chains<> *chains;
   static size_t num_chains;
+  static std::vector<std::string> command_outputs;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -36,9 +38,8 @@ public:
    *                    the header of a csv file
    */
   static void SetUpTestCase() {
-    path_separator = get_path_separator();
     model_path = convert_model_path(get_model_path());
-      
+    
     chains = create_chains();
   }
     
@@ -50,43 +51,6 @@ public:
    */
   static void TearDownTestCase() {
     delete chains;
-  }
-
-  /** 
-   * Gets the path separator for the OS.
-   * 
-   * @return '\' for Windows, '/' otherwise.
-   */
-  static char get_path_separator() {
-    char c;
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    c = fgetc(in);
-    pclose(in);
-    return c;
-  }
-
-  /** 
-   * Returns the path as a string with the appropriate
-   * path separator.
-   * 
-   * @param model_path vector of strings representing path to the model
-   * 
-   * @return the string representation of the path with the appropriate
-   *    path separator.
-   */
-  static std::string
-  convert_model_path(const std::vector<std::string> model_path) {
-    std::string path;
-    if (model_path.size() > 0) {
-      path.append(model_path[0]);
-      for (size_t i = 1; i < model_path.size(); i++) {
-        path.append(1, path_separator);
-        path.append(model_path[i]);
-      }
-    }
-    return path;
   }
 
   /** 
@@ -139,9 +103,10 @@ public:
    */
   static void run_model() {
     for (size_t chain = 0; chain < num_chains; chain++) {
-      std::string command = get_command(chain);
-      EXPECT_EQ(0, system(command.c_str()))
-        << "Can not execute command: " << command << std::endl;
+      std::string command_output;
+      EXPECT_NO_THROW(command_output = run_command(get_command(chain))) 
+        << "Can not execute command: " << get_command(chain);
+      command_outputs.push_back(command_output);
     }
     populate_chains();
   }
@@ -157,8 +122,8 @@ public:
   static stan::mcmc::chains<>* create_chains() {
     std::string command = get_command(0U);
     command += " --iter=0";
-    EXPECT_EQ(0, system(command.c_str()))
-      << "Can not build header using: " << command << std::endl;
+    EXPECT_NO_THROW(run_command(command)) 
+      << "Can not build header using: " << command;
       
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
@@ -197,9 +162,6 @@ public:
 };
   
 template<class Derived> 
-char Model_Test_Fixture<Derived>::path_separator;
-
-template<class Derived> 
 stan::mcmc::chains<> *Model_Test_Fixture<Derived>::chains;
 
 template<class Derived>
@@ -208,7 +170,8 @@ size_t Model_Test_Fixture<Derived>::num_chains = 2;
 template<class Derived>
 std::string Model_Test_Fixture<Derived>::model_path;
 
-
+template<class Derived>
+std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
@@ -280,16 +243,28 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   
   if (failed == 0)
     return;
-  
 
   double p = 1 - cdf(binomial(n, alpha), failed);
   // this test should fail less than 0.1% of the time.
   if (p < 0.001) {
+    err_message << "------------------------------------------------------------\n";
+    for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {
+      std::vector<std::pair<std::string, std::string> > options = 
+        parse_command_output(TypeParam::command_outputs[chain]);
+      for (size_t i = 0; i < options.size(); i++) {
+        if (options[i].first == "seed") {
+          err_message << "seed: " << options[i].second << std::endl;
+        }
+      }
+    }
+    
     EXPECT_EQ(0, failed)
       << "Failed " << failed << " of " << expected_values.size() << " comparisons\n"
       << "p: " << p << std::endl
       << "------------------------------------------------------------\n"
-      << err_message.str();
+      << err_message.str() << std::endl
+      << "------------------------------------------------------------\n";
+    
   }
 }
 
