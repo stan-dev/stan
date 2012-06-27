@@ -1,11 +1,12 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
+#include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad.hpp>
 
 namespace stan {
 
@@ -42,6 +43,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
+      // using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -54,6 +56,24 @@ namespace stan {
 	    && stan::length(sigma)))
 	return 0.0;
 
+      // set up return value accumulator
+      double logp(0.0);
+
+      // validate args (here done over var, which should be OK)
+      if (!check_not_nan(function, y, "Random variate y", &logp, Policy()))
+	return logp;
+      if (!check_finite(function, mu, "Location parameter, mu,", 
+			&logp, Policy()))
+	return logp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+			  &logp, Policy()))
+	return logp;
+      // if (!(check_consistent_sizes(function,y,mu,sigma,"Sizes of y, mu, sigma",
+      // 				   &logp, Policy())))
+      // 	return logp;
+      
+
+      // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
@@ -70,18 +90,7 @@ namespace stan {
         log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      // set up return value accumulator
-      double logp(0.0);
-
-      // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variate y", &logp, Policy()))
-	return logp;
-      if (!check_finite(function, mu, "Location parameter, mu,", 
-			&logp, Policy()))
-	return logp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
-			  &logp, Policy()))
-	return logp;
+      
 
       for (size_t n = 0; n < N; n++) {
 

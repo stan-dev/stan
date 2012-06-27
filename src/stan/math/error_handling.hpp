@@ -495,7 +495,31 @@ namespace stan {
     }
 
 
-
+   // template <typename T1, typename T2, typename T3, typename T_result, class Policy>
+    // void check_consistent_sizes(const char* function,
+    // 				const T1& x1, 
+    // 				const T2& x2, 
+    // 				const T3& x3
+    // 				T_result* result,
+    // 				const Policy&) {
+    // }
+    // template <typename T1, typename T2, typename T3, typename T_result>
+    // inline void check_consistent_sizes(const char* function,
+    // 				       const T1& x1, 
+    // 				       const T2& x2, 
+    // 				       const T3& x3,
+    // 				       T_result* result) {
+    //   return check_consistent_sizes(function,x1,x2,x3,result,default_policy());
+    // }
+    // template <typename T1, typename T2, typename T3, typename T_result>
+    // inline void check_consistent_sizes(const char* function,
+    // 				       const T1& x1, 
+    // 				       const T2& x2, 
+    // 				       const T3& x3,
+    // 				       typename return_type<T1,T2,T3>::type* result) {
+    //   return check_consistent_sizes(function,x1,x2,x3,result,default_policy());
+    // }
+    
 
   }
 }
