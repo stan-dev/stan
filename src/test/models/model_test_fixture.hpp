@@ -103,9 +103,8 @@ public:
    */
   static void run_model() {
     for (size_t chain = 0; chain < num_chains; chain++) {
-      std::string command = get_command(chain);
-      EXPECT_EQ(0, system(command.c_str()))
-        << "Can not execute command: " << command << std::endl;
+      EXPECT_NO_THROW(run_command(get_command(chain))) 
+        << "Can not execute command: " << get_command(chain);
     }
     populate_chains();
   }
@@ -121,8 +120,8 @@ public:
   static stan::mcmc::chains<>* create_chains() {
     std::string command = get_command(0U);
     command += " --iter=0";
-    EXPECT_EQ(0, system(command.c_str()))
-      << "Can not build header using: " << command << std::endl;
+    EXPECT_NO_THROW(run_command(command)) 
+      << "Can not build header using: " << command;
       
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
