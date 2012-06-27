@@ -51,34 +51,6 @@ public:
   static vector<pair<string, string> > command_changes;
   static vector<pair<string, string> > output_changes;
   
-  static std::string get_path(const char* path_array[], size_t length) {
-    std::string path;
-    if (length==0)
-      return path;
-    
-    path.append(path_array[0]);
-    for (size_t i = 1; i < length; i++) {
-      path.append(1, get_path_separator());
-      path.append(path_array[i]);
-    }
-    return path;
-  }
-
-
-
-  static std::string get_path(const vector<string>& path_vector) {
-    std::string path;
-    if (path_vector.size()==0)
-      return path;
-    
-    path.append(path_vector[0]);
-    for (size_t i = 1; i < path_vector.size(); i++) {
-      path.append(1, get_path_separator());
-      path.append(path_vector[i]);
-    }
-    return path;
-  }
-  
   void static SetUpTestCase() {
     model_path.append("models");
     model_path.append(1, get_path_separator());

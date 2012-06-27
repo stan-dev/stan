@@ -39,7 +39,7 @@ public:
   static void SetUpTestCase() {
     path_separator = get_path_separator();
     model_path = convert_model_path(get_model_path());
-      
+    
     chains = create_chains();
   }
     
@@ -51,28 +51,6 @@ public:
    */
   static void TearDownTestCase() {
     delete chains;
-  }
-
-  /** 
-   * Returns the path as a string with the appropriate
-   * path separator.
-   * 
-   * @param model_path vector of strings representing path to the model
-   * 
-   * @return the string representation of the path with the appropriate
-   *    path separator.
-   */
-  static std::string
-  convert_model_path(const std::vector<std::string> model_path) {
-    std::string path;
-    if (model_path.size() > 0) {
-      path.append(model_path[0]);
-      for (size_t i = 1; i < model_path.size(); i++) {
-        path.append(1, path_separator);
-        path.append(model_path[i]);
-      }
-    }
-    return path;
   }
 
   /** 
