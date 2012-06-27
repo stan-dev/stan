@@ -14,10 +14,17 @@ logistic_generate_data <- function(N, M, file="dat", seed=0) {
   y <- as.vector(ifelse(inv_logit(alpha + x %*% beta) > runif(N), 1, 0));
   dump(c("N", "M", "y", "x"), file=paste(file, ".Rdata", sep=""));
   dump(c("N", "M", "alpha", "beta", "seed"), file=paste(file, "_param.Rdata", sep=""));
-  return (list(alpha=alpha, beta=beta, x=x, y=y));
+  #return (list(alpha=alpha, beta=beta, x=x, y=y));
 }
 
-if (FALSE) {
-  source("logistic_generate_data.R");
-  dat <- logistic_generate_data(1000, 3, file="logistic_1000_3");
+
+## generate data
+N <- c(1000, 5000, 10000); #, 100000, 1000000);
+M <- c(1, 10, 100, 500, 1000);
+for (n in N) {
+  for (m in M) {
+    if (n > m)
+      logistic_generate_data(n, m, file=paste("logistic_", n, "_", m, sep=""));
+  }
 }
+
