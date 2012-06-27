@@ -42,26 +42,27 @@ TEST(LogisticSpeedTest,Prerequisites) {
   model_path.push_back("logistic");
   Rscript = "logistic_generate_data.R";
 
-  data_files.push_back("logistic_1000_1");
-  data_files.push_back("logistic_1000_10");
-  data_files.push_back("logistic_1000_100");
-  data_files.push_back("logistic_1000_500");
-  data_files.push_back("logistic_5000_1");
-  data_files.push_back("logistic_5000_10");
-  data_files.push_back("logistic_5000_100");
-  data_files.push_back("logistic_5000_500");
-  data_files.push_back("logistic_5000_1000");
-  data_files.push_back("logistic_10000_1");
-  data_files.push_back("logistic_10000_10");
-  data_files.push_back("logistic_10000_100");
-  data_files.push_back("logistic_10000_500");
-  data_files.push_back("logistic_10000_1000");
+  // data_files.push_back("logistic_1000_1");
+  //   data_files.push_back("logistic_1000_10");
+  //   data_files.push_back("logistic_1000_100");
+  //   data_files.push_back("logistic_1000_500");
+  //   data_files.push_back("logistic_5000_1");
+  //   data_files.push_back("logistic_5000_10");
+  //   data_files.push_back("logistic_5000_100");
+  //   data_files.push_back("logistic_5000_500");
+  //   data_files.push_back("logistic_5000_1000");
+  //   data_files.push_back("logistic_10000_1");
+  //   data_files.push_back("logistic_10000_10");
+  //   data_files.push_back("logistic_10000_100");
+  //   data_files.push_back("logistic_10000_500");
+  //   data_files.push_back("logistic_10000_1000");
+  // 
 }
 
 TEST(LogisticSpeedTest,GenerateData) {
   if (!has_R) {
     std::cout << "No R available" << std::endl;
-    return;
+    return;  // should this fail?  probably
   }
   bool has_data = true;
   std::string path = convert_model_path(model_path);
@@ -86,20 +87,20 @@ TEST(LogisticSpeedTest,GenerateData) {
   command += "Rscript ";
   command += Rscript;
 
+  // no guarantee here that we have the right files
+
   ASSERT_NO_THROW(run_command(command))
     << command;
   SUCCEED();
 }
 
-TEST(LogisticSpeedTest,Stan_1000_1) {
-  std::string filename = "logistic_1000_1";
+void test_logistic_speed_stan(std::string& filename, size_t iterations) {
   std::stringstream command;
   std::string path = convert_model_path(model_path);
 
-
   command << path << get_path_separator() << "logistic"
           << " --data=" << path << get_path_separator() << filename << ".Rdata"
-          << " --iter=2000";
+          << " --iter=" << iterations;
   
   
   std::vector<std::string> command_outputs;
@@ -109,10 +110,17 @@ TEST(LogisticSpeedTest,Stan_1000_1) {
     command_chain << " --chain_id=" << chain
                   << " --samples=" << path << get_path_separator() 
                   << filename << ".chain_" << chain << ".csv";
+    // start timer
     EXPECT_NO_THROW(command_outputs.push_back(run_command(command_chain.str())))
       << "Failed running command: " << command_chain.str();
+    // end timer
   }
   
   
   SUCCEED();
 }
+
+TEST(LogisticSpeedTest,Stan_X) { 
+  test_logistic_speed_stan("logistic_1000_1",2000);
+}
+

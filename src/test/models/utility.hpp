@@ -63,11 +63,9 @@ std::string run_command(std::string command) {
   
   std::string output;
   char buf[1024];
-  size_t count = fread(&buf, 1, 1024, in);
-  while (count > 0) {
+  size_t count;
+  while ((count =  fread(&buf, 1, 1024, in)) > 0)
     output += std::string(&buf[0], &buf[count]);
-    count = fread(&buf, 1, 1024, in);
-  }
   
   if (pclose(in) != 0) {
     std::string err_msg;
