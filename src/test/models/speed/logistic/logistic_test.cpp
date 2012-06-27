@@ -33,7 +33,7 @@ TEST(LogisticSpeedTest,Prerequisites) {
     run_command(command);
     has_jags = true;
   } catch (...) {
-    std::cout << "System does not have Rscript available" << std::endl
+    std::cout << "System does not have jags available" << std::endl
               << "Failed to run: " << command << std::endl;
   }
 
@@ -82,7 +82,7 @@ TEST(LogisticSpeedTest,GenerateData) {
   std::string command;
   command = "cd ";
   command += convert_model_path(model_path);
-  command += "; ";
+  command += " && ";
   command += "Rscript ";
   command += Rscript;
 
