@@ -42,7 +42,7 @@ TEST(LogisticSpeedTest,Prerequisites) {
   model_path.push_back("logistic");
   Rscript = "logistic_generate_data.R";
 
-  // data_files.push_back("logistic_1000_1");
+  data_files.push_back("logistic_128_2");
   //   data_files.push_back("logistic_1000_10");
   //   data_files.push_back("logistic_1000_100");
   //   data_files.push_back("logistic_1000_500");
@@ -94,7 +94,7 @@ TEST(LogisticSpeedTest,GenerateData) {
   SUCCEED();
 }
 
-void test_logistic_speed_stan(std::string& filename, size_t iterations) {
+void test_logistic_speed_stan(std::string filename, size_t iterations) {
   std::stringstream command;
   std::string path = convert_model_path(model_path);
 
@@ -121,6 +121,6 @@ void test_logistic_speed_stan(std::string& filename, size_t iterations) {
 }
 
 TEST(LogisticSpeedTest,Stan_X) { 
-  test_logistic_speed_stan("logistic_1000_1",2000);
+  test_logistic_speed_stan("logistic_128_2",2000);
 }
 
