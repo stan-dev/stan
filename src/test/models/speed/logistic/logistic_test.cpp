@@ -102,13 +102,15 @@ TEST(LogisticSpeedTest,Stan_1000_1) {
           << " --iter=2000";
   
   
+  std::vector<std::string> command_outputs;
   for (size_t chain = 0; chain < num_chains; chain++) {
     std::stringstream command_chain;
     command_chain << command.str();
     command_chain << " --chain_id=" << chain
                   << " --samples=" << path << get_path_separator() 
                   << filename << ".chain_" << chain << ".csv";
-    std::cout << command_chain.str() << std::endl;
+    EXPECT_NO_THROW(command_outputs.push_back(run_command(command_chain.str())))
+      << "Failed running command: " << command_chain.str();
   }
   
   
