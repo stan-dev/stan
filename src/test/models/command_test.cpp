@@ -206,39 +206,6 @@ public:
   }
 
   /** 
-   * Runs the command provided and returns the system output
-   * as a string.
-   * 
-   * @param command A command that can be run from the shell
-   * @return the system output of the command
-   */  
-  string run_command(const string& command) {
-    FILE *in;
-    if(!(in = popen(command.c_str(), "r"))) {
-      string err_msg;
-      err_msg = "Could not run: \"";
-      err_msg+= command;
-      err_msg+= "\"";
-      throw std::runtime_error(err_msg.c_str());
-    }
-
-    string output;
-    char buf[1024];
-    size_t count = fread(&buf, 1, 1024, in);
-    while (count > 0) {
-      output += string(&buf[0], &buf[count]);
-      //std::cout << "intermediate output: " << output << std::endl;
-      count = fread(&buf, 1, 1024, in);
-    }
-    pclose(in);
-    
-    //std::cout << "ran command: " << command << std::endl;
-    //std::cout << "output : \n";
-    //std::cout << output << std::endl << std::endl;
-    return output;
-  }
-
-  /** 
    * Returns the help options from the string provide.
    * Help options start with "--".
    * 
