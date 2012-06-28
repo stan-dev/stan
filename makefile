@@ -179,7 +179,7 @@ clean-manual:
 	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf
 
 clean-models:
-	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch
+	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
 
 clean-demo:
 	$(RM) -r demo
