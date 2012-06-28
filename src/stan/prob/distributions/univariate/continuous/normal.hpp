@@ -43,7 +43,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
-      // using stan::math::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -52,25 +52,26 @@ namespace stan {
         return 0.0;
       // check if any vectors are zero length
       if (!(stan::length(y) 
-	    && stan::length(mu) 
-	    && stan::length(sigma)))
-	return 0.0;
+            && stan::length(mu) 
+            && stan::length(sigma)))
+        return 0.0;
 
       // set up return value accumulator
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variate y", &logp, Policy()))
-	return logp;
+        return logp;
       if (!check_finite(function, mu, "Location parameter, mu,", 
-			&logp, Policy()))
-	return logp;
+                        &logp, Policy()))
+        return logp;
       if (!check_positive(function, sigma, "Scale parameter, sigma,", 
-			  &logp, Policy()))
-	return logp;
-      // if (!(check_consistent_sizes(function,y,mu,sigma,"Sizes of y, mu, sigma",
-      // 				   &logp, Policy())))
-      // 	return logp;
+                          &logp, Policy()))
+        return logp;
+      if (!(check_consistent_sizes(function,
+                                   y,mu,sigma,"y","mu","sigma",
+                                   &logp, Policy())))
+        return logp;
       
 
       // set up template expressions wrapping scalars into vector views
@@ -82,9 +83,9 @@ namespace stan {
         operands_and_partials(y, mu, sigma, y_vec, mu_vec, sigma_vec);
 
       AmbiguousVector<double, is_vector<T_scale>::value> 
-	inv_sigma(length(sigma));
+        inv_sigma(length(sigma));
       AmbiguousVector<double, is_vector<T_scale>::value> 
-	log_sigma(length(sigma));
+        log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         log_sigma[i] = log(value_of(sigma_vec[i]));
@@ -94,36 +95,36 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
 
-	// pull out values of arguments
-	const double y_dbl = value_of(y_vec[n]);
-	const double mu_dbl = value_of(mu_vec[n]);
-	// const double sigma_dbl = value_of(sigma_vec[n]); // not used
+        // pull out values of arguments
+        const double y_dbl = value_of(y_vec[n]);
+        const double mu_dbl = value_of(mu_vec[n]);
+        // const double sigma_dbl = value_of(sigma_vec[n]); // not used
       
-	// reusable subexpression values
-	const double y_minus_mu_over_sigma 
-	  = (y_dbl - mu_dbl) * inv_sigma[n];
-	const double y_minus_mu_over_sigma_squared 
-	  = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
+        // reusable subexpression values
+        const double y_minus_mu_over_sigma 
+          = (y_dbl - mu_dbl) * inv_sigma[n];
+        const double y_minus_mu_over_sigma_squared 
+          = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
-	static double NEGATIVE_HALF = - 0.5;
+        static double NEGATIVE_HALF = - 0.5;
 
-	// log probability
-	if (include_summand<Prop>::value)
-	  logp += NEG_LOG_SQRT_TWO_PI;
-	if (include_summand<Prop,T_scale>::value)
-	  logp -= log_sigma[n];
-	if (include_summand<Prop,T_y,T_loc,T_scale>::value)
-	  logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
+        // log probability
+        if (include_summand<Prop>::value)
+          logp += NEG_LOG_SQRT_TWO_PI;
+        if (include_summand<Prop,T_scale>::value)
+          logp -= log_sigma[n];
+        if (include_summand<Prop,T_y,T_loc,T_scale>::value)
+          logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
 
-	// gradients
-	double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
-	if (!is_constant<typename is_vector<T_y>::type>::value)
-	  operands_and_partials.d_x1[n] -= scaled_diff;
-	if (!is_constant<typename is_vector<T_loc>::type>::value)
-	  operands_and_partials.d_x2[n] += scaled_diff;
-	if (!is_constant<typename is_vector<T_scale>::type>::value)
-	  operands_and_partials.d_x3[n] 
-	    += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
+        // gradients
+        double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
+        if (!is_constant<typename is_vector<T_y>::type>::value)
+          operands_and_partials.d_x1[n] -= scaled_diff;
+        if (!is_constant<typename is_vector<T_loc>::type>::value)
+          operands_and_partials.d_x2[n] += scaled_diff;
+        if (!is_constant<typename is_vector<T_scale>::type>::value)
+          operands_and_partials.d_x3[n] 
+            += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
 
       }
 
