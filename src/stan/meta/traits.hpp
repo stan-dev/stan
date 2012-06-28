@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <boost/type_traits.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
 
@@ -87,9 +88,9 @@ namespace stan {
     size_t result = length(x1);
     result = result > length(x2) ? result : length(x2);
     result = result > length(x3) ? result : length(x3);
-    assert((length(x1) == 1) || (length(x1) == result));
-    assert((length(x2) == 1) || (length(x2) == result));
-    assert((length(x3) == 1) || (length(x3) == result));
+    // assert((length(x1) == 1) || (length(x1) == result));
+    // assert((length(x2) == 1) || (length(x2) == result));
+    // assert((length(x3) == 1) || (length(x3) == result));
     return result;
   }
 
@@ -162,6 +163,29 @@ namespace stan {
         return *x_;
     }
   };
+
+  /**
+   * Metaprogram to calculate the base scalar return type resulting
+   * from promoting all the scalar types of the template parameters.
+   */
+    template <typename T1, 
+              typename T2 = double, 
+              typename T3 = double, 
+              typename T4 = double, 
+              typename T5 = double, 
+              typename T6 = double>
+    struct return_type {
+      typedef typename 
+      boost::math::tools::promote_args<typename scalar_type<T1>::type,
+                                       typename scalar_type<T2>::type,
+                                       typename scalar_type<T3>::type,
+                                       typename scalar_type<T4>::type,
+                                       typename scalar_type<T5>::type,
+                                       typename scalar_type<T6>::type>::type
+      type;
+    };
+
+
 
 }
 
