@@ -495,25 +495,49 @@ namespace stan {
           return result;
         }
       public:
-        dot_product_vv_vari(const var* v1, const var* v2, size_t length) : 
+        dot_product_vv_vari(const var* v1, const var* v2, size_t length,
+                            dot_product_vv_vari* shared_v1 = NULL,
+                            dot_product_vv_vari* shared_v2 = NULL) : 
           vari(var_dot(v1, v2, length)), length_(length) {
-          v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
-          v2_ = v1_ + length_;
-          for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
-          for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i].vi_;
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          }
+          else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i].vi_;
+          }
+          else {
+            v2_ = shared_v2->v2_;
+          }
         }
         template<int R1,int C1,int R2,int C2>
         dot_product_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
-                            const Eigen::Matrix<var,R2,C2> &v2) : 
+                            const Eigen::Matrix<var,R2,C2> &v2,
+                            dot_product_vv_vari* shared_v1 = NULL,
+                            dot_product_vv_vari* shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
-          v1_ = (vari**)memalloc_.alloc(2*length_*sizeof(vari*));
-          v2_ = v1_ + length_;
-          for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
-          for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i].vi_;
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          }
+          else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i].vi_;
+          }
+          else {
+            v2_ = shared_v2->v2_;
+          }
         }
         void chain() {
           for (size_t i = 0; i < length_; i++) {
@@ -544,25 +568,45 @@ namespace stan {
           return result;
         }
       public:
-        dot_product_vd_vari(const var* v1, const double* v2, size_t length) : 
+        dot_product_vd_vari(const var* v1, const double* v2, size_t length,
+                            dot_product_vd_vari *shared_v1 = NULL,
+                            dot_product_vd_vari *shared_v2 = NULL) : 
           vari(var_dot(v1, v2, length)), length_(length) {
-          v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
-          v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
-          for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
-          for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i];
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          } else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i];
+          } else {
+            v2_ = shared_v2->v2_;
+          }
         }
         template<int R1,int C1,int R2,int C2>
         dot_product_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
-                            const Eigen::Matrix<double,R2,C2> &v2) : 
+                            const Eigen::Matrix<double,R2,C2> &v2,
+                            dot_product_vd_vari *shared_v1 = NULL,
+                            dot_product_vd_vari *shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
-          v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
-          v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
-          for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
-          for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i];
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          } else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i];
+          } else {
+            v2_ = shared_v2->v2_;
+          }
         }
         void chain() {
           for (size_t i = 0; i < length_; i++) {
@@ -1148,10 +1192,36 @@ namespace stan {
      * @param[in] c Scalar.
      * @return Matrix or Vector plus the scalar.
      */
-    template <typename T1, typename T2, int Rows, int Cols>
+    template <int Rows, int Cols>
     inline Eigen::Matrix<var, Rows, Cols>
-    add(const Eigen::Matrix<T1, Rows, Cols>& m,
-        const T2& c) {
+    add(const Eigen::Matrix<var, Rows, Cols>& m,
+        const var& c) {
+      return (m.array() + c).matrix();
+    }
+
+    /**
+     * Return the sum of a matrix or vector and a scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
+     * @return Matrix or Vector plus the scalar.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const Eigen::Matrix<var, Rows, Cols>& m,
+        const double& c) {
+      return (m.array() + to_var(c)).matrix();
+    }
+
+    /**
+     * Return the sum of a matrix or vector and a scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
+     * @return Matrix or Vector plus the scalar.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const Eigen::Matrix<double, Rows, Cols>& m,
+        const var& c) {
       return (to_var(m).array() + c).matrix();
     }
 
@@ -1161,11 +1231,37 @@ namespace stan {
      * @param[in] m Matrix or vector.
      * @return Scalar plus vector.
      */
-    template <typename T1, typename T2, int Rows, int Cols>
+    template <int Rows, int Cols>
     inline Eigen::Matrix<var, Rows, Cols>
-    add(const T1& c,
-        const Eigen::Matrix<T2, Rows, Cols>& m) {
+    add(const var& c,
+        const Eigen::Matrix<var, Rows, Cols>& m) {
+      return (c + m.array()).matrix();
+    }
+
+    /**
+     * Return the sum of a scalar and a matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
+     * @return Scalar plus vector.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const var& c,
+        const Eigen::Matrix<double, Rows, Cols>& m) {
       return (c + to_var(m).array()).matrix();
+    }
+
+    /**
+     * Return the sum of a scalar and a matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
+     * @return Scalar plus vector.
+     */
+    template <int Rows, int Cols>
+    inline Eigen::Matrix<var, Rows, Cols>
+    add(const double& c,
+        const Eigen::Matrix<var, Rows, Cols>& m) {
+      return (c + m.array()).matrix();
     }
 
     /**
@@ -1485,7 +1581,26 @@ namespace stan {
         Eigen::Matrix<var,1,C1> crow(m1.row(i));
         for (int j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<var,R2,1> ccol(m2.col(j));
-          result(i,j) = dot_product(crow,ccol);
+          if (j == 0) {
+            if (i == 0) {
+              result(i,j) = var(new dot_product_vv_vari(crow,ccol));
+            }
+            else {
+              dot_product_vv_vari *v2 = static_cast<dot_product_vv_vari*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vv_vari(crow,ccol,NULL,v2));
+            }
+          }
+          else { 
+            if (i == 0) {
+              dot_product_vv_vari *v1 = static_cast<dot_product_vv_vari*>(result(i,0).vi_);
+              result(i,j) = var(new dot_product_vv_vari(crow,ccol,v1));
+            }
+            else /* if (i != 0 && j != 0) */ {
+              dot_product_vv_vari *v1 = static_cast<dot_product_vv_vari*>(result(i,0).vi_);
+              dot_product_vv_vari *v2 = static_cast<dot_product_vv_vari*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vv_vari(crow,ccol,v1,v2));
+            }
+          }
         }
       }
       return result;
@@ -1511,7 +1626,27 @@ namespace stan {
         Eigen::Matrix<double,1,C1> crow(m1.row(i));
         for (int j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<var,R2,1> ccol(m2.col(j));
-          result(i,j) = dot_product(crow,ccol);
+//          result(i,j) = dot_product(crow,ccol);
+          if (j == 0) {
+            if (i == 0) {
+              result(i,j) = var(new dot_product_vd_vari(ccol,crow));
+            }
+            else {
+              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vd_vari(ccol,crow,v2,NULL));
+            }
+          }
+          else { 
+            if (i == 0) {
+              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
+              result(i,j) = var(new dot_product_vd_vari(ccol,crow,NULL,v1));
+            }
+            else /* if (i != 0 && j != 0) */ {
+              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
+              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vd_vari(ccol,crow,v2,v1));
+            }
+          }
         }
       }
       return result;
@@ -1537,7 +1672,27 @@ namespace stan {
         Eigen::Matrix<var,1,C1> crow(m1.row(i));
         for (int j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<double,R2,1> ccol(m2.col(j));
-          result(i,j) = dot_product(crow,ccol);
+//          result(i,j) = dot_product(crow,ccol);
+          if (j == 0) {
+            if (i == 0) {
+              result(i,j) = var(new dot_product_vd_vari(crow,ccol));
+            }
+            else {
+              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vd_vari(crow,ccol,NULL,v2));
+            }
+          }
+          else { 
+            if (i == 0) {
+              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
+              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1));
+            }
+            else /* if (i != 0 && j != 0) */ {
+              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
+              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1,v2));
+            }
+          }
         }
       }
       return result;

@@ -207,6 +207,21 @@ TEST(io_dump, reader_sequence) {
   EXPECT_FALSE(reader.next());
 }
 
+TEST(io_dump,two_lines) {
+  std::string txt = "foo <- 3\nbar <- 4";
+  std::stringstream in(txt);
+  stan::io::dump dump(in);
+  EXPECT_TRUE(dump.contains_i("foo"));
+  EXPECT_TRUE(dump.contains_i("bar"));
+
+  std::string txt2 = "foo <- 3\nloo <- 4";
+  std::stringstream in2(txt2);
+  stan::io::dump dump2(in2);
+  EXPECT_TRUE(dump2.contains_i("foo"));
+  EXPECT_FALSE(dump2.contains_i("oo"));
+  EXPECT_TRUE(dump2.contains_i("loo"));
+}
+
 TEST(io_dump,dump) {
   std::string txt = "foo <- c(1,2)\nbar<-1.0\n\"bing\"<-\nstructure(c(1.0,4.0,2.0,5.0,3.0,6.0), .Dim = c(2,3))\nqux <- 2.0\nquux<-structure(c(1.0,2.0,3.0,4.0), .Dim = c(2L, 2L))";
   std::stringstream in(txt);

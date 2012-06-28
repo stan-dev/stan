@@ -340,6 +340,9 @@ Command-line
 C++ API
 ----------------------------------------------------------------------
 
+* add scalar subtraction to match scalar addition of vectors
+  (to distribute over values)
+
 * make sure still possible to use header-only ad
 
 * as much partial eval for gradients as possible

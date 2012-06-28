@@ -6,11 +6,6 @@
 
 namespace stan {
 
-  namespace agrad {
-    class var;
-    class vari;
-  }
-
   /**
    * Metaprogramming struct to detect whether a given type is constant
    * in the mathematical sense (not the C++ <code>const</code>
@@ -62,14 +57,6 @@ namespace stan {
     typedef typename scalar_type<T>::type type;
   };
       
-  template <typename T>
-  struct var_to_vi {
-    typedef T type;
-  };
-  template <>
-  struct var_to_vi<stan::agrad::var> {
-    typedef stan::agrad::vari* type;
-  };
 
   template <typename T>
   struct is_vector {
@@ -106,7 +93,8 @@ namespace stan {
     return result;
   }
 
-  template <typename T, bool is_vec=0>
+  // AmbiguousVector is the simple VectorView for writing doubles into
+  template <typename T, bool is_vec = 0>
   class AmbiguousVector {
   private:
     T x_;
@@ -115,6 +103,7 @@ namespace stan {
     T& operator[](int /*i*/) { return x_; }
     size_t size() { return 1; }
   };
+
   template <typename T>
   class AmbiguousVector<T, 1> {
   private:
@@ -125,40 +114,41 @@ namespace stan {
     size_t size() { return x_.size(); }
   };
 
-  template<typename T, bool is_vec>
+
+  // two template params for use in partials_vari OperandsAndPartials
+  template<typename T, bool is_vec = stan::is_vector<T>::value>
   class VectorView {
   private:
     T x_;
   public:
     VectorView(T x) : x_(x) { }
-    T& operator[](int /*i*/) { return x_; }
+    T& operator[](int /*i*/) { 
+      return x_; 
+    }
   };
-  template<typename T, bool is_vec>
-  class VectorView<std::vector<T>, is_vec> {
+
+  template<typename T>
+  class VectorView<std::vector<T>, true> {
   private:
-    std::vector<T>* x_;
+    std::vector<T>& x_;
   public:
-    VectorView(std::vector<T>& x) : x_(&x) { }
+    VectorView(std::vector<T>& x) : x_(x) { }
     T& operator[](int i) { 
-      if (is_vec)
-        return (*x_)[i];
-      else
-        return (*x_)[0];
+      return x_[i];
     }
   };
-  template<typename T, bool is_vec>
-  class VectorView<const std::vector<T>, is_vec> {
+
+  template<typename T>
+  class VectorView<const std::vector<T>, true> {
   private:
-    const std::vector<T>* x_;
+    const std::vector<T>& x_;
   public:
-    VectorView(const std::vector<T>& x) : x_(&x) { }
+    VectorView(const std::vector<T>& x) : x_(x) { }
     const T& operator[](int i) const { 
-      if (is_vec)
-        return (*x_)[i];
-      else
-        return (*x_)[0];
+      return x_[i];
     }
   };
+
   template<typename T, bool is_vec>
   class VectorView<T*, is_vec> {
   private:

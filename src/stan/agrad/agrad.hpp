@@ -16,6 +16,17 @@ namespace stan {
 
     class chainable;
     class vari;
+    class var;
+
+    template <typename T>
+    struct var_to_vi {
+      typedef T type;
+    };
+    template <>
+    struct var_to_vi<stan::agrad::var> {
+      typedef stan::agrad::vari* type;
+    };
+
 
     // FIXME: manage all this as a single singleton (thread local)
     extern std::vector<chainable*> var_stack_; 

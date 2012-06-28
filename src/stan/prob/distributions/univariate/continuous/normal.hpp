@@ -1,11 +1,12 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
+#include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad.hpp>
 
 namespace stan {
 
@@ -22,7 +23,8 @@ namespace stan {
      * @param y (Sequence of) scalar(s).
      * @param mu (Sequence of) location parameter(s)
      * for the normal distribution.
-     * @param sigma (Sequence of) scale parameters for the normal distribution.
+     * @param sigma (Sequence of) scale parameters for the normal
+     * distribution.
      * @return The log of the product of the densities.
      * @throw std::domain_error if the scale is not positive.
      * @tparam T_y Underlying type of scalar in sequence.
@@ -31,7 +33,7 @@ namespace stan {
     template <bool Prop, 
               typename T_y, typename T_loc, typename T_scale,
               class Policy>
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                const Policy& /*policy*/) {
       static const char* function = "stan::prob::normal_log<%1%>(%1%)";
@@ -41,6 +43,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
+      // using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -53,64 +56,74 @@ namespace stan {
 	    && stan::length(sigma)))
 	return 0.0;
 
-      VectorView<const T_y, is_vector<T_y>::value> y_vec(y);
-      VectorView<const T_loc, is_vector<T_loc>::value> mu_vec(mu);
-      VectorView<const T_scale, is_vector<T_scale>::value> sigma_vec(sigma);
+      // set up return value accumulator
+      double logp(0.0);
+
+      // validate args (here done over var, which should be OK)
+      if (!check_not_nan(function, y, "Random variate y", &logp, Policy()))
+	return logp;
+      if (!check_finite(function, mu, "Location parameter, mu,", 
+			&logp, Policy()))
+	return logp;
+      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+			  &logp, Policy()))
+	return logp;
+      // if (!(check_consistent_sizes(function,y,mu,sigma,"Sizes of y, mu, sigma",
+      // 				   &logp, Policy())))
+      // 	return logp;
+      
+
+      // set up template expressions wrapping scalars into vector views
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
       agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma, y_vec, mu_vec, sigma_vec);
 
-      AmbiguousVector<double, is_vector<T_scale>::value> inv_sigma(length(sigma));
-      AmbiguousVector<double, is_vector<T_scale>::value> log_sigma(length(sigma));
+      AmbiguousVector<double, is_vector<T_scale>::value> 
+	inv_sigma(length(sigma));
+      AmbiguousVector<double, is_vector<T_scale>::value> 
+	log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      // set up return value accumulator
-      double logp(0.0);
+      
 
       for (size_t n = 0; n < N; n++) {
 
-      // pull out values of arguments
-      const double y_dbl = value_of(y_vec[n]);
-      const double mu_dbl = value_of(mu_vec[n]);
-      const double sigma_dbl = value_of(sigma_vec[n]);
+	// pull out values of arguments
+	const double y_dbl = value_of(y_vec[n]);
+	const double mu_dbl = value_of(mu_vec[n]);
+	// const double sigma_dbl = value_of(sigma_vec[n]); // not used
       
-      // validate args
-      if (!check_not_nan(function, y_dbl, "Random variate y", &logp, Policy()))
-        return logp;
-      if (!check_finite(function, mu_dbl, "Location parameter, mu,", 
-                        &logp, Policy()))
-        return logp;
-      if (!check_positive(function, sigma_dbl, "Scale parameter, sigma,", 
-                          &logp, Policy()))
-        return logp;
+	// reusable subexpression values
+	const double y_minus_mu_over_sigma 
+	  = (y_dbl - mu_dbl) * inv_sigma[n];
+	const double y_minus_mu_over_sigma_squared 
+	  = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
-      // reusable subexpression values
-      const double y_minus_mu_over_sigma 
-        = (y_dbl - mu_dbl) * inv_sigma[n];
-      const double y_minus_mu_over_sigma_squared 
-        = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
+	static double NEGATIVE_HALF = - 0.5;
 
-      static double NEGATIVE_HALF = - 0.5;
+	// log probability
+	if (include_summand<Prop>::value)
+	  logp += NEG_LOG_SQRT_TWO_PI;
+	if (include_summand<Prop,T_scale>::value)
+	  logp -= log_sigma[n];
+	if (include_summand<Prop,T_y,T_loc,T_scale>::value)
+	  logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
 
-      // log probability
-      if (include_summand<Prop>::value)
-        logp += NEG_LOG_SQRT_TWO_PI;
-      if (include_summand<Prop,T_scale>::value)
-        logp -= log_sigma[n];
-      if (include_summand<Prop,T_y,T_loc,T_scale>::value)
-        logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
-
-      // gradients
-      double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
-      if (!is_constant<typename is_vector<T_y>::type>::value)
-        operands_and_partials.d_x1[n] -= scaled_diff;
-      if (!is_constant<typename is_vector<T_loc>::type>::value)
-        operands_and_partials.d_x2[n] += scaled_diff;
-      if (!is_constant<typename is_vector<T_scale>::type>::value)
-        operands_and_partials.d_x3[n] += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
+	// gradients
+	double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
+	if (!is_constant<typename is_vector<T_y>::type>::value)
+	  operands_and_partials.d_x1[n] -= scaled_diff;
+	if (!is_constant<typename is_vector<T_loc>::type>::value)
+	  operands_and_partials.d_x2[n] += scaled_diff;
+	if (!is_constant<typename is_vector<T_scale>::type>::value)
+	  operands_and_partials.d_x3[n] 
+	    += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
 
       }
 
@@ -121,7 +134,7 @@ namespace stan {
     template <bool propto,
               typename T_y, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_log<propto>(y,mu,sigma,stan::math::default_policy());
     }
@@ -129,7 +142,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     inline
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy&) {
       return normal_log<false>(y,mu,sigma,Policy());
@@ -137,10 +150,11 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_log<false>(y,mu,sigma,stan::math::default_policy());
     }
+
 
     /**
      * Calculates the normal cumulative distribution function for the given
@@ -164,7 +178,7 @@ namespace stan {
      */
     template <typename T_y, typename T_loc, typename T_scale,
               class Policy>
-    typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
              const Policy&) {
       static const char* function = "stan::prob::normal_p(%1%)";
@@ -197,15 +211,7 @@ namespace stan {
     }
 
 
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline 
-    typename boost::math::tools::promote_args<typename is_vector<T_y>::type,typename is_vector<T_loc>::type,typename is_vector<T_scale>::type>::type
-    normal_log(const std::vector<T_y>& y,
-               const T_loc& mu,
-               const T_scale& sigma) {
-      return normal_log<false>(y,mu,sigma,stan::math::default_policy());
-    }
-
+ 
   }
 }
 #endif
