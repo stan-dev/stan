@@ -2,6 +2,8 @@
 #include <test/models/utility.hpp>
 #include <fstream>
 #include <stan/mcmc/chains.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 
 const size_t num_chains = 4;
 bool has_R = false;
@@ -95,6 +97,35 @@ TEST(LogisticSpeedTest,GenerateData) {
   SUCCEED();
 }
 
+// returns number of milliseconds to execute commands;
+long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
+  long time;
+  std::string path = convert_model_path(model_path);
+  //random_seed 
+  //= (boost::posix_time::microsec_clock::universal_time() -
+  //boost::posix_time::ptime(boost::posix_time::min_date_time))
+  // .total_milliseconds();
+  for (size_t chain = 0; chain < num_chains; chain++) {
+    std::stringstream command_chain;
+    command_chain << command;
+    command_chain << " --chain_id=" << chain
+                  << " --samples=" << path << get_path_separator() 
+                  << filename << ".chain_" << chain << ".csv";
+    std::string command_output;
+    try {
+      // start timer
+      command_output = run_command(command_chain.str());
+      // end timer
+    } catch(...) {
+      ADD_FAILURE() << "Failed running command: " << command_chain.str();
+    }
+    command_outputs.push_back(command_output);
+  }
+
+  
+  return 0;
+}
+
 void test_logistic_speed_stan(std::string filename, size_t iterations) {
   if (!has_R)
     return;
@@ -104,22 +135,11 @@ void test_logistic_speed_stan(std::string filename, size_t iterations) {
   command << path << get_path_separator() << "logistic"
           << " --data=" << path << get_path_separator() << filename << ".Rdata"
           << " --iter=" << iterations;
-  
-  
-  std::vector<std::string> command_outputs;
-  for (size_t chain = 0; chain < num_chains; chain++) {
-    std::stringstream command_chain;
-    command_chain << command.str();
-    command_chain << " --chain_id=" << chain
-                  << " --samples=" << path << get_path_separator() 
-                  << filename << ".chain_" << chain << ".csv";
-    // start timer
-    std::string command_output;
-    EXPECT_NO_THROW(command_output = run_command(command_chain.str()))
-      << "Failed running command: " << command_chain.str();
-    // end timer
-    command_outputs.push_back(command_output);
-  }
+
+  std::vector<std::string> command_outputs;  
+  long time = run_stan(command.str(), filename, command_outputs);
+
+
 
   std::stringstream samples;
   samples << path << get_path_separator()
