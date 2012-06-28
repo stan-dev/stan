@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/models/utility.hpp>
 #include <fstream>
+#include <stan/mcmc/chains.hpp>
 
 const size_t num_chains = 4;
 bool has_R = false;
@@ -95,6 +96,8 @@ TEST(LogisticSpeedTest,GenerateData) {
 }
 
 void test_logistic_speed_stan(std::string filename, size_t iterations) {
+  if (!has_R)
+    return;
   std::stringstream command;
   std::string path = convert_model_path(model_path);
 
@@ -111,16 +114,43 @@ void test_logistic_speed_stan(std::string filename, size_t iterations) {
                   << " --samples=" << path << get_path_separator() 
                   << filename << ".chain_" << chain << ".csv";
     // start timer
-    EXPECT_NO_THROW(command_outputs.push_back(run_command(command_chain.str())))
+    std::string command_output;
+    EXPECT_NO_THROW(command_output = run_command(command_chain.str()))
       << "Failed running command: " << command_chain.str();
     // end timer
+    command_outputs.push_back(command_output);
   }
+
+  std::stringstream samples;
+  samples << path << get_path_separator()
+          << filename << ".chain_0.csv";
   
-  
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables(samples.str(), 2U,
+                             names, dimss);
+
+  stan::mcmc::chains<> chains(num_chains, names, dimss);
+  for (size_t chain = 0; chain < num_chains; chain++) {
+    samples.str("");
+    samples << path << get_path_separator()
+            << filename << ".chain_" << chain << ".csv";
+    stan::mcmc::add_chain(chains, chain, samples.str(), 2U);
+  }
+
+  size_t num_params = chains.num_params();
+  for (size_t i = 0; i < num_params; i++) {
+    std::cout << "------------------------------------------------------------\n";
+    std::cout << "beta[" << i << "]" << std::endl;
+    std::cout << "\tmean:        " << chains.mean(i) << std::endl;
+    std::cout << "\tsd:          " << chains.sd(i) << std::endl;
+    std::cout << "\tneff:        " << chains.effective_sample_size(i) << std::endl;
+    std::cout << "\tsplit R hat: " << chains.split_potential_scale_reduction(i) << std::endl;
+  }
   SUCCEED();
 }
 
-TEST(LogisticSpeedTest,Stan_X) { 
-  test_logistic_speed_stan("logistic_128_2",2000);
+TEST(LogisticSpeedTest,Stan_128_2) { 
+  test_logistic_speed_stan("logistic_128_2", 250U);
 }
 
