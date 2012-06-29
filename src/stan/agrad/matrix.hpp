@@ -630,8 +630,8 @@ namespace stan {
           return result;
         }
         template<typename Derived1,typename Derived2>
-        inline static double var_dot(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                                     const Eigen::DenseCoeffsBase<Derived2> &v2) {
+        inline static double var_dot(const Eigen::DenseBase<Derived1> &v1,
+                                     const Eigen::DenseBase<Derived2> &v2) {
           double result = 0;
           for (int i = 0; i < v1.size(); i++)
             result += v1[i].vi_->val_ * v2[i].vi_->val_;
@@ -660,8 +660,8 @@ namespace stan {
           }
         }
         template<typename Derived1,typename Derived2>
-        dot_product_vv_vari(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                            const Eigen::DenseCoeffsBase<Derived2> &v2,
+        dot_product_vv_vari(const Eigen::DenseBase<Derived1> &v1,
+                            const Eigen::DenseBase<Derived2> &v2,
                             dot_product_vv_vari* shared_v1 = NULL,
                             dot_product_vv_vari* shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
@@ -726,8 +726,8 @@ namespace stan {
           return result;
         }
         template<typename Derived1,typename Derived2>
-        inline static double var_dot(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                                     const Eigen::DenseCoeffsBase<Derived2> &v2) {
+        inline static double var_dot(const Eigen::DenseBase<Derived1> &v1,
+                                     const Eigen::DenseBase<Derived2> &v2) {
           double result = 0;
           for (int i = 0; i < v1.size(); i++)
             result += v1[i].vi_->val_ * v2[i];
@@ -754,8 +754,8 @@ namespace stan {
           }
         }
         template<typename Derived1,typename Derived2>
-        dot_product_vd_vari(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                            const Eigen::DenseCoeffsBase<Derived2> &v2,
+        dot_product_vd_vari(const Eigen::DenseBase<Derived1> &v1,
+                            const Eigen::DenseBase<Derived2> &v2,
                             dot_product_vd_vari *shared_v1 = NULL,
                             dot_product_vd_vari *shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
@@ -1835,7 +1835,7 @@ namespace stan {
           else { 
             if (i == 0) {
               dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
-              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1));
+              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1,NULL));
             }
             else /* if (i != 0 && j != 0) */ {
               dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
