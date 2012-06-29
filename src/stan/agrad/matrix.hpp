@@ -682,6 +682,29 @@ namespace stan {
             v2_ = shared_v2->v2_;
           }
         }
+        template<int R1,int C1,int R2,int C2>
+        dot_product_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                            const Eigen::Matrix<var,R2,C2> &v2,
+                            dot_product_vv_vari* shared_v1 = NULL,
+                            dot_product_vv_vari* shared_v2 = NULL) : 
+          vari(var_dot(v1, v2)), length_(v1.size()) {
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          }
+          else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i].vi_;
+          }
+          else {
+            v2_ = shared_v2->v2_;
+          }
+        }
         void chain() {
           for (size_t i = 0; i < length_; i++) {
             v1_[i]->adj_ += adj_ * v2_[i]->val_;
@@ -733,6 +756,27 @@ namespace stan {
         template<typename Derived1,typename Derived2>
         dot_product_vd_vari(const Eigen::DenseCoeffsBase<Derived1> &v1,
                             const Eigen::DenseCoeffsBase<Derived2> &v2,
+                            dot_product_vd_vari *shared_v1 = NULL,
+                            dot_product_vd_vari *shared_v2 = NULL) : 
+          vari(var_dot(v1, v2)), length_(v1.size()) {
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          } else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i];
+          } else {
+            v2_ = shared_v2->v2_;
+          }
+        }
+        template<int R1,int C1,int R2,int C2>
+        dot_product_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                            const Eigen::Matrix<double,R2,C2> &v2,
                             dot_product_vd_vari *shared_v1 = NULL,
                             dot_product_vd_vari *shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
