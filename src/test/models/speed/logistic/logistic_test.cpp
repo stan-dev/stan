@@ -152,7 +152,19 @@ stan::mcmc::chains<> create_chains(const std::string& filename) {
   }
   return chains;
 }
-
+void get_beta(const std::string& filename, std::vector<double>& beta) {
+  std::string path = convert_model_path(model_path);
+  std::stringstream param_filename;
+  param_filename << path << get_path_separator() << filename
+                 << "_param.Rdata";
+  std::ifstream param_ifstream(param_filename.str().c_str());
+  stan::io::dump param_values(param_ifstream);
+  
+  beta = param_values.vals_r("beta");
+  for (size_t i = 0; i < beta.size(); i++) {
+    std::cout << "beta[" << i << "]: " << beta[i] << std::endl;
+  }
+}
 void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
   if (!has_R)
     return;
@@ -168,13 +180,8 @@ void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
   long time = run_stan(command.str(), filename, command_outputs);
   stan::mcmc::chains<> chains = create_chains(filename);
 
-  
-  std::stringstream param_filename;
-  param_filename << path << get_path_separator() << filename
-                 << "_param.Rdata";
-  std::cout << "param filename: " << param_filename.str() << std::endl;
-  //stan::io::dump_reader param_values(in);
-
+  std::vector<double> beta;
+  get_beta(filename, beta);
 
 
   std::cout << "************************************************************\n"
