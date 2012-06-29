@@ -180,6 +180,20 @@ TYPED_TEST_P(Model_Test_Fixture, RunModel) {
 }
 
 TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
+  std::vector<std::string> err_message;
+  for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {
+    std::vector<std::pair<std::string, std::string> > options = 
+      parse_command_output(TypeParam::command_outputs[chain]);
+    parse_command_output(TypeParam::command_outputs[chain]);
+
+    std::string msg = "Seed is : ";
+    for (size_t option = 0; option < options.size(); option++) {
+      if (options[option].first == "seed")
+        msg += options[option].second;
+    }
+    err_message.push_back(msg);
+  }
+
   stan::mcmc::chains<> *c = TypeParam::chains;
   size_t num_chains = c->num_chains();
   size_t num_params = c->num_params();
@@ -187,7 +201,8 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     for (size_t param = 0; param < num_params; param++) {
       EXPECT_TRUE(c->variance(chain, param) > 0)
         << "Chain " << chain << ", param " << param
-        << ": variance is 0";
+        << ": variance is 0" << std::endl
+        << err_message[chain];
     }
   }
 }
@@ -251,10 +266,10 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {
       std::vector<std::pair<std::string, std::string> > options = 
         parse_command_output(TypeParam::command_outputs[chain]);
-      for (size_t i = 0; i < options.size(); i++) {
-        if (options[i].first == "seed") {
-          err_message << "seed: " << options[i].second << std::endl;
-        }
+
+      for (size_t option = 0; option < options.size(); option++) {
+        if (options[option].first == "seed")
+          err_message << "seed: " << options[option].second << std::endl;
       }
     }
     
