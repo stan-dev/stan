@@ -27,7 +27,7 @@ GTEST ?= lib/gtest_1.6.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -I lib -O$O -Wall
+CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -O$O -Wall
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
