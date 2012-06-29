@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/models/utility.hpp>
 #include <fstream>
+#include <stan/io/dump.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -86,15 +87,30 @@ TEST(LogisticSpeedTest,GenerateData) {
 }
 
 // returns number of milliseconds to execute commands;
+/** 
+ * Executes the Stan model and returns elapsed time.
+ *
+ * The Stan model is executed <code>num_chains</code> times.
+ * The <code>command</code> argument has the basic Stan command
+ * to run. The <code>filename</code> argument has the basename
+ * for the output samples. This is append with the chain id and
+ * the suffix '.csv'.
+ *
+ * The standard output stream and error output stream for each 
+ * chain is recorded and output in command_outputs.
+ * 
+ * 
+ * @param[in] command The command to run.
+ * @param[in] filename The output filename without a suffix.
+ * @param[out] command_outputs The captured output per chain.
+ * 
+ * @return Elapsed time running the commands in milliseconds.
+ */
 long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
   using boost::posix_time::ptime;
 
   long time = 0;
   std::string path = convert_model_path(model_path);
-  //random_seed 
-  //= (boost::posix_time::microsec_clock::universal_time() -
-  //boost::posix_time::ptime(boost::posix_time::min_date_time))
-  // .total_milliseconds();
 
   for (size_t chain = 0; chain < num_chains; chain++) {
     std::stringstream command_chain;
@@ -116,24 +132,8 @@ long run_stan(const std::string& command, const std::string& filename, std::vect
   return time;
 }
 
-void test_logistic_speed_stan(std::string filename, size_t iterations) {
-  if (!has_R)
-    return;
-  std::stringstream command;
+stan::mcmc::chains<> create_chains(const std::string& filename) {
   std::string path = convert_model_path(model_path);
-
-  command << path << get_path_separator() << "logistic"
-          << " --data=" << path << get_path_separator() << filename << ".Rdata"
-          << " --iter=" << iterations
-          << " --refresh=" << iterations;
-
-  std::vector<std::string> command_outputs;  
-  long time = run_stan(command.str(), filename, command_outputs);
-  std::cout << "************************************************************\n"
-            << "milliseconds: " << time << std::endl
-            << "************************************************************\n";
-
-
   std::stringstream samples;
   samples << path << get_path_separator()
           << filename << ".chain_0.csv";
@@ -150,7 +150,36 @@ void test_logistic_speed_stan(std::string filename, size_t iterations) {
             << filename << ".chain_" << chain << ".csv";
     stan::mcmc::add_chain(chains, chain, samples.str(), 2U);
   }
+  return chains;
+}
 
+void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
+  if (!has_R)
+    return;
+  std::stringstream command;
+  std::string path = convert_model_path(model_path);
+
+  command << path << get_path_separator() << "logistic"
+          << " --data=" << path << get_path_separator() << filename << ".Rdata"
+          << " --iter=" << iterations
+          << " --refresh=" << iterations;
+
+  std::vector<std::string> command_outputs;  
+  long time = run_stan(command.str(), filename, command_outputs);
+  stan::mcmc::chains<> chains = create_chains(filename);
+
+  
+  std::stringstream param_filename;
+  param_filename << path << get_path_separator() << filename
+                 << "_param.Rdata";
+  std::cout << "param filename: " << param_filename.str() << std::endl;
+  //stan::io::dump_reader param_values(in);
+
+
+
+  std::cout << "************************************************************\n"
+            << "milliseconds: " << time << std::endl
+            << "************************************************************\n";
   size_t num_params = chains.num_params();
   for (size_t i = 0; i < num_params; i++) {
     std::cout << "------------------------------------------------------------\n";
