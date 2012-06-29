@@ -20,7 +20,7 @@ logistic_generate_data <- function(N, M, file="dat", seed=0) {
 
 
 ## generate data
-N <- c(128);#, 1024, 4096); #, 16K-ish
+N <- c(128, 1024, 4096); #, 16K-ish
 M <- c(2);#, 8, 32, 128, 512); # , 2048);
 for (n in N) {
   for (m in M) {

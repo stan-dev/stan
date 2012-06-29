@@ -46,20 +46,8 @@ TEST(LogisticSpeedTest,Prerequisites) {
   Rscript = "logistic_generate_data.R";
 
   data_files.push_back("logistic_128_2");
-  //   data_files.push_back("logistic_1000_10");
-  //   data_files.push_back("logistic_1000_100");
-  //   data_files.push_back("logistic_1000_500");
-  //   data_files.push_back("logistic_5000_1");
-  //   data_files.push_back("logistic_5000_10");
-  //   data_files.push_back("logistic_5000_100");
-  //   data_files.push_back("logistic_5000_500");
-  //   data_files.push_back("logistic_5000_1000");
-  //   data_files.push_back("logistic_10000_1");
-  //   data_files.push_back("logistic_10000_10");
-  //   data_files.push_back("logistic_10000_100");
-  //   data_files.push_back("logistic_10000_500");
-  //   data_files.push_back("logistic_10000_1000");
-  // 
+  data_files.push_back("logistic_1024_2");
+  data_files.push_back("logistic_4096_2");
 }
 
 TEST(LogisticSpeedTest,GenerateData) {
@@ -99,12 +87,15 @@ TEST(LogisticSpeedTest,GenerateData) {
 
 // returns number of milliseconds to execute commands;
 long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
-  long time;
+  using boost::posix_time::ptime;
+
+  long time = 0;
   std::string path = convert_model_path(model_path);
   //random_seed 
   //= (boost::posix_time::microsec_clock::universal_time() -
   //boost::posix_time::ptime(boost::posix_time::min_date_time))
   // .total_milliseconds();
+
   for (size_t chain = 0; chain < num_chains; chain++) {
     std::stringstream command_chain;
     command_chain << command;
@@ -113,17 +104,16 @@ long run_stan(const std::string& command, const std::string& filename, std::vect
                   << filename << ".chain_" << chain << ".csv";
     std::string command_output;
     try {
-      // start timer
+      ptime time_start(boost::posix_time::microsec_clock::universal_time()); // start timer
       command_output = run_command(command_chain.str());
-      // end timer
+      ptime time_end(boost::posix_time::microsec_clock::universal_time());   // end timer
+      time += (time_end - time_start).total_milliseconds();
     } catch(...) {
       ADD_FAILURE() << "Failed running command: " << command_chain.str();
     }
     command_outputs.push_back(command_output);
   }
-
-  
-  return 0;
+  return time;
 }
 
 void test_logistic_speed_stan(std::string filename, size_t iterations) {
@@ -134,11 +124,14 @@ void test_logistic_speed_stan(std::string filename, size_t iterations) {
 
   command << path << get_path_separator() << "logistic"
           << " --data=" << path << get_path_separator() << filename << ".Rdata"
-          << " --iter=" << iterations;
+          << " --iter=" << iterations
+          << " --refresh=" << iterations;
 
   std::vector<std::string> command_outputs;  
   long time = run_stan(command.str(), filename, command_outputs);
-
+  std::cout << "************************************************************\n"
+            << "milliseconds: " << time << std::endl
+            << "************************************************************\n";
 
 
   std::stringstream samples;
@@ -173,4 +166,13 @@ void test_logistic_speed_stan(std::string filename, size_t iterations) {
 TEST(LogisticSpeedTest,Stan_128_2) { 
   test_logistic_speed_stan("logistic_128_2", 250U);
 }
+
+TEST(LogisticSpeedTest,Stan_1024_2) { 
+  test_logistic_speed_stan("logistic_1024_2", 250U);
+}
+
+TEST(LogisticSpeedTest,Stan_4096_2) { 
+  test_logistic_speed_stan("logistic_4096_2", 250U);
+}
+
 
