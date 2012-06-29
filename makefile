@@ -18,9 +18,15 @@ O = 3
 AR = ar
 
 ##
+# Library locations
+##
+EIGEN ?= lib/eigen_3.0
+
+
+##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I lib -O$O -Wall
+CFLAGS = -I src -I $(EIGEN) -I lib -O$O -Wall
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
