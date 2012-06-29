@@ -18,9 +18,16 @@ O = 3
 AR = ar
 
 ##
+# Library locations
+##
+EIGEN ?= lib/eigen_3.0
+BOOST ?= lib/boost_1.50.0
+GTEST ?= lib/gtest_1.6.0
+
+##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I lib -O$O -Wall
+CFLAGS = -I src -I $(EIGEN) -I $(EIGEN)/unsupported -I $(BOOST) -O$O -Wall
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
