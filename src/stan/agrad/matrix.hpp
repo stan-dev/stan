@@ -210,63 +210,62 @@ namespace Eigen {
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
-    	typedef stan::agrad::var LhsScalar;
-    	typedef stan::agrad::var RhsScalar;
-    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-    	enum { LhsStorageOrder = ColMajor };
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      enum { LhsStorageOrder = ColMajor };
 
-    	EIGEN_DONT_INLINE static void run(
-    			Index rows, Index cols,
-    			const LhsScalar* lhs, Index lhsStride,
-    			const RhsScalar* rhs, Index rhsIncr,
-    			ResScalar* res, Index resIncr, const ResScalar &alpha)
-    	{
-    		for (Index i = 0; i < rows; i++) {
-    			res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(LhsStorageOrder == ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),(LhsStorageOrder == ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
-    		}
-    	}
+      EIGEN_DONT_INLINE static void run(
+        Index rows, Index cols,
+    	const LhsScalar* lhs, Index lhsStride,
+    	const RhsScalar* rhs, Index rhsIncr,
+    	ResScalar* res, Index resIncr, const ResScalar &alpha)
+      {
+        for (Index i = 0; i < rows; i++) {
+          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
+        }
+      }
     };
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,RowMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
-    	typedef stan::agrad::var LhsScalar;
-    	typedef stan::agrad::var RhsScalar;
-    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-    	enum { LhsStorageOrder = RowMajor };
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      enum { LhsStorageOrder = RowMajor };
 
-    	EIGEN_DONT_INLINE static void run(
-    			Index rows, Index cols,
-    			const LhsScalar* lhs, Index lhsStride,
-    			const RhsScalar* rhs, Index rhsIncr,
-    			ResScalar* res, Index resIncr, const RhsScalar &alpha)
-    	{
-    		for (Index i = 0; i < rows; i++) {
-    			res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(LhsStorageOrder == ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),(LhsStorageOrder == ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
-    		}
-    	}
+      EIGEN_DONT_INLINE static void run(
+        Index rows, Index cols,
+        const LhsScalar* lhs, Index lhsStride,
+        const RhsScalar* rhs, Index rhsIncr,
+        ResScalar* res, Index resIncr, const RhsScalar &alpha)
+      {
+        for (Index i = 0; i < rows; i++) {
+          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
+        }
+      }
     };
     template<typename Index, int LhsStorageOrder, bool ConjugateLhs, int RhsStorageOrder, bool ConjugateRhs>
     struct general_matrix_matrix_product<Index,stan::agrad::var,LhsStorageOrder,ConjugateLhs,stan::agrad::var,RhsStorageOrder,ConjugateRhs,ColMajor>
     {
-    	typedef stan::agrad::var LhsScalar;
-    	typedef stan::agrad::var RhsScalar;
-    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-		static void run(Index rows, Index cols, Index depth,
-		  const LhsScalar* _lhs, Index lhsStride,
-		  const RhsScalar* _rhs, Index rhsStride,
-		  ResScalar* res, Index resStride,
-		  const ResScalar &alpha,
-		  level3_blocking<LhsScalar,RhsScalar>& blocking,
-		  GemmParallelInfo<Index>* info = 0)
-		{
-			for (Index i = 0; i < cols; i++) {
-				general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
-						rows,depth,
-						_lhs,lhsStride,
-						&_rhs[(RhsStorageOrder == ColMajor)?(i*rhsStride):(i)],(RhsStorageOrder == ColMajor)?(1):(rhsStride),
-						&res[i*resStride],1,alpha);
-			}
-		}
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      static void run(Index rows, Index cols, Index depth,
+                      const LhsScalar* _lhs, Index lhsStride,
+                      const RhsScalar* _rhs, Index rhsStride,
+                      ResScalar* res, Index resStride,
+                      const ResScalar &alpha,
+                      level3_blocking<LhsScalar,RhsScalar>& blocking,
+                      GemmParallelInfo<Index>* info = 0)
+      {
+        for (Index i = 0; i < cols; i++) {
+          general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
+              rows,depth,_lhs,lhsStride,
+              &_rhs[((int)RhsStorageOrder == (int)ColMajor)?(i*rhsStride):(i)],((int)RhsStorageOrder == (int)ColMajor)?(1):(rhsStride),
+              &res[i*resStride],1,alpha);
+        }
+      }
     };
   }
 }
