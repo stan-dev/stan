@@ -5,6 +5,13 @@
 #include <stan/mcmc/chains.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+class LogisticSpeedTest :
+  public testing::Test {
+public:
+  static void SetUpTestCase() {
+    std::cout << "-----\n\n";
+  }
+};
 
 const size_t num_chains = 4;
 bool has_R = false;
@@ -13,7 +20,7 @@ std::vector<std::string> model_path;
 std::string Rscript;
 std::vector<std::string> data_files;
 
-TEST(LogisticSpeedTest,Prerequisites) {
+TEST_F(LogisticSpeedTest,Prerequisites) {
   std::string command;
   command = "Rscript --version";
   try {
@@ -23,7 +30,6 @@ TEST(LogisticSpeedTest,Prerequisites) {
     std::cout << "System does not have Rscript available" << std::endl
               << "Failed to run: " << command << std::endl;
   }
-
 
   std::vector<std::string> test_file;
   test_file.push_back("src");
@@ -51,7 +57,7 @@ TEST(LogisticSpeedTest,Prerequisites) {
   data_files.push_back("logistic_4096_2");
 }
 
-TEST(LogisticSpeedTest,GenerateData) {
+TEST_F(LogisticSpeedTest,GenerateData) {
   if (!has_R) {
     std::cout << "No R available" << std::endl;
     return;  // should this fail?  probably
@@ -199,15 +205,15 @@ void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
   SUCCEED();
 }
 
-TEST(LogisticSpeedTest,Stan_128_2) { 
+TEST_F(LogisticSpeedTest,Stan_128_2) { 
   test_logistic_speed_stan("logistic_128_2", 250U);
 }
 
-TEST(LogisticSpeedTest,Stan_1024_2) { 
+TEST_F(LogisticSpeedTest,Stan_1024_2) { 
   test_logistic_speed_stan("logistic_1024_2", 250U);
 }
 
-TEST(LogisticSpeedTest,Stan_4096_2) { 
+TEST_F(LogisticSpeedTest,Stan_4096_2) { 
   test_logistic_speed_stan("logistic_4096_2", 250U);
 }
 
