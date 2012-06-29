@@ -8,89 +8,24 @@
 class LogisticSpeedTest :
   public testing::Test {
 public:
+  static const size_t num_chains;
+  static bool has_R;
+  static bool has_jags;
+  static std::string path;
+
+  std::string Rscript;
+  std::vector<std::string> data_files;
+
   static void SetUpTestCase() {
     std::cout << "-----\n\n";
-  }
-};
-
-const size_t num_chains = 4;
-bool has_R = false;
-bool has_jags = false;
-std::vector<std::string> model_path;
-std::string Rscript;
-std::vector<std::string> data_files;
-
-TEST_F(LogisticSpeedTest,Prerequisites) {
-  std::string command;
-  command = "Rscript --version";
-  try {
-    run_command(command);
-    has_R = true;
-  } catch (...) {
-    std::cout << "System does not have Rscript available" << std::endl
-              << "Failed to run: " << command << std::endl;
+    std::vector<std::string> model_path;
+    model_path.push_back("models");
+    model_path.push_back("speed");
+    model_path.push_back("logistic");
+    path = convert_model_path(model_path);
   }
 
-  std::vector<std::string> test_file;
-  test_file.push_back("src");
-  test_file.push_back("models");
-  test_file.push_back("speed");
-  test_file.push_back("empty.jags");
-  command = "jags ";
-  command += convert_model_path(test_file);
-  
-  try {
-    run_command(command);
-    has_jags = true;
-  } catch (...) {
-    std::cout << "System does not have jags available" << std::endl
-              << "Failed to run: " << command << std::endl;
-  }
 
-  model_path.push_back("models");
-  model_path.push_back("speed");
-  model_path.push_back("logistic");
-  Rscript = "logistic_generate_data.R";
-
-  data_files.push_back("logistic_128_2");
-  data_files.push_back("logistic_1024_2");
-  data_files.push_back("logistic_4096_2");
-}
-
-TEST_F(LogisticSpeedTest,GenerateData) {
-  if (!has_R) {
-    std::cout << "No R available" << std::endl;
-    return;  // should this fail?  probably
-  }
-  bool has_data = true;
-  std::string path = convert_model_path(model_path);
-  for (size_t i = 0; i < data_files.size() && has_data; i++) {
-    std::string data_file = path;
-    data_file += get_path_separator();
-    data_file += data_files[i];
-    data_file += ".Rdata";
-    std::ifstream file(data_file.c_str());
-    if (!file)
-      has_data = false;
-  }
-
-  if (has_data)
-    return;
-
-  // generate data using R script
-  std::string command;
-  command = "cd ";
-  command += convert_model_path(model_path);
-  command += " && ";
-  command += "Rscript ";
-  command += Rscript;
-
-  // no guarantee here that we have the right files
-
-  ASSERT_NO_THROW(run_command(command))
-    << command;
-  SUCCEED();
-}
 
 // returns number of milliseconds to execute commands;
 /** 
@@ -116,7 +51,6 @@ long run_stan(const std::string& command, const std::string& filename, std::vect
   using boost::posix_time::ptime;
 
   long time = 0;
-  std::string path = convert_model_path(model_path);
 
   for (size_t chain = 0; chain < num_chains; chain++) {
     std::stringstream command_chain;
@@ -139,7 +73,6 @@ long run_stan(const std::string& command, const std::string& filename, std::vect
 }
 
 stan::mcmc::chains<> create_chains(const std::string& filename) {
-  std::string path = convert_model_path(model_path);
   std::stringstream samples;
   samples << path << get_path_separator()
           << filename << ".chain_0.csv";
@@ -159,7 +92,6 @@ stan::mcmc::chains<> create_chains(const std::string& filename) {
   return chains;
 }
 void get_beta(const std::string& filename, std::vector<double>& beta) {
-  std::string path = convert_model_path(model_path);
   std::stringstream param_filename;
   param_filename << path << get_path_separator() << filename
                  << "_param.Rdata";
@@ -175,7 +107,6 @@ void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
   if (!has_R)
     return;
   std::stringstream command;
-  std::string path = convert_model_path(model_path);
 
   command << path << get_path_separator() << "logistic"
           << " --data=" << path << get_path_separator() << filename << ".Rdata"
@@ -204,6 +135,82 @@ void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
   }
   SUCCEED();
 }
+
+};
+  const size_t LogisticSpeedTest::num_chains = 4;
+  bool LogisticSpeedTest::has_R;
+  bool LogisticSpeedTest::has_jags;
+  std::string LogisticSpeedTest::path;
+  
+
+TEST_F(LogisticSpeedTest,Prerequisites) {
+  std::string command;
+  command = "Rscript --version";
+  try {
+    run_command(command);
+    has_R = true;
+  } catch (...) {
+    std::cout << "System does not have Rscript available" << std::endl
+              << "Failed to run: " << command << std::endl;
+  }
+
+  std::vector<std::string> test_file;
+  test_file.push_back("src");
+  test_file.push_back("models");
+  test_file.push_back("speed");
+  test_file.push_back("empty.jags");
+  command = "jags ";
+  command += path;
+  
+  try {
+    run_command(command);
+    has_jags = true;
+  } catch (...) {
+    std::cout << "System does not have jags available" << std::endl
+              << "Failed to run: " << command << std::endl;
+  }
+
+  Rscript = "logistic_generate_data.R";
+
+  data_files.push_back("logistic_128_2");
+  data_files.push_back("logistic_1024_2");
+  data_files.push_back("logistic_4096_2");
+}
+
+TEST_F(LogisticSpeedTest,GenerateData) {
+  if (!has_R) {
+    std::cout << "No R available" << std::endl;
+    return;  // should this fail?  probably
+  }
+  bool has_data = true;
+  for (size_t i = 0; i < data_files.size() && has_data; i++) {
+    std::string data_file = path;
+    data_file += get_path_separator();
+    data_file += data_files[i];
+    data_file += ".Rdata";
+    std::ifstream file(data_file.c_str());
+    if (!file)
+      has_data = false;
+  }
+
+  if (has_data)
+    return;
+
+  // generate data using R script
+  std::string command;
+  command = "cd ";
+  command += path;
+  command += " && ";
+  command += "Rscript ";
+  command += Rscript;
+
+  // no guarantee here that we have the right files
+
+  ASSERT_NO_THROW(run_command(command))
+    << command;
+  SUCCEED();
+}
+
 
 TEST_F(LogisticSpeedTest,Stan_128_2) { 
   test_logistic_speed_stan("logistic_128_2", 250U);
