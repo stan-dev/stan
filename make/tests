@@ -3,8 +3,8 @@
 # GTEST_MAIN is the file that contains the google test
 ##
 LIBGTEST = test/libgtest.a
-GTEST_MAIN = lib/gtest/src/gtest_main.cc
-CFLAGS_GTEST += -I lib/gtest/include -I lib/gtest
+GTEST_MAIN = $(GTEST)/src/gtest_main.cc
+CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 
 ##
 # Target to build all models and test them. This needs to be before 
@@ -54,7 +54,7 @@ test-all: test-unit test-models
 ## 
 $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
-test/gtest.o: lib/gtest/src/gtest-all.cc
+test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 

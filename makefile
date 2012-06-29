@@ -22,6 +22,7 @@ AR = ar
 ##
 EIGEN ?= lib/eigen_3.0
 BOOST ?= lib/boost_1.49
+GTEST ?= lib/gtest_1.6.0
 
 ##
 # Set default compiler options.
