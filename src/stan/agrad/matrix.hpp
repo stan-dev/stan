@@ -210,63 +210,62 @@ namespace Eigen {
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
-    	typedef stan::agrad::var LhsScalar;
-    	typedef stan::agrad::var RhsScalar;
-    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-    	enum { LhsStorageOrder = ColMajor };
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      enum { LhsStorageOrder = ColMajor };
 
-    	EIGEN_DONT_INLINE static void run(
-    			Index rows, Index cols,
-    			const LhsScalar* lhs, Index lhsStride,
-    			const RhsScalar* rhs, Index rhsIncr,
-    			ResScalar* res, Index resIncr, const ResScalar &alpha)
-    	{
-    		for (Index i = 0; i < rows; i++) {
-    			res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(LhsStorageOrder == ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),(LhsStorageOrder == ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
-    		}
-    	}
+      EIGEN_DONT_INLINE static void run(
+        Index rows, Index cols,
+    	const LhsScalar* lhs, Index lhsStride,
+    	const RhsScalar* rhs, Index rhsIncr,
+    	ResScalar* res, Index resIncr, const ResScalar &alpha)
+      {
+        for (Index i = 0; i < rows; i++) {
+          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
+        }
+      }
     };
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
     struct general_matrix_vector_product<Index,stan::agrad::var,RowMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
     {
-    	typedef stan::agrad::var LhsScalar;
-    	typedef stan::agrad::var RhsScalar;
-    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-    	enum { LhsStorageOrder = RowMajor };
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      enum { LhsStorageOrder = RowMajor };
 
-    	EIGEN_DONT_INLINE static void run(
-    			Index rows, Index cols,
-    			const LhsScalar* lhs, Index lhsStride,
-    			const RhsScalar* rhs, Index rhsIncr,
-    			ResScalar* res, Index resIncr, const RhsScalar &alpha)
-    	{
-    		for (Index i = 0; i < rows; i++) {
-    			res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,(LhsStorageOrder == ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),(LhsStorageOrder == ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
-    		}
-    	}
+      EIGEN_DONT_INLINE static void run(
+        Index rows, Index cols,
+        const LhsScalar* lhs, Index lhsStride,
+        const RhsScalar* rhs, Index rhsIncr,
+        ResScalar* res, Index resIncr, const RhsScalar &alpha)
+      {
+        for (Index i = 0; i < rows; i++) {
+          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
+        }
+      }
     };
     template<typename Index, int LhsStorageOrder, bool ConjugateLhs, int RhsStorageOrder, bool ConjugateRhs>
     struct general_matrix_matrix_product<Index,stan::agrad::var,LhsStorageOrder,ConjugateLhs,stan::agrad::var,RhsStorageOrder,ConjugateRhs,ColMajor>
     {
-    	typedef stan::agrad::var LhsScalar;
-    	typedef stan::agrad::var RhsScalar;
-    	typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-		static void run(Index rows, Index cols, Index depth,
-		  const LhsScalar* _lhs, Index lhsStride,
-		  const RhsScalar* _rhs, Index rhsStride,
-		  ResScalar* res, Index resStride,
-		  const ResScalar &alpha,
-		  level3_blocking<LhsScalar,RhsScalar>& blocking,
-		  GemmParallelInfo<Index>* info = 0)
-		{
-			for (Index i = 0; i < cols; i++) {
-				general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
-						rows,depth,
-						_lhs,lhsStride,
-						&_rhs[(RhsStorageOrder == ColMajor)?(i*rhsStride):(i)],(RhsStorageOrder == ColMajor)?(1):(rhsStride),
-						&res[i*resStride],1,alpha);
-			}
-		}
+      typedef stan::agrad::var LhsScalar;
+      typedef stan::agrad::var RhsScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      static void run(Index rows, Index cols, Index depth,
+                      const LhsScalar* _lhs, Index lhsStride,
+                      const RhsScalar* _rhs, Index rhsStride,
+                      ResScalar* res, Index resStride,
+                      const ResScalar &alpha,
+                      level3_blocking<LhsScalar,RhsScalar>& blocking,
+                      GemmParallelInfo<Index>* info = 0)
+      {
+        for (Index i = 0; i < cols; i++) {
+          general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
+              rows,depth,_lhs,lhsStride,
+              &_rhs[((int)RhsStorageOrder == (int)ColMajor)?(i*rhsStride):(i)],((int)RhsStorageOrder == (int)ColMajor)?(1):(rhsStride),
+              &res[i*resStride],1,alpha);
+        }
+      }
     };
   }
 }
@@ -631,8 +630,8 @@ namespace stan {
           return result;
         }
         template<typename Derived1,typename Derived2>
-        inline static double var_dot(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                                     const Eigen::DenseCoeffsBase<Derived2> &v2) {
+        inline static double var_dot(const Eigen::DenseBase<Derived1> &v1,
+                                     const Eigen::DenseBase<Derived2> &v2) {
           double result = 0;
           for (int i = 0; i < v1.size(); i++)
             result += v1[i].vi_->val_ * v2[i].vi_->val_;
@@ -661,8 +660,31 @@ namespace stan {
           }
         }
         template<typename Derived1,typename Derived2>
-        dot_product_vv_vari(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                            const Eigen::DenseCoeffsBase<Derived2> &v2,
+        dot_product_vv_vari(const Eigen::DenseBase<Derived1> &v1,
+                            const Eigen::DenseBase<Derived2> &v2,
+                            dot_product_vv_vari* shared_v1 = NULL,
+                            dot_product_vv_vari* shared_v2 = NULL) : 
+          vari(var_dot(v1, v2)), length_(v1.size()) {
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          }
+          else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i].vi_;
+          }
+          else {
+            v2_ = shared_v2->v2_;
+          }
+        }
+        template<int R1,int C1,int R2,int C2>
+        dot_product_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                            const Eigen::Matrix<var,R2,C2> &v2,
                             dot_product_vv_vari* shared_v1 = NULL,
                             dot_product_vv_vari* shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
@@ -704,8 +726,8 @@ namespace stan {
           return result;
         }
         template<typename Derived1,typename Derived2>
-        inline static double var_dot(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                                     const Eigen::DenseCoeffsBase<Derived2> &v2) {
+        inline static double var_dot(const Eigen::DenseBase<Derived1> &v1,
+                                     const Eigen::DenseBase<Derived2> &v2) {
           double result = 0;
           for (int i = 0; i < v1.size(); i++)
             result += v1[i].vi_->val_ * v2[i];
@@ -732,8 +754,29 @@ namespace stan {
           }
         }
         template<typename Derived1,typename Derived2>
-        dot_product_vd_vari(const Eigen::DenseCoeffsBase<Derived1> &v1,
-                            const Eigen::DenseCoeffsBase<Derived2> &v2,
+        dot_product_vd_vari(const Eigen::DenseBase<Derived1> &v1,
+                            const Eigen::DenseBase<Derived2> &v2,
+                            dot_product_vd_vari *shared_v1 = NULL,
+                            dot_product_vd_vari *shared_v2 = NULL) : 
+          vari(var_dot(v1, v2)), length_(v1.size()) {
+          if (shared_v1 == NULL) {
+            v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            for (size_t i = 0; i < length_; i++)
+              v1_[i] = v1[i].vi_;
+          } else {
+            v1_ = shared_v1->v1_;
+          }
+          if (shared_v2 == NULL) {
+            v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+            for (size_t i = 0; i < length_; i++)
+              v2_[i] = v2[i];
+          } else {
+            v2_ = shared_v2->v2_;
+          }
+        }
+        template<int R1,int C1,int R2,int C2>
+        dot_product_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
+                            const Eigen::Matrix<double,R2,C2> &v2,
                             dot_product_vd_vari *shared_v1 = NULL,
                             dot_product_vd_vari *shared_v2 = NULL) : 
           vari(var_dot(v1, v2)), length_(v1.size()) {
@@ -1792,7 +1835,7 @@ namespace stan {
           else { 
             if (i == 0) {
               dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
-              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1));
+              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1,NULL));
             }
             else /* if (i != 0 && j != 0) */ {
               dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
