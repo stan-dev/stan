@@ -27,120 +27,120 @@ public:
 
 
 
-// returns number of milliseconds to execute commands;
-/** 
- * Executes the Stan model and returns elapsed time.
- *
- * The Stan model is executed <code>num_chains</code> times.
- * The <code>command</code> argument has the basic Stan command
- * to run. The <code>filename</code> argument has the basename
- * for the output samples. This is append with the chain id and
- * the suffix '.csv'.
- *
- * The standard output stream and error output stream for each 
- * chain is recorded and output in command_outputs.
- * 
- * 
- * @param[in] command The command to run.
- * @param[in] filename The output filename without a suffix.
- * @param[out] command_outputs The captured output per chain.
- * 
- * @return Elapsed time running the commands in milliseconds.
- */
-long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
-  using boost::posix_time::ptime;
+  // returns number of milliseconds to execute commands;
+  /** 
+   * Executes the Stan model and returns elapsed time.
+   *
+   * The Stan model is executed <code>num_chains</code> times.
+   * The <code>command</code> argument has the basic Stan command
+   * to run. The <code>filename</code> argument has the basename
+   * for the output samples. This is append with the chain id and
+   * the suffix '.csv'.
+   *
+   * The standard output stream and error output stream for each 
+   * chain is recorded and output in command_outputs.
+   * 
+   * 
+   * @param[in] command The command to run.
+   * @param[in] filename The output filename without a suffix.
+   * @param[out] command_outputs The captured output per chain.
+   * 
+   * @return Elapsed time running the commands in milliseconds.
+   */
+  long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
+    using boost::posix_time::ptime;
 
-  long time = 0;
+    long time = 0;
 
-  for (size_t chain = 0; chain < num_chains; chain++) {
-    std::stringstream command_chain;
-    command_chain << command;
-    command_chain << " --chain_id=" << chain
-                  << " --samples=" << path << get_path_separator() 
-                  << filename << ".chain_" << chain << ".csv";
-    std::string command_output;
-    try {
-      ptime time_start(boost::posix_time::microsec_clock::universal_time()); // start timer
-      command_output = run_command(command_chain.str());
-      ptime time_end(boost::posix_time::microsec_clock::universal_time());   // end timer
-      time += (time_end - time_start).total_milliseconds();
-    } catch(...) {
-      ADD_FAILURE() << "Failed running command: " << command_chain.str();
+    for (size_t chain = 0; chain < num_chains; chain++) {
+      std::stringstream command_chain;
+      command_chain << command;
+      command_chain << " --chain_id=" << chain
+                    << " --samples=" << path << get_path_separator() 
+                    << filename << ".chain_" << chain << ".csv";
+      std::string command_output;
+      try {
+        ptime time_start(boost::posix_time::microsec_clock::universal_time()); // start timer
+        command_output = run_command(command_chain.str());
+        ptime time_end(boost::posix_time::microsec_clock::universal_time());   // end timer
+        time += (time_end - time_start).total_milliseconds();
+      } catch(...) {
+        ADD_FAILURE() << "Failed running command: " << command_chain.str();
+      }
+      command_outputs.push_back(command_output);
     }
-    command_outputs.push_back(command_output);
+    return time;
   }
-  return time;
-}
 
-stan::mcmc::chains<> create_chains(const std::string& filename) {
-  std::stringstream samples;
-  samples << path << get_path_separator()
-          << filename << ".chain_0.csv";
-  
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables(samples.str(), 2U,
-                             names, dimss);
-
-  stan::mcmc::chains<> chains(num_chains, names, dimss);
-  for (size_t chain = 0; chain < num_chains; chain++) {
-    samples.str("");
+  stan::mcmc::chains<> create_chains(const std::string& filename) {
+    std::stringstream samples;
     samples << path << get_path_separator()
-            << filename << ".chain_" << chain << ".csv";
-    stan::mcmc::add_chain(chains, chain, samples.str(), 2U);
-  }
-  return chains;
-}
-void get_beta(const std::string& filename, std::vector<double>& beta) {
-  std::stringstream param_filename;
-  param_filename << path << get_path_separator() << filename
-                 << "_param.Rdata";
-  std::ifstream param_ifstream(param_filename.str().c_str());
-  stan::io::dump param_values(param_ifstream);
+            << filename << ".chain_0.csv";
   
-  beta = param_values.vals_r("beta");
-  for (size_t i = 0; i < beta.size(); i++) {
-    std::cout << "beta[" << i << "]: " << beta[i] << std::endl;
+    std::vector<std::string> names;
+    std::vector<std::vector<size_t> > dimss;
+    stan::mcmc::read_variables(samples.str(), 2U,
+                               names, dimss);
+
+    stan::mcmc::chains<> chains(num_chains, names, dimss);
+    for (size_t chain = 0; chain < num_chains; chain++) {
+      samples.str("");
+      samples << path << get_path_separator()
+              << filename << ".chain_" << chain << ".csv";
+      stan::mcmc::add_chain(chains, chain, samples.str(), 2U);
+    }
+    return chains;
   }
-}
-void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
-  if (!has_R)
-    return;
-  std::stringstream command;
-
-  command << path << get_path_separator() << "logistic"
-          << " --data=" << path << get_path_separator() << filename << ".Rdata"
-          << " --iter=" << iterations
-          << " --refresh=" << iterations;
-
-  std::vector<std::string> command_outputs;  
-  long time = run_stan(command.str(), filename, command_outputs);
-  stan::mcmc::chains<> chains = create_chains(filename);
-
-  std::vector<double> beta;
-  get_beta(filename, beta);
-
-
-  std::cout << "************************************************************\n"
-            << "milliseconds: " << time << std::endl
-            << "************************************************************\n";
-  size_t num_params = chains.num_params();
-  for (size_t i = 0; i < num_params; i++) {
-    std::cout << "------------------------------------------------------------\n";
-    std::cout << "beta[" << i << "]" << std::endl;
-    std::cout << "\tmean:        " << chains.mean(i) << std::endl;
-    std::cout << "\tsd:          " << chains.sd(i) << std::endl;
-    std::cout << "\tneff:        " << chains.effective_sample_size(i) << std::endl;
-    std::cout << "\tsplit R hat: " << chains.split_potential_scale_reduction(i) << std::endl;
+  void get_beta(const std::string& filename, std::vector<double>& beta) {
+    std::stringstream param_filename;
+    param_filename << path << get_path_separator() << filename
+                   << "_param.Rdata";
+    std::ifstream param_ifstream(param_filename.str().c_str());
+    stan::io::dump param_values(param_ifstream);
+  
+    beta = param_values.vals_r("beta");
+    for (size_t i = 0; i < beta.size(); i++) {
+      std::cout << "beta[" << i << "]: " << beta[i] << std::endl;
+    }
   }
-  SUCCEED();
-}
+  void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
+    if (!has_R)
+      return;
+    std::stringstream command;
+
+    command << path << get_path_separator() << "logistic"
+            << " --data=" << path << get_path_separator() << filename << ".Rdata"
+            << " --iter=" << iterations
+            << " --refresh=" << iterations;
+
+    std::vector<std::string> command_outputs;  
+    long time = run_stan(command.str(), filename, command_outputs);
+    stan::mcmc::chains<> chains = create_chains(filename);
+
+    std::vector<double> beta;
+    get_beta(filename, beta);
+
+
+    std::cout << "************************************************************\n"
+              << "milliseconds: " << time << std::endl
+              << "************************************************************\n";
+    size_t num_params = chains.num_params();
+    for (size_t i = 0; i < num_params; i++) {
+      std::cout << "------------------------------------------------------------\n";
+      std::cout << "beta[" << i << "]" << std::endl;
+      std::cout << "\tmean:        " << chains.mean(i) << std::endl;
+      std::cout << "\tsd:          " << chains.sd(i) << std::endl;
+      std::cout << "\tneff:        " << chains.effective_sample_size(i) << std::endl;
+      std::cout << "\tsplit R hat: " << chains.split_potential_scale_reduction(i) << std::endl;
+    }
+    SUCCEED();
+  }
 
 };
-  const size_t LogisticSpeedTest::num_chains = 4;
-  bool LogisticSpeedTest::has_R;
-  bool LogisticSpeedTest::has_jags;
-  std::string LogisticSpeedTest::path;
+const size_t LogisticSpeedTest::num_chains = 4;
+bool LogisticSpeedTest::has_R;
+bool LogisticSpeedTest::has_jags;
+std::string LogisticSpeedTest::path;
   
 
 TEST_F(LogisticSpeedTest,Prerequisites) {
