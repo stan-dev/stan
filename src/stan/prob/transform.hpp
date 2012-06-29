@@ -72,7 +72,7 @@ namespace stan {
       for(size_t i = 1; i < (K - 1); i++) {
         position += pull;
         pull--;
-        temp = U.row(i).tail(pull).array();
+        temp = U.row(i).tail(pull);
         temp /= sqrt(acc.tail(pull) / acc(i));
         CPCs.segment(position, pull) = temp;
         acc.tail(pull) *= 1.0 - temp.square();
