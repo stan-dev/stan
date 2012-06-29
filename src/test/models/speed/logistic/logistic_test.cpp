@@ -17,17 +17,14 @@ public:
   std::vector<std::string> data_files;
 
   static void SetUpTestCase() {
-    std::cout << "-----\n\n";
     std::vector<std::string> model_path;
     model_path.push_back("models");
     model_path.push_back("speed");
     model_path.push_back("logistic");
+
     path = convert_model_path(model_path);
   }
 
-
-
-  // returns number of milliseconds to execute commands;
   /** 
    * Executes the Stan model and returns elapsed time.
    *
@@ -51,7 +48,6 @@ public:
     using boost::posix_time::ptime;
 
     long time = 0;
-
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::stringstream command_chain;
       command_chain << command;
@@ -72,6 +68,13 @@ public:
     return time;
   }
 
+  /** 
+   * Creates a chain object based on the filename provided.
+   *
+   * @param filename base filename.
+   * 
+   * @return a chain object
+   */
   stan::mcmc::chains<> create_chains(const std::string& filename) {
     std::stringstream samples;
     samples << path << get_path_separator()
@@ -91,6 +94,13 @@ public:
     }
     return chains;
   }
+
+  /** 
+   * Gets the beta from the generated data.
+   * 
+   * @param[in] filename filename
+   * @param[out] beta output vector
+   */
   void get_beta(const std::string& filename, std::vector<double>& beta) {
     std::stringstream param_filename;
     param_filename << path << get_path_separator() << filename
@@ -103,23 +113,46 @@ public:
       std::cout << "beta[" << i << "]: " << beta[i] << std::endl;
     }
   }
-  void test_logistic_speed_stan(const std::string& filename, size_t iterations) {
+
+  /** 
+   * Runs the test case.
+   * 
+   * 1) Get the generated beta.
+   * 2) Run Stan num_chains times
+   * 3) Test values of sampled parameters
+   * 4) Output useful values.
+   * 
+   * @param filename 
+   * @param iterations 
+   */
+  void test_logistic_speed_stan(const std::string& filename, const size_t iterations) {
     if (!has_R)
       return;
-    std::stringstream command;
 
+    // 1) Get the generated beta.
+    std::vector<double> beta;
+    get_beta(filename, beta);
+
+    // 2) Run Stan num_chains times
+    std::stringstream command;
     command << path << get_path_separator() << "logistic"
             << " --data=" << path << get_path_separator() << filename << ".Rdata"
             << " --iter=" << iterations
             << " --refresh=" << iterations;
-
     std::vector<std::string> command_outputs;  
     long time = run_stan(command.str(), filename, command_outputs);
+
+
+    // 3) Test values of sampled parameters
     stan::mcmc::chains<> chains = create_chains(filename);
+    // TODO: test sampled values using chain
 
-    std::vector<double> beta;
-    get_beta(filename, beta);
 
+    // 4) Output useful values.
+
+
+    //------------------------------------------------------------
+    // test output
 
     std::cout << "************************************************************\n"
               << "milliseconds: " << time << std::endl
