@@ -15,61 +15,23 @@ protected:
   stan::agrad::vari* alpha_;
   stan::agrad::vari** v1_;
   stan::agrad::vari** v2_;
+  double dotval_;
   size_t length_;
   inline static double eval_gevv(const stan::agrad::var* alpha,
-	                         const stan::agrad::var* v1, int stride1,
-	  	  	         const stan::agrad::var* v2, int stride2,
-                                 size_t length) {
+                                 const stan::agrad::var* v1, int stride1,
+                                 const stan::agrad::var* v2, int stride2,
+                                 size_t length, double *dotprod) {
     double result = 0;
     for (size_t i = 0; i < length; i++)
       result += v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
+    *dotprod = result;
     return alpha->vi_->val_ * result;
   }
 public:
   gevv_vvv_vari(const stan::agrad::var* alpha, 
-		const stan::agrad::var* v1, int stride1, 
-		const stan::agrad::var* v2, int stride2, size_t length) : 
-    vari(eval_gevv(alpha, v1, stride1, v2, stride2, length)), length_(length) {
-	alpha_ = alpha->vi_;
-    v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
-    v2_ = v1_ + length_;
-    for (size_t i = 0; i < length_; i++)
-      v1_[i] = v1[i*stride1].vi_;
-    for (size_t i = 0; i < length_; i++)
-      v2_[i] = v2[i*stride2].vi_;
-  }
-  void chain() {
-    for (size_t i = 0; i < length_; i++) {
-      v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
-      v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
-      alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
-    }
-  }
-};
-/*class gevv_vvvv_vari : public stan::agrad::vari {
-protected:
-  stan::agrad::vari* r_;
-  stan::agrad::vari* alpha_;
-  stan::agrad::vari** v1_;
-  stan::agrad::vari** v2_;
-  size_t length_;
-  inline static double eval_gevv(const stan::agrad::var* res,
-                                 const stan::agrad::var* alpha,
-	                         const stan::agrad::var* v1, int stride1,
-	  	  	         const stan::agrad::var* v2, int stride2,
-                                 size_t length) {
-    double result = 0;
-    for (size_t i = 0; i < length; i++)
-      result += v1[i*stride1].vi_->val_ * v2[i*stride2].vi_->val_;
-    return alpha->vi_->val_ * result + res->vi_->val_;
-  }
-public:
-  gevv_vvvv_vari(const stan::agrad::var* res,
-                 const stan::agrad::var* alpha, 
-		 const stan::agrad::var* v1, int stride1, 
-		 const stan::agrad::var* v2, int stride2, size_t length) : 
-        vari(eval_gevv(res, alpha, v1, stride1, v2, stride2, length)), length_(length) {
-    r_ = res->vi_;
+                const stan::agrad::var* v1, int stride1, 
+                const stan::agrad::var* v2, int stride2, size_t length) : 
+      vari(eval_gevv(alpha,v1,stride1,v2,stride2,length,&dotval_)), length_(length) {
     alpha_ = alpha->vi_;
     v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
     v2_ = v1_ + length_;
@@ -79,13 +41,14 @@ public:
       v2_[i] = v2[i*stride2].vi_;
   }
   void chain() {
+    const double adj_alpha = adj_ * alpha_->val_;
     for (size_t i = 0; i < length_; i++) {
-      v1_[i]->adj_ += adj_ * v2_[i]->val_ * alpha_->val_;
-      v2_[i]->adj_ += adj_ * v1_[i]->val_ * alpha_->val_;
-      alpha_->adj_ += adj_ * v1_[i]->val_ * v2_[i]->val_;
+      v1_[i]->adj_ += adj_alpha * v2_[i]->val_;
+      v2_[i]->adj_ += adj_alpha * v1_[i]->val_;
     }
+    alpha_->adj_ += adj_ * dotval_;
   }
-};*/
+};
 }
 }
 
@@ -217,9 +180,9 @@ namespace Eigen {
 
       EIGEN_DONT_INLINE static void run(
         Index rows, Index cols,
-    	const LhsScalar* lhs, Index lhsStride,
-    	const RhsScalar* rhs, Index rhsIncr,
-    	ResScalar* res, Index resIncr, const ResScalar &alpha)
+        const LhsScalar* lhs, Index lhsStride,
+        const RhsScalar* rhs, Index rhsIncr,
+        ResScalar* res, Index resIncr, const ResScalar &alpha)
       {
         for (Index i = 0; i < rows; i++) {
           res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
@@ -1973,6 +1936,35 @@ namespace stan {
      * @return Unit simplex result of the softmax transform of the vector.
      */
     vector_v softmax(const vector_v& v);
+
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
+                                                         const Eigen::Matrix<var,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.template triangularView<Eigen::Lower>().solve(b);
+    }
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
+                                                         const Eigen::Matrix<double,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.template triangularView<Eigen::Lower>().solve(to_var(b));
+    }
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,
+                                                         const Eigen::Matrix<var,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return to_var(A).template triangularView<Eigen::Lower>().solve(b);
+    }
+
 
     /**
      * Returns the solution of the system Ax=b when A is triangular.

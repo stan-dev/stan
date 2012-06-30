@@ -43,13 +43,13 @@ namespace stan {
                 typename T_result,
                 typename T_msg2,
                 class Policy>
-      bool domain_error(const char* function,
-                        const T_y& y,
-                        const char* name,
-                        const char* error_msg,
-                        T_msg2 error_msg2,
-                        T_result* result,
-                        const Policy&) {
+      inline bool dom_err(const char* function,
+                          const T_y& y,
+                          const char* name,
+                          const char* error_msg,
+                          T_msg2 error_msg2,
+                          T_result* result,
+                          const Policy&) {
         using stan::math::policies::raise_domain_error;
         std::ostringstream msg_o;
         msg_o << name << error_msg << error_msg2;
@@ -66,14 +66,14 @@ namespace stan {
                 typename T_result,
                 typename T_msg2,
                 class Policy>
-      inline bool domain_error_vec(size_t i,
-                                   const char* function,
-                                   const std::vector<T_y>& y,
-                                   const char* name,
-                                   const char* error_msg,
-                                   T_msg2 error_msg2,
-                                   T_result* result,
-                                   const Policy&) {
+      inline bool dom_err_vec(size_t i,
+                              const char* function,
+                              const std::vector<T_y>& y,
+                              const char* name,
+                              const char* error_msg,
+                              T_msg2 error_msg2,
+                              T_result* result,
+                              const Policy&) {
         using stan::math::policies::raise_domain_error;
         std::ostringstream msg_o;
         msg_o << name << "[" << i << "] " << error_msg << error_msg2;
@@ -110,7 +110,7 @@ namespace stan {
                               T_result* result,
                               const Policy&) {
       if ((boost::math::isnan)(y)) 
-        return domain_error(function,y,name,
+        return dom_err(function,y,name,
                             " is %1%, but must not be nan!","",
                             result,Policy());
       return true;
@@ -128,7 +128,7 @@ namespace stan {
                               const Policy&) {
       for (size_t i = 0; i < y.size(); i++)
         if ((boost::math::isnan)(y[i])) 
-          return domain_error_vec(i,function,y,name,
+          return dom_err_vec(i,function,y,name,
                                   " is %1%, but must not be nan!","",
                                   result,Policy());
       return true;
@@ -163,7 +163,7 @@ namespace stan {
                              T_result* result,
                              const Policy&) {
       if (!(boost::math::isfinite)(y))
-        return domain_error(function,y,name,
+        return dom_err(function,y,name,
                             " is %1%, but must be finite!","",
                             result,Policy());
       return true;
@@ -176,7 +176,7 @@ namespace stan {
                              const Policy&) {
       for (size_t i = 0; i < y.size(); i++) 
         if (!(boost::math::isfinite)(y[i])) 
-          return domain_error_vec(i,function,y,name,
+          return dom_err_vec(i,function,y,name,
                                   " is %1%, but must be finite!","",
                                   result,Policy());
       return true;
@@ -208,7 +208,7 @@ namespace stan {
                               const Policy&) {
 
       if (!(x > low))
-        return domain_error(function,x,name,
+        return dom_err(function,x,name,
                             " is %1%, but must be greater than ",
                             low,result,Policy());
       return true;
@@ -222,7 +222,7 @@ namespace stan {
                               const Policy&) {
       for (size_t i = 0; i < x.size(); ++i)
         if (!(x[i] > low))
-          return domain_error_vec(i,function,x,name,
+          return dom_err_vec(i,function,x,name,
                                   " is %1%, but must be greater than ",
                                   low,result,Policy());
       return true;
@@ -253,7 +253,7 @@ namespace stan {
                                        T_result* result,
                                        const Policy&) {
       if (!(x >= low))
-        return domain_error(function,x,name,
+        return dom_err(function,x,name,
                             " is %1%, but must be greater than or equal to ",
                             low,result,Policy());
       return true;
@@ -267,7 +267,7 @@ namespace stan {
                                        const Policy&) {
       for (size_t i = 0; i < x.size(); ++i)
         if (!(x[i] >= low))
-          return domain_error_vec(
+          return dom_err_vec(
                           i,function,x,name,
                           " is %1%, but must be greater than or equal to",
                           low,result,Policy());
@@ -302,7 +302,7 @@ namespace stan {
                            T_result* result,
                            const Policy&) {
       if (!(x < high)) 
-        return domain_error(function,x,name,
+        return dom_err(function,x,name,
                             " is %1%, but must be less than ",
                             high,result,Policy());
       return true;
@@ -316,7 +316,7 @@ namespace stan {
                            const Policy&) {
       for (size_t i = 0; i < x.size(); ++i)
         if (!(x[i] < high))
-          return domain_error_vec(i,function,x,name,
+          return dom_err_vec(i,function,x,name,
                                   " is %1%, but must be less than",
                                   high,result,Policy());
       return true;
@@ -348,7 +348,7 @@ namespace stan {
                                     T_result* result,
                                     const Policy&) {
       if (!(x <= high))
-        return domain_error(function,x,name,
+        return dom_err(function,x,name,
                             " is %1%, but must be less than or equal to ",
                             high,result,Policy());
       return true;
@@ -362,7 +362,7 @@ namespace stan {
                                     const Policy&) {
       for (size_t i = 0; i < x.size(); ++i)
         if (!(x[i] <= high))
-          return domain_error_vec(
+          return dom_err_vec(
                                   i,function,x,name,
                                   " is %1%, but must be less than or equal to",
                                   high,result,Policy());
@@ -398,7 +398,7 @@ namespace stan {
                               T_result* result,
                               const Policy&) {
       if (!(low <= x && x <= high))
-        return domain_error(function,x,name," is %1%, but must be between ",
+        return dom_err(function,x,name," is %1%, but must be between ",
                             std::pair<T_low,T_high>(low,high),
                             result,Policy());
       return true;
@@ -414,7 +414,7 @@ namespace stan {
                               const Policy&) {
       for (size_t i = 0; i < x.size(); ++i)
         if (!(low <= x[i] && x[i] <= high))
-          return domain_error_vec(i,function,x,name,
+          return dom_err_vec(i,function,x,name,
                                   " is %1%, but must be between ",
                                   std::pair<T_low,T_high>(low,high),
                                   result,Policy());
@@ -452,7 +452,7 @@ namespace stan {
       // have to use not is_unsigned. is_signed will be false
       // floating point types that have no unsigned versions.
       if (!boost::is_unsigned<T_x>::value && !(x >= 0)) 
-        return domain_error(function,x,name,
+        return dom_err(function,x,name,
                             " is %1%, but must be >= 0!","",result,Policy());
       return true;
     }
@@ -465,7 +465,7 @@ namespace stan {
                                   const Policy&) {
       for (size_t i = 0; i < x.size(); ++i)
         if (!boost::is_unsigned<T_x>::value && !(x[i] >= 0)) 
-          return domain_error_vec(i,function,x,name,
+          return dom_err_vec(i,function,x,name,
                                   " is %1%, but must be >= 0!","",
                                   result,Policy());
       return true;
@@ -495,7 +495,7 @@ namespace stan {
                                T_result* result,
                                const Policy&) {
       if (!(x > 0))
-        return domain_error(function,x,name,
+        return dom_err(function,x,name,
                             " is %1%, but must be > 0","",result,Policy());
       return true;
     }
@@ -507,7 +507,7 @@ namespace stan {
                                const Policy&) { 
       for (size_t i = 0; i < y.size(); i++) 
         if (!(y[i] > 0)) 
-          return domain_error_vec(i,function,y,name,
+          return dom_err_vec(i,function,y,name,
                                   " is %1%, but must be > 0","",
                                   result,Policy());
       return true;
@@ -546,7 +546,7 @@ namespace stan {
       size_t x_size = size_of(x);
       if (x_size == 1 || x_size == max_size)
         return true;
-      return domain_error(
+      return dom_err(
               function,x_size,name,
               " (max size) is %1%, but must be consistent, 1 or max=",max_size,
               result,Policy());

@@ -1325,6 +1325,16 @@ namespace stan {
     vector_d softmax(const vector_d& y);
     
 
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<double,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,
+                                                            const Eigen::Matrix<double,R2,C2> &b) {
+      if (A.cols() != A.rows())
+        throw std::invalid_argument("A is not square");
+      if (A.cols() != b.rows())
+        throw std::invalid_argument("A.cols() != b.rows()");
+      return A.template triangularView<Eigen::Lower>().solve(b);
+    }
+
     /**
      * Returns the solution of the system Ax=b when A is triangular
      * @param A Triangular matrix.  Specify upper or lower with TriView
