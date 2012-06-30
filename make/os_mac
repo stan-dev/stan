@@ -7,7 +7,6 @@
 ##
 
 ifeq (g++,$(CC_TYPE))
-  CFLAGS += -g
   CFLAGS += -Wno-unused-function
   PCH = .gch
 endif
