@@ -1255,7 +1255,45 @@ namespace stan {
       return var(new trunc_vari(a.vi_));
     }
 
-    /**
+
+ /**
+     * Return the positive difference between the first variable's the value
+     * and the second's (C99).
+     *
+     * See stan::math::fdim() for the double-based version.
+     *
+     * The partial derivative with respect to the first argument is
+     *
+     * \f$\frac{\partial}{\partial x} \mbox{fdim}(x,y) = 0.0\f$ if \f$x < y\f$, and
+     *
+     * \f$\frac{\partial}{\partial x} \mbox{fdim}(x,y) = 1.0\f$ if \f$x \geq y\f$.
+     *
+     * With respect to the second argument, the partial is
+     * 
+     * \f$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = 0.0\f$ if \f$x < y\f$, and
+     *
+     * \f$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = -\lfloor\frac{x}{y}\rfloor\f$ if \f$x \geq y\f$.
+     * 
+     * @param a First variable.
+     * @param b Second variable.
+     * @return The positive difference between the first and second
+     * variable.
+     */
+    template <class Policy>
+    inline var fdim(const stan::agrad::var& a,
+                    const stan::agrad::var& b,
+		    const Policy&) {
+      static const char* function = "stan::math::fdim(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+	return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+	return result;
+      return a.vi_->val_ > b.vi_->val_
+        ? var(new fdim_vv_vari(a.vi_,b.vi_))
+        : var(new vari(0.0));
+    }
+ /**
      * Return the positive difference between the first variable's the value
      * and the second's (C99).
      *
@@ -1280,9 +1318,7 @@ namespace stan {
      */
     inline var fdim(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
-      return a.vi_->val_ > b.vi_->val_
-        ? var(new fdim_vv_vari(a.vi_,b.vi_))
-        : var(new vari(0.0));
+      return fdim(a,b, stan::math::default_policy());
     }
 
     /**
@@ -1304,6 +1340,35 @@ namespace stan {
      */
     inline var fdim(const double& a,
                     const stan::agrad::var& b) {
+      return fdim(a,b, stan::math::default_policy());
+    }
+ /**
+     * Return the positive difference between the first value and the
+     * value of the second variable (C99).
+     *
+     * See fdim(var,var) for definitions of values and derivatives.
+     *
+     * The derivative with respect to the variable is
+     *
+     * \f$\frac{d}{d y} \mbox{fdim}(c,y) = 0.0\f$ if \f$c < y\f$, and
+     *
+     * \f$\frac{d}{d y} \mbox{fdim}(c,y) = -\lfloor\frac{c}{y}\rfloor\f$ if \f$c \geq y\f$.
+     * 
+     * @param a First value.
+     * @param b Second variable.
+     * @return The positive difference between the first and second
+     * arguments.
+     */
+    template <class Policy>  
+    inline var fdim(const double& a,
+		    const stan::agrad::var& b,
+		    const Policy&) {
+      static const char* function = "stan::math::fdim(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+	return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+	return result;
       return a > b.vi_->val_
         ? var(new fdim_dv_vari(a,b.vi_))
         : var(new vari(0.0));
@@ -1325,11 +1390,41 @@ namespace stan {
      * @param b Second variable.
      * @return The positive difference between the first and second arguments.
      */
+    template <class Policy>  
     inline var fdim(const stan::agrad::var& a,
-                    const double& b) {
+                    const double& b,
+		    const Policy&) {
+      static const char* function = "stan::math::fdim(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+	return result;
+      if(!check_not_nan(function,b,"b", &result, Policy()))
+	return result;
       return a.vi_->val_ > b
         ? var(new fdim_vd_vari(a.vi_,b))
         : var(new vari(0.0));
+    }
+
+    /**
+     * Return the positive difference between the first variable's value
+     * and the second value (C99).
+     *
+     * See fdim(var,var) for definitions of values and derivatives.
+     *
+     * The derivative with respect to the variable is
+     *
+     * \f$\frac{d}{d x} \mbox{fdim}(x,c) = 0.0\f$ if \f$x < c\f$, and
+     *
+     * \f$\frac{d}{d x} \mbox{fdim}(x,c) = 1.0\f$ if \f$x \geq yc\f$.
+     *
+     * @param a First value.
+     * @param b Second variable.
+     * @return The positive difference between the first and second arguments.
+     */  
+    inline var fdim(const stan::agrad::var& a,
+                    const double& b) {
+    
+      return fdim(a,b, stan::math::default_policy());
     }
 
 
