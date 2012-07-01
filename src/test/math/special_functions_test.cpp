@@ -122,9 +122,36 @@ TEST(MathsSpecialFunctions, log2_errnopolicy) {
   EXPECT_TRUE(std::isnan(result));
 }
 
-TEST(MathsSpecialFunctions, fdim) {
+TEST(MathsSpecialFunctions, fdim_defaultpolicy) {
   EXPECT_FLOAT_EQ(1.0, stan::math::fdim(3.0,2.0));
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(2.0,3.0));
+
+  EXPECT_FLOAT_EQ(0.0, stan::math::fdim(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(std::numeric_limits<double>::infinity(), 1.0));
+ EXPECT_FLOAT_EQ(0.0, stan::math::fdim(1.0, std::numeric_limits<double>::infinity()));
+
+  double nan= std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fdim(nan, 1.0),std::domain_error);
+  EXPECT_THROW(stan::math::fdim(1.0, nan),std::domain_error); 
+  EXPECT_THROW(stan::math::fdim(nan, nan),std::domain_error);
+}
+
+TEST(MathsSpecialFunctions, fdim_errnopolicy) {
+  EXPECT_FLOAT_EQ(1.0, stan::math::fdim(3.0,2.0));
+  EXPECT_FLOAT_EQ(0.0, stan::math::fdim(2.0,3.0));
+
+  EXPECT_FLOAT_EQ(0.0, stan::math::fdim(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(),errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(std::numeric_limits<double>::infinity(), 1.0, errno_policy()));
+  EXPECT_FLOAT_EQ(0.0, stan::math::fdim(1.0, std::numeric_limits<double>::infinity(),errno_policy()));
+
+  double nan= std::numeric_limits<double>::quiet_NaN();
+  double  result = 0;
+  EXPECT_NO_THROW(result = stan::math::fdim(nan, 1.0, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(result = stan::math::fdim(1.0, nan, errno_policy())); 
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(stan::math::fdim(nan, nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
 }
 
 TEST(MathsSpecialFunctions, step) {

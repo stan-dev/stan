@@ -69,12 +69,38 @@ namespace stan {
      *
      * @param a First value.
      * @param b Second value.
+     * @param Policy Type of policy.
+     * @error_policy
+     *    @li y must not be NaN
+     * @return Returns min(a - b, 0.0).
+     */
+    template <typename T1, typename T2, class Policy>
+    inline typename boost::math::tools::promote_args<T1, T2>::type
+    fdim(T1 a, T2 b, const Policy&) {
+      static const char* function = "stan::math::fdim(%1%)";
+      T1 result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+	return result;
+      if(!check_not_nan(function,b, "b", &result, Policy()))
+	return result;
+      return (a > b) ? (a - b) : 0.0;
+    } 
+    
+    /** 
+     * The positive difference function (C99).  
+     *
+     * The function is defined by
+     *
+     * <code>fdim(a,b) = (a > b) ? (a - b) : 0.0</code>.
+     *
+     * @param a First value.
+     * @param b Second value.
      * @return Returns min(a - b, 0.0).
      */
     template <typename T1, typename T2>
     inline typename boost::math::tools::promote_args<T1, T2>::type
     fdim(T1 a, T2 b) {
-      return (a > b) ? (a - b) : 0.0;
+      return fdim(a,b,stan::math::default_policy());
     }
 
     /**
