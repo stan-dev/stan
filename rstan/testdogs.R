@@ -1,5 +1,6 @@
 
 
+options(error = dump.frames)
 
 
 ## not working???
@@ -161,21 +162,29 @@ post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19, comment = "#")
 colMeans(post)
 
 print(ss1)
-summary(ss)
+print(ss)
 summary(ss, probs = c(0.25, .5, .75), pars = c('alpha'))
+# stop("for debug")
+
+sampleshandle <- ss@.fit$sampleshandle
+lst <- sampleshandle$get_samples(ss@model.pars) 
+print(names(lst))
+print(names(lst[[1]]))
+
 ex <- extract(ss) 
 print(ss, pars = c('alpha', 'beta')) 
 # print(ss, pars = c('alpha', 'beta1')) # error
 
 
-library(ggplot2)
+# library(ggplot2)
+ 
 
 sf <- stan(model.code = dogsstan, data = dogsdat, verbose = TRUE, n.chains = 3, seed = 1340384924, sample.file = 'dogsb.csv')
 traceplot(sf)
 plot(sf)
-
+# 
 cs <- chain.summary(sf)
-
+# 
 print(cs, digits = 3) 
 print(sf)
 
@@ -184,7 +193,7 @@ require(coda)
 to.mcmc.list <- function(lst) {
   as.mcmc.list(lapply(lst, FUN = function(x) as.mcmc(do.call(cbind, x))))  
 } 
-
+ 
 tall3 <- to.mcmc.list(tall) 
 summary(tall3)
 effectiveSize(tall3)

@@ -53,6 +53,7 @@ stanplot <- function(object, pars = object@model.pars,
     
   } 
   if (plot) multi.print.plots(ps) 
+  names(ps) <- pars 
   invisible(ps) 
 } 
 
@@ -102,27 +103,6 @@ check.pars <- function(object, pars) {
     stop("No parameter ", paste(pars[m], collapse = ', ')) 
   pars_nows
 } 
-  
-
-get.all.chain.samples <- function(object, pars = object@model.pars) {
-  
-  # Get all the samples for all the chains
-  # 
-  # Args:
-  #   object: S4 class stanfit 
-  #   pars:  a vector of character for parameter names
-  # 
-  # Returns:
-  #   a list, every element of which is the samples for 
-  #   a chain 
-  # 
-  sampleshandle <- object@.fit$sampleshandle  
-  ss <- vector("list", object@num.chains) 
-  for (cid in 1:object@num.chains) {
-    ss[[cid]] <- sampleshandle$get_chain_samples(cid, pars) 
-  } 
-  lapply(ss, FUN = function(x) do.call(cbind, x))
-} 
 
 ### 
 
@@ -130,23 +110,31 @@ setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
 setMethod("extract", signature(object = "stanfit"), # , pars = "character"), 
-          definition = function(object, pars, ...) {
+          definition = function(object, pars, permuted = FALSE, ...) {
             # Obtain the samples of all chains from the C++ mcmc::chain object 
             #
             # Args:
             #   object: the object of "stanfit" class 
             #   pars: the names of parameters (including other quantities) 
+            #   permuted: if TRUE, the returned samples are permuted without
+            #             warming up. And all the chains are merged. 
             #
             # Returns:
-            #   A list, every element of which is samples of a chain and also
-            #   a list. The list of chain's element is a vector of samples 
-            #   for one parameter. 
+            #   If permuted is TRUE, return an array (matrix) of samples with each
+            #   column being the samples for a parameter. 
+            #   If permuted is FALSE, return a list, every element of which is
+            #   samples of a chain and also a list. The list of chain's element
+            #   is a vector of samples for one parameter. 
  
             sampleshandle <- object@.fit$sampleshandle  
             if (missing(pars)) {
               pars <- object@model.pars
             } else {
               pars <- check.pars(object, pars) 
+            } 
+            
+            if (permuted) {
+              return(do.call(cbind, sampleshandle$get_kept_samples_permuted(pars)))
             } 
   
             lapply(sampleshandle$get_samples(pars),
@@ -240,14 +228,16 @@ setMethod("summary", signature = (object = "stanfit"),
 
 traceplot <- function(object, pars, plot = TRUE) {
 
+  check.plot.pkgs() 
+
   if (missing(pars)) {
     pars <- object@model.pars
   } else {
     pars <- check.pars(pars) 
   }
-  
+
   sampleshandle <- object@.fit$sampleshandle  
-  ss <- get.all.chain.samples(object, pars) 
+  ss <- extract(object, pars, permuted = FALSE) 
 
   ## use the n.warmup and n.thin for the first chain 
   chain1_args <- sampleshandle$get_chain_stan_args(1) 
@@ -304,6 +294,7 @@ traceplot <- function(object, pars, plot = TRUE) {
     }
     ps[[i]] <- p
   } 
+  names(ps) <- pars 
   if (plot) multi.print.plots(ps) 
   return(invisible(ps)) 
 } 
