@@ -12,9 +12,8 @@ public:
   static bool has_R;
   static bool has_jags;
   static std::string path;
-
-  std::string Rscript;
-  std::vector<std::string> data_files;
+  static std::string Rscript;
+  static std::vector<std::string> data_files;
 
   static void SetUpTestCase() {
     std::vector<std::string> model_path;
@@ -23,6 +22,12 @@ public:
     model_path.push_back("logistic");
 
     path = convert_model_path(model_path);
+
+    Rscript = "logistic_generate_data.R";
+
+    data_files.push_back("logistic_128_2");
+    data_files.push_back("logistic_1024_2");
+    data_files.push_back("logistic_4096_2");
   }
 
   /** 
@@ -174,6 +179,8 @@ const size_t LogisticSpeedTest::num_chains = 4;
 bool LogisticSpeedTest::has_R;
 bool LogisticSpeedTest::has_jags;
 std::string LogisticSpeedTest::path;
+std::string LogisticSpeedTest::Rscript;
+std::vector<std::string> LogisticSpeedTest::data_files;
   
 
 TEST_F(LogisticSpeedTest,Prerequisites) {
@@ -202,12 +209,6 @@ TEST_F(LogisticSpeedTest,Prerequisites) {
     std::cout << "System does not have jags available" << std::endl
               << "Failed to run: " << command << std::endl;
   }
-
-  Rscript = "logistic_generate_data.R";
-
-  data_files.push_back("logistic_128_2");
-  data_files.push_back("logistic_1024_2");
-  data_files.push_back("logistic_4096_2");
 }
 
 TEST_F(LogisticSpeedTest,GenerateData) {
