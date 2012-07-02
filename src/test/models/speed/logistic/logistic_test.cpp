@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <test/models/utility.hpp>
 #include <fstream>
+#include <algorithm>
 #include <stan/io/dump.hpp>
+#include <stan/io/csv_writer.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/math/distributions/students_t.hpp>
@@ -25,8 +27,32 @@ std::vector<TestInfo> getTestCases() {
   testCases.push_back(TestInfo(1024, 2, 250));
   testCases.push_back(TestInfo(4096, 2, 250));
   
+  testCases.push_back(TestInfo(128,  8, 150));
+  testCases.push_back(TestInfo(1024, 8, 150));
+  testCases.push_back(TestInfo(4096, 8, 150));
+  
+  testCases.push_back(TestInfo(128,  32, 300));
+  testCases.push_back(TestInfo(1024, 32, 300));
+  testCases.push_back(TestInfo(4096, 32, 300));
+  
+  testCases.push_back(TestInfo(1024, 128, 1000));
+  testCases.push_back(TestInfo(4096, 128, 1000));
+  
+  testCases.push_back(TestInfo(1024, 512, 100000));
+  testCases.push_back(TestInfo(4096, 512, 100000));
+  
   return testCases;
 }
+
+::std::ostream& operator<<(::std::ostream& os, const TestInfo& info) {
+  os << "TestInfo:" << std::endl
+     << "\tN:          " << info.N << std::endl
+     << "\tM:          " << info.M << std::endl
+     << "\titerations: " << info.iterations << std::endl;
+  return os;  // whatever needed to print bar to os
+}
+
+
 class LogisticSpeedTest :
   public testing::TestWithParam<TestInfo> {
 public:
@@ -34,8 +60,10 @@ public:
   static bool has_R;
   static bool has_jags;
   static std::string path;
+  static std::ofstream output_file;
   static std::string Rscript;
   static std::vector<std::string> data_files;
+  static size_t max_M;
 
   static void SetUpTestCase() {
     std::vector<std::string> model_path;
@@ -48,12 +76,40 @@ public:
     Rscript = "logistic_generate_data.R";
 
     std::vector<TestInfo> testCases = getTestCases();
+    max_M = 0;
     for (size_t i = 0; i < testCases.size(); i++) {
       TestInfo info = testCases[i];
       std::stringstream filename;
       filename << "logistic_" << info.N << "_" << info.M;
+      max_M = info.M > max_M ? info.M : max_M;
       data_files.push_back(filename.str());
     }
+    
+    
+    std::stringstream output_filename;
+    output_filename << path << get_path_separator() 
+                    << "logistic.csv";
+    output_file.open(output_filename.str().c_str());
+    
+    output_file << "Program,"
+                << "N,"
+                << "M,"
+                << "milliseconds,"
+                << "Min effective samples,"
+                << "ms per min effective samples";
+    for (size_t m = 0; m < max_M; m++) {
+      output_file << "," << "effective sample size " << m;
+    }
+    output_file << "\n";
+    //    - Info about the run: 'Stan', n, m
+    //    - time
+    //    - min effective samples
+    //    - time / min effective samples
+    //    - effective samples 1..m
+  }
+  
+  static void TearDownTestCase() {
+    output_file.close();
   }
 
   /** 
@@ -153,7 +209,8 @@ public:
    * @param filename 
    * @param iterations 
    */
-  void test_logistic_speed_stan(const std::string& filename, const size_t iterations) {
+  void test_logistic_speed_stan(const std::string& filename, const size_t iterations,
+                                const TestInfo& info) {
     if (!has_R)
       return;
     using std::vector;
@@ -187,7 +244,7 @@ public:
       double se = chains.sd(index) / sqrt(neff);
       double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
       
-      if (abs(beta[index] - sample_mean) > z*se) {
+      if (fabs(beta[index] - sample_mean) > z*se) {
         num_failed++;
         // want the error message to have which, what, how
         err_message << "beta[" << index << "]:"
@@ -197,11 +254,11 @@ public:
                     << "\n\tsplit R.hat: " << setw(10) << chains.split_potential_scale_reduction(index)
                     << "\n\tz:           " << setw(10) << z
                     << "\n\tse:          " << setw(10) << se
-                    << "\n\n\tabs(diff) > z * se: " 
-                    << abs(beta[index] - sample_mean) << " > " << z*se << "\n\n";
+                    << "\n\n\tfabs(diff) > z * se: " 
+                    << fabs(beta[index] - sample_mean) << " > " << z*se << "\n\n";
       }
     }
-    double p = 1 - cdf(binomial(beta.size(), alpha), num_failed);
+    /*double p = 1 - cdf(binomial(beta.size(), alpha), num_failed);
     // this test should fail less than 0.1% of the time.
     if (p < 0.001) {
       EXPECT_EQ(0, num_failed)
@@ -210,16 +267,35 @@ public:
         << "------------------------------------------------------------\n"
         << err_message.str() << std::endl
         << "------------------------------------------------------------\n";
-    }
+        }*/
 
     // 4) Output useful values.
-    //    - Info about the run: 'Stan', n, m
-    //    - time
-    //    - min effective samples
-    //    - time / min effective samples
-    //    - effective samples 1..m
-    
+    vector<double> neff(beta.size(), 0.0);
+    for (size_t m = 0; m < beta.size(); m++) {
+      neff[m] = chains.effective_sample_size(m);
+    }
+    double min_neff = std::min(neff.front(), neff.back());
 
+
+    //    - Info about the run: 'Stan', n, m
+    stan::io::csv_writer writer(output_file);
+    writer.write("Stan");
+    writer.write((double)info.N);
+    writer.write((double)info.M);
+    //    - time
+    writer.write((double)time);
+    //    - min effective samples
+    writer.write(min_neff);
+    //    - time / min effective samples
+    writer.write((double)time / min_neff);
+    //    - effective samples 1..m
+    for (size_t m = 0; m < neff.size(); m++)
+      writer.write(neff[m]);
+    for (size_t m = neff.size()+1; m < max_M; m++)
+      writer.write("");
+    writer.newline();
+
+/*
     //------------------------------------------------------------
     // test output
 
@@ -234,7 +310,7 @@ public:
       std::cout << "\tsd:          " << chains.sd(i) << std::endl;
       std::cout << "\tneff:        " << chains.effective_sample_size(i) << std::endl;
       std::cout << "\tsplit R hat: " << chains.split_potential_scale_reduction(i) << std::endl;
-    }
+      }*/
     SUCCEED();
   }
 
@@ -243,9 +319,10 @@ const size_t LogisticSpeedTest::num_chains = 4;
 bool LogisticSpeedTest::has_R;
 bool LogisticSpeedTest::has_jags;
 std::string LogisticSpeedTest::path;
+std::ofstream LogisticSpeedTest::output_file;
 std::string LogisticSpeedTest::Rscript;
 std::vector<std::string> LogisticSpeedTest::data_files;
-  
+size_t LogisticSpeedTest::max_M;
 
 TEST_F(LogisticSpeedTest,Prerequisites) {
   std::string command;
@@ -264,7 +341,7 @@ TEST_F(LogisticSpeedTest,Prerequisites) {
   test_file.push_back("speed");
   test_file.push_back("empty.jags");
   command = "jags ";
-  command += path;
+  command += convert_model_path(test_file);
   
   try {
     run_command(command);
@@ -317,7 +394,7 @@ TEST_P(LogisticSpeedTest, Stan) {
            << "_"
            << info.M;
 
-  test_logistic_speed_stan(filename.str(), info.iterations);
+  test_logistic_speed_stan(filename.str(), info.iterations, info);
 }
 
 INSTANTIATE_TEST_CASE_P(,
