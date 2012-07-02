@@ -7,8 +7,28 @@
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/binomial.hpp>
 
+
+class TestInfo {
+public:
+  size_t N;
+  size_t M;
+  size_t iterations;
+  
+  TestInfo(size_t N, size_t M, size_t iterations) 
+    : N(N), M(M), iterations(iterations) { }
+};
+
+std::vector<TestInfo> getTestCases() {
+  std::vector<TestInfo> testCases;
+  
+  testCases.push_back(TestInfo(128,  2, 250));
+  testCases.push_back(TestInfo(1024, 2, 250));
+  testCases.push_back(TestInfo(4096, 2, 250));
+  
+  return testCases;
+}
 class LogisticSpeedTest :
-  public testing::Test {
+  public testing::TestWithParam<TestInfo> {
 public:
   static const size_t num_chains;
   static bool has_R;
@@ -27,9 +47,13 @@ public:
 
     Rscript = "logistic_generate_data.R";
 
-    data_files.push_back("logistic_128_2");
-    data_files.push_back("logistic_1024_2");
-    data_files.push_back("logistic_4096_2");
+    std::vector<TestInfo> testCases = getTestCases();
+    for (size_t i = 0; i < testCases.size(); i++) {
+      TestInfo info = testCases[i];
+      std::stringstream filename;
+      filename << "logistic_" << info.N << "_" << info.M;
+      data_files.push_back(filename.str());
+    }
   }
 
   /** 
@@ -187,10 +211,14 @@ public:
         << err_message.str() << std::endl
         << "------------------------------------------------------------\n";
     }
-    // TODO: test sampled values using chain
 
     // 4) Output useful values.
-
+    //    - Info about the run: 'Stan', n, m
+    //    - time
+    //    - min effective samples
+    //    - time / min effective samples
+    //    - effective samples 1..m
+    
 
     //------------------------------------------------------------
     // test output
@@ -281,17 +309,17 @@ TEST_F(LogisticSpeedTest,GenerateData) {
   SUCCEED();
 }
 
+TEST_P(LogisticSpeedTest, Stan) {
+  std::stringstream filename;
+  TestInfo info = GetParam();
+  filename << "logistic_"
+           << info.N
+           << "_"
+           << info.M;
 
-TEST_F(LogisticSpeedTest,Stan_128_2) { 
-  test_logistic_speed_stan("logistic_128_2", 250U);
+  test_logistic_speed_stan(filename.str(), info.iterations);
 }
 
-TEST_F(LogisticSpeedTest,Stan_1024_2) { 
-  test_logistic_speed_stan("logistic_1024_2", 250U);
-}
-
-TEST_F(LogisticSpeedTest,Stan_4096_2) { 
-  test_logistic_speed_stan("logistic_4096_2", 250U);
-}
-
-
+INSTANTIATE_TEST_CASE_P(,
+                        LogisticSpeedTest,
+                        testing::ValuesIn(getTestCases()));
