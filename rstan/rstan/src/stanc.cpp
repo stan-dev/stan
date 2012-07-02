@@ -10,7 +10,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "stanc.hpp"
+RcppExport SEXP stanc(SEXP model_stancode, SEXP model_name);
+RcppExport SEXP stanc_version(); 
 
 SEXP stanc_version() {
   BEGIN_RCPP;
