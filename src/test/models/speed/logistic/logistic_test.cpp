@@ -4,6 +4,8 @@
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/math/distributions/students_t.hpp>
+#include <boost/math/distributions/binomial.hpp>
 
 class LogisticSpeedTest :
   public testing::Test {
@@ -114,9 +116,6 @@ public:
     stan::io::dump param_values(param_ifstream);
   
     beta = param_values.vals_r("beta");
-    for (size_t i = 0; i < beta.size(); i++) {
-      std::cout << "beta[" << i << "]: " << beta[i] << std::endl;
-    }
   }
 
   /** 
@@ -133,9 +132,14 @@ public:
   void test_logistic_speed_stan(const std::string& filename, const size_t iterations) {
     if (!has_R)
       return;
-
+    using std::vector;
+    using boost::math::students_t;
+    using boost::math::binomial;
+    using boost::math::quantile;
+    using std::setw;
+    
     // 1) Get the generated beta.
-    std::vector<double> beta;
+    vector<double> beta;
     get_beta(filename, beta);
 
     // 2) Run Stan num_chains times
@@ -144,14 +148,46 @@ public:
             << " --data=" << path << get_path_separator() << filename << ".Rdata"
             << " --iter=" << iterations
             << " --refresh=" << iterations;
-    std::vector<std::string> command_outputs;  
+    vector<std::string> command_outputs;  
     long time = run_stan(command.str(), filename, command_outputs);
 
 
     // 3) Test values of sampled parameters
     stan::mcmc::chains<> chains = create_chains(filename);
+    int num_failed = 0;
+    std::stringstream err_message;
+    double alpha = 0.05;
+    for (size_t index = 0; index < beta.size(); index++) {
+      double neff = chains.effective_sample_size(index);
+      double sample_mean = chains.mean(index);
+      double se = chains.sd(index) / sqrt(neff);
+      double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
+      
+      if (abs(beta[index] - sample_mean) > z*se) {
+        num_failed++;
+        // want the error message to have which, what, how
+        err_message << "beta[" << index << "]:"
+                    << "\n\texpected:    " << setw(10) << beta[index]
+                    << "\n\tsampled:     " << setw(10) << sample_mean
+                    << "\n\tneff:        " << setw(10) << neff
+                    << "\n\tsplit R.hat: " << setw(10) << chains.split_potential_scale_reduction(index)
+                    << "\n\tz:           " << setw(10) << z
+                    << "\n\tse:          " << setw(10) << se
+                    << "\n\n\tabs(diff) > z * se: " 
+                    << abs(beta[index] - sample_mean) << " > " << z*se << "\n\n";
+      }
+    }
+    double p = 1 - cdf(binomial(beta.size(), alpha), num_failed);
+    // this test should fail less than 0.1% of the time.
+    if (p < 0.001) {
+      EXPECT_EQ(0, num_failed)
+        << "Failed " << num_failed << " of " << beta.size() << " comparisons\n"
+        << "p: " << p << std::endl
+        << "------------------------------------------------------------\n"
+        << err_message.str() << std::endl
+        << "------------------------------------------------------------\n";
+    }
     // TODO: test sampled values using chain
-
 
     // 4) Output useful values.
 
