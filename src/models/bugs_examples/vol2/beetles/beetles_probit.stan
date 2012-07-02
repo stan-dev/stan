@@ -29,10 +29,10 @@ model {
         r[i] ~ binomial(n[i], p[i]);
 }
 generated quantities {
-  real D;
+//  real D;
   real alpha; 
   real llike[N];
-  real llike_sat[N];
+//  real llike_sat[N];
   real rhat[N];
 
   alpha <- alpha_star - beta*mean_x;              
@@ -40,9 +40,9 @@ generated quantities {
   for (i in 1:N) {
       llike[i]  <- r[i] * log(p[i]) 
                    + (n[i] - r[i]) * log(1-p[i]);  
-      llike_sat[i] <- r[i] * log(r[i] / n[i]) 
-                      + (n[i] - r[i]) * log(1-r[i] / n[i]);
+//      llike_sat[i] <- r[i] * log(r[i] / n[i]) 
+//                      + (n[i] - r[i]) * log(1-r[i] / n[i]);
       rhat[i] <- p[i] * n[i]; 
    }
-   D <- 2 * (sum(llike_sat) - sum(llike));
+//   D <- 2 * (sum(llike_sat) - sum(llike));
 }
