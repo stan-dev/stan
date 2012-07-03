@@ -313,13 +313,13 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
   }
 }
 
-void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
   EXPECT_NEAR(expected_mean, c.mean(0U), 50)
     << "Test that data file is being used";
 }
 
-void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   int num_iter = options[iter] ? 100 : 2000;
   int num_warmup = options[warmup] ? 60 : num_iter/2;
   size_t expected_num_samples = num_iter - num_warmup;
@@ -335,17 +335,20 @@ void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::ch
   }
 }
 
-void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<> c) {
+void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   if (options[iter] || 
       options[leapfrog_steps] || 
       options[epsilon] ||
+      options[epsilon_pm] ||
       options[delta] ||
-      options[gamma_opt])
+      options[gamma_opt] ||
+      options[thin] ||
+      options[append_samples] ||
+      !options[seed])
     return;
   // seed / chain_id test
   double expected_first_y;
-  if (options[seed] 
-      && !options[append_samples] 
+  if (!options[append_samples] 
       && !options[warmup]) {
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
@@ -378,10 +381,11 @@ TEST_P(ModelCommand, OptionsTest) {
   
   std::string command = get_command(options, changed_options);
   SCOPED_TRACE(command);
-  //std::cout << command << std::endl;
-  //for (int i = 0; i < changed_options.size(); i++) {
-  //  std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
-  //}
+  /*std::cout << command << std::endl;
+  for (int i = 0; i < changed_options.size(); i++) {
+    std::cout << i << ": " << changed_options[i].first << ", " << changed_options[i].second << std::endl;
+  }
+  std::cout << "---" << std::endl;*/
 
   // check_output
   check_output(run_command(command), changed_options);
@@ -389,17 +393,35 @@ TEST_P(ModelCommand, OptionsTest) {
   // test sampled values
   vector<string> names;
   vector<vector<size_t> > dimss;
-  size_t skip = options[leapfrog_steps] ? 1U : 2U;
+  size_t skip;
+  if (options[leapfrog_steps])
+    skip = options[epsilon] && !options[epsilon_pm] ? 1U : 2U;
+  else {
+    skip = options[epsilon] && !options[epsilon_pm] ? 2U : 3U;
+    /*if (options[epsilon] && options[epsilon_pm])
+      skip = 3U;
+    else if (!options[epsilon] && options[epsilon_pm])
+      skip = 3U;
+    else if (options[epsilon] && !options[epsilon_pm])
+      skip = 2U;
+    else if (!options[epsilon] && !options[epsilon_pm])
+    skip = 3U;*/
+  }
+  //std::cout << "options[leapfrog_steps]: " << options[leapfrog_steps] << std::endl;
+  //std::cout << "options[epsilon]:        " << options[epsilon] << std::endl;
+  //std::cout << "options[epsilon_pm]:     " << options[epsilon_pm] << std::endl;
+  //std::cout << "skip:                    " << skip << std::endl;
+
   stan::mcmc::read_variables(model_path+".csv", skip,
                              names, dimss);
-      
   stan::mcmc::chains<> c(1U, names, dimss);
   stan::mcmc::add_chain(c, 0, model_path+".csv", skip);
-  
+
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);
   test_specific_sample_values(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
+                        //Range(27648, 27651));
                         Range(0, 1<<options_count));
