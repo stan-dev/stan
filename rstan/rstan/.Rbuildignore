@@ -1,7 +1,7 @@
 inst/include/stanlib/gtest.*$
 _inst/include/stanlib/boost.*$
-_inst/include/stanlib/Eigen.*$
-inst/include/stanlib/Eigen/.*CMakeLists.txt$
+_inst/include/stanlib/eigen.*$
+inst/include/stanlib/eigen.*/.*CMakeLists.txt$
 inst/include/stansrc/test.*$
 _inst/include/stansrc/models.*$
 inst/include/stansrc/models/.*README$/i

@@ -1,7 +1,9 @@
 rstan.inc.path  <- system.file('include', package = 'rstan')
 rstan.libs.path <- system.file('libs', package = 'rstan')
 PKG_CPPFLAGS_env <- paste0(' -I"', paste0(rstan.inc.path, '/stansrc" '), 
-                           ' -I"', paste0(rstan.inc.path, '/stanlib" '), 
+                           ' -I"', paste0(rstan.inc.path, '/stanlib/eigen_3.1.0" '), 
+                           ' -I"', paste0(rstan.inc.path, '/stanlib/eigen_3.1.0/unsupported" '), 
+                           ' -I"', paste0(rstan.inc.path, '/stanlib/boost_1.50.0" '), 
                            ' -I"', rstan.inc.path, '"')
 
 RSTAN_LIBS <- paste0(' -L"', rstan.libs.path, '" -Wl,-rpath,"', rstan.libs.path, '" -lrstan ')

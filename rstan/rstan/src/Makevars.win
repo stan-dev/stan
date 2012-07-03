@@ -1,3 +1,13 @@
+PKG_LIBS = $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "Rcpp:::LdFlags()")
+
+PKG_CPPFLAGS += -I"../inst/include/stansrc"  
+PKG_CPPFLAGS += -I"../inst/include/stanlib/eigen_3.1.0"  
+PKG_CPPFLAGS += -I"../inst/include/stanlib/eigen_3.1.0/unsupported"  
+PKG_CPPFLAGS += -I"../inst/include/stanlib/boost_1.50" 
+PKG_CPPFLAGS += -I"../inst/include" 
+
+
+
 USERDIR = ../inst/libs$(R_ARCH)
 STATICLIB = librstan.a
 USERLIB = $(USERDIR)/$(STATICLIB) 

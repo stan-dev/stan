@@ -34,7 +34,11 @@ USERLIB = librstan$(DYLIB_EXT)
 USERLIBST = librstan.a 
 
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
-PKG_CPPFLAGS += -I"../inst/include/stansrc"  -I"../inst/include/stanlib"  -I"../inst/include" 
+PKG_CPPFLAGS += -I"../inst/include/stansrc"  
+PKG_CPPFLAGS += -I"../inst/include/stanlib/eigen_3.1.0"  
+PKG_CPPFLAGS += -I"../inst/include/stanlib/eigen_3.1.0/unsupported"  
+PKG_CPPFLAGS += -I"../inst/include/stanlib/boost_1.50.0" 
+PKG_CPPFLAGS += -I"../inst/include" 
 
 userLibrary: $(USERLIB) $(USERLIBST)
 	-@if test ! -e $(USERDIR)$(R_ARCH); then mkdir -p $(USERDIR)$(R_ARCH); fi

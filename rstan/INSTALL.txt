@@ -1,3 +1,4 @@
+Installation on Linux: 
 
 1. run `R CMD build rstan` at STAN_HOME/rstan 
 
