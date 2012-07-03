@@ -170,19 +170,23 @@ namespace stan {
        * @param params_r Real-valued parameter vector.
        * @param params_i Integer-valued parameter vector.
        * @param epsilon Real-valued scalar saying how much to perturb 
+       * @param error Real-valued scalar saying how much error to allow
        * @param o Output stream for messages.
        * params_r. Defaults to 1e-6.
+       * @return 0 if the gradeints are close enough, non-0 otherwise
        */
-      void test_gradients(std::vector<double>& params_r,
-                          std::vector<int>& params_i,
-                          double epsilon = 1e-6,
-                          std::ostream& o = std::cout) {
+      int test_gradients(std::vector<double>& params_r,
+                         std::vector<int>& params_i,
+                         double epsilon = 1e-6,
+                         double error = 1e-6,
+                         std::ostream& o = std::cout) {
         std::vector<double> grad;
         double lp = grad_log_prob(params_r,params_i,grad);
         
-        
         std::vector<double> grad_fd;
         finite_diff_grad(params_r,params_i,grad_fd,epsilon);
+
+        int num_failed = 0;
         
         o << std::endl
           << " Log probability=" << lp
@@ -202,7 +206,10 @@ namespace stan {
             << std::setw(16) << grad_fd[k]
             << std::setw(16) << (grad[k] - grad_fd[k])
             << std::endl;
+          if (std::fabs(grad[k] - grad_fd[k]) > error)
+            num_failed++;
         }
+        return num_failed;
       }
 
       /**
@@ -211,9 +218,11 @@ namespace stan {
        * real and integer parameters.
        *
        * @param epsilon Finite d
+       * @param error Allowable error
        * @param o Output stream for messages.
        */
       void test_gradients_random(double epsilon = 1e-6,
+                                 double error = 1e-6,
                                  std::ostream& o = std::cout) {
         std::vector<double> params_r(num_params_r());
         std::vector<int> params_i(num_params_i());
@@ -221,7 +230,7 @@ namespace stan {
           params_r[i] = 0.0; // FIXME:  randomize
         for (size_t i = 0; i < params_i.size(); ++i)
           params_i[i] = 0;   // FIXME:  randomize, keep in range
-        test_gradients(params_r,params_i,epsilon,o);
+        test_gradients(params_r,params_i,epsilon,error,o);
       }
                                  
 

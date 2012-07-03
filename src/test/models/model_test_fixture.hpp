@@ -105,7 +105,7 @@ public:
       << "Gradient test failed. \n"
       << "\tRan command: " << command << "\n"
       << "\tCommand output: " << command_output;
-    std::cout << "command_output: " << command_output << "\n";
+    //std::cout << "command_output: " << command_output << "\n";
   }
 
   /** 
