@@ -1,4 +1,3 @@
-
 #ifndef __STAN__MCMC__CHAINS_HPP__
 #define __STAN__MCMC__CHAINS_HPP__
 
@@ -13,8 +12,6 @@
 #include <vector>
 #include <fstream>
 #include <cstdlib>
-
-#include <Eigen/Dense>
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -1435,44 +1432,36 @@ namespace stan {
           n_samples = std::min(n_samples, this->num_kept_samples(chain));
         }
 
-	/*using std::vector;
-	vector< vector<double> > acov;
-	for (size_t chain = 0; chain < m; chain++) {
-	  vector<double> acov_chain;
-	  autocovariance(chain, n, acov_chain);
-	  acov.push_back(acov_chain);
-	  std::cout << "var for chain " << m << "?: " << acov_chain[0]*n_samples/(n_samples-1) << std::endl;
-	  }*/
-	
-        std::vector<double> chain_mean;
-        std::vector<double> chain_var;
+        using std::vector;
+        vector< vector<double> > acov;
         for (size_t chain = 0; chain < m; chain++) {
-          chain_mean.push_back(this->mean(chain,n));
-          chain_var.push_back(this->variance(chain,n));
-	  //std::cout << "var for chain " << m << "!: " << this->variance(chain, n) << std::endl;
+          vector<double> acov_chain;
+          autocovariance(chain, n, acov_chain);
+          acov.push_back(acov_chain);
         }
-        double var_plus = stan::math::mean(chain_var)*(n_samples-1)/n_samples + 
+        
+        vector<double> chain_mean;
+        vector<double> chain_var;
+        for (size_t chain = 0; chain < m; chain++) {
+          double n_kept_samples = num_kept_samples(chain);
+          chain_mean.push_back(this->mean(chain,n));
+          chain_var.push_back(acov[chain][0]*n_kept_samples/(n_kept_samples-1));
+        }
+        double mean_var = stan::math::mean(chain_var);
+        double var_plus = mean_var*(n_samples-1)/n_samples + 
           stan::math::variance(chain_mean);
-
-        std::vector<double> rho_hat_t;
+        vector<double> rho_hat_t;
         double rho_hat = 0;
         for (size_t t = 1; (t < n_samples && rho_hat >= 0); t++) {
-          double variogram = 0;
+          vector<double> acov_t(m);
           for (size_t chain = 0; chain < m; chain++) {
-            std::vector<double> samples;
-            this->get_kept_samples(chain,n,samples);
-            samples.resize(n_samples);
-            for (size_t ii = 0; ii < n_samples-t; ii++) {
-              double diff = samples[ii] - samples[ii+t]; 
-              variogram += diff * diff;
-            }
+            acov_t[chain] = acov[chain][t];
           }
-          variogram /= m * (n_samples-t);
-          rho_hat = 1 - variogram / (2 * var_plus);
+          rho_hat = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
           if (rho_hat >= 0)
             rho_hat_t.push_back(rho_hat);
-        }        
-      
+        }
+        
         double ess = m*n_samples;
         if (rho_hat_t.size() > 0) {
           ess /= 1 + 2 * stan::math::sum(rho_hat_t);

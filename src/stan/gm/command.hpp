@@ -163,8 +163,10 @@ namespace stan {
         if (m < num_warmup) {
           sampler.next(); // discard
         } else {
-          if (epsilon_adapt)
+          if (epsilon_adapt && sampler.adapting()) {
             sampler.adapt_off();
+            sampler.write_adaptation_params(sample_file_stream);
+          }
           if (((m - num_warmup) % num_thin) != 0) {
             sampler.next();
             continue;

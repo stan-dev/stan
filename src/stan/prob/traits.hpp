@@ -2,6 +2,7 @@
 #define __STAN__PROB__TRAITS_HPP__
 
 #include <stan/meta/traits.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
 
@@ -38,16 +39,18 @@ namespace stan {
        */
       enum { 
         value =  ( !propto
-                   || !stan::is_constant<T1>::value
-                   || !stan::is_constant<T2>::value
-                   || !stan::is_constant<T3>::value
-                   || !stan::is_constant<T4>::value 
-                   || !stan::is_constant<T5>::value 
-                   || !stan::is_constant<T6>::value  )
+                   || !stan::is_constant<typename scalar_type<T1>::type>::value
+                   || !stan::is_constant<typename scalar_type<T2>::type>::value
+                   || !stan::is_constant<typename scalar_type<T3>::type>::value
+                   || !stan::is_constant<typename scalar_type<T4>::type>::value
+                   || !stan::is_constant<typename scalar_type<T5>::type>::value
+                   || !stan::is_constant<typename scalar_type<T6>::type>::value 
+                   )
 
       };
 
     };
+
 
   }
 

@@ -153,7 +153,7 @@ template metaprogramming facilities are implemented with the Boost
 \begin{itemize}
 \item Home: http://www.boost.org/users/license.html
 \item License: Boost Software License
-\item Version: 1.49.0
+\item Version: 1.50.0
 \end{itemize}
 %
 The Boost source code is distributed with \Stan.
@@ -167,7 +167,7 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: LGPL3+
-\item Tested Version: 3.0.5
+\item Tested Version: 3.1.0
 \end{itemize}
 %
 The Eigen library is distributed with \Stan.
@@ -264,16 +264,12 @@ Tested Version(s): 1.6.0
 The Google Test framework is distributed with \Stan.
 
 
-
-
-
-
 \section{Tips for Mac OS X}
 
 \subsection{Install Xcode}
 
 Apple's Xcode contains both compilers and make all of the tools needed 
-to work with \Stan as a user.  Which version you need depends on your
+to work with \Stan as a user.  Which version you need depends on the
 operating system version.
 
 \begin{description}
@@ -288,10 +284,10 @@ menu option \code{Xcode}, select \code{Preferences}, then click on the
 \code{Downloads} icon and then click on the \code{Install} button next
 to the option labeled ``Command Line Tools.''
 
-At this point, you should have the make system \code{make}, the two
-\Cpp compilers/linkers \gpp and \clang installed, which
-is all you need to run \Stan.  You should also have the \code{git}
-version control system at this point.
+At this point, you should have the make system \code{make} and the two
+\Cpp compilers/linkers, \gpp and \clang, installed.  This is all you
+need to run \Stan.  Xcode will also install the \code{git} version
+control system at this point.
 
 \subsection{More Recent Compilers}
 
@@ -340,6 +336,68 @@ following site.
 %
 Although (at the time of this writing) there were only versions listed
 up to OS X version ``Snow Leopard,'' they work on ``Lion''.
+
+\subsection{\LaTeX\ Typesetting Package}
+
+\Stan uses the \LaTeX\ typesetting package for generating manuals,
+talks, and other materials (Doxygen is used for API documentation; see
+below).  The first step is to download the MacTeX \code{.mpkg} file
+from the following URL [warning: the download is approximately 2GB and
+the installation approximately 3.5GB].
+%
+\begin{quote}
+\url{http://www.tug.org/mactex/2011/}
+\end{quote}
+%
+Once it is downloaded, just click on the \code{.mpkg} file and then
+follow the installer instructions.  The installer will add the command
+to the \code{PATH} environment variable so that the \code{pdflatex}
+used by \Stan is available from the command line.
+
+
+\subsection{Lucida Console Font}
+
+A free TrueType version of Lucida Console for the Mac is available
+at the following URL.
+%
+\begin{quote}
+\url{http://www.fontpalace.com/font-details/Lucida+Console/}
+\end{quote}
+%
+Download the \code{.ttf} file, then click on it to install.  It
+will then be availabe as a preference in the Mac terminal application.
+
+\subsection{Doxygen API Documentation}
+
+\Stan's API documentation is generated using the Doxygen tool.   This
+tool is available from
+%
+\begin{quote}
+\url{http://www.doxygen.org}
+\end{quote}
+%
+Select the \code{Download} link from the second of the right-hand side
+navigation bars, then select the binary distribution \code{.dmg} file
+for Mac OS X.  Clicking on the \code{.dmg} file opens the finder with
+a view of the unpacked Doxygen executable.  Just drag the Doxyge icon
+into the Applications folder (or wherever you want to keep it).  Then
+add the path to the Doxygen executable, 
+%
+\begin{quote}
+\url{/Applications/Doxygen.app/Contents/Resources/doxygen}
+\end{quote}
+%
+to the system \code{PATH} environment variable.  You can do add to the
+\code{PATH} environment by adding this line to the end of the
+top-level \Verb|~/.profile| file.  
+%
+\begin{quote}
+\begin{Verbatim}
+export PATH=/Applications/Doxygen.app/Contents/Resources:$PATH
+\end{Verbatim}
+\end{quote}
+%
+The next shell started will then be able to find the \code{doxygen} command.
 
 
 \section{Tips for Windows}

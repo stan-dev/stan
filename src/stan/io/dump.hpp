@@ -436,6 +436,24 @@ namespace stan {
       std::vector<size_t> dims_;
       std::istream& in_;
 
+      bool scan_single_char(char c_expected) {
+        int c = in_.peek();
+        if (c != c_expected)
+          return false;
+        char c_skip;
+        in_.get(c_skip);
+        return true;
+      }
+
+      bool scan_optional_long() {
+        if (scan_single_char('l'))
+          return true;
+        else if (scan_single_char('L'))
+          return true;
+        else
+          return false;
+      }
+
       bool scan_char(char c_expected) {
         char c;
         in_ >> c;
@@ -503,7 +521,6 @@ namespace stan {
           break;
         }
         while (in_.get(c)) {
-          if (std::isspace(c)) continue;
           if (std::isdigit(c) || c == '-') {
             buf.push_back(c);
           } else if (c == '.'
@@ -522,7 +539,7 @@ namespace stan {
           if (!(std::stringstream(buf) >> n))
             return false;
           stack_i_.push_back(n);
-          scan_char('L') || scan_char('l'); // allow optional L/l
+          scan_optional_long();
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
             stack_r_.push_back(static_cast<double>(stack_i_[j]));
@@ -573,9 +590,11 @@ namespace stan {
           if (!scan_char('(')) return false;
           size_t dim;
           in_ >> dim;
+          scan_optional_long(); 
           dims_.push_back(dim);
           while (scan_char(',')) {
             in_ >> dim;
+            scan_optional_long(); 
             dims_.push_back(dim);
           }
           if (!scan_char(')')) return false;

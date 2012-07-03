@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <boost/type_traits.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
 
@@ -57,6 +58,133 @@ namespace stan {
     typedef typename scalar_type<T>::type type;
   };
       
+
+  template <typename T>
+  struct is_vector {
+    enum { value = 0 };
+    typedef T type;
+  };
+  template <typename T>
+  struct is_vector <std::vector<T> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+  template <typename T>
+  struct is_vector <const std::vector<T> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+
+  template <typename T>
+  size_t length(const T& x) { 
+    if (is_vector<T>::value)
+      return ((std::vector<typename is_vector<T>::type>*)&x)->size();
+    else
+      return 1;
+  }
+
+  template <typename T1, typename T2, typename T3>
+  size_t max_size(const T1& x1, const T2& x2, const T3& x3) {
+    size_t result = length(x1);
+    result = result > length(x2) ? result : length(x2);
+    result = result > length(x3) ? result : length(x3);
+    // assert((length(x1) == 1) || (length(x1) == result));
+    // assert((length(x2) == 1) || (length(x2) == result));
+    // assert((length(x3) == 1) || (length(x3) == result));
+    return result;
+  }
+
+  // AmbiguousVector is the simple VectorView for writing doubles into
+  template <typename T, bool is_vec = 0>
+  class AmbiguousVector {
+  private:
+    T x_;
+  public:
+    AmbiguousVector(size_t /*n*/) : x_(0) { }
+    T& operator[](int /*i*/) { return x_; }
+    size_t size() { return 1; }
+  };
+
+  template <typename T>
+  class AmbiguousVector<T, 1> {
+  private:
+    std::vector<T> x_;
+  public:
+    AmbiguousVector(size_t n) : x_(n, 0) { }
+    T& operator[](int i) { return x_[i]; }
+    size_t size() { return x_.size(); }
+  };
+
+
+  // two template params for use in partials_vari OperandsAndPartials
+  template<typename T, bool is_vec = stan::is_vector<T>::value>
+  class VectorView {
+  private:
+    T x_;
+  public:
+    VectorView(T x) : x_(x) { }
+    T& operator[](int /*i*/) { 
+      return x_; 
+    }
+  };
+
+  template<typename T>
+  class VectorView<std::vector<T>, true> {
+  private:
+    std::vector<T>& x_;
+  public:
+    VectorView(std::vector<T>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+
+  template<typename T>
+  class VectorView<const std::vector<T>, true> {
+  private:
+    const std::vector<T>& x_;
+  public:
+    VectorView(const std::vector<T>& x) : x_(x) { }
+    const T& operator[](int i) const { 
+      return x_[i];
+    }
+  };
+
+  template<typename T, bool is_vec>
+  class VectorView<T*, is_vec> {
+  private:
+    T* x_;
+  public:
+    VectorView(T* x) : x_(x) { }
+    T& operator[](int i) { 
+      if (is_vec)
+        return x_[i];
+      else
+        return *x_;
+    }
+  };
+
+  /**
+   * Metaprogram to calculate the base scalar return type resulting
+   * from promoting all the scalar types of the template parameters.
+   */
+    template <typename T1, 
+              typename T2 = double, 
+              typename T3 = double, 
+              typename T4 = double, 
+              typename T5 = double, 
+              typename T6 = double>
+    struct return_type {
+      typedef typename 
+      boost::math::tools::promote_args<typename scalar_type<T1>::type,
+                                       typename scalar_type<T2>::type,
+                                       typename scalar_type<T3>::type,
+                                       typename scalar_type<T4>::type,
+                                       typename scalar_type<T5>::type,
+                                       typename scalar_type<T6>::type>::type
+      type;
+    };
+
 
 
 }

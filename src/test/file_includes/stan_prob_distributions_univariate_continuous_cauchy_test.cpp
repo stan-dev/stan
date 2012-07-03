@@ -1,4 +1,4 @@
-#include <stan/prob/distributions/univariate/continuous/Cauchy.hpp>
+#include <stan/prob/distributions/univariate/continuous/cauchy.hpp>
 #include <gtest/gtest.h>
 
 TEST(stanProbDistributionsUnivariateContinuousCauchy,headerParses) {

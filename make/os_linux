@@ -8,13 +8,11 @@
 ##
 
 ifeq (g++,$(CC_TYPE))
-  CFLAGS += -g
   CFLAGS_GTEST += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
-  CFLAGS += -g
 #  CFLAGS += -m32
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   LDLIBS += -static-libgcc
@@ -24,7 +22,6 @@ ifeq (mingw32-g++,$(CC_TYPE))
 endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wunused-function
-  CFLAGS += -g
   CFLAGS += -Wno-tautological-compare
   CFLAGS_GTEST += -lpthread
   #PCH = .pch

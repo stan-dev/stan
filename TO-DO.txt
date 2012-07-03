@@ -340,6 +340,9 @@ Command-line
 C++ API
 ----------------------------------------------------------------------
 
+* add scalar subtraction to match scalar addition of vectors
+  (to distribute over values)
+
 * make sure still possible to use header-only ad
 
 * as much partial eval for gradients as possible
@@ -395,6 +398,8 @@ C++ API
 
 Special Functions, Probability Functions and Distributions
 ----------------------------------------------------------------------
+* break out body of error handling to get isnan if/else inlined
+
 * beta distro with mean plus "precision" params
   - beta_mean_log(theta|phi,kappa)
     = beta_log(theta|phi*kappa, (1-phi)*kappa)
