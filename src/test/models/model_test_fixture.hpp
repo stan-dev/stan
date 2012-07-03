@@ -26,6 +26,7 @@ public:
   static stan::mcmc::chains<> *chains;
   static size_t num_chains;
   static std::vector<std::string> command_outputs;
+  static const size_t skip;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -91,7 +92,7 @@ public:
   static void populate_chains() {
     if (chains->num_kept_samples() == 0U) {
       for (size_t chain = 0U; chain < num_chains; chain++) {
-        stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), 2U);
+        stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), skip);
       }
     }
   }
@@ -127,7 +128,7 @@ public:
       
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(get_csv_file(0U), 2,
+    stan::mcmc::read_variables(get_csv_file(0U), skip,
                                names, dimss);
       
     return (new stan::mcmc::chains<>(num_chains, names, dimss));
@@ -172,6 +173,9 @@ std::string Model_Test_Fixture<Derived>::model_path;
 
 template<class Derived>
 std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
+
+template<class Derived>
+const size_t Model_Test_Fixture<Derived>::skip = 3U;
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
