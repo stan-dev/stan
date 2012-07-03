@@ -11,4 +11,5 @@ Depends: methods, Rcpp (>= 0.9.10), inline
 LinkingTo: Rcpp
 Imports: graphics  
 Suggests: ggplot2, grid, RUnit, gridExtra
+URL: https://code.google.com/p/stan/
 # RcppModules: yada

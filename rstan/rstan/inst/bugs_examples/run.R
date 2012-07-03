@@ -8,13 +8,13 @@ vol1/bones           bones.stan           bones.Rdata
 
 print(mod.def)
 
-STAN_HOME <- Sys.getenv("STAN_HOME")
+STAN_SRC_HOME <- paste0(system.file('include', package = 'rstan'), "/stansrc/") 
 
-BUGS_EX_PATH <- "/src/models/bugs_examples/"
+BUGS_EX_PATH <- "models/bugs_examples/"
 
 for (i in 1:nrow(mod.def)) {
-  scodef <- file.path(STAN_HOME, BUGS_EX_PATH, mod.def[i, 1], mod.def[i, 2])
-  dataf <- file.path(STAN_HOME, BUGS_EX_PATH, mod.def[i, 1], mod.def[i, 3])
+  scodef <- file.path(STAN_SRC_HOME, BUGS_EX_PATH, mod.def[i, 1], mod.def[i, 2])
+  dataf <- file.path(STAN_SRC_HOME, BUGS_EX_PATH, mod.def[i, 1], mod.def[i, 3])
   print(mod.def[i, 1]) 
   modelname <- basename(mod.def[i, 1]) 
   cat("model:", modelname, "\n")

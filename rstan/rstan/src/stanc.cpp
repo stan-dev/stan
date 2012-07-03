@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <Rcpp.h>
+
 RcppExport SEXP stanc(SEXP model_stancode, SEXP model_name);
 RcppExport SEXP stanc_version(); 
 

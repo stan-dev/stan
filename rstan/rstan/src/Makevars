@@ -1,9 +1,6 @@
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
 # PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L$(STAN_HOME)/bin -lstanc 
 # PKG_CPPFLAGS = -I$(STAN_HOME)/lib -I$(STAN_HOME)/src -I./include/ 
-
-PKG_CPPFLAGS =  -I"../inst/include/stansrc"  -I"../inst/include/stanlib"  -I"../inst/include" 
 
 ## As an alternative, one can also add this code in a file 'configure'
 ##
@@ -28,4 +25,32 @@ PKG_CPPFLAGS =  -I"../inst/include/stansrc"  -I"../inst/include/stanlib"  -I"../
 ## done by a number of packages, but recommended only for more advanced users
 ## comfortable with autoconf and its related tools.
 
+all: $(SHLIB) userLibrary
 
+## we place it inside the inst/ directory so that it gets installed by the package
+USERDIR = ../inst/libs
+
+USERLIB = librstan$(DYLIB_EXT)
+USERLIBST = librstan.a 
+
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
+PKG_CPPFLAGS += -I"../inst/include/stansrc"  -I"../inst/include/stanlib"  -I"../inst/include" 
+
+userLibrary: $(USERLIB) $(USERLIBST)
+	-@if test ! -e $(USERDIR)$(R_ARCH); then mkdir -p $(USERDIR)$(R_ARCH); fi
+	cp $(USERLIB) $(USERDIR)$(R_ARCH)
+	cp $(USERLIBST) $(USERDIR)$(R_ARCH)
+	rm $(USERLIB) $(USERLIBST)
+
+$(USERLIB): $(OBJECTS)
+	$(SHLIB_CXXLD) -o $(USERLIB) $(OBJECTS) $(SHLIB_CXXLDFLAGS) $(ALL_LIBS)
+	@if test -e "/usr/bin/install_name_tool"; then /usr/bin/install_name_tool -id $(R_PACKAGE_DIR)/lib$(R_ARCH)/$(USERLIB) $(USERLIB); fi
+
+$(USERLIBST): $(OBJECTS)
+	$(AR) qc $(USERLIBST) $(OBJECTS)
+	@if test -n "$(RANLIB)"; then $(RANLIB) $(USERLIBST); fi
+
+.PHONY: all clean userLibrary
+
+clean: 
+	rm -f $(OBJECTS) $(SHLIB) $(USERLIB) $(USERLIBST)
