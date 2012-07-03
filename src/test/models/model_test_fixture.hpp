@@ -216,7 +216,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using std::vector;
   using std::pair;
   using std::sqrt;
-  using std::abs;
+  using std::fabs;
   using std::setw;
 
   using boost::math::students_t;
@@ -245,7 +245,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     double se = c->sd(index) / sqrt(neff);
     double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
 
-    if (abs(expected_mean - sample_mean) > z*se) {
+    if (fabs(expected_mean - sample_mean) > z*se) {
       failed++;
       // want the error message to have which, what, how
       err_message << "parameter index: " << index
@@ -255,8 +255,8 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
                   << "\n\tse:          " << setw(10) << se
-                  << "\n\n\tabs(diff) > z * se: " 
-                  << abs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
+                  << "\n\n\tfabs(diff) > z * se: " 
+                  << fabs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
     }
   }
   
