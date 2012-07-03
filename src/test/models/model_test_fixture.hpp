@@ -97,7 +97,17 @@ public:
     }
   }
   
-    
+  static void test_gradient() {
+    std::string command = get_command(0U);
+    command += " --test_grad";
+    std::string command_output;
+    EXPECT_NO_THROW(command_output = run_command(command))
+      << "Gradient test failed. \n"
+      << "\tRan command: " << command << "\n"
+      << "\tCommand output: " << command_output;
+    //std::cout << "command_output: " << command_output << "\n";
+  }
+
   /** 
    * Runs the model num_chains times.
    * Populates the chains object after running the model.
@@ -178,6 +188,10 @@ template<class Derived>
 const size_t Model_Test_Fixture<Derived>::skip = 3U;
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
+
+TYPED_TEST_P(Model_Test_Fixture, TestGradient) {
+  TypeParam::test_gradient();
+}
 
 TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
@@ -288,6 +302,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 }
 
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
+                           TestGradient,
                            RunModel,
                            ChainsTest,
                            ExpectedValuesTest);
