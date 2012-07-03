@@ -27,7 +27,7 @@ std::vector<TestInfo> getTestCases() {
   testCases.push_back(TestInfo(1024, 2, 250));
   testCases.push_back(TestInfo(4096, 2, 250));
   
-  testCases.push_back(TestInfo(128,  8, 150));
+  /*testCases.push_back(TestInfo(128,  8, 150));
   testCases.push_back(TestInfo(1024, 8, 150));
   testCases.push_back(TestInfo(4096, 8, 150));
   
@@ -39,7 +39,7 @@ std::vector<TestInfo> getTestCases() {
   testCases.push_back(TestInfo(4096, 128, 1000));
   
   testCases.push_back(TestInfo(1024, 512, 100000));
-  testCases.push_back(TestInfo(4096, 512, 100000));
+  testCases.push_back(TestInfo(4096, 512, 100000));*/
   
   return testCases;
 }
