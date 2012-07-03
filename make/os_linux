@@ -21,7 +21,7 @@ ifeq (mingw32-g++,$(CC_TYPE))
   EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
-  CFLAGS += -Wunused-function
+  CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
   CFLAGS_GTEST += -lpthread
   #PCH = .pch
