@@ -226,6 +226,18 @@ namespace stan {
       }
 
       /**
+       * Use this method to write the adaptation parameters into
+       * the output.  
+       *
+       * These should be written as one or more comment lines,
+       * each starting with a \code{#} character.
+       *
+       * @param o Output stream to which adaptation information is written.
+       */
+      virtual void write_adaptation_params(std::ostream& o) {
+      }
+
+      /**
        * Write out any sampler-specific parameter names for output.
        *
        * This method must

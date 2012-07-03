@@ -38,6 +38,8 @@ namespace stan {
     template <class BaseRNG = boost::mt19937>
     class adaptive_hmc : public adaptive_sampler {
     private:
+
+      // FIXME:  make _model constant
       // Provides the target distribution we're trying to sample from
       stan::model::prob_grad& _model;
     
@@ -49,8 +51,13 @@ namespace stan {
       // The +/- around epsilon
       double _epsilon_pm;
 
+      // last value of epsilon used by the algorithm
+      double _last_epsilon;
+      bool _adapt_epsilon;
+
+
       // The desired value of E[acceptance probability]
-      double _delta;
+      const double _delta;
 
       // The most recent setting of the real-valued parameters
       std::vector<double> _x;
@@ -116,6 +123,8 @@ namespace stan {
 
           _epsilon(epsilon),
           _epsilon_pm(epsilon_pm),
+          _last_epsilon(epsilon),
+          _adapt_epsilon(epsilon < 0.0),
 
           _delta(delta),
           
@@ -131,7 +140,7 @@ namespace stan {
           _da(gamma, std::vector<double>(1, 0)) {
         model.init(_x,_z);
         _logp = model.grad_log_prob(_x,_z,_g);
-        if (_epsilon <= 0.0)
+        if (_adapt_epsilon)
           find_reasonable_parameters();
         _da.setx0(std::vector<double>(1, log(_epsilon)));
       }
@@ -174,7 +183,7 @@ namespace stan {
        */
       void set_params_r(const std::vector<double>& x) {
         if (x.size() != _model.num_params_r())
-          throw std::invalid_argument ("x.size() must match the number of parameters of the model.");
+          throw std::invalid_argument("x.size() must match number of model params.");
         _x = x;
         _logp = _model.grad_log_prob(_x,_z,_g);
       }
@@ -232,6 +241,10 @@ namespace stan {
         }
       }
 
+      bool varying_epsilon() {
+        return _epsilon_pm != 0;
+      }
+
       /**
        * Returns the next sample.
        *
@@ -258,13 +271,14 @@ namespace stan {
         std::vector<double> x_new(_x);
         double logp_new = -1e100;
         double epsilon = _epsilon;
-        if (_epsilon_pm != 0.0) { // to adapt w/o randomizing, include "&& !adapting()"
+        // only vary epsilon after done adapting
+        if (!adapting() && varying_epsilon()) { 
           double low = epsilon * (1.0 - _epsilon_pm);
           double high = epsilon * (1.0 + _epsilon_pm);
           double range = high - low;
           epsilon = low + (range * _rand_uniform_01());
         }
-
+        _last_epsilon = epsilon;
         for (unsigned int l = 0; l < _L; ++l)
           logp_new = leapfrog(_model, _z, x_new, m, g_new, epsilon);
         nfevals_plus_eq(_L);
@@ -284,7 +298,7 @@ namespace stan {
         if (adapting()) {
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
-          std::vector<double> result;
+          std::vector<double> result; // FIXME: update directly to _epsilon?
           _da.update(gvec, result);
           _epsilon = exp(result[0]);
         }
@@ -320,6 +334,18 @@ namespace stan {
       virtual void get_parameters(std::vector<double>& params) {
         params.assign(1, _epsilon);
       }
+
+
+      virtual void write_sampler_param_names(std::ostream& o) {
+        if (_adapt_epsilon || varying_epsilon())
+          o << "stepsize__,";
+      }
+
+      virtual void write_sampler_params(std::ostream& o) {
+        if (_adapt_epsilon || varying_epsilon())
+          o << _last_epsilon << ',';
+      }
+
 
     };
 

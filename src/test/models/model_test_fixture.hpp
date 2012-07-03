@@ -26,6 +26,7 @@ public:
   static stan::mcmc::chains<> *chains;
   static size_t num_chains;
   static std::vector<std::string> command_outputs;
+  static const size_t skip;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -91,7 +92,7 @@ public:
   static void populate_chains() {
     if (chains->num_kept_samples() == 0U) {
       for (size_t chain = 0U; chain < num_chains; chain++) {
-        stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), 2U);
+        stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), skip);
       }
     }
   }
@@ -127,7 +128,7 @@ public:
       
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(get_csv_file(0U), 2,
+    stan::mcmc::read_variables(get_csv_file(0U), skip,
                                names, dimss);
       
     return (new stan::mcmc::chains<>(num_chains, names, dimss));
@@ -173,6 +174,9 @@ std::string Model_Test_Fixture<Derived>::model_path;
 template<class Derived>
 std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
 
+template<class Derived>
+const size_t Model_Test_Fixture<Derived>::skip = 3U;
+
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
 TYPED_TEST_P(Model_Test_Fixture, RunModel) {
@@ -212,7 +216,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using std::vector;
   using std::pair;
   using std::sqrt;
-  using std::abs;
+  using std::fabs;
   using std::setw;
 
   using boost::math::students_t;
@@ -241,7 +245,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     double se = c->sd(index) / sqrt(neff);
     double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
 
-    if (abs(expected_mean - sample_mean) > z*se) {
+    if (fabs(expected_mean - sample_mean) > z*se) {
       failed++;
       // want the error message to have which, what, how
       err_message << "parameter index: " << index
@@ -251,8 +255,8 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
                   << "\n\tse:          " << setw(10) << se
-                  << "\n\n\tabs(diff) > z * se: " 
-                  << abs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
+                  << "\n\n\tfabs(diff) > z * se: " 
+                  << fabs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
     }
   }
   

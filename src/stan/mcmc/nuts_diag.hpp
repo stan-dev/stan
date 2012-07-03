@@ -53,6 +53,8 @@ namespace stan {
 
       // The +/- around epsilon 
       double _epsilon_pm; 
+      double _last_epsilon;
+      const bool _adapt_epsilon;
 
       // The desired value of E[number of states in slice in last doubling]
       double _delta;
@@ -152,7 +154,9 @@ namespace stan {
 
           _epsilon(epsilon),
           _epsilon_pm(epsilon_pm),
-          
+          _last_epsilon(epsilon),
+          _adapt_epsilon(epsilon < 0.0),
+
           _delta(delta),
           _gamma(gamma),
 
@@ -240,6 +244,10 @@ namespace stan {
         }
       }
 
+      bool varying_epsilon() {
+        return _epsilon_pm != 0;
+      }
+
       /**
        * Return the next sample.
        *
@@ -274,6 +282,17 @@ namespace stan {
         int n_considered = 0;
         // for-loop with depth outside to set lastdepth
         int depth = 0;
+
+        double epsilon = _epsilon;
+        // only vary epsilon after done adapting
+        if (!adapting() && varying_epsilon()) { 
+          double low = epsilon * (1.0 - _epsilon_pm);
+          double high = epsilon * (1.0 + _epsilon_pm);
+          double range = high - low;
+          epsilon = low + (range * _rand_uniform_01());
+        }
+        _last_epsilon = epsilon; // use last_epsilon in tree build
+
         while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
           direction = 2 * (_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
@@ -305,7 +324,7 @@ namespace stan {
         // Now we just have to update global (epsilon) and local
         // (step_sizes) step sizes, if adaptation is on.
         double adapt_stat = prob_sum / float(n_considered);
-        if (adapting()) {
+        if (adapting()) { 
           // epsilon.
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
@@ -341,20 +360,35 @@ namespace stan {
         double avg_eta = 1.0 / n_steps();
         update_mean_stat(avg_eta,adapt_stat);
 
-        mcmc::sample s(_x, _z, _logp);
-        return s;
+        return mcmc::sample(_x, _z, _logp);
       }
 
       int last_depth() {
         return _lastdepth;
       }
 
-      virtual void write_sampler_param_names(std::ostream& o) {
+     virtual void write_sampler_param_names(std::ostream& o) {
         o << "treedepth__,";
+        if (_adapt_epsilon || varying_epsilon())
+          o << "stepsize__,";
       }
 
       virtual void write_sampler_params(std::ostream& o) {
         o << _lastdepth << ',';
+        if (_adapt_epsilon || varying_epsilon())
+          o << _last_epsilon << ',';
+      }
+
+      virtual void write_adaptation_params(std::ostream& o) {
+        o << "# (mcmc::nuts_diag) adaptation finished" << '\n';
+        o << "# step size=" << _epsilon << '\n';
+        o << "# parameter masses:\n"; // FIXME:  names/delineation requires access to model
+        o << "# ";
+        for (size_t k = 0; k < _step_sizes.size(); ++k) {
+          if (k > 0) o << ',';
+          o << _step_sizes[k];
+        }
+        o << '\n';
       }
 
 
@@ -421,7 +455,7 @@ namespace stan {
           gradminus = grad;
           mminus = m;
           newlogp = rescaled_leapfrog(_model, _z, _step_sizes, xminus,
-                                      mminus, gradminus, direction * _epsilon);
+                                      mminus, gradminus, direction * _last_epsilon);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;

@@ -13,8 +13,6 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <Eigen/Dense>
-
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>

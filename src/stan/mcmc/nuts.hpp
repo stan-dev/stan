@@ -52,6 +52,11 @@ namespace stan {
 
       // The +/- around epsilon 
       double _epsilon_pm; 
+      
+      // last value used for epsilon
+      double _last_epsilon;
+
+      bool _adapt_epsilon;
 
       // The desired value of E[number of states in slice in last doubling]
       double _delta;
@@ -143,6 +148,8 @@ namespace stan {
 
           _epsilon(epsilon),
           _epsilon_pm(epsilon_pm),
+          _last_epsilon(epsilon),
+          _adapt_epsilon(epsilon < 0.0),
           
           _delta(delta),
           _gamma(gamma),
@@ -160,7 +167,7 @@ namespace stan {
         
         model.init(_x, _z);
         _logp = model.grad_log_prob(_x, _z, _g);
-        if (_epsilon <= 0)
+        if (_adapt_epsilon)
           find_reasonable_parameters();
         if (adapting()) {
           // Err on the side of regularizing epsilon towards being too big;
@@ -175,6 +182,7 @@ namespace stan {
        * The implementation for this class is a no-op.
        */
       ~nuts() { }
+
 
       /**
        * Set the model real and integer parameters to the specified
@@ -230,6 +238,10 @@ namespace stan {
         }
       }
 
+      bool varying_epsilon() {
+        return _epsilon_pm != 0;
+      }
+
       /**
        * Return the next sample.
        *
@@ -264,6 +276,17 @@ namespace stan {
         int n_considered = 0;
         // for-loop with depth outside to set lastdepth
         int depth = 0;
+
+        double epsilon = _epsilon;
+        // only vary epsilon after done adapting
+        if (!adapting() && varying_epsilon()) { 
+          double low = epsilon * (1.0 - _epsilon_pm);
+          double high = epsilon * (1.0 + _epsilon_pm);
+          double range = high - low;
+          epsilon = low + (range * _rand_uniform_01());
+        }
+        _last_epsilon = epsilon; // use last_epsilon in tree build
+
         while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
           direction = 2 * (_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
@@ -318,10 +341,14 @@ namespace stan {
 
       virtual void write_sampler_param_names(std::ostream& o) {
         o << "treedepth__,";
+        if (_adapt_epsilon || varying_epsilon())
+          o << "stepsize__,";
       }
 
       virtual void write_sampler_params(std::ostream& o) {
         o << _lastdepth << ',';
+        if (_adapt_epsilon || varying_epsilon())
+          o << _last_epsilon << ',';
       }
 
 
@@ -387,8 +414,9 @@ namespace stan {
           xminus = x;
           gradminus = grad;
           mminus = m;
+          // FIXME:  lepfrog needs +/- _epsilon_pm
           newlogp = leapfrog(_model, _z, xminus, mminus, gradminus,
-                             direction * _epsilon);
+                             direction * _last_epsilon);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;
