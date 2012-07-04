@@ -58,10 +58,9 @@ struct qr_preconditioner_should_do_anything
   };
 };
 
-// Stan-specific patch of "struct" -> "class" to match specializations
 template<typename MatrixType, int QRPreconditioner, int Case,
          bool DoAnything = qr_preconditioner_should_do_anything<MatrixType, QRPreconditioner, Case>::ret
-> class qr_preconditioner_impl {};
+> struct qr_preconditioner_impl {};
 
 template<typename MatrixType, int QRPreconditioner, int Case>
 class qr_preconditioner_impl<MatrixType, QRPreconditioner, Case, false>
