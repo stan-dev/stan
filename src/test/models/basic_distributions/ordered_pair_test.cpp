@@ -5,6 +5,7 @@ class Models_BasicDistributions_OrderedPair :
   public Model_Test_Fixture<Models_BasicDistributions_OrderedPair> {
 protected:
   virtual void SetUp() {
+    populate_chains();
   }
 public:
   static std::vector<std::string> get_model_path() {
@@ -26,6 +27,21 @@ public:
 
 };
 
+
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_OrderedPair,
 			      Model_Test_Fixture,
 			      Models_BasicDistributions_OrderedPair);
+
+
+TEST_F(Models_BasicDistributions_OrderedPair,
+       Test_Ordered_Pair) {
+  using std::vector;
+  vector<double> a, b;
+  chains->get_samples(0U, a);
+  chains->get_samples(1U, b);
+
+  for (size_t n = 0; n < chains->num_samples(); n++)
+    EXPECT_TRUE(a[n] < b[n])
+      << n << ": expecting " << a[n] << " to be less than " << b[n];
+
+}
