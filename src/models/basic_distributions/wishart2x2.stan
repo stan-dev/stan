@@ -45,7 +45,7 @@ model {
   //     | rho * sd2               rho * sd1        sd1 * sd2 * (1 - rho^2)   |
 
   lp__ <- lp__ + log(2.0 * sd1) + log(2.0 * sd2) + log(sd1 * sd2 * (1.0 - rho * rho));
-
+  
   W ~ wishart(4, S);
 }
 
