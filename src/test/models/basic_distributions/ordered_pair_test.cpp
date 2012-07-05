@@ -40,8 +40,12 @@ TEST_F(Models_BasicDistributions_OrderedPair,
   chains->get_samples(0U, a);
   chains->get_samples(1U, b);
 
-  for (size_t n = 0; n < chains->num_samples(); n++)
-    EXPECT_TRUE(a[n] < b[n])
+  for (size_t n = 0; n < chains->num_samples(); n++) {
+    EXPECT_GE(a[n], -5);
+    EXPECT_LE(a[n], 5);
+    EXPECT_GE(b[n], -5);
+    EXPECT_LE(b[n], 5);
+    EXPECT_LT(a[n], b[n])
       << n << ": expecting " << a[n] << " to be less than " << b[n];
-
+  }
 }

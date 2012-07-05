@@ -131,14 +131,14 @@ public:
    * @return An initialized chains object.
    */
   static stan::mcmc::chains<>* create_chains() {
-    std::string command = get_command(0U);
+    std::string command = get_command(num_chains);
     command += " --iter=0";
     EXPECT_NO_THROW(run_command(command)) 
       << "Can not build header using: " << command;
       
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(get_csv_file(0U), skip,
+    stan::mcmc::read_variables(get_csv_file(num_chains), skip,
                                names, dimss);
       
     return (new stan::mcmc::chains<>(num_chains, names, dimss));
