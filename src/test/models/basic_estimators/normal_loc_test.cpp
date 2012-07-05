@@ -21,7 +21,10 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+
+    expected_values.push_back(make_pair(0U, 1.15));
     return expected_values;
   }
 
