@@ -19,6 +19,10 @@ public:
     return false;
   }
 
+  static size_t num_iterations() {
+    return iterations;
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
     using std::make_pair;

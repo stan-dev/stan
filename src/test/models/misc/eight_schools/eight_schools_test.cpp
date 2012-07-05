@@ -15,8 +15,13 @@ public:
     model_path.push_back("eight_schools");
     return model_path;
   }
+  
   static bool has_data() {
     return true;
+  }
+  
+  static size_t num_iterations() {
+    return iterations;
   }
 
   static std::vector<std::pair<size_t, double> >
@@ -24,7 +29,6 @@ public:
     std::vector<std::pair<size_t, double> > expected_values;
     return expected_values;
   }
-
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_Misc_EightSchools,
