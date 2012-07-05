@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
+#include <algorithm>
 
 class Models_BasicDistributions_Triangle : 
   public Model_Test_Fixture<Models_BasicDistributions_Triangle> {
@@ -20,7 +21,11 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+    
+    expected_values.push_back(make_pair(0U, 0));
+    
     return expected_values;
   }
 
@@ -29,3 +34,22 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Triangle,
 			      Model_Test_Fixture,
 			      Models_BasicDistributions_Triangle);
+
+TEST_F(Models_BasicDistributions_Triangle,
+	Test_Triangle) {
+  populate_chains();
+  
+  std::vector<double> y;
+  
+  chains->get_samples(0U, y);
+  
+  double min, max;
+  min = *std::min_element(y.begin(), y.end());
+  max = *std::max_element(y.begin(), y.end());
+
+  EXPECT_LE(min, -0.9)
+    << "expecting to get close to the corner";
+  EXPECT_GE(max, 0.9)
+    << "expecting to get close to the corner";
+}
+
