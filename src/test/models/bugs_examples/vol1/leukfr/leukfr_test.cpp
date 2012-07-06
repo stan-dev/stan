@@ -25,6 +25,10 @@ public:
     return iterations;
   }
 
+  static void populate_chains() {
+    default_populate_chains();
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
     std::vector<std::pair<size_t, double> > expected_values;

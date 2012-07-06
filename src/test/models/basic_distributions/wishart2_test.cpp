@@ -19,7 +19,11 @@ public:
   }
 
   static size_t num_iterations() {
-    return iterations;
+    return 8000U;
+  }
+
+  static void populate_chains() {
+    default_populate_chains();
   }
 
   static std::vector<std::pair<size_t, double> >
