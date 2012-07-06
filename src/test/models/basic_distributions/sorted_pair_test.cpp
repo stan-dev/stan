@@ -23,14 +23,13 @@ public:
     return iterations;
   }
 
+  static void populate_chains() {
+    default_populate_chains();
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
-    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
-    
-    expected_values.push_back(make_pair(0U, 0));
-    expected_values.push_back(make_pair(1U, 0));
-
     return expected_values;
   }
 

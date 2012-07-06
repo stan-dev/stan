@@ -89,16 +89,19 @@ public:
     return command.str();
   }
 
-
   /** 
    * Populates the chains object with data from csv files.
    */
-  static void populate_chains() {
+  static void default_populate_chains() {
     if (chains->num_kept_samples() == 0U) {
       for (size_t chain = 0U; chain < num_chains; chain++) {
         stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), skip);
       }
     }
+  }
+
+  static void populate_chains() {
+    Derived::populate_chains();
   }
   
   static void test_gradient() {
