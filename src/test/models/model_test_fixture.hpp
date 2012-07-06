@@ -266,7 +266,6 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   double alpha = 0.05;
   if (n < 3)
     alpha = 0.01;
-
   
   int failed = 0;
   std::stringstream err_message;
@@ -299,6 +298,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 
   double p = 1 - cdf(binomial(n, alpha), failed);
   // this test should fail less than 0.1% of the time.
+  // (if all the parameters are failing independently... ha)
   if (p < 0.001) {
     err_message << "------------------------------------------------------------\n";
     for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {
