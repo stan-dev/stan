@@ -1,4 +1,3 @@
-
 transformed data {
   cov_matrix(3) S;
   S[1, 1] <- 2; S[1, 2] <- 0; S[1, 3] <- 0; 

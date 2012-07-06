@@ -17,6 +17,10 @@ public:
     return false;
   }
 
+  static size_t num_iterations() {
+    return iterations;
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
     using std::make_pair;
@@ -47,3 +51,4 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Binormal,
 			      Model_Test_Fixture,
 			      Models_BasicDistributions_Binormal);
+

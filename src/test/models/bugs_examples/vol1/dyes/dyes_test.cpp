@@ -20,6 +20,10 @@ public:
     return true;
   }
 
+  static size_t num_iterations() {
+    return 5000U;
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
     std::vector<std::pair<size_t, double> > expected_values;
