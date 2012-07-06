@@ -331,7 +331,7 @@ namespace stan {
         void chain() {
           static const double NEG_HALF = -0.5;
           static const double INV_SQRT_TWO_PI 
-            = 1.0 / std::sqrt(2.0 * std::sqrt(boost::math::constants::pi<double>()));
+            = 1.0 / std::sqrt(2.0 * boost::math::constants::pi<double>());
           avi_->adj_ += adj_ * INV_SQRT_TWO_PI * std::exp(NEG_HALF * avi_->val_ * avi_->val_);
         }
       };
@@ -738,7 +738,7 @@ namespace stan {
      */
     template <class Policy>
     inline var exp2(const stan::agrad::var& a,
-		    const Policy&) {
+                    const Policy&) {
       static const char* function = "stan::math::exp2(%1%)";
       double result;
       if (!check_not_nan(function, a, "a", &result, Policy()))
@@ -1179,13 +1179,13 @@ namespace stan {
      */
     template <class Policy>
     inline var log2(const stan::agrad::var& a,
-		    const Policy&) {
+                    const Policy&) {
       static const char* function = "stan::math::log2(%1%)";
       double result;
       if (!check_not_nan(function, a, "a", &result, Policy()))
         return result;
       if(!check_greater_or_equal(function,a,0.0,"a", &result, Policy()))
-	return result;
+        return result;
       return var(new log2_vari(a.vi_));
     }
  /**
@@ -1282,13 +1282,13 @@ namespace stan {
     template <class Policy>
     inline var fdim(const stan::agrad::var& a,
                     const stan::agrad::var& b,
-		    const Policy&) {
+                    const Policy&) {
       static const char* function = "stan::math::fdim(%1%)";
       double result;
       if(!check_not_nan(function, a, "a", &result, Policy()))
-	return result;
+        return result;
       if(!check_not_nan(function, b, "b", &result, Policy()))
-	return result;
+        return result;
       return a.vi_->val_ > b.vi_->val_
         ? var(new fdim_vv_vari(a.vi_,b.vi_))
         : var(new vari(0.0));
@@ -1361,14 +1361,14 @@ namespace stan {
      */
     template <class Policy>  
     inline var fdim(const double& a,
-		    const stan::agrad::var& b,
-		    const Policy&) {
+                    const stan::agrad::var& b,
+                    const Policy&) {
       static const char* function = "stan::math::fdim(%1%)";
       double result;
       if(!check_not_nan(function, a, "a", &result, Policy()))
-	return result;
+        return result;
       if(!check_not_nan(function, b, "b", &result, Policy()))
-	return result;
+        return result;
       return a > b.vi_->val_
         ? var(new fdim_dv_vari(a,b.vi_))
         : var(new vari(0.0));
@@ -1393,13 +1393,13 @@ namespace stan {
     template <class Policy>  
     inline var fdim(const stan::agrad::var& a,
                     const double& b,
-		    const Policy&) {
+                    const Policy&) {
       static const char* function = "stan::math::fdim(%1%)";
       double result;
       if(!check_not_nan(function, a, "a", &result, Policy()))
-	return result;
+        return result;
       if(!check_not_nan(function,b,"b", &result, Policy()))
-	return result;
+        return result;
       return a.vi_->val_ > b
         ? var(new fdim_vd_vari(a.vi_,b))
         : var(new vari(0.0));

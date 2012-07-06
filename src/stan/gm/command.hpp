@@ -401,8 +401,7 @@ namespace stan {
 
       if (command.has_flag("test_grad")) {
         std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-        model.test_gradients(params_r,params_i);
-        return 0;
+        return model.test_gradients(params_r,params_i);
       }
 
       std::fstream sample_stream(sample_file.c_str(), 

@@ -19,9 +19,25 @@ public:
     return false;
   }
 
+  static size_t num_iterations() {
+    return iterations;
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+    
+    expected_values.push_back(make_pair(0U, 2));  // W[1,1]
+    expected_values.push_back(make_pair(1U, 0));  // W[1,2]
+    expected_values.push_back(make_pair(2U, 0));  // W[1,3]
+    expected_values.push_back(make_pair(3U, 0));  // W[2,1]
+    expected_values.push_back(make_pair(4U, 1));  // W[2,2]
+    expected_values.push_back(make_pair(5U, 0));  // W[2,3]
+    expected_values.push_back(make_pair(6U, 0));  // W[3,1]
+    expected_values.push_back(make_pair(7U, 0));  // W[3,2]
+    expected_values.push_back(make_pair(8U, 0.5));// W[3,3]
+
     return expected_values;
   }
 

@@ -8,7 +8,12 @@
 
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
-  PCH = .gch
+  VERSION := $(CC_MAJOR).$(CC_MINOR)
+  ifeq (4.2,$(CC_MAJOR).$(CC_MINOR))
+    PCH = 
+  else
+    PCH = .gch
+  endif
 endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function

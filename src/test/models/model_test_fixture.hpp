@@ -27,6 +27,7 @@ public:
   static size_t num_chains;
   static std::vector<std::string> command_outputs;
   static const size_t skip;
+  static size_t iterations;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -40,7 +41,9 @@ public:
    */
   static void SetUpTestCase() {
     model_path = convert_model_path(get_model_path());
-    
+
+    iterations = num_iterations();
+
     chains = create_chains();
   }
     
@@ -81,7 +84,8 @@ public:
     if (has_data()) {
       command << " --data=" << model_path << ".Rdata";
     }
-    command << " --refresh=2000";
+    command << " --iter=" << iterations;
+    command << " --refresh=" << iterations;
     return command.str();
   }
 
@@ -97,7 +101,17 @@ public:
     }
   }
   
-    
+  static void test_gradient() {
+    std::string command = get_command(0U);
+    command += " --test_grad";
+    std::string command_output;
+    EXPECT_NO_THROW(command_output = run_command(command))
+      << "Gradient test failed. \n"
+      << "\tRan command: " << command << "\n"
+      << "\tCommand output: " << command_output;
+    //std::cout << "command_output: " << command_output << "\n";
+  }
+
   /** 
    * Runs the model num_chains times.
    * Populates the chains object after running the model.
@@ -121,14 +135,15 @@ public:
    * @return An initialized chains object.
    */
   static stan::mcmc::chains<>* create_chains() {
-    std::string command = get_command(0U);
-    command += " --iter=0";
-    EXPECT_NO_THROW(run_command(command)) 
-      << "Can not build header using: " << command;
+    std::stringstream command;
+    command << get_command(num_chains)
+	    << " --iter=0";
+    EXPECT_NO_THROW(run_command(command.str())) 
+      << "Can not build header using: " << command.str();
       
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(get_csv_file(0U), skip,
+    stan::mcmc::read_variables(get_csv_file(num_chains), skip,
                                names, dimss);
       
     return (new stan::mcmc::chains<>(num_chains, names, dimss));
@@ -155,6 +170,10 @@ public:
     return Derived::has_data();
   }
   
+  static size_t num_iterations() {
+    return Derived::num_iterations();
+  }
+
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
     return Derived::get_expected_values();
@@ -177,7 +196,15 @@ std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
 template<class Derived>
 const size_t Model_Test_Fixture<Derived>::skip = 3U;
 
+template<class Derived>
+size_t Model_Test_Fixture<Derived>::iterations = 2000U;
+
+
 TYPED_TEST_CASE_P(Model_Test_Fixture);
+
+TYPED_TEST_P(Model_Test_Fixture, TestGradient) {
+  TypeParam::test_gradient();
+}
 
 TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
@@ -203,9 +230,13 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   size_t num_params = c->num_params();
   for (size_t chain = 0; chain < num_chains; chain++) {
     for (size_t param = 0; param < num_params; param++) {
-      EXPECT_TRUE(c->variance(chain, param) > 0)
+      EXPECT_GT(c->variance(chain, param), 0)
         << "Chain " << chain << ", param " << param
         << ": variance is 0" << std::endl
+        << err_message[chain];
+      EXPECT_LT(c->split_potential_scale_reduction(param), 1.1)
+	<< "Chain " << chain << ", param " << param
+        << ": split r hat > 1.1" << std::endl
         << err_message[chain];
     }
   }
@@ -216,7 +247,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using std::vector;
   using std::pair;
   using std::sqrt;
-  using std::abs;
+  using std::fabs;
   using std::setw;
 
   using boost::math::students_t;
@@ -245,7 +276,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     double se = c->sd(index) / sqrt(neff);
     double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
 
-    if (abs(expected_mean - sample_mean) > z*se) {
+    if (fabs(expected_mean - sample_mean) > z*se) {
       failed++;
       // want the error message to have which, what, how
       err_message << "parameter index: " << index
@@ -255,8 +286,8 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
                   << "\n\tse:          " << setw(10) << se
-                  << "\n\n\tabs(diff) > z * se: " 
-                  << abs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
+                  << "\n\n\tfabs(diff) > z * se: " 
+                  << fabs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
     }
   }
   
@@ -288,6 +319,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 }
 
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
+                           TestGradient,
                            RunModel,
                            ChainsTest,
                            ExpectedValuesTest);

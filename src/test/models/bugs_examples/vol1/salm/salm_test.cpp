@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
 
-class Models_BugsExamples_Vol1_Salm2 : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_Salm2> {
+class Models_BugsExamples_Vol1_Salm : 
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Salm> {
 protected:
   virtual void SetUp() {
   }
@@ -13,12 +13,16 @@ public:
     model_path.push_back("bugs_examples");
     model_path.push_back("vol1");
     model_path.push_back("salm");
-    model_path.push_back("salm2");
+    model_path.push_back("salm");
     return model_path;
   }
 
   static bool has_data() {
     return true;
+  }
+
+  static size_t num_iterations() {
+    return iterations;
   }
 
   static std::vector<std::pair<size_t, double> >
@@ -29,6 +33,6 @@ public:
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Salm2,
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Salm,
 			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Salm2);
+			      Models_BugsExamples_Vol1_Salm);

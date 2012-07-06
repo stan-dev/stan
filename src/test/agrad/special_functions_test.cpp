@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include "stan/agrad/agrad.hpp"
 #include "stan/agrad/special_functions.hpp"
+#include "stan/prob/distributions/univariate/continuous/normal.hpp"
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
@@ -282,7 +283,7 @@ TEST(agrad_agrad_special_functions,exp2_defaultpolicy) {
   
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-		  stan::math::exp2(a).val());
+                  stan::math::exp2(a).val());
   
   a = std::numeric_limits<AVAR>::quiet_NaN();
   EXPECT_THROW(stan::math::exp2(a), std::domain_error);
@@ -300,7 +301,7 @@ TEST(agrad_agrad_special_functions,exp2_errnopolicy) {
   
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-		  stan::math::exp2(a, errno_policy()).val());
+                  stan::math::exp2(a, errno_policy()).val());
 
   a = std::numeric_limits<AVAR>::quiet_NaN();
   EXPECT_NO_THROW(f = stan::math::exp2(a, errno_policy()));
@@ -597,7 +598,7 @@ TEST(agrad_agrad_special_functions,log2_defaultpolicy) {
 
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-		  stan::math::log2(a).val());
+                  stan::math::log2(a).val());
 
   a = std::numeric_limits<AVAR>::quiet_NaN();
   EXPECT_THROW(stan::math::log2(a), std::domain_error);
@@ -618,7 +619,7 @@ TEST(agrad_agrad_special_functions,log2_errnopolicy) {
 
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-		  stan::math::log2(a, errno_policy()).val());
+                  stan::math::log2(a, errno_policy()).val());
 
   a = std::numeric_limits<AVAR>::quiet_NaN();
   EXPECT_NO_THROW(f = stan::math::log2(a, errno_policy()));
@@ -1748,3 +1749,30 @@ TEST(AgradSpecialFunctions,value_of) {
   EXPECT_FLOAT_EQ(5.0, value_of(5.0)); // make sure all work together
   EXPECT_FLOAT_EQ(5.0, value_of(5));
 }
+
+TEST(AgradSpecialFunctions, Phi) {
+  using stan::agrad::var;
+  using stan::math::value_of;
+  using std::exp;
+  using stan::prob::normal_log;
+  
+
+  std::vector<double> y_values;
+  y_values.push_back(0.0);
+  y_values.push_back(0.9);
+  y_values.push_back(-5.0);
+
+  for (size_t i = 0; i < y_values.size(); i++) {
+    var y, phi_y;
+    AVEC x;
+    VEC dy;
+    y = y_values[i];
+    phi_y = stan::agrad::Phi(y);
+    x = createAVEC(y);
+    phi_y.grad(x,dy);
+    EXPECT_FLOAT_EQ(stan::math::Phi(value_of(y)), value_of(phi_y));
+    EXPECT_FLOAT_EQ(exp(normal_log(value_of(y), 0.0, 1.0)), dy[0])
+      << "y = " << y;
+  }
+}
+
