@@ -10,6 +10,10 @@ RCPP_MODULE(%model_name%){
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::call_sampler) 
 
+    .method("get_param_dimss", 
+            &rstan::stan_fit<%model_name%_namespace::%model_name%,
+                             boost::random::ecuyer1988>::get_param_dimss) 
+
     .method("get_samples", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_samples) 
@@ -17,14 +21,6 @@ RCPP_MODULE(%model_name%){
     .method("get_chain_samples", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,
                              boost::random::ecuyer1988>::get_chain_samples) 
-
-    .method("get_kept_samples", 
-            &rstan::stan_fit<%model_name%_namespace::%model_name%,
-                             boost::random::ecuyer1988>::get_kept_samples) 
-
-    .method("get_chain_kept_samples", 
-            &rstan::stan_fit<%model_name%_namespace::%model_name%,
-                             boost::random::ecuyer1988>::get_chain_kept_samples) 
 
     .method("param_names", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%,

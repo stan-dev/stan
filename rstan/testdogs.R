@@ -1,19 +1,6 @@
 
 
 options(error = dump.frames)
-
-
-## not working???
-#   Sys.setenv(STAN_HOME = '/home/jq/Desktop/stan') 
-#   LD_LIBRARY_PATH = paste(Sys.getenv("LD_LIBRARY_PATH"), 
-#                           ":/home/jq/Desktop/stan/bin", 
-#                           sep = '')
-
-#   Sys.setenv(LD_LIBRARY_PATH = LD_LIBRARY_PATH)
-
-#   cat("STAN_HOME=", Sys.getenv("STAN_HOME"), "\n")
-#   cat("LD_LIBRARY_PATH=", Sys.getenv("LD_LIBRARY_PATH"), "\n")
-
 library(rstan) 
 
 
@@ -112,8 +99,6 @@ ss <- sampling(dogsrr, data = dogsdat, n.chains = 3, seed = 1340338046,
 ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
                 n.iter = 2012, sample.file = 'dogs.csv')
 
-
-
   args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012, seed = 1340384924)
   dogsdat <- rstan:::data.preprocess(dogsdat)
   sampler <- new(dogsrr@.modelmod$sampler, dogsdat, 3)
@@ -122,9 +107,9 @@ ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
   sampler$call_sampler(args) 
   args$chain_id <- 3;
   sampler$call_sampler(args) 
-  t1 <- do.call(cbind, sampler$get_chain_samples(1, c("alpha", "beta", "p", "q"))) 
-  t2 <- do.call(cbind, sampler$get_chain_samples(2, c("alpha", "beta", "p", "q"))) 
-  t3 <- do.call(cbind, sampler$get_chain_samples(3, c("alpha", "beta", "p", "q"))) 
+  t1 <- do.call(cbind, sampler$get_chain_samples(1, c("alpha", "beta", "p", "q"), TRUE, TRUE)) 
+  t2 <- do.call(cbind, sampler$get_chain_samples(2, c("alpha", "beta", "p", "q"), TRUE, TRUE)) 
+  t3 <- do.call(cbind, sampler$get_chain_samples(3, c("alpha", "beta", "p", "q"), TRUE, TRUE)) 
   head(t1)
   pnames <- sampler$param_names() 
 
@@ -134,10 +119,14 @@ ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
   k.num.s  <- sampler$num_kept_samples() 
   print(sampler$num_chain_kept_samples(1)) 
 
-  pars <- c("alpha", "beta")
+  pars <- c("alpha", "beta", "q")
 
-  tall <- sampler$get_samples(pars)
-  kepttall <- sampler$get_kept_samples(pars)
+  tall <- sampler$get_samples(pars, TRUE, TRUE)
+  # keep_warmup = FALSE
+  kepttall <- sampler$get_samples(pars, FALSE, FALSE)
+  dimss <- sampler$get_param_dimss(pars)
+  
+  print(dimss) 
 
 probs_oi <- c(0.025, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975)
 
@@ -167,7 +156,7 @@ summary(ss, probs = c(0.25, .5, .75), pars = c('alpha'))
 # stop("for debug")
 
 sampleshandle <- ss@.fit$sampleshandle
-lst <- sampleshandle$get_samples(ss@model.pars) 
+lst <- sampleshandle$get_samples(ss@model.pars, FALSE, TRUE) 
 print(names(lst))
 print(names(lst[[1]]))
 

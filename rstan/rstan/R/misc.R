@@ -442,8 +442,62 @@ read.rdump <- function(f) {
   as.list(e)
 } 
 
+seq.array.ind <- function(d, col.major = FALSE) {
+  #
+  # Generate an array of indices for an array parameter 
+  # in order of major or column. 
+  #
+  # Args:
+  #   d: the dimensions of an array parameter, for example, 
+  #     c(2, 3). 
+  # 
+  #   col.major: Determine what is the order of indices. 
+  #   If col.major = TRUE, for d = c(2, 3), return 
+  #   [1, 1] 
+  #   [2, 1] 
+  #   [1, 2] 
+  #   [2, 2] 
+  #   [1, 3] 
+  #   [2, 3] 
+  #   If col.major = FALSE, for d = c(2, 3), return 
+  #   [1, 1] 
+  #   [1, 2] 
+  #   [1, 3] 
+  #   [2, 1] 
+  #   [2, 2] 
+  #   [2, 3] 
+  # 
+  # Returns: 
+  #   If length of d is 0, return empty vector. 
+  #   Otherwise, return an array of indices, each
+  #   row of which is an index. 
+  # 
+  # Note:
+  #   R function arrayInd might be helpful sometimes. 
+  # 
+  if (length(d) == 0L)
+    return(numeric(0L)) 
+  total <- prod(d) 
+  len <- length(d) 
+  res <- array(1L, dim = c(total, len)) 
+  jidx <- if (col.major) 1L:len else len:1L
+  for (i in 2L:total) {
+    res[i, ] <- res[i - 1, ]
+    for (j in jidx) { 
+      if (res[i - 1, j] < d[j]) {
+        res[i, j] <- res[i - 1, j] + 1
+        break; 
+      } 
+      res[i, j] <- 1
+    } 
+  } 
+  res 
+} 
 
-## FIXME: a better way to check grid and ggplot2, 
+
+
+
+## FIXME: a better way if any to check grid and ggplot2, 
 ## 
 check.plot.pkgs <- function() {
    stopifnot(require("ggplot2"))
