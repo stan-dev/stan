@@ -33,8 +33,54 @@ TEST(MathsSpecialFunctions, binomial_coefficient_log) {
   EXPECT_NEAR(3.0, exp(stan::math::binomial_coefficient_log(3.0,2.0)),0.0001);
 }
 
-TEST(MathsSpecialFunctions, fma) {
+TEST(MathsSpecialFunctions, fma_defaultpolicy) {
   EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, stan::math::fma(3.0,5.0,7.0));
+  
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),1.0));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(1.0 ,std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(),1.0,std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(), 5.0 ,1.0));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(1.0 ,2.0,std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(1.0,std::numeric_limits<double>::infinity(),2.0));
+ 
+ double nan = std::numeric_limits<double>::quiet_NaN();
+ EXPECT_THROW(stan::math::fma(nan, nan, nan),std::domain_error);
+ EXPECT_THROW(stan::math::fma(nan, nan, 1.0),std::domain_error); 
+ EXPECT_THROW(stan::math::fma(nan, 1.0, nan),std::domain_error);
+ EXPECT_THROW(stan::math::fma(1.0, nan, nan),std::domain_error);
+ EXPECT_THROW(stan::math::fma(nan, 1.0, 1.0),std::domain_error);
+ EXPECT_THROW(stan::math::fma(1.0, nan, 1.0),std::domain_error); 
+ EXPECT_THROW(stan::math::fma(1.0, 1.0, nan),std::domain_error);
+
+}
+TEST(MathsSpecialFunctions, fma_errnopolicy) {
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, stan::math::fma(3.0,5.0,7.0));
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(), errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),1.0, errno_policy()));
+   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(1.0 ,std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(), errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(),1.0,std::numeric_limits<double>::infinity(), errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(std::numeric_limits<double>::infinity(), 5.0 ,1.0, errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(1.0 ,2.0,std::numeric_limits<double>::infinity(), errno_policy()));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(1.0,std::numeric_limits<double>::infinity(),2.0, errno_policy()));
+  
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double result = 0;
+  EXPECT_NO_THROW(result = stan::math::fma(nan, 1.0,1.0, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(result = stan::math::fma(1.0, nan, 1.0, errno_policy())); 
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(stan::math::fma(1.0, 1.0, nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(result = stan::math::fma(nan, nan,1.0, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(result = stan::math::fma(nan,1.0, nan, errno_policy())); 
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(stan::math::fma(1.0, nan, nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
+  EXPECT_NO_THROW(stan::math::fma(nan, nan, nan, errno_policy()));
+  EXPECT_TRUE(std::isnan(result));
 }
 
 TEST(MathsSpecialFunctions, lbeta) {

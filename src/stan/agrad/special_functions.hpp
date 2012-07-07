@@ -840,10 +840,45 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
+    template <class Policy>
+    inline var fma(const stan::agrad::var& a,
+                   const stan::agrad::var& b,
+                   const stan::agrad::var& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+       if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
+      return var(new fma_vvv_vari(a.vi_,b.vi_,c.vi_));
+    }
+ /**
+     * The fused multiply-add function for three variables (C99).
+     * This function returns the product of the first two arguments
+     * plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The partial derivatives are
+     *
+     * \f$\frac{\partial}{\partial x} (x * y) + z = y\f$, and
+     *
+     * \f$\frac{\partial}{\partial y} (x * y) + z = x\f$, and
+     *
+     * \f$\frac{\partial}{\partial z} (x * y) + z = 1\f$.
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
     inline var fma(const stan::agrad::var& a,
                    const stan::agrad::var& b,
                    const stan::agrad::var& c) {
-      return var(new fma_vvv_vari(a.vi_,b.vi_,c.vi_));
+      return fma(a,b,c, stan::math::default_policy());
     }
 
     /**
@@ -867,6 +902,39 @@ namespace stan {
     inline var fma(const stan::agrad::var& a,
                    const stan::agrad::var& b,
                    const double& c) {
+      return fma(a,b,c, stan::math::default_policy());
+    }
+ /**
+     * The fused multiply-add function for two variables and a value
+     * (C99).  This function returns the product of the first two
+     * arguments plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The partial derivatives are
+     *
+     * \f$\frac{\partial}{\partial x} (x * y) + c = y\f$, and
+     *
+     * \f$\frac{\partial}{\partial y} (x * y) + c = x\f$.
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
+    template <class Policy>
+    inline var fma(const stan::agrad::var& a,
+                   const stan::agrad::var& b,
+                   const double& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+       if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
       return var(new fma_vvd_vari(a.vi_,b.vi_,c));
     }
 
@@ -888,10 +956,43 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
+    template <class Policy>
+    inline var fma(const stan::agrad::var& a,
+                   const double& b,
+                   const stan::agrad::var& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+       if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
+      return var(new fma_vdv_vari(a.vi_,b,c.vi_));
+    }
+ /**
+     * The fused multiply-add function for a variable, value, and
+     * variable (C99).  This function returns the product of the first
+     * two arguments plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The partial derivatives are
+     *
+     * \f$\frac{\partial}{\partial x} (x * c) + z = c\f$, and
+     *
+     * \f$\frac{\partial}{\partial z} (x * c) + z = 1\f$.
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
     inline var fma(const stan::agrad::var& a,
                    const double& b,
                    const stan::agrad::var& c) {
-      return var(new fma_vdv_vari(a.vi_,b,c.vi_));
+      return fma(a,b,c, stan::math::default_policy());
     }
 
     /**
@@ -910,10 +1011,41 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
+    template <class Policy>
+    inline var fma(const stan::agrad::var& a,
+                   const double& b, 
+                   const double& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
+      return var(new fma_vdd_vari(a.vi_,b,c));
+    }
+/**
+     * The fused multiply-add function for a variable and two values
+     * (C99).  This function returns the product of the first two
+     * arguments plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The derivative is
+     *
+     * \f$\frac{d}{d x} (x * c) + d = c\f$.
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
     inline var fma(const stan::agrad::var& a,
                    const double& b, 
                    const double& c) {
-      return var(new fma_vdd_vari(a.vi_,b,c));
+      return fma(a,b,c, stan::math::default_policy());
     }
 
     /**
@@ -932,10 +1064,41 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
+    template <class Policy>
+    inline var fma(const double& a,
+                   const stan::agrad::var& b,
+                   const double& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
+      return var(new fma_vdd_vari(b.vi_,a,c));
+    }
+  /**
+     * The fused multiply-add function for a value, variable, and
+     * value (C99).  This function returns the product of the first
+     * two arguments plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The derivative is
+     *
+     * \f$\frac{d}{d y} (c * y) + d = c\f$, and
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
     inline var fma(const double& a,
                    const stan::agrad::var& b,
                    const double& c) {
-      return var(new fma_vdd_vari(b.vi_,a,c));
+      return fma(a,b,c, stan::math::default_policy());
     }
 
     /**
@@ -954,10 +1117,41 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
+    template <class Policy>
+    inline var fma(const double& a,
+                   const double& b,
+                   const stan::agrad::var& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
+      return var(new fma_ddv_vari(a,b,c.vi_));
+    }
+ /**
+     * The fused multiply-add function for two values and a variable,
+     * and value (C99).  This function returns the product of the
+     * first two arguments plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The derivative is
+     *
+     * \f$\frac{\partial}{\partial z} (c * d) + z = 1\f$.
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
     inline var fma(const double& a,
                    const double& b,
                    const stan::agrad::var& c) {
-      return var(new fma_ddv_vari(a,b,c.vi_));
+      return fma(a,b,c, stan::math::default_policy());
     }
 
     /**
@@ -978,10 +1172,43 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
+    template <class Policy>
+    inline var fma(const double& a,
+                   const stan::agrad::var& b,
+                   const stan::agrad::var& c,
+		   const Policy&) {
+      static const char* function = "stan::math::fma(%1%)";
+      double result;
+      if(!check_not_nan(function, a, "a", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, b, "b", &result, Policy()))
+        return result;
+      if(!check_not_nan(function, c, "c", &result, Policy()))
+        return result;
+      return var(new fma_vdv_vari(b.vi_,a,c.vi_)); // a-b symmetry
+    }
+ /**
+     * The fused multiply-add function for a value and two variables
+     * (C99).  This function returns the product of the first two
+     * arguments plus the third argument.
+     *
+     * See boost::math::fma() for the double-based version.
+     *
+     * The partial derivaties are
+     *
+     * \f$\frac{\partial}{\partial y} (c * y) + z = c\f$, and
+     *
+     * \f$\frac{\partial}{\partial z} (c * y) + z = 1\f$.
+     *
+     * @param a First multiplicand.
+     * @param b Second multiplicand.
+     * @param c Summand.
+     * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
+     */
     inline var fma(const double& a,
                    const stan::agrad::var& b,
                    const stan::agrad::var& c) {
-      return var(new fma_vdv_vari(b.vi_,a,c.vi_)); // a-b symmetry
+      return fma(a,b,c, stan::math::default_policy());
     }
 
     /**
