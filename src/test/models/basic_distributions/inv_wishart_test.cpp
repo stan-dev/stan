@@ -20,7 +20,7 @@ public:
   }
 
   static size_t num_iterations() {
-    return iterations;
+    return 10000U;
   }
 
   static void populate_chains() {
