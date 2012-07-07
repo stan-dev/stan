@@ -8,6 +8,7 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: R interface to Stan 
 License: GPL-3
 Depends: methods, Rcpp (>= 0.9.10), inline
+# Depends: methods, Rcpp (>= 0.9.10), inline, RcppEigen (>= 0.2.0)
 LinkingTo: Rcpp
 Imports: graphics  
 Suggests: ggplot2, grid, RUnit, gridExtra

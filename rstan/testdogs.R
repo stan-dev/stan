@@ -119,7 +119,7 @@ ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
   k.num.s  <- sampler$num_kept_samples() 
   print(sampler$num_chain_kept_samples(1)) 
 
-  pars <- c("alpha", "beta", "q")
+  pars <- c("alpha", "beta")
 
   tall <- sampler$get_samples(pars, TRUE, TRUE)
   # keep_warmup = FALSE
