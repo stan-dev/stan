@@ -60,7 +60,7 @@ TEST(agrad_agrad_special_functions,lgamma) {
   EXPECT_FLOAT_EQ(boost::math::digamma(3.0),grad_f[0]);
 }
 
-TEST(agrad_agrad_special_functions,fma_vvv) {
+TEST(agrad_agrad_special_functions,fma_vvv_defaultpolicy) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -73,9 +73,67 @@ TEST(agrad_agrad_special_functions,fma_vvv) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
   EXPECT_FLOAT_EQ(1.0,grad_f[2]);
-}  
 
-TEST(agrad_agrad_special_functions,fma_vvd) {
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,b).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanAVAR, nanAVAR, nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanAVAR,b), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(b,nanAVAR,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(b,nanAVAR,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(b,c,nanAVAR), std::domain_error);
+} 
+TEST(agrad_agrad_special_functions,fma_vvv_errnopolicy) {
+  AVAR a = 3.0;
+  AVAR b = 5.0;
+  AVAR c = 7.0;
+  AVAR f = fma(a,b,c, errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(a,b,c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(5.0,grad_f[0]);
+  EXPECT_FLOAT_EQ(3.0,grad_f[1]);
+  EXPECT_FLOAT_EQ(1.0,grad_f[2]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,b,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanAVAR,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanAVAR,b,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(b,nanAVAR,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(b,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(b,c,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  }
+
+
+TEST(agrad_agrad_special_functions,fma_vvd_defaultpolicy) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -87,9 +145,70 @@ TEST(agrad_agrad_special_functions,fma_vvd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,b).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,a,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,b,infinityDouble).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanAVAR,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanAVAR,b), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(b,nanAVAR,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(b,nanAVAR,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(b,a,nanDouble), std::domain_error);
+
+}  
+TEST(agrad_agrad_special_functions,fma_vvd_errnopolicy) {
+  AVAR a = 3.0;
+  AVAR b = 5.0;
+  double c = 7.0;
+  AVAR f = fma(a,b,c,errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(a,b);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(5.0,grad_f[0]);
+  EXPECT_FLOAT_EQ(3.0,grad_f[1]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(b,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityDouble,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanAVAR,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(b,nanAVAR,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(b,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(b,a,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
 }  
 
-TEST(agrad_agrad_special_functions,fma_vdv) {
+TEST(agrad_agrad_special_functions,fma_vdv_defaultpolicy) {
   AVAR a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;
@@ -101,9 +220,70 @@ TEST(agrad_agrad_special_functions,fma_vdv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
-}  
 
-TEST(agrad_agrad_special_functions,fma_vdd) {
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble, infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,c,infinityAVAR).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanDouble,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanDouble,a), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanDouble,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanDouble,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(c,a,nanAVAR), std::domain_error);
+
+} 
+TEST(agrad_agrad_special_functions,fma_vdv_errnopolicy) {
+  AVAR a = 3.0;
+  double b = 5.0;
+  AVAR c = 7.0;
+  AVAR f = fma(a,b,c, errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(a,c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(5.0,grad_f[0]);
+  EXPECT_FLOAT_EQ(1.0,grad_f[1]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanDouble,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanDouble,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanDouble,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanDouble,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(c,a,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+}   
+
+TEST(agrad_agrad_special_functions,fma_vdd_defaultpolicy) {
   AVAR a = 3.0;
   double b = 5.0;
   double c = 7.0;
@@ -114,9 +294,70 @@ TEST(agrad_agrad_special_functions,fma_vdd) {
   VEC grad_f;
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble, infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityDouble).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanDouble,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,nanDouble,b), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanDouble,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanAVAR,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanDouble,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,b,nanDouble), std::domain_error);
 }  
 
-TEST(agrad_agrad_special_functions,fma_dvv) {
+TEST(agrad_agrad_special_functions,fma_vdd_errnopolicy) {
+  AVAR a = 3.0;
+  double b = 5.0;
+  double c = 7.0;
+  AVAR f = fma(a,b,c,errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(5.0,grad_f[0]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  a = 3.0;
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble,infinityDouble, errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,infinityDouble,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityAVAR,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityDouble,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanDouble,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,nanDouble,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanDouble,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanAVAR,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanDouble,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,b,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+}
+
+TEST(agrad_agrad_special_functions,fma_dvv_defaultpolicy) {
   double a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -128,9 +369,70 @@ TEST(agrad_agrad_special_functions,fma_dvv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR, infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanDouble,nanAVAR,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,nanAVAR,b), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,b,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanAVAR,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanAVAR,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,b,nanAVAR), std::domain_error);
+} 
+
+TEST(agrad_agrad_special_functions,fma_dvv_errnopolicy) {
+  double a = 3.0;
+  AVAR b = 5.0;
+  AVAR c = 7.0;
+  AVAR f = fma(a,b,c,errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(b,c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(3.0,grad_f[0]);
+  EXPECT_FLOAT_EQ(1.0,grad_f[1]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,nanAVAR,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,b,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanAVAR,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,b,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
 }  
 
-TEST(agrad_agrad_special_functions,fma_dvd) {
+TEST(agrad_agrad_special_functions,fma_dvd_defaultpolicy) {
   double a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -141,9 +443,68 @@ TEST(agrad_agrad_special_functions,fma_dvd) {
   VEC grad_f;
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR, infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,infinityDouble).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityDouble).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanDouble,nanAVAR,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,nanAVAR,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,b,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanAVAR,nanDouble), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanAVAR,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,b,nanDouble), std::domain_error);
+}  
+TEST(agrad_agrad_special_functions,fma_dvd_errnopolicy) {
+  double a = 3.0;
+  AVAR b = 5.0;
+  double c = 7.0;
+  AVAR f = fma(a,b,c, errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(b);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(3.0,grad_f[0]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,infinityDouble,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityAVAR,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityDouble,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,nanAVAR,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,b,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanAVAR,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanAVAR,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,b,nanDouble,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
 }  
 
-TEST(agrad_agrad_special_functions,fma_ddv) {
+TEST(agrad_agrad_special_functions,fma_ddv_defaultpolicy) {
   double a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;
@@ -154,6 +515,65 @@ TEST(agrad_agrad_special_functions,fma_ddv) {
   VEC grad_f;
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityDouble, infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityDouble,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,infinityAVAR).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,c).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::fma(nanDouble,nanDouble,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,nanDouble,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,b,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanDouble,nanAVAR), std::domain_error);
+  EXPECT_THROW(stan::math::fma(nanDouble,b,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,nanDouble,c), std::domain_error);
+  EXPECT_THROW(stan::math::fma(a,b,nanAVAR), std::domain_error);
+}  
+TEST(agrad_agrad_special_functions,fma_ddv_errnopolicy) {
+  double a = 3.0;
+  double b = 5.0;
+  AVAR c = 7.0;
+  AVAR f = fma(a,b,c, errno_policy());
+  EXPECT_FLOAT_EQ(3.0 * 5.0 + 7.0, f.val());
+  
+  AVEC x = createAVEC(c);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(1.0,grad_f[0]);
+
+  AVAR infinityAVAR = std::numeric_limits<AVAR>::infinity();
+  double infinityDouble = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityDouble,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,infinityDouble,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,infinityAVAR,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(infinityDouble,b,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,infinityDouble,c,errno_policy()).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fma(a,b,infinityAVAR,errno_policy()).val());
+  
+  AVAR nanAVAR = std::numeric_limits<AVAR>::quiet_NaN();
+  double nanDouble = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,nanDouble,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,nanDouble,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,b,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanDouble,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(nanDouble,b,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,nanDouble,c,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
+  EXPECT_NO_THROW(f = stan::math::fma(a,b,nanAVAR,errno_policy()));
+  EXPECT_TRUE(std::isnan(f.val()));
 }  
 
 
