@@ -89,16 +89,19 @@ public:
     return command.str();
   }
 
-
   /** 
    * Populates the chains object with data from csv files.
    */
-  static void populate_chains() {
+  static void default_populate_chains() {
     if (chains->num_kept_samples() == 0U) {
       for (size_t chain = 0U; chain < num_chains; chain++) {
         stan::mcmc::add_chain(*chains, chain, get_csv_file(chain), skip);
       }
     }
+  }
+
+  static void populate_chains() {
+    Derived::populate_chains();
   }
   
   static void test_gradient() {
@@ -260,10 +263,9 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     return;
 
   stan::mcmc::chains<> *c = TypeParam::chains;
-  double alpha = 0.05;
+  double alpha = 0.005;
   if (n < 3)
-    alpha = 0.01;
-
+    alpha = 0.001;
   
   int failed = 0;
   std::stringstream err_message;
@@ -296,6 +298,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 
   double p = 1 - cdf(binomial(n, alpha), failed);
   // this test should fail less than 0.1% of the time.
+  // (if all the parameters are failing independently... ha)
   if (p < 0.001) {
     err_message << "------------------------------------------------------------\n";
     for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {

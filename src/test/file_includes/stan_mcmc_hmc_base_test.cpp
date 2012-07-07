@@ -1,6 +1,6 @@
 #include <stan/mcmc/hmc_base.hpp>
 #include <gtest/gtest.h>
 
-TEST(stanMcmcHmc,headerParses) {
+TEST(stanMcmcHmcBase,headerParses) {
   EXPECT_TRUE(true);
 }

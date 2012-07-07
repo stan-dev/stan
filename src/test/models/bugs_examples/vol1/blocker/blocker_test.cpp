@@ -16,12 +16,17 @@ public:
     model_path.push_back("blocker");
     return model_path;
   }
+
   static bool has_data() {
     return true;
   }
 
   static size_t num_iterations() {
-    return iterations;
+    return 8000U;
+  }
+
+  static void populate_chains() {
+    default_populate_chains();
   }
 
   static std::vector<std::pair<size_t, double> >
