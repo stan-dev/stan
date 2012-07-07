@@ -1,6 +1,8 @@
 #ifndef __STAN__MCMC__HMC_BASE_H__
 #define __STAN__MCMC__HMC_BASE_H__
 
+#include <ctime>
+
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>

@@ -19,7 +19,7 @@ public:
   }
 
   static size_t num_iterations() {
-    return 16000U;
+    return iterations;
   }
 
   static void populate_chains() {
@@ -35,10 +35,6 @@ public:
     expected_values.push_back(make_pair(6U, 0.0));       // W[1,2]
     expected_values.push_back(make_pair(7U, 0.0));       // W[2,1]
     expected_values.push_back(make_pair(8U, 0.5 * 4.0)); // W[2,2]
-
-    expected_values.push_back(make_pair(1U, 2.0 * 4.0));
-    expected_values.push_back(make_pair(4U, 0.0));
-    expected_values.push_back(make_pair(2U, 0.5 * 4.0));
 
     return expected_values;
   }
