@@ -31,7 +31,15 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+
+    expected_values.push_back(make_pair(0U, -0.5525));  // alpha0
+    expected_values.push_back(make_pair(1U, 0.08382));  // alpha1
+    expected_values.push_back(make_pair(2U, -0.8165));  // alpha12
+    expected_values.push_back(make_pair(3U, 1.346));    // alpha2
+    expected_values.push_back(make_pair(26U, 0.267));   // sigma
+
     return expected_values;
   }
 

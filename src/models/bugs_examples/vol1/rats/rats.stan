@@ -12,14 +12,14 @@ parameters {
   real beta[N];
 
   real mu_alpha;
-  real mu_beta;
+  real mu_beta;          // beta.c in original bugs model
 
   real(0,) sigmasq_y;
   real(0,) sigmasq_alpha;
   real(0,) sigmasq_beta;
 }
 transformed parameters {
-  real(0,) sigma_y;
+  real(0,) sigma_y;       // sigma in original bugs model
   real(0,) sigma_alpha;
   real(0,) sigma_beta;
 
@@ -39,4 +39,8 @@ model {
     for (t in 1:T) 
       y[n,t] ~ normal(alpha[n] + beta[n] * (x[t] - xbar), sigma_y);
 
+}
+generated quantities {
+  real alpha0;
+  alpha0 <- mu_alpha - xbar * mu_beta;
 }

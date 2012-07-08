@@ -30,7 +30,16 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+    
+    expected_values.push_back(make_pair(0U, -0.2446));  // alpha
+    expected_values.push_back(make_pair(2U, 0.7833));   // A
+
+    // FIXME: find out why beta doesn't match.
+    //expected_values.push_back(make_pair(1U, -0.07886)); // beta
+    //expected_values.push_back(make_pair(3U, 0.9242));   // B
+
     return expected_values;
   }
 
