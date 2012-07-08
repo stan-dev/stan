@@ -10,8 +10,8 @@ data {
 parameters {
     real alpha0;
     real alpha1;
-    real alpha2;
     real alpha12;
+    real alpha2;
     real(0,) tau;
     real b[I];
 }
