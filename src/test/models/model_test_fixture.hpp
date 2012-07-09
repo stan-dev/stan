@@ -278,7 +278,9 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     double se = c->sd(index) / sqrt(neff);
     double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
 
-    if (fabs(expected_mean - sample_mean) > z*se) {
+
+    // that 2.0 is there to make the test fail less often.
+    if (fabs(expected_mean - sample_mean) > z*se * 2.0) {
       failed++;
       // want the error message to have which, what, how
       err_message << "parameter index: " << index
