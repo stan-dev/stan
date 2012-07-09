@@ -18,18 +18,27 @@ namespace stan {
     class hmc_base : public adaptive_sampler {
     protected:
       BaseRNG _rand_int;
-      boost::variate_generator<BaseRNG&, boost::normal_distribution<> > _rand_unit_norm;
+      boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
+        _rand_unit_norm;
       boost::uniform_01<BaseRNG&> _rand_uniform_01;
     public:
-      hmc_base(BaseRNG rand_int = BaseRNG(std::time(0))) 
-	: _rand_int(rand_int),
-	  _rand_unit_norm(_rand_int, boost::normal_distribution<>()),
-	  _rand_uniform_01(_rand_int)
+      /**
+       * Construct a base HMC sampler.
+       *
+       * @param adapt Flag indicating whether adaptation is turned on.
+       * @param rand_int Base random integer generator.
+       */
+      hmc_base(bool adapt,
+               BaseRNG rand_int = BaseRNG(std::time(0))) 
+        : adaptive_sampler(adapt),
+          _rand_int(rand_int),
+          _rand_unit_norm(_rand_int, boost::normal_distribution<>()),
+          _rand_uniform_01(_rand_int)
       {  }
     };
 
   }
 }
-	  
+          
 
 #endif

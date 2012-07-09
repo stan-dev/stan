@@ -14,6 +14,7 @@
 #include <stan/math/util.hpp>
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
+#include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
 
 namespace stan {
@@ -28,7 +29,7 @@ namespace stan {
      * <code>prob_grad</code>.  
      */
     template <class BaseRNG = boost::mt19937>
-    class nuts : public adaptive_sampler {
+    class nuts : public hmc_base<BaseRNG> {
     private:
 
       // Provides the target distribution we're trying to sample from
@@ -63,11 +64,6 @@ namespace stan {
 
       // Tuning parameter for dual averaging
       double _gamma; 
-
-      // RNGs
-      BaseRNG _rand_int;
-      boost::variate_generator<BaseRNG&, boost::normal_distribution<> > _rand_unit_norm;
-      boost::uniform_01<BaseRNG&> _rand_uniform_01;
 
       // Stop immediately if H < u - _maxchange
       const double _maxchange;
@@ -139,7 +135,7 @@ namespace stan {
            double delta = 0.6, 
            double gamma = 0.05,
            BaseRNG base_rng = BaseRNG(std::time(0)) )
-        : adaptive_sampler(adapt_epsilon),
+        : hmc_base<BaseRNG>(adapt_epsilon,base_rng),
 
           _model(model), // what used to be here
           _x(model.num_params_r()),
@@ -154,11 +150,6 @@ namespace stan {
           _delta(delta),
           _gamma(gamma),
 
-          _rand_int(base_rng),
-          _rand_unit_norm(_rand_int,
-                          boost::normal_distribution<double>()),
-          _rand_uniform_01(_rand_int),
-
           _maxchange(-1000),
           _maxdepth(maxdepth),
           _lastdepth(-1),
@@ -169,7 +160,7 @@ namespace stan {
         _logp = model.grad_log_prob(_x, _z, _g);
         if (_adapt_epsilon)
           find_reasonable_parameters();
-        if (adapting()) {
+        if (this->adapting()) {
           // Err on the side of regularizing epsilon towards being too big;
           // the logic is that it's cheaper to run NUTS when epsilon's large.
           _da.setx0(std::vector<double>(1, log(_epsilon * 10)));
@@ -212,7 +203,7 @@ namespace stan {
         std::vector<double> x = _x;
         std::vector<double> m(_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
-          m[i] = _rand_unit_norm();
+          m[i] = this->_rand_unit_norm();
         std::vector<double> g = _g;
         double lastlogp = _logp;
         double logp = leapfrog(_model, _z, x, m, g, _epsilon);
@@ -224,7 +215,7 @@ namespace stan {
           x = _x;
           g = _g;
           for (size_t i = 0; i < m.size(); ++i)
-            m[i] = _rand_unit_norm();
+            m[i] = this->_rand_unit_norm();
           logp = leapfrog(_model, _z, x, m, g, _epsilon);
           H = logp - lastlogp;
 //           fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
@@ -251,7 +242,7 @@ namespace stan {
         // Initialize the algorithm
         std::vector<double> mminus(_model.num_params_r());
         for (size_t i = 0; i < mminus.size(); ++i)
-          mminus[i] = _rand_unit_norm();
+          mminus[i] = this->_rand_unit_norm();
         std::vector<double> mplus(mminus);
         // The log-joint probability of the momentum and position terms, i.e.
         // -(kinetic energy + potential energy)
@@ -263,9 +254,9 @@ namespace stan {
         std::vector<double> xplus(_x);
 
         // Sample the slice variable
-        double u = log(_rand_uniform_01()) + H0;
+        double u = log(this->_rand_uniform_01()) + H0;
         int nvalid = 1;
-        int direction = 2 * (_rand_uniform_01() > 0.5) - 1;
+        int direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
         bool criterion = true;
 
         // Repeatedly double the set of points we've visited
@@ -279,16 +270,16 @@ namespace stan {
 
         double epsilon = _epsilon;
         // only vary epsilon after done adapting
-        if (!adapting() && varying_epsilon()) { 
+        if (!this->adapting() && varying_epsilon()) { 
           double low = epsilon * (1.0 - _epsilon_pm);
           double high = epsilon * (1.0 + _epsilon_pm);
           double range = high - low;
-          epsilon = low + (range * _rand_uniform_01());
+          epsilon = low + (range * this->_rand_uniform_01());
         }
         _last_epsilon = epsilon; // use last_epsilon in tree build
 
         while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
-          direction = 2 * (_rand_uniform_01() > 0.5) - 1;
+          direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
             build_tree(xminus, mminus, gradminus, u, direction, depth,
                        H0, xminus, mminus, gradminus, dummy1, dummy2, dummy3,
@@ -305,7 +296,7 @@ namespace stan {
           criterion = compute_criterion(xplus, xminus, mplus, mminus);
           // Metropolis-Hastings to determine if we can jump to a point in
           // the new half-tree
-          if (_rand_uniform_01() < float(newnvalid) / (1e-100+float(nvalid))) {
+          if (this->_rand_uniform_01() < float(newnvalid) / (1e-100+float(nvalid))) {
             _x = newx;
             _g = newgrad;
             _logp = newlogp;
@@ -318,7 +309,7 @@ namespace stan {
 
         // Now we just have to update epsilon, if adaptation is on.
         double adapt_stat = prob_sum / float(n_considered);
-        if (adapting()) {
+        if (this->adapting()) {
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
           std::vector<double> result;
@@ -328,8 +319,8 @@ namespace stan {
         std::vector<double> result;
         _da.xbar(result);
 //         fprintf(stderr, "xbar = %f\n", exp(result[0]));
-        double avg_eta = 1.0 / n_steps();
-        update_mean_stat(avg_eta,adapt_stat);
+        double avg_eta = 1.0 / this->n_steps();
+        this->update_mean_stat(avg_eta,adapt_stat);
 
         mcmc::sample s(_x, _z, _logp);
         return s;
@@ -429,7 +420,7 @@ namespace stan {
           criterion = newH - u > _maxchange;
           prob_sum = stan::math::min(1, exp(newH - H0));
           n_considered = 1;
-          nfevals_plus_eq(1);
+          this->nfevals_plus_eq(1);
         } else {            // depth >= 1
           build_tree(x, m, grad, u, direction, depth-1, H0, xminus, mminus,
                      gradminus, xplus, mplus, gradplus, newx, newgrad, newlogp,
@@ -454,7 +445,8 @@ namespace stan {
                          newx2, newgrad2, newlogp2, nvalid2, criterion2,
                          prob_sum2, n_considered2);
             if (criterion && 
-                (_rand_uniform_01() < float(nvalid2) / float(nvalid+nvalid2))){
+                (this->_rand_uniform_01() 
+                 < float(nvalid2) / float(nvalid+nvalid2))) {
               newx = newx2;
               newgrad = newgrad2;
               newlogp = newlogp2;
@@ -477,7 +469,7 @@ namespace stan {
        * lower-variance estimate of the optimal epsilon.
        */
       virtual void adapt_off() {
-        if (!adapting()) return;
+        if (!this->adapting()) return;
         adaptive_sampler::adapt_off();
         std::vector<double> result;
         _da.xbar(result);
