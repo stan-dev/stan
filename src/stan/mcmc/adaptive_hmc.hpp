@@ -6,16 +6,17 @@
 #include <iostream>
 #include <vector>
 
-#include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/random/variate_generator.hpp>
+#include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
 
+#include <stan/math/util.hpp>
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
-#include <stan/model/prob_grad.hpp>
+#include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
-#include <stan/math/util.hpp>
+#include <stan/model/prob_grad.hpp>
 
 namespace stan {
 
@@ -36,7 +37,7 @@ namespace stan {
      * base class <code>stan::mcmc::sample</code>.
      */
     template <class BaseRNG = boost::mt19937>
-    class adaptive_hmc : public adaptive_sampler {
+    class adaptive_hmc : public hmc_base<BaseRNG> {
     private:
 
       // FIXME:  make _model constant
@@ -67,12 +68,6 @@ namespace stan {
       std::vector<double> _g;
       // The most recent log-likelihood
       double _logp;
-
-
-
-      BaseRNG _rand_int;
-      boost::variate_generator<BaseRNG&, boost::normal_distribution<> > _rand_unit_norm;
-      boost::uniform_01<BaseRNG&> _rand_uniform_01;
 
       // Class implementing Nesterov's primal-dual averaging
       DualAverage _da;
@@ -116,7 +111,8 @@ namespace stan {
                    double delta = 0.651,
                    double gamma = 0.05,
                    BaseRNG base_rng = BaseRNG(std::time(0)))
-        : adaptive_sampler(epsilon_adapt),
+        : hmc_base<BaseRNG>(epsilon_adapt,base_rng),
+
           _model(model),
 
           _L(L),
@@ -131,11 +127,6 @@ namespace stan {
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r()),
-
-          _rand_int(base_rng),
-          _rand_unit_norm(_rand_int,
-                          boost::normal_distribution<>()),
-          _rand_uniform_01(_rand_int),
 
           _da(gamma, std::vector<double>(1, 0)) {
         model.init(_x,_z);
@@ -215,7 +206,7 @@ namespace stan {
         std::vector<double> x = _x;
         std::vector<double> m(_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
-          m[i] = _rand_unit_norm();
+          m[i] = this->_rand_unit_norm();
         std::vector<double> g = _g;
         double lastlogp = _logp;
         double logp = leapfrog(_model, _z, x, m, g, _epsilon);
@@ -227,7 +218,7 @@ namespace stan {
           x = _x;
           g = _g;
           for (size_t i = 0; i < m.size(); ++i)
-            m[i] = _rand_unit_norm();
+            m[i] = this->_rand_unit_norm();
           logp = leapfrog(_model, _z, x, m, g, _epsilon);
           H = logp - lastlogp;
           // fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
@@ -259,12 +250,12 @@ namespace stan {
         //        k < _model.param_range_i_upper(m); 
         //        ++k)
         //     probs.push_back(_model.log_prob_star(m,k,_x,_z));
-        //   _z[m] = sample_unnorm_log(probs,_rand_uniform_01);
+        //   _z[m] = sample_unnorm_log(probs,this->_rand_uniform_01);
         // }
         // HMC for continuous
         std::vector<double> m(_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
-          m[i] = _rand_unit_norm();
+          m[i] = this->_rand_unit_norm();
         double H = -(stan::math::dot_self(m) / 2.0) + _logp; 
         
         std::vector<double> g_new(_g);
@@ -272,20 +263,20 @@ namespace stan {
         double logp_new = -1e100;
         double epsilon = _epsilon;
         // only vary epsilon after done adapting
-        if (!adapting() && varying_epsilon()) { 
+        if (!this->adapting() && varying_epsilon()) { 
           double low = epsilon * (1.0 - _epsilon_pm);
           double high = epsilon * (1.0 + _epsilon_pm);
           double range = high - low;
-          epsilon = low + (range * _rand_uniform_01());
+          epsilon = low + (range * this->_rand_uniform_01());
         }
         _last_epsilon = epsilon;
         for (unsigned int l = 0; l < _L; ++l)
           logp_new = leapfrog(_model, _z, x_new, m, g_new, epsilon);
-        nfevals_plus_eq(_L);
+        this->nfevals_plus_eq(_L);
 
         double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;
         double dH = H_new - H;
-        if (_rand_uniform_01() < exp(dH)) {
+        if (this->_rand_uniform_01() < exp(dH)) {
           _x = x_new;
           _g = g_new;
           _logp = logp_new;
@@ -295,7 +286,7 @@ namespace stan {
         double adapt_stat = stan::math::min(1, exp(dH));
         if (adapt_stat != adapt_stat)
           adapt_stat = 0;
-        if (adapting()) {
+        if (this->adapting()) {
           double adapt_g = adapt_stat - _delta;
           std::vector<double> gvec(1, -adapt_g);
           std::vector<double> result; // FIXME: update directly to _epsilon?
@@ -305,8 +296,8 @@ namespace stan {
         std::vector<double> result;
         _da.xbar(result);
         // fprintf(stderr, "xbar = %f\n", exp(result[0]));
-        double avg_eta = 1.0 / n_steps();
-        update_mean_stat(avg_eta,adapt_stat);
+        double avg_eta = 1.0 / this->n_steps();
+        this->update_mean_stat(avg_eta,adapt_stat);
 
         return mcmc::sample(_x, _z, _logp);
       }
@@ -319,7 +310,7 @@ namespace stan {
        * the optimal epsilon.
        */
       virtual void adapt_off() {
-        if (!adapting()) return;
+        if (!this->adapting()) return;
         adaptive_sampler::adapt_off();
         std::vector<double> result;
         _da.xbar(result);
