@@ -1,0 +1,7 @@
+Installation on Linux: 
+
+1. run `R CMD build rstan` at STAN_HOME/rstan 
+
+2. run R CMD INSTALL for the file created in step 1. 
+   Assuming that the package built in step is rstan_1.0.tar.gz, it would be 
+   R CMD INSTALL rstan_1.0.tar.gz 

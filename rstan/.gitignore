@@ -1,0 +1,6 @@
+*.csv
+*.swp
+*.o
+*.so
+*.rds
+*.out

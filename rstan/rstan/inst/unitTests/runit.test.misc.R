@@ -1,0 +1,77 @@
+
+.setUp <- function() {
+  model.code <- "model { \n y ~ normal(0, 1); \n}"  
+  cat(model.code, file = 'tmp.stan')  
+
+  a <- c(1, 3, 5)
+  b <- matrix(1:10, ncol = 2)
+  c <- array(1:18, dim = c(2, 3, 3)) 
+  dump(c("a", "b", "c"), file = 'dumpabc.Rdump')
+  rstan:::stan.dump(c("a", "b", "c"), file = 'standumpabc.Rdump')
+} 
+
+
+test.util <- function() {
+  lst <- list(z = c(1L, 2L, 4L), 
+              a = 1:100, 
+              b = matrix(1:9 / 9, ncol = 3), 
+              c = structure(1:100, .Dim = c(5, 20)),
+              g = array(c(3, 3, 9, 3, 3, 4, 5, 6, 9, 8, 0, 2), dim = c(2, 2, 3)), 
+              d = 1:100 + .1) 
+  lst <- rstan:::data.preprocess(lst) 
+  lst2 <- lst; 
+  lst2$f <- matrix(c(3, NA, NA, NA, 3, 4), ncol = 3) 
+
+  checkEquals(dim(lst$g), c(2, 2, 3), "Keep the dimension infomation")
+  checkTrue(is.integer(lst$z), "Do as.integer when appropriate") 
+  checkTrue(is.double(lst$b), msg = "Not do as.integer when it is not appropriate") 
+  checkException(rstan:::data.preprocess(lst2), 
+                 msg = "Stop if data have NA") 
+
+  model.code <- "model { \n y ~ normal(0, 1); \n}"  
+  # cat(model.code, file = 'tmp.stan')  
+  checkEquals(model.code, rstan:::read.model.from.con('tmp.stan'), 
+              msg = "Read stan model from file") 
+  checkEquals(model.code, rstan:::get.model.code('tmp.stan'), 
+              msg = "Read stan model from file") 
+  checkEquals(model.code, rstan:::get.model.code(model.code = model.code), 
+              msg = "Read stan model from model.code") 
+  checkException(rstan:::get.model.code(), 
+                 msg = "Read stan model from model.code") 
+} 
+
+
+test.read.rdump <- function() {
+  l <- rstan:::read.rdump("dumpabc.Rdump")
+  checkEquals(l$a, c(1, 3, 5)) 
+  checkEquals(l$b, matrix(1:10, ncol = 2))
+  checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
+} 
+
+test.stan.dump <- function() {
+  l <- rstan:::read.rdump("standumpabc.Rdump")
+  checkEquals(l$a, c(1, 3, 5)) 
+  checkEquals(l$b, matrix(1:10, ncol = 2))
+  checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
+} 
+
+test.seq.array.ind <- function() {
+  a <- rstan:::seq.array.ind(numeric(0))
+  checkEquals(length(a), 0) 
+  # by default, col.major is FALSE
+  b <- rstan:::seq.array.ind(2:5, col.major = TRUE) 
+  c <- arrayInd(1:prod(2:5), .dim = 2:5) 
+  checkEquals(b, c) 
+  d <- rstan:::seq.array.ind(2:3, col.major = FALSE)
+  e <- matrix(c(1, 1, 1, 2, 1, 3, 2, 1, 2, 2, 2, 3), 
+              nrow = 6, byrow = TRUE)
+  checkEquals(d, as.array(e)) 
+} 
+
+ 
+.tearDown <- function() {
+  unlink('tmp.stan') 
+  unlink('dumpabc.Rdump') 
+  unlink('standumpabc.Rdump') 
+} 
+

@@ -1,0 +1,26 @@
+useDynLib(rstan)
+# exportPattern("^[[:alpha:]]+")
+
+importFrom("graphics", plot)
+
+export (
+  stan.model,
+# stan.samples,
+  stanc, 
+  stanc.version, 
+  stan,
+  stan.dump,
+  rstan.options,
+  get.rstan.options
+)
+
+exportClasses (
+  stanmodel, stanfit 
+) 
+exportMethods (
+#   print, plot, 
+#   extract, 
+  show, sampling, summary, print, extract, chain.summary,
+  traceplot, plot
+)
+import(Rcpp)
