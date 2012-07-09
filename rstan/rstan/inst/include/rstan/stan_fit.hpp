@@ -528,7 +528,6 @@ namespace rstan {
            ++it) {
         size_t j = chains_.param_name_to_index(*it);
         std::vector<size_t> j_dims = chains_.param_dims(j); 
-        size_t j_size = chains_.param_size(j); 
         std::vector<std::string> j_n;  
         get_col_major_names(*it, j_dims, j_n);
         flatnames_.insert(flatnames_.end(), j_n.begin(), j_n.end()); 

@@ -93,7 +93,7 @@ namespace rstan {
         std::vector<std::string> varnames 
           = Rcpp::as<std::vector<std::string> >(in.names()); 
         // Rprintf("in.size()=%d.\n", in.size()); 
-        for (size_t i = 0; i < in.size(); i++) {
+        for (int i = 0; i < in.size(); i++) {
           SEXP ee = in[i]; 
           SEXP dim = Rf_getAttrib(ee, R_DimSymbol); 
           R_len_t eelen = Rf_length(ee); 

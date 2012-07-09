@@ -32,7 +32,7 @@ libstanLibrary: $(USERLIB)
 	rm $(USERLIB) 
 
 $(USERLIB): $(LIBSTANOBJECTS)
-	$(SHLIB_CXXLD) -o $(USERLIB) $(LIBSTANOBJECTS) $(SHLIB_CXXLDFLAGS) $(ALL_LIBS)
+	$(SHLIB_CXXLD) -s -o $(USERLIB) $(LIBSTANOBJECTS) $(SHLIB_CXXLDFLAGS) $(ALL_LIBS)
 	@if test -e "/usr/bin/install_name_tool"; then /usr/bin/install_name_tool -id $(R_PACKAGE_DIR)/lib$(R_ARCH)/$(USERLIB) $(USERLIB); fi
 
 .PHONY: all clean libstanLibrary
