@@ -21,6 +21,10 @@ public:
     return true;
   }
 
+  static bool has_init() {
+    return false;
+  }
+
   static size_t num_iterations() {
     return 16000U;
   }
@@ -31,7 +35,29 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha"),
+					  dims);
+    expected_values.push_back(make_pair(index, 2.193));
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("beta"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.3059));
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("gamma"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.0009557));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.2608));
+
     return expected_values;
   }
 

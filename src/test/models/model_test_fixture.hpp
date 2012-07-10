@@ -84,6 +84,9 @@ public:
     if (has_data()) {
       command << " --data=" << model_path << ".Rdata";
     }
+    if (has_init()) {
+      command << " --init=" << model_path << "_init.Rdata";
+    }
     command << " --iter=" << iterations;
     command << " --refresh=" << iterations;
     return command.str();
@@ -172,7 +175,17 @@ public:
   static bool has_data() {
     return Derived::has_data();
   }
-  
+
+  /**
+   * Return true if the model has an initialization file.
+   *
+   * @return true if the model has an initialization file;
+   *         false otherwise.
+   */
+  static bool has_init() {
+    return Derived::has_init();
+  }
+
   static size_t num_iterations() {
     return Derived::num_iterations();
   }

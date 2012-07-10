@@ -21,6 +21,10 @@ public:
     return true;
   }
 
+  static bool has_init() {
+    return false;
+  }
+
   static size_t num_iterations() {
     return iterations;
   }
