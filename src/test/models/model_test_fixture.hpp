@@ -300,6 +300,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
       err_message << "parameter index: " << index
                   << "\n\texpected:    " << setw(10) << expected_mean
                   << "\n\tsampled:     " << setw(10) << sample_mean
+		  << "\n\tsd:          " << setw(10) << c->sd(index)
                   << "\n\tneff:        " << setw(10) << neff
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
