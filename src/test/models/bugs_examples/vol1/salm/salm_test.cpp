@@ -22,11 +22,11 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
   static size_t num_iterations() {
-    return 16000U;
+    return iterations;
   }
 
   static void populate_chains() {
