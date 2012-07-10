@@ -516,9 +516,9 @@ namespace rstan {
 
     stan_fit(SEXP data, SEXP n_chains) : // try : 
       data_(Rcpp::as<Rcpp::List>(data)), 
-      num_chains_(Rcpp::as<size_t>(n_chains)), 
-      model_(data_), 
       names_(get_param_names(model_)), 
+      model_(data_), 
+      num_chains_(Rcpp::as<size_t>(n_chains)), 
       chains_(num_chains_, names_, get_param_dims(model_)) 
     {  
 
