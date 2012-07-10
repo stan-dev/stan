@@ -15,6 +15,6 @@ pois5 <- sqrt(s0_sqrd) * (1 / post[, 11] - 1);
 pois6 <- sqrt(post[, 12]); 
 
 poi <- cbind(poi1, pois1, pois2, pois3, pois4, pois5, pois6); 
-colnames(poi) <- c(paste("OR", 1:6, sep = ''), paste("sigma", 1:6, sep = '')); 
+colnames(poi) <- c(paste("OR", 1:6, sep = ''), paste("tau", 1:6, sep = '')); 
 summary(as.mcmc(poi))
 plot(as.mcmc(poi)) 
