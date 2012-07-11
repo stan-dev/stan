@@ -1,7 +1,4 @@
-# 
 # http://www.openbugs.info/Examples/Blockers.html
-
-# status (works: fairly close to results from package BUGSExampels) 
 
 data {
   int(0,) N; 
