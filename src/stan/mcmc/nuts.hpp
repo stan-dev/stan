@@ -109,13 +109,8 @@ namespace stan {
           _maxdepth(maxdepth),
           _lastdepth(-1)
       {
-        if (this->_epsilon_adapt)
-          find_reasonable_parameters();
-        if (this->adapting()) {
-          // Err on the side of regularizing epsilon towards being too big;
-          // the logic is that it's cheaper to run NUTS when epsilon's large.
-          this->_da.setx0(std::vector<double>(1, log(this->_epsilon * 10)));
-        }
+	// start at 10 * epsilon because NUTS cheaper for larger epsilon
+	this->adaptation_init(10.0);
       }
 
       /**
@@ -124,65 +119,6 @@ namespace stan {
        * The implementation for this class is a no-op.
        */
       ~nuts() { }
-
-
-      /**
-       * Set the model real and integer parameters to the specified
-       * values.  
-       *
-       * This method will typically be used to set the parameters
-       * by the client of this class after initialization.  
-       *
-       * @param x Real parameters.
-       * @param z Integer parameters.
-       */
-      virtual void set_params(const std::vector<double>& x,
-                              const std::vector<int>& z) {
-        assert(x.size() == this->_x.size());
-        assert(z.size() == this->_z.size());
-        this->_x = x;
-        this->_z = z;
-        this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
-      }
-
-      /**
-       * Search for a roughly reasonable (within a factor of 2)
-       * setting of the step size epsilon.
-       */
-      virtual void find_reasonable_parameters() {
-        this->_epsilon = 1;
-        std::vector<double> x = this->_x;
-        std::vector<double> m(this->_model.num_params_r());
-        for (size_t i = 0; i < m.size(); ++i)
-          m[i] = this->_rand_unit_norm();
-        std::vector<double> g = this->_g;
-        double lastlogp = this->_logp;
-        double logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
-        double H = logp - lastlogp;
-        int direction = H > log(0.5) ? 1 : -1;
-//         fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                 this->_epsilon, lastlogp, logp);
-        while (true) {
-          x = this->_x;
-          g = this->_g;
-          for (size_t i = 0; i < m.size(); ++i)
-            m[i] = this->_rand_unit_norm();
-          logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
-          H = logp - lastlogp;
-//           fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                   this->_epsilon, lastlogp, logp);
-          if ((direction == 1) && (H < log(0.5)))
-            break;
-          else if ((direction == -1) && (H > log(0.5)))
-            break;
-          else
-            this->_epsilon = direction == 1 ? 2 * this->_epsilon : 0.5 * this->_epsilon;
-        }
-      }
-
-      bool varying_epsilon() {
-        return this->_epsilon_pm != 0;
-      }
 
       /**
        * Return the next sample.
@@ -221,7 +157,7 @@ namespace stan {
 
         double epsilon = this->_epsilon;
         // only vary epsilon after done adapting
-        if (!this->adapting() && varying_epsilon()) { 
+        if (!this->adapting() && this->varying_epsilon()) { 
           double low = epsilon * (1.0 - this->_epsilon_pm);
           double high = epsilon * (1.0 + this->_epsilon_pm);
           double range = high - low;
@@ -283,13 +219,13 @@ namespace stan {
 
       virtual void write_sampler_param_names(std::ostream& o) {
         o << "treedepth__,";
-        if (this->_epsilon_adapt || varying_epsilon())
+        if (this->_epsilon_adapt || this->varying_epsilon())
           o << "stepsize__,";
       }
 
       virtual void write_sampler_params(std::ostream& o) {
         o << _lastdepth << ',';
-        if (this->_epsilon_adapt || varying_epsilon())
+        if (this->_epsilon_adapt || this->varying_epsilon())
           o << this->_epsilon_last << ',';
       }
 
@@ -409,31 +345,6 @@ namespace stan {
           }
           criterion &= compute_criterion(xplus, xminus, mplus, mminus);
         }
-      }
-
-      /**
-       * Turn off parameter adaptation. 
-       *
-       * Because we're using primal-dual averaging, once we're done
-       * adapting we want to set epsilon=the _average_ value of
-       * epsilon over each adaptation step. This results in a
-       * lower-variance estimate of the optimal epsilon.
-       */
-      virtual void adapt_off() {
-        if (!this->adapting()) return;
-        adaptive_sampler::adapt_off();
-        std::vector<double> result;
-        this->_da.xbar(result);
-        this->_epsilon = exp(result[0]);
-      }
-
-      /**
-       * Return the step size, epsilon.
-       *
-       * @param[out] params Where to store epsilon.
-       */
-      virtual void get_parameters(std::vector<double>& params) {
-        params.assign(1, this->_epsilon);
       }
 
 

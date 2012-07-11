@@ -11,6 +11,8 @@
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/mcmc/util.hpp>
+
 
 namespace stan {
 
@@ -46,6 +48,44 @@ namespace stan {
       std::vector<int> _z;              // most recent discrete params
       std::vector<double> _g;           // most recent gradient
       double _logp;                     // most recent log prob
+
+      /**
+       * Search for a roughly reasonable (within a factor of 2)
+       * setting of the step size epsilon.
+       */
+      virtual void find_reasonable_parameters() {
+        this->_epsilon = 1.0;
+        std::vector<double> x = this->_x;
+        std::vector<double> m(this->_model.num_params_r());
+        for (size_t i = 0; i < m.size(); ++i)
+          m[i] = this->_rand_unit_norm();
+        std::vector<double> g = this->_g;
+        double lastlogp = this->_logp;
+        double logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
+        double H = logp - lastlogp;
+        int direction = H > log(0.5) ? 1 : -1;
+        while (1) {
+          x = this->_x;
+          g = this->_g;
+          for (size_t i = 0; i < m.size(); ++i)
+            m[i] = this->_rand_unit_norm();
+          logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
+          H = logp - lastlogp;
+          if ((direction == 1) && (H < log(0.5)))
+            break;
+          else if ((direction == -1) && (H > log(0.5)))
+            break;
+          else
+            this->_epsilon = ( (direction == 1) 
+			       ? 2.0 * this->_epsilon 
+			       : 0.5 * this->_epsilon );
+        }
+      }
+
+      void adaptation_init(double epsilon_scale) {
+	if (this->adapting())
+	  this->_da.setx0(std::vector<double>(1, log(epsilon_scale * _epsilon)));
+      }
 
     public:
 
@@ -89,8 +129,103 @@ namespace stan {
       {        
         model.init(_x,_z);
         _logp = model.grad_log_prob(_x,_z,_g);
+        if (epsilon_adapt)
+          find_reasonable_parameters();
       }
-    };
+
+      virtual ~hmc_base() { }
+
+      /**
+       * Sets the model real and integer parameters to the specified
+       * values.  
+       *
+       * This method will typically be used to set the parameters
+       * by the client of this class after initialization.  
+       *
+       * @param x Real parameters.
+       * @param z Integer parameters.
+       */
+      virtual void set_params(const std::vector<double>& x,
+			      const std::vector<int>& z) {
+	assert(x.size() == this->_x.size());
+	assert(z.size() == this->_z.size());
+	this->_x = x;
+	this->_z = z;
+	this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
+      }
+
+      /**
+       * Sets the model real parameters to the specified values
+       * and update gradients and log probability to match.
+       *
+       * This method will typically be used to set the parrs
+       * by the client of this class after initialization.  
+       *
+       * @param x Real parameters.
+       * @throw std::invalid_argument if the number of real parameters does
+       *   not match the number of parameters defined by the model.
+       */
+      void set_params_r(const std::vector<double>& x) {
+        if (x.size() != this->_model.num_params_r())
+          throw std::invalid_argument("x.size() must match num model params.");
+        this->_x = x;
+        this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
+      }
+
+
+      /**
+       * Sets the model integer parameters to the specified values
+       * and update gradients and log probability to match.
+       *
+       * This method will typically be used to set the parameters
+       * by the client of this class after initialization.  
+       *
+       * @param z Integer parameters.
+       * @throw std::invalid_argument if the number of integer parameters does
+       *   not match the number of parameters defined by the model.
+       */
+      void set_params_i(const std::vector<int>& z) {
+        if (z.size() != this->_model.num_params_i())
+          throw std::invalid_argument("z.size() must match num params");
+        this->_z = z;
+        this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
+      }
+
+      bool varying_epsilon() {
+        return this->_epsilon_pm != 0;
+      }
+
+      /**
+       * Turn off parameter adaptation. 
+       *
+       * Because we're using primal-dual averaging, once we're done
+       * adapting we want to set epsilon=the _average_ value of
+       * epsilon over each adaptation step. This results in a
+       * lower-variance estimate of the optimal epsilon.
+       */
+      virtual void adapt_off() {
+        if (!this->adapting()) return;
+        adaptive_sampler::adapt_off();
+        std::vector<double> result;
+        this->_da.xbar(result);
+        this->_epsilon = exp(result[0]);
+      }
+
+      /**
+       * Write the step size into position 1 of the specified vector.
+       *
+       * @param[out] params Where to store epsilon.
+       */
+      virtual void get_parameters(std::vector<double>& params) {
+        params.assign(1, this->_epsilon);
+      }
+
+
+
+
+
+
+    }; // class hmc_base
 
   }
 }
