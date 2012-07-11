@@ -70,10 +70,6 @@ namespace stan {
 
     public:
 
-      double epsilon() { return this->_epsilon; }
-
-      void setEpsilon(double epsilon) { this->_epsilon = epsilon; }
-
       /**
        * Construct a No-U-Turn Sampler (NUTS) for the specified model,
        * using the specified step size and number of leapfrog steps,
@@ -252,10 +248,6 @@ namespace stan {
         return mcmc::sample(this->_x, this->_z, this->_logp);
       }
 
-      int last_depth() {
-        return _lastdepth;
-      }
-
      virtual void write_sampler_param_names(std::ostream& o) {
         o << "treedepth__,";
         if (this->_epsilon_adapt || this->varying_epsilon())
@@ -280,10 +272,6 @@ namespace stan {
         o << '\n';
       }
 
-
-      virtual double log_prob() {
-        return this->_logp;
-      }
 
       /**
        * The core recursion in NUTS.
