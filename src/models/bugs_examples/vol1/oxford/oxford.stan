@@ -19,8 +19,12 @@ parameters {
   real alpha;
   real beta1; 
   real beta2;
-  real(0, 3) sigma; // Q: do we need 'real(0, 3)' or just 'real'? 
+  real(0,) sigma_sq;
   real b[K]; 
+}
+transformed parameters {
+  real(0,) sigma;
+  sigma <- sqrt(sigma_sq);
 }
 model {
   for (i in 1:K) {
@@ -34,5 +38,5 @@ model {
   alpha  ~ normal(0.0, 1000); 
   beta1  ~ normal(0.0, 1000); 
   beta2  ~ normal(0.0, 1000); 
-  sigma  ~ uniform(0, 3);
+  sigma_sq ~ inv_gamma(0.001, 0.001);
 }
