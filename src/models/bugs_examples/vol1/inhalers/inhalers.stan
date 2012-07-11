@@ -1,7 +1,6 @@
 # Inhaler: ordered categorical data 
 ## http://www.openbugs.info/Examples/Inhalers.html
 
-
 ## FIXME i(?): 
 ## Is there a way to specify say
 ## real a[3] with the restriction that a[1] < a[2] < a[3]? 
@@ -117,4 +116,9 @@ model {
   delta2 ~ normal(0, 1000); 
  
   sigmasq ~ inv_gamma(0.001, 0.001);
+}
+generated quantities {
+  real log_sigma;
+  
+  log_sigma <- log(sigma);
 }

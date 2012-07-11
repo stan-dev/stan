@@ -35,7 +35,43 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0U);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("a"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 0.712));
+    expected_values.push_back(make_pair(index + 1U, 3.936));
+    expected_values.push_back(make_pair(index + 2U, 5.28));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("beta"),
+					  dims);
+    expected_values.push_back(make_pair(index, 1.067));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("kappa"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.2463));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("log_sigma"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.195));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("pi"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.2367));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
+					  dims);
+    expected_values.push_back(make_pair(index, 1.24));
+
+
+
+
+    
     return expected_values;
   }
 
