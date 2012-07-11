@@ -34,7 +34,45 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0U);
+
     std::vector<std::pair<size_t, double> > expected_values;
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha_Age"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.4891));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha_BT"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.3496));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha_Base"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.8931));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha_Trt"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.9428));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha_V4"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.1027));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha0"),
+					  dims);
+    expected_values.push_back(make_pair(index, -1.435));
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma_b"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.3624));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma_b1"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.4987));
+
     return expected_values;
   }
 
