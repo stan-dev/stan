@@ -314,9 +314,9 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     return;
 
   double p = 1 - cdf(binomial(n, alpha), failed);
-  // this test should fail less than 0.1% of the time.
+  // this test should fail less than 0.01% of the time.
   // (if all the parameters are failing independently... ha)
-  if (p < 0.001) {
+  if (p < 0.0001) {
     err_message << "------------------------------------------------------------\n";
     for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {
       std::vector<std::pair<std::string, std::string> > options = 
