@@ -22,11 +22,11 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
   static size_t num_iterations() {
-    return 16000U;
+    return iterations;
   }
 
   static void populate_chains() {
@@ -35,7 +35,25 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0U);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("d"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.2492));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("delta_new"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.2499));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma_delta"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.1189));
+    
     return expected_values;
   }
 
