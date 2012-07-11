@@ -32,39 +32,6 @@ namespace stan {
     class nuts : public hmc_base<BaseRNG> {
     private:
 
-      // Provides the target distribution we're trying to sample from
-      // it's a ref only because it's heavy to copy
-      stan::model::prob_grad& _model;
-    
-      // The most recent setting of the real-valued parameters
-      std::vector<double> _x;
-
-      // The most recent setting of the discrete parameters
-      std::vector<int> _z;
-
-      // The most recent gradient with respect to the real parameters
-      std::vector<double> _g;
-
-      // The most recent log-likelihood
-      double _logp;
-
-      // The step size used in the Hamiltonian simulation
-      double _epsilon;
-
-      // The +/- around epsilon 
-      double _epsilon_pm; 
-      
-      // last value used for epsilon
-      double _last_epsilon;
-
-      bool _adapt_epsilon;
-
-      // The desired value of E[number of states in slice in last doubling]
-      double _delta;
-
-      // Tuning parameter for dual averaging
-      double _gamma; 
-
       // Stop immediately if H < u - _maxchange
       const double _maxchange;
 
@@ -73,10 +40,6 @@ namespace stan {
 
       // depth of last sample taken (-1 before any samples)
       int _lastdepth;
-
-      // Class implementing Nesterov's primal-dual averaging
-      DualAverage _da;
-
 
       /**
        * Determine whether we've started to make a "U-turn" at either end
@@ -97,9 +60,9 @@ namespace stan {
 
     public:
 
-      double epsilon() { return _epsilon; }
+      double epsilon() { return this->_epsilon; }
 
-      void setEpsilon(double epsilon) { _epsilon = epsilon; }
+      void setEpsilon(double epsilon) { this->_epsilon = epsilon; }
 
       /**
        * Construct a No-U-Turn Sampler (NUTS) for the specified model,
@@ -118,7 +81,7 @@ namespace stan {
        * will be called to initialize epsilon.
        * @param epsilon_pm Plus/minus range for uniformly sampling epsilon around
        * its value.
-       * @param adapt_epsilon True if epsilon is adapted during warmup.
+       * @param epsilon_adapt True if epsilon is adapted during warmup.
        * @param delta Optional target value between 0 and 1 used to tune 
        * epsilon. Lower delta => higher epsilon => more efficiency, unless
        * epsilon gets _too_ big in which case efficiency suffers.
@@ -131,39 +94,27 @@ namespace stan {
            int maxdepth = 10,
            double epsilon = -1,
            double epsilon_pm = 0.0,
-           bool adapt_epsilon = true,
+           bool epsilon_adapt = true,
            double delta = 0.6, 
            double gamma = 0.05,
            BaseRNG base_rng = BaseRNG(std::time(0)) )
-        : hmc_base<BaseRNG>(adapt_epsilon,base_rng),
-
-          _model(model), // what used to be here
-          _x(model.num_params_r()),
-          _z(model.num_params_i()),
-          _g(model.num_params_r()),
-
-          _epsilon(epsilon),
-          _epsilon_pm(epsilon_pm),
-          _last_epsilon(epsilon),
-          _adapt_epsilon(epsilon < 0.0),
-          
-          _delta(delta),
-          _gamma(gamma),
-
+        : hmc_base<BaseRNG>(model,
+                            epsilon,
+                            epsilon_pm,
+                            epsilon_adapt,
+                            delta,
+                            gamma,
+                            base_rng),
           _maxchange(-1000),
           _maxdepth(maxdepth),
-          _lastdepth(-1),
-
-          _da(gamma, std::vector<double>(1, 0)) {
-        
-        model.init(_x, _z);
-        _logp = model.grad_log_prob(_x, _z, _g);
-        if (_adapt_epsilon)
+          _lastdepth(-1)
+      {
+        if (this->_epsilon_adapt)
           find_reasonable_parameters();
         if (this->adapting()) {
           // Err on the side of regularizing epsilon towards being too big;
           // the logic is that it's cheaper to run NUTS when epsilon's large.
-          _da.setx0(std::vector<double>(1, log(_epsilon * 10)));
+          this->_da.setx0(std::vector<double>(1, log(this->_epsilon * 10)));
         }
       }
 
@@ -187,11 +138,11 @@ namespace stan {
        */
       virtual void set_params(const std::vector<double>& x,
                               const std::vector<int>& z) {
-        assert(x.size() == _x.size());
-        assert(z.size() == _z.size());
-        _x = x;
-        _z = z;
-        _logp = _model.grad_log_prob(_x,_z,_g);
+        assert(x.size() == this->_x.size());
+        assert(z.size() == this->_z.size());
+        this->_x = x;
+        this->_z = z;
+        this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
       }
 
       /**
@@ -199,38 +150,38 @@ namespace stan {
        * setting of the step size epsilon.
        */
       virtual void find_reasonable_parameters() {
-        _epsilon = 1;
-        std::vector<double> x = _x;
-        std::vector<double> m(_model.num_params_r());
+        this->_epsilon = 1;
+        std::vector<double> x = this->_x;
+        std::vector<double> m(this->_model.num_params_r());
         for (size_t i = 0; i < m.size(); ++i)
           m[i] = this->_rand_unit_norm();
-        std::vector<double> g = _g;
-        double lastlogp = _logp;
-        double logp = leapfrog(_model, _z, x, m, g, _epsilon);
+        std::vector<double> g = this->_g;
+        double lastlogp = this->_logp;
+        double logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
         double H = logp - lastlogp;
         int direction = H > log(0.5) ? 1 : -1;
 //         fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                 _epsilon, lastlogp, logp);
+//                 this->_epsilon, lastlogp, logp);
         while (true) {
-          x = _x;
-          g = _g;
+          x = this->_x;
+          g = this->_g;
           for (size_t i = 0; i < m.size(); ++i)
             m[i] = this->_rand_unit_norm();
-          logp = leapfrog(_model, _z, x, m, g, _epsilon);
+          logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
           H = logp - lastlogp;
 //           fprintf(stderr, "epsilon = %f.  initial logp = %f, lf logp = %f\n", 
-//                   _epsilon, lastlogp, logp);
+//                   this->_epsilon, lastlogp, logp);
           if ((direction == 1) && (H < log(0.5)))
             break;
           else if ((direction == -1) && (H > log(0.5)))
             break;
           else
-            _epsilon = direction == 1 ? 2 * _epsilon : 0.5 * _epsilon;
+            this->_epsilon = direction == 1 ? 2 * this->_epsilon : 0.5 * this->_epsilon;
         }
       }
 
       bool varying_epsilon() {
-        return _epsilon_pm != 0;
+        return this->_epsilon_pm != 0;
       }
 
       /**
@@ -240,18 +191,18 @@ namespace stan {
        */
       virtual sample next_impl() {
         // Initialize the algorithm
-        std::vector<double> mminus(_model.num_params_r());
+        std::vector<double> mminus(this->_model.num_params_r());
         for (size_t i = 0; i < mminus.size(); ++i)
           mminus[i] = this->_rand_unit_norm();
         std::vector<double> mplus(mminus);
         // The log-joint probability of the momentum and position terms, i.e.
         // -(kinetic energy + potential energy)
-        double H0 = -0.5 * stan::math::dot_self(mminus) + _logp;
+        double H0 = -0.5 * stan::math::dot_self(mminus) + this->_logp;
 
-        std::vector<double> gradminus(_g);
-        std::vector<double> gradplus(_g);
-        std::vector<double> xminus(_x);
-        std::vector<double> xplus(_x);
+        std::vector<double> gradminus(this->_g);
+        std::vector<double> gradplus(this->_g);
+        std::vector<double> xminus(this->_x);
+        std::vector<double> xplus(this->_x);
 
         // Sample the slice variable
         double u = log(this->_rand_uniform_01()) + H0;
@@ -268,15 +219,15 @@ namespace stan {
         // for-loop with depth outside to set lastdepth
         int depth = 0;
 
-        double epsilon = _epsilon;
+        double epsilon = this->_epsilon;
         // only vary epsilon after done adapting
         if (!this->adapting() && varying_epsilon()) { 
-          double low = epsilon * (1.0 - _epsilon_pm);
-          double high = epsilon * (1.0 + _epsilon_pm);
+          double low = epsilon * (1.0 - this->_epsilon_pm);
+          double high = epsilon * (1.0 + this->_epsilon_pm);
           double range = high - low;
           epsilon = low + (range * this->_rand_uniform_01());
         }
-        _last_epsilon = epsilon; // use last_epsilon in tree build
+        this->_epsilon_last = epsilon; // use epsilon_last in tree build
 
         while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
           direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
@@ -297,12 +248,12 @@ namespace stan {
           // Metropolis-Hastings to determine if we can jump to a point in
           // the new half-tree
           if (this->_rand_uniform_01() < float(newnvalid) / (1e-100+float(nvalid))) {
-            _x = newx;
-            _g = newgrad;
-            _logp = newlogp;
+            this->_x = newx;
+            this->_g = newgrad;
+            this->_logp = newlogp;
           }
           nvalid += newnvalid;
-//          fprintf(stderr, "depth = %d, _logp = %g\n", depth, _logp);
+//          fprintf(stderr, "depth = %d, this->_logp = %g\n", depth, this->_logp);
           ++depth;
         }
         _lastdepth = depth;
@@ -310,19 +261,19 @@ namespace stan {
         // Now we just have to update epsilon, if adaptation is on.
         double adapt_stat = prob_sum / float(n_considered);
         if (this->adapting()) {
-          double adapt_g = adapt_stat - _delta;
+          double adapt_g = adapt_stat - this->_delta;
           std::vector<double> gvec(1, -adapt_g);
           std::vector<double> result;
-          _da.update(gvec, result);
-          _epsilon = exp(result[0]);
+          this->_da.update(gvec, result);
+          this->_epsilon = exp(result[0]);
         }
         std::vector<double> result;
-        _da.xbar(result);
+        this->_da.xbar(result);
 //         fprintf(stderr, "xbar = %f\n", exp(result[0]));
         double avg_eta = 1.0 / this->n_steps();
         this->update_mean_stat(avg_eta,adapt_stat);
 
-        mcmc::sample s(_x, _z, _logp);
+        mcmc::sample s(this->_x, this->_z, this->_logp);
         return s;
       }
 
@@ -332,19 +283,19 @@ namespace stan {
 
       virtual void write_sampler_param_names(std::ostream& o) {
         o << "treedepth__,";
-        if (_adapt_epsilon || varying_epsilon())
+        if (this->_epsilon_adapt || varying_epsilon())
           o << "stepsize__,";
       }
 
       virtual void write_sampler_params(std::ostream& o) {
         o << _lastdepth << ',';
-        if (_adapt_epsilon || varying_epsilon())
-          o << _last_epsilon << ',';
+        if (this->_epsilon_adapt || varying_epsilon())
+          o << this->_epsilon_last << ',';
       }
 
 
       virtual double log_prob() {
-        return _logp;
+        return this->_logp;
       }
 
       /**
@@ -405,9 +356,9 @@ namespace stan {
           xminus = x;
           gradminus = grad;
           mminus = m;
-          // FIXME:  lepfrog needs +/- _epsilon_pm
-          newlogp = leapfrog(_model, _z, xminus, mminus, gradminus,
-                             direction * _last_epsilon);
+          // FIXME:  lepfrog needs +/- this->_epsilon_pm
+          newlogp = leapfrog(this->_model, this->_z, xminus, mminus, gradminus,
+                             direction * this->_epsilon_last);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;
@@ -472,8 +423,8 @@ namespace stan {
         if (!this->adapting()) return;
         adaptive_sampler::adapt_off();
         std::vector<double> result;
-        _da.xbar(result);
-        _epsilon = exp(result[0]);
+        this->_da.xbar(result);
+        this->_epsilon = exp(result[0]);
       }
 
       /**
@@ -482,7 +433,7 @@ namespace stan {
        * @param[out] params Where to store epsilon.
        */
       virtual void get_parameters(std::vector<double>& params) {
-        params.assign(1, _epsilon);
+        params.assign(1, this->_epsilon);
       }
 
 
