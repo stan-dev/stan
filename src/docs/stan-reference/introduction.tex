@@ -263,7 +263,7 @@ placeholder for the top-level directory, \code{stan-1.0.0}, containing
 
 Once all the tools required for \Stan are installed (see
 \refappendix{install}), \Stan's libraries must be built.  There is a
-makefile supplied so that this can be done with one commad.
+makefile supplied so that this can be done with one command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -282,9 +282,8 @@ of compatible compilers and versions, see \refappendix{install}.
 
 \section{Compiling  with \code{stanc}}
 
-Starting at \Stan's home directory, written here as {\tt \$stan},
-the model may be compiled by the \Stan compiler, \stanc, into \Cpp code
-as follows.
+Starting at \Stan's home directory, the model may be compiled by 
+the \Stan compiler, \stanc, into \Cpp code as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -600,7 +599,7 @@ theta ~ beta(1,1);
 The beta distribution is conjugate to the Bernoulli, meaning that the
 posterior is also a beta distribution.  In theory, the closed form of
 the posterior would allow for more efficient sampling, but \Stan,
-least as of yet, does not make use of this information.  See
+at least as of yet, does not make use of this information.  See
 \refchapter{optimization} for information on how to code sufficient
 statistics and conjugate priors directly in \Stan to speed this model up.
 

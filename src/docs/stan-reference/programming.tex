@@ -503,14 +503,14 @@ parameters {
 }
 model {
     for (n in 1:N)
-        y[n] ~ normal(beta * x[n] + alpha, sigma);
+        y[n] ~ normal(alpha + beta * x[n], sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
 There are \code{N} observations, each with predictor \code{x[n]} and
-outcome \code{y[n]}.  The slope and intercept parameters are
-\code{beta} and \code{alpha}.  The model assumes a normally
+outcome \code{y[n]}.  The intercept and slope parameters are
+\code{alpha} and \code{beta}.  The model assumes a normally
 distributed noise term with scale \code{sigma}.  This model has
 improper priors for the two regression coefficients.
 
@@ -523,7 +523,7 @@ For example, weak priors can be assigned to the coefficients as follows.
 \begin{Verbatim}
     alpha ~ normal(0,100);
     beta ~ normal(0,100);
-    epsilon ~ uniform(0,100);
+    sigma ~ uniform(0,100);
 \end{Verbatim}
 \end{quote}
 %
@@ -534,7 +534,7 @@ as follows.
 \begin{Verbatim}
     alpha ~ cauchy(0,2.5);
     beta ~ cauchy(0,2.5);
-    epsilon ~ cauchy(0,2.5);
+    sigma ~ cauchy(0,2.5);
 \end{Verbatim}
 \end{quote}
 %
@@ -545,7 +545,7 @@ requires the half-Cauchy distribution, which would be expressed in
 %
 \begin{quote}
 \begin{Verbatim}
-    epsilon ~ cauchy(0,2.5) T(0,);
+    sigma ~ cauchy(0,2.5) T(0,);
 \end{Verbatim}
 \end{quote}
 %
@@ -597,7 +597,7 @@ parameters {
 }
 model {
     for (n in 1:N)
-        y[n] ~ bernoulli(inv_logit(beta * x[n] + alpha));
+        y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
 } 
 \end{Verbatim}
 \end{quote}
@@ -622,7 +622,7 @@ regression model may be coded in \Stan as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-        y[n] ~ bernoulli(erf(beta * x[n] + alpha));
+        y[n] ~ bernoulli(erf(alpha + beta * x[n]));
 \end{Verbatim}
 \end{quote}
 
@@ -654,7 +654,7 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The sofmax function is defined for a $K$-vector $\gamma \in \reals^K$ by
+The softmax function is defined for a $K$-vector $\gamma \in \reals^K$ by
 \[
 \mbox{softmax}(\gamma) = 
 \left(
@@ -923,7 +923,7 @@ model {
 \noindent
 Custom distributions may also be implemented directly within \Stan's
 programming language.  A simple example is the triangle distribution,
-whose density is shaped like an Isosceles triangle with corners at
+whose density is shaped like an isosceles triangle with corners at
 specified bounds and height determined by the constraint that a
 density integrate to 1.  If $\alpha \in \reals$ and $\beta \in \reals$
 are the bounds, with $\alpha < \beta$, then $y \in (\alpha,\beta)$ has
@@ -1035,6 +1035,7 @@ model {
     theta ~ beta(alpha,beta);
     for (n in 1:N) 
         y[n] ~ bernoulli(theta);
+}
 \end{Verbatim}
 \end{quote}
 %
