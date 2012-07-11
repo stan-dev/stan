@@ -1,6 +1,7 @@
 # Stacks: robust regression and ridge regression 
 # http://mathstat.helsinki.fi/openbugs/Examples/Stacks.html
-# Model a) normal error 
+# Model a) normal error
+
 data {
   int(0,) N;
   int(0,) p;
@@ -28,7 +29,7 @@ parameters {
 } 
 
 transformed parameters {
-  real sigma;
+  real(0,) sigma;
   real mu[N];
 
   sigma <- sqrt(sigmasq);
