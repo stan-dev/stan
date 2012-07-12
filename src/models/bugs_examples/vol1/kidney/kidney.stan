@@ -1,6 +1,6 @@
 # http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol1.pdf
 # Page 51: Kidney: Weibull regression with random efects
-
+# http://www.openbugs.info/Examples/Kidney.html
 
 data {
   int(0,) NP; 
@@ -39,7 +39,7 @@ transformed parameters {
   sigma <- sqrt(1 / tau); 
 }
 
-model {
+model {  
   alpha ~ normal(0, 100); 
   beta_age ~ normal(0, 100); 
   beta_sex ~ normal(0, 100);
@@ -52,8 +52,8 @@ model {
 
   for (i in 1:NP) b[i] ~ normal(0, sigma);   
   for (i in 1:N_uc) {
-    t_uc[i] ~ weibull(r, exp(-(alpha + beta_age * age_uc[i] + beta_sex * sex_uc[i] 
-                               + yabeta_disease[disease_uc[i]] + b[patient_uc[i]]) / r));
+    t_uc[i] ~ weibull(r, exp(-(alpha + beta_age * age_uc[i] + beta_sex * sex_uc[i] +
+                               yabeta_disease[disease_uc[i]] + b[patient_uc[i]]) / r));
   } 
   for (i in 1:N_rc) {
     1 ~ bernoulli(exp(-pow(t_rc[i] / exp(-(alpha + beta_age * age_rc[i] + beta_sex * sex_rc[i] 
@@ -62,4 +62,8 @@ model {
     // 0 ~ bernoulli(weibull_p(t_rc[i], exp(-(alpha + beta_age * age_rc[i] + beta_sex * sex_rc[i] 
     //                                      + yabeta_disease[disease_rc[i]] + b[patient_rc[i]]) / r), r));
   }
+}
+
+generated quantities {
+
 }

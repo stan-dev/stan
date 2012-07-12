@@ -26,6 +26,11 @@ public:
     return 8000U;
   }
 
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    return params_to_skip;
+  }
+
   static void populate_chains() {
     if (chains->num_kept_samples() == 0U) {
       stan::mcmc::chains<> *tmp_chains = create_chains();

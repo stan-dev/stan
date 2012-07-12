@@ -186,6 +186,10 @@ public:
     return Derived::has_init();
   }
 
+  static std::vector<size_t> skip_chains_test() {
+    return Derived::skip_chains_test();
+  } 
+
   static size_t num_iterations() {
     return Derived::num_iterations();
   }
@@ -244,17 +248,20 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   stan::mcmc::chains<> *c = TypeParam::chains;
   size_t num_chains = c->num_chains();
   size_t num_params = c->num_params();
+  std::vector<size_t> params_to_skip = TypeParam::skip_chains_test();
   for (size_t chain = 0; chain < num_chains; chain++) {
     for (size_t param = 0; param < num_params; param++) {
-      EXPECT_GT(c->variance(chain, param), 0)
-        << "Chain " << chain << ", param " << param
-        << ": variance is 0" << std::endl
-        << err_message[chain];
-      // made this 1.2 to fail less often
-      EXPECT_LT(c->split_potential_scale_reduction(param), 1.2) 
-	<< "Chain " << chain << ", param " << param
-        << ": split r hat > 1.2" << std::endl
-        << err_message[chain];
+      if (std::find(params_to_skip.begin(), params_to_skip.end(), param) != params_to_skip.end()) {
+	EXPECT_GT(c->variance(chain, param), 0)
+	  << "Chain " << chain << ", param " << param
+	  << ": variance is 0" << std::endl
+	  << err_message[chain];
+	// made this 1.2 to fail less often
+	EXPECT_LT(c->split_potential_scale_reduction(param), 1.2) 
+	  << "Chain " << chain << ", param " << param
+	  << ": split r hat > 1.2" << std::endl
+	  << err_message[chain];
+      }
     }
   }
 }
@@ -277,9 +284,9 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     return;
 
   stan::mcmc::chains<> *c = TypeParam::chains;
-  double alpha = 0.01;
-  if (n < 3)
-    alpha = 0.0001;
+  double alpha = 0.05;
+  if (n == 1) 
+    alpha = 0.0005;
   
   int failed = 0;
   std::stringstream err_message;
@@ -316,7 +323,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   double p = 1 - cdf(binomial(n, alpha), failed);
   // this test should fail less than 0.01% of the time.
   // (if all the parameters are failing independently... ha)
-  if (p < 0.0001) {
+  if (p < 0.001) {
     err_message << "------------------------------------------------------------\n";
     for (size_t chain = 0; chain < TypeParam::num_chains; chain++) {
       std::vector<std::pair<std::string, std::string> > options = 

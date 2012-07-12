@@ -25,6 +25,11 @@ public:
     return iterations;
   }
 
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    return params_to_skip;
+  }
+
   static void populate_chains() {
     default_populate_chains();
   }
