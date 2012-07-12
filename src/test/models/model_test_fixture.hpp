@@ -277,9 +277,9 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     return;
 
   stan::mcmc::chains<> *c = TypeParam::chains;
-  double alpha = 0.005;
+  double alpha = 0.01;
   if (n < 3)
-    alpha = 0.001;
+    alpha = 0.0001;
   
   int failed = 0;
   std::stringstream err_message;
