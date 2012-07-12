@@ -23,16 +23,26 @@ namespace rstan {
 
   namespace io {
 
-    /**
     namespace {
-       size_t product(std::vector<size_t> dims) {
-         size_t y = 1U;
-         for (size_t i = 0; i < dims.size(); ++i)
-           y *= dims[i];
-         return y;
-       }
+      /**
+      size_t product(std::vector<size_t> dims) {
+        size_t y = 1U;
+        for (size_t i = 0; i < dims.size(); ++i)
+          y *= dims[i];
+        return y;
+      }
+      */
+      template <class T1, class T2> 
+      void  T1v_to_T2v(const std::vector<T1>& v,
+                       std::vector<T2>& v2) {
+        v2.resize(0); 
+        for (typename std::vector<T1>::const_iterator it = v.begin();
+             it != v.end();
+             ++it) { 
+          v2.push_back(static_cast<T2>(*it));
+        }     
+      } 
     }
-    **/
 
     /**
      * Represents named arrays with dimensions.
@@ -109,10 +119,11 @@ namespace rstan {
 
           if (Rf_isInteger(ee)) {
             if (Rf_length(dim) > 0) { 
+              std::vector<size_t> d; 
+              T1v_to_T2v(Rcpp::as<std::vector<unsigned int> >(dim), d); 
               vars_i_.insert(pspid_v_t(varnames[i], 
                 std::pair<std::vector<int>, std::vector<size_t> >(
-                  Rcpp::as<std::vector<int> >(ee), 
-                  Rcpp::as<std::vector<size_t> >(dim)))); 
+                  Rcpp::as<std::vector<int> >(ee), d))); 
             } else {
               if (1 == eelen) {  // scalar 
                 vars_i_.insert(pspid_v_t(varnames[i], 
@@ -127,10 +138,11 @@ namespace rstan {
             } 
           } else if(Rf_isNumeric(ee)) {
             if (Rf_length(dim) > 0) { 
+              std::vector<size_t> d; 
+              T1v_to_T2v(Rcpp::as<std::vector<unsigned int> >(dim), d); 
               vars_r_.insert(pspdd_v_t(varnames[i], 
                 std::pair<std::vector<double>, std::vector<size_t> >(
-                  Rcpp::as<std::vector<double> >(ee), 
-                  Rcpp::as<std::vector<size_t> >(dim)))); 
+                  Rcpp::as<std::vector<double> >(ee), d))); 
             } else {
               if (1 == eelen) { 
                 vars_r_.insert(pspdd_v_t(varnames[i], 

@@ -41,7 +41,18 @@
 namespace rstan {
 
   namespace { 
-  
+    // Potentially this could be problematic. 
+    template <class T1, class T2> 
+    void  T1v_to_T2v(const std::vector<T1>& v,
+                     std::vector<T2>& v2) {
+      v2.resize(0); 
+      for (typename std::vector<T1>::const_iterator it = v.begin();
+           it != v.end();
+           ++it) { 
+        v2.push_back(static_cast<T2>(*it));
+      }     
+    } 
+
     bool do_print(int refresh) {
       return refresh > 0;
     }
@@ -114,7 +125,7 @@ namespace rstan {
                      std::vector<int>& params_i,
                      Model& model,
                      stan::mcmc::chains<RNG>& chains,
-                     size_t chain_id) {
+                     unsigned int chain_id) {
   
       sampler.set_params(params_r,params_i);
 
@@ -177,12 +188,12 @@ namespace rstan {
       bool sample_file_flag = args.get_sample_file_flag(); 
       std::string sample_file = args.get_sample_file(); 
 
-      size_t num_iterations = args.get_iter(); 
-      size_t num_warmup = args.get_warmup(); 
-      size_t num_thin = args.get_thin(); 
+      unsigned int num_iterations = args.get_iter(); 
+      unsigned int num_warmup = args.get_warmup(); 
+      unsigned int num_thin = args.get_thin(); 
       int leapfrog_steps = args.get_leapfrog_steps(); 
 
-      size_t random_seed = args.get_random_seed();
+      unsigned int random_seed = args.get_random_seed();
 
       double epsilon = args.get_epsilon(); 
       bool epsilon_adapt = epsilon <= 0.0; 
@@ -198,9 +209,9 @@ namespace rstan {
 
       double gamma = args.get_gamma(); 
 
-      size_t refresh = args.get_refresh(); 
+      int refresh = args.get_refresh(); 
 
-      size_t chain_id = args.get_chain_id(); 
+      unsigned int chain_id = args.get_chain_id(); 
 
       // FASTER, but no parallel guarantees:
       // typedef boost::mt19937 rng_t;
@@ -351,8 +362,8 @@ namespace rstan {
     io::rlist_ref_var_context data_;
     std::vector<std::string>  names_;
     Model model_;
-    size_t num_chains_; 
-    std::map<size_t, stan_args> argss_; 
+    unsigned int num_chains_; 
+    std::map<unsigned int, stan_args> argss_; 
     // std::vector<stan_args> argss_;
     // stan::mcmc::chains<RNG> chains_; 
     chains_for_R<RNG> chains_; 
@@ -518,7 +529,7 @@ namespace rstan {
       data_(Rcpp::as<Rcpp::List>(data)), 
       names_(get_param_names(model_)), 
       model_(data_), 
-      num_chains_(Rcpp::as<size_t>(n_chains)), 
+      num_chains_(Rcpp::as<unsigned int>(n_chains)), 
       chains_(num_chains_, names_, get_param_dims(model_)) 
     {  
 
@@ -554,8 +565,8 @@ namespace rstan {
      */ 
   
     SEXP get_chain_stan_args(SEXP chain_id) {
-      size_t k = Rcpp::as<size_t>(chain_id); 
-      std::map<size_t, stan_args>::const_iterator it
+      unsigned int k = Rcpp::as<unsigned int>(chain_id); 
+      std::map<unsigned int, stan_args>::const_iterator it
         = argss_.find(k);  
       if (it != argss_.end()) 
         return (it -> second).stan_args_to_rlist(); 
@@ -577,7 +588,7 @@ namespace rstan {
       std::vector<std::string> cnames(num_chains_, "chain."); 
 
       std::string cname("chain."); 
-      for (std::map<size_t, stan_args>::const_iterator it = argss_.begin(); 
+      for (std::map<unsigned int, stan_args>::const_iterator it = argss_.begin(); 
            it != argss_.end(); 
            ++it)   
         lst[cname + to_string(it -> first)] = (it -> second).stan_args_to_rlist(); 
@@ -603,7 +614,7 @@ namespace rstan {
       if (!argss_.empty()) 
         t.set_random_seed((argss_.begin() -> second).get_random_seed()); 
 
-      size_t c_id = t.get_chain_id(); 
+      unsigned int c_id = t.get_chain_id(); 
       // rstan::io::rcout << "chain id = " << c_id << std::endl;
       if (c_id > num_chains_) { 
         rstan::io::rcerr << "chain id cannot be larger than # of chains"
@@ -617,7 +628,7 @@ namespace rstan {
                          << " was sampled before." << std::endl;
         return Rcpp::wrap(false);
       } 
-      argss_.insert(std::map<size_t, stan_args>::value_type(c_id, t));
+      argss_.insert(std::map<unsigned int, stan_args>::value_type(c_id, t));
      
       // assuming that the warmup are set all the same for 
       // all the chains or simply here we only use one
@@ -705,7 +716,7 @@ namespace rstan {
     SEXP get_chain_samples(SEXP chain_id, SEXP names, 
                            SEXP keep_warmup = Rcpp::wrap(true),
                            SEXP expand = Rcpp::wrap(false)) {
-      size_t k = Rcpp::as<size_t>(chain_id) - 1;  // make it start from 0
+      size_t k = Rcpp::as<unsigned int>(chain_id) - 1;  // make it start from 0
       bool kw = Rcpp::as<bool>(keep_warmup); 
       bool ep = Rcpp::as<bool>(expand); 
       std::vector<SEXP> samples; 
@@ -750,7 +761,11 @@ namespace rstan {
       for (std::vector<std::vector<size_t> >::const_iterator it = dimss.begin(); 
            it != dimss.end(); 
            ++it) {
-        dimss2.push_back(Rcpp::wrap(*it)); 
+        std::vector<unsigned int> v2; 
+        T1v_to_T2v(*it, v2); 
+        dimss2.push_back(Rcpp::wrap(v2)); 
+        // Cast size_t to unsigned int, which potentially is problematic. 
+        // But Rcpp (and/or? R) could not deal with size_t on windows. 
       }
       Rcpp::List lst(dimss2.begin(), dimss2.end()); 
       lst.names() = names2;
@@ -778,7 +793,7 @@ namespace rstan {
                      SEXP expand = Rcpp::wrap(false)) {
       Rcpp::List lst(num_chains_); 
       std::vector<std::string> cnames(num_chains_, "chain."); 
-      for (size_t i = 0; i < num_chains_; ++i) {
+      for (unsigned int i = 0; i < num_chains_; ++i) {
         lst[i] = get_chain_samples(Rcpp::wrap(i + 1), names, keep_warmup, expand);
         cnames[i] += to_string(i + 1);  
       }
@@ -857,7 +872,7 @@ namespace rstan {
      */
     SEXP get_chain_quantiles(SEXP chain_id, SEXP names, SEXP probs) {
       
-      size_t k = Rcpp::as<size_t>(chain_id) - 1;  // make it start from 0
+      size_t k = Rcpp::as<unsigned int>(chain_id) - 1;  // make it start from 0
 
       std::vector<size_t> indices; 
       std::vector<std::string> flatnames; // names for the returned samples 
@@ -891,7 +906,7 @@ namespace rstan {
      *  second is the SD. 
      */
     SEXP get_chain_mean_and_sd(SEXP chain_id, SEXP names) {
-      size_t k = Rcpp::as<size_t>(chain_id) - 1;  // make it start from 0
+      size_t k = Rcpp::as<unsigned int>(chain_id) - 1;  // make it start from 0
 
       std::vector<size_t> indices; 
       std::vector<std::string> flatnames; 
@@ -1029,7 +1044,7 @@ namespace rstan {
      * @return Number of warmup iterations. 
      */
     SEXP warmup() {
-      return Rcpp::wrap(chains_.warmup()); 
+      return Rcpp::wrap(static_cast<unsigned int>(chains_.warmup())); 
     } 
 
     /**
@@ -1043,19 +1058,19 @@ namespace rstan {
      */
     
     SEXP num_chain_samples(size_t k) {
-      return Rcpp::wrap(chains_.num_samples(k - 1)); 
+      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_samples(k - 1))); 
     } 
 
     SEXP num_chain_kept_samples(size_t k) {
-      return Rcpp::wrap(chains_.num_kept_samples(k - 1)); 
+      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_kept_samples(k - 1))); 
     } 
 
     SEXP num_samples() { 
-      return Rcpp::wrap(chains_.num_samples()); 
+      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_samples())); 
     } 
 
     SEXP num_kept_samples() {
-      return Rcpp::wrap(chains_.num_kept_samples()); 
+      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_kept_samples())); 
     } 
 
     /**
