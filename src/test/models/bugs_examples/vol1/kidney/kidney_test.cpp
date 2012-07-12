@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
 
-class Models_BugsExamples_Vol1_Bones : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_Bones> {
+class Models_BugsExamples_Vol1_Kidney : 
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Kidney> {
 protected:
   virtual void SetUp() {
   }
@@ -31,6 +31,14 @@ public:
 
   static std::vector<size_t> skip_chains_test() {
     std::vector<size_t> params_to_skip;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
+    index = chains->get_total_param_index(chains->param_name_to_index("yabeta_disease"),
+					  dims);
+    params_to_skip.push_back(index);
+
     return params_to_skip;
   }
 
@@ -82,6 +90,6 @@ public:
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Bones,
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Kidney,
 			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Bones);
+			      Models_BugsExamples_Vol1_Kidney);

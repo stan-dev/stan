@@ -249,9 +249,10 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   size_t num_chains = c->num_chains();
   size_t num_params = c->num_params();
   std::vector<size_t> params_to_skip = TypeParam::skip_chains_test();
+
   for (size_t chain = 0; chain < num_chains; chain++) {
     for (size_t param = 0; param < num_params; param++) {
-      if (std::find(params_to_skip.begin(), params_to_skip.end(), param) != params_to_skip.end()) {
+      if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
 	EXPECT_GT(c->variance(chain, param), 0)
 	  << "Chain " << chain << ", param " << param
 	  << ": variance is 0" << std::endl
