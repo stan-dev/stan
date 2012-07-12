@@ -10,6 +10,8 @@ typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
 
+
+
 AVEC createAVEC(AVAR x) {
   AVEC v;
   v.push_back(x);
@@ -27,6 +29,13 @@ AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
   v.push_back(x2);
   v.push_back(x3);
   return v;
+}
+
+TEST(AgradAgrad,undefined) {
+  AVAR a;
+  EXPECT_TRUE(a.is_uninitialized());
+  a = 5;
+  EXPECT_FALSE(a.is_uninitialized());
 }
 
 TEST(AgradAgrad,a_eq_x) {
