@@ -21,8 +21,17 @@ public:
     return true;
   }
 
+  static bool has_init() {
+    return false;
+  }
+
   static size_t num_iterations() {
-    return iterations;
+    return 4000U;
+  }
+
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    return params_to_skip;
   }
 
   static void populate_chains() {
@@ -31,7 +40,38 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0U);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("median"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 23.65));
+    /*expected_values.push_back(make_pair(index + 1U, 35.18));
+    expected_values.push_back(make_pair(index + 2U, 26.68));
+    expected_values.push_back(make_pair(index + 3U, 21.28));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("pos_control"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.3088));
+    */
+
+    index = chains->get_total_param_index(chains->param_name_to_index("r"),
+					  dims);
+    expected_values.push_back(make_pair(index, 2.902));
+
+    /*index = chains->get_total_param_index(chains->param_name_to_index("test_sub"),
+					  dims);
+    expected_values.push_back(make_pair(index, -0.3475));
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("veh_control"),
+					  dims);
+    expected_values.push_back(make_pair(index, -1.143));
+    */
+
     return expected_values;
   }
 

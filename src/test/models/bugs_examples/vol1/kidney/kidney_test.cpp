@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
 
-class Models_BugsExamples_Vol1_Bones : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol1_Bones> {
+class Models_BugsExamples_Vol1_Kidney : 
+  public Model_Test_Fixture<Models_BugsExamples_Vol1_Kidney> {
 protected:
   virtual void SetUp() {
   }
@@ -12,8 +12,8 @@ public:
     model_path.push_back("models");
     model_path.push_back("bugs_examples");
     model_path.push_back("vol1");
-    model_path.push_back("bones");
-    model_path.push_back("bones");
+    model_path.push_back("kidney");
+    model_path.push_back("kidney");
     return model_path;
   }
 
@@ -21,8 +21,25 @@ public:
     return true;
   }
 
+  static bool has_init() {
+    return false;
+  }
+
   static size_t num_iterations() {
-    return iterations;
+    return 4000U;
+  }
+
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
+    index = chains->get_total_param_index(chains->param_name_to_index("yabeta_disease"),
+					  dims);
+    params_to_skip.push_back(index);
+
+    return params_to_skip;
   }
 
   static void populate_chains() {
@@ -31,12 +48,48 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("alpha"),
+					  dims);
+    expected_values.push_back(make_pair(index, -5.529));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("beta_disease2"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.1265));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("beta_disease3"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.5995));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("beta_disease4"),
+					  dims);
+    expected_values.push_back(make_pair(index, -1.198));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("beta_sex"),
+					  dims);
+    expected_values.push_back(make_pair(index, -1.945));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("r"),
+					  dims);
+    expected_values.push_back(make_pair(index, 1.205));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
+					  dims);
+    expected_values.push_back(make_pair(index, 0.6367));
+
+
+
     return expected_values;
   }
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Bones,
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Kidney,
 			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Bones);
+			      Models_BugsExamples_Vol1_Kidney);

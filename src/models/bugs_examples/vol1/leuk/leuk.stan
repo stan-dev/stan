@@ -37,10 +37,22 @@ model {
     for(i in 1:N) {
       // dN[i, j] ~ poisson(Y[i, j] * exp(beta * Z[i]) * dL0[j]); 
       lp__ <- lp__ + if_else(Y[i, j], poisson_log(dN[i, j], Y[i, j] * exp(beta * Z[i]) * dL0[j]), 0); 
-
     }     
-    // Survivor function = exp(-Integral{l0(u)du})^exp(beta*z)    
-    // S.treat[j] <- pow(exp(-sum(dL0[1:j])), exp(beta * -0.5));
-    // S.placebo[j] <- pow(exp(-sum(dL0[1:j])), exp(beta * 0.5));	
   }
+}
+
+generated quantities {
+  real S_placebo[NT];
+  real S_treat[NT];
+
+  for (j in 1:NT) {
+    // Survivor function = exp(-Integral{l0(u)du})^exp(beta*z)
+    real s;
+    s <- 0;
+    for (i in 1:j)
+      s <- s + dL0[i];
+    S_treat[j] <- pow(exp(-s), exp(beta * -0.5));
+    S_placebo[j] <- pow(exp(-s), exp(beta * 0.5));	
+  }
+  
 }
