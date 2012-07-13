@@ -790,69 +790,74 @@ namespace stan {
       void operator()(nil const& x) const { }
       void operator()(int_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,0);
       }
       void operator()(double_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,0);
       }
       void operator()(vector_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.M_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,1);
+      }
+      void operator()(simplex_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims,1);
+      }
+      void operator()(ordered_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims,1);
       }
       void operator()(row_vector_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.N_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,1);
       }
       void operator()(matrix_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.M_);
         dims.push_back(x.N_);
-        validate_array(x.name_,dims);
-      }
-      void operator()(simplex_var_decl const& x) const {
-        std::vector<expression> dims(x.dims_);
-        dims.push_back(x.K_);
-        validate_array(x.name_,dims);
-      }
-      void operator()(ordered_var_decl const& x) const {
-        std::vector<expression> dims(x.dims_);
-        dims.push_back(x.K_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,2);
       }
       void operator()(cov_matrix_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         dims.push_back(x.K_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,2);
       }
       void operator()(corr_matrix_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         dims.push_back(x.K_);
-        validate_array(x.name_,dims);
+        validate_array(x.name_,dims,2);
       }
       void validate_array(const std::string& name, 
-                         const std::vector<expression>& dims) const {
+			  const std::vector<expression>& dims,
+			  size_t matrix_dims) const {
+
+	size_t non_matrix_dims = dims.size() - matrix_dims;
 
         for (size_t k = 0; k < dims.size(); ++k) {
           generate_indent(indents_ + k,o_);
           o_ << "for (int i" << k << "__ = 0; i" << k << "__ < ";
           generate_expression(dims[k],o_);
           o_ << "; ++i" << k << "__) {" << EOL;
-
-          // generate_indent(indents_ + k + 1, o_);
-          // o_ << "std::cout << \"i" << k << "__=\" << " << "i" << k << "__;" << EOL;
-
         }
+
         generate_indent(indents_ + dims.size(), o_);
         o_ << "if (" << name;
-        for (size_t k = 0; k < dims.size(); ++k)
+        for (size_t k = 0; k < non_matrix_dims; ++k)
           o_ << "[i" << k << "__]";
+	if (matrix_dims > 0) {
+	  o_ << "(i" << non_matrix_dims << "__";
+	  if (matrix_dims > 1)
+	    o_ << ",i" << (non_matrix_dims + 1) << "__";
+	  o_ << ')';
+	}
         o_ << ".is_uninitialized()) {" << EOL;
-
         generate_indent(indents_ + dims.size() + 1, o_);
         o_ << "std::stringstream msg__;" << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
