@@ -31,6 +31,8 @@ public:
 
   static std::vector<size_t> skip_chains_test() {
     std::vector<size_t> params_to_skip;
+    // FIXME: remove this when forward sampling is available
+    params_to_skip.push_back(47U);  // delta_new
     return params_to_skip;
   }
 

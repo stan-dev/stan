@@ -31,6 +31,8 @@ model {
   d ~ normal(0.0, 1.0E3); 
   sigmasq_delta ~ inv_gamma(.001, .001); 
 
+  // FIXME: sample in generated quantities once
+  //        forward sampling methods are available.
   // do not think stan supports predictive posterior
   delta_new ~ student_t(4, d, sigma_delta); 
 }
