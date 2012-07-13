@@ -27,65 +27,15 @@ namespace stan {
      *
      * @param y Value.
      * @tparam T Type of scalar.
-     * @tparam Policy Type of policy.
-     * @error_policy
-     *    @li y must not be NaN.
-     * @return Exponent base 2 of value.
-     */
-    template <typename T, class Policy>
-    inline typename boost::math::tools::promote_args<T>::type
-    exp2(T y, const Policy&) {
-      static const char* function = "stan::math::exp2(%1%)";
-      T result;
-      if (!check_not_nan(function, y, "y", &result, Policy()))
-        return result;
-      using std::pow;
-      return pow(2.0,y);
-    }
-
-    /**
-     * Return the exponent base 2 of the specified argument (C99).
-     *
-     * The exponent base 2 function is defined by
-     *
-     * <code>exp2(y) = pow(2.0,y)</code>.
-     *
-     * @param y Value.
-     * @tparam T Type of scalar.
      * @return Exponent base 2 of value.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     exp2(T y) {
-      return exp2(y, stan::math::default_policy());
+      using std::pow;
+      return pow(2.0,y);
     }
 
-    /** 
-     * The positive difference function (C99).  
-     *
-     * The function is defined by
-     *
-     * <code>fdim(a,b) = (a > b) ? (a - b) : 0.0</code>.
-     *
-     * @param a First value.
-     * @param b Second value.
-     * @param Policy Type of policy.
-     * @error_policy
-     *    @li a,b must not be NaN
-     * @return Returns min(a - b, 0.0).
-     */
-    template <typename T1, typename T2, class Policy>
-    inline typename boost::math::tools::promote_args<T1, T2>::type
-    fdim(T1 a, T2 b, const Policy&) {
-      static const char* function = "stan::math::fdim(%1%)";
-      T1 result;
-      if(!check_not_nan(function, a, "a", &result, Policy()))
-	return result;
-      if(!check_not_nan(function,b, "b", &result, Policy()))
-	return result;
-      return (a > b) ? (a - b) : 0.0;
-    } 
-    
     /** 
      * The positive difference function (C99).  
      *
@@ -100,38 +50,10 @@ namespace stan {
     template <typename T1, typename T2>
     inline typename boost::math::tools::promote_args<T1, T2>::type
     fdim(T1 a, T2 b) {
-      return fdim(a,b,stan::math::default_policy());
-    }
-
+      return (a > b) ? (a - b) : 0.0;
+    } 
+    
     /**
-     * The fused multiply-add operation (C99).  
-     *
-     * The function is defined by
-     *
-     * <code>fma(a,b,c) = (a * b) + c</code>.
-     *
-     * @param a First value.
-     * @param b Second value.
-     * @param c Third value.
-     * @param Policy Type of policy
-     * @error_policy
-     *    @li a,b,c  must not be NaN
-     * @return Product of the first two values plust the third.
-     */
-    template <typename T1, typename T2, typename T3, class Policy>
-    inline typename boost::math::tools::promote_args<T1,T2,T3>::type
-    fma(T1 a, T2 b, T3 c, const Policy&) {
-      static const char* function = "stan::math::fma(%1%)";
-      T1 result;
-      if(!check_not_nan(function, a, "a", &result, Policy()))
-	return result;
-      if(!check_not_nan(function,b, "b", &result, Policy()))
-	return result;
-      if(!check_not_nan(function,c, "c", &result, Policy()))
-	return result;
-      return a * b + c;
-    }
-   /**
      * The fused multiply-add operation (C99).  
      *
      * The function is defined by
@@ -146,7 +68,7 @@ namespace stan {
     template <typename T1, typename T2, typename T3>
     inline typename boost::math::tools::promote_args<T1,T2,T3>::type
     fma(T1 a, T2 b, T3 c) {
-      return fma(a,b,c, stan::math::default_policy());
+      return (a * b) + c;
     }
 
     /**
@@ -156,45 +78,17 @@ namespace stan {
      *
      * <code>log2(a) = log(a) / std::log(2.0)</code>.
      *
-     * @param a Value.
      * @tparam T type of scalar
-     * @tparam Policy Type of policy
-     * @error_policy
-          @li y must not be NaN or less than zero
-     * @return Base 2 logarithm of the value.
-     */
-    template <typename T, class Policy>
-    inline typename boost::math::tools::promote_args<T>::type
-    log2(T a, const Policy&) {
-      static const char* function = "stan::math::exp2(%1%)";
-      T result;
-      if(!check_not_nan(function,a, "a", &result, Policy()))
-        return result;
-      if(!check_greater_or_equal(function,a,0.0,"a", &result, Policy()))
-        return result;
-      using std::log;
-      const static double LOG2 = std::log(2.0);
-      return log(a) / LOG2;
-    }
-/**
-     * Returns the base 2 logarithm of the argument (C99).
-     *
-     * The function is defined by:
-     *
-     * <code>log2(a) = log(a) / std::log(2.0)</code>.
-     *
      * @param a Value.
-     * @tparam T type of scalar
      * @return Base 2 logarithm of the value.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log2(T a) {
-      return log2(a, stan::math::default_policy());
+      using std::log;
+      const static double LOG2 = std::log(2.0);
+      return log(a) / LOG2;
     }
-
-
-
 
     // OTHER BASIC FUNCTIONS
 
