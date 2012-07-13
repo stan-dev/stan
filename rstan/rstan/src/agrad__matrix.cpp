@@ -1,1 +1,3 @@
-../../../src/stan/agrad/matrix.cpp
+
+#include <stan/agrad/matrix.cpp>
+

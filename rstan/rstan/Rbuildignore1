@@ -14,11 +14,11 @@ inst/include/stansrc/models/.*\.csv$
 inst/include/stansrc/docs.*$
 inst/include/stansrc/doxygen.*$
 inst/include/stansrc/stan.hpp.*$
-inst/include/stansrc/stan/command/.*\.cpp$
-inst/include/stansrc/stan/gm/.*\.cpp$
-inst/include/stansrc/stan/gm/grammars/.*\.cpp$
-inst/include/stansrc/stan/agrad/.*\.cpp$
-inst/include/stansrc/stan/math/.*\.cpp$
+_inst/include/stansrc/stan/command/.*\.cpp$
+_inst/include/stansrc/stan/gm/.*\.cpp$
+_inst/include/stansrc/stan/gm/grammars/.*\.cpp$
+_inst/include/stansrc/stan/agrad/.*\.cpp$
+_inst/include/stansrc/stan/math/.*\.cpp$
 inst/unitTests/.*\.html$
 inst/unitTests/.*\.txt$
 tests/.*[.]html$
@@ -32,3 +32,4 @@ Rbuildignore.*$
 .*\.so$
 .*\.o$
 .*\.out$
+.*\.rds$

@@ -41,7 +41,11 @@
 namespace rstan {
 
   namespace { 
-    // Potentially this could be problematic. 
+    // Potentially this could be problematic for 
+    // converting size_t vector to unsigned int. 
+    // But given the limitation of R, the values
+    // passed from R should be fine using unsigned int 
+    // inside stan. 
     template <class T1, class T2> 
     void  T1v_to_T2v(const std::vector<T1>& v,
                      std::vector<T2>& v2) {
@@ -395,8 +399,16 @@ namespace rstan {
      * @param dimms[out] Dimensions of the parameters requsted. 
      *  For scalars and element of array parameters, it is a 
      *  empty vector if size_t. 
+     * 
+     ** @tparam T the type of the dimensions. In Stan, size_t is 
+     **  used.  But when communicating between R, Rcpp does
+     **  not support wrap/as size_t (as of Thu Jul 12 14:33:32 EDT 2012), 
+     **  in which case, unsigned int could be used. 
      */ 
 
+    /*
+    template <class T>
+     */
     void param_dimss(const std::vector<std::string>& names,
                      std::vector<std::string>& names2,
                      std::vector<std::vector<size_t> >& dimss) {
@@ -514,6 +526,116 @@ namespace rstan {
         } 
       }
     }
+
+    /**
+     * Obtain kept samples by index from a chain for one parameter. 
+     *
+     * @param k Index of chain (starting from 0).
+     * @param n Indexe of a parameter (starting from 0). 
+     * @return A vector of samples in form of R's numeric vector. 
+     *
+     */
+    SEXP get_chain_samples_0(size_t k, size_t n, bool keep_warmup = true) {
+      std::vector<double> s; 
+      if (keep_warmup) 
+        chains_.get_samples(k, n, s);
+      else
+        chains_.get_kept_samples(k, n, s);
+      return Rcpp::wrap(s);
+    } 
+
+    /**
+     * Obtain kept samples by index from a chain. 
+     *
+     * @param k Index of chain (starting from 0).
+     * @param ns Indexes of parameters (starting from 0). 
+     * @return A vector of samples in form of R's numeric vector, in which
+     *  samples for multiple parameters are concatenated. 
+     *
+     */
+    SEXP get_chain_samples_0(size_t k, 
+                             const std::vector<size_t>& ns, 
+                             bool keep_warmup = true) {
+      size_t num = keep_warmup
+                   ? chains_.num_samples(k) 
+                   : chains_.num_kept_samples(k);
+      Rcpp::NumericVector nv(ns.size() * num); 
+      Rcpp::NumericVector::iterator nv_it = nv.begin(); 
+      for (std::vector<size_t>::const_iterator it = ns.begin(); 
+           it != ns.end(); 
+           ++it) {
+        std::vector<double> s; 
+        if (keep_warmup) 
+          chains_.get_samples(k, *it, s);
+        else
+          chains_.get_kept_samples(k, *it, s);
+        for (std::vector<double>::const_iterator sit = s.begin(); 
+             sit != s.end(); 
+             ++sit) {
+          *nv_it++ = *sit; 
+        }
+      } 
+      return Rcpp::wrap(nv);    
+    } 
+
+    /**
+     * @param k The chain id, starting from 0.
+     * @param n The parameter index 
+     * @param probs Probabilities specifying quantiles of interest. 
+     * @return An R vector of quantiles 
+     */
+
+    SEXP get_chain_quantiles_0(
+      size_t k, size_t n, const std::vector<double>& probs) {
+
+      std::vector<double> qois; 
+      chains_.quantiles(k, n, probs, qois); 
+      return Rcpp::wrap(qois); 
+    } 
+
+    /**
+     * @param n The parameter index.
+     * @param probs Probabilities specifying quantiles of interest.
+     * @return An R vector of quantiles.  
+     */
+
+    SEXP get_quantiles_0(size_t n, const std::vector<double>& probs) {
+
+      std::vector<double> qois; 
+      chains_.quantiles(n, probs, qois); 
+      return Rcpp::wrap(qois); 
+    } 
+
+    /**
+     * Return the kept samples permuted for multiple parameters. 
+     *
+     * @param ns The total indices of parameters. 
+     * @return An R vector of samples that are permuted. 
+     *  The samples are concatenated into one vector. 
+     */
+    SEXP get_kept_samples_permuted_0(const std::vector<size_t>& ns) {
+      size_t num = chains_.num_kept_samples(); 
+      Rcpp::NumericVector nv(ns.size() * num); 
+      Rcpp::NumericVector::iterator nv_it = nv.begin(); 
+      for (std::vector<size_t>::const_iterator it = ns.begin(); 
+           it != ns.end(); 
+           ++it) {
+        std::vector<double> s; 
+        chains_.get_kept_samples_permuted(*it, s); 
+        for (std::vector<double>::const_iterator sit = s.begin(); 
+             sit != s.end(); 
+             ++sit) {
+          *nv_it++ = *sit; 
+        }
+      }
+      return Rcpp::wrap(nv);
+    }
+
+    SEXP get_kept_samples_permuted_0(size_t n) { 
+      std::vector<double> s; 
+      chains_.get_kept_samples_permuted(n, s); 
+      return Rcpp::wrap(s);
+    } 
 
   public:
 
@@ -646,57 +768,6 @@ namespace rstan {
       return Rcpp::wrap(true);  
     } 
 
-    /**
-     * Obtain kept samples by index from a chain for one parameter. 
-     *
-     * @param k Index of chain (starting from 0).
-     * @param n Indexe of a parameter (starting from 0). 
-     * @return A vector of samples in form of R's numeric vector. 
-     *
-     */
-    SEXP get_chain_samples_0(size_t k, size_t n, bool keep_warmup = true) {
-      std::vector<double> s; 
-      if (keep_warmup) 
-        chains_.get_samples(k, n, s);
-      else
-        chains_.get_kept_samples(k, n, s);
-      return Rcpp::wrap(s);
-    } 
-
-    /**
-     * Obtain kept samples by index from a chain. 
-     *
-     * @param k Index of chain (starting from 0).
-     * @param ns Indexes of parameters (starting from 0). 
-     * @return A vector of samples in form of R's numeric vector, in which
-     *  samples for multiple parameters are concatenated. 
-     *
-     */
-    SEXP get_chain_samples_0(size_t k, 
-                             const std::vector<size_t>& ns, 
-                             bool keep_warmup = true) {
-      size_t num = keep_warmup
-                   ? chains_.num_samples(k) 
-                   : chains_.num_kept_samples(k);
-      Rcpp::NumericVector nv(ns.size() * num); 
-      Rcpp::NumericVector::iterator nv_it = nv.begin(); 
-      for (std::vector<size_t>::const_iterator it = ns.begin(); 
-           it != ns.end(); 
-           ++it) {
-        std::vector<double> s; 
-        if (keep_warmup) 
-          chains_.get_samples(k, *it, s);
-        else
-          chains_.get_kept_samples(k, *it, s);
-        for (std::vector<double>::const_iterator sit = s.begin(); 
-             sit != s.end(); 
-             ++sit) {
-          *nv_it++ = *sit; 
-        }
-      } 
-      return Rcpp::wrap(nv);    
-    } 
-
 
     /** 
      * Obtain samples by names from a chain.  
@@ -801,18 +872,6 @@ namespace rstan {
       return lst;
     } 
 
-    /**
-     * @param n The parameter index.
-     * @param probs Probabilities specifying quantiles of interest.
-     * @return An R vector of quantiles.  
-     */
-
-    SEXP get_quantiles_0(size_t n, const std::vector<double>& probs) {
-
-      std::vector<double> qois; 
-      chains_.quantiles(n, probs, qois); 
-      return Rcpp::wrap(qois); 
-    } 
 
     /**
      * Get the quantiles of the samples from all chains. 
@@ -845,21 +904,6 @@ namespace rstan {
      return Rcpp::wrap(lst);
     } 
 
-
-    /**
-     * @param k The chain id, starting from 0.
-     * @param n The parameter index 
-     * @param probs Probabilities specifying quantiles of interest. 
-     * @return An R vector of quantiles 
-     */
-
-    SEXP get_chain_quantiles_0(
-      size_t k, size_t n, const std::vector<double>& probs) {
-
-      std::vector<double> qois; 
-      chains_.quantiles(k, n, probs, qois); 
-      return Rcpp::wrap(qois); 
-    } 
 
     /**
      * Get the quantiles of the samples of one chain: 
@@ -1051,17 +1095,19 @@ namespace rstan {
      * Return the number of samples including warmup and kept samples
      * in the specified chain.
      *
-     * @param k Markov chain index, starting from 1.
+     * @param k Markov chain index, starting from 1. 
+     *  Note that in Stan, size_t is used, but Rcpp has some issue on some
+     *  platforms, so here unsigned int is used. 
      * @return Number of samples in the specified chain.
      * @throw std::out_of_range If the identifier is greater than
      * or equal to the number of chains.
      */
     
-    SEXP num_chain_samples(size_t k) {
+    SEXP num_chain_samples(unsigned int k) {
       return Rcpp::wrap(static_cast<unsigned int>(chains_.num_samples(k - 1))); 
     } 
 
-    SEXP num_chain_kept_samples(size_t k) {
+    SEXP num_chain_kept_samples(unsigned int k) {
       return Rcpp::wrap(static_cast<unsigned int>(chains_.num_kept_samples(k - 1))); 
     } 
 
@@ -1073,37 +1119,6 @@ namespace rstan {
       return Rcpp::wrap(static_cast<unsigned int>(chains_.num_kept_samples())); 
     } 
 
-    /**
-     * Return the kept samples permuted for multiple parameters. 
-     *
-     * @param ns The total indices of parameters. 
-     * @return An R vector of samples that are permuted. 
-     *  The samples are concatenated into one vector. 
-     */
-    SEXP get_kept_samples_permuted_0(const std::vector<size_t>& ns) {
-      size_t num = chains_.num_kept_samples(); 
-      Rcpp::NumericVector nv(ns.size() * num); 
-      Rcpp::NumericVector::iterator nv_it = nv.begin(); 
-      for (std::vector<size_t>::const_iterator it = ns.begin(); 
-           it != ns.end(); 
-           ++it) {
-        std::vector<double> s; 
-        chains_.get_kept_samples_permuted(*it, s); 
-        for (std::vector<double>::const_iterator sit = s.begin(); 
-             sit != s.end(); 
-             ++sit) {
-          *nv_it++ = *sit; 
-        }
-      }
-      return Rcpp::wrap(nv);
-    }
-
-    SEXP get_kept_samples_permuted_0(size_t n) { 
-      std::vector<double> s; 
-      chains_.get_kept_samples_permuted(n, s); 
-      return Rcpp::wrap(s);
-    } 
-    
     /* Return the kept samples permuted for parameters.
      * 
      * @param names The names of parameters of interest. 

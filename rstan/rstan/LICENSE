@@ -1,0 +1,9 @@
+1. Stan code (under include/stansrc) included in RStan
+   are licensed under new BSD (http://www.opensource.org/licenses/BSD-3-Clause).
+   More details could be found on Stan's homepage and Stan's reference manual. 
+
+2. Other sources included in RStan if any are distributed according to their
+   licenses. 
+
+3. RStan code are under GPLv3. 
+
