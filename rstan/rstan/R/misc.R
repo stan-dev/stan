@@ -203,6 +203,7 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
       argss[[i]]$seed <- seed; 
 
   if (!missing(sample.file)) {
+    sample.file <- writable.sample.file(sample.file) 
     if (n.chains == 1) 
         argss[[1]]$sample_file <- sample.file
     if (n.chains > 1) {
@@ -210,10 +211,41 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
         argss[[i]]$sample_file <- append.id(sample.file, i) 
     }
   }
-
   check.args(argss) 
-  
   argss 
+} 
+
+is.dir.writable <- function(path) {
+  if (file.access(path, mode = 2) < 0)
+    return(FALSE) 
+  return(TRUE)
+} 
+
+writable.sample.file <- 
+function(file, warning = TRUE, 
+         wfun = function(x, x2) {
+           paste('Warning: "', x, '" is not writable; use "', x2, '" instead.', sep = '')
+         }) { 
+  # Check if the path for file is writable, if not using tempdir() 
+  # 
+  # Args:
+  #  file: The file interested. 
+  #  warning: TRUE give a warning. 
+  #  warningfun: A function that take two dirs for creating 
+  #    the warning message. 
+  # 
+  # Returns:
+  #  If the specified file is writable, return itself. 
+  #  Otherwise, change the path to tempdir(). 
+  
+  dir <- dirname(file) 
+  if (!is.dir.writable(dir)) { 
+    dir2 <- tempdir()
+    if (warning)
+      cat(wfun(dir, dir2))
+    return(file.path(dir2, basename(file)))
+  } 
+  file
 } 
 
 

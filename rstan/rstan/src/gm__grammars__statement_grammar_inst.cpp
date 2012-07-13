@@ -1,1 +1,3 @@
-../../../src/stan/gm/grammars/statement_grammar_inst.cpp
+#include <stan/gm/grammars/statement_grammar_inst.cpp>
+
+

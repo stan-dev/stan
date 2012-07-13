@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <vector>
 #include <ostream>
+#include <iostream>
 
 #include <stan/memory/stack_alloc.hpp>
 
@@ -244,13 +245,26 @@ namespace stan {
       vari * vi_;
 
       /**
+       * Return <code>true</code> if this variable has been
+       * declared, but not been defined.  Any attempt to use an
+       * undefined variable's value or adjoint will result in a
+       * segmentation fault.
+       *
+       * @return <code>true</code> if this variable does not yet have
+       * a defined variable.
+       */ 
+      bool is_uninitialized() {
+        return (vi_ == static_cast<vari*>(0U));
+      }
+
+      /**
        * Construct a variable from a pointer to a variable implementation.
        *
        * @param vi Variable implementation. 
        */
-      explicit var(vari* vi) :
-        vi_(vi) {
-      }
+      explicit var(vari* vi)
+      : vi_(vi) 
+      {  }
 
       /**
        * Construct a variable for later assignment.   
@@ -259,8 +273,9 @@ namespace stan {
        * dangling.  Before an assignment, the behavior is thus undefined just
        * as for a basic double.
        */
-      var() {
-      }
+       var() 
+       : vi_(static_cast<vari*>(0U))
+       { }
 
       /**      
        * Construct a variable by static casting the specified

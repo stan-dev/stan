@@ -42,6 +42,21 @@ namespace stan {
       visgen(std::ostream& o) : o_(o) { }
     };
 
+    void generate_start_namespace(std::string name,
+                                   std::ostream& o) {
+      o << "namespace " << name << "_namespace {" << EOL2;
+    }
+
+     void generate_end_namespace(std::ostream& o) {
+       o << "} // namespace" << EOL2;
+     }
+
+     void generate_comment(std::string const& msg, int indent, 
+                           std::ostream& o) {
+       generate_indent(indent,o);
+       o << "// " << msg        << EOL;
+     }
+
 
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression> indexes, 
@@ -765,21 +780,111 @@ namespace stan {
         boost::apply_visitor(vis,vs[i].decl_);
     }
 
+    struct validate_transformed_params_visgen : public visgen {
+      int indents_;
+      validate_transformed_params_visgen(int indents,
+                                         std::ostream& o)
+        : visgen(o),
+          indents_(indents) 
+      { }
+      void operator()(nil const& x) const { }
+      void operator()(int_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(double_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(vector_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.M_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(row_vector_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.N_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(matrix_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.M_);
+        dims.push_back(x.N_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(simplex_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(ordered_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(cov_matrix_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims);
+      }
+      void operator()(corr_matrix_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims);
+      }
+      void validate_array(const std::string& name, 
+                         const std::vector<expression>& dims) const {
 
-    void generate_start_namespace(std::string name,
-                                   std::ostream& o) {
-      o << "namespace " << name << "_namespace {" << EOL2;
+        for (size_t k = 0; k < dims.size(); ++k) {
+          generate_indent(indents_ + k,o_);
+          o_ << "for (int i" << k << "__ = 0; i" << k << "__ < ";
+          generate_expression(dims[k],o_);
+          o_ << "; ++i" << k << "__) {" << EOL;
+
+          // generate_indent(indents_ + k + 1, o_);
+          // o_ << "std::cout << \"i" << k << "__=\" << " << "i" << k << "__;" << EOL;
+
+        }
+        generate_indent(indents_ + dims.size(), o_);
+        o_ << "if (" << name;
+        for (size_t k = 0; k < dims.size(); ++k)
+          o_ << "[i" << k << "__]";
+        o_ << ".is_uninitialized()) {" << EOL;
+
+        generate_indent(indents_ + dims.size() + 1, o_);
+        o_ << "std::stringstream msg__;" << EOL;
+        generate_indent(indents_ + dims.size() + 1, o_);
+        o_ << "msg__ << \"Undefined transformed parameter: "
+           << name << "\"";
+        for (size_t k = 0; k < dims.size(); ++k) {
+          o_ << " << '['";
+          o_ << " << i" << k << "__";
+          o_ << " << ']'";
+        }
+        o_ << ';' << EOL;
+        generate_indent(indents_ + dims.size() + 1, o_);
+        o_ << "throw std::runtime_error(msg__.str());" << EOL;
+
+        generate_indent(indents_ + dims.size(), o_);
+        o_ << "}" << EOL;
+        for (size_t k = 0; k < dims.size(); ++k) {
+          generate_indent(indents_ + dims.size() - k - 1, o_);
+          o_ << "}" << EOL;
+        }
+      }
+    };
+
+    void generate_validate_transformed_params(const std::vector<var_decl>& vs,
+                                              int indent,
+                                              std::ostream& o) {
+      generate_comment("validate transformed parameters",indent,o);
+      validate_transformed_params_visgen vis(indent,o);
+      for (size_t i = 0; i < vs.size(); ++i)
+        boost::apply_visitor(vis,vs[i].decl_);
+      o << EOL;
     }
-
-     void generate_end_namespace(std::ostream& o) {
-       o << "} // namespace" << EOL2;
-     }
-
-     void generate_comment(std::string const& msg, int indent, 
-                           std::ostream& o) {
-       generate_indent(indent,o);
-       o << "// " << msg        << EOL;
-     }
 
     void generate_statement(statement const& s, int indent, std::ostream& o,
                             bool include_sampling, bool is_var);
@@ -930,6 +1035,8 @@ namespace stan {
       static bool include_sampling = true;
       generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
       o << EOL;
+      
+      generate_validate_transformed_params(p.derived_decl_.first,2,o);
 
       generate_comment("model body",2,o);
       generate_statement(p.statement_,2,o,include_sampling,is_var);
@@ -1268,8 +1375,10 @@ namespace stan {
     void generate_constructor(const program& prog,
                               const std::string& model_name,
                               std::ostream& o) {
-      o << INDENT << model_name << "(stan::io::var_context& context__)" << EOL;
-      o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" << EOL; // resize 0 with var_resizing
+      o << INDENT << model_name << "(stan::io::var_context& context__)" 
+        << EOL;
+      o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" 
+        << EOL; // resize 0 with var_resizing
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
@@ -1286,7 +1395,8 @@ namespace stan {
       static bool include_sampling = false;
       static bool is_var = false;
       for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
-        generate_statement(prog.derived_data_decl_.second[i],2,o,include_sampling,is_var);
+        generate_statement(prog.derived_data_decl_.second[i],
+                           2,o,include_sampling,is_var);
       
       generate_comment("validate transformed data",2,o);
       generate_validate_var_decls(prog.derived_data_decl_.first,2,o);
@@ -2023,7 +2133,8 @@ namespace stan {
       // transformed parameters guaranteed to satisfy constraints
 
       o << EOL;
-      generate_comment("declare and define transformed parameters",2,o);
+      generate_comment("declare, define and validate transformed parameters",
+                       2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
@@ -2032,7 +2143,6 @@ namespace stan {
       generate_statements(prog.derived_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
 
-      generate_comment("validate transformed parameters",2,o);
       generate_validate_var_decls(prog.derived_decl_.first,2,o);
       o << EOL;
 
@@ -2328,8 +2438,6 @@ namespace stan {
         boost::apply_visitor(vis_writer,prog.parameter_decl_[i].decl_);
 
 
-      // transformed parameters guaranteed to satisfy constraints
-
       o << EOL;
       generate_comment("declare and define transformed parameters",2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
@@ -2517,10 +2625,15 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "stan::gm::nuts_command<" << model_name << "_namespace::" << model_name << ">(argc,argv);" << EOL;
+      out << INDENT2 << "stan::gm::nuts_command<" << model_name 
+          << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (std::exception& e) {" << EOL;
-      out << INDENT2 << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" << EOL;
-      out << INDENT2 << "std::cerr << \"Diagnostic information: \" << std::endl << boost::diagnostic_information(e) << std::endl;" << EOL;
+      out << INDENT2 
+          << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" 
+          << EOL;
+      out << INDENT2
+          << "std::cerr << \"Diagnostic information: \" << std::endl << boost::diagnostic_information(e) << std::endl;" 
+          << EOL;
       out << INDENT2 << "return -1;" << EOL;
       out << INDENT << "}" << EOL;
 

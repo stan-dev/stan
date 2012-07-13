@@ -1,1 +1,3 @@
-../../../src/stan/math/matrix.cpp
+
+#include <stan/math/matrix.cpp>
+
