@@ -42,6 +42,24 @@ stan.model <- function(file, verbose = FALSE,
 
 } 
 
+is.sm.valid <- function(sm) {
+  # Test if a stan model (compiled object) is still valid. 
+  # It could become invalid when the user for example 
+  # save this object and then load it in another R session
+  # because the compiled model is lost. 
+  # 
+  # Args:
+  #   sm: the stanmodel object 
+  # Note:  
+  # This depends on currently that we return R_NilValue
+  # in the `src` when calling cxxfunction. 
+  # 
+  fx <- sm@.modelmod$cxxfun 
+  r <- tryCatch(fx(), error = function(e) FALSE)
+  if (is.null(r)) return(TRUE) 
+  FALSE
+} 
+
 ##
 ##
 ## 

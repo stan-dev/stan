@@ -477,11 +477,11 @@ namespace rstan {
 
     /* Obtain the indices and flatnames for a vector of parameter names. 
      * @param names[in] Names of parameters of interests 
-     * @param indices[out] The indices for all parameters in the overall
-     * samples. Note the index here is the index as in 
-     * <code>stan::mcmc::chains::get_total_param_index</code>; 
-     * but not the index in 
-     * <code>stan::mcmc::chains::param_name_to_index</code>.  
+     * @param indices[out] The total indices for all parameters in the overall
+     *  samples. Note the index here is the index as in 
+     *  <code>stan::mcmc::chains::get_total_param_index</code>; 
+     *  but not the index in 
+     *  <code>stan::mcmc::chains::param_name_to_index</code>.  
     
      * @param flatnames[out] Flatnames for all the names. That is, 
      * if parameter a is of length 3, it would be added as 
@@ -499,8 +499,7 @@ namespace rstan {
       for (std::vector<std::string>::const_iterator it = names.begin();
            it != names.end(); 
            ++it) {
-        if (it -> find('[') != it -> npos && 
-            it -> find(']') != it -> npos) { // already a flatname 
+        if (is_flatname(*it)) { 
           size_t ts = std::distance(flatnames_.begin(),
                                     std::find(flatnames_.begin(), 
                                               flatnames_.end(), *it));       

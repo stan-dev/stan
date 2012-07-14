@@ -324,8 +324,12 @@ setMethod("traceplot", signature = (object = "stanfit"),
            return(invisible(ps)) 
           })  
 
-
-
+is.sf.valid <- function(sf) {
+  # Similar to is.sm.valid. 
+  # This depends on currently that we return R_NilValue
+  # in the `src` when calling cxxfunction. 
+  return(rstan:::is.sm.valid.(sf@.fit$stanmodel)) 
+} 
 
 
 
