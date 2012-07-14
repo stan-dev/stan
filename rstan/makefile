@@ -24,10 +24,10 @@ else
   LINKCMD2 = ln -s ../../../../src ./rstan/inst/include/stansrc
 endif
   
-RSTANVER := $(shell echo `Rscript -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])"`)
+RSTANVER := $(shell Rscript -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])")
 STANPKG := rstan_$(RSTANVER).tar.gz 
 
-$(STANPKG): ./rstan/DESCRIPTION 
+build $(STANPKG): ./rstan/DESCRIPTION 
 	@rm -f "./rstan/inst/include/stanlib"
 	@rm -f "./rstan/inst/include/stansrc"
 	$(LINKCMD1)
@@ -36,11 +36,13 @@ $(STANPKG): ./rstan/DESCRIPTION
 	R CMD build rstan
 
 check: $(STANPKG) 
-	R CMD check $(STANPKG) 
+	R CMD check --as-cran $(STANPKG) 
 
 install: $(STANPKG) 
+	# R CMD INSTALL --no-multiarch $(STANPKG) 
 	R CMD INSTALL $(STANPKG) 
 
 clean: 
 	rm -f $(STANPKG) 
 
+.PHONY: build check install clean 
