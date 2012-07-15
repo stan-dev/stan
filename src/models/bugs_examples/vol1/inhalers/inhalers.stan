@@ -1,17 +1,7 @@
 # Inhaler: ordered categorical data 
 ## http://www.openbugs.info/Examples/Inhalers.html
 
-
-## FIXME i(?): 
-## Is there a way to specify say
-## real a[3] with the restriction that a[1] < a[2] < a[3]? 
-## 
-## Now, it is specify as 
-## a0 
-## a0 + delta1 
-## a0 + delta1 + delta2, with the restriction delta1 and delta > 0. 
-
-## FIXE ii: 
+## FIXME ii: 
 ## specify using categorical distribution directly 
 ## done (but x ~ categorical[p], in which x starts
 ## from 0). 
@@ -65,17 +55,18 @@ parameters {
   real pi; 
   real kappa;
   real a0; 
-  real(0,) delta1; 
-  real(0,) delta2; 
-  real b[N]; 
+//  real(0,) delta1; 
+//  real(0,) delta2; 
+  real b[N];
+  ordered(Ncut) a;
 } 
 
 transformed parameters {
-  real a[Ncut];  // Ncut = 3
+//  real a[Ncut];  // Ncut = 3
   real(0,) sigma; 
-  a[1] <- a0; 
-  a[2] <- a0 + delta1; 
-  a[3] <- a0 + delta1 + delta2; 
+//  a[1] <- a0; 
+//  a[2] <- a0 + delta1; 
+//  a[3] <- a0 + delta1 + delta2; 
   sigma <- sqrt(sigmasq); 
 } 
 model {
@@ -113,8 +104,13 @@ model {
   kappa ~ normal(0, 1000); 
 
   a0 ~ normal(0, 1000);
-  delta1 ~ normal(0, 1000); 
-  delta2 ~ normal(0, 1000); 
+//  delta1 ~ normal(0, 1000); 
+//  delta2 ~ normal(0, 1000); 
  
   sigmasq ~ inv_gamma(0.001, 0.001);
+}
+generated quantities {
+  real log_sigma;
+  
+  log_sigma <- log(sigma);
 }

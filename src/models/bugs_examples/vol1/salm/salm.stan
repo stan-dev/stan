@@ -1,34 +1,34 @@
 ##  http://www.openbugs.info/Examples/Salm.html
-
+##  this matches the jags implementation
 data {
-    int(0,) I;
-    int(0,) J;
-    int(0,) y[I,J];
-    real x[I];
+    int(0,) doses;
+    int(0,) plates;
+    int(0,) y[doses,plates];
+    real x[doses];
 }
 transformed data {
-    real logx[I];
+    real logx[doses];
     real mean_x;
     real mean_logx;
-    real centered_x[I];
-    real centered_logx[I];
+    real centered_x[doses];
+    real centered_logx[doses];
 
     mean_x <- mean(x);
-    for (i in 1:I)
-        centered_x[i] <- x[i] - mean_x;
+    for (dose in 1:doses)
+        centered_x[dose] <- x[dose] - mean_x;
 
-    for (i in 1:I)
-        logx[i] <- log(x[i] + 10);
+    for (dose in 1:doses)
+        logx[dose] <- log(x[dose] + 10);
     mean_logx <- mean(logx);
-    for (i in 1:I)
-        centered_logx[i] <- logx[i] - mean_logx;
+    for (dose in 1:doses)
+        centered_logx[dose] <- logx[dose] - mean_logx;
 }
 parameters {
     real alpha_star;
     real beta;
     real gamma;
     real(0,) tau;
-    real lambda[I,J];
+    real lambda[doses,plates];
 }
 transformed parameters {
     real(0,) sigma;
@@ -39,16 +39,16 @@ transformed parameters {
 }
 model {
    alpha_star ~ normal(0.0,1.0E3);
-   beta ~ normal(0.0,1.0E3);
-   gamma ~ normal(0.0,1.0E3); 
-   tau ~ gamma(1.0E-3,1.0E-3);
-   for (i in 1:I) {
-      for (j in 1:J) {
-         lambda[i,j] ~ normal(0.0, sigma); 
-         y[i,j] ~ poisson(exp(alpha_star 
-                              + beta * centered_logx[i]
-                              + gamma * centered_x[i]
-                              + lambda[i,j]) );
+   beta ~ normal(0.0,1000);
+   gamma ~ normal(0.0,1000); 
+   tau ~ gamma(0.001,0.001);
+   for (dose in 1:doses) {
+      for (plate in 1:plates) {
+         lambda[dose,plate] ~ normal(0.0, sigma); 
+         y[dose,plate] ~ poisson(exp(alpha_star 
+                              + beta * centered_logx[dose]
+                              + gamma * centered_x[dose]
+                              + lambda[dose,plate]) );
      }
    }
 }

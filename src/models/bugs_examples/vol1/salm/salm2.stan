@@ -2,34 +2,34 @@
 
 ## the version without centering x's 
 data {
-    int(0,) I;
-    int(0,) J;
-    int(0,) y[I,J];
-    real x[I];
+    int(0,)  doses;
+    int(0,)  plates;
+    int(0,)  y[doses,plates];
+    real(0,) x[doses];
 }
 parameters {
     real alpha; 
     real beta;
     real gamma;
     real(0,) tau;
-    real lambda[I,J];
+    real lambda[doses,plates];
 }
 transformed parameters {
     real(0,) sigma;
     sigma <- 1.0 / sqrt(tau);
 }
 model {
-   alpha ~ normal(0.0, 1.0E3);
-   beta ~ normal(0.0, 1.0E3);
-   gamma ~ normal(0.0, 1.0E3); 
-   tau ~ gamma(1.0E-3, 1.0E-3);
-   for (i in 1:I) {
-      for (j in 1:J) {
-         lambda[i, j] ~ normal(0.0, sigma); 
-         y[i, j] ~ poisson(exp(alpha 
-                               + beta * log(x[i] + 10) 
-                               + gamma * x[i] 
-                               + lambda[i, j]) );
+   alpha ~ normal(0.0, 100);
+   beta ~ normal(0.0, 100);
+   gamma ~ normal(0.0, 1.0E5); 
+   tau ~ gamma(0.001, 0.001);
+   for (dose in 1:doses) {
+      for (plate in 1:plates) {
+         lambda[dose, plate] ~ normal(0.0, sigma);
+         y[dose, plate] ~ poisson(exp(alpha +
+                                      beta * log(x[dose] + 10) +
+                                      gamma * x[dose] +
+                                      lambda[dose, plate]) );
      }
    }
 }

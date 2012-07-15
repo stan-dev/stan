@@ -9,7 +9,7 @@ parameters {
   real(0,) alpha; 
   real(0,) beta;
   real(0,) theta[N];
-} 
+}
 
 model {
   alpha ~ exponential(1.0);

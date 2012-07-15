@@ -84,10 +84,10 @@ namespace rstan {
   private:
     bool sample_file_flag; // true: write out to a file; false, do not 
     std::string sample_file; // the file for outputting the samples 
-    size_t iter;   // number of iterations 
-    size_t warmup; // number of warmup 
-    size_t thin; 
-    size_t refresh; 
+    unsigned int iter;   // number of iterations 
+    unsigned int warmup; // number of warmup 
+    unsigned int thin; 
+    int refresh;  // < 0, no output 
     int leapfrog_steps; 
     double epsilon; 
     int max_treedepth; 
@@ -97,7 +97,7 @@ namespace rstan {
     double gamma; 
     int random_seed; 
     std::string random_seed_src; // "user" or "default" 
-    size_t chain_id; 
+    unsigned int chain_id; 
     std::string chain_id_src; // "user" or "default" 
     bool append_samples; 
     bool test_grad; 
@@ -142,16 +142,16 @@ namespace rstan {
 
       idx = find_index(args_names, std::string("iter")); 
       if (idx == args_names.size()) iter = 2000U;  
-      else iter = Rcpp::as<size_t>(in[idx]); 
+      else iter = Rcpp::as<unsigned int>(in[idx]); 
 
       idx = find_index(args_names, std::string("warmup")); 
       if (idx == args_names.size()) warmup = iter / 2; 
-      else warmup = Rcpp::as<size_t>(in[idx]); 
+      else warmup = Rcpp::as<unsigned int>(in[idx]); 
 
       idx = find_index(args_names, std::string("thin")); 
-      size_t calculated_thin = (iter - warmup) / 1000U;
+      unsigned int calculated_thin = (iter - warmup) / 1000U;
       if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1U;
-      else thin = Rcpp::as<size_t>(in[idx]); 
+      else thin = Rcpp::as<unsigned int>(in[idx]); 
 
       idx = find_index(args_names, std::string("leapfrog_steps"));
       if (idx == args_names.size()) leapfrog_steps = -1; 
@@ -183,7 +183,7 @@ namespace rstan {
       
       idx = find_index(args_names, std::string("refresh")); 
       if (idx == args_names.size())  refresh = 1; 
-      else refresh = Rcpp::as<size_t>(in[idx]); 
+      else refresh = Rcpp::as<int>(in[idx]); 
 
 
       idx = find_index(args_names, std::string("seed")); 
@@ -191,7 +191,7 @@ namespace rstan {
         random_seed = std::time(0); 
         random_seed_src = "random"; 
       } else {
-        random_seed = Rcpp::as<size_t>(in[idx]); 
+        random_seed = Rcpp::as<unsigned int>(in[idx]); 
         random_seed_src = "user"; 
       }
 
@@ -200,7 +200,7 @@ namespace rstan {
         chain_id = 1; 
         chain_id_src = "default"; 
       } else {
-        chain_id = Rcpp::as<size_t>(in[idx]); 
+        chain_id = Rcpp::as<unsigned int>(in[idx]); 
         chain_id_src = "user"; 
       }
       
@@ -246,7 +246,7 @@ namespace rstan {
       return lst; 
     } 
 
-    void set_random_seed(size_t seed) {
+    void set_random_seed(unsigned int seed) {
       random_seed = seed;
     } 
     const std::string& get_random_seed_src() const {
@@ -268,13 +268,13 @@ namespace rstan {
     bool get_sample_file_flag() const { 
       return sample_file_flag; 
     }
-    size_t get_warmup() const {
+    unsigned int get_warmup() const {
       return warmup; 
     } 
-    size_t get_refresh() const { 
+    int get_refresh() const { 
       return refresh; 
     } 
-    size_t get_thin() const {
+    unsigned int get_thin() const {
       return thin;
     } 
     int get_leapfrog_steps() const {
@@ -307,7 +307,7 @@ namespace rstan {
     const std::string& get_init() const {
       return init;
     } 
-    size_t get_chain_id() const {
+    unsigned int get_chain_id() const {
       return chain_id; 
     } 
     bool get_unit_mass_matrix() const {

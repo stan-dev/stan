@@ -1,1 +1,3 @@
-../../../src/stan/agrad/agrad.cpp
+#include <stan/agrad/agrad.cpp> 
+
+

@@ -26,7 +26,7 @@ RSTAN_LIBS_fun <- function() {
   ## is not necessarily good in our case. 
   rstan.libs.path <- rstan.libs.path_fun()
   if (static) {
-    paste0(rstan.libs.path, '/libstan.a')
+    paste0('"', rstan.libs.path, '/libstan.a', '"')
   } else {
     paste0(' -L"', rstan.libs.path, '" -Wl,-rpath,"', rstan.libs.path, '" -lstan ')
   }

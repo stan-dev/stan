@@ -1,0 +1,4 @@
+theta <- 1500
+sigmasq_within <- 1
+sigmasq_between <- 1
+mu <- c(1500, 1500, 1500, 1500, 1500, 1500)

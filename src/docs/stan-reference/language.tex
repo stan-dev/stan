@@ -102,7 +102,7 @@ parameters.
 The first step of the calculation requires the inverse transform of
 the unconstrained parameter values back to the constrained parameters
 in terms of which the model is defined.  There is no error checking
-required because the inverse transform is a total function every point
+required because the inverse transform is a total function on every point
 in whose range satisfies the constraints.
 
 Because the probability statements in the model are defined in terms
@@ -158,21 +158,21 @@ that are thinned), there is an output stage of writing the samples.
 The write is to a file for the \Stan command, but will be to \R's memory
 for the \R interface.
 
-\subsection{Derived Quantities} 
+\subsection{Generated Quantities} 
 
-Before generating any output, the statements in the derived quantities 
+Before generating any output, the statements in the generated quantities 
 block are executed.  This can be used for any forward simulation based
 on parameters of the model.  Or it may be used to transform parameters
 to an appropriate form for output.  
 
-After the derived quantities statements execute, the constraints
-declared on derived quantities variables are validated.   If these
+After the generated quantities statements execute, the constraints
+declared on generated quantities variables are validated.   If these
 constraints are violated, the program will terminate with a diagnostic message.
 
 \subsection{Write}
 
 The final step is to write the actual values.  The values of all
-variables declared as parameters, transformed parameters, or derived
+variables declared as parameters, transformed parameters, or generated
 quantities are written.  Local variables are not written, nor is the
 data or transformed data.  All values are written in their constrained
 forms, that is the form that is used in the model definitions.
@@ -203,9 +203,9 @@ written to a \acronym{csv} file or directly back to \R's memory.
 %         increment momentum by half step-size times gradient
 %     if not rejected by Metropolis condition:
 %         update parameters to new values
-%         execute derived quantities statement
-%         validate transformed quantities constraints
-%         write parameters, transformed parameters, derived quantities
+%         execute transformed parameters statement
+%         validate transformed parameters constraints
+%         write parameters, transformed parameters, generated quantities
 % \end{verbatim}
 
 
@@ -788,7 +788,7 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \section{Types versus Sizes}
 
 The size associated with a given variable is not part of its data
-type.  The sizes are determined dynamically (at run time) and thus
+type.  Sizes are determined dynamically (at run time) and thus
 cannot be type-checked statically.  
 
 \subsection{Type Naming Notation}
@@ -959,7 +959,7 @@ encodings or decodings.
 Any expression wrapped in parentheses is also an expression. Like in
 \Cpp, but unlike in \R, only the round parentheses, \code{(} and
 \code{)}, are allowed.  The square bracketes \code{[} and \code{]} are
-reserve for array indexing and the curly braces \code{\{} and
+reserved for array indexing and the curly braces \code{\{} and
 \code{\}} for grouping statements.
 
 With parentheses it is possible to explicitly group subexpressions
@@ -1863,7 +1863,7 @@ transformed parameters {
 model { 
    ... statements ...
 }
-derived quantities {
+generated quantities {
    ... declarations ... statements ...
 }
 \end{Verbatim}
@@ -1883,7 +1883,7 @@ before the statements.
 The variables declared in each block have scope over all subsequent
 statements.  Thus a variable declared in the transformed data block
 may be used in the model block.  But a variable declared in the
-derived quantities block may not be used in any earlier block,
+generated quantities block may not be used in any earlier block,
 including the model block.
 
 \subsection{Automatic Variable Definitions}
@@ -1926,9 +1926,9 @@ evaluated once per leapfrog step.  Transformed parameters are then
 declared and their defining statements executed once per leapfrog
 step.
 
-\subsection{Derived Quantities}
+\subsection{Generated Quantities}
 
-The derived quantity variables are defined once per sample after all
+The generated quantity variables are defined once per sample after all
 the leapfrog steps have been completed.  These may be random
 quantities, so the block must be rerun even if the Metropolis
 adjustment of \HMC or \NUTS rejects the update proposal.  
@@ -1996,9 +1996,9 @@ modeled parameters & \code{parameters}, \code{transformed parameters}
 \\
 unmodeled parameters & \code{data}, \code{transformed data}
 \\[2pt] \hline
-derived quantities & \code{transformed data}, \code{transformed parameters}, 
+generated quantities & \code{transformed data}, \code{transformed parameters}, 
 \\ 
-& \code{derived quantities}
+& \code{generated quantities}
 \\ \hline\hline
 loop indices & loop statement
 \\ 
@@ -2052,7 +2052,7 @@ model {
   for (n in 1:N)
     y[n] ~ normal(mu_y,sigma_y);
 }
-derived quantities {
+generated quantities {
   double y_rep[N];          // derived quantity (replic)
   for (n in 1:N)
     y_rep[n] <- rand_normal(mu_y,sigma_y);
@@ -2094,14 +2094,14 @@ a scale parameter and assigned to the variable \code{sigma\_y} in the
 is considered a derived quantity --- its value is entirely determined
 by the values of other variables.  
 
-The \code{derived quantities} block defines a second array of \code{N}
+The \code{generated quantities} block defines a second array of \code{N}
 entries, \code{y\_rep}, for replicated data.  The vector \code{y\_rep}
 has its values filled in by randomly generating normal variates given
 the parameters \code{mu\_y} and \code{sigma\_y}.  This kind of derived
 quantity may be used for model checking.
 
 Finally, the variable \code{n} is used as a loop index in two for
-loops, one in the \code{model} block and one in the \code{derived
+loops, one in the \code{model} block and one in the \code{generated
   quantities} block.
 
 

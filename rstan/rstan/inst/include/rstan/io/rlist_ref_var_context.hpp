@@ -23,16 +23,27 @@ namespace rstan {
 
   namespace io {
 
-    /**
     namespace {
-       size_t product(std::vector<size_t> dims) {
-         size_t y = 1U;
-         for (size_t i = 0; i < dims.size(); ++i)
-           y *= dims[i];
-         return y;
-       }
-    }
-    **/
+      /**
+      size_t product(std::vector<size_t> dims) {
+        size_t y = 1U;
+        for (size_t i = 0; i < dims.size(); ++i)
+          y *= dims[i];
+        return y;
+      }
+      */
+
+      template <class T1, class T2> 
+      void  T1v_to_T2v(const std::vector<T1>& v,
+                       std::vector<T2>& v2) {
+        v2.resize(0); 
+        for (typename std::vector<T1>::const_iterator it = v.begin();
+             it != v.end();
+             ++it) { 
+          v2.push_back(static_cast<T2>(*it));
+        }     
+      } 
+    } 
 
     /**
      * Represents named arrays with dimensions.
@@ -109,8 +120,9 @@ namespace rstan {
 
           if (Rf_isInteger(ee)) {
             if (Rf_length(dim) > 0) { 
-              vars_i_dim_.insert(psd_v_t(varnames[i], 
-                                         Rcpp::as<std::vector<size_t> >(dim))); 
+              std::vector<size_t> d; 
+              T1v_to_T2v(Rcpp::as<std::vector<unsigned int> >(dim), d);     
+              vars_i_dim_.insert(psd_v_t(varnames[i], d)); 
             } else {
               if (1 == eelen) {  // scalar 
                 vars_i_dim_.insert(psd_v_t(varnames[i], empty_vec_ui_)); 
@@ -121,8 +133,9 @@ namespace rstan {
             } 
           } else if(Rf_isNumeric(ee)) {
             if (Rf_length(dim) > 0) { 
-              vars_r_dim_.insert(psd_v_t(varnames[i], 
-                                         Rcpp::as<std::vector<size_t> >(dim))); 
+              std::vector<size_t> d; 
+              T1v_to_T2v(Rcpp::as<std::vector<unsigned int> >(dim), d);     
+              vars_r_dim_.insert(psd_v_t(varnames[i], d)); 
             } else {
               if (1 == eelen) {  // scalar 
                 vars_r_dim_.insert(psd_v_t(varnames[i], empty_vec_ui_)); 

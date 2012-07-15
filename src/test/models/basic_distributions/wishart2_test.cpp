@@ -18,8 +18,17 @@ public:
     return false;
   }
 
+  static bool has_init() {
+    return false;
+  }
+
   static size_t num_iterations() {
     return 8000U;
+  }
+
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    return params_to_skip;
   }
 
   static void populate_chains() {

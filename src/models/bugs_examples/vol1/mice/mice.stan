@@ -1,41 +1,54 @@
 # http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol1.pdf
 # Page 48: Mice Weibull regression 
+# http://www.openbugs.info/Examples/Mice.html
 
-# note that stan and JAGS have different parameterization for Weibull
+# note that Stan and JAGS have different parameterization for Weibull
 # distribution
- 
+
+# Data is transformed using data_reorg.R 
 data {
-  int(0,) N_uc; 
-  int(0,) N_rc; 
+  int(0,) N_uncensored;
+  int(0,) N_censored;
   int(0,) M;
-  int(0,) group_uc[N_uc];
-  int(0,) group_rc[N_rc];
-  int(0,) last_t_rc[N_rc]; 
-  real(0,) t_uc[N_uc]; 
+  int(1,M) group_uncensored[N_uncensored];
+  int(1,M) group_censored[N_censored];
+  real(0,) censor_time;
+  real(0,censor_time) t_uncensored[N_uncensored];
 }
 
 parameters {
-  real beta[M]; 
-  real(0,) r; 
-} 
+  real(0,) r;
+  real beta[M];
+  real(censor_time,) t_censored[N_censored];
+}
 
 transformed parameters {
-  real sigma[M]; 
-  for (m in 1:M)  sigma[m] <- exp(-beta[m] / r);  
-} 
+  real(0,) sigma[M];
+  for (m in 1:M)
+    sigma[m] <- exp(-beta[m] / r);
+}
 
 model {
-  r ~ gamma(1.0, 0.0001);      
-  #   for(j in 1:M) {
-  #     beta[j] ~ normal(0.0, 1E2); 
-  #   }
-  beta ~ normal(0, 100); 
-  for(i in 1:N_uc) {                          
-    t_uc[i] ~ weibull(r, sigma[group_uc[i]]); 
+  r ~ exponential(0.001);
+  beta ~ normal(0, 100);
+  for (n in 1:N_uncensored) {
+    t_uncensored[n] ~ weibull(r, exp(-beta[group_uncensored[n]] / r));
   }
-  for (i in 1:N_rc) {
-    1 ~ bernoulli(exp(-pow(last_t_rc[i] / sigma[group_rc[i]], r)));
-    // TODO: try using weibull_p instead (the following line):
-    // 0 ~ bernoulli(weibull_p(last_t_rc[i], sigma[group_rc[i]], r)); 
-  } 
-} 
+  for (n in 1:N_censored) {
+    t_censored[n] ~ weibull(r, exp(-beta[group_censored[n]] / r));
+  }
+}
+
+generated quantities {
+  real median[M];
+  real pos_control;
+  real test_sub;
+  real veh_control;
+  
+  for (m in 1:M)
+    median[m] <- pow(log(2) * exp(-beta[m]), 1/r);
+  
+  veh_control <- beta[2] - beta[1];
+  test_sub    <- beta[3] - beta[1];
+  pos_control <- beta[4] - beta[1];
+}

@@ -4,7 +4,7 @@ data {
     int n[N];
 }
 parameters {
-     real(0,1) p[N];
+    real(0,1) p[N];
 }
 model {
   for (i in 1:N) {

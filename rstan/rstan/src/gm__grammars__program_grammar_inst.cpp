@@ -1,1 +1,1 @@
-../../../src/stan/gm/grammars/program_grammar_inst.cpp
+#include <stan/gm/grammars/program_grammar_inst.cpp>

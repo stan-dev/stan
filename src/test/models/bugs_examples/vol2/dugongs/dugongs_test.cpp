@@ -20,8 +20,17 @@ public:
     return true;
   }
 
+  static bool has_init() {
+    return true;
+  }
+
   static size_t num_iterations() {
     return iterations;
+  }
+
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    return params_to_skip;
   }
 
   static void populate_chains() {
@@ -30,7 +39,15 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+
+    expected_values.push_back(make_pair(5U, 1.861));  // U3
+    expected_values.push_back(make_pair(0U, 2.652));  // alpha
+    expected_values.push_back(make_pair(1U, 0.9729)); // beta
+    expected_values.push_back(make_pair(2U, 0.8623)); // lambda
+    expected_values.push_back(make_pair(4U, 0.0992)); // sigma
+
     return expected_values;
   }
 

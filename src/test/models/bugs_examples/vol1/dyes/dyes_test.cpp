@@ -16,12 +16,22 @@ public:
     model_path.push_back("dyes");
     return model_path;
   }
+
   static bool has_data() {
     return true;
   }
 
+  static bool has_init() {
+    return true;
+  }
+
   static size_t num_iterations() {
-    return 10000U;
+    return iterations;
+  }
+
+  static std::vector<size_t> skip_chains_test() {
+    std::vector<size_t> params_to_skip;
+    return params_to_skip;
   }
 
   static void populate_chains() {
@@ -30,7 +40,13 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<size_t, double> > expected_values;
+
+    expected_values.push_back(make_pair(0U, 2207)); // sigma2.btw
+    expected_values.push_back(make_pair(1U, 3034)); // sigma2.with
+    expected_values.push_back(make_pair(2U, 1528)); // theta
+
     return expected_values;
   }
 

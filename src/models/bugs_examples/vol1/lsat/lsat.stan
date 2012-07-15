@@ -1,7 +1,10 @@
+# LSAT: item response
+# http://www.openbugs.info/Examples/Lsat.html
+
 data {
-  int(0,) N; //1000, number of students
-  int(0,) R; //32, number of patterns of results: 2^T
-  int(0,) T; //5, number of questions
+  int(0,) N; // 1000, number of students
+  int(0,) R; // 32, number of patterns of results: 2^T
+  int(0,) T; // 5, number of questions
   int(0,) culm[R];
   int(0,) response[R,T];
 }

@@ -1,7 +1,4 @@
-# 
 # http://www.openbugs.info/Examples/Blockers.html
-
-# status (works: fairly close to results from package BUGSExampels) 
 
 data {
   int(0,) N; 
@@ -10,15 +7,17 @@ data {
   int(0,) nc[N]; 
   int(0,) rc[N]; 
 } 
+
 parameters {
   real d; 
   real(0,) sigmasq_delta; 
   real mu[N]; 
-  real delta[N]; 
+  real delta[N];
+  real delta_new;
 } 
 
 transformed parameters {
-  real sigma_delta; 
+  real(0,) sigma_delta; 
   sigma_delta <- sqrt(sigmasq_delta); 
 } 
 
@@ -32,6 +31,8 @@ model {
   d ~ normal(0.0, 1.0E3); 
   sigmasq_delta ~ inv_gamma(.001, .001); 
 
+  // FIXME: sample in generated quantities once
+  //        forward sampling methods are available.
   // do not think stan supports predictive posterior
-  // delta_new ~ student_t(4, d, sigma_delta); 
+  delta_new ~ student_t(4, d, sigma_delta); 
 }

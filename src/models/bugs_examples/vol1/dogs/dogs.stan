@@ -6,17 +6,23 @@ data {
   int Y[Ndogs, Ntrials];
 }
 transformed data {
+  int y[Ndogs, Ntrials];
   int xa[Ndogs, Ntrials]; 
-  int xs[Ndogs, Ntrials]; 
+  int xs[Ndogs, Ntrials];
   for (dog in 1:Ndogs) {
-    //xa[dog, 1] <- 0; 
+    xa[dog, 1] <- 0; 
+    xs[dog, 1] <- 0;
     for (trial in 2:Ntrials) {
-      //xa[dog, trial] <- sum(Y[dog, 1:(trial-1)]);
-      for (k in 1:(trial - 1)) 
+      for (k in 1:(trial - 1))
         xa[dog, trial] <- xa[dog, trial] + Y[dog, k]; 
       xs[dog, trial] <- trial - 1 - xa[dog, trial];
     }
-  } 
+  }
+  for (dog in 1:Ndogs) {
+    for (trial in 1:Ntrials) {
+      y[dog, trial] <- 1 - Y[dog, trial];
+    }
+  }
 } 
 parameters {
   real(, -0.00001) alpha;
@@ -27,7 +33,7 @@ model {
   beta  ~ normal(0.0, 316.2);
   for(dog in 1:Ndogs)  
     for (trial in 2:Ntrials)  
-      1 - Y[dog, trial] ~ bernoulli(exp(alpha * xa[dog, trial] + beta * xs[dog, trial]));
+      y[dog, trial] ~ bernoulli(exp(alpha * xa[dog, trial] + beta * xs[dog, trial]));
 } 
 generated quantities {
   real A;
