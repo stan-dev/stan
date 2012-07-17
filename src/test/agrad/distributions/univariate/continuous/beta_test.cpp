@@ -68,3 +68,68 @@ TEST(AgradDistributionsBeta,ProptoBeta) {
                                    y, alpha, 1.5,
                                    "var: beta");
 }
+
+template <bool Prop, typename T_y, typename T_alpha, typename T_beta>
+var test_beta_log(const T_y& y, const T_alpha& alpha, const T_beta& beta) {
+  using stan::prob::include_summand;
+  using stan::math::log1m;
+  using stan::math::multiply_log;
+  var lp = 0.0;
+  if (include_summand<Prop,T_alpha,T_beta>::value)
+    lp += lgamma(alpha + beta);
+  if (include_summand<Prop,T_alpha>::value)
+    lp -= lgamma(alpha);
+  if (include_summand<Prop,T_beta>::value)
+    lp -= lgamma(beta);
+  if (include_summand<Prop,T_y,T_alpha>::value)
+    lp += multiply_log(alpha-1.0, y);
+  if (include_summand<Prop,T_y,T_beta>::value)
+    lp += (beta - 1.0) * log1m(y);
+  return lp;
+}
+
+
+template <typename T_y, typename T_alpha, typename T_beta>
+void gradient_test(double y, double alpha, double beta) {
+  using stan::math::value_of;
+  using stan::is_constant;
+  using stan::prob::beta_log;
+
+  T_y y1(y);
+  T_alpha alpha1(alpha);
+  T_beta beta1(beta);
+  var logp1 = beta_log<true>(y1, alpha1, beta1);
+  stan::agrad::grad(logp1.vi_);
+  double dy1 = var(y1).adj();
+  double dalpha1 = var(alpha1).adj();
+  double dbeta1 = var(beta1).adj();
+  
+
+  T_y y2(y);
+  T_alpha alpha2(alpha);
+  T_beta beta2(beta);
+  var logp2 = test_beta_log<true>(y2, alpha2, beta2);
+  stan::agrad::grad(logp2.vi_);
+  double dy2 = var(y2).adj();
+  double dalpha2 = var(alpha2).adj();
+  double dbeta2 = var(beta2).adj();
+
+
+  EXPECT_FLOAT_EQ(logp2.val(), logp1.val());
+  if (!is_constant<T_y>::value)
+    EXPECT_FLOAT_EQ(dy2, dy1);
+  if (!is_constant<T_alpha>::value)
+    EXPECT_FLOAT_EQ(dalpha2, dalpha1);
+  if (!is_constant<T_beta>::value)
+    EXPECT_FLOAT_EQ(dbeta2, dbeta1);
+}
+
+TEST(AgradDistributionsBeta,GradientTest) {
+  gradient_test<var,var,var>(0.3, 2.0, 3.0);
+  gradient_test<var,var,double>(0.3, 2.0, 3.0);
+  gradient_test<var,double,var>(0.3, 2.0, 3.0);
+  gradient_test<var,double,double>(0.3, 2.0, 3.0);
+  gradient_test<double,var,var>(0.3, 2.0, 3.0);
+  gradient_test<double,var,double>(0.3, 2.0, 3.0);
+  gradient_test<double,double,var>(0.3, 2.0, 3.0);
+}
