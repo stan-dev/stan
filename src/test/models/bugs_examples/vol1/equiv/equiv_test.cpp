@@ -31,6 +31,7 @@ public:
 
   static std::vector<size_t> skip_chains_test() {
     std::vector<size_t> params_to_skip;
+    params_to_skip.push_back(17U);
     return params_to_skip;
   }
 
