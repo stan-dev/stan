@@ -170,8 +170,6 @@ namespace stan {
      * @param mu The location of the normal distribution.
      * @param sigma The scale of the normal distriubtion
      * @return The unit normal cdf evaluated at the specified arguments.
-     * @tparam propto Set to <code>true</code> if only calculated up to a
-     * proportion.
      * @tparam T_y Type of y.
      * @tparam T_loc Type of mean parameter.
      * @tparam T_scale Type of standard deviation paramater.

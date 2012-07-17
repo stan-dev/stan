@@ -162,7 +162,20 @@ namespace stan {
       return beta_log<false>(y,alpha,beta,stan::math::default_policy());
     }
 
-
+    
+    /**
+     * Calculates the beta cumulative distribution function for the given
+     * variate and scale variables.
+     * 
+     * @param y A scalar variate.
+     * @param alpha Prior sample size.
+     * @param beta Prior sample size.
+     * @return The beta cdf evaluated at the specified arguments.
+     * @tparam T_y Type of y.
+     * @tparam T_scale_succ Type of alpha.
+     * @tparam T_scale_fail Type of beta.
+     * @tparam Policy Error-handling policy.
+     */
     template <typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
