@@ -55,29 +55,22 @@ parameters {
   real pi; 
   real kappa;
   real a0; 
-//  real(0,) delta1; 
-//  real(0,) delta2; 
   real b[N];
   ordered(Ncut) a;
 } 
 
 transformed parameters {
-//  real a[Ncut];  // Ncut = 3
   real(0,) sigma; 
-//  a[1] <- a0; 
-//  a[2] <- a0 + delta1; 
-//  a[3] <- a0 + delta1 + delta2; 
   sigma <- sqrt(sigmasq); 
 } 
 model {
   real Q[N, T, Ncut]; 
-  // real p[N, T, Ncut + 1]; 
   vector(Ncut + 1) p[N, T]; 
   real mu[G, T]; 
 
   for (g in 1:G) {
     for(t in 1:T) { 
-      # logistic mean for group g in period t
+      // logistic mean for group g in period t
       mu[g, t] <- beta * treat[g, t] * .5 + pi * period[g, t] * .5 + kappa * carry[g, t]; 
     }
   }                                                             
@@ -94,8 +87,7 @@ model {
       p[i, t, (Ncut + 1)] <- Q[i, t, Ncut];
       
       response[i, t] - 1 ~ categorical(p[i, t]);
-      // lp__ <- lp__ + log(p[i, t, response[i, t]]); 
-    }
+     }
   }
   b ~ normal(0, sigma);
 
@@ -104,8 +96,6 @@ model {
   kappa ~ normal(0, 1000); 
 
   a0 ~ normal(0, 1000);
-//  delta1 ~ normal(0, 1000); 
-//  delta2 ~ normal(0, 1000); 
  
   sigmasq ~ inv_gamma(0.001, 0.001);
 }

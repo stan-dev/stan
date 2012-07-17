@@ -41,11 +41,23 @@ public:
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
     using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0U);
+
     std::vector<std::pair<size_t, double> > expected_values;
 
-    expected_values.push_back(make_pair(0U, 2207)); // sigma2.btw
-    expected_values.push_back(make_pair(1U, 3034)); // sigma2.with
-    expected_values.push_back(make_pair(2U, 1528)); // theta
+    index = chains->get_total_param_index(chains->param_name_to_index("sigmasq_between"),
+					  dims);
+    expected_values.push_back(make_pair(index, 2207));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigmasq_within"),
+					  dims);
+    expected_values.push_back(make_pair(index, 3034));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("theta"),
+					  dims);
+    expected_values.push_back(make_pair(index, 1528));
 
     return expected_values;
   }
