@@ -151,17 +151,37 @@ stan = function(model.file,
   
     for (chain in 1:chains) {
         write("","");
-        write(paste("Step 5.",chain,".  Create Initialization File"),"");
+        write(paste("Step 5.",chain,".1.  Create Initialization File"),"");
+        init.file = NULL;
         if (is.null(inits)) {
             write("No initializations specified.","");
+        } else if (is.character(inits)) {
+            init.file = inits;
+            write(paste("Reading inits from file = ",init.file),"");
+            if (!file.exists(init.file)) {
+                write("ERROR:  Init file does not exist.","");
+                return(-4);
+            }
+        } else if (is.function(inits)) {
+            init.file = paste(samples.dir,"/inits",chain,".R",sep="");
+            write(paste("Found inits function.  Writing to file = ",
+                        inits.file),"");
+            inits.list = inits();
+            write.data.list.to.file(inits.list, initis.file);
+        } else {
+            write(paste("ERROR: Unsupported type for inits =",
+                        typeof(inits)),"");
+            return(-5);
         }
-        write(paste("Step 5.",chain,".  Sample Chain ",chain,sep=""),"");
+        write(paste("Step 5.",chain,".2.  Sample Chain ",chain,sep=""),"");
         samples.file = paste(samples.dir,"/samples",chain,".csv",sep="");
         cmd = paste(model.executable,
                     ifelse(is.null(data.file),
                            "",
                            paste(" --data=",data.file,sep="")),
-                    # " --init=",init.file,
+                    ifelse(is.null(init.file),
+                           "",
+                           paste(" --init=",init.file,sep="")),
                     " --samples=",samples.file,
                     " --seed=",seed,
                     " --chain_id=",chain,
