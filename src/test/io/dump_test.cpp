@@ -128,6 +128,25 @@ TEST(io_dump, reader_ints) {
   test_list("iroc",vs,"iroc <- 9:8");
 }
 
+
+TEST(io_dump, reader_vec_data) {
+  std::vector<int> expected_vals;
+  expected_vals.push_back(1);
+  expected_vals.push_back(2);
+  expected_vals.push_back(3);
+  expected_vals.push_back(4);
+  expected_vals.push_back(5);
+  expected_vals.push_back(6);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2U);
+  expected_dims.push_back(3U);
+  // std::string txt = "foo <- structure(1:6, .Dim = c(2,3))";
+  std::string txt = "foo <- structure(c(1,2,3,4,5,6), .Dim = c(2,3))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+}
+
 TEST(io_dump, reader_vec_double) {
   std::vector<double> expected_vals;
   expected_vals.push_back(1.0);

@@ -105,8 +105,8 @@ namespace stan {
 	if (y_dbl < 0 || y_dbl > 1)
 	  return 0.0;
 
-	double log_y = log(y_dbl);
-	double log1m_y = log1m(y_dbl);
+	const double log_y = log(y_dbl);
+	const double log1m_y = log1m(y_dbl);
 	// log probability
 	if (include_summand<Prop,T_scale_succ,T_scale_fail>::value)
 	  logp += lgamma(alpha_dbl + beta_dbl);
@@ -120,11 +120,10 @@ namespace stan {
 	  logp += (beta_dbl-1.0) * log1m_y;
 
 	// gradients
-	double log_beta_AB = log(boost::math::beta(alpha_dbl, beta_dbl));
-	double digamma_alpha_beta = boost::math::digamma(alpha_dbl + beta_dbl);
-	double digamma_alpha = boost::math::digamma(alpha_dbl);
-	double digamma_beta = boost::math::digamma(beta_dbl);
-
+	const double log_beta_AB = log(boost::math::beta(alpha_dbl, beta_dbl));
+	const double digamma_alpha_beta = boost::math::digamma(alpha_dbl + beta_dbl);
+	const double digamma_alpha = boost::math::digamma(alpha_dbl);
+	const double digamma_beta = boost::math::digamma(beta_dbl);
 
 	if (!is_constant<typename is_vector<T_y>::type>::value)
 	  operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl + (beta_dbl-1)/(y_dbl-1);
@@ -139,16 +138,14 @@ namespace stan {
     template <bool Prop,
               typename T_y, typename T_scale_succ, typename T_scale_fail>
     inline 
-    typename 
-    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       return beta_log<Prop>(y,alpha,beta,stan::math::default_policy());
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy>
-    typename 
-    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
              const Policy&) {
       return beta_log<false>(y,alpha,beta,Policy());
@@ -156,16 +153,28 @@ namespace stan {
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     inline 
-    typename 
-    boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       return beta_log<false>(y,alpha,beta,stan::math::default_policy());
     }
 
-
+    
+    /**
+     * Calculates the beta cumulative distribution function for the given
+     * variate and scale variables.
+     * 
+     * @param y A scalar variate.
+     * @param alpha Prior sample size.
+     * @param beta Prior sample size.
+     * @return The beta cdf evaluated at the specified arguments.
+     * @tparam T_y Type of y.
+     * @tparam T_scale_succ Type of alpha.
+     * @tparam T_scale_fail Type of beta.
+     * @tparam Policy Error-handling policy.
+     */
     template <typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy>
-    typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_p(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
            const Policy&) {
       static const char* function = "stan::prob::beta_p(%1%)";
@@ -204,7 +213,7 @@ namespace stan {
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-    typename boost::math::tools::promote_args<T_y,T_scale_succ,T_scale_fail>::type
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_p(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       return beta_p(y,alpha,beta,stan::math::default_policy());
     }
