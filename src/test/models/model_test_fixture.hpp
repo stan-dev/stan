@@ -81,6 +81,7 @@ public:
     std::stringstream command;
     command << model_path;
     command << " --samples=" << get_csv_file(chain);
+    command << " --chain_id=" << chain;
     if (has_data()) {
       command << " --data=" << model_path << ".Rdata";
     }
