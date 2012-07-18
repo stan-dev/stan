@@ -1,6 +1,8 @@
-library("R2WinBUGS");
+stopifnot(require("R2WinBUGS"));
 
-STAN_HOME = "/Users/carp/stan";
+check.stan.home = function(stan.home) {
+  return(file.exists(file.path(stan.home, "r2stan_sys.R")))
+}
 
 run.cmd = function(cmd) {
   write(paste("Command:",cmd), "");
@@ -28,9 +30,10 @@ dots.to.brackets = function(param.name) {
 
 stan.translate = function(model.file,
                           cpp.file = "anon_model.cpp",
-                          stan.home = STAN_HOME) {
+                          stan.home = Sys.getenv("STAN_HOME")) {
+  if(!check.stan.home(stan.home)) stop("stan.home is not specified correctly")
   write("Stan Model Translation", "");
-  cmd = paste(stan.home,"/bin/stanc",
+  cmd = paste(file.path(stan.home,"bin", "stanc"),
               " ",model.file,
               " --o=",cpp.file,
               sep="");
@@ -38,16 +41,19 @@ stan.translate = function(model.file,
 }
 
 stan.compile = function(cpp.file="anon_model.cpp",
-                        stan.home = STAN_HOME,
+                        stan.home = Sys.getenv("STAN_HOME"),
                         cc = "g++ -O3") {
+  if(!check.stan.home(stan.home)) stop("stan.home is not specified correctly")
+  BOOST <- grep("^boost", dir(file.path(stan.home, "lib")), value = TRUE)
+  EIGEN <- grep("^eigen", dir(file.path(stan.home, "lib")), value = TRUE)
   write("Stan Model Compilation", "");
   cmd = paste(cc,
-              " -L",stan.home,"/bin",
+              " -L",file.path(stan.home,"bin"),
               " -l","stan",
-              " -I",stan.home,"/lib/boost_1.50.0",
-              " -I",stan.home,"/lib/eigen_3.1.0",
-              " -I",stan.home,"/lib/eigen_3.1.0/unsupported",
-              " -I",stan.home,"/src",
+              " -I",file.path(stan.home,"lib", BOOST),
+              " -I",file.path(stan.home,"lib", EIGEN),
+              " -I",file.path(stan.home,"lib", EIGEN, "unsupported"),
+              " -I",file.path(stan.home,"src"),
               " ",cpp.file,
               sep="");
   return(run.cmd(cmd));
@@ -97,9 +103,10 @@ stan = function(model.file,
                 gamma = 0.05,
                 test_grad = FALSE,
                 cc = "g++ -O3",
-                stan.home = STAN_HOME) {
+                stan.home = Sys.getenv("STAN_HOME")) {
 
-    write("","");
+  if(!check.stan.home(stan.home)) stop("stan.home is not specified correctly")
+  write("","");
     write("Step 1.  Create Output Directory","");
     write(paste("Directory:",samples.dir),"");
     dir.create(samples.dir, showWarnings = FALSE, recursive = TRUE);
@@ -133,7 +140,7 @@ stan = function(model.file,
             return(-2);
         }
     } else if (is.list(data)) {
-        data.file = paste(samples.dir,"/dumpdata.R",sep="");
+        data.file = file.path(samples.dir,"dumpdata.R");
         write(paste("Found data list. Writing to file = ",
                     data.file),"");
         write.data.list.to.file(data, data.file);
@@ -163,7 +170,7 @@ stan = function(model.file,
                 return(-4);
             }
         } else if (is.function(inits)) {
-            init.file = paste(samples.dir,"/inits",chain,".R",sep="");
+            init.file = file.path(samples.dir,"inits",paste(chain,".R",sep=""));
             write(paste("Found inits function.  Writing to file = ",
                         inits.file),"");
             inits.list = inits();
@@ -174,7 +181,7 @@ stan = function(model.file,
             return(-5);
         }
         write(paste("Step 5.",chain,".2.  Sample Chain ",chain,sep=""),"");
-        samples.file = paste(samples.dir,"/samples",chain,".csv",sep="");
+        samples.file = file.path(samples.dir,paste("samples",chain,".csv",sep=""));
         cmd = paste(model.executable,
                     ifelse(is.null(data.file),
                            "",
@@ -219,8 +226,9 @@ stan = function(model.file,
             param.names[i] = dots.to.brackets(param.names[i]);
         dimnames(samples.chains)[[3]] = param.names;
     }
+    program = system(paste(file.path(stan.home, "bin", "stanc"), "--version"), intern = TRUE)
     return(as.bugs.array(samples.chains,
-                         program = "Stan 1.0 (beta)",
+                         program = program,
                          n.iter = iter,
                          n.burnin = warmup,
                          n.thin = thin));
