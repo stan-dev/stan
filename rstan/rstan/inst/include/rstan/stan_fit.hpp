@@ -11,9 +11,10 @@
 #include <sstream>
 #include <vector>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-#include <boost/random/mersenne_twister.hpp>
+//#include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
@@ -29,7 +30,7 @@
 #include <rstan/io/rlist_ref_var_context.hpp> 
 #include <rstan/io/r_ostream.hpp> 
 #include <rstan/stan_args.hpp> 
-#include <rstan/chains_for_R.hpp>
+// #include <rstan/chains_for_R.hpp>
 // #include <stan/mcmc/chains.hpp>
 
 #include <Rcpp.h>
@@ -37,25 +38,194 @@
 
 // REF: stan/gm/command.hpp 
 
-
 namespace rstan {
 
-  namespace { 
-    // Potentially this could be problematic for 
-    // converting size_t vector to unsigned int. 
-    // But given the limitation of R, the values
-    // passed from R should be fine using unsigned int 
-    // inside stan. 
-    template <class T1, class T2> 
-    void  T1v_to_T2v(const std::vector<T1>& v,
-                     std::vector<T2>& v2) {
-      v2.resize(0); 
-      for (typename std::vector<T1>::const_iterator it = v.begin();
-           it != v.end();
-           ++it) { 
-        v2.push_back(static_cast<T2>(*it));
-      }     
+  namespace {
+    template <class T> 
+    T product(std::vector<T> dims) {
+      T y = 1U;
+      for (size_t i = 0; i < dims.size(); ++i)
+        y *= dims[i];
+      return y;
+    }
+
+    /**
+     *  Get the parameter indexes for a vector(array) parameter.
+     *  For example, we have parameter beta, which has 
+     *  dimension [2,3]. Then this function gets 
+     *  the indexes as (if col_major = false)
+     *  [0,0], [0,1], [0,2] 
+     *  [1,0], [1,1], [1,2] 
+     *  or (if col_major = true) 
+     *  [0,0], [1,0] 
+     *  [0,1], [1,1] 
+     *  [0,2], [121] 
+     *
+     *  @param dim[in] the dimension of parameter
+     *  @param idx[out] for keeping all the indexes
+     *
+     *  <p> when idx is empty (size = 0), idx 
+     *  would be inserted an empty vector. 
+     * 
+     *
+     */
+    
+    template <class T>
+    void expand_indices(std::vector<T> dim,
+                        std::vector<std::vector<T> >& idx,
+                        bool col_major = false) {
+      size_t len = dim.size();
+      idx.resize(0);
+      size_t total = product(dim);
+      std::vector<size_t> loopj;
+      for (size_t i = 1; i <= len; ++i)
+        loopj.push_back(len - i);
+    
+      if (col_major)
+        for (size_t i = 0; i < len; ++i)
+          loopj[i] = len - 1 - loopj[i];
+    
+      idx.push_back(std::vector<T>(len, 0));
+      for (size_t i = 1; i < total; i++) {
+        std::vector<T>  v(idx.back());
+        for (size_t j = 0; j < len; ++j) {
+          size_t k = loopj[j];
+          if (v[k] < dim[k] - 1) {
+            v[k] += 1;
+            break;
+          }
+          v[k] = 0;
+        }
+        idx.push_back(v);
+      }
+    }
+
+    /**
+     * Get the names for an array of given dimensions 
+     * in the way of column majored. 
+     * For exmaple, if we know an array named `a`, with
+     * dimensions of [2, 3, 4], the names then are (starting
+     * from 0):
+     * a[0,0,0]
+     * a[1,0,0]
+     * a[0,1,0]
+     * a[1,1,0]
+     * a[0,2,0]
+     * a[1,2,0]
+     * a[0,0,1]
+     * a[1,0,1]
+     * a[0,1,1]
+     * a[1,1,1]
+     * a[0,2,1]
+     * a[1,2,1]
+     * a[0,0,2]
+     * a[1,0,2]
+     * a[0,1,2]
+     * a[1,1,2]
+     * a[0,2,2]
+     * a[1,2,2]
+     * a[0,0,3]
+     * a[1,0,3]
+     * a[0,1,3]
+     * a[1,1,3]
+     * a[0,2,3]
+     * a[1,2,3]
+     *
+     * @param name The name of the array variable 
+     * @param dim The dimensions of the array 
+     * @param fnames[out] Where the names would be pushed. 
+     * @param first_is_one[true] Where to start for the first index: 0 or 1. 
+     *
+     */
+    template <class T> void
+    get_flatnames(const std::string& name,
+                  const std::vector<T>& dim,
+                  std::vector<std::string>& fnames,
+                  bool col_major = true,
+                  bool first_is_one = true) {
+
+      fnames.clear(); 
+      if (0 == dim.size()) {
+        fnames.push_back(name);
+        return;
+      }
+
+      std::vector<std::vector<T> > idx;
+      expand_indices(dim, idx, col_major); 
+      size_t first = first_is_one ? 1 : 0;
+      for (typename std::vector<std::vector<T> >::const_iterator it = idx.begin();
+           it != idx.end();
+           ++it) {
+        std::stringstream stri;
+        stri << name << "[";
+
+        size_t lenm1 = it -> size() - 1;
+        for (size_t i = 0; i < lenm1; i++)
+          stri << ((*it)[i] + first) << ",";
+        stri << ((*it)[lenm1] + first) << "]";
+        fnames.push_back(stri.str());
+      }
+    }
+
+    // vectorize get_flatnames 
+    template <class T> 
+    void get_all_flatnames(const std::vector<std::string>& names, 
+                           const std::vector<T>& dims, 
+                           std::vector<std::string>& fnames, 
+                           bool col_major = true) {
+      fnames.clear(); 
+      for (size_t i = 0; i < names.size(); ++i) {
+        std::vector<std::string> i_names; 
+        get_flatnames(names[i], dims[i], i_names, col_major, true); // col_major = true
+        fnames.insert(fnames.end(), i_names.begin(), i_names.end());
+      } 
     } 
+  }
+
+  namespace { 
+    /**
+     *@tparam T The type by which we use for dimensions. T could be say size_t
+     * or unsigned int. This whole business (not using size_t) is due to that
+     * Rcpp::wrap/as does not support size_t on some platforms and R could not
+     * deal with 64bits integers. 
+     *
+     */ 
+    template <class T> 
+    size_t calc_num_params(const std::vector<T>& dim) {
+      T num_params = 1;
+      for (size_t i = 0;  i < dim.size(); ++i)
+        num_params *= dim[i];
+      return num_params;
+    }
+
+    template <class T> 
+    void calc_starts(const std::vector<std::vector<T> >& dims,
+                     std::vector<T>& starts) { 
+      starts.resize(0); 
+      starts.push_back(0); 
+      for (size_t i = 1; i < dims.size(); ++i)
+        starts.push_back(starts[i - 1] + calc_num_params(dims[i - 1]));
+    }
+
+    template <class T> 
+    T calc_total_num_params(const std::vector<std::vector<T> >& dims) {
+      T num_params = 0;
+      for (size_t i = 0; i < dims.size(); ++i)
+        num_params += calc_num_params(dims[i]);
+      return num_params;
+    }
+
+    /**
+     * Only calculate parameter with index in indexes. 
+     */ 
+    template <class T> 
+    T calc_total_num_params(const std::vector<std::vector<T> >& dims, 
+                            const std::vector<size_t> indexes) {
+      T num_params = 0;
+      for (size_t i = 0; i < indexes.size(); ++i)
+        num_params += calc_num_params(dims[indexes[i]]);
+      return num_params;
+    }
 
     bool do_print(int refresh) {
       return refresh > 0;
@@ -66,42 +236,6 @@ namespace rstan {
         && ((n + 1) % refresh == 0);
     }
   
-    /*
-    void write_comment(std::ostream& o) {
-      o << "#" << std::endl;
-    }
-  
-    template <typename M>
-    void write_comment(std::ostream& o,
-                       const M& msg) {
-      o << "# " << msg << std::endl;
-    }
-  
-    template <typename K, typename V>
-    void write_comment_property(std::ostream& o,
-                                const K& key,
-                                const V& val) {
-      o << "# " << key << "=" << val << std::endl;
-    }
-    */
-
-    /** 
-     * Print out a std::vector 
-     */
-    /**
-    template <typename T>
-    void printv(std::ostream& o, const std::vector<T>& v) {
-      for (typename std::vector<T>::const_iterator it = v.begin(); it != v.end(); ++it)
-        o << *it << std::endl;
-    }
-    */
-    template <typename T>
-    std::string to_string(T i) {
-      std::stringstream ss;
-      ss << i;
-      return ss.str();
-    }
-
     template <class Model>
     std::vector<std::string> get_param_names(Model& m) { 
       std::vector<std::string> names;
@@ -109,14 +243,35 @@ namespace rstan {
       return names; // copy for return
     }
 
-    template <class Model>
-    std::vector<std::vector<size_t> > get_param_dims(Model& m) {
-      std::vector<std::vector<size_t> > dimss; 
-      m.get_dims(dimss); 
-      return dimss; 
+    /**
+     * Cast a size_t vector to an unsigned int vector. 
+     * The reason is that first Rcpp::wrap/as does not 
+     * support size_t on some platforms; second R 
+     * could not deal with 64bits integers.  
+     */ 
+
+    std::vector<unsigned int> 
+    sizet_to_uint(std::vector<size_t> v1) {
+      std::vector<unsigned int> v2(v1.size());
+      for (size_t i = 0;i < v1.size(); ++i) 
+        v2[i] = static_cast<unsigned int>(v1[i]);
+      return v2;
     } 
 
-    template <class Sampler, class Model, class RNG>
+    template <class Model>
+    std::vector<std::vector<unsigned int> > get_param_dims(Model& m) {
+      std::vector<std::vector<size_t> > dims; 
+      m.get_dims(dims); 
+
+      std::vector<std::vector<unsigned int> > uintdims; 
+      for (std::vector<std::vector<size_t> >::const_iterator it = dims.begin();
+           it != dims.end(); 
+           ++it) 
+        uintdims.push_back(sizet_to_uint(*it)); 
+      return uintdims; 
+    } 
+
+    template <class Sampler, class Model> 
     void sample_from(Sampler& sampler,
                      bool epsilon_adapt,
                      int refresh,
@@ -128,12 +283,11 @@ namespace rstan {
                      std::vector<double>& params_r,
                      std::vector<int>& params_i,
                      Model& model,
-                     stan::mcmc::chains<RNG>& chains,
-                     unsigned int chain_id) {
+                     std::vector<Rcpp::NumericVector>& chains, 
+                     const size_t iter_save, 
+                     const std::vector<size_t>& qoi_idx) {  
   
       sampler.set_params(params_r,params_i);
-
-     
       int it_print_width = std::ceil(std::log10(num_iterations));
       rstan::io::rcout << std::endl;
   
@@ -143,7 +297,9 @@ namespace rstan {
       else 
         sampler.adapt_off(); 
       std::vector<double> params_inr; 
-      for (int m = 0; m < num_iterations; ++m) {
+     
+      unsigned ii = 0; // index for iterations saved to chains
+      for (int m = 0; m < num_iterations; ++m, ++ii) {
         if (do_print(m,refresh)) {
           rstan::io::rcout << "\rIteration: ";
           rstan::io::rcout << std::setw(it_print_width) << (m + 1)
@@ -167,7 +323,9 @@ namespace rstan {
         sample.params_r(params_r);
         sample.params_i(params_i);
         model.write_array(params_r,params_i,params_inr); 
-        chains.add(chain_id - 1, params_inr); 
+        
+        for (size_t z = 0; z < qoi_idx.size(); ++z)  
+          chains[z][ii] = params_inr[qoi_idx[z]]; 
   
         // FIXME: use csv_writer arg to make comma optional?
         if (sample_file_flag) { 
@@ -180,14 +338,15 @@ namespace rstan {
 
     /**
      * @tparam Model 
-     * @tparam RNG RNG for stan::mcmc::chains 
      */
     
-    template <class Model, class RNG> 
+    template <class Model> 
     int sampler_command(const io::rlist_ref_var_context& data, 
-                       const stan_args& args, 
-                       Model& model, 
-                       stan::mcmc::chains<RNG>& chains_) {
+                        const stan_args& args, 
+                        Model& model, 
+                        std::vector<Rcpp::NumericVector>& chains, 
+                        unsigned int iter_save,
+                        const std::vector<size_t>& qoi_idx) {  
 
       bool sample_file_flag = args.get_sample_file_flag(); 
       std::string sample_file = args.get_sample_file(); 
@@ -200,14 +359,13 @@ namespace rstan {
       unsigned int random_seed = args.get_random_seed();
 
       double epsilon = args.get_epsilon(); 
-      bool epsilon_adapt = epsilon <= 0.0; 
+      bool epsilon_adapt = (epsilon <= 0.0); 
 
       bool unit_mass_matrix = args.get_unit_mass_matrix();
 
       int max_treedepth = args.get_max_treedepth(); 
 
       double epsilon_pm = args.get_epsilon_pm(); 
-
 
       double delta = args.get_delta(); 
 
@@ -294,7 +452,7 @@ namespace rstan {
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains_,chain_id); 
+                    model,chains,iter_save,qoi_idx); 
 
   
       } else if (0 > leapfrog_steps && unit_mass_matrix) {
@@ -315,7 +473,7 @@ namespace rstan {
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains_,chain_id); 
+                    model,chains,iter_save,qoi_idx); 
       } else {
         // Stardard HMC
         stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
@@ -334,7 +492,7 @@ namespace rstan {
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains_,chain_id);
+                    model,chains,iter_save,qoi_idx); 
       }
       
       if (sample_file_flag) {
@@ -349,809 +507,238 @@ namespace rstan {
     }
   } 
 
-  /**
-   * <p> To implement a Rcpp class module for R's user interface with 
-   * samplers in stan (HMC, NUTS-I, NUTS-II).  
-   * Adapted from <code> stan/src/stan/gm/command.hpp</code>. 
-   * 
-   * @tparam Model The model translated from the Stan language.
-   * @tparam RNG RNG for stan::mcmc::chains 
-   *
-   */
-
   template <class Model, class RNG> 
   class stan_fit {
 
   private:
     io::rlist_ref_var_context data_;
-    std::vector<std::string>  names_;
     Model model_;
-    unsigned int num_chains_; 
-    std::map<unsigned int, stan_args> argss_; 
-    // std::vector<stan_args> argss_;
-    // stan::mcmc::chains<RNG> chains_; 
-    chains_for_R<RNG> chains_; 
+    const std::vector<std::string> names_;
+    const std::vector<std::vector<unsigned int> > dims_; 
+    const unsigned int num_params_; 
 
-    std::vector<std::string> flatnames_; 
+    std::vector<std::string> names_oi_; // parameters of interests 
+    std::vector<std::vector<unsigned int> > dims_oi_; 
+    std::vector<size_t> names_oi_tidx_;  // the total indexes of names2.
+    std::vector<unsigned int> starts_oi_;  
+    unsigned int num_params2_;  // total number of POI's.   
+    std::vector<std::string> fnames_oi_; 
 
   private: 
-  
     /**
      * Tell if a parameter name is an element of an array parameter. 
      * Note that it only supports full specified name; slicing 
      * is not supported. The test only tries to see if there 
      * are brackets. 
      */
-  
     bool is_flatname(const std::string& name) {
       return name.find('[') != name.npos && name.find(']') != name.npos; 
     } 
- 
-    /**
-     * Obtain the dimensions for parameters.
-     *
-     * @param names[in] Names of parameters of interest. Note here
-     *  the name could be an element of an array parameter, 
-     *  for example a[5], b[3,4] are legitimate names. 
-     * @param names2[out] Names of those parameters that we 
-     *  do have. This is just in case that we requets some
-     *  parameter that are not in the model. 
-     * @param dimms[out] Dimensions of the parameters requsted. 
-     *  For scalars and element of array parameters, it is a 
-     *  empty vector if size_t. 
-     * 
-     ** @tparam T the type of the dimensions. In Stan, size_t is 
-     **  used.  But when communicating between R, Rcpp does
-     **  not support wrap/as size_t (as of Thu Jul 12 14:33:32 EDT 2012), 
-     **  in which case, unsigned int could be used. 
-     */ 
+  
+    void update_param_oi0(const std::vector<std::string>& pnames) {
+      names_oi_.clear(); 
+      dims_oi_.clear(); 
+      names_oi_tidx_.clear(); 
 
-    /*
-    template <class T>
-     */
-    void param_dimss(const std::vector<std::string>& names,
-                     std::vector<std::string>& names2,
-                     std::vector<std::vector<size_t> >& dimss) {
-      dimss.resize(0); 
-      for (std::vector<std::string>::const_iterator it = names.begin();
-           it != names.end(); 
-           ++it) {
-        if (is_flatname(*it)) { // an element of an array 
-          size_t ts = std::distance(flatnames_.begin(),
-                                    std::find(flatnames_.begin(), 
-                                              flatnames_.end(), *it));       
-          if (ts == flatnames_.size()) // not found 
-            continue; 
-          names2.push_back(*it); 
-          dimss.push_back(std::vector<size_t>());
-          continue;
-        }
-        size_t j = chains_.param_name_to_index(*it);
-        dimss.push_back(chains_.param_dims(j)); 
-        names2.push_back(*it); 
+      std::vector<unsigned int> starts; 
+      calc_starts(dims_, starts);
+      for (std::vector<std::string>::const_iterator it = pnames.begin(); 
+           it != pnames.end(); 
+           ++it) { 
+        size_t p = find_index(names_, *it); 
+        if (p != names_.size()) {
+          names_oi_.push_back(*it); 
+          dims_oi_.push_back(dims_[p]); 
+          size_t i_num = calc_num_params(dims_[p]); 
+          size_t i_start = starts[p]; 
+          for (size_t j = i_start; j < i_start + i_num; j++)
+            names_oi_tidx_.push_back(j);
+        } 
       }
+      calc_starts(dims_oi_, starts_oi_);
+      num_params2_ = names_oi_tidx_.size(); 
     } 
-   
+
+  public:
+    SEXP update_param_oi(SEXP pars) {
+      std::vector<std::string> pnames = 
+        Rcpp::as<std::vector<std::string> >(pars);  
+      update_param_oi0(pnames); 
+      get_all_flatnames(names_oi_, dims_oi_, fnames_oi_, true); 
+      return Rcpp::wrap(true); 
+    } 
+
+    stan_fit(SEXP data, SEXP pars) : 
+      data_(Rcpp::as<Rcpp::List>(data)), 
+      model_(data_),  
+      names_(get_param_names(model_)), 
+      dims_(get_param_dims(model_)), 
+      num_params_(calc_total_num_params(dims_)) 
+    {  
+      update_param_oi(pars); 
+    }
+
+    stan_fit(SEXP data) : 
+      data_(Rcpp::as<Rcpp::List>(data)), 
+      model_(data_),
+      names_(get_param_names(model_)), 
+      dims_(get_param_dims(model_)), 
+      num_params_(calc_total_num_params(dims_)), 
+      names_oi_(names_), 
+      dims_oi_(dims_),
+      num_params2_(num_params_)  
+    {
+      for (size_t j = 0; j < num_params2_; j++) 
+        names_oi_tidx_.push_back(j);
+      calc_starts(dims_oi_, starts_oi_);
+      get_all_flatnames(names_oi_, dims_oi_, fnames_oi_, true); 
+    }             
+
+
+    SEXP call_sampler(SEXP args) { 
+      BEGIN_RCPP; 
+      stan_args arg(Rcpp::as<Rcpp::List>(args)); 
+      unsigned int iter_save = arg.get_iter_save(); 
+      std::vector<Rcpp::NumericVector> chains; 
+      for (unsigned int i = 0; i < num_params2_; i++) 
+        chains.push_back(Rcpp::NumericVector(iter_save)); 
+
+      try {
+        sampler_command(data_, arg, model_, chains, iter_save, names_oi_tidx_); 
+      } catch (std::exception& e) {
+        rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
+        rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
+        return R_NilValue; 
+      }
+      // chains.attr("ncol") = Rcpp::wrap(num_params2_); 
+      Rcpp::List lst(chains.begin(), chains.end()); 
+      lst.names() = fnames_oi_; 
+      return lst; 
+      END_RCPP; 
+    } 
+
+    SEXP param_names() const {
+      BEGIN_RCPP; 
+      return Rcpp::wrap(names_);
+      END_RCPP; 
+    } 
+
+    SEXP param_names_oi() const {
+      BEGIN_RCPP; 
+      return Rcpp::wrap(names_oi_);
+      END_RCPP; 
+    } 
+
     /**
-     * Obtain the total indices for parameters.
-     *
-     * @param names[in] Names of parameters of interest. Note here
-     *  the name could be an element of an array parameter, 
-     *  for example a[5], b[3,4] are legitimate names. 
-     * @param names2[out] Names of those parameters that we 
-     *  do have. This is just in case that we request 
-     *  parameters that are not in the model. 
-     * @param indices Indices for the parameter requested. 
-     *  The indices for each parameter is a vector, the min 
-     *  length of which is 1. 
+     * tidx (total indexes) 
+     * the index is among those parameters of interests, not 
+     * all the parameters. 
      */ 
-    void param_total_indices(const std::vector<std::string>& names,
-                             std::vector<std::string>& names2, 
-                             std::vector<std::vector<size_t> >& indices) {
-      names2.resize(0);
-      indices.resize(0);
+    SEXP param_oi_tidx(SEXP pars) {
+      BEGIN_RCPP; 
+      std::vector<std::string> names = 
+        Rcpp::as<std::vector<std::string> >(pars); 
+      std::vector<std::string> names2; 
+      std::vector<std::vector<unsigned int> > indexes; 
       for (std::vector<std::string>::const_iterator it = names.begin();
            it != names.end(); 
            ++it) {
         if (is_flatname(*it)) { // an element of an array  
-          size_t ts = std::distance(flatnames_.begin(),
-                                    std::find(flatnames_.begin(), 
-                                              flatnames_.end(), *it));       
-          if (ts == flatnames_.size()) // not found 
+          size_t ts = std::distance(fnames_oi_.begin(),
+                                    std::find(fnames_oi_.begin(), 
+                                              fnames_oi_.end(), *it));       
+          if (ts == fnames_oi_.size()) // not found 
             continue; 
           names2.push_back(*it); 
-          indices.push_back(std::vector<size_t>(1, ts)); 
+          indexes.push_back(std::vector<unsigned int>(1, ts)); 
           continue;
         }
-        size_t j = chains_.param_name_to_index(*it);
-        size_t j_size = chains_.param_size(j); 
-        size_t j_start = chains_.param_start(j); 
-        std::vector<size_t> j_idx; 
-        for (size_t k = 0; k < j_size; k++) {
+        size_t j = std::distance(names_oi_.begin(), 
+                                 std::find(names_oi_.begin(),    
+                                           names_oi_.end(), *it)); 
+        if (j == names_oi_.size()) // nout found 
+          continue; 
+        unsigned int j_size = calc_num_params(dims_oi_[j]); 
+        unsigned int j_start = starts_oi_[j]; 
+        std::vector<unsigned int> j_idx; 
+        for (unsigned int k = 0; k < j_size; k++) {
           j_idx.push_back(j_start + k); 
         } 
         names2.push_back(*it); 
-        indices.push_back(j_idx); 
+        indexes.push_back(j_idx); 
       }
-    } 
-
-    /* Obtain the indices and flatnames for a vector of parameter names. 
-     * @param names[in] Names of parameters of interests 
-     * @param indices[out] The total indices for all parameters in the overall
-     *  samples. Note the index here is the index as in 
-     *  <code>stan::mcmc::chains::get_total_param_index</code>; 
-     *  but not the index in 
-     *  <code>stan::mcmc::chains::param_name_to_index</code>.  
-    
-     * @param flatnames[out] Flatnames for all the names. That is, 
-     * if parameter a is of length 3, it would be added as 
-     * a[1], a[2], a[3]. 
-     *
-     */
-  
-    void param_names_to_indices_and_flatnames(
-      const std::vector<std::string>& names, 
-      std::vector<size_t>& indices,
-      std::vector<std::string>& flatnames) {
-      indices.resize(0);
-      flatnames.resize(0);
-
-      for (std::vector<std::string>::const_iterator it = names.begin();
-           it != names.end(); 
-           ++it) {
-        if (is_flatname(*it)) { 
-          size_t ts = std::distance(flatnames_.begin(),
-                                    std::find(flatnames_.begin(), 
-                                              flatnames_.end(), *it));       
-          if (ts == flatnames_.size()) // not found 
-            continue; 
-          flatnames.push_back(*it); 
-          indices.push_back(ts); 
-          continue;
-        } 
-
-        size_t j = chains_.param_name_to_index(*it);
-        std::vector<size_t> j_dims = chains_.param_dims(j); 
-
-        std::vector<std::vector<size_t> > j_idx;  
-        expand_indices(j_dims, j_idx); // col_major = false 
-
-        for (std::vector<std::vector<size_t> >::const_iterator it = j_idx.begin(); 
-             it != j_idx.end(); 
-             ++it) { 
-          size_t total_idx = chains_.get_total_param_index(j, *it); 
-          indices.push_back(total_idx); 
-          flatnames.push_back(flatnames_[total_idx]); 
-        } 
-      }
-    }
-
-    /**
-     * Obtain kept samples by index from a chain for one parameter. 
-     *
-     * @param k Index of chain (starting from 0).
-     * @param n Indexe of a parameter (starting from 0). 
-     * @return A vector of samples in form of R's numeric vector. 
-     *
-     */
-    SEXP get_chain_samples_0(size_t k, size_t n, bool keep_warmup = true) {
-      std::vector<double> s; 
-      if (keep_warmup) 
-        chains_.get_samples(k, n, s);
-      else
-        chains_.get_kept_samples(k, n, s);
-      return Rcpp::wrap(s);
-    } 
-
-    /**
-     * Obtain kept samples by index from a chain. 
-     *
-     * @param k Index of chain (starting from 0).
-     * @param ns Indexes of parameters (starting from 0). 
-     * @return A vector of samples in form of R's numeric vector, in which
-     *  samples for multiple parameters are concatenated. 
-     *
-     */
-    SEXP get_chain_samples_0(size_t k, 
-                             const std::vector<size_t>& ns, 
-                             bool keep_warmup = true) {
-      size_t num = keep_warmup
-                   ? chains_.num_samples(k) 
-                   : chains_.num_kept_samples(k);
-      Rcpp::NumericVector nv(ns.size() * num); 
-      Rcpp::NumericVector::iterator nv_it = nv.begin(); 
-      for (std::vector<size_t>::const_iterator it = ns.begin(); 
-           it != ns.end(); 
-           ++it) {
-        std::vector<double> s; 
-        if (keep_warmup) 
-          chains_.get_samples(k, *it, s);
-        else
-          chains_.get_kept_samples(k, *it, s);
-        for (std::vector<double>::const_iterator sit = s.begin(); 
-             sit != s.end(); 
-             ++sit) {
-          *nv_it++ = *sit; 
-        }
-      } 
-      return Rcpp::wrap(nv);    
-    } 
-
-    /**
-     * @param k The chain id, starting from 0.
-     * @param n The parameter index 
-     * @param probs Probabilities specifying quantiles of interest. 
-     * @return An R vector of quantiles 
-     */
-
-    SEXP get_chain_quantiles_0(
-      size_t k, size_t n, const std::vector<double>& probs) {
-
-      std::vector<double> qois; 
-      chains_.quantiles(k, n, probs, qois); 
-      return Rcpp::wrap(qois); 
-    } 
-
-    /**
-     * @param n The parameter index.
-     * @param probs Probabilities specifying quantiles of interest.
-     * @return An R vector of quantiles.  
-     */
-
-    SEXP get_quantiles_0(size_t n, const std::vector<double>& probs) {
-
-      std::vector<double> qois; 
-      chains_.quantiles(n, probs, qois); 
-      return Rcpp::wrap(qois); 
-    } 
-
-    /**
-     * Return the kept samples permuted for multiple parameters. 
-     *
-     * @param ns The total indices of parameters. 
-     * @return An R vector of samples that are permuted. 
-     *  The samples are concatenated into one vector. 
-     */
-    SEXP get_kept_samples_permuted_0(const std::vector<size_t>& ns) {
-      size_t num = chains_.num_kept_samples(); 
-      Rcpp::NumericVector nv(ns.size() * num); 
-      Rcpp::NumericVector::iterator nv_it = nv.begin(); 
-      for (std::vector<size_t>::const_iterator it = ns.begin(); 
-           it != ns.end(); 
-           ++it) {
-        std::vector<double> s; 
-        chains_.get_kept_samples_permuted(*it, s); 
-        for (std::vector<double>::const_iterator sit = s.begin(); 
-             sit != s.end(); 
-             ++sit) {
-          *nv_it++ = *sit; 
-        }
-      }
-      return Rcpp::wrap(nv);
-    }
-
-    SEXP get_kept_samples_permuted_0(size_t n) { 
-      std::vector<double> s; 
-      chains_.get_kept_samples_permuted(n, s); 
-      return Rcpp::wrap(s);
-    } 
-
-  public:
-
-    /**
-     * @param data The data for the model. From R's perspective, 
-     *  it is a named list. 
-     *
-     * @param n_chains The number of chains. 
-     *
-     */ 
-
-    stan_fit(SEXP data, SEXP n_chains) : // try : 
-      data_(Rcpp::as<Rcpp::List>(data)), 
-      names_(get_param_names(model_)), 
-      model_(data_), 
-      num_chains_(Rcpp::as<unsigned int>(n_chains)), 
-      chains_(num_chains_, names_, get_param_dims(model_)) 
-    {  
-
-      std::vector<std::string> names = chains_.param_names();
-      for (std::vector<std::string>::const_iterator it = names.begin();
-           it != names.end(); 
-           ++it) {
-        size_t j = chains_.param_name_to_index(*it);
-        std::vector<size_t> j_dims = chains_.param_dims(j); 
-        std::vector<std::string> j_n;  
-        get_col_major_names(*it, j_dims, j_n);
-        flatnames_.insert(flatnames_.end(), j_n.begin(), j_n.end()); 
-      }
-
-      // argss_.resize(0); 
-    }/* catch (std::exception& e) {
-      rstan::io::rcerr << std::endl << "Exception: " 
-                       << e.what() << std::endl;
-      rstan::io::rcerr << "Diagnostic information: " << std::endl
-                       << boost::diagnostic_information(e) << std::endl;
-      throw; 
-    } */ 
-    // not really helpful of using try---catch though it could throw
-    // exception in the ctor.
-
-
-    /**
-     * Get the arguments used for sampling a chain. 
-     * 
-     * @param chain_id The chain ID stariting from 1.
-     * @return An R list providing the arguments used for the chain.
-  
-     */ 
-  
-    SEXP get_chain_stan_args(SEXP chain_id) {
-      unsigned int k = Rcpp::as<unsigned int>(chain_id); 
-      std::map<unsigned int, stan_args>::const_iterator it
-        = argss_.find(k);  
-      if (it != argss_.end()) 
-        return (it -> second).stan_args_to_rlist(); 
-      rstan::io::rcerr << "error: chain id " << chain_id 
-                       << " not found." << std::endl;
-      return R_NilValue;
-    }
-     
-    /**
-     * Get the arguments used for sampling all the chains. 
-     * 
-     * @return An R list providing the arguments used for all the chain.
-     *  each element of the R list is an R list for one chain. 
-  
-     */ 
-
-    SEXP get_stan_args() { 
-      Rcpp::List lst; 
-      std::vector<std::string> cnames(num_chains_, "chain."); 
-
-      std::string cname("chain."); 
-      for (std::map<unsigned int, stan_args>::const_iterator it = argss_.begin(); 
-           it != argss_.end(); 
-           ++it)   
-        lst[cname + to_string(it -> first)] = (it -> second).stan_args_to_rlist(); 
-
-      return lst;
-    }
-     
-
-    /**
-     * This function would be exposed (using Rcpp module, see
-     * <code>rcpp_module_def_for_rstan.hpp</code>) to R to call 
-     * methods defined here. 
-     *
-     *
-     * @param args The arguments for nuts in form of R's list. 
-     * @return TRUE if there is no exception; FALSE otherwise. 
-     *
-     */
-    SEXP call_sampler(SEXP args) { 
-
-      stan_args t(Rcpp::as<Rcpp::List>(args)); 
-      // set the seeds to be the same for all chains
-      if (!argss_.empty()) 
-        t.set_random_seed((argss_.begin() -> second).get_random_seed()); 
-
-      unsigned int c_id = t.get_chain_id(); 
-      // rstan::io::rcout << "chain id = " << c_id << std::endl;
-      if (c_id > num_chains_) { 
-        rstan::io::rcerr << "chain id cannot be larger than # of chains"
-                         << "; chain_id = " << c_id 
-                         << ", num_chains = " << num_chains_  << "."
-                         << std::endl;
-        return Rcpp::wrap(false);
-      } 
-      if (argss_.count(c_id)) {
-        rstan::io::rcerr << "chain of id " << c_id 
-                         << " was sampled before." << std::endl;
-        return Rcpp::wrap(false);
-      } 
-      argss_.insert(std::map<unsigned int, stan_args>::value_type(c_id, t));
-     
-      // assuming that the warmup are set all the same for 
-      // all the chains or simply here we only use one
-      if (1 == argss_.size())
-        chains_.set_warmup(t.get_warmup() / t.get_thin()); 
-
-      try {
-        sampler_command(data_, t, model_, chains_); 
-     
-      } catch (std::exception& e) {
-        rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
-        rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
-        return Rcpp::wrap(false); 
-      }
-      return Rcpp::wrap(true);  
-    } 
-
-
-    /** 
-     * Obtain samples by names from a chain.  
-     * 
-     * @param chain_id  The chain id starting from 1.
-     * @param names The names of parameter of interests. 
-     * @param keep_warmup Whether to keep the warmup samples. 
-     * @param expand  See comments in <code>get_samples</code>.
-     * 
-     * @return An R list, each element of which includes the samples of one
-     *  parameter. Note if a parameter is a vector or array, 
-     *  when expand is TRUE, all the samples are concatenated so that when
-     *  returned to R, after the dimension attribute is set, it is an array. Or
-     *  when expand is FALSE, parameter are expanded with indices. 
-     */
-
-    SEXP get_chain_samples(SEXP chain_id, SEXP names, 
-                           SEXP keep_warmup = Rcpp::wrap(true),
-                           SEXP expand = Rcpp::wrap(false)) {
-      size_t k = Rcpp::as<unsigned int>(chain_id) - 1;  // make it start from 0
-      bool kw = Rcpp::as<bool>(keep_warmup); 
-      bool ep = Rcpp::as<bool>(expand); 
-      std::vector<SEXP> samples; 
-      std::vector<std::string> names2; 
-      if (!ep) { 
-        std::vector<std::vector<size_t> > indices; 
-        param_total_indices(Rcpp::as<std::vector<std::string> >(names), 
-                          names2, indices); 
-        for (size_t i = 0; i < names2.size(); i++) {
-          samples.push_back(get_chain_samples_0(k, indices[i], kw)); 
-        } 
-      } else {
-        std::vector<size_t> indices; 
-        param_names_to_indices_and_flatnames(
-          Rcpp::as<std::vector<std::string> >(names),
-          indices, 
-          names2); 
-        for (std::vector<size_t>::const_iterator it = indices.begin(); 
-             it != indices.end(); 
-             ++it) {
-          samples.push_back(get_chain_samples_0(k, *it, kw));
-        }
-      } 
-      Rcpp::List lst(samples.begin(), samples.end());
+      Rcpp::List lst = Rcpp::wrap(indexes); 
       lst.names() = names2; 
-      return Rcpp::wrap(lst);
-    } 
-
-    /**
-     * Obtain the parameter's dimensions. Also an element of an
-     * array parameter is allowed, but the returned dimension 
-     * for such as parameter, i.e., alpha[1], is an empty vector. 
-     *
-     * @param names The names of parameters of interests, which 
-     *  could be scalar, array, or an element of an array. 
-     */
-    SEXP get_param_dimss(SEXP names) {
-      std::vector<std::string> names2; 
-      std::vector<std::vector<size_t> > dimss; 
-      param_dimss(Rcpp::as<std::vector<std::string> >(names), names2, dimss); 
-      std::vector<SEXP>  dimss2; 
-      for (std::vector<std::vector<size_t> >::const_iterator it = dimss.begin(); 
-           it != dimss.end(); 
-           ++it) {
-        std::vector<unsigned int> v2; 
-        T1v_to_T2v(*it, v2); 
-        dimss2.push_back(Rcpp::wrap(v2)); 
-        // Cast size_t to unsigned int, which potentially is problematic. 
-        // But Rcpp (and/or? R) could not deal with size_t on windows. 
-      }
-      Rcpp::List lst(dimss2.begin(), dimss2.end()); 
-      lst.names() = names2;
-      return Rcpp::wrap(lst);
-    } 
-
-    /** 
-     * Obtain samples for all the chains 
-     * 
-     * @param expand TRUE means that the samples for 
-     *   an array parameter would be expanded as multiple
-     *   parameters. So parameter alpha[5] defined in stan
-     *   model would have vector in a list named from alpha[1]
-     *   to alpha[5]. When expand is FALSE, it would only 
-     *   appear as alpha, but in a form of multiple array. 
-     * 
-     * @return A list, each element of which are samples of a chain. 
-     *  The element is also a list, each element of which is a vector 
-     *  of samples for a parameter (or other quantity of interest). 
-     *  In the case of array parameters, the vectors are concatenated. 
-     *
-     */
-    SEXP get_samples(SEXP names, 
-                     SEXP keep_warmup = Rcpp::wrap(true), 
-                     SEXP expand = Rcpp::wrap(false)) {
-      Rcpp::List lst(num_chains_); 
-      std::vector<std::string> cnames(num_chains_, "chain."); 
-      for (unsigned int i = 0; i < num_chains_; ++i) {
-        lst[i] = get_chain_samples(Rcpp::wrap(i + 1), names, keep_warmup, expand);
-        cnames[i] += to_string(i + 1);  
-      }
-      lst.names() = cnames; 
-      return lst;
+      return lst; 
+      END_RCPP;
     } 
 
 
-    /**
-     * Get the quantiles of the samples from all chains. 
-     *
-     * @param names An R vector of parameter names 
-     * @param probs An R vector of probabilities specifying
-     *  quantiles of interest. 
-     *
-     */
-    SEXP get_quantiles(SEXP names, SEXP probs) {
-      
-      std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; // names for the returned samples 
-      param_names_to_indices_and_flatnames(
-        Rcpp::as<std::vector<std::string> >(names),
-        indices, 
-        flatnames); 
+    SEXP param_dims() const {
+      BEGIN_RCPP; 
+      Rcpp::List lst = Rcpp::wrap(dims_); 
+      lst.names() = names_; 
+      return lst; 
+      END_RCPP;
+    } 
 
-     std::vector<double> ps = Rcpp::as<std::vector<double> >(probs); 
+    SEXP param_dims_oi() const {
+      BEGIN_RCPP; 
+      Rcpp::List lst = Rcpp::wrap(dims_oi_); 
+      lst.names() = names_oi_; 
+      return lst; 
+      END_RCPP;
+    } 
     
-     std::vector<SEXP> quanss; 
-     for (std::vector<size_t>::const_iterator it = indices.begin(); 
-          it != indices.end(); 
-          ++it) {
-       quanss.push_back(get_quantiles_0(*it, ps)); 
-         
-     } 
-     Rcpp::List lst(quanss.begin(), quanss.end());
-     lst.names() = flatnames; 
-     return Rcpp::wrap(lst);
+    SEXP param_fnames_oi() const {
+      BEGIN_RCPP; 
+      std::vector<std::string> fnames; 
+      get_all_flatnames(names_oi_, dims_oi_, fnames, true); 
+      return Rcpp::wrap(fnames); 
+      END_RCPP;
     } 
 
-
-    /**
-     * Get the quantiles of the samples of one chain: 
+    /*
+     * Obtain a permutation of size n. 
+     * see <code>permutation</code> in <code>mcmc::chains.hpp</code>. 
      *
-     * @param chain_id The chain id from R starting at 1 
-     * @param names An R vector of parameter names 
-     * @param probs An R vector of probabilities specifying
-     *  quantiles of interest. 
-     *
-     */
-    SEXP get_chain_quantiles(SEXP chain_id, SEXP names, SEXP probs) {
-      
-      size_t k = Rcpp::as<unsigned int>(chain_id) - 1;  // make it start from 0
-
-      std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; // names for the returned samples 
-      param_names_to_indices_and_flatnames(
-        Rcpp::as<std::vector<std::string> >(names),
-        indices, 
-        flatnames); 
-
-     std::vector<double> ps = Rcpp::as<std::vector<double> >(probs); 
-    
-     std::vector<SEXP> quanss; 
-     for (std::vector<size_t>::const_iterator it = indices.begin(); 
-          it != indices.end(); 
-          ++it) {
-       quanss.push_back(get_chain_quantiles_0(k, *it, ps)); 
-         
-     } 
-     Rcpp::List lst(quanss.begin(), quanss.end());
-     lst.names() = flatnames; 
-     return Rcpp::wrap(lst);
-    } 
-
-    /**
-     * Get the mean and standard deviation for samples of one chain
-     * 
-     * @param names An R vector of names specifying parameters of 
-     *  interest
-     * @param chain_id The chain id starting from 1. 
-     * @return An R list, each element of which contains a vector for 
-     *  a parameter. The fist element of the vector is mean and the 
-     *  second is the SD. 
-     */
-    SEXP get_chain_mean_and_sd(SEXP chain_id, SEXP names) {
-      size_t k = Rcpp::as<unsigned int>(chain_id) - 1;  // make it start from 0
-
-      std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; 
-      param_names_to_indices_and_flatnames(
-        Rcpp::as<std::vector<std::string> >(names),
-        indices, 
-        flatnames); 
-
-      std::vector<SEXP> mnsds;  //mean and sd's 
-      for (std::vector<size_t>::const_iterator it = indices.begin(); 
-           it != indices.end(); 
-           ++it) {
-        Rcpp::NumericVector v(2); 
-        v[0] = chains_.mean(k, *it);
-        v[1] = chains_.sd(k, *it);
-        mnsds.push_back(Rcpp::wrap(v)); 
-         
+     * @param nsc_ Size of permutation to create; the starting point of the
+     *  sequence, typically 0 or 1; and the chain id. 
+     *  If the starting point is not specified, defaults to 1. 
+     *  If the chain id is not specified, defaults to 1. 
+     * @return A permutation of length n starting from 's'.
+     */ 
+    SEXP permutation(SEXP nsc_) { 
+      static time_t seed = std::time(0);  //defaults to time-based init 
+      boost::uintmax_t DISCARD_STRIDE = 1 << 31; 
+      Rcpp::IntegerVector nsc(nsc_); 
+      unsigned int n = nsc[0]; 
+      unsigned int s = 1;
+      unsigned int cid = 1; 
+      // rstan::io::rcout << "stride = " << DISCARD_STRIDE << std::endl; 
+      // rstan::io::rcout << "nsc.size() = " << nsc.size() << std::endl; 
+      // rstan::io::rcout << "nsc[0]=" << nsc[0] 
+      //                  << "nsc[1]=" << nsc[1] 
+      //                  << "nsc[2]=" << nsc[2] << std::endl; 
+      switch (nsc.size()) {
+        case 3:  cid = nsc[2]; s = nsc[1]; break;
+        case 2:  s = nsc[1]; break;
       } 
-      Rcpp::List lst(mnsds.begin(), mnsds.end());
-      lst.names() = flatnames; 
-      return Rcpp::wrap(lst);
-    } 
-
-    /**
-     * Get the mean and standard deviation for samples of all chains
-     * 
-     * @param names An R vector of names specifying parameters of 
-     *  interest
-     * @return An R list, each element of which contains a vector for 
-     *  a parameter. The fist element of the vector is mean and the 
-     *  second is the SD. 
-     */
-    SEXP get_mean_and_sd(SEXP names) {
-      std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; 
-      param_names_to_indices_and_flatnames(
-        Rcpp::as<std::vector<std::string> >(names),
-        indices, 
-        flatnames); 
-
-      std::vector<SEXP> mnsds;  
-      for (std::vector<size_t>::const_iterator it = indices.begin(); 
-           it != indices.end(); 
-           ++it) {
-        Rcpp::NumericVector v(2); 
-        v[0] = chains_.mean(*it);
-        // rstan::io::rcout << "v[0] = " << v[0] << std::endl;
-        v[1] = chains_.sd(*it);
-        // rstan::io::rcout << "v[1] = " << v[1] << std::endl;
-        mnsds.push_back(Rcpp::wrap(v)); 
-         
+      // rstan::io::rcout << "cid = " << cid << std::endl; 
+      RNG rng(seed); 
+      rng.discard(DISCARD_STRIDE * (cid - 1));
+      Rcpp::IntegerVector x(n); 
+      for (size_t i = 0; i < n; ++i)
+        x[i] = i + s;
+      if (n < 2) return x; 
+      for (size_t i = n; --i != 0; ) {
+        boost::random::uniform_int_distribution<size_t> uid(0, i);
+        size_t j = uid(rng);
+        unsigned int temp = x[i];
+        x[i] = x[j];
+        x[j] = temp;
       } 
-      Rcpp::List lst(mnsds.begin(), mnsds.end());
-      lst.names() = flatnames; 
-      return Rcpp::wrap(lst);
-    } 
-
-    /**
-     * Get the effective sample size (ESS). 
-     * 
-     * @param names An R vector of paramemter names. 
-     * @return The ESS for all the paramemters in form of an R list, every
-     *  element of which is the ESS for a paramemter. 
-     */
-    SEXP get_ess(SEXP names) {
-      std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; 
-      param_names_to_indices_and_flatnames(
-        Rcpp::as<std::vector<std::string> >(names),
-        indices, 
-        flatnames); 
-
-      std::vector<SEXP> esss;  
-      for (std::vector<size_t>::const_iterator it = indices.begin(); 
-           it != indices.end(); 
-           ++it) {
-        esss.push_back(Rcpp::wrap(chains_.effective_sample_size(*it))); 
-         
-      } 
-      Rcpp::List lst(esss.begin(), esss.end());
-      lst.names() = flatnames; 
-      return Rcpp::wrap(lst);
-    } 
-
-    /**
-     * Get the split R hat (the split potential scale reduction)
-     * 
-     * @param names An R vector of paramemter names. 
-     * @return The R hat's for all the paramemters in form of an R list, every
-     *  element of which is the ESS for a paramemter. 
-     */
-    SEXP get_split_rhat(SEXP names) {
-      std::vector<size_t> indices; 
-      std::vector<std::string> flatnames; 
-      param_names_to_indices_and_flatnames(
-        Rcpp::as<std::vector<std::string> >(names),
-        indices, 
-        flatnames); 
-
-      std::vector<SEXP> rhats;  
-      for (std::vector<size_t>::const_iterator it = indices.begin(); 
-           it != indices.end(); 
-           ++it) {
-        rhats.push_back(Rcpp::wrap(chains_.split_potential_scale_reduction(*it))); 
-         
-      } 
-      Rcpp::List lst(rhats.begin(), rhats.end());
-      lst.names() = flatnames; 
-      return Rcpp::wrap(lst);
-    } 
-
-    /**
-     * Get all the parameter names that are in the chains object 
-     * @return An R vector of names of the parameters.
-     */
-    SEXP param_names() {
-      std::vector<std::string> names(chains_.param_names());
-      return Rcpp::wrap(names); 
-    } 
-
-    /**
-     * Get all the parameter names in forms of `flat names`,
-     * i.e., beta of length 3 would be beta[1], beta[2], beta[3]
-     *
-     * @return An R vector of names of the parameters.
-     */
-
-    SEXP param_flat_names() {
-      return Rcpp::wrap(flatnames_); 
-    } 
-
-    /**
-     * Return the warmup for the stored samples. 
-     *
-     * @return Number of warmup iterations. 
-     */
-    SEXP warmup() {
-      return Rcpp::wrap(static_cast<unsigned int>(chains_.warmup())); 
-    } 
-
-    /**
-     * Return the number of samples including warmup and kept samples
-     * in the specified chain.
-     *
-     * @param k Markov chain index, starting from 1. 
-     *  Note that in Stan, size_t is used, but Rcpp has some issue on some
-     *  platforms, so here unsigned int is used. 
-     * @return Number of samples in the specified chain.
-     * @throw std::out_of_range If the identifier is greater than
-     * or equal to the number of chains.
-     */
-    
-    SEXP num_chain_samples(unsigned int k) {
-      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_samples(k - 1))); 
-    } 
-
-    SEXP num_chain_kept_samples(unsigned int k) {
-      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_kept_samples(k - 1))); 
-    } 
-
-    SEXP num_samples() { 
-      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_samples())); 
-    } 
-
-    SEXP num_kept_samples() {
-      return Rcpp::wrap(static_cast<unsigned int>(chains_.num_kept_samples())); 
-    } 
-
-    /* Return the kept samples permuted for parameters.
-     * 
-     * @param names The names of parameters of interest. 
-     * @return An R list, every element of which is an 
-     *  R vector of samples that are permuted for one parameter.
-     */
-    SEXP get_kept_samples_permuted(SEXP names, SEXP expand) {
-      std::vector<std::string> names2; 
-
-      std::vector<SEXP> samples; 
-      bool ep = Rcpp::as<bool>(expand); 
-      if (!ep) { 
-        std::vector<std::vector<size_t> > indices; 
-        param_total_indices(Rcpp::as<std::vector<std::string> >(names), 
-                            names2, indices); 
-
-        for (size_t i = 0; i < names2.size(); i++) {
-          samples.push_back(get_kept_samples_permuted_0(indices[i]));
-        } 
-      } else {
-        std::vector<size_t> indices; 
-        param_names_to_indices_and_flatnames(
-          Rcpp::as<std::vector<std::string> >(names),
-          indices, 
-          names2); 
-        for (std::vector<size_t>::const_iterator it = indices.begin(); 
-             it != indices.end(); 
-             ++it) {
-          samples.push_back(get_kept_samples_permuted_0(*it)); 
-        }
-      } 
-      Rcpp::List lst(samples.begin(), samples.end());
-      lst.names() = names2; 
-      return Rcpp::wrap(lst);
+      return x; 
     } 
   };
 } 

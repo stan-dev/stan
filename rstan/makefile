@@ -28,8 +28,8 @@ RSTANVER := $(shell Rscript -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"
 STANPKG := rstan_$(RSTANVER).tar.gz 
 
 build $(STANPKG): ./rstan/DESCRIPTION 
-	@rm -f "./rstan/inst/include/stanlib"
-	@rm -f "./rstan/inst/include/stansrc"
+	@rm -rf "./rstan/inst/include/stanlib"
+	@rm -rf "./rstan/inst/include/stansrc"
 	$(LINKCMD1)
 	$(LINKCMD2)
 	@rm -f $(STANPKG) 

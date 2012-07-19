@@ -40,7 +40,7 @@ namespace rstan {
      */
    
     template <class T>
-    size_t find_index(std::vector<T> v, const T& e) {
+    size_t find_index(const std::vector<T>& v, const T& e) {
       return std::distance(v.begin(), std::find(v.begin(), v.end(), e));  
     } 
   } 
@@ -87,6 +87,7 @@ namespace rstan {
     unsigned int iter;   // number of iterations 
     unsigned int warmup; // number of warmup 
     unsigned int thin; 
+    unsigned int iter_save; // number of iterations saved 
     int refresh;  // < 0, no output 
     int leapfrog_steps; 
     double epsilon; 
@@ -153,6 +154,9 @@ namespace rstan {
       if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1U;
       else thin = Rcpp::as<unsigned int>(in[idx]); 
 
+      iter_save = 1 + (iter - 1) / thin; 
+      // starting from 0, iterations of 0, thin, 2 * thin, .... are saved. 
+
       idx = find_index(args_names, std::string("leapfrog_steps"));
       if (idx == args_names.size()) leapfrog_steps = -1; 
       else leapfrog_steps = Rcpp::as<int>(in[idx]); 
@@ -185,14 +189,13 @@ namespace rstan {
       if (idx == args_names.size())  refresh = 1; 
       else refresh = Rcpp::as<int>(in[idx]); 
 
-
       idx = find_index(args_names, std::string("seed")); 
       if (idx == args_names.size()) {
         random_seed = std::time(0); 
         random_seed_src = "random"; 
       } else {
         random_seed = Rcpp::as<unsigned int>(in[idx]); 
-        random_seed_src = "user"; 
+        random_seed_src = "user or from R"; 
       }
 
       idx = find_index(args_names, std::string("chain_id")); 
@@ -277,6 +280,11 @@ namespace rstan {
     unsigned int get_thin() const {
       return thin;
     } 
+    
+    unsigned int get_iter_save() const { 
+      return iter_save; 
+    } 
+
     int get_leapfrog_steps() const {
       return leapfrog_steps; 
     } 
