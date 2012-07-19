@@ -8,14 +8,16 @@ data {
 parameters {
     real theta[J];     
     real mu_theta;   
-    real(0,) sigma_theta; 
+    real(0,1000) sigma_theta; 
 }
 model {
-    mu_theta ~ normal(0,1000);
-
-    sigma_theta ~ uniform(0,1000);
-    for (j in 1:J)
-        theta[j] ~ normal(mu_theta, sigma_theta);
-    for (j in 1:J)
-        y[j] ~ normal(theta[j], sigma_y[j]);
+    // loop
+    //    for (j in 1:J)
+    //        theta[j] ~ normal(mu_theta, sigma_theta);
+    //    for (j in 1:J)
+    //        y[j] ~ normal(theta[j], sigma_y[j]);
+  
+    // vectorized loops
+    theta ~ normal(mu_theta, sigma_theta); 
+    y ~ normal(theta,sigma_y);
 }
