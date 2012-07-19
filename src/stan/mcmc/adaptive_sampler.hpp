@@ -211,7 +211,7 @@ namespace stan {
        * Write out any sampler-specific parameters for output.
        *
        * This method must
-       * match<code>write_sampler_param_names(std::ostream&)</code> in
+       * match <code>write_sampler_param_names()</code> in
        * terms of number of parameters written.
        *
        * Params should be writte starting with a comma, then
@@ -230,7 +230,7 @@ namespace stan {
        * the output.  
        *
        * These should be written as one or more comment lines,
-       * each starting with a \code{#} character.
+       * each starting with a pound (<code>#</code>) character.
        *
        * @param o Output stream to which adaptation information is written.
        */
@@ -240,9 +240,9 @@ namespace stan {
       /**
        * Write out any sampler-specific parameter names for output.
        *
-       * This method must
-       * match<code>write_sampler_params(std::ostream&)</code> in
-       * terms of number of parameters written.
+       * This method must match
+       * <code>write_sampler_params()</code> in terms of
+       * number of parameters written.
        *
        * Params should be writte starting with a comma, then the first
        * parameter, then a comma, then the second parameter, ending on

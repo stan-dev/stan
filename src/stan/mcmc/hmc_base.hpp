@@ -77,14 +77,14 @@ namespace stan {
             break;
           else
             this->_epsilon = ( (direction == 1) 
-			       ? 2.0 * this->_epsilon 
-			       : 0.5 * this->_epsilon );
+                               ? 2.0 * this->_epsilon 
+                               : 0.5 * this->_epsilon );
         }
       }
 
       void adaptation_init(double epsilon_scale) {
-	if (this->adapting())
-	  this->_da.setx0(std::vector<double>(1, log(epsilon_scale * _epsilon)));
+        if (this->adapting())
+          this->_da.setx0(std::vector<double>(1, log(epsilon_scale * _epsilon)));
       }
 
     public:
@@ -101,7 +101,10 @@ namespace stan {
        * <code>[epsilon*(1-epsilon_pm),
        * epsilon*(1+epsilon_pm)]</code>;
        * default value = 0.0
-       * @param adapt_epsilon Flag indicating whether adaptation is turned on.
+       * @param epsilon_adapt Flag indicating whether adaptation is
+       * turned on.
+       * @param delta Target acceptance rate for adaptation.
+       * @param gamma Tuning parameter for dual averaging adaptation.
        * @param rand_int Base random integer generator.
        */
       hmc_base(stan::model::prob_grad& model,
@@ -146,12 +149,12 @@ namespace stan {
        * @param z Integer parameters.
        */
       virtual void set_params(const std::vector<double>& x,
-			      const std::vector<int>& z) {
-	assert(x.size() == this->_x.size());
-	assert(z.size() == this->_z.size());
-	this->_x = x;
-	this->_z = z;
-	this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
+                              const std::vector<int>& z) {
+        assert(x.size() == this->_x.size());
+        assert(z.size() == this->_z.size());
+        this->_x = x;
+        this->_z = z;
+        this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);
       }
 
       /**

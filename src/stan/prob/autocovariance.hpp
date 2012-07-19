@@ -19,9 +19,9 @@ namespace stan {
      *
      * <p>An FFT engine can be created for reuse for type double with:
      * 
-     * <blockquote><pre>
+     * <pre>
      *     Eigen::FFT<double> fft;
-     * </pre></blockquote>
+     * </pre>
      *
      * @tparam T Scalar type.
      * @param y Input sequence.
@@ -30,14 +30,14 @@ namespace stan {
      */
     template <typename T>
     void autocovariance(const std::vector<T>& y,
-			std::vector<T>& acov,
-			Eigen::FFT<T>& fft) {
+                        std::vector<T>& acov,
+                        Eigen::FFT<T>& fft) {
       
       stan::prob::autocorrelation(y, acov, fft);
 
       T var = stan::math::variance(y) * (y.size()-1) / y.size();
       for (size_t i = 0; i < y.size(); i++) {
-	acov[i] *= var;
+        acov[i] *= var;
       }
     }
 
@@ -59,7 +59,7 @@ namespace stan {
      */
     template <typename T>
     void autocovariance(const std::vector<T>& y,
-			std::vector<T>& acov) {
+                        std::vector<T>& acov) {
       Eigen::FFT<T> fft;
       return autocovariance(y,acov,fft);
     }
