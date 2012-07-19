@@ -131,21 +131,42 @@ TEST(io_dump, reader_ints) {
 
 TEST(io_dump, reader_vec_data) {
   std::vector<int> expected_vals;
-  expected_vals.push_back(1);
-  expected_vals.push_back(2);
-  expected_vals.push_back(3);
-  expected_vals.push_back(4);
-  expected_vals.push_back(5);
-  expected_vals.push_back(6);
+  for (int i = 1; i <= 6; ++i)
+    expected_vals.push_back(i);
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2U);
   expected_dims.push_back(3U);
-  // std::string txt = "foo <- structure(1:6, .Dim = c(2,3))";
-  std::string txt = "foo <- structure(c(1,2,3,4,5,6), .Dim = c(2,3))";
+
+  std::string txt = "foo <- structure(1:6, .Dim = c(2,3))";
   std::stringstream in(txt);
   stan::io::dump_reader reader(in);
   test_list2(reader,"foo",expected_vals,expected_dims);
 }
+TEST(io_dump, reader_vec_data_backward) {
+  std::vector<int> expected_vals;
+  for (int i = 20; i >= 1; --i)
+    expected_vals.push_back(i);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(5U);
+  expected_dims.push_back(4U);
+
+  std::string txt = "foo <- structure(20:1, .Dim = c(5,4))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+}
+TEST(io_dump, reader_vec_data_long_suffix) {
+  std::vector<int> expected_vals;
+  for (int i = 10; i >= -9; --i)
+    expected_vals.push_back(i);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(20U);
+  std::string txt = "a <-\nc(10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L, 1L, 0L, -1L, -2L, -3L, \n-4L, -5L, -6L, -7L, -8L, -9L)";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"a",expected_vals,expected_dims);
+}
+
 
 TEST(io_dump, reader_vec_double) {
   std::vector<double> expected_vals;
