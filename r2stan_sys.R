@@ -175,8 +175,10 @@ stan = function(model.file,
                         inits.file),"");
             inits.list = inits();
             write.data.list.to.file(inits.list, initis.file);
+        } else if (inits == 0) {
+            init.file = 0; # not really a file, initializes all unconstr params to 0
         } else {
-            write(paste("ERROR: Unsupported type for inits =",
+          write(paste("ERROR: Unsupported type for inits =",
                         typeof(inits)),"");
             return(-5);
         }
@@ -228,7 +230,7 @@ stan = function(model.file,
     }
     program = system(paste(file.path(stan.home, "bin", "stanc"), "--version"), intern = TRUE)
     return(as.bugs.array(samples.chains,
-                         program = program,
+                         program = "stan, version 1.0.0",
                          n.iter = iter,
                          n.burnin = warmup,
                          n.thin = thin));
