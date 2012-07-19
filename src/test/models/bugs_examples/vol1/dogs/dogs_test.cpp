@@ -25,11 +25,13 @@ public:
   }
 
   static size_t num_iterations() {
-    return iterations;
+    return 20000U;
   }
 
   static std::vector<size_t> skip_chains_test() {
     std::vector<size_t> params_to_skip;
+    params_to_skip.push_back(2U);      // A
+    params_to_skip.push_back(3U);      // B
     return params_to_skip;
   }
 
