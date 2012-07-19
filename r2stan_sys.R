@@ -76,6 +76,10 @@ list.to.environment =  function(var.list) {
     return(env);
 }
 
+int.string = function(s) {
+    return(format(s,scientific=FALSE));
+}
+
 write.data.list.to.file = function(data, 
                                    data.file) {
     data.env <- list.to.environment(data);
@@ -192,13 +196,13 @@ stan = function(model.file,
                            "",
                            paste(" --init=",init.file,sep="")),
                     " --samples=",samples.file,
-                    " --seed=",seed,
-                    " --chain_id=",chain,
-                    " --iter=",iter,
-                    " --warmup=",warmup,
-                    " --thin=",thin,
-                    " --leapfrog_steps=",leapfrog_steps,
-                    " --max_treedepth=",max_treedepth,
+                    " --seed=",int.string(seed),
+                    " --chain_id=",int.string(chain),
+                    " --iter=",int.string(iter),
+                    " --warmup=",int.string(warmup),
+                    " --thin=",int.string(thin),
+                    " --leapfrog_steps=",int.string(leapfrog_steps),
+                    " --max_treedepth=",int.string(max_treedepth),
                     " --epsilon=",epsilon,
                     " --epsilon_pm=",epsilon_pm,
                     ifelse(unit_mass_matrix," --unit_mass_matrix",""),
@@ -228,9 +232,9 @@ stan = function(model.file,
             param.names[i] = dots.to.brackets(param.names[i]);
         dimnames(samples.chains)[[3]] = param.names;
     }
-    program = system(paste(file.path(stan.home, "bin", "stanc"), "--version"), intern = TRUE)
+    # program = system(paste(file.path(stan.home, "bin", "stanc"), "--version"), intern = TRUE)
     return(as.bugs.array(samples.chains,
-                         program = "stan, version 1.0.0",
+                         program = "Stan 1.0.0",
                          n.iter = iter,
                          n.burnin = warmup,
                          n.thin = thin));
