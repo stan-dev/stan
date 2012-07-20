@@ -21,45 +21,13 @@ setMethod("show", "stanfit",
                 object@sim$n.chains, " chains.\n", sep = '')  
           })  
 
-stanplot <- function(object, pars, prob = 0.8) { 
-  pars <- if (missing(pars)) object@sim$pars.oi else check.pars(object@sim, pars) 
-  probs = c(0.5, 0.5 + c(-prob, prob) * 0.5) 
-
-  num.par <- length(pars)
-  chains.v <- 1:object@sim$n.chains 
-
-  ps <- vector("list", num.par) 
-  for (i in 1:num.par) {
-    par <- pars[i] 
-    rhats <- sampleshandle$get_split_rhat(par) 
-    mlu0 <- do.call(rbind, sampleshandle$get_quantiles(par, probs)) 
-    cms <- lapply(chains.v, 
-                  FUN = function(k) {
-                    z <- sampleshandle$get_chain_quantiles(k, par, .5)
-                    do.call(cbind, z) 
-                  })
-    cms <- data.frame(do.call(rbind, cms)) 
-    # print(cms) 
-    mlu <- list(median = mlu0[, 1], le = mlu0[, 2], ue = mlu0[, 3]) 
-    par.idx <- gsub(par, "", names(rhats)) 
-    rhats <- do.call(c, rhats) 
-    # cat("rhats=", rhats, "\n") 
-    ps[[i]] <- plot.pars0(mlu, cms, rhats, par, par.idx, prob = prob)
-    
-  } 
-  if (plot) multi.print.plots(ps) 
-  names(ps) <- pars 
-  invisible(ps) 
-} 
-
 if (!isGeneric("plot")) 
   setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
 
 setMethod("plot", signature = (x = "stanfit"), 
-          function(x, y, pars = y, prob = 0.8, ...) {
-            if (missing(y)) 
-              y <- x@model.pars 
-            invisible(stanplot(object = x, pars = pars, prob = prob, plot = TRUE))
+          function(x, y, pars = y, display.parallel = FALSE, ...) {
+            pars <- if (missing(pars) && missing(y)) x@sim$pars.oi else check.pars(x@sim, pars) 
+            stan.plot.inferences(x@sim, x@summary, pars, display.parallel, ...) 
           }) 
 
 setMethod("print", signature = (x = "stanfit"),
@@ -68,7 +36,17 @@ setMethod("print", signature = (x = "stanfit"),
                    digits.summary = 3, ...) { 
             if (missing(pars)) pars <- x@model.pars
             s <- summary(x, pars, probs, ...)  
+            cat("Inference for Stan model:", x@model.name, '.\n', sep = '')
+            cat(x@sim$n.chains, " chains: each with n.iter=", x@sim$n.iter, 
+                "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, ".\n", sep = '') 
+            cat("Each chain has ", x@sim$n.save[1], " samples saved.\n\n", sep = '') 
+
             print(round(s$summary, digits.summary), ...) 
+
+            cat("\nSamples are drawn using NUTS at ", x@.MISC$date, ".\n", sep = '') 
+            cat("For each parameters, ESS is a crude measure of effective samples size,\n") 
+            cat("and Rhat is the potential scale reduction factor on split chains (at \n")
+            cat("convergence, Rhat=1).\n")
           })  
 
 
@@ -108,7 +86,7 @@ get.kept.samples <- function(n, sim) {
     s <- s[[n]][-(1:nw)] 
     s[permutation] 
   } 
-  ss <- mapply(gcks, sim$samples, sim$n.warmup, sim$permutation,
+  ss <- mapply(gcks, sim$samples, sim$n.warmup2, sim$permutation,
                SIMPLIFY = FALSE, USE.NAMES = FALSE) 
   do.call(c, ss) 
 } 
@@ -122,17 +100,17 @@ get.samples <- function(n, sim, inc.warmup = TRUE) {
     if (inc.warmup)  return(s[[n]])
     else return(s[[n]][-(1:nw)]) 
   } 
-  ss <- mapply(gcs, sim$samples, inc.warmup, sim$n.warmup, 
+  ss <- mapply(gcs, sim$samples, inc.warmup, sim$n.warmup2, 
                SIMPLIFY = FALSE, USE.NAMES = FALSE) 
   ss 
 } 
 
 par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
-  # same n.thin, n.save, n.warmup for all the chains
+  # same n.thin, n.save, n.warmup2 for all the chains
   n.thin <- sim$n.thin[1] 
-  n.warmup <- sim$n.warmup[1] 
+  n.warmup2 <- sim$n.warmup2[1] 
   n.save <- sim$n.save[1] 
-  n.kept <- n.save - n.warmup 
+  n.kept <- n.save - n.warmup2 
   yrange <- NULL 
   main <- paste("Trace plot of ", par.name) 
   
@@ -143,22 +121,23 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
     }
     plot(c(1, id[length(id)]), yrange, type = 'n', 
          xlab = 'Iterations', ylab = "", main = main)
-    rect(par("usr")[1], par("usr")[3], n.warmup * n.thin, par("usr")[4], 
+    rect(par("usr")[1], par("usr")[3], n.warmup2 * n.thin, par("usr")[4], 
          col = rstan:::rstancolgrey[3], border = NA)
     for (i in 1:sim$n.chains) {
       lines(id, sim$samples[[i]][[n]], xlab = '', ylab = '', 
             lwd = 1, col = rstancolc[(i-1) %% 6 + 1]) 
     }
   } else {  
-    idx <- n.warmup + 1:n.kept
-    id <- seq((n.warmup + 1)* n.thin, by = n.thin, length.out = n.kept) 
+    idx <- n.warmup2 + 1:n.kept
+    id <- seq((n.warmup2 + 1)* n.thin, by = n.thin, length.out = n.kept) 
     for (i in 1:sim$n.chains) {
       yrange <- range(yrange, sim$samples[[i]][[n]][idx]) 
     }
-    plot(c((n.warmup + 1), id[length(id)]), yrange, type = 'n', 
-         xlab = 'Iterations (without warmup)', ylab = par.name, main = main)
+    plot(c((n.warmup2 + 1), id[length(id)]), yrange, type = 'n', 
+         xlab = 'Iterations (without warmup)', ylab = "", main = main)
     for (i in 1:sim$n.chains)  
-      lines(id, sim$samples[[i]][[n]][idx], lwd = 1, col = rstancolc[(i-1) %% 6 + 1]) 
+      lines(id, sim$samples[[i]][[n]][idx], lwd = 1, 
+            xlab = '', ylab = '', col = rstancolc[(i-1) %% 6 + 1]) 
   } 
 } 
 
@@ -192,7 +171,7 @@ setMethod("extract", signature(object = "stanfit"),
                                        object@sim$fnames.oi, 
                                        pars) 
 
-            n.kept <- object@sim$n.save - object@sim$n.warmup 
+            n.kept <- object@sim$n.save - object@sim$n.warmup2
             fun1 <- function(par) {
               sss <- sapply(tidx[[par]], get.kept.samples, object@sim) 
               dim(sss) <- c(sum(n.kept), object@sim$dims.oi[[par]]) 
@@ -212,7 +191,7 @@ setMethod("extract", signature(object = "stanfit"),
             sssf <- unlist(sss2, use.names = FALSE) 
   
             n2 <- object@sim$n.save[1]  ## assuming all the chains have equal n.iter 
-            if (!inc.warmup) n2 <- n2 - object@sim$n.warmup[1] 
+            if (!inc.warmup) n2 <- n2 - object@sim$n.warmup2[1] 
             dim(sssf) <- c(n2, object@sim$n.chains, length(tidx)) 
             dimnames(sssf)[[3]] <- tidxnames
             sssf 
@@ -266,17 +245,16 @@ setMethod("traceplot", signature = (object = "stanfit"),
             num.plots <- length(tidx) 
             if (num.plots %in% 2:4) par(mfrow = c(num.plots, 1)) 
             if (num.plots > 5) par(mfrow = c(4, 2)) 
-            if (num.plots > 8) set.ask <- ask 
             par.traceplot(object@sim, tidx[1], object@sim$fnames.oi[1], 
                           inc.warmup = inc.warmup)
-            if (ask) ask.old <- devAskNewPage(ask = ask)
+            if (num.plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
             if (num.plots > 1) { 
               for (n in 2:num.plots)
                 par.traceplot(object@sim, tidx[n], object@sim$fnames.oi[n], 
                               inc.warmup = inc.warmup)
             }
             if (ask) devAskNewPage(ask = ask.old)
-            invisible(par(par.mfrow.old)) 
+            invisible(par(mfrow = par.mfrow.old)) 
           })  
 
 is.sf.valid <- function(sf) {

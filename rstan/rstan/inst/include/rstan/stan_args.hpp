@@ -83,9 +83,9 @@ namespace rstan {
   class stan_args {
   private:
     bool sample_file_flag; // true: write out to a file; false, do not 
-    std::string sample_file; // the file for outputting the samples 
-    unsigned int iter;   // number of iterations 
-    unsigned int warmup; // number of warmup 
+    std::string sample_file; // the file for outputting the samples    // 1
+    unsigned int iter;   // number of iterations                       // 2 
+    unsigned int warmup; // number of warmup                          
     unsigned int thin; 
     unsigned int iter_save; // number of iterations saved 
     int refresh;  // < 0, no output 
@@ -244,8 +244,9 @@ namespace rstan {
       lst["gamma"] = gamma;                     // 9 
       lst["random_seed"] = random_seed;         // 10
       lst["chain_id"] = chain_id;               // 11
-      lst["init.t"] = init;                     // 12
-      lst["init.v"] = init_list;                // 13 
+      lst["unit_mass_matrix"] = unit_mass_matrix; // 12
+      lst["init.t"] = init;                     // 13
+      lst["init.v"] = init_list;                // 14 
       return lst; 
     } 
 

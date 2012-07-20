@@ -29,7 +29,7 @@ list.as.integer.if.doable <- function(x) {
            if (isTRUE(all.equal(y, round(y), check.attributes = FALSE))) 
              storage.mode(y) <- "integer"  
            return(y) 
-         });  
+         })
 } 
 
 
@@ -78,7 +78,7 @@ data.preprocess <- function(data) { # , varnames) {
                    ## since we do not know what variables are needed
                    ## at this point.
                    if (any(is.na(x))) {
-                     stop("Stan does not support NA in the data.\n");
+                     stop("Stan does not support NA in the data.\n")
                    } 
  
                    # remove those not numeric data 
@@ -97,7 +97,7 @@ data.preprocess <- function(data) { # , varnames) {
 
 
 read.model.from.con <- function(con) {
-  lines <- readLines(con, n = -1L, warn = FALSE);
+  lines <- readLines(con, n = -1L, warn = FALSE)
   paste(lines, collapse = '\n') 
 } 
 
@@ -128,7 +128,7 @@ check.args <- function(argss) {
 } 
 
 #
-# model.code <- read.model.from.con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan');
+# model.code <- read.model.from.con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan')
 # cat(model.code)
 
 
@@ -178,7 +178,7 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
       }
       init.vs <- init.v 
     } else { 
-      cat("init.v=", init.v, "\n") 
+      # cat("init.v=", init.v, "\n") 
       stop("Wrong specification of initial values")
     } 
   } 
@@ -198,7 +198,7 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
     for (i in 1:n.chains) 
       argss[[i]]$init_list = init.vs[[i]]   
 
-  if (!missing(sample.file)) {
+  if (!missing(sample.file) && !is.na(sample.file)) {
     sample.file <- writable.sample.file(sample.file) 
     if (n.chains == 1) 
         argss[[1]]$sample_file <- sample.file
@@ -215,8 +215,7 @@ config.argss <- function(n.chains, n.iter, n.warmup, n.thin,
 } 
 
 is.dir.writable <- function(path) {
-  if (file.access(path, mode = 2) < 0)
-    return(FALSE) 
+  if (file.access(path, mode = 2) < 0) return(FALSE) 
   return(TRUE)
 } 
 
@@ -290,23 +289,23 @@ stan.dump <- function(list, file, append = FALSE,
     }
   }
 
-  l2 <- NULL; 
+  l2 <- NULL
   addnlpat <- paste0("(.{1,", width, "})(\\s|$)")
   for (v in list) {
     vv <- get(v, envir) 
 
-    if (!is.numeric(vv))  next; 
+    if (!is.numeric(vv))  next
 
     if (is.vector(vv)) {
       if (length(vv) == 1) {
         cat(v, " <- ", vv, "\n", file = file, sep = '')
-        next;
+        next
       }
       str <- paste0(v, " <- \nc(", paste(vv, collapse = ', '), ")") 
       str <-  gsub(addnlpat, '\\1\n', str)
       cat(str, file = file) 
       l2 <- c(l2, v) 
-      next; 
+      next
     }    
 
     if (is.matrix(vv) || is.array(vv)) { 
@@ -317,7 +316,7 @@ stan.dump <- function(list, file, append = FALSE,
       str <- gsub(addnlpat, '\\1\n', str)
       cat(str, 
           ".Dim = c(", paste(vvdim, collapse = ', '), "))\n", file = file, sep = '')
-      next; 
+      next
     }
   }
   invisible(l2) 
@@ -347,115 +346,12 @@ get.rhat.cols <- function(rhats) {
            for (i in 1:length(rhat.breaks)) {
              # cat("i=", i, "\n")
              if (x >= rhat.breaks[i]) 
-               next;
+               next
              return(rhat.colors[i])
            }  
            get.rstan.options("plot.rhat.large.col")
 		 })  
 }
-
-
-multi.print.plots <- function(ps, nrow = get.rstan.options("plot.nrow"), 
-                                  ncol = get.rstan.options("plot.ncol")) {
-  # plots a list of plots using grid.arrange 
-  # 
-  # Args:
-  #  ps A list of plots obtained from ggplot or 
-  #  those supported by grid.arrange 
-  num.p <- length(ps)
-  if (num.p < 1) return(NULL) 
-  if (nrow == 1 && ncol == 1) {
-    for (i in 1:num.p)
-      print(ps[[i]])
-  }
-  stopifnot(require(gridExtra))
-  start <- seq(1, num.p, by = nrow * ncol)
-  end <- c(start[-1] - 1, num.p)
-  for (i in 1:length(start)) {
-    args <- c(ps[start[i]:end[i]], list(ncol = ncol, nrow = nrow))
-    do.call(grid.arrange, args)
-  }
-  # virtualGrob
-}
-
-
-plot.pars0 <- function(mlu, cms, srhats, par.name, par.idx, 
-                       plot = FALSE, prob = 0.8) {                
-  # Plot a parameter (scale, vector, or array) with median, 
-  # credible interval, and medians from separate chains, 
-  # where par.name provides the parameter name and par.idx 
-  # the indexes. par.idx could be empty for plotting a scale
-  # parameter
-  # 
-  # Args:
-  #   mlu: a list with elements of median, le, and ue, 
-  #        computed from samples of all the chains for 
-  #        all parameters.  For example, mlu$median
-  #        is a vector of median for 5 parameters.
-  #   cms: a list, each element of which is the medians of 
-  #        separate chains for a parameter.
-  #   srhats: a vector of split R hats for all parameters.
-  #   par.name: parameter name, for example, beta.
-  #   par.idx: parameter indexes, for example, [1], [2], [3].
-  #   plot: TRUE -- render the plot; FALSE -- not. 
-  #   prob: The probability of the interval, only used in 
-  #         the title. So the caller should set prob 
-  #         match what are in mlu
-  # 
-  # Returns: 
-  #   A grob of ggplot
-
-  num.par <- length(mlu[[1]])
-  
-  m.cols <- get.rstan.options("plot.chain.median.cols")
-  srhat.cols = get.rhat.cols(srhats)
-  # cat("srhat.cols=", srhat.cols, "\n")
-  
-  d <- data.frame(x = 1:num.par, 
-                  y = mlu$median, 
-                  le = mlu$le, 
-                  ue = mlu$ue, 
-                  cs = srhat.cols)
-  # print(d)
-  
-  ## for later setting up all the colors manually
-  cols.manual <- unique(c(srhat.cols, m.cols))
-  names(cols.manual) <- cols.manual;
-
-  lens <- sapply(cms, function(x) length(x))
-  m.cols <- rep(m.cols, max(lens)) # in case m.cols's length is not enough
-  colidx <- do.call(c, lapply(lens, function(n) 1:n)) 
-  par.id <- do.call(c, lapply(1:length(lens), function(i) rep(i, lens[i])))
-  d2 <- data.frame(x = par.id, 
-                   y = do.call(c, cms),
-                   col = m.cols[colidx])
-
-  p1 <- ggplot() +
-    geom_linerange(data = d, 
-                   aes(x = x, ymin = le, ymax = ue, color = cs), 
-                   size = 1, alpha = .8) +
-    geom_point(data = d, 
-               aes(x = x, y = y, colour = cs), 
-               shape = 15, size = 3) + 
-    geom_point(data = d2, 
-               aes(x = x, y = y, colour = col), 
-               shape = 4, size = 4) +
-    scale_colour_manual(values = cols.manual) +
-    ylab(par.name) + 
-    opts(legend.position = "none", axis.title.x = theme_blank()) + 
-    opts(title = paste0("Medians and ", probs2str(prob), " intervals")) +  
-    scale_x_discrete(labels = par.idx)
-  
-  if (plot) print(p1)
-  return(invisible(p1))
-}
-
-## test plot.pars0
-# df <- data.frame(median = c(1,2,3), le = c(0.5, 1, 2), ue = c(2, 3, 4))
-# cms <- list(c(1,2,3), c(4,5))
-# p <- plot.pars0(df, cms, srhats = c(1.1,1.5,2), 
-#                 par.name = "beta", 
-#                 par.idx = c("[1]", "[2]", "[3]"))
 
 read.rdump <- function(f) {
   # Read variables defined in an R dump file to an R list
@@ -542,7 +438,7 @@ seq.array.ind <- function(d, col.major = FALSE) {
     for (j in jidx) { 
       if (res[i - 1, j] < d[j]) {
         res[i, j] <- res[i - 1, j] + 1
-        break; 
+        break
       } 
       res[i, j] <- 1
     } 
@@ -629,7 +525,7 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
 #  
 #  fun1 <- function(chain.id) {
 #    cat("chain.id=", chain.id)
-#    return(list(mu = chain.id));
+#    return(list(mu = chain.id))
 #  } 
 #  b <- config.argss(3, c(100, 200), 10, 1, c("user", 1), fun1, seed = 3) 
 #  print(b)
@@ -687,8 +583,7 @@ rstancold <-
 
 ## summarize the chains merged and individually 
 get.par.summary <- function(sim, n, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
-  n.warmup <- sim$n.warmup 
-  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:n.warmup[i])]) 
+  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
   sumfun <- function(chain) c(mean(chain), sd(chain), quantile(chain, probs = probs))
   cs <- lapply(ss, sumfun)
   as <- sumfun(do.call(c, ss)) 
@@ -716,9 +611,8 @@ summary.sim <- function(sim, pars, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75
   list(summary = as, c.summary = cs) 
 }  
 
-# a mimicking of bugs.plot.inferences in R2WinBUGS  
+# ported from bugs.plot.inferences in R2WinBUGS  
 # 
-# FIXME: to delete  ~/Desktop/bitb/yabbrep/winbugs
 stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, ...) {
   # 
   # Args:
@@ -847,7 +741,10 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     } 
     if (J < k.num.p) text (-.015, -k, "*", cex = cex.names, col = "red")
   } 
-  par(mar = mar.old) 
+  invisible(par(mar = mar.old)) 
 } 
 
-
+legitimate.model.name <- function(name) {
+  # To make model name be a valid name in C++. 
+  return("stan_model")
+} 

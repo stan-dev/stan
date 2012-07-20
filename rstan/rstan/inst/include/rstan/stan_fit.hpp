@@ -595,16 +595,17 @@ namespace rstan {
     }             
 
 
-    SEXP call_sampler(SEXP args) { 
+    SEXP call_sampler(SEXP args_) { 
       BEGIN_RCPP; 
-      stan_args arg(Rcpp::as<Rcpp::List>(args)); 
-      unsigned int iter_save = arg.get_iter_save(); 
+      Rcpp::List lst_args(args_); 
+      stan_args args(lst_args); 
+      unsigned int iter_save = args.get_iter_save(); 
       std::vector<Rcpp::NumericVector> chains; 
       for (unsigned int i = 0; i < num_params2_; i++) 
         chains.push_back(Rcpp::NumericVector(iter_save)); 
 
       try {
-        sampler_command(data_, arg, model_, chains, iter_save, names_oi_tidx_); 
+        sampler_command(data_, args, model_, chains, iter_save, names_oi_tidx_); 
       } catch (std::exception& e) {
         rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
         rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
@@ -612,6 +613,7 @@ namespace rstan {
       }
       // chains.attr("ncol") = Rcpp::wrap(num_params2_); 
       Rcpp::List lst(chains.begin(), chains.end()); 
+      lst.attr("args") = args.stan_args_to_rlist(); 
       lst.names() = fnames_oi_; 
       return lst; 
       END_RCPP; 
