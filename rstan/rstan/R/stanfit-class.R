@@ -36,14 +36,15 @@ setMethod("print", signature = (x = "stanfit"),
                    digits.summary = 3, ...) { 
             if (missing(pars)) pars <- x@model.pars
             s <- summary(x, pars, probs, ...)  
-            cat("Inference for Stan model:", x@model.name, '.\n', sep = '')
+            cat("Inference for Stan model: ", x@model.name, '.\n', sep = '')
             cat(x@sim$n.chains, " chains: each with n.iter=", x@sim$n.iter, 
-                "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, ".\n", sep = '') 
-            cat("Each chain has ", x@sim$n.save[1], " samples saved.\n\n", sep = '') 
+                "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, "; ", 
+                x@sim$n.save[1], " samples saved.\n\n", sep = '') 
 
             print(round(s$summary, digits.summary), ...) 
 
-            cat("\nSamples are drawn using NUTS at ", x@.MISC$date, ".\n", sep = '') 
+            sampler <- attributes(x@sim$samples[[1]])$args$sampler 
+            cat("\nSamples were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
             cat("For each parameters, ESS is a crude measure of effective samples size,\n") 
             cat("and Rhat is the potential scale reduction factor on split chains (at \n")
             cat("convergence, Rhat=1).\n")
@@ -112,7 +113,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
   n.save <- sim$n.save[1] 
   n.kept <- n.save - n.warmup2 
   yrange <- NULL 
-  main <- paste("Trace plot of ", par.name) 
+  main <- paste("Trace of ", par.name) 
   
   if (inc.warmup) {
     id <- seq(1, by = n.thin, length.out = n.save) 
@@ -193,7 +194,7 @@ setMethod("extract", signature(object = "stanfit"),
             n2 <- object@sim$n.save[1]  ## assuming all the chains have equal n.iter 
             if (!inc.warmup) n2 <- n2 - object@sim$n.warmup2[1] 
             dim(sssf) <- c(n2, object@sim$n.chains, length(tidx)) 
-            dimnames(sssf)[[3]] <- tidxnames
+            dimnames(sssf) <- list(NULL, NULL, tidxnames) 
             sssf 
           })  
 
@@ -212,18 +213,35 @@ setMethod("summary", signature = (object = "stanfit"),
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
 
             m <- match(probs, c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975))  
-            if (any(is.na(m)))  return(summary.sim(object@sim, pars, probs)) 
+            if (any(is.na(m))) {
+              ss <-  summary.sim(object@sim, pars, probs) 
+              row.idx <- attr(ss, "row.major.idx") 
+              ss2 <- list(summary = ss$summary[row.major.idx, ], 
+                          c.summary = ss$c.summary[row.major.idx, , ])
+              return(ss2) 
+            }
 
             tidx <- pars.total.indexes(object@sim$pars.oi, 
                                        object@sim$dims.oi, 
                                        object@sim$fnames.oi, 
                                        pars) 
+            tidx <- lapply(tidx, function(x) attr(x, "row.major.idx"))
             tidx <- unlist(tidx, use.names = FALSE)
             stat.idx <- c(1:2, 2 + m) 
             stat.idx2 <- c(1:2, 2 + m, 12, 13) # including ess and rhat
+   
+            s1 <- object@summary$summary[tidx, stat.idx2]  
+            pars.names <- rownames(object@summary$summary)[tidx] 
+            dim(s1) <- c(length(tidx), length(stat.idx2)) 
+            rownames(s1) <- pars.names 
+            colnames(s1) <- colnames(object@summary$summary)[stat.idx2] 
+
+            s2 <- object@summary$c.summary[tidx, stat.idx, ]
+            dim(s2) <- c(length(tidx), length(stat.idx), object@sim$n.chains)
+            stat.names2 <- dimnames(object@summary$c.summary)[[2]][stat.idx]
+            dimnames(s2) <- list(pars.names, stat.names2, NULL) 
            
-            ss <- list(summary = object@summary$summary[tidx, stat.idx2], 
-                       c.summary = object@summary$c.summary[tidx, stat.idx, ])
+            ss <- list(summary = s1, c.summary = s2)
             invisible(ss) 
           })  
 
@@ -240,6 +258,7 @@ setMethod("traceplot", signature = (object = "stanfit"),
                                        object@sim$dims.oi, 
                                        object@sim$fnames.oi, 
                                        pars) 
+            tidx <- lapply(tidx, function(x) attr(x, "row.major.idx"))
             tidx <- unlist(tidx, use.names = FALSE)
             par.mfrow.old <- par('mfrow')
             num.plots <- length(tidx) 

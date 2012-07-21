@@ -82,6 +82,8 @@ setMethod("sampling", "stanmodel",
               # cat("[sampling:] i=", i, "\n")
               # print(args.list[[i]])
               samples[[i]] <- sampler$call_sampler(args.list[[i]])
+              if (is.null(samples[[i]])) 
+                stop("Error occurred when calling the sampler")
             }
 
             permutation.lst <-

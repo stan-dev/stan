@@ -342,7 +342,7 @@ namespace rstan {
     
     template <class Model> 
     int sampler_command(const io::rlist_ref_var_context& data, 
-                        const stan_args& args, 
+                        stan_args& args, 
                         Model& model, 
                         std::vector<Rcpp::NumericVector>& chains, 
                         unsigned int iter_save,
@@ -436,6 +436,7 @@ namespace rstan {
 
       if (0 > leapfrog_steps && !unit_mass_matrix) {
         // NUTS II (with diagonal mass matrix estimation during warmup)
+        args.set_sampler("NUTS2"); 
         stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
@@ -457,6 +458,7 @@ namespace rstan {
   
       } else if (0 > leapfrog_steps && unit_mass_matrix) {
         // NUTS I (unit mass matrix)
+        args.set_sampler("NUTS1"); 
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
@@ -476,6 +478,7 @@ namespace rstan {
                     model,chains,iter_save,qoi_idx); 
       } else {
         // Stardard HMC
+        args.set_sampler("HMC"); 
         stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,
@@ -498,7 +501,7 @@ namespace rstan {
       if (sample_file_flag) {
         rstan::io::rcout << std::endl << "Samples of chain " 
                          << chain_id 
-                         << " is written to file " << sample_file;
+                         << " are written to file " << sample_file;
 
         sample_stream.close();
       }
@@ -604,13 +607,16 @@ namespace rstan {
       for (unsigned int i = 0; i < num_params2_; i++) 
         chains.push_back(Rcpp::NumericVector(iter_save)); 
 
+      sampler_command(data_, args, model_, chains, iter_save, names_oi_tidx_); 
+      // let Rcpp handle the error dispatching. 
+      /*
       try {
-        sampler_command(data_, args, model_, chains, iter_save, names_oi_tidx_); 
       } catch (std::exception& e) {
         rstan::io::rcerr << std::endl << "Exception: " << e.what() << std::endl;
         rstan::io::rcerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
         return R_NilValue; 
       }
+      */
       // chains.attr("ncol") = Rcpp::wrap(num_params2_); 
       Rcpp::List lst(chains.begin(), chains.end()); 
       lst.attr("args") = args.stan_args_to_rlist(); 

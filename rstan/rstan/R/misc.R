@@ -488,24 +488,30 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
   #   names: all the parameters names specifying the sequence of parameters 
   #   dims:  the dimensions for all parameters 
   #   fnames: all the parameter names specified by names and dims 
-  #   pars:  the parameters of interess. This function assumes that
+  #   pars:  the parameters of interests. This function assumes that
   #     pars are in names.   
   # Note: inside each parameter (vector or array), the sequence is in terms of
   #   col-major. That means if we have parameter alpha and beta, the dims
   #   of which are [2,2] and [2,3] respectively.  The whole parameter sequence
   #   are alpha[1,1], alpha[2,1], alpha[1,2], alpha[2,2], beta[1,1], beta[2,1],
-  #   beta[1,2], beta[2,2], beta[1,3], beta[2,3]. 
+  #   beta[1,2], beta[2,2], beta[1,3], beta[2,3]. In addition, for the col-majored
+  #   sequence, an attribute named 'row.major.idx' is attached, which could
+  #   be used when row major index is favored. . 
 
   starts <- calc.starts(dims) 
   par.total.indexes <- function(par) {
     p <- match(par, fnames)
+    # note that here when `par' is a scalar, it would
+    # match to one of `fnames'
     if (!is.na(p)) {
       names(p) <- par 
+      attr(p, "row.major.idx") <- p 
       return(p) 
     } 
     p <- match(par, names) 
     idx <- starts[p] + seq(0, by = 1, length.out = num.pars(dims[[p]])) 
     names(idx) <- fnames[idx] 
+    attr(idx, "row.major.idx") <- starts[p] + idx_col2rowm(dims[[p]]) - 1 
     idx
   } 
   idx <- lapply(pars, FUN = par.total.indexes) 
@@ -596,19 +602,23 @@ get.par.summary <- function(sim, n, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.7
 summary.sim <- function(sim, pars, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
   probs.str <- probs2str(probs)
   pars <- if (missing(pars)) sim$pars.oi else check.pars(object, pars) 
-  tidx <- rstan:::pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
+  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
   s <- lapply(tidx, function(n) get.par.summary(sim, n, probs = probs))
   as <- lapply(s, function(x) c(x$summary, x$ess, x$splitrhat))  
   as <- do.call(rbind, as)
+  dim(as) <- c(length(tidx), 4 + length(probs)) 
   rownames(as) <- sim$fnames.oi[tidx] 
   colnames(as) <- c("Mean", "SD", probs.str, "ESS", "Rhat") 
   cs <- lapply(s, function(x) x$c.summary) 
   cs <- do.call(rbind, cs) 
   dim(cs) <- c(length(tidx), 2 + length(probs), sim$n.chains) 
-  dimnames(cs)[[1]] <- sim$fnames.oi[tidx] 
-  dimnames(cs)[[2]] <- c("Mean", "SD", probs.str) 
-  list(summary = as, c.summary = cs) 
+  dimnames(cs) <- list(sim$fnames.oi[tidx], c("Mean", "SD", probs.str), NULL) 
+  ss <- list(summary = as, c.summary = cs) 
+  attr(ss, "row.major.idx") <- tidx.rowm 
+  ss
 }  
 
 # ported from bugs.plot.inferences in R2WinBUGS  
@@ -673,12 +683,12 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
 
   for (k in 1:n.pars) { 
     k.dim <- sim$dims.oi[[pars[k]]] 
-    k.aidx <- seq.array.ind(k.dim, col.major = TRUE) 
+    k.aidx <- seq.array.ind(k.dim, col.major = !TRUE) 
     
 	# number of parameters we are going to plot for this 
 	# particular vector/array parameter 
 
-    index <- tidx[[k]] 
+    index <- attr(tidx[[k]], "row.major.idx")  
     k.num.p <- length(index) 
     J <- min(k.num.p, max.width)
     spacing <- 3.5 / max(J, standard.width)

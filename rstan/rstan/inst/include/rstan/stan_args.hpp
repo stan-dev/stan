@@ -104,6 +104,7 @@ namespace rstan {
     bool test_grad; 
     std::string init; 
     SEXP init_list;  
+    std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
 
   public:
    
@@ -247,11 +248,15 @@ namespace rstan {
       lst["unit_mass_matrix"] = unit_mass_matrix; // 12
       lst["init.t"] = init;                     // 13
       lst["init.v"] = init_list;                // 14 
+      lst["sampler"] = sampler; 
       return lst; 
     } 
 
     void set_random_seed(unsigned int seed) {
       random_seed = seed;
+    } 
+    void set_sampler(std::string s) {
+      sampler = s; 
     } 
     const std::string& get_random_seed_src() const {
       return random_seed_src; 

@@ -17,8 +17,8 @@ ifeq ($(uname_S), Linux)
 endif
 
 ifeq ($(OS), win)
-  LINKCMD1 = @cmd /c mklink /J ".^\rstan^\inst^\include^\stanlib"  "..^\lib"
-  LINKCMD2 = @cmd /c mklink /J ".^\rstan^\inst^\include^\stansrc"  "..^\src"
+  LINKCMD1 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stanlib"  "..^\..^\..^\..^\lib"
+  LINKCMD2 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stansrc"  "..^\..^\..^\..^\src"
 else
   LINKCMD1 = ln -s ../../../../lib ./rstan/inst/include/stanlib
   LINKCMD2 = ln -s ../../../../src ./rstan/inst/include/stansrc

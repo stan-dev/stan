@@ -14,6 +14,7 @@ inst/include/stansrc/models/.*\.csv$
 inst/include/stansrc/docs.*$
 inst/include/stansrc/doxygen.*$
 inst/include/stansrc/stan.hpp.*$
+inst/libstan.*$
 _inst/include/stansrc/stan/command/.*\.cpp$
 _inst/include/stansrc/stan/gm/.*\.cpp$
 _inst/include/stansrc/stan/gm/grammars/.*\.cpp$

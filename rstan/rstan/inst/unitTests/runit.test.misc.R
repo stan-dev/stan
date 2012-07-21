@@ -124,12 +124,18 @@ test.pars.total.indexes <- function() {
   dims <- list(alpha = c(2, 3)) 
   fnames <- rstan:::flatnames(names, dims)  
   tidx <- rstan:::pars.total.indexes(names, dims, fnames, "alpha") 
+  tidx.attr1 <- attr(tidx[[1]], "row.major.idx") 
+  attributes(tidx[[1]]) <- NULL 
   checkEquals(unname(tidx[[1]]), 1:6) 
+  checkEquals(unname(tidx.attr1), c(1, 3, 5, 2, 4, 6)) 
   names2 <- c(names, "beta") 
   dims2 <- list(alpha = c(2, 3), beta = 8) 
   fnames2 <- rstan:::flatnames(names2, dims2)  
   tidx2 <- rstan:::pars.total.indexes(names2, dims2, fnames2, "beta") 
-  checkEquals(unname(tidx2[[1]]), 6 + 1:8); 
+  tidx2.attr1 <- attr(tidx2[[1]], "row.major.idx")
+  attributes(tidx2[[1]]) <- NULL
+  checkEquals(unname(tidx2[[1]]), 6 + 1:8)  
+  checkEquals(unname(tidx2.attr1), 6 + 1:8)
 } 
  
 .tearDown <- function() {
