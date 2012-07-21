@@ -1,12 +1,7 @@
-## take a look at the samples and compare with results computed 
-## in other program. 
-
-
 library(coda) 
-post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')[, -(1:3)]
 poi <- as.mcmc(post)
 summary(poi)
-q(save = "no")
 
 # The rest is for the ice example from JAGS
 

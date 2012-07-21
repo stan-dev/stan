@@ -3,7 +3,7 @@ library(coda)
 I <- 4
 J <- 2
 K <- 5
-post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#');
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')[, -(1:3)]
 
 tmpfun <- function(x, y) {
   paste("[", x, ", ", y, "]", sep = '');

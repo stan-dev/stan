@@ -2,7 +2,7 @@ library(coda)
 library(BUGSExamples);
 
 
-post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#')
+post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#')[, -(1:3)]
 summary(as.mcmc(post)) 
 
 pars <- c("q", "beta0C", "beta", "phi") 

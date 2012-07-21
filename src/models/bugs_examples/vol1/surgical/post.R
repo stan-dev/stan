@@ -1,5 +1,5 @@
 library(coda) 
-post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')[, -(1:3)]
 summary(as.mcmc(post)) 
 
 # run in JAGS, BUGSExamples is needed.  

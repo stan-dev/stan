@@ -20,15 +20,10 @@ structure(c(-4.7831624, 0.00291866339160000, -1.968915345, 0.265791517214,
 "SD", "Naive SE", "Time-series SE")))
 
 
-## assuming the order of variables in samples.csv are the same as model
-## specification file 
-poi <- post[, 1:8]
-names(poi) <- c("alpha", "beta_age", "beta_sex", 
-                "beta_disease2", "beta_disease3", "beta_disease4", 
-                "r", "sigma"); 
-
-poi[, 8] <- sqrt(1 / poi[, 8]) 
-
+poi.names <- c("alpha", "beta_age", "beta_sex", 
+               "beta_disease2", "beta_disease3", "beta_disease4", 
+               "r", "sigma"); 
+poi <- post[, poi.names] 
 poi <- as.mcmc(poi); 
 summary(poi) 
 

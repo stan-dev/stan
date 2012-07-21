@@ -1,12 +1,9 @@
-## take a look at the samples and compare with results computed 
-## in other program. 
-
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
 N <- 10;
-names(post) <- c("alpha", "beta", paste("theta", 1:N, sep = ''))  
-summary(as.mcmc(post)) 
+poi <- post[, c("alpha", "beta", paste("theta.", 1:N, sep = ''))]   
+summary(as.mcmc(poi)) 
 
 # copied from JAGS 
 "benchstats" <-

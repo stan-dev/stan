@@ -4,14 +4,9 @@
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
 
-poi <- post[, c(121, 122, 123, 124)]
-## assuming the order of variables in samples.csv are the same as model
-## specification file 
-colnames(poi) <- c("alpha", "beta1", "beta2", "sigma") 
-
+poi <- post[, c("alpha", "beta1", "beta2", "sigma")] 
 poi <- as.mcmc(poi)
 summary(poi) 
-
 
 # copied from jags example 
 "benchstats" <-
