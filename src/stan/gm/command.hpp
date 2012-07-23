@@ -295,8 +295,8 @@ namespace stan {
       typedef boost::ecuyer1988 rng_t;
       rng_t base_rng(random_seed);
       // (2**50 = 1T samples, 1000 chains)
-      static boost::uintmax_t DISCARD_STRIDE = 1;
-      DISCARD_STRIDE <<= 50;
+      static boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 50;
+      // DISCARD_STRIDE <<= 50;
       base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
       
       std::vector<int> params_i;
