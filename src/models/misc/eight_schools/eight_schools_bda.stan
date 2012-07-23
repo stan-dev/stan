@@ -17,7 +17,8 @@ model {
     //    for (j in 1:J)
     //        y[j] ~ normal(theta[j], sigma_y[j]);
   
-    // vectorized loops
+    // vectorized loops  
+    mu_theta ~ normal(0,1000);
     theta ~ normal(mu_theta, sigma_theta); 
     y ~ normal(theta,sigma_y);
 }
