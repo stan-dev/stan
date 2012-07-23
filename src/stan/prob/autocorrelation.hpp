@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <complex>
-#include <Eigen/FFT>
+#include <unsupported/Eigen/FFT>
 
 #include <stan/math/matrix.hpp>
 
