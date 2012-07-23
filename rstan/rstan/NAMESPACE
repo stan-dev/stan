@@ -10,8 +10,8 @@ export (
   stanc.version, 
   stan,
   stan.dump,
-  rstan.options,
-  get.rstan.options
+  rstan.options 
+# get.rstan.options
 )
 
 exportClasses (

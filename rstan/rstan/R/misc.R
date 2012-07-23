@@ -354,7 +354,7 @@ get.rhat.cols <- function(rhats) {
 }
 
 read.rdump <- function(f) {
-  # Read variables defined in an R dump file to an R list
+  # Read data defined in an R dump file to an R list
   # 
   # Args:
   #   f: the file to be sourced
@@ -447,6 +447,9 @@ seq.array.ind <- function(d, col.major = FALSE) {
 } 
 
 flat.one.par <- function(n, d, col.major = FALSE) {
+  # Return all the elemenetwise parameters for a vector/array
+  # parameter. 
+  # 
   # Args:
   #  n: Name of the parameter. For example, n = "alpha" 
   #  d: A vector indicates the dimensions of parameter n. 
@@ -496,7 +499,7 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
   #   are alpha[1,1], alpha[2,1], alpha[1,2], alpha[2,2], beta[1,1], beta[2,1],
   #   beta[1,2], beta[2,2], beta[1,3], beta[2,3]. In addition, for the col-majored
   #   sequence, an attribute named 'row.major.idx' is attached, which could
-  #   be used when row major index is favored. . 
+  #   be used when row major index is favored.
 
   starts <- calc.starts(dims) 
   par.total.indexes <- function(par) {
@@ -600,6 +603,7 @@ get.par.summary <- function(sim, n, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.7
 } 
 
 summary.sim <- function(sim, pars, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
+  # cat("summary.sim is called.\n")
   probs.str <- probs2str(probs)
   pars <- if (missing(pars)) sim$pars.oi else check.pars(object, pars) 
   tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
@@ -630,6 +634,10 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
   #   pars: parameters of interests
   #   display.parallel
 
+  alert.col <- get.rstan.options("rstan.alert.col")
+  chain.cols <- get.rstan.options("rstan.chain.cols")
+  chain.cols.len <- length(chain.cols) 
+
   if (exists('windows'))  dev.fun <- windows 
   if (exists('X11'))  dev.fun <- X11 
   opt.dev <- options("device") 
@@ -639,6 +647,9 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     cex.axis <- .6
     cex.tiny <- .4
     cex.points <- .7
+    # the standard number of parameters in an array parameters. 
+    # we have this so that even the # of parameters are less than
+    # 30, we still have equal space between parameters. 
     standard.width <- 30
     max.width <- 40
     min.width <- .02
@@ -664,7 +675,8 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     options (warn = -1)
   }
   height <- .6
-  mar.old <- par(mar = c(0, 0, 1, 0))
+  # mar: c(bottom, left, top, right)
+  mar.old <- par(mar = c(1, 0, 1, 0))
 
   plot(c(0, 1), c(-n.pars - .5, -.4), 
        ann = FALSE, bty = "n", xaxt = "n", yaxt = "n", type = "n")
@@ -674,22 +686,30 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
   W <- max(strwidth(pars, cex = cex.names))
   # the max width of the variable names 
 
-  # cex.names in defined at the beginning of this fun
+  # cex.names is defined at the beginning of this fun
   B <- (1 - W) / 3.8
   A <- 1 - 3.5 * B
   title <- if (display.parallel) "80% interval for each chain" else  "medians and 80% intervals"
-  text (A, -.4, title, adj = 0, cex = cex.names)
-  num.height <- strheight (1:9, cex = cex.tiny)
+  text(A, -.4, title, adj = 0, cex = cex.names)
+  num.height <- strheight (1:9, cex = cex.tiny) * 1.2
 
+  truncated <- FALSE 
   for (k in 1:n.pars) { 
-    k.dim <- sim$dims.oi[[pars[k]]] 
-    k.aidx <- seq.array.ind(k.dim, col.major = !TRUE) 
-    
-	# number of parameters we are going to plot for this 
-	# particular vector/array parameter 
+    text (0, -k, pars[k], adj = 0, cex = cex.names)
 
+    k.dim <- sim$dims.oi[[pars[k]]] 
+    k.dim.len <- length(k.dim)
+    k.aidx <- seq.array.ind(k.dim, col.major = FALSE) 
+    
+    # the index for the parameters in the whole 
+    # sequences of parameters 
     index <- attr(tidx[[k]], "row.major.idx")  
+
+	# number of parameters we could plot for this 
+	# particular vector/array parameter 
     k.num.p <- length(index) 
+
+    # number of parameter we would plot
     J <- min(k.num.p, max.width)
     spacing <- 3.5 / max(J, standard.width)
 
@@ -701,6 +721,8 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     med <- array(med, dim = c(k.num.p, 1)) 
     i80 <- summary$summary[index, 2 + i80p] 
     i80 <- array(i80, dim = c(k.num.p, 2)) 
+    rhats <- summary$summary[index, "Rhat"]
+    rhats.cols <- get.rhat.cols(rhats) 
   
     med.chain <- summary$c.summary[index, 2 + mp, ]
     med.chain <- array(med.chain, dim = c(k.num.p, sim$n.chains)) 
@@ -720,38 +742,69 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     }
 	# plot the breaks of the axis
     for (x in p.rng){
-      text (A-B*.2, a+b*x, x, cex=cex.axis)
-      lines (A+B*c(-.05,0), rep(a+b*x,2))
+      text(A - B * .2, a + b * x, x, cex = cex.axis)
+      lines(A + B * c(-.05, 0), rep(a + b * x, 2))
     }
     for (j in 1:J){
       if (display.parallel){
         for (m in 1:n.chains){
           interval <- a + b * i80.chain[j, , m]
+
+          # When the interval is too tiny, we use the min.width instead
+          # of the real one. 
           if (interval[2] - interval[1] < min.width)
-            interval <- mean(interval) + c(-1,1)*min.width/2
-          lines(A + B * spacing*rep(j+.6*(m-(n.chains+1)/2)/n.chains,2), interval, lwd=.5, col=m+1)
+            interval <- mean(interval) + c(-.5, .5) * min.width
+          segments(x0 = A + B * spacing * (j + .6 *(m - (n.chains + 1) / 2) / n.chains), 
+                   y0 = interval[1], y1 = interval[2], lwd = .5, 
+                   col = chain.cols[(m-1) %% chain.cols.len + 1]) 
         }
       } else {
-        lines (A + B * spacing * rep(j, 2), a + b * i80[j,], lwd = .5)
+        lines(A + B * spacing * rep(j, 2), a + b * i80[j,], lwd = .5)
         for (m in 1:n.chains)
-          points (A + B * spacing * j, a + b * med.chain[j, m], pch = 20, cex = cex.points, col = m + 1)
+          points(A + B * spacing * j, a + b * med.chain[j, m], 
+                 pch = 20, cex = cex.points, 
+                 col = chain.cols[(m-1) %% chain.cols.len + 1])
       } 
 
+      # draw an indicator for Rhat
+      # (xleft, ybottom, xright, ytop)
+       
+      if (k.dim.len == 0) 
+        rect(A + B * spacing * (j - .5), -k - height / 2 - 0.05 + num.height * .5, 
+             A + B * spacing * (j + .5), -k - height / 2 - 0.05 - num.height * .5, col = rhats.cols[j], border = NA) 
+
       # plot the dimension indexes for this parameter 
-      if (length(k.dim) >= 1) { 
+      if (k.dim.len  >= 1) { 
+        rect(A + B * spacing * (j - .5), -k - height / 2 - 0.05 + num.height * .5, 
+             A + B * spacing * (j + .5), -k - height / 2 - 0.05 - num.height * (k.dim.len - .5), col = rhats.cols[j], border = NA) 
+
         # k.dim: the dimension of parameter k 
-        for (m in 1:length(k.dim)) {
+        for (m in 1:k.dim.len) {
           index0 <- k.aidx[j, m] 
           if (j == 1)
             text(A+B*spacing*j, -k-height/2-.05-num.height*(m-1), index0, cex=cex.tiny)
           else if (index0 != k.aidx[j - 1, m] & (index0 %% (floor(log10(index0) + 1)) == 0))
             text(A+B*spacing*j, -k-height/2-.05-num.height*(m-1), index0, cex=cex.tiny)
+
+          # Note for `(index0 %% (floor(log10(index0) + 1)) == 0) in the above condition.
+          # When 10 <= index0 <= 99, floor(log10(index0) + 1) == 2,
+          # so that one index would be drawn out of two consecutive. 
+          # That is, we would have 10, 12, 14, 16, etc. 
+          # Similarly, when 100 <= index0 <= 999, we draw one out of three
+          # though in the case, we do not draw them at all since the max is  
+          # 40.  
         }
       }
     } 
-    if (J < k.num.p) text (-.015, -k, "*", cex = cex.names, col = "red")
+    if (J < k.num.p) {
+      text (-.015, -k, "*", cex = cex.names, col = alert.col)
+      truncated <- TRUE
+    } 
   } 
   invisible(par(mar = mar.old)) 
+  if (truncated) {
+    text(0, -n.pars - .5, "*  array truncated for lack of space", adj = 0, cex = cex.names, col = alert.col)
+  } 
 } 
 
 legitimate.model.name <- function(name) {

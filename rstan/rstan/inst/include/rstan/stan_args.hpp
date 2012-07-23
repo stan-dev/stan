@@ -187,7 +187,7 @@ namespace rstan {
       else gamma = Rcpp::as<double>(in[idx]); 
       
       idx = find_index(args_names, std::string("refresh")); 
-      if (idx == args_names.size())  refresh = 1; 
+      if (idx == args_names.size())  refresh = std::max(iter / 20, 1U); 
       else refresh = Rcpp::as<int>(in[idx]); 
 
       idx = find_index(args_names, std::string("seed")); 

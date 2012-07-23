@@ -538,6 +538,11 @@ namespace rstan {
       return name.find('[') != name.npos && name.find(']') != name.npos; 
     } 
   
+    /*
+     * Update the parameters we are interested for the model. 
+     * As well, the dimensions vector for the parameters are 
+     * updated. 
+     */
     void update_param_oi0(const std::vector<std::string>& pnames) {
       names_oi_.clear(); 
       dims_oi_.clear(); 

@@ -13,7 +13,8 @@ setClass(Class = "stanmodel",
 
 setMethod("show", "stanmodel",
           function(object) {
-            cat("Stan model: ", object@model.name, ".\n" ,sep = '') 
+            cat("Stanmodel: ", object@model.name, " code as:\n" ,sep = '') 
+            cat(object@model.code, "\n")
           }) 
 
 #   setMethod("plot", "stanmodel",
@@ -103,16 +104,19 @@ setMethod("sampling", "stanmodel",
                        dims.oi = sampler$param_dims_oi(),
                        fnames.oi = fnames.oi,
                        n.flatnames = n.flatnames) 
-            summary <- summary.sim(sim)
-            new("stanfit",
-                model.name = object@model.name,
-                model.pars = sampler$param_names(),
-                model.dims = sampler$param_dims(),
-                sim = sim,
-                summary = summary,
-                arg.lst = args.list,
-                .MISC = list(stanmodel = object, date = date()))
-                # keep a ref to avoid garbage collection
-                # (see comments in fun stan.model)
+            # summary <- summary.sim(sim)
+            fit <- new("stanfit",
+                       model.name = object@model.name,
+                       model.pars = sampler$param_names(),
+                       par.dims = sampler$param_dims(),
+                       sim = sim,
+                       # summary = summary,
+                       arg.lst = args.list,
+                       .MISC = new.env()) 
+             assign("stanmodel", object, envir = fit@.MISC)
+             # keep a ref to avoid garbage collection
+             # (see comments in fun stan.model)
+             assign("date", date(), envir = fit@.MISC) 
+             return(fit)
           }) 
 

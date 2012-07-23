@@ -4,11 +4,11 @@ setClass(Class = "stanfit",
          representation = representation(
            model.name = "character", 
            model.pars = "character", 
-           model.dims = "list", 
+           par.dims = "list", 
            sim = "list", 
-           summary = "list", 
+           # summary = "list", 
            arg.lst = "list", 
-           .MISC = "list"
+           .MISC = "environment"
          ),  
          validity = function(object) {
            return(TRUE) 
@@ -27,7 +27,9 @@ if (!isGeneric("plot"))
 setMethod("plot", signature = (x = "stanfit"), 
           function(x, y, pars = y, display.parallel = FALSE, ...) {
             pars <- if (missing(pars) && missing(y)) x@sim$pars.oi else check.pars(x@sim, pars) 
-            stan.plot.inferences(x@sim, x@summary, pars, display.parallel, ...) 
+            if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
+              assign("summary", summary.sim(x@sim), envir = x@.MISC)
+            stan.plot.inferences(x@sim, x@.MISC$summary, pars, display.parallel, ...) 
           }) 
 
 setMethod("print", signature = (x = "stanfit"),
@@ -71,6 +73,8 @@ check.pars <- function(sim, pars) {
   m <- which(match(pars_wo_ws, allpars, nomatch = 0) == 0)
   if (length(m) > 0) 
     stop("No parameter ", paste(pars[m], collapse = ', ')) 
+  if (length(pars_wo_ws) == 0) 
+    stop("No parameter specified (pars is empty)")
   pars_wo_ws
 } 
 
@@ -114,7 +118,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
   n.kept <- n.save - n.warmup2 
   yrange <- NULL 
   main <- paste("Trace of ", par.name) 
-  
+  chain.cols <- get.rstan.options("rstan.chain.cols")
   if (inc.warmup) {
     id <- seq(1, by = n.thin, length.out = n.save) 
     for (i in 1:sim$n.chains) {
@@ -126,7 +130,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
          col = rstan:::rstancolgrey[3], border = NA)
     for (i in 1:sim$n.chains) {
       lines(id, sim$samples[[i]][[n]], xlab = '', ylab = '', 
-            lwd = 1, col = rstancolc[(i-1) %% 6 + 1]) 
+            lwd = 1, col = chain.cols[(i-1) %% 6 + 1]) 
     }
   } else {  
     idx <- n.warmup2 + 1:n.kept
@@ -138,7 +142,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
          xlab = 'Iterations (without warmup)', ylab = "", main = main)
     for (i in 1:sim$n.chains)  
       lines(id, sim$samples[[i]][[n]][idx], lwd = 1, 
-            xlab = '', ylab = '', col = rstancolc[(i-1) %% 6 + 1]) 
+            xlab = '', ylab = '', col = chain.cols[(i-1) %% 6 + 1]) 
   } 
 } 
 
@@ -148,7 +152,7 @@ setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
 setMethod("extract", signature(object = "stanfit"),
-          definition = function(object, pars, permuted = FALSE, inc.warmup = TRUE, ...) {
+          definition = function(object, pars, permuted = FALSE, inc.warmup = TRUE) {
             # Extract the samples in different forms for different parameters. 
             #
             # Args:
@@ -221,6 +225,9 @@ setMethod("summary", signature = (object = "stanfit"),
               return(ss2) 
             }
 
+            if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
+              assign("summary", summary.sim(object@sim), envir = object@.MISC)
+
             tidx <- pars.total.indexes(object@sim$pars.oi, 
                                        object@sim$dims.oi, 
                                        object@sim$fnames.oi, 
@@ -230,15 +237,15 @@ setMethod("summary", signature = (object = "stanfit"),
             stat.idx <- c(1:2, 2 + m) 
             stat.idx2 <- c(1:2, 2 + m, 12, 13) # including ess and rhat
    
-            s1 <- object@summary$summary[tidx, stat.idx2]  
-            pars.names <- rownames(object@summary$summary)[tidx] 
+            s1 <- object@.MISC$summary$summary[tidx, stat.idx2]  
+            pars.names <- rownames(object@.MISC$summary$summary)[tidx] 
             dim(s1) <- c(length(tidx), length(stat.idx2)) 
             rownames(s1) <- pars.names 
-            colnames(s1) <- colnames(object@summary$summary)[stat.idx2] 
+            colnames(s1) <- colnames(object@.MISC$summary$summary)[stat.idx2] 
 
-            s2 <- object@summary$c.summary[tidx, stat.idx, ]
+            s2 <- object@.MISC$summary$c.summary[tidx, stat.idx, ]
             dim(s2) <- c(length(tidx), length(stat.idx), object@sim$n.chains)
-            stat.names2 <- dimnames(object@summary$c.summary)[[2]][stat.idx]
+            stat.names2 <- dimnames(object@.MISC$summary$c.summary)[[2]][stat.idx]
             dimnames(s2) <- list(pars.names, stat.names2, NULL) 
            
             ss <- list(summary = s1, c.summary = s2)
@@ -273,7 +280,8 @@ setMethod("traceplot", signature = (object = "stanfit"),
                               inc.warmup = inc.warmup)
             }
             if (ask) devAskNewPage(ask = ask.old)
-            invisible(par(mfrow = par.mfrow.old)) 
+            par(mfrow = par.mfrow.old)
+            invisible() 
           })  
 
 is.sf.valid <- function(sf) {
