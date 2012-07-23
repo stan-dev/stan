@@ -80,9 +80,9 @@ linear algebra functions.  Eigen makes extensive use of expression
 templates for lazy evaluation and the curiously recurring template
 pattern to implement concepts without virtual function calls.  But we
 ran into the same problem with Eigen as with the existing probability
-libraries --- they didn't support mixed operations of algorithmic
+libraries --- it doesn't support mixed operations of algorithmic
 differentiation variables and primitives like \code{double}.  This is
-a problem we have yet to optimize away as of \Stan version 1, but we
+a problem we have yet to optimize away as of \Stan version 1.0, but we
 have plans to extend Eigen itself to support heterogeneous 
 matrix operator types.
 
@@ -125,53 +125,36 @@ the efficiency of compilation might compensate for the lack of ideal
 fit to the problem.  
 
 We realized we were doing redundant calculations, so we wrote a
-vectorized form of the normal distribution, which sped things up a
-bit.  At the same time, we introduced some simple template
-metaprograms to remove the calculation of constant terms in the log
-probability.  These both improved speed, but not enough (there is
-still room for more vectorization in the regression component of the
-Rats model).
+vectorized form of the normal distribution for multiple variates with
+the same mean and scale, which sped things up a bit. At the same
+time, we introduced some simple template metaprograms to remove the
+calculation of constant terms in the log probability.  These both
+improved speed, but not enough.  Finally, we figured out how to both
+vectorize and partially evaluate the gradients of the densities using
+a combination of expression templates and metaprogramming.  At this
+point, we are within a factor of two or so of a hand-coded gradient
+function.
 
 Later, when we were trying to fit a time-series model, we found that
 normalizing the data to unit sample mean and variance sped up the fits
-by an order of magnitude.  Although \HMC is rotation invariant (why it
-can handle high correlations), it is not scale invariant.  Gibbs
-sampling, on the other hand, is scale invariant, but not rotation
-invariant.  
+by an order of magnitude.  Although \HMC and \NUTS are rotation
+invariant (explaining why they can sample effectively from
+multivariate densities with high correlations), they are not scale
+invariant.  Gibbs sampling, on the other hand, is scale invariant, but
+not rotation invariant.
 
 We were still using a unit mass matrix in the simulated Hamiltonian
 dynamics.  The last tweak to \Stan before version 1.0 was to estimate
 a diagonal mass matrix during warmup.  This is beyond the \NUTS paper
-on Arxiv, so we've been calling it \NUTS II.  This sped up the
-unscaled data models by an order of magnitude, though it breaks the
-nice theoretical property of rotation invariance.
+on {\it arXiv}, so we've been calling it \NUTS~{\sc ii}.  Using a mass
+matrix sped up the unscaled data models by an order of magnitude,
+though it breaks the nice theoretical property of rotation invariance.
 
 \section*{\Stan's Future}
 
 We're not done. There's still an enormous amount of work to do to
 improve \Stan.  Our to-do list is kept at the top level of the release
-in the file \code{TO-DO.txt}.  Our top priorities going forward are
-(1) sample analysis in \Cpp (effective sample size, split-$\hat{R}$
-convergence monitoring, smallest and central posterior intervals,
-etc.), and (2) an \R interface along the lines of {\small R2WinBUGS}.
-
-We will also continue to work on speeding up algorithmic
-differentiation through partial evaluation, especially for matrix and
-probability functions.  
-
-Another immediate to-do item is adding a richer set of
-parameterizations to existing probability functions (e.g.,
-precision-based parameterizations of elliptical distributions and
-logit-based parameterizations of discrete models), a broader set of
-cumulative distribution functions for truncated and censored data, and
-the full range of random variate generators for forward sampling and
-model checking.  
-
-Although it is very expensive (cubic in dimensionality) and limited in
-applicability (log concave probability functions), we are still
-interested in approaches like that of Riemann manifold \HMC
-\cite{GirolamiCalderhead:2011}; if this work pans out, it will appear
-in \NUTS III.
+in the file \code{TO-DO.txt}.  
 
 \section*{You Can Help}
 
