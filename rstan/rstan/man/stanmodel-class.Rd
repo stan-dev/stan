@@ -23,6 +23,7 @@
 \section{Slots}{
   \describe{
     \item{\code{model.name}:}{The model name, object of \code{"character"}} 
+    \item{\code{model.code}:}{The model code, object of \code{"character"}, in Stan model language} 
     \item{\code{.modelmod}:}{Object of \code{"list"}  
       that includes C++ object (just the definition, not an instance) exposed
       by Rcpp, a module for drawing samples and conducting analysis on the

@@ -12,31 +12,38 @@
 
 \usage{
   %% extract(object, \dots)  
-  \S4method{extract}{stanfit,character}(object, pars, ...) 
+  \S4method{extract}{stanfit}(object, pars, permuted = FALSE, inc.warmup = TRUE) 
 } 
 
 \section{Methods}{
   \describe{
-    \item{extract}{\code{signature(object = "stanfit", pars = "character")}}{
-       Extract samples for a fitted model (defined by class \code{"stanfit"}).  
+    \item{extract}{\code{signature(object = "stanfit"}}{
+       Extract samples for a fitted model defined by class \code{"stanfit"}.  
     }
   }
 }
 
 \arguments{
   \item{object}{An object of class \code{"\linkS4class{stanfit}"}.}
-
   \item{pars}{An object of class \code{"character"} providing the parameter
-              names (or other quantity names) of interest. If not specified,
-              all parameters would be used.
-             } 
-  \item{...}{FIXME. To be added.} 
+    names (or other quantity names) of interest. If not specified,
+    all parameters stored would be used.} 
+  \item{permuted}{\code{TRUE} of \code{FALSE}. If \code{TRUE}, all kept 
+    samples (that is, warmup samples
+    are discarded) in each chain are permuted are merged. If \code{FALSE}, 
+    the original order are kept.}
+  \item{inc.warmup}{\code{TRUE} of \code{FALSE}. The argument matters
+    only if \code{permuted} is \code{FALSE}. If \code{TRUE}, warmup
+    samples are included; otherwise excluded.}
 }
-
 \value{
-  A \code{"list"}, every element of which is the samples for a chain. 
+  When \code{permuted = TRUE}, this function returns a list,  
+  every element of which is the samples for a chain. 
   The samples of a chain is in form of an array. 
-} 
+  When \code{permuted = FALSE}, an array is returned; the first
+  dimension is the iterations; the second is the number of chains; the 
+  third are the parameters. The parameters are expanded for vector/array 
+  parameters.} 
 
 \examples{
 \dontrun{

@@ -11,62 +11,66 @@ fitted result.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-stan(file, model.name = "anon_model", model.code = "", data, n.chains = 1L,
+stan(file, model.name = "anon_model", model.code = "", data = list(), pars = NA, n.chains = 1L,
 n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
-init.v = NULL, seed, sample.file, stan.home, verbose = FALSE, ...)
+init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{file}{
-%%     ~~Describe \code{file} here~~
-}
-  \item{model.name}{
-%%     ~~Describe \code{model.name} here~~
-}
-  \item{model.code}{
-%%     ~~Describe \code{model.code} here~~
-}
-  \item{data}{
-%%     ~~Describe \code{data} here~~
-}
-  \item{n.chains}{
-%%     ~~Describe \code{n.chains} here~~
-}
-  \item{n.iter}{
-%%     ~~Describe \code{n.iter} here~~
-}
-  \item{n.warmup}{
-%%     ~~Describe \code{n.warmup} here~~
-}
-  \item{n.thin}{
-%%     ~~Describe \code{n.thin} here~~
-}
-  \item{init.t}{
-%%     ~~Describe \code{init.t} here~~
-}
-  \item{init.v}{
-%%     ~~Describe \code{init.v} here~~
-}
-  \item{seed}{
-%%     ~~Describe \code{seed} here~~
-}
-  \item{sample.file}{
-%%     ~~Describe \code{sample.file} here~~
-}
-  \item{stan.home}{
-%%     ~~Describe \code{stan.home} here~~
-}
-  \item{verbose}{
-%%     ~~Describe \code{verbose} here~~
-}
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
-}
+  \item{file}{The file specifying the model in Stan language.}
+  \item{model.name}{A character for naming the model.}
+  \item{model.code}{A character string specifying the model.  An alternative
+    way for specifying model instead of \code{file}.}
+  \item{data}{An object of class \code{"list"} or \code{"environment"}
+    providing the data for the model.}    
+  \item{pars}{A vector of character string specifying parameters of interests; defaults
+    to \code{NA} indicating all parameters in the model.}
+  \item{n.chains}{A positive integer specifying number of chains; defaults to 1.} 
+  \item{n.iter}{A positive integer specifying how many iterations for all the
+    chains (including warmup). The default is 2000.}
+  \item{n.warmup}{A positive integer specifying number of initial samples to be
+    discarded. The default is \code{"n.iter / 2"}. Note that this is also known as burnin.}
+  \item{n.thin}{A positive integer specifying the period for saving samples; defaults to 1.} 
+  \item{seed}{The seed for random number generation. The default is generated from 1 to 
+    the maximum integer supported by R on the machine. Note that when multiple chains
+    are used, only one seed is needed.}
+  \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
+    indicating how the initial values of parameters are specified. \code{"0"}: 
+    initialize all to be zero on the unconstrained support; 
+    \code{"user"}: specify by the user in \code{"init.v"}; and 
+    \code{"random"}: randomly generated.  }
+  \item{init.v}{A function or a list to specify initial values. When it 
+    is a function, it optionally takes a parameter \code{chain.id}. If it 
+    is a list, the length of the list must be the number of chains and 
+    each element is a named list specifying the initial values for all parameters.}
+  \item{sample.file}{A character string of file name for specifying where the 
+    samples are written into. If not provided, files are not created. Note 
+    that when the folder specified is not writable, \code{"tempdir()"} is used. 
+    And when there are multiple chains, an underscore and chain number is appended
+    to the file name.} 
+  \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
+    intermediate output inside the function, which might be helpful for
+    debugging the model, are printed or not.}
+  \item{\dots}{Other parameters for the sampler. 
+    These are \code{"leapfrog_steps"} (integer), 
+    \code{"epsilon"} (double), 
+    \code{"gamma"} (double), 
+    \code{"delta"} (double), 
+    \code{"unit_mass_matrix"} (TRUE of FALSE), 
+    \code{"max_treedepth"} (integer).  Details could be 
+    found in Stan's manual. Note that by default, 
+    \code{"leapfrog_steps"} is \code{-1} and 
+    \code{"unit_mass_matrix"} is \code{FALSE} so that
+    NUTS2 sampler is called, which is the default sampler.  
+
+    In addition, \code{refresh} (integer) could be used to
+    control how to indicate the progress during sampling.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
+    Fitted results in form of \code{"stanfit"}
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}

@@ -11,17 +11,17 @@
 
 \usage{
   %% sampling(object, \dots)  
-  \S4method{sampling}{stanmodel}(object, data, n.chains = 1L, n.iter = 2000L, 
-    n.warmup = floor(n.iter / 2), 
-    n.thin = 1L, init.t = 'random', init.v = NULL, seed, 
-    sample.file, \dots, verbose = FALSE)   
+  \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, n.chains = 1L, n.iter = 2000L, 
+    n.warmup = floor(n.iter / 2), n.thin = 1L, seed = sample.int(.Machine$integer.max, 1),
+    init.t = 'random', init.v = NULL, 
+    sample.file, verbose = FALSE, \ldots)   
 } 
 
 \section{Methods}{
   \describe{
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
-      Call NUTS to draw samples from the model defined by class \code{"stanmodel"} 
+      Call samplers such as NUTS1 and NUTS2 to draw samples from the model defined by class \code{"stanmodel"} 
       given the data, init values, etc. 
     }
   }
@@ -33,44 +33,70 @@
   \item{data}{An object of class \code{"list"} or \code{"environment"}
     providing the data for the model.}    
 
- \item{n.chains}{A positive integer specifying number of chains. The default is 1. (Not 
-   implemented now, that is, it is always 1.)} 
+  \item{pars}{A vector of character string specifying parameters of interests; defaults
+    to \code{NA} indicating all parameters in the model. Only parameters in \code{pars}
+    are stored in the fitted results.}
 
- \item{n.iter}{A positive integer specifying how many iterations for all the
-   chains (including warmup). The default is 2000.}
+  \item{n.chains}{A positive integer specifying number of chains; defaults to 1.} 
+ 
+  \item{n.iter}{A positive integer specifying how many iterations for all the
+    chains (including warmup). The default is 2000.}
 
- \item{n.warmup}{A positive integer specifying number of initial samples to be
-                 discarded. The default is \code{"n.iter / 2"}.}
+  \item{n.warmup}{A positive integer specifying number of initial samples to be
+    discarded. The default is \code{"n.iter / 2"}. Note that this is also known as burnin.}
 
- \item{n.thin}{A positive integer specifying the period between saved samples
-   after warmup. The default is 1.} 
+  \item{n.thin}{A positive integer specifying the period for saving samples; defaults to 1.} 
 
- \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
-   indicating how the initial values of parameters are specified. \code{"0"}: 
-   initialize all to be zero (FIXME: check if is on the unconstrained support); 
-   \code{"user"}: specify by the user in \code{"init.v"}; and 
-   \code{"random"}: randomly generated.  }
+  \item{seed}{The seed for random number generation. The default is generated from 1 to 
+    the maximum integer supported by R on the machine. Note that when multiple chains
+    are used, only one seed is needed.}
 
- \item{init.v}{An object of class \code{"list"}, a named list for specifying
-   initial values for the model parameters. Note that now the user must specify 
-   them for all parameters.}
+  \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
+    indicating how the initial values of parameters are specified. \code{"0"}: 
+    initialize all to be zero on the unconstrained support; 
+    \code{"user"}: specify by the user in \code{"init.v"}; and 
+    \code{"random"}: randomly generated.  }
 
- \item{seed}{An integer for random number generation seed. 
-   The default is randomly generated from time.} 
+  \item{init.v}{A function or a list to specify initial values. When it 
+    is a function, it optionally takes a parameter \code{chain.id}. If it 
+    is a list, the length of the list must be the number of chains and 
+    each element is a named list specifying the initial values for all parameters.}
 
- \item{sample.file}{A character string of file name for specifying where the 
-   samples are written into.} 
+  \item{sample.file}{A character string of file name for specifying where the 
+    samples are written into. If not provided, files are not created. Note 
+    that when the folder specified is not writable, \code{"tempdir()"} is used. 
+    And when there are multiple chains, an underscore and chain number is appended
+    to the file name.} 
 
- \item{\dots}{Not implemented now.  They are supposed to provide 
-   additional parameters for NUTS.}
    
- \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
-   intermediate output inside the function, which might be helpful for
-   debugging the model, are printed or not.}
-      
+  \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
+    intermediate output inside the function, which might be helpful for
+    debugging the model, are printed or not.}
+
+  \item{\dots}{Other parameters for the sampler: 
+    \enumerate{
+      \item \code{"leapfrog_steps"}, \code{integer}
+      \item \code{"epsilon"}, \code{double}
+      \item \code{"gamma"}, \code{double} 
+      \item \code{"delta"}, \code{double}
+      \item \code{"unit_mass_matrix"}, \code{TRUE} or \code{FALSE} 
+      \item \code{"max_treedepth"}, \code{integer}  
+    }
+
+    More details could be 
+    found in Stan's manual. Note that by default, 
+    \code{"leapfrog_steps"} is \code{-1} and 
+    \code{"unit_mass_matrix"} is \code{FALSE} so that
+    NUTS2 sampler is called, which is the default sampler.  
+
+    In addition, \code{refresh} (integer) could be used to
+    control how to indicate the progress during sampling.
+  }
 }
 \value{
-  \code{TRUE} indicates success of sampling; otherwise \code{FALSE}. 
+   A named list, each element of which are the samples
+   for one parameger.  In the case of vector (array) parameters,
+   their elements are used. 
 } 
 
 \examples{
