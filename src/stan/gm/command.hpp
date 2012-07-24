@@ -443,6 +443,7 @@ namespace stan {
           nuts2_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
+        nuts2_sampler.set_error_stream(std::cout);
 
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
@@ -458,6 +459,7 @@ namespace stan {
                                              delta, gamma, 
                                              base_rng);
 
+        nuts_sampler.set_error_stream(std::cout);
           // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -479,6 +481,7 @@ namespace stan {
                                                     delta, gamma,
                                                     base_rng);
 
+        hmc_sampler.set_error_stream(std::cout);
         // cut & paste (see above) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first

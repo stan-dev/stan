@@ -122,8 +122,8 @@ namespace stan {
           _x_sum_n(0),
           _next_diag_adapt(10) 
       {
-	// start at 10 * epsilon because NUTS cheaper for larger epsilon
-	this->adaptation_init(10.0);
+        // start at 10 * epsilon because NUTS cheaper for larger epsilon
+        this->adaptation_init(10.0);
       }
 
       /**
@@ -331,8 +331,10 @@ namespace stan {
           xminus = x;
           gradminus = grad;
           mminus = m;
-          newlogp = rescaled_leapfrog(this->_model, this->_z, _step_sizes, xminus,
-                                      mminus, gradminus, direction * this->_epsilon_last);
+          newlogp = rescaled_leapfrog(this->_model, this->_z, _step_sizes, 
+                                      xminus, mminus, gradminus, 
+                                      direction * this->_epsilon_last,
+                                      this->_error_msgs);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;

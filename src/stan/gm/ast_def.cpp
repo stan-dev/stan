@@ -386,7 +386,7 @@ namespace stan {
     }
 
 
- expr_type infer_type_indexing(const base_expr_type& expr_base_type,
+    expr_type infer_type_indexing(const base_expr_type& expr_base_type,
                                   size_t num_expr_dims,
                                   size_t num_index_dims) {
       if (num_index_dims <= num_expr_dims)
@@ -401,13 +401,7 @@ namespace stan {
         if (expr_base_type == MATRIX_T)
           return expr_type(DOUBLE_T,0U);
       
-      std::cerr << "expression base type=";
-      write_base_expr_type(std::cerr,expr_base_type);
-      std::cerr << std::endl;
-      std::cerr << "too many index dimensions;"
-                << " require at most " << num_expr_dims
-                << " found " << num_index_dims
-                << std::endl;
+      // error condition, result expr_type has is_ill_formed() = true
       return expr_type();
     }
 
