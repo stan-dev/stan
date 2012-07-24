@@ -67,7 +67,7 @@ more general technique described in the next section.
 In some situations, such as when a multivariate probability function
 has partially observed outcomes or parameters, it will be necessary to
 create a vector mixing known (data) and unknown (parameter) values.
-This can be done directly in \Stan by creating a vector or array in the
+This can be done in \Stan by creating a vector or array in the
 \code{transformed parameter} block and assigning to it.
 
 The following example involves a bivariate covariance matrix in which the
@@ -171,10 +171,10 @@ location parameters; these could be given priors in the model.
 
 \subsection{Unknown Truncation Points}
 
-Nothing prevents the truncation points from being estimated as
+If the truncation points are unknown, they may be estimated as
 parameters.  This can be done with a slight rearrangement of the
-variable declarations from the model in the previous section with known
-truncation points.
+variable declarations from the model in the previous section with
+known truncation points.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -201,10 +201,10 @@ Here there is a lower truncation point \code{L} which is declared to
 be less than or equal to the minimum value of \code{y}.  The upper
 truncation point \code{U} is declared to be larger than the maximum
 value of \code{y}.  This declaration, although dependent on the data,
-only enforces the constraint that the data fall within the
-truncation bounds.  With the constraint that there is at least one
-data point \code{y[n]}, the constraint that \code{L} is less than
-\code{U} is enforced indirectly.
+only enforces the constraint that the data fall within the truncation
+bounds.  With \code{N} declared as type \code{int(1,)}, there must be
+at least one data point.  The constraint that \code{L} is less than
+\code{U} is enforced indirectly, based on the non-empty data.
 
 The ellipses where the priors for the bounds \code{L} and \code{U}
 should go should be filled in with a an informative prior in
@@ -266,9 +266,10 @@ probability of
 \[
 \mbox{Pr}[y > U] 
 = \int_U^{\infty} \distro{Normal}(y|\mu,\sigma) \, dy
-= 1 - \Phi\left(\frac{y - \mu}{\sigma}\right).
+= 1 - \Phi\left(\frac{y - \mu}{\sigma}\right),
 \]
 %
+where $\Phi()$ is the unit normal cumulative distribution function.
 With $M$ censored observations, the total probability on the log scale
 is
 \[
@@ -276,10 +277,15 @@ is
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
 = M \, \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)
 \]
-
 % 
-This can be implemented directly in \Stan using the cumulative normal
-distribution function \code{normal\_p}.  The following model assumes
+Although \Stan implements $\Phi$ with the function $\code{Phi}$, \Stan
+also provides the cumulative distribution function \code{normal\_p},
+defined byma
+\[
+\code{normal\_p}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
+\]
+%
+The following model assumes
 that the censoring point is known, so it is declared as data.
 %
 \begin{quote}
@@ -303,7 +309,7 @@ model {
 \end{quote}
 %
 For the observed values in \Verb|y_obs|, the normal sampling model is
-used directly (without truncation).  The log probability accumulator
+used without truncation.  The log probability accumulator
 \Verb|lp__| is directly incremented using the calculated log
 cumulative normal probability of the censored data items.  The
 built-in function \code{log1m} is used, which maps $x$ to $\log (1 -
