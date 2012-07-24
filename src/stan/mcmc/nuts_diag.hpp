@@ -22,7 +22,7 @@ namespace stan {
   namespace mcmc {
 
     /**
-     * No-U-Turn Sampler (NUTS) with diagonal mass adaptation.
+     * No-U-Turn Sampler (NUTS) with varying step sizes.
      *
      * The NUTS sampler requires a probability model with the ability
      * to compute gradients, characterized as an instance of
@@ -263,7 +263,7 @@ namespace stan {
       virtual void write_adaptation_params(std::ostream& o) {
         o << "# (mcmc::nuts_diag) adaptation finished" << '\n';
         o << "# step size=" << this->_epsilon << '\n';
-        o << "# parameter masses:\n"; // FIXME:  names/delineation requires access to model
+        o << "# parameter step size multipliers:\n"; // FIXME:  names/delineation requires access to model
         o << "# ";
         for (size_t k = 0; k < _step_sizes.size(); ++k) {
           if (k > 0) o << ',';

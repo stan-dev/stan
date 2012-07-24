@@ -271,10 +271,10 @@ the system time automatically.
 \section{Command-Line Options}
 
 The executable \Stan program is highly configurable.  At the highest
-level, it may be configured for type of sampler (standard \HMC or \NUTS,
-with or without step size adaptation), it may be provided with
-data, initializations, a file to which to send the output, random
-number generation seeds, etc.  
+level, it may be configured for type of sampler (standard \HMC or
+\NUTS, with or without step size adaptation), it may
+be provided with data, initializations, a file to which to send the
+output, random number generation seeds, etc.
 
 The full set of options is as follows.  The next section provides
 some typical use-case examples.
@@ -292,7 +292,7 @@ some typical use-case examples.
 %
 \cmdarg{init}{file}
 {Use initial values from specified file or zero
-  values if <file>=0}
+  values if \code{\farg{<file>}=0}}
 {default is random initialization}
 %
 \cmdarg{samples}{file}
@@ -308,7 +308,9 @@ some typical use-case examples.
 {default is to randomly generate from time}
 %
 \cmdarg{chain\_id}{int}
-{Markov chain identifier}
+{Markov chain identifier, indexed from 1, to seed the L'Ecuyer 
+  random number generator to ensure non-overlapping random number
+  sequences for each chain \citep{Lecuyer:1999}}
 {default = \code{1}}
 %
 \cmdarg{iter}{+int}
@@ -321,17 +323,21 @@ some typical use-case examples.
 %
 \cmdarg{thin}{+int}
 {Period between saved samples after warm up}
-{default = \code{max(1, floor(iter - warmup) / 1000)}}
+{default = \code{max(1, (iter - warmup) / 1000)}}
 %
 \cmdarg{refresh}{+int}
 {Period between samples updating progress report print}
 {default = \code{max(1, iter / 200)}}
 %
-\cmdflag{unit\_mass\_matrix}
-{Use unit mass matrix for \NUTS; see related parameter \code{epsilon}}
-{\NUTS default is to estimate a diagonal mass matrix}%
-\footnote{Estimating a diagonal mass matrix is equivalent to 
-estimating a stepsize for each parameter.}
+\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; see
+  related parameter \code{epsilon}} {\NUTS default is to estimate 
+  step sizes that vary by parameter}%
+\footnote{\Stan's implementation of \NUTS follows the approach in
+  \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
+  different step sizes for each parameter.  Varying step sizes are
+  acceptable for \HMC even though they vary the time scale of each
+  parameter and thus depart from the Hamiltonian interpretation of the
+  trajectory.}
 %
 \cmdarg{leapfrog\_steps}{int}
 {Number of leapfrog steps; \code{-1} for No-U-Turn adaptation}
@@ -346,8 +352,12 @@ estimating a stepsize for each parameter.}
 {default = \code{-1}}
 %
 \cmdarg{epsilon}{[0,1]}
-{Sample epsilon \code{+/- epsilon * epsilon\_pm}; see related parameter \code{unit\_mass\_matrix}}
+{Sample epsilon uniformly from the interval 
+\\
+\code{(epsilon - epsilon\_pm,\ epsilon + epsilon\_pm)}}
 {default = \code{0.0}}
+
+
 %
 \cmdarg{delta}{+float}
 {Initial step size for step-size adaptation}
@@ -380,7 +390,7 @@ following table summarizes.
 \\[8pt]
 \NUTS & \Verb|--epsilon=e|
 \\
-\NUTS + tuned step size & \Verb|--diagonal_mass_matrix|
+\NUTS + tuned step size & \Verb|--equal_step_sizes|
 \\
 \NUTS + tuned varying step sizes & (default configuration)
 \end{tabular}
@@ -499,6 +509,16 @@ equivalent to the following.
 y <- structure(c(1,2,3,4,5,6), .Dim = 2:3)
 \end{verbatim}
 \end{quote}
+%
+Similarly, the values may also be written with colon notation.  Thus
+the following is equivalent to the last two variable definitions.
+%
+\begin{quote}
+\begin{verbatim}
+y <- structure(1:6, .Dim = 2:3)
+\end{verbatim}
+\end{quote}
+
 
 
 \section{Integer- and Real-Valued Variables}
@@ -608,6 +628,47 @@ structure(c(1,2,3,
 Because there are no decimal points in the values, the resulting dump
 file may be used for three-dimensional array variables declared as
 \code{int} or \code{real}.
+
+\section{BNF Grammar for Dump Data}
+
+A more precise definition of the dump data format is provided
+by the following (mildly templated) Backus-Naur form grammar.
+
+{\small 
+\begin{verbatim}
+ definitions ::= definition+
+
+ definition ::= name ("->" | '=') value optional_semicolon
+
+ name ::= char* 
+        | ''' char* ''' 
+        | '"' char* '"'
+
+ value ::= value<int> | value<double>
+
+ value<T> ::= T 
+            | seq<T>
+            | 'struct' '(' seq<T> ',' ".Dim" '=' seq<int> ')'
+
+ seq<int> ::= int ':' int
+            | cseq<int>
+
+ seq<real> ::= cseq<real>
+
+ cseq<T> ::= 'c' '(' vseq<T> ')'
+
+ vseq<T> ::= T
+           | T ',' vseq<T>
+\end{verbatim}
+}
+\noindent
+The template parameters \code{T} will be set to either \code{int} or
+\code{real}.  Because \Stan allows promotion of integer values to real
+values, an integer sequence specification in the dump data format may
+be assigned to either an integer- or real-based variable in \Stan.
+
+
+
 
 
 
