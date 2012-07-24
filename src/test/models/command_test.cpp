@@ -33,7 +33,7 @@ enum cl_options {
   max_treedepth,
   epsilon,
   epsilon_pm,
-  unit_mass_matrix,
+  equal_step_sizes,
   delta,
   gamma_opt,
   options_count   // should be last. will hold the number of tested options
@@ -76,7 +76,7 @@ public:
     expected_help_options.push_back("max_treedepth");
     expected_help_options.push_back("epsilon");
     expected_help_options.push_back("epsilon_pm");
-    expected_help_options.push_back("unit_mass_matrix");
+    expected_help_options.push_back("equal_step_sizes");
     expected_help_options.push_back("delta");
     expected_help_options.push_back("gamma");
     expected_help_options.push_back("test_grad");
@@ -91,7 +91,7 @@ public:
     expected_output.push_back(make_pair("iter", "2000"));
     expected_output.push_back(make_pair("warmup", "1000"));
     expected_output.push_back(make_pair("thin", "1 (default)"));
-    expected_output.push_back(make_pair("unit_mass_matrix", "0"));
+    expected_output.push_back(make_pair("equal_step_sizes", "0"));
     expected_output.push_back(make_pair("leapfrog_steps", "-1"));
     expected_output.push_back(make_pair("max_treedepth", "10"));
     expected_output.push_back(make_pair("epsilon", "-1"));
@@ -181,10 +181,10 @@ public:
     output_changes [epsilon_pm] = make_pair("",
                                             "0.5");
     
-    option_name[unit_mass_matrix] = "unit_mass_matrix";
-    command_changes[unit_mass_matrix] = make_pair("",
-                                                  " --unit_mass_matrix");
-    output_changes [unit_mass_matrix] = make_pair("",
+    option_name[equal_step_sizes] = "equal_step_sizes";
+    command_changes[equal_step_sizes] = make_pair("",
+                                                  " --equal_step_sizes");
+    output_changes [equal_step_sizes] = make_pair("",
                                                   "1");
 
     option_name[delta] = "delta";
