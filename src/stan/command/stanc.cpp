@@ -128,8 +128,8 @@ int main(int argc, const char* argv[]) {
       return PARSE_FAIL_RC;
     }
 
-  } catch(const std::exception& e) {
-    std::cerr << std::endl
+  } catch (const std::exception& e) {
+    std::cout << std::endl
               << "ERROR PARSING"
               << std::endl
               << e.what()
