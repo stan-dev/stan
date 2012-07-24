@@ -13,7 +13,7 @@ setClass(Class = "stanmodel",
 
 setMethod("show", "stanmodel",
           function(object) {
-            cat("Stanmodel: ", object@model.name, " code as:\n" ,sep = '') 
+            cat("Stanmodel: `", object@model.name, "' coded as follows:\n" ,sep = '') 
             cat(object@model.code, "\n")
           }) 
 

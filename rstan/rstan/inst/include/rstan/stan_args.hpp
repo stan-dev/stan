@@ -62,7 +62,7 @@ namespace rstan {
    * <li> epsilon
    * <li> max_treedepth 
    * <li> epsilon_pm
-   * <li> unit_mass_matrix (bool)
+   * <li> equal_step_sizes (bool)
    * <li> delta 
    * <li> gamma 
    * <li> random_seed 
@@ -93,7 +93,7 @@ namespace rstan {
     double epsilon; 
     int max_treedepth; 
     double epsilon_pm; 
-    bool unit_mass_matrix;  // default: false 
+    bool equal_step_sizes;  // default: false 
     double delta; 
     double gamma; 
     int random_seed; 
@@ -174,9 +174,9 @@ namespace rstan {
       if (idx == args_names.size())  max_treedepth = 10; 
       else max_treedepth = Rcpp::as<int>(in[idx]); 
 
-      idx = find_index(args_names, std::string("unit_mass_matrix")); 
-      if (idx == args_names.size()) unit_mass_matrix = false; 
-      else unit_mass_matrix = Rcpp::as<bool>(in[idx]); 
+      idx = find_index(args_names, std::string("equal_step_sizes")); 
+      if (idx == args_names.size()) equal_step_sizes = false; 
+      else equal_step_sizes = Rcpp::as<bool>(in[idx]); 
      
       idx = find_index(args_names, std::string("delta")); 
       if (idx == args_names.size())  delta = 0.5;
@@ -245,7 +245,7 @@ namespace rstan {
       lst["gamma"] = gamma;                     // 9 
       lst["random_seed"] = random_seed;         // 10
       lst["chain_id"] = chain_id;               // 11
-      lst["unit_mass_matrix"] = unit_mass_matrix; // 12
+      lst["equal_step_sizes"] = equal_step_sizes; // 12
       lst["init.t"] = init;                     // 13
       lst["init.v"] = init_list;                // 14 
       lst["sampler"] = sampler; 
@@ -324,8 +324,8 @@ namespace rstan {
     unsigned int get_chain_id() const {
       return chain_id; 
     } 
-    bool get_unit_mass_matrix() const {
-      return unit_mass_matrix; 
+    bool get_equal_step_sizes() const {
+      return equal_step_sizes; 
     } 
     void write_args_as_comment(std::ostream& ostream) const { 
       // write_comment(ostream);
@@ -341,7 +341,7 @@ namespace rstan {
       write_comment_property(ostream,"leapfrog_steps",leapfrog_steps);
       write_comment_property(ostream,"max_treedepth",max_treedepth);
       write_comment_property(ostream,"epsilon",epsilon);
-      write_comment_property(ostream,"unit_mass_matrix",unit_mass_matrix); 
+      write_comment_property(ostream,"equal_step_sizes",equal_step_sizes); 
       write_comment_property(ostream,"epsilon_pm",epsilon_pm);
       write_comment_property(ostream,"delta",delta);
       write_comment_property(ostream,"gamma",gamma);

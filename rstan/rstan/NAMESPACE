@@ -2,6 +2,7 @@ useDynLib(rstan)
 # exportPattern("^[[:alpha:]]+")
 
 importFrom("graphics", plot)
+importFrom("Matrix", summary)
 
 export (
   stan.model,

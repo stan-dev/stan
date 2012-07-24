@@ -33,7 +33,7 @@
   \item{data}{An object of class \code{"list"} or \code{"environment"}
     providing the data for the model.}    
 
-  \item{pars}{A vector of character string specifying parameters of interests; defaults
+  \item{pars}{A vector of character string specifying parameters of interest; defaults
     to \code{NA} indicating all parameters in the model. Only parameters in \code{pars}
     are stored in the fitted results.}
 
@@ -79,14 +79,14 @@
       \item \code{"epsilon"}, \code{double}
       \item \code{"gamma"}, \code{double} 
       \item \code{"delta"}, \code{double}
-      \item \code{"unit_mass_matrix"}, \code{TRUE} or \code{FALSE} 
+      \item \code{"equal_step_sizes"}, \code{TRUE} or \code{FALSE} 
       \item \code{"max_treedepth"}, \code{integer}  
     }
 
     More details could be 
     found in Stan's manual. Note that by default, 
     \code{"leapfrog_steps"} is \code{-1} and 
-    \code{"unit_mass_matrix"} is \code{FALSE} so that
+    \code{"equal_step_sizes"} is \code{FALSE} so that
     NUTS2 sampler is called, which is the default sampler.  
 
     In addition, \code{refresh} (integer) could be used to
