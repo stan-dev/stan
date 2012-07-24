@@ -8,10 +8,10 @@ rstan.libs.path_fun <- function() {
 }
 
 # Using RcppEigen 
-# eigen.path <- system.file('include', package = 'RcppEigen')
+eigen.path <- system.file('include', package = 'RcppEigen')
 
 # If included in RStan 
-eigen.path <- paste0(rstan.inc.path, '/stanlib/eigen_3.1.0') 
+# eigen.path <- paste0(rstan.inc.path, '/stanlib/eigen_3.1.0') 
 
 PKG_CPPFLAGS_env <- paste0(' -I"', paste0(rstan.inc.path, '/stansrc" '), 
                            ' -I"', paste0(eigen.path, '" '), 

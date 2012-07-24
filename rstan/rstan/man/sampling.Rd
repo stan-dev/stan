@@ -33,7 +33,7 @@
   \item{data}{An object of class \code{"list"} or \code{"environment"}
     providing the data for the model.}    
 
-  \item{pars}{A vector of character string specifying parameters of interests; defaults
+  \item{pars}{A vector of character string specifying parameters of interest; defaults
     to \code{NA} indicating all parameters in the model. Only parameters in \code{pars}
     are stored in the fitted results.}
 

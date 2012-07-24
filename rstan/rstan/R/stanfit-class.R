@@ -17,7 +17,7 @@ setClass(Class = "stanfit",
 
 setMethod("show", "stanfit",
           function(object) { 
-            cat("Stan fit: ", object@model.name, " with ", 
+            cat("Stanfit of model: `", object@model.name, "' with ", 
                 object@sim$n.chains, " chains.\n", sep = '')  
           })  
 
@@ -36,7 +36,7 @@ setMethod("print", signature = (x = "stanfit"),
           function(x, pars, 
                    probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
                    digits.summary = 3, ...) { 
-            if (missing(pars)) pars <- x@model.pars
+            if (missing(pars)) pars <- x@sim$pars.oi 
             s <- summary(x, pars, probs, ...)  
             cat("Inference for Stan model: ", x@model.name, '.\n', sep = '')
             cat(x@sim$n.chains, " chains: each with n.iter=", x@sim$n.iter, 
@@ -215,14 +215,13 @@ setMethod("summary", signature = (object = "stanfit"),
             pars <- if (missing(pars)) object@sim$pars.oi else check.pars(object@sim, pars) 
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
-
             m <- match(probs, c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975))  
             if (any(is.na(m))) {
               ss <-  summary.sim(object@sim, pars, probs) 
               row.idx <- attr(ss, "row.major.idx") 
-              ss2 <- list(summary = ss$summary[row.major.idx, ], 
-                          c.summary = ss$c.summary[row.major.idx, , ])
-              return(ss2) 
+              ss2 <- list(summary = ss$summary[row.idx, ], 
+                          c.summary = ss$c.summary[row.idx, , ])
+              return(invisible(ss2)) 
             }
 
             if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 

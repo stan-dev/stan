@@ -491,7 +491,7 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
   #   names: all the parameters names specifying the sequence of parameters 
   #   dims:  the dimensions for all parameters 
   #   fnames: all the parameter names specified by names and dims 
-  #   pars:  the parameters of interests. This function assumes that
+  #   pars:  the parameters of interest. This function assumes that
   #     pars are in names.   
   # Note: inside each parameter (vector or array), the sequence is in terms of
   #   col-major. That means if we have parameter alpha and beta, the dims
@@ -605,7 +605,7 @@ get.par.summary <- function(sim, n, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.7
 summary.sim <- function(sim, pars, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
   # cat("summary.sim is called.\n")
   probs.str <- probs2str(probs)
-  pars <- if (missing(pars)) sim$pars.oi else check.pars(object, pars) 
+  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
   tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
@@ -631,7 +631,7 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
   # 
   # Args:
   #   sim: the sim list in stanfit object
-  #   pars: parameters of interests
+  #   pars: parameters of interest
   #   display.parallel
 
   alert.col <- get.rstan.options("rstan.alert.col")

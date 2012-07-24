@@ -22,14 +22,14 @@ n.iter <- 520
 # s4 <- sampler$call_sampler(list(iter = n.iter, thin = 1, sample_file = "8schools4.csv", seed = 3, chain_id = 1))
 
 # HMC
-ss1 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, leapfrog_steps = 5, refresh = -1)  
+ss1 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, leapfrog_steps = 5, refresh = 100)  
 
 # NUTS 1 
-ss2 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, unit_mass_matrix = TRUE, refresh = -1) 
+ss2 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, unit_mass_matrix = TRUE, refresh = 100) 
 
 # NUTS 2 
-ss3 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, unit_mass_matrix = TRUE, refresh = -1) 
+ss3 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, unit_mass_matrix = TRUE, refresh = 100) 
 
-print(ss) 
-plot(ss)
-traceplot(ss)
+print(ss1) 
+plot(ss1)
+traceplot(ss1)

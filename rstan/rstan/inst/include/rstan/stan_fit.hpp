@@ -520,7 +520,7 @@ namespace rstan {
     const std::vector<std::vector<unsigned int> > dims_; 
     const unsigned int num_params_; 
 
-    std::vector<std::string> names_oi_; // parameters of interests 
+    std::vector<std::string> names_oi_; // parameters of interest 
     std::vector<std::vector<unsigned int> > dims_oi_; 
     std::vector<size_t> names_oi_tidx_;  // the total indexes of names2.
     std::vector<unsigned int> starts_oi_;  
@@ -644,7 +644,7 @@ namespace rstan {
 
     /**
      * tidx (total indexes) 
-     * the index is among those parameters of interests, not 
+     * the index is among those parameters of interest, not 
      * all the parameters. 
      */ 
     SEXP param_oi_tidx(SEXP pars) {
