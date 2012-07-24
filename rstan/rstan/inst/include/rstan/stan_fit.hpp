@@ -361,7 +361,7 @@ namespace rstan {
       double epsilon = args.get_epsilon(); 
       bool epsilon_adapt = (epsilon <= 0.0); 
 
-      bool unit_mass_matrix = args.get_unit_mass_matrix();
+      bool equal_step_sizes = args.get_equal_step_sizes();
 
       int max_treedepth = args.get_max_treedepth(); 
 
@@ -434,7 +434,7 @@ namespace rstan {
         args.write_args_as_comment(sample_stream); 
       } 
 
-      if (0 > leapfrog_steps && !unit_mass_matrix) {
+      if (0 > leapfrog_steps && !equal_step_sizes) {
         // NUTS II (with diagonal mass matrix estimation during warmup)
         args.set_sampler("NUTS2"); 
         stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
@@ -449,6 +449,7 @@ namespace rstan {
           nuts2_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
+        nuts2_sampler.set_error_stream(rstan::io::rcerr); 
 
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
@@ -456,7 +457,7 @@ namespace rstan {
                     model,chains,iter_save,qoi_idx); 
 
   
-      } else if (0 > leapfrog_steps && unit_mass_matrix) {
+      } else if (0 > leapfrog_steps && equal_step_sizes) {
         // NUTS I (unit mass matrix)
         args.set_sampler("NUTS1"); 
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
@@ -471,7 +472,7 @@ namespace rstan {
           nuts_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
-
+        nuts_sampler.set_error_stream(rstan::io::rcerr); 
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
@@ -491,7 +492,7 @@ namespace rstan {
           hmc_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
-
+        hmc_sampler.set_error_stream(rstan::io::rcerr); 
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,

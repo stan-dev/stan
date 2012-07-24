@@ -79,14 +79,14 @@
       \item \code{"epsilon"}, \code{double}
       \item \code{"gamma"}, \code{double} 
       \item \code{"delta"}, \code{double}
-      \item \code{"unit_mass_matrix"}, \code{TRUE} or \code{FALSE} 
+      \item \code{"equal_step_sizes"}, \code{TRUE} or \code{FALSE} 
       \item \code{"max_treedepth"}, \code{integer}  
     }
 
     More details could be 
     found in Stan's manual. Note that by default, 
     \code{"leapfrog_steps"} is \code{-1} and 
-    \code{"unit_mass_matrix"} is \code{FALSE} so that
+    \code{"equal_step_sizes"} is \code{FALSE} so that
     NUTS2 sampler is called, which is the default sampler.  
 
     In addition, \code{refresh} (integer) could be used to
