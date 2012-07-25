@@ -4,6 +4,7 @@
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix.hpp>
 
 namespace stan {
 
@@ -65,23 +66,56 @@ namespace stan {
     typedef T type;
   };
   template <typename T>
-  struct is_vector <std::vector<T> > {
+  struct is_vector<const T> {
+    enum { value = is_vector<T>::value };
+    typedef T type;
+  };
+  template <typename T>
+  struct is_vector<std::vector<T> > {
     enum { value = 1 };
     typedef T type;
   };
   template <typename T>
-  struct is_vector <const std::vector<T> > {
+  struct is_vector<Eigen::Matrix<T,Eigen::Dynamic,1> > {
     enum { value = 1 };
     typedef T type;
   };
+  template <typename T>
+  struct is_vector<Eigen::Matrix<T,1,Eigen::Dynamic> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+  
+  // Matt's original version
+  // size_t length(const T& x) { 
+  //   if (is_vector<T>::value)
+  //     return ((std::vector<typename is_vector<T>::type>*)&x)->size();
+  //   else
+  //     return 1;
+  // }
 
+  // FIXME: not a trait, move to meta
+
+  // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
-  size_t length(const T& x) { 
-    if (is_vector<T>::value)
-      return ((std::vector<typename is_vector<T>::type>*)&x)->size();
-    else
-      return 1;
+  size_t length(const T& x) {
+    return 1;
   }
+  template <typename T>
+  size_t length(const std::vector<T>& x) {
+    return x.size();
+  }
+  template <typename T>
+  size_t length(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    return v.size();
+  }
+  template <typename T>
+  size_t length(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
+    return rv.size();
+  }
+
+
+  
 
   template <typename T1, typename T2, typename T3>
   size_t max_size(const T1& x1, const T2& x2, const T3& x3) {
@@ -95,6 +129,9 @@ namespace stan {
   }
 
   // AmbiguousVector is the simple VectorView for writing doubles into
+  // should work for Eigen vectors and std::vector
+  // FIXME:  used only with T= double, so could just fix it.
+  // FIXME:  rename -- "Ambiguous" is not the right word here
   template <typename T, bool is_vec = 0>
   class AmbiguousVector {
   private:
@@ -128,28 +165,6 @@ namespace stan {
     }
   };
 
-  template<typename T>
-  class VectorView<std::vector<T>, true> {
-  private:
-    std::vector<T>& x_;
-  public:
-    VectorView(std::vector<T>& x) : x_(x) { }
-    T& operator[](int i) { 
-      return x_[i];
-    }
-  };
-
-  template<typename T>
-  class VectorView<const std::vector<T>, true> {
-  private:
-    const std::vector<T>& x_;
-  public:
-    VectorView(const std::vector<T>& x) : x_(x) { }
-    const T& operator[](int i) const { 
-      return x_[i];
-    }
-  };
-
   template<typename T, bool is_vec>
   class VectorView<T*, is_vec> {
   private:
@@ -163,6 +178,70 @@ namespace stan {
         return *x_;
     }
   };
+
+  template<typename T>
+  class VectorView<std::vector<T>, true> {
+  private:
+    std::vector<T>& x_;
+  public:
+    VectorView(std::vector<T>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+  template<typename T>
+  class VectorView<const std::vector<T>, true> {
+  private:
+    const std::vector<T>& x_;
+  public:
+    VectorView(const std::vector<T>& x) : x_(x) { }
+    const T& operator[](int i) const { 
+      return x_[i];
+    }
+  };
+
+  template<typename T>
+  class VectorView<Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
+  private:
+    Eigen::Matrix<T,Eigen::Dynamic,1>& x_;
+  public:
+    VectorView(Eigen::Matrix<T,Eigen::Dynamic,1>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+  template<typename T>
+  class VectorView<const Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
+  private:
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& x_;
+  public:
+    VectorView(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) : x_(x) { }
+    const T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+
+  template<typename T>
+  class VectorView<Eigen::Matrix<T,1,Eigen::Dynamic>, true> {
+  private:
+    Eigen::Matrix<T,1,Eigen::Dynamic>& x_;
+  public:
+    VectorView(Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+  template<typename T>
+  class VectorView<const Eigen::Matrix<T,1,Eigen::Dynamic>, true> {
+  private:
+    const Eigen::Matrix<T,1,Eigen::Dynamic>& x_;
+  public:
+    VectorView(const Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
+    const T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+
 
   /**
    * Metaprogram to calculate the base scalar return type resulting
