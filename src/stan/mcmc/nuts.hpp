@@ -105,8 +105,8 @@ namespace stan {
           _maxdepth(maxdepth),
           _lastdepth(-1)
       {
-	// start at 10 * epsilon because NUTS cheaper for larger epsilon
-	this->adaptation_init(10.0);
+        // start at 10 * epsilon because NUTS cheaper for larger epsilon
+        this->adaptation_init(10.0);
       }
 
       /**
@@ -282,7 +282,8 @@ namespace stan {
           mminus = m;
           // FIXME:  lepfrog needs +/- this->_epsilon_pm
           newlogp = leapfrog(this->_model, this->_z, xminus, mminus, gradminus,
-                             direction * this->_epsilon_last);
+                             direction * this->_epsilon_last,
+                             this->_error_msgs);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;

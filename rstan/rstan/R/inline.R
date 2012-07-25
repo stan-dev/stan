@@ -8,10 +8,10 @@ rstan.libs.path_fun <- function() {
 }
 
 # Using RcppEigen 
-# eigen.path <- system.file('include', package = 'RcppEigen')
+eigen.path <- system.file('include', package = 'RcppEigen')
 
 # If included in RStan 
-eigen.path <- paste0(rstan.inc.path, '/stanlib/eigen_3.1.0') 
+# eigen.path <- paste0(rstan.inc.path, '/stanlib/eigen_3.1.0') 
 
 PKG_CPPFLAGS_env <- paste0(' -I"', paste0(rstan.inc.path, '/stansrc" '), 
                            ' -I"', paste0(eigen.path, '" '), 
@@ -19,11 +19,16 @@ PKG_CPPFLAGS_env <- paste0(' -I"', paste0(rstan.inc.path, '/stansrc" '),
                            ' -I"', paste0(rstan.inc.path, '/stanlib/boost_1.50.0" '), 
                            ' -I"', rstan.inc.path, '"')
 
+static.linking <- function() {
+  # return(Rcpp:::staticLinking());
+  ## not following Rcpp's link, we only have either dynamic version or static
+  ## version because the libraries are big. 
+  ## (In Rcpp, both versions are compiled.) 
+  return(.Platform$OS.type == 'windows')
+} 
 
 RSTAN_LIBS_fun <- function() {
-  static <- Rcpp:::staticLinking()
-  ## currently following Rcpp's link mechanism, which 
-  ## is not necessarily good in our case. 
+  static <- static.linking()
   rstan.libs.path <- rstan.libs.path_fun()
   if (static) {
     paste0('"', rstan.libs.path, '/libstan.a', '"')
@@ -45,7 +50,7 @@ rstanplugin <- function() {
                   PKG_CPPFLAGS = paste(Rcpp_plugin$env$PKG_CPPFLAGS, PKG_CPPFLAGS_env)))  
 } 
 
-# registerPlugin("rstan", rstanplugin); 
+# registerPlugin("rstan", rstanplugin)
 
 inlineCxxPlugin <- function(...) {
   settings <- rstanplugin()  

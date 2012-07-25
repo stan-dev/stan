@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <complex>
-#include <Eigen/FFT>
+#include <unsupported/Eigen/FFT>
 
 #include <stan/math/matrix.hpp>
 
@@ -23,9 +23,9 @@ namespace stan {
      *
      * <p>An FFT engine can be created for reuse for type double with:
      * 
-     * <blockquote><pre>
+     * <pre>
      *     Eigen::FFT<double> fft;
-     * </pre></blockquote>
+     * </pre>
      *
      * @tparam T Scalar type.
      * @param y Input sequence.
@@ -51,7 +51,7 @@ namespace stan {
       centered_signal.insert(centered_signal.end(),N,0.0);
       T mean = stan::math::mean(y);
       for (size_t i = 0; i < N; i++)
-	centered_signal[i] -= mean;
+        centered_signal[i] -= mean;
       
       fft.fwd(freqvec,centered_signal);
       for (size_t i = 0; i < Nt2; ++i)
@@ -73,11 +73,11 @@ namespace stan {
       fft.inv(mask_correction_factors, freqvec);
 
       for (size_t i = 0; i < N; ++i) {
-	ac[i] /= mask_correction_factors[i];
+        ac[i] /= mask_correction_factors[i];
       }
       T var = ac[0];      
       for (size_t i = 0; i < N; ++i)
-	ac[i] /= var;
+        ac[i] /= var;
     }
 
     /**

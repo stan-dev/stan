@@ -40,7 +40,7 @@ namespace rstan {
      */
    
     template <class T>
-    size_t find_index(std::vector<T> v, const T& e) {
+    size_t find_index(const std::vector<T>& v, const T& e) {
       return std::distance(v.begin(), std::find(v.begin(), v.end(), e));  
     } 
   } 
@@ -62,7 +62,7 @@ namespace rstan {
    * <li> epsilon
    * <li> max_treedepth 
    * <li> epsilon_pm
-   * <li> unit_mass_matrix (bool)
+   * <li> equal_step_sizes (bool)
    * <li> delta 
    * <li> gamma 
    * <li> random_seed 
@@ -83,16 +83,17 @@ namespace rstan {
   class stan_args {
   private:
     bool sample_file_flag; // true: write out to a file; false, do not 
-    std::string sample_file; // the file for outputting the samples 
-    unsigned int iter;   // number of iterations 
-    unsigned int warmup; // number of warmup 
+    std::string sample_file; // the file for outputting the samples    // 1
+    unsigned int iter;   // number of iterations                       // 2 
+    unsigned int warmup; // number of warmup                          
     unsigned int thin; 
+    unsigned int iter_save; // number of iterations saved 
     int refresh;  // < 0, no output 
     int leapfrog_steps; 
     double epsilon; 
     int max_treedepth; 
     double epsilon_pm; 
-    bool unit_mass_matrix;  // default: false 
+    bool equal_step_sizes;  // default: false 
     double delta; 
     double gamma; 
     int random_seed; 
@@ -103,6 +104,7 @@ namespace rstan {
     bool test_grad; 
     std::string init; 
     SEXP init_list;  
+    std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
 
   public:
    
@@ -153,6 +155,9 @@ namespace rstan {
       if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1U;
       else thin = Rcpp::as<unsigned int>(in[idx]); 
 
+      iter_save = 1 + (iter - 1) / thin; 
+      // starting from 0, iterations of 0, thin, 2 * thin, .... are saved. 
+
       idx = find_index(args_names, std::string("leapfrog_steps"));
       if (idx == args_names.size()) leapfrog_steps = -1; 
       else leapfrog_steps = Rcpp::as<int>(in[idx]); 
@@ -169,9 +174,9 @@ namespace rstan {
       if (idx == args_names.size())  max_treedepth = 10; 
       else max_treedepth = Rcpp::as<int>(in[idx]); 
 
-      idx = find_index(args_names, std::string("unit_mass_matrix")); 
-      if (idx == args_names.size()) unit_mass_matrix = false; 
-      else unit_mass_matrix = Rcpp::as<bool>(in[idx]); 
+      idx = find_index(args_names, std::string("equal_step_sizes")); 
+      if (idx == args_names.size()) equal_step_sizes = false; 
+      else equal_step_sizes = Rcpp::as<bool>(in[idx]); 
      
       idx = find_index(args_names, std::string("delta")); 
       if (idx == args_names.size())  delta = 0.5;
@@ -182,9 +187,8 @@ namespace rstan {
       else gamma = Rcpp::as<double>(in[idx]); 
       
       idx = find_index(args_names, std::string("refresh")); 
-      if (idx == args_names.size())  refresh = 1; 
+      if (idx == args_names.size())  refresh = std::max(iter / 20, 1U); 
       else refresh = Rcpp::as<int>(in[idx]); 
-
 
       idx = find_index(args_names, std::string("seed")); 
       if (idx == args_names.size()) {
@@ -192,7 +196,7 @@ namespace rstan {
         random_seed_src = "random"; 
       } else {
         random_seed = Rcpp::as<unsigned int>(in[idx]); 
-        random_seed_src = "user"; 
+        random_seed_src = "user or from R"; 
       }
 
       idx = find_index(args_names, std::string("chain_id")); 
@@ -241,13 +245,18 @@ namespace rstan {
       lst["gamma"] = gamma;                     // 9 
       lst["random_seed"] = random_seed;         // 10
       lst["chain_id"] = chain_id;               // 11
-      lst["init.t"] = init;                     // 12
-      lst["init.v"] = init_list;                // 13 
+      lst["equal_step_sizes"] = equal_step_sizes; // 12
+      lst["init.t"] = init;                     // 13
+      lst["init.v"] = init_list;                // 14 
+      lst["sampler"] = sampler; 
       return lst; 
     } 
 
     void set_random_seed(unsigned int seed) {
       random_seed = seed;
+    } 
+    void set_sampler(std::string s) {
+      sampler = s; 
     } 
     const std::string& get_random_seed_src() const {
       return random_seed_src; 
@@ -277,6 +286,11 @@ namespace rstan {
     unsigned int get_thin() const {
       return thin;
     } 
+    
+    unsigned int get_iter_save() const { 
+      return iter_save; 
+    } 
+
     int get_leapfrog_steps() const {
       return leapfrog_steps; 
     } 
@@ -310,8 +324,8 @@ namespace rstan {
     unsigned int get_chain_id() const {
       return chain_id; 
     } 
-    bool get_unit_mass_matrix() const {
-      return unit_mass_matrix; 
+    bool get_equal_step_sizes() const {
+      return equal_step_sizes; 
     } 
     void write_args_as_comment(std::ostream& ostream) const { 
       // write_comment(ostream);
@@ -327,7 +341,7 @@ namespace rstan {
       write_comment_property(ostream,"leapfrog_steps",leapfrog_steps);
       write_comment_property(ostream,"max_treedepth",max_treedepth);
       write_comment_property(ostream,"epsilon",epsilon);
-      write_comment_property(ostream,"unit_mass_matrix",unit_mass_matrix); 
+      write_comment_property(ostream,"equal_step_sizes",equal_step_sizes); 
       write_comment_property(ostream,"epsilon_pm",epsilon_pm);
       write_comment_property(ostream,"delta",delta);
       write_comment_property(ostream,"gamma",gamma);

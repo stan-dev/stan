@@ -14,7 +14,7 @@
 
 \usage{
   stan.model(file, verbose = FALSE, model.name = "anon_model", 
-             model.code = "", stan.home)
+             model.code = "")
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -33,10 +33,6 @@
 
   \item{model.code}{A character string to specify the model instead of using
     argument file. 
-  }
-
-  \item{stan.home}{A character string given where Stan is installed. Note that 
-    it is not used for the time being. 
   }
 }
 

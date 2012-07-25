@@ -4,7 +4,7 @@ stanc <- function(model.code, model.name = "anon_model", verbose = FALSE) {
   SUCCESS_RC <- 0 
   EXCEPTION_RC <- -1
   PARSE_FAIL_RC <- -2 
-  r <- .Call("stanc", model.code, model.name, PACKAGE = "rstan");
+  r <- .Call("stanc", model.code, model.name, PACKAGE = "rstan")
   if (is.null(r)) {
     stop(paste("Failed to run stanc for model '", model.name, 
                "' and no error message provided", sep = '')) 

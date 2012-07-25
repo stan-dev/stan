@@ -1,23 +1,14 @@
 STAN_HOME = ../../../../..
-PGM = alli#
+PGM = alli2#
 CXX = g++  
 CXX = clang++ 
+CPPFLAGS = -I $(STAN_HOME)/lib/boost_1.50.0 -I$(STAN_HOME)/lib/eigen_3.1.0 -I$(STAN_HOME)/lib/eigen_3.1.0/unsupported  -I $(STAN_HOME)/src
+LIBFLAGS = -L$(STAN_HOME)/bin -lstan 
 
-.PHONY : one two 
-
-
-two : 
-	$(STAN_HOME)/bin/stanc --name=$(PGM)2  $(PGM)2.stan 
-	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)2.cpp -o $(PGM)2
-	./$(PGM)2 --data=$(PGM)2.Rdata --samples=samples.csv 
-
-one : 
-	$(STAN_HOME)/bin/stanc --name=$(PGM)1  $(PGM)1.stan 
-	$(CXX) -O3 -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM)1.cpp -o $(PGM)1
-	./$(PGM)1 --data=$(PGM).Rdata --samples=samples1.csv 
-
-.PHONY : clean 
+$(PGM) : 
+	$(STAN_HOME)/bin/stanc --name=$(PGM)  $(PGM).stan 
+	$(CXX) -O3 -DNDEBUG $(CPPFLAGS)  $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
+	./$(PGM) --data=$(PGM).Rdata --samples=samples.csv 
 
 clean :
-	rm $(PGM)1.cpp samples1.csv $(PGM)1 
-	rm $(PGM)2.cpp samples2.csv $(PGM)2
+	rm -f $(PGM).cpp samples.csv $(PGM) 

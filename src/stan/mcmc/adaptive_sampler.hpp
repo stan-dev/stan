@@ -24,6 +24,7 @@ namespace stan {
       int _n_adapt_steps;
       unsigned int _nfevals;
       double _mean_stat;
+      std::ostream* _error_msgs;
 
     public:
 
@@ -32,19 +33,41 @@ namespace stan {
        * status.
        *
        * @param adapt Initial adaptation status.
+       * @param error_msgs Pointer to output stream for error
+       * messages.
        */
-      adaptive_sampler(bool adapt)
+      adaptive_sampler(bool adapt,
+                       std::ostream* error_msgs = 0)
         : _adapt(adapt), 
           _n_steps(0), 
           _n_adapt_steps(0), 
           _nfevals(0),
-          _mean_stat(0) {
+          _mean_stat(0),
+          _error_msgs(error_msgs) {
       }
 
       /**
        * Destructor.
        */
       virtual ~adaptive_sampler() { 
+      }
+
+      /**
+       * Set the stream into which errors will be written
+       * as the sampler runs.  
+       *
+       * @param error_msgs Stream to which error messages are written.
+       */
+      void set_error_stream(std::ostream& error_msgs) {
+        _error_msgs = &error_msgs;
+      }
+
+      /**
+       * Unset the stream into which errors are written to 0 so
+       * that error messages are ignored.
+       */
+      void unset_error_stream() {
+        _error_msgs = 0;
       }
 
       /**
@@ -211,7 +234,7 @@ namespace stan {
        * Write out any sampler-specific parameters for output.
        *
        * This method must
-       * match<code>write_sampler_param_names(std::ostream&)</code> in
+       * match <code>write_sampler_param_names()</code> in
        * terms of number of parameters written.
        *
        * Params should be writte starting with a comma, then
@@ -230,7 +253,7 @@ namespace stan {
        * the output.  
        *
        * These should be written as one or more comment lines,
-       * each starting with a \code{#} character.
+       * each starting with a pound (<code>#</code>) character.
        *
        * @param o Output stream to which adaptation information is written.
        */
@@ -240,9 +263,9 @@ namespace stan {
       /**
        * Write out any sampler-specific parameter names for output.
        *
-       * This method must
-       * match<code>write_sampler_params(std::ostream&)</code> in
-       * terms of number of parameters written.
+       * This method must match
+       * <code>write_sampler_params()</code> in terms of
+       * number of parameters written.
        *
        * Params should be writte starting with a comma, then the first
        * parameter, then a comma, then the second parameter, ending on

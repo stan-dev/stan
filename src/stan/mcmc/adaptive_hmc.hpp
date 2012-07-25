@@ -71,7 +71,7 @@ namespace stan {
        * theoretical justification.
        * @param gamma Regularization parameter. See 
        * <code>stan::mcmc::DualAverage</code>.
-       * @param base_rng Seed for random number generator; optional, if not
+       * @param rand_int Seed for random number generator; optional, if not
        * specified, generate new seen based on system time.
        */
       adaptive_hmc(stan::model::prob_grad& model,
@@ -91,7 +91,7 @@ namespace stan {
                             rand_int),
           _L(L)
       {
-	this->adaptation_init(1.0);  // target is just epsilon
+        this->adaptation_init(1.0);  // target is just epsilon
       }
 
       /**
@@ -140,7 +140,8 @@ namespace stan {
         }
         this->_epsilon_last = epsilon;
         for (unsigned int l = 0; l < _L; ++l)
-          logp_new = leapfrog(this->_model, this->_z, x_new, m, g_new, epsilon);
+          logp_new = leapfrog(this->_model, this->_z, x_new, m, g_new, epsilon,
+                              this->_error_msgs);
         this->nfevals_plus_eq(_L);
 
         double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;

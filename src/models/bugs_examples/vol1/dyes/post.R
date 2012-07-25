@@ -1,6 +1,6 @@
 library(coda) 
 library(BUGSExamples)
-post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#') 
+post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#')[,-(1:3)]
 summary(as.mcmc(post)) 
 
 ex <- list(name = "Dyes", parameters = c("theta", "sigma2.with", "sigma2.btw"),

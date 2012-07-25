@@ -585,7 +585,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_constrain(const T x, const TU ub, T& lp) {
-      lp -= x;
+      lp += x;
       return ub - exp(x);
     }
 

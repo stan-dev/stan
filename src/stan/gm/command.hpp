@@ -103,9 +103,9 @@ namespace stan {
                         "Sample epsilon +/- epsilon * epsilon_pm",
                         "default = 0.0");
 
-      print_help_option("unit_mass_matrix","",
-                        "Use unit mass matrix for NUTS",
-                        "default is to estimate a diagonal mass matrix during warmup");
+      print_help_option("equal_step_sizes","",
+                        "Use same step size for every parameter with NUTS",
+                        "default is to estimate varying step sizes during warmup");
       
       print_help_option("delta","+float",
                         "Initial step size for step-size adaptation",
@@ -247,7 +247,7 @@ namespace stan {
 
       bool epsilon_adapt = epsilon <= 0.0;
 
-      bool unit_mass_matrix = command.has_flag("unit_mass_matrix");
+      bool equal_step_sizes = command.has_flag("equal_step_sizes");
 
       double delta = 0.5;
       command.val("delta", delta);
@@ -295,8 +295,8 @@ namespace stan {
       typedef boost::ecuyer1988 rng_t;
       rng_t base_rng(random_seed);
       // (2**50 = 1T samples, 1000 chains)
-      static boost::uintmax_t DISCARD_STRIDE = 1;
-      DISCARD_STRIDE <<= 50;
+      static boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 50;
+      // DISCARD_STRIDE <<= 50;
       base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
       
       std::vector<int> params_i;
@@ -391,7 +391,7 @@ namespace stan {
                 << (user_supplied_thin ? " (user supplied)" : " (default)")
                 << std::endl;
 
-      std::cout << "unit_mass_matrix = " << unit_mass_matrix << std::endl;
+      std::cout << "equal_step_sizes = " << equal_step_sizes << std::endl;
       std::cout << "leapfrog_steps = " << leapfrog_steps << std::endl;
       std::cout << "max_treedepth = " << max_treedepth << std::endl;;
       std::cout << "epsilon = " << epsilon << std::endl;;
@@ -420,7 +420,7 @@ namespace stan {
       write_comment_property(sample_stream,"iter",num_iterations);
       write_comment_property(sample_stream,"warmup",num_warmup);
       write_comment_property(sample_stream,"thin",num_thin);
-      write_comment_property(sample_stream,"unit_mass_matrix",unit_mass_matrix);
+      write_comment_property(sample_stream,"equal_step_sizes",equal_step_sizes);
       write_comment_property(sample_stream,"leapfrog_steps",leapfrog_steps);
       write_comment_property(sample_stream,"max_treedepth",max_treedepth);
       write_comment_property(sample_stream,"epsilon",epsilon);
@@ -429,8 +429,8 @@ namespace stan {
       write_comment_property(sample_stream,"gamma",gamma);
       write_comment(sample_stream);
 
-      if (leapfrog_steps < 0 && !unit_mass_matrix) {
-        // NUTS II (with diagonal mass matrix estimation during warmup)
+      if (leapfrog_steps < 0 && !equal_step_sizes) {
+        // NUTS II (with varying step size estimation during warmup)
         stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
@@ -443,21 +443,23 @@ namespace stan {
           nuts2_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
+        nuts2_sampler.set_error_stream(std::cout);
 
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,params_r,params_i,
                     model);
 
-      } else if (leapfrog_steps < 0 && unit_mass_matrix) {
+      } else if (leapfrog_steps < 0 && equal_step_sizes) {
 
-        // NUTS I (unit mass matrix)
+        // NUTS I (equal step sizes)
         stan::mcmc::nuts<rng_t> nuts_sampler(model, 
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
                                              base_rng);
 
+        nuts_sampler.set_error_stream(std::cout);
           // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -479,6 +481,7 @@ namespace stan {
                                                     delta, gamma,
                                                     base_rng);
 
+        hmc_sampler.set_error_stream(std::cout);
         // cut & paste (see above) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first

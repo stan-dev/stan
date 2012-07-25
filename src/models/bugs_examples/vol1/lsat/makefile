@@ -1,8 +1,10 @@
 STAN_HOME = ../../../../..
+CPPFLAGS = -I $(STAN_HOME)/lib/boost_1.50.0 -I$(STAN_HOME)/lib/eigen_3.1.0 -I$(STAN_HOME)/lib/eigen_3.1.0/unsupported  -I $(STAN_HOME)/src
+LIBFLAGS = -L$(STAN_HOME)/bin -lstan 
 
 lsat :
 	$(STAN_HOME)/bin/stanc --name=lsat lsat.stan 
-	g++ -O0  -DNDEBUG -I $(STAN_HOME)/lib -I $(STAN_HOME)/src lsat.cpp -o lsat
+	g++ -O0  -DNDEBUG $(CPPFLAGS) lsat.cpp -o lsat $(LIBFLAGS)
 	./lsat --data=lsat.Rdata
 
 clean :

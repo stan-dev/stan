@@ -37,23 +37,26 @@ namespace stan {
     double leapfrog(stan::model::prob_grad& model, 
                     std::vector<int> z,
                     std::vector<double>& x, std::vector<double>& m,
-                    std::vector<double>& g, double epsilon) {
+                    std::vector<double>& g, double epsilon,
+                    std::ostream* error_msgs = 0) {
       stan::math::scaled_add(m, g, 0.5 * epsilon);
       stan::math::scaled_add(x, m, epsilon);
       double logp;
       try {
         logp = model.grad_log_prob(x, z, g);
       } catch (std::domain_error e) {
+        if (error_msgs) {
         // FIXME: remove output
-        std::cerr << std::endl
-                  << "****************************************" 
-                  << "****************************************" 
-                  << std::endl
-                  << "Error in model.grad_log_prob:" 
-                  << std::endl
-                  << boost::diagnostic_information(e)
-                  << std::endl
-                  << std::endl;
+          *error_msgs << std::endl
+                      << "****************************************" 
+                      << "****************************************" 
+                      << std::endl
+                      << "Error in model.grad_log_prob:" 
+                      << std::endl
+                      << boost::diagnostic_information(e)
+                      << std::endl
+                      << std::endl;
+        }
         logp = -std::numeric_limits<double>::infinity();
       }
       stan::math::scaled_add(m, g, 0.5 * epsilon);
@@ -67,7 +70,8 @@ namespace stan {
                              std::vector<int> z, 
                              const std::vector<double>& step_sizes,
                              std::vector<double>& x, std::vector<double>& m,
-                             std::vector<double>& g, double epsilon) {
+                             std::vector<double>& g, double epsilon,
+                             std::ostream* error_msgs = 0) {
       for (size_t i = 0; i < m.size(); i++)
         m[i] += 0.5 * epsilon * step_sizes[i] * g[i];
       for (size_t i = 0; i < x.size(); i++)
@@ -76,16 +80,18 @@ namespace stan {
       try {
         logp = model.grad_log_prob(x, z, g);
       } catch (std::domain_error e) {
-        // FIXME: remove output
-        std::cerr << std::endl
-                  << "****************************************" 
-                  << "****************************************" 
-                  << std::endl
-                  << "Error in model.grad_log_prob:" 
-                  << std::endl
-                  << boost::diagnostic_information(e)
-                  << std::endl
-                  << std::endl;
+        if (error_msgs) {
+          // FIXME: remove output
+          *error_msgs << std::endl
+                      << "****************************************" 
+                      << "****************************************" 
+                      << std::endl
+                      << "Error in model.grad_log_prob:" 
+                      << std::endl
+                      << boost::diagnostic_information(e)
+                      << std::endl
+                      << std::endl;
+        }
         logp = -std::numeric_limits<double>::infinity();
       }
       for (size_t i = 0; i < m.size(); i++)

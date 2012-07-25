@@ -67,7 +67,7 @@ more general technique described in the next section.
 In some situations, such as when a multivariate probability function
 has partially observed outcomes or parameters, it will be necessary to
 create a vector mixing known (data) and unknown (parameter) values.
-This can be done directly in \Stan by creating a vector or array in the
+This can be done in \Stan by creating a vector or array in the
 \code{transformed parameter} block and assigning to it.
 
 The following example involves a bivariate covariance matrix in which the
@@ -171,10 +171,10 @@ location parameters; these could be given priors in the model.
 
 \subsection{Unknown Truncation Points}
 
-Nothing prevents the truncation points from being estimated as
+If the truncation points are unknown, they may be estimated as
 parameters.  This can be done with a slight rearrangement of the
-variable declarations from the model in the previous section with known
-truncation points.
+variable declarations from the model in the previous section with
+known truncation points.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -201,10 +201,10 @@ Here there is a lower truncation point \code{L} which is declared to
 be less than or equal to the minimum value of \code{y}.  The upper
 truncation point \code{U} is declared to be larger than the maximum
 value of \code{y}.  This declaration, although dependent on the data,
-only enforces the constraint that the data fall within the
-truncation bounds.  With the constraint that there is at least one
-data point \code{y[n]}, the constraint that \code{L} is less than
-\code{U} is enforced indirectly.
+only enforces the constraint that the data fall within the truncation
+bounds.  With \code{N} declared as type \code{int(1,)}, there must be
+at least one data point.  The constraint that \code{L} is less than
+\code{U} is enforced indirectly, based on the non-empty data.
 
 The ellipses where the priors for the bounds \code{L} and \code{U}
 should go should be filled in with a an informative prior in
@@ -266,9 +266,10 @@ probability of
 \[
 \mbox{Pr}[y > U] 
 = \int_U^{\infty} \distro{Normal}(y|\mu,\sigma) \, dy
-= 1 - \Phi\left(\frac{y - \mu}{\sigma}\right).
+= 1 - \Phi\left(\frac{y - \mu}{\sigma}\right),
 \]
 %
+where $\Phi()$ is the unit normal cumulative distribution function.
 With $M$ censored observations, the total probability on the log scale
 is
 \[
@@ -276,10 +277,15 @@ is
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
 = M \, \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)
 \]
-
 % 
-This can be implemented directly in \Stan using the cumulative normal
-distribution function \code{normal\_p}.  The following model assumes
+Although \Stan implements $\Phi$ with the function $\code{Phi}$, \Stan
+also provides the cumulative distribution function \code{normal\_p},
+defined byma
+\[
+\code{normal\_p}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
+\]
+%
+The following model assumes
 that the censoring point is known, so it is declared as data.
 %
 \begin{quote}
@@ -303,7 +309,7 @@ model {
 \end{quote}
 %
 For the observed values in \Verb|y_obs|, the normal sampling model is
-used directly (without truncation).  The log probability accumulator
+used without truncation.  The log probability accumulator
 \Verb|lp__| is directly incremented using the calculated log
 cumulative normal probability of the censored data items.  The
 built-in function \code{log1m} is used, which maps $x$ to $\log (1 -
@@ -321,7 +327,7 @@ block to the parameters block.
 Mixture models of an outcome assume that the outcome is drawn from one
 of several distributions, the identity of which is controlled by a
 categorical mixing distribution. Mixture models typically have
-multimodal densities with modes around the modes of the mixture
+multimodal densities with modes near the modes of the mixture
 components.  Mixture models may be parameterized in several ways,
 as described in the following sections.
 
@@ -349,8 +355,9 @@ y_n \sim \distro{Normal}(\mu_{z[n]},\sigma_{z[n]}).
 \]
 %
 This model is not directly supported by \Stan because it involves
-discrete parameters $z_n$, but it may be implemented as described in
-the next section.
+discrete parameters $z_n$, but \Stan can sample $\mu$ and $\sigma$ 
+by summing out the $z$ parameter as described in the next section.
+
 
 \section{Summing out the Responsibility Parameter}
 
@@ -616,13 +623,14 @@ typically written as
 \Phi(x) = \int_{-\infty}^x \distro{Normal}(y|0,1) \, dy.
 \]
 %
-The cumulative unit normal distribution function $\Phi$ is also known
-as the error function and written as \code{erf(x)}.  The probit
-regression model may be coded in \Stan as follows.
+The cumulative unit normal distribution function $\Phi$ is implemented
+in \Stan as the function \code{Phi}.  The probit regression model
+may be coded in \Stan by replacing the logistic model's sampling
+statement witht he following.
 %
 \begin{quote}
 \begin{Verbatim}
-        y[n] ~ bernoulli(erf(alpha + beta * x[n]));
+        y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
 \end{Verbatim}
 \end{quote}
 
@@ -632,7 +640,7 @@ Multiple outcome forms of logistic regression can be coded directly in
 \Stan.  For instance, suppose there are $K$ possible outcomes for each
 output variable $y_n$.  Also suppose that there is a $D$-dimensional
 vector $x_n$ of predictors for $y_n$.  The multi-logit model with
-improper flat priors on the coefficients is coded as follows.
+$\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -718,7 +726,14 @@ model {
 \end{quote}
 % 
 The vector of cutpoints \code{c} is declared as \code{ordered(K-1)},
-which guarantees that \code{c[k]} is less than \code{c[k+1]}.
+which guarantees that \code{c[k]} is less than \code{c[k+1]}. 
+
+If the cutpoints were assigned independent priors, the constraint
+effectively truncates the joint prior to support over points that
+satisfy the ordering constraint.  Luckily, \Stan does not need to
+compute the effect of the constraint on the normalizing term because
+the probability is only needed up to a proportion.
+
 
 \subsubsection{Ordered Probit}
 
@@ -743,21 +758,21 @@ model {
   for (n in 1:N) {
       real eta;
       eta <- x[n] * beta;
-      theta[1] = 1 - erf(eta - c(1));
+      theta[1] = 1 - Phi(eta - c(1));
       for (k in 2:(K-1))
-          theta[k] = erf(eta - c(k-1)) - erf(eta - c(k));
-      theta[K] = erf(eta - c(K-1));
+          theta[k] = Phi(eta - c(k-1)) - erf(eta - c(k));
+      theta[K] = Phi(eta - c(K-1));
       y[n] ~ categorical(theta);
   }
 }
 \end{Verbatim}
 \end{quote}
 %
-The logistic model could also be coded this way by replacing \code{erf}
-with \code{inv\_logit}, though the built-in encoding is more efficient
-and more numerically stable.  A small efficiency gain could be
-achieved by computing the values \code{1 - erf(eta - c(d))} once and
-storing them for re-use.
+The logistic model could also be coded this way by replacing
+\code{Phi} with \code{inv\_logit}, though the built-in encoding based
+on the softmax transform is more efficient and more numerically
+stable.  A small efficiency gain could be achieved by computing the
+values \code{1 - Phi(eta - c(d))} once and storing them for re-use.
 
 \section{Hierarchical Logistic Regression}
 
@@ -777,9 +792,10 @@ an associated predictor vector $x_n \in \reals^D$.  Each level $l$
 gets its own coefficient vector $\beta_l \in \reals^D$.  The
 hierarchical structure involves drawing the coefficients $\beta_{l,d}
 \in \reals$ from a prior that is also estimated with the data.  This
-hierarchically estimated prior determines the amount of pooling; if
-the data in each level are very similar, the pooling will be strong,
-but if it is very dissimilar, the pooling will be weak.
+hierarchically estimated prior determines the amount of pooling.  If
+the data in each level are very similar, strong pooling will be
+reflected in low hierarchical variance.  If the data in the levels are
+dissimilar, weaker pooling will be reflected in higher hierarchical variance.
 
 The following model encodes a hierarchical logistic regression model
 with a hierarchical prior on the regression coefficients.
@@ -848,7 +864,7 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The first observed data point, \code{y[n]}, is not modeled here.  
+The first observed data point, \code{y[1]}, is not modeled here.  
 
 \subsection{Extensions to the Model} 
 
@@ -973,7 +989,7 @@ program rather than being set.  This is because the transform involved
 for the bounded variable \code{y} of type \code{real(-1,1)} implicitly
 adds a term to \code{lp\_\_} to adjust the log probability for the
 transform (adding the log absolute derivative of the inverse
-transform).
+transform, a scaled inverse logit).
 
 The constrained type \code{real(-1,1)} declared for \code{y} is
 critical for correct sampling behavior.  If the constraint on \code{y}
@@ -1000,18 +1016,205 @@ sample properly.%
 %
 \footnote{The problem is the (extremely!) light tails of the triangle
   distribution.  The standard \HMC and \NUTS samplers cannot get into the
-  corners of the triangle properly.  Because the actual code declares
+  corners of the triangle properly.  Because the \Stan code declares
   \code{y} to be of type \code{real(-1,1)}, the inverse logit
   transform is applied to the unconstrained variable and its log
   absolute derivative added to the log probability.  The resulting
   distribution on the logit-transformed \code{y} is well behaved.  See
-  \refchapter{variable-transforms} for more information on the actual
-  transforms used.}
+  \refchapter{variable-transforms} for more information on the
+  transforms used by \Stan.}
 
 
 
 \chapter{Optimizing \Stan Code}\label{optimization.chapter}
 \noindent
+This chapter provides a grab bag of techniques for optimizating \Stan
+code, including vectorization, sufficient statistics, and conjugacy.
+
+\section{Vectorization}
+
+\subsection{Gradient Bottleneck}
+
+\Stan spends the vast majority of its time computing the gradient of
+the log probability function, making gradients the obvious target for
+optimization.  \Stan's gradient calculations with algorithmic
+differentiation require a template expression to be allocated%
+%
+\footnote{\Stan uses its own arena-based allocation, so the time is
+not as bad as it would be with a raw call to \code{new}.}
+%
+and constructed for each subexpression of a \Stan program involving
+parameters or transformed parameters.  This section defines
+optimization strategies based on vectorizing these subexpressions to
+reduce the work done during algorithmic differentiation.
+
+\subsection{Vectorization through Matrix Operations}
+
+The following program directly encodes a linear regression with fixed
+unit noise using a two-dimensional array \code{x} of predictors, an
+array \code{y} of outcomes, and an array \code{beta} of regression
+coefficients.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int(1,) K;
+    int(1,) N;
+    real x[K,N];
+    real y[N];
+    ...
+parameters {
+    real beta[K];
+    ...
+}
+model {
+    for (n in 1:N) {
+        real gamma;  gamma <- 0.0;
+        for (k in 1:K)
+            gamma <- gamma + x[n,k] * beta[k];
+        y[n] ~ normal(gamma,1);
+    }
+}
+\end{Verbatim}
+\end{quote}
+%
+The following model computes the same log probability function as the
+previous model, even supporting the same input files for data and
+initialization.
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+    ...
+    vector(K) x[N];
+    real y[N];
+    ...
+parameters {
+    vector(K) beta;
+    ...
+}
+model {
+    for (n in 1:N)
+        y[n] ~ normal(dot_product(x[n],beta), 1);
+}
+\end{Verbatim}
+\end{quote}
+%
+Although it produces equivalent results, the dot product should not be
+replaced with a transpose and multiply, as in
+%
+\begin{quote}
+\begin{Verbatim} 
+        y[n] ~ normal(x[n]' * beta, 1);
+\end{Verbatim}
+\end{quote}
+%
+The problem is that the transposition creates an intermediate result
+for the expression \code{beta'}.%
+%
+\footnote{\Stan cannot exploit the expression templates in the Eigen
+  matrix library because of the inability to multiply vectors of
+  algorithmic differentiation variables with vectors of scalars, as
+  would be required for \code{beta' * x[n]}.}
+%
+This problem with transposition could itself be mitigated somewhat by
+reordering the product and pulling the transposition out of the loop,
+as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+...
+transformed parameters {
+    row_vector beta_t;    beta_t <- beta';
+}
+model {
+    for (n in 1:N)
+        y[n] ~ normal(beta_t * x[n], 1);
+}
+\end{Verbatim}
+\end{quote}
+%
+The problem with transposition could be completely solved by directly
+encoding either the \code{x} or \code{n} as row vectors, as in the
+following example.
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+    ...
+    row_vector(K) x[N];
+    real y[N];
+    ...
+parameters {
+    vector(K) beta;
+    ...
+}
+model {
+    for (n in 1:N)
+        y[n] ~ normal(x[n] * beta), 1);
+}
+\end{Verbatim}
+\end{quote}
+%
+Declaring the data as a matrix and then computing all the predictors
+at once using matrix multiplication is more efficient still, as in the
+following example.
+%
+\begin{quote}
+\begin{Verbatim}  
+data {
+    ...
+    matrix(N,K) x;
+    real y[N];
+    ... 
+parameters {
+    vector(K) beta;
+    ...
+} 
+transformed parameters {
+    vector(N) gamma;
+    gamma <- x * beta;
+} 
+model {
+    for (n in 1:N)
+        y[n] ~ normal(gamma[n], 1);
+}
+\end{Verbatim}
+\end{quote}
+% 
+% \subsection{Vectorized Probability Functions}
+% The final and most efficient version replaces the loops and
+% transformed parameters by using the vectorized form of the normal
+% probability function, as in the following example.
+% %
+% \begin{quote}
+% \begin{Verbatim} 
+% data {
+%     ...
+%     matrix(N,K) x;
+%     vector(N) y;
+%     ...
+% parameters {
+%     vector(K) beta;
+%     ...
+% }
+% model {
+%     y ~ normal(x * beta, 1);
+% }
+% \end{Verbatim}
+% \end{quote}
+% %
+% The variables are all declared as either matrix or vector types.
+% The result of the matrix-vector multiplication \code{x * beta} in the
+% model block is a vector of the same length as \code{y}.  
+
+% The probability function documentation in \refpart{} indicates which
+% of \Stan's probability functions support vectorization.  Vectorized
+% probability functions accept either vector or scalar inputs for all
+% arguments, with the only restriction being that all vector arguments
+% are the same dimensionality.  In the example above, \code{y} is a
+% vector of size \code{N}, \code{x * beta} is a vector of size \code{N},
+% and \code{1} is a scalar.
 
 \section{Exploiting Sufficient Statistics}
 

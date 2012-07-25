@@ -1,11 +1,10 @@
 library(coda)
 post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#') 
 
-beginwith <- function(vstr, patterns, sort = TRUE) {
+beginwith <- function(vstr, patterns) { 
   patterns <- paste(patterns, ".*", sep = ''); 
   a <- lapply(patterns, FUN = function(p) {grep(p, vstr)}) 
-  if (!sort)  return(do.call("c", a)) 
-  sort(do.call("c", a))
+  do.call("c", a)
 } 
 
 

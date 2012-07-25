@@ -3,11 +3,8 @@
 
 library(coda) 
 post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#'); 
-
 NT <- 17
-
-dL0 <- post[, 1 + (1:NT)]; 
-beta <- post[, 1]; 
+beta <- post[, "beta"]  
 
 S_treat <- matrix(0, ncol = NT, nrow = nrow(post))
 S_placebo <- matrix(0, ncol = NT, nrow = nrow(post))

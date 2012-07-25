@@ -116,8 +116,10 @@ namespace stan {
                                                  num_index_dims);
 
         if (lhs_type.is_ill_formed()) {
-          error_msgs << "ill-formed lhs of assignment"
-                     << std::endl;
+          error_msgs << "too many indexes for variable " 
+                     << "; variable name = " << name
+                     << "; num dimensions given = " << num_index_dims
+                     << "; variable array dimensions = " << lhs_var_num_dims;
           return false;
         }
         if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {

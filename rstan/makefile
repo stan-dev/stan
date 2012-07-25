@@ -17,19 +17,19 @@ ifeq ($(uname_S), Linux)
 endif
 
 ifeq ($(OS), win)
-  LINKCMD1 = @cmd /c mklink /J ".^\rstan^\inst^\include^\stanlib"  "..^\lib"
-  LINKCMD2 = @cmd /c mklink /J ".^\rstan^\inst^\include^\stansrc"  "..^\src"
+  LINKCMD1 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stanlib"  "..^\..^\..^\..^\lib"
+  LINKCMD2 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stansrc"  "..^\..^\..^\..^\src"
 else
   LINKCMD1 = ln -s ../../../../lib ./rstan/inst/include/stanlib
   LINKCMD2 = ln -s ../../../../src ./rstan/inst/include/stansrc
 endif
   
-RSTANVER := $(shell echo `Rscript -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])"`)
+RSTANVER := $(shell Rscript -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])")
 STANPKG := rstan_$(RSTANVER).tar.gz 
 
 build $(STANPKG): ./rstan/DESCRIPTION 
-	@rm -f "./rstan/inst/include/stanlib"
-	@rm -f "./rstan/inst/include/stansrc"
+	@rm -rf "./rstan/inst/include/stanlib"
+	@rm -rf "./rstan/inst/include/stansrc"
 	$(LINKCMD1)
 	$(LINKCMD2)
 	@rm -f $(STANPKG) 
@@ -39,6 +39,7 @@ check: $(STANPKG)
 	R CMD check --as-cran $(STANPKG) 
 
 install: $(STANPKG) 
+	# R CMD INSTALL --no-multiarch $(STANPKG) 
 	R CMD INSTALL $(STANPKG) 
 
 clean: 

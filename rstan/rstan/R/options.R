@@ -10,18 +10,24 @@
   # assign("plot.kept.col", 20, e)
   assign("plot.chains.cols", 1:10, e)
 
+  tmat <- matrix(c(254, 237, 222, 
+                   253, 208, 162, 
+                   253, 174, 107, 
+                   253, 141, 60, 
+                   230, 85, 13, 
+                   166, 54, 3), 
+                 byrow = TRUE, ncol = 3)
+
+  rhat.cols <- rgb(tmat, alpha = 150, names = paste(1:nrow(tmat)),
+                   maxColorValue = 255)
+
   assign("plot.rhat.breaks", c(1.1, 1.2, 1.5, 2), e)
-  assign("plot.rhat.cols", c("black", "black", "blue", "green", "red"), e)
+  assign("plot.rhat.cols", rhat.cols, e)
 
   # when R-hat is NA, NaN, or Inf
-  assign("plot.rhat.na.col", "red", e)
+  assign("plot.rhat.na.col", rhat.cols[6] , e)
   # when R-hat is large than max(rhat.breaks) 
-  assign("plot.rhat.large.col", "red", e)
-
-  # how many plots (traceplot and plots) for 
-  # each page 
-  assign("plot.nrow", 4, e) 
-  assign("plot.ncol", 1, e) 
+  assign("plot.rhat.large.col", rhat.cols[6], e)
 
   # for plot(stanfit)
   # the color for indicating the median of 
@@ -30,6 +36,14 @@
   assign("plot.chain.median.cols", 
          c("green", "red", "yellow", "blue", "brown", "purple",
            "chocolate", "cyan", "coral"), e)
+
+  # color for indicating or important info. 
+  # for example, the color of star and text saying
+  # the variable is truncated in stan.plot.inferences
+  assign("rstan.alert.col", rgb(230, 85, 13, maxColorValue = 255), e)
+
+  # color for plot chains in trace plot and stan.plot.inferences 
+  assign("rstan.chain.cols", rstancolc, e)
 
   # cat(".init.rstan.opt.env called.\n")
   invisible(e)
@@ -68,7 +82,7 @@ rstan.options <- function(...) {
     return(e) 
   a.names <- names(a) 
   lapply(1:len, FUN = function(i) assign(a.names[i], a[[i]], e)) 
-  invisible(e)
+  invisible(as.list(e))
 } 
 
 ## test code 

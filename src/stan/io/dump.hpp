@@ -579,8 +579,23 @@ namespace stan {
 
       bool scan_struct_value() {
         if (!scan_char('(')) return false;
-        if (!scan_char('c')) return false;
-        scan_seq_value();
+        if (scan_char('c')) { 
+          scan_seq_value();
+        } else {
+          size_t start;
+          in_ >> start;
+          if (!scan_char(':'))
+            return false;
+          size_t end;
+          in_ >> end;
+          if (start <= end) {
+            for (int i = start; i <= end; ++i)
+              stack_i_.push_back(i);
+          } else {
+            for (int i = start; i >= end; --i)
+              stack_i_.push_back(i);
+          }
+        } 
         dims_.clear();
         if (!scan_char(',')) return false;
         if (!scan_char('.')) return false;

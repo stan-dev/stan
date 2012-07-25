@@ -88,7 +88,7 @@ TEST(prob_transform, ub) {
 TEST(prob_transform, ub_j) {
   double lp = 15.0;
   EXPECT_FLOAT_EQ(2.0 - exp(-1.0), stan::prob::ub_constrain(-1.0,2.0,lp));
-  EXPECT_FLOAT_EQ(15.0 + 1.0, lp);
+  EXPECT_FLOAT_EQ(15.0 - 1.0, lp);
 }
 TEST(prob_transform, ub_f) {
   double y = 2.0;

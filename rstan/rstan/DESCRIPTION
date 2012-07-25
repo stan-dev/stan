@@ -7,11 +7,8 @@ Author: Who wrote it
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: R interface to Stan 
 License: file LICENSE
-Depends: methods, Rcpp (>= 0.9.10), inline
-# Depends: methods, Rcpp (>= 0.9.10), inline, RcppEigen (>= 0.2.0)
+Depends: methods, Rcpp (>= 0.9.10), inline, RcppEigen(>= 0.3.0), Matrix
 LinkingTo: Rcpp
-# LinkingTo: Rcp, RcppEigen
-Imports: graphics  
-Suggests: ggplot2, grid, RUnit, gridExtra
+Imports: graphics, Matrix  
+Suggests: RUnit
 URL: https://code.google.com/p/stan/
-# RcppModules: yada
