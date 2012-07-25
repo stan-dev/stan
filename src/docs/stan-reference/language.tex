@@ -14,9 +14,12 @@ blocks in more detail.
 
 The first step of execution is to read data into memory.  
 For the \Stan model executable, data is read from a file in the dump
-format (see \refchapter{dump}); for calls from \R, variables may be
-read from file or directly from \R's memory.
-
+format (see \refchapter{dump}).%
+%
+\footnote{The \Cpp code underlying \Stan is flexible enough to allow
+  data to be read from memory or file.  Calls from \R, for instance,
+  can be configured to read data from file or directly from \R's
+  memory.}
 All of the variables declared in the \code{data} block will be read.
 If a variable cannot be read, the program will halt with a message
 indicating which data variable is missing.
@@ -44,11 +47,10 @@ displayed.
 \subsection{Initialization}
 
 If there are user-supplied initial values for parameters, these are
-read using the same input source as data reads (file for the \Stan
-model executable or \R's memory when called from \R).  Any constraints
-declared on the parameters are validated for the initial values.  If a
-variable's value violates its declared constraint, the program halts
-and a diagnostic message is printed.
+read using the same input mechanism and same file format as data
+reads.  Any constraints declared on the parameters are validated for
+the initial values.  If a variable's value violates its declared
+constraint, the program halts and a diagnostic message is printed.
 
 After being read, initial values are transformed to unconstrained
 values that will be used to initialize the sampler. 
@@ -72,20 +74,16 @@ steps.
 
 For each leapfrog step, the negative log probability function and its
 gradient need to be evaluated at the position corresponding to the
-current parameter values (a more
-detailed sketch is provided in the next section).  The first
-evaluation is used to update the momentum a half step size based on
-the gradient.  Then the position (that is, parameter values) are
-updated a full step based on the momentum.  Finally, the second
-evaluation of the log probabilty and gradient are used to update the
-momentum another half step.
+current parameter values (a more detailed sketch is provided in the
+next section).  These are used to update the momentum based on the
+gradient and the position based on the momentum.
 
 For simple models, only a few leapfrog steps with large step sizes are
 needed.  For models with complex posterior geometries, many small
 leapfrog steps may be needed to accurately model the path of the
 parameters.
 
-If the user specifies the number of leapfrog steps (i.e., chosen to
+If the user specifies the number of leapfrog steps (i.e., chooses to
 use standard \HMC), that number of leapfrog steps are simulated.  If
 the user has not specified the number of leapfrog steps, the no-U-turn
 sampler (\NUTS) will determine the number of leapfrog steps adaptively
