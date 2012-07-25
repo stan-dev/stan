@@ -206,7 +206,7 @@ template<class Derived>
 stan::mcmc::chains<> *Model_Test_Fixture<Derived>::chains;
 
 template<class Derived>
-size_t Model_Test_Fixture<Derived>::num_chains = 2;
+size_t Model_Test_Fixture<Derived>::num_chains = 4;
 
 template<class Derived>
 std::string Model_Test_Fixture<Derived>::model_path;
@@ -302,8 +302,8 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
 
 
-    // that 2.0 is there to make the test fail less often.
-    if (fabs(expected_mean - sample_mean) > z*se * 2.0) {
+    // that 5.0 is there to make the test fail less often.
+    if (fabs(expected_mean - sample_mean) > z*se * 5.0) {
       failed++;
       // want the error message to have which, what, how
       err_message << "parameter index: " << index
@@ -314,8 +314,8 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
                   << "\n\tse:          " << setw(10) << se
-                  << "\n\n\tfabs(diff) > z * se: " 
-                  << fabs(expected_mean - sample_mean) << " > " << z*se << "\n\n";
+                  << "\n\n\tfabs(diff) > z * se * 5.0: " 
+                  << fabs(expected_mean - sample_mean) << " > " << z*se * 5.0 << "\n\n";
     }
   }
   

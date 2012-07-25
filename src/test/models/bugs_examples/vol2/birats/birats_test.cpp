@@ -25,7 +25,7 @@ public:
   }
 
   static size_t num_iterations() {
-    return iterations;
+    return 8000U;
   }
 
   static std::vector<size_t> skip_chains_test() {
