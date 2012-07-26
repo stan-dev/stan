@@ -14,7 +14,7 @@
 
 \usage{
   stan.model(file, verbose = FALSE, model.name = "anon_model", 
-             model.code = "")
+             model.code = "", boost.lib = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -34,6 +34,9 @@
   \item{model.code}{A character string to specify the model instead of using
     argument file. 
   }
+  \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}. 
+    If specified, this path would be used instead for boost library header files for compiling 
+    the model in C++ language.}
 }
 
 \details{

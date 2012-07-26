@@ -56,11 +56,10 @@
   } 
 
   '
-  rr <- stan.model(model.code = stanmodelcode, model.name = "normal1", 
-                   verbose = TRUE) 
-
   y <- rnorm(20) 
   dat <- list(N = 20, y = y); 
-  s <- sampling(rr, data = dat, n.iter = 2012, n.chains = 3, sample.file = 'norm1.csv')
-  print(summary(s)) 
+  fit <- stan(model.code = stanmodelcode, model.name = "example", 
+              data = dat, n.iter = 2012, n.chains = 3, sample.file = 'norm.csv',
+              verbose = TRUE) 
+  print(fit)
 } 

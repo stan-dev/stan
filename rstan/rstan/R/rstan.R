@@ -4,7 +4,8 @@
 ## 
 stan.model <- function(file, verbose = FALSE, 
                        model.name = "anon_model", 
-                       model.code = '') { 
+                       model.code = '', 
+                       boost.lib = NULL) { 
 
   # Construct a stan model from stan code 
   # 
@@ -22,9 +23,16 @@ stan.model <- function(file, verbose = FALSE,
                r$cppcode, 
                get_Rcpp_module_def_code(model.name2), 
                sep = '')  
-  
-  fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
-                    includes = inc, plugin = "rstan", verbose = verbose) 
+
+  if (!is.null(boost.lib)) { 
+    old.boost.lib <- rstan.options(boost.lib = boost.lib) 
+    tryCatch(fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
+                               includes = inc, plugin = "rstan", verbose = verbose),
+             error = function(e) {rstan.options(boost.lib = old.boost.lib); stop(e)})
+  } else {
+    fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
+                      includes = inc, plugin = "rstan", verbose = verbose) 
+  } 
                
   mod <- Module(model.name2, getDynLib(fx)) 
   # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
@@ -73,7 +81,7 @@ stan <- function(file, model.name = "anon_model",
                  init.v = NULL, 
                  seed = sample.int(.Machine$integer.max, 1), 
                  sample.file, 
-                 verbose = FALSE, ...) {
+                 verbose = FALSE, ..., boost.lib = NULL) {
   # Return a fitted model (stanfit object)  from a stan model, data, etc.  
   # A wrap of method stan.model and sampling of class stanmodel. 
   # 
@@ -83,7 +91,7 @@ stan <- function(file, model.name = "anon_model",
   #   A S4 class stanfit object  
  
   if (missing(sample.file))  sample.file <- NA 
-  sm <- stan.model(file, verbose = verbose, model.name, model.code)
+  sm <- stan.model(file, verbose = verbose, model.name, model.code, boost.lib)
   sampling(sm, data, pars, n.chains, n.iter, n.warmup, n.thin, seed, init.t, init.v, 
            sample.file = sample.file, verbose = verbose, ...) 
 } 

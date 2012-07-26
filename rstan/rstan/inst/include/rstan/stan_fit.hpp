@@ -289,7 +289,7 @@ namespace rstan {
   
       sampler.set_params(params_r,params_i);
       int it_print_width = std::ceil(std::log10(num_iterations));
-      rstan::io::rcout << std::endl;
+      // rstan::io::rcout << std::endl;
   
       // rstan::io::rcout << "in sample_from." << std::endl; 
       if (epsilon_adapt)
@@ -334,6 +334,9 @@ namespace rstan {
           model.write_csv(params_r,params_i,sample_file_stream);
         }
       }
+      if (refresh > 0) 
+        rstan::io::rcout << std::endl; 
+      // rstan::io::rcout << "out of sample_from." << std::endl; 
     }
 
     /**
@@ -502,11 +505,10 @@ namespace rstan {
       if (sample_file_flag) {
         rstan::io::rcout << std::endl << "Samples of chain " 
                          << chain_id 
-                         << " are written to file " << sample_file;
-
+                         << " are written to file " << sample_file 
+                         << std::endl;
         sample_stream.close();
       }
-      rstan::io::rcout << std::endl << std::endl; 
       return 0;
     }
   } 
