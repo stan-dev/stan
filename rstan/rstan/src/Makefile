@@ -20,7 +20,8 @@ PKG_CPPFLAGS += -I"../inst/include/stanlib/boost_1.50.0"
 PKG_CPPFLAGS += -I"../inst/include" 
 
 # CXXFLAGS = -O2 -pipe -g $(LTO)
-CXXFLAGS = -Os -s -pipe $(LTO)
+# CXXFLAGS = -Os -pipe $(LTO)
+CXXFLAGS = -O3 $(LTO)
 SHLIB_LDFLAGS = $(SHLIB_CXXLDFLAGS) 
 SHLIB_LD = $(SHLIB_CXXLD)
 
