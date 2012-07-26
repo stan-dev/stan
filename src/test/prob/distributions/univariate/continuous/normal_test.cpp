@@ -1,30 +1,16 @@
-#include <test/prob/distributions/distribution_test_fixture.hpp>
+#define _LOG_PROB_ normal_log
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
+
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
 using std::vector;
 using std::numeric_limits;
-
-/*template <typename... Args>
-double log_prob(Args&&... args) {
-  return stan::prob::normal_log<false>(args...);
-  }*/
-
-
-
-template <typename T1, typename T2, typename T3, class Policy>
-double log_prob(const T1& y,
-		const T2& mu, 
-		const T3& sigma,
-		Policy&) {
-  return stan::prob::normal_log<false>(y, mu, sigma, Policy());
-}
 
 
 class ProbDistributionsNormal : public DistributionTest {
 public:
   // need this to resolve functions
-  //using DistributionTest::log_prob;
-  
 
   void valid_values(vector<vector<double> >& parameters,
 		    vector<double>& log_prob) {
