@@ -14,9 +14,12 @@ blocks in more detail.
 
 The first step of execution is to read data into memory.  
 For the \Stan model executable, data is read from a file in the dump
-format (see \refchapter{dump}); for calls from \R, variables may be
-read from file or directly from \R's memory.
-
+format (see \refchapter{dump}).%
+%
+\footnote{The \Cpp code underlying \Stan is flexible enough to allow
+  data to be read from memory or file.  Calls from \R, for instance,
+  can be configured to read data from file or directly from \R's
+  memory.}
 All of the variables declared in the \code{data} block will be read.
 If a variable cannot be read, the program will halt with a message
 indicating which data variable is missing.
@@ -44,11 +47,10 @@ displayed.
 \subsection{Initialization}
 
 If there are user-supplied initial values for parameters, these are
-read using the same input source as data reads (file for the \Stan
-model executable or \R's memory when called from \R).  Any constraints
-declared on the parameters are validated for the initial values.  If a
-variable's value violates its declared constraint, the program halts
-and a diagnostic message is printed.
+read using the same input mechanism and same file format as data
+reads.  Any constraints declared on the parameters are validated for
+the initial values.  If a variable's value violates its declared
+constraint, the program halts and a diagnostic message is printed.
 
 After being read, initial values are transformed to unconstrained
 values that will be used to initialize the sampler. 
@@ -72,20 +74,16 @@ steps.
 
 For each leapfrog step, the negative log probability function and its
 gradient need to be evaluated at the position corresponding to the
-current parameter values (a more
-detailed sketch is provided in the next section).  The first
-evaluation is used to update the momentum a half step size based on
-the gradient.  Then the position (that is, parameter values) are
-updated a full step based on the momentum.  Finally, the second
-evaluation of the log probabilty and gradient are used to update the
-momentum another half step.
+current parameter values (a more detailed sketch is provided in the
+next section).  These are used to update the momentum based on the
+gradient and the position based on the momentum.
 
 For simple models, only a few leapfrog steps with large step sizes are
 needed.  For models with complex posterior geometries, many small
 leapfrog steps may be needed to accurately model the path of the
 parameters.
 
-If the user specifies the number of leapfrog steps (i.e., chosen to
+If the user specifies the number of leapfrog steps (i.e., chooses to
 use standard \HMC), that number of leapfrog steps are simulated.  If
 the user has not specified the number of leapfrog steps, the no-U-turn
 sampler (\NUTS) will determine the number of leapfrog steps adaptively
@@ -155,8 +153,6 @@ values.  Otherwise, the sample is the current set of parameter values.
 
 For each final sample (not counting samples during warmup or samples
 that are thinned), there is an output stage of writing the samples.
-The write is to a file for the \Stan command, but will be to \R's memory
-for the \R interface.
 
 \subsection{Generated Quantities} 
 
@@ -181,8 +177,9 @@ In the executable form of a \Stan models, parameters, transformed
 parameters, and generated quantities are written to a file in
 comma-separated value (\acronym{csv}) notation with a header defining
 the names of the parameters (including indices for multivariate
-parameters).  In the \R version of \Stan, the values may either be
-written to a \acronym{csv} file or directly back to \R's memory.
+parameters).%
+\footnote{In the \R version of \Stan, the values may either be
+written to a \acronym{csv} file or directly back to \R's memory.}
 
 % PSEUDOCODE FOR STAN MODEL
 % \begin{verbatim}
@@ -227,7 +224,7 @@ The motivation for strong, static typing is threefold.
 \item Strong typing forces the programmer's intent to be declared with
   the variable, making programs easier to comprehend and hence easier
   to debug and maintain.
-\item Strong typing catches programming errors relative to the
+\item Strong typing allows programming errors relative to the
   declared intent to be caught sooner (at compile time) rather than
   later (at run time).  The \Stan compiler (see \refchapter{stanc})
   will flag any type errors and indicate the offending expressions
@@ -237,9 +234,9 @@ The motivation for strong, static typing is threefold.
   them to propagate and potentially pollute final results.
 \end{itemize}
 %
-Strong typing disallows assigning the same variable to different types
-at different points in the program or in different invocations of the
-program. 
+Strong typing disallows assigning the same variable to objects of
+different types at different points in the program or in different
+invocations of the program.
 
 \section{Overview of Data Types}
 
@@ -278,21 +275,21 @@ arithmetic.
 
 \subsection{Integers}\label{int-data-type.section}
 
-Stan uses 64-bit (8-byte) integers for all of its integer
+Stan uses 32-bit (4-byte) integers for all of its integer
 representations.  The maximum value that can be represented
-as an integer is $2^{63}-1$; the minimum value is $-(2^{63})$.
+as an integer is $2^{31}-1$; the minimum value is $-(2^{31})$.
 
-When integers overflow, their values wrap.  Thus it is up to
-the \Stan programmer to make sure the integer values in their programs
-stay in range.  In particular, every intermediate expression must have
-an integer value that is in range.
+When integers overflow, their values wrap.  Thus it is up to the \Stan
+programmer to make sure the integer values in their programs stay in
+range.  In particular, every intermediate expression must have an
+integer value that is in range.
 
 \subsection{Reals}\label{real-data-type.section}
 
 \Stan uses 64-bit (8-byte) floating point representations of real
 numbers.  \Stan roughly%
 %
-\footnote{\Stan compiles integers to \code{long int} and reals to
+\footnote{\Stan compiles integers to \code{int} and reals to
   \code{double} types in \Cpp.  Precise details of rounding will depend
   on the compiler and hardware architecture on which the code is run.}
 %
@@ -302,10 +299,10 @@ slightly larger than $\pm 10^{307}$.  It is a good idea to stay well
 away from such extreme values in \Stan models as they are prone to
 cause overflow.
 
-64-bit floating point representations have roughly 16 digits of
-accuracy.  But when they are combined, the result often has less
+64-bit floating point representations have roughly 15 decimal digits
+of accuracy.  But when they are combined, the result often has less
 accuracy.  In some cases, the difference in accuracy between two
-operands and their result is large.  
+operands and their result is large.
 
 There are three special real values used to represent (1) error
 conditions, (2) positive infinity, and (3) negative infinity.  The
@@ -322,7 +319,7 @@ integer representation.
 Unlike in \Cpp, real values are never demoted to integers.  Therefore,
 real values may only be assigned to real variables.  Integer values
 may be assigned to either integer variables or real variables.
-Interally, the integer representation is cast to a floating-point
+Internally, the integer representation is cast to a floating-point
 representation.  This operation is not without overhead and should
 thus be avoided where possible.
 
@@ -438,7 +435,7 @@ data {
  real lb;
 }
 parameters {
- real(lb,) phi;
+   real(lb,) phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -452,11 +449,11 @@ defined at the point the constraint is used.  For instance,
 \begin{quote}
 \begin{Verbatim}
 data { 
- int(1,) N;
- real y[N];
+   int(1,) N;
+   real y[N];
 }
 parameters {
- real(fmin(y),fmax(y)) phi;
+   real(fmin(y),fmax(y)) phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -480,11 +477,11 @@ structured values like vectors.
 \subsection{Indexing}
 
 Vectors and matrices, as well as arrays, are indexed starting from one
-($1$) in \Stan.  This follows the convention in statistics and linear
+in \Stan.  This follows the convention in statistics and linear
 algebra as well as their implementations in the statistical software
 packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
 languages, on the other hand, such as \Cpp and Python, index arrays
-starting from zero~($0$).
+starting from zero.
 
 
 \subsection{Unconstrained Vectors}
@@ -521,19 +518,20 @@ simplex(5) theta;
 Unit simplexes are implemented as vectors and may be assigned to other
 vectors and vice-versa.  Simplex variables, like other constrained
 variables, are validated to ensure they contain simplex values; for
-simplexes, this is only done up to $\epsilon$ to account for errors
-arising from floating-point imprecision.
+simplexes, this is only done up to a statically specified accuracy
+threshold $\epsilon$ to account for errors arising from floating-point
+imprecision.
 
 
-\subsection{Positive, Ordered Vectors}
+\subsection{Ordered Vectors}
 
-A positive ordered vector is a vector whose positive entries are
-sorted in ascending order.  For instance, $(1.0,2.7,2.71)^{\top}$ is a
-positive, ordered vector.  Positive ordered vectors are most often
-employed as cut points in ordinal logistic regression models.  
+An ordered vector type in \Stan represents a vector whose entries are
+sorted in ascending order.  For instance, $(1.0,2.7,2.71)^{\top}$ is
+an ordered vector.  Ordered vectors are most often employed as cut
+points in ordered logistic regression models (see
+\refsection{ordered-logistic}).
 
-The variable \code{c} is declared as an ordered 5-vector of positive
-values by
+The variable \code{c} is declared as an ordered 5-vector by
 %
 \begin{quote}
 \begin{Verbatim}
@@ -541,10 +539,10 @@ ordered(5) c;
 \end{Verbatim}
 \end{quote}
 %
-
-After their declaration, positive, ordered vectors, like unit
-simplexes, may be assigned to other vectors and other vectors may be
-assigned to them.  
+After their declaration, ordered vectors, like unit simplexes, may be
+assigned to other vectors and other vectors may be assigned to them.
+Constraints will be checked after executing the block in which the
+variables were declared.
 
 \subsection{Unconstrained Row Vectors}
 
@@ -578,7 +576,7 @@ matrix(M,N) B;
 declares \code{A} to be a $3 \times 3$ matrix and \code{B} to be a $M
 \times N$ matrix.  For the second declaration to be well formed, the
 variables \code{M} and \code{N} must be declared as integers in either
-the data or transformed data block.
+the data or transformed data block and before the matrix declaration.
 
 \subsection{Correlation Matrices}
 
@@ -586,7 +584,7 @@ Matrix variables may be constrained to represent correlation matrices.
 A matrix is a correlation matrix if it is symmetric and positive
 definite, has entries between $-1$ and $1$, and has a unit diagonal.
 Because correlation matrices are square, they only need one dimension
-declared.  For example,
+to be declared.  For example,
 %
 \begin{quote}
 \begin{Verbatim} 
