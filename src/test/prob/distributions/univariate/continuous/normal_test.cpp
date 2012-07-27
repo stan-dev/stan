@@ -10,8 +10,6 @@ using std::numeric_limits;
 
 class ProbDistributionsNormal : public DistributionTest {
 public:
-  // need this to resolve functions
-
   void valid_values(vector<vector<double> >& parameters,
 		    vector<double>& log_prob) {
     vector<double> param(3);
