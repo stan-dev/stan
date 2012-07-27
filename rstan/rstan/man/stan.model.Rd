@@ -13,8 +13,9 @@
 }
 
 \usage{
-  stan.model(file, verbose = FALSE, model.name = "anon_model", 
-             model.code = "", boost.lib = NULL)
+  stan.model(file, model.name = "anon_model", 
+             model.code = "", stanc.ret = NULL, boost.lib = NULL, 
+             verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -23,10 +24,6 @@
     in Stan language. 
   }
 
-  \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
-    intermediate output inside the function, which might be helpful for debugging
-    the model, are printed or not. 
-  }
   \item{model.name}{A character string for naming the model (the
     default is \code{"anon_model"}). 
   }
@@ -34,9 +31,16 @@
   \item{model.code}{A character string to specify the model instead of using
     argument file. 
   }
+  \item{stanc.ret}{The returned list from \code{stanc}, an alternative way
+    to specify the model using previous results.}   
   \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}. 
     If specified, this path would be used instead for boost library header files for compiling 
     the model in C++ language.}
+  \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
+    intermediate output inside the function, which might be helpful for debugging
+    the model, are printed or not. 
+  }
+
 }
 
 \details{

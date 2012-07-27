@@ -22,6 +22,14 @@ _inst/include/stansrc/stan/agrad/.*\.cpp$
 _inst/include/stansrc/stan/math/.*\.cpp$
 inst/unitTests/.*\.html$
 inst/unitTests/.*\.txt$
+vignettes/makefile$
+vignettes/.*\.tex$
+vignettes/.*\.pdf$
+vignettes/.*\.aux$
+vignettes/.*\.log$
+vignettes/.*\.out$
+vignettes/.*\.bbl$
+vignettes/.*\.toc$
 tests/.*[.]html$
 tests/.*[.]txt$
 \.gitignore$

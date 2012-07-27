@@ -1,0 +1,207 @@
+\documentclass[12pt]{article}
+\usepackage{Sweave}
+\usepackage{hyperref}
+\usepackage{times}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{booktabs} 
+\usepackage{enumerate}
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em,fontsize=\footnotesize} 
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em,fontsize=\footnotesize} 
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em,fontsize=\footnotesize}
+
+\newcommand{\Stan}{Stan\xspace}
+\newcommand{\RStan}{RStan\xspace}
+\newcommand{\rstan}{rstan\xspace}
+\newcommand{\stanc}{{\ttfamily stanc}\xspace}
+\newcommand*{\Cpp}{C\raise.2ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
+\newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+\newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+
+\newcommand{\acronym}[1]{{\sc #1}\xspace}
+
+\newcommand{\ASCII}{\acronym{ascii}}
+\newcommand{\BNF}{\acronym{bnf}}
+\newcommand{\MATLAB}{\acronym{matlab}}
+\newcommand{\R}{\acronym{r}}
+\newcommand{\SPLUS}{\acronym{s}}
+\newcommand{\BUGS}{\acronym{bugs}}
+\newcommand{\JAGS}{\acronym{jags}}
+\newcommand{\MCMC}{\acronym{mcmc}}
+\newcommand{\HMC}{\acronym{hmc}}
+\newcommand{\NUTS}{\acronym{nuts}}
+\newcommand{\MSVC}{\acronym{msvc}}
+\newcommand{\LKJ}{\acronym{lkj}}
+\newcommand{\CPC}{\acronym{cpc}}
+
+\newcommand{\code}[1]{{\tt #1}}
+
+\bibliographystyle{apalike}
+
+%\VignetteIndexEntry{RStan} 
+
+% The next line is needed for inverse search...
+\SweaveOpts{concordance=TRUE, keep.source=TRUE}
+<<echo=false>>=
+options(width=60)
+@
+
+\title{The \RStan Package: the \R interface to \Stan}
+
+\author{The Stan Development Team \\ mc.stanislaw@gmail.com}
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This is a short introduction to \RStan\footnote{The name of this package is
+\rstan so \code{library(rstan)} should be used to load this package in \R.}, the \R
+interface to \Stan. Users of \RStan need to be familiar with \Stan first,
+especially the \Stan model language.  Details about \Stan could be found in its
+manual, so we focus on how to use \RStan on an example. 
+
+\subsection{Prerequisites} 
+
+Although we refer to \RStan as an \R interface to \Stan, \RStan does not 
+need \Stan to be installed. However, we need a \Cpp compiler as needed by
+\Stan. Refer to \cite{StanManual:2012} for how to install a \Cpp compiler if there 
+not exists one. 
+
+In addition, package \rstan depends on other packages of ``Rcpp'', ``inline'',
+and ``RcppEigen.'' In the case of install \RStan from source, these packages 
+need to be installed first if not installed automatically. 
+
+\subsection{Overview of using \RStan}
+
+First, we could summarize the steps of using \Stan to conduct 
+statictical inference simply as follows. 
+\begin{enumerate}[I]
+\item Represent the statictical model in \Stan model language 
+\item Compile the \Stan model to \Cpp code using \stanc 
+\item Compile the \Cpp code for the model using a \Cpp compiler such as \gpp to 
+      create an executable file 
+\item Prepare Data  
+\item Run the executable to generate samples 
+\item Do model inference based on the samples 
+\end{enumerate}
+
+In \RStan, we have the same steps as in \Stan but packaged 
+in different functions. Knowing these steps is helpful especially
+in the case we encounter problem with our coding. In addition, 
+in \RStan, we provide a function called \code{stan} to wrap up
+most of the abvoe steps. 
+
+
+\section{An example} 
+
+In this section, we use an example to demonstrate using \RStan. 
+In section 5.5 of \cite{GelmanCarlinSternRubin:2003}, a hierarchical model is used to model 
+coaching effects from eight schools. The data are given in table
+\ref{tab08schoolsdata}. 
+The statistical model is specified as 
+\begin{align}
+y_j &\sim \text{normal}(\theta_j, \sigma_j), \quad j=1,\ldots,8, \label{eq08schoolmodeleq1} \\ 
+\theta_1, \ldots, \theta_8 &\overset{IID}{\sim} \text{normal}(\mu, \tau^2), 
+\end{align} 
+where in \eqref{eq08schoolmodeleq1}, $\sigma_j$ is known. 
+Further we have prior for $(\mu, \tau)$ as specified in \cite{GelmanCarlinSternRubin:2003}. 
+
+\begin{table}[ht]
+\centering 
+\caption{Data of Eight schools example}
+\label{tab08schoolsdata}
+\begin{tabular}{ccc} 
+\toprule 
+School  & 
+\begin{minipage}[t]{0.16\columnwidth}%
+Estimated treatment effect, $y_j$ 
+\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}%
+s.e.\ of effect estimate, $\sigma_j$  
+\end{minipage}  \\
+\midrule
+A     &  28   & 15  \\
+B     &   8   & 10  \\
+C     &  -3   & 16  \\
+D     &   7   & 11  \\
+E     &  -1   &  9  \\
+F     &   1   & 11  \\
+G     &  18   & 10  \\
+H     &  12   & 18  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+In both \Stan and \RStan, we first represent this model in 
+\Stan model language. \RStan allows the model to be coded 
+in a text file or a character string in \R. 
+Here we use a character string. 
+<<echo=TRUE>>=
+library(rstan) 
+schools.code <- '
+  data {
+    int(0,) J; // number of schools 
+    real y[J]; // estimated treatment effects
+    real(0,) sigma_y[J]; // s.e. of effect estimates 
+  } 
+  parameters {
+    real theta[J]; 
+    real mu; 
+    real(0,) tau; 
+  } 
+  model {
+    theta ~ normal(mu, tau); 
+    y ~ normal(theta, sigma_y);
+  } 
+'
+@
+
+\RStan accepts data as a \code{list} or an \code{environment}. So to prepare the data
+in \R, we have 
+<<echo=TRUE>>=
+dat <- list(J = 8, 
+            y = c(28,  8, -3,  7, -1,  1, 18, 12),
+            sigma_y = c(15, 10, 16, 11,  9, 11, 10, 18))
+@
+
+Next, we can function \code{stan} to sample from the model. 
+<<echo=TRUE, results=hide>>=
+fit <- stan(model.code = schools.code, data = dat, 
+            n.iter = 2012, n.chains = 4)
+@
+
+Function \code{stan} wraps up the follow three steps. These steps are similar to some
+steps mentioned above for \Stan. But \RStan has a deep integration of \Stan, which 
+makes it more efficient than if we call an outside \Stan.  
+\begin{enumerate}
+\item Compile the \Stan model to \Cpp code 
+\item Compile the \Cpp code 
+\item Load the compiled model and sample 
+\end{enumerate}
+
+Notice it is easy to just use function \code{stan} in one step if everything
+goes well. \RStan also provides functionality to break down it to multiple
+steps to make it easier to debug our \Stan model code and \R code. 
+
+Function \code{stan} return an S4 object of class \code{stanfit}, for which
+a few generic function such as \code{print} and \code{plot} are provided. 
+<<echo=TRUE>>=
+print(fit)
+@
+
+\bibliography{rstan} 
+
+\end{document} 
+

@@ -1,26 +1,39 @@
 
 ## 
-## @param stan.home TBD 
 ## 
-stan.model <- function(file, verbose = FALSE, 
+stan.model <- function(file, 
                        model.name = "anon_model", 
                        model.code = '', 
-                       boost.lib = NULL) { 
+                       stanc.ret = NULL, 
+                       boost.lib = NULL, 
+                       verbose = FALSE) { 
 
   # Construct a stan model from stan code 
   # 
   # Args: 
   #   file: the file that has the model in Stan model language.
-  #   model.name: a character for naming the model. Note that
-  #     the name needs to be a valid C++ name. So 
+  #   model.name: a character for naming the model. 
+  #   stanc.ret: An alternative way to specify the model
+  #     by using returned results from stanc. 
   #   model.code: if file is not specified, we can used 
   #     a character to specify the model.   
 
-  model.code <- get.model.code(file, model.code)  
-  model.name2 <- legitimate.model.name(model.name) 
-  r <- stanc(model.code, model.name2) 
+  if (is.null(stanc.ret)) {
+    model.code <- get.model.code(file, model.code)  
+    stanc.ret <- stanc(model.code, model.name) 
+  } 
+  if (!is.list(stanc.ret)) {
+    stop("stanc.ret needs to be the returned object from stanc.")
+  } 
+  m <- match(c("cppcode", "model_name"), names(stanc.ret)) 
+  if (any(is.na(m))) {
+    stop("stanc.ret does not have element `cppcode' and `model_name'") 
+  } 
+
+  model.name2 <- stanc.ret$model.name2 
+  model.name <- stanc.ret$model_name 
   inc <- paste("#include <rstan/rstaninc.hpp>\n", 
-               r$cppcode, 
+               stanc.ret$cppcode, 
                get_Rcpp_module_def_code(model.name2), 
                sep = '')  
 
