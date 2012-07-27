@@ -7,21 +7,24 @@ Set and read options used in RStan
 }
 \description{
 Set and read options used in RStan. Some arguments are programmed as options
-that can be controled by user. 
+that can be controlled by user. 
 }
 \usage{
 rstan.options(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{\dots}{Arguments are in forms of \code{argument = value}.
-  Then option \code{argument} is set as \code{value}. }
+  \item{\dots}{Arguments must be in forms of \code{argument = value}.
+  Then option \code{argument} is set as \code{value}. In the case
+  of just obtaining options, each argument could be a character string.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-All the options used in RStan as a lit. 
+A list of the old options if exists. If an option does
+not exist before, it is \code{NA}. When there is only 
+one option, the old value is returned. 
 }
 \references{
 %% ~put references to the literature/web site here ~

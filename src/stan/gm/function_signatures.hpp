@@ -243,8 +243,8 @@ add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
+add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add_ternary("normal_log");
-add_quaternary("normal_trunc_l_log");
 add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T,DOUBLE_T); // vectorized
 add("normal_log",DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T); // vectorized
 add("normal_log",DOUBLE_T,DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U)); // vectorized

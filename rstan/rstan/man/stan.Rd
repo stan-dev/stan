@@ -13,7 +13,7 @@ fitted result.
 \usage{
 stan(file, model.name = "anon_model", model.code = "", data = list(), pars = NA, n.chains = 1L,
 n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
-init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose = FALSE, ...)
+init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose = FALSE, ..., boost.lib = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -65,6 +65,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
 
     In addition, \code{refresh} (integer) could be used to
     control how to indicate the progress during sampling.}
+  \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -93,9 +94,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-
   library(rstan)
-
   scode <- "
   parameters {
     real y[2]; 

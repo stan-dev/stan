@@ -95,7 +95,7 @@
 }
 \value{
    A named list, each element of which are the samples
-   for one parameger.  In the case of vector (array) parameters,
+   for one parameter.  In the case of vector (array) parameters,
    their elements are used. 
 } 
 

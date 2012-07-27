@@ -118,7 +118,8 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
   n.kept <- n.save - n.warmup2 
   yrange <- NULL 
   main <- paste("Trace of ", par.name) 
-  chain.cols <- get.rstan.options("rstan.chain.cols")
+  chain.cols <- rstan.options("rstan.chain.cols")
+  warmup.col <- rstan.options("rstan.warmup.col") 
   if (inc.warmup) {
     id <- seq(1, by = n.thin, length.out = n.save) 
     for (i in 1:sim$n.chains) {
@@ -127,7 +128,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
     plot(c(1, id[length(id)]), yrange, type = 'n', 
          xlab = 'Iterations', ylab = "", main = main)
     rect(par("usr")[1], par("usr")[3], n.warmup2 * n.thin, par("usr")[4], 
-         col = rstan:::rstancolgrey[3], border = NA)
+         col = warmup.col, border = NA)
     for (i in 1:sim$n.chains) {
       lines(id, sim$samples[[i]][[n]], xlab = '', ylab = '', 
             lwd = 1, col = chain.cols[(i-1) %% 6 + 1]) 

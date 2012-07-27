@@ -32,3 +32,9 @@ print(ss2)
 print(ss3) 
 plot(ss1)
 traceplot(ss1)
+
+ss4 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, refresh = 10) 
+
+ss <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4)
+print(ss)
+

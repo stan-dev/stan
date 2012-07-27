@@ -334,10 +334,10 @@ get.rhat.cols <- function(rhats) {
   # Args:
   #   rhat: a scale 
   #
-  rhat.na.col <- get.rstan.options("plot.rhat.na.col")
-  rhat.breaks <- get.rstan.options("plot.rhat.breaks")
+  rhat.na.col <- rstan.options("plot.rhat.na.col")
+  rhat.breaks <- rstan.options("plot.rhat.breaks")
   # print(rhat.breaks)
-  rhat.colors <- get.rstan.options("plot.rhat.cols")
+  rhat.colors <- rstan.options("plot.rhat.cols")
   
   sapply(rhats, 
          FUN = function(x) {
@@ -349,7 +349,7 @@ get.rhat.cols <- function(rhats) {
                next
              return(rhat.colors[i])
            }  
-           get.rstan.options("plot.rhat.large.col")
+           rstan.options("plot.rhat.large.col")
 		 })  
 }
 
@@ -540,33 +540,6 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
 #  print(b)
 #  
 #  
-
-
-# colors friendly to color-blind 
-# from http://colorbrewer2.org/
-colp1 <- matrix(
-  c(140, 81, 10, 216, 179, 101, 246, 232, 195, 
-    245, 245, 245, 199, 234, 229, 90, 180, 172, 
-    1, 102, 94),  
-  byrow = TRUE, ncol = 3) 
-
-
-colp2 <- matrix(
-  c(178, 24, 43, 239, 138, 98, 253, 219, 199, 
-    247, 247, 247, 209, 229, 240, 103, 169, 207, 
-    33, 102, 172), 
-  byrow = TRUE, ncol = 3) 
-
-rstancolaa <- rgb(colp1, names = paste(1:7), maxColorValue = 255)
-rstancolab <- rgb(colp1, alpha = 100, names = paste(1:7), maxColorValue = 255)
-rstancolba <- rgb(colp2, names = paste(1:7), maxColorValue = 255)
-rstancolbb <- rgb(colp2, alpha = 100, names = paste(1:7), maxColorValue = 255)
-
-
-rstancolgrey <- rgb(matrix(c(247, 247, 247, 204, 204, 204, 150, 150, 150, 82, 82, 82),  
-                           byrow = TRUE, ncol = 3), 
-                    names = paste(1:4), maxColorValue = 255)
-
 rstancolgrey <- rgb(matrix(c(247, 247, 247, 204, 204, 204, 150, 150, 150, 82, 82, 82),  
                            byrow = TRUE, ncol = 3), 
                     alpha = 100, 
@@ -582,13 +555,6 @@ rstancolc <- rgb(matrix(c(230, 97, 1,
                           254, 224, 182), 
                         byrow = TRUE, ncol = 3),
                  names = paste(1:6), maxColorValue = 255) 
-
-## some colors from package dichromat
-rstancold <- 
-  c("#990F0F", "#B22D2D", "#CC5252", "#E67E7E", "#FFB2B2", "#99700F", "#B28B2D",
-    "#CCA852", "#E6C77E", "#FFE8B2", "#1F990F", "#3CB22D", "#60CC52", "#8AE67E",
-    "#BCFFB2", "#710F99", "#8B2DB2", "#A852CC", "#C77EE6", "#E9B2FF", "#990F20",
-    "#B22D3C", "#CC5260", "#E67E8A", "#FFB2BC") 
 
 ## summarize the chains merged and individually 
 get.par.summary <- function(sim, n, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
@@ -634,8 +600,8 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
   #   pars: parameters of interest
   #   display.parallel
 
-  alert.col <- get.rstan.options("rstan.alert.col")
-  chain.cols <- get.rstan.options("rstan.chain.cols")
+  alert.col <- rstan.options("rstan.alert.col")
+  chain.cols <- rstan.options("rstan.chain.cols")
   chain.cols.len <- length(chain.cols) 
 
   if (exists('windows'))  dev.fun <- windows 
@@ -811,3 +777,5 @@ legitimate.model.name <- function(name) {
   # To make model name be a valid name in C++. 
   return("stan_model")
 } 
+
+boost.url <- function() {"http://www.boost.org/users/download/"} 

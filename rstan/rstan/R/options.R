@@ -6,10 +6,6 @@
 
 
 .init.rstan.opt.env <- function(e) {
-  assign("plot.warmup.col", 19, e)
-  # assign("plot.kept.col", 20, e)
-  assign("plot.chains.cols", 1:10, e)
-
   tmat <- matrix(c(254, 237, 222, 
                    253, 208, 162, 
                    253, 174, 107, 
@@ -29,14 +25,6 @@
   # when R-hat is large than max(rhat.breaks) 
   assign("plot.rhat.large.col", rhat.cols[6], e)
 
-  # for plot(stanfit)
-  # the color for indicating the median of 
-  # for samples from all the chains or 
-  # separate chains
-  assign("plot.chain.median.cols", 
-         c("green", "red", "yellow", "blue", "brown", "purple",
-           "chocolate", "cyan", "coral"), e)
-
   # color for indicating or important info. 
   # for example, the color of star and text saying
   # the variable is truncated in stan.plot.inferences
@@ -45,32 +33,24 @@
   # color for plot chains in trace plot and stan.plot.inferences 
   assign("rstan.chain.cols", rstancolc, e)
 
+  # color for shading the area of warmup trace plot
+  assign("rstan.warmup.col", rstan:::rstancolgrey[3], e)
+
+  # boost lib path 
+  rstan.inc.path  <- system.file('include', package = 'rstan')
+  boost.lib.path <- file.path(rstan.inc.path, '/stanlib/boost_1.50.0') 
+  assign("boost.lib", boost.lib.path, e) 
+
   # cat(".init.rstan.opt.env called.\n")
   invisible(e)
 }
 
 .init.rstan.opt.env(.rstan.opt.env)
 
-get.rstan.options <- function(opt.name) {
-  # Get an RStan option by name
-  # Args:
-  #   opt.name: the name of the options 
-  # Return:
-  #   A named list of option values. If the name 
-  #   is not found, the value is NA. If opt.name 
-  #   is just one name, the object is returned (not
-  #   in a list). 
-
-  e <- .rstan.opt.env
-  if (length(as.list(e)) == 0)
-    .init.rstan.opt.env(e)
-  r <- mget(opt.name, envir = e, ifnotfound = NA)
-  if (length(opt.name) == 1) return(r[[1]])
-  invisible(r)
-}
-
-
 rstan.options <- function(...) { 
+  # Set/get options in RStan
+  # Args: any options can be defined, using 'name = value' 
+  #
   # e <- rstan:::.rstan.opt.env 
   e <- .rstan.opt.env 
   if (length(as.list(e)) == 0) 
@@ -78,11 +58,30 @@ rstan.options <- function(...) {
 
   a <-  list(...)
   len <- length(a) 
-  if (len < 1) 
-    return(e) 
+  if (len < 1) return(NA) 
   a.names <- names(a) 
-  lapply(1:len, FUN = function(i) assign(a.names[i], a[[i]], e)) 
-  invisible(as.list(e))
+  # deal with the case that this function is called as 
+  # rstan.options("a", "b")
+  if (is.null(a.names)) {
+    ns <- unlist(a) 
+    if (!is.character(ns)) 
+      stop("rstan.options only accepts arguments as `name=value'") 
+    r <- mget(unlist(a), envir = e, ifnotfound = NA)
+    if (length(r) == 1) return(r[[1]])
+    return(invisible(r))
+  } 
+  # the case for 
+  # rstan.options(a = 3, b = 4, "c")
+  empty.idx <- which(a.names == '')
+  nonempty.idx <- which(a.names != '')
+
+  opt.names <- c(a.names[nonempty.idx], unlist(a[empty.idx]))
+  r <- mget(opt.names, envir = e, ifnotfound = NA)
+
+  lapply(a.names[nonempty.idx], FUN = function(n) assign(n, a[[n]], e)) 
+
+  if (length(r) == 1) return(r[[1]])
+  invisible(r)
 } 
 
 ## test code 

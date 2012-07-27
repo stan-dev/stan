@@ -160,6 +160,13 @@ namespace stan {
                const expr_type& arg_type2,
                const expr_type& arg_type3,
                const expr_type& arg_type4);
+      void add(const std::string& name,
+               const expr_type& result_type,
+               const expr_type& arg_type1,
+               const expr_type& arg_type2,
+               const expr_type& arg_type3,
+               const expr_type& arg_type4,
+               const expr_type& arg_type5);
       void add_nullary(const::std::string& name);
       void add_unary(const::std::string& name);
       void add_binary(const::std::string& name);

@@ -35,6 +35,7 @@ build $(STANPKG): ./rstan/DESCRIPTION
 	@rm -f $(STANPKG) 
 	R CMD build rstan
 
+
 check: $(STANPKG) 
 	R CMD check --as-cran $(STANPKG) 
 
@@ -44,5 +45,8 @@ install: $(STANPKG)
 
 clean: 
 	rm -f $(STANPKG) 
+
+# buildbin:   # build a binary version  
+# R CMD INSTALL -l ./tmp --build rstan
 
 .PHONY: build check install clean 
