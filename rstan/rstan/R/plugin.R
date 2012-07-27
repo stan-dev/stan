@@ -1,5 +1,6 @@
 ##
 ## Define rstan plugin for inline package.
+## (original name: inline.R)
 ##
 
 rstan.inc.path  <- system.file('include', package = 'rstan')
@@ -17,6 +18,13 @@ eigen.path <- system.file('include', package = 'RcppEigen')
 # If included in RStan
 # eigen.path <- paste0(rstan.inc.path, '/stanlib/eigen_3.1.0')
 
+static.linking <- function() {
+  # return(Rcpp:::staticLinking());
+  ## not following Rcpp's link, we only have either dynamic version or static
+  ## version because the libraries are big.
+  ## (In Rcpp, both versions are compiled.)
+ return(.Platform$OS.type == 'windows')
+}
 
 PKG_CPPFLAGS_env_fun <- function() {
    paste(' -I"', file.path(rstan.inc.path, '/stansrc" '),
@@ -27,9 +35,7 @@ PKG_CPPFLAGS_env_fun <- function() {
 }
 
 RSTAN_LIBS_fun <- function() {
-  static <- Rcpp:::staticLinking()
-  ## currently following Rcpp's link mechanism, which
-  ## is not necessarily good in our case.
+  static <- static.linking() 
   rstan.libs.path <- rstan.libs.path_fun()
   if (static) {
     paste('"', rstan.libs.path, '/libstan.a', '"', sep = '')
