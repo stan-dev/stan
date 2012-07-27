@@ -544,8 +544,10 @@ namespace stan {
                                       T_result* result,
                                       const Policy&) {
       size_t x_size = size_of(x);
-      if (x_size == 1 || x_size == max_size)
-        return true;
+      if (is_vector<T>::value && x_size == max_size)
+	return true;
+      if (!is_vector<T>::value && x_size == 1)
+	return true;
       return dom_err(
               function,x_size,name,
               " (max size) is %1%, but must be consistent, 1 or max=",max_size,

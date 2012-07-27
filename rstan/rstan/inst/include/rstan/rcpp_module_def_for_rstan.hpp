@@ -1,5 +1,5 @@
 /**
- * Define Rcpp Module to expose stan_fit2's functions to R. 
+ * Define Rcpp Module to expose stan_fit's functions to R. 
  */ 
 RCPP_MODULE(%model_name%){
   Rcpp::class_<rstan::stan_fit<%model_name%_namespace::%model_name%, 
