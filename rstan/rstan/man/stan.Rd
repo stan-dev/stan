@@ -21,7 +21,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
   \item{model.name}{A character for naming the model.}
   \item{model.code}{A character string specifying the model.  An alternative
     way for specifying model instead of \code{file}.}
-  \item{data}{An object of class \code{"list"} or \code{"environment"}
+  \item{data}{An object of class \code{list} or \code{environment}
     providing the data for the model.}    
   \item{pars}{A vector of character string specifying parameters of interests; defaults
     to \code{NA} indicating all parameters in the model.}
@@ -29,7 +29,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
   \item{n.iter}{A positive integer specifying how many iterations for all the
     chains (including warmup). The default is 2000.}
   \item{n.warmup}{A positive integer specifying number of initial samples to be
-    discarded. The default is \code{"n.iter / 2"}. Note that this is also known as burnin.}
+    discarded. The default is \code{n.iter / 2}. Note that this is also known as burnin.}
   \item{n.thin}{A positive integer specifying the period for saving samples; defaults to 1.} 
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
     the maximum integer supported by R on the machine. Note that when multiple chains
@@ -37,7 +37,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
   \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
     indicating how the initial values of parameters are specified. \code{"0"}: 
     initialize all to be zero on the unconstrained support; 
-    \code{"user"}: specify by the user in \code{"init.v"}; and 
+    \code{"user"}: specify by the user in \code{init.v}; and 
     \code{"random"}: randomly generated.  }
   \item{init.v}{A function or a list to specify initial values. When it 
     is a function, it optionally takes a parameter \code{chain.id}. If it 
@@ -45,33 +45,34 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
     each element is a named list specifying the initial values for all parameters.}
   \item{sample.file}{A character string of file name for specifying where the 
     samples are written into. If not provided, files are not created. Note 
-    that when the folder specified is not writable, \code{"tempdir()"} is used. 
+    that when the folder specified is not writable, \code{tempdir()} is used. 
     And when there are multiple chains, an underscore and chain number is appended
     to the file name.} 
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     intermediate output inside the function, which might be helpful for
     debugging the model, are printed or not.}
   \item{\dots}{Other parameters for the sampler. 
-    These are \code{"leapfrog_steps"} (integer), 
-    \code{"epsilon"} (double), 
-    \code{"gamma"} (double), 
-    \code{"delta"} (double), 
-    \code{"equal_step_sizes"} (TRUE of FALSE), 
-    \code{"max_treedepth"} (integer).  Details could be 
+    These are \code{leapfrog_steps} (integer), 
+    \code{epsilon} (double), 
+    \code{gamma} (double), 
+    \code{delta} (double), 
+    \code{equal_step_sizes} (TRUE of FALSE), 
+    \code{max_treedepth} (integer).  Details could be 
     found in Stan's manual. Note that by default, 
-    \code{"leapfrog_steps"} is \code{-1} and 
-    \code{"equal_step_sizes"} is \code{FALSE} so that
+    \code{leapfrog_steps} is \code{-1} and 
+    \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler is called, which is the default sampler.  
 
     In addition, \code{refresh} (integer) could be used to
-    control how to indicate the progress during sampling.}
+    control how to indicate the progress during sampling (i.e.\
+    show the progress every \code{refresh} iterations).}
   \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-    Fitted results in form of \code{"stanfit"}
+    Fitted results as an object of S4 class \code{stanfit}.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
@@ -91,7 +92,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{sampling}} 
 }
 \examples{
   library(rstan)
@@ -104,10 +105,8 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
     y[2] ~ double_exponential(0, 2);
   } 
   "
-
   s.f <- stan(model.code = scode, verbose = FALSE) 
   print(s.f)
-
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

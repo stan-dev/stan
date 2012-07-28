@@ -7,6 +7,7 @@
 \title{\code{sampling}: draws samples from Stan model}
 \description{
   Draw samples from the model defined by class \code{stanmodel}. 
+  This is a generic function of S4 class \code{stanmodel}. 
 }
 
 \usage{
@@ -21,16 +22,16 @@
   \describe{
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
-      Call samplers such as NUTS1 and NUTS2 to draw samples from the model defined by class \code{"stanmodel"} 
-      given the data, init values, etc. 
+      Call samplers such as NUTS1 and NUTS2 to draw samples from the model defined by S4 class \code{stanmodel} 
+      given the data, initial values, etc. 
     }
   }
 }
 
 \arguments{
-  \item{object}{An object of class \code{"\linkS4class{stanmodel}"} object.}
+  \item{object}{An object of class \code{\linkS4class{stanmodel}} object.}
 
-  \item{data}{An object of class \code{"list"} or \code{"environment"}
+  \item{data}{An object of class \code{list} or \code{environment}
     providing the data for the model.}    
 
   \item{pars}{A vector of character string specifying parameters of interest; defaults
@@ -43,7 +44,7 @@
     chains (including warmup). The default is 2000.}
 
   \item{n.warmup}{A positive integer specifying number of initial samples to be
-    discarded. The default is \code{"n.iter / 2"}. Note that this is also known as burnin.}
+    discarded. The default is \code{n.iter / 2}. Note that this is also known as burnin.}
 
   \item{n.thin}{A positive integer specifying the period for saving samples; defaults to 1.} 
 
@@ -54,7 +55,7 @@
   \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
     indicating how the initial values of parameters are specified. \code{"0"}: 
     initialize all to be zero on the unconstrained support; 
-    \code{"user"}: specify by the user in \code{"init.v"}; and 
+    \code{"user"}: specify by the user in \code{init.v}; and 
     \code{"random"}: randomly generated.  }
 
   \item{init.v}{A function or a list to specify initial values. When it 
@@ -64,10 +65,9 @@
 
   \item{sample.file}{A character string of file name for specifying where the 
     samples are written into. If not provided, files are not created. Note 
-    that when the folder specified is not writable, \code{"tempdir()"} is used. 
+    that when the folder specified is not writable, \code{tempdir()} is used. 
     And when there are multiple chains, an underscore and chain number is appended
     to the file name.} 
-
    
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     intermediate output inside the function, which might be helpful for
@@ -75,22 +75,23 @@
 
   \item{\dots}{Other parameters for the sampler: 
     \enumerate{
-      \item \code{"leapfrog_steps"}, \code{integer}
-      \item \code{"epsilon"}, \code{double}
-      \item \code{"gamma"}, \code{double} 
-      \item \code{"delta"}, \code{double}
-      \item \code{"equal_step_sizes"}, \code{TRUE} or \code{FALSE} 
-      \item \code{"max_treedepth"}, \code{integer}  
+      \item \code{leapfrog_steps}, \code{integer}
+      \item \code{epsilon}, \code{double}
+      \item \code{gamma}, \code{double} 
+      \item \code{delta}, \code{double}
+      \item \code{equal_step_sizes}, \code{TRUE} or \code{FALSE} 
+      \item \code{max_treedepth}, \code{integer}  
     }
 
     More details could be 
     found in Stan's manual. Note that by default, 
-    \code{"leapfrog_steps"} is \code{-1} and 
-    \code{"equal_step_sizes"} is \code{FALSE} so that
+    \code{leapfrog_steps} is \code{-1} and 
+    \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler is called, which is the default sampler.  
 
     In addition, \code{refresh} (integer) could be used to
-    control how to indicate the progress during sampling.
+    control how to indicate the progress during sampling 
+    (i.e.\ show the progress every \code{refresh} iterations.).
   }
 }
 \value{

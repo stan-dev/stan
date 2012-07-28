@@ -4,10 +4,11 @@
 \title{Construct a Stan model} 
 
 \description{
-  A Bayesian statistical model specified in Stan language
-  (\url{http://code.google.com/p/stan}) 
-  is first compiled to C++ code. The model C++ code plus other auxiliary 
-  code is compiled into shared object, which is also loaded then. 
+  Construct and \code{stanmodel} object from a model 
+  represented by Stan model language. The model 
+  is compiled to C++ code if it is not done.  
+  The model C++ code plus other auxiliary 
+  code is compiled into shared object and then loaded. 
   The loaded module is available for drawing samples.  
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
@@ -49,7 +50,7 @@
 }
 \value{
   A stanmodel class object (\linkS4class{stanmodel}), which could be
-  then used for drawing samples later. 
+  used later for drawing samples by calling its \code{sampling} function.
   %%  ~Describe the value returned
   %%  If it is a LIST, use
   %%  \item{comp1 }{Description of 'comp1'}
@@ -57,6 +58,7 @@
   %% ...
 }
 \references{
+ \url{http://code.google.com/p/stan} 
   %% ~put references to the literature/web site here ~
 }
 \author{

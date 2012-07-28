@@ -4,11 +4,11 @@
 \alias{stanc} 
 \docType{package}
 \title{
-Stanc: compile model in Stan language to C++ code
+stanc: compile model in Stan language to C++ code
 }
 \description{
-  Compile model in Stan language to C++ code, which could later 
-  be compiled and loaded for drawing samples from the 
+  Compile model in Stan language to C++ code, which could 
+  be compiled and then loaded for drawing samples for the 
   model. 
 }
 \usage{
@@ -17,13 +17,24 @@ Stanc: compile model in Stan language to C++ code
 
 \arguments{
   \item{model.code}{A character string for a model in Stan language.}
-  \item{model.name}{A character string for nameing the model. The 
-    default is \code{"anon_model"}.}
-  \item{verbose}{\code{TRUE} provide more information during the procedure; 
-    \code{FALSE} otherwise. The default is \code{FALSE}.}             
+  \item{model.name}{A character string for naming the model. The 
+    default is \code{anon_model}.}
+  \item{verbose}{\code{TRUE} print out more intermediate information during the
+    procedure; \code{FALSE} otherwise. The default is \code{FALSE}.}             
 } 
 
+\value{
+  A list including an element of the C++ code. Relative elements are 
+  \enumerate{ 
+    \item \code{model.name} The model name specified by the user or the default if not specified. 
+    \item \code{model.code} The model's Stan code. 
+    \item \code{cppcode}    The model's C++ code. 
+    \item \code{status}     The status indicating success/failure of compiling the Stan code. 
+  } 
+}
+
 \examples{
+\dontrun{
 stanmodelcode <- '
 data {
   int(0,) N;
@@ -43,6 +54,5 @@ model {
 r <- stanc(stanmodelcode, "normal1") 
 names(r)
 cat(r$cppcode)
-\dontrun{
 }
 }

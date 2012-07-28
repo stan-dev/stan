@@ -18,7 +18,7 @@
 }
 
 \arguments{
-  \item{object}{An object of class \code{"\linkS4class{stanfit}"} object.}
+  \item{object}{An object of class \code{\linkS4class{stanfit}} object.}
   \item{pars}{A vector of character string specifying parameters to be plotted.} 
   \item{inc.warmup}{\code{TRUE} or \code{FALSE}, indicating whether 
     the warmup samples are included in the trace plot; defaults to \code{TRUE}}

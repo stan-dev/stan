@@ -7,7 +7,7 @@ Set and read options used in RStan
 }
 \description{
 Set and read options used in RStan. Some arguments are programmed as options
-that can be controlled by user. 
+so that can be controlled by user. 
 }
 \usage{
 rstan.options(...)

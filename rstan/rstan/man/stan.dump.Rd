@@ -9,10 +9,10 @@ that Stan supports
 
 
 \description{
-  This function takes a vector of names of \R objects and produces
-  text representations of the objects on a file or connection.
-  A \code{stan.dump} can usually be used as data input of the 
-  Stan package (\url{http://stan.googlecode.com}) or 
+  This function takes a vector of names of \R objects and outputs
+  text representations of the objects to a file or connection.
+  The file created by \code{stan.dump} is typically used as data 
+  input of the Stan package (\url{http://stan.googlecode.com}) or 
   \code{\link{source}}d into another \R session.
 }
 
@@ -23,7 +23,7 @@ stan.dump(list, file, append = FALSE,
 }
 
 \arguments{
-  \item{list}{character.  The names of one or more \R objects to be dumped.}
+  \item{list}{character. The names of one or more \R objects to be dumped.}
 
   \item{file}{either a character string naming a file or a
     \link{connection}.  \code{""} indicates output to the console.}
@@ -43,7 +43,7 @@ stan.dump(list, file, append = FALSE,
 
 \value{
   An invisible character vector containing the names of the objects
-  which were dumped.
+  that were dumped.
 }
 \references{
 %% ~put references to the literature/web site here ~
@@ -61,14 +61,12 @@ stan.dump(list, file, append = FALSE,
 
 \seealso{
 \code{\link{dump}} 
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
+x <- 1; y <- 1:10; z <- array(1:10, dim = c(2,5)) 
+stan.dump(ls(pattern = '^[xyz]'), "xyz.Rdmped")
+cat(paste(readLines("xyz.Rdmped"), collapse = '\n'), '\n')
+unlink("xyz.Rdmped")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
