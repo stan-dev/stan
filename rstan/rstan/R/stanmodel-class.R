@@ -66,8 +66,14 @@ setMethod("sampling", "stanmodel",
               data <- list()
 
             sampler <- new(object@.modelmod$sampler, data)
-            if (!missing(pars) && !is.na(pars) && length(pars) > 0)
+            m.pars = sampler$param_names() 
+            p.dims = sampler$param_dims() 
+            if (!missing(pars) && !is.na(pars) && length(pars) > 0) {
               sampler$update_param_oi(pars)
+              m <- which(match(pars, m.pars, nomatch = 0) == 0)
+              if (length(m) > 0) 
+                stop("No parameter ", paste(pars[m], collapse = ', ')) 
+	    }
 
             args.list <- config.argss(n.chains = n.chains, n.iter = n.iter,
                                       n.warmup = n.warmup, n.thin = n.thin,
@@ -104,14 +110,16 @@ setMethod("sampling", "stanmodel",
                        dims.oi = sampler$param_dims_oi(),
                        fnames.oi = fnames.oi,
                        n.flatnames = n.flatnames) 
-            # summary <- summary.sim(sim)
             fit <- new("stanfit",
                        model.name = object@model.name,
-                       model.pars = sampler$param_names(),
-                       par.dims = sampler$param_dims(),
+                       model.pars = m.pars, 
+                       par.dims = p.dims, 
                        sim = sim,
                        # summary = summary,
-                       arg.lst = args.list,
+                       # keep a record of the initial values 
+                       inits = organize.inits(lapply(sim$samples, function(x) attr(x, "inits")), 
+                                               m.pars, p.dims), 
+                       stan.args = args.list,
                        .MISC = new.env()) 
              assign("stanmodel", object, envir = fit@.MISC)
              # keep a ref to avoid garbage collection

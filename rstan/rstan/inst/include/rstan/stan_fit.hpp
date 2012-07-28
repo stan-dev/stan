@@ -341,6 +341,12 @@ namespace rstan {
 
     /**
      * @tparam Model 
+     * @param chains[out]: the object into which the samples for parameters
+     *   of interest are written. 
+     * @param initv[out]: the initial values used, or the first iteration. 
+     * @iter_save: the number of iterations that would be save after 
+     *   taking account of the thinning. 
+     * @qoi_idx: the indexes for all parameters of interest.  
      */
     
     template <class Model> 
@@ -348,6 +354,7 @@ namespace rstan {
                         stan_args& args, 
                         Model& model, 
                         std::vector<Rcpp::NumericVector>& chains, 
+                        std::vector<double>& initv, 
                         unsigned int iter_save,
                         const std::vector<size_t>& qoi_idx) {  
 
@@ -418,6 +425,17 @@ namespace rstan {
         for (size_t i = 0; i < params_r.size(); ++i)
           params_r[i] = init_rng();
       }
+
+      // keep a record of the initial values 
+      model.write_array(params_r,params_i,initv); 
+   
+      /*
+      for (size_t i = 0; i < params_r.size(); i++) 
+        rstan::io::rcout << "params_r[" << i << "]=" << params_r[i] << std::endl; 
+
+      for (size_t i = 0; i < params_i.size(); i++) 
+        rstan::io::rcout << "params_i[" << i << "]=" << params_i[i] << std::endl; 
+      */
 
       std::fstream sample_stream; 
       bool append_samples = args.get_append_samples(); 
@@ -612,10 +630,11 @@ namespace rstan {
       stan_args args(lst_args); 
       unsigned int iter_save = args.get_iter_save(); 
       std::vector<Rcpp::NumericVector> chains; 
+      std::vector<double> initv; 
       for (unsigned int i = 0; i < num_params2_; i++) 
         chains.push_back(Rcpp::NumericVector(iter_save)); 
 
-      sampler_command(data_, args, model_, chains, iter_save, names_oi_tidx_); 
+      sampler_command(data_, args, model_, chains, initv, iter_save, names_oi_tidx_); 
       // let Rcpp handle the error dispatching. 
       /*
       try {
@@ -628,6 +647,7 @@ namespace rstan {
       // chains.attr("ncol") = Rcpp::wrap(num_params2_); 
       Rcpp::List lst(chains.begin(), chains.end()); 
       lst.attr("args") = args.stan_args_to_rlist(); 
+      lst.attr("inits") = initv; 
       lst.names() = fnames_oi_; 
       return lst; 
       END_RCPP; 

@@ -67,7 +67,3 @@ sampling(rr, data = dat, n.iter = 2012, init.t = 'user',
 #          seed = 3, n.thin = 1, 
 #          sample.file = yasfile) 
 
-
-## TODO(mav): 
-##   1. R doc (Rd) 
-

@@ -37,8 +37,8 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
   \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
     indicating how the initial values of parameters are specified. \code{"0"}: 
     initialize all to be zero on the unconstrained support; 
-    \code{"user"}: specify by the user in \code{init.v}; and 
-    \code{"random"}: randomly generated.  }
+    \code{"user"}: specified by the user in \code{init.v}; and 
+    \code{"random"}: randomly generated.}
   \item{init.v}{A function or a list to specify initial values. When it 
     is a function, it optionally takes a parameter \code{chain.id}. If it 
     is a list, the length of the list must be the number of chains and 

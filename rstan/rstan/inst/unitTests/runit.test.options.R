@@ -4,8 +4,8 @@
 } 
 
 test.options1 <- function() {
-  o <- as.list(rstan:::rstan.options()) 
-  checkTrue(is.na(o)) 
+  o <- rstan:::rstan.options() 
+  checkTrue(is.null(o)) 
   rstan:::rstan.options(testname = 22) 
   checkEquals(rstan:::rstan.options("testname"), 22) 
 } 

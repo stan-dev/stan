@@ -57,7 +57,7 @@ SEXP stanc(SEXP model_stancode, SEXP model_name) {
                               Rcpp::Named("msg") = Rcpp::wrap(e.what())); 
   }
   return Rcpp::List::create(Rcpp::Named("status") = SUCCESS_RC, 
-                            Rcpp::Named("model_name") = mname_,
+                            Rcpp::Named("model.name") = mname_,
                             Rcpp::Named("cppcode") = out.str());
 
   END_RCPP;

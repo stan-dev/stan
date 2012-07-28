@@ -34,6 +34,14 @@ traceplot(ss1)
 
 ss4 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, refresh = 10) 
 
-ss <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4)
+ss <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4, sample.file = '8schools.csv')
 print(ss)
+
+ss.inits <- ss@inits 
+ss.same <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4, seed = ss@stan.args[[1]]$seed, 
+               init.t = 'user', init.v = ss.inits, sample.file = 'ya8schools.csv') 
+
+b <- identical(ss@sim$samples, ss.same@sim$samples) 
+# note that ss is not the same as ss.same becase 
+# in ss, there are steps to generate the random inital values 
 

@@ -591,6 +591,28 @@ summary.sim <- function(sim, pars, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75
   ss
 }  
 
+organize.inits <- function(inits, pars, dims) {
+  # obtain a list of inital values for each chain in sim
+  # Args: 
+  #   inits: a list of vectors, each vector is the 
+  #     inits for a chain 
+  n.chains <- length(inits) 
+  starts <- calc.starts(dims) 
+  tmpfun <- function(x) {
+    lst <- lapply(1:length(pars),  
+                  function(i) { 
+                    len <- num.pars(dims[[i]]) 
+                    if (1 == len) return(x[starts[i]]) 
+                    y <- x[starts[i] + (1:len) - 1] 
+                    dim(y) <- dims[[i]] 
+                    return(y) 
+                  })
+    names(lst) <- pars 
+    lst 
+  } 
+  lapply(inits, tmpfun) 
+} 
+
 # ported from bugs.plot.inferences in R2WinBUGS  
 # 
 stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, ...) {

@@ -6,8 +6,8 @@ setClass(Class = "stanfit",
            model.pars = "character", 
            par.dims = "list", 
            sim = "list", 
-           # summary = "list", 
-           arg.lst = "list", 
+           inits = "list", 
+           stan.args = "list", 
            .MISC = "environment"
          ),  
          validity = function(object) {
@@ -119,7 +119,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
   yrange <- NULL 
   main <- paste("Trace of ", par.name) 
   chain.cols <- rstan.options("rstan.chain.cols")
-  warmup.col <- rstan.options("rstan.warmup.col") 
+  warmup.col <- rstan.options("rstan.warmup.bg.col") 
   if (inc.warmup) {
     id <- seq(1, by = n.thin, length.out = n.save) 
     for (i in 1:sim$n.chains) {

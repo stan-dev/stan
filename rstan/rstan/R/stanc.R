@@ -7,8 +7,9 @@ stanc <- function(model.code, model.name = "anon_model", verbose = FALSE) {
   model.name2 <- legitimate.model.name(model.name) 
   r <- .Call("stanc", model.code, model.name2, PACKAGE = "rstan")
   # from the cpp code of stanc,
-  # returned is a named list with element 'status', 'model_name', and 'cppcode' 
+  # returned is a named list with element 'status', 'model.name', and 'cppcode' 
   r$model.name2 <- model.name2  
+  r$model.code <- model.code 
   if (is.null(r)) {
     stop(paste("Failed to run stanc for model '", model.name, 
                "' and no error message provided", sep = '')) 

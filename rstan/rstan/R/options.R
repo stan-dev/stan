@@ -34,7 +34,7 @@
   assign("rstan.chain.cols", rstancolc, e)
 
   # color for shading the area of warmup trace plot
-  assign("rstan.warmup.col", rstan:::rstancolgrey[3], e)
+  assign("rstan.warmup.bg.col", rstan:::rstancolgrey[3], e)
 
   # boost lib path 
   rstan.inc.path  <- system.file('include', package = 'rstan')
@@ -58,7 +58,7 @@ rstan.options <- function(...) {
 
   a <-  list(...)
   len <- length(a) 
-  if (len < 1) return(NA) 
+  if (len < 1) return(NULL) 
   a.names <- names(a) 
   # deal with the case that this function is called as 
   # rstan.options("a", "b")
@@ -70,15 +70,14 @@ rstan.options <- function(...) {
     if (length(r) == 1) return(r[[1]])
     return(invisible(r))
   } 
-  # the case for 
+  # the case for, for example, 
   # rstan.options(a = 3, b = 4, "c")
-  empty.idx <- which(a.names == '')
-  nonempty.idx <- which(a.names != '')
+  empty <- (a.names == '') 
 
-  opt.names <- c(a.names[nonempty.idx], unlist(a[empty.idx]))
+  opt.names <- c(a.names[!empty], unlist(a[empty]))
   r <- mget(opt.names, envir = e, ifnotfound = NA)
 
-  lapply(a.names[nonempty.idx], FUN = function(n) assign(n, a[[n]], e)) 
+  lapply(a.names[!empty], FUN = function(n) assign(n, a[[n]], e)) 
 
   if (length(r) == 1) return(r[[1]])
   invisible(r)

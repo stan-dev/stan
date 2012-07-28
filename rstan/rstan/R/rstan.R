@@ -25,13 +25,17 @@ stan.model <- function(file,
   if (!is.list(stanc.ret)) {
     stop("stanc.ret needs to be the returned object from stanc.")
   } 
-  m <- match(c("cppcode", "model_name"), names(stanc.ret)) 
+  m <- match(c("cppcode", "model.name", "status"), names(stanc.ret)) 
   if (any(is.na(m))) {
-    stop("stanc.ret does not have element `cppcode' and `model_name'") 
+    stop("stanc.ret does not have element `cppcode', `model.name', and `status'") 
+  } else {
+    if (stanc.ret$status != 0) 
+      stop("stanc.ret is not a successfully returned list from stanc")
   } 
 
   model.name2 <- stanc.ret$model.name2 
-  model.name <- stanc.ret$model_name 
+  model.name <- stanc.ret$model.name 
+  model.code <- stanc.ret$model.code 
   inc <- paste("#include <rstan/rstaninc.hpp>\n", 
                stanc.ret$cppcode, 
                get_Rcpp_module_def_code(model.name2), 
@@ -58,7 +62,7 @@ stan.model <- function(file,
   ## We keep a reference to *fx* above to avoid fx to be 
   ## deleted by R's garbage collection. Note that if fx 
   ## is freed, we lost the compiled shared object, which
-  ## then cause segfault later. 
+  ## could cause segfault later. 
 } 
 
 is.sm.valid <- function(sm) {
