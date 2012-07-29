@@ -35,7 +35,7 @@
       of \code{"list"}} 
     \item{\code{inits}:}{The initial values either specified or generated
       randomly for all chains, object of \code{"list"}. Each member is a list for a chain.} 
-    \item{\code{arg.lst}:}{The arguments used for sampling all chains, object of \code{"list"}}
+    \item{\code{stan.args}:}{The arguments used for sampling all chains, object of \code{"list"}}
     \item{\code{.MISC}:}{Miscellaneous helper information used for the fitted model, 
       object of \code{"environment"}}
   }

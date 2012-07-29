@@ -33,6 +33,7 @@ build $(STANPKG): ./rstan/DESCRIPTION
 	$(LINKCMD1)
 	$(LINKCMD2)
 	@rm -f $(STANPKG) 
+	@echo "git.head <- function() \"`git rev-parse HEAD`\"" > rstan/R/git.head.R
 	R CMD build rstan
 
 
