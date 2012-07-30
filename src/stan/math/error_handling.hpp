@@ -545,9 +545,9 @@ namespace stan {
                                       const Policy&) {
       size_t x_size = size_of(x);
       if (is_vector<T>::value && x_size == max_size)
-	return true;
+        return true;
       if (!is_vector<T>::value && x_size == 1)
-	return true;
+        return true;
       return dom_err(
               function,x_size,name,
               " (max size) is %1%, but must be consistent, 1 or max=",max_size,
@@ -583,7 +583,7 @@ namespace stan {
       return check_consistent_sizes(function,x1,x2,x3,name1,name2,name3,
                                     result,default_policy());
     }
-    template <typename T1, typename T2, typename T3, typename T_result>
+    template <typename T1, typename T2, typename T3>
     inline bool check_consistent_sizes(
                        const char* function,
                        const T1& x1, 
