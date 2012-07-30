@@ -58,7 +58,22 @@ namespace stan {
   struct scalar_type<std::vector<T> > {
     typedef typename scalar_type<T>::type type;
   };
-      
+
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,1> > {
+    typedef typename scalar_type<T>::type type;
+  };
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,1,Eigen::Dynamic> > {
+    typedef typename scalar_type<T>::type type;
+  };
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+    typedef typename scalar_type<T>::type type;
+  };
+
+
+
 
   template <typename T>
   struct is_vector {
