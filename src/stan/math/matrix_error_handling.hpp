@@ -15,6 +15,15 @@ namespace stan {
 
   namespace math {
 
+    template <typename T>
+    size_t size_of(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) {
+      return x.size();
+    }
+    template <typename T>
+    size_t size_of(const Eigen::Matrix<T, 1, Eigen::Dynamic>& x) {
+      return x.size();
+    }
+
     template <typename T_size1, typename T_size2, typename T_result,
               class Policy>
     inline bool check_size_match(const char* function,
@@ -305,135 +314,6 @@ namespace stan {
       return check_corr_matrix(function,y,name,result,default_policy());
     }
 
-
-
-
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy&) {
-      using stan::math::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (boost::math::isnan(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must not be nan!";
-          T_result tmp = raise_domain_error<T_result,T_y>(function,
-                                                          message.str().c_str(),
-                                                          y[i],
-                                                          Policy());
-          if (result != 0)
-            *result = tmp;
-          return false;
-        }
-      }
-      return true;
-    }
-
-    template <typename T_y, typename T_result>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const char* name,
-                              T_result* result) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-
-    template <typename T>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
-                              const char* name,
-                              T* result = 0) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-
-
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_not_nan(const char* function,
-                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const char* name,
-                  T_result* result,
-                  const Policy&) {
-      for (int i = 0; i < y.rows(); i++) {
-        for (int j = 0; j < y.cols(); j++) {
-          if (boost::math::isnan(y(i,j))) {
-            std::ostringstream message;
-            message << name << "[" << i << "," << j 
-                    << "] is %1%, but must not be nan!";
-            T_result tmp
-              = policies::raise_domain_error<T_y>(function,
-                                                  message.str().c_str(),
-                                                  y(i,j), Policy());
-            if (result != 0)
-              *result = tmp;
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-
-    template <typename T_y, typename T_result>
-    inline bool check_not_nan(const char* function,
-                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const char* name,
-                  T_result* result) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-
-    template <typename T>
-    inline bool check_not_nan(const char* function,
-                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const char* name,
-                  T* result = 0) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-
-
-
-
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_finite(const char* function,
-                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                             const char* name,
-                             T_result* result,
-                             const Policy&) {
-      using stan::math::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (!boost::math::isfinite(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must be finite!";
-          T_result tmp = raise_domain_error<T_result,T_y>(function,
-                                                          message.str().c_str(),
-                                                          y[i],
-                                                          Policy());
-          if (result != 0)
-            *result = tmp;
-          return false;
-        }
-      }
-      return true;
-    }
-
-    template <typename T_y, typename T_result>
-    inline bool check_finite(const char* function,
-                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                             const char* name,
-                             T_result* result) {
-      return check_finite(function,y,name,result,default_policy());
-    }
-
-    template <typename T>
-    inline bool check_finite(const char* function,
-                             const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
-                             const char* name,
-                             T* result = 0) {
-      return check_finite(function,y,name,result,default_policy());
-    }
-
-
-
-
     /**
      * Return <code>true</code> if the specified matrix is a valid
      * covariance matrix.  A valid covariance matrix must be symmetric
@@ -459,7 +339,6 @@ namespace stan {
         return false;
       return true;
     }
-
     template <typename T_covar, typename T_result>
     inline bool check_cov_matrix(const char* function,
          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
@@ -467,7 +346,6 @@ namespace stan {
       return check_cov_matrix(function,Sigma,result,default_policy());
       
     }
-
     template <typename T>
     inline bool check_cov_matrix(const char* function,
          const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
@@ -546,7 +424,6 @@ namespace stan {
       }
       return true;
     }                         
-
     template <typename T_y,
               typename T_result> // = typename T_prob_vector::value_type, 
     inline bool check_simplex(const char* function,
@@ -555,7 +432,6 @@ namespace stan {
                               T_result* result) {
       return check_simplex(function,theta,name,result,default_policy());
     }
-
     template <typename T>
     inline bool check_simplex(const char* function,
                               const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
@@ -610,7 +486,6 @@ namespace stan {
       }
       return true;
     }                         
-
     template <typename T_y, typename T_result>
     bool check_ordered(const char* function,
                        const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
@@ -618,13 +493,282 @@ namespace stan {
                            T_result* result) {
       return check_ordered(function,y,name,result,default_policy());
     }
-
     template <typename T>
     bool check_ordered(const char* function,
                        const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
                        const char* name,
                        T* result = 0) {
       return check_ordered(function,y,name,result,default_policy());
+    }
+
+
+
+    // error_handling functions for Eigen vector, row vector & matrix
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                              const char* name,
+                              T_result* result,
+                              const Policy&) {
+      using stan::math::policies::raise_domain_error;
+      for (int i = 0; i < y.rows(); i++) {
+        if (boost::math::isnan(y[i])) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must not be nan!";
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                              const char* name,
+                              T_result* result) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
+                              const char* name,
+                              T* result = 0) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
+                              const char* name,
+                              T_result* result,
+                              const Policy&) {
+      using stan::math::policies::raise_domain_error;
+      for (int i = 0; i < y.rows(); i++) {
+        if (boost::math::isnan(y[i])) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must not be nan!";
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
+                              const char* name,
+                              T_result* result) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_not_nan(const char* function,
+                              const Eigen::Matrix<T,1,Eigen::Dynamic>& y,
+                              const char* name,
+                              T* result = 0) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_not_nan(const char* function,
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result,
+                  const Policy&) {
+      for (int i = 0; i < y.rows(); i++) {
+        for (int j = 0; j < y.cols(); j++) {
+          if (boost::math::isnan(y(i,j))) {
+            std::ostringstream message;
+            message << name << "[" << i << "," << j 
+                    << "] is %1%, but must not be nan!";
+            T_result tmp
+              = policies::raise_domain_error<T_y>(function,
+                                                  message.str().c_str(),
+                                                  y(i,j), Policy());
+            if (result != 0)
+              *result = tmp;
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_not_nan(const char* function,
+                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T_result* result) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_not_nan(const char* function,
+                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                  const char* name,
+                  T* result = 0) {
+      return check_not_nan(function,y,name,result,default_policy());
+    }
+
+
+
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T_result* result,
+                             const Policy&) {
+      using stan::math::policies::raise_domain_error;
+      for (int i = 0; i < y.rows(); i++) {
+        if (!boost::math::isfinite(y[i])) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must be finite!";
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T_result* result) {
+      return check_finite(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T* result = 0) {
+      return check_finite(function,y,name,result,default_policy());
+    }
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
+                             const char* name,
+                             T_result* result,
+                             const Policy&) {
+      using stan::math::policies::raise_domain_error;
+      for (int i = 0; i < y.rows(); i++) {
+        if (!boost::math::isfinite(y[i])) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must be finite!";
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
+                             const char* name,
+                             T_result* result) {
+      return check_finite(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_finite(const char* function,
+                             const Eigen::Matrix<T,1,Eigen::Dynamic>& y,
+                             const char* name,
+                             T* result = 0) {
+      return check_finite(function,y,name,result,default_policy());
+    }
+
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_positive(const char* function,
+                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T_result* result,
+                             const Policy&) {
+      using stan::math::policies::raise_domain_error;
+      for (int i = 0; i < y.rows(); i++) {
+        if (!(y[i] > 0)) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must be positive!";
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_positive(const char* function,
+                             const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T_result* result) {
+      return check_positive(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_positive(const char* function,
+                             const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
+                             const char* name,
+                             T* result = 0) {
+      return check_positive(function,y,name,result,default_policy());
+    }
+
+    template <typename T_y, typename T_result, class Policy>
+    inline bool check_positive(const char* function,
+                               const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
+                             const char* name,
+                             T_result* result,
+                             const Policy&) {
+      using stan::math::policies::raise_domain_error;
+      for (int i = 0; i < y.rows(); i++) {
+        if (!(y[i] > 0)) {
+          std::ostringstream message;
+          message << name << "[" << i << "] is %1%, but must be positive!";
+          T_result tmp = raise_domain_error<T_result,T_y>(function,
+                                                          message.str().c_str(),
+                                                          y[i],
+                                                          Policy());
+          if (result != 0)
+            *result = tmp;
+          return false;
+        }
+      }
+      return true;
+    }
+    template <typename T_y, typename T_result>
+    inline bool check_positive(const char* function,
+                               const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
+                             const char* name,
+                             T_result* result) {
+      return check_positive(function,y,name,result,default_policy());
+    }
+    template <typename T>
+    inline bool check_positive(const char* function,
+                               const Eigen::Matrix<T,1,Eigen::Dynamic>& y,
+                             const char* name,
+                             T* result = 0) {
+      return check_positive(function,y,name,result,default_policy());
     }
 
 

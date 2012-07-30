@@ -75,6 +75,7 @@ namespace stan {
 
 
 
+
   template <typename T>
   struct is_vector {
     enum { value = 0 };
