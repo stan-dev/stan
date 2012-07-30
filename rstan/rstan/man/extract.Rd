@@ -3,7 +3,7 @@
 \alias{extract} 
 \alias{extract-methods}
 \alias{extract,stanfit-method}
-\alias{extract,stanfit,character-method}
+%\alias{extract,stanfit,character-method}
 
 \title{\code{extract}: extract samples from fitted Stan model}
 \description{
@@ -18,7 +18,7 @@
 \section{Methods}{
   \describe{
     \item{extract}{\code{signature(object = "stanfit"}}{
-       Extract samples for a fitted model defined by class \code{"stanfit"}.  
+       Extract samples for a fitted model defined by class \code{stanfit}.  
     }
   }
 }
@@ -46,8 +46,7 @@
   parameters.} 
 
 \examples{
-\dontrun{
-}
+  \dontrun{}
 } 
 
 \keyword{methods}

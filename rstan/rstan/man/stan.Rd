@@ -11,9 +11,11 @@ fitted result.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-stan(file, model.name = "anon_model", model.code = "", data = list(), pars = NA, n.chains = 1L,
-n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
-init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose = FALSE, ..., boost.lib = NULL)
+stan(file, model.name = "anon_model", model.code = "", 
+  data = list(), pars = NA, n.chains = 1L,
+  n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
+  init.v = NULL, seed = sample.int(.Machine$integer.max, 1), 
+  sample.file, verbose = FALSE, ..., boost.lib = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -69,10 +71,18 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
   \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  \code{stan} is a one step function to fit a 
+  Stan model. It first compiles the model represented by
+  Stan modelling language to C++ code. Second, the 
+  C++ code is compiled into binary shared object, which
+  is loaded into the current \R session (an object
+  of S4 class \code{stanmodel} is created). Then samples 
+  are drawn and wrapped in an object of S4 class \code{stanfit}, 
+  which provides function such as \code{print} and \code{plot}
+  to check the results of the fitted model. 
 }
 \value{
-    Fitted results as an object of S4 class \code{stanfit}.
+  Fitted results as an object of S4 class \code{stanfit}.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
@@ -80,7 +90,9 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+  The Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  \url{http://code.google.com/p/stan}. 
 }
 \author{
 %%  ~~who you are~~
@@ -92,7 +104,7 @@ init.v = NULL, seed = sample.int(.Machine$integer.max, 1), sample.file, verbose 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{sampling}} 
+  \code{\link{sampling}} 
 }
 \examples{
   library(rstan)

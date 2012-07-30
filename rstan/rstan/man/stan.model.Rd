@@ -10,7 +10,6 @@
   The model C++ code plus other auxiliary 
   code is compiled into shared object and then loaded. 
   The loaded module is available for drawing samples.  
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 
 \usage{
@@ -58,7 +57,9 @@
   %% ...
 }
 \references{
- \url{http://code.google.com/p/stan} 
+  The Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  \url{http://code.google.com/p/stan}. 
   %% ~put references to the literature/web site here ~
 }
 \author{
@@ -71,12 +72,9 @@
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-  \code{\linkS4class{stanmodel}} 
-  %% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\linkS4class{stanmodel}} and \code{\link{stan}} 
 }
 \examples{
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{stan}
+\keyword{rstan}
 \keyword{stanmodel}
