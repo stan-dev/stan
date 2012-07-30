@@ -9,9 +9,10 @@
 \alias{print,stanfit-method}
 \alias{show,stanfit-method}
 \alias{plot,stanfit-method}
+%% \alias{stan.code,stanfit-method}
 %% \alias{traceplot,stanfit-method}
 
-\title{Class \code{"stanfit"}}
+\title{Class \code{stanfit}: fitted Stan model}
 
 \description{
   Samples and other inferences information for a Stan model, typically, a
@@ -20,24 +21,24 @@
 } 
 
 \section{Objects from the Class}{
-  Objects are usually created by calling \code{sampling} function in \code{"stan.model"},
+  Objects are usually created by calling \code{sampling} function in S4 class \code{stan.model},
   or by the \code{stan} function, which wraps the \code{sampling} function inside.  
 }
 
 
 \section{Slots}{
   \describe{
-    \item{\code{model.name}:}{The model name, object of \code{"character"}} 
+    \item{\code{model.name}:}{The model name, object of \code{character}} 
     \item{\code{model.pars}:}{The names of parameters (or transformed
-      parameters, derived quantities), object of \code{"character"}} 
-    \item{\code{par.dims}:}{The dimensions for all parameters, object of \code{"list"}}
+      parameters, derived quantities), object of \code{character}} 
+    \item{\code{par.dims}:}{The dimensions for all parameters, object of \code{list}}
     \item{\code{sim}:}{Simulation results including samples for the model, object 
-      of \code{"list"}} 
+      of \code{list}} 
     \item{\code{inits}:}{The initial values either specified or generated
-      randomly for all chains, object of \code{"list"}. Each member is a list for a chain.} 
-    \item{\code{stan.args}:}{The arguments used for sampling all chains, object of \code{"list"}}
+      randomly for all chains, object of \code{list}. Each member is a list for a chain.} 
+    \item{\code{stan.args}:}{The arguments used for sampling all chains, object of \code{list}}
     \item{\code{.MISC}:}{Miscellaneous helper information used for the fitted model, 
-      object of \code{"environment"}}
+      object of \code{environment}}
   }
 }
 
@@ -57,11 +58,15 @@
       (see \code{\link{extract}}).}
     \item{traceplot}{\code{signature(object = "stanfit")}:
       plot the trace of chains.} 
+    \item{stan.code}{\code{signature(object = "stanfit")}:
+      get the Stan code for the fitted model.}
   }
 }
 
 \references{
-%%  ~~put references to the literature/web site here~~
+  The Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  \url{http://code.google.com/p/stan}. 
 }
 \author{
 %%  ~~who you are~~
@@ -73,10 +78,10 @@
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%%  ~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-%%  ~~or \code{\linkS4class{CLASSNAME}} for links to other classes ~~~
+  \code{\link{stan}} and \code{\linkS4class{stanmodel}} 
 }
 \examples{
-showClass("stanfit")
+  showClass("stanfit")
 }
 \keyword{classes}
+\keyword{stanfit} 

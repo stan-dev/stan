@@ -3,27 +3,19 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Obtain the version of stanc in Stan} 
 \description{
-The stan version is in form of MAJOR_VERION.MINOR_VERSION.PATCH_VERSION (the
-first version is 1.0.0.). 
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  The stan version is in form of MAJOR_VERION.MINOR_VERSION.PATCH_VERSION (the
+  first version is 1.0.0.). 
 }
 \usage{
   stanc.version()
 }
-%- maybe also 'usage' for other objects documented here.
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
 \value{
   A character string giving the version of stanc. 
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+  The Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  \url{http://code.google.com/p/stan}. 
 }
 \author{
 %%  ~~who you are~~
@@ -32,15 +24,10 @@ first version is 1.0.0.).
 %%  ~~further notes~~
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{stan}} and \code{\link{stan.model}} 
 }
 \examples{
   stanc.version() 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{stan} 
-\keyword{version} 
+\keyword{rstan} 

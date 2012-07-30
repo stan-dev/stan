@@ -42,6 +42,18 @@ ss.same <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4, seed = ss@stan
                init.t = 'user', init.v = ss.inits, sample.file = 'ya8schools.csv') 
 
 b <- identical(ss@sim$samples, ss.same@sim$samples) 
-# note that ss is not the same as ss.same becase 
-# in ss, there are steps to generate the random inital values 
+# b is not true as ss is initialized randomly while ss.same is not. 
+
+
+s <- summary(ss.same, pars = "mu_theta", probs = c(.3, .8))
+print(ss.same, pars = 'theta', probs = c(.4, .8))
+print(ss.same)
+
+
+fit2 <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 3, pars = "theta")
+print(fit2)
+print(fit2, pars = 'theta')
+print(fit2, pars = 'mu_theta')
+
+
 

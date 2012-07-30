@@ -1,10 +1,8 @@
-
-
 \name{stanc}
 \alias{stanc} 
 \docType{package}
 \title{
-stanc: compile model in Stan language to C++ code
+\code{stanc}: compile model in Stan modeling language to C++ code
 }
 \description{
   Compile model in Stan language to C++ code, which could 
@@ -32,6 +30,16 @@ stanc: compile model in Stan language to C++ code
     \item \code{status}     The status indicating success/failure of compiling the Stan code. 
   } 
 }
+
+\references{
+  The Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  \url{http://code.google.com/p/stan}. 
+} 
+
+\seealso{
+  \code{\link{stan.model}} and \code{\link{stan}}
+} 
 
 \examples{
 \dontrun{

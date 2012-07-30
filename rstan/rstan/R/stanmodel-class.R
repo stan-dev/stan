@@ -13,7 +13,7 @@ setClass(Class = "stanmodel",
 
 setMethod("show", "stanmodel",
           function(object) {
-            cat("Stanmodel: `", object@model.name, "' coded as follows:\n" ,sep = '') 
+            cat("S4 class stanmodel: `", object@model.name, "' coded as follows:\n" ,sep = '') 
             cat(object@model.code, "\n")
           }) 
 
@@ -73,7 +73,7 @@ setMethod("sampling", "stanmodel",
               m <- which(match(pars, m.pars, nomatch = 0) == 0)
               if (length(m) > 0) 
                 stop("No parameter ", paste(pars[m], collapse = ', ')) 
-	    }
+            }
 
             args.list <- config.argss(n.chains = n.chains, n.iter = n.iter,
                                       n.warmup = n.warmup, n.thin = n.thin,
@@ -88,6 +88,7 @@ setMethod("sampling", "stanmodel",
             for (i in 1:n.chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args.list[[i]])
+              cat("SAMPLING FOR MODEL '", object@model.name, "' NOW (CHAIN ", i, ").\n", sep = '')
               samples[[i]] <- sampler$call_sampler(args.list[[i]])
               if (is.null(samples[[i]])) 
                 stop("Error occurred when calling the sampler")

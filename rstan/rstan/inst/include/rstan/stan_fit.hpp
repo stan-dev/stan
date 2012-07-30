@@ -524,7 +524,7 @@ namespace rstan {
       }
       
       if (sample_file_flag) {
-        rstan::io::rcout << std::endl << "Samples of chain " 
+        rstan::io::rcout << "Samples of chain " 
                          << chain_id 
                          << " are written to file " << sample_file 
                          << std::endl;

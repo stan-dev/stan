@@ -33,14 +33,15 @@ stan.model <- function(file,
       stop("stanc.ret is not a successfully returned list from stanc")
   } 
 
-  model.name2 <- stanc.ret$model.name2 
+  model.cppname <- stanc.ret$model.cppname 
   model.name <- stanc.ret$model.name 
   model.code <- stanc.ret$model.code 
   inc <- paste("#include <rstan/rstaninc.hpp>\n", 
                stanc.ret$cppcode, 
-               get_Rcpp_module_def_code(model.name2), 
+               get_Rcpp_module_def_code(model.cppname), 
                sep = '')  
 
+  cat("COMPILING THE C++ CODE FOR MODEL '", model.name, "' NOW.\n", sep = '') 
   if (!is.null(boost.lib)) { 
     old.boost.lib <- rstan.options(boost.lib = boost.lib) 
     tryCatch(fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
@@ -51,9 +52,9 @@ stan.model <- function(file,
                       includes = inc, plugin = "rstan", verbose = verbose) 
   } 
                
-  mod <- Module(model.name2, getDynLib(fx)) 
+  mod <- Module(model.cppname, getDynLib(fx)) 
   # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
-  stan_fit_cpp_module <- eval(call("$", mod, model.name2))
+  stan_fit_cpp_module <- eval(call("$", mod, model.cppname))
   new("stanmodel", model.name = model.name, 
       model.code = model.code, 
       .modelmod = list(sampler = stan_fit_cpp_module, 
