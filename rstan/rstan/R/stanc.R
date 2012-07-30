@@ -1,14 +1,16 @@
 stanc <- function(model.code, model.name = "anon_model", verbose = FALSE) {
   # Call stanc, which is written in C++
   # 
+
+  cat("COMPILING MODEL '", model.name, "' FROM Stan CODE TO C++ CODE NOW.\n", sep = '')
   SUCCESS_RC <- 0 
   EXCEPTION_RC <- -1
   PARSE_FAIL_RC <- -2 
-  model.name2 <- legitimate.model.name(model.name) 
-  r <- .Call("stanc", model.code, model.name2, PACKAGE = "rstan")
+  model.cppname <- legitimate.model.name(model.name) 
+  r <- .Call("stanc", model.code, model.cppname, PACKAGE = "rstan")
   # from the cpp code of stanc,
   # returned is a named list with element 'status', 'model.name', and 'cppcode' 
-  r$model.name2 <- model.name2  
+  r$model.name <- model.name  
   r$model.code <- model.code 
   if (is.null(r)) {
     stop(paste("Failed to run stanc for model '", model.name, 

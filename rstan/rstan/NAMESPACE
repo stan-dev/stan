@@ -22,6 +22,6 @@ exportMethods (
 #   print, plot, 
 #   extract, 
   show, sampling, summary, print, extract, 
-  traceplot, plot
+  traceplot, plot, stan.code
 )
 import(Rcpp)

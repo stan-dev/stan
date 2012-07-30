@@ -17,7 +17,7 @@ setClass(Class = "stanfit",
 
 setMethod("show", "stanfit",
           function(object) { 
-            cat("Stanfit of model: `", object@model.name, "' with ", 
+            cat("S4 class stanfit of model: `", object@model.name, "' with ", 
                 object@sim$n.chains, " chains.\n", sep = '')  
           })  
 
@@ -52,6 +52,18 @@ setMethod("print", signature = (x = "stanfit"),
             cat("convergence, Rhat=1).\n")
           })  
 
+setGeneric(name = "stan.code",
+           def = function(object, ...) { standardGeneric("stan.code")}) 
+
+setMethod('stan.code', signature = (object = 'stanfit'), 
+          function(object, print = FALSE) {
+            if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
+              stop("stanmodel is not found") 
+            code <- object@.MISC$stanmodel$model.code
+            if (print) cat(code, "\n") 
+            invisible(code)
+          }) 
+
 
 ### HELPER FUNCTIONS
 ### 
@@ -75,7 +87,7 @@ check.pars <- function(sim, pars) {
     stop("No parameter ", paste(pars[m], collapse = ', ')) 
   if (length(pars_wo_ws) == 0) 
     stop("No parameter specified (pars is empty)")
-  pars_wo_ws
+  unique(pars_wo_ws) 
 } 
 
 get.kept.samples <- function(n, sim) {
@@ -213,15 +225,46 @@ setMethod("extract", signature(object = "stanfit"),
 setMethod("summary", signature = (object = "stanfit"), 
           function(object, pars, 
                    probs = c(0.025, 0.25, 0.50, 0.75, 0.975), ...) { 
+            # Summarize the samples (that is, compute the mean, SD, quantiles, for 
+            # the samples in all chains and chains individually after removing
+            # warmup samples, and ESS and split R hat for all the kept samples.)
+            # 
+            # Returns: 
+            #   A list with elements:
+            #   summary: the summary for all the kept samples 
+            #   c.summary: the summary for individual chains. 
+            # 
+            # Note: 
+            #   This function is a not straight in terms of implementation as it
+            #   saves some standard summaries including ESS and Rhat in the environment
+            #   of the object, which is used if it's available and created upon 
+            #   the first time standard summary is called. . 
+            #   In addition, the indexes complicate the implementation as internally
+            #   we use column major indexes for vector/array parameters. But it might
+            #   be better to use row major indexes for the output such as print.
+           
             pars <- if (missing(pars)) object@sim$pars.oi else check.pars(object@sim, pars) 
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
             m <- match(probs, c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975))  
             if (any(is.na(m))) {
-              ss <-  summary.sim(object@sim, pars, probs) 
+              g.ess <- FALSE; g.rhat <- FALSE 
+              if (!exists("summary", envir = object@.MISC, inherits = FALSE)) {
+                g.ess <- TRUE; g.rhat <- TRUE
+              }
+              ss <-  summary.sim(object@sim, pars, probs, get.ess = g.ess, get.rhat = g.rhat) 
               row.idx <- attr(ss, "row.major.idx") 
-              ss2 <- list(summary = ss$summary[row.idx, ], 
-                          c.summary = ss$c.summary[row.idx, , ])
+              col.idx <- attr(ss, "col.major.idx") 
+
+              if (is.null(ss$ess)) ss$ess <- object@.MISC$summary$ess[col.idx, drop = FALSE] 
+              if (is.null(ss$rhat)) ss$rhat <- object@.MISC$summary$rhat[col.idx, drop = FALSE] 
+
+              summary <- cbind(ss$summary, ss$ess, ss$rhat)
+              colnames(summary) <- c(colnames(ss$summary), 'ESS', 'Rhat')
+
+              idx2 <- match(row.idx, col.idx) 
+              ss2 <- list(summary = summary[idx2, , drop = FALSE],
+                          c.summary = ss$c.summary[idx2, , , drop = FALSE]) 
               return(invisible(ss2)) 
             }
 
@@ -234,17 +277,19 @@ setMethod("summary", signature = (object = "stanfit"),
                                        pars) 
             tidx <- lapply(tidx, function(x) attr(x, "row.major.idx"))
             tidx <- unlist(tidx, use.names = FALSE)
+            tidx.len <- length(tidx)
             stat.idx <- c(1:2, 2 + m) 
-            stat.idx2 <- c(1:2, 2 + m, 12, 13) # including ess and rhat
-   
-            s1 <- object@.MISC$summary$summary[tidx, stat.idx2]  
-            pars.names <- rownames(object@.MISC$summary$summary)[tidx] 
-            dim(s1) <- c(length(tidx), length(stat.idx2)) 
-            rownames(s1) <- pars.names 
-            colnames(s1) <- colnames(object@.MISC$summary$summary)[stat.idx2] 
 
-            s2 <- object@.MISC$summary$c.summary[tidx, stat.idx, ]
-            dim(s2) <- c(length(tidx), length(stat.idx), object@sim$n.chains)
+            s1 <- cbind(object@.MISC$summary$summary[tidx, stat.idx, drop = FALSE], 
+                        object@.MISC$summary$ess[tidx, drop = FALSE],
+                        object@.MISC$summary$rhat[tidx, drop = FALSE])  
+            pars.names <- rownames(object@.MISC$summary$summary)[tidx] 
+            dim(s1) <- c(length(tidx), length(stat.idx) + 2) 
+            rownames(s1) <- pars.names 
+            colnames(s1) <- c(colnames(object@.MISC$summary$summary)[stat.idx], "ESS", "Rhat") 
+
+            s2 <- object@.MISC$summary$c.summary[tidx, stat.idx, , drop = FALSE]
+            dim(s2) <- c(tidx.len, length(stat.idx), object@sim$n.chains)
             stat.names2 <- dimnames(object@.MISC$summary$c.summary)[[2]][stat.idx]
             dimnames(s2) <- list(pars.names, stat.names2, NULL) 
            
@@ -271,12 +316,12 @@ setMethod("traceplot", signature = (object = "stanfit"),
             num.plots <- length(tidx) 
             if (num.plots %in% 2:4) par(mfrow = c(num.plots, 1)) 
             if (num.plots > 5) par(mfrow = c(4, 2)) 
-            par.traceplot(object@sim, tidx[1], object@sim$fnames.oi[1], 
+            par.traceplot(object@sim, tidx[1], object@sim$fnames.oi[tidx[1]], 
                           inc.warmup = inc.warmup)
             if (num.plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
             if (num.plots > 1) { 
               for (n in 2:num.plots)
-                par.traceplot(object@sim, tidx[n], object@sim$fnames.oi[n], 
+                par.traceplot(object@sim, tidx[n], object@sim$fnames.oi[tidx[n]], 
                               inc.warmup = inc.warmup)
             }
             if (ask) devAskNewPage(ask = ask.old)

@@ -556,40 +556,72 @@ rstancolc <- rgb(matrix(c(230, 97, 1,
                         byrow = TRUE, ncol = 3),
                  names = paste(1:6), maxColorValue = 255) 
 
+default.summary.probs <- function() c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)
+
 ## summarize the chains merged and individually 
-get.par.summary <- function(sim, n, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
+get.par.summary <- function(sim, n, probs = default.summary.probs()) {
   ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
   sumfun <- function(chain) c(mean(chain), sd(chain), quantile(chain, probs = probs))
   cs <- lapply(ss, sumfun)
   as <- sumfun(do.call(c, ss)) 
   list(summary = as, 
-       c.summary = unlist(cs, use.names = FALSE), 
-       ess = rstan:::rstan.ess(sim, n), 
-       splitrhat = rstan:::rstan.splitrhat(sim, n)) 
+       c.summary = unlist(cs, use.names = FALSE)) 
 } 
 
-summary.sim <- function(sim, pars, probs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)) {
+summary.sim <- function(sim, pars, probs = default.summary.probs(), 
+                        get.ess = TRUE, get.rhat = TRUE) {
   # cat("summary.sim is called.\n")
   probs.str <- probs2str(probs)
   pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
   tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
+  tidx.len <- length(tidx) 
   tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
   s <- lapply(tidx, function(n) get.par.summary(sim, n, probs = probs))
-  as <- lapply(s, function(x) c(x$summary, x$ess, x$splitrhat))  
-  as <- do.call(rbind, as)
-  dim(as) <- c(length(tidx), 4 + length(probs)) 
-  rownames(as) <- sim$fnames.oi[tidx] 
-  colnames(as) <- c("Mean", "SD", probs.str, "ESS", "Rhat") 
+  ess <- if (get.ess) array(sapply(tidx, function(n) rstan.ess(sim, n)), dim = c(tidx.len, 1)) else NULL 
+  rhat <- if (get.rhat) array(sapply(tidx, function(n) rstan.splitrhat(sim, n)), dim = c(tidx.len, 1)) else NULL 
+  # mean, sd, quantiles 
+  msq <- do.call(rbind, lapply(s, function(x) x$summary))
+  dim(msq) <- c(tidx.len, 2 + length(probs)) 
+  rownames(msq) <- sim$fnames.oi[tidx] 
+  colnames(msq) <- c("Mean", "SD", probs.str) 
   cs <- lapply(s, function(x) x$c.summary) 
   cs <- do.call(rbind, cs) 
-  dim(cs) <- c(length(tidx), 2 + length(probs), sim$n.chains) 
+  dim(cs) <- c(tidx.len, 2 + length(probs), sim$n.chains) 
   dimnames(cs) <- list(sim$fnames.oi[tidx], c("Mean", "SD", probs.str), NULL) 
-  ss <- list(summary = as, c.summary = cs) 
+  ss <- list(summary = msq, c.summary = cs, ess = ess, rhat = rhat) 
   attr(ss, "row.major.idx") <- tidx.rowm 
+  attr(ss, "col.major.idx") <- tidx
   ss
 }  
+
+summary.sim.ess <- function(sim, pars) {
+  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
+  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
+  tidx <- unlist(tidx, use.names = FALSE)
+  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  ess <- sapply(tidx, function(n) rstan.ess(sim, n)) 
+  names(ess) <- sim$fnames.oi[tidx]
+  attr(ess, "row.major.idx") <- tidx.rowm
+  attr(ess, "col.major.idx") <- tidx
+  ess 
+} 
+
+summary.sim.rhat <- function(sim, pars) {
+  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
+  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
+  tidx <- unlist(tidx, use.names = FALSE)
+  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  rhat <- sapply(tidx, function(n) rstan.splitrhat(sim, n)) 
+  names(rhat) <- sim$fnames.oi[tidx]
+  attr(rhat, "row.major.idx") <- tidx.rowm
+  attr(rhat, "col.major.idx") <- tidx
+  rhat 
+} 
+
 
 organize.inits <- function(inits, pars, dims) {
   # obtain a list of inital values for each chain in sim
@@ -702,14 +734,14 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     spacing <- 3.5 / max(J, standard.width)
 
     # the medians for all the kept samples merged 
-    sprobs = c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)
+    sprobs = default.summary.probs()  
     mp <- match(0.5, sprobs) 
     i80p <- match(c(0.1, 0.9), sprobs) 
     med <- summary$summary[index, 2 + mp] 
     med <- array(med, dim = c(k.num.p, 1)) 
     i80 <- summary$summary[index, 2 + i80p] 
     i80 <- array(i80, dim = c(k.num.p, 2)) 
-    rhats <- summary$summary[index, "Rhat"]
+    rhats <- summary$rhat 
     rhats.cols <- get.rhat.cols(rhats) 
   
     med.chain <- summary$c.summary[index, 2 + mp, ]
