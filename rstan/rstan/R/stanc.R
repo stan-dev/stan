@@ -2,7 +2,7 @@ stanc <- function(model.code, model.name = "anon_model", verbose = FALSE) {
   # Call stanc, which is written in C++
   # 
 
-  cat("COMPILING MODEL '", model.name, "' FROM Stan CODE TO C++ CODE NOW.\n", sep = '')
+  cat("\nCOMPILING MODEL '", model.name, "' FROM Stan CODE TO C++ CODE NOW.\n", sep = '')
   SUCCESS_RC <- 0 
   EXCEPTION_RC <- -1
   PARSE_FAIL_RC <- -2 

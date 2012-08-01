@@ -48,7 +48,7 @@ setGeneric(name = "sampling",
 #                         verbose = FALSE) { standardGeneric("sampling")})
 
 setMethod("sampling", "stanmodel",
-          function(object, data = list(), pars = NA, n.chains = 1L, n.iter = 2000L,
+          function(object, data = list(), pars = NA, n.chains = 4L, n.iter = 2000L,
                    n.warmup = floor(n.iter / 2),
                    n.thin = 1L, seed = sample.int(.Machine$integer.max, 1),
                    init.t = "random", init.v = NULL,

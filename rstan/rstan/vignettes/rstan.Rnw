@@ -42,6 +42,14 @@
 
 \newcommand{\code}[1]{{\tt #1}}
 
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+
+\newcommand{\E}{\mathsf{E}}
+\newcommand{\VAR}{\mathsf{VAR}}
+\newcommand{\COV}{\mathsf{COV}}
+\newcommand{\Prob}{\mathsf{P}}
+
 \bibliographystyle{apalike}
 
 %\VignetteIndexEntry{RStan} 
@@ -52,7 +60,7 @@
 options(width=60)
 @
 
-\title{The \RStan Package: the \R interface to \Stan}
+\title{The \pkg{RStan} Package: the \proglang{R} interface to \proglang{Stan}}
 
 \author{The Stan Development Team \\ mc.stanislaw@gmail.com}
 
@@ -66,29 +74,30 @@ options(width=60)
 \section{Introduction}
 
 This is a short introduction to \RStan\footnote{The name of this package is
-\rstan so \code{library(rstan)} should be used to load this package in \R.}, the \R
-interface to \Stan. Users of \RStan need to be familiar with \Stan first,
-especially the \Stan model language.  Details about \Stan could be found in its
+\pkg{rstan} so \code{library(rstan)} should be used to load this package in \proglang{R}.}, 
+the \proglang{R}
+interface to \proglang{Stan}. Users of \RStan need to be familiar with \proglang{Stan} first,
+especially the \proglang{Stan} model language.  Details about \proglang{Stan} could be found in its
 manual, so we focus on how to use \RStan on an example. 
 
 \subsection{Prerequisites} 
 
-Although we refer to \RStan as an \R interface to \Stan, \RStan does not 
-need \Stan to be installed. However, we need a \Cpp compiler as needed by
-\Stan. Refer to \cite{StanManual:2012} for how to install a \Cpp compiler if there 
+Although we refer to \RStan as an \R interface to \proglang{Stan}, \RStan does not 
+need \proglang{Stan} to be installed. However, we need a \Cpp compiler as needed by
+\proglang{Stan}. Refer to \cite{StanManual:2012} for how to install a \Cpp compiler if there 
 not exists one. 
 
-In addition, package \rstan depends on other packages of ``Rcpp'', ``inline'',
-and ``RcppEigen.'' In the case of install \RStan from source, these packages 
+In addition, package \rstan depends on other packages of \pkg{Rcpp}, \pkg{inline},
+and \pkg{RcppEigen}. In the case of install \RStan from source, these packages 
 need to be installed first if not installed automatically. 
 
 \subsection{Overview of using \RStan}
 
-First, we could summarize the steps of using \Stan to conduct 
+First, we could summarize the steps of using \proglang{Stan} to conduct 
 statictical inference simply as follows. 
 \begin{enumerate}[I]
-\item Represent the statictical model in \Stan model language 
-\item Compile the \Stan model to \Cpp code using \stanc 
+\item Represent the statictical model in \proglang{Stan} model language 
+\item Compile the \proglang{Stan} model to \Cpp code using \stanc 
 \item Compile the \Cpp code for the model using a \Cpp compiler such as \gpp to 
       create an executable file 
 \item Prepare Data  
@@ -96,18 +105,20 @@ statictical inference simply as follows.
 \item Do model inference based on the samples 
 \end{enumerate}
 
-In \RStan, we have the same steps as in \Stan but packaged 
+In \RStan, we have the same steps as in \proglang{Stan} but packaged 
 in different functions. Knowing these steps is helpful especially
 in the case we encounter problem with our coding. In addition, 
 in \RStan, we provide a function called \code{stan} to wrap up
 most of the abvoe steps. 
 
 
-\section{An example} 
+\section{An example of using \RStan} 
+\label{sec0example} 
 
 In this section, we use an example to demonstrate using \RStan. 
 In section 5.5 of \cite{GelmanCarlinSternRubin:2003}, a hierarchical model is used to model 
-coaching effects from eight schools. The data are given in table
+coaching effects from eight schools. Later on, we call this example eight schools example. 
+The data are given in table
 \ref{tab08schoolsdata}. 
 The statistical model is specified as 
 \begin{align}
@@ -144,8 +155,8 @@ H     &  12   & 18  \\
 \end{table}
 
 
-In both \Stan and \RStan, we first represent this model in 
-\Stan model language. \RStan allows the model to be coded 
+In both \proglang{Stan} and \RStan, we first represent this model in 
+\proglang{Stan} model language. \RStan allows the model to be coded 
 in a text file or a character string in \R. 
 Here we use a character string. 
 <<echo=TRUE>>=
@@ -183,17 +194,17 @@ fit <- stan(model.code = schools.code, data = dat,
 @
 
 Function \code{stan} wraps up the follow three steps. These steps are similar to some
-steps mentioned above for \Stan. But \RStan has a deep integration of \Stan, which 
-makes it more efficient than if we call an outside \Stan.  
+steps mentioned above for \proglang{Stan}. But \RStan has a deep integration of \proglang{Stan}, which 
+makes it more efficient than if we call an outside \proglang{Stan}.  
 \begin{enumerate}
-\item Compile the \Stan model to \Cpp code 
+\item Compile the \proglang{Stan} model to \Cpp code 
 \item Compile the \Cpp code 
 \item Load the compiled model and sample 
 \end{enumerate}
 
 Notice it is easy to just use function \code{stan} in one step if everything
 goes well. \RStan also provides functionality to break down it to multiple
-steps to make it easier to debug our \Stan model code and \R code. 
+steps to make it easier to debug our \proglang{Stan} model code and \R code. 
 
 Function \code{stan} return an S4 object of class \code{stanfit}, for which
 a few generic function such as \code{print} and \code{plot} are provided. 
@@ -201,7 +212,77 @@ a few generic function such as \code{print} and \code{plot} are provided.
 print(fit)
 @
 
-\bibliography{rstan} 
+\section{Eight schools example step by step}
+\label{sec0examplesteps} 
 
+In section \ref{sec0example}, the eight schools example is fitted in \RStan
+just using function \code{stan}. However, in our actual development of modeling
+and coding, we need more steps to have a working model. \RStan also 
+provides functionality to in a way the process is like using \proglang{Stan}. 
+
+First, we can use \code{stanc} function to compile the model in \proglang{Stan}
+modeling language to \Cpp code. In the case that we have syntax errors in the 
+model's \proglang{Stan} code, the error information from \code{stanc} would 
+be reported to help debug. For the eight schools example, we use 
+<<echo=TRUE, results=hide>>=
+rt <- stanc(model.code = schools.code, model.name = '8schools') 
+@
+
+Second, after we have successfully compiled out model to \Cpp code, we can
+use function \code{stan.model} to compile the \Cpp code and load the 
+shared object of the model to \proglang{R}, which is represented 
+by a S4 class \code{stanmodel}. Note that in this step (as in calling
+\code{stan}), a lot of intermediate message such as the \Cpp code and warning
+message from the \Cpp compiler during compiling the \Cpp
+code might be spewed out especially if \code{verbose = TRUE}. 
+In most cases, these messages could be ignored unless there is an error. 
+<<echo=TRUE, results=hide>>=
+sm <- stan.model(stanc.ret = rt, verbose = FALSE)
+@
+
+Also we can construct a model from the model's \proglang{Stan} code
+using \code{stan.model}, which in this case would include compiling
+the model to \Cpp using \code{stanc}. 
+<<echo=TRUE, results=hide>>=
+sm <- stan.model(model.code = schools.code, model.name = '8schools', 
+                 verbose = FALSE)
+@
+
+Last, we could use the generic function \code{sampling} of 
+S4 class \code{stanmodel} to simulate samples from the posterior
+distribution. 
+<<echo=TRUE, results=hide>>= 
+fit <- sampling(sm, data = dat, n.chains = 4)
+@
+
+The returned object from the above \code{sampling} is an object
+of S4 class \code{stanfit}, the same result returned 
+by function \code{stan}. Also here we could have a variety of 
+arguments to control the sampling procedure the same as in 
+\code{stan}, since inside function \code{stan}, function
+\code{sampling} is called. 
+
+
+For the fitted object, S4 class \code{stanfit}, currently,
+we have defined generic functions such as \code{print},
+\code{summary}, \code{plot}, \code{traceplot}, \code{stan.code}, etc. 
+Using these functions, we first could diagnose the convergence
+of the Markov chains by looking at the trace plots and calculating 
+the split Rhats.  The inference based on the kept samples (that is, warmup
+samples are discarded) could be obtained by \code{summary}
+function and printed out by \code{print}. Also the samples saved 
+could be extracted in a couple of ways. 
+
+In addition, in the \code{stanfit} object, we keep all 
+the information regarding the samples procedure, for example, the initials
+values for all parameters and the seed for random number generating.
+
+
+\section{Summary} 
+
+\RStan provides a convenient and straightforward interface
+to \Stan. 
+
+\bibliography{rstan} 
 \end{document} 
 

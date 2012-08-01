@@ -59,7 +59,7 @@ setMethod('stan.code', signature = (object = 'stanfit'),
           function(object, print = FALSE) {
             if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
               stop("stanmodel is not found") 
-            code <- object@.MISC$stanmodel$model.code
+            code <- object@.MISC$stanmodel@model.code
             if (print) cat(code, "\n") 
             invisible(code)
           }) 

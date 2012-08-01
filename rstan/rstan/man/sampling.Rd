@@ -75,23 +75,24 @@
 
   \item{\dots}{Other parameters for the sampler: 
     \enumerate{
-      \item \code{leapfrog_steps}, \code{integer}
-      \item \code{epsilon}, \code{double}
-      \item \code{gamma}, \code{double} 
-      \item \code{delta}, \code{double}
-      \item \code{equal_step_sizes}, \code{TRUE} or \code{FALSE} 
-      \item \code{max_treedepth}, \code{integer}  
+      \item \code{leapfrog_steps} (\code{integer})
+      \item \code{epsilon} (\code{double})
+      \item \code{gamma} (\code{double}) 
+      \item \code{delta} (\code{double})
+      \item \code{equal_step_sizes} (\code{TRUE} or \code{FALSE})
+      \item \code{max_treedepth} (\code{integer})
     }
 
     More details could be 
     found in Stan's manual. Note that by default, 
     \code{leapfrog_steps} is \code{-1} and 
     \code{equal_step_sizes} is \code{FALSE} so that
-    NUTS2 sampler is called, which is the default sampler.  
+    NUTS2 sampler, the default sampler one, is used.
 
-    In addition, \code{refresh} (integer) could be used to
+    In addition, \code{refresh} (\code{integer}) could be used to
     control how to indicate the progress during sampling 
-    (i.e.\ show the progress every \code{refresh} iterations.).
+    (i.e. show the progress every \code{refresh} iterations).
+
   }
 }
 \value{

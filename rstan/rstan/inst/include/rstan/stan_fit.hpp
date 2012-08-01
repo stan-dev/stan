@@ -335,7 +335,7 @@ namespace rstan {
         }
       }
       if (refresh > 0) 
-        rstan::io::rcout << std::endl; 
+        rstan::io::rcout << std::endl << std::endl; 
       // rstan::io::rcout << "out of sample_from." << std::endl; 
     }
 

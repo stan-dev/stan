@@ -5,7 +5,7 @@
 
 \description{
   Construct and \code{stanmodel} object from a model 
-  represented by Stan model language. The model 
+  represented by Stan modeling language. The model 
   is compiled to C++ code if it is not done.  
   The model C++ code plus other auxiliary 
   code is compiled into shared object and then loaded. 

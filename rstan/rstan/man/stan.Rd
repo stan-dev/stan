@@ -6,7 +6,7 @@ Fit a Stan model
 %%  ~~function to do ... ~~
 }
 \description{
-Fit a model in Stan model language and return 
+Fit a model in Stan modeling language and return 
 fitted result. 
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
@@ -53,33 +53,40 @@ stan(file, model.name = "anon_model", model.code = "",
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     intermediate output inside the function, which might be helpful for
     debugging the model, are printed or not.}
-  \item{\dots}{Other parameters for the sampler. 
-    These are \code{leapfrog_steps} (integer), 
-    \code{epsilon} (double), 
-    \code{gamma} (double), 
-    \code{delta} (double), 
-    \code{equal_step_sizes} (TRUE of FALSE), 
-    \code{max_treedepth} (integer).  Details could be 
+  \item{\dots}{Other parameters for the sampler: 
+    \enumerate{
+      \item \code{leapfrog_steps} (\code{integer})
+      \item \code{epsilon} (\code{double})
+      \item \code{gamma} (\code{double}) 
+      \item \code{delta} (\code{double})
+      \item \code{equal_step_sizes} (\code{TRUE} or \code{FALSE})
+      \item \code{max_treedepth} (\code{integer})
+    }
+
+    More details could be 
     found in Stan's manual. Note that by default, 
     \code{leapfrog_steps} is \code{-1} and 
     \code{equal_step_sizes} is \code{FALSE} so that
-    NUTS2 sampler is called, which is the default sampler.  
+    NUTS2 sampler, the default sampler one, is used.
 
-    In addition, \code{refresh} (integer) could be used to
-    control how to indicate the progress during sampling (i.e.\
-    show the progress every \code{refresh} iterations).}
-  \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}.}
+    In addition, \code{refresh} (\code{integer}) could be used to
+    control how to indicate the progress during sampling (i.e. 
+    show the progress every \code{refresh} iterations).} 
+
+  \item{boost.lib}{The path for boost library that can be downloaded from
+     \url{http://http://www.boost.org/users/download/}. This provides an
+     alternative path for the boost library used in Stan.}
 }
 \details{
   \code{stan} is a one step function to fit a 
   Stan model. It first compiles the model represented by
-  Stan modelling language to C++ code. Second, the 
+  Stan modeling language to C++ code. Second, the 
   C++ code is compiled into binary shared object, which
   is loaded into the current \R session (an object
   of S4 class \code{stanmodel} is created). Then samples 
   are drawn and wrapped in an object of S4 class \code{stanfit}, 
-  which provides function such as \code{print} and \code{plot}
-  to check the results of the fitted model. 
+  which provides functions such as \code{print}, \code{summary}, and \code{plot}
+  to take a look of the results of the fitted model. 
 }
 \value{
   Fitted results as an object of S4 class \code{stanfit}.
