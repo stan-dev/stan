@@ -574,21 +574,6 @@ namespace stan {
       return check_consistent_sizes(function,x1,x2,x3,name1,name2,name3,
                                     result,default_policy());
     }
-    /*template <typename T1, typename T2, typename T3>
-    inline bool check_consistent_sizes(
-                       const char* function,
-                       const T1& x1, 
-                       const T2& x2, 
-                       const T3& x3,
-                       const char* name1,
-                       const char* name2,
-                       const char* name3,
-                       typename stan::return_type<T1,T2,T3>::type* result) {
-      return check_consistent_sizes(function,x1,x2,x3,name1,name2,name3,
-                                    result,default_policy());
-    }
-    */
-
   }
 }
 
