@@ -40,6 +40,19 @@ namespace stan {
     return rv.size();
   }
 
+  template <typename T>
+  size_t size_of(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    return v.size();
+  }
+  template <typename T>
+  size_t size_of(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
+    return rv.size();
+  }
+  template <typename T>
+  size_t size_of(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    return m.size();
+  }
+
   template<typename T>
   class VectorView<Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
   private:

@@ -1,28 +1,15 @@
 #ifndef __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
 #define __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
 
-#include <limits>
-
-#include <stan/math/boost_error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/meta/matrix_traits.hpp>
 #include <stan/math/error_handling.hpp>
 
-#include <stan/math/matrix.hpp>
 
 #include <boost/type_traits/common_type.hpp>
 
 namespace stan { 
 
   namespace math {
-
-    template <typename T>
-    size_t size_of(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) {
-      return x.size();
-    }
-    template <typename T>
-    size_t size_of(const Eigen::Matrix<T, 1, Eigen::Dynamic>& x) {
-      return x.size();
-    }
 
     template <typename T_size1, typename T_size2, typename T_result,
               class Policy>

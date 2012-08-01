@@ -88,10 +88,19 @@ namespace stan {
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
   size_t length(const T& x) {
-    return 1;
+    return 1U;
   }
   template <typename T>
   size_t length(const std::vector<T>& x) {
+    return x.size();
+  }
+
+  template <typename T>
+  size_t size_of(const T& x) {
+    return 1U;
+  }
+  template <typename T>
+  size_t size_of(const std::vector<T>& x) {
     return x.size();
   }
 
