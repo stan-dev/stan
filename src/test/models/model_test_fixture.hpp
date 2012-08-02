@@ -258,12 +258,16 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
 	  << "Chain " << chain << ", param " << param
 	  << ": variance is 0" << std::endl
 	  << err_message[chain];
-	// made this 1.2 to fail less often
-	EXPECT_LT(c->split_potential_scale_reduction(param), 1.2) 
-	  << "Chain " << chain << ", param " << param
-	  << ": split r hat > 1.2" << std::endl
-	  << err_message[chain];
       }
+    }
+  }
+
+  for (size_t param = 0; param < num_params; param++) {
+    if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
+      // made this 1.2 to fail less often
+      EXPECT_LT(c->split_potential_scale_reduction(param), 1.2) 
+	<< "Param " << param
+	<< ": split r hat > 1.2" << std::endl;
     }
   }
 }
@@ -298,12 +302,26 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
 
     double neff = c->effective_sample_size(index);
     double sample_mean = c->mean(index);
-    double se = c->sd(index) / sqrt(neff);
+    double sd = c->sd(index);
+    double se = sd / sqrt(neff);
     double z = quantile(students_t(neff-1.0), 1 - alpha/2.0);
 
-
+    if (fabs(expected_mean - sample_mean) > sd) {
+      failed++;
+      // want the error message to have which, what, how
+      err_message << "parameter index: " << index
+                  << "\n\texpected:    " << setw(10) << expected_mean
+                  << "\n\tsampled:     " << setw(10) << sample_mean
+		  << "\n\tsd:          " << setw(10) << c->sd(index)
+                  << "\n\tneff:        " << setw(10) << neff
+                  << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
+                  << "\n\tz:           " << setw(10) << z
+                  << "\n\tse:          " << setw(10) << se
+                  << "\n\n\tfabs(diff) > sd: " 
+                  << fabs(expected_mean - sample_mean) << " > " << sd << "\n\n";
+    }
     // that 5.0 is there to make the test fail less often.
-    if (fabs(expected_mean - sample_mean) > z*se * 5.0) {
+    /*if (fabs(expected_mean - sample_mean) > z*se * 5.0) {
       failed++;
       // want the error message to have which, what, how
       err_message << "parameter index: " << index
@@ -316,7 +334,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
                   << "\n\tse:          " << setw(10) << se
                   << "\n\n\tfabs(diff) > z * se * 5.0: " 
                   << fabs(expected_mean - sample_mean) << " > " << z*se * 5.0 << "\n\n";
-    }
+		  }*/
   }
   
   if (failed == 0)

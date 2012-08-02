@@ -29,8 +29,8 @@ transformed parameters {
 }  
 
 model {
-  for (n in 1:N) Y[n] ~ multi_normal(mu, Sigma); 
-  Sigma ~ inv_wishart(4, S); 
   beta0 ~ normal(0, 32);
   beta1 ~ normal(0, 32);
+  Sigma ~ inv_wishart(4, S); 
+  for (n in 1:N) Y[n] ~ multi_normal(mu, Sigma); 
 } 
