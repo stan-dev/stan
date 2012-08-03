@@ -11,6 +11,23 @@ namespace stan {
   
   namespace prob {
 
+    namespace {
+      /**
+       * Find the optimal next size for the FFT so that 
+       * a minimum number of zeros are padded. 
+       */ 
+      size_t fft_next_good_size(size_t N) { 
+        while (true) {
+          size_t m = N;
+          while((m % 2) == 0) m /= 2;
+          while((m % 3) == 0) m /= 3;
+          while((m % 5) == 0) m /= 5;
+          if (m <= 1)
+            return N; 
+          N++;
+        }
+      }
+    } 
     
     /**
      * Write autocorrelation estimates for every lag for the specified
@@ -41,25 +58,27 @@ namespace stan {
       using std::complex;
 
       size_t N = y.size();
-      size_t Nt2 = 2 * N;
+      size_t M = fft_next_good_size(N); 
+      size_t Mt2 = 2 * M;
 
 
       vector<complex<T> > freqvec;
       
       // centered_signal = y-mean(y) followed by N zeroes
       vector<T> centered_signal(y);
-      centered_signal.insert(centered_signal.end(),N,0.0);
+      centered_signal.insert(centered_signal.end(),Mt2-N,0.0);
       T mean = stan::math::mean(y);
       for (size_t i = 0; i < N; i++)
         centered_signal[i] -= mean;
       
       fft.fwd(freqvec,centered_signal);
-      for (size_t i = 0; i < Nt2; ++i)
+      for (size_t i = 0; i < Mt2; ++i)
         freqvec[i] = complex<T>(norm(freqvec[i]), 0.0);
       
       fft.inv(ac,freqvec);
       ac.resize(N);
 
+      /*
       vector<T> mask_correction_factors;      
       vector<T> mask;
       mask.insert(mask.end(),N,1.0);
@@ -75,6 +94,10 @@ namespace stan {
       for (size_t i = 0; i < N; ++i) {
         ac[i] /= mask_correction_factors[i];
       }
+      */
+      for (size_t i = 0; i < N; ++i) {
+        ac[i] /= (N - i); 
+      } 
       T var = ac[0];      
       for (size_t i = 0; i < N; ++i)
         ac[i] /= var;
