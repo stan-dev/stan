@@ -6,6 +6,7 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/math/special_functions.hpp>
 
 
 namespace stan {

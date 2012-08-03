@@ -22,11 +22,11 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
   static size_t num_iterations() {
-    return 20000U;
+    return 8000U;
   }
 
   static std::vector<size_t> skip_chains_test() {

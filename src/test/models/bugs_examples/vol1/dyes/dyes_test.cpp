@@ -26,7 +26,7 @@ public:
   }
 
   static size_t num_iterations() {
-    return 4000U;
+    return 8000U;
   }
 
   static std::vector<size_t> skip_chains_test() {
@@ -47,16 +47,14 @@ public:
 
     std::vector<std::pair<size_t, double> > expected_values;
 
-    /*
-      // FIXME: does not always settle on these values.
-      index = chains->get_total_param_index(chains->param_name_to_index("sigmasq_between"),
-      dims);
-      expected_values.push_back(make_pair(index, 2207));
-      
-      index = chains->get_total_param_index(chains->param_name_to_index("sigmasq_within"),
-      dims);
-      expected_values.push_back(make_pair(index, 3034));
-    */
+    // FIXME: does not always settle on these values.
+    index = chains->get_total_param_index(chains->param_name_to_index("sigmasq_between"),
+    dims);
+    expected_values.push_back(make_pair(index, 2207));
+    
+    index = chains->get_total_param_index(chains->param_name_to_index("sigmasq_within"),
+    dims);
+    expected_values.push_back(make_pair(index, 3034));
     
     index = chains->get_total_param_index(chains->param_name_to_index("theta"),
 					  dims);
