@@ -21,8 +21,8 @@ TEST(ProbDistributionsNormal,Eigen) {
   mu << -1.0, -2.0, -3.0, -10.0;
   Matrix<double,Dynamic,1> sigma(4);
   sigma << 0.5, 1.5, 3.0, 15.0;
-  double z = normal_log(y,mu,sigma);
-  std::cout << "z=" << z << std::endl;
+  //double z = normal_log(y,mu,sigma);
+  //std::cout << "z=" << z << std::endl;
   EXPECT_TRUE(true);
 }
 
