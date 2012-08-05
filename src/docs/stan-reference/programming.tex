@@ -585,11 +585,17 @@ model {
 %
 The degrees of freedom constant \code{nu} is specified as data.
 
-\section{Logistic and Probit Regression}
+\section{Logistic and Probit Regression}\label{logistic-probit-regression.section}
 
-For binary outcomes, logistic or probit regression can be used.  A
-logistic regression with one predictor and an intercept is coded as
-follows. 
+For binary outcomes, either of the closely related logistic or probit
+regression models may be used.  These generalized linear models vary
+only in the link function they use to map linear predictions in
+$(-\infty,\infty)$ to probability values in $(0,1)$.  Their respective
+link functions, the logistic function and the unit normal cumulative distribution
+function, are both sigmoid functions (i.e., they are both {\it S}-shaped).
+
+A logistic regression model with one predictor and an intercept is coded as
+follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1181,40 +1187,40 @@ model {
 }
 \end{Verbatim}
 \end{quote}
-% 
-% \subsection{Vectorized Probability Functions}
-% The final and most efficient version replaces the loops and
-% transformed parameters by using the vectorized form of the normal
-% probability function, as in the following example.
-% %
-% \begin{quote}
-% \begin{Verbatim} 
-% data {
-%     ...
-%     matrix(N,K) x;
-%     vector(N) y;
-%     ...
-% parameters {
-%     vector(K) beta;
-%     ...
-% }
-% model {
-%     y ~ normal(x * beta, 1);
-% }
-% \end{Verbatim}
-% \end{quote}
-% %
-% The variables are all declared as either matrix or vector types.
-% The result of the matrix-vector multiplication \code{x * beta} in the
-% model block is a vector of the same length as \code{y}.  
 
-% The probability function documentation in \refpart{} indicates which
-% of \Stan's probability functions support vectorization.  Vectorized
-% probability functions accept either vector or scalar inputs for all
-% arguments, with the only restriction being that all vector arguments
-% are the same dimensionality.  In the example above, \code{y} is a
-% vector of size \code{N}, \code{x * beta} is a vector of size \code{N},
-% and \code{1} is a scalar.
+\subsection{Vectorized Probability Functions}
+The final and most efficient version replaces the loops and
+transformed parameters by using the vectorized form of the normal
+probability function, as in the following example.
+%
+\begin{quote}
+\begin{Verbatim} 
+data {
+    ...
+    matrix(N,K) x;
+    vector(N) y;
+    ...
+parameters {
+    vector(K) beta;
+    ...
+}
+model {
+    y ~ normal(x * beta, 1);
+}
+\end{Verbatim}
+\end{quote}
+%
+The variables are all declared as either matrix or vector types.
+The result of the matrix-vector multiplication \code{x * beta} in the
+model block is a vector of the same length as \code{y}.  
+
+The probability function documentation in \refpart{built-in-functions} indicates which
+of \Stan's probability functions support vectorization.  Vectorized
+probability functions accept either vector or scalar inputs for all
+arguments, with the only restriction being that all vector arguments
+are the same dimensionality.  In the example above, \code{y} is a
+vector of size \code{N}, \code{x * beta} is a vector of size \code{N},
+and \code{1} is a scalar.
 
 \section{Exploiting Sufficient Statistics}
 

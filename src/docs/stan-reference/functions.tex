@@ -1,6 +1,3 @@
-
-
-
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
@@ -15,9 +12,9 @@ types of arguments and return results of type integer.
 
 \Stan's arithmetic is based on standard double-precision \Cpp integer and
 floating-point arithmetic.  If the arguments to an arithmetic operator
-are both integers, as in \code{2+2}, integer arithmetic is used.  If
+are both integers, as in \code{2~+~2}, integer arithmetic is used.  If
 one argument is an integer and the other a floating-point value, as in
-\code{2.0+2}, \code{2+2.0}, then the integer is promoted to a floating
+\code{2.0~+~2} and \code{2~+~2.0}, then the integer is promoted to a floating
 point value and floating-point arithmetic is used.
 
 Integer arithmetic behaves slightly differently than floating point
@@ -33,13 +30,13 @@ Secondly, because the set of integers is not closed under division and
 there is no special infinite value for integers, integer division
 behaves differently.  For integer division by values other than zero,
 the result is rounded toward 0.  For instance, positive results are
-rounded down, as in \code{1/2 = 0} and \code{5/3 = 1}, whereas
-negative results are rounded up, as in \code{(-1)/2 = 0} and
-\code{(-5)/33 = -1}.
+rounded down, as in \code{1~/~2~=~0} and \code{5~/~3~=~1}, whereas
+negative results are rounded up, as in \code{(-1)~/~2~=~0} and
+\code{(-5)~/~33~=~-1}.
 
-Unlike floating point division, where \code{1.0/0.0} produces the
+Unlike floating point division, where \code{1.0~/~0.0} produces the
 special positive infinite value, integer division by zero, as in
-\code{1/0}, has undefined behavior in the \Cpp standard.  For example,
+\code{1~/~0}, has undefined behavior in the \Cpp standard.  For example,
 the \clang compiler on Mac OS X returns 3764, whereas the \gpp
 compiler throws a floating-point exception and aborts the program with
 a warning.  As with overflow, it is up to the user to make sure
@@ -108,10 +105,13 @@ The maximum of \farg{x} and \farg{y}}
 
 \noindent
 This chapter describes built-in functions that take zero or more real
-or integer arguments and return real values.  Constants are
-represented as functions with no arguments and must be called as such.
+or integer arguments and return real values.  
 
 \section{Mathematical Constants}\label{built-in-constants.section}
+
+Constants are represented as functions with no arguments and must be
+called as such.  For instance, the mathematical constant $\pi$ must be
+written in a \Stan program as \code{pi()}.
 
 %
 \begin{description}
@@ -235,6 +235,7 @@ The maximum of \farg{x} and \farg{y}}
 %
 \end{description}
 
+
 \section{Arithmetic Functions}
 %
 \begin{description}
@@ -243,8 +244,9 @@ The real value remainder after dividing \farg{x} by \farg{y}}
 %
 \end{description}
 
-\section{Rounding Functions}
 
+\section{Rounding Functions}
+%
 \begin{description}
 %
 \fitem{real}{floor}{real \farg{x}}{
@@ -264,8 +266,9 @@ converted to a double value}
 %
 \end{description}
 
-\section{Power and Logarithm Functions}
 
+\section{Power and Logarithm Functions}
+%
 \begin{description}
 %
 \fitem{real}{sqrt}{real \farg{x}}{
@@ -283,9 +286,6 @@ The natural exponential of \farg{x}}
 \fitem{real}{exp2}{real \farg{x}}{
 The base-2 exponential of \farg{x}}
 %
-\fitem{real}{expm1}{real \farg{x}}{
-The natural exponential of \farg{x} minus 1}
-%
 \fitem{real}{log}{real \farg{x}}{
 The natural logarithm of \farg{x}}
 %
@@ -301,26 +301,8 @@ The base-10 logarithm of \farg{x}}
 \end{description}
 
 
-
-
-\section{Link Functions}
-
-\begin{description}
-%
-\fitem{real}{logit}{real \farg{x}}{
-The log odds, or logit, function applied to \farg{x}}
-%
-\fitem{real}{inv\_logit}{real \farg{x}}{
-The logistic sigmoid function applied to \farg{x}}
-%
-\fitem{real}{inv\_cloglog}{real \farg{x}}{
-The inverse of the complement log-log function applied to \farg{x}}
-%
-\end{description}
-
-
 \section{Trigonometric Functions}
-
+%
 \begin{description}
 %
 \fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
@@ -351,8 +333,9 @@ by \farg{y}}
 %
 \end{description}
 
-\section{Hyperbolic Trigonometric Functions}
 
+\section{Hyperbolic Trigonometric Functions}
+%
 \begin{description}
 %
 \fitem{real}{cosh}{real \farg{x}}{
@@ -375,8 +358,28 @@ The inverse hyperbolic tangent (in radians) of \farg{x}}
 %
 \end{description}
 
-\section{Probability-Related Functions}
 
+\section{Link Functions}
+
+The following functions are commonly used as link functions in
+generalized linear models (see \refsection{logistic-probit-regression}).
+%
+\begin{description}
+%
+\fitem{real}{logit}{real \farg{x}}{
+The log odds, or logit, function applied to \farg{x}}
+%
+\fitem{real}{inv\_logit}{real \farg{x}}{
+The logistic sigmoid function applied to \farg{x}}
+%
+\fitem{real}{inv\_cloglog}{real \farg{x}}{
+The inverse of the complement log-log function applied to \farg{x}}
+%
+\end{description}
+
+
+\section{Probability-Related Functions}
+%
 \begin{description}
 %
 \fitem{real}{erf}{real \farg{x}}{
@@ -398,7 +401,7 @@ binary outcome \farg{y}}
 
 
 \section{Combinatorial Functions}
-
+%
 \begin{description}
 %
 \fitem{real}{tgamma}{real \farg{x}}{
@@ -423,7 +426,15 @@ The natural logarithm of the binomial coefficient of \farg{x} choose
 
 \section{Composed Functions}
 
+The functions in this section are equivalent in theory to combinations
+of other functions.  In practice, they are implemented to be more
+efficient and more numerically stable than defining them directly
+using more basic \Stan functions.
+%
 \begin{description}
+%
+\fitem{real}{expm1}{real \farg{x}}{
+The natural exponential of \farg{x} minus 1}
 %
 \fitem{real}{fma}{real \farg{x}, 
                real \farg{y},
@@ -453,8 +464,7 @@ of \farg{x} and the natural exponentiation of \farg{y}}
 
 
 \chapter{Array Operations}
-\noindent
-
+%
 \begin{description}
 \fitem{real}{sum}{real \farg{x}[]}
 The sum of the elements in \farg{x}
@@ -478,7 +488,7 @@ The natural logarithm of the sum of the exponentials of the elements in \farg{x}
 \noindent
 
 \section{Integer-Valued Matrix Size Functions}
-
+%
 \begin{description}
 %
 \fitem{int}{rows}{vector \farg{x}}{The number of
@@ -594,22 +604,23 @@ the scalar \farg{y} and matrix \farg{x}}
 
 
 \subsection{Broadcast Infix Operators}
-
+%
 \begin{description}
 %
-\fitem{matrix}{operator+}{real \farg{x}, vector \farg{y}}{The result of
+\fitem{vector}{operator+}{real \farg{x}, vector \farg{y}}{The result of
 adding \farg{x} to every entry in the vector \farg{y}}
 %
-\fitem{matrix}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
+\fitem{row\_vector}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
 adding \farg{x} to every entry in the row vector \farg{y}}
 %
 \fitem{matrix}{operator+}{real \farg{x}, matrix \farg{y}}{The result of
 adding \farg{x} to every entry in the matrix \farg{y}}
 %
-\fitem{matrix}{operator+}{vector \farg{x}, real \farg{y}}{The result of
+%
+\fitem{vector}{operator+}{vector \farg{x}, real \farg{y}}{The result of
 adding \farg{y} to every entry in the vector \farg{x}}
 %
-\fitem{matrix}{operator+}{row\_vector \farg{x}, real \farg{y}}{The result of
+\fitem{row\_vector}{operator+}{row\_vector \farg{x}, real \farg{y}}{The result of
 adding \farg{y} to every entry in the row vector \farg{x}}
 %
 \fitem{matrix}{operator+}{matrix \farg{x}, real \farg{y}}{The result of
@@ -845,23 +856,7 @@ of matrix \farg{x}}
 \end{description}
 
 
-\section{Linear Algebra Functions and Solvers}
-
-\subsection{Matrix Division Infix Operators}
-%
-\begin{description}
-%
-\fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
-The right division of \farg{b} by \farg{A}; equivalently
-\code{\farg{b} * inv(\farg{A})}}
-%
-\fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
-The left division of \farg{b} by \farg{A}; equivalently
-\code{inv(\farg{A}) * \farg{b}}
-%
-\end{description}
-
-\subsection{Special Matrix Functions}
+\section{Special Matrix Functions}
 
 The softmax function maps $\reals^K$ to the $K$-simplex by
 \[
@@ -877,6 +872,24 @@ where $\exp(y)$ is the componentwise exponentiation of $y$.
 The softmax of \farg{x}}
 \end{description}
 %
+
+
+
+\section{Linear Algebra Functions and Solvers}
+
+\subsection{Matrix Division Infix Operators}
+%
+\begin{description}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inv(\farg{A})}}
+%
+\fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inv(\farg{A}) * \farg{b}}
+%
+\end{description}
 
 \subsection{Linear Algebra Functions}
 
@@ -894,7 +907,7 @@ The inverse of \farg{A}}
 \fitem{vector}{eigenvalues}{matrix \farg{A}}{
 The vector of eigenvalues of \farg{A} in descending order}
 %
-\fitem{matrix}{eigenvalues}{matrix \farg{A}}{
+\fitem{matrix}{eigenvectors}{matrix \farg{A}}{
 The matrix with the eigenvectors of \farg{A} as columns}
 %
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
@@ -915,30 +928,6 @@ The singular values of \farg{A} in descending order}
 
 \end{description}
 
-
-
-\section{Integer-Valued Matrix Size Functions}
-
-\begin{description}
-%
-\fitem{int}{rows}{vector \farg{x}}{The number of
-rows in the vector \farg{x}}
-%
-\fitem{int}{rows}{row\_vector \farg{x}}{The number of
-rows in the row vector \farg{x}, namely 1}
-%
-\fitem{int}{rows}{matrix \farg{x}}{The number of
-rows in the matrix \farg{x}}
-%
-\fitem{int}{cols}{vector \farg{x}}{The number of columns
-in the vector \farg{x}, namely 1}
-%
-\fitem{int}{cols}{row\_vector \farg{x}}{The number of columns
-in the row vector \farg{x}}
-%
-\fitem{int}{cols}{matrix \farg{x}}{The number of columns
-in the matrix \farg{x}}
-\end{description}
 
 
 
