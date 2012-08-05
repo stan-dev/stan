@@ -2,7 +2,6 @@
 #include <boost/type_traits.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/meta/matrix_traits.hpp>
 #include <stan/math/matrix.hpp>
 
 TEST(MetaTraits, isConstant) {

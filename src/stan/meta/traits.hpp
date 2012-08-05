@@ -4,6 +4,8 @@
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix.hpp>
+
 
 namespace stan {
 
@@ -58,6 +60,18 @@ namespace stan {
     typedef typename scalar_type<T>::type type;
   };
 
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,1> > {
+    typedef typename scalar_type<T>::type type;
+  };
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,1,Eigen::Dynamic> > {
+    typedef typename scalar_type<T>::type type;
+  };
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+    typedef typename scalar_type<T>::type type;
+  };
 
   template <typename T>
   struct is_vector {
@@ -75,6 +89,17 @@ namespace stan {
     typedef T type;
   };
   
+  template <typename T>
+  struct is_vector<Eigen::Matrix<T,Eigen::Dynamic,1> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+  template <typename T>
+  struct is_vector<Eigen::Matrix<T,1,Eigen::Dynamic> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+
   // Matt's original version
   // size_t length(const T& x) { 
   //   if (is_vector<T>::value)
@@ -94,6 +119,16 @@ namespace stan {
   size_t length(const std::vector<T>& x) {
     return x.size();
   }
+  
+  template <typename T>
+  size_t length(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    return v.size();
+  }
+  template <typename T>
+  size_t length(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
+    return rv.size();
+  }
+
 
   template <typename T>
   size_t size_of(const T& x) {
@@ -103,8 +138,18 @@ namespace stan {
   size_t size_of(const std::vector<T>& x) {
     return x.size();
   }
-
-
+  template <typename T>
+  size_t size_of(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    return v.size();
+  }
+  template <typename T>
+  size_t size_of(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
+    return rv.size();
+  }
+  template <typename T>
+  size_t size_of(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    return m.size();
+  }
   
 
   template <typename T1, typename T2, typename T3>
@@ -186,6 +231,49 @@ namespace stan {
   public:
     VectorView(const std::vector<T>& x) : x_(x) { }
     const T& operator[](int i) const { 
+      return x_[i];
+    }
+  };
+
+
+  template<typename T>
+  class VectorView<Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
+  private:
+    Eigen::Matrix<T,Eigen::Dynamic,1>& x_;
+  public:
+    VectorView(Eigen::Matrix<T,Eigen::Dynamic,1>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+  template<typename T>
+  class VectorView<const Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
+  private:
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& x_;
+  public:
+    VectorView(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) : x_(x) { }
+    const T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+
+  template<typename T>
+  class VectorView<Eigen::Matrix<T,1,Eigen::Dynamic>, true> {
+  private:
+    Eigen::Matrix<T,1,Eigen::Dynamic>& x_;
+  public:
+    VectorView(Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
+    T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+  template<typename T>
+  class VectorView<const Eigen::Matrix<T,1,Eigen::Dynamic>, true> {
+  private:
+    const Eigen::Matrix<T,1,Eigen::Dynamic>& x_;
+  public:
+    VectorView(const Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
+    const T& operator[](int i) { 
       return x_[i];
     }
   };
