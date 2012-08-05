@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
 #define __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
 
-#include <stan/meta/matrix_traits.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling.hpp>
 
 
