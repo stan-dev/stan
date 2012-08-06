@@ -17,14 +17,14 @@
 
 \section{Methods}{
   \describe{
-    \item{extract}{\code{signature(object = "stanfit"}}{
+    \item{extract}{\code{signature(object = stanfit}}{
        Extract samples for a fitted model defined by class \code{stanfit}.  
     }
   }
 }
 
 \arguments{
-  \item{object}{An object of class \code{"\linkS4class{stanfit}"}.}
+  \item{object}{An object of class \code{\linkS4class{stanfit}}}.
   \item{pars}{An object of class \code{"character"} providing the parameter
     names (or other quantity names) of interest. If not specified,
     all parameters stored would be used.} 

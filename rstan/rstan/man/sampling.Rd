@@ -12,7 +12,7 @@
 
 \usage{
   %% sampling(object, \dots)  
-  \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, n.chains = 1L, n.iter = 2000L, 
+  \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, n.chains = 4L, n.iter = 2000L, 
     n.warmup = floor(n.iter / 2), n.thin = 1L, seed = sample.int(.Machine$integer.max, 1),
     init.t = 'random', init.v = NULL, 
     sample.file, verbose = FALSE, \ldots)   

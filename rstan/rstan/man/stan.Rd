@@ -12,7 +12,7 @@ fitted result.
 }
 \usage{
 stan(file, model.name = "anon_model", model.code = "", 
-  data = list(), pars = NA, n.chains = 1L,
+  data = list(), pars = NA, n.chains = 4L,
   n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
   init.v = NULL, seed = sample.int(.Machine$integer.max, 1), 
   sample.file, verbose = FALSE, ..., boost.lib = NULL)

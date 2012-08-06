@@ -6,7 +6,7 @@
 \title{\code{stan.code}: obtain the Stan modeling language code for a fitted model} 
 \description{
  Obtain the Stan modeling language code for a fitted model. 
- This is a generic function of class \code{stanfit}. 
+ This is a generic function of S4 class \code{stanfit}. 
 }
 \usage{
   \S4method{stan.code}{stanfit}(object, print = FALSE) 
@@ -26,6 +26,9 @@
 } 
 \value{
   A character string of the Stan modeling language code.
+} 
+\seealso{
+  \code{stan}, \code{stanc}, and \code{\linkS4class{stanfit}} 
 } 
 \keyword{methods}
 \keyword{stanfit} 

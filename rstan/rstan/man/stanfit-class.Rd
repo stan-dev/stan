@@ -60,6 +60,10 @@
       plot the trace of chains.} 
     \item{stan.code}{\code{signature(object = "stanfit")}:
       get the Stan code for the fitted model.}
+    \item{get.inits}{\code{signature(object = "stanfit")}:
+      get the initial values for parameters used in sampling all chains.} 
+    \item{get.seed}{\code{signature(object = "stanfit")}: 
+      get the seed that used for sampling.} 
   }
 }
 

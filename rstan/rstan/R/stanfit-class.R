@@ -64,6 +64,18 @@ setMethod('stan.code', signature = (object = 'stanfit'),
             invisible(code)
           }) 
 
+setGeneric(name = 'get.inits', 
+           def = function(object, ...) { standardGeneric("get.inits")})
+
+setMethod("get.inits", signature = (object = 'stanfit'), 
+          function(object) { invisible(object@inits) })
+
+setGeneric(name = 'get.seed', 
+           def = function(object, ...) { standardGeneric("get.seed")})
+
+setMethod("get.seed", signature = (object = 'stanfit'), 
+          function(object) { invisible(object@stan.args[[1]]$seed) })
+
 
 ### HELPER FUNCTIONS
 ### 
