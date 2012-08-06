@@ -33,46 +33,6 @@ namespace stan {
 
   // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
 
-  /**
-   * Metaprogram structure to determine the base scalar type
-   * of a template argument.
-   *
-   * <p>This base class should be specialized for structured types.
-   *
-   * @tparam T Type of object.
-   */
-  template <typename T>
-  struct scalar_type {
-    /** 
-     * Base scalar type for object.
-     */
-    typedef T type;
-  };
-
-  /**
-   * Metaprogram specialization extracting the base type of
-   * a standard vector recursively.
-   *
-   * @tparam Scalar type of vector.
-   */
-  template <typename T>
-  struct scalar_type<std::vector<T> > {
-    typedef typename scalar_type<T>::type type;
-  };
-
-  template <typename T>
-  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,1> > {
-    typedef typename scalar_type<T>::type type;
-  };
-  template <typename T>
-  struct scalar_type<Eigen::Matrix<T,1,Eigen::Dynamic> > {
-    typedef typename scalar_type<T>::type type;
-  };
-  template <typename T>
-  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
-    typedef typename scalar_type<T>::type type;
-  };
-
   template <typename T>
   struct is_vector {
     enum { value = 0 };
@@ -98,6 +58,30 @@ namespace stan {
   struct is_vector<Eigen::Matrix<T,1,Eigen::Dynamic> > {
     enum { value = 1 };
     typedef T type;
+  };
+
+  namespace {
+    template <bool vector, typename T>
+    struct scalar_type_helper {
+      typedef T type;
+    };
+    
+    template <typename T> 
+    struct scalar_type_helper<true, T> {
+      typedef typename scalar_type_helper<is_vector<typename T::value_type>::value, typename T::value_type>::type type;
+    };
+  }
+  /**
+   * Metaprogram structure to determine the base scalar type
+   * of a template argument.
+   *
+   * <p>This base class should be specialized for structured types.
+   *
+   * @tparam T Type of object.
+   */
+  template <typename T>
+  struct scalar_type {
+    typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
   // Matt's original version
