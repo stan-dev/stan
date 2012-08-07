@@ -671,30 +671,54 @@ namespace stan {
 
 
 
-
-    template <typename T_x, typename T_result, class Policy>
-    inline bool check_positive(const char* function,
-                               const T_x& x,
-                               const char* name,
-                               T_result* result,
-                               const Policy&) {
-      if (!(x > 0))
-        return dom_err(function,x,name,
-                            " is %1%, but must be > 0","",result,Policy());
-      return true;
+    namespace {
+      template <typename T_y,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct positive {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  // have to use not is_unsigned. is_signed will be false
+	  // floating point types that have no unsigned versions.
+	  if (!boost::is_unsigned<T_y>::value && !(y > 0)) 
+	    return dom_err(function,y,name,
+			   " is %1%, but must be > 0!","",
+			   result,Policy());
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_result,
+		class Policy>
+      struct positive<T_y, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if (!boost::is_unsigned<typename T_y::value_type>::value && !(y[n] > 0)) 
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must be > 0!","",
+				 result,Policy());
+	  }
+	  return true;
+	}
+      };
     }
     template <typename T_y, typename T_result, class Policy>
     inline bool check_positive(const char* function,
-                               const std::vector<T_y>& y,
-                               const char* name,
-                               T_result* result,
-                               const Policy&) { 
-      for (size_t i = 0; i < y.size(); i++) 
-        if (!(y[i] > 0)) 
-          return dom_err_vec(i,function,y,name,
-                                  " is %1%, but must be > 0","",
-                                  result,Policy());
-      return true;
+				  const T_y& y,
+				  const char* name,
+				  T_result* result,
+				  const Policy&) {
+      return positive<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
     }
     template <typename T_x, typename T_result>
     inline bool check_positive(const char* function,
