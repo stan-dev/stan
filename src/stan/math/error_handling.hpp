@@ -457,50 +457,73 @@ namespace stan {
     }
 
 
-
-    template <typename T_x, typename T_high, typename T_result, class Policy>
-    inline bool check_less_or_equal(const char* function,
-                                    const T_x& x,
-                                    const T_high& high,
-                                    const char* name,  
-                                    T_result* result,
-                                    const Policy&) {
-      if (!(x <= high))
-        return dom_err(function,x,name,
-                            " is %1%, but must be less than or equal to ",
-                            high,result,Policy());
-      return true;
+    namespace {
+      template <typename T_y,
+		typename T_high,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct less_or_equal {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const T_high& high,
+			  const char* name,  
+			  T_result* result,
+			  const Policy&) {
+	  if (!(y <= high))
+	    return dom_err(function,y,name,
+			   " is %1%, but must be less than or equal to ",
+			   high,result,Policy());
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_high,
+		typename T_result,
+		class Policy>
+      struct less_or_equal<T_y, T_high, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const T_high& high,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if (!(y[n] <= high))
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must be less than or equal to ",
+				 high,result,Policy());
+	  }
+	  return true;
+	}
+      };
     }
-    template <typename T_x, typename T_high, typename T_result, class Policy>
+    template <typename T_y, typename T_high, typename T_result, class Policy>
     inline bool check_less_or_equal(const char* function,
-                                    const std::vector<T_x>& x,
-                                    const T_high& high,
-                                    const char* name,  
-                                    T_result* result,
-                                    const Policy&) {
-      for (size_t i = 0; i < x.size(); ++i)
-        if (!(x[i] <= high))
-          return dom_err_vec(
-                                  i,function,x,name,
-                                  " is %1%, but must be less than or equal to",
-                                  high,result,Policy());
-      return true;
+				    const T_y& y,
+				    const T_high& high,
+				    const char* name,  
+				    T_result* result,
+				    const Policy&) {
+      return less_or_equal<T_y,T_high,T_result,Policy,is_vector<T_y>::value>::check(function,y,high,name,result,Policy());
     }
-    template <typename T_x, typename T_high, typename T_result>
+    template <typename T_y, typename T_high, typename T_result>
     inline bool check_less_or_equal(const char* function,
-                                    const T_x& x,
+                                    const T_y& y,
                                     const T_high& high,
                                     const char* name,  
                                     T_result* result) {
-      return check_less_or_equal(function,x,high,name,result,default_policy());
+      return check_less_or_equal(function,y,high,name,result,default_policy());
     }
-    template <typename T_x, typename T_high>
+    template <typename T_y, typename T_high>
     inline bool check_less_or_equal(const char* function,
-                                    const T_x& x,
+                                    const T_y& y,
                                     const T_high& high,
                                     const char* name,  
-                                    T_x* result = 0) {
-      return check_less_or_equal(function,x,high,name,result,default_policy());
+                                    T_y* result = 0) {
+      return check_less_or_equal(function,y,high,name,result,default_policy());
     }
 
 
