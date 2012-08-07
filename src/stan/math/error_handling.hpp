@@ -68,7 +68,7 @@ namespace stan {
                 class Policy>
       inline bool dom_err_vec(size_t i,
                               const char* function,
-                              const std::vector<T_y>& y,
+                              const T_y& y,
                               const char* name,
                               const char* error_msg,
                               T_msg2 error_msg2,
@@ -77,7 +77,7 @@ namespace stan {
         using stan::math::policies::raise_domain_error;
         std::ostringstream msg_o;
         msg_o << name << "[" << i << "] " << error_msg << error_msg2;
-        T_result tmp = raise_domain_error<T_result,T_y>(function,
+        T_result tmp = raise_domain_error<T_result,typename T_y::value_type>(function,
                                                         msg_o.str().c_str(),
                                                         y[i],
                                                         Policy());
@@ -87,8 +87,56 @@ namespace stan {
       }
     } // end anon namespace
 
+    namespace {
+      template <typename T_y,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct not_nan {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  if ((boost::math::isnan)(y)) 
+	    return dom_err(function,y,name,
+			   " is %1%, but must not be nan!","",
+			   result,Policy());
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_result,
+		class Policy>
+      struct not_nan<T_y, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if ((boost::math::isnan)(y[n])) 
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must not be nan!","",
+				 result,Policy());
+	    return true;
+	  }
+	}
+      };
+    }
 
-
+    template <typename T_y,
+	      typename T_result,
+	      class Policy>
+    inline bool check_not_nan(const char* function,
+                              const T_y& y,
+                              const char* name,
+                              T_result* result,
+                              const Policy&) {
+      return not_nan<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
+    }
     
     /**
      * Checks if the variable y is nan.
@@ -101,38 +149,38 @@ namespace stan {
      * @tparam T_result Type of result returned.
      * @tparam Policy Error handling policy.
      */
-    template <typename T_y, 
-              typename T_result,
-              class Policy>
-    inline bool check_not_nan(const char* function,
-                              const T_y& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy&) {
-      if ((boost::math::isnan)(y)) 
-        return dom_err(function,y,name,
-                            " is %1%, but must not be nan!","",
-                            result,Policy());
-      return true;
-    }
+    // template <typename T_y, 
+    //           typename T_result,
+    //           class Policy>
+    // inline bool check_not_nan(const char* function,
+    //                           const T_y& y,
+    //                           const char* name,
+    //                           T_result* result,
+    //                           const Policy&) {
+    //   if ((boost::math::isnan)(y)) 
+    //     return dom_err(function,y,name,
+    //                         " is %1%, but must not be nan!","",
+    //                         result,Policy());
+    //   return true;
+    //   }
     /**
      * Check that the specified argument vector does not contain a nan.
      */
-    template <typename T_y, 
-              typename T_result,
-              class Policy>
-    inline bool check_not_nan(const char* function,
-                              const std::vector<T_y>& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy&) {
-      for (size_t i = 0; i < y.size(); i++)
-        if ((boost::math::isnan)(y[i])) 
-          return dom_err_vec(i,function,y,name,
-                                  " is %1%, but must not be nan!","",
-                                  result,Policy());
-      return true;
-    }
+    // template <typename T_y, 
+    //           typename T_result,
+    //           class Policy>
+    // inline bool check_not_nan(const char* function,
+    //                           const std::vector<T_y>& y,
+    //                           const char* name,
+    //                           T_result* result,
+    //                           const Policy&) {
+    //   for (size_t i = 0; i < y.size(); i++)
+    //     if ((boost::math::isnan)(y[i])) 
+    //       return dom_err_vec(i,function,y,name,
+    //                               " is %1%, but must not be nan!","",
+    //                               result,Policy());
+    //   return true;
+    // }
 
     template <typename T_y, 
               typename T_result>
@@ -150,8 +198,6 @@ namespace stan {
                               T* result = 0) {
       return check_not_nan(function,y,name,result,default_policy());
     }
-
-
 
     /**
      * Checks if the variable y is finite.
