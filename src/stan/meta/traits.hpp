@@ -61,7 +61,7 @@ namespace stan {
   };
 
   namespace {
-    template <bool vector, typename T>
+    template <bool is_vec, typename T>
     struct scalar_type_helper {
       typedef T type;
     };
@@ -113,29 +113,25 @@ namespace stan {
     return rv.size();
   }
 
+  template<typename T, bool is_vec>
+  struct size_of_helper {
+    static size_t size_of(const T& x) {
+      return 1U;
+    }
+  };
+
+  template<typename T>
+  struct size_of_helper<T, true> {
+    static size_t size_of(const T& x) {
+      return x.size();
+    }
+  };
 
   template <typename T>
   size_t size_of(const T& x) {
-    return 1U;
-  }
-  template <typename T>
-  size_t size_of(const std::vector<T>& x) {
-    return x.size();
-  }
-  template <typename T>
-  size_t size_of(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
-    return v.size();
-  }
-  template <typename T>
-  size_t size_of(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
-    return rv.size();
-  }
-  template <typename T>
-  size_t size_of(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-    return m.size();
+    return size_of_helper<T, is_vector<T>::value>::size_of(x);
   }
   
-
   template <typename T1, typename T2, typename T3>
   size_t max_size(const T1& x1, const T2& x2, const T3& x3) {
     size_t result = length(x1);
