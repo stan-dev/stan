@@ -160,61 +160,61 @@ TEST(MathErrorHandling,CheckFiniteVectorErrnoPolicy) {
   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
 }
 
-// // ---------- check_finite: matrix tests ----------
-// TEST(MathErrorHandling,CheckFiniteMatrixDefaultPolicy) {
-//   const char* function = "check_finite (%1%)";
-//   double result;
-//   Eigen::Matrix<double,Eigen::Dynamic,1> x;
+// ---------- check_finite: matrix tests ----------
+TEST(MathErrorHandling,CheckFiniteMatrixDefaultPolicy) {
+  const char* function = "check_finite (%1%)";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, 1;
-//   ASSERT_TRUE (check_finite (function, x, "x", &result, default_policy())) << "check_finite should be true with finite x";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, 1;
+  ASSERT_TRUE (check_finite (function, x, "x", &result, default_policy())) << "check_finite should be true with finite x";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::infinity();
-//   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on Inf";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on Inf";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, -std::numeric_limits<double>::infinity();
-//   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on -Inf";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, -std::numeric_limits<double>::infinity();
+  EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on -Inf";
   
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::quiet_NaN();
-//   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
-// }
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
+}
 
-// TEST(MathErrorHandling,CheckFiniteMatrixErrnoPolicy) {
-//   const char* function = "check_finite (%1%)";
-//   double result;
-//   Eigen::Matrix<double,Eigen::Dynamic,1> x;
+TEST(MathErrorHandling,CheckFiniteMatrixErrnoPolicy) {
+  const char* function = "check_finite (%1%)";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, 1;
-//   EXPECT_TRUE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should be true with finite x";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, 1;
+  EXPECT_TRUE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should be true with finite x";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::infinity();
-//   EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on Inf";
-//   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on Inf";
+  EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, -std::numeric_limits<double>::infinity();
-//   EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on -Inf";
-//   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on -Inf";
+  EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::quiet_NaN(); 
-//   EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on NaN";
-//   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
-//   }
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::quiet_NaN(); 
+  EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on NaN";
+  EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
+  }
 
 // ---------- check_bounded tests ----------
 TEST(MathErrorHandling,CheckBoundedDefaultPolicyX) {
@@ -412,7 +412,6 @@ TEST(MathErrorHandling,CheckBoundedErrnoPolicyHigh) {
 }
 
 // ----------  ----------
-//TEST(MathErrorHandling,)
 TEST(MathErrorHandling,CheckGreaterDefaultPolicy) {
   const char* function = "check_greater(%1%)";
   double x = 10.0;

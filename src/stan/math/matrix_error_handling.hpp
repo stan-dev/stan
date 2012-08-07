@@ -9,7 +9,7 @@
 namespace stan { 
 
   namespace math {
-
+    
     template <typename T_size1, typename T_size2, typename T_result,
               class Policy>
     inline bool check_size_match(const char* function,
