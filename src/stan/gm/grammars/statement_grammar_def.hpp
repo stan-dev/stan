@@ -382,11 +382,11 @@ namespace stan {
       truncation_range_r.name("range pair");
       truncation_range_r
         %= lit('T')
-        > lit('(') 
+        > lit('[') 
         > -expression_g
         > lit(',')
         > -expression_g
-        > lit(')');
+        > lit(']');
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r 

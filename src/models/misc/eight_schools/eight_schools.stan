@@ -1,16 +1,16 @@
 // EIGHT SCHOOLS MODEL
 
 data {
-    int(0,) J;               // number of schools
+    int[0, ] J;               // number of schools
     real y[J];             // estimated treatment effect (school j)
-    real(0,) sigma_y[J];   // standard error of effect estimate (school j)
+    real[0, ] sigma_y[J];   // standard error of effect estimate (school j)
     real sigma_xi;         // prior scale (coefficient)
 }
 parameters {
     real mu;               // intercept coefficient (for y)
     real xi;               // slope coefficient (for y)
     real eta[J];           // predictor (school j)
-    real(0,) sigma_eta;    // deviation of eta
+    real[0, ] sigma_eta;    // deviation of eta
 }
 model {
     sigma_eta ~ cauchy(0,1);
