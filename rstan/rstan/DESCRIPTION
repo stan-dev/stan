@@ -2,9 +2,9 @@ Package: rstan
 Type: Package
 Title: R interface to Stan
 Version: 1.0
-Date: 2012-05-15
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Date: 2012-08-5
+Author: Andrew Gelman <gelman@stat.columbia.edu>, Bob Carpenter <carp@alias-i.com>, Matt Hoffman <mdhoffma@cs.princeton.edu>, Daniel Lee <bearlee@alum.mit.edu>, Michale Malecki <malecki@gmail.com>, Ben Goodrich <goodrich.ben@gmail.com>, Jiqiang Guo <guojq28@gmail.com>, Marcus Brubaker <mbrubake@cs.toronto.edu>
+Maintainer: Jiqiang Guo <guojq28@gmail.com>
 Description: R interface to Stan 
 License: file LICENSE
 Depends: methods, Rcpp (>= 0.9.10), inline, RcppEigen(>= 0.3.0), Matrix

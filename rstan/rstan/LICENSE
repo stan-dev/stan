@@ -1,9 +1,13 @@
-1. Stan code (under include/stansrc) included in RStan
+RStan (package rstan) are licensed under GPLv3 (http://www.gnu.org/copyleft/gpl.html)
+
+Other sources distributed with RStan are under different licenses: 
+
+1. Stan code (in folder include/stansrc) included in RStan
    are licensed under new BSD (http://www.opensource.org/licenses/BSD-3-Clause).
-   More details could be found on Stan's homepage and Stan's reference manual. 
 
-2. Other sources included in RStan if any are distributed according to their
-   licenses. 
+2. Part of boost library (in folder include/stanlib) distributed with RStan is 
+   under the Boost Software License version 1.0 (http://www.opensource.org/licenses/BSL-1.0) 
 
-3. RStan code are under GPLv3. 
+   
+
 
