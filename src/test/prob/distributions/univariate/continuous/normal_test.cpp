@@ -21,9 +21,12 @@ TEST(ProbDistributionsNormal,Eigen) {
   mu << -1.0, -2.0, -3.0, -10.0;
   Matrix<double,Dynamic,1> sigma(4);
   sigma << 0.5, 1.5, 3.0, 15.0;
-  //double z = normal_log(y,mu,sigma);
-  //std::cout << "z=" << z << std::endl;
-  EXPECT_TRUE(true);
+
+  double sum = 0;
+  for (size_t n = 0; n < 4; n++)
+    sum += normal_log(y[n], mu[n], sigma[n]);
+
+  EXPECT_FLOAT_EQ(sum, normal_log(y,mu,sigma));
 }
 
 
