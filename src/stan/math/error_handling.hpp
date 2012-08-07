@@ -240,9 +240,9 @@ namespace stan {
     template <typename T>
     inline bool check_finite(const char* function,
                              const T& y,
-                             const char* name,
-                             T* result = 0) {
-      return check_finite(function,y,name,result,default_policy());
+                             const char* name) {
+      return check_finite<T,typename scalar_type<T>::type *>
+	(function,y,name,0,default_policy());
     }
 
     // FIXME: fully vectorize for T_y and T_low
@@ -319,7 +319,8 @@ namespace stan {
                               const T_low& low,
                               const char* name,  
                               T_y* result = 0) {
-      return check_greater(function,y,low,name,result,default_policy());
+      return check_greater<T_y,T_low,typename scalar_type<T_y>::type *>
+	(function,y,low,name,0,default_policy());
     }
 
     // FIXME: fully vectorize for T_y and T_low
@@ -388,10 +389,9 @@ namespace stan {
     inline bool check_greater_or_equal(const char* function,
                                        const T_y& y,
                                        const T_low& low,
-                                       const char* name,  
-                                       T_y* result = 0) {
-      return check_greater_or_equal(function,y,low,name,result,
-                                    default_policy());
+                                       const char* name) {
+      return check_greater_or_equal<T_y,T_low,typename scalar_type<T_y>::type *>
+	(function,y,low,name,0,default_policy());
     }
 
     // FIXME: fully vectorize for T_high
@@ -459,9 +459,9 @@ namespace stan {
     inline bool check_less(const char* function,
                            const T_y& y,
                            const T_high& high,
-                           const char* name,  
-                           T_y* result = 0) {
-      return check_less(function,y,high,name,result,default_policy());
+                           const char* name) {
+      return check_less<T_y,T_high,typename scalar_type<T_y>::type *>
+	(function,y,high,name,0,default_policy());
     }
 
     // FIXME: fully vectorize for T_y and T_high
@@ -529,9 +529,9 @@ namespace stan {
     inline bool check_less_or_equal(const char* function,
                                     const T_y& y,
                                     const T_high& high,
-                                    const char* name,  
-                                    T_y* result = 0) {
-      return check_less_or_equal(function,y,high,name,result,default_policy());
+                                    const char* name) {
+      return check_less_or_equal<T_y,T_high,typename scalar_type<T_y>::type *>
+	(function,y,high,name,0,default_policy());
     }
 
 
@@ -610,11 +610,9 @@ namespace stan {
                               const T_high& high,
                               const char* name,  
                               T_y* result = 0) {
-      return check_bounded(function,y,low,high,name,result,default_policy());
+      return check_bounded<T_y,T_low,T_high,typename scalar_type<T_y>::type *>
+	(function,y,low,high,name,0,default_policy());
     }
-
-
-
 
     namespace {
       template <typename T_y,
@@ -675,9 +673,9 @@ namespace stan {
     template <typename T_y>
     inline bool check_nonnegative(const char* function,
                                   const T_y& y,
-                                  const char* name,
-                                  T_y* result = 0) {
-      return check_nonnegative(function,y,name,result,default_policy());
+                                  const char* name) {
+      return check_nonnegative<T_y,typename scalar_type<T_y>::type *>
+	(function,y,name,0,default_policy());
     }
 
 
@@ -741,9 +739,9 @@ namespace stan {
     template <typename T>
     inline bool check_positive(const char* function,
                                const T& x,
-                               const char* name,
-                               T* result = 0) {
-      return check_positive(function,x,name,result,default_policy());
+                               const char* name) {
+      return check_positive<T,typename scalar_type<T>::type *>
+	(function,x,name,0,default_policy());
     }
 
     template <typename T, typename T_result, class Policy>
