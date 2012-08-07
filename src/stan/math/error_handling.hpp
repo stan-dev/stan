@@ -177,7 +177,7 @@ namespace stan {
       return check_not_nan(function,y,name,result,default_policy());
     }
 
-    
+     
     namespace {
       template <typename T_y,
 		typename T_result,
@@ -217,8 +217,6 @@ namespace stan {
 	}
       };
     }
-
-
     /**
      * Checks if the variable y is finite.
      */
@@ -607,47 +605,68 @@ namespace stan {
 
 
 
-    template <typename T_x, typename T_result, 
-              class Policy>
-    inline bool check_nonnegative(const char* function,
-                                  const T_x& x,
-                                  const char* name,
-                                  T_result* result,
-                                  const Policy&) {
-      // have to use not is_unsigned. is_signed will be false
-      // floating point types that have no unsigned versions.
-      if (!boost::is_unsigned<T_x>::value && !(x >= 0)) 
-        return dom_err(function,x,name,
-                            " is %1%, but must be >= 0!","",result,Policy());
-      return true;
+    namespace {
+      template <typename T_y,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct nonnegative {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  // have to use not is_unsigned. is_signed will be false
+	  // floating point types that have no unsigned versions.
+	  if (!boost::is_unsigned<T_y>::value && !(y >= 0)) 
+	    return dom_err(function,y,name,
+			   " is %1%, but must be >= 0!","",
+			   result,Policy());
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_result,
+		class Policy>
+      struct nonnegative<T_y, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if (!boost::is_unsigned<typename T_y::value_type>::value && !(y[n] >= 0)) 
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must be >= 0!","",
+				 result,Policy());
+	  }
+	  return true;
+	}
+      };
     }
-    template <typename T_x, typename T_result, 
-              class Policy>
+    template <typename T_y, typename T_result, class Policy>
     inline bool check_nonnegative(const char* function,
-                                  const std::vector<T_x>& x,
-                                  const char* name,
-                                  T_result* result,
-                                  const Policy&) {
-      for (size_t i = 0; i < x.size(); ++i)
-        if (!boost::is_unsigned<T_x>::value && !(x[i] >= 0)) 
-          return dom_err_vec(i,function,x,name,
-                                  " is %1%, but must be >= 0!","",
-                                  result,Policy());
-      return true;
+				  const T_y& y,
+				  const char* name,
+				  T_result* result,
+				  const Policy&) {
+      return nonnegative<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
     }
-    template <typename T_x, typename T_result>
+    template <typename T_y, typename T_result>
     inline bool check_nonnegative(const char* function,
-                                  const T_x& x,
+                                  const T_y& y,
                                   const char* name,
                                   T_result* result) {
-      return check_nonnegative(function,x,name,result,default_policy());
+      return check_nonnegative(function,y,name,result,default_policy());
     }
-    template <typename T>
+    template <typename T_y>
     inline bool check_nonnegative(const char* function,
-                                  const T& x,
+                                  const T_y& y,
                                   const char* name,
-                                  T* result = 0) {
-      return check_nonnegative(function,x,name,result,default_policy());
+                                  T_y* result = 0) {
+      return check_nonnegative(function,y,name,result,default_policy());
     }
 
 
