@@ -245,6 +245,7 @@ namespace stan {
       return check_finite(function,y,name,result,default_policy());
     }
 
+    // FIXME: fully vectorize for T_y and T_low
     namespace {
       template <typename T_y,
 		typename T_low,
@@ -314,6 +315,7 @@ namespace stan {
       return check_greater(function,y,low,name,result,default_policy());
     }
 
+    // FIXME: fully vectorize for T_y and T_low
     namespace {
       template <typename T_y,
 		typename T_low,
@@ -385,6 +387,7 @@ namespace stan {
                                     default_policy());
     }
 
+    // FIXME: fully vectorize for T_high
     namespace {
       template <typename T_y,
 		typename T_high,
@@ -454,6 +457,7 @@ namespace stan {
       return check_less(function,y,high,name,result,default_policy());
     }
 
+    // FIXME: fully vectorize for T_y and T_high
     namespace {
       template <typename T_y,
 		typename T_high,
@@ -524,7 +528,7 @@ namespace stan {
     }
 
 
-
+    // FIXME: fully vectorize for T_y, T_low, and T_high
     namespace {
       template <typename T_y,
 		typename T_low,
