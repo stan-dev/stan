@@ -78,9 +78,9 @@ namespace stan {
         std::ostringstream msg_o;
         msg_o << name << "[" << i << "] " << error_msg << error_msg2;
         T_result tmp = raise_domain_error<T_result,typename T_y::value_type>(function,
-                                                        msg_o.str().c_str(),
-                                                        y[i],
-                                                        Policy());
+									     msg_o.str().c_str(),
+									     y[i],
+									     Policy());
         if (result != 0)
           *result = tmp;
         return false;
@@ -172,9 +172,9 @@ namespace stan {
     template <typename T>
     inline bool check_not_nan(const char* function,
                               const T& y,
-                              const char* name,
-                              T* result = 0) {
-      return check_not_nan(function,y,name,result,default_policy());
+                              const char* name) {
+      return check_not_nan<T, typename scalar_type<T>::type *>
+	(function,y,name,0,default_policy());
     }
 
      
