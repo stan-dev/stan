@@ -456,7 +456,6 @@ namespace stan {
       return check_less(function,y,high,name,result,default_policy());
     }
 
-
     namespace {
       template <typename T_y,
 		typename T_high,
@@ -528,56 +527,81 @@ namespace stan {
 
 
 
-
-    template <typename T_x, typename T_low, typename T_high, typename T_result,
-              class Policy>
-    inline bool check_bounded(const char* function,
-                              const T_x& x,
-                              const T_low& low,
-                              const T_high& high,
-                              const char* name,  
-                              T_result* result,
-                              const Policy&) {
-      if (!(low <= x && x <= high))
-        return dom_err(function,x,name," is %1%, but must be between ",
+    namespace {
+      template <typename T_y,
+		typename T_low,
+		typename T_high,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct bounded {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const T_low& low,
+			  const T_high& high,
+			  const char* name,  
+			  T_result* result,
+			  const Policy&) {
+	  if (!(low <= y && y <= high))
+	    return dom_err(function,y,name," is %1%, but must be between ",
                             std::pair<T_low,T_high>(low,high),
                             result,Policy());
-      return true;
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_low,
+		typename T_high,
+		typename T_result,
+		class Policy>
+      struct bounded<T_y, T_low, T_high, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const T_low& low,
+			  const T_high& high,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if (!(low <= y[n] && y[n] <= high))
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must be between ",
+				 std::pair<T_low,T_high>(low,high),
+				 result,Policy());
+	  }
+	  return true;
+	}
+      };
     }
-    template <typename T_x, typename T_low, typename T_high, typename T_result,
-              class Policy>
+    template <typename T_y, typename T_low, typename T_high, typename T_result, class Policy>
     inline bool check_bounded(const char* function,
-                              const std::vector<T_x>& x,
-                              const T_low& low,
-                              const T_high& high,
-                              const char* name,  
-                              T_result* result,
-                              const Policy&) {
-      for (size_t i = 0; i < x.size(); ++i)
-        if (!(low <= x[i] && x[i] <= high))
-          return dom_err_vec(i,function,x,name,
-                                  " is %1%, but must be between ",
-                                  std::pair<T_low,T_high>(low,high),
-                                  result,Policy());
-      return true;
+			      const T_y& y,
+			      const T_low& low,
+			      const T_high& high,
+			      const char* name,  
+			      T_result* result,
+			      const Policy&) {
+      return bounded<T_y,T_low,T_high,T_result,Policy,is_vector<T_y>::value>::check(function,y,low,high,name,result,Policy());
     }
-    template <typename T_x, typename T_low, typename T_high, typename T_result>
+    template <typename T_y, typename T_low, typename T_high, typename T_result>
     inline bool check_bounded(const char* function,
-                              const T_x& x,
+                              const T_y& y,
                               const T_low& low,
                               const T_high& high,
                               const char* name,  
                               T_result* result) {
-      return check_bounded(function,x,low,high,name,result,default_policy());
+      return check_bounded(function,y,low,high,name,result,default_policy());
     }
-    template <typename T_x, typename T_low, typename T_high>
+    template <typename T_y, typename T_low, typename T_high>
     inline bool check_bounded(const char* function,
-                              const T_x& x,
+                              const T_y& y,
                               const T_low& low,
                               const T_high& high,
                               const char* name,  
-                              T_x* result = 0) {
-      return check_bounded(function,x,low,high,name,result,default_policy());
+                              T_y* result = 0) {
+      return check_bounded(function,y,low,high,name,result,default_policy());
     }
 
 
