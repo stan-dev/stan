@@ -4,7 +4,6 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/error_handling.hpp>
 
-
 #include <boost/type_traits/common_type.hpp>
 
 namespace stan { 
@@ -490,82 +489,7 @@ namespace stan {
 
 
 
-    // error_handling functions for Eigen vector, row vector & matrix
-
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy&) {
-      using stan::math::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (boost::math::isnan(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must not be nan!";
-          T_result tmp = raise_domain_error<T_result,T_y>(function,
-                                                          message.str().c_str(),
-                                                          y[i],
-                                                          Policy());
-          if (result != 0)
-            *result = tmp;
-          return false;
-        }
-      }
-      return true;
-    }
-    template <typename T_y, typename T_result>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const char* name,
-                              T_result* result) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-    template <typename T>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
-                              const char* name,
-                              T* result = 0) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy&) {
-      using stan::math::policies::raise_domain_error;
-      for (int i = 0; i < y.rows(); i++) {
-        if (boost::math::isnan(y[i])) {
-          std::ostringstream message;
-          message << name << "[" << i << "] is %1%, but must not be nan!";
-          T_result tmp = raise_domain_error<T_result,T_y>(function,
-                                                          message.str().c_str(),
-                                                          y[i],
-                                                          Policy());
-          if (result != 0)
-            *result = tmp;
-          return false;
-        }
-      }
-      return true;
-    }
-    template <typename T_y, typename T_result>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T_y,1,Eigen::Dynamic>& y,
-                              const char* name,
-                              T_result* result) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-    template <typename T>
-    inline bool check_not_nan(const char* function,
-                              const Eigen::Matrix<T,1,Eigen::Dynamic>& y,
-                              const char* name,
-                              T* result = 0) {
-      return check_not_nan(function,y,name,result,default_policy());
-    }
-
+    // error_handling functions for Eigen matrix
 
     template <typename T_y, typename T_result, class Policy>
     inline bool check_not_nan(const char* function,
