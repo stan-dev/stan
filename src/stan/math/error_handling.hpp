@@ -121,23 +121,12 @@ namespace stan {
 	      return dom_err_vec(n,function,y,name,
 				 " is %1%, but must not be nan!","",
 				 result,Policy());
-	    return true;
 	  }
+	  return true;
 	}
       };
     }
 
-    template <typename T_y,
-	      typename T_result,
-	      class Policy>
-    inline bool check_not_nan(const char* function,
-                              const T_y& y,
-                              const char* name,
-                              T_result* result,
-                              const Policy&) {
-      return not_nan<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
-    }
-    
     /**
      * Checks if the variable y is nan.
      *
@@ -149,39 +138,28 @@ namespace stan {
      * @tparam T_result Type of result returned.
      * @tparam Policy Error handling policy.
      */
-    // template <typename T_y, 
-    //           typename T_result,
-    //           class Policy>
-    // inline bool check_not_nan(const char* function,
-    //                           const T_y& y,
-    //                           const char* name,
-    //                           T_result* result,
-    //                           const Policy&) {
-    //   if ((boost::math::isnan)(y)) 
-    //     return dom_err(function,y,name,
-    //                         " is %1%, but must not be nan!","",
-    //                         result,Policy());
-    //   return true;
-    //   }
-    /**
-     * Check that the specified argument vector does not contain a nan.
-     */
-    // template <typename T_y, 
-    //           typename T_result,
-    //           class Policy>
-    // inline bool check_not_nan(const char* function,
-    //                           const std::vector<T_y>& y,
-    //                           const char* name,
-    //                           T_result* result,
-    //                           const Policy&) {
-    //   for (size_t i = 0; i < y.size(); i++)
-    //     if ((boost::math::isnan)(y[i])) 
-    //       return dom_err_vec(i,function,y,name,
-    //                               " is %1%, but must not be nan!","",
-    //                               result,Policy());
-    //   return true;
-    // }
+    template <typename T_y,
+	      typename T_result,
+	      class Policy>
+    inline bool check_not_nan(const char* function,
+                              const T_y& y,
+                              const char* name,
+                              T_result* result,
+                              const Policy&) {
+      return not_nan<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
+    }
 
+    /**
+     * Checks if the variable y is nan.
+     *
+     * @param function Name of function being invoked.
+     * @param y Reference to variable being tested.
+     * @param name Name of variable being tested.
+     * @param result Pointer to resulting value after test.
+     * @tparam T_y Type of variable being tested.
+     * @tparam T_result Type of result returned.
+     * @tparam Policy Error handling policy.
+     */
     template <typename T_y, 
               typename T_result>
     inline bool check_not_nan(const char* function,
@@ -199,6 +177,48 @@ namespace stan {
       return check_not_nan(function,y,name,result,default_policy());
     }
 
+    
+    namespace {
+      template <typename T_y,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct finite {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  if (!(boost::math::isfinite)(y)) 
+	    return dom_err(function,y,name,
+			   " is %1%, but must be finite!","",
+			   result,Policy());
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_result,
+		class Policy>
+      struct finite<T_y, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if (!(boost::math::isfinite)(y[n])) 
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must be finite!","",
+				 result,Policy());
+	  }
+	  return true;
+	}
+      };
+    }
+
+
     /**
      * Checks if the variable y is finite.
      */
@@ -208,25 +228,9 @@ namespace stan {
                              const char* name,
                              T_result* result,
                              const Policy&) {
-      if (!(boost::math::isfinite)(y))
-        return dom_err(function,y,name,
-                            " is %1%, but must be finite!","",
-                            result,Policy());
-      return true;
+      return finite<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
     }
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_finite(const char* function,
-                             const std::vector<T_y>& y,
-                             const char* name,
-                             T_result* result,
-                             const Policy&) {
-      for (size_t i = 0; i < y.size(); i++) 
-        if (!(boost::math::isfinite)(y[i])) 
-          return dom_err_vec(i,function,y,name,
-                                  " is %1%, but must be finite!","",
-                                  result,Policy());
-      return true;
-    }
+
     template <typename T_y, typename T_result>
     inline bool check_finite(const char* function,
                              const T_y& y,
@@ -234,6 +238,7 @@ namespace stan {
                              T_result* result) {
       return check_finite(function,y,name,result,default_policy());
     }
+    
     template <typename T>
     inline bool check_finite(const char* function,
                              const T& y,
@@ -241,9 +246,6 @@ namespace stan {
                              T* result = 0) {
       return check_finite(function,y,name,result,default_policy());
     }
-
-
-
 
     template <typename T_x, typename T_low, typename T_result, class Policy>
     inline bool check_greater(const char* function,
