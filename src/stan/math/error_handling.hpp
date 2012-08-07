@@ -247,8 +247,6 @@ namespace stan {
       return check_finite(function,y,name,result,default_policy());
     }
 
-
-
     namespace {
       template <typename T_y,
 		typename T_low,
@@ -318,51 +316,74 @@ namespace stan {
       return check_greater(function,y,low,name,result,default_policy());
     }
 
-
-    template <typename T_x, typename T_low, typename T_result, class Policy>
-    inline bool check_greater_or_equal(const char* function,
-                                       const T_x& x,
-                                       const T_low& low,
-                                       const char* name,  
-                                       T_result* result,
-                                       const Policy&) {
-      if (!(x >= low))
-        return dom_err(function,x,name,
-                            " is %1%, but must be greater than or equal to ",
-                            low,result,Policy());
-      return true;
+    namespace {
+      template <typename T_y,
+		typename T_low,
+		typename T_result,
+		class Policy,
+		bool is_vec>
+      struct greater_or_equal {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const T_low& low,
+			  const char* name,  
+			  T_result* result,
+			  const Policy&) {
+	  if (!(y >= low))
+	    return dom_err(function,y,name,
+			   " is %1%, but must be greater than or equal to ",
+			   low,result,Policy());
+	  return true;
+	}
+      };
+    
+      template <typename T_y,
+		typename T_low,
+		typename T_result,
+		class Policy>
+      struct greater_or_equal<T_y, T_low, T_result, Policy, true> {
+	static bool check(const char* function,
+			  const T_y& y,
+			  const T_low& low,
+			  const char* name,
+			  T_result* result,
+			  const Policy&) {
+	  using stan::length;
+	  for (size_t n = 0; n < length(y); n++) {
+	    if (!(y[n] >= low))
+	      return dom_err_vec(n,function,y,name,
+				 " is %1%, but must be greater than or equal to ",
+				 low,result,Policy());
+	  }
+	  return true;
+	}
+      };
     }
-    template <typename T_x, typename T_low, typename T_result, class Policy>
+    template <typename T_y, typename T_low, typename T_result, class Policy>
     inline bool check_greater_or_equal(const char* function,
-                                       const std::vector<T_x>& x,
-                                       const T_low& low,
-                                       const char* name,  
-                                       T_result* result,
-                                       const Policy&) {
-      for (size_t i = 0; i < x.size(); ++i)
-        if (!(x[i] >= low))
-          return dom_err_vec(
-                          i,function,x,name,
-                          " is %1%, but must be greater than or equal to",
-                          low,result,Policy());
-      return true;
+				       const T_y& y,
+				       const T_low& low,
+				       const char* name,  
+				       T_result* result,
+				       const Policy&) {
+      return greater_or_equal<T_y,T_low,T_result,Policy,is_vector<T_y>::value>::check(function,y,low,name,result,Policy());
     }
-    template <typename T_x, typename T_low, typename T_result>
+    template <typename T_y, typename T_low, typename T_result>
     inline bool check_greater_or_equal(const char* function,
-                                       const T_x& x,
+                                       const T_y& y,
                                        const T_low& low,
                                        const char* name,  
                                        T_result* result) {
-      return check_greater_or_equal(function,x,low,name,result,
+      return check_greater_or_equal(function,y,low,name,result,
                                     default_policy());
     }                               
-    template <typename T_x, typename T_low>
+    template <typename T_y, typename T_low>
     inline bool check_greater_or_equal(const char* function,
-                                       const T_x& x,
+                                       const T_y& y,
                                        const T_low& low,
                                        const char* name,  
-                                       T_x* result = 0) {
-      return check_greater_or_equal(function,x,low,name,result,
+                                       T_y* result = 0) {
+      return check_greater_or_equal(function,y,low,name,result,
                                     default_policy());
     }
 
