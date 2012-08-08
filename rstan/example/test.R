@@ -4,7 +4,7 @@ library(rstan)
 
 stanmodelcode <- '
 data {
-  int(0,) N;
+  int[0,] N;
   real y[N];
 } 
 
@@ -31,7 +31,7 @@ f <- sampling(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.cs
 
 
 
-sampling(rr, data = dat, n.iter = 2012, init.t = 'user', 
+sampling(rr, data = dat, n.iter = 2012, init.t = 'user', n.chains = 1,
          init.v = list(list(mu = 2)), seed = 3, n.thin = 1, 
          sample.file = 'norm1.csv')
 

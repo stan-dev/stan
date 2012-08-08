@@ -44,7 +44,7 @@
 
   stanmodelcode <- '
   data {
-    int(0,) N;
+    int[0,] N;
     real y[N];
   } 
 

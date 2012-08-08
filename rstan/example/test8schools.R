@@ -34,6 +34,7 @@ traceplot(ss1)
 
 ss4 <- sampling(m, data = dat, n.iter = n.iter, n.chains = 4, refresh = 10) 
 
+n.iter <- 52012
 ss <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4, sample.file = '8schools.csv')
 print(ss)
 
@@ -50,10 +51,10 @@ print(ss.same, pars = 'theta', probs = c(.4, .8))
 print(ss.same)
 
 
-fit2 <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 3, pars = "theta")
-print(fit2)
-print(fit2, pars = 'theta')
-print(fit2, pars = 'mu_theta')
+# fit2 <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 3, pars = "theta")
+# print(fit2)
+# print(fit2, pars = 'theta')
+# print(fit2, pars = 'mu_theta')
 
 
 
