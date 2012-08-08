@@ -26,7 +26,7 @@ indicating which data variable is missing.
 
 After each variable is read, if it has a declared constraint, the
 constraint is validated.  For example, if a variable \code{N} is
-declared as \code{int(0,)}, after \code{N} is read, it will be tested
+declared as \code{int[0,]}, after \code{N} is read, it will be tested
 to make sure it is greater than or equal to zero.  If a variable
 violates its declared constraint, the program will halt with a warning
 message indicating which variable contains an illegal value, the value
@@ -352,7 +352,7 @@ the following.
 %
 \begin{quote}
 \begin{Verbatim}
-int(1,) N;
+int[1,] N;
 \end{Verbatim}
 \end{quote}
 %
@@ -364,7 +364,7 @@ the following example.
 %
 \begin{quote}
 \begin{Verbatim} 
-int(0,1) cond;
+int[0,1] cond;
 \end{Verbatim}
 \end{quote}
 
@@ -394,7 +394,7 @@ The variable \code{sigma} may be declared to be non-negative as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-real(0,) sigma;
+real[0,] sigma;
 \end{Verbatim}
 \end{quote}
 %
@@ -403,7 +403,7 @@ to $-1$.
 %
 \begin{quote}
 \begin{Verbatim} 
-real(,-1) x;
+real[,-1] x;
 \end{Verbatim}
 \end{quote}
 % 
@@ -412,7 +412,7 @@ following declaration.
 %
 \begin{quote}
 \begin{Verbatim}
-real(-1,1) rho;
+real[-1,1] rho;
 \end{Verbatim}
 \end{quote}
 %
@@ -435,7 +435,7 @@ data {
  real lb;
 }
 parameters {
-   real(lb,) phi;
+   real[lb,] phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -449,11 +449,11 @@ defined at the point the constraint is used.  For instance,
 \begin{quote}
 \begin{Verbatim}
 data { 
-   int(1,) N;
+   int[1,] N;
    real y[N];
 }
 parameters {
-   real(fmin(y),fmax(y)) phi;
+   real[fmin(y),fmax(y)] phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -493,7 +493,7 @@ the keyword \code{vector}, as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-vector(3) u;
+vector[3] u;
 \end{Verbatim}
 \end{quote}
 %
@@ -510,7 +510,7 @@ be a unit $5$-simplex by
 %
 \begin{quote}
 \begin{Verbatim} 
-simplex(5) theta;
+simplex[5] theta;
 \end{Verbatim}
 \end{quote}
 % 
@@ -535,7 +535,7 @@ The variable \code{c} is declared as an ordered 5-vector by
 %
 \begin{quote}
 \begin{Verbatim}
-ordered(5) c;
+ordered[5] c;
 \end{Verbatim}
 \end{quote}
 %
@@ -552,7 +552,7 @@ a 1093-dimensional row vector \code{u} would be declared as
 %
 \begin{quote}
 \begin{Verbatim}
-row_vector(1093) u;
+row_vector[1093] u;
 \end{Verbatim}
 \end{quote}
 %
@@ -568,8 +568,8 @@ number of rows and number of columns.  For example,
 %
 \begin{quote}
 \begin{Verbatim}  
-matrix(3,3) A;  
-matrix(M,N) B;
+matrix[3,3] A;  
+matrix[M,N] B;
 \end{Verbatim}
 \end{quote}
 %  
@@ -588,7 +588,7 @@ to be declared.  For example,
 %
 \begin{quote}
 \begin{Verbatim} 
-corr_matrix(3) Sigma;
+corr_matrix[3] Sigma;
 \end{Verbatim}
 \end{quote}
 % 
@@ -606,7 +606,7 @@ single dimension in their declaration.  For instance,
 %
 \begin{quote}
 \begin{Verbatim} 
-cov_matrix(K) Omega;
+cov_matrix[K] Omega;
 \end{Verbatim}
 \end{quote}
 % 
@@ -617,10 +617,10 @@ $K$ is the value of the data variable \code{K}.
 
 Constrained variables of all types may be assigned to other variables
 of the same unconstrained type and vice-versa.  For instance, a
-variable declared to be \code{real(0,1)} could be assigned to a
+variable declared to be \code{real[0,1]} could be assigned to a
 variable declared as \code{real} and vice-versa.  Similarly,
-a variable declared as \code{matrix(3,3)} may be assigned to a
-variable declared as \code{cov\_matrix(3)} and vice-versa.  
+a variable declared as \code{matrix[3,3]} may be assigned to a
+variable declared as \code{cov\_matrix[3]} and vice-versa.  
 
 Checks are carried out at the end of each relevant block of statements
 to ensure constraints are enforced.  This includes run-time size
@@ -640,10 +640,10 @@ For example, the following is legal.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int(0,) N_observed;    int(0,) N_missing;
+  int[0,] N_observed;    int[0,] N_missing;
   ...
 transformed parameters {
-  vector(N_observed + N_missing) y;
+  vector[N_observed + N_missing] y;
   ...
 \end{Verbatim}
 \end{quote}
@@ -660,8 +660,8 @@ This allows \Stan blocks such as
 %
 \begin{quote}
 \begin{Verbatim} 
-matrix(M,N) a;    
-row_vector(N) v;    
+matrix[M,N] a;    
+row_vector[N] v;    
 real x;
 ...
 v <- m[2];   
@@ -716,7 +716,7 @@ columns, and two shelves can be declared as follows.
 %
 \begin{quote}
 \begin{Verbatim} 
-real(0,) z[5,4,2];
+real[0,] z[5,4,2];
 \end{Verbatim}
 \end{quote}
 %
@@ -725,7 +725,7 @@ Arrays may also be declared to contain vectors.  For example,
 %
 \begin{quote}
 \begin{Verbatim}  
-vector(7) mu[3];
+vector[7] mu[3];
 \end{Verbatim}
 \end{quote}
 % 
@@ -734,7 +734,7 @@ Arrays may also contain matrices.  The example
 %
 \begin{quote}
 \begin{Verbatim} 
-matrix(7,2) mu[15,12];
+matrix[7,2] mu[15,12];
 \end{Verbatim}
 \end{quote}
 %
@@ -744,7 +744,7 @@ declaration
 %
 \begin{quote}
 \begin{Verbatim}  
-cov_matrix(5) mu[2,3,4];
+cov_matrix[5] mu[2,3,4];
 \end{Verbatim}
 \end{quote}
 % 
@@ -1322,7 +1322,7 @@ are both of type \code{matrix}, is well formed.
 \begin{quote}
 \begin{Verbatim}
 Sigma
-  <- diag_matrix(sigma) 
+  <- diag_matrix(sigma)
      * Omega 
      * diag_matrix(sigma);
 \end{Verbatim}
@@ -1470,7 +1470,7 @@ restricted to $(-0.5,2.1)$ is encoded as follows.
 %
 \begin{quote}
 \begin{Verbatim} 
-y ~ normal(0,1) T(-0.5,2.1);
+y ~ normal(0,1) T[-0.5,2.1];
 \end{Verbatim}
 \end{quote}
 % 
@@ -1506,7 +1506,7 @@ be represented as
 %
 \begin{quote}
 \begin{Verbatim} 
-y ~ normal(0,1) T(-0.5,);
+y ~ normal(0,1) T[-0.5,];
 \end{Verbatim}
 \end{quote}
 % 
@@ -1530,7 +1530,7 @@ be represented as
 %
 \begin{quote}
 \begin{Verbatim} 
-y ~ normal(0,1) T(,2.1);
+y ~ normal(0,1) T[,2.1];
 \end{Verbatim}
 \end{quote}
 % 
@@ -1810,7 +1810,7 @@ only types that may be used are
 %
 \begin{quote}
 \code{int}, \code{real}, 
-\code{vector(K)}, \code{row\_vector(K)}, and \code{matrix(M,N)}.
+\code{vector[K]}, \code{row\_vector[K]}, and \code{matrix[M,N]}.
 \end{quote}
 
 \subsection{Blocks within Blocks}
@@ -2036,7 +2036,7 @@ kind of each variable next to its declaration.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int(0,) N;                // unmodeled data
+  int[0,] N;                // unmodeled data
   real y[N];                // modeled data
   double mu_mu;             // config. unmodeled param
   double(0,) sigma_mu;      // config. unmodeled param
@@ -2049,7 +2049,7 @@ transformed data {
 } 
 parameters {
   real mu_y;                // modeled param
-  real(0,) tau_y;           // modeled param
+  real[0,] tau_y;           // modeled param
 } 
 transformed parameters {
   double(0,) sigma_y;       // derived quantity (param)
@@ -2147,7 +2147,7 @@ The \code{data} block does not allow statements.
 
 Each variable's value is validated against its declaration as it is
 read.  For example, if a variable \code{sigma} is declared as
-\code{real(0,)}, then trying to assign it a negative value will raise
+\code{real[0,]}, then trying to assign it a negative value will raise
 an error.  As a result, data type errors will be caught as early as
 possible.  Similarly, attempts to provide data of the wrong size for a
 compound data structure will also raise an error.
