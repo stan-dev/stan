@@ -1,8 +1,8 @@
 # compared with JAGS version in 
 # the R package BUGSExamples (https://r-forge.r-project.org/R/?group_id=882) 
 data {
-  int(0,) Ndogs; 
-  int(0,) Ntrials; 
+  int[0,] Ndogs; 
+  int[0,] Ntrials; 
   int Y[Ndogs, Ntrials];
 }
 transformed data {
@@ -25,8 +25,8 @@ transformed data {
   }
 } 
 parameters {
-  real(, -0.00001) alpha;
-  real(, -0.00001) beta;
+  real[, -0.00001] alpha;
+  real[, -0.00001] beta;
 } 
 model {
   alpha ~ normal(0.0, 316.2);

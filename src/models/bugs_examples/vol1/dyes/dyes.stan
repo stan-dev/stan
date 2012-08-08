@@ -5,12 +5,12 @@ data {
   int BATCHES; 
   int SAMPLES; 
   real y[BATCHES, SAMPLES]; 
-  // vector(SAMPLES) y[BATCHES]; 
+  // vector[SAMPLES] y[BATCHES]; 
 } 
 
 parameters {
-  real(0,) tau_between;
-  real(0,) tau_within; 
+  real[0,] tau_between;
+  real[0,] tau_within; 
   real theta;
   real mu[BATCHES]; 
 } 

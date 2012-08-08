@@ -1,5 +1,5 @@
 transformed data {
-  cov_matrix(2) S;
+  cov_matrix[2] S;
 
   for (i in 1:2)
     for (j in 1:2)
@@ -9,7 +9,7 @@ transformed data {
   S[2,2] <- 0.5;
 } 
 parameters {
-  cov_matrix(2) W; 
+  cov_matrix[2] W; 
 } 
 model {
   W ~ wishart(4, S); 

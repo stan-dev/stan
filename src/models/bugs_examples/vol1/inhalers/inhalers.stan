@@ -8,13 +8,13 @@
 
 
 data {
-  int(0,) N; 
-  int(0,) T; 
-  int(0,) G; 
-  int(0,) Npattern; 
-  int(0,) Ncum[16, 2]; 
-  int(0,) pattern[16, 2]; 
-  int(0,) Ncut;
+  int[0,] N; 
+  int[0,] T; 
+  int[0,] G; 
+  int[0,] Npattern; 
+  int[0,] Ncum[16, 2]; 
+  int[0,] pattern[16, 2]; 
+  int[0,] Ncut;
   int treat[2, 2]; 
   int period[2, 2]; 
   int carry[2, 2]; 
@@ -50,22 +50,22 @@ transformed data {
 }
 
 parameters {
-  real(0,) sigmasq; 
+  real[0,] sigmasq; 
   real beta; 
   real pi; 
   real kappa;
   real a0; 
   real b[N];
-  ordered(Ncut) a;
+  ordered[Ncut] a;
 } 
 
 transformed parameters {
-  real(0,) sigma; 
+  real[0,] sigma; 
   sigma <- sqrt(sigmasq); 
 } 
 model {
   real Q[N, T, Ncut]; 
-  vector(Ncut + 1) p[N, T]; 
+  vector[Ncut + 1] p[N, T]; 
   real mu[G, T]; 
 
   for (g in 1:G) {

@@ -3,18 +3,18 @@
 ## 
 
 data {
-  int(0,) N;
-  int(0,) T;
+  int[0,] N;
+  int[0,] T;
   real x[T];
   real xbar;
   real y[N,T];
-  cov_matrix(2) Omega; 
+  cov_matrix[2] Omega; 
 }
 parameters {
-  vector(2) beta[N];
-  vector(2) mu_beta;
-  real(0,) sigmasq_y;
-  cov_matrix(2) Sigma_beta; 
+  vector[2] beta[N];
+  vector[2] mu_beta;
+  real[0,] sigmasq_y;
+  cov_matrix[2] Sigma_beta; 
 }
 //  transformed parameters {
 //    real rho; 
@@ -23,7 +23,7 @@ parameters {
 //    //alpha0 <- mu_beta[1] - mu_beta[2] * xbar; 
 //  }
 transformed parameters {
-  real(0,) sigma_y; 
+  real[0,] sigma_y; 
   sigma_y <- sqrt(sigmasq_y); 
 } 
 model {

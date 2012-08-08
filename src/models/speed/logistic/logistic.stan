@@ -1,11 +1,11 @@
 data {
-  int(0,) N;               // number of items
-  int(0,) M;               // number of predictors
-  int(0,1) y[N];           // outcomes
-  row_vector(M) x[N];      // predictors
+  int[0,] N;               // number of items
+  int[0,] M;               // number of predictors
+  int[0,1] y[N];           // outcomes
+  row_vector[M] x[N];      // predictors
 }
 parameters {
-  vector(M) beta;          // coefficients
+  vector[M] beta;          // coefficients
 }
 model {
   for (m in 1:M)

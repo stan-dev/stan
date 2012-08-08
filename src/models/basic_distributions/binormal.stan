@@ -1,6 +1,6 @@
 transformed data {
-    matrix(2,2) Sigma;
-    vector(2) mu;
+    matrix[2,2] Sigma;
+    vector[2] mu;
 
     mu[1] <- 0.0;
     mu[2] <- 0.0;
@@ -10,7 +10,7 @@ transformed data {
     Sigma[2,1] <- 0.10;
 }
 parameters {
-    vector(2) y;
+    vector[2] y;
 }
 model {
       y ~ multi_normal(mu,Sigma);

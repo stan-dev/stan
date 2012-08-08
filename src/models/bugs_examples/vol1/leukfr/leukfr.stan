@@ -12,13 +12,13 @@
 
 
 data {
-  int(0,) N;
-  int(0,) NT;
-  int(0,) obs_t[N]; 
-  int(0,) t[NT + 1]; 
-  int(0,) fail[N]; 
-  int(0,) Npair; 
-  int(0,) pair[N];
+  int[0,] N;
+  int[0,] NT;
+  int[0,] obs_t[N]; 
+  int[0,] t[NT + 1]; 
+  int[0,] fail[N]; 
+  int[0,] Npair; 
+  int[0,] pair[N];
   real Z[N]; 
 }
 
@@ -40,13 +40,13 @@ transformed data {
 
 parameters {
   real beta; 
-  real(0,) tau;
-  real(0,) dL0[NT]; 
+  real[0,] tau;
+  real[0,] dL0[NT]; 
   real b[Npair]; 
 } 
 
 transformed parameters {
-  real(0,) sigma; 
+  real[0,] sigma; 
   sigma <- 1 / sqrt(tau); 
 } 
 

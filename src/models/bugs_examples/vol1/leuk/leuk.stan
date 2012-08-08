@@ -2,11 +2,11 @@
 # URL of OpenBugs' implementation: 
 #   http://www.openbugs.info/Examples/Leuk.html
 data {
-  int(0,) N;
-  int(0,) NT;
-  int(0,) obs_t[N]; 
-  int(0,) t[NT + 1]; 
-  int(0,) fail[N]; 
+  int[0,] N;
+  int[0,] NT;
+  int[0,] obs_t[N]; 
+  int[0,] t[NT + 1]; 
+  int[0,] fail[N]; 
   real Z[N]; 
 }
 
@@ -27,7 +27,7 @@ transformed data {
 
 parameters {
   real beta; 
-  real(0,) dL0[NT]; 
+  real[0,] dL0[NT]; 
 } 
 
 model {

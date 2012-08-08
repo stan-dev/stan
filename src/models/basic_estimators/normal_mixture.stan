@@ -2,11 +2,11 @@
 // p(y|mu,theta) = theta * Normal(y|mu[1],1) + (1-theta) * Normal(y|mu[2],1);
 
 data {
-  int(0,)  N;
+  int[0,]  N;
   real y[N];
 }
 parameters {
-  real(0,1) theta;
+  real[0,1] theta;
   real mu[2];
 }
 transformed parameters {

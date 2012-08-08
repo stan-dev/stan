@@ -8,15 +8,15 @@
 
 
 data {
-  int(0,) N; 
+  int[0,] N; 
   real x[N]; 
   real Y[N]; 
 } 
 parameters {
   real alpha; 
   real beta;  
-  real(.5, 1) lambda; // orginal gamma in the JAGS example  
-  real(0,) tau; 
+  real[.5, 1] lambda; // orginal gamma in the JAGS example  
+  real[0,] tau; 
    
 } 
 transformed parameters {

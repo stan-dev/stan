@@ -4,7 +4,7 @@
  */
 
 parameters {
-    corr_matrix(3) m;
+    corr_matrix[3] m;
 }
 model {
     /* uniform model */

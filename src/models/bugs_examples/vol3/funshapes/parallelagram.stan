@@ -3,8 +3,8 @@
 # status: working 
 
 parameters {
-  real(0, 1) x; 
-  real(-1, 1) y; 
+  real[0, 1] x; 
+  real[-1, 1] y; 
 } 
 
 model {

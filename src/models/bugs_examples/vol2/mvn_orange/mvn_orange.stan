@@ -6,25 +6,25 @@
 # and the s.e. for some parameters
 
 data {
-  int(0,) K;
-  int(0,) N;
+  int[0,] K;
+  int[0,] N;
   int x[N];
   real Y[K, N]; 
-  cov_matrix(3) invR;  
-  // matrix(3, 3) invR; 
-  cov_matrix(3) mu_var_prior; 
-  vector(3) mu_m_prior; 
+  cov_matrix[3] invR;  
+  // matrix[3, 3] invR; 
+  cov_matrix[3] mu_var_prior; 
+  vector[3] mu_m_prior; 
 }
 
 parameters{
-  real(0,) sigmasq;
-  vector(3)  theta[K]; 
-  vector(3)  thetamu; 
-  cov_matrix(3) thetavar; 
+  real[0,] sigmasq;
+  vector[3]  theta[K]; 
+  vector[3]  thetamu; 
+  cov_matrix[3] thetavar; 
 } 
 
 transformed parameters {
-  real(0,) sigma; 
+  real[0,] sigma; 
   sigma <- sqrt(sigmasq);
 } 
 

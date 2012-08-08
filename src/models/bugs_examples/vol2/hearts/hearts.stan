@@ -7,10 +7,10 @@
 
 
 data {
-  int(0,) N;
-  int(0,) x[N];
-  int(0,) y[N];
-  int(0,) t[N];
+  int[0,] N;
+  int[0,] x[N];
+  int[0,] y[N];
+  int[0,] t[N];
 } 
 
 parameters {
@@ -19,7 +19,7 @@ parameters {
 } 
 
 transformed parameters {
-  real(0,1) theta;
+  real[0,1] theta;
   theta <- inv_logit(delta); 
 } 
 

@@ -1,7 +1,7 @@
 data {
-    int(0,) N;
-    int(0,) n[N];
-    int(0,) r[N];
+    int[0,] N;
+    int[0,] n[N];
+    int[0,] r[N];
     real x[N];
 }
 transformed data {

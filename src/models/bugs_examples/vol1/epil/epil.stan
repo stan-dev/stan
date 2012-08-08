@@ -5,11 +5,11 @@
 
 
 data {
-  int(0,) N; 
-  int(0,) T; 
-  int(0,) y[N, T]; 
-  int(0,) Trt[N]; 
-  int(0,) V4[T]; 
+  int[0,] N; 
+  int[0,] T; 
+  int[0,] y[N, T]; 
+  int[0,] Trt[N]; 
+  int[0,] V4[T]; 
   real  log_Base4[N];
   real  log_Age[N]; 
   real  BT[N]; 
@@ -29,13 +29,13 @@ parameters {
   real  alpha_V4;
   real  b1[N]; 
   real  b[N, T];
-  real(0,) sigmasq_b; 
-  real(0,) sigmasq_b1; 
+  real[0,] sigmasq_b; 
+  real[0,] sigmasq_b1; 
 }
 
 transformed parameters {
-  real(0,) sigma_b; 
-  real(0,) sigma_b1; 
+  real[0,] sigma_b; 
+  real[0,] sigma_b1; 
   sigma_b <- sqrt(sigmasq_b); 
   sigma_b1 <- sqrt(sigmasq_b1); 
 } 

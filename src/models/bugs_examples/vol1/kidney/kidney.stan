@@ -3,11 +3,11 @@
 # http://www.openbugs.info/Examples/Kidney.html
 
 data {
-  int(0,) NP; 
-  int(0,) N_uc;
-  int(0,) N_rc;
-  real(0,) t_uc[N_uc]; 
-  real(0,) t_rc[N_rc]; 
+  int[0,] NP; 
+  int[0,] N_uc;
+  int[0,] N_rc;
+  real[0,] t_uc[N_uc]; 
+  real[0,] t_rc[N_rc]; 
   int disease_uc[N_uc]; 
   int disease_rc[N_rc]; 
   int patient_uc[N_uc]; 
@@ -24,8 +24,8 @@ parameters {
   real beta_disease2; 
   real beta_disease3; 
   real beta_disease4; 
-  real(0,) r; 
-  real(0,) tau;
+  real[0,] r; 
+  real[0,] tau;
   real b[NP]; 
 } 
 
