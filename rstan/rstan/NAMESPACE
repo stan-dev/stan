@@ -11,6 +11,7 @@ export (
   stanc.version, 
   stan,
   stan.dump,
+  read.rdump,
   rstan.options 
 # get.rstan.options
 )
