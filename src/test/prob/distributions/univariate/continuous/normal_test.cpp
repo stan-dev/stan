@@ -10,23 +10,6 @@
 using std::vector;
 using std::numeric_limits;
 
-TEST(ProbDistributionsNormal,Eigen) {
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-  using stan::prob::normal_log;
-
-  Matrix<double,Dynamic,1> y(4);
-  y << 1.0, 2.0, 3.0, 4.0;
-  Matrix<double,Dynamic,1> mu(4);
-  mu << -1.0, -2.0, -3.0, -10.0;
-  Matrix<double,Dynamic,1> sigma(4);
-  sigma << 0.5, 1.5, 3.0, 15.0;
-  //double z = normal_log(y,mu,sigma);
-  //std::cout << "z=" << z << std::endl;
-  EXPECT_TRUE(true);
-}
-
-
 class ProbDistributionsNormal : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,

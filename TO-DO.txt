@@ -800,3 +800,13 @@ Speed Comparisons (vs. JAGS)
   - ESS rate at equilibrium
 
 
+
+Vectorize error checking
+======================================================================
+
+* Functions: need to completely vectorize.
+   - check_greater_or_equal
+   - check_less
+   - check_less_or_equal
+   - check_bounded
+

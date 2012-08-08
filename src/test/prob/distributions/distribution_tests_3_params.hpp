@@ -229,6 +229,109 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
   EXPECT_NO_THROW(log_prob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
 }
 
+TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  Matrix<double,Dynamic,1> param1(N_repeat), param2(N_repeat), param3(N_repeat);
+  param1.setConstant(parameters[0]);
+  param2.setConstant(parameters[1]);
+  param3.setConstant(parameters[2]);
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
+
+TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  Matrix<double,Dynamic,1> param1(N_repeat), param2(N_repeat);
+  double param3;
+  param1.setConstant(parameters[0]);
+  param2.setConstant(parameters[1]);
+  param3 = parameters[2];
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
+
+TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  Matrix<double,Dynamic,1> param1(N_repeat), param3(N_repeat);
+  double param2(N_repeat);
+  param1.setConstant(parameters[0]);
+  param2 = parameters[1];
+  param3.setConstant(parameters[2]);
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
+
+TYPED_TEST_P(DistributionTestFixture, matrix_double_double) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  Matrix<double,Dynamic,1> param1(N_repeat);
+  double param2, param3;
+  param1.setConstant(parameters[0]);
+  param2 = parameters[1];
+  param3 = parameters[2];
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
+
+TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  double param1;
+  Matrix<double,Dynamic,1> param2(N_repeat), param3(N_repeat);
+  param1 = parameters[0];
+  param2.setConstant(parameters[1]);
+  param3.setConstant(parameters[2]);
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
+
+TYPED_TEST_P(DistributionTestFixture, double_matrix_double) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  double param1, param3;
+  Matrix<double,Dynamic,1> param2(N_repeat);
+  param1 = parameters[0];
+  param2.setConstant(parameters[1]);
+  param3 = parameters[2];
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
+
+TYPED_TEST_P(DistributionTestFixture, double_double_matrix) {
+  TypeParam t;
+  vector<double> parameters = this->first_valid_params();
+  double expected_value = this->first_valid_value();
+  
+  size_t N_repeat = 25;
+  double param1, param2;
+  Matrix<double,Dynamic,1> param3(N_repeat);
+  param1 = parameters[0];
+  param2 = parameters[1];
+  param3.setConstant(parameters[2]);
+  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+		  _LOG_PROB_<false>(param1, param2, param3));
+}
 
 
 REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
@@ -242,6 +345,13 @@ REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
 			   double_vector_vector,
 			   double_vector_double,
 			   double_double_vector,
-			   invalid_different_vector_sizes);
+			   invalid_different_vector_sizes,
+			   matrix_matrix_matrix,
+			   matrix_matrix_double,
+			   matrix_double_matrix,
+			   matrix_double_double,
+			   double_matrix_matrix,
+			   double_matrix_double,
+			   double_double_matrix);
 
 #endif

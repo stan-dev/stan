@@ -13,6 +13,8 @@ using stan::prob::_LOG_PROB_;
 #include <stan/math/matrix.hpp>
 
 using std::vector;
+using Eigen::Matrix;
+using Eigen::Dynamic;
 
 using boost::math::policies::policy;
 using boost::math::policies::domain_error;

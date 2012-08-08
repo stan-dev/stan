@@ -26,7 +26,7 @@ TEST(MathErrorHandling,CheckNotNanErrnoPolicy) {
   const char* function = "check_not_nan(%1%)";
   double x = 0;
   double result;
- 
+
   EXPECT_TRUE(check_not_nan(function, x, "x", &result, errno_policy())) << "check_not_nan should be true with finite x: " << x;
   x = std::numeric_limits<double>::infinity();
   EXPECT_TRUE(check_not_nan(function, x, "x", &result, errno_policy())) << "check_not_nan should be true with x = Inf: " << x;
@@ -160,61 +160,61 @@ TEST(MathErrorHandling,CheckFiniteVectorErrnoPolicy) {
   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
 }
 
-// // ---------- check_finite: matrix tests ----------
-// TEST(MathErrorHandling,CheckFiniteMatrixDefaultPolicy) {
-//   const char* function = "check_finite (%1%)";
-//   double result;
-//   Eigen::Matrix<double,Eigen::Dynamic,1> x;
+// ---------- check_finite: matrix tests ----------
+TEST(MathErrorHandling,CheckFiniteMatrixDefaultPolicy) {
+  const char* function = "check_finite (%1%)";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, 1;
-//   ASSERT_TRUE (check_finite (function, x, "x", &result, default_policy())) << "check_finite should be true with finite x";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, 1;
+  ASSERT_TRUE (check_finite (function, x, "x", &result, default_policy())) << "check_finite should be true with finite x";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::infinity();
-//   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on Inf";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on Inf";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, -std::numeric_limits<double>::infinity();
-//   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on -Inf";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, -std::numeric_limits<double>::infinity();
+  EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on -Inf";
   
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::quiet_NaN();
-//   EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
-// }
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW (check_finite (function, x, "x", &result, default_policy()), std::domain_error) << "check_finite should throw exception on NaN";
+}
 
-// TEST(MathErrorHandling,CheckFiniteMatrixErrnoPolicy) {
-//   const char* function = "check_finite (%1%)";
-//   double result;
-//   Eigen::Matrix<double,Eigen::Dynamic,1> x;
+TEST(MathErrorHandling,CheckFiniteMatrixErrnoPolicy) {
+  const char* function = "check_finite (%1%)";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, 1;
-//   EXPECT_TRUE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should be true with finite x";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, 1;
+  EXPECT_TRUE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should be true with finite x";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::infinity();
-//   EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on Inf";
-//   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on Inf";
+  EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, -std::numeric_limits<double>::infinity();
-//   EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on -Inf";
-//   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
+  result = 0;
+  x.resize(3);
+  x << -1, 0, -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on -Inf";
+  EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
 
-//   result = 0;
-//   x.resize(3);
-//   x << -1, 0, std::numeric_limits<double>::quiet_NaN(); 
-//   EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on NaN";
-//   EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
-//   }
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::quiet_NaN(); 
+  EXPECT_FALSE (check_finite (function, x, "x", &result, errno_policy())) << "check_finite should return FALSE on NaN";
+  EXPECT_TRUE (std::isnan (result)) << "check_finite should have returned NaN";
+  }
 
 // ---------- check_bounded tests ----------
 TEST(MathErrorHandling,CheckBoundedDefaultPolicyX) {
@@ -412,7 +412,6 @@ TEST(MathErrorHandling,CheckBoundedErrnoPolicyHigh) {
 }
 
 // ----------  ----------
-//TEST(MathErrorHandling,)
 TEST(MathErrorHandling,CheckGreaterDefaultPolicy) {
   const char* function = "check_greater(%1%)";
   double x = 10.0;
@@ -487,6 +486,259 @@ TEST(MathErrorHandling,CheckGreaterErrnoPolicy) {
     << "check_greater should return false with x == Inf and lb == Inf";
   EXPECT_TRUE(std::isnan(result));
 }
+
+TEST(MathErrorHandling,CheckGreaterMatrixDefaultPolicy) {
+  const char* function = "check_greater(%1%)";
+  double result;
+  double x;
+  double low;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
+  Eigen::Matrix<double,Eigen::Dynamic,1> low_vec;
+  x_vec.resize(3);
+  low_vec.resize(3);
+
+  // x_vec, low_vec
+  result = 0;
+  x_vec   << -1, 0, 1;
+  low_vec << -2, -1, 0;
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result)) 
+    << "check_greater: matrix<3,1>, matrix<3,1>";
+
+  x_vec   <<   -1,    0,   1;
+  low_vec << -1.1, -0.1, 0.9;
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result)) 
+    << "check_greater: matrix<3,1>, matrix<3,1>";
+
+
+  x_vec   << -1, 0, std::numeric_limits<double>::infinity();
+  low_vec << -2, -1, 0;
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result)) 
+    << "check_greater: matrix<3,1>, matrix<3,1>, y has infinity";
+  
+  x_vec   << -1, 0, 1;
+  low_vec << -2, 0, 0;
+  EXPECT_THROW(check_greater(function, x_vec, low_vec, "x", &result), std::domain_error) 
+    << "check_greater: matrix<3,1>, matrix<3,1>, should fail for index 1";
+  
+  x_vec   << -1, 0,  1;
+  low_vec << -2, -1, std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x_vec, low_vec, "x", &result), std::domain_error) 
+    << "check_greater: matrix<3,1>, matrix<3,1>, should fail with infinity";
+  
+  x_vec   << -1, 0,  std::numeric_limits<double>::infinity();
+  low_vec << -2, -1, std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x_vec, low_vec, "x", &result), std::domain_error) 
+    << "check_greater: matrix<3,1>, matrix<3,1>, should fail with infinity";
+  
+  x_vec   << -1, 0,  1;
+  low_vec << -2, -1, -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result))
+  << "check_greater: matrix<3,1>, matrix<3,1>, should pass with -infinity";
+
+  // x_vec, low
+  result = 0;
+  x_vec   << -1, 0, 1;
+  low = -2;
+  EXPECT_TRUE(check_greater(function, x_vec, low, "x", &result)) 
+    << "check_greater: matrix<3,1>, double";
+
+  x_vec   <<   -1,    0,   1;
+  low = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x_vec, low, "x", &result)) 
+    << "check_greater: matrix<3,1>, double";
+
+  x_vec   << -1, 0, 1;
+  low = 0;
+  EXPECT_THROW(check_greater(function, x_vec, low, "x", &result), std::domain_error) 
+    << "check_greater: matrix<3,1>, double, should fail for index 1/2";
+  
+  x_vec   << -1, 0,  1;
+  low = std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x, low, "x", &result), std::domain_error) 
+    << "check_greater: matrix<3,1>, double, should fail with infinity";
+  
+  // x, low_vec
+  result = 0;
+  x = 2;
+  low_vec << -1, 0, 1;
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result)) 
+    << "check_greater: double, matrix<3,1>";
+
+  x = 10;
+  low_vec << -1, 0, -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result)) 
+    << "check_greater: double, matrix<3,1>, low has -inf";
+
+  x = 10;
+  low_vec << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x, low_vec, "x", &result), std::domain_error) 
+    << "check_greater: double, matrix<3,1>, low has inf";
+  
+  x = std::numeric_limits<double>::infinity();
+  low_vec << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_THROW(check_greater(function, x, low_vec, "x", &result), std::domain_error) 
+    << "check_greater: double, matrix<3,1>, x is inf, low has inf";
+  
+  x = std::numeric_limits<double>::infinity();
+  low_vec << -1, 0, 1;
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result)) 
+    << "check_greater: double, matrix<3,1>, x is inf";
+
+  x = 1.1;
+  low_vec << -1, 0, 1;
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result)) 
+    << "check_greater: double, matrix<3,1>";
+  
+  x = 0.9;
+  low_vec << -1, 0, 1;
+  EXPECT_THROW(check_greater(function, x, low_vec, "x", &result), std::domain_error) 
+    << "check_greater: double, matrix<3,1>";
+}
+
+TEST(MathErrorHandling,CheckGreaterMatrixErrnoPolicy) {
+  const char* function = "check_greater(%1%)";
+  double result;
+  double x;
+  double low;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
+  Eigen::Matrix<double,Eigen::Dynamic,1> low_vec;
+  x_vec.resize(3);
+  low_vec.resize(3);
+
+  // x_vec, low_vec
+  result = 0;
+  x_vec   << -1, 0, 1;
+  low_vec << -2, -1, 0;
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+  << "check_greater: matrix<3,1>, matrix<3,1>";
+
+  result = 0;
+  x_vec   <<   -1,    0,   1;
+  low_vec << -1.1, -0.1, 0.9;
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+  << "check_greater: matrix<3,1>, matrix<3,1>";
+
+  result = 0;
+  x_vec   << -1, 0, std::numeric_limits<double>::infinity();
+  low_vec << -2, -1, 0;
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, matrix<3,1>, y has infinity";
+  
+  result = 0;
+  x_vec   << -1, 0, 1;
+  low_vec << -2, 0, 0;
+  EXPECT_FALSE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, matrix<3,1>, should fail for index 1";
+  
+  result = 0;
+  x_vec   << -1, 0,  1;
+  low_vec << -2, -1, std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, matrix<3,1>, should fail with infinity";
+  
+  result = 0;
+  x_vec   << -1, 0,  std::numeric_limits<double>::infinity();
+  low_vec << -2, -1, std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, matrix<3,1>, should fail with infinity";
+  
+  result = 0;
+  x_vec   << -1, 0,  1;
+  low_vec << -2, -1, -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x_vec, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, matrix<3,1>, should pass with -infinity";
+
+  // x_vec, low
+  result = 0;
+  x_vec   << -1, 0, 1;
+  low = -2;
+  EXPECT_TRUE(check_greater(function, x_vec, low, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, double";
+
+  result = 0;
+  x_vec   <<   -1,    0,   1;
+  low = -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(check_greater(function, x_vec, low, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, double";
+
+  result = 0;
+  x_vec   << -1, 0, 1;
+  low = 0;
+  EXPECT_FALSE(check_greater(function, x_vec, low, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, double, should fail for index 1/2";
+  
+  result = 0;
+  x_vec   << -1, 0,  1;
+  low = std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x, low, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: matrix<3,1>, double, should fail with infinity";
+  
+
+  // x, low_vec
+  result = 0;
+  x = 2;
+  low_vec << -1, 0, 1;
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: double, matrix<3,1>";
+
+  result = 0;
+  x = 10;
+  low_vec << -1, 0, -std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(result = check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result)) 
+    << "check_greater: double, matrix<3,1>, low has -inf";
+
+  result = 0;
+  x = 10;
+  low_vec << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: double, matrix<3,1>, low has inf";
+  
+  result = 0;
+  x = std::numeric_limits<double>::infinity();
+  low_vec << -1, 0, std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result))
+    << "check_greater: double, matrix<3,1>, x is inf, low has inf";
+  
+  result = 0;
+  x = std::numeric_limits<double>::infinity();
+  low_vec << -1, 0, 1;
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: double, matrix<3,1>, x is inf";
+
+  result = 0;
+  x = 1.1;
+  low_vec << -1, 0, 1;
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(!std::isnan(result))
+    << "check_greater: double, matrix<3,1>";
+  
+  result = 0;
+  x = 0.9;
+  low_vec << -1, 0, 1;
+  EXPECT_FALSE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_FALSE(!std::isnan(result)) 
+    << "check_greater: double, matrix<3,1>";
+}
+
+
+
+
 
 TEST(MathErrorHandling,CheckGreaterOrEqualDefaultPolicy) {
   const char* function = "check_greater_or_equal(%1%)";

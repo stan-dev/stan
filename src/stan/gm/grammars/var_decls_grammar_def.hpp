@@ -408,10 +408,10 @@ namespace stan {
       vector_decl_r.name("vector declaration");
       vector_decl_r 
         %= lit("vector")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -419,10 +419,10 @@ namespace stan {
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r 
         %= lit("row_vector")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -430,13 +430,13 @@ namespace stan {
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r 
         %= lit("matrix")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(',')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -444,10 +444,10 @@ namespace stan {
       simplex_decl_r.name("simplex declaration");
       simplex_decl_r 
         %= lit("simplex")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';'); 
@@ -455,10 +455,10 @@ namespace stan {
       ordered_decl_r.name("positive ordered declaration");
       ordered_decl_r 
         %= lit("ordered")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -466,10 +466,10 @@ namespace stan {
       corr_matrix_decl_r.name("correlation matrix declaration");
       corr_matrix_decl_r 
         %= lit("corr_matrix")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -477,10 +477,10 @@ namespace stan {
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 
         %= lit("cov_matrix")
-        > lit('(')
+        > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(')')
+        > lit(']')
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -502,24 +502,24 @@ namespace stan {
 
       range_brackets_int_r.name("range expression pair, brackets");
       range_brackets_int_r 
-        %= lit('(') 
+        %= lit('[') 
         > -(expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
         > lit(',')
         > -(expression_g
             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-        > lit(')');
+        > lit(']');
 
       range_brackets_double_r.name("range expression pair, brackets");
       range_brackets_double_r 
-        %= lit('(') 
+        %= lit('[') 
         > -(expression_g
             [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
         > lit(',')
         > -(expression_g
             [_pass 
              = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-        > lit(')');
+        > lit(']');
 
       identifier_r.name("identifier");
       identifier_r
