@@ -317,8 +317,7 @@ namespace stan {
     inline bool check_greater(const char* function,
                               const T_y& y,
                               const T_low& low,
-                              const char* name,  
-                              T_y* result = 0) {
+                              const char* name) {
       return check_greater<T_y,T_low,typename scalar_type<T_y>::type *>
 	(function,y,low,name,0,default_policy());
     }
@@ -608,8 +607,7 @@ namespace stan {
                               const T_y& y,
                               const T_low& low,
                               const T_high& high,
-                              const char* name,  
-                              T_y* result = 0) {
+                              const char* name) {
       return check_bounded<T_y,T_low,T_high,typename scalar_type<T_y>::type *>
 	(function,y,low,high,name,0,default_policy());
     }
