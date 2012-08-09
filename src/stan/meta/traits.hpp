@@ -131,7 +131,16 @@ namespace stan {
   size_t size_of(const T& x) {
     return size_of_helper<T, is_vector<T>::value>::size_of(x);
   }
-  
+
+  template <typename T1, typename T2>
+  size_t max_size(const T1& x1, const T2& x2) {
+    size_t result = length(x1);
+    result = result > length(x2) ? result : length(x2);
+    // assert((length(x1) == 1) || (length(x1) == result));
+    // assert((length(x2) == 1) || (length(x2) == result));
+    return result;
+  }
+
   template <typename T1, typename T2, typename T3>
   size_t max_size(const T1& x1, const T2& x2, const T3& x3) {
     size_t result = length(x1);

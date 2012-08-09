@@ -544,8 +544,6 @@ namespace stan {
 	(function,y,high,name,0,default_policy());
     }
 
-
-    // FIXME: fully vectorize for T_y, T_low, and T_high
     namespace {
       template <typename T_y,
 		typename T_low,
@@ -561,10 +559,16 @@ namespace stan {
 			  const char* name,  
 			  T_result* result,
 			  const Policy&) {
-	  if (!(low <= y && y <= high))
-	    return dom_err(function,y,name," is %1%, but must be between ",
-			   std::pair<T_low,T_high>(low,high),
-			   result,Policy());
+	  using stan::length;
+	  using stan::max_size;
+	  VectorView<const T_low> low_vec(low);
+	  VectorView<const T_high> high_vec(high);
+	  for (size_t n = 0; n < max_size(low, high); n++) {
+	    if (!(low_vec[n] <= y && y <= high_vec[n]))
+	      return dom_err(function,y,name," is %1%, but must be between ",
+			     std::pair<typename scalar_type<T_low>::type, typename scalar_type<T_high>::type>(low_vec[n],high_vec[n]),
+			     result,Policy());
+	  }
 	  return true;
 	}
       };
@@ -583,11 +587,13 @@ namespace stan {
 			  T_result* result,
 			  const Policy&) {
 	  using stan::length;
+	  VectorView<const T_low> low_vec(low);
+	  VectorView<const T_high> high_vec(high);
 	  for (size_t n = 0; n < length(y); n++) {
-	    if (!(low <= y[n] && y[n] <= high))
+	    if (!(low_vec[n] <= y[n] && y[n] <= high_vec[n]))
 	      return dom_err_vec(n,function,y,name,
 				 " is %1%, but must be between ",
-				 std::pair<T_low,T_high>(low,high),
+				 std::pair<typename scalar_type<T_low>::type, typename scalar_type<T_high>::type>(low_vec[n],high_vec[n]),
 				 result,Policy());
 	  }
 	  return true;
