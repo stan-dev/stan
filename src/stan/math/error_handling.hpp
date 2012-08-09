@@ -302,7 +302,7 @@ namespace stan {
                               T_result* result,
                               const Policy&) {
       return greater<T_y,T_low,T_result,Policy,
-		     is_vector<T_y>::value>::check(function,y,low,name,result,Policy());
+	is_vector<T_y>::value>::check(function,y,low,name,result,Policy());
     }
     template <typename T_y, typename T_low, typename T_result>
     inline bool check_greater(const char* function,
@@ -395,8 +395,7 @@ namespace stan {
       return check_greater_or_equal<T_y,T_low,typename scalar_type<T_y>::type *>
 	(function,y,low,name,0,default_policy());
     }
-
-    // FIXME: fully vectorize for T_high
+  
     namespace {
       template <typename T_y,
 		typename T_high,
@@ -410,10 +409,14 @@ namespace stan {
 			  const char* name,  
 			  T_result* result,
 			  const Policy&) {
-	  if (!(y < high))
-	    return dom_err(function,y,name,
-			   " is %1%, but must be less than ",
-			   high,result,Policy());
+	  using stan::length;
+	  VectorView<const T_high> high_vec(high);
+	  for (size_t n = 0; n < length(high); n++) {
+	    if (!(y < high_vec[n]))
+	      return dom_err(function,y,name,
+			     " is %1%, but must be less than ",
+			     high_vec[n],result,Policy());
+	  }
 	  return true;
 	}
       };
@@ -430,11 +433,12 @@ namespace stan {
 			  T_result* result,
 			  const Policy&) {
 	  using stan::length;
+	  VectorView<const T_high> high_vec(high);
 	  for (size_t n = 0; n < length(y); n++) {
-	    if (!(y[n] < high))
+	    if (!(y[n] < high_vec[n]))
 	      return dom_err_vec(n,function,y,name,
 				 " is %1%, but must be less than ",
-				 high,result,Policy());
+				 high_vec[n],result,Policy());
 	  }
 	  return true;
 	}
@@ -555,8 +559,8 @@ namespace stan {
 			  const Policy&) {
 	  if (!(low <= y && y <= high))
 	    return dom_err(function,y,name," is %1%, but must be between ",
-                            std::pair<T_low,T_high>(low,high),
-                            result,Policy());
+			   std::pair<T_low,T_high>(low,high),
+			   result,Policy());
 	  return true;
 	}
       };
@@ -724,10 +728,10 @@ namespace stan {
     }
     template <typename T_y, typename T_result, class Policy>
     inline bool check_positive(const char* function,
-				  const T_y& y,
-				  const char* name,
-				  T_result* result,
-				  const Policy&) {
+			       const T_y& y,
+			       const char* name,
+			       T_result* result,
+			       const Policy&) {
       return positive<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
     }
     template <typename T_x, typename T_result>
@@ -758,9 +762,9 @@ namespace stan {
       if (!is_vector<T>::value && x_size == 1)
         return true;
       return dom_err(
-              function,x_size,name,
-              " (max size) is %1%, but must be consistent, 1 or max=",max_size,
-              result,Policy());
+		     function,x_size,name,
+		     " (max size) is %1%, but must be consistent, 1 or max=",max_size,
+		     result,Policy());
     }
 
     template <typename T1, typename T2, typename T3, typename T_result, 
