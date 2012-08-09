@@ -696,7 +696,7 @@ TEST(MathErrorHandling,CheckGreaterMatrixErrnoPolicy) {
   result = 0;
   x = 10;
   low_vec << -1, 0, -std::numeric_limits<double>::infinity();
-  EXPECT_TRUE(result = check_greater(function, x, low_vec, "x", &result, errno_policy()));
+  EXPECT_TRUE(check_greater(function, x, low_vec, "x", &result, errno_policy()));
   EXPECT_TRUE(!std::isnan(result)) 
     << "check_greater: double, matrix<3,1>, low has -inf";
 
