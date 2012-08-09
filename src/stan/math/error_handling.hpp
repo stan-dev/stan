@@ -470,7 +470,6 @@ namespace stan {
 	(function,y,high,name,0,default_policy());
     }
 
-    // FIXME: fully vectorize for T_y and T_high
     namespace {
       template <typename T_y,
 		typename T_high,
@@ -484,10 +483,14 @@ namespace stan {
 			  const char* name,  
 			  T_result* result,
 			  const Policy&) {
-	  if (!(y <= high))
-	    return dom_err(function,y,name,
-			   " is %1%, but must be less than or equal to ",
-			   high,result,Policy());
+	  using stan::length;
+	  VectorView<const T_high> high_vec(high);
+	  for (size_t n = 0; n < length(high); n++) {
+	    if (!(y <= high_vec[n]))
+	      return dom_err(function,y,name,
+			     " is %1%, but must be less than or equal to ",
+			     high_vec[n],result,Policy());
+	  }
 	  return true;
 	}
       };
@@ -504,11 +507,12 @@ namespace stan {
 			  T_result* result,
 			  const Policy&) {
 	  using stan::length;
+	  VectorView<const T_high> high_vec(high);
 	  for (size_t n = 0; n < length(y); n++) {
-	    if (!(y[n] <= high))
+	    if (!(y[n] <= high_vec[n]))
 	      return dom_err_vec(n,function,y,name,
 				 " is %1%, but must be less than or equal to ",
-				 high,result,Policy());
+				 high_vec[n],result,Policy());
 	  }
 	  return true;
 	}
