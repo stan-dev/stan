@@ -79,6 +79,11 @@ namespace stan {
             this->_epsilon = ( (direction == 1) 
                                ? 2.0 * this->_epsilon 
                                : 0.5 * this->_epsilon );
+
+	  if (this->_epsilon > 1e300)
+	    throw std::runtime_error("Posterior is improper. Please check your model.");
+	  if (this->_epsilon == 0)
+	    throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
         }
       }
 
