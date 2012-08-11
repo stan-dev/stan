@@ -561,7 +561,7 @@ default.summary.probs <- function() c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90,
 ## summarize the chains merged and individually 
 get.par.summary <- function(sim, n, probs = default.summary.probs()) {
   ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
-  sumfun <- function(chain) c(mean(chain), sd(chain), quantile(chain, probs = probs))
+  sumfun <- function(chain) c(mean(chain), 0, sd(chain), quantile(chain, probs = probs))
   cs <- lapply(ss, sumfun)
   as <- sumfun(do.call(c, ss)) 
   list(summary = as, 
@@ -585,7 +585,9 @@ summary.sim <- function(sim, pars, probs = default.summary.probs(),
   msq <- do.call(rbind, lapply(s, function(x) x$summary))
   dim(msq) <- c(tidx.len, 2 + length(probs)) 
   rownames(msq) <- sim$fnames.oi[tidx] 
-  colnames(msq) <- c("Mean", "SD", probs.str) 
+  colnames(msq) <- c("Mean", "SE.Mean", "SD", probs.str) 
+  # SE.Mean: Standard error of the mean; sigma / sqrt(n) 
+  msq[, "SE.Mean"] <- msq[, "SD"] / sqrt(ess) 
   cs <- lapply(s, function(x) x$c.summary) 
   cs <- do.call(rbind, cs) 
   dim(cs) <- c(tidx.len, 2 + length(probs), sim$n.chains) 
@@ -606,7 +608,7 @@ summary.sim.ess <- function(sim, pars) {
   names(ess) <- sim$fnames.oi[tidx]
   attr(ess, "row.major.idx") <- tidx.rowm
   attr(ess, "col.major.idx") <- tidx
-  ess 
+  ess
 } 
 
 summary.sim.rhat <- function(sim, pars) {

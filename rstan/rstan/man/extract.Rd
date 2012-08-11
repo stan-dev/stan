@@ -45,9 +45,9 @@
   third are the parameters. The parameters are expanded for vector/array 
   parameters.} 
 
-\examples{
-  \dontrun{}
-} 
+% \examples{
+%   \dontrun{}
+% } 
 
 \keyword{methods}
 \keyword{stanfit}

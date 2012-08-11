@@ -35,7 +35,7 @@ setMethod("plot", signature = (x = "stanfit"),
 setMethod("print", signature = (x = "stanfit"),
           function(x, pars, 
                    probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
-                   digits.summary = 3, ...) { 
+                   digits.summary = 1, ...) { 
             if (missing(pars)) pars <- x@sim$pars.oi 
             s <- summary(x, pars, probs, ...)  
             cat("Inference for Stan model: ", x@model.name, '.\n', sep = '')
@@ -43,10 +43,13 @@ setMethod("print", signature = (x = "stanfit"),
                 "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, "; ", 
                 x@sim$n.save[1], " samples saved.\n\n", sep = '') 
 
+            # round ESS to 0 decimal point 
+            s$summary[, 'ESS'] <- round(s$summary[, 'ESS'], 0)
+
             print(round(s$summary, digits.summary), ...) 
 
             sampler <- attributes(x@sim$samples[[1]])$args$sampler 
-            cat("\nSamples were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
+            cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
             cat("For each parameters, ESS is a crude measure of effective samples size,\n") 
             cat("and Rhat is the potential scale reduction factor on split chains (at \n")
             cat("convergence, Rhat=1).\n")
@@ -64,6 +67,15 @@ setMethod('stan.code', signature = (object = 'stanfit'),
             invisible(code)
           }) 
 
+setMethod("get.stanmodel", signature = (object = 'stanfit'), 
+          function(object) { 
+            if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
+              stop("stanmodel is not found") 
+            invisible(object@.MISC$stanmodel) 
+          }) 
+
+invisible(object@stan.args[[1]]$seed) })
+
 setGeneric(name = 'get.inits', 
            def = function(object, ...) { standardGeneric("get.inits")})
 
@@ -75,6 +87,9 @@ setGeneric(name = 'get.seed',
 
 setMethod("get.seed", signature = (object = 'stanfit'), 
           function(object) { invisible(object@stan.args[[1]]$seed) })
+
+setGeneric(name = 'get.stanmodel', 
+           def = function(object, ...) { standardGeneric("get.stanmodel")})
 
 
 ### HELPER FUNCTIONS
