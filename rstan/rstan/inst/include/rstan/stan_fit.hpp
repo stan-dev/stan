@@ -32,9 +32,13 @@
 #include <rstan/stan_args.hpp> 
 // #include <rstan/chains_for_R.hpp>
 // #include <stan/mcmc/chains.hpp>
-
 #include <Rcpp.h>
 // #include <Rinternals.h>
+
+//http://cran.r-project.org/doc/manuals/R-exts.html#Allowing-interrupts
+#include <R_ext/Utils.h>
+// void R_CheckUserInterrupt(void);
+
 
 // REF: stan/gm/command.hpp 
 
@@ -301,6 +305,7 @@ namespace rstan {
       unsigned ii = 0; // index for iterations saved to chains
       for (int m = 0; m < num_iterations; ++m, ++ii) {
         if (do_print(m,refresh)) {
+          R_CheckUserInterrupt(); 
           rstan::io::rcout << "\rIteration: ";
           rstan::io::rcout << std::setw(it_print_width) << (m + 1)
                            << " / " << num_iterations;

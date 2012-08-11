@@ -118,7 +118,8 @@ namespace rstan {
 
     Rcpp::List slst(static_cast<SEXP>(allsamples[k]));  // chain k
     Rcpp::NumericVector nv(static_cast<SEXP>(slst[n])); // parameter n  
-    for (size_t i = n_warmup2[k]; i < n_save[k]; i++) {
+    // use int instead of size_t since these are R integers. 
+    for (int i = n_warmup2[k]; i < n_save[k]; i++) {
       f(nv[i]); 
     } 
   }

@@ -51,14 +51,13 @@ setMethod("sampling", "stanmodel",
           function(object, data = list(), pars = NA, n.chains = 4L, n.iter = 2000L,
                    n.warmup = floor(n.iter / 2),
                    n.thin = 1L, seed = sample.int(.Machine$integer.max, 1),
-                   init.t = "random", init.v = NULL,
-                   sample.file, verbose = FALSE, check.data = TRUE, ...) {
+                   init.t = "random", init.v = NULL, check.data = TRUE, 
+                   sample.file, verbose = FALSE, ...) {
 
             if (!is.sm.valid(object))
               stop("The compiled model in C++ is not valid any more")
             if (n.chains < 1) 
               stop("The number of chains (n.chains) is less than 1")
-
 
             if (check.data) { 
               # allow data to be specified as a vector of character string 

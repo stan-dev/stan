@@ -12,7 +12,7 @@ fitted result.
 }
 \usage{
 stan(file, model.name = "anon_model", model.code = "", 
-  data = list(), pars = NA, n.chains = 4L,
+  fit = NA, data = list(), pars = NA, n.chains = 4L,
   n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
   init.v = NULL, seed = sample.int(.Machine$integer.max, 1), 
   sample.file, verbose = FALSE, ..., boost.lib = NULL)
@@ -23,6 +23,10 @@ stan(file, model.name = "anon_model", model.code = "",
   \item{model.name}{A character for naming the model.}
   \item{model.code}{A character string specifying the model.  An alternative
     way for specifying model instead of \code{file}.}
+  \item{fit}{An instance of S4 class \code{stanfit}; defaults to \code{NA}. 
+    When it is not \code{NA}, the model from the fitted result 
+    is used to sample. Hence time for recompiling the C++ code
+    is saved.} 
   \item{data}{An object of class \code{list} or \code{environment}
     providing the data for the model.}    
   \item{pars}{A vector of character string specifying parameters of interests; defaults
@@ -87,6 +91,11 @@ stan(file, model.name = "anon_model", model.code = "",
   are drawn and wrapped in an object of S4 class \code{stanfit}, 
   which provides functions such as \code{print}, \code{summary}, and \code{plot}
   to take a look of the results of the fitted model. 
+
+  \code{stan} could also be used to sample again from a fitted model under
+  different settings (e.g., different \code{n.iter}) by providing 
+  argument \code{fit}. In this case, the compiled C++ code 
+  for the model is reused. 
 }
 \value{
   Fitted results as an object of S4 class \code{stanfit}.
@@ -105,7 +114,11 @@ stan(file, model.name = "anon_model", model.code = "",
 %%  ~~who you are~~
 }
 \note{
-%%  ~~further notes~~
+  As Stan does not allow missing data. The data are pre-processed 
+  to check if there is any \code{NA} and it would stop when there is. 
+  Also, Stan allows only numeric data, that is, doubles and integers. 
+  Data of other types (for examples, characters) are not passed to 
+  Stan. 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -113,7 +126,7 @@ stan(file, model.name = "anon_model", model.code = "",
 \seealso{
   \code{\link{sampling}} 
 }
-\examples{
+\examples{\dontrun{
   library(rstan)
   scode <- "
   parameters {
@@ -126,7 +139,7 @@ stan(file, model.name = "anon_model", model.code = "",
   "
   s.f <- stan(model.code = scode, verbose = FALSE) 
   print(s.f)
-}
+}} 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{rstan} 

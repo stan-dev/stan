@@ -3,7 +3,9 @@
 ## (original name: inline.R)
 ##
 
-rstan.inc.path  <- system.file('include', package = 'rstan')
+rstan.inc.path_fun <- function() { 
+  system.file('include', package = 'rstan')
+} 
 
 rstan.libs.path_fun <- function() {
   if (nzchar(.Platform$r_arch)) {
@@ -13,10 +15,12 @@ rstan.libs.path_fun <- function() {
 }
 
 # Using RcppEigen
-eigen.path <- system.file('include', package = 'RcppEigen')
+eigen.path_fun <- function() {
+  system.file('include', package = 'RcppEigen')
+} 
 
 # If included in RStan
-# eigen.path <- paste0(rstan.inc.path, '/stanlib/eigen_3.1.0')
+# eigen.path_fun() <- paste0(rstan.inc.path_fun(), '/stanlib/eigen_3.1.0')
 
 static.linking <- function() {
   # return(Rcpp:::staticLinking());
@@ -27,11 +31,11 @@ static.linking <- function() {
 }
 
 PKG_CPPFLAGS_env_fun <- function() {
-   paste(' -I"', file.path(rstan.inc.path, '/stansrc" '),
-         ' -I"', file.path(eigen.path, '" '),
-         ' -I"', file.path(eigen.path, '/unsupported" '),
+   paste(' -I"', file.path(rstan.inc.path_fun(), '/stansrc" '),
+         ' -I"', file.path(eigen.path_fun(), '" '),
+         ' -I"', file.path(eigen.path_fun(), '/unsupported" '),
          ' -I"', rstan.options("boost.lib"), '"',
-         ' -I"', rstan.inc.path, '"', sep = '')
+         ' -I"', rstan.inc.path_fun(), '"', sep = '')
 }
 
 RSTAN_LIBS_fun <- function() {

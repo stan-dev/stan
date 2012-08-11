@@ -4,7 +4,6 @@
 
 .rstan.opt.env <- new.env() 
 
-
 .init.rstan.opt.env <- function(e) {
   tmat <- matrix(c(254, 237, 222, 
                    253, 208, 162, 
@@ -45,7 +44,7 @@
   invisible(e)
 }
 
-.init.rstan.opt.env(.rstan.opt.env)
+# .init.rstan.opt.env(.rstan.opt.env)
 
 rstan.options <- function(...) { 
   # Set/get options in RStan

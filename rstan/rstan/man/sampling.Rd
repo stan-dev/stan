@@ -12,10 +12,10 @@
 
 \usage{
   %% sampling(object, \dots)  
-  \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, n.chains = 4L, n.iter = 2000L, 
-    n.warmup = floor(n.iter / 2), n.thin = 1L, seed = sample.int(.Machine$integer.max, 1),
-    init.t = 'random', init.v = NULL, 
-    sample.file, verbose = FALSE, \ldots)   
+  \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, 
+    n.chains = 4L, n.iter = 2000L, n.warmup = floor(n.iter / 2), n.thin = 1L,
+    seed = sample.int(.Machine$integer.max, 1), init.t = 'random', init.v = NULL, 
+    check.data = TRUE, sample.file, verbose = FALSE, \ldots)   
 } 
 
 \section{Methods}{
@@ -56,12 +56,16 @@
     indicating how the initial values of parameters are specified. \code{"0"}: 
     initialize all to be zero on the unconstrained support; 
     \code{"user"}: specified by the user in \code{init.v}; and 
-    \code{"random"}: randomly generated.  }
+    \code{"random"}: randomly generated.}
 
   \item{init.v}{A function or a list to specify initial values. When it 
     is a function, it optionally takes a parameter \code{chain.id}. If it 
     is a list, the length of the list must be the number of chains and 
     each element is a named list specifying the initial values for all parameters.}
+
+  \item{check.data}{Logical: if \code{TRUE}, the data would be preprocessed; 
+    otherwise not. If the data is not checked and preprocessed, it is safe 
+    to leave it to be the default \code{TRUE}.}
 
   \item{sample.file}{A character string of file name for specifying where the 
     samples are written into. If not provided, files are not created. Note 
