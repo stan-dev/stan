@@ -32,14 +32,29 @@ list.as.integer.if.doable <- function(x) {
          })
 } 
 
+mklist <- function(names, env = as.environment(-1)) {
+  # Make a list using names 
+  # Args: 
+  #   names: character strings of names of objects 
+  #   env: the environment to look for objects with names
+  # Note: we use inherits = TRUE when calling mget 
+  d <- mget(names, env, ifnotfound = NA, inherits = TRUE) 
+  n <- which(is.na(d)) 
+  if (length(n) > 0) {
+    stop(paste("objects ", paste("'", names[n], "'", collapse = ', ', sep = ''), " not found", sep = ''))
+  } 
+  d 
+} 
 
 
 data.preprocess <- function(data) { # , varnames) {
   # Preprocess the data (list or env) to list for stan
   # 
   # Args:
-  #  data A list or environment: 
+  #  data: A list, an environment, or a vector of character strings for names
+  #  of objects 
   #   * stop if there is NA; no-name lists; duplicate names  
+  #   * stop if the objects given name is not found  
   #   * remove NULL, non-numeric elements 
   #   * change to integers when applicable 
 
@@ -68,11 +83,14 @@ data.preprocess <- function(data) { # , varnames) {
            paste(v[duplicated(v)], collapse = " "))
     }
   } else {
-    stop("data must be a list or environment")
+    stop("data must be a list or an environment") 
   } 
  
   data <- lapply(data, 
                  FUN = function(x) {
+
+                   ## change data.frame to array 
+                   if (is.data.frame(x)) x <- data.matrix(x) 
  
                    ## Now we stop whenever we have NA in the data
                    ## since we do not know what variables are needed
@@ -749,7 +767,7 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     i80.chain <- summary$c.summary[index, 2 + i80p, ]
     i80.chain <- array(i80.chain, dim = c(k.num.p, 2, sim$n.chains))
 
-    rng <- range(i80, i80.chain)
+    rng <- if (display.parallel) range(i80, i80.chain) else range(i80)
     p.rng <- pretty(rng, n = 2)
     b <- height / (max(p.rng) - min(p.rng))
     a <- -(k + height / 2) - b * p.rng[1]

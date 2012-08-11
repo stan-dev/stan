@@ -52,18 +52,22 @@ setMethod("sampling", "stanmodel",
                    n.warmup = floor(n.iter / 2),
                    n.thin = 1L, seed = sample.int(.Machine$integer.max, 1),
                    init.t = "random", init.v = NULL,
-                   sample.file, verbose = FALSE, ...) {
+                   sample.file, verbose = FALSE, check.data = TRUE, ...) {
 
             if (!is.sm.valid(object))
               stop("The compiled model in C++ is not valid any more")
             if (n.chains < 1) 
               stop("The number of chains (n.chains) is less than 1")
 
-            # check data and preprocess
-            if (!missing(data) && length(data) > 0)
-              data <- data.preprocess(data)
-            else
-              data <- list()
+
+            if (check.data) { 
+              # allow data to be specified as a vector of character string 
+              if (is.character(data)) data <- mklist(data) 
+
+              # check data and preprocess
+              if (!missing(data) && length(data) > 0) data <- data.preprocess(data)
+              else data <- list()
+            } 
 
             sampler <- new(object@.modelmod$sampler, data)
             m.pars = sampler$param_names() 

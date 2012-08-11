@@ -109,7 +109,10 @@ stan <- function(file, model.name = "anon_model",
   #   A S4 class stanfit object  
  
   if (missing(sample.file))  sample.file <- NA 
+  if (is.character(data)) data <- mklist(data) 
+  if (!missing(data) && length(data) > 0) data <- data.preprocess(data)
+  else data <- list(); 
   sm <- stan.model(file, verbose = verbose, model.name, model.code, boost.lib)
   sampling(sm, data, pars, n.chains, n.iter, n.warmup, n.thin, seed, init.t, init.v, 
-           sample.file = sample.file, verbose = verbose, ...) 
+           sample.file = sample.file, verbose = verbose, check.data = FALSE, ...) 
 } 
