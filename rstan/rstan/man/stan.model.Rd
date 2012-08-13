@@ -40,41 +40,40 @@
     intermediate output inside the function, which might be helpful for debugging
     the model, are printed or not. 
   }
-
 }
 
 \details{
   %%  ~~ If necessary, more details than the description above ~~
   The details of Stan can be found at \url{http://code.googlecode.com/p/stan}. 
+
+  There are three ways to specify the model's code for \code{stan.model}. 
+  \enumerate{ 
+  \item use a character string to include the Stan modeling language code 
+        and then specify parameter \code{model.code}. 
+  \item use a file and then specify file parameter \code{file}. 
+  \item use the compiled results from \code{stanc} and then specify 
+        parameter \code{stanc.ret}. 
+  } 
 }
 \value{
   A stanmodel class object (\linkS4class{stanmodel}), which could be
   used later for drawing samples by calling its \code{sampling} function.
-  %%  ~Describe the value returned
-  %%  If it is a LIST, use
-  %%  \item{comp1 }{Description of 'comp1'}
-  %%  \item{comp2 }{Description of 'comp2'}
-  %% ...
 }
 \references{
   The Stan Development Team (2012) 
   \emph{Stan Modeling Language: User's Guide and Reference}. 
   \url{http://code.google.com/p/stan}. 
-  %% ~put references to the literature/web site here ~
-}
-\author{
-  %%  ~~who you are~~
 }
 \note{
-  %%  ~~further notes~~
+  The object of S4 class \code{stanmodel} created by \code{stan.model} 
+  could \strong{not} be well saved in that we could not apply \code{sampling} 
+  function for a loaded object of \code{stanmodel} from previously saved. 
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
   \code{\linkS4class{stanmodel}} and \code{\link{stan}} 
 }
-\examples{
-}
+\examples{\dontrun{
+stan.model(model.code = 'parameters {real y;} model {y ~ normal(0,1);}')
+}}
 \keyword{rstan}
-\keyword{stanmodel}

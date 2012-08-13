@@ -50,5 +50,3 @@
 % } 
 
 \keyword{methods}
-\keyword{stanfit}
-% \keyword{ ~~ other possible keyword(s) ~~ }

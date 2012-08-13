@@ -1,5 +1,5 @@
-\name{stan.dump}
-\alias{stan.dump}
+\name{stan.rdump}
+\alias{stan.rdump}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Dump the data for a Stan model to R dump file
@@ -11,13 +11,13 @@ that Stan supports
 \description{
   This function takes a vector of names of \R objects and outputs
   text representations of the objects to a file or connection.
-  The file created by \code{stan.dump} is typically used as data 
+  The file created by \code{stan.rdump} is typically used as data 
   input of the Stan package (\url{http://stan.googlecode.com}) or 
   \code{\link{source}}d into another \R session.
 }
 
 \usage{
-stan.dump(list, file, append = FALSE, 
+stan.rdump(list, file, append = FALSE, 
           envir = parent.frame(),
           width = options("width")$width)
 }
@@ -37,38 +37,22 @@ stan.dump(list, file, append = FALSE,
     The output is broken into lines with \code{width.}}
 }
 
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-
 \value{
   An invisible character vector containing the names of the objects
   that were dumped.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
 \note{
-  \code{stan.dump} only dumps numeric data, which could be 
-  scale, vector, array, or matrix.  
-%%  ~~further notes~~
+  \code{stan.rdump} only dumps numeric data, which could be 
+  scalar, vector, array, or matrix.  
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{dump}} 
+  \code{\link{dump}} 
 }
 \examples{
 x <- 1; y <- 1:10; z <- array(1:10, dim = c(2,5)) 
-stan.dump(ls(pattern = '^[xyz]'), "xyz.Rdmped")
-cat(paste(readLines("xyz.Rdmped"), collapse = '\n'), '\n')
-unlink("xyz.Rdmped")
+stan.rdump(ls(pattern = '^[xyz]'), "xyz.Rdump")
+cat(paste(readLines("xyz.Rdump"), collapse = '\n'), '\n')
+unlink("xyz.Rdump")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{rstan} 
-\keyword{dump}  

@@ -96,7 +96,6 @@
     In addition, \code{refresh} (\code{integer}) could be used to
     control how to indicate the progress during sampling 
     (i.e. show the progress every \code{refresh} iterations).
-
   }
 }
 \value{
@@ -105,11 +104,9 @@
    their elements are used. 
 } 
 
-\examples{
-\dontrun{
-}
-} 
+\examples{\dontrun{
+m <- stan.model(model.code = 'parameters {real y;} model {y ~ normal(0,1);}')
+f <- sampling(m, n.iter = 100)
+}} 
 
 \keyword{methods}
-\keyword{stanmodel}
-% \keyword{ ~~ other possible keyword(s) ~~ }

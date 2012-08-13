@@ -9,7 +9,7 @@
 \alias{print,stanfit-method}
 \alias{show,stanfit-method}
 \alias{plot,stanfit-method}
-%% \alias{stan.code,stanfit-method}
+%% \alias{get.stancode,stanfit-method}
 %% \alias{traceplot,stanfit-method}
 
 \title{Class \code{stanfit}: fitted Stan model}
@@ -44,21 +44,31 @@
 
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "stanfit")}: prints a very short summary
+    \item{show}{\code{signature(object = "stanfit")}: prints the default summary
       for the model.}
     \item{plot}{\code{signature(x = 'stanfit')}: plot an overview of summaries 
       for all parameters.}
+    \item{print}{\code{signature(x = 'stanfit')}: print the summary of the 
+      model with inference about mean (\code{Mean}), standard error of the 
+      mean (\code{SE.Mean}), standard deviation (\code{SD}), and quantities
+      about quantities of interest based on all chains merged. 
+      Most of the printout are the results from function \code{summary}.} 
     \item{summary}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the samples: the quantiles 
       (for example, 2.5\%, 50\%, 97.5\%, which could be specified), 
       the mean, the standard deviation (SD), the effective sample size (ESS),
-      and the split Rhat (split potential split potential scale reduction).}
+      and the split Rhat (split potential split potential scale reduction).
+      Returned is a named list with elements \code{summary} and \code{c.summary}, 
+      summaries for all chains merged without warmup and individual chains
+      respectively. For the summary of all chains merged, we also have \code{SE.Mean},
+      the standard error of the mean. 
+    }
     \item{extract}{\code{signature(object = "stanfit")}: 
       get the samples for all chains for all (or specified ) parameters. 
       (see \code{\link{extract}}).}
     \item{traceplot}{\code{signature(object = "stanfit")}:
       plot the trace of chains.} 
-    \item{stan.code}{\code{signature(object = "stanfit")}:
+    \item{get.stancode}{\code{signature(object = "stanfit")}:
       get the Stan code for the fitted model.}
     \item{get.stanmodel}{\code{signature(object = "stanfit")}: 
       get the S4 class \code{stanmodel} from the fitted 
@@ -75,20 +85,10 @@
   \emph{Stan Modeling Language: User's Guide and Reference}. 
   \url{http://code.google.com/p/stan}. 
 }
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
   \code{\link{stan}} and \code{\linkS4class{stanmodel}} 
 }
 \examples{
-  showClass("stanfit")
+showClass("stanfit")
 }
 \keyword{classes}
-\keyword{stanfit} 

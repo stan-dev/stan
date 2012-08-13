@@ -1,3 +1,21 @@
+# Part of the rstan package for an R interface to Stan 
+# Copyright (C) 2012 Columbia University
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 
 #   is.whole.number <- function(x) {
 #     all.equal(x, round(x), check.attributes = FALSE) 
@@ -579,38 +597,125 @@ default.summary.probs <- function() c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90,
 ## summarize the chains merged and individually 
 get.par.summary <- function(sim, n, probs = default.summary.probs()) {
   ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
-  sumfun <- function(chain) c(mean(chain), 0, sd(chain), quantile(chain, probs = probs))
-  cs <- lapply(ss, sumfun)
-  as <- sumfun(do.call(c, ss)) 
-  list(summary = as, 
-       c.summary = unlist(cs, use.names = FALSE)) 
+  msdfun <- function(chain) c(mean(chain), sd(chain))
+  qfun <- function(chain) quantile(chain, probs = probs)
+  c.msd <- unlist(lapply(ss, msdfun), use.names = FALSE) 
+  c.quan <- unlist(lapply(ss, qfun), use.names = FALSE) 
+  ass <- do.call(c, ss) 
+  msd <- msdfun(ass) 
+  quan <- qfun(ass) 
+  list(msd = msdfun(ass), quan = qfun(ass), c.msd = c.msd, c.quan = c.quan) 
 } 
 
-summary.sim <- function(sim, pars, probs = default.summary.probs(), 
-                        get.ess = TRUE, get.rhat = TRUE) {
+# mean and sd 
+get.par.summary.msd <- function(sim, n) { 
+  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
+  sumfun <- function(chain) c(mean(chain), sd(chain)) 
+  cs <- lapply(ss, sumfun)
+  as <- sumfun(do.call(c, ss)) 
+  list(msd = as, c.msd = unlist(cs, use.names = FALSE)) 
+} 
+
+# quantiles 
+get.par.summary.quantile <- function(sim, n, probs = default.summary.probs()) {
+  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
+  sumfun <- function(chain) quantile(chain, probs = probs)
+  cs <- lapply(ss, sumfun)
+  as <- sumfun(do.call(c, ss)) 
+  list(quan = as, c.quan = unlist(cs, use.names = FALSE)) 
+} 
+
+combine.msd.quan <- function(msd, quan) {
+  # Combine msd and quantiles for chain's summary 
+  # Args:
+  #   msd: the array for mean and sd with dim num.par * 2 * n.chains 
+  #   cquan: the array for quantiles with dim num.par * n.quan * n.chains 
+  dim1 <- dim(msd) 
+  dim2 <- dim(quan) 
+  if (any(dim1[c(1, 3)] != dim2[c(1, 3)])) 
+    stop("numers of parameter/chains differ in msd and quan") 
+  n.chains <- dim1[3] 
+  n.par <- dim1[1] 
+  n.stat <- dim1[2] + dim2[2] 
+  par.names <- dimnames(msd)[[1]] 
+  stat.names <- c(dimnames(msd)[[2]], dimnames(quan)[[2]]) 
+  fun <- function(i) {
+    # This is a bit ugly; one reason is that we need to 
+    # deal with the case that dim1[1] = 1, in which 
+    # a1 is a vector. 
+    a1 <- msd[, , i] 
+    a2 <- quan[, , i] 
+    dim(a1) <- dim1[1:2] 
+    dim(a2) <- dim2[1:2] 
+    cbind(a1, a2)
+  } 
+  ll <- lapply(1:n.chains, fun) 
+  twodnames <- dimnames(ll[[1]]) 
+  msdquan <- array(unlist(ll), dim = c(n.par, n.stat, n.chains)) 
+  dimnames(msdquan) <- list(par.names, stat.names, NULL) 
+  msdquan 
+} 
+
+summary.sim <- function(sim, pars, probs = default.summary.probs()) {
   # cat("summary.sim is called.\n")
   probs.str <- probs2str(probs)
+  probs.len <- length(probs) 
   pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
   tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx.len <- length(tidx) 
   tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
-  s <- lapply(tidx, function(n) get.par.summary(sim, n, probs = probs))
-  ess <- if (get.ess) array(sapply(tidx, function(n) rstan.ess(sim, n)), dim = c(tidx.len, 1)) else NULL 
-  rhat <- if (get.rhat) array(sapply(tidx, function(n) rstan.splitrhat(sim, n)), dim = c(tidx.len, 1)) else NULL 
-  # mean, sd, quantiles 
-  msq <- do.call(rbind, lapply(s, function(x) x$summary))
-  dim(msq) <- c(tidx.len, 2 + length(probs)) 
-  rownames(msq) <- sim$fnames.oi[tidx] 
-  colnames(msq) <- c("Mean", "SE.Mean", "SD", probs.str) 
-  # SE.Mean: Standard error of the mean; sigma / sqrt(n) 
-  msq[, "SE.Mean"] <- msq[, "SD"] / sqrt(ess) 
-  cs <- lapply(s, function(x) x$c.summary) 
-  cs <- do.call(rbind, cs) 
-  dim(cs) <- c(tidx.len, 2 + length(probs), sim$n.chains) 
-  dimnames(cs) <- list(sim$fnames.oi[tidx], c("Mean", "SD", probs.str), NULL) 
-  ss <- list(summary = msq, c.summary = cs, ess = ess, rhat = rhat) 
+  lmsdq <- lapply(tidx, function(n) get.par.summary(sim, n, probs)) 
+  msd <- do.call(rbind, lapply(lmsdq, function(x) x$msd)) 
+  quan <- do.call(rbind, lapply(lmsdq, function(x) x$quan)) 
+  dim(msd) <- c(tidx.len, 2) 
+  dim(quan) <- c(tidx.len, probs.len) 
+  rownames(msd) <- sim$fnames.oi[tidx] 
+  rownames(quan) <- sim$fnames.oi[tidx] 
+  colnames(msd) <- c("Mean", "SD") 
+  colnames(quan) <- probs.str 
+
+  c.msd <- do.call(rbind, lapply(lmsdq, function(x) x$c.msd)) 
+  c.quan <- do.call(rbind, lapply(lmsdq, function(x) x$c.quan)) 
+  dim(c.msd) <- c(tidx.len, 2, sim$n.chains) 
+  dim(c.quan) <- c(tidx.len, probs.len, sim$n.chains) 
+
+  dimnames(c.msd) <- list(sim$fnames.oi[tidx], c("Mean", "SD"), NULL) 
+  dimnames(c.quan) <- list(sim$fnames.oi[tidx], probs.str, NULL)
+
+  ess <-  array(sapply(tidx, function(n) rstan.ess(sim, n)), dim = c(tidx.len, 1)) 
+  rhat <- array(sapply(tidx, function(n) rstan.splitrhat(sim, n)), dim = c(tidx.len, 1)) 
+
+  ss <- list(msd = msd, sem = msd[, 2] / sqrt(ess), 
+             c.msd = c.msd, quan = quan, c.quan = c.quan, 
+             ess = ess, rhat = rhat) 
+  attr(ss, "row.major.idx") <- tidx.rowm 
+  attr(ss, "col.major.idx") <- tidx
+  ss
+}  
+
+summary.sim.quan <- function(sim, pars, probs = default.summary.probs()) {
+  # cat("summary.sim is called.\n")
+  probs.str <- probs2str(probs)
+  probs.len <- length(probs) 
+  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
+  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
+  tidx <- unlist(tidx, use.names = FALSE)
+  tidx.len <- length(tidx) 
+  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  lquan <- lapply(tidx, function(n) get.par.summary.quantile(sim, n, probs)) 
+  quan <- do.call(rbind, lapply(lquan, function(x) x$quan)) 
+  dim(quan) <- c(tidx.len, probs.len) 
+  rownames(quan) <- sim$fnames.oi[tidx] 
+  colnames(quan) <- probs.str 
+
+  c.quan <- do.call(rbind, lapply(lquan, function(x) x$c.quan)) 
+  dim(c.quan) <- c(tidx.len, probs.len, sim$n.chains) 
+  dimnames(c.quan) <- list(sim$fnames.oi[tidx], probs.str, NULL)
+
+  ss <- list(quan = quan, c.quan = c.quan)
   attr(ss, "row.major.idx") <- tidx.rowm 
   attr(ss, "col.major.idx") <- tidx
   ss
@@ -757,16 +862,16 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
     sprobs = default.summary.probs()  
     mp <- match(0.5, sprobs) 
     i80p <- match(c(0.1, 0.9), sprobs) 
-    med <- summary$summary[index, 2 + mp] 
+    med <- summary$quan[index, mp] 
     med <- array(med, dim = c(k.num.p, 1)) 
-    i80 <- summary$summary[index, 2 + i80p] 
+    i80 <- summary$quan[index, i80p] 
     i80 <- array(i80, dim = c(k.num.p, 2)) 
     rhats <- summary$rhat 
     rhats.cols <- get.rhat.cols(rhats) 
   
-    med.chain <- summary$c.summary[index, 2 + mp, ]
+    med.chain <- summary$c.quan[index, mp, ]
     med.chain <- array(med.chain, dim = c(k.num.p, sim$n.chains)) 
-    i80.chain <- summary$c.summary[index, 2 + i80p, ]
+    i80.chain <- summary$c.quan[index, i80p, ]
     i80.chain <- array(i80.chain, dim = c(k.num.p, 2, sim$n.chains))
 
     rng <- if (display.parallel) range(i80, i80.chain) else range(i80)
@@ -849,7 +954,7 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
 
 legitimate.model.name <- function(name) {
   # To make model name be a valid name in C++. 
-  return("stan_model")
+  return("anon_model")
 } 
 
 boost.url <- function() {"http://www.boost.org/users/download/"} 

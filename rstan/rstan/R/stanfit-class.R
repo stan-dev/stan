@@ -1,25 +1,47 @@
-require(methods) 
+# Part of the rstan package for an R interface to Stan 
+# Copyright (C) 2012 Columbia University
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-setClass(Class = "stanfit",
-         representation = representation(
-           model.name = "character", 
-           model.pars = "character", 
-           par.dims = "list", 
-           sim = "list", 
-           inits = "list", 
-           stan.args = "list", 
-           .MISC = "environment"
-         ),  
-         validity = function(object) {
-           return(TRUE) 
-         })
 
-
-setMethod("show", "stanfit",
-          function(object) { 
-            cat("S4 class stanfit of model: `", object@model.name, "' with ", 
-                object@sim$n.chains, " chains.\n", sep = '')  
+setMethod("show", "stanfit", 
+          function(object) {
+            printstanfit(x = object, pars = object@sim$pars.oi)
           })  
+
+printstanfit <- function(x, pars = x@sim$pars.oi, 
+                         probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
+                         digits.summary = 1, ...) { 
+  s <- summary(x, pars, probs, ...)  
+  cat("Inference for Stan model: ", x@model.name, '.\n', sep = '')
+  cat(x@sim$n.chains, " chains: each with n.iter=", x@sim$n.iter, 
+      "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, "; ", 
+      x@sim$n.save[1], " samples saved.\n\n", sep = '') 
+
+  # round ESS to 0 decimal point 
+  s$summary[, 'ESS'] <- round(s$summary[, 'ESS'], 0)
+
+  print(round(s$summary, digits.summary), ...) 
+
+  sampler <- attributes(x@sim$samples[[1]])$args$sampler 
+  cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
+  cat("For each parameters, ESS is a crude measure of effective samples size,\n") 
+  cat("and Rhat is the potential scale reduction factor on split chains (at \n")
+  cat("convergence, Rhat=1).\n")
+}  
+setMethod("print", "stanfit", printstanfit) 
 
 if (!isGeneric("plot")) 
   setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
@@ -31,29 +53,6 @@ setMethod("plot", signature = (x = "stanfit"),
               assign("summary", summary.sim(x@sim), envir = x@.MISC)
             stan.plot.inferences(x@sim, x@.MISC$summary, pars, display.parallel, ...) 
           }) 
-
-setMethod("print", signature = (x = "stanfit"),
-          function(x, pars, 
-                   probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
-                   digits.summary = 1, ...) { 
-            if (missing(pars)) pars <- x@sim$pars.oi 
-            s <- summary(x, pars, probs, ...)  
-            cat("Inference for Stan model: ", x@model.name, '.\n', sep = '')
-            cat(x@sim$n.chains, " chains: each with n.iter=", x@sim$n.iter, 
-                "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, "; ", 
-                x@sim$n.save[1], " samples saved.\n\n", sep = '') 
-
-            # round ESS to 0 decimal point 
-            s$summary[, 'ESS'] <- round(s$summary[, 'ESS'], 0)
-
-            print(round(s$summary, digits.summary), ...) 
-
-            sampler <- attributes(x@sim$samples[[1]])$args$sampler 
-            cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
-            cat("For each parameters, ESS is a crude measure of effective samples size,\n") 
-            cat("and Rhat is the potential scale reduction factor on split chains (at \n")
-            cat("convergence, Rhat=1).\n")
-          })  
 
 setGeneric(name = "stan.code",
            def = function(object, ...) { standardGeneric("stan.code")}) 
@@ -67,14 +66,15 @@ setMethod('stan.code', signature = (object = 'stanfit'),
             invisible(code)
           }) 
 
+setGeneric(name = 'get.stanmodel', 
+           def = function(object, ...) { standardGeneric("get.stanmodel")})
+
 setMethod("get.stanmodel", signature = (object = 'stanfit'), 
           function(object) { 
             if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
               stop("stanmodel is not found") 
             invisible(object@.MISC$stanmodel) 
           }) 
-
-invisible(object@stan.args[[1]]$seed) })
 
 setGeneric(name = 'get.inits', 
            def = function(object, ...) { standardGeneric("get.inits")})
@@ -87,10 +87,6 @@ setGeneric(name = 'get.seed',
 
 setMethod("get.seed", signature = (object = 'stanfit'), 
           function(object) { invisible(object@stan.args[[1]]$seed) })
-
-setGeneric(name = 'get.stanmodel', 
-           def = function(object, ...) { standardGeneric("get.stanmodel")})
-
 
 ### HELPER FUNCTIONS
 ### 
@@ -269,34 +265,35 @@ setMethod("summary", signature = (object = "stanfit"),
             #   In addition, the indexes complicate the implementation as internally
             #   we use column major indexes for vector/array parameters. But it might
             #   be better to use row major indexes for the output such as print.
+
+            if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
+              assign("summary", summary.sim(object@sim), envir = object@.MISC)
            
             pars <- if (missing(pars)) object@sim$pars.oi else check.pars(object@sim, pars) 
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
-            m <- match(probs, c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975))  
+            m <- match(probs, default.summary.probs())
             if (any(is.na(m))) {
-              g.ess <- FALSE; g.rhat <- FALSE 
-              if (!exists("summary", envir = object@.MISC, inherits = FALSE)) {
-                g.ess <- TRUE; g.rhat <- TRUE
-              }
-              ss <-  summary.sim(object@sim, pars, probs, get.ess = g.ess, get.rhat = g.rhat) 
+              ss <-  summary.sim.quan(object@sim, pars, probs) 
               row.idx <- attr(ss, "row.major.idx") 
               col.idx <- attr(ss, "col.major.idx") 
 
-              if (is.null(ss$ess)) ss$ess <- object@.MISC$summary$ess[col.idx, drop = FALSE] 
-              if (is.null(ss$rhat)) ss$rhat <- object@.MISC$summary$rhat[col.idx, drop = FALSE] 
+              ss$ess <- object@.MISC$summary$ess[col.idx, drop = FALSE] 
+              ss$rhat <- object@.MISC$summary$rhat[col.idx, drop = FALSE] 
+              ss$mean <- object@.MISC$summary$msd[col.idx, 1, drop = FALSE] 
+              ss$sd <- object@.MISC$summary$msd[col.idx, 1, drop = FALSE] 
+              ss$sem <- object@.MISC$summary$sem 
+              s1 <- cbind(ss$mean, ss$sem, ss$sd, 
+                          ss$quan, ss$ess, ss$rhat)
+              colnames(s1) <- c("Mean", "SE.Mean", "SD", colnames(ss$quan), 'ESS', 'Rhat')
 
-              summary <- cbind(ss$summary, ss$ess, ss$rhat)
-              colnames(summary) <- c(colnames(ss$summary), 'ESS', 'Rhat')
+              s2 <- combine.msd.quan(object@.MISC$summary$c.msd[col.idx, , , drop = FALSE], ss$c.quan) 
 
               idx2 <- match(row.idx, col.idx) 
-              ss2 <- list(summary = summary[idx2, , drop = FALSE],
-                          c.summary = ss$c.summary[idx2, , , drop = FALSE]) 
-              return(invisible(ss2)) 
+              ss <- list(summary = s1[idx2, , drop = FALSE],
+                         c.summary = s2[idx2, , , drop = FALSE]) 
+              return(invisible(ss)) 
             }
-
-            if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
-              assign("summary", summary.sim(object@sim), envir = object@.MISC)
 
             tidx <- pars.total.indexes(object@sim$pars.oi, 
                                        object@sim$dims.oi, 
@@ -305,21 +302,23 @@ setMethod("summary", signature = (object = "stanfit"),
             tidx <- lapply(tidx, function(x) attr(x, "row.major.idx"))
             tidx <- unlist(tidx, use.names = FALSE)
             tidx.len <- length(tidx)
-            stat.idx <- c(1:2, 2 + m) 
 
-            s1 <- cbind(object@.MISC$summary$summary[tidx, stat.idx, drop = FALSE], 
-                        object@.MISC$summary$ess[tidx, drop = FALSE],
-                        object@.MISC$summary$rhat[tidx, drop = FALSE])  
-            pars.names <- rownames(object@.MISC$summary$summary)[tidx] 
-            dim(s1) <- c(length(tidx), length(stat.idx) + 2) 
+            ss <- object@.MISC$summary 
+
+            s1 <- cbind(ss$msd[tidx, 1, drop = FALSE], 
+                        ss$sem[tidx, drop = FALSE], 
+                        ss$msd[tidx, 2, drop = FALSE], 
+                        ss$quan[tidx, m, drop = FALSE], 
+                        ss$ess[tidx, drop = FALSE],
+                        ss$rhat[tidx, drop = FALSE])  
+            pars.names <- rownames(ss$msd)[tidx] 
+            qnames <- colnames(ss$quan)[m] 
+            dim(s1) <- c(length(tidx), length(m) + 5) 
             rownames(s1) <- pars.names 
-            colnames(s1) <- c(colnames(object@.MISC$summary$summary)[stat.idx], "ESS", "Rhat") 
-
-            s2 <- object@.MISC$summary$c.summary[tidx, stat.idx, , drop = FALSE]
-            dim(s2) <- c(tidx.len, length(stat.idx), object@sim$n.chains)
-            stat.names2 <- dimnames(object@.MISC$summary$c.summary)[[2]][stat.idx]
-            dimnames(s2) <- list(pars.names, stat.names2, NULL) 
-           
+            colnames(s1) <- c("Mean", "SE.Mean", "SD", qnames, 'ESS', 'Rhat')
+            s2 <- combine.msd.quan(ss$c.msd[tidx, , , drop = FALSE], ss$c.quan[tidx, m, , drop = FALSE]) 
+            dim(s2) <- c(tidx.len, length(m) + 2, object@sim$n.chains)
+            dimnames(s2) <- list(pars.names, c("Mean", "SD", qnames), NULL) 
             ss <- list(summary = s1, c.summary = s2)
             invisible(ss) 
           })  
@@ -353,7 +352,7 @@ setMethod("traceplot", signature = (object = "stanfit"),
             }
             if (ask) devAskNewPage(ask = ask.old)
             par(mfrow = par.mfrow.old)
-            invisible() 
+            invisible(NULL) 
           })  
 
 is.sf.valid <- function(sf) {

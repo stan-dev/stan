@@ -38,17 +38,13 @@
   }
 }
 
-\references{
-%%  ~~put references to the literature/web site here~~
-}
-\author{
-%%  ~~who you are~~
-}
 \note{
-%%  ~~further notes~~
+  Objects of class \code{stanfit} could \strong{not} be saved as ordinary 
+  R objects. One reason is that the C++ code for the model is
+  compiled and loaded all temporarily using package inline, which
+  does not provide any approach to save and reload the compiled binary
+  objects.  
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{stanc}} 

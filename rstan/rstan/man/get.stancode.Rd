@@ -1,15 +1,15 @@
-\name{stan.code-methods}
+\name{get.stancode-methods}
 \docType{methods}
-\alias{stan.code}
-\alias{stan.code-methods}
-\alias{stan.code,stanfit-method}
-\title{\code{stan.code}: obtain the Stan modeling language code for a fitted model} 
+\alias{get.stancode}
+\alias{get.stancode-methods}
+\alias{get.stancode,stanfit-method}
+\title{\code{get.stancode}: obtain the Stan modeling language code for a fitted model} 
 \description{
  Obtain the Stan modeling language code for a fitted model. 
  This is a generic function of S4 class \code{stanfit}. 
 }
 \usage{
-  \S4method{stan.code}{stanfit}(object, print = FALSE) 
+  \S4method{get.stancode}{stanfit}(object, print = FALSE) 
 } 
 \section{Methods}{
   \describe{
@@ -31,4 +31,3 @@
   \code{stan}, \code{stanc}, and \code{\linkS4class{stanfit}} 
 } 
 \keyword{methods}
-\keyword{stanfit} 

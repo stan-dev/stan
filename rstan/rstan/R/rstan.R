@@ -1,3 +1,21 @@
+# Part of the rstan package for an R interface to Stan 
+# Copyright (C) 2012 Columbia University
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 
 ## 
 ## 
@@ -109,14 +127,9 @@ stan <- function(file, model.name = "anon_model",
   # Returns: 
   #   A S4 class stanfit object  
 
-  if (is.na(fit)) {
-    sm <- stan.model(file, verbose = verbose, model.name, model.code, boost.lib)
-  } else { 
-    if (!isS4(fit) || (class(fit) != 'stanfit')) {
-      stop("Parameter fit is not an instance of S4 class stanfit") 
-    }
-    sm <- get.stan.model(fit) 
-  } 
+  if (is(fit, "stanfit")) sm <- get.stanmodel(fit)
+  else sm <- stan.model(file, verbose = verbose, model.name, model.code, boost.lib)
+
   if (missing(sample.file))  sample.file <- NA 
 
   # check data before compiling model, which typically takes more time 
@@ -124,7 +137,6 @@ stan <- function(file, model.name = "anon_model",
   if (!missing(data) && length(data) > 0) data <- data.preprocess(data)
   else data <- list()  
 
-  sm <- stan.model(file, verbose = verbose, model.name, model.code, boost.lib)
   sampling(sm, data, pars, n.chains, n.iter, n.warmup, n.thin, seed, init.t, init.v, 
            sample.file = sample.file, verbose = verbose, check.data = FALSE, ...) 
 } 

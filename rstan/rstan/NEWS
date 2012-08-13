@@ -1,0 +1,21 @@
+Sat Aug 11 2012:
+1. Bug fixes
+   * plot for stanfit wide y-axis 
+   * print for stanfit class (?) 
+   * not working binary build for Mac 
+
+2. New functionality 
+   * add standard error of mean (SE.Mean) to print of stanfit 
+   * function stan allow suing previous fitted stanfit object by adding
+     parameter 'fit'
+   * allow some type of interruption during sampling 
+   * allow data for function stan to be specified as object names 
+
+3. Others 
+   * more documentation 
+   * use GPL for License and add LicenseNote in DESCRIPTION file 
+   * add GPL LICENSE header to some files (need to check again) 
+     follow https://www.gnu.org/licenses/gpl-howto.html
+
+Wed Aug 8 2012:
+Uploaded to googlecode wiki: internally released. 

@@ -15,17 +15,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+setClass(Class = "stanfit",
+         representation = representation(
+           model.name = "character", 
+           model.pars = "character", 
+           par.dims = "list", 
+           sim = "list", 
+           inits = "list", 
+           stan.args = "list", 
+           .MISC = "environment"
+         ),  
+         validity = function(object) {
+           return(TRUE) 
+         })
 
-rstan.ess <- function(sim, n) {
-  # Args:
-  #   n: Chain index starting from 1.
-  ess <- .Call("effective_sample_size", sim, n - 1, PACKAGE = "rstan")
-  ess
-} 
-
-rstan.splitrhat <- function(sim, n) {
-  # Args:
-  #   n: Chain index starting from 1.
-  rhat <- .Call("split_potential_scale_reduction", sim, n - 1, PACKAGE = "rstan")
-  rhat
-} 
+setClass(Class = "stanmodel",
+         representation = representation(
+           model.name = "character",
+           model.code = "character",
+           .modelmod = "list"
+         ), 
+         validity = function(object) {
+           return(TRUE)
+         })

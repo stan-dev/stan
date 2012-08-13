@@ -99,47 +99,45 @@ stan(file, model.name = "anon_model", model.code = "",
 }
 \value{
   Fitted results as an object of S4 class \code{stanfit}.
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
 }
-\references{
-  The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://code.google.com/p/stan}. 
-}
-\author{
-%%  ~~who you are~~
-}
+
 \note{
   As Stan does not allow missing data. The data are pre-processed 
   to check if there is any \code{NA} and it would stop when there is. 
   Also, Stan allows only numeric data, that is, doubles and integers. 
   Data of other types (for examples, characters) are not passed to 
   Stan. 
+
+  We could use a previous fitted model object (i.e., an instance
+  of S4 class \code{stanfit}) as input for function \code{stan} to 
+  refit the model, for example, with different configuration or data. 
+  But for now, since the compiled C++ code for the model could 
+  \strong{not} be saved, it would not work to refit a model in a R session
+  where the fitted model is loaded from the saved image from previous R 
+  sessions. In other words, this only works without quitting R. 
+  This situation might be improved in the future. 
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
+\references{
+  The Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  \url{http://code.google.com/p/stan}. 
+}
 \seealso{
-  \code{\link{sampling}} 
+  \code{\link{sampling}} and \linkS4class{stanfit}
 }
 \examples{\dontrun{
-  library(rstan)
-  scode <- "
-  parameters {
-    real y[2]; 
-  } 
-  model {
-    y[1] ~ normal(0, 1);
-    y[2] ~ double_exponential(0, 2);
-  } 
-  "
-  s.f <- stan(model.code = scode, verbose = FALSE) 
-  print(s.f)
+library(rstan)
+scode <- "
+parameters {
+  real y[2]; 
+} 
+model {
+  y[1] ~ normal(0, 1);
+  y[2] ~ double_exponential(0, 2);
+} 
+"
+s.f <- stan(model.code = scode, verbose = FALSE) 
+print(s.f)
 }} 
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{rstan} 

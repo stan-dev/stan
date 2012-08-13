@@ -17,13 +17,6 @@
   \emph{Stan Modeling Language: User's Guide and Reference}. 
   \url{http://code.google.com/p/stan}. 
 }
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
 \seealso{
   \code{\link{stan}} and \code{\link{stan.model}} 
 }

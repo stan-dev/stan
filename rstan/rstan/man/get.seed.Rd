@@ -28,4 +28,3 @@
   \code{\linkS4class{stanfit}} 
 }
 \keyword{methods}
-\keyword{stanfit} 

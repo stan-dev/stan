@@ -23,6 +23,7 @@ exportMethods (
 #   print, plot, 
 #   extract, 
   show, sampling, summary, print, extract, 
-  traceplot, plot, stan.code, get.inits, get.seed
+  traceplot, plot, stan.code, get.inits, get.seed, 
+  get.stanmodel
 )
 import(Rcpp)

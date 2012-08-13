@@ -45,20 +45,20 @@ A list of the old options if exists. If an option does
 not exist before, it is \code{NA}. When there is only 
 one option, the old value is returned. 
 }
-\references{
+%\references{
 %% ~put references to the literature/web site here ~
-}
-\author{
+%}
+%\author{
 %%  ~~who you are~~
-}
-\note{
+%}
+%\note{
 %%  ~~further notes~~
-}
+%}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
+%\seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\examples{}
+%}
+%\examples{}
 \keyword{rstan} 

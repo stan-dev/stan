@@ -26,16 +26,15 @@
     whether the user is prompted before starting a new page of output in the case
     there are a lot of parameters (see \code{\link[grDevices]{devAskNewPage}}).}
 }
-\value{} 
+\value{\code{NULL}} 
 
 \seealso{
   \code{\link[grDevices]{devAskNewPage}} 
 }
 
-\examples{
-  \dontrun{}
-} 
-
+\examples{\dontrun{
+library(rstan) 
+fit <- stan(model.code = "parameters {real y;} model {y ~ normal(0,1);}") 
+traceplot(fit) 
+}} 
 \keyword{methods}
-\keyword{traceplot}
-\keyword{stanfit}

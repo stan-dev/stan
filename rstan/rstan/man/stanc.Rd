@@ -31,6 +31,20 @@
   } 
 }
 
+\note{
+  R users might make the following mistakes when 
+  using Stan modeling language.
+
+  Using dot(".") in variable names such as \code{a.1}. However,
+  The syntax in some respect of the Stan modeling language is
+  more like programming language C++, which does not allow dot. 
+  And in Stan modeling language, we need explicite semicolon (";")
+  to end a statement. 
+
+  In addition, all reserved key words in C++ programming language 
+  could not be used as variable names, see Stan's manual. 
+} 
+
 \references{
   The Stan Development Team (2012) 
   \emph{Stan Modeling Language: User's Guide and Reference}. 
@@ -41,8 +55,7 @@
   \code{\link{stan.model}} and \code{\link{stan}}
 } 
 
-\examples{
-\dontrun{
+\examples{\dontrun{
 stanmodelcode <- '
 data {
   int[0,] N;
@@ -62,5 +75,4 @@ model {
 r <- stanc(stanmodelcode, "normal1") 
 names(r)
 cat(r$cppcode)
-}
-}
+}}
