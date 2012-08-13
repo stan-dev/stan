@@ -255,7 +255,8 @@ namespace stan {
       double gamma = 0.05;
       command.val("gamma", gamma);
 
-      int refresh = 1;
+      int refresh = num_iterations / 200;
+      refresh = refresh <= 0 ? 1 : refresh;
       command.val("refresh",refresh);
 
       unsigned int random_seed = 0;
