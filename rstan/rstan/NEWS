@@ -1,8 +1,9 @@
 Sat Aug 11 2012:
 1. Bug fixes
    * plot for stanfit wide y-axis 
-   * print for stanfit class (?) 
-   * not working binary build for Mac 
+   * print for stanfit class 
+   * not working binary build for Mac, this is because variables for 
+     the path of header files are using values when they are built.  
 
 2. New functionality 
    * add standard error of mean (SE.Mean) to print of stanfit 
@@ -14,8 +15,8 @@ Sat Aug 11 2012:
 3. Others 
    * more documentation 
    * use GPL for License and add LicenseNote in DESCRIPTION file 
-   * add GPL LICENSE header to some files (need to check again) 
-     follow https://www.gnu.org/licenses/gpl-howto.html
+   * add GPL LICENSE header to some files 
+     (follow https://www.gnu.org/licenses/gpl-howto.html) 
 
 Wed Aug 8 2012:
 Uploaded to googlecode wiki: internally released. 

@@ -12,8 +12,7 @@
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 setMethod("show", "stanfit", 
@@ -46,7 +45,7 @@ setMethod("print", "stanfit", printstanfit)
 if (!isGeneric("plot")) 
   setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
 
-setMethod("plot", signature = (x = "stanfit"), 
+setMethod("plot", signature = "stanfit", 
           function(x, y, pars = y, display.parallel = FALSE, ...) {
             pars <- if (missing(pars) && missing(y)) x@sim$pars.oi else check.pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
@@ -54,10 +53,10 @@ setMethod("plot", signature = (x = "stanfit"),
             stan.plot.inferences(x@sim, x@.MISC$summary, pars, display.parallel, ...) 
           }) 
 
-setGeneric(name = "stan.code",
-           def = function(object, ...) { standardGeneric("stan.code")}) 
+setGeneric(name = "get.stancode",
+           def = function(object, ...) { standardGeneric("get.stancode")}) 
 
-setMethod('stan.code', signature = (object = 'stanfit'), 
+setMethod('get.stancode', signature = "stanfit", 
           function(object, print = FALSE) {
             if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
               stop("stanmodel is not found") 
@@ -69,7 +68,7 @@ setMethod('stan.code', signature = (object = 'stanfit'),
 setGeneric(name = 'get.stanmodel', 
            def = function(object, ...) { standardGeneric("get.stanmodel")})
 
-setMethod("get.stanmodel", signature = (object = 'stanfit'), 
+setMethod("get.stanmodel", signature = "stanfit", 
           function(object) { 
             if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
               stop("stanmodel is not found") 
@@ -79,13 +78,13 @@ setMethod("get.stanmodel", signature = (object = 'stanfit'),
 setGeneric(name = 'get.inits', 
            def = function(object, ...) { standardGeneric("get.inits")})
 
-setMethod("get.inits", signature = (object = 'stanfit'), 
+setMethod("get.inits", signature = "stanfit", 
           function(object) { invisible(object@inits) })
 
 setGeneric(name = 'get.seed', 
            def = function(object, ...) { standardGeneric("get.seed")})
 
-setMethod("get.seed", signature = (object = 'stanfit'), 
+setMethod("get.seed", signature = "stanfit", 
           function(object) { invisible(object@stan.args[[1]]$seed) })
 
 ### HELPER FUNCTIONS
@@ -187,7 +186,7 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
 setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
-setMethod("extract", signature(object = "stanfit"),
+setMethod("extract", signature = "stanfit",
           definition = function(object, pars, permuted = FALSE, inc.warmup = TRUE) {
             # Extract the samples in different forms for different parameters. 
             #
@@ -245,7 +244,7 @@ setMethod("extract", signature(object = "stanfit"),
 #                      }) 
 #   } 
 
-setMethod("summary", signature = (object = "stanfit"), 
+setMethod("summary", signature = "stanfit", 
           function(object, pars, 
                    probs = c(0.025, 0.25, 0.50, 0.75, 0.975), ...) { 
             # Summarize the samples (that is, compute the mean, SD, quantiles, for 
@@ -281,8 +280,8 @@ setMethod("summary", signature = (object = "stanfit"),
               ss$ess <- object@.MISC$summary$ess[col.idx, drop = FALSE] 
               ss$rhat <- object@.MISC$summary$rhat[col.idx, drop = FALSE] 
               ss$mean <- object@.MISC$summary$msd[col.idx, 1, drop = FALSE] 
-              ss$sd <- object@.MISC$summary$msd[col.idx, 1, drop = FALSE] 
-              ss$sem <- object@.MISC$summary$sem 
+              ss$sd <- object@.MISC$summary$msd[col.idx, 2, drop = FALSE] 
+              ss$sem <- object@.MISC$summary$sem[col.idx]  
               s1 <- cbind(ss$mean, ss$sem, ss$sd, 
                           ss$quan, ss$ess, ss$rhat)
               colnames(s1) <- c("Mean", "SE.Mean", "SD", colnames(ss$quan), 'ESS', 'Rhat')
@@ -328,7 +327,7 @@ if (!isGeneric("traceplot")) {
              def = function(object, ...) { standardGeneric("traceplot") }) 
 } 
 
-setMethod("traceplot", signature = (object = "stanfit"), 
+setMethod("traceplot", signature = "stanfit", 
           function(object, pars, inc.warmup = TRUE, ask = FALSE) { 
 
             pars <- if (missing(pars)) object@sim$pars.oi else check.pars(object@sim, pars) 

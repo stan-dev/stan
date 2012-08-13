@@ -12,8 +12,7 @@
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
@@ -292,9 +291,9 @@ probs2str <- function(probs, digits = 1) {
 } 
 
 
-stan.dump <- function(list, file, append = FALSE, 
-                      envir = parent.frame(),
-                      width = options("width")$width) {
+stan.rdump <- function(list, file, append = FALSE, 
+                       envir = parent.frame(),
+                       width = options("width")$width) {
   # Dump an R list or environment for a model data 
   # to the R dump file that Stan supports.
   #
@@ -309,7 +308,7 @@ stan.dump <- function(list, file, append = FALSE,
   # Return:
  
   if (missing(file)) 
-    stop("stan.dump needs argument 'file', ",
+    stop("stan.rdump needs argument 'file', ",
          "into which the data are dumped.") 
 
   if (is.character(file)) {
@@ -358,12 +357,12 @@ stan.dump <- function(list, file, append = FALSE,
   invisible(l2) 
 } 
 
-## test stan.dump simply
+## test stan.rdump simply
 # a <- 1:3
 # b <- 3
 # c <- matrix(1:9, ncol = 3)
 # d <- array(1:90, dim = c(9, 2, 5))
-# stan.dump(c('a', 'b', 'c', 'd'), file = 'a.txt')
+# stan.rdump(c('a', 'b', 'c', 'd'), file = 'a.txt')
 
 get.rhat.cols <- function(rhats) {
   # 

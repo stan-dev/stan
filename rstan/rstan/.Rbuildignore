@@ -24,7 +24,7 @@ inst/unitTests/.*\.html$
 inst/unitTests/.*\.txt$
 vignettes/makefile$
 vignettes/.*\.tex$
-vignettes/.*\.pdf$
+_vignettes/.*\.pdf$
 vignettes/.*\.aux$
 vignettes/.*\.log$
 vignettes/.*\.out$

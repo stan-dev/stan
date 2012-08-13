@@ -275,7 +275,7 @@ arguments to control the sampling procedure the same as in
 
 For the fitted object, S4 class \code{stanfit}, currently,
 we have defined generic functions such as \code{print},
-\code{summary}, \code{plot}, \code{traceplot}, \code{stan.code}, etc. 
+\code{summary}, \code{plot}, \code{traceplot}, \code{get.stancode}, etc. 
 Using these functions, we first could diagnose the convergence
 of the Markov chains by looking at the trace plots and calculating 
 the split Rhats.  The inference based on the kept samples (that is, warmup
@@ -372,14 +372,16 @@ dimnames(s2)
 
 In \RStan, we could return the model's \Stan modeling
 language code from the fitted object by calling 
-\code{stan.code}. All the initial values and seeds are 
+\code{get.stancode}. All the initial values and seeds are 
 also saved in this object, so they could be used to 
 reproduce previous sampling procedure. 
-To get the initial values we could use \code{get.inits}
+To get the initial values we could use \code{get.inits}. 
+See table~\ref{tab0stanfitfuns} for a summary of functions
+defined in class \code{stanfit}. 
 
 \begin{table}
 \caption{Generic functions for S4 class \code{stanfit}} 
-\label{tab0gfun4stanfit}
+\label{tab0stanfitfuns} 
 \begin{tabular}{lp{4in}} 
 \toprule 
 Name  &    Functionality    \\ 
@@ -389,13 +391,13 @@ Name  &    Functionality    \\
 \code{plot}          & plot the inferences (intervals and medians) for parameters \\
 \code{traceplot}     & plot the traces of chains  \\
 \code{extract}       & extract samples of parameters  \\
-\code{stan.code}     & extract the model \Stan code  \\
+\code{get.stancode}     & extract the model \Stan code  \\
+\code{get.stanmodel}     & extract the \code{stanmodel} object \\ 
 \code{get.seed}      & get the seed used for sampling  \\
 \code{get.inits}     & get the initial values used for sampling  \\
 \bottomrule 
 \end{tabular}
 \end{table}
-
 
 
 \section{Summary} 

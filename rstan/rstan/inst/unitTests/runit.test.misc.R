@@ -7,7 +7,7 @@
   b <- matrix(1:10, ncol = 2)
   c <- array(1:18, dim = c(2, 3, 3)) 
   dump(c("a", "b", "c"), file = 'dumpabc.Rdump')
-  rstan:::stan.dump(c("a", "b", "c"), file = 'standumpabc.Rdump')
+  rstan:::stan.rdump(c("a", "b", "c"), file = 'standumpabc.Rdump')
 } 
 
 
@@ -48,7 +48,7 @@ test.read.rdump <- function() {
   checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
 } 
 
-test.stan.dump <- function() {
+test.stan.rdump <- function() {
   l <- rstan:::read.rdump("standumpabc.Rdump")
   checkEquals(l$a, c(1, 3, 5)) 
   checkEquals(l$b, matrix(1:10, ncol = 2))
@@ -136,6 +136,16 @@ test.pars.total.indexes <- function() {
   attributes(tidx2[[1]]) <- NULL
   checkEquals(unname(tidx2[[1]]), 6 + 1:8)  
   checkEquals(unname(tidx2.attr1), 6 + 1:8)
+} 
+
+test.mklist <- function() {
+  x <- 3:5 
+  y <- array(1:9, dim = c(3, 3))  
+  assign("x", x, envir = .GlobalEnv) 
+  assign("y", y, envir = .GlobalEnv) 
+  a <- list(x = x, y = y) 
+  b <- rstan:::mklist(c("x", "y")) 
+  checkTrue(identical(a, b)) 
 } 
  
 .tearDown <- function() {
