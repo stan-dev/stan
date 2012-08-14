@@ -128,8 +128,8 @@ help:
 	@echo 'Common targets:'
 	@echo '  Model related:'
 	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
-	@echo '  - lib/libstan.a  : Build the Stan static library (used in linking models).'
-	@echo '  - lib/libstanc.a : Build the Stan compiler static library (used in linking'
+	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
+	@echo '  - bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                     bin/stanc$(EXE))'
 	@echo '  - models/*$(EXE) : If a Stan model exists at src/models/*.stan, this target'
 	@echo '                     will copy the Stan model to models/*.stan, then build the'
@@ -171,6 +171,9 @@ ifneq (,$(filter runtest/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst runtest/,,$(MAKECMDGOALS)))
 endif
 
+all: build docs
+build: libstan.a stanc
+docs: manual doxygen
 
 ##
 # Clean up.
@@ -193,3 +196,4 @@ clean-demo:
 
 clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
+
