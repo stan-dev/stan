@@ -1,24 +1,26 @@
 // EIGHT SCHOOLS MODEL
 // ported from:
-// Gelman et al., Bayesian Data Analysis, 2nd Edition, p. 592
-
+// Gelman et al., Bayesian Data Analysis, 2nd Edition, p. 598
+// EIGHT SCHOOLS MODEL
 
 data {
-    int[0,] J;             // number of schools
+    int[0,] J;               // number of schools
     real y[J];             // estimated treatment effect (school j)
-    real[0,] sigma_y[J];   // std dev of effect estimate (school j)
+    real[0,] sigma_y[J];   // standard error of effect estimate (school j)
+    real sigma_xi;         // prior scale (coefficient)
 }
 parameters {
-    real mu_theta;   
-    real theta[J];     
-    real[0,1000] sigma_theta; 
+    real mu;               // intercept coefficient (for y)
+    real xi;               // slope coefficient (for y)
+    real eta[J];           // predictor (school j)
+    real[0,] sigma_eta;    // deviation of eta
 }
 model {
-    mu_theta ~ normal(0,1000);
-    theta ~ normal(mu_theta, sigma_theta); 
-    y ~ normal(theta,sigma_y);
-
-    // last two lines are equiv to unvectorized versions
-    //   for (j in 1:J) theta[j] ~ normal(mu_theta, sigma_theta);
-    //   for (j in 1:J) y[j] ~ normal(theta[j], sigma_y[j]);
+    sigma_eta ~ cauchy(0,1);
+    for (j in 1:J)
+        eta[j] ~ normal(0, sigma_eta);
+    mu ~ normal(0,10);
+    xi ~ normal(0, sigma_xi);
+    for (j in 1:J)
+        y[j] ~ normal(mu + xi * eta[j], sigma_y[j]);
 }
