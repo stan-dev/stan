@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 /** 
  * Gets the path separator for the OS.
@@ -77,6 +78,28 @@ std::string run_command(std::string command) {
 
   return output;
 }
+
+/** 
+ * Runs the command provided and returns the system output
+ * as a string.
+ * 
+ * @param[in] command A command that can be run from the shell
+ * @param[out] elapsed_milliseconds Adds number of milliseconds run to current value.
+ * @return the system output of the command
+ */  
+std::string run_command(const std::string& command, long& elapsed_milliseconds) {
+  using boost::posix_time::ptime;
+  using boost::posix_time::microsec_clock;
+  
+  ptime time_start(microsec_clock::universal_time()); // start timer
+  std::string output = run_command(command);
+  ptime time_end(microsec_clock::universal_time());   // end timer
+
+  elapsed_milliseconds += (time_end - time_start).total_milliseconds();
+  
+  return output;
+}
+
 
 /** 
  * Returns the help options from the string provided.

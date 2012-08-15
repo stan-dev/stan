@@ -5,7 +5,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/csv_writer.hpp>
 #include <stan/mcmc/chains.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/binomial.hpp>
 
@@ -132,8 +131,6 @@ public:
    * @return Elapsed time running the commands in milliseconds.
    */
   long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
-    using boost::posix_time::ptime;
-
     long time = 0;
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::stringstream command_chain;
@@ -143,10 +140,7 @@ public:
                     << filename << ".chain_" << chain << ".csv";
       std::string command_output;
       try {
-        ptime time_start(boost::posix_time::microsec_clock::universal_time()); // start timer
-        command_output = run_command(command_chain.str());
-        ptime time_end(boost::posix_time::microsec_clock::universal_time());   // end timer
-        time += (time_end - time_start).total_milliseconds();
+        command_output = run_command(command_chain.str(), time);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command_chain.str();
       }
