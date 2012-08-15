@@ -22,15 +22,15 @@ public:
 std::vector<TestInfo> getTestCases() {
   std::vector<TestInfo> testCases;
   
-  testCases.push_back(TestInfo(128,  2, 250));
-  testCases.push_back(TestInfo(1024, 2, 250));
-  testCases.push_back(TestInfo(4096, 2, 250));
+  testCases.push_back(TestInfo(128,  2, 2000));
+  testCases.push_back(TestInfo(1024, 2, 2000));
+  testCases.push_back(TestInfo(4096, 2, 2000));
   
-  /*testCases.push_back(TestInfo(128,  8, 150));
-  testCases.push_back(TestInfo(1024, 8, 150));
-  testCases.push_back(TestInfo(4096, 8, 150));
+  testCases.push_back(TestInfo(128,  8, 2000));
+  testCases.push_back(TestInfo(1024, 8, 2000));
+  testCases.push_back(TestInfo(4096, 8, 2000));
   
-  testCases.push_back(TestInfo(128,  32, 300));
+  /*testCases.push_back(TestInfo(128,  32, 300));
   testCases.push_back(TestInfo(1024, 32, 300));
   testCases.push_back(TestInfo(4096, 32, 300));
   
@@ -163,7 +163,7 @@ public:
   
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(samples.str(), 2U,
+    stan::mcmc::read_variables(samples.str(), 3U,
                                names, dimss);
 
     stan::mcmc::chains<> chains(num_chains, names, dimss);
@@ -171,7 +171,7 @@ public:
       samples.str("");
       samples << path << get_path_separator()
               << filename << ".chain_" << chain << ".csv";
-      stan::mcmc::add_chain(chains, chain, samples.str(), 2U);
+      stan::mcmc::add_chain(chains, chain, samples.str(), 3U);
     }
     return chains;
   }
