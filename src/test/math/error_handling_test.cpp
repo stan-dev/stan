@@ -1240,7 +1240,7 @@ TEST(MathErrorHandling,CheckGreaterOrEqualMatrixErrnoPolicy) {
   result = 0;
   x_vec   << -1, 0,  1;
   low = std::numeric_limits<double>::infinity();
-  EXPECT_FALSE(check_greater_or_equal(function, x, low, "x", &result, errno_policy()))
+  EXPECT_FALSE(check_greater_or_equal(function, x_vec, low, "x", &result, errno_policy()))
     << "check_greater_or_equal: matrix<3,1>, double, should fail with infinity";
   EXPECT_FALSE(!std::isnan(result));
   
