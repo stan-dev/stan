@@ -17,7 +17,7 @@ MISSING_MODEL_TESTS := $(shell find src/models -type f -name '*.stan')
 MISSING_MODEL_TESTS := $(MISSING_MODEL_TESTS:src/models/%.stan=models/%)
 MISSING_MODEL_TESTS := $(filter-out $(MODEL_TESTS:test/%=%),$(MISSING_MODEL_TESTS))
 .PHONY: test-models
-test-models: $(addprefix runtest/,$(MODEL_TESTS))
+test-models: $(addprefix runtest_no_fail/,$(MODEL_TESTS))
 ifneq ($(MISSING_MODEL_TESTS),)
 	@echo 
 	@echo '-------------------- Missing $(words $(MISSING_MODEL_TESTS)) tests --------------------'
@@ -31,7 +31,7 @@ endif
 BUGS_TESTS := $(shell find src/test/models/bugs_examples -type f -name '*_test.cpp')
 BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
 .PHONY: test-bugs
-test-bugs: $(addprefix runtest/,$(BUGS_TESTS))
+test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
 
 ##
 # Target to build unit tests. All unit tests are in src/test 
@@ -75,8 +75,8 @@ $(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
-	$@ --gtest_output="xml:$(basename $@).xml"
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest_no_fail/,$(MAKECMDGOALS)),)
+	-$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
 ##
@@ -130,6 +130,12 @@ endif
 runtest/% : %$(EXE)
 	@echo '------------------------------------------------------------'
 	$< --gtest_output="xml:$*.xml";
+
+.PHONY: runtest_no_fail/%
+.SECONDARY:
+runtest_no_fail/% : %$(EXE)
+	@echo '------------------------------------------------------------'
+	-$< --gtest_output="xml:$*.xml";
 
 ##
 # target path_separator for use in some tests that need to 
