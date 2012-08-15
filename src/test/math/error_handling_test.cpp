@@ -1115,7 +1115,7 @@ TEST(MathErrorHandling,CheckGreaterOrEqualMatrixDefaultPolicy) {
   
   x_vec   << -1, 0,  1;
   low = std::numeric_limits<double>::infinity();
-  EXPECT_THROW(check_greater_or_equal(function, x, low, "x", &result), std::domain_error) 
+  EXPECT_THROW(check_greater_or_equal(function, x_vec, low, "x", &result), std::domain_error) 
     << "check_greater_or_equal: matrix<3,1>, double, should fail with infinity";
   
   // x, low_vec
