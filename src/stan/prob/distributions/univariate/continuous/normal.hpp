@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -210,7 +213,18 @@ namespace stan {
     }
 
 
- 
+    template <typename T_loc, typename T_scale, class RNG>
+    inline double
+    normal_random(const T_loc& mu, const T_scale& sigma, RNG& rng) {
+      using boost::variate_generator;
+      using boost::normal_distribution;
+      using stan::math::value_of;
+      variate_generator<RNG&, normal_distribution<> >
+        rng_unit_norm(rng, normal_distribution<>());
+      return value_of(mu)  + value_of(sigma) * rng_unit_norm();
+    }
+
+
   }
 }
 #endif
