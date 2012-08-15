@@ -1209,13 +1209,14 @@ The variables are all declared as either matrix or vector types.
 The result of the matrix-vector multiplication \code{x * beta} in the
 model block is a vector of the same length as \code{y}.  
 
-The probability function documentation in \refpart{built-in-functions} indicates which
-of \Stan's probability functions support vectorization.  Vectorized
-probability functions accept either vector or scalar inputs for all
-arguments, with the only restriction being that all vector arguments
-are the same dimensionality.  In the example above, \code{y} is a
-vector of size \code{N}, \code{x * beta} is a vector of size \code{N},
-and \code{1} is a scalar.
+The probability function documentation in \refpart{built-in-functions}
+indicates which of \Stan's probability functions support
+vectorization; see \refsection{prob-vectorization} for more
+information.  Vectorized probability functions accept either vector or
+scalar inputs for all arguments, with the only restriction being that
+all vector arguments are the same dimensionality.  In the example
+above, \code{y} is a vector of size \code{N}, \code{x * beta} is a
+vector of size \code{N}, and \code{1} is a scalar.
 
 \section{Exploiting Sufficient Statistics}
 

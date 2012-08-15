@@ -1428,7 +1428,7 @@ expression.  For instance, it is legal syntactically to write
 \begin{quote}
 \begin{Verbatim}
 data {
-    double(0,) y;
+    real(0,) y;
 }
 model {
     ....
@@ -2038,12 +2038,12 @@ kind of each variable next to its declaration.
 data {
   int[0,] N;                // unmodeled data
   real y[N];                // modeled data
-  double mu_mu;             // config. unmodeled param
-  double(0,) sigma_mu;      // config. unmodeled param
+  real mu_mu;             // config. unmodeled param
+  real(0,) sigma_mu;      // config. unmodeled param
 }
 transformed data {
-  double(0,) alpha;         // const. unmodeled param
-  double(0,) beta;          // const. unmodeled param
+  real(0,) alpha;         // const. unmodeled param
+  real(0,) beta;          // const. unmodeled param
   alpha <- 0.1;       
   beta <- 0.1;
 } 
@@ -2052,7 +2052,7 @@ parameters {
   real[0,] tau_y;           // modeled param
 } 
 transformed parameters {
-  double(0,) sigma_y;       // derived quantity (param)
+  real(0,) sigma_y;       // derived quantity (param)
   sigma_y <- pow(tau_y,-0.5);
 }
 model {
@@ -2062,7 +2062,7 @@ model {
     y[n] ~ normal(mu_y,sigma_y);
 }
 generated quantities {
-  double y_rep[N];          // derived quantity (replicate)
+  real y_rep[N];          // derived quantity (replicate)
   for (n in 1:N)
     y_rep[n] <- rand_normal(mu_y,sigma_y);
 }
