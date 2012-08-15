@@ -30,7 +30,8 @@ namespace stan {
      * @param[in] x Real parameters
      * @param[in,out] m Momentum.
      * @param[in,out] g Gradient at x, z.
-     * @param[in] epsilon Step size used in Hamiltonian dynamics
+     * @param[in] epsilon Step size used in Hamiltonian dynamics.
+     * @param[in,out] error_msgs Output stream for error messages.
      * 
      * @return the log probability of x and m.
      */
@@ -46,7 +47,6 @@ namespace stan {
         logp = model.grad_log_prob(x, z, g);
       } catch (std::domain_error e) {
         if (error_msgs) {
-        // FIXME: remove output
           *error_msgs << std::endl
                       << "****************************************" 
                       << "****************************************" 

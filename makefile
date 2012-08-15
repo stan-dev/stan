@@ -171,6 +171,14 @@ ifneq (,$(filter runtest/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst runtest/,,$(MAKECMDGOALS)))
 endif
 
+ifneq (,$(filter-out runtest_no_fail/%,$(filter-out clean%,$(MAKECMDGOALS))))
+  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+endif
+
+ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
+endif
+
 
 ##
 # Clean up.

@@ -122,7 +122,7 @@ namespace stan {
        * Construct a resizable stack allocator initially holding the
        * specified number of bytes.
        *
-       * @param $initial_nbytes Initial number of bytes for the
+       * @param initial_nbytes Initial number of bytes for the
        * allocator.  Defaults to <code>(1 << 16) = 64KB</code> initial bytes.
        * @throws std::runtime_error if the underlying malloc is not 8-byte
        * aligned.
@@ -160,7 +160,7 @@ namespace stan {
        * This function may call C++'s <code>malloc()</code> function,
        * with any exceptions percolated throught this function.
        *
-       * @param size_t $len Number of bytes to allocate.
+       * @param len Number of bytes to allocate.
        * @return A pointer to the allocated memory.
        */
       inline void* alloc(size_t len) {
