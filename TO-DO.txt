@@ -7,7 +7,10 @@ STAN V1.0
 
 * speed tests relative to JAGS
 
-* revise home page (see below)
+* revise home page (see below) 
+  -- content see below and in web/index.html
+  -- launch on mc-stan.org
+
 
 
 HOME PAGE
@@ -39,7 +42,7 @@ Why does someone show up on the home page?
  - How to cite Stan
    now: Arxiv/JMLR paper NUTS, manual/web site for Stan
  - older versions
-
+c++
 
 
 CODE CLEANUP
@@ -67,8 +70,28 @@ CODE CLEANUP
 
 
 
-Stan-R
+RStan
 ======================================================================
+
+* group dimensions of multivariate params somehow
+  -- perhaps share scale?
+
+* print for each parameter, with default and config in plot(stan.fit).
+  -- log ESS,
+  -- log R-hat, and
+  -- stacked per-chain medians + intervals
+     ++ combined chains
+  -- overlaid density estimates 
+     ++ combined chains
+  -- stacked histograms (sparklines-like)
+  ?? autocorrelation plot
+  -- traceplot
+  -- MCMC std error
+  -- posterior sd
+
+* control number of digits in output
+  -- low default to make Andrew happy
+  -- have it depend on se scale?
 
 * order of plots should match declaration order
 
@@ -120,6 +143,12 @@ EXTENSIONS
 
 Sampling
 ----------------------------------------------------------------------
+
+* allow cross-chain sharing of adaptation parameters
+  to recover from a subset of chains going off the rails during
+  warmup
+
+* set mass matrix from the parameters
 
 * discrete samplers (Matt)
   - Gibbs for small outcome sets
@@ -225,6 +254,9 @@ Modeling Language
 
 * Allow normal_log(y|0,1) as parser synonym for normal_log(y,0,1)
 
+* have sampling categorical variables raise an error on parse
+  if it doesn't already
+
 * warnings
   - a <- foo(theta) if LHS contains variable: overwrite var
   - a ~ foo(theta)  if LHS is complex expression: need Jacobian
@@ -305,11 +337,29 @@ Stanc Compiler
   need to evaluate auto-dif when just evaluating function
 
 * Stan safe mode to compile BUGS/JAGS-compliant models
+  - allows more error checking and optimization
 
+* More precompilation into object files.
+  -- Pros:  faster compiles
+  -- Cons:  it makes the code more difficult to manage
+            and less flexible by requiring redundancy 
+            and preinstation of templates
+* More targeted imports.  
+  -- Pros:  faster compiles because less code to read
+  -- Cons:  may defeat precompiled headers
 
 
 Command-line
 ----------------------------------------------------------------------
+
+* write analyze command to read in output and do analysis a la print in RStan
+
+* allow multiple chains to be run from single command
+  -- allow this to optionally call analyze on results
+
+
+* allow Stan to read data in multiple formats (particulary CSV)
+  -- and allow multiple files to be specified for single run
 
 * allow configuration of target reject rate in step-size adaptation
 
@@ -341,6 +391,19 @@ Command-line
 
 C++ API
 ----------------------------------------------------------------------
+
+* memcpy faster than copy ctor and operator= for var?
+
+* remove dependence of prob functions like normal_log on agrad, 
+  Eigen matrices, etc.
+  -- does this even matter any more?
+
+* better way of declaring polymorphic vectorized functions
+  -- { Eigen vector, Eigen row vector, Eigen matrix, std vector}^N
+  -- ideally just with normal_log(reals,reals,reals)
+  -- push through manual, too
+
+* unfold logistic and linear regression auto-difs
 
 * allow user-defined extensions
 
@@ -403,6 +466,13 @@ C++ API
 Special Functions, Probability Functions and Distributions
 ----------------------------------------------------------------------
 * break out body of error handling to get isnan if/else inlined
+
+* handle covariance or correlation matrix of an AR1 process. 
+If rho is the auto-regressive parameter, the entries of the 
+correlation matrix are powers of rho. And the precision matrix 
+is tridiagonal and known analytically. So, 
+it would be inefficient to plow that through 
+multivariate_normal_log().
 
 * beta distro with mean plus "precision" params
   - beta_mean_log(theta|phi,kappa)
@@ -574,6 +644,8 @@ Models
   - something we don't have to get too involved vetting
   - ideally things hard to do with other systems
   - or illustrate the unusual parts of our modeling language
+
+* add base class for models
  
 
 New Stuff
@@ -588,6 +660,17 @@ New Stuff
 
 * built-ins to facilitate cross-validation
   - especially on hierarchical models
+
+* allow references in Stan language to make it easy to
+  set eigenvalues + eigenvectors in one call
+
+* tuple types for multiple returns (U,S,V) <- svd(A)
+  -- different than array literals as may have different typed components
+
+* introduce transforms into the Stan language that have the same
+  effect as the declarations, e.g.
+    parameters {  real x; }
+    transformed_parameters { real(0,1) y; y <- lub(y,0,1,lp__); }
 
 * use plain old optimization to get close to a mode
 
@@ -607,6 +690,21 @@ New Stuff
 
 * Riemannian manifold sampling
  - Girolami's method with auto-diff Hessians
+
+* add Gibbs sampling
+
+* add adaptive slice sampling
+  -- will it fit into adaptive_sampler in mcmc?
+  -- goal to minimize number of function evals
+     ++ step out: linear, with log step-in
+     ++ doubling: exp, log step-in (but reject & more evals)
+
+* adapt low-order approximation to an actual mass matrix
+
+* add ensemble/swarm sampler (affine invariant)
+  -- how to calculate ESS given correlations?
+  -- look up proper detailed balance or convergence proof
+  -- use slice or their distro
 
 * multiple imputation
   - when to run it?
@@ -686,6 +784,8 @@ MODELS
   all roots of 1 - SUM_i rho[i]**i to be within unit
   complex circle
 
+* show how to code undirected graphical models in Stan
+
 
 BUGS Models
 ----------------------------------------------------------------------
@@ -730,6 +830,16 @@ for the following, categorized by issue.
 
 MODELING LANGUAGE MANUAL
 ======================================================================
+
+* drop Lucida console font section (?) or link Bigelow and Holmes
+
+* get page numbers back
+
+* step-by-step install
+  - mac, linux, windows
+  - stan, c++, make
+
+* break out sampler chapter in doc to describe multiple samplers
 
 * performance tips
   - compute once and re-use if possible
