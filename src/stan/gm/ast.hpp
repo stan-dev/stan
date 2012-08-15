@@ -52,42 +52,7 @@ namespace stan {
     struct var_type;
     struct vector_var_decl;
 
-    // enum base_expr_type {
-    //   INT_T,
-    //   DOUBLE_T,
-    //   VECTOR_T, // includes: SIMPLEX_T, POS_ORDERED_T
-    //   ROW_VECTOR_T,
-    //   MATRIX_T,
-    //   ILL_FORMED_T // includes: CORR_MATRIX_T, COV_MATRIX_T
-    // };
-
-    // std::ostream& operator<<(std::ostream& o, base_expr_type type) {
-    //   switch (type) {
-    //   case INT_T :
-    //     o << "int";
-    //     break;
-    //   case DOUBLE_T :
-    //     o << "double";
-    //     break;
-    //   case VECTOR_T :
-    //     o << "vector";
-    //     break;
-    //   case ROW_VECTOR_T :
-    //     o << "row vector";
-    //     break;
-    //   case MATRIX_T :
-    //     o << "matrix";
-    //     break;
-    //   case ILL_FORMED_T :
-    //     o << "ill formed";
-    //     break;
-    //   default:
-    //     o << "UNKNOWN";
-    //   }
-    //   return o;
-    // }
-
-    // forward declarable enum hack
+    // forward declarable enum hack (can't fwd-decl enum)
     typedef int base_expr_type;
     const int INT_T = 1;
     const int DOUBLE_T = 2;
@@ -95,16 +60,6 @@ namespace stan {
     const int ROW_VECTOR_T = 4;
     const int MATRIX_T = 5;
     const int ILL_FORMED_T = 6;
-
-    // // can't forward-declare an enum
-    // enum base_expr_type {
-    //   INT_T,
-    //   DOUBLE_T,
-    //   VECTOR_T, // includes: SIMPLEX_T, POS_ORDERED_T
-    //   ROW_VECTOR_T,
-    //   MATRIX_T,
-    //   ILL_FORMED_T // includes: CORR_MATRIX_T, COV_MATRIX_T
-    // };
 
     std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type);
 

@@ -244,14 +244,20 @@ add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
-add_ternary("normal_log");
-add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T,DOUBLE_T); // vectorized
-add("normal_log",DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T); // vectorized
-add("normal_log",DOUBLE_T,DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U)); // vectorized
-add("normal_log",DOUBLE_T,DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
-add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),DOUBLE_T,expr_type(DOUBLE_T,1U)); // vectorized
-add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U),DOUBLE_T); // vectorized
-add("normal_log",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
+
+std::vector<expr_type> vector_types;
+vector_types.push_back(DOUBLE_T);                  // scalar
+vector_types.push_back(expr_type(DOUBLE_T,1U));    // std vector
+vector_types.push_back(VECTOR_T);                  // Eigen vector
+vector_types.push_back(ROW_VECTOR_T);              // Eigen row vector
+
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("normal_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+
 add_ternary("pareto_log");
 add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_ternary("scaled_inv_chi_square_log");
