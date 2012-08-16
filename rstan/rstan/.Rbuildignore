@@ -41,4 +41,3 @@ Rbuildignore.*$
 .*\.so$
 .*\.o$
 .*\.out$
-.*\.rds$

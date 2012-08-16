@@ -91,14 +91,9 @@ is.sm.valid <- function(sm) {
   # 
   # Args:
   #   sm: the stanmodel object 
-  # Note:  
-  # This depends on currently that we return R_NilValue
-  # in the `src` when calling cxxfunction. 
   # 
   fx <- sm@.modelmod$cxxfun 
-  r <- tryCatch(fx(), error = function(e) FALSE)
-  if (is.null(r)) return(TRUE) 
-  FALSE
+  !is.null.cxxfun(fx) 
 } 
 
 ##

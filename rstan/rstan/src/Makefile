@@ -5,7 +5,7 @@ SHLIB = rstan.so
 USERLIB = libstan$(DYLIB_EXT)
 
 
-OBJECTS = stanc.o gm__grammars__whitespace_grammar_inst.o gm__grammars__program_grammar_inst.o gm__grammars__statement_grammar_inst.o  gm__ast_def.o gm__grammars__var_deccls_grammar_inst.o gm__grammars__expression_grammar_inst.o chains.o
+OBJECTS = stanc.o gm__grammars__whitespace_grammar_inst.o gm__grammars__program_grammar_inst.o gm__grammars__statement_grammar_inst.o  gm__ast_def.o gm__grammars__var_deccls_grammar_inst.o gm__grammars__expression_grammar_inst.o chains.o misc.o 
 
 LIBSTANOBJECTS = agrad__agrad.o agrad__matrix.o math__matrix.o
 

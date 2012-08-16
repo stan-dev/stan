@@ -992,3 +992,15 @@ makeconf.path <- function() {
     return(file.path(R.home(component = 'etc'), 'Makeconf'))
   return(file.path(R.home(component = 'etc'), arch, 'Makeconf'))
 } 
+
+is.null.ptr <- function(ns) {
+  .Call("is_Null_NS", ns)
+}
+
+is.null.cxxfun <- function(cx) {
+  # Tell if the returned object from cxxfunction in package inline
+  # contains null pointer 
+  add <- body(cx@.Data)[[2]]
+  # add is of class NativeSymbol
+  .Call("is_Null_NS", add)
+}
