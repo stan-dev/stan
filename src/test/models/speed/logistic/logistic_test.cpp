@@ -5,7 +5,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/csv_writer.hpp>
 #include <stan/mcmc/chains.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/binomial.hpp>
 
@@ -23,15 +22,15 @@ public:
 std::vector<TestInfo> getTestCases() {
   std::vector<TestInfo> testCases;
   
-  testCases.push_back(TestInfo(128,  2, 250));
-  testCases.push_back(TestInfo(1024, 2, 250));
-  testCases.push_back(TestInfo(4096, 2, 250));
+  testCases.push_back(TestInfo(128,  2, 2000));
+  testCases.push_back(TestInfo(1024, 2, 2000));
+  testCases.push_back(TestInfo(4096, 2, 2000));
   
-  /*testCases.push_back(TestInfo(128,  8, 150));
-  testCases.push_back(TestInfo(1024, 8, 150));
-  testCases.push_back(TestInfo(4096, 8, 150));
+  testCases.push_back(TestInfo(128,  8, 2000));
+  testCases.push_back(TestInfo(1024, 8, 2000));
+  testCases.push_back(TestInfo(4096, 8, 2000));
   
-  testCases.push_back(TestInfo(128,  32, 300));
+  /*testCases.push_back(TestInfo(128,  32, 300));
   testCases.push_back(TestInfo(1024, 32, 300));
   testCases.push_back(TestInfo(4096, 32, 300));
   
@@ -132,8 +131,6 @@ public:
    * @return Elapsed time running the commands in milliseconds.
    */
   long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
-    using boost::posix_time::ptime;
-
     long time = 0;
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::stringstream command_chain;
@@ -143,10 +140,7 @@ public:
                     << filename << ".chain_" << chain << ".csv";
       std::string command_output;
       try {
-        ptime time_start(boost::posix_time::microsec_clock::universal_time()); // start timer
-        command_output = run_command(command_chain.str());
-        ptime time_end(boost::posix_time::microsec_clock::universal_time());   // end timer
-        time += (time_end - time_start).total_milliseconds();
+        command_output = run_command(command_chain.str(), time);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command_chain.str();
       }
@@ -169,7 +163,7 @@ public:
   
     std::vector<std::string> names;
     std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(samples.str(), 2U,
+    stan::mcmc::read_variables(samples.str(), 3U,
                                names, dimss);
 
     stan::mcmc::chains<> chains(num_chains, names, dimss);
@@ -177,7 +171,7 @@ public:
       samples.str("");
       samples << path << get_path_separator()
               << filename << ".chain_" << chain << ".csv";
-      stan::mcmc::add_chain(chains, chain, samples.str(), 2U);
+      stan::mcmc::add_chain(chains, chain, samples.str(), 3U);
     }
     return chains;
   }
