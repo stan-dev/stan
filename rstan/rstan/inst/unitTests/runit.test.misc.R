@@ -147,6 +147,11 @@ test.mklist <- function() {
   b <- rstan:::mklist(c("x", "y")) 
   checkTrue(identical(a, b)) 
 } 
+
+test.makeconf.path <- function() {
+  p <- makeconf.path()  
+  checkTrue(file.exists(makeconf.path()))
+} 
  
 .tearDown <- function() {
   unlink('tmp.stan') 

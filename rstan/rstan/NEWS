@@ -1,3 +1,10 @@
+1. Bug fixes
+   * not working binary build for Mac (not fixed last time) (?)
+
+2. New features 
+   * add makeconf.path function to obtain the full path for file Makeconf 
+
+
 Sat Aug 11 2012:
 1. Bug fixes
    * plot for stanfit wide y-axis 
@@ -5,7 +12,7 @@ Sat Aug 11 2012:
    * not working binary build for Mac, this is because variables for 
      the path of header files are using values when they are built.  
 
-2. New functionality 
+2. New features
    * add standard error of mean (SE.Mean) to print of stanfit 
    * function stan allow suing previous fitted stanfit object by adding
      parameter 'fit'

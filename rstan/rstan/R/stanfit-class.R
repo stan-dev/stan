@@ -36,7 +36,7 @@ printstanfit <- function(x, pars = x@sim$pars.oi,
 
   sampler <- attributes(x@sim$samples[[1]])$args$sampler 
   cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
-  cat("For each parameters, ESS is a crude measure of effective samples size,\n") 
+  cat("For each parameter, ESS is a crude measure of effective samples size,\n") 
   cat("and Rhat is the potential scale reduction factor on split chains (at \n")
   cat("convergence, Rhat=1).\n")
 }  
@@ -50,7 +50,8 @@ setMethod("plot", signature = "stanfit",
             pars <- if (missing(pars) && missing(y)) x@sim$pars.oi else check.pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary.sim(x@sim), envir = x@.MISC)
-            stan.plot.inferences(x@sim, x@.MISC$summary, pars, display.parallel, ...) 
+            info <- list(model.name = x@model.name, model.date = x@.MISC$date) 
+            stan.plot.inferences(x@sim, x@.MISC$summary, pars, info, display.parallel, ...) 
           }) 
 
 setGeneric(name = "get.stancode",

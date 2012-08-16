@@ -12,6 +12,7 @@ export (
   stan,
   stan.rdump,
   read.rdump,
+  makeconf.path,
   rstan.options 
 # get.rstan.options
 )

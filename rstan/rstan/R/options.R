@@ -34,6 +34,8 @@
                    maxColorValue = 255)
 
   assign("plot.rhat.breaks", c(1.1, 1.2, 1.5, 2), e)
+  # in this default setting, 
+  # if rhat < rhat.breaks[i], the color is rhat.cols[i]
   assign("plot.rhat.cols", rhat.cols, e)
 
   # when R-hat is NA, NaN, or Inf

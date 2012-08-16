@@ -367,26 +367,45 @@ stan.rdump <- function(list, file, append = FALSE,
 get.rhat.cols <- function(rhats) {
   # 
   # Args:
-  #   rhat: a scale 
+  #   rhat: a scalar 
   #
   rhat.na.col <- rstan.options("plot.rhat.na.col")
   rhat.breaks <- rstan.options("plot.rhat.breaks")
   # print(rhat.breaks)
   rhat.colors <- rstan.options("plot.rhat.cols")
-  
+
   sapply(rhats, 
          FUN = function(x) {
            if (is.na(x) || is.nan(x) || is.infinite(x))
              return(rhat.na.col)           
            for (i in 1:length(rhat.breaks)) {
              # cat("i=", i, "\n")
-             if (x >= rhat.breaks[i]) 
-               next
+             if (x >= rhat.breaks[i]) next
              return(rhat.colors[i])
            }  
            rstan.options("plot.rhat.large.col")
 		 })  
 }
+
+plot.rhat.legend <- function(x, y, height, p.cex) { 
+  rhat.breaks <- rstan.options("plot.rhat.breaks")
+  n.breaks <- length(rhat.breaks) 
+  rhat.colors <- rstan.options("plot.rhat.cols")[1:n.breaks] 
+  rhat.legend.txts <- c(paste("< ", rhat.breaks, sep = ''), 
+                        paste(">= ", max(rhat.breaks), sep = ''))
+  rhat.legend.cols <- c(rhat.colors, rstan.options('plot.rhat.large.col')) 
+  rhat.legend.width <- strwidth(rhat.legend.txts) 
+  rhat.rect.width <- strwidth("r-hat  ") 
+  text(x, y, label = 'R-hat: ')  
+  s1 <- strwidth('R-hat: ') 
+  starts <- x + c(s1, s1 + cumsum(rhat.rect.width + rhat.legend.width)) 
+
+  for (i in 1:length(rhat.legend.cols)) {
+    rect(starts[i], y, starts[i] + rhat.rect.width, y + height, col = rhat.legend.cols[i], border = NA) 
+    text(starts[i] + rhat.rect.width, y, label = rhat.legend.txts[i], cex = p.cex) 
+  } 
+} 
+  
 
 read.rdump <- function(f) {
   # Read data defined in an R dump file to an R list
@@ -771,11 +790,12 @@ organize.inits <- function(inits, pars, dims) {
 
 # ported from bugs.plot.inferences in R2WinBUGS  
 # 
-stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, ...) {
+stan.plot.inferences <- function(sim, summary, pars, model.info, display.parallel = FALSE, ...) {
   # 
   # Args:
   #   sim: the sim list in stanfit object
   #   pars: parameters of interest
+  #   model.info: names list with elements model.name and model.date 
   #   display.parallel
 
   alert.col <- rstan.options("rstan.alert.col")
@@ -826,6 +846,14 @@ stan.plot.inferences <- function(sim, summary, pars, display.parallel = FALSE, .
        ann = FALSE, bty = "n", xaxt = "n", yaxt = "n", type = "n")
   if (!is.R())
     options(warn = warn.settings)
+
+  # plot the model general information 
+  header <- paste("Stan model '", model.info$model.name, "' (", n.chains, 
+                  " chains: n.iter=", sim$n.iter, "; n.burnin=", sim$n.warmup, 
+                  "; n.thin=", sim$n.thin, ") fitted at ",
+                  model.info$model.date, sep = '') 
+  # side: (1=bottom, 2=left, 3=top, 4=right)
+  mtext(header, side = 3, outer = TRUE, line = -1, cex = .7)
 
   W <- max(strwidth(pars, cex = cex.names))
   # the max width of the variable names 
@@ -957,3 +985,10 @@ legitimate.model.name <- function(name) {
 } 
 
 boost.url <- function() {"http://www.boost.org/users/download/"} 
+
+makeconf.path <- function() {
+  arch <- .Platform$r_arch
+  if (arch == '') 
+    return(file.path(R.home(component = 'etc'), 'Makeconf'))
+  return(file.path(R.home(component = 'etc'), arch, 'Makeconf'))
+} 

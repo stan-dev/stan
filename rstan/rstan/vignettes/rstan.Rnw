@@ -175,7 +175,7 @@ schools.code <- '
   data {
     int[0,] J; // number of schools 
     real y[J]; // estimated treatment effects
-    real[0,] sigma_y[J]; // s.e. of effect estimates 
+    real[0,] sigma[J]; // s.e. of effect estimates 
   } 
   parameters {
     real theta[J]; 
@@ -184,7 +184,7 @@ schools.code <- '
   } 
   model {
     theta ~ normal(mu, tau); 
-    y ~ normal(theta, sigma_y);
+    y ~ normal(theta, sigma);
   } 
 '
 @
@@ -194,7 +194,7 @@ in \R, we have
 <<echo=TRUE>>=
 dat <- list(J = 8, 
             y = c(28,  8, -3,  7, -1,  1, 18, 12),
-            sigma_y = c(15, 10, 16, 11,  9, 11, 10, 18))
+            sigma = c(15, 10, 16, 11,  9, 11, 10, 18))
 @
 
 Next, we can function \code{stan} to sample from the model. 
