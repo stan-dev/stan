@@ -61,13 +61,10 @@ stan.model <- function(file,
   cat("COMPILING THE C++ CODE FOR MODEL '", model.name, "' NOW.\n", sep = '') 
   if (!is.null(boost.lib)) { 
     old.boost.lib <- rstan.options(boost.lib = boost.lib) 
-    tryCatch(fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
-                               includes = inc, plugin = "rstan", verbose = verbose),
-             error = function(e) {rstan.options(boost.lib = old.boost.lib); stop(e)})
-  } else {
-    fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
-                      includes = inc, plugin = "rstan", verbose = verbose) 
+    on.exit(rstan.options(boost.lib = old.boost.lib)) 
   } 
+  fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
+                    includes = inc, plugin = "rstan", verbose = verbose) 
                
   mod <- Module(model.cppname, getDynLib(fx)) 
   # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
@@ -122,7 +119,8 @@ stan <- function(file, model.name = "anon_model",
   #   A S4 class stanfit object  
 
   if (is(fit, "stanfit")) sm <- get.stanmodel(fit)
-  else sm <- stan.model(file, verbose = verbose, model.name, model.code, boost.lib)
+  else sm <- stan.model(file, model.name = model.name, model.code = model.code,
+                        boost.lib = boost.lib, verbose = verbose)
 
   if (missing(sample.file))  sample.file <- NA 
 
