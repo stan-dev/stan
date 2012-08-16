@@ -1,4 +1,4 @@
-\pagestyle{empty}\part{Introduction}
+\part{Introduction}
 
 
 \chapter{Overview}
@@ -634,15 +634,16 @@ statistics and conjugate priors explicitly in \Stan to speed this model up.
 
 \section{Comments}
 
-If the character \code{\#} appears on a line, that character and every
-character up to but not including the end of line is ignored.  This is
-the style of comments used in Python, R, and the shell.  
-
-If the character pair \code{//} appears together on a line, that pair
-and every character up to but not including the end of line is
-ignored.  This is the style of comments used in C.  This is the
-preferred commenting style for line-based comments and for commenting
+If the character pair \code{//} appears together on a line, that pair 
+and every character up to but not including the end of line is 
+ignored.  This is the style of comments used in C.  This is the 
+preferred commenting style for line-based comments and for commenting 
 out code.
+
+The character \code{\#} behaves the same way as the character pair
+\code{//}.  If \code{#} appears on a line, that character and every
+character up to but not including the end of line is ignored.  This is
+the style of comments used in Python, R, and Unix shell scripts.  
 
 \Stan also supports \Cpp comment style in which any content placed
 between \code{/*} and \code{*/} is ignored along with the boundary
