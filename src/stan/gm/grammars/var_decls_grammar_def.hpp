@@ -580,20 +580,41 @@ namespace stan {
                     [ _pass = set_int_range_upper_f(_val,_1,
                                                     boost::phoenix::ref(error_msgs_)) ] ) )
            | 
-           ( 
-            -(lit("upper")
-              > lit('=')
-              > expression_g
-              [ _pass = set_int_range_upper_f(_val,_1,
-                                               boost::phoenix::ref(error_msgs_)) ])
-            > -(lit(',')
-                > lit("lower")
-                > lit('=')
-                > expression_g
-                  [ _pass = set_int_range_lower_f(_val,_1,
-                                                  boost::phoenix::ref(error_msgs_)) ]) )
+           ( lit("upper")
+             > lit('=')
+             > expression_g
+             [ _pass = set_int_range_upper_f(_val,_1,
+                                             boost::phoenix::ref(error_msgs_)) ])
             )
         > lit('>');
+
+        // > ( 
+        //    ( (lit("lower")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_int_range_lower_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //      > -( lit(',')
+        //           > lit("upper")
+        //           > lit('=')
+        //           > expression_g
+        //             [ _pass = set_int_range_upper_f(_val,_1,
+        //                                             boost::phoenix::ref(error_msgs_)) ] ) )
+        //    | 
+        //    ( 
+        //     -(lit("upper")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_int_range_upper_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //     > -(lit(',')
+        //         > lit("lower")
+        //         > lit('=')
+        //         > expression_g
+        //           [ _pass = set_int_range_lower_f(_val,_1,
+        //                                           boost::phoenix::ref(error_msgs_)) ]) )
+        //     )
+        // > lit('>');
 
       range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r 
@@ -611,20 +632,41 @@ namespace stan {
                     [ _pass = set_double_range_upper_f(_val,_1,
                                                     boost::phoenix::ref(error_msgs_)) ] ) )
            | 
-           ( 
-            -(lit("upper")
-              > lit('=')
-              > expression_g
-              [ _pass = set_double_range_upper_f(_val,_1,
-                                               boost::phoenix::ref(error_msgs_)) ])
-            > -(lit(',')
-                > lit("lower")
-                > lit('=')
-                > expression_g
-                  [ _pass = set_double_range_lower_f(_val,_1,
-                                                  boost::phoenix::ref(error_msgs_)) ]) )
+           ( lit("upper")
+             > lit('=')
+             > expression_g
+               [ _pass = set_double_range_upper_f(_val,_1,
+                                                  boost::phoenix::ref(error_msgs_)) ])
             )
         > lit('>');
+
+        // > ( 
+        //    ( (lit("lower")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_double_range_lower_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //      > -( lit(',')
+        //           > lit("upper")
+        //           > lit('=')
+        //           > expression_g
+        //             [ _pass = set_double_range_upper_f(_val,_1,
+        //                                             boost::phoenix::ref(error_msgs_)) ] ) )
+        //    | 
+        //    ( 
+        //     -(lit("upper")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_double_range_upper_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //     > -(lit(',')
+        //         > lit("lower")
+        //         > lit('=')
+        //         > expression_g
+        //           [ _pass = set_double_range_lower_f(_val,_1,
+        //                                           boost::phoenix::ref(error_msgs_)) ]) )
+        //     )
+        // > lit('>');
 
 
       // range_brackets_double_r.name("double range expression pair, brackets");
