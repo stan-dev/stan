@@ -2,7 +2,7 @@ all: symbols.rds $(SHLIB) libstanLibrary
 LIBSTAN = ../inst/libstan
 SHLIB = rstan.so
 
-USERLIB = libstan$(DYLIB_EXT)
+USERLIB = libstan.a
 
 
 OBJECTS = stanc.o gm__grammars__whitespace_grammar_inst.o gm__grammars__program_grammar_inst.o gm__grammars__statement_grammar_inst.o  gm__ast_def.o gm__grammars__var_deccls_grammar_inst.o gm__grammars__expression_grammar_inst.o chains.o misc.o 
@@ -25,15 +25,19 @@ CXXFLAGS = -O3 $(LTO)
 SHLIB_LDFLAGS = $(SHLIB_CXXLDFLAGS) 
 SHLIB_LD = $(SHLIB_CXXLD)
 
+$(USERLIB): $(LIBSTANOBJECTS)
+	$(AR) qc $@ $^ 
+	@if test -n "$(RANLIB)"; then $(RANLIB) $@; fi
+
 
 libstanLibrary: $(USERLIB) 
 	-@if test ! -e $(LIBSTAN)$(R_ARCH); then mkdir -p $(LIBSTAN)$(R_ARCH); fi
 	cp $(USERLIB) $(LIBSTAN)$(R_ARCH)
 	rm $(USERLIB) 
 
-$(USERLIB): $(LIBSTANOBJECTS)
-	$(SHLIB_CXXLD) -s -o $(USERLIB) $(LIBSTANOBJECTS) $(SHLIB_CXXLDFLAGS) $(ALL_LIBS)
-	@if test -e "/usr/bin/install_name_tool"; then /usr/bin/install_name_tool -id $(R_PACKAGE_DIR)/libstan/$(R_ARCH)/$(USERLIB) $(USERLIB); fi
+# $(USERLIB): $(LIBSTANOBJECTS)
+#   $(SHLIB_CXXLD) -s -o $(USERLIB) $(LIBSTANOBJECTS) $(SHLIB_CXXLDFLAGS) $(ALL_LIBS)
+#   @if test -e "/usr/bin/install_name_tool"; then /usr/bin/install_name_tool -id $(R_PACKAGE_DIR)/libstan/$(R_ARCH)/$(USERLIB) $(USERLIB); fi
 
 include $(R_SHARE_DIR)/make/shlib.mk
 

@@ -50,6 +50,14 @@
 
   # color for plot chains in trace plot and stan.plot.inferences 
   assign("rstan.chain.cols", rstancolc, e)
+   
+  # set the default number of parameters we are considered 
+  # for plot of stanfit: when the number of parameters in a 
+  # vector/array parameter is less than 
+  # what is set here, we would have empty space. But when the 
+  # number of parameters is larger than max, they are truncated. 
+  assign('plot.standard.npar', 30, e)
+  assign('plot.max.npar', 40, e)
 
   # color for shading the area of warmup trace plot
   assign("rstan.warmup.bg.col", rstan:::rstancolgrey[3], e)

@@ -387,22 +387,27 @@ get.rhat.cols <- function(rhats) {
 		 })  
 }
 
-plot.rhat.legend <- function(x, y, height, p.cex) { 
+plot.rhat.legend <- function(x, y, cex = 1) { 
+  # Args
+  #   x, y: left, bottom corner coordinates 
+  #   cex: cex for the labels 
   rhat.breaks <- rstan.options("plot.rhat.breaks")
   n.breaks <- length(rhat.breaks) 
   rhat.colors <- rstan.options("plot.rhat.cols")[1:n.breaks] 
-  rhat.legend.txts <- c(paste("< ", rhat.breaks, sep = ''), 
-                        paste(">= ", max(rhat.breaks), sep = ''))
+  rhat.legend.txts <- c(paste("< ", rhat.breaks, "  ", sep = ''), 
+                        paste(">= ", max(rhat.breaks), "  ", sep = ''))
   rhat.legend.cols <- c(rhat.colors, rstan.options('plot.rhat.large.col')) 
-  rhat.legend.width <- strwidth(rhat.legend.txts) 
-  rhat.rect.width <- strwidth("r-hat  ") 
-  text(x, y, label = 'R-hat: ')  
-  s1 <- strwidth('R-hat: ') 
+  rhat.legend.width <- strwidth(rhat.legend.txts, cex = cex) 
+  rhat.rect.width <- strwidth("r-hat ", cex = cex) 
+  text(x, y, label = 'Rhat:  ', adj = c(0, 0), cex = cex)  
+  s1 <- strwidth('Rhat:  ', cex = cex) 
   starts <- x + c(s1, s1 + cumsum(rhat.rect.width + rhat.legend.width)) 
+
+  height <- strheight("0123456789<>=", cex = cex)
 
   for (i in 1:length(rhat.legend.cols)) {
     rect(starts[i], y, starts[i] + rhat.rect.width, y + height, col = rhat.legend.cols[i], border = NA) 
-    text(starts[i] + rhat.rect.width, y, label = rhat.legend.txts[i], cex = p.cex) 
+    text(starts[i] + rhat.rect.width, y, adj = c(0, 0), label = rhat.legend.txts[i], cex = cex) 
   } 
 } 
   
@@ -802,30 +807,29 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
   chain.cols <- rstan.options("rstan.chain.cols")
   chain.cols.len <- length(chain.cols) 
 
+  # FIXME: the following if - else for all platforms 
   if (exists('windows'))  dev.fun <- windows 
   if (exists('X11'))  dev.fun <- X11 
   opt.dev <- options("device") 
   if (.Device %in% c("windows", "X11cairo")  ||
       (.Device=="null device" && identical(opt.dev, dev.fun))) {
-    cex.names <- .7
-    cex.axis <- .6
-    cex.tiny <- .4
     cex.points <- .7
-    # the standard number of parameters in an array parameters. 
-    # we have this so that even the # of parameters are less than
-    # 30, we still have equal space between parameters. 
-    standard.width <- 30
-    max.width <- 40
     min.width <- .02
   } else {
-    cex.names <- .7
-    cex.axis <- .6
-    cex.tiny <- .4
     cex.points <- .3
-    standard.width <- 30
-    max.width <- 40
     min.width <- .01
   }
+
+  cex.names <- .7
+  cex.axis <- .6 
+  cex.tiny <- .4 
+  # the standard number of parameters in an array parameters. 
+  # we have this so that even the # of parameters are less than
+  # 30, we still have equal space between parameters for 
+  # the whole plot. 
+  standard.width <- rstan.options('plot.standard.npar') 
+  max.width <- rstan.options('plot.max.npar') 
+
   pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
   n.pars <- length(pars) 
   n.chains <- sim$n.chains
@@ -840,7 +844,9 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
   }
   height <- .6
   # mar: c(bottom, left, top, right)
-  mar.old <- par(mar = c(1, 0, 1, 0))
+  par.old <- par(no.readonly = TRUE)
+  on.exit(par(par.old)) 
+  par(mar = c(1, 0, 1, 0))
 
   plot(c(0, 1), c(-n.pars - .5, -.4), 
        ann = FALSE, bty = "n", xaxt = "n", yaxt = "n", type = "n")
@@ -973,10 +979,12 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
       truncated <- TRUE
     } 
   } 
-  invisible(par(mar = mar.old)) 
+  plot.rhat.legend(0, -n.pars - .5, cex = cex.names)
   if (truncated) {
-    text(0, -n.pars - .5, "*  array truncated for lack of space", adj = 0, cex = cex.names, col = alert.col)
+    text(0, -n.pars - .5 - num.height * 2.5, "*  array truncated for lack of space", 
+         adj = c(0, 0), cex = cex.names, col = alert.col)
   } 
+  invisible(NULL)
 } 
 
 legitimate.model.name <- function(name) {

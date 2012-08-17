@@ -1,14 +1,14 @@
 library(rstan)
 
 model_name <- "_8chools";
-sfile <- "../../src/models/misc/eight_schools/eight_schools_bda.stan"
+sfile <- "../../src/models/misc/eight_schools/eight_schools.stan"
 m <- stan.model(file = sfile, 
                 model.name = model_name, 
                 verbose = TRUE)  
 
 dat <- list(J = 8L, 
             y = c(28,  8, -3,  7, -1,  1, 18, 12),
-            sigma_y = c(15, 10, 16, 11,  9, 11, 10, 18))
+            sigma = c(15, 10, 16, 11,  9, 11, 10, 18))
 
 # sampler <- new(m@.modelmod$sampler, dat)
 # s1 <- sampler$call_sampler(list(iter = n.iter, thin = 1, sample_file = "8schools1.csv", seed = 3, chain_id = 1))

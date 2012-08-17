@@ -44,7 +44,9 @@ static.linking <- function() {
   ## not following Rcpp's link, we only have either dynamic version or static
   ## version because the libraries are big.
   ## (In Rcpp, both versions are compiled.)
- return(.Platform$OS.type == 'windows')
+  # return(.Platform$OS.type == 'windows')
+  # For the time being, use static linking for libstan on all platforms. 
+  TRUE
 }
 
 PKG_CPPFLAGS_env_fun <- function() {
