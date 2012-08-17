@@ -2,8 +2,8 @@
 #  http://www.openbugs.info/Examples/Jaws.html
 
 data {
-  int[0,] N; 
-  int[0,] M; 
+  int<lower=0> N; 
+  int<lower=0> M; 
   vector[M] Y[N]; 
   real age[M]; 
   cov_matrix[M] S; 

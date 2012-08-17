@@ -6,8 +6,8 @@
 # and the s.e. for some parameters
 
 data {
-  int[0,] K;
-  int[0,] N;
+  int<lower=0> K;
+  int<lower=0> N;
   int x[N];
   real Y[K, N]; 
   cov_matrix[3] invR;  
@@ -17,14 +17,14 @@ data {
 }
 
 parameters{
-  real[0,] sigmasq;
+  real<lower=0> sigmasq;
   vector[3]  theta[K]; 
   vector[3]  thetamu; 
   cov_matrix[3] thetavar; 
 } 
 
 transformed parameters {
-  real[0,] sigma; 
+  real<lower=0> sigma; 
   sigma <- sqrt(sigmasq);
 } 
 

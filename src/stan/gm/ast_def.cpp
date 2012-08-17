@@ -26,7 +26,7 @@ namespace stan {
         o << "int";
         break;
       case DOUBLE_T :
-        o << "double";
+        o << "real";
         break;
       case VECTOR_T :
         o << "vector";
@@ -91,7 +91,8 @@ namespace stan {
 
     std::ostream& operator<<(std::ostream& o, const expr_type& et) {
       write_base_expr_type(o,et.type());
-      o << '[' << et.num_dims() << ']';
+      if (et.num_dims() > 0) 
+        o << '[' << et.num_dims() << ']';
       return o;
     }
 

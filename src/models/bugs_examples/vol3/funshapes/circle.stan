@@ -1,8 +1,8 @@
 # http://www.openbugs.info/Examples/Funshapes.html
 
 parameters {
-  real[-1, 1] x; 
-  real[-1, 1] y; 
+  real<lower=-1,upper= 1> x; 
+  real<lower=-1,upper= 1> y; 
 } 
 
 model {

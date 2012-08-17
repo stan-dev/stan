@@ -4,17 +4,17 @@
 # status: error thrown out during execution immediately 
 
 data {
-  int[0,] K;
-  int[0,] N;
+  int<lower=0> K;
+  int<lower=0> N;
   int x[N];
   real Y[K, N]; 
 }
 
 parameters{
-  real[0,] tau_C;
+  real<lower=0> tau_C;
   real theta[K, 3];
   real mu[3]; 
-  real[0,] tau[3];
+  real<lower=0> tau[3];
 } 
 
 transformed parameters {

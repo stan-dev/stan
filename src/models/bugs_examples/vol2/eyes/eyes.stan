@@ -10,17 +10,17 @@
 // latent indicators 
 
 data {
-  int[0,] N; 
+  int<lower=0> N; 
   real y[N]; 
 //  vector[2] alpha;
 } 
 parameters {
-  // int[0,] z[N]; 
-  real[0,] sigmasq;
-  real[0,] theta;
+  // int<lower=0> z[N]; 
+  real<lower=0> sigmasq;
+  real<lower=0> theta;
   real lambda_1; 
   // vector[2] p;
-  real[0, 1] p1; 
+  real<lower=0,upper= 1> p1; 
 } 
 transformed parameters {
     real lambda[2];

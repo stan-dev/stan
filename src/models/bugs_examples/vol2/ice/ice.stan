@@ -11,9 +11,9 @@
 // status: the results are farely cose to those 
 // from JAGS 
 data {
-  int[0,] N; 
-  int[0,] Nage; 
-  int[0,] K; 
+  int<lower=0> N; 
+  int<lower=0> Nage; 
+  int<lower=0> K; 
   int year[N]; 
   int cases[N]; 
   int age[N]; 
@@ -24,7 +24,7 @@ data {
 parameters {
   real alpha[Nage - 1]; 
   real beta[K]; 
-  real[0,1] sigma; 
+  real<lower=0,upper=1> sigma; 
 } 
 
 model {

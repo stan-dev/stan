@@ -1,23 +1,23 @@
 # http://www.openbugs.info/Examples/Blockers.html
 
 data {
-  int[0,] N; 
-  int[0,] nt[N]; 
-  int[0,] rt[N]; 
-  int[0,] nc[N]; 
-  int[0,] rc[N]; 
+  int<lower=0> N; 
+  int<lower=0> nt[N]; 
+  int<lower=0> rt[N]; 
+  int<lower=0> nc[N]; 
+  int<lower=0> rc[N]; 
 } 
 
 parameters {
   real d; 
-  real[0,] sigmasq_delta; 
+  real<lower=0> sigmasq_delta; 
   real mu[N]; 
   real delta[N];
   real delta_new;
 } 
 
 transformed parameters {
-  real[0,] sigma_delta; 
+  real<lower=0> sigma_delta; 
   sigma_delta <- sqrt(sigmasq_delta); 
 } 
 

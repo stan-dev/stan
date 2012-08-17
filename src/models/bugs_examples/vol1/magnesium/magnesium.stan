@@ -17,8 +17,8 @@ data {
 } 
 transformed data {
   int N_priors;
-  real[0,] s0_sq;
-  real[0,] p0_sigma;
+  real<lower=0> s0_sq;
+  real<lower=0> p0_sigma;
 
   N_priors <- 6;
   s0_sq <- 0.1272041; 
@@ -28,17 +28,17 @@ transformed data {
 parameters {
   real mu[N_priors];
   real theta[N_priors, N_studies];
-  real[0,1] pc[N_priors, N_studies];
-  real[0,] inv_tau_sq_1;
-  real[0,50] tau_sq_2;
-  real[0,50] tau_3;
-  real[0,1] B0;
-  real[0,1] D0;
-  real[0,] tau_sq_6;
+  real<lower=0,upper=1> pc[N_priors, N_studies];
+  real<lower=0> inv_tau_sq_1;
+  real<lower=0,upper=50> tau_sq_2;
+  real<lower=0,upper=50> tau_3;
+  real<lower=0,upper=1> B0;
+  real<lower=0,upper=1> D0;
+  real<lower=0> tau_sq_6;
 }
 
 transformed parameters {
-  real[0,] tau[N_priors];
+  real<lower=0> tau[N_priors];
 
   tau[1] <- 1/sqrt(inv_tau_sq_1);
   tau[2] <- sqrt(tau_sq_2);

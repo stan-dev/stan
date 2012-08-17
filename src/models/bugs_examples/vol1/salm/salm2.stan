@@ -2,20 +2,20 @@
 
 ## the version without centering x's 
 data {
-    int[0,]  doses;
-    int[0,]  plates;
-    int[0,]  y[doses,plates];
-    real[0,] x[doses];
+    int<lower=0>  doses;
+    int<lower=0>  plates;
+    int<lower=0>  y[doses,plates];
+    real<lower=0> x[doses];
 }
 parameters {
     real alpha; 
     real beta;
     real gamma;
-    real[0,] tau;
+    real<lower=0> tau;
     real lambda[doses,plates];
 }
 transformed parameters {
-    real[0,] sigma;
+    real<lower=0> sigma;
     sigma <- 1.0 / sqrt(tau);
 }
 model {

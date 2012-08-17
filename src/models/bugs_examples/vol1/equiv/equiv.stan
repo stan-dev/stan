@@ -2,8 +2,8 @@
 #  http://www.openbugs.info/Examples/Equiv.html
 
 data {
-  int[0,] P; 
-  int[0,] N; 
+  int<lower=0> P; 
+  int<lower=0> N; 
   int group[N]; 
   real Y[N, P]; 
   int sign[2];
@@ -20,8 +20,8 @@ parameters {
   real mu;
   real phi; 
   real pi; 
-  real[0,] sigmasq1;
-  real[0,] sigmasq2;
+  real<lower=0> sigmasq1;
+  real<lower=0> sigmasq2;
   real delta[N]; 
 } 
 

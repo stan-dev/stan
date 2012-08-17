@@ -7,23 +7,23 @@
 
 # Data is transformed using data_reorg.R 
 data {
-  int[0,] N_uncensored;
-  int[0,] N_censored;
-  int[0,] M;
-  int[1,M] group_uncensored[N_uncensored];
-  int[1,M] group_censored[N_censored];
-  real[0,] censor_time;
-  real[0,censor_time] t_uncensored[N_uncensored];
+  int<lower=0> N_uncensored;
+  int<lower=0> N_censored;
+  int<lower=0> M;
+  int<lower=1,upper=M> group_uncensored[N_uncensored];
+  int<lower=1,upper=M> group_censored[N_censored];
+  real<lower=0> censor_time;
+  real<lower=0,upper=censor_time> t_uncensored[N_uncensored];
 }
 
 parameters {
-  real[0,] r;
+  real<lower=0> r;
   real beta[M];
-  real[censor_time,] t_censored[N_censored];
+  real<lower=censor_time> t_censored[N_censored];
 }
 
 transformed parameters {
-  real[0,] sigma[M];
+  real<lower=0> sigma[M];
   for (m in 1:M)
     sigma[m] <- exp(-beta[m] / r);
 }

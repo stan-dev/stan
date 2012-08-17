@@ -17,8 +17,8 @@ transformed data {
 }
 parameters {
   real x;
-  real[0,] sd1;
-  real[0,] sd2;
+  real<lower=0> sd1;
+  real<lower=0> sd2;
 }
 transformed parameters {
   real rho;

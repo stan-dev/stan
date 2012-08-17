@@ -9,8 +9,8 @@ data {
 } 
 
 parameters {
-  real[0,] tau_between;
-  real[0,] tau_within; 
+  real<lower=0> tau_between;
+  real<lower=0> tau_within; 
   real theta;
   real mu[BATCHES]; 
 } 

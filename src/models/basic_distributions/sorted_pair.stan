@@ -1,6 +1,6 @@
 parameters {
-    real[-1,1] x1;
-    real[-1,1] x2;
+    real<lower=-1,upper=1> x1;
+    real<lower=-1,upper=1> x2;
 }
 model {
 }

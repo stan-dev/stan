@@ -6,13 +6,13 @@
 ## estimate dof using continuous priors 
 
 data {
-  int[0,] N; 
+  int<lower=0> N; 
   real y[N]; 
 } 
 
 parameters {
   // learning about the dof as a continuous quantity
-  real[2, 100] d; 
+  real<lower=2,upper= 100> d; 
 } 
 
 model {

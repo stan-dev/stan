@@ -2,7 +2,7 @@
 # http://www.openbugs.info/Examples/Camel.html
 
 #   data {
-#     int[0,] N; # N = 12 
+#     int<lower=0> N; # N = 12 
 #     
 #   } 
 
@@ -68,6 +68,6 @@ model {
 } 
 
 generated quantities { 
-  real[-1, 1] rho; 
+  real<lower=-1,upper= 1> rho; 
   rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 
