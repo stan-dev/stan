@@ -137,12 +137,10 @@ namespace stan {
 
     namespace {
       
-      inline
-      void check_range(size_t max,
-                       size_t i, 
-                       const char* msg,
-                       size_t idx) {
-        if (i < 1 || i > max) {
+      void raise_range_error(size_t max,
+                             size_t i, 
+                             const char* msg,
+                             size_t idx) {
           std::stringstream s;
           s << "INDEX OPERATOR [] OUT OF BOUNDS"
             << "; index=" << i
@@ -152,7 +150,15 @@ namespace stan {
             << "; " << msg
             << std::endl;
           throw std::out_of_range(s.str());
-        }
+      }
+
+      inline
+      void check_range(size_t max,
+                       size_t i, 
+                       const char* msg,
+                       size_t idx) {
+        if (i < 1 || i > max) 
+          raise_range_error(max,i,msg,idx);
       }
 
     }
