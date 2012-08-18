@@ -124,6 +124,14 @@ TEST(prob_transform, lub_j) {
                   + log(1.0 - stan::math::inv_logit(x)),
                   lp);
 }
+TEST(ProbTransform, lubException) {
+  using stan::prob::lub_constrain;
+  EXPECT_THROW(lub_constrain(5.0,1.0,1.0), std::domain_error);
+  EXPECT_NO_THROW(lub_constrain(5.0,1.0,1.01));
+  double lp = 12;
+  EXPECT_THROW(lub_constrain(5.0,1.0,1.0,lp), std::domain_error);
+  EXPECT_NO_THROW(lub_constrain(5.0,1.0,1.01,lp));
+}
 TEST(prob_transform, lub_f) {
   double L = -10.0;
   double U = 27.0;

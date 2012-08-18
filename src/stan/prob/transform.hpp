@@ -637,13 +637,35 @@ namespace stan {
      * @tparam T Type of scalar.
      * @tparam TL Type of lower bound.
      * @tparam TU Type of upper bound.
+     * @throw std::domain_error if ub <= lb
      */
     template <typename T, typename TL, typename TU>
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-      using stan::math::inv_logit;
-      return lb + (ub - lb) * inv_logit(x);
+       if (!(lb < ub)) {
+        std::stringstream s;
+        s << "domain error in lub_constrain;  lower bound = " << lb
+          << " must be strictly less than upper bound = " << ub;
+        throw std::domain_error(s.str());
+      }
+      T inv_logit_x;
+      if (x > 0) {
+        T exp_minus_x = exp(-x);
+        inv_logit_x = 1.0 / (1.0 + exp_minus_x);
+        // Prevent x from reaching one unless it really really should.
+        if ((x < std::numeric_limits<double>::infinity()) 
+            && (inv_logit_x == 1))
+            inv_logit_x = 1 - 1e-15;
+      } else {
+        T exp_x = exp(x);
+        inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
+        // Prevent x from reaching zero unless it really really should.
+        if ((x > -std::numeric_limits<double>::infinity()) 
+            && (inv_logit_x== 0))
+            inv_logit_x = 1e-100;
+      }
+      return lb + (ub - lb) * inv_logit_x;
     }
 
     /**
@@ -677,10 +699,17 @@ namespace stan {
      * @tparam T Type of scalar.
      * @tparam TL Type of lower bound.
      * @tparam TU Type of upper bound.
+     * @throw std::domain_error if ub <= lb
      */
     template <typename T, typename TL, typename TU>
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, const TL lb, const TU ub, T& lp) {
+      if (!(lb < ub)) {
+        std::stringstream s;
+        s << "domain error in lub_constrain;  lower bound = " << lb
+          << " must be strictly less than upper bound = " << ub;
+        throw std::domain_error(s.str());
+      }
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -689,7 +718,6 @@ namespace stan {
         // Prevent x from reaching one unless it really really should.
         if ((x < std::numeric_limits<double>::infinity()) 
             && (inv_logit_x == 1))
-
             inv_logit_x = 1 - 1e-15;
       } else {
         T exp_x = exp(x);
