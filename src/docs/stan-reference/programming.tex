@@ -31,13 +31,13 @@ could be coded as follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int[0,] N_obs;
-  int[0,] N_miss;
+  int<lower=0> N_obs;
+  int<lower=0> N_miss;
   real y_obs[N_obs];
 }
 parameters {
   real mu;
-  real[0,] sigma;
+  real<lower=0> sigma;
   real y_miss[N_miss];
 }
 model {
@@ -76,7 +76,7 @@ variances are known, but the covariance is not.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int[0,] N;
+  int<lower=0> N;
   vector[2] y[N];
   double(0,) var1;  double(0,) var2;
 }
@@ -87,7 +87,7 @@ transformed data {
 }
 parameters {
   vector[2] mu;
-  real[min_cov, max_cov] cov;
+  real<lower=min_cov,upper= max_cov> cov;
 }
 transformed parameters {
   matrix[2,2] sigma;
@@ -147,13 +147,13 @@ the observations as follows.
 \begin{quote}
 \begin{Verbatim} 
 data {
-   int[0,] N;
+   int<lower=0> N;
    real U;
-   real[,U] y[N];
+   real<upper=U> y[N];
 } 
 parameters
    real mu;
-   real[0,] sigma;
+   real<lower=0> sigma;
 } 
 model {
   for (n in 1:N)
@@ -179,14 +179,14 @@ known truncation points.
 \begin{quote}
 \begin{Verbatim}
 data {
-   int[1,] N;
+   int<lower=1> N;
    real y[N];
 }
 parameters
-   real[, min(y]) L; 
-   real[max(y], ) U;
+   real<upper = min(y)> L; 
+   real<lower = max(y)> U;
    real mu;
-   real[0,] sigma;
+   real<lower=0> sigma;
 }
 model {
   L ~ ...;  
@@ -202,7 +202,7 @@ be less than or equal to the minimum value of \code{y}.  The upper
 truncation point \code{U} is declared to be larger than the maximum
 value of \code{y}.  This declaration, although dependent on the data,
 only enforces the constraint that the data fall within the truncation
-bounds.  With \code{N} declared as type \code{int[1,]}, there must be
+bounds.  With \code{N} declared as type \code{int<lower=1>}, there must be
 at least one data point.  The constraint that \code{L} is less than
 \code{U} is enforced indirectly, based on the non-empty data.
 
@@ -229,15 +229,15 @@ matrices, the censored values must be represented explicitly.
 \begin{quote}
 \begin{Verbatim}
 data {
-   int[0,] N_obs;
-   int[0,] N_cens;
-   real[0,] y_obs[N_obs];
-   real[max(y_obs),] U;
+   int<lower=0> N_obs;
+   int<lower=0> N_cens;
+   real<lower=0> y_obs[N_obs];
+   real<lower=max(y_obs)> U;
 }
 parameters {
-  real[U,] y[N_cens];
+  real<lower=U> y[N_cens];
   real mu;
-  real[0,] sigma;
+  real<lower=0> sigma;
 }
 model {
    for (n in 1:N_obs)
@@ -251,7 +251,7 @@ model {
 Because the censored data array \code{y} is declared to be a parameter, it
 will be sampled along with the location and scale parameters \code{mu}
 and \code{sigma}.  Because the censored data array \code{y} is
-declared to have values of type \code{real[U,]}, all imputed values
+declared to have values of type \code{real<lower=U>}, all imputed values
 for censored data will be greater than \code{U}.  The imputed censored
 data affects the location and scale parameters through the last
 sampling statement in the model.  
@@ -291,14 +291,14 @@ that the censoring point is known, so it is declared as data.
 \begin{quote}
 \begin{Verbatim}
 data {
-   int[0,] N_obs;
-   int[0,] N_cens;
-   real[0,] y_obs[N_obs];
-   real[max(y_obs),] U;
+   int<lower=0> N_obs;
+   int<lower=0> N_cens;
+   real<lower=0> y_obs[N_obs];
+   real<lower=max(y_obs)> U;
 }
 parameters {
   real mu;
-  real[0,] sigma;
+  real<lower=0> sigma;
 }
 model {
    for (n in 1:N_obs)
@@ -417,14 +417,14 @@ components specified as data yields the following model.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int[1,] K;           // number of mixture components
-  int[1,] N;           // number of data points
+  int<lower=1> K;           // number of mixture components
+  int<lower=1> N;           // number of data points
   real y[N];           // observations
 }
 parameters {
   simplex[K] theta;    // mixing proportions
   real mu[K];          // locations of mixture components
-  real[0,] sigma[K];   // scales of mixture components
+  real<lower=0> sigma[K];   // scales of mixture components
 }
 model {
   real ps[K];          // temp for log component densities
@@ -499,14 +499,14 @@ This latter form of the model is coded in \Stan as follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-   int[0,] N;
+   int<lower=0> N;
    real x[N];
    real y[N];
 }
 parameters {
     real alpha;
     real beta;
-    real[0,] sigma;
+    real<lower=0> sigma;
 }
 model {
     for (n in 1:N)
@@ -573,7 +573,7 @@ sampling distribution is changed to the following.
 \begin{Verbatim}
 data {
     ...
-    real[0,] nu;
+    real<lower=0> nu;
 }
 ...
 model {
@@ -600,9 +600,9 @@ follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int[0,] N;
+    int<lower=0> N;
     real x[N];
-    int[0,1] y[N];
+    int<lower=0,upper=1> y[N];
 }
 parameters {
     real alpha;
@@ -651,8 +651,8 @@ $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-   int[0,] N;
-   int[1,K] y[N];
+   int<lower=0> N;
+   int<lower=1,upper=K> y[N];
    vector[D] x[N];
 }
 parameters {
@@ -714,10 +714,10 @@ The ordered logistic model can be coded in \Stan using the
 \begin{quote}
 \begin{Verbatim} 
 data {
-  int[1,] D;
-  int[2,] K;
-  int[0,] N;
-  int[1,K] y[N];
+  int<lower=1> D;
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1,upper=K> y[N];
   row_vector[D] x[N];
 } 
 parameters {
@@ -749,10 +749,10 @@ An ordered probit model could be coded in a manner similar to the
 \begin{quote}
 \begin{Verbatim}
 data {
-  int[1,] D;
-  int[2,] K;
-  int[0,] N;
-  int[1,K] y[N];
+  int<lower=1> D;
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1,upper=K> y[N];
   row_vector[D] x[N];
 }
 parameters {
@@ -809,15 +809,15 @@ with a hierarchical prior on the regression coefficients.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int[1,] D;
-    int[0,] N;
-    int[1,] L;
-    int[0,1] y[N];
-    int[1,L] ll[N];
+    int<lower=1> D;
+    int<lower=0> N;
+    int<lower=1> L;
+    int<lower=0,upper=1> y[N];
+    int<lower=1,upper=L> ll[N];
 }
 parameters {
     real mu[D];
-    real[0,] sigma[D];
+    real<lower=0> sigma[D];
     vector[D] beta[L];
 }
 model {
@@ -855,7 +855,7 @@ the \Stan program for the AR(1) model is as follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int[0,] N;
+    int<lower=0> N;
     real y[N];
 }
 parameters {
@@ -885,7 +885,7 @@ coefficient \code{beta} may be constrained with bounds as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-    real[-1,1] beta;
+    real<lower=-1,upper=1> beta;
 \end{Verbatim}
 \end{quote}
 %
@@ -918,7 +918,7 @@ predictor in a loop.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int[0,] K;
+    int<lower=0> K;
     ...
 parameters {
     real beta[K];
@@ -974,7 +974,7 @@ $\distro{Triangle}(-1,1)$.
 \begin{quote}
 \begin{Verbatim}
 parameters {
-    real[-1,1] y;
+    real<lower=-1,upper=1> y;
 }
 model {
     lp__ <- lp__ + log1m(fabs(y));
@@ -992,12 +992,12 @@ computation is faster, more accurate, and more stable.
 
 The log probability variable \code{lp\_\_} is incremented in this
 program rather than being set.  This is because the transform involved
-for the bounded variable \code{y} of type \code{real[-1,1]} implicitly
+for the bounded variable \code{y} of type \code{real<lower=-1,upper=1>} implicitly
 adds a term to \code{lp\_\_} to adjust the log probability for the
 transform (adding the log absolute derivative of the inverse
 transform, a scaled inverse logit).
 
-The constrained type \code{real[-1,1]} declared for \code{y} is
+The constrained type \code{real<lower=-1,upper=1>} declared for \code{y} is
 critical for correct sampling behavior.  If the constraint on \code{y}
 is removed from the program, say by declaring \code{y} as having the
 unconstrained scalar type \code{real}, the program would compile, but
@@ -1023,7 +1023,7 @@ sample properly.%
 \footnote{The problem is the (extremely!) light tails of the triangle
   distribution.  The standard \HMC and \NUTS samplers cannot get into the
   corners of the triangle properly.  Because the \Stan code declares
-  \code{y} to be of type \code{real[-1,1]}, the inverse logit
+  \code{y} to be of type \code{real<lower=-1,upper=1>}, the inverse logit
   transform is applied to the unconstrained variable and its log
   absolute derivative added to the log probability.  The resulting
   distribution on the logit-transformed \code{y} is well behaved.  See
@@ -1064,8 +1064,8 @@ coefficients.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int[1,] K;
-    int[1,] N;
+    int<lower=1> K;
+    int<lower=1> N;
     real x[K,N];
     real y[N];
     ...
@@ -1228,13 +1228,13 @@ sampling model.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int[0,] N;
-    int[0,1] y[N];
-    real[0,] alpha;
-    real[0,] beta;
+    int<lower=0> N;
+    int<lower=0,upper=1> y[N];
+    real<lower=0> alpha;
+    real<lower=0> beta;
 }
 parameters {
-    real[0,1] theta;
+    real<lower=0,upper=1> theta;
 }
 model {
     theta ~ beta(alpha,beta);
@@ -1290,7 +1290,7 @@ defined to be \code{sum(y)} could be used in the place of \code{sum(y)}.
 % \begin{quote}
 % \begin{Verbatim}
 % generated quantities {
-%     real[0,1] theta;
+%     real<lower=0,upper=1> theta;
 %     theta ~ random_beta(alpha + sum(y), beta + N - sum(y));
 % }
 % \end{Verbatim}

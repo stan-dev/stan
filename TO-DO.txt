@@ -178,10 +178,18 @@ Sampling
 Modeling Language
 ----------------------------------------------------------------------
 
+* make any C++ reserved word a reserved word so it doesn't
+  mess up C++ compilation
+
+* constants for max and min integer values
+
 * convert all int values to long to match doc!
 
-* add asserts or something to throw exceptions
+* add asserts to the language itself, or something to throw exceptions
   - even a general logger with debug levels?
+
+* add printf statement for debugging purposes
+  - really format or just list params?
 
 * need to pass in randomizer to repeat generated quantities
   - where to do this? 
@@ -245,9 +253,6 @@ Modeling Language
 * matrix power operations
   -  matrix power:    A^n
   - matrix elementwise power:  A.^x
-
-* add printf statement for debugging purposes
-  - really format or just list params?
 
 * Allow normal_log<true> and normal_log<false> to be accessed
   directly
@@ -352,6 +357,8 @@ Stanc Compiler
 Command-line
 ----------------------------------------------------------------------
 
+* need way to allow stanc to turn on STAN_NO_DEBUG
+
 * write analyze command to read in output and do analysis a la print in RStan
 
 * allow multiple chains to be run from single command
@@ -391,6 +398,9 @@ Command-line
 
 C++ API
 ----------------------------------------------------------------------
+
+* turn off stan::math::check_range() in math/matrix.hpp
+  if STAN_NO_DEBUG or NDEBUG flag is present
 
 * memcpy faster than copy ctor and operator= for var?
 

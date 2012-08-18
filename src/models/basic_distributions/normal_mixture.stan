@@ -1,7 +1,7 @@
 transformed data {
-  real[0,1] theta;
+  real<lower=0,upper=1> theta;
   real mu[2];
-  real[0,] sigma[2];
+  real<lower=0> sigma[2];
   
   mu[1] <- 0.0;    sigma[1] <- 0.5;
   mu[2] <- 4.0;    sigma[2] <- 3.0;

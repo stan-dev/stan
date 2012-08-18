@@ -147,7 +147,7 @@ add("diagonal",VECTOR_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
 
 add("transpose",ROW_VECTOR_T,VECTOR_T);
-add("tranpose",VECTOR_T,ROW_VECTOR_T);
+add("transpose",VECTOR_T,ROW_VECTOR_T);
 add("transpose",MATRIX_T,MATRIX_T);
 
 add("inverse",MATRIX_T,MATRIX_T);

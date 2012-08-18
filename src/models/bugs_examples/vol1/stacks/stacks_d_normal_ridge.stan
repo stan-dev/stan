@@ -3,8 +3,8 @@
 # Model d) normal error ridge regression
 
 data {
-  int[0,] N;
-  int[0,] p;
+  int<lower=0> N;
+  int<lower=0> p;
   real Y[N];
   matrix[N,p] x;
 } 
@@ -25,12 +25,12 @@ transformed data {
 parameters {
   real beta0; 
   real beta[p]; 
-  real[0,] sigmasq; 
-  real[0,] phi;
+  real<lower=0> sigmasq; 
+  real<lower=0> phi;
 } 
 
 transformed parameters {
-  real[0,] sigma;
+  real<lower=0> sigma;
   real mu[N];
 
   sigma <- sqrt(sigmasq);

@@ -474,11 +474,11 @@ can be used to estimate a Bernoulli parameter \code{theta} from
 \begin{quote}
 \begin{Verbatim}
 data {
-   int[0,] N;
-   int[0,1] y[N];
+   int<lower=0> N;
+   int<lower=0,upper=1> y[N];
 }
 parameters {
-   real[0,1] theta;
+   real<lower=0,upper=1> theta;
 }
 model {
    for (n in 1:N)
@@ -489,17 +489,17 @@ model {
 %
 This program declares two data variables in its \code{data} block.
 The first data variable, \code{N}, is an integer encoding the number
-of observations.  The declaration \code{int[0,]} indicates that
+of observations.  The declaration \code{int<lower=0>} indicates that
 \code{N} must take on non-negative values.  The second data variable,
 \code{y}, is declared as \code{y[N]}, specifying that it is an array
 of \code{N} values.  Each of these values has the declared type,
-\code{int[0,1]}, an integer between 0 and 1 inclusive, i.e., a binary
+\code{int<lower=0,upper=1>}, an integer between 0 and 1 inclusive, i.e., a binary
 value.  The \code{N} individual binary values in the array \code{y}
 are accessed using standard array notation, indexing from 1, as \code{y[1]},
 \code{y[2]}, ..., \code{y[N]}.
 
 The \code{parameters} block declares a single parameter, \code{theta}.
-The parameter \code{theta} is declared as type \code{real[0,1]},
+The parameter \code{theta} is declared as type \code{real<lower=0,upper=1>},
 contstraining it to continuous values between zero and one inclusive,
 to ensure it satisfies the constraint placed on it by the probability
 function \code{bernoulli} in the \code{model} block.
@@ -641,7 +641,7 @@ preferred commenting style for line-based comments and for commenting
 out code.
 
 The character \code{\#} behaves the same way as the character pair
-\code{//}.  If \code{#} appears on a line, that character and every
+\code{//}.  If \code{\#} appears on a line, that character and every
 character up to but not including the end of line is ignored.  This is
 the style of comments used in Python, R, and Unix shell scripts.  
 

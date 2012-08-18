@@ -1,9 +1,9 @@
 ##  http://www.openbugs.info/Examples/Salm.html
 ##  this matches the jags implementation
 data {
-    int[0,] doses;
-    int[0,] plates;
-    int[0,] y[doses,plates];
+    int<lower=0> doses;
+    int<lower=0> plates;
+    int<lower=0> y[doses,plates];
     real x[doses];
 }
 transformed data {
@@ -27,11 +27,11 @@ parameters {
     real alpha_star;
     real beta;
     real gamma;
-    real[0,] tau;
+    real<lower=0> tau;
     real lambda[doses,plates];
 }
 transformed parameters {
-    real[0,] sigma;
+    real<lower=0> sigma;
     real alpha;
 
     alpha <- alpha_star - beta * mean_logx - gamma * mean_x;

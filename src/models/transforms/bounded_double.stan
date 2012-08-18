@@ -1,5 +1,5 @@
 parameters {
-    real[-1,1] rho;
+    real<lower=-1,upper=1> rho;
 }
 model {
     /* uniform on support */

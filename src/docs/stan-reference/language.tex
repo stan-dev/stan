@@ -26,7 +26,7 @@ indicating which data variable is missing.
 
 After each variable is read, if it has a declared constraint, the
 constraint is validated.  For example, if a variable \code{N} is
-declared as \code{int[0,]}, after \code{N} is read, it will be tested
+declared as \code{int<lower=0>}, after \code{N} is read, it will be tested
 to make sure it is greater than or equal to zero.  If a variable
 violates its declared constraint, the program will halt with a warning
 message indicating which variable contains an illegal value, the value
@@ -352,7 +352,7 @@ the following.
 %
 \begin{quote}
 \begin{Verbatim}
-int[1,] N;
+int<lower=1> N;
 \end{Verbatim}
 \end{quote}
 %
@@ -364,7 +364,7 @@ the following example.
 %
 \begin{quote}
 \begin{Verbatim} 
-int[0,1] cond;
+int<lower=0,upper=1> cond;
 \end{Verbatim}
 \end{quote}
 
@@ -394,7 +394,7 @@ The variable \code{sigma} may be declared to be non-negative as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-real[0,] sigma;
+real<lower=0> sigma;
 \end{Verbatim}
 \end{quote}
 %
@@ -403,7 +403,7 @@ to $-1$.
 %
 \begin{quote}
 \begin{Verbatim} 
-real[,-1] x;
+real<upper=-1> x;
 \end{Verbatim}
 \end{quote}
 % 
@@ -412,7 +412,7 @@ following declaration.
 %
 \begin{quote}
 \begin{Verbatim}
-real[-1,1] rho;
+real<lower=-1,upper=1> rho;
 \end{Verbatim}
 \end{quote}
 %
@@ -435,7 +435,7 @@ data {
  real lb;
 }
 parameters {
-   real[lb,] phi;
+   real<lower=lb> phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -449,11 +449,11 @@ defined at the point the constraint is used.  For instance,
 \begin{quote}
 \begin{Verbatim}
 data { 
-   int[1,] N;
+   int<lower=1> N;
    real y[N];
 }
 parameters {
-   real[fmin(y),fmax(y)] phi;
+   real<lower=fmin(y),upper=fmax(y)> phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -617,7 +617,7 @@ $K$ is the value of the data variable \code{K}.
 
 Constrained variables of all types may be assigned to other variables
 of the same unconstrained type and vice-versa.  For instance, a
-variable declared to be \code{real[0,1]} could be assigned to a
+variable declared to be \code{real<lower=0,upper=1>} could be assigned to a
 variable declared as \code{real} and vice-versa.  Similarly,
 a variable declared as \code{matrix[3,3]} may be assigned to a
 variable declared as \code{cov\_matrix[3]} and vice-versa.  
@@ -640,7 +640,7 @@ For example, the following is legal.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int[0,] N_observed;    int[0,] N_missing;
+  int<lower=0> N_observed;    int<lower=0> N_missing;
   ...
 transformed parameters {
   vector[N_observed + N_missing] y;
@@ -716,7 +716,7 @@ columns, and two shelves can be declared as follows.
 %
 \begin{quote}
 \begin{Verbatim} 
-real[0,] z[5,4,2];
+real<lower=0> z[5,4,2];
 \end{Verbatim}
 \end{quote}
 %
@@ -801,7 +801,7 @@ Because size information is not part of a data type, data
 types will be written without size information.  For instance,
 \code{real[]} is the type of one-dimensional array of reals and
 \code{matrix} is the type of matrices.  The three-dimensional integer
-array type is written as \code{int[,,]}, indicating the number slots
+array type is written as \code{rea[\, , \, ,]}, indicating the number slots
 available for indexing.  Similarly, \code{vector[,]} is the type of a
 two-dimensional array of vectors.
 
@@ -1094,8 +1094,8 @@ array, then \code{x[2,501]} is of type \code{real}.
 \subsection{Accessing Subarrays}
 
 The subscripting operator also returns subarrays of arrays.  For
-example, if \code{x} is of type \code{real[\,,\,,\,]}, then \code{x[2]}
-is of type \code{real[,]}, and \code{x[2,3]} is of type
+example, if \code{x} is of type \code{real[~,~,~]}, then \code{x[2]}
+is of type \code{real[~,~]}, and \code{x[2,3]} is of type
 \code{real[]}.  As a result, the expressions \code{x[2,3]} and
 \code{x[2][3]} have the same meaning.  
 
@@ -1333,7 +1333,7 @@ complex assignment statement and its expression across lines.
 
 Assignments to slices of larger multi-variate data structures are
 supported by \Stan.  For example, \code{a} is an array of type
-\code{real[,]} and \code{b} is an array of type \code{real[]}, then
+\code{real[~,~]} and \code{b} is an array of type \code{real[]}, then
 the following two statements are both well-formed.
 %
 \begin{quote}
@@ -2036,7 +2036,7 @@ kind of each variable next to its declaration.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int[0,] N;                // unmodeled data
+  int<lower=0> N;                // unmodeled data
   real y[N];                // modeled data
   real mu_mu;             // config. unmodeled param
   real(0,) sigma_mu;      // config. unmodeled param
@@ -2049,7 +2049,7 @@ transformed data {
 } 
 parameters {
   real mu_y;                // modeled param
-  real[0,] tau_y;           // modeled param
+  real<lower=0> tau_y;           // modeled param
 } 
 transformed parameters {
   real(0,) sigma_y;       // derived quantity (param)
@@ -2147,7 +2147,7 @@ The \code{data} block does not allow statements.
 
 Each variable's value is validated against its declaration as it is
 read.  For example, if a variable \code{sigma} is declared as
-\code{real[0,]}, then trying to assign it a negative value will raise
+\code{real<lower=0>}, then trying to assign it a negative value will raise
 an error.  As a result, data type errors will be caught as early as
 possible.  Similarly, attempts to provide data of the wrong size for a
 compound data structure will also raise an error.

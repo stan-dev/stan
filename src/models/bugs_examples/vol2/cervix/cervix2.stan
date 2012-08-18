@@ -15,8 +15,8 @@
 
 
 data {
-  int[0,] Nc; 
-  int[0,] Ni; 
+  int<lower=0> Nc; 
+  int<lower=0> Ni; 
   int xc[Nc];
   int wc[Nc];
   int dc[Nc];
@@ -25,8 +25,8 @@ data {
 } 
 
 parameters {
-  real[0, 1] phi[2, 2];
-  real[0, 1] q; 
+  real<lower=0,upper= 1> phi[2, 2];
+  real<lower=0,upper= 1> q; 
   real beta0C; 
   real beta; 
   # note that xi is discrete parameters with support {0, 1} 

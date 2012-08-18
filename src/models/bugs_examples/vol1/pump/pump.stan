@@ -1,14 +1,14 @@
 
 data {
-  int[0,] N; 
-  int[0,] x[N];
+  int<lower=0> N; 
+  int<lower=0> x[N];
   real  t[N]; 
 } 
 
 parameters {
-  real[0,] alpha; 
-  real[0,] beta;
-  real[0,] theta[N];
+  real<lower=0> alpha; 
+  real<lower=0> beta;
+  real<lower=0> theta[N];
 }
 
 model {

@@ -2,11 +2,11 @@
 # Page 34: Oxford: smooth fit to log-odds ratios
 
 data {
-  int[0,] K; 
-  int[0,] n0[K];
-  int[0,] n1[K]; 
-  int[0,] r0[K]; 
-  int[0,] r1[K]; 
+  int<lower=0> K; 
+  int<lower=0> n0[K];
+  int<lower=0> n1[K]; 
+  int<lower=0> r0[K]; 
+  int<lower=0> r1[K]; 
   int year[K]; 
 } 
 transformed data {
@@ -19,11 +19,11 @@ parameters {
   real alpha;
   real beta1; 
   real beta2;
-  real[0,] sigma_sq;
+  real<lower=0> sigma_sq;
   real b[K]; 
 }
 transformed parameters {
-  real[0,] sigma;
+  real<lower=0> sigma;
   sigma <- sqrt(sigma_sq);
 }
 model {

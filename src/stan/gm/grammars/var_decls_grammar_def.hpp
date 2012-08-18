@@ -273,6 +273,15 @@ namespace stan {
     };
     boost::phoenix::function<validate_identifier> validate_identifier_f;
 
+    struct empty_range {
+      template <typename T1>
+      struct result { typedef range type; };
+      range operator()(std::stringstream& error_msgs) const {
+        return range();
+      }
+    };
+    boost::phoenix::function<empty_range> empty_range_f;
+
     struct validate_int_expr {
       template <typename T1, typename T2>
       struct result { typedef bool type; };
@@ -288,6 +297,34 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+
+    struct set_int_range_lower {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(range& range,
+                      const expression& expr,
+                      std::stringstream& error_msgs) const {
+        range.low_ = expr;
+        validate_int_expr validator;
+        return validator(expr,error_msgs);
+      }
+    };
+    boost::phoenix::function<set_int_range_lower> set_int_range_lower_f;
+
+    struct set_int_range_upper {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(range& range,
+                      const expression& expr,
+                      std::stringstream& error_msgs) const {
+        range.high_ = expr;
+        validate_int_expr validator;
+        return validator(expr,error_msgs);
+      }
+    };
+    boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
+
+
 
     struct validate_int_data_expr {
       template <typename T1, typename T2, typename T3>
@@ -326,6 +363,33 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_double_expr> validate_double_expr_f;
+
+
+    struct set_double_range_lower {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(range& range,
+                      const expression& expr,
+                      std::stringstream& error_msgs) const {
+        range.low_ = expr;
+        validate_double_expr validator;
+        return validator(expr,error_msgs);
+      }
+    };
+    boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
+
+    struct set_double_range_upper {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(range& range,
+                      const expression& expr,
+                      std::stringstream& error_msgs) const {
+        range.high_ = expr;
+        validate_double_expr validator;
+        return validator(expr,error_msgs);
+      }
+    };
+    boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
 
     template <typename Iterator>
@@ -500,32 +564,126 @@ namespace stan {
         > lit(']')
         ;
 
-      range_brackets_int_r.name("range expression pair, brackets");
+      range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r 
-        %= lit('[') 
-        > -(expression_g
-            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-        > lit(',')
-        > -(expression_g
-            [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-        > lit(']');
+        = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
+        > ( 
+           ( (lit("lower")
+              > lit('=')
+              > expression_g
+              [ _pass = set_int_range_lower_f(_val,_1,
+                                               boost::phoenix::ref(error_msgs_)) ])
+             > -( lit(',')
+                  > lit("upper")
+                  > lit('=')
+                  > expression_g
+                    [ _pass = set_int_range_upper_f(_val,_1,
+                                                    boost::phoenix::ref(error_msgs_)) ] ) )
+           | 
+           ( lit("upper")
+             > lit('=')
+             > expression_g
+             [ _pass = set_int_range_upper_f(_val,_1,
+                                             boost::phoenix::ref(error_msgs_)) ])
+            )
+        > lit('>');
 
-      range_brackets_double_r.name("range expression pair, brackets");
+        // > ( 
+        //    ( (lit("lower")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_int_range_lower_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //      > -( lit(',')
+        //           > lit("upper")
+        //           > lit('=')
+        //           > expression_g
+        //             [ _pass = set_int_range_upper_f(_val,_1,
+        //                                             boost::phoenix::ref(error_msgs_)) ] ) )
+        //    | 
+        //    ( 
+        //     -(lit("upper")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_int_range_upper_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //     > -(lit(',')
+        //         > lit("lower")
+        //         > lit('=')
+        //         > expression_g
+        //           [ _pass = set_int_range_lower_f(_val,_1,
+        //                                           boost::phoenix::ref(error_msgs_)) ]) )
+        //     )
+        // > lit('>');
+
+      range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r 
-        %= lit('[') 
-        > -(expression_g
-            [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-        > lit(',')
-        > -(expression_g
-            [_pass 
-             = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-        > lit(']');
+        = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
+        > ( 
+           ( (lit("lower")
+              > lit('=')
+              > expression_g
+              [ _pass = set_double_range_lower_f(_val,_1,
+                                               boost::phoenix::ref(error_msgs_)) ])
+             > -( lit(',')
+                  > lit("upper")
+                  > lit('=')
+                  > expression_g
+                    [ _pass = set_double_range_upper_f(_val,_1,
+                                                    boost::phoenix::ref(error_msgs_)) ] ) )
+           | 
+           ( lit("upper")
+             > lit('=')
+             > expression_g
+               [ _pass = set_double_range_upper_f(_val,_1,
+                                                  boost::phoenix::ref(error_msgs_)) ])
+            )
+        > lit('>');
+
+        // > ( 
+        //    ( (lit("lower")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_double_range_lower_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //      > -( lit(',')
+        //           > lit("upper")
+        //           > lit('=')
+        //           > expression_g
+        //             [ _pass = set_double_range_upper_f(_val,_1,
+        //                                             boost::phoenix::ref(error_msgs_)) ] ) )
+        //    | 
+        //    ( 
+        //     -(lit("upper")
+        //       > lit('=')
+        //       > expression_g
+        //       [ _pass = set_double_range_upper_f(_val,_1,
+        //                                        boost::phoenix::ref(error_msgs_)) ])
+        //     > -(lit(',')
+        //         > lit("lower")
+        //         > lit('=')
+        //         > expression_g
+        //           [ _pass = set_double_range_lower_f(_val,_1,
+        //                                           boost::phoenix::ref(error_msgs_)) ]) )
+        //     )
+        // > lit('>');
+
+
+      // range_brackets_double_r.name("double range expression pair, brackets");
+      // range_brackets_double_r 
+      //   %= lit('[') 
+      //   > -(expression_g
+      //       [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+      //   > lit(',')
+      //   > -(expression_g
+      //       [_pass 
+      //        = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
+      //   > lit(']');
 
       identifier_r.name("identifier");
       identifier_r
         %= identifier_name_r
           [_pass = validate_identifier_f(_1,boost::phoenix::ref(error_msgs_))]
-
         ;
 
       identifier_name_r.name("identifier subrule");

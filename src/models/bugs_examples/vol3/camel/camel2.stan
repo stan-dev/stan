@@ -45,7 +45,7 @@ parameters {
 } 
 
 transformed parameters {
-  real[-1, 1] rho; 
+  real<lower=-1,upper= 1> rho; 
   rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 
 
