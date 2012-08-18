@@ -142,6 +142,7 @@ namespace stan {
                        size_t i, 
                        const char* msg,
                        size_t idx) {
+#ifndef NDEBUG
         if (i < 1 || i > max) {
           std::stringstream s;
           s << "INDEX OPERATOR [] OUT OF BOUNDS"
@@ -153,6 +154,7 @@ namespace stan {
             << std::endl;
           throw std::out_of_range(s.str());
         }
+#endif
       }
 
     }
