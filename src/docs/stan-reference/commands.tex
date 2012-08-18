@@ -427,6 +427,10 @@ some typical use-case examples.
 {Period between saved samples after warm up}
 {default = \code{max(1, (iter - warmup) / 1000)}}
 %
+\cmdflag{save\_warmup}{Save the warmup samples as well
+as the post-warmup samples}{default is to not save the
+warmup samples}
+%
 \cmdarg{refresh}{+int}
 {Period between samples updating progress report print}
 {default = \code{max(1, iter / 200)}}
