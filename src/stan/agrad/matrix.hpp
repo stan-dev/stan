@@ -580,6 +580,50 @@ namespace stan {
         }
       };
 
+      class sum_v_vari : public vari{
+      protected:
+        vari** v_;
+        size_t length_;
+        inline static double var_sum(const var *v, size_t length) {
+          double result = 0;
+          for (size_t i = 0; i < length; i++)
+            result += v[i].vi_->val_;
+          return result;
+        } 
+        template<typename Derived>
+        inline static double var_sum(const Eigen::DenseBase<Derived> &v) {
+          double result = 0;
+          for (int i = 0; i < v.size(); i++)
+            result += v(i).vi_->val_;
+          return result;
+        } 
+      public:
+        template<typename Derived>
+        sum_v_vari(const Eigen::DenseBase<Derived> &v) :
+          vari(var_sum(v)), length_(v.size()) {
+          v_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          for (size_t i = 0; i < length_; i++)
+            v_[i] = v(i).vi_;
+        }
+        template<int R1,int C1>
+        sum_v_vari(const Eigen::Matrix<var,R1,C1> &v1) :
+          vari(var_sum(v1)), length_(v1.size()) {
+          v_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          for (size_t i = 0; i < length_; i++)
+            v_[i] = v1(i).vi_;
+        }
+        sum_v_vari(const var *v, size_t len) :
+          vari(var_sum(v,len)), length_(len) {
+          v_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          for (size_t i = 0; i < length_; i++)
+            v_[i] = v[i].vi_;
+        }
+        void chain() {
+          for (size_t i = 0; i < length_; i++) {
+            v_[i]->adj_ += adj_;
+          }
+        }
+      };
       class dot_product_vv_vari : public vari {
       protected:
         vari** v1_;
@@ -1155,23 +1199,13 @@ namespace stan {
 
     /**
      * Returns the sum of the coefficients of the specified
-     * column vector.
-     * @param[in] v Specified vector.
-     * @return Sum of coefficients of vector.
+     * matrix
+     * @param[in] m Specified matrix.
+     * @return Sum of coefficients of matrix.
      */
-    template <typename T>
-    inline var sum(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      return to_var(v.sum());
-    }
-    /**
-     * Returns the sum of the coefficients of the specified
-     * row vector.
-     * @param[in] rv Specified vector.
-     * @return Sum of coefficients of vector.
-     */
-    template <typename T>
-    inline var sum(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      return to_var(rv.sum());
+    template<int R,int C>
+    inline var sum(const Eigen::Matrix<double,R,C> &m) {
+      return to_var(m.sum());
     }
     /**
      * Returns the sum of the coefficients of the specified
@@ -1179,9 +1213,9 @@ namespace stan {
      * @param[in] m Specified matrix.
      * @return Sum of coefficients of matrix.
      */
-    template <typename T>
-    inline var sum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      return to_var(m.sum());
+    template<int R,int C>
+    inline var sum(const Eigen::Matrix<var,R,C> &m) {
+      return var(new sum_v_vari(m));
     }
 
     /**
