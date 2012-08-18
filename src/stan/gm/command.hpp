@@ -115,6 +115,9 @@ namespace stan {
                     "Gamma parameter for dual averaging step-size adaptation",
                     "default = 0.05");
 
+      print_help_option("save_warmup","",
+                        "Save the warmup samples");
+
       print_help_option("test_grad","",
                         "Test gradient calculations using finite differences");
       
@@ -137,6 +140,7 @@ namespace stan {
                      int num_iterations,
                      int num_warmup,
                      int num_thin,
+                     bool save_warmup,
                      std::ostream& sample_file_stream,
                      std::vector<double>& params_r,
                      std::vector<int>& params_i,
@@ -161,7 +165,18 @@ namespace stan {
           std::cout.flush();
         }
         if (m < num_warmup) {
-          sampler.next(); // discard
+          if (save_warmup && (m % num_thin) == 0) {
+            stan::mcmc::sample sample = sampler.next();
+
+            // FIXME: use csv_writer arg to make comma optional?
+            sample_file_stream << sample.log_prob() << ',';
+            sampler.write_sampler_params(sample_file_stream);
+            sample.params_r(params_r);
+            sample.params_i(params_i);
+            model.write_csv(params_r,params_i,sample_file_stream);
+          } else {
+            sampler.next(); // discard
+          }
         } else {
           if (epsilon_adapt && sampler.adapting()) {
             sampler.adapt_off();
@@ -355,6 +370,8 @@ namespace stan {
         }
       }
 
+      bool save_warmup = command.has_flag("save_warmup");
+
       bool append_samples = command.has_flag("append_samples");
       std::ios_base::openmode samples_append_mode
         = append_samples
@@ -374,6 +391,7 @@ namespace stan {
 
       std::cout << "samples = " << sample_file << std::endl;
       std::cout << "append_samples = " << append_samples << std::endl;
+      std::cout << "save_warmup = " << save_warmup<< std::endl;
 
       std::cout << "seed = " << random_seed 
                 << " (" << (command.has_key("seed") 
@@ -416,6 +434,7 @@ namespace stan {
       write_comment_property(sample_stream,"data",data_file);
       write_comment_property(sample_stream,"init",init_val);
       write_comment_property(sample_stream,"append_samples",append_samples);
+      write_comment_property(sample_stream,"save_warmup",save_warmup);
       write_comment_property(sample_stream,"seed",random_seed);
       write_comment_property(sample_stream,"chain_id",chain_id);
       write_comment_property(sample_stream,"iter",num_iterations);
@@ -447,7 +466,7 @@ namespace stan {
         nuts2_sampler.set_error_stream(std::cout);
 
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
-                    num_iterations,num_warmup,num_thin,
+                    num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
                     model);
 
@@ -469,7 +488,7 @@ namespace stan {
         }
 
         sample_from(nuts_sampler,epsilon_adapt,refresh,
-                    num_iterations,num_warmup,num_thin,
+                    num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
                     model);
 
@@ -491,7 +510,7 @@ namespace stan {
         }
 
         sample_from(hmc_sampler,epsilon_adapt,refresh,
-                    num_iterations,num_warmup,num_thin,
+                    num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
                     model);
       }
