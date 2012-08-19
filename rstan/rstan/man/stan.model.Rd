@@ -56,7 +56,7 @@
   } 
 }
 \value{
-  A stanmodel class object (\linkS4class{stanmodel}), which could be
+  A stanmodel class object (\linkS4class{stanmodel}), which can be
   used later for drawing samples by calling its \code{sampling} function.
 }
 \references{
@@ -66,7 +66,7 @@
 }
 \note{
   The object of S4 class \code{stanmodel} created by \code{stan.model} 
-  could \strong{not} be well saved in that we could not apply \code{sampling} 
+  \strong{cannot} be well saved in that we can not apply \code{sampling} 
   function for a loaded object of \code{stanmodel} from previously saved. 
 }
 

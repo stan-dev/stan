@@ -173,14 +173,14 @@ Here we use a character string.
 library(rstan) 
 schools.code <- '
   data {
-    int[0,] J; // number of schools 
+    int<lower=0> J; // number of schools 
     real y[J]; // estimated treatment effects
-    real[0,] sigma[J]; // s.e. of effect estimates 
+    real<lower=0> sigma[J]; // s.e. of effect estimates 
   } 
   parameters {
     real theta[J]; 
     real mu; 
-    real[0,] tau; 
+    real<lower=0> tau; 
   } 
   model {
     theta ~ normal(mu, tau); 

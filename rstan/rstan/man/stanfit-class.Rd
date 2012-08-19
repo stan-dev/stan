@@ -55,7 +55,7 @@
       Most of the printout are the results from function \code{summary}.} 
     \item{summary}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the samples: the quantiles 
-      (for example, 2.5\%, 50\%, 97.5\%, which could be specified), 
+      (for example, 2.5\%, 50\%, 97.5\%, which can be specified), 
       the mean, the standard deviation (SD), the effective sample size (ESS),
       and the split Rhat (split potential split potential scale reduction).
       Returned is a named list with elements \code{summary} and \code{c.summary}, 

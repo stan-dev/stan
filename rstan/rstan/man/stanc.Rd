@@ -5,7 +5,7 @@
 \code{stanc}: compile model in Stan modeling language to C++ code
 }
 \description{
-  Compile model in Stan language to C++ code, which could 
+  Compile model in Stan language to C++ code, which can 
   be compiled and then loaded for drawing samples for the 
   model. 
 }
@@ -42,7 +42,7 @@
   to end a statement. 
 
   In addition, all reserved key words in C++ programming language 
-  could not be used as variable names, see Stan's manual. 
+  cannot be used as variable names, see Stan's manual. 
 } 
 
 \references{
@@ -58,7 +58,7 @@
 \examples{\dontrun{
 stanmodelcode <- '
 data {
-  int[0,] N;
+  int<lower=0> N;
   real y[N];
 } 
 

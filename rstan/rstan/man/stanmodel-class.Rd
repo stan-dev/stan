@@ -39,7 +39,7 @@
 }
 
 \note{
-  Objects of class \code{stanfit} could \strong{not} be saved as ordinary 
+  Objects of class \code{stanfit} \strong{cannot} be saved as ordinary 
   R objects. One reason is that the C++ code for the model is
   compiled and loaded all temporarily using package inline, which
   does not provide any approach to save and reload the compiled binary

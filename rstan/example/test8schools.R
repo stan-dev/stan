@@ -46,7 +46,7 @@ b <- identical(ss@sim$samples, ss.same@sim$samples)
 # b is not true as ss is initialized randomly while ss.same is not. 
 
 
-s <- summary(ss.same, pars = "mu_theta", probs = c(.3, .8))
+s <- summary(ss.same, pars = "mu", probs = c(.3, .8))
 print(ss.same, pars = 'theta', probs = c(.4, .8))
 print(ss.same)
 
@@ -54,7 +54,7 @@ print(ss.same)
 # fit2 <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 3, pars = "theta")
 # print(fit2)
 # print(fit2, pars = 'theta')
-# print(fit2, pars = 'mu_theta')
+# print(fit2, pars = 'mu')
 
 
 

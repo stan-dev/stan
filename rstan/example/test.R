@@ -4,7 +4,7 @@ library(rstan)
 
 stanmodelcode <- '
 data {
-  int[0,] N;
+  int<lower=0> N;
   real y[N];
 } 
 

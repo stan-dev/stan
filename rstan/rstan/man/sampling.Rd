@@ -87,13 +87,13 @@
       \item \code{max_treedepth} (\code{integer})
     }
 
-    More details could be 
+    More details can be 
     found in Stan's manual. Note that by default, 
     \code{leapfrog_steps} is \code{-1} and 
     \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler, the default sampler one, is used.
 
-    In addition, \code{refresh} (\code{integer}) could be used to
+    In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling 
     (i.e. show the progress every \code{refresh} iterations).
   }

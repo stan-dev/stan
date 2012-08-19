@@ -4,7 +4,7 @@ useDynLib(rstan)
 importFrom("graphics", plot)
 importFrom("Matrix", summary, print)
 
-export (
+export(
   stan.model,
 # stan.samples,
   stanc, 
@@ -17,10 +17,10 @@ export (
 # get.rstan.options
 )
 
-exportClasses (
+exportClasses(
   stanmodel, stanfit 
 ) 
-exportMethods (
+exportMethods(
 #   print, plot, 
 #   extract, 
   show, sampling, summary, print, extract, 

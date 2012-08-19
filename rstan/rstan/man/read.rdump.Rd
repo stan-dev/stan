@@ -11,7 +11,7 @@ read.rdump(f)
   \item{f}{A character string providing the dump file name.}
 }
 \details{
-The R dump file could be read directly by R function \code{source}, which
+The R dump file can be read directly by R function \code{source}, which
 by default would read the data into the user's workspace (the global environment). 
 This function instead read the data to a list, making it convenient to 
 prepare data for function \code{stan}. 

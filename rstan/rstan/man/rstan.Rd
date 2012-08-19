@@ -51,7 +51,7 @@ cat("Stan version: ", stanc.version(), sep = '');
 
 stanmodelcode <- "
 data {
-  int[0,] N;
+  int<lower=0> N;
   real y[N];
 } 
 

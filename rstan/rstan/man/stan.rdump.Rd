@@ -42,7 +42,7 @@ stan.rdump(list, file, append = FALSE,
   that were dumped.
 }
 \note{
-  \code{stan.rdump} only dumps numeric data, which could be 
+  \code{stan.rdump} only dumps numeric data, which can be 
   scalar, vector, array, or matrix.  
 }
 

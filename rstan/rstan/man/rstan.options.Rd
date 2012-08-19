@@ -16,7 +16,7 @@ rstan.options(...)
 \arguments{
   \item{\dots}{Arguments must be in forms of \code{argument = value}.
   Then option \code{argument} is set as \code{value}. In the case
-  of just obtaining options, each argument could be a character string.}
+  of just obtaining options, each argument can be a character string.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -35,7 +35,7 @@ rstan.options(...)
     \item \code{rstan.chains.cols}: The colors used in \code{plot(signature = 'stanfit')}
       and \code{traceplot(signature = 'stanfit')} for coloring different chains. 
     \item \code{rstan.warmup.bg.col}: The background color for the warmup area in the traceplots. 
-    \item \code{boost.lib}: The path for the boost library. The user could specify 
+    \item \code{boost.lib}: The path for the boost library. The user can specify 
      \code{boost.lib} when calling \code{stan} temporarily. This option is valid 
      for the whole \R session. 
   } 

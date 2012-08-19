@@ -67,13 +67,13 @@ stan(file, model.name = "anon_model", model.code = "",
       \item \code{max_treedepth} (\code{integer})
     }
 
-    More details could be 
+    More details can be 
     found in Stan's manual. Note that by default, 
     \code{leapfrog_steps} is \code{-1} and 
     \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler, the default sampler one, is used.
 
-    In addition, \code{refresh} (\code{integer}) could be used to
+    In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling (i.e. 
     show the progress every \code{refresh} iterations).} 
 
@@ -92,7 +92,7 @@ stan(file, model.name = "anon_model", model.code = "",
   which provides functions such as \code{print}, \code{summary}, and \code{plot}
   to take a look of the results of the fitted model. 
 
-  \code{stan} could also be used to sample again from a fitted model under
+  \code{stan} can also be used to sample again from a fitted model under
   different settings (e.g., different \code{n.iter}) by providing 
   argument \code{fit}. In this case, the compiled C++ code 
   for the model is reused. 
@@ -108,11 +108,11 @@ stan(file, model.name = "anon_model", model.code = "",
   Data of other types (for examples, characters) are not passed to 
   Stan. 
 
-  We could use a previous fitted model object (i.e., an instance
+  We can use a previous fitted model object (i.e., an instance
   of S4 class \code{stanfit}) as input for function \code{stan} to 
   refit the model, for example, with different configuration or data. 
-  But for now, since the compiled C++ code for the model could 
-  \strong{not} be saved, it would not work to refit a model in a R session
+  But for now, since the compiled C++ code for the model 
+  \strong{cannot} be saved, it would not work to refit a model in a R session
   where the fitted model is loaded from the saved image from previous R 
   sessions. In other words, this only works without quitting R. 
   This situation might be improved in the future. 

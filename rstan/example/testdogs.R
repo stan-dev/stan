@@ -44,8 +44,8 @@ dogsdat <- list(Ndogs = 30,
 
 dogsstan <- "
 data {
-  int[0,] Ndogs;
-  int[0,] Ntrials;
+  int<lower=0> Ndogs;
+  int<lower=0> Ntrials;
   int Y[Ndogs, Ntrials];
 }
 
@@ -62,8 +62,8 @@ transformed data {
 }
 
 parameters {
-  real[, -0.00001] alpha;
-  real[, -0.00001] beta;
+  real<upper=-0.00001> alpha;
+  real<upper=-0.00001> beta;
 }
 
 transformed parameters {
