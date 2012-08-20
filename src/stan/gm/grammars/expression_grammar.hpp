@@ -68,17 +68,6 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       indexed_factor_r;
 
-      // two of these because of type-coercion from index_op to expression
-      boost::spirit::qi::rule<Iterator, 
-                              index_op(), 
-                              whitespace_grammar<Iterator> > 
-      indexed_factor_2_r; 
-
-      boost::spirit::qi::rule<Iterator, 
-                              expression(), 
-                              whitespace_grammar<Iterator> > 
-      transposed_factor_r;
-
       boost::spirit::qi::rule<Iterator,
                               int_literal(), 
                               whitespace_grammar<Iterator> > 

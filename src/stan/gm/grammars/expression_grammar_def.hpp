@@ -302,20 +302,25 @@ namespace stan {
     };
     boost::phoenix::function<transpose_expr> transpose_f;
 
-    struct set_indexed_factor_type {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
-      bool operator()(index_op& io,
-                      std::ostream& error_msgs) const {
-        io.infer_type();
-        if (io.type_.is_ill_formed()) {
+    struct add_expression_dimss {
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef T1 type; };
+      expression operator()(expression& expression,
+                            std::vector<std::vector<stan::gm::expression> >& dimss,
+                            bool& pass,
+                            std::ostream& error_msgs) const {
+        index_op iop(expression,dimss);
+        iop.infer_type();
+        if (iop.type_.is_ill_formed()) {
           error_msgs << "indexes inappropriate for expression." << std::endl;
-          return false;
+          pass = false;
+        } else {
+          pass = true;
         }
-        return true;
+        return iop;
       }
     };
-    boost::phoenix::function<set_indexed_factor_type> set_indexed_factor_type_f;
+    boost::phoenix::function<add_expression_dimss> add_expression_dimss_f;
 
     struct set_var_type {
       template <typename T1, typename T2, typename T3, typename T4>
@@ -422,23 +427,18 @@ namespace stan {
         | indexed_factor_r [_val = _1];
 
 
-      // two of these to put semantic action on this one w. index_op input
       indexed_factor_r.name("(optionally) indexed factor [sub]");
       indexed_factor_r 
-        %=  transposed_factor_r
-        [_val = transpose_f(_1,boost::phoenix::ref(error_msgs_))] 
-        | (indexed_factor_2_r 
-           [_pass = set_indexed_factor_type_f(_1,
-                                              boost::phoenix::ref(error_msgs_))])
+        = factor_r [_val = _1]
+        > * (  
+               (+dims_r) 
+               [_val = add_expression_dimss_f(_val, _1, _pass,
+                                            boost::phoenix::ref(error_msgs_))]
+               | 
+               lit("'") 
+               [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 
+               )
         ;
-        
-      indexed_factor_2_r.name("(optionally) indexed factor [sub] 2");
-      indexed_factor_2_r 
-        %= (factor_r >> *dims_r);
-
-      transposed_factor_r.name("matrix transpose");
-      transposed_factor_r 
-        %= (factor_r >> lit("'"));
 
       factor_r.name("factor");
       factor_r
@@ -453,34 +453,6 @@ namespace stan {
             > expression_r    [_val = _1]
             > lit(')') )
         ;
-
-      // add case to factor_r
-      // | matrix_or_vector_r
-
-
-      // matrix_or_vector_r 
-      //   %= lit('[')
-      //   > (matrix_r | vector_r)
-      //   > lit(']')
-      //   ;
-
-      // matrix_r %= matrix2_r;
-
-      // matrix2_r.name("matrix expression");
-      // matrix2_r
-      //   %= vector2_r % ',';
-      
-      // vector_r %= vector2_r;
-
-      // vector2_r.name("vector expression");
-      // vector2_r
-      //   %=  ( expression_r 
-      //         [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-      //         % ',' 
-      //         )
-      //   ;
-      
-
         
       int_literal_r.name("integer literal");
       int_literal_r
