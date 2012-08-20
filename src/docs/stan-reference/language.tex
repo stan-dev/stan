@@ -1977,10 +1977,54 @@ defined is given in \reffigure{block-actions}.
   program blocks in the first column.  The middle column indicates
   whether the block allows statements.  The last row indicates that 
   parameter initialization requires a read and transform operation
-  applied once per chain.}
+  applied once per chain.}%
 \label{block-actions.figure}
 \end{figure}
 %
+\begin{figure}[t]
+\begin{center}
+\begin{tabular}{ccc|l}
+{\it Params} & {\it Log Prob} & {\it Print} & {\it Declare In}
+\\\hline \hline
+$+$ & $+$ & $+$ & \code{transformed parameters}
+\\
+$+$ & $+$ & $-$ & {\it local in}\ \code{model}
+\\
+$+$ & $-$ & $-$ & {\it local in}\ \code{generated quantities}
+\\
+$+$ & $-$ & $+$ & \code{generated quantities}
+\\
+$-$ & $-$ & $+$ & \code{generated quantities}$^*$
+\\
+$-$ & $\pm$ & $-$ & {\it local in}\ \code{transformed data}
+\\
+$-$ & $+$ & $+$ & \code{transformed data} {\it and}\ \code{generated quantities}$^*$
+\end{tabular}
+\end{center}
+\caption{\it This table indicates where variables that are not basic
+  data or parameters should be declared, based on whether it is
+  defined in terms of parameters, whether it is used in the log
+  probability function defined in the model block, and whether it is
+  printed.  
+  The two lines marked with asterisks ($*$) should not be used as
+  there is no need to print a variable every iteration that does not
+  depend on the value of any parameters.}%
+\label{variable-flowchart.figure}
+\end{figure}
+%
+Another way to look at the variables is in terms of their function.
+To decide which variable to use, consult the charts in 
+\reffigure{variable-flowchart.figure}.  The last line has no
+corresponding location, as there is no need to print a variable
+every iteration that does not depend on parameters.  If absolutely
+necessary, this can be accomplished 
+
+, for a variable
+that is not printed, a variable that does not depend on parameters but 
+is printed and used in the log probability function should be
+defined as transformed data
+
+
 The rest of this chapter provides full details on when and how the
 variables and statements in each block are executed.
 %
