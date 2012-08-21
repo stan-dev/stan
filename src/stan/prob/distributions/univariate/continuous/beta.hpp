@@ -120,7 +120,6 @@ namespace stan {
 	  logp += (beta_dbl-1.0) * log1m_y;
 
 	// gradients
-	const double log_beta_AB = log(boost::math::beta(alpha_dbl, beta_dbl));
 	const double digamma_alpha_beta = boost::math::digamma(alpha_dbl + beta_dbl);
 	const double digamma_alpha = boost::math::digamma(alpha_dbl);
 	const double digamma_beta = boost::math::digamma(beta_dbl);
