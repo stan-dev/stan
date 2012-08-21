@@ -16,8 +16,8 @@ namespace stan {
       
       class lgamma_vari : public op_v_vari {
       public:
-        lgamma_vari(vari* avi) :
-          op_v_vari(boost::math::lgamma(avi->val_), avi) {
+        lgamma_vari(double value, vari* avi) :
+          op_v_vari(value, avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * boost::math::digamma(avi_->val_);
@@ -767,7 +767,8 @@ namespace stan {
      * @return Log gamma of the variable.
      */
     inline var lgamma(const stan::agrad::var& a) {
-      return var(new lgamma_vari(a.vi_));
+      double lgamma_a = boost::math::lgamma(a.val());
+      return var(new lgamma_vari(lgamma_a, a.vi_));
     }
 
     /**
@@ -1238,9 +1239,9 @@ namespace stan {
     inline var fdim(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
       if (a.vi_->val_ > b.vi_->val_)
-	return var(new fdim_vv_vari(a.vi_,b.vi_));
+        return var(new fdim_vv_vari(a.vi_,b.vi_));
       else
-	return var(new vari(0.0));
+        return var(new vari(0.0));
     }
 
     /**
