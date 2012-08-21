@@ -83,3 +83,32 @@ TEST(ProbDistributionsNegBinomial,ErrnoPolicy) {
   result = neg_binomial_log(n,alpha,inf, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
+TEST(ProbDistributionsNegBinomial,check_values) {
+  int n;
+  double alpha;
+  double beta;
+  double result;
+  
+
+  alpha = 82.34;
+  beta = 0.366114;
+  n = 0;
+  result = neg_binomial_log(n, alpha, beta);
+  EXPECT_FLOAT_EQ(-108.423725446514, result);
+
+  n = 1;
+  result = neg_binomial_log(n, alpha, beta);
+  EXPECT_FLOAT_EQ(-104.324838643183, result);
+  
+  n = 2;
+  result = neg_binomial_log(n, alpha, beta);
+  EXPECT_FLOAT_EQ(-100.907027410759, result);
+
+  n = 4;
+  result = neg_binomial_log(n, alpha, beta);
+  EXPECT_FLOAT_EQ(-95.1343749604898, result);
+  
+  n = 5;
+  result = neg_binomial_log(n, alpha, beta);
+  EXPECT_FLOAT_EQ(-92.597490095807, result);
+}
