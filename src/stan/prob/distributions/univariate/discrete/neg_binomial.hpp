@@ -46,7 +46,8 @@ namespace stan {
       
       lp = 0.0;
       if (include_summand<propto,T_shape>::value)
-        lp += binomial_coefficient_log<T_shape>(n + alpha - 1.0, n);
+	if (n != 0)
+	  lp += binomial_coefficient_log<T_shape>(n + alpha - 1.0, n);
       if (include_summand<propto,T_shape,T_inv_scale>::value)
         lp += multiply_log(alpha, beta) - (alpha + n) * log1p(beta);
       return lp;
