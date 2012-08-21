@@ -59,7 +59,16 @@ setMethod("sampling", "stanmodel",
                    sample.file, verbose = FALSE, ...) {
 
             if (!is.sm.valid(object))
-              stop("The compiled model in C++ is not valid any more")
+              stop("the compiled model from C++ code is not valid any more")
+
+            if (!is.dso.loaded(object@dso)) {
+               grab.cxxfun(object@dso) 
+               model.cppname <- object@.modelmod$model.cppname  
+               mod <- Module(model.cppname, getDynLib(object@dso)) 
+               stan_fit_cpp_module <- eval(call("$", mod, model.cppname))
+               assign("sampler", stan_fit_cpp_module, envir = object@.modelmod)
+            }
+
             if (n.chains < 1) 
               stop("The number of chains (n.chains) is less than 1")
 

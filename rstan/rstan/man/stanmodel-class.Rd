@@ -22,28 +22,32 @@
 
 \section{Slots}{
   \describe{
-    \item{\code{model.name}:}{The model name, object of \code{character}} 
-    \item{\code{model.code}:}{The model code, object of \code{character}, in Stan modeling language} 
-    \item{\code{.modelmod}:}{Object of \code{list}  
-      that includes C++ object (just the definition, not an instance) exposed
-      by Rcpp, a module mainly for drawing samples for the model.}
+    \item{\code{model.name}:}{The model name, object of \code{character}.} 
+    \item{\code{model.code}:}{The model code, object of \code{character}, in Stan modeling language.} 
+    \item{\code{.modelmod}:}{Object of \code{environment}  
+      that includes C++ object exposed by Rcpp, a module mainly for drawing
+      samples for the model.}
+    \item{\code{dso}:}{Object of S4 class \code{cxxdso}. The container for the dynamic 
+      shared objects compiled the C++ code of the model, returned from function
+      \code{cxxfunction} in package \pkg{inline}.}
   }
 }
 
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "stanmodel")}: prints the class. }
+    \item{show}{\code{signature(object = "stanmodel")}: prints the model in
+      Stan modeling language code.}
     \item{sampling}{\code{signature(object = "stanmodel")}: draw samples for
       the model (see \code{\link{sampling}}).}
   }
 }
 
 \note{
-  Objects of class \code{stanfit} \strong{cannot} be saved as ordinary 
-  R objects. One reason is that the C++ code for the model is
-  compiled and loaded all temporarily using package inline, which
-  does not provide any approach to save and reload the compiled binary
-  objects.  
+  Objects of class \code{stanfit} can be saved for using across 
+  \R sessions only if \code{save.dso = TRUE} is used during calling
+  functions that create \code{stanfit} objects (e.g., \code{stan}). 
+  But definitely even if \code{save.dso = TRUE}, it cannot be used across
+  platforms. 
 }
 
 \seealso{

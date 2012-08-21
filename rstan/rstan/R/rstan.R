@@ -23,6 +23,7 @@ stan.model <- function(file,
                        model.code = '', 
                        stanc.ret = NULL, 
                        boost.lib = NULL, 
+                       save.dso = TRUE,
                        verbose = FALSE) { 
 
   # Construct a stan model from stan code 
@@ -63,34 +64,41 @@ stan.model <- function(file,
     old.boost.lib <- rstan.options(boost.lib = boost.lib) 
     on.exit(rstan.options(boost.lib = old.boost.lib)) 
   } 
-  fx <- cxxfunction(signature(), body = '  return R_NilValue;', 
-                    includes = inc, plugin = "rstan", verbose = verbose) 
+  dso <- cxxfunctionplus(signature(), body = '  return R_NilValue;', 
+                         includes = inc, plugin = "rstan", save.dso = save.dso,
+                         verbose = verbose) 
                
-  mod <- Module(model.cppname, getDynLib(fx)) 
+  mod <- Module(model.cppname, getDynLib(dso)) 
   # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
   stan_fit_cpp_module <- eval(call("$", mod, model.cppname))
-  new("stanmodel", model.name = model.name, 
-      model.code = model.code, 
-      .modelmod = list(sampler = stan_fit_cpp_module, 
-                       cxxfun = fx)) # keep a reference of fx
+  obj <- new("stanmodel", model.name = model.name, 
+             model.code = model.code, 
+             dso = dso, # keep a reference to dso
+             .modelmod = new.env()) # store the sampler, which could be replaced 
+  assign("model.cppname", model.cppname, envir = obj@.modelmod)
+  assign("sampler", stan_fit_cpp_module, envir = obj@.modelmod)
+  obj 
 
-  ## We keep a reference to *fx* above to avoid fx to be 
-  ## deleted by R's garbage collection. Note that if fx 
-  ## is freed, we lost the compiled shared object, which
-  ## could cause segfault later. 
+  ## We keep a reference to *dso* above to avoid dso to be 
+  ## deleted by R's garbage collection. Note that if dso 
+  ## is freed, we can lose the compiled shared object, which
+  ## can cause segfault later. 
 } 
 
 is.sm.valid <- function(sm) {
   # Test if a stan model (compiled object) is still valid. 
-  # It could become invalid when the user for example 
-  # save this object and then load it in another R session
-  # because the compiled model is lost. 
+  # It could become invalid when the user do not specify
+  # save.dso when calling stan.model. So when the user
+  # use the model created in another R session, the dso
+  # is lost. 
   # 
   # Args:
   #   sm: the stanmodel object 
   # 
-  fx <- sm@.modelmod$cxxfun 
-  !is.null.cxxfun(fx) 
+  if (is.dso.loaded(sm@dso)) return(TRUE)
+  if (!sm@dso@dso.saved) return(FALSE)
+  if (!identical(sm@dso@system, R.version$system)) return(FALSE)
+  TRUE
 } 
 
 ##
@@ -109,6 +117,7 @@ stan <- function(file, model.name = "anon_model",
                  init.v = NULL, 
                  seed = sample.int(.Machine$integer.max, 1), 
                  sample.file, 
+                 save.dso = TRUE,
                  verbose = FALSE, ..., boost.lib = NULL) {
   # Return a fitted model (stanfit object)  from a stan model, data, etc.  
   # A wrap of method stan.model and sampling of class stanmodel. 
@@ -120,7 +129,7 @@ stan <- function(file, model.name = "anon_model",
 
   if (is(fit, "stanfit")) sm <- get.stanmodel(fit)
   else sm <- stan.model(file, model.name = model.name, model.code = model.code,
-                        boost.lib = boost.lib, verbose = verbose)
+                        boost.lib = boost.lib, save.dso = save.dso, verbose = verbose)
 
   if (missing(sample.file))  sample.file <- NA 
 
