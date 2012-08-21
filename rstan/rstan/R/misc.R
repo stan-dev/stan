@@ -1012,3 +1012,18 @@ is.null.cxxfun <- function(cx) {
   # add is of class NativeSymbol
   .Call("is_Null_NS", add)
 }
+
+file_ext <- function(x) {
+  # obtain the file extension 
+  # copied from tools package 
+  pos <- regexpr("\\.([[:alnum:]]+)$", x)
+  ifelse(pos > -1L, substring(x, pos + 1L), "")
+}
+
+obj.size.str <- function(x) {
+  if (x >= 1024^3)       return(paste(round(x/1024^3, 1L), "Gb"))
+  else if (x >= 1024^2)  return(paste(round(x/1024^2, 1L), "Mb"))
+  else if (x >= 1024)    return(paste(round(x/1024, 1L), "Kb"))
+  return(paste(x, "bytes")) 
+} 
+

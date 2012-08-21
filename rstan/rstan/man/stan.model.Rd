@@ -1,8 +1,6 @@
 \name{stan.model}
 \alias{stan.model}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Construct a Stan model} 
-
 \description{
   Construct and \code{stanmodel} object from a model 
   represented by Stan modeling language. The model 
@@ -15,7 +13,7 @@
 \usage{
   stan.model(file, model.name = "anon_model", 
              model.code = "", stanc.ret = NULL, boost.lib = NULL, 
-             verbose = FALSE)
+             save.dso = TRUE, verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -36,6 +34,11 @@
   \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}. 
     If specified, this path would be used instead for boost library header files for compiling 
     the model in C++ language.}
+  \item{save.dso}{Logical with the default of \code{TRUE}: indication of whether the 
+    dynamic shared object (DSO) compiled from the C++ code for the model 
+    will be saved or not. If \code{TRUE}, we can draw samples from
+    the same model in another R session using the saved object of class \code{stanfit} (i.e.,
+    returned from function \code{stan}) without compiling the C++ code again.}
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     intermediate output inside the function, which might be helpful for debugging
     the model, are printed or not. 
@@ -66,8 +69,8 @@
 }
 \note{
   The object of S4 class \code{stanmodel} created by \code{stan.model} 
-  \strong{cannot} be well saved in that we can not apply \code{sampling} 
-  function for a loaded object of \code{stanmodel} from previously saved. 
+  is well saved when calling function \code{stan} (or \code{stan.model})
+  with \code{save.dso = TRUE}. 
 }
 
 \seealso{

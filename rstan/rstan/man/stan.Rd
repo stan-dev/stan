@@ -1,21 +1,17 @@
 \name{stan}
 \alias{stan}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-Fit a Stan model
-%%  ~~function to do ... ~~
-}
+\title{Fit a model using Stan}
 \description{
-Fit a model in Stan modeling language and return 
-fitted result. 
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  Fit a model in Stan modeling language and return the fitted result. 
 }
 \usage{
 stan(file, model.name = "anon_model", model.code = "", 
   fit = NA, data = list(), pars = NA, n.chains = 4L,
-  n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, init.t = "random",
-  init.v = NULL, seed = sample.int(.Machine$integer.max, 1), 
-  sample.file, verbose = FALSE, ..., boost.lib = NULL)
+  n.iter = 2000L, n.warmup = floor(n.iter/2), n.thin = 1L, 
+  init.t = "random", init.v = NULL, 
+  seed = sample.int(.Machine$integer.max, 1), 
+  sample.file, save.dso = TRUE, 
+  verbose = FALSE, ..., boost.lib = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -54,6 +50,13 @@ stan(file, model.name = "anon_model", model.code = "",
     that when the folder specified is not writable, \code{tempdir()} is used. 
     And when there are multiple chains, an underscore and chain number is appended
     to the file name.} 
+  \item{save.dso}{Logical with the default of \code{TRUE}: indication of whether the 
+    dynamic shared object (DSO) compiled from the C++ code for the model 
+    will be saved or not. If \code{TRUE}, we can draw samples from
+    the same model in another R session using the saved object of class \code{stanfit} (i.e.,
+    returned from function \code{stan}) without compiling the C++ code again.
+    This parameter only takes effect when \code{stan} is not called
+    with specifying parameter \code{fit}.}
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     intermediate output inside the function, which might be helpful for
     debugging the model, are printed or not.}
@@ -111,11 +114,9 @@ stan(file, model.name = "anon_model", model.code = "",
   We can use a previous fitted model object (i.e., an instance
   of S4 class \code{stanfit}) as input for function \code{stan} to 
   refit the model, for example, with different configuration or data. 
-  But for now, since the compiled C++ code for the model 
-  \strong{cannot} be saved, it would not work to refit a model in a R session
-  where the fitted model is loaded from the saved image from previous R 
-  sessions. In other words, this only works without quitting R. 
-  This situation might be improved in the future. 
+  However, when an object of class \code{stanfit} is created by 
+  for example, calling \code{stan} with \code{save.dso = FALSE},
+  the fitted results cannot be used across \R sessions.  
 }
 
 \references{

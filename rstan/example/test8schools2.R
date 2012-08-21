@@ -27,3 +27,7 @@ plot(ss)
 ss2 <- stan(fit = ss, data = dat, n.iter = 2000) 
 print(ss2, probs = c(0.38))
 print(ss2, probs = c(0.48))
+
+ss3 <- stan(fit = ss, data = dat, save.dso = FALSE) # save.dso taks no effect 
+yss <- stan(sfile, data = dat, n.iter = n.iter, n.chains = 4, sample.file = '8schools.csv', save.dso = FALSE)
+save.image()
