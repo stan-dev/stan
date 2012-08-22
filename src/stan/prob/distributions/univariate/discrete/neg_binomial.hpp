@@ -45,11 +45,25 @@ namespace stan {
       using stan::math::binomial_coefficient_log;
       
       lp = 0.0;
+
+      // Special case where negative binomial reduces to Poisson
+      if (alpha > 1e10) {
+        if (include_summand<propto>::value)
+          lp -= lgamma(n + 1.0);
+        if (include_summand<propto,T_shape>::value ||
+            include_summand<propto,T_inv_scale>::value) {
+          typename promote_args<T_shape, T_inv_scale>::type lambda;
+          lambda = alpha / beta;
+          lp += multiply_log(n, lambda) - lambda;
+          return lp;
+        }
+      }
+      // More typical cases
       if (include_summand<propto,T_shape>::value)
 	if (n != 0)
 	  lp += binomial_coefficient_log<T_shape>(n + alpha - 1.0, n);
       if (include_summand<propto,T_shape,T_inv_scale>::value)
-        lp += multiply_log(alpha, beta) - (alpha + n) * log1p(beta);
+	lp += -n * log1p(beta) + alpha * log(beta / (1 + beta));
       return lp;
     }
 

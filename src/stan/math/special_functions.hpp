@@ -174,9 +174,15 @@ namespace stan {
     template <typename T_N, typename T_n>
     inline typename boost::math::tools::promote_args<T_N, T_n>::type
     binomial_coefficient_log(T_N N, T_n n) {
-      return lgamma(N + 1.0)
-        - lgamma(n + 1.0)
-        - lgamma(N - n + 1.0);
+      using std::log;
+
+      const double cutoff = 10;
+      if ((N < cutoff) || (N - n < cutoff)) {
+	return lgamma(N + 1.0) - lgamma(n + 1.0) - lgamma(N - n + 1.0);
+      } else {
+	return n * log(N - n) + (N + 0.5) * log(N/(N-n))
+	  + 1/(12*N) - n - 1/(12*(N-n)) - lgamma(n + 1.0);
+      }
     }
 
     /**
