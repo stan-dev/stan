@@ -21,7 +21,7 @@ using testing::Combine;
 using testing::Range;
 
 enum cl_options {
-  append_samples, // should be first option
+  append_samples, // should be first option for testing purposes
   data,
   init,
   seed,
@@ -79,6 +79,7 @@ public:
     expected_help_options.push_back("equal_step_sizes");
     expected_help_options.push_back("delta");
     expected_help_options.push_back("gamma");
+    expected_help_options.push_back("save_warmup");
     expected_help_options.push_back("test_grad");
 
     expected_output.push_back(make_pair("data","(specified model requires no data)"));
@@ -86,6 +87,7 @@ public:
     expected_output.push_back(make_pair("init tries", "1"));
     expected_output.push_back(make_pair("samples", model_path+".csv"));
     expected_output.push_back(make_pair("append_samples", "0"));
+    expected_output.push_back(make_pair("save_warmup", "0"));
     expected_output.push_back(make_pair("seed", ""));
     expected_output.push_back(make_pair("chain_id", "1 (default)"));
     expected_output.push_back(make_pair("iter", "2000"));
