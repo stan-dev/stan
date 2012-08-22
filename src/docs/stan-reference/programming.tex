@@ -78,10 +78,10 @@ variances are known, but the covariance is not.
 data {
   int<lower=0> N;
   vector[2] y[N];
-  double(0,) var1;  double(0,) var2;
+  double<lower=0> var1;  double<lower=0> var2;
 }
 transformed data {
-  double(0,) max_cov;  double(0,) min_cov;   
+  double<lower=0> max_cov;  double<lower=0> min_cov;   
   max_cov <- sqrt(var1 * var2);  
   min_cov <- -max_cov;
 }
