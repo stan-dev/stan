@@ -319,6 +319,9 @@ Modeling Language
 * ragged arrays
   - ready to use with vec<...<vec<x>...> pattern
   - not clear how to declare (follow C?)
+  -- example on p. 8 of 
+     http://www.jstatsoft.org/v36/c01/paper/
+     involving ragged param arays for graded response model
 
 * subroutines
   - user-defined functions in StanGM
@@ -398,6 +401,11 @@ Command-line
 
 C++ API
 ----------------------------------------------------------------------
+
+* dump format handle:
+  - integers with scientific notation
+  - NaN, Inf, -Inf  (written just like that)
+  - length one arrays read in like scalars
 
 * turn off stan::math::check_range() in math/matrix.hpp
   if STAN_NO_DEBUG or NDEBUG flag is present
