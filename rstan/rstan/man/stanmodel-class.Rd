@@ -12,7 +12,7 @@
 \description{
   A \code{stanmodel} object represents the model compiled from C++ code. 
   Mainly, \code{sampling} method for this class are defined to draw
-  samples from this model. 
+  sample from this model. 
 } 
 
 \section{Objects from the Class}{
@@ -25,8 +25,8 @@
     \item{\code{model.name}:}{The model name, object of \code{character}.} 
     \item{\code{model.code}:}{The model code, object of \code{character}, in Stan modeling language.} 
     \item{\code{.modelmod}:}{Object of \code{environment}  
-      that includes C++ object exposed by Rcpp, a module mainly for drawing
-      samples for the model.}
+      that includes a C++ object exposed by package \pkg{Rcpp}, a module mainly for drawing
+      sample for the model.}
     \item{\code{dso}:}{Object of S4 class \code{cxxdso}. The container for the dynamic 
       shared objects compiled the C++ code of the model, returned from function
       \code{cxxfunction} in package \pkg{inline}.}
@@ -35,9 +35,9 @@
 
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "stanmodel")}: prints the model in
+    \item{show}{\code{signature(object = "stanmodel")}: print the model in
       Stan modeling language code.}
-    \item{sampling}{\code{signature(object = "stanmodel")}: draw samples for
+    \item{sampling}{\code{signature(object = "stanmodel")}: draw sample for
       the model (see \code{\link{sampling}}).}
   }
 }

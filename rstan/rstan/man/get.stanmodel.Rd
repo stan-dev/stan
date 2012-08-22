@@ -5,16 +5,16 @@
 \alias{get.stanmodel,stanfit-method}
 \title{\code{get.stanmodel}: obtain the S4 class \code{stanmodel} from the fitted model} 
 \description{
- As an instance of S4 class \code{stanfit} is the fitted results (mainly 
- samples) from a \code{stanmodel}. This method is used to extract
- the S4 class \code{stanmodel} instance from the fitted model.} 
+ An object of S4 class \code{stanfit} is the fitted results (mainly 
+ sample) from a \code{stanmodel}. This method is used to extract
+ the S4 class \code{stanmodel} object from the fitted model.} 
 \usage{
   \S4method{get.stanmodel}{stanfit}(object) 
 } 
 \section{Methods}{
   \describe{
     \item{\code{signature(object = "stanfit")}}{
-      Extract the \code{stanmodel} instance. 
+      Extract the \code{stanmodel} object. 
     }
   }
 }

@@ -5,9 +5,9 @@
 \alias{extract,stanfit-method}
 %\alias{extract,stanfit,character-method}
 
-\title{\code{extract}: extract samples from fitted Stan model}
+\title{\code{extract}: extract sample from fitted Stan model}
 \description{
-  Extract samples drawn for a fitted model defined by class \code{stanfit}. 
+  Extract sample drawn for a fitted model defined by class \code{stanfit}. 
 }
 
 \usage{
@@ -18,7 +18,7 @@
 \section{Methods}{
   \describe{
     \item{extract}{\code{signature(object = stanfit}}{
-       Extract samples for a fitted model defined by class \code{stanfit}.  
+       Extract sample for a fitted model defined by class \code{stanfit}.  
     }
   }
 }
@@ -29,17 +29,17 @@
     names (or other quantity names) of interest. If not specified,
     all parameters stored would be used.} 
   \item{permuted}{\code{TRUE} of \code{FALSE}. If \code{TRUE}, all kept 
-    samples (that is, warmup samples
+    sample (that is, warmup sample
     are discarded) in each chain are permuted are merged. If \code{FALSE}, 
     the original order are kept.}
   \item{inc.warmup}{\code{TRUE} of \code{FALSE}. The argument matters
     only if \code{permuted} is \code{FALSE}. If \code{TRUE}, warmup
-    samples are included; otherwise excluded.}
+    sample are included; otherwise excluded.}
 }
 \value{
   When \code{permuted = TRUE}, this function returns a list,  
-  every element of which is the samples for a chain. 
-  The samples of a chain is in form of an array. 
+  every element of which is the sample for a chain. 
+  The sample of a chain is in form of an array. 
   When \code{permuted = FALSE}, an array is returned; the first
   dimension is the iterations; the second is the number of chains; the 
   third are the parameters. The parameters are expanded for vector/array 

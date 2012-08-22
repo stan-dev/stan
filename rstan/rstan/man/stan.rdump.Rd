@@ -2,7 +2,7 @@
 \alias{stan.rdump}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Dump the data for a Stan model to R dump file
+Dump the data for a Stan model to \R dump file
 that Stan supports
 %%  ~~function to do ... ~~
 }

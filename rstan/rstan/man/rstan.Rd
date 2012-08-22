@@ -3,9 +3,9 @@
 \alias{rstan-package}
 \alias{rstan} 
 \docType{package}
-\title{RStan --- R interface to Stan}
+\title{RStan --- \R interface to Stan}
 \description{
-  R interface to Stan, which is a C++ package for obtaining Bayesian
+  \R interface to Stan, which is a C++ package for obtaining Bayesian
   inference using the No-U-turn sampler, a variant of Hamiltonian Monte
   Carlo (see \url{http:/stan.googlecode.com}). 
 }

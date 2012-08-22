@@ -6,7 +6,7 @@
 }
 \description{
   Compile model in Stan language to C++ code, which can 
-  be compiled and then loaded for drawing samples for the 
+  be compiled and then loaded for drawing sample for the 
   model. 
 }
 \usage{
@@ -32,17 +32,21 @@
 }
 
 \note{
-  R users might make the following mistakes when 
+  \R users might make the following mistakes when 
   using Stan modeling language.
 
-  Using dot(".") in variable names such as \code{a.1}. However,
+  Using dot(".") in variable names for data and parameters 
+  such as \code{a.1}. However,
   The syntax in some respect of the Stan modeling language is
   more like programming language C++, which does not allow dot. 
   And in Stan modeling language, we need explicite semicolon (";")
   to end a statement. 
 
-  In addition, all reserved key words in C++ programming language 
-  cannot be used as variable names, see Stan's manual. 
+  In addition, most of all reserved keywords in C++ programming language 
+  as well as some names such as \code{std} that have already 
+  used in C++ cannot be used as variable names, see Stan's manual. 
+  The reserved keywords of C++ can be found at, for example, 
+  \url{http://en.cppreference.com/w/cpp/keyword}.
 } 
 
 \references{

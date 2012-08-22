@@ -4,9 +4,9 @@
 \alias{sampling-methods}
 \alias{sampling,stanmodel-method}
 
-\title{\code{sampling}: draws samples from Stan model}
+\title{\code{sampling}: draws sample from Stan model}
 \description{
-  Draw samples from the model defined by class \code{stanmodel}. 
+  Draw sample from the model defined by class \code{stanmodel}. 
   This is a generic function of S4 class \code{stanmodel}. 
 }
 
@@ -22,7 +22,7 @@
   \describe{
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
-      Call samplers such as NUTS1 and NUTS2 to draw samples from the model defined by S4 class \code{stanmodel} 
+      Call samplers such as NUTS1 and NUTS2 to draw sample from the model defined by S4 class \code{stanmodel} 
       given the data, initial values, etc. 
     }
   }
@@ -35,21 +35,21 @@
     providing the data for the model.}    
 
   \item{pars}{A vector of character string specifying parameters of interest; defaults
-    to \code{NA} indicating all parameters in the model. Only parameters in \code{pars}
-    are stored in the fitted results.}
+    to \code{NA} indicating all parameters in the model. Only sample for parameters given 
+    in \code{pars} are stored in the fitted results.}
 
   \item{n.chains}{A positive integer specifying number of chains; defaults to 1.} 
  
   \item{n.iter}{A positive integer specifying how many iterations for all the
     chains (including warmup). The default is 2000.}
 
-  \item{n.warmup}{A positive integer specifying number of initial samples to be
-    discarded. The default is \code{n.iter / 2}. Note that this is also known as burnin.}
+  \item{n.warmup}{A positive integer specifying the number of iterations to be
+    discarded. The default is \code{n.iter / 2}. This is also known as burnin.}
 
-  \item{n.thin}{A positive integer specifying the period for saving samples; defaults to 1.} 
+  \item{n.thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
 
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
-    the maximum integer supported by R on the machine. Note that when multiple chains
+    the maximum integer supported by \R on the machine. When multiple chains
     are used, only one seed is needed.}
 
   \item{init.t}{One of \code{0} (or \code{"0"}), \code{"user"}, or \code{"random"} 
@@ -68,9 +68,9 @@
     to leave it to be the default \code{TRUE}.}
 
   \item{sample.file}{A character string of file name for specifying where the 
-    samples are written into. If not provided, files are not created. Note 
+    sample are written into. If not provided, files are not created. Note 
     that when the folder specified is not writable, \code{tempdir()} is used. 
-    And when there are multiple chains, an underscore and chain number is appended
+    And when there are multiple chains, an underscore and chain number are appended
     to the file name.} 
    
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
@@ -88,10 +88,10 @@
     }
 
     More details can be 
-    found in Stan's manual. Note that by default, 
+    found in Stan's manual. By default, 
     \code{leapfrog_steps} is \code{-1} and 
     \code{equal_step_sizes} is \code{FALSE} so that
-    NUTS2 sampler, the default sampler one, is used.
+    NUTS2 sampler, the default sampler, is used.
 
     In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling 
@@ -99,10 +99,13 @@
   }
 }
 \value{
-   A named list, each element of which are the samples
-   for one parameter.  In the case of vector (array) parameters,
-   their elements are used. 
+   An object of S4 class \code{stanfit} that represented 
+   the fitted results. 
 } 
+
+\seealso{
+  \code{\linkS4class{stanmodel}}, \code{\linkS4class{stanfit}} 
+}
 
 \examples{\dontrun{
 m <- stan.model(model.code = 'parameters {real y;} model {y ~ normal(0,1);}')

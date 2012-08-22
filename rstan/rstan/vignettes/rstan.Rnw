@@ -127,7 +127,7 @@ most of the abvoe steps.
 
 In this section, we use an example to demonstrate using \RStan. 
 In section 5.5 of \cite{GelmanCarlinSternRubin:2003}, a hierarchical model is used to model 
-coaching effects from eight schools. Later on, we call this example eight schools example. 
+coaching effects from eight schools. For short, we call this example ``eight schools.'' 
 The data are given in table
 \ref{tab08schoolsdata}. 
 The statistical model is specified as 
@@ -189,23 +189,27 @@ schools.code <- '
 '
 @
 
-\RStan accepts data as a \code{list} or an \code{environment}. So to prepare the data
-in \R, we have 
+\RStan accepts data as a \code{list}, an \code{environment}, or a vector of characters
+containing object names in the working space. So to prepare the data
+in \R, we create a \code{list} as follows. 
 <<echo=TRUE>>=
 dat <- list(J = 8, 
             y = c(28,  8, -3,  7, -1,  1, 18, 12),
             sigma = c(15, 10, 16, 11,  9, 11, 10, 18))
 @
 
-Next, we can function \code{stan} to sample from the model. 
+Next, we can call function \code{stan} to sample from the model. 
 <<echo=TRUE, results=hide>>=
 fit <- stan(model.code = schools.code, data = dat, 
             n.iter = 2012, n.chains = 4)
 @
 
+
+
+
 Function \code{stan} wraps up the follow three steps. These steps are similar to some
 steps mentioned above for \Stan. But \RStan has a deep integration of \Stan, which 
-makes it more efficient and convenient than if we call an outside \Stan.  
+makes it easier to use \Stan. 
 \begin{enumerate}
 \item Compile the \Stan model to \Cpp code 
 \item Compile the \Cpp code 
@@ -213,10 +217,10 @@ makes it more efficient and convenient than if we call an outside \Stan.
 \end{enumerate}
 
 Notice it is easy to just use function \code{stan} in one step if everything
-goes well. \RStan also provides functionality to using \RStan in multiple
+goes well. \RStan also provides functionality to fit a model by several 
 steps to make it easier to debug our \Stan model code and \R code. 
 
-Function \code{stan} return an S4 object of class \code{stanfit}, for which
+Function \code{stan} returns an S4 object of class \code{stanfit}, for which
 a few generic function such as \code{print} and \code{plot} are provided. 
 <<echo=TRUE>>=
 print(fit)
@@ -227,8 +231,8 @@ print(fit)
 
 In section \ref{sec0example}, the eight schools example is fitted in \RStan
 just using function \code{stan}. However, in our actual development of modeling
-and coding, we need more steps to have a working model. \RStan also 
-provides functionality to in a way the process is like using \Stan. 
+and coding, we can use a few steps to have a working model. \RStan also 
+provides functionality to fit a model step by step as using \Stan. 
 
 First, we can use \code{stanc} function to compile the model in \Stan
 modeling language to \Cpp code. In the case that we have syntax errors in the 
@@ -251,7 +255,7 @@ sm <- stan.model(stanc.ret = rt, verbose = FALSE)
 @
 
 Also we can construct a model from the model's \Stan code
-using \code{stan.model}, which in this case would include compiling
+using \code{stan.model}, which in this case includes the step of compiling
 the model to \Cpp using \code{stanc}. 
 <<echo=TRUE, results=hide>>=
 sm <- stan.model(model.code = schools.code, model.name = '8schools', 
@@ -276,12 +280,12 @@ arguments to control the sampling procedure the same as in
 For the fitted object, S4 class \code{stanfit}, currently,
 we have defined generic functions such as \code{print},
 \code{summary}, \code{plot}, \code{traceplot}, \code{get.stancode}, etc. 
-Using these functions, we first could diagnose the convergence
+Using these functions, we first can diagnose the convergence
 of the Markov chains by looking at the trace plots and calculating 
 the split Rhats.  The inference based on the kept samples (that is, warmup
 samples are discarded) could be obtained by \code{summary}
 function and printed out by \code{print}. Also the samples saved 
-could be extracted in a couple of ways. 
+could be extracted in a couple of ways using function \code{extract}. 
 
 In addition, in the \code{stanfit} object, we keep all 
 the information regarding the samples procedure, for example, the initials
@@ -324,12 +328,12 @@ Figure~\ref{fig0stanfitplot} presents the plot of the eight schools example.
 On this plot, an credible interval (typically 80\%) for all the samples
 and the median of each chain are displayed. In addition, under the lines
 indicating intervals, a small colored area is used to indicated the 
-value of split Rhat, which gets intense with the value of Rhat. 
+value of split Rhat, in which the color indicates the value of Rhat. 
 
 Function \code{traceplot} plot the traces of all chains for the parameters 
 specified. If we include the warmup samples by setting \code{inc.warmup = TRUE} (the 
 default), the background color of the warmup area is different from after warmup.   
-We could exclude the warmup area by specifying \code{inc.warmup = FALSE}
+We can exclude the warmup area by specifying \code{inc.warmup = FALSE}
 when calling \code{traceplot}.  The example for parameter $\theta$
 of the eight schools model is presented in Figure~\ref{fig0stanfitplot}. 
 \begin{figure}[ht]
@@ -337,7 +341,7 @@ of the eight schools model is presented in Figure~\ref{fig0stanfitplot}.
 <<echo=false, fig=TRUE, label=stanfit_plot>>=
 plot(fit)
 @
-\caption{An overview plot for the inference of eight schools model} 
+\caption{An overview plot for the inference of eight schools example} 
 \label{fig0stanfitplot}
 \end{figure}
 
@@ -368,6 +372,25 @@ dim(s2)
 dimnames(s2)
 @
 
+\subsection{The dynamic shared objects for models} 
+
+In \Stan, for every model, we use \stanc to compile the 
+model from Stan modeling language code to \Cpp code 
+and the compile the \Cpp code to dynamic shared object (DSO),
+which is loaded into \R ang executed to draw samples. 
+The compiling from C++ code to DSO, sometimes, takes a while. 
+When the model is the same, we could reuse the previous compiled 
+DSO. In function \code{stan}, if parameter \code{fit} is specified
+with a previous fitted object, the compiled model is reused. 
+When reusing a previous fitted model, we could specify different 
+data and other parameters for function \code{stan}. 
+
+In addition, if the fitted model is saved, for example, by function
+\code{save} and \code{save.image}, \RStan is able to save the 
+DSO for models, so that they could be used across \R sessions. 
+Saving the DSO is optional by specify parameter \code{save.dso}, which
+is \code{TRUE}, by default, during calling function \code{stan}. 
+
 \section{Miscellaneous} 
 
 In \RStan, we could return the model's \Stan modeling
@@ -391,7 +414,7 @@ Name  &    Functionality    \\
 \code{plot}          & plot the inferences (intervals and medians) for parameters \\
 \code{traceplot}     & plot the traces of chains  \\
 \code{extract}       & extract samples of parameters  \\
-\code{get.stancode}     & extract the model \Stan code  \\
+\code{get.stancode}     & extract the \Stan modeling language code of the model  \\
 \code{get.stanmodel}     & extract the \code{stanmodel} object \\ 
 \code{get.seed}      & get the seed used for sampling  \\
 \code{get.inits}     & get the initial values used for sampling  \\
@@ -402,8 +425,7 @@ Name  &    Functionality    \\
 
 \section{Summary} 
 
-\RStan provides a convenient and straightforward interface
-to \Stan. 
+\RStan provides a convenient and end to end interface to \Stan. 
 
 \bibliography{rstan} 
 \end{document} 

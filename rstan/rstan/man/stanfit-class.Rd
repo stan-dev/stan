@@ -32,7 +32,7 @@
     \item{\code{model.pars}:}{The names of parameters (or transformed
       parameters, derived quantities), object of \code{character}} 
     \item{\code{par.dims}:}{The dimensions for all parameters, object of \code{list}}
-    \item{\code{sim}:}{Simulation results including samples for the model, object 
+    \item{\code{sim}:}{Simulation results including sample for the model, object 
       of \code{list}} 
     \item{\code{inits}:}{The initial values either specified or generated
       randomly for all chains, object of \code{list}. Each member is a list for a chain.} 
@@ -44,7 +44,7 @@
 
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "stanfit")}: prints the default summary
+    \item{show}{\code{signature(object = "stanfit")}: print the default summary
       for the model.}
     \item{plot}{\code{signature(x = 'stanfit')}: plot an overview of summaries 
       for all parameters.}
@@ -54,7 +54,7 @@
       about quantities of interest based on all chains merged. 
       Most of the printout are the results from function \code{summary}.} 
     \item{summary}{\code{signature(object = "stanfit")}: summarizes the 
-      distributions of quantities using the samples: the quantiles 
+      distributions of quantities using the sample: the quantiles 
       (for example, 2.5\%, 50\%, 97.5\%, which can be specified), 
       the mean, the standard deviation (SD), the effective sample size (ESS),
       and the split Rhat (split potential split potential scale reduction).
@@ -64,7 +64,7 @@
       the standard error of the mean. 
     }
     \item{extract}{\code{signature(object = "stanfit")}: 
-      get the samples for all chains for all (or specified ) parameters. 
+      get the sample for all chains for all (or specified ) parameters. 
       (see \code{\link{extract}}).}
     \item{traceplot}{\code{signature(object = "stanfit")}:
       plot the trace of chains.} 

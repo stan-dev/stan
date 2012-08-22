@@ -59,7 +59,7 @@ setMethod("sampling", "stanmodel",
                    sample.file, verbose = FALSE, ...) {
 
             if (!is.sm.valid(object))
-              stop("the compiled model from C++ code is not valid any more")
+              stop("the compiled model from C++ code is not valid")
 
             if (!is.dso.loaded(object@dso)) {
                grab.cxxfun(object@dso) 
