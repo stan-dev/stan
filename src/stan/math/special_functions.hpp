@@ -176,7 +176,7 @@ namespace stan {
     binomial_coefficient_log(T_N N, T_n n) {
       using std::log;
 
-      const double cutoff = 10;
+      const double cutoff = 1000;
       if ((N < cutoff) || (N - n < cutoff)) {
 	return lgamma(N + 1.0) - lgamma(n + 1.0) - lgamma(N - n + 1.0);
       } else {
