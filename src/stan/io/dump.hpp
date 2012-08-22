@@ -589,10 +589,10 @@ namespace stan {
           size_t end;
           in_ >> end;
           if (start <= end) {
-            for (int i = start; i <= end; ++i)
+            for (size_t i = start; i <= end; ++i)
               stack_i_.push_back(i);
           } else {
-            for (int i = start; i >= end; --i)
+            for (size_t i = start; i >= end; --i)
               stack_i_.push_back(i);
           }
         } 
@@ -621,10 +621,10 @@ namespace stan {
           size_t end;
           in_ >> end;
           if (start < end) {
-            for (int i = start; i <= end; ++i)
+            for (size_t i = start; i <= end; ++i)
               dims_.push_back(i);
           } else {
-            for (int i = start; i >= end; --i)
+            for (size_t i = start; i >= end; --i)
               dims_.push_back(i);
           }
         }
