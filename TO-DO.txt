@@ -1,48 +1,16 @@
 STAN V1.0
 ======================================================================
 
-* distribution engineering (Daniel)
-  download:  tarballs, doc
-  tarball:  Stan repository (+ binaries?)
-
 * speed tests relative to JAGS
 
-* revise home page (see below) 
-  -- content see below and in web/index.html
-  -- launch on mc-stan.org
+* test model names for C++ reserved words
+  along with identifiers in models;  add to doc
 
+* update doc for revised stanc default model names
 
+* update doc to use makefiles for models
 
-HOME PAGE
-======================================================================
-Why does someone show up on the home page?
-
-* Find out what Stan is
- - short description right up top
- - link to manual
-
-* Download latest
- - clear license link
- - big link to latest code tarball:
-     stan-src-1.0.0.tgz
- - link to latest Git repository
-
-* Find/join User Group
- - big link to groups
-
-* Contact / issue tracker
- - big link up top
-
-* Maybe they also want:
-- executables
-   + bin/stanc
-   + pre-built versions for certain OS/compilers
-- browse Git source archive
- - API doc online
- - How to cite Stan
-   now: Arxiv/JMLR paper NUTS, manual/web site for Stan
- - older versions
-c++
+* write command-line getting started and pull out of manual
 
 
 CODE CLEANUP
