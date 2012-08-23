@@ -85,14 +85,6 @@ int main(int argc, const char* argv[]) {
 
   stan::gm::program prog;
   try {
-
-    std::string model_name;
-    if (cmd.has_key("name")) {
-      cmd.val("name",model_name);
-    } else {
-      model_name = "anon_model";
-    }
-    
     if (cmd.bare_size() != 1) {
       std::string msg("require file name to compile as input. "
                       "execute \"stanc --help\" for more information");
@@ -102,6 +94,42 @@ int main(int argc, const char* argv[]) {
     cmd.bare(0,in_file_name);
     std::fstream in(in_file_name.c_str());
 
+    std::string model_name;
+    if (cmd.has_key("name")) {
+      cmd.val("name",model_name);
+    } else {
+      size_t slashInd = in_file_name.rfind('/');
+      size_t ptInd = in_file_name.rfind('.');
+      if (ptInd == std::string::npos)
+        ptInd = in_file_name.length();
+      if (slashInd == std::string::npos) {
+        slashInd = in_file_name.rfind('\\');
+      }
+      if (slashInd == std::string::npos) {
+        slashInd = 0;
+      } else {
+        slashInd++;
+      }
+      model_name = in_file_name.substr(slashInd,ptInd - slashInd) + "_model";
+      for (std::string::iterator strIt = model_name.begin();
+           strIt != model_name.end(); strIt++) {
+        if (!isalnum(*strIt) && *strIt != '_') {
+          *strIt = '_';
+        }
+      }
+    }
+    if (!isalpha(model_name[0]) && model_name[0] != '_') {
+      std::string msg("model_name must not start with a number or symbol other than _");
+      throw std::invalid_argument(msg);
+    }
+    for (std::string::iterator strIt = model_name.begin();
+         strIt != model_name.end(); strIt++) {
+      if (!isalnum(*strIt) && *strIt != '_') {
+        std::string msg("model_name must contain only letters, numbers and _");
+        throw std::invalid_argument(msg);
+      }
+    }
+    
     std::string out_file_name;
     if (cmd.has_key("o")) {
       cmd.val("o",out_file_name);
