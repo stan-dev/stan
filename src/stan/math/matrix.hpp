@@ -1,12 +1,15 @@
 #ifndef __STAN__MATH__MATRIX_HPP__
 #define __STAN__MATH__MATRIX_HPP__
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
-#include <Eigen/Dense>
-
 #include <stdexcept>
 #include <vector>
 
+#include <boost/math/tools/promotion.hpp>
+
+#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
+#include <Eigen/Dense>
+
+#include <stan/math/boost_error_handling.hpp>
 
 namespace stan {
   
@@ -731,10 +734,16 @@ namespace stan {
      * in the specified standard vector.
      * @param v Specified vector.
      * @return Sample mean of vector coefficients.
+     * @throws std::domain_error if the size of the vector is less
+     * than 1.
      */
     template <typename T>
-    inline double mean(const std::vector<T>& v) {
-      double sum(0);
+    inline 
+    typename boost::math::tools::promote_args<T>::type
+    mean(const std::vector<T>& v) {
+      T sum(0);
+      if (v.size() == 0) 
+        BOOST_THROW_EXCEPTION(std::domain_error("argument to mean have size > 0; found size=0"));
       for (size_t i = 0; i < v.size(); ++i)
         sum += v[i];
       return sum / v.size();
@@ -770,14 +779,24 @@ namespace stan {
 
     /**
      * Returns the sample variance (divide by length - 1) of the
-     * coefficients in the specified column vector.
+     * coefficients in the specified standard vector.
      * @param v Specified vector.
      * @return Sample variance of vector.
+     * @throws std::domain_error if the size of the vector is less
+     * than 2.
      */
     template <typename T>
-    inline double variance(const std::vector<T>& v) {
-      T v_mean = mean(v);
-      T sum_sq_diff = 0;
+    inline 
+    typename boost::math::tools::promote_args<T>::type
+    variance(const std::vector<T>& v) {
+      if (v.size() < 2) {
+        std::stringstream s;
+        s << "argument to variance must have size >= 2"
+          << "; found v.size()=" << v.size();
+        BOOST_THROW_EXCEPTION(std::domain_error(s.str()));
+      }        
+      T v_mean(mean(v));
+      T sum_sq_diff(0);
       for (size_t i = 0; i < v.size(); ++i) {
         T diff = v[i] - v_mean;
         sum_sq_diff += diff * diff;
@@ -840,7 +859,9 @@ namespace stan {
      * @return Sample variance of vector.
      */
     template <typename T>
-    inline double sd(const std::vector<T>& v) {
+    inline 
+    typename boost::math::tools::promote_args<T>::type
+    sd(const std::vector<T>& v) {
       return sqrt(variance(v));
     }
 

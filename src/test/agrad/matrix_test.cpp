@@ -2833,3 +2833,77 @@ TEST(MathMatrix,softmax) {
   EXPECT_FLOAT_EQ(exp(1)/(exp(-1) + exp(1) + exp(10.0)), theta3[1].val());
   EXPECT_FLOAT_EQ(exp(10)/(exp(-1) + exp(1) + exp(10.0)), theta3[2].val());
 }
+TEST(AgradMatrix, meanStdVector) {
+  using stan::math::mean; // should use arg-dep lookup
+  using std::vector;
+  using stan::agrad::var;
+  vector<var> x(0);
+  EXPECT_THROW(mean(x), std::domain_error);
+  x.push_back(1.0);
+  EXPECT_FLOAT_EQ(1.0, mean(x).val());
+  x.push_back(2.0);
+  EXPECT_FLOAT_EQ(1.5, mean(x).val());
+
+  vector<var> y = createAVEC(1.0,2.0);
+  var f = mean(y);
+  vector<double> grad = cgrad(f, y[0], y[1]);
+  EXPECT_FLOAT_EQ(0.5, grad[0]);
+  EXPECT_FLOAT_EQ(0.5, grad[1]);
+  EXPECT_EQ(2, grad.size());
+}
+TEST(AgradMatrix, varianceStdVector) {
+  using stan::math::variance; // should use arg-dep lookup
+  using std::vector;
+  using stan::agrad::var;
+
+  vector<var> y1 = createAVEC(0.5,2.0,3.5);
+  var f1 = variance(y1);
+  vector<double> grad1 = cgrad(f1, y1[0], y1[1], y1[2]);
+  double f1_val = f1.val(); // save before cleaned out
+
+  vector<var> y2 = createAVEC(0.5,2.0,3.5);
+  var mean2 = (y2[0] + y2[1] + y2[2]) / 3.0;
+  var sum_sq_diff_2 
+    = (y2[0] - mean2) * (y2[0] - mean2)
+    + (y2[1] - mean2) * (y2[1] - mean2)
+    + (y2[2] - mean2) * (y2[2] - mean2); 
+  var f2 = sum_sq_diff_2 / (3 - 1);
+
+  EXPECT_EQ(f2.val(), f1_val);
+
+  vector<double> grad2 = cgrad(f2, y2[0], y2[1], y2[2]);
+
+  EXPECT_EQ(3, grad1.size());
+  EXPECT_EQ(3, grad2.size());
+  for (size_t i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(grad2[i], grad1[i]);
+}
+TEST(AgradMatrix, sdStdVector) {
+  using stan::math::sd; // should use arg-dep lookup (and for sqrt)
+  using std::vector;
+  using stan::agrad::var;
+
+  vector<var> y1 = createAVEC(0.5,2.0,3.5);
+  var f1 = sd(y1);
+  vector<double> grad1 = cgrad(f1, y1[0], y1[1], y1[2]);
+  double f1_val = f1.val(); // save before cleaned out
+
+  vector<var> y2 = createAVEC(0.5,2.0,3.5);
+  var mean2 = (y2[0] + y2[1] + y2[2]) / 3.0;
+  var sum_sq_diff_2 
+    = (y2[0] - mean2) * (y2[0] - mean2)
+    + (y2[1] - mean2) * (y2[1] - mean2)
+    + (y2[2] - mean2) * (y2[2] - mean2); 
+  var f2 = sqrt(sum_sq_diff_2 / (3 - 1));
+
+  EXPECT_EQ(f2.val(), f1_val);
+
+  vector<double> grad2 = cgrad(f2, y2[0], y2[1], y2[2]);
+
+  EXPECT_EQ(3, grad1.size());
+  EXPECT_EQ(3, grad2.size());
+  for (size_t i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(grad2[i], grad1[i]);
+}
+
+
