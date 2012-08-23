@@ -47,7 +47,7 @@ void print_stanc_help() {
 
   print_help_option("name","string",
                     "Model name",
-                    "default = \"anon_model\"");
+                    "default = \"$model_filename_model\"");
 
   print_help_option("o","file",
                     "Output file for generated C++ code",
