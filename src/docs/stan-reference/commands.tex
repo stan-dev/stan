@@ -239,7 +239,7 @@ The following commands will produce an executable in the file
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd $stan
-> g++ -O3 -Lbin -lstan -Isrc -Ilib/boost_1.50.0 \
+> g++ -O3 -Lbin -lstan -Isrc -Ilib/boost_1.51.0 \
   -Ilib/eigen_3.1.0 my_model.cpp -o my_model
 \end{Verbatim}
 \end{quote} % $
@@ -256,7 +256,7 @@ The options used here are as follows.
   searched for code (it contains the top-level \Stan headers),
 \item[\code{-Ilib/eigen\_3.1.0}] specifies the directory for
   the Eigen library,
-\item[\code{-Ilib/boost\_1.50.0}] specifies the directory for the 
+\item[\code{-Ilib/boost\_1.51.0}] specifies the directory for the 
   Boost library,
 \item[\code{my\_model.cpp}] specifies the name of the source file to
   compile, and 
