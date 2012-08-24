@@ -12,7 +12,9 @@ Author: Jiqiang Guo <guojq28@gmail.com>,
         Michale Malecki <malecki@gmail.com>, 
         Andrew Gelman <gelman@stat.columbia.edu>
 Maintainer: Jiqiang Guo <guojq28@gmail.com>
-Description: R interface to Stan 
+Description: R interface to Stan (Stan is an open-source package for obtaining
+        Bayesian inference using the No-U-Turn sampler, a variant of
+        Hamiltonian Monte Carlo.)
 License: GPL (>=3)
 LicenseNote: RStan includes part of unmodified copies of Stan and Boost,
   available at http://code.google.com/p/stan and http://www.boost.org with
@@ -21,4 +23,4 @@ Depends: methods, Rcpp (>= 0.9.10), inline, RcppEigen(>= 0.3.0), Matrix
 LinkingTo: Rcpp
 Imports: graphics, Matrix  
 Suggests: RUnit
-URL: https://code.google.com/p/stan/
+URL: http://mc-stan.org

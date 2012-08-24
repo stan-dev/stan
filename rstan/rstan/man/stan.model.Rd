@@ -49,7 +49,7 @@
 
 \details{
   %%  ~~ If necessary, more details than the description above ~~
-  The details of Stan can be found at \url{http://code.googlecode.com/p/stan}. 
+  The details of Stan can be found at \url{http://code.goglecode.com/p/stan}. 
 
   There are three ways to specify the model's code for \code{stan.model}. 
   \enumerate{ 
@@ -67,7 +67,7 @@
 \references{
   The Stan Development Team (2012) 
   \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://code.google.com/p/stan}. 
+  \url{http://mc-stan.org}. 
 }
 \note{
   The object of S4 class \code{stanmodel} created by \code{stan.model} 
