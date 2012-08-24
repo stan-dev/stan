@@ -1,4 +1,2 @@
 1. collect more information about the sampler to R 
-2. plot with information about model and 
-   legend for Rhat 
-3. cache compiled objects 
+2(?). Makefile build for all platforms 

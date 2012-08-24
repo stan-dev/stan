@@ -1,8 +1,16 @@
+Fri Aug 24 2012
+1. use boost 1.51.0 
+
+Tue Aug 21 2012
 1. Bug fixes
-   * not working binary build for Mac (not fixed last time) (?)
+   * not working binary build for Mac (not fixed last time)
+   * bug fixes in Stan
 
 2. New features 
    * add makeconf.path function to obtain the full path for file Makeconf 
+   * add Rhat legend for stanfit's plot 
+   * support saving stanfit object for reusing across R sessions  
+   * using <lower=, upper=> syntax for bounded variables 
 
 
 Sat Aug 11 2012:
@@ -10,7 +18,7 @@ Sat Aug 11 2012:
    * plot for stanfit wide y-axis 
    * print for stanfit class 
    * not working binary build for Mac, this is because variables for 
-     the path of header files are using values when they are built.  
+     the path of header files are using values computed when the package is built.  
 
 2. New features
    * add standard error of mean (SE.Mean) to print of stanfit 
