@@ -83,8 +83,8 @@ stan(file, model.name = "anon_model", model.code = "",
     show the progress every \code{refresh} iterations).} 
 
   \item{boost.lib}{The path for boost library that can be downloaded from
-     \url{http://http://www.boost.org/users/download/}. This provides an
-     alternative path for the boost library used in Stan.}
+     \url{http://www.boost.org/users/download/}. This provides an
+     alternative way to specify the boost library used in Stan.}
 }
 \details{
   \code{stan} is a one step function to fit a 

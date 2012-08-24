@@ -48,8 +48,7 @@
 }
 
 \details{
-  %%  ~~ If necessary, more details than the description above ~~
-  The details of Stan can be found at \url{http://code.goglecode.com/p/stan}. 
+  More details of Stan can be found at \url{http://mc-stan.org}. 
 
   There are three ways to specify the model's code for \code{stan.model}. 
   \enumerate{ 
