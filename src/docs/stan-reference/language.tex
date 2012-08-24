@@ -2432,24 +2432,21 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 \begin{Verbatim}
 var_decl ::= var_type var_name ?dims
 
-var_type ::= int ?int_range
-           | real ?real_range
-           | vector '(' int_expression ')'
-           | ordered '(' int_expression ')'
-           | simplex '(' int_expression ')'
-           | row_vector '(' int_expression ')'
-           | matrix '(' int_expression ',' int_expression ')'
-           | corr_matrix '(' int_expression ')'
-           | cov_matrix '(' int_expression ')'
+var_type ::= int ?('<' range '>')
+           | real ?('<' range '>')
+           | vector '[' expression ']'
+           | ordered '[' expression ']'
+           | simplex '[' expression ']'
+           | row_vector '[' expression ']'
+           | matrix '[' expression ',' expression ']'
+           | corr_matrix '[' expression ']'
+           | cov_matrix '[' expression ']'
 
-int_range ::= '(' int_expression ',' ?int_expression ')'
-            | '('  ','  int_expression ')'
+range ::= 'lower' '=' expression ',' 'upper' = expression
+        | 'lower' '=' expression
+        | 'upper' '=' expression
 
-real_range ::= '(' real_expression ',' ?real_expression ')'
-             | '('  ','  real_expression ')'
-
-
-dims ::= '['  int_expression (',' int_expression)*  ']'
+dims ::= '['  expression (',' expression)*  ']'
 \end{Verbatim}
 }
 
@@ -2484,7 +2481,7 @@ statement
   | '{' var_decl* statement+ '}'
   | ';'
 
-truncation ::= 'T' (int_range | real_range)
+truncation ::= 'T' '[' ?expression ',' ?expression ']'
 
 lhs ::= identifier
       | identifier '[' expressions ']'
