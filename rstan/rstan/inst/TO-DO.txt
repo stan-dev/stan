@@ -1,0 +1,2 @@
+1. collect more information about the sampler to R 
+2(?). Makefile build for all platforms 

@@ -124,7 +124,7 @@ stan(file, model.name = "anon_model", model.code = "",
 \references{
   The Stan Development Team (2012) 
   \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://code.google.com/p/stan}. 
+  \url{http://mc-stan.org}. 
 }
 \seealso{
   \code{\link{stanc}} compiling model code in Stan modeling language to C++, 

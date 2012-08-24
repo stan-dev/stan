@@ -1,7 +1,7 @@
 STAN_HOME = ../../../../..
 PGM = leuk
 CXX = clang++ 
-CPPFLAGS = -I $(STAN_HOME)/lib/boost_1.50.0 -I$(STAN_HOME)/lib/eigen_3.1.0 -I$(STAN_HOME)/lib/eigen_3.1.0/unsupported  -I $(STAN_HOME)/src
+CPPFLAGS = -I $(STAN_HOME)/lib/boost_1.51.0 -I$(STAN_HOME)/lib/eigen_3.1.1 -I$(STAN_HOME)/lib/eigen_3.1.1/unsupported  -I $(STAN_HOME)/src
 LIBFLAGS = -L$(STAN_HOME)/bin -lstan 
 
 $(PGM) :

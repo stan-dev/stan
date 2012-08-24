@@ -13,7 +13,7 @@ setMethod("show", "cxxdso",
                 ", size = ", obj.size.str(object.size(object@.MISC$dso.bin)), ".\n", sep = '')  
             cat("And dso.last.path = '", object@.MISC$dso.last.path, "'.\n", sep = '')
             cat("Created on: ", object@system, ".\n", sep = '')
-            cat("Loaded now: ", is.dso.loaded(object), ".\n", sep = '')
+            cat("Loaded now: ", if (is.dso.loaded(object)) 'YES' else 'NO', ".\n", sep = '')
             cat("The signatures is/are as follows: \n")
             print(object@sig); 
           })

@@ -7,5 +7,6 @@
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
 #include <stan/prob/distributions/univariate/discrete/beta_binomial.hpp>
 #include <stan/prob/distributions/univariate/discrete/hypergeometric.hpp>
+#include <stan/prob/distributions/univariate/discrete/ordered_logistic.hpp>
 
 #endif

@@ -12,7 +12,7 @@ that Stan supports
   This function takes a vector of names of \R objects and outputs
   text representations of the objects to a file or connection.
   The file created by \code{stan.rdump} is typically used as data 
-  input of the Stan package (\url{http://stan.googlecode.com}) or 
+  input of the Stan package (\url{http://stan.goglecode.com}) or 
   \code{\link{source}}d into another \R session.
 }
 

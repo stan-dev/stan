@@ -7,7 +7,7 @@
 \description{
   \R interface to Stan, which is a C++ package for obtaining Bayesian
   inference using the No-U-turn sampler, a variant of Hamiltonian Monte
-  Carlo (see \url{http:/stan.googlecode.com}). 
+  Carlo (see \url{http:/stan.goglecode.com}). 
 }
 
 \details{
@@ -42,7 +42,7 @@
 \references{
   The Stan Development Team (2012) 
   \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://code.google.com/p/stan}. 
+  \url{http://mc-stan.org}. 
 }
 
 \examples{\dontrun{ 

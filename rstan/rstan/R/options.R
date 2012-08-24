@@ -64,7 +64,7 @@
 
   # boost lib path 
   rstan.inc.path  <- system.file('include', package = 'rstan')
-  boost.lib.path <- file.path(rstan.inc.path, '/stanlib/boost_1.50.0') 
+  boost.lib.path <- file.path(rstan.inc.path, '/stanlib/boost_1.51.0') 
   assign("boost.lib", boost.lib.path, e) 
 
   # cat(".init.rstan.opt.env called.\n")
