@@ -124,7 +124,7 @@ namespace stan {
                   const Policy&) {
       static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
 
-      using stan::math::mdivide_left_tri;
+      using stan::math::mdivide_left_tri_low;
       using stan::math::columns_dot_self;
       using stan::math::multiply;
       using stan::math::subtract;
@@ -164,11 +164,13 @@ namespace stan {
         
         Eigen::Matrix<typename 
                       boost::math::tools::promote_args<T_loc,T_y>::type,
-                      Eigen::Dynamic,Eigen::Dynamic> z = subtract(y,MU).transpose();
+                      Eigen::Dynamic,Eigen::Dynamic> 
+          z(subtract(y,MU).transpose()); // was = 
                 
         Eigen::Matrix<typename 
                       boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-                      Eigen::Dynamic,Eigen::Dynamic> half(mdivide_left_tri<Eigen::Lower>(L,z));
+                      Eigen::Dynamic,Eigen::Dynamic> 
+          half(mdivide_left_tri_low(L,z));
           
         lp -= 0.5 * columns_dot_self(half).sum();
       }
