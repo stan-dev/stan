@@ -57,7 +57,6 @@ PKG_CPPFLAGS_env_fun <- function() {
          ' -I"', rstan.inc.path_fun(), '"', sep = '')
 }
 
-
 legitimate.space.in.path <- function(path) {
   # Add preceding '\\' to spaces on non-windows (this should happen rarely,
   # and not sure it will work)
@@ -97,7 +96,7 @@ rstanplugin <- function() {
   rcpp_pkg_libs <- Rcpp_plugin$env$PKG_LIBS
   rcpp_pkg_path <- system.file(package = 'Rcpp')
   rcpp_pkg_path2 <- legitimate.space.in.path(rcpp_pkg_path) 
-
+ 
   # In case  we have space (typicall on windows though not necessarily)
   # in the file path of Rcpp's library. 
   
