@@ -5,6 +5,13 @@ sfile <- "../../src/models/misc/eight_schools/eight_schools.stan"
 m <- stan.model(file = sfile, 
                 model.name = model_name, 
                 verbose = TRUE)  
+m@dso 
+
+yam <- stan.model(file = sfile, 
+                  model.name = model_name, 
+                  save.dso = FALSE, 
+                  verbose = TRUE)  
+yam@dso 
 
 dat <- list(J = 8L, 
             y = c(28,  8, -3,  7, -1,  1, 18, 12),

@@ -16,7 +16,8 @@ OBJECTS = stanc.o gm__grammars__whitespace_grammar_inst.o gm__grammars__program_
 EIGEN_PATH = `$(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))"`
 # EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.0
 
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
+# PKG_LIBS = "`$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`" 
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "cat(utils::shortPathName(Rcpp:::RcppLdFlags(TRUE)))"` 
 PKG_CPPFLAGS += -I"../inst/include/stansrc"  
 PKG_CPPFLAGS += -I"$(EIGEN_PATH)" 
 PKG_CPPFLAGS += -I"$(EIGEN_PATH)/unsupported" 

@@ -11,6 +11,8 @@ inst/include/stansrc/models/.*[.]stan[.]0$
 inst/include/stansrc/models/.*makefile$
 inst/include/stansrc/models/.*post.*\.R$
 inst/include/stansrc/models/.*\.csv$
+inst/include/stansrc/.*\.hpp\.d$
+inst/include/stansrc/.*\..pp\.gch$
 inst/include/stansrc/docs.*$
 inst/include/stansrc/doxygen.*$
 inst/include/stansrc/stan.hpp.*$

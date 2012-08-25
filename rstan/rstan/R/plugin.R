@@ -57,11 +57,33 @@ PKG_CPPFLAGS_env_fun <- function() {
          ' -I"', rstan.inc.path_fun(), '"', sep = '')
 }
 
+
+legitimate.space.in.path <- function(path) {
+  # Add preceding '\\' to spaces on non-windows (this should happen rarely,
+  # and not sure it will work)
+  # For windows, use the short path name (8.3 format) 
+  # 
+  WINDOWS <- .Platform$OS.type == "windows"
+  if (WINDOWS) { 
+    path2 <- utils::shortPathName(path) 
+    # it is weird that the '\\' in the path name will be gone
+    # when passed to cxxfunction, so chagne it to '/' 
+    return(gsub('\\\\', '/', path2, perl=TRUE))
+  }
+  gsub("([^\\\\])(\\s+)", '\\1\\\\\\2', path, perl = TRUE)
+} 
+
 RSTAN_LIBS_fun <- function() {
   static <- static.linking() 
   rstan.libs.path <- rstan.libs.path_fun()
+
+  # It seems that adding quotes to the path does not work well 
+  # in the case there is space in the path name 
+  if (grepl('[^\\\\]\\s', rstan.libs.path, perl = TRUE))
+    rstan.libs.path <- legitimate.space.in.path(rstan.libs.path)
+
   if (static) {
-    paste('"', rstan.libs.path, '/libstan.a', '"', sep = '')
+    paste(' "', rstan.libs.path, '/libstan.a', '"', sep = '')
   } else {
     paste(' -L"', rstan.libs.path, '" -Wl,-rpath,"', rstan.libs.path, '" -lstan ', sep = '')
   }
@@ -72,11 +94,23 @@ RSTAN_LIBS_fun <- function() {
 
 rstanplugin <- function() {
   Rcpp_plugin <- getPlugin("Rcpp")
+  rcpp_pkg_libs <- Rcpp_plugin$env$PKG_LIBS
+  rcpp_pkg_path <- system.file(package = 'Rcpp')
+  rcpp_pkg_path2 <- legitimate.space.in.path(rcpp_pkg_path) 
+
+  # In case  we have space (typicall on windows though not necessarily)
+  # in the file path of Rcpp's library. 
+  
+  # If rcpp_PKG_LIBS contains space without preceding '\\', add `\\'; 
+  # otherwise keept it intact
+  if (grepl('[^\\\\]\\s', rcpp_pkg_libs, perl = TRUE))
+    rcpp_pkg_libs <- gsub(rcpp_pkg_path, rcpp_pkg_path2, rcpp_pkg_libs, fixed = TRUE) 
+
   list(includes = '',
        body = function(x) x,
        LinkingTo = c("Rcpp"),
 	   ## FIXME see if we can use LinkingTo for RcppEighen's header files
-       env = list(PKG_LIBS = paste(Rcpp_plugin$env$PKG_LIBS, RSTAN_LIBS_fun()),
+       env = list(PKG_LIBS = paste(rcpp_pkg_libs, RSTAN_LIBS_fun()),
                   PKG_CPPFLAGS = paste(Rcpp_plugin$env$PKG_CPPFLAGS, PKG_CPPFLAGS_env_fun())))
 }
 
