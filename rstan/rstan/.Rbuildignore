@@ -43,3 +43,4 @@ Rbuildignore.*$
 .*\.so$
 .*\.o$
 .*\.out$
+^.*\.txt$

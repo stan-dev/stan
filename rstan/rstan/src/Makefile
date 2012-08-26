@@ -9,7 +9,7 @@ OBJECTS = stanc.o gm__grammars__whitespace_grammar_inst.o gm__grammars__program_
 
 LIBSTANOBJECTS = agrad__agrad.o agrad__matrix.o math__matrix.o
 
-EIGEN_PATH = `$(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))"`
+EIGEN_PATH := `$(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))"`
 # EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.0
 
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
