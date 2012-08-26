@@ -26,11 +26,12 @@ std::vector<TestInfo> getTestCases() {
   testCases.push_back(TestInfo(1024, 2, 2000));
   testCases.push_back(TestInfo(4096, 2, 2000));
   
+  /*
   testCases.push_back(TestInfo(128,  8, 2000));
   testCases.push_back(TestInfo(1024, 8, 2000));
   testCases.push_back(TestInfo(4096, 8, 2000));
   
-  /*testCases.push_back(TestInfo(128,  32, 300));
+  testCases.push_back(TestInfo(128,  32, 300));
   testCases.push_back(TestInfo(1024, 32, 300));
   testCases.push_back(TestInfo(4096, 32, 300));
   
@@ -203,7 +204,8 @@ public:
    * @param filename 
    * @param iterations 
    */
-  void test_logistic_speed_stan(const std::string& filename, const size_t iterations,
+  void test_logistic_speed_stan(const std::string& filename, 
+				const size_t iterations,
                                 const TestInfo& info) {
     if (!has_R)
       return;
@@ -308,6 +310,33 @@ public:
     SUCCEED();
   }
 
+  void test_logistic_speed_jags(const std::string& filename, 
+				const size_t iterations,
+                                const TestInfo& info) {
+    if (!has_R)
+      return;
+    using std::vector;
+    using boost::math::students_t;
+    using boost::math::binomial;
+    using boost::math::quantile;
+    using std::setw;
+    
+    // 1) Get the generated beta.
+    vector<double> beta;
+    get_beta(filename, beta);
+    
+    // 2) Run JAGS num_chains times
+    std::stringstream command;
+    //command << path << get_path_separator() << "logistic"
+    //<< " --data=" << path << get_path_separator() << filename << ".Rdata"
+    //<< " --iter=" << iterations
+    //<< " --refresh=" << iterations;
+    //vector<std::string> command_outputs;  
+    //long time = run_stan(command.str(), filename, command_outputs);
+    long time = 0;
+    
+    SUCCEED();
+  }
 };
 const size_t LogisticSpeedTest::num_chains = 4;
 bool LogisticSpeedTest::has_R;
@@ -390,6 +419,18 @@ TEST_P(LogisticSpeedTest, Stan) {
 
   test_logistic_speed_stan(filename.str(), info.iterations, info);
 }
+
+TEST_P(LogisticSpeedTest, JAGS) {
+  std::stringstream filename;
+  TestInfo info = GetParam();
+  filename << "logistic_"
+           << info.N
+           << "_"
+           << info.M;
+  
+  test_logistic_speed_jags(filename.str(), info.iterations, info);
+}
+
 
 INSTANTIATE_TEST_CASE_P(,
                         LogisticSpeedTest,

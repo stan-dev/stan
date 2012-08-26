@@ -91,7 +91,6 @@ TYPED_TEST_P(DistributionTestFixture, valid_vector) {
   ASSERT_EQ(parameters.size(), expected_values.size());
   ASSERT_GT(parameters.size(), 0);
   
-  size_t N = parameters[0].size();
   vector<double> param1, param2, param3;
   for (size_t n = 0; n < parameters.size(); n++) {
     param1.push_back(parameters[n][0]);
@@ -103,7 +102,6 @@ TYPED_TEST_P(DistributionTestFixture, valid_vector) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_vector) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -117,7 +115,6 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_vector) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_double) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -132,7 +129,6 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_double) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_double_vector) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -147,7 +143,6 @@ TYPED_TEST_P(DistributionTestFixture, vector_double_vector) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_double_double) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -162,7 +157,6 @@ TYPED_TEST_P(DistributionTestFixture, vector_double_double) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_vector_vector) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -177,7 +171,6 @@ TYPED_TEST_P(DistributionTestFixture, double_vector_vector) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_vector_double) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -192,7 +185,6 @@ TYPED_TEST_P(DistributionTestFixture, double_vector_double) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_vector) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -230,7 +222,6 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -244,7 +235,6 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -259,7 +249,6 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -274,7 +263,6 @@ TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_double_double) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -289,7 +277,6 @@ TYPED_TEST_P(DistributionTestFixture, matrix_double_double) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -304,7 +291,6 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix_double) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
@@ -319,7 +305,6 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix_double) {
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_matrix) {
-  TypeParam t;
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
