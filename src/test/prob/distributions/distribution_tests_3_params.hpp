@@ -8,7 +8,7 @@ TYPED_TEST_P(DistributionTestFixture, check_valid) {
 
   t.valid_values(parameters, expected_values);
   ASSERT_EQ(parameters.size(), expected_values.size());
-  ASSERT_GT(parameters.size(), 0);
+  ASSERT_GT(parameters.size(), 0U);
 
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -89,7 +89,7 @@ TYPED_TEST_P(DistributionTestFixture, valid_vector) {
   
   t.valid_values(parameters, expected_values);
   ASSERT_EQ(parameters.size(), expected_values.size());
-  ASSERT_GT(parameters.size(), 0);
+  ASSERT_GT(parameters.size(), 0U);
   
   vector<double> param1, param2, param3;
   for (size_t n = 0; n < parameters.size(); n++) {
@@ -217,7 +217,8 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
     << "Should throw error with sizes (" 
     << param1.size() << ", " << param2.size() << ", " << param3.size() << ")";
   
-  double log_prob = 0.0;
+  double log_prob;
+  (void)log_prob;
   EXPECT_NO_THROW(log_prob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
 }
 
