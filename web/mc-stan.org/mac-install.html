@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>Stan: Mac Command-Line Installation</title>
+<meta http-equiv="Content-type"
+      content="application/xhtml+xml; charset=utf-8"/>
+<meta http-equiv="Content-Language"
+      content="en"/>
+<link href="stan.css"
+      type="text/css"
+      rel="stylesheet"
+      title="lp-site"
+      media="screen,projection,tv"/>
+<link href="web/css/stan.css"
+      title="lp-site"
+      type="text/css"
+      rel="stylesheet"
+      media="print,handheld,tty,aural,braille,embossed"/>
+</head>
+
+<body>
+
+<h1>Stan: Mac Command Install</h1>
+<hr />
+
+<p>Running Stan on a Mac from the command line requires the Stan
+source code and a C++ build environment.  This page provides
+step-by-step instructions.</p>
+
+<h3>Finding and Opening Mac Applications and Files</h3>
+
+<p>To open an application, use <tt>[Command-Space]</tt> to open Spotlight, enter the
+application's name in the text field, then click on the
+application in the pop-up menu or <tt>[Return]</tt> if highlighted.</p>
+
+<p>Spotlight can be used in the same way to find files or folders,
+such as the default <tt>Downloads</tt> folder for web downloads.</p>
+
+<h2>Open a Terminal for Shell Commands</h2>
+
+<p>To run shell commands, open the built-in Terminal application.</p>
+
+<h2>Install Xcode 4 Development Environment</h2>
+
+<p>From the <a href="https://developer.apple.com/xcode/">Xcode
+home page</a>, click <tt>View in Mac App Store</tt>.</p>
+
+<p>From the App Store, click <tt>Install</tt>, enter Apple ID,
+and wait for Xcode to finish installing.</p>
+
+<p>Open the Xcode application, click top-level menu
+<tt>Preferences</tt>, click top-row button <tt>Downloads</tt>, 
+click button for <tt>Components</tt>, click on the <tt>Install</tt>
+button to the right of the <tt>Command Line Tools</tt> entry, then
+wait for it to finish installing.  
+</p>
+
+<p>Click top-level menu <tt>Xcode</tt>, then click item <tt>Quit Xcode</tt> to quit.</p>
+
+<p>To test, open the Terminal application and enter:</p>
+
+<pre>% make --version</pre>
+<pre>% g++ --version</pre>
+
+<p>Verify that <tt>make</tt> is at version 3.81
+or later and <tt>g++</tt> is at 4.2.1 or later.</p>
+
+
+
+<h2>Download and Unpack Stan Source</h2>
+
+<p>Download the most recent version of
+<tt>stan-src-1.m.p.tgz</tt> (<tt>m</tt> is the minor
+version and <tt>p</tt> the patch level) from
+<a href="http://code.google.com/p/stan/downloads/list">Stan
+  Downloads</a>.</p>
+
+<p>Open the folder containing the download in the Finder
+(typically, the user's top-level <tt>Downloads</tt> folder).</p>
+
+<p>If the Mac OS has not automatically unpacked the <tt>.tgz</tt>
+file into file <tt>stan-src-1.m.p.tar</tt>,
+double-click the <tt>.tgz</tt> file to unpack.</p>
+
+<p>Double click on the <tt>.tar</tt> file to unarchive
+directory <tt>stan-src-1.m.p</tt>.</p>
+
+<p>Move the resulting directory to a location where it will not be
+deleted, henceforth called <tt>&lt;path-to-stan&gt;</tt>.</p>
+
+<p>Continue on the <a href="command-quickstart.html">Command-Line
+Quick Start</a> page.</p>
+
+
+
+<h2>Building Stan</h2>
+
+<p>To build Stan, first open the Terminal application.  Then change
+directories to the directory in which Stan is installed.</p>
+
+<pre>
+% cd &lt;path-to-stan&gt;
+</pre>
+
+<p>Then make the library with</p>
+<pre>
+% make bin/libstan.a
+</pre>
+
+<p>and then make the model parser and code generator with</p>
+
+<pre>
+% make bin/stanc
+</pre>
+
+<p><i>Warning:</i> The <tt>make</tt> program may take 10+ minutes and
+consume 2+GB of memory to build <tt>libstan</tt> and <tt>stanc</tt>.</p>
+Compiler warnings may be safely ignored.
+</p>
+<p>
+Building <tt>libstan.a</tt> and <tt>bin/stanc</tt> need only be done once.
+</p>
+
+
+<h2>Testing Stan</h2>
+
+<p>To test that everything builds properly from the source in
+directory <tt>&lt;path-to-stan&gt;</tt>, run the following commands from a shell.
+
+<pre>% cd &lt;path-to-stan&gt;</pre>
+<pre>% make O=0 test-unit</pre>
+
+<p>That's the letter O followed by an equal sign followed by the digit
+0, which sets the tests to run at the lowest optimization level.</p>
+<p>
+
+<p><i>Warning:</i> The <tt>make</tt> program may take 20+ minutes 
+and consume 3+GB of memory to run the unit tests.  Warnings can
+be safely ignored if the tests complete without a <tt>FAIL</tt> error.</p>
+
+
+
+
+
+
+<div>  
+  <br />
+  <hr />
+  <small style="margin:0 0 0 0.1em">
+  &gt; to the <a href="index.html">Stan Home Page</a>
+  </small>
+</div>
+
+
+</body>
+</html>
