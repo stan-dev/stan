@@ -250,9 +250,10 @@ real values), and \code{matrix} (of real values).
 \subsection{Constrained Data Types}
 
 Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  There are two constrained vector data types,
+bounds, or both.  There are three constrained vector data types,
 \code{simplex} for unit simplexes and \code{ordered} for ordered
-vectors of scalars.  There are two specialized matrix data types,
+vectors of scalars and \code{positive\_ordered} for vectors of positive
+ordered scalars.  There are two specialized matrix data types,
 \code{corr\_matrix} and \code{cov\_matrix}, for correlation matrices
 (symmetric, positive definite, unit diagonal) and covariance matrices
 (symmetric, positive definite).
@@ -542,7 +543,8 @@ ordered[5] c;
 After their declaration, ordered vectors, like unit simplexes, may be
 assigned to other vectors and other vectors may be assigned to them.
 Constraints will be checked after executing the block in which the
-variables were declared.
+variables were declared.  There is also a \code{positive\_ordered} vector type
+which operates similarly but all entries are constrained to be positive.
 
 \subsection{Unconstrained Row Vectors}
 
@@ -911,6 +913,7 @@ any of the following.
 \code{vector},
 \code{simplex},
 \code{ordered},
+\code{positive_ordered},
 \code{row\_vector},
 \code{matrix},
 \code{corr\_matrix},
@@ -2436,6 +2439,7 @@ var_type ::= int ?('<' range '>')
            | real ?('<' range '>')
            | vector '[' expression ']'
            | ordered '[' expression ']'
+           | positive_ordered '[' expression ']'
            | simplex '[' expression ']'
            | row_vector '[' expression ']'
            | matrix '[' expression ',' expression ']'
