@@ -2873,8 +2873,8 @@ TEST(AgradMatrix, varianceStdVector) {
 
   vector<double> grad2 = cgrad(f2, y2[0], y2[1], y2[2]);
 
-  EXPECT_EQ(3, grad1.size());
-  EXPECT_EQ(3, grad2.size());
+  EXPECT_EQ(3U, grad1.size());
+  EXPECT_EQ(3U, grad2.size());
   for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(grad2[i], grad1[i]);
 }
@@ -2900,8 +2900,8 @@ TEST(AgradMatrix, sdStdVector) {
 
   vector<double> grad2 = cgrad(f2, y2[0], y2[1], y2[2]);
 
-  EXPECT_EQ(3, grad1.size());
-  EXPECT_EQ(3, grad2.size());
+  EXPECT_EQ(3U, grad1.size());
+  EXPECT_EQ(3U, grad2.size());
   for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(grad2[i], grad1[i]);
 }
@@ -2921,7 +2921,7 @@ TEST(AgradMatrix, initializeVariable) {
 
   vector<var> b(3);
   initialize_variable(b, var(2.0));
-  EXPECT_EQ(3,b.size());
+  EXPECT_EQ(3U,b.size());
   EXPECT_FLOAT_EQ(2.0, b[0].val());
   EXPECT_FLOAT_EQ(2.0, b[1].val());
   EXPECT_FLOAT_EQ(2.0, b[2].val());
