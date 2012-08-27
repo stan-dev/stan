@@ -275,9 +275,28 @@ namespace stan {
        *
        * @param[out] o Output stream to which param names are written.
        */
-      virtual void write_sampler_param_names(std::ostream& o) { 
+      virtual void write_sampler_param_names(std::ostream& o) {
+      }
+
+      /**
+       * Get any sampler-specific parameter namess.
+       *
+       * @param[out] names Output vector to which param names are written.
+       */
+
+      virtual void get_sampler_param_names(std::vector<std::string>& names) {
       }
                                 
+      /**
+       * Get any sampler-specific parameters.
+       *
+       * @param[out] values Output vector to which params are written.
+       *  All values are casted to type double.
+       *  This function should match get_sampler_param_names.
+       *
+       */
+      virtual void get_sampler_params(std::vector<double>& values) {
+      }
 
     };
 

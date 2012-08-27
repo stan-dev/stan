@@ -780,6 +780,67 @@ namespace stan {
         boost::apply_visitor(vis,vs[i].decl_);
     }
 
+    // see member_var_decl_visgen cut & paste
+    struct generate_init_vars_visgen : public visgen {
+      int indent_;
+      generate_init_vars_visgen(int indent,
+                                std::ostream& o)
+        : visgen(o),
+          indent_(indent) {
+      }
+      void operator()(nil const& x) const { }
+      void operator()(int_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(double_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(vector_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(row_vector_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(matrix_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(simplex_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(ordered_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(cov_matrix_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+      void operator()(corr_matrix_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
+    };
+
+    void generate_init_vars(const std::vector<var_decl>& vs,
+                            int indent,
+                            std::ostream& o) {
+      generate_init_vars_visgen vis(indent,o);
+      o << EOL;
+      generate_comment("initialized transformed params to avoid seg fault on val access",
+                       indent,o);
+      generate_indent(indent,o);
+      o << "var INIT_DUMMY__(std::numeric_limits<double>::quiet_NaN());" << EOL;
+      for (size_t i = 0; i < vs.size(); ++i)
+        boost::apply_visitor(vis,vs[i].decl_);
+    }
+
+
     struct validate_transformed_params_visgen : public visgen {
       int indents_;
       validate_transformed_params_visgen(int indents,
@@ -835,10 +896,10 @@ namespace stan {
         validate_array(x.name_,dims,2);
       }
       void validate_array(const std::string& name, 
-			  const std::vector<expression>& dims,
-			  size_t matrix_dims) const {
+                          const std::vector<expression>& dims,
+                          size_t matrix_dims) const {
 
-	size_t non_matrix_dims = dims.size() - matrix_dims;
+        size_t non_matrix_dims = dims.size() - matrix_dims;
 
         for (size_t k = 0; k < dims.size(); ++k) {
           generate_indent(indents_ + k,o_);
@@ -851,12 +912,12 @@ namespace stan {
         o_ << "if (" << name;
         for (size_t k = 0; k < non_matrix_dims; ++k)
           o_ << "[i" << k << "__]";
-	if (matrix_dims > 0) {
-	  o_ << "(i" << non_matrix_dims << "__";
-	  if (matrix_dims > 1)
-	    o_ << ",i" << (non_matrix_dims + 1) << "__";
-	  o_ << ')';
-	}
+        if (matrix_dims > 0) {
+          o_ << "(i" << non_matrix_dims << "__";
+          if (matrix_dims > 1)
+            o_ << ",i" << (non_matrix_dims + 1) << "__";
+          o_ << ')';
+        }
         o_ << ".is_uninitialized()) {" << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
         o_ << "std::stringstream msg__;" << EOL;
@@ -1036,6 +1097,8 @@ namespace stan {
       static bool is_var = true;
       generate_comment("transformed parameters",2,o);
       generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
+      generate_init_vars(p.derived_decl_.first,2,o);
+
       o << EOL;
       static bool include_sampling = true;
       generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
@@ -2135,7 +2198,7 @@ namespace stan {
       // this is for all other values
       write_csv_vars_visgen vis_writer(o);
 
-      // transformed parameters guaranteed to satisfy constraints
+      // parameters are guaranteed to satisfy constraints
 
       o << EOL;
       generate_comment("declare, define and validate transformed parameters",

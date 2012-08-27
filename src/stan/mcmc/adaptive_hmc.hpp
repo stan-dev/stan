@@ -182,7 +182,17 @@ namespace stan {
           o << this->_epsilon_last << ',';
       }
 
+      virtual void get_sampler_param_names(std::vector<std::string>& names) {
+        names.clear();
+        if (this->_epsilon_adapt || this->varying_epsilon())
+          names.push_back("stepsize__");
+      }
 
+      virtual void get_sampler_params(std::vector<double>& values) {
+        values.clear();
+        if (this->_epsilon_adapt || this->varying_epsilon())
+          values.push_back(this->_epsilon_last);
+      }
     };
 
   }

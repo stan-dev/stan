@@ -221,6 +221,18 @@ namespace stan {
           o << this->_epsilon_last << ',';
       }
 
+      virtual void get_sampler_param_names(std::vector<std::string>& names) {
+        names.clear();
+        names.push_back("treedepth__");
+        if (this->_epsilon_adapt || this->varying_epsilon())
+          names.push_back("stepsize__,");
+      }
+      virtual void get_sampler_params(std::vector<double>& values) {
+        values.clear();
+        values.push_back(_lastdepth);
+        if (this->_epsilon_adapt || this->varying_epsilon())
+          values.push_back(this->_epsilon_last);
+      }
 
       /**
        * The core recursion in NUTS.

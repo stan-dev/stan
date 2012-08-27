@@ -1,17 +1,15 @@
 STAN V1.0
 ======================================================================
 
-* speed tests relative to JAGS
+* update doc 
+  - revised stanc default model names
+  - use makefiles for models
+  - cmd-line getting started, pull out of manual
 
-* test model names for C++ reserved words
-  along with identifiers in models;  add to doc
+? add safety inits for transformed parameters to prevent seg faults
 
-* update doc for revised stanc default model names
-
-* update doc to use makefiles for models
-
-* write command-line getting started and pull out of manual
-
+? add identifier checks for C++ and Stan reserved words, including
+  model name in stanc
 
 CODE CLEANUP
 ======================================================================
@@ -32,8 +30,7 @@ CODE CLEANUP
 
 * convert for loops with size bounds to appropriate iterators
 
-* reduce massive code duplication in
-  - mcmc samplers
+* reduce code duplication in
   - gm generator
 
 
@@ -111,6 +108,9 @@ EXTENSIONS
 
 Sampling
 ----------------------------------------------------------------------
+
+* catch +inf, -inf values of unconstrained params and let
+  users know they have an improper posterior
 
 * allow cross-chain sharing of adaptation parameters
   to recover from a subset of chains going off the rails during
