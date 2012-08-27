@@ -292,6 +292,9 @@ namespace stan {
       void operator()(ordered_var_decl const& x) const {
         generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.K_);
       }
+      void operator()(positive_ordered_var_decl const& x) const {
+        generate_initialization(o_,2U,x.name_,"vector_d",x.dims_,x.K_);
+      }
       void operator()(matrix_var_decl const& x) const {
         generate_initialization(o_,2U,x.name_,"matrix_d",x.dims_,x.M_,x.N_);
       }
@@ -370,6 +373,11 @@ namespace stan {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
         generate_initialize_array("vector_v","ordered",read_args,x.name_,x.dims_);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_v","positive_ordered",read_args,x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
@@ -563,6 +571,9 @@ namespace stan {
       void operator()(ordered_var_decl const& x) const {
         nonbasic_validate(x,"ordered");
       }
+      void operator()(positive_ordered_var_decl const& x) const {
+        nonbasic_validate(x,"positive_ordered");
+      }
       void operator()(corr_matrix_var_decl const& x) const {
         nonbasic_validate(x,"corr_matrix");
       }
@@ -605,6 +616,9 @@ namespace stan {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
       void operator()(ordered_var_decl const& x) const {
+        declare_array(("vector_d"), x.name_, x.dims_.size());
+      }
+      void operator()(positive_ordered_var_decl const& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
       void operator()(cov_matrix_var_decl const& x) const {
@@ -695,6 +709,12 @@ namespace stan {
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(ordered_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
+        declare_array(is_var_ ? "vector_v" : "vector_d", 
+                      ctor_args, x.name_, x.dims_);
+      }
+      void operator()(positive_ordered_var_decl const& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_var_ ? "vector_v" : "vector_d", 
@@ -817,6 +837,10 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
       }
+      void operator()(positive_ordered_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+      }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
         o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
@@ -868,6 +892,11 @@ namespace stan {
         validate_array(x.name_,dims,1);
       }
       void operator()(ordered_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        validate_array(x.name_,dims,1);
+      }
+      void operator()(positive_ordered_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         validate_array(x.name_,dims,1);
@@ -1319,6 +1348,41 @@ namespace stan {
         }
         o_ << INDENT2 << "}" << EOL;
       }
+      // same as simplex
+      void operator()(positive_ordered_var_decl const& x) const {
+        std::vector<expression> dims = x.dims_;
+        var_resizer_(x);
+        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
+        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
+        o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos__ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+        generate_expression(x.K_,o_);
+        o_ << ";" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        size_t indentation = 2;
+        for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+          size_t dim = dims.size() - dim_up - 1U;
+          ++indentation;
+          generate_indent(indentation,o_);
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          generate_expression(dims[dim],o_);
+          o_ << ";" << EOL;
+          generate_indent(indentation,o_);
+          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+        }
+        generate_indent(indentation+1,o_);
+        o_ << x.name_;
+        for (size_t dim = 0; dim < dims.size(); ++dim)
+          o_ << "[i_" << dim << "__]";
+        o_ << "[i_vec__]";
+        o_ << " = vals_r__[pos__++];" << EOL;
+        for (size_t dim = 0; dim < dims.size(); ++dim) {
+          generate_indent(dims.size() + 2 - dim,o_);
+          o_ << "}" << EOL;
+        }
+        o_ << INDENT2 << "}" << EOL;
+      }
       // extra loop and different accessor vs. vector
       void operator()(matrix_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
@@ -1534,6 +1598,12 @@ namespace stan {
         generate_buffer_loop("r",x.name_,x.dims_,x.K_);
         generate_write_loop("ordered_unconstrain(",x.name_,x.dims_);
       }
+      void operator()(positive_ordered_var_decl const& x) const {
+        generate_check_double(x.name_,x.dims_.size() + 1);
+        generate_declaration(x.name_,"vector_d",x.dims_,x.K_);
+        generate_buffer_loop("r",x.name_,x.dims_,x.K_);
+        generate_write_loop("positive_ordered_unconstrain(",x.name_,x.dims_);
+      }
       void operator()(matrix_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 2);
         generate_declaration(x.name_,"matrix_d",x.dims_,x.M_,x.N_);
@@ -1730,6 +1800,11 @@ namespace stan {
         matrix_args.push_back(x.K_);
         generate_dims_array(matrix_args,x.dims_);
       }
+      void operator()(const positive_ordered_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
@@ -1818,6 +1893,9 @@ namespace stan {
       void operator()(const ordered_var_decl& x) const {
         generate_param_names(x.name_);
       }
+      void operator()(const positive_ordered_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         generate_param_names(x.name_);
       }
@@ -1896,6 +1974,11 @@ namespace stan {
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
       void operator()(const ordered_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_csv_header_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
@@ -2030,6 +2113,11 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array("vector_d","ordered",read_args,x.name_,x.dims_);
       }
+      void operator()(const positive_ordered_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_d","positive_ordered",read_args,x.name_,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -2135,6 +2223,9 @@ namespace stan {
         write_array(x.name_,x.dims_);
       }
       void operator()(const ordered_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
         write_array(x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -2299,6 +2390,11 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array("vector_d","ordered",read_args,x.name_,x.dims_);
       }
+      void operator()(const positive_ordered_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_d","positive_ordered",read_args,x.name_,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -2416,6 +2512,11 @@ namespace stan {
         write_array(x.name_,dims,EMPTY_EXP_VECTOR);
       }
       void operator()(const ordered_var_decl& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        write_array(x.name_,dims,EMPTY_EXP_VECTOR);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         write_array(x.name_,dims,EMPTY_EXP_VECTOR);
@@ -2598,6 +2699,9 @@ namespace stan {
         o_ << ";" << EOL;
       }
       void operator()(const ordered_var_decl& x) const {
+        generate_increment(x.K_,x.dims_);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
         generate_increment(x.K_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {

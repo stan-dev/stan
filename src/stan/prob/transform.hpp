@@ -1095,6 +1095,87 @@ namespace stan {
     }
     
 
+    // POSITIVE ORDERED 
+    
+    /**
+     * Return an increasing positive ordered vector derived from the specified
+     * free vector.  The returned constrained vector will have the
+     * same dimensionality as the specified free vector.
+     *
+     * @param x Free vector of scalars.
+     * @return Positive, increasing ordered vector.
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    positive_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      size_type k = x.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> y(k);
+      if (k == 0)
+        return y;
+      y[0] = exp(x[0]);
+      for (size_type i = 1; 
+           i < k; 
+           ++i)
+        y[i] = y[i-1] + exp(x[i]);
+      return y;
+    }
+
+    /**
+     * Return a positive valued, increasing positive ordered vector derived
+     * from the specified free vector and increment the specified log
+     * probability reference with the log absolute Jacobian determinant
+     * of the transform.  The returned constrained vector
+     * will have the same dimensionality as the specified free vector.
+     *
+     * @param x Free vector of scalars.
+     * @param lp Log probability reference.
+     * @return Positive, increasing ordered vector. 
+     * @tparam T Type of scalar.
+     */
+    template <typename T>
+    inline
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    positive_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      for (size_type i = 0; i < x.size(); ++i)
+        lp += x(i);
+      return positive_ordered_constrain(x);
+    }
+
+
+
+    /**
+     * Return the vector of unconstrained scalars that transform to
+     * the specified positive ordered vector.
+     *
+     * <p>This function inverts the constraining operation defined in 
+     * <code>positive_ordered_constrain(Matrix)</code>,
+     *
+     * @param y Vector of positive, ordered scalars.
+     * @return Free vector that transforms into the input vector.
+     * @tparam T Type of scalar.
+     * @throw std::domain_error if y is not a vector of positive,
+     *   ordered scalars.
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    positive_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      stan::math::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
+                                y, "y");
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      size_type k = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
+      if (k == 0) 
+        return x;
+      x[0] = log(y[0]);
+      for (size_type i = 1; i < k; ++i)
+        x[i] = log(y[i] - y[i-1]);
+      return x;
+    }
+    
+
     // CORRELATION MATRIX
     /**
      * Return the correlation matrix of the specified dimensionality
