@@ -21,7 +21,7 @@ dist: clean-all
 	rsync -avz --exclude "*~" --exclude ".fname" --exclude ".git*" --exclude stan-src-$(VERSION_STRING) --exclude "*.tgz" ./ stan-src-$(VERSION_STRING) > /dev/null
 	@echo ''
 	@echo '- creating the tarball'
-	tar --gzip -chf stan-src-$(VERSION_STRING).tgz stan-src-$(VERSION_STRING)
+	tar --gzip --create --dereference --mode=755 --file=stan-src-$(VERSION_STRING).tgz stan-src-$(VERSION_STRING)
 	@echo ''
 	@echo '- cleanup'
 	-rm -rf stan-src-$(VERSION_STRING) .fname
