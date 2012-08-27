@@ -2907,3 +2907,52 @@ TEST(AgradMatrix, sdStdVector) {
 }
 
 
+TEST(AgradMatrix, initializeVariable) {
+  using stan::agrad::initialize_variable;
+  using std::vector;
+  using stan::agrad::var;
+
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  var a;
+  initialize_variable(a, var(1.0));
+  EXPECT_FLOAT_EQ(1.0, a.val());
+
+  vector<var> b(3);
+  initialize_variable(b, var(2.0));
+  EXPECT_EQ(3,b.size());
+  EXPECT_FLOAT_EQ(2.0, b[0].val());
+  EXPECT_FLOAT_EQ(2.0, b[1].val());
+  EXPECT_FLOAT_EQ(2.0, b[2].val());
+
+  vector<vector<var> > c(4,vector<var>(3));
+  initialize_variable(c, var(3.0));
+  for (size_t m = 0; m < c.size(); ++m)
+    for (size_t n = 0; n < c[0].size(); ++n)
+      EXPECT_FLOAT_EQ(3.0,c[m][n].val());
+
+  Matrix<var, Dynamic, Dynamic> aa(5,7);
+  initialize_variable(aa, var(4.0));
+  for (int m = 0; m < aa.rows(); ++m)
+    for (int n = 0; n < aa.cols(); ++n)
+      EXPECT_FLOAT_EQ(4.0, aa(m,n).val());
+
+  Matrix<var, Dynamic, 1> bb(5);
+  initialize_variable(bb, var(5.0));
+  for (int m = 0; m < bb.size(); ++m) 
+      EXPECT_FLOAT_EQ(5.0, bb(m).val());
+
+  Matrix<var,1,Dynamic> cc(12);
+  initialize_variable(cc, var(7.0));
+  for (int m = 0; m < cc.size(); ++m) 
+    EXPECT_FLOAT_EQ(7.0, cc(m).val());
+  
+  Matrix<var,Dynamic,Dynamic> init_val(3,4);
+  vector<Matrix<var,Dynamic,Dynamic> > dd(5, init_val);
+  initialize_variable(dd, var(11.0));
+  for (size_t i = 0; i < dd.size(); ++i)
+    for (int m = 0; m < dd[0].rows(); ++m)
+      for (int n = 0; n < dd[0].cols(); ++n)
+        EXPECT_FLOAT_EQ(11.0, dd[i](m,n).val());
+}
