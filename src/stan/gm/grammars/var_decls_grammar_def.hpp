@@ -82,6 +82,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::ordered_var_decl,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::positive_ordered_var_decl,
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::cov_matrix_var_decl,
                           (stan::gm::expression, K_)
                           (std::string, name_)
@@ -138,6 +143,11 @@ namespace stan {
       bool operator()(const ordered_var_decl& x) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found ordered." << std::endl;
+        return false;
+      }
+      bool operator()(const positive_ordered_var_decl& x) const {
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found positive_ordered." << std::endl;
         return false;
       }
       bool operator()(const cov_matrix_var_decl& x) const {
@@ -440,6 +450,9 @@ namespace stan {
             | ordered_decl_r   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
+            | positive_ordered_decl_r   
+            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                              boost::phoenix::ref(error_msgs_))]
             | corr_matrix_decl_r   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
@@ -516,9 +529,20 @@ namespace stan {
         > opt_dims_r
         > lit(';'); 
 
-      ordered_decl_r.name("positive ordered declaration");
+      ordered_decl_r.name("ordered declaration");
       ordered_decl_r 
         %= lit("ordered")
+        > lit('[')
+        > expression_g
+        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        > lit(']')
+        > identifier_r 
+        > opt_dims_r
+        > lit(';');
+
+      positive_ordered_decl_r.name("positive_ordered declaration");
+      positive_ordered_decl_r 
+        %= lit("positive_ordered")
         > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]

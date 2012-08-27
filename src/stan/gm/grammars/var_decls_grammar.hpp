@@ -85,6 +85,11 @@ namespace stan {
       ordered_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              positive_ordered_var_decl(), 
+                              whitespace_grammar<Iterator> > 
+      positive_ordered_decl_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               range(),
                               whitespace_grammar<Iterator> > 
       range_brackets_double_r;

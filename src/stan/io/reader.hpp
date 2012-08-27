@@ -855,6 +855,50 @@ namespace stan {
       }
 
       /**
+       * Return the next vector of specified size containing
+       * positive values in ascending order.  
+       *
+       * <p>See <code>stan::math::check_positive_ordered(T)</code> for
+       * behavior on failure.
+       *
+       * @param k Size of returned vector.
+       * @return Vector of positive values in ascending order.
+       */
+      inline vector_t positive_ordered(size_t k) {
+        vector_t x(vector(k));
+        stan::math::check_positive_ordered("stan::io::positive_ordered(%1%)", x, "x");
+        return x;
+      }
+
+      /**
+       * Return the next positive ordered vector of the specified length.
+       *
+       * <p>See <code>stan::prob::positive_ordered_constrain(Matrix)</code>.
+       * 
+       * @param k Length of returned vector.
+       * @return Next positive_ordered vector of the specified
+       * length.
+       */
+      inline vector_t positive_ordered_constrain(size_t k) {
+        return stan::prob::positive_ordered_constrain(vector(k));
+      }
+
+      /**
+       * Return the next positive_ordered vector of the specified
+       * size, incrementing the specified reference with the log
+       * absolute Jacobian of the determinant.
+       *
+       * <p>See <code>stan::prob::positive_ordered_constrain(Matrix,T&)</code>.
+       *
+       * @param k Size of vector.
+       * @param lp Log probability reference to increment.
+       * @return Next positive_ordered vector of the specified size.
+       */
+      inline vector_t positive_ordered_constrain(size_t k, T& lp) {
+        return stan::prob::positive_ordered_constrain(vector(k),lp);
+      }
+
+      /**
        * Returns the next correlation matrix of the specified dimensionality.
        *
        * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.

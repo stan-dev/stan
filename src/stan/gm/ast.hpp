@@ -38,6 +38,7 @@ namespace stan {
     struct matrix_var_decl;
     struct no_op_statement;
     struct ordered_var_decl;
+    struct positive_ordered_var_decl;
     struct program;
     struct range;
     struct row_vector_var_decl;
@@ -421,6 +422,16 @@ namespace stan {
                        std::vector<expression> const& dims);
     };
 
+    struct positive_ordered_var_decl : public base_var_decl {
+      std::string name_;
+      expression K_;
+      std::vector<expression> dims_;
+      positive_ordered_var_decl();
+      positive_ordered_var_decl(expression const& K,
+                                std::string const& name,
+                                std::vector<expression> const& dims);
+    };
+
     struct vector_var_decl : public base_var_decl {
       expression M_;
       vector_var_decl();
@@ -485,6 +496,7 @@ namespace stan {
       std::string operator()(const matrix_var_decl& x) const;
       std::string operator()(const simplex_var_decl& x) const;
       std::string operator()(const ordered_var_decl& x) const;
+      std::string operator()(const positive_ordered_var_decl& x) const;
       std::string operator()(const cov_matrix_var_decl& x) const;
       std::string operator()(const corr_matrix_var_decl& x) const;
     };
@@ -501,6 +513,7 @@ namespace stan {
                              boost::recursive_wrapper<matrix_var_decl>,
                              boost::recursive_wrapper<simplex_var_decl>,
                              boost::recursive_wrapper<ordered_var_decl>,
+                             boost::recursive_wrapper<positive_ordered_var_decl>,
                              boost::recursive_wrapper<cov_matrix_var_decl>,
                              boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
@@ -520,6 +533,7 @@ namespace stan {
       var_decl(const matrix_var_decl& decl);
       var_decl(const simplex_var_decl& decl);
       var_decl(const ordered_var_decl& decl);
+      var_decl(const positive_ordered_var_decl& decl);
       var_decl(const cov_matrix_var_decl& decl);
       var_decl(const corr_matrix_var_decl& decl);
 
