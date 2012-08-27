@@ -2849,7 +2849,7 @@ TEST(AgradMatrix, meanStdVector) {
   vector<double> grad = cgrad(f, y[0], y[1]);
   EXPECT_FLOAT_EQ(0.5, grad[0]);
   EXPECT_FLOAT_EQ(0.5, grad[1]);
-  EXPECT_EQ(2, grad.size());
+  EXPECT_EQ(2U, grad.size());
 }
 TEST(AgradMatrix, varianceStdVector) {
   using stan::math::variance; // should use arg-dep lookup
