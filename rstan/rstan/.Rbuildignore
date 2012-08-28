@@ -16,6 +16,7 @@ inst/include/stansrc/.*\..pp\.gch$
 inst/include/stansrc/docs.*$
 inst/include/stansrc/doxygen.*$
 inst/include/stansrc/stan.hpp.*$
+inst/include/rstan/.*\..pp\.gch$
 inst/libstan.*$
 _inst/include/stansrc/stan/command/.*\.cpp$
 _inst/include/stansrc/stan/gm/.*\.cpp$

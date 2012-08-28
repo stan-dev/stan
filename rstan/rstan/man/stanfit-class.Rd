@@ -9,7 +9,15 @@
 \alias{print,stanfit-method}
 \alias{show,stanfit-method}
 \alias{plot,stanfit-method}
-%% \alias{get.stancode,stanfit-method}
+\alias{get_logposterior} 
+\alias{get_logposterior,ANY-method}
+\alias{get_logposterior,stanfit,logical-method}
+\alias{get_adaptation_info} 
+\alias{get_adaptation_info,stanfit-method}
+\alias{get_adaptation_info,ANY-method}
+\alias{get_sampler_params}
+\alias{get_sampler_params,ANY-method}
+\alias{get_sampler_params,stanfit,logical-method}
 %% \alias{traceplot,stanfit-method}
 
 \title{Class \code{stanfit}: fitted Stan model}
@@ -49,18 +57,18 @@
     \item{plot}{\code{signature(x = 'stanfit')}: plot an overview of summaries 
       for all parameters.}
     \item{print}{\code{signature(x = 'stanfit')}: print the summary of the 
-      model with inference about mean (\code{Mean}), standard error of the 
-      mean (\code{SE.Mean}), standard deviation (\code{SD}), and quantities
+      model with inference about mean (\code{mean}), standard error of the 
+      mean (\code{se_mean}), standard deviation (\code{sd}), and quantities
       about quantities of interest based on all chains merged. 
       Most of the printout are the results from function \code{summary}.} 
     \item{summary}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the sample: the quantiles 
       (for example, 2.5\%, 50\%, 97.5\%, which can be specified), 
-      the mean, the standard deviation (SD), the effective sample size (ESS),
+      the mean, the standard deviation (sd), the effective sample size (n_eff),
       and the split Rhat (split potential split potential scale reduction).
       Returned is a named list with elements \code{summary} and \code{c.summary}, 
       summaries for all chains merged without warmup and individual chains
-      respectively. For the summary of all chains merged, we also have \code{SE.Mean},
+      respectively. For the summary of all chains merged, we also have \code{se_mean},
       the standard error of the mean. 
     }
     \item{extract}{\code{signature(object = "stanfit")}: 
@@ -77,6 +85,25 @@
       get the initial values for parameters used in sampling all chains.} 
     \item{get.seed}{\code{signature(object = "stanfit")}: 
       get the seed that used for sampling.} 
+    \item{get_logposterior}{\code{signature(object = 'stanfit', 
+      inc_warmup = 'logical')}:
+      get the log-posterior (up to a constant) for all chains. 
+      Each element of the returned \code{list} is the log-posterior 
+      for a chain. \code{inc_warmup} indicates whether to include
+      the warmup period.} 
+    \item{get_adaptation_info}{\code{signature(object = 'stanfit')}:
+      obtain the adaptation information for 
+      sampler, which now only NUTS2 has. The results are returned 
+      as a list, each element of which is a character string
+      for a chain. } 
+    \item{get_sampler_params}{\code{signature(obtain = 'stanfit', 
+      inc_warmup = 'logical')}:
+      obtain the parameters used for the sampler such as 
+      \emph{stepsize} and \empth{treedepth}. The results are returned
+      as a list, each element of which is an array for a chain.
+      The array has number of columns corresponding to the number
+      of parameters used in the sampler and its column names 
+      provide the parameter names.}
   }
 }
 

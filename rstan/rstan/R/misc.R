@@ -384,7 +384,7 @@ get.rhat.cols <- function(rhats) {
              return(rhat.colors[i])
            }  
            rstan.options("plot.rhat.large.col")
-		 })  
+         })  
 }
 
 plot.rhat.legend <- function(x, y, cex = 1) { 
@@ -696,7 +696,7 @@ summary.sim <- function(sim, pars, probs = default.summary.probs()) {
   dim(quan) <- c(tidx.len, probs.len) 
   rownames(msd) <- sim$fnames.oi[tidx] 
   rownames(quan) <- sim$fnames.oi[tidx] 
-  colnames(msd) <- c("Mean", "SD") 
+  colnames(msd) <- c("mean", "sd") 
   colnames(quan) <- probs.str 
 
   c.msd <- do.call(rbind, lapply(lmsdq, function(x) x$c.msd)) 
@@ -704,13 +704,19 @@ summary.sim <- function(sim, pars, probs = default.summary.probs()) {
   dim(c.msd) <- c(tidx.len, 2, sim$n.chains) 
   dim(c.quan) <- c(tidx.len, probs.len, sim$n.chains) 
 
-  dimnames(c.msd) <- list(sim$fnames.oi[tidx], c("Mean", "SD"), NULL) 
+  dimnames(c.msd) <- list(sim$fnames.oi[tidx], c("mean", "sd"), NULL) 
   dimnames(c.quan) <- list(sim$fnames.oi[tidx], probs.str, NULL)
 
   ess <-  array(sapply(tidx, function(n) rstan.ess(sim, n)), dim = c(tidx.len, 1)) 
   rhat <- array(sapply(tidx, function(n) rstan.splitrhat(sim, n)), dim = c(tidx.len, 1)) 
 
+  # mean of each chain's log-posterior after warm-up
+  lp_mean <- mapply(function(i, x, w) { mean(attr(x, 'lp')[-(1:w)]) }, 
+                    1:sim$n.chains, sim$samples, sim$n.warmup2,
+                    USE.NAMES = FALSE) 
+
   ss <- list(msd = msd, sem = msd[, 2] / sqrt(ess), 
+             lp_mean = lp_mean, 
              c.msd = c.msd, quan = quan, c.quan = c.quan, 
              ess = ess, rhat = rhat) 
   attr(ss, "row.major.idx") <- tidx.rowm 
@@ -883,8 +889,8 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
     # sequences of parameters 
     index <- attr(tidx[[k]], "row.major.idx")  
 
-	# number of parameters we could plot for this 
-	# particular vector/array parameter 
+    # number of parameters we could plot for this 
+    # particular vector/array parameter 
     k.num.p <- length(index) 
 
     # number of parameter we would plot
@@ -918,7 +924,7 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
       lines(A + B * spacing * c(0, J + 1), 
             rep(a, 2), lwd = .5, col = "gray")
     }
-	# plot the breaks of the axis
+    # plot the breaks of the axis
     for (x in p.rng){
       text(A - B * .2, a + b * x, x, cex = cex.axis)
       lines(A + B * c(-.05, 0), rep(a + b * x, 2))

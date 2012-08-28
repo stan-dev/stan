@@ -23,8 +23,11 @@ exportClasses(
 exportMethods(
 #   print, plot, 
 #   extract, 
-  show, sampling, summary, print, extract, 
-  traceplot, plot, get.stancode, get.inits, get.seed, 
-  get.stanmodel
+  show, sampling, summary, print, extract,
+  traceplot, plot, get.stancode, get.inits, get.seed,
+  get_adaptation_info,
+  get_sampler_params,
+  get_logposterior, 
+  get.stanmodel 
 )
 import(Rcpp)

@@ -29,14 +29,17 @@ printstanfit <- function(x, pars = x@sim$pars.oi,
       "; n.warmup=", x@sim$n.warmup, "; n.thin=", x@sim$n.thin, "; ", 
       x@sim$n.save[1], " samples saved.\n\n", sep = '') 
 
-  # round ESS to 0 decimal point 
-  s$summary[, 'ESS'] <- round(s$summary[, 'ESS'], 0)
+  # round n_eff to 0 decimal point 
+  s$summary[, 'n_eff'] <- round(s$summary[, 'n_eff'], 0)
 
   print(round(s$summary, digits.summary), ...) 
 
-  sampler <- attributes(x@sim$samples[[1]])$args$sampler 
-  cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
-  cat("For each parameter, ESS is a crude measure of effective samples size,\n") 
+  sampler <- attr(x@sim$samples[[1]], "args")$sampler 
+
+  cat("\nLog-posterior (mean of each chain): ", 
+      paste(round(s$lp_mean, digits.summary), collapse = ', '), ".\n", sep = '')
+  cat("Sample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
+  cat("For each parameter, n_eff is a crude measure of effective sample size,\n") 
   cat("and Rhat is the potential scale reduction factor on split chains (at \n")
   cat("convergence, Rhat=1).\n")
 }  
@@ -184,6 +187,48 @@ par.traceplot <- function(sim, n, par.name, inc.warmup = TRUE) {
 
 ######
 
+setGeneric(name = 'get_adaptation_info', 
+           def = function(object, ...) { standardGeneric("get_adaptation_info")})
+
+setMethod("get_adaptation_info", 
+          definition = function(object) {
+            lai <- lapply(object@sim$samples, function(x) attr(x, "adaptation_info"))
+            is_empty <- function(x) { 
+              if (is.null(x)) return(TRUE) 
+              if (is.character(x) && all(nchar(x) == 0)) return(TRUE)
+              FALSE
+            }
+            if (all(sapply(lai, FUN = is_empty))) return(invisible(NULL))  
+            invisible(lai) 
+          }) 
+
+setGeneric(name = "get_logposterior", 
+           def = function(object, ...) { standardGeneric("get_logposterior")})
+
+
+setMethod("get_logposterior", 
+          definition = function(object, inc_warmup = TRUE) {
+            llp <- lapply(object@sim$samples, function(x) attr(x, "lp"))
+            if (inc_warmup) return(invisible(llp)) 
+            invisible(mapply(function(x, w) x[-(1:w)], 
+                             llp, object@sim$n.warmup2,
+                             SIMPLIFY = FALSE, USE.NAMES = FALSE)) 
+          }) 
+
+setGeneric(name = 'get_sampler_params', 
+           def = function(object, ...) { standardGeneric("get_sampler_params")}) 
+
+setMethod("get_sampler_params", 
+          definition = function(object, inc_warmup = TRUE) {
+            ldf <- lapply(object@sim$samples, 
+                          function(x) do.call(cbind, attr(x, "sampler_params")))   
+            if (all(sapply(ldf, is.null))) return(invisible(NULL))  
+            if (inc_warmup) return(invisible(ldf)) 
+            invisible(mapply(function(x, w) x[-(1:w), , drop = FALSE], 
+                             ldf, object@sim$n.warmup2, 
+                             SIMPLIFY = FALSE, USE.NAMES = FALSE)) 
+          }) 
+
 setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
@@ -250,7 +295,7 @@ setMethod("summary", signature = "stanfit",
                    probs = c(0.025, 0.25, 0.50, 0.75, 0.975), ...) { 
             # Summarize the samples (that is, compute the mean, SD, quantiles, for 
             # the samples in all chains and chains individually after removing
-            # warmup samples, and ESS and split R hat for all the kept samples.)
+            # warmup samples, and n_eff and split R hat for all the kept samples.)
             # 
             # Returns: 
             #   A list with elements:
@@ -258,10 +303,10 @@ setMethod("summary", signature = "stanfit",
             #   c.summary: the summary for individual chains. 
             # 
             # Note: 
-            #   This function is a not straight in terms of implementation as it
-            #   saves some standard summaries including ESS and Rhat in the environment
-            #   of the object, which is used if it's available and created upon 
-            #   the first time standard summary is called. . 
+            #   This function is not straight in terms of implementation as it
+            #   saves some standard summaries including n_eff and Rhat in the
+            #   environment of the object. The summaries and created upon 
+            #   the first time standard summary is called and resued later if possible. 
             #   In addition, the indexes complicate the implementation as internally
             #   we use column major indexes for vector/array parameters. But it might
             #   be better to use row major indexes for the output such as print.
@@ -273,7 +318,7 @@ setMethod("summary", signature = "stanfit",
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
             m <- match(probs, default.summary.probs())
-            if (any(is.na(m))) {
+            if (any(is.na(m))) { # unordinary quantiles are requested 
               ss <-  summary.sim.quan(object@sim, pars, probs) 
               row.idx <- attr(ss, "row.major.idx") 
               col.idx <- attr(ss, "col.major.idx") 
@@ -285,13 +330,14 @@ setMethod("summary", signature = "stanfit",
               ss$sem <- object@.MISC$summary$sem[col.idx]  
               s1 <- cbind(ss$mean, ss$sem, ss$sd, 
                           ss$quan, ss$ess, ss$rhat)
-              colnames(s1) <- c("Mean", "SE.Mean", "SD", colnames(ss$quan), 'ESS', 'Rhat')
+              colnames(s1) <- c("mean", "se_mean", "sd", colnames(ss$quan), 'n_eff', 'Rhat')
 
               s2 <- combine.msd.quan(object@.MISC$summary$c.msd[col.idx, , , drop = FALSE], ss$c.quan) 
 
               idx2 <- match(row.idx, col.idx) 
               ss <- list(summary = s1[idx2, , drop = FALSE],
-                         c.summary = s2[idx2, , , drop = FALSE]) 
+                         c.summary = s2[idx2, , , drop = FALSE],
+                         lp_mean = object@.MISC$summary$lp_mean) 
               return(invisible(ss)) 
             }
 
@@ -315,11 +361,12 @@ setMethod("summary", signature = "stanfit",
             qnames <- colnames(ss$quan)[m] 
             dim(s1) <- c(length(tidx), length(m) + 5) 
             rownames(s1) <- pars.names 
-            colnames(s1) <- c("Mean", "SE.Mean", "SD", qnames, 'ESS', 'Rhat')
+            colnames(s1) <- c("mean", "se_mean", "sd", qnames, 'n_eff', 'Rhat')
             s2 <- combine.msd.quan(ss$c.msd[tidx, , , drop = FALSE], ss$c.quan[tidx, m, , drop = FALSE]) 
             dim(s2) <- c(tidx.len, length(m) + 2, object@sim$n.chains)
-            dimnames(s2) <- list(pars.names, c("Mean", "SD", qnames), NULL) 
-            ss <- list(summary = s1, c.summary = s2)
+            dimnames(s2) <- list(pars.names, c("mean", "sd", qnames), NULL) 
+            ss <- list(summary = s1, c.summary = s2, 
+                       lp_mean = object@.MISC$summary$lp_mean) 
             invisible(ss) 
           })  
 
