@@ -54,7 +54,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using Eigen::Array;
 
-      unsigned int k = S.rows();
+      typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", 
                                  &lp, Policy()))
