@@ -2,14 +2,14 @@
 \alias{stan_model}
 \title{Construct a Stan model} 
 \description{
-  Construct an object of S4 class \code{stanmodel} from a model 
-  represented by Stan modeling language. A \code{stanmodel} 
-  can be used to draw sample from the model.  In this 
-  function, a model is compiled to C++ code if the input is code 
-  in Stan modeling language.  The C++ code for the model plus other auxiliary 
+  Construct an instance of S4 class \code{stanmodel} from a model 
+  specified in Stan's modeling language. A \code{stanmodel} 
+  can be used to draw samples from the model.  If the model is
+  supplied in the Stan modeling language, it is first translated to
+  C++ code.  The C++ code for the model plus other auxiliary 
   code is compiled into a dynamic shared object (DSO) and then loaded. 
-  The loaded DSO for the model can be executed to draw sample, obtaining
-  inference for the model.  
+  The loaded DSO for the model can be executed to draw samples, allowing
+  inference to be performed for the model and data.
 }
 
 \usage{
@@ -20,53 +20,56 @@
 %- maybe also 'usage' for other objects documented here.
 
 \arguments{
-  \item{file}{A character string or a connection that \R supports specifying the model 
-    in Stan modeling language. 
+  \item{file}{A character string or a connection that \R supports 
+    specifying the Stan model specification in Stan's modeling language. 
   }
 
   \item{model_name}{A character string for naming the model (the
     default is \code{"anon_model"}). 
   }
 
-  \item{model_code}{A character string to specify the model instead of using
-    parameter \code{file}. 
+  \item{model_code}{A character string containing the model specification;
+    an alterantive is to specify the model with parameters \code{file}
+    or \code{stanc_ret}.}
   }
-  \item{stanc_ret}{The returned list from function \code{stanc}, an alternative way
-    to specify the model using previous results.}   
-  \item{boost_lib}{The path for boost library \url{http://http://www.boost.org/users/download/}. 
-    If specified, this path would be used instead for boost library header files for compiling 
-    the model in C++ language.}
+  \item{stanc_ret}{A list returned list from a previous call to 
+    function \code{stanc}, which may be used to specify the model  
+    used in the call to \code{stanc}.}
+  \item{boost_lib}{The path to a version of the Boost C++ library to
+    use instead of the one supplied with RStan.}
   \item{save_dso}{Logical with the default of \code{TRUE}: indication of whether the 
     dynamic shared object (DSO) compiled from the C++ code for the model 
     will be saved or not. If \code{TRUE}, we can draw sample from
     the same model in another \R session using the saved DSO (i.e., without compiling 
     the C++ code again).}
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
-    some intermediate output inside the function, which might be helpful for debugging
-    the model, is printed or not. 
+    to report intermediate output to the console, 
+    which might be helpful for debugging.
   }
 }
 
 \details{
-  More details of Stan can be found at \url{http://mc-stan.org}. 
+  More details of Stan, including the full user's guide and reference 
+  manual can be found at \url{http://mc-stan.org/}. 
 
   There are three ways to specify the model's code for \code{stan_model}. 
   \enumerate{ 
-  \item use a character string to include the Stan modeling language code 
-        and then specify parameter \code{model_code}. 
-  \item use a file (or a connection) and then specify parameter \code{file}. 
-  \item use the compiled results from \code{stanc} and then specify 
-        parameter \code{stanc_ret}. 
+  \item parameter \code{model_code}, containing character string to 
+       whose value is the Stan model specification,
+  \item parameter \code{file}, indicating a file (or a connection) from
+       which to read the Stan model specification, or 
+  \item parameter \code{stanc_ret}, indicating the re-use of a model
+       generated in a previous call to \code{stanc}.
   } 
 }
 \value{
-  An bject of S4 class (\linkS4class{stanmodel}), which can be
-  used later for drawing sample by calling its \code{sampling} function.
+  An instance of S4 class \code{\linkS4class{stanmodel}}, which can be
+  used later for drawing samples by calling its \code{sampling} function.
 }
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://mc-stan.org}. 
+  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \url{http://mc-stan.org/}. 
 }
 \seealso{
   \code{\linkS4class{stanmodel}} and \code{\link{stan}} 

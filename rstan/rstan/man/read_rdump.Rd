@@ -14,10 +14,11 @@ read_rdump(f)
 The \R dump file can be read directly by \R function \code{source}, which
 by default would read the data into the user's workspace (the global environment). 
 This function instead read the data to a list, making it convenient to 
-prepare data for function \code{stan}. 
+prepare data for the \code{stan} model-fitting function.
 }
 \value{
-A list containing all the data defined in the dump file.
+A list containing all the data defined in the dump file with
+keys corresponding to variable names.
 }
 \seealso{
 \code{\link{stan_rdump}}; \code{\link{dump}} 
