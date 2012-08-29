@@ -1,0 +1,4 @@
+ErrorDocument 404 http://mc-stan.org/
+ErrorDocument 500 http://mc-stan.org/
+ErrorDocument 403 http://mc-stan.org/
+ErrorDocument 401 http://mc-stan.org/
