@@ -20,11 +20,11 @@
 ## (original name: inline.R)
 ##
 
-rstan.inc.path_fun <- function() { 
+rstan_inc_path_fun <- function() { 
   system.file('include', package = 'rstan')
 } 
 
-rstan.libs.path_fun <- function() {
+rstan_libs_path_fun <- function() {
   if (nzchar(.Platform$r_arch)) {
     return(system.file('libstan', .Platform$r_arch, package = 'rstan'))
   }
@@ -32,14 +32,14 @@ rstan.libs.path_fun <- function() {
 }
 
 # Using RcppEigen
-eigen.path_fun <- function() {
+eigen_path_fun <- function() {
   system.file('include', package = 'RcppEigen')
 } 
 
 # If included in RStan
-# eigen.path_fun() <- paste0(rstan.inc.path_fun(), '/stanlib/eigen_3.1.0')
+# eigen_path_fun() <- paste0(rstan_inc_path_fun(), '/stanlib/eigen_3.1.0')
 
-static.linking <- function() {
+static_linking <- function() {
   # return(Rcpp:::staticLinking());
   ## not following Rcpp's link, we only have either dynamic version or static
   ## version because the libraries are big.
@@ -50,14 +50,14 @@ static.linking <- function() {
 }
 
 PKG_CPPFLAGS_env_fun <- function() {
-   paste(' -I"', file.path(rstan.inc.path_fun(), '/stansrc" '),
-         ' -I"', file.path(eigen.path_fun(), '" '),
-         ' -I"', file.path(eigen.path_fun(), '/unsupported" '),
-         ' -I"', rstan.options("boost.lib"), '"',
-         ' -I"', rstan.inc.path_fun(), '"', sep = '')
+   paste(' -I"', file.path(rstan_inc_path_fun(), '/stansrc" '),
+         ' -I"', file.path(eigen_path_fun(), '" '),
+         ' -I"', file.path(eigen_path_fun(), '/unsupported" '),
+         ' -I"', rstan_options("boost_lib"), '"',
+         ' -I"', rstan_inc_path_fun(), '"', sep = '')
 }
 
-legitimate.space.in.path <- function(path) {
+legitimate_space_in_path <- function(path) {
   # Add preceding '\\' to spaces on non-windows (this should happen rarely,
   # and not sure it will work)
   # For windows, use the short path name (8.3 format) 
@@ -73,13 +73,13 @@ legitimate.space.in.path <- function(path) {
 } 
 
 RSTAN_LIBS_fun <- function() {
-  static <- static.linking() 
-  rstan.libs.path <- rstan.libs.path_fun()
+  static <- static_linking() 
+  rstan.libs.path <- rstan_libs_path_fun()
 
   # It seems that adding quotes to the path does not work well 
   # in the case there is space in the path name 
   if (grepl('[^\\\\]\\s', rstan.libs.path, perl = TRUE))
-    rstan.libs.path <- legitimate.space.in.path(rstan.libs.path)
+    rstan.libs.path <- legitimate_space_in_path(rstan.libs.path)
 
   if (static) {
     paste(' "', rstan.libs.path, '/libstan.a', '"', sep = '')
@@ -95,7 +95,7 @@ rstanplugin <- function() {
   Rcpp_plugin <- getPlugin("Rcpp")
   rcpp_pkg_libs <- Rcpp_plugin$env$PKG_LIBS
   rcpp_pkg_path <- system.file(package = 'Rcpp')
-  rcpp_pkg_path2 <- legitimate.space.in.path(rcpp_pkg_path) 
+  rcpp_pkg_path2 <- legitimate_space_in_path(rcpp_pkg_path) 
  
   # In case  we have space (typicall on windows though not necessarily)
   # in the file path of Rcpp's library. 
@@ -117,7 +117,7 @@ rstanplugin <- function() {
 # inlineCxxPlugin would automatically get registered in inline's plugin list.
 # Note that everytime rstan plugin is used, inlineCxxPlugin
 # gets called so we can change some settings on the fly
-# for example now by setting rstan.options(boost.lib=xxx)
+# for example now by setting rstan_options(boost_lib=xxx)
 inlineCxxPlugin <- function(...) {
   settings <- rstanplugin()
   settings

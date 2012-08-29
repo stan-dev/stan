@@ -171,7 +171,7 @@ in a text file or a character string in \R.
 Here we use a character string. 
 <<echo=TRUE>>=
 library(rstan) 
-schools.code <- '
+schools_code <- '
   data {
     int<lower=0> J; // number of schools 
     real y[J]; // estimated treatment effects
@@ -200,8 +200,8 @@ dat <- list(J = 8,
 
 Next, we can call function \code{stan} to sample from the model. 
 <<echo=TRUE, results=hide>>=
-fit <- stan(model.code = schools.code, data = dat, 
-            n.iter = 2012, n.chains = 4)
+fit <- stan(model_code = schools_code, data = dat, 
+            n_iter = 2012, n_chains = 4)
 @
 
 
@@ -239,11 +239,11 @@ modeling language to \Cpp code. In the case that we have syntax errors in the
 model's \Stan code, the error information from \code{stanc} would 
 be reported to help debug. For the eight schools example, we use 
 <<echo=TRUE, results=hide>>=
-rt <- stanc(model.code = schools.code, model.name = '8schools') 
+rt <- stanc(model_code = schools_code, model_name = '8schools') 
 @
 
 Second, after we have successfully compiled out model to \Cpp code, we can
-use function \code{stan.model} to compile the \Cpp code and load the 
+use function \code{stan\_model} to compile the \Cpp code and load the 
 shared object of the model to \R, which is represented 
 by a S4 class \code{stanmodel}. Note that in this step (as in calling
 \code{stan}), a lot of intermediate message such as the \Cpp code and warning
@@ -251,14 +251,14 @@ message from the \Cpp compiler during compiling the \Cpp
 code might be spewed out especially if \code{verbose = TRUE}. 
 In most cases, these messages could be ignored unless there is an error. 
 <<echo=TRUE, results=hide>>=
-sm <- stan.model(stanc.ret = rt, verbose = FALSE)
+sm <- stan_model(stanc_ret = rt, verbose = FALSE)
 @
 
 Also we can construct a model from the model's \Stan code
-using \code{stan.model}, which in this case includes the step of compiling
+using \code{stan\_model}, which in this case includes the step of compiling
 the model to \Cpp using \code{stanc}. 
 <<echo=TRUE, results=hide>>=
-sm <- stan.model(model.code = schools.code, model.name = '8schools', 
+sm <- stan_model(model_code = schools_code, model_name = '8schools', 
                  verbose = FALSE)
 @
 

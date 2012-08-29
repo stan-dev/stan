@@ -1,5 +1,5 @@
-\name{stanc.version}
-\alias{stanc.version}
+\name{stanc_version}
+\alias{stanc_version}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Obtain the version of stanc in Stan} 
 \description{
@@ -7,7 +7,7 @@
   first version is 1.0.0.). 
 }
 \usage{
-  stanc.version()
+  stanc_version()
 }
 \value{
   A character string giving the version of stanc. 
@@ -18,9 +18,9 @@
   \url{http://mc-stan.org}. 
 }
 \seealso{
-  \code{\link{stan}} and \code{\link{stan.model}} 
+  \code{\link{stan}} and \code{\link{stan_model}} 
 }
 \examples{
-  stanc.version() 
+  stanc_version() 
 }
 \keyword{rstan} 

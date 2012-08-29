@@ -5,16 +5,15 @@ importFrom("graphics", plot)
 importFrom("Matrix", summary, print)
 
 export(
-  stan.model,
-# stan.samples,
+  stan_model,
   stanc, 
-  stanc.version, 
+  stanc_version, 
   stan,
-  stan.rdump,
-  read.rdump,
-  makeconf.path,
-  rstan.options 
-# get.rstan.options
+  stan_rdump,
+  read_rdump,
+  makeconf_path,
+  rstan_options 
+# get_rstan.options
 )
 
 exportClasses(
@@ -24,10 +23,10 @@ exportMethods(
 #   print, plot, 
 #   extract, 
   show, sampling, summary, print, extract,
-  traceplot, plot, get.stancode, get.inits, get.seed,
+  traceplot, plot, get_stancode, get_inits, get_seed,
   get_adaptation_info,
   get_sampler_params,
   get_logposterior, 
-  get.stanmodel 
+  get_stanmodel 
 )
 import(Rcpp)

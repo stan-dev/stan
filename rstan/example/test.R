@@ -20,20 +20,18 @@ model {
 '
 model_name <- "normal1"; 
 
-rr <- stan.model(model.code = stanmodelcode, model.name = model_name, 
+rr <- stan_model(model_code = stanmodelcode, model_name = model_name, 
                  verbose = TRUE) 
 
 y <- rnorm(20) 
 mean(y) 
 sd(y)
 dat <- list(N = 20, y = y); 
-f <- sampling(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
+f <- sampling(rr, data = dat, init = 0, iter = 2012, sample_file = 'norm1.csv')
 
-
-
-sampling(rr, data = dat, n.iter = 2012, init.t = 'user', n.chains = 1,
-         init.v = list(list(mu = 2)), seed = 3, n.thin = 1, 
-         sample.file = 'norm1.csv')
+sampling(rr, data = dat, iter = 2012, n_chains = 1,
+         init = list(list(mu = 2)), seed = 3, thin = 1, 
+         sample_file = 'norm1.csv')
 
 post <- read.csv(file = 'norm1.csv', header = TRUE, skip = 19, comment = '#') 
 colMeans(post)
@@ -45,25 +43,13 @@ colMeans(post)
 ### 
 
 dat <- list(N = 20L, y = y); 
-f <- sampling(rr, data = dat, init.t = 0, n.iter = 2012, sample.file = 'norm1.csv')
+f <- sampling(rr, data = dat, init = 0, iter = 2012, sample_file = 'norm1.csv')
 sampler <- new(rr@.modelmod$sampler, dat)
-args <- list(init = 'user', init_list = list(mu2 = 2)) 
+args <- list(init = list(mu2 = 2)) 
 s <- sampler$call_sampler(args) 
 summary(s)
 
-sampling(rr, data = dat, n.iter = 2012, init.t = 'user', 
-         init.v = list(list(mu2 = 2)), seed = 3, thin = 1, 
-         sample.file = 'norm1.csv')
-
-# stan.samples(b, dat, n.chains = 1, n.iter = 2012, 
-#              init.t = 'user', init.v = list(mu1 = 2)) 
-
-
-
-# yasfile <- paste(model_name, ".csv", sep = '')  
-
-# sampling(rr, data = dat, n.iter = 2012, init.t = 'random', 
-#          n.chains = 4,
-#          seed = 3, n.thin = 1, 
-#          sample.file = yasfile) 
+sampling(rr, data = dat, iter = 2012, 
+         init = list(list(mu2 = 2)), seed = 3, thin = 1, 
+         sample_file = 'norm1.csv')
 

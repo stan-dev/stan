@@ -69,7 +69,7 @@ namespace rstan {
    * The following arguments could be in the names lists
    *
    * <ul>
-   * <li> sample_file: into which samples are written 
+   * <li> samples: to which samples are written 
    * <li> iter: total number of iterations, including warmup (default: 2000)  
    * <li> warmup: 
    * <li> thin 
@@ -127,7 +127,7 @@ namespace rstan {
    
     /**
     stan_args(): 
-      sample_file("samples.csv"),  
+      samples("samples.csv"),  
       iter(2000U), 
       warmup(1000U), 
       thin(1U), 
@@ -148,7 +148,7 @@ namespace rstan {
       init_list(R_NilValue) {
     } 
     */
-    stan_args(const Rcpp::List& in) {
+    stan_args(const Rcpp::List& in) : init_list(R_NilValue) {
       std::vector<std::string> args_names 
         = Rcpp::as<std::vector<std::string> >(in.names()); 
    
@@ -226,13 +226,15 @@ namespace rstan {
       }
       
       idx = find_index(args_names, std::string("init")); 
-      if (idx == args_names.size()) init = "random"; 
-      else init = Rcpp::as<std::string>(in[idx]); // "0", "user", or "random"
-
-      idx = find_index(args_names, std::string("init_list")); 
-      if (idx == args_names.size()) init_list = R_NilValue; 
-      else init_list = in[idx]; 
-
+      if (idx == args_names.size()) {
+        init = "random"; 
+      } else {
+        switch (TYPEOF(in[idx])) {
+          case STRSXP: init = Rcpp::as<std::string>(in[idx]); break; 
+          case VECSXP: init = "user"; init_list = in[idx]; break; 
+          default: init = "random"; 
+        } 
+      }
       // rstan::io::rcout << "init=" << init << std::endl;  
       // std::string yesorno = Rf_isNull(init_list) ? "yes" : "no";
       // rstan::io::rcout << "init_list is null: " << yesorno << std::endl; 
@@ -249,12 +251,12 @@ namespace rstan {
     SEXP stan_args_to_rlist() const {
       Rcpp::List lst; 
       if (sample_file_flag) 
-        lst["sample_file"] = sample_file; 
+        lst["sample_file"] = sample_file;
       else 
         lst["sample_file_flag"] = false;
-      lst["n.iter"] = iter;                     // 2 
-      lst["n.warmup"] = warmup;                 // 3 
-      lst["n.thin"] = thin;                     // 4 
+      lst["iter"] = iter;                     // 2 
+      lst["warmup"] = warmup;                 // 3 
+      lst["thin"] = thin;                     // 4 
       lst["leapfrog_steps"] = leapfrog_steps;   // 5 
       lst["epsilon"] = epsilon;                 // 6 
       lst["max_treedepth"] = max_treedepth;     // 7 
@@ -263,8 +265,8 @@ namespace rstan {
       lst["random_seed"] = random_seed;         // 10
       lst["chain_id"] = chain_id;               // 11
       lst["equal_step_sizes"] = equal_step_sizes; // 12
-      lst["init.t"] = init;                     // 13
-      lst["init.v"] = init_list;                // 14 
+      lst["init"] = init;                        // 13
+      lst["init_list"] = init_list;                // 14 
       lst["sampler"] = sampler; 
       return lst; 
     } 
@@ -289,7 +291,7 @@ namespace rstan {
       return iter; 
     } 
     const std::string& get_sample_file() const {
-      return sample_file; 
+      return sample_file;
     } 
     bool get_sample_file_flag() const { 
       return sample_file_flag; 

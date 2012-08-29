@@ -16,14 +16,14 @@
 } 
 
 \section{Objects from the Class}{
-  Objects are usually created by calling function \code{stan.model}
+  Objects are usually created by calling function \code{stan_model}
 }
 
 
 \section{Slots}{
   \describe{
-    \item{\code{model.name}:}{The model name, object of \code{character}.} 
-    \item{\code{model.code}:}{The model code, object of \code{character}, in Stan modeling language.} 
+    \item{\code{model_name}:}{The model name, object of \code{character}.} 
+    \item{\code{model_code}:}{The model code, object of \code{character}, in Stan modeling language.} 
     \item{\code{.modelmod}:}{Object of \code{environment}  
       that includes a C++ object exposed by package \pkg{Rcpp}, a module mainly for drawing
       sample for the model.}
@@ -44,9 +44,9 @@
 
 \note{
   Objects of class \code{stanfit} can be saved for using across 
-  \R sessions only if \code{save.dso = TRUE} is used during calling
+  \R sessions only if \code{save_dso = TRUE} is used during calling
   functions that create \code{stanfit} objects (e.g., \code{stan}). 
-  But definitely even if \code{save.dso = TRUE}, it cannot be used across
+  But definitely even if \code{save_dso = TRUE}, it cannot be used across
   platforms. 
 }
 

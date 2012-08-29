@@ -17,7 +17,7 @@ library(package = pkg, character.only = TRUE)
 rstantest <- defineTestSuite("rstantest",
                              dirs = path, 
                              testFileRegexp = "^runit.+\\.R",
-                             testFuncRegexp = "^test.+",
+                             testFuncRegexp = "^test_+",
                              rngKind = "Marsaglia-Multicarry",
                              rngNormalKind = "Kinderman-Ramage")
 

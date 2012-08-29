@@ -1,36 +1,35 @@
-setGeneric(name = "grab.cxxfun",
-           def = function(object, ...) { standardGeneric("grab.cxxfun")})
+setGeneric(name = "grab_cxxfun",
+           def = function(object, ...) { standardGeneric("grab_cxxfun")})
 
-setGeneric(name = "is.dso.loaded",
-           def = function(object, ...) { standardGeneric("is.dso.loaded")})
-setGeneric(name = "reload.dso", 
-           def = function(object, ...) { standardGeneric("reload.dso")})
+setGeneric(name = "is_dso_loaded",
+           def = function(object, ...) { standardGeneric("is_dso_loaded")})
+setGeneric(name = "reload_dso", 
+           def = function(object, ...) { standardGeneric("reload_dso")})
 
 setMethod("show", "cxxdso", 
           function(object) {
-            cat("S4 class cxxdso: dso.saved = ", object@dso.saved, 
-                ", dso.filename = ", object@dso.filename, 
-                ", size = ", obj.size.str(object.size(object@.MISC$dso.bin)), ".\n", sep = '')  
-            cat("And dso.last.path = '", object@.MISC$dso.last.path, "'.\n", sep = '')
+            cat("S4 class cxxdso: dso_saved = ", object@dso_saved, 
+                ", dso_filename = ", object@dso_filename, 
+                ", size = ", obj_size_str(object.size(object@.MISC$dso.bin)), ".\n", sep = '')  
+            cat("And dso_last_path = '", object@.MISC$dso_last_path, "'.\n", sep = '')
             cat("Created on: ", object@system, ".\n", sep = '')
-            cat("Loaded now: ", if (is.dso.loaded(object)) 'YES' else 'NO', ".\n", sep = '')
+            cat("Loaded now: ", if (is_dso_loaded(object)) 'YES' else 'NO', ".\n", sep = '')
             cat("The signatures is/are as follows: \n")
             print(object@sig); 
           })
 
-
-setMethod('is.dso.loaded', signature(object = 'cxxdso'), 
+setMethod('is_dso_loaded', signature(object = 'cxxdso'), 
           function(object) {
-            f2 <- sub("\\.[^.]*$", "", basename(object@.MISC$dso.last.path)) 
+            f2 <- sub("\\.[^.]*$", "", basename(object@.MISC$dso_last_path)) 
             dlls <- getLoadedDLLs()
             f2 %in% names(dlls)
           }) 
 
-setMethod('grab.cxxfun', signature(object = "cxxdso"), 
+setMethod('grab_cxxfun', signature(object = "cxxdso"), 
           function(object) { 
-            if (!is.null.cxxfun(object@.MISC$cxxfun)) 
+            if (!is_null_cxxfun(object@.MISC$cxxfun)) 
               return(object@.MISC$cxxfun)
-            if (!object@dso.saved) 
+            if (!object@dso_saved) 
               stop("the cxx fun is NULL now and this cxxdso is not saved")
 
             # If the file is still loaded  
@@ -38,25 +37,25 @@ setMethod('grab.cxxfun', signature(object = "cxxdso"),
             #   The function ‘dyn.unload’ unlinks the DLL.  Note that unloading a
             #   DLL and then re-loading a DLL of the same name may or may not
             #   work: on Solaris it uses the first version loaded.
-            f <- sub("\\.[^.]*$", "", basename(object@dso.filename)) 
-            f2 <- sub("\\.[^.]*$", "", basename(object@.MISC$dso.last.path)) 
+            f <- sub("\\.[^.]*$", "", basename(object@dso_filename)) 
+            f2 <- sub("\\.[^.]*$", "", basename(object@.MISC$dso_last_path)) 
             dlls <- getLoadedDLLs()
             if (f2 %in% names(dlls)) { # still loaded 
               DLL <- dlls[[f2]] 
-              return(cxxfun.from.dll(object@sig, object@.MISC$cxxfun@code, DLL, check.dll = FALSE)) 
+              return(cxxfun_from_dll(object@sig, object@.MISC$cxxfun@code, DLL, check_dll = FALSE)) 
             }
             
             # not loaded  
             if (!identical(object@system, R.version$system)) 
               stop(paste("this cxxdso object was created on system '", object@system, "'", sep = ''))
-            cx <- cxxfun.from.dso.bin(object) 
+            cx <- cxxfun_from_dso_bin(object) 
             assign('cxxfun', cx, object@.MISC) 
             return(cx) 
           }) 
 
 setMethod("getDynLib", signature(x = "cxxdso"),
           function(x) { 
-            fx <- grab.cxxfun(x) 
+            fx <- grab_cxxfun(x) 
             env <- environment(fx@.Data)
             f <- get("f", env)
             dlls <- getLoadedDLLs()

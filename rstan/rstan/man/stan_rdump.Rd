@@ -1,5 +1,5 @@
-\name{stan.rdump}
-\alias{stan.rdump}
+\name{stan_rdump}
+\alias{stan_rdump}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Dump the data for a Stan model to \R dump file
@@ -11,29 +11,29 @@ that Stan supports
 \description{
   This function takes a vector of names of \R objects and outputs
   text representations of the objects to a file or connection.
-  The file created by \code{stan.rdump} is typically used as data 
+  The file created by \code{stan_rdump} is typically used as data 
   input of the Stan package (\url{http://mc-stan.org}) or 
   \code{\link{source}}d into another \R session.
 }
 
 \usage{
-stan.rdump(list, file, append = FALSE, 
+stan_rdump(list, file, append = FALSE, 
           envir = parent.frame(),
           width = options("width")$width)
 }
 
 \arguments{
-  \item{list}{character. The names of one or more \R objects to be dumped.}
+  \item{list}{A character string: the names of one or more \R objects to be dumped.}
 
-  \item{file}{either a character string naming a file or a
+  \item{file}{Either a character string naming a file or a
     \link{connection}.  \code{""} indicates output to the console.}
 
-  \item{append}{if \code{TRUE} and \code{file} is a character string,
+  \item{append}{Logical: if \code{TRUE} and \code{file} is a character string,
     output will be appended to \code{file}; otherwise, it will overwrite
     the contents of \code{file}.}
 
-  \item{envir}{the environment to search for objects.}
-  \item{width}{the width for maximum characters on a line.  
+  \item{envir}{The environment to search for objects.}
+  \item{width}{The width for maximum characters on a line.  
     The output is broken into lines with \code{width.}}
 }
 
@@ -42,7 +42,7 @@ stan.rdump(list, file, append = FALSE,
   that were dumped.
 }
 \note{
-  \code{stan.rdump} only dumps numeric data, which can be 
+  \code{stan_rdump} only dumps numeric data, which can be 
   scalar, vector, array, or matrix.  
 }
 
@@ -51,7 +51,7 @@ stan.rdump(list, file, append = FALSE,
 }
 \examples{
 x <- 1; y <- 1:10; z <- array(1:10, dim = c(2,5)) 
-stan.rdump(ls(pattern = '^[xyz]'), "xyz.Rdump")
+stan_rdump(ls(pattern = '^[xyz]'), "xyz.Rdump")
 cat(paste(readLines("xyz.Rdump"), collapse = '\n'), '\n')
 unlink("xyz.Rdump")
 }

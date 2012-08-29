@@ -28,7 +28,7 @@
 #     return(y) 
 #   } 
  
-list.as.integer.if.doable <- function(x) {
+list_as_integer_if_doable <- function(x) {
   # change the storage mode from 'real' to 'integer' 
   # if applicable since by default R use real.
   #
@@ -64,7 +64,7 @@ mklist <- function(names, env = as.environment(-1)) {
 } 
 
 
-data.preprocess <- function(data) { # , varnames) {
+data_preprocess <- function(data) { # , varnames) {
   # Preprocess the data (list or env) to list for stan
   # 
   # Args:
@@ -131,12 +131,12 @@ data.preprocess <- function(data) { # , varnames) {
 } 
 
 
-read.model.from.con <- function(con) {
+read_model_from_con <- function(con) {
   lines <- readLines(con, n = -1L, warn = FALSE)
   paste(lines, collapse = '\n') 
 } 
 
-get.model.code <- function(file, model.code = '') {
+get_model_strcode <- function(file, model_code = '') {
   if (!missing(file)) {
     if (is.character(file)) {
       fname <- file
@@ -148,26 +148,26 @@ get.model.code <- function(file, model.code = '') {
     } else if (!inherits(file, "connection")) {
       stop("file must be a character string or connection")
     }
-    model.code <- paste(readLines(file, warn = FALSE), collapse = '\n') 
-  } else if (model.code == '') {  
-    stop("Model file missing and empty model.code")
+    model_code <- paste(readLines(file, warn = FALSE), collapse = '\n') 
+  } else if (model_code == '') {  
+    stop("Model file missing and empty model_code")
   } 
-  model.code 
+  model_code 
 } 
 
 
 
 # FIXEME: implement more check on the arguments 
-check.args <- function(argss) {
+check_args <- function(argss) {
   if (FALSE) stop() 
 } 
 
 #
-# model.code <- read.model.from.con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan')
-# cat(model.code)
+# model_code <- read_model_from_con('http://stan.googlecode.com/git/src/models/bugs_examples/vol1/dyes/dyes.stan')
+# cat(model_code)
 
 
-append.id <- function(file, id, suffix = '.csv') {
+append_id <- function(file, id, suffix = '.csv') {
   fname <- basename(file)
   fpath <- dirname(file)
   fname2 <- gsub("\\.csv[[:space:]]*$", 
@@ -178,83 +178,73 @@ append.id <- function(file, id, suffix = '.csv') {
   file.path(fpath, fname2)
 }
 
+config_argss <- function(n_chains, iter, warmup, thin, 
+                        init, seed, sample_file, ...) {
 
+  iters <- rep(iter, n_chains)   
+  thins <- rep(thin, n_chains)  
+  warmups <- rep(warmup, n_chains) 
 
-config.argss <- function(n.chains, n.iter, n.warmup, n.thin, 
-                        init.t, init.v,
-                        seed, sample.file, ...) {
-
-  n.iters <- rep(n.iter, n.chains)   
-  n.thins <- rep(n.thin, n.chains)  
-  n.warmups <- rep(n.warmup, n.chains) 
-
-  init.t <- as.character(init.t)
-  init.t[which(!init.t %in% c("0", "user"))] <- 'random'
-
-  init.ts <- rep(init.t, n.chains)  
-  init.vs <- vector("list", n.chains) 
-  if (!missing(init.v) && !is.null(init.v)) {
-    if (is.function(init.v)) {
-      ## the function could take an argument named by chain.id 
-      ## from 1 to num.chains. 
-      if (any(names(formals(init.v)) == "chain.id")) {
-        for (i in 1:n.chains)  
-          init.vs[[i]] <- init.v(chain.id = i)
-      } else {
-        for (i in 1:n.chains)  
-          init.vs[[i]] <- init.v() 
-      } 
-    } else if (is.list(init.v)) {
-      if (length(init.v) != n.chains) 
-        stop("Initial value list mismatchs number of chains") 
-      if (!any(sapply(init.v, is.list))) {
-        # print(init.v)
-        stop("Initial value list is not a list of lists") 
-      }
-      init.vs <- init.v 
-    } else { 
-      # cat("init.v=", init.v, "\n") 
-      stop("Wrong specification of initial values")
-    } 
+  inits_specified <- FALSE
+  if (is.numeric(init)) init <- as.character(init) 
+  if (is.character(init)) {
+    if (init[1] %in% c("0", "random")) inits <- rep(init[1], n_chains) 
+    else inits <- rep("random", n_chains) 
+    inits_specified <- TRUE
   } 
+  if (!inits_specified && is.function(init)) {
+    ## the function can take an argument named by chain_id 
+    if (any(names(formals(init)) == "chain_id")) {
+      inits <- lapply(1:n_chains, function(id) init(chain_id = id))
+    } else {
+      inits <- lapply(1:n_chains, function(id) init())
+    } 
+    inits_specified <- TRUE
+  } 
+  if (!inits_specified && is.list(init)) {
+    if (length(init) != n_chains) 
+      stop("initial value list mismatchs number of chains") 
+    if (!any(sapply(init, is.list))) {
+      stop("initial value list is not a list of lists") 
+    }
+    inits <- init; 
+    inits_specified <- TRUE
+  }
+  if (!inits_specified) stop("wrong specification of initial values")
 
   ## only one seed is needed by virtue of the RNG 
   seed <- if (!missing(seed)) seed else sample.int(.Machine$integer.max, 1)
 
-  argss <- vector("list", n.chains)  
+  argss <- vector("list", n_chains)  
   ## the name of arguments in the list need to 
   ## match those in include/rstan/stan_args.hpp 
-  for (i in 1:n.chains)  
+  for (i in 1:n_chains)  
     argss[[i]] <- list(chain_id = i, 
-                       iter = n.iters[i], thin = n.thins[i], seed = seed, 
-                       warmup = n.warmups[i], init = init.ts[i]) 
+                       iter = iters[i], thin = thins[i], seed = seed, 
+                       warmup = warmups[i], init = inits[[i]]) 
     
-  if (!missing(init.v) && !is.null(init.v))  
-    for (i in 1:n.chains) 
-      argss[[i]]$init_list = init.vs[[i]]   
-
-  if (!missing(sample.file) && !is.na(sample.file)) {
-    sample.file <- writable.sample.file(sample.file) 
-    if (n.chains == 1) 
-        argss[[1]]$sample_file <- sample.file
-    if (n.chains > 1) {
-      for (i in 1:n.chains) 
-        argss[[i]]$sample_file <- append.id(sample.file, i) 
+  if (!missing(sample_file) && !is.na(sample_file)) {
+    sample_file <- writable_sample_file(sample_file) 
+    if (n_chains == 1) 
+        argss[[1]]$sample_file <- sample_file
+    if (n_chains > 1) {
+      for (i in 1:n_chains) 
+        argss[[i]]$sample_file <- append_id(sample_file, i) 
     }
   }
   dotlist <- list(...) 
-  for (i in 1:n.chains) 
+  for (i in 1:n_chains) 
     argss[[i]] <- c(argss[[i]], dotlist) 
-  check.args(argss) 
+  check_args(argss) 
   argss 
 } 
 
-is.dir.writable <- function(path) {
+is_dir_writable <- function(path) {
   if (file.access(path, mode = 2) < 0) return(FALSE) 
   return(TRUE)
 } 
 
-writable.sample.file <- 
+writable_sample_file <- 
 function(file, warning = TRUE, 
          wfun = function(x, x2) {
            paste('Warning: "', x, '" is not writable; use "', x2, '" instead.', sep = '')
@@ -272,7 +262,7 @@ function(file, warning = TRUE,
   #  Otherwise, change the path to tempdir(). 
   
   dir <- dirname(file) 
-  if (!is.dir.writable(dir)) { 
+  if (!is_dir_writable(dir)) { 
     dir2 <- tempdir()
     if (warning)
       cat(wfun(dir, dir2))
@@ -291,7 +281,7 @@ probs2str <- function(probs, digits = 1) {
 } 
 
 
-stan.rdump <- function(list, file, append = FALSE, 
+stan_rdump <- function(list, file, append = FALSE, 
                        envir = parent.frame(),
                        width = options("width")$width) {
   # Dump an R list or environment for a model data 
@@ -308,7 +298,7 @@ stan.rdump <- function(list, file, append = FALSE,
   # Return:
  
   if (missing(file)) 
-    stop("stan.rdump needs argument 'file', ",
+    stop("stan_rdump needs argument 'file', ",
          "into which the data are dumped.") 
 
   if (is.character(file)) {
@@ -357,22 +347,22 @@ stan.rdump <- function(list, file, append = FALSE,
   invisible(l2) 
 } 
 
-## test stan.rdump simply
+## test stan_rdump simply
 # a <- 1:3
 # b <- 3
 # c <- matrix(1:9, ncol = 3)
 # d <- array(1:90, dim = c(9, 2, 5))
-# stan.rdump(c('a', 'b', 'c', 'd'), file = 'a.txt')
+# stan_rdump(c('a', 'b', 'c', 'd'), file = 'a.txt')
 
-get.rhat.cols <- function(rhats) {
+get_rhat_cols <- function(rhats) {
   # 
   # Args:
   #   rhat: a scalar 
   #
-  rhat.na.col <- rstan.options("plot.rhat.na.col")
-  rhat.breaks <- rstan.options("plot.rhat.breaks")
+  rhat.na.col <- rstan_options("plot_rhat_na.col")
+  rhat.breaks <- rstan_options("plot_rhat_breaks")
   # print(rhat.breaks)
-  rhat.colors <- rstan.options("plot.rhat.cols")
+  rhat.colors <- rstan_options("plot_rhat_cols")
 
   sapply(rhats, 
          FUN = function(x) {
@@ -383,20 +373,20 @@ get.rhat.cols <- function(rhats) {
              if (x >= rhat.breaks[i]) next
              return(rhat.colors[i])
            }  
-           rstan.options("plot.rhat.large.col")
+           rstan_options("plot_rhat_large_col")
          })  
 }
 
-plot.rhat.legend <- function(x, y, cex = 1) { 
+plot_rhat_legend <- function(x, y, cex = 1) { 
   # Args
   #   x, y: left, bottom corner coordinates 
   #   cex: cex for the labels 
-  rhat.breaks <- rstan.options("plot.rhat.breaks")
+  rhat.breaks <- rstan_options("plot_rhat_breaks")
   n.breaks <- length(rhat.breaks) 
-  rhat.colors <- rstan.options("plot.rhat.cols")[1:n.breaks] 
+  rhat.colors <- rstan_options("plot_rhat_cols")[1:n.breaks] 
   rhat.legend.txts <- c(paste("< ", rhat.breaks, "  ", sep = ''), 
                         paste(">= ", max(rhat.breaks), "  ", sep = ''))
-  rhat.legend.cols <- c(rhat.colors, rstan.options('plot.rhat.large.col')) 
+  rhat.legend.cols <- c(rhat.colors, rstan_options('plot_rhat_large_col')) 
   rhat.legend.width <- strwidth(rhat.legend.txts, cex = cex) 
   rhat.rect.width <- strwidth("r-hat ", cex = cex) 
   text(x, y, label = 'Rhat:  ', adj = c(0, 0), cex = cex)  
@@ -412,7 +402,7 @@ plot.rhat.legend <- function(x, y, cex = 1) {
 } 
   
 
-read.rdump <- function(f) {
+read_rdump <- function(f) {
   # Read data defined in an R dump file to an R list
   # 
   # Args:
@@ -453,7 +443,7 @@ idx_row2colm <- function(d) {
 } 
 
 
-seq.array.ind <- function(d, col.major = FALSE) {
+seq_array_ind <- function(d, col.major = FALSE) {
   #
   # Generate an array of indexes for an array parameter 
   # in order of major or column. 
@@ -505,7 +495,7 @@ seq.array.ind <- function(d, col.major = FALSE) {
   res 
 } 
 
-flat.one.par <- function(n, d, col.major = FALSE) {
+flat_one_par <- function(n, d, col.major = FALSE) {
   # Return all the elemenetwise parameters for a vector/array
   # parameter. 
   # 
@@ -516,7 +506,7 @@ flat.one.par <- function(n, d, col.major = FALSE) {
   #     as well when n is a scalar. 
   # 
   if (0 == length(d)) return(n)  
-  nameidx <- seq.array.ind(d, col.major) 
+  nameidx <- seq_array_ind(d, col.major) 
   names <- apply(nameidx, 1, function(x) paste(n, "[", paste(x, collapse = ','), "]", sep = '')) 
   as.vector(names) 
 } 
@@ -524,8 +514,8 @@ flat.one.par <- function(n, d, col.major = FALSE) {
 
 flatnames <- function(names, dims, col.major = FALSE) {
   if (length(names) == 1) 
-    return(flat.one.par(names, dims[[1]], col.major = col.major))  
-  nameslst <- mapply(flat.one.par, names, dims, 
+    return(flat_one_par(names, dims[[1]], col.major = col.major))  
+  nameslst <- mapply(flat_one_par, names, dims, 
                      MoreArgs = list(col.major = col.major), 
                      SIMPLIFY = FALSE,
                      USE.NAMES = FALSE) 
@@ -534,16 +524,16 @@ flatnames <- function(names, dims, col.major = FALSE) {
   do.call(c, nameslst) 
 } 
 
-num.pars <- function(d) prod(d) 
+num_pars <- function(d) prod(d) 
 
-calc.starts <- function(dims) {
+calc_starts <- function(dims) {
   len <- length(dims) 
-  s <- sapply(dims, function(d)  num.pars(d)) 
+  s <- sapply(dims, function(d)  num_pars(d)) 
   cumsum(c(1, s))[1:len] 
 } 
 
 
-pars.total.indexes <- function(names, dims, fnames, pars) {
+pars_total_indexes <- function(names, dims, fnames, pars) {
   # Obtain the total indexes for parameters (pars) in the 
   # whole sequences of names that is order by 'column major.' 
   # Args: 
@@ -560,8 +550,10 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
   #   sequence, an attribute named 'row.major.idx' is attached, which could
   #   be used when row major index is favored.
 
-  starts <- calc.starts(dims) 
-  par.total.indexes <- function(par) {
+  starts <- calc_starts(dims) 
+  par_total_indexes <- function(par) {
+    # for just one parameter
+    #
     p <- match(par, fnames)
     # note that here when `par' is a scalar, it would
     # match to one of `fnames'
@@ -571,31 +563,31 @@ pars.total.indexes <- function(names, dims, fnames, pars) {
       return(p) 
     } 
     p <- match(par, names) 
-    idx <- starts[p] + seq(0, by = 1, length.out = num.pars(dims[[p]])) 
+    idx <- starts[p] + seq(0, by = 1, length.out = num_pars(dims[[p]])) 
     names(idx) <- fnames[idx] 
     attr(idx, "row.major.idx") <- starts[p] + idx_col2rowm(dims[[p]]) - 1 
     idx
   } 
-  idx <- lapply(pars, FUN = par.total.indexes) 
+  idx <- lapply(pars, FUN = par_total_indexes) 
   names(idx) <- pars 
   idx 
 } 
 
-## simple test for pars.total.indexes 
+## simple test for pars_total_indexes 
 #  names <- c('alpha', 'beta', 'gamma')
 #  dims <- list(c(2,3), c(3,4,5), c(5))
 #  fnames <- flatnames(names, dims, col.major = TRUE) 
-#  pars.total.indexes(names, dims, fnames, c('gamma', 'alpha', 'beta')) 
+#  pars_total_indexes(names, dims, fnames, c('gamma', 'alpha', 'beta')) 
 
 #### temporary test code 
-#  a <- config.argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
+#  a <- config_argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
 #  print(a) 
 #  
 #  fun1 <- function(chain.id) {
 #    cat("chain.id=", chain.id)
 #    return(list(mu = chain.id))
 #  } 
-#  b <- config.argss(3, c(100, 200), 10, 1, c("user", 1), fun1, seed = 3) 
+#  b <- config_argss(3, c(100, 200), 10, 1, c("user", 1), fun1, seed = 3) 
 #  print(b)
 #  
 #  
@@ -615,11 +607,11 @@ rstancolc <- rgb(matrix(c(230, 97, 1,
                         byrow = TRUE, ncol = 3),
                  names = paste(1:6), maxColorValue = 255) 
 
-default.summary.probs <- function() c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)
+default_summary_probs <- function() c(0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.975)
 
 ## summarize the chains merged and individually 
-get.par.summary <- function(sim, n, probs = default.summary.probs()) {
-  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
+get_par_summary <- function(sim, n, probs = default_summary_probs()) {
+  ss <- lapply(1:sim$n_chains, function(i) sim$samples[[i]][[n]][-(1:sim$warmup2[i])]) 
   msdfun <- function(chain) c(mean(chain), sd(chain))
   qfun <- function(chain) quantile(chain, probs = probs)
   c.msd <- unlist(lapply(ss, msdfun), use.names = FALSE) 
@@ -631,8 +623,8 @@ get.par.summary <- function(sim, n, probs = default.summary.probs()) {
 } 
 
 # mean and sd 
-get.par.summary.msd <- function(sim, n) { 
-  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
+get_par_summary_msd <- function(sim, n) { 
+  ss <- lapply(1:sim$n_chains, function(i) sim$samples[[i]][[n]][-(1:sim$warmup2[i])]) 
   sumfun <- function(chain) c(mean(chain), sd(chain)) 
   cs <- lapply(ss, sumfun)
   as <- sumfun(do.call(c, ss)) 
@@ -640,24 +632,24 @@ get.par.summary.msd <- function(sim, n) {
 } 
 
 # quantiles 
-get.par.summary.quantile <- function(sim, n, probs = default.summary.probs()) {
-  ss <- lapply(1:sim$n.chains, function(i) sim$samples[[i]][[n]][-(1:sim$n.warmup2[i])]) 
+get_par_summary_quantile <- function(sim, n, probs = default_summary_probs()) {
+  ss <- lapply(1:sim$n_chains, function(i) sim$samples[[i]][[n]][-(1:sim$warmup2[i])]) 
   sumfun <- function(chain) quantile(chain, probs = probs)
   cs <- lapply(ss, sumfun)
   as <- sumfun(do.call(c, ss)) 
   list(quan = as, c.quan = unlist(cs, use.names = FALSE)) 
 } 
 
-combine.msd.quan <- function(msd, quan) {
+combine_msd_quan <- function(msd, quan) {
   # Combine msd and quantiles for chain's summary 
   # Args:
-  #   msd: the array for mean and sd with dim num.par * 2 * n.chains 
-  #   cquan: the array for quantiles with dim num.par * n.quan * n.chains 
+  #   msd: the array for mean and sd with dim num.par * 2 * n_chains 
+  #   cquan: the array for quantiles with dim num.par * n.quan * n_chains 
   dim1 <- dim(msd) 
   dim2 <- dim(quan) 
   if (any(dim1[c(1, 3)] != dim2[c(1, 3)])) 
     stop("numers of parameter/chains differ in msd and quan") 
-  n.chains <- dim1[3] 
+  n_chains <- dim1[3] 
   n.par <- dim1[1] 
   n.stat <- dim1[2] + dim2[2] 
   par.names <- dimnames(msd)[[1]] 
@@ -672,24 +664,24 @@ combine.msd.quan <- function(msd, quan) {
     dim(a2) <- dim2[1:2] 
     cbind(a1, a2)
   } 
-  ll <- lapply(1:n.chains, fun) 
+  ll <- lapply(1:n_chains, fun) 
   twodnames <- dimnames(ll[[1]]) 
-  msdquan <- array(unlist(ll), dim = c(n.par, n.stat, n.chains)) 
+  msdquan <- array(unlist(ll), dim = c(n.par, n.stat, n_chains)) 
   dimnames(msdquan) <- list(par.names, stat.names, NULL) 
   msdquan 
 } 
 
-summary.sim <- function(sim, pars, probs = default.summary.probs()) {
-  # cat("summary.sim is called.\n")
+summary_sim <- function(sim, pars, probs = default_summary_probs()) {
+  # cat("summary_sim is called.\n")
   probs.str <- probs2str(probs)
   probs.len <- length(probs) 
-  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
-  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  pars <- if (missing(pars)) sim$pars.oi else check_pars(sim, pars) 
+  tidx <- pars_total_indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx.len <- length(tidx) 
   tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
-  lmsdq <- lapply(tidx, function(n) get.par.summary(sim, n, probs)) 
+  lmsdq <- lapply(tidx, function(n) get_par_summary(sim, n, probs)) 
   msd <- do.call(rbind, lapply(lmsdq, function(x) x$msd)) 
   quan <- do.call(rbind, lapply(lmsdq, function(x) x$quan)) 
   dim(msd) <- c(tidx.len, 2) 
@@ -701,18 +693,18 @@ summary.sim <- function(sim, pars, probs = default.summary.probs()) {
 
   c.msd <- do.call(rbind, lapply(lmsdq, function(x) x$c.msd)) 
   c.quan <- do.call(rbind, lapply(lmsdq, function(x) x$c.quan)) 
-  dim(c.msd) <- c(tidx.len, 2, sim$n.chains) 
-  dim(c.quan) <- c(tidx.len, probs.len, sim$n.chains) 
+  dim(c.msd) <- c(tidx.len, 2, sim$n_chains) 
+  dim(c.quan) <- c(tidx.len, probs.len, sim$n_chains) 
 
   dimnames(c.msd) <- list(sim$fnames.oi[tidx], c("mean", "sd"), NULL) 
   dimnames(c.quan) <- list(sim$fnames.oi[tidx], probs.str, NULL)
 
-  ess <-  array(sapply(tidx, function(n) rstan.ess(sim, n)), dim = c(tidx.len, 1)) 
-  rhat <- array(sapply(tidx, function(n) rstan.splitrhat(sim, n)), dim = c(tidx.len, 1)) 
+  ess <-  array(sapply(tidx, function(n) rstan_ess(sim, n)), dim = c(tidx.len, 1)) 
+  rhat <- array(sapply(tidx, function(n) rstan_splitrhat(sim, n)), dim = c(tidx.len, 1)) 
 
   # mean of each chain's log-posterior after warm-up
   lp_mean <- mapply(function(i, x, w) { mean(attr(x, 'lp')[-(1:w)]) }, 
-                    1:sim$n.chains, sim$samples, sim$n.warmup2,
+                    1:sim$n_chains, sim$samples, sim$warmup2,
                     USE.NAMES = FALSE) 
 
   ss <- list(msd = msd, sem = msd[, 2] / sqrt(ess), 
@@ -724,24 +716,24 @@ summary.sim <- function(sim, pars, probs = default.summary.probs()) {
   ss
 }  
 
-summary.sim.quan <- function(sim, pars, probs = default.summary.probs()) {
-  # cat("summary.sim is called.\n")
+summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
+  # cat("summary_sim is called.\n")
   probs.str <- probs2str(probs)
   probs.len <- length(probs) 
-  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
-  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  pars <- if (missing(pars)) sim$pars.oi else check_pars(sim, pars) 
+  tidx <- pars_total_indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx.len <- length(tidx) 
   tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
-  lquan <- lapply(tidx, function(n) get.par.summary.quantile(sim, n, probs)) 
+  lquan <- lapply(tidx, function(n) get_par_summary_quantile(sim, n, probs)) 
   quan <- do.call(rbind, lapply(lquan, function(x) x$quan)) 
   dim(quan) <- c(tidx.len, probs.len) 
   rownames(quan) <- sim$fnames.oi[tidx] 
   colnames(quan) <- probs.str 
 
   c.quan <- do.call(rbind, lapply(lquan, function(x) x$c.quan)) 
-  dim(c.quan) <- c(tidx.len, probs.len, sim$n.chains) 
+  dim(c.quan) <- c(tidx.len, probs.len, sim$n_chains) 
   dimnames(c.quan) <- list(sim$fnames.oi[tidx], probs.str, NULL)
 
   ss <- list(quan = quan, c.quan = c.quan)
@@ -750,26 +742,26 @@ summary.sim.quan <- function(sim, pars, probs = default.summary.probs()) {
   ss
 }  
 
-summary.sim.ess <- function(sim, pars) {
-  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
-  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+summary_sim_ess <- function(sim, pars) {
+  pars <- if (missing(pars)) sim$pars.oi else check_pars(sim, pars) 
+  tidx <- pars_total_indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
-  ess <- sapply(tidx, function(n) rstan.ess(sim, n)) 
+  ess <- sapply(tidx, function(n) rstan_ess(sim, n)) 
   names(ess) <- sim$fnames.oi[tidx]
   attr(ess, "row.major.idx") <- tidx.rowm
   attr(ess, "col.major.idx") <- tidx
   ess
 } 
 
-summary.sim.rhat <- function(sim, pars) {
-  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
-  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+summary_sim_rhat <- function(sim, pars) {
+  pars <- if (missing(pars)) sim$pars.oi else check_pars(sim, pars) 
+  tidx <- pars_total_indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
   tidx.rowm <- lapply(tidx, function(x) attr(x, "row.major.idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
-  rhat <- sapply(tidx, function(n) rstan.splitrhat(sim, n)) 
+  rhat <- sapply(tidx, function(n) rstan_splitrhat(sim, n)) 
   names(rhat) <- sim$fnames.oi[tidx]
   attr(rhat, "row.major.idx") <- tidx.rowm
   attr(rhat, "col.major.idx") <- tidx
@@ -777,17 +769,17 @@ summary.sim.rhat <- function(sim, pars) {
 } 
 
 
-organize.inits <- function(inits, pars, dims) {
+organize_inits <- function(inits, pars, dims) {
   # obtain a list of inital values for each chain in sim
   # Args: 
   #   inits: a list of vectors, each vector is the 
   #     inits for a chain 
-  n.chains <- length(inits) 
-  starts <- calc.starts(dims) 
+  n_chains <- length(inits) 
+  starts <- calc_starts(dims) 
   tmpfun <- function(x) {
     lst <- lapply(1:length(pars),  
                   function(i) { 
-                    len <- num.pars(dims[[i]]) 
+                    len <- num_pars(dims[[i]]) 
                     if (1 == len) return(x[starts[i]]) 
                     y <- x[starts[i] + (1:len) - 1] 
                     dim(y) <- dims[[i]] 
@@ -801,16 +793,16 @@ organize.inits <- function(inits, pars, dims) {
 
 # ported from bugs.plot.inferences in R2WinBUGS  
 # 
-stan.plot.inferences <- function(sim, summary, pars, model.info, display.parallel = FALSE, ...) {
+stan_plot_inferences <- function(sim, summary, pars, model.info, display.parallel = FALSE, ...) {
   # 
   # Args:
   #   sim: the sim list in stanfit object
   #   pars: parameters of interest
-  #   model.info: names list with elements model.name and model.date 
+  #   model.info: names list with elements model_name and model.date 
   #   display.parallel
 
-  alert.col <- rstan.options("rstan.alert.col")
-  chain.cols <- rstan.options("rstan.chain.cols")
+  alert.col <- rstan_options("rstan_alert_col")
+  chain.cols <- rstan_options("rstan_chain_cols")
   chain.cols.len <- length(chain.cols) 
 
   # FIXME: the following if - else for all platforms 
@@ -833,14 +825,14 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
   # we have this so that even the # of parameters are less than
   # 30, we still have equal space between parameters for 
   # the whole plot. 
-  standard.width <- rstan.options('plot.standard.npar') 
-  max.width <- rstan.options('plot.max.npar') 
+  standard.width <- rstan_options('plot_standard_npar') 
+  max.width <- rstan_options('plot_max_npar') 
 
-  pars <- if (missing(pars)) sim$pars.oi else check.pars(sim, pars) 
+  pars <- if (missing(pars)) sim$pars.oi else check_pars(sim, pars) 
   n.pars <- length(pars) 
-  n.chains <- sim$n.chains
+  n_chains <- sim$n_chains
  
-  tidx <- pars.total.indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
+  tidx <- pars_total_indexes(sim$pars.oi, sim$dims.oi, sim$fnames.oi, pars) 
 
   ## if in Splus, suppress printing of warnings during the plotting.
   ## otherwise a warning is generated 
@@ -860,9 +852,9 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
     options(warn = warn.settings)
 
   # plot the model general information 
-  header <- paste("Stan model '", model.info$model.name, "' (", n.chains, 
-                  " chains: n.iter=", sim$n.iter, "; n.burnin=", sim$n.warmup, 
-                  "; n.thin=", sim$n.thin, ") fitted at ",
+  header <- paste("Stan model '", model.info$model_name, "' (", n_chains, 
+                  " chains: iter=", sim$iter, "; warmup=", sim$warmup, 
+                  "; thin=", sim$thin, ") fitted at ",
                   model.info$model.date, sep = '') 
   # side: (1=bottom, 2=left, 3=top, 4=right)
   mtext(header, side = 3, outer = TRUE, line = -1, cex = .7)
@@ -883,7 +875,7 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
 
     k.dim <- sim$dims.oi[[pars[k]]] 
     k.dim.len <- length(k.dim)
-    k.aidx <- seq.array.ind(k.dim, col.major = FALSE) 
+    k.aidx <- seq_array_ind(k.dim, col.major = FALSE) 
     
     # the index for the parameters in the whole 
     # sequences of parameters 
@@ -898,7 +890,7 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
     spacing <- 3.5 / max(J, standard.width)
 
     # the medians for all the kept samples merged 
-    sprobs = default.summary.probs()  
+    sprobs = default_summary_probs()  
     mp <- match(0.5, sprobs) 
     i80p <- match(c(0.1, 0.9), sprobs) 
     med <- summary$quan[index, mp] 
@@ -906,12 +898,12 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
     i80 <- summary$quan[index, i80p] 
     i80 <- array(i80, dim = c(k.num.p, 2)) 
     rhats <- summary$rhat 
-    rhats.cols <- get.rhat.cols(rhats) 
+    rhats.cols <- get_rhat_cols(rhats) 
   
     med.chain <- summary$c.quan[index, mp, ]
-    med.chain <- array(med.chain, dim = c(k.num.p, sim$n.chains)) 
+    med.chain <- array(med.chain, dim = c(k.num.p, sim$n_chains)) 
     i80.chain <- summary$c.quan[index, i80p, ]
-    i80.chain <- array(i80.chain, dim = c(k.num.p, 2, sim$n.chains))
+    i80.chain <- array(i80.chain, dim = c(k.num.p, 2, sim$n_chains))
 
     rng <- if (display.parallel) range(i80, i80.chain) else range(i80)
     p.rng <- pretty(rng, n = 2)
@@ -931,20 +923,20 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
     }
     for (j in 1:J){
       if (display.parallel){
-        for (m in 1:n.chains){
+        for (m in 1:n_chains){
           interval <- a + b * i80.chain[j, , m]
 
           # When the interval is too tiny, we use the min.width instead
           # of the real one. 
           if (interval[2] - interval[1] < min.width)
             interval <- mean(interval) + c(-.5, .5) * min.width
-          segments(x0 = A + B * spacing * (j + .6 *(m - (n.chains + 1) / 2) / n.chains), 
+          segments(x0 = A + B * spacing * (j + .6 *(m - (n_chains + 1) / 2) / n_chains), 
                    y0 = interval[1], y1 = interval[2], lwd = .5, 
                    col = chain.cols[(m-1) %% chain.cols.len + 1]) 
         }
       } else {
         lines(A + B * spacing * rep(j, 2), a + b * i80[j,], lwd = .5)
-        for (m in 1:n.chains)
+        for (m in 1:n_chains)
           points(A + B * spacing * j, a + b * med.chain[j, m], 
                  pch = 20, cex = cex.points, 
                  col = chain.cols[(m-1) %% chain.cols.len + 1])
@@ -985,7 +977,7 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
       truncated <- TRUE
     } 
   } 
-  plot.rhat.legend(0, -n.pars - .5, cex = cex.names)
+  plot_rhat_legend(0, -n.pars - .5, cex = cex.names)
   if (truncated) {
     text(0, -n.pars - .5 - num.height * 2.5, "*  array truncated for lack of space", 
          adj = c(0, 0), cex = cex.names, col = alert.col)
@@ -993,25 +985,25 @@ stan.plot.inferences <- function(sim, summary, pars, model.info, display.paralle
   invisible(NULL)
 } 
 
-legitimate.model.name <- function(name) {
+legitimate_model_name <- function(name) {
   # To make model name be a valid name in C++. 
   return("anon_model")
 } 
 
-boost.url <- function() {"http://www.boost.org/users/download/"} 
+boost_url <- function() {"http://www.boost.org/users/download/"} 
 
-makeconf.path <- function() {
+makeconf_path <- function() {
   arch <- .Platform$r_arch
   if (arch == '') 
     return(file.path(R.home(component = 'etc'), 'Makeconf'))
   return(file.path(R.home(component = 'etc'), arch, 'Makeconf'))
 } 
 
-is.null.ptr <- function(ns) {
+is_null_ptr <- function(ns) {
   .Call("is_Null_NS", ns)
 }
 
-is.null.cxxfun <- function(cx) {
+is_null_cxxfun <- function(cx) {
   # Tell if the returned object from cxxfunction in package inline
   # contains null pointer 
   add <- body(cx@.Data)[[2]]
@@ -1026,7 +1018,7 @@ file_ext <- function(x) {
   ifelse(pos > -1L, substring(x, pos + 1L), "")
 }
 
-obj.size.str <- function(x) {
+obj_size_str <- function(x) {
   if (x >= 1024^3)       return(paste(round(x/1024^3, 1L), "Gb"))
   else if (x >= 1024^2)  return(paste(round(x/1024^2, 1L), "Mb"))
   else if (x >= 1024)    return(paste(round(x/1024, 1L), "Kb"))

@@ -1,74 +1,74 @@
 
 .setUp <- function() {
-  model.code <- "model { \n y ~ normal(0, 1); \n}"  
-  cat(model.code, file = 'tmp.stan')  
+  model_code <- "model { \n y ~ normal(0, 1); \n}"  
+  cat(model_code, file = 'tmp.stan')  
 
   a <- c(1, 3, 5)
   b <- matrix(1:10, ncol = 2)
   c <- array(1:18, dim = c(2, 3, 3)) 
   dump(c("a", "b", "c"), file = 'dumpabc.Rdump')
-  rstan:::stan.rdump(c("a", "b", "c"), file = 'standumpabc.Rdump')
+  rstan:::stan_rdump(c("a", "b", "c"), file = 'standumpabc.Rdump')
 } 
 
 
-test.util <- function() {
+test_util <- function() {
   lst <- list(z = c(1L, 2L, 4L), 
               a = 1:100, 
               b = matrix(1:9 / 9, ncol = 3), 
               c = structure(1:100, .Dim = c(5, 20)),
               g = array(c(3, 3, 9, 3, 3, 4, 5, 6, 9, 8, 0, 2), dim = c(2, 2, 3)), 
               d = 1:100 + .1) 
-  lst <- rstan:::data.preprocess(lst) 
+  lst <- rstan:::data_preprocess(lst) 
   lst2 <- lst; 
   lst2$f <- matrix(c(3, NA, NA, NA, 3, 4), ncol = 3) 
 
   checkEquals(dim(lst$g), c(2, 2, 3), "Keep the dimension infomation")
   checkTrue(is.integer(lst$z), "Do as.integer when appropriate") 
   checkTrue(is.double(lst$b), msg = "Not do as.integer when it is not appropriate") 
-  checkException(rstan:::data.preprocess(lst2), 
+  checkException(rstan:::data_preprocess(lst2), 
                  msg = "Stop if data have NA") 
 
-  model.code <- "model { \n y ~ normal(0, 1); \n}"  
-  # cat(model.code, file = 'tmp.stan')  
-  checkEquals(model.code, rstan:::read.model.from.con('tmp.stan'), 
+  model_code <- "model { \n y ~ normal(0, 1); \n}"  
+  # cat(model_code, file = 'tmp.stan')  
+  checkEquals(model_code, rstan:::read_model_from_con('tmp.stan'), 
               msg = "Read stan model from file") 
-  checkEquals(model.code, rstan:::get.model.code('tmp.stan'), 
+  checkEquals(model_code, rstan:::get_model_strcode('tmp.stan'), 
               msg = "Read stan model from file") 
-  checkEquals(model.code, rstan:::get.model.code(model.code = model.code), 
-              msg = "Read stan model from model.code") 
-  checkException(rstan:::get.model.code(), 
-                 msg = "Read stan model from model.code") 
+  checkEquals(model_code, rstan:::get_model_strcode(model_code = model_code), 
+              msg = "Read stan model from model_code") 
+  checkException(rstan:::get_model_strcode(), 
+                 msg = "Read stan model from model_code") 
 } 
 
 
-test.read.rdump <- function() {
-  l <- rstan:::read.rdump("dumpabc.Rdump")
+test_read_rdump <- function() {
+  l <- rstan:::read_rdump("dumpabc.Rdump")
   checkEquals(l$a, c(1, 3, 5)) 
   checkEquals(l$b, matrix(1:10, ncol = 2))
   checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
 } 
 
-test.stan.rdump <- function() {
-  l <- rstan:::read.rdump("standumpabc.Rdump")
+test_stan_rdump <- function() {
+  l <- rstan:::read_rdump("standumpabc.Rdump")
   checkEquals(l$a, c(1, 3, 5)) 
   checkEquals(l$b, matrix(1:10, ncol = 2))
   checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
 } 
 
-test.seq.array.ind <- function() {
-  a <- rstan:::seq.array.ind(numeric(0))
+test_seq_array_ind <- function() {
+  a <- rstan:::seq_array_ind(numeric(0))
   checkEquals(length(a), 0) 
   # by default, col.major is FALSE
-  b <- rstan:::seq.array.ind(2:5, col.major = TRUE) 
+  b <- rstan:::seq_array_ind(2:5, col.major = TRUE) 
   c <- arrayInd(1:prod(2:5), .dim = 2:5) 
   checkEquals(b, c) 
-  d <- rstan:::seq.array.ind(2:3, col.major = FALSE)
+  d <- rstan:::seq_array_ind(2:3, col.major = FALSE)
   e <- matrix(c(1, 1, 1, 2, 1, 3, 2, 1, 2, 2, 2, 3), 
               nrow = 6, byrow = TRUE)
   checkEquals(d, as.array(e)) 
 } 
 
-test.flatnames <- function() {
+test_flatnames <- function() {
   names <- c("alpha", "beta", "gamma", "delta") 
   dims <- list(alpha = integer(0), beta = c(2, 3), gamma = c(2, 3, 4), delta = c(5))
   fnames <- rstan:::flatnames(names, dims)  
@@ -88,7 +88,7 @@ test.flatnames <- function() {
   checkEquals(fnames2, "alpha")
 } 
 
-test.idx_col2rowm <- function() {
+test_idx_col2rowm <- function() {
   d <- integer(0) 
   idx <- rstan:::idx_col2rowm(d) 
   checkEquals(idx, 1) 
@@ -104,7 +104,7 @@ test.idx_col2rowm <- function() {
   checkEquals(idx3, yidx3)
 } 
 
-test.idx_row2colm <- function() {
+test_idx_row2colm <- function() {
   d <- integer(0) 
   idx <- rstan:::idx_row2colm(d) 
   checkEquals(idx, 1) 
@@ -119,11 +119,11 @@ test.idx_row2colm <- function() {
   checkEquals(idx3, yidx3)
 } 
 
-test.pars.total.indexes <- function() {
+test_pars_total_indexes <- function() {
   names <- "alpha" 
   dims <- list(alpha = c(2, 3)) 
   fnames <- rstan:::flatnames(names, dims)  
-  tidx <- rstan:::pars.total.indexes(names, dims, fnames, "alpha") 
+  tidx <- rstan:::pars_total_indexes(names, dims, fnames, "alpha") 
   tidx.attr1 <- attr(tidx[[1]], "row.major.idx") 
   attributes(tidx[[1]]) <- NULL 
   checkEquals(unname(tidx[[1]]), 1:6) 
@@ -131,14 +131,14 @@ test.pars.total.indexes <- function() {
   names2 <- c(names, "beta") 
   dims2 <- list(alpha = c(2, 3), beta = 8) 
   fnames2 <- rstan:::flatnames(names2, dims2)  
-  tidx2 <- rstan:::pars.total.indexes(names2, dims2, fnames2, "beta") 
+  tidx2 <- rstan:::pars_total_indexes(names2, dims2, fnames2, "beta") 
   tidx2.attr1 <- attr(tidx2[[1]], "row.major.idx")
   attributes(tidx2[[1]]) <- NULL
   checkEquals(unname(tidx2[[1]]), 6 + 1:8)  
   checkEquals(unname(tidx2.attr1), 6 + 1:8)
 } 
 
-test.mklist <- function() {
+test_mklist <- function() {
   x <- 3:5 
   y <- array(1:9, dim = c(3, 3))  
   assign("x", x, envir = .GlobalEnv) 
@@ -148,9 +148,9 @@ test.mklist <- function() {
   checkTrue(identical(a, b)) 
 } 
 
-test.makeconf.path <- function() {
-  p <- makeconf.path()  
-  checkTrue(file.exists(makeconf.path()))
+test.makeconf_path <- function() {
+  p <- makeconf_path()  
+  checkTrue(file.exists(makeconf_path()))
 } 
  
 .tearDown <- function() {

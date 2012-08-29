@@ -1,5 +1,5 @@
-\name{stan.model}
-\alias{stan.model}
+\name{stan_model}
+\alias{stan_model}
 \title{Construct a Stan model} 
 \description{
   Construct an object of S4 class \code{stanmodel} from a model 
@@ -13,9 +13,9 @@
 }
 
 \usage{
-  stan.model(file, model.name = "anon_model", 
-             model.code = "", stanc.ret = NULL, boost.lib = NULL, 
-             save.dso = TRUE, verbose = FALSE)
+  stan_model(file, model_name = "anon_model", 
+             model_code = "", stanc_ret = NULL, boost_lib = NULL, 
+             save_dso = TRUE, verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -24,19 +24,19 @@
     in Stan modeling language. 
   }
 
-  \item{model.name}{A character string for naming the model (the
+  \item{model_name}{A character string for naming the model (the
     default is \code{"anon_model"}). 
   }
 
-  \item{model.code}{A character string to specify the model instead of using
+  \item{model_code}{A character string to specify the model instead of using
     parameter \code{file}. 
   }
-  \item{stanc.ret}{The returned list from function \code{stanc}, an alternative way
+  \item{stanc_ret}{The returned list from function \code{stanc}, an alternative way
     to specify the model using previous results.}   
-  \item{boost.lib}{The path for boost library \url{http://http://www.boost.org/users/download/}. 
+  \item{boost_lib}{The path for boost library \url{http://http://www.boost.org/users/download/}. 
     If specified, this path would be used instead for boost library header files for compiling 
     the model in C++ language.}
-  \item{save.dso}{Logical with the default of \code{TRUE}: indication of whether the 
+  \item{save_dso}{Logical with the default of \code{TRUE}: indication of whether the 
     dynamic shared object (DSO) compiled from the C++ code for the model 
     will be saved or not. If \code{TRUE}, we can draw sample from
     the same model in another \R session using the saved DSO (i.e., without compiling 
@@ -50,13 +50,13 @@
 \details{
   More details of Stan can be found at \url{http://mc-stan.org}. 
 
-  There are three ways to specify the model's code for \code{stan.model}. 
+  There are three ways to specify the model's code for \code{stan_model}. 
   \enumerate{ 
   \item use a character string to include the Stan modeling language code 
-        and then specify parameter \code{model.code}. 
-  \item use a file and then specify parameter \code{file}. 
+        and then specify parameter \code{model_code}. 
+  \item use a file (or a connection) and then specify parameter \code{file}. 
   \item use the compiled results from \code{stanc} and then specify 
-        parameter \code{stanc.ret}. 
+        parameter \code{stanc_ret}. 
   } 
 }
 \value{
@@ -68,16 +68,10 @@
   \emph{Stan Modeling Language: User's Guide and Reference}. 
   \url{http://mc-stan.org}. 
 }
-\note{
-  The object of S4 class \code{stanmodel} created by \code{stan.model} 
-  is saved when calling function \code{stan} (or \code{stan.model})
-  with \code{save.dso = TRUE}. 
-}
-
 \seealso{
   \code{\linkS4class{stanmodel}} and \code{\link{stan}} 
 }
 \examples{\dontrun{
-stan.model(model.code = 'parameters {real y;} model {y ~ normal(0,1);}')
+stan_model(model_code = 'parameters {real y;} model {y ~ normal(0,1);}')
 }}
 \keyword{rstan}

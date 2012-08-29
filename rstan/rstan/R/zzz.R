@@ -23,11 +23,7 @@
   rstanLib <- dirname(system.file(package = "rstan"))
   version <- packageDescription("rstan", lib.loc = rstanLib)$Version
   builddate <- packageDescription("rstan", lib.loc = rstanLib)$Packaged
-  gitrev <- substring(git.head(), 0, 12) 
+  gitrev <- substring(git_head(), 0, 12) 
   packageStartupMessage(paste("rstan (Version ", version, ", packaged: ", builddate, ", GitRev: ", gitrev, ")", sep = ""))
-  packageStartupMessage("rstan  Copyright (C) 2012 Columbia University")
-  packageStartupMessage("This program comes with ABSOLUTELY NO WARRANTY.")
-  packageStartupMessage("This is free software, and you are welcome to redistribute it")
-  packageStartupMessage("under the General Public License version 3 or later.")
 } 
 

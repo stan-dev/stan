@@ -374,7 +374,7 @@ namespace rstan {
   
         // FIXME: use csv_writer arg to make comma optional?
         if (sample_file_flag) { 
-          sampler.write_sampler_params(sample_file_stream);
+          // sampler.write_sampler_params(sample_file_stream);
           model.write_csv(params_r,params_i,sample_file_stream);
         }
       }
@@ -576,7 +576,7 @@ namespace rstan {
       }
       
       if (sample_file_flag) {
-        rstan::io::rcout << "Samples of chain " 
+        rstan::io::rcout << "Sample of chain " 
                          << chain_id 
                          << " are written to file " << sample_file 
                          << std::endl;

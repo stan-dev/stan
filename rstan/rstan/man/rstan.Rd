@@ -28,7 +28,7 @@
   Author:\tab Jiqiang Guo <guojq28@gmail.com>   \cr 
          \tab Marcus Brubaker <mbrubake@cs.toronto.edu>   \cr 
          \tab Bob Carpenter <carp@alias-i.com>   \cr 
-         \tab Ben Goodrich <goodrich.ben@gmail.com>  \cr 
+         \tab Ben Goodrich <bg2382@columbia.edu> \cr 
          \tab Matt Hoffman <mdhoffma@cs.princeton.edu>  \cr 
          \tab Daniel Lee <bearlee@alum.mit.edu>  \cr 
          \tab Michale Malecki <malecki@gmail.com>  \cr 
@@ -47,7 +47,7 @@
 
 \examples{\dontrun{ 
 library(rstan) 
-cat("Stan version: ", stanc.version(), sep = ''); 
+cat("Stan version: ", stanc_version(), sep = ''); 
 
 stanmodelcode <- "
 data {
@@ -67,8 +67,8 @@ model {
 
 y <- rnorm(20) 
 dat <- list(N = 20, y = y); 
-fit <- stan(model.code = stanmodelcode, model.name = "example", 
-            data = dat, n.iter = 2012, n.chains = 3, sample.file = 'norm.csv',
+fit <- stan(model_code = stanmodelcode, model_name = "example", 
+            data = dat, iter = 2012, n_chains = 3, sample_file = 'norm.csv',
             verbose = TRUE) 
 print(fit)
 }}  

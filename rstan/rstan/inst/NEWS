@@ -1,3 +1,6 @@
+Wed Aug 2012
+1. Changes
+   * replace dots with underscores especially in function names
 Sun Aug 26 2012
 1. New features 
    * get more information about the sampler such as treedepth, 

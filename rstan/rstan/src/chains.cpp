@@ -29,14 +29,14 @@
 namespace rstan {
 
   /**
-   * @param sim An R list that has element n.chains, n.flatnames, samples,
-   *  n.save, n.warmup2, etc. In particular, 
-   *  n.chains: number of chains. 
-   *  n.flatnames: the total number of param in form of scalars.  
-   *  n.save: sizes of saved iterations for all chains. 
-   *  n.warmup2: simiar to n.save, but for warmup sizes. Note this n.warmup
-   *  might be different from the n.warmup specified by the user for running
-   *  the sampler because thinning is accounted in n.warmup2. 
+   * @param sim An R list that has element n_chains, n_flatnames, samples,
+   *  n_save, warmup2, etc. In particular, 
+   *  n_chains: number of chains. 
+   *  n_flatnames: the total number of param in form of scalars.  
+   *  n_save: sizes of saved iterations for all chains. 
+   *  warmup2: simiar to n_save, but for warmup sizes. Note this warmup
+   *  might be different from the warmup specified by the user for running
+   *  the sampler because thinning is accounted in warmup2. 
    *  samples: A list for saved samples. Each element is a list for a chain. 
    *    Each chain is a list as well, every element of which is a chain of
    *    samples for a parameter. 
@@ -44,10 +44,10 @@ namespace rstan {
    */ 
   void validate_sim(SEXP sim) {
     std::vector<std::string> snames;
-    snames.push_back("n.chains"); 
-    snames.push_back("n.flatnames"); 
-    snames.push_back("n.save");
-    snames.push_back("n.warmup2");
+    snames.push_back("n_chains"); 
+    snames.push_back("n_flatnames"); 
+    snames.push_back("n_save");
+    snames.push_back("warmup2");
     snames.push_back("samples");
     snames.push_back("permutation");
     Rcpp::List lst(sim); 
@@ -63,10 +63,10 @@ namespace rstan {
        } 
     }
 
-    unsigned int type = TYPEOF(lst["n.chains"]); 
+    unsigned int type = TYPEOF(lst["n_chains"]); 
     if (type != INTSXP &&  type != REALSXP) { 
       std::stringstream msg;
-      msg << "wrong type of n.chains in sim; found " 
+      msg << "wrong type of n_chains in sim; found " 
           << Rf_type2char(type) 
           << ", but INTSXP/REALSXP needed"; 
       throw std::domain_error(msg.str()); 
@@ -75,12 +75,12 @@ namespace rstan {
 
   unsigned int num_chains(SEXP sim) {
     Rcpp::List lst(sim); 
-    return Rcpp::as<unsigned int>(lst["n.chains"]); 
+    return Rcpp::as<unsigned int>(lst["n_chains"]); 
   } 
 
   unsigned int num_params(SEXP sim) {
     Rcpp::List lst(sim); 
-    return Rcpp::as<unsigned int>(lst["n.flatnames"]); 
+    return Rcpp::as<unsigned int>(lst["n_flatnames"]); 
   } 
   /** 
    *
@@ -96,12 +96,12 @@ namespace rstan {
       throw std::domain_error(msg.str()); 
     } 
     Rcpp::List allsamples(static_cast<SEXP>(lst["samples"])); 
-    Rcpp::IntegerVector n_save(static_cast<SEXP>(lst["n.save"])); 
-    Rcpp::IntegerVector n_warmup2(static_cast<SEXP>(lst["n.warmup2"])); 
+    Rcpp::IntegerVector n_save(static_cast<SEXP>(lst["n_save"])); 
+    Rcpp::IntegerVector warmup2(static_cast<SEXP>(lst["warmup2"])); 
   
     Rcpp::List slst(static_cast<SEXP>(allsamples[k]));  // chain k
     Rcpp::NumericVector nv(static_cast<SEXP>(slst[n])); // parameter n  
-    samples.assign(n_warmup2[k] + nv.begin(), nv.end()); 
+    samples.assign(warmup2[k] + nv.begin(), nv.end()); 
   } 
 
   void validate_param_idx(SEXP sim, size_t n) {
@@ -130,13 +130,13 @@ namespace rstan {
                           F& f) {
     Rcpp::List lst(sim); 
     Rcpp::List allsamples(static_cast<SEXP>(lst["samples"])); 
-    Rcpp::IntegerVector n_save(static_cast<SEXP>(lst["n.save"])); 
-    Rcpp::IntegerVector n_warmup2(static_cast<SEXP>(lst["n.warmup2"])); 
+    Rcpp::IntegerVector n_save(static_cast<SEXP>(lst["n_save"])); 
+    Rcpp::IntegerVector warmup2(static_cast<SEXP>(lst["warmup2"])); 
 
     Rcpp::List slst(static_cast<SEXP>(allsamples[k]));  // chain k
     Rcpp::NumericVector nv(static_cast<SEXP>(slst[n])); // parameter n  
     // use int instead of size_t since these are R integers. 
-    for (int i = n_warmup2[k]; i < n_save[k]; i++) {
+    for (int i = warmup2[k]; i < n_save[k]; i++) {
       f(nv[i]); 
     } 
   }
@@ -198,10 +198,10 @@ SEXP effective_sample_size(SEXP sim, SEXP n_) {
   // need to generalize to each jagged samples per chain
   
   std::vector<unsigned int> ns_save = 
-    Rcpp::as<std::vector<unsigned int> >(lst["n.save"]); 
+    Rcpp::as<std::vector<unsigned int> >(lst["n_save"]); 
 
   std::vector<unsigned int> ns_warmup2 = 
-    Rcpp::as<std::vector<unsigned int> >(lst["n.warmup2"]); 
+    Rcpp::as<std::vector<unsigned int> >(lst["warmup2"]); 
 
   std::vector<unsigned int> ns_kept(ns_save); 
   for (size_t i = 0; i < ns_kept.size(); i++) 
@@ -228,8 +228,8 @@ SEXP effective_sample_size(SEXP sim, SEXP n_) {
     chain_var.push_back(acov[chain][0]*n_kept_samples/(n_kept_samples-1));
   }
   double mean_var = stan::math::mean(chain_var);
-  double var_plus = mean_var*(n_samples-1)/n_samples + 
-    stan::math::variance(chain_mean);
+  double var_plus = mean_var*(n_samples-1)/n_samples;
+  if (m > 1) var_plus += stan::math::variance(chain_mean);
   vector<double> rho_hat_t;
   double rho_hat = 0;
   for (size_t t = 1; (t < n_samples && rho_hat >= 0); t++) {
@@ -274,10 +274,10 @@ SEXP split_potential_scale_reduction(SEXP sim, SEXP n_) {
   // Rcpp::Rcout << "n_chains=" << n_chains << std::endl; 
 
   std::vector<unsigned int> ns_save = 
-    Rcpp::as<std::vector<unsigned int> >(lst["n.save"]); 
+    Rcpp::as<std::vector<unsigned int> >(lst["n_save"]); 
 
   std::vector<unsigned int> ns_warmup2 = 
-    Rcpp::as<std::vector<unsigned int> >(lst["n.warmup2"]); 
+    Rcpp::as<std::vector<unsigned int> >(lst["warmup2"]); 
 
   std::vector<unsigned int> ns_kept(ns_save); 
   for (size_t i = 0; i < ns_kept.size(); i++) 

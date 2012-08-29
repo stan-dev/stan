@@ -12,7 +12,7 @@
 
 \usage{
   %% extract(object, \dots)  
-  \S4method{extract}{stanfit}(object, pars, permuted = FALSE, inc.warmup = TRUE) 
+  \S4method{extract}{stanfit}(object, pars, permuted = FALSE, inc_warmup = TRUE) 
 } 
 
 \section{Methods}{
@@ -32,7 +32,7 @@
     sample (that is, warmup sample
     are discarded) in each chain are permuted are merged. If \code{FALSE}, 
     the original order are kept.}
-  \item{inc.warmup}{\code{TRUE} of \code{FALSE}. The argument matters
+  \item{inc_warmup}{\code{TRUE} of \code{FALSE}. The argument matters
     only if \code{permuted} is \code{FALSE}. If \code{TRUE}, warmup
     sample are included; otherwise excluded.}
 }

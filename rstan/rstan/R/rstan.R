@@ -18,64 +18,64 @@
 
 ## 
 ## 
-stan.model <- function(file, 
-                       model.name = "anon_model", 
-                       model.code = '', 
-                       stanc.ret = NULL, 
-                       boost.lib = NULL, 
-                       save.dso = TRUE,
+stan_model <- function(file, 
+                       model_name = "anon_model", 
+                       model_code = '', 
+                       stanc_ret = NULL, 
+                       boost_lib = NULL, 
+                       save_dso = TRUE,
                        verbose = FALSE) { 
 
   # Construct a stan model from stan code 
   # 
   # Args: 
   #   file: the file that has the model in Stan model language.
-  #   model.name: a character for naming the model. 
-  #   stanc.ret: An alternative way to specify the model
+  #   model_name: a character for naming the model. 
+  #   stanc_ret: An alternative way to specify the model
   #     by using returned results from stanc. 
-  #   model.code: if file is not specified, we can used 
+  #   model_code: if file is not specified, we can used 
   #     a character to specify the model.   
 
-  if (is.null(stanc.ret)) {
-    model.code <- get.model.code(file, model.code)  
-    stanc.ret <- stanc(model.code, model.name) 
+  if (is.null(stanc_ret)) {
+    model_code <- get_model_strcode(file, model_code)  
+    stanc_ret <- stanc(model_code, model_name) 
   } 
-  if (!is.list(stanc.ret)) {
-    stop("stanc.ret needs to be the returned object from stanc.")
+  if (!is.list(stanc_ret)) {
+    stop("stanc_ret needs to be the returned object from stanc.")
   } 
-  m <- match(c("cppcode", "model.name", "status"), names(stanc.ret)) 
+  m <- match(c("cppcode", "model_name", "status"), names(stanc_ret)) 
   if (any(is.na(m))) {
-    stop("stanc.ret does not have element `cppcode', `model.name', and `status'") 
+    stop("stanc_ret does not have element `cppcode', `model_name', and `status'") 
   } else {
-    if (stanc.ret$status != 0) 
-      stop("stanc.ret is not a successfully returned list from stanc")
+    if (stanc_ret$status != 0) 
+      stop("stanc_ret is not a successfully returned list from stanc")
   } 
 
-  model.cppname <- stanc.ret$model.cppname 
-  model.name <- stanc.ret$model.name 
-  model.code <- stanc.ret$model.code 
+  model_cppname <- stanc_ret$model_cppname 
+  model_name <- stanc_ret$model_name 
+  model_code <- stanc_ret$model_code 
   inc <- paste("#include <rstan/rstaninc.hpp>\n", 
-               stanc.ret$cppcode, 
-               get_Rcpp_module_def_code(model.cppname), 
+               stanc_ret$cppcode, 
+               get_Rcpp_module_def_code(model_cppname), 
                sep = '')  
 
-  cat("COMPILING THE C++ CODE FOR MODEL '", model.name, "' NOW.\n", sep = '') 
-  if (!is.null(boost.lib)) { 
-    old.boost.lib <- rstan.options(boost.lib = boost.lib) 
-    on.exit(rstan.options(boost.lib = old.boost.lib)) 
+  cat("COMPILING THE C++ CODE FOR MODEL '", model_name, "' NOW.\n", sep = '') 
+  if (!is.null(boost_lib)) { 
+    old.boost_lib <- rstan_options(boost_lib = boost_lib) 
+    on.exit(rstan_options(boost_lib = old.boost_lib)) 
   } 
   dso <- cxxfunctionplus(signature(), body = '  return R_NilValue;', 
-                         includes = inc, plugin = "rstan", save.dso = save.dso,
+                         includes = inc, plugin = "rstan", save_dso = save_dso,
                          verbose = verbose) 
                
-  mod <- Module(model.cppname, getDynLib(dso)) 
-  # stan_fit_cpp_module <- do.call("$", list(mod, model.name))
-  stan_fit_cpp_module <- eval(call("$", mod, model.cppname))
-  obj <- new("stanmodel", model.name = model.name, 
-             model.code = model.code, 
+  mod <- Module(model_cppname, getDynLib(dso)) 
+  # stan_fit_cpp_module <- do.call("$", list(mod, model_name))
+  stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
+  obj <- new("stanmodel", model_name = model_name, 
+             model_code = model_code, 
              dso = dso, # keep a reference to dso
              .modelmod = new.env()) # store the sampler, which could be replaced 
-  assign("model.cppname", model.cppname, envir = obj@.modelmod)
+  assign("model_cppname", model_cppname, envir = obj@.modelmod)
   assign("sampler", stan_fit_cpp_module, envir = obj@.modelmod)
   obj 
 
@@ -85,18 +85,18 @@ stan.model <- function(file,
   ## can cause segfault later. 
 } 
 
-is.sm.valid <- function(sm) {
+is_sm_valid <- function(sm) {
   # Test if a stan model (compiled object) is still valid. 
   # It could become invalid when the user do not specify
-  # save.dso when calling stan.model. So when the user
+  # save_dso when calling stan_model. So when the user
   # use the model created in another R session, the dso
   # is lost. 
   # 
   # Args:
   #   sm: the stanmodel object 
   # 
-  if (is.dso.loaded(sm@dso)) return(TRUE)
-  if (!sm@dso@dso.saved) return(FALSE)
+  if (is_dso_loaded(sm@dso)) return(TRUE)
+  if (!sm@dso@dso_saved) return(FALSE)
   if (!identical(sm@dso@system, R.version$system)) return(FALSE)
   TRUE
 } 
@@ -105,39 +105,38 @@ is.sm.valid <- function(sm) {
 ##
 ## 
 
-stan <- function(file, model.name = "anon_model", 
-                 model.code = '', 
+stan <- function(file, model_name = "anon_model", 
+                 model_code = '', 
                  fit = NA, 
                  data = list(), 
                  pars = NA, 
-                 n.chains = 4L, n.iter = 2000L, 
-                 n.warmup = floor(n.iter / 2), 
-                 n.thin = 1L, 
-                 init.t = "random", 
-                 init.v = NULL, 
+                 n_chains = 4L, iter = 2000L, 
+                 warmup = floor(iter / 2), 
+                 thin = 1L, 
+                 init = "random", 
                  seed = sample.int(.Machine$integer.max, 1), 
-                 sample.file, 
-                 save.dso = TRUE,
-                 verbose = FALSE, ..., boost.lib = NULL) {
+                 sample_file, # the file to which the samples are written
+                 save_dso = TRUE,
+                 verbose = FALSE, ..., boost_lib = NULL) {
   # Return a fitted model (stanfit object)  from a stan model, data, etc.  
-  # A wrap of method stan.model and sampling of class stanmodel. 
+  # A wrap of method stan_model and sampling of class stanmodel. 
   # 
   # Args:
   # 
   # Returns: 
   #   A S4 class stanfit object  
 
-  if (is(fit, "stanfit")) sm <- get.stanmodel(fit)
-  else sm <- stan.model(file, model.name = model.name, model.code = model.code,
-                        boost.lib = boost.lib, save.dso = save.dso, verbose = verbose)
+  if (is(fit, "stanfit")) sm <- get_stanmodel(fit)
+  else sm <- stan_model(file, model_name = model_name, model_code = model_code,
+                        boost_lib = boost_lib, save_dso = save_dso, verbose = verbose)
 
-  if (missing(sample.file))  sample.file <- NA 
+  if (missing(sample_file))  sample_file <- NA 
 
   # check data before compiling model, which typically takes more time 
   if (is.character(data)) data <- mklist(data) 
-  if (!missing(data) && length(data) > 0) data <- data.preprocess(data)
+  if (!missing(data) && length(data) > 0) data <- data_preprocess(data)
   else data <- list()  
 
-  sampling(sm, data, pars, n.chains, n.iter, n.warmup, n.thin, seed, init.t, init.v, 
-           sample.file = sample.file, verbose = verbose, check.data = FALSE, ...) 
+  sampling(sm, data, pars, n_chains, iter, warmup, thin, seed, init, 
+           sample_file = sample_file, verbose = verbose, check_data = FALSE, ...) 
 } 

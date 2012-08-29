@@ -90,16 +90,16 @@ model {
 
 
 model_name <- "dogs"; 
-dogsrr <- stan.model(model.code = dogsstan, model.name = model_name, 
+dogsrr <- stan_model(model_code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-ss <- sampling(dogsrr, data = dogsdat, n.chains = 3, seed = 1340338046,
-               n.iter = 2012, sample.file = 'dogs.csv')
+ss <- sampling(dogsrr, data = dogsdat, n_chains = 3, seed = 1340338046,
+               iter = 2012, sample_file = 'dogs.csv')
 
-ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
-                n.iter = 2012, sample.file = 'dogs.csv')
+ss1 <- sampling(dogsrr, data = dogsdat, n_chains = 1, seed = 1340384924,
+                iter = 2012, sample_file = 'dogs.csv')
 
-  args <- list(init_t = 'random', sample_file = 'dogs.csv', iter = 2012, seed = 1340384924)
+  args <- list(init = 'random', sample_file = 'dogs.csv', iter = 2012, seed = 1340384924)
   dogsdat <- rstan:::data.preprocess(dogsdat)
   sampler <- new(dogsrr@.modelmod$sampler, dogsdat) 
   t1 <- sampler$call_sampler(args) 
@@ -108,6 +108,8 @@ ss1 <- sampling(dogsrr, data = dogsdat, n.chains = 1, seed = 1340384924,
   args$chain_id <- 3;
   t3 <- sampler$call_sampler(args) 
   pnames <- sampler$param_names() 
+
+stop("no particular reason")
 
   pars <- c("alpha", "beta")
 
@@ -127,8 +129,8 @@ print(ss, pars = c('alpha', 'beta'))
 # print(ss, pars = c('alpha', 'beta1')) # error
 
 
-sf <- stan(model.code = dogsstan, data = dogsdat, verbose = TRUE, n.chains = 3,
-           seed = 1340384924, sample.file = 'dogsb.csv')
+sf <- stan(model_code = dogsstan, data = dogsdat, verbose = TRUE, n_chains = 3,
+           seed = 1340384924, sample_file = 'dogsb.csv')
 traceplot(sf)
 plot(sf)
 print(sf)

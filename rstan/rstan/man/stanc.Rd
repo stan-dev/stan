@@ -6,16 +6,15 @@
 }
 \description{
   Compile model in Stan language to C++ code, which can 
-  be compiled and then loaded for drawing sample for the 
-  model. 
+  be compiled and then loaded for sampling. 
 }
 \usage{
-  stanc(model.code, model.name = "anon_model", verbose = FALSE) 
+  stanc(model_code, model_name = "anon_model", verbose = FALSE) 
 } 
 
 \arguments{
-  \item{model.code}{A character string for a model in Stan language.}
-  \item{model.name}{A character string for naming the model. The 
+  \item{model_code}{A character string for a model in Stan language.}
+  \item{model_name}{A character string for naming the model. The 
     default is \code{anon_model}.}
   \item{verbose}{\code{TRUE} print out more intermediate information during the
     procedure; \code{FALSE} otherwise. The default is \code{FALSE}.}             
@@ -24,8 +23,8 @@
 \value{
   A list including an element of the C++ code. Relative elements are 
   \enumerate{ 
-    \item \code{model.name} The model name specified by the user or the default if not specified. 
-    \item \code{model.code} The model's Stan code. 
+    \item \code{model_name} The model name specified by the user or the default if not specified. 
+    \item \code{model_code} The model's Stan code. 
     \item \code{cppcode}    The model's C++ code. 
     \item \code{status}     The status indicating success/failure of compiling the Stan code. 
   } 
@@ -56,7 +55,7 @@
 } 
 
 \seealso{
-  \code{\link{stan.model}} and \code{\link{stan}}
+  \code{\link{stan_model}} and \code{\link{stan}}
 } 
 
 \examples{\dontrun{

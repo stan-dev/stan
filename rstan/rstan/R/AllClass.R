@@ -17,13 +17,13 @@
 setClass(Class = "cxxdso",
          representation = representation(
            sig = "list", # A list of function signature that would be returned by cxxfuncion 
-           dso.saved = "logical", # flag for if the dso is saved or not
-           # dso.last.path = 'character', # where the dso is saved last time 
-           dso.filename = "character", # the dso file name when it is created the first time
+           dso_saved = "logical", # flag for if the dso is saved or not
+           # dso_last_path = 'character', # where the dso is saved last time 
+           dso_filename = "character", # the dso file name when it is created the first time
            system = "character", # what is the OS (R.version$system)?  
            .MISC = "environment" # an envir to save 
                                  #  1. the returned object by cxxfuncion using name cxxfun 
-                                 #  2. the file path used last time using name dso.last.path 
+                                 #  2. the file path used last time using name dso_last_path 
                                  #  3. The binary dso with name dso.bin, which is a raw vector.  
                                  #     We put it here since the environment is not copied 
                                  #     when assigned to another 
@@ -36,12 +36,12 @@ setClass(Class = "cxxdso",
 
 setClass(Class = "stanfit",
          representation = representation(
-           model.name = "character", 
-           model.pars = "character", 
-           par.dims = "list", 
+           model_name = "character", 
+           model_pars = "character", 
+           par_dims = "list", 
            sim = "list", 
            inits = "list", 
-           stan.args = "list", 
+           stan_args = "list", 
            .MISC = "environment"
          ),  
          validity = function(object) {
@@ -50,11 +50,11 @@ setClass(Class = "stanfit",
 
 setClass(Class = "stanmodel",
          representation = representation(
-           model.name = "character",
-           model.code = "character",
+           model_name = "character",
+           model_code = "character",
            .modelmod = "environment", 
              # to store the sampler object, Rcpp module stanfit instance 
-             # and the model's name in C++ code (model.cppname), also
+             # and the model's name in C++ code (model_cppname), also
              # used for the Rcpp module name. 
            dso = 'cxxdso'), 
          validity = function(object) {
