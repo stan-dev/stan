@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Dump the data for a Stan model to \R dump file
-that Stan supports
+in the limited format that Stan can read.
 %%  ~~function to do ... ~~
 }
 
@@ -12,7 +12,7 @@ that Stan supports
   This function takes a vector of names of \R objects and outputs
   text representations of the objects to a file or connection.
   The file created by \code{stan_rdump} is typically used as data 
-  input of the Stan package (\url{http://mc-stan.org}) or 
+  input of the Stan package (\url{http://mc-stan.org/}) or 
   \code{\link{source}}d into another \R session.
 }
 
@@ -43,7 +43,7 @@ stan_rdump(list, file, append = FALSE,
 }
 \note{
   \code{stan_rdump} only dumps numeric data, which can be 
-  scalar, vector, array, or matrix.  
+  a scalar, vector, matrix, or (multidimensional) array.
 }
 
 \seealso{

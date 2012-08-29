@@ -14,6 +14,8 @@ STAN V1.0
 CODE CLEANUP
 ======================================================================
 
+* use "sample of size 1000" rather than "1000 samples", etc.
+
 * const declarations wherever possible
 
 * more care with size_t, etc.

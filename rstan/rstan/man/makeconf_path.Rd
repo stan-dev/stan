@@ -20,13 +20,13 @@ makeconf_path()
 
 \details{
   The configuration for compiling shared objects using \code{R CMD SHLIB} 
-  are set in file \code{Makeconf}. To change how the C/C++ code are 
-  compiled, we can modify this file. In rstan, package \pkg{inline} 
-  compiles the C++ code using \code{R CMD SHLIB}. To make the 
-  code run faster, we prefer to using the highest optimization level. 
-  In compilers such as gcc (\url{http://gcc.gnu.org}), we would like to set
-  \code{-O3} in \code{CXXFLAGS}.  In addition, we can also modify this file
-  to use other C++ compilers such as \emph{clang}. 
+  are set in file \code{Makeconf}. To change how the C++ code is
+  compiled, modify this file. For RStan, package \pkg{inline} 
+  compiles the C++ code using \code{R CMD SHLIB}. To speed up compiled
+  Stan models, increase the optimization level to \code{-O3} defined
+  in property \code{CXXFLAGS} in the file \code{Makeconf}.
+  This file may also be modified to specify alternative C++ compilers,
+  such as clang++ or later versions of g++.
 }
 
 \seealso{
