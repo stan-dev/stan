@@ -1497,6 +1497,15 @@ namespace stan {
       }
     };
 
+    void suppress_warning(const std::string& indent,
+			 const std::string& var_name,
+			 std::ostream& o) {
+      o << indent << "(void) " 
+	<< var_name << ";"
+	<< " // dummy call to supress warning"
+	<< EOL;
+    }
+
     void generate_member_var_inits(const std::vector<var_decl>& vs,
                                    std::ostream& o) {
       dump_member_var_visgen vis(o);
@@ -1513,7 +1522,9 @@ namespace stan {
         << EOL; // resize 0 with var_resizing
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
+      suppress_warning(INDENT2, "function__", o);
       o << INDENT2 << "size_t pos__;" << EOL;
+      suppress_warning(INDENT2, "pos__", o);
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
 
@@ -2279,6 +2290,7 @@ namespace stan {
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_csv(%1%)\";" << EOL;
+      suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and writes parameters
       generate_comment("read-transform, write parameters",2,o);
@@ -2295,6 +2307,7 @@ namespace stan {
       generate_comment("declare, define and validate transformed parameters",
                        2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
+      suppress_warning(INDENT2, "lp__", o);
       static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
@@ -2592,6 +2605,7 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_array(%1%)\";" << EOL;
+      suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and sets parameters
       generate_comment("read-transform, write parameters",2,o);
@@ -2610,6 +2624,7 @@ namespace stan {
       o << EOL;
       generate_comment("declare and define transformed parameters",2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
+      suppress_warning(INDENT2, "lp__", o);
       static bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;

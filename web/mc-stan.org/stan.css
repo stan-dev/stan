@@ -1,7 +1,7 @@
 * {
   padding: 0;
   margin: 0;
-  font-family: optima, palatino, georgia, "times new roman", times;
+  font-family: georgia, palatino, "times new roman", times;
 }
 body { 
   font-size: 1em;   
@@ -14,12 +14,15 @@ p {
   width: 30em;
   line-height: 1.35em;
 }
+hr {
+    background-color: #606060;
+}
 h1 {
-  font-size: 200%;  
+  font-size: 200%;   
   color: #606060;
 }
 h2 {  
-  font-size: 120%;  
+  font-size: 125%;  
   margin: 1em 0 0.5em 0;
   color: #606060;
 }
@@ -38,12 +41,12 @@ ul {
     margin: 0.5em 1.5em 0.5em 1.5em;
 }
 li {
-    margin: 0em 0 0.5em 0;
+  margin: 0em 0 0.5em 0;
   line-height: 1.35em;
 }
-tt {
-    font-family: monaco, menlo, "lucida console", "courier new", courier, monospace;
-    font-size: 80%; 
+tt {  
+    font-family: "lucida console", menlo, monaco, "courier new", courier,  monospace;
+    font-size: 85%;   
 }
 * td {
     font-weight: normal;
@@ -56,8 +59,8 @@ tt {
 pre {
 }
 pre { 
-  font-family: monaco, menlo, "lucida console", "courier new", courier,  monospace;
-  font-size: .7em;
+  font-family: "lucida console", menlo, monaco, "courier new", courier,  monospace;
+  font-size: .75em;
   padding: 0.5em 1.5ex;
   margin: 0.85em 2ex .85em 1.5ex;
   color: black;
