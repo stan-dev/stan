@@ -1448,8 +1448,8 @@ namespace stan {
           chain_var.push_back(acov[chain][0]*n_kept_samples/(n_kept_samples-1));
         }
         double mean_var = stan::math::mean(chain_var);
-        double var_plus = mean_var*(n_samples-1)/n_samples + 
-          stan::math::variance(chain_mean);
+        double var_plus = mean_var*(n_samples-1)/n_samples;
+        if (m > 1) var_plus += stan::math::variance(chain_mean);
         vector<double> rho_hat_t;
         double rho_hat = 0;
         for (size_t t = 1; (t < n_samples && rho_hat >= 0); t++) {

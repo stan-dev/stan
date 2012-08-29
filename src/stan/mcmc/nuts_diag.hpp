@@ -276,7 +276,7 @@ namespace stan {
         names.clear();
         names.push_back("treedepth__");
         if (this->_epsilon_adapt || this->varying_epsilon())
-          names.push_back("stepsize__,");
+          names.push_back("stepsize__");
       }
 
       virtual void get_sampler_params(std::vector<double>& values) {
