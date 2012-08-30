@@ -76,7 +76,7 @@ on the compiler and linker.
 %
 \begin{itemize}
 \item Linux (Debian, Ubuntu, Red Hat), 
-\item Mac OS X (Snow Leopard, Lion), and
+\item Mac OS X (Snow Leopard, Lion, Mountain Lion), and
 \item Windows (XP, 7).
 \end{itemize}
 %
@@ -86,7 +86,315 @@ new versions of these operating systems and gradually phase out
 testing on older versions.
 
 
-\section{Requirements}
+
+\section{Step-by-Step Mac Install Instructions}
+
+This section provides step-by-step install instructions for the Mac;
+Linux and Windows sections follow.  It repeats the step-by-step
+install instructions on Stan's home page at \url{http://mc-stan.org/}.
+
+Stan has been tested on Mac OS X versions Snow Leopard, Lion, and
+Mountain Lion.
+
+\subsection{Tips for Mac Users}
+
+\subsubsection{Finding and Opening Mac Applications and Files}
+
+To open an application, use \code{[Command-Space]} (press both keys at
+once on the keyboard) to open Spotlight, enter the application's name
+in the text field, then click on the application in the pop-up menu or
+\code{[Return]} if the right file or application is highlighted.
+
+Spotlight can be used in the same way to find files or folders,
+such as the default \code{Downloads} folder for web downloads.
+
+\subsubsection{Open a Terminal for Shell Commands}
+
+To run shell commands, open the built-in Terminal application (see the
+previous subsection for details on how to find and open applications).
+
+\subsection{Install Xcode C++ Development Environment}
+
+The easiest (but not the only) way to install a \Cpp
+development environment on a Mac is to use Apple's Xcode
+development environment.
+
+From the Xcode home page, 
+%
+\begin{quote}
+\url{https://developer.apple.com/xcode/}
+\end{quote}
+%
+click \code{View in Mac App Store}.
+
+From the App Store, click \code{Install}, enter an Apple ID,
+and wait for Xcode to finish installing.
+
+Open the Xcode application, click top-level menu
+\code{Preferences}, click top-row button \code{Downloads},
+click button for \code{Components}, click on the \code{Install}
+button to the right of the \code{Command Line Tools} entry, then
+wait for it to finish installing.  
+
+Click the top-level menu item \code{Xcode}, then click item 
+\code{Quit Xcode} to quit.
+
+To test, open the Terminal application and enter
+
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make --version
+> g++ --version
+\end{Verbatim}
+\end{quote}
+%
+Verify that \code{make} is at version 3.81 or later and \code{g++}
+is at 4.2.1 or later.
+
+
+\subsection{Download and Unpack Stan Source}
+
+Download the most recent version of \code{stan-src-1.m.p.tgz}
+(\code{m} is the minor version and \code{p} the patch level) from
+the Stan downloads list,
+%
+\begin{quote}
+\url{http://code.google.com/p/stan/downloads/list}
+\end{quote}
+
+Open the folder containing the download in the Finder
+(typically, the user's top-level \code{Downloads} folder).
+
+If the Mac OS has not automatically unpacked the \code{.tgz}
+file into file \code{stan-src-1.m.p.tar},
+double-click the \code{.tgz} file to unpack.
+
+Double click on the \code{.tar} file to unarchive
+directory \code{stan-src-1.m.p}.
+
+Move the resulting directory to a location where it will not be
+deleted, henceforth called \code{<stan-home>}.
+
+
+\section{Step-by-Step Linux Install Instructions}
+
+Stan has been tested on various Linux installations, including
+Ubuntu, Debian, and Red Hat.
+
+\subsection{Installing C++ Development Tools}
+
+On Linux, \Cpp compilers and \code{make} are often installed by default.
+
+To see if the \code{g++} compiler and \code{make} build system
+are already installed, use the commands
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> g++ --version
+\end{Verbatim}
+\end{quote}
+% 
+and
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make --version
+\end{Verbatim}
+\end{quote}
+%
+
+If these are at least at \code{g++} version 4.2.1 or later and \code{make}
+version 3.81 or later, no additional installations are necessary.  It
+may still be desirable to update the \Cpp compiler \code{g++}, because
+later versions are faster.
+
+To install the latest version of these
+tools (or upgrade an older version), use the commands
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> sudo apt-get install g++ 
+\end{Verbatim}
+\end{quote}
+%
+and
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> sudo apt-get install make 
+\end{Verbatim}
+\end{quote}
+% 
+A password will likely be required by the superuser command \code{sudo}.
+
+
+\subsection{Downloading and Unpacking Stan Source}
+
+Download the most recent stable version of Stan,
+\code{stan-src-1.m.p.tgz}, where \code{m} is the minor version and
+\code{p} the patch level), from the Stan downloads page,
+%
+\begin{quote}
+\url{http://code.google.com/p/stan/downloads/list}
+\end{quote}
+%
+to the directory where Stan will reside.
+
+In a command shell, change directories to where the
+tarball was downloaded, say \code{<download-dir>}, with
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd <download-dir>
+\end{Verbatim}
+\end{quote}
+%
+where \code{<download-dir>} is replaced with the actual path to the diretory.
+
+Then, unpack the distribution into the subdirectory
+\begin{quote}
+\nolinkurl{<download-dir>/stan-src-1.m.p}
+\end{quote}
+%
+with
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> tar -xzf stan-src-1.m.p.tgz
+\end{Verbatim}
+\end{quote}
+
+
+
+\section{Step-by-Step Windows Install Instructions}
+
+Stan has been tested on Windows XP and Windows 7.
+
+\subsection{Note for Cygwin Users}
+
+Stan can be run under Cygwin, the Linux look-and-feel environment for
+Windows.  Cygwin must have recent versions of \code{make} and
+\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
+will behave as under Linux. 
+
+The remaining instructions in this section are for users wishing to
+run Stan under Windows in a command (i.e., DOS) shell.
+
+\subsection{Windows Tips}
+
+\subsubsection{Opening a Command Shell}
+
+To open a Windows command shell, first open the \code{Start Menu}
+(usually in the lower left of the screen), select option
+\code{All Programs}, then option \code{Accessories}, then
+program \code{Command Prompt}.
+
+Alternatively, enter \code{[Windows+r]} (both keys together on the
+keyboard), and enter \code{cmd} into the text field that pops up in
+the Run window, then press \code{[Return]} on the keyboard to run.
+
+\subsection{Rtools C++ Development Environment}
+
+The simplest way to install a full \Cpp build environment that will
+work for Stan is to use the Rtools package designed for R developers
+on Windows (even if you don't plan to use R).
+
+First, download the latest \emph{frozen} (i.e., stable) version of
+Rtools from the Rtools home page, using
+%
+\begin{quote}
+\url{http://cran.r-project.org/bin/windows/Rtools/}
+\end{quote}
+
+Next, double click on the downloaded file to open the Rtools
+install wizard, then proceed through its options.
+\begin{itemize}
+\item \emph{Language}: select language, click \code{Next},
+\item \emph{Welcome}: click \code{Next},
+\item \emph{Information}: click \code{Next},
+\item \emph{Setup Location}: accept default (\Verb|c:\Rtools|), click \code{Next},
+\item \emph{Select Components}: select default, \code{Package
+   Authoring}, click \code{Next},
+\item \emph{Select Additional Tasks}: check \code{Edit Path} and \code{Save
+ Version in Registry}, click \code{Next},
+\item \emph{System Path Report}: click \code{Next},
+\item \emph{Ready to Install}: click \code{Next}, wait for the
+  install to complete, then
+\item \emph{Finish}: click \code{Finish}.
+\end{itemize}
+
+\subsection{Downloading and Unpacking Stan}
+
+The Stan source code distributions are named
+\code{stan-src-1.m.p.tgz}, where \code{m} is the minor version and
+\code{p} the patch level.
+
+Download the latest Stan source from the Stan downloads page,
+%
+\begin{quote}
+\url{http://code.google.com/p/stan/downloads/list}
+\end{quote}
+%
+to any non-temporary folder.  (If in doubt, select \code{My Documents}
+on Windows XP or \code{Documents} on Windows 7.)  
+
+Change to the download directory (aka folder) using one of the
+following commands, replacing \code{<username>} with
+a Windows user name.
+%
+\begin{itemize}
+\item \emph{Windows XP}: \ From the default starting directory, use
+the followith commands (quotes and all):
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd "My Documents"
+\end{Verbatim}
+\end{quote}
+%
+The full path (including quotes) will work from anywhere,
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd cd "c:\Documents and Settings\<username>\My Documents"
+\end{Verbatim}
+\end{quote}
+\item \emph{Windows 7}:  \  From the default starting directory, use
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd Documents
+\end{Verbatim}
+\end{quote} 
+or use the full path, including quotes, from anywhere,
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd "c:\Users\<username>\Documents"
+\end{Verbatim}
+\end{quote}
+\end{itemize}
+%
+To verify that the downloaded Stan \code{.tgz} file is there,
+list the directory contents using:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> dir
+\end{Verbatim}
+\end{quote}
+
+Finally, unpack the distribution using the \code{tar} command (which is
+installed as part of Rtools).
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> tar -xzf --no-same-owner stan-src.1.m.p.tgz 
+\end{Verbatim}
+\end{quote}
+%
+The \code{--no-same-owner} flag is not strictly necessary,
+but it removes a bunch of irrelevant warnings.
+
+
+
+\section{Required Software and Tools}
 
 The only two absolute requirements for running \Stan are the
 \Stan source code (and dependent libraries) and a \Cpp compiler.

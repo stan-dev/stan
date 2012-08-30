@@ -527,8 +527,8 @@ imprecision.
 \subsection{Ordered Vectors}
 
 An ordered vector type in \Stan represents a vector whose entries are
-sorted in ascending order.  For instance, $(1.0,2.7,2.71)^{\top}$ is
-an ordered vector.  Ordered vectors are most often employed as cut
+sorted in ascending order.  For instance, $(-1.3,2.7,2.71)^{\top}$ is
+an ordered 3-vector.  Ordered vectors are most often employed as cut
 points in ordered logistic regression models (see
 \refsection{ordered-logistic}).
 
@@ -540,11 +540,30 @@ ordered[5] c;
 \end{Verbatim}
 \end{quote}
 %
-After their declaration, ordered vectors, like unit simplexes, may be
-assigned to other vectors and other vectors may be assigned to them.
-Constraints will be checked after executing the block in which the
-variables were declared.  There is also a \code{positive\_ordered} vector type
-which operates similarly but all entries are constrained to be positive.
+After their declaration, ordered vectors, like unit simplexes, may be 
+assigned to other vectors and other vectors may be assigned to them. 
+Constraints will be checked after executing the block in which the 
+variables were declared.  
+
+
+\subsection{Positive, Ordered Vectors}
+
+There is also a positive, ordered vector type which operates similarly
+to ordered vectors, but all entries are constrained to be positive.
+For instance, $(2,3.7,4,12.9)$ is a positive, ordered 4-vector.
+
+The variable \code{d} is declared as a positive, ordered 5-vector by
+%
+\begin{quote}
+\begin{Verbatim}
+positive_ordered[5] d;
+\end{Verbatim}
+\end{quote}
+%
+Like ordered vectors, after their declaration positive ordered vectors
+assigned to other vectors and other vectors may be assigned to them. 
+Constraints will be checked after executing the block in which the 
+variables were declared.  
 
 \subsection{Unconstrained Row Vectors}
 
