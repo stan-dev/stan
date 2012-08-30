@@ -520,7 +520,7 @@ you can look for similar structures in these examples.
 %
 \begin{quote}
 \begin{Verbatim}
-y ~ normal (mu, sigma);
+y ~ normal(mu, sigma);
 \end{Verbatim}
 \end{quote}
 %
@@ -528,7 +528,7 @@ and
 %
 \begin{quote}
 \begin{Verbatim}
-for (i in 1:n) y[i] ~ normal (mu, sigma);
+for (i in 1:n) y[i] ~ normal(mu, sigma);
 \end{Verbatim}
 \end{quote}
 %
@@ -537,7 +537,7 @@ Or, equivalently (recall that a line break is just another form of whitespace),
 \begin{quote}
 \begin{Verbatim}
 for (i in 1:n)
-  y[i] ~ normal (mu, sigma);
+  y[i] ~ normal(mu, sigma);
 \end{Verbatim}
 \end{quote}
 %
@@ -546,7 +546,7 @@ and also equivalently,
 \begin{quote}
 \begin{Verbatim}
 for (i in 1:n) {
-  y[i] ~ normal (mu, sigma);
+  y[i] ~ normal(mu, sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -588,7 +588,7 @@ $\vdots$ & $\vdots$
 {
   total <- 0;
   for (i in 1:n){
-    theta[i] ~ normal (total, sigma);
+    theta[i] ~ normal(total, sigma);
     total <- total + theta[i];
   }
 }
@@ -759,8 +759,8 @@ model { }
   As noted earlier, each statement in a Stan model is directly translated into the \Cpp code for computing the log posterior.  Thus, for example, the following pair of statements is legal in a Stan model:
 \begin{quote}
 \begin{Verbatim}
-  y ~ normal (0,1);
-  y ~ normal (2,3);
+  y ~ normal(0,1);
+  y ~ normal(2,3);
 \end{Verbatim}
 \end{quote}
 %
@@ -773,8 +773,8 @@ density function.
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 \begin{quote}
 \begin{Verbatim}
-  x ~ normal (0.8*y, sigma);
-  y ~ normal (0.8*x, sigma);
+  x ~ normal(0.8*y, sigma);
+  y ~ normal(0.8*x, sigma);
 \end{Verbatim}
 \end{quote}
 %
@@ -801,23 +801,22 @@ conditionals have regressions with slope 0.8.
 
 \begin{itemize}
 
-\item Stan can be set up from within R using two lines of code,
-  following the instructions for running Stan from R on
+\item Stan can be set up from within R using two lines of code.
+  Follow the instructions for running Stan from R on
   \url{http://mc-stan.org/}.  You don't need to separately download
-  Stan and RStan.  Just follow the instructions for installing RStan
-  and everything gets set up automatically.  When RStan moves to
-  CRAN, it will get even easier.
+  Stan and RStan.  Installing RStan will automatically set up Stan.
+  When RStan moves to CRAN, it will get even easier.
 \item In practice we typically run the same Stan model repeatedly.  If
-  you pass Stan the result of a previously fitted model it will save
-  time and not need to recompile.  An example is given on the running
+  you pass RStan the result of a previously fitted model the model will 
+  not need be recompiled. An example is given on the running
   Stan from R pages available from \code{http://mc-stan.org/}.
 \item When you run Stan, it saves various conditions including
   starting values, some control variables for the tuning and running
-  of the no-U-turn sampler, and the initial random seed.  You can
+  of the no-U-turn sampler, and the initial random seed. You can
   specify these values in the Stan call and thus achieve exact
   replication if desired.  (This can be useful for debugging.)
 \item When running \BUGS from R, you need to send exactly the data
-  that the model needs.  When running Stan, you can include extra
+  that the model needs.  When running RStan, you can include extra
   data, which can be helpful when playing around with models.  For
   example, if you remove a variable \code{x} from the model, you can keep
   it in the data sent from R, thus allowing you to quickly alter the

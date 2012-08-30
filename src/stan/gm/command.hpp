@@ -88,7 +88,7 @@ namespace stan {
                         "default = max(1,iter/200))");
 
       print_help_option("leapfrog_steps","int",
-                        "Number of leapfrog steps; -1 for No-U-Turn adaptation",
+                        "Number of leapfrog steps; -1 for no-U-turn adaptation",
                         "default = -1");
 
       print_help_option("max_treedepth","int",
