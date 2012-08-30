@@ -69,7 +69,7 @@ namespace rstan {
    * The following arguments could be in the names lists
    *
    * <ul>
-   * <li> samples: to which samples are written 
+   * <li> sample_file: to which samples are written 
    * <li> iter: total number of iterations, including warmup (default: 2000)  
    * <li> warmup: 
    * <li> thin 

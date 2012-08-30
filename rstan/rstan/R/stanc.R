@@ -31,13 +31,13 @@ stanc <- function(model_code, model_name = "anon_model", verbose = FALSE) {
   r$model_name <- model_name  
   r$model_code <- model_code 
   if (is.null(r)) {
-    stop(paste("Failed to run stanc for model '", model_name, 
+    stop(paste("failed to run stanc for model '", model_name, 
                "' and no error message provided", sep = '')) 
   } else if (r$status == PARSE_FAIL_RC) {
-    stop(paste("Failed to parse Stan model '", model_name, 
+    stop(paste("failed to parse Stan model '", model_name, 
                "' and no error message provided"), sep = '') 
   } else if (r$status == EXCEPTION_RC) {
-    stop(paste("Failed to parse Stan model '", model_name, 
+    stop(paste("failed to parse Stan model '", model_name, 
                "' and error message provided as:\n", 
                r$msg, sep = '')) 
   } 
@@ -50,7 +50,7 @@ stanc <- function(model_code, model_name = "anon_model", verbose = FALSE) {
 }
 
 
-stanc_version <- function() {
+stan_version <- function() {
   .Call('stanc_version', PACKAGE = 'rstan')
 }
 

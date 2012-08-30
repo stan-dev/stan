@@ -1,26 +1,9 @@
-# Part of the rstan package for an R interface to Stan 
-# Copyright (C) 2012 Columbia University
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
 setMethod("show", "stanfit", 
           function(object) {
-            printstanfit(x = object, pars = object@sim$pars.oi)
+            printstanfit(x = object, pars = object@sim$pars_oi)
           })  
 
-printstanfit <- function(x, pars = x@sim$pars.oi, 
+printstanfit <- function(x, pars = x@sim$pars_oi, 
                          probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
                          digits.summary = 1, ...) { 
   s <- summary(x, pars, probs, ...)  
@@ -36,9 +19,7 @@ printstanfit <- function(x, pars = x@sim$pars.oi,
 
   sampler <- attr(x@sim$samples[[1]], "args")$sampler 
 
-  cat("\nLog-posterior (mean of each chain): ", 
-      paste(round(s$lp_mean, digits.summary), collapse = ', '), ".\n", sep = '')
-  cat("Sample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
+  cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
   cat("For each parameter, n_eff is a crude measure of effective sample size,\n") 
   cat("and Rhat is the potential scale reduction factor on split chains (at \n")
   cat("convergence, Rhat=1).\n")
@@ -49,12 +30,12 @@ if (!isGeneric("plot"))
   setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
 
 setMethod("plot", signature = "stanfit", 
-          function(x, y, pars = y, display.parallel = FALSE, ...) {
-            pars <- if (missing(pars) && missing(y)) x@sim$pars.oi else check_pars(x@sim, pars) 
+          function(x, y, pars = y, display_parallel = FALSE, ...) {
+            pars <- if (missing(pars) && missing(y)) x@sim$pars_oi else check_pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
-            info <- list(model_name = x@model_name, model.date = x@.MISC$date) 
-            stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display.parallel, ...) 
+            info <- list(model_name = x@model_name, model_date = x@.MISC$date) 
+            stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display_parallel, ...) 
           }) 
 
 setGeneric(name = "get_stancode",
@@ -105,14 +86,14 @@ check_pars <- function(sim, pars) {
   # Returns:
   #   pars without white spaces, if any, if all are valid
   #   otherwise stop reporting error
-  if (missing(pars)) return(sim$pars.oi) 
+  if (missing(pars)) return(sim$pars_oi) 
   pars_wo_ws <- gsub('\\s+', '', pars) 
-  allpars <- c(sim$pars.oi, sim$fnames.oi) 
+  allpars <- c(sim$pars_oi, sim$fnames_oi) 
   m <- which(match(pars_wo_ws, allpars, nomatch = 0) == 0)
   if (length(m) > 0) 
-    stop("No parameter ", paste(pars[m], collapse = ', ')) 
+    stop("no parameter ", paste(pars[m], collapse = ', ')) 
   if (length(pars_wo_ws) == 0) 
-    stop("No parameter specified (pars is empty)")
+    stop("no parameter specified (pars is empty)")
   unique(pars_wo_ws) 
 } 
 
@@ -156,8 +137,8 @@ par_traceplot <- function(sim, n, par.name, inc_warmup = TRUE) {
   n_kept <- n_save - warmup2 
   yrange <- NULL 
   main <- paste("Trace of ", par.name) 
-  chain.cols <- rstan_options("rstan_chain_cols")
-  warmup.col <- rstan_options("rstan_warmup_bg_col") 
+  chain_cols <- rstan_options("rstan_chain_cols")
+  warmup_col <- rstan_options("rstan_warmup_bg_col") 
   if (inc_warmup) {
     id <- seq(1, by = thin, length.out = n_save) 
     for (i in 1:sim$n_chains) {
@@ -166,10 +147,10 @@ par_traceplot <- function(sim, n, par.name, inc_warmup = TRUE) {
     plot(c(1, id[length(id)]), yrange, type = 'n', 
          xlab = 'Iterations', ylab = "", main = main)
     rect(par("usr")[1], par("usr")[3], warmup2 * thin, par("usr")[4], 
-         col = warmup.col, border = NA)
+         col = warmup_col, border = NA)
     for (i in 1:sim$n_chains) {
       lines(id, sim$samples[[i]][[n]], xlab = '', ylab = '', 
-            lwd = 1, col = chain.cols[(i-1) %% 6 + 1]) 
+            lwd = 1, col = chain_cols[(i-1) %% 6 + 1]) 
     }
   } else {  
     idx <- warmup2 + 1:n_kept
@@ -181,7 +162,7 @@ par_traceplot <- function(sim, n, par.name, inc_warmup = TRUE) {
          xlab = 'Iterations (without warmup)', ylab = "", main = main)
     for (i in 1:sim$n_chains)  
       lines(id, sim$samples[[i]][[n]][idx], lwd = 1, 
-            xlab = '', ylab = '', col = chain.cols[(i-1) %% 6 + 1]) 
+            xlab = '', ylab = '', col = chain_cols[(i-1) %% 6 + 1]) 
   } 
 } 
 
@@ -208,7 +189,7 @@ setGeneric(name = "get_logposterior",
 
 setMethod("get_logposterior", 
           definition = function(object, inc_warmup = TRUE) {
-            llp <- lapply(object@sim$samples, function(x) attr(x, "lp"))
+            llp <- lapply(object@sim$samples, function(x) x[['lp__']]) 
             if (inc_warmup) return(invisible(llp)) 
             invisible(mapply(function(x, w) x[-(1:w)], 
                              llp, object@sim$warmup2,
@@ -251,16 +232,16 @@ setMethod("extract", signature = "stanfit",
             #   (# of iter (with or w.o. warmup), # of chains, # of flat parameters). 
 
 
-            pars <- if (missing(pars)) object@sim$pars.oi else check_pars(object@sim, pars) 
-            tidx <- pars_total_indexes(object@sim$pars.oi, 
-                                       object@sim$dims.oi, 
-                                       object@sim$fnames.oi, 
+            pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
+            tidx <- pars_total_indexes(object@sim$pars_oi, 
+                                       object@sim$dims_oi, 
+                                       object@sim$fnames_oi, 
                                        pars) 
 
             n_kept <- object@sim$n_save - object@sim$warmup2
             fun1 <- function(par) {
               sss <- sapply(tidx[[par]], get_kept_samples, object@sim) 
-              dim(sss) <- c(sum(n_kept), object@sim$dims.oi[[par]]) 
+              dim(sss) <- c(sum(n_kept), object@sim$dims_oi[[par]]) 
               sss 
             } 
            
@@ -271,7 +252,7 @@ setMethod("extract", signature = "stanfit",
             } 
 
             tidx <- unlist(tidx, use.names = FALSE) 
-            tidxnames <- object@sim$fnames.oi[tidx] 
+            tidxnames <- object@sim$fnames_oi[tidx] 
             sss <- lapply(tidx, get_samples, object@sim, inc_warmup) 
             sss2 <- lapply(sss, function(x) do.call(c, x))  # concatenate samples from different chains
             sssf <- unlist(sss2, use.names = FALSE) 
@@ -314,40 +295,39 @@ setMethod("summary", signature = "stanfit",
             if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
               assign("summary", summary_sim(object@sim), envir = object@.MISC)
            
-            pars <- if (missing(pars)) object@sim$pars.oi else check_pars(object@sim, pars) 
+            pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
             m <- match(probs, default_summary_probs())
             if (any(is.na(m))) { # unordinary quantiles are requested 
               ss <-  summary_sim_quan(object@sim, pars, probs) 
-              row.idx <- attr(ss, "row.major.idx") 
-              col.idx <- attr(ss, "col.major.idx") 
+              row_idx <- attr(ss, "row_major_idx") 
+              col_idx <- attr(ss, "col_major_idx") 
 
-              ss$ess <- object@.MISC$summary$ess[col.idx, drop = FALSE] 
-              ss$rhat <- object@.MISC$summary$rhat[col.idx, drop = FALSE] 
-              ss$mean <- object@.MISC$summary$msd[col.idx, 1, drop = FALSE] 
-              ss$sd <- object@.MISC$summary$msd[col.idx, 2, drop = FALSE] 
-              ss$sem <- object@.MISC$summary$sem[col.idx]  
+              ss$ess <- object@.MISC$summary$ess[col_idx, drop = FALSE] 
+              ss$rhat <- object@.MISC$summary$rhat[col_idx, drop = FALSE] 
+              ss$mean <- object@.MISC$summary$msd[col_idx, 1, drop = FALSE] 
+              ss$sd <- object@.MISC$summary$msd[col_idx, 2, drop = FALSE] 
+              ss$sem <- object@.MISC$summary$sem[col_idx]  
               s1 <- cbind(ss$mean, ss$sem, ss$sd, 
                           ss$quan, ss$ess, ss$rhat)
               colnames(s1) <- c("mean", "se_mean", "sd", colnames(ss$quan), 'n_eff', 'Rhat')
 
-              s2 <- combine_msd_quan(object@.MISC$summary$c.msd[col.idx, , , drop = FALSE], ss$c.quan) 
+              s2 <- combine_msd_quan(object@.MISC$summary$c_msd[col_idx, , , drop = FALSE], ss$c_quan) 
 
-              idx2 <- match(row.idx, col.idx) 
+              idx2 <- match(row_idx, col_idx) 
               ss <- list(summary = s1[idx2, , drop = FALSE],
-                         c_summary = s2[idx2, , , drop = FALSE],
-                         lp_mean = object@.MISC$summary$lp_mean) 
+                         c_summary = s2[idx2, , , drop = FALSE])
               return(invisible(ss)) 
             }
 
-            tidx <- pars_total_indexes(object@sim$pars.oi, 
-                                       object@sim$dims.oi, 
-                                       object@sim$fnames.oi, 
+            tidx <- pars_total_indexes(object@sim$pars_oi, 
+                                       object@sim$dims_oi, 
+                                       object@sim$fnames_oi, 
                                        pars) 
-            tidx <- lapply(tidx, function(x) attr(x, "row.major.idx"))
+            tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
             tidx <- unlist(tidx, use.names = FALSE)
-            tidx.len <- length(tidx)
+            tidx_len <- length(tidx)
 
             ss <- object@.MISC$summary 
 
@@ -362,11 +342,10 @@ setMethod("summary", signature = "stanfit",
             dim(s1) <- c(length(tidx), length(m) + 5) 
             rownames(s1) <- pars.names 
             colnames(s1) <- c("mean", "se_mean", "sd", qnames, 'n_eff', 'Rhat')
-            s2 <- combine_msd_quan(ss$c.msd[tidx, , , drop = FALSE], ss$c.quan[tidx, m, , drop = FALSE]) 
-            dim(s2) <- c(tidx.len, length(m) + 2, object@sim$n_chains)
+            s2 <- combine_msd_quan(ss$c_msd[tidx, , , drop = FALSE], ss$c_quan[tidx, m, , drop = FALSE]) 
+            dim(s2) <- c(tidx_len, length(m) + 2, object@sim$n_chains)
             dimnames(s2) <- list(pars.names, c("mean", "sd", qnames), NULL) 
-            ss <- list(summary = s1, c_summary = s2, 
-                       lp_mean = object@.MISC$summary$lp_mean) 
+            ss <- list(summary = s1, c_summary = s2) 
             invisible(ss) 
           })  
 
@@ -378,23 +357,23 @@ if (!isGeneric("traceplot")) {
 setMethod("traceplot", signature = "stanfit", 
           function(object, pars, inc_warmup = TRUE, ask = FALSE) { 
 
-            pars <- if (missing(pars)) object@sim$pars.oi else check_pars(object@sim, pars) 
-            tidx <- pars_total_indexes(object@sim$pars.oi, 
-                                       object@sim$dims.oi, 
-                                       object@sim$fnames.oi, 
+            pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
+            tidx <- pars_total_indexes(object@sim$pars_oi, 
+                                       object@sim$dims_oi, 
+                                       object@sim$fnames_oi, 
                                        pars) 
-            tidx <- lapply(tidx, function(x) attr(x, "row.major.idx"))
+            tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
             tidx <- unlist(tidx, use.names = FALSE)
             par.mfrow.old <- par('mfrow')
             num.plots <- length(tidx) 
             if (num.plots %in% 2:4) par(mfrow = c(num.plots, 1)) 
             if (num.plots > 5) par(mfrow = c(4, 2)) 
-            par_traceplot(object@sim, tidx[1], object@sim$fnames.oi[tidx[1]], 
+            par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
                           inc_warmup = inc_warmup)
             if (num.plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
             if (num.plots > 1) { 
               for (n in 2:num.plots)
-                par_traceplot(object@sim, tidx[n], object@sim$fnames.oi[tidx[n]], 
+                par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
                               inc_warmup = inc_warmup)
             }
             if (ask) devAskNewPage(ask = ask.old)

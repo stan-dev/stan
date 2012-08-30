@@ -64,7 +64,7 @@ setMethod("sampling", "stanmodel",
             }
 
             if (n_chains < 1) 
-              stop("The number of chains (n_chains) is less than 1")
+              stop("the number of chains (n_chains) is less than 1")
 
             if (check_data) { 
               # allow data to be specified as a vector of character string 
@@ -82,7 +82,7 @@ setMethod("sampling", "stanmodel",
               sampler$update_param_oi(pars)
               m <- which(match(pars, m.pars, nomatch = 0) == 0)
               if (length(m) > 0) 
-                stop("No parameter ", paste(pars[m], collapse = ', ')) 
+                stop("no parameter ", paste(pars[m], collapse = ', ')) 
             }
 
             args_list <- config_argss(n_chains = n_chains, iter = iter,
@@ -106,8 +106,8 @@ setMethod("sampling", "stanmodel",
             permutation.lst <-
               lapply(1:n_chains, function(id) sampler$permutation(c(n_kept, 1, id))) 
 
-            fnames.oi <- sampler$param_fnames_oi()
-            n_flatnames <- length(fnames.oi)
+            fnames_oi <- sampler$param_fnames_oi()
+            n_flatnames <- length(fnames_oi)
             sim = list(samples = samples,
                        iter = iter, thin = thin, 
                        warmup = warmup, 
@@ -116,9 +116,9 @@ setMethod("sampling", "stanmodel",
                        warmup2 = rep(warmup2, n_chains),
                        thin = rep(thin, n_chains),
                        permutation = permutation.lst,
-                       pars.oi = sampler$param_names_oi(),
-                       dims.oi = sampler$param_dims_oi(),
-                       fnames.oi = fnames.oi,
+                       pars_oi = sampler$param_names_oi(),
+                       dims_oi = sampler$param_dims_oi(),
+                       fnames_oi = fnames_oi,
                        n_flatnames = n_flatnames) 
             fit <- new("stanfit",
                        model_name = object@model_name,

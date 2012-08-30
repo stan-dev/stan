@@ -261,6 +261,7 @@ namespace rstan {
     std::vector<std::string> get_param_names(Model& m) { 
       std::vector<std::string> names;
       m.get_param_names(names);
+      names.push_back("lp__");
       return names; // copy for return
     }
 
@@ -289,6 +290,9 @@ namespace rstan {
            it != dims.end(); 
            ++it) 
         uintdims.push_back(sizet_to_uint(*it)); 
+
+      std::vector<unsigned int> scalar_dim;
+      uintdims.push_back(scalar_dim); 
       return uintdims; 
     } 
 
@@ -305,7 +309,6 @@ namespace rstan {
                      std::vector<int>& params_i,
                      Model& model,
                      std::vector<Rcpp::NumericVector>& chains, 
-                     Rcpp::NumericVector& lp,
                      const size_t iter_save, 
                      const std::vector<size_t>& qoi_idx,
                      std::vector<Rcpp::NumericVector>& sampler_params, 
@@ -321,11 +324,12 @@ namespace rstan {
         sampler.adapt_on(); 
 
       std::vector<double> params_inr; 
+      if (refresh > num_iterations) refresh = -1; 
      
       unsigned ii = 0; // index for iterations saved to chains
       for (int m = 0; m < num_iterations; ++m, ++ii) {
+        R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
-          R_CheckUserInterrupt(); 
           rstan::io::rcout << "\rIteration: ";
           rstan::io::rcout << std::setw(it_print_width) << (m + 1)
                            << " / " << num_iterations;
@@ -356,7 +360,6 @@ namespace rstan {
         model.write_array(params_r,params_i,params_inr); 
 
         double lp__ = sample.log_prob();
-        lp[ii] = lp__; 
         if (sample_file_flag)
           sample_file_stream << lp__ << ","; 
 
@@ -368,10 +371,11 @@ namespace rstan {
             sample_file_stream << ii_sampler_params[z] << ",";
         } 
         
-        for (size_t z = 0; z < qoi_idx.size(); ++z)  
+        size_t z = 0;
+        for (; z < qoi_idx.size() - 1; ++z)  
           chains[z][ii] = params_inr[qoi_idx[z]]; 
+        chains[z][ii] = lp__;
           
-  
         // FIXME: use csv_writer arg to make comma optional?
         if (sample_file_flag) { 
           // sampler.write_sampler_params(sample_file_stream);
@@ -398,7 +402,6 @@ namespace rstan {
                         stan_args& args, 
                         Model& model, 
                         std::vector<Rcpp::NumericVector>& chains, 
-                        Rcpp::NumericVector& lp, 
                         std::vector<double>& initv, 
                         unsigned int iter_save,
                         const std::vector<size_t>& qoi_idx,
@@ -522,7 +525,7 @@ namespace rstan {
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,lp,iter_save,qoi_idx,sampler_params,
+                    model,chains,iter_save,qoi_idx,sampler_params,
                     adaptation_info); 
 
       } else if (0 > leapfrog_steps && equal_step_sizes) {
@@ -547,7 +550,7 @@ namespace rstan {
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,lp,iter_save,qoi_idx,sampler_params,
+                    model,chains,iter_save,qoi_idx,sampler_params,
                     adaptation_info); 
       } else {
         // Stardard HMC
@@ -571,7 +574,7 @@ namespace rstan {
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,lp,iter_save,qoi_idx,sampler_params,
+                    model,chains,iter_save,qoi_idx,sampler_params,
                     adaptation_info); 
       }
       
@@ -630,6 +633,10 @@ namespace rstan {
       for (std::vector<std::string>::const_iterator it = pnames.begin(); 
            it != pnames.end(); 
            ++it) { 
+        if (*it == "lp__") {
+          names_oi_tidx_.push_back(-1); // -1 for lp__ as it is not real parameters 
+          continue;
+        } 
         size_t p = find_index(names_, *it); 
         if (p != names_.size()) {
           names_oi_.push_back(*it); 
@@ -648,6 +655,7 @@ namespace rstan {
     SEXP update_param_oi(SEXP pars) {
       std::vector<std::string> pnames = 
         Rcpp::as<std::vector<std::string> >(pars);  
+      pnames.push_back("lp__"); 
       update_param_oi0(pnames); 
       get_all_flatnames(names_oi_, dims_oi_, fnames_oi_, true); 
       return Rcpp::wrap(true); 
@@ -673,12 +681,12 @@ namespace rstan {
       dims_oi_(dims_),
       num_params2_(num_params_)  
     {
-      for (size_t j = 0; j < num_params2_; j++) 
+      for (size_t j = 0; j < num_params2_ - 1; j++) 
         names_oi_tidx_.push_back(j);
+      names_oi_tidx_.push_back(-1); // lp__
       calc_starts(dims_oi_, starts_oi_);
       get_all_flatnames(names_oi_, dims_oi_, fnames_oi_, true); 
     }             
-
 
     SEXP call_sampler(SEXP args_) { 
       BEGIN_RCPP; 
@@ -690,13 +698,12 @@ namespace rstan {
       std::vector<std::string> sampler_param_names; 
       std::string adaptation_info; 
       std::vector<double> initv; 
+
+      // (+1) for saving the log-posterior
       for (unsigned int i = 0; i < num_params2_; i++) 
         chains.push_back(Rcpp::NumericVector(iter_save)); 
-
-      // the log posterior up to a constant 
-      Rcpp::NumericVector lp(iter_save); 
-
-      sampler_command(data_, args, model_, chains, lp, initv, iter_save, names_oi_tidx_, 
+       
+      sampler_command(data_, args, model_, chains, initv, iter_save, names_oi_tidx_, 
                       sampler_param_names, sampler_params, adaptation_info); 
       // let Rcpp handle the error dispatching. 
       /*
@@ -711,7 +718,6 @@ namespace rstan {
       Rcpp::List lst(chains.begin(), chains.end()); 
       lst.attr("args") = args.stan_args_to_rlist(); 
       lst.attr("inits") = initv; 
-      lst.attr("lp") = lp;
       lst.attr("adaptation_info") = adaptation_info;
       
       // sampler parameters such as treedepth
