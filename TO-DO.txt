@@ -819,9 +819,11 @@ for the following, categorized by issue.
 MODELING LANGUAGE MANUAL
 ======================================================================
 
-* drop Lucida console font section (?) or link Bigelow and Holmes
+* include section for BUGS user migration
+  -- Andrew's e-mail contents
+  -- integer arithmetic gotcha
 
-* get page numbers back
+* drop Lucida console font section (?) or link Bigelow and Holmes
 
 * step-by-step install
   - mac, linux, windows
