@@ -1,5 +1,5 @@
 .PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a 
+bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
