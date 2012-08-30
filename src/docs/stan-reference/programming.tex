@@ -219,7 +219,7 @@ both.  Unlike with truncated data, the number of data points that were
 censored is known.  The textbook example is the household scale which
 does not report values above 300 pounds.  
 
-\subsection{Estmating Censored Values}
+\subsection{Estimating Censored Values}
 
 One way to model censored data is to treat the censored data as
 missing data that is constrained to fall in the censored range of
@@ -280,7 +280,7 @@ is
 % 
 Although \Stan implements $\Phi$ with the function $\code{Phi}$, \Stan
 also provides the cumulative distribution function \code{normal\_p},
-defined byma
+defined by
 \[
 \code{normal\_p}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
 \]
@@ -565,7 +565,7 @@ distribution suffices.
 The standard approach to linear regression is to model the noise
 term $\epsilon$ as having a normal distribution.  From \Stan's
 perspective, there is nothing special about normally distributed
-noise.  For instance, robust regression can be accomodated by giving
+noise.  For instance, robust regression can be accommodated by giving
 the noise term a Student-$t$ distribution.  To code this in \Stan, the
 sampling distribution is changed to the following.
 %
@@ -632,7 +632,7 @@ typically written as
 The cumulative unit normal distribution function $\Phi$ is implemented
 in \Stan as the function \code{Phi}.  The probit regression model
 may be coded in \Stan by replacing the logistic model's sampling
-statement witht he following.
+statement with the following.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -984,7 +984,7 @@ model {
 %
 The single scalar parameter \code{y} is declared as lying in the
 interval \code{(-1,1)}.  The log probability variable \code{lp\_\_} is
-incremented with the joint log probabilty of all parameters, i.e.,
+incremented with the joint log probability of all parameters, i.e.,
 $\log \distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
 \code{log1m(fabs(y))}.  The function \code{log1m} is is defined so
 that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but the
@@ -1034,7 +1034,7 @@ sample properly.%
 
 \chapter{Optimizing \Stan Code}\label{optimization.chapter}
 \noindent
-This chapter provides a grab bag of techniques for optimizating \Stan
+This chapter provides a grab bag of techniques for optimizing \Stan
 code, including vectorization, sufficient statistics, and conjugacy.
 
 \section{Vectorization}

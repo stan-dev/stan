@@ -110,12 +110,12 @@ must be added to the accumulated log probability.
 Next, the transformed parameter statements are executed.  After they
 complete, any constraints declared for the transformed parameters are
 checked.  If the constraints are violated, the model will halt with a
-diagnositc error message.
+diagnostic error message.
 
-The final step in the log probability funcition calculation is to
+The final step in the log probability function calculation is to
 execute the statements defined in the model block.  
 
-As the log probabilty function executes, it accumulates an in-memory
+As the log probability function executes, it accumulates an in-memory
 representation of the expression tree used to calculate the log
 probability.  This includes all of the transformed parameter
 operations and all of the Jacobian adjustments.  This tree is then
@@ -125,7 +125,7 @@ account for the majority of the cycles consumed by a \Stan program.
 
 \section{Metropolis Accept/Reject}
 
-A standard Metrpolis accept/reject step is required to retain detailed
+A standard Metropolis accept/reject step is required to retain detailed
 balance and ensure samples are marginally distributed according to the
 probability function defined by the model.  This Metropolis adjustment
 is based on comparing log probabilities, here defined by the
@@ -193,10 +193,10 @@ written to a \acronym{csv} file or directly back to \R's memory.}
 %     if warming up and adapting, adapt step size
 %     randomly initialize momentum
 %     for each leapfrog step:
-%         calculate log probabilty and gradient
+%         calculate log probability and gradient
 %         increment momentum by half step-size times gradient
 %         increment parameters by step-size times momentum
-%         calculate log probabilty and gradient
+%         calculate log probability and gradient
 %         increment momentum by half step-size times gradient
 %     if not rejected by Metropolis condition:
 %         update parameters to new values
@@ -561,7 +561,7 @@ row_vector[1093] u;
 
 Row vectors may not be assigned to column vectors, nor may column
 vectors be assigned to row vectors.  If assignments are required, they
-may be accomodated through the transposition operator.
+may be accommodated through the transposition operator.
 
 \subsection{Unconstrained Matrices}
 
@@ -756,7 +756,7 @@ of a $2 \times 3 \times 4$ array of $5 \times 5$ covariance matrices.
 
 If \code{x} is a 1-dimensional array of length 5, then \code{x[1]} is
 the first element in the array and \code{x[5]} is the last.  For a $3
-\times 4$ array \code{y} of two dimesions, \code{y[1,1]} is the first
+\times 4$ array \code{y} of two dimensions, \code{y[1,1]} is the first
 element and \code{y[3,4]} the last element.  For a three-dimensional
 array \code{z}, the first element is \code{z[1,1,1]}, and so on.
 
@@ -803,7 +803,7 @@ Because size information is not part of a data type, data
 types will be written without size information.  For instance,
 \code{real[]} is the type of one-dimensional array of reals and
 \code{matrix} is the type of matrices.  The three-dimensional integer
-array type is written as \code{rea[\, , \, ,]}, indicating the number slots
+array type is written as \code{real[\, , \, ,]}, indicating the number slots
 available for indexing.  Similarly, \code{vector[,]} is the type of a
 two-dimensional array of vectors.
 
@@ -931,7 +931,7 @@ Variable names will not conflict with the following block identifiers,
 \code{generated},
 \end{quote}
 %
-nor will theyc onflict with the names of predefined functions or
+nor will they conflict with the names of predefined functions or
 distributions.  Nevertheless, these names should be avoided for the
 sake of program clarity.
 
@@ -962,7 +962,7 @@ encodings or decodings.
 
 Any expression wrapped in parentheses is also an expression. Like in
 \Cpp, but unlike in \R, only the round parentheses, \code{(} and
-\code{)}, are allowed.  The square bracketes \code{[} and \code{]} are
+\code{)}, are allowed.  The square brackets \code{[} and \code{]} are
 reserved for array indexing and the curly braces \code{\{} and
 \code{\}} for grouping statements.
 
@@ -1057,7 +1057,7 @@ associativity.
 \\ 
 \code{+} & 2 & n/a & unary prefix & promotion (no-op in \Stan)
 \\ \hline
-\code{'} & 3 & n/a & unary posfix & transposition
+\code{'} & 3 & n/a & unary postfix & transposition
 \end{tabular}
 \end{center}
 %
@@ -1254,7 +1254,7 @@ the \Stan compiler will flag the expression as illegal.
 \noindent 
 The blocks of a \Stan program (see \refchapter{blocks}) are made up of
 variable declarations and statements.  Unlike programs in \BUGS, the
-declarations and statments making up a \Stan program are executed in
+declarations and statements making up a \Stan program are executed in
 the order in which they are written.  Variables must be defined to
 have some value (as well as declared to have some type) before they
 are used --- if they do not, the behavior is undefined.
@@ -1305,7 +1305,7 @@ languages by writing
 \end{quote}
 %
 Such self assignments are not allowed in \BUGS, because they induce a
-cycle into the the directed graphical model.
+cycle into the directed graphical model.
 
 The left-hand side of an assignment may contain indices for array, matrix, or vector
 data structures.  For instance, if \code{Sigma} is of type
@@ -1387,7 +1387,7 @@ to have the distribution indicated by the right-hand side of the
 sampling statement.
 
 Executing such a statement does not perform any sampling.  In \Stan, a
-sampling statement is merely a notational convenenience.  The above
+sampling statement is merely a notational convenience.  The above
 sampling statement could be written as an assignment statement using
 the reserved variable \code{lp\_\_} as
 %
@@ -1575,7 +1575,7 @@ may not be declared by the user) in the \code{data}, \code{transformed
 % Users may add their own probability functions and cumulative
 % distribution by adding functions of the appropriate type.  If the
 % appropriate cumulative distribution is available to match a
-% probability function, truncated versions of that probabilty function
+% probability function, truncated versions of that probability function
 % may be used. 
 
 % See \refappendix{user-defined-functions} for details on how to add
@@ -1656,7 +1656,7 @@ for (n in 1:N) {
 \end{quote}
 %
 In this program, \code{theta} is assigned after it is used in the
-probablity statement.  This presupposes it was defined before the
+probability statement.  This presupposes it was defined before the
 first loop iteration (otherwise behavior is undefined), and then each
 loop uses the assignment from the previous iteration. 
 
@@ -1746,7 +1746,7 @@ for (n in 1:N)
 %
 The problem is that the body of the for loop is taken to be the
 statement directly following it, which is 
-\Verb|y[n] ~ normal(mu,sigma)|.  This leaves the probabilty statement for
+\Verb|y[n] ~ normal(mu,sigma)|.  This leaves the probability statement for
 \code{z[n]} hanging, as is clear from the following equivalent
 program.
 %
@@ -1767,7 +1767,7 @@ error.
 
 \subsection{Local Variable Declarations}
 
-A for loop has a statement as a body.  It is often convenenient in
+A for loop has a statement as a body.  It is often convenient in
 writing programs to be able to define a local variable that will be
 used temporarily and then forgotten.  For instance, the for loop
 example of repeated assignment should use a local variable for maximum
@@ -2186,7 +2186,7 @@ process will read the data exactly once.%
 Data variables are not transformed in any way.  The format for data
 files is provided in \refchapter{dump}.
 
-\subsection{Statments}
+\subsection{Statements}
 
 The \code{data} block does not allow statements.
 
@@ -2262,7 +2262,7 @@ involved for saving the parameter values corresponding to a sample.
 
 Stan's two samplers, standard Hamiltonian Monte Carlo (\HMC) and the
 adaptive no-U-turn sampler (\NUTS), are most easily (and often most
-effectively) implemented over a multivariate probabilty density that
+effectively) implemented over a multivariate probability density that
 has support on all of $\reals^n$.  To do this, the parameters
 defined in the \code{parameters} block must be transformed so they are
 unconstrained. 
@@ -2286,7 +2286,7 @@ probability function defined by the compiled \Stan program may have
 fewer parameters than it would appear from looking at the declarations
 in the \code{parameters} program block. 
 
-The probabilty function on the unconstrained parameters is defined in
+The probability function on the unconstrained parameters is defined in
 such a way that the order of the parameters in the vector corresponds
 to the order of the variables defined in the \code{parameters} program
 block.  The details of the specific transformations are provided in
@@ -2364,7 +2364,7 @@ generated quantities block are
 \item generating predictions for new data,
 \item calculating posterior event probabilities, including multiple comparisons,
   sign tests, etc.,
-\item calcualting posterior expectations,
+\item calculating posterior expectations,
 \item transforming parameters for reporting,
 \item applying full Bayesian decision theory,
 \item calculating log likelihoods, deviances, etc.\ for model comparison.
@@ -2373,7 +2373,7 @@ generated quantities block are
 Forward samples, event probabilities and statistics may all be
 calculated directly using plug-in estimates.  \Stan automatically
 provides full Bayesian inference by producing samples from the
-posterior distribtuion of any calculated event probabilities,
+posterior distribution of any calculated event probabilities,
 predictions, or statistics.  See \refchapter{bayesian} for more
 information on Bayesian inference.
 
@@ -2401,7 +2401,7 @@ constraints on function typing and operator precedence and
 associativity.
 
 
-\section{BNF Grammrs}
+\section{BNF Grammars}
 
 \subsection{Syntactic Conventions}
 

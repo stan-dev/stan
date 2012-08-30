@@ -22,7 +22,7 @@ arithmetic.  The first difference is how overflow is treated.  If the
 sum or product of two integers overflows the maximum integer
 representable, the result is an undesirable wraparound behavior at the
 bit level.  If the integers were first promoted to real numbers, they
-would not overlflow a floating-point representation.  There are no
+would not overflow a floating-point representation.  There are no
 extra checks in \Stan to flag overflows, so it is up to the user to
 make sure it does not occur.
 
@@ -61,7 +61,7 @@ The difference between the minuend \farg{x} and subtrahend \farg{y}}
 The product of the factors \farg{x} and \farg{y}}
 %
 \fitem{int}{operator/}{int \farg{x}, int \farg{y}}{
-The integer quotiont of the dividend \farg{x} and divisor \farg{y}}
+The integer quotient of the dividend \farg{x} and divisor \farg{y}}
 %
 \end{description}
 
@@ -69,7 +69,7 @@ The integer quotiont of the dividend \farg{x} and divisor \farg{y}}
 
 \begin{description}
 \fitem{int}{operator-}{int \farg{x}}{
-The negation of the the subtrahend \farg{x}}
+The negation of the subtrahend \farg{x}}
 
 \fitem{int}{operator+}{int \farg{x}}{
 The promotion of addend \farg{x} to a int, which is a no-op
@@ -190,7 +190,7 @@ The difference between the minuend \farg{x} and subtrahend \farg{y}}
 The product of the factors \farg{x} and \farg{y}}
 %
 \fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
-The quotiont of the dividend \farg{x} and divisor \farg{y}}
+The quotient of the dividend \farg{x} and divisor \farg{y}}
 %
 \end{description}
 
@@ -198,7 +198,7 @@ The quotiont of the dividend \farg{x} and divisor \farg{y}}
 
 \begin{description}
 \fitem{real}{operator-}{real \farg{x}}{
-The negation of the the subtrahend \farg{x}}
+The negation of the subtrahend \farg{x}}
 
 \fitem{real}{operator+}{real \farg{x}}{
 The promotion of addend \farg{x} to a real, which is a no-op
@@ -306,7 +306,7 @@ The base-10 logarithm of \farg{x}}
 \begin{description}
 %
 \fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
-The length of the hypoteneuse of a right triangle with sides of
+The length of the hypotenuse of a right triangle with sides of
 length \farg{x} and \farg{y}}
 %
 \fitem{real}{cos}{real \farg{x}}{
@@ -319,7 +319,7 @@ The sine of the angle \farg{x} (in radians)}
 The tangent of the angle \farg{x} (in radians)}
 %
 \fitem{real}{acos}{real \farg{x}}{
-The princpipal arc (inverse) cosine (in radians) of \farg{x}}
+The principal arc (inverse) cosine (in radians) of \farg{x}}
 %
 \fitem{real}{asin}{real \farg{x}}{
 The principal arc (inverse) sine (in radians) of \farg{x}}
@@ -392,7 +392,7 @@ The complementary error function of \farg{x}}
 The cumulative unit normal density function of \farg{x}}
 %
 \fitem{real}{log\_loss}{int \farg{y}, real \farg{y\_hat}}{
-The log loss of predicting probabilty \farg{y\_hat} for 
+The log loss of predicting probability \farg{y\_hat} for 
 binary outcome \farg{y}}
 %
 \end{description}
@@ -553,7 +553,7 @@ the matrices \farg{x} and \farg{y}}
 the vectors \farg{x} and \farg{y}}
 %
 \fitem{row\_vector}{operator-}{row\_vector \farg{x}, row\_vector \farg{y}}{The
-  difference between the the row vectors \farg{x} and \farg{y}}
+  difference between the row vectors \farg{x} and \farg{y}}
 %
 \fitem{matrix}{operator-}{matrix \farg{x}, matrix \farg{y}}{The difference between
   the matrices \farg{x} and \farg{y}}
@@ -1218,7 +1218,7 @@ row vector have the same size.
 
 \section{Univariate Continuous Probabilities}
 
-The univariate continous probability distributions have support on all
+The univariate continuous probability distributions have support on all
 real numbers.
 
 \subsection{Normal Distribution}
@@ -1736,7 +1736,7 @@ $y \in \reals^K$,
 
 \section{Covariance Matrix Distributions}
 
-The covariance matrix distirbutions have support on symmetric,
+The covariance matrix distributions have support on symmetric,
 positive-definite $K \times K$ matrices.
 
 \subsection{Wishart Distribution}

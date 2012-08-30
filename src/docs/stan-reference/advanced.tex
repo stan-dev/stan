@@ -1,7 +1,7 @@
 \part{Additional Topics}
 
 
-\chapter{Bayesian Data Anaysis}\label{bayesian.chapter}
+\chapter{Bayesian Data Analysis}\label{bayesian.chapter}
 
 \noindent
 \cite{GelmanCarlinSternRubin:2003} provide the following
@@ -17,7 +17,7 @@ They go on to describe how Bayesian statistics differs from
 frequentist approaches.
 %
 \begin{quote}
-  The essential characteristic of Bayesian methods is their explict
+  The essential characteristic of Bayesian methods is their explicit
   use of probability for quantifying uncertainty in inferences based
   on statistical analysis.
 \end{quote}
@@ -110,7 +110,7 @@ p(\theta|y;x)  & =  & \displaystyle \frac{p(\theta,y;x)}{p(y;x)}
 \end{array}
 \]
 %
-Bayes's rule ``inverts'' the probabilty of the posterior
+Bayes's rule ``inverts'' the probability of the posterior
 $p(\theta|y;x)$, expressing it solely in terms of the likelihood
 $p(y|\theta;x)$ and prior $p(\theta;x)$.  The last step is important
 for \Stan, which only requires probability functions to be
@@ -137,11 +137,11 @@ Like the posterior itself, predictive inference is characterized
 probabilistically.  Rather than using a point estimate of the
 parameters $\theta$, predictions are made based on averaging the
 predictions over a range of $\theta$ weighted by the posterior
-probabiltiy $p(\theta|y;x)$ of $\theta$ given data $y$ (and constants
+probability $p(\theta|y;x)$ of $\theta$ given data $y$ (and constants
 $x$).
 
 The posterior may also be used to estimate event probabilities.  For
-instance, the probabilty that a parameter $\theta_k$ is greater than
+instance, the probability that a parameter $\theta_k$ is greater than
 zero is characterized probabilistically by
 %
 \[
@@ -169,7 +169,7 @@ p(\tilde{y}|\theta) p(\theta|y;x) \, d\tilde{y} \, d\theta.
 
 \noindent
 Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
-generate samples frm the posterior distribution for inference.  
+generate samples from the posterior distribution for inference.  
 
 
 \section{Monte Carlo Sampling}
@@ -730,7 +730,7 @@ Y = \log(X - a).
 
 \subsection{Lower Bound Inverse Transform}
 %
-The inverse of the the lower-bound transform maps an unbounded
+The inverse of the lower-bound transform maps an unbounded
 variable $Y$ to a variable $X$ that is bounded below by $a$ by
 %
 \[
@@ -1053,7 +1053,7 @@ x_k =
 %
 The summation term represents the length of the original stick left at
 stage $k$.  This is multiplied by the break proportion $z_k$ to yield
-$x_k$.  Only $K-1$ unconstrained parameters are required, with the
+$x_k$.  Only $K-1$ unconstrained parameters are required, with
 the last dimension's value $x_K$ set to the length of the remaining
 piece of the original stick,
 \[
@@ -1096,10 +1096,10 @@ and
 .
 \]
 %
-This definition is recursive, definining $x_k$ in terms of
+This definition is recursive, defining $x_k$ in terms of
 $x_{1},\ldots,x_{k-1}$.
 
-Because the Jacobian $J$ of $f^{-1}$ is lower triangular and positve, its
+Because the Jacobian $J$ of $f^{-1}$ is lower triangular and positive, its
 absolute determinant reduces to
 %
 \[
@@ -1312,7 +1312,7 @@ w = \mbox{chol}(x).
 
 The next step from the Cholesky factor $w$ back to the array $z$ of
 {\CPC}s is simplified by the ordering of the elements in the
-definition of of $w$, which when inverted yields
+definition of $w$, which when inverted yields
 %
 \[
 z_{i,j} =
@@ -1543,7 +1543,7 @@ p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
 % \end{quote}
 
 % The gradient implementation class a pure virtual method which
-% implements the log probabilty function in a way that allows it to be
+% implements the log probability function in a way that allows it to be
 % automatically differentiated.  This method is just the log probability
 % function defined in terms of \Stan's algorithmic gradient variables,
 % \code{stan::agrad::var}.  
