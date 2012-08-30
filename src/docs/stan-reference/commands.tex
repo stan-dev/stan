@@ -130,7 +130,7 @@ such as optimization.
 
 These options should be placed right after the call to \code{make}
 itself.  For instance, to specify the \code{clang++} compiler at
-optimization level 3, use
+optimization level 0, use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -150,11 +150,11 @@ system execution path.
 \subsubsection{Optimization Option}
 
 The option \code{O=0} (that's letter 'O', equal sign, digit '0'),
-specifies optimization level 0 (no optimization), whereaas \code{O=3}
+specifies optimization level 0 (no optimization), whereas \code{O=3}
 specifies optimization level 3 (effectively full optimization), with
 levels 1 and 2 in between.
 
-With higher optimization levels, generated code tends to be bigger
+With higher optimization levels, generated executable tends to be bigger
 (in terms of bytes in memory) and faster.  For best results on
 computationally-intensive models, use optimization level 3 for the
 Stan library and for compiling models.
@@ -251,7 +251,9 @@ the failure occurred and reason for the failure.
 The following example illustrates a fully qualified call to \stanc
 to build the simple Bernoulli model; just replace \code{<stan-home>}
 with the top-level directory containing Stan (i.e., the directory
-containing the file named \code{makefile}).
+containing the file named \code{makefile}). 
+
+For Linux and Mac:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -262,6 +264,19 @@ containing the file named \code{makefile}).
 \end{quote}
 %
 The backslash (\Verb|\|) indicates a continuation of the same line.
+
+For Windows:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd <stan-home>
+> bin\stanc --name=bernoulli --o=bernoulli.cpp
+  src/models/basic_estimators/bernoulli.stan 
+\end{Verbatim}
+\end{quote}
+%
+The second command must be typed on a single line in Windows. 
+
 This call specifies the name of the model, here {\tt bernoulli}.
 This will determine the name of the class implementing the model in
 the \Cpp code.  Because this name is the name of a \Cpp class, it must
@@ -272,7 +287,7 @@ any \Cpp reserved keyword.
 
 The \Cpp code implementing the class is written to the file
 \code{bernoulli.cpp} in the current directory.  The final argument,
-\code{binormal.stan}, is the file from which to read the \Stan
+\code{bernoulli.stan}, is the file from which to read the \Stan
 program.
 
 \subsection{Command-Line Options for {\tt\bfseries stanc}}
@@ -415,11 +430,11 @@ Suppose following the instructions in the last chapter
 program that resides in the source file \code{<stan-home>/my\_model.cpp}.
 
 The following commands will produce an executable in the file
-\code{my\_model} in the current working directory (\code{\$stan}).
+\code{my\_model} in the current working directory (\code{<stan-home>}).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd $stan
+> cd <stan-home>
 > g++ -O3 -Lbin -Isrc -Ilib/boost_1.51.0 \
   -Ilib/eigen_3.1.0 my_model.cpp -o my_model -lstan
 \end{Verbatim}
@@ -563,23 +578,9 @@ some typical use-case examples.
 {Period between saved samples after warm up}
 {default = \code{max(1, (iter - warmup) / 1000)}}
 %
-\cmdflag{save\_warmup}{Save the warmup samples as well
-as the post-warmup samples}{default is to not save the
-warmup samples}
-%
 \cmdarg{refresh}{+int}
 {Period between samples updating progress report print}
 {default = \code{max(1, iter / 200)}}
-%
-\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; see
-  related parameter \code{epsilon}} {\NUTS default is to estimate 
-  step sizes that vary by parameter}%
-\footnote{\Stan's implementation of \NUTS follows the approach in
-  \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
-  different step sizes for each parameter.  Varying step sizes are
-  acceptable for \HMC even though they vary the time scale of each
-  parameter and thus depart from the Hamiltonian interpretation of the
-  trajectory.}
 %
 \cmdarg{leapfrog\_steps}{int}
 {Number of leapfrog steps; \code{-1} for no-U-turn adaptation}
@@ -599,6 +600,16 @@ warmup samples}
 \code{(epsilon - epsilon\_pm,\ epsilon + epsilon\_pm)}}
 {default = \code{0.0}}
 %
+\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; see
+  related parameter \code{epsilon}} {\NUTS default is to estimate 
+  step sizes that vary by parameter}%
+\footnote{\Stan's implementation of \NUTS follows the approach in
+  \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
+  different step sizes for each parameter.  Varying step sizes are
+  acceptable for \HMC even though they vary the time scale of each
+  parameter and thus depart from the Hamiltonian interpretation of the
+  trajectory.}
+%
 \cmdarg{delta}{+float}
 {Initial step size for step-size adaptation}
 {default = \code{0.5}}
@@ -608,7 +619,8 @@ warmup samples}
 {default = \code{0.05}}
 %
 \cmdflag{save\_warmup}
-{Save the warmup samples}
+{Save the warmup samples as well as the post-warmup samples}
+{default is to not save the warmup samples}
 %
 \cmdflag{test\_grad}
 {Test gradient calculations using finite differences; if this option
