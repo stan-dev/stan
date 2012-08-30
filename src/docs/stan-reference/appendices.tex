@@ -694,10 +694,10 @@ language section of this manual.
 \item In \BUGS you need to define all variables.  In Stan, if you
   declare but don't define a parameter it implicitly has a flat prior
   (on the scale in which the parameter is defined).  For example, if
-  you a parameters \code{p} declared as 
+  you have a parameter \code{p} declared as 
 \begin{quote}
 \begin{Verbatim}
-real<lower=0, upper=1> p;
+real<lower=0,upper=1> p;
 \end{Verbatim}
 \end{quote}
 %
@@ -737,7 +737,7 @@ on $(-\infty,\infty)$ to \code{theta}.
 \begin{quote}
 \begin{Verbatim}
 parameters {
-    real theta;
+  real theta;
 } 
 model { }
 \end{Verbatim}
@@ -748,19 +748,17 @@ model { }
 %   factors in the posterior density.  So you can define beta(0,0), it's
 %   simply a mathematical function.  Stan doesn't "care" if it has a
 %   finite integral.
-\item Although parameters in Stan models may have improper priors, it
-  is critical for the Hamiltonian simulations and NUTS sampler that
-  the models have proper posteriors.  Improper posteriors can cause
-  Stan to hang during warmup if adaptation is used (it is on by
-  default) or during sampling if NUTS is used without a hard upper
-  limit on Hamiltonian simulation steps.  At best, the sampler will
-  drift and the chains will not mix well.  
+\item Although parameters in Stan models may have improper priors, we
+  do not want improper \emph{posterior} distributions, as we are trying to
+  use these distributions for Bayesian inference.  There is no general
+  way to check if a posterior distribution is improper.  But if all
+  the priors are proper, the posterior will be proper also.
 \item
   As noted earlier, each statement in a Stan model is directly translated into the \Cpp code for computing the log posterior.  Thus, for example, the following pair of statements is legal in a Stan model:
 \begin{quote}
 \begin{Verbatim}
-  y ~ normal(0,1);
-  y ~ normal(2,3);
+y ~ normal(0,1);
+y ~ normal(2,3);
 \end{Verbatim}
 \end{quote}
 %
@@ -773,8 +771,8 @@ density function.
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 \begin{quote}
 \begin{Verbatim}
-  x ~ normal(0.8*y, sigma);
-  y ~ normal(0.8*x, sigma);
+x ~ normal(0.8*y, sigma);
+y ~ normal(0.8*x, sigma);
 \end{Verbatim}
 \end{quote}
 %
