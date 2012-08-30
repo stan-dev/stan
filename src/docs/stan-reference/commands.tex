@@ -292,8 +292,15 @@ program.
 
 \subsection{Command-Line Options for {\tt\bfseries stanc}}
 
-The following options are available for \code{stanc}.
-
+The model translation program \code{stanc} is called as follows.
+%
+\begin{quote}
+\code{> stanc [options] {\slshape model\_file}}
+\end{quote}
+%
+The argument \code{\slshape model\_file} is a path to a Stan model file ending
+in suffix \code{.stan}.  The options are as follows.
+%
 \begin{description}
 %
 \item[\tt {-}-help] 
@@ -311,7 +318,7 @@ and asking for help on the mailing lists.
 Specify the name of the class used for the implementation of the
 \Stan model in the generated \Cpp code.  
 \\[2pt]
-Default: {\tt {\slshape class\_name = model\_filename\_model}}
+Default: {\tt {\slshape class\_name = model\_file}\_model}
 %
 \item[\tt {-}-o={\slshape cpp\_file\_name}]
 \mbox{ } \\ 
