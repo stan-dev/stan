@@ -1033,15 +1033,15 @@ step $k$, is defined elementwise for $1 \leq k < K$ by
 %
 \[
 z_k = \mbox{logit}^{-1} \left( y_k 
-                             - \mbox{logit} \left( \frac{1}{K - k + 1}
+                             - \log \left( \frac{1}{K - k}
                                             \right)
                        \right).
 \]
 %
 The logit term in the above definition adjusts the transform so that a
-zero vector $y$ is mapped to the simplex $(1/K,\ldots,1/K)$.  For instance, if
+zero vector $y$ is mapped to the simplex $x = (1/K,\ldots,1/K)$.  For instance, if
 $y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
-if $z_{K-1} = 0$, then $z_{K-1} = 1/2$.  
+if $y_{K-1} = 0$, then $z_{K-1} = 1/2$.  
 
 The break proportions $z$ are applied to determine the stick sizes and
 resulting value of $x_k$ for $1 \leq k < K$ by
@@ -1076,10 +1076,10 @@ J_{k,k}
 %
 where
 \[
-\frac{\partial z_k}{\partial y_K} 
-= \frac{\partial}{\partial z_k} 
+\frac{\partial z_k}{\partial y_k} 
+= \frac{\partial}{\partial y_k} 
    \mbox{logit}^{-1} \left(
-                       y_k - \mbox{logit} \left( \frac{1}{K-k+1}
+                       y_k - \log \left( \frac{1}{K-k}
                                           \right)
                     \right)
 = z_k (1 - z_k),
@@ -1150,8 +1150,8 @@ $z$, $y$ is defined elementwise by
 \[
 y_k 
 = \mbox{logit}(z_k)
-+ \mbox{logit}\left(
-   \frac{1}{K-k+1}
++ \mbox{log}\left(
+   \frac{1}{K-k}
    \right)
 .
 \]
