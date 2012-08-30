@@ -77,8 +77,10 @@ object of type \code{list}}
       Most of the printout are the results from method \code{summary}. Other 
       parameters that can be specified are \code{pars}, \code{probs}, and
       \code{digits_summary}. \code{pars} specifies the parameters of interest;
-      \code{probs} specifies the quantities of interest; \code{digits_summary}
-      specifies the number of significant digits for printing out the summary. 
+      \code{probs} specifies the quantiles of interest; the default
+      are 2.5\%, 25\%, 50\%, 75\%, and 97.5\%. 
+      \code{digits_summary} specifies the number of significant digits for
+      printing out the summary. 
     } 
     \item{\code{summary}}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the sample: the quantiles 
