@@ -1,7 +1,7 @@
-\name{stanc_version}
-\alias{stanc_version}
+\name{stan_version}
+\alias{stan_version}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Obtain the version of stanc in Stan} 
+\title{Obtain the version of Stan} 
 \description{
   The stan version is in form of \code{major.minor.patch};  the
   first version is 1.0.0, indicating major version 1, minor version
@@ -9,7 +9,7 @@
   and backward compatibility will only be affected by major versions.
 }
 \usage{
-  stanc_version()
+  stan_version()
 }
 \value{
   A character string giving the version of Stan used in this version of RStan. 
@@ -23,6 +23,6 @@
   \code{\link{stan}} and \code{\link{stan_model}} 
 }
 \examples{
-  stanc_version() 
+  stan_version() 
 }
 \keyword{rstan} 

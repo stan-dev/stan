@@ -7,7 +7,7 @@
 
 \title{\code{extract}: extract sample from fitted Stan model}
 \description{
-  Extract samples drawn from a fitted model represented by an 
+  Extract sample drawn from a fitted model represented by an 
   instance of class \code{stanfit}.
 }
 
@@ -18,8 +18,8 @@
 
 \section{Methods}{
   \describe{
-    \item{extract}{\code{signature(object = stanfit}}{
-       Extract samples for a fitted model defined by class \code{stanfit}.  
+    \item{extract}{\code{signature(object = "stanfit")}}{ Extract sample for a
+      fitted model defined by class \code{stanfit}.  
     }
   }
 }
@@ -29,10 +29,9 @@
   \item{pars}{An object of class \code{"character"} providing the parameter
     names (or other quantity names) of interest. If not specified,
     all parameters and other quantities are used.} 
-  \item{permuted}{\code{TRUE} of \code{FALSE}. If \code{TRUE}, all kept 
-    samples (that is, warmup sample
-    are discarded) in each chain are permuted are merged. If \code{FALSE}, 
-    the original order are kept.}
+  \item{permuted}{\code{TRUE} of \code{FALSE}. If \code{TRUE}, only draws
+    after the \emph{warmup} period in each chain are permuted and merged. 
+    If \code{FALSE}, the original order are kept.}
   \item{inc_warmup}{\code{TRUE} of \code{FALSE}. The argument matters
     only if \code{permuted} is \code{FALSE}. If \code{TRUE}, warmup
     sample are included; otherwise excluded.}

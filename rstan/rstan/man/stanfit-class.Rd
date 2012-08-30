@@ -8,7 +8,7 @@
 %% \alias{extract,stanfit-method}
 \alias{print,stanfit-method}
 \alias{show,stanfit-method}
-\alias{plot,stanfit-method}
+% \alias{plot,stanfit-method}
 \alias{get_stancode}
 \alias{get_stancode,stanfit-method}
 \alias{get_stanmodel}
@@ -57,7 +57,7 @@ object of type \code{list}}
       randomly for all chains, object of type \code{list} 
       containing named lists corresponding to initial values in the chains.}
     \item{\code{stan_args}:}{The arguments used for sampling all chains,
-       object of type X\code{list}}
+       object of type \code{list}}
     \item{\code{.MISC}:}{Miscellaneous helper information used for the fitted model, 
       object of type \code{environment}}
   }
@@ -67,9 +67,10 @@ object of type \code{list}}
   \describe{
     \item{\code{show}}{\code{signature(object = "stanfit")}: print the default summary
       for the model.}
-    \item{\code{plot}}{\code{signature(x = 'stanfit')}: plot an overview of summaries 
-      for all parameters.}
-    \item{\code{print}}{\code{signature(x = 'stanfit')}: print the summary of the 
+    \item{\code{plot}}{\code{signature(x = "stanfit", y = "missing")}: plot an overview of summaries 
+      for all parameters (see \code{\link{plot}}).
+    }
+    \item{\code{print}}{\code{signature(x = "stanfit")}: print the summary of the 
       model with inference about mean (\code{mean}), standard error of the 
       mean (\code{se_mean}), standard deviation (\code{sd}), and quantities
       about quantities of interest based on all chains merged. 
@@ -78,11 +79,13 @@ object of type \code{list}}
       distributions of quantities using the sample: the quantiles 
       (for example, 2.5\%, 50\%, 97.5\%, which can be specified), 
       the mean, the standard deviation (sd), the effective sample size (n_eff),
-      and the split Rhat (i.e., potential scale reduction derived from all chains after splitting each chain in half and treating the halves as chains).
+      and the split Rhat (i.e., potential scale reduction derived from all
+      chains after splitting each chain in half and treating the halves as chains).
       Returned is a named list with elements such as \code{summary} and \code{c_summary}, 
       summaries for all chains merged without warmup and individual chains.
       For the summary of all chains merged, we also have \code{se_mean},
-      the standard error of the mean. 
+      the standard error of the mean. In addition to parameters, the log-posterior
+      (\code{lp__}) is also a quantity of interest in the summary.  
     }
     \item{\code{extract}}{\code{signature(object = "stanfit")}: 
       get the sample for all chains for all (or specified ) parameters. 
@@ -98,24 +101,25 @@ object of type \code{list}}
       get the initial values for parameters used in sampling all chains.} 
     \item{\code{get_seed}}{\code{signature(object = "stanfit")}: 
       get the seed that used for sampling.} 
-    \item{\code{get_logposterior}}{\code{signature(object = 'stanfit', inc_warmup = 'logical')}:
-      get the log-posterior (up to a additive constant, which is up to
+    \item{\code{get_logposterior}}{\code{signature(object = "stanfit")}: 
+      get the log-posterior (up to an additive constant, which is up to
       a multiplicative constant on the linear scale) for all chains. 
       Each element of the returned \code{list} is the log-posterior 
-      for a chain. \code{inc_warmup} indicates whether to include
+      for a chain. Optional parameter \code{inc_warmup} indicates whether to include
       the warmup period.} 
-    \item{\code{get_adaptation_info}}{\code{signature(object = 'stanfit')}:
+    \item{\code{get_adaptation_info}}{\code{signature(object = "stanfit")}:
       obtain the adaptation information for 
       sampler, which now only NUTS2 has. The results are returned 
       as a list, each element of which is a character string
       for a chain.} 
-    \item{\code{get_sampler_params}}{\code{signature(obtain = 'stanfit', inc_warmup = 'logical')}:
+    \item{\code{get_sampler_params}}{\code{signature(obtain = "stanfit")}: 
       obtain the parameters used for the sampler such as 
       \code{stepsize} and \code{treedepth}. The results are returned
       as a list, each element of which is an array for a chain.
       The array has number of columns corresponding to the number
       of parameters used in the sampler and its column names 
-      provide the parameter names.}
+      provide the parameter names. Optional parameter \code{inc_warmup}
+      indicates whether to include the warmup period.} 
   }
 }
 
@@ -127,7 +131,17 @@ object of type \code{list}}
 \seealso{
   \code{\link{stan}} and \code{\linkS4class{stanmodel}} 
 }
-\examples{
+\examples{\dontrun{
 showClass("stanfit")
-}
+fit <- stan(model_code = 'parameters {real y[2];} model {y ~ normal(0,1);}')
+fit2 <- stan(fit = fit)
+print(fit)
+plot(fit)
+traceplot(fit)
+ainfo <- get_adaptation_info(fit)
+cat(ainfo[[1]])
+seed <- get_seed(fit)
+sp <- get_sampler_params(fit)
+head(sp[[1]])
+}}
 \keyword{classes}

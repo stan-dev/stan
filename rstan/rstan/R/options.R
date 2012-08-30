@@ -1,21 +1,3 @@
-# Part of the rstan package for an R interface to Stan 
-# Copyright (C) 2012 Columbia University
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-
 ## Use an environment to keep some options, especially, 
 ## for plotting. 
 
@@ -63,9 +45,11 @@ init_rstan_opt_env <- function(e) {
   assign("rstan_warmup_bg_col", rstan:::rstancolgrey[3], e)
 
   # boost lib path 
-  rstan.inc.path  <- system.file('include', package = 'rstan')
-  boost_lib.path <- file.path(rstan.inc.path, '/stanlib/boost_1.51.0') 
-  assign("boost_lib", boost_lib.path, e) 
+  rstan_inc_path  <- system.file('include', package = 'rstan')
+  boost_lib_path <- file.path(rstan_inc_path, '/stanlib/boost_1.51.0') 
+  eigen_lib_path <- system.file('include', package = 'RcppEigen')
+  assign("eigen_lib", eigen_lib_path, e) 
+  assign("boost_lib", boost_lib_path, e) 
 
   # cat("init_rstan_opt_env called.\n")
   invisible(e)
@@ -103,7 +87,14 @@ rstan_options <- function(...) {
   opt.names <- c(a.names[!empty], unlist(a[empty]))
   r <- mget(opt.names, envir = e, ifnotfound = NA)
 
-  lapply(a.names[!empty], FUN = function(n) assign(n, a[[n]], e)) 
+  lapply(a.names[!empty], 
+         FUN = function(n) {
+           if (n == 'plot_rhat_breaks') {
+             assign(n, sort(a[[n]]), e)
+           } else {
+             assign(n, a[[n]], e)
+           }
+         }) 
 
   if (length(r) == 1) return(r[[1]])
   invisible(r)

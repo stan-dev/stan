@@ -23,7 +23,7 @@
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
       Call sampler (NUTS or HMC, depending on parameters) 
-      to draw samples from the model defined by S4 class \code{stanmodel} 
+      to draw sample from the model defined by S4 class \code{stanmodel} 
       given the data, initial values, etc. 
     }
   }
@@ -32,8 +32,10 @@
 \arguments{
   \item{object}{An object of class \code{\linkS4class{stanmodel}}.}
 
-  \item{data}{An object of class \code{list} or an \code{environment}
-    providing the data for the model.}    
+  \item{data}{An object of class \code{list}, \code{environment}
+    providing the data for the model, or a vector character strings 
+    for all the names of objects used as data in the working space. 
+    See the notes in \code{\link{stan}}.} 
 
   \item{pars}{A vector of character strings specifying parameters of interest; defaults
     to \code{NA} indicating all parameters in the model. Only samples for parameters given 
@@ -44,11 +46,10 @@
   \item{iter}{A positive integer specifying how many iterations for all the
     chains (including warmup). The default is 2000.}
 
-  \item{warmup}{A positive integer specifying the number of iterations to be
-    discarded.  If step-size adaptation is on (which it is by default), this 
+  \item{warmup}{A positive integer specifying the number of warmup (aks burnin)
+    iterations.  If step-size adaptation is on (which it is by default), this 
     also controls the number of iterations for which adaptation is run (and
-    hence the samples should not be used for inference).  Also known as burnin.
-    The default is \code{iter / 2}.}
+    hence the samples should not be used for inference). The default is \code{iter/2}.}
 
   \item{thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
 
@@ -58,17 +59,20 @@
     derived from that of the first chain to avoid dependent samples.}
 
   \item{init}{One of digit \code{0}, string \code{"0"} or \code{"random"}, 
-    or a list of initial parameter values with which to initialize.
-    indicating how the initial values of parameters are specified. 
-    \code{"0"}: 
-    initialize all to be zero on the unconstrained support; 
+    a function that returns a list, or a list of initial parameter values with
+    which to indicate how the initial values of parameters are specified. 
+    \code{"0"}: initialize all to be zero on the unconstrained support; 
     \code{"random"}: randomly generated;
-    \code{list}: a list of lists equal in length to the number of chains (\code{n\_chains}), where each list in the list of lists specifies the initial
-    values of parameters by name for the corresponding chain.}
+    \code{list}: a list of lists equal in length to the number of chains 
+     (\code{n\_chains}), where each list in the list of lists specifies the initial
+      values of parameters by name for the corresponding chain.
+    \code{function}: a function that returns a list for specifying 
+      the initial values of parameters for a chain. The function
+      can take an optional parameter \code{chain_id}. }
 
   \item{check_data}{Logical: if \code{TRUE}, the data would be preprocessed; 
     otherwise not. If the data is not checked and preprocessed, it is safe 
-    to leave it to be the default \code{TRUE}.}
+    to leave it to be the default \code{TRUE}. See the notes in \code{\link{stan}}.}
 
   \item{sample_file}{A character string of file name for specifying where to 
     write samples for \emph{all} parameters and other saved quantities. 
@@ -100,6 +104,7 @@
     In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling 
     (i.e. show the progress every \code{refresh} iterations).
+    The progress indicator is turned off if \code{refresh < 0}.
   }
 }
 \value{

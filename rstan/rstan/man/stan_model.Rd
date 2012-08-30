@@ -14,7 +14,8 @@
 
 \usage{
   stan_model(file, model_name = "anon_model", 
-             model_code = "", stanc_ret = NULL, boost_lib = NULL, 
+             model_code = "", stanc_ret = NULL, 
+             boost_lib = NULL, eigen_lib = NULL, 
              save_dso = TRUE, verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -30,13 +31,15 @@
 
   \item{model_code}{A character string containing the model specification;
     an alterantive is to specify the model with parameters \code{file}
-    or \code{stanc_ret}.}
+    or \code{stanc_ret}. 
   }
   \item{stanc_ret}{A list returned list from a previous call to 
     function \code{stanc}, which may be used to specify the model  
     used in the call to \code{stanc}.}
   \item{boost_lib}{The path to a version of the Boost C++ library to
     use instead of the one supplied with RStan.}
+  \item{eigen_lib}{The path to a version of the Eigen C++ library to
+    use instead of the one in package RcppEigen.} 
   \item{save_dso}{Logical with the default of \code{TRUE}: indication of whether the 
     dynamic shared object (DSO) compiled from the C++ code for the model 
     will be saved or not. If \code{TRUE}, we can draw sample from
@@ -44,8 +47,7 @@
     the C++ code again).}
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     to report intermediate output to the console, 
-    which might be helpful for debugging.
-  }
+    which might be helpful for debugging.}
 }
 
 \details{

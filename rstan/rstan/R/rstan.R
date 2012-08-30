@@ -1,28 +1,10 @@
-# Part of the rstan package for an R interface to Stan 
-# Copyright (C) 2012 Columbia University
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-
-## 
 ## 
 stan_model <- function(file, 
                        model_name = "anon_model", 
                        model_code = '', 
                        stanc_ret = NULL, 
                        boost_lib = NULL, 
+                       eigen_lib = NULL, 
                        save_dso = TRUE,
                        verbose = FALSE) { 
 
@@ -37,9 +19,9 @@ stan_model <- function(file,
   #     a character to specify the model.   
 
   if (is.null(stanc_ret)) {
-    model_code <- get_model_strcode(file, model_code)  
-    stanc_ret <- stanc(model_code, model_name) 
-  } 
+    stanc_ret <- stanc(file = file, model_code = model_code, 
+                       model_name = model_name, verbose)
+  }
   if (!is.list(stanc_ret)) {
     stop("stanc_ret needs to be the returned object from stanc.")
   } 
@@ -47,7 +29,7 @@ stan_model <- function(file,
   if (any(is.na(m))) {
     stop("stanc_ret does not have element `cppcode', `model_name', and `status'") 
   } else {
-    if (stanc_ret$status != 0) 
+    if (!stanc_ret$status)
       stop("stanc_ret is not a successfully returned list from stanc")
   } 
 
@@ -64,6 +46,12 @@ stan_model <- function(file,
     old.boost_lib <- rstan_options(boost_lib = boost_lib) 
     on.exit(rstan_options(boost_lib = old.boost_lib)) 
   } 
+
+  if (!is.null(eigen_lib)) { 
+    old.eigen_lib <- rstan_options(eigen_lib = eigen_lib) 
+    on.exit(rstan_options(eigen_lib = old.eigen_lib)) 
+  }
+  
   dso <- cxxfunctionplus(signature(), body = '  return R_NilValue;', 
                          includes = inc, plugin = "rstan", save_dso = save_dso,
                          verbose = verbose) 
@@ -117,7 +105,9 @@ stan <- function(file, model_name = "anon_model",
                  seed = sample.int(.Machine$integer.max, 1), 
                  sample_file, # the file to which the samples are written
                  save_dso = TRUE,
-                 verbose = FALSE, ..., boost_lib = NULL) {
+                 verbose = FALSE, ..., 
+                 boost_lib = NULL, 
+                 eigen_lib = NULL) {
   # Return a fitted model (stanfit object)  from a stan model, data, etc.  
   # A wrap of method stan_model and sampling of class stanmodel. 
   # 
@@ -126,16 +116,17 @@ stan <- function(file, model_name = "anon_model",
   # Returns: 
   #   A S4 class stanfit object  
 
-  if (is(fit, "stanfit")) sm <- get_stanmodel(fit)
-  else sm <- stan_model(file, model_name = model_name, model_code = model_code,
-                        boost_lib = boost_lib, save_dso = save_dso, verbose = verbose)
-
-  if (missing(sample_file))  sample_file <- NA 
-
   # check data before compiling model, which typically takes more time 
   if (is.character(data)) data <- mklist(data) 
   if (!missing(data) && length(data) > 0) data <- data_preprocess(data)
   else data <- list()  
+
+  if (is(fit, "stanfit")) sm <- get_stanmodel(fit)
+  else sm <- stan_model(file, model_name = model_name, model_code = model_code,
+                        boost_lib = boost_lib, eigen_lib = eigen_lib, 
+                        save_dso = save_dso, verbose = verbose)
+
+  if (missing(sample_file))  sample_file <- NA 
 
   sampling(sm, data, pars, n_chains, iter, warmup, thin, seed, init, 
            sample_file = sample_file, verbose = verbose, check_data = FALSE, ...) 

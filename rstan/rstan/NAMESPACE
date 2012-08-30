@@ -7,7 +7,7 @@ importFrom("Matrix", summary, print)
 export(
   stan_model,
   stanc, 
-  stanc_version, 
+  stan_version, 
   stan,
   stan_rdump,
   read_rdump,

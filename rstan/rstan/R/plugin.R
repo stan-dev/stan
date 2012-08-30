@@ -1,20 +1,3 @@
-# Part of the rstan package for an R interface to Stan 
-# Copyright (C) 2012 Columbia University
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
 ##
 ## Define rstan plugin for inline package.
 ## (original name: inline.R)
@@ -33,7 +16,7 @@ rstan_libs_path_fun <- function() {
 
 # Using RcppEigen
 eigen_path_fun <- function() {
-  system.file('include', package = 'RcppEigen')
+  rstan_options("eigen_lib")
 } 
 
 # If included in RStan
@@ -108,7 +91,7 @@ rstanplugin <- function() {
   list(includes = '',
        body = function(x) x,
        LinkingTo = c("Rcpp"),
-       ## FIXME see if we can use LinkingTo for RcppEighen's header files
+       ## FIXME see if we can use LinkingTo for RcppEigen's header files
        env = list(PKG_LIBS = paste(rcpp_pkg_libs, RSTAN_LIBS_fun()),
                   PKG_CPPFLAGS = paste(Rcpp_plugin$env$PKG_CPPFLAGS, PKG_CPPFLAGS_env_fun())))
 }

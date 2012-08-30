@@ -124,7 +124,7 @@ test_pars_total_indexes <- function() {
   dims <- list(alpha = c(2, 3)) 
   fnames <- rstan:::flatnames(names, dims)  
   tidx <- rstan:::pars_total_indexes(names, dims, fnames, "alpha") 
-  tidx.attr1 <- attr(tidx[[1]], "row.major.idx") 
+  tidx.attr1 <- attr(tidx[[1]], "row_major_idx") 
   attributes(tidx[[1]]) <- NULL 
   checkEquals(unname(tidx[[1]]), 1:6) 
   checkEquals(unname(tidx.attr1), c(1, 3, 5, 2, 4, 6)) 
@@ -132,7 +132,7 @@ test_pars_total_indexes <- function() {
   dims2 <- list(alpha = c(2, 3), beta = 8) 
   fnames2 <- rstan:::flatnames(names2, dims2)  
   tidx2 <- rstan:::pars_total_indexes(names2, dims2, fnames2, "beta") 
-  tidx2.attr1 <- attr(tidx2[[1]], "row.major.idx")
+  tidx2.attr1 <- attr(tidx2[[1]], "row_major_idx")
   attributes(tidx2[[1]]) <- NULL
   checkEquals(unname(tidx2[[1]]), 6 + 1:8)  
   checkEquals(unname(tidx2.attr1), 6 + 1:8)
@@ -148,7 +148,7 @@ test_mklist <- function() {
   checkTrue(identical(a, b)) 
 } 
 
-test.makeconf_path <- function() {
+test_makeconf_path <- function() {
   p <- makeconf_path()  
   checkTrue(file.exists(makeconf_path()))
 } 

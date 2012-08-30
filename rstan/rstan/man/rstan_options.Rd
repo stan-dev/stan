@@ -1,13 +1,9 @@
 \name{rstan_options}
 \alias{rstan_options}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-Set and read options used in RStan
-%%  ~~function to do ... ~~
-}
+\title{Set and read options used in RStan}
 \description{
-Set and read options used in RStan. Some arguments are options that 
-may be controlled by the user.
+Set and read options used in RStan. Some settings as options can be 
+controlled by the user.
 }
 \usage{
 rstan_options(...)
@@ -24,28 +20,34 @@ rstan_options(...)
   The available options are:
   \enumerate{
     \item \code{plot_rhat_breaks}: The cut off points for Rhat for which we would indicate
-      using a different color. This is a numeric vector, defaults to \code{c(1.1, 1.2, 1.5, 2)}. 
+      using a different color. This is a numeric vector, defaults to \code{c(1.1, 1.2, 1.5, 2)}
+      The value for this option will be sorted in ascending order. 
+      So \code{plot_rhat_breaks = c(1.2, 1.5)} is equivalent to 
+      \code{plot_rhat_breaks = c(1.5, 1.2)}. 
     \item \code{plot_rhat_cols}: A vector of the same length as   
           \code{plot_rhat_breaks} that indicates the colors for the
           breaks.
     \item \code{plot_rhat_na_col}: The color for Rhat when it is \code{NA}. 
     \item \code{plot_rhat_large_col}: The color for Rhat when it is larger than 
-      the largest value of \code{plot_rhat_breaks}. 
-    \item \code{rstan_alert_col}: The color in \code{plot(signature = 'stanfit')} 
-      to show that the vector/array parameters are truncated. 
-    \item \code{rstan_chains_cols}: The colors used in  
-           \code{plot(signature = 'stanfit')}
-          and \cr \code{traceplot(signature = 'stanfit')} 
+          the largest value of \code{plot_rhat_breaks}. 
+    \item \code{rstan_alert_col}: The color used in method \code{plot}
+          of S4 class \code{\linkS4class{stanfit}}  to show that the vector/array
+          parameters are truncated. 
+    \item \code{rstan_chains_cols}: The colors used in methods \code{plot}
+          and \code{traceplot} of S4 class \code{\linkS4class{stanfit}}  
           for coloring different chains. 
     \item \code{rstawarmup_bg_col}: The background color for  
-           the warmup area in the traceplots. 
+          the warmup area in the traceplots. 
     \item \code{boost_lib}: The path for the Boost C++ library used
+          to compile Stan models.  This option is valid 
+          for the whole \R session if not changed again. 
+    \item \code{eigen_lib}: The path for the Eigen C++ library used
           to compile Stan models.  This option is valid 
          for the whole \R session if not changed again. 
   } 
 }
 \value{
-The values for existing options and \code{NA} for non-existent options.
+The values as a \code{list} for existing options and \code{NA} for non-existent options.
 When only one option is specified, its old value is returned. 
 }
 %\references{

@@ -29,13 +29,13 @@ setMethod("print", "stanfit", printstanfit)
 if (!isGeneric("plot")) 
   setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
 
-setMethod("plot", signature = "stanfit", 
-          function(x, y, pars = y, display_parallel = FALSE, ...) {
-            pars <- if (missing(pars) && missing(y)) x@sim$pars_oi else check_pars(x@sim, pars) 
+setMethod("plot", signature(x = "stanfit", y = "missing"), 
+          function(x, pars, display_parallel = FALSE) {
+            pars <- if (missing(pars)) x@sim$pars_oi else check_pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
             info <- list(model_name = x@model_name, model_date = x@.MISC$date) 
-            stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display_parallel, ...) 
+            stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display_parallel)
           }) 
 
 setGeneric(name = "get_stancode",

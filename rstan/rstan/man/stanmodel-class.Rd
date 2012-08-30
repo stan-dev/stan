@@ -28,7 +28,7 @@
       that includes a C++ object exposed by package \pkg{Rcpp};  
       primarily used for drawing samples for the model.}
     \item{\code{dso}:}{Object of S4 class \code{cxxdso}. The container for the dynamic 
-      shared objects compiled the C++ code of the model, returned from function
+      shared objects compiled from the C++ code of the model, returned from function
       \code{cxxfunction} in package \pkg{inline}.}
   }
 }
@@ -42,11 +42,14 @@
 }
 
 \note{
-  Objects of class \code{stanfit} can be saved for use across 
-  \R sessions only if \code{save_dso = TRUE} is used during calling
-  functions that create \code{stanfit} objects (e.g., \code{stan}). 
+  Objects of class \code{stanmodel} can be saved for use across 
+  \R sessions only if \code{save_dso = TRUE} is set during calling
+  functions that create \code{stanmodel} objects (e.g., \code{stan} 
+  and \code{stan_model}). 
 
-  Even if \code{save_dso = TRUE}, this may not work on all platforms.
+  Even if \code{save_dso = TRUE}, the model cannot be loaded on
+  a platform (operating system, etc.) that differs from
+  the one on which it was compiled.
 }
 
 \seealso{

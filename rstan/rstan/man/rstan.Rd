@@ -49,7 +49,7 @@
 
 \examples{\dontrun{ 
 library(rstan) 
-cat("Stan version: ", stanc_version(), sep = ''); 
+cat("Stan version: ", stan_version(), sep = ''); 
 
 stanmodelcode <- "
 data {

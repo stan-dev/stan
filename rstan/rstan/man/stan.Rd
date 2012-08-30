@@ -11,7 +11,9 @@ stan(file, model_name = "anon_model", model_code = "",
   iter = 2000L, warmup = floor(iter/2), thin = 1L, 
   init = "random", seed = sample.int(.Machine$integer.max, 1), 
   sample_file, save_dso = TRUE, 
-  verbose = FALSE, ..., boost_lib = NULL)
+  verbose = FALSE, ..., 
+  boost_lib = NULL,
+  eigen_lib = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,17 +32,19 @@ stan(file, model_name = "anon_model", model_code = "",
     is re-used, thus saving the time that would otherwise be spent 
     recompiling the C++ code for the model.}
   \item{data}{An object of class \code{list}, \code{environment}
-    providing the data for the model, or character strings 
-    for all the names of objects used as data in the working space.}    
+    providing the data for the model, or a vector of character strings 
+    for all the names of objects used as data in the working space. 
+    See the notes below.}    
   \item{pars}{A vector of character string specifying parameters of interest; defaults
     to \code{NA} indicating all parameters in the model. Only samples for parameters
     given in \code{pars} are stored in the fitted results.}
   \item{n_chains}{A positive integer specifying number of chains; defaults to 4.} 
   \item{iter}{A positive integer specifying how many iterations for all the
     chains (including warmup). The default is 2000.}
-  \item{warmup}{A positive integer specifying number of warmup (aka burnin) iterations.  This also specifies the number of iterations used for step-size
+  \item{warmup}{A positive integer specifying number of warmup (aka burnin)
+     iterations.  This also specifies the number of iterations used for step-size
      adaptation, so warmup samples should not be used for inference.
-     The default is \code{iter / 2}.  }
+     The default is \code{iter/2}.}
   \item{thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
     the maximum integer supported by \R on the machine. When multiple chains
@@ -48,13 +52,17 @@ stan(file, model_name = "anon_model", model_code = "",
     generated from the first chain's seed to prevent dependency among the
     random number streams for the chains.}
   \item{init}{One of digit \code{0}, string \code{"0"} or \code{"random"}, 
-    or a list of initial parameter values with which to initialize.
-    indicating how the initial values of parameters are specified. 
-    \code{"0"}: 
-    initialize all to be zero on the unconstrained support; 
+    a function that returns a list, or a list of initial parameter values with
+    which to indicate how the initial values of parameters are specified. 
+    \code{"0"}: initialize all to be zero on the unconstrained support; 
     \code{"random"}: randomly generated;
-    \code{list}: a list of lists equal in length to the number of chains (\code{n\_chains}), where each list in the list of lists specifies the initial
-    values of parameters by name for the corresponding chain.}
+    \code{list}: a list of lists equal in length to the number of chains 
+     (\code{n\_chains}), where each list in the list of lists specifies the initial
+      values of parameters by name for the corresponding chain.
+    \code{function}: a function that returns a list for specifying 
+      the initial values of parameters for a chain. The function
+      can take an optional parameter \code{chain_id}. 
+  }
   \item{sample_file}{A character string of file name for specifying where to 
     write samples for \emph{all} parameters and other saved quantities. 
     If not provided, files are not created. When the folder specified 
@@ -92,19 +100,23 @@ stan(file, model_name = "anon_model", model_code = "",
 
     In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling (i.e. 
-    show the progress every \code{refresh} iterations).} 
+    show the progress every \code{refresh} iterations). The 
+    progress indicator is turned off if \code{refresh < 0}.
+  } 
 
   \item{boost_lib}{The path for an alternative version of the Boost C++ 
      library to the one supplied with RStan.}
+
+  \item{eigen_lib}{The path for an alternative version of the Eigen C++ 
+     library to the one in \pkg{RcppEigen}.} 
 }
 \details{
   \code{stan} does all of the work of fitting a
   Stan model and returning the results as an instance of \code{stanfit}. 
-  First, it compiles the Stan model to C++ code.
-  Second, the 
+  First, it translates the Stan model to C++ code.  Second, the 
   C++ code is compiled into a binary shared object, which
   is loaded into the current \R session (an object
-  of S4 class \code{stanmodel} is created). Finally, samples
+  of S4 class \code{stanmodel} is created). Finally, sample
   are drawn and wrapped in an object of S4 class \code{stanfit}, 
   which provides functions such as \code{print}, \code{summary}, and \code{plot}
   to inspect and retrieve the results of the fitted model. 
@@ -119,16 +131,34 @@ stan(file, model_name = "anon_model", model_code = "",
 }
 
 \note{
-  Unlike BUGS, Stan does not allow missing data. Any \code{NA} values
-  in supplied data will cause the function to stop and report an error.
-
-  Stan allows only numeric data, that is, doubles, integers, and arrays
-  of these.  Data of other types (for examples, characters) are not passed to 
-  Stan. 
+  The data passed to \code{stan} are preprocessed before
+  passing to Stan. This process mainly includes the following:
+  \enumerate{
+    \item Change the data of type from \code{double} 
+      to \code{integer} if no accuracy is lost. The main
+      reason is that by default, \R uses \code{double}
+      as data type such as in \code{a <- 3}. But Stan 
+      will not read data of type \code{int} from \code{real} 
+      and it reads data from \code{int} if the data 
+      type is declared as \code{real}. 
+   
+   \item Check if there is \code{NA} in the data. 
+     Unlike BUGS, Stan does not allow missing data. Any \code{NA} values
+     in supplied data will cause the function to stop and report an error.
+  
+   \item Check data types passed in.  Stan allows only numeric data, that is,
+     doubles, integers, and arrays of these.  Data of other types (for
+     examples, characters) are not passed to Stan. Data of  
+     \code{data.frame} are converted to \code{matrix} by
+     function \code{data.matrix}. 
+     
+    \item In addition, duplicated names in a list will cause 
+     the function to stop and report an error. 
+  } 
 
   The returned S4 class \code{stanfit} will save the compiled model
   across sessions if the option \code{save_dso = TRUE}
-  is supplied \emph{and} the option \code{fit} is \emph{not} supplied.
+  is supplied.  
 
   The function accepts a previously fitted instance of \code{stanfit}
   through parameter \code{fit} in order to reuse the compiled model; other
@@ -141,7 +171,7 @@ stan(file, model_name = "anon_model", model_code = "",
   \url{http://mc-stan.org}. 
 }
 \seealso{
-  \code{\link{stanc}} for compiling model code in Stan modeling language to C++, 
+  \code{\link{stanc}} for translating model code in Stan modeling language to C++, 
   \code{\link{sampling}} for sampling, and \code{\linkS4class{stanfit}} for the fitted results.
 }
 \examples{\dontrun{

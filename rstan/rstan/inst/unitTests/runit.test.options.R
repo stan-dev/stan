@@ -19,3 +19,12 @@ test_options2 <- function() {
   o <- rstan:::rstan_options('a', 'b') 
   checkEquals(o$a, 34) 
 } 
+
+test_plot_rhat_breaks <- function() {
+  rstan_options(plot_rhat_breaks = c(2, 1.2))
+  o <- rstan_options("plot_rhat_breaks")
+  checkEquals(o, c(1.2, 2)) 
+  rstan_options(plot_rhat_breaks = c(1.5, 2, 1.2))
+  o <- rstan_options("plot_rhat_breaks")
+  checkEquals(o, c(1.2, 1.5, 2)) 
+} 
