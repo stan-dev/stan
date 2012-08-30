@@ -170,21 +170,12 @@ data.
 \chapter{Getting Started}
 
 \noindent
-This chapter%
-%
-\footnote{The content of this chapter is the same as that in the
-  command-line getting started section of \url{http://mc-stan.com/}.}
-%
-is designed to help users get acquainted with the overall
+This chapter is designed to help users get acquainted with the overall
 design of the \Stan language and calling \Stan from the command line.
 Later chapters are devoted to expanding on the material in this
-chapter with full reference documentation.  
-
-\section{Installation}
-
-For information about supported versions of Windows, Mac and Linux
-platforms along with step-by-step installation instructions, see
-\refappendix{install}.
+chapter with full reference documentation.  The content is identical
+to that found on the getting-started with the command-line
+documentation on the Stan home page, \url{http://mc-stan.org/}.
 
 \section{For BUGS Users}
 
@@ -192,234 +183,249 @@ platforms along with step-by-step installation instructions, see
 and important differences between Stan and BUGS (including WinBUGS,
 OpenBUGs, and JAGS).
 
-\section{A Minimal Program}
 
-Stan is distributed with several working models.  The simplest of
-these is found in the following location relative to the top-level
-distribution.
+\section{Installation}
+
+For information about supported versions of Windows, Mac and Linux
+platforms along with step-by-step installation instructions, see
+\refappendix{install}.
+
+\section{Building Stan}
+
+Building Stan itself works the same way across platforms.
+To build Stan, first open a command-line terminal application.  Then change
+directories to the directory in which Stan is installed (i.e., the
+directory containing the file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim}
-src/models/basic_distributions/normal.stan
+\begin{Verbatim}[fontshape=sl]
+% cd <stan-home>
 \end{Verbatim}
 \end{quote}
 %
-The contents of this file are as follows.
+Then make the library with the folloiwng make command.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+% make bin/libstan.a
+\end{Verbatim}
+\end{quote}
+%
+and then make the model parser and code generator with
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+% make bin/stanc
+\end{Verbatim}
+\end{quote}
+%
+\emph{Warning}: The \code{make} program may take 10+ minutes and
+consume 2+GB of memory to build \code{libstan} and \code{stanc}.
+Compiler warnings, including \code{uname: not found}, may be safely ignored.
+
+Building \code{libstan.a} and \code{bin/stanc} need only be done once.
+
+\section{Compiling and Executing a Model}
+
+The rest of this quick-start guide explains how to code
+and run a very simple Bayesian model.
+
+\subsection{A Simple Bernoulli Model}
+
+The following simple model is availabe in the source
+distribution located at \code{<stan-home>} as
+%
+\begin{quote}
+\nolinkurl{src/models/basic_estimators/bernoulli.stan}
+\end{quote}
+%
+The file contains the following model.
 %
 \begin{quote}
 \begin{Verbatim}
+data {
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N];
+}
 parameters {
-  real y;
+  real<lower=0,upper=1> theta;
 }
 model {
-  y ~ normal(0,1);
+  for (n in 1:N)
+    y[n] ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
 %
-The model's single parameter \code{y} is declared to take real values.
-The probability model specifies that \code{y} has a normal
-distribution with location 0 and scale 1.  This model will
-sample a single unit normal variate.  
+The model assumes the binary observed data \code{y[1],...,y[N]}
+are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  There is
+an implicit uniform prior on \code{theta} arising from the
+constraint in its definition in the \code{parameters} block
+restricting it to values between 0 and 1 (inclusive).
 
-\section{Whitespace and Semicolons}
+\subsection{Data Set}
 
-In \Stan, every variable declaration and atomic statement must be
-terminated by a semicolon (\code{;}).  This is the convention followed
-by programming languages such as \Cpp, but not the convention followed
-by the statistical languages \R and \BUGS.
-
-The reason for the \Cpp convention is to ensure that differences in
-whitespace are not meaningful.  The following is a complete, legal
-statement in \R and \BUGS.
+A data set of $\mbox{\code{N}}=10$ observations is availabe in the file
+%
+\begin{quote}
+\nolinkurl{src/models/basic_estimators/bernoulli.Rdata}
+\end{quote}
+%
+The content of the file is as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-a <- b +
-     c
+N <- 10
+y <- c(0,1,0,0,0,0,0,0,0,1)
 \end{Verbatim}
 \end{quote}
 %
-In contrast, the following is illegal in \R and \BUGS.
-%
-\begin{quote}
-\begin{Verbatim}
-a <- b
-     + c
-\end{Verbatim}
-\end{quote}
-%
-The only difference is in the placement of whitespace.  In \Stan,
-there is no whitespace-dependent behavior.  Neither of these is a
-complete statement, whereas either one terminated with a semicolon is.
-The second form is recommended for \Cpp and \Stan; it is the
-convention adopted by most programming languages and in typesetting
-mathematics because it allows easier visual identification of
-continued lines.
+This defines the contents of two variables, \code{N} and \code{y},
+using an R-like syntax (see \refchapter{dump} for more information).
 
 
-\section{Unpacking \Stan}
 
-The first step in using \Stan is unpacking the gzipped tar file into
-its own directory.  This can be done with a system tool, or on the
-command line with the \code{tar} command as follows.
+\subsection{Generating and Compiling the Model}
+
+A single call to \code{make} will generate the \Cpp code for a
+model with a name ending in \code{.stan} and compile it for
+execution.  This call will also compile the library \code{libstan.a}
+and the parser/code generator \code{stanc} if they have not already
+been compiled.
+
+First, change directories to where Stan was unpacked.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> tar -xzf stan-1.0.0.tgz
-...
-> cd stan-1.0.0
+> cd <stan-home>
 \end{Verbatim}
 \end{quote}
 %
-Throughout the documentation, \code{\$stan} will be used as a
-placeholder for the top-level directory, \code{stan-1.0.0}, containing
-\Stan.
-
-
-\section{Building \Stan's Translator and Libraries}\label{build-stan-libs.section}
-
-Once all the tools required for \Stan are installed (see
-\refappendix{install}), \Stan's libraries must be built.  There is a
-makefile supplied so that this can be done with one command.%
-%
-\footnote{The command to make the \Stan libraries can take ten minutes
-  or more to compile on a single core at optimization level 3.  One
-  way to speed this up a bit is to add the option \code{-j4} to the
-  call to \code{make} to use four cores to do the work in parallel;
-  other numbers of cores may also be specified.}
+Then issue the following command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd $stan
-> make CC=g++ O=3 bin/libstan.a bin/stanc
+> make src/models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
 %
-This will make the \Stan library archive, \code{libstan.a}, and the
-model compiler \code{stanc}.  
-
-The two options specify to use the
-\code{g++} compiler for \Cpp and optimization level 3.  For a list
-of compatible compilers and versions, see \refappendix{install}.
-
-
-
-
-\section{Compiling  with \code{stanc}}
-
-Starting at \Stan's home directory, the model may be compiled by 
-the \Stan compiler, \stanc, into \Cpp code as follows.
+The \code{make} command may be issued from another directory as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd $stan
-> bin/stanc src/models/basic_distributions/normal.stan
-\end{Verbatim}
-%
-\begin{Verbatim}
-Model name=anon_model
-Input file=src/models/basic_distributions/normal.stan
-Output file=anon_model.cpp
+> make -f <stan-home>/makefile <path-to-model>
 \end{Verbatim}
 \end{quote}
 %
-The output indicates the name of the model, here the default value
-\code{anon\_model}, the input file from which the \Stan program is
-read, here \code{normal.stan}, and the output file to which the
-generated \Cpp code is written, here \code{anon\_model.cpp}.  See
-\refsection{stanc} for more documentation on the \stanc compiler.
+where \code{<stan-home>} is replaced with the top-level directory
+containing the file named \code{makefile} and \code{<path-to-model>}
+is replaced with the path to the model file.
 
-\section{Compiling the Generated Code}
+The C++ generated for the model and its compiled executable
+form will be placed in the same directory as the model.
 
-The file generated by \stanc must next be compiled with a \Cpp
-compiler by linking to \Stan's source and library directories using
-the {\tt -I} option of the compiler.  The following example 
-uses the \clang compiler for \Cpp.
+
+\subsection{Executing the Model}
+
+The model can be executed from the directory in which it resides.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> g++ -O3 -Lbin -lstan -Isrc -Ilib/boost_1.51.0 \
-  -Ilib/eigen_3.1.0 anon_model.cpp 
+> cd src/models/basic_estimators 
 \end{Verbatim}
 \end{quote}
 %
-The line-final backslashes indicate that the command is continued on
-the next line.  This command invokes the \code{g++} compiler for \Cpp
-to create a platform-specific executable in the default location,
-which is {\tt a.out} by convention.  The \code{-O} option is for
-optimization level 3, \code{-L} option specifies where to look for
-compiled libraries, the \code{-l} option specifies the library to look
-for, and the two \code{-I} libraries point to header files for \Stan
-and its dependencies.
-
-If all goes well, as above, there is no output to the console.  More
-information about compiling the \Cpp code generated by \Stan may be
-found in \refsection{compiling-cpp}.  Installation information for
-\Cpp compilers may be found in \refappendix{install}.
-
-\section{Running the Sampler}
-
-The executable resulting from compiling the generated \Cpp may be run
-as follows.
+To execute the model under Linux or Mac, use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./a.out
+> ./bernoulli --data=bernoulli.Rdata
 \end{Verbatim}
+\end{quote}
 %
+The \code{./} prefix before the executable is only required under
+Linux and the Mac when executing a model from the directory in which
+it resides.
+
+For the Windows DOS terminal, the \code{./} prefix is not needed,
+resulting in the following command.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> bernoulli --data=bernoulli.Rdata
+\end{Verbatim}
+\end{quote}
+%
+Whether the command is run in Windows, Linux, or on the Mac, the
+output is the same.  First, the parameters are echoed to the standard output,
+which shows up on the terminal as follows.
+%
+\begin{quote}
 \begin{Verbatim}
 STAN SAMPLING COMMAND
-data = 
+data = bernoulli.Rdata
 init = random initialization
+init tries = 1
 samples = samples.csv
 append_samples = 0
-seed = 1331941513 (randomly generated)
-chain_id=1 (default)
+save_warmup = 0
+seed = 1845979644 (randomly generated)
+chain_id = 1 (default)
 iter = 2000
 warmup = 1000
-thin = 1
+thin = 1 (default)
+equal_step_sizes = 0
 leapfrog_steps = -1
 max_treedepth = 10
 epsilon = -1
 epsilon_pm = 0
-epsilon_adapt_off = 0
 delta = 0.5
 gamma = 0.05
-
-Iteration: 2000 / 2000 [100%]  (Sampling)
+...
 \end{Verbatim}
 \end{quote}
 %
-For more information on configuring the compiled sampler, see
-\refchapter{stan-cmd}.
+The ellipses (\code{...}) indicate that the output continues (as
+described below).
 
-\section{Inspecting the Output}
-
-The program indicates to the standard output that the samples are
-written to \code{samples.csv}.  The first few lines of this file are
-comments about aspects of the run; see \refchapter{stan-cmd} for more
-information on these settings, most of which are user configurable
-from the command line.
+Next, the sampler counts up the iterations in place, reporting
+percentage completed, ending as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cat samples.csv
-\end{Verbatim}
 \begin{Verbatim}
+...
+Iteration: 2000 / 2000 [100%]  (Sampling)
+...
+\end{Verbatim}
+\end{quote}
+
+\subsection{Sampler Output}
+
+Each execution of the model results in the samples from a single
+Markov chain being written to a file in comma-separated value (CSV) format.
+The default name of the output file is \nolinkurl{samples.csv}.</p>
+
+The first part of the output file just repeats the parameters
+as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
+%
+\begin{quote}
+\begin{Verbatim}
+...
 # Samples Generated by Stan
 #
-# stan_version_major=alpha
+# stan_version_major=1
 # stan_version_minor=0
 # stan_version_patch=0
-# data=
+# data=bernoulli.Rdata
 # init=random initialization
 # append_samples=0
-# seed=1331941796
+# save_warmup=0
+# seed=1845979644
 # chain_id=1
 # iter=2000
 # warmup=1000
 # thin=1
+# equal_step_sizes=0
 # leapfrog_steps=-1
 # max_treedepth=10
 # epsilon=-1
@@ -430,237 +436,112 @@ from the command line.
 \end{Verbatim}
 \end{quote}
 %
-The ellipses notation, {\tt ...}, indicates that the output continues
-beyond what's shown.  Here, what follows is the data in standard
-comma-separate value ({\sc csv}) notation.
+This is then followed by a header indicating the
+names of the values sampled.
 %
 \begin{quote}
 \begin{Verbatim}
 ...
-lp__,treedepth__,y
--0.0126699,1,0.159185
--0.222796,1,-0.667527
--0.222796,1,-0.667527
--0.404457,1,-0.899397
+lp__,treedepth__,stepsize__,theta
 ...
 \end{Verbatim}
 \end{quote}
 %
-The first line consists of a header indicating the names of the
-variables on the lines to follow, and each following line indicates a
-single sampled value of the parameters.  The first column is reserved
-for the (unnormalized) log probability (density) of the parameters,
-with name {\tt lp\_\_} (the two trailing underscores are to prevent
-name conflicts with user-defined model parameters).  The next values
-are for reporting the behavior of the sampler.  In this case, the
-\NUTS sampler was used, so there is a report of the depth of tree it
-explored, with variable name {\tt treedepth\_\_}.  The remaining
-values are parameters.  Here, the model has only one parameter, {\tt
-  y}.  The first sampled value for {\tt y} is 0.159185, the second is
--0.667527, and so on.
+The first three names correspond to the log probability function
+value at the sample, the depth of tree evaluated by the NUTS sampler,
+and the step size.  The single model parameter \code{theta} is
+stored in the fourth column.
 
-Note that the second sampled value is repeated.  This is not a bug.
-Rather, it is the behavior to expect from a sampler using a Metropolis
-acceptance step for proposals, as \Stan's samplers \HMC and \NUTS do.
-The reduction in inferential power due to the repetition is accounted
-for in the effective sample size calculation, which adjusts for
-autocorrelation in the sample sequence.
-
-\section{Data}
-
-\Stan allows data to be specified in programs, used in models, and
-read into compiled \Stan programs. This section provides an example of
-coding and running a \Stan program with data stored in a file in the
-\SPLUS/\R dump format.
-
-The \Stan program in 
-\begin{quote}
-\begin{Verbatim}
-src/models/basic_estimators/bernoulli.stan
-\end{Verbatim}
-\end{quote}
-can be used to estimate a Bernoulli parameter \code{theta} from
-\code{N} binary observations.  The file contains the following code.
+Next up is the result of adaptation, reported as comments.
 %
 \begin{quote}
 \begin{Verbatim}
-data {
-   int<lower=0> N;
-   int<lower=0,upper=1> y[N];
-}
-parameters {
-   real<lower=0,upper=1> theta;
-}
-model {
-   for (n in 1:N)
-      y[n] ~ bernoulli(theta);
-}
+...
+# step size=1.43707
+# parameter step size multipliers:
+# 1
+...
 \end{Verbatim}
 \end{quote}
 %
-This program declares two data variables in its \code{data} block.
-The first data variable, \code{N}, is an integer encoding the number
-of observations.  The declaration \code{int<lower=0>} indicates that
-\code{N} must take on non-negative values.  The second data variable,
-\code{y}, is declared as \code{y[N]}, specifying that it is an array
-of \code{N} values.  Each of these values has the declared type,
-\code{int<lower=0,upper=1>}, an integer between 0 and 1 inclusive, i.e., a binary
-value.  The \code{N} individual binary values in the array \code{y}
-are accessed using standard array notation, indexing from 1, as \code{y[1]},
-\code{y[2]}, ..., \code{y[N]}.
+This report says that NUTS step-size adaptation during warmup
+settled on a step size of 1.43707.  The next two lines
+indicate the multipliers for scaling individual parameters, here
+just a single multiplier, 1, corresponding to the single
+parameter \code{theta}.
 
-The \code{parameters} block declares a single parameter, \code{theta}.
-The parameter \code{theta} is declared as type \code{real<lower=0,upper=1>},
-constraining it to continuous values between zero and one inclusive,
-to ensure it satisfies the constraint placed on it by the probability
-function \code{bernoulli} in the \code{model} block.
-
-The \code{model} block consists of a for-loop for the data.   The loop is
-specified so that the body is executed for values of \code{n} between
-\code{1} and \code{N} inclusive.  The body here is a sampling
-statement specifying that the variable \code{y[n]} is modeled as
-having a Bernoulli distribution with chance of success \code{theta}.  
-
-A sample data file for this program can be found in the file
-\code{bernoulli.Rdata} in the same directory as the model.  This data file has
-the following contents.
+The rest of the file contains lines corresponding to the
+samples from each iteration.%
+%
+\footnote{There are repeated entries due to the Metropolis accept step
+in the no-U-turn sampling algorithm.}
+%
 %
 \begin{quote}
 \begin{Verbatim}
-N <- 10
-y <- c(0,1,0,0,0,0,0,0,0,1)
+...
+-7.07769,1,1.43707,0.158674
+-7.07769,1,1.43707,0.158674
+-7.37289,1,1.43707,0.130089
+-7.09254,1,1.43707,0.361906
+-7.09254,1,1.43707,0.361906
+-7.09254,1,1.43707,0.361906
+-6.96213,1,1.43707,0.337061
+-6.96213,1,1.43707,0.337061
+-6.77689,1,1.43707,0.220795
+...
+-6.85235,1,1.43707,0.195994
+-6.85235,1,1.43707,0.195994
+-6.81491,1,1.43707,0.20624
+-6.81491,1,1.43707,0.20624
+-6.81491,1,1.43707,0.20624
+-6.81491,1,1.43707,0.20624
+-6.81491,1,1.43707,0.20624
 \end{Verbatim}
 \end{quote}
 %
-Here there
-is a non-negative integer value for \code{N} and an array of length
-\code{N} (i.e., 10) integer values between 0 and 1 inclusive.  The
-array is coded using the same sequence notation as used by \R,  \code{c(...)}.
-The dump format supported by \Stan is documented in \refchapter{dump}.
+This ends the output.  
 
-A data file must contain appropriate values for all of the data
-variables declared in the \Stan program's \code{data} block.  The data
-file may also include values not used by the \Stan program; the extra
-variables take time and space to read into memory, but will not be
-used by \Stan.
+\subsection{Configuring Command-Line Options}
 
-The data is not part of the compiled model.  Thus, the \Stan program
-is compiled by \stanc and the \Cpp compiler in the same way as the
-program in the previous section.  This time, the output model gets an
-explicitly specified name.
-%
-%
-\begin{center}
-\begin{Verbatim}[fontshape=sl]
- > bin/stanc --name=bern src/models/basic_estimators/bernoulli.stan 
-\end{Verbatim}
-\begin{Verbatim}
- Model name=bern
- Input file=src/models/basic_estimators/bernoulli.stan
- Output file=bern.cpp
-\end{Verbatim}
-\end{center}
-%
-As before, the \Cpp compiler needs to be given the name of
-generated file.
+The command-line options for running a model are detailed in
+the next chapter. They can also be printed on the command
+line in Linux and on the Mac as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> g++ -O3 -Lbin -lstan -Isrc -Ilib/boost_1.51.0 \
-  -Ilib/eigen_3.1.0 -o bern bern.cpp
+> ./bernoulli --help
 \end{Verbatim}
 \end{quote}
 %
-The new compiler option, \code{-o~bern}, specifies the name of the
-executable file.  Now the code may be executed by calling its
-executable with the data file specified.
+and on Windows with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./bern --data=src/models/basic_estimators/bernoulli.Rdata
+> bernoulli --help
 \end{Verbatim}
 \end{quote}
-%
-The command-line option \code{--data=} provides the location of the
-data file.
 
-\section{Proper and Improper Priors}
+\subsection{Testing Stan}
 
-Priors are not required for variables in \Stan.  That is, not every
-parameter needs to show up on the left-hand side of a sampling
-statement in the model.  
-
-\subsection{Implicit Uniform Priors}
-
-The model in the previous section does not contain a sampling
-statement for \code{theta}.  Not specifying a prior is equivalent to
-specifying a uniform prior.  
-
-A uniform prior is only proper if the parameter is bounded, as was the
-case for \code{theta} in the previous section.  In this case, the
-implicit uniform prior is proper because \code{theta} is bounded to a
-finite interval.
-
-Improper priors are also allowed in \Stan programs.  Improper priors
-result if there is a parameter with support that is unbounded at least
-on one side.  Parameters with support bounded on both sides are
-equivalent to uniform priors.  In some cases, an improper prior may
-lead to a proper posterior, but it is up to the user to guarantee that
-constraints on the parameter(s) or the data ensure the propriety of
-the posterior.
-
-\subsection{Explicit Priors}
-
-The uniform prior could have also been specified explicitly by adding the
-following statement to the \code{model} block of the program.
+To run the Stan unit tests of basic functionality, run the
+following commands from a shell (where \code{<stan-home>} is replaced
+top-level directory into which Stan was unpacked; it should contain a
+file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim} 
-theta ~ uniform(0,1);
-\end{Verbatim}
-\end{quote}
-% 
-
-\subsection{Conjugate Priors}
-
-Because $\distro{Beta}(1,1)$ is the uniform distribution on $(0,1)$,
-a uniform prior on \code{theta} may also be specified as follows.
-%
-\begin{quote}
-\begin{Verbatim}
-theta ~ beta(1,1);
+\begin{Verbatim}[fontshape=sl]
+> cd <stan-home>
+> make O=0 test-unit
 \end{Verbatim}
 \end{quote}
 %
-The beta distribution is conjugate to the Bernoulli, meaning that the
-posterior is also a beta distribution.  In theory, the closed form of
-the posterior would allow for more efficient sampling, but \Stan,
-at least as of yet, does not make use of this information.  See
-\refchapter{optimization} for information on how to code sufficient
-statistics and conjugate priors explicitly in \Stan to speed this model up.
+That's the letter 'O' followed by an equal sign followed by the digit
+'0', which sets the tests to run at the lowest optimization level.
 
-
-
-
-
-\section{Comments}
-
-If the character pair \code{//} appears together on a line, that pair 
-and every character up to but not including the end of line is 
-ignored.  This is the style of comments used in C.  This is the 
-preferred commenting style for line-based comments and for commenting 
-out code.
-
-The character \code{\#} behaves the same way as the character pair
-\code{//}.  If \code{\#} appears on a line, that character and every
-character up to but not including the end of line is ignored.  This is
-the style of comments used in Python, R, and Unix shell scripts.  
-
-\Stan also supports \Cpp comment style in which any content placed
-between \code{/*} and \code{*/} is ignored along with the boundary
-markers.  This is the preferred style for long documentation comments.
-It is difficult to use this method to comment out code, because 
-an internal close comment sequence, \code{*/}, may take precedence.
+\emph{Warning}: The \code{make} program may take 20+ minutes 
+and consume 3+GB of memory to run the unit tests.  Warnings can
+be safely ignored if the tests complete without a \code{FAIL} error.
 
 
 % \section{User-Defined Distributions and Functions}

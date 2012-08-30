@@ -42,10 +42,11 @@ appropriate platform-specific installation guide.</p>
 <p>Building Stan itself works the same way across platforms.</p>
 
 <p>To build Stan, first open the Terminal application.  Then change
-directories to the directory in which Stan is installed.</p>
+directories to the directory in which Stan is installed (i.e., the
+directory containing the file named <tt>makefile</tt>).</p>
 
 <pre>
-% cd &lt;path-to-stan&gt;
+% cd &lt;stan-home&gt;
 </pre>
 
 <p>Then make the library with</p>
@@ -77,10 +78,10 @@ and run a very simple Bayesian model.</p>
 <h3>A Simple Bernoulli Model</h3>
 
 <p>The following simple model is availabe in the source
-distribution located at <tt>&lt;path-to-stan&gt;</tt> as</p>
+distribution located at <tt>&lt;stan-home&gt;</tt> as</p>
 
 <ul>
-  <li><tt>&lt;path-to-stan&gt;/src/models/basic_estimators/bernoulli.stan</tt></li>
+  <li><tt>&lt;stan-home&gt;/src/models/basic_estimators/bernoulli.stan</tt></li>
 </ul>
 
 <pre>
@@ -108,7 +109,7 @@ restricting it to values between 0 and 1 (inclusive).</p>
 
 <p>A data set of <tt>N=10</tt> observations is availabe as</p>
 <ul>
-  <li><tt>&lt;path-to-stan&gt;/src/models/basic_estimators/bernoulli.Rdata</tt></li>
+  <li><tt>&lt;stan-home&gt;/src/models/basic_estimators/bernoulli.Rdata</tt></li>
 </ul>
 
 <pre>
@@ -129,7 +130,7 @@ and the parser/code generator <tt>stanc</tt>.
 <p>First, change directories to where Stan was unpacked.</p>
 
 <pre>
-% cd &lt;path-to-stan&gt;
+% cd &lt;stan-home&gt;
 </pre>
 
 <p>Then issue the command</p>
@@ -141,7 +142,7 @@ and the parser/code generator <tt>stanc</tt>.
 <p>The <tt>make</tt> command may be issued from another directory with</p>
 
 <pre>
-% make -f &lt;path-to-stan&gt;/makefile &lt;path-to-model&gt;
+% make -f &lt;stan-home&gt;/makefile &lt;path-to-model&gt;
 </pre>
 
 <p>The C++ generated for the model and its compiled executable
@@ -319,7 +320,7 @@ bernoulli --help
 <p>To run the Stan unit tests of basic functionality, run the
 following commands from a shell.</p>
 
-<pre>% cd &lt;path-to-stan&gt;</pre>
+<pre>% cd &lt;stan-home&gt;</pre>
 <pre>% make O=0 test-unit</pre>
 
 <p>That's the letter O followed by an equal sign followed by the digit
