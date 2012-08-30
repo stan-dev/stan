@@ -5,14 +5,16 @@ STAN V1.0
   - revised stanc default model names
   - use makefiles for models
   - cmd-line getting started, pull out of manual
-
-? add safety inits for transformed parameters to prevent seg faults
+  - pull -lstan to end of g++ commands
 
 ? add identifier checks for C++ and Stan reserved words, including
   model name in stanc
 
+
 CODE CLEANUP
 ======================================================================
+
+* use "sample of size 1000" rather than "1000 samples", etc.
 
 * const declarations wherever possible
 

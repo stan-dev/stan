@@ -3,19 +3,21 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Obtain the version of stanc in Stan} 
 \description{
-  The stan version is in form of MAJOR_VERION.MINOR_VERSION.PATCH_VERSION (the
-  first version is 1.0.0.). 
+  The stan version is in form of \code{major.minor.patch};  the
+  first version is 1.0.0, indicating major version 1, minor version
+  0 and patch level 0.  Functionality only changes with minor versions
+  and backward compatibility will only be affected by major versions.
 }
 \usage{
   stanc_version()
 }
 \value{
-  A character string giving the version of stanc. 
+  A character string giving the version of Stan used in this version of RStan. 
 }
 \references{
-  The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://mc-stan.org}. 
+  Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \url{http://mc-stan.org/}. 
 }
 \seealso{
   \code{\link{stan}} and \code{\link{stan_model}} 

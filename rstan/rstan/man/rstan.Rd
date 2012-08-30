@@ -7,7 +7,7 @@
 \description{
   \R interface to Stan, which is a C++ package for obtaining Bayesian
   inference using the No-U-turn sampler, a variant of Hamiltonian Monte
-  Carlo (see \url{http://mc-stan.org}).
+  Carlo (see \url{http://mc-stan.org/}).
 }
 
 \details{
@@ -20,7 +20,9 @@
   }
 
   The RStan package provides an interface to Stan. 
-  See the manual of Stan for more information. 
+  For more information on Stan and its modeling language,
+  see the \emph{Stan Modeling Language User's Guide and Reference Manual},   
+  which is available \url{http://mc-stan.org/}.
 
 }
 \author{
@@ -31,7 +33,7 @@
          \tab Ben Goodrich <bg2382@columbia.edu> \cr 
          \tab Matt Hoffman <mdhoffma@cs.princeton.edu>  \cr 
          \tab Daniel Lee <bearlee@alum.mit.edu>  \cr 
-         \tab Michale Malecki <malecki@gmail.com>  \cr 
+         \tab Michael Malecki <malecki@gmail.com>  \cr 
          \tab Andrew Gelman <gelman@stat.columbia.edu> \cr 
   } 
 
@@ -41,8 +43,8 @@
 }
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://mc-stan.org}. 
+  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \url{http://mc-stan.org/}. 
 }
 
 \examples{\dontrun{ 

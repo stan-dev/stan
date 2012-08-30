@@ -4,7 +4,9 @@
 \alias{traceplot,stanfit-method}
 
 \title{\code{traceplot}: draw the traces of the sample}
-\description{Draw the traces of sample of individual chains, a way to check the convergence by vision.}
+\description{Draw the traceplot corresponding to one or more
+ Markov chains, providing a visual way to inspect sampling behavior
+ and assess mixing across chains and convergence.}
 
 \usage{
   %% traceplot(object, \dots)  
@@ -18,8 +20,9 @@
 }
 
 \arguments{
-  \item{object}{An object of class \code{\linkS4class{stanfit}} object.}
-  \item{pars}{A vector of character string specifying parameters to be plotted.} 
+  \item{object}{An instance of class \code{\linkS4class{stanfit}}.}
+  \item{pars}{A vector of character string specifying the  
+      parameters to be plotted.} 
   \item{inc_warmup}{\code{TRUE} or \code{FALSE}, indicating whether 
     the warmup sample are included in the trace plot; defaults to \code{TRUE}}
   \item{ask}{\code{TRUE} or \code{FALSE}, to control (for the current device)

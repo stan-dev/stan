@@ -6,8 +6,8 @@
 
 \title{\code{sampling}: draws sample from Stan model}
 \description{
-  Draw sample from the model defined by class \code{stanmodel}. 
-  This is a generic function of S4 class \code{stanmodel}. 
+  Draw samples from the model defined by class \code{stanmodel}. 
+  This method is a generic function of the S4 class \code{stanmodel}. 
 }
 
 \usage{
@@ -22,20 +22,21 @@
   \describe{
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
-      Call samplers such as NUTS1 and NUTS2 to draw sample from the model defined by S4 class \code{stanmodel} 
+      Call sampler (NUTS or HMC, depending on parameters) 
+      to draw samples from the model defined by S4 class \code{stanmodel} 
       given the data, initial values, etc. 
     }
   }
 }
 
 \arguments{
-  \item{object}{An object of class \code{\linkS4class{stanmodel}} object.}
+  \item{object}{An object of class \code{\linkS4class{stanmodel}}.}
 
-  \item{data}{An object of class \code{list} or \code{environment}
+  \item{data}{An object of class \code{list} or an \code{environment}
     providing the data for the model.}    
 
-  \item{pars}{A vector of character string specifying parameters of interest; defaults
-    to \code{NA} indicating all parameters in the model. Only sample for parameters given 
+  \item{pars}{A vector of character strings specifying parameters of interest; defaults
+    to \code{NA} indicating all parameters in the model. Only samples for parameters given 
     in \code{pars} are stored in the fitted results.}
 
   \item{n_chains}{A positive integer specifying number of chains; defaults to 4.} 
@@ -44,37 +45,41 @@
     chains (including warmup). The default is 2000.}
 
   \item{warmup}{A positive integer specifying the number of iterations to be
-    discarded. The default is \code{iter / 2}. This is also known as burnin.}
+    discarded.  If step-size adaptation is on (which it is by default), this 
+    also controls the number of iterations for which adaptation is run (and
+    hence the samples should not be used for inference).  Also known as burnin.
+    The default is \code{iter / 2}.}
 
   \item{thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
 
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
-    the maximum integer supported by \R on the machine. When multiple chains
-    are used, only one seed is needed.}
+    the maximum integer supported by \R on the machine. Even if multiple chains
+    are used, only one seed is needed, with other chains having seeds  
+    derived from that of the first chain to avoid dependent samples.}
 
-  \item{init}{One of \code{0} (or \code{"0"}), \code{"random"}, or a list 
-    indicating how the initial values of parameters are specified. \code{"0"}: 
+  \item{init}{One of digit \code{0}, string \code{"0"} or \code{"random"}, 
+    or a list of initial parameter values with which to initialize.
+    indicating how the initial values of parameters are specified. 
+    \code{"0"}: 
     initialize all to be zero on the unconstrained support; 
     \code{"random"}: randomly generated;
-    object of \code{list}: a list of named list. If a list
-    is used to specify the initial values, the length of the list should 
-    be the number of chains (\code{n\_chains}). And each list 
-    is a named list, every element of which specifies the initial 
-    value(s) for a parameter.}
+    \code{list}: a list of lists equal in length to the number of chains (\code{n\_chains}), where each list in the list of lists specifies the initial
+    values of parameters by name for the corresponding chain.}
 
   \item{check_data}{Logical: if \code{TRUE}, the data would be preprocessed; 
     otherwise not. If the data is not checked and preprocessed, it is safe 
     to leave it to be the default \code{TRUE}.}
 
-  \item{sample_file}{A character string of file name for specifying where the 
-    sample for \emph{all} parameters are written into. If not provided, files
-    are not created. When the folder specified is not writable, \code{tempdir()} is used. 
-    And when there are multiple chains, an underscore and chain number are appended
-    to the file name.} 
+  \item{sample_file}{A character string of file name for specifying where to 
+    write samples for \emph{all} parameters and other saved quantities. 
+    If not provided, files are not created. When the folder specified 
+    is not writable, \code{tempdir()} is used. 
+    When there are multiple chains, an underscore and chain number are appended
+    to the file name.}
    
-  \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
-    intermediate output inside the function, which might be helpful for
-    debugging the model, are printed or not.}
+  \item{verbose}{\code{TRUE} or \code{FALSE}: flag indicating whether 
+     to print intermediate output from Stan on the console, which might
+     be helpful for model debugging.}
 
   \item{\dots}{Other parameters for the sampler: 
     \enumerate{
@@ -98,7 +103,7 @@
   }
 }
 \value{
-   An object of S4 class \code{stanfit} that represented 
+   An object of S4 class \code{stanfit} representing
    the fitted results. 
 } 
 

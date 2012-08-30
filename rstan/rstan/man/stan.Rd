@@ -2,7 +2,8 @@
 \alias{stan}
 \title{Fit a model using Stan}
 \description{
-  Fit a model in Stan modeling language and return the fitted result. 
+  Fit a model defined in the Stan modeling language and  
+  return the fitted result as an instance of \code{stanfit}. 
 }
 \usage{
 stan(file, model_name = "anon_model", model_code = "", 
@@ -14,15 +15,20 @@ stan(file, model_name = "anon_model", model_code = "",
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{file}{A character string or a connection that \R supports to specify the model 
-    in Stan modeling language.}
-  \item{model_name}{A character for naming the model.}
-  \item{model_code}{A character string for specifying the model.  An alternative
-    way to specify model instead of using parameter \code{file}.}
-  \item{fit}{An instance of S4 class \code{stanfit}; defaults to \code{NA}. 
-    When it is not \code{NA}, the model from the fitted result 
-    is used to sample. Hence time for recompiling the C++ code
-    is saved.} 
+  \item{file}{A character string file name or a connection that \R supports 
+    containing the text of a model specification in the Stan modeling 
+    language; a model may also be specified directly
+    as a character string using parameter \code{model_code} or through
+    a previous fit using parameter \code{fit}.}
+  \item{model_name}{A character string naming the model.}
+  \item{model_code}{A character string containing the model definition; models
+    may also be read from files using parameter \code{file} or through
+    a previous fit using parameter \code{fit}.}
+  \item{fit}{An instance of S4 class \code{stanfit} derived from
+             a previous fit;  defaults to \code{NA}. 
+    When not \code{NA}, the compiled model from the fitted result 
+    is re-used, thus saving the time that would otherwise be spent 
+    recompiling the C++ code for the model.}
   \item{data}{An object of class \code{list}, \code{environment}
     providing the data for the model, or character strings 
     for all the names of objects used as data in the working space.}    
@@ -32,36 +38,42 @@ stan(file, model_name = "anon_model", model_code = "",
   \item{n_chains}{A positive integer specifying number of chains; defaults to 4.} 
   \item{iter}{A positive integer specifying how many iterations for all the
     chains (including warmup). The default is 2000.}
-  \item{warmup}{A positive integer specifying number of iterations to be
-    discarded. The default is \code{iter / 2}. This is also known as burnin.}
+  \item{warmup}{A positive integer specifying number of warmup (aka burnin) iterations.  This also specifies the number of iterations used for step-size
+     adaptation, so warmup samples should not be used for inference.
+     The default is \code{iter / 2}.  }
   \item{thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
     the maximum integer supported by \R on the machine. When multiple chains
-    are used, only one seed is needed.}
-  \item{init}{One of \code{0} (or \code{"0"}), \code{"random"}, or a list 
-    indicating how the initial values of parameters are specified. \code{"0"}: 
+    are used, only one seed is needed, with other chains' seeds being
+    generated from the first chain's seed to prevent dependency among the
+    random number streams for the chains.}
+  \item{init}{One of digit \code{0}, string \code{"0"} or \code{"random"}, 
+    or a list of initial parameter values with which to initialize.
+    indicating how the initial values of parameters are specified. 
+    \code{"0"}: 
     initialize all to be zero on the unconstrained support; 
     \code{"random"}: randomly generated;
-    object of \code{list}: a list of named list. If a list
-    is used to specify the initial values, the length of the list should 
-    be the number of chains (\code{n\_chains}). And each list 
-    is a named list, every element of which specifies the initial 
-    value(s) for a parameter.}
-  \item{sample_file}{A character string of file name for specifying where the 
-    sample for \emph{all} parameters are written into. If not provided, files
-    are not created. When the folder specified is not writable, \code{tempdir()} is used. 
-    And when there are multiple chains, an underscore and chain number is appended
-    to the file name.} 
-  \item{save_dso}{Logical with the default of \code{TRUE}: indication of whether the 
+    \code{list}: a list of lists equal in length to the number of chains (\code{n\_chains}), where each list in the list of lists specifies the initial
+    values of parameters by name for the corresponding chain.}
+  \item{sample_file}{A character string of file name for specifying where to 
+    write samples for \emph{all} parameters and other saved quantities. 
+    If not provided, files are not created. When the folder specified 
+    is not writable, \code{tempdir()} is used. 
+    When there are multiple chains, an underscore and chain number are appended
+    to the file name.}
+
+  \item{save_dso}{Logical, with default \code{TRUE}, indicating whether the 
     dynamic shared object (DSO) compiled from the C++ code for the model 
-    will be saved or not. If \code{TRUE}, we can draw sample from
+    will be saved or not. If \code{TRUE}, we can draw samples from
     the same model in another \R session using the saved DSO (i.e., 
     without compiling the C++ code again).
-    This parameter only takes effect when \code{stan} is used to 
-    fit a model from scratch, that is, not with specifying parameter \code{fit}.}
-  \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
-    intermediate output inside the function, which might be helpful for
-    debugging the model, are printed or not.}
+    This parameter only takes effect if \code{fit} is not used; with  
+    \code{fit} defined, the DSO from the previous run is used.}
+
+  \item{verbose}{\code{TRUE} or \code{FALSE}: flag indicating whether 
+     to print intermediate output from Stan on the console, which might
+     be helpful for model debugging.}
+
   \item{\dots}{Other parameters for the sampler: 
     \enumerate{
       \item \code{leapfrog_steps} (\code{integer})
@@ -82,20 +94,20 @@ stan(file, model_name = "anon_model", model_code = "",
     control how to indicate the progress during sampling (i.e. 
     show the progress every \code{refresh} iterations).} 
 
-  \item{boost_lib}{The path for boost library that can be downloaded from
-     \url{http://www.boost.org/users/download/}. This provides an
-     alternative way to specify the boost library used in Stan.}
+  \item{boost_lib}{The path for an alternative version of the Boost C++ 
+     library to the one supplied with RStan.}
 }
 \details{
-  \code{stan} is a one step function to fit a 
-  Stan model. It first compiles the model represented by
-  Stan modeling language to C++ code. Second, the 
-  C++ code is compiled into binary shared object, which
+  \code{stan} does all of the work of fitting a
+  Stan model and returning the results as an instance of \code{stanfit}. 
+  First, it compiles the Stan model to C++ code.
+  Second, the 
+  C++ code is compiled into a binary shared object, which
   is loaded into the current \R session (an object
-  of S4 class \code{stanmodel} is created). Then sample 
+  of S4 class \code{stanmodel} is created). Finally, samples
   are drawn and wrapped in an object of S4 class \code{stanfit}, 
   which provides functions such as \code{print}, \code{summary}, and \code{plot}
-  to take a look of the results of the fitted model. 
+  to inspect and retrieve the results of the fitted model. 
 
   \code{stan} can also be used to sample again from a fitted model under
   different settings (e.g., different \code{iter}) by providing 
@@ -107,28 +119,30 @@ stan(file, model_name = "anon_model", model_code = "",
 }
 
 \note{
-  As Stan does not allow missing data. The data are pre-processed 
-  to check if there is any \code{NA} and it would stop when there is. 
-  Also, Stan allows only numeric data, that is, doubles and integers. 
-  Data of other types (for examples, characters) are not passed to 
+  Unlike BUGS, Stan does not allow missing data. Any \code{NA} values
+  in supplied data will cause the function to stop and report an error.
+
+  Stan allows only numeric data, that is, doubles, integers, and arrays
+  of these.  Data of other types (for examples, characters) are not passed to 
   Stan. 
 
-  We can use a previous fitted model object (i.e., an object
-  of S4 class \code{stanfit}) as input for function \code{stan} to 
-  refit the model, for example, with different configuration or data. 
-  However, when an object of class \code{stanfit} is created by 
-  for example, calling \code{stan} with \code{save_dso = FALSE},
-  the fitted results cannot be used across \R sessions.  
+  The returned S4 class \code{stanfit} will save the compiled model
+  across sessions if the option \code{save_dso = TRUE}
+  is supplied \emph{and} the option \code{fit} is \emph{not} supplied.
+
+  The function accepts a previously fitted instance of \code{stanfit}
+  through parameter \code{fit} in order to reuse the compiled model; other
+  configuration may change.
 }
 
 \references{
-  The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference}. 
+  Stan Development Team (2012) 
+  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }
 \seealso{
-  \code{\link{stanc}} compiling model code in Stan modeling language to C++, 
-  \code{\link{sampling}} and \linkS4class{stanfit}
+  \code{\link{stanc}} for compiling model code in Stan modeling language to C++, 
+  \code{\link{sampling}} for sampling, and \code{\linkS4class{stanfit}} for the fitted results.
 }
 \examples{\dontrun{
 library(rstan)
@@ -141,8 +155,8 @@ model {
   y[2] ~ double_exponential(0, 2);
 } 
 "
-s.f <- stan(model_code = scode, verbose = FALSE) 
+s.f <- stan(model_code = scode, iter = 10, verbose = FALSE) 
 print(s.f)
-s.f2 <- stan(fit = s.f, iter = 1000, verbose = FALSE) 
+s.f2 <- stan(fit = s.f, iter = 10000, verbose = FALSE) 
 }} 
 \keyword{rstan} 

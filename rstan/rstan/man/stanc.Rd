@@ -2,56 +2,47 @@
 \alias{stanc} 
 \docType{package}
 \title{
-\code{stanc}: compile model in Stan modeling language to C++ code
+\code{stanc}: translate Stan model specification to C++ code
 }
 \description{
-  Compile model in Stan language to C++ code, which can 
-  be compiled and then loaded for sampling. 
+  Translate Stan model specification to C++ code, which can 
+  then be compiled and loaded for sampling. 
 }
 \usage{
   stanc(model_code, model_name = "anon_model", verbose = FALSE) 
 } 
 
 \arguments{
-  \item{model_code}{A character string for a model in Stan language.}
-  \item{model_name}{A character string for naming the model. The 
+  \item{model_code}{A character string containing a Stan model specification.}
+  \item{model_name}{A character string naming the model. The 
     default is \code{anon_model}.}
   \item{verbose}{\code{TRUE} print out more intermediate information during the
-    procedure; \code{FALSE} otherwise. The default is \code{FALSE}.}             
+    translation procedure; \code{FALSE} otherwise. The default is \code{FALSE}.}             
 } 
 
 \value{
-  A list including an element of the C++ code. Relative elements are 
+  A list with named entries:
   \enumerate{ 
-    \item \code{model_name} The model name specified by the user or the default if not specified. 
-    \item \code{model_code} The model's Stan code. 
-    \item \code{cppcode}    The model's C++ code. 
-    \item \code{status}     The status indicating success/failure of compiling the Stan code. 
+    \item \code{model_name} Character string for the model name.
+    \item \code{model_code} Character string for the model's Stan specification. 
+    \item \code{cppcode}    Character string for the model's C++ code. 
+    \item \code{status}     Boolean status indicating success/failure of 
+                            translating and compiling the Stan code. 
   } 
 }
 
 \note{
-  \R users might make the following mistakes when 
-  using Stan modeling language.
-
-  Using dot(".") in variable names for data and parameters 
-  such as \code{a.1}. However,
-  The syntax in some respect of the Stan modeling language is
-  more like programming language C++, which does not allow dot. 
-  And in Stan modeling language, we need explicite semicolon (";")
-  to end a statement. 
-
-  In addition, most of all reserved keywords in C++ programming language 
-  as well as some names such as \code{std} that have already 
-  used in C++ cannot be used as variable names, see Stan's manual. 
-  The reserved keywords of C++ can be found at, for example, 
-  \url{http://en.cppreference.com/w/cpp/keyword}.
+  Unlike \R, in which variable identifiers may contain dots (e.g. \code{a.1}),
+  Stan prohibits dots from occurring in variable identifiers.
+  using Stan modeling language.  Further, C++ reserved words and
+  Stan reserved words may not be used for variable names;  see the
+  Stan User's Guide for a complete list.  
 } 
 
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference}. 
-  \url{http://mc-stan.org}. 
+  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \url{http://mc-stan.org/}. 
 } 
 
 \seealso{
@@ -59,7 +50,7 @@
 } 
 
 \examples{\dontrun{
-stanmodelcode <- '
+stanmodelcode <- "
 data {
   int<lower=0> N;
   real y[N];
@@ -73,8 +64,8 @@ model {
   mu ~ normal(0, 10);
   y ~ normal(mu, 1); 
 } 
+"
 
-'
 r <- stanc(stanmodelcode, "normal1") 
 names(r)
 cat(r$cppcode)
