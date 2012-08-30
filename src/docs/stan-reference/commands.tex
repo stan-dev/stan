@@ -1,31 +1,197 @@
 \part{Commands and Data Formats}
 
 
-\chapter{Compiling \Stan Programs to C++}\label{stanc.chapter}
+\chapter{Compiling \Stan Programs}
 
-\noindent 
-Preparing a \Stan program to be run involves two compilation steps,
+\noindent
+Preparing a \Stan program to be run involves two steps,
 %
 \begin{enumerate}
-\item compiling the \Stan program to \Cpp, and
+\item translating the \Stan program to \Cpp, and
 \item compiling the resulting \Cpp to an executable.
 \end{enumerate}
 %
-This chapter discusses the first step; the second step is discussed in
-\refchapter{compiling-cpp}.  The model translation step described in
-this chapter and the \Cpp compilation step described in the next
-chapter, along with compiling all dependent binaries can be automated
-with make; see \refchapter{make-models} for details.
+This chapter discusses both steps, as well as their encapsulation into
+a single make target.  
 
-\section{Building the \stanc Compiler}
+\section{Installing Stan}
 
-Before the \stanc compiler can be used, it must be built.  The
-commands are different in Windows and Unix-like operating systems.
+Before Stan can be run, it must be installed; see
+\refappendix{install} for complete platform-specific installation
+details.
 
-\subsection{Linux and Mac OS X}
+\section{Translating and Compiling through {\tt\bfseries make}}\label{make-models.section}
 
-Use the following call to \code{make}.%
+The simplest way to compile a Stan program is through the \code{make}
+build tool, which encapsulates the translation and compilation step
+into a single command.  The commands making up the \code{make} target
+for compiling a model are described in the following sections, and the
+following chapter describes how to run a compiled model.
+
+\subsection{Translating and Compiling Test Models}
+
+There are a number of test models distributed with Stan which unpack
+into the path \code{src/models}.  To build the simple example
+\nolinkurl{src/models/basic\_estimators/bernoulli.stan}, the following call
+to \code{make} suffices.  First the directory is changed to Stan's home
+directory by replacing \code{<stan-home>} with the appropriate path.
 %
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd <stan-home>
+\end{Verbatim}
+\end{quote}
+%
+The current directory should now contain the file named
+\code{makefile}, which is the default instructions used by
+\code{make}.  From within the top-level Stan directory, the following call
+will build an executable form of the Bernoulli estimator.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make src/models/basic_estimators/bernoulli
+\end{Verbatim}
+\end{quote}
+%
+This will translate the model \code{bernoulli.stan} to a \Cpp file and
+compile that \Cpp file, putting the executable in
+\nolinkurl{src/models/basic_distributions/bernoulli(.exe)}.  Although
+the make command including arguments is itself portable, the target it
+creates is different under Windows than in Unix-like platforms.  Under
+Linux and the Mac, the executable will be called \code{bernoulli},
+whereas under Windows it will be called \code{bernoulli.exe}.
+
+\subsection{Dependencies in {\tt\bfseries make}}
+
+A \code{make} target can depend on other \code{make} targets.  When
+executing a \code{make} target, first all of the targets on which it
+depends are checked to see if they are up to date, and if they are
+not, they are rebuilt.  This includes the top-level target itself.  If
+the \code{make} target to build the Bernoulli estimator is invoked a
+second time, it will see that it is up to date, and not compile
+anything.  But if one of the underlying files has changes since the
+last invocation \code{make}, such as the model specification file, it
+will be retranslated to \Cpp and recompiled to an executable.
+
+There is a dependency included in the make target that will
+automatically build the \code{bin/stanc} compiler and the
+\code{bin/libstan.a} library whenever building a model.
+
+
+\subsection{Making Other Models}
+
+A \code{make} target can be invoked from a directory other than the
+one that contains the \code{makefile} with the \code{-f} option.  Thus
+an alternative way to compile this model from its own source directory
+would be as follows (again replacing \code{<stan-home>} with the
+appropriate path to the top-level directory in which Stan was
+unpacked).
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd <stan-home>src/models/basic_estimators
+> make -f ../../../makefile bernoulli
+\end{Verbatim}
+\end{quote}
+%
+The expression \code{../../../makefile} is a relative path to the
+file named \code{makefile}; this says to go up three directories
+(i.e., back to \code{<stan-home>}) and then look for a file named
+\code{makefile}.  This can be an absolute path, too.  The Unix-like
+forward slashes can be used under Windows as well as under Linux and
+Mac.  
+
+
+\subsection{Getting Help from the {\tt makefile}}
+
+Stan's \code{makefile}, which contains the top-level instructions to
+\code{make}, provides extensive help in terms of targets and options.
+It is located at the top-level of the distribution, so first change
+directories to that location.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd <stan-home>
+\end{Verbatim}
+\end{quote} 
+and then invoke make with the target \code{help},
+
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make help
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{Options to \code{make}}
+
+Stan's \code{make} targets allow the user to change compilers,
+library versions for Eigen and Boost, as well as compilation options
+such as optimization.
+
+These options should be placed right after the call to \code{make}
+itself.  For instance, to specify the \code{clang++} compiler at
+optimization level 3, use
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make CC=clang++ O=0 ...
+\end{Verbatim}
+\end{quote}
+
+
+\subsubsection{Compiler Option}
+
+The option \code{CC=g++} specifies the \code{g++} compiler and
+\code{CC=clang++} specifies the \code{clang++} compiler.  Other
+compilers with other names may be specified the same way.  A full path
+may be used, or just the name of the program if it can be found on the
+system execution path.  
+
+\subsubsection{Optimization Option}
+
+The option \code{O=0} (that's letter 'O', equal sign, digit '0'),
+specifies optimization level 0 (no optimization), whereaas \code{O=3}
+specifies optimization level 3 (effectively full optimization), with
+levels 1 and 2 in between.
+
+With higher optimization levels, generated code tends to be bigger
+(in terms of bytes in memory) and faster.  For best results on
+computationally-intensive models, use optimization level 3 for the
+Stan library and for compiling models.
+
+\subsubsection{Library Options}
+
+Alternative versions of Eigen, Boost, and Google Test may be specified
+using the properties \code{EIGEN}, \code{BOOST}, and \code{GTEST}.
+Just set them equal to a path that resolves to an appropriate library.
+See the libraries distributed under \code{lib} to see which
+subdirectory of the library distribution should be specified in order
+for the include paths in the \Cpp code to resolve properly.
+
+
+\subsection{Additional  \code{make} Targets}
+
+All of these targets are intended to be invoked from the top-level
+directory in which Stan was unpacked (i.e., the directory that
+contains the file named \code{makefile}).
+
+\subsubsection{Clean Targets}
+
+A very useful target is \code{clean-all}, invoked as
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make clean-all
+\end{Verbatim}
+\end{quote}
+%
+This removes everything that's created automatically by \code{make},
+including the \code{stanc} translator, the Stan libraries, and all the
+automatically generated documentation.  
+
+\subsubsection{Make Target for \code{stanc}}
+
+To make the \code{stanc} compiler, use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -33,26 +199,47 @@ Use the following call to \code{make}.%
 \end{Verbatim}
 \end{quote}
 %
-The default compiler option is \code{CC=g++} and the default
-optimization level is \code{O=3} (the letter 'O').
+As with other executables, the executable \code{bin/stanc} will be
+created under Linux and Mac, whereas \code{bin/stanc.exe} will be
+created under Windows.
 
-\subsection{Windows}
+\subsubsection{Make Target for Stan Library}
 
-Windows behaves the same way, but executables must be specified
-with a \code{.exe} suffix.  For building \stanc, the command is
+To build the Stan library, use the following target,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make bin/stanc.exe
+> make bin/libstan.a
+\end{Verbatim}
+\end{quote}
+
+
+
+\section{Translating \Stan to C++ with {\tt\bfseries stanc}}\label{stanc.section}
+
+
+\subsection{Building the \stanc Compiler and the Stan Library}
+
+Before the \stanc compiler can be used, it must be built.  Use the
+following command from the top-level distribution directory containing
+the file named \code{makefile}.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make bin/stanc
 \end{Verbatim}
 \end{quote}
 %
-The default compiler options are the same, \code{CC=g++} \code{O=3}.
-Counterintuitively, the make command to windows uses the forward-slash
-path separator, even in Windows; a backslash will not work.
+This invocation produces the executable \code{bin/stanc} under Linux
+and Mac, and \code{bin/stanc.exe} under Windows.  The invocation of
+\code{make}, including the forward slash, is the same on both platforms.
+
+The default compiler option is \code{CC=g++} and the default
+optimization level is \code{O=3} (the letter 'O');  to see how to
+change these, see the previous section in this chapter on \code{make}.
 
 
-\section{The \stanc Compiler}
+\subsection{The \stanc Compiler}
 
 The \stanc compiler converts \Stan programs to \Cpp programs.  The
 first stage of compilation involves parsing the text of the \Stan
@@ -61,17 +248,21 @@ generates \Cpp code.  If the parser fails, it will provide a
 diagnostic error message indicating the location in the input where
 the failure occurred and reason for the failure.
 
-\subsection{Linux and Mac OS X}
-
-The following example illustrates a fully qualified call to \stanc.%
+The following example illustrates a fully qualified call to \stanc
+to build the simple Bernoulli model; just replace \code{<stan-home>}
+with the top-level directory containing Stan (i.e., the directory
+containing the file named \code{makefile}).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> bin/stanc --name=binary_normal --o=binorm.cpp binormal.stan 
+> cd <stan-home>
+> bin/stanc --name=bernoulli --o=bernoulli.cpp \
+  src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
 %
-This call specifies the name of the model, here {\tt binary\_normal}.
+The backslash (\Verb|\|) indicates a continuation of the same line.
+This call specifies the name of the model, here {\tt bernoulli}.
 This will determine the name of the class implementing the model in
 the \Cpp code.  Because this name is the name of a \Cpp class, it must
 start with an alphabetic character (\code{a--z} or \code{A--Z}) and
@@ -79,24 +270,14 @@ contain only alphanumeric characters (\code{a--z}, \code{A--Z}, and
 \code{0--9}) and underscores (\code{\_}) and should not conflict with
 any \Cpp reserved keyword.  
 
-The \Cpp code implementing the class is written to \code{binorm.cpp}.
-The final argument, \code{binormal.stan}, is the file from which to
-read the \Stan program.
+The \Cpp code implementing the class is written to the file
+\code{bernoulli.cpp} in the current directory.  The final argument,
+\code{binormal.stan}, is the file from which to read the \Stan
+program.
 
-\subsection{Windows}
+\subsection{Command-Line Options for {\tt\bfseries stanc}}
 
-The call on Windows is similar, but must be made with a backslash
-for the parent directory of \code{stanc}.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> bin\stanc --name=binary_normal --o=binorm.cpp binormal.stan 
-\end{Verbatim}
-\end{quote}
-%
-The \code{.exe} suffix on \code{stanc.exe} is optional in Windows.
-
-\section{Command-Line Options}
+The following options are available for \code{stanc}.
 
 \begin{description}
 %
@@ -133,21 +314,19 @@ Default: generate a main function
 
 
 
-
-
-\chapter{Compiling C++ Programs}\label{compiling-cpp.chapter}
+\section{Compiling C++ Programs}\label{compiling-cpp.section}
 
 \noindent
-As shown in the previous chapter (\refchapter{stanc}), \Stan converts
+As shown in the previous section (\refsection{stanc}), \Stan converts
 a program in the \Stan modeling language to a \Cpp program.  This \Cpp
 program must then be compiled using a \Cpp compiler.  
 
 The \Cpp compilation step described in this chapter, the model
 translation step described in the last chapter, and the compilation of
 the dependent binaries \code{bin/stanc} and \code{bin/libstan.a} may
-be automated through make; see \refchapter{make-models} for details.
+be automated through make; see \refsection{make-models} for details.
 
-\section{Which Compiler?}
+\subsection{Which Compiler?}
 
 \Stan has been developed using two portable, open-source \Cpp
 compilers, \gpp and \clang, both of which run under and generate code
@@ -163,7 +342,7 @@ optimization, but the machine code generated by \gpp at high
 optimization levels is faster.
 
 
-\section{What the Compiler Does}
+\subsection{What the Compiler Does}
 
 A \Cpp compiler like \gpp or \clang performs several lower-level
 operations in sequence,
@@ -183,7 +362,7 @@ assembler to convert assembly language code to machine code, and the
 linker to resolve the location of references in the relocatable object
 files.
 
-\section{Compiler Optimization}
+\subsection{Compiler Optimization}
 
 \Stan was written with an optimizing compiler in mind, which allows
 the code to be kept relatively clean and modular.  As a result, \Stan
@@ -197,23 +376,25 @@ with \code{-O0}; in both cases, the first character is the letter `O'
 and the second the digit `0'.
 
 
-\section{Building the \Stan Library}
+\subsection{Building the \Stan Library}
 
 Before compiling a \Stan-generated \Cpp program, the \Stan object
 library archive must be built using the makefile.  This only needs to
 be done once and then the archive may be reused.  The recommended
-build command for the \Stan archive is as follows.
+build command for the \Stan archive is as follows (replacing
+\code{<stan-home>} with the directory into which Stan was unpacked and
+which contains the file named \code{makefile}).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd $stan
+> cd <stan-home>
 > make CC=g++ O=3 bin/libstan.a 
 \end{Verbatim}
-\end{quote} % $ -- dollar sign get highlighting unconfused in emacs!
+\end{quote}
 %
 Please be patient and ignore the (unused function) warning messages.
 Compilation with high optimization on \code{g++} takes time (as much
-as 10 minutes or more) and memory (a little over 3GB). 
+as 10 minutes or more) and memory (as much as 3GB). 
 
 This example uses the \code{g++} compiler for \Cpp (makefile option
 \code{CC=g++}).  The \clang compiler may be used by specifying
@@ -227,11 +408,11 @@ recommended for running models.  It can be useful for working on
 \Stan's \Cpp code.
 
 
-\section{Compiling a \Stan Model}
+\subsection{Compiling a \Stan Model}
 
 Suppose following the instructions in the last chapter
-(\refchapter{stanc}) that a \Stan program has been converted to a \Cpp
-program that resides in the source file \code{\$stan/my\_model.cpp}.
+(\refsection{stanc}) that a \Stan program has been converted to a \Cpp
+program that resides in the source file \code{<stan-home>/my\_model.cpp}.
 
 The following commands will produce an executable in the file
 \code{my\_model} in the current working directory (\code{\$stan}).
@@ -239,10 +420,12 @@ The following commands will produce an executable in the file
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd $stan
-> g++ -O3 -Lbin -lstan -Isrc -Ilib/boost_1.51.0 \
-  -Ilib/eigen_3.1.0 my_model.cpp -o my_model
+> g++ -O3 -Lbin -Isrc -Ilib/boost_1.51.0 \
+  -Ilib/eigen_3.1.0 my_model.cpp -o my_model -lstan
 \end{Verbatim}
-\end{quote} % $
+\end{quote} %
+The backslash (\Verb|\|) is used to indicate that the command is
+continued; it should be entered all one one line.
 %
 The options used here are as follows.
 \begin{quote}
@@ -250,8 +433,6 @@ The options used here are as follows.
 \item[\code{-O3}] sets optimization level 3,
 \item[\code{-Lbin}] specifies that the archive is in the \code{bin}
   directory,
-\item[\code{-lstan}] specifies the name of the archived library (not
-  the name of the file in which it resides),
 \item[\code{-Isrc}] specifies that the directory \code{src} should be
   searched for code (it contains the top-level \Stan headers),
 \item[\code{-Ilib/eigen\_3.1.0}] specifies the directory for
@@ -262,6 +443,8 @@ The options used here are as follows.
   compile, and 
 \item[\code{-o my\_model}] is the name of the resulting executable
   produced by the command (suffixed by \code{.exe} in Windows).
+\item[\code{-lstan}] specifies the name of the archived library (not
+  the name of the file in which it resides),
 \end{description}
 \end{quote}
 %
@@ -275,7 +458,7 @@ executable name specified using the \code{-o} option, then the model
 is written into a file named \code{a.out}.
  
 
-\section{Library Dependencies}
+\subsection{Library Dependencies}
 
 \Stan depends on two open-source libraries,
 %
@@ -285,71 +468,24 @@ is written into a file named \code{a.out}.
 \end{enumerate}
 %
 These are both distributed along with \Stan in the directory
-\code{\$stan/lib}.  
+\code{<stan-home>/lib}.  
 
 The code for \Stan itself is located in the directory
-\code{\$stan/src}.  Because not all of \Stan is included in the
+\code{<stan-home>/src}.  Because not all of \Stan is included in the
 archive \code{bin/libstan.a}, the \code{src} directory must also be
 included for compilation.
 
 
 
-\chapter{Translating and Compiling through \code{make}}\label{make-models.chapter}
-
-Instead of calling the \Cpp compiler directly, the \code{make} tool
-may be used to translate a \Stan model to \Cpp and then compile the
-resulting \Cpp to an executable.  In the next two sections, the
-targets invoked by \code{make} are broken down step-by-step.
-
-\section{Translating and Compiling Test Models}
-
-There are a number of test models in the directory \code{src/models}
-of the distribution.  
-
-\subsection{Linux and Mac OS X}
-
-For example, to build the simple example
-\url{src/models/basic\_distributions/normal.stan}, the following call
-to make suffices.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make src/models/basic_distributions/normal
-\end{Verbatim}
-\end{quote}
-%
-This will translate the model \code{normal.stan} to a \Cpp file and
-compile that \Cpp file, putting the executable in
-\url{src/models/basic_distributions/normal}.
-
-There is a dependency included in the make target that will
-automatically build the \code{bin/stanc} compiler and
-the \code{bin/libstan.a} library.
-
-\subsection{Windows}
-
-For Windows, the make target needs to specify the \code{.exe} suffix.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make src/models/basic_distributions/normal.exe
-\end{Verbatim}
-\end{quote}
-%
-The resulting executable will be placed in
-\url{src/models/basic_distributions/normal.exe}.
-
-
-\section{Translating and Compiling User-Defined Models}
 
 
 \chapter{Running a \Stan Program}\label{stan-cmd.chapter}
 
 \noindent 
 Once a \Stan program defining a model has been converted to a \Cpp
-program for that model (see \refchapter{stanc}) and the resulting \Cpp
+program for that model (see \refsection{stanc}) and the resulting \Cpp
 program compiled to a platform-specific executable (see
-\refchapter{compiling-cpp}), the model is ready to be run.
+\refsection{compiling-cpp}), the model is ready to be run.
 
 \section{Simple Example}
 

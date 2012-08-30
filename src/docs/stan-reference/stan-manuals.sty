@@ -18,11 +18,7 @@
 \usepackage{titlesec}
 \usepackage{graphicx}
 \usepackage{natbib}
-
 \usepackage{url}
-
-% causing parsing issues if turned on
-% \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 
 \usepackage[titles]{tocloft}
 \setlength{\cftbeforechapskip}{0.5ex}
@@ -44,6 +40,13 @@
 %
 \titleformat{\subsection}{\bfseries}{}{0em}{}
 %\titlespacing{\subsection}{-1em}{12pt}{6pt}
+\titleformat{\subsubsection}{\slshape}{}{0em}{}
+%\titlespacing{\subsection}{-1em}{12pt}{6pt}
+
+\usepackage{color}
+\definecolor{linkcolor}{RGB}{16,16,128}
+\usepackage[colorlinks=true,linkcolor=linkcolor,anchorcolor=linkcolor,citecolor=linkcolor,filecolor=linkcolor,menucolor=linkcolor,runcolor=linkcolor,urlcolor=linkcolor,allcolors=linkcolor,pdfborder={0
+  0 0}]{hyperref}
 
 \newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
