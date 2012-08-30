@@ -88,7 +88,7 @@ This is a short introduction to \RStan \footnote{The name of this package is
 the \R interface to \Stan. Users of \RStan need to be familiar with \Stan first,
 especially the \Stan modeling language.  Details about \Stan can be found in 
 \emph{Stan Modeling Language User's Guide and Reference
-Manual}(\citealt{StanManual:2012}), so we focus on how to use \RStan by an
+Manual} (\citealt{StanManual:2012}), so we focus on how to use \RStan by an
 example in \cite{GelmanCarlinSternRubin:2003} here. 
 
 \subsection{Prerequisites} 
@@ -98,7 +98,7 @@ need \Stan to be installed. However, we need a \Cpp compiler as needed by
 \Stan. Refer to \cite{StanManual:2012} for how to install a \Cpp compiler if there 
 not exists one. 
 
-In addition, package \pkg{rstan} depends on other packages of \cpkg{Rcpp}, \cpkg{inline},
+In addition, package \pkg{rstan} depends on other \R packages: \cpkg{Rcpp}, \cpkg{inline},
 and \cpkg{RcppEigen}. Before installing \RStan, these packages 
 need to be installed first if not installed automatically. 
 
@@ -108,7 +108,7 @@ First, we can summarize the steps of using \Stan to conduct
 statistical inference simply as follows. 
 \begin{enumerate}[I]
 \item Represent the statistical model in \Stan modeling language 
-\item Translate the \Stan model to \Cpp code using \stanc 
+\item Translate model coded in \Stan modeling language to \Cpp code using \stanc 
 \item Compile the \Cpp code for the model using a \Cpp compiler such as \gpp to 
       create an executable file 
 \item Prepare Data  
@@ -118,8 +118,8 @@ statistical inference simply as follows.
 
 In \RStan, we have the same steps as in \Stan but packaged 
 in different functions. Knowing these steps is helpful especially
-in the case we encounter problem with our coding. In addition, 
-in \RStan, we provide a function called \code{stan} to wrap up
+in the case we encounter problem with our coding. In \RStan, 
+we provide a function called \code{stan} to wrap up
 most of the above steps. 
 
 
@@ -210,14 +210,15 @@ Function \code{stan} wraps up the follow three steps. These steps are similar to
 steps mentioned above for \Stan. But \RStan has a deep integration of \Stan, which 
 allows end-to-end use of \Stan inside \R. 
 \begin{enumerate}
-\item Translate the \Stan model to \Cpp code 
+\item Translate the model in \Stan code to \Cpp code 
 \item Compile the \Cpp code to binary dynamic shared object (DSO)
 \item Load the DSO and sample 
 \end{enumerate}
 
-Notice it is easy to just use function \code{stan} in one step if everything
-goes well. \RStan also provides functionality to fit a model by several 
-steps to make it easier to debug our \Stan model code and \R code. 
+Notice it is easy to just use function \code{stan} to conduct all the above
+steps if everything goes well. \RStan also provides functionality to fit a
+model by several steps to make it easier to debug our \Stan model code and \R
+code. 
 
 Function \code{stan} returns an object of S4 class \code{stanfit}, for which
 a few generic methods such as \code{print} and \code{plot} are provided. 
@@ -269,10 +270,10 @@ fit <- sampling(sm, data = dat, n.chains = 4)
 @
 
 The returned object from the above \code{sampling} is an object
-of S4 class \code{stanfit}, the same result returned 
-by function \code{stan}. Also here we can have a variety of 
+of S4 class \code{stanfit}, the same type of result returned 
+by function \code{stan}. Also we have a variety of 
 arguments to control the sampling procedure the same as in 
-\code{stan}, since inside function \code{stan}, function
+function \code{stan}, since inside function \code{stan}, function
 \code{sampling} is called. 
 
 
@@ -293,7 +294,7 @@ the information regarding the sampling procedure, for example, the initial
 values for all parameters, the seed for random number generating,
 and parameters used for the sampler. 
 
-\section{More details about using package \pkg{rstan}}
+\section{More details about using RStan}
 
 Details about \pkg{rstan} and the usage of its functions could be 
 found inside \pkg{rstan}'s documentation. We talk about a few important
@@ -321,18 +322,18 @@ need to be given.
 In \RStan, we wrap the fitted model in an S4 class \code{stanfit}. Generic
 functions defined for this class includes \code{print} (demonstrated in 
 Section \ref{sec0example}), \code{plot}, \code{summary},
-\code{traceplot}. A common feature for most of these functions are that they allow us 
+\code{traceplot}, etc. A common feature for most of these functions are that they allow us 
 to specify parameters of interest through \code{pars} so that only part of 
 the results for the fitted model are, for example, printed (plotted), which
 could be helpful when there are too many parameters in the model.  
 
 Function \code{plot} intends to give us an overview of the inference 
 for all the parameters (if possible) in the model. 
-Figure~\ref{fig0stanfitplot} presents the plot of the eight schools example. 
+Figure \ref{fig0stanfitplot} presents the plot of the eight schools example. 
 In this plot, an credible interval (typically 80\%) for all the sample
 as well as the log-posterior (\code{lp\_\_}), 
 and the median of each chain are displayed. In addition, under the lines
-indicating intervals, a small colored area is used to indicated the 
+indicating intervals, a small colored area is used to indicate the 
 value of split Rhat, in which the color indicates the value of Rhat. 
 
 Function \code{traceplot} plot the traces of all chains for the parameters 
@@ -382,7 +383,7 @@ dimnames(s2)
 In \Stan, for every model, we use \stanc to compile the 
 model from Stan modeling language code to \Cpp code 
 and then compile the \Cpp code to dynamic shared object (DSO),
-which is loaded into \R ang executed to draw sample. 
+which is loaded into \R and executed to draw sample. 
 The compiling from C++ code to DSO, sometimes, takes a while. 
 When the model is the same, we could reuse the DSO from previous run. 
 In function \code{stan}, if parameter \code{fit} is specified
@@ -404,7 +405,7 @@ language code from the fitted object by calling
 also saved in this object, so they can be used to 
 reproduce previous sampling procedure. 
 To get the initial values we can use \code{get\_inits}. 
-See table~\ref{tab0stanfitfuns} for a summary of functions
+See Table \ref{tab0stanfitfuns} for a summary of functions
 defined in class \code{stanfit}. 
 
 \begin{table}
