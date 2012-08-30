@@ -1,15 +1,6 @@
 STAN V1.0
 ======================================================================
 
-* update doc 
-  - revised stanc default model names
-  - use makefiles for models
-  - cmd-line getting started, pull out of manual
-  - pull -lstan to end of g++ commands
-
-? add identifier checks for C++ and Stan reserved words, including
-  model name in stanc
-
 
 CODE CLEANUP
 ======================================================================
