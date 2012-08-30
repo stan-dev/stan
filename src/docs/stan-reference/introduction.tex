@@ -22,7 +22,7 @@ data, future predictions), $y$ is a sequence of modeled known
 values, and $x$ is a sequence of unmodeled predictors and constants
 (e.g., sizes, hyperparameters).
 
-\Stan programs consist of variable type declarations and statments.
+\Stan programs consist of variable type declarations and statements.
 Variable types include constrained and unconstrained integer, scalar,
 vector, and matrix types, as well as (multidimensional) arrays of
 other types.  Variables are declared in blocks corresponding to the
@@ -42,7 +42,7 @@ blocks.  A special model block consists of statements defining the log
 probability for the model.
 
 Within the model block, \BUGS-style sampling notation may be used as
-shorthand for incrementing an underlying log probablity variable, the
+shorthand for incrementing an underlying log probability variable, the
 value of which defines the log probability function.  The log
 probability variable may also be accessed directly, allowing
 user-defined probability functions and Jacobians of transforms.
@@ -77,7 +77,7 @@ can be summed out of models.
 
 \HMC accelerates both convergence to the stationary distribution and
 subsequent parameter exploration by using the gradient of the log
-probabilty function.  The unknown quantity vector $\theta$ is
+probability function.  The unknown quantity vector $\theta$ is
 interpreted as the position of a fictional particle.  Each iteration
 generates a random momentum and simulates the path of the particle
 with potential energy determined the (negative) log probability
@@ -119,7 +119,7 @@ no-U-turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.
 Samples in a Markov chain are only drawn with the marginal
 distribution $p(\theta|y;x)$ after the chain has converged to its
 equilibrium distribution.  There are several methods to test whether
-an \MCMC method has failed to converge; unforunately, passing the
+an \MCMC method has failed to converge; unfortunately, passing the
 tests does not guarantee convergence.  The recommended method for
 \Stan is to run multiple Markov chains each with different diffuse
 initial parameter values, discard the warmup/adaptation samples, then
@@ -500,7 +500,7 @@ are accessed using standard array notation, indexing from 1, as \code{y[1]},
 
 The \code{parameters} block declares a single parameter, \code{theta}.
 The parameter \code{theta} is declared as type \code{real<lower=0,upper=1>},
-contstraining it to continuous values between zero and one inclusive,
+constraining it to continuous values between zero and one inclusive,
 to ensure it satisfies the constraint placed on it by the probability
 function \code{bernoulli} in the \code{model} block.
 
