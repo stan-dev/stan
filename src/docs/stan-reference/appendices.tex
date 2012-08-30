@@ -97,12 +97,12 @@ In order to compile \Stan models, the \Stan source code is required.
 The latest version of \Stan can be downloaded from the following link.
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/}
+\url{http://mc-stan.org/}
 \end{quote}
 %
 The \Stan source code distribution includes \Stan's source code,
 documentation, build tools, unit tests, demo models, documentation and
-the source for the required libraries Eigen and Boost and the source for
+source for the required libraries Boost and Eigen, and the source for
 an optional testing library, Google Test.
 
 \subsubsection{Boost C++ Library Source}
@@ -131,7 +131,7 @@ algebra library.
 \item Tested Version: 3.1.0
 \end{itemize}
 %
-The Eigen library is distributed with \Stan.
+The Eigen source code is distributed with \Stan.
 
 
 \subsection{\Cpp Compiler}
@@ -173,7 +173,7 @@ in.
 
 \subsection{GNU Make Build Tool}
 
-\Stan automates the build, test, documentation and deployment tasks
+\Stan automates the build, test, documentation, and deployment tasks
 using scripts in the form of makefiles to run with GNU Make.
 %
 \begin{itemize}
@@ -229,9 +229,9 @@ The Google Test framework is distributed with \Stan.
 
 \subsection{Install Xcode}
 
-Apple's Xcode contains both compilers and make all of the tools needed 
-to work with \Stan as a user.  Which version you need depends on the
-operating system version.
+Apple's Xcode contains both the \clang and \gpp compilers and make, all of the tools 
+needed to work with \Stan as a user. The version of Xcode to install depends on the
+version of Mac OS X.
 
 \begin{description}
 \item[Mac OS X ``Snow Leopard'' or earlier]
