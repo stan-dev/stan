@@ -750,6 +750,13 @@ organize_inits <- function(inits, pars, dims) {
   # Args: 
   #   inits: a list of vectors, each vector is the 
   #     inits for a chain 
+  #   pars: vector of character for the names 
+  #   dims: a list of lists with equal length of `pars` 
+
+  # remove element 'lp__' in the names 
+  idx_of_lp <- which(pars == "lp__")
+  if (idx_of_lp > 0) pars <- pars[-idx_of_lp] 
+
   n_chains <- length(inits) 
   starts <- calc_starts(dims) 
   tmpfun <- function(x) {

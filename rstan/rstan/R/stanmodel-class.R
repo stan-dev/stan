@@ -59,11 +59,11 @@ setMethod("sampling", "stanmodel",
             } 
 
             sampler <- new(object@.modelmod$sampler, data)
-            m.pars = sampler$param_names() 
-            p.dims = sampler$param_dims() 
+            m_pars = sampler$param_names() 
+            p_dims = sampler$param_dims() 
             if (!missing(pars) && !is.na(pars) && length(pars) > 0) {
               sampler$update_param_oi(pars)
-              m <- which(match(pars, m.pars, nomatch = 0) == 0)
+              m <- which(match(pars, m_pars, nomatch = 0) == 0)
               if (length(m) > 0) 
                 stop("no parameter ", paste(pars[m], collapse = ', ')) 
             }
@@ -105,13 +105,13 @@ setMethod("sampling", "stanmodel",
                        n_flatnames = n_flatnames) 
             fit <- new("stanfit",
                        model_name = object@model_name,
-                       model_pars = m.pars, 
-                       par_dims = p.dims, 
+                       model_pars = m_pars, 
+                       par_dims = p_dims, 
                        sim = sim,
                        # summary = summary,
                        # keep a record of the initial values 
                        inits = organize_inits(lapply(sim$samples, function(x) attr(x, "inits")), 
-                                               m.pars, p.dims), 
+                                               m_pars, p_dims), 
                        stan_args = args_list,
                        .MISC = new.env()) 
              assign("stanmodel", object, envir = fit@.MISC)
