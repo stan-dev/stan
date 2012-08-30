@@ -5,7 +5,7 @@ setMethod("show", "stanfit",
 
 printstanfit <- function(x, pars = x@sim$pars_oi, 
                          probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
-                         digits.summary = 1, ...) { 
+                         digits_summary = 1, ...) { 
   s <- summary(x, pars, probs, ...)  
   cat("Inference for Stan model: ", x@model_name, '.\n', sep = '')
   cat(x@sim$n_chains, " chains: each with iter=", x@sim$iter, 
@@ -15,7 +15,7 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
   # round n_eff to 0 decimal point 
   s$summary[, 'n_eff'] <- round(s$summary[, 'n_eff'], 0)
 
-  print(round(s$summary, digits.summary), ...) 
+  print(round(s$summary, digits_summary), ...) 
 
   sampler <- attr(x@sim$samples[[1]], "args")$sampler 
 

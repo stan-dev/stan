@@ -74,10 +74,16 @@ object of type \code{list}}
       model with inference about mean (\code{mean}), standard error of the 
       mean (\code{se_mean}), standard deviation (\code{sd}), and quantities
       about quantities of interest based on all chains merged. 
-      Most of the printout are the results from method \code{summary}.} 
+      Most of the printout are the results from method \code{summary}. Other 
+      parameters that can be specified are \code{pars}, \code{probs}, and
+      \code{digits_summary}. \code{pars} specifies the parameters of interest;
+      \code{probs} specifies the quantities of interest; \code{digits_summary}
+      specifies the number of significant digits for printing out the summary. 
+    } 
     \item{\code{summary}}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the sample: the quantiles 
-      (for example, 2.5\%, 50\%, 97.5\%, which can be specified), 
+      (for example, 2.5\%, 50\%, 97.5\%, which can be specified by 
+      using parameter \code{probs}), 
       the mean, the standard deviation (sd), the effective sample size (n_eff),
       and the split Rhat (i.e., potential scale reduction derived from all
       chains after splitting each chain in half and treating the halves as chains).
@@ -86,12 +92,16 @@ object of type \code{list}}
       For the summary of all chains merged, we also have \code{se_mean},
       the standard error of the mean. In addition to parameters, the log-posterior
       (\code{lp__}) is also a quantity of interest in the summary.  
+      To specify parameters of interest, use parameter \code{pars}. The 
+      default for \code{pars} is all the parameters saved in the fitted
+      results as well as the log-posterior. 
     }
     \item{\code{extract}}{\code{signature(object = "stanfit")}: 
       get the sample for all chains for all (or specified ) parameters. 
       (see \code{\link{extract}}).}
     \item{\code{traceplot}}{\code{signature(object = "stanfit")}:
-      plot the trace of chains.} 
+      plot the trace of chains (see \code{\link{traceplot}}). 
+    } 
     \item{\code{get_stancode}}{\code{signature(object = "stanfit")}:
       get the Stan code for the fitted model.}
     \item{\code{get_stanmodel}}{\code{signature(object = "stanfit")}: 
@@ -142,6 +152,7 @@ ainfo <- get_adaptation_info(fit)
 cat(ainfo[[1]])
 seed <- get_seed(fit)
 sp <- get_sampler_params(fit)
+sp2 <- get_sampler_params(fit, inc_warmup = FALSE)
 head(sp[[1]])
 }}
 \keyword{classes}
