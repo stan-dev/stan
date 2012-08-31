@@ -8,6 +8,6 @@
   pkgdesc <- packageDescription("rstan", lib.loc = rstanLib)
   builddate <- gsub(';.*$', '', pkgdesc$Packaged)
   gitrev <- substring(git_head(), 0, 12) 
-  packageStartupMessage(paste("rstan (Version ", pkgdesc$version, ", packaged: ", builddate, ", GitRev: ", gitrev, ")", sep = ""))
+  packageStartupMessage(paste("rstan (Version ", pkgdesc$Version, ", packaged: ", builddate, ", GitRev: ", gitrev, ")", sep = ""))
 } 
 
