@@ -69,59 +69,60 @@ hyperparameters, and predictors.
 
 \subsection{Probability Functions}
 
-The probability function $p(y,\theta;x)$ is the joint probability
-function of the data $y$ and parameters $\theta$ given the constants
-and predictors $x$.  The conditional probability function
-$p(y|\theta;x)$ of the data $y$ given parameters $\theta$ and
-constants $x$ is called the sampling probability function;  it is also
-called the likelihood function when viewed as a function of $\theta$
-for fixed $y$ and $x$.  
+The probability function $p(y,\theta)$ is the joint probability
+function of the data $y$ and parameters $\theta$.  The constants and
+predictors $x$ are implicitly understood as being part of the
+conditioning.  The conditional probability function $p(y|\theta)$ of
+the data $y$ given parameters $\theta$ and constants $x$ is called the
+sampling probability function; it is also called the likelihood
+function when viewed as a function of $\theta$ for fixed $y$ and $x$.
 
-The probability function $p(\theta;x)$ over the parameters given the
-constants is called the prior because it characterizes the probability
+The probability function $p(\theta)$ over the parameters given the
+constants $x$ is called the prior because it characterizes the probability
 of the parameters before any data is observed.  The conditional
-probability function $p(\theta|y;x)$ is called the posterior because
+probability function $p(\theta|y)$ is called the posterior because
 it characterizes the probability of parameters given observed data $y$
-(and constants $x$).  
+and constants $x$.  
 
 \subsection{Bayes's Rule}
 
 The technical apparatus of Bayesian inference hinges on the following
-chain of equations, known in various forms as Bayes's rule.
+chain of equations, known in various forms as Bayes's rule (where
+again, the constants $x$ are implicit).
 %
 \[
 \begin{array}{rcll}
-p(\theta|y;x)  & =  & \displaystyle \frac{p(\theta,y;x)}{p(y;x)} 
+p(\theta|y)  & =  & \displaystyle \frac{p(\theta,y)}{p(y)} 
 & \mbox{{} \ \ \ \ \ [definition of  conditional probability]}
 \\[16pt]
-& = & \displaystyle \frac{p(y|\theta;x) \, p(\theta;x)}{p(y;x)}
+& = & \displaystyle \frac{p(y|\theta) \, p(\theta)}{p(y)}
 & \mbox{{} \ \ \ \ \ [chain rule]}
 \\[16pt]
-& = & \displaystyle \frac{p(y|\theta;x) \, p(\theta;x)}
-                        {\int_{\Theta} p(y,\theta;x) \, dx}
+& = & \displaystyle \frac{p(y|\theta) \, p(\theta)}
+                        {\int_{\Theta} p(y,\theta) \, d\theta}
 & \mbox{{} \ \ \ \ \ [law of total probability]}
 \\[16pt]
-& = & \displaystyle \frac{p(y|\theta;x) \, p(\theta;x)}
-                        {\int_{\Theta} p(y|\theta;x) \, p(\theta;x) \, dx}
+& = & \displaystyle \frac{p(y|\theta) \, p(\theta)}
+                        {\int_{\Theta} p(y|\theta) \, p(\theta) \, d\theta}
 & \mbox{{} \ \ \ \ \ [chain rule]}
 \\[16pt]
-& \propto & \displaystyle p(y|\theta;x) \, p(\theta;x)
+& \propto & \displaystyle p(y|\theta) \, p(\theta)
 & \mbox{{} \ \ \ \ \ [$y$ is fixed]}
 \end{array}
 \]
 %
 Bayes's rule ``inverts'' the probability of the posterior
-$p(\theta|y;x)$, expressing it solely in terms of the likelihood
-$p(y|\theta;x)$ and prior $p(\theta;x)$.  The last step is important
-for \Stan, which only requires probability functions to be
-characterized up to a constant multiplier.  
+$p(\theta|y)$, expressing it solely in terms of the likelihood
+$p(y|\theta)$ and prior $p(\theta)$ (again, with constants and
+predictors $x$ implicit).  The last step is important for \Stan, which
+only requires probability functions to be characterized up to a
+constant multiplier.
 
 \subsection{Predictive Inference}
 
 The uncertainty in the estimation of parameters $\theta$ from the data
-$y$ (given the model) is characterized by the posterior
-$p(\theta|y;x)$.  The posterior is thus crucial for Bayesian
-predictive inference.
+$y$ (given the model) is characterized by the posterior $p(\theta|y)$.
+The posterior is thus crucial for Bayesian predictive inference.
 
 If $\tilde{y}$ is taken to represent new, perhaps as yet unknown,
 observations, along with corresponding constants and predictors
@@ -129,16 +130,17 @@ $\tilde{x}$, then the posterior predictive probability function is
 given by
 %
 \[
-p(\tilde{y}|\tilde{x},\, y,x)
-= \int_{\Theta} p(\tilde{y}|\theta;\tilde{x}) 
-                \, p(\theta|y;x) \, d\theta.
+p(\tilde{y}|y)
+= \int_{\Theta} p(\tilde{y}|\theta) 
+                \, p(\theta|y) \, d\theta.
 \]
-Like the posterior itself, predictive inference is characterized
-probabilistically.  Rather than using a point estimate of the
-parameters $\theta$, predictions are made based on averaging the
-predictions over a range of $\theta$ weighted by the posterior
-probability $p(\theta|y;x)$ of $\theta$ given data $y$ (and constants
-$x$).
+Here, both the original constants and predictors $x$ and the new
+constants and predictors $\tilde{x}$ are implicit.  Like the posterior
+itself, predictive inference is characterized probabilistically.
+Rather than using a point estimate of the parameters $\theta$,
+predictions are made based on averaging the predictions over a range
+of $\theta$ weighted by the posterior probability $p(\theta|y)$ of
+$\theta$ given data $y$ (and constants $x$).
 
 The posterior may also be used to estimate event probabilities.  For
 instance, the probability that a parameter $\theta_k$ is greater than
@@ -146,7 +148,7 @@ zero is characterized probabilistically by
 %
 \[
 \mbox{Pr}[\theta_k > 0]
-= \int_{\Theta} \mbox{I}(\theta_k > 0) \, p(\theta|y;x) \, d\theta.
+= \int_{\Theta} \mbox{I}(\theta_k > 0) \, p(\theta|y) \, d\theta.
 \]
 %
 The indicator function, $\mbox{I}(\phi)$, evaluates to one if the
@@ -159,7 +161,7 @@ probability function as
 \[
 \mbox{Pr}[\tilde{y}_n > \tilde{y}_{n'}]
 = \int_{\Theta} \int_{Y} \mbox{I}(\tilde{y}_n > \tilde{y}_{n'}) \,
-p(\tilde{y}|\theta) p(\theta|y;x) \, d\tilde{y} \, d\theta.
+p(\tilde{y}|\theta) p(\theta|y) \, d\tilde{y} \, d\theta.
 \]
 
 
@@ -185,8 +187,10 @@ defined by the integral
 \mu = \int_{\Theta} \, \theta \times p(\theta) \, d\theta.
 \]
 For even a moderately complex Bayesian model, the posterior density
-$p(\theta|y;x)$ leads to an integral that is impossible to evaluate
-analytically.
+$p(\theta|y)$ leads to an integral that is impossible to evaluate
+analytically.  The posterior also depends on the constants and
+predictors $x$, but from here, they will just be ellided and taken as
+given.
 
 Now suppose it is possible to draw independent samples from
 $p(\theta)$ and let $\theta^{(1)},\theta^{(2)},\ldots,\theta^{(N)}$ be
@@ -606,7 +610,7 @@ inferential power is accounted for with effective sample size
 calculations as described in \refsection{effective-sample-size}.
 
 
-\chapter{Variable Transforms}\label{variable-transforms.chapter}
+\chapter{Transformations of Variables}\label{variable-transforms.chapter}
 
 \noindent
 To avoid having to deal with constraints while simulating the

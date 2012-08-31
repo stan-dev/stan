@@ -1,6 +1,29 @@
-STAN V1.0
+STAN V1.0.1
 ======================================================================
 
+- MAYBE add n_chains, n_iter, n_warmup, n_thin as extra arguments 
+  + code for RStan and maybe Stan
+  + doc for RStan and Stan
+  + deprecate old options, iter, warmup, thin w/o breaking
+    backward compaibility (move old ones to footnote in manual)
+    -- warning when used that deprecated?
+
+- print signatures of functions with matching names in
+  errors from parsers
+  + stretch goal to use edit distance like clang++ does
+
+- put a table of vectorized functions in the doc
+
+- add chains argument to Stan command to run multiple chains
+  and write into one or more files
+
+- We also probably need a branch called v1.0.x or v1.x. And a set of
+  guidelines for what goes in what branch. And to write down our
+  accumulated set of guidelines so that other people can find them.
+
+- add prior to getting started examples in doc
+
+- make manual needs to go one or two more latex rounds
 
 CODE CLEANUP
 ======================================================================
@@ -139,6 +162,13 @@ Sampling
 Modeling Language
 ----------------------------------------------------------------------
 
+* syntactic sugar sampling notation
+  - blocks where sampling not allowed (all but model)
+  - generated quantities, parameter init block:
+      beta[n] ~ normal(0,10);
+    means 
+      beta[n] <- random_normal(0,10);
+
 * make any C++ reserved word a reserved word so it doesn't
   mess up C++ compilation
 
@@ -202,14 +232,6 @@ Modeling Language
 * add a parameter initialization block
   - fill in values not given randomly or report error?
   - needs randomization
-
-* syntactic sugar sampling notation
-  - blocks where sampling not allowed (all but model)
-  - generated quantities, parameter init block:
-      beta[n] ~ normal(0,10);
-    means 
-      beta[n] <- random_normal(0,10);
-  - right-hand side must all be defined here
 
 * matrix power operations
   -  matrix power:    A^n

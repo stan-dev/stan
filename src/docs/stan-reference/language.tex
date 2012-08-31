@@ -2218,12 +2218,14 @@ model {
     y[n] ~ normal(mu_y,sigma_y);
 }
 generated quantities {
-  real y_rep[N];          // derived quantity (replicate)
-  for (n in 1:N)
-    y_rep[n] <- rand_normal(mu_y,sigma_y);
+  real variance_y;       // derived quantity (transform)
+  variance_y <- sigma_y * sigma_y; 
 }
 \end{Verbatim}
 \end{quote}
+%  from generated_quantities
+%  for (n in 1:N)
+%    y_variance[n] <- sigma_y rand_normal(mu_y,sigma_y);
 %
 In this example, \code{y[N]} is a modeled data vector.  Although it is
 specified in the \code{data} block, and thus must have a known value
@@ -2262,16 +2264,20 @@ a scale parameter and assigned to the variable \code{sigma\_y} in the
 is considered a derived quantity --- its value is entirely determined
 by the values of other variables.  
 
-The \code{generated quantities} block defines a second array of \code{N}
-entries, \code{y\_rep}, for replicated data.  The vector \code{y\_rep}
-has its values filled in by randomly generating normal variates given
-the parameters \code{mu\_y} and \code{sigma\_y}.  This kind of derived
-quantity may be used for model checking.
+The \code{generated quantities} block defines a value
+\code{variance\_y}, which is defined as a transform of the scale or
+deviation parameter \code{sigma\_y}.  It is defined in the generated
+quantities block because it is not used in the model.  Making it
+a generated quantity allows it to be monitored for convergence (being
+a non-linear transform, it will have different autocorrelation and
+hence convergence properties than the deviation itself).  
 
-Finally, the variable \code{n} is used as a loop index in two for
-loops, one in the \code{model} block and one in the \code{generated
-  quantities} block.
+In later versions of Stan which have random number generators for
+the distributions, the \code{generated quantities} block will be
+usable to generate replicated data for model checking.
 
+Finally, the variable \code{n} is used as a loop index in the
+\code{model} block.  
 
 
 \section{Program Block: \code{data}}
