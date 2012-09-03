@@ -10,8 +10,9 @@ dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
 
 STATICLIB_EXT <- 'a' 
+files <- Sys.glob(paste("*", STATICLIB_EXT, sep = ''))
 libstanarch <- if (nzchar(R_ARCH)) paste('libstan', R_ARCH, sep = '') else 'libstan'
-dest <- file.path(R_PACKAGE_DIR, libarch)
+dest <- file.path(R_PACKAGE_DIR, libstanarch)
 dir.create(dest, recursive = TRUE, showWarnings = FALSE)
 file.copy(files, dest, overwrite = TRUE)
 
