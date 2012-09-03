@@ -39,9 +39,9 @@ $(USERLIB): $(LIBSTANOBJECTS)
 
 
 libstanLibrary: $(USERLIB) 
-	-@if test ! -e $(LIBSTAN)$(R_ARCH); then mkdir -p $(LIBSTAN)$(R_ARCH); fi
-	cp $(USERLIB) $(LIBSTAN)$(R_ARCH)
-	rm $(USERLIB) 
+	# -@if test ! -e $(LIBSTAN)$(R_ARCH); then mkdir -p $(LIBSTAN)$(R_ARCH); fi
+	# cp $(USERLIB) $(LIBSTAN)$(R_ARCH)
+	# rm $(USERLIB) 
 
 # $(USERLIB): $(LIBSTANOBJECTS)
 #   $(SHLIB_CXXLD) -s -o $(USERLIB) $(LIBSTANOBJECTS) $(SHLIB_CXXLDFLAGS) $(ALL_LIBS)
