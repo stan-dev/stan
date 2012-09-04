@@ -786,6 +786,60 @@ you can look for similar structures in these examples.
   model are directly executable: they translate exactly into C++ code
   that is used to compute the log posterior density (which in turn is
   used to compute the gradient).
+\item In \BUGS, the order in which statements are written does not
+  matter.  They are executed according to the directed graphical model
+  so that variables are always defined when needed.  A side effect of
+  the direct execution of \Stan's modeling language is that statements
+  execute in the order in which they are written.  For instance, the
+  following \Stan program, which sets \code{mu} before using it to
+  sample \code{y}.
+%
+\begin{quote}
+\begin{Verbatim}
+mu <- a + b * x;
+y ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+It translates to the following \Cpp code.
+%
+\begin{quote}
+\begin{Verbatim} 
+mu = a + b * x; 
+lp += normal_log(mu,sigma);
+\end{Verbatim}
+\end{quote} 
+%
+Contrast this with the \Stan program
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu,sigma)
+mu <- a + b * x
+\end{Verbatim}
+\end{quote}
+%
+This program is well formed, but is almost certainly  
+a coding error, because it attempts to use \code{mu} before 
+it is set. It translates to the following \Cpp code.
+%
+\begin{quote}
+\begin{Verbatim}
+lp += normal_log(mu,sigma);
+mu = a + b * x;
+\end{Verbatim}
+\end{quote}
+%
+The direct translation to the imperative language of \Cpp code
+highlights the potential error of using \code{mu} in the first
+statement.
+\\[8pt]
+To trap these kinds of errors, variables are initialized to the
+specail not-a-number (\code{NaN}) value.  If \code{NaN} is passed to a
+log probability function, it will raise a domain exception, which will
+in turn be reported by the sampler.  The sampler will reject the
+sample out of hand as if it had zero probability.
+%
 \item Stan uses its own \Cpp algorithmic differentiation packages to
   compute the gradient of the log density (up to a proportion).
   Gradients are required during the Hamiltonian dynamics simulations
