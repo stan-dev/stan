@@ -54,6 +54,10 @@ CODE CLEANUP
 RStan
 ======================================================================
 
+* error messages like index out of bounds need to get
+  trapped by RStan and reported; just need to catch
+  indexing exceptions
+
 * group dimensions of multivariate params somehow
   -- perhaps share scale?
 
@@ -384,6 +388,8 @@ Command-line
 
 C++ API
 ----------------------------------------------------------------------
+
+* rename _p to _cdf and deprecate _p functions?
 
 * dump format handle:
   - integers with scientific notation
