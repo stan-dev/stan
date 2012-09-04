@@ -1023,7 +1023,7 @@ namespace stan {
         o_ << ");" << EOL;
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
           generate_indent(indent_,o_);
-          o_ << "lp__ += log(";
+          o_ << "lp__ -= log(";
           o_ << x.dist_.family_ << "_p(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
@@ -1039,7 +1039,7 @@ namespace stan {
           o_ << "));" << EOL;
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           generate_indent(indent_,o_);
-          o_ << "lp__ += log(";
+          o_ << "lp__ -= log(";
           o_ << x.dist_.family_ << "_p(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
@@ -1049,7 +1049,7 @@ namespace stan {
           o_ << "));" << EOL;
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           generate_indent(indent_,o_);
-          o_ << "lp__ += log(1.0 - "; // FIXME: use log1m()
+          o_ << "lp__ -= log1m(";
           o_ << x.dist_.family_ << "_p(";
           generate_expression(x.truncation_.low_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
@@ -1498,12 +1498,12 @@ namespace stan {
     };
 
     void suppress_warning(const std::string& indent,
-			 const std::string& var_name,
-			 std::ostream& o) {
+                         const std::string& var_name,
+                         std::ostream& o) {
       o << indent << "(void) " 
-	<< var_name << ";"
-	<< " // dummy call to supress warning"
-	<< EOL;
+        << var_name << ";"
+        << " // dummy call to supress warning"
+        << EOL;
     }
 
     void generate_member_var_inits(const std::vector<var_decl>& vs,
