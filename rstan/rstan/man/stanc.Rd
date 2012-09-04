@@ -15,10 +15,14 @@ Translate Stan model specification to C++ code
 \arguments{
   \item{file}{A character string or a connection that \R supports 
     specifying the Stan model specification in Stan's modeling language.}
-  \item{model_code}{A character string containing a Stan model specification. 
-    The default is empty so parameter \code{file} is used.}
+  \item{model_code}{A character string either containing a Stan model specification 
+    or the name of a character string object in the workspace. 
+    This parameter is used only if parameter \code{file} is 
+    not specified, so it defaults to empty string.} 
   \item{model_name}{A character string naming the model. The 
-    default is \code{"anon_model"}.}
+    default is \code{"anon_model"}. However, the model name would be derived
+    from \code{file} or \code{model_code} (if \code{model_code} is the name of a
+    character string object) if \code{model_name} is not specified.} 
   \item{verbose}{\code{TRUE} print out more intermediate information during the
     translation procedure; \code{FALSE} otherwise. The default is \code{FALSE}.}             
 } 
@@ -44,7 +48,7 @@ Translate Stan model specification to C++ code
 
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 } 
 
@@ -69,7 +73,8 @@ model {
 } 
 "
 
-r <- stanc(model_code = stanmodelcode, "normal1") 
+r <- stanc(model_code = "stanmodelcode", "normal1") 
+# r <- stanc(model_code = stanmodelcode, "normal1") 
 names(r)
 cat(r$cppcode)
 }}

@@ -93,10 +93,10 @@ model_name <- "dogs";
 dogsrr <- stan_model(model_code = dogsstan, model.name = model_name, 
                      verbose = TRUE) 
 
-ss <- sampling(dogsrr, data = dogsdat, n_chains = 3, seed = 1340338046,
+ss <- sampling(dogsrr, data = dogsdat, chains = 3, seed = 1340338046,
                iter = 2012, sample_file = 'dogs.csv')
 
-ss1 <- sampling(dogsrr, data = dogsdat, n_chains = 1, seed = 1340384924,
+ss1 <- sampling(dogsrr, data = dogsdat, chains = 1, seed = 1340384924,
                 iter = 2012, sample_file = 'dogs.csv')
 
   args <- list(init = 'random', sample_file = 'dogs.csv', iter = 2012, seed = 1340384924)
@@ -129,7 +129,7 @@ print(ss, pars = c('alpha', 'beta'))
 # print(ss, pars = c('alpha', 'beta1')) # error
 
 
-sf <- stan(model_code = dogsstan, data = dogsdat, verbose = TRUE, n_chains = 3,
+sf <- stan(model_code = dogsstan, data = dogsdat, verbose = TRUE, chains = 3,
            seed = 1340384924, sample_file = 'dogsb.csv')
 traceplot(sf)
 plot(sf)

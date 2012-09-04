@@ -27,11 +27,18 @@ setMethod("show", "stanmodel",
 setGeneric(name = "sampling",
            def = function(object, ...) { standardGeneric("sampling")})
 
+setGeneric(name = "get_cppcode", 
+           def = function(object, ...) { standardGeneric("get_cppcode")})
+
+setMethod("get_cppcode", "stanmodel", 
+          function(object) {
+            object@.modelmod$model_cppcode  
+          }) 
 
 setMethod("sampling", "stanmodel",
-          function(object, data = list(), pars = NA, n_chains = 4L, iter = 2000L,
+          function(object, data = list(), pars = NA, chains = 4, iter = 2000,
                    warmup = floor(iter / 2),
-                   thin = 1L, seed = sample.int(.Machine$integer.max, 1),
+                   thin = 1, seed = sample.int(.Machine$integer.max, 1),
                    init = "random", check_data = TRUE, 
                    sample_file, verbose = FALSE, ...) {
 
@@ -46,8 +53,8 @@ setMethod("sampling", "stanmodel",
                assign("sampler", stan_fit_cpp_module, envir = object@.modelmod)
             }
 
-            if (n_chains < 1) 
-              stop("the number of chains (n_chains) is less than 1")
+            if (chains < 1) 
+              stop("the number of chains is less than 1")
 
             if (check_data) { 
               # allow data to be specified as a vector of character string 
@@ -68,16 +75,16 @@ setMethod("sampling", "stanmodel",
                 stop("no parameter ", paste(pars[m], collapse = ', ')) 
             }
 
-            args_list <- config_argss(n_chains = n_chains, iter = iter,
+            args_list <- config_argss(chains = chains, iter = iter,
                                       warmup = warmup, thin = thin,
                                       init = init, seed = seed, sample_file, ...)
             n_save <- 1 + (iter - 1) %/% thin 
             # number of samples saved after thinning
             warmup2 <- 1 + (warmup - 1) %/% thin 
             n_kept <- n_save - warmup2 
-            samples <- vector("list", n_chains)
+            samples <- vector("list", chains)
 
-            for (i in 1:n_chains) {
+            for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
               cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
@@ -87,17 +94,17 @@ setMethod("sampling", "stanmodel",
             }
 
             permutation.lst <-
-              lapply(1:n_chains, function(id) sampler$permutation(c(n_kept, 1, id))) 
+              lapply(1:chains, function(id) sampler$permutation(c(n_kept, 1, id))) 
 
             fnames_oi <- sampler$param_fnames_oi()
             n_flatnames <- length(fnames_oi)
             sim = list(samples = samples,
                        iter = iter, thin = thin, 
                        warmup = warmup, 
-                       n_chains = n_chains,
-                       n_save = rep(n_save, n_chains),
-                       warmup2 = rep(warmup2, n_chains),
-                       thin = rep(thin, n_chains),
+                       chains = chains,
+                       n_save = rep(n_save, chains),
+                       warmup2 = rep(warmup2, chains),
+                       thin = rep(thin, chains),
                        permutation = permutation.lst,
                        pars_oi = sampler$param_names_oi(),
                        dims_oi = sampler$param_dims_oi(),

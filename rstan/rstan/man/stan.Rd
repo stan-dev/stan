@@ -7,8 +7,8 @@
 }
 \usage{
 stan(file, model_name = "anon_model", model_code = "", 
-  fit = NA, data = list(), pars = NA, n_chains = 4L,
-  iter = 2000L, warmup = floor(iter/2), thin = 1L, 
+  fit = NA, data = list(), pars = NA, chains = 4,
+  iter = 2000, warmup = floor(iter/2), thin = 1, 
   init = "random", seed = sample.int(.Machine$integer.max, 1), 
   sample_file, save_dso = TRUE, 
   verbose = FALSE, ..., 
@@ -21,11 +21,17 @@ stan(file, model_name = "anon_model", model_code = "",
     containing the text of a model specification in the Stan modeling 
     language; a model may also be specified directly
     as a character string using parameter \code{model_code} or through
-    a previous fit using parameter \code{fit}.}
-  \item{model_name}{A character string naming the model.}
-  \item{model_code}{A character string containing the model definition; models
-    may also be read from files using parameter \code{file} or through
-    a previous fit using parameter \code{fit}.}
+    a previous fit using parameter \code{fit}. 
+    When \code{fit} is specified, parameter \code{file} is ignored.}
+  \item{model_name}{A character string naming the model; defaults 
+    to \code{"anon_model"}. However, the model name would be derived from 
+    \code{file} or \code{model_code} (if \code{model_code} is the name
+    of a character string object) if \code{model_name} is not specified.}
+  \item{model_code}{A character string either containing the model definition
+    or the name of a character string object in the workspace. This 
+    parameter is used only if parameter \code{file} is not specified. 
+    When \code{fit} is specified, the model compiled previously
+    is used so specifying \code{model_code} is ignored.}
   \item{fit}{An instance of S4 class \code{stanfit} derived from
              a previous fit;  defaults to \code{NA}. 
     When not \code{NA}, the compiled model from the fitted result 
@@ -38,9 +44,9 @@ stan(file, model_name = "anon_model", model_code = "",
   \item{pars}{A vector of character string specifying parameters of interest; defaults
     to \code{NA} indicating all parameters in the model. Only samples for parameters
     given in \code{pars} are stored in the fitted results.}
-  \item{n_chains}{A positive integer specifying number of chains; defaults to 4.} 
-  \item{iter}{A positive integer specifying how many iterations for all the
-    chains (including warmup). The default is 2000.}
+  \item{chains}{A positive integer specifying number of chains; defaults to 4.} 
+  \item{iter}{A positive integer specifying how many iterations for each 
+    chain (including warmup). The default is 2000.}
   \item{warmup}{A positive integer specifying number of warmup (aka burnin)
      iterations.  This also specifies the number of iterations used for step-size
      adaptation, so warmup samples should not be used for inference.
@@ -57,7 +63,7 @@ stan(file, model_name = "anon_model", model_code = "",
     \code{"0"}: initialize all to be zero on the unconstrained support; 
     \code{"random"}: randomly generated;
     \code{list}: a list of lists equal in length to the number of chains 
-     (\code{n\_chains}), where each list in the list of lists specifies the initial
+     (parameter \code{chains}), where each list in the list of lists specifies the initial
       values of parameters by name for the corresponding chain.
     \code{function}: a function that returns a list for specifying 
       the initial values of parameters for a chain. The function
@@ -152,8 +158,13 @@ stan(file, model_name = "anon_model", model_code = "",
      \code{data.frame} are converted to \code{matrix} by
      function \code{data.matrix}. 
      
-    \item In addition, duplicated names in a list will cause 
-     the function to stop and report an error. 
+   \item Check whether there are objects in the data list with duplicated names.
+     Duplicated names, if found, will cause the function to stop and
+     report an error. 
+
+   \item Check whether the names of objects in the data list are legal 
+     Stan names. If illegal names are found, it will stop and 
+     report an error. See Stan's manul for the rules of variable names. 
   } 
 
   The returned S4 class \code{stanfit} will save the compiled model
@@ -167,7 +178,7 @@ stan(file, model_name = "anon_model", model_code = "",
 
 \references{
   Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }
 \seealso{

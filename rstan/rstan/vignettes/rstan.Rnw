@@ -202,7 +202,7 @@ dat <- list(J = 8,
 Next, we can call function \code{stan} to sample from the model. 
 <<echo=TRUE, results=hide>>=
 fit <- stan(model_code = schools_code, data = dat, 
-            n_iter = 1000, n_chains = 4)
+            iter = 1000, chains = 4)
 @
 
 
@@ -266,7 +266,7 @@ Last, we can use method \code{sampling} associated with
 S4 class \code{stanmodel} to simulate sample from the posterior
 distribution. 
 <<echo=TRUE, results=hide>>= 
-fit <- sampling(sm, data = dat, n.chains = 4)
+fit <- sampling(sm, data = dat, chains = 4)
 @
 
 The returned object from the above \code{sampling} is an object
@@ -303,8 +303,8 @@ points here.
 \subsection{Arguments of function \code{stan}} 
 
 The arguments for sampling (in function \code{stan} and 
-\code{sampling}) mainly include data and defining the behavior of 
-the sampler such as \code{n\_chains}, \code{iter}, and \code{warmup}. 
+\code{sampling}) mainly include data and defining the settings of 
+the sampler such as \code{chains}, \code{iter}, and \code{warmup}. 
 In particular, \code{warmup} specifies the number of iterations 
 in which the NUTS sampler is in status of adaptation (hence
 the sample should not be used for inference). 

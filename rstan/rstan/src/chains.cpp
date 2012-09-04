@@ -12,9 +12,9 @@
 namespace rstan {
 
   /**
-   * @param sim An R list that has element n_chains, n_flatnames, samples,
+   * @param sim An R list that has element chains, n_flatnames, samples,
    *  n_save, warmup2, etc. In particular, 
-   *  n_chains: number of chains. 
+   *  chains: number of chains. 
    *  n_flatnames: the total number of param in form of scalars.  
    *  n_save: sizes of saved iterations for all chains. 
    *  warmup2: simiar to n_save, but for warmup sizes. Note this warmup
@@ -27,7 +27,7 @@ namespace rstan {
    */ 
   void validate_sim(SEXP sim) {
     std::vector<std::string> snames;
-    snames.push_back("n_chains"); 
+    snames.push_back("chains"); 
     snames.push_back("n_flatnames"); 
     snames.push_back("n_save");
     snames.push_back("warmup2");
@@ -46,10 +46,10 @@ namespace rstan {
        } 
     }
 
-    unsigned int type = TYPEOF(lst["n_chains"]); 
+    unsigned int type = TYPEOF(lst["chains"]); 
     if (type != INTSXP &&  type != REALSXP) { 
       std::stringstream msg;
-      msg << "wrong type of n_chains in sim; found " 
+      msg << "wrong type of chains in sim; found " 
           << Rf_type2char(type) 
           << ", but INTSXP/REALSXP needed"; 
       throw std::domain_error(msg.str()); 
@@ -58,7 +58,7 @@ namespace rstan {
 
   unsigned int num_chains(SEXP sim) {
     Rcpp::List lst(sim); 
-    return Rcpp::as<unsigned int>(lst["n_chains"]); 
+    return Rcpp::as<unsigned int>(lst["chains"]); 
   } 
 
   unsigned int num_params(SEXP sim) {

@@ -29,7 +29,7 @@ sd(y)
 dat <- list(N = 20, y = y); 
 f <- sampling(rr, data = dat, init = 0, iter = 2012, sample_file = 'norm1.csv')
 
-sampling(rr, data = dat, iter = 2012, n_chains = 1,
+sampling(rr, data = dat, iter = 2012, chains = 1,
          init = list(list(mu = 2)), seed = 3, thin = 1, 
          sample_file = 'norm1.csv')
 

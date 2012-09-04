@@ -24,7 +24,7 @@ test_essnrhat <- function() {
   lst <- list(samples = list(c1 = c1, c2 = c2), 
               n_save = c(nrow(c1), nrow(c2)), 
               permutation = NULL, 
-              warmup2 = rep(0, 2), n_chains = 2, n_flatnames = ncol(c1))
+              warmup2 = rep(0, 2), chains = 2, n_flatnames = ncol(c1))
   ess <- rstan:::rstan_ess(lst, 3)
   # cat("ess=", ess, "\n") 
   checkEquals(ess, 13.0778, tolerance = 0.001); 

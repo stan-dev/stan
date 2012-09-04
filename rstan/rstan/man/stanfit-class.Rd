@@ -83,7 +83,7 @@ object of type \code{list}}
       printing out the summary. 
     } 
     \item{\code{summary}}{\code{signature(object = "stanfit")}: summarizes the 
-      distributions of quantities using the sample: the quantiles 
+      distributions of quantities using the samples: the quantiles 
       (for example, 2.5\%, 50\%, 97.5\%, which can be specified by 
       using parameter \code{probs}), 
       the mean, the standard deviation (sd), the effective sample size (n_eff),
@@ -99,7 +99,7 @@ object of type \code{list}}
       results as well as the log-posterior. 
     }
     \item{\code{extract}}{\code{signature(object = "stanfit")}: 
-      get the sample for all chains for all (or specified ) parameters. 
+      get the samples for all chains for all (or specified) parameters. 
       (see \code{\link{extract}}).}
     \item{\code{traceplot}}{\code{signature(object = "stanfit")}:
       plot the trace of chains (see \code{\link{traceplot}}). 
@@ -137,7 +137,7 @@ object of type \code{list}}
 
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }
 \seealso{

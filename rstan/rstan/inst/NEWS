@@ -1,6 +1,12 @@
+Mon Sep  3 2012
+1. Changes 
+   * parameter n_chains changed to chains 
+   * derive model_name from model_code or file if model_name is not specified 
+
 Wed Aug 2012
 1. Changes
    * replace dots with underscores especially in function names
+
 Sun Aug 26 2012
 1. New features 
    * get more information about the sampler such as treedepth, 

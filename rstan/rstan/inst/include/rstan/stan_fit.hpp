@@ -107,7 +107,7 @@ namespace rstan {
     /**
      * Get the names for an array of given dimensions 
      * in the way of column majored. 
-     * For exmaple, if we know an array named `a`, with
+     * For example, if we know an array named `a`, with
      * dimensions of [2, 3, 4], the names then are (starting
      * from 0):
      * a[0,0,0]
@@ -682,7 +682,6 @@ namespace rstan {
       std::string adaptation_info; 
       std::vector<double> initv; 
 
-      // (+1) for saving the log-posterior
       for (unsigned int i = 0; i < num_params2_; i++) 
         chains.push_back(Rcpp::NumericVector(iter_save)); 
        

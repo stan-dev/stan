@@ -14,7 +14,7 @@
   \tabular{ll}{
     Package: \tab rstan\cr
     Type: \tab Package\cr
-    Version: \tab 1.0\cr
+    Version: \tab 1.0.1\cr
     Date: \tab \Sexpr[eval=TRUE,results=rd,stage=build]{date()}\cr
     License: \tab GPL-3 \cr
   }
@@ -43,13 +43,13 @@
 }
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 }
 
 \examples{\dontrun{ 
 library(rstan) 
-cat("Stan version: ", stan_version(), sep = ''); 
+cat("Stan version:", stan_version(), "\n")
 
 stanmodelcode <- "
 data {
@@ -70,7 +70,7 @@ model {
 y <- rnorm(20) 
 dat <- list(N = 20, y = y); 
 fit <- stan(model_code = stanmodelcode, model_name = "example", 
-            data = dat, iter = 2012, n_chains = 3, sample_file = 'norm.csv',
+            data = dat, iter = 2012, chains = 3, sample_file = 'norm.csv',
             verbose = TRUE) 
 print(fit)
 }}  

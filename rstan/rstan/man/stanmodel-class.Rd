@@ -5,6 +5,8 @@
 \docType{class}
 \alias{stanmodel-class}
 %% \alias{sampling,stanmodel-method}
+\alias{get_cppcode}
+\alias{get_cppcode,stanmodel-method}
 \alias{show,stanmodel-method}
 
 \title{Class representing model compiled from C++}
@@ -38,6 +40,9 @@
     \item{\code{show}}{\code{signature(object = "stanmodel")}: print the Stan model specification.}
     \item{\code{sampling}}{\code{signature(object = "stanmodel")}: draw samples for
       the model (see \code{\link{sampling}}).}
+    \item{\code{get_cppcode}}{\code{signature(object = "stanmodel")}: return the C++ code for the model
+      as a character string. This is part of the C++ code that is compiled to the dynamic 
+      shared object for the model.}
   }
 }
 

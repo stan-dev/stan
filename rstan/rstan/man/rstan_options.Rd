@@ -33,7 +33,7 @@ rstan_options(...)
     \item \code{rstan_alert_col}: The color used in method \code{plot}
           of S4 class \code{\linkS4class{stanfit}}  to show that the vector/array
           parameters are truncated. 
-    \item \code{rstan_chains_cols}: The colors used in methods \code{plot}
+    \item \code{rstan_chain_cols}: The colors used in methods \code{plot}
           and \code{traceplot} of S4 class \code{\linkS4class{stanfit}}  
           for coloring different chains. 
     \item \code{rstawarmup_bg_col}: The background color for  

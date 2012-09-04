@@ -1,5 +1,6 @@
 \name{rstan-internal}
 \alias{rstan-internal}
+\alias{get_cppcode,ANY-method}
 \alias{get_logposterior,ANY-method}
 \alias{get_adaptation_info,ANY-method}
 \alias{get_sampler_params,ANY-method}

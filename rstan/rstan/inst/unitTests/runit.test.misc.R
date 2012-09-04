@@ -10,6 +10,51 @@
   rstan:::stan_rdump(c("a", "b", "c"), file = 'standumpabc.Rdump')
 } 
 
+test_get_model_strcode <- function() {
+  model_code <- "model { \n y ~ normal(0, 1); \n}"  
+  code <- 'parameters { real y; } model{y ~ normal(0,1);}'
+  str1 <- rstan:::get_model_strcode("tmp.stan") 
+  str2 <- rstan:::get_model_strcode(model_code = code)
+  str3 <- rstan:::get_model_strcode(model_code = 'code') 
+  str4 <- rstan:::get_model_strcode(model_code = 'parameters {real y;} model {y ~ normal(0,1); }') 
+ 
+  mname1 <- attr(str1, 'model_name2')
+  mname2 <- attr(str2, 'model_name2')
+  mname3 <- attr(str3, 'model_name2')
+  mname4 <- attr(str4, 'model_name2')
+  checkEquals(mname1, 'tmp')
+  checkEquals(mname2, 'code') 
+  checkEquals(mname3, 'code')
+  checkEquals(mname4, 'anon_model')
+   
+  attributes(str1) <- NULL 
+  attributes(str2) <- NULL 
+  attributes(str3) <- NULL 
+  checkEquals(str1, model_code) 
+  checkEquals(str2, code) 
+  checkEquals(str3, code) 
+
+  model_code <- "model { \n y ~ normal(0, 1); \n}"  
+  # cat(model_code, file = 'tmp.stan')  
+  checkEquals(model_code, rstan:::read_model_from_con('tmp.stan'), 
+              msg = "Read stan model from file") 
+  attr(model_code, 'model_name2') <- 'tmp' 
+  checkEquals(model_code, rstan:::get_model_strcode('tmp.stan'), 
+              msg = "Read stan model from file") 
+  attr(model_code, 'model_name2') <- 'model_code' 
+  checkEquals(model_code, rstan:::get_model_strcode(model_code = model_code), 
+              msg = "Read stan model from model_code") 
+  checkException(rstan:::get_model_strcode(), 
+                 msg = "Read stan model from model_code") 
+} 
+
+test_is_valid_stan_name <- function() {
+  checkTrue(!rstan:::is_legal_stan_vname('7dd'))
+  checkTrue(!rstan:::is_legal_stan_vname('model'))
+  checkTrue(!rstan:::is_legal_stan_vname('private'))
+  checkTrue(!rstan:::is_legal_stan_vname('hello__'))
+  checkTrue(rstan:::is_legal_stan_vname('y'))
+} 
 
 test_util <- function() {
   lst <- list(z = c(1L, 2L, 4L), 
@@ -28,16 +73,6 @@ test_util <- function() {
   checkException(rstan:::data_preprocess(lst2), 
                  msg = "Stop if data have NA") 
 
-  model_code <- "model { \n y ~ normal(0, 1); \n}"  
-  # cat(model_code, file = 'tmp.stan')  
-  checkEquals(model_code, rstan:::read_model_from_con('tmp.stan'), 
-              msg = "Read stan model from file") 
-  checkEquals(model_code, rstan:::get_model_strcode('tmp.stan'), 
-              msg = "Read stan model from file") 
-  checkEquals(model_code, rstan:::get_model_strcode(model_code = model_code), 
-              msg = "Read stan model from model_code") 
-  checkException(rstan:::get_model_strcode(), 
-                 msg = "Read stan model from model_code") 
 } 
 
 
@@ -141,8 +176,6 @@ test_pars_total_indexes <- function() {
 test_mklist <- function() {
   x <- 3:5 
   y <- array(1:9, dim = c(3, 3))  
-  assign("x", x, envir = .GlobalEnv) 
-  assign("y", y, envir = .GlobalEnv) 
   a <- list(x = x, y = y) 
   b <- rstan:::mklist(c("x", "y")) 
   checkTrue(identical(a, b)) 

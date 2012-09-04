@@ -17,13 +17,14 @@ in the limited format that Stan can read.
 }
 
 \usage{
-stan_rdump(list, file, append = FALSE, 
+stan_rdump(list, file = "", append = FALSE, 
           envir = parent.frame(),
           width = options("width")$width)
 }
 
 \arguments{
-  \item{list}{A character string: the names of one or more \R objects to be dumped.}
+  \item{list}{A character string: the names of one or more \R objects to be
+    dumped. See the note below.}
 
   \item{file}{Either a character string naming a file or a
     \link{connection}.  \code{""} indicates output to the console.}
@@ -44,6 +45,25 @@ stan_rdump(list, file, append = FALSE,
 \note{
   \code{stan_rdump} only dumps numeric data, which can be 
   a scalar, vector, matrix, or (multidimensional) array.
+  In the case if it is a \code{data.frame}, function 
+  \code{data.matrix} is applied to the data frame before
+  dumping. 
+
+  \code{stan_rdump} will check whether the names of objects
+  are legal variable names in Stan. If an illegal name is 
+  found, data will be dumped with a warning. However, passing the 
+  name checking does not necessarily mean that the name is 
+  legal. More details regarding rules of variable names in Stan can
+  be found in Stan's manual. 
+  
+  If objects with specified names are not found, a warning will
+  be issued. 
+}
+
+\references{
+  Stan Development Team (2012) 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
+  \url{http://mc-stan.org}. 
 }
 
 \seealso{

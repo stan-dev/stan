@@ -19,7 +19,7 @@ for (i in 1:nrow(mod_def)) {
   modelname <- basename(mod_def[i, 1]) 
   cat("model:", modelname, "\n")
 
-  fit <- stan(file = scodef, data = rstan:::read_rdump(dataf), n_chains = 3)
+  fit <- stan(file = scodef, data = rstan:::read_rdump(dataf), chains = 3)
   print(fit)
   cat("\n\n")
 } 

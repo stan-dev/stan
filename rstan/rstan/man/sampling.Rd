@@ -4,7 +4,7 @@
 \alias{sampling-methods}
 \alias{sampling,stanmodel-method}
 
-\title{\code{sampling}: draws sample from Stan model}
+\title{\code{sampling}: draw samples from Stan model}
 \description{
   Draw samples from the model defined by class \code{stanmodel}. 
   This method is a generic function of the S4 class \code{stanmodel}. 
@@ -13,7 +13,7 @@
 \usage{
   %% sampling(object, \dots)  
   \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, 
-    n_chains = 4L, iter = 2000L, warmup = floor(iter / 2), thin = 1L,
+    chains = 4, iter = 2000, warmup = floor(iter/2), thin = 1,
     seed = sample.int(.Machine$integer.max, 1), init = 'random', 
     check_data = TRUE, sample_file, verbose = FALSE, \ldots)   
 } 
@@ -23,7 +23,7 @@
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
       Call sampler (NUTS or HMC, depending on parameters) 
-      to draw sample from the model defined by S4 class \code{stanmodel} 
+      to draw samples from the model defined by S4 class \code{stanmodel} 
       given the data, initial values, etc. 
     }
   }
@@ -41,17 +41,17 @@
     to \code{NA} indicating all parameters in the model. Only samples for parameters given 
     in \code{pars} are stored in the fitted results.}
 
-  \item{n_chains}{A positive integer specifying number of chains; defaults to 4.} 
+  \item{chains}{A positive integer specifying number of chains; defaults to 4.} 
  
-  \item{iter}{A positive integer specifying how many iterations for all the
-    chains (including warmup). The default is 2000.}
+  \item{iter}{A positive integer specifying how many iterations for each chain
+    (including warmup). The default is 2000.}
 
   \item{warmup}{A positive integer specifying the number of warmup (aks burnin)
     iterations.  If step-size adaptation is on (which it is by default), this 
     also controls the number of iterations for which adaptation is run (and
     hence the samples should not be used for inference). The default is \code{iter/2}.}
 
-  \item{thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
+  \item{thin}{A positive integer specifying the period for saving samples; defaults to 1.} 
 
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
     the maximum integer supported by \R on the machine. Even if multiple chains
@@ -64,7 +64,7 @@
     \code{"0"}: initialize all to be zero on the unconstrained support; 
     \code{"random"}: randomly generated;
     \code{list}: a list of lists equal in length to the number of chains 
-     (\code{n\_chains}), where each list in the list of lists specifies the initial
+     (parameter \code{chains}), where each list in the list of lists specifies the initial
       values of parameters by name for the corresponding chain.
     \code{function}: a function that returns a list for specifying 
       the initial values of parameters for a chain. The function

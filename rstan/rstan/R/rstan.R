@@ -19,6 +19,10 @@ stan_model <- function(file,
   #     a character to specify the model.   
 
   if (is.null(stanc_ret)) {
+    model_name2 <- deparse(substitute(model_code))
+    if (is.null(attr(model_code, "model_name2")))
+      attr(model_code, "model_name2") <- model_name2
+    if (missing(model_name)) model_name <- NULL 
     stanc_ret <- stanc(file = file, model_code = model_code, 
                        model_name = model_name, verbose)
   }
@@ -64,6 +68,7 @@ stan_model <- function(file,
              dso = dso, # keep a reference to dso
              .modelmod = new.env()) # store the sampler, which could be replaced 
   assign("model_cppname", model_cppname, envir = obj@.modelmod)
+  assign("model_cppcode", stanc_ret$cppcode, envir = obj@.modelmod)
   assign("sampler", stan_fit_cpp_module, envir = obj@.modelmod)
   obj 
 
@@ -98,9 +103,9 @@ stan <- function(file, model_name = "anon_model",
                  fit = NA, 
                  data = list(), 
                  pars = NA, 
-                 n_chains = 4L, iter = 2000L, 
+                 chains = 4, iter = 2000, 
                  warmup = floor(iter / 2), 
-                 thin = 1L, 
+                 thin = 1, 
                  init = "random", 
                  seed = sample.int(.Machine$integer.max, 1), 
                  sample_file, # the file to which the samples are written
@@ -122,12 +127,16 @@ stan <- function(file, model_name = "anon_model",
   else data <- list()  
 
   if (is(fit, "stanfit")) sm <- get_stanmodel(fit)
-  else sm <- stan_model(file, model_name = model_name, model_code = model_code,
-                        boost_lib = boost_lib, eigen_lib = eigen_lib, 
-                        save_dso = save_dso, verbose = verbose)
+  else { 
+    attr(model_code, "model_name2") <- deparse(substitute(model_code))  
+    if (missing(model_name)) model_name <- NULL 
+    sm <- stan_model(file, model_name = model_name, model_code = model_code,
+                     boost_lib = boost_lib, eigen_lib = eigen_lib, 
+                     save_dso = save_dso, verbose = verbose)
+  }
 
   if (missing(sample_file))  sample_file <- NA 
 
-  sampling(sm, data, pars, n_chains, iter, warmup, thin, seed, init, 
+  sampling(sm, data, pars, chains, iter, warmup, thin, seed, init, 
            sample_file = sample_file, verbose = verbose, check_data = FALSE, ...) 
 } 

@@ -16,7 +16,7 @@
 }
 \references{
   Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 }
 \seealso{

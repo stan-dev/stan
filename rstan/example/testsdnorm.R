@@ -14,7 +14,7 @@ model {
 } 
 "
 
-s.f1 <- stan(model_code = scode, verbose = TRUE, n_chains = 1) 
+s.f1 <- stan(model_code = scode, verbose = TRUE, chains = 1) 
 print(s.f1)
 plot(s.f1)
 

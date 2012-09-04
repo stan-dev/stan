@@ -60,7 +60,7 @@ cxxfun_from_dso_bin <- function(dso) {
   code <- dso@.MISC$cxxfun@code
   tfile <- tempfile() 
   f <- basename(tfile) 
-  libLFile <- paste(tfile, ".", file_ext(dso@.MISC$dso_last_path), sep = '') 
+  libLFile <- paste(tfile, ".", filename_ext(dso@.MISC$dso_last_path), sep = '') 
   # write the raw vector containing the dso file to temporary file
   writeBin(dso@.MISC$dso.bin, libLFile) 
   cleanup <- function(env) {

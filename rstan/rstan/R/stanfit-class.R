@@ -8,7 +8,7 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
                          digits_summary = 1, ...) { 
   s <- summary(x, pars, probs, ...)  
   cat("Inference for Stan model: ", x@model_name, '.\n', sep = '')
-  cat(x@sim$n_chains, " chains: each with iter=", x@sim$iter, 
+  cat(x@sim$chains, " chains: each with iter=", x@sim$iter, 
       "; warmup=", x@sim$warmup, "; thin=", x@sim$thin, "; ", 
       x@sim$n_save[1], " iterations saved.\n\n", sep = '') 
 
@@ -19,7 +19,7 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
 
   sampler <- attr(x@sim$samples[[1]], "args")$sampler 
 
-  cat("\nSample were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
+  cat("\nSamples were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
   cat("For each parameter, n_eff is a crude measure of effective sample size,\n") 
   cat("and Rhat is the potential scale reduction factor on split chains (at \n")
   cat("convergence, Rhat=1).\n")
@@ -70,7 +70,7 @@ setGeneric(name = 'get_seed',
            def = function(object, ...) { standardGeneric("get_seed")})
 
 setMethod("get_seed", signature = "stanfit", 
-          function(object) { invisible(object@stan_args[[1]]$seed) })
+          function(object) { object@stan_args[[1]]$seed })
 
 ### HELPER FUNCTIONS
 ### 
@@ -141,26 +141,26 @@ par_traceplot <- function(sim, n, par.name, inc_warmup = TRUE) {
   warmup_col <- rstan_options("rstan_warmup_bg_col") 
   if (inc_warmup) {
     id <- seq(1, by = thin, length.out = n_save) 
-    for (i in 1:sim$n_chains) {
+    for (i in 1:sim$chains) {
       yrange <- range(yrange, sim$samples[[i]][[n]]) 
     }
     plot(c(1, id[length(id)]), yrange, type = 'n', 
          xlab = 'Iterations', ylab = "", main = main)
     rect(par("usr")[1], par("usr")[3], warmup2 * thin, par("usr")[4], 
          col = warmup_col, border = NA)
-    for (i in 1:sim$n_chains) {
+    for (i in 1:sim$chains) {
       lines(id, sim$samples[[i]][[n]], xlab = '', ylab = '', 
             lwd = 1, col = chain_cols[(i-1) %% 6 + 1]) 
     }
   } else {  
     idx <- warmup2 + 1:n_kept
     id <- seq((warmup2 + 1)* thin, by = thin, length.out = n_kept) 
-    for (i in 1:sim$n_chains) {
+    for (i in 1:sim$chains) {
       yrange <- range(yrange, sim$samples[[i]][[n]][idx]) 
     }
     plot(c((warmup2 + 1), id[length(id)]), yrange, type = 'n', 
          xlab = 'Iterations (without warmup)', ylab = "", main = main)
-    for (i in 1:sim$n_chains)  
+    for (i in 1:sim$chains)  
       lines(id, sim$samples[[i]][[n]][idx], lwd = 1, 
             xlab = '', ylab = '', col = chain_cols[(i-1) %% 6 + 1]) 
   } 
@@ -259,7 +259,7 @@ setMethod("extract", signature = "stanfit",
   
             n2 <- object@sim$n_save[1]  ## assuming all the chains have equal iter 
             if (!inc_warmup) n2 <- n2 - object@sim$warmup2[1] 
-            dim(sssf) <- c(n2, object@sim$n_chains, length(tidx)) 
+            dim(sssf) <- c(n2, object@sim$chains, length(tidx)) 
             dimnames(sssf) <- list(NULL, NULL, tidxnames) 
             sssf 
           })  
@@ -343,7 +343,7 @@ setMethod("summary", signature = "stanfit",
             rownames(s1) <- pars.names 
             colnames(s1) <- c("mean", "se_mean", "sd", qnames, 'n_eff', 'Rhat')
             s2 <- combine_msd_quan(ss$c_msd[tidx, , , drop = FALSE], ss$c_quan[tidx, m, , drop = FALSE]) 
-            dim(s2) <- c(tidx_len, length(m) + 2, object@sim$n_chains)
+            dim(s2) <- c(tidx_len, length(m) + 2, object@sim$chains)
             dimnames(s2) <- list(pars.names, c("mean", "sd", qnames), NULL) 
             ss <- list(summary = s1, c_summary = s2) 
             invisible(ss) 

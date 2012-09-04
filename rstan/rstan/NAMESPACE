@@ -22,6 +22,7 @@ exportClasses(
 exportMethods(
 #   print, plot, 
 #   extract, 
+  get_cppcode, # for stanmodel 
   show, sampling, summary, print, extract,
   traceplot, plot, get_stancode, get_inits, get_seed,
   get_adaptation_info,

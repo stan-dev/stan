@@ -25,24 +25,27 @@
     specifying the Stan model specification in Stan's modeling language. 
   }
 
-  \item{model_name}{A character string for naming the model (the
-    default is \code{"anon_model"}). 
-  }
+  \item{model_name}{A character string naming the model; defaults 
+    to \code{"anon_model"}. However, the model name would be derived from 
+    \code{file} or \code{model_code} (if \code{model_code} is the name of a
+    character string object) if \code{model_name} is not specified.}
 
-  \item{model_code}{A character string containing the model specification;
+  \item{model_code}{A character string either containing the model 
+    specification or the name of a character string object in the workspace;
     an alterantive is to specify the model with parameters \code{file}
     or \code{stanc_ret}. 
   }
-  \item{stanc_ret}{A list returned list from a previous call to 
-    function \code{stanc}, which may be used to specify the model  
-    used in the call to \code{stanc}.}
+  \item{stanc_ret}{A named list returned from a previous call to 
+    function \code{stanc}. The list can be used to specify the model  
+    instead of using parameter \code{file} or \code{model_code}. 
+  }
   \item{boost_lib}{The path to a version of the Boost C++ library to
     use instead of the one supplied with RStan.}
   \item{eigen_lib}{The path to a version of the Eigen C++ library to
-    use instead of the one in package RcppEigen.} 
+    use instead of the one in package \pkg{RcppEigen}.} 
   \item{save_dso}{Logical with the default of \code{TRUE}: indication of whether the 
     dynamic shared object (DSO) compiled from the C++ code for the model 
-    will be saved or not. If \code{TRUE}, we can draw sample from
+    will be saved or not. If \code{TRUE}, we can draw samples from
     the same model in another \R session using the saved DSO (i.e., without compiling 
     the C++ code again).}
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
@@ -70,7 +73,7 @@
 }
 \references{
   The Stan Development Team (2012) 
-  \emph{Stan Modeling Language: User's Guide and Reference Manual}. 
+  \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 }
 \seealso{
