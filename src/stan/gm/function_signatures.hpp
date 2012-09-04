@@ -217,6 +217,8 @@ add_binary("log_sum_exp");
 
 add_unary("square");
 
+add("softmax",VECTOR_T,VECTOR_T);
+
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add_ternary("beta_log");
@@ -244,6 +246,7 @@ add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
+add("normal_p",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T);
 
 std::vector<expr_type> vector_types;
 vector_types.push_back(DOUBLE_T);                  // scalar
