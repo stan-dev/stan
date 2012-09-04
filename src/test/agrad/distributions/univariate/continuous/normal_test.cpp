@@ -318,3 +318,21 @@ TEST(AgradDistributions,gradients_all) {
   test_gradients<false,double,var,double>(-2.7, -1.1, 1.3);
   test_gradients<false,double,double,var>(-2.7, -1.1, 1.3);
 }
+
+TEST(AgradDistributions,NormalCdfGrad) {
+  using stan::agrad::var;
+  using std::vector;
+  var y = 1.0;
+  var mu = 5.0;
+  var sigma = 12.0;
+  std::vector x(3);
+  x[0] = y;
+  x[1] = mu;
+  x[2] = sigma;
+
+  var p = normal_p(y,mu,sigma);
+
+  std::vector g;
+  p.grad(x,g);
+  
+}

@@ -202,7 +202,8 @@ namespace stan {
                           &lp, Policy()))
         return lp;
 
-      return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
+      return 0.5 + 0.5 * erf((y - mu) / (sigma * SQRT_2));
+      // return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
     }
 
     template <typename T_y, typename T_loc, typename T_scale>

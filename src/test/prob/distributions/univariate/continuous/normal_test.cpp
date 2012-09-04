@@ -71,6 +71,18 @@ public:
 
 };
 
+TEST(ProbDistributions,NormalCdf) {
+  using stan::prob::normal_p;
+  EXPECT_NEAR(0.5, normal_p(0,0,0.01), 1E-8);
+  EXPECT_NEAR(0.5, normal_p(0,0,0.1), 1E-8);
+  EXPECT_NEAR(0.5, normal_p(0,0,1), 1E-8);
+  EXPECT_NEAR(0.5, normal_p(0,0,10), 1E-8);
+  EXPECT_NEAR(0.5, normal_p(0,0,100), 1E-8);
+
+  EXPECT_NEAR(0.3694413, normal_p(1,5,12), 1E-7);
+  EXPECT_NEAR(0.9999683, normal_p(-2,-3,0.25), 1E-7);
+}
+
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNormal,
                               DistributionTestFixture,
                               ProbDistributionsNormal);
