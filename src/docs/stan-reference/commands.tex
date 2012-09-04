@@ -78,27 +78,27 @@ automatically build the \code{bin/stanc} compiler and the
 \code{bin/libstan.a} library whenever building a model.
 
 
-\subsection{Making Other Models}
-
-A \code{make} target can be invoked from a directory other than the
-one that contains the \code{makefile} with the \code{-f} option.  Thus
-an alternative way to compile this model from its own source directory
-would be as follows (again replacing \code{<stan-home>} with the
-appropriate path to the top-level directory in which Stan was
-unpacked).
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <stan-home>src/models/basic_estimators
-> make -f ../../../makefile bernoulli
-\end{Verbatim}
-\end{quote}
+%\subsection{Making Other Models}
 %
-The expression \code{../../../makefile} is a relative path to the
-file named \code{makefile}; this says to go up three directories
-(i.e., back to \code{<stan-home>}) and then look for a file named
-\code{makefile}.  This can be an absolute path, too.  The Unix-like
-forward slashes can be used under Windows as well as under Linux and
-Mac.  
+%A \code{make} target can be invoked from a directory other than the
+%one that contains the \code{makefile} with the \code{-f} option.  Thus
+%an alternative way to compile this model from its own source directory
+%would be as follows (again replacing \code{<stan-home>} with the
+%appropriate path to the top-level directory in which Stan was
+%unpacked).
+%\begin{quote}
+%\begin{Verbatim}[fontshape=sl]
+%> cd <stan-home>src/models/basic_estimators
+%> make -f ../../../makefile bernoulli
+%\end{Verbatim}
+%\end{quote}
+%%
+%The expression \code{../../../makefile} is a relative path to the
+%file named \code{makefile}; this says to go up three directories
+%(i.e., back to \code{<stan-home>}) and then look for a file named
+%\code{makefile}.  This can be an absolute path, too.  The Unix-like
+%forward slashes can be used under Windows as well as under Linux and
+%Mac.  
 
 
 \subsection{Getting Help from the {\tt makefile}}
