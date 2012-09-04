@@ -48,14 +48,10 @@ namespace stan {
       } catch (std::domain_error e) {
         if (error_msgs) {
           *error_msgs << std::endl
-                      << "****************************************" 
-                      << "****************************************" 
-                      << std::endl
-                      << "Error in model.grad_log_prob:" 
-                      << std::endl
-                      << boost::diagnostic_information(e)
-                      << std::endl
-                      << std::endl;
+		      << "Warning (non-fatal rejection): "
+		      << e.what()
+		      << std::endl;
+
         }
         logp = -std::numeric_limits<double>::infinity();
       }
@@ -83,14 +79,9 @@ namespace stan {
         if (error_msgs) {
           // FIXME: remove output
           *error_msgs << std::endl
-                      << "****************************************" 
-                      << "****************************************" 
-                      << std::endl
-                      << "Error in model.grad_log_prob:" 
-                      << std::endl
-                      << boost::diagnostic_information(e)
-                      << std::endl
-                      << std::endl;
+		      << "Warning (non-fatal rejection): "
+		      << e.what()
+		      << std::endl;
         }
         logp = -std::numeric_limits<double>::infinity();
       }
