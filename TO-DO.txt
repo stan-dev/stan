@@ -1,6 +1,25 @@
 STAN V1.0.1
 ======================================================================
 
+* check our functions are all defined
+
+*p.45: several places c(1), c(k), ... ought to be c[1], c[k], ...?
+*p.52: footnote~2, does not match code example?
+*p.53: vectorized prob function subsection identical to previous para?
+*p.68: code example, use matrix name m instead of a for clarity
+*p.70: bottom, real[,,] -> int[,,]
+*p.81, pnorm(2.1) \approx 0.98, not 0.95
+*p.81, truncated below at -0.5, not 0.5
+*p.89, middle, sentence incomplete?
+*p.101, (-5)/3 = -1, not (-5)/33
+*p.108, suggestion/wish: useful (more clear) to provide mathematical formulae
+
+
+- Fix make so it works from dir other than one with makefile
+  OR fix instructions; 
+    + won't work for earlier versions of Make, like ones in RTools
+    + alt to pass in argument for home, which defaults to CD
+
 - MAYBE add n_chains, n_iter, n_warmup, n_thin as extra arguments 
   + code for RStan and maybe Stan
   + doc for RStan and Stan
@@ -28,6 +47,8 @@ STAN V1.0.1
 CODE CLEANUP
 ======================================================================
 
+* remove writes into Stan directory itself
+
 * use "sample of size 1000" rather than "1000 samples", etc.
 
 * const declarations wherever possible
@@ -50,6 +71,12 @@ CODE CLEANUP
   - gm generator
 
 
+MISC
+======================================================================
+* Jeffrey Arnold (8/13/12 message to list) about syntax highlighting.
+  ? how to integrate
+
+* truncations need to be vectorized, too!
 
 RStan
 ======================================================================
@@ -281,6 +308,11 @@ Modeling Language
   - while (cond) statement;
   - repeat statement until cond;
   - for (statement; condition; statement) statement;
+  - Marcus's hack:
+    if (a > b) {...}
+    ==
+    for  (i in 1:int_step(a-b)) {...}
+
 
 * for-each
   - foreach (variable : expression) statement;
@@ -533,7 +565,7 @@ multivariate_normal_log().
   - inverse_sqrt_gamma(...)
 
 * random generation functions
-  - rnorm(),...
+  - normal_random()
 
 * special functions
   - inv(x) = 1/x
@@ -565,6 +597,10 @@ multivariate_normal_log().
   - normalize sample to zero sample mean, unit sample variance
 
 * cumulative distribution functions
+  - need for truncated distros mostly
+        foo_cdf_lb_log(L|...) == log(1 - foo_cdf(L|...))
+        foo_cdf_ub_log(U|...) == log(foo_cdf(U|...))
+        foo_cdf_lub_log(L,U|...) == log(foo_cdf(U|...) - foo_cdf(L|...))
   - to add:
      + calculation of cdf
      + two functions: 1) with templated policy, 2) with no policy,
