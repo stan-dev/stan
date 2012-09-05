@@ -35,8 +35,8 @@ and we'd have a support function like:
 
 
 - Fix make so it works from dir other than one with makefile
-  OR fix instructions; 
-    + won't work for earlier versions of Make, like ones in RTools
+    + not straighforward for GNU make 3.79 (included in RTools) or
+    non-GNU make
     + alt to pass in argument for home, which defaults to CD
 
 - MAYBE add n_chains, n_iter, n_warmup, n_thin as extra arguments 
