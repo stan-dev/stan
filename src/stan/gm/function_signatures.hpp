@@ -79,6 +79,10 @@ add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sum",DOUBLE_T,VECTOR_T);
 add("sum",DOUBLE_T,ROW_VECTOR_T);
 add("sum",DOUBLE_T,MATRIX_T);
+add("sum",INT_T,expr_type(INT_T,1));
+add("sum",INT_T,VECTOR_T);
+add("sum",INT_T,ROW_VECTOR_T);
+add("sum",INT_T,MATRIX_T);
 
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);

@@ -13,6 +13,15 @@ namespace stan {
       return a > b ? a : b; 
     }
 
+    inline double max(std::vector<double>& x) {
+      double max = x[0];
+      for (size_t i = 1; i < x.size(); ++i)
+        if (x[i] > max)
+          max = x[i];
+      return max;
+    }
+
+
     inline double min(double a, double b) { 
       return a < b ? a : b; 
     }
@@ -58,21 +67,14 @@ namespace stan {
       }
       return sqrt(result);
     }
-
-    inline double sum_vec(std::vector<double> x) {
+    
+    inline double sum(std::vector<double>& x) {
       double sum = x[0];
       for (size_t i = 1; i < x.size(); ++i)
         sum += x[i];
       return sum;
     }
 
-    inline double max_vec(std::vector<double> x) {
-      double max = x[0];
-      for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] > max)
-          max = x[i];
-      return max;
-    }
       
   }
 }

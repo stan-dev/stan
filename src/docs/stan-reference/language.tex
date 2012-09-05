@@ -1542,10 +1542,9 @@ expression.  For instance, it is legal syntactically to write
 data {
     real<lower=0> y;
 }
+...
 model {
-    ....
     log(y) ~ normal(mu,sigma);
-    ...
 }
 \end{Verbatim}
 \end{quote}
@@ -1581,7 +1580,7 @@ truncated.  For example, a truncated unit normal distribution
 restricted to $(-0.5,2.1)$ is encoded as follows.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}
 y ~ normal(0,1) T[-0.5,2.1];
 \end{Verbatim}
 \end{quote}
@@ -1592,6 +1591,7 @@ same translation (up to arithmetic precision issues) as
 %
 \begin{quote}
 \begin{Verbatim}
+y ~ normal(0,1);
 lp__ <- lp__ - log(normal_p(2.1,0,1) - normal_p(-0.5,0,1));
 \end{Verbatim}
 \end{quote}
@@ -1627,6 +1627,7 @@ the accumulated log probability.
 %
 \begin{quote}
 \begin{Verbatim}
+y ~ normal(0,1);
 lp__ <- lp__ - log(1 - normal_p(-0.5,0,1));
 \end{Verbatim}
 \end{quote}
@@ -1651,6 +1652,7 @@ the accumulated log probability.
 %
 \begin{quote}
 \begin{Verbatim}
+y ~ normal(0,1);
 lp__ <- lp__ - log(normal_p(2.1,0,1));
 \end{Verbatim}
 \end{quote}

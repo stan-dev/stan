@@ -78,16 +78,16 @@ variances are known, but the covariance is not.
 data {
   int<lower=0> N;
   vector[2] y[N];
-  double<lower=0> var1;  double<lower=0> var2;
+  real<lower=0> var1;     real<lower=0> var2;
 }
 transformed data {
-  double<lower=0> max_cov;  double<lower=0> min_cov;   
+  real<lower=0> max_cov;  real<lower=0> min_cov;   
   max_cov <- sqrt(var1 * var2);  
   min_cov <- -max_cov;
 }
 parameters {
   vector[2] mu;
-  real<lower=min_cov,upper= max_cov> cov;
+  real<lower=min_cov,upper=max_cov> cov;
 }
 transformed parameters {
   matrix[2,2] sigma;
@@ -151,7 +151,7 @@ data {
    real U;
    real<upper=U> y[N];
 } 
-parameters
+parameters {
    real mu;
    real<lower=0> sigma;
 } 
@@ -235,14 +235,14 @@ data {
    real<lower=max(y_obs)> U;
 }
 parameters {
-  real<lower=U> y[N_cens];
+  real<lower=U> y_cens[N_cens];
   real mu;
   real<lower=0> sigma;
 }
 model {
    for (n in 1:N_obs)
        y_obs[n] ~ normal(mu,sigma);
-   for (y in 1:N_cens)
+   for (n in 1:N_cens)
        y_cens[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
@@ -417,17 +417,17 @@ components specified as data yields the following model.
 \begin{quote}
 \begin{Verbatim}
 data {
-  int<lower=1> K;           // number of mixture components
-  int<lower=1> N;           // number of data points
-  real y[N];           // observations
+  int<lower=1> K;          // number of mixture components
+  int<lower=1> N;          // number of data points
+  real y[N];               // observations
 }
 parameters {
-  simplex[K] theta;    // mixing proportions
-  real mu[K];          // locations of mixture components
-  real<lower=0> sigma[K];   // scales of mixture components
+  simplex[K] theta;        // mixing proportions
+  real mu[K];              // locations of mixture components
+  real<lower=0> sigma[K];  // scales of mixture components
 }
 model {
-  real ps[K];          // temp for log component densities
+  real ps[K];              // temp for log component densities
   for (k in 1:K) {
     mu[k] ~ normal(0,10);
     sigma[k] ~ uniform(0,10);
@@ -651,7 +651,9 @@ $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 \begin{quote}
 \begin{Verbatim}
 data {
+   int<lower=2> K;
    int<lower=0> N;
+   int<lower=1> D;
    int<lower=1,upper=K> y[N];
    vector[D] x[N];
 }
@@ -714,14 +716,14 @@ The ordered logistic model can be coded in \Stan using the
 \begin{quote}
 \begin{Verbatim} 
 data {
-  int<lower=1> D;
   int<lower=2> K;
   int<lower=0> N;
+  int<lower=1> D;
   int<lower=1,upper=K> y[N];
   row_vector[D] x[N];
 } 
 parameters {
-  matrix[D] beta;
+  vector[D] beta;
   ordered[K-1] c;
 } 
 model {
@@ -749,14 +751,14 @@ An ordered probit model could be coded in a manner similar to the
 \begin{quote}
 \begin{Verbatim}
 data {
-  int<lower=1> D;
   int<lower=2> K;
   int<lower=0> N;
+  int<lower=1> D;
   int<lower=1,upper=K> y[N];
   row_vector[D] x[N];
 }
 parameters {
-  matrix[D] beta;
+  vector[D] beta;
   ordered[K-1] c;
 }
 model {
@@ -764,10 +766,10 @@ model {
   for (n in 1:N) {
       real eta;
       eta <- x[n] * beta;
-      theta[1] = 1 - Phi(eta - c(1));
+      theta[1] <- 1 - Phi(eta - c[1]);
       for (k in 2:(K-1))
-          theta[k] = Phi(eta - c(k-1)) - erf(eta - c(k));
-      theta[K] = Phi(eta - c(K-1));
+          theta[k] <- Phi(eta - c[k-1]) - erf(eta - c[k]);
+      theta[K] <- Phi(eta - c[K-1]);
       y[n] ~ categorical(theta);
   }
 }
@@ -814,6 +816,7 @@ data {
     int<lower=1> L;
     int<lower=0,upper=1> y[N];
     int<lower=1,upper=L> ll[N];
+    row_vector[D] x[N];
 }
 parameters {
     real mu[D];
@@ -919,18 +922,22 @@ predictor in a loop.
 \begin{Verbatim}
 data {
     int<lower=0> K;
-    ...
+    int<lower=0> N;
+    real y[N];
+}
 parameters {
+    real alpha;
     real beta[K];
-    ...
+    real sigma;
+}
 model {
-    for (n in (K+1):N)
+    for (n in (K+1):N) {
         real mu;
-        mu <- alpha;
-        for (k in 1:K)
-            mu <- mu + beta[k] * x[n-k];
-        y[n] ~ normal(mu,sigma);
-    }
+    mu <- alpha;
+    for (k in 1:K)
+        mu <- mu + beta[k] * y[n-k];
+    y[n] ~ normal(mu, sigma);
+  }
 }
 \end{Verbatim}
 \end{quote}
@@ -939,7 +946,7 @@ model {
 
 
 
-\chapter{Custom Probability  Functions}%
+\chapter{Custom Probability Functions}%
 \label{custom-probability-functions.chapter}
 
 \noindent
@@ -1068,10 +1075,9 @@ data {
     int<lower=1> N;
     real x[K,N];
     real y[N];
-    ...
+}
 parameters {
     real beta[K];
-    ...
 }
 model {
     for (n in 1:N) {
@@ -1091,13 +1097,13 @@ initialization.
 \begin{quote}
 \begin{Verbatim} 
 data {
-    ...
+    int<lower=1> K;
+    int<lower=1> N;
     vector[K] x[N];
     real y[N];
-    ...
+}
 parameters {
     vector[K] beta;
-    ...
 }
 model {
     for (n in 1:N)
@@ -1116,7 +1122,7 @@ replaced with a transpose and multiply, as in
 \end{quote}
 %
 The problem is that the transposition creates an intermediate result
-for the expression \code{beta'}.%
+for the expression \code{x[n]'}.%
 %
 \footnote{\Stan cannot exploit the expression templates in the Eigen
   matrix library because of the inability to multiply vectors of
@@ -1131,7 +1137,8 @@ as follows.
 \begin{Verbatim} 
 ...
 transformed parameters {
-    row_vector beta_t;    beta_t <- beta';
+    row_vector[K] beta_t;
+    beta_t <- beta';
 }
 model {
     for (n in 1:N)
@@ -1141,7 +1148,7 @@ model {
 \end{quote}
 %
 The problem with transposition could be completely solved by directly
-encoding either the \code{x} or \code{n} as row vectors, as in the
+encoding the \code{x} as a row vector, as in the
 following example.
 %
 \begin{quote}
@@ -1149,15 +1156,14 @@ following example.
 data {
     ...
     row_vector[K] x[N];
-    real y[N];
     ...
+}
 parameters {
     vector[K] beta;
-    ...
 }
 model {
     for (n in 1:N)
-        y[n] ~ normal(x[n] * beta), 1);
+        y[n] ~ normal(x[n] * beta, 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -1169,16 +1175,16 @@ following example.
 \begin{quote}
 \begin{Verbatim}  
 data {
-    ...
+    int<lower=1> K;
+    int<lower=1> N;
     matrix[N,K] x;
     vector[N] y;
-    ... 
+}
 parameters {
     vector[K] beta;
-    ...
 } 
 model {
-    y ~ normal(x*beta,1);
+    y ~ normal(x * beta, 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -1191,14 +1197,14 @@ probability function, as in the following example.
 \begin{quote}
 \begin{Verbatim} 
 data {
-    ...
+    int<lower=1> K;
+    int<lower=1> N;
     matrix[N,K] x;
     vector[N] y;
-    ...
+}
 parameters {
     vector[K] beta;
-    ...
-}
+} 
 model {
     y ~ normal(x * beta, 1);
 }
