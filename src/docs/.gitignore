@@ -3,4 +3,5 @@
 *.blg
 *.log
 *.toc
+*.out
 stan-reference/stan-reference.pdf
