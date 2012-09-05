@@ -1,7 +1,26 @@
 STAN V1.0.1
 ======================================================================
 
-* check our functions are all defined
+* check ranges for lvalue expressions in assignments
+
+   check_range(vector,i,"v");
+    v[i-1] = ...;
+  }
+
+and we'd have a support function like:
+
+  template <typename T>
+  inline check_range(const std::vector<T>& x,
+                     size_t i,
+                     const char* msg) {
+  #if (!defined NDEBUG) || (!defined STAN_NO_DEBUG)
+      if (i < 1 || i > x.size())
+          ... throw some kind of idx exception ...
+  #endif
+  }
+
+
+* check our functions in doc are all defined in function signatures in gm/
 
 *p.45: several places c(1), c(k), ... ought to be c[1], c[k], ...?
 *p.52: footnote~2, does not match code example?
