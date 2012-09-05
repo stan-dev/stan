@@ -780,7 +780,7 @@ The logistic model could also be coded this way by replacing
 \code{Phi} with \code{inv\_logit}, though the built-in encoding based
 on the softmax transform is more efficient and more numerically
 stable.  A small efficiency gain could be achieved by computing the
-values \code{1 - Phi(eta - c(d))} once and storing them for re-use.
+values \code{Phi(eta - c[k])} once and storing them for re-use.
 
 \section{Hierarchical Logistic Regression}
 
@@ -868,7 +868,7 @@ parameters {
 }
 model {
     for (n in 2:N)
-       y[n] ~ normal(alpha + beta * y[n-1], sigma);
+       y[n] ~ normal(alpha + beta*y[n-1], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -907,7 +907,7 @@ coefficient \code{gamma} and the following model statement.
 \begin{quote}
 \begin{Verbatim}
 for (n in 3:N)
-  y[n] ~ normal(alpha + beta * y[n-1] + gamma * y[n-2], sigma);
+  y[n] ~ normal(alpha + beta*y[n-1] + gamma*y[n-2], sigma);
 \end{Verbatim}
 \end{quote}
 
