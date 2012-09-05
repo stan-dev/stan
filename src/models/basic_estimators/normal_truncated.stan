@@ -1,7 +1,7 @@
 data {
   real U;
   int<lower=1> N;
-  real<upper = U> y[N];
+  real<upper=U> y[N];
 }
 parameters {
   real mu;
@@ -9,5 +9,5 @@ parameters {
 }
 model {
   for (n in 1:N)
-    y[n] ~ normal(mu,sigma) T[,0];
+    y[n] ~ normal(mu,sigma) T[,U];
 }
