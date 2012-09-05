@@ -19,7 +19,6 @@ and we'd have a support function like:
   #endif
   }
 
-
 * check our functions in doc are all defined in function signatures in gm/
 
 *p.51: "Vectorized Probability Functions" subsection identical to previous para?
@@ -35,17 +34,7 @@ and we'd have a support function like:
 *p.108, suggestion/wish: useful (more clear) to provide mathematical formulae
 
 
-- Fix make so it works from dir other than one with makefile
-    + not straighforward for GNU make 3.79 (included in RTools) or
-    non-GNU make
-    + alt to pass in argument for home, which defaults to CD
-
-- MAYBE add n_chains, n_iter, n_warmup, n_thin as extra arguments 
-  + code for RStan and maybe Stan
-  + doc for RStan and Stan
-  + deprecate old options, iter, warmup, thin w/o breaking
-    backward compaibility (move old ones to footnote in manual)
-    -- warning when used that deprecated?
+- Switch n_chains to chains in RStan
 
 - print signatures of functions with matching names in
   errors from parsers
@@ -56,13 +45,47 @@ and we'd have a support function like:
 - add chains argument to Stan command to run multiple chains
   and write into one or more files
 
-- We also probably need a branch called v1.0.x or v1.x. And a set of
-  guidelines for what goes in what branch. And to write down our
-  accumulated set of guidelines so that other people can find them.
-
 - add prior to getting started examples in doc
 
 - make manual needs to go one or two more latex rounds
+
+
+Convergence Diagnostics
+==========================================================
+
+verboseEvolve:
+  Evolve the current state by one half momentum step, one full
+  position step, and then one half momentum step, displaying H, and (
+  \Delta H / epsilon^{2} ) at each update.  The idea is that if the
+  leapfrog is working properly then you should see the cancellation of
+  errors (some error in one direction, then lots of error in the other
+  direction, then error in the first direction again to cancel the
+  bulk of the difference).
+
+checkIntError:
+  Evolve the current state by a given number of iterations, displaying
+  H and ( \Delta H / epsilon^{2} ) at each update so that you can see
+  if the error is only slowly increasing or straight up diverging for
+  the given evolution parameters.
+
+saveTrajectory:
+    Evolve the current state through a single trajectory, saving each
+    update to a file.  This way you can plot the entire trajectory and
+    check it visually for problems (helpful in diagnosing divergences,
+    bad step-sizes, etc).
+
+plotSamples:
+    Save the proposed sample, proposed potential, and acceptance
+    probability in the chain, then display the visual diagnostics
+    we've discussed before, namely histograms of each marginal
+    distribution for samples with p(accept) < 0.1 and p(accept) > 0.9.
+    For NUTS you'd have to play around with this a bit -- Matt had
+    recommended looking at the average acceptance probability across
+    the entire chain, but I'm not sure which sample you'd plot in that
+    case.  You'd do just as well plotting each step along the
+    trajectory along with what its acceptance probability would be,
+    provided the storage of all those samples doesn't cause issues.
+
 
 CODE CLEANUP
 ======================================================================
@@ -97,6 +120,26 @@ MISC
   ? how to integrate
 
 * truncations need to be vectorized, too!
+
+Release Management
+======================================================================
+- We also probably need a branch called v1.0.x or v1.x. And a set of
+  guidelines for what goes in what branch. And to write down our
+  accumulated set of guidelines so that other people can find them.
+  + I (Bob) think we should wait until we change major version to
+    v2.x.y before worrying about this, and only then if we break
+    backward compatibility
+
+
+Make
+======================================================================
+- Fix make so it works from dir other than one with makefile
+    + not straighforward for GNU make 3.79 (included in RTools) or
+    non-GNU make
+    + alt to pass in argument for home, which defaults to CD
+
+
+
 
 RStan
 ======================================================================
