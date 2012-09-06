@@ -24,9 +24,6 @@ and we'd have a support function like:
 
 * check our functions in doc are all defined in function signatures in gm/
 
-*p.108, suggestion/wish: useful (more clear) to provide mathematical formulae
-
-
 - Switch n_chains to chains in RStan
 
 - print signatures of functions with matching names in
@@ -248,6 +245,8 @@ Sampling
 
 Modeling Language
 ----------------------------------------------------------------------
+
+* add max() and min() for floating point args
 
 * syntactic sugar sampling notation
   - blocks where sampling not allowed (all but model)
@@ -929,6 +928,8 @@ for the following, categorized by issue.
 
 MODELING LANGUAGE MANUAL
 ======================================================================
+
+* provide mathematical definitions of all the special functions
 
 * include section for BUGS user migration
   -- Andrew's e-mail contents
