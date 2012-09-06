@@ -39,8 +39,8 @@ transformed data {
   transformed_data_real <- log10();
 
   // special values
-//FIXME:  transformed_data_real <- nan();
-//FIXME:  transformed_data_real <- infinity();
+  transformed_data_real <- not_a_number();
+  transformed_data_real <- positive_infinity();
   transformed_data_real <- negative_infinity();
   transformed_data_real <- epsilon();
   transformed_data_real <- negative_epsilon();

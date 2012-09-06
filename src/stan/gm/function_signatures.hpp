@@ -8,7 +8,6 @@ add_nullary("epsilon");
 
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 
-add_nullary("infinity");
 
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
@@ -27,11 +26,12 @@ add("min",DOUBLE_T,ROW_VECTOR_T);
 add("min",DOUBLE_T,MATRIX_T);
 add("min",INT_T,INT_T,INT_T);
 
-add_nullary("nan");
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
+add_nullary("not_a_number");
 
 add_nullary("pi");
+add_nullary("positive_infinity");
 
 add_nullary("sqrt2");
 add_unary("step");
