@@ -50,7 +50,7 @@ setMethod("sampling", "stanmodel",
                model_cppname <- object@.modelmod$model_cppname  
                mod <- Module(model_cppname, getDynLib(object@dso)) 
                stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
-               assign("sampler", stan_fit_cpp_module, envir = object@.modelmod)
+               assign("sampler_mod", stan_fit_cpp_module, envir = object@.modelmod)
             }
 
             if (chains < 1) 
@@ -65,7 +65,7 @@ setMethod("sampling", "stanmodel",
               else data <- list()
             } 
 
-            sampler <- new(object@.modelmod$sampler, data)
+            sampler <- new(object@.modelmod$sampler_mod, data)
             m_pars = sampler$param_names() 
             p_dims = sampler$param_dims() 
             if (!missing(pars) && !is.na(pars) && length(pars) > 0) {
@@ -125,6 +125,12 @@ setMethod("sampling", "stanmodel",
              # keep a ref to avoid garbage collection
              # (see comments in fun stan_model)
              assign("date", date(), envir = fit@.MISC) 
+             rm(sampler) 
+             invisible(gc())  
+             # triger gc to really delete sampler, create from the sampler_mod.   
+             # the issue here is that if sampler is removed later automatically by 
+             # R's gabbage collector after the fx (the loaded dso) is removed, 
+             # it will cause a segfault, which will crash R. 
              invisible(fit)
           }) 
 

@@ -58,7 +58,7 @@ stan_model <- function(file,
   
   dso <- cxxfunctionplus(signature(), body = '  return R_NilValue;', 
                          includes = inc, plugin = "rstan", save_dso = save_dso,
-                         verbose = verbose) 
+                         id = model_name, verbose = verbose) 
                
   mod <- Module(model_cppname, getDynLib(dso)) 
   # stan_fit_cpp_module <- do.call("$", list(mod, model_name))
@@ -69,7 +69,7 @@ stan_model <- function(file,
              .modelmod = new.env()) # store the sampler, which could be replaced 
   assign("model_cppname", model_cppname, envir = obj@.modelmod)
   assign("model_cppcode", stanc_ret$cppcode, envir = obj@.modelmod)
-  assign("sampler", stan_fit_cpp_module, envir = obj@.modelmod)
+  assign("sampler_mod", stan_fit_cpp_module, envir = obj@.modelmod)
   obj 
 
   ## We keep a reference to *dso* above to avoid dso to be 
