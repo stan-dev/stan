@@ -2,9 +2,16 @@
 
 add_unary("abs");
 add("abs",INT_T,INT_T);
+add_unary("ceil");
 
 add_nullary("e");
 add_nullary("epsilon");
+add_unary("fabs");
+add_binary("fdim");
+add_unary("floor");
+add_binary("fmax");
+add_binary("fmin");
+add_binary("fmod");
 
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 
@@ -25,17 +32,15 @@ add("min",DOUBLE_T,VECTOR_T);
 add("min",DOUBLE_T,ROW_VECTOR_T);
 add("min",DOUBLE_T,MATRIX_T);
 add("min",INT_T,INT_T,INT_T);
-
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 add_nullary("not_a_number");
-
 add_nullary("pi");
 add_nullary("positive_infinity");
-
+add_unary("round");
 add_nullary("sqrt2");
 add_unary("step");
-
+add_unary("trunc");
 
 //------------------------------------------------------------
 
@@ -58,10 +63,6 @@ add_unary("cosh");
 add_unary("sinh");
 add_unary("tanh");
 
-add_unary("fabs");
-add_unary("floor");
-add_unary("ceil");
-add_binary("fmod");
 
 add("exp",VECTOR_T,VECTOR_T);
 add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
@@ -217,19 +218,14 @@ add_unary("log1m");
 
 add_ternary("fma");
 
-add_binary("fmax");
-add_binary("fmin");
 
 add_binary("hypot");
 
 add_unary("log2");
 add_unary("cbrt");
 
-add_unary("round");
 
-add_unary("trunc");
 
-add_binary("fdim");
 
 add_unary("tgamma");
 
