@@ -715,7 +715,7 @@ namespace stan {
      *
      * @return Positive infinity.
      */
-    inline double infinity() {
+    inline double positive_infinity() {
       return INFTY;
     }
 
@@ -733,7 +733,7 @@ namespace stan {
      *
      * @return Quiet not-a-number.
      */
-    inline double nan() {
+    inline double not_a_number() {
       return NOT_A_NUMBER;
     }
 

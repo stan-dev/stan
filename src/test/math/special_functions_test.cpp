@@ -210,14 +210,14 @@ TEST(MathsSpecialFunctions, log10_fun) {
 }
 
 TEST(MathsSpecialFunctions, infty) {
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::infinity());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::positive_infinity());
 }
 TEST(MathsSpecialFunctions, neg_infty) {
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), 
                   stan::math::negative_infinity());
 }
 TEST(MathsSpecialFunctions, nan) {
-  EXPECT_TRUE(std::isnan(stan::math::nan()));
+  EXPECT_TRUE(std::isnan(stan::math::not_a_number()));
 }
 TEST(MathsSpecialFunctions, epsilon) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::epsilon(),
