@@ -1,6 +1,9 @@
 STAN V1.0.1
 ======================================================================
 
+* check initial gradients and if they're bad (any NaN), just
+  bomb right away
+
 * check ranges for lvalue expressions in assignments
 
    check_range(vector,i,"v");
@@ -21,16 +24,6 @@ and we'd have a support function like:
 
 * check our functions in doc are all defined in function signatures in gm/
 
-*p.51: "Vectorized Probability Functions" subsection identical to previous para?
-       DL: the text describes different things. Bob, want to take a look at how to
-       best describe the two issues? The last paragraph describes using matrix 
-       multiplication to improve efficiency. The point of the next section is to
-       describe vectorized probability functions. Should the first example use a
-       precalculated "x * beta" variable and use a loop?
-*p.52: footnote~2, does not match code example?
-       DL: could you check this one?
-*p.89, middle, sentence incomplete?
-       DL: language.tex, about line 2136
 *p.108, suggestion/wish: useful (more clear) to provide mathematical formulae
 
 

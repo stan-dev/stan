@@ -1156,7 +1156,9 @@ associativity.
 \\ \hline
 \code{*} & 1 & left & binary infix & multiplication
 \\
-\code{/} & 1 & left & binary infix & division
+\code{/} & 1 & left & binary infix & (right) division
+\\ \hline
+\Verb|\| & 1 & left & binary infix & left division
 \\ \hline
 \code{.*} & 1 & left & binary infix & elementwise multiplication
 \\
@@ -2119,10 +2121,11 @@ $-$ & $+$ & $+$ & \code{transformed data} {\it and}\ \code{generated quantities}
   data or parameters should be declared, based on whether it is
   defined in terms of parameters, whether it is used in the log
   probability function defined in the model block, and whether it is
-  printed.  
-  The two lines marked with asterisks ($*$) should not be used as
-  there is no need to print a variable every iteration that does not
-  depend on the value of any parameters.}%
+  printed.  The two lines marked with asterisks ($*$) should not be
+  used as there is no need to print a variable every iteration that
+  does not depend on the value of any parameters (for information on
+  how to print these if necessary, see \refnote{print-var-no-param}
+  in this chapter).}%
 \label{variable-flowchart.figure}
 \end{figure}
 %
@@ -2130,15 +2133,12 @@ Another way to look at the variables is in terms of their function.
 To decide which variable to use, consult the charts in 
 \reffigure{variable-flowchart}.  The last line has no
 corresponding location, as there is no need to print a variable
-every iteration that does not depend on parameters.  If absolutely
-necessary, this can be accomplished 
-
-, for a variable
-that is not printed, a variable that does not depend on parameters but 
-is printed and used in the log probability function should be
-defined as transformed data
-
-
+every iteration that does not depend on parameters.%
+%
+\footnote{It is possible to print a variable every iteration that does
+  not depend on parameters --- just define it (or redefine it if it is
+  transformed data) in the \code{generated quantities} block.\label{print-var-no-param.footnote}}
+%
 The rest of this chapter provides full details on when and how the
 variables and statements in each block are executed.
 %
