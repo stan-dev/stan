@@ -1,5 +1,44 @@
 // included from constructor for function_signatures() in src/stan/gm/ast.hpp
 
+add_unary("abs");
+add("abs",INT_T,INT_T);
+
+add_nullary("e");
+add_nullary("epsilon");
+
+add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
+
+add_nullary("infinity");
+
+add("int_step",INT_T,DOUBLE_T);
+add("int_step",INT_T,INT_T);
+
+add_nullary("log10");
+add_nullary("log2");
+
+add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("max",DOUBLE_T,VECTOR_T);
+add("max",DOUBLE_T,ROW_VECTOR_T);
+add("max",DOUBLE_T,MATRIX_T);
+add("max",INT_T,INT_T,INT_T);
+add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("min",DOUBLE_T,VECTOR_T);
+add("min",DOUBLE_T,ROW_VECTOR_T);
+add("min",DOUBLE_T,MATRIX_T);
+add("min",INT_T,INT_T,INT_T);
+
+add_nullary("nan");
+add_nullary("negative_epsilon");
+add_nullary("negative_infinity");
+
+add_nullary("pi");
+
+add_nullary("sqrt2");
+add_unary("step");
+
+
+//------------------------------------------------------------
+
 add_unary("exp");
 add_unary("log");
 add_unary("log10");
@@ -23,7 +62,6 @@ add_unary("fabs");
 add_unary("floor");
 add_unary("ceil");
 add_binary("fmod");
-add_unary("abs");
 
 add("exp",VECTOR_T,VECTOR_T);
 add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
@@ -50,15 +88,7 @@ add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 
-add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("min",DOUBLE_T,VECTOR_T);
-add("min",DOUBLE_T,ROW_VECTOR_T);
-add("min",DOUBLE_T,MATRIX_T);
 
-add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("max",DOUBLE_T,VECTOR_T);
-add("max",DOUBLE_T,ROW_VECTOR_T);
-add("max",DOUBLE_T,MATRIX_T);
 
 add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("mean",DOUBLE_T,VECTOR_T);
@@ -203,9 +233,9 @@ add_binary("fdim");
 
 add_unary("tgamma");
 
-add("int_step",INT_T,DOUBLE_T);
 
-add_unary("step");
+
+
 
 add_unary("inv_cloglog");
 
@@ -275,7 +305,7 @@ add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
 add_ternary("weibull_p");
 
-add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
+
 add_binary("binomial_coefficient_log");
 
 
@@ -283,16 +313,7 @@ add_binary("binomial_coefficient_log");
 
 // CONSTANTS
 
-add_nullary("e");
-add_nullary("pi");
-add_nullary("sqrt2");
-add_nullary("log2");
-add_nullary("log10");
-add_nullary("infinity");
-add_nullary("negative_infinity");
-add_nullary("nan");
-add_nullary("epsilon");
-add_nullary("negative_epsilon");
+
 
 
 
