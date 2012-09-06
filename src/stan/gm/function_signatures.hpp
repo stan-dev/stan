@@ -2,26 +2,24 @@
 
 add_unary("abs");
 add("abs",INT_T,INT_T);
+add_unary("cbrt");
 add_unary("ceil");
-
 add_nullary("e");
 add_nullary("epsilon");
+add_unary("exp");
+add_unary("exp2");
 add_unary("fabs");
 add_binary("fdim");
 add_unary("floor");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
-
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
-
-
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
-
+add_unary("log");
 add_nullary("log10");
 add_nullary("log2");
-
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
@@ -37,18 +35,17 @@ add_nullary("negative_infinity");
 add_nullary("not_a_number");
 add_nullary("pi");
 add_nullary("positive_infinity");
+add_binary("pow");
 add_unary("round");
+add_unary("sqrt");
 add_nullary("sqrt2");
+add_unary("square");
 add_unary("step");
 add_unary("trunc");
 
 //------------------------------------------------------------
 
-add_unary("exp");
-add_unary("log");
 add_unary("log10");
-add_binary("pow");
-add_unary("sqrt");
 
 add_unary("cos");
 add_unary("sin");
@@ -207,7 +204,6 @@ add_unary("atanh");
 add_unary("erf");
 add_unary("erfc");
 
-add_unary("exp2");
 add_unary("expm1");
 
 add_binary("lbeta");
@@ -222,7 +218,6 @@ add_ternary("fma");
 add_binary("hypot");
 
 add_unary("log2");
-add_unary("cbrt");
 
 
 
@@ -245,7 +240,6 @@ add_binary("log_loss");
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");
 
-add_unary("square");
 
 add("softmax",VECTOR_T,VECTOR_T);
 

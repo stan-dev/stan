@@ -78,6 +78,17 @@ transformed data{
   transformed_data_real <- ceil(d_real_1);
   transformed_data_real <- round(d_real_1);
   transformed_data_real <- trunc(d_real_1);
+
+  //   power and logarithm functions
+  transformed_data_real <- sqrt(d_real_1);
+  transformed_data_real <- cbrt(d_real_1);
+  transformed_data_real <- square(d_real_1);
+  transformed_data_real <- exp(d_real_1);
+  transformed_data_real <- exp2(d_real_1);
+  transformed_data_real <- log(d_real_1);
+  transformed_data_real <- log2(d_real_1);
+  transformed_data_real <- log10(d_real_1);
+  transformed_data_real <- pow(d_real_1, d_real_2);
 }
 parameters {
   real p_real_1;
@@ -171,6 +182,28 @@ transformed parameters {
   transformed_param_real <- trunc(d_real_1);
   transformed_param_real <- trunc(p_real_1);
   
+  //   power and logarithm functions
+  transformed_param_real <- sqrt(d_real_1);
+  transformed_param_real <- sqrt(p_real_1);
+  transformed_param_real <- cbrt(d_real_1);
+  transformed_param_real <- cbrt(p_real_1);
+  transformed_param_real <- square(d_real_1);
+  transformed_param_real <- square(p_real_1);
+  transformed_param_real <- exp(d_real_1);
+  transformed_param_real <- exp(p_real_1);
+  transformed_param_real <- exp2(d_real_1);
+  transformed_param_real <- exp2(p_real_1);
+  transformed_param_real <- log(d_real_1);
+  transformed_param_real <- log(p_real_1);
+  transformed_param_real <- log2(d_real_1);
+  transformed_param_real <- log2(p_real_1);
+  transformed_param_real <- log10(d_real_1);
+  transformed_param_real <- log10(p_real_1);
+  transformed_param_real <- pow(d_real_1, d_real_2);
+  transformed_param_real <- pow(p_real_1, d_real_2);
+  transformed_param_real <- pow(d_real_1, p_real_2);
+  transformed_param_real <- pow(p_real_1, p_real_2);
+
 
 /*
   transformed_param_real <- d_real_1;
