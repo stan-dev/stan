@@ -89,6 +89,16 @@ transformed data{
   transformed_data_real <- log2(d_real_1);
   transformed_data_real <- log10(d_real_1);
   transformed_data_real <- pow(d_real_1, d_real_2);
+
+  //   trigonometric functions
+  transformed_data_real <- hypot(d_real_1, d_real_2);
+  transformed_data_real <- cos(d_real_1);
+  transformed_data_real <- sin(d_real_1);
+  transformed_data_real <- tan(d_real_1);
+  transformed_data_real <- acos(d_real_1);
+  transformed_data_real <- asin(d_real_1);
+  transformed_data_real <- atan(d_real_1);
+  transformed_data_real <- atan2(d_real_1, d_real_2);
 }
 parameters {
   real p_real_1;
@@ -204,17 +214,27 @@ transformed parameters {
   transformed_param_real <- pow(d_real_1, p_real_2);
   transformed_param_real <- pow(p_real_1, p_real_2);
 
-
-/*
-  transformed_param_real <- d_real_1;
-  transformed_param_real <- d_real_1;
-  transformed_param_real <- d_real_1;
-  transformed_param_real <- d_real_1;
-  transformed_param_real <- d_real_1;
-  transformed_param_real <- d_real_1;
-
-*/
-
+  //   trigonometric functions
+  transformed_param_real <- hypot(d_real_1, d_real_2);
+  transformed_param_real <- hypot(p_real_1, d_real_2);
+  transformed_param_real <- hypot(d_real_1, p_real_2);
+  transformed_param_real <- hypot(p_real_1, p_real_2);
+  transformed_param_real <- cos(d_real_1);
+  transformed_param_real <- cos(p_real_1);
+  transformed_param_real <- sin(d_real_1);
+  transformed_param_real <- sin(p_real_1);
+  transformed_param_real <- tan(d_real_1);
+  transformed_param_real <- tan(p_real_1);
+  transformed_param_real <- acos(d_real_1);
+  transformed_param_real <- acos(p_real_1);
+  transformed_param_real <- asin(d_real_1);
+  transformed_param_real <- asin(p_real_1);
+  transformed_param_real <- atan(d_real_1);
+  transformed_param_real <- atan(p_real_1);
+  transformed_param_real <- atan2(d_real_1, d_real_2);
+  transformed_param_real <- atan2(p_real_1, d_real_2);
+  transformed_param_real <- atan2(d_real_1, p_real_2);
+  transformed_param_real <- atan2(p_real_1, p_real_2);
 }
 model {
 }

@@ -2,8 +2,13 @@
 
 add_unary("abs");
 add("abs",INT_T,INT_T);
+add_unary("acos");
+add_unary("asin");
+add_unary("atan");
+add_binary("atan2");
 add_unary("cbrt");
 add_unary("ceil");
+add_unary("cos");
 add_nullary("e");
 add_nullary("epsilon");
 add_unary("exp");
@@ -14,6 +19,7 @@ add_unary("floor");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
+add_binary("hypot");
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
@@ -37,24 +43,19 @@ add_nullary("pi");
 add_nullary("positive_infinity");
 add_binary("pow");
 add_unary("round");
+add_unary("sin");
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
 add_unary("step");
+add_unary("tan");
 add_unary("trunc");
 
 //------------------------------------------------------------
 
 add_unary("log10");
 
-add_unary("cos");
-add_unary("sin");
-add_unary("tan");
 
-add_unary("acos");
-add_unary("asin");
-add_unary("atan");
-add_binary("atan2");
 
 add_unary("cosh");
 add_unary("sinh");
@@ -215,7 +216,6 @@ add_unary("log1m");
 add_ternary("fma");
 
 
-add_binary("hypot");
 
 add_unary("log2");
 
