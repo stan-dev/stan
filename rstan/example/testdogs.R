@@ -90,7 +90,7 @@ model {
 
 
 model_name <- "dogs"; 
-dogsrr <- stan_model(model_code = dogsstan, model.name = model_name, 
+dogsrr <- stan_model(model_code = dogsstan, model_name = model_name, 
                      verbose = TRUE) 
 
 ss <- sampling(dogsrr, data = dogsdat, chains = 3, seed = 1340338046,
@@ -100,8 +100,14 @@ ss1 <- sampling(dogsrr, data = dogsdat, chains = 1, seed = 1340384924,
                 iter = 2012, sample_file = 'dogs.csv')
 
   args <- list(init = 'random', sample_file = 'dogs.csv', iter = 2012, seed = 1340384924)
-  dogsdat <- rstan:::data.preprocess(dogsdat)
-  sampler <- new(dogsrr@.modelmod$sampler, dogsdat) 
+  dogsdat <- rstan:::data_preprocess(dogsdat)
+
+  mod <- dogsrr@dso@.CXXDSOMISC$module 
+  model_cppname <- dogsrr@model_cpp$model_cppname 
+  stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
+  sampler <- new(stan_fit_cpp_module, dogsdat) 
+
+
   t1 <- sampler$call_sampler(args) 
   args$chain_id <- 2;
   t2 <- sampler$call_sampler(args) 
@@ -109,7 +115,6 @@ ss1 <- sampling(dogsrr, data = dogsdat, chains = 1, seed = 1340384924,
   t3 <- sampler$call_sampler(args) 
   pnames <- sampler$param_names() 
 
-stop("no particular reason")
 
   pars <- c("alpha", "beta")
 
@@ -118,6 +123,8 @@ print(args)
 
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19, comment = "#") 
 colMeans(post)
+
+stop('no reason')
 
 print(ss1)
 print(ss)

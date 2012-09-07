@@ -44,12 +44,20 @@ colMeans(post)
 
 dat <- list(N = 20L, y = y); 
 f <- sampling(rr, data = dat, init = 0, iter = 2012, sample_file = 'norm1.csv')
-sampler <- new(rr@.modelmod$sampler, dat)
+
+
+mod <- rr@dso@.CXXDSOMISC$module 
+model_cppname <- rr@model_cpp$model_cppname 
+stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
+sampler <- new(stan_fit_cpp_module, dat) 
+args <- list(init = list(mu = 2)) 
+s <- sampler$call_sampler(args) 
 args <- list(init = list(mu2 = 2)) 
 s <- sampler$call_sampler(args) 
 summary(s)
 
-sampling(rr, data = dat, iter = 2012, 
+
+sampling(rr, data = dat, iter = 2012, chains = 1,
          init = list(list(mu2 = 2)), seed = 3, thin = 1, 
          sample_file = 'norm1.csv')
 

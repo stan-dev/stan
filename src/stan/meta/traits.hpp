@@ -31,6 +31,28 @@ namespace stan {
     enum { value = boost::is_convertible<T,double>::value };
   };
 
+
+  /**
+   * Metaprogram to determine if a type has a base scalar
+   * type that can be assigned to type double.
+   */
+  template <typename T>
+  struct is_constant_struct {
+    enum { value = is_constant<T>::value };
+  };
+
+
+  template <typename T>
+  struct is_constant_struct<std::vector<T> > {
+    enum { value = is_constant_struct<T>::value };
+  };
+
+  template <typename T, int R, int C>
+  struct is_constant_struct<Eigen::Matrix<T,R,C> > {
+    enum { value = is_constant_struct<T>::value };
+  };
+
+
   // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
 
   template <typename T>

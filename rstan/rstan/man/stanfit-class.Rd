@@ -58,6 +58,8 @@ object of type \code{list}}
       containing named lists corresponding to initial values in the chains.}
     \item{\code{stan_args}:}{The arguments used for sampling all chains,
        object of type \code{list}}
+    \item{\code{stanmodel}:}{The instance of S4 class \code{stanmodel}} 
+    \item{\code{date}:}{The date the object is created} 
     \item{\code{.MISC}:}{Miscellaneous helper information used for the fitted model, 
       object of type \code{environment}}
   }

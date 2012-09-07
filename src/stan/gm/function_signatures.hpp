@@ -2,66 +2,113 @@
 
 add_unary("abs");
 add("abs",INT_T,INT_T);
+add_unary("acos");
+add_unary("acosh");
+add_unary("asin");
+add_unary("asinh");
+add_unary("atan");
+add_binary("atan2");
+add_unary("atanh");
+add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
+add_binary("binomial_coefficient_log");
+add_unary("cbrt");
 add_unary("ceil");
-
+add("cols",INT_T,VECTOR_T);
+add("cols",INT_T,ROW_VECTOR_T);
+add("cols",INT_T,MATRIX_T);
+add_unary("cos");
+add_unary("cosh");
 add_nullary("e");
 add_nullary("epsilon");
+add_unary("erf");
+add_unary("erfc");
+add_unary("exp");
+add_unary("exp2");
+add_unary("expm1");
 add_unary("fabs");
 add_binary("fdim");
 add_unary("floor");
+add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
-
+add_binary("hypot");
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
-
-
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
-
+add_unary("inv_cloglog");
+add_unary("inv_logit");
+add_binary("lbeta");
+add_unary("lgamma");
+add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
+add_unary("log");
+add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
+add_binary("log_sum_exp");
 add_nullary("log10");
+add_unary("log1m");
+add_unary("log1p");
+add_unary("log1p_exp");
 add_nullary("log2");
-
+add_unary("logit");
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
 add("max",DOUBLE_T,MATRIX_T);
 add("max",INT_T,INT_T,INT_T);
+add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("mean",DOUBLE_T,VECTOR_T);
+add("mean",DOUBLE_T,ROW_VECTOR_T);
+add("mean",DOUBLE_T,MATRIX_T);
 add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("min",DOUBLE_T,VECTOR_T);
 add("min",DOUBLE_T,ROW_VECTOR_T);
 add("min",DOUBLE_T,MATRIX_T);
 add("min",INT_T,INT_T,INT_T);
+add_binary("multiply_log");
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 add_nullary("not_a_number");
+add_unary("Phi");
 add_nullary("pi");
 add_nullary("positive_infinity");
+add_binary("pow");
 add_unary("round");
+add("rows",INT_T,VECTOR_T);
+add("rows",INT_T,ROW_VECTOR_T);
+add("rows",INT_T,MATRIX_T);
+add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("sd",DOUBLE_T,VECTOR_T);
+add("sd",DOUBLE_T,ROW_VECTOR_T);
+add("sd",DOUBLE_T,MATRIX_T);
+add_unary("sin");
+add_unary("sinh");
+add_unary("sqrt");
 add_nullary("sqrt2");
+add_unary("square");
 add_unary("step");
+add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("sum",DOUBLE_T,VECTOR_T);
+add("sum",DOUBLE_T,ROW_VECTOR_T);
+add("sum",DOUBLE_T,MATRIX_T);
+add("sum",INT_T,expr_type(INT_T,1));
+add("sum",INT_T,VECTOR_T);
+add("sum",INT_T,ROW_VECTOR_T);
+add("sum",INT_T,MATRIX_T);
+add_unary("tan");
+add_unary("tanh");
+add_unary("tgamma");
 add_unary("trunc");
+add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("variance",DOUBLE_T,VECTOR_T);
+add("variance",DOUBLE_T,ROW_VECTOR_T);
+add("variance",DOUBLE_T,MATRIX_T);
 
 //------------------------------------------------------------
 
-add_unary("exp");
-add_unary("log");
 add_unary("log10");
-add_binary("pow");
-add_unary("sqrt");
 
-add_unary("cos");
-add_unary("sin");
-add_unary("tan");
 
-add_unary("acos");
-add_unary("asin");
-add_unary("atan");
-add_binary("atan2");
 
-add_unary("cosh");
-add_unary("sinh");
-add_unary("tanh");
 
 
 add("exp",VECTOR_T,VECTOR_T);
@@ -72,13 +119,7 @@ add("log",VECTOR_T,VECTOR_T);
 add("log",ROW_VECTOR_T,ROW_VECTOR_T);
 add("log",MATRIX_T,MATRIX_T);
 
-add("rows",INT_T,VECTOR_T);
-add("rows",INT_T,ROW_VECTOR_T);
-add("rows",INT_T,MATRIX_T);
 
-add("cols",INT_T,VECTOR_T);
-add("cols",INT_T,ROW_VECTOR_T);
-add("cols",INT_T,MATRIX_T);
 
 add("determinant",DOUBLE_T,MATRIX_T);
 add("trace",DOUBLE_T,MATRIX_T);
@@ -91,29 +132,9 @@ add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // ve
 
 
 
-add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("mean",DOUBLE_T,VECTOR_T);
-add("mean",DOUBLE_T,ROW_VECTOR_T);
-add("mean",DOUBLE_T,MATRIX_T);
 
-add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("variance",DOUBLE_T,VECTOR_T);
-add("variance",DOUBLE_T,ROW_VECTOR_T);
-add("variance",DOUBLE_T,MATRIX_T);
 
-add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("sd",DOUBLE_T,VECTOR_T);
-add("sd",DOUBLE_T,ROW_VECTOR_T);
-add("sd",DOUBLE_T,MATRIX_T);
 
-add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("sum",DOUBLE_T,VECTOR_T);
-add("sum",DOUBLE_T,ROW_VECTOR_T);
-add("sum",DOUBLE_T,MATRIX_T);
-add("sum",INT_T,expr_type(INT_T,1));
-add("sum",INT_T,VECTOR_T);
-add("sum",INT_T,ROW_VECTOR_T);
-add("sum",INT_T,MATRIX_T);
 
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);
@@ -200,52 +221,25 @@ add("singular_values",VECTOR_T,MATRIX_T);
 // eigen_decompose, eigen_decompose_sym, svd return void
 // so no calling in Stan GM
 
-add_unary("acosh");
-add_unary("asinh");
-add_unary("atanh");
-
-add_unary("erf");
-add_unary("erfc");
-
-add_unary("exp2");
-add_unary("expm1");
-
-add_binary("lbeta");
-add_unary("lgamma");
-
-add_unary("log1p");
-add_unary("log1m");
-
-add_ternary("fma");
 
 
-add_binary("hypot");
+
 
 add_unary("log2");
-add_unary("cbrt");
-
-
-
-
-add_unary("tgamma");
 
 
 
 
 
-add_unary("inv_cloglog");
 
-add_unary("Phi");
 
-add_unary("logit");
-add_unary("inv_logit");
 
-add_binary("log_loss");
 
-add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
-add_binary("log_sum_exp");
 
-add_unary("square");
+
+
+
+
 
 add("softmax",VECTOR_T,VECTOR_T);
 
@@ -302,7 +296,6 @@ add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add_ternary("weibull_p");
 
 
-add_binary("binomial_coefficient_log");
 
 
 // MULTINOMIAL?  no vector<int> type

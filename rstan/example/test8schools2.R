@@ -41,3 +41,6 @@ ss5 <- stan(fit = ss, data = dat, init = initfun)
 
 inits <- lapply(1:4, initfun)
 ss6 <- stan(fit = ss, data = dat, init = inits) 
+
+ss7 <- stan(fit = ss, data = dat, init = inits, chains = 4, thin = 7) 
+

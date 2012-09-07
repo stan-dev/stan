@@ -1063,7 +1063,9 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
 
 legitimate_model_name <- function(name) {
   # To make model name be a valid name in C++. 
-  return("anon_model")
+  name <- gsub('[^[:alnum:]]', '_', name) 
+  paste(basename(tempfile('stan_fit', '')), '_', name, sep = '')
+  # return("anon_model")
 } 
 
 boost_url <- function() {"http://www.boost.org/users/download/"} 
