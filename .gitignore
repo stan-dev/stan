@@ -25,3 +25,6 @@
 stan.Rproj
 .kdev4/
 stan.kdev4
+
+# model files
+src/test/gm/model_specs/*.cpp

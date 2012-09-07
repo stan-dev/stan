@@ -185,6 +185,7 @@ docs: manual doxygen
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) -r *.dSYM
+	$(RM) src/test/gm/model_specs/*.cpp
 
 clean-dox:
 	$(RM) -r doc/api
