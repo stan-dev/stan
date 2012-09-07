@@ -121,6 +121,15 @@ transformed data{
   transformed_data_real <- lmgamma(d_int, d_real);
   transformed_data_real <- lbeta(d_real, d_real);
   transformed_data_real <- binomial_coefficient_log(d_real, d_real);
+
+  //   composed functions
+  transformed_data_real <- expm1(d_real);
+  transformed_data_real <- fma(d_real, d_real, d_real);
+  transformed_data_real <- multiply_log(d_real, d_real);
+  transformed_data_real <- log1p(d_real);
+  transformed_data_real <- log1m(d_real);
+  transformed_data_real <- log1p_exp(d_real);
+  transformed_data_real <- log_sum_exp(d_real, d_real);
 }
 parameters {
   real p_real;
@@ -303,6 +312,32 @@ transformed parameters {
   transformed_param_real <- binomial_coefficient_log(p_real, d_real);
   transformed_param_real <- binomial_coefficient_log(d_real, p_real);
   transformed_param_real <- binomial_coefficient_log(p_real, p_real);
+
+  //   composed functions
+  transformed_param_real <- expm1(d_real);
+  transformed_param_real <- expm1(p_real);
+  transformed_param_real <- fma(d_real, d_real, d_real);
+  transformed_param_real <- fma(d_real, d_real, p_real);
+  transformed_param_real <- fma(d_real, p_real, d_real);
+  transformed_param_real <- fma(d_real, p_real, p_real);
+  transformed_param_real <- fma(p_real, d_real, d_real);
+  transformed_param_real <- fma(p_real, d_real, p_real);
+  transformed_param_real <- fma(p_real, p_real, d_real);
+  transformed_param_real <- fma(p_real, p_real, p_real);
+  transformed_param_real <- multiply_log(d_real, d_real);
+  transformed_param_real <- multiply_log(p_real, d_real);
+  transformed_param_real <- multiply_log(d_real, p_real);
+  transformed_param_real <- multiply_log(p_real, p_real);
+  transformed_param_real <- log1p(d_real);
+  transformed_param_real <- log1p(p_real);
+  transformed_param_real <- log1m(d_real);
+  transformed_param_real <- log1m(p_real);
+  transformed_param_real <- log1p_exp(d_real);
+  transformed_param_real <- log1p_exp(p_real);
+  transformed_param_real <- log_sum_exp(d_real, d_real);
+  transformed_param_real <- log_sum_exp(p_real, d_real);
+  transformed_param_real <- log_sum_exp(d_real, p_real);
+  transformed_param_real <- log_sum_exp(p_real, p_real);
 }
 model {
 }

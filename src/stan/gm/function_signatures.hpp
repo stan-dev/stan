@@ -1,6 +1,5 @@
 // included from constructor for function_signatures() in src/stan/gm/ast.hpp
 
-
 add_unary("abs");
 add("abs",INT_T,INT_T);
 add_unary("acos");
@@ -22,9 +21,11 @@ add_unary("erf");
 add_unary("erfc");
 add_unary("exp");
 add_unary("exp2");
+add_unary("expm1");
 add_unary("fabs");
 add_binary("fdim");
 add_unary("floor");
+add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
@@ -39,6 +40,9 @@ add_unary("lgamma");
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
 add_nullary("log10");
+add_unary("log1m");
+add_unary("log1p");
+add_unary("log1p_exp");
 add_nullary("log2");
 add_unary("logit");
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
@@ -51,6 +55,7 @@ add("min",DOUBLE_T,VECTOR_T);
 add("min",DOUBLE_T,ROW_VECTOR_T);
 add("min",DOUBLE_T,MATRIX_T);
 add("min",INT_T,INT_T,INT_T);
+add_binary("multiply_log");
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 add_nullary("not_a_number");
@@ -215,13 +220,6 @@ add("singular_values",VECTOR_T,MATRIX_T);
 // so no calling in Stan GM
 
 
-
-add_unary("expm1");
-
-add_unary("log1p");
-add_unary("log1m");
-
-add_ternary("fma");
 
 
 
