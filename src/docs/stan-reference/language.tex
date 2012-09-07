@@ -1594,12 +1594,12 @@ same translation (up to arithmetic precision issues) as
 \begin{quote}
 \begin{Verbatim}
 y ~ normal(0,1);
-lp__ <- lp__ - log(normal_p(2.1,0,1) - normal_p(-0.5,0,1));
+lp__ <- lp__ - log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1));
 \end{Verbatim}
 \end{quote}
 %
-The function \code{normal\_p} represents the cumulative normal
-distribution function.  For example, \code{normal\_p(2.1,0,1)} evaluates to 
+The function \code{normal\_cdf} represents the cumulative normal
+distribution function.  For example, \code{normal\_cdf(2.1,0,1)} evaluates to 
 \[
 \int_{-\infty}^{2.1} \mbox{\sf Normal}(x|0,1) \, dx,
 \]
@@ -1630,7 +1630,7 @@ the accumulated log probability.
 \begin{quote}
 \begin{Verbatim}
 y ~ normal(0,1);
-lp__ <- lp__ - log(1 - normal_p(-0.5,0,1));
+lp__ <- lp__ - log(1 - normal_cdf(-0.5,0,1));
 \end{Verbatim}
 \end{quote}
 
@@ -1655,7 +1655,7 @@ the accumulated log probability.
 \begin{quote}
 \begin{Verbatim}
 y ~ normal(0,1);
-lp__ <- lp__ - log(normal_p(2.1,0,1));
+lp__ <- lp__ - log(normal_cdf(2.1,0,1));
 \end{Verbatim}
 \end{quote}
 

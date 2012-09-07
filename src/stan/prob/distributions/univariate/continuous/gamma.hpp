@@ -121,9 +121,9 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_inv_scale, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
-    gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
+    gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
             const Policy&) {
-      static const char* function = "stan::prob::gamma_p<%1%>(%1%)";
+      static const char* function = "stan::prob::gamma_cdf(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -149,15 +149,14 @@ namespace stan {
                           &result, Policy())) 
         return result;
       
-      using boost::math::gamma_p;
-      return gamma_p(alpha, y*beta);
+      return boost::math::gamma_p(alpha, y*beta);
     }
 
     template <typename T_y, typename T_shape, typename T_inv_scale>
     inline
     typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
-    gamma_p(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      return gamma_p(y,alpha,beta,stan::math::default_policy());
+    gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
+      return gamma_cdf(y,alpha,beta,stan::math::default_policy());
     }
       
 

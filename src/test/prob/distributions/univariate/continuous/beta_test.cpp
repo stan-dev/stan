@@ -66,20 +66,20 @@ INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBeta,
 
 
 TEST(ProbDistributionsBeta,Cumulative) {
-  EXPECT_FLOAT_EQ(0.06590419, stan::prob::beta_p(0.3,0.7,0.1));
-  EXPECT_FLOAT_EQ(0.1565002, stan::prob::beta_p(0.7,0.7,0.1));
-  EXPECT_FLOAT_EQ(0.5, stan::prob::beta_p(0.5,5,5));
-  EXPECT_FLOAT_EQ(0.2665677, stan::prob::beta_p(0.4,5,5));
-  EXPECT_FLOAT_EQ(0.8828741, stan::prob::beta_p(0.66,2,3));
-  EXPECT_FLOAT_EQ(0.8734666, stan::prob::beta_p(0.66,2.1,3));
+  EXPECT_FLOAT_EQ(0.06590419, stan::prob::beta_cdf(0.3,0.7,0.1));
+  EXPECT_FLOAT_EQ(0.1565002, stan::prob::beta_cdf(0.7,0.7,0.1));
+  EXPECT_FLOAT_EQ(0.5, stan::prob::beta_cdf(0.5,5,5));
+  EXPECT_FLOAT_EQ(0.2665677, stan::prob::beta_cdf(0.4,5,5));
+  EXPECT_FLOAT_EQ(0.8828741, stan::prob::beta_cdf(0.66,2,3));
+  EXPECT_FLOAT_EQ(0.8734666, stan::prob::beta_cdf(0.66,2.1,3));
 }
 TEST(ProbDistributionsBeta,CumulativeDefaultPolicySigma) {
-  EXPECT_THROW(stan::prob::beta_p(0.5, 0.0, 1), std::domain_error)
+  EXPECT_THROW(stan::prob::beta_cdf(0.5, 0.0, 1), std::domain_error)
     << "alpha == 0 should throw";
-  EXPECT_THROW(stan::prob::beta_p(0.5, -0.5, 1), std::domain_error)
+  EXPECT_THROW(stan::prob::beta_cdf(0.5, -0.5, 1), std::domain_error)
     << "alpha < 0 should throw";
-  EXPECT_THROW(stan::prob::beta_p(0.5, 2, 0), std::domain_error)
+  EXPECT_THROW(stan::prob::beta_cdf(0.5, 2, 0), std::domain_error)
     << "beta == 0 should throw";
-  EXPECT_THROW(stan::prob::beta_p(0.5, 2, -1), std::domain_error)
+  EXPECT_THROW(stan::prob::beta_cdf(0.5, 2, -1), std::domain_error)
     << "beta < 0 should throw";
 }

@@ -58,8 +58,8 @@ model {
   for (i in 1:N_rc) {
     1 ~ bernoulli(exp(-pow(t_rc[i] / exp(-(alpha + beta_age * age_rc[i] + beta_sex * sex_rc[i] 
                                          + yabeta_disease[disease_rc[i]] + b[patient_rc[i]]) / r), r)));
-    //TODO: try the weibull_p 
-    // 0 ~ bernoulli(weibull_p(t_rc[i], exp(-(alpha + beta_age * age_rc[i] + beta_sex * sex_rc[i] 
+    //TODO: try the weibull_cdf 
+    // 0 ~ bernoulli(weibull_cdf(t_rc[i], exp(-(alpha + beta_age * age_rc[i] + beta_sex * sex_rc[i] 
     //                                      + yabeta_disease[disease_rc[i]] + b[patient_rc[i]]) / r), r));
   }
 }

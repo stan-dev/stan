@@ -90,10 +90,10 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    double_exponential_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+    double_exponential_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                          const Policy&) {
       static const char* function
-        = "stan::prob::double_exponential_p<%1%>(%1%)";
+        = "stan::prob::double_exponential_cdf(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -120,8 +120,8 @@ namespace stan {
     
     template <typename T_y, typename T_loc, typename T_scale>
     typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
-    double_exponential_p(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return double_exponential_p(y,mu,sigma,stan::math::default_policy());
+    double_exponential_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      return double_exponential_cdf(y,mu,sigma,stan::math::default_policy());
     }
     
   }

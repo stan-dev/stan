@@ -1024,13 +1024,13 @@ namespace stan {
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
           generate_indent(indent_,o_);
           o_ << "lp__ -= log(";
-          o_ << x.dist_.family_ << "_p(";
+          o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << ") - " << x.dist_.family_ << "_p(";
+          o_ << ") - " << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.low_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1040,7 +1040,7 @@ namespace stan {
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           generate_indent(indent_,o_);
           o_ << "lp__ -= log(";
-          o_ << x.dist_.family_ << "_p(";
+          o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1050,7 +1050,7 @@ namespace stan {
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           generate_indent(indent_,o_);
           o_ << "lp__ -= log1m(";
-          o_ << x.dist_.family_ << "_p(";
+          o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.low_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";

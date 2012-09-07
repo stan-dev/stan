@@ -106,11 +106,11 @@ namespace stan {
               typename T_inv_scale, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
-    exponential_p(const T_y& y, 
+    exponential_cdf(const T_y& y, 
                   const T_inv_scale& beta, 
                   const Policy&) {
 
-      static const char* function = "stan::prob::exponential_p<%1%>(%1%)";
+      static const char* function = "stan::prob::exponential_cdf(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -135,9 +135,9 @@ namespace stan {
               typename T_inv_scale>
     inline
     typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
-    exponential_p(const T_y& y, 
+    exponential_cdf(const T_y& y, 
                   const T_inv_scale& beta) {
-      return exponential_p(y,beta,stan::math::default_policy());
+      return exponential_cdf(y,beta,stan::math::default_policy());
     }
     
 

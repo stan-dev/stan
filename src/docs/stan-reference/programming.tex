@@ -279,10 +279,10 @@ is
 \]
 % 
 Although \Stan implements $\Phi$ with the function $\code{Phi}$, \Stan
-also provides the cumulative distribution function \code{normal\_p},
+also provides the cumulative distribution function \code{normal\_cdf},
 defined by
 \[
-\code{normal\_p}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
+\code{normal\_cdf}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
 \]
 %
 The following model assumes
@@ -303,7 +303,7 @@ parameters {
 model {
    for (n in 1:N_obs)
        y_obs[n] ~ normal(mu,sigma); 
-   lp__ <- lp__ + N_cens * log1m(normal_p(U,mu,sigma));
+   lp__ <- lp__ + N_cens * log1m(normal_cdf(U,mu,sigma));
 }
 \end{Verbatim}
 \end{quote}

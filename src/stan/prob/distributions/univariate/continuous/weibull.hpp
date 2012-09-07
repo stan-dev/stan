@@ -89,10 +89,10 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma, 
+    weibull_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma, 
               const Policy&) {
 
-      static const char* function = "stan::prob::weibull_p<%1%>(%1%)";
+      static const char* function = "stan::prob::weibull_cdf(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -122,8 +122,8 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     inline
     typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
-    weibull_p(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      return weibull_p(y,alpha,sigma,stan::math::default_policy());
+    weibull_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      return weibull_cdf(y,alpha,sigma,stan::math::default_policy());
     }
 
   }

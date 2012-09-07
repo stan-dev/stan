@@ -174,9 +174,9 @@ namespace stan {
     template <typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_p(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-           const Policy&) {
-      static const char* function = "stan::prob::beta_p(%1%)";
+    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
+	     const Policy&) {
+      static const char* function = "stan::prob::beta_cdf(%1%)";
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -213,8 +213,8 @@ namespace stan {
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_p(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_p(y,alpha,beta,stan::math::default_policy());
+    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
+      return beta_cdf(y,alpha,beta,stan::math::default_policy());
     }
   }
 }

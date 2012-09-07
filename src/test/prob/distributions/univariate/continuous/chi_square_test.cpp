@@ -66,7 +66,7 @@ TEST(ProbDistributionsChiSquare,ErrnoPolicy) {
   EXPECT_TRUE (std::isnan(result));
 }
 TEST(ProbDistributionsChiSquare,Cumulative) {
-  using stan::prob::chi_square_p;
-  EXPECT_FLOAT_EQ(0.9518757, chi_square_p(7.9,3.0));
-  EXPECT_FLOAT_EQ(0.9267752, chi_square_p(1.9,0.5));
+  using stan::prob::chi_square_cdf;
+  EXPECT_FLOAT_EQ(0.9518757, chi_square_cdf(7.9,3.0));
+  EXPECT_FLOAT_EQ(0.9267752, chi_square_cdf(1.9,0.5));
 }

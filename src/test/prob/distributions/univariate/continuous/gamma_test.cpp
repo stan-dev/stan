@@ -84,8 +84,8 @@ TEST(ProbDistributionsGamma,ErrnoPolicy) {
 
 TEST(ProbDistributionsGamma,Cumulative) {
   // values from R
-  EXPECT_FLOAT_EQ(0.59399415, stan::prob::gamma_p(1.0,2.0,2.0));
-  EXPECT_FLOAT_EQ(0.96658356, stan::prob::gamma_p(2.0,0.25,0.75));
-  EXPECT_FLOAT_EQ(0.63212056, stan::prob::gamma_p(1,1,1));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_p(0,1,1));
+  EXPECT_FLOAT_EQ(0.59399415, stan::prob::gamma_cdf(1.0,2.0,2.0));
+  EXPECT_FLOAT_EQ(0.96658356, stan::prob::gamma_cdf(2.0,0.25,0.75));
+  EXPECT_FLOAT_EQ(0.63212056, stan::prob::gamma_cdf(1,1,1));
+  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_cdf(0,1,1));
 }

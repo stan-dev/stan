@@ -175,9 +175,9 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_p(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+    cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy&) {
-      static const char* function = "stan::prob::cauchy_p<%1%>(%1%)";
+      static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -205,8 +205,8 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_p(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return cauchy_p(y, mu, sigma, stan::math::default_policy());
+    cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      return cauchy_cdf(y, mu, sigma, stan::math::default_policy());
     }
   }
 }

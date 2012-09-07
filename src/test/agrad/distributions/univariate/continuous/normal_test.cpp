@@ -330,7 +330,7 @@ TEST(AgradDistributions,NormalCdfGrad) {
   x[1] = mu;
   x[2] = sigma;
 
-  var p = stan::prob::normal_p(y,mu,sigma);
+  var p = stan::prob::normal_cdf(y,mu,sigma);
 
   std::vector<double> g;
   p.grad(x,g);

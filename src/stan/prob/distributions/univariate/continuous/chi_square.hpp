@@ -104,8 +104,8 @@ namespace stan {
     template <typename T_y, typename T_dof, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_dof>::type
-    chi_square_p(const T_y& y, const T_dof& nu, const Policy&) {
-      static const char* function = "stan::prob::chi_square_p<%1%>(%1%)";
+    chi_square_cdf(const T_y& y, const T_dof& nu, const Policy&) {
+      static const char* function = "stan::prob::chi_square_cdf(%1%)";
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -120,13 +120,13 @@ namespace stan {
       if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       
-      return stan::prob::gamma_p(y,nu/2,0.5,Policy());
+      return stan::prob::gamma_cdf(y,nu/2,0.5,Policy());
     }
 
     template <typename T_y, typename T_dof>
     typename boost::math::tools::promote_args<T_y,T_dof>::type
-    chi_square_p(const T_y& y, const T_dof& nu) {
-      return chi_square_p(y, nu, stan::math::default_policy());
+    chi_square_cdf(const T_y& y, const T_dof& nu) {
+      return chi_square_cdf(y, nu, stan::math::default_policy());
     }
   }
 }
