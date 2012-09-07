@@ -57,19 +57,19 @@ cxxfun_from_dso_bin <- function(dso) {
   #   and then loaded the dso. . 
 
   sig <- dso@sig 
-  code <- dso@.MISC$cxxfun@code
+  code <- dso@.CXXDSOMISC$cxxfun@code
   tfile <- tempfile() 
   f <- basename(tfile) 
-  libLFile <- paste(tfile, ".", filename_ext(dso@.MISC$dso_last_path), sep = '') 
+  libLFile <- paste(tfile, ".", filename_ext(dso@.CXXDSOMISC$dso_last_path), sep = '') 
   # write the raw vector containing the dso file to temporary file
-  writeBin(dso@.MISC$dso.bin, libLFile) 
+  writeBin(dso@.CXXDSOMISC$dso_bin, libLFile) 
   cleanup <- function(env) {
     if (f %in% names(getLoadedDLLs())) dyn.unload(libLFile)
       unlink(libLFile)
   }
   reg.finalizer(environment(), cleanup, onexit = TRUE)
   DLL <- dyn.load(libLFile) 
-  assign('dso_last_path', libLFile, dso@.MISC) 
+  assign('dso_last_path', libLFile, dso@.CXXDSOMISC) 
   res <- vector("list", length(sig))
   names(res) <- names(sig)
   res <- new("CFuncList", res)
@@ -119,11 +119,12 @@ read_dso <- function(path) {
 cxxfunctionplus <- function(sig = character(), body = character(),
                             plugin = "default", includes = "",
                             settings = getPlugin(plugin), 
-                            save_dso = FALSE, ..., verbose = FALSE) {
+                            save_dso = FALSE, module_name = "MODULE", 
+                            ..., verbose = FALSE) {
   fx <- cxxfunction(sig = sig, body = body, plugin = plugin, includes = includes, 
                     settings = settings, ..., verbose = verbose)
   dso_last_path <- dso_path(fx)
-  dso.bin <- if (save_dso) read_dso(dso_last_path) else raw(0)
+  dso_bin <- if (save_dso) read_dso(dso_last_path) else raw(0)
   dso_filename <- sub("\\.[^.]*$", "", basename(dso_last_path)) 
   if (!is.list(sig))  { 
     sig <- list(sig) 
@@ -131,11 +132,14 @@ cxxfunctionplus <- function(sig = character(), body = character(),
   } 
   dso <- new('cxxdso', sig = sig, dso_saved = save_dso, 
              dso_filename = dso_filename, 
+             modulename = module_name, 
              system = R.version$system, 
-             .MISC = new.env()) 
-  assign("cxxfun", fx, envir = dso@.MISC)
-  assign("dso_last_path", dso_last_path, envir = dso@.MISC)
-  assign("dso.bin", dso.bin, envir = dso@.MISC)
+             .CXXDSOMISC = new.env()) 
+  assign("cxxfun", fx, envir = dso@.CXXDSOMISC)
+  assign("dso_last_path", dso_last_path, envir = dso@.CXXDSOMISC)
+  assign("dso_bin", dso_bin, envir = dso@.CXXDSOMISC)
+  if (!is.null(module_name) && module_name != '') 
+    assign("module", Module(module_name, getDynLib(fx)), envir = dso@.CXXDSOMISC)
   return(dso)
 } 
 

@@ -309,7 +309,7 @@ namespace rstan {
       std::vector<double> params_inr; 
       if (refresh > num_iterations) refresh = -1; 
      
-      unsigned ii = 0; // index for iterations saved to chains
+      unsigned int ii = 0; // index for iterations saved to chains
       for (int m = 0; m < num_iterations; ++m) { 
         R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
@@ -354,6 +354,10 @@ namespace rstan {
             sample_file_stream << ii_sampler_params[z] << ",";
         } 
         
+        // check range of ii 
+        if (ii >= chains[0].size()) {
+          throw std::out_of_range("index ii of the iteration is out of range"); 
+        } 
         size_t z = 0;
         for (; z < qoi_idx.size() - 1; ++z)  
           chains[z][ii] = params_inr[qoi_idx[z]]; 

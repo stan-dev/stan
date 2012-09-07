@@ -26,9 +26,8 @@
   \describe{
     \item{\code{model_name}:}{The model name, an object of type \code{character}.} 
     \item{\code{model_code}:}{The Stan model specification, an object of type \code{character}.} 
-    \item{\code{.modelmod}:}{Object of type \code{environment}  
-      that includes a C++ object exposed by package \pkg{Rcpp};  
-      primarily used for drawing samples for the model.}
+    \item{\code{model_cpp}:}{Object of type \code{list}
+      that includes the C++ code for the model.} 
     \item{\code{dso}:}{Object of S4 class \code{cxxdso}. The container for the dynamic 
       shared objects compiled from the C++ code of the model, returned from function
       \code{cxxfunction} in package \pkg{inline}.}

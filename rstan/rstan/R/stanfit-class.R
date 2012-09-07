@@ -19,7 +19,7 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
 
   sampler <- attr(x@sim$samples[[1]], "args")$sampler 
 
-  cat("\nSamples were drawn using ", sampler, " at ", x@.MISC$date, ".\n", sep = '') 
+  cat("\nSamples were drawn using ", sampler, " at ", x@date, ".\n", sep = '') 
   cat("For each parameter, n_eff is a crude measure of effective sample size,\n") 
   cat("and Rhat is the potential scale reduction factor on split chains (at \n")
   cat("convergence, Rhat=1).\n")
@@ -34,7 +34,7 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
             pars <- if (missing(pars)) x@sim$pars_oi else check_pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
-            info <- list(model_name = x@model_name, model_date = x@.MISC$date) 
+            info <- list(model_name = x@model_name, model_date = x@date) 
             stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display_parallel)
           }) 
 
@@ -55,9 +55,7 @@ setGeneric(name = 'get_stanmodel',
 
 setMethod("get_stanmodel", signature = "stanfit", 
           function(object) { 
-            if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
-              stop("stanmodel is not found") 
-            invisible(object@.MISC$stanmodel) 
+            invisible(object@stanmodel) 
           }) 
 
 setGeneric(name = 'get_inits', 

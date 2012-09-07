@@ -55,23 +55,19 @@ stan_model <- function(file,
     old.eigen_lib <- rstan_options(eigen_lib = eigen_lib) 
     on.exit(rstan_options(eigen_lib = old.eigen_lib)) 
   }
+
   
-  dso <- cxxfunctionplus(signature(), body = '  return R_NilValue;', 
+  dso <- cxxfunctionplus(signature(), body = paste(" return Rcpp::wrap(\"", model_name, "\");", sep = ''), 
                          includes = inc, plugin = "rstan", save_dso = save_dso,
-                         id = model_name, verbose = verbose) 
+                         module_name = model_cppname, 
+                         verbose = verbose) 
                
-  mod <- Module(model_cppname, getDynLib(dso)) 
-  # stan_fit_cpp_module <- do.call("$", list(mod, model_name))
-  stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
   obj <- new("stanmodel", model_name = model_name, 
              model_code = model_code, 
              dso = dso, # keep a reference to dso
-             .modelmod = new.env()) # store the sampler, which could be replaced 
-  assign("model_cppname", model_cppname, envir = obj@.modelmod)
-  assign("model_cppcode", stanc_ret$cppcode, envir = obj@.modelmod)
-  assign("sampler_mod", stan_fit_cpp_module, envir = obj@.modelmod)
-  obj 
-
+             model_cpp = list(model_cppname = model_cppname, 
+                              model_cppcode = stanc_ret$cppcode)) 
+  invisible(obj) 
   ## We keep a reference to *dso* above to avoid dso to be 
   ## deleted by R's garbage collection. Note that if dso 
   ## is freed, we can lose the compiled shared object, which

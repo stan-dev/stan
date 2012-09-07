@@ -32,7 +32,7 @@ setGeneric(name = "get_cppcode",
 
 setMethod("get_cppcode", "stanmodel", 
           function(object) {
-            object@.modelmod$model_cppcode  
+            object@model_cpp$model_cppcode  
           }) 
 
 setMethod("sampling", "stanmodel",
@@ -45,13 +45,15 @@ setMethod("sampling", "stanmodel",
             if (!is_sm_valid(object))
               stop("the compiled object from C++ code for this model is not valid")
 
+            model_cppname <- object@model_cpp$model_cppname 
+            # cat("model_cppname=", model_cppname, '\n')
             if (!is_dso_loaded(object@dso)) {
-               grab_cxxfun(object@dso) 
-               model_cppname <- object@.modelmod$model_cppname  
-               mod <- Module(model_cppname, getDynLib(object@dso)) 
-               stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
-               assign("sampler_mod", stan_fit_cpp_module, envir = object@.modelmod)
-            }
+              # load the dso if available 
+              grab_cxxfun(object@dso) 
+            } 
+            # mod <- object@dso@.CXXDSOMISC$module 
+            mod <- get("module", envir = object@dso@.CXXDSOMISC, inherits = FALSE) 
+            stan_fit_cpp_module <- eval(call("$", mod, model_cppname)) 
 
             if (chains < 1) 
               stop("the number of chains is less than 1")
@@ -65,7 +67,8 @@ setMethod("sampling", "stanmodel",
               else data <- list()
             } 
 
-            sampler <- new(object@.modelmod$sampler_mod, data)
+            sampler <- new(stan_fit_cpp_module, data) 
+
             m_pars = sampler$param_names() 
             p_dims = sampler$param_dims() 
             if (!missing(pars) && !is.na(pars) && length(pars) > 0) {
@@ -110,27 +113,27 @@ setMethod("sampling", "stanmodel",
                        dims_oi = sampler$param_dims_oi(),
                        fnames_oi = fnames_oi,
                        n_flatnames = n_flatnames) 
-            fit <- new("stanfit",
-                       model_name = object@model_name,
-                       model_pars = m_pars, 
-                       par_dims = p_dims, 
-                       sim = sim,
-                       # summary = summary,
-                       # keep a record of the initial values 
-                       inits = organize_inits(lapply(sim$samples, function(x) attr(x, "inits")), 
-                                               m_pars, p_dims), 
-                       stan_args = args_list,
-                       .MISC = new.env()) 
-             assign("stanmodel", object, envir = fit@.MISC)
-             # keep a ref to avoid garbage collection
-             # (see comments in fun stan_model)
-             assign("date", date(), envir = fit@.MISC) 
+            nfit <- new("stanfit",
+                        model_name = object@model_name,
+                        model_pars = m_pars, 
+                        par_dims = p_dims, 
+                        sim = sim,
+                        # summary = summary,
+                        # keep a record of the initial values 
+                        inits = organize_inits(lapply(sim$samples, function(x) attr(x, "inits")), 
+                                                m_pars, p_dims), 
+                        stan_args = args_list,
+                        stanmodel = object, 
+                          # keep a ref to avoid garbage collection
+                          # (see comments in fun stan_model)
+                        date = date(),
+                        .MISC = new.env()) 
              rm(sampler) 
              invisible(gc())  
              # triger gc to really delete sampler, create from the sampler_mod.   
              # the issue here is that if sampler is removed later automatically by 
              # R's gabbage collector after the fx (the loaded dso) is removed, 
              # it will cause a segfault, which will crash R. 
-             invisible(fit)
+             invisible(nfit)
           }) 
 
