@@ -107,6 +107,11 @@ transformed data{
   transformed_data_real <- acosh(d_real_1);
   transformed_data_real <- asinh(d_real_1);
   transformed_data_real <- atanh(d_real_1);
+
+  //   link functions
+  transformed_data_real <- logit(d_real_1);
+  transformed_data_real <- inv_logit(d_real_1);
+  transformed_data_real <- inv_cloglog(d_real_1);
 }
 parameters {
   real p_real_1;
@@ -257,6 +262,14 @@ transformed parameters {
   transformed_param_real <- asinh(p_real_1);
   transformed_param_real <- atanh(d_real_1);
   transformed_param_real <- atanh(p_real_1);
+
+  //   link functions
+  transformed_param_real <- logit(d_real_1);
+  transformed_param_real <- logit(p_real_1);
+  transformed_param_real <- inv_logit(d_real_1);
+  transformed_param_real <- inv_logit(p_real_1);
+  transformed_param_real <- inv_cloglog(d_real_1);
+  transformed_param_real <- inv_cloglog(p_real_1);
 }
 model {
 }

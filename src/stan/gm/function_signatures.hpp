@@ -27,9 +27,12 @@ add_binary("hypot");
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
+add_unary("inv_cloglog");
+add_unary("inv_logit");
 add_unary("log");
 add_nullary("log10");
 add_nullary("log2");
+add_unary("logit");
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
@@ -228,12 +231,9 @@ add_unary("tgamma");
 
 
 
-add_unary("inv_cloglog");
 
 add_unary("Phi");
 
-add_unary("logit");
-add_unary("inv_logit");
 
 add_binary("log_loss");
 
