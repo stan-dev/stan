@@ -19,6 +19,8 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* templated functions returning var should go away in matrix
+
 * add base class for stanc-generated models
 
 * alternative distribution parameterizations
