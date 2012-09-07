@@ -118,6 +118,13 @@ transformed data{
   transformed_data_real <- erfc(d_real_1);
   transformed_data_real <- Phi(d_real_1);
   transformed_data_real <- binary_log_loss(d_int_1, d_real_1);
+
+  //   combinatorial functions
+  transformed_data_real <- tgamma(d_real_1);
+  transformed_data_real <- lgamma(d_real_1);
+  transformed_data_real <- lmgamma(d_int_1, d_real_1);
+  transformed_data_real <- lbeta(d_real_1, d_real_2);
+  transformed_data_real <- binomial_coefficient_log(d_real_1, d_real_2);
 }
 parameters {
   real p_real_1;
@@ -286,7 +293,23 @@ transformed parameters {
   transformed_param_real <- Phi(p_real_1);
   transformed_param_real <- binary_log_loss(d_int_1, d_real_1);
   transformed_param_real <- binary_log_loss(d_int_1, p_real_1);
-  
+
+  //   combinatorial functions
+  transformed_param_real <- tgamma(d_real_1);
+  transformed_param_real <- tgamma(p_real_1);
+  transformed_param_real <- lgamma(d_real_1);
+  transformed_param_real <- lgamma(p_real_1);
+  transformed_param_real <- lmgamma(d_int_1, d_real_1);
+  transformed_param_real <- lmgamma(d_int_1, p_real_1);
+  transformed_param_real <- lbeta(d_real_1, d_real_2);
+  transformed_param_real <- lbeta(p_real_1, d_real_2);
+  transformed_param_real <- lbeta(d_real_1, p_real_2);
+  transformed_param_real <- lbeta(p_real_1, p_real_2);
+  transformed_param_real <- binomial_coefficient_log(d_real_1, d_real_2);
+  transformed_param_real <- binomial_coefficient_log(p_real_1, d_real_2);
+  transformed_param_real <- binomial_coefficient_log(d_real_1, p_real_2);
+  transformed_param_real <- binomial_coefficient_log(p_real_1, p_real_2);
+
 }
 model {
 }

@@ -1,5 +1,6 @@
 // included from constructor for function_signatures() in src/stan/gm/ast.hpp
 
+
 add_unary("abs");
 add("abs",INT_T,INT_T);
 add_unary("acos");
@@ -10,6 +11,7 @@ add_unary("atan");
 add_binary("atan2");
 add_unary("atanh");
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
+add_binary("binomial_coefficient_log");
 add_unary("cbrt");
 add_unary("ceil");
 add_unary("cos");
@@ -32,6 +34,9 @@ add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
 add_unary("inv_cloglog");
 add_unary("inv_logit");
+add_binary("lbeta");
+add_unary("lgamma");
+add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
 add_nullary("log10");
 add_nullary("log2");
@@ -62,6 +67,7 @@ add_unary("square");
 add_unary("step");
 add_unary("tan");
 add_unary("tanh");
+add_unary("tgamma");
 add_unary("trunc");
 
 //------------------------------------------------------------
@@ -212,9 +218,6 @@ add("singular_values",VECTOR_T,MATRIX_T);
 
 add_unary("expm1");
 
-add_binary("lbeta");
-add_unary("lgamma");
-
 add_unary("log1p");
 add_unary("log1m");
 
@@ -227,7 +230,6 @@ add_unary("log2");
 
 
 
-add_unary("tgamma");
 
 
 
@@ -296,7 +298,6 @@ add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add_ternary("weibull_p");
 
 
-add_binary("binomial_coefficient_log");
 
 
 // MULTINOMIAL?  no vector<int> type
