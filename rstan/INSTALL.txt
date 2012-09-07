@@ -1,9 +1,3 @@
 Installation: 
 
-1. run `make install' when present working direcotyr is STAN_HOME/rstan. 
-   
-   
-
-
-
-
+1. run `make install' when present working directory is STAN_HOME/rstan. 
