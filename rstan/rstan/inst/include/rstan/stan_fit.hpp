@@ -310,7 +310,7 @@ namespace rstan {
       if (refresh > num_iterations) refresh = -1; 
      
       unsigned ii = 0; // index for iterations saved to chains
-      for (int m = 0; m < num_iterations; ++m, ++ii) {
+      for (int m = 0; m < num_iterations; ++m) { 
         R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
           rstan::io::rcout << "\rIteration: ";
@@ -358,6 +358,8 @@ namespace rstan {
         for (; z < qoi_idx.size() - 1; ++z)  
           chains[z][ii] = params_inr[qoi_idx[z]]; 
         chains[z][ii] = lp__;
+
+        ii++; 
           
         // FIXME: use csv_writer arg to make comma optional?
         if (sample_file_flag) { 
