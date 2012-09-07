@@ -1,11 +1,12 @@
 data { 
   int d_int;
-  
   real d_real;
+  real d_real_array[d_int];
 }
 transformed data{
   int transformed_data_int;
   real transformed_data_real;
+  real transformed_data_real_array[transformed_data_int];
 
   //*** Integer-Valued Basic Functions ***
   // integer-valued arithmetic operators
@@ -130,12 +131,21 @@ transformed data{
   transformed_data_real <- log1m(d_real);
   transformed_data_real <- log1p_exp(d_real);
   transformed_data_real <- log_sum_exp(d_real, d_real);
+
+  //  array operations
+  transformed_data_real <- sum(d_real_array);
+  transformed_data_real <- mean(d_real_array);
+  transformed_data_real <- variance(d_real_array);
+  transformed_data_real <- sd(d_real_array);
+  transformed_data_real <- log_sum_exp(d_real_array);
 }
 parameters {
   real p_real;
+  real p_real_array[d_int];
 }
 transformed parameters {
   real transformed_param_real;
+  real transformed_param_real_array[d_int];
 
   //*** Real-Valued Basic Functions ***
   // mathematical constants
@@ -338,6 +348,18 @@ transformed parameters {
   transformed_param_real <- log_sum_exp(p_real, d_real);
   transformed_param_real <- log_sum_exp(d_real, p_real);
   transformed_param_real <- log_sum_exp(p_real, p_real);
+
+  //  array operations
+  transformed_param_real <- sum(d_real_array);
+  transformed_param_real <- sum(p_real_array);
+  transformed_param_real <- mean(d_real_array);
+  transformed_param_real <- mean(p_real_array);
+  transformed_param_real <- variance(d_real_array);
+  transformed_param_real <- variance(p_real_array);
+  transformed_param_real <- sd(d_real_array);
+  transformed_param_real <- sd(p_real_array);
+  transformed_param_real <- log_sum_exp(d_real_array);
+  transformed_param_real <- log_sum_exp(p_real_array);
 }
 model {
 }

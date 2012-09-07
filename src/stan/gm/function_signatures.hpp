@@ -39,6 +39,8 @@ add_binary("lbeta");
 add_unary("lgamma");
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
+add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
+add_binary("log_sum_exp");
 add_nullary("log10");
 add_unary("log1m");
 add_unary("log1p");
@@ -50,6 +52,10 @@ add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
 add("max",DOUBLE_T,MATRIX_T);
 add("max",INT_T,INT_T,INT_T);
+add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("mean",DOUBLE_T,VECTOR_T);
+add("mean",DOUBLE_T,ROW_VECTOR_T);
+add("mean",DOUBLE_T,MATRIX_T);
 add("min",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("min",DOUBLE_T,VECTOR_T);
 add("min",DOUBLE_T,ROW_VECTOR_T);
@@ -64,16 +70,32 @@ add_nullary("pi");
 add_nullary("positive_infinity");
 add_binary("pow");
 add_unary("round");
+add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("sd",DOUBLE_T,VECTOR_T);
+add("sd",DOUBLE_T,ROW_VECTOR_T);
+add("sd",DOUBLE_T,MATRIX_T);
 add_unary("sin");
 add_unary("sinh");
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
 add_unary("step");
+add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("sum",DOUBLE_T,VECTOR_T);
+add("sum",DOUBLE_T,ROW_VECTOR_T);
+add("sum",DOUBLE_T,MATRIX_T);
+add("sum",INT_T,expr_type(INT_T,1));
+add("sum",INT_T,VECTOR_T);
+add("sum",INT_T,ROW_VECTOR_T);
+add("sum",INT_T,MATRIX_T);
 add_unary("tan");
 add_unary("tanh");
 add_unary("tgamma");
 add_unary("trunc");
+add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
+add("variance",DOUBLE_T,VECTOR_T);
+add("variance",DOUBLE_T,ROW_VECTOR_T);
+add("variance",DOUBLE_T,MATRIX_T);
 
 //------------------------------------------------------------
 
@@ -110,29 +132,9 @@ add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // ve
 
 
 
-add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("mean",DOUBLE_T,VECTOR_T);
-add("mean",DOUBLE_T,ROW_VECTOR_T);
-add("mean",DOUBLE_T,MATRIX_T);
 
-add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("variance",DOUBLE_T,VECTOR_T);
-add("variance",DOUBLE_T,ROW_VECTOR_T);
-add("variance",DOUBLE_T,MATRIX_T);
 
-add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("sd",DOUBLE_T,VECTOR_T);
-add("sd",DOUBLE_T,ROW_VECTOR_T);
-add("sd",DOUBLE_T,MATRIX_T);
 
-add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
-add("sum",DOUBLE_T,VECTOR_T);
-add("sum",DOUBLE_T,ROW_VECTOR_T);
-add("sum",DOUBLE_T,MATRIX_T);
-add("sum",INT_T,expr_type(INT_T,1));
-add("sum",INT_T,VECTOR_T);
-add("sum",INT_T,ROW_VECTOR_T);
-add("sum",INT_T,MATRIX_T);
 
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);
@@ -237,8 +239,6 @@ add_unary("log2");
 
 
 
-add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
-add_binary("log_sum_exp");
 
 
 add("softmax",VECTOR_T,VECTOR_T);
