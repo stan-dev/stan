@@ -9,12 +9,15 @@ add_unary("asinh");
 add_unary("atan");
 add_binary("atan2");
 add_unary("atanh");
+add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("cbrt");
 add_unary("ceil");
 add_unary("cos");
 add_unary("cosh");
 add_nullary("e");
 add_nullary("epsilon");
+add_unary("erf");
+add_unary("erfc");
 add_unary("exp");
 add_unary("exp2");
 add_unary("fabs");
@@ -46,6 +49,7 @@ add("min",INT_T,INT_T,INT_T);
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 add_nullary("not_a_number");
+add_unary("Phi");
 add_nullary("pi");
 add_nullary("positive_infinity");
 add_binary("pow");
@@ -205,8 +209,6 @@ add("singular_values",VECTOR_T,MATRIX_T);
 // so no calling in Stan GM
 
 
-add_unary("erf");
-add_unary("erfc");
 
 add_unary("expm1");
 
@@ -232,10 +234,8 @@ add_unary("tgamma");
 
 
 
-add_unary("Phi");
 
 
-add_binary("log_loss");
 
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");

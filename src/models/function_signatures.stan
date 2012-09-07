@@ -112,6 +112,12 @@ transformed data{
   transformed_data_real <- logit(d_real_1);
   transformed_data_real <- inv_logit(d_real_1);
   transformed_data_real <- inv_cloglog(d_real_1);
+
+  //   probability-related functions
+  transformed_data_real <- erf(d_real_1);
+  transformed_data_real <- erfc(d_real_1);
+  transformed_data_real <- Phi(d_real_1);
+  transformed_data_real <- binary_log_loss(d_int_1, d_real_1);
 }
 parameters {
   real p_real_1;
@@ -270,6 +276,17 @@ transformed parameters {
   transformed_param_real <- inv_logit(p_real_1);
   transformed_param_real <- inv_cloglog(d_real_1);
   transformed_param_real <- inv_cloglog(p_real_1);
+
+  //   probability-related functions
+  transformed_param_real <- erf(d_real_1);
+  transformed_param_real <- erf(p_real_1);
+  transformed_param_real <- erfc(d_real_1);
+  transformed_param_real <- erfc(p_real_1);
+  transformed_param_real <- Phi(d_real_1);
+  transformed_param_real <- Phi(p_real_1);
+  transformed_param_real <- binary_log_loss(d_int_1, d_real_1);
+  transformed_param_real <- binary_log_loss(d_int_1, p_real_1);
+  
 }
 model {
 }
