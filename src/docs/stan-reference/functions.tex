@@ -32,7 +32,7 @@ behaves differently.  For integer division by values other than zero,
 the result is rounded toward 0.  For instance, positive results are
 rounded down, as in \code{1~/~2~=~0} and \code{5~/~3~=~1}, whereas
 negative results are rounded up, as in \code{(-1)~/~2~=~0} and
-\code{(-5)~/~33~=~-1}.
+\code{(-5)~/~3~=~-1}.
 
 Unlike floating point division, where \code{1.0~/~0.0} produces the
 special positive infinite value, integer division by zero, as in
@@ -72,8 +72,7 @@ The integer quotient of the dividend \farg{x} and divisor \farg{y}}
 The negation of the subtrahend \farg{x}}
 
 \fitem{int}{operator+}{int \farg{x}}{
-The promotion of addend \farg{x} to a int, which is a no-op
-for int inputs}
+This is a no-op.}
 \end{description}
 
 \section{Absolute Functions}
@@ -136,10 +135,10 @@ The natural logarithm of 10}
 \section{Special Values}
 
 \begin{description}
-\fitem{real}{nan}{}{
+\fitem{real}{not\_a\_number}{}{
 Not-a-number, a special non-finite real value returned to signal an error}
 %
-\fitem{real}{infinity}{}{
+\fitem{real}{positive\_infinity}{}{
  Positive infinity, a special non-finite real value larger than all
   finite numbers}
 %
@@ -201,8 +200,7 @@ The quotient of the dividend \farg{x} and divisor \farg{y}}
 The negation of the subtrahend \farg{x}}
 
 \fitem{real}{operator+}{real \farg{x}}{
-The promotion of addend \farg{x} to a real, which is a no-op
-for real inputs}
+This is a no-op.}
 \end{description}
 
 
@@ -391,7 +389,7 @@ The complementary error function of \farg{x}}
 \fitem{real}{Phi}{real \farg{x}}{
 The cumulative unit normal density function of \farg{x}}
 %
-\fitem{real}{log\_loss}{int \farg{y}, real \farg{y\_hat}}{
+\fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probability \farg{y\_hat} for 
 binary outcome \farg{y}}
 %
@@ -1010,7 +1008,7 @@ If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
 
 \begin{description}
 %
-  \fitem{real}{beta\_binomial\_log}{int \farg{n}, int \farg{N}, real
+  \fitem{real}{binomial\_log}{int \farg{n}, int \farg{N}, real
     \farg{theta}}{The log binomial probability mass of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
 %
@@ -1139,7 +1137,7 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
 
 \begin{description}
 %
- \fitem{real}{negative\_binomial\_log}{int \farg{n}, real
+ \fitem{real}{neg\_binomial\_log}{int \farg{n}, real
    \farg{alpha}, real \farg{beta}}{The log negative binomial probability
    mass of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
 %

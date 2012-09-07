@@ -780,7 +780,7 @@ The logistic model could also be coded this way by replacing
 \code{Phi} with \code{inv\_logit}, though the built-in encoding based
 on the softmax transform is more efficient and more numerically
 stable.  A small efficiency gain could be achieved by computing the
-values \code{1 - Phi(eta - c(d))} once and storing them for re-use.
+values \code{Phi(eta - c[k])} once and storing them for re-use.
 
 \section{Hierarchical Logistic Regression}
 
@@ -868,7 +868,7 @@ parameters {
 }
 model {
     for (n in 2:N)
-       y[n] ~ normal(alpha + beta * y[n-1], sigma);
+       y[n] ~ normal(alpha + beta*y[n-1], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -907,7 +907,7 @@ coefficient \code{gamma} and the following model statement.
 \begin{quote}
 \begin{Verbatim}
 for (n in 3:N)
-  y[n] ~ normal(alpha + beta * y[n-1] + gamma * y[n-2], sigma);
+  y[n] ~ normal(alpha + beta*y[n-1] + gamma*y[n-2], sigma);
 \end{Verbatim}
 \end{quote}
 
@@ -1028,7 +1028,7 @@ the model will compile and run without arithmetic errors, but will not
 sample properly.%
 %
 \footnote{The problem is the (extremely!) light tails of the triangle
-  distribution.  The standard \HMC and \NUTS samplers cannot get into the
+  distribution.  The standard \HMC and \NUTS samplers can't get into the
   corners of the triangle properly.  Because the \Stan code declares
   \code{y} to be of type \code{real<lower=-1,upper=1>}, the inverse logit
   transform is applied to the unconstrained variable and its log
@@ -1121,15 +1121,20 @@ replaced with a transpose and multiply, as in
 \end{Verbatim}
 \end{quote}
 %
-The problem is that the transposition creates an intermediate result
-for the expression \code{x[n]'}.%
+The relative inefficiency of the transpose and multiply approach is
+that the transposition operator allocates a new vector into which the
+result of the transposition is copied.  This consumes both time
+and memory.
 %
-\footnote{\Stan cannot exploit the expression templates in the Eigen
-  matrix library because of the inability to multiply vectors of
-  algorithmic differentiation variables with vectors of scalars, as
-  would be required for \code{beta' * x[n]}.}
+\footnote{Future versions of \Stan may remove this inefficiency
+by more fully exploiting expression templates inside the Eigen
+\Cpp matrix library.  This will require enhancing Eigen to deal
+with mixed-type arguments, such as the type \code{double} used
+for constants and the algorithmic differentiation type
+\code{stan::agrad::var} 
+used for variables.}
 %
-This problem with transposition could itself be mitigated somewhat by
+The inefficiency of transposition could itself be mitigated somewhat by
 reordering the product and pulling the transposition out of the loop,
 as follows.
 %
@@ -1170,26 +1175,10 @@ model {
 %
 Declaring the data as a matrix and then computing all the predictors
 at once using matrix multiplication is more efficient still, as in the
-following example.
-%
-\begin{quote}
-\begin{Verbatim}  
-data {
-    int<lower=1> K;
-    int<lower=1> N;
-    matrix[N,K] x;
-    vector[N] y;
-}
-parameters {
-    vector[K] beta;
-} 
-model {
-    y ~ normal(x * beta, 1);
-}
-\end{Verbatim}
-\end{quote}
+example discussed in the next section.
 
 \subsection{Vectorized Probability Functions}
+
 The final and most efficient version replaces the loops and
 transformed parameters by using the vectorized form of the normal
 probability function, as in the following example.

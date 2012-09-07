@@ -681,7 +681,7 @@ This allows \Stan blocks such as
 %
 \begin{quote}
 \begin{Verbatim} 
-matrix[M,N] a;    
+matrix[M,N] m;    
 row_vector[N] v;    
 real x;
 ...
@@ -822,7 +822,7 @@ Because size information is not part of a data type, data
 types will be written without size information.  For instance,
 \code{real[]} is the type of one-dimensional array of reals and
 \code{matrix} is the type of matrices.  The three-dimensional integer
-array type is written as \code{real[\, , \, ,]}, indicating the number slots
+array type is written as \code{int[\, , \, ,]}, indicating the number slots
 available for indexing.  Similarly, \code{vector[,]} is the type of a
 two-dimensional array of vectors.
 
@@ -1156,7 +1156,9 @@ associativity.
 \\ \hline
 \code{*} & 1 & left & binary infix & multiplication
 \\
-\code{/} & 1 & left & binary infix & division
+\code{/} & 1 & left & binary infix & (right) division
+\\ \hline
+\Verb|\| & 1 & left & binary infix & left division
 \\ \hline
 \code{.*} & 1 & left & binary infix & elementwise multiplication
 \\
@@ -1603,7 +1605,7 @@ distribution function.  For example, \code{normal\_p(2.1,0,1)} evaluates to
 \]
 %
 which is the probability a unit normal variable takes on values less
-than 2.1, or about 0.95.
+than 2.1, or about 0.98.
 
 As with constrained variable declarations, truncation can be one
 sided.  The density $p(x)$ can be truncated below by $a$ to define a
@@ -1613,7 +1615,7 @@ density $p_{(a,)}(x)$ with support $(a,\infty)$ by setting
 p_{(a,)}(x) = \frac{p(x)}
                  {\int_a^{\infty} p(x') \, dx'}.
 \]
-For example, the unit normal distribution truncated below at 0.5 would
+For example, the unit normal distribution truncated below at -0.5 would
 be represented as
 %
 \begin{quote}
@@ -2060,7 +2062,7 @@ adjustment of \HMC or \NUTS rejects the update proposal.
 
 \subsection{Variable Read, Write, and Definition Summary}
 
-A table summarizing the point at which variables are read, written and
+A table summarizing the point at which variables are read, written, and
 defined is given in \reffigure{block-actions}.
 %
 \begin{figure}
@@ -2119,10 +2121,11 @@ $-$ & $+$ & $+$ & \code{transformed data} {\it and}\ \code{generated quantities}
   data or parameters should be declared, based on whether it is
   defined in terms of parameters, whether it is used in the log
   probability function defined in the model block, and whether it is
-  printed.  
-  The two lines marked with asterisks ($*$) should not be used as
-  there is no need to print a variable every iteration that does not
-  depend on the value of any parameters.}%
+  printed.  The two lines marked with asterisks ($*$) should not be
+  used as there is no need to print a variable every iteration that
+  does not depend on the value of any parameters (for information on
+  how to print these if necessary, see \refnote{print-var-no-param}
+  in this chapter).}%
 \label{variable-flowchart.figure}
 \end{figure}
 %
@@ -2130,15 +2133,12 @@ Another way to look at the variables is in terms of their function.
 To decide which variable to use, consult the charts in 
 \reffigure{variable-flowchart}.  The last line has no
 corresponding location, as there is no need to print a variable
-every iteration that does not depend on parameters.  If absolutely
-necessary, this can be accomplished 
-
-, for a variable
-that is not printed, a variable that does not depend on parameters but 
-is printed and used in the log probability function should be
-defined as transformed data
-
-
+every iteration that does not depend on parameters.%
+%
+\footnote{It is possible to print a variable every iteration that does
+  not depend on parameters --- just define it (or redefine it if it is
+  transformed data) in the \code{generated quantities} block.\label{print-var-no-param.footnote}}
+%
 The rest of this chapter provides full details on when and how the
 variables and statements in each block are executed.
 %
