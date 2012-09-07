@@ -99,6 +99,14 @@ transformed data{
   transformed_data_real <- asin(d_real_1);
   transformed_data_real <- atan(d_real_1);
   transformed_data_real <- atan2(d_real_1, d_real_2);
+
+  //   hyperbolic trigonometric functions
+  transformed_data_real <- cosh(d_real_1);
+  transformed_data_real <- sinh(d_real_1);
+  transformed_data_real <- tanh(d_real_1);
+  transformed_data_real <- acosh(d_real_1);
+  transformed_data_real <- asinh(d_real_1);
+  transformed_data_real <- atanh(d_real_1);
 }
 parameters {
   real p_real_1;
@@ -235,6 +243,20 @@ transformed parameters {
   transformed_param_real <- atan2(p_real_1, d_real_2);
   transformed_param_real <- atan2(d_real_1, p_real_2);
   transformed_param_real <- atan2(p_real_1, p_real_2);
+
+  //   hyperbolic trigonometric functions
+  transformed_param_real <- cosh(d_real_1);
+  transformed_param_real <- cosh(p_real_1);
+  transformed_param_real <- sinh(d_real_1);
+  transformed_param_real <- sinh(p_real_1);
+  transformed_param_real <- tanh(d_real_1);
+  transformed_param_real <- tanh(p_real_1);
+  transformed_param_real <- acosh(d_real_1);
+  transformed_param_real <- acosh(p_real_1);
+  transformed_param_real <- asinh(d_real_1);
+  transformed_param_real <- asinh(p_real_1);
+  transformed_param_real <- atanh(d_real_1);
+  transformed_param_real <- atanh(p_real_1);
 }
 model {
 }

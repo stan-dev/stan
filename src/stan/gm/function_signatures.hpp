@@ -3,12 +3,16 @@
 add_unary("abs");
 add("abs",INT_T,INT_T);
 add_unary("acos");
+add_unary("acosh");
 add_unary("asin");
+add_unary("asinh");
 add_unary("atan");
 add_binary("atan2");
+add_unary("atanh");
 add_unary("cbrt");
 add_unary("ceil");
 add_unary("cos");
+add_unary("cosh");
 add_nullary("e");
 add_nullary("epsilon");
 add_unary("exp");
@@ -44,11 +48,13 @@ add_nullary("positive_infinity");
 add_binary("pow");
 add_unary("round");
 add_unary("sin");
+add_unary("sinh");
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
 add_unary("step");
 add_unary("tan");
+add_unary("tanh");
 add_unary("trunc");
 
 //------------------------------------------------------------
@@ -57,9 +63,6 @@ add_unary("log10");
 
 
 
-add_unary("cosh");
-add_unary("sinh");
-add_unary("tanh");
 
 
 add("exp",VECTOR_T,VECTOR_T);
@@ -198,9 +201,6 @@ add("singular_values",VECTOR_T,MATRIX_T);
 // eigen_decompose, eigen_decompose_sym, svd return void
 // so no calling in Stan GM
 
-add_unary("acosh");
-add_unary("asinh");
-add_unary("atanh");
 
 add_unary("erf");
 add_unary("erfc");
