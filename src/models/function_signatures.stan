@@ -2,11 +2,17 @@ data {
   int d_int;
   real d_real;
   real d_real_array[d_int];
+  matrix[d_int,d_int] d_matrix;
+  vector[d_int] d_vector;
+  row_vector[d_int] d_row_vector;
 }
 transformed data{
   int transformed_data_int;
   real transformed_data_real;
-  real transformed_data_real_array[transformed_data_int];
+  real transformed_data_real_array[d_int];
+  matrix[d_int,d_int] transformed_data_matrix;
+  vector[d_int] transformed_data_vector;
+  row_vector[d_int] transformed_data_row_vector;
 
   //*** Integer-Valued Basic Functions ***
   // integer-valued arithmetic operators
@@ -132,20 +138,35 @@ transformed data{
   transformed_data_real <- log1p_exp(d_real);
   transformed_data_real <- log_sum_exp(d_real, d_real);
 
-  //  array operations
+  //*** Array Operations ***
   transformed_data_real <- sum(d_real_array);
   transformed_data_real <- mean(d_real_array);
   transformed_data_real <- variance(d_real_array);
   transformed_data_real <- sd(d_real_array);
   transformed_data_real <- log_sum_exp(d_real_array);
+  
+  //*** Matrix Operations ***
+  // Integer-Valued Matrix Size Functions
+  transformed_data_int <- rows(d_vector);
+  transformed_data_int <- rows(d_row_vector);
+  transformed_data_int <- rows(d_matrix);
+  transformed_data_int <- cols(d_vector);
+  transformed_data_int <- cols(d_row_vector);
+  transformed_data_int <- cols(d_matrix);
 }
 parameters {
   real p_real;
   real p_real_array[d_int];
+  matrix[d_int,d_int] p_matrix;
+  vector[d_int] p_vector;
+  row_vector[d_int] p_row_vector;
 }
 transformed parameters {
   real transformed_param_real;
   real transformed_param_real_array[d_int];
+  matrix[d_int,d_int] transformed_param_matrix;
+  vector[d_int] transformed_param_vector;
+  row_vector[d_int] transformed_param_row_vector;
 
   //*** Real-Valued Basic Functions ***
   // mathematical constants
@@ -349,7 +370,7 @@ transformed parameters {
   transformed_param_real <- log_sum_exp(d_real, p_real);
   transformed_param_real <- log_sum_exp(p_real, p_real);
 
-  //  array operations
+  //*** Array Operations ***
   transformed_param_real <- sum(d_real_array);
   transformed_param_real <- sum(p_real_array);
   transformed_param_real <- mean(d_real_array);
@@ -360,6 +381,21 @@ transformed parameters {
   transformed_param_real <- sd(p_real_array);
   transformed_param_real <- log_sum_exp(d_real_array);
   transformed_param_real <- log_sum_exp(p_real_array);
+
+  //*** Matrix Operations ***
+  // Integer-Valued Matrix Size Functions
+  transformed_param_real <- int_step(rows(d_vector)); // using int_step to test integer output
+  transformed_param_real <- int_step(rows(p_vector)); 
+  transformed_param_real <- int_step(rows(d_row_vector));
+  transformed_param_real <- int_step(rows(p_row_vector));
+  transformed_param_real <- int_step(rows(d_matrix));
+  transformed_param_real <- int_step(rows(p_matrix));
+  transformed_param_real <- int_step(cols(d_vector)); // using int_step to test integer output
+  transformed_param_real <- int_step(cols(p_vector)); 
+  transformed_param_real <- int_step(cols(d_row_vector));
+  transformed_param_real <- int_step(cols(p_row_vector));
+  transformed_param_real <- int_step(cols(d_matrix));
+  transformed_param_real <- int_step(cols(p_matrix));
 }
 model {
 }

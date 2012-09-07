@@ -13,6 +13,9 @@ add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 add_unary("cbrt");
 add_unary("ceil");
+add("cols",INT_T,VECTOR_T);
+add("cols",INT_T,ROW_VECTOR_T);
+add("cols",INT_T,MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
 add_nullary("e");
@@ -70,6 +73,9 @@ add_nullary("pi");
 add_nullary("positive_infinity");
 add_binary("pow");
 add_unary("round");
+add("rows",INT_T,VECTOR_T);
+add("rows",INT_T,ROW_VECTOR_T);
+add("rows",INT_T,MATRIX_T);
 add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sd",DOUBLE_T,VECTOR_T);
 add("sd",DOUBLE_T,ROW_VECTOR_T);
@@ -113,13 +119,7 @@ add("log",VECTOR_T,VECTOR_T);
 add("log",ROW_VECTOR_T,ROW_VECTOR_T);
 add("log",MATRIX_T,MATRIX_T);
 
-add("rows",INT_T,VECTOR_T);
-add("rows",INT_T,ROW_VECTOR_T);
-add("rows",INT_T,MATRIX_T);
 
-add("cols",INT_T,VECTOR_T);
-add("cols",INT_T,ROW_VECTOR_T);
-add("cols",INT_T,MATRIX_T);
 
 add("determinant",DOUBLE_T,MATRIX_T);
 add("trace",DOUBLE_T,MATRIX_T);
