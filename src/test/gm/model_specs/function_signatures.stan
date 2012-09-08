@@ -231,6 +231,16 @@ transformed data{
   transformed_data_real <- prod(d_row_vector);
   transformed_data_real <- prod(d_matrix);
 
+  //  sample moments
+  transformed_data_real <- mean(d_vector);
+  transformed_data_real <- mean(d_row_vector);
+  transformed_data_real <- mean(d_matrix);
+  transformed_data_real <- variance(d_vector);
+  transformed_data_real <- variance(d_row_vector);
+  transformed_data_real <- variance(d_matrix);
+  transformed_data_real <- sd(d_vector);
+  transformed_data_real <- sd(d_row_vector);
+  transformed_data_real <- sd(d_matrix);
 }
 parameters {
   real p_real;
@@ -690,6 +700,25 @@ transformed parameters {
   transformed_param_real <- prod(d_matrix);
   transformed_param_real <- prod(p_matrix);
 
+  //  sample moments
+  transformed_param_real <- mean(d_vector);
+  transformed_param_real <- mean(p_vector);
+  transformed_param_real <- mean(d_row_vector);
+  transformed_param_real <- mean(p_row_vector);
+  transformed_param_real <- mean(d_matrix);
+  transformed_param_real <- mean(p_matrix);
+  transformed_param_real <- variance(d_vector);
+  transformed_param_real <- variance(p_vector);
+  transformed_param_real <- variance(d_row_vector);
+  transformed_param_real <- variance(p_row_vector);
+  transformed_param_real <- variance(d_matrix);
+  transformed_param_real <- variance(p_matrix);
+  transformed_param_real <- sd(d_vector);
+  transformed_param_real <- sd(p_vector);
+  transformed_param_real <- sd(d_row_vector);
+  transformed_param_real <- sd(p_row_vector);
+  transformed_param_real <- sd(d_matrix);
+  transformed_param_real <- sd(p_matrix);
 }
 model {
 }
