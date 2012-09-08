@@ -200,6 +200,14 @@ transformed data{
   transformed_data_vector <- d_vector ./ d_vector;
   transformed_data_row_vector <- d_row_vector ./ d_row_vector;
   transformed_data_matrix <- d_matrix ./ d_matrix;
+
+  //   elementwise logarithms
+  transformed_data_vector <- log(d_vector);
+  transformed_data_row_vector <- log(d_row_vector);
+  transformed_data_matrix <- log(d_matrix);
+  transformed_data_vector <- exp(d_vector);
+  transformed_data_row_vector <- exp(d_row_vector);
+  transformed_data_matrix <- exp(d_matrix);
 }
 parameters {
   real p_real;
@@ -599,6 +607,19 @@ transformed parameters {
   transformed_param_matrix <- d_matrix ./ p_matrix;
   transformed_param_matrix <- p_matrix ./ p_matrix;
 
+  //   elementwise logarithms
+  //FIXME: transformed_param_vector <- log(d_vector);
+  transformed_param_vector <- log(p_vector);
+  //FIXME: transformed_param_row_vector <- log(d_row_vector);
+  transformed_param_row_vector <- log(p_row_vector);
+  //FIXME: transformed_param_matrix <- log(d_matrix);
+  transformed_param_matrix <- log(p_matrix);
+  //FIXME: transformed_param_vector <- exp(d_vector);
+  transformed_param_vector <- exp(p_vector);
+  //FIXME: transformed_param_row_vector <- exp(d_row_vector);
+  transformed_param_row_vector <- exp(p_row_vector);
+  //FIXME: transformed_param_matrix <- exp(d_matrix);
+  transformed_param_matrix <- exp(p_matrix);
 
 }
 model {
