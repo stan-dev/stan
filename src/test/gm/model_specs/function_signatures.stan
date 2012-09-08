@@ -214,6 +214,14 @@ transformed data{
   transformed_data_real <- dot_product(d_vector, d_row_vector);
   transformed_data_real <- dot_product(d_row_vector, d_vector);
   transformed_data_real <- dot_product(d_row_vector, d_row_vector);
+
+  //  reductions
+  transformed_data_real <- min(d_vector);
+  transformed_data_real <- min(d_row_vector);
+  transformed_data_real <- min(d_matrix);
+  transformed_data_real <- max(d_vector);
+  transformed_data_real <- max(d_row_vector);
+  transformed_data_real <- max(d_matrix);
 }
 parameters {
   real p_real;
@@ -645,6 +653,19 @@ transformed parameters {
   transformed_param_real <- dot_product(d_row_vector, p_row_vector);
   transformed_param_real <- dot_product(p_row_vector, p_row_vector);
 
+  //  reductions
+  transformed_param_real <- min(d_vector);
+  transformed_param_real <- min(p_vector);
+  transformed_param_real <- min(d_row_vector);
+  transformed_param_real <- min(p_row_vector);
+  transformed_param_real <- min(d_matrix);
+  transformed_param_real <- min(p_matrix);
+  transformed_param_real <- max(d_vector);
+  transformed_param_real <- max(p_vector);
+  transformed_param_real <- max(d_row_vector);
+  transformed_param_real <- max(p_row_vector);
+  transformed_param_real <- max(d_matrix);
+  transformed_param_real <- max(p_matrix);
 }
 model {
 }
