@@ -6,7 +6,7 @@ data {
   vector[d_int] d_vector;
   row_vector[d_int] d_row_vector;
 }
-transformed data{
+transformed data {
   int transformed_data_int;
   real transformed_data_real;
   real transformed_data_real_array[d_int];
@@ -280,6 +280,9 @@ transformed data{
   // Bounded Discrete Probabilities
   transformed_data_real <- binomial_log(d_int, d_int, d_real);
   transformed_data_real <- beta_binomial_log(d_int, d_int, d_real, d_real);
+  transformed_data_real <- hypergeometric_log(d_int, d_int, d_int, d_int);
+  transformed_data_real <- categorical_log(d_int, d_vector);
+  transformed_data_real <- ordered_logistic_log(d_int, d_real, d_vector);
 }
 parameters {
   real p_real;
@@ -826,7 +829,13 @@ transformed parameters {
   transformed_param_real <- beta_binomial_log(d_int, d_int, p_real, d_real);
   transformed_param_real <- beta_binomial_log(d_int, d_int, d_real, p_real);
   transformed_param_real <- beta_binomial_log(d_int, d_int, p_real, p_real);
-
+  transformed_param_real <- hypergeometric_log(d_int, d_int, d_int, d_int);
+  transformed_param_real <- categorical_log(d_int, d_vector);
+  transformed_param_real <- categorical_log(d_int, p_vector);
+  transformed_param_real <- ordered_logistic_log(d_int, d_real, d_vector);
+  transformed_param_real <- ordered_logistic_log(d_int, p_real, d_vector);
+  transformed_param_real <- ordered_logistic_log(d_int, d_real, p_vector);
+  transformed_param_real <- ordered_logistic_log(d_int, p_real, p_vector);
 }
-model {
+model {  
 }
