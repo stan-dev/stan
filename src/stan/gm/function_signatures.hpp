@@ -22,12 +22,14 @@ add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 add_unary("cbrt");
 add_unary("ceil");
+add("cholesky_decompose",MATRIX_T,MATRIX_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);
 add("cols",INT_T,MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
+add("determinant",DOUBLE_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
@@ -40,6 +42,10 @@ add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 add_nullary("e");
+add("eigenvalues",VECTOR_T,MATRIX_T);
+add("eigenvalues_sym",VECTOR_T,MATRIX_T);
+add("eigenvectors",MATRIX_T,MATRIX_T);
+add("eigenvectors_sym",MATRIX_T,MATRIX_T);
 add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -68,6 +74,7 @@ add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
 add_unary("inv_cloglog");
 add_unary("inv_logit");
+add("inverse",MATRIX_T,MATRIX_T);
 add_binary("lbeta");
 add_unary("lgamma");
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
@@ -90,6 +97,10 @@ add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
 add("max",DOUBLE_T,MATRIX_T);
 add("max",INT_T,INT_T,INT_T);
+add("mdivide_left",VECTOR_T,MATRIX_T,VECTOR_T);
+add("mdivide_left",MATRIX_T,MATRIX_T,MATRIX_T);
+add("mdivide_right",ROW_VECTOR_T,ROW_VECTOR_T,MATRIX_T);
+add("mdivide_right",MATRIX_T,MATRIX_T,MATRIX_T);
 add("mean",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("mean",DOUBLE_T,VECTOR_T);
 add("mean",DOUBLE_T,ROW_VECTOR_T);
@@ -136,7 +147,9 @@ add("sd",DOUBLE_T,VECTOR_T);
 add("sd",DOUBLE_T,ROW_VECTOR_T);
 add("sd",DOUBLE_T,MATRIX_T);
 add_unary("sin");
+add("singular_values",VECTOR_T,MATRIX_T);
 add_unary("sinh");
+add("softmax",VECTOR_T,VECTOR_T);
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
@@ -157,6 +170,7 @@ add("sum",DOUBLE_T,MATRIX_T);
 add_unary("tan");
 add_unary("tanh");
 add_unary("tgamma");
+add("trace",DOUBLE_T,MATRIX_T);
 add("transpose",ROW_VECTOR_T,VECTOR_T);
 add("transpose",VECTOR_T,ROW_VECTOR_T);
 add("transpose",MATRIX_T,MATRIX_T);
@@ -169,33 +183,16 @@ add("variance",DOUBLE_T,MATRIX_T);
 //------------------------------------------------------------
 
 
-add("determinant",DOUBLE_T,MATRIX_T);
-add("trace",DOUBLE_T,MATRIX_T);
-
-add("mdivide_left",VECTOR_T,MATRIX_T,VECTOR_T);
-add("mdivide_left",MATRIX_T,MATRIX_T,MATRIX_T);
-
-add("mdivide_right",ROW_VECTOR_T,ROW_VECTOR_T,MATRIX_T);
-add("mdivide_right",MATRIX_T,MATRIX_T,MATRIX_T);
 
 
 
-add("inverse",MATRIX_T,MATRIX_T);
 
-add("eigenvalues",VECTOR_T,MATRIX_T);
-add("eigenvectors",MATRIX_T,MATRIX_T);
 
-add("eigenvalues_sym",VECTOR_T,MATRIX_T);
-add("eigenvectors_sym",MATRIX_T,MATRIX_T);
 
-add("cholesky_decompose",MATRIX_T,MATRIX_T);
-
-add("singular_values",VECTOR_T,MATRIX_T);
 
 // eigen_decompose, eigen_decompose_sym, svd return void
 // so no calling in Stan GM
 
-add("softmax",VECTOR_T,VECTOR_T);
 
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);

@@ -253,6 +253,25 @@ transformed data{
   transformed_data_matrix <- d_matrix';
   transformed_data_row_vector <- d_vector';
   transformed_data_vector <- d_row_vector';
+
+  // Special Matrix Functions
+  transformed_data_vector <- softmax(d_vector);
+
+  // Linear Algebra Functions and Scalars
+  //   matrix division infix operators
+  transformed_data_row_vector <- d_row_vector / d_matrix;
+  transformed_data_vector <- d_matrix \ d_vector;
+  
+  //   linear algebra functions
+  transformed_data_real <- trace(d_matrix);
+  transformed_data_real <- determinant(d_matrix);
+  transformed_data_matrix <- inverse(d_matrix);
+  transformed_data_vector <- eigenvalues(d_matrix);
+  transformed_data_matrix <- eigenvectors(d_matrix);
+  transformed_data_vector <- eigenvalues_sym(d_matrix);
+  transformed_data_matrix <- eigenvectors_sym(d_matrix);
+  transformed_data_matrix <- cholesky_decompose(d_matrix);
+  transformed_data_vector <- singular_values(d_matrix);
 }
 parameters {
   real p_real;
@@ -750,6 +769,41 @@ transformed parameters {
   transformed_param_row_vector <- p_vector';
   //FIXME: transformed_param_vector <- d_row_vector';
   transformed_param_vector <- p_row_vector';
+
+  // Special Matrix Functions
+  //FIXME: transformed_param_vector <- softmax(d_vector);
+  transformed_param_vector <- softmax(p_vector);
+
+  // Linear Algebra Functions and Solvers
+  //   matrix division infix operators
+  //FIXME: transformed_param_row_vector <- d_row_vector / d_matrix;
+  transformed_param_row_vector <- p_row_vector / d_matrix;
+  transformed_param_row_vector <- d_row_vector / p_matrix;
+  transformed_param_row_vector <- p_row_vector / p_matrix;
+  //FIXME: transformed_param_vector <- d_matrix \ d_vector;
+  transformed_param_vector <- p_matrix \ d_vector;
+  transformed_param_vector <- d_matrix \ p_vector;
+  transformed_param_vector <- p_matrix \ p_vector;
+  
+  //   linear algebra functions
+  transformed_param_real <- trace(d_matrix);
+  transformed_param_real <- trace(p_matrix);
+  transformed_param_real <- determinant(d_matrix);
+  transformed_param_real <- determinant(p_matrix);
+  //FIXME: transformed_param_matrix <- inverse(d_matrix);
+  transformed_param_matrix <- inverse(p_matrix);
+  //FIXME: transformed_param_vector <- eigenvalues(d_matrix);
+  transformed_param_vector <- eigenvalues(p_matrix);
+  //FIXME: transformed_param_matrix <- eigenvectors(d_matrix);
+  transformed_param_matrix <- eigenvectors(p_matrix);
+  //FIXME: transformed_param_vector <- eigenvalues_sym(d_matrix);
+  transformed_param_vector <- eigenvalues_sym(p_matrix);
+  //FIXME: transformed_param_matrix <- eigenvectors_sym(d_matrix);
+  transformed_param_matrix <- eigenvectors_sym(p_matrix);
+  //FIXME: transformed_param_matrix <- cholesky_decompose(d_matrix);
+  transformed_param_matrix <- cholesky_decompose(p_matrix);
+  //FIXME: transformed_param_vector <- singular_values(d_matrix);
+  transformed_param_vector <- singular_values(p_matrix);
 }
 model {
 }
