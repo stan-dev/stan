@@ -241,6 +241,14 @@ transformed data{
   transformed_data_real <- sd(d_vector);
   transformed_data_real <- sd(d_row_vector);
   transformed_data_real <- sd(d_matrix);
+  
+  // Slice and Package Functions
+  //   diagonal matrices
+  transformed_data_vector <- diagonal(d_matrix);
+  transformed_data_matrix <- diag_matrix(d_vector);
+  transformed_data_vector <- col(d_matrix, d_int);
+  transformed_data_row_vector <- row(d_matrix, d_int);
+  
 }
 parameters {
   real p_real;
@@ -719,6 +727,18 @@ transformed parameters {
   transformed_param_real <- sd(p_row_vector);
   transformed_param_real <- sd(d_matrix);
   transformed_param_real <- sd(p_matrix);
+
+  // Slice and Package Functions
+  //   diagonal matrices
+  //FIXME: transformed_param_vector <- diagonal(d_matrix);
+  transformed_param_vector <- diagonal(p_matrix);
+  //FIXME: transformed_param_matrix <- diag_matrix(d_vector);
+  transformed_param_matrix <- diag_matrix(p_vector);
+  //FIXME: transformed_param_vector <- col(d_matrix, d_int);
+  transformed_param_vector <- col(p_matrix, d_int);
+  //FIXME: transformed_param_row_vector <- row(d_matrix, d_int);
+  transformed_param_row_vector <- row(p_matrix, d_int);
+
 }
 model {
 }

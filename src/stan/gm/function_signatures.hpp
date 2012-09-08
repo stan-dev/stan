@@ -114,23 +114,8 @@ add("variance",DOUBLE_T,MATRIX_T);
 
 add_unary("log10");
 
-
-
-
-
-
-
-
-
 add("determinant",DOUBLE_T,MATRIX_T);
 add("trace",DOUBLE_T,MATRIX_T);
-
-
-
-
-
-
-
 
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);
@@ -217,25 +202,7 @@ add("singular_values",VECTOR_T,MATRIX_T);
 // eigen_decompose, eigen_decompose_sym, svd return void
 // so no calling in Stan GM
 
-
-
-
-
 add_unary("log2");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 add("softmax",VECTOR_T,VECTOR_T);
 
@@ -290,9 +257,6 @@ add_ternary("weibull_log");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
 add_ternary("weibull_p");
-
-
-
 
 // MULTINOMIAL?  no vector<int> type
 
