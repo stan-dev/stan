@@ -18,11 +18,19 @@ add("cols",INT_T,ROW_VECTOR_T);
 add("cols",INT_T,MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
+add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 add_nullary("e");
 add_nullary("epsilon");
 add_unary("erf");
 add_unary("erfc");
 add_unary("exp");
+add("exp",VECTOR_T,VECTOR_T);
+add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
+add("exp",MATRIX_T,MATRIX_T);
 add_unary("exp2");
 add_unary("expm1");
 add_unary("fabs");
@@ -42,6 +50,9 @@ add_binary("lbeta");
 add_unary("lgamma");
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
+add("log",VECTOR_T,VECTOR_T);
+add("log",ROW_VECTOR_T,ROW_VECTOR_T);
+add("log",MATRIX_T,MATRIX_T);
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");
 add_nullary("log10");
@@ -90,10 +101,6 @@ add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sum",DOUBLE_T,VECTOR_T);
 add("sum",DOUBLE_T,ROW_VECTOR_T);
 add("sum",DOUBLE_T,MATRIX_T);
-add("sum",INT_T,expr_type(INT_T,1));
-add("sum",INT_T,VECTOR_T);
-add("sum",INT_T,ROW_VECTOR_T);
-add("sum",INT_T,MATRIX_T);
 add_unary("tan");
 add_unary("tanh");
 add_unary("tgamma");
@@ -111,24 +118,13 @@ add_unary("log10");
 
 
 
-add("exp",VECTOR_T,VECTOR_T);
-add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
-add("exp",MATRIX_T,MATRIX_T);
 
-add("log",VECTOR_T,VECTOR_T);
-add("log",ROW_VECTOR_T,ROW_VECTOR_T);
-add("log",MATRIX_T,MATRIX_T);
 
 
 
 add("determinant",DOUBLE_T,MATRIX_T);
 add("trace",DOUBLE_T,MATRIX_T);
 
-add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
-add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
-add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
-add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
-add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 
 
 
