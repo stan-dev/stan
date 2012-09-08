@@ -193,6 +193,13 @@ transformed data{
   transformed_data_matrix <- d_matrix - d_real;
   transformed_data_matrix <- d_real - d_matrix;
 
+  //   elementwise products
+  transformed_data_vector <- d_vector .* d_vector;
+  transformed_data_row_vector <- d_row_vector .* d_row_vector;
+  transformed_data_matrix <- d_matrix .* d_matrix;
+  transformed_data_vector <- d_vector ./ d_vector;
+  transformed_data_row_vector <- d_row_vector ./ d_row_vector;
+  transformed_data_matrix <- d_matrix ./ d_matrix;
 }
 parameters {
   real p_real;
@@ -565,6 +572,34 @@ transformed parameters {
   transformed_param_matrix <- p_real - d_matrix; 
   transformed_param_matrix <- d_real - p_matrix;
   transformed_param_matrix <- p_real - p_matrix;
+  
+  //   elementwise products
+  //FIXME: transformed_param_vector <- d_vector .* d_vector;
+  transformed_param_vector <- p_vector .* d_vector;
+  transformed_param_vector <- d_vector .* p_vector;
+  transformed_param_vector <- p_vector .* p_vector;
+  //FIXME: transformed_param_row_vector <- d_row_vector .* d_row_vector;
+  transformed_param_row_vector <- p_row_vector .* d_row_vector;
+  transformed_param_row_vector <- d_row_vector .* p_row_vector;
+  transformed_param_row_vector <- p_row_vector .* p_row_vector;
+  //FIXME: transformed_param_matrix <- d_matrix .* d_matrix;
+  transformed_param_matrix <- p_matrix .* d_matrix;
+  transformed_param_matrix <- d_matrix .* p_matrix;
+  transformed_param_matrix <- p_matrix .* p_matrix;
+  //FIXME: transformed_param_vector <- d_vector ./ d_vector;
+  transformed_param_vector <- p_vector ./ d_vector;
+  transformed_param_vector <- d_vector ./ p_vector;
+  transformed_param_vector <- p_vector ./ p_vector;
+  //FIXME: transformed_param_row_vector <- d_row_vector ./ d_row_vector;
+  transformed_param_row_vector <- p_row_vector ./ d_row_vector;
+  transformed_param_row_vector <- d_row_vector ./ p_row_vector;
+  transformed_param_row_vector <- p_row_vector ./ p_row_vector;
+  //FIXME: transformed_param_matrix <- d_matrix ./ d_matrix;
+  transformed_param_matrix <- p_matrix ./ d_matrix;
+  transformed_param_matrix <- d_matrix ./ p_matrix;
+  transformed_param_matrix <- p_matrix ./ p_matrix;
+
+
 }
 model {
 }
