@@ -18,8 +18,12 @@ add_unary("asinh");
 add_unary("atan");
 add_binary("atan2");
 add_unary("atanh");
+add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
+add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
+add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
+add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
 add_unary("cbrt");
 add_unary("ceil");
 add("cholesky_decompose",MATRIX_T,MATRIX_T);
@@ -194,11 +198,7 @@ add("variance",DOUBLE_T,MATRIX_T);
 // so no calling in Stan GM
 
 
-add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
-add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add_ternary("beta_log");
-add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
-add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
 add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_ternary("cauchy_log");

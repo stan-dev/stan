@@ -272,6 +272,14 @@ transformed data{
   transformed_data_matrix <- eigenvectors_sym(d_matrix);
   transformed_data_matrix <- cholesky_decompose(d_matrix);
   transformed_data_vector <- singular_values(d_matrix);
+
+  //*** Discrete Probabilities ***
+  // Binary Discrete Probabilities
+  transformed_data_real <- bernoulli_log(d_int, d_real);
+  transformed_data_real <- bernoulli_logit_log(d_int, d_real);
+  // Bounded Discrete Probabilities
+  transformed_data_real <- binomial_log(d_int, d_int, d_real);
+  transformed_data_real <- beta_binomial_log(d_int, d_int, d_real, d_real);
 }
 parameters {
   real p_real;
@@ -804,6 +812,21 @@ transformed parameters {
   transformed_param_matrix <- cholesky_decompose(p_matrix);
   //FIXME: transformed_param_vector <- singular_values(d_matrix);
   transformed_param_vector <- singular_values(p_matrix);
+
+  //*** Discrete Probabilities ***
+  // Binary Discrete Probabilities
+  transformed_param_real <- bernoulli_log(d_int, d_real);
+  transformed_param_real <- bernoulli_log(d_int, p_real);
+  transformed_param_real <- bernoulli_logit_log(d_int, d_real);
+  transformed_param_real <- bernoulli_logit_log(d_int, p_real);
+  // Bounded Discrete Probabilities
+  transformed_param_real <- binomial_log(d_int, d_int, d_real);
+  transformed_param_real <- binomial_log(d_int, d_int, p_real);
+  transformed_param_real <- beta_binomial_log(d_int, d_int, d_real, d_real);
+  transformed_param_real <- beta_binomial_log(d_int, d_int, p_real, d_real);
+  transformed_param_real <- beta_binomial_log(d_int, d_int, d_real, p_real);
+  transformed_param_real <- beta_binomial_log(d_int, d_int, p_real, p_real);
+
 }
 model {
 }
