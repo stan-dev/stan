@@ -249,6 +249,10 @@ transformed data{
   transformed_data_vector <- col(d_matrix, d_int);
   transformed_data_row_vector <- row(d_matrix, d_int);
   
+  //   transposition postfix operator
+  transformed_data_matrix <- d_matrix';
+  transformed_data_row_vector <- d_vector';
+  transformed_data_vector <- d_row_vector';
 }
 parameters {
   real p_real;
@@ -739,6 +743,13 @@ transformed parameters {
   //FIXME: transformed_param_row_vector <- row(d_matrix, d_int);
   transformed_param_row_vector <- row(p_matrix, d_int);
 
+  //   transposition postfix operator
+  //FIXME: transformed_param_matrix <- d_matrix';
+  transformed_param_matrix <- p_matrix';  
+  //FIXME: transformed_param_row_vector <- d_vector';
+  transformed_param_row_vector <- p_vector';
+  //FIXME: transformed_param_vector <- d_row_vector';
+  transformed_param_vector <- p_row_vector';
 }
 model {
 }
