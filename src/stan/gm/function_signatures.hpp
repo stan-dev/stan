@@ -136,6 +136,7 @@ add_binary("multiply_log");
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 add_nullary("not_a_number");
+add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_unary("Phi");
 add_nullary("pi");
 add_nullary("positive_infinity");
@@ -201,7 +202,6 @@ add("variance",DOUBLE_T,MATRIX_T);
 
 
 add_ternary("beta_log");
-add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_ternary("cauchy_log");
 add_binary("chi_square_log");
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
