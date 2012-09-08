@@ -1614,6 +1614,10 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>
     elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
                  const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
+      if (m1.cols() != m2.cols())
+        throw std::invalid_argument("m1.cols() != m2.cols()");
+      if (m1.rows() != m2.rows())
+        throw std::invalid_argument("m1.rows() != m2.rows()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
@@ -1631,6 +1635,8 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>
     elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
                  const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) * v2(i);
@@ -1646,6 +1652,8 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>
     elt_multiply(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
                  const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) * v2(i);
@@ -1663,6 +1671,10 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>
     elt_divide(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
                const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
+      if (m1.cols() != m2.cols())
+        throw std::invalid_argument("m1.cols() != m2.cols()");
+      if (m1.rows() != m2.rows())
+        throw std::invalid_argument("m1.rows() != m2.rows()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
@@ -1680,6 +1692,8 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>
     elt_divide(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
                const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) / v2(i);
@@ -1695,6 +1709,8 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>
     elt_divide(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
                const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
+      if (v1.size() != v2.size())
+        throw std::invalid_argument("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) / v2(i);
