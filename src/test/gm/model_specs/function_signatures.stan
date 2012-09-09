@@ -332,6 +332,19 @@ transformed data {
   transformed_data_real <- cauchy_log(d_real, d_real, d_real);
   transformed_data_real <- double_exponential_log(d_real, d_real, d_real);
   transformed_data_real <- logistic_log(d_real, d_real, d_real);
+  // Positive Continuous Probabilities
+  transformed_data_real <- lognormal_log(d_real, d_real, d_real);
+  transformed_data_real <- lognormal_cdf(d_real, d_real, d_real);
+  transformed_data_real <- chi_square_log(d_real, d_real);
+  transformed_data_real <- inv_chi_square_log(d_real, d_real);
+  transformed_data_real <- scaled_inv_chi_square_log(d_real, d_real, d_real);
+  transformed_data_real <- exponential_log(d_real, d_real);
+  transformed_data_real <- exponential_cdf(d_real, d_real);
+  transformed_data_real <- gamma_log(d_real, d_real, d_real);
+  //FIXME: transformed_data_real <- gamma_cdf(d_real, d_real, d_real);
+  transformed_data_real <- inv_gamma_log(d_real, d_real, d_real);
+  transformed_data_real <- weibull_log(d_real, d_real, d_real);
+  transformed_data_real <- weibull_cdf(d_real, d_real, d_real);
 }
 parameters {
   real p_real;
@@ -1458,8 +1471,89 @@ transformed parameters {
   transformed_param_real <- logistic_log(p_real, d_real, p_real);
   transformed_param_real <- logistic_log(p_real, p_real, d_real);
   transformed_param_real <- logistic_log(p_real, p_real, p_real);
-
-
+  // Positive Continuous Probabilities
+  transformed_param_real <- lognormal_log(d_real, d_real, d_real);
+  transformed_param_real <- lognormal_log(d_real, d_real, p_real);
+  transformed_param_real <- lognormal_log(d_real, p_real, d_real);
+  transformed_param_real <- lognormal_log(d_real, p_real, p_real);
+  transformed_param_real <- lognormal_log(p_real, d_real, d_real);
+  transformed_param_real <- lognormal_log(p_real, d_real, p_real);
+  transformed_param_real <- lognormal_log(p_real, p_real, d_real);
+  transformed_param_real <- lognormal_log(p_real, p_real, p_real);
+  transformed_param_real <- lognormal_cdf(d_real, d_real, d_real);
+  transformed_param_real <- lognormal_cdf(d_real, d_real, p_real);
+  transformed_param_real <- lognormal_cdf(d_real, p_real, d_real);
+  transformed_param_real <- lognormal_cdf(d_real, p_real, p_real);
+  transformed_param_real <- lognormal_cdf(p_real, d_real, d_real);
+  transformed_param_real <- lognormal_cdf(p_real, d_real, p_real);
+  transformed_param_real <- lognormal_cdf(p_real, p_real, d_real);
+  transformed_param_real <- lognormal_cdf(p_real, p_real, p_real);
+  transformed_param_real <- chi_square_log(d_real, d_real);
+  transformed_param_real <- chi_square_log(d_real, p_real);
+  transformed_param_real <- chi_square_log(p_real, d_real);
+  transformed_param_real <- chi_square_log(p_real, p_real);
+  transformed_param_real <- inv_chi_square_log(d_real, d_real);
+  transformed_param_real <- inv_chi_square_log(d_real, p_real);
+  transformed_param_real <- inv_chi_square_log(p_real, d_real);
+  transformed_param_real <- inv_chi_square_log(p_real, p_real);
+  transformed_param_real <- scaled_inv_chi_square_log(d_real, d_real, d_real);
+  transformed_param_real <- scaled_inv_chi_square_log(d_real, d_real, p_real);
+  transformed_param_real <- scaled_inv_chi_square_log(d_real, p_real, d_real);
+  transformed_param_real <- scaled_inv_chi_square_log(d_real, p_real, p_real);
+  transformed_param_real <- scaled_inv_chi_square_log(p_real, d_real, d_real);
+  transformed_param_real <- scaled_inv_chi_square_log(p_real, d_real, p_real);
+  transformed_param_real <- scaled_inv_chi_square_log(p_real, p_real, d_real);
+  transformed_param_real <- scaled_inv_chi_square_log(p_real, p_real, p_real);
+  transformed_param_real <- exponential_log(d_real, d_real);
+  transformed_param_real <- exponential_log(d_real, p_real);
+  transformed_param_real <- exponential_log(p_real, d_real);
+  transformed_param_real <- exponential_log(p_real, p_real);
+  transformed_param_real <- exponential_cdf(d_real, d_real);
+  transformed_param_real <- exponential_cdf(d_real, p_real);
+  transformed_param_real <- exponential_cdf(p_real, d_real);
+  transformed_param_real <- exponential_cdf(p_real, p_real);
+  transformed_param_real <- gamma_log(d_real, d_real, d_real);
+  transformed_param_real <- gamma_log(d_real, d_real, p_real);
+  transformed_param_real <- gamma_log(d_real, p_real, d_real);
+  transformed_param_real <- gamma_log(d_real, p_real, p_real);
+  transformed_param_real <- gamma_log(p_real, d_real, d_real);
+  transformed_param_real <- gamma_log(p_real, d_real, p_real);
+  transformed_param_real <- gamma_log(p_real, p_real, d_real);
+  transformed_param_real <- gamma_log(p_real, p_real, p_real);
+/*
+  //FIXME: include when gamma_cdf is available
+  transformed_param_real <- gamma_cdf(d_real, d_real, d_real);
+  transformed_param_real <- gamma_cdf(d_real, d_real, p_real);
+  transformed_param_real <- gamma_cdf(d_real, p_real, d_real);
+  transformed_param_real <- gamma_cdf(d_real, p_real, p_real);
+  transformed_param_real <- gamma_cdf(p_real, d_real, d_real);
+  transformed_param_real <- gamma_cdf(p_real, d_real, p_real);
+  transformed_param_real <- gamma_cdf(p_real, p_real, d_real);
+  transformed_param_real <- gamma_cdf(p_real, p_real, p_real);*/
+  transformed_param_real <- inv_gamma_log(d_real, d_real, d_real);
+  transformed_param_real <- inv_gamma_log(d_real, d_real, p_real);
+  transformed_param_real <- inv_gamma_log(d_real, p_real, d_real);
+  transformed_param_real <- inv_gamma_log(d_real, p_real, p_real);
+  transformed_param_real <- inv_gamma_log(p_real, d_real, d_real);
+  transformed_param_real <- inv_gamma_log(p_real, d_real, p_real);
+  transformed_param_real <- inv_gamma_log(p_real, p_real, d_real);
+  transformed_param_real <- inv_gamma_log(p_real, p_real, p_real);
+  transformed_param_real <- weibull_log(d_real, d_real, d_real);
+  transformed_param_real <- weibull_log(d_real, d_real, p_real);
+  transformed_param_real <- weibull_log(d_real, p_real, d_real);
+  transformed_param_real <- weibull_log(d_real, p_real, p_real);
+  transformed_param_real <- weibull_log(p_real, d_real, d_real);
+  transformed_param_real <- weibull_log(p_real, d_real, p_real);
+  transformed_param_real <- weibull_log(p_real, p_real, d_real);
+  transformed_param_real <- weibull_log(p_real, p_real, p_real);
+  transformed_param_real <- weibull_cdf(d_real, d_real, d_real);
+  transformed_param_real <- weibull_cdf(d_real, d_real, p_real);
+  transformed_param_real <- weibull_cdf(d_real, p_real, d_real);
+  transformed_param_real <- weibull_cdf(d_real, p_real, p_real);
+  transformed_param_real <- weibull_cdf(p_real, d_real, d_real);
+  transformed_param_real <- weibull_cdf(p_real, d_real, p_real);
+  transformed_param_real <- weibull_cdf(p_real, p_real, d_real);
+  transformed_param_real <- weibull_cdf(p_real, p_real, p_real);
 }
 model {  
 }
