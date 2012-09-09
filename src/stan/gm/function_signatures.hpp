@@ -1,5 +1,12 @@
 // included from constructor for function_signatures() in src/stan/gm/ast.hpp
 
+std::vector<expr_type> vector_types;
+vector_types.push_back(DOUBLE_T);                  // scalar
+vector_types.push_back(expr_type(DOUBLE_T,1U));    // std vector
+vector_types.push_back(VECTOR_T);                  // Eigen vector
+vector_types.push_back(ROW_VECTOR_T);              // Eigen row vector
+
+
 add_unary("abs");
 add("abs",INT_T,INT_T);
 add_unary("acos");
@@ -24,6 +31,7 @@ add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
+add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
 add_unary("cbrt");
 add_unary("ceil");
 add("cholesky_decompose",MATRIX_T,MATRIX_T);
@@ -72,6 +80,7 @@ add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
+add("hypergeometric_log",DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
 add_binary("hypot");
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("int_step",INT_T,DOUBLE_T);
@@ -118,6 +127,7 @@ add("minus",DOUBLE_T,DOUBLE_T);
 add("minus",VECTOR_T,VECTOR_T);
 add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
+add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("multiply",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("multiply",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("multiply",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -131,11 +141,21 @@ add("multiply",VECTOR_T,DOUBLE_T,VECTOR_T);
 add("multiply",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
 add("multiply",MATRIX_T,DOUBLE_T,MATRIX_T);
 add_binary("multiply_log");
+add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
+add("normal_cdf",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T);
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("normal_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add_nullary("not_a_number");
+add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_unary("Phi");
 add_nullary("pi");
+add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod",DOUBLE_T,VECTOR_T);
@@ -199,15 +219,12 @@ add("variance",DOUBLE_T,MATRIX_T);
 
 
 add_ternary("beta_log");
-add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
-add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_ternary("cauchy_log");
 add_binary("chi_square_log");
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add_ternary("double_exponential_log");
 add_binary("exponential_log");
 add_ternary("gamma_log");
-add("hypergeometric_log",DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
 add_binary("inv_chi_square_log");
 add_ternary("inv_gamma_log");
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
@@ -218,26 +235,12 @@ add_ternary("lognormal_log");
 add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
-add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
-add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
+
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
-add("normal_p",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T);
 
-std::vector<expr_type> vector_types;
-vector_types.push_back(DOUBLE_T);                  // scalar
-vector_types.push_back(expr_type(DOUBLE_T,1U));    // std vector
-vector_types.push_back(VECTOR_T);                  // Eigen vector
-vector_types.push_back(ROW_VECTOR_T);              // Eigen row vector
 
-for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j)
-    for (size_t k = 0; k < vector_types.size(); ++k)
-      add("normal_log",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
 
 add_ternary("pareto_log");
-add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_ternary("scaled_inv_chi_square_log");
 add_quaternary("student_t_log");
 add_ternary("uniform_log");
