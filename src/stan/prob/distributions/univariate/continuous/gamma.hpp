@@ -118,7 +118,7 @@ namespace stan {
      * @tparam T_shape Type of shape.
      * @tparam T_inv_scale Type of inverse scale.
      */    
-    template <typename T_y, typename T_shape, typename T_inv_scale, 
+    /*template <typename T_y, typename T_shape, typename T_inv_scale, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
     gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
@@ -149,6 +149,7 @@ namespace stan {
                           &result, Policy())) 
         return result;
       
+	// FIXME: implement gamma cdf
       return boost::math::gamma_p(alpha, y*beta);
     }
 
@@ -158,7 +159,7 @@ namespace stan {
     gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
       return gamma_cdf(y,alpha,beta,stan::math::default_policy());
     }
-      
+    */
 
   }
 }

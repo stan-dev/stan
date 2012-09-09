@@ -101,7 +101,7 @@ namespace stan {
      * 
      * @return The cdf of the chi square distribution
      */
-    template <typename T_y, typename T_dof, 
+    /*template <typename T_y, typename T_dof, 
               class Policy>
     typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_cdf(const T_y& y, const T_dof& nu, const Policy&) {
@@ -120,6 +120,7 @@ namespace stan {
       if (!check_positive(function, nu, "Degrees of freedom", &lp, Policy()))
         return lp;
       
+	// FIXME: include when gamma_cdf() is ready
       return stan::prob::gamma_cdf(y,nu/2,0.5,Policy());
     }
 
@@ -127,7 +128,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_dof>::type
     chi_square_cdf(const T_y& y, const T_dof& nu) {
       return chi_square_cdf(y, nu, stan::math::default_policy());
-    }
+    }*/
   }
 }
 
