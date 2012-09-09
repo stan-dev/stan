@@ -11,13 +11,14 @@ namespace stan {
 
     // BetaBinomial(n|alpha,beta) [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto,
-              typename T_size, 
+              typename T_size1, 
+	      typename T_size2, 
               class Policy>
-    typename boost::math::tools::promote_args<T_size>::type
+    typename boost::math::tools::promote_args<T_size1,T_size2>::type
     beta_binomial_log(const int n, 
                       const int N, 
-                      const T_size& alpha, 
-                      const T_size& beta, 
+                      const T_size1& alpha, 
+                      const T_size2& beta, 
                       const Policy&) {
       static const char* function = "stan::prob::beta_binomial_log<%1%>(%1%)";
 
@@ -26,7 +27,7 @@ namespace stan {
       using stan::math::check_positive;
       using boost::math::tools::promote_args;
 
-      typename promote_args<T_size>::type lp;
+      typename promote_args<T_size1,T_size2>::type lp;
       if (!check_nonnegative(function, N, "Population size, N,", &lp, Policy()))
         return lp;
       if (!check_finite(function, alpha, "Prior sample size, alpha,", &lp, 
@@ -51,39 +52,40 @@ namespace stan {
       lp = 0.0;
       if (include_summand<propto>::value)
         lp += binomial_coefficient_log(N,n);
-      if (include_summand<propto,T_size>::value)
+      if (include_summand<propto,T_size1,T_size2>::value)
         lp += lbeta(n + alpha, N - n + beta) - lbeta(alpha,beta);
       return lp;
     }
 
     template <bool propto,
-              typename T_size>
-    typename boost::math::tools::promote_args<T_size>::type
+              typename T_size1,
+	      typename T_size2>
+    typename boost::math::tools::promote_args<T_size1,T_size2>::type
     beta_binomial_log(const int n, const int N, 
-                      const T_size& alpha, const T_size& beta) {
+                      const T_size1& alpha, const T_size2& beta) {
       return beta_binomial_log<propto>(n,N,alpha,beta,
                                        stan::math::default_policy());
     }
 
-    template <typename T_size, 
+    template <typename T_size1,
+	      typename T_size2, 
               class Policy>
-    typename boost::math::tools::promote_args<T_size>::type
+    typename boost::math::tools::promote_args<T_size1,T_size2>::type
     inline
     beta_binomial_log(const int n, const int N, 
-                      const T_size& alpha, const T_size& beta, 
+                      const T_size1& alpha, const T_size2& beta, 
                       const Policy&) {
       return beta_binomial_log<false>(n,N,alpha,beta,Policy());
     }
 
-    template <typename T_size>
-    typename boost::math::tools::promote_args<T_size>::type
+    template <typename T_size1,
+	      typename T_size2>
+    typename boost::math::tools::promote_args<T_size1,T_size2>::type
     beta_binomial_log(const int n, const int N, 
-                      const T_size& alpha, const T_size& beta) {
+                      const T_size1& alpha, const T_size2& beta) {
       return beta_binomial_log<false>(n,N,alpha,beta,
                                       stan::math::default_policy());
     }
-
-
 
   }
 }

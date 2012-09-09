@@ -605,24 +605,23 @@ the scalar \farg{y} and matrix \farg{x}}
 %
 \begin{description}
 %
-\fitem{vector}{operator+}{real \farg{x}, vector \farg{y}}{The result of
-adding \farg{x} to every entry in the vector \farg{y}}
-%
-\fitem{row\_vector}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
-adding \farg{x} to every entry in the row vector \farg{y}}
-%
-\fitem{matrix}{operator+}{real \farg{x}, matrix \farg{y}}{The result of
-adding \farg{x} to every entry in the matrix \farg{y}}
-%
-%
 \fitem{vector}{operator+}{vector \farg{x}, real \farg{y}}{The result of
 adding \farg{y} to every entry in the vector \farg{x}}
+%
+\fitem{vector}{operator+}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the vector \farg{y}}
 %
 \fitem{row\_vector}{operator+}{row\_vector \farg{x}, real \farg{y}}{The result of
 adding \farg{y} to every entry in the row vector \farg{x}}
 %
+\fitem{row\_vector}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the row vector \farg{y}}
+%
 \fitem{matrix}{operator+}{matrix \farg{x}, real \farg{y}}{The result of
 adding \farg{y} to every entry in the matrix \farg{x}}
+%
+\fitem{matrix}{operator+}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in the matrix \farg{y}}
 %
 \end{description}
 \vspace*{-4pt}
@@ -798,7 +797,7 @@ values in \farg{x} (divide by size minus 1)}
 %
 \fitem{real}{variance}{matrix \farg{x}}{
 The sample variance of the values in 
-farg{x} (divide by size minus 1)}
+\farg{x} (divide by size minus 1)}
 %
 \vspace*{4pt}
 %
@@ -912,11 +911,11 @@ The matrix with the eigenvectors of \farg{A} as columns}
 The vector of eigenvalues of a symmetric view of \farg{A} 
 in descending order}
 %
-\fitem{vector}{eigenvectors\_sym}{matrix \farg{A}}{
+\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{
 The matrix with the eigenvectors of a symmetric view of
 \farg{A}}
 %
-\fitem{matrix}{cholesky}{matrix \farg{A}}{
+\fitem{matrix}{cholesky\_decompose}{matrix \farg{A}}{
 The lower-triangular Cholesky factor of \farg{A}}
 %
 \fitem{vector}{singular\_values}{matrix \farg{A}}{
@@ -1237,11 +1236,6 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   \fitem{real}{normal\_log}{reals \farg{y}, reals \farg{mu}, reals
     \farg{sigma}}{The log of the normal density of \farg{y} given
     location \farg{mu} and scale \farg{sigma}}
-%
-\fitem{real}{normal\_log}{real[] \farg{y}, real \farg{mu}, real
-  \farg{sigma}}{The sum for \code{n} from 1 to
-  \code{size(\farg{y})} of the log of the normal density of
-  \code{\farg{y}[n]} given location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{normal\_p}{real \farg{y}, real \farg{mu}, real
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
