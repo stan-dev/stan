@@ -2956,3 +2956,52 @@ TEST(AgradMatrix, initializeVariable) {
       for (int n = 0; n < dd[0].cols(); ++n)
         EXPECT_FLOAT_EQ(11.0, dd[i](m,n).val());
 }
+
+TEST(AgradMatrix, assign) {
+  using stan::agrad::var;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  
+  var x;
+  assign(x,2.0);
+  EXPECT_FLOAT_EQ(2.0,x.val());
+
+  var y(3.0);
+  assign(x,y);
+  EXPECT_FLOAT_EQ(3.0,x.val());
+
+  vector<double> y_dbl(2);
+  y_dbl[0] = 2.0;
+  y_dbl[1] = 3.0;
+  
+  vector<var> y_var(2);
+  assign(y_var,y_dbl);
+  EXPECT_FLOAT_EQ(2.0,y_var[0].val());
+  EXPECT_FLOAT_EQ(3.0,y_var[1].val());
+
+  Matrix<double,Dynamic,1> v_dbl(6);
+  v_dbl << 1,2,3,4,5,6;
+  Matrix<var,Dynamic,1> v_var(6);
+  assign(v_var,v_dbl);
+  EXPECT_FLOAT_EQ(1,v_var(0).val());
+  EXPECT_FLOAT_EQ(6,v_var(5).val());
+
+  Matrix<double,1,Dynamic> rv_dbl(3);
+  rv_dbl << 2, 4, 6;
+  Matrix<var,1,Dynamic> rv_var(3);
+  assign(rv_var,rv_dbl);
+  EXPECT_FLOAT_EQ(2,rv_var(0).val());
+  EXPECT_FLOAT_EQ(4,rv_var(1).val());
+  EXPECT_FLOAT_EQ(6,rv_var(2).val());
+
+  Matrix<double,Dynamic,Dynamic> m_dbl(2,3);
+  m_dbl << 2, 4, 6, 100, 200, 300;
+  Matrix<var,Dynamic,Dynamic> m_var(2,3);
+  assign(m_var,m_dbl);
+  EXPECT_EQ(2,m_var.rows());
+  EXPECT_EQ(3,m_var.cols());
+  EXPECT_FLOAT_EQ(2,m_var(0,0).val());
+  EXPECT_FLOAT_EQ(100,m_var(1,0).val());
+  EXPECT_FLOAT_EQ(300,m_var(1,2).val());
+}

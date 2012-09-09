@@ -8,6 +8,6 @@ group_uncensored <- group[is_censored == 0];
 group_censored <- group[is_censored == 1];
 
 t_uncensored <- t[is_censored == 0];
-censor_time <- 40
+censor_time <- last_t[is_censored == 1] 
 
 dump(c("N_uncensored", "N_censored", "M", "group_uncensored", "group_censored", "t_uncensored", "censor_time"), file = "mice.Rdata"); 
