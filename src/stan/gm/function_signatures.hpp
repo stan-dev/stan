@@ -235,8 +235,3 @@ add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 //------------------------------------------------------------
 
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
-
-
-
-
-
