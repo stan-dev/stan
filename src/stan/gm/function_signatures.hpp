@@ -120,6 +120,7 @@ add("minus",DOUBLE_T,DOUBLE_T);
 add("minus",VECTOR_T,VECTOR_T);
 add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
+add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("multiply",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("multiply",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("multiply",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -220,7 +221,6 @@ add_ternary("lognormal_log");
 add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
-add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("normal_p",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T);

@@ -1,5 +1,6 @@
 data { 
   int d_int;
+  int d_int_array[d_int];
   real d_real;
   real d_real_array[d_int];
   matrix[d_int,d_int] d_matrix;
@@ -285,7 +286,9 @@ transformed data {
   transformed_data_real <- ordered_logistic_log(d_int, d_real, d_vector);
   // Unbounded Discrete Distributions
   transformed_data_real <- neg_binomial_log(d_int, d_real, d_real);  
-  transformed_data_real <- poisson_log(d_int, d_real);  
+  transformed_data_real <- poisson_log(d_int, d_real);
+  // Multivariate Discrete Probabilities
+  transformed_data_real <- multinomial_log(d_int_array, d_vector);
 }
 parameters {
   real p_real;
@@ -846,6 +849,9 @@ transformed parameters {
   transformed_param_real <- neg_binomial_log(d_int, p_real, p_real);
   transformed_param_real <- poisson_log(d_int, d_real);
   transformed_param_real <- poisson_log(d_int, p_real);
+  // Multivariate Discrete Probabilities
+  transformed_param_real <- multinomial_log(d_int_array, d_vector);
+  transformed_param_real <- multinomial_log(d_int_array, p_vector);
 }
 model {  
 }
