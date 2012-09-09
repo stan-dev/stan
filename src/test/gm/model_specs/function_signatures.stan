@@ -328,6 +328,10 @@ transformed data {
   transformed_data_real <- normal_log(d_real_array, d_real_array, d_row_vector);
   transformed_data_real <- normal_log(d_real_array, d_real_array, d_real_array);
   transformed_data_real <- normal_cdf(d_real, d_real, d_real);
+  transformed_data_real <- student_t_log(d_real, d_real, d_real, d_real);
+  transformed_data_real <- cauchy_log(d_real, d_real, d_real);
+  transformed_data_real <- double_exponential_log(d_real, d_real, d_real);
+  transformed_data_real <- logistic_log(d_real, d_real, d_real);
 }
 parameters {
   real p_real;
@@ -1414,6 +1418,48 @@ transformed parameters {
   transformed_param_real <- normal_cdf(p_real, d_real, p_real);
   transformed_param_real <- normal_cdf(p_real, p_real, d_real);
   transformed_param_real <- normal_cdf(p_real, p_real, p_real);
+  transformed_param_real <- student_t_log(d_real, d_real, d_real, d_real);
+  transformed_param_real <- student_t_log(d_real, d_real, d_real, p_real);
+  transformed_param_real <- student_t_log(d_real, d_real, p_real, d_real);
+  transformed_param_real <- student_t_log(d_real, d_real, p_real, p_real);
+  transformed_param_real <- student_t_log(d_real, p_real, d_real, d_real);
+  transformed_param_real <- student_t_log(d_real, p_real, d_real, p_real);
+  transformed_param_real <- student_t_log(d_real, p_real, p_real, d_real);
+  transformed_param_real <- student_t_log(d_real, p_real, p_real, p_real);
+  transformed_param_real <- student_t_log(p_real, d_real, d_real, d_real);
+  transformed_param_real <- student_t_log(p_real, d_real, d_real, p_real);
+  transformed_param_real <- student_t_log(p_real, d_real, p_real, d_real);
+  transformed_param_real <- student_t_log(p_real, d_real, p_real, p_real);
+  transformed_param_real <- student_t_log(p_real, p_real, d_real, d_real);
+  transformed_param_real <- student_t_log(p_real, p_real, d_real, p_real);
+  transformed_param_real <- student_t_log(p_real, p_real, p_real, d_real);
+  transformed_param_real <- student_t_log(p_real, p_real, p_real, p_real);
+  transformed_param_real <- cauchy_log(d_real, d_real, d_real);
+  transformed_param_real <- cauchy_log(d_real, d_real, p_real);
+  transformed_param_real <- cauchy_log(d_real, p_real, d_real);
+  transformed_param_real <- cauchy_log(d_real, p_real, p_real);
+  transformed_param_real <- cauchy_log(p_real, d_real, d_real);
+  transformed_param_real <- cauchy_log(p_real, d_real, p_real);
+  transformed_param_real <- cauchy_log(p_real, p_real, d_real);
+  transformed_param_real <- cauchy_log(p_real, p_real, p_real);
+  transformed_param_real <- double_exponential_log(d_real, d_real, d_real);
+  transformed_param_real <- double_exponential_log(d_real, d_real, p_real);
+  transformed_param_real <- double_exponential_log(d_real, p_real, d_real);
+  transformed_param_real <- double_exponential_log(d_real, p_real, p_real);
+  transformed_param_real <- double_exponential_log(p_real, d_real, d_real);
+  transformed_param_real <- double_exponential_log(p_real, d_real, p_real);
+  transformed_param_real <- double_exponential_log(p_real, p_real, d_real);
+  transformed_param_real <- double_exponential_log(p_real, p_real, p_real);
+  transformed_param_real <- logistic_log(d_real, d_real, d_real);
+  transformed_param_real <- logistic_log(d_real, d_real, p_real);
+  transformed_param_real <- logistic_log(d_real, p_real, d_real);
+  transformed_param_real <- logistic_log(d_real, p_real, p_real);
+  transformed_param_real <- logistic_log(p_real, d_real, d_real);
+  transformed_param_real <- logistic_log(p_real, d_real, p_real);
+  transformed_param_real <- logistic_log(p_real, p_real, d_real);
+  transformed_param_real <- logistic_log(p_real, p_real, p_real);
+
+
 }
 model {  
 }
