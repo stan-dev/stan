@@ -133,12 +133,14 @@ add("multiply",VECTOR_T,DOUBLE_T,VECTOR_T);
 add("multiply",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
 add("multiply",MATRIX_T,DOUBLE_T,MATRIX_T);
 add_binary("multiply_log");
+add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 add_nullary("not_a_number");
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add_unary("Phi");
 add_nullary("pi");
+add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod",DOUBLE_T,VECTOR_T);
@@ -219,7 +221,7 @@ add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
-add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
+
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("normal_p",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T);
 
@@ -237,7 +239,6 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
 
 add_ternary("pareto_log");
-add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_ternary("scaled_inv_chi_square_log");
 add_quaternary("student_t_log");
 add_ternary("uniform_log");
