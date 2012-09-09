@@ -165,6 +165,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
 add_nullary("not_a_number");
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
+add_ternary("pareto_log");
 add_unary("Phi");
 add_nullary("pi");
 add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
@@ -248,7 +249,6 @@ add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
 
 
 
-add_ternary("pareto_log");
 add_ternary("uniform_log");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 

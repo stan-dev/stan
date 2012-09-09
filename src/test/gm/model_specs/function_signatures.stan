@@ -345,6 +345,8 @@ transformed data {
   transformed_data_real <- inv_gamma_log(d_real, d_real, d_real);
   transformed_data_real <- weibull_log(d_real, d_real, d_real);
   transformed_data_real <- weibull_cdf(d_real, d_real, d_real);
+  // Positive Lower-Bounded Probabilities
+  transformed_data_real <- pareto_log(d_real, d_real, d_real);
 }
 parameters {
   real p_real;
@@ -1554,6 +1556,15 @@ transformed parameters {
   transformed_param_real <- weibull_cdf(p_real, d_real, p_real);
   transformed_param_real <- weibull_cdf(p_real, p_real, d_real);
   transformed_param_real <- weibull_cdf(p_real, p_real, p_real);
+  // Positive Lower-Bounded Probabilities
+  transformed_param_real <- pareto_log(d_real, d_real, d_real);
+  transformed_param_real <- pareto_log(d_real, d_real, p_real);
+  transformed_param_real <- pareto_log(d_real, p_real, d_real);
+  transformed_param_real <- pareto_log(d_real, p_real, p_real);
+  transformed_param_real <- pareto_log(p_real, d_real, d_real);
+  transformed_param_real <- pareto_log(p_real, d_real, p_real);
+  transformed_param_real <- pareto_log(p_real, p_real, d_real);
+  transformed_param_real <- pareto_log(p_real, p_real, p_real);
 }
 model {  
 }
