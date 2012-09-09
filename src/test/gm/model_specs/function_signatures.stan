@@ -353,6 +353,10 @@ transformed data {
   transformed_data_real <- uniform_log(d_real, d_real, d_real);
   // Simplex Probabilities
   transformed_data_real <- dirichlet_log(d_vector, d_vector);
+  // Vector Probabilities
+  transformed_data_real <- multi_normal_log(d_vector, d_vector, d_matrix);
+  transformed_data_real <- multi_normal_cholesky_log(d_vector, d_vector, d_matrix);
+  transformed_data_real <- multi_student_t_log(d_vector, d_real, d_vector, d_matrix);
 }
 parameters {
   real p_real;
@@ -1594,6 +1598,24 @@ transformed parameters {
   transformed_param_real <- dirichlet_log(d_vector, p_vector);
   transformed_param_real <- dirichlet_log(p_vector, d_vector);
   transformed_param_real <- dirichlet_log(p_vector, p_vector);
+  // Vector Probabilities
+  transformed_param_real <- multi_normal_log(d_vector, d_vector, d_matrix);
+  transformed_param_real <- multi_normal_log(d_vector, d_vector, p_matrix);
+  transformed_param_real <- multi_normal_log(d_vector, p_vector, d_matrix);
+  transformed_param_real <- multi_normal_log(d_vector, p_vector, p_matrix);
+  transformed_param_real <- multi_normal_log(p_vector, d_vector, d_matrix);
+  transformed_param_real <- multi_normal_log(p_vector, d_vector, p_matrix);
+  transformed_param_real <- multi_normal_log(p_vector, p_vector, d_matrix);
+  transformed_param_real <- multi_normal_log(p_vector, p_vector, p_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(d_vector, d_vector, d_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(d_vector, d_vector, p_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(d_vector, p_vector, d_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(d_vector, p_vector, p_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(p_vector, d_vector, d_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(p_vector, d_vector, p_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(p_vector, p_vector, d_matrix);
+  transformed_param_real <- multi_normal_cholesky_log(p_vector, p_vector, p_matrix);
+
 
 }
 model {  
