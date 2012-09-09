@@ -349,6 +349,8 @@ transformed data {
   transformed_data_real <- pareto_log(d_real, d_real, d_real);
   // [0,1] Continuous Probabilities
   transformed_data_real <- beta_log(d_real, d_real, d_real);
+  // Bounded Continuous Probabilities
+  transformed_data_real <- uniform_log(d_real, d_real, d_real);
 }
 parameters {
   real p_real;
@@ -1576,6 +1578,16 @@ transformed parameters {
   transformed_param_real <- beta_log(p_real, d_real, p_real);
   transformed_param_real <- beta_log(p_real, p_real, d_real);
   transformed_param_real <- beta_log(p_real, p_real, p_real);
+  // Bounded Continuous Probabilities
+  transformed_param_real <- uniform_log(d_real, d_real, d_real);
+  transformed_param_real <- uniform_log(d_real, d_real, p_real);
+  transformed_param_real <- uniform_log(d_real, p_real, d_real);
+  transformed_param_real <- uniform_log(d_real, p_real, p_real);
+  transformed_param_real <- uniform_log(p_real, d_real, d_real);
+  transformed_param_real <- uniform_log(p_real, d_real, p_real);
+  transformed_param_real <- uniform_log(p_real, p_real, d_real);
+  transformed_param_real <- uniform_log(p_real, p_real, p_real);
+
 }
 model {  
 }
