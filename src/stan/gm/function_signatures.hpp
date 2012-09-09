@@ -47,6 +47,7 @@ add_unary("cosh");
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
+add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -238,7 +239,6 @@ add_ternary("weibull_cdf");
 // so no calling in Stan GM
 
 
-add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
 add("lkj_cov_log",DOUBLE_T, MATRIX_T,MATRIX_T,MATRIX_T,DOUBLE_T);
