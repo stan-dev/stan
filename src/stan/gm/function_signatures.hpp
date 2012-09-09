@@ -28,6 +28,7 @@ add_unary("atanh");
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
+add_ternary("beta_log");
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
@@ -236,7 +237,6 @@ add_ternary("weibull_cdf");
 // so no calling in Stan GM
 
 
-add_ternary("beta_log");
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
