@@ -98,9 +98,13 @@ add_binary("inv_chi_square_log");
 add_unary("inv_cloglog");
 add_ternary("inv_gamma_log");
 add_unary("inv_logit");
+add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inverse",MATRIX_T,MATRIX_T);
 add_binary("lbeta");
 add_unary("lgamma");
+add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
+add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
+//FIXME: add("lkj_cov_log",DOUBLE_T, MATRIX_T,VECTOR_T,VECTOR_T,DOUBLE_T);
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
 add("log",VECTOR_T,VECTOR_T);
@@ -226,36 +230,11 @@ add("variance",DOUBLE_T,ROW_VECTOR_T);
 add("variance",DOUBLE_T,MATRIX_T);
 add_ternary("weibull_log");
 add_ternary("weibull_cdf");
-
+add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
 //------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-// eigen_decompose, eigen_decompose_sym, svd return void
-// so no calling in Stan GM
-
-
-add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
-add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
-add("lkj_cov_log",DOUBLE_T, MATRIX_T,MATRIX_T,MATRIX_T,DOUBLE_T);
-
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
-
-
-
-add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
-
-// MULTINOMIAL?  no vector<int> type
-
-// CONSTANTS
-
 
 
 

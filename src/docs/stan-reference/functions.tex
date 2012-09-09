@@ -1763,7 +1763,7 @@ the multivariate Gamma function,
 
 \begin{description}
 %
-\fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+\fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
  \farg{S}}{The log of the Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
  \farg{S}}
@@ -1797,23 +1797,23 @@ positive-definite $W \in \reals^{K \times K}$,
 
 \begin{description}
 %
-\fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+\fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
  \farg{S}}{The log of the inverse Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
  \farg{S}}
 %
 \end{description}
 
-\subsection{LKJ Covariance Distribution}
+%\subsection{LKJ Covariance Distribution}
 
-\begin{description}
+%\begin{description}
 %
-\fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
-\farg{sigma}, real \farg{eta}}{The log of the LKJ density for covariance matrix
-\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
-and shape \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+%\fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
+%\farg{sigma}, real \farg{eta}}{The log of the LKJ density for covariance matrix
+%\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
+%and shape \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
 %
-\end{description}
+%\end{description}
 
 
 
@@ -1823,6 +1823,18 @@ The correlation matrix distributions have support on the (Cholesky
 factors of) correlation matrices.  A Cholesky factor $L$ for a $K
 \times K$ covariance matrix of dimensions $K$ has rows of unit length
 so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
+
+\subsection{LKJ Correlation Distribution}
+
+\begin{description}
+%
+  \fitem{real}{lkj\_corr\_log}{matrix \farg{y}, real
+    \farg{eta}}{The log of the LKJ density for the correlation matrix
+    \farg{y} given shape
+    \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+%
+\end{description}
+
 
 \subsection{LKJ Cholesky Distribution}
 
