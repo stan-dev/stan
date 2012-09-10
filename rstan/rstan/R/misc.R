@@ -1063,9 +1063,23 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
 
 legitimate_model_name <- function(name) {
   # To make model name be a valid name in C++. 
-  name <- gsub('[^[:alnum:]]', '_', name) 
-  paste(basename(tempfile('stan_fit', '')), '_', name, sep = '')
+  name <- paste(basename(tempfile('stan_fit', '')), '_', name, sep = '')
+  gsub('[^[:alnum:]]', '_', name) 
   # return("anon_model")
+
+  # Note: why using different (ideally unique) name?   
+  # 
+  # The name returned from this function is used 
+  # as Rcpp module name and the name for the stan_fit class
+  # for each model. Actually we need a unique name. The reason
+  # is that it seems if the Rcpp modules have the same name, a newly
+  # created model created from compiling the C++ code would replace
+  # previous one though the DSO files are different. I guess 
+  # that Rcpp implement the module by call the C++ function using .Call, we
+  # would always call the function with the same name loaded later. I am 
+  # not sure the real reason, but experiments do show that 
+  # later modules created would use previous one if the class name
+  # in the module is the same. 
 } 
 
 boost_url <- function() {"http://www.boost.org/users/download/"} 

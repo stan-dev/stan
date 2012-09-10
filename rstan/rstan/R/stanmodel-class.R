@@ -68,6 +68,7 @@ setMethod("sampling", "stanmodel",
             } 
 
             sampler <- new(stan_fit_cpp_module, data) 
+            on.exit({rm(sampler); invisible(gc())}) 
 
             m_pars = sampler$param_names() 
             p_dims = sampler$param_dims() 
@@ -86,6 +87,7 @@ setMethod("sampling", "stanmodel",
             warmup2 <- 1 + (warmup - 1) %/% thin 
             n_kept <- n_save - warmup2 
             samples <- vector("list", chains)
+
 
             for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
@@ -128,8 +130,6 @@ setMethod("sampling", "stanmodel",
                           # (see comments in fun stan_model)
                         date = date(),
                         .MISC = new.env()) 
-             rm(sampler) 
-             invisible(gc())  
              # triger gc to really delete sampler, create from the sampler_mod.   
              # the issue here is that if sampler is removed later automatically by 
              # R's gabbage collector after the fx (the loaded dso) is removed, 
