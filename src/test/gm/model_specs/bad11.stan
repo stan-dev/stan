@@ -1,0 +1,5 @@
+parameters {
+  int theta;
+}
+model {
+}
