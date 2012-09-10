@@ -104,7 +104,7 @@ add_binary("lbeta");
 add_unary("lgamma");
 add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
 add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
-//FIXME: add("lkj_cov_log",DOUBLE_T, MATRIX_T,VECTOR_T,VECTOR_T,DOUBLE_T);
+add("lkj_cov_log",DOUBLE_T, MATRIX_T,VECTOR_T,VECTOR_T,DOUBLE_T);
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
 add("log",VECTOR_T,VECTOR_T);

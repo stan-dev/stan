@@ -18,28 +18,30 @@ namespace stan {
     template <typename T_shape>
     T_shape do_lkj_constant(const T_shape& eta, const unsigned int& K) {
       // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
-      T_shape the_sum = 0.0;
-      T_shape constant = 0.0;
-      T_shape beta_arg;
       
-      if(eta == 1.0) {
-        for(unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
+      if (stan::is_constant<typename stan::scalar_type<T_shape> >::value
+          && eta == 1.0) {
+        double sum = 0.0;
+        double constant = 0.0;
+        double beta_arg = 0.0;
+        for (unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
           beta_arg = 0.5 * (k + 1.0);
           constant += k * (2.0 * lgamma(beta_arg) - lgamma(2.0 * beta_arg));
-          the_sum += pow(static_cast<double>(k),2.0);
+          sum += pow(static_cast<double>(k),2.0);
         }
-        constant += the_sum * LOG_TWO;
+        constant += sum * LOG_TWO;
         return constant;
       }
-
-      T_shape diff;
-      for(unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-        diff = K - k;
+      T_shape sum = 0.0;
+      T_shape constant = 0.0;
+      T_shape beta_arg;
+      for (unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
+        unsigned int diff = K - k;
         beta_arg = eta + 0.5 * (diff - 1);
         constant += diff * (2.0 * lgamma(beta_arg) - lgamma(2.0 * beta_arg));
-        the_sum += (2.0 * eta - 2.0 + diff) * diff;
+        sum += (2.0 * eta - 2.0 + diff) * diff;
       }
-      constant += the_sum * LOG_TWO;
+      constant += sum * LOG_TWO;
       return constant;
     }
 
@@ -67,7 +69,7 @@ namespace stan {
       if (K == 0)
         return 0.0;
       
-      if (include_summand<propto>::value) 
+      if (include_summand<propto,T_shape>::value) 
         lp += do_lkj_constant(eta, K);
       if (include_summand<propto,T_covar,T_shape>::value && eta != 1.0)
         lp += (eta - 1.0) * 2.0 * L.diagonal().array().log().sum();

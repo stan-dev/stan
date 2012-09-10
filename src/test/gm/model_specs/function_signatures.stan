@@ -360,7 +360,7 @@ transformed data {
   // Covariance Matrix Distributions
   transformed_data_real <- wishart_log(d_matrix, d_real, d_matrix);
   transformed_data_real <- inv_wishart_log(d_matrix, d_real, d_matrix);
-  //FIXME: transformed_data_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
+  transformed_data_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
   transformed_data_real <- lkj_corr_log(d_matrix, d_real);
   transformed_data_real <- lkj_corr_cholesky_log(d_matrix, d_real);
 }
@@ -1638,25 +1638,22 @@ transformed parameters {
   transformed_param_real <- inv_wishart_log(p_matrix, d_real, p_matrix);
   transformed_param_real <- inv_wishart_log(p_matrix, p_real, d_matrix);
   transformed_param_real <- inv_wishart_log(p_matrix, p_real, p_matrix);
-/*
-  // FIXME: include when lkj_cov_log is available
   transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
-*/
+  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, d_vector, p_real);
+  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, p_vector, d_real);
+  transformed_param_real <- lkj_cov_log(d_matrix, d_vector, p_vector, p_real);
+  transformed_param_real <- lkj_cov_log(d_matrix, p_vector, d_vector, d_real);
+  transformed_param_real <- lkj_cov_log(d_matrix, p_vector, d_vector, p_real);
+  transformed_param_real <- lkj_cov_log(d_matrix, p_vector, p_vector, d_real);
+  transformed_param_real <- lkj_cov_log(d_matrix, p_vector, p_vector, p_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, d_vector, d_vector, d_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, d_vector, d_vector, p_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, d_vector, p_vector, d_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, d_vector, p_vector, p_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, p_vector, d_vector, d_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, p_vector, d_vector, p_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, p_vector, p_vector, d_real);
+  transformed_param_real <- lkj_cov_log(p_matrix, p_vector, p_vector, p_real);
   transformed_param_real <- lkj_corr_log(d_matrix, d_real);
   transformed_param_real <- lkj_corr_log(d_matrix, p_real);
   transformed_param_real <- lkj_corr_log(p_matrix, d_real);

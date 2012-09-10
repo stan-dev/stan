@@ -6,6 +6,7 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
@@ -36,6 +37,8 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
       if (!check_size_match(function, mu.rows(), sigma.rows(), &lp, Policy()))
         return lp;
+      if (!check_size_match(function, y.cols(), y.rows(), &lp, Policy()))
+      return lp;
       if (!check_size_match(function, mu.rows(), y.rows(), &lp, Policy()))
         return lp;
       if (!check_positive(function, eta, "eta", &lp, Policy()))
@@ -44,24 +47,27 @@ namespace stan {
         return lp;
       if (!check_finite(function, sigma, "Scale parameter, sigma", 
                         &lp, Policy()))
-        return lp;      
-      if (!check_finite(function, y, "Covariance matrix, y", &lp, Policy()))
-        return lp;
+        return lp;    
+      for (int m = 0; m < y.rows(); ++m)
+        for (int n = 0; n < y.cols(); ++n)
+          if (!check_finite(function, y(m,n), "Covariance matrix, y(m,n)", &lp, Policy()))
+            return lp;
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds
         = y.diagonal().array().sqrt();
-      for(unsigned int k = 0; k < K; k++) {
-        lp += lognormal_log<propto>(sds(k), mu(k), sigma(k));
+      for (unsigned int k = 0; k < K; k++) {
+        lp += lognormal_log<propto>(sds(k), mu(k), sigma(k), Policy());
       }
-      if(eta == 1.0) {
+      if (stan::is_constant<typename stan::scalar_type<T_shape> >::value
+          && eta == 1.0) {
         // no need to rescale y into a correlation matrix
-        lp += lkj_corr_log<propto>(y,eta); 
+        lp += lkj_corr_log<propto,T_y,T_shape,Policy>(y, eta, Policy()); 
         return lp;
       }
-      Eigen::DiagonalMatrix<double,Eigen::Dynamic> D(K);
-      D.diagonal() = sds.inverse();
-      lp += lkj_corr_log<propto>(D * y * D, eta);
+      Eigen::DiagonalMatrix<T_y,Eigen::Dynamic> D(K);
+      D.diagonal() = sds.inverse();  // FIXME:  D.diagonal() inefficient
+      lp += lkj_corr_log<propto,T_y,T_shape,Policy>(D * y * D, eta, Policy());
       return lp;
     }
 
@@ -131,17 +137,18 @@ namespace stan {
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds
         = y.diagonal().array().sqrt();
-      for(unsigned int k = 0; k < K; k++) {
-        lp += lognormal_log<propto>(sds(k), mu, sigma);
+      for (unsigned int k = 0; k < K; k++) {
+        lp += lognormal_log<propto>(sds(k), mu, sigma, Policy());
       }
-      if (eta == 1.0) {
+      if (stan::is_constant<typename stan::scalar_type<T_shape> >::value
+          && eta == 1.0) {
         // no need to rescale y into a correlation matrix
-        lp += lkj_corr_log<propto>(y,eta); 
+        lp += lkj_corr_log<propto>(y,eta,Policy()); 
         return lp;
       }
-      Eigen::DiagonalMatrix<double,Eigen::Dynamic> D(K);
+      Eigen::DiagonalMatrix<T_y,Eigen::Dynamic> D(K);
       D.diagonal() = sds.inverse();
-      lp += lkj_corr_log<propto>(D * y * D, eta);
+      lp += lkj_corr_log<propto,T_y,T_shape,Policy>(D * y * D, eta, Policy());
       return lp;
     }
 

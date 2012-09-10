@@ -18,6 +18,13 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* remove all the names of variables from error conditions and replace
+  with descriptive terms (this in every probability function)
+
+* add extra tests to all matrix functions expecting square matrices
+  to verify we get square matrices (e.g, lkj_cov,...)
+  -- add error messages to check_size_match
+
 * templated functions returning var should go away in matrix
 
 * add base class for stanc-generated models
