@@ -2,9 +2,13 @@ inv_logit = function(u) { 1.0/(1.0 + exp(-u)); }
     
 J <- 400;
 K <- 100;
-alpha <- rnorm(J,0,1);
-beta <- rnorm(K,0,1);
-delta <- 0.75;
+
+sigma_alpha <- 0.66;
+sigma_beta <- 1.5;
+
+alpha <- rnorm(J,0,sigma_alpha);
+beta <- rnorm(K,0,sigma_beta);
+delta <- 0.8;
 
 y_all <- matrix(0,nrow=J,ncol=K);
 for (j in 1:J)
@@ -29,6 +33,6 @@ for (j in 1:J) {
   }
 }
 
-dump(c("J","K","N","jj","kk","y"), "irt.Rdata");
+dump(c("J","K","N","jj","kk","y"), "irt_hier.Rdata");
 
 

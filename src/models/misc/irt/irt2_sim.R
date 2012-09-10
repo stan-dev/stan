@@ -1,15 +1,15 @@
 inv_logit = function(u) { 1.0/(1.0 + exp(-u)); }
     
-J <- 400;
+J <- 400;  
 K <- 100;
 alpha <- rnorm(J,0,1);
 beta <- rnorm(K,0,1);
 delta <- 0.75;
-
+gamma <- exp(rnorm(K,0,0.5));
 y_all <- matrix(0,nrow=J,ncol=K);
 for (j in 1:J)
   for (k in 1:K)
-    y_all[j,k] <- rbinom(1,1,inv_logit(alpha[j] - beta[k] + delta));
+    y_all[j,k] <- rbinom(1,1,inv_logit(gamma[k] * (alpha[j] - beta[k] + delta)));
 
 p_observed = 0.75;
 observed <- matrix(rbinom(J*K,1,p_observed),nrow=J,ncol=K);
@@ -29,6 +29,6 @@ for (j in 1:J) {
   }
 }
 
-dump(c("J","K","N","jj","kk","y"), "irt.Rdata");
+dump(c("J","K","N","jj","kk","y"), "irt2.Rdata");
 
 
