@@ -234,6 +234,14 @@ namespace stan {
                      << var_decl.name_ 
                      << std::endl;
           return var_decl;
+        } 
+        if ((vo == parameter_origin || vo == transformed_parameter_origin)
+            && var_decl.base_type_ == INT_T) {
+          pass = false;
+          error_msgs << "integer parameters or transformed parameters are not allowed; "
+                     << " found declared type int, parameter name=" << var_decl.name_
+                     << std::endl;
+          return var_decl;
         }
         pass = true;  // probably don't need to set true
         vm.add(var_decl.name_,var_decl,vo);
