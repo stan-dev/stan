@@ -33,6 +33,6 @@ for (j in 1:J) {
   }
 }
 
-dump(c("J","K","N","jj","kk","y"), "irt_hier.Rdata");
+dump(c("J","K","N","jj","kk","y"), "irt_multilevel.Rdata");
 
 

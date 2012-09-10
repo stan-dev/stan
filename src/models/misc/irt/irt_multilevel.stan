@@ -1,5 +1,3 @@
-
-
 data {
   int<lower=1> J;                // number of students
   int<lower=1> K;                // number of questions
@@ -16,7 +14,6 @@ parameters {
   real <lower=0> sigma_beta;     // sd of question difficulties
 }
 model {
-  // improper priors on sigma_alpha, sigma_beta
   alpha ~ normal(0,sigma_alpha); 
   beta ~ normal(0,sigma_beta);   
   delta ~ normal(.75,1);          // informative around known value
