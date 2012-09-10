@@ -23,13 +23,13 @@ namespace stan {
                     const Policy&) {
       static const char* function = "stan::prob::multinomial_log<%1%>(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_nonnegative;
       using stan::math::check_simplex;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_prob>::type lp(0.0);
-      if (!check_positive(function, ns, "Sample sizes, ns,", &lp, Policy()))
+      if (!check_nonnegative(function, ns, "Sample sizes, ns,", &lp, Policy()))
         return lp;
       if (!check_simplex(function, theta, "Probabilities, theta,", 
                          &lp, Policy()))

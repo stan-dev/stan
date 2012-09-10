@@ -54,7 +54,7 @@ TEST(ProbDistributionsMultinomial,DefaultPolicy) {
   EXPECT_NO_THROW(multinomial_log(ns, theta));
   
   ns[1] = 0;
-  EXPECT_THROW(multinomial_log(ns, theta), std::domain_error);
+  EXPECT_NO_THROW(multinomial_log(ns, theta));
   ns[1] = -1;
   EXPECT_THROW(multinomial_log(ns, theta), std::domain_error);
   ns[1] = 1;
@@ -79,6 +79,27 @@ TEST(ProbDistributionsMultinomial,DefaultPolicy) {
   EXPECT_THROW(multinomial_log(ns, theta), std::domain_error);
 }
 
+TEST(ProbDistributionsMultinomial, zeros) {
+  double result;
+  std::vector<int> ns;
+  ns.push_back(0);
+  ns.push_back(1);
+  ns.push_back(2);
+  Matrix<double,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+
+  result = multinomial_log(ns, theta);
+  EXPECT_FALSE(std::isnan(result));
+
+  std::vector<int> ns2;
+  ns2.push_back(0);
+  ns2.push_back(0);
+  ns2.push_back(0);
+  
+  double result2 = multinomial_log(ns2, theta);
+  EXPECT_FLOAT_EQ(0.0, result2);
+}
+
 TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   double inf = std::numeric_limits<double>::infinity();
@@ -96,7 +117,7 @@ TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
   
   ns[1] = 0;
   result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_FALSE(std::isnan(result));
   ns[1] = -1;
   result = multinomial_log(ns, theta, errno_policy());
   EXPECT_TRUE(std::isnan(result));
