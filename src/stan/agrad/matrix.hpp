@@ -2324,6 +2324,62 @@ namespace stan {
              matrix_v& u,
              matrix_v& v,
              vector_v& s);
+
+
+    inline void assign_to_var(stan::agrad::var& var, const double& val) {
+      var = val;
+    }
+    inline void assign_to_var(stan::agrad::var& var, const stan::agrad::var& val) {
+      var = val;
+    }
+    template <typename LHS, typename RHS>
+    inline void assign_to_var(std::vector<LHS>& x, const std::vector<RHS>& y) {
+      for (size_t i = 0; i < x.size(); ++i)
+        assign_to_var(x[i],y[i]);
+    }
+    template <typename LHS, typename RHS>
+    inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,1>& x, 
+                              const Eigen::Matrix<RHS,Eigen::Dynamic,1>& y) {
+      for (size_t i = 0; i < x.size(); ++i)
+        assign_to_var(x(i),y(i));
+    }
+    template <typename LHS, typename RHS>
+    inline void assign_to_var(Eigen::Matrix<LHS,1,Eigen::Dynamic>& x, 
+                              const Eigen::Matrix<RHS,1,Eigen::Dynamic>& y) {
+      for (size_t i = 0; i < x.size(); ++i)
+        assign_to_var(x(i),y(i));
+    }
+    template <typename LHS, typename RHS>
+    inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,Eigen::Dynamic>& x, 
+                              const Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      for (size_t n = 0; n < x.cols(); ++n)
+        for (size_t m = 0; m < x.rows(); ++m)
+          assign_to_var(x(m,n),y(m,n));
+    }
+
+    template <typename T1, typename T2>
+    inline void assign_to_nonvar(T1& var, const T2& val) {
+      throw std::domain_error("illegal assignment with mismatched LHS and RHS types");
+    }
+    template <typename T>
+    inline void assign_to_nonvar(T& var, const T& val) {
+      var = val;
+    }
+    
+
+    template <typename LHS, typename RHS>
+    inline void assign(LHS& var,
+                       const RHS& val) {
+      using stan::is_constant_struct;
+      if (is_constant_struct<RHS>::value 
+          && !is_constant_struct<LHS>::value)
+        assign_to_var(var,val);
+      else
+        assign_to_nonvar(var,val);
+    }
+    
+
+
   }
 }
 

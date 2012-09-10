@@ -80,3 +80,16 @@ TEST(AgradDistributionsGamma,ProptoBeta) {
                                    y, alpha, 1.5,
                                    "var: beta");
 }
+/*
+// FIXME: include once gamma_cdf works.
+TEST(AgradDistributionsGamma,GammaCdf) {
+  double y(1.0);
+  var y_var(1.0);
+  double alpha(1.0);
+  var alpha_var(1.0);
+  double beta(1.0);
+  var beta_var(1.0);
+  EXPECT_FLOAT_EQ(0.59399415, stan::prob::gamma_cdf(1.0,2.0,2.0));
+  EXPECT_FLOAT_EQ(0.59399415, stan::prob::gamma_cdf(y_var,alpha_var,beta_var));
+  }
+*/

@@ -1237,7 +1237,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
     \farg{sigma}}{The log of the normal density of \farg{y} given
     location \farg{mu} and scale \farg{sigma}}
 %
-\fitem{real}{normal\_p}{real \farg{y}, real \farg{mu}, real
+\fitem{real}{normal\_cdf}{real \farg{y}, real \farg{mu}, real
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
 \end{description}
@@ -1353,7 +1353,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   \farg{sigma}}{The log of the lognormal density of \farg{y} given location
   \farg{mu} and scale \farg{sigma}}
 %
-\fitem{real}{lognormal\_p}{real \farg{y}, real \farg{mu}, real
+\fitem{real}{lognormal\_cdf}{real \farg{y}, real \farg{mu}, real
   \farg{sigma}}{The cumulative lognormal distribution of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
 \end{description}
@@ -1444,7 +1444,7 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
   \fitem{real}{exponential\_log}{real \farg{y}, real \farg{beta}}{The
     log of the exponential density of \farg{y} given inverse scale \farg{beta}}
 %
-\fitem{real}{exponential\_p}{real \farg{y}, real \farg{beta}}{The
+\fitem{real}{exponential\_cdf}{real \farg{y}, real \farg{beta}}{The
   cumulative distribution function of \farg{y} given inverse scale
   \farg{beta}}
 \end{description}
@@ -1469,9 +1469,9 @@ y^{\alpha - 1}
   \farg{beta}}{The log of the gamma density of \farg{y} given shape
   \farg{alpha} and inverse scale \farg{beta}}
 %
-  \fitem{real}{gamma\_p}{real \farg{y}, real \farg{alpha}, real
-   \farg{beta}}{The cumulative distribution function of \farg{y} given shape
-   \farg{alpha} and inverse scale \farg{beta}}
+%  \fitem{real}{gamma\_cdf}{real \farg{y}, real \farg{alpha}, real
+ %  \farg{beta}}{The cumulative distribution function of \farg{y} given shape
+ %  \farg{alpha} and inverse scale \farg{beta}}
 \end{description}
 
 \subsection{Inverse Gamma Distribution}
@@ -1517,7 +1517,7 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 \farg{sigma}}{The log of the Weibull density of \farg{y} given shape
 \farg{alpha} and scale \farg{sigma}}
 %
-\fitem{real}{weibull\_p}{real \farg{y}, real \farg{alpha}, real
+\fitem{real}{weibull\_cdf}{real \farg{y}, real \farg{alpha}, real
 \farg{sigma}}{The Weibull cumulative distribution of \farg{y} given shape
 \farg{alpha} and scale \farg{sigma}}
 \end{description}
@@ -1763,7 +1763,7 @@ the multivariate Gamma function,
 
 \begin{description}
 %
-\fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+\fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
  \farg{S}}{The log of the Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
  \farg{S}}
@@ -1797,23 +1797,23 @@ positive-definite $W \in \reals^{K \times K}$,
 
 \begin{description}
 %
-\fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, real
+\fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
  \farg{S}}{The log of the inverse Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
  \farg{S}}
 %
 \end{description}
 
-\subsection{LKJ Covariance Distribution}
+%\subsection{LKJ Covariance Distribution}
 
-\begin{description}
+%\begin{description}
 %
-\fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
-\farg{sigma}, real \farg{eta}}{The log of the LKJ density for covariance matrix
-\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
-and shape \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+%\fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
+%\farg{sigma}, real \farg{eta}}{The log of the LKJ density for covariance matrix
+%\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
+%and shape \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
 %
-\end{description}
+%\end{description}
 
 
 
@@ -1823,6 +1823,18 @@ The correlation matrix distributions have support on the (Cholesky
 factors of) correlation matrices.  A Cholesky factor $L$ for a $K
 \times K$ covariance matrix of dimensions $K$ has rows of unit length
 so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
+
+\subsection{LKJ Correlation Distribution}
+
+\begin{description}
+%
+  \fitem{real}{lkj\_corr\_log}{matrix \farg{y}, real
+    \farg{eta}}{The log of the LKJ density for the correlation matrix
+    \farg{y} given shape
+    \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+%
+\end{description}
+
 
 \subsection{LKJ Cholesky Distribution}
 

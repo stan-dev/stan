@@ -28,13 +28,16 @@ add_unary("atanh");
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
+add_ternary("beta_log");
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
 add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
+add_ternary("cauchy_log");
 add_unary("cbrt");
 add_unary("ceil");
 add("cholesky_decompose",MATRIX_T,MATRIX_T);
+add_binary("chi_square_log");
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);
@@ -44,6 +47,7 @@ add_unary("cosh");
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
+add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -53,6 +57,7 @@ add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
+add_ternary("double_exponential_log");
 add_nullary("e");
 add("eigenvalues",VECTOR_T,MATRIX_T);
 add("eigenvalues_sym",VECTOR_T,MATRIX_T);
@@ -73,6 +78,8 @@ add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
 add("exp",MATRIX_T,MATRIX_T);
 add_unary("exp2");
 add_unary("expm1");
+add_binary("exponential_log");
+add_binary("exponential_cdf");
 add_unary("fabs");
 add_binary("fdim");
 add_unary("floor");
@@ -80,16 +87,24 @@ add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
+add_ternary("gamma_log");
+//FIXME: add_ternary("gamma_cdf");
 add("hypergeometric_log",DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
 add_binary("hypot");
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
+add_binary("inv_chi_square_log");
 add_unary("inv_cloglog");
+add_ternary("inv_gamma_log");
 add_unary("inv_logit");
+add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inverse",MATRIX_T,MATRIX_T);
 add_binary("lbeta");
 add_unary("lgamma");
+add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
+add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
+//FIXME: add("lkj_cov_log",DOUBLE_T, MATRIX_T,VECTOR_T,VECTOR_T,DOUBLE_T);
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
 add_unary("log");
 add("log",VECTOR_T,VECTOR_T);
@@ -104,7 +119,10 @@ add_unary("log1p");
 add_unary("log1p_exp");
 add_nullary("log2");
 add_unary("log2");
+add_ternary("logistic_log");
 add_unary("logit");
+add_ternary("lognormal_cdf");
+add_ternary("lognormal_log");
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("max",DOUBLE_T,VECTOR_T);
 add("max",DOUBLE_T,ROW_VECTOR_T);
@@ -127,6 +145,9 @@ add("minus",DOUBLE_T,DOUBLE_T);
 add("minus",VECTOR_T,VECTOR_T);
 add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
+add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
+add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
+add("multi_student_t_log",DOUBLE_T, VECTOR_T,DOUBLE_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("multiply",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("multiply",VECTOR_T,VECTOR_T,DOUBLE_T);
@@ -153,6 +174,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
 add_nullary("not_a_number");
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
+add_ternary("pareto_log");
 add_unary("Phi");
 add_nullary("pi");
 add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
@@ -166,6 +188,7 @@ add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("rows",INT_T,VECTOR_T);
 add("rows",INT_T,ROW_VECTOR_T);
 add("rows",INT_T,MATRIX_T);
+add_ternary("scaled_inv_chi_square_log");
 add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sd",DOUBLE_T,VECTOR_T);
 add("sd",DOUBLE_T,ROW_VECTOR_T);
@@ -178,6 +201,7 @@ add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
 add_unary("step");
+add_quaternary("student_t_log");
 add("subtract",VECTOR_T,VECTOR_T,VECTOR_T);
 add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("subtract",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -199,62 +223,15 @@ add("transpose",ROW_VECTOR_T,VECTOR_T);
 add("transpose",VECTOR_T,ROW_VECTOR_T);
 add("transpose",MATRIX_T,MATRIX_T);
 add_unary("trunc");
+add_ternary("uniform_log");
 add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("variance",DOUBLE_T,VECTOR_T);
 add("variance",DOUBLE_T,ROW_VECTOR_T);
 add("variance",DOUBLE_T,MATRIX_T);
+add_ternary("weibull_log");
+add_ternary("weibull_cdf");
+add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
 //------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-// eigen_decompose, eigen_decompose_sym, svd return void
-// so no calling in Stan GM
-
-
-add_ternary("beta_log");
-add_ternary("cauchy_log");
-add_binary("chi_square_log");
-add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
-add_ternary("double_exponential_log");
-add_binary("exponential_log");
-add_ternary("gamma_log");
-add_binary("inv_chi_square_log");
-add_ternary("inv_gamma_log");
-add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
-add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
-add("lkj_cov_log",DOUBLE_T, MATRIX_T,MATRIX_T,MATRIX_T,DOUBLE_T);
-add_ternary("logistic_log");
-add_ternary("lognormal_log");
-add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_student_t_log",DOUBLE_T, DOUBLE_T,VECTOR_T,VECTOR_T,MATRIX_T);
-
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
-
-
-
-add_ternary("pareto_log");
-add_ternary("scaled_inv_chi_square_log");
-add_quaternary("student_t_log");
-add_ternary("uniform_log");
-add_ternary("weibull_log");
-add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
-
-add_ternary("weibull_p");
-
-// MULTINOMIAL?  no vector<int> type
-
-// CONSTANTS
-
-
-
-
-
-
