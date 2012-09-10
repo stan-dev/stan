@@ -12,7 +12,6 @@ The to-do list is organized into the following sections:
  
 V 1.0.1
 ======================================================================
-* rename _p to _cdf
 
 
 C++ API
