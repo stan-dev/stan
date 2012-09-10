@@ -609,59 +609,59 @@ transformed parameters {
 
   // Matrix Arithmetic Operators
   //   negation prefix operators
-  //FIXME: transformed_param_vector <- -d_vector;
+  transformed_param_vector <- -d_vector;
   transformed_param_vector <- -p_vector;
-  //FIXME: transformed_param_row_vector <- -d_row_vector;
+  transformed_param_row_vector <- -d_row_vector;
   transformed_param_row_vector <- -p_row_vector;
-  //FIXME: transformed_param_matrix <- -d_matrix;
+  transformed_param_matrix <- -d_matrix;
   transformed_param_matrix <- -p_matrix;
 
   //   infix matrix operators
-  //FIXME: transformed_param_vector <- d_vector + d_vector;
+  transformed_param_vector <- d_vector + d_vector;
   transformed_param_vector <- p_vector + d_vector;
   transformed_param_vector <- d_vector + p_vector;
   transformed_param_vector <- p_vector + p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector + d_row_vector;
+  transformed_param_row_vector <- d_row_vector + d_row_vector;
   transformed_param_row_vector <- p_row_vector + d_row_vector;
   transformed_param_row_vector <- d_row_vector + p_row_vector;
   transformed_param_row_vector <- p_row_vector + p_row_vector;
-  //FIXME: transformed_param_matrix <- d_matrix + d_matrix;
+  transformed_param_matrix <- d_matrix + d_matrix;
   transformed_param_matrix <- p_matrix + d_matrix;
   transformed_param_matrix <- d_matrix + p_matrix;
   transformed_param_matrix <- p_matrix + p_matrix;
-  //FIXME: transformed_param_vector <- d_vector - d_vector;
+  transformed_param_vector <- d_vector - d_vector;
   transformed_param_vector <- p_vector - d_vector;
   transformed_param_vector <- d_vector - p_vector;
   transformed_param_vector <- p_vector - p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector - d_row_vector;
+  transformed_param_row_vector <- d_row_vector - d_row_vector;
   transformed_param_row_vector <- p_row_vector - d_row_vector;
   transformed_param_row_vector <- d_row_vector - p_row_vector;
   transformed_param_row_vector <- p_row_vector - p_row_vector;
-  //FIXME: transformed_param_matrix <- d_matrix - d_matrix;
+  transformed_param_matrix <- d_matrix - d_matrix;
   transformed_param_matrix <- p_matrix - d_matrix;
   transformed_param_matrix <- d_matrix - p_matrix;
   transformed_param_matrix <- p_matrix - p_matrix;
-  //FIXME: transformed_param_vector <- d_real * d_vector;
+  transformed_param_vector <- d_real * d_vector;
   transformed_param_vector <- p_real * d_vector;
   transformed_param_vector <- d_real * p_vector;
   transformed_param_vector <- p_real * p_vector;
-  //FIXME: transformed_param_row_vector <- d_real * d_row_vector;
+  transformed_param_row_vector <- d_real * d_row_vector;
   transformed_param_row_vector <- p_real * d_row_vector;
   transformed_param_row_vector <- d_real * p_row_vector;
   transformed_param_row_vector <- p_real * p_row_vector;
-  //FIXME: transformed_param_matrix <- d_real * d_matrix;
+  transformed_param_matrix <- d_real * d_matrix;
   transformed_param_matrix <- p_real * d_matrix;
   transformed_param_matrix <- d_real * p_matrix;
   transformed_param_matrix <- p_real * p_matrix;
-  //FIXME: transformed_param_vector <- d_vector * d_real;
+  transformed_param_vector <- d_vector * d_real;
   transformed_param_vector <- p_vector * d_real;
   transformed_param_vector <- d_vector * p_real;
   transformed_param_vector <- p_vector * p_real;
-  //FIXME: transformed_param_row_vector <- d_row_vector * d_real;
+  transformed_param_row_vector <- d_row_vector * d_real;
   transformed_param_row_vector <- p_row_vector * d_real;
   transformed_param_row_vector <- d_row_vector * p_real;
   transformed_param_row_vector <- p_row_vector * p_real;
-  //FIXME: transformed_param_matrix <- d_matrix * d_real;
+  transformed_param_matrix <- d_matrix * d_real;
   transformed_param_matrix <- p_matrix * d_real;
   transformed_param_matrix <- d_matrix * p_real;
   transformed_param_matrix <- p_matrix * p_real;
@@ -669,111 +669,111 @@ transformed parameters {
   transformed_param_real <- p_row_vector * d_vector;
   transformed_param_real <- d_row_vector * p_vector;
   transformed_param_real <- p_row_vector * p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector * d_matrix;
+  transformed_param_row_vector <- d_row_vector * d_matrix;
   transformed_param_row_vector <- p_row_vector * d_matrix;
   transformed_param_row_vector <- d_row_vector * p_matrix;
   transformed_param_row_vector <- p_row_vector * p_matrix;
-  //FIXME: transformed_param_matrix <- d_matrix * d_real;
+  transformed_param_matrix <- d_matrix * d_real;
   transformed_param_matrix <- p_matrix * d_real;
   transformed_param_matrix <- d_matrix * p_real;
   transformed_param_matrix <- p_matrix * p_real;
-  //FIXME: transformed_param_vector <- d_matrix * d_vector;
+  transformed_param_vector <- d_matrix * d_vector;
   transformed_param_vector <- p_matrix * d_vector;
   transformed_param_vector <- d_matrix * p_vector;
   transformed_param_vector <- p_matrix * p_vector;
-  //FIXME: transformed_param_matrix <- d_matrix * d_matrix;
+  transformed_param_matrix <- d_matrix * d_matrix;
   transformed_param_matrix <- p_matrix * d_matrix;
   transformed_param_matrix <- d_matrix * p_matrix;
   transformed_param_matrix <- p_matrix * p_matrix;
 
   //   broadcast infix operators
-  //FIXME: transformed_param_vector <- d_vector + d_real;
+  transformed_param_vector <- d_vector + d_real;
   transformed_param_vector <- p_vector + d_real;
   transformed_param_vector <- d_vector + p_real;
   transformed_param_vector <- p_vector + p_real;
-  //FIXME: transformed_param_vector <- d_real + d_vector;
+  transformed_param_vector <- d_real + d_vector;
   transformed_param_vector <- p_real + d_vector; 
   transformed_param_vector <- d_real + p_vector;
   transformed_param_vector <- p_real + p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector + d_real;
+  transformed_param_row_vector <- d_row_vector + d_real;
   transformed_param_row_vector <- p_row_vector + d_real;
   transformed_param_row_vector <- d_row_vector + p_real;
   transformed_param_row_vector <- p_row_vector + p_real;
-  //FIXME: transformed_param_row_vector <- d_real + d_row_vector;
+  transformed_param_row_vector <- d_real + d_row_vector;
   transformed_param_row_vector <- p_real + d_row_vector; 
   transformed_param_row_vector <- d_real + p_row_vector;
   transformed_param_row_vector <- p_real + p_row_vector;
-  //FIXME: transformed_param_matrix <- d_matrix + d_real;
+  transformed_param_matrix <- d_matrix + d_real;
   transformed_param_matrix <- p_matrix + d_real;
   transformed_param_matrix <- d_matrix + p_real;
   transformed_param_matrix <- p_matrix + p_real;
-  //FIXME: transformed_param_matrix <- d_real + d_matrix;
+  transformed_param_matrix <- d_real + d_matrix;
   transformed_param_matrix <- p_real + d_matrix; 
   transformed_param_matrix <- d_real + p_matrix;
   transformed_param_matrix <- p_real + p_matrix;
-  //FIXME: transformed_param_vector <- d_vector - d_real;
+  transformed_param_vector <- d_vector - d_real;
   transformed_param_vector <- p_vector - d_real;
   transformed_param_vector <- d_vector - p_real;
   transformed_param_vector <- p_vector - p_real;
-  //FIXME: transformed_param_vector <- d_real - d_vector;
+  transformed_param_vector <- d_real - d_vector;
   transformed_param_vector <- p_real - d_vector; 
   transformed_param_vector <- d_real - p_vector;
   transformed_param_vector <- p_real - p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector - d_real;
+  transformed_param_row_vector <- d_row_vector - d_real;
   transformed_param_row_vector <- p_row_vector - d_real;
   transformed_param_row_vector <- d_row_vector - p_real;
   transformed_param_row_vector <- p_row_vector - p_real;
-  //FIXME: transformed_param_row_vector <- d_real - d_row_vector;
+  transformed_param_row_vector <- d_real - d_row_vector;
   transformed_param_row_vector <- p_real - d_row_vector; 
   transformed_param_row_vector <- d_real - p_row_vector;
   transformed_param_row_vector <- p_real - p_row_vector;
-  //FIXME: transformed_param_matrix <- d_matrix - d_real;
+  transformed_param_matrix <- d_matrix - d_real;
   transformed_param_matrix <- p_matrix - d_real;
   transformed_param_matrix <- d_matrix - p_real;
   transformed_param_matrix <- p_matrix - p_real;
-  //FIXME: transformed_param_matrix <- d_real - d_matrix;
+  transformed_param_matrix <- d_real - d_matrix;
   transformed_param_matrix <- p_real - d_matrix; 
   transformed_param_matrix <- d_real - p_matrix;
   transformed_param_matrix <- p_real - p_matrix;
   
   //   elementwise products
-  //FIXME: transformed_param_vector <- d_vector .* d_vector;
+  transformed_param_vector <- d_vector .* d_vector;
   transformed_param_vector <- p_vector .* d_vector;
   transformed_param_vector <- d_vector .* p_vector;
   transformed_param_vector <- p_vector .* p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector .* d_row_vector;
+  transformed_param_row_vector <- d_row_vector .* d_row_vector;
   transformed_param_row_vector <- p_row_vector .* d_row_vector;
   transformed_param_row_vector <- d_row_vector .* p_row_vector;
   transformed_param_row_vector <- p_row_vector .* p_row_vector;
-  //FIXME: transformed_param_matrix <- d_matrix .* d_matrix;
+  transformed_param_matrix <- d_matrix .* d_matrix;
   transformed_param_matrix <- p_matrix .* d_matrix;
   transformed_param_matrix <- d_matrix .* p_matrix;
   transformed_param_matrix <- p_matrix .* p_matrix;
-  //FIXME: transformed_param_vector <- d_vector ./ d_vector;
+  transformed_param_vector <- d_vector ./ d_vector;
   transformed_param_vector <- p_vector ./ d_vector;
   transformed_param_vector <- d_vector ./ p_vector;
   transformed_param_vector <- p_vector ./ p_vector;
-  //FIXME: transformed_param_row_vector <- d_row_vector ./ d_row_vector;
+  transformed_param_row_vector <- d_row_vector ./ d_row_vector;
   transformed_param_row_vector <- p_row_vector ./ d_row_vector;
   transformed_param_row_vector <- d_row_vector ./ p_row_vector;
   transformed_param_row_vector <- p_row_vector ./ p_row_vector;
-  //FIXME: transformed_param_matrix <- d_matrix ./ d_matrix;
+  transformed_param_matrix <- d_matrix ./ d_matrix;
   transformed_param_matrix <- p_matrix ./ d_matrix;
   transformed_param_matrix <- d_matrix ./ p_matrix;
   transformed_param_matrix <- p_matrix ./ p_matrix;
 
   //   elementwise logarithms
-  //FIXME: transformed_param_vector <- log(d_vector);
+  transformed_param_vector <- log(d_vector);
   transformed_param_vector <- log(p_vector);
-  //FIXME: transformed_param_row_vector <- log(d_row_vector);
+  transformed_param_row_vector <- log(d_row_vector);
   transformed_param_row_vector <- log(p_row_vector);
-  //FIXME: transformed_param_matrix <- log(d_matrix);
+  transformed_param_matrix <- log(d_matrix);
   transformed_param_matrix <- log(p_matrix);
-  //FIXME: transformed_param_vector <- exp(d_vector);
+  transformed_param_vector <- exp(d_vector);
   transformed_param_vector <- exp(p_vector);
-  //FIXME: transformed_param_row_vector <- exp(d_row_vector);
+  transformed_param_row_vector <- exp(d_row_vector);
   transformed_param_row_vector <- exp(p_row_vector);
-  //FIXME: transformed_param_matrix <- exp(d_matrix);
+  transformed_param_matrix <- exp(d_matrix);
   transformed_param_matrix <- exp(p_matrix);
 
   //  dot products
@@ -844,34 +844,34 @@ transformed parameters {
 
   // Slice and Package Functions
   //   diagonal matrices
-  //FIXME: transformed_param_vector <- diagonal(d_matrix);
+  transformed_param_vector <- diagonal(d_matrix);
   transformed_param_vector <- diagonal(p_matrix);
-  //FIXME: transformed_param_matrix <- diag_matrix(d_vector);
+  transformed_param_matrix <- diag_matrix(d_vector);
   transformed_param_matrix <- diag_matrix(p_vector);
-  //FIXME: transformed_param_vector <- col(d_matrix, d_int);
+  transformed_param_vector <- col(d_matrix, d_int);
   transformed_param_vector <- col(p_matrix, d_int);
-  //FIXME: transformed_param_row_vector <- row(d_matrix, d_int);
+  transformed_param_row_vector <- row(d_matrix, d_int);
   transformed_param_row_vector <- row(p_matrix, d_int);
 
   //   transposition postfix operator
-  //FIXME: transformed_param_matrix <- d_matrix';
+  transformed_param_matrix <- d_matrix';
   transformed_param_matrix <- p_matrix';  
-  //FIXME: transformed_param_row_vector <- d_vector';
+  transformed_param_row_vector <- d_vector';
   transformed_param_row_vector <- p_vector';
-  //FIXME: transformed_param_vector <- d_row_vector';
+  transformed_param_vector <- d_row_vector';
   transformed_param_vector <- p_row_vector';
 
   // Special Matrix Functions
-  //FIXME: transformed_param_vector <- softmax(d_vector);
+  transformed_param_vector <- softmax(d_vector);
   transformed_param_vector <- softmax(p_vector);
 
   // Linear Algebra Functions and Solvers
   //   matrix division infix operators
-  //FIXME: transformed_param_row_vector <- d_row_vector / d_matrix;
+  transformed_param_row_vector <- d_row_vector / d_matrix;
   transformed_param_row_vector <- p_row_vector / d_matrix;
   transformed_param_row_vector <- d_row_vector / p_matrix;
   transformed_param_row_vector <- p_row_vector / p_matrix;
-  //FIXME: transformed_param_vector <- d_matrix \ d_vector;
+  transformed_param_vector <- d_matrix \ d_vector;
   transformed_param_vector <- p_matrix \ d_vector;
   transformed_param_vector <- d_matrix \ p_vector;
   transformed_param_vector <- p_matrix \ p_vector;
@@ -881,19 +881,19 @@ transformed parameters {
   transformed_param_real <- trace(p_matrix);
   transformed_param_real <- determinant(d_matrix);
   transformed_param_real <- determinant(p_matrix);
-  //FIXME: transformed_param_matrix <- inverse(d_matrix);
+  transformed_param_matrix <- inverse(d_matrix);
   transformed_param_matrix <- inverse(p_matrix);
-  //FIXME: transformed_param_vector <- eigenvalues(d_matrix);
+  transformed_param_vector <- eigenvalues(d_matrix);
   transformed_param_vector <- eigenvalues(p_matrix);
-  //FIXME: transformed_param_matrix <- eigenvectors(d_matrix);
+  transformed_param_matrix <- eigenvectors(d_matrix);
   transformed_param_matrix <- eigenvectors(p_matrix);
-  //FIXME: transformed_param_vector <- eigenvalues_sym(d_matrix);
+  transformed_param_vector <- eigenvalues_sym(d_matrix);
   transformed_param_vector <- eigenvalues_sym(p_matrix);
-  //FIXME: transformed_param_matrix <- eigenvectors_sym(d_matrix);
+  transformed_param_matrix <- eigenvectors_sym(d_matrix);
   transformed_param_matrix <- eigenvectors_sym(p_matrix);
-  //FIXME: transformed_param_matrix <- cholesky_decompose(d_matrix);
+  transformed_param_matrix <- cholesky_decompose(d_matrix);
   transformed_param_matrix <- cholesky_decompose(p_matrix);
-  //FIXME: transformed_param_vector <- singular_values(d_matrix);
+  transformed_param_vector <- singular_values(d_matrix);
   transformed_param_vector <- singular_values(p_matrix);
 
   //*** Discrete Probabilities ***

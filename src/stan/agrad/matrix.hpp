@@ -2326,12 +2326,22 @@ namespace stan {
              vector_v& s);
 
 
+    // FIXME:  double val?
     inline void assign_to_var(stan::agrad::var& var, const double& val) {
       var = val;
     }
     inline void assign_to_var(stan::agrad::var& var, const stan::agrad::var& val) {
       var = val;
     }
+    // FIXME:  int val?
+    inline void assign_to_var(int& n_lhs, const int& n_rhs) {
+      n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
+    }
+    // FIXME:  double val?
+    inline void assign_to_var(double& n_lhs, const double& n_rhs) {
+      n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
+    }
+
     template <typename LHS, typename RHS>
     inline void assign_to_var(std::vector<LHS>& x, const std::vector<RHS>& y) {
       for (size_t i = 0; i < x.size(); ++i)
@@ -2351,7 +2361,7 @@ namespace stan {
     }
     template <typename LHS, typename RHS>
     inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,Eigen::Dynamic>& x, 
-                              const Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>& y) {
+                      const Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>& y) {
       for (size_t n = 0; n < x.cols(); ++n)
         for (size_t m = 0; m < x.rows(); ++m)
           assign_to_var(x(m,n),y(m,n));
@@ -2366,7 +2376,6 @@ namespace stan {
       var = val;
     }
     
-
     template <typename LHS, typename RHS>
     inline void assign(LHS& var,
                        const RHS& val) {

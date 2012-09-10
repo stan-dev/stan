@@ -1001,14 +1001,15 @@ namespace stan {
       }
       void operator()(assignment const& x) const {
         generate_indent(indent_,o_);
+        o_ << "assign(";
         generate_indexed_expr(x.var_dims_.name_,
                               x.var_dims_.dims_,
                               x.var_type_.base_type_,
                               x.var_type_.dims_.size(),
                               o_);
-        o_ << " = ";
+        o_ << ", ";
         generate_expression(x.expr_,o_);
-        o_ << ";" << EOL;
+        o_ << ");" << EOL;
       }
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
