@@ -3,6 +3,9 @@
 # make 3.81.
 ##
 
+## Disable implicit rules.
+SUFFIXES:
+
 # The default target of this Makefile is...
 help:
 
