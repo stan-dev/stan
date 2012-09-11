@@ -66,7 +66,7 @@ namespace stan {
         return lp;
       }
       Eigen::DiagonalMatrix<T_y,Eigen::Dynamic> D(K);
-      D.diagonal() = sds.inverse();  // FIXME:  D.diagonal() inefficient
+      D.diagonal() = sds.inverse();
       lp += lkj_corr_log<propto,T_y,T_shape,Policy>(D * y * D, eta, Policy());
       return lp;
     }
