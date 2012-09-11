@@ -57,6 +57,8 @@ add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
+add("dot_self",DOUBLE_T,VECTOR_T);
+add("dot_self",DOUBLE_T,ROW_VECTOR_T);
 add_ternary("double_exponential_log");
 add_nullary("e");
 add("eigenvalues",VECTOR_T,MATRIX_T);

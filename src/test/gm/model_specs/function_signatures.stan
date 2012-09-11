@@ -216,6 +216,9 @@ transformed data {
   transformed_data_real <- dot_product(d_row_vector, d_vector);
   transformed_data_real <- dot_product(d_row_vector, d_row_vector);
 
+  transformed_data_real <- dot_self(d_vector);
+  transformed_data_real <- dot_self(d_row_vector);
+
   //  reductions
   transformed_data_real <- min(d_vector);
   transformed_data_real <- min(d_row_vector);
@@ -793,6 +796,9 @@ transformed parameters {
   transformed_param_real <- dot_product(p_row_vector, d_row_vector);
   transformed_param_real <- dot_product(d_row_vector, p_row_vector);
   transformed_param_real <- dot_product(p_row_vector, p_row_vector);
+
+  transformed_param_real <- dot_self(p_vector);
+  transformed_param_real <- dot_self(p_row_vector);
 
   //  reductions
   transformed_param_real <- min(d_vector);
