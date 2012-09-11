@@ -2367,6 +2367,9 @@ namespace stan {
           assign_to_var(x(m,n),y(m,n));
     }
 
+    inline void assign_to_nonvar(double& var, int val) {
+      var = val;
+    }
     template <typename T1, typename T2>
     inline void assign_to_nonvar(T1& var, const T2& val) {
       throw std::domain_error("illegal assignment with mismatched LHS and RHS types");
@@ -2375,6 +2378,7 @@ namespace stan {
     inline void assign_to_nonvar(T& var, const T& val) {
       var = val;
     }
+    
     
     template <typename LHS, typename RHS>
     inline void assign(LHS& var,
@@ -2387,6 +2391,10 @@ namespace stan {
         assign_to_nonvar(var,val);
     }
     
+
+
+    
+
 
 
   }
