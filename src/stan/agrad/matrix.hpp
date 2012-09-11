@@ -2367,33 +2367,39 @@ namespace stan {
           assign_to_var(x(m,n),y(m,n));
     }
 
-    inline void assign_to_nonvar(double& var, int val) {
-      var = val;
-    }
-    template <typename T1, typename T2>
-    inline void assign_to_nonvar(T1& var, const T2& val) {
-      throw std::domain_error("illegal assignment with mismatched LHS and RHS types");
-    }
-    template <typename T>
-    inline void assign_to_nonvar(T& var, const T& val) {
-      var = val;
-    }
-    
     
     template <typename LHS, typename RHS>
-    inline void assign(LHS& var,
-                       const RHS& val) {
-      using stan::is_constant_struct;
-      if (is_constant_struct<RHS>::value 
-          && !is_constant_struct<LHS>::value)
+    struct needs_promotion {
+      enum { value = ( is_constant_struct<RHS>::value 
+                       && !is_constant_struct<LHS>::value) };
+    };
+
+    template <bool PromoteRHS, typename LHS, typename RHS>
+    struct assigner {
+      static inline void assign(LHS& var, const RHS& val) {
+        throw std::domain_error("should not call base class of assigner");
+      }
+    };
+
+    template <typename LHS, typename RHS>
+    struct assigner<false,LHS,RHS> {
+      static inline void assign(LHS& var, const RHS& val) {
+        var = val;
+      }
+    };
+
+    template <typename LHS, typename RHS>
+    struct assigner<true,LHS,RHS> {
+      static inline void assign(LHS& var, const RHS& val) {
         assign_to_var(var,val);
-      else
-        assign_to_nonvar(var,val);
+      }
+    };
+
+    
+    template <typename LHS, typename RHS>
+    inline void assign(LHS& var, const RHS& val) {
+      assigner<needs_promotion<LHS,RHS>::value, LHS, RHS>::assign(var,val);
     }
-    
-
-
-    
 
 
 
