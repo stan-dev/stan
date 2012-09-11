@@ -185,10 +185,11 @@ docs: manual doxygen
 ##
 # Clean up.
 ##
+MODEL_SPECS := $(wildcard src/test/gm/model_specs/*.stan)
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
-	$(RM) -r *.dSYM
-	$(RM) src/test/gm/model_specs/*.cpp
+	$(RM) $(wildcard *.dSYM) $(wildcard *.d.*)
+	$(RM) $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE))
 
 clean-dox:
 	$(RM) -r doc/api
@@ -204,4 +205,5 @@ clean-demo:
 
 clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
+	$(RM) $(wildcard *.d) $(wildcard *.o)
 
