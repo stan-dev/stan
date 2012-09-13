@@ -28,16 +28,16 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_shape, T_inv_scale>::type lp;
-      if (!check_nonnegative(function, n, "n", &lp, Policy()))
+      if (!check_nonnegative(function, n, "Failures variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Shape, alpha,", &lp, Policy()))
+      if (!check_finite(function, alpha, "Shape parameter", &lp, Policy()))
         return lp;
-      if (!check_positive(function, alpha, "Shape, alpha,", &lp, Policy()))
+      if (!check_positive(function, alpha, "Shape parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, beta, "Inverse scale, beta,",
+      if (!check_finite(function, beta, "Inverse scale parameter",
                         &lp, Policy()))
         return lp;
-      if (!check_positive(function, beta, "Inverse scale, beta,", 
+      if (!check_positive(function, beta, "Inverse scale parameter", 
                           &lp, Policy()))
         return lp;
       

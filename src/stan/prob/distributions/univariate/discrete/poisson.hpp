@@ -25,13 +25,13 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_rate>::type lp;
-      if (!check_nonnegative(function, n, "Number n", &lp, Policy()))
+      if (!check_nonnegative(function, n, "Random variable", &lp, Policy()))
         return lp;
       if (!check_not_nan(function, lambda,
-                         "Rate parameter, lambda,", &lp, Policy()))
+                         "Rate parameter", &lp, Policy()))
         return lp;
       if (!check_nonnegative(function, lambda,
-                             "Rate parameter, lambda,", &lp, Policy()))
+                             "Rate parameter", &lp, Policy()))
         return lp;
       
       if (lambda == 0)

@@ -23,15 +23,15 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale>::type lp(0.0);
-      if (!check_finite(function, y, "Random variate y", &lp, Policy()))
+      if (!check_finite(function, y, "Random variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu,",
+      if (!check_finite(function, mu, "Location parameter",
                         &lp, Policy()))
         return lp;
-      if (!check_finite(function, sigma, "Scale parameter, sigma,", &lp, 
+      if (!check_finite(function, sigma, "Scale parameter", &lp, 
                         Policy()))
         return lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,",
+      if (!check_positive(function, sigma, "Scale parameter",
                           &lp, Policy()))
         return lp;
 

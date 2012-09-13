@@ -29,11 +29,11 @@ namespace stan {
 
       typename promote_args<T_prob>::type lp(0.0);
       if (!check_bounded(function, n, lb, theta.size()-1,
-                         "Number of items, n,",
+                         "Number of categories",
                          &lp, Policy()))
         return lp;
       if (!check_simplex(function, theta,
-                         "Simplex, theta,",
+                         "Probabilities parameter",
                          &lp, Policy()))
         return lp;
   

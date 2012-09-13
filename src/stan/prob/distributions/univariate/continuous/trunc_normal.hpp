@@ -56,13 +56,13 @@ namespace stan {
       
       typename promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type lp(0.0);
 
-      if (!check_not_nan(function, alpha, "Lower bound, alpha", 
+      if (!check_not_nan(function, alpha, "Lower bound", 
                          &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, beta, "Upper bound, beta", 
+      if (!check_not_nan(function, beta, "Upper bound", 
                          &lp, Policy()))
         return lp;
-      if (!check_greater(function, beta, alpha, "Upper bound, beta", 
+      if (!check_greater(function, beta, alpha, "Upper bound", 
                          &lp, Policy()))
         return lp;
       
