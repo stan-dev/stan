@@ -61,7 +61,7 @@ namespace stan {
     void autocovariance(const std::vector<T>& y,
                         std::vector<T>& acov) {
       Eigen::FFT<T> fft;
-      return autocovariance(y,acov,fft);
+      autocovariance(y,acov,fft);
     }
 
 
