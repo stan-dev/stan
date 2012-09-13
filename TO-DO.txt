@@ -3,14 +3,14 @@ STAN TO-DO LIST
 
 The to-do list is organized into the following sections:
 
-* C++ API                       * RStan
+* C++ API                              * RStan
 * Modeling Language             * Manual
-* Build                         * Web Pages
-* Testing                       * Release Mgmt
-* Command-Line                  * Models
+* Build                                    * Web Pages
+* Testing                                * Release Mgmt
+* Command-Line                   * Models
 
  
-V 1.0.1
+V 1.0.2
 ======================================================================
 
 
