@@ -837,6 +837,183 @@ model {
 \end{quote}   
 
 
+\section{Item-Response Theory Models}
+
+Item-response theory (IRT) models the situation in which a number of
+students each answer one or more of a group of test questions.  The
+model is based on parameters for the ability of the students, the
+difficulty of the questions, and in more articulated models, the
+discimrinativess of the questions and the probability of guessing
+correctly; see \citep[pps.~314--320]{GelmanHill:2007} for a textbook
+introduction to hierarchical IRT models and \citep{Curtis:2010} for
+encodings of a range of IRT models in BUGS.
+
+
+\subsection{Data Declaration with Missingness}
+
+The data provided for an IRT model may be declared as follows
+to account for the fact that not every student is required to answer
+every question.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> J;              // number of students
+  int<lower=1> K;              // number of questions
+  int<lower=1> N;              // number of observations
+  int<lower=1,upper=J> jj[N];  // student for observation n
+  int<lower=1,upper=K> kk[N];  // question for observation n
+  int<lower=0,upper=1> y[N];   // correctness for observation n
+}
+\end{Verbatim}
+\end{quote}
+%
+This declares a total of \code{N} student-question pairs in the data
+set, where each \code{n} in \code{1:N} indexes a binary observation
+\code{y[n]} of the correctness of the answer of student \code{jj[n]}
+on question \code{kk[n]}.
+
+The prior hyperparameters will be hard coded in the rest of this
+section for simplicity, though they could be coded as data in
+Stan for more flexibility.
+
+\subsection{1PL (Rasch) Model}
+
+The 1PL item-response model, also known as the Rasch model, has one
+parameter (1P) for questions and uses the logistic link function (L).
+This model is distributed with Stan in the file
+\url{src/models/misc/irt/irt.stan}.
+
+The model parameters are declared as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+parameters {    
+  real delta;         // mean student ability
+  real alpha[J];      // ability of student j - mean ability
+  real beta[K];       // difficulty of question k
+}
+\end{Verbatim}
+\end{quote}
+%
+The parameter \code{alpha[j]} is the ability coefficient for student
+\code{j} and \code{beta[k]} is the difficulty coefficient for question
+\code{k}.  The non-standard parameterization used here also includes
+an intercept term \code{delta}, which represents the average student's
+response to the average question.%
+%
+\footnote{\citep{GelmanHill:2007} treat the $\delta$ term equivalently
+  as the location parameter in the distribution of student abilities.}
+%
+The model itself is as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+model {
+  alpha ~ normal(0,1);         // informative true prior
+  beta ~ normal(0,1);          // informative true prior
+  delta ~ normal(.75,1);       // informative true prior
+  for (n in 1:N)
+    y[n] ~ bernoulli_logit(alpha[jj[n]] - beta[kk[n]] + delta);
+}
+\end{Verbatim}
+\end{quote}
+%
+This model uses the logit-parameterized Bernoulli distribution, where
+\[
+\code{bernoulli\_logit}(y|\alpha) =
+\code{bernoulli}(y|\mbox{logit}^{-1}(\alpha)).
+\]
+%
+The key to understanding it is the term inside the
+\code{bernoulli\_logit} distribution, from which it follows that
+\[
+\mbox{Pr}[Y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
++ \delta).
+\]
+%
+The model suffers from additive identifiability issues without the
+priors.  For example, adding a term $\xi$ to each $\alpha_j$ and
+$\beta_k$ results in the same predictions.  The use of priors for
+$\alpha$ and $\beta$ located at 0 identifies the parameters; see
+\citep{GelmanHill:2007} for a discussion of identifiability issues and
+alternative approaches to identification.  
+
+For testing purposes, the IRT 1PL model distributed with Stan uses
+informative priors that match the actual data generation process used
+to simulate the data in R (the simulation code is supplied in the same
+directory as the models).  This is unrealistic for most practical
+applications, but allows Stan's inferences to be validated.  A simple
+sensitivity analysis with fatter priors shows that the posterior is
+fairly sensitive to the prior even with 400 students and 100 questions
+and only 25\% missingness at random.  For real applications, the
+priors should be fit hierarchically along with the other parameters,
+as described in the next section.
+
+
+\subsection{Multilevel 2PL Model}
+
+The simple 1PL model described in the previous section is generalized
+in this section with the addition of a discrimination parameter to
+model how noisy a question is and by adding multilevel priors for the
+student and question parameters.
+
+The model parameters are declared as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {    
+  real delta;                    // mean student ability
+  real alpha[J];                 // ability for student j - mean ability
+  real beta[K];                  // difficulty for question k
+  real log_gamma[K];             // discriminativeness for question k
+  real<lower=0> sigma_alpha;     // sd of student abilities  
+  real<lower=0> sigma_beta;      // sd of question difficulties 
+  real<lower=0> sigma_gamma;     // sd of log question discriminativeness
+}
+\end{Verbatim}
+\end{quote}
+%
+The parameters should be clearer after the model definition.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  alpha ~ normal(0,sigma_alpha); 
+  beta ~ normal(0,sigma_beta);   
+  log_gamma ~ normal(0,sigma_gamma);
+  delta ~ cauchy(0,5);
+  sigma_alpha ~ cauchy(0,5);
+  sigma_beta ~ cauchy(0,5);
+  sigma_gamma ~ cauchy(0,5);
+  for (n in 1:N)
+    y[n] ~ bernoulli_logit( exp(log_gamma[kk[n]])
+                            * (alpha[jj[n]] - beta[kk[n]] + delta) );
+}
+\end{Verbatim}
+\end{quote}
+%
+First, the predictor inside the \code{bernoulli\_logit} term is
+equivalent to the predictor of the 1PL model multipled by the
+discriminativeness for the question, \code{exp(log\_gamma[kk[n]])}.
+The parameter \code{log\_gamma[k]} represents how discriminative a
+question is, with log discriminations above 0 being less (because
+their exponentiation drives the predictor away from zero, which drives
+the prediction away from 0.5) and discriminations below 0 being more
+noisy (driving the predictor toward zero and hence the prediction
+toward 0.5).
+
+The intercept term \code{delta} can't be modeled hierarchically, so it
+is given a weakly informative $\distro{Cauchy}(0,5)$ prior.
+Similarly, the scale terms, \code{sigma\_alpha}, \code{sigma\_beta},
+and \code{sigma\_gamma}, are given half-Cauchy priors.  The truncation
+in the half-Cauchy prior is implicit; explicit truncation is not
+necessary because the log probabilty need only be calculated up to a
+proportion and the scale variables are constrained to $(0,\infty)$ by 
+their declarations.
+
+
+
 \section{Autoregressive Models}
 
 A first-order autoregressive model (AR(1)) with normal noise takes
@@ -1053,13 +1230,57 @@ the log probability function, making gradients the obvious target for
 optimization.  \Stan's gradient calculations with algorithmic
 differentiation require a template expression to be allocated%
 %
-\footnote{\Stan uses its own arena-based allocation, so the time is
-not as bad as it would be with a raw call to \code{new}.}
+\footnote{\Stan uses its own arena-based allocation, so allocation and
+  deallocation are faster than with a raw call to \code{new}.}
 %
 and constructed for each subexpression of a \Stan program involving
 parameters or transformed parameters.  This section defines
 optimization strategies based on vectorizing these subexpressions to
 reduce the work done during algorithmic differentiation.
+
+\subsection{Vectorizing Summations}
+
+Because of the gradient bottleneck described in the previous section,
+it is more efficient to collect a sequence of summands into a vector
+or array and then apply the \code{sum()} operation than it is to
+continually call the \code{+=} operator.  For example, consider the
+following code snippet, where \code{foo()} is some operation that
+depends on \code{n}.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) 
+   total += foo(n,...);
+\end{Verbatim}
+\end{quote}
+%
+This code has to create intermediate representations for each
+of the \code{N} summands.  
+
+A faster alternative is to copy the values into a vector, then
+apply the \code{sum()} operator, as in the following refactoring.
+%
+\begin{quote}
+\begin{Verbatim}
+{  
+  vector[N] summands;
+  for (n in 1:N) 
+    summands[n] = foo(n,...);
+  total += sum(summands);
+}
+\end{Verbatim}
+\end{quote}
+%
+Syntactically, the replacement is a statement block delineated
+by curly brackets (\Verb|{|, \Verb|}|), starting with the definition
+of the local variable \code{summands}.
+
+Even though it involves extra work to allocate the \code{summands}
+vector and copy \code{N} values into it, the savings in
+differentiation more than make up for it.  Perhaps surprisingly,
+it will also use substantially less memory overall than incrementing
+\code{total} within the loop.
+
 
 \subsection{Vectorization through Matrix Operations}
 
