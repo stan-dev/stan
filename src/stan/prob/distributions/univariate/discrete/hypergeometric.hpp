@@ -21,7 +21,7 @@ namespace stan {
                        const unsigned int a, 
                        const unsigned int b, 
                        const Policy&) {
-      static const char* function = "stan::prob::hypergeometric_log<%1%>(%1%)";
+      static const char* function = "stan::prob::hypergeometric_log(%1%)";
 
       using stan::math::check_finite;      
       using stan::math::check_bounded;

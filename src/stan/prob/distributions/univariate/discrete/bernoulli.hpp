@@ -18,7 +18,7 @@ namespace stan {
     bernoulli_log(const int n, 
                   const T_prob& theta, 
                   const Policy&) {
-      static const char* function = "stan::prob::bernoulli_log<%1%>(%1%)";
+      static const char* function = "stan::prob::bernoulli_log(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
@@ -81,7 +81,7 @@ namespace stan {
     bernoulli_logit_log(const int n, 
                         const T_prob& theta, 
                         const Policy&) {
-      static const char* function = "stan::prob::bernoulli_logit_log<%1%>(%1%)";
+      static const char* function = "stan::prob::bernoulli_logit_log(%1%)";
 
       using stan::math::check_not_nan;
       using stan::math::check_bounded;

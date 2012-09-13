@@ -37,7 +37,7 @@ namespace stan {
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
                               const Policy&) {
       static const char* function 
-        = "stan::prob::scaled_inv_chi_square_log<%1%>(%1%)";
+        = "stan::prob::scaled_inv_chi_square_log(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_positive;

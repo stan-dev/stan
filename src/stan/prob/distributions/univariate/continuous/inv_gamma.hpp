@@ -32,7 +32,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, 
                   const Policy&) {
-      static const char* function = "stan::prob::inv_gamma_log<%1%>(%1%)";
+      static const char* function = "stan::prob::inv_gamma_log(%1%)";
       
       using stan::math::check_not_nan;
       using stan::math::check_positive;

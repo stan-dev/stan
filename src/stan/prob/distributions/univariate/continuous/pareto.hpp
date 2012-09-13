@@ -16,7 +16,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha, 
                const Policy&) {
-      static const char* function = "stan::prob::pareto_log<%1%>(%1%)";
+      static const char* function = "stan::prob::pareto_log(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_positive;

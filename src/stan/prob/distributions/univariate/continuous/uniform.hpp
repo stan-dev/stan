@@ -39,7 +39,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, 
                 const Policy&) {
-      static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
+      static const char* function = "stan::prob::uniform_log(%1%)";
       
       using stan::math::check_not_nan;
       using stan::math::check_finite;

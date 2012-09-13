@@ -21,7 +21,7 @@ namespace stan {
     multinomial_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
                     const Policy&) {
-      static const char* function = "stan::prob::multinomial_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multinomial_log(%1%)";
 
       using stan::math::check_nonnegative;
       using stan::math::check_simplex;

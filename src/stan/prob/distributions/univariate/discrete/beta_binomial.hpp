@@ -20,7 +20,7 @@ namespace stan {
                       const T_size1& alpha, 
                       const T_size2& beta, 
                       const Policy&) {
-      static const char* function = "stan::prob::beta_binomial_log<%1%>(%1%)";
+      static const char* function = "stan::prob::beta_binomial_log(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;

@@ -56,7 +56,7 @@ namespace stan {
              const T_shape& eta, 
              const Policy&) {
       static const char* function 
-        = "stan::prob::lkj_corr_cholesky_log<%1%>(%1%)";
+        = "stan::prob::lkj_corr_cholesky_log(%1%)";
 
       using boost::math::tools::promote_args;
       using stan::math::check_positive;
@@ -119,7 +119,7 @@ namespace stan {
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
                  const T_shape& eta, 
                  const Policy&) {
-      static const char* function = "stan::prob::lkj_corr_log<%1%>(%1%)";
+      static const char* function = "stan::prob::lkj_corr_log(%1%)";
 
       using stan::math::check_size_match;
       using stan::math::check_not_nan;

@@ -31,7 +31,7 @@ namespace stan {
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                         const Policy&) {
-      static const char* function = "stan::prob::multi_student_t<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_student_t(%1%)";
 
       using stan::math::check_size_match;
       using stan::math::check_finite;
