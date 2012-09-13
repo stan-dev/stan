@@ -18,7 +18,7 @@ namespace stan {
     double_exponential_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                            const Policy&) {
       static const char* function
-        = "stan::prob::double_exponential_log<%1%>(%1%)";
+        = "stan::prob::double_exponential_log(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_positive;

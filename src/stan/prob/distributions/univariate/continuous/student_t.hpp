@@ -42,7 +42,7 @@ namespace stan {
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma, 
                   const Policy&) {
-      static const char* function = "stan::prob::student_t_log<%1%>(%1%)";
+      static const char* function = "stan::prob::student_t_log(%1%)";
 
       using stan::math::check_positive;
       using stan::math::check_finite;

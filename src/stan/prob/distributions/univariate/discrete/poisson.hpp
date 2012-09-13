@@ -18,7 +18,7 @@ namespace stan {
     poisson_log(const unsigned int n, const T_rate& lambda, 
                 const Policy&) {
 
-      static const char* function = "stan::prob::poisson_log<%1%>(%1%)";
+      static const char* function = "stan::prob::poisson_log(%1%)";
       
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;

@@ -39,7 +39,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                const Policy& /*policy*/) {
-      static const char* function = "stan::prob::normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::normal_log(%1%)";
 
       using std::log;
       using stan::is_constant;

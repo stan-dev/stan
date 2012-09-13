@@ -35,7 +35,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_dof>::type
     inv_chi_square_log(const T_y& y, const T_dof& nu, 
                        const Policy&) {
-      static const char* function = "stan::prob::inv_chi_square_log<%1%>(%1%)";
+      static const char* function = "stan::prob::inv_chi_square_log(%1%)";
 
       using stan::math::check_finite;      
       using stan::math::check_positive;

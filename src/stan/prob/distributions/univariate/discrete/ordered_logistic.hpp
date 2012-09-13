@@ -65,7 +65,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::log1p_exp;
 
-      static const char* function = "stan::prob::ordered_logistic<%1%>(%1%)";
+      static const char* function = "stan::prob::ordered_logistic(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_positive;

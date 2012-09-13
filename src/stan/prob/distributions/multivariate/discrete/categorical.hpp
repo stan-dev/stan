@@ -19,7 +19,7 @@ namespace stan {
     categorical_log(const typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
                     const Policy&) {
-      static const char* function = "stan::prob::categorical_log<%1%>(%1%)";
+      static const char* function = "stan::prob::categorical_log(%1%)";
 
       using stan::math::check_bounded;
       using stan::math::check_simplex;

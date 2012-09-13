@@ -34,7 +34,7 @@ namespace stan {
                   const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                   const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                   const Policy&) {
-      static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
       using stan::math::mdivide_left_tri_low;
       using stan::math::dot_self;
@@ -122,7 +122,7 @@ namespace stan {
                   const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                   const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                   const Policy&) {
-      static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
       using stan::math::mdivide_left_tri_low;
       using stan::math::columns_dot_self;
@@ -236,7 +236,7 @@ namespace stan {
              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
              const Policy&) {
-      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       using stan::math::check_size_match;
@@ -303,7 +303,7 @@ namespace stan {
              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
              const Policy&) {
-      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       using stan::math::check_size_match;

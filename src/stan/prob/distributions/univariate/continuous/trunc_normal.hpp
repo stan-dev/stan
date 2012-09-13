@@ -45,7 +45,7 @@ namespace stan {
     trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                      const T_alpha& alpha, const T_beta& beta,
                      const Policy&) {
-      static const char* function = "stan::prob::trunc_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::trunc_normal_log(%1%)";
       
       
       using stan::math::check_greater;

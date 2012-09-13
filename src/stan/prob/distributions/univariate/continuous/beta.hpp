@@ -38,7 +38,7 @@ namespace stan {
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
              const Policy&) {
-      static const char* function = "stan::prob::beta_log<%1%>(%1%)";
+      static const char* function = "stan::prob::beta_log(%1%)";
       
       using stan::math::check_positive;
       using stan::math::check_finite;

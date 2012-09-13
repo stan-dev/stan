@@ -50,7 +50,7 @@ namespace stan {
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                 const Policy&) {
-      static const char* function = "stan::prob::wishart_log<%1%>(%1%)";
+      static const char* function = "stan::prob::wishart_log(%1%)";
 
       using stan::math::check_greater_or_equal;
       using stan::math::check_size_match;
