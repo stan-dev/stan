@@ -29,19 +29,19 @@ namespace stan {
       
       typename promote_args<T_prob>::type lp(0.0);
       if (!check_bounded(function, n, 0, N,
-                         "Successes, n,",
+                         "Successes variable",
                          &lp, Policy()))
         return lp;
       if (!check_nonnegative(function, N,
-                             "Population size, N,",
+                             "Population size parameter",
                              &lp, Policy()))
         return lp;
       if (!check_finite(function, theta,
-                        "Probability, theta,",
+                        "Probability parameter",
                         &lp, Policy()))
         return lp;
       if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability, theta,",
+                         "Probability parameter",
                          &lp, Policy()))
         return lp;
 

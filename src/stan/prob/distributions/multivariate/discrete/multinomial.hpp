@@ -29,9 +29,9 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_prob>::type lp(0.0);
-      if (!check_nonnegative(function, ns, "Sample sizes, ns,", &lp, Policy()))
+      if (!check_nonnegative(function, ns, "Number of trials variable", &lp, Policy()))
         return lp;
-      if (!check_simplex(function, theta, "Probabilities, theta,", 
+      if (!check_simplex(function, theta, "Probabilites parameter", 
                          &lp, Policy()))
         return lp;
       if (!check_size_match(function, ns.size(), theta.rows(), &lp, Policy()))

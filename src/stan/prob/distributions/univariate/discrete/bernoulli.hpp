@@ -24,12 +24,12 @@ namespace stan {
       using stan::math::check_bounded;
 
       T_prob lp;
-      if (!check_bounded(function, n, 0, 1, "n", &lp, Policy()))
+      if (!check_bounded(function, n, 0, 1, "Random variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, theta, "Probability, theta,", &lp, Policy()))
+      if (!check_finite(function, theta, "Probability parameter", &lp, Policy()))
         return lp;
       if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability, theta,", &lp, Policy()))
+                         "Probability parameter", &lp, Policy()))
         return lp;
 
       using stan::math::log1m;
@@ -89,7 +89,7 @@ namespace stan {
       T_prob lp;
       if (!check_bounded(function, n, 0, 1, "n", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, theta, "logit(probability), theta",
+      if (!check_not_nan(function, theta, "Logit transformed probability parameter",
                          &lp, Policy()))
         return lp;
 

@@ -47,18 +47,18 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_shape,T_inv_scale>::type lp = 0.0;
-      if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Shape parameter, alpha,", 
+      if (!check_finite(function, alpha, "Shape parameter", 
                         &lp, Policy())) 
         return lp;
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", 
+      if (!check_positive(function, alpha, "Shape parameter", 
                           &lp, Policy())) 
         return lp;
-      if (!check_finite(function, beta, "Inverse scale parameter, beta,", 
+      if (!check_finite(function, beta, "Inverse scale parameter", 
                         &lp, Policy())) 
         return lp;
-      if (!check_positive(function, beta, "Inverse scale parameter, beta,", 
+      if (!check_positive(function, beta, "Inverse scale parameter", 
                           &lp, Policy())) 
         return lp;
       
@@ -131,21 +131,21 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_inv_scale>::type result;
-      if (!check_finite(function, y, "Random variate, y,", &result, Policy()))
+      if (!check_finite(function, y, "Random variable", &result, Policy()))
         return result;
-      if (!check_nonnegative(function, y, "Random variate, y,", &result,
+      if (!check_nonnegative(function, y, "Random variable", &result,
                              Policy()))
         return result;
-      if (!check_finite(function, alpha, "Shape parameter, alpha,", &result, 
+      if (!check_finite(function, alpha, "Shape parameter", &result, 
                         Policy())) 
         return result;
-      if (!check_positive(function, alpha, "Shape parameter, alpha,", &result, 
+      if (!check_positive(function, alpha, "Shape parameter", &result, 
                           Policy())) 
         return result;
-      if (!check_finite(function, beta, "Inverse scale parameter, beta,", 
+      if (!check_finite(function, beta, "Inverse scale parameter", 
                         &result, Policy())) 
         return result;
-      if (!check_positive(function, beta, "Inverse scale parameter, beta,", 
+      if (!check_positive(function, beta, "Inverse scale parameter", 
                           &result, Policy())) 
         return result;
       
