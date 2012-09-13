@@ -189,7 +189,7 @@ MODEL_SPECS := $(wildcard src/test/gm/model_specs/*.stan)
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) $(wildcard *.dSYM) $(wildcard *.d.*)
-	$(RM) $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)))
 
 clean-dox:
 	$(RM) -r doc/api
