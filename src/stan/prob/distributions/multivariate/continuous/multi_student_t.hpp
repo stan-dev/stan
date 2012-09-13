@@ -31,7 +31,7 @@ namespace stan {
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                         const Policy&) {
-      static const char* function = "stan::prob::multi_student_t<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_student_t(%1%)";
 
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -47,20 +47,20 @@ namespace stan {
         return lp;
       if (!check_size_match(function, y.size(), Sigma.cols(), &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "y", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
         return lp;
-      if (!check_symmetric(function, Sigma, "Sigma", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Scale parameter", &lp, Policy()))
         return lp;
 
       // allows infinities
       if (!check_not_nan(function, nu, 
-                         "Degrees of freedom, nu", &lp,
+                         "Degrees of freedom parameter", &lp,
                          Policy()))
         return lp;
       if (!check_positive(function, nu, 
-                          "Degrees of freedom, nu", &lp,
+                          "Degrees of freedom parameter", &lp,
                           Policy()))
         return lp;
       

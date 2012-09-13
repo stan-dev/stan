@@ -19,7 +19,7 @@ namespace stan {
     categorical_log(const typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
                     const Policy&) {
-      static const char* function = "stan::prob::categorical_log<%1%>(%1%)";
+      static const char* function = "stan::prob::categorical_log(%1%)";
 
       using stan::math::check_bounded;
       using stan::math::check_simplex;
@@ -29,11 +29,11 @@ namespace stan {
 
       typename promote_args<T_prob>::type lp(0.0);
       if (!check_bounded(function, n, lb, theta.size()-1,
-                         "Number of items, n,",
+                         "Number of categories",
                          &lp, Policy()))
         return lp;
       if (!check_simplex(function, theta,
-                         "Simplex, theta,",
+                         "Probabilities parameter",
                          &lp, Policy()))
         return lp;
   

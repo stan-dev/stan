@@ -27,7 +27,7 @@ namespace stan {
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,1>& sigma,
                 const T_shape& eta,
                 const Policy&) {
-      static const char* function = "stan::prob::lkj_cov_log<%1%>(%1%)";
+      static const char* function = "stan::prob::lkj_cov_log(%1%)";
       
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -41,16 +41,16 @@ namespace stan {
       return lp;
       if (!check_size_match(function, mu.rows(), y.rows(), &lp, Policy()))
         return lp;
-      if (!check_positive(function, eta, "eta", &lp, Policy()))
+      if (!check_positive(function, eta, "Shape parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, sigma, "Scale parameter, sigma", 
-                        &lp, Policy()))
-        return lp;    
+      if (!check_finite(function, sigma, "Scale parameter", &lp, Policy()))
+        return lp;
+      // FIXME: build vectorized versions
       for (int m = 0; m < y.rows(); ++m)
         for (int n = 0; n < y.cols(); ++n)
-          if (!check_finite(function, y(m,n), "Covariance matrix, y(m,n)", &lp, Policy()))
+          if (!check_finite(function, y(m,n), "Covariance matrix", &lp, Policy()))
             return lp;
       
       const unsigned int K = y.rows();
@@ -119,18 +119,18 @@ namespace stan {
                 const T_scale& sigma, 
                 const T_shape& eta, 
                 const Policy&) {
-      static const char* function = "stan::prob::lkj_cov_log<%1%>(%1%)";
+      static const char* function = "stan::prob::lkj_cov_log(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
-      if (!check_positive(function, eta, "eta", &lp, Policy()))
+      if (!check_positive(function, eta, "Shape parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, sigma, "Scale parameter, sigma", 
+      if (!check_finite(function, sigma, "Scale parameter", 
                         &lp, Policy()))
         return lp;
       

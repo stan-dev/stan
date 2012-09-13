@@ -34,7 +34,7 @@ namespace stan {
                   const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                   const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                   const Policy&) {
-      static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
       using stan::math::mdivide_left_tri_low;
       using stan::math::dot_self;
@@ -55,9 +55,9 @@ namespace stan {
         return lp;
       if (!check_size_match(function, y.size(), L.cols(), &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "mu", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
-      if (!check_not_nan(function, y, "y", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
         return lp;
 
       if (y.rows() == 0)
@@ -122,7 +122,7 @@ namespace stan {
                   const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                   const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                   const Policy&) {
-      static const char* function = "stan::prob::multi_normal_cholesky_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
       using stan::math::mdivide_left_tri_low;
       using stan::math::columns_dot_self;
@@ -143,9 +143,9 @@ namespace stan {
         return lp;
       if (!check_size_match(function, y.cols(), L.cols(), &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "mu", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
-      if (!check_not_nan(function, y, "y", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
         return lp;
 
       if (y.cols() == 0)
@@ -236,7 +236,7 @@ namespace stan {
              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
              const Policy&) {
-      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       using stan::math::check_size_match;
@@ -245,14 +245,14 @@ namespace stan {
 
       if (!check_size_match(function, Sigma.rows(), Sigma.cols(), &lp, Policy()))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
         return lp;
-      if (!check_symmetric(function, Sigma, "Sigma", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
         return lp;
       Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
       if (LLT.info() != Eigen::Success) {
         lp = stan::math::policies::raise_domain_error<T_covar>(function,
-                                              "Sigma is not positive definite (%1%)",
+                                              "Covariance matrix is not positive definite (%1%)",
                                               0,Policy());
         return lp;
       }
@@ -303,7 +303,7 @@ namespace stan {
              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
              const Policy&) {
-      static const char* function = "stan::prob::multi_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       using stan::math::check_size_match;
@@ -312,9 +312,9 @@ namespace stan {
 
       if (!check_size_match(function, Sigma.rows(), Sigma.cols(), &lp, Policy()))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
         return lp;
-      if (!check_symmetric(function, Sigma, "Sigma", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
         return lp;
       Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
       if (LLT.info() != Eigen::Success) {

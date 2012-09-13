@@ -226,7 +226,7 @@ namespace stan {
        */
       void ordered_unconstrain(vector_t& y) {
         if (y.size() == 0) return;
-        stan::math::check_ordered("stan::io::ordered_unconstrain(%1%)", y, "y");
+        stan::math::check_ordered("stan::io::ordered_unconstrain(%1%)", y, "Vector");
         data_r_.push_back(y[0]);
         for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
@@ -250,7 +250,7 @@ namespace stan {
        */
       void positive_ordered_unconstrain(vector_t& y) {
         if (y.size() == 0) return;
-        stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", y, "y");
+        stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", y, "Vector");
         data_r_.push_back(log(y[0]));
         for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
@@ -307,7 +307,7 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a simplex.
        */
       void simplex_unconstrain(vector_t& y) {
-        stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", y, "y");
+        stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", y, "Vector");
         typename vector_t::size_type k_minus_1 = y.size() - 1;
         double log_y_k = log(y[k_minus_1]);
         for (typename vector_t::size_type i = 0; i < k_minus_1; ++i) {
@@ -331,7 +331,7 @@ namespace stan {
        *    on log scale are unconstrained.
        */
       void corr_matrix_unconstrain(matrix_t& y) {
-        stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", y, "y");
+        stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", y, "Matrix");
         size_t k = y.rows();
         size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);

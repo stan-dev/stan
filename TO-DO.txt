@@ -3,23 +3,20 @@ STAN TO-DO LIST
 
 The to-do list is organized into the following sections:
 
-* C++ API                       * RStan
+* C++ API                              * RStan
 * Modeling Language             * Manual
-* Build                         * Web Pages
-* Testing                       * Release Mgmt
-* Command-Line                  * Models
+* Build                                    * Web Pages
+* Testing                                * Release Mgmt
+* Command-Line                   * Models
 
  
-V 1.0.1
+V 1.0.2
 ======================================================================
 
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
-
-* remove all the names of variables from error conditions and replace
-  with descriptive terms (this in every probability function)
 
 * add extra tests to all matrix functions expecting square matrices
   to verify we get square matrices (e.g, lkj_cov,...)

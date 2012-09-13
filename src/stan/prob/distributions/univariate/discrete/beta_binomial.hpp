@@ -20,7 +20,7 @@ namespace stan {
                       const T_size1& alpha, 
                       const T_size2& beta, 
                       const Policy&) {
-      static const char* function = "stan::prob::beta_binomial_log<%1%>(%1%)";
+      static const char* function = "stan::prob::beta_binomial_log(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
@@ -28,18 +28,18 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_size1,T_size2>::type lp;
-      if (!check_nonnegative(function, N, "Population size, N,", &lp, Policy()))
+      if (!check_nonnegative(function, N, "Population size parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Prior sample size, alpha,", &lp, 
+      if (!check_finite(function, alpha, "First prior sample size parameter", &lp, 
                         Policy()))
         return lp;
-      if (!check_positive(function, alpha, "Prior sample size, alpha,", 
+      if (!check_positive(function, alpha, "First prior sample size parameter", 
                           &lp, Policy()))
         return lp;
-      if (!check_finite(function, beta, "Prior sample size, beta,",
+      if (!check_finite(function, beta, "Second prior sample size parameter",
                         &lp, Policy()))
         return lp;
-      if (!check_positive(function, beta, "Prior sample size, beta,", 
+      if (!check_positive(function, beta, "Second prior sample size parameter", 
                           &lp, Policy()))
         return lp;
       

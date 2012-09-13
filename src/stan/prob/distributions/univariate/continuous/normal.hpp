@@ -39,7 +39,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                const Policy& /*policy*/) {
-      static const char* function = "stan::prob::normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::normal_log(%1%)";
 
       using std::log;
       using stan::is_constant;
@@ -63,16 +63,17 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variate y", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
         return logp;
-      if (!check_finite(function, mu, "Location parameter, mu,", 
+      if (!check_finite(function, mu, "Location parameter", 
                         &logp, Policy()))
         return logp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+      if (!check_positive(function, sigma, "Scale parameter", 
                           &logp, Policy()))
         return logp;
       if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,"y","mu","sigma",
+                                   y,mu,sigma,
+				   "Random variable","Location parameter","Scale parameter",
                                    &logp, Policy())))
         return logp;
       
@@ -191,14 +192,14 @@ namespace stan {
 
       using boost::math::tools::promote_args;
       typename promote_args<T_y, T_loc, T_scale>::type lp;
-      if (!check_not_nan(function, y, "Random variate y", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, mu, "Location parameter, mu,", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, sigma, "Scale parameter, sigma,", 
+      if (!check_not_nan(function, sigma, "Scale parameter", 
                          &lp, Policy()))
         return lp;
-      if (!check_positive(function, sigma, "Scale parameter, sigma,", 
+      if (!check_positive(function, sigma, "Scale parameter", 
                           &lp, Policy()))
         return lp;
 

@@ -39,7 +39,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta, 
                 const Policy&) {
-      static const char* function = "stan::prob::uniform_log<%1%>(%1%)";
+      static const char* function = "stan::prob::uniform_log(%1%)";
       
       using stan::math::check_not_nan;
       using stan::math::check_finite;
@@ -47,13 +47,13 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_low,T_high>::type lp(0.0);
-      if(!check_not_nan(function, y, "y", &lp, Policy()))
+      if(!check_not_nan(function, y, "Random variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Lower bound, alpha,", &lp, Policy()))
+      if (!check_finite(function, alpha, "Lower bound parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, beta, "Upper bound, beta,", &lp, Policy()))
+      if (!check_finite(function, beta, "Upper bound parameter", &lp, Policy()))
         return lp;
-      if (!check_greater(function, beta, alpha, "Upper bound, beta,",
+      if (!check_greater(function, beta, alpha, "Upper bound parameter",
                          &lp, Policy()))
         return lp;
       

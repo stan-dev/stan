@@ -45,7 +45,7 @@ namespace stan {
     trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                      const T_alpha& alpha, const T_beta& beta,
                      const Policy&) {
-      static const char* function = "stan::prob::trunc_normal_log<%1%>(%1%)";
+      static const char* function = "stan::prob::trunc_normal_log(%1%)";
       
       
       using stan::math::check_greater;
@@ -56,13 +56,13 @@ namespace stan {
       
       typename promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type lp(0.0);
 
-      if (!check_not_nan(function, alpha, "Lower bound, alpha", 
+      if (!check_not_nan(function, alpha, "Lower bound", 
                          &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, beta, "Upper bound, beta", 
+      if (!check_not_nan(function, beta, "Upper bound", 
                          &lp, Policy()))
         return lp;
-      if (!check_greater(function, beta, alpha, "Upper bound, beta", 
+      if (!check_greater(function, beta, alpha, "Upper bound", 
                          &lp, Policy()))
         return lp;
       

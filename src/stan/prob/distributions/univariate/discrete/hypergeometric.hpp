@@ -21,20 +21,20 @@ namespace stan {
                        const unsigned int a, 
                        const unsigned int b, 
                        const Policy&) {
-      static const char* function = "stan::prob::hypergeometric_log<%1%>(%1%)";
+      static const char* function = "stan::prob::hypergeometric_log(%1%)";
 
       using stan::math::check_finite;      
       using stan::math::check_bounded;
       using stan::math::check_greater;
 
       double lp(0.0);
-      if (!check_bounded(function, n, 0U, a, "Number, n,", &lp, Policy()))
+      if (!check_bounded(function, n, 0U, a, "Successes variable", &lp, Policy()))
         return lp;
-      if (!check_greater(function, N, n, "Number, N,", &lp, Policy()))
+      if (!check_greater(function, N, n, "Population size parameter", &lp, Policy()))
         return lp;
-      if (!check_bounded(function, N-n, 0U, b, "Number, N-n,", &lp, Policy()))
+      if (!check_bounded(function, N-n, 0U, b, "Population size parameter minus success variable,", &lp, Policy()))
         return lp;
-      if (!check_bounded(function, N, 0U, a+b, "Number, N,", &lp, Policy()))
+      if (!check_bounded(function, N, 0U, a+b, "Population size parameter", &lp, Policy()))
         return lp;
       
       

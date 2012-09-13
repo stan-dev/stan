@@ -47,7 +47,7 @@ namespace stan {
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
                 const Policy&) {
-      static const char* function = "stan::prob::inv_wishart_log<%1%>(%1%)";
+      static const char* function = "stan::prob::inv_wishart_log(%1%)";
       
       using stan::math::check_greater_or_equal;
       using stan::math::check_size_match;
@@ -56,7 +56,7 @@ namespace stan {
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom, nu,", 
+      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom parameter", 
                                  &lp, Policy()))
         return lp;
       if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))

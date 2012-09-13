@@ -465,7 +465,7 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "y");
+      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "Positive variable");
       return log(y);
     }
 
@@ -531,7 +531,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TL>::type
     lb_free(const T y, const TL lb) {
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
-                                         y, lb, "y");
+                                         y, lb, "Lower bounded variable");
       return log(y - lb);
     }
     
@@ -613,7 +613,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TU>::type
     ub_free(const T y, const TU ub) {
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
-                                      y, ub, "y");
+                                      y, ub, "Upper bounded variable");
       return log(ub - y);
     }
 
@@ -759,7 +759,7 @@ namespace stan {
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, lb, ub, "y");
+                                y, lb, ub, "Bounded variable");
       return logit((y - lb) / (ub - lb));
     }
 
@@ -836,7 +836,7 @@ namespace stan {
     T prob_free(const T y) {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::prob_free(%1%)",
-                                y, 0, 1, "y, a probability,");
+                                y, 0, 1, "Probability variable");
       return logit(y);
     }
     
@@ -902,7 +902,7 @@ namespace stan {
     inline
     T corr_free(const T y) {
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, -1, 1, "y, a correlation,");
+                                y, -1, 1, "Correlation variable");
       return atanh(y);
     }
 
@@ -1000,7 +1000,7 @@ namespace stan {
     simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "x");
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable");
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
@@ -1082,7 +1082,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_ordered("stan::prob::ordered_free(%1%)", 
-                                y, "y");
+                                y, "Ordered variable");
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
@@ -1163,7 +1163,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     positive_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
-                                y, "y");
+                                y, "Positive ordered variable");
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);

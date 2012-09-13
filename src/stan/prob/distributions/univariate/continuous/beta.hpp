@@ -38,7 +38,7 @@ namespace stan {
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
              const Policy&) {
-      static const char* function = "stan::prob::beta_log<%1%>(%1%)";
+      static const char* function = "stan::prob::beta_log(%1%)";
       
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -65,25 +65,26 @@ namespace stan {
       
       // validate args (here done over var, which should be OK)
       if (!check_finite(function, alpha,
-                        "Prior success sample size plus 1, alpha,",
+                        "First shape parameter",
                         &logp, Policy()))
         return logp;
       if (!check_positive(function, alpha, 
-                          "Prior success sample size plus 1, alpha,",
+                          "First shape parameter",
                           &logp, Policy()))
         return logp;
       if (!check_finite(function, beta, 
-                          "Prior failure sample size plus 1, beta,",
+                          "Second shape parameter",
                           &logp, Policy()))
         return logp;
       if (!check_positive(function, beta, 
-                          "Prior failure sample size plus 1, beta,",
+                          "Second shape parameter",
                           &logp, Policy()))
         return logp;
-      if (!check_not_nan(function, y, "Random variate, y,", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
         return logp;
       if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,"y","alpha","beta",
+                                   y,alpha,beta,
+				   "Random variable","First shape parameter","Second shape parameter",
                                    &logp, Policy())))
         return logp;
 
@@ -185,22 +186,22 @@ namespace stan {
       
       typename promote_args<T_y,T_scale_succ,T_scale_fail>::type lp;
       if (!check_finite(function, alpha,
-                        "Prior success sample size plus 1, alpha,",
+                        "First shape parameter",
                         &lp, Policy()))
         return lp;
       if (!check_positive(function, alpha, 
-                          "Prior success sample size plus 1, alpha,",
+                          "First shape parameter",
                           &lp, Policy()))
         return lp;
       if (!check_finite(function, beta, 
-                          "Prior failure sample size plus 1, beta,",
+                          "Second shape parameter",
                           &lp, Policy()))
         return lp;
       if (!check_positive(function, beta, 
-                          "Prior failure sample size plus 1, beta,",
+                          "Second shape parameter",
                           &lp, Policy()))
         return lp;
-      if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
         return lp;
       
       if (y < 0.0)

@@ -485,7 +485,8 @@ namespace stan {
        */
       inline T scalar_pos() {
         T x(scalar());
-        stan::math::check_positive("stan::io::scalar_pos(%1%)", x, "x");
+        stan::math::check_positive("stan::io::scalar_pos(%1%)", x, 
+				   "Constrained scalar");
         return x;
       }
 
@@ -530,7 +531,7 @@ namespace stan {
       inline T scalar_lb(const TL lb) {
         T x(scalar());
         stan::math::check_greater_or_equal("stan::io::scalar_lb(%1%)",
-                                           x, lb, "x");
+                                           x, lb, "Constrained scalar");
         return x;
       }
 
@@ -583,7 +584,7 @@ namespace stan {
       template <typename TU>
       inline T scalar_ub(TU ub) {
         T x(scalar());
-        stan::math::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, "x");
+        stan::math::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, "Constrained scalar");
         return x;
       }
 
@@ -636,7 +637,7 @@ namespace stan {
       template <typename TL, typename TU>
       inline T scalar_lub(const TL lb, const TU ub) {
         T x(scalar());
-        stan::math::check_bounded("stan::io::scalar_lub(%1%)", x, lb, ub, "x");
+        stan::math::check_bounded("stan::io::scalar_lub(%1%)", x, lb, ub, "Constrained scalar");
         return x;
       }
 
@@ -686,7 +687,7 @@ namespace stan {
        */
       inline T prob() {
         T x(scalar());
-        stan::math::check_bounded("stan::io::prob(%1%)", x, 0, 1, "x");
+        stan::math::check_bounded("stan::io::prob(%1%)", x, 0, 1, "Constrained probability");
         return x;
       }
 
@@ -732,7 +733,7 @@ namespace stan {
        */
       inline T corr() {
         T x(scalar());
-        stan::math::check_bounded("stan::io::corr(%1%)", x, -1, 1, "x");
+        stan::math::check_bounded("stan::io::corr(%1%)", x, -1, 1, "Correlation value");
         return x;
       }
 
@@ -775,7 +776,7 @@ namespace stan {
        */
       inline vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        stan::math::check_simplex("stan::io::simplex(%1%)", theta, "theta");
+        stan::math::check_simplex("stan::io::simplex(%1%)", theta, "Constrained vector");
         return theta;
       }
 
@@ -822,7 +823,7 @@ namespace stan {
        */
       inline vector_t ordered(size_t k) {
         vector_t x(vector(k));
-        stan::math::check_ordered("stan::io::ordered(%1%)", x, "x");
+        stan::math::check_ordered("stan::io::ordered(%1%)", x, "Constrained vector");
         return x;
       }
 
@@ -866,7 +867,7 @@ namespace stan {
        */
       inline vector_t positive_ordered(size_t k) {
         vector_t x(vector(k));
-        stan::math::check_positive_ordered("stan::io::positive_ordered(%1%)", x, "x");
+        stan::math::check_positive_ordered("stan::io::positive_ordered(%1%)", x, "Constrained vector");
         return x;
       }
 
@@ -909,7 +910,7 @@ namespace stan {
        */
       inline matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "x");
+        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "Constrained matrix");
         return x;
       }
 
@@ -955,7 +956,7 @@ namespace stan {
        */
       inline matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        stan::math::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "y");
+        stan::math::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "Constrained matrix");
         return y;
       }
 

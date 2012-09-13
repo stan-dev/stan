@@ -28,3 +28,5 @@ stan.kdev4
 
 # model files
 src/test/gm/model_specs/*.cpp
+src/test/gm/model_specs/function_signatures
+src/test/gm/model_specs/function_signatures.exe

@@ -65,7 +65,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::log1p_exp;
 
-      static const char* function = "stan::prob::ordered_logistic<%1%>(%1%)";
+      static const char* function = "stan::prob::ordered_logistic(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -79,34 +79,34 @@ namespace stan {
 
       typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
       if (!check_bounded(function, y, 1, K,
-                         "y must be between 1 and K", 
+                         "Random variable", 
                          &lp, Policy()))
         return lp;
 
       if (!check_finite(function, lambda, 
-                        "location must be finite", &lp, Policy()))
+                        "Location parameter", &lp, Policy()))
         return lp;
 
       if (!check_greater(function, c.size(), 0,
-                         "must be at least one cutpoint",
+                         "Size of cut points parameter",
                          &lp, Policy()))
         return lp;
 
 
       for (int i = 1; i < c.size(); ++i) {
         if (!check_greater(function, c(i), c(i - 1),
-                           "cut points must be positie increasing",
+                           "Cut points parameter",
                            &lp, Policy()))
           return lp;
       }
 
       if (!check_finite(function, c(c.size()-1), 
-                        "the last cut point must be finite",
+                        "Cut points parameter",
                         &lp, Policy()))
         return lp;
       
       if (!check_finite(function, c(0),
-                        "the first cut point must be finite",
+                        "Cut points parameter",
                         &lp, Policy())) 
         return lp;
 

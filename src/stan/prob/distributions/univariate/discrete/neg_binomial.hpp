@@ -20,7 +20,7 @@ namespace stan {
                      const T_inv_scale& beta, 
                      const Policy&) {
 
-      static const char* function = "stan::prob::neg_binomial_log<%1%>(%1%)";
+      static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
       using stan::math::check_finite;      
       using stan::math::check_nonnegative;
@@ -28,16 +28,16 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_shape, T_inv_scale>::type lp;
-      if (!check_nonnegative(function, n, "n", &lp, Policy()))
+      if (!check_nonnegative(function, n, "Failures variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Shape, alpha,", &lp, Policy()))
+      if (!check_finite(function, alpha, "Shape parameter", &lp, Policy()))
         return lp;
-      if (!check_positive(function, alpha, "Shape, alpha,", &lp, Policy()))
+      if (!check_positive(function, alpha, "Shape parameter", &lp, Policy()))
         return lp;
-      if (!check_finite(function, beta, "Inverse scale, beta,",
+      if (!check_finite(function, beta, "Inverse scale parameter",
                         &lp, Policy()))
         return lp;
-      if (!check_positive(function, beta, "Inverse scale, beta,", 
+      if (!check_positive(function, beta, "Inverse scale parameter", 
                           &lp, Policy()))
         return lp;
       

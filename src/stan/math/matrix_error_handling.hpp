@@ -10,6 +10,7 @@ namespace stan {
 
   namespace math {
     
+    // FIXME: update warnings
     template <typename T_size1, typename T_size2, typename T_result,
               class Policy>
     inline bool check_size_match(const char* function,
@@ -21,7 +22,7 @@ namespace stan {
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
       if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
         std::ostringstream msg;
-        msg << "i and j must be same.  Found i=%1%, j=" << j;
+        msg << "i and j must be same. Found i=%1%, j=" << j;
         T_result tmp = raise_domain_error<T_result,T_size1>(function,
                                                             msg.str().c_str(),
                                                             i,
@@ -130,6 +131,7 @@ namespace stan {
      * @return <code>true</code> if the matrix is positive definite.
      * @tparam T Type of scalar.
      */
+    // FIXME: update warnings (message has (0,0) item)
     template <typename T_y, typename T_result, class Policy>
     inline bool check_pos_definite(const char* function,
                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
@@ -199,6 +201,7 @@ namespace stan {
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
+    // FIXME: update warnings
     template <typename T_y, typename T_result, class Policy>
     inline bool check_cov_matrix(const char* function,
                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
@@ -250,6 +253,7 @@ namespace stan {
      * correlation matrix.
      * @tparam T Type of scalar.
      */
+    // FIXME: update warnings
     template <typename T_y, typename T_result, class Policy>
     inline bool check_corr_matrix(const char* function,
                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
@@ -311,6 +315,7 @@ namespace stan {
      * @return <code>true</code> if the matrix is a valid covariance matrix.
      * @tparam T Type of scalar.
      */
+    // FIXME: update warnings
     template <typename T_covar, typename T_result, class Policy>
     inline bool check_cov_matrix(const char* function,
          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
@@ -370,11 +375,10 @@ namespace stan {
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
-        T_prob size = 0.0;  // FIXME: this type is a hack -- fix at double?
-        T_result tmp = raise_domain_error<T_result,T_prob>(function,
-                                                           message.c_str(),
-                                                           size,
-                                                           Policy());
+        T_result tmp = raise_domain_error<size_t, size_t>(function, 
+							  message.c_str(), 
+							  0, 
+							  Policy());
         if (result != 0)
           *result = tmp;
         return false;

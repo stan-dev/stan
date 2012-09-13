@@ -20,7 +20,7 @@ namespace stan {
                  const T_prob& theta, 
                  const Policy&) {
 
-      static const char* function = "stan::prob::binomial_log<%1%>(%1%)";
+      static const char* function = "stan::prob::binomial_log(%1%)";
       
       using stan::math::check_finite;
       using stan::math::check_bounded;
@@ -29,19 +29,19 @@ namespace stan {
       
       typename promote_args<T_prob>::type lp(0.0);
       if (!check_bounded(function, n, 0, N,
-                         "Successes, n,",
+                         "Successes variable",
                          &lp, Policy()))
         return lp;
       if (!check_nonnegative(function, N,
-                             "Population size, N,",
+                             "Population size parameter",
                              &lp, Policy()))
         return lp;
       if (!check_finite(function, theta,
-                        "Probability, theta,",
+                        "Probability parameter",
                         &lp, Policy()))
         return lp;
       if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability, theta,",
+                         "Probability parameter",
                          &lp, Policy()))
         return lp;
 

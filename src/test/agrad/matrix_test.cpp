@@ -2958,6 +2958,7 @@ TEST(AgradMatrix, initializeVariable) {
 }
 
 TEST(AgradMatrix, assign) {
+  using stan::agrad::assign;
   using stan::agrad::var;
   using std::vector;
   using Eigen::Matrix;
@@ -2967,9 +2968,27 @@ TEST(AgradMatrix, assign) {
   assign(x,2.0);
   EXPECT_FLOAT_EQ(2.0,x.val());
 
+  assign(x,2);
+  EXPECT_FLOAT_EQ(2.0,x.val());
+
   var y(3.0);
   assign(x,y);
   EXPECT_FLOAT_EQ(3.0,x.val());
+
+  double xd;
+  assign(xd,2.0);
+  EXPECT_FLOAT_EQ(2.0,xd);
+
+  assign(xd,2);
+  EXPECT_FLOAT_EQ(2.0,xd);
+
+  int iii;
+  assign(iii,2);
+  EXPECT_EQ(2,iii);
+
+  unsigned int j = 12;
+  assign(iii,j);
+  EXPECT_EQ(12,j);
 
   vector<double> y_dbl(2);
   y_dbl[0] = 2.0;

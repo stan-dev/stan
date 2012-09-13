@@ -32,7 +32,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, 
                   const Policy&) {
-      static const char* function = "stan::prob::inv_gamma_log<%1%>(%1%)";
+      static const char* function = "stan::prob::inv_gamma_log(%1%)";
       
       using stan::math::check_not_nan;
       using stan::math::check_positive;
@@ -40,18 +40,18 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_scale>::type lp;
-      if (!check_not_nan(function, y, "Random variate, y,", &lp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
         return lp;
-      if (!check_finite(function, alpha, "Shape parameter, alpha,", 
+      if (!check_finite(function, alpha, "Shape parameter", 
                         &lp, Policy())) 
         return lp;
-      if (!check_positive(function, alpha, "Shape parameter, alpha,",
+      if (!check_positive(function, alpha, "Shape parameter",
                           &lp, Policy())) 
         return lp;
-      if (!check_finite(function, beta, "Scale parameter, beta,",
+      if (!check_finite(function, beta, "Scale parameter",
                         &lp, Policy())) 
         return lp;
-      if (!check_positive(function, beta, "Scale parameter, beta,", 
+      if (!check_positive(function, beta, "Scale parameter", 
                           &lp, Policy())) 
         return lp;
 
