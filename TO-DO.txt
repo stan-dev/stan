@@ -3,11 +3,11 @@ STAN TO-DO LIST
 
 The to-do list is organized into the following sections:
 
-* C++ API                              * RStan
+* C++ API                       * RStan
 * Modeling Language             * Manual
-* Build                                    * Web Pages
-* Testing                                * Release Mgmt
-* Command-Line                   * Models
+* Build                         * Web Pages
+* Testing                       * Release Mgmt
+* Command-Line                  * Models
 
  
 V 1.0.2
@@ -594,9 +594,18 @@ Testing
 RStan / PStan / MStan / Command Line
 ======================================================================
 
+* (cmd) more RStan like behavior
+  -- add --chains=N argument to command-line to run multiple chains
+     and write into one or more files (already done in RStan)
+  -- new command to read .csv files into chains object and print out
+     summary (related to a single command)
+
 * (PStan) interface to Python
 
 * (MStan) interface to MATLAB
+
+* (RStan/cmd) --functions option in stanc to print out
+  signatures of all available functions for current version
 
 * (R/cmd) Convergence monitoring of higher moments
   -- at least squared for variance, which being non-linear
@@ -642,9 +651,6 @@ RStan / PStan / MStan / Command Line
   return error message if not
 
 * (R) switch n_chains to chains
-
-* (cmd) add chains argument to command-line to run multiple chains
-  and write into one or more files (already done in RStan)
 
 * (R/cmd) order of plots/output variables should match declaration
 
