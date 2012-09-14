@@ -75,6 +75,12 @@ C++ API
                    = log(logit(-u))
                    = -log1p_exp(u)
 
+* Skew normal distribution
+  -- involves Phi() in its *density* function like
+     the truncated normal
+  -- hack for now using 
+     normal_log(x|mu,sigma) + log(Phi(alpha * (x - mu) / sigma))
+
 * More matrix functions from Eigen:
   - singular vectors in addition to values
     + nice to have (U,S,V) = svd(A) syntax for this
@@ -87,10 +93,17 @@ C++ API
   - normalize sample to zero sample mean, unit sample variance
 
 * cumulative distribution functions
+  - should we have the basic cdfs on the log scale?
   - need for truncated distros mostly
         foo_cdf_lb_log(L|...) == log(1 - foo_cdf(L|...))
+                              == foo_ccdf_log(L|...)
+
         foo_cdf_ub_log(U|...) == log(foo_cdf(U|...))
+                              == foo_cdf_log(U|...)
+
         foo_cdf_lub_log(L,U|...) == log(foo_cdf(U|...) - foo_cdf(L|...))
+                                 == log_sum_exp(foo_cdf_log(U|...),                                 
+                                                0, foo_ccdf_log(L|...))
   - to add:
      + calculation of cdf
      + two functions: 1) with templated policy, 2) with no policy,
