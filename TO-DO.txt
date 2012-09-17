@@ -54,6 +54,23 @@ C++ API
         beta  <- (1 - phi) * k
     determinant = k  (det [[a,b],[c,d]] = ad - bc)
 
+* von Mises distribution (with location and concentration params?)
+  -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
+
+* Bessel functions
+  Wolfram has some great resources on symbolic derivatives.
+  - J:  Bessel function of first kind
+    Basic order n has order (n+1) as its derivative.  So it's easy
+    to build the function and vari in one go for all orders:
+    signature:   T bessel(int v, const T& x);
+    http://www.boost.org/doc/libs/1_51_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/bessel/bessel.html
+  - I:  Modified (hyperbolic) Bessel function of first kind
+    See:  http://functions.wolfram.com/Bessel-TypeFunctions/BesselI/20/01/02/
+          for derivatives in terms of value and higher-order eval
+    signature:   T modified_bessel(int v, const T& x);
+    http://www.boost.org/doc/libs/1_51_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/bessel/mbessel.html
+  - we really (or at least also) want bessel_log() and modified_bessel_log()
+
 * pow special cases
   - inv(x) = pow(x,-1) = 1/x
   - inv_square(x) = pow(x,-2)
@@ -408,7 +425,6 @@ Modeling Language
     parameters {  real x; }
     transformed_parameters { real(0,1) y; y <- lub(y,0,1,lp__); }
 
-
 * extensions
   - declare file paths to #include
   - declare namespace usings
@@ -615,6 +631,9 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (Rstan) propagate debug error messages to R
+  see: http://lists.r-forge.r-project.org/pipermail/rcpp-devel/2011-October/003006.html
 
 * (cmd) more RStan like behavior
   -- add --chains=N argument to command-line to run multiple chains
