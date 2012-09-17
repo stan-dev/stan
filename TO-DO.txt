@@ -58,18 +58,17 @@ C++ API
   -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
 
 * Bessel functions
-  Wolfram has some great resources on symbolic derivatives.
   - J:  Bessel function of first kind
-    Basic order n has order (n+1) as its derivative.  So it's easy
-    to build the function and vari in one go for all orders:
-    signature:   T bessel(int v, const T& x);
-    http://www.boost.org/doc/libs/1_51_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/bessel/bessel.html
+    derivatives: http://functions.wolfram.com/Bessel-TypeFunctions/BesselJ/20/01/
+    signature:   T bessel(const T1& v, const T2& x);
+    boost:  http://www.boost.org/doc/libs/1_51_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/bessel/bessel.html
   - I:  Modified (hyperbolic) Bessel function of first kind
-    See:  http://functions.wolfram.com/Bessel-TypeFunctions/BesselI/20/01/02/
-          for derivatives in terms of value and higher-order eval
-    signature:   T modified_bessel(int v, const T& x);
-    http://www.boost.org/doc/libs/1_51_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/bessel/mbessel.html
+    derivatives:  http://functions.wolfram.com/Bessel-TypeFunctions/BesselI/20/01/
+    signature:   T modified_bessel(const T1& v, const T& x);
+    boost: http://www.boost.org/doc/libs/1_51_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/bessel/mbessel.html
   - we really (or at least also) want bessel_log() and modified_bessel_log()
+  - and derivatives are really nasty for the concentration param if we
+    don't auto-dif
 
 * pow special cases
   - inv(x) = pow(x,-1) = 1/x
