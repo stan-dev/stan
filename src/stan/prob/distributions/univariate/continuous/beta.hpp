@@ -2,10 +2,11 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__BETA_HPP__
 
 #include <stan/agrad.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -49,9 +50,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::prob::include_summand;
 
-      // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_scale_succ,T_scale_fail>::value)
-	return 0.0;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -87,6 +85,10 @@ namespace stan {
 				   "Random variable","First shape parameter","Second shape parameter",
                                    &logp, Policy())))
         return logp;
+
+      // check if no variables are involved and prop-to
+      if (!include_summand<Prop,T_y,T_scale_succ,T_scale_fail>::value)
+	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
