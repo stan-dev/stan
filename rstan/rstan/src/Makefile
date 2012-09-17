@@ -4,15 +4,14 @@ SHLIB = rstan.so
 
 USERLIB = libstan.a
 
-
 OBJECTS = stanc.o gm__grammars__whitespace_grammar_inst.o gm__grammars__program_grammar_inst.o gm__grammars__statement_grammar_inst.o  gm__ast_def.o gm__grammars__var_deccls_grammar_inst.o gm__grammars__expression_grammar_inst.o chains.o misc.o 
 
 LIBSTANOBJECTS = agrad__agrad.o agrad__matrix.o math__matrix.o
 
-EIGEN_PATH := `$(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))"`
+EIGEN_PATH := $(shell $(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))")
 # EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.0
 
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
+PKG_LIBS = $(shell  $(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()") 
 PKG_CPPFLAGS += -I"../inst/include/stansrc"  
 PKG_CPPFLAGS += -I"$(EIGEN_PATH)" 
 PKG_CPPFLAGS += -I"$(EIGEN_PATH)/unsupported" 
