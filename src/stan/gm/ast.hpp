@@ -39,6 +39,7 @@ namespace stan {
     struct no_op_statement;
     struct ordered_var_decl;
     struct positive_ordered_var_decl;
+    struct print_statement;
     struct program;
     struct range;
     struct row_vector_var_decl;
@@ -546,6 +547,7 @@ namespace stan {
                            boost::recursive_wrapper<sample>,
                            boost::recursive_wrapper<statements>,
                            boost::recursive_wrapper<for_statement>,
+                           boost::recursive_wrapper<print_statement>,
                            boost::recursive_wrapper<no_op_statement> >
     statement_t;
     
@@ -559,6 +561,7 @@ namespace stan {
     statement(const sample& st);
     statement(const statements& st);
     statement(const for_statement& st);
+    statement(const print_statement& st);
     statement(const no_op_statement& st);
 
     // template <typename Statement>
@@ -575,6 +578,13 @@ namespace stan {
                   range& range,
                   statement& stmt);
   };
+
+  struct print_statement {
+    std::vector<expression> expressions_;
+    print_statement();
+    print_statement(const std::vector<expression>& expressions);
+  };
+
 
   struct no_op_statement {
       // no op, no data

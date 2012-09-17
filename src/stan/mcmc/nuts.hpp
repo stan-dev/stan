@@ -295,7 +295,7 @@ namespace stan {
           // FIXME:  lepfrog needs +/- this->_epsilon_pm
           newlogp = leapfrog(this->_model, this->_z, xminus, mminus, gradminus,
                              direction * this->_epsilon_last,
-                             this->_error_msgs);
+                             this->_error_msgs, this->_output_msgs);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;

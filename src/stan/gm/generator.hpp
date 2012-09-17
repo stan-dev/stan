@@ -1077,6 +1077,23 @@ namespace stan {
           o_ << "}" << EOL;
         }
       }
+      void operator()(const print_statement& ps) const {
+        generate_indent(indent_,o_);
+        o_ << "if (pstream__)" << EOL;
+        generate_indent(indent_ + 1,o_);
+        o_ << "*pstream__";
+        for (size_t i = 0; i < ps.expressions_.size(); ++i) {
+          o_ << " << " << '"';
+          if (i > 0) o_ << ' ';
+          generate_expression(ps.expressions_[i],o_);
+          o_ << "=" 
+             << '"'
+             << " << (";
+          generate_expression(ps.expressions_[i],o_);
+          o_ << ") << " << "';'";
+        }
+        o_ << " << std::endl;" << EOL;
+      }
       void operator()(const for_statement& x) const {
         generate_indent(indent_,o_);
         o_ << "for (int " << x.variable_ << " = ";
@@ -1117,7 +1134,8 @@ namespace stan {
                            std::ostream& o) {
       o << EOL;
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
-      o << INDENT << "             vector<int>& params_i__) {" << EOL2;
+      o << INDENT << "             vector<int>& params_i__," << EOL;
+      o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
       o << INDENT2 << "var lp__(0.0);" << EOL;
 
       generate_comment("model parameters",2,o);
@@ -1517,7 +1535,8 @@ namespace stan {
     void generate_constructor(const program& prog,
                               const std::string& model_name,
                               std::ostream& o) {
-      o << INDENT << model_name << "(stan::io::var_context& context__)" 
+      o << INDENT << model_name << "(stan::io::var_context& context__,";
+      o << INDENT << "    std::ostream* pstream__ = 0)"
         << EOL;
       o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" 
         << EOL; // resize 0 with var_resizing
@@ -2285,7 +2304,8 @@ namespace stan {
                                    std::ostream& o) {
       o << INDENT << "void write_csv(std::vector<double>& params_r__," << EOL;
       o << INDENT << "               std::vector<int>& params_i__," << EOL;
-      o << INDENT << "               std::ostream& o__) {" << EOL;
+      o << INDENT << "               std::ostream& o__," << EOL;
+      o << INDENT << "               std::ostream* pstream__ = 0) {" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
         << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
@@ -2601,7 +2621,8 @@ namespace stan {
                                      std::ostream& o) {
       o << INDENT << "void write_array(std::vector<double>& params_r__," << EOL;
       o << INDENT << "                 std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                 std::vector<double>& vars__) {" << EOL;
+      o << INDENT << "                 std::vector<double>& vars__," << EOL;
+      o << INDENT << "                 std::ostream* pstream__ = 0) {" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "static const char* function__ = \""

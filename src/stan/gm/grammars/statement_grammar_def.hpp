@@ -64,6 +64,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
                           (stan::gm::range, range_)
                           (stan::gm::statement, statement_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
+                          (std::vector<stan::gm::expression>, expressions_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
                           (stan::gm::expression, expr_)
                           (stan::gm::distribution, dist_) 
@@ -281,6 +284,7 @@ namespace stan {
       statement_r
         %= statement_seq_r(_r1,_r2)
         | for_statement_r(_r1,_r2)
+        | print_statement_r
         | assignment_r 
         [_pass 
          = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
@@ -320,6 +324,13 @@ namespace stan {
         > eps 
         [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
       ;
+
+      print_statement_r.name("print statement");
+      print_statement_r
+        %= lit("print")
+        > lit('(')
+        > (expression_g % ',')
+        > lit(')');
 
       identifier_r.name("identifier");
       identifier_r

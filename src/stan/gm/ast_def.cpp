@@ -706,6 +706,7 @@ namespace stan {
     statement::statement(const sample& st) : statement_(st) { }
     statement::statement(const statements& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
+    statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
     // template <typename Statement>
@@ -716,8 +717,6 @@ namespace stan {
 
 
 
-  
-
     for_statement::for_statement() {
       }
     for_statement::for_statement(std::string& variable,
@@ -727,9 +726,13 @@ namespace stan {
         range_(range),
         statement_(stmt) {
     }
-    
 
-   
+    print_statement::print_statement() { }
+
+    print_statement::print_statement(const std::vector<expression>& expressions) 
+      : expressions_(expressions) { 
+    }
+    
     program::program() { }
     program::program(const std::vector<var_decl>& data_decl,
                      const std::pair<std::vector<var_decl>,

@@ -2,11 +2,12 @@
 #define __STAN__MODEL__PROB_GRAD_HPP__
 
 #include <iomanip>
+#include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <stdio.h>
 #include <utility>
 #include <vector>
-#include <stdio.h>
 
 #include <stan/io/csv_writer.hpp>
 
@@ -86,15 +87,18 @@ namespace stan {
 
       virtual double grad_log_prob(std::vector<double>& params_r, 
                                    std::vector<int>& params_i,
-                                   std::vector<double>& gradient) = 0;
+                                   std::vector<double>& gradient,
+                                   std::ostream* output_stream = 0) = 0;
 
       virtual double log_prob(std::vector<double>& params_r, 
-                              std::vector<int>& params_i) = 0;
+                              std::vector<int>& params_i,
+                              std::ostream* output_stream = 0) = 0;
 
       virtual double log_prob_star(size_t idx, 
                                    int val,
                                    std::vector<double>& params_r,
-                                   std::vector<int>& params_i) {
+                                   std::vector<int>& params_i,
+                                   std::ostream* output_stream = 0) {
         if (idx >= num_params_i()) // || idx < 0
           throw std::runtime_error ("idx >= num_params_i()");
         if (val >= param_range_i(idx).first) // 
@@ -104,7 +108,7 @@ namespace stan {
 
         int original_val = params_i[idx];
         params_i[idx] = val;
-        double result = log_prob(params_r,params_i);
+        double result = log_prob(params_r,params_i,output_stream);
         params_i[idx] = original_val;
         return result;
       }
@@ -119,11 +123,14 @@ namespace stan {
        *
        * @param params_r Real-valued parameter vector.
        * @param params_i Integer-valued parameter vector.
-       * @param o Output stream to which values are written
+       * @params o Stream to which CSV file is written
+       * @param output_stream Stream to which print statements in Stan
+       * programs are written, default is 0
        */
       virtual void write_csv(std::vector<double>& params_r,
                              std::vector<int>& params_i,
-                             std::ostream& o) {
+                             std::ostream& o,
+                             std::ostream* output_stream = 0) {
         stan::io::csv_writer writer(o);
         for (size_t i = 0; i < params_i.size(); ++i)
           writer.write(params_i[i]);
@@ -142,19 +149,21 @@ namespace stan {
        * @param params_i Integer-valued parameters.
        * @param[out] grad Vector into which gradient is written.
        * @param epsilon
+       * @param[in,out] output_stream
        */
       void finite_diff_grad(std::vector<double>& params_r,
                             std::vector<int>& params_i,
                             std::vector<double>& grad,
-                            double epsilon = 1e-6) {
+                            double epsilon = 1e-6,
+                            std::ostream* output_stream = 0) {
         std::vector<double> perturbed(params_r);
-        grad_log_prob(params_r, params_i, grad);
+        grad_log_prob(params_r,params_i,grad,output_stream);
         grad.resize(params_r.size());
         for (size_t k = 0; k < params_r.size(); k++) {
           perturbed[k] += epsilon;
-          double logp_plus = log_prob(perturbed, params_i);
+          double logp_plus = log_prob(perturbed,params_i,output_stream);
           perturbed[k] = params_r[k] - epsilon;
-          double logp_minus = log_prob(perturbed, params_i);
+          double logp_minus = log_prob(perturbed,params_i,output_stream);
           double gradest = (logp_plus - logp_minus) / (2*epsilon);
           grad[k] = gradest;
           perturbed[k] = params_r[k]; 
@@ -173,18 +182,21 @@ namespace stan {
        * @param error Real-valued scalar saying how much error to allow
        * @param o Output stream for messages.
        * params_r. Defaults to 1e-6.
-       * @return 0 if the gradeints are close enough, non-0 otherwise
+       * @param output_stream Stream to which Stan programs write.
+       * @return number of failed gradient comparisons versus allowed
+       * error, so 0 if all gradients pass
        */
       int test_gradients(std::vector<double>& params_r,
                          std::vector<int>& params_i,
                          double epsilon = 1e-6,
                          double error = 1e-6,
-                         std::ostream& o = std::cout) {
+                         std::ostream& o = std::cout,
+                         std::ostream* output_stream = 0) {
         std::vector<double> grad;
-        double lp = grad_log_prob(params_r,params_i,grad);
+        double lp = grad_log_prob(params_r,params_i,grad,output_stream);
         
         std::vector<double> grad_fd;
-        finite_diff_grad(params_r,params_i,grad_fd,epsilon);
+        finite_diff_grad(params_r,params_i,grad_fd,epsilon,output_stream);
 
         int num_failed = 0;
         
@@ -211,28 +223,6 @@ namespace stan {
         }
         return num_failed;
       }
-
-      /**
-       * Test gradients computed by finite differences against those
-       * computed by the model, using random initialization for
-       * real and integer parameters.
-       *
-       * @param epsilon Finite d
-       * @param error Allowable error
-       * @param o Output stream for messages.
-       */
-      void test_gradients_random(double epsilon = 1e-6,
-                                 double error = 1e-6,
-                                 std::ostream& o = std::cout) {
-        std::vector<double> params_r(num_params_r());
-        std::vector<int> params_i(num_params_i());
-        for (size_t i = 0; i < params_r.size(); ++i)
-          params_r[i] = 0.0; // FIXME:  randomize
-        for (size_t i = 0; i < params_i.size(); ++i)
-          params_i[i] = 0;   // FIXME:  randomize, keep in range
-        test_gradients(params_r,params_i,epsilon,error,o);
-      }
-                                 
 
     };
   }

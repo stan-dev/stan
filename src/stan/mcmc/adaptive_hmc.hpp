@@ -89,20 +89,16 @@ namespace stan {
                             delta,
                             gamma,
                             rand_int),
-          _L(L)
-      {
+          _L(L) {
         this->adaptation_init(1.0);  // target is just epsilon
       }
+
 
       /**
        * Destructor. The implementation for this class is a no-op.
        */
       ~adaptive_hmc() {
       }
-
-      
-
-
 
 
       /**
@@ -141,7 +137,7 @@ namespace stan {
         this->_epsilon_last = epsilon;
         for (unsigned int l = 0; l < _L; ++l)
           logp_new = leapfrog(this->_model, this->_z, x_new, m, g_new, epsilon,
-                              this->_error_msgs);
+                              this->_error_msgs, this->_output_msgs);
         this->nfevals_plus_eq(_L);
 
         double H_new = -(stan::math::dot_self(m) / 2.0) + logp_new;

@@ -29,30 +29,33 @@ namespace stan {
       }
 
       virtual agrad::var log_prob(std::vector<agrad::var>& params_r, 
-                                  std::vector<int>& params_i) = 0;
+                                  std::vector<int>& params_i,
+                                  std::ostream* output_stream = 0) = 0;
 
       virtual double grad_log_prob(std::vector<double>& params_r, 
                                    std::vector<int>& params_i, 
-                                   std::vector<double>& gradient) {
+                                   std::vector<double>& gradient,
+                                   std::ostream* output_stream = 0) {
         std::vector<agrad::var> ad_params_r(num_params_r());
         for (size_t i = 0; i < num_params_r(); ++i) {
           agrad::var var_i(params_r[i]);
           ad_params_r[i] = var_i;
         }
-        agrad::var adLogProb = log_prob(ad_params_r,params_i);
+        agrad::var adLogProb = log_prob(ad_params_r,params_i,output_stream);
         double val = adLogProb.val();
         adLogProb.grad(ad_params_r,gradient);
         return val;
       }
 
       virtual double log_prob(std::vector<double>& params_r,
-                              std::vector<int>& params_i) {
+                              std::vector<int>& params_i,
+                              std::ostream* output_stream = 0) {
         std::vector<agrad::var> ad_params_r;
         for (size_t i = 0; i < num_params_r(); ++i) {
           agrad::var var_i(params_r[i]);
           ad_params_r.push_back(var_i);
         }
-        agrad::var adLogProb = log_prob(ad_params_r,params_i);
+        agrad::var adLogProb = log_prob(ad_params_r,params_i,output_stream);
         double val = adLogProb.val();
         agrad::recover_memory();
         return val;

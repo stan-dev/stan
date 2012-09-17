@@ -25,6 +25,7 @@ namespace stan {
       unsigned int _nfevals;
       double _mean_stat;
       std::ostream* _error_msgs;
+      std::ostream* _output_msgs;
 
     public:
 
@@ -37,13 +38,15 @@ namespace stan {
        * messages.
        */
       adaptive_sampler(bool adapt,
-                       std::ostream* error_msgs = 0)
+                       std::ostream* error_msgs = 0,
+                       std::ostream* output_msgs = 0)
         : _adapt(adapt), 
           _n_steps(0), 
           _n_adapt_steps(0), 
           _nfevals(0),
           _mean_stat(0),
-          _error_msgs(error_msgs) {
+          _error_msgs(error_msgs),
+          _output_msgs(output_msgs) {
       }
 
       /**
@@ -69,6 +72,26 @@ namespace stan {
       void unset_error_stream() {
         _error_msgs = 0;
       }
+
+
+      /**
+       * Set the stream into which output will be written
+       * as the sampler runs.  
+       *
+       * @param error_msgs Stream to which output messages are written.
+       */
+      void set_output_stream(std::ostream& output_msgs) {
+        _output_msgs = &output_msgs;
+      }
+
+      /**
+       * Unset the stream into which errors are written to 0 so
+       * that output messages are ignored.
+       */
+      void unset_output_stream() {
+        _output_msgs = 0;
+      }
+
 
       /**
        * Set the model real and integer parameters to the specified

@@ -124,13 +124,9 @@ namespace stan {
       std::cout << std::endl;
     }
 
-    bool do_print(int refresh) {
-      return refresh > 0;
-    }
-
     bool do_print(int n, int refresh) {
-      return do_print(refresh)
-        && ((n + 1) % refresh == 0);
+      return n == 0
+        || ((n + 1) % refresh == 0);
     }
 
     template <class Sampler, class Model>
@@ -155,13 +151,14 @@ namespace stan {
         sampler.adapt_on(); 
       for (int m = 0; m < num_iterations; ++m) {
         if (do_print(m,refresh)) {
-          std::cout << "\rIteration: ";
+          std::cout << "Iteration: ";
           std::cout << std::setw(it_print_width) << (m + 1)
                     << " / " << num_iterations;
           std::cout << " [" << std::setw(3) 
                     << static_cast<int>((100.0 * (m + 1))/num_iterations)
                     << "%] ";
           std::cout << ((m < num_warmup) ? " (Adapting)" : " (Sampling)");
+          std::cout << std::endl;
           std::cout.flush();
         }
         if (m < num_warmup) {
@@ -231,7 +228,8 @@ namespace stan {
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
 
-      Model model(data_var_context);
+      // FIXME: configure to use alt to std::cout for model prints
+      Model model(data_var_context, &std::cout);
 
       std::string sample_file = "samples.csv";
       command.val("samples",sample_file);
@@ -351,7 +349,8 @@ namespace stan {
         for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
           for (size_t i = 0; i < params_r.size(); ++i)
             params_r[i] = init_rng();
-          double init_log_prob = model.grad_log_prob(params_r,params_i,init_grad);
+          // FIXME: allow config vs. std::cout
+          double init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
           if (!boost::math::isfinite(init_log_prob))
             continue;
           for (size_t i = 0; i < init_grad.size(); ++i)
@@ -463,7 +462,8 @@ namespace stan {
           nuts2_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
-        nuts2_sampler.set_error_stream(std::cout);
+        nuts2_sampler.set_error_stream(std::cout);  // cout intended
+        nuts2_sampler.set_output_stream(std::cout); 
 
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,save_warmup,
@@ -480,6 +480,7 @@ namespace stan {
                                              base_rng);
 
         nuts_sampler.set_error_stream(std::cout);
+        nuts_sampler.set_output_stream(std::cout); // cout intended
           // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -501,7 +502,8 @@ namespace stan {
                                                     delta, gamma,
                                                     base_rng);
 
-        hmc_sampler.set_error_stream(std::cout);
+        hmc_sampler.set_error_stream(std::cout); // intended
+        hmc_sampler.set_output_stream(std::cout);
         // cut & paste (see above) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first

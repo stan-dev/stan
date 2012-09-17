@@ -32,6 +32,7 @@ namespace stan {
      * @param[in,out] g Gradient at x, z.
      * @param[in] epsilon Step size used in Hamiltonian dynamics.
      * @param[in,out] error_msgs Output stream for error messages.
+     * @param[in,out] output_msgs Output stream for output messages.
      * 
      * @return the log probability of x and m.
      */
@@ -39,18 +40,19 @@ namespace stan {
                     std::vector<int> z,
                     std::vector<double>& x, std::vector<double>& m,
                     std::vector<double>& g, double epsilon,
-                    std::ostream* error_msgs = 0) {
+                    std::ostream* error_msgs = 0,
+                    std::ostream* output_msgs = 0) {
       stan::math::scaled_add(m, g, 0.5 * epsilon);
       stan::math::scaled_add(x, m, epsilon);
       double logp;
       try {
-        logp = model.grad_log_prob(x, z, g);
+        logp = model.grad_log_prob(x, z, g, output_msgs);
       } catch (std::domain_error e) {
         if (error_msgs) {
           *error_msgs << std::endl
-		      << "Warning (non-fatal rejection): "
-		      << e.what()
-		      << std::endl;
+                      << "Warning (non-fatal rejection): "
+                      << e.what()
+                      << std::endl;
 
         }
         logp = -std::numeric_limits<double>::infinity();
@@ -67,21 +69,22 @@ namespace stan {
                              const std::vector<double>& step_sizes,
                              std::vector<double>& x, std::vector<double>& m,
                              std::vector<double>& g, double epsilon,
-                             std::ostream* error_msgs = 0) {
+                             std::ostream* error_msgs = 0,
+                             std::ostream* output_msgs = 0) {
       for (size_t i = 0; i < m.size(); i++)
         m[i] += 0.5 * epsilon * step_sizes[i] * g[i];
       for (size_t i = 0; i < x.size(); i++)
         x[i] += epsilon * step_sizes[i] * m[i];
       double logp;
       try {
-        logp = model.grad_log_prob(x, z, g);
+        logp = model.grad_log_prob(x, z, g, output_msgs);
       } catch (std::domain_error e) {
         if (error_msgs) {
           // FIXME: remove output
           *error_msgs << std::endl
-		      << "Warning (non-fatal rejection): "
-		      << e.what()
-		      << std::endl;
+                      << "Warning (non-fatal rejection): "
+                      << e.what()
+                      << std::endl;
         }
         logp = -std::numeric_limits<double>::infinity();
       }
@@ -90,6 +93,7 @@ namespace stan {
       return logp;
     }
 
+    // this is for eventual gibbs sampler for discrete
     int sample_unnorm_log(std::vector<double> probs, 
                           boost::uniform_01<boost::mt19937&>& rand_uniform_01) {
       // linearize and scale, but don't norm

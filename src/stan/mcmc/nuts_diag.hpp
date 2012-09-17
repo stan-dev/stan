@@ -347,7 +347,7 @@ namespace stan {
           newlogp = rescaled_leapfrog(this->_model, this->_z, _step_sizes, 
                                       xminus, mminus, gradminus, 
                                       direction * this->_epsilon_last,
-                                      this->_error_msgs);
+                                      this->_error_msgs, this->_output_msgs);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;
