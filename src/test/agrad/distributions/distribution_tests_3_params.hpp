@@ -1,9 +1,6 @@
 #ifndef __TEST__AGRAD__DISTRIBUTIONS__DISTRIBUTION_TESTS_3_PARAMS_HPP___
 #define __TEST__AGRAD__DISTRIBUTIONS__DISTRIBUTION_TESTS_3_PARAMS_HPP___
-/*
-TYPED_TEST_P(AgradDistributionTestFixture, ) {
-}
-*/
+
 using stan::agrad::var;
 
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
@@ -800,7 +797,223 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvv) {
       << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
   }
 }
-	     
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddd) {
+  SUCCEED() << "No op for (d,d,d) input" << std::endl;
+}
+
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p2(p[2]);
+    
+    var lp = _LOG_PROB_<true>(p[0], p[1], p2);
+    var expected_lp = t.log_prob(p[0], p[1], p2);
+    vector<var> v_params(1);
+    v_params[0] = p2;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvd) {  
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p1(p[1]);
+    
+    var lp = _LOG_PROB_<true>(p[0], p1, p[2]);
+    var expected_lp = t.log_prob(p[0], p1, p[2]);
+    vector<var> v_params(1);
+    v_params[0] = p1;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvv) {  
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p1(p[1]);
+    var p2(p[2]);
+    
+    var lp = _LOG_PROB_<true>(p[0], p1, p2);
+    var expected_lp = t.log_prob(p[0], p1, p2);
+    vector<var> v_params(2);
+    v_params[0] = p1;
+    v_params[1] = p2;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[1],
+		    gradients[1])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdd) {  
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p0(p[0]);
+    
+    var lp = _LOG_PROB_<true>(p0, p[1], p[2]);
+    var expected_lp = t.log_prob(p0, p[1], p[2]);
+    vector<var> v_params(1);
+    v_params[0] = p0;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p0(p[0]);
+    var p2(p[2]);
+    
+    var lp = _LOG_PROB_<true>(p0, p[1], p2);
+    var expected_lp = t.log_prob(p0, p[1], p2);
+    vector<var> v_params(2);
+    v_params[0] = p0;
+    v_params[1] = p2;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[1],
+		    gradients[1])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p0(p[0]);
+    var p1(p[1]);
+    
+    var lp = _LOG_PROB_<true>(p0, p1, p[2]);
+    var expected_lp = t.log_prob(p0, p1, p[2]);
+    vector<var> v_params(2);
+    v_params[0] = p0;
+    v_params[1] = p1;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[1],
+		    gradients[1])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> p(parameters[n]);
+    var p0(p[0]);
+    var p1(p[1]);
+    var p2(p[2]);
+    
+    var lp = _LOG_PROB_<true>(p0, p1, p2);
+    var expected_lp = t.log_prob(p0, p1, p2);
+    vector<var> v_params(3);
+    v_params[0] = p0;
+    v_params[1] = p1;
+    v_params[2] = p2;
+    
+    vector<double> gradients;
+    lp.grad(v_params, gradients);
+    vector<double> expected_gradients;
+    expected_lp.grad(v_params, expected_gradients);
+    
+    EXPECT_FLOAT_EQ(expected_lp.val(),
+		    lp.val())
+      << "Index: " << n << " - function value test failed" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[0],
+		    gradients[0])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[1],
+		    gradients[1])
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+    EXPECT_FLOAT_EQ(expected_gradients[2],
+		    gradients[2])
+      << "Index: " << n << " - hand-coded test failed for parameter 2" << std::endl;
+  }
+}
+
 
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   check_valid_ddd,
@@ -834,6 +1047,14 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   gradient_finite_diff_vdd,
 			   gradient_finite_diff_vdv,
 			   gradient_finite_diff_vvd,
-			   gradient_finite_diff_vvv
+			   gradient_finite_diff_vvv,
+			   gradient_function_ddd,
+			   gradient_function_ddv,
+			   gradient_function_dvd,
+			   gradient_function_dvv,
+			   gradient_function_vdd,
+			   gradient_function_vdv,
+			   gradient_function_vvd,
+			   gradient_function_vvv
 			   );
 #endif

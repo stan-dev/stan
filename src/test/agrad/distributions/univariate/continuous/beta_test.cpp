@@ -6,6 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
+using stan::agrad::var;
 
 class AgradDistributionsBeta : public AgradDistributionTest {
 public:
@@ -52,6 +53,29 @@ public:
 
     index.push_back(2U);
     value.push_back(-numeric_limits<double>::infinity());
+  }
+
+  template <class T_y, class T_scale1, class T_scale2>
+  var log_prob(const T_y& y, const T_scale1& alpha, const T_scale2& beta) {
+    using std::log;
+    using stan::math::log1m;
+    using stan::math::log;
+    using stan::math::value_of;
+    using stan::prob::include_summand;
+    
+    var logp(0);
+    
+    if (include_summand<true,T_y,T_scale1>::value)
+      logp += (alpha - 1.0) * log(y);
+    if (include_summand<true,T_y,T_scale2>::value)
+      logp += (beta - 1.0) * log1m(y);
+    if (include_summand<true,T_scale1,T_scale2>::value)
+      logp += lgamma(alpha + beta);
+    if (include_summand<true,T_scale1>::value)
+      logp -= lgamma(alpha);
+    if (include_summand<true,T_scale2>::value)
+      logp -= lgamma(beta);
+    return logp;
   }
 
 };
