@@ -1017,283 +1017,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
       << "Index: " << n << " - hand-coded test failed for parameter 2" << std::endl;
   }
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_DDD) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  
-  double expected_logprob = 0.0;
 
-  vector<double> p0, p1, p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_DDV) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-    
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    double p0 = parameters[n][0];
-    double p1 = parameters[n][1];
-    var p2 = parameters[n][2];
-    var logprob = _LOG_PROB_<true>(p0, p1, p2);
-    vector<var> x;
-    x.push_back(p2);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p2.push_back(grad[0]);
-  }
-  
-  vector<double> p0, p1;
-  vector<var> p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-  vector<double> grad_p2;
-  logprob.grad(p2, grad_p2);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
-      << "Index " << n << ": gradient failed for parameter 2"; 
-  }
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_DVD) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    double p0 = parameters[n][0];
-    var p1 = parameters[n][1];
-    double p2 = parameters[n][2];
-    var logprob = _LOG_PROB_<true>(p0, p1, p2);
-    vector<var> x;
-    x.push_back(p1);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p1.push_back(grad[0]);
-  }
-
-  vector<double> p0, p2;
-  vector<var> p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-  vector<double> grad_p1;
-  logprob.grad(p1, grad_p1);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
-      << "Index " << n << ": gradient failed for parameter 1"; 
-  }
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_DVV) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-    
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p1, expected_grad_p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    double p0 = parameters[n][0];
-    var p1 = parameters[n][1];
-    var p2 = parameters[n][2];
-    var logprob = _LOG_PROB_<true>(p0, p1, p2);
-    vector<var> x;
-    x.push_back(p1);
-    x.push_back(p2);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p1.push_back(grad[0]);
-    expected_grad_p2.push_back(grad[1]);
-  }
-
-  vector<double> p0;
-  vector<var> p1, p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-  vector<double> grad_p1, grad_p2;
-  logprob.grad(p1, grad_p1);
-  logprob.grad(p2, grad_p2);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
-      << "Index " << n << ": gradient failed for parameter 1"; 
-    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
-      << "Index " << n << ": gradient failed for parameter 2"; 
-  }
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_VDD) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p0;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    var p0 = parameters[n][0];
-    double p1 = parameters[n][1];
-    double p2 = parameters[n][2];
-    var logprob = _LOG_PROB_<true>(p0, p1, p2);
-    vector<var> x;
-    x.push_back(p0);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p0.push_back(grad[0]);
-  }
-
-  vector<var> p0;
-  vector<double> p1, p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-  vector<double> grad_p0;
-  logprob.grad(p0, grad_p0);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
-      << "Index " << n << ": gradient failed for parameter 0"; 
-  }
-}
-
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_VDV) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-    
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p0, expected_grad_p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    var p0 = parameters[n][0];
-    double p1 = parameters[n][1];
-    var p2 = parameters[n][2];
-    var logprob = _LOG_PROB_<true>(p0, p1, p2);
-    vector<var> x;
-    x.push_back(p0);
-    x.push_back(p2);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p0.push_back(grad[0]);
-    expected_grad_p2.push_back(grad[1]);
-  }
-
-  vector<var> p0, p2;
-  vector<double> p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-  vector<double> grad_p0, grad_p2;
-  logprob.grad(p0, grad_p0);
-  logprob.grad(p2, grad_p2);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
-      << "Index " << n << ": gradient failed for parameter 0"; 
-    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
-      << "Index " << n << ": gradient failed for parameter 2"; 
-  }
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_VVD) {
-  TypeParam t;
-  vector<vector<double> > parameters;
-  t.valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  
-  
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p0, expected_grad_p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    var p0 = parameters[n][0];
-    var p1 = parameters[n][1];
-    double p2 = parameters[n][2];
-    var logprob = _LOG_PROB_<true>(p0, p1, p2);
-    vector<var> x;
-    x.push_back(p0);
-    x.push_back(p1);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p0.push_back(grad[0]);
-    expected_grad_p1.push_back(grad[1]);
-  }
-
-  vector<var> p0, p1;
-  vector<double> p2;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(parameters[n][0]);
-    p1.push_back(parameters[n][1]);
-    p2.push_back(parameters[n][2]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1, p2);
-  vector<double> grad_p0, grad_p1;
-  logprob.grad(p0, grad_p0);
-  logprob.grad(p1, grad_p1);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
-      << "Index " << n << ": gradient failed for parameter 0"; 
-    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
-      << "Index " << n << ": gradient failed for parameter 1"; 
-  }
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_VVV) {
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVV) {
   TypeParam t;
   vector<vector<double> > parameters;
   t.valid_values(parameters);
@@ -1343,24 +1068,1288 @@ TYPED_TEST_P(AgradDistributionTestFixture, vectorized_VVV) {
       << "Index " << n << ": gradient failed for parameter 2"; 
   }
 }
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0, expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    double p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1.push_back(grad[1]);
+  }
+
+  vector<var> p0, p1;
+  vector<double> p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1;
+  logprob.grad(p0, grad_p0);
+  logprob.grad(p1, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0, expected_grad_p1;
+  double expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1.push_back(grad[1]);
+    expected_grad_p2 += grad[2];
+  }
+
+  vector<var> p0, p1;
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1, grad_p2;
+  vector<var> x;
+  x.push_back(p2);
+  logprob.grad(p0, grad_p0);
+  logprob.grad(p1, grad_p1);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+    << "Gradient failed for parameter 2"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVd) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0, expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    double p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1.push_back(grad[1]);
+  }
+
+  vector<var> p0, p1;
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1;
+  logprob.grad(p0, grad_p0);
+  logprob.grad(p1, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+  }
+}
+
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+    
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0, expected_grad_p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[n][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p2.push_back(grad[1]);
+  }
+
+  vector<var> p0, p2;
+  vector<double> p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p2;
+  logprob.grad(p0, grad_p0);
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+}
+
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[n][1];
+    double p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+  }
+
+  vector<var> p0;
+  vector<double> p1, p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0;
+  logprob.grad(p0, grad_p0);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+}
 
 
 
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDv) {
+    TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+    
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  double expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[n][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p2 += grad[1];
+  }
+
+  vector<var> p0;
+  vector<double> p1;
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p2;
+  vector<var> x;
+  x.push_back(p2);
+  logprob.grad(p0, grad_p0);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+  << "Gradient failed for parameter 2";
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDd) {
+TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[n][1];
+    double p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    vector<double> grad;
+    logprob.grad(x, grad);
+    
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+  }
+
+  vector<var> p0;
+  vector<double> p1;
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0;
+  logprob.grad(p0, grad_p0);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VvV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0, expected_grad_p2;
+  double expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1 += grad[1];
+    expected_grad_p2.push_back(grad[2]);
+  }
+
+  vector<var> p0, p2;
+  var p1 = parameters[0][1];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1, grad_p2;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(p0, grad_p0);
+  logprob.grad(x, grad_p1);
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VvD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  double expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    double p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1 += grad[1];
+  }
+
+  vector<var> p0;
+  var p1 = parameters[0][1];
+  vector<double> p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(p0, grad_p0);
+  logprob.grad(x, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vvv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  double expected_grad_p1 = 0.0, expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1 += grad[1];
+    expected_grad_p2 += grad[2];
+  }
+
+  vector<var> p0;
+  var p1 = parameters[0][1];
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1, grad_p2;
+  logprob.grad(p0, grad_p0);
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(x, grad_p1);
+  x.clear();
+  x.push_back(p2);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+    << "Gradient failed for parameter 2"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vvd) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  double expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    double p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p1 += grad[1];
+  }
+
+  vector<var> p0;
+  var p1 = parameters[0][1];
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p1;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(p0, grad_p0);
+  logprob.grad(x, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VdV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+    
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0, expected_grad_p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[0][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p2.push_back(grad[1]);
+  }
+
+  vector<var> p0, p2;
+  double p1 = parameters[0][1];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p2;
+  logprob.grad(p0, grad_p0);
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VdD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[0][1];
+    double p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+  }
+
+  vector<var> p0;
+  double p1 = parameters[0][1];
+  vector<double> p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0;
+  logprob.grad(p0, grad_p0);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vdv) {
+    TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  double expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[0][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+    expected_grad_p2 += grad[1];
+  }
+
+  vector<var> p0;
+  double p1 = parameters[0][1];
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0, grad_p2;
+  vector<var> x;
+  x.push_back(p2);
+  logprob.grad(p0, grad_p0);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+  << "Gradient failed for parameter 2";
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vdd) {
+TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    var p0 = parameters[n][0];
+    double p1 = parameters[0][1];
+    double p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p0);
+    vector<double> grad;
+    logprob.grad(x, grad);
+    
+    expected_logprob += logprob.val();
+    expected_grad_p0.push_back(grad[0]);
+  }
+
+  vector<var> p0;
+  double p1 = parameters[0][1];
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p0;
+  logprob.grad(p0, grad_p0);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p0[n], grad_p0[n]) 
+      << "Index " << n << ": gradient failed for parameter 0"; 
+  }
+}
+
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p1, expected_grad_p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1.push_back(grad[0]);
+    expected_grad_p2.push_back(grad[1]);
+  }
+
+  vector<double> p0;
+  vector<var> p1, p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1, grad_p2;
+  logprob.grad(p1, grad_p1);
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    double p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1.push_back(grad[0]);
+  }
+
+  vector<double> p0, p2;
+  vector<var> p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1;
+  logprob.grad(p1, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p1;
+  double expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1.push_back(grad[0]);
+    expected_grad_p2 += grad[1];
+  }
+
+  vector<double> p0;
+  vector<var> p1;
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1, grad_p2;
+  vector<var> x;
+  x.push_back(p2);
+  logprob.grad(p1, grad_p1);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+    << "Gradient failed for parameter 2"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVd) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[n][1];
+    double p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1.push_back(grad[0]);
+  }
+
+  vector<double> p0;
+  vector<var> p1;
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1;
+  logprob.grad(p1, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
+      << "Index " << n << ": gradient failed for parameter 1"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+    
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    double p1 = parameters[n][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p2.push_back(grad[0]);
+  }
+
+  vector<double> p0, p1;
+  vector<var> p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p2;
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> p0, p1, p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+    
+  double expected_logprob = 0.0;
+  vector<double> expected_;
+  double expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    double p1 = parameters[n][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p2 += grad[0];
+  }
+
+  vector<double> p0, p1;
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p2;
+  vector<var> x;
+  x.push_back(p2);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+    << "Gradient failed for parameter 2";
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDd) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  
+  vector<double> p0, p1;
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p1.push_back(parameters[n][1]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DvV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p2;
+  double expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1 += grad[0];
+    expected_grad_p2.push_back(grad[1]);
+  }
+
+  vector<double> p0;
+  vector<var> p2;
+  var p1 = parameters[0][1];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1, grad_p2;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(x, grad_p1);
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DvD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  double expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    double p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1 += grad[0];
+  }
+
+  vector<double> p0, p2;
+  var p1 = parameters[0][1];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(x, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Dvv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  double expected_grad_p1 = 0.0, expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    
+    x.push_back(p1);
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1 += grad[0];
+    expected_grad_p2 += grad[1];
+  }
+
+  vector<double> p0;
+  var p1 = parameters[0][1];
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1, grad_p2;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(x, grad_p1);
+  x.clear();
+  x.push_back(p2);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+    << "Gradient failed for parameter 2"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Dvd) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  double expected_grad_p1;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    var p1 = parameters[0][1];
+    double p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p1);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p1 += grad[0];
+  }
+
+  vector<double> p0;
+  var p1 = parameters[0][1];
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p1;
+  vector<var> x;
+  x.push_back(p1);
+  logprob.grad(x, grad_p1);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
+    << "Gradient failed for parameter 1"; 
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DdV) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+    
+  double expected_logprob = 0.0;
+  vector<double> expected_grad_p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    double p1 = parameters[0][1];
+    var p2 = parameters[n][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p2.push_back(grad[0]);
+  }
+
+  vector<double> p0;
+  double p1 = parameters[0][1];
+  vector<var> p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p2;
+  logprob.grad(p2, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    EXPECT_FLOAT_EQ(expected_grad_p2[n], grad_p2[n])
+      << "Index " << n << ": gradient failed for parameter 2"; 
+  }
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DdD) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+
+  vector<double> p0;
+  double p1 = parameters[0][1];
+  vector<double> p2;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+    p2.push_back(parameters[n][2]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Ddv) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+
+  double expected_logprob = 0.0;
+  double expected_grad_p2 = 0.0;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    double p0 = parameters[n][0];
+    double p1 = parameters[0][1];
+    var p2 = parameters[0][2];
+    var logprob = _LOG_PROB_<true>(p0, p1, p2);
+    vector<var> x;
+    x.push_back(p2);
+    vector<double> grad;
+    logprob.grad(x, grad);
+
+    expected_logprob += logprob.val();
+    expected_grad_p2 += grad[0];
+  }
+
+  vector<double> p0;
+  double p1 = parameters[0][1];
+  var p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  vector<double> grad_p2;
+  vector<var> x;
+  x.push_back(p2);
+  logprob.grad(x, grad_p2);
+
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+  EXPECT_FLOAT_EQ(expected_grad_p2, grad_p2[0])
+  << "Gradient failed for parameter 2";
+}
+TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Ddd) {
+  TypeParam t;
+  vector<vector<double> > parameters;
+  t.valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  double expected_logprob = 0.0;
+  
+  vector<double> p0;
+  double p1 = parameters[0][1];
+  double p2 = parameters[0][2];
+  for (size_t n = 0; n < parameters.size(); n++) {
+    p0.push_back(parameters[n][0]);
+  }
+  var logprob = _LOG_PROB_<true>(p0, p1, p2);
+  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
+    << "log probability does not match" << std::endl;
+}
 
 
+//------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
+// This has a limit of 50 tests.
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   check_valid_ddd,
 			   check_valid_ddv,
@@ -1401,14 +2390,41 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   gradient_function_vdd,
 			   gradient_function_vdv,
 			   gradient_function_vvd,
-			   gradient_function_vvv,
-			   vectorized_DDD,
-			   vectorized_DDV,
-			   vectorized_DVD,
-			   vectorized_DVV,
-			   vectorized_VDD,
-			   vectorized_VDV,
+			   gradient_function_vvv);
+REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture2,
+			   vectorized_VVV,
 			   vectorized_VVD,
-			   vectorized_VVV
+			   vectorized_VVv,
+			   vectorized_VVd,
+			   vectorized_VDV,
+			   vectorized_VDD,
+			   vectorized_VDv,
+			   vectorized_VDd,
+			   vectorized_VvV,
+			   vectorized_VvD,
+			   vectorized_Vvv,
+			   vectorized_Vvd,
+			   vectorized_VdV,
+			   vectorized_VdD,
+			   vectorized_Vdv,
+			   vectorized_Vdd,
+
+
+			   vectorized_DVV,
+			   vectorized_DVD,
+			   vectorized_DVv,
+			   vectorized_DVd,
+			   vectorized_DDV,
+			   vectorized_DDD,
+			   vectorized_DDv,
+			   vectorized_DDd,
+			   vectorized_DvV,
+			   vectorized_DvD,
+			   vectorized_Dvv,
+			   vectorized_Dvd,
+			   vectorized_DdV,
+			   vectorized_DdD,
+			   vectorized_Ddv,
+			   vectorized_Ddd
 			   );
 #endif
