@@ -1,16 +1,15 @@
 #ifndef __TEST__AGRAD__DISTRIBUTIONS__DISTRIBUTION_TESTS_3_PARAMS_HPP___
 #define __TEST__AGRAD__DISTRIBUTIONS__DISTRIBUTION_TESTS_3_PARAMS_HPP___
 
-using stan::agrad::var;
-
 // v: var
 // d: double
 // V: vector<var>
 // D: vector<double>
+
+using stan::agrad::var;
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -24,9 +23,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -38,9 +36,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -52,9 +49,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -66,9 +62,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -80,9 +75,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -94,9 +88,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -108,9 +101,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params = parameters[n];
@@ -121,15 +113,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvv) {
       << "Failed with (v,v,v) at index: " << n << std::endl;
   }
 }
-
-
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddd) {
-  TypeParam t;
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -156,44 +145,38 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddv) {
-  TypeParam t;
   vector<size_t> index;
   vector<double> invalid_values;
-
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
     vector<double> invalid_params(valid_params);
     invalid_params[index[n]] = invalid_values[n];
-
     EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0],
 				  invalid_params[1],
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
     vector<double> invalid_params(valid_params);
     invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
     EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0], 
 				  invalid_params[1],
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvd) {  
-  TypeParam t;
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -204,8 +187,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvd) {
 				  var(invalid_params[1]),
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -220,12 +202,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvv) {  
-  TypeParam t;
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -236,8 +217,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvv) {
 				  var(invalid_params[1]),
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -251,12 +231,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvv) {
       << "Default policy with NaN for parameter: " << i;
   }
 }
-TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {  TypeParam t;
+TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -267,8 +247,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {  TypeParam t;
 				  invalid_params[1],
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -282,12 +261,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {  TypeParam t;
       << "Default policy with NaN for parameter: " << i;
   }
 }
-TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {  TypeParam t;
+TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {  
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -298,8 +277,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {  TypeParam t;
 				  invalid_params[1],
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -314,12 +292,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {  TypeParam t;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvd) {
-  TypeParam t;
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -330,8 +307,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvd) {
 				  var(invalid_params[1]),
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -346,12 +322,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvv) {
-  TypeParam t;
   vector<size_t> index;
   vector<double> invalid_values;
 
   const vector<double> valid_params = this->first_valid_params();
-  t.invalid_values(index, invalid_values);
+  TypeParam().invalid_values(index, invalid_values);
   ASSERT_EQ(index.size(), invalid_values.size());
   
   for (size_t n = 0; n < index.size(); n++) {
@@ -362,8 +337,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvv) {
 				  var(invalid_params[1]),
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
+      << "Default policy. Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -378,12 +352,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddd) {
-  TypeParam t;
   var logprob_true = _LOG_PROB_<true>(this->first_valid_params()[0],
 				      this->first_valid_params()[1],
 				      this->first_valid_params()[2]);
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> params(parameters[n]);
@@ -399,7 +372,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddv) {
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(params[0],
@@ -409,7 +381,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddv) {
 				      params[1],
 				      var(params[2]));
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[2] = parameters[n][2];
@@ -428,7 +400,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dvd) {
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(params[0],
@@ -438,7 +409,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dvd) {
 				      var(params[1]),
 				      params[2]);
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[1] = parameters[n][1];
@@ -457,7 +428,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dvv) { 
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(params[0],
@@ -467,7 +437,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dvv) {
 				      var(params[1]),
 				      var(params[2]));
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[1] = parameters[n][1];
@@ -486,7 +456,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dvv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vdd) { 
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(var(params[0]),
@@ -496,7 +465,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vdd) {
 				      params[1],
 				      params[2]);
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[0] = parameters[n][0];
@@ -514,7 +483,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vdd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vdv) {
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(var(params[0]),
@@ -524,7 +492,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vdv) {
 				      params[1],
 				      var(params[2]));
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[0] = parameters[n][0];
@@ -543,7 +511,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vdv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vvd) { 
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(var(params[0]),
@@ -553,7 +520,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vvd) {
 				      var(params[1]),
 				      params[2]);
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[0] = parameters[n][0];
@@ -572,7 +539,6 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vvv) { 
-  TypeParam t;
   vector<double> params(this->first_valid_params());
 
   var logprob_false = _LOG_PROB_<false>(var(params[0]),
@@ -582,7 +548,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vvv) {
 				      var(params[1]),
 				      var(params[2]));
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     params[0] = parameters[n][0];
@@ -601,14 +567,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vvv) {
       << "_LOG_PROB_(" << params[0] << "," << params[1] << "," << params[2] << ")" << std::endl;
   }
 }
-
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_ddd) {
   SUCCEED() << "No op for all double" << std::endl;
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_ddv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -629,9 +593,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_ddv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -652,9 +615,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -682,9 +644,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdd) {  
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -705,9 +666,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -735,9 +695,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -766,9 +725,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   double e = this->e();
   double e_times_2 = (2.0 * e);
@@ -806,16 +764,15 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddd) {
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
     var p2(p[2]);
     
     var lp = _LOG_PROB_<true>(p[0], p[1], p2);
-    var expected_lp = t.log_prob(p[0], p[1], p2);
+    var expected_lp = TypeParam().log_prob(p[0], p[1], p2);
     vector<var> v_params(1);
     v_params[0] = p2;
     
@@ -833,16 +790,15 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvd) {  
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
     var p1(p[1]);
     
     var lp = _LOG_PROB_<true>(p[0], p1, p[2]);
-    var expected_lp = t.log_prob(p[0], p1, p[2]);
+    var expected_lp = TypeParam().log_prob(p[0], p1, p[2]);
     vector<var> v_params(1);
     v_params[0] = p1;
     
@@ -860,9 +816,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvv) {  
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
@@ -870,7 +825,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvv) {
     var p2(p[2]);
     
     var lp = _LOG_PROB_<true>(p[0], p1, p2);
-    var expected_lp = t.log_prob(p[0], p1, p2);
+    var expected_lp = TypeParam().log_prob(p[0], p1, p2);
     vector<var> v_params(2);
     v_params[0] = p1;
     v_params[1] = p2;
@@ -892,16 +847,15 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvv) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdd) {  
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
     var p0(p[0]);
     
     var lp = _LOG_PROB_<true>(p0, p[1], p[2]);
-    var expected_lp = t.log_prob(p0, p[1], p[2]);
+    var expected_lp = TypeParam().log_prob(p0, p[1], p[2]);
     vector<var> v_params(1);
     v_params[0] = p0;
     
@@ -918,9 +872,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdd) {
       << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
   }
 }
-TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {  TypeParam t;
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
@@ -928,7 +882,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {  TypeParam t
     var p2(p[2]);
     
     var lp = _LOG_PROB_<true>(p0, p[1], p2);
-    var expected_lp = t.log_prob(p0, p[1], p2);
+    var expected_lp = TypeParam().log_prob(p0, p[1], p2);
     vector<var> v_params(2);
     v_params[0] = p0;
     v_params[1] = p2;
@@ -949,9 +903,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {  TypeParam t
       << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
   }
 }
-TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {  TypeParam t;
+TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {  
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
@@ -959,7 +913,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {  TypeParam t
     var p1(p[1]);
     
     var lp = _LOG_PROB_<true>(p0, p1, p[2]);
-    var expected_lp = t.log_prob(p0, p1, p[2]);
+    var expected_lp = TypeParam().log_prob(p0, p1, p[2]);
     vector<var> v_params(2);
     v_params[0] = p0;
     v_params[1] = p1;
@@ -981,9 +935,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {  TypeParam t
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   for (size_t n = 0; n < parameters.size(); n++) {
     vector<double> p(parameters[n]);
@@ -992,7 +945,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
     var p2(p[2]);
     
     var lp = _LOG_PROB_<true>(p0, p1, p2);
-    var expected_lp = t.log_prob(p0, p1, p2);
+    var expected_lp = TypeParam().log_prob(p0, p1, p2);
     vector<var> v_params(3);
     v_params[0] = p0;
     v_params[1] = p1;
@@ -1017,11 +970,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
       << "Index: " << n << " - hand-coded test failed for parameter 2" << std::endl;
   }
 }
-
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   
@@ -1069,9 +1020,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVV) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   
@@ -1115,9 +1065,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVD) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   
@@ -1168,9 +1117,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVv) {
     << "Gradient failed for parameter 2"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1211,11 +1159,9 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVd) {
       << "Index " << n << ": gradient failed for parameter 1"; 
   }
 }
-
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
@@ -1257,11 +1203,9 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDV) {
       << "Index " << n << ": gradient failed for parameter 2"; 
   }
 }
-
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1298,13 +1242,9 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDD) {
       << "Index " << n << ": gradient failed for parameter 0"; 
   }
 }
-
-
-
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDv) {
-    TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
@@ -1350,9 +1290,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDv) {
   << "Gradient failed for parameter 2";
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VDd) {
-TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1390,9 +1329,8 @@ TypeParam t;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VvV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   
@@ -1443,9 +1381,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VvV) {
     << "Gradient failed for parameter 1"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VvD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1491,9 +1428,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VvD) {
     << "Gradient failed for parameter 1"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1545,9 +1481,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vvv) {
     << "Gradient failed for parameter 2"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vvd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1592,9 +1527,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vvd) {
     << "Gradient failed for parameter 1"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VdV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
@@ -1636,9 +1570,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VdV) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VdD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1676,9 +1609,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VdD) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vdv) {
-    TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
 
   double expected_logprob = 0.0;
@@ -1723,9 +1655,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vdv) {
   << "Gradient failed for parameter 2";
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Vdd) {
-TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1763,9 +1694,8 @@ TypeParam t;
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1808,9 +1738,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVV) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   
@@ -1849,9 +1778,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVD) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1898,9 +1826,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVv) {
     << "Gradient failed for parameter 2"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1938,9 +1865,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DVd) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
@@ -1979,9 +1905,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDV) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -1996,9 +1921,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDD) {
     << "log probability does not match" << std::endl;
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
@@ -2037,9 +1961,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDv) {
     << "Gradient failed for parameter 2";
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2055,9 +1978,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DDd) {
     << "log probability does not match" << std::endl;
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DvV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2103,9 +2025,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DvV) {
     << "Gradient failed for parameter 1"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DvD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2143,9 +2064,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DvD) {
     << "Gradient failed for parameter 1"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Dvv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2190,9 +2110,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Dvv) {
     << "Gradient failed for parameter 2"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Dvd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2229,9 +2148,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Dvd) {
     << "Gradient failed for parameter 1"; 
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DdV) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
@@ -2270,9 +2188,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DdV) {
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DdD) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2289,9 +2206,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_DdD) {
     << "log probability does not match" << std::endl;
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Ddv) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
 
   double expected_logprob = 0.0;
@@ -2328,9 +2244,8 @@ TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Ddv) {
   << "Gradient failed for parameter 2";
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_Ddd) {
-  TypeParam t;
   vector<vector<double> > parameters;
-  t.valid_values(parameters);
+  TypeParam().valid_values(parameters);
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
@@ -2408,8 +2323,6 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture2,
 			   vectorized_VdD,
 			   vectorized_Vdv,
 			   vectorized_Vdd,
-
-
 			   vectorized_DVV,
 			   vectorized_DVD,
 			   vectorized_DVv,
@@ -2425,6 +2338,5 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture2,
 			   vectorized_DdV,
 			   vectorized_DdD,
 			   vectorized_Ddv,
-			   vectorized_Ddd
-			   );
+			   vectorized_Ddd);
 #endif
