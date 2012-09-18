@@ -1975,23 +1975,64 @@ Each time the loop body is executed, it will print the string ``loop iteration:
 
 \subsection{Print Content}
 
-A literal string in a print statement always prints exactly that
-string (without the quotes).  Expressions in print statements result
-in the value of the expression being printed. 
+The text printed by a print statement varies based on its content.  A
+literal (i.e., quoted) string in a print statement always prints
+exactly that string (without the quotes).  Expressions in print
+statements result in the value of the expression being printed.
+But how the value of the expression is formatted will depend on its type.
 
-\subsubsection{Print Conent of Parameter Variables and Data Variables}
+Printing a simple \code{real} or \code{int} typed variable always
+prints the variable's value.%
+%
+\footnote{The adjoint component is always zero during execution for
+  the algorithmic differentiation variables used to implement
+  parameters, transformed parameters, and local variables in the model.}
+%
+For array, vector, and matrix variables, the print format uses
+brackets.  For example, a 3-vector will print as
+%
+\begin{quote}
+\begin{Verbatim}
+[1,2,3]
+\end{Verbatim}
+\end{quote}
+%
+and a $2 \times 3$-matrix as 
+%
+\begin{quote}
+\begin{Verbatim}
+[[1,2,3],[4,5,6]]
+\end{Verbatim}
+\end{quote}
+%
 
-Printing a (transformed) parameter or local variable in the
-transformed parameter or model block will print the value of the
-parameter followed by a colon, followed by a zero.  The zero is the
-value of the algorithmic differentation adjoint variable, which is
-always zero until the model code completes execution; other than
-signaling the type of variable (parameter or data), the colon and zero
-may be ignored.
+Printing a more readable version of arrays or matrices can be done
+with loops.  An example is the print statement in the following
+transformed data block.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  matrix[2,2] u;  
+  u[1,1] <- 1.0;  u[1,2] <- 4.0;    
+  u[2,1] <- 9.0;  u[2,2] <- 16.0;
+  for (n in 1:2)
+    print("u[", n, "] = ", u[n]);
+}
+\end{Verbatim}
+\end{quote}
+%
+This print statement executes twice, printing the following two lines
+of output.
+%
+\begin{quote}
+\begin{Verbatim}
+u[1] = [1,4]
+u[2] = [9,16]
+\end{Verbatim}
+\end{quote}
 
-Printing a data variable or transformed data variable or a local
-variable in the transformed data block prints just the
-value of the variable.
+
 
 \subsection{Print Frequency}
 

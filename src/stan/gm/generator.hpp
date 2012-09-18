@@ -178,6 +178,7 @@ namespace stan {
       generate_using("stan::agrad::var",o);
       generate_using("stan::model::prob_grad_ad",o);
       generate_using("stan::math::get_base1",o);
+      generate_using("stan::math::stan_print",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);
@@ -1094,15 +1095,17 @@ namespace stan {
       }
       void operator()(const print_statement& ps) const {
         generate_indent(indent_,o_);
-        o_ << "if (pstream__)" << EOL;
-        generate_indent(indent_ + 1,o_);
-        o_ << "*pstream__";
+        o_ << "if (pstream__) {" << EOL;
         for (size_t i = 0; i < ps.printables_.size(); ++i) {
-          o_ << " << (";
+          generate_indent(indent_ + 1,o_);
+          o_ << "stan_print(pstream__,";
           generate_printable(ps.printables_[i],o_);
-          o_ << ")";
+          o_ << ");" << EOL;
         }
-        o_ << " << std::endl;" << EOL;
+        generate_indent(indent_ + 1,o_);
+        o_ << "*pstream__ << std::endl;" << EOL;
+        generate_indent(indent_,o_);
+        o_ << '}' << EOL;
       }
       void operator()(const for_statement& x) const {
         generate_indent(indent_,o_);

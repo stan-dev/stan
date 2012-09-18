@@ -2401,6 +2401,10 @@ namespace stan {
       assigner<needs_promotion<LHS,RHS>::value, LHS, RHS>::assign(var,val);
     }
 
+    void stan_print(std::ostream* o, const var& x) {
+      *o << x.val();
+    }
+
 
 
   }

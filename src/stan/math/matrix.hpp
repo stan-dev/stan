@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX_HPP__
 
 #include <stdexcept>
+#include <ostream>
 #include <vector>
 
 #include <boost/math/tools/promotion.hpp>
@@ -1554,6 +1555,52 @@ namespace stan {
      * @param s Singular values.
      */
     void svd(const matrix_d& m, matrix_d& u, matrix_d& v, vector_d& s);
+
+    template <typename T>
+    void stan_print(std::ostream* o, const T& x) {
+      *o << x;
+    }
+    
+    template <typename T>
+    void stan_print(std::ostream* o, const std::vector<T>& x) {
+      *o << '[';
+      for (int i = 0; i < x.size(); ++i) {
+        if (i > 0) *o << ',';
+        stan_print(o,x[i]);
+      }
+      *o << ']';
+    }
+
+    template <typename T>
+    void stan_print(std::ostream* o, const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+      *o << '[';
+      for (int i = 0; i < x.size(); ++i) {
+        if (i > 0) *o << ',';
+        stan_print(o,x(i));
+      }
+      *o << ']';
+    }
+
+    template <typename T>
+    void stan_print(std::ostream* o, const Eigen::Matrix<T,1,Eigen::Dynamic>& x) {
+      *o << '[';
+      for (int i = 0; i < x.size(); ++i) {
+        if (i > 0) *o << ',';
+        stan_print(o,x(i));
+      }
+      *o << ']';
+    }
+
+    template <typename T>
+    void stan_print(std::ostream* o, const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
+      *o << '[';
+      for (int i = 0; i < x.rows(); ++i) {
+        if (i > 0) *o << ',';
+        stan_print(o,x.row(i));
+      }
+      *o << ']';
+    }
+
 
   }
 
