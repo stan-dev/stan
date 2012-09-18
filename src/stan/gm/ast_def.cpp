@@ -624,7 +624,8 @@ namespace stan {
     }
 
 
-    cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { }
+    cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
+    }
     cov_matrix_var_decl::cov_matrix_var_decl(expression const& K,
                                      std::string const& name,
                                      std::vector<expression> const& dims)

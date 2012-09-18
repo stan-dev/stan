@@ -428,9 +428,7 @@ namespace stan {
     };
 
     struct ordered_var_decl : public base_var_decl {
-      std::string name_;
       expression K_;
-      std::vector<expression> dims_;
       ordered_var_decl();
       ordered_var_decl(expression const& K,
                        std::string const& name,
@@ -438,9 +436,7 @@ namespace stan {
     };
 
     struct positive_ordered_var_decl : public base_var_decl {
-      std::string name_;
       expression K_;
-      std::vector<expression> dims_;
       positive_ordered_var_decl();
       positive_ordered_var_decl(expression const& K,
                                 std::string const& name,
@@ -478,21 +474,17 @@ namespace stan {
    
 
     struct cov_matrix_var_decl : public base_var_decl {
-      std::string name_;
       expression K_;
-      std::vector<expression> dims_;
       cov_matrix_var_decl();
       cov_matrix_var_decl(expression const& K,
-                           std::string const& name,
+                          std::string const& name,
                           std::vector<expression> const& dims);
     };
 
 
 
     struct corr_matrix_var_decl : public base_var_decl {
-      std::string name_;
       expression K_;
-      std::vector<expression> dims_;
       corr_matrix_var_decl();
       corr_matrix_var_decl(expression const& K,
                            std::string const& name,

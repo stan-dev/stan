@@ -517,10 +517,10 @@ namespace stan {
         %= lit("matrix")
         > lit('[')
         > expression_g
-        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(',')
         > expression_g
-        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r 
         > opt_dims_r
@@ -575,7 +575,7 @@ namespace stan {
         %= lit("cov_matrix")
         > lit('[')
         > expression_g
-        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r 
         > opt_dims_r
@@ -620,34 +620,6 @@ namespace stan {
             )
         > lit('>');
 
-        // > ( 
-        //    ( (lit("lower")
-        //       > lit('=')
-        //       > expression_g
-        //       [ _pass = set_int_range_lower_f(_val,_1,
-        //                                        boost::phoenix::ref(error_msgs_)) ])
-        //      > -( lit(',')
-        //           > lit("upper")
-        //           > lit('=')
-        //           > expression_g
-        //             [ _pass = set_int_range_upper_f(_val,_1,
-        //                                             boost::phoenix::ref(error_msgs_)) ] ) )
-        //    | 
-        //    ( 
-        //     -(lit("upper")
-        //       > lit('=')
-        //       > expression_g
-        //       [ _pass = set_int_range_upper_f(_val,_1,
-        //                                        boost::phoenix::ref(error_msgs_)) ])
-        //     > -(lit(',')
-        //         > lit("lower")
-        //         > lit('=')
-        //         > expression_g
-        //           [ _pass = set_int_range_lower_f(_val,_1,
-        //                                           boost::phoenix::ref(error_msgs_)) ]) )
-        //     )
-        // > lit('>');
-
       range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r 
         = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
@@ -671,46 +643,6 @@ namespace stan {
                                                   boost::phoenix::ref(error_msgs_)) ])
             )
         > lit('>');
-
-        // > ( 
-        //    ( (lit("lower")
-        //       > lit('=')
-        //       > expression_g
-        //       [ _pass = set_double_range_lower_f(_val,_1,
-        //                                        boost::phoenix::ref(error_msgs_)) ])
-        //      > -( lit(',')
-        //           > lit("upper")
-        //           > lit('=')
-        //           > expression_g
-        //             [ _pass = set_double_range_upper_f(_val,_1,
-        //                                             boost::phoenix::ref(error_msgs_)) ] ) )
-        //    | 
-        //    ( 
-        //     -(lit("upper")
-        //       > lit('=')
-        //       > expression_g
-        //       [ _pass = set_double_range_upper_f(_val,_1,
-        //                                        boost::phoenix::ref(error_msgs_)) ])
-        //     > -(lit(',')
-        //         > lit("lower")
-        //         > lit('=')
-        //         > expression_g
-        //           [ _pass = set_double_range_lower_f(_val,_1,
-        //                                           boost::phoenix::ref(error_msgs_)) ]) )
-        //     )
-        // > lit('>');
-
-
-      // range_brackets_double_r.name("double range expression pair, brackets");
-      // range_brackets_double_r 
-      //   %= lit('[') 
-      //   > -(expression_g
-      //       [_pass = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-      //   > lit(',')
-      //   > -(expression_g
-      //       [_pass 
-      //        = validate_double_expr_f(_1,boost::phoenix::ref(error_msgs_))])
-      //   > lit(']');
 
       identifier_r.name("identifier");
       identifier_r
