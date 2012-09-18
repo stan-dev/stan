@@ -18,6 +18,16 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* higher-order auto-dif
+  -- chain rule:
+     http://en.wikipedia.org/wiki/Chain_rule#Higher_derivatives
+  -- store adj_, adj2_ and adj3_ in new class 
+     ++ stan::agrad::var3 with matching stan::agrad::vari3,
+        and also var2, vari2
+  -- chain() needs to compute them all in order
+     ++ perhaps with chain1(), chain2(), and chain3(), with
+        chain1() being the existing rule
+
 * use expression template for value of += so that we could
     -- sum_expression& operator+=(sum_expression&, const var&);
     -- sum_expression(const var&);
@@ -630,6 +640,9 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (Rstan) expose transform and inverse transform functions
+  -- danger is that the transforms may change over time
 
 * (Rstan) propagate debug error messages to R
   see: http://lists.r-forge.r-project.org/pipermail/rcpp-devel/2011-October/003006.html
