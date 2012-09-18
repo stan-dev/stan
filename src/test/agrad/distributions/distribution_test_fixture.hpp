@@ -68,8 +68,20 @@ public:
     return 1e-6;
   }
 };
+template<class T>
+class AgradDistributionTestFixture3 : public ::testing::Test {
+public:
+  vector<double> first_valid_params() {
+    vector<vector<double> > params;
+    T().valid_values(params); 
+    return params[0];
+  }
+  double e() {
+    return 1e-6;
+  }
+};
 
 TYPED_TEST_CASE_P(AgradDistributionTestFixture);
 TYPED_TEST_CASE_P(AgradDistributionTestFixture2);
-
+TYPED_TEST_CASE_P(AgradDistributionTestFixture3);
 #endif

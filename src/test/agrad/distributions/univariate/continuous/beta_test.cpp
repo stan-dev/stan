@@ -86,4 +86,6 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsBeta,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsBeta,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsBeta);
-
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsBeta,
+			      AgradDistributionTestFixture3,
+			      AgradDistributionsBeta);
