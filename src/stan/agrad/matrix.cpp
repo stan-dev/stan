@@ -135,6 +135,11 @@ namespace stan {
       s = svd.singularValues();
     }
 
+    void stan_print(std::ostream* o, const var& x) {
+      *o << x.val();
+    }
+
+
   }
 
 }
