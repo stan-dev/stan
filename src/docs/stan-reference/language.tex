@@ -1955,6 +1955,75 @@ defines its own local block implicitly over the statement following it
 in which the loop variable is defined.  As far as \Stan is concerned,
 these two uses of \code{n} are unrelated.  
 
+\section{Print Statements}\label{print-statements.section}
+
+Stan provides print statements that can print literal strings and the
+values of expressions.  Print statements accept any number of
+arguments.  Consider the following for-each statement with a print
+statement in its body.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) { print("loop iteration: ", n); ... }
+\end{Verbatim}
+\end{quote}
+%
+The print statement will execute every time the body of the loop does.
+Each time the loop body is executed, it will print the string ``loop iteration:
+'' (with the trailing space), followed by the value of the expression
+\code{n}, followed by a new line.
+
+\subsection{Print Content}
+
+A literal string in a print statement always prints exactly that
+string (without the quotes).  Expressions in print statements result
+in the value of the expression being printed. 
+
+\subsubsection{Print Conent of Parameter Variables and Data Variables}
+
+Printing a (transformed) parameter or local variable in the
+transformed parameter or model block will print the value of the
+parameter followed by a colon, followed by a zero.  The zero is the
+value of the algorithmic differentation adjoint variable, which is
+always zero until the model code completes execution; other than
+signaling the type of variable (parameter or data), the colon and zero
+may be ignored.
+
+Printing a data variable or transformed data variable or a local
+variable in the transformed data block prints just the
+value of the variable.
+
+\subsection{Print Frequency}
+
+Printing for a print statement happens every time it is exectued.  The
+\code{transformed data} block is executed once per chain, the
+\code{transformed parameter} and \code{model} blocks once per leapfrog
+step, and the \code{generated quantities} block once per iteration.
+
+\subsection{String Literals}
+
+String literals begin and end with a double quote character
+(\Verb|"|).  The characters between the double quote characters may be
+the space character or any visible ASCII character, with the exception
+of the backslash character (\Verb|\|) and double quote character
+(\Verb|"|).  The full list of visible ASCII characters is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+0 1 2 3 4 5 6 7 8 9 0 ~ @ # $ % ^ & * _ ' ` - + = { 
+} [ ] ( ) < > | / ! ? . , ; :
+\end{Verbatim}
+\end{quote}
+
+\subsection{Debug by \code{print}}
+
+Because Stan is an imperative language, print statements can be very
+useful for debugging.  They can be used to display the values of
+variables or expressions at various points in the execution of a
+program.  They are particularly useful for spotting problematic
+not-a-number of infinite values, both of which will be printed.
 
 
 \chapter{Program Blocks}\label{blocks.chapter}
@@ -1963,6 +2032,24 @@ these two uses of \code{n} are unrelated.
 A \Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations, followed in the case
 of some blocks with statements.  
+
+\section{Comments}\label{comments.section}
+
+Stan supports \Cpp-style line-based and bracketed comments.  Comments
+may be used anywhere whitespace is allowed in a Stan program.
+
+\subsection{Line-Based Comments}
+
+In line-based comments, any text on a line following
+two forward slahses (\Verb|//|) or the pound sign (\Verb|#|)
+is ignored (along with the slashes or pound sign).  
+
+\subsection{Bracketed Comments}
+
+For bracketed comments, any text between a forward-slash and asterisk
+pair (\Verb|/*|) and an asterisk and forward-slash pair (\Verb|*/|) is
+ignored.
+
 
 \section{Overview of \Stan's Program Blocks}
 
@@ -2550,24 +2637,28 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}
-var_decl ::= var_type var_name ?dims
+var_decl ::= var_type variable ?dims
 
-var_type ::= int ?('<' range '>')
-           | real ?('<' range '>')
-           | vector '[' expression ']'
-           | ordered '[' expression ']'
-           | positive_ordered '[' expression ']'
-           | simplex '[' expression ']'
-           | row_vector '[' expression ']'
-           | matrix '[' expression ',' expression ']'
-           | corr_matrix '[' expression ']'
-           | cov_matrix '[' expression ']'
+var_type ::= 'int' ?('<' range '>')
+           | 'real' ?('<' range '>')
+           | 'vector' '[' expression ']'
+           | 'ordered' '[' expression ']'
+           | 'positive_ordered' '[' expression ']'
+           | 'simplex' '[' expression ']'
+           | 'row_vector' '[' expression ']'
+           | 'matrix' '[' expression ',' expression ']'
+           | 'corr_matrix' '[' expression ']'
+           | 'cov_matrix' '[' expression ']'
 
 range ::= 'lower' '=' expression ',' 'upper' = expression
         | 'lower' '=' expression
         | 'upper' '=' expression
 
 dims ::= '['  expression (',' expression)*  ']'
+
+variable ::= identifier
+
+identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 \end{Verbatim}
 }
 
@@ -2576,17 +2667,27 @@ dims ::= '['  expression (',' expression)*  ']'
 {
 \small
 \begin{Verbatim}
-expression ::= literal
+expression ::= numeric_literal
              | variable
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
              | expression '[' expressions ']'
-             | function '(' ?expressions ')'
+             | function_literal '(' ?expressions ')'
              | '(' expression ')'
 
 expressions ::= expression
               | expression ',' expressions
+
+numeric_literal ::= int_literal | real_literal
+
+integer_literal ::= [0-9]*
+
+real_literal ::= [0-9]* ?('.' [0-9]*) ?exp_literal
+                  
+exp_literal ::= ('e' | 'E') integer_literal
+
+function_literal ::= identifier
 \end{Verbatim}
 }
 
@@ -2600,7 +2701,10 @@ statement
   | expression '~' identifier '(' ?expressions ')' ?truncation ';'
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
   | '{' var_decl* statement+ '}'
+  | 'print' '(' (expression | string_literal)* ')'
   | ';'
+
+string_literal ::= '"' char* '"'
 
 truncation ::= 'T' '[' ?expression ',' ?expression ']'
 
@@ -2632,3 +2736,7 @@ In the \Stan grammar provided in this chapter, the expression \code{1
 meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
 operator precedences and associativities.
 
+\subsection{Forms of Numbers}
+
+Integer literals longer than one digit may not start with 0 and real
+literals cannot consist of only a period or only an exponent.

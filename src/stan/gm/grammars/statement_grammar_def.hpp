@@ -65,7 +65,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
                           (stan::gm::statement, statement_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
-                          (std::vector<stan::gm::expression>, expressions_) )
+                          (std::vector<stan::gm::printable>, printables_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
                           (stan::gm::expression, expr_)
@@ -329,9 +329,21 @@ namespace stan {
       print_statement_r
         %= lit("print")
         > lit('(')
-        > (expression_g % ',')
+        > (printable_r % ',')
+        // > (expression_g % ',')
         > lit(')');
 
+      printable_r.name("printable");
+      printable_r
+        %= printable_string_r 
+        | expression_g;
+
+      printable_string_r.name("printable quoted string");
+      printable_string_r
+        %= lit('"')
+        > lexeme[*char_("a-zA-Z0-9/~!@#$%^&*()_+`-={}|[]:;'<>?,./ ")]
+        > lit('"');
+      
       identifier_r.name("identifier");
       identifier_r
         %= (lexeme[char_("a-zA-Z") 

@@ -206,6 +206,20 @@ namespace stan {
       expression_t expr_;
     };
 
+    struct printable {
+      typedef boost::variant<boost::recursive_wrapper<std::string>,
+                             boost::recursive_wrapper<expression> >
+      printable_t;
+
+      printable();
+      printable(const expression& expression);
+      printable(const std::string& msg);
+      printable(const printable_t& printable);
+      printable(const printable& printable);
+
+      printable_t printable_;
+    };
+
     struct is_nil_op : public boost::static_visitor<bool> {
       bool operator()(const nil& x) const;
       bool operator()(const int_literal& x) const;
@@ -580,9 +594,9 @@ namespace stan {
   };
 
   struct print_statement {
-    std::vector<expression> expressions_;
+    std::vector<printable> printables_;
     print_statement();
-    print_statement(const std::vector<expression>& expressions);
+    print_statement(const std::vector<printable>& printables);
   };
 
 
@@ -634,6 +648,7 @@ namespace stan {
                expression& expr);
   };
   
+    // FIXME:  is this next necessary dependency?
   // from generator.hpp
   void generate_expression(const expression& e, std::ostream& o);
 

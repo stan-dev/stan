@@ -317,6 +317,14 @@ namespace stan {
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
 
+    printable::printable() : printable_("") { }
+    printable::printable(const expression& expr) : printable_(expr) { }
+    printable::printable(const std::string& msg) : printable_(msg) { }
+    printable::printable(const printable_t& printable) 
+      : printable_(printable) { }
+    printable::printable(const printable& printable)
+      : printable_(printable.printable_) { }
+
     bool is_nil_op::operator()(const nil& x) const { return true; }
     bool is_nil_op::operator()(const int_literal& x) const { return false; }
     bool is_nil_op::operator()(const double_literal& x) const { return false; }
@@ -729,8 +737,8 @@ namespace stan {
 
     print_statement::print_statement() { }
 
-    print_statement::print_statement(const std::vector<expression>& expressions) 
-      : expressions_(expressions) { 
+    print_statement::print_statement(const std::vector<printable>& printables) 
+      : printables_(printables) { 
     }
     
     program::program() { }

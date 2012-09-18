@@ -1,6 +1,144 @@
 \part{Programming Techniques}\label{programming-techniques.part}
 
 
+\chapter{Print Statements and Debugging}
+
+\noindent
+Before getting into specific statistical programming techniques
+in the following chapters, this chapter is dedicated to comments
+and print statements.
+
+\section{Comments}
+
+Stan supports \Cpp-style comments; see \refsection{comments} for full
+details.  The recommended style is to use line-based comments for
+short comments on the code or to comment out one or more
+lines of code.  Bracketed comments are then reserved for long
+documentation comments.  The reason for this convention is that
+bracketed comments cannot be wrapped inside of bracketed comments.
+
+\subsection{What Not to Comment}
+
+When commenting code, it is usually safe to assume that you are 
+writing the comments for other programmers who understand the basics 
+of the programming language in use.  In other words, don't comment the
+obvious.  For instance, there is no need to have comments
+such as the following, which add nothing to the code.
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(0,1);  // y has a unit normal distribution
+\end{Verbatim}
+\end{quote}
+%
+A Jacobian adjustment for a hand-coded transform might be worth
+commenting, as in the following example.
+%
+\begin{quote}
+\begin{Verbatim}
+exp(y) ~ normal(0,1);
+lp__ <- lp__ + y;  // log Jacobian of exp(y) inverse transform
+\end{Verbatim}
+\end{quote}
+%
+It's an art form to empathize with a future code reader and decide
+what they will or won't know (or remember) about statistics and Stan.
+
+\subsection{What to Comment}
+
+It can help to document variable declarations if variables are given
+generic names like \code{N}, \code{mu}, and \code{sigma}.  For
+example, some data variable declarations in an item-response model
+might be usefully commented as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+int<lower=1> N;   // number of observations
+int<lower=1> I;   // number of students
+int<lower=1> J;   // number of test questions
+\end{Verbatim}
+\end{quote}
+%
+The alternative is to use longer names that do not require comments.
+%
+\begin{quote}
+\begin{Verbatim}
+int<lower=1> n_obs;
+int<lower=1> n_students;
+int<lower=1> n_questions;
+\end{Verbatim}
+\end{quote}
+%
+Both styles reasonable and which one to adopt is mostly a matter of
+taste (mostly because sometimes models come with their own naming
+conventions which should be followed so as not to confuse readers of
+the code familiar with the statistical conventions).
+
+Some code authors like big blocks of comments at the top explaining
+the purpose of the model, who wrote it, copyright and licensing
+information, and so on.  The following bracketed comment is an
+example of a conventional style for large comment blocks.
+%
+\begin{quote}
+\begin{Verbatim}
+/*
+ * Item-Response Theory PL3 Model
+ * -----------------------------------------------------
+ * Copyright: Joe Schmoe  <joe@schmoe.com>
+ * Date:  19 September 2012
+ * License: GPLv3
+ */
+
+data {
+  ...
+\end{Verbatim}
+\end{quote}
+%
+The use of leading asterisks helps readers understand the scope of the
+comment.  The problem with including dates or other volatile
+information in comments is that they can easily get out of synch with
+the reality of the code.  A misleading comment or one that is wrong is
+worse than no comment at all!
+
+\section{Print Statements}
+
+Stan supports print statements with one or more string or expression
+arguments.  Because Stan is an imperative language, variables can have
+different values at different points in the execution of a program.
+Print statements can be invaluable for debugging, especially for a
+language like Stan with no stepwise debugger.
+
+For instance, to print the value of the expression \code{y} along with
+the log probability accumulator, use the following statement.
+%
+\begin{quote}
+\begin{Verbatim}
+print("y=", y, " log probability=", lp__);
+\end{Verbatim}
+\end{quote}
+%
+This print statement prints the string ``y='' followed by the value of
+the expression \code{y}, followed by the string `` log probability=''
+(with the leading space), followed by the value of the variable
+\Verb|lp__|. 
+
+Each print statement is followed by a new line (the specific
+ASCII character(s) generated to create a new line are platform specific).
+
+Arbitrary expressions can be used.  For example, the statement
+\begin{quote}
+\begin{Verbatim}
+print("1+1=", 1+1);
+\end{Verbatim}
+\end{quote}
+%
+will print ``1 + 1 = 2'' followed by a new line.
+
+Print statements may be used anywhere other statements may be used,
+but their behavior in terms of frequency depends on how often the
+block they are in is evaluated.  See \refsection{print-statements} for
+more information on the syntax and evaluation of print statements.
+
 
 \chapter{Missing Data \& Partially Known Parameters}
 

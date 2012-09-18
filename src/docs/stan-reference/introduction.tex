@@ -243,25 +243,31 @@ The file contains the following model.
 %
 \begin{quote}
 \begin{Verbatim}
-data {
-  int<lower=0> N;
+data { 
+  int<lower=0> N; 
   int<lower=0,upper=1> y[N];
-}
+} 
 parameters {
   real<lower=0,upper=1> theta;
-}
+} 
 model {
-  for (n in 1:N)
+  theta ~ beta(1,1);
+  for (n in 1:N) 
     y[n] ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
 %
 The model assumes the binary observed data \code{y[1],...,y[N]}
-are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  There is
-an implicit uniform prior on \code{theta} arising from the
-constraint in its definition in the \code{parameters} block
-restricting it to values between 0 and 1 (inclusive).
+are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The
+prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).%
+%
+\footnote{If no prior were specified in the model block, the
+constraints on \code{theta} ensure it falls between 0 and 1,
+providing \code{theta} an implicit uniform prior.  For parameters
+with no prior specified and unbounded support, the result is an
+improper prior.  Stan accepts improper priors, but posteriors must
+be proper in order for sampling to succeed.}
 
 \subsection{Data Set}
 

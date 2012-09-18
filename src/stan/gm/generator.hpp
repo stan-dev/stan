@@ -147,6 +147,21 @@ namespace stan {
       boost::apply_visitor(vis, e.expr_);
     }
 
+    struct printable_visgen : public visgen {
+      printable_visgen(std::ostream& o) : visgen(o) {  }
+      void operator()(const std::string& s) const { 
+        o_ << '"' << s << '"';
+      }
+      void operator()(const expression& e) const { 
+        generate_expression(e,o_);
+      }
+    };
+
+    void generate_printable(const printable& p, std::ostream& o) {
+      printable_visgen vis(o);
+      boost::apply_visitor(vis, p.printable_);
+    }
+
     void generate_using(const std::string& type, std::ostream& o) {
       o << "using " << type << ";" << EOL;
     }
@@ -1082,15 +1097,10 @@ namespace stan {
         o_ << "if (pstream__)" << EOL;
         generate_indent(indent_ + 1,o_);
         o_ << "*pstream__";
-        for (size_t i = 0; i < ps.expressions_.size(); ++i) {
-          o_ << " << " << '"';
-          if (i > 0) o_ << ' ';
-          generate_expression(ps.expressions_[i],o_);
-          o_ << "=" 
-             << '"'
-             << " << (";
-          generate_expression(ps.expressions_[i],o_);
-          o_ << ") << " << "';'";
+        for (size_t i = 0; i < ps.printables_.size(); ++i) {
+          o_ << " << (";
+          generate_printable(ps.printables_[i],o_);
+          o_ << ")";
         }
         o_ << " << std::endl;" << EOL;
       }
