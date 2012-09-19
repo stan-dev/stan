@@ -625,7 +625,10 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_ddv) {
     EXPECT_NEAR(diff_g2,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
+
+
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvd) {
@@ -648,7 +651,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvd) {
     EXPECT_NEAR(diff_g1,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
+    
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvv) {
@@ -675,11 +680,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvv) {
     EXPECT_NEAR(diff_g1,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_NEAR(diff_g2,
 		gradients[1],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdd) {  
@@ -702,7 +709,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdd) {
     EXPECT_NEAR(diff_g0,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdv) {
@@ -729,11 +737,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdv) {
     EXPECT_NEAR(diff_g0,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_NEAR(diff_g2,
 		gradients[1],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvd) {
@@ -761,11 +771,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvd) {
     EXPECT_NEAR(diff_g0,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_NEAR(diff_g1,
 		gradients[1],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvv) {
@@ -795,15 +807,18 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvv) {
     EXPECT_NEAR(diff_g0,
 		gradients[0],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_NEAR(diff_g1,
 		gradients[1],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_NEAR(diff_g2,
 		gradients[2],
 		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddd) {
@@ -830,10 +845,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_ddv) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvd) {  
@@ -856,10 +873,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvd) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvv) {  
@@ -884,13 +903,16 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dvv) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[1],
 		    gradients[1])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdd) {  
@@ -913,10 +935,12 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdd) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {
@@ -941,13 +965,16 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vdv) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[1],
 		    gradients[1])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {  
@@ -972,13 +999,16 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvd) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[1],
 		    gradients[1])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
@@ -1005,16 +1035,20 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_vvv) {
     
     EXPECT_FLOAT_EQ(expected_lp.val(),
 		    lp.val())
-      << "Index: " << n << " - function value test failed" << std::endl;
+      << "Index: " << n << " - function value test failed" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[0],
 		    gradients[0])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 0" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[1],
 		    gradients[1])
-      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl;
+      << "Index: " << n << " - hand-coded gradient test failed for parameter 1" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(expected_gradients[2],
 		    gradients[2])
-      << "Index: " << n << " - hand-coded test failed for parameter 2" << std::endl;
+      << "Index: " << n << " - hand-coded test failed for parameter 2" << std::endl
+      << "(" << p[0] << ", " << p[1] << ", " << p[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, vectorized_VVV) {

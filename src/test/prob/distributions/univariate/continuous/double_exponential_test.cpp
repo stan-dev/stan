@@ -1,107 +1,90 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ double_exponential_log
 #include <stan/prob/distributions/univariate/continuous/double_exponential.hpp>
 
-TEST(ProbDistributionsDoubleExponential,DoubleExponential) {
-  EXPECT_FLOAT_EQ(-0.6931472, stan::prob::double_exponential_log(1.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(-1.693147, stan::prob::double_exponential_log(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(-5.693147, stan::prob::double_exponential_log(-3.0,2.0,1.0));
-  EXPECT_FLOAT_EQ(-1.886294, stan::prob::double_exponential_log(1.0,0.0,2.0));
-  EXPECT_FLOAT_EQ(-0.8, stan::prob::double_exponential_log(1.9,2.3,0.5));
-  EXPECT_FLOAT_EQ(-0.9068528, stan::prob::double_exponential_log(1.9,2.3,0.25));
-}
-TEST(ProbDistributionsDoubleExponential,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::double_exponential_log<true>(1.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::double_exponential_log<true>(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::double_exponential_log<true>(-3.0,2.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::double_exponential_log<true>(1.0,0.0,2.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::double_exponential_log<true>(1.9,2.3,0.5));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::double_exponential_log<true>(1.9,2.3,0.25));
-}
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+using std::vector;
+using std::numeric_limits;
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
-using stan::prob::double_exponential_log;
-
-TEST(ProbDistributionsDoubleExponential,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-
-  double y = 5.5;
-  double mu = 5.0;
-  double sigma = 3.0;
-  
-  EXPECT_NO_THROW(double_exponential_log(y, mu, sigma));
-  EXPECT_NO_THROW(double_exponential_log(-y, mu, sigma));
-  EXPECT_NO_THROW(double_exponential_log(y, -mu, sigma));
-  
-  EXPECT_THROW(double_exponential_log(nan, mu, sigma), std::domain_error);
-  EXPECT_THROW(double_exponential_log(-inf, mu, sigma), std::domain_error);
-  EXPECT_THROW(double_exponential_log(inf, mu, sigma), std::domain_error);
-  
-  EXPECT_THROW(double_exponential_log(y, nan, sigma), std::domain_error);
-  EXPECT_THROW(double_exponential_log(y, -inf, sigma), std::domain_error);
-  EXPECT_THROW(double_exponential_log(y, inf, sigma), std::domain_error);
-  
-  EXPECT_THROW(double_exponential_log(y, mu, nan), std::domain_error);
-  EXPECT_THROW(double_exponential_log(y, mu, 0.0), std::domain_error);
-  EXPECT_THROW(double_exponential_log(y, mu, -1.0), std::domain_error);
-  EXPECT_THROW(double_exponential_log(y, mu, -inf), std::domain_error);
-  EXPECT_THROW(double_exponential_log(y, mu, inf), std::domain_error);
-}
-TEST(ProbDistributionsDoubleExponential,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-
-  double result;
-  double y = 5.5;
-  double mu = 5.0;
-  double sigma = 3.0;
-  
-  result = double_exponential_log(y, mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = double_exponential_log(-y, mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = double_exponential_log(y, -mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+class ProbDistributionsDoubleExponential : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
     
-  result = double_exponential_log(nan, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(-inf, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(inf, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = double_exponential_log(y, nan, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(y, -inf, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(y, inf, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = double_exponential_log(y, mu, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(y, mu, 0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(y, mu, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(y, mu, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = double_exponential_log(y, mu, inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+    param[0] = 1.0;                  // y
+    param[1] = 1.0;                  // mu
+    param[2] = 1.0;                  // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-0.6931472);  // expected log_prob
+
+    param[0] = 2.0;                  // y
+    param[1] = 1.0;                  // mu
+    param[2] = 1.0;                  // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-1.693147);   // expected log_prob
+    
+    param[0] = -3.0;                 // y
+    param[1] = 2.0;                  // mu
+    param[2] = 1.0;                  // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-5.693147);   // expected log_prob
+    
+    param[0] = 1.0;                  // y
+    param[1] = 0.0;                  // mu
+    param[2] = 2.0;                  // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-1.886294);   // expected log_prob
+
+    param[0] = 1.9;                  // y
+    param[1] = 2.3;                  // mu
+    param[2] = 0.5;                  // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-0.8);        // expected log_prob
+
+    param[0] = 1.9;                  // y
+    param[1] = 2.3;                  // mu
+    param[2] = 0.25;                  // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-0.9068528);        // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    index.push_back(0U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(0U);
+    value.push_back(-numeric_limits<double>::infinity());
+    
+    // mu
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsDoubleExponential,
+ 			      DistributionTestFixture,
+ 			      ProbDistributionsDoubleExponential);
+
 TEST(ProbDistributionsDoubleExponential,Cumulative) {
   EXPECT_FLOAT_EQ(0.5, stan::prob::double_exponential_cdf(1.0,1.0,1.0));
   EXPECT_FLOAT_EQ(0.8160603, stan::prob::double_exponential_cdf(2.0,1.0,1.0));
