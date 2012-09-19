@@ -53,7 +53,7 @@ public:
   }
   
   double e() {
-    return 1e-6;
+    return 1e-8;
   }
 };
 template<class T>
@@ -65,7 +65,7 @@ public:
     return params[0];
   }
   double e() {
-    return 1e-6;
+    return 1e-8;
   }
 };
 template<class T>
@@ -77,7 +77,7 @@ public:
     return params[0];
   }
   double e() {
-    return 1e-6;
+    return 1e-8;
   }
 };
 

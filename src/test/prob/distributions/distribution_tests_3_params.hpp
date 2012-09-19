@@ -18,13 +18,15 @@ TYPED_TEST_P(DistributionTestFixture, check_valid) {
 		    _LOG_PROB_<false>(params[0],
 				      params[1],
 				      params[2]))
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
     
     EXPECT_FLOAT_EQ(0.0,
 		    _LOG_PROB_<true>(params[0],
 				     params[1],
 				     params[2]))
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 
@@ -45,7 +47,9 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 				   invalid_params[2]),
 		 std::domain_error)
       << "Default policy. "
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
+
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
@@ -53,11 +57,13 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 							  invalid_params[2],
 							  errno_policy()))
       << "errno policy. "
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
     
     EXPECT_TRUE(std::isnan(expected_log_prob))
       << "errno policy. "
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
   }
 
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -68,14 +74,16 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 				   invalid_params[1],
 				   invalid_params[2]),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
 							  invalid_params[1],
 							  invalid_params[2],
 							  errno_policy()))
-      << "errno policy with NaN for parameter: " << i;
+      << "errno policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
     
     EXPECT_TRUE(std::isnan(expected_log_prob))
       << "errno policy with NaN for parameter: " << i;
