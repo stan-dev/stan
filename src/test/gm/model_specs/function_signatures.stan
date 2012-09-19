@@ -352,6 +352,41 @@ transformed data {
   transformed_data_real <- pareto_log(d_real, d_real, d_real);
   // [0,1] Continuous Probabilities
   transformed_data_real <- beta_log(d_real, d_real, d_real);
+  transformed_data_real <- beta_log(d_real, d_real, d_vector);
+  transformed_data_real <- beta_log(d_real, d_real, d_row_vector);
+  transformed_data_real <- beta_log(d_real, d_real, d_real_array);
+  transformed_data_real <- beta_log(d_real, d_vector, d_real);
+  transformed_data_real <- beta_log(d_real, d_vector, d_vector);
+  transformed_data_real <- beta_log(d_real, d_vector, d_row_vector);
+  transformed_data_real <- beta_log(d_real, d_vector, d_real_array);
+  transformed_data_real <- beta_log(d_real, d_row_vector, d_real);
+  transformed_data_real <- beta_log(d_real, d_row_vector, d_vector);
+  transformed_data_real <- beta_log(d_real, d_row_vector, d_row_vector);
+  transformed_data_real <- beta_log(d_real, d_row_vector, d_real_array);
+  transformed_data_real <- beta_log(d_real, d_real_array, d_real);
+  transformed_data_real <- beta_log(d_real, d_real_array, d_vector);
+  transformed_data_real <- beta_log(d_real, d_real_array, d_row_vector);
+  transformed_data_real <- beta_log(d_real, d_real_array, d_real_array);
+  transformed_data_real <- beta_log(d_vector, d_real, d_real);
+  transformed_data_real <- beta_log(d_vector, d_real, d_vector);
+  transformed_data_real <- beta_log(d_vector, d_real, d_row_vector);
+  transformed_data_real <- beta_log(d_vector, d_real, d_real_array);
+  transformed_data_real <- beta_log(d_row_vector, d_vector, d_real);
+  transformed_data_real <- beta_log(d_row_vector, d_vector, d_vector);
+  transformed_data_real <- beta_log(d_row_vector, d_vector, d_row_vector);
+  transformed_data_real <- beta_log(d_row_vector, d_vector, d_real_array);
+  transformed_data_real <- beta_log(d_row_vector, d_row_vector, d_real);
+  transformed_data_real <- beta_log(d_row_vector, d_row_vector, d_vector);
+  transformed_data_real <- beta_log(d_row_vector, d_row_vector, d_row_vector);
+  transformed_data_real <- beta_log(d_row_vector, d_row_vector, d_real_array);
+  transformed_data_real <- beta_log(d_row_vector, d_real_array, d_real);
+  transformed_data_real <- beta_log(d_row_vector, d_real_array, d_vector);
+  transformed_data_real <- beta_log(d_row_vector, d_real_array, d_row_vector);
+  transformed_data_real <- beta_log(d_row_vector, d_real_array, d_real_array);
+  transformed_data_real <- beta_log(d_real_array, d_real_array, d_real);
+  transformed_data_real <- beta_log(d_real_array, d_real_array, d_vector);
+  transformed_data_real <- beta_log(d_real_array, d_real_array, d_row_vector);
+  transformed_data_real <- beta_log(d_real_array, d_real_array, d_real_array);
   // Bounded Continuous Probabilities
   transformed_data_real <- uniform_log(d_real, d_real, d_real);
   // Simplex Probabilities
