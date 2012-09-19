@@ -28,12 +28,22 @@ add_unary("atanh");
 add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
-add_ternary("beta_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("beta_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 add("binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T);
 add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
-add_ternary("cauchy_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("cauchy_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add_unary("cbrt");
 add_unary("ceil");
 add("cholesky_decompose",MATRIX_T,MATRIX_T);

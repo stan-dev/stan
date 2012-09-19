@@ -7,6 +7,24 @@
 // D: vector<double>
 
 using stan::agrad::var;
+
+TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
+  vector<double> parameters = this->first_valid_params();
+
+  var param1, param2, param3;
+  var logprob;
+  param1 = parameters[0];
+  param2 = parameters[1];
+  param3 = parameters[2];
+  
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3, errno_policy()));
+}
+
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
   vector<vector<double> > parameters;
   TypeParam().valid_values(parameters);
@@ -17,9 +35,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
 					  params[1],
 					  params[2]))
-      << "Failed with (d,d,d) at index: " << n << std::endl;
+      << "Failed with (d,d,d) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
     EXPECT_FLOAT_EQ(0.0, lp.val())
-      << "Failed propto with (d,d,d) at index: " << n << std::endl;
+      << "Failed propto with (d,d,d) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddv) {
@@ -32,7 +52,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddv) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
 					  params[1],
 					  var(params[2])))
-      << "Failed with (d,d,v) at index: " << n << std::endl;
+      << "Failed with (d,d,v) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvd) {
@@ -45,7 +66,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvd) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
 					  var(params[1]),
 					  params[2]))
-      << "Failed with (d,v,d) at index: " << n << std::endl;
+      << "Failed with (d,v,d) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvv) {
@@ -58,7 +80,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvv) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
 					  var(params[1]),
 					  var(params[2])))
-      << "Failed with (d,v,v) at index: " << n << std::endl;
+      << "Failed with (d,v,v) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdd) {
@@ -71,7 +94,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdd) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
 					  params[1],
 					  params[2]))
-      << "Failed with (v,d,d) at index: " << n << std::endl;
+      << "Failed with (v,d,d) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdv) {
@@ -84,7 +108,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdv) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
 					  params[1],
 					  var(params[2])))
-      << "Failed with (v,d,v) at index: " << n << std::endl;
+      << "Failed with (v,d,v) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvd) {
@@ -97,7 +122,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvd) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
 					  var(params[1]),
 					  params[2]))
-      << "Failed with (d,v,d) at index: " << n << std::endl;
+      << "Failed with (d,v,d) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvv) {
@@ -110,7 +136,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvv) {
     EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
 					  var(params[1]),
 					  var(params[2])))
-      << "Failed with (v,v,v) at index: " << n << std::endl;
+      << "Failed with (v,v,v) at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddd) {
@@ -141,7 +168,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddd) {
 				  invalid_params[1],
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddv) {
@@ -168,7 +196,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddv) {
 				  invalid_params[1],
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i << std::endl;
+      << "Default policy with NaN for parameter: " << i << std::endl
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvd) {  
@@ -198,7 +227,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvd) {
 				  var(invalid_params[1]),
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvv) {  
@@ -228,7 +258,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvv) {
 				  var(invalid_params[1]),
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {
@@ -258,7 +289,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {
 				  invalid_params[1],
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {  
@@ -288,7 +320,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {
 				  invalid_params[1],
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvd) {
@@ -318,7 +351,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvd) {
 				  var(invalid_params[1]),
 				  invalid_params[2]),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvv) {
@@ -348,7 +382,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvv) {
 				  var(invalid_params[1]),
 				  var(invalid_params[2])),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i      
+      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
   }
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddd) {
@@ -587,8 +622,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_ddv) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g2,
-		    gradients[0])
+    EXPECT_NEAR(diff_g2,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
   }
 }
@@ -609,8 +645,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvd) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g1,
-		    gradients[0])
+    EXPECT_NEAR(diff_g1,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
   }
 }
@@ -635,11 +672,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dvv) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g1,
-		    gradients[0])
+    EXPECT_NEAR(diff_g1,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
-    EXPECT_FLOAT_EQ(diff_g2,
-		    gradients[1])
+    EXPECT_NEAR(diff_g2,
+		gradients[1],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
   }
 }
@@ -660,8 +699,9 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdd) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g0,
-		    gradients[0])
+    EXPECT_NEAR(diff_g0,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
   }
 }
@@ -686,11 +726,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vdv) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g0,
-		    gradients[0])
+    EXPECT_NEAR(diff_g0,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
-    EXPECT_FLOAT_EQ(diff_g2,
-		    gradients[1])
+    EXPECT_NEAR(diff_g2,
+		gradients[1],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
   }
 }
@@ -716,11 +758,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvd) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g0,
-		    gradients[0])
+    EXPECT_NEAR(diff_g0,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
-    EXPECT_FLOAT_EQ(diff_g1,
-		    gradients[1])
+    EXPECT_NEAR(diff_g1,
+		gradients[1],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
   }
 }
@@ -748,14 +792,17 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vvv) {
     vector<double> gradients;
     lp.grad(v_params, gradients);
 
-    EXPECT_FLOAT_EQ(diff_g0,
-		    gradients[0])
+    EXPECT_NEAR(diff_g0,
+		gradients[0],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl;
-    EXPECT_FLOAT_EQ(diff_g1,
-		    gradients[1])
+    EXPECT_NEAR(diff_g1,
+		gradients[1],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl;
-    EXPECT_FLOAT_EQ(diff_g2,
-		    gradients[2])
+    EXPECT_NEAR(diff_g2,
+		gradients[2],
+		1e-4)
       << "Index: " << n << " - Finite diff test failed for parameter 2" << std::endl;
   }
 }
@@ -3232,10 +3279,9 @@ TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddD) {
     << "log probability does not match" << std::endl;
 }
 
-//------------------------------------------------------------
-
 // This has a limit of 50 tests.
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
+			   call_all_versions,
 			   check_valid_ddd,
 			   check_valid_ddv,
 			   check_valid_dvd,

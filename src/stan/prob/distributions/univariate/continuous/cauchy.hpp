@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__CAUCHY_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__CAUCHY_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
 
 #include <stan/agrad.hpp>
 #include <stan/prob/traits.hpp>
@@ -43,9 +43,6 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
-        return 0.0;
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -72,6 +69,10 @@ namespace stan {
 				   "Random variable","Location parameter","Scale parameter",
                                    &logp, Policy())))
         return logp;
+
+      // check if no variables are involved and prop-to
+      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
+        return 0.0;
 
       using stan::math::log1p;
       using stan::math::square;
@@ -152,7 +153,7 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_scale>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return cauchy_log<false>(y,mu,sigma,stan::math::default_policy());
     }
