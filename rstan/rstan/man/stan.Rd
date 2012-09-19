@@ -106,8 +106,9 @@ stan(file, model_name = "anon_model", model_code = "",
 
     In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling (i.e. 
-    show the progress every \code{refresh} iterations). The 
-    progress indicator is turned off if \code{refresh < 0}.
+    show the progress every \code{refresh} iterations). 
+    By default, \code{refresh = max(iter/10, 1)}. 
+    The progress indicator is turned off if \code{refresh < 0}.
   } 
 
   \item{boost_lib}{The path for an alternative version of the Boost C++ 

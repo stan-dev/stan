@@ -42,7 +42,7 @@ check: $(STANPKG)
 
 install: $(STANPKG) 
 	# R CMD INSTALL --no-multiarch $(STANPKG) 
-	R CMD INSTALL $(STANPKG) 
+	R CMD INSTALL --merge-multiarch $(STANPKG) 
 
 clean: 
 	rm -f $(STANPKG) 

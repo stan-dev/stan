@@ -28,6 +28,7 @@
 \author{
   \tabular{ll}{
   Author:\tab Jiqiang Guo <guojq28@gmail.com>   \cr 
+         \tab Michael Betancourt <betanalpha@gmail.com> \cr 
          \tab Marcus Brubaker <mbrubake@cs.toronto.edu>   \cr 
          \tab Bob Carpenter <carp@alias-i.com>   \cr 
          \tab Ben Goodrich <bg2382@columbia.edu> \cr 

@@ -104,6 +104,7 @@
     In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling 
     (i.e. show the progress every \code{refresh} iterations).
+    By default, \code{refresh = max(iter/10, 1)}. 
     The progress indicator is turned off if \code{refresh < 0}.
   }
 }
