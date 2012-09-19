@@ -7,6 +7,24 @@
 // D: vector<double>
 
 using stan::agrad::var;
+
+TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
+  vector<double> parameters = this->first_valid_params();
+
+  var param1, param2, param3;
+  var logprob;
+  param1 = parameters[0];
+  param2 = parameters[1];
+  param3 = parameters[2];
+  
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3, errno_policy()));
+}
+
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
   vector<vector<double> > parameters;
   TypeParam().valid_values(parameters);
@@ -3261,10 +3279,9 @@ TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddD) {
     << "log probability does not match" << std::endl;
 }
 
-//------------------------------------------------------------
-
 // This has a limit of 50 tests.
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
+			   call_all_versions,
 			   check_valid_ddd,
 			   check_valid_ddv,
 			   check_valid_dvd,
