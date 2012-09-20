@@ -58,7 +58,6 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-
       double logp(0.0);
       
       // validate args (here done over var, which should be OK)

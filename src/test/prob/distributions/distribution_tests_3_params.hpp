@@ -1,6 +1,23 @@
 #ifndef __TEST__PROB__DISTRIBUTIONS__DISTRIBUTION_TESTS_3_PARAMS_HPP___
 #define __TEST__PROB__DISTRIBUTIONS__DISTRIBUTION_TESTS_3_PARAMS_HPP___
 
+
+TYPED_TEST_P(DistributionTestFixture, call_all_versions) {
+  vector<double> parameters = this->first_valid_params();
+  double param1, param2, param3;
+  double logprob;
+  param1 = parameters[0];
+  param2 = parameters[1];
+  param3 = parameters[2];
+  
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3, errno_policy()));
+}
+
 TYPED_TEST_P(DistributionTestFixture, check_valid) {
   TypeParam t;
   vector<vector<double> > parameters;
@@ -18,13 +35,15 @@ TYPED_TEST_P(DistributionTestFixture, check_valid) {
 		    _LOG_PROB_<false>(params[0],
 				      params[1],
 				      params[2]))
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
     
     EXPECT_FLOAT_EQ(0.0,
 		    _LOG_PROB_<true>(params[0],
 				     params[1],
 				     params[2]))
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
   }
 }
 
@@ -45,7 +64,9 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 				   invalid_params[2]),
 		 std::domain_error)
       << "Default policy. "
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
+
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
@@ -53,11 +74,13 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 							  invalid_params[2],
 							  errno_policy()))
       << "errno policy. "
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
     
     EXPECT_TRUE(std::isnan(expected_log_prob))
       << "errno policy. "
-      << "Failed at index: " << n << std::endl;
+      << "Failed at index: " << n << std::endl
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
   }
 
   for (size_t i = 0; i < valid_params.size(); i++) {
@@ -68,14 +91,16 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 				   invalid_params[1],
 				   invalid_params[2]),
 		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i;
+      << "Default policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
 							  invalid_params[1],
 							  invalid_params[2],
 							  errno_policy()))
-      << "errno policy with NaN for parameter: " << i;
+      << "errno policy with NaN for parameter: " << i
+      << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
     
     EXPECT_TRUE(std::isnan(expected_log_prob))
       << "errno policy with NaN for parameter: " << i;
@@ -321,6 +346,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double_matrix) {
 
 
 REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
+			   call_all_versions,
 			   check_valid,
 			   check_invalid,
 			   valid_vector,

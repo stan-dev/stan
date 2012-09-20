@@ -88,7 +88,7 @@ namespace rstan {
     unsigned int warmup; // number of warmup                          
     unsigned int thin; 
     unsigned int iter_save; // number of iterations saved 
-    int refresh;  // < 0, no output 
+    int refresh;  // 
     int leapfrog_steps; 
     double epsilon; 
     int max_treedepth; 
@@ -186,9 +186,10 @@ namespace rstan {
       if (idx == args_names.size()) gamma = 0.05; 
       else gamma = Rcpp::as<double>(in[idx]); 
       
-      idx = find_index(args_names, std::string("refresh")); 
-      if (idx == args_names.size())  refresh = std::max(iter / 100, 1U); 
-      else refresh = Rcpp::as<int>(in[idx]); 
+      refresh = 1;
+      idx = find_index(args_names, std::string("refresh"));
+      if (idx == args_names.size() && iter > 10)  refresh = iter / 10;
+      else refresh = Rcpp::as<int>(in[idx]);
 
       idx = find_index(args_names, std::string("seed")); 
       if (idx == args_names.size()) {

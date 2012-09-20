@@ -231,13 +231,9 @@ namespace rstan {
       return num_params;
     }
 
-    bool do_print(int refresh) {
-      return refresh > 0;
-    }
-  
     bool do_print(int n, int refresh) {
-      return do_print(refresh)
-        && ((n + 1) % refresh == 0);
+      return refresh < 0 ? false : 
+             (n == 0) || ((n + 1) % refresh == 0);
     }
   
     template <class Model>
@@ -313,13 +309,14 @@ namespace rstan {
       for (int m = 0; m < num_iterations; ++m) { 
         R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
-          rstan::io::rcout << "\rIteration: ";
+          rstan::io::rcout << "Iteration: ";
           rstan::io::rcout << std::setw(it_print_width) << (m + 1)
                            << " / " << num_iterations;
           rstan::io::rcout << " [" << std::setw(3)
                            << static_cast<int>((100.0 * (m + 1))/num_iterations)
                            << "%] ";
           rstan::io::rcout << ((m < num_warmup) ? " (Adapting)" : " (Sampling)");
+          rstan::io::rcout << std::endl;
           rstan::io::rcout.flush();
         } 
 
@@ -509,7 +506,8 @@ namespace rstan {
             sample_stream << sampler_param_names[i] << ","; 
           model.write_csv_header(sample_stream);
         }
-        nuts2_sampler.set_error_stream(rstan::io::rcerr); 
+        nuts2_sampler.set_error_stream(rstan::io::rcout); // rcout intended as in Stan
+        nuts2_sampler.set_output_stream(rstan::io::rcout); 
 
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
@@ -535,7 +533,8 @@ namespace rstan {
           nuts_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
-        nuts_sampler.set_error_stream(rstan::io::rcerr); 
+        nuts_sampler.set_error_stream(rstan::io::rcout);  // rcout intended
+        nuts_sampler.set_output_stream(rstan::io::rcout); 
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
@@ -559,7 +558,8 @@ namespace rstan {
           hmc_sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         }
-        hmc_sampler.set_error_stream(rstan::io::rcerr); 
+        hmc_sampler.set_error_stream(rstan::io::rcout); // rcout intended
+        hmc_sampler.set_output_stream(rstan::io::rcout); 
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
@@ -652,7 +652,7 @@ namespace rstan {
 
     stan_fit(SEXP data, SEXP pars) : 
       data_(Rcpp::as<Rcpp::List>(data)), 
-      model_(data_),  
+      model_(data_, &rstan::io::rcout),  
       names_(get_param_names(model_)), 
       dims_(get_param_dims(model_)), 
       num_params_(calc_total_num_params(dims_)) 
@@ -662,7 +662,7 @@ namespace rstan {
 
     stan_fit(SEXP data) : 
       data_(Rcpp::as<Rcpp::List>(data)), 
-      model_(data_),
+      model_(data_, &rstan::io::rcout),  
       names_(get_param_names(model_)), 
       dims_(get_param_dims(model_)), 
       num_params_(calc_total_num_params(dims_)), 

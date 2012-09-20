@@ -4,6 +4,7 @@ Title: RStan: R interface to Stan
 Version: 1.0.2
 Date: 2012-09-14
 Author: Jiqiang Guo <guojq28@gmail.com>,   
+        Michael Betancourt <betanalpha@gmail.com>,
         Marcus Brubaker <mbrubake@cs.toronto.edu>,  
         Bob Carpenter <carp@alias-i.com>,  
         Ben Goodrich <bg2382@columbia.edu>, 
