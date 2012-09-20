@@ -90,14 +90,15 @@ namespace stan {
 	if (!is_constant<typename is_vector<T_y>::type>::value) {
 	  if (y_m_mu > 0)
 	    operands_and_partials.d_x1[n] -= inv_sigma;
-	  else if (y_m_mu < 0)
+	  if (y_m_mu < 0)
 	    operands_and_partials.d_x1[n] += inv_sigma;
-	  }
-	if (!is_constant<typename is_vector<T_loc>::type>::value)
+	}
+	if (!is_constant<typename is_vector<T_loc>::type>::value) {
 	  if (y_m_mu > 0)
 	    operands_and_partials.d_x2[n] += inv_sigma;
-	  else if (y_m_mu < 0)
+	  if (y_m_mu < 0)
 	    operands_and_partials.d_x2[n] -= inv_sigma;
+	}
 	if (!is_constant<typename is_vector<T_scale>::type>::value)
 	  operands_and_partials.d_x3[n] += -inv_sigma + fabs_y_m_mu * inv_sigma * inv_sigma;
       }
