@@ -7,5 +7,5 @@ parameters {
 }
 model {
   for (i in 1:10)
-      y[i] ~ multi_normal(mu[i],Sigma[i]);
+    y[i] ~ multi_normal(mu[i],Sigma[i]);
 }
