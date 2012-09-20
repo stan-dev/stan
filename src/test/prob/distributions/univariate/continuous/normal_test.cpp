@@ -67,9 +67,17 @@ public:
 
     index.push_back(2U);
     value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
   }
 
 };
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNormal,
+                              DistributionTestFixture,
+                              ProbDistributionsNormal);
+
 
 TEST(ProbDistributions,NormalCdf) {
   using stan::prob::normal_cdf;
@@ -82,8 +90,3 @@ TEST(ProbDistributions,NormalCdf) {
   EXPECT_NEAR(0.3694413, normal_cdf(1,5,12), 1E-7);
   EXPECT_NEAR(0.9999683, normal_cdf(-2,-3,0.25), 1E-7);
 }
-
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNormal,
-                              DistributionTestFixture,
-                              ProbDistributionsNormal);
-

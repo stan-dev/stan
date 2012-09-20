@@ -50,9 +50,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::prob::include_summand;
 
-      // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
-        return 0.0;
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -76,7 +73,10 @@ namespace stan {
 				   "Random variable","Location parameter","Scale parameter",
                                    &logp, Policy())))
         return logp;
-      
+
+      // check if no variables are involved and prop-to
+      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
+        return 0.0;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
