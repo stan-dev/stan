@@ -3,14 +3,15 @@ parameters {
   real<lower=0.5, upper=1> z;
   real<lower=0, upper=2*pi()> phi; 
 } 
-
-transformed parameters {
+model {
+  // p(z,phi) prop-to z
+  lp__ <- lp__ + log(z); 
+} 
+generated quantities {
   real x;
   real y;
   x <- z * cos(phi); 
   y <- z * sin(phi);
 } 
 
-model {
-  lp__ <- lp__ + log(z); 
-} 
+
