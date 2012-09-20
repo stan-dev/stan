@@ -69,7 +69,12 @@ add("dot_product",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U)); // vectorized
 add("dot_self",DOUBLE_T,VECTOR_T);
 add("dot_self",DOUBLE_T,ROW_VECTOR_T);
-add_ternary("double_exponential_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("double_exponential_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add_nullary("e");
 add("eigenvalues",VECTOR_T,MATRIX_T);
 add("eigenvalues_sym",VECTOR_T,MATRIX_T);
