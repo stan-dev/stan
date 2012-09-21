@@ -7,6 +7,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <boost/math/special_functions/sign.hpp>
 
 namespace stan {
 
@@ -30,6 +31,8 @@ namespace stan {
       using stan::prob::include_summand;
       using std::log;
       using std::fabs;
+      using boost::math::sign;
+
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -88,16 +91,10 @@ namespace stan {
 	
 	// gradients
 	if (!is_constant<typename is_vector<T_y>::type>::value) {
-	  if (y_m_mu > 0)
-	    operands_and_partials.d_x1[n] -= inv_sigma;
-	  if (y_m_mu < 0)
-	    operands_and_partials.d_x1[n] += inv_sigma;
+	  operands_and_partials.d_x1[n] -= sign(y_m_mu) * inv_sigma;
 	}
 	if (!is_constant<typename is_vector<T_loc>::type>::value) {
-	  if (y_m_mu > 0)
-	    operands_and_partials.d_x2[n] += inv_sigma;
-	  if (y_m_mu < 0)
-	    operands_and_partials.d_x2[n] -= inv_sigma;
+	  operands_and_partials.d_x2[n] += sign(y_m_mu) * inv_sigma;
 	}
 	if (!is_constant<typename is_vector<T_scale>::type>::value)
 	  operands_and_partials.d_x3[n] += -inv_sigma + fabs_y_m_mu * inv_sigma * inv_sigma;
