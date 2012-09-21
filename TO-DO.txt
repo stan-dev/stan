@@ -3,6 +3,8 @@ STAN TO-DO LIST
 
 The to-do list is organized into the following sections:
 
+* next release to-do and change list
+
 * C++ API                       * RStan
 * Modeling Language             * Manual
 * Build                         * Web Pages
@@ -10,13 +12,39 @@ The to-do list is organized into the following sections:
 * Command-Line                  * Models
 
  
-V 1.0.2
+V 1.0.2 Release Notes
 ======================================================================
+
+To Do for 1.0.2
+  -- matrix bounds checks in math/matrix, agrad/matrix, 
+     and prob/distributions
+ 
+Bug Fixes:
+  -- check ranges for LHS of assignment to prevent seg faults
+  -- indexing fixed for arrays of matrix/vector/row_vector
+  -- vectorized double_exponential, cauchy, beta
+  -- fixed void return type in auto_covariance
+  -- removed template variable names from distribution error msgs
+  -- upgraded BUGS ring model to use constraints plus tan2()
+
+New Features:
+  -- print statements
+
+Manual Additions:
+  -- programming guide: IRT models 
+  -- new appendix: style guide
+  -- new appendix: migrating from Stan
 
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* bring isinf in line with revised Boost
+
+* add lower/upper bound infinite or negative infinite values
+  -- need is_pos_inf<T>(x) and is_neg_inf(x) tests and we
+     only have isinf() which is either/or
 
 * higher-order auto-dif
   -- chain rule:
