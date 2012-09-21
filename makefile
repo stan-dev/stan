@@ -195,7 +195,7 @@ clean-dox:
 	$(RM) -r doc/api
 
 clean-manual:
-	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf *.out
+	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind
 
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d

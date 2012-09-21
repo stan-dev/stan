@@ -1202,6 +1202,236 @@ conditionals have regressions with slope 0.8.
 \end{itemize}
 
 
+\chapter{Stan Program Style Guide}
+
+\noindent
+This appendix describes the preferred style for laying out Stan
+models. These are not rules of the language, but simply
+recommendations for laying out programs in a text editor.  Although
+these recommendations may seem arbitrary, they are similar to those of
+many teams for many programming languages.  Like rules for typesetting
+text, the goal is to achieve readability without wasting white space
+either vertically or horizontally.
+
+\section{Choose a Consistent Style}
+
+The most important point of style is consistency.  Consistent coding
+style makes it easier to read not only a single program, but multiple
+programs.  So when departing from this style guide, the number one
+recommendation is to do so consistently.
+
+\section{Line Length}
+
+Line lengths should not exceed 80 characters.%
+%
+\footnote{Even 80 characters may be too many for rendering in print.}
+%
+This is a typical recommendation for many programming language style
+guides because it makes it easier to lay out text edit windows side by
+side and to view the code on the web without wrapping, easier to view
+diffs from version control, etc.  About the only thing that is
+sacrificed is laying out expressions on a single line.
+
+\section{Variable Naming}
+
+The recommended variable naming is to follow C/\Cpp naming
+conventions, in which variables are lowercase, with the underscore
+character (\Verb|_|) used as a separator.  Thus it is preferred to use
+\Verb|sigma_y|, rather than the run together \Verb|sigmay|, camel-case
+\Verb|sigmaY|, or capitalized camel-case \Verb|SigmaY|.  Even matrix
+variables should be lowercased.
+
+The exception to the lowercasing recommendation, which also follows
+the C/\Cpp conventions, is for size constants, for which the
+recommended form is a single uppercase letter.  The reason for this is
+that it allows the loop variables match.  So loops over the indices of
+an $M \times N$ matrix $a$ would look as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+for (m in 1:M)
+  for (n in 1:N)
+     a[m,n] = ...
+\end{Verbatim}
+\end{quote}
+
+
+
+\section{Parentheses and Brackets}
+
+\subsection{Optional Parentheses for Single-Statement Blocks}
+
+Single-statement blocks can be rendered in one of two ways.  Without
+statement-block delineating brackets, they will look as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+for (n in 1:N)
+  y[n] ~ normal(mu,1);
+\end{Verbatim}
+\end{quote}
+% 
+With brackets the rednering is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) {
+  y[n] ~ normal(mu,1);
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{No Open Brackets on Own Line}
+
+Vertical space is valuable as it controls how much of a program you
+can see.  The preferred Stan style is as shown in the previous
+section, not as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) 
+{
+  y[n] ~ normal(mu,1);
+}
+\end{Verbatim}
+\end{quote}
+%
+This also goes for parameters blocks, transformed data blocks, 
+which should look as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed parameters {
+  real sigma;
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+
+
+
+\section{White Space}
+
+Stan allows spaces between elements of a program.  The white space
+characters allowed in Stan programs include the space (ASCII
+\code{0x20}), line feed (ASCII \code{0x0A}), carriage return
+(\code{0x0D}), and tab (\code{0x09}).  Stan treats all whitespace
+characters interchangeably, with any sequence of whitespace characters
+being syntactically equivalent to a single space character.
+Nevertheless, effective use of whitespace is the key to good program
+layout.
+
+
+\subsection{Line Breaks Between Statements and Declarations}
+
+It is dispreferred to have multiple statements or declarations on the
+same line, as in the following example.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed parameters {
+  real mu_centered;  real sigma;
+  mu <- (mu_raw - mean_mu_raw);    sigma <- pow(tau,-2);
+}
+\end{Verbatim}
+\end{quote}
+%
+These should be broken into four separate lines.
+
+\subsection{No Tabs}
+
+Stan programs should not contain tab characters.  They are legal and
+may be used anywhere other whitespace occurs.  Using tabs to layout a
+program is highly unportable because the number of spaces
+represented by a single tab character varies depending on which
+program is doing the rendering and how it is configured.  
+
+\subsection{Two-Character Indents}
+
+Stan has standardized on two-spaces of indentation, like the
+usual standard used for C/C++ (and unlike the usual standard
+for Java, which is four spaces, or Python, which is one or more tabs
+depending on indent level).   The other sensible choice is four
+characters.  Just be consistent.  
+
+\subsection{Space Between \code{if} and Condition}
+
+Use a space after \code{if}s.  For instance, use \code{if (x < y) ...}, not
+\code{if(x < y) ...}.
+
+\subsection{No Space For Function Calls}
+
+There is no space between a funtion name and the function it applies
+to.  For instance, use \code{normal(0,1)}, not \code{normal (0,1)}.
+
+\subsection{Spaces Around Operators}
+
+There should be spaces around binary operators.  For instance, use
+\code{y[1]~<-~x}, not \code{y[1]<-x}, use \code{(x~+~y)~*~z} not
+\code{(x+y)*z}.
+
+\subsection{Breaking Expressions across Lines}
+
+Sometimes expressions are too long to fit on a single line.  In that
+case, the recommended form is to break \emph{before} an operator,%
+%
+\footnote{This is the usual convention in both typesetting and other
+  programming languages. Neither R nor BUGS allows breaks before an
+  operator because they allow newlines to signal the end of an
+  expression or statement.}
+%
+aligning the operator to indicate scoping.  For example, use the
+following form (though not the content; inverting matrices is almost
+always a bad idea).
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + (y - mu)'
+               * inv(Sigma) 
+               * (y - mu);
+\end{Verbatim}
+\end{quote}
+%
+Here, the multiplication operator (\code{*}) is aligned to clearly
+signal the multiplicands in the product.  
+
+For function arguments, break after a comma and line the next
+argument up underneath as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+y[n] ~ normal(alpha + beta * x + gamma * y,
+              pow(tau,-2));
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Optional Spaces after Commas}
+
+Optionally use spaces after commas in function arguments for clarity.
+For example, \code{normal(alpha * x[n] + beta,sigma)} can also be
+written as \code{normal(alpha~*~x[n]~+~beta,~sigma)}.
+
+
+
+\subsection{Unix Newlines}
+
+Wherever possible, Stan programs should use a single line feed 
+character to separate lines.  All of the Stan developers (so far, at 
+least) work on Unix-like operating systems and using a standard 
+newline makes the programs easier for us to read and share.  
+
+\subsubsection{Platform Specificity of Newlines}
+
+Newlines are signaled in Unix-like operating systems such as Linux and
+Mac OS X with a single line-feed (LF) character (ASCII code point
+\code{0x0A}).  Newlines are signaled in Windows using two characters,
+a carriage return (CR) character (ASCII code point \code{0x0D})
+followed by a line-feed (LF) character.
+
 
 
 
