@@ -89,6 +89,15 @@ TEST(ProbDistributionsLognormal,ErrnoPolicy) {
   EXPECT_TRUE(std::isnan(result));
 }
 TEST(ProbDistributionsLognormal,Cumulative) {
-  EXPECT_FLOAT_EQ(0.4687341, stan::prob::lognormal_cdf(1.2,0.3,1.5));
-  EXPECT_FLOAT_EQ(0.2835506, stan::prob::lognormal_cdf(12.0,3.0,0.9));
+  using stan::prob::lognormal_cdf;
+  EXPECT_FLOAT_EQ(0.4687341, lognormal_cdf(1.2,0.3,1.5));
+  EXPECT_FLOAT_EQ(0.2835506, lognormal_cdf(12.0,3.0,0.9));
+
+  double pos_inf = std::numeric_limits<double>::infinity();
+  
+  // ?? double neg_inf = -pos_inf;
+  // ?? EXPECT_FLOAT_EQ(0.0,lognormal_cdf(neg_inf,0.0,1.0));
+
+  EXPECT_FLOAT_EQ(0.0,lognormal_cdf(0.0,0.0,1.0));
+  EXPECT_FLOAT_EQ(1.0,lognormal_cdf(pos_inf,0.0,1.0));
 }

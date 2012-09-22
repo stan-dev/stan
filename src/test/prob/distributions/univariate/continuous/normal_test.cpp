@@ -89,4 +89,7 @@ TEST(ProbDistributions,NormalCdf) {
 
   EXPECT_NEAR(0.3694413, normal_cdf(1,5,12), 1E-7);
   EXPECT_NEAR(0.9999683, normal_cdf(-2,-3,0.25), 1E-7);
+
+  EXPECT_FLOAT_EQ(0.0, normal_cdf(-numeric_limits<double>::infinity(),0.0,1.0));
+  EXPECT_FLOAT_EQ(1.0, normal_cdf(numeric_limits<double>::infinity(),0.0,1.0));
 }
