@@ -280,7 +280,21 @@ transformed data {
   //*** Discrete Probabilities ***
   // Binary Discrete Probabilities
   transformed_data_real <- bernoulli_log(d_int, d_real);
+  transformed_data_real <- bernoulli_log(d_int, d_vector);
+  transformed_data_real <- bernoulli_log(d_int, d_row_vector);
+  transformed_data_real <- bernoulli_log(d_int, d_real_array);
+  transformed_data_real <- bernoulli_log(d_int_array, d_real);
+  transformed_data_real <- bernoulli_log(d_int_array, d_vector);
+  transformed_data_real <- bernoulli_log(d_int_array, d_row_vector);
+  transformed_data_real <- bernoulli_log(d_int_array, d_real_array);
   transformed_data_real <- bernoulli_logit_log(d_int, d_real);
+  transformed_data_real <- bernoulli_logit_log(d_int, d_vector);
+  transformed_data_real <- bernoulli_logit_log(d_int, d_row_vector);
+  transformed_data_real <- bernoulli_logit_log(d_int, d_real_array);
+  transformed_data_real <- bernoulli_logit_log(d_int_array, d_real);
+  transformed_data_real <- bernoulli_logit_log(d_int_array, d_vector);
+  transformed_data_real <- bernoulli_logit_log(d_int_array, d_row_vector);
+  transformed_data_real <- bernoulli_logit_log(d_int_array, d_real_array);
   // Bounded Discrete Probabilities
   transformed_data_real <- binomial_log(d_int, d_int, d_real);
   transformed_data_real <- beta_binomial_log(d_int, d_int, d_real, d_real);
@@ -1011,8 +1025,36 @@ transformed parameters {
   // Binary Discrete Probabilities
   transformed_param_real <- bernoulli_log(d_int, d_real);
   transformed_param_real <- bernoulli_log(d_int, p_real);
+  transformed_param_real <- bernoulli_log(d_int, d_vector);
+  transformed_param_real <- bernoulli_log(d_int, p_vector);
+  transformed_param_real <- bernoulli_log(d_int, d_row_vector);
+  transformed_param_real <- bernoulli_log(d_int, p_row_vector);
+  transformed_param_real <- bernoulli_log(d_int, d_real_array);
+  transformed_param_real <- bernoulli_log(d_int, p_real_array);
+  transformed_param_real <- bernoulli_log(d_int_array, d_real);
+  transformed_param_real <- bernoulli_log(d_int_array, p_real);
+  transformed_param_real <- bernoulli_log(d_int_array, d_vector);
+  transformed_param_real <- bernoulli_log(d_int_array, p_vector);
+  transformed_param_real <- bernoulli_log(d_int_array, d_row_vector);
+  transformed_param_real <- bernoulli_log(d_int_array, p_row_vector);
+  transformed_param_real <- bernoulli_log(d_int_array, d_real_array);
+  transformed_param_real <- bernoulli_log(d_int_array, p_real_array);
   transformed_param_real <- bernoulli_logit_log(d_int, d_real);
   transformed_param_real <- bernoulli_logit_log(d_int, p_real);
+  transformed_param_real <- bernoulli_logit_log(d_int, d_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int, p_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int, d_row_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int, p_row_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int, d_real_array);
+  transformed_param_real <- bernoulli_logit_log(d_int, p_real_array);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, d_real);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, p_real);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, d_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, p_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, d_row_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, p_row_vector);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, d_real_array);
+  transformed_param_real <- bernoulli_logit_log(d_int_array, p_real_array);
   // Bounded Discrete Probabilities
   transformed_param_real <- binomial_log(d_int, d_int, d_real);
   transformed_param_real <- binomial_log(d_int, d_int, p_real);
