@@ -33,7 +33,6 @@ public:
     param[1] = 0.01;        // theta
     parameters.push_back(param);
     log_prob.push_back(log(0.99)); // expected log_prob
-
   }
  
   void invalid_values(vector<size_t>& index, 

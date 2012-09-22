@@ -71,7 +71,7 @@ namespace stan {
 	if (include_summand<Prop,T_prob>::value) {
 	  if (n_int == 1)
 	    logp += log(theta_dbl);
-	  else if (n_int == 0)
+	  else
 	    logp += log1m(theta_dbl);
 	}
 
@@ -79,7 +79,7 @@ namespace stan {
 	if (!is_constant<typename is_vector<T_prob>::type>::value) {
 	  if (n_int == 1)
 	    operands_and_partials.d_x1[n] += 1.0 / theta_dbl;
-	  else if (n_int == 0)
+	  else
 	    operands_and_partials.d_x1[n] += 1.0 / (theta_dbl - 1.0);
 	}
       }
