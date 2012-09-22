@@ -1,4 +1,4 @@
-#define _LOG_PROB_ bernoulli_log
+#define _LOG_PROB_ bernoulli_logit_log
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 
 #include <test/agrad/distributions/distribution_test_fixture.hpp>
@@ -8,25 +8,39 @@ using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionsBernoulli : public AgradDistributionTest {
+class AgradDistributionsBernoulliLogistic : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters) {
+    using stan::math::logit;
+    using std::exp;
     vector<double> param(2);
 
     param[0] = 1;           // n
-    param[1] = 0.25;        // theta
+    param[1] = logit(0.25); // theta
     parameters.push_back(param);
 
     param[0] = 0;           // n
-    param[1] = 0.25;        // theta
+    param[1] = logit(0.25); // theta
     parameters.push_back(param);
 
     param[0] = 1;           // n
-    param[1] = 0.01;        // theta
+    param[1] = logit(0.01); // theta
     parameters.push_back(param);
 
     param[0] = 0;           // n
-    param[1] = 0.01;        // theta
+    param[1] = logit(0.01); // theta
+    parameters.push_back(param);
+
+    param[0] = 0;            // n
+    param[1] = 25;           // theta
+    parameters.push_back(param);
+
+    param[0] = 1;            // n
+    param[1] = -25;          // theta
+    parameters.push_back(param);
+    
+    param[0] = 0;           // n
+    param[1] = -25;         // theta
     parameters.push_back(param);
   }
  
@@ -40,11 +54,6 @@ public:
     value.push_back(2);
 
     // theta
-    index.push_back(1U);
-    value.push_back(-0.001);
-
-    index.push_back(1U);
-    value.push_back(1.001);
   }
 
   template <class T_prob>
@@ -54,19 +63,22 @@ public:
     using stan::math::log1m;
     using stan::prob::include_summand;
 
-    var logp(0);
     if (include_summand<true,T_prob>::value) {
-      if (n == 1)
-	logp += log(theta);
-      else if (n == 0)
-	logp += log1m(theta);
+      T_prob ntheta = (2*n-1) * theta;
+      // Handle extreme values gracefully using Taylor approximations.
+      const static double cutoff = 20.0;
+      if (ntheta > cutoff)
+	return -exp(-ntheta);
+      else if (ntheta < -cutoff)
+	return ntheta;
+      else
+	return -log(1 + exp(-ntheta));
     }
-    return logp;
+    return 0.0;
   }
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsBernoulli,
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsBernoulliLogistic,
 			      AgradDistributionTestFixture,
-			      AgradDistributionsBernoulli);
-
+			      AgradDistributionsBernoulliLogistic);
 

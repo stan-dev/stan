@@ -178,6 +178,46 @@ namespace stan {
       };
     }
 
+
+    template<typename T1>
+    struct OperandsAndPartials1 {
+      size_t nvaris;
+
+      agrad::vari** all_varis;
+      double* all_partials;
+
+      VectorView<double*, is_vector<T1>::value> d_x1;
+
+      const static bool all_constant = is_constant<typename is_vector<T1>::type>::value;
+
+      OperandsAndPartials1(const T1& x1,
+			   VectorView<const T1, is_vector<T1>::value> x1_vec)
+        : nvaris((!is_constant<typename is_vector<T1>::type>::value) * length(x1)),
+          all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*[nvaris]))),
+          all_partials((double*)agrad::chainable::operator new(sizeof(double[nvaris]))),
+          d_x1(all_partials)
+      {
+        size_t base = 0;
+        if (!is_constant<typename is_vector<T1>::type>::value) {
+          for (size_t i = 0; i < length(x1); i++)
+            all_varis[base + i] = agrad::coerce_to_vari(agrad::extract_vari(x1_vec[i]));
+          base += length(x1);
+        }
+        for (size_t i = 0; i < nvaris; i++)
+          all_partials[i] = 0.0;
+      }
+
+      typename boost::math::tools::promote_args<typename is_vector<T1>::type>::type
+      to_var(double logp) {
+        if (all_constant)
+          return logp;
+        else
+          return sanitizer<all_constant>::sanitize(agrad::simple_var(logp, nvaris, all_varis, all_partials));
+      }
+    };
+
+
+
     template<typename T1, typename T2, typename T3>
     struct OperandsAndPartials {
       size_t nvaris;

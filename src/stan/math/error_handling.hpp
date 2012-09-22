@@ -777,6 +777,31 @@ namespace stan {
                      result,Policy());
     }
 
+    template <typename T1, typename T2, typename T_result, 
+              class Policy>
+    inline bool check_consistent_sizes(const char* function,
+                                       const T1& x1, 
+                                       const T2& x2, 
+                                       const char* name1,
+                                       const char* name2,
+                                       T_result* result,
+                                       const Policy&) {
+      size_t max_size = std::max(size_of(x1),
+                                 size_of(x2));
+      return check_consistent_size(max_size,function,x1,name1,result,Policy())
+        && check_consistent_size(max_size,function,x2,name2,result,Policy());
+    }
+    template <typename T1, typename T2, typename T_result>
+    inline bool check_consistent_sizes(const char* function,
+                                       const T1& x1, 
+                                       const T2& x2, 
+                                       const char* name1,
+                                       const char* name2,
+                                       T_result* result) {
+      return check_consistent_sizes(function,x1,x2,name1,name2,
+                                    result,default_policy());
+    }
+
     template <typename T1, typename T2, typename T3, typename T_result, 
               class Policy>
     inline bool check_consistent_sizes(const char* function,
