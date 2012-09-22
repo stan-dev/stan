@@ -18,6 +18,8 @@ V 1.0.2 Release Notes
 To Do for 1.0.2
   -- matrix bounds checks in math/matrix, agrad/matrix, 
      and prob/distributions
+  -- removed (unsigned) long long instances in dump and error testing
+  -- fixed sd() and variance() to return 1.0 for sequences of size 1
  
 Bug Fixes:
   -- check ranges for LHS of assignment to prevent seg faults
@@ -26,6 +28,9 @@ Bug Fixes:
   -- fixed void return type in auto_covariance
   -- removed template variable names from distribution error msgs
   -- upgraded BUGS ring model to use constraints plus tan2()
+  -- changed matrix to throw domain_error rather than illegal_argument
+  -- added matrix size and shape tests to avoid seg faults
+  -- boundary conditions at limits of support for cdfs
 
 New Features:
   -- print statements
@@ -34,6 +39,7 @@ Manual Additions:
   -- programming guide: IRT models 
   -- new appendix: style guide
   -- new appendix: migrating from Stan
+  -- new index: function and distribution index
 
 
 C++ API
