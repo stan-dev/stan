@@ -3,7 +3,7 @@
 # Change point model with very poor parameterization stated in WINBUGS examples
 
 data {
-  int(0,) N; 
+  int<lower=0> N; 
   real x[N]; 
   real Y[N]; 
   
@@ -17,8 +17,8 @@ transformed data {
 parameters {
   real alpha;
   real beta[2]; 
-  real(0,) tau; 
-  int(0,) k;
+  real<lower=0> tau; 
+  int<lower=0> k;
 } 
 
 transformed parameters {

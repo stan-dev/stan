@@ -2,10 +2,10 @@
 # Page 29: Ice: non-parametric smoothing in an age-cohort model
 
 data {
-  int(0,) N; 
-  int(0,) Nage;
-  int(0,) None; 
-  int(0,) K; 
+  int<lower=0> N; 
+  int<lower=0> Nage;
+  int<lower=0> None; 
+  int<lower=0> K; 
   int year[N]; 
   int cases[N]; 
   int age[N]; 
@@ -31,7 +31,7 @@ transformed data { # deterministic functions of data to be called only once
 parameters {
   real alpha[Nage - 1]; 
   real beta[K];
-  real(0.05,) sigma;
+  real<lower=0.05> sigma;
 } 
 transformed parameters { # deterministic functions of parameters called every iteration
     real betamean[K];

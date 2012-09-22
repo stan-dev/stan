@@ -9,7 +9,7 @@
 
 
 data {
-  int(0,) N; 
+  int<lower=0> N; 
   real y[N]; 
 } 
 
@@ -23,7 +23,7 @@ parameters {
 } 
 transformed parameters {
   // learning about the dof as a continuous quantity
-  int(2, 50) d; 
+  int<lower=2, upper=50> d; 
   d <- K + 2; 
 } 
 

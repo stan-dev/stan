@@ -16,13 +16,13 @@ $(PGM) :
 	./$(PGM) # --data=$(PGM).Rdata
 
 $(PGM2) :
-	$(STAN_HOME)/bin/stanc --name=$(PGM2)  $(PGM2).stan.0 
+	$(STAN_HOME)/bin/stanc --name=$(PGM2)  $(PGM2).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM2).cpp -o $(PGM2) -L$(STAN_HOME)/bin -lstan 
 	./$(PGM2) --iter=10000 --warmup=1000  # --data=$(PGM2).Rdata
 
 
 $(PGM3) :
-	$(STAN_HOME)/bin/stanc --name=$(PGM3)  $(PGM3).stan.0
+	$(STAN_HOME)/bin/stanc --name=$(PGM3)  $(PGM3).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM3).cpp -o $(PGM3) -L$(STAN_HOME)/bin -lstan 
 	./$(PGM3) --iter=10000 --warmup=1000 --thin=1# --data=$(PGM3).Rdata
 

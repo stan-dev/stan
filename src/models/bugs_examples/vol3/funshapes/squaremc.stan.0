@@ -1,11 +1,11 @@
 # http://www.openbugs.info/Examples/Funshapes.html
 # square minus circle 
 
-## status: not working (stan is hanging over there)
+## status: not working 
 
 parameters {
-  real(-1, 1) x; 
-  real(-1, 1) y; 
+  real<lower=-1, upper=1> x; 
+  real<lower=-1, upper=1> y; 
 } 
 
 model {
