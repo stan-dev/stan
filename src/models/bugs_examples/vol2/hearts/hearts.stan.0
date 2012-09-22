@@ -5,20 +5,20 @@
 ## status: not work (there are discrete parameters) 
 ## see hearts.stan 
 data {
-  int(0,) N;
-  int(0,) x[N];
-  int(0,) y[N];
-  int(0,) t[N];
+  int<lower=0> N;
+  int<lower=0> x[N];
+  int<lower=0> y[N];
+  int<lower=0> t[N];
 } 
 
 parameters {
   real alpha; 
   real delta; 
-  int(0,) state[N]; // these are discrete parameters. the support is 0 or 1 actually. ??
+  int<lower=0> state[N]; // these are discrete parameters. the support is 0 or 1 actually. ??
 } 
 
 transformed parameters {
-  real(0,1) theta;
+  real<lower=0, upper=1> theta;
   theta <- inv_logit(delta); 
 } 
 
