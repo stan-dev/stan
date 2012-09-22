@@ -1,5 +1,5 @@
 #define _LOG_PROB_ bernoulli_logit_log
-#include <stan/prob/distributions/univariate/discrete/bernoulli_logit.hpp>
+#include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 
 #include <test/prob/distributions/distribution_test_fixture.hpp>
 #include <test/prob/distributions/discrete_distribution_tests_2_params.hpp>
