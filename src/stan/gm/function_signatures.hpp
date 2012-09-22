@@ -25,8 +25,14 @@ add_unary("asinh");
 add_unary("atan");
 add_binary("atan2");
 add_unary("atanh");
-add("bernoulli_log",DOUBLE_T,INT_T,DOUBLE_T);
-add("bernoulli_logit_log",DOUBLE_T,INT_T,DOUBLE_T);
+for (size_t i = 0; i < vector_types.size(); ++i) {
+  add("bernoulli_log",DOUBLE_T,INT_T,vector_types[i]);
+  add("bernoulli_log",DOUBLE_T,expr_type(INT_T,1U),vector_types[i]);
+}
+for (size_t i = 0; i < vector_types.size(); ++i) {
+  add("bernoulli_logit_log",DOUBLE_T,INT_T,vector_types[i]);
+  add("bernoulli_logit_log",DOUBLE_T,expr_type(INT_T,1U),vector_types[i]);
+}
 add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
