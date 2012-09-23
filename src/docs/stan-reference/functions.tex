@@ -464,21 +464,32 @@ of \farg{x} and the natural exponentiation of \farg{y}}
 \chapter{Array Operations}
 %
 \begin{description}
-\fitem{real}{sum}{real \farg{x}[]}
-The sum of the elements in \farg{x}
+\fitem{real}{sum}{real \farg{x}[]}{
+The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
-\fitem{real}{mean}{real \farg{x}[]}
-The sample mean of the elements in \farg{x}
+\fitem{real}{sum}{int \farg{x}[]}{
+The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
-\fitem{real}{variance}{real \farg{x}[]}
+\fitem{real}{prod}{real \farg{x}[]}{
+The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
+%
+\fitem{real}{prod}{int \farg{x}[]}{
+The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
+%
+\fitem{real}{mean}{real \farg{x}[]}{
+The sample mean of the elements in \farg{x}, or raise exception
+if \farg{x} is empty}
+%
+\fitem{real}{variance}{real \farg{x}[]}{
 The sample variance of the elements in \farg{x} (based on
-dividing by \code{length - 1})
+dividing by \code{length - 1}), or 0 if \farg{x} is empty}
 %
-\fitem{real}{sd}{real \farg{x}[]} The sample standard deviation of
-elements in \farg{x} (divide by \code{length - 1})
+\fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
+elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
+is empty}
 %
-\fitem{real}{log\_sum\_exp}{real \farg{x}[]}
-The natural logarithm of the sum of the exponentials of the elements in \farg{x}
+\fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
 \end{description}
 
 
@@ -730,22 +741,22 @@ The dot product of the row vector \farg{x} with itself}
 \begin{description}
 %
 \fitem{real}{min}{vector \farg{x}}{
-The minimum value in \farg{x}}
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
 %
 \fitem{real}{min}{row\_vector \farg{x}}{
-The minimum value in \farg{x}}
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
 %
 \fitem{real}{min}{matrix \farg{x}}{
-The minimum value in \farg{x}}
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
 %
 \fitem{real}{max}{vector \farg{x}}{
-The maximum value in \farg{x}}
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
 %
 \fitem{real}{max}{row\_vector \farg{x}}{
-The maximum value in \farg{x}}
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
 %
 \fitem{real}{max}{matrix \farg{x}}{
-The maximum value in \farg{x}}
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
 %
 \end{description}
 
@@ -754,23 +765,23 @@ The maximum value in \farg{x}}
 \begin{description}
 %
 \fitem{real}{sum}{vector \farg{x}}{
-The sum of the values in \farg{x} (zero if size zero)}
+The sum of the values in \farg{x}, or 0 if \farg{x} is empty}
 %
 \fitem{real}{sum}{row\_vector \farg{x}}{
-The sum of the values in \farg{x} (zero if size zero)}
+The sum of the values in \farg{x}, or 0 if \farg{x} is empty}
 %
 \fitem{real}{sum}{matrix \farg{x}}{
-The sum of the values in \farg{x} (zero if size zero)}
+The sum of the values in \farg{x}, or 0 if \farg{x} is empty}
 %
 %
 \fitem{real}{prod}{vector \farg{x}}{
-The product of the values in \farg{x} (one if size zero)}
+The product of the values in \farg{x}, or 1 if \farg{x} is empty}
 %
 \fitem{real}{prod}{row\_vector \farg{x}}{
-The product of the values in \farg{x} (one if size zero)}
+The product of the values in \farg{x}, or 1 if \farg{x} is empty}
 %
 \fitem{real}{prod}{matrix \farg{x}}{
-The product of the values in \farg{x} (one if size zero)}
+The product of the values in \farg{x}, or 1 if \farg{x} is empty}
 %
 \end{description}
 
@@ -781,42 +792,44 @@ The product of the values in \farg{x} (one if size zero)}
 \begin{description}
 %
 \fitem{real}{mean}{vector \farg{x}}{
-The sample mean of the values in \farg{x}}
+The sample mean of the values in \farg{x}, or raise
+exception if \farg{x} is empty}
 %
 \fitem{real}{mean}{row\_vector \farg{x}}{
-The sample mean of the values in \farg{x}}
+The sample mean of the values in \farg{x}, or raise
+exception if \farg{x} is empty}
 %
 \fitem{real}{mean}{matrix \farg{x}}{
-The sample mean of the values in \farg{x}
-(divide by length minus 1)}
+The sample mean of the values in \farg{x}, or raise
+exception if \farg{x} is empty}
 %
 \vspace*{4pt}
 %
 \fitem{real}{variance}{vector \farg{x}}{
 The sample variance of the values in \farg{x}
-(divide by size minus 1)}
+(divide by size minus 1), or 0 if \farg{x} is empty}
 %
-\fitem{real}{variance}{row\_vector \farg{x}}{ 
-The sample variance of the
-values in \farg{x} (divide by size minus 1)}
+\fitem{real}{variance}{row\_vector \farg{x}}{ The sample variance of
+  the values in \farg{x} (divide by size minus 1), or 0 if \farg{x} is
+  empty}
 %
 \fitem{real}{variance}{matrix \farg{x}}{
 The sample variance of the values in 
-\farg{x} (divide by size minus 1)}
+\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
 %
 \vspace*{4pt}
 %
 \fitem{real}{sd}{vector \farg{x}}{
 The sample standard deviation of the values in \farg{x}
-(divide by size minus 1)}
+(divide by size minus 1), or 0 if \farg{x} is empty}
 %
 \fitem{real}{sd}{row\_vector \farg{x}}{ 
-The sample standard deviation of the
-values in \farg{x} (divide by size minus 1)}
+The sample standard deviation of the values in \farg{x} (divide by
+size minus 1), or 0 if \farg{x} is empty}
 %
 \fitem{real}{sd}{matrix \farg{x}}{
 The sample standard deviation of the values in 
-\farg{x} (divide by size minus 1)}
+\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
 %
 \end{description}
 
@@ -1304,8 +1317,8 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \]
 
 \begin{description}
-\fitem{real}{double\_exponential\_log}{real \farg{y}, real \farg{mu},
-real \farg{sigma}}{ The log of the double exponential density of \farg{y} given
+\fitem{real}{double\_exponential\_log}{reals \farg{y}, reals \farg{mu},
+reals \farg{sigma}}{ The log of the double exponential density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
