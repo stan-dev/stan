@@ -50,7 +50,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::prob::include_summand;
 
-
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(alpha) 
@@ -105,7 +104,7 @@ namespace stan {
 
 	// reusable subexpressions values
 	if (y_dbl < 0 || y_dbl > 1)
-	  return 0.0;
+	  return LOG_ZERO;
 
 	const double log_y = log(y_dbl);
 	const double log1m_y = log1m(y_dbl);
