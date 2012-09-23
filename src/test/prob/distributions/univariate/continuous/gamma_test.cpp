@@ -1,85 +1,85 @@
-#include <gtest/gtest.h>
-#include "stan/prob/distributions/univariate/continuous/gamma.hpp"
+#define _LOG_PROB_ gamma_log
+#include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+using std::vector;
+using std::numeric_limits;
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+class ProbDistributionsGamma : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
 
+    param[0] = 1.0;                 // y
+    param[1] = 2.0;                 // alpha
+    param[2] = 2.0;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(-0.6137056); // expected log_prob
 
-TEST(ProbDistributionsGamma,Gamma) {
-  EXPECT_FLOAT_EQ(-0.6137056, stan::prob::gamma_log(1.0,2.0,2.0));
-  EXPECT_FLOAT_EQ(-3.379803, stan::prob::gamma_log(2.0,0.25,0.75));
-  EXPECT_FLOAT_EQ(-1, stan::prob::gamma_log(1,1,1));
-  EXPECT_FLOAT_EQ(log(2.0), stan::prob::gamma_log(0.0,1.0,2.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::gamma_log(-10.0,1.0,2.0));
-}
-TEST(ProbDistributionsGamma,Boundary) {
-  double y;
-  double alpha;
-  double gamma;
+    param[0] = 2.0;                 // y
+    param[1] = 0.25;                // alpha
+    param[2] = 0.75;                // beta
+    parameters.push_back(param);
+    log_prob.push_back(-3.379803);  // expected log_prob
 
-  y = 0;
-  alpha = 1;
-  gamma = 1;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log(y,alpha,gamma));
-}
-TEST(ProbDistributionsGamma,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log<true>(1.0,2.0,2.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log<true>(2.0,0.25,0.75));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::gamma_log<true>(1,1,1));
-}
-TEST(ProbDistributionsGamma,DefaultPolicy) {
-  double y = 0.5;
-  double alpha = 1.5;
-  double beta = 2.0;
-  
-  EXPECT_NO_THROW(stan::prob::gamma_log(y, alpha, beta));
-  EXPECT_NO_THROW(stan::prob::gamma_log(-1.0, alpha, beta));
-  EXPECT_THROW (stan::prob::gamma_log(y, 0.0, beta), std::domain_error) <<
-    "alpha = 0.0 should throw an exception";
-  EXPECT_THROW (stan::prob::gamma_log(y, -1.0, beta), std::domain_error) <<
-    "alpha < 0 should throw an exception. alpha = " << alpha;
-  EXPECT_THROW (stan::prob::gamma_log(y, alpha, 0.0), std::domain_error) <<
-    "beta = 0.0 should throw an exception";
-  EXPECT_THROW (stan::prob::gamma_log(y, alpha, -1.0), std::domain_error) <<
-    "beta < 0 should throw an exception. beta = " << beta;
-}
-TEST(ProbDistributionsGamma,ErrnoPolicy) {
-  double result;
-  double y = 0.5;
-  double alpha = 1.5;
-  double beta = 2.0;
-  
-  EXPECT_NO_THROW(result=stan::prob::gamma_log(y, alpha, beta, errno_policy()));
-  EXPECT_FALSE(std::isnan(result));
-  
-  EXPECT_NO_THROW(result=stan::prob::gamma_log(-1.0, alpha, beta, errno_policy()));
-  EXPECT_FALSE(std::isnan(result));
-  
-  EXPECT_NO_THROW(result=stan::prob::gamma_log(y, 0.0, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result));
-  
-  EXPECT_NO_THROW(result=stan::prob::gamma_log(y, -1.0, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result));
+    param[0] = 1.0;                 // y
+    param[1] = 1.0;                 // alpha
+    param[2] = 1.0;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(-1.0);       // expected log_prob
+    
+    /*param[0] = 0.0;                 // y
+    param[1] = 1.0;                 // alpha
+    param[2] = 2.0;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(log(2.0));   // expected log_prob
+    
+    param[0] = -10.0;               // y
+    param[1] = 1.0;                 // alpha
+    param[2] = 2.0;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(log(0.0));   // expected log_prob */
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // alpha
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  EXPECT_NO_THROW(result=stan::prob::gamma_log(y, alpha, 0.0, errno_policy()));
-  EXPECT_TRUE(std::isnan(result));
+    index.push_back(1U);
+    value.push_back(-1.0);
 
-  EXPECT_NO_THROW(result=stan::prob::gamma_log(y, alpha, -1.0, errno_policy()));
-  EXPECT_TRUE(std::isnan(result));
-}
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // beta
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsGamma,
+			      DistributionTestFixture,
+			      ProbDistributionsGamma);
 
 /*
 // FIXME: include when gamma_cdf works.
