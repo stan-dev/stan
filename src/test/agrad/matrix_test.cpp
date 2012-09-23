@@ -328,9 +328,9 @@ TEST(agrad_matrix, dot_product__vector_vector__exception) {
   vector_d d2(2);
   vector_v v2(4);
 
-  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, dot_product__rowvector_vector) {
   row_vector_d d1(3);
@@ -353,9 +353,9 @@ TEST(agrad_matrix, dot_product__rowvector_vector__exception) {
   vector_d d2(2);
   vector_v v2(4);
 
-  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, dot_product__vector_rowvector) {
   vector_d d1(3);
@@ -378,9 +378,9 @@ TEST(agrad_matrix, dot_product__vector_rowvector__exception) {
   row_vector_d d2(2);
   row_vector_v v2(4);
 
-  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, dot_product__rowvector_rowvector) {
   row_vector_d d1(3), d2(3);
@@ -399,9 +399,9 @@ TEST(agrad_matrix, dot_product__rowvector_rowvector__exception) {
   row_vector_d d1(3), d2(2);
   row_vector_v v1(3), v2(4);
 
-  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::invalid_argument);
-  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::invalid_argument);
+  EXPECT_THROW (stan::agrad::dot_product(v1, d2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(d1, v2), std::domain_error);
+  EXPECT_THROW (stan::agrad::dot_product(v1, v2), std::domain_error);
 }
 // end dot_product tests
 
@@ -518,10 +518,10 @@ TEST(agrad_matrix, add__vector_vector__exception) {
   vector_v v1(5), v2(1);
   
   vector_v output;
-  EXPECT_THROW(output = stan::agrad::add(d1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(v1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(d1, v2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(v1, v2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(d1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(v1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(d1, v2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, add__rowvector_rowvector) {
   row_vector_v expected_output(5), output;
@@ -568,10 +568,10 @@ TEST(agrad_matrix, add__rowvector_rowvector__exception) {
   row_vector_v v1(5), v2(2);
 
   row_vector_v output;
-  EXPECT_THROW(output = stan::agrad::add(d1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(d1, v2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(v1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(v1, v2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(d1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(d1, v2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(v1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, add__matrix_matrix) {
   matrix_v expected_output(2,2), output;
@@ -614,10 +614,10 @@ TEST(agrad_matrix, add__matrix_matrix__exception) {
   matrix_v v1(2,2), v2(1,2);
 
   matrix_v output;
-  EXPECT_THROW(output = stan::agrad::add(d1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(d1, v2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(v1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::add(v1, v2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::add(d1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(d1, v2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(v1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::add(v1, v2), std::domain_error);
 }
 // end add tests
 
@@ -667,10 +667,10 @@ TEST(agrad_matrix, subtract__vector_vector__exception) {
   vector_v v1(5), v2(1);
   
   vector_v output;
-  EXPECT_THROW(output = stan::agrad::subtract(d1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(v1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(d1, v2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(v1, v2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(d1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(v1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(d1, v2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, subtract__rowvector_rowvector) {
   row_vector_v expected_output(5), output;
@@ -717,10 +717,10 @@ TEST(agrad_matrix, subtract__rowvector_rowvector__exception) {
   row_vector_v v1(5), v2(2);
 
   row_vector_v output;
-  EXPECT_THROW(output = stan::agrad::subtract(d1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(d1, v2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(v1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(v1, v2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(d1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(d1, v2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(v1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, subtract__matrix_matrix) {
   matrix_v expected_output(2,2), output;
@@ -765,10 +765,10 @@ TEST(agrad_matrix, subtract__matrix_matrix__exception) {
   matrix_v v1(2,2), v2(1,2);
 
   matrix_v output;
-  EXPECT_THROW(output = stan::agrad::subtract(d1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(d1, v2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(v1, d2), std::invalid_argument);
-  EXPECT_THROW(output = stan::agrad::subtract(v1, v2), std::invalid_argument);
+  EXPECT_THROW(output = stan::agrad::subtract(d1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(d1, v2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(v1, d2), std::domain_error);
+  EXPECT_THROW(output = stan::agrad::subtract(v1, v2), std::domain_error);
 }
 // end subtract tests
 
@@ -1602,9 +1602,9 @@ TEST(agrad_matrix, multiply__rowvector_vector) {
   
   d1.resize(1);
   v1.resize(1);
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
 }
 TEST(agrad_matrix, multiply__vector_rowvector) {
   vector_d d1(3);
@@ -1691,9 +1691,9 @@ TEST(agrad_matrix, multiply__matrix_vector__exception) {
   matrix_v v1(3,2);
   vector_d d2(4);
   vector_v v2(4);
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
 }
 TEST(agrad_matrix, multiply__rowvector_matrix) {
   row_vector_d d1(3);
@@ -1726,9 +1726,9 @@ TEST(agrad_matrix, multiply__rowvector_matrix__exception) {
   row_vector_v v1(4);
   matrix_d d2(3,2);
   matrix_v v2(3,2);
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
 }
 TEST(agrad_matrix, multiply__matrix_matrix) {
   matrix_d d1(2,3);
@@ -1771,9 +1771,9 @@ TEST(agrad_matrix, multiply__matrix_matrix__exception) {
   matrix_d d2(3,2);
   matrix_v v2(3,2);
 
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::invalid_argument);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
 }
 // end multiply tests
 
@@ -2591,13 +2591,13 @@ TEST(agradMatrix,col_v_exc0) {
   using stan::agrad::col;
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(col(y,0),std::invalid_argument);
+  EXPECT_THROW(col(y,0),std::domain_error);
 }
 TEST(agradMatrix,col_v_excHigh) {
   using stan::agrad::col;
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(col(y,5),std::invalid_argument);
+  EXPECT_THROW(col(y,5),std::domain_error);
 }
 TEST(agradMatrix,row_v) {
   using stan::agrad::row;
@@ -2619,13 +2619,13 @@ TEST(agradMatrix,row_v_exc0) {
   using stan::agrad::row;
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(row(y,0),std::invalid_argument);
+  EXPECT_THROW(row(y,0),std::domain_error);
 }
 TEST(agradMatrix,row_v_excHigh) {
   using stan::agrad::row;
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(row(y,5),std::invalid_argument);
+  EXPECT_THROW(row(y,5),std::domain_error);
 }
 TEST(agradMatrix, dot_product_vv) {
   std::vector<var> a, b;

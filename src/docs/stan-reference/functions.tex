@@ -464,6 +464,18 @@ of \farg{x} and the natural exponentiation of \farg{y}}
 \chapter{Array Operations}
 %
 \begin{description}
+\fitem{real}{min}{real \farg{x}[]}{
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
+%
+\fitem{int}{min}{int \farg{x}[]}{
+The minimum value in \farg{x}, or raise exception if \farg{x} is empty}
+%
+\fitem{real}{max}{real \farg{x}[]}{
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
+%
+\fitem{int}{max}{int \farg{x}[]}{
+The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
+%
 \fitem{real}{sum}{real \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %

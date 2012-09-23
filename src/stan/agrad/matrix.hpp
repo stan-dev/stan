@@ -850,7 +850,7 @@ namespace stan {
     template<int R, int C>
     inline var dot_self(const Eigen::Matrix<var, R, C>& v) {
       if (v.rows() != 1 && v.cols() != 1)
-        throw std::invalid_argument("v must be a vector");
+        throw std::domain_error("v must be a vector");
       return var(new dot_self_vari(v));
     }
     
@@ -860,17 +860,17 @@ namespace stan {
      * @param[in] v1 First column vector.
      * @param[in] v2 Second column vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2.
+     * @throw std::domain_error if length of v1 is not equal to length of v2.
      */
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
                            const Eigen::Matrix<var, R2, C2>& v2) {
       if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::invalid_argument("v1 must be a vector");
+        throw std::domain_error("v1 must be a vector");
       if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::invalid_argument("v2 must be a vector");
+        throw std::domain_error("v2 must be a vector");
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return var(new dot_product_vv_vari(v1,v2));
     }
     /**
@@ -879,18 +879,18 @@ namespace stan {
      * @param[in] v1 First column vector.
      * @param[in] v2 Second column vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2
+     * @throw std::domain_error if length of v1 is not equal to length of v2
      * or either v1 or v2 are not vectors.
      */
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
                            const Eigen::Matrix<double, R2, C2>& v2) {
       if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::invalid_argument("v1 must be a vector");
+        throw std::domain_error("v1 must be a vector");
       if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::invalid_argument("v2 must be a vector");
+        throw std::domain_error("v2 must be a vector");
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return var(new dot_product_vd_vari(v1,v2));
     }
     /**
@@ -899,18 +899,18 @@ namespace stan {
      * @param[in] v1 First column vector.
      * @param[in] v2 Second column vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument if length of v1 is not equal to length of v2
+     * @throw std::domain_error if length of v1 is not equal to length of v2
      * or either v1 or v2 are not vectors.
      */
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                            const Eigen::Matrix<var, R2, C2>& v2) {
       if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::invalid_argument("v1 must be a vector");
+        throw std::domain_error("v1 must be a vector");
       if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::invalid_argument("v2 must be a vector");
+        throw std::domain_error("v2 must be a vector");
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return var(new dot_product_vd_vari(v2,v1));
     }
     /**
@@ -952,12 +952,12 @@ namespace stan {
      * @param[in] v1 First vector.
      * @param[in] v2 Second vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument if sizes of v1 and v2 do not match.
+     * @throw std::domain_error if sizes of v1 and v2 do not match.
      */
     inline var dot_product(const std::vector<var>& v1,
                            const std::vector<var>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return var(new dot_product_vv_vari(&v1[0], &v2[0], v1.size()));
     }
     /**
@@ -966,12 +966,12 @@ namespace stan {
      * @param[in] v1 First vector.
      * @param[in] v2 Second vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument if sizes of v1 and v2 do not match.
+     * @throw std::domain_error if sizes of v1 and v2 do not match.
      */
     inline var dot_product(const std::vector<var>& v1,
                            const std::vector<double>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return var(new dot_product_vd_vari(&v1[0], &v2[0], v1.size()));
     }
     /**
@@ -980,12 +980,12 @@ namespace stan {
      * @param[in] v1 First vector.
      * @param[in] v2 Second vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument if sizes of v1 and v2 do not match.
+     * @throw std::domain_error if sizes of v1 and v2 do not match.
      */
     inline var dot_product(const std::vector<double>& v1,
                            const std::vector<var>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return var(new dot_product_vd_vari(&v2[0], &v1[0], v1.size()));
     }
 
@@ -1315,14 +1315,14 @@ namespace stan {
      * @param[in] v1 First vector.
      * @param[in] v2 Second vector.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if size of v1 is not equal to size of v2.
+     * @throw std::domain_error if size of v1 is not equal to size of v2.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, 1> 
     add(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
         const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return to_var(v1) + to_var(v2);
     }
     /**
@@ -1332,14 +1332,14 @@ namespace stan {
      * @param[in] rv1 First vector.
      * @param[in] rv2 Second vector.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if size of rv1 is not equal to size of rv2.
+     * @throw std::domain_error if size of rv1 is not equal to size of rv2.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, 1, Eigen::Dynamic>
     add(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv1, 
         const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv2) {
       if (rv1.size() != rv2.size())
-        throw std::invalid_argument("rv1.size() must equal rv2.size()");
+        throw std::domain_error("rv1.size() must equal rv2.size()");
       return to_var(rv1) + to_var(rv2);
     }
 
@@ -1350,14 +1350,14 @@ namespace stan {
      * @param[in] m1 First matrix.
      * @param[in] m2 Second matrix.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if dimension of m1 and m2 do not match.
+     * @throw std::domain_error if dimension of m1 and m2 do not match.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>
     add(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
         const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::invalid_argument("m1 dimensions must match m2 dimensions");
+        throw std::domain_error("m1 dimensions must match m2 dimensions");
       return to_var(m1) + to_var(m2);
     }
 
@@ -1469,14 +1469,14 @@ namespace stan {
      * @param[in] v1 First vector.
      * @param[in] v2 Second vector.
      * @return First vector minus the second vector.
-     * @throw std::invalid_argument if size of v1 does not match size of v2.
+     * @throw std::domain_error if size of v1 does not match size of v2.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, 1> 
     subtract(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
              const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+        throw std::domain_error("v1.size() must equal v2.size()");
       return to_var(v1) - to_var(v2);
     }
     /**
@@ -1485,14 +1485,14 @@ namespace stan {
      * @param[in] rv1 First vector.
      * @param[in] rv2 Second vector.
      * @return First vector minus the second vector.
-     * @throw std::invalid_argument if size of rv1 does not match size of rv2.
+     * @throw std::domain_error if size of rv1 does not match size of rv2.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, 1, Eigen::Dynamic> 
     subtract(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv1, 
              const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv2) {
       if (rv1.size() != rv2.size())
-        throw std::invalid_argument("rv1.size() must equal rv2.size()");
+        throw std::domain_error("rv1.size() must equal rv2.size()");
       return to_var(rv1) - to_var(rv2);
     }
 
@@ -1502,14 +1502,14 @@ namespace stan {
      * @param[in] m1 First matrix.
      * @param[in] m2 Second matrix.
      * @return First matrix minus the second matrix.
-     * @throw std::invalid_argument if dimension of m1 and m2 do not match.
+     * @throw std::domain_error if dimension of m1 and m2 do not match.
      */
     template <typename T1, typename T2>
     inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> 
     subtract(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
              const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::invalid_argument("m1 dimensions must match m2 dimensions");
+        throw std::domain_error("m1 dimensions must match m2 dimensions");
       return to_var(m1) - to_var(m2);
     }
 
@@ -1615,9 +1615,9 @@ namespace stan {
     elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
                  const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
       if (m1.cols() != m2.cols())
-        throw std::invalid_argument("m1.cols() != m2.cols()");
+        throw std::domain_error("m1.cols() != m2.cols()");
       if (m1.rows() != m2.rows())
-        throw std::invalid_argument("m1.rows() != m2.rows()");
+        throw std::domain_error("m1.rows() != m2.rows()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
@@ -1636,7 +1636,7 @@ namespace stan {
     elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
                  const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() != v2.size()");
+        throw std::domain_error("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) * v2(i);
@@ -1653,7 +1653,7 @@ namespace stan {
     elt_multiply(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
                  const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() != v2.size()");
+        throw std::domain_error("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) * v2(i);
@@ -1672,9 +1672,9 @@ namespace stan {
     elt_divide(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
                const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
       if (m1.cols() != m2.cols())
-        throw std::invalid_argument("m1.cols() != m2.cols()");
+        throw std::domain_error("m1.cols() != m2.cols()");
       if (m1.rows() != m2.rows())
-        throw std::invalid_argument("m1.rows() != m2.rows()");
+        throw std::domain_error("m1.rows() != m2.rows()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
@@ -1693,7 +1693,7 @@ namespace stan {
     elt_divide(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
                const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() != v2.size()");
+        throw std::domain_error("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) / v2(i);
@@ -1710,7 +1710,7 @@ namespace stan {
     elt_divide(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
                const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() != v2.size()");
+        throw std::domain_error("v1.size() != v2.size()");
       Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) / v2(i);
@@ -1759,14 +1759,14 @@ namespace stan {
      * @param[in] m1 First matrix.
      * @param[in] m2 Second matrix.
      * @return The product of the first and second matrices.
-     * @throw std::invalid_argument if the number of columns of m1 does not match
+     * @throw std::domain_error if the number of columns of m1 does not match
      *   the number of rows of m2.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<var,R1,C1>& m1,
                                              const Eigen::Matrix<var,R2,C2>& m2) {
       if (m1.cols() != m2.rows())
-        throw std::invalid_argument("m1.cols() != m2.rows()");
+        throw std::domain_error("m1.cols() != m2.rows()");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<var,R1,C1>::ConstRowXpr crow(m1.row(i));
@@ -1804,14 +1804,14 @@ namespace stan {
      * @param[in] m1 First matrix.
      * @param[in] m2 Second matrix.
      * @return The product of the first and second matrices.
-     * @throw std::invalid_argument if the number of columns of m1 does not match
+     * @throw std::domain_error if the number of columns of m1 does not match
      *   the number of rows of m2.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
                                              const Eigen::Matrix<var,R2,C2>& m2) {
       if (m1.cols() != m2.rows())
-        throw std::invalid_argument("m1.cols() != m2.rows()");
+        throw std::domain_error("m1.cols() != m2.rows()");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<double,R1,C1>::ConstRowXpr crow(m1.row(i));
@@ -1850,14 +1850,14 @@ namespace stan {
      * @param[in] m1 First matrix.
      * @param[in] m2 Second matrix.
      * @return The product of the first and second matrices.
-     * @throw std::invalid_argument if the number of columns of m1 does not match
+     * @throw std::domain_error if the number of columns of m1 does not match
      *   the number of rows of m2.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<var,R1,C1>& m1,
                                              const Eigen::Matrix<double,R2,C2>& m2) {
       if (m1.cols() != m2.rows())
-        throw std::invalid_argument("m1.cols() != m2.rows()");
+        throw std::domain_error("m1.cols() != m2.rows()");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<var,R1,C1>::ConstRowXpr crow(m1.row(i));
@@ -1896,13 +1896,13 @@ namespace stan {
      * @param[in] rv Row vector.
      * @param[in] v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
-     * @throw std::invalid_argument if rv and v are not the same size
+     * @throw std::domain_error if rv and v are not the same size
      */
     template <int C1,int R2>
     inline var multiply(const Eigen::Matrix<var, 1, C1>& rv, 
                         const Eigen::Matrix<var, R2, 1>& v) {
       if (rv.size() != v.size())
-        throw std::invalid_argument("rv.size() != v.size()");
+        throw std::domain_error("rv.size() != v.size()");
       return dot_product(rv, v);
     }
     /**
@@ -1912,13 +1912,13 @@ namespace stan {
      * @param[in] rv Row vector.
      * @param[in] v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
-     * @throw std::invalid_argument if rv and v are not the same size
+     * @throw std::domain_error if rv and v are not the same size
      */
     template <int C1,int R2>
     inline var multiply(const Eigen::Matrix<double, 1, C1>& rv, 
                         const Eigen::Matrix<var, R2, 1>& v) {
       if (rv.size() != v.size())
-        throw std::invalid_argument("rv.size() != v.size()");
+        throw std::domain_error("rv.size() != v.size()");
       return dot_product(rv, v);
     }
     /**
@@ -1928,13 +1928,13 @@ namespace stan {
      * @param[in] rv Row vector.
      * @param[in] v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
-     * @throw std::invalid_argument if rv and v are not the same size
+     * @throw std::domain_error if rv and v are not the same size
      */
     template <int C1,int R2>
     inline var multiply(const Eigen::Matrix<var, 1, C1>& rv, 
                         const Eigen::Matrix<double, R2, 1>& v) {
       if (rv.size() != v.size())
-        throw std::invalid_argument("rv.size() != v.size()");
+        throw std::domain_error("rv.size() != v.size()");
       return dot_product(rv, v);
     }
 
@@ -1946,7 +1946,7 @@ namespace stan {
      * @param[in] i Row index (plus 1).
      * @return Specified row of the matrix; between 1 and the number
      * of rows of <code>m</code> inclusive.
-     * @throws std::invalid_argument If the index is 0 or
+     * @throws std::domain_error If the index is 0 or
      * greater than the number of columns.
      */
     row_vector_v row(const matrix_v& m, size_t i);
@@ -1959,7 +1959,7 @@ namespace stan {
      * @param[in] j Column index (plus 1); between 1 and the number of
      * columns of <code>m</code> inclusive.
      * @return Specified column of the matrix.
-     * @throws std::invalid_argument if the index is 0 or greater than
+     * @throws std::domain_error if the index is 0 or greater than
      * the number of columns.
      */
     vector_v col(const matrix_v& m, size_t j);
@@ -2019,27 +2019,27 @@ namespace stan {
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
                                                          const Eigen::Matrix<var,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<Eigen::Lower>().solve(b);
     }
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
                                                          const Eigen::Matrix<double,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<Eigen::Lower>().solve(to_var(b));
     }
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,
                                                          const Eigen::Matrix<var,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return to_var(A).template triangularView<Eigen::Lower>().solve(b);
     }
 
@@ -2050,16 +2050,16 @@ namespace stan {
      * either Eigen::Upper or Eigen::Lower.
      * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
                                                      const Eigen::Matrix<var,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<TriView>().solve(b);
     }
     /**
@@ -2068,16 +2068,16 @@ namespace stan {
      * either Eigen::Upper or Eigen::Lower.
      * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
                                                      const Eigen::Matrix<double,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<TriView>().solve(to_var(b));
     }
     /**
@@ -2086,16 +2086,16 @@ namespace stan {
      * either Eigen::Upper or Eigen::Lower.
      * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
                                                      const Eigen::Matrix<var,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return to_var(A).template triangularView<TriView>().solve(b);
     }
 
@@ -2104,16 +2104,16 @@ namespace stan {
      * @param[in] A Matrix.
      * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
                                                  const Eigen::Matrix<var,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.lu().solve(b);
     }
     /**
@@ -2121,16 +2121,16 @@ namespace stan {
      * @param[in] A Matrix.
      * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int R1, int C1, int R2, int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
                                                  const Eigen::Matrix<var,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       // FIXME: it would be much faster to do LU, then convert to var
       return to_var(A).lu().solve(b);
     }
@@ -2139,16 +2139,16 @@ namespace stan {
      * @param[in] A Matrix.
      * @param[in] b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int R1, int C1, int R2, int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
                                                  const Eigen::Matrix<double,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.lu().solve(to_var(b));
     }
 
@@ -2157,16 +2157,16 @@ namespace stan {
      * @param[in] b Right hand side matrix or vector.
      * @param[in] A Matrix.
      * @return x = b A^-1, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * @throws std::domain_error if A is not square or the cols of b don't
      * match the size of A.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
                                                   const Eigen::Matrix<var,R2,C2> &A) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.rows() != b.cols())
-        throw std::invalid_argument("A.rows() != b.cols()");
+        throw std::domain_error("A.rows() != b.cols()");
       return A.transpose().lu().solve(b.transpose()).transpose();
     }
     /**
@@ -2174,16 +2174,16 @@ namespace stan {
      * @param[in] b Right hand side matrix or vector.
      * @param[in] A Matrix.
      * @return x = b A^-1, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * @throws std::domain_error if A is not square or the cols of b don't
      * match the size of A.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
                                                   const Eigen::Matrix<var,R2,C2> &A) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.rows() != b.cols())
-        throw std::invalid_argument("A.rows() != b.cols()");
+        throw std::domain_error("A.rows() != b.cols()");
       return A.transpose().lu().solve(to_var(b).transpose()).transpose();
     }
     /**
@@ -2191,16 +2191,16 @@ namespace stan {
      * @param[in] b Right hand side matrix or vector.
      * @param[in] A Matrix.
      * @return x = b A^-1, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the cols of b don't
+     * @throws std::domain_error if A is not square or the cols of b don't
      * match the size of A.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
                                                   const Eigen::Matrix<double,R2,C2> &A) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.rows() != b.cols())
-        throw std::invalid_argument("A.rows() != b.cols()");
+        throw std::domain_error("A.rows() != b.cols()");
       return to_var(A).transpose().lu().solve(b.transpose()).transpose();
     }
     /**
