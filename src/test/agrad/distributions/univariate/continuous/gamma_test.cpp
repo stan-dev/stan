@@ -74,7 +74,6 @@ public:
 
   template <class T_y, class T_shape, class T_inv_scale>
   var log_prob(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-    using stan::math::value_of;
     using stan::prob::include_summand;
     using stan::math::multiply_log;
     

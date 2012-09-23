@@ -91,7 +91,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale>
         operands_and_partials(y, alpha, beta, y_vec, alpha_vec, beta_vec);
 
-
       using boost::math::lgamma;
       using stan::math::multiply_log;
       using boost::math::digamma;
