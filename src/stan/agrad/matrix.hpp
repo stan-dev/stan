@@ -6,6 +6,7 @@
 
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
+#include <stan/math/boost_error_handling.hpp>
 #include <stan/math/matrix.hpp>
 
 namespace stan {
@@ -995,12 +996,12 @@ namespace stan {
      *
      * @param[in] v Specified vector.
      * @return Minimum coefficient value in the vector.
-     * @throw std::domain_error if v has no elements
      */
+    //FIXME: types shouldn't go from T to var
     template <typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       if (v.size() == 0) 
-        throw std::domain_error ("v.size() == 0");
+        return std::numeric_limits<double>::infinity();
       return to_var(v.minCoeff());
     }
     /**
@@ -1009,12 +1010,12 @@ namespace stan {
      *
      * @param[in] rv Specified vector.
      * @return Minimum coefficient value in the vector.
-     * @throw std::domain_error if rv has no elements
      */
+    //FIXME: types shouldn't go from T to var
     template <typename T>
     inline var min(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
       if (rv.size() == 0) 
-        throw std::domain_error ("rv.size() == 0");
+        return std::numeric_limits<double>::infinity();
       return to_var(rv.minCoeff());
     }
     /**
@@ -1023,12 +1024,11 @@ namespace stan {
      *
      * @param[in] m Specified matrix.
      * @return Minimum coefficient value in the matrix.
-     * @throw std::domain_error if m has no elements
      */
     template <typename T>
     inline var min(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       if (m.size() == 0) 
-        throw std::domain_error ("m.size() == 0");
+        return std::numeric_limits<double>::infinity();
       return to_var(m.minCoeff());
     }
 
@@ -1038,12 +1038,11 @@ namespace stan {
      *
      * @param[in] v Specified vector.
      * @return Maximum coefficient value in the vector.
-     * @throw std::domain_error if v has no elements
      */
     template <typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       if (v.size() == 0) 
-        throw std::domain_error ("v.size() == 0");
+        return -std::numeric_limits<double>::infinity();
       return to_var(v.maxCoeff());
     }
     /**
@@ -1051,12 +1050,11 @@ namespace stan {
      * row vector.
      * @param[in] rv Specified vector.
      * @return Maximum coefficient value in the vector.
-     * @throw std::domain_error if rv has no elements
      */
     template <typename T>
     inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
       if (rv.size() == 0) 
-        throw std::domain_error ("rv.size() == 0");
+        return -std::numeric_limits<double>::infinity();
       return to_var(rv.maxCoeff());
     }
     /**
@@ -1064,12 +1062,11 @@ namespace stan {
      * matrix.
      * @param[in] m Specified matrix.
      * @return Maximum coefficient value in the matrix.
-     * @throw std::domain_error if m has no elements
      */
     template <typename T>
     inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       if (m.size() == 0) 
-        throw std::domain_error ("m.size() == 0");
+        return -std::numeric_limits<double>::infinity();
       return to_var(m.maxCoeff());
     }
 
@@ -1082,8 +1079,7 @@ namespace stan {
      */
     template <typename T>
     inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() == 0) 
-        throw std::domain_error ("v.size() == 0");
+      stan::math::validate_nonzero_size(v,"mean");
       return to_var(v.mean());
     }
     /**
@@ -1095,8 +1091,7 @@ namespace stan {
      */
     template <typename T>
     inline var mean(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() == 0) 
-        throw std::domain_error ("rv.size() == 0");
+      stan::math::validate_nonzero_size(rv,"mean");
       return to_var(rv.mean());
     }
     /**
@@ -1108,8 +1103,7 @@ namespace stan {
      */
     template <typename T>
     inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() == 0) 
-        throw std::domain_error ("m.size() == 0");
+      stan::math::validate_nonzero_size(m,"mean");
       return to_var(m.mean());
     }
 
@@ -1190,10 +1184,12 @@ namespace stan {
      * returns 0.0
      * @throw std::domain_error if v has no elements
      */
+    // FIXME: type T to var is bad
     template <typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() == 0) 
-        throw std::domain_error ("v.size() == 0");
+      stan::math::validate_nonzero_size(v,"sd");
+      if (v.size() == 1)
+        return 0.0;
       return to_var(sqrt(variance(v)));
     }
     /**
@@ -1206,8 +1202,9 @@ namespace stan {
      */
     template <typename T>
     inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() == 0) 
-        throw std::domain_error ("rv.size() <= 1");
+      stan::math::validate_nonzero_size(rv,"sd");
+      if (rv.size() == 1)
+        return 0.0;
       return to_var(sqrt(variance(rv)));
     }
     /**
@@ -1220,8 +1217,9 @@ namespace stan {
      */
     template <typename T>
     inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() == 0) 
-        throw std::domain_error ("m.size() == 0");
+      stan::math::validate_nonzero_size(m,"sd");
+      if (m.size() == 1)
+        return 0.0;
       return to_var(sqrt(variance(m)));
     }
 
@@ -1231,6 +1229,7 @@ namespace stan {
      * @param[in] m Specified matrix.
      * @return Sum of coefficients of matrix.
      */
+    // FIXME: eliminate
     template<int R,int C>
     inline var sum(const Eigen::Matrix<double,R,C> &m) {
       return to_var(m.sum());
@@ -1242,7 +1241,9 @@ namespace stan {
      * @return Sum of coefficients of matrix.
      */
     template<int R,int C>
-    inline var sum(const Eigen::Matrix<var,R,C> &m) {
+    inline var sum(const Eigen::Matrix<var,R,C>& m) {
+      if (m.size() == 0)
+        return 0.0;
       return var(new sum_v_vari(m));
     }
 
@@ -1253,6 +1254,7 @@ namespace stan {
      * @return Product of coefficients of vector.
      */
     inline var prod(const vector_v& v) {
+      if (v.size() == 0) return 1.0;
       return v.prod();
     }
     /**
@@ -1262,6 +1264,7 @@ namespace stan {
      * @return Product of coefficients of vector.
      */
     inline var prod(const row_vector_v& rv) {
+      if (rv.size() == 0) return 1.0;
       return rv.prod();
     }
     /**
@@ -1271,6 +1274,7 @@ namespace stan {
      * @return Product of coefficients of matrix.
      */
     inline var prod(const matrix_v& m) {
+      if (m.size() == 0) return 1.0;
       return m.prod();
     }
 

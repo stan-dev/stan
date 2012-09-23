@@ -948,14 +948,9 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     variance(const std::vector<T>& v) {
-      if (v.size() < 1) {
-        std::stringstream s;
-        s << "argument to variance must have size >= 2"
-          << "; found v.size()=" << v.size();
-        BOOST_THROW_EXCEPTION(std::domain_error(s.str()));
-      }        
+      validate_nonzero_size(v,"variance");
       if (v.size() == 1)
-        return 1.0;
+        return 0.0;
       T v_mean(mean(v));
       T sum_sq_diff(0);
       for (size_t i = 0; i < v.size(); ++i) {
@@ -972,14 +967,9 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double variance(const vector_d& v) {
-      if (v.size() < 1) {
-        std::stringstream s;
-        s << "vector argument to variance must have size >= 1"
-          << "; found v.size()=" << v.size();
-        BOOST_THROW_EXCEPTION(std::domain_error(s.str()));
-      }        
+      validate_nonzero_size(v,"variance");
       if (v.size() == 1)
-        return 1.0;
+        return 0.0;
       double mean = v.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < v.size(); ++i) {
@@ -995,14 +985,9 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double variance(const row_vector_d& rv) {
-      if (rv.size() < 1) {
-        std::stringstream s;
-        s << "row vec argument to variance must have size >= 1"
-          << "; found rv.size()=" << rv.size();
-        BOOST_THROW_EXCEPTION(std::domain_error(s.str()));
-      }        
+      validate_nonzero_size(rv,"variance");
       if (rv.size() == 1)
-        return 1.0;
+        return 0.0;
       double mean = rv.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
@@ -1018,14 +1003,9 @@ namespace stan {
      * @return Sample variance of matrix.
      */
     inline double variance(const matrix_d& m) {
-      if (m.size() < 1) {
-        std::stringstream s;
-        s << "matrix argument to variance must have size >= 1"
-          << "; found m.size()=" << m.size();
-        BOOST_THROW_EXCEPTION(std::domain_error(s.str()));
-      }        
+      validate_nonzero_size(m,"variance");
       if (m.size() == 1)
-        return 1.0;
+        return 0.0;
       double mean = m.mean();
       double sum_sq_diff = 0;
       for (int j = 0; j < m.cols(); ++j) { 
@@ -1047,6 +1027,8 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     sd(const std::vector<T>& v) {
+      validate_nonzero_size(v,"sd");
+      if (v.size() == 1) return 0.0;
       return sqrt(variance(v));
     }
 
@@ -1057,6 +1039,8 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double sd(const vector_d& v) {
+      validate_nonzero_size(v,"sd");
+      if (v.size() == 1) return 0.0;
       return sqrt(variance(v));
     }
     /**
@@ -1066,6 +1050,8 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double sd(const row_vector_d& rv) {
+      validate_nonzero_size(rv,"sd");
+      if (rv.size() == 1) return 0.0;
       return sqrt(variance(rv));
     }
     /**
@@ -1075,6 +1061,8 @@ namespace stan {
      * @return Sample variance of matrix.
      */
     inline double sd(const matrix_d& m) {
+      validate_nonzero_size(m,"sd");
+      if (m.size() == 1) return 0.0;
       return sqrt(variance(m));
     }
 
@@ -1088,7 +1076,7 @@ namespace stan {
      */
     template <typename T>
     inline T sum(const std::vector<T>& xs) {
-      if (xs.size() == 0) return 0.0;
+      if (xs.size() == 0) return 0;
       T sum(xs[0]);
       for (size_t i = 1; i < xs.size(); ++i)
         sum += xs[i];
