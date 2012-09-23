@@ -110,7 +110,12 @@ add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
-add_ternary("gamma_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("gamma_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 //FIXME: add_ternary("gamma_cdf");
 add("hypergeometric_log",DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
 add_binary("hypot");
@@ -119,7 +124,12 @@ add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
 add_binary("inv_chi_square_log");
 add_unary("inv_cloglog");
-add_ternary("inv_gamma_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("inv_gamma_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add_unary("inv_logit");
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inverse",MATRIX_T,MATRIX_T);

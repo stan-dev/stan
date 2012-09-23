@@ -1,75 +1,72 @@
-#include <gtest/gtest.h>
-#include "stan/prob/distributions/univariate/continuous/inv_gamma.hpp"
+#define _LOG_PROB_ inv_gamma_log
+#include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+using std::vector;
+using std::numeric_limits;
 
-TEST(ProbDistributions,InvGamma) {
-  EXPECT_FLOAT_EQ(-1, stan::prob::inv_gamma_log(1,1,1.0));
-  EXPECT_FLOAT_EQ(-0.8185295, stan::prob::inv_gamma_log(0.5,2.9,3.1));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::inv_gamma_log(0.0,2.9,3.1));
-}
-TEST(ProbDistributions,InvGammaPropto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::inv_gamma_log<true>(1,1,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::inv_gamma_log<true>(0.5,2.9,3.1));
-}
-TEST(ProbDistributions,InvGammaDefaultPolicy) {
-  double y = 0.5;
-  double alpha = 1.0;
-  double beta = 2.0;
-  
-  EXPECT_NO_THROW(stan::prob::inv_gamma_log(y, alpha, beta));
-  EXPECT_NO_THROW(stan::prob::inv_gamma_log(0.0, alpha, beta));
-  EXPECT_NO_THROW(stan::prob::inv_gamma_log(-1, alpha, beta));
-  EXPECT_THROW(stan::prob::inv_gamma_log(y, 0.0, beta), std::domain_error)
-    << "exception expected when alpha = 0.0";
-  EXPECT_THROW(stan::prob::inv_gamma_log(y, -1.0, beta), std::domain_error)
-    << "exception expected when alpha < 0.";
-  EXPECT_THROW(stan::prob::inv_gamma_log(y, alpha, 0.0), std::domain_error)
-    << "exception expected when beta = 0.0";
-  EXPECT_THROW(stan::prob::inv_gamma_log(y, alpha, -1.0), std::domain_error)
-    << "exception expected when beta < 0.";
-}
-TEST(ProbDistributions,InvGammaErrnoPolicy) {
-  double y = 0.5;
-  double alpha = 1.0;
-  double beta = 2.0;
-  double result;
-  
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(y, alpha, beta, errno_policy()));
-  EXPECT_FALSE(std::isnan(result)) << "this should work fine";
+class ProbDistributionsInvGamma : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
 
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(0.0, alpha, beta, errno_policy()));
-  EXPECT_FALSE(std::isnan(result));
-  
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(-1.0, alpha, beta, errno_policy()));
-  EXPECT_FALSE(std::isnan(result));
+    param[0] = 1.0;                 // y
+    param[1] = 1.0;                 // alpha
+    param[2] = 1.0;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(-1.0);       // expected log_prob
 
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(y, 0.0, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result))
-    << "exception expected when alpha = 0.0";
+    param[0] = 0.5;                 // y
+    param[1] = 2.9;                 // alpha
+    param[2] = 3.1;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(-0.8185295); // expected log_prob
+    
+    /*
+      param[0] = 0.0;                 // y
+      param[1] = 2.9;                 // alpha
+      param[2] = 3.1;                 // beta
+      parameters.push_back(param);
+      log_prob.push_back(log(0.0));   // expected log_prob
+    */
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // alpha
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(y, -1.0, beta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result))
-    << "exception expected when alpha < 0.";
+    index.push_back(1U);
+    value.push_back(-1.0);
 
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(y, alpha, 0.0, errno_policy()));
-  EXPECT_TRUE(std::isnan(result))
-    << "exception expected when beta = 0.0";
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
 
-  EXPECT_NO_THROW(result = stan::prob::inv_gamma_log(y, alpha, -1.0, errno_policy()));
-  EXPECT_TRUE(std::isnan(result))
-    << "exception expected when beta < 0.";
-}
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // beta
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsInvGamma,
+			      DistributionTestFixture,
+			      ProbDistributionsInvGamma);
