@@ -174,26 +174,25 @@ namespace stan {
     return result;
   }
 
-  // AmbiguousVector is the simple VectorView for writing doubles into
+  // VectorOrScalar is the simple VectorView for writing doubles into
   // should work for Eigen vectors and std::vector
   // FIXME:  used only with T= double, so could just fix it.
-  // FIXME:  rename -- "Ambiguous" is not the right word here
   template <typename T, bool is_vec = 0>
-  class AmbiguousVector {
+  class VectorOrScalar {
   private:
     T x_;
   public:
-    AmbiguousVector(size_t /*n*/) : x_(0) { }
+    VectorOrScalar(size_t /*n*/) : x_(0) { }
     T& operator[](int /*i*/) { return x_; }
     size_t size() { return 1; }
   };
 
   template <typename T>
-  class AmbiguousVector<T, 1> {
+  class VectorOrScalar<T, 1> {
   private:
     std::vector<T> x_;
   public:
-    AmbiguousVector(size_t n) : x_(n, 0) { }
+    VectorOrScalar(size_t n) : x_(n, 0) { }
     T& operator[](int i) { return x_[i]; }
     size_t size() { return x_.size(); }
   };

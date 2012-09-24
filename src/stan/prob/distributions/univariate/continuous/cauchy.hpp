@@ -83,9 +83,9 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      AmbiguousVector<double, is_vector<T_scale>::value> 
+      VectorOrScalar<double, is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
-      AmbiguousVector<double, is_vector<T_scale>::value> 
+      VectorOrScalar<double, is_vector<T_scale>::value> 
         log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
