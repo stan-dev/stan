@@ -15,7 +15,7 @@ namespace stan {
 
     // DoubleExponential(y|mu,sigma)  [sigma > 0]
     // FIXME: add documentation
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     typename return_type<T_y,T_loc,T_scale>::type
@@ -60,7 +60,7 @@ namespace stan {
         return logp;
       
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
+      if (!include_summand<propto,T_y,T_loc,T_scale>::value)
 	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
@@ -82,11 +82,11 @@ namespace stan {
 	const double inv_sigma = 1.0 / sigma_dbl;
 
 	// log probability
-	if (include_summand<Prop>::value)
+	if (include_summand<propto>::value)
 	  logp += NEG_LOG_TWO;
-	if (include_summand<Prop,T_scale>::value)
+	if (include_summand<propto,T_scale>::value)
 	  logp -= log(sigma_dbl);
-	if (include_summand<Prop,T_y,T_loc,T_scale>::value)
+	if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	  logp -= fabs_y_m_mu * inv_sigma;
 	
 	// gradients
@@ -103,12 +103,12 @@ namespace stan {
     }
 
 
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_log(const T_y& y, const T_loc& mu, 
                            const T_scale& sigma) {
-      return double_exponential_log<Prop>(y,mu,sigma,
+      return double_exponential_log<propto>(y,mu,sigma,
                                             stan::math::default_policy());
     }
 

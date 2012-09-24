@@ -33,7 +33,7 @@ namespace stan {
      * @tparam T_y Underlying type of scalar in sequence.
      * @tparam T_loc Type of location parameter.
      */
-    template <bool Prop, 
+    template <bool propto, 
               typename T_y, typename T_loc, typename T_scale,
               class Policy>
     typename return_type<T_y,T_loc,T_scale>::type
@@ -75,7 +75,7 @@ namespace stan {
         return logp;
 
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
+      if (!include_summand<propto,T_y,T_loc,T_scale>::value)
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
@@ -110,11 +110,11 @@ namespace stan {
         static double NEGATIVE_HALF = - 0.5;
 
         // log probability
-        if (include_summand<Prop>::value)
+        if (include_summand<propto>::value)
           logp += NEG_LOG_SQRT_TWO_PI;
-        if (include_summand<Prop,T_scale>::value)
+        if (include_summand<propto,T_scale>::value)
           logp -= log_sigma[n];
-        if (include_summand<Prop,T_y,T_loc,T_scale>::value)
+        if (include_summand<propto,T_y,T_loc,T_scale>::value)
           logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
 
         // gradients
