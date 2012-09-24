@@ -141,6 +141,13 @@ transformed data {
 
   //*** Array Operations ***
   transformed_data_real <- sum(d_real_array);
+  transformed_data_int <- sum(d_int_array);
+  transformed_data_real <- prod(d_real_array);
+  transformed_data_int <- prod(d_int_array);
+  transformed_data_real <- min(d_real_array);
+  transformed_data_int <- min(d_int_array);
+  transformed_data_real <- max(d_real_array);
+  transformed_data_int <- max(d_int_array);
   transformed_data_real <- mean(d_real_array);
   transformed_data_real <- variance(d_real_array);
   transformed_data_real <- sd(d_real_array);

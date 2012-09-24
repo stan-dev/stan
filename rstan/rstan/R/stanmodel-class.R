@@ -1,6 +1,6 @@
 setMethod("show", "stanmodel",
           function(object) {
-            cat("S4 class stanmodel: `", object@model_name, "' coded as follows:\n" ,sep = '') 
+            cat("S4 class stanmodel '", object@model_name, "' coded as follows:\n" ,sep = '') 
             cat(object@model_code, "\n")
           }) 
 
@@ -28,12 +28,16 @@ setGeneric(name = "sampling",
            def = function(object, ...) { standardGeneric("sampling")})
 
 setGeneric(name = "get_cppcode", 
-           def = function(object, ...) { standardGeneric("get_cppcode")})
+           def = function(object, ...) { standardGeneric("get_cppcode") })
 
 setMethod("get_cppcode", "stanmodel", 
           function(object) {
             object@model_cpp$model_cppcode  
           }) 
+
+setGeneric(name = "get_cxxflags", 
+           def = function(object, ...) { standardGeneric("get_cxxflags") })
+setMethod("get_cxxflags", "stanmodel", function(object) { object@dso@cxxflags }) 
 
 setMethod("sampling", "stanmodel",
           function(object, data = list(), pars = NA, chains = 4, iter = 2000,

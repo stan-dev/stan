@@ -99,19 +99,17 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_scale>::type lp;
-      if(!check_finite(function, y, "Random variable", &lp, Policy()))
+      if (!check_finite(function, alpha, "Shape parameter", 
+                        &lp, Policy()))
         return lp;
-      if(!check_finite(function, alpha, "Shape parameter", 
-                       &lp, Policy()))
+      if (!check_positive(function, alpha, "Shape parameter",
+                          &lp, Policy()))
         return lp;
-      if(!check_positive(function, alpha, "Shape parameter",
-                         &lp, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter",
+                        &lp, Policy()))
         return lp;
-      if(!check_finite(function, sigma, "Scale parameter",
-                       &lp, Policy()))
-        return lp;
-      if(!check_positive(function, sigma, "Scale parameter", 
-                         &lp, Policy()))
+      if (!check_positive(function, sigma, "Scale parameter", 
+                          &lp, Policy()))
         return lp;
       
       if (y < 0.0)

@@ -30,7 +30,7 @@ if (length(files)) {
     for (file in dylib) system(paste("dsymutil ", file, sep = ''))
   }
  
-  if(file_test("-f", "symbols.rds")) file.copy("symbols.rds", dest)
+  if (file_test("-f", "symbols.rds")) file.copy("symbols.rds", dest)
 } 
 
 

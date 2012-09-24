@@ -39,7 +39,7 @@ namespace stan {
               class Policy>
     typename return_type<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
-              const Policy& = Policy()) {
+              const Policy&) {
       static const char* function = "stan::prob::gamma_log(%1%)";
       
       using stan::math::check_not_nan;
@@ -199,7 +199,7 @@ namespace stan {
                           &result, Policy())) 
         return result;
       
-	// FIXME: implement gamma cdf
+        // FIXME: implement gamma cdf
       return boost::math::gamma_p(alpha, y*beta);
     }
 

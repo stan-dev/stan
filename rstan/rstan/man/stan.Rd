@@ -175,6 +175,12 @@ stan(file, model_name = "anon_model", model_code = "",
   The function accepts a previously fitted instance of \code{stanfit}
   through parameter \code{fit} in order to reuse the compiled model; other
   configuration may change.
+
+  The optimization level for compiling the C++ code generated for the 
+  model can be set by \code{set_cppo}. In general, the higher the optimization
+  level, the fast the generated binary code for the model runs. In general, 
+  fast generated binary code for the model that run fast by using higher
+  optimization level is at the cost of long time to compile the C++ code. 
 }
 
 \references{
@@ -185,6 +191,10 @@ stan(file, model_name = "anon_model", model_code = "",
 \seealso{
   \code{\link{stanc}} for translating model code in Stan modeling language to C++, 
   \code{\link{sampling}} for sampling, and \code{\linkS4class{stanfit}} for the fitted results.
+
+  see \code{set_cppo} for setting higher optimization level for compiling the C++ 
+  code.
+  
 }
 \examples{\dontrun{
 library(rstan)

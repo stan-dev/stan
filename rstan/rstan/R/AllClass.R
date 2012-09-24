@@ -7,6 +7,7 @@ setClass(Class = "cxxdso",
            dso_filename = "character", # the dso file name when it is created the first time
            modulename = 'character', # in rstan, we always compile the c++ code with an Rcpp module
            system = "character", # what is the OS (R.version$system)?  
+           cxxflags = "character", # the CXXFLAGS used to compile the DSO 
            .CXXDSOMISC = "environment" # an envir to save 
                                  #  1. the returned object by cxxfuncion using name cxxfun 
                                  #  2. the file path used last time using name dso_last_path 

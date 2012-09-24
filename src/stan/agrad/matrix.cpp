@@ -15,28 +15,28 @@ namespace stan {
 
     row_vector_v row(const matrix_v& m, size_t i) {
       if (i == 0U) {
-        throw std::invalid_argument("row() indexes from 1; found index i=0");
+        throw std::domain_error("row() indexes from 1; found index i=0");
       }
       if (i > static_cast<size_t>(m.rows())) {
         std::stringstream msg;
         msg << "index must be less than or equal to number of rows"
             << " found m.rows()=" << m.rows()
             << "; i=" << i;
-        throw std::invalid_argument(msg.str());
+        throw std::domain_error(msg.str());
       }
       return m.row(i - 1);
     }
 
     vector_v col(const matrix_v& m, size_t j) {
       if (j == 0U) {
-        throw std::invalid_argument("row() indexes from 1; found index i=0");
+        throw std::domain_error("row() indexes from 1; found index i=0");
       }
       if (j > static_cast<size_t>(m.cols())) {
         std::stringstream msg;
         msg << "index must be less than or equal to number of rows"
             << " found m.cols()=" << m.cols()
             << "; =" << j;
-        throw std::invalid_argument(msg.str());
+        throw std::domain_error(msg.str());
       }
       return m.col(j - 1);
     }

@@ -134,6 +134,7 @@ cxxfunctionplus <- function(sig = character(), body = character(),
              dso_filename = dso_filename, 
              modulename = module_name, 
              system = R.version$system, 
+             cxxflags = get_curr_cxxflags(), 
              .CXXDSOMISC = new.env()) 
   assign("cxxfun", fx, envir = dso@.CXXDSOMISC)
   assign("dso_last_path", dso_last_path, envir = dso@.CXXDSOMISC)

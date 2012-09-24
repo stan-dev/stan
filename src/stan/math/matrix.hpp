@@ -586,14 +586,91 @@ namespace stan {
       return m.cols();
     }
     
+    template <typename T, int R, int C>
+    void validate_square(const Eigen::Matrix<T,R,C>& x,
+                         const char* msg) {
+      if (x.rows() == x.cols()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require square matrix, but found"
+         << " rows=" << x.rows()
+         << "; cols=" << x.cols();
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T1, int R1, int C1, typename T2, int R2, int C2>
+    inline void validate_matching_dims(const Eigen::Matrix<T1,R1,C1>& x1,
+                                const Eigen::Matrix<T2,R2,C2>& x2,
+                                const char* msg) {
+      if (x1.rows() == x2.rows()
+          && x1.cols() == x2.cols()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require matching dimensions, but found"
+         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
+         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols();
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T1, typename T2>
+    inline void validate_matching_sizes(const std::vector<T1>& x1,
+                                        const std::vector<T2>& x2,
+                                        const char* msg) {
+      if (x1.size() == x2.size()) return;
+      std::stringstream ss;
+      ss << "require matching sizes in " << msg
+         << " found first argument size=" << x1.size()
+         << "; second argument size=" << x2.size();
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T1, int R1, int C1, typename T2, int R2, int C2>
+    inline void validate_matching_sizes(const Eigen::Matrix<T1,R1,C1>& x1,
+                                        const Eigen::Matrix<T2,R2,C2>& x2,
+                                        const char* msg) {
+      if (x1.size() == x2.size()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require matching sizes, but found"
+         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
+         << " arg1 size=" << (x1.rows() * x1.cols())
+         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols()
+         << " arg2 size=" << (x2.rows() * x2.cols());
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T>
+    inline void validate_nonzero_size(const T& x, const char* msg) {
+      if (x.size() > 0) return;
+      std::stringstream ss;
+      ss << "require non-zero size for " << msg
+         << "found size=" << x.size();
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T, int R, int C>
+    inline void validate_vector(const Eigen::Matrix<T,R,C>& x,
+                                const char* msg) {
+      if (x.rows() == 1 || x.cols() == 1) return;
+      std::stringstream ss;
+      ss << "error in " << msg
+         << "; require vector, found "
+         << " rows=" << x.rows() << "cols=" << x.cols();
+      throw std::domain_error(ss.str());
+    }
+
+
+
+    
+
 
     // scalar returns
 
     /**
-     * Returns the determinant of the specified
-     * square matrix.
+     * Returns the determinant of the specified square matrix.
      * @param m Specified matrix.
      * @return Determinant of the matrix.
+     * @throw std::domain_error if matrix is not square.
      */
     double determinant(const matrix_d& m);
 
@@ -603,12 +680,11 @@ namespace stan {
      * @param v Vector.
      * @tparam R number of rows or <code>Eigen::Dynamic</code> for dynamic
      * @tparam C number of rows or <code>Eigen::Dyanmic</code> for dynamic
-     * @throw std::invalid_argument If v is not vector dimensioned.
+     * @throw std::domain_error If v is not vector dimensioned.
      */
     template <int R, int C>
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
-      if (v.rows() != 1 && v.cols() != 1)
-        throw std::invalid_argument("v must be a vector");
+      validate_vector(v,"dot_self");
       double sum = 0.0;
       for (int i = 0; i < v.size(); ++i)
         sum += v(i) * v(i);
@@ -632,18 +708,15 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return Dot product of the vectors.
-     * @throw std::invalid_argument If the vectors are not the same
+     * @throw std::domain_error If the vectors are not the same
      * size or if they are both not vector dimensioned.
      */
     template<int R1,int C1,int R2, int C2>
     inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                               const Eigen::Matrix<double, R2, C2>& v2) {
-      if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::invalid_argument("v1 must be a vector");
-      if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::invalid_argument("v2 must be a vector");
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+      validate_vector(v1,"dot_product");
+      validate_vector(v2,"dot_product");
+      validate_matching_sizes(v1,v2,"dot_product");
       double sum = 0.0;
       for (int i = 0; i < v1.size(); ++i)
         sum += v1[i] * v2[i]; 
@@ -666,12 +739,47 @@ namespace stan {
      * Returns the dot product of the specified arrays of doubles.
      * @param v1 First array.
      * @param v2 Second array.
+     * @throw std::domain_error if the vectors are not the same size.
      */
     inline double dot_product(const std::vector<double>& v1,
                               const std::vector<double>& v2) {
-      if (v1.size() != v2.size())
-        throw std::invalid_argument("v1.size() must equal v2.size()");
+      validate_matching_sizes(v1,v2,"dot_product");
       return dot_product(&v1[0], &v2[0], v1.size());
+    }
+
+    /**
+     * Returns the minimum coefficient in the specified
+     * column vector.
+     * @param v Specified vector.
+     * @return Minimum coefficient value in the vector.
+     * @tparam Type of values being compared and returned
+     */
+    inline int min(const std::vector<int>& x) {
+      if (x.size() == 0)
+        throw std::domain_error("error: cannot take min of empty int vector");
+      int min = x[0];
+      for (size_t i = 1; i < x.size(); ++i)
+        if (x[i] < min) 
+          min = x[i];
+      return min;
+    }
+
+    /**
+     * Returns the minimum coefficient in the specified
+     * column vector.
+     * @param v Specified vector.
+     * @return Minimum coefficient value in the vector.
+     * @tparam Type of values being compared and returned
+     */
+    template <typename T>
+    inline T min(const std::vector<T>& x) {
+      if (x.size() == 0)
+        return std::numeric_limits<T>::infinity();
+      T min = x[0];
+      for (size_t i = 1; i < x.size(); ++i)
+        if (x[i] < min) 
+          min = x[i];
+      return min;
     }
 
     /**
@@ -681,6 +789,8 @@ namespace stan {
      * @return Minimum coefficient value in the vector.
      */
     inline double min(const vector_d& v) {
+      if (v.size() == 0) 
+        return std::numeric_limits<double>::infinity();
       return v.minCoeff();
     }
     /**
@@ -690,6 +800,8 @@ namespace stan {
      * @return Minimum coefficient value in the vector.
      */
     inline double min(const row_vector_d& rv) {
+      if (rv.size() == 0) 
+        return std::numeric_limits<double>::infinity();
       return rv.minCoeff();
     }
     /**
@@ -699,7 +811,45 @@ namespace stan {
      * @return Minimum coefficient value in the matrix.
      */
     inline double min(const matrix_d& m) {
+      if (m.size() == 0)
+        return std::numeric_limits<double>::infinity();
       return m.minCoeff();
+    }
+
+    /**
+     * Returns the maximum coefficient in the specified
+     * column vector.
+     * @param v Specified vector.
+     * @return Maximum coefficient value in the vector.
+     * @tparam Type of values being compared and returned
+     * @throw std::domain_error If the size of the vector is zero.
+     */
+    inline int max(const std::vector<int>& x) {
+      if (x.size() == 0)
+        throw std::domain_error("error: cannot take max of empty int vector");
+      int max = x[0];
+      for (size_t i = 1; i < x.size(); ++i)
+        if (x[i] > max) 
+          max = x[i];
+      return max;
+    }
+
+    /**
+     * Returns the maximum coefficient in the specified
+     * column vector.
+     * @param v Specified vector.
+     * @return Maximum coefficient value in the vector.
+     * @tparam T Type of values being compared and returned
+     */
+    template <typename T>
+    inline T max(const std::vector<T>& x) {
+      if (x.size() == 0)
+        return -std::numeric_limits<T>::infinity();
+      T max = x[0];
+      for (size_t i = 1; i < x.size(); ++i)
+        if (x[i] > max) 
+          max = x[i];
+      return max;
     }
 
     /**
@@ -709,6 +859,8 @@ namespace stan {
      * @return Maximum coefficient value in the vector.
      */
     inline double max(const vector_d& v) {
+      if (v.size() == 0)
+        return -std::numeric_limits<double>::infinity();
       return v.maxCoeff();
     }
     /**
@@ -718,6 +870,8 @@ namespace stan {
      * @return Maximum coefficient value in the vector.
      */
     inline double max(const row_vector_d& rv) {
+      if (rv.size() == 0)
+        return -std::numeric_limits<double>::infinity();
       return rv.maxCoeff();
     }
     /**
@@ -727,6 +881,8 @@ namespace stan {
      * @return Maximum coefficient value in the matrix.
      */
     inline double max(const matrix_d& m) {
+      if (m.size() == 0)
+        return -std::numeric_limits<double>::infinity();
       return m.maxCoeff();
     }
 
@@ -742,10 +898,9 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     mean(const std::vector<T>& v) {
-      T sum(0);
-      if (v.size() == 0) 
-        BOOST_THROW_EXCEPTION(std::domain_error("argument to mean have size > 0; found size=0"));
-      for (size_t i = 0; i < v.size(); ++i)
+      validate_nonzero_size(v,"mean");
+      T sum(v[0]);
+      for (size_t i = 1; i < v.size(); ++i)
         sum += v[i];
       return sum / v.size();
     }
@@ -757,6 +912,7 @@ namespace stan {
      * @return Sample mean of vector coefficients.
      */
     inline double mean(const vector_d& v) {
+      validate_nonzero_size(v,"mean");
       return v.mean();
     }
     /**
@@ -766,6 +922,7 @@ namespace stan {
      * @return Sample mean of vector coefficients.
      */
     inline double mean(const row_vector_d& rv) {
+      validate_nonzero_size(rv,"mean");
       return rv.mean();
     }
     /**
@@ -775,6 +932,7 @@ namespace stan {
      * @return Sample mean of matrix coefficients.
      */
     inline double mean(const matrix_d& m) {
+      validate_nonzero_size(m,"mean");
       return m.mean();
     }
 
@@ -784,18 +942,15 @@ namespace stan {
      * @param v Specified vector.
      * @return Sample variance of vector.
      * @throws std::domain_error if the size of the vector is less
-     * than 2.
+     * than 1.
      */
     template <typename T>
     inline 
     typename boost::math::tools::promote_args<T>::type
     variance(const std::vector<T>& v) {
-      if (v.size() < 2) {
-        std::stringstream s;
-        s << "argument to variance must have size >= 2"
-          << "; found v.size()=" << v.size();
-        BOOST_THROW_EXCEPTION(std::domain_error(s.str()));
-      }        
+      validate_nonzero_size(v,"variance");
+      if (v.size() == 1)
+        return 0.0;
       T v_mean(mean(v));
       T sum_sq_diff(0);
       for (size_t i = 0; i < v.size(); ++i) {
@@ -812,6 +967,9 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double variance(const vector_d& v) {
+      validate_nonzero_size(v,"variance");
+      if (v.size() == 1)
+        return 0.0;
       double mean = v.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < v.size(); ++i) {
@@ -827,6 +985,9 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double variance(const row_vector_d& rv) {
+      validate_nonzero_size(rv,"variance");
+      if (rv.size() == 1)
+        return 0.0;
       double mean = rv.mean();
       double sum_sq_diff = 0;
       for (int i = 0; i < rv.size(); ++i) {
@@ -842,6 +1003,9 @@ namespace stan {
      * @return Sample variance of matrix.
      */
     inline double variance(const matrix_d& m) {
+      validate_nonzero_size(m,"variance");
+      if (m.size() == 1)
+        return 0.0;
       double mean = m.mean();
       double sum_sq_diff = 0;
       for (int j = 0; j < m.cols(); ++j) { 
@@ -863,6 +1027,8 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     sd(const std::vector<T>& v) {
+      validate_nonzero_size(v,"sd");
+      if (v.size() == 1) return 0.0;
       return sqrt(variance(v));
     }
 
@@ -873,6 +1039,8 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double sd(const vector_d& v) {
+      validate_nonzero_size(v,"sd");
+      if (v.size() == 1) return 0.0;
       return sqrt(variance(v));
     }
     /**
@@ -882,6 +1050,8 @@ namespace stan {
      * @return Sample variance of vector.
      */
     inline double sd(const row_vector_d& rv) {
+      validate_nonzero_size(rv,"sd");
+      if (rv.size() == 1) return 0.0;
       return sqrt(variance(rv));
     }
     /**
@@ -891,6 +1061,8 @@ namespace stan {
      * @return Sample variance of matrix.
      */
     inline double sd(const matrix_d& m) {
+      validate_nonzero_size(m,"sd");
+      if (m.size() == 1) return 0.0;
       return sqrt(variance(m));
     }
 
@@ -904,8 +1076,9 @@ namespace stan {
      */
     template <typename T>
     inline T sum(const std::vector<T>& xs) {
-      T sum(0);
-      for (size_t i = 0; i < xs.size(); ++i)
+      if (xs.size() == 0) return 0;
+      T sum(xs[0]);
+      for (size_t i = 1; i < xs.size(); ++i)
         sum += xs[i];
       return sum;
     }
@@ -938,6 +1111,20 @@ namespace stan {
       return m.sum();
     }
 
+    /**
+     * Returns the product of the coefficients of the specified
+     * standard vector.
+     * @param v Specified vector.
+     * @return Product of coefficients of vector.
+     */
+    template <typename T>
+    inline T prod(const std::vector<T>& v) {
+      if (v.size() == 0) return 1;
+      T product = v[0];
+      for (size_t i = 1; i < v.size(); ++i)
+        product *= v[i];
+      return product;
+    }
     
     /**
      * Returns the product of the coefficients of the specified
@@ -946,6 +1133,7 @@ namespace stan {
      * @return Product of coefficients of vector.
      */
     inline double prod(const vector_d& v) {
+      if (v.size() == 0) return 1.0;
       return v.prod();
     }
     /**
@@ -955,6 +1143,7 @@ namespace stan {
      * @return Product of coefficients of vector.
      */
     inline double prod(const row_vector_d& rv) {
+      if (rv.size() == 0) return 1.0;
       return rv.prod();
     }
     /**
@@ -964,6 +1153,7 @@ namespace stan {
      * @return Product of coefficients of matrix.
      */
     inline double prod(const matrix_d& m) {
+      if (m.size() == 0) return 1.0;
       return m.prod();
     }
 
@@ -988,7 +1178,7 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if v1 and v2 are not the same size.
+     * @throw std::domain_error if v1 and v2 are not the same size.
      */
     vector_d add(const vector_d& v1, const vector_d& v2);
     /**
@@ -997,7 +1187,7 @@ namespace stan {
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if rv1 and rv2 are not the same size.
+     * @throw std::domain_error if rv1 and rv2 are not the same size.
      */
     row_vector_d add(const row_vector_d& rv1, 
                             const row_vector_d& rv2);
@@ -1007,7 +1197,7 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return Sum of the two vectors.
-     * @throw std::invalid_argument if m1 and m2 are not the same size.
+     * @throw std::domain_error if m1 and m2 are not the same size.
      */
     matrix_d add(const matrix_d& m1, const matrix_d& m2);
 
@@ -1060,7 +1250,7 @@ namespace stan {
      * @param v1 First vector.
      * @param v2 Second vector.
      * @return First vector minus the second vector.
-     * @throw std::invalid_argument if v1 and v2 are not the same size.
+     * @throw std::domain_error if v1 and v2 are not the same size.
      */
     vector_d subtract(const vector_d& v1, const vector_d& v2);
     /**
@@ -1069,7 +1259,7 @@ namespace stan {
      * @param rv1 First vector.
      * @param rv2 Second vector.
      * @return First vector minus the second vector.
-     * @throw std::invalid_argument if rv1 and rv2 are not the same size.
+     * @throw std::domain_error if rv1 and rv2 are not the same size.
      */
     row_vector_d subtract(const row_vector_d& rv1, const row_vector_d& rv2);
     /**
@@ -1078,7 +1268,7 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return First matrix minus the second matrix.
-     * @throw std::invalid_argument if m1 and m2 are not the same size.
+     * @throw std::domain_error if m1 and m2 are not the same size.
      */
     matrix_d subtract(const matrix_d& m1, const matrix_d& m2);
 
@@ -1226,7 +1416,7 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.
      * @return The product of the first and second matrices.
-     * @throw std::invalid_argument if the number of columns of m1 does not match
+     * @throw std::domain_error if the number of columns of m1 does not match
      *   the number of rows of m2.
      */
     template<int R1,int C1,int R2,int C2>
@@ -1234,7 +1424,7 @@ namespace stan {
                                                 const Eigen::Matrix<double,R2,C2>& m2) {
       
       if (m1.cols() != m2.rows())
-        throw std::invalid_argument("m1.cols() != m2.rows()");
+        throw std::domain_error("m1.cols() != m2.rows()");
       return m1*m2;
     }
     /**
@@ -1244,13 +1434,13 @@ namespace stan {
      * @param rv Row vector.
      * @param v Column vector.
      * @return Scalar result of multiplying row vector by column vector.
-     * @throw std::invalid_argument if rv and v are not the same size.
+     * @throw std::domain_error if rv and v are not the same size.
      */
     template<int C1,int R2>
     inline double multiply(const Eigen::Matrix<double,1,C1>& rv,
                            const Eigen::Matrix<double,R2,1>& v) {
       if (rv.size() != v.size()) 
-        throw std::invalid_argument ("rv.size() != v.size()");
+        throw std::domain_error ("rv.size() != v.size()");
       return rv.dot(v);
     }
     /**
@@ -1359,9 +1549,9 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,
                                                             const Eigen::Matrix<double,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<Eigen::Lower>().solve(b);
     }
 
@@ -1371,16 +1561,16 @@ namespace stan {
      * being Eigen::Upper or Eigen::Lower.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<double,R1,C2> mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
                                                         const Eigen::Matrix<double,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<TriView>().solve(b);
     }
     /**
@@ -1389,16 +1579,16 @@ namespace stan {
      * being Eigen::Upper or Eigen::Lower.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<double,R1,C2> mdivide_right_tri(const Eigen::Matrix<double,R1,C1> &b,
                                                          const Eigen::Matrix<double,R2,C2> &A) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.rows() != b.cols())
-        throw std::invalid_argument("A.rows() != b.cols()");
+        throw std::domain_error("A.rows() != b.cols()");
       return A.template triangularView<TriView>().transpose().solve(b.transpose()).transpose();
     }
     /**
@@ -1406,16 +1596,16 @@ namespace stan {
      * @param A Matrix.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<double,R1,C2> mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
                                                     const Eigen::Matrix<double,R2,C2> &b) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.cols() != b.rows())
-        throw std::invalid_argument("A.cols() != b.rows()");
+        throw std::domain_error("A.cols() != b.rows()");
       return A.lu().solve(b);
     }
     /**
@@ -1423,16 +1613,16 @@ namespace stan {
      * @param A Matrix.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
-     * @throws std::invalid_argument if A is not square or the rows of b don't
+     * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<double,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
                                                      const Eigen::Matrix<double,R2,C2> &A) {
       if (A.cols() != A.rows())
-        throw std::invalid_argument("A is not square");
+        throw std::domain_error("A is not square");
       if (A.rows() != b.cols())
-        throw std::invalid_argument("A.rows() != b.cols()");
+        throw std::domain_error("A.rows() != b.cols()");
       return A.transpose().lu().solve(b.transpose()).transpose();
     }
 
@@ -1519,7 +1709,7 @@ namespace stan {
      * <p>\f$A = L \times L^T\f$.
      * @param m Symmetrix matrix.
      * @return Square root of matrix.
-     * @throw std::invalid_argument if m is not a square matrix
+     * @throw std::domain_error if m is not a square matrix
      */
     matrix_d cholesky_decompose(const matrix_d& m);
 

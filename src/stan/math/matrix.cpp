@@ -9,42 +9,42 @@ namespace stan {
   namespace math {
 
     double determinant(const matrix_d &m) {
+      validate_square(m,"determinant");
       return m.determinant();
     }
 
     vector_d add(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size()) 
-        throw std::invalid_argument ("v1.size() != v2.size()");
+      validate_matching_dims(v1,v2,"add");
       return v1 + v2;
     }
 
     row_vector_d add(const row_vector_d& rv1, const row_vector_d& rv2) {
       if (rv1.size() != rv2.size()) 
-        throw std::invalid_argument ("rv1.size() != rv2.size()");
+        throw std::domain_error ("rv1.size() != rv2.size()");
       return rv1 + rv2;
     }
 
     matrix_d add(const matrix_d& m1, const matrix_d& m2) {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::invalid_argument ("dimensions of m1 and m2 do not match");
+        throw std::domain_error ("dimensions of m1 and m2 do not match");
       return m1 + m2;
     }
 
     vector_d subtract(const vector_d& v1, const vector_d& v2) {
       if (v1.size() != v2.size())
-        throw std::invalid_argument ("v1.size() != v2.size()");
+        throw std::domain_error ("v1.size() != v2.size()");
       return v1 - v2;
     }
 
     row_vector_d subtract(const row_vector_d& rv1, const row_vector_d& rv2) {
       if (rv1.size() != rv2.size())
-        throw std::invalid_argument ("rv1.size() != rv2.size()");
+        throw std::domain_error ("rv1.size() != rv2.size()");
       return rv1 - rv2;
     }
 
     matrix_d subtract(const matrix_d& m1, const matrix_d& m2) {
       if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::invalid_argument ("dimensions of m1 and m2 do not match");
+        throw std::domain_error ("dimensions of m1 and m2 do not match");
       return m1 - m2;
     }
 
@@ -268,7 +268,7 @@ namespace stan {
 
     matrix_d cholesky_decompose(const matrix_d& m) {
       if (m.rows() != m.cols())
-        throw std::invalid_argument ("m must be a square matrix");
+        throw std::domain_error("m must be a square matrix");
       Eigen::LLT<matrix_d> llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
