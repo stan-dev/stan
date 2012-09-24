@@ -600,8 +600,8 @@ namespace stan {
 
     template <typename T1, int R1, int C1, typename T2, int R2, int C2>
     inline void validate_matching_dims(const Eigen::Matrix<T1,R1,C1>& x1,
-                                const Eigen::Matrix<T2,R2,C2>& x2,
-                                const char* msg) {
+                                       const Eigen::Matrix<T2,R2,C2>& x2,
+                                       const char* msg) {
       if (x1.rows() == x2.rows()
           && x1.cols() == x2.cols()) return;
       std::stringstream ss;
@@ -1160,7 +1160,8 @@ namespace stan {
     /**
      * Returns the trace of the specified matrix.  The trace
      * is defined as the sum of the elements on the diagonal.
-     * The matrix is not required to be square.
+     * The matrix is not required to be square.  Returns 0 if
+     * matrix is empty.
      *
      * @param m Specified matrix.
      * @return Trace of the matrix.
@@ -1190,7 +1191,7 @@ namespace stan {
      * @throw std::domain_error if rv1 and rv2 are not the same size.
      */
     row_vector_d add(const row_vector_d& rv1, 
-                            const row_vector_d& rv2);
+                     const row_vector_d& rv2);
     /**
      * Return the sum of the specified matrices.  The two matrices
      * must have the same dimensions.

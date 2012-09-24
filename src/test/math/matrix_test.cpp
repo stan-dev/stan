@@ -1323,3 +1323,112 @@ TEST(MathMatrix,mean) {
   m << 1.0, 2.0, 4.0, 9.0, 16.0, 25.0;
   EXPECT_FLOAT_EQ(9.5,mean(m));
 }
+
+TEST(MathMatrix, trace) {
+  using stan::math::trace;
+  matrix_d m;
+  EXPECT_FLOAT_EQ(0.0,trace(m));
+  m = matrix_d(1,1);
+  m << 2.3;
+  EXPECT_FLOAT_EQ(2.3,trace(m));
+  m = matrix_d(2,3);
+  m << 1, 2, 3, 4, 5, 6;
+  EXPECT_FLOAT_EQ(6.0,trace(m));
+}
+
+TEST(MathMatrix, minus) {
+  vector_d v0;
+  row_vector_d rv0;
+  matrix_d m0;
+  EXPECT_EQ(0,stan::math::minus(v0).size());
+  EXPECT_EQ(0,stan::math::minus(rv0).size());
+  EXPECT_EQ(0,stan::math::minus(m0).size());
+  vector_d v1(2);
+  v1 << 1, 2;
+  vector_d v2(3);
+  v2 << 10, 100, 1000;
+
+  row_vector_d rv1(2);
+  v1 << 1, 2;
+  row_vector_d rv2(3);
+  v2 << 10, 100, 1000;
+
+  matrix_d m1(2,3);
+  m1 << 1, 2, 3, 4, 5, 6;
+  matrix_d m2(3,2);
+  m2 << 10, 100, 1000, 0, -10, -12;
+
+  using stan::math::add;
+  EXPECT_THROW(add(v1,v2),std::domain_error);
+  EXPECT_THROW(add(rv1,rv2),std::domain_error);
+  EXPECT_THROW(add(m1,m2),std::domain_error);
+
+  using stan::math::subtract;
+  EXPECT_THROW(subtract(v1,v2),std::domain_error);
+  EXPECT_THROW(subtract(rv1,rv2),std::domain_error);
+  EXPECT_THROW(subtract(m1,m2),std::domain_error);
+
+  using stan::math::divide;
+  EXPECT_NO_THROW(divide(v0,2.0));
+  EXPECT_NO_THROW(divide(rv0,2.0));
+  EXPECT_NO_THROW(divide(m0,2.0));
+
+  using stan::math::multiply;
+  EXPECT_NO_THROW(multiply(v0,2.0));
+  EXPECT_NO_THROW(multiply(rv0,2.0));
+  EXPECT_NO_THROW(multiply(m0,2.0));
+  EXPECT_NO_THROW(multiply(2.0,v0));
+  EXPECT_NO_THROW(multiply(2.0,rv0));
+  EXPECT_NO_THROW(multiply(2.0,m0));
+
+  using stan::math::col;
+  EXPECT_THROW(col(m1,5),std::domain_error);
+
+  using stan::math::row;
+  EXPECT_THROW(row(m1,5),std::domain_error);
+
+  using stan::math::diagonal;
+  EXPECT_NO_THROW(diagonal(m0));
+
+  using stan::math::diag_matrix;
+  EXPECT_NO_THROW(diag_matrix(v0));
+
+  using stan::math::transpose;
+  EXPECT_NO_THROW(transpose(v0));
+  EXPECT_NO_THROW(transpose(rv0));
+  EXPECT_NO_THROW(transpose(m0));
+
+  using stan::math::inverse;
+  EXPECT_THROW(inverse(m1),std::domain_error);
+
+  using stan::math::softmax;
+  EXPECT_THROW(softmax(v0),std::domain_error);
+
+  using stan::math::eigenvalues;
+  EXPECT_NO_THROW(eigenvalues(m0));
+  EXPECT_THROW(eigenvalues(m1),std::domain_error);
+
+  using stan::math::eigenvectors;
+  EXPECT_THROW(eigenvectors(m0),std::domain_error);
+  matrix_d ev_m1(1,1);
+  ev_m1 << 2.0;
+  EXPECT_NO_THROW(eigenvectors(ev_m1));
+  EXPECT_THROW(eigenvectors(m1),std::domain_error);
+
+
+  using stan::math::eigenvalues_sym;
+  EXPECT_THROW(eigenvalues_sym(m0),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
+
+  using stan::math::eigenvectors_sym;
+  EXPECT_THROW(eigenvectors_sym(m0),std::domain_error);
+  EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
+  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
+
+  using stan::math::cholesky_decompose;
+  EXPECT_NO_THROW(cholesky_decompose(m0));
+  EXPECT_THROW(cholesky_decompose(m1),std::domain_error);
+
+  using stan::math::singular_values;
+  EXPECT_NO_THROW(singular_values(m0));
+}

@@ -19,32 +19,27 @@ namespace stan {
     }
 
     row_vector_d add(const row_vector_d& rv1, const row_vector_d& rv2) {
-      if (rv1.size() != rv2.size()) 
-        throw std::domain_error ("rv1.size() != rv2.size()");
+      validate_matching_dims(rv1,rv2,"add");
       return rv1 + rv2;
     }
 
     matrix_d add(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::domain_error ("dimensions of m1 and m2 do not match");
+      validate_matching_dims(m1,m2,"add");
       return m1 + m2;
     }
 
     vector_d subtract(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error ("v1.size() != v2.size()");
+      validate_matching_dims(v1,v2,"subtract");
       return v1 - v2;
     }
 
     row_vector_d subtract(const row_vector_d& rv1, const row_vector_d& rv2) {
-      if (rv1.size() != rv2.size())
-        throw std::domain_error ("rv1.size() != rv2.size()");
+      validate_matching_dims(rv1,rv2,"subtract");
       return rv1 - rv2;
     }
 
     matrix_d subtract(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::domain_error ("dimensions of m1 and m2 do not match");
+      validate_matching_dims(m1,m2,"subtract");
       return m1 - m2;
     }
 
@@ -73,12 +68,7 @@ namespace stan {
     }
 
     vector_d elt_multiply(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "vectors must have same dimensions, v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size() << std::endl;
-        throw std::domain_error(msg.str());
-      }
+      validate_matching_dims(v1,v2,"elementwise multiply");
       vector_d prod(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         prod(i) = v1(i) * v2(i);
@@ -86,12 +76,7 @@ namespace stan {
     }
 
     row_vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "vectors must have same dimensions, v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size() << std::endl;
-        throw std::domain_error(msg.str());
-      }
+      validate_matching_dims(v1,v2,"elementwise multiply");
       row_vector_d prod(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         prod(i) = v1(i) * v2(i);
@@ -99,17 +84,7 @@ namespace stan {
     }
 
     matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows()
-          || m1.cols() != m2.cols()) {
-        std::stringstream msg;
-        msg << "vectors must have same dimensions"
-            << "; m1.rows()=" << m1.rows() 
-            << ", m2.rows()=" << m2.rows()
-            << ", m1.cols()=" << m1.cols()
-            << ", m2.cols()=" << m2.cols()
-            << std::endl;
-        throw std::domain_error(msg.str());
-      }
+      validate_matching_dims(m1,m2,"elementwise multiply");
       matrix_d prod(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
         for (int i = 0; i < m1.rows(); ++i)
@@ -118,14 +93,7 @@ namespace stan {
     }
 
     vector_d elt_divide(const vector_d& v1, const vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "require vectors to be same size for element-wise division;"
-            << " found v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size()
-            << std::endl;
-        throw std::domain_error(msg.str());
-      }
+      validate_matching_dims(v1,v2,"elementwise divide");
       vector_d prod(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         prod(i) = v1(i) / v2(i);
@@ -133,14 +101,7 @@ namespace stan {
     }
 
     row_vector_d elt_divide(const row_vector_d& v1, const row_vector_d& v2) {
-      if (v1.size() != v2.size()) {
-        std::stringstream msg;
-        msg << "require vectors to be same size for element-wise division;"
-            << " found v1.size()=" << v1.size()
-            << ", v2.size()=" << v2.size()
-            << std::endl;
-        throw std::domain_error(msg.str());
-      }
+      validate_matching_dims(v1,v2,"elementwise divide");
       row_vector_d prod(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         prod(i) = v1(i) / v2(i);
@@ -148,16 +109,7 @@ namespace stan {
     }
 
     matrix_d elt_divide(const matrix_d& m1, const matrix_d& m2) {
-      if (m1.rows() != m2.rows() 
-          || m1.cols() != m2.cols()) {
-        std::stringstream msg;
-        msg << "require matrices to be same dimensions for element-wise division;"
-            << " found m1.rows()=" << m1.rows() << ", m1.cols()=" << m1.cols()
-            << "; m2.rows()=" << m2.rows() << ", m2.cols()=" << m2.cols()
-            << std::endl;
-        throw std::domain_error(msg.str());
-
-      }
+      validate_matching_dims(m1,m2,"elementwise divide");
       matrix_d prod(m1.rows(),m1.cols());
       for (int j = 0; j < m2.cols(); ++j)
         for (int i = 0; i < m1.rows(); ++i)
@@ -190,10 +142,24 @@ namespace stan {
     }
 
     row_vector_d row(const matrix_d& m, size_t i) {
+      if (i >= m.rows()) {
+        std::stringstream msg;
+        msg << "error, row index out of order."
+            << " matrix.rows()=" << m.rows()
+            << "; index i=" << i;
+        throw std::domain_error(msg.str());
+      }
       return m.row(i - 1);
     }
 
     vector_d col(const matrix_d& m, size_t j) {
+      if (j >= m.cols()) {
+        std::stringstream msg;
+        msg << "error, column index out of order."
+            << " matrix.cols()=" << m.cols()
+            << "; index j=" << j;
+        throw std::domain_error(msg.str());
+      }
       return m.col(j - 1);
     }
 
@@ -218,24 +184,29 @@ namespace stan {
     }
 
     matrix_d inverse(const matrix_d& m) {
+      validate_square(m,"matirx inverse");
       return m.inverse();
     }
 
     vector_d
     softmax(const vector_d& x) {
+      validate_nonzero_size(x,"vector softmax");
       vector_d theta(x.size());
       stan::math::softmax<vector_d,double>(x,theta);
       return theta;
     }
 
     vector_d eigenvalues(const matrix_d& m) {
-      // false == no vectors
+      validate_square(m,"eigenvalues");
+      // false arg means no eigenvector calcs
       Eigen::EigenSolver<matrix_d> solver(m,false);
       // FIXME: test imag() all 0?
       return solver.eigenvalues().real();
     }
 
     matrix_d eigenvectors(const matrix_d& m) {
+      validate_nonzero_size(m,"eigenvectors");
+      validate_square(m,"eigenvectors");
       Eigen::EigenSolver<matrix_d> solver(m);
       return solver.eigenvectors().real();
     }
@@ -249,11 +220,16 @@ namespace stan {
     }
 
     vector_d eigenvalues_sym(const matrix_d& m) {
+      validate_nonzero_size(m,"eigenvalues_sym");
+      validate_square(m,"eigenvalues_sym");
+      // FIXME: validate actually symmetric?
       Eigen::SelfAdjointEigenSolver<matrix_d> solver(m,Eigen::EigenvaluesOnly);
       return solver.eigenvalues().real();
     }
 
     matrix_d eigenvectors_sym(const matrix_d& m) {
+      validate_nonzero_size(m,"eigenvectors_sym");
+      validate_square(m,"eigenvectors_sym");
       Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
       return solver.eigenvectors().real();
     }
@@ -267,8 +243,7 @@ namespace stan {
     }
 
     matrix_d cholesky_decompose(const matrix_d& m) {
-      if (m.rows() != m.cols())
-        throw std::domain_error("m must be a square matrix");
+      validate_square(m,"cholesky decomposition");
       Eigen::LLT<matrix_d> llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
