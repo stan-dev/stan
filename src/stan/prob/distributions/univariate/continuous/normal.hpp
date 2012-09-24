@@ -95,10 +95,7 @@ namespace stan {
         log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      
-
       for (size_t n = 0; n < N; n++) {
-
         // pull out values of arguments
         const double y_dbl = value_of(y_vec[n]);
         const double mu_dbl = value_of(mu_vec[n]);
@@ -129,7 +126,6 @@ namespace stan {
         if (!is_constant<typename is_vector<T_scale>::type>::value)
           operands_and_partials.d_x3[n] 
             += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
-
       }
 
       return operands_and_partials.to_var(logp);
