@@ -308,8 +308,7 @@ config_argss <- function(chains, iter, warmup, thin,
 } 
 
 is_dir_writable <- function(path) {
-  if (file.access(path, mode = 2) < 0) return(FALSE) 
-  return(TRUE)
+  (file.access(path, mode = 2) > 0) && (file.access(path, mode = 1) > 0)  
 } 
 
 writable_sample_file <- 

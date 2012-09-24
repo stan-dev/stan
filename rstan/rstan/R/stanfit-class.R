@@ -41,11 +41,17 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
 setGeneric(name = "get_stancode",
            def = function(object, ...) { standardGeneric("get_stancode")}) 
 
+setGeneric(name = "get_cppo", 
+           def = function(object, ...) { standardGeneric("get_cppo") }) 
+
+setMethod('get_cppo', signature = "stanfit", 
+           function(object) { 
+             get_cxxo_level(get_cxxflag(object@stanmodel)) 
+           }) 
+
 setMethod('get_stancode', signature = "stanfit", 
           function(object, print = FALSE) {
-            if (!exists("stanmodel", envir = object@.MISC, inherits = FALSE)) 
-              stop("stanmodel is not found") 
-            code <- object@.MISC$stanmodel@model_code
+            code <- object@stanmodel@model_code
             if (print) cat(code, "\n") 
             invisible(code)
           }) 
@@ -383,5 +389,5 @@ is_sf_valid <- function(sf) {
   # Similar to is_sm_valid  
   # This depends on currently that we return R_NilValue
   # in the `src` when calling cxxfunction. 
-  return(rstan:::is_sm_valid(sf@.MISC$stanmodel)) 
+  return(rstan:::is_sm_valid(sf@stanmodel)) 
 } 

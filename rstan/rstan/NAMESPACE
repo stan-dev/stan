@@ -12,6 +12,7 @@ export(
   stan_rdump,
   read_rdump,
   makeconf_path,
+  set_cppo, get_cppo, 
   rstan_options 
 # get_rstan.options
 )
@@ -22,9 +23,9 @@ exportClasses(
 exportMethods(
 #   print, plot, 
 #   extract, 
-  get_cppcode, # for stanmodel 
+  get_cppcode, get_cxxflags, # for stanmodel 
   show, sampling, summary, print, extract,
-  traceplot, plot, get_stancode, get_inits, get_seed,
+  traceplot, plot, get_stancode, get_inits, get_seed, get_cppo,
   get_adaptation_info,
   get_sampler_params,
   get_logposterior, 

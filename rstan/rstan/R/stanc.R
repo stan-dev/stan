@@ -27,8 +27,7 @@ stanc <- function(file, model_code = '', model_name = "anon_model", verbose = FA
                "' and no error message provided"), sep = '') 
   } else if (r$status == EXCEPTION_RC) {
     stop(paste("failed to parse Stan model '", model_name, 
-               "' and error message provided as:\n", 
-               r$msg, sep = '')) 
+               "' with error message:\n", r$msg, sep = '')) 
   } 
   
   r$status = if (r$status == 0) TRUE else FALSE

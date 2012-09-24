@@ -6,7 +6,9 @@
 \alias{stanmodel-class}
 %% \alias{sampling,stanmodel-method}
 \alias{get_cppcode}
+\alias{get_cxxflags}
 \alias{get_cppcode,stanmodel-method}
+\alias{get_cxxflags,stanmodel-method}
 \alias{show,stanmodel-method}
 
 \title{Class representing model compiled from C++}
@@ -42,6 +44,8 @@
     \item{\code{get_cppcode}}{\code{signature(object = "stanmodel")}: return the C++ code for the model
       as a character string. This is part of the C++ code that is compiled to the dynamic 
       shared object for the model.}
+    \item{\code{get_cxxflags}}{\code{signature(object = "stanmodel")}: return the \code{CXXFLAGS} 
+      used for compiling the model. The returned string is like \code{CXXFLAGS = -O3}.}
   }
 }
 
