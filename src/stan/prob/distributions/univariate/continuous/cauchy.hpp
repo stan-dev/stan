@@ -29,7 +29,7 @@ namespace stan {
      * @error_policy
      *    @li sigma must be positive.
      */
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_loc, typename T_scale, 
               class Policy>
     typename return_type<T_y,T_loc,T_scale>::type
@@ -71,7 +71,7 @@ namespace stan {
         return logp;
 
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_loc,T_scale>::value)
+      if (!include_summand<propto,T_y,T_loc,T_scale>::value)
         return 0.0;
 
       using stan::math::log1p;
@@ -115,11 +115,11 @@ namespace stan {
 	  = sigma_dbl * sigma_dbl;
 
 	// log probability
-	if (include_summand<Prop>::value)
+	if (include_summand<propto>::value)
 	  logp += NEG_LOG_PI;
-	if (include_summand<Prop,T_scale>::value)
+	if (include_summand<propto,T_scale>::value)
 	  logp -= log_sigma[n];
-	if (include_summand<Prop,T_y,T_loc,T_scale>::value)
+	if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	  logp -= log1p(y_minus_mu_over_sigma_squared);
 	
         // gradients

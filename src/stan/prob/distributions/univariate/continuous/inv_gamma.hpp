@@ -28,7 +28,7 @@ namespace stan {
      * @tparam T_shape Type of shape.
      * @tparam T_scale Type of scale.
      */
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_shape, typename T_scale, 
               class Policy>
     typename return_type<T_y,T_shape,T_scale>::type
@@ -73,7 +73,7 @@ namespace stan {
         return logp;
 
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_shape,T_scale>::value)
+      if (!include_summand<propto,T_y,T_shape,T_scale>::value)
 	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
@@ -101,13 +101,13 @@ namespace stan {
 	const double log_y = y_dbl == 0 ? 0.0 : log(y_dbl);
 	const double inv_y = 1 / y_dbl;
 	
-	if (include_summand<Prop,T_shape>::value)
+	if (include_summand<propto,T_shape>::value)
 	  logp -= lgamma(alpha_dbl);
-	if (include_summand<Prop,T_shape,T_scale>::value)
+	if (include_summand<propto,T_shape,T_scale>::value)
 	  logp += alpha_dbl * log(beta_dbl);
-	if (include_summand<Prop,T_y,T_shape>::value)
+	if (include_summand<propto,T_y,T_shape>::value)
 	  logp -= (alpha_dbl+1.0) * log_y;
-	if (include_summand<Prop,T_y,T_scale>::value)
+	if (include_summand<propto,T_y,T_scale>::value)
 	  logp -= beta_dbl * inv_y;
 	
 	// gradients
@@ -123,12 +123,12 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_shape, typename T_scale>
     inline
     typename return_type<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      return inv_gamma_log<Prop>(y,alpha,beta,stan::math::default_policy());
+      return inv_gamma_log<propto>(y,alpha,beta,stan::math::default_policy());
     }
 
     template <typename T_y, typename T_shape, typename T_scale, 
