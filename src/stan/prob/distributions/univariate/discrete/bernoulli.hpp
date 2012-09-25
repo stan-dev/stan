@@ -14,7 +14,7 @@ namespace stan {
 
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
     // FIXME: documentation
-    template <bool Prop,
+    template <bool propto,
               typename T_n, typename T_prob, 
               class Policy>
     typename return_type<T_prob>::type
@@ -53,7 +53,7 @@ namespace stan {
         return logp;
 
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_prob>::value)
+      if (!include_summand<propto,T_prob>::value)
 	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
@@ -68,7 +68,7 @@ namespace stan {
 	const int n_int = value_of(n_vec[n]);
 	const double theta_dbl = value_of(theta_vec[n]);
 	
-	if (include_summand<Prop,T_prob>::value) {
+	if (include_summand<propto,T_prob>::value) {
 	  if (n_int == 1)
 	    logp += log(theta_dbl);
 	  else
@@ -86,14 +86,14 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool Prop,
+    template <bool propto,
 	      typename T_y,
               typename T_prob>
     inline
     typename return_type<T_prob>::type
     bernoulli_log(const T_y& n, 
                   const T_prob& theta) {
-      return bernoulli_log<Prop>(n,theta,stan::math::default_policy());
+      return bernoulli_log<propto>(n,theta,stan::math::default_policy());
     }
 
     template <typename T_y,
@@ -118,7 +118,7 @@ namespace stan {
 
     // Bernoulli(n|inv_logit(theta))   [0 <= n <= 1;   -inf <= theta <= inf]
     // FIXME: documentation
-    template <bool Prop,
+    template <bool propto,
 	      typename T_n,
               typename T_prob, 
               class Policy>
@@ -157,7 +157,7 @@ namespace stan {
 	return logp;
       
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_prob>::value)
+      if (!include_summand<propto,T_prob>::value)
 	return 0.0;
       
       // set up template expressions wrapping scalars into vector views
@@ -177,7 +177,7 @@ namespace stan {
 	const double ntheta = sign * theta_dbl;
 	const double exp_m_ntheta = exp(-ntheta);
 	
-	if (include_summand<Prop,T_prob>::value) {
+	if (include_summand<propto,T_prob>::value) {
 	  // Handle extreme values gracefully using Taylor approximations.
 	  const static double cutoff = 20.0;
 	  if (ntheta > cutoff)
@@ -203,14 +203,14 @@ namespace stan {
     }
 
 
-    template <bool Prop,
+    template <bool propto,
 	      typename T_n,
               typename T_prob>
     inline
     typename return_type<T_prob>::type
     bernoulli_logit_log(const T_n& n, 
                         const T_prob& theta) {
-      return bernoulli_logit_log<Prop>(n,theta,stan::math::default_policy());
+      return bernoulli_logit_log<propto>(n,theta,stan::math::default_policy());
     }
 
 

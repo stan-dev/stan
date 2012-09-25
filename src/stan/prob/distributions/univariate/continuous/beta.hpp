@@ -33,7 +33,7 @@ namespace stan {
      *    @li alpha must be positive and finite.
      *    @li beta must be positive and finite.
      */
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_scale_succ, typename T_scale_fail,
               class Policy>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
@@ -85,7 +85,7 @@ namespace stan {
         return logp;
 
       // check if no variables are involved and prop-to
-      if (!include_summand<Prop,T_y,T_scale_succ,T_scale_fail>::value)
+      if (!include_summand<propto,T_y,T_scale_succ,T_scale_fail>::value)
 	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
@@ -109,15 +109,15 @@ namespace stan {
 	const double log_y = log(y_dbl);
 	const double log1m_y = log1m(y_dbl);
 	// log probability
-	if (include_summand<Prop,T_scale_succ,T_scale_fail>::value)
+	if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
 	  logp += lgamma(alpha_dbl + beta_dbl);
-	if (include_summand<Prop,T_scale_succ>::value)
+	if (include_summand<propto,T_scale_succ>::value)
 	  logp -= lgamma(alpha_dbl);
-	if (include_summand<Prop,T_scale_fail>::value)
+	if (include_summand<propto,T_scale_fail>::value)
 	  logp -= lgamma(beta_dbl);
-	if (include_summand<Prop,T_y,T_scale_succ>::value)
+	if (include_summand<propto,T_y,T_scale_succ>::value)
 	  logp += (alpha_dbl-1.0) * log_y;
-	if (include_summand<Prop,T_y,T_scale_fail>::value)
+	if (include_summand<propto,T_y,T_scale_fail>::value)
 	  logp += (beta_dbl-1.0) * log1m_y;
 
 	// gradients
@@ -135,12 +135,12 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool Prop,
+    template <bool propto,
               typename T_y, typename T_scale_succ, typename T_scale_fail>
     inline 
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_log<Prop>(y,alpha,beta,stan::math::default_policy());
+      return beta_log<propto>(y,alpha,beta,stan::math::default_policy());
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail,
