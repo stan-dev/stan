@@ -5,10 +5,11 @@
 
 \title{Set and get the optimization level and debug flag for compiling the C++ code} 
 
-\description{Set and get the optimization level, which is defined in 
+\description{Set and get the optimization level, defined in 
  CXXFLAGS, for compiling the C++ code. Also flag \code{-DDEBUG} 
  or \code{-DNDEBUG} in \code{R_XTRA_CPPFLAGS} is set depending on the
- optimization model.}
+ optimization mode.  
+}
 
 \usage{
   set_cppo(mode = c("fast", "presentation2", "presentation1", "debug"))
@@ -39,16 +40,18 @@
 
 \note{
   Since the optimization level is set by using a file with name \code{Makevars} (or 
-  a similar file name depending on platforms) in folder 
-  \code{.R} under the user's home directory, the side effect is that the optimization
+  a similar file with names such as \code{Makevars.win64}, \code{Makevars.win}, 
+  \code{Makevars-$R_PLATFROM} depending on platforms) in folder 
+  \code{.R} under the user's home directory, the \emph{side effect} is that the optimization
   level set here will be used by \code{R CMD SHLIB} and possibly installing other \R package 
   from source (including installing \pkg{rstan} again). If this is not desired, the 
   created file can be removed. For the same 
   reason, the optimization level that is set stays once \code{set_cppo} is called. If a different
-  optimization level is needed, \code{set_cppo} should be called again. 
+  optimization level is needed, \code{set_cppo} needs to be called again. 
 
-  Generally for compiling models, we strongly recommend using \code{mode="fast"}. In the 
-  case for the purpose of easily debugging code, \code{mode="debug"} can be used. And we recommend 
+  Generally for compiling models, what is strongly recommended is to use \code{mode="fast"}. When
+  debugging C++ code using for example \code{gdb}, \code{mode="debug"} can be used, in which
+  case \code{-g} flag is also set in \code{CXXFLAGS}. And we recommend 
   calling \code{set_cppo} again to set the optimization mode back to \code{"fast"} after 
   finishing debugging. 
 } 
@@ -59,6 +62,8 @@
   \url{http://mc-stan.org/}. 
 
   help of \code{R CMD SHLIB}. 
+
+  manual of \emph{gcc} and \emph{clang}. 
 } 
 
 \seealso{

@@ -12,7 +12,7 @@ setMethod("show", "cxxdso",
                 ", dso_filename = ", object@dso_filename, 
                 ", size = ", obj_size_str(object.size(object@.CXXDSOMISC$dso_bin)), ".\n", sep = '')  
             cat("And dso_last_path = '", object@.CXXDSOMISC$dso_last_path, "'.\n", sep = '')
-            cat("Created on: ", object@system, " with ", object@cxxflags, ".\n", sep = '')
+            cat("Created on: '", object@system, "' with ", object@cxxflags, ".\n", sep = '')
             cat("Loaded now: ", if (is_dso_loaded(object)) 'YES' else 'NO', ".\n", sep = '')
             cat("The signatures is/are as follows: \n")
             print(object@sig); 

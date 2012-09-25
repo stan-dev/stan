@@ -85,9 +85,7 @@ is_sm_valid <- function(sm) {
   #   sm: the stanmodel object 
   # 
   if (is_dso_loaded(sm@dso)) return(TRUE)
-  if (!sm@dso@dso_saved) return(FALSE)
-  if (!identical(sm@dso@system, R.version$system)) return(FALSE)
-  TRUE
+  sm@dso@dso_saved && identical(sm@dso@system, R.version$system)
 } 
 
 ##

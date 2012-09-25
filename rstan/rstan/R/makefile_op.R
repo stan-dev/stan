@@ -113,6 +113,7 @@ set_makefile_flags <- function(flags) {
 
   flagnames <- names(flags) 
   paste_bn <- function(...)  paste(..., sep = '\n') 
+  flags <- lapply(flags, function(x) paste(x, " #set_by_rstan")) 
 
   # the Makevars file does not exist 
   if (!file.exists(lmf)) {
@@ -121,7 +122,7 @@ set_makefile_flags <- function(flags) {
       stop(paste("directory ", homedotR, " is not writable", sep = '')) 
     cat(paste("# created by rstan at ", date(), sep = ''), '\n', file = lmf) 
     cat(do.call(paste_bn, flags), file = lmf, append = TRUE) 
-    return(invisible(TRUE)) 
+    return(invisible(NULL)) 
   } 
 
   if (file.access(lmf, mode = 2) < 0) 
@@ -130,7 +131,7 @@ set_makefile_flags <- function(flags) {
   lmf_txt <- readLines(lmf, warn = FALSE) 
   if (length(lmf_txt) < 1) {  # empty file 
     cat(do.call(paste_bn, flags), file = lmf, append = TRUE) 
-    return(invisible(TRUE))  
+    return(invisible(NULL))  
   } 
 
   # change the existing file 
@@ -151,18 +152,22 @@ set_makefile_flags <- function(flags) {
 
   cat(paste(lmf_txt, collapse = '\n'), file = lmf) 
   cat(makefile_exta, file = lmf, append = TRUE) 
-  invisible(TRUE) 
+  invisible(NULL) 
 } 
 
-rm_last_makefile <- function() {
+rm_last_makefile <- function(force = TRUE) {
   # remove the file given by last_makefile()
   # return: 
   #  ‘0’ for success, ‘1’ for failure, invisibly. 
   #  '-1' file not exists 
   lmf <- last_makefile() 
-  if (file.exists(lmf)) 
-    return(unlink(lmf, force = TRUE)) 
-  return(-1) 
+  msgs <- c(paste(lmf, " does not exist", sep = ''), 
+            paste("removed file ", lmf, sep = ''), 
+            paste("failed to remove file ", lmf, sep = '')) 
+  ret <- -1 
+  if (file.exists(lmf)) ret <- unlink(lmf, force = force) 
+  cat(msgs[ret + 2], '\n') 
+  invisible(ret) 
 } 
 
 get_cxxo_level <- function(str) {
@@ -184,21 +189,44 @@ if_ndebug_defined <- function(str) {
 } 
 
 
+rm_rstan_makefile_flags <- function() {
+  # remove flags in $HOME/.R/Makevars with #rstan 
+  lmf <- last_makefile() 
+  if (!file.exists(lmf)) return(NULL)
+  if (file.access(lmf, mode = 2) < 0) 
+    stop(paste(lmf, " is not writable", sep = '')) 
+  lmf_txt <- readLines(lmf, warn = FALSE) 
+  if (length(lmf_txt) < 1) return(NULL)
+  for (i in length(lmf_txt):1) {
+    if (grepl("#set_by_rstan", lmf_txt[i])) 
+      lmf_txt[i] <- NA  
+  } 
+  lmf_txt <- lmf_txt[!is.na(lmf_txt)] 
+  cat(paste(lmf_txt, collapse = '\n'), file = lmf) 
+  message("compiler flags set by rstan are removed") 
+  invisible(NULL)
+} 
+
 set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug")) { 
   # set the optimization level for compiling C++ code using R CMD SHLIB
   # Args:
   #   mode: one of fast, presentation2, presentation1, debug, corresponding
-  #   to level 3, 2, 1, 0 
+  #   to level 3, 2, 1, 0. 
   #   In addition, when debug mode is specified, it will add -g to CXXFLAGS. 
-  #   But currently in mode !debug, -g is not removed, so if debug mode 
-  #   is used once, -g will stay unless the file is removed. (The reason
-  #   is that it seems -g is set by default.)
+  #   In mode other than debug, -g is removed if exists. 
   # Return: 
   #   A list with names CXXFLAGS and R_XTRA_CPPFLAGS that are set 
   # 
   mode = match.arg(mode) 
   level = c(3, 2, 1, 0)[match(mode, c("fast", "presentation2", "presentation1", "debug"))]  
   makefile_txt <- get_makefile_txt() 
+
+  # if (mode == 'system') {
+  #   rm_rstan_makefile_flags() 
+  #   message("compiler flags set by rstan are removed") 
+  #   retrun(invisible(list()))
+  # } 
+
   sys_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt, headtotail = TRUE)
   curr_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt) 
   curr_r_xtra_cppflags <- get_makefile_flags("R_XTRA_CPPFLAGS", makefile_txt) 
@@ -208,9 +236,9 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug")
     stop(paste(level, " might not be a legal optimization level for C++ compilation", sep = '')) 
   old_olevel <- get_cxxo_level(curr_cxxflags) 
   if (old_olevel == level)  {
-    if ((level == '0' && grepl("DDEBUG", curr_r_xtra_cppflags) && grepl("-g", curr_cxxflags)) ||  
-        (level != '0' && grepl("DNDEBUG", curr_r_xtra_cppflags))) 
-    message(paste('model ', mode, ' for compiling C++ code has been set already', sep = ''))
+    if ((level == '0' && grepl("-DDEBUG", curr_r_xtra_cppflags) && grepl(" -g", curr_cxxflags)) ||  
+        (level != '0' && grepl("-DNDEBUG", curr_r_xtra_cppflags) && !grepl(" -g", curr_cxxflags))) 
+    message(paste('mode ', mode, ' for compiling C++ code has been set already', sep = ''))
     return(invisible(list(CXXFLAGS = curr_cxxflags, 
                           R_XTRA_CPPFLAGS = curr_r_xtra_cppflags))) 
   } 
@@ -221,17 +249,16 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug")
                        paste("-O", level, sep = ''), curr_cxxflags, fixed = TRUE) 
                  } 
   if (level == '0') { 
-    if (!grepl("-g", new_cxxflags)) new_cxxflags <- sub("\\s*$", " -g", new_cxxflags) 
+    if (!grepl(" -g", new_cxxflags)) new_cxxflags <- sub("\\s*$", " -g", new_cxxflags) 
     new_r_xtra_cppflags <- sub("-DNDEBUG", "-DDEBUG", curr_r_xtra_cppflags, fixed = TRUE) 
   } else {
-    if (!grepl("-g", sys_cxxflags)) 
-      new_cxxflags <- sub("-g", "", new_cxxflags, fixed = TRUE)
+    new_cxxflags <- sub("-g", "", new_cxxflags, fixed = TRUE)
     new_r_xtra_cppflags <- sub("-DDEBUG", "-DNDEBUG", curr_r_xtra_cppflags, fixed = TRUE) 
   } 
   flags <- list(CXXFLAGS = new_cxxflags,
                 R_XTRA_CPPFLAGS = new_r_xtra_cppflags) 
   set_makefile_flags(flags) 
-  message(paste('model ', mode, ' for compiling C++ code is set', sep = ''))
+  message(paste('mode ', mode, ' for compiling C++ code is set', sep = ''))
   invisible(flags) 
 } 
 

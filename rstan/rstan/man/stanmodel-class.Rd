@@ -56,7 +56,7 @@
   and \code{stan_model}). 
 
   Even if \code{save_dso = TRUE}, the model cannot be loaded on
-  a platform (operating system, etc.) that differs from
+  a platform (operating system, 32 bits or 64 bits, etc.) that differs from
   the one on which it was compiled.
 }
 

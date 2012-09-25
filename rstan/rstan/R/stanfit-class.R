@@ -46,7 +46,7 @@ setGeneric(name = "get_cppo_mode",
 
 setMethod('get_cppo_mode', signature = "stanfit", 
            function(object) { 
-             l <- get_cxxo_level(get_cxxflag(object@stanmodel)) 
+             l <- get_cxxo_level(get_cxxflags(object@stanmodel)) 
              if ("" == l) l <- "0" 
              p <- match(l, c("3", "2", "1", "0")) 
              c("fast", "presentation2", "presentation1", "debug")[p]
@@ -390,7 +390,5 @@ setMethod("traceplot", signature = "stanfit",
 
 is_sf_valid <- function(sf) {
   # Similar to is_sm_valid  
-  # This depends on currently that we return R_NilValue
-  # in the `src` when calling cxxfunction. 
   return(rstan:::is_sm_valid(sf@stanmodel)) 
 } 
