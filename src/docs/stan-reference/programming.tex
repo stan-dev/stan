@@ -1259,6 +1259,67 @@ model {
 
 
 
+% \chapter{Change of Variables}
+
+% his is certainly something that is unique to Stan. I believe the rule is:
+
+% 1) If the LHS of a ~ is declared in the parameters block, then the
+% user does NOT need to adjust lp__ with a log absolute Jacobian
+% determinant because Stan will do it automatically if
+% necessary. Similarly, if updating lp__ manually instead of using the ~
+% syntax, if the variable(s) that are contributing that that lp__ update
+% are declared in the parameters block, then the user does NOT need to
+% further adjust lp__ with a log absolute Jacobian determinant because
+% Stan will do it automatically if necessary
+
+% 2) If the LHS of a ~ is declared in the transformed parameters block
+% or is declared as a local variable in the model block, then the user
+% DOES need to adjust lp__ with a log absolute Jacobian
+% determinant. Similarly, if updating lp__ manually instead of using the
+% ~ syntax, if the variable(s) that are contributing that that lp__
+% update are declared in the transformed parameters block or the model
+% block, then the user DOES need to further adjust lp__ with a log
+% absolute Jacobian determinant.
+
+% When the user does this in the .stan file:
+
+% parameters{
+%   cov_matrix[K] Sigma;
+% }
+
+% The C++ code utilizes a Cholesky factor (L) --- even though L is not
+% mentioned in the .stan file --- and comes out looking like:
+
+% Sigma = L * L.transpose();
+% lp__ += a log absolute Jacobian determinant
+
+% In other words, the user is utilizing the Cholesky factor without
+% necessarily knowing it.
+
+% However, the C++ code is always utilizing unbounded primitive
+% parameters that correspond to the parameters declared in the .stan
+% file. The only exception is
+
+% parameters {
+%   real mu;
+% }
+
+% Since mu is unrestricted, there is no need to complicate things with a
+% primitive parameter. In contrast,
+
+% parameter {
+%   real<lower=0> sigma;
+% }
+
+% is positive so the C++ will have something like
+
+% sigma = exp(sigma_primitive);
+% lp__ += a log absolute partial derivative
+
+% In other words, a Cholesky factor is the primitive parameter
+% underlying a covariance matrix, just like sigma_primitive is the
+primitive parameter underlying sigma.
+
 
 
 \chapter{Custom Probability Functions}%
