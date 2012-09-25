@@ -106,16 +106,6 @@ namespace stan {
     typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
-  // Matt's original version
-  // size_t length(const T& x) { 
-  //   if (is_vector<T>::value)
-  //     return ((std::vector<typename is_vector<T>::type>*)&x)->size();
-  //   else
-  //     return 1;
-  // }
-
-  // FIXME: not a trait, move to meta
-
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
   size_t length(const T& x) {
@@ -284,6 +274,46 @@ namespace stan {
   public:
     VectorView(const Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
     const T& operator[](int i) { 
+      return x_[i];
+    }
+  };
+
+  //template<bool used = 0, typename T=double, bool is_vec = stan::is_vector<T>::value>
+  //class DoubleVectorView {
+  //public:
+  //DoubleVectorView(T& /* x */) { }
+  //  double& operator[](size_t /* i */) {
+  //    throw std::runtime_error("used is false. this should never be called");
+  //  }
+  //};
+
+  template<bool used, typename T, bool is_vec = stan::is_vector<T>::value>
+  class DoubleVectorView {
+  public:
+    DoubleVectorView(T& /* x */) { }
+    double& operator[](size_t /* i */) {
+      throw std::runtime_error("used is false. this should never be called");
+    }
+  };
+
+  template<typename T>
+  class DoubleVectorView<true, T, false> {
+  private:
+    double x_;
+  public:
+    DoubleVectorView(T& x) : x_(0.0) { }
+    double& operator[](size_t /* i */) {
+      return x_;
+    }
+  };
+
+  template<typename T>
+  class DoubleVectorView<true, T, true> {
+  private:
+    std::vector<double> x_;
+  public:
+    DoubleVectorView(T& x) : x_(stan::length(x)) { }
+    double& operator[](size_t i) {
       return x_[i];
     }
   };
