@@ -207,7 +207,7 @@ namespace stan {
           all_partials[i] = 0.0;
       }
 
-      typename boost::math::tools::promote_args<typename is_vector<T1>::type>::type
+      typename return_type<T1>::type
       to_var(double logp) {
         if (all_constant)
           return logp;
@@ -270,7 +270,7 @@ namespace stan {
           all_partials[i] = 0.0;
       }
 
-      typename boost::math::tools::promote_args<typename is_vector<T1>::type,typename is_vector<T2>::type,typename is_vector<T3>::type>::type
+      typename return_type<T1,T2,T3>::type
       to_var(double logp) {
         if (all_constant)
           return logp;
