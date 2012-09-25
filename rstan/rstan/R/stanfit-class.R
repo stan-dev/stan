@@ -41,12 +41,12 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
 setGeneric(name = "get_stancode",
            def = function(object, ...) { standardGeneric("get_stancode")}) 
 
-setGeneric(name = "get_cppo", 
-           def = function(object, ...) { standardGeneric("get_cppo") }) 
+setGeneric(name = "get_cppo_mode", 
+           def = function(object, ...) { standardGeneric("get_cppo_mode") }) 
 
-setMethod('get_cppo', signature = "stanfit", 
+setMethod('get_cppo_mode', signature = "stanfit", 
            function(object) { 
-             get_cxxo_level(get_cxxflag(object@stanmodel)) 
+             get_cppo(get_cxxflag(object@stanmodel)) 
            }) 
 
 setMethod('get_stancode', signature = "stanfit", 

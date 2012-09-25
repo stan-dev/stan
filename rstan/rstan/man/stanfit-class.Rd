@@ -9,8 +9,8 @@
 \alias{print,stanfit-method}
 \alias{show,stanfit-method}
 % \alias{plot,stanfit-method}
-\alias{get_cppo} 
-\alias{get_cppo,stanfit-method} 
+\alias{get_cppo_mode} 
+\alias{get_cppo_mode,stanfit-method} 
 \alias{get_stancode}
 \alias{get_stancode,stanfit-method}
 \alias{get_stanmodel}
@@ -110,9 +110,11 @@ object of type \code{list}}
     } 
     \item{\code{get_stancode}}{\code{signature(object = "stanfit")}:
       get the Stan code for the fitted model.}
-    \item{\code{get_cppo}}{\code{signature(object = "stanfit")}:
-      get the optimization level used for compiling the model associated 
-      with this fitted results. The returned string is like \code{"3"}.} 
+    \item{\code{get_cppo_mode}}{\code{signature(object = "stanfit")}:
+      get the optimization mode used for compiling the model associated 
+      with this fitted results. The returned string is 
+      one of \code{"fast"}, \code{"presentation2"}, 
+      \code{"presentation1"}, and \code{"debug"}.} 
     \item{\code{get_stanmodel}}{\code{signature(object = "stanfit")}: 
       get the object of S4 class \code{stanmodel} of the fitted 
       model.} 

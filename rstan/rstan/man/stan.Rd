@@ -178,8 +178,8 @@ stan(file, model_name = "anon_model", model_code = "",
 
   The optimization level for compiling the C++ code generated for the 
   model can be set by \code{set_cppo}. In general, the higher the optimization
-  level, the fast the generated binary code for the model runs. In general, 
-  fast generated binary code for the model that run fast by using higher
+  level, the faster the generated binary code for the model runs. However, 
+  the binary code generated for the model runs fast by using higher
   optimization level is at the cost of long time to compile the C++ code. 
 }
 
