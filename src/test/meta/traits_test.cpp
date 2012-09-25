@@ -155,21 +155,6 @@ TEST(MetaTraits, VectorView)  {
     EXPECT_FLOAT_EQ(d[n], dv[n]);
 }
 
-TEST(MetaTraits, VectorOrScalar) {
-  using stan::VectorOrScalar;
-  VectorOrScalar<double,true> av(10);
-  for (size_t n = 0; n < 10; ++n)
-    av[n] = n * n;
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(n * n, av[n]);
-  EXPECT_EQ(10U, av.size());
-
-  VectorOrScalar<double,false> bv(112); // 112 ignored
-  EXPECT_EQ(1U, bv.size());
-  bv[0] = 12.0;
-  EXPECT_EQ(12.0, bv[0]);
-}
-
 TEST(MetaTraits, DoubleVectorView_false_double) {
   using std::vector;
   using stan::DoubleVectorView;

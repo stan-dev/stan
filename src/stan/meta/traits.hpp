@@ -164,30 +164,6 @@ namespace stan {
     return result;
   }
 
-  // VectorOrScalar is the simple VectorView for writing doubles into
-  // should work for Eigen vectors and std::vector
-  // FIXME:  used only with T= double, so could just fix it.
-  template <typename T, bool is_vec = 0>
-  class VectorOrScalar {
-  private:
-    T x_;
-  public:
-    VectorOrScalar(size_t /*n*/) : x_(0) { }
-    T& operator[](int /*i*/) { return x_; }
-    size_t size() { return 1; }
-  };
-
-  template <typename T>
-  class VectorOrScalar<T, 1> {
-  private:
-    std::vector<T> x_;
-  public:
-    VectorOrScalar(size_t n) : x_(n, 0) { }
-    T& operator[](int i) { return x_[i]; }
-    size_t size() { return x_.size(); }
-  };
-
-
   // two template params for use in partials_vari OperandsAndPartials
   template<typename T, bool is_vec = stan::is_vector<T>::value>
   class VectorView {
