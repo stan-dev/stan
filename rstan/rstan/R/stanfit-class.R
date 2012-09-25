@@ -46,7 +46,10 @@ setGeneric(name = "get_cppo_mode",
 
 setMethod('get_cppo_mode', signature = "stanfit", 
            function(object) { 
-             get_cppo(get_cxxflag(object@stanmodel)) 
+             l <- get_cxxo_level(get_cxxflag(object@stanmodel)) 
+             if ("" == l) l <- "0" 
+             p <- match(l, c("3", "2", "1", "0")) 
+             c("fast", "presentation2", "presentation1", "debug")[p]
            }) 
 
 setMethod('get_stancode', signature = "stanfit", 

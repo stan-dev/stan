@@ -34,9 +34,9 @@ stan(file, model_name = "anon_model", model_code = "",
     is used so specifying \code{model_code} is ignored.}
   \item{fit}{An instance of S4 class \code{stanfit} derived from
              a previous fit;  defaults to \code{NA}. 
-    When not \code{NA}, the compiled model from the fitted result 
-    is re-used, thus saving the time that would otherwise be spent 
-    recompiling the C++ code for the model.}
+    If \code{fit} is not \code{NA}, the compiled model associated with the fitted result 
+    is re-used; thus the time that would otherwise be spent 
+    recompiling the C++ code for the model can be saved.}
   \item{data}{An object of class \code{list}, \code{environment}
     providing the data for the model, or a vector of character strings 
     for all the names of objects used as data in the working space. 

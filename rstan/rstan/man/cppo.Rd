@@ -38,8 +38,8 @@
 
 
 \note{
-  Since the optimization level is set by using files such as \code{Makevars} (or similar
-  file names depending on platforms) in folder 
+  Since the optimization level is set by using a file with name \code{Makevars} (or 
+  a similar file name depending on platforms) in folder 
   \code{.R} under the user's home directory, the side effect is that the optimization
   level set here will be used by \code{R CMD SHLIB} and possibly installing other \R package 
   from source (including installing \pkg{rstan} again). If this is not desired, the 
