@@ -278,15 +278,6 @@ namespace stan {
     }
   };
 
-  //template<bool used = 0, typename T=double, bool is_vec = stan::is_vector<T>::value>
-  //class DoubleVectorView {
-  //public:
-  //DoubleVectorView(T& /* x */) { }
-  //  double& operator[](size_t /* i */) {
-  //    throw std::runtime_error("used is false. this should never be called");
-  //  }
-  //};
-
   template<bool used, typename T, bool is_vec = stan::is_vector<T>::value>
   class DoubleVectorView {
   public:
