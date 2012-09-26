@@ -93,8 +93,7 @@ namespace stan {
       VectorView<const T_scale_succ> alpha_vec(alpha);
       VectorView<const T_scale_fail> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials_new<T_y, T_scale_succ, T_scale_fail>
-        operands_and_partials(y, alpha, beta);
+      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
 	// pull out values of arguments

@@ -3,17 +3,17 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/special_functions.hpp>
 
-using stan::agrad::OperandsAndPartials_new;
+using stan::agrad::OperandsAndPartials;
 using stan::agrad::var;
 TEST(AgradPartialsVari, OperandsAndPartials) {
-  OperandsAndPartials_new<double> o1;
+  OperandsAndPartials<double> o1;
   EXPECT_EQ(0U, o1.nvaris);
   
-  OperandsAndPartials_new<double,double,double,double> o2;
+  OperandsAndPartials<double,double,double,double> o2;
   EXPECT_EQ(0U, o2.nvaris);
   
   std::vector<double> d_vec(4);
-  OperandsAndPartials_new<std::vector<double> > o3(d_vec);
+  OperandsAndPartials<std::vector<double> > o3(d_vec);
   EXPECT_EQ(0U, o3.nvaris);
 
   std::vector<var> v_vec;
@@ -24,7 +24,7 @@ TEST(AgradPartialsVari, OperandsAndPartials) {
   
   std::vector<double> grad;
 
-  OperandsAndPartials_new<std::vector<var> > o4(v_vec);
+  OperandsAndPartials<std::vector<var> > o4(v_vec);
   o4.d_x1[0] = 10.0;
   o4.d_x1[1] = 20.0;
   o4.d_x1[2] = 30.0;
@@ -43,7 +43,7 @@ TEST(AgradPartialsVari,OperandsAndPartials1) {
   using stan::agrad::vari;
   var x = 2.0;
   var z = -3.0 * x;  // dz/dx = -3
-  OperandsAndPartials_new<var> o(z);
+  OperandsAndPartials<var> o(z);
   o.d_x1[0] += 5.0;  // dy/dz = 5
 
   var y = o.to_var(-1.0);
@@ -57,7 +57,7 @@ TEST(AgradPartialsVari,OperandsAndPartials2) {
   var x2 = 3.0;
   var z1 = -5.0 * x1; // dz1/dx1 = -5
   var z2 = -7.0 * x2; // dz2/dx2 = -7
-  OperandsAndPartials_new<var,var> o(z1,z2);
+  OperandsAndPartials<var,var> o(z1,z2);
   o.d_x1[0] += 11.0;  // dy/dz1 = 11.0
   o.d_x2[0] += 13.0;  // dy/dz2 = 13.0
   var y = o.to_var(-1.0);
@@ -75,7 +75,7 @@ TEST(AgradPartialsVari, OperandsAndPartials3) {
   var z2 = -9.0 * x2;  // dz2/dx2 = -7
   var z3 = -11.0 * x3; // dz3/dx3 = -11
 
-  OperandsAndPartials_new<var,var,var> o(z1, z2, z3);
+  OperandsAndPartials<var,var,var> o(z1, z2, z3);
   o.d_x1[0] += 17.0;  // dy/dz1 = 17.0
   o.d_x2[0] += 19.0;  // dy/dz2 = 19.0
   o.d_x3[0] += 23.0;  // dy/dz3 = 23.0

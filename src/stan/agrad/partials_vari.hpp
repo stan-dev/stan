@@ -9,21 +9,22 @@ namespace stan {
 
   namespace agrad {
 
-    class partials1s_vari : public vari {
+    class partials_vari : public vari {
     private:
       const size_t N_;
-      vari** operands1_;   double* partials1_;
+      vari** operands_;   
+      double* partials_;
     public: 
-      partials1s_vari(double value,
-                      size_t N,
-                      vari** operands1, double* partials1)
+      partials_vari(double value,
+		    size_t N,
+		    vari** operands, double* partials)
         : vari(value),
           N_(N),
-          operands1_(operands1),
-          partials1_(partials1) { }
+          operands_(operands),
+          partials_(partials) { }
       void chain() {
         for (size_t n = 0; n < N_; ++n)
-          operands1_[n]->adj_ += adj_ * partials1_[n];
+          operands_[n]->adj_ += adj_ * partials_[n];
       }
     };
 
@@ -38,7 +39,7 @@ namespace stan {
       var partials_to_var<var>(double logp, size_t nvaris,
 			agrad::vari** all_varis,
 			double* all_partials) {
-	return var(new agrad::partials1s_vari(logp, nvaris, all_varis, all_partials));
+	return var(new agrad::partials_vari(logp, nvaris, all_varis, all_partials));
       }
 
       template<typename T, 
@@ -73,7 +74,7 @@ namespace stan {
     template<typename T1=double, typename T2=double, typename T3=double, 
 	     typename T4=double, typename T5=double, typename T6=double, 
 	     typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type>
-    struct OperandsAndPartials_new {
+    struct OperandsAndPartials {
       const static bool all_constant = is_constant<T_return_type>::value;
       size_t nvaris;
       agrad::vari** all_varis;
@@ -86,8 +87,8 @@ namespace stan {
       VectorView<double*, is_vector<T5>::value> d_x5;
       VectorView<double*, is_vector<T6>::value> d_x6;
        
-      OperandsAndPartials_new(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
-			      const T4& x4=0, const T5& x5=0, const T6& x6=0)
+      OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+			  const T4& x4=0, const T5& x5=0, const T6& x6=0)
 	: nvaris(!is_constant_struct<T1>::value * length(x1) +
 		 !is_constant_struct<T2>::value * length(x2) +
 		 !is_constant_struct<T3>::value * length(x3) +
@@ -139,9 +140,6 @@ namespace stan {
 	return partials_to_var<T_return_type>(logp, nvaris, all_varis, all_partials);
       }
     };
-
-
-
 
   } 
 } 

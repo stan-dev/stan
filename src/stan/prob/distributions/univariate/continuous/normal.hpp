@@ -83,8 +83,7 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      agrad::OperandsAndPartials_new<T_y, T_loc, T_scale>
-        operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
 
       DoubleVectorView<true,T_scale> inv_sigma(sigma);
       DoubleVectorView<true,T_scale> log_sigma(sigma);
