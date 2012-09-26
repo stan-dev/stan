@@ -7,15 +7,14 @@ using stan::agrad::OperandsAndPartials_new;
 using stan::agrad::var;
 TEST(AgradPartialsVari, OperandsAndPartials) {
   OperandsAndPartials_new<double> o1;
-  std::cout << "o1.nvaris: " << o1.nvaris << std::endl;
+  EXPECT_EQ(0U, o1.nvaris);
   
   OperandsAndPartials_new<double,double,double,double> o2;
-  std::cout << "o2.nvaris: " << o2.nvaris << std::endl;
+  EXPECT_EQ(0U, o2.nvaris);
   
   std::vector<double> d_vec(4);
   OperandsAndPartials_new<std::vector<double> > o3(d_vec);
-  std::cout << "o3.nvaris: " << o3.nvaris << std::endl;
-
+  EXPECT_EQ(0U, o3.nvaris);
 
   std::vector<var> v_vec;
   v_vec.push_back(var(0.0));
@@ -23,10 +22,22 @@ TEST(AgradPartialsVari, OperandsAndPartials) {
   v_vec.push_back(var(2.0));
   v_vec.push_back(var(3.0));
   
+  std::vector<double> grad;
+
   OperandsAndPartials_new<std::vector<var> > o4(v_vec);
-  std::cout << "o4.nvaris: " << o4.nvaris << std::endl;
-  var a = o4.to_var(10.0);
-  std::cout << "a: " << a << std::endl;
+  o4.d_x1[0] = 10.0;
+  o4.d_x1[1] = 20.0;
+  o4.d_x1[2] = 30.0;
+  o4.d_x1[3] = 40.0;
+  
+  var v = o4.to_var(10.0);
+  v.grad(v_vec, grad);
+  EXPECT_EQ(4U, o4.nvaris);
+  EXPECT_FLOAT_EQ(10.0, v.val());
+  EXPECT_FLOAT_EQ(10.0, grad[0]);
+  EXPECT_FLOAT_EQ(20.0, grad[1]);
+  EXPECT_FLOAT_EQ(30.0, grad[2]);
+  EXPECT_FLOAT_EQ(40.0, grad[3]);
 }
 
 
