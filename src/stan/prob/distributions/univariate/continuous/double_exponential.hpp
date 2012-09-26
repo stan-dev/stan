@@ -68,8 +68,8 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      agrad::OperandsAndPartials<T_y,T_loc,T_scale>
-	operands_and_partials(y, mu, sigma, y_vec, mu_vec, sigma_vec);
+      agrad::OperandsAndPartials_new<T_y,T_loc,T_scale>
+	operands_and_partials(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
 	const double y_dbl = value_of(y_vec[n]);

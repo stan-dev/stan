@@ -60,8 +60,8 @@ namespace stan {
       VectorView<const T_n> n_vec(n);
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
-      agrad::OperandsAndPartials1<T_prob>
-        operands_and_partials(theta, theta_vec);
+      agrad::OperandsAndPartials_new<T_prob>
+        operands_and_partials(theta);
 
       for (size_t n = 0; n < N; n++) {
 	// pull out values of arguments

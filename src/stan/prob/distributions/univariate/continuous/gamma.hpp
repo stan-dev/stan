@@ -88,8 +88,8 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale>
-        operands_and_partials(y, alpha, beta, y_vec, alpha_vec, beta_vec);
+      agrad::OperandsAndPartials_new<T_y, T_shape, T_inv_scale>
+        operands_and_partials(y, alpha, beta);
 
       using boost::math::lgamma;
       using stan::math::multiply_log;

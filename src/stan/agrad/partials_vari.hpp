@@ -134,6 +134,14 @@ namespace stan {
     agrad::vari* coerce_to_vari(T x) { return 0; }
     agrad::vari* coerce_to_vari(vari* x) { return x; }
 
+    template<typename T>
+    agrad::vari* extract_vari_new(T x) { return 0; }
+    template<>
+    agrad::vari* extract_vari_new(const var* x) { return x->vi_; }
+    template<>
+    agrad::vari* extract_vari_new(const var x) { return x.vi_; }
+
+    
     inline agrad::var simple_var(double v, const agrad::var& y1, double dy1) {
       return agrad::var(new agrad::partials1_vari(v, extract_vari(y1), dy1));
     }
@@ -188,7 +196,7 @@ namespace stan {
 
       VectorView<double*, is_vector<T1>::value> d_x1;
 
-      const static bool all_constant = is_constant<typename is_vector<T1>::type>::value;
+      const static bool all_constant = is_constant<typename return_type<T1>::type>::value;
 
       OperandsAndPartials1(const T1& x1,
 			   VectorView<const T1, is_vector<T1>::value> x1_vec)
@@ -216,8 +224,6 @@ namespace stan {
       }
     };
 
-
-
     template<typename T1, typename T2, typename T3>
     struct OperandsAndPartials {
       size_t nvaris;
@@ -229,9 +235,7 @@ namespace stan {
       VectorView<double*, is_vector<T2>::value> d_x2;
       VectorView<double*, is_vector<T3>::value> d_x3;
 
-      const static bool all_constant = is_constant<typename is_vector<T1>::type>::value
-        && is_constant<typename is_vector<T2>::type>::value
-        && is_constant<typename is_vector<T3>::type>::value;
+      const static bool all_constant = is_constant<typename return_type<T1,T2,T3>::type>::value;
 
       OperandsAndPartials(const T1& x1, const T2& x2, const T3& x3,
                           VectorView<const T1, is_vector<T1>::value> x1_vec,
@@ -278,6 +282,94 @@ namespace stan {
           return sanitizer<all_constant>::sanitize(agrad::simple_var(logp, nvaris, all_varis, all_partials));
       }
     };
+
+
+    //------------------------------------------------------------
+    namespace {
+      template<typename T>
+      T partials_to_var(double logp, size_t nvaris,
+			agrad::vari** all_varis,
+			double* all_partials) {
+	return logp;
+      }
+      template<>
+      var partials_to_var<var>(double logp, size_t nvaris,
+			agrad::vari** all_varis,
+			double* all_partials) {
+	return var(new agrad::partials1s_vari(logp, nvaris, all_varis, all_partials));
+      }
+    }
+
+    template<typename T1, typename T2=double, typename T3=double, typename T4=double,
+	     typename T_return_type=typename return_type<T1,T2,T3,T4>::type>
+    struct OperandsAndPartials_new {
+      const static bool all_constant = is_constant<T_return_type>::value;
+      size_t nvaris;
+      agrad::vari** all_varis;
+      double* all_partials;
+
+      VectorView<double*, is_vector<T1>::value> d_x1;
+      VectorView<double*, is_vector<T2>::value> d_x2;
+      VectorView<double*, is_vector<T3>::value> d_x3;
+      VectorView<double*, is_vector<T4>::value> d_x4;
+
+      OperandsAndPartials_new(const T1& x1=0, const T2& x2=0, const T3& x3=0, const T4& x4=0)
+	: nvaris(!is_constant_struct<T1>::value * length(x1) +
+		 !is_constant_struct<T2>::value * length(x2) +
+		 !is_constant_struct<T3>::value * length(x3) +
+		 !is_constant_struct<T4>::value * length(x4)),
+	  all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*[nvaris]))),
+          all_partials((double*)agrad::chainable::operator new(sizeof(double[nvaris]))),
+	  d_x1(all_partials),
+          d_x2(all_partials 
+	       + (!is_constant_struct<T1>::value) * length(x1)),
+          d_x3(all_partials 
+	       + (!is_constant_struct<T1>::value) * length(x1)
+               + (!is_constant_struct<T2>::value) * length(x2)),
+	  d_x4(all_partials 
+	       + (!is_constant_struct<T1>::value) * length(x1)
+               + (!is_constant_struct<T2>::value) * length(x2)
+	       + (!is_constant_struct<T2>::value) * length(x3))
+
+{
+	size_t base = 0;
+        if (!is_constant_struct<T1>::value) {
+	  // FIXME: once VectorView points at the same thing,
+	  //        use that construction
+	  VectorView<const T1, is_vector<T1>::value> x1_vec(x1);
+          for (size_t n = 0; n < length(x1); n++) 
+	    all_varis[base + n] = agrad::extract_vari_new(x1_vec[n]);
+          base += length(x1);
+        }
+	if (!is_constant_struct<T2>::value) {
+	  VectorView<const T2, is_vector<T2>::value> x2_vec(x2);
+          for (size_t n = 0; n < length(x2); n++) 
+	    all_varis[base + n] = agrad::extract_vari_new(x2_vec[n]);
+          base += length(x2);
+        }
+	if (!is_constant_struct<T3>::value) {
+	  VectorView<const T3, is_vector<T3>::value> x3_vec(x3);
+          for (size_t n = 0; n < length(x3); n++) 
+	    all_varis[base + n] = agrad::extract_vari_new(x3_vec[n]);
+          base += length(x3);
+        }
+	if (!is_constant_struct<T4>::value) {
+	  VectorView<const T4, is_vector<T4>::value> x4_vec(x4);
+          for (size_t n = 0; n < length(x4); n++) 
+	    all_varis[base + n] = agrad::extract_vari_new(x4_vec[n]);
+          //base += length(x4);
+        }
+	std::fill(all_partials, all_partials+nvaris, 0);
+      }
+
+      T_return_type
+      to_var(double logp) {
+	return partials_to_var<T_return_type>(logp, nvaris, all_varis, all_partials);
+      }
+    };
+
+
+
 
   } 
 } 

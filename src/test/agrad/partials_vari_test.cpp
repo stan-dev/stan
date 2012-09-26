@@ -3,6 +3,32 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/special_functions.hpp>
 
+using stan::agrad::OperandsAndPartials_new;
+using stan::agrad::var;
+TEST(AgradPartialsVari, OperandsAndPartials) {
+  OperandsAndPartials_new<double> o1;
+  std::cout << "o1.nvaris: " << o1.nvaris << std::endl;
+  
+  OperandsAndPartials_new<double,double,double,double> o2;
+  std::cout << "o2.nvaris: " << o2.nvaris << std::endl;
+  
+  std::vector<double> d_vec(4);
+  OperandsAndPartials_new<std::vector<double> > o3(d_vec);
+  std::cout << "o3.nvaris: " << o3.nvaris << std::endl;
+
+
+  std::vector<var> v_vec;
+  v_vec.push_back(var(0.0));
+  v_vec.push_back(var(1.0));
+  v_vec.push_back(var(2.0));
+  v_vec.push_back(var(3.0));
+  
+  OperandsAndPartials_new<std::vector<var> > o4(v_vec);
+  std::cout << "o4.nvaris: " << o4.nvaris << std::endl;
+  var a = o4.to_var(10.0);
+  std::cout << "a: " << a << std::endl;
+}
+
 
 TEST(AgradPartialsVari,simple_var_vvv) {
   using stan::agrad::var;

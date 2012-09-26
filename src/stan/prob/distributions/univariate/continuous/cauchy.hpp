@@ -91,8 +91,8 @@ namespace stan {
       }
 
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
-        operands_and_partials(y, mu, sigma, y_vec, mu_vec, sigma_vec);
+      agrad::OperandsAndPartials_new<T_y, T_loc, T_scale>
+        operands_and_partials(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
 	// pull out values of arguments
