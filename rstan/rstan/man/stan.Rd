@@ -84,7 +84,7 @@ stan(file, model_name = "anon_model", model_code = "",
     This parameter only takes effect if \code{fit} is not used; with  
     \code{fit} defined, the DSO from the previous run is used.
     When \code{save_dso=TRUE}, the fitted object can be loaded from 
-    what is saved previously and used from sampling, if the compiling
+    what is saved previously and used from sampling, if the compiling is
     done on the same platform, that is, same operating system and same 
     architecture (32bits or 64bits). 
 }
@@ -212,8 +212,8 @@ model {
   y[2] ~ double_exponential(0, 2);
 } 
 "
-s.f <- stan(model_code = scode, iter = 10, verbose = FALSE) 
-print(s.f)
-s.f2 <- stan(fit = s.f, iter = 10000, verbose = FALSE) 
+fit1 <- stan(model_code = scode, iter = 10, verbose = FALSE) 
+print(fit1)
+fit2 <- stan(fit = fit1, iter = 10000, verbose = FALSE) 
 }} 
 \keyword{rstan} 

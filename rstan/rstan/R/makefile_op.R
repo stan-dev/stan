@@ -15,8 +15,11 @@ get_makefile_txt <- function() {
     rarch <- paste0("/", .Platform$r_arch)
   site <- file.path(R.home("etc"), rarch, "Makevars.site")
 
+  sys_makeconf <- file.path(R.home("etc"), rarch, "Makeconf")
+  if (!file.exists(sys_makeconf)) 
+    stop(paste("file ", sys_makeconf, " does not exist", sep = '')) 
   makefiles <-
-    c(file.path(R.home("etc"), rarch, "Makeconf"),
+    c(sys_makeconf, 
       if (file.exists(site)) site,
       file.path(R.home("share"), "make", if (WINDOWS) "winshlib.mk" else "shlib.mk"))
 

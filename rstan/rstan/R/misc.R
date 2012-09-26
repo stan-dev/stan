@@ -249,6 +249,19 @@ append_id <- function(file, id, suffix = '.csv') {
 config_argss <- function(chains, iter, warmup, thin, 
                         init, seed, sample_file, ...) {
 
+  iter <- as.integer(iter) 
+  if (iter < 1) 
+    stop("parameter 'iter' should be a positive integer")
+  thin <- as.integer(thin) 
+  if (thin < 1 || thin > iter) 
+    stop("parameter 'thin' should be a positive integer less than 'iter'")
+  warmup <- as.integer(warmup) 
+  if (warmup < 1 || warmup > iter) 
+    stop("parameter 'warmup' should be a positive integer less than 'iter'")
+  chains <- as.integer(chains) 
+  if (chains < 1) 
+    stop("parameter 'chains' should be a positive integer")
+
   iters <- rep(iter, chains)   
   thins <- rep(thin, chains)  
   warmups <- rep(warmup, chains) 
