@@ -4,10 +4,14 @@
 } 
 
 test_stan_args <- function() { 
-  inc <- paste(readLines('test_stan_args.cpp'), collapse = '\n')
+  src <- ' 
+    Rcpp::List lst(x); 
+    rstan::stan_args args(lst); 
+    return args.stan_args_to_rlist(); 
+  ' 
   fx <- cxxfunction(signature(x = "list"), 
-                    body = "  return test_stan_args(x);", 
-                    includes = inc, 
+                    body = src, 
+                    includes = "#include <rstan/stan_args.hpp>", 
                     plugin = "rstan", verbose = TRUE)
 
   a1 <- fx(list(iter = 100)) 

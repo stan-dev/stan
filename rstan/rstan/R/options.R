@@ -1,7 +1,7 @@
 ## Use an environment to keep some options, especially, 
 ## for plotting. 
 
-.rstan.opt.env <- new.env() 
+.rstan_opt_env <- new.env() 
 
 init_rstan_opt_env <- function(e) {
   tmat <- matrix(c(254, 237, 222, 
@@ -12,18 +12,18 @@ init_rstan_opt_env <- function(e) {
                    166, 54, 3), 
                  byrow = TRUE, ncol = 3)
 
-  rhat.cols <- rgb(tmat, alpha = 150, names = paste(1:nrow(tmat)),
+  rhat_cols <- rgb(tmat, alpha = 150, names = paste(1:nrow(tmat)),
                    maxColorValue = 255)
 
   assign("plot_rhat_breaks", c(1.1, 1.2, 1.5, 2), e)
   # in this default setting, 
-  # if rhat < rhat.breaks[i], the color is rhat.cols[i]
-  assign("plot_rhat_cols", rhat.cols, e)
+  # if rhat < rhat.breaks[i], the color is rhat_cols[i]
+  assign("plot_rhat_cols", rhat_cols, e)
 
   # when R-hat is NA, NaN, or Inf
-  assign("plot_rhat_na_col", rhat.cols[6] , e)
+  assign("plot_rhat_nan_col", rhat_cols[6] , e)
   # when R-hat is large than max(rhat.breaks) 
-  assign("plot_rhat_large_col", rhat.cols[6], e)
+  assign("plot_rhat_large_col", rhat_cols[6], e)
 
   # color for indicating or important info. 
   # for example, the color of star and text saying
@@ -55,24 +55,24 @@ init_rstan_opt_env <- function(e) {
   invisible(e)
 }
 
-# init_rstan_opt_env(.rstan.opt.env)
+# init_rstan_opt_env(.rstan_opt_env)
 
 rstan_options <- function(...) { 
   # Set/get options in RStan
   # Args: any options can be defined, using 'name = value' 
   #
-  # e <- rstan:::.rstan.opt.env 
-  e <- .rstan.opt.env 
+  # e <- rstan:::.rstan_opt_env 
+  e <- .rstan_opt_env 
   if (length(as.list(e)) == 0) 
     init_rstan_opt_env(e) 
 
   a <-  list(...)
   len <- length(a) 
   if (len < 1) return(NULL) 
-  a.names <- names(a) 
+  a_names <- names(a) 
   # deal with the case that this function is called as 
   # rstan_options("a", "b")
-  if (is.null(a.names)) {
+  if (is.null(a_names)) {
     ns <- unlist(a) 
     if (!is.character(ns)) 
       stop("rstan_options only accepts arguments as `name=value'") 
@@ -82,12 +82,12 @@ rstan_options <- function(...) {
   } 
   # the case for, for example, 
   # rstan_options(a = 3, b = 4, "c")
-  empty <- (a.names == '') 
+  empty <- (a_names == '') 
 
-  opt.names <- c(a.names[!empty], unlist(a[empty]))
-  r <- mget(opt.names, envir = e, ifnotfound = NA)
+  opt_names <- c(a_names[!empty], unlist(a[empty]))
+  r <- mget(opt_names, envir = e, ifnotfound = NA)
 
-  lapply(a.names[!empty], 
+  lapply(a_names[!empty], 
          FUN = function(n) {
            if (n == 'plot_rhat_breaks') {
              assign(n, sort(a[[n]]), e)

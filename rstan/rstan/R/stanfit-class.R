@@ -136,14 +136,14 @@ get_samples <- function(n, sim, inc_warmup = TRUE) {
   ss 
 } 
 
-par_traceplot <- function(sim, n, par.name, inc_warmup = TRUE) {
+par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE) {
   # same thin, n_save, warmup2 for all the chains
   thin <- sim$thin[1] 
   warmup2 <- sim$warmup2[1] 
   n_save <- sim$n_save[1] 
   n_kept <- n_save - warmup2 
   yrange <- NULL 
-  main <- paste("Trace of ", par.name) 
+  main <- paste("Trace of ", par_name) 
   chain_cols <- rstan_options("rstan_chain_cols")
   warmup_col <- rstan_options("rstan_warmup_bg_col") 
   if (inc_warmup) {
@@ -344,14 +344,14 @@ setMethod("summary", signature = "stanfit",
                         ss$quan[tidx, m, drop = FALSE], 
                         ss$ess[tidx, drop = FALSE],
                         ss$rhat[tidx, drop = FALSE])  
-            pars.names <- rownames(ss$msd)[tidx] 
+            pars_names <- rownames(ss$msd)[tidx] 
             qnames <- colnames(ss$quan)[m] 
             dim(s1) <- c(length(tidx), length(m) + 5) 
-            rownames(s1) <- pars.names 
+            rownames(s1) <- pars_names 
             colnames(s1) <- c("mean", "se_mean", "sd", qnames, 'n_eff', 'Rhat')
             s2 <- combine_msd_quan(ss$c_msd[tidx, , , drop = FALSE], ss$c_quan[tidx, m, , drop = FALSE]) 
             dim(s2) <- c(tidx_len, length(m) + 2, object@sim$chains)
-            dimnames(s2) <- list(pars.names, c("mean", "sd", qnames), NULL) 
+            dimnames(s2) <- list(pars_names, c("mean", "sd", qnames), NULL) 
             ss <- list(summary = s1, c_summary = s2) 
             invisible(ss) 
           })  
@@ -371,20 +371,20 @@ setMethod("traceplot", signature = "stanfit",
                                        pars) 
             tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
             tidx <- unlist(tidx, use.names = FALSE)
-            par.mfrow.old <- par('mfrow')
-            num.plots <- length(tidx) 
-            if (num.plots %in% 2:4) par(mfrow = c(num.plots, 1)) 
-            if (num.plots > 5) par(mfrow = c(4, 2)) 
+            par_mfrow_old <- par('mfrow')
+            num_plots <- length(tidx) 
+            if (num_plots %in% 2:4) par(mfrow = c(num_plots, 1)) 
+            if (num_plots > 5) par(mfrow = c(4, 2)) 
             par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
                           inc_warmup = inc_warmup)
-            if (num.plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
-            if (num.plots > 1) { 
-              for (n in 2:num.plots)
+            if (num_plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
+            if (num_plots > 1) { 
+              for (n in 2:num_plots)
                 par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
                               inc_warmup = inc_warmup)
             }
             if (ask) devAskNewPage(ask = ask.old)
-            par(mfrow = par.mfrow.old)
+            par(mfrow = par_mfrow_old)
             invisible(NULL) 
           })  
 

@@ -244,6 +244,7 @@ namespace rstan {
       lst["warmup"] = warmup;                 // 3 
       lst["thin"] = thin;                     // 4 
       lst["refresh"] = refresh; 
+      lst["iter_save"] = iter_save; 
       lst["leapfrog_steps"] = leapfrog_steps;   // 5 
       lst["epsilon"] = epsilon;                 // 6 
       lst["max_treedepth"] = max_treedepth;     // 7 
