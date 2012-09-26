@@ -1038,8 +1038,32 @@ namespace stan {
           generate_expression(x.dist_.args_[i],o_);
         }
         o_ << ");" << EOL;
-        if (x.truncation_.has_low() && x.truncation_.has_high()) {
+        // generate bounds test
+        if (x.truncation_.has_low()) {
           generate_indent(indent_,o_);
+          o_ << "if (";
+          generate_expression(x.expr_,o_);
+          o_ << " < ";
+          generate_expression(x.truncation_.low_.expr_,o_); // low
+                                                            // bound
+          o_ << ") lp__ -= std::numeric_limits<double>::infinity();" << EOL;
+        }
+        if (x.truncation_.has_high()) {
+          generate_indent(indent_,o_);
+          if (x.truncation_.has_low()) o_ << "else ";
+          o_ << "if (";
+          generate_expression(x.expr_,o_);
+          o_ << " > ";
+          generate_expression(x.truncation_.high_.expr_,o_); // low
+                                                            // bound
+          o_ << ") lp__ -= std::numeric_limits<double>::infinity();" << EOL;
+        }
+        if (x.truncation_.has_low() || x.truncation_.has_high()) {
+          generate_indent(indent_,o_);
+          o_ << "else ";
+        }
+        // generate log denominator
+        if (x.truncation_.has_low() && x.truncation_.has_high()) {
           o_ << "lp__ -= log(";
           o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_,o_);
@@ -1055,7 +1079,6 @@ namespace stan {
           }
           o_ << "));" << EOL;
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
-          generate_indent(indent_,o_);
           o_ << "lp__ -= log(";
           o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_,o_);
@@ -1065,7 +1088,6 @@ namespace stan {
           }
           o_ << "));" << EOL;
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
-          generate_indent(indent_,o_);
           o_ << "lp__ -= log1m(";
           o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.low_.expr_,o_);

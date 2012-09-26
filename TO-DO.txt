@@ -16,9 +16,6 @@ V 1.0.2 Release Notes
 ======================================================================
 
 To Do for 1.0.2
-  -- patch truncation returns for variates outside of range; test
-     that cdf exists in compile
-  -- update manual on returning -inf if out of truncation range
   ?? remove (unsigned) long long instances in dump and error testing
   ?? manual section on reparameterization and change of vars
  
