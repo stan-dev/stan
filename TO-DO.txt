@@ -20,17 +20,20 @@ To Do for 1.0.2
      and prob/distributions
   -- removed (unsigned) long long instances in dump and error testing
   -- fixed sd() and variance() to return 1.0 for sequences of size 1
+  -- patch truncation returns for variates outside of range; test
+     that cdf exists in compile
  
 Bug Fixes:
   -- check ranges for LHS of assignment to prevent seg faults
   -- indexing fixed for arrays of matrix/vector/row_vector
-  -- vectorized double_exponential, cauchy, beta
+  -- vectorized several probability functions
   -- fixed void return type in auto_covariance
   -- removed template variable names from distribution error msgs
   -- upgraded BUGS ring model to use constraints plus tan2()
   -- changed matrix to throw domain_error rather than illegal_argument
   -- added matrix size and shape tests to avoid seg faults
   -- boundary conditions at limits of support for cdfs
+  -- patch truncation to return -inf for variates out of range
 
 New Features:
   -- print statements
