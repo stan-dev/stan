@@ -1383,9 +1383,12 @@ TEST(MathMatrix, minus) {
 
   using stan::math::col;
   EXPECT_THROW(col(m1,5),std::domain_error);
+  EXPECT_THROW(col(m1,0),std::domain_error);
+  
 
   using stan::math::row;
   EXPECT_THROW(row(m1,5),std::domain_error);
+  EXPECT_THROW(row(m1,0),std::domain_error);
 
   using stan::math::diagonal;
   EXPECT_NO_THROW(diagonal(m0));
