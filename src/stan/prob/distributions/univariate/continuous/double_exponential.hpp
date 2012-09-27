@@ -24,6 +24,7 @@ namespace stan {
       static const char* function
         = "stan::prob::double_exponential_log(%1%)";
       
+      using stan::is_constant_struct;
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_consistent_sizes;
@@ -70,18 +71,20 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
       agrad::OperandsAndPartials<T_y,T_loc,T_scale> operands_and_partials(y, mu, sigma);
 
-      DoubleVectorView<true,T_scale> 
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_scale> 
 	inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> 
+      DoubleVectorView<!is_constant_struct<T_scale>::value,T_scale> 
 	inv_sigma_squared(length(sigma));
       DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> 
 	log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
-        inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
-	if (include_summand<propto,T_scale>::value) {
+	const double sigma_dbl = value_of(sigma_vec[i]);
+	if (include_summand<propto,T_y,T_loc,T_scale>::value)
+	  inv_sigma[i] = 1.0 / sigma_dbl;
+	if (include_summand<propto,T_scale>::value) 
 	  log_sigma[i] = log(value_of(sigma_vec[i]));
+	if (!is_constant_struct<T_scale>::value) 
 	  inv_sigma_squared[i] = inv_sigma[i] * inv_sigma[i];
-	}
       }
 
 
@@ -102,13 +105,16 @@ namespace stan {
 	  logp -= fabs_y_m_mu * inv_sigma[n];
 	
 	// gradients
-	if (!is_constant<typename is_vector<T_y>::type>::value) {
-	  operands_and_partials.d_x1[n] -= sign(y_m_mu) * inv_sigma[n];
+	double sign_y_m_mu_times_inv_sigma(0);
+	if (!is_constant_struct<T_y>::value || !is_constant_struct<T_loc>::value)
+	  sign_y_m_mu_times_inv_sigma = sign(y_m_mu) * inv_sigma[n];
+	if (!is_constant_struct<T_y>::value) {
+	  operands_and_partials.d_x1[n] -= sign_y_m_mu_times_inv_sigma;
 	}
-	if (!is_constant<typename is_vector<T_loc>::type>::value) {
-	  operands_and_partials.d_x2[n] += sign(y_m_mu) * inv_sigma[n];
+	if (!is_constant_struct<T_loc>::value) {
+	  operands_and_partials.d_x2[n] += sign_y_m_mu_times_inv_sigma;
 	}
-	if (!is_constant<typename is_vector<T_scale>::type>::value)
+	if (!is_constant_struct<T_scale>::value)
 	  operands_and_partials.d_x3[n] += -inv_sigma[n] + fabs_y_m_mu * inv_sigma_squared[n];
       }
       return operands_and_partials.to_var(logp);
