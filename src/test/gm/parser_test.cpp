@@ -157,4 +157,5 @@ TEST(gm_parser,parsable_test_bad11) {
 TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures1.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures2.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures3.stan"));
 }
