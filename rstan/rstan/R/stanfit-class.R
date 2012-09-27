@@ -6,6 +6,12 @@ setMethod("show", "stanfit",
 printstanfit <- function(x, pars = x@sim$pars_oi, 
                          probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
                          digits_summary = 1, ...) { 
+  if (x@mode == 1L) { 
+    cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
+        "no sample is collected.\n", sep = '')
+    return(invisible(NULL)) 
+  }
+
   s <- summary(x, pars, probs, ...)  
   cat("Inference for Stan model: ", x@model_name, '.\n', sep = '')
   cat(x@sim$chains, " chains: each with iter=", x@sim$iter, 
@@ -19,10 +25,11 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
 
   sampler <- attr(x@sim$samples[[1]], "args")$sampler 
 
-  cat("\nSamples were drawn using ", sampler, " at ", x@date, ".\n", sep = '') 
-  cat("For each parameter, n_eff is a crude measure of effective sample size,\n") 
-  cat("and Rhat is the potential scale reduction factor on split chains (at \n")
-  cat("convergence, Rhat=1).\n")
+  cat("\nSamples were drawn using ", sampler, " at ", x@date, ".\n",
+      "For each parameter, n_eff is a crude measure of effective sample size,\n", 
+      "and Rhat is the potential scale reduction factor on split chains (at \n",
+      "convergence, Rhat=1).\n", sep = '')
+  return(invisible(NULL)) 
 }  
 setMethod("print", "stanfit", printstanfit) 
 
@@ -31,6 +38,11 @@ if (!isGeneric("plot"))
 
 setMethod("plot", signature(x = "stanfit", y = "missing"), 
           function(x, pars, display_parallel = FALSE) {
+            if (x@mode == 1L) {
+              cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
             pars <- if (missing(pars)) x@sim$pars_oi else check_pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
@@ -124,10 +136,17 @@ get_kept_samples <- function(n, sim) {
 
 get_samples <- function(n, sim, inc_warmup = TRUE) {
   # get chain samples
+  # Args:
+  #   n: parameter index (integer)
+  #   sim: the sim list in stanfit 
+  # 
   # Returns:
   #   a list of chains for the nth parameter; each chain is an 
   #   element of the list.  
   gcs <- function(s, inc_warmup, nw) {
+    # Args:
+    #   s: samples of all chains 
+    #   nw: number of warmup 
     if (inc_warmup)  return(s[[n]])
     else return(s[[n]][-(1:nw)]) 
   } 
@@ -180,6 +199,12 @@ setGeneric(name = 'get_adaptation_info',
 
 setMethod("get_adaptation_info", 
           definition = function(object) {
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
+
             lai <- lapply(object@sim$samples, function(x) attr(x, "adaptation_info"))
             is_empty <- function(x) { 
               if (is.null(x)) return(TRUE) 
@@ -196,6 +221,11 @@ setGeneric(name = "get_logposterior",
 
 setMethod("get_logposterior", 
           definition = function(object, inc_warmup = TRUE) {
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
             llp <- lapply(object@sim$samples, function(x) x[['lp__']]) 
             if (inc_warmup) return(invisible(llp)) 
             invisible(mapply(function(x, w) x[-(1:w)], 
@@ -208,6 +238,11 @@ setGeneric(name = 'get_sampler_params',
 
 setMethod("get_sampler_params", 
           definition = function(object, inc_warmup = TRUE) {
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
             ldf <- lapply(object@sim$samples, 
                           function(x) do.call(cbind, attr(x, "sampler_params")))   
             if (all(sapply(ldf, is.null))) return(invisible(NULL))  
@@ -238,7 +273,11 @@ setMethod("extract", signature = "stanfit",
             #   If permuted is FALSE, return array with dimensions
             #   (# of iter (with or w.o. warmup), # of chains, # of flat parameters). 
 
-
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
@@ -298,6 +337,12 @@ setMethod("summary", signature = "stanfit",
             #   In addition, the indexes complicate the implementation as internally
             #   we use column major indexes for vector/array parameters. But it might
             #   be better to use row major indexes for the output such as print.
+
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
 
             if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
               assign("summary", summary_sim(object@sim), envir = object@.MISC)
@@ -364,6 +409,11 @@ if (!isGeneric("traceplot")) {
 setMethod("traceplot", signature = "stanfit", 
           function(object, pars, inc_warmup = TRUE, ask = FALSE) { 
 
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "no sample is collected.\n", sep = '')
+              return(invisible(NULL)) 
+            }
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 

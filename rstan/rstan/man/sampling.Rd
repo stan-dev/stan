@@ -106,6 +106,12 @@
     (i.e. show the progress every \code{refresh} iterations).
     By default, \code{refresh = max(iter/10, 1)}. 
     The progress indicator is turned off if \code{refresh < 0}.
+
+    Another parameter is \code{test_grad} (\code{TRUE} or \code{FALSE}).  
+    If \code{test_grad=TRUE}, Stan will not do any sampling. Instead,
+    the gradient calculation is tested and printed out and the fitted
+    \code{stanfit} object is in test gradient mode.  By default, it is
+    \code{FALSE}. 
   }
 }
 \value{

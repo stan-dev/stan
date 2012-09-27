@@ -320,13 +320,13 @@ config_argss <- function(chains, iter, warmup, thin,
 } 
 
 is_dir_writable <- function(path) {
-  (file.access(path, mode = 2) > 0) && (file.access(path, mode = 1) > 0)  
+  (file.access(path, mode = 2) == 0) && (file.access(path, mode = 1) == 0)  
 } 
 
 writable_sample_file <- 
-function(file, warning = TRUE, 
+function(file, warn = TRUE, 
          wfun = function(x, x2) {
-           paste('Warning: "', x, '" is not writable; use "', x2, '" instead.', sep = '')
+           paste('"', x, '" is not writable; use "', x2, '" instead', sep = '')
          }) { 
   # Check if the path for file is writable, if not using tempdir() 
   # 
@@ -341,13 +341,11 @@ function(file, warning = TRUE,
   #  Otherwise, change the path to tempdir(). 
   
   dir <- dirname(file) 
-  if (!is_dir_writable(dir)) { 
-    dir2 <- tempdir()
-    if (warning)
-      cat(wfun(dir, dir2))
-    return(file.path(dir2, basename(file)))
-  } 
-  file
+  if (is_dir_writable(dir)) return(file)  
+
+  dir2 <- tempdir()
+  if (warn) warning(wfun(dir, dir2))
+  file.path(dir2, basename(file))
 } 
 
 

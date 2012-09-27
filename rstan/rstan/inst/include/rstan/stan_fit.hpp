@@ -580,7 +580,9 @@ namespace rstan {
                          << " is written to file " << sample_file 
                          << std::endl << std::endl;
         sample_stream.close();
-      }
+      } else {
+        rstan::io::rcout << std::endl; 
+      } 
       return 0;
     }
 

@@ -51,3 +51,21 @@ rstan:::is_sf_valid(ss)
 ## print the dso 
 ss@stanmodel@dso 
 
+samples <- extract(ss) 
+
+lapply(get_adaptation_info(ss), function(x) cat(x, '\n')) 
+ss8 <- stan(fit = ss, data = dat, test_grad = TRUE)
+print(ss8)
+summary(ss8)
+plot(ss8)
+traceplot(ss8)
+get_adaptation_info(ss8)
+get_cppo_mode(ss8)
+print(get_inits(ss8))
+
+print(get_seed(ss8))
+get_stancode(ss8, print = TRUE) 
+sm8 <- get_stanmodel(ss8)
+extract(ss8) 
+
+

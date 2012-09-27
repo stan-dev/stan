@@ -94,7 +94,6 @@ setMethod("sampling", "stanmodel",
             n_kept <- n_save - warmup2 
             samples <- vector("list", chains)
 
-
             for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
@@ -103,6 +102,26 @@ setMethod("sampling", "stanmodel",
               if (is.null(samples[[i]])) 
                 stop("error occurred during calling the sampler")
             }
+
+            # test_gradient mode: no sample 
+            if (attr(samples[[1]], 'test_grad')) {
+              sim = list(num_failed = samples)
+              nfit <- new("stanfit",
+                          model_name = object@model_name,
+                          model_pars = m_pars, 
+                          par_dims = p_dims, 
+                          mode = 1L, 
+                          sim = sim, 
+                          inits = organize_inits(lapply(samples, function(x) attr(x, "inits")), 
+                                                 m_pars, p_dims), 
+                          stan_args = args_list,
+                          stanmodel = object, 
+                          # keep a ref to avoid garbage collection
+                          # (see comments in fun stan_model)
+                          date = date(),
+                          .MISC = new.env()) 
+              return(invisible(nfit)) 
+            } 
 
             permutation.lst <-
               lapply(1:chains, function(id) sampler$permutation(c(n_kept, 1, id))) 
@@ -125,11 +144,12 @@ setMethod("sampling", "stanmodel",
                         model_name = object@model_name,
                         model_pars = m_pars, 
                         par_dims = p_dims, 
+                        mode = 0L, 
                         sim = sim,
                         # summary = summary,
                         # keep a record of the initial values 
                         inits = organize_inits(lapply(sim$samples, function(x) attr(x, "inits")), 
-                                                m_pars, p_dims), 
+                                               m_pars, p_dims), 
                         stan_args = args_list,
                         stanmodel = object, 
                           # keep a ref to avoid garbage collection

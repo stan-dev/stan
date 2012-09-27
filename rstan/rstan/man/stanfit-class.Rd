@@ -37,7 +37,8 @@
   \code{print} and \code{plot} and other methods are provided
   for the summaries of the fitted results.  
   Access methods allow the the underlying data making up a fit
-  to be retrieved.
+  to be retrieved. There are two modes; sampling mode and 
+  test gradient mode. 
 } 
 
 \section{Objects from the Class}{
@@ -53,8 +54,11 @@
       parameters, derived quantities), object of type \code{character}} 
     \item{\code{par_dims}:}{The dimensions for all parameters, 
        object of type \code{list}}
-    \item{\code{sim}:}{Simulation results including samples for the model, 
-object of type \code{list}} 
+    \item{\code{mode}:}{The mode of the fitted model, object of type 
+       \code{integer}. \code{0} indicates sampling mode; \code{1}
+       indicates test gradient mode for which no sampling is done.}
+    \item{\code{sim}:}{Simulation results including samples for the model,
+       object of type \code{list}} 
     \item{\code{inits}:}{The initial values either specified or generated
       randomly for all chains, object of type \code{list} 
       containing named lists corresponding to initial values in the chains.}

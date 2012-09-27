@@ -260,6 +260,7 @@ namespace rstan {
       lst["init"] = init;                        // 13
       lst["init_list"] = init_list;                // 14 
       lst["sampler"] = sampler; 
+      lst["test_grad"] = test_grad;
       return lst; 
     } 
 

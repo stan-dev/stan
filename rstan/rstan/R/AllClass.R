@@ -38,6 +38,7 @@ setClass(Class = "stanfit",
            model_name = "character", 
            model_pars = "character", 
            par_dims = "list", 
+           mode = "integer", # 0: samples; 1: test_grad (no samples) 
            sim = "list", 
            inits = "list", 
            stan_args = "list", 
@@ -48,3 +49,6 @@ setClass(Class = "stanfit",
          validity = function(object) {
            return(TRUE) 
          })
+
+# list all methods for stanfit 
+# showMethods(class = 'stanfit', where = getNamespace("rstan"))

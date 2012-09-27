@@ -93,11 +93,11 @@ test_stan_rdump <- function() {
 test_seq_array_ind <- function() {
   a <- rstan:::seq_array_ind(numeric(0))
   checkEquals(length(a), 0) 
-  # by default, col.major is FALSE
-  b <- rstan:::seq_array_ind(2:5, col.major = TRUE) 
+  # by default, col_major is FALSE
+  b <- rstan:::seq_array_ind(2:5, col_major = TRUE) 
   c <- arrayInd(1:prod(2:5), .dim = 2:5) 
   checkEquals(b, c) 
-  d <- rstan:::seq_array_ind(2:3, col.major = FALSE)
+  d <- rstan:::seq_array_ind(2:3, col_major = FALSE)
   e <- matrix(c(1, 1, 1, 2, 1, 3, 2, 1, 2, 2, 2, 3), 
               nrow = 6, byrow = TRUE)
   checkEquals(d, as.array(e)) 
