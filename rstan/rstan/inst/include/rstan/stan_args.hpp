@@ -228,6 +228,10 @@ namespace rstan {
       idx = find_index(args_names, std::string("append_samples")); 
       if (idx == args_names.size()) append_samples = false; 
       else append_samples = Rcpp::as<bool>(in[idx]); 
+
+      idx = find_index(args_names, std::string("test_grad")); 
+      if (idx == args_names.size()) test_grad = false; 
+      else test_grad = Rcpp::as<bool>(in[idx]);
     } 
 
     /**

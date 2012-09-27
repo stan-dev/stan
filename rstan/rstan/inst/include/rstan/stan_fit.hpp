@@ -368,8 +368,8 @@ namespace rstan {
           model.write_csv(params_r,params_i,sample_file_stream);
         }
       }
-      if (refresh > 0) 
-        rstan::io::rcout << std::endl << std::endl; 
+      // if (refresh > 0) 
+      //   rstan::io::rcout << std::endl << std::endl; 
       // rstan::io::rcout << "out of sample_from." << std::endl; 
     }
 
@@ -412,6 +412,7 @@ namespace rstan {
       double gamma = args.get_gamma(); 
       int refresh = args.get_refresh(); 
       unsigned int chain_id = args.get_chain_id(); 
+      bool test_grad = args.get_test_grad();
 
       // FASTER, but no parallel guarantees:
       // typedef boost::mt19937 rng_t;
@@ -443,8 +444,7 @@ namespace rstan {
         // init_rng generates uniformly from -2 to 2
         boost::random::uniform_real_distribution<double> 
           init_range_distribution(-2.0,2.0);
-        boost::variate_generator<rng_t&, 
-                       boost::random::uniform_real_distribution<double> >
+        boost::variate_generator<rng_t&, boost::random::uniform_real_distribution<double> >
           init_rng(base_rng,init_range_distribution);
 
         params_i = std::vector<int>(model.num_params_i(),0);
@@ -453,9 +453,16 @@ namespace rstan {
         for (size_t i = 0; i < params_r.size(); ++i)
           params_r[i] = init_rng();
       }
-
       // keep a record of the initial values 
       model.write_array(params_r,params_i,initv); 
+
+      if (test_grad) {
+        rstan::io::rcout << std::endl << "TEST GRADIENT MODE" << std::endl;
+        std::stringstream ss; 
+        int num_failed = model.test_gradients(params_r,params_i,1e-6,1e-6,ss);
+        rstan::io::rcout << ss.str() << std::endl; 
+        return num_failed; 
+      } 
    
       /*
       for (size_t i = 0; i < params_r.size(); i++) 
@@ -570,8 +577,8 @@ namespace rstan {
       if (sample_file_flag) {
         rstan::io::rcout << "Sample of chain " 
                          << chain_id 
-                         << " are written to file " << sample_file 
-                         << std::endl;
+                         << " is written to file " << sample_file 
+                         << std::endl << std::endl;
         sample_stream.close();
       }
       return 0;
@@ -687,12 +694,23 @@ namespace rstan {
       std::vector<std::string> sampler_param_names; 
       std::string adaptation_info; 
       std::vector<double> initv; 
+      bool test_grad = args.get_test_grad(); 
+      int ret; 
 
-      for (unsigned int i = 0; i < num_params2_; i++) 
-        chains.push_back(Rcpp::NumericVector(iter_save)); 
+      if (!test_grad) { 
+        for (unsigned int i = 0; i < num_params2_; i++) 
+          chains.push_back(Rcpp::NumericVector(iter_save)); 
+      }
        
-      sampler_command(data_, args, model_, chains, initv, iter_save, names_oi_tidx_, 
-                      sampler_param_names, sampler_params, adaptation_info); 
+      ret = sampler_command(data_, args, model_, chains, initv, iter_save, names_oi_tidx_, 
+                            sampler_param_names, sampler_params, adaptation_info); 
+
+      if (test_grad) {
+        Rcpp::IntegerVector num_failed = Rcpp::IntegerVector::create(ret);
+        num_failed.attr("test_grad") = Rcpp::wrap(true); 
+        num_failed.attr("inits") = initv; 
+        return num_failed; 
+      }
       // let Rcpp handle the error dispatching. 
       /*
       try {
@@ -704,6 +722,7 @@ namespace rstan {
       */
       // chains.attr("ncol") = Rcpp::wrap(num_params2_); 
       Rcpp::List lst(chains.begin(), chains.end()); 
+      lst.attr("test_grad") = Rcpp::wrap(false); 
       lst.attr("args") = args.stan_args_to_rlist(); 
       lst.attr("inits") = initv; 
       lst.attr("adaptation_info") = adaptation_info;
