@@ -6,7 +6,6 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix.hpp>
 
-
 namespace stan {
 
   /**
@@ -106,16 +105,6 @@ namespace stan {
     typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
-  // Matt's original version
-  // size_t length(const T& x) { 
-  //   if (is_vector<T>::value)
-  //     return ((std::vector<typename is_vector<T>::type>*)&x)->size();
-  //   else
-  //     return 1;
-  // }
-
-  // FIXME: not a trait, move to meta
-
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
   size_t length(const T& x) {
@@ -173,118 +162,90 @@ namespace stan {
     // assert((length(x3) == 1) || (length(x3) == result));
     return result;
   }
-
-  // AmbiguousVector is the simple VectorView for writing doubles into
-  // should work for Eigen vectors and std::vector
-  // FIXME:  used only with T= double, so could just fix it.
-  // FIXME:  rename -- "Ambiguous" is not the right word here
-  template <typename T, bool is_vec = 0>
-  class AmbiguousVector {
-  private:
-    T x_;
-  public:
-    AmbiguousVector(size_t /*n*/) : x_(0) { }
-    T& operator[](int /*i*/) { return x_; }
-    size_t size() { return 1; }
-  };
-
-  template <typename T>
-  class AmbiguousVector<T, 1> {
-  private:
-    std::vector<T> x_;
-  public:
-    AmbiguousVector(size_t n) : x_(n, 0) { }
-    T& operator[](int i) { return x_[i]; }
-    size_t size() { return x_.size(); }
-  };
-
-
-  // two template params for use in partials_vari OperandsAndPartials
-  template<typename T, bool is_vec = stan::is_vector<T>::value>
+  
+  template<typename T, 
+	   bool is_vec = stan::is_vector<T>::value>
   class VectorView {
   private:
-    T x_;
+    T* x_;
   public:
-    VectorView(T x) : x_(x) { }
-    T& operator[](int /*i*/) { 
-      return x_; 
+    VectorView(T& x) : x_(&x) { }
+    typename scalar_type<T>::type& operator[](int /*i*/) {
+      return *x_;
     }
   };
-
-  template<typename T, bool is_vec>
-  class VectorView<T*, is_vec> {
+  
+  template<typename T>
+  class VectorView<T*,false> {
   private:
     T* x_;
   public:
     VectorView(T* x) : x_(x) { }
-    T& operator[](int i) { 
-      if (is_vec)
-        return x_[i];
-      else
-        return *x_;
+    typename scalar_type<T>::type& operator[](int i) {
+      return *x_;
     }
   };
-
+  
   template<typename T>
-  class VectorView<std::vector<T>, true> {
+  class VectorView<T,true> {
   private:
-    std::vector<T>& x_;
+    T* x_;
   public:
-    VectorView(std::vector<T>& x) : x_(x) { }
-    T& operator[](int i) { 
-      return x_[i];
+    VectorView(T& x) : x_(&x) { }
+    typename scalar_type<T>::type& operator[](int i) {
+      return (*x_)[i];
     }
   };
+  
   template<typename T>
-  class VectorView<const std::vector<T>, true> {
+  class VectorView<T*,true> {
   private:
-    const std::vector<T>& x_;
+    T* x_;
   public:
-    VectorView(const std::vector<T>& x) : x_(x) { }
-    const T& operator[](int i) const { 
-      return x_[i];
-    }
-  };
-
-
-  template<typename T>
-  class VectorView<Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
-  private:
-    Eigen::Matrix<T,Eigen::Dynamic,1>& x_;
-  public:
-    VectorView(Eigen::Matrix<T,Eigen::Dynamic,1>& x) : x_(x) { }
-    T& operator[](int i) { 
-      return x_[i];
-    }
-  };
-  template<typename T>
-  class VectorView<const Eigen::Matrix<T,Eigen::Dynamic,1>, true> {
-  private:
-    const Eigen::Matrix<T,Eigen::Dynamic,1>& x_;
-  public:
-    VectorView(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) : x_(x) { }
-    const T& operator[](int i) { 
+    VectorView(T* x) : x_(x) { }
+    typename scalar_type<T>::type& operator[](int i) {
       return x_[i];
     }
   };
 
   template<typename T>
-  class VectorView<Eigen::Matrix<T,1,Eigen::Dynamic>, true> {
+  class VectorView<const T,true> {
   private:
-    Eigen::Matrix<T,1,Eigen::Dynamic>& x_;
+    const T* x_;
   public:
-    VectorView(Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
-    T& operator[](int i) { 
-      return x_[i];
+    VectorView(const T& x) : x_(&x) { }
+    typename scalar_type<T>::type operator[](int i) {
+      return (*x_)[i];
     }
   };
-  template<typename T>
-  class VectorView<const Eigen::Matrix<T,1,Eigen::Dynamic>, true> {
-  private:
-    const Eigen::Matrix<T,1,Eigen::Dynamic>& x_;
+
+  template<bool used, typename T = double, bool is_vec = stan::is_vector<T>::value>
+  class DoubleVectorView {
   public:
-    VectorView(const Eigen::Matrix<T,1,Eigen::Dynamic>& x) : x_(x) { }
-    const T& operator[](int i) { 
+    DoubleVectorView(const size_t /* n */) { }
+    double& operator[](size_t /* i */) {
+      throw std::runtime_error("used is false. this should never be called");
+    }
+  };
+
+  template<typename T>
+  class DoubleVectorView<true, T, false> {
+  private:
+    double x_;
+  public:
+    DoubleVectorView(const size_t /* n */) : x_(0.0) { }
+    double& operator[](size_t /* i */) {
+      return x_;
+    }
+  };
+
+  template<typename T>
+  class DoubleVectorView<true, T, true> {
+  private:
+    std::vector<double> x_;
+  public:
+    DoubleVectorView(const size_t n) : x_(n) { }
+    double& operator[](size_t i) {
       return x_[i];
     }
   };
