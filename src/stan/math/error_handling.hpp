@@ -259,7 +259,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_low> low_vec(low);
+          VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(low); n++) {
             if (!(y > low_vec[n]))
               return dom_err(function,y,name,
@@ -282,7 +282,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_low> low_vec(low);
+          VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
             if (!(y[n] > low_vec[n])) {
               return dom_err_vec(n,function,y,name,
@@ -335,7 +335,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_low> low_vec(low);
+          VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(low); n++) {
             if (!(y >= low_vec[n]))
               return dom_err(function,y,name,
@@ -358,7 +358,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_low> low_vec(low);
+          VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
             if (!(y[n] >= low_vec[n]))
               return dom_err_vec(n,function,y,name,
@@ -410,7 +410,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_high> high_vec(high);
+          VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(high); n++) {
             if (!(y < high_vec[n]))
               return dom_err(function,y,name,
@@ -433,7 +433,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_high> high_vec(high);
+          VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
             if (!(y[n] < high_vec[n]))
               return dom_err_vec(n,function,y,name,
@@ -484,7 +484,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_high> high_vec(high);
+          VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(high); n++) {
             if (!(y <= high_vec[n]))
               return dom_err(function,y,name,
@@ -507,7 +507,7 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_high> high_vec(high);
+          VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
             if (!(y[n] <= high_vec[n]))
               return dom_err_vec(n,function,y,name,
@@ -561,8 +561,8 @@ namespace stan {
                           const Policy&) {
           using stan::length;
           using stan::max_size;
-          VectorView_new<const T_low> low_vec(low);
-          VectorView_new<const T_high> high_vec(high);
+          VectorView<const T_low> low_vec(low);
+          VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < max_size(low, high); n++) {
             if (!(low_vec[n] <= y && y <= high_vec[n]))
               return dom_err(function,y,name," is %1%, but must be between ",
@@ -587,8 +587,8 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
-          VectorView_new<const T_low> low_vec(low);
-          VectorView_new<const T_high> high_vec(high);
+          VectorView<const T_low> low_vec(low);
+          VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
             if (!(low_vec[n] <= y[n] && y[n] <= high_vec[n]))
               return dom_err_vec(n,function,y,name,

@@ -165,55 +165,55 @@ namespace stan {
   
   template<typename T, 
 	   bool is_vec = stan::is_vector<T>::value>
-  class VectorView_new {
+  class VectorView {
   private:
     T* x_;
   public:
-    VectorView_new(T& x) : x_(&x) { }
+    VectorView(T& x) : x_(&x) { }
     typename scalar_type<T>::type& operator[](int /*i*/) {
       return *x_;
     }
   };
   
   template<typename T>
-  class VectorView_new<T*,false> {
+  class VectorView<T*,false> {
   private:
     T* x_;
   public:
-    VectorView_new(T* x) : x_(x) { }
+    VectorView(T* x) : x_(x) { }
     typename scalar_type<T>::type& operator[](int i) {
       return *x_;
     }
   };
   
   template<typename T>
-  class VectorView_new<T,true> {
+  class VectorView<T,true> {
   private:
     T* x_;
   public:
-    VectorView_new(T& x) : x_(&x) { }
+    VectorView(T& x) : x_(&x) { }
     typename scalar_type<T>::type& operator[](int i) {
       return (*x_)[i];
     }
   };
   
   template<typename T>
-  class VectorView_new<T*,true> {
+  class VectorView<T*,true> {
   private:
     T* x_;
   public:
-    VectorView_new(T* x) : x_(x) { }
+    VectorView(T* x) : x_(x) { }
     typename scalar_type<T>::type& operator[](int i) {
       return x_[i];
     }
   };
 
   template<typename T>
-  class VectorView_new<const T,true> {
+  class VectorView<const T,true> {
   private:
     const T* x_;
   public:
-    VectorView_new(const T& x) : x_(&x) { }
+    VectorView(const T& x) : x_(&x) { }
     typename scalar_type<T>::type operator[](int i) {
       return (*x_)[i];
     }
