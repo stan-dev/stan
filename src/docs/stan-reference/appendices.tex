@@ -1232,6 +1232,18 @@ side and to view the code on the web without wrapping, easier to view
 diffs from version control, etc.  About the only thing that is
 sacrificed is laying out expressions on a single line.
 
+\section{File Extensions}
+
+The recommended file extension for Stan model files is \code{.stan}.  
+For Stan data dump files, the recommended extension is \code{.R}, or
+\code{.dump.R}.%
+%
+\footnote{Stan still uses the \code{.Rdata} extension in its examples,
+  but this is misleading because R itself uses the extension
+  \code{.Rdata} for the binary file produced by its \code{save()}
+  function, not the ASCII file produced by its \code{dump()} function.}
+
+
 \section{Variable Naming}
 
 The recommended variable naming is to follow C/\Cpp naming
@@ -1256,22 +1268,88 @@ for (m in 1:M)
 \end{quote}
 
 
+\section{Local Variable Scope}
+
+Declaring local variables in the block in which they are used aids in
+understanding programs because it cuts down on the amount of text
+scanning or memory required to reunite the declaration and definition.
+
+The following Stan program corresponds to a direct translation of a
+BUGS model, which uses a different element of \code{mu} in each
+iteration.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  real mu[N];
+  for (n in 1:N) {
+    mu[n] <- alpha * x[n] + beta;
+    y[n] ~ normal(mu[n],sigma);
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+Because variables can be reused in Stan and because they should be
+declared locally for clarity, this model should be recoded as follows.
+%
+\begin{quote}
+\begin{Verbatim} 
+model {
+  for (n in 1:N) {
+    real mu;
+    mu <- alpha * x[n] + beta;
+    y[n] ~ normal(mu,sigma);
+  }
+}
+\end{Verbatim}
+\end{quote}
+% 
+The local variable can be eliminated altogether, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  for (n in 1:N)
+    y[n] ~ normal(alpha * x[n] + beta, sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+There is unlikely to be any measurable efficiency difference
+between the last two implementations, but both should be a bit
+more efficient than the BUGS translation.
+
+\subsubsection{Scope of Compound Structures with Componentwise Assignment}
+
+In the case of local variables for compound structures, such as
+arrays, vectors, or matrices, if they are built up component by
+component rather than in large chunks, it can be more efficient to
+declare a local variable for the structure outside of the block
+in which it is used.  This allows it to be allocated once and then
+reused.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  vector[K] mu;
+  for (n in 1:N) {
+    for (k in 1:K) 
+      mu[k] <- ...;
+    y[n] ~ multi_normal(mu,Sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+In this case, the vector \code{mu} will be allocated
+outside of both loops, and used a total of \code{N} times.
 
 \section{Parentheses and Brackets}
 
 \subsection{Optional Parentheses for Single-Statement Blocks}
 
-Single-statement blocks can be rendered in one of two ways.  Without
-statement-block delineating brackets, they will look as follows.
-%
-\begin{quote}
-\begin{Verbatim} 
-for (n in 1:N)
-  y[n] ~ normal(mu,1);
-\end{Verbatim}
-\end{quote}
-% 
-With brackets the rednering is as follows.
+Single-statement blocks can be rendered in one of two ways.  The fully
+explicit bracketed way is as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1281,6 +1359,55 @@ for (n in 1:N) {
 \end{Verbatim}
 \end{quote}
 %
+The following statement without brackets has the same effect.
+%
+\begin{quote}
+\begin{Verbatim}  
+for (n in 1:N)
+  y[n] ~ normal(mu,1);
+\end{Verbatim}
+\end{quote}
+%  
+Single-statement blocks can also be written on a single line, as
+in the following example.
+%
+\begin{quote}
+\begin{Verbatim} 
+for (n in 1:N) y[n] ~ normal(mu,1);
+\end{Verbatim}
+\end{quote}
+%
+These can be much harder to read thn the first example Only use this
+style if the statement is very simple, as in this example.  Unless
+there are many similar cases, it's almost always clearer to put
+each sampling statement on its own line.
+
+The use of for loops without brackets can be dangerous.  For instance,
+consider this program.
+%
+\begin{quote}
+\begin{Verbatim}  
+for (n in 1:N)
+  z[n] ~ normal(nu,1);
+  y[n] ~ normal(mu,1);
+\end{Verbatim}
+\end{quote}
+%
+Because Stan ignores whitespace and the parser completes a statement
+as eagerly as possible (just as in C++), the previous program is
+equivalent to the following program.
+%
+\begin{quote}
+\begin{Verbatim}  
+for (n in 1:N) {
+  z[n] ~ normal(nu,1);
+}
+y[n] ~ normal(mu,1);
+\end{Verbatim}
+\end{quote}
+%
+
+
 
 \subsection{No Open Brackets on Own Line}
 
