@@ -585,6 +585,30 @@ namespace stan {
     inline size_t cols(const matrix_d& m) {
       return m.cols();
     }
+
+    template <typename T, int R, int C>
+    void validate_column_index(const Eigen::Matrix<T,R,C>& m,
+                               size_t j,
+                               const char* msg) {
+      if (j > 0 && j <=  static_cast<size_t>(m.cols())) return;
+      std::stringstream ss;
+      ss << "require 0 < column index <= number of columns in" << msg;
+      ss << " found cols()=" << m.cols()
+         << "; index j=" << j;
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T, int R, int C>
+    void validate_row_index(const Eigen::Matrix<T,R,C>& m,
+                            size_t i,
+                            const char* msg) {
+      if (i > 0 && i <=  static_cast<size_t>(m.rows())) return;
+      std::stringstream ss;
+      ss << "require 0 < row index <= number of rows in" << msg;
+      ss << " found rows()=" << m.rows()
+         << "; index i=" << i;
+      throw std::domain_error(ss.str());
+    }
     
     template <typename T, int R, int C>
     void validate_square(const Eigen::Matrix<T,R,C>& x,
@@ -638,6 +662,19 @@ namespace stan {
          << " arg2 size=" << (x2.rows() * x2.cols());
       throw std::domain_error(ss.str());
     }
+
+    template <typename T1, int R1, int C1, typename T2, int R2, int C2>
+    inline void validate_multiplicable(const Eigen::Matrix<T1,R1,C1>& x1,
+                                       const Eigen::Matrix<T2,R2,C2>& x2,
+                                       const char* msg) {
+      if (x1.cols() == x2.rows()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require cols of arg1 to match rows of arg2, but found "
+         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
+         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols();
+      throw std::domain_error(ss.str());
+    }    
 
     template <typename T>
     inline void validate_nonzero_size(const T& x, const char* msg) {
@@ -1139,7 +1176,8 @@ namespace stan {
      * @return The matrix or vector minus the scalar.
      */
     template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> subtract(const Eigen::Matrix<double,Rows,Cols>& m, double c) {
+    inline Eigen::Matrix<double,Rows,Cols> subtract(const Eigen::Matrix<double,Rows,Cols>& m, 
+                                                    double c) {
       return (m.array() - c).matrix();
     }
     /**

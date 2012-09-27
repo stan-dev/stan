@@ -457,17 +457,18 @@ TEST(agrad_matrix,add_scalar) {
 }
 
 TEST(agrad_matrix,subtract_scalar) {
+  using stan::math::subtract;
   matrix_v v(2,2);
   v << 1, 2, 3, 4;
   matrix_v result;
 
-  result = stan::agrad::subtract(2.0,v);
+  result = subtract(2.0,v);
   EXPECT_FLOAT_EQ(1.0,result(0,0).val());
   EXPECT_FLOAT_EQ(0.0,result(0,1).val());
   EXPECT_FLOAT_EQ(-1.0,result(1,0).val());
   EXPECT_FLOAT_EQ(-2.0,result(1,1).val());
 
-  result = stan::agrad::subtract(v,2.0);
+  result = subtract(v,2.0);
   EXPECT_FLOAT_EQ(-1.0,result(0,0).val());
   EXPECT_FLOAT_EQ(0.0,result(0,1).val());
   EXPECT_FLOAT_EQ(1.0,result(1,0).val());
@@ -633,7 +634,11 @@ TEST(agrad_matrix, add_matrix_matrix_exception) {
 
 // subtract tests
 TEST(agrad_matrix, subtract_vector_vector) {
-  vector_v expected_output(5), output;
+  using stan::math::subtract;
+
+  vector_d expected_output(5);
+  vector_v output;
+  vector_d output_d;
   vector_d vd_1(5), vd_2(5);
   vector_v vv_1(5), vv_2(5);
 
@@ -644,46 +649,50 @@ TEST(agrad_matrix, subtract_vector_vector) {
   
   expected_output << -2, -1, -10, 5, 0;
   
-  output = stan::agrad::subtract(vd_1, vd_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output_d = subtract(vd_1, vd_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output_d(0));
+  EXPECT_FLOAT_EQ(expected_output(1), output_d(1));
+  EXPECT_FLOAT_EQ(expected_output(2), output_d(2));
+  EXPECT_FLOAT_EQ(expected_output(3), output_d(3));
+  EXPECT_FLOAT_EQ(expected_output(4), output_d(4));  
 
-  output = stan::agrad::subtract(vv_1, vd_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output = subtract(vv_1, vd_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output(0).val());
+  EXPECT_FLOAT_EQ(expected_output(1), output(1).val());
+  EXPECT_FLOAT_EQ(expected_output(2), output(2).val());
+  EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
+  EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 
-  output = stan::agrad::subtract(vd_1, vv_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output = subtract(vd_1, vv_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output(0).val());
+  EXPECT_FLOAT_EQ(expected_output(1), output(1).val());
+  EXPECT_FLOAT_EQ(expected_output(2), output(2).val());
+  EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
+  EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 
-  output = stan::agrad::subtract(vv_1, vv_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output = subtract(vv_1, vv_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output(0).val());
+  EXPECT_FLOAT_EQ(expected_output(1), output(1).val());
+  EXPECT_FLOAT_EQ(expected_output(2), output(2).val());
+  EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
+  EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 }
 TEST(agrad_matrix, subtract_vector_vector_exception) {
+  using stan::math::subtract;
   vector_d d1(5), d2(1);
   vector_v v1(5), v2(1);
   
   vector_v output;
-  EXPECT_THROW( stan::agrad::subtract(d1, d2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(v1, d2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(d1, v2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(v1, v2), std::domain_error);
+  EXPECT_THROW( subtract(d1, d2), std::domain_error);
+  EXPECT_THROW( subtract(v1, d2), std::domain_error);
+  EXPECT_THROW( subtract(d1, v2), std::domain_error);
+  EXPECT_THROW( subtract(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, subtract_rowvector_rowvector) {
-  row_vector_v expected_output(5), output;
+  using stan::math::subtract;
+  row_vector_d expected_output(5);
+  row_vector_d  output_d;
+  row_vector_v  output;
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_v rvv_1(5), rvv_2(5);
 
@@ -694,46 +703,49 @@ TEST(agrad_matrix, subtract_rowvector_rowvector) {
   
   expected_output << -2, -1, -10, 5, 0;
   
-  output = stan::agrad::subtract(rvd_1, rvd_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output_d = subtract(rvd_1, rvd_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output_d(0));
+  EXPECT_FLOAT_EQ(expected_output(1), output_d(1));
+  EXPECT_FLOAT_EQ(expected_output(2), output_d(2));
+  EXPECT_FLOAT_EQ(expected_output(3), output_d(3));
+  EXPECT_FLOAT_EQ(expected_output(4), output_d(4));
 
-  output = stan::agrad::subtract(rvv_1, rvd_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output = subtract(rvv_1, rvd_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output(0).val());
+  EXPECT_FLOAT_EQ(expected_output(1), output(1).val());
+  EXPECT_FLOAT_EQ(expected_output(2), output(2).val());
+  EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
+  EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 
-  output = stan::agrad::subtract(rvd_1, rvv_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output = subtract(rvd_1, rvv_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output(0).val());
+  EXPECT_FLOAT_EQ(expected_output(1), output(1).val());
+  EXPECT_FLOAT_EQ(expected_output(2), output(2).val());
+  EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
+  EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 
-  output = stan::agrad::subtract(rvv_1, rvv_2);
-  EXPECT_FLOAT_EQ(expected_output(0).val(), output(0).val());
-  EXPECT_FLOAT_EQ(expected_output(1).val(), output(1).val());
-  EXPECT_FLOAT_EQ(expected_output(2).val(), output(2).val());
-  EXPECT_FLOAT_EQ(expected_output(3).val(), output(3).val());
-  EXPECT_FLOAT_EQ(expected_output(4).val(), output(4).val());  
+  output = subtract(rvv_1, rvv_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output(0).val());
+  EXPECT_FLOAT_EQ(expected_output(1), output(1).val());
+  EXPECT_FLOAT_EQ(expected_output(2), output(2).val());
+  EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
+  EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 }
 TEST(agrad_matrix, subtract_rowvector_rowvector_exception) {
+  using stan::math::subtract;
   row_vector_d d1(5), d2(2);
   row_vector_v v1(5), v2(2);
 
   row_vector_v output;
-  EXPECT_THROW( stan::agrad::subtract(d1, d2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(d1, v2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(v1, d2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(v1, v2), std::domain_error);
+  EXPECT_THROW( subtract(d1, d2), std::domain_error);
+  EXPECT_THROW( subtract(d1, v2), std::domain_error);
+  EXPECT_THROW( subtract(v1, d2), std::domain_error);
+  EXPECT_THROW( subtract(v1, v2), std::domain_error);
 }
 TEST(agrad_matrix, subtract_matrix_matrix) {
-  matrix_v expected_output(2,2), output;
+  using stan::math::subtract;
+  matrix_d expected_output(2,2);
+  matrix_v output;
   matrix_d md_1(2,2), md_2(2,2);
   matrix_v mv_1(2,2), mv_2(2,2);
   matrix_d md_mis (2, 3);
@@ -746,38 +758,39 @@ TEST(agrad_matrix, subtract_matrix_matrix) {
   
   expected_output << -20, 11, 9, -2;
   
-  output = stan::agrad::subtract(md_1, md_2);
-  EXPECT_FLOAT_EQ(expected_output(0,0).val(), output(0,0).val());
-  EXPECT_FLOAT_EQ(expected_output(0,1).val(), output(0,1).val());
-  EXPECT_FLOAT_EQ(expected_output(1,0).val(), output(1,0).val());
-  EXPECT_FLOAT_EQ(expected_output(1,1).val(), output(1,1).val());
+  matrix_d output_d = subtract(md_1, md_2);
+  EXPECT_FLOAT_EQ(expected_output(0,0), output_d(0,0));
+  EXPECT_FLOAT_EQ(expected_output(0,1), output_d(0,1));
+  EXPECT_FLOAT_EQ(expected_output(1,0), output_d(1,0));
+  EXPECT_FLOAT_EQ(expected_output(1,1), output_d(1,1));
 
-  output = stan::agrad::subtract(mv_1, md_2);
-  EXPECT_FLOAT_EQ(expected_output(0,0).val(), output(0,0).val());
-  EXPECT_FLOAT_EQ(expected_output(0,1).val(), output(0,1).val());
-  EXPECT_FLOAT_EQ(expected_output(1,0).val(), output(1,0).val());
-  EXPECT_FLOAT_EQ(expected_output(1,1).val(), output(1,1).val());
+  output = subtract(mv_1, md_2);
+  EXPECT_FLOAT_EQ(expected_output(0,0), output(0,0).val());
+  EXPECT_FLOAT_EQ(expected_output(0,1), output(0,1).val());
+  EXPECT_FLOAT_EQ(expected_output(1,0), output(1,0).val());
+  EXPECT_FLOAT_EQ(expected_output(1,1), output(1,1).val());
 
-  output = stan::agrad::subtract(md_1, mv_2);
-  EXPECT_FLOAT_EQ(expected_output(0,0).val(), output(0,0).val());
-  EXPECT_FLOAT_EQ(expected_output(0,1).val(), output(0,1).val());
-  EXPECT_FLOAT_EQ(expected_output(1,0).val(), output(1,0).val());
-  EXPECT_FLOAT_EQ(expected_output(1,1).val(), output(1,1).val());
+  output = subtract(md_1, mv_2);
+  EXPECT_FLOAT_EQ(expected_output(0,0), output(0,0).val());
+  EXPECT_FLOAT_EQ(expected_output(0,1), output(0,1).val());
+  EXPECT_FLOAT_EQ(expected_output(1,0), output(1,0).val());
+  EXPECT_FLOAT_EQ(expected_output(1,1), output(1,1).val());
 
-  output = stan::agrad::subtract(mv_1, mv_2);
-  EXPECT_FLOAT_EQ(expected_output(0,0).val(), output(0,0).val());
-  EXPECT_FLOAT_EQ(expected_output(0,1).val(), output(0,1).val());
-  EXPECT_FLOAT_EQ(expected_output(1,0).val(), output(1,0).val());
-  EXPECT_FLOAT_EQ(expected_output(1,1).val(), output(1,1).val());
+  output = subtract(mv_1, mv_2);
+  EXPECT_FLOAT_EQ(expected_output(0,0), output(0,0).val());
+  EXPECT_FLOAT_EQ(expected_output(0,1), output(0,1).val());
+  EXPECT_FLOAT_EQ(expected_output(1,0), output(1,0).val());
+  EXPECT_FLOAT_EQ(expected_output(1,1), output(1,1).val());
 }
 TEST(agrad_matrix, subtract_matrix_matrix_exception) {
+  using stan::math::subtract;
   matrix_d d1(2,2), d2(1,2);
   matrix_v v1(2,2), v2(1,2);
 
-  EXPECT_THROW( stan::agrad::subtract(d1, d2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(d1, v2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(v1, d2), std::domain_error);
-  EXPECT_THROW( stan::agrad::subtract(v1, v2), std::domain_error);
+  EXPECT_THROW( subtract(d1, d2), std::domain_error);
+  EXPECT_THROW( subtract(d1, v2), std::domain_error);
+  EXPECT_THROW( subtract(v1, d2), std::domain_error);
+  EXPECT_THROW( subtract(v1, v2), std::domain_error);
 }
 // end subtract tests
 
@@ -786,7 +799,7 @@ TEST(agrad_matrix, minus_scalar) {
   double x = 10;
   var v = 11;
   
-  EXPECT_FLOAT_EQ(-10, stan::agrad::minus(x).val());
+  EXPECT_FLOAT_EQ(-10, stan::agrad::minus(x));
   EXPECT_FLOAT_EQ(-11, stan::agrad::minus(v).val());
 }
 TEST(agrad_matrix, minus_vector) {
@@ -796,13 +809,14 @@ TEST(agrad_matrix, minus_vector) {
   d << -100, 0, 1;
   v << -100, 0, 1;
   
-  vector_v output;
-  output = stan::agrad::minus (d);
-  EXPECT_FLOAT_EQ(100, output[0].val());
-  EXPECT_FLOAT_EQ(0, output[1].val());
-  EXPECT_FLOAT_EQ(-1, output[2].val());
+  vector_d output_d;
+  output_d = stan::agrad::minus(d);
+  EXPECT_FLOAT_EQ(100, output_d[0]);
+  EXPECT_FLOAT_EQ(0, output_d[1]);
+  EXPECT_FLOAT_EQ(-1, output_d[2]);
 
-  output = stan::agrad::minus (v);
+  vector_v output;
+  output = stan::agrad::minus(v);
   EXPECT_FLOAT_EQ(100, output[0].val());
   EXPECT_FLOAT_EQ(0, output[1].val());
   EXPECT_FLOAT_EQ(-1, output[2].val());
@@ -814,13 +828,14 @@ TEST(agrad_matrix, minus_rowvector) {
   d << -100, 0, 1;
   v << -100, 0, 1;
   
-  row_vector_v output;
-  output = stan::agrad::minus (d);
-  EXPECT_FLOAT_EQ(100, output[0].val());
-  EXPECT_FLOAT_EQ(0, output[1].val());
-  EXPECT_FLOAT_EQ(-1, output[2].val());
+  row_vector_d output_d;
+  output_d = stan::agrad::minus(d);
+  EXPECT_FLOAT_EQ(100, output_d[0]);
+  EXPECT_FLOAT_EQ(0, output_d[1]);
+  EXPECT_FLOAT_EQ(-1, output_d[2]);
 
-  output = stan::agrad::minus (v);
+  row_vector_v output;
+  output = stan::agrad::minus(v);
   EXPECT_FLOAT_EQ(100, output[0].val());
   EXPECT_FLOAT_EQ(0, output[1].val());
   EXPECT_FLOAT_EQ(-1, output[2].val());
@@ -832,16 +847,15 @@ TEST(agrad_matrix, minus_matrix) {
   d << -100, 0, 1, 20, -40, 2;
   v << -100, 0, 1, 20, -40, 2;
 
-  matrix_v output;
-  output = stan::agrad::minus (d);
-  EXPECT_FLOAT_EQ(100, output(0,0).val());
-  EXPECT_FLOAT_EQ(  0, output(0,1).val());
-  EXPECT_FLOAT_EQ( -1, output(0,2).val());
-  EXPECT_FLOAT_EQ(-20, output(1,0).val());
-  EXPECT_FLOAT_EQ( 40, output(1,1).val());
-  EXPECT_FLOAT_EQ( -2, output(1,2).val());
+  matrix_d output_d = stan::agrad::minus(d);
+  EXPECT_FLOAT_EQ(100, output_d(0,0));
+  EXPECT_FLOAT_EQ(  0, output_d(0,1));
+  EXPECT_FLOAT_EQ( -1, output_d(0,2));
+  EXPECT_FLOAT_EQ(-20, output_d(1,0));
+  EXPECT_FLOAT_EQ( 40, output_d(1,1));
+  EXPECT_FLOAT_EQ( -2, output_d(1,2));
 
-  output = stan::agrad::minus (v);
+  matrix_v output = stan::agrad::minus(v);
   EXPECT_FLOAT_EQ(100, output(0,0).val());
   EXPECT_FLOAT_EQ(  0, output(0,1).val());
   EXPECT_FLOAT_EQ( -1, output(0,2).val());
@@ -853,6 +867,7 @@ TEST(agrad_matrix, minus_matrix) {
 
 // divide tests
 TEST(agrad_matrix, divide_scalar) {
+  using stan::agrad::divide;
   double d1, d2;
   var    v1, v2;
 
@@ -861,27 +876,28 @@ TEST(agrad_matrix, divide_scalar) {
   d2 = -2;
   v2 = -2;
   
-  EXPECT_FLOAT_EQ(-5, stan::agrad::divide(d1, d2).val());
-  EXPECT_FLOAT_EQ(-5, stan::agrad::divide(d1, v2).val());
-  EXPECT_FLOAT_EQ(-5, stan::agrad::divide(v1, d2).val());
-  EXPECT_FLOAT_EQ(-5, stan::agrad::divide(v1, v2).val());
+  EXPECT_FLOAT_EQ(-5, divide(d1, d2));
+  EXPECT_FLOAT_EQ(-5, divide(d1, v2).val());
+  EXPECT_FLOAT_EQ(-5, divide(v1, d2).val());
+  EXPECT_FLOAT_EQ(-5, divide(v1, v2).val());
 
   d2 = 0;
   v2 = 0;
 
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::agrad::divide(d1, d2).val());
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::agrad::divide(d1, v2).val());
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::agrad::divide(v1, d2).val());
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::agrad::divide(v1, v2).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), divide(d1, d2));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), divide(d1, v2).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), divide(v1, d2).val());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), divide(v1, v2).val());
 
   d1 = 0;
   v1 = 0;
-  EXPECT_TRUE (std::isnan(stan::agrad::divide(d1, d2).val()));
-  EXPECT_TRUE (std::isnan(stan::agrad::divide(d1, v2).val()));
-  EXPECT_TRUE (std::isnan(stan::agrad::divide(v1, d2).val()));
-  EXPECT_TRUE (std::isnan(stan::agrad::divide(v1, v2).val()));
+  EXPECT_TRUE(std::isnan(divide(d1, d2)));
+  EXPECT_TRUE(std::isnan(divide(d1, v2).val()));
+  EXPECT_TRUE(std::isnan(divide(v1, d2).val()));
+  EXPECT_TRUE(std::isnan(divide(v1, v2).val()));
 }
 TEST(agrad_matrix, divide_vector) {
+  using stan::math::divide;
   vector_d d1(3);
   vector_v v1(3);
   double d2;
@@ -892,23 +908,24 @@ TEST(agrad_matrix, divide_vector) {
   d2 = -2;
   v2 = -2;
   
+  vector_d output_d;
+  output_d = divide(d1, d2);
+  EXPECT_FLOAT_EQ(-50, output_d(0));
+  EXPECT_FLOAT_EQ(  0, output_d(1));
+  EXPECT_FLOAT_EQ(1.5, output_d(2));
+
   vector_v output;
-  output = stan::agrad::divide(d1, d2);
+  output = divide(d1, v2);
   EXPECT_FLOAT_EQ(-50, output(0).val());
   EXPECT_FLOAT_EQ(  0, output(1).val());
   EXPECT_FLOAT_EQ(1.5, output(2).val());
 
-  output = stan::agrad::divide(d1, v2);
+  output = divide(v1, d2);
   EXPECT_FLOAT_EQ(-50, output(0).val());
   EXPECT_FLOAT_EQ(  0, output(1).val());
   EXPECT_FLOAT_EQ(1.5, output(2).val());
 
-  output = stan::agrad::divide(v1, d2);
-  EXPECT_FLOAT_EQ(-50, output(0).val());
-  EXPECT_FLOAT_EQ(  0, output(1).val());
-  EXPECT_FLOAT_EQ(1.5, output(2).val());
-
-  output = stan::agrad::divide(v1, v2);
+  output = divide(v1, v2);
   EXPECT_FLOAT_EQ(-50, output(0).val());
   EXPECT_FLOAT_EQ(  0, output(1).val());
   EXPECT_FLOAT_EQ(1.5, output(2).val());
@@ -916,27 +933,28 @@ TEST(agrad_matrix, divide_vector) {
 
   d2 = 0;
   v2 = 0;
-  output = stan::agrad::divide(d1, d2);
+  output_d = divide(d1, d2);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output_d(0));
+  EXPECT_TRUE (std::isnan(output_d(1)));
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output_d(2));
+
+  output = divide(d1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 
-  output = stan::agrad::divide(d1, v2);
+  output = divide(v1, d2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 
-  output = stan::agrad::divide(v1, d2);
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
-  EXPECT_TRUE (std::isnan(output(1).val()));
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
-
-  output = stan::agrad::divide(v1, v2);
+  output = divide(v1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 }
 TEST(agrad_matrix, divide_rowvector) {
+  using stan::math::divide;
   row_vector_d d1(3);
   row_vector_v v1(3);
   double d2;
@@ -947,51 +965,52 @@ TEST(agrad_matrix, divide_rowvector) {
   d2 = -2;
   v2 = -2;
   
+  row_vector_d output_d = divide(d1, d2);
+  EXPECT_FLOAT_EQ(-50, output_d(0));
+  EXPECT_FLOAT_EQ(  0, output_d(1));
+  EXPECT_FLOAT_EQ(1.5, output_d(2));
+
   row_vector_v output;
-  output = stan::agrad::divide(d1, d2);
+  output = divide(d1, v2);
   EXPECT_FLOAT_EQ(-50, output(0).val());
   EXPECT_FLOAT_EQ(  0, output(1).val());
   EXPECT_FLOAT_EQ(1.5, output(2).val());
 
-  output = stan::agrad::divide(d1, v2);
+  output = divide(v1, d2);
   EXPECT_FLOAT_EQ(-50, output(0).val());
   EXPECT_FLOAT_EQ(  0, output(1).val());
   EXPECT_FLOAT_EQ(1.5, output(2).val());
 
-  output = stan::agrad::divide(v1, d2);
+  output = divide(v1, v2);
   EXPECT_FLOAT_EQ(-50, output(0).val());
   EXPECT_FLOAT_EQ(  0, output(1).val());
   EXPECT_FLOAT_EQ(1.5, output(2).val());
-
-  output = stan::agrad::divide(v1, v2);
-  EXPECT_FLOAT_EQ(-50, output(0).val());
-  EXPECT_FLOAT_EQ(  0, output(1).val());
-  EXPECT_FLOAT_EQ(1.5, output(2).val());
-
 
   d2 = 0;
   v2 = 0;
-  output = stan::agrad::divide(d1, d2);
+  output_d = divide(d1, d2);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output_d(0));
+  EXPECT_TRUE(std::isnan(output_d(1)));
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output_d(2));
+
+  output = divide(d1, v2);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
+  EXPECT_TRUE(std::isnan(output(1).val()));
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
+
+  output = divide(v1, d2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 
-  output = stan::agrad::divide(d1, v2);
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
-  EXPECT_TRUE (std::isnan(output(1).val()));
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
-
-  output = stan::agrad::divide(v1, d2);
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
-  EXPECT_TRUE (std::isnan(output(1).val()));
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
-
-  output = stan::agrad::divide(v1, v2);
+  output = divide(v1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val());
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 }
 TEST(agrad_matrix, divide_matrix) {
+  using stan::math::divide;
+
   matrix_d d1(2,2);
   matrix_v v1(2,2);
   double d2;
@@ -1002,26 +1021,26 @@ TEST(agrad_matrix, divide_matrix) {
   d2 = -2;
   v2 = -2;
   
-  matrix_v output;
-  output = stan::agrad::divide(d1, d2);
-  EXPECT_FLOAT_EQ(-50, output(0,0).val());
-  EXPECT_FLOAT_EQ(  0, output(0,1).val());
-  EXPECT_FLOAT_EQ(1.5, output(1,0).val());
-  EXPECT_FLOAT_EQ( -2, output(1,1).val());
+  matrix_d output_d = divide(d1, d2);
+  EXPECT_FLOAT_EQ(-50, output_d(0,0));
+  EXPECT_FLOAT_EQ(  0, output_d(0,1));
+  EXPECT_FLOAT_EQ(1.5, output_d(1,0));
+  EXPECT_FLOAT_EQ( -2, output_d(1,1));
 
-  output = stan::agrad::divide(d1, v2);
+  matrix_v output;
+  output = divide(d1, v2);
   EXPECT_FLOAT_EQ(-50, output(0,0).val());
   EXPECT_FLOAT_EQ(  0, output(0,1).val());
   EXPECT_FLOAT_EQ(1.5, output(1,0).val());
   EXPECT_FLOAT_EQ( -2, output(1,1).val());
   
-  output = stan::agrad::divide(v1, d2);
+  output = divide(v1, d2);
   EXPECT_FLOAT_EQ(-50, output(0,0).val());
   EXPECT_FLOAT_EQ(  0, output(0,1).val());
   EXPECT_FLOAT_EQ(1.5, output(1,0).val());
   EXPECT_FLOAT_EQ( -2, output(1,1).val());
   
-  output = stan::agrad::divide(v1, v2);
+  output = divide(v1, v2);
   EXPECT_FLOAT_EQ(-50, output(0,0).val());
   EXPECT_FLOAT_EQ(  0, output(0,1).val());
   EXPECT_FLOAT_EQ(1.5, output(1,0).val());
@@ -1029,25 +1048,25 @@ TEST(agrad_matrix, divide_matrix) {
 
   d2 = 0;
   v2 = 0;
-  output = stan::agrad::divide(d1, d2);
+  output_d = divide(d1, d2);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output_d(0,0));
+  EXPECT_TRUE(std::isnan(output_d(0,1)));
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output_d(1,0));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output_d(1,1));
+
+  output = divide(d1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,0).val());
   EXPECT_TRUE (std::isnan(output(0,1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(1,0).val());
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1,1).val());
 
-  output = stan::agrad::divide(d1, v2);
+  output = divide(v1, d2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,0).val());
   EXPECT_TRUE (std::isnan(output(0,1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(1,0).val());
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1,1).val());
 
-  output = stan::agrad::divide(v1, d2);
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,0).val());
-  EXPECT_TRUE (std::isnan(output(0,1).val()));
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(1,0).val());
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1,1).val());
-
-  output = stan::agrad::divide(v1, v2);
+  output = divide(v1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,0).val());
   EXPECT_TRUE (std::isnan(output(0,1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(1,0).val());
@@ -1517,6 +1536,8 @@ TEST(agrad_matrix, sum_matrix) {
 
 // multiply tests
 TEST(agrad_matrix, multiply_scalar_scalar) {
+  using stan::agrad::multiply;
+  using stan::agrad::var;
   double d1, d2;
   var    v1, v2;
 
@@ -1525,9 +1546,16 @@ TEST(agrad_matrix, multiply_scalar_scalar) {
   d2 = -2;
   v2 = -2;
   
-  EXPECT_FLOAT_EQ(-20.0, stan::agrad::multiply(d1, v2).val());
-  EXPECT_FLOAT_EQ(-20.0, stan::agrad::multiply(v1, d2).val());
-  EXPECT_FLOAT_EQ(-20.0, stan::agrad::multiply(v1, v2).val());
+  EXPECT_FLOAT_EQ(-20.0, multiply(d1,d2));
+  EXPECT_FLOAT_EQ(-20.0, multiply(d1, v2).val());
+  EXPECT_FLOAT_EQ(-20.0, multiply(v1, d2).val());
+  EXPECT_FLOAT_EQ(-20.0, multiply(v1, v2).val());
+
+  EXPECT_FLOAT_EQ(6.0, multiply(var(3),var(2)).val());
+  EXPECT_FLOAT_EQ(6.0, multiply(3.0,var(2)).val());
+  EXPECT_FLOAT_EQ(6.0, multiply(var(3),2.0).val());
+
+  
 }
 TEST(agrad_matrix, multiply_vector_scalar) {
   vector_d d1(3);
@@ -1541,17 +1569,17 @@ TEST(agrad_matrix, multiply_vector_scalar) {
   v2 = -2;
   
   vector_v output;
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_FLOAT_EQ(-200, output(0).val());
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
 
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_FLOAT_EQ(-200, output(0).val());
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
 
-  output = stan::agrad::multiply(v1, v2);
+  output = multiply(v1, v2);
   EXPECT_FLOAT_EQ(-200, output(0).val());
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
@@ -1568,17 +1596,17 @@ TEST(agrad_matrix, multiply_rowvector_scalar) {
   v2 = -2;
   
   row_vector_v output;
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_FLOAT_EQ(-200, output(0).val());
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
 
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_FLOAT_EQ(-200, output(0).val());
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
 
-  output = stan::agrad::multiply(v1, v2);
+  output = multiply(v1, v2);
   EXPECT_FLOAT_EQ(-200, output(0).val());
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
@@ -1595,19 +1623,19 @@ TEST(agrad_matrix, multiply_matrix_scalar) {
   v2 = -2;
   
   matrix_v output;
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_FLOAT_EQ(-200, output(0,0).val());
   EXPECT_FLOAT_EQ(   0, output(0,1).val());
   EXPECT_FLOAT_EQ(   6, output(1,0).val());
   EXPECT_FLOAT_EQ(  -8, output(1,1).val());
 
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_FLOAT_EQ(-200, output(0,0).val());
   EXPECT_FLOAT_EQ(   0, output(0,1).val());
   EXPECT_FLOAT_EQ(   6, output(1,0).val());
   EXPECT_FLOAT_EQ(  -8, output(1,1).val());
  
-  output = stan::agrad::multiply(v1, v2);
+  output = multiply(v1, v2);
   EXPECT_FLOAT_EQ(-200, output(0,0).val());
   EXPECT_FLOAT_EQ(   0, output(0,1).val());
   EXPECT_FLOAT_EQ(   6, output(1,0).val());
@@ -1624,15 +1652,15 @@ TEST(agrad_matrix, multiply_rowvector_vector) {
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
 
-  EXPECT_FLOAT_EQ(3, stan::agrad::multiply(v1, v2).val());
-  EXPECT_FLOAT_EQ(3, stan::agrad::multiply(v1, d2).val());
-  EXPECT_FLOAT_EQ(3, stan::agrad::multiply(d1, v2).val());
+  EXPECT_FLOAT_EQ(3, multiply(v1, v2).val());
+  EXPECT_FLOAT_EQ(3, multiply(v1, d2).val());
+  EXPECT_FLOAT_EQ(3, multiply(d1, v2).val());
   
   d1.resize(1);
   v1.resize(1);
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 TEST(agrad_matrix, multiply_vector_rowvector) {
   vector_d d1(3);
@@ -1645,7 +1673,7 @@ TEST(agrad_matrix, multiply_vector_rowvector) {
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
 
-  matrix_v output = stan::agrad::multiply(v1, v2);
+  matrix_v output = multiply(v1, v2);
   EXPECT_EQ(3, output.rows());
   EXPECT_EQ(3, output.cols());
   EXPECT_FLOAT_EQ(  4, output(0,0).val());
@@ -1658,7 +1686,7 @@ TEST(agrad_matrix, multiply_vector_rowvector) {
   EXPECT_FLOAT_EQ( 10, output(2,1).val());
   EXPECT_FLOAT_EQ(  5, output(2,2).val());
   
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_EQ(3, output.rows());
   EXPECT_EQ(3, output.cols());
   EXPECT_FLOAT_EQ(  4, output(0,0).val());
@@ -1671,7 +1699,7 @@ TEST(agrad_matrix, multiply_vector_rowvector) {
   EXPECT_FLOAT_EQ( 10, output(2,1).val());
   EXPECT_FLOAT_EQ(  5, output(2,2).val());
   
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_EQ(3, output.rows());
   EXPECT_EQ(3, output.cols());
   EXPECT_FLOAT_EQ(  4, output(0,0).val());
@@ -1695,20 +1723,20 @@ TEST(agrad_matrix, multiply_matrix_vector) {
   d2 << -2, 4;
   v2 << -2, 4;
 
-  vector_v output = stan::agrad::multiply(v1, v2);
+  vector_v output = multiply(v1, v2);
   EXPECT_EQ(3, output.size());
   EXPECT_FLOAT_EQ(10, output(0).val());
   EXPECT_FLOAT_EQ(26, output(1).val());
   EXPECT_FLOAT_EQ( 0, output(2).val());
 
   
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_EQ(3, output.size());
   EXPECT_FLOAT_EQ(10, output(0).val());
   EXPECT_FLOAT_EQ(26, output(1).val());
   EXPECT_FLOAT_EQ( 0, output(2).val());
   
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_EQ(3, output.size());
   EXPECT_FLOAT_EQ(10, output(0).val());
   EXPECT_FLOAT_EQ(26, output(1).val());
@@ -1719,9 +1747,9 @@ TEST(agrad_matrix, multiply_matrix_vector_exception) {
   matrix_v v1(3,2);
   vector_d d2(4);
   vector_v v2(4);
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 TEST(agrad_matrix, multiply_rowvector_matrix) {
   row_vector_d d1(3);
@@ -1734,17 +1762,17 @@ TEST(agrad_matrix, multiply_rowvector_matrix) {
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
 
-  vector_v output = stan::agrad::multiply(v1, v2);
+  vector_v output = multiply(v1, v2);
   EXPECT_EQ(2, output.size());
   EXPECT_FLOAT_EQ(-24, output(0).val());
   EXPECT_FLOAT_EQ(  9, output(1).val());
 
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_EQ(2, output.size());
   EXPECT_FLOAT_EQ(-24, output(0).val());
   EXPECT_FLOAT_EQ(  9, output(1).val());
   
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_EQ(2, output.size());
   EXPECT_FLOAT_EQ(-24, output(0).val());
   EXPECT_FLOAT_EQ(  9, output(1).val());
@@ -1754,9 +1782,9 @@ TEST(agrad_matrix, multiply_rowvector_matrix_exception) {
   row_vector_v v1(4);
   matrix_d d2(3,2);
   matrix_v v2(3,2);
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 TEST(agrad_matrix, multiply_matrix_matrix) {
   matrix_d d1(2,3);
@@ -1769,7 +1797,7 @@ TEST(agrad_matrix, multiply_matrix_matrix) {
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
 
-  matrix_v output = stan::agrad::multiply(v1, v2);
+  matrix_v output = multiply(v1, v2);
   EXPECT_EQ(2, output.rows());
   EXPECT_EQ(2, output.cols());
   EXPECT_FLOAT_EQ(-117, output(0,0).val());
@@ -1777,7 +1805,7 @@ TEST(agrad_matrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ( 157, output(1,0).val());
   EXPECT_FLOAT_EQ( 135, output(1,1).val());
 
-  output = stan::agrad::multiply(v1, d2);
+  output = multiply(v1, d2);
   EXPECT_EQ(2, output.rows());
   EXPECT_EQ(2, output.cols());
   EXPECT_FLOAT_EQ(-117, output(0,0).val());
@@ -1785,7 +1813,7 @@ TEST(agrad_matrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ( 157, output(1,0).val());
   EXPECT_FLOAT_EQ( 135, output(1,1).val());
   
-  output = stan::agrad::multiply(d1, v2);
+  output = multiply(d1, v2);
   EXPECT_EQ(2, output.rows());
   EXPECT_EQ(2, output.cols());
   EXPECT_FLOAT_EQ(-117, output(0,0).val());
@@ -1799,15 +1827,19 @@ TEST(agrad_matrix, multiply_matrix_matrix_exception) {
   matrix_d d2(3,2);
   matrix_v v2(3,2);
 
-  EXPECT_THROW(stan::agrad::multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, d2), std::domain_error);
+  EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 // end multiply tests
 
 
 
 TEST(agrad_matrix,transpose_matrix) {
+  using stan::math::transpose;
+  EXPECT_EQ(0,transpose(matrix_v()).size());
+  EXPECT_EQ(0,transpose(matrix_d()).size());
+
   matrix_v a(2,3);
   a << -1.0, 2.0, -3.0, 
         5.0, 10.0, 100.0;
@@ -2013,6 +2045,8 @@ TEST(agrad_matrix,inverse_val) {
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  EXPECT_THROW(inverse(matrix_v(2,3)), std::domain_error);
 }
 TEST(agrad_matrix,inverse_grad) {
   using stan::math::inverse;
@@ -2071,6 +2105,8 @@ TEST(agrad_matrix,inverse_inverse_sum) {
 TEST(agrad_matrix,eigenval_sum) {
   using stan::math::eigenvalues;
   using stan::math::sum;
+
+  EXPECT_THROW(eigenvalues(matrix_v(3,2)), std::domain_error);
 
   matrix_v a(3,3);
   a << 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 13.0, 11.0, 19.0;
@@ -2473,7 +2509,7 @@ TEST(agradMatrix,elt_divide_vec_vv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 TEST(agradMatrix,elt_divide_vec_vd) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   vector_v x(2);
   x << 2, 5;
   vector_d y(2);
@@ -2488,7 +2524,7 @@ TEST(agradMatrix,elt_divide_vec_vd) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 TEST(agradMatrix,elt_divide_vec_dv) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   vector_d x(2);
   x << 2, 5;
   vector_v y(2);
@@ -2621,11 +2657,13 @@ TEST(agradMatrix,col_v_exc0) {
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
   EXPECT_THROW(col(y,0),std::domain_error);
+  EXPECT_THROW(col(y,7),std::domain_error);
 }
 TEST(agradMatrix,col_v_excHigh) {
   using stan::agrad::col;
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
+  EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,5),std::domain_error);
 }
 TEST(agradMatrix,row_v) {
@@ -2649,11 +2687,13 @@ TEST(agradMatrix,row_v_exc0) {
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
   EXPECT_THROW(row(y,0),std::domain_error);
+  EXPECT_THROW(row(y,7),std::domain_error);
 }
 TEST(agradMatrix,row_v_excHigh) {
   using stan::agrad::row;
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
+  EXPECT_THROW(row(y,0),std::domain_error);
   EXPECT_THROW(row(y,5),std::domain_error);
 }
 TEST(agradMatrix, dot_product_vv) {
@@ -2839,6 +2879,8 @@ TEST(MathMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
+
+  EXPECT_THROW(softmax(vector_v()),std::domain_error);
   
   Matrix<var,Dynamic,1> x(1);
   x << 0.0;
@@ -3126,4 +3168,18 @@ TEST(AgradMatrix,prod) {
   EXPECT_FLOAT_EQ(3.0,g[0]);
   EXPECT_FLOAT_EQ(2.0,g[1]);
   
+}
+TEST(AgradMatrix,diagMatrix) {
+  using stan::math::diag_matrix;
+  EXPECT_EQ(0,diag_matrix(vector_v()).size());
+  EXPECT_EQ(4,diag_matrix(vector_v(2)).size());
+  EXPECT_EQ(0,diag_matrix(vector_d()).size());
+  EXPECT_EQ(4,diag_matrix(vector_d(2)).size());
+
+  vector_v v(3);
+  v << 1, 4, 9;
+  matrix_v m = diag_matrix(v);
+  EXPECT_EQ(1,m(0,0).val());
+  EXPECT_EQ(4,m(1,1).val());
+  EXPECT_EQ(9,m(2,2).val());
 }

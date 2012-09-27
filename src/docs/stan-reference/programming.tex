@@ -305,7 +305,64 @@ the data for \code{y} to respect the constraint;  this will be checked
 when the data is loaded into the model before sampling begins.
 
 This model implicitly uses an improper flat prior on the scale and
-location parameters; these could be given priors in the model.
+location parameters; these could be given priors in the model using
+sampling statements.
+
+\subsection{Constraints and Out-of-Bounds Returns}\label{truncation-constraints.section}
+
+If the sampled variate in a truncated distribution lies outside of
+the truncation range, the probability is zero, so the log probability
+will evaluate to $-\infty$.  For instance, if variate \code{y} is
+sampled with the statement.
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N) 
+    y[n] ~ normal(mu,sigma) T[L,U];
+\end{Verbatim}
+\end{quote}
+%
+then if the value of \code{y[n]} is less than the value of \code{L}
+or greater than the value of \code{U}, the sampling statement produces
+a zero-probability estimate.
+
+To avoid variables straying outside of truncation bounds, appropriate
+constraints are required.  For exmaple, if \code{y} is a parameter in
+the above model, the declaration should constrain it to fall between
+the values of \code{L} and \code{U}.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+    real<lower=L,upper=U> y[N];
+    ...
+\end{Verbatim}
+\end{quote}
+
+If in the above model, \code{L} or \code{U} is a parameter and
+\code{y} is data, then \code{L} and \code{U} must be appropriately
+constrained so that all data is in range and the value of \code{L} is
+less than that of \code{U} (if they are equal, the parameter range
+collapses to a single point and the Hamiltonian dynamics used by 
+the sampler break down).  The following declarations ensure the bounds
+are well behaved.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+    real<upper=min(y)> L; // L < y[n]
+    real<lower=fmax(L,max(y))> U; // L < U; y[n] < U
+\end{Verbatim}
+\end{quote}
+%
+Note that for pairs of real numbers, the function \code{fmax} is used
+rather than \code{max}.
+
+
+
+
+
+
 
 \subsection{Unknown Truncation Points}
 
