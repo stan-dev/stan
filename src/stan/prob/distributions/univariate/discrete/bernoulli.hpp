@@ -91,11 +91,12 @@ namespace stan {
 	  }
 	  
 	  // gradient
-	  if (include_summand<propto,T_prob>::value)
+	  if (include_summand<propto,T_prob>::value) {
 	    if (n_int == 1)
 	      operands_and_partials.d_x1[n] += 1.0 / theta_dbl;
 	    else
 	      operands_and_partials.d_x1[n] += 1.0 / (theta_dbl - 1);
+	  }
 	}
       }
       return operands_and_partials.to_var(logp);
