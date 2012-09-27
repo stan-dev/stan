@@ -6,7 +6,6 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix.hpp>
 
-
 namespace stan {
 
   /**
@@ -163,6 +162,64 @@ namespace stan {
     // assert((length(x3) == 1) || (length(x3) == result));
     return result;
   }
+  
+  template<typename T, 
+	   bool is_vec = stan::is_vector<T>::value>
+  class VectorView_new {
+  private:
+    T* x_;
+  public:
+    VectorView_new(T& x) : x_(&x) { }
+    typename scalar_type<T>::type& operator[](int /*i*/) {
+      return *x_;
+    }
+  };
+  
+  template<typename T>
+  class VectorView_new<T*,false> {
+  private:
+    T* x_;
+  public:
+    VectorView_new(T* x) : x_(x) { }
+    typename scalar_type<T>::type& operator[](int i) {
+      return *x_;
+    }
+  };
+  
+  template<typename T>
+  class VectorView_new<T,true> {
+  private:
+    T* x_;
+  public:
+    VectorView_new(T& x) : x_(&x) { }
+    typename scalar_type<T>::type& operator[](int i) {
+      return (*x_)[i];
+    }
+  };
+  
+  template<typename T>
+  class VectorView_new<T*,true> {
+  private:
+    T* x_;
+  public:
+    VectorView_new(T* x) : x_(x) { }
+    typename scalar_type<T>::type& operator[](int i) {
+      return x_[i];
+    }
+  };
+
+  template<typename T>
+  class VectorView_new<const T,true> {
+  private:
+    const T* x_;
+  public:
+    VectorView_new(const T& x) : x_(&x) { }
+    typename scalar_type<T>::type operator[](int i) {
+      return (*x_)[i];
+    }
+  };
+
+  
 
   // two template params for use in partials_vari OperandsAndPartials
   template<typename T, bool is_vec = stan::is_vector<T>::value>
@@ -175,21 +232,27 @@ namespace stan {
       return x_; 
     }
   };
-
-  template<typename T, bool is_vec>
-  class VectorView<T*, is_vec> {
+  template<typename T>
+  class VectorView<T*,true> {
   private:
     T* x_;
   public:
     VectorView(T* x) : x_(x) { }
     T& operator[](int i) { 
-      if (is_vec)
-        return x_[i];
-      else
-        return *x_;
+      return x_[i];
     }
   };
-
+  template<typename T>
+  class VectorView<T*,false> {
+  private:
+    T* x_;
+  public:
+    VectorView(T* x) : x_(x) { }
+    T& operator[](int /*i*/) { 
+      return *x_;
+    }
+  };
+  
   template<typename T>
   class VectorView<std::vector<T>, true> {
   private:
@@ -279,7 +342,7 @@ namespace stan {
   private:
     std::vector<double> x_;
   public:
-    DoubleVectorView(const T& x) : x_(stan::length(x)) { }
+    DoubleVectorView(const T& x) : x_(length(x)) { }
     double& operator[](size_t i) {
       return x_[i];
     }

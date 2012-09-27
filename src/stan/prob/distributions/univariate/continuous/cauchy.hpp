@@ -78,9 +78,9 @@ namespace stan {
       using stan::math::square;
       
       // set up template expressions wrapping scalars into vector views
-      VectorView<const T_y> y_vec(y);
-      VectorView<const T_loc> mu_vec(mu);
-      VectorView<const T_scale> sigma_vec(sigma);
+      VectorView_new<const T_y> y_vec(y);
+      VectorView_new<const T_loc> mu_vec(mu);
+      VectorView_new<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
       DoubleVectorView<true, T_scale> inv_sigma(sigma);

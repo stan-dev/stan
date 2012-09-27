@@ -89,9 +89,9 @@ namespace stan {
 	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
-      VectorView<const T_y> y_vec(y);
-      VectorView<const T_scale_succ> alpha_vec(alpha);
-      VectorView<const T_scale_fail> beta_vec(beta);
+      VectorView_new<const T_y> y_vec(y);
+      VectorView_new<const T_scale_succ> alpha_vec(alpha);
+      VectorView_new<const T_scale_fail> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
 

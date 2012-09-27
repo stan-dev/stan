@@ -57,8 +57,8 @@ namespace stan {
 	return 0.0;
 
       // set up template expressions wrapping scalars into vector views
-      VectorView<const T_n> n_vec(n);
-      VectorView<const T_prob> theta_vec(theta);
+      VectorView_new<const T_n> n_vec(n);
+      VectorView_new<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
 
@@ -160,8 +160,8 @@ namespace stan {
 	return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      VectorView<const T_n> n_vec(n);
-      VectorView<const T_prob> theta_vec(theta);
+      VectorView_new<const T_n> n_vec(n);
+      VectorView_new<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
 
