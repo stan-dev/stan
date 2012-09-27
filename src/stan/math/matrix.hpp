@@ -1363,6 +1363,30 @@ namespace stan {
      */
     matrix_d multiply(double c, const matrix_d& m);
 
+    /**
+     * Returns the result of multiplying the lower triangular
+     * portion of the square input matrix by its own transpose.
+     * @param L Matrix to multiply.
+     * @return The lower triangular values in L times their own
+     * transpose.
+     * @throw std::domain_error If the input matrix is not square.
+     */
+    inline matrix_d
+    multiply_lower_tri_self_transpose(const matrix_d& L) {
+      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
+      if (L.rows() == 0)
+        return matrix_d(0,0);
+      if (L.rows() == 1) {
+        matrix_d result(1,1);
+        result(0,0) = L(0,0) * L(0,0);
+        return result;
+      }
+      // FIXME:  write custom following agrad/matrix because can't get L_tri into
+      // multiplication as no template support for tri * tri
+      matrix_d L_tri = L.transpose().triangularView<Eigen::Upper>();
+      return L.triangularView<Eigen::Lower>() * L_tri;
+    }
+
 
 
     /**

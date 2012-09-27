@@ -3183,3 +3183,85 @@ TEST(AgradMatrix,diagMatrix) {
   EXPECT_EQ(4,m(1,1).val());
   EXPECT_EQ(9,m(2,2).val());
 }
+
+
+std::vector<double> grad_eigen(const matrix_v& L, 
+                               int m_test, int n_test) {
+  size_t K = (L.rows() * (L.rows() + 1)) / 2;
+  std::vector<var> x(K);
+  int pos = 0;
+  for (int m = 0; m < L.rows(); ++m)
+    for (int n = 0; n <= m; ++n)
+      x[pos++] = L(m,n);
+  matrix_v LLT =  L * L.transpose();  // eigen
+  var f = LLT(m_test,n_test);
+  std::vector<double> g;
+  f.grad(x,g);
+  return g;
+}
+
+std::vector<double> grad_stan(const matrix_v& L, 
+                              int m_test, int n_test) {
+  size_t K = (L.rows() * (L.rows() + 1)) / 2;
+  std::vector<var> x(K);
+  int pos = 0;
+  for (int m = 0; m < L.rows(); ++m)
+    for (int n = 0; n <= m; ++n)
+      x[pos++] = L(m,n);
+  matrix_v LLT =  multiply_lower_tri_self_transpose(L);
+  var f = LLT(m_test,n_test);
+  std::vector<double> g;
+  f.grad(x,g);
+  return g;
+}
+
+void test_LLT_grad(const matrix_v& L, int m_test, int n_test) {
+  using std::vector;
+  vector<double> g_eigen = grad_eigen(L,m_test,n_test);
+  vector<double> g_stan = grad_stan(L,m_test,n_test);
+  std::cout << "********** GRAD SIZE=" << g_eigen.size() << std::endl;
+  EXPECT_EQ(g_eigen.size(), g_stan.size());
+  for (size_t i = 0; i < g_eigen.size(); ++i)
+    EXPECT_FLOAT_EQ(g_eigen[i], g_stan[i]);
+}
+
+void test_mult_LLT_grad(const matrix_v& L) {
+  for (int m1 = 0; m1 < L.rows(); ++m1)
+    for (int n1 = 0; n1 < L.cols(); ++n1) 
+      test_LLT_grad(L,m1,n1);
+}
+
+
+void test_mult_LLT(const matrix_v& L) {
+  using stan::agrad::var;
+  matrix_v LLT_eigen = L * L.transpose();
+  matrix_v LLT_stan = multiply_lower_tri_self_transpose(L);
+  EXPECT_EQ(L.rows(),LLT_stan.rows());
+  EXPECT_EQ(L.cols(),LLT_stan.cols());
+  for (int m = 0; m < L.rows(); ++m)
+    for (int n = 0; n < L.cols(); ++n)
+      EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());  
+
+  
+}
+
+TEST(AgradMatrix, multiplyLowerTriSelfTranspose) {
+  using stan::agrad::multiply_lower_tri_self_transpose;
+  matrix_v L(3,3);
+  L << 1, 0, 0,   
+       2, 3, 0,   
+       4, 5, 6;
+  test_mult_LLT(L);
+
+  matrix_v I(2,2);
+  I << 3, 0, 
+       4, -3;
+  test_mult_LLT(I);
+
+  matrix_v J(1,1);
+  J << 3.0;
+  test_mult_LLT(J);
+
+  matrix_v K(0,0);
+  test_mult_LLT(K);
+}

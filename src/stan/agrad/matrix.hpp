@@ -588,6 +588,11 @@ namespace stan {
         vari** v_;
         size_t size_;
       public:
+        dot_self_vari(vari** v, size_t size) 
+          : vari(var_dot_self(v,size)), 
+            v_(v),
+            size_(size) {
+        }
         template <int R, int C>
         dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
           vari(var_dot_self(v)), size_(v.size()) {
@@ -596,6 +601,12 @@ namespace stan {
             v_[i] = v(i).vi_;
         }
         inline static double square(double x) { return x * x; }
+        inline static double var_dot_self(vari** v, size_t size) {
+          double sum = 0.0;
+          for (size_t i = 0; i < size; ++i)
+            sum += square(v[i]->val_);
+          return sum;
+        }
         template <int R, int C>
         inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
           double sum = 0.0;
@@ -673,7 +684,20 @@ namespace stan {
             result += v1[i].vi_->val_ * v2[i].vi_->val_;
           return result;
         }
+        inline static double var_dot(vari** v1, vari** v2, size_t length) {
+          double result = 0;
+          for (int i = 0; i < length; ++i)
+            result += v1[i]->val_ * v2[i]->val_;
+          return result;
+        }
       public:
+        dot_product_vv_vari(vari** v1, vari** v2, size_t length)
+          : vari(var_dot(v1,v2,length)),
+            v1_(v1), 
+            v2_(v2), 
+            length_(length) {
+
+        }
         dot_product_vv_vari(const var* v1, const var* v2, size_t length,
                             dot_product_vv_vari* shared_v1 = NULL,
                             dot_product_vv_vari* shared_v2 = NULL) : 
@@ -1447,6 +1471,32 @@ namespace stan {
                         const Eigen::Matrix<double, R2, 1>& v) {
       stan::math::validate_multiplicable(rv,v,"multiply");
       return dot_product(rv, v);
+    }
+
+    inline matrix_v 
+    multiply_lower_tri_self_transpose(const matrix_v& L) {
+      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
+      int K = L.rows();
+      matrix_v LLt(K,K);
+      if (K == 0) return LLt;
+      if (K == 1) {
+        LLt(0,0) = L(0,0) * L(0,0);
+        return LLt;
+      }
+      int Knz = (K * (K + 1)) / 2;  // nonzero: (K choose 2) below
+                                    // diag + K on diag
+      vari** vs = (vari**)memalloc_.alloc( Knz * sizeof(vari*) );
+      int pos = 0;
+      for (int m = 0; m < K; ++m)
+        for (int n = 0; n <= m; ++n)
+          vs[pos++] = L(m,n).vi_;
+      for (int m = 0, mpos=0; m < K; ++m, mpos += m) {
+        // FIXME: replace with dot self
+        LLt(m,m) = var(new dot_self_vari(vs + mpos, m + 1));
+        for (int n = 0, npos = 0; n < m; ++n, npos += n)
+          LLt(m,n) = LLt(n,m) = var(new dot_product_vv_vari(vs + mpos, vs + npos, n + 1));
+      }
+      return LLt;
     }
 
     /**

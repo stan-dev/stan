@@ -1435,3 +1435,36 @@ TEST(MathMatrix, minus) {
   using stan::math::singular_values;
   EXPECT_NO_THROW(singular_values(m0));
 }
+void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
+  using stan::math::multiply_lower_tri_self_transpose;
+  matrix_d y = multiply_lower_tri_self_transpose(x);
+  matrix_d xxt = x * x.transpose();
+  EXPECT_EQ(y.rows(),xxt.rows());
+  EXPECT_EQ(y.cols(),xxt.cols());
+  for (int m = 0; m < y.rows(); ++m)
+    for (int n = 0; n < y.cols(); ++n)
+      EXPECT_FLOAT_EQ(xxt(m,n),y(m,n));
+}
+TEST(MathMatrix,MultiplyLowerTriSelfTranspose) {
+  matrix_d x;
+  test_multiply_lower_tri_self_transpose(x);
+
+  x = matrix_d(1,1);
+  x << 3.0;
+  test_multiply_lower_tri_self_transpose(x);
+
+  x = matrix_d(2,2);
+  x << 
+    1.0, 0.0,
+    2.0, 3.0;
+  test_multiply_lower_tri_self_transpose(x);
+
+  x = matrix_d(3,3);
+  x << 
+    1.0, 0.0, 0.0,
+    2.0, 3.0, 0.0,
+    4.0, 5.0, 6.0;
+  test_multiply_lower_tri_self_transpose(x);
+}
+
+
