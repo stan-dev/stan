@@ -14,30 +14,12 @@ namespace stan {
     }
 
     row_vector_v row(const matrix_v& m, size_t i) {
-      if (i == 0U) {
-        throw std::domain_error("row() indexes from 1; found index i=0");
-      }
-      if (i > static_cast<size_t>(m.rows())) {
-        std::stringstream msg;
-        msg << "index must be less than or equal to number of rows"
-            << " found m.rows()=" << m.rows()
-            << "; i=" << i;
-        throw std::domain_error(msg.str());
-      }
+      stan::math::validate_row_index(m,i,"row");
       return m.row(i - 1);
     }
 
     vector_v col(const matrix_v& m, size_t j) {
-      if (j == 0U) {
-        throw std::domain_error("row() indexes from 1; found index i=0");
-      }
-      if (j > static_cast<size_t>(m.cols())) {
-        std::stringstream msg;
-        msg << "index must be less than or equal to number of rows"
-            << " found m.cols()=" << m.cols()
-            << "; =" << j;
-        throw std::domain_error(msg.str());
-      }
+      stan::math::validate_column_index(m,j,"col");
       return m.col(j - 1);
     }
 
@@ -62,16 +44,19 @@ namespace stan {
     }
 
     matrix_v inverse(const matrix_v& m) {
+      stan::math::validate_square(m,"inverse");
       return m.inverse();
     }
 
     vector_v softmax(const vector_v& x) {
+      stan::math::validate_nonzero_size(x,"vector softmax");
       vector_v theta(x.size());
       stan::math::softmax<vector_v,stan::agrad::var>(x,theta);
       return theta;
     }
 
     vector_v eigenvalues(const matrix_v& m) {
+      stan::math::validate_square(m,"eigenvalues");
       // false == no vectors
       Eigen::EigenSolver<matrix_v> solver(m,false);
       // FIXME: test imag() all 0?
@@ -79,6 +64,8 @@ namespace stan {
     }
 
     matrix_v eigenvectors(const matrix_v& m) {
+      stan::math::validate_nonzero_size(m,"eigenvectors");
+      stan::math::validate_square(m,"eigenvectors");
       Eigen::EigenSolver<matrix_v> solver(m);
       return solver.eigenvectors().real();
     }
@@ -92,11 +79,15 @@ namespace stan {
     }
 
     vector_v eigenvalues_sym(const matrix_v& m) {
+      stan::math::validate_nonzero_size(m,"eigenvalues_sym");
+      stan::math::validate_square(m,"eigenvalues_sym");
       Eigen::SelfAdjointEigenSolver<matrix_v> solver(m,Eigen::EigenvaluesOnly);
       return solver.eigenvalues().real();
     }
 
     matrix_v eigenvectors_sym(const matrix_v& m) {
+      stan::math::validate_nonzero_size(m,"eigenvectors_sym");
+      stan::math::validate_square(m,"eigenvectors_sym");
       Eigen::SelfAdjointEigenSolver<matrix_v> solver(m);
       return solver.eigenvectors().real();
     }
@@ -110,9 +101,7 @@ namespace stan {
     }
 
     matrix_v cholesky_decompose(const matrix_v& m) {
-      if (m.rows() != m.cols()) {
-        throw std::domain_error ("m must be a square matrix");
-      }
+      stan::math::validate_square(m,"cholesky decomposition");
       Eigen::LLT<matrix_v> llt(m.rows());
       llt.compute(m);
       return llt.matrixL();

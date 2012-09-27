@@ -298,14 +298,15 @@ TEST(matrix,get_base1_8) {
 }
 
 // exp tests
-TEST(matrix_test, exp__matrix) {
+TEST(matrix_test, expMatrix) {
+  using stan::math::exp;
   matrix_d expected_output(2,2);
   matrix_d mv(2,2), output;
   int i,j;
 
   mv << 1, 2, 3, 4;
   expected_output << std::exp(1), std::exp(2), std::exp(3), std::exp(4);
-  output = stan::math::exp(mv);
+  output = exp(mv);
 
   for (i = 0; i < 2; i++)
     for (j = 0; j < 2; j++)
@@ -313,14 +314,15 @@ TEST(matrix_test, exp__matrix) {
 }
 
 // log tests
-TEST(matrix_test, log__matrix) {
+TEST(matrix_test, logMatrix) {
+  using stan::math::log;
   matrix_d expected_output(2,2);
   matrix_d mv(2,2), output;
   int i,j;
 
   mv << 1, 2, 3, 4;
   expected_output << std::log(1), std::log(2), std::log(3), std::log(4);
-  output = stan::math::log(mv);
+  output = log(mv);
 
   for (i = 0; i < 2; i++)
     for (j = 0; j < 2; j++)
@@ -824,8 +826,6 @@ TEST(matrixTest,eltDivideMatrix) {
   m2 << 10, 100, 1000, 10000, 100000, 1000000;
   matrix_d m = stan::math::elt_divide(m1,m2);
   
-  std::cout << m << std::endl;
-
   EXPECT_EQ(2,m.rows());
   EXPECT_EQ(3,m.cols());
   EXPECT_FLOAT_EQ(0.1, m(0,0));
@@ -1383,9 +1383,12 @@ TEST(MathMatrix, minus) {
 
   using stan::math::col;
   EXPECT_THROW(col(m1,5),std::domain_error);
+  EXPECT_THROW(col(m1,0),std::domain_error);
+  
 
   using stan::math::row;
   EXPECT_THROW(row(m1,5),std::domain_error);
+  EXPECT_THROW(row(m1,0),std::domain_error);
 
   using stan::math::diagonal;
   EXPECT_NO_THROW(diagonal(m0));

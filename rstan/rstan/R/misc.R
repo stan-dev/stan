@@ -10,11 +10,11 @@ filename_rm_ext <- function(x) {
   sub("\\.[^.]*$", "", x)
 } 
 
-#   is.whole.number <- function(x) {
+#   is_whole_number <- function(x) {
 #     all.equal(x, round(x), check.attributes = FALSE) 
 #   } 
 
-#   as.integer.if.doable <- function(y) {
+#   as_integer_if_doable <- function(y) {
 #     if (!is.numeric(y)) return(y) 
 #     if (is.integer(y)) return(y) 
 #     if (isTRUE(all.equal(y, round(y), check.attributes = FALSE))) 
@@ -86,8 +86,7 @@ is_legal_stan_vname <- function(name) {
   if (name %in% stan_kw1) return(FALSE)
   if (name %in% stan_kw2) return(FALSE)
   if (name %in% stan_kw3) return(FALSE)
-  if (name %in% cpp_kw)   return(FALSE)
-  TRUE 
+  !name %in% cpp_kw
 } 
 
 data_preprocess <- function(data) { # , varnames) {
@@ -248,6 +247,19 @@ append_id <- function(file, id, suffix = '.csv') {
 
 config_argss <- function(chains, iter, warmup, thin, 
                         init, seed, sample_file, ...) {
+
+  iter <- as.integer(iter) 
+  if (iter < 1) 
+    stop("parameter 'iter' should be a positive integer")
+  thin <- as.integer(thin) 
+  if (thin < 1 || thin > iter) 
+    stop("parameter 'thin' should be a positive integer less than 'iter'")
+  warmup <- max(0, as.integer(warmup)) 
+  if (warmup > iter) 
+    stop("parameter 'warmup' should be an integer less than 'iter'")
+  chains <- as.integer(chains) 
+  if (chains < 1) 
+    stop("parameter 'chains' should be a positive integer")
 
   iters <- rep(iter, chains)   
   thins <- rep(thin, chains)  
@@ -431,23 +443,24 @@ stan_rdump <- function(list, file = "", append = FALSE,
 get_rhat_cols <- function(rhats) {
   # 
   # Args:
-  #   rhat: a scalar 
+  #   rhats: a vector of rhats
   #
-  rhat.na.col <- rstan_options("plot_rhat_na.col")
-  rhat.breaks <- rstan_options("plot_rhat_breaks")
-  # print(rhat.breaks)
-  rhat.colors <- rstan_options("plot_rhat_cols")
+  rhat_nan_col <- rstan_options("plot_rhat_nan_col")
+  rhat_large_col <- rstan_options("plot_rhat_large_col")
+  rhat_breaks <- rstan_options("plot_rhat_breaks")
+  # print(rhat_breaks)
+  rhat_colors <- rstan_options("plot_rhat_cols")
 
   sapply(rhats, 
          FUN = function(x) {
            if (is.na(x) || is.nan(x) || is.infinite(x))
-             return(rhat.na.col)           
-           for (i in 1:length(rhat.breaks)) {
+             return(rhat_nan_col)           
+           for (i in 1:length(rhat_breaks)) {
              # cat("i=", i, "\n")
-             if (x >= rhat.breaks[i]) next
-             return(rhat.colors[i])
+             if (x >= rhat_breaks[i]) next
+             return(rhat_colors[i])
            }  
-           rstan_options("plot_rhat_large_col")
+           rhat_large_col
          })  
 }
 
@@ -455,23 +468,25 @@ plot_rhat_legend <- function(x, y, cex = 1) {
   # Args
   #   x, y: left, bottom corner coordinates 
   #   cex: cex for the labels 
-  rhat.breaks <- rstan_options("plot_rhat_breaks")
-  n.breaks <- length(rhat.breaks) 
-  rhat.colors <- rstan_options("plot_rhat_cols")[1:n.breaks] 
-  rhat.legend.txts <- c(paste("< ", rhat.breaks, "  ", sep = ''), 
-                        paste(">= ", max(rhat.breaks), "  ", sep = ''))
-  rhat.legend.cols <- c(rhat.colors, rstan_options('plot_rhat_large_col')) 
-  rhat.legend.width <- strwidth(rhat.legend.txts, cex = cex) 
-  rhat.rect.width <- strwidth("r-hat ", cex = cex) 
+  rhat_breaks <- rstan_options("plot_rhat_breaks")
+  n_breaks <- length(rhat_breaks) 
+  rhat_colors <- rstan_options("plot_rhat_cols")[1:n_breaks] 
+  rhat_legend_labels <- c(paste("< ", rhat_breaks, "  ", sep = ''), 
+                        paste(">= ", max(rhat_breaks), "  ", sep = ''),
+                        "NaN/Inf")
+  rhat_legend_cols <- c(rhat_colors, rstan_options('plot_rhat_large_col'),
+                        rstan_options("plot_rhat_nan_col"))
+  rhat_legend_width <- strwidth(rhat_legend_labels, cex = cex) 
+  rhat_rect_width <- strwidth("r-hat ", cex = cex) 
   text(x, y, label = 'Rhat:  ', adj = c(0, 0), cex = cex)  
   s1 <- strwidth('Rhat:  ', cex = cex) 
-  starts <- x + c(s1, s1 + cumsum(rhat.rect.width + rhat.legend.width)) 
+  starts <- x + c(s1, s1 + cumsum(rhat_rect_width + rhat_legend_width)) 
 
   height <- strheight("0123456789<>=", cex = cex)
 
-  for (i in 1:length(rhat.legend.cols)) {
-    rect(starts[i], y, starts[i] + rhat.rect.width, y + height, col = rhat.legend.cols[i], border = NA) 
-    text(starts[i] + rhat.rect.width, y, adj = c(0, 0), label = rhat.legend.txts[i], cex = cex) 
+  for (i in 1:length(rhat_legend_cols)) {
+    rect(starts[i], y, starts[i] + rhat_rect_width, y + height, col = rhat_legend_cols[i], border = NA) 
+    text(starts[i] + rhat_rect_width, y, adj = c(0, 0), label = rhat_legend_labels[i], cex = cex) 
   } 
 } 
   
@@ -508,7 +523,7 @@ idx_col2rowm <- function(d) {
 
 
 idx_row2colm <- function(d) {
-  # What if it is row-major and we want col-major? 
+  # What if it is row-major and we want col_major? 
   len <- length(d) 
   if (0 == len) return(1)  
   if (1 == len) return(1:d)  
@@ -517,7 +532,7 @@ idx_row2colm <- function(d) {
 } 
 
 
-seq_array_ind <- function(d, col.major = FALSE) {
+seq_array_ind <- function(d, col_major = FALSE) {
   #
   # Generate an array of indexes for an array parameter 
   # in order of major or column. 
@@ -526,15 +541,15 @@ seq_array_ind <- function(d, col.major = FALSE) {
   #   d: the dimensions of an array parameter, for example, 
   #     c(2, 3). 
   # 
-  #   col.major: Determine what is the order of indexes. 
-  #   If col.major = TRUE, for d = c(2, 3), return 
+  #   col_major: Determine what is the order of indexes. 
+  #   If col_major = TRUE, for d = c(2, 3), return 
   #   [1, 1] 
   #   [2, 1] 
   #   [1, 2] 
   #   [2, 2] 
   #   [1, 3] 
   #   [2, 3] 
-  #   If col.major = FALSE, for d = c(2, 3), return 
+  #   If col_major = FALSE, for d = c(2, 3), return 
   #   [1, 1] 
   #   [1, 2] 
   #   [1, 3] 
@@ -555,7 +570,7 @@ seq_array_ind <- function(d, col.major = FALSE) {
   total <- prod(d) 
   len <- length(d) 
   res <- array(1L, dim = c(total, len)) 
-  jidx <- if (col.major) 1L:len else len:1L
+  jidx <- if (col_major) 1L:len else len:1L
   for (i in 2L:total) {
     res[i, ] <- res[i - 1, ]
     for (j in jidx) { 
@@ -569,7 +584,7 @@ seq_array_ind <- function(d, col.major = FALSE) {
   res 
 } 
 
-flat_one_par <- function(n, d, col.major = FALSE) {
+flat_one_par <- function(n, d, col_major = FALSE) {
   # Return all the elemenetwise parameters for a vector/array
   # parameter. 
   # 
@@ -580,17 +595,17 @@ flat_one_par <- function(n, d, col.major = FALSE) {
   #     as well when n is a scalar. 
   # 
   if (0 == length(d)) return(n)  
-  nameidx <- seq_array_ind(d, col.major) 
+  nameidx <- seq_array_ind(d, col_major) 
   names <- apply(nameidx, 1, function(x) paste(n, "[", paste(x, collapse = ','), "]", sep = '')) 
   as.vector(names) 
 } 
 
 
-flatnames <- function(names, dims, col.major = FALSE) {
+flatnames <- function(names, dims, col_major = FALSE) {
   if (length(names) == 1) 
-    return(flat_one_par(names, dims[[1]], col.major = col.major))  
+    return(flat_one_par(names, dims[[1]], col_major = col_major))  
   nameslst <- mapply(flat_one_par, names, dims, 
-                     MoreArgs = list(col.major = col.major), 
+                     MoreArgs = list(col_major = col_major), 
                      SIMPLIFY = FALSE,
                      USE.NAMES = FALSE) 
   if (is.vector(nameslst, "character")) 
@@ -650,16 +665,16 @@ pars_total_indexes <- function(names, dims, fnames, pars) {
 ## simple test for pars_total_indexes 
 #  names <- c('alpha', 'beta', 'gamma')
 #  dims <- list(c(2,3), c(3,4,5), c(5))
-#  fnames <- flatnames(names, dims, col.major = TRUE) 
+#  fnames <- flatnames(names, dims, col_major = TRUE) 
 #  pars_total_indexes(names, dims, fnames, c('gamma', 'alpha', 'beta')) 
 
 #### temporary test code 
 #  a <- config_argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
 #  print(a) 
 #  
-#  fun1 <- function(chain.id) {
-#    cat("chain.id=", chain.id)
-#    return(list(mu = chain.id))
+#  fun1 <- function(chain_id) {
+#    cat("chain_id=", chain_id)
+#    return(list(mu = chain_id))
 #  } 
 #  b <- config_argss(3, c(100, 200), 10, 1, c("user", 1), fun1, seed = 3) 
 #  print(b)
@@ -724,10 +739,10 @@ combine_msd_quan <- function(msd, quan) {
   if (any(dim1[c(1, 3)] != dim2[c(1, 3)])) 
     stop("numers of parameter/chains differ in msd and quan") 
   chains <- dim1[3] 
-  n.par <- dim1[1] 
-  n.stat <- dim1[2] + dim2[2] 
-  par.names <- dimnames(msd)[[1]] 
-  stat.names <- c(dimnames(msd)[[2]], dimnames(quan)[[2]]) 
+  n_par <- dim1[1] 
+  n_stat <- dim1[2] + dim2[2] 
+  par_names <- dimnames(msd)[[1]] 
+  stat_names <- c(dimnames(msd)[[2]], dimnames(quan)[[2]]) 
   fun <- function(i) {
     # This is a bit ugly; one reason is that we need to 
     # deal with the case that dim1[1] = 1, in which 
@@ -740,8 +755,8 @@ combine_msd_quan <- function(msd, quan) {
   } 
   ll <- lapply(1:chains, fun) 
   twodnames <- dimnames(ll[[1]]) 
-  msdquan <- array(unlist(ll), dim = c(n.par, n.stat, chains)) 
-  dimnames(msdquan) <- list(par.names, stat.names, NULL) 
+  msdquan <- array(unlist(ll), dim = c(n_par, n_stat, chains)) 
+  dimnames(msdquan) <- list(par_names, stat_names, NULL) 
   msdquan 
 } 
 
@@ -751,10 +766,10 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   probs_len <- length(probs) 
   pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
-  tidx.rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+  tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx_len <- length(tidx) 
-  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  tidx_rowm <- unlist(tidx_rowm, use.names = FALSE)
   lmsdq <- lapply(tidx, function(n) get_par_summary(sim, n, probs)) 
   msd <- do.call(rbind, lapply(lmsdq, function(x) x$msd)) 
   quan <- do.call(rbind, lapply(lmsdq, function(x) x$quan)) 
@@ -779,7 +794,7 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   ss <- list(msd = msd, sem = msd[, 2] / sqrt(ess), 
              c_msd = c_msd, quan = quan, c_quan = c_quan, 
              ess = ess, rhat = rhat) 
-  attr(ss, "row_major_idx") <- tidx.rowm 
+  attr(ss, "row_major_idx") <- tidx_rowm 
   attr(ss, "col_major_idx") <- tidx
   ss
 }  
@@ -790,10 +805,10 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   probs_len <- length(probs) 
   pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
-  tidx.rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+  tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
   tidx_len <- length(tidx) 
-  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  tidx_rowm <- unlist(tidx_rowm, use.names = FALSE)
   lquan <- lapply(tidx, function(n) get_par_summary_quantile(sim, n, probs)) 
   quan <- do.call(rbind, lapply(lquan, function(x) x$quan)) 
   dim(quan) <- c(tidx_len, probs_len) 
@@ -805,7 +820,7 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   dimnames(c_quan) <- list(sim$fnames_oi[tidx], probs_str, NULL)
 
   ss <- list(quan = quan, c_quan = c_quan)
-  attr(ss, "row_major_idx") <- tidx.rowm 
+  attr(ss, "row_major_idx") <- tidx_rowm 
   attr(ss, "col_major_idx") <- tidx
   ss
 }  
@@ -813,12 +828,12 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
 summary_sim_ess <- function(sim, pars) {
   pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
-  tidx.rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+  tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
-  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  tidx_rowm <- unlist(tidx_rowm, use.names = FALSE)
   ess <- sapply(tidx, function(n) rstan_ess(sim, n)) 
   names(ess) <- sim$fnames_oi[tidx]
-  attr(ess, "row_major_idx") <- tidx.rowm
+  attr(ess, "row_major_idx") <- tidx_rowm
   attr(ess, "col_major_idx") <- tidx
   ess
 } 
@@ -826,12 +841,12 @@ summary_sim_ess <- function(sim, pars) {
 summary_sim_rhat <- function(sim, pars) {
   pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
-  tidx.rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+  tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
-  tidx.rowm <- unlist(tidx.rowm, use.names = FALSE)
+  tidx_rowm <- unlist(tidx_rowm, use.names = FALSE)
   rhat <- sapply(tidx, function(n) rstan_splitrhat(sim, n)) 
   names(rhat) <- sim$fnames_oi[tidx]
-  attr(rhat, "row_major_idx") <- tidx.rowm
+  attr(rhat, "row_major_idx") <- tidx_rowm
   attr(rhat, "col_major_idx") <- tidx
   rhat 
 } 
@@ -868,15 +883,15 @@ organize_inits <- function(inits, pars, dims) {
 
 # ported from bugs.plot.inferences in R2WinBUGS  
 # 
-stan_plot_inferences <- function(sim, summary, pars, model.info, display_parallel = FALSE, ...) {
+stan_plot_inferences <- function(sim, summary, pars, model_info, display_parallel = FALSE, ...) {
   # 
   # Args:
   #   sim: the sim list in stanfit object
   #   pars: parameters of interest
-  #   model.info: names list with elements model_name and model_date 
+  #   model_info: names list with elements model_name and model_date 
   #   display_parallel
 
-  alert.col <- rstan_options("rstan_alert_col")
+  alert_col <- rstan_options("rstan_alert_col")
   chain_cols <- rstan_options("rstan_chain_cols")
   chain_cols.len <- length(chain_cols) 
 
@@ -893,9 +908,9 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
     min.width <- .01
   }
 
-  cex.names <- .7
+  cex_names <- .7
   cex.axis <- .6 
-  cex.tiny <- .4 
+  cex_tiny <- .4 
   # the standard number of parameters in an array parameters. 
   # we have this so that even the # of parameters are less than
   # 30, we still have equal space between parameters for 
@@ -904,7 +919,7 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
   max.width <- rstan_options('plot_max_npar') 
 
   pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
-  n.pars <- length(pars) 
+  n_pars <- length(pars) 
   chains <- sim$chains
  
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
@@ -921,36 +936,36 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
   on.exit(par(par.old)) 
   par(mar = c(1, 0, 1, 0))
 
-  plot(c(0, 1), c(-n.pars - .5, -.4), 
+  plot(c(0, 1), c(-n_pars - .5, -.4), 
        ann = FALSE, bty = "n", xaxt = "n", yaxt = "n", type = "n")
   if (!is.R())
     options(warn = warn.settings)
 
   # plot the model general information 
-  header <- paste("Stan model '", model.info$model_name, "' (", chains, 
+  header <- paste("Stan model '", model_info$model_name, "' (", chains, 
                   " chains: iter=", sim$iter, "; warmup=", sim$warmup, 
                   "; thin=", sim$thin, ") fitted at ",
-                  model.info$model_date, sep = '') 
+                  model_info$model_date, sep = '') 
   # side: (1=bottom, 2=left, 3=top, 4=right)
   mtext(header, side = 3, outer = TRUE, line = -1, cex = .7)
 
-  W <- max(strwidth(pars, cex = cex.names))
+  W <- max(strwidth(pars, cex = cex_names))
   # the max width of the variable names 
 
-  # cex.names is defined at the beginning of this fun
+  # cex_names is defined at the beginning of this fun
   B <- (1 - W) / 3.8
   A <- 1 - 3.5 * B
   title <- if (display_parallel) "80% interval for each chain" else  "medians and 80% intervals"
-  text(A, -.4, title, adj = 0, cex = cex.names)
-  num.height <- strheight (1:9, cex = cex.tiny) * 1.2
+  text(A, -.4, title, adj = 0, cex = cex_names)
+  num_height <- strheight (1:9, cex = cex_tiny) * 1.2
 
   truncated <- FALSE 
-  for (k in 1:n.pars) { 
-    text (0, -k, pars[k], adj = 0, cex = cex.names)
+  for (k in 1:n_pars) { 
+    text (0, -k, pars[k], adj = 0, cex = cex_names)
 
-    k.dim <- sim$dims_oi[[pars[k]]] 
-    k.dim.len <- length(k.dim)
-    k.aidx <- seq_array_ind(k.dim, col.major = FALSE) 
+    k_dim <- sim$dims_oi[[pars[k]]] 
+    k_dim_len <- length(k_dim)
+    k_aidx <- seq_array_ind(k_dim, col_major = FALSE) 
     
     # the index for the parameters in the whole 
     # sequences of parameters 
@@ -958,10 +973,10 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
 
     # number of parameters we could plot for this 
     # particular vector/array parameter 
-    k.num.p <- length(index) 
+    k_num_p <- length(index) 
 
     # number of parameter we would plot
-    J <- min(k.num.p, max.width)
+    J <- min(k_num_p, max.width)
     spacing <- 3.5 / max(J, standard.width)
 
     # the medians for all the kept samples merged 
@@ -969,16 +984,16 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
     mp <- match(0.5, sprobs) 
     i80p <- match(c(0.1, 0.9), sprobs) 
     med <- summary$quan[index, mp] 
-    med <- array(med, dim = c(k.num.p, 1)) 
+    med <- array(med, dim = c(k_num_p, 1)) 
     i80 <- summary$quan[index, i80p] 
-    i80 <- array(i80, dim = c(k.num.p, 2)) 
+    i80 <- array(i80, dim = c(k_num_p, 2)) 
     rhats <- summary$rhat 
-    rhats.cols <- get_rhat_cols(rhats) 
+    rhats_cols <- get_rhat_cols(rhats) 
   
     med.chain <- summary$c_quan[index, mp, ]
-    med.chain <- array(med.chain, dim = c(k.num.p, sim$chains)) 
+    med.chain <- array(med.chain, dim = c(k_num_p, sim$chains)) 
     i80.chain <- summary$c_quan[index, i80p, ]
-    i80.chain <- array(i80.chain, dim = c(k.num.p, 2, sim$chains))
+    i80.chain <- array(i80.chain, dim = c(k_num_p, 2, sim$chains))
 
     rng <- if (display_parallel) range(i80, i80.chain) else range(i80)
     p.rng <- pretty(rng, n = 2)
@@ -1020,22 +1035,22 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
       # draw an indicator for Rhat
       # (xleft, ybottom, xright, ytop)
        
-      if (k.dim.len == 0) 
-        rect(A + B * spacing * (j - .5), -k - height / 2 - 0.05 + num.height * .5, 
-             A + B * spacing * (j + .5), -k - height / 2 - 0.05 - num.height * .5, col = rhats.cols[j], border = NA) 
+      if (k_dim_len == 0) 
+        rect(A + B * spacing * (j - .5), -k - height / 2 - 0.05 + num_height * .5, 
+             A + B * spacing * (j + .5), -k - height / 2 - 0.05 - num_height * .5, col = rhats_cols[j], border = NA) 
 
       # plot the dimension indexes for this parameter 
-      if (k.dim.len  >= 1) { 
-        rect(A + B * spacing * (j - .5), -k - height / 2 - 0.05 + num.height * .5, 
-             A + B * spacing * (j + .5), -k - height / 2 - 0.05 - num.height * (k.dim.len - .5), col = rhats.cols[j], border = NA) 
+      if (k_dim_len  >= 1) { 
+        rect(A + B * spacing * (j - .5), -k - height / 2 - 0.05 + num_height * .5, 
+             A + B * spacing * (j + .5), -k - height / 2 - 0.05 - num_height * (k_dim_len - .5), col = rhats_cols[j], border = NA) 
 
-        # k.dim: the dimension of parameter k 
-        for (m in 1:k.dim.len) {
-          index0 <- k.aidx[j, m] 
+        # k_dim: the dimension of parameter k 
+        for (m in 1:k_dim_len) {
+          index0 <- k_aidx[j, m] 
           if (j == 1)
-            text(A+B*spacing*j, -k-height/2-.05-num.height*(m-1), index0, cex=cex.tiny)
-          else if (index0 != k.aidx[j - 1, m] & (index0 %% (floor(log10(index0) + 1)) == 0))
-            text(A+B*spacing*j, -k-height/2-.05-num.height*(m-1), index0, cex=cex.tiny)
+            text(A+B*spacing*j, -k-height/2-.05-num_height*(m-1), index0, cex=cex_tiny)
+          else if (index0 != k_aidx[j - 1, m] & (index0 %% (floor(log10(index0) + 1)) == 0))
+            text(A+B*spacing*j, -k-height/2-.05-num_height*(m-1), index0, cex=cex_tiny)
 
           # Note for `(index0 %% (floor(log10(index0) + 1)) == 0) in the above condition.
           # When 10 <= index0 <= 99, floor(log10(index0) + 1) == 2,
@@ -1047,15 +1062,15 @@ stan_plot_inferences <- function(sim, summary, pars, model.info, display_paralle
         }
       }
     } 
-    if (J < k.num.p) {
-      text (-.015, -k, "*", cex = cex.names, col = alert.col)
+    if (J < k_num_p) {
+      text (-.015, -k, "*", cex = cex_names, col = alert_col)
       truncated <- TRUE
     } 
   } 
-  plot_rhat_legend(0, -n.pars - .5, cex = cex.names)
+  plot_rhat_legend(0, -n_pars - .5, cex = cex_names)
   if (truncated) {
-    text(0, -n.pars - .5 - num.height * 2.5, "*  array truncated for lack of space", 
-         adj = c(0, 0), cex = cex.names, col = alert.col)
+    text(0, -n_pars - .5 - num_height * 2.5, "*  array truncated for lack of space", 
+         adj = c(0, 0), cex = cex_names, col = alert_col)
   } 
   invisible(NULL)
 } 

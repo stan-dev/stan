@@ -44,3 +44,10 @@ ss6 <- stan(fit = ss, data = dat, init = inits)
 
 ss7 <- stan(fit = ss, data = dat, init = inits, chains = 4, thin = 7) 
 
+mode <- get_cppo_mode(ss) 
+get_stancode(ss, print = TRUE) 
+rstan:::is_sf_valid(ss)
+
+## print the dso 
+ss@stanmodel@dso 
+

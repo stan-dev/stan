@@ -47,7 +47,9 @@ setMethod("sampling", "stanmodel",
                    sample_file, verbose = FALSE, ...) {
 
             if (!is_sm_valid(object))
-              stop("the compiled object from C++ code for this model is not valid")
+              stop(paste("the compiled object from C++ code for this model is invalid, possible reasons:\n",
+                         "  - compiled with save_dso=FALSE;\n", 
+                         "  - compiled on a different platform.", sep = '')) 
 
             model_cppname <- object@model_cpp$model_cppname 
             # cat("model_cppname=", model_cppname, '\n')

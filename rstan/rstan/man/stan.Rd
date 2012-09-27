@@ -34,9 +34,9 @@ stan(file, model_name = "anon_model", model_code = "",
     is used so specifying \code{model_code} is ignored.}
   \item{fit}{An instance of S4 class \code{stanfit} derived from
              a previous fit;  defaults to \code{NA}. 
-    When not \code{NA}, the compiled model from the fitted result 
-    is re-used, thus saving the time that would otherwise be spent 
-    recompiling the C++ code for the model.}
+    If \code{fit} is not \code{NA}, the compiled model associated with the fitted result 
+    is re-used; thus the time that would otherwise be spent 
+    recompiling the C++ code for the model can be saved.}
   \item{data}{An object of class \code{list}, \code{environment}
     providing the data for the model, or a vector of character strings 
     for all the names of objects used as data in the working space. 
@@ -82,7 +82,12 @@ stan(file, model_name = "anon_model", model_code = "",
     the same model in another \R session using the saved DSO (i.e., 
     without compiling the C++ code again).
     This parameter only takes effect if \code{fit} is not used; with  
-    \code{fit} defined, the DSO from the previous run is used.}
+    \code{fit} defined, the DSO from the previous run is used.
+    When \code{save_dso=TRUE}, the fitted object can be loaded from 
+    what is saved previously and used from sampling, if the compiling is
+    done on the same platform, that is, same operating system and same 
+    architecture (32bits or 64bits). 
+}
 
   \item{verbose}{\code{TRUE} or \code{FALSE}: flag indicating whether 
      to print intermediate output from Stan on the console, which might
@@ -178,8 +183,8 @@ stan(file, model_name = "anon_model", model_code = "",
 
   The optimization level for compiling the C++ code generated for the 
   model can be set by \code{set_cppo}. In general, the higher the optimization
-  level, the fast the generated binary code for the model runs. In general, 
-  fast generated binary code for the model that run fast by using higher
+  level is set, the faster the generated binary code for the model runs. However, 
+  the binary code generated for the model runs fast by using higher
   optimization level is at the cost of long time to compile the C++ code. 
 }
 
@@ -192,7 +197,7 @@ stan(file, model_name = "anon_model", model_code = "",
   \code{\link{stanc}} for translating model code in Stan modeling language to C++, 
   \code{\link{sampling}} for sampling, and \code{\linkS4class{stanfit}} for the fitted results.
 
-  see \code{set_cppo} for setting higher optimization level for compiling the C++ 
+  see \code{\link{set_cppo}} for setting higher optimization level for compiling the C++ 
   code.
   
 }
@@ -207,8 +212,8 @@ model {
   y[2] ~ double_exponential(0, 2);
 } 
 "
-s.f <- stan(model_code = scode, iter = 10, verbose = FALSE) 
-print(s.f)
-s.f2 <- stan(fit = s.f, iter = 10000, verbose = FALSE) 
+fit1 <- stan(model_code = scode, iter = 10, verbose = FALSE) 
+print(fit1)
+fit2 <- stan(fit = fit1, iter = 10000, verbose = FALSE) 
 }} 
 \keyword{rstan} 

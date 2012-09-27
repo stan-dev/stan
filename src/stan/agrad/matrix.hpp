@@ -845,13 +845,14 @@ namespace stan {
      *
      * @param[in] v Vector.
      * @return Dot product of the vector with itself.
-     * @tparam R number of rows or <code>Eigen::Dynamic</code> for dynamic; one of R or C must be 1
-     * @tparam C number of rows or <code>Eigen::Dyanmic</code> for dynamic; one of R or C must be 1
+     * @tparam R number of rows or <code>Eigen::Dynamic</code> for
+     * dynamic; one of R or C must be 1
+     * @tparam C number of rows or <code>Eigen::Dyanmic</code> for
+     * dynamic; one of R or C must be 1
      */
     template<int R, int C>
     inline var dot_self(const Eigen::Matrix<var, R, C>& v) {
-      if (v.rows() != 1 && v.cols() != 1)
-        throw std::domain_error("v must be a vector");
+      stan::math::validate_vector(v,"dot_self");
       return var(new dot_self_vari(v));
     }
     
@@ -866,12 +867,9 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
                            const Eigen::Matrix<var, R2, C2>& v2) {
-      if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::domain_error("v1 must be a vector");
-      if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::domain_error("v2 must be a vector");
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+      stan::math::validate_vector(v1,"dot_product");
+      stan::math::validate_vector(v2,"dot_product");
+      stan::math::validate_matching_sizes(v1,v2,"dot_product");
       return var(new dot_product_vv_vari(v1,v2));
     }
     /**
@@ -886,12 +884,9 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
                            const Eigen::Matrix<double, R2, C2>& v2) {
-      if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::domain_error("v1 must be a vector");
-      if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::domain_error("v2 must be a vector");
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+      stan::math::validate_vector(v1,"dot_product");
+      stan::math::validate_vector(v2,"dot_product");
+      stan::math::validate_matching_sizes(v1,v2,"dot_product");
       return var(new dot_product_vd_vari(v1,v2));
     }
     /**
@@ -906,12 +901,9 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                            const Eigen::Matrix<var, R2, C2>& v2) {
-      if (v1.rows() != 1 && v1.cols() != 1)
-        throw std::domain_error("v1 must be a vector");
-      if (v2.rows() != 1 && v2.cols() != 1)
-        throw std::domain_error("v2 must be a vector");
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+      stan::math::validate_vector(v1,"dot_product");
+      stan::math::validate_vector(v2,"dot_product");
+      stan::math::validate_matching_sizes(v1,v2,"dot_product");
       return var(new dot_product_vd_vari(v2,v1));
     }
     /**
@@ -957,8 +949,7 @@ namespace stan {
      */
     inline var dot_product(const std::vector<var>& v1,
                            const std::vector<var>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+      stan::math::validate_matching_sizes(v1,v2,"dot_product");
       return var(new dot_product_vv_vari(&v1[0], &v2[0], v1.size()));
     }
     /**
@@ -971,8 +962,7 @@ namespace stan {
      */
     inline var dot_product(const std::vector<var>& v1,
                            const std::vector<double>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+      stan::math::validate_matching_sizes(v1,v2,"dot_product");
       return var(new dot_product_vd_vari(&v1[0], &v2[0], v1.size()));
     }
     /**
@@ -985,332 +975,24 @@ namespace stan {
      */
     inline var dot_product(const std::vector<double>& v1,
                            const std::vector<var>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+      stan::math::validate_matching_sizes(v1,v2,"dot_product");
       return var(new dot_product_vd_vari(&v2[0], &v1[0], v1.size()));
     }
 
     /**
-     * Returns the minimum coefficient in the specified
-     * column vector.
-     *
-     * @param[in] v Specified vector.
-     * @return Minimum coefficient value in the vector.
-     */
-    //FIXME: types shouldn't go from T to var
-    template <typename T>
-    inline var min(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() == 0) 
-        return std::numeric_limits<double>::infinity();
-      return to_var(v.minCoeff());
-    }
-    /**
-     * Returns the minimum coefficient in the specified
-     * row vector.
-     *
-     * @param[in] rv Specified vector.
-     * @return Minimum coefficient value in the vector.
-     */
-    //FIXME: types shouldn't go from T to var
-    template <typename T>
-    inline var min(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() == 0) 
-        return std::numeric_limits<double>::infinity();
-      return to_var(rv.minCoeff());
-    }
-    /**
-     * Returns the minimum coefficient in the specified
-     * matrix.
-     *
-     * @param[in] m Specified matrix.
-     * @return Minimum coefficient value in the matrix.
-     */
-    template <typename T>
-    inline var min(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() == 0) 
-        return std::numeric_limits<double>::infinity();
-      return to_var(m.minCoeff());
-    }
-
-    /**
-     * Returns the maximum coefficient in the specified
-     * column vector.
-     *
-     * @param[in] v Specified vector.
-     * @return Maximum coefficient value in the vector.
-     */
-    template <typename T>
-    inline var max(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() == 0) 
-        return -std::numeric_limits<double>::infinity();
-      return to_var(v.maxCoeff());
-    }
-    /**
-     * Returns the maximum coefficient in the specified
-     * row vector.
-     * @param[in] rv Specified vector.
-     * @return Maximum coefficient value in the vector.
-     */
-    template <typename T>
-    inline var max(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() == 0) 
-        return -std::numeric_limits<double>::infinity();
-      return to_var(rv.maxCoeff());
-    }
-    /**
-     * Returns the maximum coefficient in the specified
-     * matrix.
-     * @param[in] m Specified matrix.
-     * @return Maximum coefficient value in the matrix.
-     */
-    template <typename T>
-    inline var max(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() == 0) 
-        return -std::numeric_limits<double>::infinity();
-      return to_var(m.maxCoeff());
-    }
-
-    /**
-     * Returns the sample mean (i.e., average) of the coefficients
-     * in the specified column vector.
-     * @param[in] v Specified vector.
-     * @return Sample mean of vector coefficients.
-     * @throw std::domain_error if v has no elements
-     */
-    template <typename T>
-    inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      stan::math::validate_nonzero_size(v,"mean");
-      return to_var(v.mean());
-    }
-    /**
-     * Returns the sample mean (i.e., average) of the coefficients
-     * in the specified row vector.
-     * @param[in] rv Specified vector.
-     * @return Sample mean of vector coefficients.
-     * @throw std::domain_error if rv has no elements
-     */
-    template <typename T>
-    inline var mean(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      stan::math::validate_nonzero_size(rv,"mean");
-      return to_var(rv.mean());
-    }
-    /**
-     * Returns the sample mean (i.e., average) of the coefficients
-     * in the specified matrix.
-     * @param[in] m Specified matrix.
-     * @return Sample mean of matrix coefficients.
-     * @throw std::domain_error if m has no elements
-     */
-    template <typename T>
-    inline var mean(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      stan::math::validate_nonzero_size(m,"mean");
-      return to_var(m.mean());
-    }
-
-    /**
-     * Returns the sample variance (divide by length - 1) of the
-     * coefficients in the specified column vector.
-     * @param[in] v Specified vector.
-     * @return Sample variance of vector. If there is only one element, returns 0.0
-     * @throw std::domain_error if v has no elements
-     */
-    template <typename T>
-    inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      if (v.size() == 0) 
-        throw std::domain_error ("v.size() == 1");
-      if (v.size() == 1) 
-        return to_var(0.0);
-      T mean = v.mean();
-      T sum_sq_diff = 0;
-      // FIXME: redefine in terms of vectorized ops
-      // FIXME: should we use Welford's algorithm for numeric stability?
-      // (v.array() - mean).square().sum() / (v.size() - 1);
-      for (int i = 0; i < v.size(); ++i) {
-        T diff = v[i] - mean;
-        sum_sq_diff += diff * diff;
-      }
-      return to_var(sum_sq_diff / (v.size() - 1));
-    }
-    /**
-     * Returns the sample variance (divide by length - 1) of the
-     * coefficients in the specified row vector.
-     * @param[in] rv Specified vector.
-     * @return Sample variance of vector. If there is only one element, returns 0.0
-     * @throw std::domain_error if rv has no elements
-     */
-    template <typename T>
-    inline var variance(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      if (rv.size() == 0) 
-        throw std::domain_error ("rv.size() == 0");
-      if (rv.size() == 1)
-        return to_var(0.0);
-      T mean = rv.mean();
-      T sum_sq_diff = 0;
-      for (int i = 0; i < rv.size(); ++i) {
-        T diff = rv[i] - mean;
-        sum_sq_diff += diff * diff;
-      }
-      return to_var(sum_sq_diff / (rv.size() - 1));
-    }
-    /**
-     * Returns the sample variance (divide by length - 1) of the
-     * coefficients in the specified matrix.
-     * @param[in] m Specified matrix.
-     * @return Sample variance of vector. If there is only one element, returns 0.0
-     * @throw std::domain_error if v has no elements
-     */
-    template <typename T>
-    inline var variance(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.size() == 0) 
-        throw std::domain_error ("m.size() == 0");
-      if (m.size() == 1) 
-        return to_var(0.0);
-      T mean = m.mean();
-      T sum_sq_diff = 0;
-      for (int j = 0; j < m.cols(); ++j) { 
-        for (int i = 0; i < m.rows(); ++i) {
-          T diff = m(i,j) - mean;
-          sum_sq_diff += diff * diff;
-        }
-      }
-      return to_var(sum_sq_diff / (m.size() - 1));
-    }
-
-    /**
-     * Returns the unbiased sample standard deviation of the
-     * coefficients in the specified column vector.
-     * @param[in] v Specified vector.
-     * @return Sample standard deviation of vector. If there is only one element, 
-     * returns 0.0
-     * @throw std::domain_error if v has no elements
-     */
-    // FIXME: type T to var is bad
-    template <typename T>
-    inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      stan::math::validate_nonzero_size(v,"sd");
-      if (v.size() == 1)
-        return 0.0;
-      return to_var(sqrt(variance(v)));
-    }
-    /**
-     * Returns the unbiased sample standard deviation of the
-     * coefficients in the specified row vector.
-     * @param[in] rv Specified vector.
-     * @return Sample standard deviation of vector. If there is only one element, 
-     * returns 0.0
-     * @throw std::domain_error if rv has no elements
-     */
-    template <typename T>
-    inline var sd(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      stan::math::validate_nonzero_size(rv,"sd");
-      if (rv.size() == 1)
-        return 0.0;
-      return to_var(sqrt(variance(rv)));
-    }
-    /**
-     * Returns the unbiased sample standard deviation of the
-     * coefficients in the specified matrix.
-     * @param[in] m Specified matrix.
-     * @return Sample standard deviation of a matrix. If there is only one element, 
-     * returns 0.0
-     * @throw std::domain_error if m has no elements
-     */
-    template <typename T>
-    inline var sd(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      stan::math::validate_nonzero_size(m,"sd");
-      if (m.size() == 1)
-        return 0.0;
-      return to_var(sqrt(variance(m)));
-    }
-
-    /**
      * Returns the sum of the coefficients of the specified
-     * matrix
-     * @param[in] m Specified matrix.
-     * @return Sum of coefficients of matrix.
+     * column vector.
+     * @param v Specified vector.
+     * @return Sum of coefficients of vector.
      */
-    // FIXME: eliminate
-    template<int R,int C>
-    inline var sum(const Eigen::Matrix<double,R,C> &m) {
-      return to_var(m.sum());
-    }
-    /**
-     * Returns the sum of the coefficients of the specified
-     * matrix
-     * @param[in] m Specified matrix.
-     * @return Sum of coefficients of matrix.
-     */
-    template<int R,int C>
+    template <int R, int C>
     inline var sum(const Eigen::Matrix<var,R,C>& m) {
       if (m.size() == 0)
         return 0.0;
       return var(new sum_v_vari(m));
     }
 
-    /**
-     * Returns the product of the coefficients of the specified
-     * column vector.
-     * @param[in] v Specified vector.
-     * @return Product of coefficients of vector.
-     */
-    inline var prod(const vector_v& v) {
-      if (v.size() == 0) return 1.0;
-      return v.prod();
-    }
-    /**
-     * Returns the product of the coefficients of the specified
-     * row vector.
-     * @param[in] rv Specified vector.
-     * @return Product of coefficients of vector.
-     */
-    inline var prod(const row_vector_v& rv) {
-      if (rv.size() == 0) return 1.0;
-      return rv.prod();
-    }
-    /**
-     * Returns the product of the coefficients of the specified
-     * matrix.
-     * @param[in] m Specified matrix.
-     * @return Product of coefficients of matrix.
-     */
-    inline var prod(const matrix_v& m) {
-      if (m.size() == 0) return 1.0;
-      return m.prod();
-    }
 
-    /**
-     * Returns the trace of the specified matrix.  The trace
-     * is defined as the sum of the elements on the diagonal.
-     * The matrix is not required to be square.
-     *
-     * @param[in] m Specified matrix.
-     * @return Trace of the matrix.
-     */
-    inline var trace(const matrix_v& m) {
-      return m.trace();
-    }
-    
-    /**
-     * Return the element-wise logarithm of the matrix or vector.
-     *
-     * @param[in] m The matrix or vector.
-     * @return ret(i,j) = log(m(i,j))
-     */
-    template<typename TM, int Rows, int Cols>
-    inline Eigen::Matrix<var,Rows,Cols> log(const Eigen::Matrix<TM,Rows,Cols>& m) {
-      return to_var(m).array().log().matrix();
-    }
-   
-    /**
-     * Return the element-wise exponentiation of the matrix or vector.
-     *
-     * @param[in] m The matrix or vector.
-     * @return ret(i,j) = exp(m(i,j))
-     */
-    template<typename TM, int Rows, int Cols>
-    inline Eigen::Matrix<var,Rows,Cols> exp(const Eigen::Matrix<TM,Rows,Cols>& m) {
-      return to_var(m).array().exp().matrix();
-    }
      
     /**
      * Return the sum of the specified column vectors.
@@ -1321,152 +1003,39 @@ namespace stan {
      * @return Sum of the two vectors.
      * @throw std::domain_error if size of v1 is not equal to size of v2.
      */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<var, Eigen::Dynamic, 1> 
-    add(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
-        const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    add(const Eigen::Matrix<T1, R, C>& v1, 
+        const Eigen::Matrix<T2, R, C>& v2) {
+      stan::math::validate_matching_dims(v1,v2,"add");
       return to_var(v1) + to_var(v2);
     }
     /**
-     * Return the sum of the specified row vectors.  The
-     * two vectors must have the same size.
-     *
-     * @param[in] rv1 First vector.
-     * @param[in] rv2 Second vector.
-     * @return Sum of the two vectors.
-     * @throw std::domain_error if size of rv1 is not equal to size of rv2.
-     */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<var, 1, Eigen::Dynamic>
-    add(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv1, 
-        const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv2) {
-      if (rv1.size() != rv2.size())
-        throw std::domain_error("rv1.size() must equal rv2.size()");
-      return to_var(rv1) + to_var(rv2);
-    }
-
-    /**
-     * Return the sum of the specified matrices.  The two matrices
-     * must have the same dimensions.
-     *
-     * @param[in] m1 First matrix.
-     * @param[in] m2 Second matrix.
-     * @return Sum of the two vectors.
-     * @throw std::domain_error if dimension of m1 and m2 do not match.
-     */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>
-    add(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
-        const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::domain_error("m1 dimensions must match m2 dimensions");
-      return to_var(m1) + to_var(m2);
-    }
-
-    /**
      * Return the sum of a matrix or vector and a scalar.
      * @param[in] m Matrix or vector.
      * @param[in] c Scalar.
      * @return Matrix or Vector plus the scalar.
      */
-    template <int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    add(const Eigen::Matrix<var, Rows, Cols>& m,
-        const var& c) {
-      return (m.array() + c).matrix();
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    add(const Eigen::Matrix<T1, R, C>& m,
+        const T2& c) {
+      return (to_var(m).array() + to_var(c)).matrix();
     }
-
-    /**
-     * Return the sum of a matrix or vector and a scalar.
-     * @param[in] m Matrix or vector.
-     * @param[in] c Scalar.
-     * @return Matrix or Vector plus the scalar.
-     */
-    template <int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    add(const Eigen::Matrix<var, Rows, Cols>& m,
-        const double& c) {
-      return (m.array() + to_var(c)).matrix();
-    }
-
-    /**
-     * Return the sum of a matrix or vector and a scalar.
-     * @param[in] m Matrix or vector.
-     * @param[in] c Scalar.
-     * @return Matrix or Vector plus the scalar.
-     */
-    template <int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    add(const Eigen::Matrix<double, Rows, Cols>& m,
-        const var& c) {
-      return (to_var(m).array() + c).matrix();
-    }
-
     /**
      * Return the sum of a scalar and a matrix or vector.
      * @param[in] c Scalar.
      * @param[in] m Matrix or vector.
      * @return Scalar plus vector.
      */
-    template <int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    add(const var& c,
-        const Eigen::Matrix<var, Rows, Cols>& m) {
-      return (c + m.array()).matrix();
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    add(const T1& c,
+        const Eigen::Matrix<T2, R, C>& m) {
+      return (to_var(c) + to_var(m).array()).matrix();
     }
 
-    /**
-     * Return the sum of a scalar and a matrix or vector.
-     * @param[in] c Scalar.
-     * @param[in] m Matrix or vector.
-     * @return Scalar plus vector.
-     */
-    template <int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    add(const var& c,
-        const Eigen::Matrix<double, Rows, Cols>& m) {
-      return (c + to_var(m).array()).matrix();
-    }
 
-    /**
-     * Return the sum of a scalar and a matrix or vector.
-     * @param[in] c Scalar.
-     * @param[in] m Matrix or vector.
-     * @return Scalar plus vector.
-     */
-    template <int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    add(const double& c,
-        const Eigen::Matrix<var, Rows, Cols>& m) {
-      return (c + m.array()).matrix();
-    }
-
-    /**
-     * Return the difference between a matrix or vector  and a scalar.
-     * @param[in] m Matrix or vector.
-     * @param[in] c Scalar.
-     * @return Vector minus the scalar.
-     */
-    template <typename T1, typename T2, int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    subtract(const Eigen::Matrix<T1, Rows, Cols>& m,
-             const T2& c) {
-      return (to_var(m).array() - c).matrix();
-    }
-    /**
-     * Return the difference between a scalar and a matrix or vector.
-     * @param[in] c Scalar.
-     * @param[in] m Matrix or vector.
-     * @return Scalar minus vector.
-     */
-    template <typename T1, typename T2, int Rows, int Cols>
-    inline Eigen::Matrix<var, Rows, Cols>
-    subtract(const T1& c,
-             const Eigen::Matrix<T2, Rows, Cols>& m) {
-      return (c - to_var(m).array()).matrix();
-    }
     /**
      * Return the difference between the first specified column vector
      * and the second.  The two vectors must have the same size.
@@ -1475,48 +1044,37 @@ namespace stan {
      * @return First vector minus the second vector.
      * @throw std::domain_error if size of v1 does not match size of v2.
      */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<var, Eigen::Dynamic, 1> 
-    subtract(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v1, 
-             const Eigen::Matrix<T2, Eigen::Dynamic, 1>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() must equal v2.size()");
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    subtract(const Eigen::Matrix<T1, R, C>& v1, 
+             const Eigen::Matrix<T2, R, C>& v2) {
+      stan::math::validate_matching_dims(v1,v2,"subtract");
       return to_var(v1) - to_var(v2);
     }
     /**
-     * Return the difference between the first specified row vector
-     * and the second.  The two vectors must have the same size.
-     * @param[in] rv1 First vector.
-     * @param[in] rv2 Second vector.
-     * @return First vector minus the second vector.
-     * @throw std::domain_error if size of rv1 does not match size of rv2.
+     * Return the difference between a matrix or vector  and a scalar.
+     * @param[in] m Matrix or vector.
+     * @param[in] c Scalar.
+     * @return Vector minus the scalar.
      */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<var, 1, Eigen::Dynamic> 
-    subtract(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv1, 
-             const Eigen::Matrix<T2, 1, Eigen::Dynamic>& rv2) {
-      if (rv1.size() != rv2.size())
-        throw std::domain_error("rv1.size() must equal rv2.size()");
-      return to_var(rv1) - to_var(rv2);
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    subtract(const Eigen::Matrix<T1, R, C>& m,
+             const T2& c) {
+      return (to_var(m).array() - to_var(c)).matrix();
     }
-
     /**
-     * Return the difference between the first specified matrix and
-     * the second.  The two matrices must have the same dimensions.
-     * @param[in] m1 First matrix.
-     * @param[in] m2 Second matrix.
-     * @return First matrix minus the second matrix.
-     * @throw std::domain_error if dimension of m1 and m2 do not match.
+     * Return the difference between a scalar and a matrix or vector.
+     * @param[in] c Scalar.
+     * @param[in] m Matrix or vector.
+     * @return Scalar minus vector.
      */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic> 
-    subtract(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m1, 
-             const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic>& m2) {
-      if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
-        throw std::domain_error("m1 dimensions must match m2 dimensions");
-      return to_var(m1) - to_var(m2);
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    subtract(const T1& c,
+             const Eigen::Matrix<T2, R, C>& m) {
+      return (to_var(c) - to_var(m).array()).matrix();
     }
-
 
     /**
      * Return the negation of the specified variable.  The result
@@ -1525,8 +1083,8 @@ namespace stan {
      * @return The negation of the variable.
      */
     template <typename T>
-    inline var minus(const T& v) {
-      return -to_var(v);
+    inline T minus(const T& v) {
+      return -v;
     }
     /**
      * Return the negation of the specified column vector.  The result
@@ -1534,29 +1092,9 @@ namespace stan {
      * @param[in] v Specified vector.  
      * @return The negation of the vector.
      */
-    template <typename T>
-    inline vector_v minus(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
-      return -to_var(v);
-    }
-    /**
-     * Return the negation of the specified row vector.  The result is
-     * the same as multiplying by the scalar <code>-1</code>.
-     * @param[in] rv Specified vector.
-     * @return The negation of the vector.
-     */
-    template <typename T>
-    inline row_vector_v minus(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv) {
-      return -to_var(rv);
-    }
-    /**
-     * Return the negation of the specified matrix.  The result is the same
-     * as multiplying by the scalar <code>-1</code>.
-     * @param[in] m Specified matrix.
-     * @return The negation of the matrix.
-     */
-    template <typename T>
-    inline matrix_v minus(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      return -to_var(m);
+    template <typename T, int R, int C>
+    inline Eigen::Matrix<T,R,C> minus(const Eigen::Matrix<T, R, C>& v) {
+      return -v;
     }
 
     /**
@@ -1566,11 +1104,15 @@ namespace stan {
      * @param[in] c Specified scalar.
      * @return Vector divided by the scalar.
      */
+    inline double
+    divide(double x, double y) { 
+      return x / y; 
+    }
     template <typename T1, typename T2>
-    inline var divide(const T1& v, const T2& c) {
+    inline var
+    divide(const T1& v, const T2& c) {
       return to_var(v) / to_var(c);
     }
-
     /**
      * Return the division of the specified column vector by
      * the specified scalar.
@@ -1578,34 +1120,10 @@ namespace stan {
      * @param[in] c Specified scalar.
      * @return Vector divided by the scalar.
      */
-    template <typename T1, typename T2>
-    inline vector_v divide(const Eigen::Matrix<T1, Eigen::Dynamic, 1>& v, const T2& c) {
+    template <typename T1, typename T2, int R, int C>
+    inline Eigen::Matrix<var,R,C>
+    divide(const Eigen::Matrix<T1, R,C>& v, const T2& c) {
       return to_var(v) / to_var(c);
-    }
-
-    /**
-     * Return the division of the specified row vector by
-     * the specified scalar.
-     * @param[in] rv Specified vector.
-     * @param[in] c Specified scalar.
-     * @return Vector divided by the scalar.
-     */
-    template <typename T1, typename T2>
-    inline row_vector_v divide(const Eigen::Matrix<T1, 1, Eigen::Dynamic>& rv,
-                               const T2& c) {
-      return to_var(rv) / to_var(c);
-    }
-    /**
-     * Return the division of the specified matrix by the specified
-     * scalar.
-     * @param[in] m Specified matrix.
-     * @param[in] c Specified scalar.
-     * @return Matrix divided by the scalar.
-     */
-    template <typename T1, typename T2>
-    inline matrix_v divide(const Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic>& m, 
-                           const T2& c) {
-      return to_var(m) / to_var(c);
     }
 
     /**
@@ -1618,10 +1136,7 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>
     elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
                  const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
-      if (m1.cols() != m2.cols())
-        throw std::domain_error("m1.cols() != m2.cols()");
-      if (m1.rows() != m2.rows())
-        throw std::domain_error("m1.rows() != m2.rows()");
+      stan::math::validate_matching_dims(m1,m2,"elt_multiply");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
@@ -1639,8 +1154,7 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>
     elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
                  const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() != v2.size()");
+      stan::math::validate_matching_dims(v1,v2,"elt_multiply");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) * v2(i);
@@ -1656,8 +1170,7 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>
     elt_multiply(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
                  const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() != v2.size()");
+      stan::math::validate_matching_dims(v1,v2,"elt_multiply");
       Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) * v2(i);
@@ -1675,10 +1188,7 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>
     elt_divide(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
                const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
-      if (m1.cols() != m2.cols())
-        throw std::domain_error("m1.cols() != m2.cols()");
-      if (m1.rows() != m2.rows())
-        throw std::domain_error("m1.rows() != m2.rows()");
+      stan::math::validate_matching_dims(m1,m2,"elt_divide");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
         result(m1.rows(),m1.cols());
       for (int j = 0; j < m1.cols(); ++j)
@@ -1696,8 +1206,7 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>
     elt_divide(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
                const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() != v2.size()");
+      stan::math::validate_matching_dims(v1,v2,"elt_divide");
       Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) / v2(i);
@@ -1713,23 +1222,24 @@ namespace stan {
     inline Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>
     elt_divide(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
                const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
-      if (v1.size() != v2.size())
-        throw std::domain_error("v1.size() != v2.size()");
+      stan::math::validate_matching_dims(v1,v2,"elt_divide");
       Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
       for (int i = 0; i < v1.size(); ++i)
         result(i) = v1(i) / v2(i);
       return result;
     }
-
+    
     /**
      * Return the product of two scalars.
      * @param[in] v First scalar.
      * @param[in] c Specified scalar.
-     * @return Product of vector and scalar.
+     * @return Product of scalars.
      */
     template <typename T1, typename T2>
-    inline var multiply(const T1& v, const T2& c) {
-      return to_var(v) * to_var(c);
+    inline
+    typename boost::math::tools::promote_args<T1,T2>::type
+    multiply(const T1& v, const T2& c) {
+      return v * c;
     }
 
     /**
@@ -1741,6 +1251,8 @@ namespace stan {
     template<typename T1,typename T2,int R2,int C2>
     inline Eigen::Matrix<var,R2,C2> multiply(const T1& c, 
                                              const Eigen::Matrix<T2, R2, C2>& m) {
+      // FIXME:  pull out to eliminate overpromotion of one side
+      // move to matrix.hpp w. promotion?
       return to_var(m) * to_var(c);
     }
 
@@ -1769,8 +1281,7 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<var,R1,C1>& m1,
                                              const Eigen::Matrix<var,R2,C2>& m2) {
-      if (m1.cols() != m2.rows())
-        throw std::domain_error("m1.cols() != m2.rows()");
+      stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<var,R1,C1>::ConstRowXpr crow(m1.row(i));
@@ -1814,8 +1325,7 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
                                              const Eigen::Matrix<var,R2,C2>& m2) {
-      if (m1.cols() != m2.rows())
-        throw std::domain_error("m1.cols() != m2.rows()");
+      stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<double,R1,C1>::ConstRowXpr crow(m1.row(i));
@@ -1860,8 +1370,7 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> multiply(const Eigen::Matrix<var,R1,C1>& m1,
                                              const Eigen::Matrix<double,R2,C2>& m2) {
-      if (m1.cols() != m2.rows())
-        throw std::domain_error("m1.cols() != m2.rows()");
+      stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<var,R1,C1>::ConstRowXpr crow(m1.row(i));
@@ -1906,7 +1415,7 @@ namespace stan {
     inline var multiply(const Eigen::Matrix<var, 1, C1>& rv, 
                         const Eigen::Matrix<var, R2, 1>& v) {
       if (rv.size() != v.size())
-        throw std::domain_error("rv.size() != v.size()");
+        throw std::domain_error("row vector and vector must be same length in multiply");
       return dot_product(rv, v);
     }
     /**
@@ -1921,8 +1430,7 @@ namespace stan {
     template <int C1,int R2>
     inline var multiply(const Eigen::Matrix<double, 1, C1>& rv, 
                         const Eigen::Matrix<var, R2, 1>& v) {
-      if (rv.size() != v.size())
-        throw std::domain_error("rv.size() != v.size()");
+      stan::math::validate_multiplicable(rv,v,"multiply");
       return dot_product(rv, v);
     }
     /**
@@ -1937,8 +1445,7 @@ namespace stan {
     template <int C1,int R2>
     inline var multiply(const Eigen::Matrix<var, 1, C1>& rv, 
                         const Eigen::Matrix<double, R2, 1>& v) {
-      if (rv.size() != v.size())
-        throw std::domain_error("rv.size() != v.size()");
+      stan::math::validate_multiplicable(rv,v,"multiply");
       return dot_product(rv, v);
     }
 
@@ -2022,28 +1529,24 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
                                                          const Eigen::Matrix<var,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
       return A.template triangularView<Eigen::Lower>().solve(b);
     }
+    // FIXME: fold next two into above by templating out scalar types
+    // & emplying to_var to both variables
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
                                                          const Eigen::Matrix<double,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
       return A.template triangularView<Eigen::Lower>().solve(to_var(b));
     }
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,
                                                          const Eigen::Matrix<var,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
       return to_var(A).template triangularView<Eigen::Lower>().solve(b);
     }
 
@@ -2060,10 +1563,8 @@ namespace stan {
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
                                                      const Eigen::Matrix<var,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       return A.template triangularView<TriView>().solve(b);
     }
     /**
@@ -2078,10 +1579,8 @@ namespace stan {
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
                                                      const Eigen::Matrix<double,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       return A.template triangularView<TriView>().solve(to_var(b));
     }
     /**
@@ -2096,10 +1595,8 @@ namespace stan {
     template<int TriView,int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
                                                      const Eigen::Matrix<var,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       return to_var(A).template triangularView<TriView>().solve(b);
     }
 
@@ -2114,10 +1611,8 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
                                                  const Eigen::Matrix<var,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
       return A.lu().solve(b);
     }
     /**
@@ -2131,10 +1626,8 @@ namespace stan {
     template<int R1, int C1, int R2, int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
                                                  const Eigen::Matrix<var,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
       // FIXME: it would be much faster to do LU, then convert to var
       return to_var(A).lu().solve(b);
     }
@@ -2149,10 +1642,8 @@ namespace stan {
     template<int R1, int C1, int R2, int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
                                                  const Eigen::Matrix<double,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
       return A.lu().solve(to_var(b));
     }
 
@@ -2167,10 +1658,8 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
                                                   const Eigen::Matrix<var,R2,C2> &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.rows() != b.cols())
-        throw std::domain_error("A.rows() != b.cols()");
+      stan::math::validate_square(A,"mdivide_right");
+      stan::math::validate_multiplicable(b,A,"mdivide_right");
       return A.transpose().lu().solve(b.transpose()).transpose();
     }
     /**
@@ -2184,10 +1673,8 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
                                                   const Eigen::Matrix<var,R2,C2> &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.rows() != b.cols())
-        throw std::domain_error("A.rows() != b.cols()");
+      stan::math::validate_square(A,"mdivide_right");
+      stan::math::validate_multiplicable(b,A,"mdivide_right");
       return A.transpose().lu().solve(to_var(b).transpose()).transpose();
     }
     /**
@@ -2201,10 +1688,8 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_right(const Eigen::Matrix<var,R1,C1> &b,
                                                   const Eigen::Matrix<double,R2,C2> &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.rows() != b.cols())
-        throw std::domain_error("A.rows() != b.cols()");
+      stan::math::validate_square(A,"mdivide_right");
+      stan::math::validate_multiplicable(b,A,"mdivide_right");
       return to_var(A).transpose().lu().solve(b.transpose()).transpose();
     }
     /**
@@ -2388,14 +1873,14 @@ namespace stan {
     template <typename LHS, typename RHS>
     struct assigner<false,LHS,RHS> {
       static inline void assign(LHS& var, const RHS& val) {
-        var = val;
+        var = val; // no promotion of RHS
       }
     };
 
     template <typename LHS, typename RHS>
     struct assigner<true,LHS,RHS> {
       static inline void assign(LHS& var, const RHS& val) {
-        assign_to_var(var,val);
+        assign_to_var(var,val); // promote RHS
       }
     };
 

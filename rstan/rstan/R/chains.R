@@ -8,6 +8,7 @@ rstan_ess <- function(sim, n) {
 rstan_splitrhat <- function(sim, n) {
   # Args:
   #   n: Chain index starting from 1.
+  if (sim$n_save[1] - sim$warmup2[1] < 2) return(NaN)
   rhat <- .Call("split_potential_scale_reduction", sim, n - 1, PACKAGE = "rstan")
   rhat
-} 
+}

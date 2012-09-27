@@ -152,6 +152,7 @@ namespace rstan {
 
       idx = find_index(args_names, std::string("thin")); 
       unsigned int calculated_thin = (iter - warmup) / 1000U;
+      // rstan::io::rcout << "calculated_thin=" << calculated_thin << std::endl; 
       if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1U;
       else thin = Rcpp::as<unsigned int>(in[idx]); 
 
@@ -188,8 +189,9 @@ namespace rstan {
       
       refresh = 1;
       idx = find_index(args_names, std::string("refresh"));
-      if (idx == args_names.size() && iter > 10)  refresh = iter / 10;
-      else refresh = Rcpp::as<int>(in[idx]);
+      if (idx == args_names.size()) {
+        if (iter >= 20) refresh = iter / 10; 
+      } else refresh = Rcpp::as<int>(in[idx]);
 
       idx = find_index(args_names, std::string("seed")); 
       if (idx == args_names.size()) {
@@ -241,6 +243,8 @@ namespace rstan {
       lst["iter"] = iter;                     // 2 
       lst["warmup"] = warmup;                 // 3 
       lst["thin"] = thin;                     // 4 
+      lst["refresh"] = refresh; 
+      lst["iter_save"] = iter_save; 
       lst["leapfrog_steps"] = leapfrog_steps;   // 5 
       lst["epsilon"] = epsilon;                 // 6 
       lst["max_treedepth"] = max_treedepth;     // 7 

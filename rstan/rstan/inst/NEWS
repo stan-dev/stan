@@ -1,3 +1,10 @@
+Tue Sep 25 2012
+1. Changes 
+   * print progress with carriage return 
+
+2. New features 
+   * add set_cppo to set c++ compiler optimization level flag 
+
 Mon Sep  3 2012
 1. Changes 
    * parameter n_chains changed to chains 

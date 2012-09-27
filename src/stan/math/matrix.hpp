@@ -585,6 +585,30 @@ namespace stan {
     inline size_t cols(const matrix_d& m) {
       return m.cols();
     }
+
+    template <typename T, int R, int C>
+    void validate_column_index(const Eigen::Matrix<T,R,C>& m,
+                               size_t j,
+                               const char* msg) {
+      if (j > 0 && j <=  static_cast<size_t>(m.cols())) return;
+      std::stringstream ss;
+      ss << "require 0 < column index <= number of columns in" << msg;
+      ss << " found cols()=" << m.cols()
+         << "; index j=" << j;
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T, int R, int C>
+    void validate_row_index(const Eigen::Matrix<T,R,C>& m,
+                            size_t i,
+                            const char* msg) {
+      if (i > 0 && i <=  static_cast<size_t>(m.rows())) return;
+      std::stringstream ss;
+      ss << "require 0 < row index <= number of rows in" << msg;
+      ss << " found rows()=" << m.rows()
+         << "; index i=" << i;
+      throw std::domain_error(ss.str());
+    }
     
     template <typename T, int R, int C>
     void validate_square(const Eigen::Matrix<T,R,C>& x,
@@ -638,6 +662,19 @@ namespace stan {
          << " arg2 size=" << (x2.rows() * x2.cols());
       throw std::domain_error(ss.str());
     }
+
+    template <typename T1, int R1, int C1, typename T2, int R2, int C2>
+    inline void validate_multiplicable(const Eigen::Matrix<T1,R1,C1>& x1,
+                                       const Eigen::Matrix<T2,R2,C2>& x2,
+                                       const char* msg) {
+      if (x1.cols() == x2.rows()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require cols of arg1 to match rows of arg2, but found "
+         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
+         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols();
+      throw std::domain_error(ss.str());
+    }    
 
     template <typename T>
     inline void validate_nonzero_size(const T& x, const char* msg) {
@@ -784,37 +821,18 @@ namespace stan {
 
     /**
      * Returns the minimum coefficient in the specified
-     * column vector.
-     * @param v Specified vector.
+     * matrix, vector, or row vector.
+     * @param v Specified matrix, vector, or row vector.
      * @return Minimum coefficient value in the vector.
      */
-    inline double min(const vector_d& v) {
-      if (v.size() == 0) 
-        return std::numeric_limits<double>::infinity();
-      return v.minCoeff();
-    }
-    /**
-     * Returns the minimum coefficient in the specified
-     * row vector.
-     * @param rv Specified vector.
-     * @return Minimum coefficient value in the vector.
-     */
-    inline double min(const row_vector_d& rv) {
-      if (rv.size() == 0) 
-        return std::numeric_limits<double>::infinity();
-      return rv.minCoeff();
-    }
-    /**
-     * Returns the minimum coefficient in the specified
-     * matrix.
-     * @param m Specified matrix.
-     * @return Minimum coefficient value in the matrix.
-     */
-    inline double min(const matrix_d& m) {
-      if (m.size() == 0)
+    template <typename T, int R, int C>
+    inline T min(const Eigen::Matrix<T,R,C>& m) {
+      if (m.size() == 0) 
         return std::numeric_limits<double>::infinity();
       return m.minCoeff();
     }
+
+
 
     /**
      * Returns the maximum coefficient in the specified
@@ -854,33 +872,12 @@ namespace stan {
 
     /**
      * Returns the maximum coefficient in the specified
-     * column vector.
-     * @param v Specified vector.
+     * vector, row vector, or matrix.
+     * @param v Specified vector, row vector, or matrix.
      * @return Maximum coefficient value in the vector.
      */
-    inline double max(const vector_d& v) {
-      if (v.size() == 0)
-        return -std::numeric_limits<double>::infinity();
-      return v.maxCoeff();
-    }
-    /**
-     * Returns the maximum coefficient in the specified
-     * row vector.
-     * @param rv Specified vector.
-     * @return Maximum coefficient value in the vector.
-     */
-    inline double max(const row_vector_d& rv) {
-      if (rv.size() == 0)
-        return -std::numeric_limits<double>::infinity();
-      return rv.maxCoeff();
-    }
-    /**
-     * Returns the maximum coefficient in the specified
-     * matrix.
-     * @param m Specified matrix.
-     * @return Maximum coefficient value in the matrix.
-     */
-    inline double max(const matrix_d& m) {
+    template <typename T, int R, int C>
+    inline T max(const Eigen::Matrix<T,R,C>& m) {
       if (m.size() == 0)
         return -std::numeric_limits<double>::infinity();
       return m.maxCoeff();
@@ -907,31 +904,14 @@ namespace stan {
 
     /**
      * Returns the sample mean (i.e., average) of the coefficients
-     * in the specified column vector.
-     * @param v Specified vector.
+     * in the specified vector, row vector, or matrix.
+     * @param m Specified vector, row vector, or matrix.
      * @return Sample mean of vector coefficients.
      */
-    inline double mean(const vector_d& v) {
-      validate_nonzero_size(v,"mean");
-      return v.mean();
-    }
-    /**
-     * Returns the sample mean (i.e., average) of the coefficients
-     * in the specified row vector.
-     * @param rv Specified vector.
-     * @return Sample mean of vector coefficients.
-     */
-    inline double mean(const row_vector_d& rv) {
-      validate_nonzero_size(rv,"mean");
-      return rv.mean();
-    }
-    /**
-     * Returns the sample mean (i.e., average) of the coefficients
-     * in the specified matrix.
-     * @param m Specified matrix.
-     * @return Sample mean of matrix coefficients.
-     */
-    inline double mean(const matrix_d& m) {
+    template <typename T, int R, int C>
+    inline  
+    typename boost::math::tools::promote_args<T>::type
+    mean(const Eigen::Matrix<T,R,C>& m) {
       validate_nonzero_size(m,"mean");
       return m.mean();
     }
@@ -966,53 +946,21 @@ namespace stan {
      * @param v Specified vector.
      * @return Sample variance of vector.
      */
-    inline double variance(const vector_d& v) {
-      validate_nonzero_size(v,"variance");
-      if (v.size() == 1)
-        return 0.0;
-      double mean = v.mean();
-      double sum_sq_diff = 0;
-      for (int i = 0; i < v.size(); ++i) {
-        double diff = v[i] - mean;
-        sum_sq_diff += diff * diff;
-      }
-      return sum_sq_diff / (v.size() - 1);
-    }
-    /**
-     * Returns the sample variance (divide by length - 1) of the
-     * coefficients in the specified row vector.
-     * @param rv Specified vector.
-     * @return Sample variance of vector.
-     */
-    inline double variance(const row_vector_d& rv) {
-      validate_nonzero_size(rv,"variance");
-      if (rv.size() == 1)
-        return 0.0;
-      double mean = rv.mean();
-      double sum_sq_diff = 0;
-      for (int i = 0; i < rv.size(); ++i) {
-        double diff = rv[i] - mean;
-        sum_sq_diff += diff * diff;
-      }
-      return sum_sq_diff / (rv.size() - 1);
-    }
-    /**
-     * Returns the sample variance (divide by length - 1) of the
-     * coefficients in the specified matrix.
-     * @param m Specified matrix.
-     * @return Sample variance of matrix.
-     */
-    inline double variance(const matrix_d& m) {
+    template <typename T, int R, int C>
+    inline
+    typename boost::math::tools::promote_args<T>::type
+    variance(const Eigen::Matrix<T,R,C>& m) {
       validate_nonzero_size(m,"variance");
       if (m.size() == 1)
         return 0.0;
-      double mean = m.mean();
-      double sum_sq_diff = 0;
-      for (int j = 0; j < m.cols(); ++j) { 
-        for (int i = 0; i < m.rows(); ++i) {
-          double diff = m(i,j) - mean;
-          sum_sq_diff += diff * diff;
-        }
+      typename boost::math::tools::promote_args<T>::type 
+        mn(mean(m));
+      typename boost::math::tools::promote_args<T>::type 
+        sum_sq_diff(0);
+      for (int i = 0; i < m.size(); ++i) {
+        typename boost::math::tools::promote_args<T>::type 
+          diff = m(i) - mn;
+        sum_sq_diff += diff * diff;
       }
       return sum_sq_diff / (m.size() - 1);
     }
@@ -1034,34 +982,16 @@ namespace stan {
 
     /**
      * Returns the unbiased sample standard deviation of the
-     * coefficients in the specified column vector.
-     * @param v Specified vector.
-     * @return Sample variance of vector.
+     * coefficients in the specified vector, row vector, or matrix.
+     * @param m Specified vector, row vector or matrix.
+     * @return Sample variance.
      */
-    inline double sd(const vector_d& v) {
-      validate_nonzero_size(v,"sd");
-      if (v.size() == 1) return 0.0;
-      return sqrt(variance(v));
-    }
-    /**
-     * Returns the unbiased sample standard deviation of the
-     * coefficients in the specified row vector.
-     * @param rv Specified vector.
-     * @return Sample variance of vector.
-     */
-    inline double sd(const row_vector_d& rv) {
-      validate_nonzero_size(rv,"sd");
-      if (rv.size() == 1) return 0.0;
-      return sqrt(variance(rv));
-    }
-    /**
-     * Returns the unbiased sample standard deviation of the
-     * coefficients in the specified matrix.
-     * @param m Specified matrix.
-     * @return Sample variance of matrix.
-     */
-    inline double sd(const matrix_d& m) {
-      validate_nonzero_size(m,"sd");
+    template <typename T, int R, int C>
+    inline 
+    typename boost::math::tools::promote_args<T>::type
+    sd(const Eigen::Matrix<T,R,C>& m) {
+      // FIXME: redundant with test in variance; second line saves sqrt
+      validate_nonzero_size(m,"sd");  
       if (m.size() == 1) return 0.0;
       return sqrt(variance(m));
     }
@@ -1089,26 +1019,9 @@ namespace stan {
      * @param v Specified vector.
      * @return Sum of coefficients of vector.
      */
-    inline double sum(const vector_d& v) {
+    template <typename T, int R, int C>
+    inline double sum(const Eigen::Matrix<T,R,C>& v) {
       return v.sum();
-    }
-    /**
-     * Returns the sum of the coefficients of the specified
-     * row vector.
-     * @param rv Specified vector.
-     * @return Sum of coefficients of vector.
-     */
-    inline double sum(const row_vector_d& rv) {
-      return rv.sum();
-    }
-    /**
-     * Returns the sum of the coefficients of the specified
-     * matrix
-     * @param m Specified matrix.
-     * @return Sum of coefficients of matrix.
-     */
-    inline double sum(const matrix_d& m) {
-      return m.sum();
     }
 
     /**
@@ -1132,29 +1045,10 @@ namespace stan {
      * @param v Specified vector.
      * @return Product of coefficients of vector.
      */
-    inline double prod(const vector_d& v) {
+    template <typename T, int R, int C>
+    inline T prod(const Eigen::Matrix<T,R,C>& v) {
       if (v.size() == 0) return 1.0;
       return v.prod();
-    }
-    /**
-     * Returns the product of the coefficients of the specified
-     * row vector.
-     * @param rv Specified vector.
-     * @return Product of coefficients of vector.
-     */
-    inline double prod(const row_vector_d& rv) {
-      if (rv.size() == 0) return 1.0;
-      return rv.prod();
-    }
-    /**
-     * Returns the product of the coefficients of the specified
-     * matrix.
-     * @param m Specified matrix.
-     * @return Product of coefficients of matrix.
-     */
-    inline double prod(const matrix_d& m) {
-      if (m.size() == 0) return 1.0;
-      return m.prod();
     }
 
     /**
@@ -1163,11 +1057,34 @@ namespace stan {
      * The matrix is not required to be square.  Returns 0 if
      * matrix is empty.
      *
-     * @param m Specified matrix.
+     * @param[in] m Specified matrix.
      * @return Trace of the matrix.
      */
-    inline double trace(const matrix_d& m) {
+    template <typename T>
+    inline T trace(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
       return m.trace();
+    }
+
+    /**
+     * Return the element-wise logarithm of the matrix or vector.
+     *
+     * @param m The matrix or vector.
+     * @return ret(i,j) = log(m(i,j))
+     */
+    template<typename T, int Rows, int Cols>
+    inline Eigen::Matrix<T,Rows,Cols> log(const Eigen::Matrix<T,Rows,Cols>& m) {
+      return m.array().log().matrix();
+    }
+
+    /**
+     * Return the element-wise exponentiation of the matrix or vector.
+     *
+     * @param m The matrix or vector.
+     * @return ret(i,j) = exp(m(i,j))
+     */
+    template<typename T, int Rows, int Cols>
+    inline Eigen::Matrix<T,Rows,Cols> exp(const Eigen::Matrix<T,Rows,Cols>& m) {
+      return m.array().exp().matrix();
     }
 
 
@@ -1202,28 +1119,7 @@ namespace stan {
      */
     matrix_d add(const matrix_d& m1, const matrix_d& m2);
 
-    /**
-     * Return the element-wise logarithm of the matrix or vector.
-     *
-     * @param m The matrix or vector.
-     * @return ret(i,j) = log(m(i,j))
-     */
-    template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> log(const Eigen::Matrix<double,Rows,Cols>& m) {
-      return m.array().log().matrix();
-    }
-
-    /**
-     * Return the element-wise exponentiation of the matrix or vector.
-     *
-     * @param m The matrix or vector.
-     * @return ret(i,j) = exp(m(i,j))
-     */
-    template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> exp(const Eigen::Matrix<double,Rows,Cols>& m) {
-      return m.array().exp().matrix();
-    }
-
+   
     /**
      * Return the sum of a matrix or vector and a scalar.
      * @param m Matrix or vector.
@@ -1280,7 +1176,8 @@ namespace stan {
      * @return The matrix or vector minus the scalar.
      */
     template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> subtract(const Eigen::Matrix<double,Rows,Cols>& m, double c) {
+    inline Eigen::Matrix<double,Rows,Cols> subtract(const Eigen::Matrix<double,Rows,Cols>& m, 
+                                                    double c) {
       return (m.array() - c).matrix();
     }
     /**

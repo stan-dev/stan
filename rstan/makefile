@@ -44,6 +44,9 @@ install: $(STANPKG)
 	# R CMD INSTALL --no-multiarch $(STANPKG) 
 	R CMD INSTALL --merge-multiarch $(STANPKG) 
 
+uninstall: $(STANPKG) 
+	R CMD REMOVE rstan
+
 clean: 
 	rm -f $(STANPKG) 
 
