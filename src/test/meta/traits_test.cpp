@@ -296,46 +296,6 @@ TEST(MetaTraits, VectorView_new_double_star) {
   EXPECT_FLOAT_EQ(10, bv[0]);
   EXPECT_FLOAT_EQ(10, b);
 }
-TEST(MetaTraits, VectorView)  {
-  using std::vector;
-  using stan::VectorView;
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-
-  vector<double> x(10);
-  for (size_t n = 0; n < 10; ++n) x[n] = n;
-  VectorView<vector<double> > xv(x);
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(x[n], xv[n]);
-
-  const vector<double> y(x);
-  VectorView<const vector<double> > yv(y);
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(y[n], yv[n]);
-
-  Matrix<double,Dynamic,1> a(10);
-  for (size_t n = 0; n < 10; ++n) a[n] = n;
-  VectorView<Matrix<double,Dynamic,1> > av(a);
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(a[n], av[n]);
-
-  const Matrix<double,Dynamic,1> b(a);
-  VectorView<const Matrix<double,Dynamic,1> > bv(b);
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(b[n], bv[n]);
-
-  Matrix<double,1,Dynamic> c(10);
-  for (size_t n = 0; n < 10; ++n) c[n] = n;
-  VectorView<Matrix<double,1,Dynamic> > cv(c);
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(c[n], cv[n]);
-
-  const Matrix<double,1,Dynamic> d(c);
-  VectorView<const Matrix<double,Dynamic,1> > dv(d);
-  for (size_t n = 0; n < 10; ++n)
-    EXPECT_FLOAT_EQ(d[n], dv[n]);
-}
-
 TEST(MetaTraits, DoubleVectorView_false_double) {
   using std::vector;
   using stan::DoubleVectorView;
