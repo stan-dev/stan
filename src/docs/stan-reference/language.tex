@@ -1674,6 +1674,14 @@ For continuous distributions, truncation points must be expressions of
 type \code{int} or \code{real}.  For discrete distributions, truncation
 points must be expressions of type \code{int}.
 
+For a truncated sampling statement, if the value sampled is not within
+the bounds specified by the truncation expression, the result is zero
+probability and the entire statement adds $-\infty$ to the log
+probability accumulator \Verb|lp__|, which in turn results in the
+sample being rejected; see \refsection{truncation-constraints} for
+programming strategies to keep all values within bounds.
+
+
 
 \subsection{Scope of\, \code{lp\_\_}}
 

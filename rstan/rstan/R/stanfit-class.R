@@ -8,7 +8,7 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
                          digits_summary = 1, ...) { 
   if (x@mode == 1L) { 
     cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
-        "no sample is collected.\n", sep = '')
+        "sampling is not conducted.\n", sep = '')
     return(invisible(NULL)) 
   }
 
@@ -40,7 +40,7 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
           function(x, pars, display_parallel = FALSE) {
             if (x@mode == 1L) {
               cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
             pars <- if (missing(pars)) x@sim$pars_oi else check_pars(x@sim, pars) 
@@ -201,7 +201,7 @@ setMethod("get_adaptation_info",
           definition = function(object) {
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
 
@@ -223,7 +223,7 @@ setMethod("get_logposterior",
           definition = function(object, inc_warmup = TRUE) {
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
             llp <- lapply(object@sim$samples, function(x) x[['lp__']]) 
@@ -240,7 +240,7 @@ setMethod("get_sampler_params",
           definition = function(object, inc_warmup = TRUE) {
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
             ldf <- lapply(object@sim$samples, 
@@ -275,7 +275,7 @@ setMethod("extract", signature = "stanfit",
 
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
@@ -340,7 +340,7 @@ setMethod("summary", signature = "stanfit",
 
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
 
@@ -411,7 +411,7 @@ setMethod("traceplot", signature = "stanfit",
 
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
-                  "no sample is collected.\n", sep = '')
+                  "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
             }
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 

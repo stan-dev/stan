@@ -142,24 +142,12 @@ namespace stan {
     }
 
     row_vector_d row(const matrix_d& m, size_t i) {
-      if (i >= m.rows()) {
-        std::stringstream msg;
-        msg << "error, row index out of order."
-            << " matrix.rows()=" << m.rows()
-            << "; index i=" << i;
-        throw std::domain_error(msg.str());
-      }
+      validate_row_index(m,i,"row");
       return m.row(i - 1);
     }
 
     vector_d col(const matrix_d& m, size_t j) {
-      if (j >= m.cols()) {
-        std::stringstream msg;
-        msg << "error, column index out of order."
-            << " matrix.cols()=" << m.cols()
-            << "; index j=" << j;
-        throw std::domain_error(msg.str());
-      }
+      validate_column_index(m,j,"col");
       return m.col(j - 1);
     }
 
@@ -192,7 +180,7 @@ namespace stan {
     softmax(const vector_d& x) {
       validate_nonzero_size(x,"vector softmax");
       vector_d theta(x.size());
-      stan::math::softmax<vector_d,double>(x,theta);
+      softmax<vector_d,double>(x,theta);
       return theta;
     }
 
