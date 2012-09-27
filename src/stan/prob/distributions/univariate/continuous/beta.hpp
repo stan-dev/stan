@@ -49,6 +49,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::value_of;
       using stan::prob::include_summand;
+      using boost::math::digamma;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -88,12 +89,63 @@ namespace stan {
       if (!include_summand<propto,T_y,T_scale_succ,T_scale_fail>::value)
 	return 0.0;
 
-      // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale_succ> alpha_vec(alpha);
       VectorView<const T_scale_fail> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
+
+      for (size_t n = 0; n < N; n++) {
+	const double y_dbl = value_of(y_vec[n]);
+	if (y_dbl < 0 || y_dbl > 1)
+	  return LOG_ZERO;
+      }
+
+      // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
+
+
+      DoubleVectorView<true,T_y> log_y(length(y));
+      for (size_t n = 0; n < length(y); n++)
+	log_y[n] = log(value_of(y_vec[n]));
+      DoubleVectorView<include_summand<propto,T_y,T_scale_fail>::value,T_y> log1m_y(length(y));
+      if (include_summand<propto,T_y,T_scale_fail>::value) {
+	for (size_t n = 0; n < length(y); n++)
+	  log1m_y[n] = log1m(value_of(y_vec[n]));
+      }
+
+      DoubleVectorView<include_summand<propto,T_scale_succ>::value,T_scale_succ> lgamma_alpha(length(alpha));
+      DoubleVectorView<include_summand<propto,T_scale_succ>::value,T_scale_succ> digamma_alpha(length(alpha));
+      if (include_summand<propto,T_scale_succ>::value) {
+	for (size_t n = 0; n < length(alpha); n++) {
+	  lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
+	  digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
+	}
+      }
+
+      DoubleVectorView<include_summand<propto,T_scale_fail>::value,T_scale_fail> lgamma_beta(length(beta));
+      DoubleVectorView<include_summand<propto,T_scale_fail>::value,T_scale_fail> digamma_beta(length(beta));
+      if (include_summand<propto,T_scale_fail>::value) {
+	for (size_t n = 0; n < length(beta); n++) {
+	  lgamma_beta[n] = lgamma(value_of(beta_vec[n]));
+	  digamma_beta[n] = digamma(value_of(beta_vec[n]));
+	}
+      }
+
+      DoubleVectorView<include_summand<propto,T_scale_succ,T_scale_fail>::value,
+	double,
+	is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
+	lgamma_alpha_beta(max_size(alpha,beta));
+      DoubleVectorView<include_summand<propto,T_scale_succ,T_scale_fail>::value,
+	double,
+	is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
+	digamma_alpha_beta(max_size(alpha,beta));
+      if (include_summand<propto,T_scale_succ,T_scale_fail>::value) {
+	for (size_t n = 0; n < max_size(alpha,beta); n++) {
+	  lgamma_alpha_beta[n] = lgamma(value_of(alpha_vec[n]) + value_of(beta_vec[n]));
+	  digamma_alpha_beta[n] = digamma(value_of(alpha_vec[n]) + value_of(beta_vec[n]));
+	}
+      }
+
 
       for (size_t n = 0; n < N; n++) {
 	// pull out values of arguments
@@ -101,35 +153,25 @@ namespace stan {
 	const double alpha_dbl = value_of(alpha_vec[n]);
 	const double beta_dbl = value_of(beta_vec[n]);
 
-	// reusable subexpressions values
-	if (y_dbl < 0 || y_dbl > 1)
-	  return LOG_ZERO;
-
-	const double log_y = log(y_dbl);
-	const double log1m_y = log1m(y_dbl);
 	// log probability
 	if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
-	  logp += lgamma(alpha_dbl + beta_dbl);
+	  logp += lgamma_alpha_beta[n];
 	if (include_summand<propto,T_scale_succ>::value)
-	  logp -= lgamma(alpha_dbl);
+	  logp -= lgamma_alpha[n];
 	if (include_summand<propto,T_scale_fail>::value)
-	  logp -= lgamma(beta_dbl);
+	  logp -= lgamma_beta[n];
 	if (include_summand<propto,T_y,T_scale_succ>::value)
-	  logp += (alpha_dbl-1.0) * log_y;
+	  logp += (alpha_dbl-1.0) * log_y[n];
 	if (include_summand<propto,T_y,T_scale_fail>::value)
-	  logp += (beta_dbl-1.0) * log1m_y;
+	  logp += (beta_dbl-1.0) * log1m_y[n];
 
 	// gradients
-	const double digamma_alpha_beta = boost::math::digamma(alpha_dbl + beta_dbl);
-	const double digamma_alpha = boost::math::digamma(alpha_dbl);
-	const double digamma_beta = boost::math::digamma(beta_dbl);
-
-	if (!is_constant<typename is_vector<T_y>::type>::value)
+	if (include_summand<propto,T_y>::value)
 	  operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl + (beta_dbl-1)/(y_dbl-1);
-	if (!is_constant<typename is_vector<T_scale_succ>::type>::value)
-	  operands_and_partials.d_x2[n] += log_y + digamma_alpha_beta - digamma_alpha;
-	if (!is_constant<typename is_vector<T_scale_fail>::type>::value)
-	  operands_and_partials.d_x3[n] += log1m_y + digamma_alpha_beta - digamma_beta;
+	if (include_summand<propto,T_scale_succ>::value)
+	  operands_and_partials.d_x2[n] += log_y[n] + digamma_alpha_beta[n] - digamma_alpha[n];
+	if (include_summand<propto,T_scale_fail>::value)
+	  operands_and_partials.d_x3[n] += log1m_y[n] + digamma_alpha_beta[n] - digamma_beta[n];
       }
       return operands_and_partials.to_var(logp);
     }

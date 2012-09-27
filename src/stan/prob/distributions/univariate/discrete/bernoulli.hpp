@@ -61,25 +61,41 @@ namespace stan {
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-
-      for (size_t n = 0; n < N; n++) {
-	// pull out values of arguments
-	const int n_int = value_of(n_vec[n]);
-	const double theta_dbl = value_of(theta_vec[n]);
-	
-	if (include_summand<propto,T_prob>::value) {
-	  if (n_int == 1)
-	    logp += log(theta_dbl);
-	  else
-	    logp += log1m(theta_dbl);
+      
+      if (length(theta) == 1) {	
+	size_t sum = 0;
+	for (size_t n = 0; n < N; n++) {
+	  sum += value_of(n_vec[n]);
 	}
-
-	// gradient
-	if (!is_constant<typename is_vector<T_prob>::type>::value) {
-	  if (n_int == 1)
-	    operands_and_partials.d_x1[n] += 1.0 / theta_dbl;
-	  else
-	    operands_and_partials.d_x1[n] += 1.0 / (theta_dbl - 1.0);
+	const double theta_dbl = value_of(theta_vec[0]);
+	const double log_theta = log(theta_dbl);
+	const double log1m_theta = log1m(theta_dbl);
+	if (include_summand<propto,T_prob>::value) {
+	  logp += sum * log_theta;
+	  logp += (N - sum) * log1m_theta;
+	  
+	  operands_and_partials.d_x1[0] += sum / theta_dbl;
+	  operands_and_partials.d_x1[0] += (N - sum) / (theta_dbl - 1);
+	}
+      } else {
+	for (size_t n = 0; n < N; n++) {
+	  // pull out values of arguments
+	  const int n_int = value_of(n_vec[n]);
+	  const double theta_dbl = value_of(theta_vec[n]);
+	  
+	  if (include_summand<propto,T_prob>::value) {
+	    if (n_int == 1)
+	      logp += log(theta_dbl);
+	    else
+	      logp += log1m(theta_dbl);
+	  }
+	  
+	  // gradient
+	  if (include_summand<propto,T_prob>::value)
+	    if (n_int == 1)
+	      operands_and_partials.d_x1[n] += 1.0 / theta_dbl;
+	    else
+	      operands_and_partials.d_x1[n] += 1.0 / (theta_dbl - 1);
 	}
       }
       return operands_and_partials.to_var(logp);

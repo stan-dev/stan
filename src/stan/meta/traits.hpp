@@ -219,12 +219,10 @@ namespace stan {
     }
   };
 
-  
-
-  template<bool used, typename T, bool is_vec = stan::is_vector<T>::value>
+  template<bool used, typename T = double, bool is_vec = stan::is_vector<T>::value>
   class DoubleVectorView {
   public:
-    DoubleVectorView(const T& /* x */) { }
+    DoubleVectorView(const size_t /* n */) { }
     double& operator[](size_t /* i */) {
       throw std::runtime_error("used is false. this should never be called");
     }
@@ -235,7 +233,7 @@ namespace stan {
   private:
     double x_;
   public:
-    DoubleVectorView(const T& x) : x_(0.0) { }
+    DoubleVectorView(const size_t /* n */) : x_(0.0) { }
     double& operator[](size_t /* i */) {
       return x_;
     }
@@ -246,7 +244,7 @@ namespace stan {
   private:
     std::vector<double> x_;
   public:
-    DoubleVectorView(const T& x) : x_(length(x)) { }
+    DoubleVectorView(const size_t n) : x_(n) { }
     double& operator[](size_t i) {
       return x_[i];
     }

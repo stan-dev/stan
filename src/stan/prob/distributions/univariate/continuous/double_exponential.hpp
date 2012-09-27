@@ -70,33 +70,46 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
       agrad::OperandsAndPartials<T_y,T_loc,T_scale> operands_and_partials(y, mu, sigma);
 
+      DoubleVectorView<true,T_scale> 
+	inv_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> 
+	inv_sigma_squared(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> 
+	log_sigma(length(sigma));
+      for (size_t i = 0; i < length(sigma); i++) {
+        inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
+	if (include_summand<propto,T_scale>::value) {
+	  log_sigma[i] = log(value_of(sigma_vec[i]));
+	  inv_sigma_squared[i] = inv_sigma[i] * inv_sigma[i];
+	}
+      }
+
+
       for (size_t n = 0; n < N; n++) {
 	const double y_dbl = value_of(y_vec[n]);
 	const double mu_dbl = value_of(mu_vec[n]);
-	const double sigma_dbl = value_of(sigma_vec[n]);
 	
 	// reusable subexpressions values
 	const double y_m_mu = y_dbl - mu_dbl;
 	const double fabs_y_m_mu = fabs(y_m_mu);
-	const double inv_sigma = 1.0 / sigma_dbl;
 
 	// log probability
 	if (include_summand<propto>::value)
 	  logp += NEG_LOG_TWO;
 	if (include_summand<propto,T_scale>::value)
-	  logp -= log(sigma_dbl);
+	  logp -= log_sigma[n];
 	if (include_summand<propto,T_y,T_loc,T_scale>::value)
-	  logp -= fabs_y_m_mu * inv_sigma;
+	  logp -= fabs_y_m_mu * inv_sigma[n];
 	
 	// gradients
 	if (!is_constant<typename is_vector<T_y>::type>::value) {
-	  operands_and_partials.d_x1[n] -= sign(y_m_mu) * inv_sigma;
+	  operands_and_partials.d_x1[n] -= sign(y_m_mu) * inv_sigma[n];
 	}
 	if (!is_constant<typename is_vector<T_loc>::type>::value) {
-	  operands_and_partials.d_x2[n] += sign(y_m_mu) * inv_sigma;
+	  operands_and_partials.d_x2[n] += sign(y_m_mu) * inv_sigma[n];
 	}
 	if (!is_constant<typename is_vector<T_scale>::type>::value)
-	  operands_and_partials.d_x3[n] += -inv_sigma + fabs_y_m_mu * inv_sigma * inv_sigma;
+	  operands_and_partials.d_x3[n] += -inv_sigma[n] + fabs_y_m_mu * inv_sigma_squared[n];
       }
       return operands_and_partials.to_var(logp);
     }

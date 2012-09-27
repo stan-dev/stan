@@ -83,13 +83,17 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true, T_scale> inv_sigma(sigma);
-      DoubleVectorView<true, T_scale> log_sigma(sigma);
+      DoubleVectorView<true, T_scale> inv_sigma(length(sigma));
+      DoubleVectorView<true, T_scale> sigma_squared(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
-        inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
-        log_sigma[i] = log(value_of(sigma_vec[i]));
+	const double sigma_dbl = value_of(sigma_vec[i]);
+        inv_sigma[i] = 1.0 / sigma_dbl;
+	sigma_squared[i] = sigma_dbl * sigma_dbl;
+	if (include_summand<propto,T_scale>::value) {
+	  log_sigma[i] = log(sigma_dbl);
+	}
       }
-
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
 
@@ -97,7 +101,6 @@ namespace stan {
 	// pull out values of arguments
         const double y_dbl = value_of(y_vec[n]);
         const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
 	
 	// reusable subexpression values
 	const double y_minus_mu
@@ -108,8 +111,6 @@ namespace stan {
           = y_minus_mu * inv_sigma[n];
         const double y_minus_mu_over_sigma_squared 
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
-	const double sigma_squared
-	  = sigma_dbl * sigma_dbl;
 
 	// log probability
 	if (include_summand<propto>::value)
@@ -121,11 +122,11 @@ namespace stan {
 	
         // gradients
 	if (!is_constant<typename is_vector<T_y>::type>::value)
-	  operands_and_partials.d_x1[n] -= 2 * y_minus_mu / (sigma_squared + y_minus_mu_squared);
+	  operands_and_partials.d_x1[n] -= 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant<typename is_vector<T_loc>::type>::value)
-          operands_and_partials.d_x2[n] += 2 * y_minus_mu / (sigma_squared + y_minus_mu_squared);
+          operands_and_partials.d_x2[n] += 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant<typename is_vector<T_scale>::type>::value)
-          operands_and_partials.d_x3[n] += (y_minus_mu_squared - sigma_squared) / sigma_dbl / (sigma_squared + y_minus_mu_squared);
+          operands_and_partials.d_x3[n] += (y_minus_mu_squared - sigma_squared[n]) * inv_sigma[n] / (sigma_squared[n] + y_minus_mu_squared);
       }
       return operands_and_partials.to_var(logp);
     }
