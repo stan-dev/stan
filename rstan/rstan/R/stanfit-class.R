@@ -134,6 +134,16 @@ get_kept_samples <- function(n, sim) {
   do.call(c, ss) 
 } 
 
+get_kept_samples2 <- function(n, sim) {
+  # a different implementation of get_kept_samples 
+  # It seems this one is faster than get_kept_samples 
+  # TODO: to understand why it is faster? 
+  lst <- vector("list", sim$chains)
+  for (ic in 1:sim$chains)  
+    lst[[ic]] <- sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])][sim$permutation[[ic]]]
+  do.call(c, lst)
+}
+
 get_samples <- function(n, sim, inc_warmup = TRUE) {
   # get chain samples
   # Args:
@@ -153,6 +163,18 @@ get_samples <- function(n, sim, inc_warmup = TRUE) {
   ss <- mapply(gcs, sim$samples, inc_warmup, sim$warmup2, 
                SIMPLIFY = FALSE, USE.NAMES = FALSE) 
   ss 
+} 
+
+get_samples2 <- function(n, sim, inc_warmup = TRUE) {
+  # serves the same purpose with get_samples, but with 
+  # different implementation 
+  # It seems that this one is fast. 
+  lst <- vector("list", sim$chains)
+  for (ic in 1:sim$chains) {
+    lst[[ic]] <- 
+      if (inc_warmup) sim$samples[[ic]][[n]] else sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])]
+  }
+  lst
 } 
 
 par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE) {
@@ -286,7 +308,7 @@ setMethod("extract", signature = "stanfit",
 
             n_kept <- object@sim$n_save - object@sim$warmup2
             fun1 <- function(par) {
-              sss <- sapply(tidx[[par]], get_kept_samples, object@sim) 
+              sss <- sapply(tidx[[par]], get_kept_samples2, object@sim) 
               dim(sss) <- c(sum(n_kept), object@sim$dims_oi[[par]]) 
               sss 
             } 
@@ -299,7 +321,7 @@ setMethod("extract", signature = "stanfit",
 
             tidx <- unlist(tidx, use.names = FALSE) 
             tidxnames <- object@sim$fnames_oi[tidx] 
-            sss <- lapply(tidx, get_samples, object@sim, inc_warmup) 
+            sss <- lapply(tidx, get_samples2, object@sim, inc_warmup) 
             sss2 <- lapply(sss, function(x) do.call(c, x))  # concatenate samples from different chains
             sssf <- unlist(sss2, use.names = FALSE) 
   

@@ -76,7 +76,13 @@ rstan_options <- function(...) {
     ns <- unlist(a) 
     if (!is.character(ns)) 
       stop("rstan_options only accepts arguments as `name=value'") 
-    r <- mget(unlist(a), envir = e, ifnotfound = NA)
+
+   ifnotfound_fun <- function(x) {
+     warning("rstan option '", x, "' not found")
+     NA 
+   } 
+
+    r <- mget(unlist(a), envir = e, ifnotfound = list(ifnotfound_fun)) 
     if (length(r) == 1) return(r[[1]])
     return(invisible(r))
   } 
@@ -85,7 +91,7 @@ rstan_options <- function(...) {
   empty <- (a_names == '') 
 
   opt_names <- c(a_names[!empty], unlist(a[empty]))
-  r <- mget(opt_names, envir = e, ifnotfound = NA)
+  r <- mget(opt_names, envir = e, ifnotfound = list(ifnotfound_fun))
 
   lapply(a_names[!empty], 
          FUN = function(n) {

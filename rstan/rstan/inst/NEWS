@@ -1,9 +1,11 @@
 Tue Sep 25 2012
 1. Changes 
-   * print progress with carriage return 
+   * print progress of sampling with carriage return 
 
 2. New features 
    * add set_cppo to set c++ compiler optimization level flag 
+   * support test_grad in rstan; 
+     two modes --- sampling and test_grad --- for stanfit
 
 Mon Sep  3 2012
 1. Changes 
