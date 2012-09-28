@@ -1479,10 +1479,10 @@ namespace stan {
       int K = L.rows();
       matrix_v LLt(K,K);
       if (K == 0) return LLt;
-      if (K == 1) {
-        LLt(0,0) = L(0,0) * L(0,0);
-        return LLt;
-      }
+      // if (K == 1) {
+      //   LLt(0,0) = L(0,0) * L(0,0);
+      //   return LLt;
+      // }
       int Knz = (K * (K + 1)) / 2;  // nonzero: (K choose 2) below
                                     // diag + K on diag
       vari** vs = (vari**)memalloc_.alloc( Knz * sizeof(vari*) );
