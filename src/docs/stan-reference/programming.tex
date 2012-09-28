@@ -443,9 +443,9 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-Because the censored data array \code{y} is declared to be a parameter, it
+Because the censored data array \code{y\_cens} is declared to be a parameter, it
 will be sampled along with the location and scale parameters \code{mu}
-and \code{sigma}.  Because the censored data array \code{y} is
+and \code{sigma}.  Because the censored data array \code{y\_cens} is
 declared to have values of type \code{real<lower=U>}, all imputed values
 for censored data will be greater than \code{U}.  The imputed censored
 data affects the location and scale parameters through the last
@@ -639,12 +639,13 @@ model {
 \end{quote}
 %
 The model involves \code{K} mixture components and \code{N} data
-points.  The mixing proportions are defined to be a unit $K$-simplex
-using \code{simplex[K]}, the components distributions locations
-\code{mu[k]} are unconstrained and their scales \code{sigma[k]}
-constrained to be positive.  The model declares a local variable
-\code{ps} of type \code{real[K]}, which is used to accumulate the
-contributions by each mixture component.
+points.  The mixing proportion parameter \code{theta} is declared to
+be a unit $K$-simplex, whereas the component location parameter
+\code{mu} and scale parameter \code{sigma} are both defined to be
+arrays of size \code{K}.  The values in the scale array \code{sigma}
+are constrained to be non-negative.  The model declares a local 
+array variable \code{ps} to be size \code{K} and uses it to
+accumulate the contributions from the mixture components.
 
 The locations and scales are drawn from simple priors for the sake of
 this example, but could be anything supported by \Stan.  The mixture
@@ -767,13 +768,13 @@ sampling distribution is changed to the following.
 \begin{quote}
 \begin{Verbatim}
 data {
-    ...
-    real<lower=0> nu;
+  ...
+  real<lower=0> nu;
 }
 ...
 model {
-    for (n in 1:N)
-        y[n] ~ student_t(nu,0,sigma);
+  for (n in 1:N)
+    y[n] ~ student_t(nu, alpha + beta * x[n], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -1158,13 +1159,13 @@ The model parameters are declared as follows.
 \begin{quote}
 \begin{Verbatim}
 parameters {    
-  real delta;                    // mean student ability
-  real alpha[J];                 // ability for student j - mean ability
-  real beta[K];                  // difficulty for question k
-  real log_gamma[K];             // discriminativeness for question k
-  real<lower=0> sigma_alpha;     // sd of student abilities  
-  real<lower=0> sigma_beta;      // sd of question difficulties 
-  real<lower=0> sigma_gamma;     // sd of log question discriminativeness
+  real delta;                  // mean student ability
+  real alpha[J];               // ability for j - mean
+  real beta[K];                // difficulty for k
+  real log_gamma[K];           // discrim for k
+  real<lower=0> sigma_alpha;   // sd of abilities
+  real<lower=0> sigma_beta;    // sd of difficulties 
+  real<lower=0> sigma_gamma;   // sd of log discrim
 }
 \end{Verbatim}
 \end{quote}
@@ -1182,8 +1183,9 @@ model {
   sigma_beta ~ cauchy(0,5);
   sigma_gamma ~ cauchy(0,5);
   for (n in 1:N)
-    y[n] ~ bernoulli_logit( exp(log_gamma[kk[n]])
-                            * (alpha[jj[n]] - beta[kk[n]] + delta) );
+    y[n] ~ bernoulli_logit( 
+               exp(log_gamma[kk[n]])
+               * (alpha[jj[n]] - beta[kk[n]] + delta) );
 }
 \end{Verbatim}
 \end{quote}
