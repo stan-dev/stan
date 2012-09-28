@@ -23,7 +23,6 @@ Bug Fixes:
   -- indexing fixed for arrays of matrix/vector/row_vector
   -- fixed sd() and variance() to return 0.0 for sequences of size 1
   -- fixed void return type in auto_covariance
-  -- boundary conditions at limits of support for cdfs
   -- patch truncation to return -inf for variates out of range
   -- upgraded BUGS ring model to use constraints plus tan2()
 
@@ -152,6 +151,7 @@ C++ API
   - normalize sample to zero sample mean, unit sample variance
 
 * cumulative distribution functions
+  - boundary conditions at limits of support for cdfs
   - should we have the basic cdfs on the log scale?
   - need for truncated distros mostly
         foo_cdf_lb_log(L|...) == log(1 - foo_cdf(L|...))
