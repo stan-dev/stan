@@ -1484,7 +1484,7 @@ void test_tcrossprod(const matrix_d& x) {
     for (int n = 0; n < y.cols(); ++n)
       EXPECT_FLOAT_EQ(xxt(m,n),y(m,n));
 }
-TEST(MathMatrix,Tcrossprod) {
+TEST(MathMatrix,tcrossprod) {
   matrix_d x;
   test_tcrossprod(x);
 
