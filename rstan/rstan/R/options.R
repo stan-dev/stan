@@ -70,39 +70,29 @@ rstan_options <- function(...) {
   len <- length(a) 
   if (len < 1) return(NULL) 
   a_names <- names(a) 
-  # deal with the case that this function is called as 
-  # rstan_options("a", "b")
-  if (is.null(a_names)) {
-    ns <- unlist(a) 
-    if (!is.character(ns)) 
-      stop("rstan_options only accepts arguments as `name=value'") 
-
-   ifnotfound_fun <- function(x) {
-     warning("rstan option '", x, "' not found")
-     NA 
-   } 
-
-    r <- mget(unlist(a), envir = e, ifnotfound = list(ifnotfound_fun)) 
-    if (length(r) == 1) return(r[[1]])
-    return(invisible(r))
+  if (is.null(a_names)) { # case like rstan_options("a", "b")
+    empty <- rep(TRUE, len)
+    empty_len <- len 
+  } else { # case like rstan_options(a = 3, b = 4, "c")
+    empty <- (a_names == '') 
+    empty_len <- sum(empty) 
   } 
-  # the case for, for example, 
-  # rstan_options(a = 3, b = 4, "c")
-  empty <- (a_names == '') 
+  for (i in which(empty)) {
+    if (!is.character(a[[i]])) stop("rstan_options only accepts arguments as 'name=value' or 'name'") 
+  } 
+  
+  r <- if (empty_len < len) mget(a_names[!empty], envir = e, ifnotfound = NA) 
+  if (empty_len > 0) 
+    r <- c(r, mget(unlist(a[empty]), envir = e, 
+                   ifnotfound = list(function(x) { warning("rstan option '", x, "' not found"); NA })))
 
-  opt_names <- c(a_names[!empty], unlist(a[empty]))
-  r <- mget(opt_names, envir = e, ifnotfound = list(ifnotfound_fun))
+  # set options 
+  for (n in a_names[!empty]) {
+    if (n == 'plot_rhat_breaks') { assign(n, sort(a[[n]]), e); next }
+    assign(n, a[[n]], e)
+  } 
 
-  lapply(a_names[!empty], 
-         FUN = function(n) {
-           if (n == 'plot_rhat_breaks') {
-             assign(n, sort(a[[n]]), e)
-           } else {
-             assign(n, a[[n]], e)
-           }
-         }) 
-
-  if (length(r) == 1) return(r[[1]])
+  if (len == 1) return(invisible(r[[1]])) 
   invisible(r)
 } 
 
