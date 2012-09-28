@@ -15,25 +15,21 @@ The to-do list is organized into the following sections:
 V 1.0.2 Release Notes
 ======================================================================
 
-To Do for 1.0.2
-  ?? remove (unsigned) long long instances in dump and error testing
-  ?? manual section on reparameterization and change of vars
- 
 Bug Fixes:
-  -- fixed sd() and variance() to return 0.0 for sequences of size 1
   -- check ranges for LHS of assignment to prevent seg faults
-  -- indexing fixed for arrays of matrix/vector/row_vector
-  -- vectorized several probability functions (see the manual)
-  -- fixed void return type in auto_covariance
-  -- removed template variable names from distribution error msgs
   -- added matrix size and shape tests to avoid seg faults
   -- changed matrix to throw domain_error rather than illegal_argument
-  -- boundary conditions at limits of support for cdfs
+  -- removed template variable names from distribution error msgs
+  -- indexing fixed for arrays of matrix/vector/row_vector
+  -- fixed sd() and variance() to return 0.0 for sequences of size 1
+  -- fixed void return type in auto_covariance
   -- patch truncation to return -inf for variates out of range
   -- upgraded BUGS ring model to use constraints plus tan2()
 
 New Features:
   -- print statements
+  -- multiply_lower_tri_self_transpose function
+  -- vectorized several probability functions (see the manual)
 
 Manual Additions:
   -- programming guide: IRT models 
@@ -45,6 +41,8 @@ Manual Additions:
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* remove (unsigned) long long instances in dump and error testing
 
 * bring isinf in line with revised Boost
 
@@ -153,6 +151,7 @@ C++ API
   - normalize sample to zero sample mean, unit sample variance
 
 * cumulative distribution functions
+  - boundary conditions at limits of support for cdfs
   - should we have the basic cdfs on the log scale?
   - need for truncated distros mostly
         foo_cdf_lb_log(L|...) == log(1 - foo_cdf(L|...))

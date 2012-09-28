@@ -18,6 +18,11 @@ test_options2 <- function() {
   checkEquals(ov, 22) 
   o <- rstan:::rstan_options('a', 'b') 
   checkEquals(o$a, 34) 
+  o <- rstan:::rstan_options('a', 'b', 'c') 
+  checkEquals(o$c, NA) 
+  o <- rstan:::rstan_options('a', 'b', 'c', d = 38) 
+  checkEquals(o$d, NA) 
+  checkEquals(rstan:::rstan_options("d"), 38)
 } 
 
 test_plot_rhat_breaks <- function() {

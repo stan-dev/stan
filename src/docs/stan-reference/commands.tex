@@ -900,7 +900,7 @@ by the following (mildly templated) Backus-Naur form grammar.
 \begin{verbatim}
  definitions ::= definition+
 
- definition ::= name ("->" | '=') value optional_semicolon
+ definition ::= name ("<-" | '=') value optional_semicolon
 
  name ::= char* 
         | ''' char* ''' 
@@ -910,7 +910,7 @@ by the following (mildly templated) Backus-Naur form grammar.
 
  value<T> ::= T 
             | seq<T>
-            | 'struct' '(' seq<T> ',' ".Dim" '=' seq<int> ')'
+            | 'structure' '(' seq<T> ',' ".Dim" '=' seq<int> ')'
 
  seq<int> ::= int ':' int
             | cseq<int>
