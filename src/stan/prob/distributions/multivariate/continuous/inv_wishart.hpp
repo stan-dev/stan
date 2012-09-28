@@ -78,6 +78,7 @@ namespace stan {
 
       using stan::math::elt_multiply;
       using stan::math::mdivide_left_tri_low;
+      using stan::math::crossprod;
       using stan::math::lmgamma;
       
       if (include_summand<propto,T_dof>::value)
@@ -89,10 +90,7 @@ namespace stan {
         lp -= (nu + k + 1.0) * L.diagonal().array().log().sum();
       }
       if (include_summand<propto,T_y,T_scale>::value) {
-        Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
-        I.setIdentity();
-        L = mdivide_left_tri_low(L, I);
-        L = L.transpose() * L.template triangularView<Eigen::Lower>();
+        L = crossprod(mdivide_left_tri_low(L));
         lp -= 0.5 * elt_multiply(S, L).array().sum(); // trace(S * W^-1)
       }
       if (include_summand<propto,T_dof,T_scale>::value)
