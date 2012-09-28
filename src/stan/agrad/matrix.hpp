@@ -1491,12 +1491,40 @@ namespace stan {
         for (int n = 0; n <= m; ++n)
           vs[pos++] = L(m,n).vi_;
       for (int m = 0, mpos=0; m < K; ++m, mpos += m) {
-        // FIXME: replace with dot self
+        // FIXME: replace with dot_self
         LLt(m,m) = var(new dot_self_vari(vs + mpos, m + 1));
         for (int n = 0, npos = 0; n < m; ++n, npos += n)
           LLt(m,n) = LLt(n,m) = var(new dot_product_vv_vari(vs + mpos, vs + npos, n + 1));
       }
       return LLt;
+    }
+
+    /**
+     * Returns the result of post-multiplying a matrix by its
+     * own transpose.
+     * @param M Matrix to multiply.
+     * @return M times its transpose.
+     */
+    inline matrix_v
+    tcrossprod(const matrix_v& M) {
+        if(M.rows() == 0)
+          return matrix_v(0,0);
+        if(M.rows() == 1) {
+          return M * M.transpose(); // FIXME: replace with dot_self
+        }
+        matrix_v result(M.rows(),M.rows());
+        return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+    }
+
+    /**
+     * Returns the result of pre-multiplying a matrix by its
+     * own transpose.
+     * @param M Matrix to multiply.
+     * @return Transpose of M times M
+     */
+    inline matrix_v
+    crossprod(const matrix_v& M) {
+        return tcrossprod(M.transpose());
     }
 
     /**

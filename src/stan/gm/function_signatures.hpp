@@ -197,6 +197,8 @@ add("multiply",VECTOR_T,DOUBLE_T,VECTOR_T);
 add("multiply",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
 add("multiply",MATRIX_T,DOUBLE_T,MATRIX_T);
 add("multiply_lower_tri_self_transpose",MATRIX_T,MATRIX_T);
+add("tcrossprod",MATRIX_T,MATRIX_T);
+add("crossprod",MATRIX_T,MATRIX_T);
 add_binary("multiply_log");
 add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_epsilon");

@@ -747,6 +747,26 @@ The dot product of the row vector \farg{x} with itself}
 
 \subsection{Specialized Products}
 
+
+\begin{description}
+%
+\fitem{matrix}{tcrossprod}{matrix \farg{x}}{
+The product of \farg{x} postmultiplied by its own transpose, similar 
+to the tcrossprod(x) function in R. The result is a symmetric matrix 
+$\mbox{\code{x}}\,\mbox{\code{x}}^{\top}$.}
+%
+\end{description}
+
+
+\begin{description}
+%
+\fitem{matrix}{crossprod}{matrix \farg{x}}{
+The product of \farg{x} premultiplied by its own transpose,
+similar to the crossprod(x) function in R. The result is a symmetric matrix 
+$\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
+%
+\end{description}
+
 \begin{description}
 %
 \fitem{matrix}{multiply\_lower\_tri\_self\_transpose}{matrix \farg{x}}{
@@ -755,7 +775,8 @@ the diagonal) times its own transpose;  that is, if \code{L} is a
 matrix of the same dimensions as \farg{x}\, with \code{L(m,n)} equal to
   \code{\farg{x}(m,n)} for $\mbox{\code{n}} \leq \mbox{\code{m}}$ and
 \code{L(m,n)} equal to 0 if $\mbox{\code{n}} > \mbox{\code{m}}$, the
-result is the symmetric matrix $\mbox{\code{L}}\,\mbox{\code{L}}^{\top}$.}
+result is the symmetric matrix $\mbox{\code{L}}\,\mbox{\code{L}}^{\top}$.
+This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 %
 \end{description}
 
