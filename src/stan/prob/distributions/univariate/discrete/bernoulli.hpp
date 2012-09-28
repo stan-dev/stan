@@ -144,6 +144,7 @@ namespace stan {
                         const Policy&) {
       static const char* function = "stan::prob::bernoulli_logit_log(%1%)";
 
+      using stan::is_constant_struct;
       using stan::math::check_not_nan;
       using stan::math::check_bounded;
       using stan::math::value_of;
@@ -204,7 +205,7 @@ namespace stan {
 	}
 
 	// gradients
-	if (!is_constant<typename is_vector<T_prob>::type>::value) {
+	if (!is_constant_struct<T_prob>::value) {
 	  const static double cutoff = 20.0;
 	  if (ntheta > cutoff)
 	    operands_and_partials.d_x1[n] -= sign * exp_m_ntheta;
