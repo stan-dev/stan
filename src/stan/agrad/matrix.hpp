@@ -1628,6 +1628,15 @@ namespace stan {
       return to_var(A).template triangularView<Eigen::Lower>().solve(b);
     }
 
+    inline Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>
+    mdivide_left_tri_low(const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> &A) {
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      int n = A.rows();
+      Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> b;
+      b.setIdentity(n,n);
+      A.triangularView<Eigen::Lower>().solveInPlace(b);
+      return(b);
+    }
 
     /**
      * Returns the solution of the system Ax=b when A is triangular.
@@ -1676,6 +1685,24 @@ namespace stan {
       stan::math::validate_square(A,"mdivide_left_tri");
       stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       return to_var(A).template triangularView<TriView>().solve(b);
+    }
+
+    /**
+     * Returns the solution of the system Ax=b when A is triangular and b = I.
+     * @param[in] A Triangular matrix.  Upper or lower is defined by TriView being
+     * either Eigen::Upper or Eigen::Lower.
+     * @return x = A^-1 .
+     * @throws std::domain_error if A is not square
+     */
+    template<int TriView>
+    inline Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>
+    mdivide_left_tri(const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> &A) {
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      int n = A.rows();
+      Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> b;
+      b.setIdentity(n,n);
+      A.triangularView<TriView>().solveInPlace(b);
+      return b;
     }
 
     /**

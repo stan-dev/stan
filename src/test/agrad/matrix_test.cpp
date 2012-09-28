@@ -1970,6 +1970,7 @@ TEST(agrad_matrix,mdivide_right_val) {
 }
 TEST(matrixTest,mdivide_left_tri_val) {
   matrix_v Av(2,2);
+  matrix_v Av_inv(2,2);
   matrix_d Ad(2,2);
   matrix_v I;
   
@@ -1991,6 +1992,13 @@ TEST(matrixTest,mdivide_left_tri_val) {
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
   I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Ad,Av);
+  EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
+  EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
+  EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
+
+  Av_inv = stan::agrad::mdivide_left_tri<Eigen::Lower>(Av);
+  I = Av * Av_inv;
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);

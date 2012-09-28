@@ -1503,6 +1503,16 @@ namespace stan {
       return A.template triangularView<Eigen::Lower>().solve(b);
     }
 
+    inline Eigen::MatrixXd mdivide_left_tri_low(const Eigen::MatrixXd &A) {
+      if (A.cols() != A.rows())
+        throw std::domain_error("A is not square");
+      int n = A.rows();
+      Eigen::MatrixXd b;
+      b.setIdentity(n,n);
+      A.triangularView<Eigen::Lower>().solveInPlace(b);
+      return b;
+    }
+
     /**
      * Returns the solution of the system Ax=b when A is triangular
      * @param A Triangular matrix.  Specify upper or lower with TriView
@@ -1520,6 +1530,23 @@ namespace stan {
       if (A.cols() != b.rows())
         throw std::domain_error("A.cols() != b.rows()");
       return A.template triangularView<TriView>().solve(b);
+    }
+    /**
+     * Returns the solution of the system Ax=b when A is triangular and b=I.
+     * @param A Triangular matrix.  Specify upper or lower with TriView
+     * being Eigen::Upper or Eigen::Lower.
+     * @return x = A^-1 .
+     * @throws std::domain_error if A is not square
+     */
+    template<int TriView>
+    inline Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> mdivide_left_tri(const Eigen::MatrixXd &A) {
+      if (A.cols() != A.rows())
+        throw std::domain_error("A is not square");
+      int n = A.rows();
+      Eigen::MatrixXd b;
+      b.setIdentity(n,n);
+      A.triangularView<TriView>().solveInPlace(b);
+      return b;
     }
     /**
      * Returns the solution of the system Ax=b when A is triangular
