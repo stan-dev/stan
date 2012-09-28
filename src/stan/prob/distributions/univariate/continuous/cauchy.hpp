@@ -36,7 +36,8 @@ namespace stan {
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                const Policy&) {
       static const char* function = "stan::prob::cauchy_log(%1%)";
-      
+
+      using stan::is_constant_struct;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -121,11 +122,11 @@ namespace stan {
 	  logp -= log1p(y_minus_mu_over_sigma_squared);
 	
         // gradients
-	if (!is_constant<typename is_vector<T_y>::type>::value)
+	if (!is_constant_struct<T_y>::value)
 	  operands_and_partials.d_x1[n] -= 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
-        if (!is_constant<typename is_vector<T_loc>::type>::value)
+        if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
-        if (!is_constant<typename is_vector<T_scale>::type>::value)
+        if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += (y_minus_mu_squared - sigma_squared[n]) * inv_sigma[n] / (sigma_squared[n] + y_minus_mu_squared);
       }
       return operands_and_partials.to_var(logp);

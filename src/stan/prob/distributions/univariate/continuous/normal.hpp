@@ -42,7 +42,7 @@ namespace stan {
       static const char* function = "stan::prob::normal_log(%1%)";
 
       using std::log;
-      using stan::is_constant;
+      using stan::is_constant_struct;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -118,11 +118,11 @@ namespace stan {
 
         // gradients
         double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
-        if (include_summand<propto,T_y>::value)
+        if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= scaled_diff;
-        if (include_summand<propto,T_loc>::value)
+        if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += scaled_diff;
-        if (include_summand<propto,T_scale>::value)
+        if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
             += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
       }

@@ -40,7 +40,8 @@ namespace stan {
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
              const Policy&) {
       static const char* function = "stan::prob::beta_log(%1%)";
-      
+
+      using stan::is_constant_struct;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -104,48 +105,50 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
 
 
-      DoubleVectorView<true,T_y> log_y(length(y));
-      for (size_t n = 0; n < length(y); n++)
-	log_y[n] = log(value_of(y_vec[n]));
+      DoubleVectorView<include_summand<propto,T_y,T_scale_succ>::value,T_y> log_y(length(y));
       DoubleVectorView<include_summand<propto,T_y,T_scale_fail>::value,T_y> log1m_y(length(y));
-      if (include_summand<propto,T_y,T_scale_fail>::value) {
-	for (size_t n = 0; n < length(y); n++)
+      
+      for (size_t n = 0; n < length(y); n++) {
+	if (include_summand<propto,T_y,T_scale_succ>::value)
+	  log_y[n] = log(value_of(y_vec[n]));
+	if (include_summand<propto,T_y,T_scale_fail>::value)
 	  log1m_y[n] = log1m(value_of(y_vec[n]));
       }
 
-      DoubleVectorView<include_summand<propto,T_scale_succ>::value,T_scale_succ> lgamma_alpha(length(alpha));
-      DoubleVectorView<include_summand<propto,T_scale_succ>::value,T_scale_succ> digamma_alpha(length(alpha));
-      if (include_summand<propto,T_scale_succ>::value) {
-	for (size_t n = 0; n < length(alpha); n++) {
+    DoubleVectorView<include_summand<propto,T_scale_succ>::value,T_scale_succ> lgamma_alpha(length(alpha));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value,T_scale_succ> digamma_alpha(length(alpha));
+      for (size_t n = 0; n < length(alpha); n++) {
+	if (include_summand<propto,T_scale_succ>::value) 
 	  lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
+	if (!is_constant_struct<T_scale_succ>::value)
 	  digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
-	}
       }
 
+
       DoubleVectorView<include_summand<propto,T_scale_fail>::value,T_scale_fail> lgamma_beta(length(beta));
-      DoubleVectorView<include_summand<propto,T_scale_fail>::value,T_scale_fail> digamma_beta(length(beta));
-      if (include_summand<propto,T_scale_fail>::value) {
-	for (size_t n = 0; n < length(beta); n++) {
+      DoubleVectorView<!is_constant_struct<T_scale_fail>::value,T_scale_fail> digamma_beta(length(beta));
+      for (size_t n = 0; n < length(beta); n++) {
+	if (include_summand<propto,T_scale_fail>::value) 
 	  lgamma_beta[n] = lgamma(value_of(beta_vec[n]));
+	if (!is_constant_struct<T_scale_fail>::value)
 	  digamma_beta[n] = digamma(value_of(beta_vec[n]));
-	}
       }
 
       DoubleVectorView<include_summand<propto,T_scale_succ,T_scale_fail>::value,
 	double,
 	is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
 	lgamma_alpha_beta(max_size(alpha,beta));
-      DoubleVectorView<include_summand<propto,T_scale_succ,T_scale_fail>::value,
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value||!is_constant_struct<T_scale_fail>::value,
 	double,
 	is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
 	digamma_alpha_beta(max_size(alpha,beta));
-      if (include_summand<propto,T_scale_succ,T_scale_fail>::value) {
-	for (size_t n = 0; n < max_size(alpha,beta); n++) {
-	  lgamma_alpha_beta[n] = lgamma(value_of(alpha_vec[n]) + value_of(beta_vec[n]));
-	  digamma_alpha_beta[n] = digamma(value_of(alpha_vec[n]) + value_of(beta_vec[n]));
-	}
+      for (size_t n = 0; n < max_size(alpha,beta); n++) {
+	const double alpha_beta = value_of(alpha_vec[n]) + value_of(beta_vec[n]);
+	if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
+	  lgamma_alpha_beta[n] = lgamma(alpha_beta);
+	if (!is_constant_struct<T_scale_succ>::value||!is_constant_struct<T_scale_fail>::value)
+	  digamma_alpha_beta[n] = digamma(alpha_beta);
       }
-
 
       for (size_t n = 0; n < N; n++) {
 	// pull out values of arguments
@@ -166,11 +169,11 @@ namespace stan {
 	  logp += (beta_dbl-1.0) * log1m_y[n];
 
 	// gradients
-	if (include_summand<propto,T_y>::value)
+	if (!is_constant_struct<T_y>::value)
 	  operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl + (beta_dbl-1)/(y_dbl-1);
-	if (include_summand<propto,T_scale_succ>::value)
+	if (!is_constant_struct<T_scale_succ>::value)
 	  operands_and_partials.d_x2[n] += log_y[n] + digamma_alpha_beta[n] - digamma_alpha[n];
-	if (include_summand<propto,T_scale_fail>::value)
+	if (!is_constant_struct<T_scale_fail>::value)
 	  operands_and_partials.d_x3[n] += log1m_y[n] + digamma_alpha_beta[n] - digamma_beta[n];
       }
       return operands_and_partials.to_var(logp);
