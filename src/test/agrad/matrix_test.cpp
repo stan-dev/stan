@@ -3185,52 +3185,6 @@ TEST(AgradMatrix,diagMatrix) {
 }
 
 
-std::vector<double> grad_eigen(const matrix_v& L, 
-                               int m_test, int n_test) {
-  size_t K = (L.rows() * (L.rows() + 1)) / 2;
-  std::vector<var> x(K);
-  int pos = 0;
-  for (int m = 0; m < L.rows(); ++m)
-    for (int n = 0; n <= m; ++n)
-      x[pos++] = L(m,n);
-  matrix_v LLT =  L * L.transpose();  // eigen
-  var f = LLT(m_test,n_test);
-  std::vector<double> g;
-  f.grad(x,g);
-  return g;
-}
-
-std::vector<double> grad_stan(const matrix_v& L, 
-                              int m_test, int n_test) {
-  size_t K = (L.rows() * (L.rows() + 1)) / 2;
-  std::vector<var> x(K);
-  int pos = 0;
-  for (int m = 0; m < L.rows(); ++m)
-    for (int n = 0; n <= m; ++n)
-      x[pos++] = L(m,n);
-  matrix_v LLT =  multiply_lower_tri_self_transpose(L);
-  var f = LLT(m_test,n_test);
-  std::vector<double> g;
-  f.grad(x,g);
-  return g;
-}
-
-void test_LLT_grad(const matrix_v& L, int m_test, int n_test) {
-  using std::vector;
-  vector<double> g_eigen = grad_eigen(L,m_test,n_test);
-  vector<double> g_stan = grad_stan(L,m_test,n_test);
-  std::cout << "********** GRAD SIZE=" << g_eigen.size() << std::endl;
-  EXPECT_EQ(g_eigen.size(), g_stan.size());
-  for (size_t i = 0; i < g_eigen.size(); ++i)
-    EXPECT_FLOAT_EQ(g_eigen[i], g_stan[i]);
-}
-
-void test_mult_LLT_grad(const matrix_v& L) {
-  for (int m1 = 0; m1 < L.rows(); ++m1)
-    for (int n1 = 0; n1 < L.cols(); ++n1) 
-      test_LLT_grad(L,m1,n1);
-}
-
 
 void test_mult_LLT(const matrix_v& L) {
   using stan::agrad::var;
@@ -3241,8 +3195,185 @@ void test_mult_LLT(const matrix_v& L) {
   for (int m = 0; m < L.rows(); ++m)
     for (int n = 0; n < L.cols(); ++n)
       EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());  
+}
 
+TEST(AgradMatrix, multiplyLowerTriSelfTransposeGrad1) {
+  using stan::agrad::var;
+  using stan::agrad::multiply_lower_tri_self_transpose;
+  matrix_v L(1,1);
+  L << 3.0;
+  std::vector<var> x(1);
+  x[0] = L(0,0);
+
+  matrix_v LLt = multiply_lower_tri_self_transpose(L);
+  std::vector<var> y(1);
+  y[0] = LLt(0,0);
   
+  EXPECT_FLOAT_EQ(9.0, LLt(0,0).val());
+
+  std::vector<std::vector<double> > J;
+  stan::agrad::jacobian(y,x,J);
+  
+  EXPECT_FLOAT_EQ(6.0, J[0][0]);
+}
+
+TEST(AgradMatrix, multiplyLowerTriSelfTransposeGrad2) {
+  using stan::agrad::var;
+  using stan::agrad::multiply_lower_tri_self_transpose;
+  matrix_v L(2,2);
+  L << 
+    1, 0,
+    2, 3;
+  std::vector<var> x(3);
+  x[0] = L(0,0);
+  x[1] = L(1,0);
+  x[2] = L(1,1);
+
+  matrix_v LLt = multiply_lower_tri_self_transpose(L);
+  std::vector<var> y(4);
+  y[0] = LLt(0,0);
+  y[1] = LLt(0,1);
+  y[2] = LLt(1,0);
+  y[3] = LLt(1,1);
+  
+  EXPECT_FLOAT_EQ(1.0, LLt(0,0).val());
+  EXPECT_FLOAT_EQ(2.0, LLt(0,1).val());
+  EXPECT_FLOAT_EQ(2.0, LLt(1,0).val());
+  EXPECT_FLOAT_EQ(13.0, LLt(1,1).val());
+
+  std::vector<std::vector<double> > J;
+  stan::agrad::jacobian(y,x,J);
+
+  // L = 1 0
+  //     2 3
+  // Jacobian J = Jacobian(L * L')
+  // J = 2 0 0
+  //     2 1 0
+  //     2 1 0
+  //     0 4 6
+  EXPECT_FLOAT_EQ(2.0,J[0][0]);
+  EXPECT_FLOAT_EQ(0.0,J[0][1]);
+  EXPECT_FLOAT_EQ(0.0,J[0][2]);
+
+  EXPECT_FLOAT_EQ(2.0,J[1][0]);
+  EXPECT_FLOAT_EQ(1.0,J[1][1]);
+  EXPECT_FLOAT_EQ(0.0,J[1][2]);
+
+  EXPECT_FLOAT_EQ(2.0,J[2][0]);
+  EXPECT_FLOAT_EQ(1.0,J[2][1]);
+  EXPECT_FLOAT_EQ(0.0,J[2][2]);
+
+  EXPECT_FLOAT_EQ(0.0,J[3][0]);
+  EXPECT_FLOAT_EQ(4.0,J[3][1]);
+  EXPECT_FLOAT_EQ(6.0,J[3][2]);
+}
+
+TEST(AgradMatrix, multiplyLowerTriSelfTransposeGrad3) {
+  using stan::agrad::var;
+  using stan::agrad::multiply_lower_tri_self_transpose;
+  matrix_v L(3,3);
+  L << 
+    1, 0, 0,
+    2, 3, 0,
+    4, 5, 6;
+  std::vector<var> x(6);
+  x[0] = L(0,0);
+  x[1] = L(1,0);
+  x[2] = L(1,1);
+  x[3] = L(2,0);
+  x[4] = L(2,1);
+  x[5] = L(2,2);
+
+  matrix_v LLt = multiply_lower_tri_self_transpose(L);
+  std::vector<var> y(9);
+  y[0] = LLt(0,0);
+  y[1] = LLt(0,1);
+  y[2] = LLt(0,2);
+  y[3] = LLt(1,0);
+  y[4] = LLt(1,1);
+  y[5] = LLt(1,2);
+  y[6] = LLt(2,0);
+  y[7] = LLt(2,1);
+  y[8] = LLt(2,2);
+  
+  std::vector<std::vector<double> > J;
+  stan::agrad::jacobian(y,x,J);
+
+  // L = 1 0 0
+  //     2 3 0
+  //     4 5 6
+  // Jacobian J = Jacobian(L * L')
+  // J = 2 0 0 0 0 0
+  //     2 1 0 0 0 0
+  //     4 0 0 1 0 0
+  //     2 1 0 0 0 0
+  //     0 4 6 0 0 0
+  //     0 4 5 2 3 0
+  //     4 0 0 1 0 0
+  //     0 4 5 2 3 0
+  //     0 0 0 8 10 12
+
+  EXPECT_FLOAT_EQ(2.0,J[0][0]);
+  EXPECT_FLOAT_EQ(0.0,J[0][1]);
+  EXPECT_FLOAT_EQ(0.0,J[0][2]);
+  EXPECT_FLOAT_EQ(0.0,J[0][3]);
+  EXPECT_FLOAT_EQ(0.0,J[0][4]);
+  EXPECT_FLOAT_EQ(0.0,J[0][5]);
+
+  EXPECT_FLOAT_EQ(2.0,J[1][0]);
+  EXPECT_FLOAT_EQ(1.0,J[1][1]);
+  EXPECT_FLOAT_EQ(0.0,J[1][2]);
+  EXPECT_FLOAT_EQ(0.0,J[1][3]);
+  EXPECT_FLOAT_EQ(0.0,J[1][4]);
+  EXPECT_FLOAT_EQ(0.0,J[1][5]);
+
+  EXPECT_FLOAT_EQ(4.0,J[2][0]);
+  EXPECT_FLOAT_EQ(0.0,J[2][1]);  EXPECT_FLOAT_EQ(0.0,J[2][2]);
+  EXPECT_FLOAT_EQ(1.0,J[2][3]);
+  EXPECT_FLOAT_EQ(0.0,J[2][4]);
+  EXPECT_FLOAT_EQ(0.0,J[2][5]);
+
+  EXPECT_FLOAT_EQ(2.0,J[3][0]);
+  EXPECT_FLOAT_EQ(1.0,J[3][1]);
+  EXPECT_FLOAT_EQ(0.0,J[3][2]);
+  EXPECT_FLOAT_EQ(0.0,J[3][3]);
+  EXPECT_FLOAT_EQ(0.0,J[3][4]);
+  EXPECT_FLOAT_EQ(0.0,J[3][5]);
+
+  EXPECT_FLOAT_EQ(0.0,J[4][0]);
+  EXPECT_FLOAT_EQ(4.0,J[4][1]);
+  EXPECT_FLOAT_EQ(6.0,J[4][2]);
+  EXPECT_FLOAT_EQ(0.0,J[4][3]);
+  EXPECT_FLOAT_EQ(0.0,J[4][4]);
+  EXPECT_FLOAT_EQ(0.0,J[4][5]);
+
+  EXPECT_FLOAT_EQ(0.0,J[5][0]);
+  EXPECT_FLOAT_EQ(4.0,J[5][1]);
+  EXPECT_FLOAT_EQ(5.0,J[5][2]);
+  EXPECT_FLOAT_EQ(2.0,J[5][3]);
+  EXPECT_FLOAT_EQ(3.0,J[5][4]);
+  EXPECT_FLOAT_EQ(0.0,J[5][5]);
+
+  EXPECT_FLOAT_EQ(4.0,J[6][0]);
+  EXPECT_FLOAT_EQ(0.0,J[6][1]);
+  EXPECT_FLOAT_EQ(0.0,J[6][2]);
+  EXPECT_FLOAT_EQ(1.0,J[6][3]);
+  EXPECT_FLOAT_EQ(0.0,J[6][4]);
+  EXPECT_FLOAT_EQ(0.0,J[6][5]);
+
+  EXPECT_FLOAT_EQ(0.0,J[7][0]);
+  EXPECT_FLOAT_EQ(4.0,J[7][1]);
+  EXPECT_FLOAT_EQ(5.0,J[7][2]);
+  EXPECT_FLOAT_EQ(2.0,J[7][3]);
+  EXPECT_FLOAT_EQ(3.0,J[7][4]);
+  EXPECT_FLOAT_EQ(0.0,J[7][5]);
+
+  EXPECT_FLOAT_EQ(0.0,J[8][0]);
+  EXPECT_FLOAT_EQ(0.0,J[8][1]);
+  EXPECT_FLOAT_EQ(0.0,J[8][2]);
+  EXPECT_FLOAT_EQ(8.0,J[8][3]);
+  EXPECT_FLOAT_EQ(10.0,J[8][4]);
+  EXPECT_FLOAT_EQ(12.0,J[8][5]);
 }
 
 TEST(AgradMatrix, multiplyLowerTriSelfTranspose) {
@@ -3258,12 +3389,12 @@ TEST(AgradMatrix, multiplyLowerTriSelfTranspose) {
        4, -3;
   test_mult_LLT(I);
 
-  matrix_v J(1,1);
-  J << 3.0;
-  test_mult_LLT(J);
+  // matrix_v J(1,1);
+  // J << 3.0;
+  // test_mult_LLT(J);
 
-  matrix_v K(0,0);
-  test_mult_LLT(K);
+  // matrix_v K(0,0);
+  // test_mult_LLT(K);
 }
 
 void test_tcrossprod(const matrix_v& L) {
