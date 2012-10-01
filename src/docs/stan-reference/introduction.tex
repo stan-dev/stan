@@ -211,11 +211,20 @@ Then make the library with the folloiwng make command.
 \end{Verbatim}
 \end{quote}
 %
-and then make the model parser and code generator with
+and then make the model parser and code generator with the following
+call on Unix-like systems (i.e., linux, Mac):
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 % make bin/stanc
+\end{Verbatim}
+\end{quote}
+%
+The following variant is required for Windows:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+% make bin/stanc.exe
 \end{Verbatim}
 \end{quote}
 %
@@ -299,7 +308,9 @@ execution.  This call will also compile the library \code{libstan.a}
 and the parser/code generator \code{stanc} if they have not already
 been compiled.
 
-First, change directories to where Stan was unpacked.
+First, change directories to \code{<stan-home>}, the directory where
+Stan was unpacked that contains the file named \code{makefile} and
+a subdirectory called \code{src/}.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -307,25 +318,29 @@ First, change directories to where Stan was unpacked.
 \end{Verbatim}
 \end{quote}
 %
-Then issue the following command.
+Then issue the following command for Unix-like (Linux or Mac)
+operating systems:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > make src/models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
-%%
-%The \code{make} command may be issued from another directory as follows.
-%%
-%\begin{quote}
-%\begin{Verbatim}[fontshape=sl]
-%> make -f <stan-home>/makefile <path-to-model>
-%\end{Verbatim}
-%\end{quote}
-%%
-%where \code{<stan-home>} is replaced with the top-level directory
-%containing the file named \code{makefile} and \code{<path-to-model>}
-%is replaced with the path to the model file.
+%
+and the following command in Windows:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make src/models/basic_estimators/bernoulli.exe
+\end{Verbatim}
+\end{quote}
+%
+And yes, those are forward slashes in the make target for Windows.
+
+The \code{make} command may be applied to files in locations
+that are not subdirectories issued from another directory as follows.
+Just replace the relative path \code{src/models/...} with the
+actual path.
 
 The C++ generated for the model and its compiled executable
 form will be placed in the same directory as the model.
