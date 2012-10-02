@@ -1,101 +1,70 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ pareto_log
 #include <stan/prob/distributions/univariate/continuous/pareto.hpp>
 
-TEST(ProbDistributionsPareto,Pareto) {
-  EXPECT_FLOAT_EQ(-1.909543, stan::prob::pareto_log(1.5,0.5,2.0));
-  EXPECT_FLOAT_EQ(-25.69865, stan::prob::pareto_log(19.5,0.15,5.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::pareto_log(0.0,0.15,5.0));
-}
-TEST(ProbDistributionsPareto,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::pareto_log<true>(1.5,0.5,2.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::pareto_log<true>(19.5,0.15,5.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::pareto_log(0.0,0.15,5.0));
-}
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+using std::vector;
+using std::numeric_limits;
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+class ProbDistributionsPareto : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
 
-using stan::prob::pareto_log;
+    param[0] = 1.5;           // y
+    param[1] = 0.5;           // y_min
+    param[2] = 2.0;           // alpha
+    parameters.push_back(param);
+    log_prob.push_back(-1.909543); // expected log_prob
 
-TEST(ProbDistributionsPareto,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  
-  double y = 5.0;
-  double y_min = 2.0;
-  double alpha = 0.5;
-  
-  EXPECT_NO_THROW(pareto_log(y, y_min, alpha));
-  EXPECT_NO_THROW(pareto_log(-inf, y_min, alpha));
-  EXPECT_NO_THROW(pareto_log(inf, y_min, alpha));
-  EXPECT_NO_THROW(pareto_log(y, y_min, alpha));
-  
-  EXPECT_THROW(pareto_log(nan, y_min, alpha), std::domain_error);
+    param[0] = 19.5;          // y
+    param[1] = 0.15;          // y_min
+    param[2] = 5.0;           // alpha
+    parameters.push_back(param);
+    log_prob.push_back(-25.69865); // expected log_prob
 
-  EXPECT_THROW(pareto_log(y, nan, alpha), std::domain_error);
-  EXPECT_THROW(pareto_log(y, 0.0, alpha), std::domain_error);
-  EXPECT_THROW(pareto_log(y, -1.0, alpha), std::domain_error);
-  EXPECT_THROW(pareto_log(y, -inf, alpha), std::domain_error);
-  EXPECT_THROW(pareto_log(y, inf, alpha), std::domain_error);
-  
-  EXPECT_THROW(pareto_log(y, y_min, nan), std::domain_error);
-  EXPECT_THROW(pareto_log(y, y_min, 0.0), std::domain_error);
-  EXPECT_THROW(pareto_log(y, y_min, -1.0), std::domain_error);
-  EXPECT_THROW(pareto_log(y, y_min, inf), std::domain_error);
-  EXPECT_THROW(pareto_log(y, y_min, -inf), std::domain_error);
-}
-TEST(ProbDistributionsPareto,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  
-  double result;
-  double y = 5.0;
-  double y_min = 2.0;
-  double alpha = 0.5;
-  
-  result = pareto_log(y, y_min, alpha, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = pareto_log(-inf, y_min, alpha, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = pareto_log(inf, y_min, alpha, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = pareto_log(y, y_min, alpha, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+    param[0] = 0.0;           // y
+    param[1] = 0.15;          // y_min
+    param[2] = 5.0;           // alpha
+    parameters.push_back(param);
+    log_prob.push_back(log(0.0)); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // y_min
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  result = pareto_log(nan, y_min, alpha, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+    index.push_back(1U);
+    value.push_back(-1.0);
 
-  result = pareto_log(y, nan, alpha, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, 0.0, alpha, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, -1.0, alpha, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, -inf, alpha, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, inf, alpha, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = pareto_log(y, y_min, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, y_min, 0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, y_min, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, y_min, inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = pareto_log(y, y_min, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // alpha
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsPareto,
+			      DistributionTestFixture,
+			      ProbDistributionsPareto);
