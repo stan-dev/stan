@@ -69,32 +69,67 @@ namespace stan {
       
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
  
-      
       using stan::math::square;
       using std::log;
       using stan::prob::NEG_LOG_SQRT_TWO_PI;
       
+
+      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> log_sigma(length(sigma));
+      if (include_summand<propto, T_scale>::value)
+	for (size_t n = 0; n < length(sigma); n++)
+	  log_sigma[n] = log(value_of(sigma_vec[n]));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_scale> inv_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_scale> inv_sigma_sq(length(sigma));
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
+	for (size_t n = 0; n < length(sigma); n++)
+	  inv_sigma[n] = 1 / value_of(sigma_vec[n]);
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
+	for (size_t n = 0; n < length(sigma); n++)
+	  inv_sigma_sq[n] = inv_sigma[n] * inv_sigma[n];
+      
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_y> log_y(length(y));
+      if (include_summand<propto,T_y,T_loc,T_scale>::value)
+	for (size_t n = 0; n < length(y); n++)
+	  log_y[n] = log(value_of(y_vec[n]));
+      DoubleVectorView<!is_constant_struct<T_y>::value,T_y> inv_y(length(y));
+      if (!is_constant_struct<T_y>::value)
+	for (size_t n = 0; n < length(y); n++)
+	  inv_y[n] = 1 / value_of(y_vec[n]);
+
+      if (include_summand<propto>::value)
+	logp += N * NEG_LOG_SQRT_TWO_PI;
+
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
         const double mu_dbl = value_of(mu_vec[n]);
-	const double sigma_dbl = value_of(sigma_vec[n]);
 
-	if (include_summand<propto>::value)
-	  logp += NEG_LOG_SQRT_TWO_PI;
+        double logy_m_mu(0);
+	if (include_summand<propto,T_y,T_loc,T_scale>::value ||
+	    !is_constant_struct<T_y>::value)
+	  logy_m_mu = log_y[n] - mu_dbl;
+
+	double logy_m_mu_sq = logy_m_mu * logy_m_mu;
+	double logy_m_mu_div_sigma(0);
+	if (!is_constant_struct<T_y>::value ||
+	    !is_constant_struct<T_loc>::value ||
+	    !is_constant_struct<T_scale>::value)
+	  logy_m_mu_div_sigma = logy_m_mu * inv_sigma_sq[n];
+	
+
+        // log probability
 	if (include_summand<propto,T_scale>::value)
-	  logp -= log(sigma_dbl);
+	  logp -= log_sigma[n];
 	if (include_summand<propto,T_y>::value)
-	  logp -= log(y_dbl);
+	  logp -= log_y[n];
 	if (include_summand<propto,T_y,T_loc,T_scale>::value)
-	  logp -= square(log(y_dbl) - mu_dbl) / (2.0 * sigma_dbl * sigma_dbl);
+	  logp -= 0.5 * logy_m_mu_sq * inv_sigma_sq[n];
 
-
+        // gradients
 	if (!is_constant_struct<T_y>::value)
-	  operands_and_partials.d_x1[n] += - 1 / y_dbl - (log(y_dbl) - mu_dbl) / (sigma_dbl * sigma_dbl * y_dbl);
+	  operands_and_partials.d_x1[n] -=  (1 + logy_m_mu_div_sigma) * inv_y[n];
 	if (!is_constant_struct<T_loc>::value)
-	  operands_and_partials.d_x2[n] += log(y_dbl)/(sigma_dbl * sigma_dbl) - mu_dbl / (sigma_dbl * sigma_dbl);
+	  operands_and_partials.d_x2[n] += logy_m_mu_div_sigma;
 	if (!is_constant_struct<T_scale>::value)
-	  operands_and_partials.d_x3[n] += - 1/sigma_dbl + square(log(y_dbl) - mu_dbl) / (sigma_dbl * sigma_dbl * sigma_dbl);
+	  operands_and_partials.d_x3[n] += (logy_m_mu_div_sigma * logy_m_mu - 1) * inv_sigma[n];
       }
       return operands_and_partials.to_var(logp);
     }
