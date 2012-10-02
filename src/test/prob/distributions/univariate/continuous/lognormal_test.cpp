@@ -1,93 +1,63 @@
-#include <gtest/gtest.h>
-#include "stan/prob/distributions/univariate/continuous/lognormal.hpp"
+#define _LOG_PROB_ lognormal_log
+#include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 
-TEST(ProbDistributionsLognormal,Lognormal) {
-  EXPECT_FLOAT_EQ(-1.509803, stan::prob::lognormal_log(1.2,0.3,1.5));
-  EXPECT_FLOAT_EQ(-3.462263, stan::prob::lognormal_log(12.0,3.0,0.9));
-}
-TEST(ProbDistributionsLognormal,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::lognormal_log<true>(1.2,0.3,1.5));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::lognormal_log<true>(12.0,3.0,0.9));
-}
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+using std::vector;
+using std::numeric_limits;
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+class ProbDistributionsLognormal : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
 
-using stan::prob::lognormal_log;
+    param[0] = 1.2;           // y
+    param[1] = 0.3;           // mu
+    param[2] = 1.5;           // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-1.509802579); // expected log_prob
 
-TEST(ProbDistributionsLognormal,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  
-  double y = 1.0;
-  double mu = 2.0;
-  double sigma = 3.0;
+    param[0] = 12.0;          // y
+    param[1] = 3.0;           // mu
+    param[2] = 0.9;           // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-3.462263161); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // mu
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
 
-  EXPECT_NO_THROW(lognormal_log(y,mu,sigma));
-  EXPECT_NO_THROW(lognormal_log(inf,mu,sigma));
-  EXPECT_NO_THROW(lognormal_log(-inf,mu,sigma));
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
 
-  EXPECT_THROW(lognormal_log(nan,mu,sigma), std::domain_error);
-  
-  EXPECT_THROW(lognormal_log(y,nan,sigma), std::domain_error);
-  EXPECT_THROW(lognormal_log(y,-inf,sigma), std::domain_error);
-  EXPECT_THROW(lognormal_log(y,inf,sigma), std::domain_error);
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
 
-  EXPECT_THROW(lognormal_log(y,mu,nan), std::domain_error);
-  EXPECT_THROW(lognormal_log(y,mu,0.0), std::domain_error);
-  EXPECT_THROW(lognormal_log(y,mu,-1.0), std::domain_error);
-  EXPECT_THROW(lognormal_log(y,mu,-inf), std::domain_error);
-  EXPECT_THROW(lognormal_log(y,mu,inf), std::domain_error);
-}
-TEST(ProbDistributionsLognormal,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
+    index.push_back(2U);
+    value.push_back(-1.0);
 
-  double result;
-  double y = 1.0;
-  double mu = 2.0;
-  double sigma = 3.0;
-  
-  result = lognormal_log(y,mu,sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = lognormal_log(inf,mu,sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = lognormal_log(-inf,mu,sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
 
-  result = lognormal_log(nan,mu,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = lognormal_log(y,nan,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = lognormal_log(y,-inf,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = lognormal_log(y,inf,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
 
-  result = lognormal_log(y,mu,nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = lognormal_log(y,mu,0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = lognormal_log(y,mu,-1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = lognormal_log(y,mu,-inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = lognormal_log(y,mu,inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsLognormal,
+			      DistributionTestFixture,
+			      ProbDistributionsLognormal);
+
+
 TEST(ProbDistributionsLognormal,Cumulative) {
   using stan::prob::lognormal_cdf;
   EXPECT_FLOAT_EQ(0.4687341, lognormal_cdf(1.2,0.3,1.5));

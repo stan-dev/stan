@@ -686,7 +686,7 @@ namespace stan {
         }
         inline static double var_dot(vari** v1, vari** v2, size_t length) {
           double result = 0;
-          for (int i = 0; i < length; ++i)
+          for (size_t i = 0; i < length; ++i)
             result += v1[i]->val_ * v2[i]->val_;
           return result;
         }
