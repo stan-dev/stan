@@ -79,25 +79,44 @@ namespace stan {
       if (include_summand<propto,T_y,T_shape>::value)
 	for (size_t n = 0; n < length(y); n++)
 	  log_y[n] = log(value_of(y_vec[n]));
+      DoubleVectorView<!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value,T_y> inv_y(length(y));
+      if (!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value)
+	for (size_t n = 0; n < length(y); n++)
+	  inv_y[n] = 1 / value_of(y_vec[n]);
+      DoubleVectorView<include_summand<propto,T_scale,T_shape>::value,T_scale> 
+	log_y_min(length(y_min));
+      if (include_summand<propto,T_scale,T_shape>::value)
+	for (size_t n = 0; n < length(y_min); n++)
+	  log_y_min[n] = log(value_of(y_min_vec[n]));
+      DoubleVectorView<include_summand<propto,T_shape>::value,T_shape> log_alpha(length(alpha));
+      if (include_summand<propto,T_shape>::value)
+	for (size_t n = 0; n < length(alpha); n++)
+	  log_alpha[n] = log(value_of(alpha_vec[n]));
       
-      
+      DoubleVectorView<!is_constant_struct<T_shape>::value,T_shape> inv_alpha(length(alpha));
+      if (!is_constant_struct<T_shape>::value)
+	for (size_t n = 0; n < length(alpha); n++)
+	  inv_alpha[n] = 1 / value_of(alpha_vec[n]);
       
       using stan::math::multiply_log;
 
       for (size_t n = 0; n < N; n++) {
+	const double alpha_dbl = value_of(alpha_vec[n]);
+	// log probability
 	if (include_summand<propto,T_shape>::value)
-	  logp += log(value_of(alpha_vec[n]));
+	  logp += log_alpha[n];
 	if (include_summand<propto,T_scale,T_shape>::value)
-	  logp += multiply_log(value_of(alpha_vec[n]), value_of(y_min_vec[n]));
+	  logp += alpha_dbl * log_y_min[n];
 	if (include_summand<propto,T_y,T_shape>::value)
-	  logp -= multiply_log(value_of(alpha_vec[n])+1.0, value_of(y_vec[n]));
+	  logp -= alpha_dbl * log_y[n] + log_y[n];
 	
+	// gradients
 	if (!is_constant_struct<T_y>::value)
-	  operands_and_partials.d_x1[n] -= (value_of(alpha_vec[n]) + 1) / value_of(y_vec[n]);
+	  operands_and_partials.d_x1[n] -= alpha_dbl * inv_y[n] + inv_y[n];
 	if (!is_constant_struct<T_scale>::value)
-	  operands_and_partials.d_x2[n] += (value_of(alpha_vec[n])) / value_of(y_min_vec[n]);
+	  operands_and_partials.d_x2[n] += alpha_dbl / value_of(y_min_vec[n]);
 	if (!is_constant_struct<T_shape>::value)
-	  operands_and_partials.d_x3[n] += 1 / value_of(alpha_vec[n]) + log(value_of(y_min_vec[n])) - log(value_of(y_vec[n]));
+	  operands_and_partials.d_x3[n] += 1 / alpha_dbl + log_y_min[n] - log_y[n];
       }
       return operands_and_partials.to_var(logp);
     }
