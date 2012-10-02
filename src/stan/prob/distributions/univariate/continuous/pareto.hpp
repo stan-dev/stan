@@ -90,7 +90,7 @@ namespace stan {
 
     template <typename T_y, typename T_scale, typename T_shape>
     inline
-    typename boost::math::tools::promote_args<T_y,T_scale,T_shape>::type
+    typename return_type<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
       return pareto_log<false>(y,y_min,alpha,stan::math::default_policy());
     }
