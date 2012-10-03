@@ -53,7 +53,11 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 add_unary("cbrt");
 add_unary("ceil");
 add("cholesky_decompose",MATRIX_T,MATRIX_T);
-add_binary("chi_square_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+      add("chi_square_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);

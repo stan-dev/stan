@@ -1,70 +1,49 @@
-#include <gtest/gtest.h>
-#include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
+#define _LOG_PROB_ chi_square_log
+#include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_2_params.hpp>
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+using std::vector;
+using std::numeric_limits;
 
+class ProbDistributionsChiSquare : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(2);
 
-TEST(ProbDistributionsChiSquare,ChiSquare) {
-  EXPECT_FLOAT_EQ(-3.835507, stan::prob::chi_square_log(7.9,3.0));
-  EXPECT_FLOAT_EQ(-2.8927, stan::prob::chi_square_log(1.9,0.5));
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), 
-                  stan::prob::chi_square_log(-1.0,0.5));
-}
-TEST(ProbDistributionsChiSquare,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::chi_square_log<true>(7.9,3.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::chi_square_log<true>(1.9,0.5));
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), 
-                  stan::prob::chi_square_log<true>(-1.0,0.5));
-}
-TEST(ProbDistributionsChiSquare,DefaultPolicy) {
-  double y = 0.0;
-  double nu = 0.0;
-  EXPECT_NO_THROW (stan::prob::chi_square_log(1.0, 1.0));
-  EXPECT_NO_THROW (stan::prob::chi_square_log(-1.0, 1.0));
-  EXPECT_NO_THROW (stan::prob::chi_square_log(std::numeric_limits<double>::infinity(), 1.0));
-  EXPECT_NO_THROW (stan::prob::chi_square_log(-std::numeric_limits<double>::infinity(), 1.0));
+    param[0] = 7.9;                 // y
+    param[1] = 3.0;                 // nu
+    parameters.push_back(param);
+    log_prob.push_back(-3.835507);  // expected log_prob
 
+    param[0] = 1.9;                 // y
+    param[1] = 0.5;                 // nu
+    parameters.push_back(param);
+    log_prob.push_back(-2.8927);    // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // nu
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  EXPECT_THROW(stan::prob::chi_square_log(y, nu), std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_log(y, -1), std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_log(-1, nu), std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_log(std::numeric_limits<double>::quiet_NaN(), 1.0), 
-               std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_log(1.0, std::numeric_limits<double>::quiet_NaN()),
-               std::domain_error);
-  EXPECT_THROW (stan::prob::chi_square_log(1.0, std::numeric_limits<double>::infinity()),
-                std::domain_error);
-}
-TEST(ProbDistributionsChiSquare,ErrnoPolicy) {
-  double result;
-  double y = 0.0;
-  double nu = 0.0;
-  
-  result = stan::prob::chi_square_log(1.0, 1.0, errno_policy());
-  EXPECT_FALSE (std::isnan(result));
-  result = stan::prob::chi_square_log(-1.0, 1.0, errno_policy());
-  EXPECT_FALSE (std::isnan(result));
+    index.push_back(1U);
+    value.push_back(-1.0);
 
-  result = stan::prob::chi_square_log(y, nu, errno_policy());
-  EXPECT_TRUE (std::isnan(result));
-  result = stan::prob::chi_square_log(y, -1.0, errno_policy());
-  EXPECT_TRUE (std::isnan(result));
-  result = stan::prob::chi_square_log(-1.0, nu, errno_policy());  
-  EXPECT_TRUE (std::isnan(result));
-}
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsChiSquare,
+			      DistributionTestFixture,
+			      ProbDistributionsChiSquare);
+
 /*
 // FIXME: include when chi_square_cdf is implemented
 TEST(ProbDistributionsChiSquare,Cumulative) {
