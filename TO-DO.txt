@@ -42,6 +42,27 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* Vectorize distributions
+  - Allows vectorized inputs (but without partials calculated):
+    univariate/continuous
+    + chi_square
+
+  - Fully vectorized with partials calculated:
+    univariate/continuous
+    + beta
+    + cauchy
+    + double_exponential
+    + normal
+    + gamma
+    + inv_gamma
+    + logistic
+    + lognormal
+    + pareto
+    univariate/discrete
+    + bernoulli
+    + bernoulli_logit
+     
+
 * remove (unsigned) long long instances in dump and error testing
 
 * bring isinf in line with revised Boost
@@ -762,8 +783,6 @@ Manuals
   - patch: just bug fixes, no behavior change
   - minor: some new functions, backward compatible
   - major: big changes, breaking backward compatibility
-
-* put a table of vectorized functions in the doc
 
 * add prior to getting started examples in doc
 
