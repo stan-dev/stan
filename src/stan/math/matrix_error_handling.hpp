@@ -212,9 +212,9 @@ namespace stan {
         return false;
       if (!check_positive(function, y.rows(), "rows", result, Policy()))
         return false;
-      if (!check_symmetric(function, y, "y", result, Policy()))
+      if (!check_symmetric(function, y, name, result, Policy()))
         return false;
-      if (!check_pos_definite(function, y, "y", result, Policy()))
+      if (!check_pos_definite(function, y, name, result, Policy()))
         return false;
       return true;
     }
