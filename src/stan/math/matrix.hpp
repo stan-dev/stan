@@ -1567,6 +1567,22 @@ namespace stan {
       return A.template triangularView<TriView>().transpose().solve(b.transpose()).transpose();
     }
     /**
+     * Returns the solution of the system tri(A)x=b when tri(A) is a
+     * lower triangular view of the matrix A.
+     * @param A Matrix.
+     * @param b Right hand side matrix or vector.
+     * @return x = tri(A)^-1 b, solution of the linear system.
+     * @throws std::domain_error if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<double,R1,C2> mdivide_right_tri_low(const Eigen::Matrix<double,R1,C1> &b,
+                                                             const Eigen::Matrix<double,R2,C2> &A) {
+      return mdivide_right_tri<Eigen::Lower>(b,A);
+    }
+
+
+    /**
      * Returns the solution of the system Ax=b.
      * @param A Matrix.
      * @param b Right hand side matrix or vector.

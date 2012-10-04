@@ -945,13 +945,53 @@ The softmax of \farg{x}}
 %
 \fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
 The right division of \farg{b} by \farg{A}; equivalently
-\code{\farg{b} * inv(\farg{A})}}
+\code{\farg{b} * inverse(\farg{A})}}
 %
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
-\code{inv(\farg{A}) * \farg{b}}
+\code{inverse(\farg{A}) * \farg{b}}
 %
 \end{description}
+
+\subsection{Lower-Triangular Matrix-Division Functions}
+
+There are four division functions which use lower triangular views of
+a matrix.  The lower triangular view of a matrix $\mbox{tri}(A)$ is defined by
+\[
+\mbox{tri}(A)[m,n] = 
+\left\{
+\begin{array}{ll}
+A[m,n] & \mbox{if } m \geq n, \mbox{ and}
+\\[4pt]
+0 & \mbox{otherwise}.
+\end{array}
+\right.
+\]
+
+
+\begin{description}
+%
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b}, matrix \farg{a}}{
+The right division of \farg{b} by \code{tri(\farg{a})}, a lower triangular
+view of \farg{a}; equivalently \code{\farg{b} * inverse(tri(\farg{a}))}}
+%
+%
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{b}, matrix \farg{a}}{
+The right division of \farg{b} by \code{tri(\farg{a})}, a lower triangular
+view of \farg{a}; equivalently \code{\farg{b} * inverse(tri(\farg{a}))}}
+%
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{a}, vector \farg{b}}
+The left division of \farg{b} by a triangular view of
+\code{tri(\farg{a})}, a lower triangular view of \farg{a}; equivalently
+\code{inverse(tri(\farg{a})) * \farg{b}}
+%
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{a}, matrix \farg{b}}
+The left division of \farg{b} by a triangular view of
+\code{tri(\farg{a})}, a lower triangular view of \farg{a}; equivalently
+\code{inverse(tri(\farg{a})) * \farg{b}}
+%
+\end{description}
+
 
 \subsection{Linear Algebra Functions}
 
