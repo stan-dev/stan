@@ -9,39 +9,24 @@ The to-do list is organized into the following sections:
 * Modeling Language             * Manual
 * Build                         * Web Pages
 * Testing                       * Release Mgmt
-* Command-Line                  * Models
+* Command-Line                  * ModelsC++ API
 
- 
-V 1.0.2 Release Notes
+
+v 1.0.3 Release Notes
 ======================================================================
-
 Bug Fixes:
-  -- check ranges for LHS of assignment to prevent seg faults
-  -- added matrix size and shape tests to avoid seg faults
-  -- changed matrix to throw domain_error rather than illegal_argument
-  -- removed template variable names from distribution error msgs
-  -- indexing fixed for arrays of matrix/vector/row_vector
-  -- fixed sd() and variance() to return 0.0 for sequences of size 1
-  -- fixed void return type in auto_covariance
-  -- patch truncation to return -inf for variates out of range
-  -- upgraded BUGS ring model to use constraints plus tan2()
-
 New Features:
-  -- print statements
-  -- multiply_lower_tri_self_transpose function
-  -- vectorized several probability functions (see the manual)
-
+ -- mdivide_left_tri_low, mdivide_right_tri_low functions
+ -- better error checking for transforms 
 Manual Additions:
-  -- programming guide: IRT models 
-  -- new appendix: style guide
-  -- new appendix: migrating from Stan
-  -- new index: function and distribution index
 
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* switch error checking for agrad::var matrix ops to
+  convert to double-based matrix for check as in vectorized univariates
 * Vectorize distributions
   - Allows vectorized inputs (but without partials calculated):
     univariate/continuous
