@@ -24,7 +24,12 @@ transformed data {
   transformed_data_real <- inv_wishart_log(d_matrix, d_real, d_matrix);
   transformed_data_real <- lkj_cov_log(d_matrix, d_vector, d_vector, d_real);
   transformed_data_real <- lkj_corr_log(d_matrix, d_real);
-  transformed_data_real <- lkj_corr_cholesky_log(d_matrix, d_real);
+  transformed_data_real <- lkj_corr_cholesky_log(d_matrix, d_real); 
+  // mdivide_..._low
+  transformed_data_matrix <- mdivide_left_tri_low(d_matrix,d_matrix);
+  transformed_data_vector <- mdivide_left_tri_low(d_matrix,d_vector);
+  transformed_data_matrix <- mdivide_right_tri_low(d_matrix,d_matrix);
+  transformed_data_row_vector <- mdivide_right_tri_low(d_row_vector,d_matrix);
 }
 parameters {
   real p_real;
@@ -94,6 +99,36 @@ transformed parameters {
   transformed_param_real <- lkj_corr_log(d_matrix, p_real);
   transformed_param_real <- lkj_corr_log(p_matrix, d_real);
   transformed_param_real <- lkj_corr_log(p_matrix, p_real);
+
+  // mdivide_..._low
+  transformed_param_matrix <- mdivide_left_tri_low(d_matrix,d_matrix);
+  transformed_param_matrix <- mdivide_left_tri_low(transformed_param_matrix,d_matrix);
+  transformed_param_matrix <- mdivide_left_tri_low(transformed_param_matrix,
+                                                   transformed_param_matrix);
+  transformed_param_matrix <- mdivide_left_tri_low(d_matrix,
+                                                   transformed_param_matrix);
+
+  transformed_param_vector <- mdivide_left_tri_low(d_matrix,d_vector);
+  transformed_param_vector <- mdivide_left_tri_low(transformed_param_matrix,d_vector);
+  transformed_param_vector <- mdivide_left_tri_low(transformed_param_matrix,
+                                                   transformed_param_vector);
+  transformed_param_vector <- mdivide_left_tri_low(d_matrix,
+                                                   transformed_param_vector);
+
+  transformed_param_matrix <- mdivide_right_tri_low(d_matrix,d_matrix);
+  transformed_param_matrix <- mdivide_right_tri_low(transformed_param_matrix,d_matrix);
+  transformed_param_matrix <- mdivide_right_tri_low(transformed_param_matrix,
+                                                    transformed_param_matrix);
+  transformed_param_matrix <- mdivide_right_tri_low(d_matrix,
+                                                    transformed_param_matrix);
+
+  transformed_param_row_vector <- mdivide_right_tri_low(d_row_vector,d_matrix);
+  transformed_param_row_vector <- mdivide_right_tri_low(transformed_param_row_vector,d_matrix);
+  transformed_param_row_vector <- mdivide_right_tri_low(transformed_param_row_vector,
+                                                        transformed_param_matrix);
+  transformed_param_row_vector <- mdivide_right_tri_low(d_row_vector,
+                                                        transformed_param_matrix);
+
 }
 model {  
 }

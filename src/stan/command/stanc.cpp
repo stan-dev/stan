@@ -58,11 +58,9 @@ void print_stanc_help() {
 
 void delete_file(const std::string& file_name) {
   int deleted = std::remove(file_name.c_str());
-  std::cout << (deleted == 0
-                ? "OUTPUT FILE REMOVED"
-                : "COULD NOT REMOVE OUTPUT FILE")
-            << ", file=" << file_name.c_str() 
-            << std::endl;
+  if (deleted != 0 && file_name.size() > 0)
+    std::cerr << "Could not remove output file=" << file_name
+              << std::endl;
 }      
 
 
@@ -72,82 +70,85 @@ void delete_file(const std::string& file_name) {
  * @param argc Number of arguments
  * @param argv Arguments
  * 
- * @return 0 for success, -1 for exception, -2 for parser failure
+ * @return 0 for success, -1 for exception, -2 for parser failure, -3
+ * for invalid arguments.
  */
 int main(int argc, const char* argv[]) {
 
   static const int SUCCESS_RC = 0;
   static const int EXCEPTION_RC = -1;
   static const int PARSE_FAIL_RC = -2;
+  static const int INVALID_ARGUMENT_RC = -3;
 
-  stan::io::cmd_line cmd(argc,argv);
+  std::string out_file_name; // declare outside of try to delete in catch
 
-  if (cmd.has_flag("help")) {
-    print_stanc_help();
-    return SUCCESS_RC;
-  }
+  try {
 
-  if (cmd.has_flag("version")) {
-    print_version();
-    return SUCCESS_RC;
-  }
+    stan::io::cmd_line cmd(argc,argv);
 
-  if (cmd.bare_size() != 1) {
-    std::string msg("require file name to compile as input. "
-                    "execute \"stanc --help\" for more information");
-    throw std::invalid_argument(msg);
-  }
-  std::string in_file_name;
-  cmd.bare(0,in_file_name);
-  std::fstream in(in_file_name.c_str());
-
-  std::string model_name;
-  if (cmd.has_key("name")) {
-    cmd.val("name",model_name);
-  } else {
-    size_t slashInd = in_file_name.rfind('/');
-    size_t ptInd = in_file_name.rfind('.');
-    if (ptInd == std::string::npos)
-      ptInd = in_file_name.length();
-    if (slashInd == std::string::npos) {
-      slashInd = in_file_name.rfind('\\');
+    if (cmd.has_flag("help")) {
+      print_stanc_help();
+      return SUCCESS_RC;
     }
-    if (slashInd == std::string::npos) {
-      slashInd = 0;
+
+    if (cmd.has_flag("version")) {
+      print_version();
+      return SUCCESS_RC;
+    }
+
+    if (cmd.bare_size() != 1) {
+      std::string msg("Require model file as argument. ");
+      throw std::invalid_argument(msg);
+    }
+    std::string in_file_name;
+    cmd.bare(0,in_file_name);
+    std::fstream in(in_file_name.c_str());
+
+    std::string model_name;
+    if (cmd.has_key("name")) {
+      cmd.val("name",model_name);
     } else {
-      slashInd++;
+      size_t slashInd = in_file_name.rfind('/');
+      size_t ptInd = in_file_name.rfind('.');
+      if (ptInd == std::string::npos)
+        ptInd = in_file_name.length();
+      if (slashInd == std::string::npos) {
+        slashInd = in_file_name.rfind('\\');
+      }
+      if (slashInd == std::string::npos) {
+        slashInd = 0;
+      } else {
+        slashInd++;
+      }
+      model_name = in_file_name.substr(slashInd,ptInd - slashInd) + "_model";
+      for (std::string::iterator strIt = model_name.begin();
+           strIt != model_name.end(); strIt++) {
+        if (!isalnum(*strIt) && *strIt != '_') {
+          *strIt = '_';
+        }
+      }
     }
-    model_name = in_file_name.substr(slashInd,ptInd - slashInd) + "_model";
+
+    if (cmd.has_key("o")) {
+      cmd.val("o",out_file_name);
+    } else {
+      out_file_name = model_name;
+      out_file_name += ".cpp";
+    }
+
+    if (!isalpha(model_name[0]) && model_name[0] != '_') {
+      std::string msg("model_name must not start with a number or symbol other than _");
+      throw std::invalid_argument(msg);
+    }
     for (std::string::iterator strIt = model_name.begin();
          strIt != model_name.end(); strIt++) {
       if (!isalnum(*strIt) && *strIt != '_') {
-        *strIt = '_';
+        std::string msg("model_name must contain only letters, numbers and _");
+        throw std::invalid_argument(msg);
       }
     }
-  }
-
-  std::string out_file_name;
-  if (cmd.has_key("o")) {
-    cmd.val("o",out_file_name);
-  } else {
-    out_file_name = model_name;
-    out_file_name += ".cpp";
-  }
-
-  if (!isalpha(model_name[0]) && model_name[0] != '_') {
-    std::string msg("model_name must not start with a number or symbol other than _");
-    throw std::invalid_argument(msg);
-  }
-  for (std::string::iterator strIt = model_name.begin();
-       strIt != model_name.end(); strIt++) {
-    if (!isalnum(*strIt) && *strIt != '_') {
-      std::string msg("model_name must contain only letters, numbers and _");
-      throw std::invalid_argument(msg);
-    }
-  }
     
-  stan::gm::program prog;
-  try {
+    stan::gm::program prog;
     std::fstream out(out_file_name.c_str(),
                      std::fstream::out);
     std::cout << "Model name=" << model_name << std::endl;
@@ -158,12 +159,22 @@ int main(int argc, const char* argv[]) {
       = stan::gm::compile(in,out,model_name,include_main,in_file_name);
     out.close();
     if (!valid_model) {
-      std::cout << "PARSING FAILED." << std::endl;
-      delete_file(out_file_name);
+      std::cerr << "PARSING FAILED." << std::endl;
+      delete_file(out_file_name);  // FIXME: how to remove triple cut-and-paste?
       return PARSE_FAIL_RC;
     }
+  } catch (const std::invalid_argument& e) {
+    std::cerr << std::endl
+              << "INVALID COMMAND-LINE ARGUMENT"
+              << std::endl
+              << e.what()
+              << std::endl;
+    std::cerr << "Execute \"stanc --help\" for more information" 
+              << std::endl;
+    delete_file(out_file_name);
+    return INVALID_ARGUMENT_RC;
   } catch (const std::exception& e) {
-    std::cout << std::endl
+    std::cerr << std::endl
               << "ERROR PARSING"
               << std::endl
               << e.what()
