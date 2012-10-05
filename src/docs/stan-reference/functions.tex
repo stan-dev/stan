@@ -945,13 +945,53 @@ The softmax of \farg{x}}
 %
 \fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
 The right division of \farg{b} by \farg{A}; equivalently
-\code{\farg{b} * inv(\farg{A})}}
+\code{\farg{b} * inverse(\farg{A})}}
 %
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
-\code{inv(\farg{A}) * \farg{b}}
+\code{inverse(\farg{A}) * \farg{b}}
 %
 \end{description}
+
+\subsection{Lower-Triangular Matrix-Division Functions}
+
+There are four division functions which use lower triangular views of
+a matrix.  The lower triangular view of a matrix $\mbox{tri}(A)$ is defined by
+\[
+\mbox{tri}(A)[m,n] = 
+\left\{
+\begin{array}{ll}
+A[m,n] & \mbox{if } m \geq n, \mbox{ and}
+\\[4pt]
+0 & \mbox{otherwise}.
+\end{array}
+\right.
+\]
+
+
+\begin{description}
+%
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b}, matrix \farg{a}}{
+The right division of \farg{b} by \code{tri(\farg{a})}, a lower triangular
+view of \farg{a}; equivalently \code{\farg{b} * inverse(tri(\farg{a}))}}
+%
+%
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{b}, matrix \farg{a}}{
+The right division of \farg{b} by \code{tri(\farg{a})}, a lower triangular
+view of \farg{a}; equivalently \code{\farg{b} * inverse(tri(\farg{a}))}}
+%
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{a}, vector \farg{b}}
+The left division of \farg{b} by a triangular view of
+\code{tri(\farg{a})}, a lower triangular view of \farg{a}; equivalently
+\code{inverse(tri(\farg{a})) * \farg{b}}
+%
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{a}, matrix \farg{b}}
+The left division of \farg{b} by a triangular view of
+\code{tri(\farg{a})}, a lower triangular view of \farg{a}; equivalently
+\code{inverse(tri(\farg{a})) * \farg{b}}
+%
+\end{description}
+
 
 \subsection{Linear Algebra Functions}
 
@@ -1385,8 +1425,8 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \]
 
 \begin{description}
-\fitem{real}{logistic\_log}{real \farg{y}, real \farg{mu},
-real \farg{sigma}}{ The log of the logistic density of \farg{y} given
+\fitem{real}{logistic\_log}{reals \farg{y}, reals \farg{mu},
+reals \farg{sigma}}{ The log of the logistic density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
@@ -1415,7 +1455,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \]
 
 \begin{description}
- \fitem{real}{lognormal\_log}{real \farg{y}, real \farg{mu}, real
+ \fitem{real}{lognormal\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the lognormal density of \farg{y} given location
   \farg{mu} and scale \farg{sigma}}
 %
@@ -1440,7 +1480,7 @@ y^{\nu/2 - 1}
 \]
 
 \begin{description}
-\fitem{real}{chi\_square\_log}{real \farg{y}, real \farg{nu}}{The
+\fitem{real}{chi\_square\_log}{reals \farg{y}, reals \farg{nu}}{The
   log of the Chi-square density of \farg{y} given degrees of freedom
   \farg{nu}}
 \end{description}
@@ -1461,7 +1501,7 @@ y^{-(\nu/2 - 1)}
 \]
 
 \begin{description}
-\fitem{real}{inv\_chi\_square\_log}{real \farg{y}, real
+\fitem{real}{inv\_chi\_square\_log}{reals \farg{y}, reals
   \farg{nu}}{The log of the inverse Chi-square density of \farg{y} given
   degrees of freedom \farg{nu}}
 \end{description}
@@ -1488,8 +1528,8 @@ y^{-(\nu/2 + 1)}
 
 
 \begin{description}
-  \fitem{real}{scaled\_inv\_chi\_square\_log}{real \farg{y}, real
-    \farg{nu}, real \farg{s}}{The log of the scaled inverse Chi-square
+  \fitem{real}{scaled\_inv\_chi\_square\_log}{reals \farg{y}, reals
+    \farg{nu}, reals \farg{s}}{The log of the scaled inverse Chi-square
     density of \farg{y} given degrees of freedom \farg{nu} and scale
     \farg{s}}
 \end{description}
@@ -1507,7 +1547,7 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
 \]
 
 \begin{description}
-  \fitem{real}{exponential\_log}{real \farg{y}, real \farg{beta}}{The
+  \fitem{real}{exponential\_log}{reals \farg{y}, reals \farg{beta}}{The
     log of the exponential density of \farg{y} given inverse scale \farg{beta}}
 %
 \fitem{real}{exponential\_cdf}{real \farg{y}, real \farg{beta}}{The
@@ -1610,7 +1650,7 @@ $y \in \posreals$,
 \]
 
 \begin{description}
-  \fitem{real}{pareto\_log}{real \farg{y}, real \farg{y\_min}, real
+  \fitem{real}{pareto\_log}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The log of the Pareto density of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
 \end{description}

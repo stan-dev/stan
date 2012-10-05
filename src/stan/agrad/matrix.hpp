@@ -686,7 +686,7 @@ namespace stan {
         }
         inline static double var_dot(vari** v1, vari** v2, size_t length) {
           double result = 0;
-          for (int i = 0; i < length; ++i)
+          for (size_t i = 0; i < length; ++i)
             result += v1[i]->val_ * v2[i]->val_;
           return result;
         }
@@ -1797,6 +1797,45 @@ namespace stan {
       stan::math::validate_multiplicable(b,A,"mdivide_right");
       return to_var(A).transpose().lu().solve(b.transpose()).transpose();
     }
+
+   /**
+     * Returns the solution of the system Ax=b when A is triangular
+     * @param A matrix.  
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @tparam TriView triangular view of data, Eigen::Upper or Eigen::Lower
+     * @throws std::domain_error if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<int TriView,typename T1,typename T2,int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
+    mdivide_right_tri(const Eigen::Matrix<T1,R1,C1> &b,
+                      const Eigen::Matrix<T2,R2,C2> &A) {
+      stan::math::validate_square(A,"mdivide_right_tri_low");
+      stan::math::validate_multiplicable(b,A,"mdivide_right_tri_low");
+      return to_var(A)
+        .template triangularView<TriView>()
+        .transpose()
+        .solve(to_var(b).transpose())
+        .transpose();
+    }
+   /**
+     * Returns the solution of the system tri(A)x=b when tri(A) is a
+     * triangular view of A.
+     * @param A Matrix.  Specify upper or lower with TriView
+     * being Eigen::Upper or Eigen::Lower.
+     * @param b Right hand side matrix or vector.
+     * @return x = A^-1 b, solution of the linear system.
+     * @throws std::domain_error if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template<typename T1,typename T2,int R1,int C1,int R2,int C2>
+    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
+    mdivide_right_tri_low(const Eigen::Matrix<T1,R1,C1> &b,
+                          const Eigen::Matrix<T2,R2,C2> &A) {
+      return mdivide_right_tri<Eigen::Lower,T1,T2,R1,C1,R2,C2>(b,A);
+    }
+
     /**
      * Return the real component of the eigenvalues of the specified
      * matrix in descending order of magnitude.

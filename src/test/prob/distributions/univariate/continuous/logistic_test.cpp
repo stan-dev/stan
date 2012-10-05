@@ -1,90 +1,61 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ logistic_log
 #include <stan/prob/distributions/univariate/continuous/logistic.hpp>
 
-TEST(ProbDistributionsLogistic,Logistic) {
-  EXPECT_FLOAT_EQ(-2.129645, stan::prob::logistic_log(1.2,0.3,2.0));
-  EXPECT_FLOAT_EQ(-3.430098, stan::prob::logistic_log(-1.0,0.2,0.25));
-}
-TEST(ProbDistributionsLogistic,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::logistic_log<true>(1.2,0.3,2.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::logistic_log<true>(-1.0,0.2,0.25));
-}
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
+#include <gtest/gtest.h>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+#include <iostream>
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+using std::vector;
+using std::numeric_limits;
 
-using stan::prob::logistic_log;
+class ProbDistributionsLogistic : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+                    vector<double>& log_prob) {
+    vector<double> param(3);
 
-TEST(ProbDistributionsLogistic,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  
-  double y = 1.2;
-  double mu = 0.4;
-  double sigma = 2.0;
-  
-  EXPECT_NO_THROW(logistic_log(y, mu, sigma));
+    param[0] = 1.2;           // y
+    param[1] = 0.3;           // mu
+    param[2] = 2.0;           // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-2.129645); // expected log_prob
 
-  EXPECT_THROW(logistic_log(nan, mu, sigma), std::domain_error);
-  EXPECT_THROW(logistic_log(-inf, mu, sigma), std::domain_error);
-  EXPECT_THROW(logistic_log(inf, mu, sigma), std::domain_error);
-  
-  EXPECT_THROW(logistic_log(y, nan, sigma), std::domain_error);
-  EXPECT_THROW(logistic_log(y, -inf, sigma), std::domain_error);
-  EXPECT_THROW(logistic_log(y, inf, sigma), std::domain_error);
-  
-  EXPECT_THROW(logistic_log(y, mu, nan), std::domain_error);
-  EXPECT_THROW(logistic_log(y, mu, 0.0), std::domain_error);
-  EXPECT_THROW(logistic_log(y, mu, -1.0), std::domain_error);
-  EXPECT_THROW(logistic_log(y, mu, -inf), std::domain_error);
-  EXPECT_THROW(logistic_log(y, mu, inf), std::domain_error);
-}
-TEST(ProbDistributionsLogistic,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  
-  double result;
-  double y = 1.2;
-  double mu = 0.4;
-  double sigma = 2.0;
-  
-  result = logistic_log(y, mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+    param[0] = -1.0;          // y
+    param[1] = 0.2;           // mu
+    param[2] = 0.25;          // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-3.430098); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+                      vector<double>& value) {
+    // y
+    
+    // mu
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
 
-  result = logistic_log(nan, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(-inf, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(inf, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = logistic_log(y, nan, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(y, -inf, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(y, inf, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = logistic_log(y, mu, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(y, mu, 0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(y, mu, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(y, mu, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = logistic_log(y, mu, inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsLogistic,
+                              DistributionTestFixture,
+                              ProbDistributionsLogistic);

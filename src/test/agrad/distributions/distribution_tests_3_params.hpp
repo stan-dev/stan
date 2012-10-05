@@ -2629,7 +2629,7 @@ TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_vDv) {
   ASSERT_GT(parameters.size(), 0U);
     
   double expected_logprob = 0.0;
-  double expected_grad_p0;
+  double expected_grad_p0 = 0.0;
   double expected_grad_p2 = 0.0;
   for (size_t n = 0; n < parameters.size(); n++) {
     var p0 = parameters[0][0];
@@ -2768,8 +2768,8 @@ TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_vvD) {
   ASSERT_GT(parameters.size(), 0U);
   
   double expected_logprob = 0.0;
-  double expected_grad_p0;
-  double expected_grad_p1;
+  double expected_grad_p0 = 0.0;
+  double expected_grad_p1 = 0.0;
   for (size_t n = 0; n < parameters.size(); n++) {
     var p0 = parameters[0][0];
     var p1 = parameters[0][1];

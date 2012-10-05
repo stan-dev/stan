@@ -1,70 +1,87 @@
-#include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
-#include <stan/meta/traits.hpp>
+#define _LOG_PROB_ pareto_log
 #include <stan/prob/distributions/univariate/continuous/pareto.hpp>
 
-template <typename T_y, typename T_scale, typename T_shape>
-void expect_propto(T_y y1, T_scale y_min1, T_shape alpha1,
-                   T_y y2, T_scale y_min2, T_shape alpha2,
-                   std::string message) {
-  expect_eq_diffs(stan::prob::pareto_log<false>(y1,y_min1,alpha1),
-                  stan::prob::pareto_log<false>(y2,y_min2,alpha2),
-                  stan::prob::pareto_log<true>(y1,y_min1,alpha1),
-                  stan::prob::pareto_log<true>(y2,y_min2,alpha2),
-                  message);
-}
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_3_params.hpp>
 
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-TEST(AgradDistributionsPareto,Propto) {
-  expect_propto<var,var,var>(0.2,2.5,2.0,
-                             0.9,5.0,3.0,
-                             "var: y, y_min, alpha");
-}
-TEST(AgradDistributionsPareto,ProptoY) {
-  double y_min = 3.0;
-  double alpha = 2.0;
-  
-  expect_propto<var,double,double>(6.0, y_min, alpha,
-                                   10.0, y_min, alpha,
-                                   "var: y");
-}
-TEST(AgradDistributionsPareto,ProptoYYMin) {
-  double alpha = 2.0;
-  
-  expect_propto<var,var,double>(5.0, 1.0, alpha,
-                                4.1, 4.0, alpha,
-                                "var: y and y_min");
-}
-TEST(AgradDistributionsPareto,ProptoYAlpha) {
-  double y_min = 2.0;
-  
-  expect_propto<var,double,var>(2.1, y_min, 0.5,
-                                3.1, y_min, 3.0,
-                                "var: y and alpha");
-}
-TEST(AgradDistributionsPareto,ProptoYMin) {
-  double y = 15.0;
-  double alpha = 3.0;
-  
-  expect_propto<double,var,double>(y, 0.2, alpha,
-                                   y, 6.0, alpha,
-                                   "var: y_min");
-}
-TEST(AgradDistributionsPareto,ProptoYMinAlpha) {
-  double y = 0.4;
-  
-  expect_propto<double,var,var>(y, 0.6, 3.0,
-                                y, 5.0, 1.4,
-                                "var: y_min and alpha");
-}
-TEST(AgradDistributionsPareto,ProptoAlpha) {
-  double y = 6.0;
-  double y_min = 0.4;
-  
-  expect_propto<double,double,var>(y, y_min, 1.0,
-                                   y, y_min, 1.5,
-                                   "var: alpha");
-}
+class AgradDistributionsPareto : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
+
+    param[0] = 1.5;           // y
+    param[1] = 0.5;           // y_min
+    param[2] = 2.0;           // alpha
+    parameters.push_back(param);
+
+    param[0] = 19.5;          // y
+    param[1] = 0.15;          // y_min
+    param[2] = 5.0;           // alpha
+    parameters.push_back(param);
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // y_min
+    index.push_back(1U);
+    value.push_back(0.0);
+
+    index.push_back(1U);
+    value.push_back(-1.0);
+
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // alpha
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+  template <class T_y, class T_scale, class T_shape>
+  var log_prob(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
+      using stan::math::multiply_log;
+      using stan::prob::include_summand;
+      using stan::prob::LOG_ZERO;
+
+      var logp(0);
+      if (include_summand<true,T_y,T_scale>::value)
+	if (y < y_min)
+	  return LOG_ZERO;
+      if (include_summand<true,T_shape>::value)
+	logp += log(alpha);
+      if (include_summand<true,T_scale,T_shape>::value)
+	logp += multiply_log(alpha, y_min);
+      if (include_summand<true,T_y,T_shape>::value)
+	logp -= multiply_log(alpha+1.0, y);
+      return logp;
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPareto,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsPareto);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPareto,
+			      AgradDistributionTestFixture2,
+			      AgradDistributionsPareto);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPareto,
+			      AgradDistributionTestFixture3,
+			      AgradDistributionsPareto);

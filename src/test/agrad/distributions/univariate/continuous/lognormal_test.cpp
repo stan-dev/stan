@@ -1,82 +1,80 @@
-#include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
+#define _LOG_PROB_ lognormal_log
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/meta/traits.hpp>
 
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_3_params.hpp>
 
-template <typename T_y, typename T_loc, typename T_scale>
-void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
-                   T_y y2, T_loc mu2, T_scale sigma2,
-                   std::string message = "") {
-  expect_eq_diffs(stan::prob::lognormal_log<false>(y1,mu1,sigma1),
-                  stan::prob::lognormal_log<false>(y2,mu2,sigma2),
-                  stan::prob::lognormal_log<true>(y1,mu1,sigma1),
-                  stan::prob::lognormal_log<true>(y2,mu2,sigma2),
-                  message);
-}
-
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-TEST(AgradDistributionsLognormal,Propto) {
-  expect_propto<var,var,var>(1.0,2.0,10.0, 
-                             0.1,0.0,1.0,
-                             "All vars: y, mu, sigma");
-}
-TEST(AgradDistributionsLognormal,ProptoY) {
-  double mu;
-  double sigma;
-  
-  mu = 10.0;
-  sigma = 4.0;
-  expect_propto<var,double,double>(20.0,mu,sigma,
-                                   15.0,mu,sigma,
-                                   "var: y");
+class AgradDistributionsLognormal : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
 
-}
-TEST(AgradDistributionsLognormal,ProptoYMu) {
-  double sigma;
-  sigma = 5.0;
+    param[0] = 1.2;           // y
+    param[1] = 0.3;           // mu
+    param[2] = 1.5;           // sigma
+    parameters.push_back(param);
 
-  expect_propto<var,var,double>(20.0,15.0,sigma,
-                                15.0,14.0,sigma,
-                                "var: y and mu");
-  
-}
-TEST(AgradDistributionsLognormal,ProptoYSigma) {
-  double mu;
-  mu = -5.0;
+    param[0] = 12.0;          // y
+    param[1] = 0.3;           // mu
+    param[2] = 1.5;           // sigma
+    parameters.push_back(param);
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // mu
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
 
-  expect_propto<var,double,var>(-3.0,mu,4.0,
-                                -6.0,mu,10.0,
-                                "var: y and sigma");
-}
-TEST(AgradDistributionsLognormal,ProptoMu) {
-  double y;
-  double sigma;
-  
-  y = 2.0;
-  sigma = 10.0;
-  expect_propto<double,var,double>(y,1.0,sigma,
-                                   y,-1.0,sigma,
-                                   "var: mu");
-}
-TEST(AgradDistributionsLognormal,ProptoMuSigma) {
-  double y;
-  
-  y = 2.0;
-  expect_propto<double,var,var>(y,1.0,3.0,
-                                   y,-1.0,4.0,
-                                   "var: mu and sigma");
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
 
-}
-TEST(AgradDistributionsLognormal,ProptoSigma) {
-  double y;
-  double mu;
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
   
-  y = 2.0;
-  mu = -1.0;
-  expect_propto<double,double,var>(y,mu,10.0,
-                                   y,mu,5.0,
-                                   "var: sigma");
-}
+  template <class T_y, class T_loc, class T_scale>
+  var log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+      using stan::prob::include_summand;
+      using stan::math::pi;
+      using stan::math::square;
+      using stan::prob::NEG_LOG_SQRT_TWO_PI;
+
+      var lp(0.0);
+      if (include_summand<true>::value)
+	lp += NEG_LOG_SQRT_TWO_PI;
+      if (include_summand<true,T_scale>::value)
+        lp -= log(sigma);
+      if (include_summand<true,T_y>::value)
+        lp -= log(y);
+      if (include_summand<true,T_y,T_loc,T_scale>::value)
+        lp -= square(log(y) - mu) / (2.0 * sigma * sigma);
+      return lp;
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLognormal,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsLognormal);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLognormal,
+			      AgradDistributionTestFixture2,
+			      AgradDistributionsLognormal);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLognormal,
+			      AgradDistributionTestFixture3,
+			      AgradDistributionsLognormal);
