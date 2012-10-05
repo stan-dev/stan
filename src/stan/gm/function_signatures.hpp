@@ -105,7 +105,11 @@ add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
 add("exp",MATRIX_T,MATRIX_T);
 add_unary("exp2");
 add_unary("expm1");
-add_binary("exponential_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+      add("exponential_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
 add_binary("exponential_cdf");
 add_unary("fabs");
 add_binary("fdim");
