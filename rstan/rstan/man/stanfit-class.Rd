@@ -56,7 +56,9 @@
        object of type \code{list}}
     \item{\code{mode}:}{The mode of the fitted model, object of type 
        \code{integer}. \code{0} indicates sampling mode; \code{1}
-       indicates test gradient mode for which no sampling is done.}
+       indicates test gradient mode for which no sampling is done;
+       \code{2}; error occured before sampling. Most of methods for 
+       \code{stanfit} are useful only for \code{mode=1}}
     \item{\code{sim}:}{Simulation results including samples for the model,
        object of type \code{list}} 
     \item{\code{inits}:}{The initial values either specified or generated
@@ -123,9 +125,11 @@
       get the object of S4 class \code{stanmodel} of the fitted 
       model.} 
     \item{\code{get_inits}}{\code{signature(object = "stanfit")}:
-      get the initial values for parameters used in sampling all chains.} 
+      get the initial values for parameters used in sampling all chains.
+      For \code{mode=2}, it returns an empty list.} 
     \item{\code{get_seed}}{\code{signature(object = "stanfit")}: 
-      get the seed that used for sampling.} 
+      get the seed that used for sampling. When the fitted object 
+      is empty (\code{mode=2}), \code{NULL} might be returned.} 
     \item{\code{get_logposterior}}{\code{signature(object = "stanfit")}: 
       get the log-posterior (up to an additive constant, which is up to
       a multiplicative constant on the linear scale) for all chains. 

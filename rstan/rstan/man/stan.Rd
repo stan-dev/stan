@@ -145,7 +145,11 @@ stan(file, model_name = "anon_model", model_code = "",
   for the model is reused. 
 }
 \value{
-  Fitted results as an object of S4 class \code{stanfit}.
+  Fitted results as an object of S4 class \code{stanfit}. If error occurs 
+  before or during sampling, and if \code{test_grad = TRUE}, the returned
+  object would not contain samples. But the compiled binary object for the 
+  model is still included, so we can reuse the returned object for another
+  sampling. 
 }
 
 \note{

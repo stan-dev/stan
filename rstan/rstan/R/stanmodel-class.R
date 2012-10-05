@@ -39,6 +39,22 @@ setGeneric(name = "get_cxxflags",
            def = function(object, ...) { standardGeneric("get_cxxflags") })
 setMethod("get_cxxflags", "stanmodel", function(object) { object@dso@cxxflags }) 
 
+new_empty_stanfit <- function(stanmodel, model_pars = character(0), par_dims = list(), 
+                              mode = 2L, sim = list(), 
+                              inits = list(), stan_args = list()) { 
+  new("stanfit",
+      model_name = stanmodel@model_name,
+      model_pars = model_pars, 
+      par_dims = par_dims, 
+      mode = mode,
+      sim = sim, 
+      inits = inits, 
+      stan_args = stan_args, 
+      stanmodel = stanmodel, 
+      date = date(),
+      .MISC = new.env()) 
+} 
+
 setMethod("sampling", "stanmodel",
           function(object, data = list(), pars = NA, chains = 4, iter = 2000,
                    warmup = floor(iter / 2),
@@ -61,19 +77,30 @@ setMethod("sampling", "stanmodel",
             mod <- get("module", envir = object@dso@.CXXDSOMISC, inherits = FALSE) 
             stan_fit_cpp_module <- eval(call("$", mod, model_cppname)) 
 
-            if (chains < 1) 
-              stop("the number of chains is less than 1")
-
             if (check_data) { 
               # allow data to be specified as a vector of character string 
-              if (is.character(data)) data <- mklist(data) 
-
+              if (is.character(data)) {
+                data <- try(mklist(data))
+                if (is(data, "try-error")) {
+                  message("failed to create the data; sampling not done") 
+                  return(invisible(new_empty_stanfit(object)))
+                }
+              }
               # check data and preprocess
-              if (!missing(data) && length(data) > 0) data <- data_preprocess(data)
-              else data <- list()
+              if (!missing(data) && length(data) > 0) {
+                data <- try(data_preprocess(data))
+                if (is(data, "try-error")) {
+                  message("failed to preprocess the data; sampling not done") 
+                  return(invisible(new_empty_stanfit(object)))
+                }
+              } else data <- list()
             } 
 
-            sampler <- new(stan_fit_cpp_module, data) 
+            sampler <- try(new(stan_fit_cpp_module, data)) 
+            if (is(sampler, "try-error")) {
+              message('failed to create the sampler; sampling not done') 
+              return(invisible(new_empty_stanfit(object)))
+            } 
             on.exit({rm(sampler); invisible(gc())}) 
 
             m_pars = sampler$param_names() 
@@ -81,13 +108,26 @@ setMethod("sampling", "stanmodel",
             if (!missing(pars) && !is.na(pars) && length(pars) > 0) {
               sampler$update_param_oi(pars)
               m <- which(match(pars, m_pars, nomatch = 0) == 0)
-              if (length(m) > 0) 
-                stop("no parameter ", paste(pars[m], collapse = ', ')) 
+              if (length(m) > 0) {
+                message("no parameter ", paste(pars[m], collapse = ', '), "; sampling not done") 
+                return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+              }
             }
 
-            args_list <- config_argss(chains = chains, iter = iter,
-                                      warmup = warmup, thin = thin,
-                                      init = init, seed = seed, sample_file, ...)
+            if (chains < 1) {
+              message("the number of chains is less than 1; sampling not done") 
+              return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+            }
+
+            args_list <- try(config_argss(chains = chains, iter = iter,
+                                          warmup = warmup, thin = thin,
+                                          init = init, seed = seed, sample_file, ...))
+   
+            if (is(args_list, "try-error")) {
+              message('error specification of arguments; sampling not done') 
+              return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+            } 
+
             n_save <- 1 + (iter - 1) %/% thin 
             # number of samples saved after thinning
             warmup2 <- 1 + (warmup - 1) %/% thin 
@@ -98,29 +138,22 @@ setMethod("sampling", "stanmodel",
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
               cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
-              samples[[i]] <- sampler$call_sampler(args_list[[i]])
-              if (is.null(samples[[i]])) 
-                stop("error occurred during calling the sampler")
+              samples[[i]] <- try(sampler$call_sampler(args_list[[i]])) 
+              if (is(samples[[i]], "try-error")) {
+                message("error occurred during calling the sampler; sampling not done") 
+                return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+              }
             }
+
+            inits_used = organize_inits(lapply(samples, function(x) attr(x, "inits")), 
+                                        m_pars, p_dims) 
 
             # test_gradient mode: no sample 
             if (attr(samples[[1]], 'test_grad')) {
               sim = list(num_failed = samples)
-              nfit <- new("stanfit",
-                          model_name = object@model_name,
-                          model_pars = m_pars, 
-                          par_dims = p_dims, 
-                          mode = 1L, 
-                          sim = sim, 
-                          inits = organize_inits(lapply(samples, function(x) attr(x, "inits")), 
-                                                 m_pars, p_dims), 
-                          stan_args = args_list,
-                          stanmodel = object, 
-                          # keep a ref to avoid garbage collection
-                          # (see comments in fun stan_model)
-                          date = date(),
-                          .MISC = new.env()) 
-              return(invisible(nfit)) 
+              return(invisible(new_empty_stanfit(object, m_pars, p_dims, 1L, sim = sim, 
+                                                 inits = inits_used, 
+                                                 stan_args = args_list)))
             } 
 
             permutation.lst <-
@@ -146,10 +179,8 @@ setMethod("sampling", "stanmodel",
                         par_dims = p_dims, 
                         mode = 0L, 
                         sim = sim,
-                        # summary = summary,
                         # keep a record of the initial values 
-                        inits = organize_inits(lapply(sim$samples, function(x) attr(x, "inits")), 
-                                               m_pars, p_dims), 
+                        inits = inits_used, 
                         stan_args = args_list,
                         stanmodel = object, 
                           # keep a ref to avoid garbage collection

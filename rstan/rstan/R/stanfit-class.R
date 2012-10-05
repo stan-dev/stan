@@ -1,3 +1,6 @@
+# require(methods)
+# source('AllClass.R')
+
 setMethod("show", "stanfit", 
           function(object) {
             printstanfit(x = object, pars = object@sim$pars_oi)
@@ -10,7 +13,10 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
     cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
         "sampling is not conducted.\n", sep = '')
     return(invisible(NULL)) 
-  }
+  } else if (x@mode == 2L) {
+    cat("Stan model '", x@model_name, "' does not contain samples.\n", sep = '') 
+    return(invisible(NULL)) 
+  } 
 
   s <- summary(x, pars, probs, ...)  
   cat("Inference for Stan model: ", x@model_name, '.\n', sep = '')
@@ -42,7 +48,11 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
               cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (x@mode == 2L) {
+              cat("Stan model '", x@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
+
             pars <- if (missing(pars)) x@sim$pars_oi else check_pars(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
@@ -89,7 +99,9 @@ setGeneric(name = 'get_seed',
            def = function(object, ...) { standardGeneric("get_seed")})
 
 setMethod("get_seed", signature = "stanfit", 
-          function(object) { object@stan_args[[1]]$seed })
+          function(object) { 
+            if (length(object@stan_args) < 1L) return(NULL) 
+            object@stan_args[[1]]$seed })
 
 ### HELPER FUNCTIONS
 ### 
@@ -225,7 +237,10 @@ setMethod("get_adaptation_info",
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
 
             lai <- lapply(object@sim$samples, function(x) attr(x, "adaptation_info"))
             is_empty <- function(x) { 
@@ -247,7 +262,11 @@ setMethod("get_logposterior",
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
+
             llp <- lapply(object@sim$samples, function(x) x[['lp__']]) 
             if (inc_warmup) return(invisible(llp)) 
             invisible(mapply(function(x, w) x[-(1:w)], 
@@ -264,7 +283,11 @@ setMethod("get_sampler_params",
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
+
             ldf <- lapply(object@sim$samples, 
                           function(x) do.call(cbind, attr(x, "sampler_params")))   
             if (all(sapply(ldf, is.null))) return(invisible(NULL))  
@@ -299,7 +322,11 @@ setMethod("extract", signature = "stanfit",
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
+
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
@@ -364,7 +391,10 @@ setMethod("summary", signature = "stanfit",
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
 
             if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
               assign("summary", summary_sim(object@sim), envir = object@.MISC)
@@ -435,7 +465,11 @@ setMethod("traceplot", signature = "stanfit",
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
               return(invisible(NULL)) 
-            }
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
+
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 

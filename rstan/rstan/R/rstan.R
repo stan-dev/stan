@@ -115,11 +115,6 @@ stan <- function(file, model_name = "anon_model",
   # Returns: 
   #   A S4 class stanfit object  
 
-  # check data before compiling model, which typically takes more time 
-  if (is.character(data)) data <- mklist(data) 
-  if (!missing(data) && length(data) > 0) data <- data_preprocess(data)
-  else data <- list()  
-
   if (is(fit, "stanfit")) sm <- get_stanmodel(fit)
   else { 
     attr(model_code, "model_name2") <- deparse(substitute(model_code))  
@@ -132,5 +127,5 @@ stan <- function(file, model_name = "anon_model",
   if (missing(sample_file))  sample_file <- NA 
 
   sampling(sm, data, pars, chains, iter, warmup, thin, seed, init, 
-           sample_file = sample_file, verbose = verbose, check_data = FALSE, ...) 
+           sample_file = sample_file, verbose = verbose, check_data = TRUE, ...) 
 } 
