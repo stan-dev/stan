@@ -15,11 +15,14 @@ The to-do list is organized into the following sections:
 v 1.0.3 Release Notes
 ======================================================================
 Bug Fixes:
+ -- error output in stanc now directed to standard error
 New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
  -- better error checking for transforms 
+ -- catching all exceptions thrown in stanc to prevent core dumps
+ -- new error return type in stanc for invalid arguments
 Manual Additions:
-
+ -- example of defining new distribution with parameters
 
 C++ API
 ======================================================================
