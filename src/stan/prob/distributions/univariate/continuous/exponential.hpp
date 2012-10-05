@@ -1,10 +1,12 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL_HPP__
 
-#include <stan/prob/traits.hpp>
+#include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   
@@ -39,35 +41,54 @@ namespace stan {
     template <bool propto,
               typename T_y, typename T_inv_scale, 
               class Policy>
-    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta, 
                     const Policy&) {
       static const char* function = "stan::prob::exponential_log(%1%)";
 
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(beta)))
+	return 0.0;
+      
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_not_nan;
-      using boost::math::tools::promote_args;
-
-      typename promote_args<T_y,T_inv_scale>::type lp(0.0);
-      if(!check_not_nan(function, y, "Random variable", &lp, Policy()))
-        return lp;
-      if(!check_finite(function, beta, "Inverse scale parameter", &lp, Policy()))
-        return lp;
-      if(!check_positive(function, beta, "Inverse scale parameter", &lp, Policy()))
-        return lp;
+      using stan::math::check_consistent_sizes;
       
-      if (include_summand<propto,T_inv_scale>::value)
-        lp += log(beta);
-      if (include_summand<propto,T_y,T_inv_scale>::value)
-        lp -= beta * y;
-      return lp;
+      typename return_type<T_y,T_inv_scale>::type logp(0.0);
+      if(!check_not_nan(function, y, "Random variable", &logp, Policy()))
+        return logp;
+      if(!check_finite(function, beta, "Inverse scale parameter", &logp, Policy()))
+        return logp;
+      if(!check_positive(function, beta, "Inverse scale parameter", &logp, Policy()))
+        return logp;
+
+      if (!(check_consistent_sizes(function,
+                                   y,beta,
+				   "Random variable","Inverse scale parameter",
+                                   &logp, Policy())))
+        return logp;
+      
+      
+      // set up template expressions wrapping scalars into vector views
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_inv_scale> beta_vec(beta);
+      size_t N = max_size(y, beta);
+      
+      for (size_t n = 0; n < N; n++) {
+	if (include_summand<propto,T_inv_scale>::value)
+	  logp += log(beta_vec[n]);
+	if (include_summand<propto,T_y,T_inv_scale>::value)
+	  logp -= beta_vec[n] * y_vec[n];
+      }
+      return logp;
     }
     
     template <bool propto,
               typename T_y, typename T_inv_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
       return exponential_log<propto>(y,beta,stan::math::default_policy());
     }
@@ -75,14 +96,14 @@ namespace stan {
     template <typename T_y, typename T_inv_scale,
               class Policy>
     inline
-    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta, const Policy&) {
       return exponential_log<false>(y,beta,Policy());
     }
 
     template <typename T_y, typename T_inv_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_inv_scale>::type
+    typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
       return exponential_log<false>(y,beta,stan::math::default_policy());
     }

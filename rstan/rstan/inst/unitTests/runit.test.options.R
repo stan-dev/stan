@@ -33,3 +33,25 @@ test_plot_rhat_breaks <- function() {
   o <- rstan_options("plot_rhat_breaks")
   checkEquals(o, c(1.2, 1.5, 2)) 
 } 
+
+
+# all options used in rstan 
+test_rstan_options <- function() { 
+  rhat_nan_col <- rstan_options("plot_rhat_nan_col")
+  rhat_large_col <- rstan_options("plot_rhat_large_col")
+  rhat_breaks <- rstan_options("plot_rhat_breaks")
+  rhat_colors <- rstan_options("plot_rhat_cols")
+  rhat_breaks <- rstan_options("plot_rhat_breaks")
+  rhat_colors <- rstan_options("plot_rhat_cols")
+  rhat_legend_cols <- c(rhat_colors, rstan_options('plot_rhat_large_col'),
+                        rstan_options("plot_rhat_nan_col"))
+  alert_col <- rstan_options("rstan_alert_col")
+  chain_cols <- rstan_options("rstan_chain_cols")
+  standard_width <- rstan_options('plot_standard_npar') 
+  max_width <- rstan_options('plot_max_npar') 
+  rstan_options("eigen_lib")
+  rstan_options("boost_lib")
+  rstan_options("rstan_chain_cols")
+  warmup_col <- rstan_options("rstan_warmup_bg_col") 
+} 
+

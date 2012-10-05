@@ -913,8 +913,8 @@ stan_plot_inferences <- function(sim, summary, pars, model_info, display_paralle
   # we have this so that even the # of parameters are less than
   # 30, we still have equal space between parameters for 
   # the whole plot. 
-  standard.width <- rstan_options('plot_standard_npar') 
-  max.width <- rstan_options('plot_max_npar') 
+  standard_width <- rstan_options('plot_standard_npar') 
+  max_width <- rstan_options('plot_max_npar') 
 
   pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
   n_pars <- length(pars) 
@@ -974,8 +974,8 @@ stan_plot_inferences <- function(sim, summary, pars, model_info, display_paralle
     k_num_p <- length(index) 
 
     # number of parameter we would plot
-    J <- min(k_num_p, max.width)
-    spacing <- 3.5 / max(J, standard.width)
+    J <- min(k_num_p, max_width)
+    spacing <- 3.5 / max(J, standard_width)
 
     # the medians for all the kept samples merged 
     sprobs = default_summary_probs()  

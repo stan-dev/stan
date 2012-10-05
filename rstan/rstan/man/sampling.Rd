@@ -116,7 +116,8 @@
 }
 \value{
    An object of S4 class \code{stanfit} representing
-   the fitted results. 
+   the fitted results. Slot \code{mode} for this object
+   indicates if the sampling is done or not. 
 } 
 
 \seealso{

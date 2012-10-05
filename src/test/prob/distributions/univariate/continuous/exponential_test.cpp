@@ -1,85 +1,51 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ exponential_log
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_2_params.hpp>
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+using std::vector;
+using std::numeric_limits;
 
-using stan::prob::exponential_log;
+class ProbDistributionsExponential : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(2);
 
-TEST(ProbDistributionsExponential,Exponential) {
-  EXPECT_FLOAT_EQ(-2.594535, exponential_log(2.0,1.5));
-  EXPECT_FLOAT_EQ(-57.13902, exponential_log(15.0,3.9));
-}
-TEST(ProbDistributionsExponential,Propto) {
-  EXPECT_FLOAT_EQ(0.0, exponential_log<true>(2.0,1.5));
-  EXPECT_FLOAT_EQ(0.0, exponential_log<true>(15.0,3.9));
-}
-TEST(ProbDistributionsExponential,DefaultPolicy){
-  double inf = std::numeric_limits<double>::infinity();
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  
-  double y_valid = 5.0;
-  double beta_valid = 1.0;
+    param[0] = 2.0;                 // y
+    param[1] = 1.5;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(-2.594535);  // expected log_prob
 
-  EXPECT_NO_THROW(exponential_log(y_valid, beta_valid));
-  
-  EXPECT_NO_THROW(exponential_log(0.0, beta_valid));
-  EXPECT_NO_THROW(exponential_log(-1.0, beta_valid));
-  EXPECT_NO_THROW(exponential_log(-inf, beta_valid));
-  EXPECT_NO_THROW(exponential_log(inf, beta_valid));
-  
-  EXPECT_THROW(exponential_log(nan, beta_valid), std::domain_error);
-  EXPECT_THROW(exponential_log(y_valid, 0.0), std::domain_error);
-  EXPECT_THROW(exponential_log(y_valid, -1.0), std::domain_error);
-  EXPECT_THROW(exponential_log(y_valid, inf), std::domain_error);
-  EXPECT_THROW(exponential_log(y_valid, -inf), std::domain_error);
-  EXPECT_THROW(exponential_log(y_valid, nan), std::domain_error);
-}
-TEST(ProbDistributionsExponential,ErrnoPolicy){
-  double inf = std::numeric_limits<double>::infinity();
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  
-  double result;
-  double y_valid = 5.0;
-  double beta_valid = 1.0;
+    param[0] = 15.0;                // y
+    param[1] = 3.9;                 // beta
+    parameters.push_back(param);
+    log_prob.push_back(-57.13902);  // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // beta
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  result = exponential_log(y_valid, beta_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  result = exponential_log(0.0, beta_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = exponential_log(-1.0, beta_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = exponential_log(-inf, beta_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = exponential_log(inf, beta_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  result = exponential_log(nan, beta_valid, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = exponential_log(y_valid, 0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = exponential_log(y_valid, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = exponential_log(y_valid, inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = exponential_log(y_valid, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = exponential_log(y_valid, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+    index.push_back(1U);
+    value.push_back(-1.0);
+
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsExponential,
+			      DistributionTestFixture,
+			      ProbDistributionsExponential);
 
 TEST(ProbDistributionsExponential,Cumulative) {
   using std::numeric_limits;

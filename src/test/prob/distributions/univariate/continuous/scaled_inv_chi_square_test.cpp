@@ -1,94 +1,61 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ scaled_inv_chi_square_log
 #include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+using std::vector;
+using std::numeric_limits;
 
-using stan::prob::scaled_inv_chi_square_log;
+class ProbDistributionsScaledChiSquare : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
 
-TEST(ProbDistributionsScaledInvChiSquare,ScaledInvChiSquare) {
-  EXPECT_FLOAT_EQ(-3.091965, scaled_inv_chi_square_log(12.7,6.1,3.0));
-  EXPECT_FLOAT_EQ(-1.737086, scaled_inv_chi_square_log(1.0,1.0,0.5));
-}
-TEST(ProbDistributionsScaledInvChiSquare,Propto) {
-  EXPECT_FLOAT_EQ(0.0, scaled_inv_chi_square_log<true>(12.7,6.1,3.0));
-  EXPECT_FLOAT_EQ(0.0, scaled_inv_chi_square_log<true>(1.0,1.0,0.5));
-}
-TEST(ProbDistributionsScaledInvChiSquare,DefaultPolicy) {
-  double inf = std::numeric_limits<double>::infinity();
-  double nan = std::numeric_limits<double>::quiet_NaN();
+    param[0] = 12.7;          // y
+    param[1] = 6.1;           // nu
+    param[2] = 3.0;           // s
+    parameters.push_back(param);
+    log_prob.push_back(-3.091965); // expected log_prob
 
-  double y_valid = 10;
-  double nu_valid = 1.0;
-  double scale_valid = 1.0;
-
-  EXPECT_NO_THROW(scaled_inv_chi_square_log(y_valid, nu_valid, scale_valid));
-  EXPECT_NO_THROW(scaled_inv_chi_square_log(inf, nu_valid, scale_valid));
-  EXPECT_NO_THROW(scaled_inv_chi_square_log(-inf, nu_valid, scale_valid));
-  
-  EXPECT_THROW(scaled_inv_chi_square_log(nan, nu_valid, scale_valid),
-               std::domain_error) << "error on y = nan";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, 0.0, scale_valid),
-               std::domain_error) << "error on nu <= 0";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, -1.0, scale_valid),
-               std::domain_error) << "error on nu <= 0";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, inf, scale_valid),
-               std::domain_error) << "error on nu = inf";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, nan, scale_valid),
-               std::domain_error) << "error on nu = nan";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, nu_valid, 0.0),
-               std::domain_error) << "error on scale <= 0";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, nu_valid, -1.0),
-               std::domain_error) << "error on scale <= 0";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, nu_valid, inf),
-               std::domain_error) << "error on scale = inf";
-  EXPECT_THROW(scaled_inv_chi_square_log(y_valid, nu_valid, nan),
-               std::domain_error) << "error on scale = nan";
+    param[0] = 1.0;           // y
+    param[1] = 1.0;           // nu
+    param[2] = 0.5;           // s
+    parameters.push_back(param);
+    log_prob.push_back(-1.737086); // expected log_prob
   }
-TEST(ProbDistributionsScaledInvChiSquare,ErrnoPolicy) {
-  double inf = std::numeric_limits<double>::infinity();
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double result = 0;
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // nu
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  double y_valid = 10;
-  double nu_valid = 1.0;
-  double scale_valid = 1.0;
+    index.push_back(1U);
+    value.push_back(-1.0);
 
-  result = scaled_inv_chi_square_log(y_valid, nu_valid, scale_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = scaled_inv_chi_square_log(inf, nu_valid, scale_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = scaled_inv_chi_square_log(-inf, nu_valid, scale_valid, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(nan, nu_valid, scale_valid, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on y = nan";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, 0.0, scale_valid, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on nu <= 0";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, -1.0, scale_valid, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on nu <= 0";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, inf, scale_valid, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on nu = inf";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, nan, scale_valid, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on nu = nan";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, nu_valid, 0.0, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on scale <= 0";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, nu_valid, -1.0, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on scale <= 0";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, nu_valid, inf, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on scale = inf";
-  EXPECT_NO_THROW(result = scaled_inv_chi_square_log(y_valid, nu_valid, nan, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "error on scale = nan";
-}
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // s
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsScaledChiSquare,
+			      DistributionTestFixture,
+			      ProbDistributionsScaledChiSquare);
