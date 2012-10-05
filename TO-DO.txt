@@ -32,6 +32,7 @@ C++ API
     univariate/continuous
     + chi_square
     + exponential
+    + inv_chi_square
 
   - Fully vectorized with partials calculated:
     univariate/continuous

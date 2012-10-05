@@ -130,7 +130,11 @@ add_binary("hypot");
 add("if_else",DOUBLE_T,INT_T,DOUBLE_T,DOUBLE_T);
 add("int_step",INT_T,DOUBLE_T);
 add("int_step",INT_T,INT_T);
-add_binary("inv_chi_square_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+      add("inv_chi_square_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
 add_unary("inv_cloglog");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
