@@ -31,6 +31,7 @@ C++ API
   - Allows vectorized inputs (but without partials calculated):
     univariate/continuous
     + chi_square
+    + exponential
 
   - Fully vectorized with partials calculated:
     univariate/continuous
