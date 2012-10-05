@@ -1,72 +1,90 @@
-#include <gtest/gtest.h>
-#include "test/agrad/distributions/expect_eq_diffs.hpp"
-#include "stan/agrad/agrad.hpp"
-#include "stan/agrad/special_functions.hpp"
-#include "stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp"
+#define _LOG_PROB_ scaled_inv_chi_square_log
+#include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_3_params.hpp>
 
-template <typename T_y, typename T_dof, typename T_scale>
-void expect_propto(T_y y1, T_dof nu1, T_scale s1,
-                   T_y y2, T_dof nu2, T_scale s2,
-                   std::string message) {
-  expect_eq_diffs(stan::prob::scaled_inv_chi_square_log<false>(y1,nu1,s1),
-                  stan::prob::scaled_inv_chi_square_log<false>(y2,nu2,s2),
-                  stan::prob::scaled_inv_chi_square_log<true>(y1,nu1,s1),
-                  stan::prob::scaled_inv_chi_square_log<true>(y2,nu2,s2),
-                  message);
-}
-
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-TEST(AgradDistributionsScaledInvChiSquare,Propto) {
-  expect_propto<var,var,var>(12.7, 6.1, 3.0,
-                             1.0, 1.0, 0.5,
-                             "var: y, nu, and s");
-}
-TEST(AgradDistributionsScaledInvChiSquare,ProptoY) {
-  double nu = 6.1;
-  double s = 3.0;
-  
-  expect_propto<var,double,double>(3.0, nu, s,
-                                   7.0, nu, s,
-                                   "var: y");
-}
-TEST(AgradDistributionsScaledInvChiSquare,ProptoYNu) {
-  double s = 3.0;
-  
-  expect_propto<var,var,double>(3.0, 6.1, s,
-                                7.0, 1.0, s,
-                                "var: y and nu");
-}
-TEST(AgradDistributionsScaledInvChiSquare,ProptoYS) {
-  double nu = 6.1;
-  
-  expect_propto<var,double,var>(3.0, nu, 3.0,
-                                7.0, nu, 0.5,
-                                "var: y and s");
-}
-TEST(AgradDistributionsScaledInvChiSquare,ProptoNu) {
-  double y = 12.7;
-  double s = 0.5;
-  
-  expect_propto<double,var,double>(y, 0.2, s,
-                                   y, 6.0, s,
-                                   "var: nu");
-}
-TEST(AgradDistributionsScaledInvChiSquare,ProptoNuS) {
-  double y = 12.7;
-  
-  expect_propto<double,var,var>(y, 0.2, 3.0,
-                                y, 6.0, 0.5,
-                                "var: nu and s");
-}
-TEST(AgradDistributionsScaledInvChiSquare,ProptoS) {
-  double y = 12.7;
-  double nu = 6.1;
-  
-  expect_propto<var,double,var>(y, nu, 3.0,
-                                y, nu, 0.5,
-                                "var: s");
-}
+class AgradDistributionsScaledInvChiSquare : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
 
+    param[0] = 12.7;          // y
+    param[1] = 6.1;           // nu
+    param[2] = 3.0;           // s
+    parameters.push_back(param);
 
+    param[0] = 1.0;           // y
+    param[1] = 1.0;           // nu
+    param[2] = 0.5;           // s
+    parameters.push_back(param);
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // nu
+    index.push_back(1U);
+    value.push_back(0.0);
+
+    index.push_back(1U);
+    value.push_back(-1.0);
+
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // s
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+  template <class T_y, class T_dof, class T_scale>
+  var log_prob(const T_y& y, const T_dof& nu, const T_scale& s) {
+    using std::log;
+    using stan::math::log;
+    using stan::prob::include_summand;
+    using stan::math::multiply_log;
+    using stan::math::square;
+
+    
+    if (y <= 0)
+      return stan::prob::LOG_ZERO;
+    
+    var logp(0);
+    if (include_summand<true,T_dof>::value) {
+      var half_nu = 0.5 * nu;
+      logp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
+    }
+    if (include_summand<true,T_dof,T_scale>::value)
+      logp += nu * log(s);
+    if (include_summand<true,T_dof,T_y>::value)
+      logp -= multiply_log(nu*0.5+1.0, y);
+    if (include_summand<true,T_dof,T_y,T_scale>::value)
+      logp -= nu * 0.5 * square(s) / y;
+    return logp;
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsScaledInvChiSquare,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsScaledInvChiSquare);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsScaledInvChiSquare,
+			      AgradDistributionTestFixture2,
+			      AgradDistributionsScaledInvChiSquare);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsScaledInvChiSquare,
+			      AgradDistributionTestFixture3,
+			      AgradDistributionsScaledInvChiSquare);

@@ -1,11 +1,12 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SCALED_INV_CHI_SQUARE_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SCALED_INV_CHI_SQUARE_HPP__
 
-#include <stan/prob/constants.hpp>
+#include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-
 
 namespace stan {
 
@@ -33,7 +34,7 @@ namespace stan {
     template <bool propto,
               typename T_y, typename T_dof, typename T_scale, 
               class Policy>
-    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    typename return_type<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
                               const Policy&) {
       static const char* function 
@@ -42,44 +43,68 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_not_nan;
-      using boost::math::tools::promote_args;
-      
-      typename promote_args<T_y,T_dof,T_scale>::type lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
-        return lp;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &lp, Policy()))
-        return lp;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &lp, Policy()))
-        return lp;
-      if (!check_finite(function, s, "Scale parameter", &lp, Policy()))
-        return lp;
-      if (!check_positive(function, s, "Scale parameter", &lp, Policy()))
-        return lp;
+      using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
 
-      if (y <= 0)
-        return LOG_ZERO;
-      
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(nu) 
+            && stan::length(s)))
+        return 0.0;
+
+      typename return_type<T_y,T_dof,T_scale>::type logp(0.0);
+      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+        return logp;
+      if (!check_finite(function, nu, "Degrees of freedom parameter", &logp, Policy()))
+        return logp;
+      if (!check_positive(function, nu, "Degrees of freedom parameter", &logp, Policy()))
+        return logp;
+      if (!check_finite(function, s, "Scale parameter", &logp, Policy()))
+        return logp;
+      if (!check_positive(function, s, "Scale parameter", &logp, Policy()))
+        return logp;
+      if (!(check_consistent_sizes(function,
+                                   y,nu,s,
+				   "Random variable","Degrees of freedom parameter","Scale parameter",
+                                   &logp, Policy())))
+        return logp;
+
+      // check if no variables are involved and prop-to
+      if (!include_summand<propto,T_y,T_dof,T_scale>::value)
+	return 0.0;
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_dof> nu_vec(nu);
+      VectorView<const T_scale> s_vec(s);
+      size_t N = max_size(y, nu, s);
+
+      for (size_t n = 0; n < N; n++) {
+	if (value_of(y_vec[n]) <= 0)
+	  return LOG_ZERO;
+      }
+
       using stan::math::multiply_log;
       using stan::math::square;
-
-      lp = 0.0;
-      if (include_summand<propto,T_dof>::value) {
-        T_dof half_nu = 0.5 * nu;
-        lp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
+    
+      for (size_t n = 0; n < N; n++) {
+	if (include_summand<propto,T_dof>::value) {
+	  typename return_type<T_dof>::type half_nu = 0.5 * nu_vec[n];
+	  logp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
+	}
+	if (include_summand<propto,T_dof,T_scale>::value)
+	  logp += nu_vec[n] * log(s_vec[n]);
+	if (include_summand<propto,T_dof,T_y>::value)
+	  logp -= multiply_log(nu_vec[n]*0.5+1.0, y_vec[n]);
+	if (include_summand<propto,T_dof,T_y,T_scale>::value)
+	  logp -= nu_vec[n] * 0.5 * square(s_vec[n]) / y_vec[n];
       }
-      if (include_summand<propto,T_dof,T_scale>::value)
-        lp += nu * log(s);
-      if (include_summand<propto,T_dof,T_y>::value)
-        lp -= multiply_log(nu*0.5+1.0, y);
-      if (include_summand<propto,T_dof,T_y,T_scale>::value)
-        lp -= nu * 0.5 * square(s) / y;
-      return lp;
+      return logp;
     }
 
     template <bool propto,
               typename T_y, typename T_dof, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    typename return_type<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
       return scaled_inv_chi_square_log<propto>(y,nu,s,
                                                stan::math::default_policy());
@@ -88,7 +113,7 @@ namespace stan {
     template <typename T_y, typename T_dof, typename T_scale, 
               class Policy>
     inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    typename return_type<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
                               const Policy&) {
       return scaled_inv_chi_square_log<false>(y,nu,s,Policy());
@@ -96,7 +121,7 @@ namespace stan {
 
     template <typename T_y, typename T_dof, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
+    typename return_type<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
       return scaled_inv_chi_square_log<false>(y,nu,s,
                                               stan::math::default_policy());
