@@ -10,33 +10,35 @@ data {
 }
 
 transformed data {
-  int r[N,T];
+  int r[T,N];
+  vector[N] ones;
   
   for (j in 1:culm[1]) {
     for (k in 1:T) {
-      r[j,k] <- response[1,k];
+      r[k,j] <- response[1,k];
    } 
   }
   for (i in 2:R) {
     for (j in (culm[i-1] + 1):culm[i]) {
       for (k in 1:T) {
-        r[j,k] <- response[i,k];
+        r[k,j] <- response[i,k];
       }
     }
-  } 
+  }
+  for (i in 1:N)
+    ones[i] <- 1.0; 
 }
 parameters {
   real alpha[T];
-  real theta[N];
+  vector[N] theta;
   real<lower=0> beta;
 }
 model {
   alpha ~ normal(0, 100.); 
   theta ~ normal(0, 1); 
   beta ~ normal(0.0, 100.); 
-  for (j in 1:N)  
-    for (k in 1:T) 
-      r[j, k] ~ bernoulli(inv_logit(beta * theta[j] - alpha[k]));
+  for(k in 1:T)
+    r[k] ~ bernoulli_logit(beta * theta - alpha[k] * ones);
 }
 
 generated quantities {
