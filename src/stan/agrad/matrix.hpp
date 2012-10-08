@@ -1507,13 +1507,13 @@ namespace stan {
      */
     inline matrix_v
     tcrossprod(const matrix_v& M) {
-        if(M.rows() == 0)
-          return matrix_v(0,0);
-        if(M.rows() == 1) {
-          return M * M.transpose(); // FIXME: replace with dot_self
-        }
-        matrix_v result(M.rows(),M.rows());
-        return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+      if(M.rows() == 0)
+        return matrix_v(0,0);
+      if(M.rows() == 1) {
+        return M * M.transpose(); // FIXME: replace with dot_self
+      }
+      matrix_v result(M.rows(),M.rows());
+      return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
     }
 
     /**
@@ -1524,7 +1524,7 @@ namespace stan {
      */
     inline matrix_v
     crossprod(const matrix_v& M) {
-        return tcrossprod(M.transpose());
+      return tcrossprod(M.transpose());
     }
 
     /**
