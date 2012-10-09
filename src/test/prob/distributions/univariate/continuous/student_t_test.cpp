@@ -1,110 +1,80 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ student_t_log
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_4_params.hpp>
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+using std::vector;
+using std::numeric_limits;
 
-using stan::prob::student_t_log;
+class ProbDistributionsStudentT : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(4);
 
+    param[0] = 1.0;           // y
+    param[1] = 1.0;           // nu
+    param[2] = 0.0;           // mu
+    param[3] = 1.0;           // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-1.837877); // expected log_prob
 
-TEST(ProbDistributionsStudentT,StudentT) {
-  EXPECT_FLOAT_EQ(-1.837877, stan::prob::student_t_log(1.0,1.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-3.596843, stan::prob::student_t_log(-3.0,2.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(-2.531024, stan::prob::student_t_log(2.0,1.0,0.0,2.0));
-  // need test with scale != 1
-}
-TEST(ProbDistributionsStudentT,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::student_t_log<true>(1.0,1.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::student_t_log<true>(-3.0,2.0,0.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::student_t_log<true>(2.0,1.0,0.0,2.0));
-}
-TEST(ProbDistributionsStudentT,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  double y = 1.0;
-  double nu = 20.0;
-  double mu = 13.0;
-  double sigma = 5.0;
+    param[0] = -3.0;          // y
+    param[1] = 2.0;           // nu
+    param[2] = 0.0;           // mu
+    param[3] = 1.0;           // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-3.596843); // expected log_prob
 
-  EXPECT_NO_THROW(student_t_log(y, nu, mu, sigma));
-  EXPECT_NO_THROW(student_t_log(inf, nu, mu, sigma));
-  EXPECT_NO_THROW(student_t_log(-inf, nu, mu, sigma));
-  
-  EXPECT_THROW(student_t_log(nan, nu, mu, sigma), std::domain_error);
-  
-  EXPECT_THROW(student_t_log(y, 0.0, mu, sigma), std::domain_error);
-  EXPECT_THROW(student_t_log(y, -1.0, mu, sigma), std::domain_error);
-  EXPECT_THROW(student_t_log(y, inf, mu, sigma), std::domain_error);
-  EXPECT_THROW(student_t_log(y, -inf, mu, sigma), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nan, mu, sigma), std::domain_error);
-  
-  EXPECT_THROW(student_t_log(y, nu, inf, sigma), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nu, -inf, sigma), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nu, nan, sigma), std::domain_error);
+    param[0] = 2.0;           // y
+    param[1] = 1.0;           // nu
+    param[2] = 0.0;           // mu
+    param[3] = 2.0;           // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-2.531024); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // nu
+    index.push_back(1U);
+    value.push_back(0.0);
 
-  EXPECT_THROW(student_t_log(y, nu, mu, 0.0), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nu, mu, -1.0), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nu, mu, inf), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nu, mu, -inf), std::domain_error);
-  EXPECT_THROW(student_t_log(y, nu, inf, nan), std::domain_error);
-}
-TEST(ProbDistributionsStudentT,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  double y = 1.0;
-  double nu = 20.0;
-  double mu = 13.0;
-  double sigma = 5.0;
-  double result;
-  
-  result = student_t_log(y, nu, mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = student_t_log(inf, nu, mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = student_t_log(-inf, nu, mu, sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  result = student_t_log(nan, nu, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = student_t_log(y, 0.0, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, -1.0, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, inf, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, -inf, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nan, mu, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = student_t_log(y, nu, inf, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nu, -inf, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nu, nan, sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+    index.push_back(1U);
+    value.push_back(-1.0);
 
-  result = student_t_log(y, nu, mu, 0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nu, mu, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nu, mu, inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nu, mu, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = student_t_log(y, nu, inf, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // mu
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(3U);
+    value.push_back(0.0);
+
+    index.push_back(3U);
+    value.push_back(-1.0);
+
+    index.push_back(3U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(3U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsStudentT,
+			      DistributionTestFixture,
+			      ProbDistributionsStudentT);
