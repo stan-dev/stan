@@ -71,8 +71,12 @@ namespace stan {
       
       if (include_summand<propto,T_shape>::value) 
         lp += do_lkj_constant(eta, K);
-      if (include_summand<propto,T_covar,T_shape>::value && eta != 1.0)
+      if (include_summand<propto,T_covar,T_shape>::value) {
+        if ( (eta == 1.0) &&
+            stan::is_constant<typename stan::scalar_type<T_shape> >::value)
+          return lp;
         lp += (eta - 1.0) * 2.0 * L.diagonal().array().log().sum();
+      }
       
       return lp;
     }
