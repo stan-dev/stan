@@ -1642,6 +1642,42 @@ namespace stan {
       }
       
       /** 
+       * Reads values from a csv file. Reads the last variables in
+       * each file.
+       * 
+       * @param[in,out] file csv output file.
+       * @param[out] values Values from csv file. Order has not been altered.
+       */
+      void
+      read_values(std::fstream& file, 
+                  std::vector<std::vector<double> >& thetas) {
+        thetas.clear();
+        std::string header = read_header(file);
+        int num_values = 1;
+        for (const char* header_ptr = header.c_str(); 
+             *header_ptr != '\n' && *header_ptr != 0; header_ptr++)
+          num_values += *header_ptr == ',';
+
+        std::vector<double> theta;
+        std::string line;
+        std::vector<std::string> tokens;
+        while (file.peek() != std::istream::traits_type::eof()) {
+          while (file.peek() == '#') { // ignore comments
+            file.ignore(10000, '\n');
+          }
+          std::getline(file, line, '\n');
+          tokenize(line, ',', tokens);
+          theta.clear();
+          for (size_t i = tokens.size()-num_values; i < tokens.size(); i++) {
+            theta.push_back(atof(tokens[i].c_str()));
+          }
+          if (theta.size() > 0) {
+            thetas.push_back(theta);
+          }
+        }
+      }
+      
+      /** 
        * Reorders the values in thetas. Each vector has the elements in the
        * index in from placed in the location to.
        * 
