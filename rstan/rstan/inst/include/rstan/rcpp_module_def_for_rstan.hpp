@@ -1,9 +1,9 @@
 /**
  * Define Rcpp Module to expose stan_fit's functions to R. 
  */ 
-RCPP_MODULE(%model_name%){
+RCPP_MODULE(stan_fit4%model_name%_mod){
   Rcpp::class_<rstan::stan_fit<%model_name%_namespace::%model_name%, 
-               boost::random::ecuyer1988> >("%model_name%")
+               boost::random::ecuyer1988> >("stan_fit4%model_name%")
     // .constructor<Rcpp::List>() 
     .constructor<SEXP>() 
     .constructor<SEXP, SEXP>() 
@@ -27,4 +27,3 @@ RCPP_MODULE(%model_name%){
             &rstan::stan_fit<%model_name%_namespace::%model_name%, boost::random::ecuyer1988>::param_oi_tidx)
     ;
 } 
-

@@ -75,7 +75,7 @@ setMethod("sampling", "stanmodel",
             } 
             # mod <- object@dso@.CXXDSOMISC$module 
             mod <- get("module", envir = object@dso@.CXXDSOMISC, inherits = FALSE) 
-            stan_fit_cpp_module <- eval(call("$", mod, model_cppname)) 
+            stan_fit_cpp_module <- eval(call("$", mod, paste('stan_fit4', model_cppname, sep = ''))) 
 
             if (check_data) { 
               # allow data to be specified as a vector of character string 

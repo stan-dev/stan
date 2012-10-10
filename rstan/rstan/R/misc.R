@@ -1073,9 +1073,12 @@ stan_plot_inferences <- function(sim, summary, pars, model_info, display_paralle
   invisible(NULL)
 } 
 
-legitimate_model_name <- function(name) {
+legitimate_model_name <- function(name, obfuscate_name = TRUE) {
   # To make model name be a valid name in C++. 
-  name <- paste(basename(tempfile('stan_fit', '')), '_', name, sep = '')
+  # obfuscate_name 
+
+  namep1 <- if (obfuscate_name)  basename(tempfile('model', '')) else 'model' 
+  name <- paste(namep1, '_', name, sep = '') 
   gsub('[^[:alnum:]]', '_', name) 
   # return("anon_model")
 
@@ -1091,7 +1094,10 @@ legitimate_model_name <- function(name) {
   # would always call the function with the same name loaded later. I am 
   # not sure the real reason, but experiments do show that 
   # later modules created would use previous one if the class name
-  # in the module is the same. 
+  # in the module is the same. So if obfuscate_name = TRUE, we try
+  # to generate a unique name, if FALSE, it is the user's responsibility 
+  # to keep the name unique and in the case, users might be able to
+  # take advantage of tools such as ccache 
 } 
 
 boost_url <- function() {"http://www.boost.org/users/download/"} 
@@ -1122,3 +1128,9 @@ obj_size_str <- function(x) {
   return(paste(x, "bytes")) 
 } 
 
+system_info <- function() {
+  paste("OS: ", R.version$system, 
+        "; rstan: ",  packageVersion('rstan'), 
+        "; Rcpp: ", packageVersion('Rcpp'),
+        "; inline: ", packageVersion('inline'), sep = '')
+} 

@@ -120,6 +120,9 @@ stan(file, model_name = "anon_model", model_code = "",
     the gradient calculation is tested and printed out and the fitted
     \code{stanfit} object is in test gradient mode.  By default, it is
     \code{FALSE}. 
+ 
+    When a new model is fitted starting from Stan model code, 
+    \code{\dots} is passed to \code{stan_model} and thus \code{stanc}.
   } 
 
   \item{boost_lib}{The path for an alternative version of the Boost C++ 

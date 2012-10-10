@@ -6,7 +6,7 @@ stan_model <- function(file,
                        boost_lib = NULL, 
                        eigen_lib = NULL, 
                        save_dso = TRUE,
-                       verbose = FALSE) { 
+                       verbose = FALSE, ...) { 
 
   # Construct a stan model from stan code 
   # 
@@ -24,7 +24,7 @@ stan_model <- function(file,
       attr(model_code, "model_name2") <- model_name2
     if (missing(model_name)) model_name <- NULL 
     stanc_ret <- stanc(file = file, model_code = model_code, 
-                       model_name = model_name, verbose)
+                       model_name = model_name, verbose, ...)
   }
   if (!is.list(stanc_ret)) {
     stop("stanc_ret needs to be the returned object from stanc.")
@@ -46,6 +46,7 @@ stan_model <- function(file,
                sep = '')  
 
   cat("COMPILING THE C++ CODE FOR MODEL '", model_name, "' NOW.\n", sep = '') 
+  if (verbose) cat(system_info(), "\n")
   if (!is.null(boost_lib)) { 
     old.boost_lib <- rstan_options(boost_lib = boost_lib) 
     on.exit(rstan_options(boost_lib = old.boost_lib)) 
@@ -59,7 +60,7 @@ stan_model <- function(file,
   
   dso <- cxxfunctionplus(signature(), body = paste(" return Rcpp::wrap(\"", model_name, "\");", sep = ''), 
                          includes = inc, plugin = "rstan", save_dso = save_dso,
-                         module_name = model_cppname, 
+                         module_name = paste('stan_fit4', model_cppname, '_mod', sep = ''), 
                          verbose = verbose) 
                
   obj <- new("stanmodel", model_name = model_name, 
@@ -121,7 +122,7 @@ stan <- function(file, model_name = "anon_model",
     if (missing(model_name)) model_name <- NULL 
     sm <- stan_model(file, model_name = model_name, model_code = model_code,
                      boost_lib = boost_lib, eigen_lib = eigen_lib, 
-                     save_dso = save_dso, verbose = verbose)
+                     save_dso = save_dso, verbose = verbose, ...)
   }
 
   if (missing(sample_file))  sample_file <- NA 
