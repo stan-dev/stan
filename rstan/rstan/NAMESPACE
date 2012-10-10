@@ -13,6 +13,7 @@ export(
   read_rdump,
   makeconf_path,
   set_cppo, get_cppo, 
+  stan_demo, 
   rstan_options 
 # get_rstan.options
 )
