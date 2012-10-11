@@ -9,19 +9,24 @@
   created from matching user input and gets fitted in the demonstration.} 
  
 \usage{
-  stan_demo(model = NULL, ...) 
+  stan_demo(model = character(0), ...) 
 } 
  
 \arguments{
   \item{model}{A character string for model name to specify which model
-    will be used for demonstration.  The default is \code{NULL}, where a list
-    of all available models are printed out for selection.} 
+    will be used for demonstration.  The default is an empty string, which
+    prompts the user to select one the available models. If \code{model = 0},
+    a character vector of all models is returned without any user intervention.
+    If \code{model = i} where \code{i > 0}, then the ith available model is
+    chosen without user intervention, which is useful for testing.}
   \item{\dots}{passed to \code{stan}.}
 } 
 
 
 \value{
-  An S4 object of \code{stanfit} returned from \code{stan}. 
+  An S4 object of \code{stanfit} returned from \code{stan}, unless
+  \code{model = 0}, in which case a character vector of paths to
+  available models is returned.
 }
 
 \references{
@@ -34,7 +39,11 @@
   \code{\link{stan}} 
 } 
 
-\examples{\dontrun{
- stan_demo()  # select from all available examples 
- stan_demo("dogs") # run a specific example 
-}} 
+\examples{
+  model_names <- gsub(".stan$", "", basename(stan_demo(0)))
+  print(model_names)
+  \dontrun{
+     stan_demo("dogs") # run the dogs model
+     stan_demo(1) # run model_names[1]
+  }
+} 
