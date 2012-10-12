@@ -187,10 +187,6 @@ setMethod("sampling", "stanmodel",
                           # (see comments in fun stan_model)
                         date = date(),
                         .MISC = new.env()) 
-             # triger gc to really delete sampler, create from the sampler_mod.   
-             # the issue here is that if sampler is removed later automatically by 
-             # R's gabbage collector after the fx (the loaded dso) is removed, 
-             # it will cause a segfault, which will crash R. 
              invisible(nfit)
           }) 
 

@@ -17,7 +17,7 @@ stan_demo <- function(model = character(0), ...) {
     }
     else if(MODEL_NUM == 0) MODELS <- ""
     else MODELS <- select.list(MODELS)
-    if(MODELS == "") {
+    if(!nzchar(MODELS)) {
       return(dir(MODELS_HOME, pattern = paste0(model, ".stan", "$"), 
                  recursive = TRUE, full.names = TRUE))
     }

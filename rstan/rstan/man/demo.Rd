@@ -43,7 +43,7 @@
   model_names <- gsub(".stan$", "", basename(stan_demo(0)))
   print(model_names)
   \dontrun{
-     stan_demo("dogs") # run the dogs model
-     stan_demo(1) # run model_names[1]
+     dogsfit <- stan_demo("dogs") # run the dogs model
+     fit1 <- stan_demo(1) # run model_names[1]
   }
 } 

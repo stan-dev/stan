@@ -14,6 +14,7 @@ export(
   makeconf_path,
   set_cppo, get_cppo, 
   stan_demo, 
+  sflist2stanfit,
   rstan_options 
 # get_rstan.options
 )
