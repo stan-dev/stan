@@ -126,18 +126,20 @@ setMethod("sampling", "stanmodel",
             if (is(args_list, "try-error")) {
               message('error specification of arguments; sampling not done') 
               return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
-            } 
+            }
 
             n_save <- 1 + (iter - 1) %/% thin 
             # number of samples saved after thinning
             warmup2 <- 1 + (warmup - 1) %/% thin 
             n_kept <- n_save - warmup2 
             samples <- vector("list", chains)
+            dots <- list(...)
 
             for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
-              cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
+              if (is.null(dots$refresh) || dots$refresh >= 0) 
+                cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
               samples[[i]] <- try(sampler$call_sampler(args_list[[i]])) 
               if (is(samples[[i]], "try-error")) {
                 message("error occurred during calling the sampler; sampling not done") 
