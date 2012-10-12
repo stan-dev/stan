@@ -459,7 +459,12 @@ if (!isGeneric("traceplot")) {
 } 
 
 setMethod("traceplot", signature = "stanfit", 
-          function(object, pars, inc_warmup = TRUE, ask = FALSE) { 
+          function(object, pars, inc_warmup = TRUE, ask = FALSE, ...) { 
+            # Args:
+            #  ..., nrow, defaults to 4
+            #  ..., ncol, defaults to 2 
+            #  nrow and ncol are used to define mfrow for the whole plot area
+            #  when there are many parameters. 
 
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
@@ -470,6 +475,10 @@ setMethod("traceplot", signature = "stanfit",
               return(invisible(NULL)) 
             } 
 
+            dotlst <- list(...)
+            nrow <- if (hasArg(nrow)) as.integer(dotlst$nrow) else 4 
+            ncol <- if (hasArg(ncol)) as.integer(dotlst$ncol) else 2 
+
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
@@ -479,11 +488,11 @@ setMethod("traceplot", signature = "stanfit",
             tidx <- unlist(tidx, use.names = FALSE)
             par_mfrow_old <- par('mfrow')
             num_plots <- length(tidx) 
-            if (num_plots %in% 2:4) par(mfrow = c(num_plots, 1)) 
-            if (num_plots > 5) par(mfrow = c(4, 2)) 
+            if (num_plots %in% 2:nrow) par(mfrow = c(num_plots, 1)) 
+            if (num_plots > nrow) par(mfrow = c(nrow, ncol)) 
             par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
                           inc_warmup = inc_warmup)
-            if (num_plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
+            if (num_plots > nrow*ncol && ask) ask.old <- devAskNewPage(ask = TRUE)
             if (num_plots > 1) { 
               for (n in 2:num_plots)
                 par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
