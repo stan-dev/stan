@@ -269,7 +269,7 @@ get_cppo <- function() {
   # get the optimization level as a character 
   curr_cxxflags <- get_makefile_flags("CXXFLAGS", get_makefile_txt())
   l <- get_cxxo_level(curr_cxxflags)  
-  if ("" == l) l <- "0" 
+  if (!nzchar(l)) l <- "0"
   p <- match(l, c("3", "2", "1", "0")) 
   c("fast", "presentation2", "presentation1", "debug")[p]
 } 

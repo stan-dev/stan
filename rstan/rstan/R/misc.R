@@ -246,7 +246,7 @@ append_id <- function(file, id, suffix = '.csv') {
 }
 
 config_argss <- function(chains, iter, warmup, thin, 
-                        init, seed, sample_file, ...) {
+                         init, seed, sample_file, ...) {
 
   iter <- as.integer(iter) 
   if (iter < 1) 
@@ -295,11 +295,26 @@ config_argss <- function(chains, iter, warmup, thin,
   ## only one seed is needed by virtue of the RNG 
   seed <- if (!missing(seed)) seed else sample.int(.Machine$integer.max, 1)
 
+  dotlist <- list(...)
+
+  # use chain_id argument if specified
+  if (is.null(dotlist$chain_id)) { 
+    chain_ids <- seq_len(chains)
+  } else {
+    chain_id <- as.integer(dotlist$chain_id)
+    if (any(duplicated(chain_id))) stop("chain_id has duplicated elements")
+    chain_id_len <- length(chain_id)
+    chain_ids <- if (chain_id_len >= chains) chain_id else {
+                   c(chain_id, max(chain_id) + seq_len(chains - chain_id_len))
+                 }
+    dotlist$chain_id <- NULL
+  }
+
   argss <- vector("list", chains)  
   ## the name of arguments in the list need to 
   ## match those in include/rstan/stan_args.hpp 
   for (i in 1:chains)  
-    argss[[i]] <- list(chain_id = i, 
+    argss[[i]] <- list(chain_id = chain_ids[i],
                        iter = iters[i], thin = thins[i], seed = seed, 
                        warmup = warmups[i], init = inits[[i]]) 
     
@@ -312,10 +327,10 @@ config_argss <- function(chains, iter, warmup, thin,
         argss[[i]]$sample_file <- append_id(sample_file, i) 
     }
   }
-  dotlist <- list(...) 
-  for (i in 1:chains) 
-    argss[[i]] <- c(argss[[i]], dotlist) 
-  check_args(argss) 
+  
+  for (i in 1:chains)
+    argss[[i]] <- c(argss[[i]], dotlist)
+  check_args(argss)
   argss 
 } 
 

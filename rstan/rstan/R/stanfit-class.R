@@ -526,7 +526,7 @@ sflist2stanfit <- function(sflist) {
   for (i in 2:sf_len) { 
     if (!identical(sflist[[i]]@sim$pars_oi, sflist[[1]]@sim$pars_oi) || 
         !identical(sflist[[i]]@sim$dims_oi, sflist[[1]]@sim$dims_oi))   
-      stop("parameters in element ", i, " (stanfit object) is different from in element 1") 
+      stop("parameters in element ", i, " (stanfit object) are different from in element 1") 
     if (sflist[[i]]@sim$n_save[1] != sflist[[1]]@sim$n_save[1] ||  
         sflist[[i]]@sim$warmup2[1] != sflist[[1]]@sim$warmup2[1])
       stop("all 'stanfit' objects should have equal length of iterations and warmup") 
