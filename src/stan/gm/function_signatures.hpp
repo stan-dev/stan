@@ -278,7 +278,13 @@ add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
 add_unary("step");
-add_quaternary("student_t_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      for (size_t l = 0; l < vector_types.size(); ++l)
+	add("student_t_log",
+	    DOUBLE_T, // result
+	    vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
 add("subtract",VECTOR_T,VECTOR_T,VECTOR_T);
 add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("subtract",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -301,7 +307,12 @@ add("transpose",ROW_VECTOR_T,VECTOR_T);
 add("transpose",VECTOR_T,ROW_VECTOR_T);
 add("transpose",MATRIX_T,MATRIX_T);
 add_unary("trunc");
-add_ternary("uniform_log");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+	add("uniform_log",
+	    DOUBLE_T, // result
+	    vector_types[i], vector_types[j], vector_types[k]); // args
 add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("variance",DOUBLE_T,VECTOR_T);
 add("variance",DOUBLE_T,ROW_VECTOR_T);
