@@ -2493,16 +2493,18 @@ void update_expected_gradients(var& logprob,
     grad0.push_back(grad[0]);
     grad.erase(grad.begin());
   }
-  if (!is_constant_struct<T1>::value) {
+  if (!is_constant<T1>::value) {
     grad1.push_back(grad[0]);
     grad.erase(grad.begin());
   }
-  if (!is_constant_struct<T2>::value) {
+  if (!is_constant<T2>::value) {
     grad2.push_back(grad[0]);
     grad.erase(grad.begin());
   }
-  if (!is_constant_struct<T3>::value)
+  if (!is_constant<T3>::value) {
     grad3.push_back(grad[0]);
+    grad.erase(grad.begin());
+  }
 }
 template<class T, 
 	 bool is_const>
@@ -2572,7 +2574,6 @@ vector<var> get_params<vector<var> >(vector<vector<double> >& parameters, size_t
     param[n] = parameters[n][p];
   return param;
 }
-// want: test_vector<T1, T2, T3, T4>
 template<class T0, class T1, class T2, class T3, class TypeParam>
 void test_vectorized() {
   vector<vector<double> > parameters;
@@ -2616,22 +2617,6 @@ void test_vectorized() {
 		 e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3,
 		 p0, p1, p2, p3);
   return;
-}
-template<class T_grad>
-void increment_gradient(var& logprob, var& param, T_grad& e_grad) {
-  vector<var> x;
-  vector<double> grad;
-  x.push_back(param);
-  logprob.grad(x, grad);
-  e_grad.push_back(grad[0]);
-}
-template<>
-void increment_gradient<var>(var& logprob, var& param, var& e_grad) {
-  vector<var> x;
-  vector<double> grad;
-  x.push_back(param);
-  logprob.grad(x, grad);
-  e_grad += grad[0];
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dddd) {
   test_vectorized<double, double, double, double, TypeParam>();
