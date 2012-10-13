@@ -85,6 +85,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsScaledInvChiSquare,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsScaledInvChiSquare,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsScaledInvChiSquare);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsScaledInvChiSquare,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsScaledInvChiSquare);

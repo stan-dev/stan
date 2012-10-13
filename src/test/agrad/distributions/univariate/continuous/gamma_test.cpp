@@ -96,9 +96,6 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsGamma,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsGamma,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsGamma);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsGamma,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsGamma);
 
 /*
 // FIXME: include once gamma_cdf works.

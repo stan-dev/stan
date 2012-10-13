@@ -79,9 +79,6 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNormal,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNormal,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsNormal);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNormal,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsNormal);
 
 TEST(AgradDistributions,NormalCdfGrad) {
   using stan::agrad::var;

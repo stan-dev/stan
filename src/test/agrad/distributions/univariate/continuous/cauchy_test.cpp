@@ -77,6 +77,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsCauchy,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsCauchy,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsCauchy);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsCauchy,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsCauchy);
