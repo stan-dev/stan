@@ -37,8 +37,8 @@ C++ API
     + exponential
     + inv_chi_square
     + scaled_inv_chi_square
-
-  - Fully vectorized with partials calculated:
+    + student_t
+- Fully vectorized with partials calculated:
     univariate/continuous
     + beta
     + cauchy
