@@ -138,7 +138,7 @@ setMethod("sampling", "stanmodel",
             for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
-              if (is.null(dots$refresh) || dots$refresh >= 0) 
+              if (is.null(dots$refresh) || dots$refresh > 0) 
                 cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
               samples[[i]] <- try(sampler$call_sampler(args_list[[i]])) 
               if (is(samples[[i]], "try-error")) {
