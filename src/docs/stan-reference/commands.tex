@@ -601,10 +601,10 @@ some typical use-case examples.
 {Initial value for step size, or \code{-1} to set automatically}
 {default = \code{-1}}
 %
-\cmdarg{epsilon}{[0,1]}
+\cmdarg{epsilon\_pm}{[0,1]}
 {Sample epsilon uniformly from the interval 
 \\
-\code{(epsilon - epsilon\_pm,\ epsilon + epsilon\_pm)}}
+\code{[epsilon * (1 - epsilon\_pm),\ epsilon * (1 + epsilon\_pm)]}}
 {default = \code{0.0}}
 %
 \cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; see
