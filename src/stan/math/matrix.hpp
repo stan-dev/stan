@@ -1337,8 +1337,9 @@ namespace stan {
     template<int C1,int R2>
     inline double multiply(const Eigen::Matrix<double,1,C1>& rv,
                            const Eigen::Matrix<double,R2,1>& v) {
+      stan::math::validate_matching_sizes(rv,v,"multiply");
       if (rv.size() != v.size()) 
-        throw std::domain_error ("rv.size() != v.size()");
+        throw std::domain_error("rv.size() != v.size()");
       return rv.dot(v);
     }
     /**
