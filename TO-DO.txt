@@ -24,12 +24,20 @@ New Features:
 Manual Additions:
  -- example of defining new distribution with parameters
 
+* check that positive definiteness enforced for transformed params,
+  transformed data, 
+
+
+
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* replace Eigen .sum() with stan::math::sum() for auto-dif
+
 * switch error checking for agrad::var matrix ops to
   convert to double-based matrix for check as in vectorized univariates
+
 * Vectorize distributions
   - Allows vectorized inputs (but without partials calculated):
     univariate/continuous
