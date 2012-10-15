@@ -25,13 +25,20 @@ Manual Additions:
  -- example of defining new distribution with parameters
 
 * check that positive definiteness enforced for transformed params,
-  transformed data, 
+  transformed data
+
+* fix refresh=0 bug to have it not print anything
 
 
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* Ben's example: 
+  matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
+  this could recycle the first arg, a matrix shaped like a vector
+  and the second arg, a matrix shaped like a roo vector.
 
 * replace Eigen .sum() with stan::math::sum() for auto-dif
 
@@ -775,6 +782,11 @@ Web Pages
 
 Manuals
 ======================================================================
+
+* copy FAQ into manual appendix (and onto web?)
+
+* mention that even if you aren't interested in all the parameters,
+  you do want to save them to monitor convergence and ESS
 
 * provide mathematical definitions of all the special functions
 
