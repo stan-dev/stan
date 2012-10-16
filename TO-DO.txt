@@ -39,6 +39,7 @@ C++ API
     + scaled_inv_chi_square
     + student_t
     + uniform
+    + weibull
 - Fully vectorized with partials calculated:
     univariate/continuous
     + beta

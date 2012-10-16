@@ -1,82 +1,79 @@
-#include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
-#include <stan/meta/traits.hpp>
+#define _LOG_PROB_ weibull_log
 #include <stan/prob/distributions/univariate/continuous/weibull.hpp>
 
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_3_params.hpp>
 
-template <typename T_y, typename T_shape, typename T_inv_scale>
-void expect_propto(T_y y1, T_shape alpha1, T_inv_scale beta1,
-                   T_y y2, T_shape alpha2, T_inv_scale beta2,
-                   std::string message) {
-  expect_eq_diffs(stan::prob::weibull_log<false>(y1,alpha1,beta1),
-                  stan::prob::weibull_log<false>(y2,alpha2,beta2),
-                  stan::prob::weibull_log<true>(y1,alpha1,beta1),
-                  stan::prob::weibull_log<true>(y2,alpha2,beta2),
-                  message);
-}
-
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-TEST(AgradDistributionsWeibull,Boundary) {
-  var y;
-  var alpha;
-  var sigma;
+class AgradDistributionsWeibull : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
 
-  y = 0;
-  alpha = 1;
-  sigma = 1;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::weibull_log(y,alpha,sigma).val());
-}
+    param[0] = 2.0;                 // y
+    param[1] = 1.0;                 // alpha
+    param[2] = 1.0;                 // sigma
+    parameters.push_back(param);
 
-TEST(AgradDistributionsWeibull,Propto) {
-  expect_propto<var,var,var>(5.0,2.5,2.0,
-                             6.0,5.0,3.0,
-                             "var: y, alpha, sigma");
-}
-TEST(AgradDistributionsWeibull,ProptoY) {
-  double alpha = 3.0;
-  double sigma = 2.0;
-  
-  expect_propto<var,double,double>(3.0, alpha, sigma,
-                                   7.0, alpha, sigma,
-                                   "var: y");
-}
-TEST(AgradDistributionsWeibull,ProptoYAlpha) {
-  double sigma = 2.0;
-  
-  expect_propto<var,var,double>(3.0, 1.0, sigma,
-                                  7.0, 4.0, sigma,
-                                "var: y and alpha");
-}
-TEST(AgradDistributionsWeibull,ProptoYSigma) {
-  double alpha = 2.0;
-  
-  expect_propto<var,double,var>(3.0, alpha, 0.5,
-                                7.0, alpha, 3.0,
-                                "var: y and sigma");
-}
-TEST(AgradDistributionsWeibull,ProptoAlpha) {
-  double y = 2.0;
-  double sigma = 3.0;
-  
-  expect_propto<double,var,double>(y, 0.2, sigma,
-                                   y, 6.0, sigma,
-                                   "var: alpha");
-}
-TEST(AgradDistributionsWeibull,ProptoAlphaSigma) {
-  double y = 1.1;
-  
-  expect_propto<double,var,var>(y, 0.6, 3.0,
-                                y, 5.0, 1.4,
-                                "var: alpha and sigma");
-}
-TEST(AgradDistributionsWeibull,ProptoSigma) {
-  double y = 3.0;
-  double alpha = 6.0;
-  
-  expect_propto<double,double,var>(y, alpha, 1.0,
-                                   y, alpha, 1.5,
-                                   "var: sigma");
-}
+    param[0] = 0.25;                // y
+    param[1] = 2.9;                 // alpha
+    param[2] = 1.8;                 // sigma
+    parameters.push_back(param);
+
+    param[0] = 3.9;                 // y
+    param[1] = 1.7;                 // alpha
+    param[2] = 0.25;                // sigma
+    parameters.push_back(param);
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // alpha
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+  }
+
+  template <class T_y, class T_shape, class T_scale>
+  var log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+    using std::log;
+    using std::pow;
+    using stan::math::multiply_log;
+    using stan::math::log;
+    using stan::math::value_of;
+    using stan::prob::include_summand;
+    
+    var logp(0);
+    
+    if (include_summand<true,T_shape>::value)
+      logp += log(alpha);
+    if (include_summand<true,T_y,T_shape>::value)
+      logp += multiply_log(alpha-1.0, y);
+    if (include_summand<true,T_shape,T_scale>::value)
+      logp -= multiply_log(alpha, sigma);
+    if (include_summand<true,T_y,T_shape,T_scale>::value)
+      logp -= pow(y / sigma, alpha);
+    return logp;
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsWeibull,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsWeibull);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsWeibull,
+			      AgradDistributionTestFixture2,
+			      AgradDistributionsWeibull);
