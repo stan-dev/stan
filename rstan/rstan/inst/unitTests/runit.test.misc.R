@@ -185,10 +185,28 @@ test_makeconf_path <- function() {
   p <- makeconf_path()  
   checkTrue(file.exists(makeconf_path()))
 } 
+
+test_config_argss <- function() {
+  # (chains, iter, warmup, thin, init, seed, sample_file, ...)
+  a <- rstan:::config_argss(3, 100, 10, 3, 0, 0, "a.csv", chain_id = 4)
+  checkEquals(length(a), 3)
+  checkEquals(a[[1]]$init, "0") 
+  checkEquals(a[[1]]$chain_id, 4) 
+  checkEquals(a[[3]]$chain_id, 6) 
+  b <- rstan:::config_argss(3, 100, 10, 3, "0", 10, "a.csv") 
+  checkEquals(b[[3]]$chain_id, 3) 
+  checkEquals(b[[1]]$init, "0") 
+  c <- rstan:::config_argss(3, 100, 10, 3, "random", 10, "a.csv") 
+  checkEquals(c[[1]]$init, "random") 
+  d <- rstan:::config_argss(4, 100, 10, 3, "random", 10, "a.csv", chain_id = c(3, 2, 1)) 
+  checkEquals(d[[3]]$chain_id, 1) 
+  checkEquals(d[[4]]$chain_id, 4) 
+  checkException(rstan:::config_argss(3, 100, 10, 3, "random", 10, NA, chain_id = c(3, 3)))
+} 
  
 .tearDown <- function() {
   unlink('tmp.stan') 
   unlink('dumpabc.Rdump') 
   unlink('standumpabc.Rdump') 
-} 
+}
 

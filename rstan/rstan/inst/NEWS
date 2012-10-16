@@ -1,3 +1,12 @@
+Wed Oct 10 2012
+1. New features 
+   * return empty stanfit object upon error such as incorrect data
+     input, wrong argument specification, etc. Previously, it will 
+     stop. So another mode is added for stanfit object.  
+   * add function stan_demo() to run examples included in Stan. 
+   * add function sflist2stanfit() to merge a list of stanfit objects into one,
+   * so some user level parallel can be done. 
+
 Tue Sep 25 2012
 1. Changes 
    * print progress of sampling with carriage return 

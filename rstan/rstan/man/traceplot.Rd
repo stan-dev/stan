@@ -10,7 +10,7 @@
 
 \usage{
   %% traceplot(object, \dots)  
-  \S4method{traceplot}{stanfit}(object, pars, inc_warmup = TRUE, ask = FALSE) 
+  \S4method{traceplot}{stanfit}(object, pars, inc_warmup = TRUE, ask = FALSE, ...) 
 } 
 
 \section{Methods}{
@@ -28,6 +28,9 @@
   \item{ask}{\code{TRUE} or \code{FALSE}, to control (for the current device)
     whether the user is prompted before starting a new page of output in the case
     there are a lot of parameters (see \code{\link[grDevices]{devAskNewPage}}).}
+  \item{\dots}{Additional parameters include \code{nrow} and \code{ncol}, default
+    to 4 and 2, respectively. When the number of traceplots are larger, the plot
+    layout will be \code{nrow * ncol}.}
 }
 \value{\code{NULL}} 
 

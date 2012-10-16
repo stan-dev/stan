@@ -232,7 +232,7 @@ namespace rstan {
     }
 
     bool do_print(int n, int refresh) {
-      return refresh < 0 ? false : 
+      return refresh < 1 ? false : 
              (n == 0) || ((n + 1) % refresh == 0);
     }
   

@@ -1916,8 +1916,10 @@ positive-definite $W \in \reals^{K \times K}$,
 
 \fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu}, vector
 \farg{sigma}, real \farg{eta}}{The log of the LKJ density for covariance matrix
-\farg{W} given location vector \farg{mu}, scale vector \farg{sigma},
-and shape \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+\farg{W} is the sum of log of the lognormal density of the standard deviations
+given location vector \farg{mu} and scale vector \farg{sigma} and the log of the 
+lkj\_corr density of the correlation matrix given shape \farg{eta}. 
+See the next section for details on the lkj\_corr density.}
 
 \end{description}
 
@@ -1936,8 +1938,14 @@ so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
 %
   \fitem{real}{lkj\_corr\_log}{matrix \farg{y}, real
     \farg{eta}}{The log of the LKJ density for the correlation matrix
-    \farg{y} given shape
-    \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+    \farg{y} given nonnegative shape \farg{eta}. The LKJ density is 
+    proportional to $\det(y)^{(\eta - 1)}$. The shape parameter \farg{eta}
+    can be interpreted like the shape parameter of a symmetric beta
+    distribution. If $\eta = 1$, then the density is uniform over all
+    correlation  matrices of a given order. If $\eta > 1$, the identity
+    matrix is the modal correlation matrix, especially as $\eta$ becomes
+    large. For $0 < \eta < 1$, the density has a trough at the identity
+    matrix. See \citep{LewandowskiKurowickaJoe:2009} for definitions.}
 %
 \end{description}
 
@@ -1949,7 +1957,9 @@ so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
   \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
     \farg{eta}}{The log of the LKJ density for the lower-triangular
     Cholesky factor \farg{L} of a correlation matrix given shape
-    \farg{eta}; see \citep{LewandowskiKurowickaJoe:2009} for definitions}
+    \farg{eta}. The LKJ density is proportional to 
+    $\det(L L^\top)^{(\eta - 1)} = \det(L)^{(2 \eta - 2)}$. See the
+    previous subsection for details on interpreting the shape \farg{eta}.}
 %
 \end{description}
 

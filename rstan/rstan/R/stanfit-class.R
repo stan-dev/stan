@@ -459,7 +459,12 @@ if (!isGeneric("traceplot")) {
 } 
 
 setMethod("traceplot", signature = "stanfit", 
-          function(object, pars, inc_warmup = TRUE, ask = FALSE) { 
+          function(object, pars, inc_warmup = TRUE, ask = FALSE, ...) { 
+            # Args:
+            #  ..., nrow, defaults to 4
+            #  ..., ncol, defaults to 2 
+            #  nrow and ncol are used to define mfrow for the whole plot area
+            #  when there are many parameters. 
 
             if (object@mode == 1L) {
               cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
@@ -470,6 +475,10 @@ setMethod("traceplot", signature = "stanfit",
               return(invisible(NULL)) 
             } 
 
+            dotlst <- list(...)
+            nrow <- if (hasArg(nrow)) as.integer(dotlst$nrow) else 4 
+            ncol <- if (hasArg(ncol)) as.integer(dotlst$ncol) else 2 
+
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
@@ -479,11 +488,11 @@ setMethod("traceplot", signature = "stanfit",
             tidx <- unlist(tidx, use.names = FALSE)
             par_mfrow_old <- par('mfrow')
             num_plots <- length(tidx) 
-            if (num_plots %in% 2:4) par(mfrow = c(num_plots, 1)) 
-            if (num_plots > 5) par(mfrow = c(4, 2)) 
+            if (num_plots %in% 2:nrow) par(mfrow = c(num_plots, 1)) 
+            if (num_plots > nrow) par(mfrow = c(nrow, ncol)) 
             par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
                           inc_warmup = inc_warmup)
-            if (num_plots > 8 && ask) ask.old <- devAskNewPage(ask = TRUE)
+            if (num_plots > nrow*ncol && ask) ask.old <- devAskNewPage(ask = TRUE)
             if (num_plots > 1) { 
               for (n in 2:num_plots)
                 par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
@@ -498,3 +507,64 @@ is_sf_valid <- function(sf) {
   # Similar to is_sm_valid  
   return(rstan:::is_sm_valid(sf@stanmodel)) 
 } 
+
+
+sflist2stanfit <- function(sflist) {
+  # merge a list of stanfit objects into one
+  # Args:
+  #   sflist, a list of stanfit objects, each element of which 
+  #   should have equal length of `iter`, `warmup`, and `thin`. 
+  # Returns: 
+  #   A new stanfit objects have all the chains in each element of sf_list. 
+  #   The date would be where the new object is created. 
+  # Note: 
+  #   * method get_seed would not work well for this merged 
+  #     stanfit object. But all the information is still there. 
+  #   * When print function is called, the sampler is obtained 
+  #     only from the first chain. 
+  #  
+  sf_len <- length(sflist) 
+  if (sf_len < 2) stop("'sflist' should have more than 1 elements")
+  if (!is.list(sflist) || 
+      any(sapply(sflist, function(x) !is(x, "stanfit")))) {   
+    stop("'sflist' must be a list of 'stanfit' objects")
+  }
+  if (any(sapply(sflist, function(x) x@mode != 0))) {
+    stop("each 'stanfit' object in 'sflist' must contain samples") 
+  }   
+  for (i in 2:sf_len) { 
+    if (!identical(sflist[[i]]@sim$pars_oi, sflist[[1]]@sim$pars_oi) || 
+        !identical(sflist[[i]]@sim$dims_oi, sflist[[1]]@sim$dims_oi))   
+      stop("parameters in element ", i, " (stanfit object) are different from in element 1") 
+    if (sflist[[i]]@sim$n_save[1] != sflist[[1]]@sim$n_save[1] ||  
+        sflist[[i]]@sim$warmup2[1] != sflist[[1]]@sim$warmup2[1])
+      stop("all 'stanfit' objects should have equal length of iterations and warmup") 
+  } 
+  n_chains = sum(sapply(sflist, function(x) x@sim$chains))  
+  sim = list(samples = do.call(c, lapply(sflist, function(x) x@sim$samples)),  
+             chains = n_chains, 
+             iter = sflist[[1]]@sim$iter, 
+             thin = sflist[[1]]@sim$thin, 
+             warmup = sflist[[1]]@sim$warmup,
+             n_save = rep(sflist[[1]]@sim$n_save[1], n_chains), 
+             warmup2 = rep(sflist[[1]]@sim$warmup2[1], n_chains), 
+             thin = rep(sflist[[1]]@sim$thin[1], n_chains), 
+             permutation = do.call(c, lapply(sflist, function(x) x@sim$permutation)), 
+             pars_oi = sflist[[1]]@sim$pars_oi, 
+             dims_oi = sflist[[1]]@sim$dims_oi, 
+             fnames_oi = sflist[[1]]@sim$fnames_oi,
+             n_flatnames = sflist[[1]]@sim$n_flatnames) 
+  nfit <- new("stanfit", 
+              model_name = sflist[[1]]@model_name, 
+              model_pars = sflist[[1]]@model_pars,
+              par_dims  = sflist[[1]]@par_dims, 
+              mode = 0L, 
+              sim = sim, 
+              inits = do.call(c, lapply(sflist, function(x) x@inits)), 
+              stan_args = do.call(c, lapply(sflist, function(x) x@stan_args)), 
+              stanmodel = sflist[[1]]@stanmodel, 
+              date = date(), 
+              .MISC = new.env()) 
+  invisible(nfit)
+} 
+# sflist2stan(list(l1=ss1, l2=ss2))

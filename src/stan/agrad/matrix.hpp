@@ -8,6 +8,7 @@
 #include <stan/agrad/special_functions.hpp>
 #include <stan/math/boost_error_handling.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 
 namespace stan {
   namespace agrad {
@@ -1005,9 +1006,9 @@ namespace stan {
 
     /**
      * Returns the sum of the coefficients of the specified
-     * column vector.
-     * @param v Specified vector.
-     * @return Sum of coefficients of vector.
+     * matrix, column vector or row vector.
+     * @param m Specified matrix or vector.
+     * @return Sum of coefficients of matrix.
      */
     template <int R, int C>
     inline var sum(const Eigen::Matrix<var,R,C>& m) {
@@ -1507,13 +1508,13 @@ namespace stan {
      */
     inline matrix_v
     tcrossprod(const matrix_v& M) {
-        if(M.rows() == 0)
-          return matrix_v(0,0);
-        if(M.rows() == 1) {
-          return M * M.transpose(); // FIXME: replace with dot_self
-        }
-        matrix_v result(M.rows(),M.rows());
-        return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+      if(M.rows() == 0)
+        return matrix_v(0,0);
+      if(M.rows() == 1) {
+        return M * M.transpose(); // FIXME: replace with dot_self
+      }
+      matrix_v result(M.rows(),M.rows());
+      return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
     }
 
     /**
@@ -1524,7 +1525,7 @@ namespace stan {
      */
     inline matrix_v
     crossprod(const matrix_v& M) {
-        return tcrossprod(M.transpose());
+      return tcrossprod(M.transpose());
     }
 
     /**
@@ -1975,6 +1976,22 @@ namespace stan {
       n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
     }
 
+    template <typename T_result, class Policy>
+    inline bool check_pos_definite(const char* function,
+                                   const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                   const char* name,
+                                   T_result* result,
+                                   const Policy&) {
+        typedef 
+        typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+        size_type;
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y_d(y.rows(),y.cols());
+        for (size_type i = 0; i < y_d.rows(); i++) 
+          for (size_type j = 0; j < y_d.cols(); j++)
+            y_d(i,j) = y(i,j).val();
+        return stan::math::check_pos_definite(function,y_d,name,result,Policy());
+    }
+    
     template <typename LHS, typename RHS>
     inline void assign_to_var(std::vector<LHS>& x, const std::vector<RHS>& y) {
       for (size_t i = 0; i < x.size(); ++i)

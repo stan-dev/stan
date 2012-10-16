@@ -9,7 +9,7 @@ Translate Stan model specification to C++ code
   then be compiled and loaded for sampling. 
 }
 \usage{
-  stanc(file, model_code = '', model_name = "anon_model", verbose = FALSE) 
+  stanc(file, model_code = '', model_name = "anon_model", verbose = FALSE, ...) 
 } 
 
 \arguments{
@@ -25,6 +25,18 @@ Translate Stan model specification to C++ code
     character string object) if \code{model_name} is not specified.} 
   \item{verbose}{\code{TRUE} print out more intermediate information during the
     translation procedure; \code{FALSE} otherwise. The default is \code{FALSE}.}             
+  \item{\dots}{optional parameters including  
+    \enumerate{ 
+      \item \code{obfuscate_model_name} (logical), \code{TRUE} if not specified. 
+      If \code{FALSE}, the model name in the generated C++ code would not 
+      contain randomly generated character string so that if model names
+      are given the same, the generated C++ code will have the same class
+      name defining the model, and the same Rcpp module name, which is used 
+      for R to execute the C++ code regardless if the stan models are the 
+      same of not. Generally, it is recommented not to specify this parameter 
+      or set it to \code{TRUE}. 
+    }
+  }
 } 
 
 \value{

@@ -93,8 +93,9 @@ stan(file, model_name = "anon_model", model_code = "",
      to print intermediate output from Stan on the console, which might
      be helpful for model debugging.}
 
-  \item{\dots}{Other parameters for the sampler: 
+  \item{\dots}{Other optional parameters for the sampler: 
     \enumerate{
+      \item \code{chain_id} (\code{integer})
       \item \code{leapfrog_steps} (\code{integer})
       \item \code{epsilon} (\code{double})
       \item \code{gamma} (\code{double}) 
@@ -109,6 +110,11 @@ stan(file, model_name = "anon_model", model_code = "",
     \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler, the default sampler, is used.
 
+    \code{chain_id} can be a vector to specify the chain_id for all 
+    chains or an integer. For the former case, they should be unique. 
+    For the latter, the sequence of integers starting from the given
+    \code{chain_id} are used for all chains. 
+
     In addition, \code{refresh} (\code{integer}) can be used to
     control how to indicate the progress during sampling (i.e. 
     show the progress every \code{refresh} iterations). 
@@ -120,6 +126,9 @@ stan(file, model_name = "anon_model", model_code = "",
     the gradient calculation is tested and printed out and the fitted
     \code{stanfit} object is in test gradient mode.  By default, it is
     \code{FALSE}. 
+ 
+    When a new model is fitted starting from Stan model code, 
+    \code{\dots} is passed to \code{stan_model} and thus \code{stanc}.
   } 
 
   \item{boost_lib}{The path for an alternative version of the Boost C++ 

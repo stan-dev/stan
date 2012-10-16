@@ -16,7 +16,7 @@
   stan_model(file, model_name = "anon_model", 
              model_code = "", stanc_ret = NULL, 
              boost_lib = NULL, eigen_lib = NULL, 
-             save_dso = TRUE, verbose = FALSE)
+             save_dso = TRUE, verbose = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -51,6 +51,7 @@
   \item{verbose}{\code{TRUE} or \code{FALSE}: indication of whether
     to report intermediate output to the console, 
     which might be helpful for debugging.}
+  \item{\dots}{passed to \code{stanc}.}
 }
 
 \details{

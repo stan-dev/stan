@@ -246,7 +246,7 @@ append_id <- function(file, id, suffix = '.csv') {
 }
 
 config_argss <- function(chains, iter, warmup, thin, 
-                        init, seed, sample_file, ...) {
+                         init, seed, sample_file, ...) {
 
   iter <- as.integer(iter) 
   if (iter < 1) 
@@ -295,11 +295,26 @@ config_argss <- function(chains, iter, warmup, thin,
   ## only one seed is needed by virtue of the RNG 
   seed <- if (!missing(seed)) seed else sample.int(.Machine$integer.max, 1)
 
+  dotlist <- list(...)
+
+  # use chain_id argument if specified
+  if (is.null(dotlist$chain_id)) { 
+    chain_ids <- seq_len(chains)
+  } else {
+    chain_id <- as.integer(dotlist$chain_id)
+    if (any(duplicated(chain_id))) stop("chain_id has duplicated elements")
+    chain_id_len <- length(chain_id)
+    chain_ids <- if (chain_id_len >= chains) chain_id else {
+                   c(chain_id, max(chain_id) + seq_len(chains - chain_id_len))
+                 }
+    dotlist$chain_id <- NULL
+  }
+
   argss <- vector("list", chains)  
   ## the name of arguments in the list need to 
   ## match those in include/rstan/stan_args.hpp 
   for (i in 1:chains)  
-    argss[[i]] <- list(chain_id = i, 
+    argss[[i]] <- list(chain_id = chain_ids[i],
                        iter = iters[i], thin = thins[i], seed = seed, 
                        warmup = warmups[i], init = inits[[i]]) 
     
@@ -312,10 +327,10 @@ config_argss <- function(chains, iter, warmup, thin,
         argss[[i]]$sample_file <- append_id(sample_file, i) 
     }
   }
-  dotlist <- list(...) 
-  for (i in 1:chains) 
-    argss[[i]] <- c(argss[[i]], dotlist) 
-  check_args(argss) 
+  
+  for (i in 1:chains)
+    argss[[i]] <- c(argss[[i]], dotlist)
+  check_args(argss)
   argss 
 } 
 
@@ -1073,9 +1088,12 @@ stan_plot_inferences <- function(sim, summary, pars, model_info, display_paralle
   invisible(NULL)
 } 
 
-legitimate_model_name <- function(name) {
+legitimate_model_name <- function(name, obfuscate_name = TRUE) {
   # To make model name be a valid name in C++. 
-  name <- paste(basename(tempfile('stan_fit', '')), '_', name, sep = '')
+  # obfuscate_name 
+
+  namep1 <- if (obfuscate_name)  basename(tempfile('model', '')) else 'model' 
+  name <- paste(namep1, '_', name, sep = '') 
   gsub('[^[:alnum:]]', '_', name) 
   # return("anon_model")
 
@@ -1091,7 +1109,10 @@ legitimate_model_name <- function(name) {
   # would always call the function with the same name loaded later. I am 
   # not sure the real reason, but experiments do show that 
   # later modules created would use previous one if the class name
-  # in the module is the same. 
+  # in the module is the same. So if obfuscate_name = TRUE, we try
+  # to generate a unique name, if FALSE, it is the user's responsibility 
+  # to keep the name unique and in the case, users might be able to
+  # take advantage of tools such as ccache 
 } 
 
 boost_url <- function() {"http://www.boost.org/users/download/"} 
@@ -1122,3 +1143,9 @@ obj_size_str <- function(x) {
   return(paste(x, "bytes")) 
 } 
 
+system_info <- function() {
+  paste("OS: ", R.version$system, 
+        "; rstan: ",  packageVersion('rstan'), 
+        "; Rcpp: ", packageVersion('Rcpp'),
+        "; inline: ", packageVersion('inline'), sep = '')
+} 

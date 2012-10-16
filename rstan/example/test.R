@@ -48,7 +48,7 @@ f <- sampling(rr, data = dat, init = 0, iter = 2012, sample_file = 'norm1.csv')
 
 mod <- rr@dso@.CXXDSOMISC$module 
 model_cppname <- rr@model_cpp$model_cppname 
-stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
+stan_fit_cpp_module <- eval(call("$", mod, paste('stan_fit4', model_cppname, sep = '')))
 sampler <- new(stan_fit_cpp_module, dat) 
 args <- list(init = list(mu = 2)) 
 s <- sampler$call_sampler(args) 

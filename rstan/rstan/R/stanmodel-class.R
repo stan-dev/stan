@@ -75,7 +75,7 @@ setMethod("sampling", "stanmodel",
             } 
             # mod <- object@dso@.CXXDSOMISC$module 
             mod <- get("module", envir = object@dso@.CXXDSOMISC, inherits = FALSE) 
-            stan_fit_cpp_module <- eval(call("$", mod, model_cppname)) 
+            stan_fit_cpp_module <- eval(call("$", mod, paste('stan_fit4', model_cppname, sep = ''))) 
 
             if (check_data) { 
               # allow data to be specified as a vector of character string 
@@ -126,18 +126,20 @@ setMethod("sampling", "stanmodel",
             if (is(args_list, "try-error")) {
               message('error specification of arguments; sampling not done') 
               return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
-            } 
+            }
 
             n_save <- 1 + (iter - 1) %/% thin 
             # number of samples saved after thinning
             warmup2 <- 1 + (warmup - 1) %/% thin 
             n_kept <- n_save - warmup2 
             samples <- vector("list", chains)
+            dots <- list(...)
 
             for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
-              cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
+              if (is.null(dots$refresh) || dots$refresh > 0) 
+                cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
               samples[[i]] <- try(sampler$call_sampler(args_list[[i]])) 
               if (is(samples[[i]], "try-error")) {
                 message("error occurred during calling the sampler; sampling not done") 
@@ -187,10 +189,6 @@ setMethod("sampling", "stanmodel",
                           # (see comments in fun stan_model)
                         date = date(),
                         .MISC = new.env()) 
-             # triger gc to really delete sampler, create from the sampler_mod.   
-             # the issue here is that if sampler is removed later automatically by 
-             # R's gabbage collector after the fx (the loaded dso) is removed, 
-             # it will cause a segfault, which will crash R. 
              invisible(nfit)
           }) 
 
