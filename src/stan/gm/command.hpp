@@ -454,7 +454,8 @@ namespace stan {
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
                                                    delta, gamma, 
-                                                   base_rng);
+                                                   base_rng, &params_r,
+                                                   &params_i);
 
         // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
@@ -477,7 +478,8 @@ namespace stan {
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
-                                             base_rng);
+                                             base_rng, &params_r,
+                                             &params_i);
 
         nuts_sampler.set_error_stream(std::cout);
         nuts_sampler.set_output_stream(std::cout); // cout intended
@@ -500,7 +502,8 @@ namespace stan {
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,
                                                     delta, gamma,
-                                                    base_rng);
+                                                    base_rng, &params_r,
+                                                    &params_i);
 
         hmc_sampler.set_error_stream(std::cout); // intended
         hmc_sampler.set_output_stream(std::cout);

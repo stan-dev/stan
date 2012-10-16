@@ -93,14 +93,18 @@ namespace stan {
            bool epsilon_adapt = true,
            double delta = 0.6, 
            double gamma = 0.05,
-           BaseRNG base_rng = BaseRNG(std::time(0)) )
+           BaseRNG base_rng = BaseRNG(std::time(0)),
+           const std::vector<double>* params_r = 0,
+           const std::vector<int>* params_i = 0) 
         : hmc_base<BaseRNG>(model,
                             epsilon,
                             epsilon_pm,
                             epsilon_adapt,
                             delta,
                             gamma,
-                            base_rng),
+                            base_rng,
+                            params_r,
+                            params_i),
           _maxchange(-1000),
           _maxdepth(maxdepth),
           _lastdepth(-1)

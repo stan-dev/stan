@@ -71,9 +71,9 @@ namespace stan {
             m[i] = this->_rand_unit_norm();
           logp = leapfrog(this->_model, this->_z, x, m, g, this->_epsilon);
           H = logp - lastlogp;
-          if ((direction == 1) && (H < log(0.5)))
+          if ((direction == 1) && !(H > log(0.5)))
             break;
-          else if ((direction == -1) && (H > log(0.5)))
+          else if ((direction == -1) && !(H < log(0.5)))
             break;
           else
             this->_epsilon = ( (direction == 1) 
@@ -118,7 +118,9 @@ namespace stan {
                bool epsilon_adapt = true,
                double delta = 0.651,
                double gamma = 0.05,
-               BaseRNG rand_int = BaseRNG(std::time(0))) 
+               BaseRNG rand_int = BaseRNG(std::time(0)),
+               const std::vector<double>* params_r = 0,
+               const std::vector<int>* params_i = 0) 
         : adaptive_sampler(epsilon_adapt),
           _model(model),
           _epsilon(epsilon),
@@ -134,8 +136,16 @@ namespace stan {
           _x(model.num_params_r()),
           _z(model.num_params_i()),
           _g(model.num_params_r())
-      {        
+      {
         model.init(_x,_z);
+        if (params_r) {
+          assert(params_r->size() == model.num_params_r());
+          _x = *params_r;
+        }
+        if (params_i) {
+          assert(params_i->size() == model.num_params_i());
+          _z = *params_i;
+        }
         _logp = model.grad_log_prob(_x,_z,_g);
         if (epsilon_adapt)
           find_reasonable_parameters();

@@ -81,14 +81,18 @@ namespace stan {
                    bool epsilon_adapt = true, 
                    double delta = 0.651,
                    double gamma = 0.05,
-                   BaseRNG rand_int = BaseRNG(std::time(0)))
+                   BaseRNG rand_int = BaseRNG(std::time(0)),
+                   const std::vector<double>* params_r = 0,
+                   const std::vector<int>* params_i = 0)
         : hmc_base<BaseRNG>(model,
                             epsilon,
                             epsilon_pm,
                             epsilon_adapt,
                             delta,
                             gamma,
-                            rand_int),
+                            rand_int,
+                            params_r,
+                            params_i),
           _L(L) {
         this->adaptation_init(1.0);  // target is just epsilon
       }
