@@ -245,6 +245,9 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
   double log_prob;
   (void)log_prob;
   EXPECT_NO_THROW(log_prob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
+
+  EXPECT_TRUE(std::isnan(log_prob))
+    << "errno policy. ";
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix) {

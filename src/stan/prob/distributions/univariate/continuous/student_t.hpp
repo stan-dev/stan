@@ -1,9 +1,11 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
 
-#include <stan/prob/constants.hpp>
+#include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
 namespace stan {
@@ -38,7 +40,7 @@ namespace stan {
     template <bool propto, typename T_y, typename T_dof, 
               typename T_loc, typename T_scale,
               class Policy>
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma, 
                   const Policy&) {
@@ -47,45 +49,76 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
-      using boost::math::tools::promote_args;
-            
-      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp = 0.0;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
-        return lp;
-      if(!check_finite(function, nu, "Degrees of freedom parameter", &lp, Policy()))
-        return lp;
-      if(!check_positive(function, nu, "Degrees of freedom parameter", &lp, Policy()))
-        return lp;
+      using stan::math::check_consistent_sizes;
+
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(nu) 
+            && stan::length(mu)
+	    && stan::length(sigma)))
+        return 0.0;
+
+      typename return_type<T_y,T_dof,T_loc,T_scale>::type logp = 0.0;
+
+      // validate args (here done over var, which should be OK)
+      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+        return logp;
+      if(!check_finite(function, nu, "Degrees of freedom parameter", &logp, Policy()))
+        return logp;
+      if(!check_positive(function, nu, "Degrees of freedom parameter", &logp, Policy()))
+        return logp;
       if (!check_finite(function, mu, "Location parameter", 
-                        &lp, Policy()))
-        return lp;
+                        &logp, Policy()))
+        return logp;
       if (!check_finite(function, sigma, "Scale parameter", 
-                        &lp, Policy()))
-        return lp;
+                        &logp, Policy()))
+        return logp;
       if (!check_positive(function, sigma, "Scale parameter", 
-                          &lp, Policy()))
-        return lp;
+                          &logp, Policy()))
+        return logp;
+
+      
+      if (!(check_consistent_sizes(function,
+                                   y,nu,mu,sigma,
+				   "Random variable","Degrees of freedom parameter","Location parameter","Scale parameter",
+                                   &logp, Policy())))
+        return logp;
+
+      // check if no variables are involved and prop-to
+      if (!include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
+	return 0.0;
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_dof> nu_vec(nu);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
+      size_t N = max_size(y, nu, mu, sigma);
 
       using stan::math::square;
       using boost::math::lgamma;
 
-      if (include_summand<propto,T_dof>::value)
-        lp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
-      if (include_summand<propto>::value)
-        lp += NEG_LOG_SQRT_PI;
-      if (include_summand<propto,T_dof>::value)
-        lp -= 0.5 * log(nu);
-      if (include_summand<propto,T_scale>::value)
-        lp -= log(sigma);
-      if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
-        lp -= ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
-      return lp;
+      using std::log;
+
+      for (size_t n = 0; n < N; n++) {
+	if (include_summand<propto,T_dof>::value)
+	  logp += lgamma( (nu_vec[n] + 1.0) / 2.0) - lgamma(nu_vec[n] / 2.0);
+	if (include_summand<propto>::value)
+	  logp += NEG_LOG_SQRT_PI;
+	if (include_summand<propto,T_dof>::value)
+	  logp -= 0.5 * log(nu_vec[n]);
+	if (include_summand<propto,T_scale>::value)
+	  logp -= log(sigma_vec[n]);
+	if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
+	  logp -= ((nu_vec[n] + 1.0) / 2.0) 
+	    * log1p( square(((y_vec[n] - mu_vec[n]) / sigma_vec[n])) / nu_vec[n]);
+      }
+      return logp;
     }
 
     template <bool propto, 
               typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma) {
       return student_t_log<propto>(y,nu,mu,sigma,stan::math::default_policy());
@@ -94,7 +127,7 @@ namespace stan {
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale,
               class Policy>
     inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma, 
                   const Policy&) {
@@ -103,7 +136,7 @@ namespace stan {
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
+    typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma) {
       return student_t_log<false>(y,nu,mu,sigma,stan::math::default_policy());

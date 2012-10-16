@@ -75,6 +75,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLognormal,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLognormal,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsLognormal);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLognormal,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsLognormal);

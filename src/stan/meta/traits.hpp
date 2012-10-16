@@ -162,6 +162,20 @@ namespace stan {
     // assert((length(x3) == 1) || (length(x3) == result));
     return result;
   }
+
+  template <typename T1, typename T2, typename T3, typename T4>
+  size_t max_size(const T1& x1, const T2& x2, const T3& x3, const T4& x4) {
+    size_t result = length(x1);
+    result = result > length(x2) ? result : length(x2);
+    result = result > length(x3) ? result : length(x3);
+    result = result > length(x4) ? result : length(x4);
+    // assert((length(x1) == 1) || (length(x1) == result));
+    // assert((length(x2) == 1) || (length(x2) == result));
+    // assert((length(x3) == 1) || (length(x3) == result));
+    // assert((length(x4) == 1) || (length(x4) == result));
+    return result;
+  }
+
   
   template<typename T, 
 	   bool is_vec = stan::is_vector<T>::value>

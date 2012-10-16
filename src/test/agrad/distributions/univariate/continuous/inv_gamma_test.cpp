@@ -90,7 +90,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsInvGamma,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsInvGamma,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsInvGamma);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsInvGamma,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsInvGamma);
-

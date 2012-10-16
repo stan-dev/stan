@@ -1,120 +1,116 @@
-#include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
+#define _LOG_PROB_ student_t_log
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_4_params.hpp>
 
-template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
-void expect_propto(T_y y1, T_dof nu1, T_loc mu1, T_scale sigma1,
-                   T_y y2, T_dof nu2, T_loc mu2, T_scale sigma2,
-                   std::string message) {
-  expect_eq_diffs(stan::prob::student_t_log<false>(y1,nu1,mu1,sigma1),
-                  stan::prob::student_t_log<false>(y2,nu2,mu2,sigma2),
-                  stan::prob::student_t_log<true>(y1,nu1,mu1,sigma1),
-                  stan::prob::student_t_log<true>(y2,nu2,mu2,sigma2),
-                  message);
-}
-
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionsStudentT : public ::testing::Test {
-protected:
-  virtual void SetUp() {
-    y1 = -3.0;
-    y2 = 2.3;
-    
-    nu1 = 2.0;
-    nu2 = 20.0;
-    
-    sigma1 = 1.5;
-    sigma2 = 10.0;
+class AgradDistributionsStudentT : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(4);
+
+    param[0] = 1.0;           // y
+    param[1] = 1.0;           // nu
+    param[2] = 0.0;           // mu
+    param[3] = 1.0;           // sigma
+    parameters.push_back(param);
+
+    param[0] = -3.0;          // y
+    param[1] = 2.0;           // nu
+    param[2] = 0.0;           // mu
+    param[3] = 1.0;           // sigma
+    parameters.push_back(param);
+
+    param[0] = 2.0;           // y
+    param[1] = 1.0;           // nu
+    param[2] = 0.0;           // mu
+    param[3] = 2.0;           // sigma
+    parameters.push_back(param);
   }
-  double y1;
-  double y2;
-  
-  double nu1;
-  double nu2;
-  
-  double mu1;
-  double mu2;
-  
-  double sigma1;
-  double sigma2;
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // nu
+    index.push_back(1U);
+    value.push_back(0.0);
+
+    index.push_back(1U);
+    value.push_back(-1.0);
+
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // mu
+    index.push_back(2U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(3U);
+    value.push_back(0.0);
+
+    index.push_back(3U);
+    value.push_back(-1.0);
+
+    index.push_back(3U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(3U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+  template <class T_y, class T_dof, class T_loc, class T_scale>
+  var log_prob(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma) {
+    using std::log;
+    using stan::math::square;
+    using stan::math::log1p;
+    using boost::math::lgamma;
+    using stan::prob::include_summand;
+    using stan::prob::NEG_LOG_SQRT_PI;
+    
+    var logp(0);
+    if (include_summand<true,T_dof>::value)
+      logp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
+    if (include_summand<true>::value)
+      logp += NEG_LOG_SQRT_PI;
+    if (include_summand<true,T_dof>::value)
+      logp -= 0.5 * log(nu);
+    if (include_summand<true,T_scale>::value)
+      logp -= log(sigma);
+    if (include_summand<true,T_y,T_dof,T_loc,T_scale>::value)
+      logp -= ((nu + 1.0) / 2.0) 
+	* log1p( square(((y - mu) / sigma)) / nu);
+    return logp;
+  }
+
 };
 
-TEST_F(AgradDistributionsStudentT,Propto) {
-  expect_propto<var,var,var,var>(y1, nu1, mu1, sigma1,
-                                 y2, nu2, mu2, sigma2, 
-                                 "all var: y, nu, mu, sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoY) {
-  expect_propto<var,double,double,double>(y1, nu1, mu1, sigma1,
-                                          y2, nu1, mu1, sigma1, 
-                                          "var: y");
-}
-TEST_F(AgradDistributionsStudentT,ProptoYNu) {
-  expect_propto<var,var,double,double>(y1, nu1, mu1, sigma1,
-                                       y2, nu2, mu1, sigma1, 
-                                       "var: y and nu");
-}
-TEST_F(AgradDistributionsStudentT,ProptoYNuMu) {
-  expect_propto<var,var,var,double>(y1, nu1, mu1, sigma1,
-                                    y2, nu2, mu2, sigma1, 
-                                    "var: y, nu, and mu");
-}
-TEST_F(AgradDistributionsStudentT,ProptoYNuSigma) {
-  expect_propto<var,var,double,var>(y1, nu1, mu1, sigma1,
-                                    y2, nu2, mu1, sigma2, 
-                                    "var: y, mu, and sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoYMu) {
-  expect_propto<var,double,var,double>(y1, nu1, mu1, sigma1,
-                                       y2, nu1, mu2, sigma1, 
-                                       "var: y and mu");
-}
-TEST_F(AgradDistributionsStudentT,ProptoYMuSigma) {
-  expect_propto<var,double,var,var>(y1, nu1, mu1, sigma1,
-                                    y2, nu1, mu2, sigma2, 
-                                    "var: y, mu, and sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoYSigma) {
-  expect_propto<var,double,double,var>(y1, nu1, mu1, sigma1,
-                                       y2, nu1, mu1, sigma2, 
-                                       "var: y and sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoNu) {
-  expect_propto<double,var,double,double>(y1, nu1, mu1, sigma1,
-                                          y1, nu2, mu1, sigma1, 
-                                          "var: nu");
-}
-TEST_F(AgradDistributionsStudentT,ProptoNuMu) {
-  expect_propto<double,var,var,double>(y1, nu1, mu1, sigma1,
-                                       y1, nu2, mu2, sigma1, 
-                                       "var: nu and mu");
-}
-TEST_F(AgradDistributionsStudentT,ProptoNuMuSigma) {
-  expect_propto<double,var,var,var>(y1, nu1, mu1, sigma1,
-                                    y1, nu2, mu2, sigma2, 
-                                    "var: nu, mu, and sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoNuSigma) {
-  expect_propto<double,var,double,var>(y1, nu1, mu1, sigma1,
-                                       y1, nu2, mu1, sigma2, 
-                                       "var: nu and sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoMu) {
-  expect_propto<double,double,var,double>(y1, nu1, mu1, sigma1,
-                                          y1, nu1, mu2, sigma1, 
-                                          "var: mu");
-}
-TEST_F(AgradDistributionsStudentT,ProptoMuSigma) {
-  expect_propto<double,double,var,var>(y1, nu1, mu1, sigma1,
-                                       y1, nu1, mu2, sigma2, 
-                                       "var: mu and sigma");
-}
-TEST_F(AgradDistributionsStudentT,ProptoSigma) {
-  expect_propto<double,double,double,var>(y1, nu1, mu1, sigma1,
-                                          y1, nu1, mu1, sigma2, 
-                                          "var: sigma");
-}
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsStudentT);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
+			      AgradDistributionTestFixture2,
+			      AgradDistributionsStudentT);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
+			      AgradDistributionTestFixture3,
+			      AgradDistributionsStudentT);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
+			      AgradDistributionTestFixture4,
+			      AgradDistributionsStudentT);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
+			      AgradDistributionTestFixture5,
+			      AgradDistributionsStudentT);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
+			      AgradDistributionTestFixture6,
+			      AgradDistributionsStudentT);

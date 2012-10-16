@@ -71,6 +71,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLogistic,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLogistic,
                               AgradDistributionTestFixture2,
                               AgradDistributionsLogistic);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsLogistic,
-                              AgradDistributionTestFixture3,
-                              AgradDistributionsLogistic);

@@ -1,16 +1,60 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ weibull_log
 #include <stan/prob/distributions/univariate/continuous/weibull.hpp>
 
-TEST(ProbDistributionsWeibull,Weibull) {
-  EXPECT_FLOAT_EQ(-2.0, stan::prob::weibull_log(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(-3.277094, stan::prob::weibull_log(0.25,2.9,1.8));
-  EXPECT_FLOAT_EQ(-102.8962, stan::prob::weibull_log(3.9,1.7,0.25));
-}
-TEST(ProbDistributionsWeibull,WeibullPropto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::weibull_log<true>(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::weibull_log<true>(0.25,2.9,1.8));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::weibull_log<true>(3.9,1.7,0.25));
-}
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_3_params.hpp>
+
+using std::vector;
+using std::numeric_limits;
+
+class ProbDistributionsWeibull : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
+
+    param[0] = 2.0;                 // y
+    param[1] = 1.0;                 // alpha
+    param[2] = 1.0;                 // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-2.0);       // expected log_prob
+
+    param[0] = 0.25;                // y
+    param[1] = 2.9;                 // alpha
+    param[2] = 1.8;                 // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-3.277094);  // expected log_prob
+
+    param[0] = 3.9;                 // y
+    param[1] = 1.7;                 // alpha
+    param[2] = 0.25;                // sigma
+    parameters.push_back(param);
+    log_prob.push_back(-102.8962);  // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // y
+    
+    // alpha
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsWeibull,
+			      DistributionTestFixture,
+			      ProbDistributionsWeibull);
 
 TEST(ProbDistributionsWeibull,Cumulative) {
   using stan::prob::weibull_cdf;
@@ -26,83 +70,4 @@ TEST(ProbDistributionsWeibull,Cumulative) {
   EXPECT_FLOAT_EQ(0.0, weibull_cdf(0.0,1.0,1.0));
   EXPECT_FLOAT_EQ(1.0, weibull_cdf(numeric_limits<double>::infinity(),
                                    1.0,1.0));
-}
-
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
-using stan::prob::weibull_log;
-
-TEST(ProbDistributionsWeibull,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-
-  double y = 1.0;
-  double alpha = 2.0;
-  double sigma = 3.0;
-
-  EXPECT_NO_THROW(weibull_log(y,alpha,sigma));
-  
-  EXPECT_THROW(weibull_log(nan,alpha,sigma), std::domain_error);
-  EXPECT_THROW(weibull_log(inf,alpha,sigma), std::domain_error);
-  EXPECT_THROW(weibull_log(-inf,alpha,sigma), std::domain_error);
-
-  EXPECT_THROW(weibull_log(y,nan,sigma), std::domain_error);
-  EXPECT_THROW(weibull_log(y,0.0,sigma), std::domain_error);
-  EXPECT_THROW(weibull_log(y,-inf,sigma), std::domain_error);
-  EXPECT_THROW(weibull_log(y,inf,sigma), std::domain_error);
-  
-  EXPECT_THROW(weibull_log(y,alpha,nan), std::domain_error);
-  EXPECT_THROW(weibull_log(y,alpha,0.0), std::domain_error);
-  EXPECT_THROW(weibull_log(y,alpha,-inf), std::domain_error);
-  EXPECT_NO_THROW(weibull_log(y,alpha,inf));
-}
-TEST(ProbDistributionsWeibull,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-
-  double result;
-  double y = 1.0;
-  double alpha = 2.0;
-  double sigma = 3.0;
-
-  result = weibull_log(y,alpha,sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  result = weibull_log(nan,alpha,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(inf,alpha,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(-inf,alpha,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-
-  result = weibull_log(y,nan,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(y,0.0,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(y,-inf,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(y,inf,sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  result = weibull_log(y,alpha,nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(y,alpha,0.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(y,alpha,-inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = weibull_log(y,alpha,inf, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
 }

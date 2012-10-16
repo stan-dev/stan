@@ -80,8 +80,59 @@ public:
     return 1e-8;
   }
 };
-
+template<class T>
+class AgradDistributionTestFixture4 : public ::testing::Test {
+public:
+  vector<double> first_valid_params() {
+    vector<vector<double> > params;
+    T().valid_values(params); 
+    return params[0];
+  }
+  double e() {
+    return 1e-8;
+  }
+};
+template<class T>
+class AgradDistributionTestFixture5 : public ::testing::Test {
+public:
+  vector<double> first_valid_params() {
+    vector<vector<double> > params;
+    T().valid_values(params); 
+    return params[0];
+  }
+  double e() {
+    return 1e-8;
+  }
+};
+template<class T>
+class AgradDistributionTestFixture6 : public ::testing::Test {
+public:
+  vector<double> first_valid_params() {
+    vector<vector<double> > params;
+    T().valid_values(params); 
+    return params[0];
+  }
+  double e() {
+    return 1e-8;
+  }
+};
+template<class T>
+class AgradDistributionTestFixture7 : public ::testing::Test {
+public:
+  vector<double> first_valid_params() {
+    vector<vector<double> > params;
+    T().valid_values(params); 
+    return params[0];
+  }
+  double e() {
+    return 1e-8;
+  }
+};
 TYPED_TEST_CASE_P(AgradDistributionTestFixture);
 TYPED_TEST_CASE_P(AgradDistributionTestFixture2);
 TYPED_TEST_CASE_P(AgradDistributionTestFixture3);
+TYPED_TEST_CASE_P(AgradDistributionTestFixture4);
+TYPED_TEST_CASE_P(AgradDistributionTestFixture5);
+TYPED_TEST_CASE_P(AgradDistributionTestFixture6);
+TYPED_TEST_CASE_P(AgradDistributionTestFixture7);
 #endif

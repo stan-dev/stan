@@ -82,6 +82,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPareto,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPareto,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsPareto);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPareto,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsPareto);

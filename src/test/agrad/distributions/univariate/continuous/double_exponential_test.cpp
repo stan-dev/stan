@@ -101,6 +101,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsDoubleExponential,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsDoubleExponential,
 			      AgradDistributionTestFixture2,
 			      AgradDistributionsDoubleExponential);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsDoubleExponential,
-			      AgradDistributionTestFixture3,
-			      AgradDistributionsDoubleExponential);
