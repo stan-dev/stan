@@ -24,12 +24,24 @@ New Features:
 Manual Additions:
  -- example of defining new distribution with parameters
 
+* warning message for int division
+
 * check that positive definiteness enforced for transformed params,
   transformed data
 
 * fix refresh=0 bug to have it not print anything
 
+* change domain error message to something less scary
+  indicating it may be a temporary problem with trajectory
+  going out of range due to simulation error;  if persists
+  may be init
 
+* make sure init is legal (not NaN, etc.), or give a warning
+
+* remove assert() calls that are not for programmer error
+  -- tests to into actual tests
+  -- runtime errors to exceptions
+  -- programmer safety check to nothing (or leave and ensure -NDEBUG)
 
 C++ API
 ======================================================================
