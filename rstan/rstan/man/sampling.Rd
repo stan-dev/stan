@@ -111,7 +111,7 @@
     control how to indicate the progress during sampling 
     (i.e. show the progress every \code{refresh} iterations).
     By default, \code{refresh = max(iter/10, 1)}. 
-    The progress indicator is turned off if \code{refresh < 0}.
+    The progress indicator is turned off if \code{refresh <= 0}.
 
     Another parameter is \code{test_grad} (\code{TRUE} or \code{FALSE}).  
     If \code{test_grad=TRUE}, Stan will not do any sampling. Instead,

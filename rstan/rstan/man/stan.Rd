@@ -84,7 +84,7 @@ stan(file, model_name = "anon_model", model_code = "",
     This parameter only takes effect if \code{fit} is not used; with  
     \code{fit} defined, the DSO from the previous run is used.
     When \code{save_dso=TRUE}, the fitted object can be loaded from 
-    what is saved previously and used from sampling, if the compiling is
+    what is saved previously and used for sampling, if the compiling is
     done on the same platform, that is, same operating system and same 
     architecture (32bits or 64bits). 
 }
@@ -119,7 +119,7 @@ stan(file, model_name = "anon_model", model_code = "",
     control how to indicate the progress during sampling (i.e. 
     show the progress every \code{refresh} iterations). 
     By default, \code{refresh = max(iter/10, 1)}. 
-    The progress indicator is turned off if \code{refresh < 0}.
+    The progress indicator is turned off if \code{refresh <= 0}.
 
     Another parameter is \code{test_grad} (\code{TRUE} or \code{FALSE}).  
     If \code{test_grad=TRUE}, Stan will not do any sampling. Instead,
