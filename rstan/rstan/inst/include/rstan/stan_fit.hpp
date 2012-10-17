@@ -254,7 +254,7 @@ namespace rstan {
     std::vector<unsigned int> 
     sizet_to_uint(std::vector<size_t> v1) {
       std::vector<unsigned int> v2(v1.size());
-      for (size_t i = 0;i < v1.size(); ++i) 
+      for (size_t i = 0; i < v1.size(); ++i) 
         v2[i] = static_cast<unsigned int>(v1[i]);
       return v2;
     } 
@@ -500,7 +500,8 @@ namespace rstan {
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
                                                    delta, gamma, 
-                                                   base_rng);
+                                                   base_rng, 
+                                                   &params_r, &params_i);
 
         nuts2_sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
@@ -529,7 +530,8 @@ namespace rstan {
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
-                                             base_rng);
+                                             base_rng,
+                                             &params_r, &params_i);
 
         nuts_sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
@@ -554,7 +556,8 @@ namespace rstan {
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,
                                                     delta, gamma,
-                                                    base_rng);
+                                                    base_rng,
+                                                    &params_r, &params_i);
 
         hmc_sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
