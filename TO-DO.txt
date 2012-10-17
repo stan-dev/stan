@@ -440,6 +440,8 @@ C++ API
 Modeling Language
 ======================================================================
 
+* get line numbers into error messages
+
 * compiler for R's linear model notation
 
 * generalize vector ops to conforming matrices 
@@ -897,6 +899,8 @@ Models
 
 Models
 ======================================================================
+
+
 * unit K-hyperball complement for stationary AR(K) parameters
   - what should the prior be?
 
