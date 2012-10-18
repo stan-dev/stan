@@ -362,7 +362,7 @@ namespace stan {
           std::cout << "Initialization failed after " << MAX_INIT_TRIES 
                     << " attempts. "
                     << " Try specifying initial values,"
-                    << " reducing ranges of constrianed values,"
+                    << " reducing ranges of constrained values,"
                     << " or reparameterizing the model."
                     << std::endl;
           return -1;
