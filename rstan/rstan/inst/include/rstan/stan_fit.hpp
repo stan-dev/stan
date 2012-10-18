@@ -497,7 +497,7 @@ namespace rstan {
         rstan::io::rcout << "params_i[" << i << "]=" << params_i[i] << std::endl; 
       */
       // reset the seed 
-      base_rng.seed(random_seed); 
+      // base_rng.seed(random_seed); 
       base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
 
       std::fstream sample_stream; 
