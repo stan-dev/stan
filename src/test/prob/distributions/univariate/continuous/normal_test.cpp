@@ -1,4 +1,5 @@
 #define _LOG_PROB_ normal_log
+#define _CDF_ normal_cdf
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
 #include <test/prob/distributions/distribution_test_fixture.hpp>
@@ -79,17 +80,104 @@ INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNormal,
                               ProbDistributionsNormal);
 
 
-TEST(ProbDistributions,NormalCdf) {
-  using stan::prob::normal_cdf;
-  EXPECT_NEAR(0.5, normal_cdf(0,0,0.01), 1E-8);
-  EXPECT_NEAR(0.5, normal_cdf(0,0,0.1), 1E-8);
-  EXPECT_NEAR(0.5, normal_cdf(0,0,1), 1E-8);
-  EXPECT_NEAR(0.5, normal_cdf(0,0,10), 1E-8);
-  EXPECT_NEAR(0.5, normal_cdf(0,0,100), 1E-8);
+class ProbCumulativeNormal : public CumulativeTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+                    vector<double>& cdf) {
+    vector<double> param(3);
 
-  EXPECT_NEAR(0.3694413, normal_cdf(1,5,12), 1E-7);
-  EXPECT_NEAR(0.9999683, normal_cdf(-2,-3,0.25), 1E-7);
+    param[0] = 0;           // y
+    param[1] = 0;           // mu
+    param[2] = 0.01;        // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.5);     // expected cdf
 
-  EXPECT_FLOAT_EQ(0.0, normal_cdf(-numeric_limits<double>::infinity(),0.0,1.0));
-  EXPECT_FLOAT_EQ(1.0, normal_cdf(numeric_limits<double>::infinity(),0.0,1.0));
-}
+    param[0] = 0;           // y
+    param[1] = 0;           // mu
+    param[2] = 0.1;         // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.5);     // expected cdf
+
+    param[0] = 0;           // y
+    param[1] = 0;           // mu
+    param[2] = 1;           // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.5);     // expected cdf
+
+    param[0] = 0;           // y
+    param[1] = 0;           // mu
+    param[2] = 1;           // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.5);     // expected cdf
+
+    param[0] = 0;           // y
+    param[1] = 0;           // mu
+    param[2] = 10;          // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.5);     // expected cdf
+
+    param[0] = 0;           // y
+    param[1] = 0;           // mu
+    param[2] = 100;         // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.5);     // expected cdf
+
+    param[0] = 1;           // y
+    param[1] = 5;           // mu
+    param[2] = 12;          // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.3694413); // expected cdf
+
+    param[0] = -2;          // y
+    param[1] = -3;          // mu
+    param[2] = 0.25;        // sigma
+    parameters.push_back(param);
+    cdf.push_back(0.9999683); // expected cdf
+  }
+
+  void zero_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
+
+    param[0] = -std::numeric_limits<double>::infinity(); // y
+    param[1] = 0;           // mu
+    param[2] = 0.01;        // sigma
+    parameters.push_back(param);
+  }
+
+  void one_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
+
+    param[0] = std::numeric_limits<double>::infinity(); // y
+    param[1] = 0;           // mu
+    param[2] = 0.01;        // sigma
+    parameters.push_back(param);
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+                      vector<double>& value) {
+    // y
+    
+    // mu
+    index.push_back(1U);
+    value.push_back(numeric_limits<double>::infinity());
+
+    index.push_back(1U);
+    value.push_back(-numeric_limits<double>::infinity());
+
+    // sigma
+    index.push_back(2U);
+    value.push_back(0.0);
+
+    index.push_back(2U);
+    value.push_back(-1.0);
+
+    index.push_back(2U);
+    value.push_back(-numeric_limits<double>::infinity());
+  }
+
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbCumulativeNormal,
+                              CumulativeTestFixture,
+                              ProbCumulativeNormal);
+
