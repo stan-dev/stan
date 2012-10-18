@@ -184,7 +184,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
 
-      typename return_type<T_y, T_loc, T_scale>::type cdf;
+      typename return_type<T_y, T_loc, T_scale>::type cdf(1);
       if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
         return cdf;
       if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
@@ -213,7 +213,7 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
       
       for (size_t n = 0; n < N; n++) {
-	cdf += 0.5 + 0.5 * erf((y_vec[n] - mu_vec[n]) / (sigma_vec[n] * SQRT_2));
+	cdf *= 0.5 + 0.5 * erf((y_vec[n] - mu_vec[n]) / (sigma_vec[n] * SQRT_2));
       }
       return cdf;
     }

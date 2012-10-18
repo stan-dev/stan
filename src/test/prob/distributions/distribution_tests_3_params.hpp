@@ -533,7 +533,7 @@ TYPED_TEST_P(CumulativeTestFixture, vector_vector_vector) {
   param1.assign(N_repeat, parameters[0]);
   param2.assign(N_repeat, parameters[1]);
   param3.assign(N_repeat, parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, vector_vector_double) { 
@@ -546,7 +546,7 @@ TYPED_TEST_P(CumulativeTestFixture, vector_vector_double) {
   param1.assign(N_repeat, parameters[0]);
   param2.assign(N_repeat, parameters[1]);
   param3 = parameters[2];
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, vector_double_vector) { 
@@ -559,7 +559,7 @@ TYPED_TEST_P(CumulativeTestFixture, vector_double_vector) {
   param1.assign(N_repeat, parameters[0]);
   param2 = parameters[1];
   param3.assign(N_repeat, parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, vector_double_double) {
@@ -572,7 +572,7 @@ TYPED_TEST_P(CumulativeTestFixture, vector_double_double) {
   param1.assign(N_repeat, parameters[0]);
   param2 = parameters[1];
   param3 = parameters[2];
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, double_vector_vector) {
@@ -585,7 +585,7 @@ TYPED_TEST_P(CumulativeTestFixture, double_vector_vector) {
   param1 = parameters[0];
   param2.assign(N_repeat, parameters[1]);
   param3.assign(N_repeat, parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, double_vector_double) { 
@@ -598,7 +598,7 @@ TYPED_TEST_P(CumulativeTestFixture, double_vector_double) {
   param1 = parameters[0];
   param2.assign(N_repeat, parameters[1]);
   param3 = parameters[2];
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, double_double_vector) { 
@@ -611,7 +611,7 @@ TYPED_TEST_P(CumulativeTestFixture, double_double_vector) {
   param1 = parameters[0];
   param2 = parameters[1];
   param3.assign(N_repeat, parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, invalid_different_vector_sizes) { 
@@ -641,7 +641,7 @@ TYPED_TEST_P(CumulativeTestFixture, matrix_matrix_matrix) {
   param1.setConstant(parameters[0]);
   param2.setConstant(parameters[1]);
   param3.setConstant(parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, matrix_matrix_double) { 
@@ -654,7 +654,7 @@ TYPED_TEST_P(CumulativeTestFixture, matrix_matrix_double) {
   param1.setConstant(parameters[0]);
   param2.setConstant(parameters[1]);
   param3 = parameters[2];
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, matrix_double_matrix) { 
@@ -667,7 +667,7 @@ TYPED_TEST_P(CumulativeTestFixture, matrix_double_matrix) {
   param1.setConstant(parameters[0]);
   param2 = parameters[1];
   param3.setConstant(parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, matrix_double_double) { 
@@ -680,7 +680,7 @@ TYPED_TEST_P(CumulativeTestFixture, matrix_double_double) {
   param1.setConstant(parameters[0]);
   param2 = parameters[1];
   param3 = parameters[2];
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, double_matrix_matrix) { 
@@ -693,7 +693,7 @@ TYPED_TEST_P(CumulativeTestFixture, double_matrix_matrix) {
   param1 = parameters[0];
   param2.setConstant(parameters[1]);
   param3.setConstant(parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, double_matrix_double) { 
@@ -706,7 +706,7 @@ TYPED_TEST_P(CumulativeTestFixture, double_matrix_double) {
   param1 = parameters[0];
   param2.setConstant(parameters[1]);
   param3 = parameters[2];
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 TYPED_TEST_P(CumulativeTestFixture, double_double_matrix) { 
@@ -719,7 +719,7 @@ TYPED_TEST_P(CumulativeTestFixture, double_double_matrix) {
   param1 = parameters[0];
   param2 = parameters[1];
   param3.setConstant(parameters[2]);
-  EXPECT_FLOAT_EQ(N_repeat * expected_value,
+  EXPECT_FLOAT_EQ(pow(expected_value, N_repeat),
 		  _CDF_(param1, param2, param3));
 }
 
