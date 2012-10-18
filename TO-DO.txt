@@ -905,8 +905,9 @@ Models
   - ideally things hard to do with other systems
   - or illustrate the unusual parts of our modeling language
 
-* Online book with models based on BUGS:
+* Online books with models based on BUGS:
   http://stat-athens.aueb.gr/~jbn/winbugs_book/
+  http://137.227.242.23/pubanalysis/kerybook/
 
 * deal with autocorrelation model params where require
   all roots of 1 - SUM_i rho[i]**i to be within unit
