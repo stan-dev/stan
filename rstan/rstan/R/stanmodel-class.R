@@ -141,7 +141,7 @@ setMethod("sampling", "stanmodel",
               if (is.null(dots$refresh) || dots$refresh > 0) 
                 cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
               samples[[i]] <- try(sampler$call_sampler(args_list[[i]])) 
-              if (is(samples[[i]], "try-error")) {
+              if (is(samples[[i]], "try-error") || is.null(samples[[i]])) {
                 message("error occurred during calling the sampler; sampling not done") 
                 return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
               }
