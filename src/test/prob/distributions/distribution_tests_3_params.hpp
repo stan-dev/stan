@@ -372,6 +372,7 @@ REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
 			   double_double_matrix);
 
 
+#ifdef _CDF_
 
 TYPED_TEST_P(CumulativeTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
@@ -743,4 +744,6 @@ REGISTER_TYPED_TEST_CASE_P(CumulativeTestFixture,
 			   double_matrix_matrix,
 			   double_matrix_double,
 			   double_double_matrix);
+#endif
+
 #endif
