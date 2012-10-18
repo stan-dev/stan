@@ -103,6 +103,14 @@ setMethod("get_seed", signature = "stanfit",
             if (length(object@stan_args) < 1L) return(NULL) 
             object@stan_args[[1]]$seed })
 
+setGeneric(name = 'get_seeds', 
+           def = function(object, ...) { standardGeneric("get_seeds")})
+
+setMethod("get_seeds", signature = "stanfit", 
+          function(object) { 
+            if (length(object@stan_args) < 1L) return(NULL) 
+            sapply(object@stan_args, function(x) x$seed) })
+
 ### HELPER FUNCTIONS
 ### 
 check_pars <- function(sim, pars) {
@@ -519,8 +527,9 @@ sflist2stanfit <- function(sflist) {
   #   The date would be where the new object is created. 
   # Note: 
   #   * method get_seed would not work well for this merged 
-  #     stanfit object. But all the information is still there. 
-  #   * When print function is called, the sampler is obtained 
+  #     stanfit object in that it only returns the seed used
+  #     for the first object. But all the information is still there. 
+  #   * When print function is called, the sampler info is obtained 
   #     only from the first chain. 
   #  
   sf_len <- length(sflist) 

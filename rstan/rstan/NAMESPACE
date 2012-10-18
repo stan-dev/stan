@@ -28,6 +28,7 @@ exportMethods(
   get_cppcode, get_cxxflags, # for stanmodel 
   show, sampling, summary, print, extract,
   traceplot, plot, get_stancode, get_inits, get_seed, get_cppo_mode,
+  get_seeds,
   get_adaptation_info,
   get_sampler_params,
   get_logposterior, 

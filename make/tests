@@ -79,12 +79,10 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest_no_fail/,$(MAKECMD
 	-$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-
-
 ##
 # Builds a single test
 ##
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a src/test/gm/model_specs/function_signatures1$(EXE) src/test/gm/model_specs/function_signatures2$(EXE) src/test/gm/model_specs/function_signatures3$(EXE) src/test/gm/model_specs/function_signatures4$(EXE)
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/function_signatures*.stan))
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)

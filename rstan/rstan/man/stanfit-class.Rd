@@ -17,6 +17,8 @@
 \alias{get_stanmodel,stanfit-method}
 \alias{get_seed}
 \alias{get_seed,stanfit-method}
+\alias{get_seeds}
+\alias{get_seeds,stanfit-method}
 \alias{get_inits}
 \alias{get_inits,stanfit-method}
 \alias{get_logposterior} 
@@ -129,6 +131,11 @@
       For \code{mode=2}, it returns an empty list.} 
     \item{\code{get_seed}}{\code{signature(object = "stanfit")}: 
       get the seed that used for sampling. When the fitted object 
+      is empty (\code{mode=2}), \code{NULL} might be returned.
+      In the case the seeds for all chains are different, use 
+      \code{get_seeds}.} 
+    \item{\code{get_seeds}}{\code{signature(object = "stanfit")}: 
+      get the seeds that used for all chains. When the fitted object 
       is empty (\code{mode=2}), \code{NULL} might be returned.} 
     \item{\code{get_logposterior}}{\code{signature(object = "stanfit")}: 
       get the log-posterior (up to an additive constant, which is up to

@@ -79,7 +79,6 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -183,27 +182,45 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
 
-      using boost::math::tools::promote_args;
-      typename promote_args<T_y, T_loc, T_scale>::type lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
-        return lp;
+      typename return_type<T_y, T_loc, T_scale>::type cdf(1);
+      if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
+        return cdf;
+      if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
+        return cdf;
       if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &lp, Policy()))
-        return lp;
+                         &cdf, Policy()))
+        return cdf;
       if (!check_positive(function, sigma, "Scale parameter", 
-                          &lp, Policy()))
-        return lp;
+                          &cdf, Policy()))
+        return cdf;
+      if (!(check_consistent_sizes(function,
+                                   y,mu,sigma,
+				   "Random variable","Location parameter","Scale parameter",
+                                   &cdf, Policy())))
+        return cdf;
 
-      return 0.5 + 0.5 * erf((y - mu) / (sigma * SQRT_2));
-      // return 0.5 * erfc(-(y - mu)/(sigma * SQRT_2));
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(mu) 
+            && stan::length(sigma)))
+        return 0.0;
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
+      size_t N = max_size(y, mu, sigma);
+      
+      for (size_t n = 0; n < N; n++) {
+	cdf *= 0.5 + 0.5 * erf((y_vec[n] - mu_vec[n]) / (sigma_vec[n] * SQRT_2));
+      }
+      return cdf;
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
     inline
-    typename boost::math::tools::promote_args<T_y, T_loc, T_scale>::type
+    typename return_type<T_y, T_loc, T_scale>::type
     normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return normal_cdf(y,mu,sigma,stan::math::default_policy());
     }
@@ -219,8 +236,6 @@ namespace stan {
         rng_unit_norm(rng, normal_distribution<>());
       return value_of(mu)  + value_of(sigma) * rng_unit_norm();
     }
-
-
   }
 }
 #endif
