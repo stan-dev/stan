@@ -28,6 +28,11 @@
 }
 
 \note{
+  The best practice is to use \code{sflist2stanfit} on a list of \code{stanfit}
+  objects created with the same \code{seed} but different \code{chain_id} (see
+  the below example). Using the same seed but different chain_id can make sure 
+  the random number generations for all chains are not correlated. 
+
   This function would do some check to see if the \code{stanfit} objects in the input list 
   can be merged. But the check is not sufficient. So generally, it is the
   user's responsibility to make sure the input is correct so that the merging
@@ -68,14 +73,17 @@ model {
   y[2] ~ double_exponential(0, 2);
 } 
 "
-fit1 <- stan(model_code = scode, iter = 1000, verbose = FALSE, chains = 1) 
-fit2 <- stan(model_code = scode, iter = 1000, verbose = FALSE, chains = 2) 
-fit12 <- sflist2stanfit(list(a = fit1, b = fit2)) 
+seed <- 123 # or any other integer 
+f1 <- stan(model_code = scode, chains = 1, seed = seed, chain_id = 1) 
+f2 <- stan(fit = f1, chains = 2, seed = seed, chain_id = 2:3) 
+f12 <- sflist2stanfit(list(f1, f2)) 
 
 ## parallel stan call 
 library(parallel)
 
 ## this may not work on Windows 
-sflist1 <- mclapply(1:4, mc.cores = 8, function(i) stan(fit = fit1, chains = 1))
-fit3 <- sflist2stanfit(sflist1)
+sflist1 <- 
+  mclapply(1:4, mc.cores = 8, 
+           function(i) stan(fit = f1, seed = seed, chains = 1, chain_id = i, refresh = -1))
+f3 <- sflist2stanfit(sflist1)
 }} 

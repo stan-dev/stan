@@ -450,8 +450,30 @@ namespace rstan {
         params_i = std::vector<int>(model.num_params_i(),0);
         params_r = std::vector<double>(model.num_params_r());
 
-        for (size_t i = 0; i < params_r.size(); ++i)
-          params_r[i] = init_rng();
+        // retry inits until get a finite log prob value
+        std::vector<double> init_grad;
+        static int MAX_INIT_TRIES = 100;
+        int num_init_tries = 0;
+        for (; num_init_tries < MAX_INIT_TRIES; ++num_init_tries) {
+          for (size_t i = 0; i < params_r.size(); ++i)
+            params_r[i] = init_rng();
+          double init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
+          if (!boost::math::isfinite(init_log_prob))
+            continue;
+          for (size_t i = 0; i < init_grad.size(); ++i)
+            if (!boost::math::isfinite(init_grad[i]))
+              continue;
+          break;
+        }
+        if (num_init_tries == MAX_INIT_TRIES) {
+          rstan::io::rcout << "Initialization failed after " << MAX_INIT_TRIES 
+                           << " attempts. "
+                           << " Try specifying initial values,"
+                           << " reducing ranges of constrained values,"
+                           << " or reparameterizing the model."
+                           << std::endl;
+          return -1;
+        }
       }
       // keep a record of the initial values 
       model.write_array(params_r,params_i,initv); 
@@ -462,6 +484,9 @@ namespace rstan {
         int num_failed = model.test_gradients(params_r,params_i,1e-6,1e-6,ss);
         rstan::io::rcout << ss.str() << std::endl; 
         return num_failed; 
+      } else {
+        for (unsigned int i = 0; i < qoi_idx.size(); i++) 
+          chains.push_back(Rcpp::NumericVector(iter_save)); 
       } 
    
       /*
@@ -701,14 +726,13 @@ namespace rstan {
       std::vector<double> initv; 
       bool test_grad = args.get_test_grad(); 
       int ret; 
-
-      if (!test_grad) { 
-        for (unsigned int i = 0; i < num_params2_; i++) 
-          chains.push_back(Rcpp::NumericVector(iter_save)); 
-      }
        
       ret = sampler_command(data_, args, model_, chains, initv, iter_save, names_oi_tidx_, 
                             sampler_param_names, sampler_params, adaptation_info); 
+
+      if (ret != 0) {
+        return R_NilValue;  // indicating error happened 
+      } 
 
       if (test_grad) {
         Rcpp::IntegerVector num_failed = Rcpp::IntegerVector::create(ret);
