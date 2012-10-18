@@ -229,7 +229,12 @@ add_binary("multiply_log");
 add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
-add("normal_cdf",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T);
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("normal_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
