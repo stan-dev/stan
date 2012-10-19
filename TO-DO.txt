@@ -16,10 +16,11 @@ v 1.0.3 Release Notes
 ======================================================================
 Bug Fixes:
  -- error output in stanc now directed to standard error
+ -- catching all exceptions thrown in stanc to prevent core dumps
 New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
+ -- all univariate continuous densities vectorized
  -- better error checking for transforms 
- -- catching all exceptions thrown in stanc to prevent core dumps
  -- new error return type in stanc for invalid arguments
 Manual Additions:
  -- example of defining new distribution with parameters
@@ -798,6 +799,18 @@ Web Pages
 
 Manuals
 ======================================================================
+
+* chapter on change of variables in the user guide
+
+* more explanation of overall output analysis
+  -- more on using generated quantities for posterior
+     + predictive simulation (waiting for RNGs)
+     + event probability calculations
+  -- exp(lp__) propto posterior
+  ?? do we do this in R or what?
+
+* mention that discrete output functions like floor()
+  lose gradient information
 
 * copy FAQ into manual appendix (and onto web?)
 
