@@ -364,7 +364,7 @@ setMethod("extract", signature = "stanfit",
             if (!inc_warmup) n2 <- n2 - object@sim$warmup2[1] 
             dim(sssf) <- c(n2, object@sim$chains, length(tidx)) 
             cids <- sapply(object@stan_args, function(x) x$chain_id)
-            dimnames(sssf) <- list(NULL, paste0("chain:", cids), tidxnames) 
+            dimnames(sssf) <- list(iterations = NULL, chains = paste0("chain:", cids), parameters = tidxnames)
             sssf 
           })  
 
