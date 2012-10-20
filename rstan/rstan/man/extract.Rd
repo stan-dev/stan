@@ -13,7 +13,7 @@
 
 \usage{
   %% extract(object, \dots)  
-  \S4method{extract}{stanfit}(object, pars, permuted = FALSE, inc_warmup = TRUE) 
+  \S4method{extract}{stanfit}(object, pars, permuted = FALSE, inc_warmup = FALSE) 
 } 
 
 \section{Methods}{
@@ -64,7 +64,7 @@ ex_model_code <- '
 '
 
 ## fit the model 
-fit <- stan(model_code = 'ex_model_code', chains = 4) 
+fit <- stan(model_code = ex_model_code, chains = 4) 
 
 ## extract alpha and beta with 'permuted = TRUE' 
 fit_ss <- extract(fit, permuted = TRUE) # fit_ss is a list 
@@ -93,4 +93,9 @@ dim(fit_ss2)
 ## in the samples.  
 dimnames(fit_ss2) 
 }} 
+
+\seealso{
+  S4 class \code{\linkS4class{stanfit}} and \link{as.array.stanfit}
+} 
+
 \keyword{methods}

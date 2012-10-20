@@ -309,7 +309,7 @@ setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
 setMethod("extract", signature = "stanfit",
-          definition = function(object, pars, permuted = FALSE, inc_warmup = TRUE) {
+          definition = function(object, pars, permuted = FALSE, inc_warmup = FALSE) {
             # Extract the samples in different forms for different parameters. 
             #
             # Args:
@@ -363,7 +363,8 @@ setMethod("extract", signature = "stanfit",
             n2 <- object@sim$n_save[1]  ## assuming all the chains have equal iter 
             if (!inc_warmup) n2 <- n2 - object@sim$warmup2[1] 
             dim(sssf) <- c(n2, object@sim$chains, length(tidx)) 
-            dimnames(sssf) <- list(NULL, NULL, tidxnames) 
+            cids <- sapply(object@stan_args, function(x) x$chain_id)
+            dimnames(sssf) <- list(NULL, paste0("chain:", cids), tidxnames) 
             sssf 
           })  
 
@@ -577,3 +578,27 @@ sflist2stanfit <- function(sflist) {
   invisible(nfit)
 } 
 # sflist2stan(list(l1=ss1, l2=ss2))
+
+
+as.array.stanfit <- function(x, ...) {
+  if (x@mode != 0) return(numeric(0)) 
+  extract(x, permuted = FALSE, inc_warmup = FALSE, ...)
+} 
+as.matrix.stanfit <- function(x, ...) {
+  if (x@mode != 0) return(numeric(0)) 
+  apply(extract(x, permuted = FALSE, inc_warmup = FALSE, ...), 
+        3, FUN = function(y) y)
+} 
+
+dim.stanfit <- function(x) {
+  if (x@mode != 0) return(numeric(0)) 
+  c(x@sim$n_save[1] - x@sim$warmup2[1], x@sim$chains, x@sim$n_flatnames)
+} 
+
+dimnames.stanfit <- function(x) {
+  if (x@mode != 0) return(character(0)) 
+  cids <- sapply(x@stan_args, function(x) x$chain_id)
+  list(NULL, paste0("chain:", cids), x@sim$fnames_oi) 
+} 
+is.array.stanfit <- function(x)  return(x@mode == 0)
+

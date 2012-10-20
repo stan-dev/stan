@@ -112,7 +112,9 @@
     }
     \item{\code{extract}}{\code{signature(object = "stanfit")}: 
       get the samples for all chains for all (or specified) parameters. 
-      (see \code{\link{extract}}).}
+      (see \code{\link{extract}}). Also see \link{as.array.stanfit} 
+      for coercing samples without warmup to arrays or matrices. 
+    }
     \item{\code{traceplot}}{\code{signature(object = "stanfit")}:
       plot the trace of chains (see \code{\link{traceplot}}). 
     } 

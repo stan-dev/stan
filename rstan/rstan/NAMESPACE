@@ -34,4 +34,9 @@ exportMethods(
   get_logposterior, 
   get_stanmodel 
 )
+S3method(as.array, stanfit)
+S3method(as.matrix, stanfit)
+S3method(is.array, stanfit)
+S3method(dim, stanfit)
+S3method(dimnames, stanfit)
 import(Rcpp)
