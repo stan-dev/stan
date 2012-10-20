@@ -288,7 +288,6 @@ namespace rstan {
                      std::vector<int>& params_i,
                      Model& model,
                      std::vector<Rcpp::NumericVector>& chains, 
-                     const size_t iter_save, 
                      const std::vector<size_t>& qoi_idx,
                      std::vector<Rcpp::NumericVector>& sampler_params, 
                      std::string& adaptation_info) { 
@@ -305,7 +304,7 @@ namespace rstan {
       std::vector<double> params_inr; 
       if (refresh > num_iterations) refresh = -1; 
      
-      unsigned int ii = 0; // index for iterations saved to chains
+      int ii = 0; // index for iterations saved to chains
       for (int m = 0; m < num_iterations; ++m) { 
         R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
@@ -351,7 +350,8 @@ namespace rstan {
             sample_file_stream << ii_sampler_params[z] << ",";
         } 
         
-        // check range of ii 
+        // check range of ii, the error should not happen by construction. 
+        // just to avoid programming error, other approach such as using DDEBUG?
         if (ii >= chains[0].size()) {
           throw std::out_of_range("index ii of the iteration is out of range"); 
         } 
@@ -384,12 +384,11 @@ namespace rstan {
      */
     
     template <class Model> 
-    int sampler_command(const io::rlist_ref_var_context& data, 
-                        stan_args& args, 
+    int sampler_command(stan_args& args, 
                         Model& model, 
                         std::vector<Rcpp::NumericVector>& chains, 
                         std::vector<double>& initv, 
-                        unsigned int iter_save,
+                        int iter_save,
                         const std::vector<size_t>& qoi_idx,
                         std::vector<std::string>& sampler_param_names, 
                         std::vector<Rcpp::NumericVector>& sampler_params, 
@@ -398,9 +397,9 @@ namespace rstan {
                             
       bool sample_file_flag = args.get_sample_file_flag(); 
       std::string sample_file = args.get_sample_file(); 
-      unsigned int num_iterations = args.get_iter(); 
-      unsigned int num_warmup = args.get_warmup(); 
-      unsigned int num_thin = args.get_thin(); 
+      int num_iterations = args.get_iter(); 
+      int num_warmup = args.get_warmup(); 
+      int num_thin = args.get_thin(); 
       int leapfrog_steps = args.get_leapfrog_steps(); 
       unsigned int random_seed = args.get_random_seed();
       double epsilon = args.get_epsilon(); 
@@ -545,7 +544,7 @@ namespace rstan {
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,iter_save,qoi_idx,sampler_params,
+                    model,chains,qoi_idx,sampler_params,
                     adaptation_info); 
 
       } else if (0 > leapfrog_steps && equal_step_sizes) {
@@ -572,7 +571,7 @@ namespace rstan {
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,iter_save,qoi_idx,sampler_params,
+                    model,chains,qoi_idx,sampler_params,
                     adaptation_info); 
       } else {
         // Stardard HMC
@@ -598,7 +597,7 @@ namespace rstan {
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,iter_save,qoi_idx,sampler_params,
+                    model,chains,qoi_idx,sampler_params,
                     adaptation_info); 
       }
       
@@ -718,7 +717,7 @@ namespace rstan {
       BEGIN_RCPP; 
       Rcpp::List lst_args(args_); 
       stan_args args(lst_args); 
-      unsigned int iter_save = args.get_iter_save(); 
+      int iter_save = args.get_iter_save(); 
       std::vector<Rcpp::NumericVector> chains; 
       std::vector<Rcpp::NumericVector> sampler_params;
       std::vector<std::string> sampler_param_names; 
@@ -727,7 +726,7 @@ namespace rstan {
       bool test_grad = args.get_test_grad(); 
       int ret; 
        
-      ret = sampler_command(data_, args, model_, chains, initv, iter_save, names_oi_tidx_, 
+      ret = sampler_command(args, model_, chains, initv, iter_save, names_oi_tidx_, 
                             sampler_param_names, sampler_params, adaptation_info); 
 
       if (ret != 0) {
@@ -859,11 +858,11 @@ namespace rstan {
      */ 
     SEXP permutation(SEXP nsc_) { 
       static time_t seed = std::time(0);  //defaults to time-based init 
-      boost::uintmax_t DISCARD_STRIDE = 1 << 31; 
+      boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 31; 
       Rcpp::IntegerVector nsc(nsc_); 
-      unsigned int n = nsc[0]; 
-      unsigned int s = 1;
-      unsigned int cid = 1; 
+      int n = nsc[0]; 
+      int s = 1;
+      int cid = 1; 
       // rstan::io::rcout << "stride = " << DISCARD_STRIDE << std::endl; 
       // rstan::io::rcout << "nsc.size() = " << nsc.size() << std::endl; 
       // rstan::io::rcout << "nsc[0]=" << nsc[0] 
@@ -877,13 +876,13 @@ namespace rstan {
       RNG rng(seed); 
       rng.discard(DISCARD_STRIDE * (cid - 1));
       Rcpp::IntegerVector x(n); 
-      for (size_t i = 0; i < n; ++i)
+      for (int i = 0; i < n; ++i)
         x[i] = i + s;
       if (n < 2) return x; 
-      for (size_t i = n; --i != 0; ) {
-        boost::random::uniform_int_distribution<size_t> uid(0, i);
-        size_t j = uid(rng);
-        unsigned int temp = x[i];
+      for (int i = n; --i != 0; ) {
+        boost::random::uniform_int_distribution<int> uid(0, i);
+        int j = uid(rng);
+        int temp = x[i];
         x[i] = x[j];
         x[j] = temp;
       } 
@@ -901,6 +900,6 @@ namespace rstan {
 STAN= ../../../../../ 
 RCPPINC=`Rscript -e "cat(system.file('include', package='Rcpp'))"`
 RINC=`Rscript -e "cat(R.home('include'))"` 
-g++ -I${RINC} -I"${STAN}/lib/boost_1.51.0" -I"${STAN}/lib/eigen_3.1.1"  -I"${STAN}/src" -I"${RCPPINC}" -I"../" stan_fit.hpp 
+g++ -Wall -I${RINC} -I"${STAN}/lib/boost_1.51.0" -I"${STAN}/lib/eigen_3.1.1"  -I"${STAN}/src" -I"${RCPPINC}" -I"../" stan_fit.hpp 
 */
 

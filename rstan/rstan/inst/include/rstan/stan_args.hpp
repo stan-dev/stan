@@ -84,10 +84,10 @@ namespace rstan {
   private:
     bool sample_file_flag; // true: write out to a file; false, do not 
     std::string sample_file; // the file for outputting the samples    // 1
-    unsigned int iter;   // number of iterations                       // 2 
-    unsigned int warmup; // number of warmup                          
-    unsigned int thin; 
-    unsigned int iter_save; // number of iterations saved 
+    int iter;   // number of iterations                       // 2 
+    int warmup; // number of warmup
+    int thin; 
+    int iter_save; // number of iterations saved 
     int refresh;  // 
     int leapfrog_steps; 
     double epsilon; 
@@ -96,7 +96,7 @@ namespace rstan {
     bool equal_step_sizes;  // default: false 
     double delta; 
     double gamma; 
-    int random_seed; 
+    unsigned int random_seed; 
     std::string random_seed_src; // "user" or "default" 
     unsigned int chain_id; 
     std::string chain_id_src; // "user" or "default" 
@@ -111,10 +111,10 @@ namespace rstan {
     /**
     stan_args(): 
       samples("samples.csv"),  
-      iter(2000U), 
-      warmup(1000U), 
-      thin(1U), 
-      refresh(1U), 
+      iter(2000), 
+      warmup(1000), 
+      thin(1), 
+      refresh(1), 
       leapfrog_steps(-1), 
       epsilon(-1.0), 
       max_treedepth(10), 
@@ -143,18 +143,18 @@ namespace rstan {
       }
 
       idx = find_index(args_names, std::string("iter")); 
-      if (idx == args_names.size()) iter = 2000U;  
-      else iter = Rcpp::as<unsigned int>(in[idx]); 
+      if (idx == args_names.size()) iter = 2000;  
+      else iter = Rcpp::as<int>(in[idx]); 
 
       idx = find_index(args_names, std::string("warmup")); 
       if (idx == args_names.size()) warmup = iter / 2; 
-      else warmup = Rcpp::as<unsigned int>(in[idx]); 
+      else warmup = Rcpp::as<int>(in[idx]); 
 
       idx = find_index(args_names, std::string("thin")); 
-      unsigned int calculated_thin = (iter - warmup) / 1000U;
+      int calculated_thin = (iter - warmup) / 1000;
       // rstan::io::rcout << "calculated_thin=" << calculated_thin << std::endl; 
-      if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1U;
-      else thin = Rcpp::as<unsigned int>(in[idx]); 
+      if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1;
+      else thin = Rcpp::as<int>(in[idx]); 
 
       iter_save = 1 + (iter - 1) / thin; 
       // starting from 0, iterations of 0, thin, 2 * thin, .... are saved. 
@@ -289,17 +289,17 @@ namespace rstan {
     bool get_sample_file_flag() const { 
       return sample_file_flag; 
     }
-    unsigned int get_warmup() const {
+    int get_warmup() const {
       return warmup; 
     } 
     int get_refresh() const { 
       return refresh; 
     } 
-    unsigned int get_thin() const {
+    int get_thin() const {
       return thin;
     } 
     
-    unsigned int get_iter_save() const { 
+    int get_iter_save() const { 
       return iter_save; 
     } 
 
@@ -313,7 +313,7 @@ namespace rstan {
       return max_treedepth; 
     } 
     double get_epsilon_pm() const {
-      return epsilon; 
+      return epsilon_pm; 
     } 
     double get_delta() const {  
       return delta;
@@ -327,7 +327,7 @@ namespace rstan {
     bool get_test_grad() const {
       return test_grad; 
     } 
-    int get_random_seed() const {
+    unsigned int get_random_seed() const {
       return random_seed; 
     } 
     const std::string& get_init() const {
