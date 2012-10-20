@@ -582,12 +582,16 @@ sflist2stanfit <- function(sflist) {
 
 as.array.stanfit <- function(x, ...) {
   if (x@mode != 0) return(numeric(0)) 
-  extract(x, permuted = FALSE, inc_warmup = FALSE, ...)
+  out <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...)
+  dimnames(out) <- dimnames(x)
+  return(out)
 } 
 as.matrix.stanfit <- function(x, ...) {
   if (x@mode != 0) return(numeric(0)) 
-  apply(extract(x, permuted = FALSE, inc_warmup = FALSE, ...), 
-        3, FUN = function(y) y)
+  out <- apply(extract(x, permuted = FALSE, inc_warmup = FALSE, ...), 
+               3, FUN = function(y) y)
+  dimnames(out) <- dimnames(x)[-2]
+  return(out)
 } 
 
 dim.stanfit <- function(x) {
@@ -598,7 +602,7 @@ dim.stanfit <- function(x) {
 dimnames.stanfit <- function(x) {
   if (x@mode != 0) return(character(0)) 
   cids <- sapply(x@stan_args, function(x) x$chain_id)
-  list(NULL, paste0("chain:", cids), x@sim$fnames_oi) 
-} 
+  list(iterations = NULL, chains = paste0("chain:", cids), parameters = x@sim$fnames_oi) 
+}
 is.array.stanfit <- function(x)  return(x@mode == 0)
 
