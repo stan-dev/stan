@@ -16,10 +16,11 @@ v 1.0.3 Release Notes
 ======================================================================
 Bug Fixes:
  -- error output in stanc now directed to standard error
+ -- catching all exceptions thrown in stanc to prevent core dumps
 New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
+ -- all univariate continuous densities vectorized
  -- better error checking for transforms 
- -- catching all exceptions thrown in stanc to prevent core dumps
  -- new error return type in stanc for invalid arguments
 Manual Additions:
  -- example of defining new distribution with parameters
@@ -440,6 +441,8 @@ C++ API
 Modeling Language
 ======================================================================
 
+* get line numbers into error messages
+
 * compiler for R's linear model notation
 
 * generalize vector ops to conforming matrices 
@@ -797,6 +800,18 @@ Web Pages
 Manuals
 ======================================================================
 
+* chapter on change of variables in the user guide
+
+* more explanation of overall output analysis
+  -- more on using generated quantities for posterior
+     + predictive simulation (waiting for RNGs)
+     + event probability calculations
+  -- exp(lp__) propto posterior
+  ?? do we do this in R or what?
+
+* mention that discrete output functions like floor()
+  lose gradient information
+
 * copy FAQ into manual appendix (and onto web?)
 
 * mention that even if you aren't interested in all the parameters,
@@ -897,6 +912,8 @@ Models
 
 Models
 ======================================================================
+
+
 * unit K-hyperball complement for stationary AR(K) parameters
   - what should the prior be?
 
@@ -905,8 +922,9 @@ Models
   - ideally things hard to do with other systems
   - or illustrate the unusual parts of our modeling language
 
-* Online book with models based on BUGS:
+* Online books with models based on BUGS:
   http://stat-athens.aueb.gr/~jbn/winbugs_book/
+  http://137.227.242.23/pubanalysis/kerybook/
 
 * deal with autocorrelation model params where require
   all roots of 1 - SUM_i rho[i]**i to be within unit
