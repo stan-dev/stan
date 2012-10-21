@@ -25,6 +25,8 @@ New Features:
 Manual Additions:
  -- example of defining new distribution with parameters
 
+* turn off refresh for flag <= 0
+
 * warning message for int division
 
 * check that positive definiteness enforced for transformed params,
