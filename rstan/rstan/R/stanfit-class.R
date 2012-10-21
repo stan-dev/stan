@@ -345,6 +345,7 @@ setMethod("extract", signature = "stanfit",
             fun1 <- function(par) {
               sss <- sapply(tidx[[par]], get_kept_samples2, object@sim) 
               dim(sss) <- c(sum(n_kept), object@sim$dims_oi[[par]]) 
+              dimnames(sss) <- list(iterations = NULL)
               sss 
             } 
            
