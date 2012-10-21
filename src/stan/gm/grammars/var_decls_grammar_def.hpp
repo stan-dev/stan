@@ -57,16 +57,19 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_var_decl,
                           (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::vector_var_decl,
+                          (stan::gm::range, range_)
                           (stan::gm::expression, M_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::row_vector_var_decl,
+                          (stan::gm::range, range_)
                           (stan::gm::expression, N_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::matrix_var_decl,
+                          (stan::gm::range, range_)
                           (stan::gm::expression, M_)
                           (stan::gm::expression, N_)
                           (std::string, name_)
@@ -424,6 +427,7 @@ namespace stan {
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
+      using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_a;
@@ -477,7 +481,9 @@ namespace stan {
       int_decl_r.name("integer declaration");
       int_decl_r 
         %= lit("int")
-        > -range_brackets_int_r
+        >> no_skip[!char_("a-zA-Z0-9_")]
+        > -range_brackets_int_r 
+        // >> (lit(' ') | lit('\n') | lit('\t') | lit('\r'))
         > identifier_r 
         > opt_dims_r
         > lit(';');
@@ -485,6 +491,7 @@ namespace stan {
       double_decl_r.name("real declaration");
       double_decl_r 
         %= lit("real")
+        >> no_skip[!char_("a-zA-Z0-9_")]
         > -range_brackets_double_r
         > identifier_r
         > opt_dims_r
@@ -493,6 +500,7 @@ namespace stan {
       vector_decl_r.name("vector declaration");
       vector_decl_r 
         %= lit("vector")
+        > -range_brackets_double_r
         > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
@@ -504,6 +512,7 @@ namespace stan {
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r 
         %= lit("row_vector")
+        > -range_brackets_double_r
         > lit('[')
         > expression_g
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
@@ -515,6 +524,7 @@ namespace stan {
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r 
         %= lit("matrix")
+        > -range_brackets_double_r
         > lit('[')
         > expression_g
           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
