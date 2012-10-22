@@ -17,11 +17,14 @@ v 1.0.3 Release Notes
 Bug Fixes:
  -- error output in stanc now directed to standard error
  -- catching all exceptions thrown in stanc to prevent core dumps
+ -- parser now accepts variable names starting with "int" and "real"
+    in first assignment after declaration
 New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
  -- all univariate continuous densities vectorized
  -- better error checking for transforms 
  -- new error return type in stanc for invalid arguments
+ -- lower and upper bounds for vectors, row vectors, and matrices
 Manual Additions:
  -- example of defining new distribution with parameters
 
@@ -31,13 +34,6 @@ Manual Additions:
 
 * check that positive definiteness enforced for transformed params,
   transformed data
-
-* fix refresh=0 bug to have it not print anything
-
-* change domain error message to something less scary
-  indicating it may be a temporary problem with trajectory
-  going out of range due to simulation error;  if persists
-  may be init
 
 * make sure init is legal (not NaN, etc.), or give a warning
 
