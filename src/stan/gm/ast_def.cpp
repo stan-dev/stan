@@ -598,27 +598,33 @@ namespace stan {
     
     vector_var_decl::vector_var_decl() : base_var_decl(VECTOR_T) { }
 
-    vector_var_decl::vector_var_decl(expression const& M,
-                      std::string const& name,
-                      std::vector<expression> const& dims)
+    vector_var_decl::vector_var_decl(range const& range,
+                                     expression const& M,
+                                     std::string const& name,
+                                     std::vector<expression> const& dims)
         : base_var_decl(name,dims,VECTOR_T),
+          range_(range),
           M_(M) {
     }
     
     row_vector_var_decl::row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
-    row_vector_var_decl::row_vector_var_decl(expression const& N,
-                          std::string const& name,
-                          std::vector<expression> const& dims)
+    row_vector_var_decl::row_vector_var_decl(range const& range,
+                                        expression const& N,
+                                        std::string const& name,
+                                        std::vector<expression> const& dims)
         : base_var_decl(name,dims,ROW_VECTOR_T),
+          range_(range),
           N_(N) {
     }
 
     matrix_var_decl::matrix_var_decl() : base_var_decl(MATRIX_T) { }
-    matrix_var_decl::matrix_var_decl(expression const& M,
+    matrix_var_decl::matrix_var_decl(range const& range,
+                      expression const& M,
                       expression const& N,
                       std::string const& name,
                       std::vector<expression> const& dims)
         : base_var_decl(name,dims,MATRIX_T),
+          range_(range),
           M_(M),
           N_(N) {
     }

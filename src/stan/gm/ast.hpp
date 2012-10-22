@@ -444,26 +444,32 @@ namespace stan {
     };
 
     struct vector_var_decl : public base_var_decl {
+      range range_;
       expression M_;
       vector_var_decl();
-      vector_var_decl(expression const& M,
+      vector_var_decl(range const& range, 
+                      expression const& M,
                       std::string const& name,
                       std::vector<expression> const& dims);
     };
 
     struct row_vector_var_decl : public base_var_decl {
+      range range_;
       expression N_;
       row_vector_var_decl();
-      row_vector_var_decl(expression const& N,
+      row_vector_var_decl(range const& range, 
+                          expression const& N,
                           std::string const& name,
                           std::vector<expression> const& dims);
     };
 
     struct matrix_var_decl : public base_var_decl {
+      range range_;
       expression M_;
       expression N_;
       matrix_var_decl();
-      matrix_var_decl(expression const& M,
+      matrix_var_decl(range const& range, 
+                      expression const& M,
                       expression const& N,
                       std::string const& name,
                       std::vector<expression> const& dims);

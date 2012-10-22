@@ -376,20 +376,21 @@ namespace stan {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
         T_result tmp = raise_domain_error<size_t, size_t>(function, 
-							  message.c_str(), 
-							  0, 
-							  Policy());
+                                                          message.c_str(), 
+                                                          0, 
+                                                          Policy());
         if (result != 0)
           *result = tmp;
         return false;
       }
       if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
-        std::string message(name);
-        message += " is not a valid simplex.";
-        message += " The sum of the elements is %1%, but should be 1.0";
+        std::stringstream msg;
         T_prob sum = theta.sum();
+        msg << "in function check_simplex(%1%), ";
+        msg << name << " is not a valid simplex.";
+        msg << " The sum of the elements should be 1, but is " << sum;
         T_result tmp = raise_domain_error<T_result,T_prob>(function, 
-                                                           message.c_str(), 
+                                                           msg.str().c_str(), 
                                                            sum, 
                                                            Policy());
         if (result != 0)

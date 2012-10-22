@@ -23,6 +23,19 @@ namespace stan {
     const std::string INDENT2("        ");
     const std::string INDENT3("            ");
 
+    template <typename D>
+    bool has_lub(const D& x) {
+      return !is_nil(x.range_.low_.expr_) && !is_nil(x.range_.high_.expr_);
+    }
+    template <typename D>
+    bool has_ub(const D& x) {
+      return is_nil(x.range_.low_.expr_) && !is_nil(x.range_.high_.expr_);
+    }
+    template <typename D>
+    bool has_lb(const D& x) {
+      return !is_nil(x.range_.low_.expr_) && is_nil(x.range_.high_.expr_);
+    }
+
     template <typename T>
     std::string to_string(T i) {
       std::stringstream ss;
@@ -338,47 +351,50 @@ namespace stan {
         : visgen(o),
           declare_vars_(declare_vars) {
       }
+      template <typename D>
+      void generate_initialize_array_bounded(const D& x, const std::string& base_type,
+                                             const std::string& read_fun_prefix,
+                                             const std::vector<expression>& dim_args) const {
+        std::vector<expression> read_args;
+        std::string read_fun(read_fun_prefix);
+        if (has_lub(x)) {
+          read_fun += "_lub";
+          read_args.push_back(x.range_.low_);
+          read_args.push_back(x.range_.high_);
+        } else if (has_lb(x)) {
+          read_fun += "_lb";
+          read_args.push_back(x.range_.low_);
+        } else if (has_ub(x)) {
+          read_fun += "_ub";
+          read_args.push_back(x.range_.high_);
+        }
+        for (size_t i = 0; i < dim_args.size(); ++i)
+          read_args.push_back(dim_args[i]);
+        generate_initialize_array(base_type,read_fun,read_args,x.name_,x.dims_);
+      }
       void operator()(const nil& x) const { }
       void operator()(const int_var_decl& x) const {
         generate_initialize_array("int","integer",EMPTY_EXP_VECTOR,x.name_,x.dims_);
       }      
       void operator()(const double_var_decl& x) const {
-        if (!is_nil(x.range_.low_.expr_)) {
-          if (!is_nil(x.range_.high_.expr_)) {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.low_);
-            read_args.push_back(x.range_.high_);
-            generate_initialize_array("var","scalar_lub",read_args,x.name_,x.dims_);
-          } else {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.low_);
-            generate_initialize_array("var","scalar_lb",read_args,x.name_,x.dims_);
-          }
-        } else {
-          if (!is_nil(x.range_.high_.expr_)) {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.high_);
-            generate_initialize_array("var","scalar_ub",read_args,x.name_,x.dims_);
-          } else {
-            generate_initialize_array("var","scalar",EMPTY_EXP_VECTOR,x.name_,x.dims_);
-          }
-        }
+        std::vector<expression> read_args;
+        generate_initialize_array_bounded(x,"var","scalar",read_args);
       }
       void operator()(const vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
-        generate_initialize_array("vector_v","vector",read_args,x.name_,x.dims_);
+        generate_initialize_array_bounded(x,"vector_v","vector",read_args);
       }
       void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.N_);
-        generate_initialize_array("row_vector_v","row_vector",read_args,x.name_,x.dims_);
+        generate_initialize_array_bounded(x,"row_vector_v","row_vector",read_args);
       }
       void operator()(const matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
-        generate_initialize_array("matrix_v","matrix",read_args,x.name_,x.dims_);
+        generate_initialize_array_bounded(x,"matrix_v","matrix",read_args);
       }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
@@ -565,13 +581,13 @@ namespace stan {
         basic_validate(x);
       }
       void operator()(vector_var_decl const& x) const {
-        // vector always unconstrained
+        basic_validate(x);
       }
       void operator()(row_vector_var_decl const& x) const {
-        // row vector always unconstrained
+        basic_validate(x);
       }
       void operator()(matrix_var_decl const& x) const {
-        // matrix always unconstrained
+        basic_validate(x);
       }
       template <typename T>
       void nonbasic_validate(const T& x,
@@ -1618,43 +1634,58 @@ namespace stan {
         generate_buffer_loop("i",x.name_, x.dims_);
         generate_write_loop("integer(",x.name_,x.dims_);
       }
+      template <typename D>
+      std::string function_args(const std::string& fun_prefix,
+                                const D& x) const {
+        std::stringstream ss;
+        ss << fun_prefix;
+        if (has_lub(x)) {
+          ss << "_lub_unconstrain(";
+          generate_expression(x.range_.low_.expr_,ss);
+          ss << ',';
+          generate_expression(x.range_.high_.expr_,ss);
+          ss << ',';
+        } else if (has_lb(x)) {
+          ss << "_lb_unconstrain(";
+          generate_expression(x.range_.low_.expr_,ss);
+          ss << ',';
+        } else if (has_ub(x)) {
+          ss << "_ub_unconstrain(";
+          generate_expression(x.range_.high_.expr_,ss);
+          ss << ',';
+        } else {
+          ss << "_unconstrain(";
+        }
+        return ss.str();
+      }
+
       void operator()(double_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size());
         generate_declaration(x.name_,"double",x.dims_);
         generate_buffer_loop("r",x.name_,x.dims_);
-        bool has_lower_bound = !is_nil(x.range_.low_.expr_);
-        bool has_upper_bound = !is_nil(x.range_.high_.expr_);
-        std::stringstream ss;
-        if (has_lower_bound && has_upper_bound) {
-          ss << "scalar_lub_unconstrain(";
-          generate_expression(x.range_.low_.expr_,ss);
-          ss << ',';
-          generate_expression(x.range_.high_.expr_,ss);
-          ss << ',';
-        } else if (has_lower_bound && !has_upper_bound) {
-          ss << "scalar_lb_unconstrain(";
-          generate_expression(x.range_.low_.expr_,ss);
-          ss << ',';
-        } else if ((!has_lower_bound) && has_upper_bound) {
-          ss << "scalar_ub_unconstrain(";
-          generate_expression(x.range_.high_.expr_,ss);
-          ss << ',';
-        } else if ((!has_lower_bound) && (!has_upper_bound)) {
-          ss << "scalar_unconstrain(";
-        }
-        generate_write_loop(ss.str(),x.name_,x.dims_);
+        generate_write_loop(function_args("scalar",x), 
+                            x.name_, x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 1);
         generate_declaration(x.name_,"vector_d",x.dims_,x.M_);
         generate_buffer_loop("r",x.name_,x.dims_,x.M_);
-        generate_write_loop("vector_unconstrain(",x.name_,x.dims_);
+        generate_write_loop(function_args("vector",x),
+                            x.name_,x.dims_);
       }
       void operator()(row_vector_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 1);
         generate_declaration(x.name_,"row_vector_d",x.dims_,x.N_);
         generate_buffer_loop("r",x.name_,x.dims_,x.N_);
-        generate_write_loop("row_vector_unconstrain(",x.name_,x.dims_);
+        generate_write_loop(function_args("row_vector",x),
+                            x.name_,x.dims_);
+      }
+      void operator()(matrix_var_decl const& x) const {
+        generate_check_double(x.name_,x.dims_.size() + 2);
+        generate_declaration(x.name_,"matrix_d",x.dims_,x.M_,x.N_);
+        generate_buffer_loop("r",x.name_,x.dims_,x.M_,x.N_);
+        generate_write_loop(function_args("matrix",x),
+                            x.name_,x.dims_);
       }
       void operator()(simplex_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 1);
@@ -1673,12 +1704,6 @@ namespace stan {
         generate_declaration(x.name_,"vector_d",x.dims_,x.K_);
         generate_buffer_loop("r",x.name_,x.dims_,x.K_);
         generate_write_loop("positive_ordered_unconstrain(",x.name_,x.dims_);
-      }
-      void operator()(matrix_var_decl const& x) const {
-        generate_check_double(x.name_,x.dims_.size() + 2);
-        generate_declaration(x.name_,"matrix_d",x.dims_,x.M_,x.N_);
-        generate_buffer_loop("r",x.name_,x.dims_,x.M_,x.N_);
-        generate_write_loop("matrix_unconstrain(",x.name_,x.dims_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 2);
@@ -2414,44 +2439,48 @@ namespace stan {
         generate_initialize_array("int","integer",EMPTY_EXP_VECTOR,
                                   x.name_,x.dims_);
       }      
-      void operator()(const double_var_decl& x) const {
-        if (!is_nil(x.range_.low_.expr_)) {
-          if (!is_nil(x.range_.high_.expr_)) {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.low_);
-            read_args.push_back(x.range_.high_);
-            generate_initialize_array("double","scalar_lub",read_args,
-                                      x.name_,x.dims_);
-          } else {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.low_);
-            generate_initialize_array("double","scalar_lb",read_args,x.name_,x.dims_);
-          }
-        } else {
-          if (!is_nil(x.range_.high_.expr_)) {
-            std::vector<expression> read_args;
-            read_args.push_back(x.range_.high_);
-            generate_initialize_array("double","scalar_ub",read_args,x.name_,x.dims_);
-          } else {
-            generate_initialize_array("double","scalar",EMPTY_EXP_VECTOR,x.name_,x.dims_);
-          }
+      // fixme -- reuse cut-and-pasted from other lub reader case
+      template <typename D>
+      void generate_initialize_array_bounded(const D& x, const std::string& base_type,
+                                             const std::string& read_fun_prefix,
+                                             const std::vector<expression>& dim_args) const {
+        std::vector<expression> read_args;
+        std::string read_fun(read_fun_prefix);
+        if (has_lub(x)) {
+          read_fun += "_lub";
+          read_args.push_back(x.range_.low_);
+          read_args.push_back(x.range_.high_);
+        } else if (has_lb(x)) {
+          read_fun += "_lb";
+          read_args.push_back(x.range_.low_);
+        } else if (has_ub(x)) {
+          read_fun += "_ub";
+          read_args.push_back(x.range_.high_);
         }
+        for (size_t i = 0; i < dim_args.size(); ++i)
+          read_args.push_back(dim_args[i]);
+        generate_initialize_array(base_type,read_fun,read_args,x.name_,x.dims_);
+      }
+
+      void operator()(const double_var_decl& x) const {
+        std::vector<expression> read_args;
+        generate_initialize_array_bounded(x,"double","scalar",read_args);
       }
       void operator()(const vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
-        generate_initialize_array("vector_d","vector",read_args,x.name_,x.dims_);
+        generate_initialize_array_bounded(x,"vector_d","vector",read_args);
       }
       void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.N_);
-        generate_initialize_array("row_vector_d","row_vector",read_args,x.name_,x.dims_);
+        generate_initialize_array_bounded(x,"row_vector_d","row_vector",read_args);
       }
       void operator()(const matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
-        generate_initialize_array("matrix_d","matrix",read_args,x.name_,x.dims_);
+        generate_initialize_array_bounded(x,"matrix_d","matrix",read_args);
       }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;

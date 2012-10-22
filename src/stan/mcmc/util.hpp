@@ -16,6 +16,24 @@ namespace stan {
 
   namespace mcmc {
 
+    void write_error_msgs(std::ostream* error_msgs,
+                          const std::domain_error& e) {
+      if (!error_msgs) return;
+      *error_msgs << std::endl
+                  << "Informational Message: The parameter state is about to be Metropolis"
+                  << " rejected due to the following underlying, non-fatal (really)"
+                  << " issue (and please ignore that what comes next might say 'error'): "
+                  << e.what()
+                  << std::endl
+                  << "If the problem persists across multiple draws, you might have"
+                  << " a problem with an initial state or a gradient somewhere."
+                  << std::endl
+                  << " If the problem does not persist, the resulting samples will still"
+                  << " be drawn from the psoterior."
+                  << std::endl;
+        }
+
+
     /**
      * Computes the log probability for a single leapfrog step 
      * in Hamiltonian Monte Carlo.
@@ -48,13 +66,7 @@ namespace stan {
       try {
         logp = model.grad_log_prob(x, z, g, output_msgs);
       } catch (std::domain_error e) {
-        if (error_msgs) {
-          *error_msgs << std::endl
-                      << "Warning (non-fatal rejection): "
-                      << e.what()
-                      << std::endl;
-
-        }
+        write_error_msgs(error_msgs,e);
         logp = -std::numeric_limits<double>::infinity();
       }
       stan::math::scaled_add(m, g, 0.5 * epsilon);
@@ -79,13 +91,7 @@ namespace stan {
       try {
         logp = model.grad_log_prob(x, z, g, output_msgs);
       } catch (std::domain_error e) {
-        if (error_msgs) {
-          // FIXME: remove output
-          *error_msgs << std::endl
-                      << "Warning (non-fatal rejection): "
-                      << e.what()
-                      << std::endl;
-        }
+        write_error_msgs(error_msgs,e);
         logp = -std::numeric_limits<double>::infinity();
       }
       for (size_t i = 0; i < m.size(); i++)

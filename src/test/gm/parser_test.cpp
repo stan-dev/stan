@@ -102,6 +102,11 @@ TEST(gm_parser,good_vars) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_vars.stan"));
 }
 
+TEST(gm_parser,good_intercept_var) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_intercept_var.stan"));
+}
+
+
 TEST(gm_parser,good_cov) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_cov.stan"));
 }
