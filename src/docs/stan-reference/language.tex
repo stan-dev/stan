@@ -444,7 +444,8 @@ parameters {
 This declares a real-valued parameter \code{phi} to take values
 greater than the value of the real-valued data variable \code{lb}.
 Constraints may be complex expressions, but must be of type \code{int}
-for integer variables and of type \code{real} for real variables.
+for integer variables and of type \code{real} for real variables
+(including constraints on vectors, row vectors, and matrices).
 Variables used in constraints can be any variable that has been
 defined at the point the constraint is used.  For instance,
 \begin{quote}
@@ -485,7 +486,7 @@ languages, on the other hand, such as \Cpp and Python, index arrays
 starting from zero.
 
 
-\subsection{Unconstrained Vectors}
+\subsection{Vectors}
 
 Vectors in \Stan are column vectors; see the next subsection for
 information on row vectors.  Vectors are declared with a size (i.e., a
@@ -495,6 +496,15 @@ the keyword \code{vector}, as follows.
 \begin{quote}
 \begin{Verbatim}
 vector[3] u;
+\end{Verbatim}
+\end{quote}
+%
+Vectors may also be declared with constraints, as in the following
+declaration of a 3-vector of non-negative values.
+%
+\begin{quote}
+\begin{Verbatim}
+vector<lower=0>[3] u;
 \end{Verbatim}
 \end{quote}
 %
@@ -565,7 +575,7 @@ assigned to other vectors and other vectors may be assigned to them.
 Constraints will be checked after executing the block in which the 
 variables were declared.  
 
-\subsection{Unconstrained Row Vectors}
+\subsection{Row Vectors}
 
 Row vectors are declared with the keyword \code{row\_vector}.
 Like (column) vectors, they are declared with a size.  For example,
@@ -577,12 +587,20 @@ row_vector[1093] u;
 \end{Verbatim}
 \end{quote}
 %
+Constraints are declared as for vectors, as in the following example
+of a 10-vector with values between -1 and 1.
+\begin{quote}
+\begin{Verbatim}
+row_vector<lower=-1,upper=1>[10] u;
+\end{Verbatim}
+\end{quote}
+%
 
 Row vectors may not be assigned to column vectors, nor may column
 vectors be assigned to row vectors.  If assignments are required, they
 may be accommodated through the transposition operator.
 
-\subsection{Unconstrained Matrices}
+\subsection{Matrices}
 
 Matrices are declared with the keyword \code{matrix} along with a
 number of rows and number of columns.  For example, 
@@ -598,6 +616,17 @@ declares \code{A} to be a $3 \times 3$ matrix and \code{B} to be a $M
 \times N$ matrix.  For the second declaration to be well formed, the
 variables \code{M} and \code{N} must be declared as integers in either
 the data or transformed data block and before the matrix declaration.
+
+Matrices may also be declared with constraints, as in this ($3 \times
+4$)-vector of non-positive values.
+%
+\begin{quote}
+\begin{Verbatim}  
+matrix<upper=0>[3,4] B;
+\end{Verbatim}
+\end{quote}
+%  
+
 
 \subsection{Correlation Matrices}
 
@@ -2688,16 +2717,18 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 \begin{Verbatim}
 var_decl ::= var_type variable ?dims
 
-var_type ::= 'int' ?('<' range '>')
-           | 'real' ?('<' range '>')
-           | 'vector' '[' expression ']'
+var_type ::= 'int' range_constraint
+           | 'real' range_constraint
+           | 'vector' range_constraint '[' expression ']'
            | 'ordered' '[' expression ']'
            | 'positive_ordered' '[' expression ']'
            | 'simplex' '[' expression ']'
-           | 'row_vector' '[' expression ']'
-           | 'matrix' '[' expression ',' expression ']'
+           | 'row_vector' range_constraint '[' expression ']'
+           | 'matrix' range_constraint '[' expression ',' expression ']'
            | 'corr_matrix' '[' expression ']'
            | 'cov_matrix' '[' expression ']'
+
+range_constraint ::= ?('<' range '>')
 
 range ::= 'lower' '=' expression ',' 'upper' = expression
         | 'lower' '=' expression

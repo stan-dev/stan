@@ -617,12 +617,13 @@ To avoid having to deal with constraints while simulating the
 Hamiltonian dynamics during sampling, every (multivariate) parameter
 in a \Stan model is transformed to an unconstrained variable behind
 the scenes by the model compiler.  The transform is based on the
-constraints, if any, in the parameter's definition.  Constraints that
-may be placed on scalars include upper and/or lower bounds, vectors
-may constrained to be ordered or unit simplexes, and matrices may be
-constrained to be correlation matrices or covariance matrices.  This
-chapter provides a definition of the transforms used for each type of
-variable.
+constraints, if any, in the parameter's definition.  Scalars or the
+scalar values in vectors, row vectors or matrices may be constrained
+with lower and/or upper bounds.  Vectors may alternatively be
+constrained to be ordered, positive ordered, or simplexes.  Matrices
+may be constrained to be correlation matrices or covariance matrices.
+This chapter provides a definition of the transforms used for each
+type of variable.
 
 \Stan converts models to \Cpp classes which define probability
 functions with support on all of $\reals^K$, where $K$ is the number
