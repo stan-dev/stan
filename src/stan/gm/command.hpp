@@ -318,7 +318,7 @@ namespace stan {
 
       std::string init_val;
       // parameter initialization
-      int num_init_tries = 1;
+      int num_init_tries = 1;  // up here for printing below
       if (command.has_key("init")) {
         num_init_tries = -1;
         command.val("init",init_val);
@@ -358,7 +358,7 @@ namespace stan {
               continue;
           break;
         }
-        if (num_init_tries == MAX_INIT_TRIES) {
+        if (num_init_tries > MAX_INIT_TRIES) {
           std::cout << "Initialization failed after " << MAX_INIT_TRIES 
                     << " attempts. "
                     << " Try specifying initial values,"
