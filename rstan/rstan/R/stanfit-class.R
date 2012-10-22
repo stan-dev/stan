@@ -378,7 +378,7 @@ setMethod("extract", signature = "stanfit",
 
 setMethod("summary", signature = "stanfit", 
           function(object, pars, 
-                   probs = c(0.025, 0.25, 0.50, 0.75, 0.975), ...) { 
+                   probs = c(0.025, 0.25, 0.50, 0.75, 0.975), use_cache = TRUE, ...) { 
             # Summarize the samples (that is, compute the mean, SD, quantiles, for 
             # the samples in all chains and chains individually after removing
             # warmup samples, and n_eff and split R hat for all the kept samples.)
@@ -406,18 +406,29 @@ setMethod("summary", signature = "stanfit",
               return(invisible(NULL)) 
             } 
 
-            if (!exists("summary", envir = object@.MISC, inherits = FALSE)) 
+            if (!exists("summary", envir = object@.MISC, inherits = FALSE) && use_cache) 
               assign("summary", summary_sim(object@sim), envir = object@.MISC)
            
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
+
+            if (!use_cache) {
+              # not using the cached (and not create cache, which takes time for too many pars)
+              ss <-  summary_sim(object@sim, pars, probs) 
+              s1 <- cbind(ss$msd[, 1, drop = FALSE], ss$sem, ss$msd[, 2, drop = FALSE], 
+                          ss$quan, ss$ess, ss$rhat)
+              colnames(s1) <- c("mean", "se_mean", "sd", colnames(ss$quan), 'n_eff', 'Rhat')
+              s2 <- combine_msd_quan(ss$c_msd, ss$c_quan) 
+              idx2 <- match(attr(ss, "row_major_idx"), attr(ss, "col_major_idx"))
+              sf <- list(summary = s1[idx2, , drop = FALSE],
+                         c_summary = s2[idx2, , , drop = FALSE])
+              return(invisible(sf)) 
+            } 
             m <- match(probs, default_summary_probs())
             if (any(is.na(m))) { # unordinary quantiles are requested 
               ss <-  summary_sim_quan(object@sim, pars, probs) 
-              row_idx <- attr(ss, "row_major_idx") 
               col_idx <- attr(ss, "col_major_idx") 
-
               ss$ess <- object@.MISC$summary$ess[col_idx, drop = FALSE] 
               ss$rhat <- object@.MISC$summary$rhat[col_idx, drop = FALSE] 
               ss$mean <- object@.MISC$summary$msd[col_idx, 1, drop = FALSE] 
@@ -426,10 +437,8 @@ setMethod("summary", signature = "stanfit",
               s1 <- cbind(ss$mean, ss$sem, ss$sd, 
                           ss$quan, ss$ess, ss$rhat)
               colnames(s1) <- c("mean", "se_mean", "sd", colnames(ss$quan), 'n_eff', 'Rhat')
-
               s2 <- combine_msd_quan(object@.MISC$summary$c_msd[col_idx, , , drop = FALSE], ss$c_quan) 
-
-              idx2 <- match(row_idx, col_idx) 
+              idx2 <- match(attr(ss, "row_major_idx"), col_idx)
               ss <- list(summary = s1[idx2, , drop = FALSE],
                          c_summary = s2[idx2, , , drop = FALSE])
               return(invisible(ss)) 

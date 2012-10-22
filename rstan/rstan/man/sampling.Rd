@@ -56,7 +56,11 @@
   \item{seed}{The seed for random number generation. The default is generated from 1 to 
     the maximum integer supported by \R on the machine. Even if multiple chains
     are used, only one seed is needed, with other chains having seeds  
-    derived from that of the first chain to avoid dependent samples.}
+    derived from that of the first chain to avoid dependent samples.
+    When a seed is specified by a number, \code{as.integer} will be applied to it. 
+    If \code{as.integer} produces \code{NA}, the seed is generated randomly. 
+    We can also specify a seed using a character string of digits, such as
+    \code{"12345"}, which is converted to integer.}
 
   \item{init}{One of digit \code{0}, string \code{"0"} or \code{"random"}, 
     a function that returns a list, or a list of initial parameter values with

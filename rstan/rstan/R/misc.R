@@ -134,9 +134,9 @@ data_preprocess <- function(data) { # , varnames) {
     stop(paste('data with name ', x, " is not allowed in Stan", sep = ''))
   } 
  
-  data <- lapply(data, 
-                 FUN = function(x) {
-
+  data <- lapply(names, 
+                 FUN = function(name) {
+                   x <- data[[name]]
                    ## change data.frame to array 
                    if (is.data.frame(x)) x <- data.matrix(x) 
  
@@ -144,11 +144,14 @@ data_preprocess <- function(data) { # , varnames) {
                    ## since we do not know what variables are needed
                    ## at this point.
                    if (any(is.na(x))) {
-                     stop("Stan does not support NA in the data.\n")
+                     stop("Stan does not support NA (in ", name, ") in data")
                    } 
  
                    # remove those not numeric data 
-                   if (!is.numeric(x)) return(NULL) 
+                   if (!is.numeric(x)) {
+                     warning("data with name ", name, " is not numeric and not used")
+                     return(NULL) 
+                   }
  
                    if (is.integer(x)) return(x) 
          
@@ -158,6 +161,7 @@ data_preprocess <- function(data) { # , varnames) {
                    return(x) 
                  })   
  
+  names(data) <- names
   data[!sapply(data, is.null)] 
 } 
 
@@ -293,7 +297,15 @@ config_argss <- function(chains, iter, warmup, thin,
   if (!inits_specified) stop("wrong specification of initial values")
 
   ## only one seed is needed by virtue of the RNG 
-  seed <- if (!missing(seed)) seed else sample.int(.Machine$integer.max, 1)
+  
+  if (missing(seed)) { 
+    seed <- sample.int(.Machine$integer.max, 1)
+  } else { 
+    if (is.numeric(seed)) seed <- as.integer(seed)
+    if (is.na(seed)) seed <- sample.int(.Machine$integer.max, 1)
+    if (is.character(seed) && grepl("[^0-9]", seed))
+      stop("seed needs to be string of digits")
+  }
 
   dotlist <- list(...)
 

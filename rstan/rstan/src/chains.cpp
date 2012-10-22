@@ -305,7 +305,7 @@ SEXP split_potential_scale_reduction(SEXP sim, SEXP n_) {
 
 RCPP_MODULE(chains) {
   using namespace Rcpp;
-  function( "srhat", &split_potential_scale_reduction, "split r hat"); 
-  function( "ess", &effective_sample_size, "ess"); 
+  function("srhat", &split_potential_scale_reduction, "split r hat"); 
+  function("ess", &effective_sample_size, "ess"); 
 }
 

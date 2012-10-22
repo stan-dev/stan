@@ -64,14 +64,18 @@ test_util <- function() {
               g = array(c(3, 3, 9, 3, 3, 4, 5, 6, 9, 8, 0, 2), dim = c(2, 2, 3)), 
               d = 1:100 + .1) 
   lst <- rstan:::data_preprocess(lst) 
-  lst2 <- lst; 
+  lst2 <- lst  
   lst2$f <- matrix(c(3, NA, NA, NA, 3, 4), ncol = 3) 
+  lst3 <- lst
+  lst3$h <- gl(3, 4)
+  lst4 <- rstan:::data_preprocess(lst3)
 
   checkEquals(dim(lst$g), c(2, 2, 3), "Keep the dimension infomation")
   checkTrue(is.integer(lst$z), "Do as.integer when appropriate") 
   checkTrue(is.double(lst$b), msg = "Not do as.integer when it is not appropriate") 
   checkException(rstan:::data_preprocess(lst2), 
                  msg = "Stop if data have NA") 
+  checkEquals(names(lst4), c("z", "a", "b", "c", "g", "d")) # check if h is removed
 
 } 
 
@@ -202,6 +206,10 @@ test_config_argss <- function() {
   checkEquals(d[[3]]$chain_id, 1) 
   checkEquals(d[[4]]$chain_id, 4) 
   checkException(rstan:::config_argss(3, 100, 10, 3, "random", 10, NA, chain_id = c(3, 3)))
+  b <- rstan:::config_argss(3, 100, 10, 3, 0, "12345", "a.csv", chain_id = 4)
+  checkEquals(b[[1]]$seed, '12345')
+  checkException(rstan:::config_argss(3, 100, 10, 3, 0, "a12345", "a.csv", chain_id = 4))
+  checkException(rstan:::config_argss(3, 100, 10, 3, 0, "1a2345", "a.csv", chain_id = 4))
 } 
  
 .tearDown <- function() {

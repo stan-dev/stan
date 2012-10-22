@@ -52,11 +52,15 @@ stan(file, model_name = "anon_model", model_code = "",
      adaptation, so warmup samples should not be used for inference.
      The default is \code{iter/2}.}
   \item{thin}{A positive integer specifying the period for saving sample; defaults to 1.} 
-  \item{seed}{The seed for random number generation. The default is generated from 1 to 
-    the maximum integer supported by \R on the machine. When multiple chains
-    are used, only one seed is needed, with other chains' seeds being
-    generated from the first chain's seed to prevent dependency among the
-    random number streams for the chains.}
+  \item{seed}{The seed, a positive integer, for random number generation. The
+    default is generated from 1 to the maximum integer supported by \R on the
+    machine. When multiple chains are used, only one seed is needed, with other
+    chains' seeds being generated from the first chain's seed to prevent
+    dependency among the random number streams for the chains. When a seed is 
+    specified by a number, \code{as.integer} will be applied to it. 
+    If \code{as.integer} produces \code{NA}, the seed is generated randomly. 
+    We can also specify a seed using a character string of digits, such as
+    \code{"12345"}, which is converted to integer.}
   \item{init}{One of digit \code{0}, string \code{"0"} or \code{"random"}, 
     a function that returns a list, or a list of initial parameter values with
     which to indicate how the initial values of parameters are specified. 

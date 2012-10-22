@@ -43,6 +43,14 @@ namespace rstan {
     size_t find_index(const std::vector<T>& v, const T& e) {
       return std::distance(v.begin(), std::find(v.begin(), v.end(), e));  
     } 
+
+    unsigned int str2uint(const std::string& str) {
+      unsigned int ui; 
+      std::stringstream sstream(str); 
+      sstream >> ui; 
+      return ui; 
+    } 
+
   } 
   /**
    * Wrap the available arguments for Stan's sampler, say NUTS, from
@@ -198,7 +206,11 @@ namespace rstan {
         random_seed = std::time(0); 
         random_seed_src = "random"; 
       } else {
-        random_seed = Rcpp::as<unsigned int>(in[idx]); 
+        if (TYPEOF(in[idx]) == STRSXP) {
+          random_seed = str2uint(Rcpp::as<std::string>(in[idx])); 
+        } else { 
+          random_seed = Rcpp::as<unsigned int>(in[idx]); 
+        } 
         random_seed_src = "user or from R"; 
       }
 
@@ -254,7 +266,9 @@ namespace rstan {
       lst["max_treedepth"] = max_treedepth;     // 7 
       lst["delta"] = delta;                     // 8 
       lst["gamma"] = gamma;                     // 9 
-      lst["random_seed"] = random_seed;         // 10
+      std::stringstream ss; 
+      ss << random_seed; 
+      lst["random_seed"] = ss.str();            // 10
       lst["chain_id"] = chain_id;               // 11
       lst["equal_step_sizes"] = equal_step_sizes; // 12
       lst["init"] = init;                        // 13

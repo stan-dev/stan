@@ -8,9 +8,10 @@ Wed Oct 20 2012
    * add function sflist2stanfit() to merge a list of stanfit objects into one,
      to facilitate some kind of user-level parallelism. 
    * add S3 method as.matrix, as.array, is.array, dim, dimnames for stanfit objects. 
+   * specify seed using string of digits 
     
 2. Bug fixes 
-   * bug of setting parameter epsilon_pm for NUTS 
+   * bug of setting parameter epsilon_pm wrongly for NUTS 
    * 
 
 Tue Sep 25 2012

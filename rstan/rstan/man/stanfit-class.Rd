@@ -92,7 +92,9 @@
       \code{probs} specifies the quantiles of interest; the default
       are 2.5\%, 25\%, 50\%, 75\%, and 97.5\%. 
       \code{digits_summary} specifies the number of significant digits for
-      printing out the summary. 
+      printing out the summary. See the following method \code{summary} 
+      since arguments such as \code{pars}, \code{probs}, and \code{use_cache}
+      are passed to it to obtain the summaries. 
     } 
     \item{\code{summary}}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the samples: the quantiles 
@@ -109,6 +111,11 @@
       To specify parameters of interest, use parameter \code{pars}. The 
       default for \code{pars} is all the parameters saved in the fitted
       results as well as the log-posterior. 
+      Another argument for \code{summary} is \code{use_cache}, which defaults
+      to \code{TRUE}. When \code{use_cache=TRUE}, the summary quantities for
+      all parameters are computed and cached for future use. 
+      So \code{use_cache=FALSE} can be used to avoid the computing of all
+      parameters if \code{pars} is given as some specific parameters. 
     }
     \item{\code{extract}}{\code{signature(object = "stanfit")}: 
       get the samples for all chains for all (or specified) parameters. 

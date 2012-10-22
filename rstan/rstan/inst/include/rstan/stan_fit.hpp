@@ -30,7 +30,6 @@
 #include <rstan/io/rlist_ref_var_context.hpp> 
 #include <rstan/io/r_ostream.hpp> 
 #include <rstan/stan_args.hpp> 
-// #include <rstan/chains_for_R.hpp>
 // #include <stan/mcmc/chains.hpp>
 #include <Rcpp.h>
 // #include <Rinternals.h>
