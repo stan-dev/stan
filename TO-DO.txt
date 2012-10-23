@@ -19,6 +19,7 @@ Bug Fixes:
  -- catching all exceptions thrown in stanc to prevent core dumps
  -- parser now accepts variable names starting with "int" and "real"
     in first assignment after declaration
+ -- now catching unknown truncation cdfs and vectorizations in stanc
 New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
  -- all univariate continuous densities vectorized
@@ -27,6 +28,12 @@ New Features:
  -- lower and upper bounds for vectors, row vectors, and matrices
 Manual Additions:
  -- example of defining new distribution with parameters
+
+* catch use of truncation with vectorized distribution
+
+* vectorization errors w. truncation
+  -- unvectorize normal_cdf (function_signatures)
+  -- test that X_cdf(...) is well defined
 
 * turn off refresh for flag <= 0
 
@@ -438,6 +445,8 @@ C++ API
 
 Modeling Language
 ======================================================================
+
+* for truncated distributions, return -inf if not in range!
 
 * get line numbers into error messages
 
