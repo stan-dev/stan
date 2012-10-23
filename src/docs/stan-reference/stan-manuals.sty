@@ -59,8 +59,9 @@
 \fxuselayouts{pdfcmargin}
 \fxusetargetlayout{changebar}
 \newcommand{\A}{\textcolor{green}}
-\newcommand{\FXA}{\fxnote{Addition to section \thesection}}
-\newcommand{\FXC}{\fxnote{Change to section \thesection}}
+\newcounter{FXNOTE}[page]
+\newcommand{\FXA}[1][\value{FXNOTE}]{\ifnum#1=0 \fxnote{Addition to section \thesection} \fi}
+\newcommand{\FXC}[1][\value{FXNOTE}]{\ifnum#1=0 \fxnote{Change to section \thesection} \fi}
 
 \newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
