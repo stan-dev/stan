@@ -1,18 +1,18 @@
 
-Wed Oct 20 2012
+Wed Oct 24 2012
 1. New features 
    * return empty stanfit object upon error such as incorrect data
      input, wrong argument specification, etc. Previously, it will 
-     stop. So another mode is added for stanfit object.  
+     stop. The empty stanfit includes the compiled model, so it can
+     be reused.
    * add function stan_demo() to run examples included in Stan. 
    * add function sflist2stanfit() to merge a list of stanfit objects into one,
      to facilitate some kind of user-level parallelism. 
    * add S3 method as.matrix, as.array, is.array, dim, dimnames for stanfit objects. 
-   * specify seed using string of digits 
+   * specify seed using string of digits in addition to numbers  
     
 2. Bug fixes 
    * bug of setting parameter epsilon_pm wrongly for NUTS 
-   * 
 
 Tue Sep 25 2012
 1. Changes 
