@@ -158,6 +158,13 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef bool type; };
 
+      bool is_double_return(const std::string& function_name,
+                            const std::vector<expr_type>& arg_types,
+                            std::ostream& error_msgs) const {
+        return function_signatures::instance()
+          .get_result_type(function_name,arg_types,error_msgs)
+          .is_primitive_double();
+      }
       bool operator()(const sample& s,
                       std::ostream& error_msgs) const {
         std::vector<expr_type> arg_types;
@@ -166,12 +173,47 @@ namespace stan {
           arg_types.push_back(s.dist_.args_[i].expression_type());
         std::string function_name(s.dist_.family_);
         function_name += "_log";
-        expr_type result_type 
-          = function_signatures::instance()
-          .get_result_type(function_name,arg_types,error_msgs);
-        if (!result_type.is_primitive_double()) {
+        // expr_type result_type 
+        // = function_signatures::instance()
+        // .get_result_type(function_name,arg_types,error_msgs);
+        // if (!result_type.is_primitive_double()) {
+        if (!is_double_return(function_name,arg_types,error_msgs)) {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
+        }
+        if (s.truncation_.has_low()) {
+          std::vector<expr_type> arg_types_trunc(arg_types);
+          arg_types_trunc[0] = s.truncation_.low_.expression_type(); 
+          std::string function_name_cdf(s.dist_.family_);
+          function_name_cdf += "_cdf";
+          if (!is_double_return(function_name_cdf,arg_types_trunc,error_msgs)) {
+            error_msgs << "lower truncation not defined for specified arguments to "
+                       << s.dist_.family_ << std::endl;
+            return false;
+          }
+          if (!is_double_return(function_name_cdf,arg_types,error_msgs)) {
+            error_msgs << "lower bound in truncation type does not match"
+                       << " sampled variate in distribution's type"
+                       << std::endl;
+            return false;
+          }
+        }
+        if (s.truncation_.has_high()) {
+          std::vector<expr_type> arg_types_trunc(arg_types);
+          arg_types_trunc[0] = s.truncation_.high_.expression_type();
+          std::string function_name_cdf(s.dist_.family_);
+          function_name_cdf += "_cdf";
+          if (!is_double_return(function_name_cdf,arg_types_trunc,error_msgs)) {
+            error_msgs << "upper truncation not defined for specified arguments to "
+                       << s.dist_.family_ << std::endl;
+            return false;
+          }
+          if (!is_double_return(function_name_cdf,arg_types,error_msgs)) {
+            error_msgs << "upper bound in truncation type does not match"
+                       << " sampled variate in distribution's type" 
+                       << std::endl;
+            return false;
+          }
         }
         return true;
 

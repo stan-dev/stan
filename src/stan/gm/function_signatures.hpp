@@ -229,12 +229,7 @@ add_binary("multiply_log");
 add("neg_binomial_log",DOUBLE_T, INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
-for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j)
-    for (size_t k = 0; k < vector_types.size(); ++k)
-      add("normal_cdf",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
+add_ternary("normal_cdf");  // not vectorizing yet!
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
@@ -287,9 +282,9 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       for (size_t l = 0; l < vector_types.size(); ++l)
-	add("student_t_log",
-	    DOUBLE_T, // result
-	    vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+        add("student_t_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
 add("subtract",VECTOR_T,VECTOR_T,VECTOR_T);
 add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("subtract",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -315,9 +310,9 @@ add_unary("trunc");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
-	add("uniform_log",
-	    DOUBLE_T, // result
-	    vector_types[i], vector_types[j], vector_types[k]); // args
+        add("uniform_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k]); // args
 add("variance",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("variance",DOUBLE_T,VECTOR_T);
 add("variance",DOUBLE_T,ROW_VECTOR_T);
@@ -325,9 +320,9 @@ add("variance",DOUBLE_T,MATRIX_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
-	add("weibull_log",
-	    DOUBLE_T, // result
-	    vector_types[i], vector_types[j], vector_types[k]); // args
+        add("weibull_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k]); // args
 add_ternary("weibull_cdf");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
