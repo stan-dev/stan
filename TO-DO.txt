@@ -14,44 +14,60 @@ The to-do list is organized into the following sections:
 
 v 1.0.3 Release Notes
 ======================================================================
-Bug Fixes:
+Stan Bug Fixes:
  -- error output in stanc now directed to standard error
  -- catching all exceptions thrown in stanc to prevent core dumps
  -- parser now accepts variable names starting with "int" and "real"
     in first assignment after declaration
  -- now catching unknown truncation cdfs and vectorizations in stanc
-New Features:
+ -- (hopefully) less scary message for domain error rejects
+ -- removed use of assert(); replaced with exceptions where
+    appropriate
+ -- fixed boundary condition on reporting max init retry failures
+ -- fixed initialization errors in tests that failed on some platforms
+ -- improved error checking for matrix size args to prevent segfaults
+Stan New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
  -- all univariate continuous densities vectorized
  -- better error checking for transforms 
  -- new error return type in stanc for invalid arguments
  -- lower and upper bounds for vectors, row vectors, and matrices
-Manual Additions:
+ -- command parameter refresh <= 0 turns off iteration reporting
+ -- int divisions produce warnings in stanc
+ -- errors caused by invalid transformed parameters include var name
+ -- various efficiency improvements and error handling for boundary
+    conditions and special cases of probability functions
+ -- simplified matrix code with heavier use of templating
+Stan Manual Additions:
  -- example of defining new distribution with parameters
-
-* catch use of truncation with vectorized distribution
-
-* vectorization errors w. truncation
-  -- unvectorize normal_cdf (function_signatures)
-  -- test that X_cdf(...) is well defined
-
-* turn off refresh for flag <= 0
-
-* warning message for int division
-
-* check that positive definiteness enforced for transformed params,
-  transformed data
-
-* make sure init is legal (not NaN, etc.), or give a warning
-
-* remove assert() calls that are not for programmer error
-  -- tests to into actual tests
-  -- runtime errors to exceptions
-  -- programmer safety check to nothing (or leave and ensure -NDEBUG)
+ -- diff report vs. previous versions
+ -- updated for range constraints on vector, row vector, matrix
+ -- updated Eigen licensing information (now MPL, was LGPL)
+ -- fixed alpha ordering issue in function index due to bolding
+RStan Bug Fixes:
+ -- bug of setting parameter epsilon_pm wrongly for NUTS 
+ -- fixed seed reset so results match Stan
+RStan New Features:
+ -- return empty stanfit object upon error such as incorrect data
+    input, wrong argument specification, etc. Previously, it will
+    stop. The empty stanfit includes the compiled model, so it can be
+    reused.
+ -- add function stan_demo() to run examples included in Stan. 
+ -- add function sflist2stanfit() to merge a list of stanfit objects 
+    into one, to facilitate user-level parallelism. 
+ -- add S3 method as.matrix, as.array, is.array, dim, 
+    dimnames for stanfit objects. 
+    specify seed using string of digits in addition to numbers  
+ -- turn off refresh if value <= 0
+ -- sped up extract method
+    
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* check that positive definiteness enforced for transformed params,
+  transformed data
 
 * Ben's example: 
   matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
@@ -87,7 +103,6 @@ C++ API
     univariate/discrete
     + bernoulli
     + bernoulli_logit
-     
 
 * remove (unsigned) long long instances in dump and error testing
 
@@ -107,6 +122,11 @@ C++ API
      ++ perhaps with chain1(), chain2(), and chain3(), with
         chain1() being the existing rule
 
+* forward mode auto-dif
+  - last revision 548: 
+  - src/stan/agrad/ad.hpp
+  - use for reasonably efficient Hessian calcs
+
 * use expression template for value of += so that we could
     -- sum_expression& operator+=(sum_expression&, const var&);
     -- sum_expression(const var&);
@@ -115,10 +135,6 @@ C++ API
   would require running lp__, etc. to be sum_expression to be useful
   without picking up signature
     -- var& operator+=(var&, const var&);
-
-* add extra tests to all matrix functions expecting square matrices
-  to verify we get square matrices (e.g, lkj_cov,...)
-  -- add error messages to check_size_match
 
 * templated functions returning var should go away in matrix
 
@@ -243,8 +259,6 @@ C++ API
 
 
 * matrix special products
-  -- lower triangular times self-transposed
-  -- vector dot-self(x) = dot_product(x,x)
   -- wrap_multiply(u,v) = u' * v * u
      ++ for square matrices,
         d/dx det(x' * A * x) = 2 det(x' * A * x) inv(x)'
@@ -398,11 +412,6 @@ C++ API
   set eigenvalues + eigenvectors (or singular vals + vecs)
   in one call
 
-* forward mode auto-dif
-  - last revision 548: 
-  - src/stan/agrad/ad.hpp
-  - use for reasonably efficient Hessian calcs
-
 * optimization API
   - functor-based concept design with templates 
   - easily pluggable with log prob in model for MAP 
@@ -445,8 +454,6 @@ C++ API
 
 Modeling Language
 ======================================================================
-
-* for truncated distributions, return -inf if not in range!
 
 * get line numbers into error messages
 

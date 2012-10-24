@@ -83,8 +83,8 @@ namespace stan {
                         "Period between saved samples after warm up",
                         "default = max(1, floor(iter - warmup) / 1000)");
 
-      print_help_option("refresh","+int",
-                        "Period between samples updating progress report print",
+      print_help_option("refresh","int",
+                        "Period between samples updating progress report print (0 for no printing)",
                         "default = max(1,iter/200))");
 
       print_help_option("leapfrog_steps","int",
@@ -125,8 +125,9 @@ namespace stan {
     }
 
     bool do_print(int n, int refresh) {
-      return n == 0
-        || ((n + 1) % refresh == 0);
+      return (refresh > 0)
+        && (n == 0
+            || ((n + 1) % refresh == 0) );
     }
 
     template <class Sampler, class Model>
@@ -269,7 +270,7 @@ namespace stan {
       command.val("gamma", gamma);
 
       int refresh = num_iterations / 200;
-      refresh = refresh <= 0 ? 1 : refresh;
+      refresh = refresh <= 0 ? 1 : refresh; // just for default
       command.val("refresh",refresh);
 
       unsigned int random_seed = 0;

@@ -86,6 +86,11 @@ namespace stan {
                                        prog_grammar,
                                        whitesp_grammar,
                                        result);
+        std::string diagnostics = prog_grammar.error_msgs_.str();
+        if (diagnostics.size() > 0) {
+          std::cerr << "DIAGNOSTIC(S) FROM PARSER:" << std::endl;
+          std::cerr << diagnostics << std::endl;
+        }
       } catch (const expectation_failure<pos_iterator_type>& e) {
         const file_position_base<std::string>& pos = e.first.get_position();
         std::stringstream msg;
@@ -99,10 +104,6 @@ namespace stan {
           msg << ' ';
         msg << " ^-- here" 
             << std::endl << std::endl;
-
-        msg << "DIAGNOSTIC(S) FROM PARSER:" << std::endl;
-        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
-        throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;

@@ -8,7 +8,7 @@ This chapter describes \Stan's built-in function that take various
 types of arguments and return results of type integer.
 
 
-\section{Integer-Valued Arithmetic Operators}
+\section{Integer-Valued Arithmetic Operators}\label{int-arithmetic.section}
 
 \Stan's arithmetic is based on standard double-precision \Cpp integer and
 floating-point arithmetic.  If the arguments to an arithmetic operator
@@ -28,19 +28,26 @@ make sure it does not occur.
 
 Secondly, because the set of integers is not closed under division and
 there is no special infinite value for integers, integer division
-behaves differently.  For integer division by values other than zero,
-the result is rounded toward 0.  For instance, positive results are
-rounded down, as in \code{1~/~2~=~0} and \code{5~/~3~=~1}, whereas
-negative results are rounded up, as in \code{(-1)~/~2~=~0} and
-\code{(-5)~/~3~=~-1}.
+implicitly rounds the result.  If both arguments are positive, the
+result is rounded down.  For example, \code{1~/~2} evaluates to 0 and
+\code{5~/~3} evaluates to 1.  
+
+If one of the integer arguments to division is negative, the latest
+\Cpp specification (\Cpp{11}), requires rounding toward zero.  This
+would have \code{-1~/~2} evaluate to 0 and \code{-7~/~2} evaluate to
+3.  Before the \Cpp{11} specification, the behavior was platform
+dependent, allowing rounding up or down.  All compilers recent enough
+to be able to deal with Stan's templating should follow the \Cpp{11}
+specification, but it may be worth testing if you are not sure and
+plan to use integer division with negative values.
 
 Unlike floating point division, where \code{1.0~/~0.0} produces the
 special positive infinite value, integer division by zero, as in
-\code{1~/~0}, has undefined behavior in the \Cpp standard.  For example,
-the \clang compiler on Mac OS X returns 3764, whereas the \gpp
-compiler throws a floating-point exception and aborts the program with
-a warning.  As with overflow, it is up to the user to make sure
-integer divide-by-zero does not occur.
+\code{1~/~0}, has undefined behavior in the \Cpp standard.  For
+example, the \clang compiler on Mac OS X returns 3764, whereas the
+\gpp compiler throws an exception and aborts the program with a
+warning.  As with overflow, it is up to the user to make sure integer
+divide-by-zero does not occur.
 
 \subsection{Binary Infix Operators}
 
