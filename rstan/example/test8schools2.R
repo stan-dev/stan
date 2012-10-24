@@ -27,10 +27,16 @@ plot(ss)
 ss2 <- stan(fit = ss, data = dat, iter = 2000) 
 print(ss2, probs = c(0.38))
 print(ss2, probs = c(0.48))
+print(ss2, probs = c(0.48), use_cache = FALSE)
 
 ss3 <- stan(fit = ss, data = dat, save_dso = FALSE) # save_dso taks no effect 
 yss <- stan(sfile, data = dat, iter = iter, chains = 4, sample_file = '8schools.csv', save_dso = FALSE)
 save.image()
+
+print(ss, use_cache = FALSE)
+ls(ss@.MISC)
+print(ss)
+ls(ss@.MISC)
 
 ss4 <- stan(fit = ss, data = dat, init = 0) 
 
@@ -67,5 +73,12 @@ print(get_seed(ss8))
 get_stancode(ss8, print = TRUE) 
 sm8 <- get_stanmodel(ss8)
 extract(ss8) 
+
+# 
+ss9 <- stan(fit = ss, data = dat,  seed = -1, chains = 1)
+# seed is too big, so in config_argss, it will be turned to NA
+ss10 <- stan(fit = ss, data = dat, seed = 4294967295, chains = 1, iter = 5)
+get_seed(ss10) 
+ss11 <- stan(fit = ss, data = dat, seed = "4294967295", chains = 1, iter = 5)
 
 

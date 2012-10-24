@@ -505,20 +505,20 @@ setMethod("traceplot", signature = "stanfit",
                                        pars) 
             tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
             tidx <- unlist(tidx, use.names = FALSE)
-            par_mfrow_old <- par('mfrow')
+            mfrow_old <- par('mfrow')
+            on.exit(par(mfrow = mfrow_old))
             num_plots <- length(tidx) 
             if (num_plots %in% 2:nrow) par(mfrow = c(num_plots, 1)) 
             if (num_plots > nrow) par(mfrow = c(nrow, ncol)) 
             par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
                           inc_warmup = inc_warmup)
-            if (num_plots > nrow*ncol && ask) ask.old <- devAskNewPage(ask = TRUE)
+            if (num_plots > nrow * ncol && ask) ask_old <- devAskNewPage(ask = TRUE)
+            on.exit({if (ask) devAskNewPage(ask = ask_old)})
             if (num_plots > 1) { 
               for (n in 2:num_plots)
                 par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
                               inc_warmup = inc_warmup)
             }
-            if (ask) devAskNewPage(ask = ask.old)
-            par(mfrow = par_mfrow_old)
             invisible(NULL) 
           })  
 

@@ -159,6 +159,14 @@ TEST(gm_parser,parsable_test_bad11) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad11.stan"),
                std::invalid_argument);
 }
+TEST(gm_parser,parsable_test_bad_trunc) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc1.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc2.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc3.stan"),
+               std::invalid_argument);
+}
 TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures1.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures2.stan"));
