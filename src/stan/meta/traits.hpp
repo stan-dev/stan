@@ -147,8 +147,6 @@ namespace stan {
   size_t max_size(const T1& x1, const T2& x2) {
     size_t result = length(x1);
     result = result > length(x2) ? result : length(x2);
-    // assert((length(x1) == 1) || (length(x1) == result));
-    // assert((length(x2) == 1) || (length(x2) == result));
     return result;
   }
 
@@ -157,9 +155,6 @@ namespace stan {
     size_t result = length(x1);
     result = result > length(x2) ? result : length(x2);
     result = result > length(x3) ? result : length(x3);
-    // assert((length(x1) == 1) || (length(x1) == result));
-    // assert((length(x2) == 1) || (length(x2) == result));
-    // assert((length(x3) == 1) || (length(x3) == result));
     return result;
   }
 
@@ -169,16 +164,12 @@ namespace stan {
     result = result > length(x2) ? result : length(x2);
     result = result > length(x3) ? result : length(x3);
     result = result > length(x4) ? result : length(x4);
-    // assert((length(x1) == 1) || (length(x1) == result));
-    // assert((length(x2) == 1) || (length(x2) == result));
-    // assert((length(x3) == 1) || (length(x3) == result));
-    // assert((length(x4) == 1) || (length(x4) == result));
     return result;
   }
 
   
   template<typename T, 
-	   bool is_vec = stan::is_vector<T>::value>
+           bool is_vec = stan::is_vector<T>::value>
   class VectorView {
   private:
     T* x_;
