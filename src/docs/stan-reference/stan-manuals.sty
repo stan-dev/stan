@@ -25,6 +25,7 @@
 \usepackage{graphicx}
 \usepackage{natbib}
 \usepackage{url}
+\usepackage{changebar}
 
 \usepackage[titles]{tocloft}
 \setlength{\cftbeforechapskip}{0.5ex}
@@ -58,7 +59,7 @@
 \usepackage[final,author=]{fixme}
 \fxuselayouts{pdfcmargin}
 \fxusetargetlayout{changebar}
-\newcommand{\A}{\textcolor{green}}
+\newcommand{\A}[1]{\cbstart#1\cbend}
 \newcounter{FXNOTE}[page]
 \newcommand{\FXA}[1][\value{FXNOTE}]{\ifnum#1=0 \fxnote{Addition to section \thesection} \stepcounter{FXNOTE} \fi}
 \newcommand{\FXC}[1][\value{FXNOTE}]{\ifnum#1=0 \fxnote{Change to section \thesection} \stepcounter{FXNOTE} \fi}
