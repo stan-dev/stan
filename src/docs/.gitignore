@@ -4,4 +4,7 @@
 *.log
 *.toc
 *.out
+*.cb
+*.cb2
+*.upa
 stan-reference/stan-reference.pdf
