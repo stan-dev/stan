@@ -37,7 +37,7 @@ for TEX_FILE in $TEX_FILES; do
 		UNIQUE_LINES=`grep  -F -w "${line}" ${TEX_FILE} | wc -l`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
 #			replace -s "${line}" "\A{$line} \FXA " -- $TEX_FILE
-			sed -i "s@^${line}@ \\\\A{ ${line}} \\\\FXA \\\\ @" $TEX_FILE
+			sed -i "s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
 		else
 			echo "In ${TEX_FILE}, no unique match for:" "${line}"
 		fi
@@ -68,7 +68,7 @@ for TEX_FILE in $TEX_FILES; do
                 UNIQUE_LINES=`grep -F -w "${line}" ${TEX_FILE} | wc -l`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
 #                        replace -s "${line}" "\A{$line} \FXC " -- $TEX_FILE
-			sed -i "s@^${line}@ \\\\A{ ${line}} \\\\FXC \\\\ @" $TEX_FILE
+			sed -i "s@^${line}@\\\\A{${line}} \\\\FXC \\\\ @" $TEX_FILE
                 else
                         echo "In ${TEX_FILE}, no unique match for:" "${line}"
                 fi
