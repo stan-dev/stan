@@ -144,7 +144,7 @@ namespace stan {
           _x = *params_r;
         }
         if (params_i) {
-          if (params_i->size() != model.num_params_i());
+          if (params_i->size() != model.num_params_i())
             throw std::invalid_argument("hmc_base ctor:  int params must match in size"); 
           _z = *params_i;
         }
