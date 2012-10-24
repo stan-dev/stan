@@ -62,8 +62,8 @@
 \fxusetargetlayout{changebar}
 \newcommand{\A}[1]{\cbstart#1\cbend}
 \newcounter{FXNOTE}[page]
-\newcommand{\FXA}[1][\value{FXNOTE}]{\ifnum#1=0 \fxnote{Addition to section \thesection} \stepcounter{FXNOTE} \fi}
-\newcommand{\FXC}[1][\value{FXNOTE}]{\ifnum#1=0 \fxnote{Change to section \thesection} \stepcounter{FXNOTE} \fi}
+\newcommand{\FXA}[1][\value{FXNOTE}]{\ifnum#1=0\fxnote{Addition to section \thesection}\stepcounter{FXNOTE}\fi}
+\newcommand{\FXC}[1][\value{FXNOTE}]{\ifnum#1=0\fxnote{Change to section \thesection}\stepcounter{FXNOTE}\fi}
 \renewcommand\englishlistfixmename{List of changes}
 
 \newcommand{\Stan}{Stan\xspace}
