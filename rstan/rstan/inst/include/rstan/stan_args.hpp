@@ -9,6 +9,7 @@
 
 #include <rstan/io/r_ostream.hpp> 
 #include <stan/version.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace rstan {
 
@@ -42,13 +43,6 @@ namespace rstan {
     template <class T>
     size_t find_index(const std::vector<T>& v, const T& e) {
       return std::distance(v.begin(), std::find(v.begin(), v.end(), e));  
-    } 
-
-    unsigned int str2uint(const std::string& str) {
-      unsigned int ui; 
-      std::stringstream sstream(str); 
-      sstream >> ui; 
-      return ui; 
     } 
 
   } 
@@ -207,7 +201,7 @@ namespace rstan {
         random_seed_src = "random"; 
       } else {
         if (TYPEOF(in[idx]) == STRSXP) {
-          random_seed = str2uint(Rcpp::as<std::string>(in[idx])); 
+          random_seed = boost::lexical_cast<unsigned int>(Rcpp::as<std::string>(in[idx])); 
         } else { 
           random_seed = Rcpp::as<unsigned int>(in[idx]); 
         } 
@@ -263,6 +257,7 @@ namespace rstan {
       lst["iter_save"] = iter_save; 
       lst["leapfrog_steps"] = leapfrog_steps;   // 5 
       lst["epsilon"] = epsilon;                 // 6 
+      lst["epsilon_pm"] = epsilon_pm;
       lst["max_treedepth"] = max_treedepth;     // 7 
       lst["delta"] = delta;                     // 8 
       lst["gamma"] = gamma;                     // 9 
