@@ -74,7 +74,22 @@ fit <- stan(model_code = stanmodelcode, model_name = "example",
             data = dat, iter = 2012, chains = 3, sample_file = 'norm.csv',
             verbose = TRUE) 
 print(fit)
+
+# extract samples 
+e <- extract(fit, permuted = TRUE) # return a list of arrays 
+mu <- e$mu 
+
+m <- extract(fit, permuted = FALSE, inc_warmup = FALSE) # return an array 
+print(dimnames(m))
+
+# using as.array directly on stanfit objects 
+m2 <- as.array(fit)
+
 }}  
+
+\seealso{
+  \code{\link{stan}}, \code{\linkS4class{stanfit}} 
+} 
 \keyword{rstan} 
 \keyword{package} 
 
