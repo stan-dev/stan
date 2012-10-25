@@ -26,6 +26,8 @@ Stan Bug Fixes:
  -- fixed boundary condition on reporting max init retry failures
  -- fixed initialization errors in tests that failed on some platforms
  -- improved error checking for matrix size args to prevent segfaults
+ -- fixed boundary condition on bounded transform to allow
+    beta(0.8,0.8) samples near 0 or 1
 Stan New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
  -- all univariate continuous densities vectorized
@@ -65,13 +67,10 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* remove (unsigned) long long instances in dump and error testing
+
 * check that positive definiteness enforced for transformed params,
   transformed data
-
-* Ben's example: 
-  matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
-  this could recycle the first arg, a matrix shaped like a vector
-  and the second arg, a matrix shaped like a roo vector.
 
 * replace Eigen .sum() with stan::math::sum() for auto-dif
 
@@ -103,7 +102,10 @@ C++ API
     + bernoulli
     + bernoulli_logit
 
-* remove (unsigned) long long instances in dump and error testing
+* Ben's example: 
+  matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
+  this could recycle the first arg, a matrix shaped like a vector
+  and the second arg, a matrix shaped like a roo vector.
 
 * bring isinf in line with revised Boost
 
