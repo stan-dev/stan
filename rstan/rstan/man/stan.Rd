@@ -218,11 +218,14 @@ stan(file, model_name = "anon_model", model_code = "",
 }
 \seealso{
   \code{\link{stanc}} for translating model code in Stan modeling language to C++, 
-  \code{\link{sampling}} for sampling, and \code{\linkS4class{stanfit}} for the fitted results.
+  \code{\link{sampling}} for sampling, and \code{\linkS4class{stanfit}} for the
+  fitted results.
 
-  see \code{\link{set_cppo}} for setting higher optimization level for compiling the C++ 
-  code.
-  
+  see \code{\link{extract}} and \code{\link{as.array.stanfit}} for extracting
+  samples from \code{stanfit} objects.
+
+  see \code{\link{set_cppo}} for setting higher optimization level for
+  compiling the C++ code.
 }
 \examples{\dontrun{
 library(rstan)
@@ -238,5 +241,11 @@ model {
 fit1 <- stan(model_code = scode, iter = 10, verbose = FALSE) 
 print(fit1)
 fit2 <- stan(fit = fit1, iter = 10000, verbose = FALSE) 
+
+## extract samples as a list of arrays
+e2 <- extract(fit2, permuted = TRUE)
+
+## using as.array on the stanfit object to get samples 
+a2 <- as.array(fit2)
 }} 
 \keyword{rstan} 

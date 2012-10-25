@@ -23,7 +23,7 @@
 \arguments{
   \item{x}{An object of S4 class \code{stanfit}} 
   \item{\dots}{Additional parameters that can be passed to \code{extract} 
-    for extracting samples from \code{stanfit} object. Now only \code{pars}
+    for extracting samples from \code{stanfit} object. Now \code{pars}
     is the only additional parameter.  
   } 
 } 
