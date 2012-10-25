@@ -18,7 +18,7 @@
 bool is_parsable(const std::string& file_name) {
   stan::gm::program prog;
   std::ifstream fs(file_name.c_str());
-  bool parsable = stan::gm::parse(fs, file_name, prog);
+  bool parsable = stan::gm::parse(0, fs, file_name, prog);
   return parsable;
 }
 
