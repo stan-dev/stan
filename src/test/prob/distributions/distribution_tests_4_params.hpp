@@ -4,8 +4,10 @@
 
 TYPED_TEST_P(DistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
+  ASSERT_EQ(4U, parameters.size());
   double param1, param2, param3, param4;
-  double logprob;
+  double logprob = 0.0;
+  (void) logprob; // supress warning
   param1 = parameters[0];
   param2 = parameters[1];
   param3 = parameters[2];

@@ -5,7 +5,8 @@ TYPED_TEST_P(DistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
   int param1;
   double param2;
-  double logprob;
+  double logprob = 0.0;
+  (void) logprob; // supress warning
   param1 = parameters[0];
   param2 = parameters[1];
   
