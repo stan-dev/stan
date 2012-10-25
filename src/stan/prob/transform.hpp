@@ -663,7 +663,7 @@ namespace stan {
         // Prevent x from reaching zero unless it really really should.
         if ((x > -std::numeric_limits<double>::infinity()) 
             && (inv_logit_x== 0))
-            inv_logit_x = 1e-100;
+            inv_logit_x = 1e-15;
       }
       return lb + (ub - lb) * inv_logit_x;
     }
@@ -726,7 +726,7 @@ namespace stan {
         // Prevent x from reaching zero unless it really really should.
         if ((x > -std::numeric_limits<double>::infinity()) 
             && (inv_logit_x== 0))
-            inv_logit_x = 1e-100;
+            inv_logit_x = 1e-15;
       }
       return lb + (ub - lb) * inv_logit_x;
     }
