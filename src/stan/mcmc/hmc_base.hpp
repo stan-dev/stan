@@ -80,10 +80,10 @@ namespace stan {
                                ? 2.0 * this->_epsilon 
                                : 0.5 * this->_epsilon );
 
-	  if (this->_epsilon > 1e300)
-	    throw std::runtime_error("Posterior is improper. Please check your model.");
-	  if (this->_epsilon == 0)
-	    throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
+          if (this->_epsilon > 1e300)
+            throw std::runtime_error("Posterior is improper. Please check your model.");
+          if (this->_epsilon == 0)
+            throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
         }
       }
 
@@ -139,11 +139,13 @@ namespace stan {
       {
         model.init(_x,_z);
         if (params_r) {
-          assert(params_r->size() == model.num_params_r());
+          if (params_r->size() != model.num_params_r())
+            throw std::invalid_argument("hmc_base ctor:  double params must match in size"); 
           _x = *params_r;
         }
         if (params_i) {
-          assert(params_i->size() == model.num_params_i());
+          if (params_i->size() != model.num_params_i())
+            throw std::invalid_argument("hmc_base ctor:  int params must match in size"); 
           _z = *params_i;
         }
         _logp = model.grad_log_prob(_x,_z,_g);
@@ -165,8 +167,10 @@ namespace stan {
        */
       virtual void set_params(const std::vector<double>& x,
                               const std::vector<int>& z) {
-        assert(x.size() == this->_x.size());
-        assert(z.size() == this->_z.size());
+        if (x.size() != this->_x.size())
+          throw std::invalid_argument("hmc_base::set_params double params must match in size");
+        if (z.size() != this->_z.size())
+          throw std::invalid_argument("hmc_base::set_params int params must match in size");
         this->_x = x;
         this->_z = z;
         this->_logp = this->_model.grad_log_prob(this->_x,this->_z,this->_g);

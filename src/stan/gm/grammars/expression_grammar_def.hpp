@@ -152,6 +152,8 @@ namespace stan {
     };
     boost::phoenix::function<multiplication_expr> multiplication;
 
+    void generate_expression(const expression& e, std::ostream& o);
+
     struct division_expr {
       template <typename T1, typename T2, typename T3>
       struct result { typedef expression type; };
@@ -159,6 +161,20 @@ namespace stan {
       expression operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
+        if (expr1.expression_type().is_primitive_int() 
+            && expr2.expression_type().is_primitive_int()) {
+          // getting here, but not printing?  only print error if problems?
+          error_msgs << "Warning: integer division implicitly rounds to integer."
+                     << " Found int division: ";
+          // generate_expression(expr1.expr_,error_msgs);
+          // error_msgs << " / ";
+          // generate_expression(expr2.expr_,error_msgs);
+          error_msgs << std::endl
+                     << " Positive values rounded down, negative values rounded up or down"
+                     << " in platform-dependent way."
+                     << std::endl;
+        }
+            
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
           return expr1 /= expr2;

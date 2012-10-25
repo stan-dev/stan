@@ -150,8 +150,10 @@ namespace stan {
        */
       virtual void set_params(const std::vector<double>& x,
                               const std::vector<int>& z) {
-        assert(x.size() == _x.size());
-        assert(z.size() == _z.size());
+        if (x.size() != _x.size())
+          throw std::invalid_argument("adaptive_cdhmc::set_params:  double params must match in size"); 
+        if (z.size() != _z.size())
+          throw std::invalid_argument("adaptive_cdhmc::set_params: int params must match in size"); 
         _x = x;
         _z = z;
         _logp = _model.grad_log_prob(_x,_z,_g);
@@ -188,7 +190,7 @@ namespace stan {
        */
       void set_params_i(const std::vector<int>& z) {
         if (z.size() != _model.num_params_i())
-          throw std::invalid_argument ("z.size() must match the number of parameters of the model.");
+          throw std::invalid_argument("z.size() must match the number of parameters of the model.");
         _z = z;
         _logp = _model.grad_log_prob(_x,_z,_g);
       }
