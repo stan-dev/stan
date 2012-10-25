@@ -1,18 +1,18 @@
 STAN RELEASE NOTES
 ======================================================================
 
-HOW TO (developer notes on how to release)
+HOW TO (developer notes on how to release, last column is ordering)
 ----------------------------------------------------------------------
- 1.  Stan C++ M.m.p frozen        (stan/src)
+ 1.  Stan C++ M.m.p frozen        (stan/src)                     
  2.  Stan manual M.m.p frozen     (stan/docs/stan-reference/)
- 3.  RStan M.m.p frozen           (stan/rstan)
+ 3.  RStan M.m.p frozen           (stan/rstan)                   > 1
  4.  Stan web pages M.m.p frozen  (stan/web)
- 5.  tag release vM.m.p in git
- 6.  Build Stan tarball and upload to Google Code->Download
- 7.  Build manual pdf & upload to Google Code->Download
- 8.  Build Rstan & upload to Google Code->Download, Google URL
- 9.  Upload web pages to mc-stan.org
-10.  Announce
+ 5.  tag release vM.m.p in git                                   > 1--4
+ 6.  Build Stan tarball and upload to Google Code->Download      > 5
+ 7.  Build manual pdf & upload to Google Code->Download          > 5
+ 8.  Build Rstan & upload to Google Code->Download, Google URL   > 5
+ 9.  Upload web pages to mc-stan.org                             > 1--8
+10.  Announce                                                    > 9
 
 
 v1.0.0
