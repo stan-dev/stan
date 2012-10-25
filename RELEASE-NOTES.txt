@@ -1,16 +1,30 @@
 STAN RELEASE NOTES
 ======================================================================
 
+HOW TO (developer notes on how to release)
+----------------------------------------------------------------------
+ 1.  Stan C++ M.m.p frozen        (stan/src)
+ 2.  Stan manual M.m.p frozen     (stan/docs/stan-reference/)
+ 3.  RStan M.m.p frozen           (stan/rstan)
+ 4.  Stan web pages M.m.p frozen  (stan/web)
+ 5.  tag release vM.m.p in git
+ 6.  Build Stan tarball and upload to Google Code->Download
+ 7.  Build manual pdf & upload to Google Code->Download
+ 8.  Build Rstan & upload to Google Code->Download, Google URL
+ 9.  Upload web pages to mc-stan.org
+10.  Announce
+
+
 v1.0.0
 ----------------------------------------------------------------------
-First release!
+First release.
 
 v1.0.1
 ----------------------------------------------------------------------
+Patch release.
 
 
-
-V 1.0.2 Release Notes
+V 1.0.2 Release Notes (28 Sep 2012)
 ----------------------------------------------------------------------
 Bug Fixes:
   -- check ranges for LHS of assignment to prevent seg faults
@@ -22,16 +36,64 @@ Bug Fixes:
   -- fixed void return type in auto_covariance
   -- patch truncation to return -inf for variates out of range
   -- upgraded BUGS ring model to use constraints plus tan2()
-
 New Features:
   -- print statements
   -- multiply_lower_tri_self_transpose function
   -- vectorized several probability functions (see the manual)
-
 Manual Additions:
   -- programming guide: IRT models 
   -- new appendix: style guide
   -- new appendix: migrating from Stan
   -- new index: function and distribution index
+
+v 1.0.3 Release Notes (25 Oct 2012)
+======================================================================
+Stan Bug Fixes:
+ -- error output in stanc now directed to standard error
+ -- catching all exceptions thrown in stanc to prevent core dumps
+ -- parser now accepts variable names starting with "int" and "real"
+    in first assignment after declaration
+ -- now catching unknown truncation cdfs and vectorizations in stanc
+ -- (hopefully) less scary message for domain error rejects
+ -- removed use of assert(); replaced with exceptions where
+    appropriate
+ -- fixed boundary condition on reporting max init retry failures
+ -- fixed initialization errors in tests that failed on some platforms
+ -- improved error checking for matrix size args to prevent segfaults
+ -- fixed boundary condition on bounded transform to allow
+    beta(0.8,0.8) samples near 0 or 1
+Stan New Features:
+ -- mdivide_left_tri_low, mdivide_right_tri_low functions
+ -- all univariate continuous densities vectorized
+ -- better error checking for transforms 
+ -- new error return type in stanc for invalid arguments
+ -- lower and upper bounds for vectors, row vectors, and matrices
+ -- command parameter refresh <= 0 turns off iteration reporting
+ -- int divisions produce warnings in stanc
+ -- errors caused by invalid transformed parameters include var name
+ -- various efficiency improvements and error handling for boundary
+    conditions and special cases of probability functions
+ -- simplified matrix code with heavier use of templating
+Stan Manual Additions:
+ -- example of defining new distribution with parameters
+ -- diff report vs. previous versions
+ -- updated for range constraints on vector, row vector, matrix
+ -- updated Eigen licensing information (now MPL, was LGPL)
+ -- fixed alpha ordering issue in function index due to bolding
+RStan Bug Fixes:
+ -- bug of setting parameter epsilon_pm wrongly for NUTS 
+ -- fixed seed reset so results match Stan
+RStan New Features:
+ -- return empty stanfit object upon error such as incorrect data
+    input, wrong argument specification, etc. Previously, it will
+    stop. The empty stanfit includes the compiled model, so it can be
+    reused.
+ -- add function stan_demo() to run examples included in Stan. 
+ -- add function sflist2stanfit() to merge a list of stanfit objects 
+    into one, to facilitate user-level parallelism. 
+ -- add S3 method as.matrix, as.array, is.array, dim, 
+    dimnames for stanfit objects. 
+ -- specify seed using string of digits in addition to numbers  
+ -- turn off refresh if value <= 0
 
 
