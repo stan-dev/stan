@@ -83,6 +83,10 @@ TEST(gm_parser,good_trunc) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_trunc.stan"));
 }
 
+TEST(gm_parser,good_vec_constraints) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_trunc.stan"));
+}
+
 TEST(gm_parser,good_const) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_const.stan"));
 }
