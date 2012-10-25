@@ -28,13 +28,14 @@ namespace stan {
      *    due to syntax error in the Graphical model; 
      *    <code>true</code> otherwise.
      */
-    bool compile(std::istream& stan_gm_in,
+    bool compile(std::ostream* output_stream, // for warnings
+                 std::istream& stan_gm_in,
                  std::ostream& cpp_out,
                  const std::string& model_name,
                  bool include_main = true,
                  const std::string& in_file_name = "input") {
       program prog;
-      bool parsed_ok = parse(stan_gm_in,in_file_name,prog);
+      bool parsed_ok = parse(output_stream,stan_gm_in,in_file_name,prog);
       if (!parsed_ok) 
         return false; // syntax error in program
       generate_cpp(prog,model_name,cpp_out,include_main);

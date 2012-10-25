@@ -147,7 +147,7 @@ int stanc_helper(int argc, const char* argv[],
     }
     bool include_main = !cmd.has_flag("no_main");
     bool valid_model 
-      = stan::gm::compile(in,out,model_name,include_main,in_file_name);
+      = stan::gm::compile(err_stream,in,out,model_name,include_main,in_file_name);
     out.close();
     if (!valid_model) {
       delete_file(out_stream,out_file_name);  // FIXME: how to remove triple cut-and-paste?

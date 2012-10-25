@@ -59,7 +59,8 @@ namespace stan {
     //                 /tracking-the-input-position-while-parsing/
     // http://boost-spirit.com/dl_more/parsing_tracking_position
     //                 /stream_iterator_errorposition_parsing.cpp
-    inline bool parse(std::istream& input, 
+    inline bool parse(std::ostream* output_stream,
+                      std::istream& input, 
                       const std::string& filename, 
                       program& result) {
       namespace classic = boost::spirit::classic;
@@ -98,9 +99,11 @@ namespace stan {
                                        whitesp_grammar,
                                        result);
         std::string diagnostics = prog_grammar.error_msgs_.str();
-        if (is_nonempty(diagnostics)) {
-          std::cerr << "DIAGNOSTIC(S) FROM PARSER:" << std::endl;
-          std::cerr << diagnostics << std::endl;
+        if (output_stream && is_nonempty(diagnostics)) {
+          *output_stream << "DIAGNOSTIC(S) FROM PARSER:" 
+                         << std::endl
+                         << diagnostics 
+                         << std::endl;
         }
       } catch (const expectation_failure<pos_iterator_type>& e) {
         const file_position_base<std::string>& pos = e.first.get_position();
