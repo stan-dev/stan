@@ -3067,7 +3067,7 @@ TEST(AgradMatrix, assign) {
 
   unsigned int j = 12;
   assign(iii,j);
-  EXPECT_EQ(12,j);
+  EXPECT_EQ(12U,j);
 
   vector<double> y_dbl(2);
   y_dbl[0] = 2.0;
