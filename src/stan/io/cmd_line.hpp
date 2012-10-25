@@ -24,51 +24,55 @@ namespace stan {
      *
      * @param option Option to print (default to empty string).
      * @param width Width of option (defaults to 20).
-     * @param o Output stream (defaults to <code>std::cout</code>).
+     * @param o Output stream ptr, default to null
      */
-    void pad_help_option(const std::string& option = "",
-                         unsigned int width = 20,
-                         std::ostream& o = std::cout) {
-      o << "  " << option;
+    void pad_help_option(std::ostream* o, 
+                         const std::string& option = "",
+                         unsigned int width = 20) {
+      if (!o) return;
+      *o << "  " << option;
       int padding = width - option.size();
       if (padding < 2) {
-        o << std::endl;
+        *o << std::endl;
         padding = width + 2; // 2 is 
       }
       for (int i = 0; i < padding; ++i)
-        o << ' ';
+        *o << ' ';
     }
 
     /** 
-     * Prints single print option to std::cout.
+     * Prints single print option to output ptr if non-null.
      * 
      * @param key_val 
      * @param msg 
      * @param note 
      */
-    void print_help_helper(const std::string& key_val,
+    void print_help_helper(std::ostream* o,
+                           const std::string& key_val,
                            const std::string& msg,
                            const std::string& note = "") {
-      pad_help_option(key_val);
-      std::cout << msg 
-                << std::endl;
+      if (!o) return;
+      pad_help_option(o,key_val);
+      *o << msg 
+         << std::endl;
       if (note.size() > 0) {
-        pad_help_option("");
-        std::cout << "    (" << note << ")" 
-                  << std::endl;
+        pad_help_option(o,"");
+        *o << "    (" << note << ")" 
+           << std::endl;
       }
-      std::cout << std::endl;
+      *o << std::endl;
     }
 
     /** 
-     * Prints single print option to std::cout.
+     * Prints single print option to output ptr if non-null.
      * 
      * @param key 
      * @param value_type 
      * @param msg 
      * @param note 
      */
-    void print_help_option(const std::string& key,
+    void print_help_option(std::ostream* o,
+                           const std::string& key,
                            const std::string& value_type,
                            const std::string& msg,
                            const std::string& note = "") {
@@ -76,7 +80,7 @@ namespace stan {
       ss << "--" << key;
       if (value_type.size() > 0)
         ss << "=<" << value_type << ">";
-      print_help_helper(ss.str(),msg,note);
+      print_help_helper(o,ss.str(),msg,note);
     }
 
     /**

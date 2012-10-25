@@ -44,81 +44,101 @@ namespace stan {
       std::cout << "OPTIONS:" << std::endl;
       std::cout << std::endl;
 
-      print_help_option("help","",
+      print_help_option(&std::cout,
+                        "help","",
                         "Display this information");
 
-      print_help_option("data","file",
+      print_help_option(&std::cout,
+                        "data","file",
                         "Read data from specified dump-format file",
                         "required if model declares data");
       
-      print_help_option("init","file",
+      print_help_option(&std::cout,
+                        "init","file",
                         "Use initial values from specified file or zero values if <file>=0",
                         "default is random initialization");
 
-      print_help_option("samples","file",
+      print_help_option(&std::cout,
+                        "samples","file",
                         "File into which samples are written",
                         "default = samples.csv");
 
-      print_help_option("append_samples","",
+      print_help_option(&std::cout,
+                        "append_samples","",
                         "Append samples to existing file if it exists",
                         "does not write header in append mode");
 
-      print_help_option("seed","int",
+      print_help_option(&std::cout,
+                        "seed","int",
                         "Random number generation seed",
                         "default = randomly generated from time");
 
-      print_help_option("chain_id","int",
+      print_help_option(&std::cout,
+                        "chain_id","int",
                         "Markov chain identifier",
                         "default = 1");
 
-      print_help_option("iter","+int",
+      print_help_option(&std::cout,
+                        "iter","+int",
                         "Total number of iterations, including warmup",
                         "default = 2000");
 
-      print_help_option("warmup","+int",
+      print_help_option(&std::cout,
+                        "warmup","+int",
                         "Discard the specified number of initial samples",
                         "default = iter / 2");
 
-      print_help_option("thin","+int",
+      print_help_option(&std::cout,
+                        "thin","+int",
                         "Period between saved samples after warm up",
                         "default = max(1, floor(iter - warmup) / 1000)");
 
-      print_help_option("refresh","int",
+      print_help_option(&std::cout,
+                        "refresh","int",
                         "Period between samples updating progress report print (0 for no printing)",
                         "default = max(1,iter/200))");
 
-      print_help_option("leapfrog_steps","int",
+      print_help_option(&std::cout,
+                        "leapfrog_steps","int",
                         "Number of leapfrog steps; -1 for no-U-turn adaptation",
                         "default = -1");
 
-      print_help_option("max_treedepth","int",
+      print_help_option(&std::cout,
+                        "max_treedepth","int",
                         "Limit NUTS leapfrog steps to 2^max_tree_depth; -1 for no limit",
                         "default = 10");
       
-      print_help_option("epsilon","float",
+      print_help_option(&std::cout,
+                        "epsilon","float",
                         "Initial value for step size, or -1 to set automatically",
                         "default = -1");
       
-      print_help_option("epsilon_pm","[0,1]",
+      print_help_option(&std::cout,
+                        "epsilon_pm","[0,1]",
                         "Sample epsilon +/- epsilon * epsilon_pm",
                         "default = 0.0");
 
-      print_help_option("equal_step_sizes","",
+      print_help_option(&std::cout,
+                        "equal_step_sizes","",
                         "Use same step size for every parameter with NUTS",
                         "default is to estimate varying step sizes during warmup");
       
-      print_help_option("delta","+float",
+      print_help_option(&std::cout,
+                        "delta","+float",
                         "Initial step size for step-size adaptation",
                         "default = 0.5");
 
-      print_help_option("gamma","+float",
+      print_help_option(&std::cout,
+                        "gamma","+float",
                     "Gamma parameter for dual averaging step-size adaptation",
                     "default = 0.05");
 
-      print_help_option("save_warmup","",
+      print_help_option(&std::cout,
+                        "save_warmup","",
                         "Save the warmup samples");
 
-      print_help_option("test_grad","",
+      print_help_option(&std::cout,
+                        "test_grad","",
                         "Test gradient calculations using finite differences");
       
       std::cout << std::endl;
