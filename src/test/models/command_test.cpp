@@ -355,7 +355,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 
-      expected_first_y = options[init] ? 0.265544 : 1.76413;
+      expected_first_y = options[init] ? -0.321312 : -0.389503;
     }
     
     vector<double> sampled_y;
