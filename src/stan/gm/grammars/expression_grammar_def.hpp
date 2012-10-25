@@ -166,9 +166,9 @@ namespace stan {
           // getting here, but not printing?  only print error if problems?
           error_msgs << "Warning: integer division implicitly rounds to integer."
                      << " Found int division: ";
-          // generate_expression(expr1.expr_,error_msgs);
-          // error_msgs << " / ";
-          // generate_expression(expr2.expr_,error_msgs);
+          generate_expression(expr1.expr_,error_msgs);
+          error_msgs << " / ";
+          generate_expression(expr2.expr_,error_msgs);
           error_msgs << std::endl
                      << " Positive values rounded down, negative values rounded up or down"
                      << " in platform-dependent way."

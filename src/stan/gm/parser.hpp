@@ -43,6 +43,17 @@ namespace stan {
 
   namespace gm {
 
+    bool is_space(char c) {
+      return c == ' ' || c == '\n' || c == '\r' || c == '\t';
+    }
+
+    bool is_nonempty(std::string& s) {
+      for (int i = 0; i < s.size(); ++i)
+        if (!is_space(s[i]))
+          return true;
+      return false;
+    }
+
     // Cut and paste source for iterator & reporting pattern:
     // http://boost-spirit.com/home/articles/qi-example
     //                 /tracking-the-input-position-while-parsing/
@@ -87,7 +98,7 @@ namespace stan {
                                        whitesp_grammar,
                                        result);
         std::string diagnostics = prog_grammar.error_msgs_.str();
-        if (diagnostics.size() > 0) {
+        if (is_nonempty(diagnostics)) {
           std::cerr << "DIAGNOSTIC(S) FROM PARSER:" << std::endl;
           std::cerr << diagnostics << std::endl;
         }
