@@ -10,6 +10,7 @@
 #include <string>
 
 #include <Rcpp.h>
+#include <rstan/io/r_ostream.hpp> 
 
 RcppExport SEXP stanc(SEXP model_stancode, SEXP model_name);
 RcppExport SEXP stan_version(); 
@@ -45,7 +46,7 @@ SEXP stanc(SEXP model_stancode, SEXP model_name) {
   std::istringstream in(mcode_); 
   try {
     bool valid_model
-      = stan::gm::compile(in,out,mname_,!INCLUDE_MAIN);
+      = stan::gm::compile(&rstan::io::rcerr,in,out,mname_,!INCLUDE_MAIN);
     if (!valid_model) {
       return Rcpp::List::create(Rcpp::Named("status") = PARSE_FAIL_RC); 
 
