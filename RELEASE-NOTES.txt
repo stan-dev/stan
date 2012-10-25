@@ -7,7 +7,7 @@ HOW TO (developer notes on how to release, last column is ordering)
  2.  Stan manual M.m.p frozen     (stan/docs/stan-reference/)
  3.  RStan M.m.p frozen           (stan/rstan)                   > 1
  4.  Stan web pages M.m.p frozen  (stan/web)
- 5.  tag release vM.m.p in git                                   > 1--4
+ 5.  tag release vM.m.p in git, push to Google Code              > 1--4
  6.  Build Stan tarball and upload to Google Code->Download      > 5
  7.  Build manual pdf & upload to Google Code->Download          > 5
  8.  Build Rstan & upload to Google Code->Download, Google URL   > 5
