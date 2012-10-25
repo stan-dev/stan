@@ -2000,20 +2000,32 @@ namespace stan {
     template <typename LHS, typename RHS>
     inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,1>& x, 
                               const Eigen::Matrix<RHS,Eigen::Dynamic,1>& y) {
-      for (size_t i = 0; i < x.size(); ++i)
+      typedef 
+        typename Eigen::Matrix<LHS,Eigen::Dynamic,1>::size_type 
+        size_type;
+      for (size_type i = 0; i < x.size(); ++i)
         assign_to_var(x(i),y(i));
     }
     template <typename LHS, typename RHS>
     inline void assign_to_var(Eigen::Matrix<LHS,1,Eigen::Dynamic>& x, 
                               const Eigen::Matrix<RHS,1,Eigen::Dynamic>& y) {
-      for (size_t i = 0; i < x.size(); ++i)
+      typedef 
+        typename Eigen::Matrix<LHS,1,Eigen::Dynamic>::size_type 
+        size_type;
+      for (size_type i = 0; i < x.size(); ++i)
         assign_to_var(x(i),y(i));
     }
     template <typename LHS, typename RHS>
     inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,Eigen::Dynamic>& x, 
                       const Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      for (size_t n = 0; n < x.cols(); ++n)
-        for (size_t m = 0; m < x.rows(); ++m)
+      typedef 
+        typename Eigen::Matrix<LHS,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+        size_type1;
+      typedef 
+        typename Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+        size_type2;
+      for (size_type1 n = 0; n < x.cols(); ++n)
+        for (size_type2 m = 0; m < x.rows(); ++m)
           assign_to_var(x(m,n),y(m,n));
     }
 

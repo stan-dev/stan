@@ -48,7 +48,7 @@ namespace stan {
     }
 
     bool is_nonempty(std::string& s) {
-      for (int i = 0; i < s.size(); ++i)
+      for (size_t i = 0; i < s.size(); ++i)
         if (!is_space(s[i]))
           return true;
       return false;
