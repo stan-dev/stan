@@ -2,7 +2,7 @@
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 
 #include <test/agrad/distributions/distribution_test_fixture.hpp>
-#include <test/agrad/distributions/discrete_distribution_tests_2_params.hpp>
+#include <test/agrad/distributions/distribution_tests_1_discrete_1_param.hpp>
 
 using std::vector;
 using std::numeric_limits;
