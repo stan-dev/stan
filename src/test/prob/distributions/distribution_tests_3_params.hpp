@@ -59,6 +59,7 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
   ASSERT_EQ(index.size(), invalid_values.size());
   for (size_t n = 0; n < index.size(); n++) {
     vector<double> invalid_params(valid_params);
+    ASSERT_TRUE(index[n] < 3);
     invalid_params[index[n]] = invalid_values[n];
 
     EXPECT_THROW(_LOG_PROB_<false>(invalid_params[0], 
@@ -68,7 +69,6 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
       << "Default policy. "
       << "Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << ", " << invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;
-
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
