@@ -1,7 +1,10 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ binomial_log
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 
-TEST(ProbDistributionsBinomial,Binomial) {
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_2_discrete_1_param.hpp>
+
+/*TEST(ProbDistributionsBinomial,Binomial) {
   EXPECT_FLOAT_EQ(-2.144372, stan::prob::binomial_log(10,20,0.4));
   EXPECT_FLOAT_EQ(-16.09438, stan::prob::binomial_log(0,10,0.8));
 }
@@ -18,14 +21,7 @@ using boost::math::policies::domain_error;
 using boost::math::policies::pole_error;
 using boost::math::policies::errno_on_error;
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
-using stan::prob::binomial_log;
+//using stan::prob::binomial_log;
 
 TEST(ProbDistributionsBinomial,DefaultPolicy) {
   double nan = std::numeric_limits<double>::quiet_NaN();
@@ -93,6 +89,54 @@ TEST(ProbDistributionsBinomial,ErrnoPolicy) {
   EXPECT_TRUE(std::isnan(result));
   result = binomial_log(n,N,1.1, errno_policy());
   EXPECT_TRUE(std::isnan(result));
-}
+  }*/
 
-// FIXME:  add propto test
+
+using std::vector;
+using std::log;
+using std::numeric_limits;
+
+class ProbDistributionsBinomial : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
+
+    param[0] = 10;           // n
+    param[1] = 20;           // N
+    param[2] = 0.4;          // theta
+    parameters.push_back(param);
+    log_prob.push_back(-2.144372); // expected log_prob
+
+    param[0] = 5;            // n
+    param[1] = 15;           // N
+    param[2] = 0.8;          // theta
+    parameters.push_back(param);
+    log_prob.push_back(-9.20273); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // n
+    index.push_back(0U);
+    value.push_back(-1);
+    
+    
+    // N
+    index.push_back(1U);
+    value.push_back(-1);
+    
+    // theta
+    index.push_back(2U);
+    value.push_back(-1e-15);
+    
+    index.push_back(2U);
+    value.push_back(1.0+1e-15);
+
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBinomial,
+			      DistributionTestFixture,
+			      ProbDistributionsBinomial);
+
