@@ -14,6 +14,10 @@ The to-do list is organized into the following sections:
 v1.0.4
 ======================================================================
 
+* make sure all range errors are being caught
+  -- math/matrix.hpp line 164
+  -- STAN_NO_DEBUG property
+  -- turn off checking if (NDEBUG || STAN_NO_DEBUG)
 
 C++ API
 ======================================================================
@@ -307,6 +311,8 @@ C++ API
 * some kind of multi-threaded timer to monitor Stan
 
 * discrete samplers
+  -- for special block, use main log_prob to evaluate
+     conditional probs up to proportion
   -- Gibbs for small outcome sets 
   -- Gibbs for non-ordinal, non-count params
      ++ e.g., LDA topic samples
