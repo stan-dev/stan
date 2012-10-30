@@ -54,7 +54,8 @@ von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa,
   bool const kappa_const = is_constant_struct<T_scale>::value;
 
   // Determine which expensive computations to perform.
-  bool const compute_bessel0 = include_summand<propto,T_scale>::value || !kappa_const;
+  bool const compute_bessel0 = include_summand<propto,T_scale>::value ||
+                               !kappa_const;
   bool const compute_bessel1 = !kappa_const;
   bool const compute_kappa_sin = !y_const || !kappa_const;
 
@@ -72,15 +73,20 @@ von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa,
     double const kappa_dbl = value_of(kappa_vec[n]);
 
     // Reusable values.
-    double const bessel0 = compute_bessel0 ? boost::math::cyl_bessel_i(0, kappa_dbl) : 0;
-    double const bessel1 = compute_bessel1 ? boost::math::cyl_bessel_i(1, kappa_dbl) : 0;
-    double const kappa_sin = compute_kappa_sin ? kappa_dbl * std::sin(mu_dbl - y_dbl) : 0;
+    double const bessel0 = compute_bessel0 ?
+                           boost::math::cyl_bessel_i(0, kappa_dbl) : 0;
+    double const bessel1 = compute_bessel1 ?
+                           boost::math::cyl_bessel_i(1, kappa_dbl) : 0;
+    double const kappa_sin = compute_kappa_sin ?
+                             kappa_dbl * std::sin(mu_dbl - y_dbl) : 0;
     double const kappa_cos = kappa_dbl * std::cos(mu_dbl - y_dbl);
 
     // Log probability.
     if (include_summand<propto>::value) logp -= LOG_TWO_PI;
-    if (include_summand<propto,T_scale>::value) logp -= std::log(bessel0);
-    /*if (include_summand<propto,T_y,T_loc,T_scale>::value)*/ logp += kappa_cos;
+    if (include_summand<propto,T_scale>::value)
+      logp -= std::log(bessel0);
+    // if (include_summand<propto,T_y,T_loc,T_scale>::value)
+      logp += kappa_cos;
 
     // Gradient.
     if (!y_const) oap.d_x1[n] += kappa_sin;
