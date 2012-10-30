@@ -25,13 +25,13 @@ struct ProbDistributionsVonMises : DistributionTest {
     param[2] = 1.;
     parameters.push_back(params);
     log_prob.push_back(-2.33261);
-    
+
     param[0] = boost::math::constants::pi<double>() / 4.;
     param[1] = -boost::math::constants::three_quarters_pi<double>();
     param[2] = 1.5;
     parameters.push_back(params);
     log_prob.push_back(-3.83666);
-  
+
     param[0] = -boost::math::constants::sixth_pi<double>();
     param[1] = boost::math::constants::sixth_pi<double>();
     param[2] = 4;
