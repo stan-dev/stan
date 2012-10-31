@@ -3,20 +3,20 @@
 
 TYPED_TEST_P(DistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
-  int param1, param2;
-  double param3;
+  int param0, param1;
+  double param2;
   double logprob = 0.0;
   (void) logprob; // supress warning
-  param1 = parameters[0];
-  param2 = parameters[1];
-  param2 = parameters[1];
+  param0 = parameters[0];
+  param1 = parameters[1];
+  param2 = parameters[2];
   
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, param3, errno_policy()));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param0, param1, param2));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param0, param1, param2));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param0, param1, param2, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param0, param1, param2, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param0, param1, param2));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param0, param1, param2, errno_policy()));
 }
 
 TYPED_TEST_P(DistributionTestFixture, check_valid) {
@@ -115,15 +115,15 @@ TYPED_TEST_P(DistributionTestFixture, valid_vector) {
   ASSERT_EQ(parameters.size(), expected_values.size());
   ASSERT_GT(parameters.size(), 0U);
   
-  vector<int> param1(parameters.size()), param2(parameters.size());
-  vector<double> param3(parameters.size());
+  vector<int> param0(parameters.size()), param1(parameters.size());
+  vector<double> param2(parameters.size());
   for (size_t n = 0; n < parameters.size(); n++) {
-    param1[n] = parameters[n][0];
-    param2[n] = parameters[n][1];
-    param3[n] = parameters[n][2];
+    param0[n] = parameters[n][0];
+    param1[n] = parameters[n][1];
+    param2[n] = parameters[n][2];
   }
   EXPECT_FLOAT_EQ(stan::math::sum(expected_values),
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_vector) {
@@ -131,14 +131,14 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_vector) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
-  vector<int> param1, param2;
-  vector<double> param3;
-  param1.assign(N_repeat, parameters[0]);
-  param2.assign(N_repeat, parameters[1]);
-  param3.assign(N_repeat, parameters[2]);
+  vector<int> param0, param1;
+  vector<double> param2;
+  param0.assign(N_repeat, parameters[0]);
+  param1.assign(N_repeat, parameters[1]);
+  param2.assign(N_repeat, parameters[2]);
 
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_double) {
@@ -146,13 +146,13 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_double) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
-  vector<int> param1, param2;
-  double param3;
-  param1.assign(N_repeat, parameters[0]);
-  param2.assign(N_repeat, parameters[1]);
-  param3 = parameters[2];
+  vector<int> param0, param1;
+  double param2;
+  param0.assign(N_repeat, parameters[0]);
+  param1.assign(N_repeat, parameters[1]);
+  param2 = parameters[2];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_int_vector) {
@@ -160,14 +160,14 @@ TYPED_TEST_P(DistributionTestFixture, vector_int_vector) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
-  vector<int> param1;
-  int param2;
-  vector<double> param3;
-  param1.assign(N_repeat, parameters[0]);
-  param2 = parameters[1];
-  param3.assign(N_repeat, parameters[2]);
+  vector<int> param0;
+  int param1;
+  vector<double> param2;
+  param0.assign(N_repeat, parameters[0]);
+  param1 = parameters[1];
+  param2.assign(N_repeat, parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_int_double) {
@@ -175,14 +175,14 @@ TYPED_TEST_P(DistributionTestFixture, vector_int_double) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
-  vector<int> param1;
-  int param2;
-  double param3;
-  param1.assign(N_repeat, parameters[0]);
-  param2 = parameters[1];
-  param3 = parameters[2];
+  vector<int> param0;
+  int param1;
+  double param2;
+  param0.assign(N_repeat, parameters[0]);
+  param1 = parameters[1];
+  param2 = parameters[2];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, int_vector_vector) {
@@ -190,14 +190,14 @@ TYPED_TEST_P(DistributionTestFixture, int_vector_vector) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
-  int param1;
-  vector<int> param2;
-  vector<double> param3;
-  param1 = parameters[0];
-  param2.assign(N_repeat, parameters[1]);
-  param3.assign(N_repeat, parameters[2]);
+  int param0;
+  vector<int> param1;
+  vector<double> param2;
+  param0 = parameters[0];
+  param1.assign(N_repeat, parameters[1]);
+  param2.assign(N_repeat, parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, int_vector_double) {
@@ -205,14 +205,14 @@ TYPED_TEST_P(DistributionTestFixture, int_vector_double) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
-  int param1;
-  vector<int> param2;
-  double param3;
-  param1 = parameters[0];
-  param2.assign(N_repeat, parameters[1]);
-  param3 = parameters[2];
+  int param0;
+  vector<int> param1;
+  double param2;
+  param0 = parameters[0];
+  param1.assign(N_repeat, parameters[1]);
+  param2 = parameters[2];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, int_int_vector) {
@@ -220,14 +220,14 @@ TYPED_TEST_P(DistributionTestFixture, int_int_vector) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 10;
+  int param0;
   int param1;
-  int param2;
-  vector<double> param3;
-  param1 = parameters[0];
-  param2 = parameters[1];
-  param3.assign(N_repeat, parameters[2]);
+  vector<double> param2;
+  param0 = parameters[0];
+  param1 = parameters[1];
+  param2.assign(N_repeat, parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
@@ -238,20 +238,20 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
   t.valid_values(parameters, expected_values);
   
   vector<double> params = parameters[0];
-  vector<int> param1, param2;
-  vector<double> param3;
+  vector<int> param0, param1;
+  vector<double> param2;
 
-  param1.assign(10U, params[0]);
-  param2.assign(2U,  params[1]);
-  param3.assign(10U, params[2]);
+  param0.assign(10U, params[0]);
+  param1.assign(2U,  params[1]);
+  param2.assign(10U, params[2]);
   
-  EXPECT_THROW(_LOG_PROB_<false>(param1, param2, param3), std::domain_error)
+  EXPECT_THROW(_LOG_PROB_<false>(param0, param1, param2), std::domain_error)
     << "Should throw error with sizes (" 
-    << param1.size() << ", " << param2.size() << ", " << param3.size() << ")";
+    << param0.size() << ", " << param1.size() << ", " << param2.size() << ")";
   
   double log_prob;
   (void)log_prob;
-  EXPECT_NO_THROW(log_prob = _LOG_PROB_<false>(param1, param2, param3, errno_policy()));
+  EXPECT_NO_THROW(log_prob = _LOG_PROB_<false>(param0, param1, param2, errno_policy()));
   EXPECT_TRUE(std::isnan(log_prob));
 }
 
@@ -260,13 +260,13 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  Matrix<int,Dynamic,1> param1(N_repeat), param2(N_repeat);
-  Matrix<double,Dynamic,1> param3(N_repeat);
-  param1.setConstant(parameters[0]);
-  param2.setConstant(parameters[1]);
-  param3.setConstant(parameters[2]);
+  Matrix<int,Dynamic,1> param0(N_repeat), param1(N_repeat);
+  Matrix<double,Dynamic,1> param2(N_repeat);
+  param0.setConstant(parameters[0]);
+  param1.setConstant(parameters[1]);
+  param2.setConstant(parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double) {
@@ -274,13 +274,13 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  Matrix<int,Dynamic,1> param1(N_repeat), param2(N_repeat);
-  double param3;
-  param1.setConstant(parameters[0]);
-  param2.setConstant(parameters[1]);
-  param3 = parameters[2];
+  Matrix<int,Dynamic,1> param0(N_repeat), param1(N_repeat);
+  double param2;
+  param0.setConstant(parameters[0]);
+  param1.setConstant(parameters[1]);
+  param2 = parameters[2];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_int_matrix) {
@@ -288,69 +288,69 @@ TYPED_TEST_P(DistributionTestFixture, matrix_int_matrix) {
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  Matrix<int,Dynamic,1> param1(N_repeat);
-  int param2;
-  Matrix<double,Dynamic,1> param3(N_repeat);
-  param1.setConstant(parameters[0]);
-  param2 = parameters[1];
-  param3.setConstant(parameters[2]);
+  Matrix<int,Dynamic,1> param0(N_repeat);
+  int param1;
+  Matrix<double,Dynamic,1> param2(N_repeat);
+  param0.setConstant(parameters[0]);
+  param1 = parameters[1];
+  param2.setConstant(parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 TYPED_TEST_P(DistributionTestFixture, matrix_int_double) {
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  Matrix<int,Dynamic,1> param1(N_repeat);
-  int param2;
-  double param3;
-  param1.setConstant(parameters[0]);
-  param2 = parameters[1];
-  param3 = parameters[2];
+  Matrix<int,Dynamic,1> param0(N_repeat);
+  int param1;
+  double param2;
+  param0.setConstant(parameters[0]);
+  param1 = parameters[1];
+  param2 = parameters[2];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 TYPED_TEST_P(DistributionTestFixture, int_matrix_matrix) {
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  int param1;
-  Matrix<int,Dynamic,1> param2(N_repeat);
-  Matrix<double,Dynamic,1> param3(N_repeat);
-  param1 = parameters[0];
-  param2.setConstant(parameters[1]);
-  param3.setConstant(parameters[2]);
+  int param0;
+  Matrix<int,Dynamic,1> param1(N_repeat);
+  Matrix<double,Dynamic,1> param2(N_repeat);
+  param0 = parameters[0];
+  param1.setConstant(parameters[1]);
+  param2.setConstant(parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 TYPED_TEST_P(DistributionTestFixture, int_matrix_double) {  
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  int param1;
-  Matrix<int,Dynamic,1> param2(N_repeat);
-  double param3;
-  param1 = parameters[0];
-  param2.setConstant(parameters[1]);
-  param3 = parameters[2];
+  int param0;
+  Matrix<int,Dynamic,1> param1(N_repeat);
+  double param2;
+  param0 = parameters[0];
+  param1.setConstant(parameters[1]);
+  param2 = parameters[2];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 TYPED_TEST_P(DistributionTestFixture, int_int_matrix) {
   vector<double> parameters = this->first_valid_params();
   double expected_value = this->first_valid_value();
   
   size_t N_repeat = 25;
-  int param1, param2;
-  Matrix<double,Dynamic,1> param3(N_repeat);
-  param1 = parameters[0];
-  param2 = parameters[1];
-  param3.setConstant(parameters[2]);
+  int param0, param1;
+  Matrix<double,Dynamic,1> param2(N_repeat);
+  param0 = parameters[0];
+  param1 = parameters[1];
+  param2.setConstant(parameters[2]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3));
+		  _LOG_PROB_<false>(param0, param1, param2));
 }
 
 REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
