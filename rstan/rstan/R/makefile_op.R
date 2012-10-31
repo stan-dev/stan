@@ -116,7 +116,11 @@ set_makefile_flags <- function(flags) {
 
   flagnames <- names(flags) 
   paste_bn <- function(...)  paste(..., sep = '\n') 
-  flags <- lapply(flags, function(x) paste(x, " #set_by_rstan")) 
+  flags <- lapply(flags, 
+                  function(x) {
+                    if (grepl('#set_by_rstan', x)) return(x)
+                    paste(x, " #set_by_rstan")  
+                  })
 
   # the Makevars file does not exist 
   if (!file.exists(lmf)) {
@@ -233,6 +237,8 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug")
   sys_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt, headtotail = TRUE)
   curr_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt) 
   curr_r_xtra_cppflags <- get_makefile_flags("R_XTRA_CPPFLAGS", makefile_txt) 
+  curr_cxxflags <- sub("#.*$", '', curr_cxxflags)  # remove all comments
+  curr_r_xtra_cppflags <- sub("#.*$", '', curr_r_xtra_cppflags)
   if (is.numeric(level)) 
     level <- as.character(level) 
   if (!level %in% c('0', '1', '2', '3', 's')) 
