@@ -1,5 +1,5 @@
-#ifndef __TEST__AGRAD__DISTRIBUTIONS__DISCRETE_DISTRIBUTION_TESTS_2_PARAMS_HPP___
-#define __TEST__AGRAD__DISTRIBUTIONS__DISCRETE_DISTRIBUTION_TESTS_2_PARAMS_HPP___
+#ifndef __TEST__AGRAD__DISTRIBUTIONS__DISTRIBUTION_TESTS_1_DISCRETE_1_PARAM_HPP___
+#define __TEST__AGRAD__DISTRIBUTIONS__DISTRIBUTION_TESTS_1_DISCRETE_1_PARAM_HPP___
 
 // i: int
 // v: var
@@ -13,18 +13,18 @@ using stan::agrad::var;
 TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
 
-  int param1;
-  var param2;
+  int param0;
+  var param1;
   var logprob;
-  param1 = parameters[0];
-  param2 = parameters[1];
+  param0 = parameters[0];
+  param1 = parameters[1];
   
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param1, param2, errno_policy()));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param1, param2, errno_policy()));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2));
-  EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param0, param1));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param0, param1));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<true>(param0, param1, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_<false>(param0, param1, errno_policy()));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param0, param1));
+  EXPECT_NO_THROW(logprob = _LOG_PROB_(param0, param1, errno_policy()));
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_id) {
