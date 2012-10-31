@@ -853,7 +853,7 @@ highlights the potential error of using \code{mu} in the first
 statement.
 \\[8pt]
 To trap these kinds of errors, variables are initialized to the
-specail not-a-number (\code{NaN}) value.  If \code{NaN} is passed to a
+special not-a-number (\code{NaN}) value.  If \code{NaN} is passed to a
 log probability function, it will raise a domain exception, which will
 in turn be reported by the sampler.  The sampler will reject the
 sample out of hand as if it had zero probability.
@@ -946,6 +946,11 @@ brackets indicating the body of the for loop.
   deviation 2 is \code{normal(1,2)}, not \code{normal(1,4)} or
   \code{normal(1,0.25)}.
 %
+\item Similarly, the second argument to the "multivariate normal" 
+  function is the covariance matrix and not the inverse covariance matrix
+  (i.e., the precision matrix) (as in \BUGS). The same is true for
+  the "multivariate student" distribution.
+%  
 \item
 The distributions have slightly different names:
 %
@@ -997,8 +1002,8 @@ executed in order, so \code{total} is overwritten in each step.
   operations which can make Stan models more compact.  For example,
   arguments to probability functions may be vectorized,%
 %
-\footnote{So far, very few distributions have been vectorized, but
-eventually all of them will be vectorized.}
+\footnote{Most distributions have been vectorized, but currently the
+truncated versions may not exist and may not be vectorized.}
 %
 allowing
 %
