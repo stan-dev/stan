@@ -562,3 +562,50 @@ TEST(MetaTraits, scalar_type) {
   bool b5 = is_same<int, scalar_type<double>::type>::value;
   EXPECT_FALSE(b5);
 }
+
+TEST(MetaTraits,VV) {
+  using stan::VV;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double x = 5;
+  VV<double> x_VV(x);
+  EXPECT_FLOAT_EQ(x,x_VV[0]);
+  EXPECT_FLOAT_EQ(x,x_VV[1]);
+  EXPECT_FLOAT_EQ(x,x_VV[2]);
+
+  vector<double> sv;
+  sv.push_back(1.0);
+  sv.push_back(4.0);
+  sv.push_back(9.0);
+  VV<vector<double> > sv_VV(sv);
+  EXPECT_FLOAT_EQ(1.0,sv_VV[0]);
+  EXPECT_FLOAT_EQ(4.0,sv_VV[1]);
+  EXPECT_FLOAT_EQ(9.0,sv_VV[2]);
+
+  Matrix<double,Dynamic,1> v(3);
+  v << 1.0, 4.0, 9.0;
+  VV<Matrix<double,Dynamic,1> > v_VV(v);
+  EXPECT_FLOAT_EQ(1.0,v_VV[0]);
+  EXPECT_FLOAT_EQ(4.0,v_VV[1]);
+  EXPECT_FLOAT_EQ(9.0,v_VV[2]);
+
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 1.0, 4.0, 9.0;
+  VV<Matrix<double,1,Dynamic> > rv_VV(rv);
+  EXPECT_FLOAT_EQ(1.0,rv_VV[0]);
+  EXPECT_FLOAT_EQ(4.0,rv_VV[1]);
+  EXPECT_FLOAT_EQ(9.0,rv_VV[2]);
+
+  Matrix<double,Dynamic,Dynamic> m(2,3);
+  m << 1.0, 2.0, 3.0, -100.0, -200.0, -300.0;
+  VV<Matrix<double,Dynamic,Dynamic> > m_VV(m);
+  int pos = 0;
+  for (int j = 0; j < 3; ++j) {
+    for (int i = 0; i < 2; ++i) {
+      EXPECT_FLOAT_EQ(m(i,j),m_VV[pos]);
+      ++pos;
+    }
+  }
+}

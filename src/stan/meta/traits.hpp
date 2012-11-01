@@ -105,6 +105,7 @@ namespace stan {
     typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
+
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
   size_t length(const T& x) {
@@ -166,6 +167,46 @@ namespace stan {
     result = result > length(x4) ? result : length(x4);
     return result;
   }
+
+  // ****************** additions for new VV *************************
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+    typedef typename scalar_type<T>::type type;
+  };
+
+
+  // handles scalar, eigen vec, eigen row vec, std vec
+  template <typename T>
+  struct is_vector_like {
+    enum { value = stan::is_vector<T>::value };  
+  };
+  // handles eigen matrix
+  template <typename T>
+  struct is_vector_like<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+    enum { value = true };
+  };
+
+
+  template <typename T,
+            bool is_array = stan::is_vector_like<T>::value>
+  class VV {
+  public: 
+    typedef typename scalar_type<T>::type scalar_t;
+
+    VV(const scalar_t& c) : x_(&c) { }
+
+    VV(const std::vector<scalar_t>& v) : x_(&v[0]) { }
+
+    template <int R, int C>
+    VV(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+
+    scalar_t operator[](int i) {
+      if (is_array) return x_[i];
+      else return *x_;
+    }
+  private:
+    const scalar_t* x_;
+  };
 
   
   template<typename T, 

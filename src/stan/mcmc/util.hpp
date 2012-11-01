@@ -29,7 +29,7 @@ namespace stan {
                   << " a problem with an initial state or a gradient somewhere."
                   << std::endl
                   << " If the problem does not persist, the resulting samples will still"
-                  << " be drawn from the psoterior."
+                  << " be drawn from the posterior."
                   << std::endl;
         }
 

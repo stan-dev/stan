@@ -18,6 +18,19 @@ v1.0.4
   -- math/matrix.hpp line 164
   -- STAN_NO_DEBUG property
   -- turn off checking if (NDEBUG || STAN_NO_DEBUG)
+   -- impl from Marcus (Eigen):
+      #ifndef STAN_NO_DEBUG
+      #ifdef NDEBUG
+      #define STAN_NO_DEBUG
+      #endif
+      #endif
+ 
+     #ifdef STAN_NO_DEBUG 
+     ..
+   #endif
+
+* make sure symmetry tests aren't too stringent for cov_matrix
+
 
 C++ API
 ======================================================================
@@ -417,6 +430,18 @@ C++ API
 Modeling Language
 ======================================================================
 
+* add ragged array types
+  -- data { int x[,]; } 
+     for a possibly ragged array x
+  -- easiest for data
+     ++ buffer values until get postfix dims
+  -- would also work for transformed data because sets
+  -- would need a way to declare raggedness for params
+     in order to read them in from array
+  -- parameters { int x[ns]; }
+     might be used if ns is an int array of sizes
+  -- how to generalize this?
+
 * get line numbers into error messages
 
 * compiler for R's linear model notation
@@ -775,6 +800,9 @@ Web Pages
 
 Manuals
 ======================================================================
+
+* transforms a la Matt, at least for all the normal-based cases
+  we know of
 
 * chapter on change of variables in the user guide
 
