@@ -2,7 +2,7 @@
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 
 #include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/discrete_distribution_tests_2_params.hpp>
+#include <test/prob/distributions/distribution_tests_1_discrete_1_param.hpp>
 
 using std::vector;
 using std::log;

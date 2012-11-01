@@ -7,6 +7,163 @@
 // D: vector<double>
 
 using stan::agrad::var;
+using stan::scalar_type;
+using stan::is_vector;
+using stan::is_constant;
+using stan::is_constant_struct;
+
+template<class T>
+T get_params(vector<vector<double> >& parameters, size_t p) {
+  return parameters[0][p];
+}
+template<>
+vector<double> get_params<vector<double> >(vector<vector<double> >& parameters, size_t p) {
+  vector<double> param(parameters.size());
+  for (size_t n = 0; n < parameters.size(); n++)
+    param[n] = parameters[n][p];
+  return param;
+}
+template<>
+vector<var> get_params<vector<var> >(vector<vector<double> >& parameters, size_t p) {
+  vector<var> param(parameters.size());
+  for (size_t n = 0; n < parameters.size(); n++)
+    param[n] = parameters[n][p];
+  return param;
+}
+template<class T>
+double get_param(vector<vector<double> >& parameters, size_t n, size_t p) {
+  if (is_vector<T>::value)
+    return parameters[n][p];
+  else
+    return parameters[0][p];
+}
+template<class T0, class T1, class T2, class T3>
+void update_expected_gradients(var& logprob,
+			       vector<double>& grad0, vector<double>& grad1,
+			       vector<double>& grad2, vector<double>& grad3,
+			       T0& p0, T1& p1,
+			       T2& p2, T3& p3) {
+  vector<var> x;
+  if (!is_constant<T0>::value)
+    x.push_back(p0);
+  if (!is_constant<T1>::value)
+    x.push_back(p1);
+  if (!is_constant<T2>::value)
+    x.push_back(p2);
+  if (!is_constant<T3>::value)
+    x.push_back(p3);
+  vector<double> grad;
+  logprob.grad(x, grad);
+  if (!is_constant<T0>::value) {
+    grad0.push_back(grad[0]);
+    grad.erase(grad.begin());
+  }
+  if (!is_constant<T1>::value) {
+    grad1.push_back(grad[0]);
+    grad.erase(grad.begin());
+  }
+  if (!is_constant<T2>::value) {
+    grad2.push_back(grad[0]);
+    grad.erase(grad.begin());
+  }
+  if (!is_constant<T3>::value) {
+    grad3.push_back(grad[0]);
+    grad.erase(grad.begin());
+  }
+}
+template<class T, 
+	 bool is_const>
+void add_params(vector<var>& x, T& p) { }
+template<>
+void add_params<var, false>(vector<var>& x, var& p) {
+  x.push_back(p);
+}
+template<>
+void add_params<vector<var>, false>(vector<var>& x, vector<var>& p) {
+  x.insert(x.end(), p.begin(), p.end());
+}
+template<class T,
+	 bool is_const>
+void test_grad(vector<double>& e_grad, vector<double>& grad, size_t p) { }
+template<>
+void test_grad<var, false>(vector<double>& e_grad, vector<double>& grad, size_t p) {
+  double expected_gradient = stan::math::sum(e_grad);
+  double gradient = grad[0];
+
+  EXPECT_FLOAT_EQ(expected_gradient, gradient)
+    << "Gradient test failed for parameter " << p;
+  grad.erase(grad.begin());
+}
+template<>
+void test_grad<vector<var>, false>(vector<double>& e_grad, vector<double>& grad, size_t p) {
+  for (size_t n = 0; n < e_grad.size(); n++)
+    EXPECT_FLOAT_EQ(e_grad[n], grad[n])
+      << "At index " << n << ". Gradient test failed for parameter " << p;
+  grad.erase(grad.begin(), grad.begin() + e_grad.size());
+}
+template<class T0, class T1, class T2, class T3>
+void test_gradients(var& logprob,
+		    vector<double>& e_grad0, vector<double>& e_grad1,
+		    vector<double>& e_grad2, vector<double>& e_grad3,
+		    T0& p0, T1& p1,
+		    T2& p2, T3& p3) {
+  vector<var> x;
+  add_params<T0, is_constant_struct<T0>::value>(x, p0);
+  add_params<T1, is_constant_struct<T1>::value>(x, p1);
+  add_params<T2, is_constant_struct<T2>::value>(x, p2);
+  add_params<T3, is_constant_struct<T3>::value>(x, p3);
+  vector<double> grad;
+  logprob.grad(x, grad);
+  
+  test_grad<T0, is_constant_struct<T0>::value>(e_grad0, grad, 0);
+  test_grad<T1, is_constant_struct<T1>::value>(e_grad1, grad, 1);
+  test_grad<T2, is_constant_struct<T2>::value>(e_grad2, grad, 2);
+  test_grad<T3, is_constant_struct<T3>::value>(e_grad3, grad, 3);
+}
+template<class T0, class T1, class T2, class T3, class TypeParam>
+void test_vectorized() {
+  vector<vector<double> > parameters;
+  TypeParam().valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  ASSERT_EQ(parameters[0].size(), 4U);
+  
+  if (is_constant_struct<T0>::value && is_constant_struct<T1>::value
+      && is_constant_struct<T2>::value && is_constant_struct<T3>::value) {
+    SUCCEED() << "No need to test all double arguments";
+    return;
+  }
+  if (!is_vector<T0>::value && !is_vector<T1>::value
+      && !is_vector<T2>::value && !is_vector<T3>::value) {
+    SUCCEED() << "No need to test all non-vector arguments";
+    return;
+  }
+
+  double e_logprob(0.0);
+  vector<double> e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    typename scalar_type<T0>::type p0 = get_param<T0>(parameters, n, 0);
+    typename scalar_type<T1>::type p1 = get_param<T1>(parameters, n, 1);
+    typename scalar_type<T2>::type p2 = get_param<T2>(parameters, n, 2);
+    typename scalar_type<T3>::type p3 = get_param<T3>(parameters, n, 3);
+    var logprob = _LOG_PROB_<true>(p0, p1, p2, p3);
+    e_logprob += logprob.val();
+    update_expected_gradients(logprob,
+			      e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3,
+			      p0, p1, p2, p3);
+  }
+  T0 p0 = get_params<T0>(parameters, 0);
+  T1 p1 = get_params<T1>(parameters, 1);
+  T2 p2 = get_params<T2>(parameters, 2);
+  T3 p3 = get_params<T3>(parameters, 3);
+  var logprob = _LOG_PROB_<true>(p0, p1, p2, p3);
+  EXPECT_FLOAT_EQ(e_logprob, logprob.val())
+    << "log probability does not match";
+
+  test_gradients(logprob,
+		 e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3,
+		 p0, p1, p2, p3);
+  return;
+}
 
 TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
@@ -2460,164 +2617,7 @@ TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vvvv) {
       << "(" << p[0] << ", " << p[1] << ", " << p[2] << ", " << p[3] << ")" << std::endl;
   }
 }
-using stan::scalar_type;
-using stan::is_vector;
-using stan::is_constant;
-using stan::is_constant_struct;
 
-template<class T>
-double get_param(vector<vector<double> >& parameters, size_t n, size_t p) {
-  if (is_vector<T>::value)
-    return parameters[n][p];
-  else
-    return parameters[0][p];
-}
-template<class T0, class T1, class T2, class T3>
-void update_expected_gradients(var& logprob,
-			       vector<double>& grad0, vector<double>& grad1,
-			       vector<double>& grad2, vector<double>& grad3,
-			       T0& p0, T1& p1,
-			       T2& p2, T3& p3) {
-  vector<var> x;
-  if (!is_constant<T0>::value)
-    x.push_back(p0);
-  if (!is_constant<T1>::value)
-    x.push_back(p1);
-  if (!is_constant<T2>::value)
-    x.push_back(p2);
-  if (!is_constant<T3>::value)
-    x.push_back(p3);
-  vector<double> grad;
-  logprob.grad(x, grad);
-  if (!is_constant<T0>::value) {
-    grad0.push_back(grad[0]);
-    grad.erase(grad.begin());
-  }
-  if (!is_constant<T1>::value) {
-    grad1.push_back(grad[0]);
-    grad.erase(grad.begin());
-  }
-  if (!is_constant<T2>::value) {
-    grad2.push_back(grad[0]);
-    grad.erase(grad.begin());
-  }
-  if (!is_constant<T3>::value) {
-    grad3.push_back(grad[0]);
-    grad.erase(grad.begin());
-  }
-}
-template<class T, 
-	 bool is_const>
-void add_params(vector<var>& x, T& p) { }
-template<>
-void add_params<var, false>(vector<var>& x, var& p) {
-  x.push_back(p);
-}
-template<>
-void add_params<vector<var>, false>(vector<var>& x, vector<var>& p) {
-  x.insert(x.end(), p.begin(), p.end());
-}
-template<class T,
-	 bool is_const>
-void test_grad(vector<double>& e_grad, vector<double>& grad, size_t p) { }
-template<>
-void test_grad<var, false>(vector<double>& e_grad, vector<double>& grad, size_t p) {
-  double expected_gradient = stan::math::sum(e_grad);
-  double gradient = grad[0];
-
-  EXPECT_FLOAT_EQ(expected_gradient, gradient)
-    << "Gradient test failed for parameter " << p;
-  grad.erase(grad.begin());
-}
-template<>
-void test_grad<vector<var>, false>(vector<double>& e_grad, vector<double>& grad, size_t p) {
-  for (size_t n = 0; n < e_grad.size(); n++)
-    EXPECT_FLOAT_EQ(e_grad[n], grad[n])
-      << "At index " << n << ". Gradient test failed for parameter " << p;
-  grad.erase(grad.begin(), grad.begin() + e_grad.size());
-}
-template<class T0, class T1, class T2, class T3>
-void test_gradients(var& logprob,
-		    vector<double>& e_grad0, vector<double>& e_grad1,
-		    vector<double>& e_grad2, vector<double>& e_grad3,
-		    T0& p0, T1& p1,
-		    T2& p2, T3& p3) {
-  vector<var> x;
-  add_params<T0, is_constant_struct<T0>::value>(x, p0);
-  add_params<T1, is_constant_struct<T1>::value>(x, p1);
-  add_params<T2, is_constant_struct<T2>::value>(x, p2);
-  add_params<T3, is_constant_struct<T3>::value>(x, p3);
-  vector<double> grad;
-  logprob.grad(x, grad);
-  
-  test_grad<T0, is_constant_struct<T0>::value>(e_grad0, grad, 0);
-  test_grad<T1, is_constant_struct<T1>::value>(e_grad1, grad, 1);
-  test_grad<T2, is_constant_struct<T2>::value>(e_grad2, grad, 2);
-  test_grad<T3, is_constant_struct<T3>::value>(e_grad3, grad, 3);
-}
-
-template<class T>
-T get_params(vector<vector<double> >& parameters, size_t p) {
-  return parameters[0][p];
-}
-template<>
-vector<double> get_params<vector<double> >(vector<vector<double> >& parameters, size_t p) {
-  vector<double> param(parameters.size());
-  for (size_t n = 0; n < parameters.size(); n++)
-    param[n] = parameters[n][p];
-  return param;
-}
-template<>
-vector<var> get_params<vector<var> >(vector<vector<double> >& parameters, size_t p) {
-  vector<var> param(parameters.size());
-  for (size_t n = 0; n < parameters.size(); n++)
-    param[n] = parameters[n][p];
-  return param;
-}
-template<class T0, class T1, class T2, class T3, class TypeParam>
-void test_vectorized() {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  ASSERT_EQ(parameters[0].size(), 4U);
-  
-  if (is_constant_struct<T0>::value && is_constant_struct<T1>::value
-      && is_constant_struct<T2>::value && is_constant_struct<T3>::value) {
-    SUCCEED() << "No need to test all double arguments";
-    return;
-  }
-  if (!is_vector<T0>::value && !is_vector<T1>::value
-      && !is_vector<T2>::value && !is_vector<T3>::value) {
-    SUCCEED() << "No need to test all non-vector arguments";
-    return;
-  }
-
-  double e_logprob(0.0);
-  vector<double> e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    typename scalar_type<T0>::type p0 = get_param<T0>(parameters, n, 0);
-    typename scalar_type<T1>::type p1 = get_param<T1>(parameters, n, 1);
-    typename scalar_type<T2>::type p2 = get_param<T2>(parameters, n, 2);
-    typename scalar_type<T3>::type p3 = get_param<T3>(parameters, n, 3);
-    var logprob = _LOG_PROB_<true>(p0, p1, p2, p3);
-    e_logprob += logprob.val();
-    update_expected_gradients(logprob,
-			      e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3,
-			      p0, p1, p2, p3);
-  }
-  T0 p0 = get_params<T0>(parameters, 0);
-  T1 p1 = get_params<T1>(parameters, 1);
-  T2 p2 = get_params<T2>(parameters, 2);
-  T3 p3 = get_params<T3>(parameters, 3);
-  var logprob = _LOG_PROB_<true>(p0, p1, p2, p3);
-  EXPECT_FLOAT_EQ(e_logprob, logprob.val())
-    << "log probability does not match";
-
-  test_gradients(logprob,
-		 e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3,
-		 p0, p1, p2, p3);
-  return;
-}
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dddd) {
   test_vectorized<double, double, double, double, TypeParam>();
 }

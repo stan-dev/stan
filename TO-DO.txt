@@ -43,6 +43,9 @@ C++ API
     + student_t
     + uniform
     + weibull
+    univariate/discrete
+    + binomial
+    + beta_binomial (needs more testing)
 - Fully vectorized with partials calculated:
     univariate/continuous
     + beta
