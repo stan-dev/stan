@@ -6,6 +6,13 @@ vector_types.push_back(expr_type(DOUBLE_T,1U));    // std vector
 vector_types.push_back(VECTOR_T);                  // Eigen vector
 vector_types.push_back(ROW_VECTOR_T);              // Eigen row vector
 
+std::vector<expr_type> int_vector_types;
+int_vector_types.push_back(INT_T);                  // scalar
+int_vector_types.push_back(expr_type(INT_T,1U));    // std vector
+int_vector_types.push_back(VECTOR_T);               // Eigen vector
+int_vector_types.push_back(ROW_VECTOR_T);           // Eigen row vector
+
+
 
 add_unary("abs");
 add("abs",INT_T,INT_T);
@@ -25,15 +32,18 @@ add_unary("asinh");
 add_unary("atan");
 add_binary("atan2");
 add_unary("atanh");
-for (size_t i = 0; i < vector_types.size(); ++i) {
-  add("bernoulli_log",DOUBLE_T,INT_T,vector_types[i]);
-  add("bernoulli_log",DOUBLE_T,expr_type(INT_T,1U),vector_types[i]);
-}
-for (size_t i = 0; i < vector_types.size(); ++i) {
-  add("bernoulli_logit_log",DOUBLE_T,INT_T,vector_types[i]);
-  add("bernoulli_logit_log",DOUBLE_T,expr_type(INT_T,1U),vector_types[i]);
-}
-add("beta_binomial_log",DOUBLE_T,INT_T,INT_T,DOUBLE_T,DOUBLE_T);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
+  add("bernoulli_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    add("bernoulli_logit_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); i++) 
+  for (size_t j = 0; j < int_vector_types.size(); j++)
+    for (size_t k = 0; k < vector_types.size(); k++)
+      for (size_t l = 0; l < vector_types.size(); l++) 
+	add("beta_binomial_log",DOUBLE_T, // result
+	    int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
@@ -249,7 +259,6 @@ add_nullary("pi");
 add("poisson_log",DOUBLE_T, INT_T,DOUBLE_T);
 add_nullary("positive_infinity");
 add_binary("pow");
-
 add("prod",INT_T,expr_type(INT_T,1));
 add("prod",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("prod",DOUBLE_T,VECTOR_T);

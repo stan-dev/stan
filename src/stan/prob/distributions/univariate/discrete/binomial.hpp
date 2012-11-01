@@ -56,6 +56,12 @@ namespace stan {
                          "Probability parameter",
                          &logp, Policy()))
         return logp;
+      if (!(check_consistent_sizes(function,
+                                   n,N,theta,
+				   "Successes variable","Population size parameter","Probability parameter",
+                                   &logp, Policy())))
+        return logp;
+
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
@@ -66,7 +72,7 @@ namespace stan {
       VectorView<const T_N> N_vec(N);
       VectorView<const T_prob> theta_vec(theta);
       size_t size = max_size(n, N, theta);
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      //agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
       
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;
