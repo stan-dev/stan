@@ -10,16 +10,15 @@
 ## with smooth density function so r in (3.1) is given 
 ## in Equation (3.4) 
 
-// status: not work 
 data {
-  int(0,) N; 
+  int<lower=0> N; 
   real x[N];
 } 
 
 parameters {
-  real(0,) alpha;
-  real(0,) sigma; 
-  real(0,) theta;
+  real<lower=0> alpha;
+  real<lower=0> sigma; 
+  real<lower=0> theta;
 } 
 
 transformed parameters {

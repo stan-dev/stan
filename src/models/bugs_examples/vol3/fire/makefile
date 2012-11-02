@@ -2,10 +2,12 @@ STAN_HOME = ../../../../..
 PGM = fire#
 CC = g++ 
 CC = clang++ 
+CPPFLAGS = -I $(STAN_HOME)/lib/boost_1.51.0 -I$(STAN_HOME)/lib/eigen_3.1.1 -I$(STAN_HOME)/lib/eigen_3.1.1/unsupported  -I $(STAN_HOME)/src
+LIBFLAGS = -L$(STAN_HOME)/bin -lstan 
 
 $(PGM) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM) $(PGM).stan.0
-	$(CC) -O0 -DNDEBUG  -I $(STAN_HOME)/lib -I $(STAN_HOME)/src $(PGM).cpp -o $(PGM) -L $(STAN_HOME)/bin -lstan
+	$(CXX) -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
 	./$(PGM) --data=$(PGM).Rdata
 
 clean :
