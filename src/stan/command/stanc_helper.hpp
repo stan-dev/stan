@@ -150,13 +150,12 @@ int stanc_helper(int argc, const char* argv[],
       = stan::gm::compile(err_stream,in,out,model_name,include_main,in_file_name);
     out.close();
     if (!valid_model) {
-      delete_file(out_stream,out_file_name);  // FIXME: how to remove triple cut-and-paste?
       if (err_stream)
         *err_stream << "PARSING FAILED." << std::endl;
+      delete_file(out_stream,out_file_name);  // FIXME: how to remove triple cut-and-paste?
       return PARSE_FAIL_RC;
     }
   } catch (const std::invalid_argument& e) {
-    delete_file(out_stream,out_file_name);
     if (err_stream) {
       *err_stream << std::endl
                   << "INVALID COMMAND-LINE ARGUMENT"
@@ -165,10 +164,10 @@ int stanc_helper(int argc, const char* argv[],
                   << std::endl;
       *err_stream << "Execute \"stanc --help\" for more information" 
                   << std::endl;
+      delete_file(out_stream,out_file_name);
     }
     return INVALID_ARGUMENT_RC;
   } catch (const std::exception& e) {
-    delete_file(out_stream,out_file_name);
     if (err_stream) {
       *err_stream << std::endl
                   << "ERROR PARSING"
@@ -176,6 +175,7 @@ int stanc_helper(int argc, const char* argv[],
                   << e.what()
                   << std::endl;
     }
+    delete_file(out_stream,out_file_name);
     return EXCEPTION_RC;
   }
   

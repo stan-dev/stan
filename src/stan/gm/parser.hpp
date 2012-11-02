@@ -108,7 +108,7 @@ namespace stan {
       } catch (const expectation_failure<pos_iterator_type>& e) {
         const file_position_base<std::string>& pos = e.first.get_position();
         std::stringstream msg;
-        msg << "LOCATION:  file=" << pos.file
+        msg << "EXPECTATION FAILURE LOCATION: file=" << pos.file
             << "; line=" << pos.line 
             << ", column=" << pos.column 
             << std::endl;
@@ -118,6 +118,7 @@ namespace stan {
           msg << ' ';
         msg << " ^-- here" 
             << std::endl << std::endl;
+        throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;

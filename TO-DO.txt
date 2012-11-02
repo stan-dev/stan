@@ -36,6 +36,11 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* poisson_log(y|alpha) = poisson(y|exp(alpha))
+
+* change step_size = epsilon +/- epsilon_pm to
+  step_size = min(C, epsilon + normal(0,sigma))
+
 * remove (unsigned) long long instances in dump and error testing
 
 * check that positive definiteness enforced for transformed params,
@@ -430,6 +435,11 @@ C++ API
 Modeling Language
 ======================================================================
 
+* allow array modifiers on types as well as variables
+  -- int[4] x;
+  -- int x[4];
+  -- change all the syntax or allow both?
+
 * add ragged array types
   -- data { int x[,]; } 
      for a possibly ragged array x
@@ -801,6 +811,30 @@ Web Pages
 Manuals
 ======================================================================
 
+* Talk about index order and read order for matrix[I,J] a[K];
+  -- in section on arrays in language reference
+  -- in section on I/O
+  -- example:
+     real x[I,J,K];
+     matrix[J,K] m[I];
+
+    for (k in 1:K)
+      for (j in 1:J)
+        for (i in 1:I)
+          x[i,j,k] = next...
+
+* Stan's default is to use uniform inits between [-2,2] 
+  on the unconstrained params.  For bounded params, that amounts
+  to a range of (inv_logit(-2), inv_logit(2)) = (.12,.88), which
+  is the central 80% interval.
+
+  For positive params, that amounts to sampling between
+  (exp(-2),exp(2)).
+
+  For unconstrained params, sampling is between (-2,2).
+
+  Plot these out because they're non-linear.
+
 * transforms a la Matt, at least for all the normal-based cases
   we know of
 
@@ -916,7 +950,6 @@ Models
 
 Models
 ======================================================================
-
 
 * unit K-hyperball complement for stationary AR(K) parameters
   - what should the prior be?
