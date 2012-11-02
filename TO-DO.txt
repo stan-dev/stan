@@ -64,6 +64,7 @@ C++ API
     univariate/discrete
     + binomial
     + beta_binomial (needs more testing)
+    + hypergeometric
 - Fully vectorized with partials calculated:
     univariate/continuous
     + beta
