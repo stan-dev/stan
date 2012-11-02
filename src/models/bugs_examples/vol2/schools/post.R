@@ -4,7 +4,7 @@ post <- read.csv(file = 'samples.csv', header = TRUE, comment.char = '#')
 poiidx <- c(grep('beta\\.[0-9]+', colnames(post)), 
             grep('gamma\\.[0-9]+', colnames(post)), 
             grep('phi', colnames(post)), 
-            grep('theta', colnames(post))) 
+            grep('theta', colnames(post)))
 
 
 poi <- post[, poiidx] 
@@ -12,8 +12,14 @@ poi <- post[, poiidx]
 summary(as.mcmc(poi)); 
 # quit('no')
 
+ranks <- post[, grep('ranks\\.[0-9]+', colnames(post))] 
+ranksm <- apply(ranks, 2, mean) 
+dotplot(rev(sort(ranksm)))
 
-library(BUGSExamples);
+
+
+
+require(BUGSExamples);
 pars <- c("beta", "gamma", "phi", "theta") 
 
 ex <- list(name = "Schools", parameters = pars,
@@ -22,4 +28,4 @@ ex <- list(name = "Schools", parameters = pars,
 
 jagspost <- runExample(ex, engine = 'JAGS')
 summary(jagspost$coda)
-plot(jagspost$coda);
+# plot(jagspost$coda);

@@ -3,9 +3,6 @@
 # multivariate hierarcical models 
 #  http://www.openbugs.info/Examples/Schools.html
 
-## status: not work (adaption hangs or it takes very long, 
-## but not that sure it is coded correctly). 
-
 data {
   int<lower=0> N; 
   int<lower=0> M; 
@@ -16,13 +13,13 @@ data {
   int VR[N, 2]; 
   real Y[N]; 
   int Gender[N]; 
-  cov_matrix(3) R; 
+  cov_matrix[3] R; 
 } 
 
 transformed data {
-  vector(3) gamma_mu; 
-  cov_matrix(3) gamma_Sigma; 
-  cov_matrix(3) invR; 
+  vector[3] gamma_mu; 
+  cov_matrix[3] gamma_Sigma; 
+  cov_matrix[3] invR; 
   invR <- inverse(R); 
   gamma_mu[1] <- 0; 
   gamma_mu[2] <- 0; 
@@ -33,19 +30,12 @@ transformed data {
 
 parameters {
   real beta[8]; 
-  vector(3) alpha[M]; 
-  vector(3) gamma; 
-  cov_matrix(3) Sigma; 
+  vector[3] alpha[M]; 
+  vector[3] gamma;
+  cov_matrix[3] Sigma; 
   real theta; 
   real phi; 
 } 
-
-
-transformed parameters {
-  real alpha1[M]; 
-  for (m in 1:M)  alpha1[m] <- alpha[m, 1]; 
-} 
-
 
 model {
   for(p in 1:N) {
@@ -67,10 +57,20 @@ model {
 
   # Priors for random coefficients:
   for (m in 1:M) alpha[m] ~ multi_normal(gamma, Sigma); 
-
   # Hyper-priors:
   gamma ~ multi_normal(gamma_mu, gamma_Sigma); 
   Sigma ~ inv_wishart(3, invR); 
 }
 
-
+generated quantities {
+  # real alpha1[M]; 
+  real ranks[M]; 
+  # for (m in 1:M)  alpha1[m] <- alpha[m, 1]; 
+  ## compute ranks 
+  for (j in 1:M) {
+    real greater_than[M]; 
+    for (k in 1:M) 
+      greater_than[k] <- step(alpha[k, 1] - alpha[j, 1]); 
+    ranks[j] <- sum(greater_than);
+  }
+} 
