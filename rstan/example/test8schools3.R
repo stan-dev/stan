@@ -15,8 +15,10 @@ dat <- list(J = 8L,
 
 iter <- 121
 
+print(ls())
+
 # NUTS 2 
-ss3 <- sampling(m, data = dat, iter = iter, chains = 4, equal_step_sizes = FALSE, refresh = 100) 
+ss3 <- sampling(yam, data = dat, iter = iter, chains = 4, equal_step_sizes = FALSE, refresh = 100) 
 ainfo3 <- get_adaptation_info(ss3)
 lp3 <- get_logposterior(ss3)
 yalp3 <- get_logposterior(ss3, inc_warmup = FALSE)
