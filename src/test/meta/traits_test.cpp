@@ -268,8 +268,7 @@ TEST(MetaTraits, VectorView_matrix_var) {
   }
 
   const Matrix<var,1,Dynamic> d(c);
-  VectorView<const Matrix<var,Dynamic,1>,
-	     stan::is_vector<Matrix<var,Dynamic,1> >::value > dv(d);
+  VectorView<const Matrix<var,1,Dynamic> > dv(d);
   for (size_t n = 0; n < 10; ++n)
     EXPECT_FLOAT_EQ(d[n].val(), dv[n].val());
 }
