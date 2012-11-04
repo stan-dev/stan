@@ -1,43 +1,77 @@
-#include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
-#include <stan/meta/traits.hpp>
+#define _LOG_PROB_ neg_binomial_log
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
 
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_1_discrete_2_params.hpp>
 
-template <typename T_shape, typename T_inv_scale>
-void expect_propto(int n1, T_shape alpha1, T_inv_scale beta1,
-                   int n2, T_shape alpha2, T_inv_scale beta2,
-                   std::string message) {
-  expect_eq_diffs(stan::prob::neg_binomial_log<false>(n1,alpha1,beta1),
-                  stan::prob::neg_binomial_log<false>(n2,alpha2,beta2),
-                  stan::prob::neg_binomial_log<true>(n1,alpha1,beta1),
-                  stan::prob::neg_binomial_log<true>(n2,alpha2,beta2),
-                  message);
-}
-
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-TEST(AgradDistributionsNegBinomial,Propto) {
-  int n = 10;
-  expect_propto<var,var>(n,2.5,2.0,
-                         n,5.0,3.0,
-                         "var: alpha and beta");
-}
-TEST(AgradDistributionsNegBinomial,ProptoAlpha) {
-  int n = 10;
-  double beta = 3.0;
-  
-  expect_propto<var,double>(n, 0.2, beta,
-                            n, 6.0, beta,
-                            "var: alpha");
-}
-TEST(AgradDistributionsNegBinomial,ProptoBeta) {
-  int n = 10;
-  double alpha = 6.0;
-  
-  expect_propto<double,var>(n, alpha, 1.0,
-                            n, alpha, 1.5,
-                            "var: beta");
-}
+class AgradDistributionsNegBinomial : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(3);
+
+    param[0] = 10;           // n
+    param[1] = 2.0;          // alpha
+    param[2] = 1.5;          // beta
+    parameters.push_back(param);
+
+    param[0] = 100;          // n
+    param[1] = 3.0;          // alpha
+    param[2] = 3.5;          // beta
+    parameters.push_back(param);
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // n
+    index.push_back(0U);
+    value.push_back(-1);
+    
+    // alpha
+    index.push_back(1U);
+    value.push_back(0);
+    
+    // beta
+    index.push_back(2U);
+    value.push_back(0);
+  }
+
+  template <class T_shape, class T_inv_scale>
+  var log_prob(const int n, const T_shape& alpha, const T_inv_scale& beta) {
+    
+    using std::log;
+    using stan::math::binomial_coefficient_log;
+    using stan::math::log1m;
+    using stan::prob::include_summand;
+
+    var logp(0);
+    // Special case where negative binomial reduces to Poisson
+    if (alpha > 1e10) {
+      if (include_summand<true>::value)
+	logp -= lgamma(n + 1.0);
+      if (include_summand<true,T_shape>::value ||
+	  include_summand<true,T_inv_scale>::value) {
+	typename stan::return_type<T_shape, T_inv_scale>::type lambda;
+	lambda = alpha / beta;
+	logp += multiply_log(n, lambda) - lambda;
+      }
+      return logp;
+    }
+    // More typical cases
+    if (include_summand<true,T_shape>::value)
+      if (n != 0)
+	logp += binomial_coefficient_log<typename stan::scalar_type<T_shape>::type>
+	  (n + alpha - 1.0, n);
+    if (include_summand<true,T_shape,T_inv_scale>::value)
+      logp += -n * log1p(beta) 
+	+ alpha * log(beta / (1 + beta));
+    return logp;
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNegBinomial,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsNegBinomial);
