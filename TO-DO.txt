@@ -65,6 +65,7 @@ C++ API
     + binomial
     + beta_binomial (needs more testing)
     + hypergeometric
+    + neg_binomial
 - Fully vectorized with partials calculated:
     univariate/continuous
     + beta
