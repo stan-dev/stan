@@ -1,77 +1,61 @@
-#include <gtest/gtest.h>
+#define _LOG_PROB_ poisson_log
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
 
-TEST(ProbDistributionsPoisson,PoissonZero) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log(0,0.0));
-}
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_1_discrete_1_param.hpp>
 
+using std::vector;
+using std::log;
+using std::numeric_limits;
 
-TEST(ProbDistributionsPoisson,Poisson) {
-  EXPECT_FLOAT_EQ(-2.900934, stan::prob::poisson_log(17,13.0));
-  EXPECT_FLOAT_EQ(-145.3547, stan::prob::poisson_log(192,42.0));
-  EXPECT_FLOAT_EQ(-3.0, stan::prob::poisson_log(0, 3.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log(0, std::numeric_limits<double>::infinity()));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log(1, 0.0));
-}
-TEST(ProbDistributionsPoisson,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(17,13.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(192,42.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(0, 3.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(0, 0.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log<true>(1, 0.0));
-}
+class ProbDistributionsPoisson : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(2);
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+    param[0] = 17;           // n
+    param[1] = 13.0;         // lambda
+    parameters.push_back(param);
+    log_prob.push_back(-2.900934); // expected log_prob
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+    param[0] = 192;          // n
+    param[1] = 42.0;         // lambda
+    parameters.push_back(param);
+    log_prob.push_back(-145.3547); // expected log_prob
 
-using stan::prob::poisson_log;
+    param[0] = 0;            // n
+    param[1] = 3.0;          // lambda
+    parameters.push_back(param);
+    log_prob.push_back(-3.0); // expected log_prob
 
-TEST(ProbDistributionsPossion,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
+    param[0] = 0;            // n
+    param[1] = std::numeric_limits<double>::infinity(); // lambda
+    parameters.push_back(param);
+    log_prob.push_back(log(0.0)); // expected log_prob
 
-  unsigned int n = 4;
-  double lambda = 3.0;
-  
-  EXPECT_NO_THROW(poisson_log(n, lambda)); 
-  EXPECT_NO_THROW(poisson_log(n, 0.0));
-  EXPECT_NO_THROW(poisson_log(n, inf));
-  
-  EXPECT_THROW(poisson_log(n, nan), std::domain_error);
-  EXPECT_THROW(poisson_log(n, -1.0), std::domain_error);
-  EXPECT_THROW(poisson_log(n, -inf), std::domain_error);
-}
-TEST(ProbDistributionsPossion,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
+    param[0] = 1;            // n
+    param[1] = 0.0;          // lambda
+    parameters.push_back(param);
+    log_prob.push_back(log(0.0)); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // n
+    index.push_back(0U);
+    value.push_back(-1);
 
-  double result;
-  unsigned int n = 4;
-  double lambda = 3.0;
-  
-  result = poisson_log(n, lambda, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = poisson_log(n, 0.0, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = poisson_log(n, inf, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  result = poisson_log(n, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = poisson_log(n, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = poisson_log(n, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
+    // lambda
+    index.push_back(1U);
+    value.push_back(-1e-5);
+
+    index.push_back(1U);
+    value.push_back(-1);
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsPoisson,
+			      DistributionTestFixture,
+			      ProbDistributionsPoisson);
+

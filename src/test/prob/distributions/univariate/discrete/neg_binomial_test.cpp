@@ -1,3 +1,56 @@
+#define _LOG_PROB_ neg_binomial_log
+#include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
+
+#include <test/prob/distributions/distribution_test_fixture.hpp>
+#include <test/prob/distributions/distribution_tests_1_discrete_2_params.hpp>
+
+using std::vector;
+using std::log;
+using std::numeric_limits;
+
+class ProbDistributionsNegBinomial : public DistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters,
+		    vector<double>& log_prob) {
+    vector<double> param(3);
+
+    param[0] = 10;           // n
+    param[1] = 2.0;          // alpha
+    param[2] = 1.5;          // beta
+    parameters.push_back(param);
+    log_prob.push_back(-7.786663); // expected log_prob
+
+    param[0] = 100;          // n
+    param[1] = 3.0;          // alpha
+    param[2] = 3.5;          // beta
+    parameters.push_back(param);
+    log_prob.push_back(-142.6147); // expected log_prob
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // n
+    index.push_back(0U);
+    value.push_back(-1);
+    
+    // alpha
+    index.push_back(1U);
+    value.push_back(0);
+    
+    // beta
+    index.push_back(2U);
+    value.push_back(0);
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNegBinomial,
+			      DistributionTestFixture,
+			      ProbDistributionsNegBinomial);
+/*
+
+
+
+
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
 
@@ -112,3 +165,4 @@ TEST(ProbDistributionsNegBinomial,check_values) {
   result = neg_binomial_log(n, alpha, beta);
   EXPECT_FLOAT_EQ(-92.597490095807, result);
 }
+*/

@@ -167,7 +167,10 @@ stan(file, model_name = "anon_model", model_code = "",
 
 \note{
   The data passed to \code{stan} are preprocessed before
-  passing to Stan. This process mainly includes the following:
+  passing to Stan. Each element of data should be either a numeric
+  vector (including special case 'scalar'), a numeric
+  array (matrix), or a numeric data frame.  This process for each element 
+  mainly includes the following:
   \enumerate{
     \item Change the data of type from \code{double} 
       to \code{integer} if no accuracy is lost. The main
@@ -181,7 +184,7 @@ stan(file, model_name = "anon_model", model_code = "",
      Unlike BUGS, Stan does not allow missing data. Any \code{NA} values
      in supplied data will cause the function to stop and report an error.
   
-   \item Check data types passed in.  Stan allows only numeric data, that is,
+   \item Check data types.  Stan allows only numeric data, that is,
      doubles, integers, and arrays of these.  Data of other types (for
      examples, characters) are not passed to Stan. Data of  
      \code{data.frame} are converted to \code{matrix} by
