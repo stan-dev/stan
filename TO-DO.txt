@@ -814,6 +814,8 @@ Web Pages
 Manuals
 ======================================================================
 
+* Fix 0--(N-1) range for categorical example and in doc for categorical
+
 * Talk about index order and read order for matrix[I,J] a[K];
   -- in section on arrays in language reference
   -- in section on I/O
