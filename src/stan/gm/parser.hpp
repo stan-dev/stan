@@ -118,6 +118,13 @@ namespace stan {
           msg << ' ';
         msg << " ^-- here" 
             << std::endl << std::endl;
+        std::string diagnostics = prog_grammar.error_msgs_.str();
+        if (output_stream && is_nonempty(diagnostics)) {
+          msg << std::endl
+              << "DIAGNOSTIC(S) FROM PARSER:"
+              << diagnostics
+              << std::endl;
+        }
         throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
