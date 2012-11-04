@@ -136,6 +136,13 @@ transformed data {
   transformed_data_real <- neg_binomial_log(d_int_array, d_real_array, d_row_vector);
   transformed_data_real <- neg_binomial_log(d_int_array, d_real_array, d_real_array);
   transformed_data_real <- poisson_log(d_int, d_real);
+  transformed_data_real <- poisson_log(d_int, d_vector);
+  transformed_data_real <- poisson_log(d_int, d_row_vector);
+  transformed_data_real <- poisson_log(d_int, d_real_array);
+  transformed_data_real <- poisson_log(d_int_array, d_real);
+  transformed_data_real <- poisson_log(d_int_array, d_vector);
+  transformed_data_real <- poisson_log(d_int_array, d_row_vector);
+  transformed_data_real <- poisson_log(d_int_array, d_real_array);
   // Multivariate Discrete Probabilities
   transformed_data_real <- multinomial_log(d_int_array, d_vector);
   //*** Continuous Probabilities ***
@@ -462,6 +469,20 @@ transformed parameters {
   transformed_param_real <- neg_binomial_log(d_int_array, p_real_array, p_real_array);
   transformed_param_real <- poisson_log(d_int, d_real);
   transformed_param_real <- poisson_log(d_int, p_real);
+  transformed_param_real <- poisson_log(d_int, d_vector);
+  transformed_param_real <- poisson_log(d_int, p_vector);
+  transformed_param_real <- poisson_log(d_int, d_row_vector);
+  transformed_param_real <- poisson_log(d_int, p_row_vector);
+  transformed_param_real <- poisson_log(d_int, d_real_array);
+  transformed_param_real <- poisson_log(d_int, p_real_array);
+  transformed_param_real <- poisson_log(d_int_array, d_real);
+  transformed_param_real <- poisson_log(d_int_array, p_real);
+  transformed_param_real <- poisson_log(d_int_array, d_vector);
+  transformed_param_real <- poisson_log(d_int_array, p_vector);
+  transformed_param_real <- poisson_log(d_int_array, d_row_vector);
+  transformed_param_real <- poisson_log(d_int_array, p_row_vector);
+  transformed_param_real <- poisson_log(d_int_array, d_real_array);
+  transformed_param_real <- poisson_log(d_int_array, p_real_array);
   // Multivariate Discrete Probabilities
   transformed_param_real <- multinomial_log(d_int_array, d_vector);
   transformed_param_real <- multinomial_log(d_int_array, p_vector);

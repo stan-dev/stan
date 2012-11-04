@@ -66,6 +66,7 @@ C++ API
     + beta_binomial (needs more testing)
     + hypergeometric
     + neg_binomial
+    + poisson
 - Fully vectorized with partials calculated:
     univariate/continuous
     + beta
