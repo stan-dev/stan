@@ -7,6 +7,7 @@
 // #include <R.h>
 // #include <Rinternals.h> 
 
+#include <algorithm>
 #include <rstan/io/r_ostream.hpp> 
 #include <stan/version.hpp>
 #include <boost/lexical_cast.hpp>

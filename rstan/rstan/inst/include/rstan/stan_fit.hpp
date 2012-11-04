@@ -240,7 +240,7 @@ namespace rstan {
       std::vector<std::string> names;
       m.get_param_names(names);
       names.push_back("lp__");
-      return names; // copy for return
+      return names; 
     }
 
     /**
@@ -269,7 +269,7 @@ namespace rstan {
            ++it) 
         uintdims.push_back(sizet_to_uint(*it)); 
 
-      std::vector<unsigned int> scalar_dim;
+      std::vector<unsigned int> scalar_dim; // for lp__
       uintdims.push_back(scalar_dim); 
       return uintdims; 
     } 
@@ -357,7 +357,7 @@ namespace rstan {
         size_t z = 0;
         for (; z < qoi_idx.size() - 1; ++z)  
           chains[z][ii] = params_inr[qoi_idx[z]]; 
-        chains[z][ii] = lp__;
+        chains[z][ii] = lp__; // or use qoi_idx = -1 for lp__
 
         ii++; 
           
@@ -657,14 +657,14 @@ namespace rstan {
       for (std::vector<std::string>::const_iterator it = pnames.begin(); 
            it != pnames.end(); 
            ++it) { 
-        if (*it == "lp__") {
-          names_oi_tidx_.push_back(-1); // -1 for lp__ as it is not real parameters 
-          continue;
-        } 
         size_t p = find_index(names_, *it); 
         if (p != names_.size()) {
           names_oi_.push_back(*it); 
           dims_oi_.push_back(dims_[p]); 
+          if (*it == "lp__") {
+            names_oi_tidx_.push_back(-1); // -1 for lp__ as it is not really a parameter  
+            continue;
+          } 
           size_t i_num = calc_num_params(dims_[p]); 
           size_t i_start = starts[p]; 
           for (size_t j = i_start; j < i_start + i_num; j++)
@@ -679,21 +679,12 @@ namespace rstan {
     SEXP update_param_oi(SEXP pars) {
       std::vector<std::string> pnames = 
         Rcpp::as<std::vector<std::string> >(pars);  
-      pnames.push_back("lp__"); 
+      if (std::find(pnames.begin(), pnames.end(), "lp__") == pnames.end()) 
+        pnames.push_back("lp__"); 
       update_param_oi0(pnames); 
       get_all_flatnames(names_oi_, dims_oi_, fnames_oi_, true); 
       return Rcpp::wrap(true); 
     } 
-
-    stan_fit(SEXP data, SEXP pars) : 
-      data_(Rcpp::as<Rcpp::List>(data)), 
-      model_(data_, &rstan::io::rcout),  
-      names_(get_param_names(model_)), 
-      dims_(get_param_dims(model_)), 
-      num_params_(calc_total_num_params(dims_)) 
-    {  
-      update_param_oi(pars); 
-    }
 
     stan_fit(SEXP data) : 
       data_(Rcpp::as<Rcpp::List>(data)), 
@@ -803,7 +794,7 @@ namespace rstan {
         size_t j = std::distance(names_oi_.begin(), 
                                  std::find(names_oi_.begin(),    
                                            names_oi_.end(), *it)); 
-        if (j == names_oi_.size()) // nout found 
+        if (j == names_oi_.size()) // not found 
           continue; 
         unsigned int j_size = calc_num_params(dims_oi_[j]); 
         unsigned int j_start = starts_oi_[j]; 
