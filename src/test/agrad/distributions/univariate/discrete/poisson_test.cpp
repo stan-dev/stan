@@ -1,38 +1,78 @@
-#include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
-#include <stan/meta/traits.hpp>
+#define _LOG_PROB_ poisson_log
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
 
-template <typename T_prob>
-void expect_propto(unsigned int n1, T_prob lambda1, 
-                   unsigned int n2, T_prob lambda2, 
-                   std::string message) {
-  expect_eq_diffs(stan::prob::poisson_log<false>(n1, lambda1),
-                  stan::prob::poisson_log<false>(n2, lambda2),
-                  stan::prob::poisson_log<true>(n1, lambda1),
-                  stan::prob::poisson_log<true>(n2, lambda2),
-                  message);
-}
+#include <test/agrad/distributions/distribution_test_fixture.hpp>
+#include <test/agrad/distributions/distribution_tests_1_discrete_1_param.hpp>
 
+using std::vector;
+using std::numeric_limits;
 using stan::agrad::var;
 
-TEST(AgradDistributionsPoisson,Propto) {
-  unsigned int n;
+class AgradDistributionsPoisson : public AgradDistributionTest {
+public:
+  void valid_values(vector<vector<double> >& parameters) {
+    vector<double> param(2);
 
-  n = 0;
-  expect_propto<var>(n, 10,
-                     n, 15,
-                     "var: lambda");
-  
-  n = 1;
-  expect_propto<var>(n, 11,
-                     n, 20,
-                     "var: lambda");
+    param[0] = 17;           // n
+    param[1] = 13.0;         // lambda
+    parameters.push_back(param);
 
-  n = 123;
-  expect_propto<var>(n, 30,
-                     n, 15,
-                     "var: lambda");
-}
+    param[0] = 192;          // n
+    param[1] = 42.0;         // lambda
+    parameters.push_back(param);
+
+    param[0] = 0;            // n
+    param[1] = 3.0;          // lambda
+    parameters.push_back(param);
+
+    /*param[0] = 0;            // n
+    param[1] = std::numeric_limits<double>::infinity(); // lambda
+    parameters.push_back(param);*/
+
+    /*    param[0] = 1;            // n
+    param[1] = 0.0;          // lambda
+    parameters.push_back(param);*/
+  }
+ 
+  void invalid_values(vector<size_t>& index, 
+		      vector<double>& value) {
+    // n
+    index.push_back(0U);
+    value.push_back(-1);
+
+    // lambda
+    index.push_back(1U);
+    value.push_back(-1e-5);
+
+    index.push_back(1U);
+    value.push_back(-1);
+  }
+
+  template <class T_rate>
+  var log_prob(const int n, const T_rate& lambda) {
+
+    using boost::math::lgamma;
+    using stan::math::multiply_log;
+    using stan::prob::LOG_ZERO;
+    using stan::prob::include_summand;
+
+    var logp(0);
+
+    if (lambda == 0)
+      return n == 0 ? 0 : LOG_ZERO;
+    
+    if (std::isinf(lambda))
+      return LOG_ZERO;
+    
+    if (include_summand<true>::value)
+      logp -= lgamma(n + 1.0);
+    if (include_summand<true,T_rate>::value)
+      logp += multiply_log(n, lambda) - lambda;
+    return logp;
+  }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPoisson,
+			      AgradDistributionTestFixture,
+			      AgradDistributionsPoisson);
+
