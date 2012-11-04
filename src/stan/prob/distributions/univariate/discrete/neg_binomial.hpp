@@ -85,7 +85,8 @@ namespace stan {
 	// More typical cases
 	if (include_summand<propto,T_shape>::value)
 	  if (n_vec[i] != 0)
-	    logp += binomial_coefficient_log<T_shape>(n_vec[i] + alpha_vec[i] - 1.0, n_vec[i]);
+	    logp += binomial_coefficient_log<typename scalar_type<T_shape>::type>
+	      (n_vec[i] + alpha_vec[i] - 1.0, n_vec[i]);
 	if (include_summand<propto,T_shape,T_inv_scale>::value)
 	  logp += -n_vec[i] * log1p(beta_vec[i]) 
 	    + alpha_vec[i] * log(beta_vec[i] / (1 + beta_vec[i]));
