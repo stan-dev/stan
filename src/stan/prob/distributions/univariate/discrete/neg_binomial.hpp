@@ -81,15 +81,16 @@ namespace stan {
 	    lambda = alpha_vec[i] / beta_vec[i];
 	    logp += multiply_log(n_vec[i], lambda) - lambda;
 	  }
-	}
+	} else {
 	// More typical cases
-	if (include_summand<propto,T_shape>::value)
-	  if (n_vec[i] != 0)
-	    logp += binomial_coefficient_log<typename scalar_type<T_shape>::type>
-	      (n_vec[i] + alpha_vec[i] - 1.0, n_vec[i]);
-	if (include_summand<propto,T_shape,T_inv_scale>::value)
-	  logp += -n_vec[i] * log1p(beta_vec[i]) 
-	    + alpha_vec[i] * log(beta_vec[i] / (1 + beta_vec[i]));
+	  if (include_summand<propto,T_shape>::value)
+	    if (n_vec[i] != 0)
+	      logp += binomial_coefficient_log<typename scalar_type<T_shape>::type>
+		(n_vec[i] + alpha_vec[i] - 1.0, n_vec[i]);
+	  if (include_summand<propto,T_shape,T_inv_scale>::value)
+	    logp += -n_vec[i] * log1p(beta_vec[i]) 
+	      + alpha_vec[i] * log(beta_vec[i] / (1 + beta_vec[i]));
+	}
       }
       return logp;
     }
