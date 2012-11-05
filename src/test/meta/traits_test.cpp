@@ -4,6 +4,8 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix.hpp>
 
+using stan::length;
+
 TEST(MetaTraits, isConstant) {
   using stan::is_constant;
   EXPECT_TRUE(is_constant<double>::value);
@@ -114,6 +116,7 @@ TEST(MetaTraits, length) {
   std::vector<double> x(10);
   EXPECT_EQ(10U, length(x));
 }
+
 TEST(MetaTraits, VectorView_double)  {
   using stan::VectorView;
 
@@ -226,7 +229,7 @@ TEST(MetaTraits, VectorView_matrix_double) {
 
   const Matrix<double,1,Dynamic> d(c);
   VectorView<const Matrix<double,1,Dynamic>, 
-	     stan::is_vector<Matrix<double,1,Dynamic> >::value > dv(d);
+          stan::is_vector<Matrix<double,1,Dynamic> >::value > dv(d);
   for (size_t n = 0; n < 10; ++n)
     EXPECT_FLOAT_EQ(d[n], dv[n]);
 }
@@ -297,7 +300,6 @@ TEST(MetaTraits, VectorView_double_star) {
   EXPECT_FLOAT_EQ(10, bv[0]);
   EXPECT_FLOAT_EQ(10, b);
 }
-using stan::length;
 TEST(MetaTraits, DoubleVectorView_false_double) {
   using std::vector;
   using stan::DoubleVectorView;
@@ -564,48 +566,48 @@ TEST(MetaTraits, scalar_type) {
   EXPECT_FALSE(b5);
 }
 
-TEST(MetaTraits,VV) {
-  using stan::VV;
+TEST(MetaTraits,VectorView) {
+  using stan::VectorView;
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
 
   double x = 5;
-  VV<double> x_VV(x);
-  EXPECT_FLOAT_EQ(x,x_VV[0]);
-  EXPECT_FLOAT_EQ(x,x_VV[1]);
-  EXPECT_FLOAT_EQ(x,x_VV[2]);
+  VectorView<const double> x_VectorView(x);
+  EXPECT_FLOAT_EQ(x,x_VectorView[0]);
+  EXPECT_FLOAT_EQ(x,x_VectorView[1]);
+  EXPECT_FLOAT_EQ(x,x_VectorView[2]);
 
   vector<double> sv;
   sv.push_back(1.0);
   sv.push_back(4.0);
   sv.push_back(9.0);
-  VV<vector<double> > sv_VV(sv);
-  EXPECT_FLOAT_EQ(1.0,sv_VV[0]);
-  EXPECT_FLOAT_EQ(4.0,sv_VV[1]);
-  EXPECT_FLOAT_EQ(9.0,sv_VV[2]);
+  VectorView<const vector<double> > sv_VectorView(sv);
+  EXPECT_FLOAT_EQ(1.0,sv_VectorView[0]);
+  EXPECT_FLOAT_EQ(4.0,sv_VectorView[1]);
+  EXPECT_FLOAT_EQ(9.0,sv_VectorView[2]);
 
   Matrix<double,Dynamic,1> v(3);
   v << 1.0, 4.0, 9.0;
-  VV<Matrix<double,Dynamic,1> > v_VV(v);
-  EXPECT_FLOAT_EQ(1.0,v_VV[0]);
-  EXPECT_FLOAT_EQ(4.0,v_VV[1]);
-  EXPECT_FLOAT_EQ(9.0,v_VV[2]);
+  VectorView<const Matrix<double,Dynamic,1> > v_VectorView(v);
+  EXPECT_FLOAT_EQ(1.0,v_VectorView[0]);
+  EXPECT_FLOAT_EQ(4.0,v_VectorView[1]);
+  EXPECT_FLOAT_EQ(9.0,v_VectorView[2]);
 
   Matrix<double,1,Dynamic> rv(3);
   rv << 1.0, 4.0, 9.0;
-  VV<Matrix<double,1,Dynamic> > rv_VV(rv);
-  EXPECT_FLOAT_EQ(1.0,rv_VV[0]);
-  EXPECT_FLOAT_EQ(4.0,rv_VV[1]);
-  EXPECT_FLOAT_EQ(9.0,rv_VV[2]);
+  VectorView<const Matrix<double,1,Dynamic> > rv_VectorView(rv);
+  EXPECT_FLOAT_EQ(1.0,rv_VectorView[0]);
+  EXPECT_FLOAT_EQ(4.0,rv_VectorView[1]);
+  EXPECT_FLOAT_EQ(9.0,rv_VectorView[2]);
 
   Matrix<double,Dynamic,Dynamic> m(2,3);
   m << 1.0, 2.0, 3.0, -100.0, -200.0, -300.0;
-  VV<Matrix<double,Dynamic,Dynamic> > m_VV(m);
+  VectorView<const Matrix<double,Dynamic,Dynamic> > m_VectorView(m);
   int pos = 0;
   for (int j = 0; j < 3; ++j) {
     for (int i = 0; i < 2; ++i) {
-      EXPECT_FLOAT_EQ(m(i,j),m_VV[pos]);
+      EXPECT_FLOAT_EQ(m(i,j),m_VectorView[pos]);
       ++pos;
     }
   }
