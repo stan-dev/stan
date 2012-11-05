@@ -27,7 +27,7 @@ enum cl_options {
   seed,
   chain_id,
   iter,
-  warmup,
+  warmup_opt,
   thin,
   leapfrog_steps,
   max_treedepth,
@@ -143,10 +143,10 @@ public:
     output_changes [iter] = make_pair("",
                                       "100");
 
-    option_name[warmup] = "warmup";
-    command_changes[warmup] = make_pair("",
+    option_name[warmup_opt] = "warmup";
+    command_changes[warmup_opt] = make_pair("",
                                         " --warmup=60");
-    output_changes [warmup] = make_pair("",
+    output_changes [warmup_opt] = make_pair("",
                                         "60");
 
     option_name[thin] = "thin";
@@ -278,13 +278,13 @@ public:
                                             output_option));
       }
     }
-    if (!options[warmup]) {
+    if (!options[warmup_opt]) {
       int num_iter = options[iter] ? 100 : 2000;
-      int num_warmup = options[warmup] ? 60 : num_iter/2;
-      stringstream warmup;
-      warmup << num_iter - num_warmup;
+      int num_warmup = options[warmup_opt] ? 60 : num_iter/2;
+      stringstream warmup_stream;
+      warmup_stream << num_iter - num_warmup;
       changed_options.push_back(make_pair("warmup",
-                                          warmup.str()));
+                                          warmup_stream.str()));
     }
     
     return command.str();
@@ -323,7 +323,7 @@ void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<
 
 void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   int num_iter = options[iter] ? 100 : 2000;
-  int num_warmup = options[warmup] ? 60 : num_iter/2;
+  int num_warmup = options[warmup_opt] ? 60 : num_iter/2;
   size_t expected_num_samples = num_iter - num_warmup;
   if (options[thin]) {
     expected_num_samples = ceil(expected_num_samples / 3.0);
@@ -349,9 +349,9 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
       !options[seed])
     return;
   // seed / chain_id test
-  double expected_first_y;
   if (!options[append_samples] 
-      && !options[warmup]) {
+      && !options[warmup_opt]) {
+    double expected_first_y;
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 

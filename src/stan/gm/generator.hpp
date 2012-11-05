@@ -571,7 +571,7 @@ namespace stan {
           o_ << "\");" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "} catch (std::domain_error e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "} catch (std::domain_error& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(int_var_decl const& x) const {
@@ -598,7 +598,7 @@ namespace stan {
         generate_loop_var(x.name_,x.dims_.size());
         o_ << ",\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\"); } catch (std::domain_error e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "\"); } catch (std::domain_error& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(simplex_var_decl const& x) const {
