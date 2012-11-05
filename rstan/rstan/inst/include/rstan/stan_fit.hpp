@@ -218,18 +218,6 @@ namespace rstan {
       return num_params;
     }
 
-    /**
-     * Only calculate parameter with index in indexes. 
-     */ 
-    template <class T> 
-    T calc_total_num_params(const std::vector<std::vector<T> >& dims, 
-                            const std::vector<size_t> indexes) {
-      T num_params = 0;
-      for (size_t i = 0; i < indexes.size(); ++i)
-        num_params += calc_num_params(dims[indexes[i]]);
-      return num_params;
-    }
-
     bool do_print(int n, int refresh) {
       return refresh < 1 ? false : 
              (n == 0) || ((n + 1) % refresh == 0);
