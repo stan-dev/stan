@@ -864,9 +864,9 @@ namespace stan {
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
         vari::grad(vi_);
-        g.resize(0);
+        g.resize(x.size());
         for (size_t i = 0U; i < x.size(); ++i) 
-          g.push_back(x[i].vi_->adj_);
+          g[i] = x[i].vi_->adj_;
         vari::recover_memory();
       }
 
@@ -1881,7 +1881,7 @@ namespace stan {
     /**
      * Return the floor of the specified variable (cmath).  
      *
-     * The derivative of the fllor function is defined and
+     * The derivative of the floor function is defined and
      * zero everywhere but at integers, so we set these derivatives
      * to zero for convenience, 
      *
