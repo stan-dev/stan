@@ -13,7 +13,7 @@
 
 \usage{
   %% extract(object, \dots)  
-  \S4method{extract}{stanfit}(object, pars, permuted = FALSE, inc_warmup = FALSE) 
+  \S4method{extract}{stanfit}(object, pars, permuted = TRUE, inc_warmup = FALSE) 
 } 
 
 \section{Methods}{
@@ -33,7 +33,9 @@
   } 
   \item{permuted}{\code{TRUE} of \code{FALSE}. If \code{TRUE}, draws
     after the \emph{warmup} period in each chain are \emph{permuted} and \emph{merged}. 
-    If \code{FALSE}, the original order are kept.}
+    If \code{FALSE}, the original order are kept. For each \code{stanfit}
+    object, the permutation is fixed (that is, extracing samples a second
+    time will give the same sequence of iterations as the previous).}
   \item{inc_warmup}{\code{TRUE} of \code{FALSE}. The argument matters
     only if \code{permuted} is \code{FALSE}. If \code{TRUE}, warmup
     draws are included; otherwise excluded.}
@@ -72,7 +74,9 @@ fit_ss <- extract(fit, permuted = TRUE) # fit_ss is a list
 alpha <- fit_ss$alpha  
 beta <- fit_ss$beta 
 ## or extract alpha by just specifying pars = 'alpha' 
-# alpha <- extract(fit, pars = 'alpha', permuted = TRUE)$alpha 
+alpha2 <- extract(fit, pars = 'alpha', permuted = TRUE)$alpha 
+
+print(identical(alpha, alpha2)) 
 
 ## get the samples for alpha[1,1] and beta[2] 
 alpha_11 <- alpha[, 1, 1] 
