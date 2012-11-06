@@ -2033,7 +2033,7 @@ namespace stan {
     /**
      * Return the floor of the specified variable (cmath).  
      *
-     * The derivative of the fllor function is defined and
+     * The derivative of the floor function is defined and
      * zero everywhere but at integers, so we set these derivatives
      * to zero for convenience, 
      *
