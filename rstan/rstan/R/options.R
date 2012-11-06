@@ -46,7 +46,7 @@ init_rstan_opt_env <- function(e) {
 
   # boost lib path 
   rstan_inc_path  <- system.file('include', package = 'rstan')
-  boost_lib_path <- file.path(rstan_inc_path, '/stanlib/boost_1.51.0') 
+  boost_lib_path <- file.path(rstan_inc_path, '/stanlib/boost_1.52.0') 
   eigen_lib_path <- system.file('include', package = 'RcppEigen')
   assign("eigen_lib", eigen_lib_path, e) 
   assign("boost_lib", boost_lib_path, e) 

@@ -15,7 +15,7 @@ PKG_LIBS = $(shell  $(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()")
 PKG_CPPFLAGS += -I"../inst/include/stansrc"  
 PKG_CPPFLAGS += -I"$(EIGEN_PATH)" 
 PKG_CPPFLAGS += -I"$(EIGEN_PATH)/unsupported" 
-PKG_CPPFLAGS += -I"../inst/include/stanlib/boost_1.51.0" 
+PKG_CPPFLAGS += -I"../inst/include/stanlib/boost_1.52.0" 
 PKG_CPPFLAGS += -I"../inst/include" 
 
 # CXXFLAGS = -O2 -pipe -g $(LTO)
