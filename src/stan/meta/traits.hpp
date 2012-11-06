@@ -174,11 +174,25 @@ namespace stan {
     typedef typename scalar_type<T>::type type;
   };
 
+  template <typename T>
+  struct scalar_type<T*> {
+    typedef typename scalar_type<T>::type type;
+  };
+
 
   // handles scalar, eigen vec, eigen row vec, std vec
   template <typename T>
   struct is_vector_like {
     enum { value = stan::is_vector<T>::value };  
+  };
+  template <typename T>
+  struct is_vector_like<T*> {
+    enum { value = true };
+  };
+  // handles const
+  template <typename T>
+  struct is_vector_like<const T> {
+    enum { value = stan::is_vector_like<T>::value };  
   };
   // handles eigen matrix
   template <typename T>
@@ -189,86 +203,123 @@ namespace stan {
 
   template <typename T,
             bool is_array = stan::is_vector_like<T>::value>
-  class VV {
+  class VectorView {
   public: 
     typedef typename scalar_type<T>::type scalar_t;
 
-    VV(const scalar_t& c) : x_(&c) { }
+    VectorView(scalar_t& c) : x_(&c) { }
 
-    VV(const std::vector<scalar_t>& v) : x_(&v[0]) { }
+    VectorView(std::vector<scalar_t>& v) : x_(&v[0]) { }
 
     template <int R, int C>
-    VV(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+    VectorView(Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
 
-    scalar_t operator[](int i) {
+    VectorView(scalar_t* x) : x_(x) { }
+
+    scalar_t& operator[](int i) {
       if (is_array) return x_[i];
-      else return *x_;
+      else return x_[0];
+    }
+  private:
+    scalar_t* x_;
+  };
+
+  template <typename T, bool is_array>
+  class VectorView<const T, is_array> {
+  public:
+    typedef typename scalar_type<T>::type scalar_t;
+
+    VectorView(const scalar_t& c) : x_(&c) { }
+
+    VectorView(const scalar_t* x) : x_(x) { }
+
+    VectorView(const std::vector<scalar_t>& v) : x_(&v[0]) { }
+
+    template <int R, int C>
+    VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+
+    const scalar_t operator[](int i) const {
+      if (is_array) return x_[i];
+      else return x_[0];
     }
   private:
     const scalar_t* x_;
   };
 
-  
-  template<typename T, 
-           bool is_vec = stan::is_vector<T>::value>
-  class VectorView {
-  private:
-    T* x_;
+  // simplify to hold value in common case where it's more efficient
+  template <>
+  class VectorView<const double, false> {
   public:
-    VectorView(T& x) : x_(&x) { }
-    typename scalar_type<T>::type& operator[](int /*i*/) {
-      return *x_;
+    VectorView(double x) : x_(x) { }
+    double operator[](int /* i */)  const {
+      return x_;
     }
-  };
-  
-  template<typename T>
-  class VectorView<T*,false> {
   private:
-    T* x_;
-  public:
-    VectorView(T* x) : x_(x) { }
-    typename scalar_type<T>::type& operator[](int i) {
-      return *x_;
-    }
-  };
-  
-  template<typename T>
-  class VectorView<T,true> {
-  private:
-    T* x_;
-  public:
-    VectorView(T& x) : x_(&x) { }
-    typename scalar_type<T>::type& operator[](int i) {
-      return (*x_)[i];
-    }
-  };
-  
-  template<typename T>
-  class VectorView<T*,true> {
-  private:
-    T* x_;
-  public:
-    VectorView(T* x) : x_(x) { }
-    typename scalar_type<T>::type& operator[](int i) {
-      return x_[i];
-    }
+    const double x_;
   };
 
-  template<typename T>
-  class VectorView<const T,true> {
-  private:
-    const T* x_;
-  public:
-    VectorView(const T& x) : x_(&x) { }
-    typename scalar_type<T>::type operator[](int i) {
-      return (*x_)[i];
-    }
-  };
+
+  
+  // template<typename T, 
+  //          bool is_vec = stan::is_vector<T>::value>
+  // class VectorView {
+  // private:
+  //   T* x_;
+  // public:
+  //   VectorView(T& x) : x_(&x) { }
+  //   typename scalar_type<T>::type& operator[](int /*i*/) {
+  //     return *x_;
+  //   }
+  // };
+  
+  // template<typename T>
+  // class VectorView<T*,false> {
+  // private:
+  //   T* x_;
+  // public:
+  //   VectorView(T* x) : x_(x) { }
+  //   typename scalar_type<T>::type& operator[](int i) {
+  //     return *x_;
+  //   }
+  // };
+  
+  // template<typename T>
+  // class VectorView<T,true> {
+  // private:
+  //   T* x_;
+  // public:
+  //   VectorView(T& x) : x_(&x) { }
+  //   typename scalar_type<T>::type& operator[](int i) {
+  //     return (*x_)[i];
+  //   }
+  // };
+  
+  // template<typename T>
+  // class VectorView<T*,true> {
+  // private:
+  //   T* x_;
+  // public:
+  //   VectorView(T* x) : x_(x) { }
+  //   typename scalar_type<T>::type& operator[](int i) {
+  //     return x_[i];
+  //   }
+  // };
+
+  // template<typename T>
+  // class VectorView<const T,true> {
+  // private:
+  //   const T* x_;
+  // public:
+  //   VectorView(const T& x) : x_(&x) { }
+  //   typename scalar_type<T>::type operator[](int i) {
+  //     return (*x_)[i];
+  //   }
+  // };
 
   template<bool used, typename T = double, bool is_vec = stan::is_vector<T>::value>
   class DoubleVectorView {
   public:
-    DoubleVectorView(const size_t /* n */) { }
+    DoubleVectorView(size_t /* n */) { }
     double& operator[](size_t /* i */) {
       throw std::runtime_error("used is false. this should never be called");
     }
@@ -279,7 +330,7 @@ namespace stan {
   private:
     double x_;
   public:
-    DoubleVectorView(const size_t /* n */) : x_(0.0) { }
+    DoubleVectorView(size_t /* n */) : x_(0.0) { }
     double& operator[](size_t /* i */) {
       return x_;
     }
@@ -290,7 +341,7 @@ namespace stan {
   private:
     std::vector<double> x_;
   public:
-    DoubleVectorView(const size_t n) : x_(n) { }
+    DoubleVectorView(size_t n) : x_(n) { }
     double& operator[](size_t i) {
       return x_[i];
     }

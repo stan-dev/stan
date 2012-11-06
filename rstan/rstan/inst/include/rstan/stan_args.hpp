@@ -15,6 +15,11 @@
 namespace rstan {
 
   namespace {
+    inline unsigned int sexp2seed(SEXP seed) { 
+      if (TYPEOF(seed) == STRSXP)  
+        return boost::lexical_cast<unsigned int>(Rcpp::as<std::string>(seed));
+      return Rcpp::as<unsigned int>(seed); 
+    }
 
     void write_comment(std::ostream& o) {
       o << "#" << std::endl;
@@ -48,11 +53,11 @@ namespace rstan {
 
   } 
   /**
-   * Wrap the available arguments for Stan's sampler, say NUTS, from
-   * Rcpp::List and set the defaults if not available. 
+   * Wrap up the available arguments for Stan's sampler, say NUTS, from
+   * Rcpp::List and set the defaults if not specified. 
    *
    *
-   * The following arguments could be in the names lists
+   * The following arguments could be in the named list
    *
    * <ul>
    * <li> sample_file: to which samples are written 
@@ -201,11 +206,7 @@ namespace rstan {
         random_seed = std::time(0); 
         random_seed_src = "random"; 
       } else {
-        if (TYPEOF(in[idx]) == STRSXP) {
-          random_seed = boost::lexical_cast<unsigned int>(Rcpp::as<std::string>(in[idx])); 
-        } else { 
-          random_seed = Rcpp::as<unsigned int>(in[idx]); 
-        } 
+        random_seed = sexp2seed(in[idx]);
         random_seed_src = "user or from R"; 
       }
 
