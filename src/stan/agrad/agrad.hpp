@@ -19,16 +19,6 @@ namespace stan {
     class vari;
     class var;
 
-    template <typename T>
-    struct var_to_vi {
-      typedef T type;
-    };
-    template <>
-    struct var_to_vi<stan::agrad::var> {
-      typedef stan::agrad::vari* type;
-    };
-
-
     // FIXME: manage all this as a single singleton (thread local)
     extern std::vector<chainable*> var_stack_; 
     extern memory::stack_alloc memalloc_;
@@ -187,17 +177,6 @@ namespace stan {
       }
 
     };
-
-    /**
-     * Returns the current size of the stack of <code>vari</code>
-     * instances.
-     *
-     * @return Size of <code>vari</code> stack.
-     */
-    inline size_t stack_size() {
-      return var_stack_.size();
-    }
-      
 
     /** 
      * Prints the auto-dif variable stack. This function
@@ -445,7 +424,7 @@ namespace stan {
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
         stan::agrad::grad(vi_);
-        g.resize(0);
+        g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i) 
           g.push_back(x[i].vi_->adj_);
         recover_memory();
