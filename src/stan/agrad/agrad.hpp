@@ -426,7 +426,7 @@ namespace stan {
         stan::agrad::grad(vi_);
         g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i) 
-          g.push_back(x[i].vi_->adj_);
+          g[i] = x[i].vi_->adj_;
         recover_memory();
       }
 
