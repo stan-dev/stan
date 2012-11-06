@@ -19,8 +19,6 @@ RCPP_MODULE(stan_fit4%model_name%_mod){
             &rstan::stan_fit<%model_name%_namespace::%model_name%, boost::random::ecuyer1988>::param_dims) 
     .method("param_dims_oi", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%, boost::random::ecuyer1988>::param_dims_oi) 
-    .method("permutation", 
-            &rstan::stan_fit<%model_name%_namespace::%model_name%, boost::random::ecuyer1988>::permutation) 
     .method("update_param_oi", 
             &rstan::stan_fit<%model_name%_namespace::%model_name%, boost::random::ecuyer1988>::update_param_oi) 
     .method("param_oi_tidx",

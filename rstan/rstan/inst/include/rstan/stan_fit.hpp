@@ -14,7 +14,7 @@
 //#include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
+//#include <boost/random/uniform_int_distribution.hpp>
 #include <stan/version.hpp>
 //#include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
@@ -822,49 +822,6 @@ namespace rstan {
       get_all_flatnames(names_oi_, dims_oi_, fnames, true); 
       return Rcpp::wrap(fnames); 
       END_RCPP;
-    } 
-
-    /*
-     * Obtain a permutation of size n. 
-     * see <code>permutation</code> in <code>mcmc::chains.hpp</code>. 
-     *
-     * @param nsc_ Size of permutation to create; the starting point of the
-     *  sequence, typically 0 or 1; and the chain id. 
-     *  If the starting point is not specified, defaults to 1. 
-     *  If the chain id is not specified, defaults to 1. 
-     * @return A permutation of length n starting from 's'.
-     */ 
-    SEXP permutation(SEXP nsc_) { 
-      static time_t seed = std::time(0);  //defaults to time-based init 
-      boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 31; 
-      Rcpp::IntegerVector nsc(nsc_); 
-      int n = nsc[0]; 
-      int s = 1;
-      int cid = 1; 
-      // rstan::io::rcout << "stride = " << DISCARD_STRIDE << std::endl; 
-      // rstan::io::rcout << "nsc.size() = " << nsc.size() << std::endl; 
-      // rstan::io::rcout << "nsc[0]=" << nsc[0] 
-      //                  << "nsc[1]=" << nsc[1] 
-      //                  << "nsc[2]=" << nsc[2] << std::endl; 
-      switch (nsc.size()) {
-        case 3:  cid = nsc[2]; s = nsc[1]; break;
-        case 2:  s = nsc[1]; break;
-      } 
-      // rstan::io::rcout << "cid = " << cid << std::endl; 
-      RNG rng(seed); 
-      rng.discard(DISCARD_STRIDE * (cid - 1));
-      Rcpp::IntegerVector x(n); 
-      for (int i = 0; i < n; ++i)
-        x[i] = i + s;
-      if (n < 2) return x; 
-      for (int i = n; --i != 0; ) {
-        boost::random::uniform_int_distribution<int> uid(0, i);
-        int j = uid(rng);
-        int temp = x[i];
-        x[i] = x[j];
-        x[j] = temp;
-      } 
-      return x; 
     } 
   };
 } 
