@@ -15,8 +15,7 @@ v1.0.4
 ======================================================================
 -- Library Versions
    Eigen: 3.1.1   to  3.1.2
-
-* Boost: 1.51.0  to  1.52.0
+   Boost: 1.51.0  to  1.52.0
 
 * make sure all range errors are being caught
   -- math/matrix.hpp line 164

@@ -25,7 +25,7 @@ AR = ar
 # Library locations
 ##
 EIGEN ?= lib/eigen_3.1.2
-BOOST ?= lib/boost_1.51.0
+BOOST ?= lib/boost_1.52.0
 GTEST ?= lib/gtest_1.6.0
 
 ##
