@@ -57,7 +57,7 @@ namespace stan {
        * auto-dif.
        */
       ~chainable() { 
-        throw std::logic_error("chainable destruction handled automatically");
+        // handled automatically
       }
 
       /**
@@ -203,6 +203,9 @@ namespace stan {
      * Prints the auto-dif variable stack. This function
      * is used for debugging purposes.
      * 
+     * Only works if all members of stack are vari* as it
+     * casts to vari*.  
+     * 
      * @param o ostream to modify
      */
     inline void print_stack(std::ostream& o) {
@@ -210,8 +213,8 @@ namespace stan {
       for (size_t i = 0; i < var_stack_.size(); ++i)
         o << i 
           << "  " << var_stack_[i]
-          << "  " << ((vari*)var_stack_[i])->val_
-          << " : " << ((vari*)var_stack_[i])->adj_
+          << "  " << (static_cast<vari*>(var_stack_[i]))->val_
+          << " : " << (static_cast<vari*>(var_stack_[i]))->adj_
           << std::endl;
     }
 

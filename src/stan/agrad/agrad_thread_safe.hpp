@@ -727,7 +727,8 @@ namespace stan {
        * dangling.  Before an assignment, the behavior is thus undefined just
        * as for a basic double.
        */
-      var() {
+      var() :
+        vi_(0) {
       }
 
       /**      
