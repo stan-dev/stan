@@ -1151,34 +1151,8 @@ namespace stan {
           bvi_->adj_ -= adj_ * d;
         }
       };
-
-
     }
 
-   
-    /**
-     * Cast variable to double. Useful for templated functions where a
-     * variable may be a var or a double and we want to be able to use
-     * things like printf().
-     *
-     * @param x Variable to cast.
-     * @tparam T Type of variable.
-     */
-    template <typename T>
-    inline double as_double(T x) { return (double)x; }
-
-    /**
-     * Cast variable to double. Useful for templated functions where a
-     * variable may be a var or a double and we want to be able to use
-     * things like printf(). This specialization makes it possible to
-     * say as_double(x) where x is a var, not a double or int or
-     * something for which casts already exist.
-     *
-     * @param x Variable to cast.
-     * @tparam T Type of variable.
-     */
-    template <>
-    inline double as_double<agrad::var>(agrad::var x) { return x.vi_->val_; }
 
     // COMPARISON OPERATORS
 
