@@ -1,9 +1,4 @@
 #include <gtest/gtest.h>
-
-#include <cstddef>
-#include <stdexcept>
-#include <complex>
-
 #include <stan/agrad/matrix.hpp>
 
 using stan::agrad::var;

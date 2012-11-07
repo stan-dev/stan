@@ -3,12 +3,10 @@
 
 // global include
 #include <sstream>
-
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
-#include <stan/math/boost_error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix_error_handling.hpp>
+
+#include <stan/agrad/special_functions.hpp>
 
 namespace stan {
   namespace agrad {
@@ -356,7 +354,7 @@ namespace stan {
      * @param[out] m_v A Matrix with automatic differentiation variables
      *    assigned with values of m.
      */
-    inline void to_var (const stan::math::matrix_d& m, matrix_v& m_v) {
+    inline void to_var(const stan::math::matrix_d& m, matrix_v& m_v) {
       m_v.resize(m.rows(), m.cols());
       for (int j = 0; j < m.cols(); ++j)
         for (int i = 0; i < m.rows(); ++i)
@@ -2035,14 +2033,14 @@ namespace stan {
       enum { value = ( is_constant_struct<RHS>::value 
                        && !is_constant_struct<LHS>::value) };
     };
-
+    
     template <bool PromoteRHS, typename LHS, typename RHS>
     struct assigner {
       static inline void assign(LHS& var, const RHS& val) {
         throw std::domain_error("should not call base class of assigner");
       }
     };
-
+    
     template <typename LHS, typename RHS>
     struct assigner<false,LHS,RHS> {
       static inline void assign(LHS& var, const RHS& val) {
@@ -2056,7 +2054,7 @@ namespace stan {
         assign_to_var(var,val); // promote RHS
       }
     };
-
+    
     
     template <typename LHS, typename RHS>
     inline void assign(LHS& var, const RHS& val) {
