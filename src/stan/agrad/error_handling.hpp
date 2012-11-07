@@ -88,6 +88,5 @@ namespace boost {
   }
 }
   
-
 #endif
 
