@@ -1,7 +1,6 @@
 STAN_HOME = ../../../../..
 PGM = fire#
-CC = g++ 
-CC = clang++ 
+CXX = clang++ 
 BOOSTPATH = $(shell find $(STAN_HOME)/lib -path '*lib/boost_*' -regex '.*lib\/boost_[^/]*')
 EIGENPATH = $(shell find $(STAN_HOME)/lib -path '*lib/eigen_*' -regex '.*lib\/eigen_[^/]*')
 CPPFLAGS = -I $(BOOSTPATH)  -I$(EIGENPATH) -I $(STAN_HOME)/src
