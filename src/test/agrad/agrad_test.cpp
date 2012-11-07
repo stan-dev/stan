@@ -1,16 +1,9 @@
 #include <gtest/gtest.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <cmath>
-#include <vector>
-#include "stan/agrad/agrad.hpp"
-
+#include <stan/agrad/agrad.hpp>
 
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
-
-
 
 AVEC createAVEC(AVAR x) {
   AVEC v;

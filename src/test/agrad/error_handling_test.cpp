@@ -1,25 +1,20 @@
 #include <gtest/gtest.h>
-#include <stan/math/error_handling.hpp>
+#include <stan/agrad/error_handling.hpp>
+/*#include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
-
-using Eigen::Dynamic;
-using Eigen::Matrix;
+#include <stan/agrad/matrix.hpp>*/
 
 
 typedef boost::math::policies::policy<
   boost::math::policies::domain_error<boost::math::policies::errno_on_error>
   > errno_policy;
 
-using stan::math::default_policy;
-using stan::math::check_not_nan;
-using stan::math::check_bounded;
-using stan::math::check_cov_matrix;
-using stan::agrad::var;
-
 //---------- check_not_nan tests ----------
-TEST(AgradDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
+TEST(AgradErrorHandling,CheckNotNanDefaultPolicy) {
+  using stan::agrad::var;
+  using stan::math::default_policy;
+  using stan::math::check_not_nan;
   const char* function = "check_not_nan(%1%)";
   var x = 0;
   double x_d = 0;
@@ -44,7 +39,9 @@ TEST(AgradDistributionsErrorHandling,CheckNotNanDefaultPolicy) {
   EXPECT_THROW(check_not_nan(function, x_d, "x", &result, default_policy()), std::domain_error) << "check_not_nan should throw exception on NaN: " << x_d;
 }
 
-TEST(AgradDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
+TEST(AgradErrorHandling,CheckNotNanErrnoPolicy) {
+  using stan::agrad::var;
+  using stan::math::check_not_nan;
   const char* function = "check_not_nan(%1%)";
   var x = 0;
   double x_d = 0;
@@ -76,7 +73,11 @@ TEST(AgradDistributionsErrorHandling,CheckNotNanErrnoPolicy) {
 }
 
 // ---------- check_bounded tests ----------
-TEST(AgradDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
+TEST(AgradErrorHandling,CheckBoundedDefaultPolicyX) {
+  using stan::agrad::var;
+  using stan::math::default_policy;
+  using stan::math::check_bounded;
+ 
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   var x = 0;
@@ -115,7 +116,11 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedDefaultPolicyX) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   
 }
-TEST(AgradDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
+TEST(AgradErrorHandling,CheckBoundedDefaultPolicyLow) {
+  using stan::agrad::var;
+  using stan::math::default_policy;
+  using stan::math::check_bounded;
+
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   var x = 0;
@@ -137,7 +142,11 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedDefaultPolicyLow) {
   EXPECT_THROW (check_bounded (function, x, low, high, name, &result, default_policy()), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(AgradDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
+TEST(AgradErrorHandling,CheckBoundedDefaultPolicyHigh) {
+  using stan::agrad::var;
+  using stan::math::default_policy;
+  using stan::math::check_bounded;
+
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   var x = 0;
@@ -162,7 +171,10 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedDefaultPolicyHigh) {
 }
 
 
-TEST(AgradDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
+TEST(AgradErrorHandling,CheckBoundedErrnoPolicyX) {
+  using stan::agrad::var;
+  using stan::math::check_bounded;
+ 
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   var x = 0;
@@ -213,7 +225,10 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedErrnoPolicyX) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(AgradDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
+TEST(AgradErrorHandling,CheckBoundedErrnoPolicyLow) {
+  using stan::agrad::var;
+  using stan::math::check_bounded;
+ 
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   var x = 0;
@@ -241,7 +256,10 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedErrnoPolicyLow) {
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-TEST(AgradDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
+TEST(AgradErrorHandling,CheckBoundedErrnoPolicyHigh) {
+  using stan::agrad::var;
+  using stan::math::check_bounded;
+ 
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
   var x = 0;
@@ -269,16 +287,3 @@ TEST(AgradDistributionsErrorHandling,CheckBoundedErrnoPolicyHigh) {
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
   EXPECT_TRUE (std::isnan (result)) << "check_bounded should set return value to NaN: " << result;
 }
-
-
-TEST(AgradDistributionsErrorHandling,CheckCovMatrixDefaultPolicy) {
-  const char* function = "check_cov_matrix (%1%)";
-  var result = 0;
-  Matrix<var,Dynamic,Dynamic> Sigma;
-  Sigma.resize(1,1);
-  Sigma << 1;
-
-  EXPECT_NO_THROW(check_cov_matrix(function, Sigma, &result, default_policy())) << "check_cov_matrix should not throw exception with Sigma: " << Sigma;
-}
-// ----------  ----------
-//TEST(AgradDistributionsErrorHandling,)
