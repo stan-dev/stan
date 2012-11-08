@@ -87,27 +87,6 @@ TEST(AgradMatrix,to_var_matrix) {
     for (int jj = 0; jj < 3; jj++)
       EXPECT_FLOAT_EQ(ii*3 + jj, m_v(ii, jj).val());
 }
-TEST(AgradMatrix,to_var_ref_matrix) {
-  using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
-  
-  matrix_d m_d(2,3);
-  m_d << 0, 1, 2, 3, 4, 5;
-
-  matrix_v m_v(5,5);
-  EXPECT_EQ(5, m_v.rows());
-  EXPECT_EQ(5, m_v.cols());
-
-  stan::agrad::to_var(m_d, m_v);  
-  EXPECT_EQ(2, m_v.rows());
-  EXPECT_EQ(3, m_v.cols());
-  EXPECT_FLOAT_EQ(0, m_v(0, 0).val());
-  EXPECT_FLOAT_EQ(1, m_v(0, 1).val());
-  EXPECT_FLOAT_EQ(2, m_v(0, 2).val());
-  EXPECT_FLOAT_EQ(3, m_v(1, 0).val());
-  EXPECT_FLOAT_EQ(4, m_v(1, 1).val());
-  EXPECT_FLOAT_EQ(5, m_v(1, 2).val());
-}
 TEST(AgradMatrix,to_var_vector) {
   using stan::math::vector_d;
   using stan::agrad::vector_v;
@@ -132,31 +111,6 @@ TEST(AgradMatrix,to_var_vector) {
   EXPECT_FLOAT_EQ(4, out(3).val());
   EXPECT_FLOAT_EQ(5, out(4).val());
 }
-TEST(AgradMatrix,to_var_ref_vector) {
-  using stan::math::vector_d;
-  using stan::agrad::vector_v;
-
-  vector_d d(5);
-  vector_v v(5);
-  
-  d << 1, 2, 3, 4, 5;
-  v << 1, 2, 3, 4, 5;
-  
-  vector_v output;
-  stan::agrad::to_var(d, output);
-  EXPECT_FLOAT_EQ(1, output(0).val());
-  EXPECT_FLOAT_EQ(2, output(1).val());
-  EXPECT_FLOAT_EQ(3, output(2).val());
-  EXPECT_FLOAT_EQ(4, output(3).val());
-  EXPECT_FLOAT_EQ(5, output(4).val());
-
-  stan::agrad::to_var(v, output);
-  EXPECT_FLOAT_EQ(1, output(0).val());
-  EXPECT_FLOAT_EQ(2, output(1).val());
-  EXPECT_FLOAT_EQ(3, output(2).val());
-  EXPECT_FLOAT_EQ(4, output(3).val());
-  EXPECT_FLOAT_EQ(5, output(4).val());
-}
 TEST(AgradMatrix,to_var_rowvector) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_v;
@@ -176,32 +130,6 @@ TEST(AgradMatrix,to_var_rowvector) {
 
   output.resize(0);
   output = stan::agrad::to_var(v);
-  EXPECT_FLOAT_EQ(1, output(0).val());
-  EXPECT_FLOAT_EQ(2, output(1).val());
-  EXPECT_FLOAT_EQ(3, output(2).val());
-  EXPECT_FLOAT_EQ(4, output(3).val());
-  EXPECT_FLOAT_EQ(5, output(4).val());
-}
-TEST(AgradMatrix,to_var_ref_rowvector) {
-  using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
-
-  row_vector_d d(5);
-  row_vector_v v(5);
-
-  d << 1, 2, 3, 4, 5;
-  v << 1, 2, 3, 4, 5;
- 
-  row_vector_v output;
-  stan::agrad::to_var(d, output);
-  EXPECT_FLOAT_EQ(1, output(0).val());
-  EXPECT_FLOAT_EQ(2, output(1).val());
-  EXPECT_FLOAT_EQ(3, output(2).val());
-  EXPECT_FLOAT_EQ(4, output(3).val());
-  EXPECT_FLOAT_EQ(5, output(4).val());
-
-  output.resize(0);
-  stan::agrad::to_var(d, output);
   EXPECT_FLOAT_EQ(1, output(0).val());
   EXPECT_FLOAT_EQ(2, output(1).val());
   EXPECT_FLOAT_EQ(3, output(2).val());
