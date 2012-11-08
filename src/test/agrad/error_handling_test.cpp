@@ -1,10 +1,5 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/error_handling.hpp>
-/*#include <stan/math/error_handling.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>*/
-
 
 typedef boost::math::policies::policy<
   boost::math::policies::domain_error<boost::math::policies::errno_on_error>
