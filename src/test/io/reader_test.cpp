@@ -1,7 +1,6 @@
 #include <stan/io/reader.hpp>
 #include <gtest/gtest.h>
 
-
 TEST(io_reader, scalar) {
   std::vector<int> theta_i;
   std::vector<double> theta;
