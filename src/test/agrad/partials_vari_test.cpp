@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/special_functions.hpp>
 
-using stan::agrad::OperandsAndPartials;
-using stan::agrad::var;
 TEST(AgradPartialsVari, OperandsAndPartials) {
+  using stan::agrad::OperandsAndPartials;
+  using stan::agrad::var;
+
   OperandsAndPartials<double> o1;
   EXPECT_EQ(0U, o1.nvaris);
   
@@ -41,6 +41,9 @@ TEST(AgradPartialsVari, OperandsAndPartials) {
 }
 TEST(AgradPartialsVari,OperandsAndPartials1) {
   using stan::agrad::vari;
+  using stan::agrad::OperandsAndPartials;
+  using stan::agrad::var;
+
   var x = 2.0;
   var z = -3.0 * x;  // dz/dx = -3
   OperandsAndPartials<var> o(z);
@@ -52,7 +55,10 @@ TEST(AgradPartialsVari,OperandsAndPartials1) {
   EXPECT_FLOAT_EQ(-15.0, x.adj());  // dy/dx = -15
 }
 TEST(AgradPartialsVari,OperandsAndPartials2) {
+  using stan::agrad::OperandsAndPartials;
   using stan::agrad::vari;
+  using stan::agrad::var;
+
   var x1 = 2.0;
   var x2 = 3.0;
   var z1 = -5.0 * x1; // dz1/dx1 = -5
@@ -67,7 +73,10 @@ TEST(AgradPartialsVari,OperandsAndPartials2) {
   EXPECT_FLOAT_EQ(-91.0, x2.adj());  // dy/dx2 = -91
 }
 TEST(AgradPartialsVari, OperandsAndPartials3) {
+  using stan::agrad::OperandsAndPartials;
   using stan::agrad::vari;
+  using stan::agrad::var;
+
   var x1 = 2.0;
   var x2 = 3.0;
   var x3 = 5.0;
