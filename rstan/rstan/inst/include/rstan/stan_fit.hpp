@@ -422,9 +422,15 @@ namespace rstan {
           params_i = std::vector<int>(model.num_params_i(),0);
           params_r = std::vector<double>(model.num_params_r(),0.0);
       } else if (init_val == "user") {
-          Rcpp::List init_lst(args.get_init_list()); 
-          rstan::io::rlist_ref_var_context init_var_context(init_lst); 
-          model.transform_inits(init_var_context,params_i,params_r);
+          try { 
+            Rcpp::List init_lst(args.get_init_list()); 
+            rstan::io::rlist_ref_var_context init_var_context(init_lst); 
+            model.transform_inits(init_var_context,params_i,params_r);
+          } catch (const std::exception& e) {
+            std::string msg("Error during user-specified initialization:\n"); 
+            msg += e.what(); 
+            throw std::invalid_argument(msg);
+          } 
       } else {
         init_val = "random"; 
         // init_rng generates uniformly from -2 to 2
