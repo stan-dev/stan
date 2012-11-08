@@ -1,7 +1,6 @@
 #ifndef __STAN__IO__VAR_CONTEXT_HPP__
 #define __STAN__IO__VAR_CONTEXT_HPP__
 
-#include <cstddef>
 #include <vector>
 #include <string>
 

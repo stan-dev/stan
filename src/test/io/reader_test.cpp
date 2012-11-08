@@ -1,8 +1,5 @@
-#include <vector>
-#include <stdexcept>
-#include <gtest/gtest.h>
 #include <stan/io/reader.hpp>
-#include <stan/math/special_functions.hpp>
+#include <gtest/gtest.h>
 
 TEST(io_reader, scalar) {
   std::vector<int> theta_i;
