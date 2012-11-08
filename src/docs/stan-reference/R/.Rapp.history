@@ -1,0 +1,16 @@
+setwd('/Users/carp/stan/docs/stan-reference/R')
+setwd('/Users/carp/stan/src/docs/stan-reference/R');
+source("funnel-plot.R")
+funnel_plot
+source("funnel-plot.R")
+funnel_plot
+source("funnel-plot.R")
+funnel_plot
+remove.packages("ggplot2")
+install.packages("ggplot2")
+source("funnel-plot.R")
+funnel_plot
+source("funnel-plot.R")
+source("funnel-plot.R")
+funnel_plot
+quit()
