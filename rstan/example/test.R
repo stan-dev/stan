@@ -118,7 +118,9 @@ if (!identical(fit3@par_dims, dim3))
   message("par_dims in fit3 is not as expected") 
 
 J <- 4  
-fit4 <- stan(fit = fit3, pars = c("y2", "lp__"), data = list(J = J)) 
+set.seed(12345)
+fit4 <- stan(fit = fit3, pars = c("y2", "lp__"), data = list(J = J), seed = 8765) 
+set.seed(12345)
 fit5 <- stan(fit = fit3, pars = "y2", data = list(J = J), seed = get_seed(fit4)) 
 if (!identical(fit4@sim, fit5@sim)) 
   message('fit4@sim is not identical with fit5@sim as supposed') 

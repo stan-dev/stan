@@ -1,3 +1,10 @@
+Sun Nov  4 2012
+1. Bug fixes 
+   * lp__ is not included when specifying pars (issue 79) 
+      https://code.google.com/p/stan/issues/detail?id=79
+2. Changes 
+   * change default value of arugment `permuted` from FALSE to TRUE for extract
+     method of S4 class stanfit 
 
 Wed Oct 24 2012
 1. New features 
@@ -44,8 +51,8 @@ Sun Aug 26 2012
 Sat Aug 25 2012
 1. Bug fixes
    * deal with the case that Rcpp and rstan is 
-   * installed to a path with space, which causes
-   * the library linked to cannot be found. 
+     installed to a path with space, which causes
+     the library linked to cannot be found. 
 
 Fri Aug 24 2012
 1. Changes 
@@ -80,8 +87,6 @@ Sat Aug 11 2012:
 3. Others 
    * more documentation 
    * use GPL for License and add LicenseNote in DESCRIPTION file 
-   * add GPL LICENSE header to some files 
-     (follow https://www.gnu.org/licenses/gpl-howto.html) 
 
 Wed Aug 8 2012:
 Uploaded to googlecode wiki: internally released. 

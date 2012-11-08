@@ -158,8 +158,10 @@ setMethod("sampling", "stanmodel",
                                                  stan_args = args_list)))
             } 
 
-            permutation.lst <-
-              lapply(1:chains, function(id) sampler$permutation(c(n_kept, 1, id))) 
+            # perm_lst <- lapply(1:chains, function(id) rstan_seq_perm(n_kept, chains, seed, chain_id = id)) 
+            ## sample_int is a little bit faster than our own rstan_seq_perm,
+            ## but without controlling the seed 
+            perm_lst <- lapply(1:chains, function(id) sample.int(n_kept))
 
             fnames_oi <- sampler$param_fnames_oi()
             n_flatnames <- length(fnames_oi)
@@ -170,7 +172,7 @@ setMethod("sampling", "stanmodel",
                        n_save = rep(n_save, chains),
                        warmup2 = rep(warmup2, chains),
                        thin = rep(thin, chains),
-                       permutation = permutation.lst,
+                       permutation = perm_lst,
                        pars_oi = sampler$param_names_oi(),
                        dims_oi = sampler$param_dims_oi(),
                        fnames_oi = fnames_oi,

@@ -347,10 +347,23 @@ namespace stan {
           params_i = std::vector<int>(model.num_params_i(),0);
           params_r = std::vector<double>(model.num_params_r(),0.0);
         } else {
-          std::fstream init_stream(init_val.c_str(),std::fstream::in);
-          stan::io::dump init_var_context(init_stream);
-          init_stream.close();
-          model.transform_inits(init_var_context,params_i,params_r);
+          try {
+            std::fstream init_stream(init_val.c_str(),std::fstream::in);
+            if (init_stream.fail()) {
+              std::string msg("ERROR: specified init file does not exist: ");
+              msg += init_val;
+              throw std::invalid_argument(msg);
+            }
+            stan::io::dump init_var_context(init_stream);
+            init_stream.close();
+            model.transform_inits(init_var_context,params_i,params_r);
+          } catch (const std::exception& e) {
+            std::cerr << "Error during user-specified initialization:" 
+                      << std::endl
+                      << e.what() 
+                      << std::endl;
+            return -5;
+          }
         }
       } else {
         init_val = "random initialization";  // for I/O

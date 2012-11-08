@@ -27,8 +27,7 @@ Cmd:    add .cpp files, makefile,  make/make*
 R:      rstan/rstan/src/Makefile{,.win}
 
 
-
-
-
-
-
+boost version 
+Cmd:    lib/boost_x.xx.x/, etc.
+R:      rstan/rstan/src/Makefile{,.win} 
+        rstan/rstan/R/options.R

@@ -309,7 +309,7 @@ setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
 setMethod("extract", signature = "stanfit",
-          definition = function(object, pars, permuted = FALSE, inc_warmup = FALSE) {
+          definition = function(object, pars, permuted = TRUE, inc_warmup = FALSE) {
             # Extract the samples in different forms for different parameters. 
             #
             # Args:

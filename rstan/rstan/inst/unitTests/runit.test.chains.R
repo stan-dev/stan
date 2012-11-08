@@ -38,3 +38,13 @@ test_essnrhat <- function() {
   # cat("rhat=", rhat2, "\n") 
   checkEquals(rhat2, 1.03715, tolerance = 0.001); 
 } 
+
+test_seq_perm <- function() {
+  s <- rstan:::rstan_seq_perm(1, 4, 12345, 1) # n, chains, seed, chain_id = 1
+  checkEquals(s, 1L)
+  s2 <- rstan:::rstan_seq_perm(10, 4, 12345) 
+  checkEquals(length(s2), 10L)
+  checkEquals(sort(s2), 1L:10L)
+  s3 <- rstan:::rstan_seq_perm(107, 4, 12345) 
+  checkEquals(sort(s3), 1L:107L)
+}
