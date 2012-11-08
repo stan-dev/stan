@@ -1,9 +1,7 @@
 #ifndef __STAN__IO__CMD_LINE_HPP__
 #define __STAN__IO__CMD_LINE_HPP__
 
-#include <cstddef>
 #include <map>
-#include <iostream>
 #include <ostream>
 #include <set>
 #include <string>
