@@ -72,7 +72,7 @@ options(width=60)
 
 \title{\RStan: the \R interface to \Stan} 
 
-\author{The Stan Development Team \\ mc.stanislaw@gmail.com}
+\author{The Stan Development Team \\ stan@mc-stan.org}
 
 
 \begin{document}

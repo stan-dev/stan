@@ -159,7 +159,8 @@ setMethod("sampling", "stanmodel",
             } 
 
             # perm_lst <- lapply(1:chains, function(id) rstan_seq_perm(n_kept, chains, seed, chain_id = id)) 
-            ## sample_int is a little bit faster than our own rstan_seq_perm,
+            ## sample_int is a little bit faster than our own rstan_seq_perm (one 
+            ## reason is that the RNG used in R is faster),
             ## but without controlling the seed 
             perm_lst <- lapply(1:chains, function(id) sample.int(n_kept))
 

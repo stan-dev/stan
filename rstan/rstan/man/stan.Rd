@@ -167,10 +167,15 @@ stan(file, model_name = "anon_model", model_code = "",
 
 \note{
   The data passed to \code{stan} are preprocessed before
-  passing to Stan. Each element of data should be either a numeric
-  vector (including special case 'scalar'), a numeric
-  array (matrix), or a numeric data frame.  This process for each element 
-  mainly includes the following:
+  passing to Stan. In general, each element of data should be either a numeric
+  vector (including special case 'scalar') or a numeric array (matrix). 
+  An element can also be a data frame or a specially structured list (see
+  details below), both of which will be converted into arrays in the
+  preprocessing.  Using a specially structured list is not
+  encouraged though it might be convenient sometimes; and when in doubt, just
+  use arrays.  
+
+  This preprocessing for each element mainly includes the following:
   \enumerate{
     \item Change the data of type from \code{double} 
       to \code{integer} if no accuracy is lost. The main
@@ -186,17 +191,29 @@ stan(file, model_name = "anon_model", model_code = "",
   
    \item Check data types.  Stan allows only numeric data, that is,
      doubles, integers, and arrays of these.  Data of other types (for
-     examples, characters) are not passed to Stan. Data of  
-     \code{data.frame} are converted to \code{matrix} by
-     function \code{data.matrix}. 
-     
+     examples, characters) are not passed to Stan. 
+
    \item Check whether there are objects in the data list with duplicated names.
      Duplicated names, if found, will cause the function to stop and
      report an error. 
 
    \item Check whether the names of objects in the data list are legal 
      Stan names. If illegal names are found, it will stop and 
-     report an error. See Stan's manul for the rules of variable names. 
+     report an error. See Stan's manual for the rules of variable names. 
+
+   \item When an element is of type \code{data.frame}, it will be converted to
+     \code{matrix} by function \code{data.matrix}. 
+
+   \item When an element is of type \code{list}, it is supposed to make it
+     easier to pass data for those declared in Stan code such as 
+     \code{"vector[J] y1[I]"} and \code{"matrix[J,K] y2[I]"}. Using the latter
+     as an example, we can use a list for \code{y2} if the list has "I" elements,
+     each of which is an array (matrix) of dimension "J*K". However, it is 
+     not possible to pass a list for data declared such as 
+     \code{"vector[K] y3[I,J]"}; the only way for it is to use an array with
+     dimension "I*J*K". In addition, technically a data frame in R is 
+     also a list, but it should not be used for the purpose here since a data frame
+     will be converted to a matrix as described above.  
   } 
 
   The returned S4 class \code{stanfit} will save the compiled model

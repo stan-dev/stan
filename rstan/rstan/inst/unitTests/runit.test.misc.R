@@ -56,7 +56,7 @@ test_is_valid_stan_name <- function() {
   checkTrue(rstan:::is_legal_stan_vname('y'))
 } 
 
-test_util <- function() {
+test_data_preprocess <- function() {
   lst <- list(z = c(1L, 2L, 4L), 
               a = 1:100, 
               b = matrix(1:9 / 9, ncol = 3), 
@@ -70,13 +70,32 @@ test_util <- function() {
   lst3$h <- gl(3, 4)
   lst4 <- rstan:::data_preprocess(lst3)
 
-  checkEquals(dim(lst$g), c(2, 2, 3), "Keep the dimension infomation")
+  checkEquals(dim(lst$g), c(2, 2, 3), "Keep the dimension information")
   checkTrue(is.integer(lst$z), "Do as.integer when appropriate") 
   checkTrue(is.double(lst$b), msg = "Not do as.integer when it is not appropriate") 
   checkException(rstan:::data_preprocess(lst2), 
                  msg = "Stop if data have NA") 
   checkEquals(names(lst4), c("z", "a", "b", "c", "g", "d")) # check if h is removed
 
+} 
+
+test_data_preprocess2 <- function() {
+  # a list of array as an element of the data list 
+  I <- 3; J <- 4; K <- 5
+  a <- lapply(1:I, function(i) rnorm(J))
+  b <- lapply(1:I, function(i) matrix(rnorm(J * K), ncol = K))
+  d <- lapply(1:I, function(i) rnorm(1, i))
+  e <- lapply(1:I, function(i) rpois(J, 1) + 1.0) 
+  lst2 <- rstan:::data_preprocess(list(a = a, b = b, d = d, e = e))
+  checkEquals(dim(lst2$a), c(I, J))
+  checkEquals(dim(lst2$b), c(I, J, K))
+  checkEquals(dim(lst2$d), c(I, 1))
+  checkTrue(is.integer(lst2$e[1, 1])) 
+  checkTrue(!is.integer(e[[1]][1])) 
+
+  a1 <- lapply(1:I, function(i) rnorm(J))
+  a2 <- lapply(1:I, function(i) rnorm(J))
+  checkException(rstan:::data_preprocess(list(a = list(a1 = a1, a2 = a2))))
 } 
 
 
@@ -211,6 +230,25 @@ test_config_argss <- function() {
   checkException(rstan:::config_argss(3, 100, 10, 3, 0, "a12345", "a.csv", chain_id = 4))
   checkException(rstan:::config_argss(3, 100, 10, 3, 0, "1a2345", "a.csv", chain_id = 4))
 } 
+
+test_data_list2array <- function() {
+  d <- list(y = rnorm(20))
+  d2 <- rstan:::data_list2array(d)
+  checkEquals(d2, array(d$y, dim = c(1, 20)))
+
+  I <- 4; J <- 5; K <- 6
+  b <- lapply(1:I, function(i) rnorm(J))
+  b2 <- rstan:::data_list2array(b)
+  b3 <- data.matrix(do.call(rbind, b))
+  checkEquals(b2, b3)
+
+  a <- lapply(1:I, function(i) array(rnorm(J * K), dim = c(J, K)))
+  a2 <- rstan:::data_list2array(a)
+  for (i in 1:I) checkEquals(a[[i]], a2[i,,])
+  checkEquals(a[[4]][5, 6], a2[4, 5, 6]) 
+  checkEquals(a[[3]][4, 2], a2[3, 4, 2]) 
+  checkEquals(a[[2]][1, 6], a2[2, 1, 6]) 
+}
  
 .tearDown <- function() {
   unlink('tmp.stan') 
