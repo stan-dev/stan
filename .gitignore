@@ -25,6 +25,7 @@
 stan.Rproj
 .kdev4/
 stan.kdev4
+.Rapp.history
 
 # model files
 src/test/gm/model_specs/*.cpp
