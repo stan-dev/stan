@@ -1524,6 +1524,153 @@ check for out-of-domain errors on the inputs).
 This chapter provides a grab bag of techniques for optimizing \Stan
 code, including vectorization, sufficient statistics, and conjugacy.
 
+\section{Reparameterization}
+
+Stan's sampler can be slow in sampling from distributions with
+difficult posterior geometries.  One way to speed up such models is
+through reparameterization.
+
+\subsection{Example: Neal's Funnel}
+
+\begin{figure}
+\vspace*{-6pt}
+\begin{center}
+\includegraphics[height=2in]{R/funnel.png}
+\includegraphics[height=2in]{R/funnel-fit.png}
+\end{center}
+\vspace*{-18pt}
+\caption{\it Neal's Funnel.  (Left) The marginal density of Neal's funnel for the upper-level
+  variable $y$ and one lower-level variable $x_1$ (see the text for
+  the formula).  The blue region has log density greater
+    than -50, the orange region density less than -50, and the gray
+    region density below -200.  (Right) 4000 samples produced by
+    running Stan with default settings.  Both plots are restricted to
+    the shown window of $x_1$ and $y$ values; samples were drawn
+    outside of this area as would be expected given the density.}\label{funnel.figure}
+\end{figure}
+
+\citep{Neal:2003} defines a distribution that exemplifies the
+difficulties of sampling from some hierarchical models.  Neal's
+example is fairly extreme, but can be trivially reparameterized in
+such a way as to make sampling straightforward.
+
+Neal's example has support for $y \in
+\mathbb{R}$ and  $x \in \mathbb{R}^9$ with density
+%
+\[
+p(y,x) = \distro{Normal}(y|0,3) \times \prod_{n=1}^9
+\distro{Normal}(x_n|0,\exp(y/2)).
+\]
+%
+The probability contours are shaped like ten-dimensional funnels.  The
+funnel's neck is particularly sharp because of the exponential
+function applied to $y$.  A plot of the log marginal density of $y$
+and the first dimension $x_1$ is shown in \reffigure{funnel}.
+
+The funnel can be implemented directly in Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {  
+  real y;
+  vector[9] x;
+}
+model {
+  y ~ normal(0,3);
+  x ~ normal(0,exp(y/2));
+}
+\end{Verbatim}
+\end{quote}
+%
+When the model is expressed this way, Stan has trouble sampling from
+the neck of the funnel, where $y$ is small and thus $x$ is constrained
+to be near 0.  This is due to the fact that the density's scale
+changes with $y$, so that a step size that works well in the body will
+be too large for the neck and a step size that works in the neck will be
+very inefficient in the body.
+
+In this particular instance, because the analytic form of the density
+from which samples are drawn is known, the model can be converted to
+the following more efficient form.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {  
+  real y_raw;
+  vector[9] x_raw;
+}
+transformed parameters {
+  real y;
+  vector[9] x;
+
+  y <- 3.0 * y_raw;
+  x <- exp(y/2) * x_raw;
+}
+model {
+  y_raw ~ normal(0,1);
+  x_raw ~ normal(0,1);
+}
+\end{Verbatim}
+\end{quote}
+%
+In this second model, the parameters \Verb|x_raw| and \Verb|y_raw| are
+sampled as independent unit normals, which is easy for Stan.  These
+are then transformed into samples from the funnel.  In this case, the
+same transform may be used to define Monte Carlo samples directly
+based on independent unit normal samples; Markov chain Monte Carlo
+methods are not necessary.  
+
+\subsection{Hierarchical Models}
+
+Unfortunately, the usual situation in applied Bayesian modeling
+involves complex geometries and interactions that are not known
+analytically.  Nevertheless, reparameterization can still be very
+effective for separating parameters.  For example, a vectorized
+hierarchical model might draw a vector of coefficients $\beta$ with
+definitions as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real mu_beta;   
+  real<lower=0> sigma_beta;
+  vector[K] beta;
+  ...
+model {
+  beta ~ normal(mu_beta,sigma_beta);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+Although not shown, there will likely be priors on both \Verb|mu_beta|
+and \Verb|sigma_beta|.  A hierarchical model such as this will suffer
+from the same kind of inefficiencies as Neal's funnel, because the
+values of \Verb|beta|, \Verb|mu_beta| and \Verb|sigma_beta| are tied
+together because changes to \Verb|beta| are tied directly to changes
+of \Verb|mu_beta| and \Verb|sigma_beta|.
+
+This model can be made much more efficient in terms of sampling by
+reparameterizing in exactly the same way as the funnel example.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  vector[K] beta_raw;
+  ...
+transformed parameters {
+  vector[K] beta;
+  beta <- mu_beta + sigma_beta * beta_raw;
+model {
+  beta_raw ~ normal(0,1);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+Any priors defined for \Verb|mu_beta| and \Verb|sigma_beta| remain as
+defined in the original model.
+
+
+
 \section{Vectorization}
 
 \subsection{Gradient Bottleneck}
