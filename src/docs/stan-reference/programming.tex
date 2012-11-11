@@ -2064,9 +2064,9 @@ reduce the work done during algorithmic differentiation.
 Because of the gradient bottleneck described in the previous section,
 it is more efficient to collect a sequence of summands into a vector
 or array and then apply the \code{sum()} operation than it is to
-continually call the \code{+=} operator.  For example, consider the
-following code snippet, where \code{foo()} is some operation that
-depends on \code{n}.
+continually increment a variable by assignment and addition.  For
+example, consider the following code snippet, where \code{foo()} is
+some operation that depends on \code{n}.
 %
 \begin{quote}
 \begin{Verbatim}
