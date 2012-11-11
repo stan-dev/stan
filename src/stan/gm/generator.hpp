@@ -346,10 +346,13 @@ namespace stan {
 
     struct init_local_var_visgen : public visgen {
       const bool declare_vars_;
+      const bool is_var_;
       init_local_var_visgen(bool declare_vars,
-                             std::ostream& o)
+                            bool is_var,
+                            std::ostream& o)
         : visgen(o),
-          declare_vars_(declare_vars) {
+          declare_vars_(declare_vars),
+          is_var_(is_var) {
       }
       template <typename D>
       void generate_initialize_array_bounded(const D& x, const std::string& base_type,
@@ -378,48 +381,48 @@ namespace stan {
       }      
       void operator()(const double_var_decl& x) const {
         std::vector<expression> read_args;
-        generate_initialize_array_bounded(x,"var","scalar",read_args);
+        generate_initialize_array_bounded(x,is_var_?"var":"double","scalar",read_args);
       }
       void operator()(const vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
-        generate_initialize_array_bounded(x,"vector_v","vector",read_args);
+        generate_initialize_array_bounded(x,is_var_?"vector_v":"vector_d","vector",read_args);
       }
       void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.N_);
-        generate_initialize_array_bounded(x,"row_vector_v","row_vector",read_args);
+        generate_initialize_array_bounded(x,is_var_?"row_vector_v":"row_vector_d","row_vector",read_args);
       }
       void operator()(const matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
-        generate_initialize_array_bounded(x,"matrix_v","matrix",read_args);
+        generate_initialize_array_bounded(x,is_var_?"matrix_v":"matrix_d","matrix",read_args);
       }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("vector_v","simplex",read_args,x.name_,x.dims_);
+        generate_initialize_array(is_var_?"vector_v":"vector_d","simplex",read_args,x.name_,x.dims_);
       }
       void operator()(const ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("vector_v","ordered",read_args,x.name_,x.dims_);
+        generate_initialize_array(is_var_?"vector_v":"vector_d","ordered",read_args,x.name_,x.dims_);
       }
       void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("vector_v","positive_ordered",read_args,x.name_,x.dims_);
+        generate_initialize_array(is_var_?"vector_v":"vector_d","positive_ordered",read_args,x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("matrix_v","cov_matrix",read_args,x.name_,x.dims_);
+        generate_initialize_array(is_var_?"matrix_v":"matrix_d","cov_matrix",read_args,x.name_,x.dims_);
       }
       void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array("matrix_v","corr_matrix",read_args,x.name_,x.dims_);
+        generate_initialize_array(is_var_?"matrix_v":"matrix_d","corr_matrix",read_args,x.name_,x.dims_);
       }
       void generate_initialize_array(const std::string& var_type,
                                      const std::string& read_type,
@@ -490,10 +493,14 @@ namespace stan {
     };
 
     void generate_local_var_inits(std::vector<var_decl> vs,
+                                  bool is_var,
                                   bool declare_vars,
                                   std::ostream& o) {
-      o << INDENT2 << "stan::io::reader<var> in__(params_r__,params_i__);" << EOL2;
-      init_local_var_visgen vis(declare_vars,o);
+      o << INDENT2 
+        << "stan::io::reader<" 
+        << (is_var ? "var" : "double")
+        << "> in__(params_r__,params_i__);" << EOL2;
+      init_local_var_visgen vis(declare_vars,is_var,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
     }
@@ -1191,13 +1198,14 @@ namespace stan {
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
-      o << INDENT2 << "var lp__(0.0);" << EOL;
-
-      generate_comment("model parameters",2,o);
-      generate_local_var_inits(p.parameter_decl_,true,o);
-      o << EOL;
+      o << INDENT2 << "var lp__(0.0);" << EOL2;
 
       static bool is_var = true;
+
+      generate_comment("model parameters",2,o);
+      generate_local_var_inits(p.parameter_decl_,is_var,true,o);
+      o << EOL;
+
       generate_comment("transformed parameters",2,o);
       generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
       generate_init_vars(p.derived_decl_.first,2,o);
@@ -1208,6 +1216,47 @@ namespace stan {
       o << EOL;
       
       generate_validate_transformed_params(p.derived_decl_.first,2,o);
+      o << INDENT2
+        << "const char* function__ = \"validate transformed params\";" 
+        << EOL;
+      generate_validate_var_decls(p.derived_decl_.first,2,o);
+
+      generate_comment("model body",2,o);
+      generate_statement(p.statement_,2,o,include_sampling,is_var);
+      o << EOL;
+      o << INDENT2 << "return lp__;" << EOL2;
+      o << INDENT << "} // log_prob()" << EOL2;
+
+
+      // double-based cut-and-paste
+      o << EOL;
+      o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
+      o << INDENT << "                vector<int>& params_i__," << EOL;
+      o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL2;
+      o << INDENT2 << "double lp__(0.0);" << EOL;
+
+      is_var = false;
+
+      generate_comment("model parameters",2,o);
+      generate_local_var_inits(p.parameter_decl_,is_var,true,o);
+      o << EOL;
+
+      generate_comment("transformed parameters",2,o);
+      generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
+
+      // skip this as won't seg fault the same way
+      // generate_init_vars(p.derived_decl_.first,2,o);
+
+      o << EOL;
+      generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
+      o << EOL;
+      
+      // skip this as we don't need inits
+      // generate_validate_transformed_params(p.derived_decl_.first,2,o);
+      o << INDENT2
+        << "const char* function__ = \"validate transformed params\";" 
+        << EOL;
+      generate_validate_var_decls(p.derived_decl_.first,2,o);
 
       generate_comment("model body",2,o);
       generate_statement(p.statement_,2,o,include_sampling,is_var);
