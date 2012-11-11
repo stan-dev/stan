@@ -1316,68 +1316,255 @@ model {
 \end{Verbatim}
 \end{quote}
 
+\chapter{Reparameterizations and Changes of Variables}
+\label{change-of-variables.chapter}
+
+\noindent
+As with BUGS, Stan supports a direct encoding of reparameterizations.
+Stan also supports changes of variables by directly incrementing the
+log probability accumulator with the log Jacobian of the transform.
+
+\section{Reparameterizations}
+
+Reparameterizations may be implemented straightforwardly.  For
+example, the Beta distribution is parameterized by two positive count
+parameters $\alpha, \beta > 0$.  The following example illustrates a
+hierarchical Stan model with a vector of parameters \code{theta} are
+drawn i.i.d.\ fro a Beta distribution whose parameters are themselves
+drawn from a hyperprior distribution.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower = 0> alpha;
+  real<lower = 0> beta;
+  ...
+model {
+  alpha ~ ...
+  beta ~ ...
+  for (n in 1:N)
+    theta[n] ~ beta(alpha,beta);
+  ...
+\end{Verbatim}
+\end{quote}
+
+It is often more natural to specify hyperpriors in terms of
+transformed parameters.  In the case of the Beta, the obvious choice
+for reparameterization is in terms of a mean parameter 
+\[
+\phi = \alpha / (\alpha + \beta)
+\]
+and total count parameter
+\[
+\lambda = \alpha + \beta.
+\]
+Following \citep[Chapter 5]{GelmanCarlinSternRubin:2003}, the mean
+gets a uniform prior and the count parameter a Pareto prior with
+$p(\lambda) \propto \lambda^{-2.5}$.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0,upper=1> phi;
+  real<lower=0.1> lambda;
+  ...
+transformed parameters {
+  real<lower=0> alpha;
+  real<lower=0> beta;
+  ...
+  alpha <- lambda * phi;
+  beta <- lambda * (1 - phi);
+  ...
+model {
+  phi ~ beta(1,1); // uniform on phi, could drop
+  lambda ~ pareto(0.1,1.5);
+  for (n in 1:N)
+    theta[n] ~ beta(alpha,beta);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+The new parameters, \code{phi} and \code{lambda}, are declared in the
+parameters block and the parameters for the Beta distribution, 
+\code{alpha} and \code{beta}, are declared and defined in the
+transformed parameter block.  Ano If their values are not of interest,
+they could instead be defined as local variables in the model as
+follows.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+   real alpha;
+   real beta;
+   alpha <- lambda * phi;
+   beta <- lambda * (1 - phi);
+...
+  for (n in 1:N)
+    theta[n] ~ beta(alpha,beta);
+...
+}
+\end{Verbatim}
+\end{quote}
+%
+With vectorization, this could be expressed more compactly and
+efficiently as follows.
+\begin{quote}
+\begin{Verbatim}
+model {
+  theta ~ beta(lambda * phi, lambda * (1 - phi));
+...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+Univariate transforms must be monotonic and differentiable everywhere
+in their support.  Stan takes care of the derivative involved in the
+gradient behind the scenes.  
+
+Multivariate transforms are more complex.  They require the log
+absolute Jacobian to be applied.  In Stan, this requires coding the
+transform and the Jacobian.  In the full case (where the Jacobian is
+not triangular), the code would look as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+
+}
+\end{Verbatim}
+\end{quote}
 
 
-% \chapter{Change of Variables}
 
-% his is certainly something that is unique to Stan. I believe the rule is:
 
-% 1) If the LHS of a ~ is declared in the parameters block, then the
-% user does NOT need to adjust lp__ with a log absolute Jacobian
-% determinant because Stan will do it automatically if
-% necessary. Similarly, if updating lp__ manually instead of using the ~
-% syntax, if the variable(s) that are contributing that that lp__ update
-% are declared in the parameters block, then the user does NOT need to
-% further adjust lp__ with a log absolute Jacobian determinant because
-% Stan will do it automatically if necessary
+\section{Changes of Variables}
 
-% 2) If the LHS of a ~ is declared in the transformed parameters block
-% or is declared as a local variable in the model block, then the user
-% DOES need to adjust lp__ with a log absolute Jacobian
-% determinant. Similarly, if updating lp__ manually instead of using the
-% ~ syntax, if the variable(s) that are contributing that that lp__
-% update are declared in the transformed parameters block or the model
-% block, then the user DOES need to further adjust lp__ with a log
-% absolute Jacobian determinant.
+Changes of variables are applied when the transformation of a
+parameter has a specified distribution.  One textbook is example is
+the lognormal distribution, which is the distribution of a variable
+$y > 0$ whose logarithm $\log y$ has a normal distribution.  
 
-% When the user does this in the .stan file:
+\subsection{Univariate Changes of Variables}
 
-% parameters{
-%   cov_matrix[K] Sigma;
-% }
+The change of variables requires an adjustment to the probability to
+account for the distortion caused by the transform.  In the case of
+univariate distributions, the the resulting probability must be scaled
+by the absolute derivative of the transform (see
+\refsection{uni-change-of-variables} for more precise definitions of
+univariate changes of variables).
 
-% The C++ code utilizes a Cholesky factor (L) --- even though L is not
-% mentioned in the .stan file --- and comes out looking like:
+In the case of log normals, if $y$'s logarithm is normal with mean
+$\mu$ and deviation $\sigma$, then the distribution of $y$ is given by
+\[
+p(y) 
+\ = \
+\distro{Normal}(\log y| \mu, \sigma) \  \left| \frac{d}{dy} \log y \right|
+\ = \
+\distro{Normal}(\log y| \mu, \sigma) \frac{1}{y}.
+\]
+Stan works on the log scale to prevent underflow, where
+\[
+\log p(y) 
+=
+\log \distro{Normal}(\log y| \mu, \sigma)
+- \log y.
+\]
 
-% Sigma = L * L.transpose();
-% lp__ += a log absolute Jacobian determinant
+In Stan, the change of variables can be applied in the sampling
+statement.  To adjust for the curvature, the log probability
+accumulator is incremented with the log absolute derivative of the
+transform.  The lognormal distribution can thus be implemented
+directly in Stan as follows.%
+%
+\footnote{This example is for illustrative purposes only; the
+  recommended way to implement the lognormal distribution in Stan is
+  with the built-in \code{lognormal} probability function (see \refsection{lognormal}).}
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> y;
+  ...
+model {
+  log(y) ~ normal(mu,sigma);
+  lp__ <- lp__ - log(y);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+It is important, as always, to declare appropriate constraints on
+parameters;  here \code{y} is constrained to be positive. 
 
-% In other words, the user is utilizing the Cholesky factor without
-% necessarily knowing it.
+It would be slightly more efficient to define a local variable for the
+logarithm, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  real log_y;
+  log_y <- log(y);
+  log_y ~ normal(mu,sigma);
+  lp__ <- lp__ - log_y;
+  ...
+\end{Verbatim}
+\end{quote}
+%
 
-% However, the C++ code is always utilizing unbounded primitive
-% parameters that correspond to the parameters declared in the .stan
-% file. The only exception is
+If \code{y} were declared as data instead of as a parameter, then the
+adjustment can be ignored because the data will be constant and Stan
+only requires the log probability up to a constant.
 
-% parameters {
-%   real mu;
-% }
+\subsection{Multivariate Changes of Variables}
 
-% Since mu is unrestricted, there is no need to complicate things with a
-% primitive parameter. In contrast,
+In the case of a multivariate transform, the log of the Jacobian of
+the transform must be added to the log probabilty accumulator (see
+\refsection{multi-change-of-variables} for more precise definitions of multivariate transforms
+and Jacobians).  In Stan, this can be coded as follows in the general
+case where the Jacobian is not a full matrix.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+   vector[K] u;      // multivariate parameter
+   ...
+transformed parameters {
+   vector[K] v;     // transformed parameter
+   matrix[K,K] J;   // Jacobian matrix of transform
+   ... compute v as a function of u ...
+   ... compute J[m,n] = d.v[m] / d.u[n] ...
+   lp__ <- lp__ + log(fabs(determinant(J)));
+   ...
+model {
+   v ~ ...;
+   ...
+\end{Verbatim}
+\end{quote}
+%
+Of course, if the Jacobian is known analytically, it will be more
+efficient to apply it directly than to call the determinant function,
+which is neither efficient nor particularly stable numerically.
 
-% parameter {
-%   real<lower=0> sigma;
-% }
-
-% is positive so the C++ will have something like
-
-% sigma = exp(sigma_primitive);
-% lp__ += a log absolute partial derivative
-
-% In other words, a Cholesky factor is the primitive parameter
-% underlying a covariance matrix, just like sigma_primitive is the
-primitive parameter underlying sigma.
+In many cases, the Jacobian matrix will be triangular, so that only
+the diagonal elements will be required for the determinant
+calculation.  Triangular Jacobians arise when each element \code{v[k]}
+of the transformed parameter vector only depends on elements
+\code{u[1]}, \ldots, \code{u[k]} of the parameter vector.  For
+triangular matrices, the determinant is the product of the diagonal
+elements, so the transformed parameters block of the above model can
+be simplified and made more efficient by recoding as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed parameters {
+  ...
+  vector[K] J_diag;  // diagonals of Jacobian matrix
+  ... 
+  ... compute J[k,k] = d.v[k] / d.u[k] ...
+  lp__ <- lp__ + sum(log(J_diag));
+  ...
+\end{Verbatim}
+\end{quote}
 
 
 
@@ -1539,14 +1726,18 @@ through reparameterization.
 \includegraphics[height=2in]{R/funnel-fit.png}
 \end{center}
 \vspace*{-18pt}
-\caption{\it Neal's Funnel.  (Left) The marginal density of Neal's funnel for the upper-level
-  variable $y$ and one lower-level variable $x_1$ (see the text for
-  the formula).  The blue region has log density greater
-    than -50, the orange region density less than -50, and the gray
-    region density below -200.  (Right) 4000 samples produced by
-    running Stan with default settings.  Both plots are restricted to
-    the shown window of $x_1$ and $y$ values; samples were drawn
-    outside of this area as would be expected given the density.}\label{funnel.figure}
+\caption{\small \it Neal's Funnel.  (Left) The marginal density of
+  Neal's funnel for the upper-level variable $y$ and one lower-level
+  variable $x_1$ (see the text for the formula).  The blue region has
+  log density greater than -4, the yellow region density less than
+  -16, and the gray background a density less than -16.  The marginal
+  standard deviation 3.  (Right) 4000 draws from a run of Stan's
+  sampler with default settings.  Both plots are restricted to the
+  shown window of $x_1$ and $y$ values; samples were drawn outside of
+  this area as would be expected given the density.  The samples are
+  consistent witht the marginal density $p(y) =
+  \distro{Normal}(y|0,3)$, which has mean 0 and standard deviation
+  3.}\label{funnel.figure}
 \end{figure}
 
 \citep{Neal:2003} defines a distribution that exemplifies the
@@ -1603,12 +1794,12 @@ transformed parameters {
   real y;
   vector[9] x;
 
-  y <- 3.0 * y_raw;
-  x <- exp(y/2) * x_raw;
+  y <- 3.0 * y_raw;       // implies y ~ normal(0,3)
+  x <- exp(y/2) * x_raw;  // implies x ~ normal(0,exp(y/2))
 }
 model {
-  y_raw ~ normal(0,1); # implies: y ~ normal(0,3)
-  x_raw ~ normal(0,1); # implies: x ~ normal(0,exp(y/2))
+  y_raw ~ normal(0,1);  
+  x_raw ~ normal(0,1);  
 }
 \end{Verbatim}
 \end{quote}
@@ -1645,15 +1836,21 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-Although not shown, there will likely be priors on both \Verb|mu_beta|
-and \Verb|sigma_beta|.  A hierarchical model such as this will suffer
-from the same kind of inefficiencies as Neal's funnel, because the
-values of \Verb|beta|, \Verb|mu_beta| and \Verb|sigma_beta| are tied
-together because changes to \Verb|beta| are tied directly to changes
-of \Verb|mu_beta| and \Verb|sigma_beta|.
+Although not shown, a full model will have priors on both
+\Verb|mu_beta| and \Verb|sigma_beta| along with data modeled based on
+these coefficients.  For instance, a standard binary logistic
+regression with data matrix \code{x} and binary outcome vector
+\code{y} would include a likelihood statement such as form
+\Verb|y ~ bernoulli_logit(x * beta)|, leading to an analytically
+intractable posterior.
 
-This model can be made much more efficient in terms of sampling by
-reparameterizing in exactly the same way as the funnel example.
+A hierarchical model such as the above will suffer from the same kind
+of inefficiencies as Neal's funnel, though typically not so extreme,
+because the values of \Verb|beta|, \Verb|mu_beta| and
+\Verb|sigma_beta| are highly correlated in the posterior.  Such a
+hierarchical model can be made much more efficient in terms of
+effective sample size by reparameterizing in exactly the same way as
+the funnel example.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1662,10 +1859,10 @@ parameters {
   ...
 transformed parameters {
   vector[K] beta;
+  // implies: beta ~ normal(mu_beta,sigma_beta)
   beta <- mu_beta + sigma_beta * beta_raw;
 model {
-  beta_raw ~ normal(0,1); 
-  // implies: beta ~ normal(mu_beta,sigma_beta)
+  beta_raw ~ normal(0,1);  
   ...
 \end{Verbatim}
 \end{quote}
