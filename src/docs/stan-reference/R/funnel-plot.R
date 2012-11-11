@@ -1,7 +1,7 @@
 library("ggplot2");
 
 p_funnel <- function(x1,y) {
-  return(dnorm(y,0.0,3.0,log=TRUE) + dnorm(x1,0.0,exp(y),log=TRUE));
+  return(dnorm(y,0.0,3.0,log=TRUE) + dnorm(x1,0.0,exp(y/2),log=TRUE));
 }
 
 K = 200;
