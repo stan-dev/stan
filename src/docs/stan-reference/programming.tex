@@ -1607,8 +1607,8 @@ transformed parameters {
   x <- exp(y/2) * x_raw;
 }
 model {
-  y_raw ~ normal(0,1);
-  x_raw ~ normal(0,1);
+  y_raw ~ normal(0,1); # implies: y ~ normal(0,3)
+  x_raw ~ normal(0,1); # implies: x ~ normal(0,exp(y/2))
 }
 \end{Verbatim}
 \end{quote}
@@ -1618,7 +1618,10 @@ sampled as independent unit normals, which is easy for Stan.  These
 are then transformed into samples from the funnel.  In this case, the
 same transform may be used to define Monte Carlo samples directly
 based on independent unit normal samples; Markov chain Monte Carlo
-methods are not necessary.  
+methods are not necessary. If such a reparameterization were used in
+Stan code, it is useful to provide a comment indicating what the
+distribution for the parameter implies for the distribution of the
+transformed parameter.
 
 \subsection{Hierarchical Models}
 
@@ -1661,7 +1664,8 @@ transformed parameters {
   vector[K] beta;
   beta <- mu_beta + sigma_beta * beta_raw;
 model {
-  beta_raw ~ normal(0,1);
+  beta_raw ~ normal(0,1); 
+  // implies: beta ~ normal(mu_beta,sigma_beta)
   ...
 \end{Verbatim}
 \end{quote}
@@ -1669,8 +1673,178 @@ model {
 Any priors defined for \Verb|mu_beta| and \Verb|sigma_beta| remain as
 defined in the original model.
 
+Reparameterization of hierarchical models is not limited to the normal
+distribution, although the normal distribution is the best candidate
+for doing so. In general, any distribution of parameters in the 
+location-scale family is a good candidate for reparameterization. Let
+$\beta = l + s\alpha$ where $l$ is a location parameter and $s$ is a
+scale parameter. Note that $l$ need not be the mean, $s$ need not
+be the standard deviation, and neither the mean nor the standard
+deviation need to exist. If $\alpha$ and $\beta$ are from the same
+distributional family but $\alpha$ has location zero and unit scale, 
+while $\beta$ has location $l$ and scale $s$, then that distribution
+is a location-scale distribution. Thus, if $\alpha$ were a parameter
+and $\beta$ were a transformed parameter, then a prior distribution
+from the location-scale family on $\alpha$ with location zero and unit 
+scale implies a prior distribution on $\beta$ with location $l$ and
+scale $s$. Doing so would reduce the dependence between $\alpha$, 
+$l$, and $s$.
 
+There are several univariate distributions in the location-scale
+family, such as the Student t distribution, including its special
+cases of the Cauchy distribution (with one degree of freedom) and the
+normal distribution (with infinite degrees of freedom). As shown above,
+if $\alpha$ is distributed standard normal, then $\beta$ is distributed
+normal with mean $\mu = l$ and standard deviation $\sigma = s$. The 
+logistic, the double exponential, the generalized extreme value 
+distributions, and the stable distribution are also in the 
+location-scale family.
 
+\subsection{Multivariate Reparameterizations}
+
+The benefits of reparameterization are not limited to univariate 
+distributions. A parameter with a multivariate normal prior distribution
+is also an excellent candidate for reparameterization. Suppose you intend
+the prior for $\beta$ to be multivariate normal with mean vector $\mu$
+and covariance matrix $\Sigma$. Such a belief is reflected by the
+following code.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> K;
+  vector[K] mu;
+  cov_matrix[K] Sigma;
+  ...
+parameters {
+  vector[K] beta;
+  ...
+model {
+  beta ~ multi_normal(mu,Sigma);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+In this case \Verb|mu| and \Verb|Sigma| are fixed data, but they could
+be unknown parameters, in which case their priors would be unaffected
+by a reparameterization of \Verb|beta|.
+
+If $\alpha$ has the same dimensions as $\beta$ but the elements of 
+$\alpha$ are independently and identically distributed standard normal 
+such that $\beta = \mu + L\alpha$, where $LL^\top = \Sigma$, then 
+$\beta$ is distributed multivariate normal with mean vector $\mu$ and 
+covariance matrix $\Sigma$. One choice for $L$ is the Cholesky factor
+of $\Sigma$. Thus, the model above could be reparameterized as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> K;
+  vector[K] mu;
+  cov_matrix[K] Sigma;
+  ...
+transformed data {
+  matrix[K,K] L;
+  L <- cholesky_decompose(Sigma);
+}
+parameters {
+  vector[K] alpha;
+  ...
+transformed parameters {
+  vector[K] beta;
+  beta <- mu + L * alpha; 
+}
+model {
+  alpha ~ normal(0,1); 
+  // implies: beta ~ multi_normal(mu, Sigma)
+  ...
+\end{Verbatim}
+\end{quote}
+%
+This reparameterization is more efficient for two reasons. First, it
+reduces dependence among the elements of \Verb|alpha| and second, it
+avoids the need to invert \Verb|Sigma| every time \Verb|multi_normal|
+is evaluated.
+
+The Cholesky factor is also useful when a covariance matrix is 
+decomposed into a correlation matrix that is multiplied from both
+sides by a diagonal matrix of standard deviations, where either the
+standard deviations or the correlations are unknown parameters. The
+Cholesky factor of the covariance matrix is equal to the product of
+a diagonal matrix of standard deviations and the Cholesky factor of
+the correlation matrix. Furthermore, the product of a diagonal matrix
+of standard deviations and a vector is equal to the elementwise
+product between the standard deviations and that vector. Thus, if for
+example the correlation matrix \Verb|Tau| were fixed data but the
+vector of standard deviations \Verb|sigma| were unknown parameters,
+then a reparameterization of \Verb|beta| in terms of \Verb|alpha|
+could be implemented as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> K;
+  vector[K] mu;
+  corr_matrix[K] Tau;
+  ...
+transformed data {
+  matrix[K,K] L;
+  L <- cholesky_decompose(Tau);
+}
+parameters {
+  vector[K] alpha;
+  vector<lower=0>[K] sigma;
+  ...
+transformed parameters {
+  vector[K] beta;
+  // This equals mu + diag_matrix(sigma) * L * alpha;
+  beta <- mu + sigma .* (L * alpha);
+}
+model {
+  sigma ~ cauchy(0,5);
+  alpha ~ normal(0,1);
+  // implies: beta ~ multi_normal(mu,
+  //  diag_matrix(sigma) * L * L' * diag_matrix(sigma)))
+  ...
+\end{Verbatim}
+\end{quote}
+%
+This reparameterization of a multivariate normal distribution in
+terms of standard normal variates can be extended to other multivariate
+distributions that can be conceptualized as contaminations of the 
+multivariate normal, such as the multivariate Student t and the skew
+multivariate normal distribution.
+
+Another candidate for reparameterization is the Dirichlet distribution
+with all $K$ shape parameters equal. \citep{ZyczkowskiSommers:2001} shows 
+that if $\theta_i$ is equal to the sum of $\beta$ independent squared 
+standard normal variates and $\rho_i = \frac{\theta_i}{\sum \theta_i}$, 
+then the $K$-vector $\rho$ is distributed Dirichlet with all shape 
+parameters equal to $\frac{\beta}{2}$. In particular, if $\beta = 2$, 
+then $\rho$ is distributed uniformally on the unit simplex. Thus, we can 
+make $\rho$ be a transformed parameter to reduce dependence, as in:
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> beta;
+  ...
+parameters {
+  vector[K] z[beta];
+  ...
+transformed parameters {
+  simplex[K] rho;
+  for (k in 1:K)
+    rho[k] <- dot_self(z[k]); // sum-of-squares
+  rho <- rho / sum(rho);
+}
+model {
+  z ~ normal(0,1); 
+  // implies: rho ~ dirichlet(0.5 * beta * ones)
+  ...
+\end{Verbatim}
+\end{quote}
+%
 \section{Vectorization}
 
 \subsection{Gradient Bottleneck}
@@ -1700,7 +1874,7 @@ depends on \code{n}.
 \begin{quote}
 \begin{Verbatim}
 for (n in 1:N) 
-   total += foo(n,...);
+   total <- total + foo(n,...);
 \end{Verbatim}
 \end{quote}
 %
@@ -1715,8 +1889,8 @@ apply the \code{sum()} operator, as in the following refactoring.
 {  
   vector[N] summands;
   for (n in 1:N) 
-    summands[n] = foo(n,...);
-  total += sum(summands);
+    summands[n] <- foo(n,...);
+  total <- sum(summands);
 }
 \end{Verbatim}
 \end{quote}
