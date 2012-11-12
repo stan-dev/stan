@@ -1585,8 +1585,39 @@ a carriage return (CR) character (ASCII code point \code{0x0D})
 followed by a line-feed (LF) character.
 
 
+\chapter{Auxiliary Stan Tools}
 
+The Stan development team mainly uses command-line programs and
+standalone text editors like \code{vi} and \code{emacs}.   
 
+\section{Tools for Emacs}
+
+Stan's emacs mode is defined relative to the directory
+\code{<stan-home>} in which Stan was unpacked from source.
+%
+\begin{quote}
+\nolinkurl{<stan-home>/src/StanMode/stan-mode.el}
+\end{quote}
+%
+
+\subsection{Installing Emacs Mode}
+
+Typically, emacs is set up to read a \code{.emacs} file from the
+user's home directory.  Add the following two lines to this file
+replacing \code{<stan-home>} with the path to where Stan was unpacked.
+\begin{quote}
+\begin{Verbatim}
+(add-to-list 'load-path "/Users/carp/stan/src/StanMode/")
+(require 'stan-mode)
+\end{Verbatim}
+\end{quote}
+
+For Aquamacs on Mac OS X, these two lines can be placed in the
+\code{.emacs} file or in the following preferences file.
+%
+\begin{quote}
+\nolinkurl{~/Library/Preferences/Aquamacs Emacs/Preferences.el}
+\end{quote}
 
 % \chapter{User-Defined Functions and Gradients}\label{user-defined-functions.appendix}
 
