@@ -838,6 +838,70 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{quote}
 %
 
+
+\subsection{Arrays of Matrices and Vectors}
+
+Arrays of vectors and matrices are accessed in the same way as arrays
+of doubles.  Consider the following vector and scalar declarations.
+%
+\begin{quote}
+\begin{Verbatim}
+vector[5] a[4,3];
+vector[5] b[4];
+vector[5] c;
+real x;
+\end{Verbatim}
+\end{quote}
+%
+With these declarations, the following assignments are legal.
+%
+\begin{quote}
+\begin{Verbatim}
+b <- a[1];      // result is array of vectors
+c <- a[1,3];    // result is vector
+c <- b[3];      //   same result as above
+x <- a[1,3,5];  // result is scalar
+x <- b[3,5];    //   same result as above
+x <- c[5];      //   same result as above
+\end{Verbatim}
+\end{quote}
+%
+Row vectors and other derived vector types (simplex and ordered)
+behave the same way in terms of indexing.
+
+Consider the following matrix, vector and scalar declarations.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[6,5] d[4,3];
+matrix[6,5] e[4];
+matrix[6,5] f;
+row_vector[5] g;
+real x;
+\end{Verbatim}
+\end{quote}
+%
+With these declarations, the following definitions are legal.
+%
+\begin{quote}
+\begin{Verbatim}
+e <- d[1];        // result is array of matrices
+f <- d[1,3];      // result is matrix
+f <- e[3];        //   same result as above
+g <- d[1,3,2];    // result is row vector
+g <- e[3,2];      //   same result as above
+g <- f[2];        //   same result as above
+x <- d[4,3,5,2];  // result is scalar
+x <- e[3,5,2];    //   same result as above
+x <- f[5,2];      //   same result as above
+x <- g[2];        //   same result as above
+\end{Verbatim}
+\end{quote}
+%
+As shown, the result \code{f[2]} of supplying a single index to a
+matrix is the indexed row, here row 2 of matrix \code{f}.
+
+
 \section{Types versus Sizes}
 
 The size associated with a given variable is not part of its data
