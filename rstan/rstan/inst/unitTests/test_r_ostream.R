@@ -13,8 +13,10 @@ inc <- '
 RcppExport SEXP test_r_ostream(SEXP params) {
   std::string str = Rcpp::as<std::string>(params);
   rstan::io::rcout << "[rcout] " << str << std::endl; 
-  rstan::io::rcerr << "[rcerr] " << str << std::endl; 
-  return Rcpp::wrap(true); 
+  rstan::io::rcerr << "[rcerr] " << str; // << std::endl;
+  rstan::io::rcerr.flush();
+  rstan::io::rcerr << std::endl;
+  return Rcpp::wrap(true);
 } 
 
 RCPP_MODULE(rstantest){

@@ -55,6 +55,11 @@ namespace rstan {
           REprintf("%c", c);
         return c;
       }
+      
+      virtual int sync() {
+         R_FlushConsole();
+         return 0;
+      } 
 
       virtual std::streamsize xsputn(const char_type* s, std::streamsize n) {
         REprintf("%.*s", n, s);
