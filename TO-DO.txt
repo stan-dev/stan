@@ -25,6 +25,9 @@ v1.0.4
 
 
 
+* catch errors in reading inits same way as in reading data
+  to report what they were and where they came from
+
 * make sure all range errors are being caught
   -- math/matrix.hpp line 164
   -- STAN_NO_DEBUG property
@@ -742,6 +745,9 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (Rstan) I/O functions to read in the output produced by
+  command-line Stan (or write-to file RStan)
 
 * (Rstan) expose transform and inverse transform functions
   -- danger is that the transforms may change over time
