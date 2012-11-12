@@ -13,9 +13,17 @@ The to-do list is organized into the following sections:
 
 v1.0.4
 ======================================================================
--- Library Versions
-   Eigen: 3.1.1   to  3.1.2
-   Boost: 1.51.0  to  1.52.0
+-- Libraries Updated
+   * Eigen version 3.1.1 replaced with version 3.1.2
+   * Boost version 1.51.0 replaced with version 1.52.0
+-- Bug Fixes
+   * fixed bug introduced in 1.0.3 that hid line and column number
+     bug reporting
+   * added checks that data dimensions match as well as sizes
+-- Improvements
+   * generating double-based log-prob function
+
+
 
 * make sure all range errors are being caught
   -- math/matrix.hpp line 164
