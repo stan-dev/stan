@@ -1,14 +1,10 @@
 #ifndef __STAN__AGRAD__MATRIX_HPP__
 #define __STAN__AGRAD__MATRIX_HPP__
 
-// global include
-#include <sstream>
-
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
-#include <stan/math/boost_error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix_error_handling.hpp>
+
+#include <stan/agrad/special_functions.hpp>
 
 namespace stan {
   namespace agrad {
@@ -298,18 +294,6 @@ namespace stan {
     }
     /**
      * Converts argument to an automatic differentiation variable.
-     * 
-     * Sets an automatic differentiation variable with the input value.
-     *
-     * @param[in] x A scalar value
-     * @param[out] var_x A reference to an automatic differentiation variable
-     *   which will have the value of x.
-     */
-    inline void to_var(const double& x, var& var_x) {
-      var_x = x;
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
      *
      * Returns a stan::agrad::var variable with the input value.
      *
@@ -318,18 +302,6 @@ namespace stan {
      */    
     inline var to_var(const var& x) {
       return x;
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
-     * Sets an automatic differentiation variable with the input value.
-     *
-     * @param[in] var_in An automatic differentiation variable.
-     * @param[out] var_out A reference to an automatic differentiation variable
-     *   which will be set to the input value.
-     */
-    inline void to_var(const var& var_in, var& var_out) {
-      var_out = var_in;
     }
     /**
      * Converts argument to an automatic differentiation variable.
@@ -346,22 +318,6 @@ namespace stan {
           m_v(i,j) = m(i,j);
       return m_v;
     }
-    
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
-     * Sets a Matrix with automatic differentiation variables.
-     *
-     * @param[in] m A Matrix of scalars.
-     * @param[out] m_v A Matrix with automatic differentiation variables
-     *    assigned with values of m.
-     */
-    inline void to_var (const stan::math::matrix_d& m, matrix_v& m_v) {
-      m_v.resize(m.rows(), m.cols());
-      for (int j = 0; j < m.cols(); ++j)
-        for (int i = 0; i < m.rows(); ++i)
-          m_v(i,j) = m(i,j);
-    }
     /**
      * Converts argument to an automatic differentiation variable.
      *
@@ -372,19 +328,6 @@ namespace stan {
      */
     inline matrix_v to_var(const matrix_v& m) {
       return m;
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
-     * Sets a Matrix with automatic differentiation variables.
-     *
-     * @param[in] m_in A Matrix of automatic differentiation variables.
-     * @param[out] m_out A Matrix of automatic differentiation variables
-     *    assigned with values of m_in.
-     */
-    inline void to_var(const matrix_v& m_in,
-                       matrix_v& m_out) {
-      m_out = m_in;
     }
     /**
      * Converts argument to an automatic differentiation variable.
@@ -404,21 +347,6 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Sets a Vector with automatic differentation variables.
-     *
-     * @param[in] v A Vector of scalars.
-     * @param[out] v_v A Vector of automatic differentation variables with
-     *   values of v.
-     */
-    inline void to_var(const stan::math::vector_d& v,
-                       vector_v& v_v) {
-      v_v.resize(v.size());
-      for (int i = 0; i < v.size(); ++i)
-        v_v[i] = v[i];
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
      * Returns a stan::agrad::var variable with the input value.     
      *
      * @param[in] v A Vector of automatic differentiation variables
@@ -427,19 +355,6 @@ namespace stan {
      */
     inline vector_v to_var(const vector_v& v) {
       return v;
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
-     * Sets a Vector with automatic differentiation variables
-     *
-     * @param[in] v_in A Vector of automatic differentiation variables
-     * @param[out] v_out A Vector of automatic differentiation variables
-     *    with values of v_in
-     */
-    inline void to_var(const vector_v& v_in,
-                       vector_v& v_out) {
-      v_out = v_in;
     }
     /**
      * Converts argument to an automatic differentiation variable.
@@ -459,21 +374,6 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Sets a row vector with automatic differentiation variables
-     *
-     * @param[in] rv A row vector of scalars
-     * @param[out] rv_v A row vector of automatic differentiation variables
-     *   with values set to rv.
-     */
-    inline void to_var(const stan::math::row_vector_d& rv,
-                       row_vector_v& rv_v) {
-      rv_v.resize(rv.size());
-      for (int i = 0; i < rv.size(); ++i)
-        rv_v[i] = rv[i];
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
      * Returns a stan::agrad::var variable with the input value.     
      *
      * @param[in] rv A row vector with automatic differentiation variables
@@ -482,19 +382,6 @@ namespace stan {
      */
     inline row_vector_v to_var(const row_vector_v& rv) {
       return rv;
-    }
-    /**
-     * Converts argument to an automatic differentiation variable.
-     *
-     * Sets a row vector with automatic differentiation variables
-     *
-     * @param[in] rv_in A row vector with automatic differentiation variables
-     * @param[out] rv_out A row vector with automatic differentiation variables
-     *    with values of rv_in
-     */
-    inline void to_var(const row_vector_v& rv_in,
-                       row_vector_v& rv_out) {
-      rv_out = rv_in;
     }
 
     /**
@@ -1976,22 +1863,6 @@ namespace stan {
       n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
     }
 
-    template <typename T_result, class Policy>
-    inline bool check_pos_definite(const char* function,
-                                   const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                   const char* name,
-                                   T_result* result,
-                                   const Policy&) {
-        typedef 
-        typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type 
-        size_type;
-        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y_d(y.rows(),y.cols());
-        for (size_type i = 0; i < y_d.rows(); i++) 
-          for (size_type j = 0; j < y_d.cols(); j++)
-            y_d(i,j) = y(i,j).val();
-        return stan::math::check_pos_definite(function,y_d,name,result,Policy());
-    }
-    
     template <typename LHS, typename RHS>
     inline void assign_to_var(std::vector<LHS>& x, const std::vector<RHS>& y) {
       for (size_t i = 0; i < x.size(); ++i)
@@ -2035,14 +1906,14 @@ namespace stan {
       enum { value = ( is_constant_struct<RHS>::value 
                        && !is_constant_struct<LHS>::value) };
     };
-
+    
     template <bool PromoteRHS, typename LHS, typename RHS>
     struct assigner {
       static inline void assign(LHS& var, const RHS& val) {
         throw std::domain_error("should not call base class of assigner");
       }
     };
-
+    
     template <typename LHS, typename RHS>
     struct assigner<false,LHS,RHS> {
       static inline void assign(LHS& var, const RHS& val) {
@@ -2056,7 +1927,7 @@ namespace stan {
         assign_to_var(var,val); // promote RHS
       }
     };
-
+    
     
     template <typename LHS, typename RHS>
     inline void assign(LHS& var, const RHS& val) {

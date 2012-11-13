@@ -1,12 +1,14 @@
-#ifndef __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS__H__
-#define __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS__H__
+#ifndef __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS_HPP__
+#define __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS_HPP__
 
-#include <cstddef>
-#include <boost/math/special_functions.hpp>
-#include <stan/agrad/agrad.hpp>
 #include <stan/agrad/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
-#include <stan/math/error_handling.hpp>
+
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/hypot.hpp>
 
 namespace stan {
 

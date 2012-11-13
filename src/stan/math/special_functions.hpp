@@ -3,7 +3,6 @@
 
 #include <stdexcept>
 
-
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/tools/promotion.hpp>

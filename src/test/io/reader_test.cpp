@@ -1,8 +1,5 @@
-#include <vector>
-#include <stdexcept>
-#include <gtest/gtest.h>
 #include <stan/io/reader.hpp>
-#include <stan/math/special_functions.hpp>
+#include <gtest/gtest.h>
 
 TEST(io_reader, scalar) {
   std::vector<int> theta_i;
@@ -219,6 +216,11 @@ TEST(io_reader, scalar_lub_exception) {
   EXPECT_NO_THROW (reader.scalar_lub(-2.0, 2.0));
   EXPECT_THROW (reader.scalar_lub(-1.0, 1.0), std::domain_error);
 }
+const double inv_logit_m2 = 0.1192029; //stan::math::inv_logit(-2.0)
+const double inv_logit_m1 = 0.2689414; //stan::math::inv_logit(-1.0)
+const double inv_logit_0 = 0.5;        //stan::math::inv_logit(0)
+const double inv_logit_3 = 0.9525741;  //stan::math::inv_logit(3.0)
+
 TEST(io_reader, scalar_lub_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -227,13 +229,12 @@ TEST(io_reader, scalar_lub_constrain) {
   theta.push_back(-1.0);
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-2.0), reader.scalar_lub_constrain(0.0,1.0));
-  EXPECT_FLOAT_EQ(3.0 + 2.0 * stan::math::inv_logit(3.0), reader.scalar_lub_constrain(3.0,5.0));
-  EXPECT_FLOAT_EQ(-3.0 + 5.0 * stan::math::inv_logit(-1.0), reader.scalar_lub_constrain(-3.0,2.0));
-  EXPECT_FLOAT_EQ(-15.0 + 30.0 * stan::math::inv_logit(0.0), reader.scalar_lub_constrain(-15.0,15.0));
+  EXPECT_FLOAT_EQ(inv_logit_m2, reader.scalar_lub_constrain(0.0,1.0));
+  EXPECT_FLOAT_EQ(3.0 + 2.0 * inv_logit_3, reader.scalar_lub_constrain(3.0,5.0));
+  EXPECT_FLOAT_EQ(-3.0 + 5.0 * inv_logit_m1, reader.scalar_lub_constrain(-3.0,2.0));
+  EXPECT_FLOAT_EQ(-15.0 + 30.0 * inv_logit_0, reader.scalar_lub_constrain(-15.0,15.0));
 }
 TEST(io_reader, scalar_lub_constrain_jacobian) {
-  using stan::math::inv_logit;
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(-2.0);
@@ -242,15 +243,15 @@ TEST(io_reader, scalar_lub_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -7.2;
-  EXPECT_FLOAT_EQ(0.0 + 1.0 * stan::math::inv_logit(-2.0), reader.scalar_lub_constrain(0.0,1.0,lp));
-  EXPECT_FLOAT_EQ(3.0 + 2.0 * stan::math::inv_logit(3.0), reader.scalar_lub_constrain(3.0,5.0,lp));
-  EXPECT_FLOAT_EQ(-3.0 + 5.0 * stan::math::inv_logit(-1.0), reader.scalar_lub_constrain(-3.0,2.0,lp));
-  EXPECT_FLOAT_EQ(-15.0 + 30.0 * stan::math::inv_logit(0.0), reader.scalar_lub_constrain(-15.0,15.0,lp));
+  EXPECT_FLOAT_EQ(0.0 + 1.0 * inv_logit_m2, reader.scalar_lub_constrain(0.0,1.0,lp));
+  EXPECT_FLOAT_EQ(3.0 + 2.0 * inv_logit_3, reader.scalar_lub_constrain(3.0,5.0,lp));
+  EXPECT_FLOAT_EQ(-3.0 + 5.0 * inv_logit_m1, reader.scalar_lub_constrain(-3.0,2.0,lp));
+  EXPECT_FLOAT_EQ(-15.0 + 30.0 * inv_logit_0, reader.scalar_lub_constrain(-15.0,15.0,lp));
   double expected_lp = -7.2 
-    + log((1.0 - 0.0) * inv_logit(-2.0) * (1 - inv_logit(-2.0))) 
-    + log((5.0 - 3.0) * inv_logit(3.0) * (1 - inv_logit(3.0)))
-    + log((2.0 - -3.0) * inv_logit(-1.0) * (1 - inv_logit(-1.0)))
-    + log((15.0 - -15.0) * inv_logit(0.0) * (1 - inv_logit(0.0)));
+    + log((1.0 - 0.0) * inv_logit_m2 * (1 - inv_logit_m2)) 
+    + log((5.0 - 3.0) * inv_logit_3 * (1 - inv_logit_3))
+    + log((2.0 - -3.0) * inv_logit_m1 * (1 - inv_logit_m1))
+    + log((15.0 - -15.0) * inv_logit_0 * (1 - inv_logit_0));
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
@@ -278,13 +279,12 @@ TEST(io_reader, prob_constrain) {
   theta.push_back(-1.0);
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-2.0), reader.prob_constrain());
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(3.0), reader.prob_constrain());
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-1.0), reader.prob_constrain());
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(0.0), reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_m2, reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_3, reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_m1, reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_0, reader.prob_constrain());
 }
 TEST(io_reader, prob_constrain_jacobian) {
-  using stan::math::inv_logit;
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(-2.0);
@@ -293,15 +293,15 @@ TEST(io_reader, prob_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -0.88;
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-2.0), reader.prob_constrain(lp));
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(3.0), reader.prob_constrain(lp));
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-1.0), reader.prob_constrain(lp));
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(0.0), reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_m2, reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_3, reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_m1, reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_0, reader.prob_constrain(lp));
   double expected_lp = -0.88
-    + log(inv_logit(-2.0) * (1.0 - inv_logit(-2.0)))
-    + log(inv_logit(3.0) * (1.0 - inv_logit(3.0)))
-    + log(inv_logit(-1.0) * (1.0 - inv_logit(-1.0)))
-    + log(inv_logit(0.0) * (1.0 - inv_logit(0.0)));
+    + log(inv_logit_m2 * (1.0 - inv_logit_m2))
+    + log(inv_logit_3 * (1.0 - inv_logit_3))
+    + log(inv_logit_m1 * (1.0 - inv_logit_m1))
+    + log(inv_logit_0 * (1.0 - inv_logit_0));
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 

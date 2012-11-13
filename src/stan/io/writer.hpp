@@ -1,16 +1,6 @@
 #ifndef __STAN__IO__WRITER_HPP__
 #define __STAN__IO__WRITER_HPP__
 
-#include <cstddef>
-#include <stdexcept>
-#include <vector>
-
-#include <boost/multi_array.hpp>
-#include <boost/throw_exception.hpp>
-
-#include <stan/math/matrix.hpp>
-#include <stan/math/special_functions.hpp>
-
 #include <stan/prob/transform.hpp>
 
 namespace stan {
