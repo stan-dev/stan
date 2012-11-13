@@ -50,11 +50,6 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
-* refactoring notes:
-  - agrad/matrix.hpp
-    repeated functionality in to_var(a,b) and assign_to_var(b,a)
-    Unused struct assigner.
-
 * poisson_log(y|alpha) = poisson(y|exp(alpha))
 
 * change step_size = epsilon +/- epsilon_pm to
@@ -86,27 +81,11 @@ C++ API
     + hypergeometric
     + neg_binomial
     + poisson
-- Fully vectorized with partials calculated:
-    univariate/continuous
-    + beta
-    + cauchy
-    + double_exponential
-    + normal
-    + gamma
-    + inv_gamma
-    + logistic
-    + lognormal
-    + pareto
-    univariate/discrete
-    + bernoulli
-    + bernoulli_logit
 
 * Ben's example: 
   matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
   this could recycle the first arg, a matrix shaped like a vector
   and the second arg, a matrix shaped like a roo vector.
-
-* bring isinf in line with revised Boost
 
 * add lower/upper bound infinite or negative infinite values
   -- need is_pos_inf<T>(x) and is_neg_inf(x) tests and we
