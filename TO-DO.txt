@@ -50,11 +50,6 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
-* refactoring notes:
-  - agrad/matrix.hpp
-    repeated functionality in to_var(a,b) and assign_to_var(b,a)
-    Unused struct assigner.
-
 * poisson_log(y|alpha) = poisson(y|exp(alpha))
 
 * change step_size = epsilon +/- epsilon_pm to
