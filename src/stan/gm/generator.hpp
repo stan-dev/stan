@@ -1265,7 +1265,7 @@ namespace stan {
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
       o << INDENT2 << "var lp__(0.0);" << EOL2;
 
-      static bool is_var = true;
+      bool is_var = true;
 
       generate_comment("model parameters",2,o);
       generate_local_var_inits(p.parameter_decl_,is_var,true,o);
@@ -1276,7 +1276,7 @@ namespace stan {
       generate_init_vars(p.derived_decl_.first,2,o);
 
       o << EOL;
-      static bool include_sampling = true;
+      bool include_sampling = true;
       generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
       o << EOL;
       
@@ -1743,8 +1743,8 @@ namespace stan {
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
-      static bool include_sampling = false;
-      static bool is_var = false;
+      bool include_sampling = false;
+      bool is_var = false;
       for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
         generate_statement(prog.derived_data_decl_.second[i],
                            2,o,include_sampling,is_var);
@@ -2528,10 +2528,10 @@ namespace stan {
                        2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       suppress_warning(INDENT2, "lp__", o);
-      static bool is_var = false;
+      bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
-      static bool include_sampling = false;
+      bool include_sampling = false;
       generate_statements(prog.derived_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
 
@@ -2850,10 +2850,10 @@ namespace stan {
       generate_comment("declare and define transformed parameters",2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       suppress_warning(INDENT2, "lp__", o);
-      static bool is_var = false;
+      bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
-      static bool include_sampling = false;
+      bool include_sampling = false;
       generate_statements(prog.derived_decl_.second,2,o,include_sampling,is_var); 
       o << EOL;
 
