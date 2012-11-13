@@ -111,7 +111,7 @@ namespace stan {
       virtual void names_i(std::vector<std::string>& names) const = 0;
 
       void add_vec(std::stringstream& msg,
-                   std::vector<size_t> dims) {
+                   const std::vector<size_t>& dims) const {
         msg << '(';
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) msg << ',';
@@ -121,7 +121,7 @@ namespace stan {
       }
 
       void validate_dims(const std::string& name,
-                         const std::vector<size_t>& dims_declared) {
+                         const std::vector<size_t>& dims_declared) const {
         std::vector<size_t> dims = dims_r(name);
         if (dims.size() != dims_declared.size()) {
           std::stringstream msg;
