@@ -1,18 +1,7 @@
 #ifndef __STAN__IO__READER_HPP__
 #define __STAN__IO__READER_HPP__
 
-#include <cstddef>
-#include <exception>
-#include <stdexcept>
-#include <vector>
-
 #include <boost/throw_exception.hpp>
-
-#include <stan/math/error_handling.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/special_functions.hpp>
-
 #include <stan/prob/transform.hpp>
 
 namespace stan {

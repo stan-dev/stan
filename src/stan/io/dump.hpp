@@ -1,18 +1,11 @@
 #ifndef __STAN__IO__DUMP_HPP__
 #define __STAN__IO__DUMP_HPP__
 
-#include <cstddef>
-#include <stdexcept>
 #include <map>
 #include <vector>
-#include <utility>
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <locale>
-
 #include <boost/throw_exception.hpp>
-
 #include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
 

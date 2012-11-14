@@ -19,16 +19,6 @@ namespace stan {
     class vari;
     class var;
 
-    template <typename T>
-    struct var_to_vi {
-      typedef T type;
-    };
-    template <>
-    struct var_to_vi<stan::agrad::var> {
-      typedef stan::agrad::vari* type;
-    };
-
-
     // FIXME: manage all this as a single singleton (thread local)
     extern std::vector<chainable*> var_stack_; 
     extern memory::stack_alloc memalloc_;
@@ -187,17 +177,6 @@ namespace stan {
       }
 
     };
-
-    /**
-     * Returns the current size of the stack of <code>vari</code>
-     * instances.
-     *
-     * @return Size of <code>vari</code> stack.
-     */
-    inline size_t stack_size() {
-      return var_stack_.size();
-    }
-      
 
     /** 
      * Prints the auto-dif variable stack. This function
@@ -445,9 +424,9 @@ namespace stan {
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
         stan::agrad::grad(vi_);
-        g.resize(0);
+        g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i) 
-          g.push_back(x[i].vi_->adj_);
+          g[i] = x[i].vi_->adj_;
         recover_memory();
       }
 
@@ -1172,34 +1151,8 @@ namespace stan {
           bvi_->adj_ -= adj_ * d;
         }
       };
-
-
     }
 
-   
-    /**
-     * Cast variable to double. Useful for templated functions where a
-     * variable may be a var or a double and we want to be able to use
-     * things like printf().
-     *
-     * @param x Variable to cast.
-     * @tparam T Type of variable.
-     */
-    template <typename T>
-    inline double as_double(T x) { return (double)x; }
-
-    /**
-     * Cast variable to double. Useful for templated functions where a
-     * variable may be a var or a double and we want to be able to use
-     * things like printf(). This specialization makes it possible to
-     * say as_double(x) where x is a var, not a double or int or
-     * something for which casts already exist.
-     *
-     * @param x Variable to cast.
-     * @tparam T Type of variable.
-     */
-    template <>
-    inline double as_double<agrad::var>(agrad::var x) { return x.vi_->val_; }
 
     // COMPARISON OPERATORS
 
@@ -2080,7 +2033,7 @@ namespace stan {
     /**
      * Return the floor of the specified variable (cmath).  
      *
-     * The derivative of the fllor function is defined and
+     * The derivative of the floor function is defined and
      * zero everywhere but at integers, so we set these derivatives
      * to zero for convenience, 
      *

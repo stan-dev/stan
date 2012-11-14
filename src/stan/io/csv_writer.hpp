@@ -1,8 +1,7 @@
 #ifndef __STAN__IO__CSV_WRITER_HPP__
 #define __STAN__IO__CSV_WRITER_HPP__
 
-#include <cstddef>
-#include <iostream>
+#include <ostream>
 #include <stan/math/matrix.hpp>
 
 namespace stan {

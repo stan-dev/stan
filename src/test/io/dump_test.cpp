@@ -1,10 +1,5 @@
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <gtest/gtest.h>
 #include <stan/io/dump.hpp>
-#include <stan/math/special_functions.hpp>
+#include <gtest/gtest.h>
 
 void test_list3(stan::io::dump_reader& reader,
                const std::vector<double>& vals) {

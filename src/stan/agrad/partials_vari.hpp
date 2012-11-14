@@ -1,7 +1,6 @@
 #ifndef __STAN__AGRAD__PARTIALS_VARI_HPP__
 #define __STAN__AGRAD__PARTIALS_VARI_HPP__
 
-#include <stan/agrad/agrad.hpp>
 #include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
 
