@@ -429,7 +429,7 @@ namespace rstan {
           } catch (const std::exception& e) {
             std::string msg("Error during user-specified initialization:\n"); 
             msg += e.what(); 
-            throw std::invalid_argument(msg);
+            throw std::runtime_error(msg);
           } 
       } else {
         init_val = "random"; 

@@ -216,6 +216,10 @@ stan(file, model_name = "anon_model", model_code = "",
      will be converted to a matrix as described above.  
   } 
 
+  Stan treats a vector of length 1 in R as a scalar.  So technically 
+  if, for example, \code{"real y[1];"} is defined in the data block, an array 
+  such as \code{"y = array(1.0, dim = 1)"} in R should be used. 
+
   The returned S4 class \code{stanfit} will save the compiled model
   across sessions if the option \code{save_dso = TRUE}
   is supplied.  
