@@ -46,9 +46,58 @@ v1.0.4
 * make sure symmetry tests aren't too stringent for cov_matrix
 
 
+PRIORITIES?
+======================================================================
+
+* discrete sampling
+* forward sampling (RNG in gen quant, all RNGs for distros)
+* cumulative distributions & truncated prob functions
+* vectorization of multivariate prob functions
+* vectorized derivatives for prob functions
+* special function vectorization
+* matrix derivative partial evals
+* Python, MATLAB, Stata, ??? interfaces
+* intro applied Bayes book with RStan
+* C++ manual
+* C++ code cleanup (API doc, privates, consts, doc, split files, 
+  long long, reserved word checking)
+* simplify error handling by removing policies
+* matrix slicing and dicing
+* matrix expressions
+* ragged arrays
+* subroutines in modeling language
+* user-specified language extensions
+* conditional expressions, statements (for, while, if-else, comparisons)
+* covariance matrix w. caching (inverse, determinant, Cholesky)
+* I/O from CSV files
+* fancier web site graphics
+* multi-threading
+* convergence diagnostics (basic I/O of leapfrog/gradients + evals)
+* command for multiple chains + report like print(fit) in RStan
+* initialization block in model
+* ensemble samplers: DREAM, differential evolution, stretch/walk
+* adapting fixed covariance matrix
+* higher-order auto-dif and RM-HMC
+* implicit functions with derivatives (for diff eqs?) 
+* compiler for R's linear model notation
+* syntactic improvements in language (e.g., multiple declares,
+  declare and assign)
+* user-callable transforms with Jacobian lp__ adjustment
+* unconstrained parameterizations of prob functions
+* new types: lower triangular (+/- strict), diagonal matrix,
+  symmetric matrix, Cholesky factor of pos-def matrix
+* improve special function and prob function behavior at limits
+* more example models, complete/improve BUGS models
+
+
+
+
+
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* unpack Eigen/Boost and use just what we need a la RStan
 
 * poisson_log(y|alpha) = poisson(y|exp(alpha))
 
@@ -282,9 +331,6 @@ C++ API
 * add scalar subtraction to match scalar addition of vectors
   (to distribute over values)
 
-* generate templated log_prob function so that you don't
-  need to evaluate auto-dif when just evaluating function
-
 * Stan safe mode to compile BUGS/JAGS-compliant models
   - allows more error checking and optimization
 
@@ -301,11 +347,6 @@ C++ API
   -- More targeted imports.  
      Pros:  faster compiles because less code to read
      Cons:  defeats precompiled headers
-
-* more general built-in initializations
-  -  normal or student-t w. params
-  -  or even set uniform boundaries
-  -  e.g., uniform(-1,1), normal(0,1), t(0,2.5)
 
 * some kind of multi-threaded timer to monitor Stan
 
@@ -391,8 +432,6 @@ C++ API
 
 * elim stan/maths/matrix lib by adding implicit ctor
   for Matrix<var,...> based on Matrix<double,...>
-
-* generalize HMC/NUTS to discrete case 
 
 * blocking updates on parameters
   - only update subset of parameters
@@ -589,30 +628,14 @@ Modeling Language
 * positive-definiteness-preserving operations
   -- rescale strictly positive
       
-* allow assignment of data to parameters?
-  -- right now, can't allocate a data matrix
-     and assign it to a parameter matrix
 
 * unit matrix function unit_matrix(K)
   -- return var or just double?  
   -- users shouldn't use this to assign to transformed param
 
-* flag attempt to define int parameter in parser
-  -- only until we add a discrete sampler
-
-* add asserts
-  -- throw exceptions rather than truly assert
-
-* add printf for debugging
-  -- do we want to format or keep it simple?
-
 * make sure reserved words from C++ are checked and flagged
 
 * constants for integer max and min values
-
-* add max() and min() for floating point args
-  -- issue is that need to compile to fmax() if there is
-     one int and one floating point argument
 
 * random generation
   -- generated quantities block
@@ -630,33 +653,7 @@ Modeling Language
      gets same grad as:
         y[n] ~ normal(mu,sigma);
    
-
-  
 * truncations need to be vectorized, too!
-
-* check our functions in doc are all defined in gm/function_signatures
-
-* check ranges for lvalue expressions in assignments, so models
-  compiled as
-      check_range(vector,i,"v");
-        v[i-1] = ...;
-      }
-  and we'd have a support function like:
-    template <typename T>
-    inline check_range(const std::vector<T>& x,
-                       size_t i,
-                       const char* msg) {
-    #if (!defined NDEBUG) || (!defined STAN_NO_DEBUG)
-        if (i < 1 || i > x.size())
-            ... throw some kind of idx exception ...
-    #endif
-    }
-
-* print signatures of functions with matching names in
-  errors from parsers
-  - stretch goal to use edit distance like clang++ does
-
-
 
 
 
@@ -707,9 +704,7 @@ Testing
   - discarding first half of samples too many if fast to converge
 
 * Speed vs. JAGS
-
   -- run JAGS compiled with g++ -O3
-
   --  Look at models where Stan performs well
       e.g.  logistic or linear regression w. Cauchy and Normal prior
      - varying model shapes (step up exponentially)
@@ -719,23 +714,18 @@ Testing
         + interaction of params (? need this with correlation ?)
         + conjugate vs. non-conjugate priors
            (well and misspecified -- more stats than speed issue)
-
   -- Single threaded
-
   -- Run 4 chains (each of same length) of each system (Stan and JAGS)
       - diffuse initializations (hand generate for each)
       - until convergence by split R-hat (all params under 1.05)
       - total (across all chains) ESS is > 100 (and < 150 or something?)
         (e.g., 25/25/25/25, or 15/35/20/30)
       - report time in effective samples/second for min ESS parameter
-
   -- Report multiple runs of each (10? 100?)
       - histograms/densities or mean/sd of multiple runs
       - how much will it vary by seed
-
   -- Throw away first half of each run?
       - to start, until split convergence/sample speeds
-
   -- Ideally, measure:
       - time to converge to equilibrium
       - ESS rate at equilibrium
@@ -966,10 +956,6 @@ Models
       case.  You'd do just as well plotting each step along the
       trajectory along with what its acceptance probability would be,
       provided the storage of all those samples doesn't cause issues.
-
-
-Models
-======================================================================
 
 * unit K-hyperball complement for stationary AR(K) parameters
   - what should the prior be?
