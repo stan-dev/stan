@@ -9,10 +9,10 @@
 
 template<class T0, class T1, class T2, class T3>
 void update_expected_gradients(var& logprob,
-			       vector<double>& grad0, vector<double>& grad1,
-			       vector<double>& grad2, vector<double>& grad3,
-			       T0& p0, T1& p1,
-			       T2& p2, T3& p3) {
+			       vector<double>& grad0, T0& p0,
+			       vector<double>& grad1, T1& p1,
+			       vector<double>& grad2, T2& p2, 
+			       vector<double>& grad3, T3& p3) {
   vector<var> x;
   if (!is_constant<T0>::value)
     x.push_back(p0);
@@ -107,8 +107,10 @@ void test_vectorized() {
     var logprob = _LOG_PROB_<true>(p0, p1, p2, p3);
     e_logprob += logprob.val();
     update_expected_gradients(logprob,
-			      e_grad_p0, e_grad_p1, e_grad_p2, e_grad_p3,
-			      p0, p1, p2, p3);
+			      e_grad_p0, p0,
+			      e_grad_p1, p1,
+			      e_grad_p2, p2,
+			      e_grad_p3, p3);
   }
   T0 p0 = get_params<T0>(parameters, 0);
   T1 p1 = get_params<T1>(parameters, 1);
