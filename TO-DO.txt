@@ -505,6 +505,40 @@ Modeling Language
   - (a,b,c) = foo();  // function returns array
   - (m,n,p) = (1,2,3);   // (1,2,3) is array literal
 
+* matrix and array notation:
+- The syntax is pretty simple modulo size conformance
+  checking.  Here's the BNF:
+    matrix_expression ::= '[' matrix_row (';' matrix_row)* ']'
+    matrix_row ::= expression*
+  The idea is that the expressions are laid out in a row
+  and a ';' indicates to start a new row.
+  The basic cases are as follows:
+    [1 2 3]    : row_vector[3]
+    [1 2 3; 4 5 6]  : matrix[2,3]
+  Use transpose to create vectors:
+    [1 2 3]'   : vector[3]
+  And allow more complex things in a matrix_row in the BNF, 
+  such as a sequence of vectors:
+    [[1 2 3]' [4 5 6]']  : matrix[3,2]
+  In general, we could allow matrices, too:
+    [[1 2; 3 4] [5 6; 7 8]] : matrix[4,2]
+  This would keep nesting in the obvious ways.
+- We need some way to call out arrays and allow higher
+  dimensions, so we can't overload the same syntax.
+  I like the following:
+     array ::= 'a' '(' expression* ')'
+  Examples are:
+    a(1,2,3)   :  int[3]
+    a(1.0,2,3)  :  real[3]
+    a(a(1,2,3), a(4,5,6)) : int[2,3]
+    a([1 2 3], [4 5 6]) : row_vector[3][2]
+  But it brings up type inference issues, because
+  a(1,2,3) is int[3], not real[3].   We could 
+  add primitive 1D-array syntax such as:
+           | 'ints' '(' int_expression* ')'
+           | 'reals' '(' real_expression* ')'
+
+
 * multiple declarations
   - e.g., double a, b, c[N];
 
