@@ -249,7 +249,6 @@ namespace stan {
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
 
-      // FIXME: configure to use alt to std::cout for model prints
       Model model(data_var_context, &std::cout);
 
       std::string sample_file = "samples.csv";

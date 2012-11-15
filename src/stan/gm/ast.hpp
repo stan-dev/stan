@@ -23,6 +23,7 @@ namespace stan {
     struct nil { };
 
     // components of abstract syntax tree 
+    struct array_literal;
     struct assignment;
     struct binary_op;
     struct distribution;
@@ -159,6 +160,7 @@ namespace stan {
       expr_type operator()(const nil& e) const;
       expr_type operator()(const int_literal& e) const;
       expr_type operator()(const double_literal& e) const;
+      expr_type operator()(const array_literal& e) const;
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
       expr_type operator()(const index_op& e) const;
@@ -173,6 +175,7 @@ namespace stan {
       typedef boost::variant<boost::recursive_wrapper<nil>, 
                              boost::recursive_wrapper<int_literal>,
                              boost::recursive_wrapper<double_literal>,
+                             boost::recursive_wrapper<array_literal>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
@@ -187,14 +190,13 @@ namespace stan {
       expression(const nil& expr);
       expression(const int_literal& expr);
       expression(const double_literal& expr);
+      expression(const array_literal& expr);
       expression(const variable& expr);
       expression(const fun& expr);
       expression(const index_op& expr);
       expression(const binary_op& expr);
       expression(const unary_op& expr);
       expression(const expression_t& expr_);
-
-
 
       expr_type expression_type() const; 
 
@@ -224,6 +226,7 @@ namespace stan {
       bool operator()(const nil& x) const;
       bool operator()(const int_literal& x) const;
       bool operator()(const double_literal& x) const;
+      bool operator()(const array_literal& x) const;
       bool operator()(const variable& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
@@ -261,6 +264,14 @@ namespace stan {
       double_literal();
       double_literal(double val);
       double_literal& operator=(const double_literal& dl);
+    };
+
+    struct array_literal {
+      std::vector<expression> args_;
+      expr_type type_;
+      array_literal();
+      array_literal(const std::vector<expression>& args);
+      array_literal& operator=(const array_literal& al);
     };
 
     struct variable {

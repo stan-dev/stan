@@ -117,6 +117,15 @@ namespace stan {
       }
       void operator()(const int_literal& n) const { o_ << n.val_; }
       void operator()(const double_literal& x) const { o_ << x.val_; }
+      void operator()(const array_literal& x) const { 
+        o_ << "stan::math::new_array<double>("
+           << x.args_.size();
+        for (size_t i = 0; i < x.args_.size(); ++i) {
+          o_ << ',';
+          generate_expression(x.args_[i],o_);
+        }
+        o_ << ')';
+      }
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const { o_ << static_cast<long>(n); }
       void operator()(double x) const { o_ << x; }
@@ -286,6 +295,7 @@ namespace stan {
 
     // only generates the test
     void generate_validate_context_size(std::ostream& o,
+                                 const std::string& stage,
                                  const std::string& var_name,
                                  const std::string& base_type,
                                  const std::vector<expression>& dims,
@@ -293,7 +303,9 @@ namespace stan {
                                  const expression& type_arg2 = expression()) {
       o << INDENT2 
         << "context__.validate_dims("
-        << '"' << var_name << '"' 
+        << '"' << stage << '"'
+        << ", " << '"' << var_name << '"' 
+        << ", " << '"' << base_type << '"'
         << ", context__.to_vec(";
       for (size_t i = 0; i < dims.size(); ++i) {
         if (i > 0) o << ",";
@@ -312,39 +324,41 @@ namespace stan {
     }
 
     struct var_size_validating_visgen : public visgen {
-      var_size_validating_visgen(std::ostream& o) 
-        : visgen(o) {
+      const std::string stage_;
+      var_size_validating_visgen(std::ostream& o, const std::string& stage) 
+        : visgen(o),
+          stage_(stage) {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"int",x.dims_);
+        generate_validate_context_size(o_,stage_,x.name_,"int",x.dims_);
       }
       void operator()(double_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"double",x.dims_);
+        generate_validate_context_size(o_,stage_,x.name_,"double",x.dims_);
       }
       void operator()(vector_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"vector_d",x.dims_,x.M_);
+        generate_validate_context_size(o_,stage_,x.name_,"vector_d",x.dims_,x.M_);
       }
       void operator()(row_vector_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"row_vector_d",x.dims_,x.N_);
+        generate_validate_context_size(o_,stage_,x.name_,"row_vector_d",x.dims_,x.N_);
       }
       void operator()(simplex_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"vector_d",x.dims_,x.K_);
+        generate_validate_context_size(o_,stage_,x.name_,"vector_d",x.dims_,x.K_);
       }
       void operator()(ordered_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"vector_d",x.dims_,x.K_);
+        generate_validate_context_size(o_,stage_,x.name_,"vector_d",x.dims_,x.K_);
       }
       void operator()(positive_ordered_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"vector_d",x.dims_,x.K_);
+        generate_validate_context_size(o_,stage_,x.name_,"vector_d",x.dims_,x.K_);
       }
       void operator()(matrix_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"matrix_d",x.dims_,x.M_,x.N_);
+        generate_validate_context_size(o_,stage_,x.name_,"matrix_d",x.dims_,x.M_,x.N_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
+        generate_validate_context_size(o_,stage_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
       }
       void operator()(corr_matrix_var_decl const& x) const {
-        generate_validate_context_size(o_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
+        generate_validate_context_size(o_,stage_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
       }
     };
 
@@ -1343,15 +1357,13 @@ namespace stan {
       dump_member_var_visgen(std::ostream& o) 
         : visgen(o),
           var_resizer_(var_resizing_visgen(o)),
-          var_size_validator_(var_size_validating_visgen(o)) {
+          var_size_validator_(var_size_validating_visgen(o,"data initialization")) {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_i(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         size_t indentation = 1;
@@ -1382,8 +1394,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         size_t indentation = 1;
@@ -1412,8 +1422,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
         var_size_validator_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
@@ -1448,8 +1456,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
@@ -1484,8 +1490,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
@@ -1520,8 +1524,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
@@ -1556,8 +1558,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
@@ -1592,8 +1592,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim__ = ";
@@ -1632,8 +1630,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_k_mat_lim__ = ";
@@ -1669,8 +1665,6 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "if (!context__.contains_r(\"" << x.name_ << "\"))" << EOL;
-        o_ << INDENT3 << "throw std::runtime_error(\"variable " << x.name_ <<" not found.\");" << EOL;
         o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
         o_ << INDENT2 << "size_t " << x.name_ << "_k_mat_lim__ = ";
@@ -1760,7 +1754,7 @@ namespace stan {
       var_size_validating_visgen var_size_validator_;
       generate_init_visgen(std::ostream& o) 
         : visgen(o),
-          var_size_validator_(o) {
+          var_size_validator_(o,"initialization") {
       }
       void operator()(nil const& x) const { } // dummy
       void operator()(int_var_decl const& x) const {

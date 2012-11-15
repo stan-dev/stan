@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__MATRIX_HPP__
 #define __STAN__MATH__MATRIX_HPP__
 
+#include <stdarg.h>
 #include <stdexcept>
 #include <ostream>
 #include <vector>
@@ -15,6 +16,20 @@
 namespace stan {
   
   namespace math {
+
+    template <typename T>
+    inline
+    std::vector<T> new_array(size_t n_args,
+                             ...) {
+      std::vector<T> result(n_args);
+      va_list ap;
+      va_start(ap, n_args);
+      for (int i = 0; i < n_args; ++i)
+        result[i] = va_arg(ap, T);
+      va_end(ap);
+      return result;
+    }
+
 
     /**
      * This is a traits structure for Eigen matrix types.

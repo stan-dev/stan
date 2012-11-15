@@ -182,6 +182,12 @@ namespace stan {
       bool operator()(const double_literal& x) const {
         return true;
       }
+      bool operator()(const array_literal& x) const {
+        for (size_t i = 0; i < x.args_.size(); ++i)
+          if (!boost::apply_visitor(*this,x.args_[i].expr_))
+            return false;
+        return true;
+      }
       bool operator()(const variable& x) const {
         var_origin origin = var_map_.get_origin(x.name_);
         bool is_data = (origin == data_origin) || (origin == transformed_data_origin);

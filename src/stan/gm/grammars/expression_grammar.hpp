@@ -43,6 +43,12 @@ namespace stan {
       double_literal_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              array_literal(),
+                              whitespace_grammar<Iterator> > 
+      array_literal_r;
+
+
+      boost::spirit::qi::rule<Iterator, 
                               expression(), 
                               whitespace_grammar<Iterator> > 
       expression_r;

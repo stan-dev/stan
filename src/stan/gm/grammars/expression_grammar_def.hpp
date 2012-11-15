@@ -61,6 +61,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
                           (double,val_)
                           (stan::gm::expr_type,type_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::array_literal,
+                          (std::vector<stan::gm::expression>,args_)
+                          (stan::gm::expr_type,type_) )
+
 namespace stan { 
 
   namespace gm {
@@ -458,8 +462,9 @@ namespace stan {
 
       factor_r.name("factor");
       factor_r
-        %=  int_literal_r      [_val = _1]
+        %=  int_literal_r     [_val = _1]
         | double_literal_r    [_val = _1]
+        | array_literal_r     [_val = _1]
         | fun_r               [_val = set_fun_type_f(_1,boost::phoenix::ref(error_msgs_))]
         | variable_r          
         [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
@@ -480,6 +485,11 @@ namespace stan {
       double_literal_r.name("real literal");
       double_literal_r
         %= double_;
+
+      array_literal_r.name("array literal");
+      array_literal_r
+        %= lit("array")
+        >> args_r;
 
       fun_r.name("function and argument expressions");
       fun_r 
