@@ -6,20 +6,7 @@
 // V: vector<var>
 // D: vector<double>
 
-using stan::agrad::var;
 
-using stan::scalar_type;
-using stan::is_vector;
-using stan::is_constant;
-using stan::is_constant_struct;
-
-template<class T>
-double get_param(vector<vector<double> >& parameters, size_t n, size_t p) {
-  if (is_vector<T>::value)
-    return parameters[n][p];
-  else
-    return parameters[0][p];
-}
 template<class T0, class T1, class T2>
 void update_expected_gradients(var& logprob,
 			       vector<double>& grad0, vector<double>& grad1, vector<double>& grad2,
@@ -92,24 +79,6 @@ void test_gradients(var& logprob,
   test_grad<T2, is_constant_struct<T2>::value>(e_grad2, grad, 2);
 }
 
-template<class T>
-T get_params(vector<vector<double> >& parameters, size_t p) {
-  return parameters[0][p];
-}
-template<>
-vector<double> get_params<vector<double> >(vector<vector<double> >& parameters, size_t p) {
-  vector<double> param(parameters.size());
-  for (size_t n = 0; n < parameters.size(); n++)
-    param[n] = parameters[n][p];
-  return param;
-}
-template<>
-vector<var> get_params<vector<var> >(vector<vector<double> >& parameters, size_t p) {
-  vector<var> param(parameters.size());
-  for (size_t n = 0; n < parameters.size(); n++)
-    param[n] = parameters[n][p];
-  return param;
-}
 template<class T0, class T1, class T2, class TypeParam>
 void test_vectorized() {
   vector<vector<double> > parameters;

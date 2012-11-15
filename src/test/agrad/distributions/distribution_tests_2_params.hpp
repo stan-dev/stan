@@ -6,7 +6,6 @@
 // V: vector<var>
 // D: vector<double>
 
-using stan::agrad::var;
 
 TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
