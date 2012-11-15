@@ -1729,12 +1729,12 @@ through reparameterization.
 \caption{\small \it Neal's Funnel.  (Left) The marginal density of
   Neal's funnel for the upper-level variable $y$ and one lower-level
   variable $x_1$ (see the text for the formula).  The blue region has
-  log density greater than -4, the yellow region density less than
+  log density greater than -8, the yellow region density greater than
   -16, and the gray background a density less than -16.  The marginal
-  standard deviation 3.  (Right) 4000 draws from a run of Stan's
+  standard deviation of $y$ is 3.  (Right) 4000 draws from a run of Stan's
   sampler with default settings.  Both plots are restricted to the
-  shown window of $x_1$ and $y$ values; samples were drawn outside of
-  this area as would be expected given the density.  The samples are
+  shown window of $x_1$ and $y$ values; some draws fell outside of
+  the displayed area as would be expected given the density.  The samples are
   consistent witht the marginal density $p(y) =
   \distro{Normal}(y|0,3)$, which has mean 0 and standard deviation
   3.}\label{funnel.figure}
