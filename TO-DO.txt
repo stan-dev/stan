@@ -21,29 +21,10 @@ v1.0.4
      bug reporting
    * added checks that data dimensions match as well as sizes
 -- Improvements
-   * generating double-based log-prob function
-
-
-
-* catch errors in reading inits same way as in reading data
-  to report what they were and where they came from
-
-* make sure all range errors are being caught
-  -- math/matrix.hpp line 164
-  -- STAN_NO_DEBUG property
-  -- turn off checking if (NDEBUG || STAN_NO_DEBUG)
-   -- impl from Marcus (Eigen):
-      #ifndef STAN_NO_DEBUG
-      #ifdef NDEBUG
-      #define STAN_NO_DEBUG
-      #endif
-      #endif
- 
-     #ifdef STAN_NO_DEBUG 
-     ..
-   #endif
-
-* make sure symmetry tests aren't too stringent for cov_matrix
+   * generating double-based log-prob function (in addition to 
+     stan::agrad::var-based)
+   * testing identifiers are not reserved words in C++/Stan
+   * trapping/reporting locations of errors in data and init reads
 
 
 PRIORITIES?
@@ -60,7 +41,7 @@ PRIORITIES?
 * intro applied Bayes book with RStan
 * C++ manual
 * C++ code cleanup (API doc, privates, consts, doc, split files, 
-  long long, reserved word checking)
+  long long)
 * simplify error handling by removing policies
 * matrix slicing and dicing
 * matrix expressions
@@ -96,6 +77,27 @@ PRIORITIES?
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* add lower/upper bound infinite or negative infinite values
+  -- need is_pos_inf<T>(x) and is_neg_inf(x) tests and we
+     only have isinf() which is either/or
+
+* make sure all range errors are being caught
+  -- math/matrix.hpp line 164
+  -- STAN_NO_DEBUG property
+  -- turn off checking if (NDEBUG || STAN_NO_DEBUG)
+   -- impl from Marcus (Eigen):
+      #ifndef STAN_NO_DEBUG
+      #ifdef NDEBUG
+      #define STAN_NO_DEBUG
+      #endif
+      #endif
+ 
+     #ifdef STAN_NO_DEBUG 
+     ..
+   #endif
+
+* make sure symmetry tests aren't too stringent for cov_matrix
 
 * unpack Eigen/Boost and use just what we need a la RStan
 
@@ -135,10 +137,6 @@ C++ API
   matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
   this could recycle the first arg, a matrix shaped like a vector
   and the second arg, a matrix shaped like a roo vector.
-
-* add lower/upper bound infinite or negative infinite values
-  -- need is_pos_inf<T>(x) and is_neg_inf(x) tests and we
-     only have isinf() which is either/or
 
 * higher-order auto-dif
   -- chain rule:
@@ -632,8 +630,6 @@ Modeling Language
 * unit matrix function unit_matrix(K)
   -- return var or just double?  
   -- users shouldn't use this to assign to transformed param
-
-* make sure reserved words from C++ are checked and flagged
 
 * constants for integer max and min values
 
