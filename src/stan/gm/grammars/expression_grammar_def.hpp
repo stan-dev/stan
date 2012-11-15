@@ -493,13 +493,13 @@ namespace stan {
 
       fun_r.name("function and argument expressions");
       fun_r 
-        %= identifier_r 
+        %= identifier_r // no test yet on valid naming
         >> args_r; 
 
-      identifier_r.name("identifier");
+      identifier_r.name("identifier (expression grammar)");
       identifier_r
-        %= (lexeme[char_("a-zA-Z") 
-                   >> *char_("a-zA-Z0-9_.")]);
+        %= lexeme[char_("a-zA-Z") 
+                  >> *char_("a-zA-Z0-9_.")];
 
       args_r.name("function argument expressions");
       args_r 
@@ -521,6 +521,7 @@ namespace stan {
       variable_r.name("variable expression");
       variable_r
         %= identifier_r;
+
 
     }
   }

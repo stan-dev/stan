@@ -259,6 +259,7 @@ namespace stan {
     };
     boost::phoenix::function<add_var> add_var_f;
 
+
     struct validate_decl_constraints {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
@@ -282,8 +283,132 @@ namespace stan {
     validate_decl_constraints_f;
 
     struct validate_identifier {
+      std::set<std::string> reserved_word_set_;
+
       template <typename T1, typename T2>
       struct result { typedef bool type; };
+
+      void reserve(const std::string& w) {
+        reserved_word_set_.insert(w);
+      }
+
+      validate_identifier() {
+        reserve("for");  
+        reserve("in");  
+        reserve("while");
+        reserve("repeat");  
+        reserve("until");  
+        reserve("if");
+        reserve("then"); 
+        reserve("else"); 
+        reserve("true");  
+        reserve("false");
+
+        reserve("int");
+        reserve("real"); 
+        reserve("vector"); 
+        reserve("simplex"); 
+        reserve("ordered"); 
+        reserve("positive_ordered"); 
+        reserve("row_vector"); 
+        reserve("matrix"); 
+        reserve("corr_matrix"); 
+        reserve("cov_matrix");
+
+        
+        reserve("model"); 
+        reserve("data"); 
+        reserve("parameters"); 
+        reserve("quantities"); 
+        reserve("transformed"); 
+        reserve("generated");
+        
+        
+        reserve("alignas"); 
+        reserve("alignof"); 
+        reserve("and"); 
+        reserve("and_eq"); 
+        reserve("asm"); 
+        reserve("auto"); 
+        reserve("bitand"); 
+        reserve("bitor"); 
+        reserve("bool"); 
+        reserve("break"); 
+        reserve("case"); 
+        reserve("catch"); 
+        reserve("char"); 
+        reserve("char16_t"); 
+        reserve("char32_t"); 
+        reserve("class"); 
+        reserve("compl"); 
+        reserve("const"); 
+        reserve("constexpr"); 
+        reserve("const_cast"); 
+        reserve("continue"); 
+        reserve("decltype"); 
+        reserve("default"); 
+        reserve("delete"); 
+        reserve("do"); 
+        reserve("double"); 
+        reserve("dynamic_cast"); 
+        reserve("else"); 
+        reserve("enum"); 
+        reserve("explicit"); 
+        reserve("export"); 
+        reserve("extern"); 
+        reserve("false"); 
+        reserve("float"); 
+        reserve("for"); 
+        reserve("friend"); 
+        reserve("goto"); 
+        reserve("if"); 
+        reserve("inline"); 
+        reserve("int"); 
+        reserve("long"); 
+        reserve("mutable"); 
+        reserve("namespace"); 
+        reserve("new"); 
+        reserve("noexcept"); 
+        reserve("not"); 
+        reserve("not_eq"); 
+        reserve("nullptr"); 
+        reserve("operator"); 
+        reserve("or"); 
+        reserve("or_eq"); 
+        reserve("private"); 
+        reserve("protected"); 
+        reserve("public"); 
+        reserve("register"); 
+        reserve("reinterpret_cast"); 
+        reserve("return"); 
+        reserve("short"); 
+        reserve("signed"); 
+        reserve("sizeof"); 
+        reserve("static"); 
+        reserve("static_assert"); 
+        reserve("static_cast"); 
+        reserve("struct"); 
+        reserve("switch"); 
+        reserve("template"); 
+        reserve("this"); 
+        reserve("thread_local"); 
+        reserve("throw"); 
+        reserve("true"); 
+        reserve("try"); 
+        reserve("typedef"); 
+        reserve("typeid"); 
+        reserve("typename"); 
+        reserve("union"); 
+        reserve("unsigned"); 
+        reserve("using"); 
+        reserve("virtual"); 
+        reserve("void"); 
+        reserve("volatile"); 
+        reserve("wchar_t"); 
+        reserve("while"); 
+        reserve("xor"); 
+        reserve("xor_eq");
+      }      
 
       bool operator()(const std::string& identifier,
                       std::stringstream& error_msgs) const {
@@ -291,8 +416,13 @@ namespace stan {
         if (len >= 2
             && identifier[len-1] == '_'
             && identifier[len-2] == '_') {
-          error_msgs << "identifiers cannot end in double underscore (__)"
+          error_msgs << "variable identifier (name) cannot end in double underscore (__)"
                      << "; found identifer=" << identifier;
+          return false;
+        }
+        if (reserved_word_set_.find(identifier) != reserved_word_set_.end()) {
+          error_msgs << "variable identifier (name) cannot be reserved word"
+                     << "; found identifier=" << identifier;
           return false;
         }
         return true;
@@ -429,6 +559,7 @@ namespace stan {
     {
 
       using boost::spirit::qi::_1;
+      using boost::spirit::qi::_3;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lexeme;
@@ -663,7 +794,7 @@ namespace stan {
       identifier_r.name("identifier");
       identifier_r
         %= identifier_name_r
-          [_pass = validate_identifier_f(_1,boost::phoenix::ref(error_msgs_))]
+           [_pass = validate_identifier_f(_val,boost::phoenix::ref(error_msgs_))]
         ;
 
       identifier_name_r.name("identifier subrule");
