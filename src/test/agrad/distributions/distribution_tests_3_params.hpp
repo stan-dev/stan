@@ -33,17 +33,6 @@ void update_expected_gradients(var& logprob,
     grad.erase(grad.begin());
   }
 }
-template<class T, 
-	 bool is_const>
-void add_params(vector<var>& x, T& p) { }
-template<>
-void add_params<var, false>(vector<var>& x, var& p) {
-  x.push_back(p);
-}
-template<>
-void add_params<vector<var>, false>(vector<var>& x, vector<var>& p) {
-  x.insert(x.end(), p.begin(), p.end());
-}
 template<class T,
 	 bool is_const>
 void test_grad(vector<double>& e_grad, vector<double>& grad, size_t p) { }
