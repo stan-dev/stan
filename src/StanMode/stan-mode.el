@@ -82,6 +82,7 @@
   ;; comments: '#', '//', or '/*' '*/' pair
   (modify-syntax-entry ?# "< b" stan-mode-syntax-table)
   (modify-syntax-entry ?_ "w" stan-mode-syntax-table)
+  (modify-syntax-entry ?\' "_" stan-mode-syntax-table)
   (setq font-lock-defaults stan-font-lock-defaults)   ; stan fonts
   )
 
