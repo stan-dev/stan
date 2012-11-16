@@ -47,7 +47,6 @@ public:
     T().valid_values(params); 
     return params[0];
   }
-  
   double e() {
     return 1e-8;
   }
@@ -140,7 +139,18 @@ using stan::scalar_type;
 using stan::is_vector;
 using stan::is_constant;
 using stan::is_constant_struct;
-
+namespace std {
+  ::std::ostream& operator<<(::std::ostream& os, const vector<double>& param) {
+    os << "(";
+    for (size_t n = 0; n < param.size(); n++) {
+      os << param[n];
+      if (n < param.size()-1)
+	os << ", ";
+    }
+    os << ")";
+    return os;
+  }
+}
 /** 
  * Gets parameters based on expected type.
  * 
@@ -151,20 +161,24 @@ using stan::is_constant_struct;
  */
 template<class T>
 T get_params(vector<vector<double> >& parameters, size_t p) {
-  return parameters[0][p];
+  if (p < parameters[0].size())
+    return parameters[0][p];
+  return 0;
 }
 template<>
 vector<double> get_params<vector<double> >(vector<vector<double> >& parameters, size_t p) {
   vector<double> param(parameters.size());
   for (size_t n = 0; n < parameters.size(); n++)
-    param[n] = parameters[n][p];
+    if (p < parameters[0].size())
+      param[n] = parameters[n][p];
   return param;
 }
 template<>
 vector<var> get_params<vector<var> >(vector<vector<double> >& parameters, size_t p) {
   vector<var> param(parameters.size());
   for (size_t n = 0; n < parameters.size(); n++)
-    param[n] = parameters[n][p];
+    if (p < parameters[0].size())
+      param[n] = parameters[n][p];
   return param;
 }
 template<>
@@ -173,6 +187,12 @@ vector<int> get_params<vector<int> >(vector<vector<double> >& parameters, size_t
   for (size_t n = 0; n < parameters.size(); n++)
     param[n] = parameters[n][p];
   return param;
+}
+
+double get_param(vector<double>& param, size_t p) {
+  if (p >= param.size())
+    return 0;
+  return param[p];
 }
 
 /** 
@@ -187,7 +207,9 @@ vector<int> get_params<vector<int> >(vector<vector<double> >& parameters, size_t
  */
 template<class T>
 double get_param(vector<vector<double> >& parameters, size_t n, size_t p) {
-  if (is_vector<T>::value)
+  if (p >= parameters[0].size())
+    return 0;
+  if (is_vector<T>::value)    
     return parameters[n][p];
   else
     return parameters[0][p];
@@ -476,6 +498,106 @@ void test_vectorized() {
   return;
 }
 
+template<class TypeParam, class T0, 
+	 class T1=double, class T2=double, class T3=double, 
+	 class T4=double, class T5=double, class T6=double, 
+	 class T7=double, class T8=double, class T9=double>
+void test_valid() {
+  vector<vector<double> > parameters;
+  TypeParam().valid_values(parameters);
+  ASSERT_GT(parameters.size(), 0U);
+  
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> params = parameters[n];
+    T0 p0 = get_params<T0>(parameters, 0);
+    T1 p1 = get_params<T1>(parameters, 1);
+    T2 p2 = get_params<T2>(parameters, 2);
+    T3 p3 = get_params<T3>(parameters, 3);
+    T4 p4 = get_params<T4>(parameters, 4);
+    T5 p5 = get_params<T5>(parameters, 5);
+    T6 p6 = get_params<T6>(parameters, 6);
+    T7 p7 = get_params<T7>(parameters, 7);
+    T8 p8 = get_params<T8>(parameters, 8);
+    T9 p9 = get_params<T9>(parameters, 9);
+    var logprob(0);
+    EXPECT_NO_THROW( ({
+	  logprob = CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>()
+	  .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	}) )
+      << "Valid parameters failed at index: " << n << std::endl
+      << params;
+
+    if (is_constant_struct<T0>::value && is_constant_struct<T1>::value && is_constant_struct<T2>::value && is_constant_struct<T3>::value
+	&& is_constant_struct<T4>::value && is_constant_struct<T5>::value && is_constant_struct<T6>::value
+	&& is_constant_struct<T7>::value && is_constant_struct<T8>::value && is_constant_struct<T9>::value) {
+      EXPECT_FLOAT_EQ(0.0, logprob.val())
+	<< "Valid parameters, failed propto calculation with all doubles at index: " << n << std::endl
+	<< params;
+
+    }
+  }  
+}
 
 
+template<class TypeParam, class T0, 
+	 class T1=double, class T2=double, class T3=double, 
+	 class T4=double, class T5=double, class T6=double, 
+	 class T7=double, class T8=double, class T9=double>
+void test_invalid() {
+  vector<vector<double> > parameters;
+  TypeParam().valid_values(parameters);
+
+  vector<size_t> index;
+  vector<double> invalid_values;
+  
+  TypeParam().invalid_values(index, invalid_values);
+  ASSERT_EQ(index.size(), invalid_values.size());
+
+  for (size_t n = 0; n < index.size(); n++) {
+    vector<double> invalid_params(parameters[0]);
+    invalid_params[index[n]] = invalid_values[n];
+    
+    T0 p0 = get_param(invalid_params, 0);
+    T1 p1 = get_param(invalid_params, 1);
+    T2 p2 = get_param(invalid_params, 2);
+    T3 p3 = get_param(invalid_params, 3);
+    T4 p4 = get_param(invalid_params, 4);
+    T5 p5 = get_param(invalid_params, 5);
+    T6 p6 = get_param(invalid_params, 6);
+    T7 p7 = get_param(invalid_params, 7);
+    T8 p8 = get_param(invalid_params, 8);
+    T9 p9 = get_param(invalid_params, 9);
+
+    EXPECT_THROW( ({
+	  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>()
+	    .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	}),
+      std::domain_error)
+      << "Default policy failed at index: " << n << std::endl
+      << invalid_params;
+  }
+  for (size_t i = 0; i < parameters[0].size(); i++) {
+    vector<double> invalid_params(parameters[0]);
+    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
+    
+    T0 p0 = get_param(invalid_params, 0);
+    T1 p1 = get_param(invalid_params, 1);
+    T2 p2 = get_param(invalid_params, 2);
+    T3 p3 = get_param(invalid_params, 3);
+    T4 p4 = get_param(invalid_params, 4);
+    T5 p5 = get_param(invalid_params, 5);
+    T6 p6 = get_param(invalid_params, 6);
+    T7 p7 = get_param(invalid_params, 7);
+    T8 p8 = get_param(invalid_params, 8);
+    T9 p9 = get_param(invalid_params, 9);
+    
+    EXPECT_THROW( ({
+	  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>()
+	    .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	}),
+      std::domain_error)
+      << "Default policy with NaN for parameter: " << i << std::endl
+      << invalid_params;
+  }
+}
 #endif

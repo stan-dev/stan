@@ -34,365 +34,52 @@ TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  params[1],
-					  params[2]))
-      << "Failed with (d,d,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-    EXPECT_FLOAT_EQ(0.0, lp.val())
-      << "Failed propto with (d,d,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, double, double >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  params[1],
-					  var(params[2])))
-      << "Failed with (d,d,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, double, var >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1]),
-					  params[2]))
-      << "Failed with (d,v,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, var, double >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1]),
-					  var(params[2])))
-      << "Failed with (d,v,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, var, var >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  params[1],
-					  params[2]))
-      << "Failed with (v,d,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, double, double >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  params[1],
-					  var(params[2])))
-      << "Failed with (v,d,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, double, var >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  var(params[1]),
-					  params[2]))
-      << "Failed with (d,v,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, var, double >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  var(params[1]),
-					  var(params[2])))
-      << "Failed with (v,v,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1] << ", " << params[2] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, var, var >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddd) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0],
-				  invalid_params[1],
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0], 
-				  invalid_params[1],
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, double, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddv) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0],
-				  invalid_params[1],
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0], 
-				  invalid_params[1],
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, double, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvd) {  
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0],
-				  var(invalid_params[1]),
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0], 
-				  var(invalid_params[1]),
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, double, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvv) {  
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0],
-				  var(invalid_params[1]),
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(invalid_params[0], 
-				  var(invalid_params[1]),
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, double, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdd) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]),
-				  invalid_params[1],
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]), 
-				  invalid_params[1],
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, var, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdv) {  
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]),
-				  invalid_params[1],
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]), 
-				  invalid_params[1],
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, var, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvd) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]),
-				  var(invalid_params[1]),
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]), 
-				  var(invalid_params[1]),
-				  invalid_params[2]),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, var, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvv) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]),
-				  var(invalid_params[1]),
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
-  for (size_t i = 0; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(var(invalid_params[0]), 
-				  var(invalid_params[1]),
-				  var(invalid_params[2])),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i      
-      << "(" << invalid_params[0] << "," << invalid_params[1] << "," << invalid_params[2] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, var, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_ddd) {
   var logprob_true = _LOG_PROB_<true>(this->first_valid_params()[0],
