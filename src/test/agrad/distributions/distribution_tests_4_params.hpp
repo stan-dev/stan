@@ -33,249 +33,53 @@ TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3, param4, errno_policy()));
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dddd) {
-  test_valid<TypeParam, double, double, double, double >();
+  test_valid<TypeParam, double, double, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dddv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  params[1],
-					  params[2],
-					  var(params[3])))
-      << "Failed with (d,d,d,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1]
-      << ", "<< params[2] << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, double, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddvd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  params[1],
-					  var(params[2]),
-					  params[3]))
-      << "Failed with (d,d,v,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1]
-      << ", "<< var(params[2]) << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, double, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddvv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  params[1],
-					  var(params[2]),
-					  var(params[3])))
-      << "Failed with (d,d,v,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << params[1]
-      << ", "<< var(params[2]) << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, double, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvdd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1]),
-					  params[2],
-					  params[3]))
-      << "Failed with (d,v,d,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << var(params[1])
-      << ", "<< params[2] << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, var, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvdv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1]),
-					  params[2],
-					  var(params[3])))
-      << "Failed with (d,v,d,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << var(params[1])
-      << ", "<< params[2] << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, var, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvvd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1]),
-					  var(params[2]),
-					  params[3]))
-      << "Failed with (d,v,v,d) at index: " << n << std::endl
-      << "(" << params[0] << ", " << var(params[1])
-      << ", "<< var(params[2]) << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, var, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvvv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1]),
-					  var(params[2]),
-					  var(params[3])))
-      << "Failed with (d,v,v,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << var(params[1])
-      << ", "<< var(params[2]) << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, double, var, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vddd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  params[1],
-					  params[2],
-					  params[3]))
-      << "Failed with (v,d,d,d) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << params[1]
-      << ", "<< params[2] << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, double, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vddv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  params[1],
-					  params[2],
-					  var(params[3])))
-      << "Failed with (v,d,d,v) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << params[1]
-      << ", "<< params[2] << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, double, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdvd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  params[1],
-					  var(params[2]),
-					  params[3]))
-      << "Failed with (v,d,v,d) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << params[1]
-      << ", "<< var(params[2]) << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, double, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdvv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  params[1],
-					  var(params[2]),
-					  var(params[3])))
-      << "Failed with (v,d,v,v) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << params[1]
-      << ", "<< var(params[2]) << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, double, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvdd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  var(params[1]),
-					  params[2],
-					  params[3]))
-      << "Failed with (v,v,d,d) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << var(params[1])
-      << ", "<< params[2] << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, var, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvdv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  var(params[1]),
-					  params[2],
-					  var(params[3])))
-      << "Failed with (v,v,d,v) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << var(params[1])
-      << ", "<< params[2] << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, var, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvvd) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  var(params[1]),
-					  var(params[2]),
-					  params[3]))
-      << "Failed with (v,v,v,d) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << var(params[1])
-      << ", "<< var(params[2]) << ", " << params[3] << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, var, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvvv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(var(params[0]),
-					  var(params[1]),
-					  var(params[2]),
-					  var(params[3])))
-      << "Failed with (v,v,v,v) at index: " << n << std::endl
-      << "(" << var(params[0]) << ", " << var(params[1])
-      << ", "<< var(params[2]) << ", " << var(params[3]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, var, var, var, var>();
 }
-
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dddd) {
   test_invalid<TypeParam, double, double, double, double>();
 }
