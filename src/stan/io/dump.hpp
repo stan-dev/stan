@@ -514,7 +514,7 @@ namespace stan {
           break;
         }
         while (in_.get(c)) {
-          if (std::isdigit(c) || c == '-') {
+          if (std::isdigit(c) || c == '-' || c == '+') {
             buf.push_back(c);
           } else if (c == '.'
                      || c == 'e'
