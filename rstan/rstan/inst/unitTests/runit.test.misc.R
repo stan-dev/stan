@@ -8,6 +8,17 @@
   c <- array(1:18, dim = c(2, 3, 3)) 
   dump(c("a", "b", "c"), file = 'dumpabc.Rdump')
   rstan:::stan_rdump(c("a", "b", "c"), file = 'standumpabc.Rdump')
+
+  cc <- c("# comment line 1", 
+          " no comments line 1", 
+          "# comment line 2",
+          "# comment line 3", 
+          "# comment line 4", 
+          "# comment line 5", 
+          " not comments line 2", 
+          "# comment line 6",
+          "not comment #comment line 7")
+  cat(file = 'cc.csv', paste(cc, collapse = '\n'))
 } 
 
 test_get_model_strcode <- function() {
@@ -196,6 +207,22 @@ test_pars_total_indexes <- function() {
   checkEquals(unname(tidx2.attr1), 6 + 1:8)
 } 
 
+test_multi_idx_row2colm <- function() {
+  dims <- list(c(3), c(2,3), integer(0), c(2))
+  col_idx <- rstan:::multi_idx_row2colm(dims)
+  target <- c(1, 2, 3, 4, 7, 5, 8, 6, 9, 10, 11, 12)
+  checkEquals(col_idx, target)
+
+  fnames <- c("alpha[1]", "alpha[2]", "alpha[3]", 
+              "beta[1,1]", "beta[1,2]", "beta[1,3]", 
+              "beta[2,1]", "beta[2,2]", "beta[2,3]", 
+              "gamma", "theta[1]", "theta[2]")
+  fnames_colm <- c("alpha[1]", "alpha[2]", "alpha[3]", 
+                   "beta[1,1]", "beta[2,1]", "beta[1,2]", "beta[2,2]", 
+                   "beta[1,3]", "beta[2,3]", "gamma", "theta[1]", "theta[2]")
+  checkEquals(fnames[col_idx], fnames_colm)
+} 
+
 test_mklist <- function() {
   x <- 3:5 
   y <- array(1:9, dim = c(3, 3))  
@@ -249,10 +276,43 @@ test_data_list2array <- function() {
   checkEquals(a[[3]][4, 2], a2[3, 4, 2]) 
   checkEquals(a[[2]][1, 6], a2[2, 1, 6]) 
 }
+
+test_read_comments <- function() {
+  a1 <- rstan:::read_comments('cc.csv', 5L)
+  checkEquals(a1[1], "# comment line 1")
+  checkEquals(a1[5], "# comment line 5")
+  a2 <- rstan:::read_comments('cc.csv', 3L)
+  checkEquals(length(a2), 3L)
+  a3 <- rstan:::read_comments('cc.csv', -1)
+  checkEquals(length(a3), 7L)
+} 
+
+test_get_dims_from_fnames <- function() {
+  names <- c('alpha', 'beta2', 'g2amma', 'theta0')
+  dims <- list(c(2L, 3L), integer(0L), c(4L), c(3L, 5L, 4L))
+  fnames <- rstan:::flatnames(names, dims)
+  fnames_d <- rstan:::sqrfnames_to_dotfnames(fnames)
+  unames <- rstan:::unique_par(fnames_d)
+  dims2 <- lapply(unames, 
+                  function(n) { 
+                    fnames_d2 <- fnames_d[sapply(fnames_d, function(i) grepl(n, i))]
+                    rstan:::get_dims_from_fnames(fnames_d2)
+                  })
+  checkEquals(dims, dims2)
+} 
+
+
+test_dotfnames_fromto_sqrfnames <- function() {
+  dn <- c("alpha", "beta.1", "beta.2", "gamma.1.2", "gamma.1.4")
+  sn <- rstan:::dotfnames_to_sqrfnames(dn)
+  dn2 <- rstan:::sqrfnames_to_dotfnames(sn)
+  checkEquals(dn, dn2)
+}
  
 .tearDown <- function() {
   unlink('tmp.stan') 
   unlink('dumpabc.Rdump') 
   unlink('standumpabc.Rdump') 
+  unlink('cc.csv')
 }
 

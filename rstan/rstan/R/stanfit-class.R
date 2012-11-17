@@ -68,7 +68,9 @@ setGeneric(name = "get_cppo_mode",
 
 setMethod('get_cppo_mode', signature = "stanfit", 
            function(object) { 
-             l <- get_cxxo_level(get_cxxflags(object@stanmodel)) 
+             cxxf <- get_cxxflags(object@stanmodel)
+             if (identical(cxxf, character(0))) return(NA)
+             l <- get_cxxo_level(cxxf)
              if ("" == l) l <- "0" 
              p <- match(l, c("3", "2", "1", "0")) 
              c("fast", "presentation2", "presentation1", "debug")[p]
@@ -199,7 +201,7 @@ get_samples2 <- function(n, sim, inc_warmup = TRUE) {
 
 par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE) {
   # same thin, n_save, warmup2 for all the chains
-  thin <- sim$thin[1] 
+  thin <- sim$thin
   warmup2 <- sim$warmup2[1] 
   n_save <- sim$n_save[1] 
   n_kept <- n_save - warmup2 
@@ -568,7 +570,6 @@ sflist2stanfit <- function(sflist) {
              warmup = sflist[[1]]@sim$warmup,
              n_save = rep(sflist[[1]]@sim$n_save[1], n_chains), 
              warmup2 = rep(sflist[[1]]@sim$warmup2[1], n_chains), 
-             thin = rep(sflist[[1]]@sim$thin[1], n_chains), 
              permutation = do.call(c, lapply(sflist, function(x) x@sim$permutation)), 
              pars_oi = sflist[[1]]@sim$pars_oi, 
              dims_oi = sflist[[1]]@sim$dims_oi, 

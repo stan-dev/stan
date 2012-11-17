@@ -360,6 +360,7 @@ namespace rstan {
       write_comment_property(ostream,"chain_id_src",chain_id_src);
       write_comment_property(ostream,"iter",iter); 
       write_comment_property(ostream,"warmup",warmup);
+      write_comment_property(ostream,"save_warmup",1);
       write_comment_property(ostream,"thin",thin);
       write_comment_property(ostream,"leapfrog_steps",leapfrog_steps);
       write_comment_property(ostream,"max_treedepth",max_treedepth);

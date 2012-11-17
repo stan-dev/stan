@@ -65,7 +65,8 @@ setMethod("sampling", "stanmodel",
             if (!is_sm_valid(object))
               stop(paste("the compiled object from C++ code for this model is invalid, possible reasons:\n",
                          "  - compiled with save_dso=FALSE;\n", 
-                         "  - compiled on a different platform.", sep = '')) 
+                         "  - compiled on a different platform;\n", 
+                         "  - not existed for being created from csv files.", sep = '')) 
 
             model_cppname <- object@model_cpp$model_cppname 
             # cat("model_cppname=", model_cppname, '\n')
@@ -171,8 +172,7 @@ setMethod("sampling", "stanmodel",
                        warmup = warmup, 
                        chains = chains,
                        n_save = rep(n_save, chains),
-                       warmup2 = rep(warmup2, chains),
-                       thin = rep(thin, chains),
+                       warmup2 = rep(warmup2, chains), # number of warmpu iters in n_save
                        permutation = perm_lst,
                        pars_oi = sampler$param_names_oi(),
                        dims_oi = sampler$param_dims_oi(),

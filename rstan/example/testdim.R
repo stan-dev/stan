@@ -18,6 +18,7 @@ c1 <- '
 library(rstan)
 fit1 <- stan(model_code = c1, data = list(mu = array(1, dim = 1)), chains = 1)
 fit1b <- stan(fit = fit1, data = list(mu = 1), chains = 1)
+fit1b <- stan(fit = fit1, data = list(mu2 = 1), chains = 1) # variable mu missing 
 
 
 c2 <- '
@@ -33,8 +34,8 @@ c2 <- '
   }
 '
 
-fit2 <- stan(model_code = c2, data = list(mu = array(1:60, dim = c(3, 4, 5))))
-fit2b <- stan(fit = fit2, data = list(mu = array(1:60, dim = c(4, 5, 3))))
+fit2 <- stan(model_code = c2, data = list(mu = array(1:60, dim = c(3, 4, 5))), chains = 1)
+fit2b <- stan(fit = fit2, data = list(mu = array(1:60, dim = c(4, 5, 3))), chains = 1)
 
 
 mu <- array(1:60, dim = c(3, 4, 5))

@@ -9,6 +9,7 @@ tmpfun <- function(x, y) {
   paste("[", x, ", ", y, "]", sep = '');
 } 
 
+# summary(as.mcmc(post[-(1:1000),]))  ## for save_warmup=1
 summary(as.mcmc(post)) 
 
 library(BUGSExamples);
@@ -25,5 +26,10 @@ plot(jagspost$coda);
 # note that in the stan version of this example, 
 # alpha[1] corresponds to alpha[2] in JAGS in which alpha[1] = 0,
 # and the same for other parameters. 
+
+library(rstan)
+
+fit <- rstan:::read_stan_csv('samples.csv')
+print(fit, digits = 4)
 
 

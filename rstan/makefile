@@ -16,6 +16,9 @@ ifeq ($(uname_S), Linux)
   OS = linux
 endif
 
+R = R --arch x86_64 
+R = R
+
 ifeq ($(OS), win)
   LINKCMD1 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stanlib"  "..^\..^\..^\..^\lib"
   LINKCMD2 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stansrc"  "..^\..^\..^\..^\src"
@@ -34,18 +37,18 @@ build $(STANPKG): ./rstan/DESCRIPTION
 	$(LINKCMD2)
 	@rm -f $(STANPKG) 
 	@echo "git_head <- function() \"`git rev-parse HEAD`\"" > rstan/R/git_head.R
-	R CMD build rstan --md5 #--no-vignettes
+	$(R) CMD build rstan --md5  # --no-vignettes
 
 
 check: $(STANPKG) 
-	R CMD check --as-cran $(STANPKG) 
+	$(R) CMD check --as-cran $(STANPKG) 
 
 install: $(STANPKG) 
-	# R CMD INSTALL --no-multiarch $(STANPKG) 
-	R CMD INSTALL --merge-multiarch $(STANPKG) 
+	# $(R) CMD INSTALL --no-multiarch $(STANPKG) 
+	$(R) CMD INSTALL --merge-multiarch $(STANPKG) 
 
 uninstall: $(STANPKG) 
-	R CMD REMOVE rstan
+	$(R) CMD REMOVE rstan
 
 clean: 
 	rm -f $(STANPKG) 

@@ -15,6 +15,7 @@ export(
   set_cppo, get_cppo, 
   stan_demo, 
   sflist2stanfit,
+  read_stan_csv,
   rstan_options 
 # get_rstan.options
 )

@@ -20,6 +20,7 @@ setMethod("show", "cxxdso",
 
 setMethod('is_dso_loaded', signature(object = 'cxxdso'), 
           function(object) {
+            if (identical(object@modulename, character(0))) return(FALSE) # null dso
             f2 <- sub("\\.[^.]*$", "", basename(object@.CXXDSOMISC$dso_last_path)) 
             dlls <- getLoadedDLLs()
             f2 %in% names(dlls)

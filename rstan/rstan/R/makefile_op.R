@@ -199,11 +199,11 @@ if_ndebug_defined <- function(str) {
 rm_rstan_makefile_flags <- function() {
   # remove flags in $HOME/.R/Makevars with #rstan 
   lmf <- last_makefile() 
-  if (!file.exists(lmf)) return(NULL)
+  if (!file.exists(lmf)) return(invisible(NULL))
   if (file.access(lmf, mode = 2) < 0) 
     stop(paste(lmf, " is not writable", sep = '')) 
   lmf_txt <- readLines(lmf, warn = FALSE) 
-  if (length(lmf_txt) < 1) return(NULL)
+  if (length(lmf_txt) < 1) return(invisible(NULL))
   for (i in length(lmf_txt):1) {
     if (grepl("#set_by_rstan", lmf_txt[i])) 
       lmf_txt[i] <- NA  
