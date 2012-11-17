@@ -13,6 +13,9 @@ public:
   var call(T0& p0, T1& p1, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&) {
     return _LOG_PROB_<true>(p0, p1);
   }
+  var call_nopropto(T0& p0, T1& p1, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&) {
+    return _LOG_PROB_<true>(p0, p1);
+  }
 };
 
 TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
@@ -56,92 +59,16 @@ TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vv) {
   test_invalid<TypeParam, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dd) {
-  var logprob_true = _LOG_PROB_<true>(this->first_valid_params()[0],
-				      this->first_valid_params()[1]);
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params(parameters[n]);
-    
-    var logprob2_true = _LOG_PROB_<true>(params[0],
-					 params[1]);
-    EXPECT_FLOAT_EQ(0.0,
-		    (logprob_true - logprob2_true).val())
-      << "propto failed at index: " << n << std::endl
-      << "_LOG_PROB_(" << this->first_valid_params()[0] << "," << this->first_valid_params()[1] << ") - " 
-      << "_LOG_PROB_(" << params[0] << "," << params[1] << ")" << std::endl;
-  }
+  test_propto<TypeParam, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_dv) {
-  vector<double> params(this->first_valid_params());
-
-  var logprob_false = _LOG_PROB_<false>(params[0],
-					var(params[1]));
-  var logprob_true = _LOG_PROB_<true>(params[0],
-				      var(params[1]));
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    params[1] = parameters[n][1];
-    var logprob2_false = _LOG_PROB_<false>(params[0],
-					   var(params[1]));
-    var logprob2_true = _LOG_PROB_<true>(params[0],
-					 var(params[1]));
-    EXPECT_FLOAT_EQ((logprob_false - logprob2_false).val(), 
-		    (logprob_true - logprob2_true).val())
-      << "propto failed at index: " << n << std::endl
-      << "_LOG_PROB_(" << this->first_valid_params()[0] << "," << this->first_valid_params()[1] << ") - " 
-      << "_LOG_PROB_(" << params[0] << "," << params[1] << ")" << std::endl;
-  }
+  test_propto<TypeParam, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vd) { 
-  vector<double> params(this->first_valid_params());
-
-  var logprob_false = _LOG_PROB_<false>(var(params[0]),
-					params[1]);
-  var logprob_true = _LOG_PROB_<true>(var(params[0]),
-				      params[1]);
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    params[0] = parameters[n][0];
-    var logprob2_false = _LOG_PROB_<false>(var(params[0]),
-					   params[1]);
-    var logprob2_true = _LOG_PROB_<true>(var(params[0]),
-					 params[1]);
-    EXPECT_FLOAT_EQ((logprob_false - logprob2_false).val(), 
-		    (logprob_true - logprob2_true).val())
-      << "propto failed at index: " << n << std::endl
-      << "_LOG_PROB_(" << this->first_valid_params()[0] << "," << this->first_valid_params()[1] << ") - " 
-      << "_LOG_PROB_(" << params[0] << "," << params[1] << ")" << std::endl;
-  }
+  test_propto<TypeParam, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vv) { 
-  vector<double> params(this->first_valid_params());
-
-  var logprob_false = _LOG_PROB_<false>(var(params[0]),
-					var(params[1]));
-  var logprob_true = _LOG_PROB_<true>(var(params[0]),
-				      var(params[1]));
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    params[0] = parameters[n][0];
-    params[1] = parameters[n][1];
-    var logprob2_false = _LOG_PROB_<false>(var(params[0]),
-					   var(params[1]));
-    var logprob2_true = _LOG_PROB_<true>(var(params[0]),
-					 var(params[1]));
-    EXPECT_FLOAT_EQ((logprob_false - logprob2_false).val(), 
-		    (logprob_true - logprob2_true).val())
-      << "propto failed at index: " << n << std::endl
-      << "_LOG_PROB_(" << this->first_valid_params()[0] << "," << this->first_valid_params()[1] << ") - " 
-      << "_LOG_PROB_(" << params[0] << "," << params[1] << ")" << std::endl;
-  }
+  test_propto<TypeParam, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dd) {
   SUCCEED() << "No op for all double" << std::endl;

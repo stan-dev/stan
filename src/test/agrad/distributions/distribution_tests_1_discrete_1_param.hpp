@@ -8,7 +8,18 @@
 // V: vector<var>
 // D: vector<double>
 
-using stan::agrad::var;
+template<class T0, class T1, class T2, class T3,
+	 class T4, class T5, class T6,
+	 class T7, class T8, class T9>
+class CALL_LOG_PROB {
+public:
+  var call(T0& p0, T1& p1, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&) {
+    return _LOG_PROB_<true>(p0, p1);
+  }
+  var call_nopropto(T0& p0, T1& p1, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&) {
+    return _LOG_PROB_<false>(p0, p1);
+  }
+};
 
 TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   vector<double> parameters = this->first_valid_params();
@@ -28,130 +39,22 @@ TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_id) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(int(params[0]),
-					  params[1]))
-      << "Failed with (i,d) at index: " << n << std::endl
-      << "(" << int(params[0]) << ", " << params[1] << ")" << std::endl;
-    EXPECT_FLOAT_EQ(0.0, lp.val())
-      << "Failed propto with (i,d) at index: " << n << std::endl
-      << "(" << int(params[0]) << ", " << params[1] << ")" << std::endl;
-  }
+  test_valid<TypeParam, int, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_iv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params = parameters[n];
-    var lp(0);
-    EXPECT_NO_THROW(lp = _LOG_PROB_<true>(params[0],
-					  var(params[1])))
-      << "Failed with (i,v) at index: " << n << std::endl
-      << "(" << params[0] << ", " << var(params[1]) << ")" << std::endl;
-  }
+  test_valid<TypeParam, int, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_id) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-
-    EXPECT_THROW(_LOG_PROB_<true>(int(invalid_params[0]),
-				  invalid_params[1]),
-		 std::domain_error)
-      << "Default policy. "
-      << "Failed at index: " << n << std::endl
-      << "(" << int(invalid_params[0]) << "," << invalid_params[1] << ")" << std::endl;
-  }
-  for (size_t i = 1; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    
-    EXPECT_THROW(_LOG_PROB_<true>(int(invalid_params[0]), 
-				  invalid_params[1]),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i
-      << "(" << int(invalid_params[0]) << "," << invalid_params[1] << ")" << std::endl;
-  }
+  test_invalid<TypeParam, int, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_iv) {
-  vector<size_t> index;
-  vector<double> invalid_values;
-  const vector<double> valid_params = this->first_valid_params();
-  TypeParam().invalid_values(index, invalid_values);
-  ASSERT_EQ(index.size(), invalid_values.size());
-  
-  for (size_t n = 0; n < index.size(); n++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[index[n]] = invalid_values[n];
-    EXPECT_THROW(_LOG_PROB_<true>(int(invalid_params[0]),
-				  var(invalid_params[1])),
-		 std::domain_error)
-      << "Default policy. Failed at index: " << n << std::endl
-      << "(" << int(invalid_params[0]) << "," << var(invalid_params[1]) << ")" << std::endl;
-  }
-  for (size_t i = 1; i < valid_params.size(); i++) {
-    vector<double> invalid_params(valid_params);
-    invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
-    EXPECT_THROW(_LOG_PROB_<true>(int(invalid_params[0]), 
-				  var(invalid_params[1])),
-		 std::domain_error)
-      << "Default policy with NaN for parameter: " << i << std::endl
-      << "(" << int(invalid_params[0]) << "," << var(invalid_params[1]) << ")" << std::endl;
-  }
+  test_invalid<TypeParam, int, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_id) {
-  var logprob_true = _LOG_PROB_<true>(int(this->first_valid_params()[0]),
-				      this->first_valid_params()[1]);
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> params(parameters[n]);
-    
-    var logprob2_true = _LOG_PROB_<true>(int(params[0]),
-					 params[1]);
-    EXPECT_FLOAT_EQ(0.0,
-		    (logprob_true - logprob2_true).val())
-      << "propto failed at index: " << n << std::endl
-      << "_LOG_PROB_(" << int(this->first_valid_params()[0]) << "," << this->first_valid_params()[1] << ") - " 
-      << "_LOG_PROB_(" << int(params[0]) << "," << params[1] << ")" << std::endl;
-  }
+  test_propto<TypeParam, int, double>();  
 }
 TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_iv) {
-  vector<double> params(this->first_valid_params());
-
-  var logprob_false = _LOG_PROB_<false>(int(params[0]),
-					var(params[1]));
-  var logprob_true = _LOG_PROB_<true>(int(params[0]),
-				      var(params[1]));
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    var logprob2_false = _LOG_PROB_<false>(int(params[0]),
-					   var(params[1]));
-    
-    var logprob2_true = _LOG_PROB_<true>(int(params[0]),
-					 var(params[1]));
-    EXPECT_FLOAT_EQ((logprob_false - logprob2_false).val(), 
-		    (logprob_true - logprob2_true).val())
-      << "propto failed at index: " << n << std::endl
-      << "_LOG_PROB_(" << int(this->first_valid_params()[0]) << "," << var(this->first_valid_params()[1]) << ") - " 
-      << "_LOG_PROB_(" << int(params[0]) << "," << var(params[1]) << ")" << std::endl;
-  }
+  test_propto<TypeParam, int, var>();  
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_id) {
   SUCCEED() << "No op for all constants" << std::endl;
@@ -211,130 +114,30 @@ TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_iv) {
       << "(" << p[0] << ", " << p[1] << ")" << std::endl;
   }
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IV) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-
-  double expected_logprob = 0.0;
-  vector<double> expected_grad_p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    int p0 = parameters[n][0];
-    var p1 = parameters[n][1];
-    var logprob = _LOG_PROB_<true>(p0, p1);
-    vector<var> x;
-    x.push_back(p1);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p1.push_back(grad[0]);
-  }
-
-  vector<int> p0;
-  vector<var> p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(int(parameters[n][0]));
-    p1.push_back(parameters[n][1]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1);
-  vector<double> grad_p1;
-  logprob.grad(p1, grad_p1);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
-      << "Index " << n << ": gradient failed for parameter 1"; 
-  }
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_ID) {
-  SUCCEED() << "No op for (I,D) input" << std::endl;
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_Iv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  
-  double expected_logprob = 0.0;
-  double expected_grad_p1 = 0.0;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    int p0 = int(parameters[n][0]);
-    var p1 = parameters[0][1];
-    var logprob = _LOG_PROB_<true>(p0, p1);
-    vector<var> x;
-    x.push_back(p1);
-    vector<double> grad;
-    logprob.grad(x, grad);
-
-    expected_logprob += logprob.val();
-    expected_grad_p1 += grad[0];
-  }
-
-  vector<int> p0;
-  var p1 = parameters[0][1];
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p0.push_back(int(parameters[n][0]));
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1);
-  vector<double> grad_p1;
-  vector<var> x;
-  x.push_back(p1);
-  logprob.grad(x, grad_p1);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  EXPECT_FLOAT_EQ(expected_grad_p1, grad_p1[0])
-    << "Gradient failed for parameter 1"; 
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_Id) {
-  SUCCEED() << "No op for (I,d) input" << std::endl;
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iV) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-    
-  double expected_logprob = 0.0;
-  int p0 = parameters[0][0];
-  vector<double> expected_grad_p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    var p1 = parameters[n][1];
-    var logprob = _LOG_PROB_<true>(p0, p1);
-    vector<var> x;
-    x.push_back(p1);
-    vector<double> grad;
-    logprob.grad(x, grad);
-    
-    expected_logprob += logprob.val();
-    expected_grad_p1.push_back(grad[0]);
-  }
-
-  vector<var> p1;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    p1.push_back(parameters[n][1]);
-  }
-  var logprob = _LOG_PROB_<true>(p0, p1);
-  vector<double> grad_p1;
-  logprob.grad(p1, grad_p1);
-
-  EXPECT_FLOAT_EQ(expected_logprob, logprob.val())
-    << "log probability does not match" << std::endl;
-  for (size_t n = 0; n < parameters.size(); n++) {
-    EXPECT_FLOAT_EQ(expected_grad_p1[n], grad_p1[n])
-      << "Index " << n << ": gradient failed for parameter 1"; 
-  }
+TYPED_TEST_P(AgradDistributionTestFixture, vectorized_id) {
+  test_vectorized<TypeParam, int, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iD) {
-  SUCCEED() << "No op for (i,D) input" << std::endl;
+  test_vectorized<TypeParam, int, vector<double> >();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iv) {
-  SUCCEED() << "No op for (i,v) input" << std::endl;
+  test_vectorized<TypeParam, int, var>();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_id) {
-  SUCCEED() << "No op for (i,d) input" << std::endl;
+TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iV) {
+  test_vectorized<TypeParam, int, vector<var> >();
 }
-
+TYPED_TEST_P(AgradDistributionTestFixture, vectorized_Id) {
+  test_vectorized<TypeParam, vector<int>, double>();
+}
+TYPED_TEST_P(AgradDistributionTestFixture, vectorized_ID) {
+  test_vectorized<TypeParam, vector<int>, vector<double> >();
+}
+TYPED_TEST_P(AgradDistributionTestFixture, vectorized_Iv) {
+  test_vectorized<TypeParam, vector<int>, var>();
+}
+TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IV) {
+  test_vectorized<TypeParam, vector<int>, vector<var> >();
+}
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   call_all_versions,
 			   check_valid_id,
@@ -347,12 +150,12 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   gradient_finite_diff_iv,
 			   gradient_function_id,
 			   gradient_function_iv,
-			   vectorized_IV,
-			   vectorized_ID,
-			   vectorized_Iv,
-			   vectorized_Id,
-			   vectorized_iV,
+			   vectorized_id,
 			   vectorized_iD,
 			   vectorized_iv,
-			   vectorized_id);
+			   vectorized_iV,
+			   vectorized_Id,
+			   vectorized_ID,
+			   vectorized_Iv,
+			   vectorized_IV);
 #endif

@@ -546,6 +546,9 @@ template<class TypeParam, class T0,
 void test_invalid() {
   vector<vector<double> > parameters;
   TypeParam().valid_values(parameters);
+  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    call_log_prob;
+
 
   vector<size_t> index;
   vector<double> invalid_values;
@@ -569,8 +572,7 @@ void test_invalid() {
     T9 p9 = get_param(invalid_params, 9);
 
     EXPECT_THROW( ({
-	  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>()
-	    .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
 	}),
       std::domain_error)
       << "Default policy failed at index: " << n << std::endl
@@ -592,12 +594,74 @@ void test_invalid() {
     T9 p9 = get_param(invalid_params, 9);
     
     EXPECT_THROW( ({
-	  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>()
-	    .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
 	}),
       std::domain_error)
       << "Default policy with NaN for parameter: " << i << std::endl
       << invalid_params;
   }
 }
+
+template<class TypeParam, class T0, 
+	 class T1=double, class T2=double, class T3=double, 
+	 class T4=double, class T5=double, class T6=double, 
+	 class T7=double, class T8=double, class T9=double>
+void test_propto() {
+  if (is_constant_struct<T0>::value && is_constant_struct<T1>::value && is_constant_struct<T2>::value && is_constant_struct<T3>::value
+      && is_constant_struct<T4>::value && is_constant_struct<T5>::value && is_constant_struct<T6>::value
+      && is_constant_struct<T7>::value && is_constant_struct<T8>::value && is_constant_struct<T9>::value) {
+    SUCCEED() << "No need to test all double arguments";
+    return;
+  }
+
+  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    call_log_prob;
+  
+  vector<vector<double> > parameters;
+  TypeParam().valid_values(parameters);
+  vector<double> reference_params = parameters[0];
+  var reference_logprob_true;
+  var reference_logprob_false;
+  {
+    T0 p0 = get_param(reference_params, 0);
+    T1 p1 = get_param(reference_params, 1);
+    T2 p2 = get_param(reference_params, 2);
+    T3 p3 = get_param(reference_params, 3);
+    T4 p4 = get_param(reference_params, 4);
+    T5 p5 = get_param(reference_params, 5);
+    T6 p6 = get_param(reference_params, 6);
+    T7 p7 = get_param(reference_params, 7);
+    T8 p8 = get_param(reference_params, 8);
+    T9 p9 = get_param(reference_params, 9);
+    
+    reference_logprob_true = call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    reference_logprob_false = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> params(parameters[n]);
+    T0 p0 = get_param<T0>(parameters, n, 0);
+    T1 p1 = get_param<T1>(parameters, n, 1);
+    T2 p2 = get_param<T2>(parameters, n, 2);
+    T3 p3 = get_param<T3>(parameters, n, 3);
+    T4 p4 = get_param<T4>(parameters, n, 4);
+    T5 p5 = get_param<T5>(parameters, n, 5);
+    T6 p6 = get_param<T6>(parameters, n, 6);
+    T7 p7 = get_param<T7>(parameters, n, 7);
+    T8 p8 = get_param<T8>(parameters, n, 8);
+    T9 p9 = get_param<T9>(parameters, n, 9);
+    
+    var logprob_true = call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    var logprob_false = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    
+    EXPECT_FLOAT_EQ(reference_logprob_false.val() - logprob_false.val(),
+		    reference_logprob_true.val() - logprob_true.val())
+      << "Propto failed at index: " << n << std::endl
+      << "_LOG_PROB_<true>" << params << " = " << logprob_true << std::endl
+      << "_LOG_PROB_<true>" << reference_params << " = " << reference_logprob_true << std::endl
+      << "_LOG_PROB_<false>" << params << " = " << logprob_false << std::endl
+      << "_LOG_PROB_<false>" << reference_params << " = " << reference_logprob_false << std::endl;
+  }
+}
+
 #endif

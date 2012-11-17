@@ -75,3 +75,6 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNegBinomial,
 			      AgradDistributionTestFixture,
 			      AgradDistributionsNegBinomial);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNegBinomial,
+			      AgradDistributionTestFixture2,
+			      AgradDistributionsNegBinomial);
