@@ -100,6 +100,9 @@ C++ API
 * make sure symmetry tests aren't too stringent for cov_matrix
 
 * unpack Eigen/Boost and use just what we need a la RStan
+  -- For Boost, do: 
+  mkdir /tmp/boost_1.52.0
+  find ${STAN_HOME}/src/ -name \*\.\[ch]pp -exec bcp --scan --boost=${STAN_HOME}/lib/boost_1.52.0 '{}' /tmp/boost_1.52.0/ \; &> /tmp/boost_1.52.0/bcp.log 
 
 * poisson_log(y|alpha) = poisson(y|exp(alpha))
 
