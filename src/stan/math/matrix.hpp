@@ -17,6 +17,7 @@ namespace stan {
   
   namespace math {
 
+    // DANGER:  no static type checking on ...; assumed to be T
     template <typename T>
     inline
     std::vector<T> new_array(size_t n_args,
@@ -1752,6 +1753,45 @@ namespace stan {
      * @param s Singular values.
      */
     void svd(const matrix_d& m, matrix_d& u, matrix_d& v, vector_d& s);
+
+
+    template <typename T>
+    inline 
+    std::vector<T>
+    cumulative_sum(const std::vector<T>& x) {
+      std::vector<T> result(x.size());
+      if (x.size() == 0)
+        return result;
+      result[0] = x[0];
+      for (size_t i = 1; i < result.size(); ++i)
+        result[i] = x[i] + result[i-1];
+      return result;
+    }
+    template <typename T, int C>
+    inline 
+    Eigen::Matrix<T,1,C> 
+    cumulative_sum(const Eigen::Matrix<T,1,C>& rv) {
+      Eigen::Matrix<T,1,C> result(rv.size());
+      if (rv.size() == 0)
+        return result;
+      result(0) = rv(0);
+      for (size_t i = 1; i < result.size(); ++i)
+        result(i) = rv(i) + result(i-1);
+      return result;
+    }
+    template <typename T, int R>
+    inline 
+    Eigen::Matrix<T,R,1>
+    cumulative_sum(const Eigen::Matrix<T,R,1>& v) {
+      Eigen::Matrix<T,R,1> result(v.size());
+      if (v.size() == 0)
+        return result;
+      result(0) = v(0);
+      for (size_t i = 1; i < result.size(); ++i)
+        result(i) = v(i) + result(i-1);
+      return result;
+    }
+
 
     template <typename T>
     void stan_print(std::ostream* o, const T& x) {

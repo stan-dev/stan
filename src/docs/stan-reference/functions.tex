@@ -728,6 +728,29 @@ The elementwise exponential of \farg{x}}
 \end{description}
 
 
+\subsection{Cumulative Sums}
+
+The cumulative sum of a sequence $x_1,\ldots,x_N$ is the 
+sequence $y_1,\ldots,y_N$, where 
+%
+\[
+y_n = \sum_{m = 1}^{n} x_n.
+\]
+
+\begin{description}
+%
+\fitem{real[]}{cumulative\_sum}{real[] \farg{x}}{
+The cumulative sum of \farg{x}}
+%
+\fitem{vector}{cumulative\_sum}{vector \farg{v}}{
+The cumulative sum of \farg{v}}
+%
+\fitem{row\_vector}{cumulative\_sum}{row\_vector \farg{rv}}{
+The cumulative sum of \farg{rv}}
+%
+\end{description}
+
+
 
 \subsection{Dot Products}
 

@@ -25,6 +25,8 @@ v1.0.4
      stan::agrad::var-based)
    * testing identifiers are not reserved words in C++/Stan
    * trapping/reporting locations of errors in data and init reads
+-- New Functions
+   * cumulative_sum()
 
 
 PRIORITIES?
@@ -220,11 +222,6 @@ C++ API
 * signed sqrt
   signed_sqrt(x) = -sqrt(-x) if x < 0
                  = sqrt(x)   if x > 0
-
-* cumulative sums
-  cumulative_sum([x1,x2,...,xN])
-    = [x1,x1+x2,x1+x2+x3, ..., x1+...+xN]
-  no better way I see to write the gradient than just use +=
 
 * log logits
   - log_logit(u) = log(logit(u)) 

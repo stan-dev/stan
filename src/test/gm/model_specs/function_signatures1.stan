@@ -153,6 +153,11 @@ transformed data {
   transformed_data_real <- sd(d_real_array);
   transformed_data_real <- log_sum_exp(d_real_array);
   
+  //*** Array to Array, Vec to Vec Operations ***
+  transformed_data_real_array <- cumulative_sum(d_real_array);
+  transformed_data_vector <- cumulative_sum(d_vector);
+  transformed_data_row_vector <- cumulative_sum(d_row_vector);
+  
   //*** Matrix Operations ***
   // Integer-Valued Matrix Size Functions
   transformed_data_int <- rows(d_vector);
@@ -511,6 +516,15 @@ transformed parameters {
   transformed_param_real <- sd(p_real_array);
   transformed_param_real <- log_sum_exp(d_real_array);
   transformed_param_real <- log_sum_exp(p_real_array);
+
+  //*** Array to Array, Vec to Vec Operations ***
+  transformed_param_real_array <- cumulative_sum(d_real_array);
+  transformed_param_real_array <- cumulative_sum(p_real_array);
+  transformed_param_vector <- cumulative_sum(d_vector);
+  transformed_param_vector <- cumulative_sum(p_vector);
+  transformed_param_row_vector <- cumulative_sum(d_row_vector);
+  transformed_param_row_vector <- cumulative_sum(p_row_vector);
+
 
   //*** Matrix Operations ***
   // Integer-Valued Matrix Size Functions
