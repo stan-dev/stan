@@ -163,6 +163,20 @@ The largest negative real value representable}
 
 \section{Logical Functions}
 
+Currently, Stan's logical abilities are very limited.  Like C++, BUGS,
+and R, Stan uses 0 to encode false, and 1 to encode true.  The only
+conditional-like operator is \Verb|if_else()| and the only logical
+output operator is \Verb|step()|.
+
+Until Stan gets comparison and boolean operations, these must be
+hacked with various flavors of arithmetic.  To test if a variable
+\code{x} is greater than or equal to \code{y}, use \code{step(x - y)}.
+To test if \code{x} equals \code{y}, use \code{step(x-y) * step(y-x)};
+to test for zero, use \code{step(x) * step(-x)}.  
+
+For conjunction, use multiplication; for disjunction, use use addition
+of absolute values.  Negation is the same as testing for zero.
+
 \begin{description}
 %
 \fitem{real}{if\_else}{int cond, real \farg{x}, real \farg{y}}{
@@ -1126,9 +1140,9 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
 \]
 \begin{description}
 %
-\fitem{real}{bernoulli\_logit\_log}{ints \farg{y}, reals \farg{theta}}{The
+\fitem{real}{bernoulli\_logit\_log}{ints \farg{y}, reals \farg{alpha}}{The
   log Bernoulli probability mass of \farg{y} given logit chance of success
-  \farg{theta}}
+  \code{exp(\farg{alpha})}}
 %
 \end{description}
 
@@ -1292,7 +1306,7 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 = 
 \frac{\exp(-\lambda)}{\lambda!}
 \,
-\lambda^n.
+\lambda^n 
 \]
 
 \begin{description}
