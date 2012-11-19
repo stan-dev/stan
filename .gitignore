@@ -18,6 +18,9 @@
 
 # temporary files
 *~
+*.idx
+*.ilg
+*.ind
 
 # depedencies files
 *.d
