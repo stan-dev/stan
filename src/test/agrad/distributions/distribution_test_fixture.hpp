@@ -664,4 +664,280 @@ void test_propto() {
   }
 }
 
+template<class TypeParam, class T0, 
+	 class T1=double, class T2=double, class T3=double, 
+	 class T4=double, class T5=double, class T6=double, 
+	 class T7=double, class T8=double, class T9=double>
+void test_finite_diff() {
+  using stan::math::value_of;
+  if (is_constant_struct<T0>::value && is_constant_struct<T1>::value && is_constant_struct<T2>::value && is_constant_struct<T3>::value
+      && is_constant_struct<T4>::value && is_constant_struct<T5>::value && is_constant_struct<T6>::value
+      && is_constant_struct<T7>::value && is_constant_struct<T8>::value && is_constant_struct<T9>::value) {
+    SUCCEED() << "No need to test all double arguments";
+    return;
+  }
+    
+  vector<vector<double> > parameters;
+  TypeParam().valid_values(parameters);
+  
+  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    call_log_prob;
+  CALL_LOG_PROB<double,double,double,double,double,
+    double,double,double,double,typename is_vector<T9>::type>
+    call_double_log_prob;
+  const double e = 1e-8;
+  const double e2 = 2 * e;
+  const double tolerance = 1e-4;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> params(parameters[n]);
+    vector<double> grad;
+    {
+      T0 p0 = get_param(params, 0);
+      T1 p1 = get_param(params, 1);
+      T2 p2 = get_param(params, 2);
+      T3 p3 = get_param(params, 3);
+      T4 p4 = get_param(params, 4);
+      T5 p5 = get_param(params, 5);
+      T6 p6 = get_param(params, 6);
+      T7 p7 = get_param(params, 7);
+      T8 p8 = get_param(params, 8);
+      T9 p9 = get_param(params, 9);
+      var logprob = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      vector<var> x;
+      if (!is_constant<T0>::value)
+	x.push_back(p0);
+      if (!is_constant<T1>::value)
+	x.push_back(p1);
+      if (!is_constant<T2>::value)
+	x.push_back(p2);
+      if (!is_constant<T3>::value)
+	x.push_back(p3);
+      if (!is_constant<T4>::value)
+	x.push_back(p4);
+      if (!is_constant<T5>::value)
+	x.push_back(p5);
+      if (!is_constant<T6>::value)
+	x.push_back(p6);
+      if (!is_constant<T7>::value)
+	x.push_back(p7);
+      if (!is_constant<T8>::value)
+	x.push_back(p8);
+      if (!is_constant<T9>::value)
+	x.push_back(p9);
+      logprob.grad(x, grad);
+    }
+    double p0 = get_param(params, 0);
+    double p1 = get_param(params, 1);
+    double p2 = get_param(params, 2);
+    double p3 = get_param(params, 3);
+    double p4 = get_param(params, 4);
+    double p5 = get_param(params, 5);
+    double p6 = get_param(params, 6);
+    double p7 = get_param(params, 7);
+    double p8 = get_param(params, 8);
+    double p9 = get_param(params, 9);
+    if (!is_constant<T0>::value) {
+      double plus = p0 + e;
+      double minus = p0 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(plus, p1, p2, p3, p4, p5, p6, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(minus, p1, p2, p3, p4, p5, p6, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 0" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T1>::value) {
+      double plus = p1 + e;
+      double minus = p1 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, plus, p2, p3, p4, p5, p6, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, minus, p2, p3, p4, p5, p6, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 1" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T2>::value) {
+      double plus = p2 + e;
+      double minus = p2 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, plus, p3, p4, p5, p6, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, minus, p3, p4, p5, p6, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 2" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T3>::value) {
+      double plus = p3 + e;
+      double minus = p3 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, plus, p4, p5, p6, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, minus, p4, p5, p6, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 3" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T4>::value) {
+      double plus = p4 + e;
+      double minus = p4 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, plus, p5, p6, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, minus, p5, p6, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 4" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T5>::value) {
+      double plus = p5 + e;
+      double minus = p5 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, plus, p6, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, minus, p6, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 5" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T6>::value) {
+      double plus = p6 + e;
+      double minus = p6 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, plus, p7, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, minus, p7, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 6" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T7>::value) {
+      double plus = p7 + e;
+      double minus = p7 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, plus, p8, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, minus, p8, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 7" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T8>::value) {
+      double plus = p8 + e;
+      double minus = p8 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, plus, p9))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, minus, p9))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 8" << std::endl << params;
+      grad.erase(grad.begin());
+    }
+    if (!is_constant<T9>::value) {
+      double plus = p9 + e;
+      double minus = p9 - e;
+      double grad_finite_diff 
+	= (value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, plus))
+	   - value_of(call_double_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, minus))) / e2;
+      EXPECT_NEAR(grad_finite_diff,grad[0],tolerance)
+	<< "Finite diff test failed for parameter 9" << std::endl << params;
+      grad.erase(grad.begin());    
+    }
+    ASSERT_EQ(0U, grad.size()) 
+      << "Something is wrong with the test. We should have compared all gradients.";    
+  }
+}
+/*
+template<class TypeParam, class T0, 
+	 class T1=double, class T2=double, class T3=double, 
+	 class T4=double, class T5=double, class T6=double, 
+	 class T7=double, class T8=double, class T9=double>
+void test_gradient_function() {
+  using stan::math::value_of;
+  if (is_constant_struct<T0>::value && is_constant_struct<T1>::value && is_constant_struct<T2>::value && is_constant_struct<T3>::value
+      && is_constant_struct<T4>::value && is_constant_struct<T5>::value && is_constant_struct<T6>::value
+      && is_constant_struct<T7>::value && is_constant_struct<T8>::value && is_constant_struct<T9>::value) {
+    SUCCEED() << "No need to test all double arguments";
+    return;
+  }
+    
+  vector<vector<double> > parameters;
+  TypeParam().valid_values(parameters);
+  
+  CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    call_log_prob;
+  for (size_t n = 0; n < parameters.size(); n++) {
+    vector<double> params(parameters[n]);
+    vector<double> expected_grad;
+    vector<double> grad;
+    {
+      T0 p0 = get_param(params, 0);
+      T1 p1 = get_param(params, 1);
+      T2 p2 = get_param(params, 2);
+      T3 p3 = get_param(params, 3);
+      T4 p4 = get_param(params, 4);
+      T5 p5 = get_param(params, 5);
+      T6 p6 = get_param(params, 6);
+      T7 p7 = get_param(params, 7);
+      T8 p8 = get_param(params, 8);
+      T9 p9 = get_param(params, 9);
+  var logprob = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      vector<var> x;
+      if (!is_constant<T0>::value)
+	x.push_back(p0);
+      if (!is_constant<T1>::value)
+	x.push_back(p1);
+      if (!is_constant<T2>::value)
+	x.push_back(p2);
+      if (!is_constant<T3>::value)
+	x.push_back(p3);
+      if (!is_constant<T4>::value)
+	x.push_back(p4);
+      if (!is_constant<T5>::value)
+	x.push_back(p5);
+      if (!is_constant<T6>::value)
+	x.push_back(p6);
+      if (!is_constant<T7>::value)
+	x.push_back(p7);
+      if (!is_constant<T8>::value)
+	x.push_back(p8);
+      if (!is_constant<T9>::value)
+	x.push_back(p9);
+      logprob.grad(x, grad);
+    }
+    {
+      T0 p0 = get_param(params, 0);
+      T1 p1 = get_param(params, 1);
+      T2 p2 = get_param(params, 2);
+      T3 p3 = get_param(params, 3);
+      T4 p4 = get_param(params, 4);
+      T5 p5 = get_param(params, 5);
+      T6 p6 = get_param(params, 6);
+      T7 p7 = get_param(params, 7);
+      T8 p8 = get_param(params, 8);
+      T9 p9 = get_param(params, 9);
+      var logprob = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      vector<var> x;
+      if (!is_constant<T0>::value)
+	x.push_back(p0);
+      if (!is_constant<T1>::value)
+	x.push_back(p1);
+      if (!is_constant<T2>::value)
+	x.push_back(p2);
+      if (!is_constant<T3>::value)
+	x.push_back(p3);
+      if (!is_constant<T4>::value)
+	x.push_back(p4);
+      if (!is_constant<T5>::value)
+	x.push_back(p5);
+      if (!is_constant<T6>::value)
+	x.push_back(p6);
+      if (!is_constant<T7>::value)
+	x.push_back(p7);
+      if (!is_constant<T8>::value)
+	x.push_back(p8);
+      if (!is_constant<T9>::value)
+	x.push_back(p9);
+      logprob.grad(x, grad);
+    }
+
+
+  }
+  
+}
+*/
+  
 #endif

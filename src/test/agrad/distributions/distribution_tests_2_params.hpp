@@ -14,7 +14,7 @@ public:
     return _LOG_PROB_<true>(p0, p1);
   }
   var call_nopropto(T0& p0, T1& p1, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&) {
-    return _LOG_PROB_<true>(p0, p1);
+    return _LOG_PROB_<false>(p0, p1);
   }
 };
 
@@ -71,89 +71,16 @@ TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_vv) {
   test_propto<TypeParam, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dd) {
-  SUCCEED() << "No op for all double" << std::endl;
+  test_finite_diff<TypeParam, double, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_dv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  double e = this->e();
-  double e_times_2 = (2.0 * e);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> p(parameters[n]);
-    double diff_g1 = (_LOG_PROB_<false>(p[0], p[1]+e) - _LOG_PROB_<false>(p[0], p[1]-e)) / e_times_2;
-      
-    var p1(p[1]);
-    var lp = _LOG_PROB_<true>(p[0], p1);
-    vector<var> v_params(1);
-    v_params[0] = p1;
-    vector<double> gradients;
-    lp.grad(v_params, gradients);
-
-    EXPECT_NEAR(diff_g1,
-		gradients[0],
-		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl
-      << "(" << p[0] << ", " << p[1] << ")" << std::endl;
-    
-  }
+  test_finite_diff<TypeParam, double, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vd) {  
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  double e = this->e();
-  double e_times_2 = (2.0 * e);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> p(parameters[n]);
-    double diff_g0 = (_LOG_PROB_<false>(p[0]+e, p[1]) - _LOG_PROB_<false>(p[0]-e, p[1])) / e_times_2;
-      
-    var p0(p[0]);
-    var lp = _LOG_PROB_<true>(p0, p[1]);
-    vector<var> v_params(1);
-    v_params[0] = p0;
-    vector<double> gradients;
-    lp.grad(v_params, gradients);
-
-    EXPECT_NEAR(diff_g0,
-		gradients[0],
-		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl
-      << "(" << p[0] << ", " << p[1] << ")" << std::endl;
-  }
+  test_finite_diff<TypeParam, var, double>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_vv) {
-  vector<vector<double> > parameters;
-  TypeParam().valid_values(parameters);
-  ASSERT_GT(parameters.size(), 0U);
-  double e = this->e();
-  double e_times_2 = (2.0 * e);
-  for (size_t n = 0; n < parameters.size(); n++) {
-    vector<double> p(parameters[n]);
-    double diff_g0 = (_LOG_PROB_<false>(p[0]+e, p[1]) - _LOG_PROB_<false>(p[0]-e, p[1])) / e_times_2;
-    double diff_g1 = (_LOG_PROB_<false>(p[0], p[1]+e) - _LOG_PROB_<false>(p[0], p[1]-e)) / e_times_2;
-      
-    var p0(p[0]);
-    var p1(p[1]);
-    
-    var lp = _LOG_PROB_<true>(p0, p1);
-    vector<var> v_params(2);
-    v_params[0] = p0;
-    v_params[1] = p1;
-    vector<double> gradients;
-    lp.grad(v_params, gradients);
-
-    EXPECT_NEAR(diff_g0,
-		gradients[0],
-		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 0" << std::endl
-      << "(" << p[0] << ", " << p[1] << ")" << std::endl;
-    EXPECT_NEAR(diff_g1,
-		gradients[1],
-		1e-4)
-      << "Index: " << n << " - Finite diff test failed for parameter 1" << std::endl
-      << "(" << p[0] << ", " << p[1] << ")" << std::endl;
-  }
+  test_finite_diff<TypeParam, var, var>();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_dd) {
   SUCCEED() << "No op for (d,d,d) input" << std::endl;
