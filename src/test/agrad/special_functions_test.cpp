@@ -1147,6 +1147,7 @@ void test_log1p_exp(double val) {
   EXPECT_EQ(1U,g.size());
   EXPECT_EQ(1U,g2.size());
   EXPECT_FLOAT_EQ(g2[0],g[0]);
+  EXPECT_FLOAT_EQ(g2[0],1.0/(1.0 + exp(-val))); // analytic deriv
   EXPECT_FLOAT_EQ(f2.val(),f_val);
 }
 
@@ -1504,4 +1505,68 @@ TEST(AgradSpecialFunctions, Phi) {
       << "y = " << y;
   }
 }
+void test_log_inv_logit(const double x) {
+  using stan::agrad::var;
+  using stan::math::log_inv_logit;
+  using std::log;
+  using stan::math::inv_logit;
+
+  
+  // test gradient
+  AVEC x1 = createAVEC(x);
+  AVAR f1 = log_inv_logit(x1[0]);
+  std::vector<double> grad_f1;
+  f1.grad(x1,grad_f1);
+
+  AVEC x2 = createAVEC(x);
+  AVAR f2 = log(inv_logit(x2[0]));
+  std::vector<double> grad_f2;
+  f2.grad(x2,grad_f2);
+
+  EXPECT_EQ(1U, grad_f1.size());
+  EXPECT_EQ(1U, grad_f2.size());
+  EXPECT_FLOAT_EQ(grad_f2[0], grad_f1[0]);
+
+  // test value
+  EXPECT_FLOAT_EQ(log(inv_logit(x)),
+                  log_inv_logit(var(x)).val());
+
+}
+TEST(AgradSpecialFunctions, log_inv_logit) {
+  test_log_inv_logit(-7.2);
+  test_log_inv_logit(0.0);
+  test_log_inv_logit(1.9);
+}
+void test_log1m_inv_logit(const double x) {
+  using stan::agrad::var;
+  using stan::math::log1m_inv_logit;
+  using std::log;
+  using stan::math::inv_logit;
+
+  
+  // test gradient
+  AVEC x1 = createAVEC(x);
+  AVAR f1 = log1m_inv_logit(x1[0]);
+  std::vector<double> grad_f1;
+  f1.grad(x1,grad_f1);
+
+  AVEC x2 = createAVEC(x);
+  AVAR f2 = log(1.0 - inv_logit(x2[0]));
+  std::vector<double> grad_f2;
+  f2.grad(x2,grad_f2);
+
+  EXPECT_EQ(1U, grad_f1.size());
+  EXPECT_EQ(1U, grad_f2.size());
+  EXPECT_FLOAT_EQ(grad_f2[0], grad_f1[0]);
+
+  // test value
+  EXPECT_FLOAT_EQ(log(1.0 - inv_logit(x)),
+                  log1m_inv_logit(var(x)).val());
+}
+TEST(AgradSpecialFunctions, log1m_inv_logit) {
+  test_log1m_inv_logit(-7.2);
+  test_log1m_inv_logit(0.0);
+  test_log1m_inv_logit(1.9);
+}
+
 

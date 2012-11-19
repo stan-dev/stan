@@ -308,3 +308,22 @@ TEST(MathsSpecialFunctions, value_of) {
   EXPECT_FLOAT_EQ(5.0,value_of(x));
   EXPECT_FLOAT_EQ(5.0,value_of(5));
 }
+
+TEST(MathSpecialFunctions, log_inv_logit) {
+  using stan::math::log_inv_logit;
+  using std::log;
+  using stan::math::inv_logit;
+
+  EXPECT_FLOAT_EQ(log(inv_logit(-7.2)), log_inv_logit(-7.2));
+  EXPECT_FLOAT_EQ(log(inv_logit(0.0)), log_inv_logit(0.0));
+  EXPECT_FLOAT_EQ(log(inv_logit(1.9)), log_inv_logit(1.9));
+}
+TEST(MathSpecialFunctions, log1m_inv_logit) {
+  using stan::math::log1m_inv_logit;
+  using std::log;
+  using stan::math::inv_logit;
+
+  EXPECT_FLOAT_EQ(log(1 - inv_logit(-7.2)), log1m_inv_logit(-7.2));
+  EXPECT_FLOAT_EQ(log(1 - inv_logit(0.0)), log1m_inv_logit(0.0));
+  EXPECT_FLOAT_EQ(log(1 - inv_logit(1.9)), log1m_inv_logit(1.9));
+}

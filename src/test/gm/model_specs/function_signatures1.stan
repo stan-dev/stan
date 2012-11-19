@@ -138,6 +138,8 @@ transformed data {
   transformed_data_real <- log1m(d_real);
   transformed_data_real <- log1p_exp(d_real);
   transformed_data_real <- log_sum_exp(d_real, d_real);
+  transformed_data_real <- log_inv_logit(d_real);
+  transformed_data_real <- log1m_inv_logit(d_real);
 
   //*** Array Operations ***
   transformed_data_real <- sum(d_real_array);
@@ -500,6 +502,10 @@ transformed parameters {
   transformed_param_real <- log1m(p_real);
   transformed_param_real <- log1p_exp(d_real);
   transformed_param_real <- log1p_exp(p_real);
+  transformed_param_real <- log_inv_logit(d_real);
+  transformed_param_real <- log_inv_logit(p_real);
+  transformed_param_real <- log1m_inv_logit(d_real);
+  transformed_param_real <- log1m_inv_logit(p_real);
   transformed_param_real <- log_sum_exp(d_real, d_real);
   transformed_param_real <- log_sum_exp(p_real, d_real);
   transformed_param_real <- log_sum_exp(d_real, p_real);

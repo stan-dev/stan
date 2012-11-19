@@ -27,6 +27,7 @@ v1.0.4
    * trapping/reporting locations of errors in data and init reads
 -- New Functions
    * cumulative_sum()
+   * log_inv_logit(), log1m_inv_logit()
 
 
 PRIORITIES?
@@ -222,14 +223,6 @@ C++ API
 * signed sqrt
   signed_sqrt(x) = -sqrt(-x) if x < 0
                  = sqrt(x)   if x > 0
-
-* log logits
-  - log_logit(u) = log(logit(u)) 
-                 = -log(1 + exp(-u))
-                 = -log1p_exp(-u)
-  - log_1mlogit(u) = log(1 - logit(u))
-                   = log(logit(-u))
-                   = -log1p_exp(u)
 
 * Skew normal distribution
   -- involves Phi() in its *density* function like

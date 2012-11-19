@@ -533,11 +533,47 @@ namespace stan {
      */
     inline double log1p_exp(const double& a) {
       using std::exp;
-      // like log_sum_exp below with b=0.0
+      // like log_sum_exp below with b=0.0; prevents underflow
       if (a > 0.0)
-        return a + log1p(exp(-a));
+        return a + log1p(exp(-a)); 
       return log1p(exp(a));
     }
+
+    /**
+     * Returns the natural logarithm of the inverse logit of the
+     * specified argument.
+     *
+     * @tparam T Scalar type
+     * @param u Input.
+     * @return log of the inverse logit of the input.
+     */
+    template <typename T>
+    inline typename boost::math::tools::promote_args<T>::type
+    log_inv_logit(const T& u) {
+      using std::exp;
+      if (u < 0.0)
+        return u - log1p(exp(u));  // prevent underflow
+      return -log1p(exp(-u));
+    }
+
+
+    /**
+     * Returns the natural logarithm of 1 minus the inverse logit
+     * of the specified argument.
+     *
+     * @tparam T Scalar type
+     * @param u Input.
+     * @return log of 1 minus the inverse logit of the input.
+     */
+    template <typename T>
+    inline typename boost::math::tools::promote_args<T>::type
+    log1m_inv_logit(const T& u) {
+      using std::exp;
+      if (u > 0.0)
+        return -u - log1p(exp(-u));  // prevent underflow
+      return -log1p(exp(u));
+    }
+
 
     /**
      * Calculates the log sum of exponetials without overflow.
@@ -604,6 +640,8 @@ namespace stan {
       return max + log(sum);
     }
 
+
+    
     /** 
      * Return the scalar value and ignore the remaining
      * arguments.
@@ -756,7 +794,6 @@ namespace stan {
     }
 
   }
-
 
 }
 

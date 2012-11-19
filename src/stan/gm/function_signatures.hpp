@@ -175,6 +175,8 @@ add_unary("log10");
 add_unary("log1m");
 add_unary("log1p");
 add_unary("log1p_exp");
+add_unary("log_inv_logit");
+add_unary("log1m_inv_logit");
 add_nullary("log2");
 add_unary("log2");
 for (size_t i = 0; i < vector_types.size(); ++i)
