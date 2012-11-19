@@ -78,6 +78,10 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* consider alternative transforms
+  -- ordered as logit(cumulative_sum(simplex))
+     [need to work through the implied geometry here]
+
 * add lower/upper bound infinite or negative infinite values
   -- need is_pos_inf<T>(x) and is_neg_inf(x) tests and we
      only have isinf() which is either/or
@@ -216,6 +220,11 @@ C++ API
 * signed sqrt
   signed_sqrt(x) = -sqrt(-x) if x < 0
                  = sqrt(x)   if x > 0
+
+* cumulative sums
+  cumulative_sum([x1,x2,...,xN])
+    = [x1,x1+x2,x1+x2+x3, ..., x1+...+xN]
+  no better way I see to write the gradient than just use +=
 
 * log logits
   - log_logit(u) = log(logit(u)) 
@@ -469,6 +478,15 @@ Modeling Language
   -- parameters { int x[ns]; }
      might be used if ns is an int array of sizes
   -- how to generalize this?
+ --  int<lower=0> N;          // number of subjects
+      int<lower=1> n_obs[N];   // num observations for subject n in 1:N
+      cov_matrix[n_obs] c;     // cov matrices for subject n in 1:N
+      *  The intent of the notation is that c[n] for n in 1:N
+         is an (n_obs[n] x n_obs[n]) covariance matrix.
+      * This notation lets us do a single final layer of
+         raggedness and could apply anywhere there's a size.  So
+            real y[n_obs];
+         is a 2D ragged array structure where y[n] is a n_obs[n]-vector
 
 * get line numbers into error messages
 
