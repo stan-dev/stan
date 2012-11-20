@@ -55,8 +55,12 @@ public:
     value.push_back(-numeric_limits<double>::infinity());
   }
 
-  template <class T_y, class T_scale1, class T_scale2>
-  var log_prob(const T_y& y, const T_scale1& alpha, const T_scale2& beta) {
+  template <class T_y, class T_scale1, class T_scale2,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, typename T9>
+  var log_prob(const T_y& y, const T_scale1& alpha, const T_scale2& beta,
+	       const T3&, const T4&, const T5&, 
+	       const T6&, const T7&, const T8&, const T9&) {
     using std::log;
     using stan::math::log1m;
     using stan::math::log;

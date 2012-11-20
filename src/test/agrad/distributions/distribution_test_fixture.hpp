@@ -840,7 +840,7 @@ void test_finite_diff() {
       << "Something is wrong with the test. We should have compared all gradients.";    
   }
 }
-/*
+
 template<class TypeParam, class T0, 
 	 class T1=double, class T2=double, class T3=double, 
 	 class T4=double, class T5=double, class T6=double, 
@@ -874,7 +874,7 @@ void test_gradient_function() {
       T7 p7 = get_param(params, 7);
       T8 p8 = get_param(params, 8);
       T9 p9 = get_param(params, 9);
-  var logprob = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      var logprob = TypeParam().log_prob(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
       vector<var> x;
       if (!is_constant<T0>::value)
 	x.push_back(p0);
@@ -896,7 +896,7 @@ void test_gradient_function() {
 	x.push_back(p8);
       if (!is_constant<T9>::value)
 	x.push_back(p9);
-      logprob.grad(x, grad);
+      logprob.grad(x, expected_grad);
     }
     {
       T0 p0 = get_param(params, 0);
@@ -933,11 +933,70 @@ void test_gradient_function() {
 	x.push_back(p9);
       logprob.grad(x, grad);
     }
-
-
+    ASSERT_EQ(expected_grad.size(), grad.size()) << "Something is wrong with the log_prob() defined in the test";
+    if (!is_constant<T0>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 0" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T1>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 1" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }  
+    if (!is_constant<T2>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 2" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T3>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 3" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T4>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 4" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T5>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 5" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T6>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 6" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T7>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 7" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T8>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 8" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
+    if (!is_constant<T9>::value) {
+      EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
+	<< "Hand coded gradient failed for param 9" << std::endl << params;
+      grad.erase(grad.begin());
+      expected_grad.erase(expected_grad.begin());
+    }
   }
   
 }
-*/
+
   
 #endif
