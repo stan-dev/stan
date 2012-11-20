@@ -208,7 +208,7 @@ namespace stan {
 	if (!is_constant_struct<T_prob>::value) {
 	  const static double cutoff = 20.0;
 	  if (ntheta > cutoff)
-	    operands_and_partials.d_x1[n] -= sign * exp_m_ntheta;
+	    operands_and_partials.d_x1[n] -= exp_m_ntheta;
 	  else if (ntheta < -cutoff)
 	    operands_and_partials.d_x1[n] += sign;
 	  else

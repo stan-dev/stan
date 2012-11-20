@@ -54,8 +54,12 @@ public:
     value.push_back(-numeric_limits<double>::infinity());
   }
 
-  template <typename T_y, typename T_loc, typename T_scale>
-  var log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+  template <typename T_y, typename T_loc, typename T_scale,
+	    typename T3, typename T4, typename T5,
+	    typename T6, typename T7, typename T8, typename T9>
+  var log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	       const T3&, const T4&, const T5&, 
+	       const T6&, const T7&, const T8&, const T9&) {
     using stan::math::log1p;
     using stan::math::square;
     using stan::prob::include_summand;

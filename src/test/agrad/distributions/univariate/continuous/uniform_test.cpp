@@ -38,8 +38,12 @@ public:
     // beta
   }
 			     
-  template <class T_y, class T_low, class T_high>
-  var log_prob(const T_y& y, const T_low& alpha, const T_high& beta) {
+  template <class T_y, class T_low, class T_high,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, typename T9>
+  var log_prob(const T_y& y, const T_low& alpha, const T_high& beta,
+	       const T3&, const T4&, const T5&, 
+	       const T6&, const T7&, const T8&, const T9&) {
       using stan::prob::include_summand;
       using stan::prob::LOG_ZERO;
 

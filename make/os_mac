@@ -8,6 +8,7 @@
 
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
+  CFLAGS_GTEST += -std=gnu++0x
   VERSION := $(CC_MAJOR).$(CC_MINOR)
   ifeq (4.2,$(CC_MAJOR).$(CC_MINOR))
     PCH = 
@@ -18,5 +19,6 @@ endif
 ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
+  CFLAGS_GTEST += -Wno-c++11-extensions
   #PCH = .pch
 endif

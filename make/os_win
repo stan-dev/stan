@@ -19,12 +19,14 @@ PATH_SEPARATOR = '\'
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+  CFLAGS_GTEST += -std=gnu++0x
   LDLIBS += -static-libgcc 
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+  CFLAGS_GTEST += -std=gnu++0x
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
   #PCH = .gch
