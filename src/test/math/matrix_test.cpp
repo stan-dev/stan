@@ -15,17 +15,20 @@ using stan::math::row_vector_d;
 // typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
 // typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 
-TEST(matrixTest,newArray) {
-  using stan::math::new_array;
-  std::vector<double> a = new_array<double>(3, 1.0,3.0,2.0);
-  EXPECT_EQ(3,a.size());
-  EXPECT_FLOAT_EQ(1.0, a[0]);
-  EXPECT_FLOAT_EQ(3.0, a[1]);
-  EXPECT_FLOAT_EQ(2.0, a[2]);
+TEST(matrixTest,arrayBuilder) {
+  using stan::math::array_builder;
 
-  std::vector<int> b = new_array<int>(0);
-  EXPECT_EQ(0,b.size());
+  EXPECT_EQ(0, array_builder<double>().array().size());
+
+  std::vector<double> x =
+    array_builder<double>().add(1).add(3).add(2).array();
+  EXPECT_EQ(3,x.size());
+  EXPECT_FLOAT_EQ(1.0, x[0]);
+  EXPECT_FLOAT_EQ(3.0, x[1]);
+  EXPECT_FLOAT_EQ(2.0, x[2]);
 }
+
+
 
 TEST(matrixTest,col) {
   matrix_d m(3,4);
