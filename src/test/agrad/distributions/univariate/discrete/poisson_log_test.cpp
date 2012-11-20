@@ -8,31 +8,29 @@ using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionsPoissonLog : public AgradDistributionTest {
+class AgradDistributionsPoisson : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters) {
-    using std::log;
-
     vector<double> param(2);
 
     param[0] = 17;           // n
-    param[1] = log(13.0);         // lambda
+    param[1] = log(13.0);         // alpha
     parameters.push_back(param);
 
     param[0] = 192;          // n
-    param[1] = log(42.0);         // lambda
+    param[1] = log(42.0);         // alpha
     parameters.push_back(param);
 
     param[0] = 0;            // n
-    param[1] = log(3.0);          // lambda
+    param[1] = log(3.0);          // alpha
     parameters.push_back(param);
 
     /*param[0] = 0;            // n
-    param[1] = std::numeric_limits<double>::infinity(); // lambda
+    param[1] = std::numeric_limits<double>::infinity(); // alpha
     parameters.push_back(param);*/
 
     /*    param[0] = 1;            // n
-    param[1] = 0.0;          // lambda
+    param[1] = 0.0;          // alpha
     parameters.push_back(param);*/
   }
  
@@ -44,8 +42,14 @@ public:
 
   }
 
-  template <class T_log_rate>
-  var log_prob(const int n, const T_log_rate& alpha) {
+  template <class T_n=int, class T_rate,
+            typename T2, typename T3, typename T4, 
+            typename T5, typename T6, typename T7, 
+            typename T8, typename T9>
+  var log_prob(const T_n& n, const T_rate& alpha,
+               const T2&, const T3&, const T4&,
+               const T5&, const T6&, const T7&,
+               const T8&, const T9&) {
 
     using std::exp;
     using boost::math::lgamma;
@@ -55,21 +59,21 @@ public:
 
     var logp(0);
 
-    if (log(alpha) == 0)
+    if (alpha == -std::numeric_limits<double>::infinity())
       return n == 0 ? 0 : LOG_ZERO;
     
-    if (std::isinf(log(alpha)))
+    if (alpha == std::numeric_limits<double>::infinity())
       return LOG_ZERO;
     
     if (include_summand<true>::value)
       logp -= lgamma(n + 1.0);
-    if (include_summand<true,T_log_rate>::value)
+    if (include_summand<true,T_rate>::value)
       logp += n * alpha - exp(alpha);
     return logp;
   }
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPoissonLog,
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsPoisson,
                               AgradDistributionTestFixture,
-                              AgradDistributionsPoissonLog);
+                              AgradDistributionsPoisson);
 
