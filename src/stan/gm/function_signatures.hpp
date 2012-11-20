@@ -264,9 +264,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
 add_unary("Phi");
 add_nullary("pi");
-for (size_t i = 0; i < int_vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j)
+for (size_t i = 0; i < int_vector_types.size(); ++i) {
+  for (size_t j = 0; j < vector_types.size(); ++j) {
     add("poisson_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
+    add("poisson_log_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
+  }
+ }
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod",INT_T,expr_type(INT_T,1));
