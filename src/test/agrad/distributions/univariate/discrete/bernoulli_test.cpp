@@ -47,9 +47,14 @@ public:
     value.push_back(1.001);
   }
 
-  template <class T_prob>
-  var log_prob(const int n, const T_prob& theta) {
-
+  template <class T_n=int, class T_prob,
+	    typename T2, typename T3, typename T4,
+	    typename T5, typename T6, typename T7,
+	    typename T8, typename T9>
+  var log_prob(const T_n& n, const T_prob& theta,
+	       const T2&, const T3&, const T4&, 
+	       const T5&, const T6&, const T7&, 
+	       const T8&, const T9&) {
     using std::log;
     using stan::math::log1m;
     using stan::prob::include_summand;

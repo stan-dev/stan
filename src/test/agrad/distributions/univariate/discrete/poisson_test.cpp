@@ -48,8 +48,14 @@ public:
     value.push_back(-1);
   }
 
-  template <class T_rate>
-  var log_prob(const int n, const T_rate& lambda) {
+  template <class T_n=int, class T_rate,
+	    typename T2, typename T3, typename T4, 
+	    typename T5, typename T6, typename T7, 
+	    typename T8, typename T9>
+  var log_prob(const T_n& n, const T_rate& lambda,
+	       const T2&, const T3&, const T4&,
+	       const T5&, const T6&, const T7&,
+	       const T8&, const T9&) {
 
     using boost::math::lgamma;
     using stan::math::multiply_log;

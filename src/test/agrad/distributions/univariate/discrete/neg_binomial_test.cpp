@@ -39,12 +39,18 @@ public:
     value.push_back(0);
   }
 
-  template <class T_shape, class T_inv_scale>
-  var log_prob(const int n, const T_shape& alpha, const T_inv_scale& beta) {
-    
+  template <class T_n=int, class T_shape, class T_inv_scale,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, 
+	    typename T9>
+  var log_prob(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
+	       const T3&, const T4&, const T5&, 
+	       const T6&, const T7&, const T8&, 
+	       const T9&) {
     using std::log;
     using stan::math::binomial_coefficient_log;
     using stan::math::log1m;
+    using stan::math::multiply_log;
     using stan::prob::include_summand;
 
     var logp(0);
@@ -74,4 +80,7 @@ public:
 
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNegBinomial,
 			      AgradDistributionTestFixture,
+			      AgradDistributionsNegBinomial);
+INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsNegBinomial,
+			      AgradDistributionTestFixture2,
 			      AgradDistributionsNegBinomial);
