@@ -6,6 +6,9 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/matrix.hpp>
 
 namespace stan {
   namespace prob {
@@ -91,10 +94,18 @@ namespace stan {
       }
       if (include_summand<propto,T_y,T_scale>::value) {
         L = crossprod(mdivide_left_tri_low(L));
-        lp -= 0.5 * elt_multiply(S, L).array().sum(); // trace(S * W^-1)
+	Eigen::Matrix<typename promote_args<T_y,T_scale>::type,
+		      Eigen::Dynamic, Eigen::Dynamic> tmp(S.rows(), S.cols());
+	for (int j = 0; j < S.cols(); ++j)
+	  for (int i = 0; i < S.rows(); ++i)
+	    tmp(i,j) = S(i,j) * L(i,j);
+	lp -= 0.5 * tmp.array().sum();
+	// FIXME: elt_multiply() is templated incorrectly and calling the following code
+	//        will break compilation under certain compiler flags 
+        //lp -= 0.5 * elt_multiply(S, L).array().sum(); // trace(S * W^-1)
       }
       if (include_summand<propto,T_dof,T_scale>::value)
-        lp += nu * k * NEG_LOG_TWO_OVER_TWO;
+	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       return lp;
     }
 
