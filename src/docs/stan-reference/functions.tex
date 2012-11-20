@@ -1096,9 +1096,9 @@ represents the value true and 0 the value false.
 
 \subsection{Bernoulli Distribution}
 
-If $\theta \in [0,1]$, then for $c \in \setlist{0,1}$, 
+If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$, 
 \[
-\distro{Bernoulli}(c|\theta)
+\distro{Bernoulli}(y|\theta)
 =
 \left\{
 \begin{array}{ll}
@@ -1222,18 +1222,16 @@ then for $n \in \setlist{0,\ldots,\min(a,N)}$,
 
 \subsection{Categorical Distribution}
 
-If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $n \in
+If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $y \in
 \setlist{1,\ldots,N}$, 
 \[
-\distro{Categorical}(n|\theta) = \theta_n.
+\distro{Categorical}(y|\theta) = \theta_n.
 \]
 
 \begin{description}
-%
 \fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
   log categorical probability mass function with outcome \farg{y} in 
 $1:N$ given $N$-simplex distribution parameter \farg{theta}}
-%
 \end{description}
 
 \subsection{Ordered Logistic Distribution}
@@ -1304,16 +1302,40 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \[
 \distro{Poisson}(n|\lambda)
 = 
-\frac{\exp(-\lambda)}{\lambda!}
+\frac{1}{n!}
 \,
 \lambda^n 
+\,
+\exp(-\lambda).
 \]
 
 \begin{description}
-\fitem{real}{poisson\_log}{ints \farg{n}, reals \farg{lambda}}{ The
+\fitem{real}{poisson\_log}{ints \farg{n}, reals \farg{lambda}}{The
   log Poisson probability mass of \farg{n} given rate \farg{lambda}}
 \end{description}
 
+
+Stan also provides a parameterization of the Poisson using the log
+rate $\alpha = \log \lambda$ as a parameter.  This is useful for
+log-linear Poisson regressions so that the predictor does not need to
+be exponentiated and passed into the standard Poisson probability
+function.
+
+If $\alpha \in \reals$, then for $n \in \nats$,
+\[
+\distro{PoissonLog}(n|\alpha)
+= 
+\frac{1}{n!}
+\,
+\frac{1}{\alpha}
+\,
+(\log \alpha)^n.
+\]
+
+\begin{description}
+\fitem{real}{poisson\_log\_log}{ints \farg{n}, reals \farg{alpha}}{The
+  log Poisson probability mass of \farg{n} given log rate \farg{lambda}}
+\end{description}
 
 
 \section{Multivariate Discrete Probabilities}
