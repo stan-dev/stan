@@ -6,6 +6,9 @@
 #include <stan/math/special_functions.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/agrad/agrad.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/agrad/matrix.hpp>
 
 namespace stan {
   namespace prob {
@@ -62,20 +65,29 @@ namespace stan {
 
       if (y.rows() == 0)
         return lp;
-
+      
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-
+      
       if (include_summand<propto,T_covar>::value)
         lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename 
-                      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-                      Eigen::Dynamic, 1> 
-          half(mdivide_left_tri_low(L,subtract(y,mu)));
-
-        lp -= 0.5 * dot_self(half);
+	Eigen::Matrix<typename 
+		      boost::math::tools::promote_args<T_y,T_loc>::type,
+		      Eigen::Dynamic, 1> y_minus_mu(y.size());
+	for (int i = 0; i < y.size(); i++)
+	  y_minus_mu(i) = y(i)-mu(i);
+	Eigen::Matrix<typename 
+		      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+		      Eigen::Dynamic, 1> 
+	  half(mdivide_left_tri_low(L,y_minus_mu));
+        // FIXME: this code does not compile. revert after fixing subtract()
+	//Eigen::Matrix<typename 
+        //               boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+        //               Eigen::Dynamic, 1> 
+        //   half(mdivide_left_tri_low(L,subtract(y,mu)));
+	lp -= 0.5 * dot_self(half);
       }
       return lp;
     }
@@ -161,18 +173,29 @@ namespace stan {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
         for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
           MU.row(i) = mu;
+	
+	Eigen::Matrix<typename boost::math::tools::promote_args<T_loc,T_y>::type,
+		      Eigen::Dynamic,Eigen::Dynamic>
+	  y_minus_MU(y.rows(), y.cols());
+	for (int i = 0; i < y.size(); i++)
+	  y_minus_MU(i) = y(i)-MU(i);
+	Eigen::Matrix<typename 
+                       boost::math::tools::promote_args<T_loc,T_y>::type,
+                       Eigen::Dynamic,Eigen::Dynamic> 
+	  z(y_minus_MU.transpose()); // was = 
         
-        Eigen::Matrix<typename 
-                      boost::math::tools::promote_args<T_loc,T_y>::type,
-                      Eigen::Dynamic,Eigen::Dynamic> 
-          z(subtract(y,MU).transpose()); // was = 
+	// FIXME: revert this code when subtract() is fixed.
+	// Eigen::Matrix<typename 
+        //               boost::math::tools::promote_args<T_loc,T_y>::type,
+        //               Eigen::Dynamic,Eigen::Dynamic> 
+        //   z(subtract(y,MU).transpose()); // was = 
                 
         Eigen::Matrix<typename 
                       boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
                       Eigen::Dynamic,Eigen::Dynamic> 
           half(mdivide_left_tri_low(L,z));
           
-        lp -= 0.5 * columns_dot_self(half).sum();
+	  lp -= 0.5 * columns_dot_self(half).sum();
       }
       return lp;
     }
@@ -249,6 +272,7 @@ namespace stan {
         return lp;
       if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
         return lp;
+
       Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
       if (LLT.info() != Eigen::Success) {
         lp = stan::math::policies::raise_domain_error<T_covar>(function,

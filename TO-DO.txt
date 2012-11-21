@@ -81,11 +81,13 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
-* rewrite elt_multiply() in matrix.hpp.
-  -- should be able to write one templated function to allow for
-     all our uses of elt_multiply.
+* rewrite functions in matrix.hpp.
+  -- Functions:
+      -- elt_multiply() [fix inv_wishart_log]
+      -- subtract() [fix multi_normal_log]
+  -- should be able to write one templated function to allow for required
+     uses.
   -- needs tests.
-  -- once it's implemented, go into inv_wishart_log and revert code
 
 * consider alternative transforms
   -- ordered as logit(cumulative_sum(simplex))
