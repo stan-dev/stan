@@ -58,7 +58,7 @@ namespace stan {
       using Eigen::Array;
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = W.rows();
-      typename promote_args<T_y,T_dof,T_scale>::type lp;
+      typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if (!check_greater_or_equal(function, nu, k - 1, 
                                   "Degrees of freedom parameter", &lp, Policy()))
         return lp;
@@ -91,7 +91,6 @@ namespace stan {
       using stan::math::elt_multiply;
       using stan::math::mdivide_left_tri_low;
       using stan::math::lmgamma;
-      lp = 0.0;
       if (include_summand<propto,T_dof>::value)
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;
 
@@ -102,16 +101,22 @@ namespace stan {
         lp -= nu * L_S.diagonal().array().log().sum();
 
       if (include_summand<propto,T_scale,T_y>::value) {
-        Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
-        I.setIdentity();
-        L_S = mdivide_left_tri_low(L_S, I);
-        L_S = L_S.transpose() * L_S.template triangularView<Eigen::Lower>();
-        lp -= 0.5 * elt_multiply(L_S, W).array().sum(); // trace(S^-1 * W)
+	Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
+	I.setIdentity();
+	L_S = mdivide_left_tri_low(L_S, I);
+	L_S = L_S.transpose() * L_S.template triangularView<Eigen::Lower>();
+	Eigen::Matrix<typename boost::math::tools::promote_args<T_y,T_scale>::type,
+		      Eigen::Dynamic,Eigen::Dynamic> tmp(L_S.rows(), L_S.cols());
+	for (int j = 0; j < L_S.cols(); ++j)
+	  for (int i = 0; i < L_S.rows(); ++i)
+	    tmp(i,j) = L_S(i,j) * W(i,j);
+	lp -= 0.5 * tmp.array().sum(); // trace(S^-1 * W)
+	// FIXME: revert when elt_multiply() is templated properly
+        // lp -= 0.5 * elt_multiply(L_S, W).array().sum(); // trace(S^-1 * W)
       }
 
       if (include_summand<propto,T_y,T_dof>::value && nu != (k + 1))
         lp += (nu - k - 1.0) * L_W.diagonal().array().log().sum();
-
       return lp;
     }
 

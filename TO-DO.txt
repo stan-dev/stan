@@ -84,7 +84,7 @@ C++ API
 
 * rewrite functions in matrix.hpp.
   -- Functions:
-      -- elt_multiply() [fix inv_wishart_log]
+      -- elt_multiply() [fix inv_wishart_log, wishart_log]
       -- subtract() [fix multi_normal_log]
   -- should be able to write one templated function to allow for required
      uses.
