@@ -1038,56 +1038,56 @@ namespace stan {
       return to_var(v) / to_var(c);
     }
 
-    /**
-     * Return the elementwise product of the specified matrices.
-     * @param[in] m1 First matrix.
-     * @param[in] m2 Second matrix.
-     * @return Elementwise product of the matrices.
-     */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>
-    elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
-                 const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
-      stan::math::validate_matching_dims(m1,m2,"elt_multiply");
-      Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
-        result(m1.rows(),m1.cols());
-      for (int j = 0; j < m1.cols(); ++j)
-        for (int i = 0; i < m1.rows(); ++i)
-          result(i,j) = m1(i,j) * m2(i,j);
-      return result;
-    }
-    /**
-     * Return the elementwise product of the specified vectors.
-     * @param[in] v1 First vector.
-     * @param[in] v2 Second vector.
-     * @return Elementwise product of the vectors.
-     */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>
-    elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
-                 const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
-      stan::math::validate_matching_dims(v1,v2,"elt_multiply");
-      Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
-      for (int i = 0; i < v1.size(); ++i)
-        result(i) = v1(i) * v2(i);
-      return result;
-    }
-    /**
-     * Return the elementwise product of the specified row vectors.
-     * @param[in] v1 First row vector.
-     * @param[in] v2 Second row vector.
-     * @return Elementwise product of the row vectors.
-     */
-    template <typename T1, typename T2>
-    inline Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>
-    elt_multiply(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
-                 const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
-      stan::math::validate_matching_dims(v1,v2,"elt_multiply");
-      Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
-      for (int i = 0; i < v1.size(); ++i)
-        result(i) = v1(i) * v2(i);
-      return result;
-    }
+    // /**
+    //  * Return the elementwise product of the specified matrices.
+    //  * @param[in] m1 First matrix.
+    //  * @param[in] m2 Second matrix.
+    //  * @return Elementwise product of the matrices.
+    //  */
+    // template <typename T1, typename T2>
+    // inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic>
+    // elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,Eigen::Dynamic>& m1,
+    //              const Eigen::Matrix<T2,Eigen::Dynamic,Eigen::Dynamic>& m2) {
+    //   stan::math::validate_matching_dims(m1,m2,"elt_multiply");
+    //   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic, Eigen::Dynamic> 
+    //     result(m1.rows(),m1.cols());
+    //   for (int j = 0; j < m1.cols(); ++j)
+    //     for (int i = 0; i < m1.rows(); ++i)
+    //       result(i,j) = m1(i,j) * m2(i,j);
+    //   return result;
+    // }
+    // /**
+    //  * Return the elementwise product of the specified vectors.
+    //  * @param[in] v1 First vector.
+    //  * @param[in] v2 Second vector.
+    //  * @return Elementwise product of the vectors.
+    //  */
+    // template <typename T1, typename T2>
+    // inline Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>
+    // elt_multiply(const Eigen::Matrix<T1,Eigen::Dynamic,1>& v1,
+    //              const Eigen::Matrix<T2,Eigen::Dynamic,1>& v2) {
+    //   stan::math::validate_matching_dims(v1,v2,"elt_multiply");
+    //   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> result(v1.size());
+    //   for (int i = 0; i < v1.size(); ++i)
+    //     result(i) = v1(i) * v2(i);
+    //   return result;
+    // }
+    // /**
+    //  * Return the elementwise product of the specified row vectors.
+    //  * @param[in] v1 First row vector.
+    //  * @param[in] v2 Second row vector.
+    //  * @return Elementwise product of the row vectors.
+    //  */
+    // template <typename T1, typename T2>
+    // inline Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic>
+    // elt_multiply(const Eigen::Matrix<T1,1,Eigen::Dynamic>& v1,
+    //              const Eigen::Matrix<T2,1,Eigen::Dynamic>& v2) {
+    //   stan::math::validate_matching_dims(v1,v2,"elt_multiply");
+    //   Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> result(v1.size());
+    //   for (int i = 0; i < v1.size(); ++i)
+    //     result(i) = v1(i) * v2(i);
+    //   return result;
+    // }
                    
 
     /**

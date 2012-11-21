@@ -2590,7 +2590,7 @@ TEST(AgradMatrix,multiply_scalar_matrix_vc) {
 }
 
 TEST(AgradMatrix,elt_multiply_vec_vv) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::agrad::vector_v;
 
   vector_v x(2);
@@ -2609,7 +2609,7 @@ TEST(AgradMatrix,elt_multiply_vec_vv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 TEST(AgradMatrix,elt_multiply_vec_vd) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_v;
 
@@ -2627,7 +2627,7 @@ TEST(AgradMatrix,elt_multiply_vec_vd) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 TEST(AgradMatrix,elt_multiply_vec_dv) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_v;
 
@@ -2646,7 +2646,7 @@ TEST(AgradMatrix,elt_multiply_vec_dv) {
 }
 
 TEST(AgradMatrix,elt_multiply_row_vec_vv) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::agrad::row_vector_v;
 
   row_vector_v x(2);
@@ -2665,7 +2665,7 @@ TEST(AgradMatrix,elt_multiply_row_vec_vv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 TEST(AgradMatrix,elt_multiply_row_vec_vd) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_v;
 
@@ -2683,7 +2683,7 @@ TEST(AgradMatrix,elt_multiply_row_vec_vd) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 TEST(AgradMatrix,elt_multiply_row_vec_dv) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_v;
 
@@ -2703,7 +2703,7 @@ TEST(AgradMatrix,elt_multiply_row_vec_dv) {
 
 
 TEST(AgradMatrix,elt_multiply_matrix_vv) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::agrad::matrix_v;
 
   matrix_v x(2,3);
@@ -2723,7 +2723,7 @@ TEST(AgradMatrix,elt_multiply_matrix_vv) {
   EXPECT_FLOAT_EQ(2.0,g[3]);
 }
 TEST(AgradMatrix,elt_multiply_matrix_vd) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
 
@@ -2744,7 +2744,7 @@ TEST(AgradMatrix,elt_multiply_matrix_vd) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 TEST(AgradMatrix,elt_multiply_matrix_dv) {
-  using stan::agrad::elt_multiply;
+  using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
 

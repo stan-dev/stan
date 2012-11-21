@@ -18,12 +18,71 @@ namespace stan {
   namespace math {
 
 
+    // from input type F to output type T 
+
+    // scalar, F != T  (base template)
+    template <typename F, typename T>
+    struct promoter {
+      static void promote(const F& u, T& t) {
+        t = u;
+      }
+    };
+    // scalar, F == T
+    template <typename T>
+    struct promoter<T,T> {
+      static void promote(const T& u, T& t) {
+        t = u;
+      }
+    };
+
+    // std::vector, F != T
+    template <typename F, typename T>
+    struct promoter<std::vector<F>, std::vector<T> > {
+      static void promote(const std::vector<F>& u,
+                          std::vector<T>& t) {
+        t.resize(u.size());
+        for (size_t i = 0; i < u.size(); ++i)
+          promoter<F,T>::promote(u[i],t[i]);
+      }
+    };
+    // F = T, std::vector
+    template <typename T>
+    struct promoter<std::vector<T>, std::vector<T> > {
+      static void promote(const std::vector<T>& u, std::vector<T>& t) {
+        t = u;
+      }
+    };
+
+    // Eigen::Matrix, F != T
+    template <typename F, typename T, int R, int C>
+    struct promoter<Eigen::Matrix<F,R,C>, Eigen::Matrix<T,R,C> > {
+      static const std::vector<T> promote(const Eigen::Matrix<F,R,C>& u,
+                                          Eigen::Matrix<T,R,C>& t) {
+        t.resize(u.rows(), u.cols());
+        for (size_t i = 0; i < u.size(); ++i)
+          promoter<F,T>::promote(u(i),t(i));
+      }
+    };
+    // Eigen::Matrix, F == T
+    template <typename T, int R, int C>
+    struct promoter<Eigen::Matrix<T,R,C>, Eigen::Matrix<T,R,C> > {
+      static const std::vector<T> promote(const Eigen::Matrix<T,R,C>& u,
+                                          Eigen::Matrix<T,R,C>& t) {
+        t = u;
+      }
+    };
+
+
+
     template <typename T>
     struct array_builder {
       std::vector<T> x_;
       array_builder() : x_() { }
-      array_builder& add(const T& x) {
-        x_.push_back(x);
+      template <typename F>
+      array_builder& add(const F& u) {
+        T t;
+        promoter<F,T>::promote(u,t);
+        x_.push_back(t);
         return *this;
       }
       std::vector<T> array() {
@@ -1253,27 +1312,41 @@ namespace stan {
      */
     matrix_d divide(const matrix_d& m, double c);
 
-    /**
-     * Return the element-wise product of the specified vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Elementwise product of the vectors.
-     */
-    vector_d elt_multiply(const vector_d& v1, const vector_d& v2);
-    /**
-     * Return the element-wise product of the specified row vectors.
-     * @param v1 First row vector.
-     * @param v2 Second row vector.
-     * @return Elementwise product of the vectors.
-     */
-    row_vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2);
-    /**
-     * Return the element-wise product of the specified matrices.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return Elementwise product of the matrices.
-     */
-    matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2);
+    template <typename T1, typename T2, int R, int C>
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    elt_multiply(const Eigen::Matrix<T1,R,C>& m1,
+                 const Eigen::Matrix<T2,R,C>& m2) {
+      stan::math::validate_matching_dims(m1,m2,"elt_multiply");
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+        result(m1.rows(),m2.cols());
+      for (int i = 0; i < m1.size(); ++i)
+        result(i) = m1(i) * m2(i);
+      return result;
+    }
+
+        
+
+    // /**
+    //  * Return the element-wise product of the specified vectors.
+    //  * @param v1 First vector.
+    //  * @param v2 Second vector.
+    //  * @return Elementwise product of the vectors.
+    //  */
+    // vector_d elt_multiply(const vector_d& v1, const vector_d& v2);
+    // /**
+    //  * Return the element-wise product of the specified row vectors.
+    //  * @param v1 First row vector.
+    //  * @param v2 Second row vector.
+    //  * @return Elementwise product of the vectors.
+    //  */
+    // row_vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2);
+    // /**
+    //  * Return the element-wise product of the specified matrices.
+    //  * @param m1 First matrix.
+    //  * @param m2 Second matrix.
+    //  * @return Elementwise product of the matrices.
+    //  */
+    // matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2);
 
 
     /**
