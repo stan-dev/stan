@@ -28,6 +28,7 @@ v1.0.4
 -- New Functions
    * cumulative_sum()
    * log_inv_logit(), log1m_inv_logit()
+   * poisson_log_log() for log-rate parameterized Poisson
 
 
 PRIORITIES?

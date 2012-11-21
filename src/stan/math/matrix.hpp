@@ -17,20 +17,19 @@ namespace stan {
   
   namespace math {
 
-    // DANGER:  no static type checking on ...; assumed to be T
-    template <typename T>
-    inline
-    std::vector<T> new_array(size_t n_args,
-                             ...) {
-      std::vector<T> result(n_args);
-      va_list ap;
-      va_start(ap, n_args);
-      for (int i = 0; i < n_args; ++i)
-        result[i] = va_arg(ap, T);
-      va_end(ap);
-      return result;
-    }
 
+    template <typename T>
+    struct array_builder {
+      std::vector<T> x_;
+      array_builder() : x_() { }
+      array_builder& add(const T& x) {
+        x_.push_back(x);
+        return *this;
+      }
+      std::vector<T> array() {
+        return x_;
+      }
+    };
 
     /**
      * This is a traits structure for Eigen matrix types.
