@@ -76,22 +76,22 @@ namespace stan {
       stan::math::validate_nonzero_size(m,"eigenvalues_sym");
       stan::math::validate_square(m,"eigenvalues_sym");
       Eigen::SelfAdjointEigenSolver<matrix_v> solver(m,Eigen::EigenvaluesOnly);
-      return solver.eigenvalues().real();
+      return solver.eigenvalues();
     }
 
     matrix_v eigenvectors_sym(const matrix_v& m) {
       stan::math::validate_nonzero_size(m,"eigenvectors_sym");
       stan::math::validate_square(m,"eigenvectors_sym");
       Eigen::SelfAdjointEigenSolver<matrix_v> solver(m);
-      return solver.eigenvectors().real();
+      return solver.eigenvectors();
     }
 
     void eigen_decompose_sym(const matrix_v& m,
                              vector_v& eigenvalues,
                              matrix_v& eigenvectors) {
       Eigen::SelfAdjointEigenSolver<matrix_v> solver(m);
-      eigenvalues = solver.eigenvalues().real();
-      eigenvectors = solver.eigenvectors().real();
+      eigenvalues = solver.eigenvalues();
+      eigenvectors = solver.eigenvectors();
     }
 
     matrix_v cholesky_decompose(const matrix_v& m) {
