@@ -73,7 +73,11 @@ namespace stan {
     };
 
 
-
+    /**
+     * Structure for building up arrays in an expression (rather than
+     * in statements) using an argumentchaining add() method and 
+     * a getter method array() to return the result.
+     */
     template <typename T>
     struct array_builder {
       std::vector<T> x_;
@@ -89,6 +93,9 @@ namespace stan {
         return x_;
       }
     };
+
+    // FIXME:  remove this as it doesn't support type inference
+    // through the definitions
 
     /**
      * This is a traits structure for Eigen matrix types.
@@ -1165,127 +1172,160 @@ namespace stan {
     // vector and matrix returns
 
     /**
-     * Return the sum of the specified column vectors.
-     * The two vectors must have the same size.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Sum of the two vectors.
-     * @throw std::domain_error if v1 and v2 are not the same size.
-     */
-    vector_d add(const vector_d& v1, const vector_d& v2);
+      * Return the sum of the specified matrices.  The two matrices
+      * must have the same dimensions. 
+
+      * @tparam T1 Scalar type of first matrix.
+      * @tparam T2 Scalar type of second matrix.
+      * @tparam R Row type of matrices.
+      * @tparam C Column type of matrices.
+      * @param m1 First matrix.
+      * @param m2 Second matrix.  
+      * @return Sum of the matrices.
+      * @throw std::domain_error if m1 and m2 do not have the same
+      * dimensions.
+      */
+    template <typename T1, typename T2, int R, int C>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
+    add(const Eigen::Matrix<T1,R,C>& m1,
+        const Eigen::Matrix<T2,R,C>& m2) {
+      stan::math::validate_matching_dims(m1,m2,"add");
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
+        result(m1.rows(),m1.cols());
+      for (int i = 0; i < result.size(); ++i)
+        result(i) = m1(i) + m2(i);
+      return result;
+    }
     /**
-     * Return the sum of the specified row vectors.  The
-     * two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return Sum of the two vectors.
-     * @throw std::domain_error if rv1 and rv2 are not the same size.
+     * Return the sum of the specified matrix and specified scalar.
+     *
+     * @tparam T1 Scalar type of matrix.
+     * @param T2 Type of scalar.
+     * @param m Matrix.
+     * @param c Scalar.
+     * @return The matrix plus the scalar.
      */
-    row_vector_d add(const row_vector_d& rv1, 
-                     const row_vector_d& rv2);
+    template <typename T1, typename T2, int R, int C>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
+    add(const Eigen::Matrix<T1,R,C>& m, 
+        const T2& c) {
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
+        result(m.rows(),m.cols());
+      for (int i = 0; i < result.size(); ++i)
+        result(i) = m(i) + c;
+      return result;
+    }
     /**
-     * Return the sum of the specified matrices.  The two matrices
-     * must have the same dimensions.
+     * Return the sum of the specified scalar and specified matrix.
+     *
+     * @param T1 Type of scalar.
+     * @tparam T2 Scalar type of matrix.
+     * @param c Scalar.
+     * @param m Matrix.
+     * @return The scalar plus the matrix.
+     */
+    template <typename T1, typename T2, int R, int C>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
+    add(const T1& c,
+        const Eigen::Matrix<T2,R,C>& m) {
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
+        result(m.rows(),m.cols());
+      for (int i = 0; i < result.size(); ++i)
+        result(i) = c + m(i);
+      return result;
+    }
+
+
+    /**
+     * Return the result of subtracting the second specified matrix
+     * from the first specified matrix.  The return scalar type is the
+     * promotion of the input types.
+     *
+     * @tparam T1 Scalar type of first matrix.
+     * @tparam T2 Scalar type of second matrix.
+     * @tparam R Row type of matrices.
+     * @tparam C Column type of matrices.
      * @param m1 First matrix.
      * @param m2 Second matrix.
-     * @return Sum of the two vectors.
-     * @throw std::domain_error if m1 and m2 are not the same size.
+     * @return Difference between first matrix and second matrix.
      */
-    matrix_d add(const matrix_d& m1, const matrix_d& m2);
-
-   
-    /**
-     * Return the sum of a matrix or vector and a scalar.
-     * @param m Matrix or vector.
-     * @param c Scalar.
-     * @return The matrix or vector plus the scalar.
-     */
-    template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> add(const Eigen::Matrix<double,Rows,Cols>& m, const double& c) {
-      return (m.array() + c).matrix();
-    }
-    /**
-     * Return the sum of a scalar and a matrix or vector.
-     * @param c Scalar.
-     * @param m Matrix or vector.
-     * @return Scalar plus the matrix or vector.
-     */
-    template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> add(const double& c, const Eigen::Matrix<double,Rows,Cols>& m) {
-      return (c + m.array()).matrix();
+    template <typename T1, typename T2, int R, int C>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    subtract(const Eigen::Matrix<T1,R,C>& m1,
+             const Eigen::Matrix<T2,R,C>& m2) {
+      stan::math::validate_matching_dims(m1,m2,"subtract");
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+        result(m1.rows(), m1.cols());
+      for (int i = 0; i < result.size(); ++i)
+        result(i) = m1(i) - m2(i);
+      return result;
     }
 
-    /**
-     * Return the difference between the first specified column vector
-     * and the second.  The two vectors must have the same size.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return First vector minus the second vector.
-     * @throw std::domain_error if v1 and v2 are not the same size.
-     */
-    vector_d subtract(const vector_d& v1, const vector_d& v2);
-    /**
-     * Return the difference between the first specified row vector and
-     * the second.  The two vectors must have the same size.
-     * @param rv1 First vector.
-     * @param rv2 Second vector.
-     * @return First vector minus the second vector.
-     * @throw std::domain_error if rv1 and rv2 are not the same size.
-     */
-    row_vector_d subtract(const row_vector_d& rv1, const row_vector_d& rv2);
-    /**
-     * Return the difference between the first specified matrix and
-     * the second.  The two matrices must have the same dimensions.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return First matrix minus the second matrix.
-     * @throw std::domain_error if m1 and m2 are not the same size.
-     */
-    matrix_d subtract(const matrix_d& m1, const matrix_d& m2);
-
-    /**
-     * Return the difference between a matrix or vector and a scalar.
-     * @param m Matrix or vector.
-     * @param c Scalar.
-     * @return The matrix or vector minus the scalar.
-     */
-    template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> subtract(const Eigen::Matrix<double,Rows,Cols>& m, 
-                                                    double c) {
-      return (m.array() - c).matrix();
+    template <typename T1, typename T2, int R, int C>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    subtract(const T1& c,
+             const Eigen::Matrix<T2,R,C>& m) {
+      
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+        result(m.rows(),m.cols());
+      for (int i = 0; i < m.size(); ++i)
+        result(i) = c - m(i);
+      return result;
     }
-    /**
-     * Return the difference between a scalar and a matrix or vector.
-     * @param c Scalar.
-     * @param m Matrix or vector.
-     * @return Scalar minus the matrix or vector.
-     */
-    template<int Rows, int Cols>
-    inline Eigen::Matrix<double,Rows,Cols> subtract(double c, const Eigen::Matrix<double,Rows,Cols>& m) {
-      return (c - m.array()).matrix();
+    template <typename T1, typename T2, int R, int C>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    subtract(const Eigen::Matrix<T1,R,C>& m,
+             const T2& c) {
+      
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+        result(m.rows(),m.cols());
+      for (int i = 0; i < m.size(); ++i)
+        result(i) = m(i) - c;
+      return result;
     }
 
+
+
     /**
-     * Return the negation of the specified column vector.  The result
-     * is the same as multiplying by the scalar <code>-1</code>.
-     * @param v Specified vector.  
-     * @return The negation of the vector.
+     * Returns the negation of the specified scalar or matrix.
+     *
+     * @tparam T Type of subtrahend.
+     * @param x Subtrahend.
+     * @return Negation of subtrahend.
      */
-    vector_d minus(const vector_d& v);
-    /**
-     * Return the negation of the specified row vector.  The result is
-     * the same as multiplying by the scalar <code>-1</code>.
-     * @param rv Specified vector.
-     * @return The negation of the vector.
-     */
-    row_vector_d minus(const row_vector_d& rv);
-    /**
-     * Return the negation of the specified matrix.  The result is the same
-     * as multiplying by the scalar <code>-1</code>.
-     * @param m Specified matrix.
-     * @return The negation of the matrix.
-     */
-    matrix_d minus(const matrix_d& m);
+    template <typename T>
+    inline
+    T minus(const T& x) {
+      return -x;
+    }
+
+    // /**
+    //  * Return the negation of the specified column vector.  The result
+    //  * is the same as multiplying by the scalar <code>-1</code>.
+    //  * @param v Specified vector.  
+    //  * @return The negation of the vector.
+    //  */
+    // vector_d minus(const vector_d& v);
+    // /**
+    //  * Return the negation of the specified row vector.  The result is
+    //  * the same as multiplying by the scalar <code>-1</code>.
+    //  * @param rv Specified vector.
+    //  * @return The negation of the vector.
+    //  */
+    // row_vector_d minus(const row_vector_d& rv);
+    // /**
+    //  * Return the negation of the specified matrix.  The result is the same
+    //  * as multiplying by the scalar <code>-1</code>.
+    //  * @param m Specified matrix.
+    //  * @return The negation of the matrix.
+    //  */
+    // matrix_d minus(const matrix_d& m);
 
 
 

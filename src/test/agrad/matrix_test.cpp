@@ -433,6 +433,7 @@ TEST(AgradMatrix, log_matrix) {
 // scalar add/subtract tests
 TEST(AgradMatrix,add_scalar) {
   using stan::agrad::matrix_v;
+  using stan::math::add;
 
   matrix_v v(2,2);
   v << 1, 2, 3, 4;

@@ -13,47 +13,32 @@ namespace stan {
       return m.determinant();
     }
 
-    vector_d add(const vector_d& v1, const vector_d& v2) {
-      validate_matching_dims(v1,v2,"add");
-      return v1 + v2;
-    }
+    // vector_d add(const vector_d& v1, const vector_d& v2) {
+    //   validate_matching_dims(v1,v2,"add");
+    //   return v1 + v2;
+    // }
 
-    row_vector_d add(const row_vector_d& rv1, const row_vector_d& rv2) {
-      validate_matching_dims(rv1,rv2,"add");
-      return rv1 + rv2;
-    }
+    // row_vector_d add(const row_vector_d& rv1, const row_vector_d& rv2) {
+    //   validate_matching_dims(rv1,rv2,"add");
+    //   return rv1 + rv2;
+    // }
 
-    matrix_d add(const matrix_d& m1, const matrix_d& m2) {
-      validate_matching_dims(m1,m2,"add");
-      return m1 + m2;
-    }
+    // matrix_d add(const matrix_d& m1, const matrix_d& m2) {
+    //   validate_matching_dims(m1,m2,"add");
+    //   return m1 + m2;
+    // }
 
-    vector_d subtract(const vector_d& v1, const vector_d& v2) {
-      validate_matching_dims(v1,v2,"subtract");
-      return v1 - v2;
-    }
-
-    row_vector_d subtract(const row_vector_d& rv1, const row_vector_d& rv2) {
-      validate_matching_dims(rv1,rv2,"subtract");
-      return rv1 - rv2;
-    }
-
-    matrix_d subtract(const matrix_d& m1, const matrix_d& m2) {
-      validate_matching_dims(m1,m2,"subtract");
-      return m1 - m2;
-    }
-
-    vector_d minus(const vector_d& v) {
-      return -v;
-    }
+    // vector_d minus(const vector_d& v) {
+    //   return -v;
+    // }
   
-    row_vector_d minus(const row_vector_d& rv) {
-      return -rv;
-    }
+    // row_vector_d minus(const row_vector_d& rv) {
+    //   return -rv;
+    // }
 
-    matrix_d minus(const matrix_d& m) {
-      return -m;
-    }
+    // matrix_d minus(const matrix_d& m) {
+    //   return -m;
+    // }
 
     row_vector_d row(const matrix_d& m, size_t i) {
       validate_row_index(m,i,"row");
