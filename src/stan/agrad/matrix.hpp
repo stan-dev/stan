@@ -384,77 +384,7 @@ namespace stan {
       return rv;
     }
 
-    /**
-     * Return number of rows.
-     *
-     * Returns the number of rows in the specified 
-     * column vector.
-     *
-     * @param v Specified vector.
-     * @return Number of rows in the vector.
-     */
-    inline size_t rows(const vector_v& v) {
-      return v.size();
-    }
-    /**
-     * Return number of rows.
-     *
-     * Returns the number of rows in the specified 
-     * row vector.  The return value is always 1.
-     *
-     * @param rv Specified vector.
-     * @return Number of rows in the vector.
-     */
-    inline size_t rows(const row_vector_v& rv) {
-      return 1;
-    }
-    /**
-     * Return number of rows.
-     * 
-     * Returns the number of rows in the specified matrix.
-     * 
-     * @param m Specified matrix.
-     * @return Number of rows in the vector.
-     */
-    inline size_t rows(const matrix_v& m) {
-      return m.rows();
-    }
 
-    /**
-     * Return number of columns.
-     *
-     * Returns the number of columns in the specified
-     * column vector.  The return value is always 1.
-     *
-     * @param v Specified vector.
-     * @return Number of columns in the vector.
-     */
-    inline size_t cols(const vector_v& v) {
-      return 1;
-    }
-    /**
-     * Return number of columns.
-     *
-     * Returns the number of columns in the specified
-     * row vector.  
-     *
-     * @param rv Specified vector.
-     * @return Number of columns in the vector.
-     */
-    inline size_t cols(const row_vector_v& rv) {
-      return rv.size();
-    }
-    /**
-     * Return number of columns.
-     *
-     * Return the number of columns in the specified matrix.
-     *
-     * @param m Specified matrix.
-     * @return Number of columns in the matrix.
-     */
-    inline size_t cols(const matrix_v& m) {
-      return m.cols();
-    }
 
     // scalar returns
 
@@ -904,27 +834,6 @@ namespace stan {
       return var(new sum_v_vari(m));
     }
 
-
-    /**
-     * Return the negation of the specified variable.  The result
-     * is the same as multiplying by the scalar <code>-1</code>.
-     * @param[in] v Specified variable.  
-     * @return The negation of the variable.
-     */
-    template <typename T>
-    inline T minus(const T& v) {
-      return -v;
-    }
-    /**
-     * Return the negation of the specified column vector.  The result
-     * is the same as multiplying by the scalar <code>-1</code>.
-     * @param[in] v Specified vector.  
-     * @return The negation of the vector.
-     */
-    template <typename T, int R, int C>
-    inline Eigen::Matrix<T,R,C> minus(const Eigen::Matrix<T, R, C>& v) {
-      return -v;
-    }
 
     /**
      * Return the division of the first scalar by

@@ -9,7 +9,7 @@ namespace stan {
 
     var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m) {
       if (m.rows() != m.cols())
-        throw std::domain_error ("m must be a square matrix");
+        throw std::domain_error ("for determinant() m must be a square matrix");
       return m.determinant();
     }
 
