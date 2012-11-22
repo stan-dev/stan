@@ -743,18 +743,17 @@ as follows.
 %
 The regression coefficients \code{alpha} and \code{beta} are
 unconstrained, but \code{epsilon} must be positive and properly
-requires the half-Cauchy distribution, which would be expressed in
-\Stan using truncation as follows.
+requires the half-Cauchy distribution.  Although Stan supports
+truncated distributions with half distributions being a special case,
+it is not necessary here because the full distribution is proportional
+when the parameters are constant.%
 %
-\begin{quote}
-\begin{Verbatim}
-    sigma ~ cauchy(0,2.5) T[0,];
-\end{Verbatim}
-\end{quote}
-%
-Because the log probability function need not be normalized, the extra
-factor of 2 is not needed in the model, so the simpler un-truncated
-distribution suffices.
+\footnote{Stan does not (yet) support truncated Cauchy distributions.
+  The distributions which may be truncated are listed for discrete
+  distributions in \refchapter{discrete-prob-functions} and for
+  continuous distributions in \refchapter{continuous-prob-functions}.
+  Available truncated distributions may be found in the index by
+  looking for suffix \code{\_cdf}.}
 
 \section{Robust Noise Models}
 
