@@ -110,6 +110,25 @@ namespace stan {
       }
     }
 
+    void generate_type(const std::string& base_type,
+                       const std::vector<expression>& dims,
+                       size_t end,
+                       std::ostream& o) {
+      for (size_t i = 0; i < end; ++i) o << "std::vector<";
+      o << base_type;
+      for (size_t i = 0; i < end; ++i) {
+        if (i > 0) o << ' ';
+        o << '>';
+      } 
+    }
+
+    std::string base_type_to_string(const base_expr_type& bt) {
+      std::stringstream s;
+      s << bt;
+      return s.str();
+    }
+                                    
+
     struct expression_visgen : public visgen {
       expression_visgen(std::ostream& o) : visgen(o) {  }
       void operator()(nil const& x) const { 
@@ -118,13 +137,18 @@ namespace stan {
       void operator()(const int_literal& n) const { o_ << n.val_; }
       void operator()(const double_literal& x) const { o_ << x.val_; }
       void operator()(const array_literal& x) const { 
-        o_ << "stan::math::new_array<double>("
-           << x.args_.size();
+        o_ << "stan::math::new_array<";
+        generate_type("foobar", // not enough to use: base_type_to_string(x.type_.base_type_),
+                      x.args_,
+                      x.args_.size(),
+                      o_);
+        o_ << ">()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
-          o_ << ',';
+          o_ << ".add(";
           generate_expression(x.args_[i],o_);
+          o_ << ")";
         }
-        o_ << ')';
+        o_ << ".array()";
       }
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const { o_ << static_cast<long>(n); }
@@ -248,18 +272,6 @@ namespace stan {
 
     void generate_end_class_decl(std::ostream& o) {
       o << "}; // model" << EOL2;
-    }
-
-    void generate_type(const std::string& base_type,
-                       const std::vector<expression>& dims,
-                       size_t end,
-                       std::ostream& o) {
-      for (size_t i = 0; i < end; ++i) o << "std::vector<";
-      o << base_type;
-      for (size_t i = 0; i < end; ++i) {
-        if (i > 0) o << ' ';
-        o << '>';
-      } 
     }
 
     void generate_initializer(std::ostream& o,

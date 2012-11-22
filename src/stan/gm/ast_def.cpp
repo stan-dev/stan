@@ -279,7 +279,7 @@ namespace stan {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const array_literal& e) const {
-      return expr_type(DOUBLE_T,1);
+      return e.type_;
     }
     expr_type expression_type_vis::operator()(const variable& e) const {
       return e.type_;
@@ -328,6 +328,53 @@ namespace stan {
       : printable_(printable) { }
     printable::printable(const printable& printable)
       : printable_(printable.printable_) { }
+
+    // contains_var::contains_var(const variable_map& var_map) 
+    //   : var_map_(var_map) {
+    // }
+    // bool contains_var::operator()(const nil& e) const {
+    //   return false;
+    // }
+    // bool contains_var::operator()(const int_literal& e) const {
+    //   return false;
+    // }
+    // bool contains_var::operator()(const double_literal& e) const {
+    //   return false;
+    // }
+    // bool contains_var::operator()(const array_literal& e) const {
+    //   for (size_t i = 0; i < e.args_.size(); ++i)
+    //     if (boost::apply_visitor(*this,e.args_[i]);
+    //       return true;
+    //   return false;
+    // }
+    // bool contains_var::operator()(const variable& e) const {
+    //   var_origin vo = variable_map_.get_origin(e.name_);
+    //   return vo == parameter_origin 
+    //     || vo == transformed_paramter_origin
+    //     || vo == local_origin;
+    // }
+    // bool contains_var::operator()(const fun& e) const {
+    //   for (size_t i = 0; i < e.args_.size(); ++i)
+    //     if (boost::apply_visitor(*this,e.args_[i]))
+    //       return true;
+    //   return false;
+    // }
+    // bool contains_var::operator()(const index_op& e) const {
+    //   if (boost::apply_visitor(*this,e.expr_))
+    //     return true;
+    //   for (size_t i = 0; i < e.dimss_.size(); ++i)
+    //     for (size_t j = 0; j < e.dimss_[i].size(); ++j)
+    //       if (boost::apply_visitor(*this,e.dims_[i][j]))
+    //         return true;
+    //   return false;
+    // }
+    // bool contains_var::operator()(const binary_op& e) const {
+    //   return boost::apply_visitor(*this,e.left)
+    //     || apply_visitor(*this,e.right);
+    // }
+    // bool contains_var::operator()(const unary_op& e) const {
+    //   return boost::apply_visitor(*this,e.subject);
+    // }
 
     bool is_nil_op::operator()(const nil& x) const { return true; }
     bool is_nil_op::operator()(const int_literal& x) const { return false; }
@@ -386,16 +433,18 @@ namespace stan {
       return *this;
     }
 
+
     array_literal::array_literal() 
       : args_(),
         type_(DOUBLE_T,1U) {
     }
     array_literal::array_literal(const std::vector<expression>& args) 
       : args_(args),
-        type_(DOUBLE_T,1U) {
+        type_() { // ill-formed w/o help
     }
     array_literal& array_literal::operator=(const array_literal& al) {
       args_ = al.args_;
+      type_ = al.type_;
       return *this;
     }
 

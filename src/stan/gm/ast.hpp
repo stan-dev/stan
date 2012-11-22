@@ -169,6 +169,9 @@ namespace stan {
       // template <typename T> expr_type operator()(const T& e) const;
     };
 
+    
+
+
     struct expression;
 
     struct expression {
@@ -207,6 +210,20 @@ namespace stan {
 
       expression_t expr_;
     };
+
+    // struct contains_var : public boost::static_visitor<bool> {
+    //   const variable_map& var_map_;
+    //   contains_var(const variable_map& var_map);
+    //   bool operator()(const nil& e) const;
+    //   bool operator()(const int_literal& e) const;
+    //   bool operator()(const double_literal& e) const;
+    //   bool operator()(const array_literal& e) const;
+    //   bool operator()(const variable& e) const;
+    //   bool operator()(const fun& e) const;
+    //   bool operator()(const index_op& e) const;
+    //   bool operator()(const binary_op& e) const;
+    //   bool operator()(const unary_op& e) const;
+    // };
 
     struct printable {
       typedef boost::variant<boost::recursive_wrapper<std::string>,
@@ -352,41 +369,9 @@ namespace stan {
     const int derived_origin = 5;
     const int local_origin = 6;
 
-    // enum var_origin {
-    //    data_origin,
-    //    transformed_data_origin,
-    //    parameter_origin,
-    //    transformed_parameter_origin,
-    //    derived_origin,
-    //    local_origin
-    //  };
-
-    // std::ostream& operator<<(std::ostream& o, const var_origin& vo) {
-    //   if (vo == data_origin)
-    //     o << "data";
-    //   else if (vo == transformed_data_origin)
-    //     o << "transformed data";
-    //   else if (vo == parameter_origin) 
-    //     o << "parameter";
-    //   else if (vo == transformed_parameter_origin)
-    //     o << "transformed parameter";
-    //   else if (vo == derived_origin)
-    //     o << "derived";
-    //   else if (vo == local_origin)
-    //     o << "local";
-    //   else 
-    //     o << "UNKNOWN ORIGIN";
-    //   return o;
-    // }  
-    
-
 
 
     void print_var_origin(std::ostream& o, const var_origin& vo);
-
-    // FIXME: replace < with print_var_ori
-    // std::ostream& operator<<(std::ostream& o, const var_origin& vo);
-
 
     struct base_var_decl {
       std::string name_;
