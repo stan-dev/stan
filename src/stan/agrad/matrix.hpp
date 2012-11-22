@@ -1161,68 +1161,6 @@ namespace stan {
       return tcrossprod(M.transpose());
     }
 
-    /**
-     * Return the specified row minus 1 of the specified matrix.  That is,
-     * indexing is from 1, not 0, so this function returns the same
-     * value as the Eigen matrix call <code>m.row(i - 1)</code>.
-     * @param[in] m Matrix.
-     * @param[in] i Row index (plus 1).
-     * @return Specified row of the matrix; between 1 and the number
-     * of rows of <code>m</code> inclusive.
-     * @throws std::domain_error If the index is 0 or
-     * greater than the number of columns.
-     */
-    row_vector_v row(const matrix_v& m, size_t i);
-
-    /**
-     * Return the specified column minus 1 of the specified matrix.  Thus
-     * indexing is from 1, not 0, and this method returns the equivalent of
-     * the Eigen matrix call <code>m.col(j - 1)</code>.
-     * @param[in] m Matrix.
-     * @param[in] j Column index (plus 1); between 1 and the number of
-     * columns of <code>m</code> inclusive.
-     * @return Specified column of the matrix.
-     * @throws std::domain_error if the index is 0 or greater than
-     * the number of columns.
-     */
-    vector_v col(const matrix_v& m, size_t j);
-
-    /**
-     * Return a column vector of the diagonal elements of the
-     * specified matrix.  The matrix is not required to be square.
-     * @param[in] m Specified matrix.  
-     * @return Diagonal of the matrix.
-     */
-    vector_v diagonal(const matrix_v& m);
-
-    /**
-     * Return a square diagonal matrix with the specified vector of
-     * coefficients as the diagonal values.
-     * @param[in] v Specified vector.
-     * @return Diagonal matrix with vector as diagonal values.
-     */
-    matrix_v diag_matrix(const vector_v& v);
-
-    /**
-     * Return the transposition of the specified column
-     * vector.
-     * @param[in] v Specified vector.
-     * @return Transpose of the vector.
-     */
-    row_vector_v transpose(const vector_v& v);
-    /**
-     * Return the transposition of the specified row
-     * vector.
-     * @param[in] rv Specified vector.
-     * @return Transpose of the vector.
-     */
-    vector_v transpose(const row_vector_v& rv);
-    /**
-     * Return the transposition of the specified matrix.
-     * @param[in] m Specified matrix.
-     * @return Transpose of the matrix.
-     */
-    matrix_v transpose(const matrix_v& m);
 
     /**
      * Returns the inverse of the specified matrix.

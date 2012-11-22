@@ -2063,6 +2063,7 @@ TEST(AgradMatrix,transpose_matrix) {
 TEST(AgradMatrix,transpose_vector) {
   using stan::agrad::vector_v;
   using stan::agrad::row_vector_v;
+  using stan::math::transpose;
 
   vector_v a(3);
   a << 1.0, 2.0, 3.0;
@@ -2082,6 +2083,7 @@ TEST(AgradMatrix,transpose_vector) {
 TEST(AgradMatrix,transpose_row_vector) {
   using stan::agrad::vector_v;
   using stan::agrad::row_vector_v;
+  using stan::math::transpose;
 
   row_vector_v a(3);
   a << 1.0, 2.0, 3.0;
@@ -2365,6 +2367,7 @@ TEST(AgradMatrix,eigenval_sum) {
 
 TEST(AgradMatrix,mat_cholesky) {
   using stan::agrad::matrix_v;
+  using stan::math::transpose;
 
   // symmetric
   matrix_v X(2,2);
@@ -2947,7 +2950,7 @@ TEST(AgradMatrix,elt_divide_mat_dv) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 TEST(AgradMatrix,col_v) {
-  using stan::agrad::col;
+  using stan::math::col;
   using stan::agrad::matrix_v;
   using stan::agrad::vector_v;
 
@@ -2964,7 +2967,7 @@ TEST(AgradMatrix,col_v) {
   EXPECT_EQ(5.0,w[1].val());
 }
 TEST(AgradMatrix,col_v_exc0) {
-  using stan::agrad::col;
+  using stan::math::col;
   using stan::agrad::matrix_v;
 
   matrix_v y(2,3);
@@ -2973,7 +2976,7 @@ TEST(AgradMatrix,col_v_exc0) {
   EXPECT_THROW(col(y,7),std::domain_error);
 }
 TEST(AgradMatrix,col_v_excHigh) {
-  using stan::agrad::col;
+  using stan::math::col;
   using stan::agrad::matrix_v;
 
   matrix_v y(2,3);
@@ -2982,7 +2985,7 @@ TEST(AgradMatrix,col_v_excHigh) {
   EXPECT_THROW(col(y,5),std::domain_error);
 }
 TEST(AgradMatrix,row_v) {
-  using stan::agrad::row;
+  using stan::math::row;
   using stan::agrad::matrix_v;
   using stan::agrad::vector_v;
 
@@ -3001,7 +3004,7 @@ TEST(AgradMatrix,row_v) {
   EXPECT_EQ(6.0,w[2].val());
 }
 TEST(AgradMatrix,row_v_exc0) {
-  using stan::agrad::row;
+  using stan::math::row;
   using stan::agrad::matrix_v;
 
   matrix_v y(2,3);
@@ -3010,7 +3013,7 @@ TEST(AgradMatrix,row_v_exc0) {
   EXPECT_THROW(row(y,7),std::domain_error);
 }
 TEST(AgradMatrix,row_v_excHigh) {
-  using stan::agrad::row;
+  using stan::math::row;
   using stan::agrad::matrix_v;
 
   matrix_v y(2,3);

@@ -8,35 +8,7 @@ namespace stan {
 
   namespace math {
 
-    row_vector_d row(const matrix_d& m, size_t i) {
-      validate_row_index(m,i,"row");
-      return m.row(i - 1);
-    }
 
-    vector_d col(const matrix_d& m, size_t j) {
-      validate_column_index(m,j,"col");
-      return m.col(j - 1);
-    }
-
-    vector_d diagonal(const matrix_d& m) {
-      return m.diagonal();
-    }
-
-    matrix_d diag_matrix(const vector_d& v) {
-      return v.asDiagonal();
-    }
-
-    row_vector_d transpose(const vector_d& v) {
-      return v.transpose();
-    }
-
-    vector_d transpose(const row_vector_d& rv) {
-      return rv.transpose();
-    }
-
-    matrix_d transpose(const matrix_d& m) {
-      return m.transpose();
-    }
 
     matrix_d inverse(const matrix_d& m) {
       validate_square(m,"matirx inverse");

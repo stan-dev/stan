@@ -7,35 +7,7 @@ namespace stan {
 
   namespace agrad {
 
-    row_vector_v row(const matrix_v& m, size_t i) {
-      stan::math::validate_row_index(m,i,"row");
-      return m.row(i - 1);
-    }
 
-    vector_v col(const matrix_v& m, size_t j) {
-      stan::math::validate_column_index(m,j,"col");
-      return m.col(j - 1);
-    }
-
-    vector_v diagonal(const matrix_v& m) {
-      return m.diagonal();
-    }
-
-    matrix_v diag_matrix(const vector_v& v) {
-      return v.asDiagonal();
-    }
-    
-    row_vector_v transpose(const vector_v& v) {
-      return v.transpose();
-    }
-
-    vector_v transpose(const row_vector_v& rv) {
-      return rv.transpose();
-    }
-
-    matrix_v transpose(const matrix_v& m) {
-      return m.transpose();
-    }
 
     matrix_v inverse(const matrix_v& m) {
       stan::math::validate_square(m,"inverse");

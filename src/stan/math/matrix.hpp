@@ -1439,11 +1439,13 @@ namespace stan {
     tcrossprod(const matrix_d& M) {
         if (M.rows() == 0)
           return matrix_d(0,0);
-        if (M.rows() == 1) {
+        if (M.rows() == 1)
           return M * M.transpose();
-        }
         matrix_d result(M.rows(),M.rows());
-        return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+        return result
+          .setZero()
+          .selfadjointView<Eigen::Upper>()
+          .rankUpdate(M);
     }
 
     /**
@@ -1464,11 +1466,19 @@ namespace stan {
      * This is equivalent to calling <code>m.row(i - 1)</code> and
      * assigning the resulting template expression to a row vector.
      * 
+     * @tparam T Scalar value type for matrix.
      * @param m Matrix.
-     * @param i Row index.
+     * @param i Row index (count from 1).
      * @return Specified row of the matrix.
      */
-    row_vector_d row(const matrix_d& m, size_t i);
+    template <typename T>
+    inline
+    Eigen::Matrix<T,1,Eigen::Dynamic>
+    row(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m, 
+        size_t i) {
+      validate_row_index(m,i,"row");
+      return m.row(i - 1);
+    }
 
     /**
      * Return the specified column of the specified matrix
@@ -1478,10 +1488,17 @@ namespace stan {
      * assigning the resulting template expression to a column vector.
      * 
      * @param m Matrix.
-     * @param j Column index.
+     * @param j Column index (count from 1).
      * @return Specified column of the matrix.
      */
-    vector_d col(const matrix_d& m, size_t j);
+    template <typename T>
+    inline
+    Eigen::Matrix<T,1,Eigen::Dynamic>
+    col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
+        size_t j) {
+      validate_column_index(m,j,"col");
+      return m.col(j - 1);
+    }
 
     /**
      * Return a column vector of the diagonal elements of the
@@ -1489,36 +1506,32 @@ namespace stan {
      * @param m Specified matrix.  
      * @return Diagonal of the matrix.
      */
-    vector_d diagonal(const matrix_d& m);
+    template <typename T>
+    inline
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    diagonal(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      return m.diagonal();
+    }
 
     /**
      * Return a square diagonal matrix with the specified vector of
      * coefficients as the diagonal values.
-     * @param v Specified vector.
+     * @param[in] v Specified vector.
      * @return Diagonal matrix with vector as diagonal values.
      */
-    matrix_d diag_matrix(const vector_d& v);
+    template <typename T>
+    inline
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    diag_matrix(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+      return v.asDiagonal();
+    }
 
-    /**
-     * Return the transposition of the specified column
-     * vector.
-     * @param v Specified vector.
-     * @return Transpose of the vector.
-     */
-    row_vector_d transpose(const vector_d& v);
-    /**
-     * Return the transposition of the specified row
-     * vector.
-     * @param rv Specified vector.
-     * @return Transpose of the vector.
-     */
-    vector_d transpose(const row_vector_d& rv);
-    /**
-     * Return the transposition of the specified matrix.
-     * @param m Specified matrix.
-     * @return Transpose of the matrix.
-     */
-    matrix_d transpose(const matrix_d& m);
+    template <typename T, int R, int C>
+    Eigen::Matrix<T,C,R>
+    inline
+    transpose(const Eigen::Matrix<T,R,C>& m) {
+      return m.transpose();
+    }
 
     /**
      * Returns the inverse of the specified matrix.
