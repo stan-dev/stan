@@ -740,16 +740,22 @@ namespace stan {
 
     
 
-
     // scalar returns
 
     /**
      * Returns the determinant of the specified square matrix.
+     *
      * @param m Specified matrix.
      * @return Determinant of the matrix.
      * @throw std::domain_error if matrix is not square.
      */
-    double determinant(const matrix_d& m);
+    template <typename T>
+    inline
+    T
+    determinant(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      stan::math::validate_square(m,"determinant");
+      return m.determinant();
+    }
 
 
     /**
@@ -1431,9 +1437,9 @@ namespace stan {
      */
     inline matrix_d
     tcrossprod(const matrix_d& M) {
-        if(M.rows() == 0)
+        if (M.rows() == 0)
           return matrix_d(0,0);
-        if(M.rows() == 1) {
+        if (M.rows() == 1) {
           return M * M.transpose();
         }
         matrix_d result(M.rows(),M.rows());

@@ -215,24 +215,24 @@ TEST(AgradMatrix,cols_matrix) {
 // determinant tests
 TEST(AgradMatrix,determinant) {
   using stan::agrad::matrix_v;
+  using stan::math::determinant;
 
   matrix_v v(2,2);
   v << 0, 1, 2, 3;
 
   AVAR det;
-  det = stan::agrad::determinant(v);
+  det = determinant(v);
   EXPECT_FLOAT_EQ(-2, det.val());
 }
 TEST(AgradMatrix,deteriminant_exception) {
   using stan::agrad::matrix_v;
+  using stan::math::determinant;
 
-  matrix_v v(2,3);
-
-  AVAR det;
-  EXPECT_THROW(det = stan::agrad::determinant(v), std::domain_error);
+  EXPECT_THROW(determinant(matrix_v(2,3)), std::domain_error);
 }
 TEST(AgradMatrix,determinant_grad) {
   using stan::agrad::matrix_v;
+  using stan::math::determinant;
   
   matrix_v X(2,2);
   AVAR a = 2.0;
@@ -243,7 +243,7 @@ TEST(AgradMatrix,determinant_grad) {
 
   AVEC x = createAVEC(a,b,c,d);
 
-  AVAR f = X.determinant();
+  AVAR f = determinant(X);
 
   // det = ad - bc
   EXPECT_FLOAT_EQ(-1.0,f.val());
@@ -258,12 +258,13 @@ TEST(AgradMatrix,determinant_grad) {
 TEST(AgradMatrix,determinant3by3) {
   // just test it can handle it
   using stan::agrad::matrix_v;
+  using stan::math::determinant;
 
   matrix_v Z(9,9);
   for (int i = 0; i < 9; ++i)
     for (int j = 0; j < 9; ++j)
       Z(i,j) = i * j + 1;
-  AVAR h = Z.determinant();
+  AVAR h = determinant(Z);
   h = h; // supresses set but not used warning
 }
 
@@ -3729,10 +3730,10 @@ void test_tcrossprod(const stan::agrad::matrix_v& L) {
   using stan::agrad::tcrossprod;
   matrix_v LLT_eigen = L * L.transpose();
   matrix_v LLT_stan = tcrossprod(L);
-  EXPECT_EQ(L.rows(),LLT_stan.rows());
-  EXPECT_EQ(L.cols(),LLT_stan.cols());
-  for (int m = 0; m < L.rows(); ++m)
-    for (int n = 0; n < L.cols(); ++n)
+  EXPECT_EQ(LLT_eigen.rows(),LLT_stan.rows());
+  EXPECT_EQ(LLT_eigen.rows(),LLT_stan.cols());
+  for (int m = 0; m < LLT_eigen.rows(); ++m)
+    for (int n = 0; n < LLT_eigen.cols(); ++n)
       EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());
 }
 TEST(AgradMatrix, tcrossprod) {
@@ -3756,6 +3757,25 @@ TEST(AgradMatrix, tcrossprod) {
   matrix_v K(0,0);
   test_tcrossprod(K);
 
+  matrix_v M(3,3);
+  M << 1, 2, 3,
+    1, 4, 9,
+    1, 8, 27;
+  test_tcrossprod(M);
+
+  matrix_v N(1,3);
+  N << 1, 2, 3;
+  test_tcrossprod(N);
+
+  matrix_v P(2,3);
+  P << 1, 2, 3,
+    -1, 4, -9;
+  test_tcrossprod(P);
+
+  matrix_v Q(3,2);
+  Q << 1, 2, 3,
+    -1, 4, -9;
+  test_tcrossprod(Q);
 }
 TEST(AgradMatrix, tcrossprodGrad1) {
   using stan::agrad::tcrossprod;

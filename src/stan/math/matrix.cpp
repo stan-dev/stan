@@ -8,11 +8,6 @@ namespace stan {
 
   namespace math {
 
-    double determinant(const matrix_d &m) {
-      validate_square(m,"determinant");
-      return m.determinant();
-    }
-
     row_vector_d row(const matrix_d& m, size_t i) {
       validate_row_index(m,i,"row");
       return m.row(i - 1);

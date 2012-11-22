@@ -7,12 +7,6 @@ namespace stan {
 
   namespace agrad {
 
-    var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m) {
-      if (m.rows() != m.cols())
-        throw std::domain_error ("for determinant() m must be a square matrix");
-      return m.determinant();
-    }
-
     row_vector_v row(const matrix_v& m, size_t i) {
       stan::math::validate_row_index(m,i,"row");
       return m.row(i - 1);

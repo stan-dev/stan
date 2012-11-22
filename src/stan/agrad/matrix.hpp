@@ -388,17 +388,17 @@ namespace stan {
 
     // scalar returns
 
-    /**
-     * Determinant of the matrix.
-     *
-     * Returns the determinant of the specified
-     * square matrix.
-     *
-     * @param m Specified matrix.
-     * @return Determinant of the matrix.
-     * @throw std::domain_error if m is not a square matrix
-     */
-    var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
+    // /**
+    //  * Determinant of the matrix.
+    //  *
+    //  * Returns the determinant of the specified
+    //  * square matrix.
+    //  *
+    //  * @param m Specified matrix.
+    //  * @return Determinant of the matrix.
+    //  * @throw std::domain_error if m is not a square matrix
+    //  */
+    // var determinant(const Eigen::Matrix<var, Eigen::Dynamic, Eigen::Dynamic>& m);
     
     namespace {
       class dot_self_vari : public vari {
@@ -1120,13 +1120,34 @@ namespace stan {
      */
     inline matrix_v
     tcrossprod(const matrix_v& M) {
-      if(M.rows() == 0)
+      if (M.rows() == 0)
         return matrix_v(0,0);
-      if(M.rows() == 1) {
-        return M * M.transpose(); // FIXME: replace with dot_self
+      if (M.rows() == 1)
+        return M * M.transpose();
+
+      // WAS JUST THIS
+      // matrix_v result(M.rows(),M.rows());
+      // return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+
+      matrix_v MMt(M.rows(),M.rows());
+
+      vari** vs 
+        = (vari**)memalloc_.alloc((M.rows() * M.cols() ) * sizeof(vari*));
+      int pos = 0;
+      for (int m = 0; m < M.rows(); ++m)
+        for (int n = 0; n < M.cols(); ++n)
+          vs[pos++] = M(m,n).vi_;
+      for (int m = 0; m < M.rows(); ++m)
+        MMt(m,m) = var(new dot_self_vari(vs + m * M.cols(),M.cols()));
+      for (int m = 0; m < M.rows(); ++m) {
+        for (int n = 0; n < m; ++n) {
+          MMt(m,n) = var(new dot_product_vv_vari(vs + m * M.cols(),
+                                                 vs + n * M.cols(),
+                                                 M.cols()));
+          MMt(n,m) = MMt(m,n);
+        }
       }
-      matrix_v result(M.rows(),M.rows());
-      return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+      return MMt;
     }
 
     /**
