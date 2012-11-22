@@ -48,7 +48,7 @@ namespace stan {
       stan::math::softmax<vector_v,stan::agrad::var>(x,theta);
       return theta;
     }
-/*
+
     vector_v eigenvalues(const matrix_v& m) {
       stan::math::validate_square(m,"eigenvalues");
       // false == no vectors
@@ -71,7 +71,7 @@ namespace stan {
       eigenvalues = solver.eigenvalues().real();
       eigenvectors = solver.eigenvectors().real();
     }
-*/
+
     vector_v eigenvalues_sym(const matrix_v& m) {
       stan::math::validate_nonzero_size(m,"eigenvalues_sym");
       stan::math::validate_square(m,"eigenvalues_sym");
