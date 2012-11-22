@@ -1287,31 +1287,37 @@ namespace stan {
      */
     matrix_d minus(const matrix_d& m);
 
-    /**
-     * Return the division of the specified column vector by
-     * the specified scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
-     * @return Vector divided by the scalar.
-     */
-    vector_d divide(const vector_d& v, double c);
-    /**
-     * Return the division of the specified row vector by
-     * the specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Vector divided by the scalar.
-     */
-    row_vector_d divide(const row_vector_d& rv, double c);
-    /**
-     * Return the division of the specified matrix by the specified
-     * scalar.
-     * @param m Specified matrix.
-     * @param c Specified scalar.
-     * @return Matrix divided by the scalar.
-     */
-    matrix_d divide(const matrix_d& m, double c);
 
+
+
+    /**
+     * Return specified matrix divided by specified scalar.
+     * @tparam R Row type for matrix.
+     * @tparam C Column type for matrix.
+     * @param m Matrix.
+     * @param c Scalar.
+     * @return Matrix divided by scalar.
+     */
+    template <int R, int C>
+    inline
+    Eigen::Matrix<double,R,C>
+    divide(const Eigen::Matrix<double,R,C>& m,
+           double c) {
+      return m / c;
+    }
+
+    /**
+     * Return the elementwise multiplication of the specified
+     * matrices.  
+     *
+     * @tparam T1 Type of scalars in first matrix.
+     * @tparam T2 Type of scalars in second matrix.
+     * @tparam R Row type of both matrices.
+     * @tparam C Column type of both matrices.
+     * @param m1 First matrix
+     * @param m2 Second matrix
+     * @return Elementwise product of matrices.
+     */
     template <typename T1, typename T2, int R, int C>
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
     elt_multiply(const Eigen::Matrix<T1,R,C>& m1,
@@ -1324,77 +1330,64 @@ namespace stan {
       return result;
     }
 
+
+    /**
+     * Return the elementwise division of the specified matrices
+     * matrices.  
+     *
+     * @tparam T1 Type of scalars in first matrix.
+     * @tparam T2 Type of scalars in second matrix.
+     * @tparam R Row type of both matrices.
+     * @tparam C Column type of both matrices.
+     * @param m1 First matrix
+     * @param m2 Second matrix
+     * @return Elementwise division of matrices.
+     */
+    template <typename T1, typename T2, int R, int C>
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+    elt_divide(const Eigen::Matrix<T1,R,C>& m1,
+               const Eigen::Matrix<T2,R,C>& m2) {
+      stan::math::validate_matching_dims(m1,m2,"elt_multiply");
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R, C>
+        result(m1.rows(),m2.cols());
+      for (int i = 0; i < m1.size(); ++i)
+        result(i) = m1(i) / m2(i);
+      return result;
+    }
         
 
-    // /**
-    //  * Return the element-wise product of the specified vectors.
-    //  * @param v1 First vector.
-    //  * @param v2 Second vector.
-    //  * @return Elementwise product of the vectors.
-    //  */
-    // vector_d elt_multiply(const vector_d& v1, const vector_d& v2);
-    // /**
-    //  * Return the element-wise product of the specified row vectors.
-    //  * @param v1 First row vector.
-    //  * @param v2 Second row vector.
-    //  * @return Elementwise product of the vectors.
-    //  */
-    // row_vector_d elt_multiply(const row_vector_d& v1, const row_vector_d& v2);
-    // /**
-    //  * Return the element-wise product of the specified matrices.
-    //  * @param m1 First matrix.
-    //  * @param m2 Second matrix.
-    //  * @return Elementwise product of the matrices.
-    //  */
-    // matrix_d elt_multiply(const matrix_d& m1, const matrix_d& m2);
-
-
     /**
-     * Return the element-wise divsion of the specified vectors.
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Elementwise division of the vectors.
-     */
-    vector_d elt_divide(const vector_d& v1, const vector_d& v2);
-    /**
-     * Return the element-wise division of the specified row vectors.
-     * @param v1 First row vector.
-     * @param v2 Second row vector.
-     * @return Elementwise division of the vectors.
-     */
-    row_vector_d elt_divide(const row_vector_d& v1, const row_vector_d& v2);
-    /**
-     * Return the element-wise division of the specified matrices.
-     * @param m1 First matrix.
-     * @param m2 Second matrix.
-     * @return Elementwise division of the matrices.
-     */
-    matrix_d elt_divide(const matrix_d& m1, const matrix_d& m2);
-
-    /**
-     * Return the product of the of the specified column
-     * vector and specified scalar.
-     * @param v Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    vector_d multiply(const vector_d& v, double c);
-    /**
-     * Return the product of the of the specified row
-     * vector and specified scalar.
-     * @param rv Specified vector.
-     * @param c Specified scalar.
-     * @return Product of vector and scalar.
-     */
-    row_vector_d multiply(const row_vector_d& rv, double c);
-    /**
-     * Return the product of the of the specified matrix
-     * and specified scalar.
+     * Return specified matrix multiplied by specified scalar.
+     * @tparam R Row type for matrix.
+     * @tparam C Column type for matrix.
      * @param m Matrix.
      * @param c Scalar.
      * @return Product of matrix and scalar.
      */
-    matrix_d multiply(const matrix_d& m, double c);
+    template <int R, int C>
+    inline
+    Eigen::Matrix<double,R,C>
+    multiply(const Eigen::Matrix<double,R,C>& m,
+             double c) {
+      return c * m;
+    }
+    /**
+     * Return specified scalar multiplied by specified matrix.
+     * @tparam R Row type for matrix.
+     * @tparam C Column type for matrix.
+     * @param c Scalar.
+     * @param m Matrix.
+     * @return Product of scalar and matrix.
+     */
+    template <int R, int C>
+    inline
+    Eigen::Matrix<double,R,C>
+    multiply(double c,
+             const Eigen::Matrix<double,R,C>& m) {
+      return c * m;
+    }
+
+
     /**
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
@@ -1410,7 +1403,7 @@ namespace stan {
                                                 const Eigen::Matrix<double,R2,C2>& m2) {
       
       if (m1.cols() != m2.rows())
-        throw std::domain_error("m1.cols() != m2.rows()");
+        throw std::domain_error("for multiplications, rows and columns must match; found m1.cols() != m2.rows()");
       return m1*m2;
     }
     /**
@@ -1430,27 +1423,6 @@ namespace stan {
         throw std::domain_error("rv.size() != v.size()");
       return rv.dot(v);
     }
-    /**
-     * Return the product of the specified scalar and vector.
-     * @param c Scalar.
-     * @param v Vector.
-     * @return Product of scalar and vector.
-     */
-    vector_d multiply(double c, const vector_d& v);
-    /**
-     * Return the product of the specified scalar and row vector.
-     * @param c Scalar.
-     * @param rv Row vector.
-     * @return Product of scalar and row vector.
-     */
-    row_vector_d multiply(double c, const row_vector_d& rv);
-    /**
-     * Return the product of the specified scalar and matrix.
-     * @param c Scalar.
-     * @param m Matrix
-     * @return Product of scalar and matrix.
-     */
-    matrix_d multiply(double c, const matrix_d& m);
 
     /**
      * Returns the result of multiplying the lower triangular
@@ -1847,7 +1819,7 @@ namespace stan {
       if (rv.size() == 0)
         return result;
       result(0) = rv(0);
-      for (size_t i = 1; i < result.size(); ++i)
+      for (int i = 1; i < result.size(); ++i)
         result(i) = rv(i) + result(i-1);
       return result;
     }
@@ -1859,7 +1831,7 @@ namespace stan {
       if (v.size() == 0)
         return result;
       result(0) = v(0);
-      for (size_t i = 1; i < result.size(); ++i)
+      for (int i = 1; i < result.size(); ++i)
         result(i) = v(i) + result(i-1);
       return result;
     }

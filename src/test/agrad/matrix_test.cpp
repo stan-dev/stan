@@ -2764,7 +2764,7 @@ TEST(AgradMatrix,elt_multiply_matrix_dv) {
 }
 
 TEST(AgradMatrix,elt_divide_vec_vv) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::agrad::vector_v;
 
   vector_v x(2);
@@ -2820,7 +2820,7 @@ TEST(AgradMatrix,elt_divide_vec_dv) {
 }
 
 TEST(AgradMatrix,elt_divide_rowvec_vv) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::agrad::row_vector_v;
 
   row_vector_v x(2);
@@ -2839,7 +2839,7 @@ TEST(AgradMatrix,elt_divide_rowvec_vv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 TEST(AgradMatrix,elt_divide_rowvec_vd) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_v;
 
@@ -2857,7 +2857,7 @@ TEST(AgradMatrix,elt_divide_rowvec_vd) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 TEST(AgradMatrix,elt_divide_rowvec_dv) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_v;
 
@@ -2877,7 +2877,7 @@ TEST(AgradMatrix,elt_divide_rowvec_dv) {
 
 
 TEST(AgradMatrix,elt_divide_mat_vv) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::agrad::matrix_v;
 
   matrix_v x(2,3);
@@ -2897,7 +2897,7 @@ TEST(AgradMatrix,elt_divide_mat_vv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 TEST(AgradMatrix,elt_divide_mat_vd) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
   
@@ -2916,7 +2916,7 @@ TEST(AgradMatrix,elt_divide_mat_vd) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 TEST(AgradMatrix,elt_divide_mat_dv) {
-  using stan::agrad::elt_divide;
+  using stan::math::elt_divide;
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
 
