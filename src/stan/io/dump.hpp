@@ -545,17 +545,6 @@ namespace stan {
         return true;
       }
 
-      void print_next_char() {
-        char c;
-        bool ok = in_.get(c);
-        if (ok) {
-          std::cout << "next char=" << c << std::endl;
-          in_.putback(c);
-        } else {
-          std::cout << "next char=<EOS>" << std::endl;
-        }
-      }
-
       bool scan_seq_value() {
         if (!scan_char('(')) return false;
         if (scan_char(')')) {

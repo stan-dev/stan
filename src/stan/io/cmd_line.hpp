@@ -179,7 +179,8 @@ namespace stan {
        *
        * @param[in] key Key whose value is returned.
        * @param[out] x Reference to value.
-       * @return Value for key, or empty string if it's not defined.
+       * @return False if the key is not found, and true if
+       * it is found.
        * @tparam Type of value.
        */
       template <typename T>
@@ -187,7 +188,8 @@ namespace stan {
         if (!has_key(key))
           return false;
         std::stringstream s(key_val_.find(key)->second);
-        return s >> x;
+        s >> x;
+        return true;
       }
 
       /**
