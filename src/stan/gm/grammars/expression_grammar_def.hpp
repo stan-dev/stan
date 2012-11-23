@@ -518,7 +518,7 @@ namespace stan {
 
       array_literal_r.name("array literal");
       array_literal_r
-        %= lit("a[")
+        %= lit("a__[")
         > *expression_r
         > lit("]")
         ;
