@@ -3517,13 +3517,16 @@ TEST(AgradMatrix,diagMatrix) {
 
 void test_mult_LLT(const stan::agrad::matrix_v& L) {
   using stan::agrad::matrix_v;
-  
-  matrix_v LLT_eigen = L * L.transpose();
+  matrix_v Lp = L; 
+  for (int m = 0; m < L.rows(); ++m)
+    for (int n = (m+1); n < L.cols(); ++n)
+      Lp(m,n) = 0;
+  matrix_v LLT_eigen = Lp * Lp.transpose();
   matrix_v LLT_stan = multiply_lower_tri_self_transpose(L);
   EXPECT_EQ(L.rows(),LLT_stan.rows());
-  EXPECT_EQ(L.cols(),LLT_stan.cols());
+  EXPECT_EQ(L.rows(),LLT_stan.cols());
   for (int m = 0; m < L.rows(); ++m)
-    for (int n = 0; n < L.cols(); ++n)
+    for (int n = 0; n < L.rows(); ++n)
       EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());  
 }
 
@@ -3713,10 +3716,29 @@ TEST(AgradMatrix, multiplyLowerTriSelfTranspose) {
   using stan::agrad::multiply_lower_tri_self_transpose;
   using stan::agrad::matrix_v;
   
-  matrix_v L(3,3);
+  matrix_v L;
+
+  L = matrix_v(3,3);
   L << 1, 0, 0,   
     2, 3, 0,   
     4, 5, 6;
+  test_mult_LLT(L);
+
+  L = matrix_v(3,3);
+  L << 1, 0, 100000,   
+    2, 3, 0,   
+    4, 5, 6;
+  test_mult_LLT(L);
+
+  L = matrix_v(2,3);
+  L << 1, 0, 0,   
+    2, 3, 0;   
+  test_mult_LLT(L);
+
+  L = matrix_v(3,2);
+  L << 1, 0,   
+    2, 3,   
+    4, 5;
   test_mult_LLT(L);
 
   matrix_v I(2,2);

@@ -1464,7 +1464,7 @@ namespace stan {
      */
     inline matrix_d
     multiply_lower_tri_self_transpose(const matrix_d& L) {
-      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
+//      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
       if (L.rows() == 0)
         return matrix_d(0,0);
       if (L.rows() == 1) {

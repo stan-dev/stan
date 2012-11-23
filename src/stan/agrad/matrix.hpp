@@ -1088,26 +1088,31 @@ namespace stan {
 
     inline matrix_v 
     multiply_lower_tri_self_transpose(const matrix_v& L) {
-      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
+//      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
       int K = L.rows();
+      int J = L.cols();
       matrix_v LLt(K,K);
       if (K == 0) return LLt;
       // if (K == 1) {
       //   LLt(0,0) = L(0,0) * L(0,0);
       //   return LLt;
       // }
-      int Knz = (K * (K + 1)) / 2;  // nonzero: (K choose 2) below
-                                    // diag + K on diag
+      int Knz;
+      if (K >= J)
+        Knz = (K-J)*J + (J * (J + 1)) / 2;
+      else // if (K < J)
+        Knz = (K * (K + 1)) / 2;
       vari** vs = (vari**)memalloc_.alloc( Knz * sizeof(vari*) );
       int pos = 0;
       for (int m = 0; m < K; ++m)
-        for (int n = 0; n <= m; ++n)
+        for (int n = 0; n < ((J < (m+1))?J:(m+1)); ++n) {
           vs[pos++] = L(m,n).vi_;
-      for (int m = 0, mpos=0; m < K; ++m, mpos += m) {
-        // FIXME: replace with dot_self
-        LLt(m,m) = var(new dot_self_vari(vs + mpos, m + 1));
-        for (int n = 0, npos = 0; n < m; ++n, npos += n)
-          LLt(m,n) = LLt(n,m) = var(new dot_product_vv_vari(vs + mpos, vs + npos, n + 1));
+        }
+      for (int m = 0, mpos=0; m < K; ++m, mpos += (J < m)?J:m) {
+        LLt(m,m) = var(new dot_self_vari(vs + mpos, (J < (m+1))?J:(m+1)));
+        for (int n = 0, npos = 0; n < m; ++n, npos += (J < n)?J:n) {
+          LLt(m,n) = LLt(n,m) = var(new dot_product_vv_vari(vs + mpos, vs + npos, (J < (n+1))?J:(n+1)));
+        }
       }
       return LLt;
     }

@@ -1482,7 +1482,12 @@ TEST(MathMatrix, minus) {
 void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
   using stan::math::multiply_lower_tri_self_transpose;
   matrix_d y = multiply_lower_tri_self_transpose(x);
-  matrix_d xxt = x * x.transpose();
+  matrix_d xp = x;
+  for (int m = 0; m < xp.rows(); ++m)
+    for (int n = m+1; n < xp.cols(); ++n)
+      xp(m,n) = 0;
+
+  matrix_d xxt = xp * xp.transpose();
   EXPECT_EQ(y.rows(),xxt.rows());
   EXPECT_EQ(y.cols(),xxt.cols());
   for (int m = 0; m < y.rows(); ++m)
@@ -1508,6 +1513,26 @@ TEST(MathMatrix,MultiplyLowerTriSelfTranspose) {
     1.0, 0.0, 0.0,
     2.0, 3.0, 0.0,
     4.0, 5.0, 6.0;
+  test_multiply_lower_tri_self_transpose(x);
+
+  x = matrix_d(3,3);
+  x << 
+    1.0, 0.0, 100000.0,
+    2.0, 3.0, 0.0,
+    4.0, 5.0, 6.0;
+  test_multiply_lower_tri_self_transpose(x);
+
+  x = matrix_d(3,2);
+  x << 
+    1.0, 0.0,
+    2.0, 3.0,
+    4.0, 5.0;
+  test_multiply_lower_tri_self_transpose(x);
+
+  x = matrix_d(2,3);
+  x << 
+    1.0, 0.0, 0.0,
+    2.0, 3.0, 0.0;
   test_multiply_lower_tri_self_transpose(x);
 }
 void test_tcrossprod(const matrix_d& x) {
