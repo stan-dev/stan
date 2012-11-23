@@ -1493,7 +1493,7 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
         size_t j) {
       validate_column_index(m,j,"col");
