@@ -9,20 +9,6 @@ namespace stan {
   namespace math {
 
 
-
-    matrix_d inverse(const matrix_d& m) {
-      validate_square(m,"matirx inverse");
-      return m.inverse();
-    }
-
-    vector_d
-    softmax(const vector_d& x) {
-      validate_nonzero_size(x,"vector softmax");
-      vector_d theta(x.size());
-      softmax<vector_d,double>(x,theta);
-      return theta;
-    }
-
     vector_d eigenvalues(const matrix_d& m) {
       validate_square(m,"eigenvalues");
       // false arg means no eigenvector calcs

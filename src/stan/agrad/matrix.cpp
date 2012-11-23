@@ -8,19 +8,6 @@ namespace stan {
   namespace agrad {
 
 
-
-    matrix_v inverse(const matrix_v& m) {
-      stan::math::validate_square(m,"inverse");
-      return m.inverse();
-    }
-
-    vector_v softmax(const vector_v& x) {
-      stan::math::validate_nonzero_size(x,"vector softmax");
-      vector_v theta(x.size());
-      stan::math::softmax<vector_v,stan::agrad::var>(x,theta);
-      return theta;
-    }
-
     vector_v eigenvalues(const matrix_v& m) {
       stan::math::validate_square(m,"eigenvalues");
       // false == no vectors

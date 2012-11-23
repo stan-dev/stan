@@ -10,6 +10,7 @@
 
 #include <stan/math/constants.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
 
@@ -360,12 +361,14 @@ namespace stan {
     template <typename Vector, typename Scalar>
     void softmax(const Vector& x, Vector& simplex) {
       using std::exp;
-      if(x.size() != simplex.size()) 
+      if (x.size() != simplex.size()) 
         BOOST_THROW_EXCEPTION(std::invalid_argument ("x.size() != simplex.size()"));
       Scalar sum(0.0); 
       Scalar max_x = maximum<Vector,Scalar>(x);
-      for (typename Vector::size_type i = 0; i < x.size(); ++i)
-        sum += (simplex[i] = exp(x[i]-max_x));
+      for (typename Vector::size_type i = 0; i < x.size(); ++i) {
+        simplex[i] = exp(x[i]-max_x);
+        sum += simplex[i];
+      }
       for (typename Vector::size_type i = 0; i < x.size(); ++i)
         simplex[i] /= sum;
     }

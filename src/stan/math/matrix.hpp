@@ -17,7 +17,6 @@ namespace stan {
   
   namespace math {
 
-
     // from input type F to output type T 
 
     // scalar, F != T  (base template)
@@ -1538,15 +1537,38 @@ namespace stan {
      * @param m Specified matrix.
      * @return Inverse of the matrix.
      */
-    matrix_d inverse(const matrix_d& m);
+    template <typename T>
+    inline
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    inverse(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      validate_square(m,"matrix inverse");
+      return m.inverse();
+    }
 
-    /**
+
+   /**
      * Return the softmax of the specified vector.
-     * @param y Vector to transform
+     * @tparam T Scalar type of values in vector.
+     * @param[in] v Vector to transform.
      * @return Unit simplex result of the softmax transform of the vector.
      */
-    vector_d softmax(const vector_d& y);
-    
+    template <typename T>
+    inline
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+      using std::exp;
+      stan::math::validate_nonzero_size(v,"vector softmax");
+      Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
+      T sum(0.0);
+      T max_v = v.maxCoeff();
+      for (int i = 0; i < v.size(); ++i) {
+        theta[i] = exp(v[i] - max_v);
+        sum += theta[i];
+      }
+      for (int i = 0; i < v.size(); ++i)
+        theta[i] /= sum;
+      return theta;
+    }
 
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<double,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,

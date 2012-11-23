@@ -1162,19 +1162,7 @@ namespace stan {
     }
 
 
-    /**
-     * Returns the inverse of the specified matrix.
-     * @param[in] m Specified matrix.
-     * @return Inverse of the matrix.
-     */
-    matrix_v inverse(const matrix_v& m);
 
-    /**
-     * Return the softmax of the specified vector.
-     * @param v Vector to transform
-     * @return Unit simplex result of the softmax transform of the vector.
-     */
-    vector_v softmax(const vector_v& v);
 
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<var,R1,C1> &A,
