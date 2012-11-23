@@ -2126,6 +2126,7 @@ TEST(AgradMatrix,mv_trace) {
 TEST(AgradMatrix,mdivide_left_val) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
+  using stan::math::mdivide_left;
 
   matrix_v Av(2,2);
   matrix_d Ad(2,2);
@@ -2158,6 +2159,7 @@ TEST(AgradMatrix,mdivide_left_val) {
 TEST(AgradMatrix,mdivide_right_val) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
+  using stan::math::mdivide_right;
 
   matrix_v Av(2,2);
   matrix_d Ad(2,2);
@@ -2189,6 +2191,7 @@ TEST(AgradMatrix,mdivide_right_val) {
 TEST(AgradMatrix,mdivide_left_tri_val) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
 
   matrix_v Av(2,2);
   matrix_v Av_inv(2,2);
@@ -2200,25 +2203,25 @@ TEST(AgradMatrix,mdivide_left_tri_val) {
   Ad << 2.0, 0.0, 
     5.0, 7.0;
 
-  I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Av,Av);
+  I = mdivide_left_tri<Eigen::Lower>(Av,Av);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Av,Ad);
+  I = mdivide_left_tri<Eigen::Lower>(Av,Ad);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  I = stan::agrad::mdivide_left_tri<Eigen::Lower>(Ad,Av);
+  I = mdivide_left_tri<Eigen::Lower>(Ad,Av);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  Av_inv = stan::agrad::mdivide_left_tri<Eigen::Lower>(Av);
+  Av_inv = mdivide_left_tri<Eigen::Lower>(Av);
   I = Av * Av_inv;
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
@@ -2230,36 +2233,37 @@ TEST(AgradMatrix,mdivide_left_tri_val) {
   Ad << 2.0, 3.0, 
     0.0, 7.0;
 
-  I = stan::agrad::mdivide_left_tri<Eigen::Upper>(Av,Av);
+  I = mdivide_left_tri<Eigen::Upper>(Av,Av);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  I = stan::agrad::mdivide_left_tri<Eigen::Upper>(Av,Ad);
+  I = mdivide_left_tri<Eigen::Upper>(Av,Ad);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  I = stan::agrad::mdivide_left_tri<Eigen::Upper>(Ad,Av);
+  I = mdivide_left_tri<Eigen::Upper>(Ad,Av);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1).val(),1.0E-12);
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
-// FIXME:  Fails in g++ 4.2 -- can't find agrad version of mdivide_left_tri
-//         Works in clang++ and later g++
-// TEST(AgradMatrix,mdivide_left_tri2) {
-//   using stan::math::mdivide_left_tri;
-//   using stan::agrad::mdivide_left_tri;
-//   int k = 3;
-//   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> L(k,k);
-//   L << 1, 2, 3, 4, 5, 6, 7, 8, 9;
-//   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
-//   I.setIdentity();
-//   L = mdivide_left_tri<Eigen::Lower>(L, I);
-// }
+
+// // FIXME:  Fails in g++ 4.2 -- can't find agrad version of mdivide_left_tri
+// //         Works in clang++ and later g++
+// // TEST(AgradMatrix,mdivide_left_tri2) {
+// //   using stan::math::mdivide_left_tri;
+// //   using stan::agrad::mdivide_left_tri;
+// //   int k = 3;
+// //   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> L(k,k);
+// //   L << 1, 2, 3, 4, 5, 6, 7, 8, 9;
+// //   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
+// //   I.setIdentity();
+// //   L = mdivide_left_tri<Eigen::Lower>(L, I);
+// // }
 TEST(AgradMatrix,inverse_val) {
   using stan::math::inverse;
   using stan::agrad::matrix_v;
@@ -4038,7 +4042,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(1.0,grad[1]);
   EXPECT_FLOAT_EQ(1.0,grad[2]);
 }
-TEST(MathMatrix, cumulative_sum) {
+TEST(AgradMatrix, cumulative_sum) {
   using stan::agrad::var;
   using stan::math::cumulative_sum;
 
@@ -4054,4 +4058,103 @@ TEST(MathMatrix, cumulative_sum) {
   test_cumulative_sum<Eigen::Matrix<var,Eigen::Dynamic,1> >();
   test_cumulative_sum<Eigen::Matrix<var,1,Eigen::Dynamic> >();
 }
+
+TEST(AgradMatrix, promoter) {
+  using stan::math::promoter;
+  using stan::math::promote_common;
+
+  using stan::agrad::var;
+
+  using std::vector;
+
+  using stan::math::matrix_d;
+  using stan::math::vector_d;
+  using stan::math::row_vector_d;
+
+  using stan::agrad::matrix_v;
+  using stan::agrad::vector_v;
+  using stan::agrad::row_vector_v;
+  
+  double a = promote_common<double,double>(3.0);
+  var b = promote_common<double,var>(4.0);
+  var c = promote_common<double,var>(var(5.0));
+  EXPECT_FLOAT_EQ(3.0, a);
+  EXPECT_FLOAT_EQ(4.0, b.val());
+  EXPECT_FLOAT_EQ(5.0, c.val());
+
+  vector<double> x(5);
+  for (int i = 0; i < 5; ++i) x[i] = i * i;
+  vector<double> y = promote_common<vector<double>, vector<double> >(x);
+  EXPECT_EQ(5,y.size());
+  for (int i = 0; i < 5; ++i)
+    EXPECT_FLOAT_EQ(x[i],y[i]);
+  std::vector<var> z = 
+    promote_common<std::vector<double>, std::vector<var> >(x);
+  EXPECT_EQ(5,z.size());
+  for (int i = 0; i < 5; ++i)
+    EXPECT_FLOAT_EQ(x[i],z[i].val());
+  vector<var> w = promote_common<vector<var>, vector<var> >(z);
+  EXPECT_EQ(5,w.size());
+  for (int i = 0; i < 5; ++i)
+    EXPECT_FLOAT_EQ(x[i],w[i].val());
+  
+  vector_d U(3);
+  for (int i = 0; i < 3; ++i)
+    U(i) = i * i;
+  vector_d V = promote_common<vector_d,vector_d>(U);
+  EXPECT_EQ(3,V.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(U(i), V(i));
+  vector_v W = promote_common<vector_d,vector_v>(U);
+  EXPECT_EQ(3,W.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(U(i), W(i).val());
+  vector_v X = promote_common<vector_v,vector_v>(W);
+  EXPECT_EQ(3,X.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(U(i), X(i).val());
+
+
+  row_vector_d G(3);
+  for (int i = 0; i < 3; ++i)
+    G(i) = i * i;
+  row_vector_d H = promote_common<row_vector_d,row_vector_d>(G);
+  EXPECT_EQ(3,H.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(G(i), H(i));
+  row_vector_v I = promote_common<row_vector_d,row_vector_v>(G);
+  EXPECT_EQ(3,W.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(G(i), I(i).val());
+  row_vector_v J = promote_common<row_vector_v,row_vector_v>(I);
+  EXPECT_EQ(3,J.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(H(i), J(i).val());
+
+  matrix_d A(3,4);
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 4; ++j)
+      A(i,j) = (i + 1) + (j * 10);
+  matrix_d B = promote_common<matrix_d,matrix_d>(A);
+  EXPECT_EQ(3,B.rows());
+  EXPECT_EQ(4,B.cols());
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 4; ++j)
+      EXPECT_FLOAT_EQ(A(i,j),B(i,j));
+  matrix_v C = promote_common<matrix_d,matrix_v>(A);
+  EXPECT_EQ(3,C.rows());
+  EXPECT_EQ(4,C.cols());
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 4; ++j)
+      EXPECT_FLOAT_EQ(A(i,j),C(i,j).val());
+  matrix_v D = promote_common<matrix_v,matrix_v>(C);
+  EXPECT_EQ(3,D.rows());
+  EXPECT_EQ(4,D.cols());
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 4; ++j)
+      EXPECT_FLOAT_EQ(A(i,j),D(i,j).val());
+  
+
+}
+
 

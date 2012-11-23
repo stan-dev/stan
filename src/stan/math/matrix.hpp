@@ -25,12 +25,18 @@ namespace stan {
       static void promote(const F& u, T& t) {
         t = u;
       }
+      static T promote_to(const F& u) {
+        return u;
+      }
     };
     // scalar, F == T
     template <typename T>
     struct promoter<T,T> {
       static void promote(const T& u, T& t) {
         t = u;
+      }
+      static T promote_to(const T& u) {
+        return u;
       }
     };
 
@@ -43,33 +49,77 @@ namespace stan {
         for (size_t i = 0; i < u.size(); ++i)
           promoter<F,T>::promote(u[i],t[i]);
       }
+      static std::vector<T>
+      promote_to(const std::vector<F>& u) {
+        std::vector<T> t;
+        promoter<std::vector<F>,std::vector<T> >::promote(u,t);
+        return t;
+      }
     };
-    // F = T, std::vector
+    // std::vector, F == T
     template <typename T>
     struct promoter<std::vector<T>, std::vector<T> > {
-      static void promote(const std::vector<T>& u, std::vector<T>& t) {
+      static void promote(const std::vector<T>& u,
+                          std::vector<T>& t) {
         t = u;
+      }
+      static std::vector<T> promote_to(const std::vector<T>& u) {
+        return u;
       }
     };
 
     // Eigen::Matrix, F != T
     template <typename F, typename T, int R, int C>
     struct promoter<Eigen::Matrix<F,R,C>, Eigen::Matrix<T,R,C> > {
-      static const std::vector<T> promote(const Eigen::Matrix<F,R,C>& u,
-                                          Eigen::Matrix<T,R,C>& t) {
+      static void promote(const Eigen::Matrix<F,R,C>& u,
+                          Eigen::Matrix<T,R,C>& t) {
         t.resize(u.rows(), u.cols());
         for (size_t i = 0; i < u.size(); ++i)
           promoter<F,T>::promote(u(i),t(i));
+      }
+      static Eigen::Matrix<T,R,C>
+      promote_to(const Eigen::Matrix<F,R,C>& u) {
+        Eigen::Matrix<T,R,C> t;
+        promoter<Eigen::Matrix<F,R,C>,Eigen::Matrix<T,R,C> >::promote(u,t);
+        return t;
       }
     };
     // Eigen::Matrix, F == T
     template <typename T, int R, int C>
     struct promoter<Eigen::Matrix<T,R,C>, Eigen::Matrix<T,R,C> > {
-      static const std::vector<T> promote(const Eigen::Matrix<T,R,C>& u,
-                                          Eigen::Matrix<T,R,C>& t) {
+      static void promote(const Eigen::Matrix<T,R,C>& u,
+                          Eigen::Matrix<T,R,C>& t) {
         t = u;
       }
+      static Eigen::Matrix<T,R,C> promote_to(const Eigen::Matrix<T,R,C>& u) {
+        return u;
+      }
     };
+
+    template <typename T1, typename T2>
+    struct common_type {
+      typedef typename boost::math::tools::promote_args<T1,T2>::type type;
+    };
+
+    template <typename T1, typename T2>
+    struct common_type<std::vector<T1>, std::vector<T2> > {
+      typedef std::vector<typename common_type<T1,T2>::type> type;
+    };
+    
+    template <typename T1, typename T2, int R, int C>
+    struct common_type<Eigen::Matrix<T1,R,C>, Eigen::Matrix<T2,R,C> > {
+      typedef Eigen::Matrix<typename common_type<T1,T2>::type,R,C> type;
+    };
+
+    template <typename T1, typename T2, typename F>
+    inline
+    typename common_type<T1,T2>::type
+    promote_common(const F& u) {
+      return promoter<F, typename common_type<T1,T2>::type>
+        ::promote_to(u);
+    }
+
+
 
 
     /**
@@ -1570,25 +1620,34 @@ namespace stan {
       return theta;
     }
 
-    template<int R1,int C1,int R2,int C2>
-    inline Eigen::Matrix<double,R1,C2> mdivide_left_tri_low(const Eigen::Matrix<double,R1,C1> &A,
-                                                            const Eigen::Matrix<double,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
-      return A.template triangularView<Eigen::Lower>().solve(b);
-    }
 
-    inline Eigen::MatrixXd mdivide_left_tri_low(const Eigen::MatrixXd &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
+    template <typename T1, typename T2, int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,
+                  R1,C2>
+    mdivide_left_tri_low(const Eigen::Matrix<T1,R1,C1> &A,
+                         const Eigen::Matrix<T2,R2,C2> &b) {
+      stan::math::validate_square(A,"mdivide_left_tri_low/2");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
+      return promote_common<Eigen::Matrix<T1,R1,C1>,
+                            Eigen::Matrix<T2,R1,C1> >(A)
+        .template triangularView<Eigen::Lower>()
+        .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
+                               Eigen::Matrix<T2,R2,C2> >(b) );
+    }
+    template <typename T>
+    inline 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    mdivide_left_tri_low(const 
+                         Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &A) {
+      stan::math::validate_square(A,"mdivide_left_tri_low/1");
       int n = A.rows();
-      Eigen::MatrixXd b;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
       b.setIdentity(n,n);
-      A.triangularView<Eigen::Lower>().solveInPlace(b);
+      A.template triangularView<Eigen::Lower>().solveInPlace(b);
       return b;
     }
+
 
     /**
      * Returns the solution of the system Ax=b when A is triangular
@@ -1599,14 +1658,19 @@ namespace stan {
      * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
-    template<int TriView,int R1,int C1,int R2,int C2>
-    inline Eigen::Matrix<double,R1,C2> mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
-                                                        const Eigen::Matrix<double,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
-      return A.template triangularView<TriView>().solve(b);
+    template <int TriView, typename T1, typename T2, 
+              int R1, int C1, int R2, int C2>
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,
+                  R1,C2>
+    mdivide_left_tri(const Eigen::Matrix<T1,R1,C1> &A,
+                     const Eigen::Matrix<T2,R2,C2> &b) {
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      return promote_common<Eigen::Matrix<T1,R1,C1>,Eigen::Matrix<T2,R1,C1> >(A)
+        .template triangularView<TriView>()
+        .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
+                               Eigen::Matrix<T2,R2,C2> >(b) );
     }
     /**
      * Returns the solution of the system Ax=b when A is triangular and b=I.
@@ -1615,83 +1679,112 @@ namespace stan {
      * @return x = A^-1 .
      * @throws std::domain_error if A is not square
      */
-    template<int TriView>
-    inline Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> mdivide_left_tri(const Eigen::MatrixXd &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
+    template<int TriView, typename T>
+    inline 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    mdivide_left_tri(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &A) {
+      stan::math::validate_square(A,"mdivide_left_tri");
       int n = A.rows();
-      Eigen::MatrixXd b;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
       b.setIdentity(n,n);
-      A.triangularView<TriView>().solveInPlace(b);
+      A.template triangularView<TriView>().solveInPlace(b);
       return b;
     }
+
     /**
-     * Returns the solution of the system Ax=b when A is triangular
-     * @param A Triangular matrix.  Specify upper or lower with TriView
-     * being Eigen::Upper or Eigen::Lower.
+     * Returns the solution of the system Ax=b.
+     * @param A Matrix.
      * @param b Right hand side matrix or vector.
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
-    template<int TriView,int R1,int C1,int R2,int C2>
-    inline Eigen::Matrix<double,R1,C2> mdivide_right_tri(const Eigen::Matrix<double,R1,C1> &b,
-                                                         const Eigen::Matrix<double,R2,C2> &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.rows() != b.cols())
-        throw std::domain_error("A.rows() != b.cols()");
-      return A.template triangularView<TriView>().transpose().solve(b.transpose()).transpose();
+    template <typename T1, typename T2, int R1, int C1, int R2, int C2>
+    inline 
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
+    mdivide_left(const Eigen::Matrix<T1,R1,C1> &A,
+                 const Eigen::Matrix<T2,R2,C2> &b) {
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      return promote_common<Eigen::Matrix<T1,R1,C1>,
+                            Eigen::Matrix<T2,R1,C1> >(A)
+        .lu()
+        .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
+                               Eigen::Matrix<T2,R2,C2> >(b) );
+    }
+
+    /**
+     * Returns the solution of the system Ax=b when A is triangular
+     * @param A Triangular matrix.  Specify upper or lower with TriView
+     * being Eigen::Upper or Eigen::Lower.
+     * @param b Right hand side matrix or vector.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::domain_error if A is not square or the rows of b don't
+     * match the size of A.
+     */
+    template <int TriView, typename T1, typename T2, 
+              int R1, int C1, int R2, int C2>
+    inline 
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
+    mdivide_right_tri(const Eigen::Matrix<T1,R1,C1> &b,
+                      const Eigen::Matrix<T2,R2,C2> &A) {
+      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::validate_multiplicable(b,A,"mdivide_right_tri");
+      return promote_common<Eigen::Matrix<T1,R1,C1>,
+                            Eigen::Matrix<T2,R1,C1> >(A)
+        .template triangularView<TriView>()
+        .transpose()
+        .solve(promote_common<Eigen::Matrix<T1,R2,C2>,
+                              Eigen::Matrix<T2,R2,C2> >(b)
+               .transpose())
+        .transpose();
     }
     /**
      * Returns the solution of the system tri(A)x=b when tri(A) is a
      * lower triangular view of the matrix A.
      * @param A Matrix.
      * @param b Right hand side matrix or vector.
-     * @return x = tri(A)^-1 b, solution of the linear system.
+     * @return x = b * tri(A)^-1, solution of the linear system.
      * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
-    template<int R1,int C1,int R2,int C2>
-    inline Eigen::Matrix<double,R1,C2> mdivide_right_tri_low(const Eigen::Matrix<double,R1,C1> &b,
-                                                             const Eigen::Matrix<double,R2,C2> &A) {
-      return mdivide_right_tri<Eigen::Lower>(b,A);
+    template <typename T1, typename T2, int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
+    mdivide_right_tri_low(const Eigen::Matrix<T1,R1,C1> &b,
+                          const Eigen::Matrix<T2,R2,C2> &A) {
+      return mdivide_right_tri<Eigen::Lower>
+        (promote_common<Eigen::Matrix<T1,R1,C1>,
+                        Eigen::Matrix<T2,R1,C1> >(b),
+         promote_common<Eigen::Matrix<T1,R2,C2>,
+                        Eigen::Matrix<T2,R2,C2> >(A));
     }
+
 
 
     /**
      * Returns the solution of the system Ax=b.
      * @param A Matrix.
      * @param b Right hand side matrix or vector.
-     * @return x = A^-1 b, solution of the linear system.
+     * @return x = b A^-1, solution of the linear system.
      * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
-    template<int R1,int C1,int R2,int C2>
-    inline Eigen::Matrix<double,R1,C2> mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
-                                                    const Eigen::Matrix<double,R2,C2> &b) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.cols() != b.rows())
-        throw std::domain_error("A.cols() != b.rows()");
-      return A.lu().solve(b);
-    }
-    /**
-     * Returns the solution of the system Ax=b.
-     * @param A Matrix.
-     * @param b Right hand side matrix or vector.
-     * @return x = A^-1 b, solution of the linear system.
-     * @throws std::domain_error if A is not square or the rows of b don't
-     * match the size of A.
-     */
-    template<int R1,int C1,int R2,int C2>
-    inline Eigen::Matrix<double,R1,C2> mdivide_right(const Eigen::Matrix<double,R1,C1> &b,
-                                                     const Eigen::Matrix<double,R2,C2> &A) {
-      if (A.cols() != A.rows())
-        throw std::domain_error("A is not square");
-      if (A.rows() != b.cols())
-        throw std::domain_error("A.rows() != b.cols()");
-      return A.transpose().lu().solve(b.transpose()).transpose();
+    template <typename T1, typename T2, int R1, int C1, int R2, int C2>
+    inline 
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
+    mdivide_right(const Eigen::Matrix<T1,R1,C1> &b,
+                  const Eigen::Matrix<T2,R2,C2> &A) {
+      stan::math::validate_square(A,"mdivide_right");
+      stan::math::validate_multiplicable(b,A,"mdivide_right");
+      return promote_common<Eigen::Matrix<T1,R2,C2>,
+                            Eigen::Matrix<T2,R2,C2> >(A)
+        .transpose()
+        .lu()
+        .solve(promote_common<Eigen::Matrix<T1,R1,C1>,
+                              Eigen::Matrix<T2,R1,C1> >(b)
+               .transpose())
+        .transpose();
     }
 
     /**
