@@ -68,6 +68,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
       add("chi_square_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j]); // args
+add("block",MATRIX_T,MATRIX_T,INT_T,INT_T,INT_T,INT_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);
@@ -109,6 +110,12 @@ add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
 add("elt_multiply",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_multiply",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T,VECTOR_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T,ROW_VECTOR_T,MATRIX_T);
+add("diag_post_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+add("diag_post_multiply",MATRIX_T,MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
 add_nullary("epsilon");
 add_unary("erf");
 add_unary("erfc");

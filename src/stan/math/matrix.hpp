@@ -1360,6 +1360,38 @@ namespace stan {
       return result;
     }
 
+    template <typename T1, typename T2, int R1,int C1,int R2,int C2>
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R2, C2>
+    diag_pre_multiply(const Eigen::Matrix<T1,R1,C1>& m1,
+                  const Eigen::Matrix<T2,R2,C2>& m2) {
+      if (m1.cols() != 1 && m1.rows() != 1)
+        throw std::domain_error("m1 must be a vector");
+      if (m1.size() != m2.rows())
+        throw std::domain_error("m1 must have same length as m2 has rows");
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R2, C2>
+        result(m2.rows(),m2.cols());
+      for (int i = 0; i < m2.rows(); ++i)
+        for (int j = 0; i < m2.cols(); ++j)
+          result(i,j) = m1(i) * m2(i,j);
+      return result;
+    }
+
+    template <typename T1, typename T2, int R1,int C1,int R2,int C2>
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R1, C1>
+    diag_post_multiply(const Eigen::Matrix<T1,R1,C1>& m1,
+                  const Eigen::Matrix<T2,R2,C2>& m2) {
+      if (m2.cols() != 1 && m2.rows() != 1)
+        throw std::domain_error("m2 must be a vector");
+      if (m2.size() != m1.cols())
+        throw std::domain_error("m2 must have same length as m1 has columns");
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R1, C1>
+        result(m1.rows(),m1.cols());
+      for (int i = 0; i < m1.rows(); ++i)
+        for (int j = 0; i < m1.cols(); ++j)
+          result(i,j) = m2(i) * m1(i,j);
+      return result;
+    }
+
 
     /**
      * Return the elementwise division of the specified matrices
@@ -1548,6 +1580,28 @@ namespace stan {
       validate_column_index(m,j,"col");
       return m.col(j - 1);
     }
+
+    /**
+     * Return a nrows x ncols submatrix starting at (i,j).
+     *
+     * @param m Matrix
+     * @param i Starting row
+     * @param j Starting column
+     * @param nrows Number of rows in block
+     * @param ncols Number of columns in block
+     **/
+    template <typename T>
+    inline
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    block(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
+          size_t i, size_t j, size_t nrows, size_t ncols) {
+      validate_row_index(m,i,"block");
+      validate_row_index(m,i+nrows-1,"block");
+      validate_column_index(m,j,"block");
+      validate_column_index(m,j+ncols-1,"block");
+      return m.block(i - 1,j - 1,nrows,ncols);
+    }
+
 
     /**
      * Return a column vector of the diagonal elements of the
