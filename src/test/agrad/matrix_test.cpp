@@ -2373,6 +2373,8 @@ TEST(AgradMatrix,eigenval_sum) {
 TEST(AgradMatrix,mat_cholesky) {
   using stan::agrad::matrix_v;
   using stan::math::transpose;
+  using stan::math::cholesky_decompose;
+  using stan::math::singular_values;
 
   // symmetric
   matrix_v X(2,2);
@@ -2390,6 +2392,8 @@ TEST(AgradMatrix,mat_cholesky) {
   EXPECT_FLOAT_EQ(b.val(),LL_trans(0,1).val());
   EXPECT_FLOAT_EQ(c.val(),LL_trans(1,0).val());
   EXPECT_FLOAT_EQ(d.val(),LL_trans(1,1).val());
+
+  EXPECT_NO_THROW(singular_values(X));
 }
 
 

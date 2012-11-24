@@ -655,6 +655,8 @@ TEST(matrix_test,cholesky_decompose_exception) {
   matrix_d m;
   
   m.resize(2,2);
+  m << 1.0, 2.0, 
+    2.0, 3.0;
   EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
 
   m.resize(0, 0);
@@ -662,6 +664,13 @@ TEST(matrix_test,cholesky_decompose_exception) {
   
   m.resize(2, 3);
   EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+
+  // not symmetric
+  m.resize(2,2);
+  m << 1.0, 2.0,
+    3.0, 4.0;
+  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+
 }
 
 TEST(matrix_test,std_vector_sum_int) {

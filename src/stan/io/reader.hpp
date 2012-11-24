@@ -60,9 +60,9 @@ namespace stan {
 
     public:
 
-      typedef typename stan::math::EigenType<T>::matrix matrix_t;
-      typedef typename stan::math::EigenType<T>::vector vector_t;
-      typedef typename stan::math::EigenType<T>::row_vector row_vector_t;
+      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
+      typedef Eigen::Matrix<T,Eigen::Dynamic,1> vector_t;
+      typedef Eigen::Matrix<T,1,Eigen::Dynamic> row_vector_t;
 
       typedef Eigen::Map<matrix_t> map_matrix_t;
       typedef Eigen::Map<vector_t> map_vector_t;

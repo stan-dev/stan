@@ -26,10 +26,10 @@ namespace stan {
       std::vector<int> data_i_;
     public:
 
-      typedef typename stan::math::EigenType<T>::matrix matrix_t;
-      typedef typename stan::math::EigenType<T>::vector vector_t;
-      typedef typename stan::math::EigenType<T>::row_vector row_vector_t;
-      
+      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
+      typedef Eigen::Matrix<T,Eigen::Dynamic,1> vector_t;
+      typedef Eigen::Matrix<T,1,Eigen::Dynamic> row_vector_t;
+
       typedef Eigen::Array<T,Eigen::Dynamic,1> array_vec_t;
 
       /**

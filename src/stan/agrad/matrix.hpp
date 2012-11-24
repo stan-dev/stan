@@ -239,19 +239,25 @@ namespace stan {
      * The type of a matrix holding <code>stan::agrad::var</code>
      * values.
      */
-    typedef stan::math::EigenType<var>::matrix matrix_v;
+    typedef 
+    Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>
+    matrix_v;
 
     /**
      * The type of a (column) vector holding <code>stan::agrad::var</code>
      * values.
      */
-    typedef stan::math::EigenType<var>::vector vector_v;
+    typedef 
+    Eigen::Matrix<var,Eigen::Dynamic,1>
+    vector_v;
 
     /**
      * The type of a row vector holding <code>stan::agrad::var</code>
      * values.
      */
-    typedef stan::math::EigenType<var>::row_vector row_vector_v;
+    typedef 
+    Eigen::Matrix<var,1,Eigen::Dynamic>
+    row_vector_v;
 
     /**
      * Initialize variable to value.  (Function may look pointless, but
@@ -1167,92 +1173,6 @@ namespace stan {
     }
 
 
-
-    // /**
-    //  * Return the eigenvalues of the specified symmetric matrix
-    //  * in descending order of magnitude.  This function is more
-    //  * efficient than the general eigenvalues function for symmetric
-    //  * matrices.
-    //  * <p>See <code>eigen_decompose()</code> for more information.
-    //  * @param[in] m Specified matrix.
-    //  * @return Eigenvalues of matrix.
-    //  */
-    // vector_v eigenvalues_sym(const matrix_v& m);
-    // /**
-    //  * Return a matrix whose rows are the real components of the
-    //  * eigenvectors of the specified symmetric matrix.  This function
-    //  * is more efficient than the general eigenvectors function for
-    //  * symmetric matrices.
-    //  * <p>See <code>eigen_decompose()</code> for more information.
-    //  * @param[in] m Symmetric matrix.
-    //  * @return Eigenvectors of matrix.
-    //  */
-    // matrix_v eigenvectors_sym(const matrix_v& m);
-    // /**
-    //  * Assign the real components of the eigenvalues and eigenvectors
-    //  * of the specified symmetric matrix to the specified references.
-    //  * <p>See <code>eigen_decompose()</code> for more information on the
-    //  * values.
-    //  * @param[in] m Symmetric matrix.  This function is more efficient
-    //  * than the general decomposition method for symmetric matrices.
-    //  * @param[out] eigenvalues Column vector reference into which
-    //  * eigenvalues are written.
-    //  * @param[out] eigenvectors Matrix reference into which eigenvectors
-    //  * are written.
-    //  */
-    // void eigen_decompose_sym(const matrix_v& m,
-    //                          vector_v& eigenvalues,
-    //                          matrix_v& eigenvectors);
-
-    /**
-     * Return the lower-triangular Cholesky factor (i.e., matrix
-     * square root) of the specified square, symmetric matrix.  The return
-     * value \f$L\f$ will be a lower-traingular matrix such that the
-     * original matrix \f$A\f$ is given by
-     * <p>\f$A = L \times L^T\f$.
-     * @param[in] m Symmetrix matrix.
-     * @return Square root of matrix.
-     * @throw std::domain_error if m is not a square matrix
-     */
-    matrix_v cholesky_decompose(const matrix_v& m);
-
-    /**
-     * Return the vector of the singular values of the specified matrix
-     * in decreasing order of magnitude.
-     * <p>See the documentation for <code>svd()</code> for
-     * information on the signular values.
-     * @param[in] m Specified matrix.
-     * @return Singular values of the matrix.
-     */
-    vector_v singular_values(const matrix_v& m);
-
-    /**
-     * Assign the real components of a singular value decomposition
-     * of the specified matrix to the specified references.  
-     * <p>Thesingular values \f$S\f$ are assigned to a vector in 
-     * decreasing order of magnitude.  The left singular vectors are
-     * found in the columns of \f$U\f$ and the right singular vectors
-     * in the columns of \f$V\f$.
-     * <p>The original matrix is recoverable as
-     * <p>\f$A = U \times \mbox{\rm diag}(S) \times V^T\f$, where
-     * \f$\mbox{\rm diag}(S)\f$ is the square diagonal matrix with
-     * diagonal elements \f$S\f$.
-     * <p>If \f$A\f$ is an \f$M \times N\f$ matrix
-     * and \f$K = \mbox{\rm min}(M,N)\f$, 
-     * then \f$U\f$ is an \f$M \times K\f$ matrix,  
-     * \f$S\f$ is a length \f$K\f$ column vector, and 
-     * \f$V\f$ is an \f$N \times K\f$ matrix.
-     * @param[in] m Matrix to decompose.
-     * @param[out] u Left singular vectors.
-     * @param[out] v Right singular vectors.
-     * @param[out] s Singular values.
-     */
-    void svd(const matrix_v& m,
-             matrix_v& u,
-             matrix_v& v,
-             vector_v& s);
-
-
     // FIXME:  double val?
     inline void assign_to_var(stan::agrad::var& var, const double& val) {
       var = val;
@@ -1340,7 +1260,9 @@ namespace stan {
       assigner<needs_promotion<LHS,RHS>::value, LHS, RHS>::assign(var,val);
     }
 
-    void stan_print(std::ostream* o, const var& x);
+    void stan_print(std::ostream* o, const var& x) {
+      *o << x.val();
+    }
 
   }
 }

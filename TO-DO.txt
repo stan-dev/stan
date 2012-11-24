@@ -20,15 +20,22 @@ v1.0.4
    * fixed bug introduced in 1.0.3 that hid line and column number
      bug reporting
    * added checks that data dimensions match as well as sizes
+   * removed non-symmetric versions of eigenvalues() and eigenvectors()
 -- Improvements
    * generating double-based log-prob function (in addition to 
      stan::agrad::var-based)
    * testing identifiers are not reserved words in C++/Stan
    * trapping/reporting locations of errors in data and init reads
+   * templated out matrix libs to reduce code duplication
+   * generalized multiply_lower_tri_self_transpose() to non-square
+     matrices
+   * vectorized auto-dif for tcrossprod() and crossprod()
 -- New Functions
-   * cumulative_sum()
-   * log_inv_logit(), log1m_inv_logit()
-   * poisson_log_log() for log-rate parameterized Poisson
+   * special functions: log_inv_logit(), log1m_inv_logit()
+   * matrix special functions: cumulative_sum()
+   * probability functions: poisson_log_log() for log-rate 
+     parameterized Poisson
+   * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
 
 
 PRIORITIES?

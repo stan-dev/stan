@@ -829,6 +829,26 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 %
 \end{description}
 
+\begin{description}
+  \fitem{matrix}{diag\_pre\_multiply}{vector \farg{v}, matrix
+    \farg{m}}{Return the product of the diagonal matrix formed from
+    the vector \code{v} and the matrix \code{m}, i.e.,
+    \code{diag\_matrix(v) * m}.}
+%
+  \fitem{matrix}{diag\_pre\_multiply}{row\_vector rv, matrix m}{Return
+    the product of the diagonal matrix formed from the vector
+    \code{rv} and the matrix \code{m}, i.e., \code{diag\_matrix(rv) *
+      m}.}
+%
+  \fitem{matrix}{diag\_post\_multiply}{matrix m, vector v}{Return the
+    product of the matrix \code{m} and the diagonal matrix formed from
+    the vector \code{v}, i.e., \code{m * diag\_matrix(v)}.}
+%
+\fitem{matrix}{diag\_post\_multiply}{matrix m, row\_vector rv}{Return the
+  product of the matrix \code{m} and the diagonal matrix fromed from
+  the the row vector \code{rv}, i.e., \code{m * diag\_matrix(rv)}.}
+\end{description}
+
 
 \section{Reductions}
 
@@ -950,6 +970,18 @@ of matrix \farg{x}}
 %
 \end{description}
 
+\subsection{Block Operations}
+
+Block operations may be used to extract a sub-block of a matrix.
+
+\begin{description}
+\fitem{matrix}{block}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_rows}, int \farg{n\_cols}}{Return the submatrix of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends \farg{n\_rows}
+  rows and \farg{n\_cols} columns.}
+\end{description}
+
+
 
 \subsection{Transposition Postfix Operator}
 
@@ -1063,6 +1095,17 @@ in descending order}
 \fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{
 The matrix with the eigenvectors of symmetric matrix
 \farg{A}}
+%
+% \fitem{vector}{eigenvalues\_self\_adjoint}{matrix \farg{A}}{The vector
+%   of eigenvalues of the self-adjoint view of \farg{A} in descending
+%   order.  The self-adjoint of matrix \farg{A} ignores the values in
+%   \farg{A} above the diagonal and treats \farg{A}[m,n] =
+%   \farg{A}[n,m].}
+%
+% \fitem{matrix}{eigenvectors\_self\_adjoint}{matrix \farg{A}}{ The
+%   matrix of eigenvectors of the matrix of the self-adjoint view of
+%   \farg{A}.  See \code{eigenvalues\_self\_adjoint} for information on
+%   the self-adjoint view of a matrix.}
 %
 \fitem{matrix}{cholesky\_decompose}{matrix \farg{A}}{
 The lower-triangular Cholesky factor of \farg{A}}

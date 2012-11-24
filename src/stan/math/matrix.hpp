@@ -143,71 +143,26 @@ namespace stan {
       }
     };
 
-    // FIXME:  remove this as it doesn't support type inference
-    // through the definitions
-
-    /**
-     * This is a traits structure for Eigen matrix types.
-     *
-     * @tparam T Underlying scalar type.
-     */ 
-    template<typename T>
-    struct EigenType {
-
-      /** Type of scalar. 
-       */
-      typedef T scalar;
-
-      /**
-       * Type of Eigen matrix.
-       */
-      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>  matrix;
-
-      /**
-       * Type of Eigen column vector.
-       */
-      typedef Eigen::Matrix<T,Eigen::Dynamic,1>  vector;
-
-      /**
-       * Type of Eigen row vector.
-       */
-      typedef Eigen::Matrix<T,1,Eigen::Dynamic>  row_vector;
-
-      /**
-       * Type of Eigen diagonal matrix.
-       */
-      typedef Eigen::DiagonalMatrix<T,Eigen::Dynamic> diagonal_matrix;
-
-      /**
-       * Type of Eigen array shaped like a (column) vector.
-       */
-      typedef Eigen::Array<T,1,Eigen::Dynamic> array_vector;
-      
-      /**
-       * Type of Eigen array shaped like a row vector.
-       */
-      typedef Eigen::Array<T,Eigen::Dynamic,1> array_row_vector;
-
-      /**
-       * Type of Eigen array shaped like a matrix.
-       */
-      typedef Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> array_matrix;
-    };      
-    
     /**
      * Type for matrix of double values.
      */
-    typedef EigenType<double>::matrix matrix_d;
+    typedef 
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>
+    matrix_d;
 
     /**
      * Type for (column) vector of double values.
      */
-    typedef EigenType<double>::vector vector_d;
+    typedef 
+    Eigen::Matrix<double,Eigen::Dynamic,1>
+    vector_d;
 
     /**
      * Type for (row) vector of double values.
      */
-    typedef EigenType<double>::row_vector row_vector_d;
+    typedef 
+    Eigen::Matrix<double,1,Eigen::Dynamic>
+    row_vector_d;
 
     namespace {
 
@@ -1483,8 +1438,7 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
                                                 const Eigen::Matrix<double,R2,C2>& m2) {
       
-      if (m1.cols() != m2.rows())
-        throw std::domain_error("for multiplications, rows and columns must match; found m1.cols() != m2.rows()");
+      validate_multiplicable(m1,m2,"multiply");
       return m1*m2;
     }
     /**
@@ -1507,7 +1461,7 @@ namespace stan {
 
     /**
      * Returns the result of multiplying the lower triangular
-     * portion of the square input matrix by its own transpose.
+     * portion of the input matrix by its own transpose.
      * @param L Matrix to multiply.
      * @return The lower triangular values in L times their own
      * transpose.
@@ -1515,7 +1469,6 @@ namespace stan {
      */
     inline matrix_d
     multiply_lower_tri_self_transpose(const matrix_d& L) {
-//      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
       if (L.rows() == 0)
         return matrix_d(0,0);
       if (L.rows() == 1) {
@@ -1892,39 +1845,6 @@ namespace stan {
 
 
 
-    // /**
-    //  * Return a matrix whose rows are the real components of the
-    //  * eigenvectors of the specified symmetric matrix.  This function
-    //  * is more efficient than the general eigenvectors function for
-    //  * symmetric matrices.
-    //  * <p>See <code>eigen_decompose()</code> for more information.
-    //  * @param m Symmetric matrix.
-    //  * @return Eigenvectors of matrix.
-    //  */
-    // matrix_d eigenvectors_sym(const matrix_d& m) {
-    //   validate_nonzero_size(m,"eigenvectors_sym");
-    //   validate_square(m,"eigenvectors_sym");
-    //   Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
-    //   return solver.eigenvectors().real();
-    // }
-
-    // /**
-    //  * Assign the real components of the eigenvalues and eigenvectors
-    //  * of the specified symmetric matrix to the specified references.
-    //  * <p>See <code>eigen_decompose()</code> for more information on the
-    //  * values.
-    //  * @param m Symmetric matrix.  This function is more efficient
-    //  * than the general decomposition method for symmetric matrices.
-    //  * @param eigenvalues Column vector reference into which
-    //  * eigenvalues are written.
-    //  * @param eigenvectors Matrix reference into which eigenvectors
-    //  * are written.
-    //  */
-    // void eigen_decompose_sym(const matrix_d& m,
-    //                                 vector_d& eigenvalues,
-    //                                 matrix_d& eigenvectors);
-
-
     /**
      * Return the lower-triangular Cholesky factor (i.e., matrix
      * square root) of the specified square, symmetric matrix.  The return
@@ -1933,9 +1853,16 @@ namespace stan {
      * <p>\f$A = L \times L^T\f$.
      * @param m Symmetrix matrix.
      * @return Square root of matrix.
-     * @throw std::domain_error if m is not a square matrix
+     * @throw std::domain_error if m is not a symmetric matrix.
      */
-    matrix_d cholesky_decompose(const matrix_d& m);
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      validate_symmetric(m,"cholesky decomposition");
+      Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
+      llt.compute(m);
+      return llt.matrixL();
+    }
 
     /**
      * Return the vector of the singular values of the specified matrix
@@ -1945,31 +1872,30 @@ namespace stan {
      * @param m Specified matrix.
      * @return Singular values of the matrix.
      */
-    vector_d singular_values(const matrix_d& m);
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    singular_values(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      return Eigen::JacobiSVD<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >(m)
+        .singularValues();
+    }
 
-    /**
-     * Assign the real components of a singular value decomposition
-     * of the specified matrix to the specified references.  
-     * <p>Thesingular values \f$S\f$ are assigned to a vector in 
-     * decreasing order of magnitude.  The left singular vectors are
-     * found in the columns of \f$U\f$ and the right singular vectors
-     * in the columns of \f$V\f$.
-     * <p>The original matrix is recoverable as
-     * <p>\f$A = U \times \mbox{\rm diag}(S) \times V^T\f$, where
-     * \f$\mbox{\rm diag}(S)\f$ is the square diagonal matrix with
-     * diagonal elements \f$S\f$.
-     * <p>If \f$A\f$ is an \f$M \times N\f$ matrix
-     * and \f$K = \mbox{\rm min}(M,N)\f$, 
-     * then \f$U\f$ is an \f$M \times K\f$ matrix,  
-     * \f$S\f$ is a length \f$K\f$ column vector, and 
-     * \f$V\f$ is an \f$N \times K\f$ matrix.
-     * @param m Matrix to decompose.
-     * @param u Left singular vectors.
-     * @param v Right singular vectors.
-     * @param s Singular values.
-     */
-    void svd(const matrix_d& m, matrix_d& u, matrix_d& v, vector_d& s);
+    // void eigen_decompose_sym(const matrix_d& m,
+    //                          vector_d& eigenvalues,
+    //                          matrix_d& eigenvectors) {
+    //   Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
+    //   eigenvalues = solver.eigenvalues().real();
+    //   eigenvectors = solver.eigenvectors().real();
+    // }
 
+
+    // void svd(const matrix_d& m, matrix_d& u, matrix_d& v, vector_d& s) {
+    //   static const unsigned int THIN_SVD_OPTIONS
+    //     = Eigen::ComputeThinU | Eigen::ComputeThinV;
+    //   Eigen::JacobiSVD<matrix_d> svd(m, THIN_SVD_OPTIONS);
+    //   u = svd.matrixU();
+    //   v = svd.matrixV();
+    //   s = svd.singularValues();
+    // }
 
     /**
      * Return the cumulative sum of the specified vector.
@@ -2060,7 +1986,8 @@ namespace stan {
     }
 
     template <typename T>
-    void stan_print(std::ostream* o, const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
+    void stan_print(std::ostream* o, 
+                    const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
       *o << '[';
       for (int i = 0; i < x.rows(); ++i) {
         if (i > 0) *o << ',';
