@@ -82,7 +82,11 @@ read_stan_csv <- function(csvfiles) {
   par_fnames <- c(fnames[paridx], "lp__")
   pars_oi <- unique_par(par_fnames)
   dims_oi <- lapply(pars_oi, 
-                    function(i) get_dims_from_fnames(par_fnames[grepl(i, par_fnames, fixed = TRUE)], i))
+                    function(i) {
+                      pat <- paste('^', i, '(\\.\\d+)*$', sep = '')
+                      i_fnames <- par_fnames[grepl(pat, par_fnames)]
+                      get_dims_from_fnames(i_fnames, i) 
+                    })
   names(dims_oi) <- pars_oi
   idx_2colm <- multi_idx_row2colm(dims_oi)
   if (chains > 1) {

@@ -189,37 +189,46 @@ test_idx_row2colm <- function() {
 } 
 
 test_pars_total_indexes <- function() {
-  names <- "alpha" 
-  dims <- list(alpha = c(2, 3)) 
+  names <- "alpha0" 
+  dims <- list(alpha0 = c(2, 3)) 
   fnames <- rstan:::flatnames(names, dims)  
-  tidx <- rstan:::pars_total_indexes(names, dims, fnames, "alpha") 
+  tidx <- rstan:::pars_total_indexes(names, dims, fnames, "alpha0") 
   tidx.attr1 <- attr(tidx[[1]], "row_major_idx") 
   attributes(tidx[[1]]) <- NULL 
   checkEquals(unname(tidx[[1]]), 1:6) 
   checkEquals(unname(tidx.attr1), c(1, 3, 5, 2, 4, 6)) 
-  names2 <- c(names, "beta") 
-  dims2 <- list(alpha = c(2, 3), beta = 8) 
+  names2 <- c(names, "alpha") 
+  dims2 <- c(dims, list(alpha = 8)) 
   fnames2 <- rstan:::flatnames(names2, dims2)  
-  tidx2 <- rstan:::pars_total_indexes(names2, dims2, fnames2, "beta") 
+  tidx2 <- rstan:::pars_total_indexes(names2, dims2, fnames2, "alpha") 
   tidx2.attr1 <- attr(tidx2[[1]], "row_major_idx")
   attributes(tidx2[[1]]) <- NULL
   checkEquals(unname(tidx2[[1]]), 6 + 1:8)  
   checkEquals(unname(tidx2.attr1), 6 + 1:8)
+  names3 <- c(names2, "p") 
+  dims3 <- c(dims2, list(p = integer(0)))
+  fnames3 <- rstan:::flatnames(names3, dims3)  
+  tidx3 <- rstan:::pars_total_indexes(names3, dims3, fnames3, "p") 
+  tidx3.attr1 <- attr(tidx3[[1]], "row_major_idx")
+  attributes(tidx3[[1]]) <- NULL
+  checkEquals(unname(tidx3[[1]]), 15)  
+  checkEquals(unname(tidx3.attr1), 15)
 } 
 
 test_multi_idx_row2colm <- function() {
+  checkEquals(rstan:::multi_idx_row2colm(list(integer(0))), 1)
   dims <- list(c(3), c(2,3), integer(0), c(2))
   col_idx <- rstan:::multi_idx_row2colm(dims)
   target <- c(1, 2, 3, 4, 7, 5, 8, 6, 9, 10, 11, 12)
   checkEquals(col_idx, target)
 
   fnames <- c("alpha[1]", "alpha[2]", "alpha[3]", 
-              "beta[1,1]", "beta[1,2]", "beta[1,3]", 
-              "beta[2,1]", "beta[2,2]", "beta[2,3]", 
-              "gamma", "theta[1]", "theta[2]")
+              "alpha2[1,1]", "alpha2[1,2]", "alpha2[1,3]", 
+              "alpha2[2,1]", "alpha2[2,2]", "alpha2[2,3]", 
+              "p", "theta[1]", "theta[2]")
   fnames_colm <- c("alpha[1]", "alpha[2]", "alpha[3]", 
-                   "beta[1,1]", "beta[2,1]", "beta[1,2]", "beta[2,2]", 
-                   "beta[1,3]", "beta[2,3]", "gamma", "theta[1]", "theta[2]")
+                   "alpha2[1,1]", "alpha2[2,1]", "alpha2[1,2]", "alpha2[2,2]", 
+                   "alpha2[1,3]", "alpha2[2,3]", "p", "theta[1]", "theta[2]")
   checkEquals(fnames[col_idx], fnames_colm)
 } 
 
@@ -296,6 +305,9 @@ test_get_dims_from_fnames <- function() {
   dims2 <- lapply(unames, 
                   function(n) { 
                     fnames_d2 <- fnames_d[sapply(fnames_d, function(i) grepl(n, i))]
+                    # the above line works here since all parameters are not nested. 
+                    # it would be probematic if say we have another parameter `p`,
+                    # since p is also part of `alpha`
                     rstan:::get_dims_from_fnames(fnames_d2)
                   })
   checkEquals(dims, dims2)

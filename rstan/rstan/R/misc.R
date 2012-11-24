@@ -606,7 +606,7 @@ multi_idx_row2colm <- function(dims) {
   # Args:
   #   dims: a list of dimensions for all the parameters
   #  
-  npar <- sapply(dims, function(d) prod(d))
+  ## print(dims)
   shifts <- calc_starts(dims) - 1
   idx <- lapply(seq_along(shifts), function(i) shifts[i] + idx_row2colm(dims[[i]]))
   do.call(c, idx)
