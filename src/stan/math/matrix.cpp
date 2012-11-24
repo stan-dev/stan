@@ -9,44 +9,7 @@ namespace stan {
   namespace math {
 
 
-    vector_d eigenvalues(const matrix_d& m) {
-      validate_square(m,"eigenvalues");
-      // false arg means no eigenvector calcs
-      Eigen::EigenSolver<matrix_d> solver(m,false);
-      // FIXME: test imag() all 0?
-      return solver.eigenvalues().real();
-    }
 
-    matrix_d eigenvectors(const matrix_d& m) {
-      validate_nonzero_size(m,"eigenvectors");
-      validate_square(m,"eigenvectors");
-      Eigen::EigenSolver<matrix_d> solver(m);
-      return solver.eigenvectors().real();
-    }
-
-    void eigen_decompose(const matrix_d& m,
-                         vector_d& eigenvalues,
-                         matrix_d& eigenvectors) {
-      Eigen::EigenSolver<matrix_d> solver(m);
-      eigenvalues = solver.eigenvalues().real();
-      eigenvectors = solver.eigenvectors().real();
-    }
-
-    vector_d eigenvalues_sym(const matrix_d& m) {
-      validate_nonzero_size(m,"eigenvalues_sym");
-      validate_square(m,"eigenvalues_sym");
-      // FIXME: validate actually symmetric?
-      Eigen::SelfAdjointEigenSolver<matrix_d> solver(m,Eigen::EigenvaluesOnly);
-      return solver.eigenvalues().real();
-    }
-
-    matrix_d eigenvectors_sym(const matrix_d& m) {
-      validate_nonzero_size(m,"eigenvectors_sym");
-      validate_square(m,"eigenvectors_sym");
-      Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
-      return solver.eigenvectors().real();
-    }
-  
     void eigen_decompose_sym(const matrix_d& m,
                              vector_d& eigenvalues,
                              matrix_d& eigenvectors) {

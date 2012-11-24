@@ -100,9 +100,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 add_nullary("e");
-add("eigenvalues",VECTOR_T,MATRIX_T);
 add("eigenvalues_sym",VECTOR_T,MATRIX_T);
-add("eigenvectors",MATRIX_T,MATRIX_T);
 add("eigenvectors_sym",MATRIX_T,MATRIX_T);
 add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);

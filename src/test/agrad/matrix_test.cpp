@@ -2340,21 +2340,22 @@ TEST(AgradMatrix,inverse_inverse_sum) {
 
 
 TEST(AgradMatrix,eigenval_sum) {
-  using stan::math::eigenvalues;
   using stan::math::sum;
   using stan::agrad::matrix_v;
   using stan::agrad::vector_v;
-
-  EXPECT_THROW(eigenvalues(matrix_v(3,2)), std::domain_error);
+  using stan::math::eigenvalues_sym;
 
   matrix_v a(3,3);
-  a << 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 13.0, 11.0, 19.0;
+  a << 
+    1.0, 2.0, 3.0,
+    2.0, 5.0, 7.9,
+    3.0, 7.9, 1.08;
   AVEC x = createAVEC(a(0,0), a(1,1), a(2,2), a(1,2));
   x.push_back(a(0,1));
   x.push_back(a(2,0));
 
   // grad sum eig = I
-  vector_v a_eigenvalues = eigenvalues(a);
+  vector_v a_eigenvalues = eigenvalues_sym(a);
   
   AVAR sum_a_eigenvalues = sum(a_eigenvalues);
   

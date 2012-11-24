@@ -1168,79 +1168,41 @@ namespace stan {
 
 
 
-    /**
-     * Return the real component of the eigenvalues of the specified
-     * matrix in descending order of magnitude.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param[in] m Specified matrix.
-     * @return Eigenvalues of matrix.
-     */
-    vector_v eigenvalues(const matrix_v& m);
-
-    /**
-     * Return a matrix whose columns are the real components of the
-     * eigenvectors of the specified matrix.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param[in] m Specified matrix.
-     * @return Eigenvectors of matrix.
-     */
-    matrix_v eigenvectors(const matrix_v& m);
-    /**
-     * Assign the real components of the eigenvalues and eigenvectors
-     * of the specified matrix to the specified references.
-     * <p>Given an input matrix \f$A\f$, the
-     * eigenvalues will be found in \f$D\f$ in descending order of
-     * magnitude.  The eigenvectors will be written into
-     * the columns of \f$V\f$.  If \f$A\f$ is invertible, then
-     * <p>\f$A = V \times \mbox{\rm diag}(D) \times V^{-1}\f$, where
-     $ \f$\mbox{\rm diag}(D)\f$ is the square diagonal matrix with
-     * diagonal elements \f$D\f$ and \f$V^{-1}\f$ is the inverse of
-     * \f$V\f$.
-     * @param[in] m Specified matrix.
-     * @param[out] eigenvalues Column vector reference into which
-     * eigenvalues are written.
-     * @param[out] eigenvectors Matrix reference into which eigenvectors
-     * are written.
-     */
-    void eigen_decompose(const matrix_v& m,
-                         vector_v& eigenvalues,
-                         matrix_v& eigenvectors);
-
-    /**
-     * Return the eigenvalues of the specified symmetric matrix
-     * in descending order of magnitude.  This function is more
-     * efficient than the general eigenvalues function for symmetric
-     * matrices.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param[in] m Specified matrix.
-     * @return Eigenvalues of matrix.
-     */
-    vector_v eigenvalues_sym(const matrix_v& m);
-    /**
-     * Return a matrix whose rows are the real components of the
-     * eigenvectors of the specified symmetric matrix.  This function
-     * is more efficient than the general eigenvectors function for
-     * symmetric matrices.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param[in] m Symmetric matrix.
-     * @return Eigenvectors of matrix.
-     */
-    matrix_v eigenvectors_sym(const matrix_v& m);
-    /**
-     * Assign the real components of the eigenvalues and eigenvectors
-     * of the specified symmetric matrix to the specified references.
-     * <p>See <code>eigen_decompose()</code> for more information on the
-     * values.
-     * @param[in] m Symmetric matrix.  This function is more efficient
-     * than the general decomposition method for symmetric matrices.
-     * @param[out] eigenvalues Column vector reference into which
-     * eigenvalues are written.
-     * @param[out] eigenvectors Matrix reference into which eigenvectors
-     * are written.
-     */
-    void eigen_decompose_sym(const matrix_v& m,
-                             vector_v& eigenvalues,
-                             matrix_v& eigenvectors);
+    // /**
+    //  * Return the eigenvalues of the specified symmetric matrix
+    //  * in descending order of magnitude.  This function is more
+    //  * efficient than the general eigenvalues function for symmetric
+    //  * matrices.
+    //  * <p>See <code>eigen_decompose()</code> for more information.
+    //  * @param[in] m Specified matrix.
+    //  * @return Eigenvalues of matrix.
+    //  */
+    // vector_v eigenvalues_sym(const matrix_v& m);
+    // /**
+    //  * Return a matrix whose rows are the real components of the
+    //  * eigenvectors of the specified symmetric matrix.  This function
+    //  * is more efficient than the general eigenvectors function for
+    //  * symmetric matrices.
+    //  * <p>See <code>eigen_decompose()</code> for more information.
+    //  * @param[in] m Symmetric matrix.
+    //  * @return Eigenvectors of matrix.
+    //  */
+    // matrix_v eigenvectors_sym(const matrix_v& m);
+    // /**
+    //  * Assign the real components of the eigenvalues and eigenvectors
+    //  * of the specified symmetric matrix to the specified references.
+    //  * <p>See <code>eigen_decompose()</code> for more information on the
+    //  * values.
+    //  * @param[in] m Symmetric matrix.  This function is more efficient
+    //  * than the general decomposition method for symmetric matrices.
+    //  * @param[out] eigenvalues Column vector reference into which
+    //  * eigenvalues are written.
+    //  * @param[out] eigenvectors Matrix reference into which eigenvectors
+    //  * are written.
+    //  */
+    // void eigen_decompose_sym(const matrix_v& m,
+    //                          vector_v& eigenvalues,
+    //                          matrix_v& eigenvectors);
 
     /**
      * Return the lower-triangular Cholesky factor (i.e., matrix

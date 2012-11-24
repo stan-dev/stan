@@ -1451,17 +1451,8 @@ TEST(MathMatrix, minus) {
   using stan::math::softmax;
   EXPECT_THROW(softmax(v0),std::domain_error);
 
-  using stan::math::eigenvalues;
-  EXPECT_NO_THROW(eigenvalues(m0));
-  EXPECT_THROW(eigenvalues(m1),std::domain_error);
-
-  using stan::math::eigenvectors;
-  EXPECT_THROW(eigenvectors(m0),std::domain_error);
   matrix_d ev_m1(1,1);
   ev_m1 << 2.0;
-  EXPECT_NO_THROW(eigenvectors(ev_m1));
-  EXPECT_THROW(eigenvectors(m1),std::domain_error);
-
 
   using stan::math::eigenvalues_sym;
   EXPECT_THROW(eigenvalues_sym(m0),std::domain_error);

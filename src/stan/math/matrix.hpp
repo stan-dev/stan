@@ -22,20 +22,20 @@ namespace stan {
     // scalar, F != T  (base template)
     template <typename F, typename T>
     struct promoter {
-      static void promote(const F& u, T& t) {
+      inline static void promote(const F& u, T& t) {
         t = u;
       }
-      static T promote_to(const F& u) {
+      inline static T promote_to(const F& u) {
         return u;
       }
     };
     // scalar, F == T
     template <typename T>
     struct promoter<T,T> {
-      static void promote(const T& u, T& t) {
+      inline static void promote(const T& u, T& t) {
         t = u;
       }
-      static T promote_to(const T& u) {
+      inline static T promote_to(const T& u) {
         return u;
       }
     };
@@ -43,13 +43,13 @@ namespace stan {
     // std::vector, F != T
     template <typename F, typename T>
     struct promoter<std::vector<F>, std::vector<T> > {
-      static void promote(const std::vector<F>& u,
+      inline static void promote(const std::vector<F>& u,
                           std::vector<T>& t) {
         t.resize(u.size());
         for (size_t i = 0; i < u.size(); ++i)
           promoter<F,T>::promote(u[i],t[i]);
       }
-      static std::vector<T>
+      inline static std::vector<T>
       promote_to(const std::vector<F>& u) {
         std::vector<T> t;
         promoter<std::vector<F>,std::vector<T> >::promote(u,t);
@@ -59,11 +59,11 @@ namespace stan {
     // std::vector, F == T
     template <typename T>
     struct promoter<std::vector<T>, std::vector<T> > {
-      static void promote(const std::vector<T>& u,
+      inline static void promote(const std::vector<T>& u,
                           std::vector<T>& t) {
         t = u;
       }
-      static std::vector<T> promote_to(const std::vector<T>& u) {
+      inline static std::vector<T> promote_to(const std::vector<T>& u) {
         return u;
       }
     };
@@ -71,13 +71,13 @@ namespace stan {
     // Eigen::Matrix, F != T
     template <typename F, typename T, int R, int C>
     struct promoter<Eigen::Matrix<F,R,C>, Eigen::Matrix<T,R,C> > {
-      static void promote(const Eigen::Matrix<F,R,C>& u,
+      inline static void promote(const Eigen::Matrix<F,R,C>& u,
                           Eigen::Matrix<T,R,C>& t) {
         t.resize(u.rows(), u.cols());
         for (size_t i = 0; i < u.size(); ++i)
           promoter<F,T>::promote(u(i),t(i));
       }
-      static Eigen::Matrix<T,R,C>
+      inline static Eigen::Matrix<T,R,C>
       promote_to(const Eigen::Matrix<F,R,C>& u) {
         Eigen::Matrix<T,R,C> t;
         promoter<Eigen::Matrix<F,R,C>,Eigen::Matrix<T,R,C> >::promote(u,t);
@@ -87,11 +87,11 @@ namespace stan {
     // Eigen::Matrix, F == T
     template <typename T, int R, int C>
     struct promoter<Eigen::Matrix<T,R,C>, Eigen::Matrix<T,R,C> > {
-      static void promote(const Eigen::Matrix<T,R,C>& u,
+      inline static void promote(const Eigen::Matrix<T,R,C>& u,
                           Eigen::Matrix<T,R,C>& t) {
         t = u;
       }
-      static Eigen::Matrix<T,R,C> promote_to(const Eigen::Matrix<T,R,C>& u) {
+      inline static Eigen::Matrix<T,R,C> promote_to(const Eigen::Matrix<T,R,C>& u) {
         return u;
       }
     };
@@ -709,6 +709,25 @@ namespace stan {
          << " rows=" << x.rows()
          << "; cols=" << x.cols();
       throw std::domain_error(ss.str());
+    }
+
+    template <typename T, int R, int C>
+    void validate_symmetric(const Eigen::Matrix<T,R,C>& x,
+                            const char* msg) {
+      // tolerance = 1E-8
+      validate_square(x,msg);
+      for (int i = 0; i < x.rows(); ++i) {
+        for (int j = 0; j < x.cols(); ++j) {
+          if (x(i,j) != x(j,i)) {
+            std::stringstream ss;
+            ss << "error in call to " << msg
+               << "; require symmetric matrix, but found"
+               << "; x[" << i << "," << j << "]=" << x(i,j)
+               << "; x[" << j << "," << i << "]=" << x(j,i);
+            throw std::domain_error(ss.str());
+          }
+        }
+      }    
     }
 
     template <typename T1, int R1, int C1, typename T2, int R2, int C2>
@@ -1842,44 +1861,6 @@ namespace stan {
     }
 
     /**
-     * Return the real component of the eigenvalues of the specified
-     * matrix in descending order of magnitude.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Specified matrix.
-     * @return Eigenvalues of matrix.
-     */
-    vector_d eigenvalues(const matrix_d& m);
-
-    /**
-     * Return a matrix whose columns are the real components of the
-     * eigenvectors of the specified matrix.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Specified matrix.
-     * @return Eigenvectors of matrix.
-     */
-    matrix_d eigenvectors(const matrix_d& m);
-    /**
-     * Assign the real components of the eigenvalues and eigenvectors
-     * of the specified matrix to the specified references.
-     * <p>Given an input matrix \f$A\f$, the
-     * eigenvalues will be found in \f$D\f$ in descending order of
-     * magnitude.  The eigenvectors will be written into
-     * the columns of \f$V\f$.  If \f$A\f$ is invertible, then
-     * <p>\f$A = V \times \mbox{\rm diag}(D) \times V^{-1}\f$, where
-     $ \f$\mbox{\rm diag}(D)\f$ is the square diagonal matrix with
-     * diagonal elements \f$D\f$ and \f$V^{-1}\f$ is the inverse of
-     * \f$V\f$.
-     * @param m Specified matrix.
-     * @param eigenvalues Column vector reference into which
-     * eigenvalues are written.
-     * @param eigenvectors Matrix reference into which eigenvectors
-     * are written.
-     */
-    void eigen_decompose(const matrix_d& m,
-                         vector_d& eigenvalues,
-                         matrix_d& eigenvectors);
-
-    /**
      * Return the eigenvalues of the specified symmetric matrix
      * in descending order of magnitude.  This function is more
      * efficient than the general eigenvalues function for symmetric
@@ -1888,32 +1869,60 @@ namespace stan {
      * @param m Specified matrix.
      * @return Eigenvalues of matrix.
      */
-    vector_d eigenvalues_sym(const matrix_d& m);
-    /**
-     * Return a matrix whose rows are the real components of the
-     * eigenvectors of the specified symmetric matrix.  This function
-     * is more efficient than the general eigenvectors function for
-     * symmetric matrices.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Symmetric matrix.
-     * @return Eigenvectors of matrix.
-     */
-    matrix_d eigenvectors_sym(const matrix_d& m);
-    /**
-     * Assign the real components of the eigenvalues and eigenvectors
-     * of the specified symmetric matrix to the specified references.
-     * <p>See <code>eigen_decompose()</code> for more information on the
-     * values.
-     * @param m Symmetric matrix.  This function is more efficient
-     * than the general decomposition method for symmetric matrices.
-     * @param eigenvalues Column vector reference into which
-     * eigenvalues are written.
-     * @param eigenvectors Matrix reference into which eigenvectors
-     * are written.
-     */
-    void eigen_decompose_sym(const matrix_d& m,
-                                    vector_d& eigenvalues,
-                                    matrix_d& eigenvectors);
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    eigenvalues_sym(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      validate_nonzero_size(m,"eigenvalues_sym");
+      validate_symmetric(m,"eigenvalues_sym");
+      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
+        solver(m,Eigen::EigenvaluesOnly);
+      return solver.eigenvalues();
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    eigenvectors_sym(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      validate_nonzero_size(m,"eigenvectors_sym");
+      validate_symmetric(m,"eigenvectors_sym");
+      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
+        solver(m);
+      return solver.eigenvectors(); 
+    }
+
+
+
+
+    // /**
+    //  * Return a matrix whose rows are the real components of the
+    //  * eigenvectors of the specified symmetric matrix.  This function
+    //  * is more efficient than the general eigenvectors function for
+    //  * symmetric matrices.
+    //  * <p>See <code>eigen_decompose()</code> for more information.
+    //  * @param m Symmetric matrix.
+    //  * @return Eigenvectors of matrix.
+    //  */
+    // matrix_d eigenvectors_sym(const matrix_d& m) {
+    //   validate_nonzero_size(m,"eigenvectors_sym");
+    //   validate_square(m,"eigenvectors_sym");
+    //   Eigen::SelfAdjointEigenSolver<matrix_d> solver(m);
+    //   return solver.eigenvectors().real();
+    // }
+
+    // /**
+    //  * Assign the real components of the eigenvalues and eigenvectors
+    //  * of the specified symmetric matrix to the specified references.
+    //  * <p>See <code>eigen_decompose()</code> for more information on the
+    //  * values.
+    //  * @param m Symmetric matrix.  This function is more efficient
+    //  * than the general decomposition method for symmetric matrices.
+    //  * @param eigenvalues Column vector reference into which
+    //  * eigenvalues are written.
+    //  * @param eigenvectors Matrix reference into which eigenvectors
+    //  * are written.
+    //  */
+    // void eigen_decompose_sym(const matrix_d& m,
+    //                                 vector_d& eigenvalues,
+    //                                 matrix_d& eigenvectors);
 
 
     /**
@@ -1962,6 +1971,17 @@ namespace stan {
     void svd(const matrix_d& m, matrix_d& u, matrix_d& v, vector_d& s);
 
 
+    /**
+     * Return the cumulative sum of the specified vector.
+     *
+     * The cumulative sum of a vector of values \code{x} is the
+     *
+     * <code>x[0], x[1] + x[2], ..., x[1] + ,..., + x[x.size()-1]</code>
+     *
+     * @tparm T Scalar type of vector.
+     * @param x Vector of values.
+     * @return Cumulative sum of values.
+     */
     template <typename T>
     inline 
     std::vector<T>
@@ -1974,31 +1994,35 @@ namespace stan {
         result[i] = x[i] + result[i-1];
       return result;
     }
-    template <typename T, int C>
+    /**
+     * Return the cumulative sum of the specified matrix.
+     *
+     * The cumulative sum is of the same type as the input and
+     * has values defined by
+     *
+     * <code>x(0), x(1) + x(2), ..., x(1) + ,..., + x(x.size()-1)</code>
+     *
+     * @tparm T Scalar type of matrix.
+     * @tparam R Row type of matrix.
+     * @tparam C Column type of matrix.
+     * @param x Vector of values.
+     * @return Cumulative sum of values.
+     */
+    template <typename T, int R, int C>
     inline 
-    Eigen::Matrix<T,1,C> 
-    cumulative_sum(const Eigen::Matrix<T,1,C>& rv) {
-      Eigen::Matrix<T,1,C> result(rv.size());
-      if (rv.size() == 0)
+    Eigen::Matrix<T,R,C> 
+    cumulative_sum(const Eigen::Matrix<T,R,C>& m) {
+      Eigen::Matrix<T,R,C> result(m.rows(),m.cols());
+      if (m.size() == 0)
         return result;
-      result(0) = rv(0);
+      result(0) = m(0);
       for (int i = 1; i < result.size(); ++i)
-        result(i) = rv(i) + result(i-1);
-      return result;
-    }
-    template <typename T, int R>
-    inline 
-    Eigen::Matrix<T,R,1>
-    cumulative_sum(const Eigen::Matrix<T,R,1>& v) {
-      Eigen::Matrix<T,R,1> result(v.size());
-      if (v.size() == 0)
-        return result;
-      result(0) = v(0);
-      for (int i = 1; i < result.size(); ++i)
-        result(i) = v(i) + result(i-1);
+        result(i) = m(i) + result(i-1);
       return result;
     }
 
+
+    // prints used in generator for print() statements in modeling language
 
     template <typename T>
     void stan_print(std::ostream* o, const T& x) {
