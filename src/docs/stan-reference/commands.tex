@@ -835,6 +835,29 @@ real valued.  This dump file may only be used for variables \code{y}
 declared as real in \Stan.
 
 
+\subsection{Infinite and Not-a-Number Values}
+
+Stan's reader supports infinite and not-a-number values for scalar
+quantities (see \refsection{real-data-type} for more information).
+Both infinite and not-a-number values are supported by Stan's
+dump-format readers.  
+%
+\begin{center}
+\begin{tabular}{r||c|c}
+{\it Value} & {\it Preferred Form} & {\it Alternative Forms} \\ \hline \hline
+positive infinity & \code{Inf} & \code{Infinity},
+\code{infinity}
+\\
+negative infinity & \code{-Inf} & \code{-Infinity},
+\code{-infinity}
+\\
+not a number & \code{NaN} & 
+\end{tabular}
+\end{center}
+%
+These strings are not case sensitive, so \code{inf} may also be used
+for positive infinity, or \code{NAN} for not-a-number.
+
 \section{Quoted Variable Names}
 
 In order to support \JAGS data files, variables may be double quoted.
@@ -928,6 +951,9 @@ The template parameters \code{T} will be set to either \code{int} or
 \code{real}.  Because \Stan allows promotion of integer values to real
 values, an integer sequence specification in the dump data format may
 be assigned to either an integer- or real-based variable in \Stan.
+
+
+
 
 
 

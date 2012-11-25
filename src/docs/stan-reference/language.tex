@@ -422,6 +422,14 @@ real<lower=-1,upper=1> rho;
 \end{quote}
 %
 
+\subsubsection{Infinite Constraints}
+
+Lower bounds that are negative infinity or upper bounds that are
+positive infinity are ignored.  Stan provides constants
+\code{positive\_infinity()} and \code{negative\_infinity()} which may
+be used for this purpose, or they may be read as data in the dump
+format.  
+
 
 \subsection{Expressions as Bounds}
 

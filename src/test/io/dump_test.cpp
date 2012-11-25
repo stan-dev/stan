@@ -53,9 +53,9 @@ void test_val(std::string name, T val, std::string s) {
 }
 
 TEST(io_dump, reader_double) {
+  test_val("a",-5.0,"a <- -5.0");
   test_val("a",5.0,"a <- 5.0");
   test_val("a",0.0,"a <- 0.0");
-  test_val("a",-5.0,"a <- -5.0");
 }
 
 TEST(io_dump, reader_int) {
@@ -161,7 +161,9 @@ TEST(io_dump, reader_vec_data_long_suffix) {
   stan::io::dump_reader reader(in);
   test_list2(reader,"a",expected_vals,expected_dims);
 }
-
+TEST(io_dump, reader_nan_inf) {
+  std::vector<double> expected_vals;
+}
 
 TEST(io_dump, reader_vec_double) {
   std::vector<double> expected_vals;

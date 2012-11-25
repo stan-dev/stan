@@ -1,6 +1,8 @@
 #ifndef __STAN__IO__DUMP_HPP__
 #define __STAN__IO__DUMP_HPP__
 
+#include <cctype>
+#include <limits>
 #include <map>
 #include <vector>
 #include <string>
@@ -486,7 +488,8 @@ namespace stan {
         return true;
       }
 
-      bool scan_chars(std::string s) {
+
+      bool scan_chars(std::string s, bool case_sensitive = true) {
         for (size_t i = 0; i < s.size(); ++i) {
           char c;
           if (!(in_ >> c)) {
@@ -494,7 +497,9 @@ namespace stan {
               in_.putback(s[i-j]);
             return false;
           }
-          if (c != s[i]) {
+          // all ASCII, so toupper is OK
+          if ((case_sensitive && c != s[i])
+              || (!case_sensitive && ::toupper(c) != ::toupper(s[i]))) {
             in_.putback(c);
             for (size_t j = 1; j < i; ++j) 
               in_.putback(s[i-j]);
@@ -512,6 +517,22 @@ namespace stan {
           if (std::isspace(c)) continue;
           in_.putback(c);
           break;
+        }
+        // must take longest first!
+        if (scan_chars("Infinity",false) || scan_chars("Inf",false)) {
+          stack_r_.push_back(std::numeric_limits<double>::infinity());
+          is_double = true;
+          return true;
+        }
+        // if (scan_chars("-Infinity",false) || scan_chars("-Inf",false)) {
+        //    stack_r_.push_back(-std::numeric_limits<double>::infinity());
+        //    is_double = true;
+        //    return true;
+        // }
+        if (scan_chars("NaN",false)) {
+          stack_r_.push_back(std::numeric_limits<double>::quiet_NaN());
+          is_double = true;
+          return true;
         }
         while (in_.get(c)) {
           if (std::isdigit(c) || c == '-' || c == '+') {

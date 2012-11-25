@@ -481,6 +481,9 @@ namespace stan {
      *
      * <p>where \f$L\f$ is the constant lower bound.
      *
+     * <p>If the lower bound is negative infinity, this function
+     * reduces to <code>identity_constrain(x)</code>.
+     *
      * @param x Unconstrained scalar input.
      * @param lb Lower-bound on constrained ouptut.
      * @return Lower-bound constrained value correspdonding to inputs.
@@ -490,6 +493,8 @@ namespace stan {
     template <typename T, typename TL>
     inline
     T lb_constrain(const T x, const TL lb) {
+      if (lb == -std::numeric_limits<double>::infinity())
+        return identity_constrain(x);
       return exp(x) + lb;
     }
 
@@ -498,6 +503,9 @@ namespace stan {
      * input and specified lower bound, incrementing the specified
      * reference with the log absolute Jacobian determinant of the
      * transform.
+     *
+     * If the lower bound is negative infinity, this function
+     * reduces to <code>identity_constraint(x,lp)</code>.
      *
      * @param x Unconstrained scalar input.
      * @param lb Lower-bound on output.
@@ -510,6 +518,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL>::type
     lb_constrain(const T x, const TL lb, T& lp) {
+      if (lb == -std::numeric_limits<double>::infinity())
+        return identity_constrain(x,lp);
       lp += x;
       return exp(x) + lb;
     }
@@ -517,6 +527,9 @@ namespace stan {
     /**
      * Return the unconstrained value that produces the specified
      * lower-bound constrained value.
+     *
+     * If the lower bound is negative infinity, it is ignored and
+     * the function reduces to <code>identity_free(y)</code>.
      * 
      * @param y Input scalar.
      * @param lb Lower bound.
@@ -530,6 +543,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL>::type
     lb_free(const T y, const TL lb) {
+      if (lb == -std::numeric_limits<double>::infinity())
+        return identity_free(y);
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
                                          y, lb, "Lower bounded variable");
       return log(y - lb);
@@ -548,6 +563,9 @@ namespace stan {
      *
      * <p>where \f$U\f$ is the upper bound.  
      * 
+     * If the upper bound is positive infinity, this function
+     * reduces to <code>identity_constrain(x)</code>.
+     * 
      * @param x Free scalar.
      * @param ub Upper bound.
      * @return Transformed scalar with specified upper bound.
@@ -558,6 +576,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_constrain(const T x, const TU ub) {
+      if (ub == std::numeric_limits<double>::infinity())
+        return identity_constrain(x);
       return ub - exp(x);
     }
 
@@ -574,6 +594,9 @@ namespace stan {
      * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | 
      *     = \log | -\mbox{exp}(x) + 0 | = x\f$.
      *
+     * If the upper bound is positive infinity, this function
+     * reduces to <code>identity_constrain(x,lp)</code>.
+     *
      * @param x Free scalar.
      * @param ub Upper bound.
      * @param lp Log probability reference.
@@ -585,6 +608,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_constrain(const T x, const TU ub, T& lp) {
+      if (ub == std::numeric_limits<double>::infinity())
+        return identity_constrain(x,lp);
       lp += x;
       return ub - exp(x);
     }
@@ -600,6 +625,9 @@ namespace stan {
      *
      * <p>where \f$U\f$ is the upper bound.
      *
+     * If the upper bound is positive infinity, this function
+     * reduces to <code>identity_free(y)</code>.
+     *
      * @param y Upper-bounded scalar.
      * @param ub Upper bound.
      * @return Free scalar corresponding to upper-bounded scalar.
@@ -612,6 +640,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_free(const T y, const TU ub) {
+      if (ub == std::numeric_limits<double>::infinity())
+        return identity_free(y);
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
                                       y, ub, "Upper bounded variable");
       return log(ub - y);
@@ -628,6 +658,14 @@ namespace stan {
      * <p>The transform is the transformed and scaled inverse logit,
      *
      * <p>\f$f(x) = L + (U - L) \mbox{logit}^{-1}(x)\f$
+     *
+     * If the lower bound is negative infinity and upper bound finite,
+     * this function reduces to <code>ub_constrain(x,ub)</code>.  If
+     * the upper bound is positive infinity and the lower bound
+     * finite, this function reduces to
+     * <code>lb_constrain(x,lb)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity, 
+     * this function reduces to <code>identity_constrain(x)</code>.
      * 
      * @param x Free scalar to transform.
      * @param lb Lower bound.
@@ -643,12 +681,13 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-       if (!(lb < ub)) {
-        std::stringstream s;
-        s << "domain error in lub_constrain;  lower bound = " << lb
-          << " must be strictly less than upper bound = " << ub;
-        throw std::domain_error(s.str());
-      }
+      stan::math::validate_less(lb,ub,"lb","ub","lub_constrain/3");
+
+      if (lb == -std::numeric_limits<double>::infinity())
+        return ub_constrain(x,ub);
+      if (ub == std::numeric_limits<double>::infinity())
+        return lb_constrain(x,lb);
+
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -688,7 +727,15 @@ namespace stan {
      *         \, (1 - \mbox{logit}^{-1}(x)) |\f$
      *
      * <p>\f$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x)) 
-                                        + \log (1 - \mbox{logit}^{-1}(x))\f$
+     *                          + \log (1 - \mbox{logit}^{-1}(x))\f$
+     *
+     * <p>If the lower bound is negative infinity and upper bound finite,
+     * this function reduces to <code>ub_constrain(x,ub,lp)</code>.  If
+     * the upper bound is positive infinity and the lower bound
+     * finite, this function reduces to
+     * <code>lb_constrain(x,lb,lp)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity, 
+     * this function reduces to <code>identity_constrain(x,lp)</code>.
      *
      * @param x Free scalar to transform.
      * @param lb Lower bound.
@@ -710,6 +757,10 @@ namespace stan {
           << " must be strictly less than upper bound = " << ub;
         throw std::domain_error(s.str());
       }
+      if (lb == -std::numeric_limits<double>::infinity())
+        return ub_constrain(x,ub,lp);
+      if (ub == std::numeric_limits<double>::infinity())
+        return lb_constrain(x,lb,lp);
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -743,6 +794,14 @@ namespace stan {
      *
      * where \f$U\f$ and \f$L\f$ are the lower and upper bounds.
      *
+     * <p>If the lower bound is negative infinity and upper bound finite,
+     * this function reduces to <code>ub_free(y,ub)</code>.  If
+     * the upper bound is positive infinity and the lower bound
+     * finite, this function reduces to
+     * <code>lb_free(x,lb)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity, 
+     * this function reduces to <code>identity_free(y)</code>.
+     *
      * @tparam T Type of scalar.
      * @param y Scalar input.
      * @param lb Lower bound.
@@ -760,6 +819,10 @@ namespace stan {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
                                 y, lb, ub, "Bounded variable");
+      if (lb == -std::numeric_limits<double>::infinity())
+        return ub_free(y,ub);
+      if (ub == std::numeric_limits<double>::infinity())
+        return lb_free(y,lb);
       return logit((y - lb) / (ub - lb));
     }
 

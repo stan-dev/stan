@@ -60,14 +60,23 @@ TEST(prob_transform, positive_rt) {
 
 TEST(prob_transform, lb) {
   EXPECT_FLOAT_EQ(exp(-1.0) + 2.0, stan::prob::lb_constrain(-1.0,2.0));
+  EXPECT_FLOAT_EQ(7.9, 
+                  stan::prob::lb_constrain(7.9, -std::numeric_limits<double>::infinity()));
 }
 TEST(prob_transform, lb_j) {
   double lp = 15.0;
   EXPECT_FLOAT_EQ(exp(-1.0) + 2.0, stan::prob::lb_constrain(-1.0,2.0,lp));
   EXPECT_FLOAT_EQ(15.0 - 1.0, lp);
+
+  double lp2 = 8.6;
+  EXPECT_FLOAT_EQ(7.9, 
+                  stan::prob::lb_constrain(7.9, -std::numeric_limits<double>::infinity(),
+                                           lp2));
+  EXPECT_FLOAT_EQ(8.6, lp2);
 }
 TEST(prob_transform, lb_f) {
   EXPECT_FLOAT_EQ(log(3.0 - 2.0), stan::prob::lb_free(3.0,2.0));
+  EXPECT_FLOAT_EQ(1.7, stan::prob::lb_free(1.7, -std::numeric_limits<double>::infinity()));
 }
 TEST(prob_transform, lb_f_exception) {
   double lb = 2.0;
@@ -84,16 +93,29 @@ TEST(prob_transform, lb_rt) {
 
 TEST(prob_transform, ub) {
   EXPECT_FLOAT_EQ(2.0 - exp(-1.0), stan::prob::ub_constrain(-1.0,2.0));
+  EXPECT_FLOAT_EQ(1.7, 
+                  stan::prob::ub_constrain(1.7, 
+                                           std::numeric_limits<double>::infinity()));
 }
 TEST(prob_transform, ub_j) {
   double lp = 15.0;
   EXPECT_FLOAT_EQ(2.0 - exp(-1.0), stan::prob::ub_constrain(-1.0,2.0,lp));
   EXPECT_FLOAT_EQ(15.0 - 1.0, lp);
+
+  double lp2 = 1.87;
+  EXPECT_FLOAT_EQ(-5.2, stan::prob::ub_constrain(-5.2,
+                                                 std::numeric_limits<double>::infinity(),
+                                                 lp2));
+  EXPECT_FLOAT_EQ(1.87,lp2);
 }
 TEST(prob_transform, ub_f) {
   double y = 2.0;
   double U = 4.0;
   EXPECT_FLOAT_EQ(log(-(y - U)), stan::prob::ub_free(2.0,4.0));
+
+  EXPECT_FLOAT_EQ(19.765, 
+                  stan::prob::ub_free(19.765,
+                                      std::numeric_limits<double>::infinity()));
 }
 TEST(prob_transform, ub_f_exception) {
   double ub = 4.0;
@@ -112,6 +134,19 @@ TEST(prob_transform, ub_rt) {
 TEST(prob_transform, lub) {
   EXPECT_FLOAT_EQ(2.0 + (5.0 - 2.0) * stan::math::inv_logit(-1.0), 
                   stan::prob::lub_constrain(-1.0,2.0,5.0));
+
+  EXPECT_FLOAT_EQ(1.7, 
+                  stan::prob::lub_constrain(1.7,
+                                            -std::numeric_limits<double>::infinity(),
+                                            +std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(1.8,3.0),
+                  stan::prob::lub_constrain(1.8,
+                                            3.0,
+                                            +std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(1.9,-12.5),
+                  stan::prob::lub_constrain(1.9,
+                                            -std::numeric_limits<double>::infinity(),
+                                            -12.5));
 }
 TEST(prob_transform, lub_j) {
   double lp = -17.0;
@@ -123,6 +158,33 @@ TEST(prob_transform, lub_j) {
   EXPECT_FLOAT_EQ(-17.0 + log(U - L) + log(stan::math::inv_logit(x)) 
                   + log(1.0 - stan::math::inv_logit(x)),
                   lp);
+
+  double lp1 = -12.9;
+  EXPECT_FLOAT_EQ(1.7, 
+                  stan::prob::lub_constrain(1.7,
+                                            -std::numeric_limits<double>::infinity(),
+                                            +std::numeric_limits<double>::infinity(),
+                                            lp1));
+  EXPECT_FLOAT_EQ(-12.9,lp1);
+
+  double lp2 = -19.8;
+  double lp2_expected = -19.8;
+  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(1.8,3.0,lp2_expected),
+                  stan::prob::lub_constrain(1.8,
+                                            3.0,
+                                            +std::numeric_limits<double>::infinity(),
+                                            lp2));
+  EXPECT_FLOAT_EQ(lp2_expected, lp2);
+
+  double lp3 = -422;
+  double lp3_expected = -422;
+  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(1.9,-12.5,lp3_expected),
+                  stan::prob::lub_constrain(1.9,
+                                            -std::numeric_limits<double>::infinity(),
+                                            -12.5,
+                                            lp3));
+  EXPECT_FLOAT_EQ(lp3_expected,lp3);
+  
 }
 TEST(ProbTransform, lubException) {
   using stan::prob::lub_constrain;
@@ -138,6 +200,19 @@ TEST(prob_transform, lub_f) {
   double y = 3.0;
   EXPECT_FLOAT_EQ(stan::math::logit((y - L) / (U - L)),
                   stan::prob::lub_free(y,L,U));
+  
+  EXPECT_FLOAT_EQ(14.2,
+                  stan::prob::lub_free(14.2,
+                                       -std::numeric_limits<double>::infinity(),
+                                       std::numeric_limits<double>::infinity()));
+  EXPECT_FLOAT_EQ(stan::prob::ub_free(-18.3,7.6),
+                  stan::prob::lub_free(-18.3,
+                                       -std::numeric_limits<double>::infinity(),
+                                       7.6));
+  EXPECT_FLOAT_EQ(stan::prob::lb_free(763.9, -3122.2),
+                  stan::prob::lub_free(763.9,
+                                       -3122.2,
+                                       std::numeric_limits<double>::infinity()));
 }
 TEST(prob_transform, lub_f_exception) {
   double L = -10.0;
