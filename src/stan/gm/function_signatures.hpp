@@ -12,7 +12,9 @@ int_vector_types.push_back(expr_type(INT_T,1U));    // std vector
 int_vector_types.push_back(VECTOR_T);               // Eigen vector
 int_vector_types.push_back(ROW_VECTOR_T);           // Eigen row vector
 
-
+std::vector<expr_type> primitive_types;
+primitive_types.push_back(INT_T);
+primitive_types.push_back(DOUBLE_T);
 
 add_unary("abs");
 add("abs",INT_T,INT_T);
@@ -169,6 +171,19 @@ add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
 add("lkj_corr_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
 add("lkj_cov_log",DOUBLE_T, MATRIX_T,VECTOR_T,VECTOR_T,DOUBLE_T);
 add("lmgamma",DOUBLE_T,INT_T,DOUBLE_T);
+for (size_t i = 0; i < primitive_types.size(); ++i) {
+  add("logical_negation",INT_T,primitive_types[i]);
+  for (size_t j = 0; j < primitive_types.size(); ++j) {
+    add("logical_or",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_and",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_eq",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_neq",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_lt",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_lte",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_gt",INT_T,primitive_types[i], primitive_types[j]);
+    add("logical_gte",INT_T,primitive_types[i], primitive_types[j]);
+  }
+}
 add_unary("log");
 add("log",VECTOR_T,VECTOR_T);
 add("log",ROW_VECTOR_T,ROW_VECTOR_T);
