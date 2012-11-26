@@ -25,13 +25,11 @@ public:
   }
 
   static size_t num_iterations() {
-    return 20000U;
+    return 2000U;
   }
 
   static std::vector<size_t> skip_chains_test() {
     std::vector<size_t> params_to_skip;
-    params_to_skip.push_back(2U);      // A
-    params_to_skip.push_back(3U);      // B
     return params_to_skip;
   }
 
@@ -47,9 +45,8 @@ public:
     expected_values.push_back(make_pair(0U, -0.2446));  // alpha
     expected_values.push_back(make_pair(2U, 0.7833));   // A
 
-    // FIXME: find out why beta doesn't match.
-    //expected_values.push_back(make_pair(1U, -0.07886)); // beta
-    //expected_values.push_back(make_pair(3U, 0.9242));   // B
+    expected_values.push_back(make_pair(1U, -0.07886)); // beta
+    expected_values.push_back(make_pair(3U, 0.9242));   // B
 
     return expected_values;
   }
