@@ -1,12 +1,17 @@
 #include <stan/io/dump.hpp>
 #include <gtest/gtest.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 void test_list3(stan::io::dump_reader& reader,
                const std::vector<double>& vals) {
   std::vector<double> vals2 = reader.double_values();
   EXPECT_EQ(vals.size(),vals2.size());
-  for (size_t i = 0; i < vals.size(); ++i)
-    EXPECT_FLOAT_EQ(vals[i],vals2[i]);
+  for (size_t i = 0; i < vals.size(); ++i) {
+    if (boost::math::isnan(vals[i]))
+      EXPECT_TRUE(boost::math::isnan(vals2[i]));
+    else
+      EXPECT_FLOAT_EQ(vals[i],vals2[i]);
+  }
 }
 void test_list3(stan::io::dump_reader& reader,
                const std::vector<int>& vals) {
@@ -162,7 +167,22 @@ TEST(io_dump, reader_vec_data_long_suffix) {
   test_list2(reader,"a",expected_vals,expected_dims);
 }
 TEST(io_dump, reader_nan_inf) {
+  std::string txt = "a <- c(-1.0, Inf, -Inf, 0, Infinity, 129, NaN, -4)"; 
   std::vector<double> expected_vals;
+  expected_vals.push_back(-1.0);
+  expected_vals.push_back(std::numeric_limits<double>::infinity());
+  expected_vals.push_back(-std::numeric_limits<double>::infinity());
+  expected_vals.push_back(0.0);
+  expected_vals.push_back(std::numeric_limits<double>::infinity());
+  expected_vals.push_back(129.0);
+  expected_vals.push_back(std::numeric_limits<double>::quiet_NaN());
+  expected_vals.push_back(-4);
+
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(expected_vals.size());
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"a",expected_vals,expected_dims);
 }
 
 TEST(io_dump, reader_vec_double) {

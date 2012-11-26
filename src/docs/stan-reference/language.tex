@@ -1396,7 +1396,7 @@ functions.  For instance, the mathematical constants $\pi$ and $e$ are
 represented as nullary functions named \code{pi()} and \code{e()}.
 See \refsection{built-in-constants} for a list of built-in constants.
 
-\subsection{Type Promotion and Function Resolution}
+\subsection{Type Promotion and Function Resolution}\label{type-promotion.section}
 
 Because of integer to real type promotion, rules must be established
 for which function is called given a sequence of argument types.  The
@@ -1454,6 +1454,143 @@ If there is not a unique function requiring fewer promotions than all
 others, as with \code{bar(1,1)} given the two declarations above, 
 the \Stan compiler will flag the expression as illegal. 
 
+\section{Type Inference}
+
+Stan is strongly statically typed, meaning that the implementation
+type of an expression can be resolved at compile time.
+
+\subsection{Implementation Types}
+
+The primitive implementation types for Stan are 
+%
+\code{int},
+\code{real},
+\code{vector},
+\code{row\_vector}, and
+\code{matrix}.
+%
+Every basic declared type corresponds to a primitive type;  see
+\reffigure{primitive-type} for the mapping from types to their
+primitive types.
+%
+\begin{figure}
+\begin{center}
+\begin{tabular}{c|c}
+{\it Type} & {\it Primitive Type} \\ \hline \hline
+\code{int} & \code{int} \\
+\code{real} & \code{real} \\[6pt]
+\code{matrix} & \code{matrix} \\
+\code{cov\_matrix} & \code{matrix} \\
+\code{corr\_matrix} & \code{matrix} \\
+\end{tabular}
+\hspace{0.4in}
+\begin{tabular}{c|c}
+{\it Type} & {\it Primitive Type} \\ \hline \hline
+\code{vector} & \code{vector} \\
+\code{simplex} & \code{vector} \\
+\code{ordered} & \code{vector} \\
+\code{pos\_ordered} & \code{vector} \\[6pt]
+\code{row\_vector} & \code{row\_vector}
+\end{tabular}
+\end{center}
+\caption{\it The table shows the variable declaration types of Stan
+  and their corresponding primitive implementation type.  Stan
+  functions, operators and probability functions have argument and
+  result types declared in terms of primitive types.
+}\label{primitive-type.figure}
+\end{figure}
+%
+A full implementation type consists of a primitive implementation type
+and an integer array dimensionality greater than or equal to zero.
+These will be written to emphasize their array-like nature.  For
+example, \code{int[]} has an array dimensionality of 1, \code{int} an
+array dimensionality of 0, and \code{int[,,]} an array dimensionality
+of 3. The implementation type \code{matrix[,,]} has a total of five
+dimensions and takes up to five indices, three from the array and two
+from the matrix.  
+
+Recall that the array dimensions come before the matrix or vector
+dimensions in an expression such as the following declaration of a
+three-dimensional array of matrices.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[M,N] a[I,J,K];
+\end{Verbatim}
+\end{quote}
+%
+The matrix \code{a} is indexed as \code{a[i,j,k,m,n]} with the array
+indices first, followed by the matrix indices, with \code{a[i,j,k]}
+being a matrix and \code{a[i,j,k,m]} being a row vector.
+
+\subsection{Type Inference Rules}
+
+Stan's type inference rules define the implementation type of an
+expression based on a background set of variable declarations.  The
+rules work bottom up from primitive literal and variable expressions
+to complex expressions.
+
+\subsubsection{Literals}
+
+An iteger literal expression such as \code{42} is of type \code{int}.
+Real literals such as \code{42.0} are of type \code{real}.
+
+\subsubsection{Variables}
+
+The type of a variable declared locally or in a previous block is
+determined by its declaration.  The type of a loop variable is
+\code{int}.  
+
+There is always a unique declaration for each variable because Stan
+prohibits the redeclaration of an already-declared variables.%
+%
+\footnote{Languages such as \Cpp and R allow the delcaration of a
+  variable of a given name in a narrower scope to hide (take
+  precedence over for evaluation) a variable defined in a containing
+  scope.  Stan will have to introduce this behavior eventually for
+  user-defined functions written in Stan.}
+
+\subsubsection{Indexing}
+
+If \code{x} is an expression of total dimensionality greater than or
+equal to $N$, then the type of expression \code{e[i1,...,iN]} is the
+same as that of \code{e[i1]...[iN]}, so it suffices to define the type
+of a singly-indexed function.  Suppose \code{e} is an expression and
+\code{i} is an expression of primitive type \code{int}.  Then
+%
+\begin{itemize}
+\item if \code{e} is an expression of array dimensionality $K > 0$,
+  then \code{e[i]} has array dimensionality $K-1$ and the same
+  primitive implementation type as \code{e},
+%
+\item if \code{e} has implementation type \code{vector} or
+  \code{row\_vector} of array dimensionality 0, then \code{e[i]} has
+  implementation type \code{real}, and
+%
+\item if \code{e} has implementation type \code{matrix}, then
+  \code{e[i]} has type \code{row\_vector}.
+\end{itemize}
+
+\subsubsection{Function Application}
+
+If \code{f} is the name of a function and \code{e1,...,eN} are
+expressions for $N \geq 0$, then \code{f(e1,...,eN)} is an expression
+whose type is determined by the return type in the function signature
+for \code{f} given \code{e1} through \code{eN}.  Recall that a
+function signature is a declaration of the argument types and the
+result type.  
+
+In looking up functions, binary operators like \code{real~*~real} are
+defined as \code{operator*(real,real)} in the documentation and index.
+
+In matching a function definition, arguments of type \code{int} may be
+promoted to type \code{real} if necessary (see \refsection{type-promotion} for an
+exact specification of Stan's integer-to-real type-promotion rule).
+
+In general, matirx operations return the lowest inferrable type.  For
+example, \code{row\_vector~*~vector} returns a value of type
+\code{real}, which is declared in the function documentation and index
+as \code{real~operator*(row\_vector,vector)}.
 
 % \subsection{Extending \Stan with User-Defined Functions}
 
@@ -2178,6 +2315,8 @@ useful for debugging.  They can be used to display the values of
 variables or expressions at various points in the execution of a
 program.  They are particularly useful for spotting problematic
 not-a-number of infinite values, both of which will be printed.
+
+
 
 
 \chapter{Program Blocks}\label{blocks.chapter}

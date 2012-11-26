@@ -626,7 +626,7 @@ namespace stan {
      * 
      * @param x array of specified values
      */
-    static double log_sum_exp(const std::vector<double>& x) {
+    double log_sum_exp(const std::vector<double>& x) {
       using std::numeric_limits;
       using std::log;
       using std::exp;
@@ -643,7 +643,163 @@ namespace stan {
       return max + log(sum);
     }
 
+    /**
+     * The logical negation function which returns 1 if the input
+     * is equal to zero and 0 otherwise.
+     *
+     * @tparam T Type to compare to zero.
+     * @param x Value to compare to zero.
+     * @return 1 if input is equal to zero.
+     */
+    template <typename T>
+    inline 
+    int
+    logical_negation(T x) {
+      return (x == 0);
+    }
 
+    /**
+     * The logical or function which returns 1 if either
+     * argument is unequal to zero and 0 otherwise.  Equivalent
+     * to <code>x1 != 0 || x2 != 0</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> if either x1 or x2 is not equal to 0.
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_or(T1 x1, T2 x2) {
+      return (x1 != 0) || (x2 != 0);
+    }
+
+    /**
+     * The logical and function which returns 1 if both arguments
+     * are unequal to zero and 0 otherwise. 
+     * Equivalent
+     * to <code>x1 != 0 && x2 != 0</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> if both x1 and x2 are not equal to 0.
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_and(T1 x1, T2 x2) {
+      return (x1 != 0) && (x2 != 0);
+    }
+
+
+
+    /**
+     * Return 1 if the first argument is equal to the second.
+     * Equivalent to <code>x1 == x2</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> iff <code>x1 == x2</code>
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_eq(T1 x1, T2 x2) {
+      return x1 == x2;
+    }
+
+    /**
+     * Return 1 if the first argument is unequal to the second.
+     * Equivalent to <code>x1 != x2</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> iff <code>x1 != x2</code>
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_neq(T1 x1, T2 x2) {
+      return x1 != x2;
+    }
+
+    /**
+     * Return 1 if the first argument is strictly less than the second.
+     * Equivalent to <code>x1 &lt; x2</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> iff <code>x1 &lt; x2</code>
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_lt(T1 x1, T2 x2) {
+      return x1 < x2;
+    }
+
+    /**
+     * Return 1 if the first argument is less than or equal to the second.
+     * Equivalent to <code>x1 &lt;= x2</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> iff <code>x1 &lt;= x2</code>
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_lte(T1 x1, T2 x2) {
+      return x1 <= x2;
+    }
+
+    /**
+     * Return 1 if the first argument is strictly greater than the second.
+     * Equivalent to <code>x1 &lt; x2</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> iff <code>x1 &gt; x2</code>
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_gt(T1 x1, T2 x2) {
+      return x1 > x2;
+    }
+
+    /**
+     * Return 1 if the first argument is greater than or equal to the second.
+     * Equivalent to <code>x1 &gt;= x2</code>.
+     *
+     * @tparam T1 Type of first argument.
+     * @tparam T2 Type of second argument.
+     * @param x1 First argument
+     * @param x2 Second argument
+     * @return <code>true</code> iff <code>x1 &gt;= x2</code>
+     */
+    template <typename T1, typename T2>
+    inline
+    int
+    logical_gte(T1 x1, T2 x2) {
+      return x1 >= x2;
+    }
+
+    
     
     /** 
      * Return the scalar value and ignore the remaining
