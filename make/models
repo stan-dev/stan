@@ -27,30 +27,30 @@ models/speed/%.stan : src/models/speed/%.stan
 		cp $(wildcard $(basename $<)*.R) $(dir $@);\
 		echo 'cp $(wildcard $(basename $<)*.R) $(dir $@)';\
 	fi;
-	@if test -f $(basename $<)*.Rdata; then \
+	@if test -f $(basename $<)*.data.R; then \
 		echo '';\
 		echo '--- Copying data ---';\
-		cp $(wildcard $(basename $<)*.Rdata) $(dir $@);\
-		echo 'cp $(wildcard $(basename $<)*.Rdata) $(dir $@)';\
+		cp $(wildcard $(basename $<)*.data.R) $(dir $@);\
+		echo 'cp $(wildcard $(basename $<)*.data.R) $(dir $@)';\
 	fi;
 
-.PRECIOUS: models/%.stan models/%.Rdata
+.PRECIOUS: models/%.stan models/%.data.R
 models/%.stan : src/models/%.stan
 	@mkdir -p $(dir $@)
 	@echo ''
 	@echo '--- Copying model ---'
 	cp $< $@ 
-	@if test -f $(patsubst src/models/%.stan,src/models/%.Rdata,$<); then \
+	@if test -f $(patsubst src/models/%.stan,src/models/%.data.R,$<); then \
 		echo '';\
 		echo '--- Copying data ---';\
-		cp $(addsuffix .Rdata,$(basename $<)) $(addsuffix .Rdata,$(basename $@));\
-		echo 'cp $(addsuffix .Rdata,$(basename $<)) $(addsuffix .Rdata,$(basename $@))';\
+		cp $(addsuffix .data.R,$(basename $<)) $(addsuffix .data.R,$(basename $@));\
+		echo 'cp $(addsuffix .data.R,$(basename $<)) $(addsuffix .data.R,$(basename $@))';\
 	fi;
-	@if test -f $(patsubst src/models/%.stan,src/models/%_init.Rdata,$<); then \
+	@if test -f $(patsubst src/models/%.stan,src/models/%.init.R,$<); then \
 		echo '';\
 		echo '--- Copying init ---';\
-		cp $(addsuffix _init.Rdata,$(basename $<)) $(addsuffix _init.Rdata,$(basename $@));\
-		echo 'cp $(addsuffix _init.Rdata,$(basename $<)) $(addsuffix _init.Rdata,$(basename $@))';\
+		cp $(addsuffix .init.R,$(basename $<)) $(addsuffix .init.R,$(basename $@));\
+		echo 'cp $(addsuffix .init.R,$(basename $<)) $(addsuffix .init.R,$(basename $@))';\
 	fi;
 
 

@@ -83,10 +83,10 @@ public:
     command << " --samples=" << get_csv_file(chain);
     command << " --chain_id=" << chain;
     if (has_data()) {
-      command << " --data=" << model_path << ".Rdata";
+      command << " --data=" << model_path << ".data.R";
     }
     if (has_init()) {
-      command << " --init=" << model_path << "_init.Rdata";
+      command << " --init=" << model_path << ".init.R";
     }
     command << " --iter=" << iterations;
     command << " --refresh=" << iterations;
