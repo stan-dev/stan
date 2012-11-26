@@ -11,7 +11,7 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan
 	$(CXX) -g -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS)
-	./$(PGM) --data=$(PGM).Rdata --iter=2000
+	./$(PGM) --data=$(PGM).data.R --iter=2000
 
 clean :
 	rm -f $(PGM).cpp samples.csv $(PGM) 

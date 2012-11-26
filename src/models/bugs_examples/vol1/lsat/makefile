@@ -7,7 +7,7 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 lsat :
 	$(STAN_HOME)/bin/stanc --name=lsat lsat.stan 
 	g++ -O0  -DNDEBUG $(CPPFLAGS) lsat.cpp -o lsat $(LIBFLAGS)
-	./lsat --data=lsat.Rdata
+	./lsat --data=lsat.data.R
 
 clean :
 	rm -f lsat.cpp samples.csv lsat

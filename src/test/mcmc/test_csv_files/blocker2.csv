@@ -3,7 +3,7 @@
 # stan_version_major=1
 # stan_version_minor=0
 # stan_version_patch=0
-# data=models/bugs_examples/vol1/blocker/blocker.Rdata
+# data=models/bugs_examples/vol1/blocker/blocker.data.R
 # init=random initialization
 # append_samples=0
 # seed=1336062631

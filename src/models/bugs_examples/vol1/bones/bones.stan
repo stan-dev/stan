@@ -19,10 +19,10 @@
 data {
   int<lower=0> nChild; 
   int<lower=0> nInd; 
-  real gamma[nInd, 4];  // -1 indicates NA in original R dump data (bones.Rdata.0)
+  real gamma[nInd, 4];  // -1 indicates NA in original R dump data (bones.data.R.0)
   real delta[nInd]; 
   int<lower=0> ncat[nInd]; 
-  int grade[nChild, nInd];  // -1 indicates NA in original R dump data (bones.Rdata.0)
+  int grade[nChild, nInd];  // -1 indicates NA in original R dump data (bones.data.R.0)
 } 
 
 

@@ -186,7 +186,7 @@ public:
   void get_beta(const std::string& filename, std::vector<double>& beta) {
     std::stringstream param_filename;
     param_filename << path << get_path_separator() << filename
-                   << "_param.Rdata";
+                   << "_param.data.R";
     std::ifstream param_ifstream(param_filename.str().c_str());
     stan::io::dump param_values(param_ifstream);
   
@@ -222,7 +222,7 @@ public:
     // 2) Run Stan num_chains times
     std::stringstream command;
     command << path << get_path_separator() << "logistic"
-            << " --data=" << path << get_path_separator() << filename << ".Rdata"
+            << " --data=" << path << get_path_separator() << filename << ".data.R"
             << " --iter=" << iterations
             << " --refresh=" << iterations;
     vector<std::string> command_outputs;  
@@ -328,7 +328,7 @@ public:
     // 2) Run JAGS num_chains times
     std::stringstream command;
     //command << path << get_path_separator() << "logistic"
-    //<< " --data=" << path << get_path_separator() << filename << ".Rdata"
+    //<< " --data=" << path << get_path_separator() << filename << ".data.R"
     //<< " --iter=" << iterations
     //<< " --refresh=" << iterations;
     //vector<std::string> command_outputs;  
@@ -385,7 +385,7 @@ TEST_F(LogisticSpeedTest,GenerateData) {
     std::string data_file = path;
     data_file += get_path_separator();
     data_file += data_files[i];
-    data_file += ".Rdata";
+    data_file += ".data.R";
     std::ifstream file(data_file.c_str());
     if (!file)
       has_data = false;

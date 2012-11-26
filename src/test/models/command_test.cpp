@@ -112,16 +112,16 @@ public:
                                                 "1");
 
     option_name[data] = "data";
-    command_changes[data] = make_pair(" --data="+data_file_base+"1.Rdata",
-                                      " --data="+data_file_base+"2.Rdata");
-    output_changes [data] = make_pair(data_file_base+"1.Rdata",
-                                      data_file_base+"2.Rdata");
+    command_changes[data] = make_pair(" --data="+data_file_base+"1.data.R",
+                                      " --data="+data_file_base+"2.data.R");
+    output_changes [data] = make_pair(data_file_base+"1.data.R",
+                                      data_file_base+"2.data.R");
 
     option_name[init] = "init";
     command_changes[init] = make_pair("",
-                                      " --init=" + data_file_base + "_init.Rdata");
+                                      " --init=" + data_file_base + ".init.R");
     output_changes [init] = make_pair("",
-                                      data_file_base + "_init.Rdata");
+                                      data_file_base + ".init.R");
 
 
     option_name[seed] = "seed";
