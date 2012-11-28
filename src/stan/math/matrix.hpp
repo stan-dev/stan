@@ -74,7 +74,7 @@ namespace stan {
       inline static void promote(const Eigen::Matrix<F,R,C>& u,
                           Eigen::Matrix<T,R,C>& t) {
         t.resize(u.rows(), u.cols());
-        for (size_t i = 0; i < u.size(); ++i)
+        for (int i = 0; i < u.size(); ++i)
           promoter<F,T>::promote(u(i),t(i));
       }
       inline static Eigen::Matrix<T,R,C>
