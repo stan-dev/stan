@@ -94,6 +94,53 @@ namespace stan {
                               std::vector<int>& params_i,
                               std::ostream* output_stream = 0) = 0;
 
+      /**
+       * Evaluate the log-probability, its gradient, and its Hessian
+       * at params_r. This default version computes the Hessian
+       * numerically by finite-differencing the gradient, at a cost of
+       * O(params_r.size()^2).
+       *
+       * @param params_r Real-valued parameter vector.
+       * @param params_i Integer-valued parameter vector.
+       * @param gradient Vector to write gradient to.
+       * @param hessian Vector to write gradient to. hessian[i*D + j]
+       * gives the element at the ith row and jth column of the Hessian
+       * (where D=params_r.size()).
+       * @param output_stream Stream to which print statements in Stan
+       * programs are written, default is 0
+       */
+      virtual double grad_hess_log_prob(std::vector<double>& params_r, 
+                                        std::vector<int>& params_i,
+                                        std::vector<double>& gradient,
+                                        std::vector<double>& hessian,
+                                        std::ostream* output_stream = 0) {
+        const double epsilon = 1e-3;
+        const int order = 4;
+        const double perturbations[order] = {-2*epsilon, -1*epsilon, epsilon, 2*epsilon};
+        const double coefficients[order] = {1.0/12.0,-2.0/3.0,2.0/3.0,-1.0/12.0};
+
+        double result = grad_log_prob(params_r, params_i, gradient, 
+                                      output_stream);
+
+        hessian.assign(params_r.size() * params_r.size(), 0);
+        std::vector<double> temp_grad(params_r.size());
+        std::vector<double> perturbed_params(params_r.begin(), params_r.end());
+        for (size_t d = 0; d < params_r.size(); d++) {
+          double* row = &hessian[d*params_r.size()];
+          for (int i = 0; i < order; i++) {
+            perturbed_params[d] = params_r[d] + perturbations[i];
+            grad_log_prob(perturbed_params, params_i, temp_grad);
+            for (size_t dd = 0; dd < params_r.size(); dd++) {
+              row[dd] += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
+              hessian[d + dd*params_r.size()] += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
+            }
+          }
+          perturbed_params[d] = params_r[d];
+        }
+
+        return result;
+      }
+
       virtual double log_prob_star(size_t idx, 
                                    int val,
                                    std::vector<double>& params_r,
