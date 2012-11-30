@@ -516,7 +516,7 @@ namespace stan {
 
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
-                         char op,
+                         const std::string& op,
                          const expression& right)
       : op(op), 
         left(left), 
@@ -858,22 +858,22 @@ namespace stan {
     }
       
     expression& expression::operator+=(const expression& rhs) {
-      expr_ = binary_op(expr_, '+', rhs);
+      expr_ = binary_op(expr_, "+", rhs);
       return *this;
     }
 
     expression& expression::operator-=(const expression& rhs) {
-      expr_ = binary_op(expr_, '-', rhs);
+      expr_ = binary_op(expr_, "-", rhs);
       return *this;
     }
 
     expression& expression::operator*=(expression const& rhs) {
-      expr_ = binary_op(expr_, '*', rhs);
+      expr_ = binary_op(expr_, "*", rhs);
       return *this;
     }
 
     expression& expression::operator/=(expression const& rhs) {
-      expr_ = binary_op(expr_, '/', rhs);
+      expr_ = binary_op(expr_, "/", rhs);
       return *this;
     }
 

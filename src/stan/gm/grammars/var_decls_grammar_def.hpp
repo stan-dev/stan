@@ -555,7 +555,8 @@ namespace stan {
       : var_decls_grammar::base_type(var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(var_map,error_msgs)
+        expression_g(var_map,error_msgs),
+        expression07_g(var_map,error_msgs,false)
     {
 
       using boost::spirit::qi::_1;
@@ -746,26 +747,26 @@ namespace stan {
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r 
         = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
-        > ( 
+        >> ( 
            ( (lit("lower")
-              > lit('=')
-              > expression_g
+              >> lit('=')
+              >> expression07_g
               [ _pass = set_int_range_lower_f(_val,_1,
                                                boost::phoenix::ref(error_msgs_)) ])
-             > -( lit(',')
-                  > lit("upper")
-                  > lit('=')
-                  > expression_g
+             >> -( lit(',')
+                   >> lit("upper")
+                   >> lit('=')
+                   >> expression07_g
                     [ _pass = set_int_range_upper_f(_val,_1,
                                                     boost::phoenix::ref(error_msgs_)) ] ) )
            | 
            ( lit("upper")
-             > lit('=')
-             > expression_g
+             >> lit('=')
+             >> expression07_g
              [ _pass = set_int_range_upper_f(_val,_1,
                                              boost::phoenix::ref(error_msgs_)) ])
             )
-        > lit('>');
+        >> lit('>');
 
       range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r 
@@ -773,19 +774,19 @@ namespace stan {
         > ( 
            ( (lit("lower")
               > lit('=')
-              > expression_g
+              > expression07_g
               [ _pass = set_double_range_lower_f(_val,_1,
                                                boost::phoenix::ref(error_msgs_)) ])
              > -( lit(',')
                   > lit("upper")
                   > lit('=')
-                  > expression_g
+                  > expression07_g
                     [ _pass = set_double_range_upper_f(_val,_1,
                                                     boost::phoenix::ref(error_msgs_)) ] ) )
            | 
            ( lit("upper")
              > lit('=')
-             > expression_g
+             > expression07_g
                [ _pass = set_double_range_upper_f(_val,_1,
                                                   boost::phoenix::ref(error_msgs_)) ])
             )

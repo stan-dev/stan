@@ -21,7 +21,8 @@ namespace stan {
                                           whitespace_grammar<Iterator> > {
 
       expression_grammar(variable_map& var_map,
-                         std::stringstream& error_msgs);
+                         std::stringstream& error_msgs,
+                         bool allow_lte = true);
 
       variable_map& var_map_;
 
@@ -52,6 +53,31 @@ namespace stan {
                               expression(), 
                               whitespace_grammar<Iterator> > 
       expression_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              expression(), 
+                              whitespace_grammar<Iterator> > 
+      expression07_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              expression(), 
+                              whitespace_grammar<Iterator> > 
+      expression09_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              expression(), 
+                              whitespace_grammar<Iterator> > 
+      expression10_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              expression(), 
+                              whitespace_grammar<Iterator> > 
+      expression14_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              expression(), 
+                              whitespace_grammar<Iterator> > 
+       expression15_r;
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<bool>, 

@@ -32,6 +32,8 @@ namespace stan {
       // grammars
       expression_grammar<Iterator> expression_g;      
 
+      expression_grammar<Iterator> expression07_g;      
+
       // rules
 
       boost::spirit::qi::rule<Iterator, 

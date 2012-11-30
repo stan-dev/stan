@@ -114,6 +114,38 @@ namespace stan {
     boost::phoenix::function<set_fun_type> set_fun_type_f;
 
 
+    struct binary_op_expr {
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef expression type; };
+
+      expression operator()(expression& expr1,
+                            const expression& expr2,
+                            const std::string& op,
+                            const std::string& fun_name,
+                            std::ostream& error_msgs) const {
+        if (!expr1.expression_type().is_primitive()
+            || !expr2.expression_type().is_primitive()) {
+          error_msgs << "binary infix operator "
+                     << op 
+                     << " with functional interpretation "
+                     << fun_name
+                     << " requires arguments or primitive type (int or real)"
+                     << ", found left type=" << expr1.expression_type()
+                     << ", right arg type=" << expr2.expression_type()
+                     << "; ";
+        }
+        std::vector<expression> args;
+        args.push_back(expr1);
+        args.push_back(expr2);
+        set_fun_type sft;
+        fun f(fun_name,args);
+        sft(f,error_msgs);
+        return expression(f);
+      }
+    };
+    boost::phoenix::function<binary_op_expr> binary_op_f;
+
+
 
     struct addition_expr {
       template <typename T1, typename T2, typename T3>
@@ -331,6 +363,26 @@ namespace stan {
     };
     boost::phoenix::function<negate_expr> negate_expr_f;
 
+    struct logical_negate_expr {
+      template <typename T1, typename T2>
+      struct result { typedef expression type; };
+
+      expression operator()(const expression& expr,
+                            std::ostream& error_msgs) const {
+        if (!expr.expression_type().is_primitive()) {
+          error_msgs << "logical negation operator ! only applies to int or real types; ";
+          return expression();
+        }
+        std::vector<expression> args;
+        args.push_back(expr);
+        set_fun_type sft;
+        fun f("logical_negation",args);
+        sft(f,error_msgs);
+        return expression(f);
+      }
+    };
+    boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
+
     struct transpose_expr {
       template <typename T1, typename T2>
       struct result { typedef expression type; };
@@ -338,7 +390,7 @@ namespace stan {
       expression operator()(const expression& expr,
                             std::ostream& error_msgs) const {
         if (expr.expression_type().is_primitive()) {
-          return expr; // transpose of basic is self?
+          return expr; // transpose of basic is self -- works?
         }
         std::vector<expression> args;
         args.push_back(expr);
@@ -429,8 +481,9 @@ namespace stan {
 
     template <typename Iterator>
     expression_grammar<Iterator>::expression_grammar(variable_map& var_map,
-                                                     std::stringstream& error_msgs)
-      : expression_grammar::base_type(expression_r),
+                                                     std::stringstream& error_msgs,
+                                                     bool allow_lte)
+      : expression_grammar::base_type(allow_lte ? expression_r : expression07_r),
         var_map_(var_map),
         error_msgs_(error_msgs) 
     {
@@ -444,11 +497,72 @@ namespace stan {
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
 
+
+
       expression_r.name("expression");
-      expression_r 
-        %=  term_r                     [_val = _1]
-        >> *( (lit('+') > term_r       [_val = addition(_val,_1,boost::phoenix::ref(error_msgs))])
-              |   (lit('-') > term_r   [_val = subtraction(_val,_1,boost::phoenix::ref(error_msgs))])
+      expression_r
+        %= expression15_r;
+
+
+      expression15_r.name("expression, precedence 15, binary ||");
+      expression15_r 
+        %= expression14_r [_val = _1]
+        > *( lit("||") 
+             > expression15_r  [_val = binary_op_f(_val,_1,"||","logical_or",
+                                                   boost::phoenix::ref(error_msgs))] 
+             );
+
+      expression14_r.name("expression, precedence 14, binary &&");
+      expression14_r 
+        %= expression10_r [_val = _1]
+        > *( lit("&&") 
+             > expression14_r  [_val = binary_op_f(_val,_1,"&&","logical_and",
+                                                   boost::phoenix::ref(error_msgs))] 
+             );
+
+      expression10_r.name("expression, precedence 10, binary ==, !=");
+      expression10_r 
+        %= expression09_r [_val = _1]
+        > *( ( lit("==") 
+               > expression10_r  [_val = binary_op_f(_val,_1,"==","logical_eq",
+                                                       boost::phoenix::ref(error_msgs))] )
+              |
+              ( lit("!=") 
+                > expression10_r  [_val = binary_op_f(_val,_1,"!=","logical_neq",
+                                                      boost::phoenix::ref(error_msgs))] ) 
+              );
+
+      expression09_r.name("expression, precedence 9, binary <, <=, >, >=");
+      expression09_r 
+        %= expression07_r [_val = _1]
+        > *( ( lit("<")
+               > expression09_r  [_val = binary_op_f(_val,_1,"<","logical_lt",
+                                                      boost::phoenix::ref(error_msgs))] )
+              |
+              ( lit("<=") 
+                > expression09_r  [_val = binary_op_f(_val,_1,"<=","logical_lte",
+                                                      boost::phoenix::ref(error_msgs))] ) 
+              |
+              ( lit(">") 
+                > expression09_r  [_val = binary_op_f(_val,_1,">","logical_gt",
+                                                      boost::phoenix::ref(error_msgs))] ) 
+              |
+              ( lit(">=") 
+                > expression09_r  [_val = binary_op_f(_val,_1,">=","logical_gte",
+                                                      boost::phoenix::ref(error_msgs))] ) 
+              );
+      
+      expression07_r.name("expression, precedence 7, binary +, -");
+      expression07_r 
+        %=  term_r                     
+            [_val = _1]
+        > *( ( lit('+')
+                > expression07_r       
+                [_val = addition(_val,_1,boost::phoenix::ref(error_msgs))] )
+              |  
+              ( lit('-') 
+                > expression07_r   
+                [_val = subtraction(_val,_1,boost::phoenix::ref(error_msgs))] )
               )
         > eps[_pass = validate_expr_type_f(_val,boost::phoenix::ref(error_msgs_))]
         ;
@@ -470,8 +584,11 @@ namespace stan {
         ;
 
       negated_factor_r 
-        %= lit('-') >> indexed_factor_r [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> indexed_factor_r  [_val = _1]
+        %= lit('-') >> negated_factor_r 
+                      [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        | lit('!') >> negated_factor_r 
+                      [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        | lit('+') >> negated_factor_r  [_val = _1]
         | indexed_factor_r [_val = _1];
 
 

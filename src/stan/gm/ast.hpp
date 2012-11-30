@@ -333,13 +333,13 @@ namespace stan {
 
 
     struct binary_op {
-      char op;
+      std::string op;
       expression left;
       expression right;
       expr_type type_;
       binary_op();
       binary_op(const expression& left,
-                char op,
+                const std::string& op,
                 const expression& right);
     };
 
