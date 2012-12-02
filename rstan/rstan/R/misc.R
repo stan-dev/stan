@@ -825,6 +825,7 @@ combine_msd_quan <- function(msd, quan) {
   n_stat <- dim1[2] + dim2[2] 
   par_names <- dimnames(msd)[[1]] 
   stat_names <- c(dimnames(msd)[[2]], dimnames(quan)[[2]]) 
+  chain_id_names <- dimnames(msd)[[3]]
   fun <- function(i) {
     # This is a bit ugly; one reason is that we need to 
     # deal with the case that dim1[1] = 1, in which 
@@ -838,7 +839,8 @@ combine_msd_quan <- function(msd, quan) {
   ll <- lapply(1:chains, fun) 
   twodnames <- dimnames(ll[[1]]) 
   msdquan <- array(unlist(ll), dim = c(n_par, n_stat, chains)) 
-  dimnames(msdquan) <- list(par_names, stat_names, NULL) 
+  dimnames(msdquan) <- list(parameter = par_names, stats = stat_names, 
+                            chains = chain_id_names) 
   msdquan 
 } 
 
@@ -867,8 +869,19 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   dim(c_msd) <- c(tidx_len, 2, sim$chains) 
   dim(c_quan) <- c(tidx_len, probs_len, sim$chains) 
 
-  dimnames(c_msd) <- list(sim$fnames_oi[tidx], c("mean", "sd"), NULL) 
-  dimnames(c_quan) <- list(sim$fnames_oi[tidx], probs_str, NULL)
+  sim_attr_args <- attr(sim, "args")
+  cids <- if (is.null(sim_attr_args)) {
+            cids <- 1:sim$chains 
+          } else {
+            sapply(attr(sim, "args"), function(x) x$chain_id)
+          }
+
+  dimnames(c_msd) <- list(parameters = sim$fnames_oi[tidx], 
+                          stats = c("mean", "sd"), 
+                          chains = paste0("chain:", cids)) 
+  dimnames(c_quan) <- list(parameters = sim$fnames_oi[tidx], 
+                           stats = probs_str, 
+                           chains = paste0("chains:", cids))
 
   ess <-  array(sapply(tidx, function(n) rstan_ess(sim, n)), dim = c(tidx_len, 1)) 
   rhat <- array(sapply(tidx, function(n) rstan_splitrhat(sim, n)), dim = c(tidx_len, 1)) 
@@ -897,9 +910,18 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   rownames(quan) <- sim$fnames_oi[tidx] 
   colnames(quan) <- probs_str 
 
+  sim_attr_args <- attr(sim, "args")
+  cids <- if (is.null(sim_attr_args)) {
+            cids <- 1:sim$chains 
+          } else {
+            sapply(attr(sim, "args"), function(x) x$chain_id)
+          }
+
   c_quan <- do.call(rbind, lapply(lquan, function(x) x$c_quan)) 
   dim(c_quan) <- c(tidx_len, probs_len, sim$chains) 
-  dimnames(c_quan) <- list(sim$fnames_oi[tidx], probs_str, NULL)
+  dimnames(c_quan) <- list(parameters = sim$fnames_oi[tidx], 
+                           stats = probs_str, 
+                           chains = paste0("chains:", cids))
 
   ss <- list(quan = quan, c_quan = c_quan)
   attr(ss, "row_major_idx") <- tidx_rowm 

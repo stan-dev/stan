@@ -1,8 +1,9 @@
 useDynLib(rstan)
 # exportPattern("^[[:alpha:]]+")
 
-importFrom("graphics", plot)
-importFrom("Matrix", summary, print)
+# importFrom("graphics", plot)
+importFrom("stats4", summary, plot)
+# importFrom("Matrix", summary, print)
 
 export(
   stan_model,
@@ -27,7 +28,7 @@ exportMethods(
 #   print, plot, 
 #   extract, 
   get_cppcode, get_cxxflags, # for stanmodel 
-  show, sampling, summary, print, extract,
+  show, sampling, summary, extract,
   traceplot, plot, get_stancode, get_inits, get_seed, get_cppo_mode,
   get_seeds,
   get_adaptation_info,
@@ -35,6 +36,7 @@ exportMethods(
   get_logposterior, 
   get_stanmodel 
 )
+S3method(print, stanfit)
 S3method(as.array, stanfit)
 S3method(as.matrix, stanfit)
 S3method(is.array, stanfit)

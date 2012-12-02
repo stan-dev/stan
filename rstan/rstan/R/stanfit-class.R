@@ -3,12 +3,12 @@
 
 setMethod("show", "stanfit", 
           function(object) {
-            printstanfit(x = object, pars = object@sim$pars_oi)
+            print.stanfit(x = object, pars = object@sim$pars_oi)
           })  
 
-printstanfit <- function(x, pars = x@sim$pars_oi, 
-                         probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
-                         digits_summary = 1, ...) { 
+print.stanfit <- function(x, pars = x@sim$pars_oi, 
+                          probs = c(0.025, 0.25, 0.5, 0.75, 0.975), 
+                          digits_summary = 1, ...) { 
   if (x@mode == 1L) { 
     cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
         "sampling is not conducted.\n", sep = '')
@@ -37,10 +37,6 @@ printstanfit <- function(x, pars = x@sim$pars_oi,
       "convergence, Rhat=1).\n", sep = '')
   return(invisible(NULL)) 
 }  
-setMethod("print", "stanfit", printstanfit) 
-
-if (!isGeneric("plot")) 
-  setGeneric("plot", function(x, y, ...) standardGeneric("plot")) 
 
 setMethod("plot", signature(x = "stanfit", y = "missing"), 
           function(x, pars, display_parallel = FALSE) {
@@ -371,13 +367,6 @@ setMethod("extract", signature = "stanfit",
             sssf 
           })  
 
-#   if (!isGeneric('summary')) {
-#     setGeneric(name = "summary",
-#                def = function(object, ...) { 
-#                        standardGeneric("summary")
-#                      }) 
-#   } 
-
 setMethod("summary", signature = "stanfit", 
           function(object, pars, 
                    probs = c(0.025, 0.25, 0.50, 0.75, 0.975), use_cache = TRUE, ...) { 
@@ -468,8 +457,9 @@ setMethod("summary", signature = "stanfit",
             rownames(s1) <- pars_names 
             colnames(s1) <- c("mean", "se_mean", "sd", qnames, 'n_eff', 'Rhat')
             s2 <- combine_msd_quan(ss$c_msd[tidx, , , drop = FALSE], ss$c_quan[tidx, m, , drop = FALSE]) 
-            dim(s2) <- c(tidx_len, length(m) + 2, object@sim$chains)
-            dimnames(s2) <- list(pars_names, c("mean", "sd", qnames), NULL) 
+            # dim(s2) <- c(tidx_len, length(m) + 2, object@sim$chains)
+            # dimnames(s2) <- list(parameter = pars_names, 
+            #                      stats = c("mean", "sd", qnames), NULL) 
             ss <- list(summary = s1, c_summary = s2) 
             invisible(ss) 
           })  

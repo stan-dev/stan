@@ -6,7 +6,6 @@
 \alias{stanfit-class}
 \alias{summary,stanfit-method}
 %% \alias{extract,stanfit-method}
-\alias{print,stanfit-method}
 \alias{show,stanfit-method}
 % \alias{plot,stanfit-method}
 \alias{get_cppo_mode} 
@@ -38,7 +37,7 @@
   sampling method \code{sampling} defined on class \code{stanmodel}.
   \code{print} and \code{plot} and other methods are provided
   for the summaries of the fitted results.  
-  Access methods allow the the underlying data making up a fit
+  Access methods allow the underlying data making up a fit
   to be retrieved. There are two modes; sampling mode and 
   test gradient mode. 
 } 
@@ -82,20 +81,6 @@
     \item{\code{plot}}{\code{signature(x = "stanfit", y = "missing")}: plot an overview of summaries 
       for all parameters (see \code{\link{plot}}).
     }
-    \item{\code{print}}{\code{signature(x = "stanfit")}: print the summary of the 
-      model with inference about mean (\code{mean}), standard error of the 
-      mean (\code{se_mean}), standard deviation (\code{sd}), and quantities
-      about quantities of interest based on all chains merged. 
-      Most of the printout are the results from method \code{summary}. Other 
-      parameters that can be specified are \code{pars}, \code{probs}, and
-      \code{digits_summary}. \code{pars} specifies the parameters of interest;
-      \code{probs} specifies the quantiles of interest; the default
-      are 2.5\%, 25\%, 50\%, 75\%, and 97.5\%. 
-      \code{digits_summary} specifies the number of significant digits for
-      printing out the summary. See the following method \code{summary} 
-      since arguments such as \code{pars}, \code{probs}, and \code{use_cache}
-      are passed to it to obtain the summaries. 
-    } 
     \item{\code{summary}}{\code{signature(object = "stanfit")}: summarizes the 
       distributions of quantities using the samples: the quantiles 
       (for example, 2.5\%, 50\%, 97.5\%, which can be specified by 
