@@ -231,11 +231,6 @@ namespace rstan {
       std::fstream fs(filename.c_str(), std::fstream::in);
       if (!fs.is_open())
         throw std::runtime_error("Could not open " + filename);
-
-      fs.seekg(0, std::ios::end);
-      file_len = fs.tellg();
-      fs.seekg(0, std::ios::beg);
-
       size_t i = 0;
       std::string line;
       char peek; 
@@ -244,7 +239,7 @@ namespace rstan {
         if (peek == std::istream::traits_type::eof()) return; 
         if (peek != '#') {
           fs.ignore(max_ignore_len, '#');
-          if (fs.tellg() == file_len) return;
+          if (fs.eof()) return;
           // fs.putback('#');
           fs.unget();
           continue;
