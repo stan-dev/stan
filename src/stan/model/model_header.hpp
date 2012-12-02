@@ -1,7 +1,6 @@
 #ifndef STAN__MODEL__MODEL__HEADER_HPP__
 #define STAN__MODEL__MODEL__HEADER_HPP__
 
-#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <fstream>
