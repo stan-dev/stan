@@ -108,7 +108,8 @@ read_stan_csv <- function(csvfiles) {
   for (i in seq_along(samples)) {
     attr(samples[[i]], "adaptation_info") <- cs_lst2[[i]]$adaptation_info 
     attr(samples[[i]], "args") <- 
-      list(sampler = get_sampler_name(cs_lst2[[i]]$leapfrog_steps, cs_lst2[[i]]$equal_step_sizes))
+      list(sampler = get_sampler_name(cs_lst2[[i]]$leapfrog_steps, cs_lst2[[i]]$equal_step_sizes),
+           chain_id = cs_lst2[[i]]$chain_id)
   } 
 
   save_warmup <- sapply(cs_lst2, function(i) i$save_warmup)

@@ -273,7 +273,7 @@ namespace stan {
     void generate_end_class_decl(std::ostream& o) {
       o << "}; // model" << EOL2;
     }
-
+    
     void generate_initializer(std::ostream& o,
                               const std::string& base_type,
                               const std::vector<expression>& dims,
@@ -1258,6 +1258,38 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << "}" << EOL;
       }
+      void operator()(const while_statement& x) const {
+        generate_indent(indent_,o_);
+        o_ << "while (";
+        generate_expression(x.condition_,o_);
+        o_ << ") {" << EOL;
+        generate_statement(x.body_, indent_+1, o_, include_sampling_,is_var_);
+        generate_indent(indent_,o_);
+        o_ << "}" << EOL;
+      }
+      void operator()(const conditional_statement& x) const {
+        for (size_t i = 0; i < x.conditions_.size(); ++i) {
+          if (i == 0) 
+            generate_indent(indent_,o_);
+          else
+            o_ << " else ";
+          o_ << "if (";
+          generate_expression(x.conditions_[i],o_);
+          o_ << ") {" << EOL;
+          generate_statement(x.bodies_[i], indent_ + 1, 
+                             o_, include_sampling_,is_var_);
+          generate_indent(indent_,o_);
+          o_ << '}';
+        }
+        if (x.bodies_.size() > x.conditions_.size()) {
+          o_ << " else {" << EOL;
+          generate_statement(x.bodies_[x.bodies_.size()-1], indent_ + 1,
+                             o_, include_sampling_, is_var_);
+          generate_indent(indent_,o_);
+          o_ << '}';
+        }
+        o_ << EOL;
+      }
       void operator()(const no_op_statement& x) const {
         // called no_op for a reason
       }
@@ -1320,47 +1352,49 @@ namespace stan {
       generate_statement(p.statement_,2,o,include_sampling,is_var);
       o << EOL;
       o << INDENT2 << "return lp__;" << EOL2;
-      o << INDENT << "} // log_prob()" << EOL2;
+      o << INDENT << "} // log_prob(...var...)" << EOL2;
 
 
-      // double-based cut-and-paste
-      o << EOL;
-      o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
-      o << INDENT << "                vector<int>& params_i__," << EOL;
-      o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL2;
-      o << INDENT2 << "double lp__(0.0);" << EOL;
+      // **************** double-based **************************
+      // **************** cut-and-paste *************************
+      // doesn't yet work because of <true> in probability generation
+    //   o << EOL;
+    //   o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
+    //   o << INDENT << "                vector<int>& params_i__," << EOL;
+    //   o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL2;
+    //   o << INDENT2 << "double lp__(0.0);" << EOL;
 
-      is_var = false;
+    //   is_var = false;
 
-      generate_comment("model parameters",2,o);
-      generate_local_var_inits(p.parameter_decl_,is_var,true,o);
-      o << EOL;
+    //   generate_comment("model parameters",2,o);
+    //   generate_local_var_inits(p.parameter_decl_,is_var,true,o);
+    //   o << EOL;
 
-      generate_comment("transformed parameters",2,o);
-      generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
+    //   generate_comment("transformed parameters",2,o);
+    //   generate_local_var_decls(p.derived_decl_.first,2,o,is_var);
 
-      // skip this as won't seg fault the same way
-      // generate_init_vars(p.derived_decl_.first,2,o);
+    //   // skip this as won't seg fault the same way
+    //   // generate_init_vars(p.derived_decl_.first,2,o);
 
-      o << EOL;
-      generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
-      o << EOL;
+    //   o << EOL;
+    //   generate_statements(p.derived_decl_.second,2,o,include_sampling,is_var);
+    //   o << EOL;
       
-      // skip this as we don't need inits
-      // generate_validate_transformed_params(p.derived_decl_.first,2,o);
-      o << INDENT2
-        << "const char* function__ = \"validate transformed params\";" 
-        << EOL;
-      o << INDENT2
-        << "(void) function__; // dummy to suppress unused var warning" 
-        << EOL;
-      generate_validate_var_decls(p.derived_decl_.first,2,o);
+    //   // skip this as we don't need inits
+    //   // generate_validate_transformed_params(p.derived_decl_.first,2,o);
+    //   o << INDENT2
+    //     << "const char* function__ = \"validate transformed params\";" 
+    //     << EOL;
+    //   o << INDENT2
+    //     << "(void) function__; // dummy to suppress unused var warning" 
+    //     << EOL;
+    //   generate_validate_var_decls(p.derived_decl_.first,2,o);
 
-      generate_comment("model body",2,o);
-      generate_statement(p.statement_,2,o,include_sampling,is_var);
-      o << EOL;
-      o << INDENT2 << "return lp__;" << EOL2;
-      o << INDENT << "} // log_prob()" << EOL2;
+    //   generate_comment("model body",2,o);
+    //   generate_statement(p.statement_,2,o,include_sampling,is_var);
+    //   o << EOL;
+    //   o << INDENT2 << "return lp__;" << EOL2;
+    //   o << INDENT << "} // log_prob(...double...)" << EOL2;
     }
 
     struct dump_member_var_visgen : public visgen {

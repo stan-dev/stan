@@ -21,8 +21,7 @@ LicenseNote: RStan includes part of unmodified copies of Stan and Boost,
   available at http://code.google.com/p/stan and http://www.boost.org 
   under licenses of "new BSD license" and "Boost license", respectively.  
   Both licenses are compatible with version 3 of the GPL. 
-Depends: methods, Rcpp (>= 0.9.10), inline, RcppEigen(>= 0.3.0), Matrix
+Depends: methods, Rcpp (>= 0.9.10), inline, stats4, utils
 LinkingTo: Rcpp
-Imports: graphics, Matrix  
 Suggests: RUnit
 URL: http://mc-stan.org

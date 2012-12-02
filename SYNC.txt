@@ -21,13 +21,16 @@ output analysis
 Cmd:    stan/mcmc/chains.hpp
 R:      rstan/rstan/src/chains.cpp
 
+var_context impl
+Cmd: 
+R: rstan/rstan/inst/include/rstan/io/rlist_ref_var_context.hpp 
 
 makefiles
 Cmd:    add .cpp files, makefile,  make/make*
 R:      rstan/rstan/src/Makefile{,.win}
 
 
-boost version 
-Cmd:    lib/boost_x.xx.x/, etc.
+boost/eigen version 
+Cmd:    lib/boost_x.xx.x/, lib/eigen_x.x.x, etc.
 R:      rstan/rstan/src/Makefile{,.win} 
         rstan/rstan/R/options.R

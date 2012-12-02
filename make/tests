@@ -71,7 +71,7 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 # missing models.
 ##
 .PRECIOUS: test/models/%.o models/%$(EXE)
-$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a
+$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
 	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
@@ -91,7 +91,7 @@ endif
 
 
 .PRECIOUS: test/%.o
-test/%$(EXE) : test/%.o bin/libstan.a
+test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
