@@ -37,6 +37,7 @@ exportMethods(
 )
 S3method(as.array, stanfit)
 S3method(as.matrix, stanfit)
+S3method(as.data.frame, stanfit)
 S3method(is.array, stanfit)
 S3method(dim, stanfit)
 S3method(dimnames, stanfit)

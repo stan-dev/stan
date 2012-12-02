@@ -1,10 +1,14 @@
+Sat Nov 24 2012
+1. New features
+   * introduce an as.data.frame S3 method for stanfit objects
+
 Sun Nov  4 2012
 1. Bug fixes 
    * lp__ is not included when specifying pars (issue 79) 
       https://code.google.com/p/stan/issues/detail?id=79
 2. Changes 
    * change default value of arugment `permuted` from FALSE to TRUE for extract
-     method of S4 class stanfit 
+     method of S4 class stanfit
 
 Wed Oct 24 2012
 1. New features 

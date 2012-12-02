@@ -603,7 +603,11 @@ as.matrix.stanfit <- function(x, ...) {
                3, FUN = function(y) y)
   dimnames(out) <- dimnames(x)[-2]
   return(out)
-} 
+}
+ 
+as.data.frame.stanfit <- function(x, ...) {
+  return( as.data.frame(as.matrix(x, ...)) )
+}
 
 dim.stanfit <- function(x) {
   if (x@mode != 0) return(numeric(0)) 
