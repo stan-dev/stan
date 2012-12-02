@@ -1258,6 +1258,38 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << "}" << EOL;
       }
+      void operator()(const while_statement& x) const {
+        generate_indent(indent_,o_);
+        o_ << "while (";
+        generate_expression(x.condition_,o_);
+        o_ << ") {" << EOL;
+        generate_statement(x.body_, indent_+1, o_, include_sampling_,is_var_);
+        generate_indent(indent_,o_);
+        o_ << "}" << EOL;
+      }
+      void operator()(const conditional_statement& x) const {
+        for (size_t i = 0; i < x.conditions_.size(); ++i) {
+          if (i == 0) 
+            generate_indent(indent_,o_);
+          else
+            o_ << " else ";
+          o_ << "if (";
+          generate_expression(x.conditions_[i],o_);
+          o_ << ") {" << EOL;
+          generate_statement(x.bodies_[i], indent_ + 1, 
+                             o_, include_sampling_,is_var_);
+          generate_indent(indent_,o_);
+          o_ << '}';
+        }
+        if (x.bodies_.size() > x.conditions_.size()) {
+          o_ << " else {" << EOL;
+          generate_statement(x.bodies_[x.bodies_.size()-1], indent_ + 1,
+                             o_, include_sampling_, is_var_);
+          generate_indent(indent_,o_);
+          o_ << '}';
+        }
+        o_ << EOL;
+      }
       void operator()(const no_op_statement& x) const {
         // called no_op for a reason
       }

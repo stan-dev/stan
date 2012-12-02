@@ -1247,35 +1247,64 @@ multiplied by a (column) vector, which produces a \code{real} value.
 
 \subsection{Operator Precedence and Associativity}\label{operator-precedence.section}
 
-The arithmetic operators have the following precedence and
-associativity.
+The precedence and associativity of operators is given in tabular form
+in \reffigure{operator-precedence}.
 %
+\begin{figure}
 \begin{center}
 \begin{tabular}{c|ccl|l}
 {\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
   Placement} & {\it Description}
 \\ \hline \hline
-\code{+} & 0 & left & binary infix & addition
+\code{||} & 9 & left & binary infix & logical or
+\\ \hline
+\Verb|&&| & 8 & left & binary infix & logical and
+\\ \hline
+\Verb|==| & 7 & left & binary infix & equality
 \\
-\code{-} & 0 & left & binary infix & subtraction
+\Verb|!=| & 7 & left & binary infix & inequality
 \\ \hline
-\code{*} & 1 & left & binary infix & multiplication
+\Verb|<| & 6 & left & binary infix & less than
 \\
-\code{/} & 1 & left & binary infix & (right) division
-\\ \hline
-\Verb|\| & 1 & left & binary infix & left division
-\\ \hline
-\code{.*} & 1 & left & binary infix & elementwise multiplication
+\Verb|<=| & 6 & left & binary infix & less or equal
 \\
-\code{./} & 1 & left & binary infix & elementwise division
+\Verb|>| & 6 & left & binary infix & greater than 
+\\
+\Verb|>=| & 6 & left & binary infix & greater or equal
 \\ \hline
-\code{-} & 2 & n/a & unary prefix & negation
+\code{+} & 5 & left & binary infix & addition
+\\
+\code{-} & 5 & left & binary infix & subtraction
+\\ \hline
+\code{*} & 4 & left & binary infix & multiplication
+\\
+\code{/} & 4 & left & binary infix & (right) division
+\\ \hline
+\Verb|\| & 3 & left & binary infix & left division
+\\ \hline
+\code{.*} & 2 & left & binary infix & elementwise multiplication
+\\
+\code{./} & 2 & left & binary infix & elementwise division
+\\ \hline
+\code{!} & 1 & n/a & unary prefix & logical negation
+\\
+\code{-} & 1 & n/a & unary prefix & negation
 \\ 
-\code{+} & 2 & n/a & unary prefix & promotion (no-op in \Stan)
+\code{+} & 1 & n/a & unary prefix & promotion (no-op in \Stan)
 \\ \hline
-\code{'} & 3 & n/a & unary postfix & transposition
+\code{'} & 0 & n/a & unary postfix & transposition
 \end{tabular}
 \end{center}
+\caption{\it Stan's unary and binary operators, with their
+  precedences, associativities, place in an expression, and a
+  description.   The operators are listed in order of precedence, from
+  least tightly binded to most tightly binding.  The full set of
+  legal arguments and corresponding result types are provided in the
+  function documentation in \refpart{built-in-functions} prefaced with
+  \code{operator} (i.e., \code{operator*(int,int):int} indicates the
+  application of the multiplication operator to two integers, which
+  returns an integer).}\label{operator-precedence.figure}
+\end{figure}
 %
 Other expression-forming operations, such as function application and
 subscripting bind more tightly than any of the arithmetic operations.  
