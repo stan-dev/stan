@@ -1,17 +1,10 @@
 #ifndef __STAN__GM__AST_HPP__
 #define __STAN__GM__AST_HPP__
 
-#include <boost/variant/apply_visitor.hpp>
+//#include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
-#include <cstddef>
-#include <limits>
-#include <climits>
-#include <iostream>
 #include <map>
-#include <stdexcept>
-#include <string>
-#include <utility>
 #include <vector>
 
 namespace stan {

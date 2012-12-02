@@ -1,17 +1,17 @@
 #ifndef __STAN__GM__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP__
 #define __STAN__GM__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP__
 
-#include <cstddef>
-#include <iomanip>
-#include <iostream>
-#include <istream>
-#include <map>
-#include <set>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
-#include <stdexcept>
+// #include <cstddef>
+// #include <iomanip>
+// #include <iostream>
+// #include <istream>
+// #include <map>
+// #include <set>
+// #include <sstream>
+// #include <string>
+// #include <utility>
+// #include <vector>
+// #include <stdexcept>
 
 #include <boost/spirit/include/qi.hpp>
 // FIXME: get rid of unused include
@@ -26,23 +26,23 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
+// #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
+//#include <boost/spirit/include/classic_position_iterator.hpp>
+//#include <boost/spirit/include/phoenix_core.hpp>
+//#include <boost/spirit/include/phoenix_function.hpp>
+//#include <boost/spirit/include/phoenix_fusion.hpp>
+//#include <boost/spirit/include/phoenix_object.hpp>
+//#include <boost/spirit/include/phoenix_operator.hpp>
+//#include <boost/spirit/include/phoenix_stl.hpp>
+//#include <boost/spirit/include/support_multi_pass.hpp>
+//#include <boost/tuple/tuple.hpp>
+//#include <boost/variant/apply_visitor.hpp>
+//#include <boost/variant/recursive_variant.hpp>
 
-#include <stan/gm/ast.hpp>
-#include <stan/gm/grammars/whitespace_grammar.hpp>
-#include <stan/gm/grammars/expression_grammar.hpp>
+//#include <stan/gm/ast.hpp>
+//#include <stan/gm/grammars/whitespace_grammar.hpp>
+//#include <stan/gm/grammars/expression_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
 
