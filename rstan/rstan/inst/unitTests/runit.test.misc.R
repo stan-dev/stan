@@ -17,7 +17,8 @@
           "# comment line 5", 
           " not comments line 2", 
           "# comment line 6",
-          "not comment #comment line 7")
+          "not comments #comment line 7",
+          "not comments at the end of file")
   cat(file = 'cc.csv', paste(cc, collapse = '\n'))
 } 
 

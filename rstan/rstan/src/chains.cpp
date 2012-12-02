@@ -225,11 +225,16 @@ namespace rstan {
     void read_comments0(const std::string& filename, size_t n, 
                         std::vector<std::string>& comments) {
       const std::streamsize max_ignore_len = std::numeric_limits<std::streamsize>::max();
+      std::streampos file_len;
       // std::cout << "len=" << max_ignore_len << std::endl;
       comments.clear(); 
       std::fstream fs(filename.c_str(), std::fstream::in);
       if (!fs.is_open())
         throw std::runtime_error("Could not open " + filename);
+
+      fs.seekg(0, std::ios::end);
+      file_len = fs.tellg();
+      fs.seekg(0, std::ios::beg);
 
       size_t i = 0;
       std::string line;
@@ -239,6 +244,7 @@ namespace rstan {
         if (peek == std::istream::traits_type::eof()) return; 
         if (peek != '#') {
           fs.ignore(max_ignore_len, '#');
+          if (fs.tellg() == file_len) return;
           // fs.putback('#');
           fs.unget();
           continue;
