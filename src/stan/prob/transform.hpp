@@ -153,7 +153,6 @@ namespace stan {
                      const size_t K) {
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = read_corr_L(CPCs, K);
-      using stan::agrad::multiply_lower_tri_self_transpose;
       using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(L);
     }
@@ -242,8 +241,7 @@ namespace stan {
 
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = read_corr_L(CPCs, K, log_prob);
-      using stan::agrad::multiply_lower_tri_self_transpose;
-      using stan::math::multiply_lower_tri_self_transpose; 
+      using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(L);
     }
     
@@ -285,8 +283,7 @@ namespace stan {
 
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = read_cov_L(CPCs, sds, log_prob);
-      using stan::agrad::multiply_lower_tri_self_transpose;
-      using stan::math::multiply_lower_tri_self_transpose; 
+      using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(L);
     }
 
@@ -307,8 +304,7 @@ namespace stan {
       D.diagonal() = sds;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = D * read_corr_L(CPCs, K);
-      using stan::agrad::multiply_lower_tri_self_transpose;
-      using stan::math::multiply_lower_tri_self_transpose; 
+      using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(L);
     }
 

@@ -55,7 +55,6 @@ namespace stan {
       using stan::math::check_greater_or_equal;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
-      using Eigen::Array;
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
@@ -79,11 +78,11 @@ namespace stan {
       }
       Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = LLT_W.matrixL();
 
-      using stan::math::elt_multiply;
+      using stan::math::dot_product;
       using stan::math::mdivide_left_tri_low;
       using stan::math::crossprod;
       using stan::math::lmgamma;
-      
+
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value) {
@@ -94,15 +93,13 @@ namespace stan {
       }
       if (include_summand<propto,T_y,T_scale>::value) {
         L = crossprod(mdivide_left_tri_low(L));
-	Eigen::Matrix<typename promote_args<T_y,T_scale>::type,
-		      Eigen::Dynamic, Eigen::Dynamic> tmp(S.rows(), S.cols());
-	for (int j = 0; j < S.cols(); ++j)
-	  for (int i = 0; i < S.rows(); ++i)
-	    tmp(i,j) = S(i,j) * L(i,j);
-	lp -= 0.5 * tmp.array().sum();
-	// FIXME: elt_multiply() is templated incorrectly and calling the following code
-	//        will break compilation under certain compiler flags 
-        //lp -= 0.5 * elt_multiply(S, L).array().sum(); // trace(S * W^-1)
+        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_inv_vec = Eigen::Map<
+          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
+                                L.data(), L.rows() * L.rows(), 1);
+        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_vec = Eigen::Map<
+          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
+                                S.data(), S.rows() * S.rows(), 1);
+        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
       }
       if (include_summand<propto,T_dof,T_scale>::value)
 	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
