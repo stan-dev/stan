@@ -34,6 +34,7 @@ exportMethods(
   get_adaptation_info,
   get_sampler_params,
   get_logposterior, 
+  get_posterior_mean,
   get_stanmodel 
 )
 S3method(print, stanfit)
