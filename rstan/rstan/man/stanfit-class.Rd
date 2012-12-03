@@ -19,6 +19,8 @@
 \alias{get_seeds}
 \alias{get_seeds,stanfit-method}
 \alias{get_inits}
+\alias{get_posterior_mean}
+\alias{get_posterior_mean,stanfit-method}
 \alias{get_inits,stanfit-method}
 \alias{get_logposterior} 
 \alias{get_logposterior,stanfit,logical-method}
@@ -38,8 +40,8 @@
   \code{print} and \code{plot} and other methods are provided
   for the summaries of the fitted results.  
   Access methods allow the underlying data making up a fit
-  to be retrieved. There are two modes; sampling mode and 
-  test gradient mode. 
+  to be retrieved. There are three modes; sampling mode, 
+  test gradient mode, error mode (no samples included). 
 } 
 
 \section{Objects from the Class}{
@@ -58,7 +60,7 @@
     \item{\code{mode}:}{The mode of the fitted model, object of type 
        \code{integer}. \code{0} indicates sampling mode; \code{1}
        indicates test gradient mode for which no sampling is done;
-       \code{2}; error occured before sampling. Most of methods for 
+       \code{2}; error occurred before sampling. Most of methods for 
        \code{stanfit} are useful only for \code{mode=1}}
     \item{\code{sim}:}{Simulation results including samples for the model,
        object of type \code{list}} 
@@ -110,6 +112,9 @@
     \item{\code{traceplot}}{\code{signature(object = "stanfit")}:
       plot the trace of chains (see \code{\link{traceplot}}). 
     } 
+    \item{\code{get_posterior_mean}}{\code{signature(object = "stanfit")}:
+      get the posterior mean for parameters of interest (using \code{pars}
+      to specify) among \emph{all} parameters.} 
     \item{\code{get_stancode}}{\code{signature(object = "stanfit")}:
       get the Stan code for the fitted model.}
     \item{\code{get_cppo_mode}}{\code{signature(object = "stanfit")}:

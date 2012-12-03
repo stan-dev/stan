@@ -25,6 +25,8 @@ lp1 <- get_logposterior(ss1)
 yalp1 <- get_logposterior(ss1, inc_warmup = FALSE)
 sp1 <- get_sampler_params(ss1) 
 yasp1 <- get_sampler_params(ss1, inc_warmup = FALSE) 
+gm1 <- get_posterior_mean(ss1)
+print(gm1)
 
 
 # NUTS 1 
@@ -34,6 +36,8 @@ lp2 <- get_logposterior(ss2)
 yalp2 <- get_logposterior(ss2, inc_warmup = FALSE)
 sp2 <- get_sampler_params(ss2)
 yasp2 <- get_sampler_params(ss2, inc_warmup = FALSE) 
+gm2 <- get_posterior_mean(ss2)
+print(gm2)
 
 # NUTS 2 
 ss3 <- sampling(m, data = dat, iter = iter, chains = 4, equal_step_sizes = FALSE, refresh = 100) 
@@ -42,6 +46,9 @@ lp3 <- get_logposterior(ss3)
 yalp3 <- get_logposterior(ss3, inc_warmup = FALSE)
 sp3 <- get_sampler_params(ss3)
 yasp3 <- get_sampler_params(ss3, inc_warmup = FALSE) 
+
+gm3 <- get_posterior_mean(ss3)
+print(gm3)
 
 print(ss1) 
 print(ss2) 

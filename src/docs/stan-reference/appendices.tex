@@ -1062,7 +1062,68 @@ used to convert the row vector \code{theta[j]} to a (column) vector.
 Column vector and row vector types are not interchangeable everywhere
 in Stan; see the function signature declarations in the programming
 language section of this manual.
+%
+\item Stan supports general conditional statements using a standard
+  if-else syntax.  For example, a zero-inflated (or -deflated)
+  Poisson mixture model may be defined using an array of mixture
+  component indicators \code{z} as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+    int<lower=0> N;
+    int<lower=0> y[N];
+  ...
+}
+model {
+    for (n in 1:N) {
+        if (y[n] == 0)
+            y[n] ~ bernoulli(theta);
+        } else {
+            y[n] ~ poisson(lambda) T[1,];
+        }
+    }
+}
+\end{Verbatim}
+\end{quote}
+%
+\item Stan supports general while loops using a standard syntax.  
+While loops give Stan full Turing equivalent computational power.
+They are useful for defining iterative functions with complex
+termination conditions.  As an illustration of their syntax,
+the for-loop
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+    ....
+    for (n in 1:N) {
+        ... do something with n ....
+    }
+}
+\end{Verbatim}
+\end{quote}
+%
+may be recoded using the following while loop.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+    int n;
+    ...
+    n <- 1;
+    while (n <= N) {
+        ... do something with n ...
+        n <- n + 1;
+    }
+}
+\end{Verbatim}
+\end{quote}
+%
+
+
 \end{itemize}
+
 
 \section{Some Differences in the Statistical Models that are Allowed}
 
@@ -1401,6 +1462,8 @@ style if the statement is very simple, as in this example.  Unless
 there are many similar cases, it's almost always clearer to put
 each sampling statement on its own line.
 
+Conditional and looping statements may also be written without brackets.
+
 The use of for loops without brackets can be dangerous.  For instance,
 consider this program.
 %
@@ -1427,6 +1490,18 @@ y[n] ~ normal(mu,1);
 %
 
 
+\subsection{Parentheses in Nested Operator Expressions}
+
+The preferred style for operators minimizes parentheses.  This reduces
+clutter in code that can actually make it harder to read expressions.
+For example, the expression \code{a~+~b~*~c} is preferred to the
+equivalent \code{a~+~(b~*~c)} or \code{(a~+~(b~*~c))}.  The operator
+precedences and associativities are given in
+\reffigure{operator-precedence}.
+
+Similarly, comparison operators can usually be written with minimal
+bracketing, with the form \code{y[n] > 0 || x[n] != 0} preferred to
+the bracketed form \code{(y[n] > 0) || (x[n] != 0)}.  
 
 \subsection{No Open Brackets on Own Line}
 

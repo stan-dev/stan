@@ -6,6 +6,7 @@ Mon Dec  3 2012
 Sat Nov 24 2012
 1. New features 
    * add read_stan_csv to create stanfit objects from sample CSV files 
+   * introduce an as.data.frame S3 method for stanfit objects
 
 Sun Nov  4 2012
 1. Bug fixes 
@@ -13,7 +14,7 @@ Sun Nov  4 2012
       https://code.google.com/p/stan/issues/detail?id=79
 2. Changes 
    * change default value of arugment `permuted` from FALSE to TRUE for extract
-     method of S4 class stanfit 
+     method of S4 class stanfit
 
 Wed Oct 24 2012
 1. New features 

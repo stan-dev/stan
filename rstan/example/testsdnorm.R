@@ -27,6 +27,7 @@ dimnames(sf1)
 a <- as.array(sf1)
 is.array(sf1)
 m <- as.matrix(sf1)
+d <- as.data.frame(sf1)
 e <- extract(sf1)
 dimnames(e) 
 
@@ -35,6 +36,7 @@ dimnames(sf3)
 is.array(sf3)
 a3 <- as.array(sf3)
 m3 <- as.matrix(sf3)
+d3 <- as.data.frame(sf3)
 dim(sf3) 
 
 

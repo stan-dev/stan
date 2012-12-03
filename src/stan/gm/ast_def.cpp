@@ -780,13 +780,16 @@ namespace stan {
     }
 
     statement::statement() : statement_(nil()) { }
+
+    // FIXME:  template these out
     statement::statement(const statement_t& st) : statement_(st) { }
-    
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
     statement::statement(const sample& st) : statement_(st) { }
     statement::statement(const statements& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
+    statement::statement(const while_statement& st) : statement_(st) { }
+    statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
@@ -799,13 +802,30 @@ namespace stan {
 
 
     for_statement::for_statement() {
-      }
+    }
     for_statement::for_statement(std::string& variable,
                                  range& range,
                                  statement& stmt)
       : variable_(variable),
         range_(range),
         statement_(stmt) {
+    }
+
+    while_statement::while_statement() { 
+    }
+    while_statement::while_statement(const expression& condition,
+                                     const statement& body) 
+      : condition_(condition),
+        body_(body) {
+    }
+
+    conditional_statement::conditional_statement() {
+    }
+    conditional_statement
+    ::conditional_statement(const std::vector<expression>& conditions,
+                            const std::vector<statement>& bodies)
+      : conditions_(conditions),
+        bodies_(bodies) {
     }
 
     print_statement::print_statement() { }

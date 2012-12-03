@@ -378,7 +378,7 @@ s <- extract(fit, pars = c("theta", "mu"), permuted = TRUE)
 names(s)
 dim(s$theta)
 dim(s$mu)
-s2 <- extract(fit, pars = "theta")
+s2 <- extract(fit, pars = "theta", permuted = FALSE)
 dim(s2)
 dimnames(s2)
 @

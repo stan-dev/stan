@@ -96,6 +96,7 @@ namespace rstan {
     int warmup; // number of warmup
     int thin; 
     int iter_save; // number of iterations saved 
+    int iter_save_wo_warmup; // number of iterations saved wo warmup
     int refresh;  // 
     int leapfrog_steps; 
     double epsilon; 
@@ -166,6 +167,7 @@ namespace rstan {
 
       iter_save = 1 + (iter - 1) / thin; 
       // starting from 0, iterations of 0, thin, 2 * thin, .... are saved. 
+      iter_save_wo_warmup = iter_save - (warmup - 1) / thin - 1;
 
       idx = find_index(args_names, std::string("leapfrog_steps"));
       if (idx == args_names.size()) leapfrog_steps = -1; 
@@ -313,6 +315,10 @@ namespace rstan {
     int get_iter_save() const { 
       return iter_save; 
     } 
+
+    inline int get_iter_save_wo_warmup() const { 
+      return iter_save_wo_warmup;
+    }
 
     int get_leapfrog_steps() const {
       return leapfrog_steps; 
