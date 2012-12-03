@@ -1,3 +1,12 @@
+Mon Dec  3 2012
+1. New features
+   * add get_posterior_mean for stanfit to obtain the posterior
+     mean for all parameter 
+
+Sat Nov 24 2012
+1. New features 
+   * add read_stan_csv to create stanfit objects from sample CSV files 
+
 Sun Nov  4 2012
 1. Bug fixes 
    * lp__ is not included when specifying pars (issue 79) 
