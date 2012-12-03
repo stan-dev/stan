@@ -49,7 +49,7 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
               return(invisible(NULL)) 
             } 
 
-            pars <- if (missing(pars)) x@sim$pars_oi else check_pars(x@sim, pars) 
+            pars <- if (missing(pars)) x@sim$pars_oi else check_pars_second(x@sim, pars) 
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
             info <- list(model_name = x@model_name, model_date = x@date) 
@@ -111,28 +111,7 @@ setMethod("get_seeds", signature = "stanfit",
 
 ### HELPER FUNCTIONS
 ### 
-check_pars <- function(sim, pars) {
-  #
-  # Check if all parameter in pars is a valid parameter 
-  # of the model 
-  # 
-  # Args:
-  #   sim: The sim slot of class stanfit 
-  #   pars:  a vector of character for parameter names
-  # 
-  # Returns:
-  #   pars without white spaces, if any, if all are valid
-  #   otherwise stop reporting error
-  if (missing(pars)) return(sim$pars_oi) 
-  pars_wo_ws <- gsub('\\s+', '', pars) 
-  allpars <- c(sim$pars_oi, sim$fnames_oi) 
-  m <- which(match(pars_wo_ws, allpars, nomatch = 0) == 0)
-  if (length(m) > 0) 
-    stop("no parameter ", paste(pars[m], collapse = ', ')) 
-  if (length(pars_wo_ws) == 0) 
-    stop("no parameter specified (pars is empty)")
-  unique(pars_wo_ws) 
-} 
+
 
 get_kept_samples <- function(n, sim) {
   #
@@ -303,6 +282,32 @@ setMethod("get_sampler_params",
                              SIMPLIFY = FALSE, USE.NAMES = FALSE)) 
           }) 
 
+setGeneric(name = 'get_posterior_mean', 
+           def = function(object, ...) { standardGeneric("get_posterior_mean")}) 
+
+setMethod("get_posterior_mean", 
+          definition = function(object, pars) {
+            fnames <- flatnames(object@model_pars, object@par_dims)
+            if (!exists("posterior_mean_4all", envir = object@.MISC, inherits = FALSE)) {
+              mean_pars <- lapply(object@sim$samples, function(x) attr(x, "mean_pars"))
+              mean_lp__ <- lapply(object@sim$samples, function(x) attr(x, "mean_lp__"))
+              m <- rbind(do.call(cbind, mean_pars), do.call(cbind, mean_lp__))
+              name_allchains <- NULL
+              if (ncol(m) > 1) {
+                m <- cbind(m, apply(m, 1, mean))
+                name_allchains <- "mean-all chains"
+              } 
+              cids <- sapply(object@stan_args, function(x) x$chain_id)
+              colnames(m) <- c(paste0('mean-chain:', cids), name_allchains)
+              rownames(m) <- fnames
+              assign("posterior_mean_4all", m, envir = object@.MISC)
+            }
+            pars <- if (missing(pars)) object@model_pars else check_pars(c(object@model_pars, fnames), pars)
+            tidx <- pars_total_indexes(object@model_pars, object@par_dims, fnames, pars) 
+            tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+            object@.MISC$posterior_mean_4all[unlist(tidx), , drop = FALSE]
+          })
+
 setGeneric(name = "extract",
            def = function(object, ...) { standardGeneric("extract")}) 
 
@@ -333,7 +338,7 @@ setMethod("extract", signature = "stanfit",
               return(invisible(NULL)) 
             } 
 
-            pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
+            pars <- if (missing(pars)) object@sim$pars_oi else check_pars_second(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
                                        object@sim$fnames_oi, 
@@ -400,7 +405,7 @@ setMethod("summary", signature = "stanfit",
             if (!exists("summary", envir = object@.MISC, inherits = FALSE) && use_cache) 
               assign("summary", summary_sim(object@sim), envir = object@.MISC)
            
-            pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
+            pars <- if (missing(pars)) object@sim$pars_oi else check_pars_second(object@sim, pars) 
             if (missing(probs)) 
               probs <- c(0.025, 0.25, 0.50, 0.75, 0.975)  
 
@@ -490,7 +495,7 @@ setMethod("traceplot", signature = "stanfit",
             nrow <- if (hasArg(nrow)) as.integer(dotlst$nrow) else 4 
             ncol <- if (hasArg(ncol)) as.integer(dotlst$ncol) else 2 
 
-            pars <- if (missing(pars)) object@sim$pars_oi else check_pars(object@sim, pars) 
+            pars <- if (missing(pars)) object@sim$pars_oi else check_pars_second(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
                                        object@sim$fnames_oi, 

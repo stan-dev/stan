@@ -702,6 +702,44 @@ calc_starts <- function(dims) {
   cumsum(c(1, s))[1:len] 
 } 
 
+check_pars <- function(allpars, pars) {
+  pars_wo_ws <- gsub('\\s+', '', pars) 
+  m <- which(match(pars_wo_ws, allpars, nomatch = 0) == 0)
+  if (length(m) > 0) 
+    stop("no parameter ", paste(pars[m], collapse = ', ')) 
+  if (length(pars_wo_ws) == 0) 
+    stop("no parameter specified (pars is empty)")
+  unique(pars_wo_ws) 
+} 
+
+check_pars_first <- function(object, pars) {
+  # Check if all parameters in pars are valid parameters of the model 
+  # Args:
+  #   object: a stanfit object 
+  #   pars: a character vector of parameter names
+  # Returns:
+  #   pars without white spaces, if any, if all are valid
+  #   otherwise stop reporting error
+  allpars <- cbind(object@model_pars, flatnames(object@model_pars))
+  check_pars(allpars, pars) 
+} 
+
+check_pars_second <- function(sim, pars) {
+  #
+  # Check if all parameters in pars are parameters for which we saved
+  # their samples 
+  # 
+  # Args:
+  #   sim: The sim slot of class stanfit 
+  #   pars: a character vector of parameter names
+  # 
+  # Returns:
+  #   pars without white spaces, if any, if all are valid
+  #   otherwise stop reporting error
+  if (missing(pars)) return(sim$pars_oi) 
+  allpars <- c(sim$pars_oi, sim$fnames_oi) 
+  check_pars(allpars, pars)
+} 
 
 pars_total_indexes <- function(names, dims, fnames, pars) {
   # Obtain the total indexes for parameters (pars) in the 
@@ -844,11 +882,12 @@ combine_msd_quan <- function(msd, quan) {
   msdquan 
 } 
 
+
 summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   # cat("summary_sim is called.\n")
   probs_str <- probs2str(probs)
   probs_len <- length(probs) 
-  pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
+  pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
   tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
@@ -898,7 +937,7 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   # cat("summary_sim is called.\n")
   probs_str <- probs2str(probs)
   probs_len <- length(probs) 
-  pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
+  pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
   tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
@@ -930,7 +969,7 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
 }  
 
 summary_sim_ess <- function(sim, pars) {
-  pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
+  pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
   tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
@@ -943,7 +982,7 @@ summary_sim_ess <- function(sim, pars) {
 } 
 
 summary_sim_rhat <- function(sim, pars) {
-  pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
+  pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
   tidx_rowm <- lapply(tidx, function(x) attr(x, "row_major_idx"))
   tidx <- unlist(tidx, use.names = FALSE)
@@ -956,6 +995,24 @@ summary_sim_rhat <- function(sim, pars) {
 } 
 
 
+par_vector2list <- function(v, pars, dims, starts = calc_starts(dims)) {
+  # Turn a vector of sample (typically an iteration)
+  # into a list according to the dims for parameters
+  # Args:
+  #   v: the vector of sample 
+  #   pars: a character vector for parameter names 
+  #   dims: a list of integer vector for parameter dimensions
+  lst <- lapply(seq_along(pars), 
+                function(i) { 
+                  len <- num_pars(dims[[i]]) 
+                  y <- v[starts[i] + (1:len) - 1] 
+                  if (length(dims[[i]]) > 0) dim(y) <- dims[[i]] 
+                  return(y) 
+                })
+  names(lst) <- pars 
+  lst 
+}
+
 organize_inits <- function(inits, pars, dims) {
   # obtain a list of inital values for each chain in sim
   # Args: 
@@ -966,22 +1023,12 @@ organize_inits <- function(inits, pars, dims) {
 
   # remove element 'lp__' in the names 
   idx_of_lp <- which(pars == "lp__")
-  if (idx_of_lp > 0) pars <- pars[-idx_of_lp] 
-
-  chains <- length(inits) 
+  if (idx_of_lp > 0) {
+    pars <- pars[-idx_of_lp] 
+    dims <- dims[-idx_of_lp] 
+  }
   starts <- calc_starts(dims) 
-  tmpfun <- function(x) {
-    lst <- lapply(1:length(pars),  
-                  function(i) { 
-                    len <- num_pars(dims[[i]]) 
-                    if (1 == len) return(x[starts[i]]) 
-                    y <- x[starts[i] + (1:len) - 1] 
-                    dim(y) <- dims[[i]] 
-                    return(y) 
-                  })
-    names(lst) <- pars 
-    lst 
-  } 
+  tmpfun <- function(x) par_vector2list(x, pars, dims, starts) 
   lapply(inits, tmpfun) 
 } 
 
@@ -1022,7 +1069,7 @@ stan_plot_inferences <- function(sim, summary, pars, model_info, display_paralle
   standard_width <- rstan_options('plot_standard_npar') 
   max_width <- rstan_options('plot_max_npar') 
 
-  pars <- if (missing(pars)) sim$pars_oi else check_pars(sim, pars) 
+  pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   n_pars <- length(pars) 
   chains <- sim$chains
  

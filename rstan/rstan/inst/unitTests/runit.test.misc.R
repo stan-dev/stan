@@ -321,6 +321,20 @@ test_dotfnames_fromto_sqrfnames <- function() {
   dn2 <- rstan:::sqrfnames_to_dotfnames(sn)
   checkEquals(dn, dn2)
 }
+
+test_par_vector2list <- function() {
+  v <- c(2.3, 3.4, 4.5, (1:8)/9); 
+  pars <- c('alpha', 'beta', 'gamma')
+  dims <- list(integer(0), c(2), c(2, 4))
+  vl <- rstan:::par_vector2list(v, pars, dims)
+  alpha <- 2.3  
+  beta <- array(v[2:3], dim = 2) 
+  gamma <- array(v[4:11], dim = c(2, 4))
+  checkEquals(length(vl), 3)
+  checkEquals(vl[[1]], alpha)
+  checkEquals(vl[[2]], beta)
+  checkEquals(vl[[3]], gamma)
+} 
  
 .tearDown <- function() {
   unlink('tmp.stan') 

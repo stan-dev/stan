@@ -276,11 +276,15 @@ namespace rstan {
                      Model& model,
                      std::vector<Rcpp::NumericVector>& chains, 
                      const std::vector<size_t>& qoi_idx,
+                     std::vector<double>& sum_pars,
+                     double& sum_lp,
                      std::vector<Rcpp::NumericVector>& sampler_params, 
                      std::string& adaptation_info) { 
                          
       adaptation_info.clear(); 
       sampler.set_params(params_r,params_i);
+      sum_pars.clear();
+      sum_pars.resize(params_i.size() + params_r.size(), 0);
       int it_print_width = std::ceil(std::log10(num_iterations));
       // rstan::io::rcout << std::endl;
   
@@ -293,6 +297,7 @@ namespace rstan {
      
       int ii = 0; // index for iterations saved to chains
       for (int m = 0; m < num_iterations; ++m) { 
+        bool is_warmup = m < num_warmup;
         R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
           rstan::io::rcout << "Iteration: ";
@@ -301,7 +306,7 @@ namespace rstan {
           rstan::io::rcout << " [" << std::setw(3)
                            << static_cast<int>((100.0 * (m + 1))/num_iterations)
                            << "%] ";
-          rstan::io::rcout << ((m < num_warmup) ? " (Adapting)" : " (Sampling)");
+          rstan::io::rcout << (is_warmup ? " (Adapting)" : " (Sampling)");
           rstan::io::rcout << std::endl;
           rstan::io::rcout.flush();
         } 
@@ -336,6 +341,11 @@ namespace rstan {
           if (sample_file_flag)
             sample_file_stream << ii_sampler_params[z] << ",";
         } 
+        if (!is_warmup) {
+          for (size_t z = 0; z < params_inr.size(); z++)
+            sum_pars[z] += params_inr[z];
+          sum_lp += lp__;
+        } 
         
         // check range of ii, the error should not happen by construction. 
         // just to avoid programming error, other approach such as using DDEBUG?
@@ -364,6 +374,8 @@ namespace rstan {
      * @tparam Model 
      * @param chains[out]: the object into which the samples for parameters
      *   of interest are written. 
+     * @param mean_pars[out]: mean of the samples for all parameters after warmup.
+     * @param mean_lp[out]: mean of lp__ of all iterations after warmup.
      * @param initv[out]: the initial values used, or the first iteration. 
      * @iter_save: the number of iterations that would be save after 
      *   taking account of the thinning. 
@@ -374,8 +386,9 @@ namespace rstan {
     int sampler_command(stan_args& args, 
                         Model& model, 
                         std::vector<Rcpp::NumericVector>& chains, 
+                        std::vector<double>& mean_pars,
+                        double& mean_lp,
                         std::vector<double>& initv, 
-                        int iter_save,
                         const std::vector<size_t>& qoi_idx,
                         std::vector<std::string>& sampler_param_names, 
                         std::vector<Rcpp::NumericVector>& sampler_params, 
@@ -387,6 +400,8 @@ namespace rstan {
       int num_iterations = args.get_iter(); 
       int num_warmup = args.get_warmup(); 
       int num_thin = args.get_thin(); 
+      int iter_save = args.get_iter_save();
+      int iter_save_wo_warmup = args.get_iter_save_wo_warmup();
       int leapfrog_steps = args.get_leapfrog_steps(); 
       unsigned int random_seed = args.get_random_seed();
       double epsilon = args.get_epsilon(); 
@@ -537,7 +552,7 @@ namespace rstan {
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,qoi_idx,sampler_params,
+                    model,chains,qoi_idx,mean_pars,mean_lp,sampler_params,
                     adaptation_info); 
 
       } else if (0 > leapfrog_steps && equal_step_sizes) {
@@ -564,7 +579,7 @@ namespace rstan {
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,qoi_idx,sampler_params,
+                    model,chains,qoi_idx,mean_pars,mean_lp,sampler_params,
                     adaptation_info); 
       } else {
         // Stardard HMC
@@ -590,9 +605,18 @@ namespace rstan {
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,
                     sample_stream,sample_file_flag,params_r,params_i,
-                    model,chains,qoi_idx,sampler_params,
+                    model,chains,qoi_idx,mean_pars,mean_lp,sampler_params,
                     adaptation_info); 
       }
+
+      if (iter_save_wo_warmup > 0) {
+        for (std::vector<double>::iterator it = mean_pars.begin(); 
+             it != mean_pars.end(); 
+             ++it) {
+          *it /= iter_save_wo_warmup;
+        }
+        mean_lp /= iter_save_wo_warmup;
+      } 
       
       if (sample_file_flag) {
         rstan::io::rcout << "Sample of chain " 
@@ -701,17 +725,19 @@ namespace rstan {
       BEGIN_RCPP; 
       Rcpp::List lst_args(args_); 
       stan_args args(lst_args); 
-      int iter_save = args.get_iter_save(); 
       std::vector<Rcpp::NumericVector> chains; 
       std::vector<Rcpp::NumericVector> sampler_params;
       std::vector<std::string> sampler_param_names; 
       std::string adaptation_info; 
+      std::vector<double> mean_pars;
       std::vector<double> initv; 
+      double mean_lp = 0; 
       bool test_grad = args.get_test_grad(); 
       int ret; 
        
-      ret = sampler_command(args, model_, chains, initv, iter_save, names_oi_tidx_, 
-                            sampler_param_names, sampler_params, adaptation_info); 
+      ret = sampler_command(args, model_, chains, mean_pars, mean_lp, initv,
+                            names_oi_tidx_, sampler_param_names,
+                            sampler_params, adaptation_info); 
 
       if (ret != 0) {
         return R_NilValue;  // indicating error happened 
@@ -737,6 +763,8 @@ namespace rstan {
       lst.attr("test_grad") = Rcpp::wrap(false); 
       lst.attr("args") = args.stan_args_to_rlist(); 
       lst.attr("inits") = initv; 
+      lst.attr("mean_pars") = mean_pars; 
+      lst.attr("mean_lp__") = mean_lp; 
       lst.attr("adaptation_info") = adaptation_info;
       
       // sampler parameters such as treedepth
