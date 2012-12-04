@@ -11,75 +11,93 @@ The to-do list is organized into the following sections:
 * Testing                       * Release Mgmt
 * Command-Line                  * ModelsC++ API
 
-v1.0.4
+v1.1.0
 ======================================================================
--- Libraries Updated
-   * Eigen version 3.1.1 replaced with version 3.1.2
-   * Boost version 1.51.0 replaced with version 1.52.0
--- Bug Fixes
-   * fixed bug introduced in 1.0.3 that hid line and column number
-     bug reporting
-   * added checks that data dimensions match as well as sizes
-   * removed non-symmetric versions of eigenvalues() and eigenvectors()
--- Improvements
-   * generating double-based log-prob function (in addition to 
-     stan::agrad::var-based)
-   * testing identifiers are not reserved words in C++/Stan
-   * trapping/reporting locations of errors in data and init reads
-   * templated out matrix libs to reduce code duplication
+-- New Features
+   * Conditiaonl (if-then-else) statements
+   * While statements
+-- New Functions
    * generalized multiply_lower_tri_self_transpose() to non-square
      matrices
-   * vectorized auto-dif for tcrossprod() and crossprod()
--- New Functions
    * special functions: log_inv_logit(), log1m_inv_logit()
    * matrix special functions: cumulative_sum()
    * probability functions: poisson_log_log() for log-rate 
      parameterized Poisson
    * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
-
+   * comparison operators (<, >, <=, >=, ==, !=)
+   * boolean operators (!, ||, &&)
+-- Bug Fixes
+   * fixed bug introduced in 1.0.3 that hid line and column number
+     bug reporting
+   * added checks that data dimensions match as well as sizes
+   * removed non-symmetric versions of eigenvalues() and eigenvectors()
+   * testing identifiers are not reserved words in C++/Stan
+   * trapping/reporting locations of errors in data and init reads
+-- Code Improvements
+   * templated out matrix libs to reduce code duplication
+   * vectorized auto-dif for tcrossprod() and crossprod()
+-- Libraries Updated
+   * Eigen version 3.1.1 replaced with version 3.1.2
+   * Boost version 1.51.0 replaced with version 1.52.0
 
 PRIORITIES?
 ======================================================================
++ (name): actively assigned
+* (name): likely to be assigned to
 
-* discrete sampling
-* forward sampling (RNG in gen quant, all RNGs for distros)
-* cumulative distributions & truncated prob functions
-* vectorization of multivariate prob functions
-* vectorized derivatives for prob functions
+Efficiency/Scalability of Code and Sampling
+-------------------------------------------
++ (Yuanjun) adapting fixed covariance matrix during warmup
++ (Daniel) vectorized derivatives for prob functions
++ (Marcus) vectorization of multivariate prob functions
 * special function vectorization
 * matrix derivative partial evals
-* Python, MATLAB, Stata, ??? interfaces
-* intro applied Bayes book with RStan
-* C++ manual
-* C++ code cleanup (API doc, privates, consts, doc, split files, 
-  long long)
-* simplify error handling by removing policies
-* matrix slicing and dicing
-* matrix expressions
-* ragged arrays
-* subroutines in modeling language
-* user-specified language extensions
-* conditional expressions, statements (for, while, if-else, comparisons)
-* covariance matrix w. caching (inverse, determinant, Cholesky)
-* I/O from CSV files
-* fancier web site graphics
+* (Ben) covariance matrix w. caching (inverse, determinant, Cholesky)
 * multi-threading
-* convergence diagnostics (basic I/O of leapfrog/gradients + evals)
-* command for multiple chains + report like print(fit) in RStan
-* initialization block in model
 * ensemble samplers: DREAM, differential evolution, stretch/walk
-* adapting fixed covariance matrix
 * higher-order auto-dif and RM-HMC
+
+Modeling Language
+-----------------
++ (Bob) forward sampling (RNG in gen quant, all RNGs for distros)
++ (Bob) new types: lower triangular (+/- strict), diagonal matrix,
+  symmetric matrix, Cholesky factor of pos-def matrix
++ (Bob) discrete sampling
++ (Michael B/Daniel) cumulative distributions & truncated prob functions
+* ragged arrays
+* matrix literal-like expressions a la MATLAB
+* matrix slicing and dicing
+* subroutines in modeling language
+* initialization block in model w. randomization
+* (Bob) user-specified language extensions (plug in facility to declare,
+  compile, link)
 * implicit functions with derivatives (for diff eqs?) 
-* compiler for R's linear model notation
-* syntactic improvements in language (e.g., multiple declares,
-  declare and assign)
 * user-callable transforms with Jacobian lp__ adjustment
 * unconstrained parameterizations of prob functions
-* new types: lower triangular (+/- strict), diagonal matrix,
-  symmetric matrix, Cholesky factor of pos-def matrix
+* (Bob) syntactic improvements in language (e.g., multiple declares,
+  compound declare and assign)
+
+Command and Interfaces
+----------------------
+* command for multiple chains + report like print(fit) in RStan
+* Python, MATLAB, Julia, Stata, ??? interfaces
+* convergence diagnostics (basic I/O of leapfrog/gradients + evals)
+* I/O from CSV files
+* (contributed OK?) compiler for R's linear model notation
+
+Cleanup
+-----------
 * improve special function and prob function behavior at limits
+* (Daniel) simplify error handling by removing policies
+
+Doc
+---
+* intro applied Bayes book with RStan
+* C++ manual for API and auto-dif
+* C++ code cleanup (API doc, privates, consts, doc, split files, 
+  long long)
 * more example models, complete/improve BUGS models
+* fancier web site graphics
 
 
 

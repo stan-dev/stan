@@ -535,19 +535,19 @@ namespace stan {
       expression09_r.name("expression, precedence 9, binary <, <=, >, >=");
       expression09_r 
         %= expression07_r [_val = _1]
-        > *( ( lit("<")
+        > *( ( lit("<=")
                > expression09_r  [_val = binary_op_f(_val,_1,"<","logical_lt",
                                                       boost::phoenix::ref(error_msgs))] )
               |
-              ( lit("<=") 
+              ( lit("<") 
                 > expression09_r  [_val = binary_op_f(_val,_1,"<=","logical_lte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
-              ( lit(">") 
+              ( lit(">=") 
                 > expression09_r  [_val = binary_op_f(_val,_1,">","logical_gt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
-              ( lit(">=") 
+              ( lit(">") 
                 > expression09_r  [_val = binary_op_f(_val,_1,">=","logical_gte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );

@@ -1260,9 +1260,9 @@ namespace stan {
       }
       void operator()(const while_statement& x) const {
         generate_indent(indent_,o_);
-        o_ << "while (";
+        o_ << "while (as_bool(";
         generate_expression(x.condition_,o_);
-        o_ << ") {" << EOL;
+        o_ << ")) {" << EOL;
         generate_statement(x.body_, indent_+1, o_, include_sampling_,is_var_);
         generate_indent(indent_,o_);
         o_ << "}" << EOL;
@@ -1273,9 +1273,9 @@ namespace stan {
             generate_indent(indent_,o_);
           else
             o_ << " else ";
-          o_ << "if (";
+          o_ << "if (as_bool(";
           generate_expression(x.conditions_[i],o_);
-          o_ << ") {" << EOL;
+          o_ << ")) {" << EOL;
           generate_statement(x.bodies_[i], indent_ + 1, 
                              o_, include_sampling_,is_var_);
           generate_indent(indent_,o_);
