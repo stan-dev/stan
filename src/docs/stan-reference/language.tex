@@ -1247,8 +1247,9 @@ multiplied by a (column) vector, which produces a \code{real} value.
 
 \subsection{Operator Precedence and Associativity}\label{operator-precedence.section}
 
-The precedence and associativity of operators is given in tabular form
-in \reffigure{operator-precedence}.
+The precedence and associativity of operators, as well as built-in
+syntax such as array indexing and function application is given in
+tabular form in \reffigure{operator-precedence}.
 %
 \begin{figure}
 \begin{center}
@@ -1266,11 +1267,11 @@ in \reffigure{operator-precedence}.
 \\ \hline
 \Verb|<| & 6 & left & binary infix & less than
 \\
-\Verb|<=| & 6 & left & binary infix & less or equal
+\Verb|<=| & 6 & left & binary infix & less than or equal
 \\
 \Verb|>| & 6 & left & binary infix & greater than 
 \\
-\Verb|>=| & 6 & left & binary infix & greater or equal
+\Verb|>=| & 6 & left & binary infix & greater than or equal
 \\ \hline
 \code{+} & 5 & left & binary infix & addition
 \\
@@ -1293,17 +1294,25 @@ in \reffigure{operator-precedence}.
 \code{+} & 1 & n/a & unary prefix & promotion (no-op in \Stan)
 \\ \hline
 \code{'} & 0 & n/a & unary postfix & transposition
+\\ \hline \hline
+\code{()} & 0 & n/a & prefix, wrap & function application
+\\
+\code{[]} & 0 & left & prefix, wrap & array, matrix indexing
 \end{tabular}
 \end{center}
 \caption{\it Stan's unary and binary operators, with their
   precedences, associativities, place in an expression, and a
-  description.   The operators are listed in order of precedence, from
-  least tightly binded to most tightly binding.  The full set of
-  legal arguments and corresponding result types are provided in the
-  function documentation in \refpart{built-in-functions} prefaced with
-  \code{operator} (i.e., \code{operator*(int,int):int} indicates the
-  application of the multiplication operator to two integers, which
-  returns an integer).}\label{operator-precedence.figure}
+  description.  The last two lines list the precedence of function
+  application and array, matrix, and vector indexing. The operators are
+  listed in order of precedence, from least tightly binded to most
+  tightly binding.  The full set of legal arguments and corresponding
+  result types are provided in the function documentation in
+  \refpart{built-in-functions} prefaced with \code{operator} (i.e.,
+  \code{operator*(int,int):int} indicates the application of the
+  multiplication operator to two integers, which returns an integer).
+  Parentheses may be used to group expressions explicitly rather than
+  relying on precedence and
+  associativity.}\label{operator-precedence.figure}
 \end{figure}
 %
 Other expression-forming operations, such as function application and
@@ -2074,19 +2083,77 @@ total <- sum(x);
 \end{Verbatim}
 \end{quote}
 
-% A variable inside (or outside) a loop may even be reassigned multiple
-% times, as in the following legal code.
-% %
-% \begin{quote}
-% \begin{Verbatim}
-% for (n in 1:100) {
-%     y <- y + y * epsilon;
-%     epsilon <- epsilon / 2.0;
-%     y <- y + y * epsilon;
-% }
-% \end{Verbatim}
-% \end{quote}
+A variable inside (or outside) a loop may even be reassigned multiple
+times, as in the following legal code.
 %
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:100) {
+    y <- y + y * epsilon;
+    epsilon <- epsilon / 2.0;
+    y <- y + y * epsilon;
+}
+\end{Verbatim}
+\end{quote}
+
+\section{Conditional Statements}
+
+Stan supports full conditional statements using
+the same if-then-else syntax as \Cpp.  The general format is
+%
+\begin{quote}
+\begin{Verbatim}
+if (condition1)
+  statement1
+else if (condition2)
+  statement2
+...
+else if (conditionN-1)
+  statementN-1
+else
+  statementN
+\end{Verbatim}
+\end{quote}
+%
+There must be a single leading \code{if} clause, which may be followed
+by any number of \code{else if} clauses, all of which may be
+optionally followed by an \code{else} clause.  Each condition must be
+a real or integer value, with non-zero values interpreted as true and
+the zero value as false.
+
+The entire sequence of if-then-else clauses forms a single conditional
+statement for evaluation.  The conditions are evaluated in order until
+until one of the conditions evaluates to a non-zero value, at which
+point its corresponding statement is executed and the conditional
+statement finishes execution.  If none of the conditions evaluates to
+a non-zero value and there is a final else clause, its statement is
+executed.  
+
+\section{While Statements}
+
+Stan supports standard while loops using the same syntax as \Cpp.  The
+general format is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+while (condition)
+  body
+\end{Verbatim}
+\end{quote}
+%
+The condition must be an integer or real expression and the body can
+be any statement (or sequence of statements in curly braces).  
+
+Evaluation of a while loop starts by evaluating the condition.
+If the condition evaluates to a true (non-zero) value, the body
+statement is executed, then an attempt is made to execute the entire
+while-loop again.  If the condition evaluates to a false (zero) value
+
+while-loop statement
+completes.  If the condition evaluates to a non-zero value, the
+statement is executed and control, then the loop is evaluated again,
+starting with the condition.  Thus the while loop executes the
+statement for as many times as the condition evaluates to true.
 
 
 \section{Statement Blocks and Local Variable Declarations}
@@ -3023,6 +3090,10 @@ function_literal ::= identifier
 statement 
 ::= lhs '<-' expression ';'
   | expression '~' identifier '(' ?expressions ')' ?truncation ';'
+  | 'if' '(' expression ')' statement
+    ('else' 'if' '(' expression ')' statement)*
+    ?('else' statement)
+  | 'while' '(' expression ')' statement
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
   | '{' var_decl* statement+ '}'
   | 'print' '(' (expression | string_literal)* ')'
@@ -3058,9 +3129,15 @@ In the \Stan grammar provided in this chapter, the expression \code{1
   + 2 * 3} has two parses.  As described in
 \refsection{operator-precedence}, \Stan disambiguates between the
 meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
-operator precedences and associativities.
+operator precedences and associativities. 
 
 \subsection{Forms of Numbers}
 
 Integer literals longer than one digit may not start with 0 and real
 literals cannot consist of only a period or only an exponent.
+
+\subsection{Conditional Arguments}
+
+Both the conditional if-then-else statement and while-loop statement
+require the expression denoting the condition to be a primitive type,
+integer or real.

@@ -952,6 +952,26 @@ namespace stan {
       return NEGATIVE_EPSILON;
     }
 
+    /**
+     * Return an integer with an equivalent boolean value to specified
+     * input.  For integers, this reduces to the identity function.
+     *
+     * @param x value.
+     * @return The value.
+     */
+    inline int as_bool(int x) {
+      return x;
+    }
+    /**
+     * Return 1 if the argument is unequal to zero and 0 otherwise.
+     *
+     * @param x Value.
+     * @return 1 if argument is equal to zero and 0 otherwise.
+     */
+    inline int as_bool(double x) {
+      return x != 0.0;
+    }
+
   }
 
 }
