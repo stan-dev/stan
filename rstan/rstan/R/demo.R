@@ -34,11 +34,10 @@ stan_demo <- function(model = character(0), ...) {
     source(file.path(MODEL_HOME, paste0(model, "_generate_data.R")), 
            local = STAN_ENV, verbose = FALSE)
     }
-  if(file.exists(file.path(MODEL_HOME, paste0(model, ".Rdata")))) {
-    source(file.path(MODEL_HOME, paste0(model, ".Rdata")), 
-           local = STAN_ENV, verbose = FALSE)
+  if(file.exists(fp <- file.path(MODEL_HOME, paste0(model, ".data.R")))) {
+    source(fp, local = STAN_ENV, verbose = FALSE)
   }
-  else if(!is.na(fp <- dir(MODEL_HOME, "Rdata$", full.names = TRUE)[1])) {
+  else if(!is.na(fp <- dir(MODEL_HOME, ".data.R$", full.names = TRUE)[1])) {
     source(file.path(fp), local = STAN_ENV, verbose = FALSE)
   }
   return(stan(MODELS, model_name = model, data = STAN_ENV, ...))
