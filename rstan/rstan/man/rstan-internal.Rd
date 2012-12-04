@@ -4,6 +4,7 @@
 \alias{get_logposterior,ANY-method}
 \alias{get_adaptation_info,ANY-method}
 \alias{get_sampler_params,ANY-method}
+\alias{get_posterior_mean,ANY-method}
 
 \alias{cxxdso-class}
 \alias{show,cxxdso-method}

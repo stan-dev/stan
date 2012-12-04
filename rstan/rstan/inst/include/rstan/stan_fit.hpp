@@ -283,8 +283,6 @@ namespace rstan {
                          
       adaptation_info.clear(); 
       sampler.set_params(params_r,params_i);
-      sum_pars.clear();
-      sum_pars.resize(params_i.size() + params_r.size(), 0);
       int it_print_width = std::ceil(std::log10(num_iterations));
       // rstan::io::rcout << std::endl;
   
@@ -484,6 +482,8 @@ namespace rstan {
       }
       // keep a record of the initial values 
       model.write_array(params_r,params_i,initv); 
+      mean_pars.clear();
+      mean_pars.resize(initv.size(), 0);
 
       if (test_grad) {
         rstan::io::rcout << std::endl << "TEST GRADIENT MODE" << std::endl;
