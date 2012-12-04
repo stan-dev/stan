@@ -95,10 +95,10 @@ namespace stan {
         L = crossprod(mdivide_left_tri_low(L));
         Eigen::Matrix<T_y,Eigen::Dynamic,1> W_inv_vec = Eigen::Map<
           const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
-                                L.data(), L.rows() * L.rows(), 1);
+                                &L(0), L.size(), 1);
         Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_vec = Eigen::Map<
           const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
-                                S.data(), S.rows() * S.rows(), 1);
+                                &S(0), S.size(), 1);
         lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
       }
       if (include_summand<propto,T_dof,T_scale>::value)
