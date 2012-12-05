@@ -433,3 +433,17 @@ TEST(MathSpecialFunctions,logicalGte) {
   EXPECT_FALSE(logical_gte(-9.0, 5.7));
   EXPECT_FALSE(logical_gte(-2,-1));
 }
+TEST(MathSpecialFunctions,asBool) {
+  using stan::math::as_bool;
+  EXPECT_TRUE(as_bool(1));
+  EXPECT_TRUE(as_bool(1.7));
+  EXPECT_TRUE(as_bool(-1.7));
+  EXPECT_TRUE(as_bool(std::numeric_limits<double>::infinity()));
+  EXPECT_TRUE(as_bool(-std::numeric_limits<double>::infinity()));
+  // don't like this behavior, but it's what C++ does
+  EXPECT_TRUE(as_bool(std::numeric_limits<double>::quiet_NaN()));
+
+  EXPECT_FALSE(as_bool(0));
+  EXPECT_FALSE(as_bool(0.0));
+  EXPECT_FALSE(as_bool(0.0f));
+}

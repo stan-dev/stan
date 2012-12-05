@@ -1532,7 +1532,57 @@ transformed parameters {
 %
 
 
+\section{Conditionals}
 
+Stan supports the full \Cpp-style conditional syntax,
+allowing real or integer values to act as conditions, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+real x;
+...
+if (x) {
+   // executes if x not equal to 0
+   ...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Explicit Comparisons of Non-Boolean Conditions}
+
+The preferred form is to write the condition out explicitly for
+integer or real values that are not produced as the result of a
+comparison or boolean operation, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+if (x != 0) ...
+\end{Verbatim}
+\end{quote}
+
+% \subsection{Functional \code{ifelse} versus Conditionals}
+% don't actually want this until we get proper short-circuiting conditionals!
+
+% If possible, the functional form \code{ifelse} is preferred to full
+% conditionals.  For example, the following block
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% if (cond)
+%   x <- foo(y);
+% else 
+%   x <- bar(z);
+% \end{Verbatim}
+% \end{quote}
+% %
+% should be recoded as follows.
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% x <- ifelse(foo(y), bar(z));
+% \end{Verbatim}
+% \end{quote}
 
 \section{White Space}
 

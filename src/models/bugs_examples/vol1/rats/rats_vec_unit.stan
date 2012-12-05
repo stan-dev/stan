@@ -11,8 +11,8 @@ parameters {
   vector[N] alpha_z;
   vector[N] beta_z;
 
-  real mu_alpha_z;
-  real mu_beta_z;
+  real mu_alpha;
+  real mu_beta;
 
   real<lower=0> sigmasq_y;
   real<lower=0> sigmasq_alpha;
@@ -22,8 +22,8 @@ transformed parameters {
   real<lower=0> sigma_y;       // sigma in original bugs model
   real<lower=0> sigma_alpha;
   real<lower=0> sigma_beta;
-  real mu_alpha;
-  real mu_beta;
+  vector[N] alpha;
+  vector[N] beta;
 
   sigma_y <- sqrt(sigmasq_y);
   sigma_alpha <- sqrt(sigmasq_alpha);

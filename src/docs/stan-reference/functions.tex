@@ -163,27 +163,110 @@ The largest negative real value representable}
 
 \section{Logical Functions}
 
-Currently, Stan's logical abilities are very limited.  Like C++, BUGS,
-and R, Stan uses 0 to encode false, and 1 to encode true.  The only
-conditional-like operator is \Verb|if_else()| and the only logical
-output operator is \Verb|step()|.
+Like C++, BUGS, and R, Stan uses 0 to encode false, and 1 to encode
+true.  Stan supports the usual boolean comparison operations and
+boolean operators.  These all have the same syntax and precedence as
+in \Cpp; for the full list of operators and precedences, see
+\reffigure{operator-precedence}.  
 
-Until Stan gets comparison and boolean operations, these must be
-hacked with various flavors of arithmetic.  To test if a variable
-\code{x} is greater than or equal to \code{y}, use \code{step(x - y)}.
-To test if \code{x} equals \code{y}, use \code{step(x-y) * step(y-x)};
-to test for zero, use \code{step(x) * step(-x)}.  
+\subsection{Comparison Operators}
 
-For conjunction, use multiplication; for disjunction, use use addition
-of absolute values.  Negation is the same as testing for zero.
+All comparison operators return boolean values, either 0 or 1.  Each
+operator has two signatures, one for integer comparisons and one for
+floating-point comparisons.  Comparing an integer and real value is
+carried out by first promoting the integer value.
+%
+\begin{description}
+\fitem{int}{operator<}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  less than \farg{y} and 0 otherwise}
+\fitem{int}{operator<=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  less than or equal to \farg{y} and 0 otherwise}
+\fitem{int}{operator>}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  greater than \farg{y} and 0 otherwise}
+\fitem{int}{operator>=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  greater than or equal to \farg{y} and 0 otherwise}
+\fitem{int}{operator==}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  equal to \farg{y} and 0 otherwise}
+\fitem{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  not equal to \farg{y} and 0 otherwise}
+\end{description}
+%
+The real-valued argument versions are identical other than for
+argument type.
+%
+\begin{description}
+\fitem{int}{operator<}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  less than \farg{y} and 0 otherwise}
+\fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  less than or equal to \farg{y} and 0 otherwise}
+\fitem{int}{operator>}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  greater than \farg{y} and 0 otherwise}
+\fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  greater than or equal to \farg{y} and 0 otherwise}
+\fitem{int}{operator==}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  equal to \farg{y} and 0 otherwise}
+\fitem{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  not equal to \farg{y} and 0 otherwise}
+\end{description}
+
+
+\subsection{Boolean Operators}
+
+Boolean operators return either 0 for false or 1 for true.  Inputs may
+be any real or integer values, with non-zero values being treated as
+true and zero values treated as false.  These operators have the usual
+precedences, with negation (not) binding the most tightly, conjunction
+the next and disjunction the weakest; all of the operators bind more
+tightly than the comparisons.  Thus an expression such as
+\Verb|!a~&&~b| is interpreted as \Verb|(!a)~&&~b|, and
+\Verb/a~<~b~||~c~>=~d~&&~e~!=~f/ as
+\Verb/(a~<~b)~||~(((c~>=~d)~&&~(e~!=~f)))/.
+%
+\begin{description}
+\fitem{int}{operator{!}}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}
+\fitem{int}{operator{\&\&}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
+  is unequal to 0 and \farg{y} is unequal to 0}
+\fitem{int}{operator{||}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
+  is unequal to 0 or \farg{y} is unequal to 0}
+\end{description}
+%
+There are corresponding real-argument versions.
+%
+\begin{description}
+\fitem{int}{operator{!}}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise}
+\fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
+  is unequal to 0 and \farg{y} is unequal to 0}
+\fitem{int}{operator{||}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
+  is unequal to 0 or \farg{y} is unequal to 0}
+\end{description}
+
+
+
+\subsubsection{Boolean Operator Short Circuiting}
+
+Like in \Cpp, the boolean operators are implemented to short circuit
+directly to a return value after evaluating the first argument if it
+is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
+\code{a} evaluates to a value other than zero, the expression returns
+the value 1 without evaluating the expression \code{b}.  Similarly,
+evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
+is zero, returns 0 without evaluating \code{b}.
+
+
+
+
+
+\subsection{Logical Functions}
 
 \begin{description}
 %
 \fitem{real}{if\_else}{int cond, real \farg{x}, real \farg{y}}{
-\farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise}
+\farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise; unlike
+the ternary operator in \Cpp, Stan's \code{if\_else} function always
+evaluates both arguments \farg{x} and \farg{y}}
 %
 \fitem{real}{step}{real \farg{x}}{
-0 if \farg{x} is negative and 1 otherwise}
+0 if \farg{x} is negative and 1 otherwise; equivalent to \code{x > 0.0}}
 %
 \end{description}
 
