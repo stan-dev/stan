@@ -1819,12 +1819,12 @@ transformed parameters {
   real y;
   vector[9] x;
 
-  y <- 3.0 * y_raw;       // implies y ~ normal(0,3)
-  x <- exp(y/2) * x_raw;  // implies x ~ normal(0,exp(y/2))
+  y <- 3.0 * y_raw;  
+  x <- exp(y/2) * x_raw;
 }
 model {
-  y_raw ~ normal(0,1);  
-  x_raw ~ normal(0,1);  
+  y_raw ~ normal(0,1); // implies y ~ normal(0,3) 
+  x_raw ~ normal(0,1); // implies x ~ normal(0,exp(y/2))  
 }
 \end{Verbatim}
 \end{quote}
@@ -1921,6 +1921,14 @@ normal with mean $\mu = l$ and standard deviation $\sigma = s$. The
 logistic, the double exponential, the generalized extreme value 
 distributions, and the stable distribution are also in the 
 location-scale family.
+
+Also, if $z$ is distributed standard normal, then $z^2$ is distributed
+chi-squared with one degree of freedom. By summing the squares of $K$
+independent standard normal variates, one can obtain a single variate
+that is distributed chi-squared with $K$ degrees of freedom. However,
+for large $K$, the computational gains of this reparameterization may
+be overwhelmed by the computational cost of specifying $K$ primitive
+parameters just to obtain one transformed parameter to use in a model.
 
 \subsection{Multivariate Reparameterizations}
 
@@ -2037,8 +2045,130 @@ distributions that can be conceptualized as contaminations of the
 multivariate normal, such as the multivariate Student t and the skew
 multivariate normal distribution.
 
+A Wishart distribution can also be reparameterized in terms of standard
+normal variates and chi-squared variates. Let $L$ be the Cholesky factor
+of a $K \times K$ positive definite scale matrix $S$ and let $\nu$ be
+the degrees of freedom. If
+\begin{eqnarray*}
+A & = & \begin{array}{cccc}
+\sqrt{c_{1}} & 0 & \cdots & 0\\
+z_{21} & \sqrt{c_{2}} & \ddots & \vdots\\
+\vdots & \ddots & \ddots & 0\\
+z_{K1} & \cdots & z_{K\left(K-1\right)} & \sqrt{c_{K}}
+\end{array}
+\end{eqnarray*}
+where each $c_i$ is distributed chi-squared with $\nu - i + 1$ degrees
+of freedom and each $z_{ij}$ is distributed standard normal, then
+$W = LAA^{\top}L^{\top}$ is distributed Wishart with scale matrix
+$S = LL^{\top}$ and degrees of freedom $\nu$. Such a reparameterization
+can be implemented by the following Stan code:
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> N;
+  int<lower=1> K;
+  int<lower=K+2> nu
+  matrix[K,K] L; // Cholesky factor of scale matrix
+  vector[K] mu;
+  matrix[N,K] y;
+  ...
+parameters {
+  vector<lower=0>[K] c;
+  vector[0.5 * K * (K - 1)] z;
+  ...
+model {
+  matrix[K,K] A;
+  int count;
+  count <- 1;
+  for (j in 1:K) {
+    for (i in (j+1):K) {
+      A[i,j] <- z[count];
+      count <- count + 1;
+    }
+    for (i in 1:(j - 1)) {
+      A[i,j] <- 0.0;
+    }
+    A[j,j] <- sqrt(c[j]);
+  }
+  
+  for (i in 1:K) {
+    c[i] ~ chi_square(nu - i + 1);
+  }
+  z ~ normal(0,1);
+  // implies: L * A * A' * L' ~ wishart(nu, L * L')
+  y ~ multi_normal_cholesky(mu, L * A);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+This reparameterization is more efficient for three reasons. First, it
+reduces dependence among the elements of \Verb|z| and second, it
+avoids the need to invert the covariance matrix, $W$ every time 
+\Verb|wishart| is evaluated. Third, if $W$ is to be used with a
+multivariate normal distribution, you can pass $L A$ to the more
+efficient \Verb|multi_normal_cholesky| function, rather than passing
+$W$ to \Verb|multi_normal|.
+
+If $W$ is distributed Wishart with scale matrix $S$ and degrees of
+freedom $\nu$, then $W^{-1}$ is distributed inverse Wishart with inverse
+scale matrix $S^{-1}$ and degrees of freedom $\nu$. Thus, the previous
+result can be used to reparameterize the inverse Wishart distribution.
+Since $W = L * A * A^{\top} * L^{\top}$, 
+$W^{-1} = L^{{\top}^{-1}} A^{{\top}^{-1}} A^{-1} L^{-1}$, where all four
+inverses exist, but 
+$L^{{-1}^{\top}} = L^{{\top}^{-1}}$ and $A^{{-1}^{\top}} = A^{{\top}^{-1}}$.
+We can slightly modify the above Stan code for this case:
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> K;
+  int<lower=K+2> nu
+  matrix[K,K] L; // Cholesky factor of scale matrix
+  ...
+transformed data {
+  matrix[K,K] eye;
+  matrix[K,K] L_inv;
+  for (j in 1:K) {
+    for (i in 1:K) {
+      eye[i,j] <- 0.0;
+    }
+    eye[j,j] <- 1.0;
+  }
+  L_inv <- mdivide_left_tri_low(L, eye);
+}
+parameters {
+  vector<lower=0>[K] c;
+  vector[0.5 * K * (K - 1)] z;
+  ...
+model {
+  matrix[K,K] A;
+  matrix[K,K] A_inv_L_inv;  
+  int count;
+  count <- 1;
+  for (j in 1:K) {
+    for (i in (j+1):K) {
+      A[i,j] <- z[count];
+      count <- count + 1;
+    }
+    for (i in 1:(j - 1)) {
+      A[i,j] <- 0.0;
+    }
+    A[j,j] <- sqrt(c[j]);
+  }
+  A_inv_L_inv <- mdivide_left_tri_low(A, L_inv);
+  for (i in 1:K) {
+    c[i] ~ chi_square(nu - i + 1);
+  }
+  z ~ normal(0,1); // implies: crossprod(A_inv_L_inv) ~ 
+  // inv_wishart(nu, L_inv' * L_inv)
+  ...
+\end{Verbatim}
+\end{quote}
+%
 Another candidate for reparameterization is the Dirichlet distribution
-with all $K$ shape parameters equal. \citep{ZyczkowskiSommers:2001} shows 
+with all $K$ shape parameters equal. \cite{ZyczkowskiSommers:2001} shows 
 that if $\theta_i$ is equal to the sum of $\beta$ independent squared 
 standard normal variates and $\rho_i = \frac{\theta_i}{\sum \theta_i}$, 
 then the $K$-vector $\rho$ is distributed Dirichlet with all shape 
