@@ -14,6 +14,6 @@ bench <- function(i) {
 
 results <- mclapply(1:length(model_names), mc.cores = 4L, FUN = bench,
                     mc.preschedule = FALSE)
-
-names(results) <- model_names
-save(results, file = 'time1.RData')
+results <- matrix(unlist(results), ncol = 2, byrow = TRUE)
+rownames(results) <- model_names
+save(results, file = 'time1.RData', compress = 'xz')
