@@ -506,7 +506,7 @@ namespace stan {
 
       expression15_r.name("expression, precedence 15, binary ||");
       expression15_r 
-        %= expression14_r [_val = _1]
+        = expression14_r [_val = _1]
         > *( lit("||") 
              > expression15_r  [_val = binary_op_f(_val,_1,"||","logical_or",
                                                    boost::phoenix::ref(error_msgs))] 
@@ -514,7 +514,7 @@ namespace stan {
 
       expression14_r.name("expression, precedence 14, binary &&");
       expression14_r 
-        %= expression10_r [_val = _1]
+        = expression10_r [_val = _1]
         > *( lit("&&") 
              > expression14_r  [_val = binary_op_f(_val,_1,"&&","logical_and",
                                                    boost::phoenix::ref(error_msgs))] 
@@ -522,7 +522,7 @@ namespace stan {
 
       expression10_r.name("expression, precedence 10, binary ==, !=");
       expression10_r 
-        %= expression09_r [_val = _1]
+        = expression09_r [_val = _1]
         > *( ( lit("==") 
                > expression10_r  [_val = binary_op_f(_val,_1,"==","logical_eq",
                                                        boost::phoenix::ref(error_msgs))] )
@@ -534,7 +534,7 @@ namespace stan {
 
       expression09_r.name("expression, precedence 9, binary <, <=, >, >=");
       expression09_r 
-        %= expression07_r [_val = _1]
+        = expression07_r [_val = _1]
         > *( ( lit("<=")
                > expression09_r  [_val = binary_op_f(_val,_1,"<","logical_lt",
                                                       boost::phoenix::ref(error_msgs))] )
@@ -554,7 +554,7 @@ namespace stan {
       
       expression07_r.name("expression, precedence 7, binary +, -");
       expression07_r 
-        %=  term_r                     
+        =  term_r                     
             [_val = _1]
         > *( ( lit('+')
                 > expression07_r       
@@ -569,7 +569,7 @@ namespace stan {
 
       term_r.name("term");
       term_r 
-        %= ( negated_factor_r                       [_val = _1]
+        = ( negated_factor_r                       [_val = _1]
              >> *( (lit('*') > negated_factor_r     
                                [_val = multiplication(_val,_1,boost::phoenix::ref(error_msgs_))])
                    | (lit('/') > negated_factor_r   
@@ -584,7 +584,7 @@ namespace stan {
         ;
 
       negated_factor_r 
-        %= lit('-') >> negated_factor_r 
+        = lit('-') >> negated_factor_r 
                       [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r 
                       [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
@@ -607,7 +607,7 @@ namespace stan {
 
       factor_r.name("factor");
       factor_r
-        %=  int_literal_r     [_val = _1]
+        =  int_literal_r     [_val = _1]
         | double_literal_r    [_val = _1]
         | array_literal_r     [_val = set_array_type_f(_1,boost::phoenix::ref(error_msgs_))]
         | fun_r               [_val = set_fun_type_f(_1,boost::phoenix::ref(error_msgs_))]
