@@ -447,3 +447,19 @@ TEST(MathSpecialFunctions,asBool) {
   EXPECT_FALSE(as_bool(0.0));
   EXPECT_FALSE(as_bool(0.0f));
 }
+TEST(MathSpecialFunctions,BoostUseTr1Def) {
+ bool BOOST_RESULT_OF_USE_TR1_is_defined = false;
+
+#ifdef BOOST_RESULT_OF_USE_TR1
+ BOOST_RESULT_OF_USE_TR1_is_defined = true;
+#endif
+
+ EXPECT_TRUE(BOOST_RESULT_OF_USE_TR1_is_defined);
+}
+TEST(MathSpecialFunctions,BoostNoDeclTypeDef) {
+ bool BOOST_NO_DECLTYPE_is_defined = false;
+#ifdef BOOST_NO_DECLTYPE
+ BOOST_NO_DECLTYPE_is_defined = true;
+#endif
+ EXPECT_TRUE(BOOST_NO_DECLTYPE_is_defined);
+}
