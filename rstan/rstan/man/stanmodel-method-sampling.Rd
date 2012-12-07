@@ -15,14 +15,14 @@
   \S4method{sampling}{stanmodel}(object, data = list(), pars = NA, 
     chains = 4, iter = 2000, warmup = floor(iter/2), thin = 1,
     seed = sample.int(.Machine$integer.max, 1), init = 'random', 
-    check_data = TRUE, sample_file, verbose = FALSE, \ldots)   
+    check_data = TRUE, sample_file, verbose = FALSE, \dots)   
 } 
 
 \section{Methods}{
   \describe{
     \item{sampling}{\code{signature(object = "stanmodel")}}{
       %%  ~~describe this method here~~
-      Call sampler (NUTS or HMC, depending on parameters) 
+      Call a sampler (NUTS or HMC, depending on parameters) 
       to draw samples from the model defined by S4 class \code{stanmodel} 
       given the data, initial values, etc. 
     }
@@ -122,9 +122,6 @@
     the gradient calculation is tested and printed out and the fitted
     \code{stanfit} object is in test gradient mode.  By default, it is
     \code{FALSE}. 
-
-    When a new model is fitted starting from Stan model code, 
-    \code{\dots} is passed to \code{stanc}.
   }
 }
 \value{
@@ -141,5 +138,3 @@
 m <- stan_model(model_code = 'parameters {real y;} model {y ~ normal(0,1);}')
 f <- sampling(m, iter = 100)
 }} 
-
-\keyword{methods}

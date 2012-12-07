@@ -111,6 +111,7 @@ namespace rstan {
     std::string chain_id_src; // "user" or "default" 
     bool append_samples; 
     bool test_grad; 
+    bool point_estimate;
     std::string init; 
     SEXP init_list;  
     std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
@@ -242,6 +243,10 @@ namespace rstan {
       idx = find_index(args_names, std::string("test_grad")); 
       if (idx == args_names.size()) test_grad = false; 
       else test_grad = Rcpp::as<bool>(in[idx]);
+
+      idx = find_index(args_names, std::string("point_estimate"));
+      if (idx == args_names.size()) point_estimate = false;
+      else point_estimate = Rcpp::as<bool>(in[idx]);
     } 
 
     /**
@@ -274,6 +279,7 @@ namespace rstan {
       lst["init_list"] = init_list;                // 14 
       lst["sampler"] = sampler; 
       lst["test_grad"] = test_grad;
+      lst["point_estimate"] = point_estimate;
       return lst; 
     } 
 
@@ -344,6 +350,9 @@ namespace rstan {
     bool get_test_grad() const {
       return test_grad; 
     } 
+    inline bool get_point_estimate() const {
+      return point_estimate;
+    }
     unsigned int get_random_seed() const {
       return random_seed; 
     } 

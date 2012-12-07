@@ -86,6 +86,11 @@ model {
     for (j in 2:Ntrials)
       1 - Y[i, j] ~ bernoulli(exp(alpha * xa[i, j] + beta * xs[i, j]));
 }
+
+generated quantities {
+  real alpha2;
+  alpha2 <- alpha; 
+} 
 " 
 
 
@@ -141,6 +146,9 @@ sf <- stan(model_code = dogsstan, data = dogsdat, verbose = TRUE, chains = 3,
 traceplot(sf)
 plot(sf)
 print(sf)
+
+m <- get_posterior_mean(sf)
+print(m)
 
 require(coda) 
 

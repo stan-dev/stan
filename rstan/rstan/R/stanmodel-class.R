@@ -4,25 +4,8 @@ setMethod("show", "stanmodel",
             cat(object@model_code, "\n")
           }) 
 
-#   setMethod("plot", "stanmodel",
-#             function(x, y, ...) {
-#               cat("plot method of class stanmodel.\n") 
-#             }) 
-
-#   setMethod("print", "stanmodel",
-#             function(x, ...) {
-#               cat("print method of class stanmodel.\n") 
-#             }) 
-
-## add extract to the list of the methods that R knows.
-#   setGeneric(name = "extract",
-#              def = function(object, x) { standardGeneric("extract")})
-
-#   setMethod("extract", "stanmodel",
-#             function(object, x) {
-#               cat("intend to return samples for parameters x.\n")
-#             }) 
-
+setGeneric(name = 'optimizing',
+           def = function(object, ...) { standardGeneric("optimizing")})
 
 setGeneric(name = "sampling",
            def = function(object, ...) { standardGeneric("sampling")})
@@ -55,26 +38,79 @@ new_empty_stanfit <- function(stanmodel, model_pars = character(0), par_dims = l
       .MISC = new.env()) 
 } 
 
+prep_call_sampler <- function(object) {
+  if (!is_sm_valid(object))
+    stop(paste("the compiled object from C++ code for this model is invalid, possible reasons:\n",
+               "  - compiled with save_dso=FALSE;\n", 
+               "  - compiled on a different platform;\n", 
+               "  - not existed for reading csv files.", sep = '')) 
+  if (!is_dso_loaded(object@dso)) {
+    # load the dso if available 
+    grab_cxxfun(object@dso) 
+  } 
+} 
+
+setMethod("optimizing", "stanmodel", 
+          function(object, data = list(), 
+                   seed = sample.int(.Machine$integer.max, 1), 
+                   init = 'random', check_data = TRUE, sample_file,
+                   verbose = FALSE, ...) {
+            prep_call_sampler(object)
+            model_cppname <- object@model_cpp$model_cppname 
+            mod <- get("module", envir = object@dso@.CXXDSOMISC, inherits = FALSE) 
+            stan_fit_cpp_module <- eval(call("$", mod, paste('stan_fit4', model_cppname, sep = ''))) 
+            if (check_data) {
+              if (is.character(data)) {
+                data <- try(mklist(data))
+                if (is(data, "try-error")) {
+                  message("failed to create the data; optimization not done") 
+                  return(invisible(list(stanmodel = object)))
+                }
+              }
+              if (!missing(data) && length(data) > 0) {
+                data <- try(data_preprocess(data))
+                if (is(data, "try-error")) {
+                  message("failed to preprocess the data; optimization not done") 
+                  return(invisible(list(stanmodel = object)))
+                }
+              } else data <- list()
+            } 
+            sampler <- try(new(stan_fit_cpp_module, data)) 
+            if (is(sampler, "try-error")) {
+              message('failed to create the optimizer; optimization not done') 
+              return(invisible(list(stanmodel = object)))
+            } 
+            on.exit({rm(sampler); invisible(gc())}) 
+            m_pars <- sampler$param_names() 
+            idx_of_lp <- which(m_pars == "lp__")
+            m_pars <- m_pars[-idx_of_lp]
+            p_dims <- sampler$param_dims()[-idx_of_lp]
+            if (is.numeric(init)) init <- as.character(init)
+            if (is.function(init)) init <- init()
+            if (!is.list(init) && !is.character(init)) {
+              message("wrong specification of initial values")
+              return(invisible(list(stanmodel = object)))
+            } 
+            seed <- check_seed(seed, warn = 1)    
+            args <- list(init = init, seed = seed, point_estimate = TRUE)
+            if (!missing(sample_file) && is.na(sample_file)) 
+              args$sample_file <- writable_sample_file(sample_file) 
+            dotlist <- list(...)
+            dotlist$test_grad <- FALSE # not to test gradient
+            optim <- sampler$call_sampler(c(args, dotlist))
+            names(optim$par) <- flatnames(m_pars, p_dims)
+            optim["stanmodel"] <- object
+            invisible(optim)
+          }) 
+
 setMethod("sampling", "stanmodel",
           function(object, data = list(), pars = NA, chains = 4, iter = 2000,
                    warmup = floor(iter / 2),
                    thin = 1, seed = sample.int(.Machine$integer.max, 1),
                    init = "random", check_data = TRUE, 
                    sample_file, verbose = FALSE, ...) {
-
-            if (!is_sm_valid(object))
-              stop(paste("the compiled object from C++ code for this model is invalid, possible reasons:\n",
-                         "  - compiled with save_dso=FALSE;\n", 
-                         "  - compiled on a different platform;\n", 
-                         "  - not existed for being created from csv files.", sep = '')) 
-
+            prep_call_sampler(object)
             model_cppname <- object@model_cpp$model_cppname 
-            # cat("model_cppname=", model_cppname, '\n')
-            if (!is_dso_loaded(object@dso)) {
-              # load the dso if available 
-              grab_cxxfun(object@dso) 
-            } 
-            # mod <- object@dso@.CXXDSOMISC$module 
             mod <- get("module", envir = object@dso@.CXXDSOMISC, inherits = FALSE) 
             stan_fit_cpp_module <- eval(call("$", mod, paste('stan_fit4', model_cppname, sep = ''))) 
 
