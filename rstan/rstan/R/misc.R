@@ -293,6 +293,17 @@ append_id <- function(file, id, suffix = '.csv') {
   file.path(fpath, fname2)
 }
 
+check_seed <- function(seed, warn = 0) {
+  if (is.character(seed) && grepl("[^0-9]", seed)) {
+    if (warn == 0) stop("seed needs to be string of digits")
+    else message("seed needs to be string of digits")
+    return(NULL)
+  } 
+  if (is.numeric(seed)) seed <- as.integer(seed)
+  if (is.na(seed)) seed <- sample.int(.Machine$integer.max, 1)
+  seed 
+} 
+
 config_argss <- function(chains, iter, warmup, thin, 
                          init, seed, sample_file, ...) {
 
@@ -341,17 +352,10 @@ config_argss <- function(chains, iter, warmup, thin,
   if (!inits_specified) stop("wrong specification of initial values")
 
   ## only one seed is needed by virtue of the RNG 
-  
-  if (missing(seed)) { 
-    seed <- sample.int(.Machine$integer.max, 1)
-  } else { 
-    if (is.numeric(seed)) seed <- as.integer(seed)
-    if (is.na(seed)) seed <- sample.int(.Machine$integer.max, 1)
-    if (is.character(seed) && grepl("[^0-9]", seed))
-      stop("seed needs to be string of digits")
-  }
+  seed <- if (missing(seed)) sample.int(.Machine$integer.max, 1) else check_seed(seed)
 
   dotlist <- list(...)
+  dotlist$point_estimate <- FALSE # not to do point estimation
 
   # use chain_id argument if specified
   if (is.null(dotlist$chain_id)) { 

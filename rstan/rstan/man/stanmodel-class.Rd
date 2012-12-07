@@ -16,7 +16,8 @@
 \description{
   A \code{stanmodel} object represents the model compiled from C++ code. 
   The \code{sampling} method defined in this class may be used to 
-  draw samples from the model.
+  draw samples from the model and \code{optimizing} method is for
+  obtaining a point estimate by maximizing the log-posterior.
 } 
 
 \section{Objects from the Class}{
@@ -41,6 +42,8 @@
     \item{\code{show}}{\code{signature(object = "stanmodel")}: print the Stan model specification.}
     \item{\code{sampling}}{\code{signature(object = "stanmodel")}: draw samples for
       the model (see \code{\link{sampling}}).}
+    \item{\code{optimizing}}{\code{signature(object = "stanmodel")}: obtain a point 
+      estimate by maximizing the posterior (see \code{\link{optimizing}}).}
     \item{\code{get_cppcode}}{\code{signature(object = "stanmodel")}: return the C++ code for the model
       as a character string. This is part of the C++ code that is compiled to the dynamic 
       shared object for the model.}

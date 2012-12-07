@@ -27,6 +27,7 @@ exportClasses(
 exportMethods(
 #   print, plot, 
 #   extract, 
+  optimizing,
   get_cppcode, get_cxxflags, # for stanmodel 
   show, sampling, summary, extract,
   traceplot, plot, get_stancode, get_inits, get_seed, get_cppo_mode,

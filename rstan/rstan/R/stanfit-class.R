@@ -287,6 +287,14 @@ setGeneric(name = 'get_posterior_mean',
 
 setMethod("get_posterior_mean", 
           definition = function(object, pars) {
+            if (object@mode == 1L) {
+              cat("Stan model '", object@model_name, "' is of mode 'test_grad';\n",
+                  "sampling is not conducted.\n", sep = '')
+              return(invisible(NULL)) 
+            } else if (object@mode == 2L) {
+              cat("Stan model '", object@model_name, "' does not contain samples.\n", sep = '') 
+              return(invisible(NULL)) 
+            } 
             fnames <- flatnames(object@model_pars, object@par_dims)
             if (!exists("posterior_mean_4all", envir = object@.MISC, inherits = FALSE)) {
               mean_pars <- lapply(object@sim$samples, function(x) attr(x, "mean_pars"))
@@ -305,7 +313,7 @@ setMethod("get_posterior_mean",
             pars <- if (missing(pars)) object@model_pars else check_pars(c(object@model_pars, fnames), pars)
             tidx <- pars_total_indexes(object@model_pars, object@par_dims, fnames, pars) 
             tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
-            object@.MISC$posterior_mean_4all[unlist(tidx), , drop = FALSE]
+            invisible(object@.MISC$posterior_mean_4all[unlist(tidx), , drop = FALSE])
           })
 
 setGeneric(name = "extract",
@@ -510,7 +518,7 @@ setMethod("traceplot", signature = "stanfit",
             par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
                           inc_warmup = inc_warmup)
             if (num_plots > nrow * ncol && ask) ask_old <- devAskNewPage(ask = TRUE)
-            on.exit({if (ask) devAskNewPage(ask = ask_old)})
+            on.exit({if (ask) devAskNewPage(ask = ask_old); par(mfrow = mfrow_old)})
             if (num_plots > 1) { 
               for (n in 2:num_plots)
                 par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
