@@ -18,7 +18,7 @@ SUFFIXES:
 # - OS: {mac, win, linux}. 
 ##
 CC = g++
-O = 3
+O = 1
 AR = ar
 
 ##
