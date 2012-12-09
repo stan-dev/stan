@@ -20,7 +20,11 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
   CFLAGS_GTEST += -std=c++0x
+#  LDLIBS += -static-libgcc
+  LDLIBS_STANC += -static-libgcc
+  LDLIBS_STANC += -static-libstdc++
   LDLIBS += -static-libgcc
+  LDLIBS += -static-libstdc++
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
