@@ -351,7 +351,6 @@ namespace stan {
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
 
-
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                                                    std::stringstream& error_msgs)
@@ -359,7 +358,8 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression_g(var_map,error_msgs),
-        var_decls_g(var_map,error_msgs) 
+        var_decls_g(var_map,error_msgs),
+        statement_2_g(var_map,error_msgs,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
@@ -381,7 +381,7 @@ namespace stan {
         %= statement_seq_r(_r1,_r2)
         | for_statement_r(_r1,_r2)
         | while_statement_r(_r1,_r2)
-        // | conditional_statement_r(_r1,_r2)
+        | statement_2_g(_r1,_r2)
         | print_statement_r
         | assignment_r 
           [_pass 
