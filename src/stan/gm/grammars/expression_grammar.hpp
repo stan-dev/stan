@@ -31,11 +31,12 @@ namespace stan {
                          std::stringstream& error_msgs,
                          bool allow_lte = true);
 
-      term_grammar<Iterator> term_g;
-
       variable_map& var_map_;
 
       std::stringstream& error_msgs_;
+
+      term_grammar<Iterator> term_g;
+
 
 
       boost::spirit::qi::rule<Iterator, 
@@ -62,11 +63,6 @@ namespace stan {
                               expression(), 
                               whitespace_grammar<Iterator> > 
       expression14_r;
-
-      boost::spirit::qi::rule<Iterator, 
-                              expression(), 
-                              whitespace_grammar<Iterator> > 
-       expression15_r;
 
 
     };
