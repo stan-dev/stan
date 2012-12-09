@@ -259,32 +259,32 @@ namespace stan {
     // };
     // boost::phoenix::function<add_conditional_body> add_conditional_body_f;
 
-    // struct add_while_condition {
-    //   template <typename T1, typename T2, typename T3>
-    //   struct result { typedef bool type; };
-    //   bool operator()(while_statement& ws,
-    //                   const expression& e,
-    //                   std::stringstream& error_msgs) const {
-    //     if (!e.expression_type().is_primitive()) {
-    //       error_msgs << "conditions in while statement must be primitive int or real;"
-    //                  << " found type=" << e.expression_type() << std::endl;
-    //       return false;
-    //     }
-    //     ws.condition_ = e;
-    //     return true;
-    //   }               
-    // };
-    // boost::phoenix::function<add_while_condition> add_while_condition_f;
+    struct add_while_condition {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(while_statement& ws,
+                      const expression& e,
+                      std::stringstream& error_msgs) const {
+        if (!e.expression_type().is_primitive()) {
+          error_msgs << "conditions in while statement must be primitive int or real;"
+                     << " found type=" << e.expression_type() << std::endl;
+          return false;
+        }
+        ws.condition_ = e;
+        return true;
+      }               
+    };
+    boost::phoenix::function<add_while_condition> add_while_condition_f;
 
-    // struct add_while_body {
-    //   template <typename T1, typename T2>
-    //   struct result { typedef void type; };
-    //   void operator()(while_statement& ws,
-    //                   const statement& s) const {
-    //     ws.body_ = s;
-    //   }
-    // };
-    // boost::phoenix::function<add_while_body> add_while_body_f;
+    struct add_while_body {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+      void operator()(while_statement& ws,
+                      const statement& s) const {
+        ws.body_ = s;
+      }
+    };
+    boost::phoenix::function<add_while_body> add_while_body_f;
     
     struct add_loop_identifier {
       template <typename T1, typename T2, typename T3, typename T4>
@@ -380,13 +380,13 @@ namespace stan {
       statement_r
         %= statement_seq_r(_r1,_r2)
         | for_statement_r(_r1,_r2)
-        // | while_statement_r(_r1,_r2)
+        | while_statement_r(_r1,_r2)
         // | conditional_statement_r(_r1,_r2)
         | print_statement_r
         | assignment_r 
-        [_pass 
-         = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
-                                 boost::phoenix::ref(error_msgs_))]
+          [_pass 
+            = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
+                                     boost::phoenix::ref(error_msgs_))]
         | sample_r(_r1) [_pass = validate_sample_f(_1,
                                                    boost::phoenix::ref(error_msgs_))]
         | no_op_statement_r
@@ -405,17 +405,17 @@ namespace stan {
       local_var_decls_r
         %= var_decls_g(false,local_origin); // - constants
 
-      // while_statement_r.name("while statement");
-      // while_statement_r
-      //   = lit("while")
-      //   > lit('(')
-      //   > expression_g
-      //     [_pass = add_while_condition_f(_val,_1,
-      //                                    boost::phoenix::ref(error_msgs_))]
-      //   > lit(')')
-      //   > statement_r(_r1,_r2)
-      //     [add_while_body_f(_val,_1)]
-      //   ;
+      while_statement_r.name("while statement");
+      while_statement_r
+        = lit("while")
+        > lit('(')
+        > expression_g
+          [_pass = add_while_condition_f(_val,_1,
+                                         boost::phoenix::ref(error_msgs_))]
+        > lit(')')
+        > statement_r(_r1,_r2)
+          [add_while_body_f(_val,_1)]
+        ;
       
       // conditional_statement_r.name("if-else statement");
       // conditional_statement_r

@@ -58,10 +58,10 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       for_statement_r;
 
-      // boost::spirit::qi::rule<Iterator, 
-      //                         while_statement(bool,var_origin), 
-      //                         whitespace_grammar<Iterator> > 
-      // while_statement_r;
+      boost::spirit::qi::rule<Iterator, 
+                              while_statement(bool,var_origin), 
+                              whitespace_grammar<Iterator> > 
+      while_statement_r;
 
       // boost::spirit::qi::rule<Iterator, 
       //                         conditional_statement(bool,var_origin),
