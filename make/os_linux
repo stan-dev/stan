@@ -10,23 +10,31 @@
 ifeq (g++,$(CC_TYPE))
   LDFLAGS += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
-  CFLAGS_GTEST += -std=c++0x
+  CFLAGS += -Wno-unused-local-typedefs
+  CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-uninitialized
+  CFLAGS += -std=c++0x
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
-#  CFLAGS += -m32
+  CFLAGS += -m32
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
-  CFLAGS_GTEST += -std=c++0x
+  CFLAGS += -std=c++0x
+  LDLIBS_STANC += -static-libgcc
+  LDLIBS_STANC += -static-libstdc++
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
   PCH = .gch
   EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
+  CFLAGS += -std=c++0x
+  CFLAGS += -stdlib=libc++
+  CFLAGS += -ftemplate-backtrace-limit=0
+  CFLAGS_GTEST += -DGTEST_USE_OWN_TR1_TUPLE
+  CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   CFLAGS += -Wno-unused-function
-  CFLAGS += -Wno-tautological-compare
-  CFLAGS_GTEST += -Wno-c++11-extensions
-  LDFLAGS += -lpthread
+  CFLAGS += -Wno-uninitialized
   #PCH = .pch
 endif
 
