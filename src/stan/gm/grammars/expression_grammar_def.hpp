@@ -42,61 +42,32 @@
 
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stan/gm/grammars/term_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
-                          (stan::gm::expression, expr_)
-                          (std::vector<std::vector<stan::gm::expression> >, 
-                           dimss_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
-                          (std::string, name_)
-                          (std::vector<stan::gm::expression>, args_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
-                          (int,val_)
-                          (stan::gm::expr_type,type_))
-
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
-                          (double,val_)
-                          (stan::gm::expr_type,type_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::array_literal,
-                          (std::vector<stan::gm::expression>,args_))
-//                          (stan::gm::expr_type,type_) )
 
 namespace stan { 
 
   namespace gm {
 
-
-    struct set_array_type {
+    // FIXME: cut and paste from term grammar, having trouble w. includes
+    struct validate_expr_type2 {
       template <typename T1, typename T2>
-      struct result { typedef array_literal type; };
+      struct result { typedef bool type; };
 
-      array_literal operator()(array_literal& array_lit,
-                               std::ostream& error_msgs) const {
-        if (array_lit.args_.size() == 0) {
-          array_lit.type_ = expr_type(DOUBLE_T,1U);
-          // print warning about default to double
-          return array_lit;
+      bool operator()(const expression& expr,
+                      std::ostream& error_msgs) const {
+        if (expr.expression_type().is_ill_formed()) {
+          error_msgs << "expression is ill formed" << std::endl;
+          return false;
         }
-        size_t elt_size = array_lit.args_[0].expression_type().num_dims_;
-        base_expr_type base_type = array_lit.args_[0].expression_type().base_type_;
-        for (size_t i = 1; i < array_lit.args_.size(); ++i) {
-          if (elt_size != array_lit.args_[i].expression_type().num_dims_
-              || base_type != array_lit.args_[i].expression_type().base_type_) {
-            array_lit.type_ = expr_type(); // ill-formed
-            // error message here about mismatch
-          }
-        }
-        array_lit.type_ = expr_type(base_type, 1U + elt_size);
-        return array_lit;
+        return true;
       }
     };
-    boost::phoenix::function<set_array_type> set_array_type_f;
+    boost::phoenix::function<validate_expr_type2> validate_expr_type2_f;
 
-    struct set_fun_type {
+    // FIXME: cut and paste from term grammar, having trouble w. includes
+    struct set_fun_type2 {
       template <typename T1, typename T2>
       struct result { typedef fun type; };
 
@@ -111,10 +82,9 @@ namespace stan {
         return fun;
       }
     };
-    boost::phoenix::function<set_fun_type> set_fun_type_f;
+    boost::phoenix::function<set_fun_type2> set_fun_type2_f;
 
-
-    struct binary_op_expr {
+   struct binary_op_expr {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
       struct result { typedef expression type; };
 
@@ -137,14 +107,13 @@ namespace stan {
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
-        set_fun_type sft;
+        set_fun_type2 sft;
         fun f(fun_name,args);
         sft(f,error_msgs);
         return expression(f);
       }
     };
     boost::phoenix::function<binary_op_expr> binary_op_f;
-
 
 
     struct addition_expr {
@@ -161,7 +130,7 @@ namespace stan {
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
-        set_fun_type sft;
+        set_fun_type2 sft;
         fun f("add",args);
         sft(f,error_msgs);
         return expression(f);
@@ -185,297 +154,13 @@ namespace stan {
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
-        set_fun_type sft;
+        set_fun_type2 sft;
         fun f("subtract",args);
         sft(f,error_msgs);
         return expression(f);
       }
     };
     boost::phoenix::function<subtraction_expr> subtraction;
-
-    struct multiplication_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 *= expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type sft;
-        fun f("multiply",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<multiplication_expr> multiplication;
-
-    void generate_expression(const expression& e, std::ostream& o);
-
-    struct division_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-        if (expr1.expression_type().is_primitive_int() 
-            && expr2.expression_type().is_primitive_int()) {
-          // getting here, but not printing?  only print error if problems?
-          error_msgs << "Warning: integer division implicitly rounds to integer."
-                     << " Found int division: ";
-          generate_expression(expr1.expr_,error_msgs);
-          error_msgs << " / ";
-          generate_expression(expr2.expr_,error_msgs);
-          error_msgs << std::endl
-                     << " Positive values rounded down, negative values rounded up or down"
-                     << " in platform-dependent way."
-                     << std::endl;
-        }
-            
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type sft;
-        if ((expr1.expression_type().type() == MATRIX_T
-             || expr1.expression_type().type() == ROW_VECTOR_T)
-            && expr2.expression_type().type() == MATRIX_T) {
-          fun f("mdivide_right",args);
-          sft(f,error_msgs);
-          return expression(f);
-        }
-        
-        fun f("divide",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<division_expr> division;
-
-    struct left_division_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type sft;
-        if (expr1.expression_type().type() == MATRIX_T
-            && (expr2.expression_type().type() == VECTOR_T
-                || expr2.expression_type().type() == MATRIX_T)) {
-          fun f("mdivide_left",args);
-          sft(f,error_msgs);
-          return expression(f);
-        }
-        fun f("divide_left",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<left_division_expr> left_division;
-
-    struct elt_multiplication_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 *= expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type sft;
-        fun f("elt_multiply",args);
-        sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
-      }
-    };
-    boost::phoenix::function<elt_multiplication_expr> elt_multiplication;
-
-    struct elt_division_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type sft;
-        fun f("elt_divide",args);
-        sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
-      }
-    };
-    boost::phoenix::function<elt_division_expr> elt_division;
-
-    // Cut-and-Paste from Spirit examples, including comment:  We
-    // should be using expression::operator-. There's a bug in phoenix
-    // type deduction mechanism that prevents us from doing
-    // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
-    // we will use a phoenix::function below:
-    struct negate_expr {
-      template <typename T1, typename T2>
-      struct result { typedef expression type; };
-
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
-        if (expr.expression_type().is_primitive()) {
-          return expression(unary_op('-', expr));
-        }
-        std::vector<expression> args;
-        args.push_back(expr);
-        set_fun_type sft;
-        fun f("minus",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<negate_expr> negate_expr_f;
-
-    struct logical_negate_expr {
-      template <typename T1, typename T2>
-      struct result { typedef expression type; };
-
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
-        if (!expr.expression_type().is_primitive()) {
-          error_msgs << "logical negation operator ! only applies to int or real types; ";
-          return expression();
-        }
-        std::vector<expression> args;
-        args.push_back(expr);
-        set_fun_type sft;
-        fun f("logical_negation",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
-
-    struct transpose_expr {
-      template <typename T1, typename T2>
-      struct result { typedef expression type; };
-
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
-        if (expr.expression_type().is_primitive()) {
-          return expr; // transpose of basic is self -- works?
-        }
-        std::vector<expression> args;
-        args.push_back(expr);
-        set_fun_type sft;
-        fun f("transpose",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<transpose_expr> transpose_f;
-
-    struct add_expression_dimss {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef T1 type; };
-      expression operator()(expression& expression,
-                            std::vector<std::vector<stan::gm::expression> >& dimss,
-                            bool& pass,
-                            std::ostream& error_msgs) const {
-        index_op iop(expression,dimss);
-        iop.infer_type();
-        if (iop.type_.is_ill_formed()) {
-          error_msgs << "indexes inappropriate for expression." << std::endl;
-          pass = false;
-        } else {
-          pass = true;
-        }
-        return iop;
-      }
-    };
-    boost::phoenix::function<add_expression_dimss> add_expression_dimss_f;
-
-    struct set_var_type {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef variable type; };
-      variable operator()(variable& var_expr, 
-                          variable_map& vm,
-                          std::ostream& error_msgs,
-                          bool& pass) const {
-        std::string name = var_expr.name_;
-        if (!vm.exists(name)) {
-          pass = false;
-          error_msgs << "variable \"" << name << '"' << " does not exist." 
-                     << std::endl;
-          return var_expr;
-        }
-        pass = true;
-        var_expr.set_type(vm.get_base_type(name),vm.get_num_dims(name));
-        return var_expr;
-      }
-    };
-    boost::phoenix::function<set_var_type> set_var_type_f;
-
-    struct validate_int_expr3 {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
-
-      bool operator()(const expression& expr,
-                      std::stringstream& error_msgs) const {
-        if (!expr.expression_type().is_primitive_int()) {
-          error_msgs << "expression denoting integer required; found type=" 
-                     << expr.expression_type() << std::endl;
-          return false;
-        }
-        return true;
-      }
-    };
-    boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
-
-
-    struct validate_expr_type {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
-
-      bool operator()(const expression& expr,
-                      std::ostream& error_msgs) const {
-        if (expr.expression_type().is_ill_formed()) {
-          error_msgs << "expression is ill formed" << std::endl;
-          return false;
-        }
-        return true;
-      }
-    };
-    boost::phoenix::function<validate_expr_type> validate_expr_type_f;
-
-    
 
 
 
@@ -485,7 +170,8 @@ namespace stan {
                                                      bool allow_lte)
       : expression_grammar::base_type(allow_lte ? expression_r : expression07_r),
         var_map_(var_map),
-        error_msgs_(error_msgs) 
+        error_msgs_(error_msgs),
+        term_g(var_map,error_msgs,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
@@ -499,16 +185,11 @@ namespace stan {
 
 
 
-      expression_r.name("expression");
+      expression_r.name("expression (top level, precedence 15, binary ||");
       expression_r
-        %= expression15_r;
-
-
-      expression15_r.name("expression, precedence 15, binary ||");
-      expression15_r 
         = expression14_r [_val = _1]
         > *( lit("||") 
-             > expression15_r  [_val = binary_op_f(_val,_1,"||","logical_or",
+             > expression14_r  [_val = binary_op_f(_val,_1,"||","logical_or",
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
@@ -516,7 +197,7 @@ namespace stan {
       expression14_r 
         = expression10_r [_val = _1]
         > *( lit("&&") 
-             > expression14_r  [_val = binary_op_f(_val,_1,"&&","logical_and",
+             > expression10_r  [_val = binary_op_f(_val,_1,"&&","logical_and",
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
@@ -524,11 +205,11 @@ namespace stan {
       expression10_r 
         = expression09_r [_val = _1]
         > *( ( lit("==") 
-               > expression10_r  [_val = binary_op_f(_val,_1,"==","logical_eq",
+               > expression09_r  [_val = binary_op_f(_val,_1,"==","logical_eq",
                                                        boost::phoenix::ref(error_msgs))] )
               |
               ( lit("!=") 
-                > expression10_r  [_val = binary_op_f(_val,_1,"!=","logical_neq",
+                > expression09_r  [_val = binary_op_f(_val,_1,"!=","logical_neq",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
 
@@ -536,140 +217,36 @@ namespace stan {
       expression09_r 
         = expression07_r [_val = _1]
         > *( ( lit("<=")
-               > expression09_r  [_val = binary_op_f(_val,_1,"<","logical_lt",
+               > expression07_r  [_val = binary_op_f(_val,_1,"<","logical_lt",
                                                       boost::phoenix::ref(error_msgs))] )
               |
               ( lit("<") 
-                > expression09_r  [_val = binary_op_f(_val,_1,"<=","logical_lte",
+                > expression07_r  [_val = binary_op_f(_val,_1,"<=","logical_lte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">=") 
-                > expression09_r  [_val = binary_op_f(_val,_1,">","logical_gt",
+                > expression07_r  [_val = binary_op_f(_val,_1,">","logical_gt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">") 
-                > expression09_r  [_val = binary_op_f(_val,_1,">=","logical_gte",
+                > expression07_r  [_val = binary_op_f(_val,_1,">=","logical_gte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
       
       expression07_r.name("expression, precedence 7, binary +, -");
       expression07_r 
-        =  term_r                     
+        =  term_g
             [_val = _1]
         > *( ( lit('+')
-                > expression07_r       
+               > term_g // expression07_r       
                 [_val = addition(_val,_1,boost::phoenix::ref(error_msgs))] )
               |  
               ( lit('-') 
-                > expression07_r   
+                > term_g // expression07_r   
                 [_val = subtraction(_val,_1,boost::phoenix::ref(error_msgs))] )
               )
-        > eps[_pass = validate_expr_type_f(_val,boost::phoenix::ref(error_msgs_))]
+        > eps[_pass = validate_expr_type2_f(_val,boost::phoenix::ref(error_msgs_))]
         ;
-
-      term_r.name("term");
-      term_r 
-        = ( negated_factor_r                       [_val = _1]
-             >> *( (lit('*') > negated_factor_r     
-                               [_val = multiplication(_val,_1,boost::phoenix::ref(error_msgs_))])
-                   | (lit('/') > negated_factor_r   
-                      [_val = division(_val,_1,boost::phoenix::ref(error_msgs_))])
-                   | (lit('\\') > negated_factor_r   [_val = left_division(_val,_1,boost::phoenix::ref(error_msgs_))])
-                   | (lit(".*") > negated_factor_r   
-                      [_val = elt_multiplication(_val,_1,boost::phoenix::ref(error_msgs_))])
-                   | (lit("./") > negated_factor_r   
-                      [_val = elt_division(_val,_1,boost::phoenix::ref(error_msgs_))])
-                   )
-             )
-        ;
-
-      negated_factor_r 
-        = lit('-') >> negated_factor_r 
-                      [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        | lit('!') >> negated_factor_r 
-                      [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> negated_factor_r  [_val = _1]
-        | indexed_factor_r [_val = _1];
-
-
-      indexed_factor_r.name("(optionally) indexed factor [sub]");
-      indexed_factor_r 
-        = factor_r [_val = _1]
-        > * (  
-               (+dims_r) 
-               [_val = add_expression_dimss_f(_val, _1, _pass,
-                                            boost::phoenix::ref(error_msgs_))]
-               | 
-               lit("'") 
-               [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 
-               )
-        ;
-
-      factor_r.name("factor");
-      factor_r
-        =  int_literal_r     [_val = _1]
-        | double_literal_r    [_val = _1]
-        | array_literal_r     [_val = set_array_type_f(_1,boost::phoenix::ref(error_msgs_))]
-        | fun_r               [_val = set_fun_type_f(_1,boost::phoenix::ref(error_msgs_))]
-        | variable_r          
-        [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
-                               boost::phoenix::ref(error_msgs_),
-                               _pass)]
-        | ( lit('(') 
-            > expression_r    [_val = _1]
-            > lit(')') )
-        ;
-        
-      int_literal_r.name("integer literal");
-      int_literal_r
-        %= int_ 
-        >> !( lit('.')
-              | lit('e')
-              | lit('E') );
-
-      double_literal_r.name("real literal");
-      double_literal_r
-        %= double_;
-
-      // a[1 2 3]
-
-      array_literal_r.name("array literal");
-      array_literal_r
-        %= lit("a__[")
-        > *expression_r
-        > lit("]")
-        ;
-
-      fun_r.name("function and argument expressions");
-      fun_r 
-        %= identifier_r // no test yet on valid naming
-        >> args_r; 
-
-      identifier_r.name("identifier (expression grammar)");
-      identifier_r
-        %= lexeme[char_("a-zA-Z") 
-                  >> *char_("a-zA-Z0-9_.")];
-
-      args_r.name("function argument expressions");
-      args_r 
-        %= (lit('(') >> lit(')'))
-        | ( lit('(')
-            >> (expression_r % ',')
-            > lit(')') )
-        ;
-      
-      dims_r.name("array dimensions");
-      dims_r 
-        %= lit('[') 
-        > (expression_r 
-           [_pass = validate_int_expr3_f(_1,boost::phoenix::ref(error_msgs_))]
-           % ',')
-        > lit(']')
-        ;
- 
-      variable_r.name("variable expression");
-      variable_r
-        %= identifier_r;
 
 
     }

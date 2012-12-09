@@ -11,6 +11,7 @@
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
+#include <stan/gm/grammars/statement_2_grammar.hpp>
 
 namespace stan { 
 
@@ -35,6 +36,7 @@ namespace stan {
       // grammars
       expression_grammar<Iterator> expression_g;  
       var_decls_grammar<Iterator> var_decls_g;
+      statement_2_grammar<Iterator> statement_2_g;
 
       // rules
       boost::spirit::qi::rule<Iterator, 
@@ -42,15 +44,18 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       assignment_r;
 
+
       boost::spirit::qi::rule<Iterator, 
                               std::vector<expression>(), 
                               whitespace_grammar<Iterator> > 
       dims_r;
 
+
       boost::spirit::qi::rule<Iterator, 
                               distribution(),
                               whitespace_grammar<Iterator> >
       distribution_r;
+
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<std::string>, 
@@ -58,20 +63,18 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       for_statement_r;
 
+
       boost::spirit::qi::rule<Iterator, 
                               while_statement(bool,var_origin), 
                               whitespace_grammar<Iterator> > 
       while_statement_r;
 
-      boost::spirit::qi::rule<Iterator, 
-                              conditional_statement(bool,var_origin),
-                              whitespace_grammar<Iterator> > 
-      conditional_statement_r;
 
       boost::spirit::qi::rule<Iterator,
                               print_statement(),
                               whitespace_grammar<Iterator> >
       print_statement_r;
+
 
       boost::spirit::qi::rule<Iterator,
                               printable(),
