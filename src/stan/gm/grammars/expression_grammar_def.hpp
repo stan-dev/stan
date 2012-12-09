@@ -61,40 +61,13 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
                           (double,val_)
                           (stan::gm::expr_type,type_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::array_literal,
-                          (std::vector<stan::gm::expression>,args_))
-//                          (stan::gm::expr_type,type_) )
+
+
 
 namespace stan { 
 
   namespace gm {
 
-
-    struct set_array_type {
-      template <typename T1, typename T2>
-      struct result { typedef array_literal type; };
-
-      array_literal operator()(array_literal& array_lit,
-                               std::ostream& error_msgs) const {
-        if (array_lit.args_.size() == 0) {
-          array_lit.type_ = expr_type(DOUBLE_T,1U);
-          // print warning about default to double
-          return array_lit;
-        }
-        size_t elt_size = array_lit.args_[0].expression_type().num_dims_;
-        base_expr_type base_type = array_lit.args_[0].expression_type().base_type_;
-        for (size_t i = 1; i < array_lit.args_.size(); ++i) {
-          if (elt_size != array_lit.args_[i].expression_type().num_dims_
-              || base_type != array_lit.args_[i].expression_type().base_type_) {
-            array_lit.type_ = expr_type(); // ill-formed
-            // error message here about mismatch
-          }
-        }
-        array_lit.type_ = expr_type(base_type, 1U + elt_size);
-        return array_lit;
-      }
-    };
-    boost::phoenix::function<set_array_type> set_array_type_f;
 
     struct set_fun_type {
       template <typename T1, typename T2>
@@ -609,7 +582,6 @@ namespace stan {
       factor_r
         =  int_literal_r     [_val = _1]
         | double_literal_r    [_val = _1]
-        | array_literal_r     [_val = set_array_type_f(_1,boost::phoenix::ref(error_msgs_))]
         | fun_r               [_val = set_fun_type_f(_1,boost::phoenix::ref(error_msgs_))]
         | variable_r          
         [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
@@ -631,14 +603,13 @@ namespace stan {
       double_literal_r
         %= double_;
 
-      // a[1 2 3]
 
-      array_literal_r.name("array literal");
-      array_literal_r
-        %= lit("a__[")
-        > *expression_r
-        > lit("]")
-        ;
+      // array_literal_r.name("array literal");
+      // array_literal_r
+      //   %= lit("a__[")
+      //   > *expression_r
+      //   > lit("]")
+      //   ;
 
       fun_r.name("function and argument expressions");
       fun_r 
