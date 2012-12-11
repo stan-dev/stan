@@ -533,7 +533,9 @@ namespace stan {
             buf.push_back(c);
           } else if (c == '.'
                      || c == 'e'
-                     || c == 'E') {
+                     || c == 'E'
+                     || c == '-'
+                     || c == '+') {
             is_double = true;
             buf.push_back(c);
           } else {
