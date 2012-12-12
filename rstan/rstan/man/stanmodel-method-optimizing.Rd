@@ -62,12 +62,16 @@
   \item{\dots}{Other optional parameters (none currently).}
 }
 \value{
-   A list with components:
+   A list with components if the optimization is done successfully:
    \item{par}{The point estimate found.}
    \item{value}{The value of the log-posterior (up to an additive constant, 
    the \code{"lp__"} in Stan) corresponding to \code{par}.}
    \item{stanmodel}{The object of \code{stanmodel} that represents the Stan
      model and includes the compiled dynamic shared object for the model.}
+
+  If the optimization is not finished for reasons such as feeding wrong data,
+  a list with a component of the compiled model (an object of \code{stanmodel})
+  is returned for future reusing. 
 } 
 
 \seealso{

@@ -92,6 +92,8 @@ setMethod("optimizing", "stanmodel",
               return(invisible(list(stanmodel = object)))
             } 
             seed <- check_seed(seed, warn = 1)    
+            if (is.null(seed))
+              return(invisible(list(stanmodel = object)))
             args <- list(init = init, seed = seed, point_estimate = TRUE)
             if (!missing(sample_file) && is.na(sample_file)) 
               args$sample_file <- writable_sample_file(sample_file) 
