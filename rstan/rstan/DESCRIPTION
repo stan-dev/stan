@@ -17,10 +17,10 @@ Description: R interface to Stan (Stan is an open-source package for obtaining
         Bayesian inference using the No-U-Turn sampler, a variant of
         Hamiltonian Monte Carlo.)
 License: GPL (>=3)
-LicenseNote: RStan includes part of unmodified copies of Stan and Boost,
-  available at http://code.google.com/p/stan and http://www.boost.org 
-  under licenses of "new BSD license" and "Boost license", respectively.  
-  Both licenses are compatible with version 3 of the GPL. 
+LicenseNote: RStan includes part of unmodified copies of Stan (http://mc-stan.org), 
+  Boost (http://www.boost.org), and Eigen (http://eigen.tuxfamily.org/), which
+  are under licenses of "new BSD license", "Boost license", and "MPL2",
+  respectively.  These three licenses are compatible with version 3 of the GPL. 
 Depends: methods, Rcpp (>= 0.9.10), inline, stats4, utils
 LinkingTo: Rcpp
 Suggests: RUnit

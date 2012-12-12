@@ -53,3 +53,9 @@ fit_nuts1 <- read_stan_csv(paste("8schools_nuts1_", 1:4, ".csv", sep = ''))
 e1 <- extract(fit_hmc)
 e2 <- extract(fit_hmc, permuted = FALSE)
 dim(e2)
+
+ss_nuts2 <- stan(file = sfile, data = dat, iter = 29, warmup = 14, chains = 4,
+                 refresh = -100, sample_file = '8schools_nuts2.csv')  
+
+fit_nuts2 <- read_stan_csv(paste("8schools_nuts2_", 1:4, ".csv", sep = ''))
+

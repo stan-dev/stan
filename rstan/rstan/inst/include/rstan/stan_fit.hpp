@@ -664,12 +664,11 @@ namespace rstan {
       if (sample_file_flag) {
         rstan::io::rcout << "Sample of chain " 
                          << chain_id 
-                         << " is written to file " << sample_file 
-                         << std::endl << std::endl;
+                         << " is written to file " << sample_file << "."
+                         << std::endl;
         sample_stream.close();
-      } else {
-        rstan::io::rcout << std::endl; 
-      } 
+      }
+      rstan::io::rcout << std::endl; 
       
       holder = Rcpp::List(chains.begin(), chains.end());
       holder.attr("test_grad") = Rcpp::wrap(false); 
