@@ -236,9 +236,15 @@ test_multi_idx_row2colm <- function() {
 test_mklist <- function() {
   x <- 3:5 
   y <- array(1:9, dim = c(3, 3))  
+  z <- list(p = 3)
+  f <- function() { TRUE }
   a <- list(x = x, y = y) 
   b <- rstan:::mklist(c("x", "y")) 
   checkTrue(identical(a, b)) 
+  c <- list(x = x, y = y, z = z) 
+  d <- rstan:::mklist(c("x", "y", "z"))
+  checkTrue(identical(c, d))
+  checkException(rstan:::mklist(c("x", "f")))
 } 
 
 test_makeconf_path <- function() {

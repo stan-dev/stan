@@ -49,12 +49,19 @@ mklist <- function(names, env = parent.frame()) {
   #   names: character strings of names of objects 
   #   env: the environment to look for objects with names
   # Note: we use inherits = TRUE when calling mget 
-  d <- mget(names, env, ifnotfound = NA, inherits = TRUE) 
-  n <- which(is.na(d)) 
+  #   and only mode of numeric and list are extracted (this
+  #   is to avoid such as get a primitive function such as
+  #   gamma.)
+  d <- mget(names, env, ifnotfound = NA, inherits = TRUE, mode = 'numeric') 
+  idx_is_na <- is.na(d)
+  names_nf <- names[idx_is_na]
+  if (length(names_nf) == 0) return(d)
+  d2 <- mget(names_nf, env, ifnotfound = NA, inherits = TRUE, mode = 'list') 
+  n <- which(is.na(d2))
   if (length(n) > 0) {
-    stop(paste("objects ", paste("'", names[n], "'", collapse = ', ', sep = ''), " not found", sep = ''))
+    stop(paste("objects ", paste("'", names_nf[n], "'", collapse = ', ', sep = ''), " not found", sep = ''))
   } 
-  d 
+  c(d[!idx_is_na],  d2)
 } 
 
 stan_kw1 <- c('for', 'in', 'while', 'repeat', 'until', 'if', 'then', 'else',
