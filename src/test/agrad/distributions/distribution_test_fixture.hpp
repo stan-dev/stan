@@ -522,7 +522,7 @@ void test_valid() {
     var logprob(0);
     EXPECT_NO_THROW( ({
 	  logprob = CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>()
-	  .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	    .call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
 	}) )
       << "Valid parameters failed at index: " << n << std::endl
       << params;
@@ -933,7 +933,8 @@ void test_gradient_function() {
 	x.push_back(p9);
       logprob.grad(x, grad);
     }
-    ASSERT_EQ(expected_grad.size(), grad.size()) << "Something is wrong with the log_prob() defined in the test";
+    ASSERT_EQ(expected_grad.size(), grad.size())
+      << "Something is wrong with the log_prob() defined in the test";
     if (!is_constant<T0>::value) {
       EXPECT_FLOAT_EQ(expected_grad[0],grad[0])
 	<< "Hand coded gradient failed for param 0" << std::endl << params;
