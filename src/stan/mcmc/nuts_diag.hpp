@@ -120,7 +120,7 @@ namespace stan {
           _maxdepth(maxdepth),
           _lastdepth(-1),
 
-          _step_sizes(model.num_params_r(), 1.0/sqrt(model.num_params_r())),
+          _step_sizes(model.num_params_r(), 1.0),
           _x_sum(model.num_params_r(), 0),
           _xsq_sum(model.num_params_r(), 0),
           _x_sum_n(0),
