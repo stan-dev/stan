@@ -337,7 +337,7 @@ void update_expected_gradients(var& logprob,
  * @param p 
  */
 template<class T,
-	 bool is_const=is_constant_struct<T>::value>
+	 bool is_const>
 void test_grad(vector<double>* e_grad, vector<double>* grad, size_t p) { }
 template<>
 
@@ -386,16 +386,16 @@ void test_gradients(var& logprob,
   vector<double> grad;
   logprob.grad(x, grad);
   
-  test_grad<T0>(e_grad0, &grad, 0);
-  test_grad<T1>(e_grad1, &grad, 1);
-  test_grad<T2>(e_grad2, &grad, 2);
-  test_grad<T3>(e_grad3, &grad, 3);
-  test_grad<T4>(e_grad4, &grad, 4);
-  test_grad<T5>(e_grad5, &grad, 5);
-  test_grad<T6>(e_grad6, &grad, 6);
-  test_grad<T7>(e_grad7, &grad, 7);
-  test_grad<T8>(e_grad8, &grad, 8);
-  test_grad<T9>(e_grad9, &grad, 9);
+  test_grad<T0,is_constant_struct<T0>::value>(e_grad0, &grad, 0);
+  test_grad<T1,is_constant_struct<T1>::value>(e_grad1, &grad, 1);
+  test_grad<T2,is_constant_struct<T2>::value>(e_grad2, &grad, 2);
+  test_grad<T3,is_constant_struct<T3>::value>(e_grad3, &grad, 3);
+  test_grad<T4,is_constant_struct<T4>::value>(e_grad4, &grad, 4);
+  test_grad<T5,is_constant_struct<T5>::value>(e_grad5, &grad, 5);
+  test_grad<T6,is_constant_struct<T6>::value>(e_grad6, &grad, 6);
+  test_grad<T7,is_constant_struct<T7>::value>(e_grad7, &grad, 7);
+  test_grad<T8,is_constant_struct<T8>::value>(e_grad8, &grad, 8);
+  test_grad<T9,is_constant_struct<T9>::value>(e_grad9, &grad, 9);
 }
 
 template<class T0, class T1, class T2, class T3,
