@@ -56,7 +56,7 @@ public:
     // theta
   }
 
-  template <class T_n=int, class T_prob,
+  template <class T_n, class T_prob,
 	    typename T2, typename T3, typename T4,
 	    typename T5, typename T6, typename T7,
 	    typename T8, typename T9>

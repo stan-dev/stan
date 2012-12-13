@@ -222,7 +222,7 @@ double get_param(vector<vector<double> >& parameters, size_t n, size_t p) {
  * @param p params to add (adds either vector<var> or var, no op for non-auto-diff variables)
  */
 template<class T, 
-	 bool is_const=is_constant_struct<T>::value>
+	 bool is_const>
 void add_params(vector<var>& x, T* p) { }
 
 template<>
@@ -250,20 +250,20 @@ void add_params<vector<var>, false>(vector<var>& x, vector<var>* p) {
  * @param grad3 
  * @param p3 
  */
-template<class T0, class T1=double, class T2=double, class T3=double,
-	 class T4=double, class T5=double, class T6=double,
-	 class T7=double, class T8=double, class T9=double>
+template<class T0, class T1, class T2, class T3,
+	 class T4, class T5, class T6,
+	 class T7, class T8, class T9>
 void update_expected_gradients(var& logprob,
 			       vector<double>* grad0, T0* p0,
-			       vector<double>* grad1=0, T1* p1=0,
-			       vector<double>* grad2=0, T2* p2=0, 
-			       vector<double>* grad3=0, T3* p3=0,
-			       vector<double>* grad4=0, T4* p4=0, 
-			       vector<double>* grad5=0, T5* p5=0, 
-			       vector<double>* grad6=0, T6* p6=0, 
-			       vector<double>* grad7=0, T7* p7=0, 
-			       vector<double>* grad8=0, T8* p8=0, 
-			       vector<double>* grad9=0, T9* p9=0) {
+			       vector<double>* grad1, T1* p1,
+			       vector<double>* grad2, T2* p2, 
+			       vector<double>* grad3, T3* p3,
+			       vector<double>* grad4, T4* p4, 
+			       vector<double>* grad5, T5* p5, 
+			       vector<double>* grad6, T6* p6, 
+			       vector<double>* grad7, T7* p7, 
+			       vector<double>* grad8, T8* p8, 
+			       vector<double>* grad9, T9* p9) {
   vector<var> x;
   if (!is_constant<T0>::value)
     x.push_back(*p0);
@@ -337,7 +337,7 @@ void update_expected_gradients(var& logprob,
  * @param p 
  */
 template<class T,
-	 bool is_const=is_constant_struct<T>::value>
+	 bool is_const>
 void test_grad(vector<double>* e_grad, vector<double>* grad, size_t p) { }
 template<>
 
@@ -357,45 +357,45 @@ void test_grad<vector<var>, false>(vector<double>* e_grad, vector<double>* grad,
   grad->erase(grad->begin(), grad->begin() + e_grad->size());
 }
 
-template<class T0, class T1=double, class T2=double, class T3=double,
-	 class T4=double, class T5=double, class T6=double,
-	 class T7=double, class T8=double, class T9=double>
+template<class T0, class T1, class T2, class T3,
+	 class T4, class T5, class T6,
+	 class T7, class T8, class T9>
 void test_gradients(var& logprob,
 		    vector<double>* e_grad0, T0* p0, 
-		    vector<double>* e_grad1=0, T1* p1=0,
-		    vector<double>* e_grad2=0, T2* p2=0, 
-		    vector<double>* e_grad3=0, T3* p3=0,
-		    vector<double>* e_grad4=0, T4* p4=0, 
-		    vector<double>* e_grad5=0, T5* p5=0, 
-		    vector<double>* e_grad6=0, T6* p6=0, 
-		    vector<double>* e_grad7=0, T7* p7=0, 
-		    vector<double>* e_grad8=0, T8* p8=0, 
-		    vector<double>* e_grad9=0, T9* p9=0) {
+		    vector<double>* e_grad1, T1* p1,
+		    vector<double>* e_grad2, T2* p2, 
+		    vector<double>* e_grad3, T3* p3,
+		    vector<double>* e_grad4, T4* p4, 
+		    vector<double>* e_grad5, T5* p5, 
+		    vector<double>* e_grad6, T6* p6, 
+		    vector<double>* e_grad7, T7* p7, 
+		    vector<double>* e_grad8, T8* p8, 
+		    vector<double>* e_grad9, T9* p9) {
   vector<var> x;
-  add_params<T0>(x, p0);
-  add_params<T1>(x, p1);
-  add_params<T2>(x, p2);
-  add_params<T3>(x, p3);
-  add_params<T4>(x, p4);
-  add_params<T5>(x, p5);
-  add_params<T6>(x, p6);
-  add_params<T7>(x, p7);
-  add_params<T8>(x, p8);
-  add_params<T9>(x, p9);
+  add_params<T0,is_constant_struct<T0>::value>(x, p0);
+  add_params<T1,is_constant_struct<T1>::value>(x, p1);
+  add_params<T2,is_constant_struct<T2>::value>(x, p2);
+  add_params<T3,is_constant_struct<T3>::value>(x, p3);
+  add_params<T4,is_constant_struct<T4>::value>(x, p4);
+  add_params<T5,is_constant_struct<T5>::value>(x, p5);
+  add_params<T6,is_constant_struct<T6>::value>(x, p6);
+  add_params<T7,is_constant_struct<T7>::value>(x, p7);
+  add_params<T8,is_constant_struct<T8>::value>(x, p8);
+  add_params<T9,is_constant_struct<T9>::value>(x, p9);
   
   vector<double> grad;
   logprob.grad(x, grad);
   
-  test_grad<T0>(e_grad0, &grad, 0);
-  test_grad<T1>(e_grad1, &grad, 1);
-  test_grad<T2>(e_grad2, &grad, 2);
-  test_grad<T3>(e_grad3, &grad, 3);
-  test_grad<T4>(e_grad4, &grad, 4);
-  test_grad<T5>(e_grad5, &grad, 5);
-  test_grad<T6>(e_grad6, &grad, 6);
-  test_grad<T7>(e_grad7, &grad, 7);
-  test_grad<T8>(e_grad8, &grad, 8);
-  test_grad<T9>(e_grad9, &grad, 9);
+  test_grad<T0,is_constant_struct<T0>::value>(e_grad0, &grad, 0);
+  test_grad<T1,is_constant_struct<T1>::value>(e_grad1, &grad, 1);
+  test_grad<T2,is_constant_struct<T2>::value>(e_grad2, &grad, 2);
+  test_grad<T3,is_constant_struct<T3>::value>(e_grad3, &grad, 3);
+  test_grad<T4,is_constant_struct<T4>::value>(e_grad4, &grad, 4);
+  test_grad<T5,is_constant_struct<T5>::value>(e_grad5, &grad, 5);
+  test_grad<T6,is_constant_struct<T6>::value>(e_grad6, &grad, 6);
+  test_grad<T7,is_constant_struct<T7>::value>(e_grad7, &grad, 7);
+  test_grad<T8,is_constant_struct<T8>::value>(e_grad8, &grad, 8);
+  test_grad<T9,is_constant_struct<T9>::value>(e_grad9, &grad, 9);
 }
 
 template<class T0, class T1, class T2, class T3,
