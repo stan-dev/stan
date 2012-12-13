@@ -10,6 +10,7 @@
 ifeq (g++,$(CC_TYPE))
   LDFLAGS += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
+  CFLAGS += -Wno-unused-local-typedefs
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
@@ -23,8 +24,8 @@ ifeq (mingw32-g++,$(CC_TYPE))
   EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
-  CFLAGS += -stdlib=libc++
-  CFLAGS_GTEST += -DGTEST_USE_OWN_TR1_TUPLE
+#  CFLAGS += -stdlib=libc++
+#  CFLAGS_GTEST += -DGTEST_USE_OWN_TR1_TUPLE
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
