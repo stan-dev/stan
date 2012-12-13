@@ -222,7 +222,7 @@ double get_param(vector<vector<double> >& parameters, size_t n, size_t p) {
  * @param p params to add (adds either vector<var> or var, no op for non-auto-diff variables)
  */
 template<class T, 
-	 bool is_const=is_constant_struct<T>::value>
+	 bool is_const>
 void add_params(vector<var>& x, T* p) { }
 
 template<>
@@ -372,16 +372,16 @@ void test_gradients(var& logprob,
 		    vector<double>* e_grad8=0, T8* p8=0, 
 		    vector<double>* e_grad9=0, T9* p9=0) {
   vector<var> x;
-  add_params<T0>(x, p0);
-  add_params<T1>(x, p1);
-  add_params<T2>(x, p2);
-  add_params<T3>(x, p3);
-  add_params<T4>(x, p4);
-  add_params<T5>(x, p5);
-  add_params<T6>(x, p6);
-  add_params<T7>(x, p7);
-  add_params<T8>(x, p8);
-  add_params<T9>(x, p9);
+  add_params<T0,is_constant_struct<T0>::value>(x, p0);
+  add_params<T1,is_constant_struct<T1>::value>(x, p1);
+  add_params<T2,is_constant_struct<T2>::value>(x, p2);
+  add_params<T3,is_constant_struct<T3>::value>(x, p3);
+  add_params<T4,is_constant_struct<T4>::value>(x, p4);
+  add_params<T5,is_constant_struct<T5>::value>(x, p5);
+  add_params<T6,is_constant_struct<T6>::value>(x, p6);
+  add_params<T7,is_constant_struct<T7>::value>(x, p7);
+  add_params<T8,is_constant_struct<T8>::value>(x, p8);
+  add_params<T9,is_constant_struct<T9>::value>(x, p9);
   
   vector<double> grad;
   logprob.grad(x, grad);
