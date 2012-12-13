@@ -357,20 +357,20 @@ void test_grad<vector<var>, false>(vector<double>* e_grad, vector<double>* grad,
   grad->erase(grad->begin(), grad->begin() + e_grad->size());
 }
 
-template<class T0, class T1=double, class T2=double, class T3=double,
-	 class T4=double, class T5=double, class T6=double,
-	 class T7=double, class T8=double, class T9=double>
+template<class T0, class T1, class T2, class T3,
+	 class T4, class T5, class T6,
+	 class T7, class T8, class T9>
 void test_gradients(var& logprob,
 		    vector<double>* e_grad0, T0* p0, 
-		    vector<double>* e_grad1=0, T1* p1=0,
-		    vector<double>* e_grad2=0, T2* p2=0, 
-		    vector<double>* e_grad3=0, T3* p3=0,
-		    vector<double>* e_grad4=0, T4* p4=0, 
-		    vector<double>* e_grad5=0, T5* p5=0, 
-		    vector<double>* e_grad6=0, T6* p6=0, 
-		    vector<double>* e_grad7=0, T7* p7=0, 
-		    vector<double>* e_grad8=0, T8* p8=0, 
-		    vector<double>* e_grad9=0, T9* p9=0) {
+		    vector<double>* e_grad1, T1* p1,
+		    vector<double>* e_grad2, T2* p2, 
+		    vector<double>* e_grad3, T3* p3,
+		    vector<double>* e_grad4, T4* p4, 
+		    vector<double>* e_grad5, T5* p5, 
+		    vector<double>* e_grad6, T6* p6, 
+		    vector<double>* e_grad7, T7* p7, 
+		    vector<double>* e_grad8, T8* p8, 
+		    vector<double>* e_grad9, T9* p9) {
   vector<var> x;
   add_params<T0,is_constant_struct<T0>::value>(x, p0);
   add_params<T1,is_constant_struct<T1>::value>(x, p1);
