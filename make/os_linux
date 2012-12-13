@@ -10,7 +10,9 @@
 ifeq (g++,$(CC_TYPE))
   LDFLAGS += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
-  CFLAGS += -Wno-unused-local-typedefs
+  ifeq (4.8,$(CC_MAJOR).$(CC_MINOR))
+    CFLAGS += -Wno-unused-local-typedefs
+  endif
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
