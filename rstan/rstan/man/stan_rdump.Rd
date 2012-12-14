@@ -13,7 +13,8 @@ in the limited format that Stan can read.
   text representations of the objects to a file or connection.
   The file created by \code{stan_rdump} is typically used as data 
   input of the Stan package (\url{http://mc-stan.org/}) or 
-  \code{\link{source}}d into another \R session.
+  \code{\link{source}}d into another \R session. The usage of 
+  this function is very similar to \code{dump} in \R. 
 }
 
 \usage{
@@ -43,11 +44,15 @@ stan_rdump(list, file = "", append = FALSE,
   that were dumped.
 }
 \note{
-  \code{stan_rdump} only dumps numeric data, which can be 
+  \code{stan_rdump} only dumps numeric data, which first can be 
   a scalar, vector, matrix, or (multidimensional) array.
-  In the case if it is a \code{data.frame}, function 
+  Additional types supported are \code{data.frame} and 
+  a specially structured \code{list}.  
+  In the case of \code{data.frame}, function 
   \code{data.matrix} is applied to the data frame before
-  dumping. 
+  dumping. See the notes in \link{stan} for the specially
+  structured \code{list}, which will be converted to 
+  \code{array} before dumping. 
 
   \code{stan_rdump} will check whether the names of objects
   are legal variable names in Stan. If an illegal name is 

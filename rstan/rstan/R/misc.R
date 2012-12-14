@@ -484,7 +484,12 @@ stan_rdump <- function(list, file = "", append = FALSE,
   for (v in list) {
     vv <- get(v, envir) 
 
-    if (is.data.frame(vv)) vv <- data.matrix(vv) 
+    if (is.data.frame(vv)) {
+      vv <- data.matrix(vv) 
+    } else if (is.list(vv)) {
+      vv <- data_list2array(vv)
+    } 
+    
     if (!is.numeric(vv))  next
 
     if (is.vector(vv)) {

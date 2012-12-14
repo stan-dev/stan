@@ -173,17 +173,19 @@ setMethod("sampling", "stanmodel",
             n_kept <- n_save - warmup2 
             samples <- vector("list", chains)
             dots <- list(...)
+            mode <- if (!is.null(dots$test_grad) && dots$test_grad) "TESTING GRADIENT" else "SAMPLING"
 
             for (i in 1:chains) {
               # cat("[sampling:] i=", i, "\n")
               # print(args_list[[i]])
               if (is.null(dots$refresh) || dots$refresh > 0) 
-                cat("SAMPLING FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
-              samples[[i]] <- try(sampler$call_sampler(args_list[[i]])) 
-              if (is(samples[[i]], "try-error") || is.null(samples[[i]])) {
+                cat(mode, " FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
+              samples_i <- try(sampler$call_sampler(args_list[[i]])) 
+              if (is(samples_i, "try-error") || is.null(samples_i)) {
                 message("error occurred during calling the sampler; sampling not done") 
                 return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
               }
+              samples[[i]] <- samples_i
             }
 
             inits_used = organize_inits(lapply(samples, function(x) attr(x, "inits")), 
@@ -191,7 +193,7 @@ setMethod("sampling", "stanmodel",
 
             # test_gradient mode: no sample 
             if (attr(samples[[1]], 'test_grad')) {
-              sim = list(num_failed = samples)
+              sim = list(num_failed = sapply(samples, function(x) x$num_failed))
               return(invisible(new_empty_stanfit(object, m_pars, p_dims, 1L, sim = sim, 
                                                  inits = inits_used, 
                                                  stan_args = args_list)))
