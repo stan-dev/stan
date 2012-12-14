@@ -39,7 +39,7 @@ public:
     value.push_back(0);
   }
 
-  template <class T_n=int, class T_shape, class T_inv_scale,
+  template <class T_n, class T_shape, class T_inv_scale,
 	    typename T3, typename T4, typename T5, 
 	    typename T6, typename T7, typename T8, 
 	    typename T9>

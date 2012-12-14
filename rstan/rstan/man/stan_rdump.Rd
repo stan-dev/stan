@@ -24,8 +24,8 @@ stan_rdump(list, file = "", append = FALSE,
 }
 
 \arguments{
-  \item{list}{A character string: the names of one or more \R objects to be
-    dumped. See the note below.}
+  \item{list}{A vector of character string: the names of one or more \R objects
+    to be dumped. See the note below.}
 
   \item{file}{Either a character string naming a file or a
     \link{connection}.  \code{""} indicates output to the console.}
@@ -75,6 +75,12 @@ stan_rdump(list, file = "", append = FALSE,
   \code{\link{dump}} 
 }
 \examples{
+# set variables in global environment
+a <- 17.5
+b <- c(1,2,3)
+# write variables a and b to file ab.data.R in working directory
+stan_rdump(c('a','b'), "ab.data.R")
+
 x <- 1; y <- 1:10; z <- array(1:10, dim = c(2,5)) 
 stan_rdump(ls(pattern = '^[xyz]'), "xyz.Rdump")
 cat(paste(readLines("xyz.Rdump"), collapse = '\n'), '\n')

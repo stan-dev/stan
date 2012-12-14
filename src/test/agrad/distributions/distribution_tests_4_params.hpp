@@ -37,820 +37,820 @@ TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   EXPECT_NO_THROW(logprob = _LOG_PROB_(param1, param2, param3, param4, errno_policy()));
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dddd) {
-  test_valid<TypeParam, double, double, double, double>();
+  AgradTest<TypeParam, double, double, double, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dddv) {
-  test_valid<TypeParam, double, double, double, var>();
+  AgradTest<TypeParam, double, double, double, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddvd) {
-  test_valid<TypeParam, double, double, var, double>();
+  AgradTest<TypeParam, double, double, var, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_ddvv) {
-  test_valid<TypeParam, double, double, var, var>();
+  AgradTest<TypeParam, double, double, var, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvdd) {
-  test_valid<TypeParam, double, var, double, double>();
+  AgradTest<TypeParam, double, var, double, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvdv) {
-  test_valid<TypeParam, double, var, double, var>();
+  AgradTest<TypeParam, double, var, double, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvvd) {
-  test_valid<TypeParam, double, var, var, double>();
+  AgradTest<TypeParam, double, var, var, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_dvvv) {
-  test_valid<TypeParam, double, var, var, var>();
+  AgradTest<TypeParam, double, var, var, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vddd) {
-  test_valid<TypeParam, var, double, double, double>();
+  AgradTest<TypeParam, var, double, double, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vddv) {
-  test_valid<TypeParam, var, double, double, var>();
+  AgradTest<TypeParam, var, double, double, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdvd) {
-  test_valid<TypeParam, var, double, var, double>();
+  AgradTest<TypeParam, var, double, var, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vdvv) {
-  test_valid<TypeParam, var, double, var, var>();
+  AgradTest<TypeParam, var, double, var, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvdd) {
-  test_valid<TypeParam, var, var, double, double>();
+  AgradTest<TypeParam, var, var, double, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvdv) {
-  test_valid<TypeParam, var, var, double, var>();
+  AgradTest<TypeParam, var, var, double, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvvd) {
-  test_valid<TypeParam, var, var, var, double>();
+  AgradTest<TypeParam, var, var, var, double>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_valid_vvvv) {
-  test_valid<TypeParam, var, var, var, var>();
+  AgradTest<TypeParam, var, var, var, var>::test_valid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dddd) {
-  test_invalid<TypeParam, double, double, double, double>();
+  AgradTest<TypeParam, double, double, double, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dddv) {
-  test_invalid<TypeParam, double, double, double, var>();
+  AgradTest<TypeParam, double, double, double, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddvd) {
-  test_invalid<TypeParam, double, double, var, double>();
+  AgradTest<TypeParam, double, double, var, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_ddvv) {
-  test_invalid<TypeParam, double, double, var, var>();
+  AgradTest<TypeParam, double, double, var, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvdd) {
-  test_invalid<TypeParam, double, var, double, double>();
+  AgradTest<TypeParam, double, var, double, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvdv) {
-  test_invalid<TypeParam, double, var, double, var>();
+  AgradTest<TypeParam, double, var, double, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvvd) {
-  test_invalid<TypeParam, double, var, var, double>();
+  AgradTest<TypeParam, double, var, var, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_dvvv) {
-  test_invalid<TypeParam, double, var, var, var>();
+  AgradTest<TypeParam, double, var, var, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vddd) {
-  test_invalid<TypeParam, var, double, double, double>();
+  AgradTest<TypeParam, var, double, double, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vddv) {
-  test_invalid<TypeParam, var, double, double, var>();
+  AgradTest<TypeParam, var, double, double, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdvd) {
-  test_invalid<TypeParam, var, double, var, double>();
+  AgradTest<TypeParam, var, double, var, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vdvv) {
-  test_invalid<TypeParam, var, double, var, var>();
+  AgradTest<TypeParam, var, double, var, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvdd) {
-  test_invalid<TypeParam, var, var, double, double>();
+  AgradTest<TypeParam, var, var, double, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvdv) {
-  test_invalid<TypeParam, var, var, double, var>();
+  AgradTest<TypeParam, var, var, double, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvvd) {
-  test_invalid<TypeParam, var, var, var, double>();
+  AgradTest<TypeParam, var, var, var, double>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_vvvv) {
-  test_invalid<TypeParam, var, var, var, var>();
+  AgradTest<TypeParam, var, var, var, var>::test_invalid();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_dddd) {
-  test_propto<TypeParam, double, double, double, double>();
+  AgradTest<TypeParam, double, double, double, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_dddv) {
-  test_propto<TypeParam, double, double, double, var>();
+  AgradTest<TypeParam, double, double, double, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_ddvd) {
-  test_propto<TypeParam, double, double, var, double>();
+  AgradTest<TypeParam, double, double, var, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_ddvv) {
-  test_propto<TypeParam, double, double, var, var>();
+  AgradTest<TypeParam, double, double, var, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_dvdd) {
-  test_propto<TypeParam, double, var, double, double>();
+  AgradTest<TypeParam, double, var, double, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_dvdv) {
-  test_propto<TypeParam, double, var, double, var>();
+  AgradTest<TypeParam, double, var, double, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_dvvd) {
-  test_propto<TypeParam, double, var, var, double>();
+  AgradTest<TypeParam, double, var, var, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_dvvv) {
-  test_propto<TypeParam, double, var, var, var>();
+  AgradTest<TypeParam, double, var, var, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vddd) {
-  test_propto<TypeParam, var, double, double, double>();
+  AgradTest<TypeParam, var, double, double, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vddv) {
-  test_propto<TypeParam, var, double, double, var>();
+  AgradTest<TypeParam, var, double, double, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vdvd) {
-  test_propto<TypeParam, var, double, var, double>();
+  AgradTest<TypeParam, var, double, var, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vdvv) {
-  test_propto<TypeParam, var, double, var, var>();
+  AgradTest<TypeParam, var, double, var, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vvdd) {
-  test_propto<TypeParam, var, var, double, double>();
+  AgradTest<TypeParam, var, var, double, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vvdv) {
-  test_propto<TypeParam, var, var, double, var>();
+  AgradTest<TypeParam, var, var, double, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vvvd) {
-  test_propto<TypeParam, var, var, var, double>();
+  AgradTest<TypeParam, var, var, var, double>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, logprob_propto_vvvv) {
-  test_propto<TypeParam, var, var, var, var>();
+  AgradTest<TypeParam, var, var, var, var>::test_propto();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_dddd) {
-  test_finite_diff<TypeParam, double, double, double, double>();
+  AgradTest<TypeParam, double, double, double, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_dddv) {
-  test_finite_diff<TypeParam, double, double, double, var>();
+  AgradTest<TypeParam, double, double, double, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_ddvd) {
-  test_finite_diff<TypeParam, double, double, var, double>();
+  AgradTest<TypeParam, double, double, var, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_ddvv) {
-  test_finite_diff<TypeParam, double, double, var, var>();
+  AgradTest<TypeParam, double, double, var, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_dvdd) {
-  test_finite_diff<TypeParam, double, var, double, double>();
+  AgradTest<TypeParam, double, var, double, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_dvdv) {
-  test_finite_diff<TypeParam, double, var, double, var>();
+  AgradTest<TypeParam, double, var, double, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_dvvd) {
-  test_finite_diff<TypeParam, double, var, var, double>();
+  AgradTest<TypeParam, double, var, var, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_dvvv) {
-  test_finite_diff<TypeParam, double, var, var, var>();
+  AgradTest<TypeParam, double, var, var, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vddd) {
-  test_finite_diff<TypeParam, var, double, double, double>();
+  AgradTest<TypeParam, var, double, double, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vddv) {
-  test_finite_diff<TypeParam, var, double, double, var>();
+  AgradTest<TypeParam, var, double, double, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vdvd) {
-  test_finite_diff<TypeParam, var, double, var, double>();
+  AgradTest<TypeParam, var, double, var, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vdvv) {
-  test_finite_diff<TypeParam, var, double, var, var>();
+  AgradTest<TypeParam, var, double, var, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vvdd) {
-  test_finite_diff<TypeParam, var, var, double, double>();
+  AgradTest<TypeParam, var, var, double, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vvdv) {
-  test_finite_diff<TypeParam, var, var, double, var>();
+  AgradTest<TypeParam, var, var, double, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vvvd) {
-  test_finite_diff<TypeParam, var, var, var, double>();
+  AgradTest<TypeParam, var, var, var, double>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_finite_diff_vvvv) {
-  test_finite_diff<TypeParam, var, var, var, var>();
+  AgradTest<TypeParam, var, var, var, var>::test_finite_diff();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_dddd) {
-  test_gradient_function<TypeParam, double, double, double, double>();
+  AgradTest<TypeParam, double, double, double, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_dddv) {
-  test_gradient_function<TypeParam, double, double, double, var>();
+  AgradTest<TypeParam, double, double, double, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_ddvd) {  
-  test_gradient_function<TypeParam, double, double, var, double>();
+  AgradTest<TypeParam, double, double, var, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_ddvv) {  
-  test_gradient_function<TypeParam, double, double, var, var>();
+  AgradTest<TypeParam, double, double, var, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_dvdd) {  
-  test_gradient_function<TypeParam, double, var, double, double>();
+  AgradTest<TypeParam, double, var, double, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_dvdv) {  
-  test_gradient_function<TypeParam, double, var, double, var>();
+  AgradTest<TypeParam, double, var, double, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_dvvd) {  
-  test_gradient_function<TypeParam, double, var, var, double>();
+  AgradTest<TypeParam, double, var, var, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_dvvv) {  
-  test_gradient_function<TypeParam, double, var, var, var>();
+  AgradTest<TypeParam, double, var, var, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vddd) {
-  test_gradient_function<TypeParam, var, double, double, double>();
+  AgradTest<TypeParam, var, double, double, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vddv) {
-  test_gradient_function<TypeParam, var, double, double, var>();
+  AgradTest<TypeParam, var, double, double, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vdvd) {  
-  test_gradient_function<TypeParam, var, double, var, double>();
+  AgradTest<TypeParam, var, double, var, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vdvv) {  
-  test_gradient_function<TypeParam, var, double, var, var>();
+  AgradTest<TypeParam, var, double, var, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vvdd) {  
-  test_gradient_function<TypeParam, var, var, double, double>();
+  AgradTest<TypeParam, var, var, double, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vvdv) {  
-  test_gradient_function<TypeParam, var, var, double, var>();
+  AgradTest<TypeParam, var, var, double, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vvvd) {  
-  test_gradient_function<TypeParam, var, var, var, double>();
+  AgradTest<TypeParam, var, var, var, double>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture2, gradient_function_vvvv) {  
-  test_gradient_function<TypeParam, var, var, var, var>();
+  AgradTest<TypeParam, var, var, var, var>::test_gradient_function();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dddd) {
-  test_vectorized<TypeParam, double, double, double, double >();
+  AgradTest<TypeParam, double, double, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dddD) {
-  test_vectorized<TypeParam, double, double, double, vector<double> >();
+  AgradTest<TypeParam, double, double, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dddv) {
-  test_vectorized<TypeParam, double, double, double, var >();
+  AgradTest<TypeParam, double, double, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dddV) {
-  test_vectorized<TypeParam, double, double, double, vector<var> >();
+  AgradTest<TypeParam, double, double, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddDd) {
- test_vectorized<TypeParam, double, double, vector<double>, double >();
+  AgradTest<TypeParam, double, double, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddDD) {
-  test_vectorized<TypeParam, double, double, vector<double>, vector<double> >();
+  AgradTest<TypeParam, double, double, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddDv) {
-  test_vectorized<TypeParam, double, double, vector<double>, var >();
+  AgradTest<TypeParam, double, double, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddDV) {
-  test_vectorized<TypeParam, double, double, vector<double>, vector<var> >();
+  AgradTest<TypeParam, double, double, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddvd) {
-  test_vectorized<TypeParam, double, double, var, double >();
+  AgradTest<TypeParam, double, double, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddvD) {
-  test_vectorized<TypeParam, double, double, var, vector<double> >();
+  AgradTest<TypeParam, double, double, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddvv) {
-  test_vectorized<TypeParam, double, double, var, var >();
+  AgradTest<TypeParam, double, double, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddvV) {
-  test_vectorized<TypeParam, double, double, var, vector<var> >();
+  AgradTest<TypeParam, double, double, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddVd) {
-  test_vectorized<TypeParam, double, double, vector<var>, double >();
+  AgradTest<TypeParam, double, double, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddVD) {
-  test_vectorized<TypeParam, double, double, vector<var>, vector<double> >();
+  AgradTest<TypeParam, double, double, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddVv) {
-  test_vectorized<TypeParam, double, double, vector<var>, var >();
+  AgradTest<TypeParam, double, double, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_ddVV) {
-  test_vectorized<TypeParam, double, double, vector<var>, vector<var> >();
+  AgradTest<TypeParam, double, double, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDdd) {
-  test_vectorized<TypeParam, double, vector<double>, double, double >();
+  AgradTest<TypeParam, double, vector<double>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDdD) {
-  test_vectorized<TypeParam, double, vector<double>, double, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDdv) {
-  test_vectorized<TypeParam, double, vector<double>, double, var >();
+  AgradTest<TypeParam, double, vector<double>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDdV) {
-  test_vectorized<TypeParam, double, vector<double>, double, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDDd) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, double >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDDD) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDDv) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, var >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDDV) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDvd) {
-  test_vectorized<TypeParam, double, vector<double>, var, double >();
+  AgradTest<TypeParam, double, vector<double>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDvD) {
-  test_vectorized<TypeParam, double, vector<double>, var, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDvv) {
-  test_vectorized<TypeParam, double, vector<double>, var, var >();
+  AgradTest<TypeParam, double, vector<double>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDvV) {
-  test_vectorized<TypeParam, double, vector<double>, var, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDVd) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, double >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDVD) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDVv) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, var >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dDVV) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVdd) {
-  test_vectorized<TypeParam, double, vector<double>, double, double >();
+  AgradTest<TypeParam, double, vector<double>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVdD) {
-  test_vectorized<TypeParam, double, vector<double>, double, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVdv) {
-  test_vectorized<TypeParam, double, vector<double>, double, var >();
+  AgradTest<TypeParam, double, vector<double>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVdV) {
-  test_vectorized<TypeParam, double, vector<double>, double, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVDd) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, double >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVDD) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVDv) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, var >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVDV) {
-  test_vectorized<TypeParam, double, vector<double>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVvd) {
-  test_vectorized<TypeParam, double, vector<double>, var, double >();
+  AgradTest<TypeParam, double, vector<double>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVvD) {
-  test_vectorized<TypeParam, double, vector<double>, var, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVvv) {
-  test_vectorized<TypeParam, double, vector<double>, var, var >();
+  AgradTest<TypeParam, double, vector<double>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVvV) {
-  test_vectorized<TypeParam, double, vector<double>, var, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVVd) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, double >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVVD) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVVv) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, var >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture3, vectorized_dVVV) {
-  test_vectorized<TypeParam, double, vector<double>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, double, vector<double>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_Dddd) {
-  test_vectorized<TypeParam, vector<double>, double, double, double >();
+  AgradTest<TypeParam, vector<double>, double, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DddD) {
-  test_vectorized<TypeParam, vector<double>, double, double, vector<double> >();
+  AgradTest<TypeParam, vector<double>, double, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_Dddv) {
-  test_vectorized<TypeParam, vector<double>, double, double, var >();
+  AgradTest<TypeParam, vector<double>, double, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DddV) {
-  test_vectorized<TypeParam, vector<double>, double, double, vector<var> >();
+  AgradTest<TypeParam, vector<double>, double, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdDd) {
-  test_vectorized<TypeParam, vector<double>, double, vector<double>, double >();
+  AgradTest<TypeParam, vector<double>, double, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdDD) {
-  test_vectorized<TypeParam, vector<double>, double, vector<double>, vector<double> >();
+  AgradTest<TypeParam, vector<double>, double, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdDv) {
-  test_vectorized<TypeParam, vector<double>, double, vector<double>, var >();
+  AgradTest<TypeParam, vector<double>, double, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdDV) {
-  test_vectorized<TypeParam, vector<double>, double, vector<double>, vector<var> >();
+  AgradTest<TypeParam, vector<double>, double, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_Ddvd) {
-  test_vectorized<TypeParam, vector<double>, double, var, double >();
+  AgradTest<TypeParam, vector<double>, double, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdvD) {
-  test_vectorized<TypeParam, vector<double>, double, var, vector<double> >();
+  AgradTest<TypeParam, vector<double>, double, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_Ddvv) {
-  test_vectorized<TypeParam, vector<double>, double, var, var >();
+  AgradTest<TypeParam, vector<double>, double, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdvV) {
-  test_vectorized<TypeParam, vector<double>, double, var, vector<var> >();
+  AgradTest<TypeParam, vector<double>, double, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdVd) {
-  test_vectorized<TypeParam, vector<double>, double, vector<var>, double >();
+  AgradTest<TypeParam, vector<double>, double, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdVD) {
-  test_vectorized<TypeParam, vector<double>, double, vector<var>, vector<double> >();
+  AgradTest<TypeParam, vector<double>, double, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdVv) {
-  test_vectorized<TypeParam, vector<double>, double, vector<var>, var >();
+  AgradTest<TypeParam, vector<double>, double, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DdVV) {
-  test_vectorized<TypeParam, vector<double>, double, vector<var>, vector<var> >();
+  AgradTest<TypeParam, vector<double>, double, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDdd) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, double, double >();
+  AgradTest<TypeParam, vector<double>, vector<double>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDdD) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, double, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDdv) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, double, var >();
+  AgradTest<TypeParam, vector<double>, vector<double>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDdV) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, double, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDDd) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<double>, double >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDDD) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDDv) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<double>, var >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDDV) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDvd) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, var, double >();
+  AgradTest<TypeParam, vector<double>, vector<double>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDvD) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, var, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDvv) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, var, var >();
+  AgradTest<TypeParam, vector<double>, vector<double>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDvV) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, var, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDVd) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<var>, double >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDVD) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDVv) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<var>, var >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DDVV) {
-  test_vectorized<TypeParam, vector<double>, vector<double>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<double>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVdd) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, double, double >();
+  AgradTest<TypeParam, vector<double>, vector<var>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVdD) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, double, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVdv) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, double, var >();
+  AgradTest<TypeParam, vector<double>, vector<var>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVdV) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, double, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVDd) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<double>, double >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVDD) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVDv) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<double>, var >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVDV) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVvd) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, var, double >();
+  AgradTest<TypeParam, vector<double>, vector<var>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVvD) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, var, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVvv) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, var, var >();
+  AgradTest<TypeParam, vector<double>, vector<var>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVvV) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, var, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVVd) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<var>, double >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVVD) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVVv) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<var>, var >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture4, vectorized_DVVV) {
-  test_vectorized<TypeParam, vector<double>, vector<var>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, vector<double>, vector<var>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vddd) {
-  test_vectorized<TypeParam, var, double, double, double >();
+  AgradTest<TypeParam, var, double, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vddD) {
-  test_vectorized<TypeParam, var, double, double, vector<double> >();
+  AgradTest<TypeParam, var, double, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vddv) {
-  test_vectorized<TypeParam, var, double, double, var >();
+  AgradTest<TypeParam, var, double, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vddV) {
-  test_vectorized<TypeParam, var, double, double, vector<var> >();
+  AgradTest<TypeParam, var, double, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdDd) {
-  test_vectorized<TypeParam, var, double, vector<double>, double >();
+  AgradTest<TypeParam, var, double, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdDD) {
-  test_vectorized<TypeParam, var, double, vector<double>, vector<double> >();
+  AgradTest<TypeParam, var, double, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdDv) {
-  test_vectorized<TypeParam, var, double, vector<double>, var >();
+  AgradTest<TypeParam, var, double, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdDV) {
-  test_vectorized<TypeParam, var, double, vector<double>, vector<var> >();
+  AgradTest<TypeParam, var, double, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdvd) {
-  test_vectorized<TypeParam, var, double, var, double >();
+  AgradTest<TypeParam, var, double, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdvD) {
-  test_vectorized<TypeParam, var, double, var, vector<double> >();
+  AgradTest<TypeParam, var, double, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdvv) {
-  test_vectorized<TypeParam, var, double, var, var >();
+  AgradTest<TypeParam, var, double, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdvV) {
-  test_vectorized<TypeParam, var, double, var, vector<var> >();
+  AgradTest<TypeParam, var, double, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdVd) {
-  test_vectorized<TypeParam, var, double, vector<var>, double >();
+  AgradTest<TypeParam, var, double, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdVD) {
-  test_vectorized<TypeParam, var, double, vector<var>, vector<double> >();
+  AgradTest<TypeParam, var, double, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdVv) {
-  test_vectorized<TypeParam, var, double, vector<var>, var >();
+  AgradTest<TypeParam, var, double, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vdVV) {
-  test_vectorized<TypeParam, var, double, vector<var>, vector<var> >();
+  AgradTest<TypeParam, var, double, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDdd) {
-  test_vectorized<TypeParam, var, vector<double>, double, double >();
+  AgradTest<TypeParam, var, vector<double>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDdD) {
-  test_vectorized<TypeParam, var, vector<double>, double, vector<double> >();
+  AgradTest<TypeParam, var, vector<double>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDdv) {
-  test_vectorized<TypeParam, var, vector<double>, double, var >();
+  AgradTest<TypeParam, var, vector<double>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDdV) {
-  test_vectorized<TypeParam, var, vector<double>, double, vector<var> >();
+  AgradTest<TypeParam, var, vector<double>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDDd) {
-  test_vectorized<TypeParam, var, vector<double>, vector<double>, double >();
+  AgradTest<TypeParam, var, vector<double>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDDD) {
-  test_vectorized<TypeParam, var, vector<double>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, var, vector<double>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDDv) {
-  test_vectorized<TypeParam, var, vector<double>, vector<double>, var >();
+  AgradTest<TypeParam, var, vector<double>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDDV) {
-  test_vectorized<TypeParam, var, vector<double>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, var, vector<double>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDvd) {
-  test_vectorized<TypeParam, var, vector<double>, var, double >();
+  AgradTest<TypeParam, var, vector<double>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDvD) {
-  test_vectorized<TypeParam, var, vector<double>, var, vector<double> >();
+  AgradTest<TypeParam, var, vector<double>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDvv) {
-  test_vectorized<TypeParam, var, vector<double>, var, var >();
+  AgradTest<TypeParam, var, vector<double>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDvV) {
-  test_vectorized<TypeParam, var, vector<double>, var, vector<var> >();
+  AgradTest<TypeParam, var, vector<double>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDVd) {
-  test_vectorized<TypeParam, var, vector<double>, vector<var>, double >();
+  AgradTest<TypeParam, var, vector<double>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDVD) {
-  test_vectorized<TypeParam, var, vector<double>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, var, vector<double>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDVv) {
-  test_vectorized<TypeParam, var, vector<double>, vector<var>, var >();
+  AgradTest<TypeParam, var, vector<double>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vDVV) {
-  test_vectorized<TypeParam, var, vector<double>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, var, vector<double>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVdd) {
-  test_vectorized<TypeParam, var, vector<var>, double, double >();
+  AgradTest<TypeParam, var, vector<var>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVdD) {
-  test_vectorized<TypeParam, var, vector<var>, double, vector<double> >();
+  AgradTest<TypeParam, var, vector<var>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVdv) {
-  test_vectorized<TypeParam, var, vector<var>, double, var >();
+  AgradTest<TypeParam, var, vector<var>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVdV) {
-  test_vectorized<TypeParam, var, vector<var>, double, vector<var> >();
+  AgradTest<TypeParam, var, vector<var>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVDd) {
-  test_vectorized<TypeParam, var, vector<var>, vector<double>, double >();
+  AgradTest<TypeParam, var, vector<var>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVDD) {
-  test_vectorized<TypeParam, var, vector<var>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, var, vector<var>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVDv) {
-  test_vectorized<TypeParam, var, vector<var>, vector<double>, var >();
+  AgradTest<TypeParam, var, vector<var>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVDV) {
-  test_vectorized<TypeParam, var, vector<var>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, var, vector<var>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVvd) {
-  test_vectorized<TypeParam, var, vector<var>, var, double >();
+  AgradTest<TypeParam, var, vector<var>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVvD) {
-  test_vectorized<TypeParam, var, vector<var>, var, vector<double> >();
+  AgradTest<TypeParam, var, vector<var>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVvv) {
-  test_vectorized<TypeParam, var, vector<var>, var, var >();
+  AgradTest<TypeParam, var, vector<var>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVvV) {
-  test_vectorized<TypeParam, var, vector<var>, var, vector<var> >();
+  AgradTest<TypeParam, var, vector<var>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVVd) {
-  test_vectorized<TypeParam, var, vector<var>, vector<var>, double >();
+  AgradTest<TypeParam, var, vector<var>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVVD) {
-  test_vectorized<TypeParam, var, vector<var>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, var, vector<var>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVVv) {
-  test_vectorized<TypeParam, var, vector<var>, vector<var>, var >();
+  AgradTest<TypeParam, var, vector<var>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture5, vectorized_vVVV) {
-  test_vectorized<TypeParam, var, vector<var>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, var, vector<var>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_Vddd) {
-  test_vectorized<TypeParam, vector<var>, double, double, double >();
+  AgradTest<TypeParam, vector<var>, double, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VddD) {
-  test_vectorized<TypeParam, vector<var>, double, double, vector<double> >();
+  AgradTest<TypeParam, vector<var>, double, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_Vddv) {
-  test_vectorized<TypeParam, vector<var>, double, double, var >();
+  AgradTest<TypeParam, vector<var>, double, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VddV) {
-  test_vectorized<TypeParam, vector<var>, double, double, vector<var> >();
+  AgradTest<TypeParam, vector<var>, double, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdDd) {
-  test_vectorized<TypeParam, vector<var>, double, vector<double>, double >();
+  AgradTest<TypeParam, vector<var>, double, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdDD) {
-  test_vectorized<TypeParam, vector<var>, double, vector<double>, vector<double> >();
+  AgradTest<TypeParam, vector<var>, double, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdDv) {
-  test_vectorized<TypeParam, vector<var>, double, vector<double>, var >();
+  AgradTest<TypeParam, vector<var>, double, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdDV) {
-  test_vectorized<TypeParam, vector<var>, double, vector<double>, vector<var> >();
+  AgradTest<TypeParam, vector<var>, double, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_Vdvd) {
-  test_vectorized<TypeParam, vector<var>, double, var, double >();
+  AgradTest<TypeParam, vector<var>, double, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdvD) {
-  test_vectorized<TypeParam, vector<var>, double, var, vector<double> >();
+  AgradTest<TypeParam, vector<var>, double, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_Vdvv) {
-  test_vectorized<TypeParam, vector<var>, double, var, var >();
+  AgradTest<TypeParam, vector<var>, double, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdvV) {
-  test_vectorized<TypeParam, vector<var>, double, var, vector<var> >();
+  AgradTest<TypeParam, vector<var>, double, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdVd) {
-  test_vectorized<TypeParam, vector<var>, double, vector<var>, double >();
+  AgradTest<TypeParam, vector<var>, double, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdVD) {
-  test_vectorized<TypeParam, vector<var>, double, vector<var>, vector<double> >();
+  AgradTest<TypeParam, vector<var>, double, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdVv) {
-  test_vectorized<TypeParam, vector<var>, double, vector<var>, var >();
+  AgradTest<TypeParam, vector<var>, double, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VdVV) {
-  test_vectorized<TypeParam, vector<var>, double, vector<var>, vector<var> >();
+  AgradTest<TypeParam, vector<var>, double, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDdd) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, double, double >();
+  AgradTest<TypeParam, vector<var>, vector<double>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDdD) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, double, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDdv) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, double, var >();
+  AgradTest<TypeParam, vector<var>, vector<double>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDdV) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, double, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDDd) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<double>, double >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDDD) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDDv) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<double>, var >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDDV) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDvd) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, var, double >();
+  AgradTest<TypeParam, vector<var>, vector<double>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDvD) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, var, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDvv) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, var, var >();
+  AgradTest<TypeParam, vector<var>, vector<double>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDvV) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, var, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDVd) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<var>, double >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDVD) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDVv) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<var>, var >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VDVV) {
-  test_vectorized<TypeParam, vector<var>, vector<double>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<double>, vector<var>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVdd) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, double, double >();
+  AgradTest<TypeParam, vector<var>, vector<var>, double, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVdD) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, double, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, double, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVdv) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, double, var >();
+  AgradTest<TypeParam, vector<var>, vector<var>, double, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVdV) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, double, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, double, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVDd) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<double>, double >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<double>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVDD) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<double>, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<double>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVDv) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<double>, var >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<double>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVDV) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<double>, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<double>, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVvd) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, var, double >();
+  AgradTest<TypeParam, vector<var>, vector<var>, var, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVvD) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, var, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, var, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVvv) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, var, var >();
+  AgradTest<TypeParam, vector<var>, vector<var>, var, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVvV) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, var, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, var, vector<var> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVVd) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<var>, double >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<var>, double >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVVD) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<var>, vector<double> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<var>, vector<double> >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVVv) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<var>, var >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<var>, var >::test_vectorized();
 }
 TYPED_TEST_P(AgradDistributionTestFixture6, vectorized_VVVV) {
-  test_vectorized<TypeParam, vector<var>, vector<var>, vector<var>, vector<var> >();
+  AgradTest<TypeParam, vector<var>, vector<var>, vector<var>, vector<var> >::test_vectorized();
 }
 
 // This has a limit of 50 tests.
