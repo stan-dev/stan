@@ -559,7 +559,26 @@ that the loop can continue without waiting for the previous chain to
 finish. This example requires several command-line options that are
 explained in further detail in the next subsection. 
 
-TODO: Windows example
+On Windows, the following is functionally equivalent to the Bash
+snippet above
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> for /l %x in (1, 1, 4) do start /b model --refresh=0 \
+>   --seed=12345 --chain_id=%x  --samples=samples%x.csv
+\end{Verbatim}
+\end{quote}
+%
+If the grep and sed programs are installed, then the following will
+combine the four csv files into a single, combined csv file
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> grep ^lp__ samples1.csv > combined.csv
+> sed '/^[#l]/d' samples*.csv >> combined.csv 
+\end{Verbatim}
+\end{quote}
+%
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
 The executable \Stan program is highly configurable.  At the highest
