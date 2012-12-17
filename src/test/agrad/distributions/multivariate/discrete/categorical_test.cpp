@@ -28,17 +28,17 @@ TEST(AgradDistributionsCategorical,Propto) {
   Matrix<var,Dynamic,1> theta2(3,1);
   theta2 << 0.1, 0.2, 0.7;
   
-  n = 0;
-  expect_propto(n, theta1,
-                n, theta2,
-                "var: theta");
-  
   n = 1;
   expect_propto(n, theta1,
                 n, theta2,
                 "var: theta");
-
+  
   n = 2;
+  expect_propto(n, theta1,
+                n, theta2,
+                "var: theta");
+
+  n = 3;
   expect_propto(n, theta1,
                 n, theta2,
                 "var: theta");

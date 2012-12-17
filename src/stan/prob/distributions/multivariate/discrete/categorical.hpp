@@ -11,7 +11,7 @@ namespace stan {
 
   namespace prob {
 
-    // Categorical(n|theta)  [0 <= n < N;   0 <= theta[n] <= 1;  SUM theta = 1]
+    // Categorical(n|theta)  [0 < n <= N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
               typename T_prob, 
               class Policy>
@@ -25,10 +25,10 @@ namespace stan {
       using stan::math::check_simplex;
       using boost::math::tools::promote_args;
 
-      typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type lb = 0;
+      typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type lb = 1;
 
       typename promote_args<T_prob>::type lp(0.0);
-      if (!check_bounded(function, n, lb, theta.size()-1,
+      if (!check_bounded(function, n, lb, theta.size(),
                          "Number of categories",
                          &lp, Policy()))
         return lp;
@@ -38,7 +38,7 @@ namespace stan {
         return lp;
   
       if (include_summand<propto,T_prob>::value)
-        return log(theta(n));
+        return log(theta(n-1));
       return 0.0;
     }
 
