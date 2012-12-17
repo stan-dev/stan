@@ -13,7 +13,7 @@ namespace stan {
 
   namespace agrad {
 
-    // f: double* -> double
+    // f: vector<T> -> T
     // Hv = H(f(x)) * v;  return f(x)
 
     template <class F>
