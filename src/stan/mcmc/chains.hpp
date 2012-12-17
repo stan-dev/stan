@@ -1763,7 +1763,7 @@ namespace stan {
       dimss.clear();
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
-        throw std::runtime_error("Could not open" + filename);
+        throw std::runtime_error("Could not open " + filename);
       }
       std::string header = read_header(csv_output_file);
       csv_output_file.close();
@@ -1791,7 +1791,7 @@ namespace stan {
                      const size_t skip) {
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
-        throw std::runtime_error("Could not open" + filename);
+        throw std::runtime_error("Could not open " + filename);
       }
       std::vector<std::vector<double> > thetas;
       read_values(csv_output_file, chains.num_params(), thetas);
