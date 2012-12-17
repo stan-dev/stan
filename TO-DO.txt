@@ -11,35 +11,6 @@ The to-do list is organized into the following sections:
 * Testing                       * Release Mgmt
 * Command-Line                  * ModelsC++ API
 
-v1.1.0
-======================================================================
--- New Features
-   * Conditiaonl (if-then-else) statements
-   * While statements
--- New Functions
-   * generalized multiply_lower_tri_self_transpose() to non-square
-     matrices
-   * special functions: log_inv_logit(), log1m_inv_logit()
-   * matrix special functions: cumulative_sum()
-   * probability functions: poisson_log_log() for log-rate 
-     parameterized Poisson
-   * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
-   * comparison operators (<, >, <=, >=, ==, !=)
-   * boolean operators (!, ||, &&)
--- Bug Fixes
-   * fixed bug introduced in 1.0.3 that hid line and column number
-     bug reporting
-   * added checks that data dimensions match as well as sizes
-   * removed non-symmetric versions of eigenvalues() and eigenvectors()
-   * testing identifiers are not reserved words in C++/Stan
-   * trapping/reporting locations of errors in data and init reads
--- Code Improvements
-   * templated out matrix libs to reduce code duplication
-   * vectorized auto-dif for tcrossprod() and crossprod()
--- Libraries Updated
-   * Eigen version 3.1.1 replaced with version 3.1.2
-   * Boost version 1.51.0 replaced with version 1.52.0
-
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
