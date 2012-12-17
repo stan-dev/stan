@@ -125,8 +125,8 @@ namespace stan {
                         "default is to estimate varying step sizes during warmup");
       
       print_help_option(&std::cout,
-                        "delta","+float",
-                        "Initial step size for step-size adaptation",
+                        "delta","[0,1]",
+                        "Accuracy target for step-size adaptation (higher means smaller step sizes)",
                         "default = 0.5");
 
       print_help_option(&std::cout,
