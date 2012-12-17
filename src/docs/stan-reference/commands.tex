@@ -270,12 +270,12 @@ For Windows:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> bin\stanc --name=bernoulli --o=bernoulli.cpp
-  src/models/basic_estimators/bernoulli.stan 
+> bin\stanc --name=bernoulli --o=bernoulli.cpp ^
+>   src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
 %
-The second command must be typed on a single line in Windows. 
+The caret (\Verb|^|) indicates continuation on Windows.
 
 This call specifies the name of the model, here {\tt bernoulli}.
 This will determine the name of the class implementing the model in
@@ -570,11 +570,11 @@ snippet above
 \end{quote}
 %
 If the grep and sed programs are installed, then the following will
-combine the four csv files into a single, combined csv file
+combine the four csv files into a single csv file
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> grep ^lp__ samples1.csv > combined.csv
+> grep lp__ samples1.csv > combined.csv
 > sed '/^[#l]/d' samples*.csv >> combined.csv 
 \end{Verbatim}
 \end{quote}
