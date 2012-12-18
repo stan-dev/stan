@@ -27,7 +27,7 @@ IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES='/^generated\squantities\s*{\s
 IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS='/^[#/].*$/d'
 
 TEX_FILES=`ls *.tex`
-#TEX_FILES=functions.tex
+#TEX_FILES=commands.tex
 UNIQUE_LINES=0
 for TEX_FILE in $TEX_FILES; do
 	if [ "stan-reference.tex" = "$TEX_FILE" ]; then
@@ -52,9 +52,11 @@ for TEX_FILE in $TEX_FILES; do
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
 	while read -r line; do
-		UNIQUE_LINES=`grep  -F -w -- "${line}" ${TEX_FILE} | wc -l`
+		grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt
+                UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
-			sed -i "s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
+                        LINE_NUM=`sed 's/[^0-9]//g' search.txt`
+			sed -i "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
 		else
 			echo "In ${TEX_FILE}, no unique match for:" "${line}"
 		fi
@@ -91,9 +93,11 @@ for TEX_FILE in $TEX_FILES; do
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
         while read -r line; do
-                UNIQUE_LINES=`grep -F -w -- "${line}" ${TEX_FILE} | wc -l`
+                grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt
+                UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
-			sed -i "s@^${line}@\\\\A{${line}} \\\\FXC \\\\ @" $TEX_FILE
+                        LINE_NUM=`sed 's/[^0-9]//g' search.txt`
+                        sed -i "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
                 else
                         echo "In ${TEX_FILE}, no unique match for:" "${line}"
                 fi
@@ -101,6 +105,7 @@ for TEX_FILE in $TEX_FILES; do
         rm changes.sh
 done
 
+rm search.txt
 sed -i 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex
 sed -i 's@final,author@draft,author@' stan-manuals.sty
 sed -i "s@List of changes@List of changes since ${OLD_VERSION}@" stan-manuals.sty
