@@ -52,7 +52,7 @@ for TEX_FILE in $TEX_FILES; do
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
 	while read -r line; do
-		UNIQUE_LINES=`grep  -F -w "${line}" ${TEX_FILE} | wc -l`
+		UNIQUE_LINES=`grep  -F -w -- "${line}" ${TEX_FILE} | wc -l`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
 			sed -i "s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
 		else
@@ -91,7 +91,7 @@ for TEX_FILE in $TEX_FILES; do
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
         while read -r line; do
-                UNIQUE_LINES=`grep -F -w "${line}" ${TEX_FILE} | wc -l`
+                UNIQUE_LINES=`grep -F -w -- "${line}" ${TEX_FILE} | wc -l`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
 			sed -i "s@^${line}@\\\\A{${line}} \\\\FXC \\\\ @" $TEX_FILE
                 else
