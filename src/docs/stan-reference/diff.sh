@@ -16,6 +16,7 @@ IGNORE_COMMENT_LINES='/%/d'
 DELETE_BRACEPLUS='s/^{+//g'
 DELETE_PLUSBRACE='s/+}$//g'
 IGNORE_LINES_WITH_LEADING_SLASH='/^\\.*$/d'
+IGNORE_LINES_WITH_LEADING_GREATER_THAN='/^>.*$/d'
 
 TEX_FILES=`ls *.tex`
 #TEX_FILES=functions.tex
@@ -29,14 +30,14 @@ for TEX_FILE in $TEX_FILES; do
 	sed ${IGNORE_COMMENT_LINES} | \
         sed ${DELETE_BRACEPLUS} | \
         sed ${DELETE_PLUSBRACE} | \
-        sed ${IGNORE_LINES_WITH_LEADING_SLASH} > \
+        sed ${IGNORE_LINES_WITH_LEADING_SLASH} |
+        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} > \
 	additions.sh
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
 	while read -r line; do
 		UNIQUE_LINES=`grep  -F -w "${line}" ${TEX_FILE} | wc -l`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
-#			replace -s "${line}" "\A{$line} \FXA " -- $TEX_FILE
 			sed -i "s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
 		else
 			echo "In ${TEX_FILE}, no unique match for:" "${line}"
@@ -60,14 +61,14 @@ for TEX_FILE in $TEX_FILES; do
         sed ${IGNORE_COMMENT_LINES} | \
         sed ${DELETE_BRACEPLUS} | \
         sed ${DELETE_PLUSBRACE} | \
-        sed ${IGNORE_LINES_WITH_LEADING_SLASH} > \
+        sed ${IGNORE_LINES_WITH_LEADING_SLASH} |
+        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} > \
         changes.sh
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
         while read -r line; do
                 UNIQUE_LINES=`grep -F -w "${line}" ${TEX_FILE} | wc -l`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
-#                        replace -s "${line}" "\A{$line} \FXC " -- $TEX_FILE
 			sed -i "s@^${line}@\\\\A{${line}} \\\\FXC \\\\ @" $TEX_FILE
                 else
                         echo "In ${TEX_FILE}, no unique match for:" "${line}"
