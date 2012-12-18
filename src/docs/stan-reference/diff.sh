@@ -52,7 +52,7 @@ for TEX_FILE in $TEX_FILES; do
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
 	while read -r line; do
-		grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt
+		grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt || true
                 UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
                         LINE_NUM=`sed 's/[^0-9]//g' search.txt`
@@ -93,7 +93,7 @@ for TEX_FILE in $TEX_FILES; do
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
         while read -r line; do
-                grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt
+                grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt || true
                 UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
                         LINE_NUM=`sed 's/[^0-9]//g' search.txt`
