@@ -24,6 +24,7 @@ IGNORE_LINES_THAT_START_WITH_PARAMETERS='/^parameters\s*{\s*$/d'
 IGNORE_LINES_THAT_START_WITH_TRANSFORMED_PARAMETERS='/^transformed\sparameters\s*{\s*$/d'
 IGNORE_LINES_THAT_START_WITH_MODEL='/^model\s*{\s*$/d'
 IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES='/^generated\squantities\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS='/^[#/].*$/d'
 
 TEX_FILES=`ls *.tex`
 #TEX_FILES=functions.tex
@@ -45,7 +46,8 @@ for TEX_FILE in $TEX_FILES; do
         sed ${IGNORE_LINES_THAT_START_WITH_PARAMETERS} |
         sed ${IGNORE_LINES_THAT_START_WITH_TRANSFORMED_PARAMETERS} |
         sed ${IGNORE_LINES_THAT_START_WITH_MODEL} |
-        sed ${IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES} > \
+        sed ${IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES} |
+        sed ${IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS} > \
 	additions.sh
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
@@ -83,7 +85,8 @@ for TEX_FILE in $TEX_FILES; do
         sed ${IGNORE_LINES_THAT_START_WITH_PARAMETERS} |
         sed ${IGNORE_LINES_THAT_START_WITH_TRANSFORMED_PARAMETERS} |
         sed ${IGNORE_LINES_THAT_START_WITH_MODEL} |
-        sed ${IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES} > \
+        sed ${IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES} |
+        sed ${IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS} > \
         changes.sh
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
