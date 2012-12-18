@@ -17,6 +17,7 @@ DELETE_BRACEPLUS='s/^{+//g'
 DELETE_PLUSBRACE='s/+}$//g'
 IGNORE_LINES_WITH_LEADING_SLASH='/^\\.*$/d'
 IGNORE_LINES_WITH_LEADING_GREATER_THAN='/^>.*$/d'
+IGNORE_LINES_WITH_RIGHT_BRACKET='/^.*\[.*/d'
 
 TEX_FILES=`ls *.tex`
 #TEX_FILES=functions.tex
@@ -31,7 +32,8 @@ for TEX_FILE in $TEX_FILES; do
         sed ${DELETE_BRACEPLUS} | \
         sed ${DELETE_PLUSBRACE} | \
         sed ${IGNORE_LINES_WITH_LEADING_SLASH} |
-        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} > \
+        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} |
+        sed ${IGNORE_LINES_WITH_RIGHT_BRACKET} > \
 	additions.sh
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
@@ -62,7 +64,8 @@ for TEX_FILE in $TEX_FILES; do
         sed ${DELETE_BRACEPLUS} | \
         sed ${DELETE_PLUSBRACE} | \
         sed ${IGNORE_LINES_WITH_LEADING_SLASH} |
-        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} > \
+        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} |
+        sed ${IGNORE_LINES_WITH_RIGHT_BRACKET} > \
         changes.sh
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
