@@ -105,7 +105,3 @@ sed -i 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex
 sed -i 's@final,author@draft,author@' stan-manuals.sty
 sed -i "s@List of changes@List of changes since ${OLD_VERSION}@" stan-manuals.sty
 echo ''
-echo 'Steps from here:'
-echo '1) Apply --- but do not commit --- patches (if any)'
-echo '2) make manual'
-echo '3) git reset --hard HEAD'
