@@ -110,3 +110,5 @@ sed -i 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex
 sed -i 's@final,author@draft,author@' stan-manuals.sty
 sed -i "s@List of changes@List of changes since ${OLD_VERSION}@" stan-manuals.sty
 echo ''
+exit 0
+
