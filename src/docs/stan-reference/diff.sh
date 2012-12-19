@@ -56,7 +56,8 @@ for TEX_FILE in $TEX_FILES; do
                 UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
                         LINE_NUM=`sed 's/[^0-9]//g' search.txt`
-			sed -i '' "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
+			sed "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE > temp.tex
+                        mv temp.tex $TEX_FILE
 		else
 			echo "In ${TEX_FILE}, no unique match for:" "${line}"
 		fi
@@ -97,7 +98,8 @@ for TEX_FILE in $TEX_FILES; do
                 UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
                         LINE_NUM=`sed 's/[^0-9]//g' search.txt`
-                        sed -i '' "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
+                        sed "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE > temp.tex
+                        mv temp.tex $TEX_FILE
                 else
                         echo "In ${TEX_FILE}, no unique match for:" "${line}"
                 fi
