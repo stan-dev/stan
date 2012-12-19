@@ -108,9 +108,10 @@ for TEX_FILE in $TEX_FILES; do
 done
 
 rm search.txt
-sed -i 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex
-sed -i 's@final,author@draft,author@' stan-manuals.sty
-sed -i "s@List of changes@List of changes since ${OLD_VERSION}@" stan-manuals.sty
+sed 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex > temp.tex
+mv temp.tex stan-reference.tex
+sed 's@final,author@draft,author@' stan-manuals.sty > temp.sty
+sed "s@List of changes@List of changes since ${OLD_VERSION}@" temp.sty > stan-manuals.sty
 echo ''
 exit 0
 
