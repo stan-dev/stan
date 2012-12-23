@@ -58,3 +58,7 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsPoisson,
                               DistributionTestFixture,
                               ProbDistributionsPoisson);
+
+TEST(ProbDistributionsPoissonCDF,Values) {
+    EXPECT_FLOAT_EQ(0.22879644, stan::prob::poisson_cdf(24, 20.23934));
+}

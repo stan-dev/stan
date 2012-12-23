@@ -43,3 +43,7 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsInvChiSquare,
 			      DistributionTestFixture,
 			      ProbDistributionsInvChiSquare);
+
+TEST(ProbDistributionsInvChiSquareCdf,Values) {
+    EXPECT_FLOAT_EQ(0.067889154, stan::prob::inv_chi_square_cdf(0.3, 1.0));
+}

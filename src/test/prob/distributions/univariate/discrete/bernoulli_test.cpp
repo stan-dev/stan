@@ -57,3 +57,6 @@ INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBernoulli,
 			      DistributionTestFixture,
 			      ProbDistributionsBernoulli);
 
+TEST(ProbDistributionsBernoulliCDF,Values) {
+    EXPECT_FLOAT_EQ(0.43, stan::prob::bernoulli_cdf(1, 0.57));
+}

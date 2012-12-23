@@ -68,3 +68,7 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsPareto,
 			      DistributionTestFixture,
 			      ProbDistributionsPareto);
+
+TEST(ProbDistributionsParetoCDF, Values) {
+    EXPECT_FLOAT_EQ(0.60434447, stan::prob::pareto_cdf(3.45, 2.89, 5.235));
+}
