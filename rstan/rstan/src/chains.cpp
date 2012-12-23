@@ -225,8 +225,6 @@ namespace rstan {
     void read_comments0(const std::string& filename, size_t n, 
                         std::vector<std::string>& comments) {
       const std::streamsize max_ignore_len = std::numeric_limits<std::streamsize>::max();
-      std::streampos file_len;
-      // std::cout << "len=" << max_ignore_len << std::endl;
       comments.clear(); 
       std::fstream fs(filename.c_str(), std::fstream::in);
       if (!fs.is_open())

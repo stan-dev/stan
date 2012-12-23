@@ -173,11 +173,11 @@ TEST(gm_parser,parsable_test_bad_trunc) {
                std::invalid_argument);
 }
 TEST(gm_parser,function_signatures) {
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures1.stan"));
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures2.stan"));
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures3.stan"));
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures4.stan"));
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures5.stan"));
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures6.stan"));
-  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/function_signatures7.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures1.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures2.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures3.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures4.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures5.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures6.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures7.stan"));
 }

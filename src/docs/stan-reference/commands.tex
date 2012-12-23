@@ -270,12 +270,12 @@ For Windows:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> bin\stanc --name=bernoulli --o=bernoulli.cpp
-  src/models/basic_estimators/bernoulli.stan 
+> bin\stanc --name=bernoulli --o=bernoulli.cpp ^
+>   src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
 %
-The second command must be typed on a single line in Windows. 
+The caret (\Verb|^|) indicates continuation on Windows.
 
 This call specifies the name of the model, here {\tt bernoulli}.
 This will determine the name of the class implementing the model in
@@ -513,7 +513,7 @@ program compiled to a platform-specific executable (see
 
 Suppose the executable is in file \code{my\_model} and the data
 is in file \code{my\_data}, both in the current working directory.
-Then the \Stan executable may be run using
+Then the \Stan executable may be run on Windows using
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -526,8 +526,59 @@ This will read the data from file \code{my\_data}, run warmup tuning for
 \NUTS sampler for 1000 iterations, writing the parameter (and other)
 values to the file \code{samples.csv} in the current working
 directory.  A random number generation seed will be derived from
-the system time automatically.
+the system time automatically. Note that on Mac or Linux, it is 
+necessary to instead execute
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./my_model --data=my_data
+\end{Verbatim}
+\end{quote}
+%
+\section{Parallel Example}
 
+The previous example executes one chain, which can be repeated to 
+generate multiple chains. However, users may want to execute chains
+in parallel on a multicore machine. To do so with four chains using
+a Bash shell on Mac or Linux execute
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> for i in {1..4}
+> do
+>   ./my_model --refresh=0 --seed=12345 --chain_id=$i \
+>     --samples=samples$i.csv --data=my_data &
+> done
+>
+\end{Verbatim}
+\end{quote}
+%
+Note that there is blank line at the end that returns control to the
+prompt. The \& at the end pushes each process into the background, so
+that the loop can continue without waiting for the previous chain to 
+finish. This example requires several command-line options that are
+explained in further detail in the next subsection. 
+
+On Windows, the following is functionally equivalent to the Bash
+snippet above
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> for /l %x in (1, 1, 4) do start /b model --refresh=0 ^
+>   --seed=12345 --chain_id=%x  --samples=samples%x.csv
+\end{Verbatim}
+\end{quote}
+%
+If the grep and sed programs are installed, then the following will
+combine the four csv files into a single csv file
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> grep lp__ samples1.csv > combined.csv
+> sed '/^[#l]/d' samples*.csv >> combined.csv 
+\end{Verbatim}
+\end{quote}
+%
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
 The executable \Stan program is highly configurable.  At the highest
@@ -556,7 +607,8 @@ some typical use-case examples.
 {default is random initialization}
 %
 \cmdarg{samples}{file}
-{File into which samples are written}
+{File into which samples are written. Be sure to distinguish the
+file when executing multiple chains simultaneously.}
 {default = \code{samples.csv}}
 %
 \cmdflag{append\_samples}
@@ -564,7 +616,9 @@ some typical use-case examples.
 {default is to overwrite specified file}
 %
 \cmdarg{seed}{int}
-{Random number generation seed}
+{Random number generation seed. When executing multiple chains
+simultaneously, it is best to give all of them the same seed
+but different values for chain\_id (see below).}
 {default is to randomly generate from time}
 %
 \cmdarg{chain\_id}{int}

@@ -15,36 +15,58 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.0.0
-----------------------------------------------------------------------
-First release.
+v1.1.0
+======================================================================
+-- Backward Compatibility Issue
+   * Categorical distribution recoded to match documentation;  it
+     now has support {1,...,K} rather than {0,...,K-1}.  
+   * (RStan) change default value of permuted flag from FALSE to TRUE for
+     Stan fit S4 extract() method
+-- New Features
+   * Conditional (if-then-else) statements
+   * While statements
+-- New Functions
+   * generalized multiply_lower_tri_self_transpose() to non-square
+     matrices
+   * special functions: log_inv_logit(), log1m_inv_logit()
+   * matrix special functions: cumulative_sum()
+   * probability functions: poisson_log_log() for log-rate 
+     parameterized Poisson
+   * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
+   * comparison operators (<, >, <=, >=, ==, !=)
+   * boolean operators (!, ||, &&)
+   * allow +/- inf values in variable declaration constraints
+-- RStan Improvements
+   * get_posterior_mean() method for Stan fit objects
+   * replaced RcppEigen dependency with include of Eigen source
+   * added read_stan_csv() to create Stan fit object from CSV files of
+     the form written to disk by the command-line version of Stan
+   * as.data.frame() S3 method for Stan fit objects
+-- Bug Fixes
+   * fixed bug in NUTS diagonal resulting in too small step sizes
+   * fixed bug introduced in 1.0.3 that hid line and column number
+     bug reporting
+   * added checks that data dimensions match as well as sizes
+   * removed non-symmetric versions of eigenvalues() and eigenvectors()
+   * testing identifiers are not reserved words in C++/Stan
+   * trapping/reporting locations of errors in data and init reads
+   * improvements in dump data format reader for more R compatibility
+     and more generality
+   * fix bug in bernoulli logit distro tail density
+-- Code Improvements
+   * templated out matrix libs to reduce code duplication
+   * vectorized auto-dif for tcrossprod() and crossprod()
+   * optimizations in Wishart
+   * vectorization with efficiency improvements in probability distributions
+-- Libraries Updated
+   * Eigen version 3.1.1 replaced with version 3.1.2
+   * Boost version 1.51.0 replaced with version 1.52.0
+-- Manual Improvements
+   * New chapter on univariate and multivariate variable transforms
+   * Many consistency improvements and typo corrections
+   * Information on running command line in parallel from shell
 
-v1.0.1
-----------------------------------------------------------------------
-Patch release.
 
-
-V 1.0.2 Release Notes (28 Sep 2012)
-----------------------------------------------------------------------
-Bug Fixes:
-  -- check ranges for LHS of assignment to prevent seg faults
-  -- added matrix size and shape tests to avoid seg faults
-  -- changed matrix to throw domain_error rather than illegal_argument
-  -- removed template variable names from distribution error msgs
-  -- indexing fixed for arrays of matrix/vector/row_vector
-  -- fixed sd() and variance() to return 0.0 for sequences of size 1
-  -- fixed void return type in auto_covariance
-  -- patch truncation to return -inf for variates out of range
-  -- upgraded BUGS ring model to use constraints plus tan2()
-New Features:
-  -- print statements
-  -- multiply_lower_tri_self_transpose function
-  -- vectorized several probability functions (see the manual)
-Manual Additions:
-  -- programming guide: IRT models 
-  -- new appendix: style guide
-  -- new appendix: migrating from Stan
-  -- new index: function and distribution index
 
 v 1.0.3 Release Notes (25 Oct 2012)
 ======================================================================
@@ -95,5 +117,42 @@ RStan New Features:
     dimnames for stanfit objects. 
  -- specify seed using string of digits in addition to numbers  
  -- turn off refresh if value <= 0
+
+
+V 1.0.2 Release Notes (28 Sep 2012)
+----------------------------------------------------------------------
+Bug Fixes:
+  -- check ranges for LHS of assignment to prevent seg faults
+  -- added matrix size and shape tests to avoid seg faults
+  -- changed matrix to throw domain_error rather than illegal_argument
+  -- removed template variable names from distribution error msgs
+  -- indexing fixed for arrays of matrix/vector/row_vector
+  -- fixed sd() and variance() to return 0.0 for sequences of size 1
+  -- fixed void return type in auto_covariance
+  -- patch truncation to return -inf for variates out of range
+  -- upgraded BUGS ring model to use constraints plus tan2()
+New Features:
+  -- print statements
+  -- multiply_lower_tri_self_transpose function
+  -- vectorized several probability functions (see the manual)
+Manual Additions:
+  -- programming guide: IRT models 
+  -- new appendix: style guide
+  -- new appendix: migrating from Stan
+  -- new index: function and distribution index
+
+
+v1.0.1
+----------------------------------------------------------------------
+Patch release.
+
+
+v1.0.0
+----------------------------------------------------------------------
+First release.
+
+
+
+
 
 

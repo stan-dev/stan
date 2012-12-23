@@ -963,7 +963,7 @@ model {
       eta <- x[n] * beta;
       theta[1] <- 1 - Phi(eta - c[1]);
       for (k in 2:(K-1))
-          theta[k] <- Phi(eta - c[k-1]) - erf(eta - c[k]);
+          theta[k] <- Phi(eta - c[k-1]) - Phi(eta - c[k]);
       theta[K] <- Phi(eta - c[K-1]);
       y[n] ~ categorical(theta);
   }
