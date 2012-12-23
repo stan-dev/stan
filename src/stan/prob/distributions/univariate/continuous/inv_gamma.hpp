@@ -7,6 +7,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/prob/internal_math.hpp>
 
 namespace stan {
 
@@ -173,7 +174,146 @@ namespace stan {
       return inv_gamma_log<false>(y,alpha,beta,stan::math::default_policy());
     }
 
-
+      /**
+       * The CDF of an inverse gamma density for y with the specified
+       * shape and scale parameters. y, shape, and scale parameters must be greater than 0.
+       * 
+       * @param y A scalar variable.
+       * @param alpha Shape parameter.
+       * @param beta Scale parameter.
+       * @throw std::domain_error if alpha is not greater than 0.
+       * @throw std::domain_error if beta is not greater than 0.
+       * @throw std::domain_error if y is not greater than 0.
+       * @tparam T_y Type of scalar.
+       * @tparam T_shape Type of shape.
+       * @tparam T_scale Type of scale.
+       */
+      
+      template <typename T_y, typename T_shape, typename T_scale, class Policy>
+      typename return_type<T_y,T_shape,T_scale>::type
+      inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta, const Policy&) { 
+          
+          // Size checks
+          if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 0.0;
+          
+          // Error checks
+          static const char* function = "stan::prob::inv_gamma_cdf(%1%)";
+          
+          using stan::math::check_finite;      
+          using stan::math::check_positive;
+          using stan::math::check_not_nan;
+          using stan::math::check_consistent_sizes;
+          using stan::math::check_greater_or_equal;
+          using stan::math::check_less_or_equal;
+          
+          using boost::math::tools::promote_args;
+          
+          double P(1.0);
+          
+          if (!check_finite(function, alpha, "Shape parameter", &P, Policy())) 
+              return P;
+          
+          if (!check_positive(function, alpha, "Shape parameter", &P, Policy())) 
+              return P;
+          
+          if (!check_finite(function, beta, "Scale parameter", &P, Policy())) 
+              return P;
+          
+          if (!check_positive(function, beta, "Scale parameter", &P, Policy())) 
+              return P;
+          
+          if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+              return P;
+          
+          if (!check_positive(function, y, "Random variable", &P, Policy())) 
+              return P;
+          
+          if (!(check_consistent_sizes(function, y, alpha, beta,
+                                       "Random variable", "Shape parameter", "Scale Parameter",
+                                       &P, Policy())))
+              return P;
+          
+          // Wrap arguments in vectors
+          VectorView<const T_y> y_vec(y);
+          VectorView<const T_shape> alpha_vec(alpha);
+          VectorView<const T_scale> beta_vec(beta);
+          size_t N = max_size(y, alpha, beta);
+          
+          agrad::OperandsAndPartials<T_y, T_shape, T_scale> operands_and_partials(y, alpha, beta);
+          
+          std::fill(operands_and_partials.all_partials,
+                    operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+          
+          // Compute CDF and its gradients
+          using stan::math::value_of;
+          using boost::math::gamma_p_derivative;
+          using boost::math::gamma_q;
+          using boost::math::digamma;
+          
+          // Cache a few expensive function calls if nu is a parameter
+          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> gamma_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> digamma_vec(stan::length(alpha));
+          
+          if (!is_constant_struct<T_shape>::value) {
+              
+              for (size_t i = 0; i < stan::length(alpha); i++) {
+                  const double alpha_dbl = value_of(alpha_vec[i]);
+                  gamma_vec[i] = gamma(alpha_dbl);
+                  digamma_vec[i] = digamma(alpha_dbl);
+              }
+              
+          }
+          
+          // Compute vectorized CDF and gradient
+          for (size_t n = 0; n < N; n++) {
+              
+              // Pull out values
+              const double y_dbl = value_of(y_vec[n]);
+              const double y_inv_dbl = 1.0 / y_dbl;
+              const double alpha_dbl = value_of(alpha_vec[n]);
+              const double beta_dbl = value_of(beta_vec[n]);
+              
+              // Compute
+              const double Pn = gamma_q(alpha_dbl, beta_dbl * y_inv_dbl);
+              
+              P *= Pn;
+              
+              if (!is_constant_struct<T_y>::value)
+                  operands_and_partials.d_x1[n] 
+                  += beta_dbl * y_inv_dbl * y_inv_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) / Pn;
+              
+              if (!is_constant_struct<T_shape>::value)
+                  operands_and_partials.d_x2[n] 
+                  += stan::math::gradRegIncGamma(alpha_dbl, beta_dbl * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
+              
+              if (!is_constant_struct<T_scale>::value)
+                  operands_and_partials.d_x3[n] 
+                  += - y_inv_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) / Pn;
+              
+          }
+          
+          for (size_t n = 0; n < N; n++) {
+              
+              if (!is_constant_struct<T_y>::value)
+                  operands_and_partials.d_x1[n] *= P;
+              
+              if (!is_constant_struct<T_shape>::value)
+                  operands_and_partials.d_x2[n] *= P;
+              
+              if (!is_constant_struct<T_scale>::value)
+                  operands_and_partials.d_x3[n] *= P;
+              
+          }
+          
+          return operands_and_partials.to_var(P);
+          
+      }
+      
+      template <typename T_y, typename T_shape, typename T_scale>
+      inline typename return_type<T_y, T_shape, T_scale>::type
+      inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta) {
+          return inv_gamma_cdf(y, alpha, beta, stan::math::default_policy());
+      }
           
   }
 }
