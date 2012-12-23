@@ -144,6 +144,106 @@ namespace stan {
       return logistic_log<false>(y,mu,sigma,stan::math::default_policy());
     }
 
+      // Logistic(y|mu,sigma) [sigma > 0]
+      template <typename T_y, typename T_loc, typename T_scale, class Policy>
+      typename return_type<T_y, T_loc, T_scale>::type
+      logistic_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy&) {
+          
+          // Size checks
+          if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 0.0;
+          
+          // Error checks
+          static const char* function = "stan::prob::logistic_cdf(%1%)";
+          
+          using stan::math::check_positive;
+          using stan::math::check_finite;
+          using stan::math::check_consistent_sizes;
+          
+          using boost::math::tools::promote_args;
+          
+          double P(1.0);
+          
+          if (!check_finite(function, y, "Random variable", &P, Policy()))
+              return P;
+          
+          if (!check_finite(function, mu, "Location parameter", &P, Policy()))
+              return P;
+          
+          if (!check_finite(function, sigma, "Scale parameter", &P, Policy()))
+              return P;
+          
+          if (!check_positive(function, sigma, "Scale parameter", &P, Policy()))
+              return P;
+          
+          if (!(check_consistent_sizes(function, y, mu, sigma,
+                                       "Random variable", "Location parameter", "Scale parameter",
+                                       &P, Policy())))
+              return P;
+          
+          // Wrap arguments in vectors
+          VectorView<const T_y> y_vec(y);
+          VectorView<const T_loc> mu_vec(mu);
+          VectorView<const T_scale> sigma_vec(sigma);
+          size_t N = max_size(y, mu, sigma);
+          
+          agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+          
+          std::fill(operands_and_partials.all_partials,
+                    operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+          
+          // Compute vectorized CDF and its gradients
+          using stan::math::value_of;
+          
+          for (size_t n = 0; n < N; n++) {
+              
+              // Pull out values
+              const double y_dbl = value_of(y_vec[n]);
+              const double mu_dbl = value_of(mu_vec[n]);
+              const double sigma_dbl = value_of(sigma_vec[n]);
+              const double sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
+              
+              // Compute
+              const double Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) * sigma_inv_vec ) );
+              
+              P *= Pn;
+              
+              if (!is_constant_struct<T_y>::value)
+                  operands_and_partials.d_x1[n] 
+                  += exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
+              
+              if (!is_constant_struct<T_loc>::value)
+                  operands_and_partials.d_x2[n] 
+                  += - exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
+              
+              if (!is_constant_struct<T_scale>::value)
+                  operands_and_partials.d_x3[n] 
+                  += - (y_dbl - mu_dbl) * sigma_inv_vec * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
+              
+          }
+          
+          for (size_t n = 0; n < N; n++) {
+              
+              if (!is_constant_struct<T_y>::value)
+                  operands_and_partials.d_x1[n] *= P;
+              
+              if (!is_constant_struct<T_loc>::value)
+                  operands_and_partials.d_x2[n] *= P;
+              
+              if (!is_constant_struct<T_scale>::value)
+                  operands_and_partials.d_x3[n] *= P;
+              
+          }        
+          
+          return operands_and_partials.to_var(P);
+          
+      }
+      
+      template <typename T_y, typename T_loc, typename T_scale>
+      inline typename return_type<T_y, T_loc, T_scale>::type
+      logistic_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+          return logistic_cdf(y, mu, sigma, stan::math::default_policy());
+      }
+      
   }
 }
 #endif
