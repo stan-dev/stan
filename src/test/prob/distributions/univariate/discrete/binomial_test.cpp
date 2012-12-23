@@ -52,3 +52,7 @@ INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBinomial,
 			      DistributionTestFixture,
 			      ProbDistributionsBinomial);
 
+
+TEST(ProbDistributionsBinomialCDF,Values) {
+    EXPECT_FLOAT_EQ(0.042817421, stan::prob::binomial_cdf(25, 30, 0.57));
+}
