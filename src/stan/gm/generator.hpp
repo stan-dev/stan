@@ -1340,7 +1340,7 @@ namespace stan {
       
       generate_validate_transformed_params(p.derived_decl_.first,2,o);
       o << INDENT2
-        << "const char* function__ = \"validate transformed params\";" 
+        << "const char* function__ = \"validate transformed params %1%\";" 
         << EOL;
       o << INDENT2
         << "(void) function__; // dummy to suppress unused var warning" 
