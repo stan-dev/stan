@@ -31,19 +31,7 @@ stan.Rproj
 stan.kdev4
 .Rapp.history
 
-# model files
-src/test/gm/model_specs/*.cpp
-src/test/gm/model_specs/function_signatures1
-src/test/gm/model_specs/function_signatures1.exe
-src/test/gm/model_specs/function_signatures2
-src/test/gm/model_specs/function_signatures2.exe
-src/test/gm/model_specs/function_signatures3
-src/test/gm/model_specs/function_signatures3.exe
-src/test/gm/model_specs/function_signatures4
-src/test/gm/model_specs/function_signatures4.exe
-src/test/gm/model_specs/function_signatures5
-src/test/gm/model_specs/function_signatures5.exe
-src/test/gm/model_specs/function_signatures6
-src/test/gm/model_specs/function_signatures6.exe
-src/test/gm/model_specs/function_signatures7
-src/test/gm/model_specs/function_signatures7.exe
+# tests: compiled models
+src/test/gm/model_specs/compiled/*
+!src/test/gm/model_specs/compiled/*.stan
+!src/test/gm/model_specs/compiled/.gitignore
