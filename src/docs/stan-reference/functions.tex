@@ -1273,18 +1273,86 @@ $\setlist{0,\ldots,N}$ for some upper bound $N$.
 
 \subsection{Binomial Distribution}
 
-If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
-\{0,\ldots,N\}$,
+Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
+\{0,\ldots,N\}$.  
+
+\subsubsection{Probability mass function}
 \[
 \distro{Binomial}(n|N,\theta)
 = {N \choose n} \theta^n (1 - \theta)^{N - n}.
 \]
 
+\subsubsection{Log probability mass function}
+%
+\begin{eqnarray*}
+\log \distro{Binomial}(n|N,\theta)
+& = &
+\log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1)
+\\[4pt]
+& & { } + n \log \theta + (N - n) \log (1 - \theta), 
+\end{eqnarray*}
+%
+\subsubsection{Gradient of log probability mass function}
+%
+\[
+\frac{\partial}{\partial \theta} \log \distro{Binomial}(n|N,\theta)
+= \frac{n}{\theta}
+- \frac{N - n}{1 - \theta}
+\]
+\subsubsection{Stan Function}
+%
 \begin{description}
 %
   \fitem{real}{binomial\_log}{int \farg{n}, int \farg{N}, real
     \farg{theta}}{The log binomial probability mass of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
+%
+\end{description}
+
+
+\subsection{Binomial Distribution (Logit Parameterization)}
+
+Stan also provides a version of the binomial probability mass function
+distribution with the chance of success parameterized on the
+unconstrained logistic scale.  
+
+Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
+\{0,\ldots,N\}$.
+
+\subsubsection{Probability mass function}
+\begin{eqnarray*}
+\distro{BinomialLogit}(n|N,\alpha)
+& = & \distro{BinomialLogit}(n|N,\mbox{logit}^{-1}(\alpha))
+\\[6pt]
+& = & {N \choose n} \left( \mbox{logit}^{-1}(\alpha) \right)^{n}
+                    \left( 1 - \mbox{logit}^{-1}(\alpha) \right)^{N - n}.
+\end{eqnarray*}
+%
+\subsubsection{Log probability mass function}
+\begin{eqnarray*}
+\log \distro{BinomialLogit}(n|N,\alpha)
+& = &
+\log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1)
+\\[4pt]
+& & { } + n \log \mbox{logit}^{-1}(\alpha) + (N - n) \log \left( 1 -
+  \mbox{logit}^{-1}(\alpha) \right), 
+\end{eqnarray*}
+%
+\subsubsection{Gradient log probability mass function}
+%
+\[
+\frac{\partial}{\partial \alpha} \log \distro{BinomialLogit}(n|N,\alpha)
+= \frac{n}{\mbox{logit}^{-1}(-\alpha)}
+- \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
+\]
+%
+\subsubsection{Stan Function}
+%
+\begin{description}
+%
+  \fitem{real}{binomial\_logit\_log}{int \farg{n}, int \farg{N}, real
+    \farg{alpha}}{The log binomial probability mass of \farg{n}
+    successes in \farg{N} trials given logit-scaled chance of success \farg{alpha}}
 %
 \end{description}
 
