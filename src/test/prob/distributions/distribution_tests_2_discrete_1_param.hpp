@@ -82,7 +82,7 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
       << "(" << (int)invalid_params[0] << ", " << (int)invalid_params[1] << ", " << invalid_params[2] << ")" << std::endl;    
   }
 
-  for (size_t i = 1; i < valid_params.size(); i++) {
+  for (size_t i = 2; i < valid_params.size(); i++) {
     vector<double> invalid_params(valid_params);
     invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
     
