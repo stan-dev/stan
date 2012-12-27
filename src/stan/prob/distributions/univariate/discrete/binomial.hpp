@@ -140,7 +140,7 @@ namespace stan {
           using stan::math::check_consistent_sizes;
           using stan::prob::include_summand;
           
-          // Ensure non-zero arguments lenghts
+          // Ensure non-zero arguments lengths
           if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
               return 0.0;
           
