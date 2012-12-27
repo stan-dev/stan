@@ -68,17 +68,17 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true,T_scale> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> log_sigma(length(sigma));
+      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
 	if (include_summand<propto,T_scale>::value)
 	  log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      DoubleVectorView<!is_constant_struct<T_loc>::value, double, is_vector<T_loc>::value || is_vector<T_scale>::value> 
+      DoubleVectorView<!is_constant_struct<T_loc>::value, is_vector<T_loc>::value || is_vector<T_scale>::value> 
 	exp_mu_div_sigma(max_size(mu,sigma));
-      DoubleVectorView<!is_constant_struct<T_loc>::value, double, is_vector<T_y>::value || is_vector<T_scale>::value> 
+      DoubleVectorView<!is_constant_struct<T_loc>::value, is_vector<T_y>::value || is_vector<T_scale>::value> 
 	exp_y_div_sigma(max_size(y,sigma));
       if (!is_constant_struct<T_loc>::value) {
 	for (size_t n = 0; n < max_size(mu,sigma); n++) 
