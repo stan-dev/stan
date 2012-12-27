@@ -163,7 +163,7 @@ namespace stan {
           using stan::math::value_of;
           using boost::math::gamma_p_derivative;
           using boost::math::gamma_q;
-          using boost::math::gamma;
+          using boost::math::tgamma;
           using boost::math::digamma;
           
           // Cache a few expensive function calls if nu is a parameter
@@ -174,7 +174,7 @@ namespace stan {
               
               for (size_t i = 0; i < stan::length(nu); i++) {
                   const double nu_dbl = value_of(nu_vec[i]);
-                  gamma_vec[i] = gamma(nu_dbl);
+                  gamma_vec[i] = tgamma(nu_dbl);
                   digamma_vec[i] = digamma(nu_dbl);
               }
               

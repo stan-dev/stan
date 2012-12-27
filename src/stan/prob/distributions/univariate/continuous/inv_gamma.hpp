@@ -249,6 +249,7 @@ namespace stan {
           using boost::math::gamma_p_derivative;
           using boost::math::gamma_q;
           using boost::math::digamma;
+	  using boost::math::tgamma;
           
           // Cache a few expensive function calls if nu is a parameter
           DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> gamma_vec(stan::length(alpha));
@@ -258,7 +259,7 @@ namespace stan {
               
               for (size_t i = 0; i < stan::length(alpha); i++) {
                   const double alpha_dbl = value_of(alpha_vec[i]);
-                  gamma_vec[i] = gamma(alpha_dbl);
+                  gamma_vec[i] = tgamma(alpha_dbl);
                   digamma_vec[i] = digamma(alpha_dbl);
               }
               
