@@ -113,115 +113,115 @@ namespace stan {
       return inv_chi_square_log<false>(y,nu,stan::math::default_policy());
     }
       
-      template <typename T_y, typename T_dof, class Policy>
-      typename return_type<T_y,T_dof>::type
-      inv_chi_square_cdf(const T_y& y, const T_dof& nu, const Policy&) {
+    template <typename T_y, typename T_dof, class Policy>
+    typename return_type<T_y,T_dof>::type
+    inv_chi_square_cdf(const T_y& y, const T_dof& nu, const Policy&) {
           
-          // Size checks
-          if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
+      // Size checks
+      if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
           
-          // Error checks
-          static const char* function = "stan::prob::inv_chi_square_cdf(%1%)";
+      // Error checks
+      static const char* function = "stan::prob::inv_chi_square_cdf(%1%)";
           
-          using stan::math::check_finite;      
-          using stan::math::check_positive;
-          using stan::math::check_not_nan;
-          using stan::math::check_consistent_sizes;
+      using stan::math::check_finite;      
+      using stan::math::check_positive;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
           
-          using boost::math::tools::promote_args;
+      using boost::math::tools::promote_args;
           
-          double P(1.0);
+      double P(1.0);
           
-          if (!check_finite(function, nu, "Degrees of freedom parameter", &P, Policy()))
-              return P;
+      if (!check_finite(function, nu, "Degrees of freedom parameter", &P, Policy()))
+	return P;
           
-          if (!check_positive(function, nu, "Degrees of freedom parameter", &P, Policy()))
-              return P;
+      if (!check_positive(function, nu, "Degrees of freedom parameter", &P, Policy()))
+	return P;
           
-          if (!check_not_nan(function, y, "Random variable", &P, Policy()))
-              return P;
+      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+	return P;
           
-          if (!check_positive(function, y, "Random variable", &P, Policy()))
-              return P;
+      if (!check_positive(function, y, "Random variable", &P, Policy()))
+	return P;
           
-          if (!(check_consistent_sizes(function, y, nu,
-                                       "Random variable", "Degrees of freedom parameter",
-                                       &P, Policy())))
-              return P;
+      if (!(check_consistent_sizes(function, y, nu,
+				   "Random variable", "Degrees of freedom parameter",
+				   &P, Policy())))
+	return P;
           
-          // Wrap arguments in vectors
-          VectorView<const T_y> y_vec(y);
-          VectorView<const T_dof> nu_vec(nu);
-          size_t N = max_size(y, nu);
+      // Wrap arguments in vectors
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_dof> nu_vec(nu);
+      size_t N = max_size(y, nu);
           
-          agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
+      agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
           
-          std::fill(operands_and_partials.all_partials,
-                    operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+      std::fill(operands_and_partials.all_partials,
+		operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
           
-          // Compute CDF and its gradients
-          using stan::math::value_of;
-          using boost::math::gamma_p_derivative;
-          using boost::math::gamma_q;
-          using boost::math::gamma;
-          using boost::math::digamma;
+      // Compute CDF and its gradients
+      using stan::math::value_of;
+      using boost::math::gamma_p_derivative;
+      using boost::math::gamma_q;
+      using boost::math::tgamma;
+      using boost::math::digamma;
           
-          // Cache a few expensive function calls if nu is a parameter
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> gamma_vec(stan::length(nu));
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> digamma_vec(stan::length(nu));
+      // Cache a few expensive function calls if nu is a parameter
+      DoubleVectorView<!is_constant_struct<T_dof>::value, is_vector<T_dof>::value> gamma_vec(stan::length(nu));
+      DoubleVectorView<!is_constant_struct<T_dof>::value, is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
-          if (!is_constant_struct<T_dof>::value)  {
+      if (!is_constant_struct<T_dof>::value)  {
               
-              for (size_t i = 0; i < stan::length(nu); i++) {
-                  const double nu_dbl = value_of(nu_vec[i]);
-                  gamma_vec[i] = gamma(nu_dbl);
-                  digamma_vec[i] = digamma(nu_dbl);
-              }
+	for (size_t i = 0; i < stan::length(nu); i++) {
+	  const double nu_dbl = value_of(nu_vec[i]);
+	  gamma_vec[i] = tgamma(nu_dbl);
+	  digamma_vec[i] = digamma(nu_dbl);
+	}
               
-          }
-          
-          // Compute vectorized CDF and gradient
-          for (size_t n = 0; n < N; n++) {
-              
-              // Pull out values
-              const double y_dbl = value_of(y_vec[n]);
-              const double y_inv_dbl = 1.0 / y_dbl;
-              const double nu_dbl = value_of(nu_vec[n]);
-              
-              // Compute
-              const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
-              
-              P *= Pn;
-              
-              if (!is_constant_struct<T_y>::value)
-                  operands_and_partials.d_x1[n] 
-                  += 0.5 * y_inv_dbl * y_inv_dbl * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
-              
-              if (!is_constant_struct<T_dof>::value)
-                  operands_and_partials.d_x2[n] 
-                  += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 0.5 * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
-              
-          }
-          
-          for (size_t n = 0; n < N; n++) {
-              
-              if (!is_constant_struct<T_y>::value)
-                  operands_and_partials.d_x1[n] *= P;
-              
-              if (!is_constant_struct<T_dof>::value)
-                  operands_and_partials.d_x2[n] *= P;
-              
-          }
-          
-          return operands_and_partials.to_var(P);
-          
       }
+          
+      // Compute vectorized CDF and gradient
+      for (size_t n = 0; n < N; n++) {
+              
+	// Pull out values
+	const double y_dbl = value_of(y_vec[n]);
+	const double y_inv_dbl = 1.0 / y_dbl;
+	const double nu_dbl = value_of(nu_vec[n]);
+              
+	// Compute
+	const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+              
+	P *= Pn;
+              
+	if (!is_constant_struct<T_y>::value)
+	  operands_and_partials.d_x1[n] 
+	    += 0.5 * y_inv_dbl * y_inv_dbl * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
+              
+	if (!is_constant_struct<T_dof>::value)
+	  operands_and_partials.d_x2[n] 
+	    += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 0.5 * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
+              
+      }
+          
+      for (size_t n = 0; n < N; n++) {
+              
+	if (!is_constant_struct<T_y>::value)
+	  operands_and_partials.d_x1[n] *= P;
+              
+	if (!is_constant_struct<T_dof>::value)
+	  operands_and_partials.d_x2[n] *= P;
+              
+      }
+          
+      return operands_and_partials.to_var(P);
+          
+    }
       
-      template <typename T_y, typename T_dof>
-      inline typename return_type<T_y,T_dof>::type
-      inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
-          return inv_chi_square_cdf(y, nu, stan::math::default_policy());
-      }
+    template <typename T_y, typename T_dof>
+    inline typename return_type<T_y,T_dof>::type
+    inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
+      return inv_chi_square_cdf(y, nu, stan::math::default_policy());
+    }
     
   }
 }

@@ -96,9 +96,9 @@ namespace stan {
       using stan::math::multiply_log;
       using boost::math::digamma;
 
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,T_y>
+      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,is_vector<T_y>::value>
 	log_y(length(y));
-      DoubleVectorView<include_summand<propto,T_y,T_scale>::value,T_y>
+      DoubleVectorView<include_summand<propto,T_y,T_scale>::value,is_vector<T_y>::value>
 	inv_y(length(y));
       for(size_t n = 0; n < length(y); n++) {
 	if (include_summand<propto,T_y,T_shape>::value)
@@ -108,9 +108,9 @@ namespace stan {
 	  inv_y[n] = 1.0 / value_of(y_vec[n]);
       }
 
-      DoubleVectorView<include_summand<propto,T_shape>::value,T_shape>
+      DoubleVectorView<include_summand<propto,T_shape>::value,is_vector<T_shape>::value>
 	lgamma_alpha(length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value,T_shape>
+      DoubleVectorView<!is_constant_struct<T_shape>::value,is_vector<T_shape>::value>
 	digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
 	if (include_summand<propto,T_shape>::value)
@@ -119,7 +119,7 @@ namespace stan {
 	  digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
-      DoubleVectorView<include_summand<propto,T_shape,T_scale>::value,T_scale>
+      DoubleVectorView<include_summand<propto,T_shape,T_scale>::value,is_vector<T_scale>::value>
 	log_beta(length(beta));
       if (include_summand<propto,T_shape,T_scale>::value)
 	for (size_t n = 0; n < length(beta); n++)
@@ -249,16 +249,17 @@ namespace stan {
           using boost::math::gamma_p_derivative;
           using boost::math::gamma_q;
           using boost::math::digamma;
+	  using boost::math::tgamma;
           
           // Cache a few expensive function calls if nu is a parameter
-          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> gamma_vec(stan::length(alpha));
-          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> digamma_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> gamma_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> digamma_vec(stan::length(alpha));
           
           if (!is_constant_struct<T_shape>::value) {
               
               for (size_t i = 0; i < stan::length(alpha); i++) {
                   const double alpha_dbl = value_of(alpha_vec[i]);
-                  gamma_vec[i] = gamma(alpha_dbl);
+                  gamma_vec[i] = tgamma(alpha_dbl);
                   digamma_vec[i] = digamma(alpha_dbl);
               }
               
