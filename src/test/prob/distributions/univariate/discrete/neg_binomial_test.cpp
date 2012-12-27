@@ -1,5 +1,6 @@
 #define _LOG_PROB_ neg_binomial_log
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
+#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 
 #include <test/prob/distributions/distribution_test_fixture.hpp>
 #include <test/prob/distributions/distribution_tests_1_discrete_2_params.hpp>
@@ -46,6 +47,18 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNegBinomial,
 			      DistributionTestFixture,
 			      ProbDistributionsNegBinomial);
+
+
+const double p = 0.57;
+const double beta = p / (1.0 - p);
+
+TEST(ProbDistributionsNegBinomialCDF,Values) {
+    EXPECT_FLOAT_EQ(0.042817421, stan::prob::neg_binomial_cdf(30, 24, beta));
+    
+    // Consistency with implemented Binomial
+    EXPECT_FLOAT_EQ(stan::prob::binomial_cdf(24, 54, p), stan::prob::neg_binomial_cdf(30, 24, beta));
+}
+
 /*
 
 
