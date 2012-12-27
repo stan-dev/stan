@@ -258,7 +258,7 @@ namespace stan {
     const double x_;
   };
 
-  template<bool used, typename T = double, bool is_vec = stan::is_vector<T>::value>
+  template<bool used, bool is_vec>
   class DoubleVectorView {
   public:
     DoubleVectorView(size_t /* n */) { }
@@ -268,7 +268,7 @@ namespace stan {
   };
 
   template<typename T>
-  class DoubleVectorView<true, T, false> {
+  class DoubleVectorView<true, false> {
   private:
     double x_;
   public:
@@ -279,7 +279,7 @@ namespace stan {
   };
 
   template<typename T>
-  class DoubleVectorView<true, T, true> {
+  class DoubleVectorView<true, true> {
   private:
     std::vector<double> x_;
   public:
