@@ -64,6 +64,9 @@ INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBetaBinomial,
 			      DistributionTestFixture,
 			      ProbDistributionsBetaBinomial);
 
+TEST(ProbDistributionsBetaBinomialCDF,Values) {
+    EXPECT_FLOAT_EQ(0.8868204314, stan::prob::beta_binomial_cdf(49, 100, 1.349, 3.938));
+}
 
 // #include <gtest/gtest.h>
 // #include <stan/prob/distributions/univariate/discrete/beta_binomial.hpp>

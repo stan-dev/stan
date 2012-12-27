@@ -310,7 +310,7 @@ namespace stan {
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
-        return 0.0;
+          return 0.0;
           
       double P(1.0);
           

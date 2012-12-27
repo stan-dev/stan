@@ -9,6 +9,89 @@ namespace stan {
     
   namespace math {
 
+      
+      double F32(double a, double b, double c, double d, double e, double z)
+      {
+          
+          double F = 1;
+          
+          double tOld = 1;
+          double tNew = 0;
+          
+          double logT = 0;
+          
+          double logZ = std::log(z);
+          
+          for(int k = 0; k < 500; ++k)
+          {
+              
+              double p = (a + k) * (b + k) * (c + k) / ( (d + k) * (e + k) * (k + 1) );
+              
+              // If a, b, or c is a negative integer then the series terminates
+              // after a finite number of interations
+              if(p == 0) break;
+              
+              logT += (p > 0 ? 1 : -1) * std::log(fabs(p)) + logZ;
+              
+              tNew = std::exp(logT);
+              
+              F += tNew;
+              
+              tOld = tNew;
+              
+          }
+          
+          return F;
+          
+      }
+      
+      void gradF32(double* g, double a, double b, double c, double d, double e, double z)
+      {
+          
+          double gOld[6];
+          
+          for(double *p = g; p != g + 6; ++p) *p = 0;
+          for(double *p = gOld; p != gOld + 6; ++p) *p = 0;
+          
+          double tOld = 1;
+          double tNew = 0;
+          
+          double logT = 0;
+          
+          double logZ = std::log(z);
+          
+          for(int k = 0; k < 500; ++k)
+          {
+              
+              double C = (a + k) / (d + k);
+              C *= (b + k) / (e + k);
+              C *= (c + k) / (1 + k);
+              
+              // If a, b, or c is a negative integer then the series terminates
+              // after a finite number of interations
+              if(C == 0) break;
+              
+              logT += (C > 0 ? 1 : -1) * std::log(fabs(C)) + logZ;
+              
+              tNew = std::exp(logT);
+              
+              gOld[0] = tNew * (gOld[0] / tOld + 1.0 / (a + k) );
+              gOld[1] = tNew * (gOld[1] / tOld + 1.0 / (b + k) );
+              gOld[2] = tNew * (gOld[2] / tOld + 1.0 / (c + k) );
+              
+              gOld[3] = tNew * (gOld[3] / tOld - 1.0 / (d + k) );
+              gOld[4] = tNew * (gOld[4] / tOld - 1.0 / (e + k) );
+              
+              gOld[5] = tNew * ( gOld[5] / tOld + 1.0 / z );
+              
+              for(int i = 0; i < 6; ++i) g[i] += gOld[i];
+              
+              tOld = tNew;
+              
+          }
+          
+      }
+      
       // Gradient of the hypergeometric function 2F1(a, b | c | z) with respect to a and c
       void grad2F1(double& gradA, double& gradC, double a, double b, double c, double z, double precision = 1e-6)
       {
