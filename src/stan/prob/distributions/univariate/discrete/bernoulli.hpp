@@ -307,12 +307,12 @@ namespace stan {
               const double n_dbl = value_of(n_vec[i]);
               const double theta_dbl = value_of(theta_vec[i]);
               
-              const double Pi = ibetac(n_dbl, 1, theta_dbl);
+              const double Pi = ibetac(n_dbl + 1, 1 - n_dbl, theta_dbl);
               
               P *= Pi;
               
               if (!is_constant_struct<T_prob>::value)
-                  operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl, 1, theta_dbl) / Pi;
+                  operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl + 1, 1 - n_dbl, theta_dbl) / Pi;
               
           }
           
