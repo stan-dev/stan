@@ -396,24 +396,36 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   Matrix<var,1,Dynamic> a_row_vector(5);
 
   DoubleVectorView<true,true> dvv1(length(a_var));
+  dvv1[0] = 0.0;
+  dvv1[1] = 1.0;
+  dvv1[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv1[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[100]);
+  EXPECT_FLOAT_EQ(1.0, dvv1[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv1[2]);
 
   DoubleVectorView<true,true> dvv2(length(a_std_vector));
+  dvv2[0] = 0.0;
+  dvv2[1] = 1.0;
+  dvv2[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv2[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[2]);  
+  EXPECT_FLOAT_EQ(1.0, dvv2[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv2[2]);  
   
   DoubleVectorView<true,true> dvv3(length(a_vector));
+  dvv3[0] = 0.0;
+  dvv3[1] = 1.0;
+  dvv3[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv3[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[2]);  
+  EXPECT_FLOAT_EQ(1.0, dvv3[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv3[2]);  
   
   DoubleVectorView<true,true> dvv4(length(a_row_vector));
+  dvv4[0] = 0.0;
+  dvv4[1] = 1.0;
+  dvv4[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv4[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[2]);
+  EXPECT_FLOAT_EQ(1.0, dvv4[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv4[2]);
 }
 
 TEST(MetaTraits, scalar_type) {
