@@ -10,6 +10,10 @@ TEST(ProbDistributionsBetaBinomial,Propto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::beta_binomial_log<true>(25,100,30.0,50.0));
 }
 
+TEST(ProbDistributionsBetaBinomialCDF,Values) {
+    EXPECT_FLOAT_EQ(0.8868204314, stan::prob::beta_binomial_cdf(49, 100, 1.349, 3.938));
+}
+
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
 using boost::math::policies::domain_error;
