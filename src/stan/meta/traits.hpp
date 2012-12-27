@@ -267,7 +267,7 @@ namespace stan {
     }
   };
 
-  template<typename T>
+  template<>
   class DoubleVectorView<true, false> {
   private:
     double x_;
@@ -278,7 +278,7 @@ namespace stan {
     }
   };
 
-  template<typename T>
+  template<>
   class DoubleVectorView<true, true> {
   private:
     std::vector<double> x_;
