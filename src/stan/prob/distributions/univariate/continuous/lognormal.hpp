@@ -74,12 +74,12 @@ namespace stan {
       using stan::prob::NEG_LOG_SQRT_TWO_PI;
       
 
-      DoubleVectorView<include_summand<propto,T_scale>::value,T_scale> log_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
       if (include_summand<propto, T_scale>::value)
 	for (size_t n = 0; n < length(sigma); n++)
 	  log_sigma[n] = log(value_of(sigma_vec[n]));
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_scale> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_scale> inv_sigma_sq(length(sigma));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_scale>::value> inv_sigma_sq(length(sigma));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	for (size_t n = 0; n < length(sigma); n++)
 	  inv_sigma[n] = 1 / value_of(sigma_vec[n]);
@@ -87,11 +87,11 @@ namespace stan {
 	for (size_t n = 0; n < length(sigma); n++)
 	  inv_sigma_sq[n] = inv_sigma[n] * inv_sigma[n];
       
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,T_y> log_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
 	for (size_t n = 0; n < length(y); n++)
 	  log_y[n] = log(value_of(y_vec[n]));
-      DoubleVectorView<!is_constant_struct<T_y>::value,T_y> inv_y(length(y));
+      DoubleVectorView<!is_constant_struct<T_y>::value,is_vector<T_y>::value> inv_y(length(y));
       if (!is_constant_struct<T_y>::value)
 	for (size_t n = 0; n < length(y); n++)
 	  inv_y[n] = 1 / value_of(y_vec[n]);
