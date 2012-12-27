@@ -42,6 +42,7 @@ namespace stan {
       static const char* function = "stan::prob::beta_log(%1%)";
 
       using stan::is_constant_struct;
+      using stan::is_vector;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -105,8 +106,8 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
 
 
-      DoubleVectorView<include_summand<propto,T_y,T_scale_succ>::value,T_y> log_y(length(y));
-      DoubleVectorView<include_summand<propto,T_y,T_scale_fail>::value,T_y> log1m_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_scale_succ>::value,is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_scale_fail>::value,is_vector<T_y>::value> log1m_y(length(y));
       
       for (size_t n = 0; n < length(y); n++) {
 	if (include_summand<propto,T_y,T_scale_succ>::value)
@@ -115,8 +116,8 @@ namespace stan {
 	  log1m_y[n] = log1m(value_of(y_vec[n]));
       }
 
-    DoubleVectorView<include_summand<propto,T_scale_succ>::value,T_scale_succ> lgamma_alpha(length(alpha));
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value,T_scale_succ> digamma_alpha(length(alpha));
+      DoubleVectorView<include_summand<propto,T_scale_succ>::value,is_vector<T_scale_succ>::value> lgamma_alpha(length(alpha));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value,is_vector<T_scale_succ>::value> digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
 	if (include_summand<propto,T_scale_succ>::value) 
 	  lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
@@ -125,8 +126,8 @@ namespace stan {
       }
 
 
-      DoubleVectorView<include_summand<propto,T_scale_fail>::value,T_scale_fail> lgamma_beta(length(beta));
-      DoubleVectorView<!is_constant_struct<T_scale_fail>::value,T_scale_fail> digamma_beta(length(beta));
+      DoubleVectorView<include_summand<propto,T_scale_fail>::value,is_vector<T_scale_fail>::value> lgamma_beta(length(beta));
+      DoubleVectorView<!is_constant_struct<T_scale_fail>::value,is_vector<T_scale_fail>::value> digamma_beta(length(beta));
       for (size_t n = 0; n < length(beta); n++) {
 	if (include_summand<propto,T_scale_fail>::value) 
 	  lgamma_beta[n] = lgamma(value_of(beta_vec[n]));
@@ -135,11 +136,9 @@ namespace stan {
       }
 
       DoubleVectorView<include_summand<propto,T_scale_succ,T_scale_fail>::value,
-	double,
 	is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
 	lgamma_alpha_beta(max_size(alpha,beta));
       DoubleVectorView<!is_constant_struct<T_scale_succ>::value||!is_constant_struct<T_scale_fail>::value,
-	double,
 	is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
 	digamma_alpha_beta(max_size(alpha,beta));
       for (size_t n = 0; n < max_size(alpha,beta); n++) {

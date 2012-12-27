@@ -199,8 +199,8 @@ namespace stan {
           using boost::math::tgamma;
           
           // Cache a few expensive function calls if nu is a parameter
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> gamma_vec(stan::length(nu));
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> digamma_vec(stan::length(nu));
+          DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> gamma_vec(stan::length(nu));
+          DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
           if (!is_constant_struct<T_dof>::value) {
               

@@ -102,7 +102,7 @@ namespace stan {
       using stan::math::multiply_log;
       using boost::math::digamma;
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,T_y>
+      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,is_vector<T_y>::value>
 	log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
 	for(size_t n = 0; n < length(y); n++) {
@@ -110,9 +110,9 @@ namespace stan {
 	    log_y[n] = log(value_of(y_vec[n]));
 	}
 
-      DoubleVectorView<include_summand<propto,T_shape>::value,T_shape>
+      DoubleVectorView<include_summand<propto,T_shape>::value,is_vector<T_shape>::value>
 	lgamma_alpha(length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value,T_shape>
+      DoubleVectorView<!is_constant_struct<T_shape>::value,is_vector<T_shape>::value>
 	digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
 	if (include_summand<propto,T_shape>::value)
@@ -121,7 +121,7 @@ namespace stan {
 	  digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
-      DoubleVectorView<include_summand<propto,T_shape,T_inv_scale>::value,T_inv_scale>
+      DoubleVectorView<include_summand<propto,T_shape,T_inv_scale>::value,is_vector<T_inv_scale>::value>
 	log_beta(length(beta));
       if (include_summand<propto,T_shape,T_inv_scale>::value)
 	for (size_t n = 0; n < length(beta); n++)

@@ -202,10 +202,10 @@ namespace stan {
           // Cache a few expensive function calls if nu is a parameter
           double digammaHalf = 0;
           
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> digamma_vec(stan::length(nu));
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> digammaNu_vec(stan::length(nu));
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> digammaNuPlusHalf_vec(stan::length(nu));
-          DoubleVectorView<!is_constant_struct<T_dof>::value, T_dof> betaNuHalf_vec(stan::length(nu));
+          DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+          DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> digammaNu_vec(stan::length(nu));
+          DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> digammaNuPlusHalf_vec(stan::length(nu));
+          DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> betaNuHalf_vec(stan::length(nu));
           
           if (!is_constant_struct<T_dof>::value) {
               
