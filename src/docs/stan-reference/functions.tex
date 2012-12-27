@@ -185,10 +185,10 @@ carried out by first promoting the integer value.
   greater than \farg{y} and 0 otherwise}
 \fitem{int}{operator>=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
   greater than or equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator==}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+\fitem{int}{operator{==}}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
   equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise}
+\fitemindex{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  not equal to \farg{y} and 0 otherwise}{operator"!"=}
 \end{description}
 %
 The real-valued argument versions are identical other than for
@@ -203,10 +203,10 @@ argument type.
   greater than \farg{y} and 0 otherwise}
 \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   greater than or equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator==}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+\fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise}
+\fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  not equal to \farg{y} and 0 otherwise}{operator"!"=}
 \end{description}
 
 
@@ -223,23 +223,22 @@ tightly than the comparisons.  Thus an expression such as
 \Verb/(a~<~b)~||~(((c~>=~d)~&&~(e~!=~f)))/.
 %
 \begin{description}
-\fitem{int}{operator{!}}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}
+\fitemindex{int}{operator!}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
 \fitem{int}{operator{\&\&}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
   is unequal to 0 and \farg{y} is unequal to 0}
-\fitem{int}{operator{||}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0}
+\fitemindex{int}{operator||}{int \farg{x}, int \farg{y}}{1 if \farg{x}
+  is unequal to 0 or \farg{y} is unequal to 0}{operator"|"|}
 \end{description}
 %
 There are corresponding real-argument versions.
 %
 \begin{description}
-\fitem{int}{operator{!}}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise}
+\fitemindex{int}{operator!}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
 \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
   is unequal to 0 and \farg{y} is unequal to 0}
-\fitem{int}{operator{||}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0}
+\fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{1 if \farg{x}
+  is unequal to 0 or \farg{y} is unequal to 0}{operator"|"|}
 \end{description}
-
 
 
 \subsubsection{Boolean Operator Short Circuiting}
@@ -260,7 +259,7 @@ is zero, returns 0 without evaluating \code{b}.
 
 \begin{description}
 %
-\fitem{real}{if\_else}{int cond, real \farg{x}, real \farg{y}}{
+\fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
 \farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise; unlike
 the ternary operator in \Cpp, Stan's \code{if\_else} function always
 evaluates both arguments \farg{x} and \farg{y}}
@@ -915,21 +914,20 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 \begin{description}
   \fitem{matrix}{diag\_pre\_multiply}{vector \farg{v}, matrix
     \farg{m}}{Return the product of the diagonal matrix formed from
-    the vector \code{v} and the matrix \code{m}, i.e.,
-    \code{diag\_matrix(v) * m}.}
+    the vector \farg{v} and the matrix \farg{m}, i.e.,
+    \code{diag\_matrix(\farg{v})~*~\farg{m}}.}
 %
-  \fitem{matrix}{diag\_pre\_multiply}{row\_vector rv, matrix m}{Return
+  \fitem{matrix}{diag\_pre\_multiply}{row\_vector \farg{rv}, matrix \farg{m}}{Return
     the product of the diagonal matrix formed from the vector
-    \code{rv} and the matrix \code{m}, i.e., \code{diag\_matrix(rv) *
-      m}.}
+    \farg{rv} and the matrix \farg{m}, i.e., \code{diag\_matrix(\farg{rv})~*~\farg{m}}.}
 %
-  \fitem{matrix}{diag\_post\_multiply}{matrix m, vector v}{Return the
-    product of the matrix \code{m} and the diagonal matrix formed from
-    the vector \code{v}, i.e., \code{m * diag\_matrix(v)}.}
+  \fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, vector \farg{v}}{Return the
+    product of the matrix \farg{m} and the diagonal matrix formed from
+    the vector \farg{v}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{v})}.}
 %
-\fitem{matrix}{diag\_post\_multiply}{matrix m, row\_vector rv}{Return the
-  product of the matrix \code{m} and the diagonal matrix fromed from
-  the the row vector \code{rv}, i.e., \code{m * diag\_matrix(rv)}.}
+\fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, row\_vector \farg{rv}}{Return the
+  product of the matrix \code{\farg{m}} and the diagonal matrix fromed from
+  the the row vector \code{\farg{rv}}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{rv})}.}
 \end{description}
 
 
@@ -1273,18 +1271,86 @@ $\setlist{0,\ldots,N}$ for some upper bound $N$.
 
 \subsection{Binomial Distribution}
 
-If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
-\{0,\ldots,N\}$,
+Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
+\{0,\ldots,N\}$.  
+
+\subsubsection{Probability mass function}
 \[
 \distro{Binomial}(n|N,\theta)
 = {N \choose n} \theta^n (1 - \theta)^{N - n}.
 \]
 
+\subsubsection{Log probability mass function}
+%
+\begin{eqnarray*}
+\log \distro{Binomial}(n|N,\theta)
+& = &
+\log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1)
+\\[4pt]
+& & { } + n \log \theta + (N - n) \log (1 - \theta), 
+\end{eqnarray*}
+%
+\subsubsection{Gradient of log probability mass function}
+%
+\[
+\frac{\partial}{\partial \theta} \log \distro{Binomial}(n|N,\theta)
+= \frac{n}{\theta}
+- \frac{N - n}{1 - \theta}
+\]
+\subsubsection{Stan Function}
+%
 \begin{description}
 %
-  \fitem{real}{binomial\_log}{int \farg{n}, int \farg{N}, real
+  \fitem{real}{binomial\_log}{ints \farg{n}, ints \farg{N}, reals
     \farg{theta}}{The log binomial probability mass of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
+%
+\end{description}
+
+
+\subsection{Binomial Distribution (Logit Parameterization)}
+
+Stan also provides a version of the binomial probability mass function
+distribution with the chance of success parameterized on the
+unconstrained logistic scale.  
+
+Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
+\{0,\ldots,N\}$.
+
+\subsubsection{Probability mass function}
+\begin{eqnarray*}
+\distro{BinomialLogit}(n|N,\alpha)
+& = & \distro{BinomialLogit}(n|N,\mbox{logit}^{-1}(\alpha))
+\\[6pt]
+& = & {N \choose n} \left( \mbox{logit}^{-1}(\alpha) \right)^{n}
+                    \left( 1 - \mbox{logit}^{-1}(\alpha) \right)^{N - n}.
+\end{eqnarray*}
+%
+\subsubsection{Log probability mass function}
+\begin{eqnarray*}
+\log \distro{BinomialLogit}(n|N,\alpha)
+& = &
+\log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1)
+\\[4pt]
+& & { } + n \log \mbox{logit}^{-1}(\alpha) + (N - n) \log \left( 1 -
+  \mbox{logit}^{-1}(\alpha) \right), 
+\end{eqnarray*}
+%
+\subsubsection{Gradient log probability mass function}
+%
+\[
+\frac{\partial}{\partial \alpha} \log \distro{BinomialLogit}(n|N,\alpha)
+= \frac{n}{\mbox{logit}^{-1}(-\alpha)}
+- \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
+\]
+%
+\subsubsection{Stan Function}
+%
+\begin{description}
+%
+  \fitem{real}{binomial\_logit\_log}{ints \farg{n}, ints \farg{N}, reals
+    \farg{alpha}}{The log binomial probability mass of \farg{n}
+    successes in \farg{N} trials given logit-scaled chance of success \farg{alpha}}
 %
 \end{description}
 
@@ -1332,8 +1398,8 @@ then for $n \in \setlist{0,\ldots,\min(a,N)}$,
 
 \begin{description}
 %
-  \fitem{real}{hypergeometric\_log}{int \farg{n}, int \farg{N}, int
-    \farg{a}, int \farg{b}}{The log hypergeometric probability mass of
+  \fitem{real}{hypergeometric\_log}{ints \farg{n}, ints \farg{N}, ints
+    \farg{a}, ints \farg{b}}{The log hypergeometric probability mass of
     \farg{n} successes in \farg{N} trials given total success count of
     \farg{a} and total failure count of \farg{b}}
 
