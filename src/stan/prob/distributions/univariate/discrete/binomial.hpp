@@ -159,8 +159,8 @@ namespace stan {
           if (!check_bounded(function, theta, 0.0, 1.0, "Probability parameter", &P, Policy()))
               return P;
           
-          if (!(check_consistent_sizes(function, n, N,theta, 
-                                       "Successes variable","Population size parameter","Probability parameter",
+          if (!(check_consistent_sizes(function, n, N, theta, 
+                                       "Successes variable", "Population size parameter", "Probability parameter",
                                        &P, Policy())))
               return P;
           
@@ -191,12 +191,12 @@ namespace stan {
               const double N_dbl = value_of(N_vec[i]);
               const double theta_dbl = value_of(theta_vec[i]);
               
-              const double Pi = ibetac(n_dbl, N_dbl, theta_dbl);
+              const double Pi = ibetac(n_dbl + 1, N_dbl - n_dbl, theta_dbl);
   
               P *= Pi;
               
               if (!is_constant_struct<T_prob>::value)
-                  operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl, N_dbl, theta_dbl) / Pi;
+                  operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl + 1, N_dbl - n_dbl, theta_dbl) / Pi;
               
           }
           
