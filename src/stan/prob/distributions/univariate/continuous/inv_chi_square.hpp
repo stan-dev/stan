@@ -163,6 +163,7 @@ namespace stan {
           using stan::math::value_of;
           using boost::math::gamma_p_derivative;
           using boost::math::gamma_q;
+          using boost::math::gamma;
           using boost::math::digamma;
           
           // Cache a few expensive function calls if nu is a parameter
