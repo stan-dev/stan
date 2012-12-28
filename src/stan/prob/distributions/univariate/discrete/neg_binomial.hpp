@@ -192,10 +192,10 @@ namespace stan {
           using boost::math::digamma;
           
           // Cache a few expensive function calls if alpha is a parameter
-          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> digammaN_vec(stan::length(alpha));
-          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> digammaAlpha_vec(stan::length(alpha));
-          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> digammaSum_vec(stan::length(alpha));
-          DoubleVectorView<!is_constant_struct<T_shape>::value, T_shape> betaFunc_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> digammaN_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> digammaAlpha_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> digammaSum_vec(stan::length(alpha));
+          DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> betaFunc_vec(stan::length(alpha));
           
           if (!is_constant_struct<T_shape>::value) {
               
