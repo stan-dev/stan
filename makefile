@@ -31,7 +31,7 @@ GTEST ?= lib/gtest_1.6.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -O$O -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE
+CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -O$O -Wall -Wextra -pedantic -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
@@ -207,4 +207,5 @@ clean-demo:
 clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
+	cd src/test/gm/model_specs/compiled; $(RM) *.cpp *.o function_signatures[0-9]$(EXE) illegal_generated_quantities illegal_transformed_data illegal_transformed_parameters
 
