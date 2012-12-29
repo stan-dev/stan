@@ -2191,7 +2191,8 @@ transformed parameters {
   rho <- rho / sum(rho);
 }
 model {
-  z ~ normal(0,1); 
+  for (b in 1:beta)
+    z[b] ~ normal(0,1); 
   // implies: rho ~ dirichlet(0.5 * beta * ones)
   ...
 \end{Verbatim}
