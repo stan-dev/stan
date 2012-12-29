@@ -85,8 +85,8 @@ model {
 } 
 "
 
-r <- stanc(model_code = "stanmodelcode", "normal1") 
-# r <- stanc(model_code = stanmodelcode, "normal1") 
+r <- stanc(model_code = "stanmodelcode", model_name = "normal1") 
+# r <- stanc(model_code = stanmodelcode, model_name = "normal1") 
 names(r)
 cat(r$cppcode)
 }}

@@ -45,6 +45,7 @@ parse_stancsv_comments <- function(comments) {
   values[['adaptation_info']] <- adaptation_info 
 
   names1 <- intersect(c("thin", "iter", "warmup", "equal_step_sizes", "chain_id",
+                        "leapfrog_steps",
                         "max_treedepth", "save_warmup"), names)
   names2 <- intersect(c("epsilon", "epsilon_pm", "gamma", "delta"), names) 
   for (z in names1) values[[z]] <- as.integer(values[[z]])
