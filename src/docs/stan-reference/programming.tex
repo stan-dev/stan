@@ -1839,6 +1839,102 @@ Stan code, it is useful to provide a comment indicating what the
 distribution for the parameter implies for the distribution of the
 transformed parameter.
 
+\subsection{Reparameterizing the Cauchy}
+
+Sampling from heavy tailed distributions such as the Cauchy is
+difficult for Hamiltonian Monte Carlo, which operates within a
+Euclidean geometry.%
+\footnote{Riemann-manifold Hamiltonian Monte Carlo (RM-HMC) overcomes
+  this difficulty by simulating the Hamiltonian dynamics in a a space
+  with a position-dependent metric; see
+  \citep{GirolamiCalderhead:2011} and \citep{Betancourt:2012}.}
+
+  
+%
+The practical problem is that tail of the Cauchy
+requires a relatively large step size compared to the trunk.  With a
+small step size, the no-U-turn sampler requires many steps when
+starting in the tail of the distribution; with a large step size,
+there will be too much rejection in the central portion of the
+distribution.  This problem may be mitigated by defining the
+Cauchy-distributed variable as the transform of a uniformly
+distributed variable using the Cauchy inverse cumulative distribution
+function.
+
+Suppose a random variable of interest $X$ has a Cauchy distribution
+with location $\mu$ and scale $\tau$, so that $X \sim
+\distro{Cauchy}(\mu,\tau)$.  The variable $X$ has a cumulative
+distribution function $F_X:\reals \rightarrow (0,1)$ defined by
+\[
+F_X(x) = \frac{1}{\pi} \arctan \left( \frac{x - \mu}{\tau} \right) +
+\frac{1}{2}.
+\]
+The inverse of the cumulative distribution function,
+$F_X^{-1}:(0,1) \rightarrow \reals$, is thus
+%
+\[
+F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( x - \frac{1}{2} \right) \right).
+\]
+Thus if the random variable $Y$ has a unit uniform distribution, $Y
+\sim \distro{Uniform}(0,1)$, then $F^{-1}_X(Y)$ has a Cauchy
+distribution with location $\mu$ and scale $\tau$, i.e., $F^{-1}_X(Y) \sim
+\distro{Cauchy}(\mu,\tau)$. 
+
+Consider a Stan program involving a Cauchy-distributed parameter
+\code{beta}.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real beta;
+  ...
+}
+model {
+  beta ~ cauchy(mu,tau);
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+This declaration of \code{beta} as a parameter may be replaced with a
+transformed parameter \code{beta} defined in terms of a
+uniform-distributed parameter \code{beta\_unif}.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=-pi()/2, upper=pi()/2> beta_unif;
+  ...
+}
+transformed parameters {
+  real beta;
+  beta <- mu + tau * tan(beta_unif);  // beta ~ cauchy(mu,tau)
+}    
+model {
+  beta_unif ~ uniform(-pi()/2, pi()/2);  // not necessary
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+It is more convenient in Stan to transform a uniform variable on
+$(-\pi/2, \pi/2)$ than one on $(0,1)$.  The Cauchy location and scale
+parameters, \code{mu} and \code{tau}, may be defined as data or may
+themselves be parameters.  The variable \code{beta} could also be
+defined as a local variable if it does not need to be included in the
+sampler's output.
+
+The uniform distribution on \code{beta\_unif} is defined explicitly in
+the model block, but it could be safely removed from the program
+without changing sampling behavior.  This is because $\log
+\distro{Uniform}(\beta_{\mbox{\footnotesize unif}}|-\pi/2,\pi/2) =
+-\log \pi$ is a constant and Stan only
+needs the total log probability up to an additive constant.  Stan will spend
+some time checking that that \code{beta\_unif} is between
+\code{-pi()/2} and \code{pi()/2}, but this condition is guaranteed by
+the constraints in the declaration of \code{beta\_unif}.  
+
+
 \subsection{Hierarchical Models}
 
 Unfortunately, the usual situation in applied Bayesian modeling
