@@ -2144,15 +2144,12 @@ while (condition)
 The condition must be an integer or real expression and the body can
 be any statement (or sequence of statements in curly braces).  
 
-Evaluation of a while loop starts by evaluating the condition.
-If the condition evaluates to a true (non-zero) value, the body
-statement is executed, then an attempt is made to execute the entire
-while-loop again.  If the condition evaluates to a false (zero) value
-while-loop statement
-completes.  If the condition evaluates to a non-zero value, the
-statement is executed and control, then the loop is evaluated again,
-starting with the condition.  Thus the while loop executes the
-statement for as many times as the condition evaluates to true.
+Evaluation of a while loop starts by evaluating the condition.  If the
+condition evaluates to a false (zero) value, the execution of the loop
+terminates and control moves to the position after the loop.  If the
+loop's condition evaluates to a true (non-zero) value, the body statement is
+executed, then the whole loop is executed again.  Thus the loop is
+continually executed as long as the condition evaluates to a true value.
 
 
 \section{Statement Blocks and Local Variable Declarations}
