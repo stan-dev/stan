@@ -578,9 +578,9 @@ public:
 	<< "Default policy failed at index: " << n << std::endl
 	<< invalid_params;
     }
-    for (size_t i = 0; i < parameters[0].size(); i++) {
+    if (std::numeric_limits<T0>::has_quiet_NaN && parameters[0].size() > 0) {
       vector<double> invalid_params(parameters[0]);
-      invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
+      invalid_params[0] = std::numeric_limits<double>::quiet_NaN();
     
       T0 p0 = get_param(invalid_params, 0);
       T1 p1 = get_param(invalid_params, 1);
@@ -597,7 +597,205 @@ public:
 	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
 	  }),
 	std::domain_error)
-	<< "Default policy with NaN for parameter: " << i << std::endl
+	<< "Default policy with NaN for parameter: " << 0 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T1>::has_quiet_NaN && parameters[0].size() > 1) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[1] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 1 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T2>::has_quiet_NaN && parameters[0].size() > 2) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[2] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 2 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T3>::has_quiet_NaN && parameters[0].size() > 3) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[3] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 3 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T4>::has_quiet_NaN && parameters[0].size() > 4) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[4] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 4 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T5>::has_quiet_NaN && parameters[0].size() > 5) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[5] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 5 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T6>::has_quiet_NaN && parameters[0].size() > 6) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[6] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 6 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T7>::has_quiet_NaN && parameters[0].size() > 7) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[7] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 7 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T8>::has_quiet_NaN && parameters[0].size() > 8) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[8] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 8 << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<T9>::has_quiet_NaN && parameters[0].size() > 9) {
+      vector<double> invalid_params(parameters[0]);
+      invalid_params[9] = std::numeric_limits<double>::quiet_NaN();
+    
+      T0 p0 = get_param(invalid_params, 0);
+      T1 p1 = get_param(invalid_params, 1);
+      T2 p2 = get_param(invalid_params, 2);
+      T3 p3 = get_param(invalid_params, 3);
+      T4 p4 = get_param(invalid_params, 4);
+      T5 p5 = get_param(invalid_params, 5);
+      T6 p6 = get_param(invalid_params, 6);
+      T7 p7 = get_param(invalid_params, 7);
+      T8 p8 = get_param(invalid_params, 8);
+      T9 p9 = get_param(invalid_params, 9);
+    
+      EXPECT_THROW( ({
+	    call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	  }),
+	std::domain_error)
+	<< "Default policy with NaN for parameter: " << 9 << std::endl
 	<< invalid_params;
     }
   }

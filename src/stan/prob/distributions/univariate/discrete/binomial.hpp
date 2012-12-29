@@ -85,7 +85,7 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      DoubleVectorView<true,T_prob> log1m_theta(length(theta));
+      DoubleVectorView<true,is_vector<T_prob>::value> log1m_theta(length(theta));
       for (size_t i = 0; i < length(theta); ++i)
         log1m_theta[i] = log1m(value_of(theta_vec[i]));
 
@@ -221,11 +221,11 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      DoubleVectorView<true,T_prob> log_inv_logit_alpha(length(alpha));
+      DoubleVectorView<true,is_vector<T_prob>::value> log_inv_logit_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_alpha[i] = log_inv_logit(value_of(alpha_vec[i]));
 
-      DoubleVectorView<true,T_prob> log_inv_logit_neg_alpha(length(alpha));
+      DoubleVectorView<true,is_vector<T_prob>::value> log_inv_logit_neg_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_neg_alpha[i] = log_inv_logit(-value_of(alpha_vec[i]));
 
@@ -310,7 +310,7 @@ namespace stan {
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
-        return 0.0;
+          return 0.0;
           
       double P(1.0);
           
@@ -331,13 +331,10 @@ namespace stan {
                          "Probability parameter", &P, Policy()))
         return P;
           
-      if (!(check_consistent_sizes(function, n, N,theta, 
-                                   "Successes variable",
-                                   "Population size parameter",
-                                   "Probability parameter",
-                                   &P, Policy())))
-        return P;
-          
+      if (!(check_consistent_sizes(function, n, N, theta, 
+                                    "Successes variable", "Population size parameter", "Probability parameter",
+                                    &P, Policy())))
+          return P;
           
       // Return if everything constant and propto
       if (!include_summand<propto,T_prob>::value)
@@ -366,13 +363,14 @@ namespace stan {
         const double N_dbl = value_of(N_vec[i]);
         const double theta_dbl = value_of(theta_vec[i]);
               
-        const double Pi = ibetac(n_dbl, N_dbl, theta_dbl);
-  
+
+        const double Pi = ibetac(n_dbl + 1, N_dbl - n_dbl, theta_dbl);
+
         P *= Pi;
-              
+
         if (!is_constant_struct<T_prob>::value)
-          operands_and_partials.d_x1[i] 
-            -=  ibeta_derivative(n_dbl, N_dbl, theta_dbl) / Pi;
+            operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl + 1, N_dbl - n_dbl, theta_dbl) / Pi;
+          
               
       }
           
