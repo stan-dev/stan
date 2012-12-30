@@ -10,7 +10,7 @@ using std::numeric_limits;
 class ProbDistributionsScaledChiSquare : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+                    vector<double>& log_prob) {
     vector<double> param(3);
 
     param[0] = 12.7;          // y
@@ -27,7 +27,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+                      vector<double>& value) {
     // y
     
     // nu
@@ -57,8 +57,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsScaledChiSquare,
-			      DistributionTestFixture,
-			      ProbDistributionsScaledChiSquare);
+                              DistributionTestFixture,
+                              ProbDistributionsScaledChiSquare);
 
 TEST(ProbDistributionsScaledInvChiSquareCDF, Values) {
     EXPECT_FLOAT_EQ(0.37242326, stan::prob::scaled_inv_chi_square_cdf(4.39, 1.349, 1.984));

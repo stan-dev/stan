@@ -33,14 +33,14 @@ TYPED_TEST_P(DistributionTestFixture, check_valid) {
     double expected_value = expected_values[n];
 
     EXPECT_FLOAT_EQ(expected_value,
-		    _LOG_PROB_<false>(params[0],
-				      params[1]))
+                    _LOG_PROB_<false>(params[0],
+                                      params[1]))
       << "Failed at index: " << n << std::endl
       << "(" << params[0] << ", " << params[1] << ")" << std::endl;
     
     EXPECT_FLOAT_EQ(0.0,
-		    _LOG_PROB_<true>(params[0],
-				     params[1]))
+                    _LOG_PROB_<true>(params[0],
+                                     params[1]))
       << "Failed at index: " << n << std::endl
       << "(" << params[0] << ", " << params[1] << ")" << std::endl;
   }
@@ -60,16 +60,16 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
     invalid_params[index[n]] = invalid_values[n];
 
     EXPECT_THROW(_LOG_PROB_<false>(invalid_params[0], 
-				   invalid_params[1]),
-		 std::domain_error)
+                                   invalid_params[1]),
+                 std::domain_error)
       << "Default policy. "
       << "Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << ", " << invalid_params[1] << ")" << std::endl;
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
-							  invalid_params[1],
-							  errno_policy()))
+                                                          invalid_params[1],
+                                                          errno_policy()))
       << "errno policy. "
       << "Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << ", " << invalid_params[1] << ")" << std::endl;
@@ -85,15 +85,15 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
     invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
     
     EXPECT_THROW(_LOG_PROB_<false>(invalid_params[0], 
-				   invalid_params[1]),
-		 std::domain_error)
+                                   invalid_params[1]),
+                 std::domain_error)
       << "Default policy with NaN for parameter: " << i
       << "(" << invalid_params[0] << ", " << invalid_params[1] << ")" << std::endl;
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
-							  invalid_params[1],
-							  errno_policy()))
+                                                          invalid_params[1],
+                                                          errno_policy()))
       << "errno policy with NaN for parameter: " << i
       << "(" << invalid_params[0] << ", " << invalid_params[1] << ")" << std::endl;
     
@@ -117,7 +117,7 @@ TYPED_TEST_P(DistributionTestFixture, valid_vector) {
     param2.push_back(parameters[n][1]);
   }
   EXPECT_FLOAT_EQ(stan::math::sum(expected_values),
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector) {
@@ -129,7 +129,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector) {
   param1.assign(N_repeat, parameters[0]);
   param2.assign(N_repeat, parameters[1]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_double) {
@@ -142,7 +142,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_double) {
   param1.assign(N_repeat, parameters[0]);
   param2 = parameters[1];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_vector) {
@@ -155,7 +155,7 @@ TYPED_TEST_P(DistributionTestFixture, double_vector) {
   param1 = parameters[0];
   param2.assign(N_repeat, parameters[1]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double) {
@@ -166,7 +166,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double) {
   param1 = parameters[0];
   param2 = parameters[1];
   EXPECT_FLOAT_EQ(expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 
@@ -187,8 +187,7 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
     << "Should throw error with sizes (" 
     << param1.size() << ", " << param2.size() << ")";
   
-  double log_prob;
-  (void)log_prob;
+  double log_prob = 0.0;
   EXPECT_NO_THROW(log_prob = _LOG_PROB_<false>(param1, param2, errno_policy()));
   
   EXPECT_TRUE(std::isnan(log_prob))
@@ -204,7 +203,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix) {
   param1.setConstant(parameters[0]);
   param2.setConstant(parameters[1]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_double) {
@@ -217,7 +216,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_double) {
   param1.setConstant(parameters[0]);
   param2 = parameters[1];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix) {
@@ -230,21 +229,21 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix) {
   param1 = parameters[0];
   param2.setConstant(parameters[1]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2));
+                  _LOG_PROB_<false>(param1, param2));
 }
 
 REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
-			   call_all_versions,
-			   check_valid,
-			   check_invalid,
-			   valid_vector,
-			   vector_vector,
-			   vector_double,
-			   double_vector,
-			   double_double,
-			   invalid_different_vector_sizes,
-			   matrix_matrix,
-			   matrix_double,
-			   double_matrix);
+                           call_all_versions,
+                           check_valid,
+                           check_invalid,
+                           valid_vector,
+                           vector_vector,
+                           vector_double,
+                           double_vector,
+                           double_double,
+                           invalid_different_vector_sizes,
+                           matrix_matrix,
+                           matrix_double,
+                           double_matrix);
 
 #endif

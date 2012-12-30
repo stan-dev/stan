@@ -12,7 +12,7 @@ using std::numeric_limits;
 class ProbDistributionsBinomial : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+                    vector<double>& log_prob) {
     vector<double> param(3);
 
     param[0] = 10;           // n
@@ -29,7 +29,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+                      vector<double>& value) {
     // n
     index.push_back(0U);
     value.push_back(-1);
@@ -50,8 +50,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBinomial,
-			      DistributionTestFixture,
-			      ProbDistributionsBinomial);
+                              DistributionTestFixture,
+                              ProbDistributionsBinomial);
 
 TEST(ProbDistributionsBinomialCDF,Values) {
     EXPECT_FLOAT_EQ(0.042817421, stan::prob::binomial_cdf(24, 54, 0.57));

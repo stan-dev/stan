@@ -108,7 +108,7 @@ namespace stan {
 
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
-  size_t length(const T& x) {
+  size_t length(const T& /*x*/) {
     return 1U;
   }
   template <typename T>
@@ -127,7 +127,7 @@ namespace stan {
 
   template<typename T, bool is_vec>
   struct size_of_helper {
-    static size_t size_of(const T& x) {
+    static size_t size_of(const T& /*x*/) {
       return 1U;
     }
   };

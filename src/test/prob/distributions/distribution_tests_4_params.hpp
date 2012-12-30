@@ -35,19 +35,19 @@ TYPED_TEST_P(DistributionTestFixture, check_valid) {
     double expected_value = expected_values[n];
 
     EXPECT_FLOAT_EQ(expected_value,
-		    _LOG_PROB_<false>(params[0],
-				      params[1],
-				      params[2],
-				      params[3]))
+                    _LOG_PROB_<false>(params[0],
+                                      params[1],
+                                      params[2],
+                                      params[3]))
       << "Failed at index: " << n << std::endl
       << "(" << params[0] << ", " << params[1] 
       << ", "<< params[2] << ", " << params[3] << ")" << std::endl;
     
     EXPECT_FLOAT_EQ(0.0,
-		    _LOG_PROB_<true>(params[0],
-				     params[1],
-				     params[2],
-				     params[3]))
+                    _LOG_PROB_<true>(params[0],
+                                     params[1],
+                                     params[2],
+                                     params[3]))
       << "Failed at index: " << n << std::endl
       << "(" << params[0] << ", " << params[1] 
       << ", "<< params[2] << ", " << params[3] << ")" << std::endl;
@@ -68,10 +68,10 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
     invalid_params[index[n]] = invalid_values[n];
 
     EXPECT_THROW(_LOG_PROB_<false>(invalid_params[0], 
-				   invalid_params[1],
-				   invalid_params[2],
-				   invalid_params[3]),
-		 std::domain_error)
+                                   invalid_params[1],
+                                   invalid_params[2],
+                                   invalid_params[3]),
+                 std::domain_error)
       << "Default policy. "
       << "Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << ", " << invalid_params[1] 
@@ -79,10 +79,10 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
-							  invalid_params[1],
-							  invalid_params[2],
-							  invalid_params[3],
-							  errno_policy()))
+                                                          invalid_params[1],
+                                                          invalid_params[2],
+                                                          invalid_params[3],
+                                                          errno_policy()))
       << "errno policy. "
       << "Failed at index: " << n << std::endl
       << "(" << invalid_params[0] << ", " << invalid_params[1] 
@@ -100,20 +100,20 @@ TYPED_TEST_P(DistributionTestFixture, check_invalid) {
     invalid_params[i] = std::numeric_limits<double>::quiet_NaN();
     
     EXPECT_THROW(_LOG_PROB_<false>(invalid_params[0], 
-				   invalid_params[1],
-				   invalid_params[2],
-				   invalid_params[3]),
-		 std::domain_error)
+                                   invalid_params[1],
+                                   invalid_params[2],
+                                   invalid_params[3]),
+                 std::domain_error)
       << "Default policy with NaN for parameter: " << i
       << "(" << invalid_params[0] << ", " << invalid_params[1] 
       << ", "<< invalid_params[2] << invalid_params[3] << ")" << std::endl;
 
     double expected_log_prob = 0.0;
     EXPECT_NO_THROW(expected_log_prob = _LOG_PROB_<false>(invalid_params[0], 
-							  invalid_params[1],
-							  invalid_params[2],
-							  invalid_params[3],
-							  errno_policy()))
+                                                          invalid_params[1],
+                                                          invalid_params[2],
+                                                          invalid_params[3],
+                                                          errno_policy()))
       << "errno policy with NaN for parameter: " << i
       << "(" << invalid_params[0] << ", " << invalid_params[1] 
       << ", "<< invalid_params[2] << invalid_params[3] << ")" << std::endl;
@@ -140,7 +140,7 @@ TYPED_TEST_P(DistributionTestFixture, valid_vector) {
     param4.push_back(parameters[n][3]);
   }
   EXPECT_FLOAT_EQ(stan::math::sum(expected_values),
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_vector_vector) {
@@ -154,7 +154,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_vector_vector) {
   param3.assign(N_repeat, parameters[2]);
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_vector_double) {
@@ -169,7 +169,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_vector_double) {
   param3.assign(N_repeat, parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_double_vector) {
@@ -184,7 +184,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_double_vector) {
   param3 = parameters[2];
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_vector_double_double) {
@@ -199,7 +199,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_vector_double_double) {
   param3 = parameters[2];
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_double_vector_vector) {
@@ -214,7 +214,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_double_vector_vector) {
   param3.assign(N_repeat, parameters[2]);
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_double_vector_double) {
@@ -229,7 +229,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_double_vector_double) {
   param3.assign(N_repeat, parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, vector_double_double_vector) {
@@ -244,7 +244,7 @@ TYPED_TEST_P(DistributionTestFixture, vector_double_double_vector) {
   param3 = parameters[2];
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 
@@ -261,7 +261,7 @@ TYPED_TEST_P(DistributionTestFixture, double_vector_vector_vector) {
   param3.assign(N_repeat, parameters[2]);
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_vector_vector_double) {
@@ -277,7 +277,7 @@ TYPED_TEST_P(DistributionTestFixture, double_vector_vector_double) {
   param3.assign(N_repeat, parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_vector_double_vector) {
@@ -294,7 +294,7 @@ TYPED_TEST_P(DistributionTestFixture, double_vector_double_vector) {
   param3 = parameters[2];
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_vector_double_double) {
@@ -311,7 +311,7 @@ TYPED_TEST_P(DistributionTestFixture, double_vector_double_double) {
   param3 = parameters[2];
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_vector_vector) {
@@ -327,7 +327,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double_vector_vector) {
   param3.assign(N_repeat, parameters[2]);
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_vector_double) {
@@ -343,7 +343,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double_vector_double) {
   param3.assign(N_repeat, parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_double_vector) {
@@ -359,7 +359,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double_double_vector) {
   param3 = parameters[2];
   param4.assign(N_repeat, parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 
@@ -372,7 +372,7 @@ TYPED_TEST_P(DistributionTestFixture, invalid_different_vector_sizes) {
   
   vector<double> params = parameters[0];
   vector<double> param1, param2, param3, param4;
-  double log_prob;
+  double log_prob = 0.0;
 
   param1.assign(1U, params[0]);
   param2.assign(10U,  params[1]);
@@ -446,7 +446,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix_matrix) {
   param3.setConstant(parameters[2]);
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix_double) {
@@ -461,7 +461,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_matrix_double) {
   param3.setConstant(parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double_matrix) {
@@ -476,7 +476,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double_matrix) {
   param3 = parameters[2];
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double_double) {
@@ -491,7 +491,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_matrix_double_double) {
   param3 = parameters[2];
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix_matrix) {
@@ -507,7 +507,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix_matrix) {
   param3.setConstant(parameters[2]);
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix_double) {
@@ -523,7 +523,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_double_matrix_double) {
   param3.setConstant(parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, matrix_double_double_matrix) {
@@ -539,7 +539,7 @@ TYPED_TEST_P(DistributionTestFixture, matrix_double_double_matrix) {
   param3 = parameters[2];
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix_matrix) {
@@ -554,7 +554,7 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix_matrix) {
   param3.setConstant(parameters[2]);
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix_double) {
@@ -570,7 +570,7 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix_matrix_double) {
   param3.setConstant(parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix_double_matrix) {
@@ -586,7 +586,7 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix_double_matrix) {
   param3 = parameters[2];
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_matrix_double_double) {
@@ -602,7 +602,7 @@ TYPED_TEST_P(DistributionTestFixture, double_matrix_double_double) {
   param3 = parameters[2];
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_matrix_matrix) {
@@ -617,7 +617,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double_matrix_matrix) {
   param3.setConstant(parameters[2]);
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_matrix_double) {
@@ -632,7 +632,7 @@ TYPED_TEST_P(DistributionTestFixture, double_double_matrix_double) {
   param3.setConstant(parameters[2]);
   param4 = parameters[3];
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 TYPED_TEST_P(DistributionTestFixture, double_double_double_matrix) {
@@ -647,44 +647,44 @@ TYPED_TEST_P(DistributionTestFixture, double_double_double_matrix) {
   param3 = parameters[2];
   param4.setConstant(parameters[3]);
   EXPECT_FLOAT_EQ(N_repeat * expected_value,
-		  _LOG_PROB_<false>(param1, param2, param3, param4));
+                  _LOG_PROB_<false>(param1, param2, param3, param4));
 }
 
 
 REGISTER_TYPED_TEST_CASE_P(DistributionTestFixture,
-			   call_all_versions,
-			   check_valid,
-			   check_invalid,
-			   valid_vector,
-			   vector_vector_vector_vector,
-			   vector_vector_vector_double,
-			   vector_vector_double_vector,
-			   vector_vector_double_double,
-			   vector_double_vector_vector,
-			   vector_double_vector_double,
-			   vector_double_double_vector,
-			   double_vector_vector_vector,
-			   double_vector_vector_double,
-			   double_vector_double_vector,
-			   double_vector_double_double,
-			   double_double_vector_vector,
-			   double_double_vector_double,
-			   double_double_double_vector,
-			   invalid_different_vector_sizes,
-			   matrix_matrix_matrix_matrix,
-			   matrix_matrix_matrix_double,
-			   matrix_matrix_double_matrix,
-			   matrix_matrix_double_double,
-			   matrix_double_matrix_matrix,
-			   matrix_double_matrix_double,
-			   matrix_double_double_matrix,
-			   double_matrix_matrix_matrix,
-			   double_matrix_matrix_double,
-			   double_matrix_double_matrix,
-			   double_matrix_double_double,
-			   double_double_matrix_matrix,
-			   double_double_matrix_double,
-			   double_double_double_matrix);
+                           call_all_versions,
+                           check_valid,
+                           check_invalid,
+                           valid_vector,
+                           vector_vector_vector_vector,
+                           vector_vector_vector_double,
+                           vector_vector_double_vector,
+                           vector_vector_double_double,
+                           vector_double_vector_vector,
+                           vector_double_vector_double,
+                           vector_double_double_vector,
+                           double_vector_vector_vector,
+                           double_vector_vector_double,
+                           double_vector_double_vector,
+                           double_vector_double_double,
+                           double_double_vector_vector,
+                           double_double_vector_double,
+                           double_double_double_vector,
+                           invalid_different_vector_sizes,
+                           matrix_matrix_matrix_matrix,
+                           matrix_matrix_matrix_double,
+                           matrix_matrix_double_matrix,
+                           matrix_matrix_double_double,
+                           matrix_double_matrix_matrix,
+                           matrix_double_matrix_double,
+                           matrix_double_double_matrix,
+                           double_matrix_matrix_matrix,
+                           double_matrix_matrix_double,
+                           double_matrix_double_matrix,
+                           double_matrix_double_double,
+                           double_double_matrix_matrix,
+                           double_double_matrix_double,
+                           double_double_double_matrix);
 
 
 #endif

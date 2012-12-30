@@ -754,7 +754,7 @@ namespace stan {
         op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
           vari(f),
           size_(vs.size()) {
-          vis_ = (vari**) operator new(sizeof(vari*[vs.size()]));
+          vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 
           for (size_t i = 0; i < vs.size(); ++i)
             vis_[i] = vs[i].vi_;
         }
@@ -1658,11 +1658,9 @@ namespace stan {
      * <code>var temp = a;  a = a + 1.0;  return temp;</code>
      *
      * @param a Variable to increment.
-     * @param dummy Unused dummy variable used to distinguish postfix operator
-     * from prefix operator.
      * @return Input variable. 
      */
-    inline var operator++(var& a, int dummy) {
+    inline var operator++(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new increment_vari(a.vi_);
       return temp;
@@ -1695,11 +1693,9 @@ namespace stan {
      * <code>var temp = a;  a = a - 1.0;  return temp;</code>
      *
      * @param a Variable to decrement.
-     * @param dummy Unused dummy variable used to distinguish suffix operator
-     * from prefix operator.
      * @return Input variable. 
      */
-    inline var operator--(var& a, int dummy) {
+    inline var operator--(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new decrement_vari(a.vi_);
       return temp;

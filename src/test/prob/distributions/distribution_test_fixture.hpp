@@ -32,14 +32,14 @@ public:
    * Subclasses should define this function.
    *
    */
-  virtual void valid_values(vector<vector<double> >& parameters, 
-			    vector<double>& log_prob) {
+  virtual void valid_values(vector<vector<double> >& /*parameters*/, 
+                            vector<double>& /*log_prob*/) {
     throw std::runtime_error("valid_values() not implemented");
   }
   
   // don't need to list nan. checked by the test.
-  virtual void invalid_values(vector<size_t>& index, 
-			      vector<double>& value) {
+  virtual void invalid_values(vector<size_t>& /*index*/, 
+                              vector<double>& /*value*/) {
     throw std::runtime_error("valid_values() not implemented");
   }
 
@@ -76,28 +76,28 @@ public:
   /**
    * Subclasses should define this function.
    */
-  virtual void valid_values(vector<vector<double> >& parameters, 
-			    vector<double>& log_prob) {
+  virtual void valid_values(vector<vector<double> >& /*parameters*/, 
+                            vector<double>& /*log_prob*/) {
     throw std::runtime_error("valid_values() not implemented");
   }
 
   /**
    * Subclasses should define this function.
    */
-  virtual void zero_values(vector<vector<double> >& parameters) {
+  virtual void zero_values(vector<vector<double> >& /*parameters*/) {
     throw std::runtime_error("zero_values() not implemented");
   }
 
   /**
    * Subclasses should define this function.
    */
-  virtual void one_values(vector<vector<double> >& parameters) {
+  virtual void one_values(vector<vector<double> >& /*parameters*/) {
     throw std::runtime_error("one_values() not implemented");
   }
   
   // don't need to list nan. checked by the test.
-  virtual void invalid_values(vector<size_t>& index, 
-			      vector<double>& value) {
+  virtual void invalid_values(vector<size_t>& /*index*/, 
+                              vector<double>& /*value*/) {
     throw std::runtime_error("valid_values() not implemented");
   }
 

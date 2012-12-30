@@ -54,8 +54,8 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicySigma) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 9.0, -3.0, -3.0, 4.0;
   
-  double result;
-  EXPECT_NO_THROW(result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  double result = 0.0;
+  EXPECT_NO_THROW(result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_FALSE(std::isnan(result));
 
   // non-symmetric
@@ -91,7 +91,7 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicyMu) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   
-  double result;
+  double result = 0.0;
   EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_FALSE(std::isnan(result));
 
@@ -159,13 +159,13 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicySigmaMultiRow) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 9.0, -3.0, -3.0, 4.0;
   
-  double result;
-  EXPECT_NO_THROW(result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  double result = 0.0;
+  EXPECT_NO_THROW(result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_FALSE(std::isnan(result));
 
   // non-symmetric
   Sigma(0, 1) = -2.5;
-  EXPECT_NO_THROW(result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_NO_THROW(result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_TRUE(std::isnan(result)) << "non-symmetric Sigma should return nan.";
 }
 TEST(ProbDistributionsMultiNormal,DefaultPolicyMuMultiRow) {
@@ -196,17 +196,17 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicyMuMultiRow) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   
-  double result;
-  EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  double result = 0.0;
+  EXPECT_NO_THROW (result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_FALSE(std::isnan(result));
 
   mu(0) = std::numeric_limits<double>::infinity();
-  EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_TRUE(std::isnan(result)) << "mu value of infinity should result in nan: " << result;
   mu(0) = -std::numeric_limits<double>::infinity();
-  EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_TRUE(std::isnan(result)) << "mu value of -infinity should result in nan: " << result;
   mu(0) = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_NO_THROW (result=stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
+  EXPECT_NO_THROW (result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_TRUE(std::isnan(result)) << "mu value of nan should result in nan: " << result;
 }

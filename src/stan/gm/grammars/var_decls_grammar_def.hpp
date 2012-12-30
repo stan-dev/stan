@@ -109,7 +109,7 @@ namespace stan {
       validate_no_constraints_vis(std::stringstream& error_msgs)
         : error_msgs_(error_msgs) { 
       }
-      bool operator()(const nil& x) const { 
+      bool operator()(const nil& /*x*/) const { 
         error_msgs_ << "nil declarations not allowed";
         return false; // fail if arises
       } 
@@ -129,36 +129,36 @@ namespace stan {
         }
         return true;
       }
-      bool operator()(const vector_var_decl& x) const {
+      bool operator()(const vector_var_decl& /*x*/) const {
         return true;
       }
-      bool operator()(const row_vector_var_decl& x) const {
+      bool operator()(const row_vector_var_decl& /*x*/) const {
         return true;
       }
-      bool operator()(const matrix_var_decl& x) const {
+      bool operator()(const matrix_var_decl& /*x*/) const {
         return true;
       }
-      bool operator()(const simplex_var_decl& x) const {
+      bool operator()(const simplex_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found simplex." << std::endl;
         return false;
       }
-      bool operator()(const ordered_var_decl& x) const {
+      bool operator()(const ordered_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found ordered." << std::endl;
         return false;
       }
-      bool operator()(const positive_ordered_var_decl& x) const {
+      bool operator()(const positive_ordered_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found positive_ordered." << std::endl;
         return false;
       }
-      bool operator()(const cov_matrix_var_decl& x) const {
+      bool operator()(const cov_matrix_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found cov_matrix." << std::endl;
         return false;
       }
-      bool operator()(const corr_matrix_var_decl& x) const {
+      bool operator()(const corr_matrix_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found corr_matrix." << std::endl;
         return false;
@@ -173,13 +173,13 @@ namespace stan {
         : error_msgs_(error_msgs),
           var_map_(var_map) {
       }
-      bool operator()(const nil& e) const {
+      bool operator()(const nil& /*e*/) const {
         return true;
       }
-      bool operator()(const int_literal& x) const {
+      bool operator()(const int_literal& /*x*/) const {
         return true;
       }
-      bool operator()(const double_literal& x) const {
+      bool operator()(const double_literal& /*x*/) const {
         return true;
       }
       bool operator()(const array_literal& x) const {
@@ -433,7 +433,7 @@ namespace stan {
     struct empty_range {
       template <typename T1>
       struct result { typedef range type; };
-      range operator()(std::stringstream& error_msgs) const {
+      range operator()(std::stringstream& /*error_msgs*/) const {
         return range();
       }
     };

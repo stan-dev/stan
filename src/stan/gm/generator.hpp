@@ -111,7 +111,7 @@ namespace stan {
     }
 
     void generate_type(const std::string& base_type,
-                       const std::vector<expression>& dims,
+                       const std::vector<expression>& /*dims*/,
                        size_t end,
                        std::ostream& o) {
       for (size_t i = 0; i < end; ++i) o << "std::vector<";
@@ -131,7 +131,7 @@ namespace stan {
 
     struct expression_visgen : public visgen {
       expression_visgen(std::ostream& o) : visgen(o) {  }
-      void operator()(nil const& x) const { 
+      void operator()(nil const& /*x*/) const { 
         o_ << "nil";
       }
       void operator()(const int_literal& n) const { o_ << n.val_; }
@@ -341,7 +341,7 @@ namespace stan {
         : visgen(o),
           stage_(stage) {
       }
-      void operator()(nil const& x) const { } // dummy
+      void operator()(nil const& /*x*/) const { } // dummy
       void operator()(int_var_decl const& x) const {
         generate_validate_context_size(o_,stage_,x.name_,"int",x.dims_);
       }
@@ -393,7 +393,7 @@ namespace stan {
       var_resizing_visgen(std::ostream& o) 
         : visgen(o) {
       }
-      void operator()(nil const& x) const { } // dummy
+      void operator()(nil const& /*x*/) const { } // dummy
       void operator()(int_var_decl const& x) const {
         generate_initialization(o_,x.name_,"int",x.dims_);
       }
@@ -466,7 +466,7 @@ namespace stan {
           read_args.push_back(dim_args[i]);
         generate_initialize_array(base_type,read_fun,read_args,x.name_,x.dims_);
       }
-      void operator()(const nil& x) const { }
+      void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
         generate_initialize_array("int","integer",EMPTY_EXP_VECTOR,x.name_,x.dims_);
       }      
@@ -640,7 +640,7 @@ namespace stan {
         for (size_t i = 0; i < dims_size; ++i)
           o_ << "[k" << i << "__]";
       }
-      void operator()(nil const& x) const { }
+      void operator()(nil const& /*x*/) const { }
       template <typename T>
       void basic_validate(T const& x) const {
         if (!(x.range_.has_low() || x.range_.has_high()))
@@ -739,7 +739,7 @@ namespace stan {
         : visgen(o),
           indents_(indents) {
       }
-      void operator()(nil const& x) const { }
+      void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         declare_array("int",x.name_,x.dims_.size());
       }
@@ -807,7 +807,7 @@ namespace stan {
           indents_(indents),
           is_var_(is_var) {
       }
-      void operator()(nil const& x) const { }
+      void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         std::vector<expression> ctor_args;
         declare_array("int",ctor_args,x.name_,x.dims_);
@@ -942,7 +942,7 @@ namespace stan {
         : visgen(o),
           indent_(indent) {
       }
-      void operator()(nil const& x) const { }
+      void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         generate_indent(indent_,o_);
         o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
@@ -1006,7 +1006,7 @@ namespace stan {
         : visgen(o),
           indents_(indents) 
       { }
-      void operator()(nil const& x) const { }
+      void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         validate_array(x.name_,dims,0);
@@ -1131,7 +1131,7 @@ namespace stan {
           include_sampling_(include_sampling),
           is_var_(is_var) {
       }
-      void operator()(nil const& x) const { 
+      void operator()(nil const& /*x*/) const { 
       }
       void operator()(assignment const& x) const {
         generate_indent(indent_,o_);
@@ -1290,8 +1290,7 @@ namespace stan {
         }
         o_ << EOL;
       }
-      void operator()(const no_op_statement& x) const {
-        // called no_op for a reason
+      void operator()(const no_op_statement& /*x*/) const {
       }
     };
 
@@ -1405,7 +1404,7 @@ namespace stan {
           var_resizer_(var_resizing_visgen(o)),
           var_size_validator_(var_size_validating_visgen(o,"data initialization")) {
       }
-      void operator()(nil const& x) const { } // dummy
+      void operator()(nil const& /*x*/) const { } // dummy
       void operator()(int_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
@@ -1802,7 +1801,7 @@ namespace stan {
         : visgen(o),
           var_size_validator_(o,"initialization") {
       }
-      void operator()(nil const& x) const { } // dummy
+      void operator()(nil const& /*x*/) const { } // dummy
       void operator()(int_var_decl const& x) const {
         generate_check_int(x.name_,x.dims_.size());
         var_size_validator_(x);
@@ -1989,7 +1988,7 @@ namespace stan {
         }
         generate_indent(2U + dims.size(),o_);
       }
-      void generate_check_int(const std::string& name, size_t n) const {
+      void generate_check_int(const std::string& name, size_t /*n*/) const {
         o_ << EOL << INDENT2
            << "if (!(context__.contains_i(\"" << name << "\")))"
            << EOL << INDENT3
@@ -1997,7 +1996,7 @@ namespace stan {
         o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << name << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0U;" << EOL;
       }
-      void generate_check_double(const std::string& name, size_t n) const {
+      void generate_check_double(const std::string& name, size_t /*n*/) const {
         o_ << EOL << INDENT2
            << "if (!(context__.contains_r(\"" << name << "\")))"
            << EOL << INDENT3
@@ -2035,7 +2034,7 @@ namespace stan {
       write_dims_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const  { }
+      void operator()(const nil& /*x*/) const  { }
       void operator()(const int_var_decl& x) const {
         generate_dims_array(EMPTY_EXP_VECTOR,x.dims_);
       }
@@ -2139,7 +2138,7 @@ namespace stan {
       write_param_names_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const  { }
+      void operator()(const nil& /*x*/) const  { }
       void operator()(const int_var_decl& x) const {
         generate_param_names(x.name_);
       }
@@ -2213,7 +2212,7 @@ namespace stan {
       write_csv_header_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const  { }
+      void operator()(const nil& /*x*/) const  { }
       void operator()(const int_var_decl& x) const {
         generate_csv_header_array(EMPTY_EXP_VECTOR,x.name_,x.dims_);
       }
@@ -2348,7 +2347,7 @@ namespace stan {
           read_args.push_back(dim_args[i]);
         generate_initialize_array(base_type,read_fun,read_args,x.name_,x.dims_);
       }
-      void operator()(const nil& x) const { }
+      void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
         generate_initialize_array("int","integer",EMPTY_EXP_VECTOR,
                                   x.name_,x.dims_);
@@ -2472,7 +2471,7 @@ namespace stan {
       write_csv_vars_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const { }
+      void operator()(const nil& /*x*/) const { }
       // FIXME: template these out
       void operator()(const int_var_decl& x) const {
         write_array(x.name_,x.dims_);
@@ -2609,7 +2608,7 @@ namespace stan {
       write_array_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const { }
+      void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
         generate_initialize_array("int","integer",EMPTY_EXP_VECTOR,
                                   x.name_,x.dims_);
@@ -2759,7 +2758,7 @@ namespace stan {
       write_array_vars_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const { }
+      void operator()(const nil& /*x*/) const { }
       // FIXME: template these out
       void operator()(const int_var_decl& x) const {
         write_array(x.name_,x.dims_,EMPTY_EXP_VECTOR);
@@ -2931,7 +2930,7 @@ namespace stan {
       set_param_ranges_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(const nil& x) const { }
+      void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
         generate_increment_i(x.dims_);
         // for loop for ranges

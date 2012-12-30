@@ -128,7 +128,7 @@ namespace Eigen {
       ReadCost = 1,
       AddCost = 1,
       MulCost = 1,
-      HasFloatingPoint = 1,
+      HasFloatingPoint = 1
     };
   };
 
@@ -213,12 +213,12 @@ namespace Eigen {
       typedef stan::agrad::var RhsScalar;
       typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
       static void run(Index rows, Index cols, Index depth,
-                      const LhsScalar* _lhs, Index lhsStride,
-                      const RhsScalar* _rhs, Index rhsStride,
-                      ResScalar* res, Index resStride,
-                      const ResScalar &alpha,
-                      level3_blocking<LhsScalar,RhsScalar>& blocking,
-                      GemmParallelInfo<Index>* info = 0)
+                  const LhsScalar* _lhs, Index lhsStride,
+                  const RhsScalar* _rhs, Index rhsStride,
+                  ResScalar* res, Index resStride,
+                  const ResScalar &alpha,
+                  level3_blocking<LhsScalar,RhsScalar>& /* blocking */,
+                  GemmParallelInfo<Index>* /* info = 0 */)
       {
         for (Index i = 0; i < cols; i++) {
           general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
@@ -1235,7 +1235,7 @@ namespace stan {
     
     template <bool PromoteRHS, typename LHS, typename RHS>
     struct assigner {
-      static inline void assign(LHS& var, const RHS& val) {
+      static inline void assign(LHS& /*var*/, const RHS& /*val*/) {
         throw std::domain_error("should not call base class of assigner");
       }
     };

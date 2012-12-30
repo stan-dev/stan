@@ -11,7 +11,7 @@ using std::numeric_limits;
 class ProbDistributionsBernoulli : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+                    vector<double>& log_prob) {
     vector<double> param(2);
 
     param[0] = 1;           // n
@@ -36,7 +36,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+                      vector<double>& value) {
     // y
     index.push_back(0U);
     value.push_back(-1);
@@ -54,8 +54,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBernoulli,
-			      DistributionTestFixture,
-			      ProbDistributionsBernoulli);
+                              DistributionTestFixture,
+                              ProbDistributionsBernoulli);
 
 TEST(ProbDistributionsBernoulliCDF,Values) {
     EXPECT_FLOAT_EQ(1, stan::prob::bernoulli_cdf(1, 0.57));

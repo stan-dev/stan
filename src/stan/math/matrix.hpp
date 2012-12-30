@@ -188,9 +188,9 @@ namespace stan {
       }
 
 
-      void resize(double x, 
-                  const std::vector<size_t>& dims, 
-                  size_t pos) {
+      void resize(double /*x*/, 
+                  const std::vector<size_t>& /*dims*/, 
+                  size_t /*pos*/) {
         // no-op
       }
 
