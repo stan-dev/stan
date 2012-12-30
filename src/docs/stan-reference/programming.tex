@@ -2278,7 +2278,7 @@ data {
   int<lower=1> beta;
   ...
 parameters {
-  vector[K] z[beta];
+  vector[beta] z[K];
   ...
 transformed parameters {
   simplex[K] rho;
@@ -2287,13 +2287,14 @@ transformed parameters {
   rho <- rho / sum(rho);
 }
 model {
-  for (b in 1:beta)
-    z[b] ~ normal(0,1); 
+  for (k in 1:K)
+    z[k] ~ normal(0,1); 
   // implies: rho ~ dirichlet(0.5 * beta * ones)
   ...
 \end{Verbatim}
 \end{quote}
 %
+
 \section{Vectorization}
 
 \subsection{Gradient Bottleneck}
