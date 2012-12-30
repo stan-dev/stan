@@ -59,7 +59,7 @@
     <arg value="stan-models-${version}.tex" />
   </exec>
   <exec executable="makeindex"> 
-    <arg value="stan-models-${version}" />
+    <arg value="stan-models-${version}.idx" />
   </exec>
   <exec executable="pdflatex"> 
     <arg value="stan-models-${version}.tex" />

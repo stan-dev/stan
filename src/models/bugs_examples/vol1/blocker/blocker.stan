@@ -1,4 +1,4 @@
-# See \url{http://www.openbugs.info/Examples/Blockers.html}.
+#DOC See \url{http://www.openbugs.info/Examples/Blockers.html}.
 data {
   int<lower=0> N; 
   int<lower=0> nt[N]; 
