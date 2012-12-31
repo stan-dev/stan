@@ -29,37 +29,37 @@ public:
     parameters.push_back(param);
   }
  
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+  void invalid_values(vector<size_t>& /*index*/, 
+                      vector<double>& /*value*/) {
     // y
     
     // alpha
 
     // beta
   }
-			     
+                             
   template <class T_y, class T_low, class T_high,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, typename T9>
+            typename T3, typename T4, typename T5, 
+            typename T6, typename T7, typename T8, typename T9>
   var log_prob(const T_y& y, const T_low& alpha, const T_high& beta,
-	       const T3&, const T4&, const T5&, 
-	       const T6&, const T7&, const T8&, const T9&) {
+               const T3&, const T4&, const T5&, 
+               const T6&, const T7&, const T8&, const T9&) {
       using stan::prob::include_summand;
       using stan::prob::LOG_ZERO;
 
       if (y < alpha || y > beta)
-	return LOG_ZERO;
+        return LOG_ZERO;
 
       var lp(0.0);
       if (include_summand<true,T_low,T_high>::value)
-	  lp -= log(beta - alpha);
+          lp -= log(beta - alpha);
       return lp;
   }
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsUniform,
-			      AgradDistributionTestFixture,
-			      AgradDistributionsUniform);
+                              AgradDistributionTestFixture,
+                              AgradDistributionsUniform);
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsUniform,
-			      AgradDistributionTestFixture2,
-			      AgradDistributionsUniform);
+                              AgradDistributionTestFixture2,
+                              AgradDistributionsUniform);

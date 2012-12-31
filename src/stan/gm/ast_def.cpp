@@ -265,7 +265,7 @@ namespace stan {
         statements_(stmts) {
     }
 
-    expr_type expression_type_vis::operator()(const nil& e) const {
+    expr_type expression_type_vis::operator()(const nil& /*e*/) const {
       return expr_type();
     }
     // template <typename T>
@@ -376,18 +376,18 @@ namespace stan {
     //   return boost::apply_visitor(*this,e.subject);
     // }
 
-    bool is_nil_op::operator()(const nil& x) const { return true; }
-    bool is_nil_op::operator()(const int_literal& x) const { return false; }
-    bool is_nil_op::operator()(const double_literal& x) const { return false; }
-    bool is_nil_op::operator()(const array_literal& x) const { return false; }
-    bool is_nil_op::operator()(const variable& x) const { return false; }
-    bool is_nil_op::operator()(const fun& x) const { return false; }
-    bool is_nil_op::operator()(const index_op& x) const { return false; }
-    bool is_nil_op::operator()(const binary_op& x) const { return false; }
-    bool is_nil_op::operator()(const unary_op& x) const { return false; }
+    bool is_nil_op::operator()(const nil& /*x*/) const { return true; }
+    bool is_nil_op::operator()(const int_literal& /*x*/) const { return false; }
+    bool is_nil_op::operator()(const double_literal& /* x */) const { return false; }
+    bool is_nil_op::operator()(const array_literal& /* x */) const { return false; }
+    bool is_nil_op::operator()(const variable& /* x */) const { return false; }
+    bool is_nil_op::operator()(const fun& /* x */) const { return false; }
+    bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
       
     // template <typename T>
-    // bool is_nil_op::operator()(const T& x) const { return false; }
+    // bool is_nil_op::operator()(const T& /* x */) const { return false; }
 
     bool is_nil(const expression& e) {
       is_nil_op ino;
@@ -717,7 +717,7 @@ namespace stan {
 
 
     name_vis::name_vis() { }
-    std::string name_vis::operator()(const nil& x) const { 
+    std::string name_vis::operator()(const nil& /* x */) const { 
       return ""; // fail if arises
     } 
     std::string name_vis::operator()(const int_var_decl& x) const {

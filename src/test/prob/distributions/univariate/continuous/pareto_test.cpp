@@ -10,7 +10,7 @@ using std::numeric_limits;
 class ProbDistributionsPareto : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+                    vector<double>& log_prob) {
     vector<double> param(3);
 
     param[0] = 1.5;           // y
@@ -33,7 +33,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+                      vector<double>& value) {
     // y
     
     // y_min
@@ -66,8 +66,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsPareto,
-			      DistributionTestFixture,
-			      ProbDistributionsPareto);
+                              DistributionTestFixture,
+                              ProbDistributionsPareto);
 
 TEST(ProbDistributionsParetoCDF, Values) {
     EXPECT_FLOAT_EQ(0.60434447, stan::prob::pareto_cdf(3.45, 2.89, 5.235));

@@ -10,7 +10,7 @@ using std::numeric_limits;
 class ProbDistributionsUniform : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+                    vector<double>& log_prob) {
     vector<double> param(3);
 
     param[0] = 0.2;                 // y
@@ -32,8 +32,8 @@ public:
     log_prob.push_back(log(0.1));   // expected log_prob
   }
  
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+  void invalid_values(vector<size_t>& /*index*/, 
+                      vector<double>& /*value*/) {
     // y
     
     // alpha
@@ -43,5 +43,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsUniform,
-			      DistributionTestFixture,
-			      ProbDistributionsUniform);
+                              DistributionTestFixture,
+                              ProbDistributionsUniform);

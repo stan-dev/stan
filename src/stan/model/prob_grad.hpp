@@ -177,7 +177,7 @@ namespace stan {
       virtual void write_csv(std::vector<double>& params_r,
                              std::vector<int>& params_i,
                              std::ostream& o,
-                             std::ostream* output_stream = 0) {
+                             std::ostream* /*output_stream = 0*/) {
         stan::io::csv_writer writer(o);
         for (size_t i = 0; i < params_i.size(); ++i)
           writer.write(params_i[i]);

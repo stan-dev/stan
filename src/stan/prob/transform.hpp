@@ -384,7 +384,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    T identity_constrain(const T x, T& lp) {
+    T identity_constrain(const T x, T& /*lp*/) {
       return x;
     }
     

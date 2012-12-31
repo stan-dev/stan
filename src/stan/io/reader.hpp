@@ -141,7 +141,7 @@ namespace stan {
        *
        * @return Next integer value.
        */
-      inline int integer_constrain(T& log_prob) {
+      inline int integer_constrain(T& /*log_prob*/) {
         return integer();
       }
       
@@ -179,7 +179,7 @@ namespace stan {
        * @param log_prob Reference to log probability variable to increment.
        * @return Next scalar.
        */
-      T scalar_constrain(T& log_prob) {
+      T scalar_constrain(T& /*log_prob*/) {
         return scalar();
       }
 
@@ -226,7 +226,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      inline vector_t vector_constrain(size_t m, T& lp) {
+      inline vector_t vector_constrain(size_t m, T& /*lp*/) {
         return map_vector_t(&scalar_ptr_increment(m),m);
       }
 
@@ -263,7 +263,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
-      inline row_vector_t row_vector_constrain(size_t m, T& lp) {
+      inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
         return map_row_vector_t(&scalar_ptr_increment(m),m);
       }
       
@@ -314,7 +314,7 @@ namespace stan {
        * @param lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
-      inline matrix_t matrix_constrain(size_t m, size_t n, T& lp) {
+      inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
         return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
       }
 
@@ -357,7 +357,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * greater than or equal to the lower bound.
        */
-      inline int integer_lb_constrain(int lb, T& lp) {
+      inline int integer_lb_constrain(int lb, T& /*lp*/) {
         return integer_lb(lb);
       }
 
@@ -400,7 +400,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      int integer_ub_constrain(int ub, T& lp) {
+      int integer_ub_constrain(int ub, T& /*lp*/) {
         return integer_ub(ub);
       }
 
@@ -454,7 +454,7 @@ namespace stan {
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
        */
-      inline int integer_lub_constrain(int lb, int ub, T& lp) {
+      inline int integer_lub_constrain(int lb, int ub, T& /*lp*/) {
         return integer_lub(lb,ub);
       }
       

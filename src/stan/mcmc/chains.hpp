@@ -1788,7 +1788,7 @@ namespace stan {
     size_t add_chain(stan::mcmc::chains<RNG>& chains, 
                      const size_t chain, 
                      const std::string filename,
-                     const size_t skip) {
+                     const size_t /*skip*/) {
       std::fstream csv_output_file(filename.c_str(), std::fstream::in);
       if (!csv_output_file.is_open()) {
         throw std::runtime_error("Could not open " + filename);
