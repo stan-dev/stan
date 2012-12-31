@@ -1329,7 +1329,7 @@ Reparameterizations may be implemented straightforwardly.  For
 example, the Beta distribution is parameterized by two positive count
 parameters $\alpha, \beta > 0$.  The following example illustrates a
 hierarchical Stan model with a vector of parameters \code{theta} are
-drawn i.i.d.\ fro a Beta distribution whose parameters are themselves
+drawn i.i.d.\ for a Beta distribution whose parameters are themselves
 drawn from a hyperprior distribution.
 %
 \begin{quote}
@@ -1440,7 +1440,7 @@ parameters {
 \section{Changes of Variables}
 
 Changes of variables are applied when the transformation of a
-parameter has a specified distribution.  One textbook is example is
+parameter has a specified distribution.  One textbook example is
 the lognormal distribution, which is the distribution of a variable
 $y > 0$ whose logarithm $\log y$ has a normal distribution.  
 
@@ -1448,7 +1448,7 @@ $y > 0$ whose logarithm $\log y$ has a normal distribution.
 
 The change of variables requires an adjustment to the probability to
 account for the distortion caused by the transform.  In the case of
-univariate distributions, the the resulting probability must be scaled
+univariate distributions, the resulting probability must be scaled
 by the absolute derivative of the transform (see
 \refsection{uni-change-of-variables} for more precise definitions of
 univariate changes of variables).
