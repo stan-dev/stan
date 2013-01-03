@@ -1248,7 +1248,7 @@ model {
 %
 The first observed data point, \code{y[1]}, is not modeled here.  
 
-\subsection{Extensions to the Model} 
+\subsection{Extensions to the AR(1) Model} 
 
 Proper priors of a range of different families may be added for the
 regression coefficients and noise scale.  The normal noise model can
@@ -1314,6 +1314,138 @@ model {
 }
 \end{Verbatim}
 \end{quote}
+
+\subsection{ARCH(1) Models}
+
+Econometric and financial time-series models usually assume
+heteroscedasticity (i.e., they allow the scale of the noise terms
+defining the series to vary over time).
+The simplest such model is the autoregressive conditional
+heteroscedasticity (ARCH) model \citep{Engle:1982}.  Unlike the
+autoregressive model AR(1), which modeled the mean of the series as
+varying over time but left the noise term fixed, the ARCH(1) model
+takes the scale of the noise terms to vary over time but leaves the
+mean term fixed.  Of course, models could be defined where both the
+mean and scale vary over time; the econometrics literature presents a
+wide range of time-series modeling choices.
+
+The ARCH(1) model is typically presented as the following sequence of
+equations, where $r_t$ is the observed return at time point $t$
+and $\mu$, $\alpha_0$, and $\alpha_1$ are unknown regression coefficient parameters.
+%
+\begin{eqnarray*}
+r_t & = & \mu + a_t 
+\\[2pt]
+a_t & = & \sigma_t \epsilon_t
+\\[2pt]
+\epsilon_t & \sim & \distro{Normal}(0,1)
+\\[2pt]
+\sigma^2_t & = & \alpha_0 + \alpha_1 a_{t-1}^2
+\end{eqnarray*}
+%
+In order to ensure the noise terms $\sigma^2_t$ are positive, the
+scale coefficients are constrained to be positive, $\alpha_0, \alpha_1
+> 0$.  To ensure stationarity of the time series, the slope is 
+constrained to to be less than onr, $\alpha_1 < 1$.%
+%
+\footnote{In practice, it can be useful to remove the constraint to
+  test whether a non-stationary set of coefficients provides a better
+  fit to the data.}
+%
+The ARCH(1) model may be coded directly in Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> T;   // number of time points
+  real r[T];        // return at time t
+}
+parameters {
+  real mu;                       // average return
+  real<lower=0> alpha0;          // noise intercept
+  real<lower=0,upper=1> alpha1;  // noise slope
+}
+model {
+  for (t in 2:T)
+    r[t] ~ normal(mu, 
+                 sqrt(alpha0 + alpha1 * pow(r[t-1] - mu,2)));
+}
+\end{Verbatim}
+\end{quote}
+%
+The loop in the model is defined so that the return at time $t=1$ is
+not modeled; the model in the next section shows how to model the
+return at $t=1$.  The model can be vectorized to be more efficient;
+the model in the next section provides an example.
+
+\subsection{GARCH(1,1) Models}
+
+The basic generalized autoregressive conditional heteroscedasticity
+(GARCH) model, GARCH(1,1), extends the ARCH(1) model by including the
+squared previous difference in return from the mean at time $t-1$ as a
+predictor of volatility at time $t$, defining
+%
+\[
+\sigma^2_t = \alpha_0 + \alpha_1 a^2_{t-1} + \beta_1 \sigma^2_{t-1}.
+\]
+%
+To ensure the scale term is positive and the resulting time series
+stationary, the coefficients must all satisfy $\alpha_0, \alpha_1,
+\beta_1 > 0$ and the slopes $\alpha_1 + \beta_1 < 1$.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> T; 
+  real r[T];
+  real<lower=0> sigma1; 
+}
+parameters {
+  real mu; 
+  real<lower=0> alpha0;          
+  real<lower=0,upper=1> alpha1;  
+  real<lower=0, upper=(1-alpha1)> beta1; 
+}
+transformed parameters {
+  real<lower=0> sigma[T];
+  sigma[1] <- sigma1;
+  for (t in 2:T)
+    sigma[t] <- sqrt(alpha0 
+                     + alpha1 * pow(r[t-1] - mu, 2)
+                     + beta1 * pow(sigma[t-1], 2));
+}
+model {
+  r ~ normal(mu,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+To get the recursive definition of the volatility regression off the
+ground, the data declaration includes a non-negative value 
+\code{sigma1} for the scale of the noise at $t = 1$. 
+
+The constraints are coded directly on the parameter declarations.
+This declaration is order-specific in that the constraint on \code{beta1}
+depends on the value of \code{alpha1}. 
+
+A transformed parameter array of non-negative values \code{sigma} is
+used to store the scale values at each time point.  The definition of
+these values in the transformed parameters block is where the
+regression is now defined.  There is an intercept \code{alpha0}, a
+slope \code{alpha1} for the squared difference in return from the mean
+at the previous time, and a slope \code{beta1} for the previous noise
+scale squared.  Finally, the whole regression is inside the
+\code{sqrt} function because Stan requires scale (deviation) parameters (not
+variance parameters) for the normal distribution.
+
+With the regression in the transformed parameter block, the model
+reduces a single vectorized sampling statement.  Because \code{r} and
+\code{sigma} are of length \code{T}, all of the data is modeled
+directly.
+
+
+
+
 
 \chapter{Reparameterizations and Changes of Variables}
 \label{change-of-variables.chapter}

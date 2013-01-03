@@ -72,6 +72,17 @@ Doc
 
 
 
+RM-HMC
+======================================================================
+Need a model that produces:
+
+Full:
+  - Hessian (dense) [symmetric view in Eigen]
+  - grad Tr[M * Hessian];  // M symmetric and fixed
+
+Diagonal Hessian:
+  - diagonal of Hessian
+  - grad (Hessian * vector)
 
 
 C++ API
