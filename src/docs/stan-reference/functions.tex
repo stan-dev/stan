@@ -1465,12 +1465,39 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
 \nats$,
 \[
 \distro{NegativeBinomial}(n|\alpha,\beta)
-= 
+ = 
 {{n + \alpha - 1} \choose {\alpha - 1}}
 \,
 \left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
 \,
 \left( \frac{1}{\beta + 1} \right)^{\!n} \!.
+\]
+\begin{eqnarray*}
+\log \distro{NegativeBinomial}(n|\alpha,\beta)
+& = & \log \Gamma(n + \alpha) 
+  - \log \Gamma(n + 1)
+  - log \Gamma(\alpha)
+\\[4pt]
+& & 
+  {} + \alpha \left(\log \beta - \log (\beta + 1) \right)
+  + n \log (\beta + 1)
+\end{eqnarray*}
+\[
+\frac{\partial}{\partial \alpha} 
+\log \distro{NegativeBinomial}(n|\alpha,\beta)
+= \Psi(n + \alpha)
+- \Psi(\alpha)
++ \log \beta
+- \log (\beta + 1)
+\]
+\[
+\frac{\partial}{\partial \beta} 
+\log \distro{NegativeBinomial}(n|\alpha,\beta)
+= \frac{\alpha}{\beta} - \frac{\alpha + n}{\beta + 1}
+\]
+where $\Psi$ is the digamma function, defined as
+\[
+\Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
 \]
 
 \begin{description}
