@@ -79,6 +79,7 @@ Need a model that produces:
 Full:
   - Hessian (dense) [symmetric view in Eigen]
   - grad Tr[M * Hessian];  // M symmetric and fixed
+  - Note: Tr[M * Hessian] == dot_product(vec(M), vec(Hessian))
 
 Diagonal Hessian:
   - diagonal of Hessian
