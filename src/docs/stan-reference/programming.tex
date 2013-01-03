@@ -206,7 +206,7 @@ In some situations, such as when a multivariate probability function
 has partially observed outcomes or parameters, it will be necessary to
 create a vector mixing known (data) and unknown (parameter) values.
 This can be done in \Stan by creating a vector or array in the
-\code{transformed parameter} block and assigning to it.
+\code{transformed parameters} block and assigning to it.
 
 The following example involves a bivariate covariance matrix in which the
 variances are known, but the covariance is not.
@@ -1438,7 +1438,7 @@ scale squared.  Finally, the whole regression is inside the
 \code{sqrt} function because Stan requires scale (deviation) parameters (not
 variance parameters) for the normal distribution.
 
-With the regression in the transformed parameter block, the model
+With the regression in the transformed parameters block, the model
 reduces a single vectorized sampling statement.  Because \code{r} and
 \code{sigma} are of length \code{T}, all of the data is modeled
 directly.
@@ -1518,7 +1518,7 @@ model {
 The new parameters, \code{phi} and \code{lambda}, are declared in the
 parameters block and the parameters for the Beta distribution, 
 \code{alpha} and \code{beta}, are declared and defined in the
-transformed parameter block.  Ano If their values are not of interest,
+transformed parameters block.  Ano If their values are not of interest,
 they could instead be defined as local variables in the model as
 follows.
 %
