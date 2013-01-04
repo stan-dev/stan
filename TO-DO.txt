@@ -212,6 +212,10 @@ C++ API
         beta  <- (1 - phi) * k
     determinant = k  (det [[a,b],[c,d]] = ad - bc)
 
+* Gumbel distribtuion
+
+* Exponentially-modified Normal distribution
+
 * von Mises distribution (with location and concentration params?)
   -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
 
