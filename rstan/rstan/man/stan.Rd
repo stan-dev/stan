@@ -220,9 +220,9 @@ stan(file, model_name = "anon_model", model_code = "",
   if, for example, \code{"real y[1];"} is defined in the data block, an array 
   such as \code{"y = array(1.0, dim = 1)"} in R should be used. 
 
-  The returned S4 class \code{stanfit} will save the compiled model
-  across sessions if the option \code{save_dso = TRUE}
-  is supplied.  
+  The returned S4 class \code{stanfit} includes the compiled model
+  if option \code{save_dso} is \code{TRUE}, so the compiled model
+  can be saved for using in future R sessions. 
 
   The function accepts a previously fitted instance of \code{stanfit}
   through parameter \code{fit} in order to reuse the compiled model; other

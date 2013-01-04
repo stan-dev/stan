@@ -59,3 +59,9 @@ ss_nuts2 <- stan(file = sfile, data = dat, iter = 29, warmup = 14, chains = 4,
 
 fit_nuts2 <- read_stan_csv(paste("8schools_nuts2_", 1:4, ".csv", sep = ''))
 
+df <- as.data.frame(fit_nuts2)
+l <- extract(fit_nuts2)
+print(fit_nuts2)
+plot(fit_nuts2)
+traceplot(fit_nuts2)
+

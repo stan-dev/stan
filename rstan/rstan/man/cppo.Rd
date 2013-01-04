@@ -12,18 +12,18 @@
 }
 
 \usage{
-  set_cppo(mode = c("fast", "presentation2", "presentation1", "debug"))
+  set_cppo(mode = c("fast", "presentation2", "presentation1", "debug", "small"))
   get_cppo() 
 } 
  
 \arguments{
   \item{mode}{A character specifying the optimization level: one of 
-              \code{"fast"}, \code{"presentation2"}, \code{"presentation1"}, \code{"debug"},   
+              \code{"fast"}, \code{"presentation2"}, \code{"presentation1"}, \code{"debug"}, \code{"small"},
               corresponding to optimization level 
-              \code{"3"}, \code{"2"}, \code{"1"}, \code{"0"}; defaults to \code{"fast"}.
+              \code{"3"}, \code{"2"}, \code{"1"}, \code{"0"}, \code{"s"}; defaults to \code{"fast"}.
               The order from \code{"fast"} to \code{"debug"} generally means
-              that the generated code runs from the fastest to the slowest. See
-              the notes below.}
+              that the generated code runs from the fastest to the slowest; \code{"small"}
+              means optimizing for size. See the notes below.}
 } 
 
 

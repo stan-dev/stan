@@ -70,6 +70,7 @@ ex_model_code <- '
       alpha[i, j] ~ normal(0, 1); 
     for (i in 1:2) 
       beta ~ normal(0, 2); 
+    # beta ~ normal(0, 2) // vectorized version
   } 
 '
 

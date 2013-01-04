@@ -136,8 +136,12 @@ get_kept_samples2 <- function(n, sim) {
   # It seems this one is faster than get_kept_samples 
   # TODO: to understand why it is faster? 
   lst <- vector("list", sim$chains)
-  for (ic in 1:sim$chains)  
-    lst[[ic]] <- sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])][sim$permutation[[ic]]]
+  for (ic in 1:sim$chains) { 
+    if (sim$warmup2[ic] > 0) 
+      lst[[ic]] <- sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])][sim$permutation[[ic]]]
+    else 
+      lst[[ic]] <- sim$samples[[ic]][[n]][sim$permutation[[ic]]]
+  } 
   do.call(c, lst)
 }
 
@@ -150,6 +154,7 @@ get_samples <- function(n, sim, inc_warmup = TRUE) {
   # Returns:
   #   a list of chains for the nth parameter; each chain is an 
   #   element of the list.  
+  if (all(sim$warmup2 == 0)) inc_warmup <- TRUE # for the case warmup sample is discarded
   gcs <- function(s, inc_warmup, nw) {
     # Args:
     #   s: samples of all chains 
@@ -166,6 +171,7 @@ get_samples2 <- function(n, sim, inc_warmup = TRUE) {
   # serves the same purpose with get_samples, but with 
   # different implementation 
   # It seems that this one is fast. 
+  if (all(sim$warmup2 == 0)) inc_warmup <- TRUE # for the case warmup sample is discarded
   lst <- vector("list", sim$chains)
   for (ic in 1:sim$chains) {
     lst[[ic]] <- 
