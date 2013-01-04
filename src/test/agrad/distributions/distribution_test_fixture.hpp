@@ -540,15 +540,28 @@ public:
     }  
   }
 
-
-
-
   static void test_invalid() {
+    if (is_vector<T0>::value || is_vector<T1>::value || is_vector<T2>::value || is_vector<T3>::value
+        || is_vector<T4>::value || is_vector<T5>::value || is_vector<T6>::value
+        || is_vector<T7>::value || is_vector<T8>::value || is_vector<T9>::value) {
+      SUCCEED() << "No need to test non-vector arguments";
+      return;
+    }
+
     vector<vector<double> > parameters;
     TypeParam().valid_values(parameters);
-    CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    CALL_LOG_PROB<typename scalar_type<T0>::type,
+      typename scalar_type<T1>::type,
+      typename scalar_type<T2>::type,
+      typename scalar_type<T3>::type,
+      typename scalar_type<T4>::type,
+      typename scalar_type<T5>::type,
+      typename scalar_type<T6>::type,
+      typename scalar_type<T7>::type,
+      typename scalar_type<T8>::type,
+      typename scalar_type<T9>::type>
       call_log_prob;
-
+    
 
     vector<size_t> index;
     vector<double> invalid_values;
@@ -560,16 +573,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[index[n]] = invalid_values[n];
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);
 
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
@@ -582,17 +595,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[0] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);    
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -604,17 +616,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[1] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -626,17 +637,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[2] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);    
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -648,17 +658,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[3] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);    
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -670,17 +679,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[4] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -692,17 +700,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[5] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);    
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -714,17 +721,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[6] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);    
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -736,17 +742,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[7] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);    
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -758,17 +763,16 @@ public:
       vector<double> invalid_params(parameters[0]);
       invalid_params[8] = std::numeric_limits<double>::quiet_NaN();
     
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);   
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -779,18 +783,17 @@ public:
     if (std::numeric_limits<T9>::has_quiet_NaN && parameters[0].size() > 9) {
       vector<double> invalid_params(parameters[0]);
       invalid_params[9] = std::numeric_limits<double>::quiet_NaN();
-    
-      T0 p0 = get_param(invalid_params, 0);
-      T1 p1 = get_param(invalid_params, 1);
-      T2 p2 = get_param(invalid_params, 2);
-      T3 p3 = get_param(invalid_params, 3);
-      T4 p4 = get_param(invalid_params, 4);
-      T5 p5 = get_param(invalid_params, 5);
-      T6 p6 = get_param(invalid_params, 6);
-      T7 p7 = get_param(invalid_params, 7);
-      T8 p8 = get_param(invalid_params, 8);
-      T9 p9 = get_param(invalid_params, 9);
-    
+
+      typename scalar_type<T0>::type p0 = get_param(invalid_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(invalid_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(invalid_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(invalid_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(invalid_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(invalid_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(invalid_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(invalid_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(invalid_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(invalid_params, 9);
       EXPECT_THROW( ({
             call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
           }),
@@ -807,8 +810,23 @@ public:
       SUCCEED() << "No need to test all double arguments";
       return;
     }
+    if (is_vector<T0>::value || is_vector<T1>::value || is_vector<T2>::value || is_vector<T3>::value
+        || is_vector<T4>::value || is_vector<T5>::value || is_vector<T6>::value
+        || is_vector<T7>::value || is_vector<T8>::value || is_vector<T9>::value) {
+      SUCCEED() << "No need to test non-vector arguments";
+      return;
+    }
 
-    CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    CALL_LOG_PROB<typename scalar_type<T0>::type,
+        typename scalar_type<T1>::type,
+        typename scalar_type<T2>::type,
+        typename scalar_type<T3>::type,
+        typename scalar_type<T4>::type,
+        typename scalar_type<T5>::type,
+        typename scalar_type<T6>::type,
+        typename scalar_type<T7>::type,
+        typename scalar_type<T8>::type,
+        typename scalar_type<T9>::type>
       call_log_prob;
   
     vector<vector<double> > parameters;
@@ -817,34 +835,35 @@ public:
     var reference_logprob_true;
     var reference_logprob_false;
     {
-      T0 p0 = get_param(reference_params, 0);
-      T1 p1 = get_param(reference_params, 1);
-      T2 p2 = get_param(reference_params, 2);
-      T3 p3 = get_param(reference_params, 3);
-      T4 p4 = get_param(reference_params, 4);
-      T5 p5 = get_param(reference_params, 5);
-      T6 p6 = get_param(reference_params, 6);
-      T7 p7 = get_param(reference_params, 7);
-      T8 p8 = get_param(reference_params, 8);
-      T9 p9 = get_param(reference_params, 9);
-    
+      typename scalar_type<T0>::type p0 = get_param(reference_params, 0);
+      typename scalar_type<T1>::type p1 = get_param(reference_params, 1);
+      typename scalar_type<T2>::type p2 = get_param(reference_params, 2);
+      typename scalar_type<T3>::type p3 = get_param(reference_params, 3);
+      typename scalar_type<T4>::type p4 = get_param(reference_params, 4);
+      typename scalar_type<T5>::type p5 = get_param(reference_params, 5);
+      typename scalar_type<T6>::type p6 = get_param(reference_params, 6);
+      typename scalar_type<T7>::type p7 = get_param(reference_params, 7);
+      typename scalar_type<T8>::type p8 = get_param(reference_params, 8);
+      typename scalar_type<T9>::type p9 = get_param(reference_params, 9);
       reference_logprob_true = call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
       reference_logprob_false = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
     }
 
     for (size_t n = 0; n < parameters.size(); n++) {
       vector<double> params(parameters[n]);
-      T0 p0 = get_param<T0>(parameters, n, 0);
-      T1 p1 = get_param<T1>(parameters, n, 1);
-      T2 p2 = get_param<T2>(parameters, n, 2);
-      T3 p3 = get_param<T3>(parameters, n, 3);
-      T4 p4 = get_param<T4>(parameters, n, 4);
-      T5 p5 = get_param<T5>(parameters, n, 5);
-      T6 p6 = get_param<T6>(parameters, n, 6);
-      T7 p7 = get_param<T7>(parameters, n, 7);
-      T8 p8 = get_param<T8>(parameters, n, 8);
-      T9 p9 = get_param<T9>(parameters, n, 9);
-    
+
+      typename scalar_type<T0>::type p0 = get_param<T0>(parameters, n, 0);
+      typename scalar_type<T1>::type p1 = get_param<T1>(parameters, n, 1);
+      typename scalar_type<T2>::type p2 = get_param<T2>(parameters, n, 2);
+      typename scalar_type<T3>::type p3 = get_param<T3>(parameters, n, 3);
+      typename scalar_type<T4>::type p4 = get_param<T4>(parameters, n, 4);
+      typename scalar_type<T5>::type p5 = get_param<T5>(parameters, n, 5);
+      typename scalar_type<T6>::type p6 = get_param<T6>(parameters, n, 6);
+      typename scalar_type<T7>::type p7 = get_param<T7>(parameters, n, 7);
+      typename scalar_type<T8>::type p8 = get_param<T8>(parameters, n, 8);
+      typename scalar_type<T9>::type p9 = get_param<T9>(parameters, n, 9);
+
+
       var logprob_true = call_log_prob.call(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
       var logprob_false = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
     
@@ -859,18 +878,33 @@ public:
   }
   
   static void test_finite_diff() {
-    using stan::math::value_of;
     if (is_constant_struct<T0>::value && is_constant_struct<T1>::value && is_constant_struct<T2>::value && is_constant_struct<T3>::value
         && is_constant_struct<T4>::value && is_constant_struct<T5>::value && is_constant_struct<T6>::value
         && is_constant_struct<T7>::value && is_constant_struct<T8>::value && is_constant_struct<T9>::value) {
       SUCCEED() << "No need to test all double arguments";
       return;
     }
+    if (is_vector<T0>::value || is_vector<T1>::value || is_vector<T2>::value || is_vector<T3>::value
+        || is_vector<T4>::value || is_vector<T5>::value || is_vector<T6>::value
+        || is_vector<T7>::value || is_vector<T8>::value || is_vector<T9>::value) {
+      SUCCEED() << "No need to test non-vector arguments";
+      return;
+    }
+    using stan::math::value_of;
     
     vector<vector<double> > parameters;
     TypeParam().valid_values(parameters);
   
-    CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    CALL_LOG_PROB<typename scalar_type<T0>::type,
+        typename scalar_type<T1>::type,
+        typename scalar_type<T2>::type,
+        typename scalar_type<T3>::type,
+        typename scalar_type<T4>::type,
+        typename scalar_type<T5>::type,
+        typename scalar_type<T6>::type,
+        typename scalar_type<T7>::type,
+        typename scalar_type<T8>::type,
+        typename scalar_type<T9>::type>
       call_log_prob;
     CALL_LOG_PROB<double,double,double,double,double,
       double,double,double,double,typename is_vector<T9>::type>
@@ -882,16 +916,16 @@ public:
       vector<double> params(parameters[n]);
       vector<double> grad;
       {
-        T0 p0 = get_param(params, 0);
-        T1 p1 = get_param(params, 1);
-        T2 p2 = get_param(params, 2);
-        T3 p3 = get_param(params, 3);
-        T4 p4 = get_param(params, 4);
-        T5 p5 = get_param(params, 5);
-        T6 p6 = get_param(params, 6);
-        T7 p7 = get_param(params, 7);
-        T8 p8 = get_param(params, 8);
-        T9 p9 = get_param(params, 9);
+	typename scalar_type<T0>::type p0 = get_param(params, 0);
+	typename scalar_type<T1>::type p1 = get_param(params, 1);
+	typename scalar_type<T2>::type p2 = get_param(params, 2);
+	typename scalar_type<T3>::type p3 = get_param(params, 3);
+	typename scalar_type<T4>::type p4 = get_param(params, 4);
+	typename scalar_type<T5>::type p5 = get_param(params, 5);
+	typename scalar_type<T6>::type p6 = get_param(params, 6);
+	typename scalar_type<T7>::type p7 = get_param(params, 7);
+	typename scalar_type<T8>::type p8 = get_param(params, 8);
+	typename scalar_type<T9>::type p9 = get_param(params, 9);
         var logprob = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         vector<var> x;
         if (!is_constant<T0>::value)
@@ -1039,27 +1073,41 @@ public:
       SUCCEED() << "No need to test all double arguments";
       return;
     }
-    
+    if (is_vector<T0>::value || is_vector<T1>::value || is_vector<T2>::value || is_vector<T3>::value
+        || is_vector<T4>::value || is_vector<T5>::value || is_vector<T6>::value
+        || is_vector<T7>::value || is_vector<T8>::value || is_vector<T9>::value) {
+      SUCCEED() << "No need to test non-vector arguments";
+      return;
+    }
     vector<vector<double> > parameters;
     TypeParam().valid_values(parameters);
   
-    CALL_LOG_PROB<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-      call_log_prob;
+    CALL_LOG_PROB<typename scalar_type<T0>::type,
+      typename scalar_type<T1>::type,
+      typename scalar_type<T2>::type,
+      typename scalar_type<T3>::type,
+      typename scalar_type<T4>::type,
+      typename scalar_type<T5>::type,
+      typename scalar_type<T6>::type,
+      typename scalar_type<T7>::type,
+      typename scalar_type<T8>::type,
+      typename scalar_type<T9>::type> call_log_prob;
+
     for (size_t n = 0; n < parameters.size(); n++) {
       vector<double> params(parameters[n]);
       vector<double> expected_grad;
       vector<double> grad;
       {
-        T0 p0 = get_param(params, 0);
-        T1 p1 = get_param(params, 1);
-        T2 p2 = get_param(params, 2);
-        T3 p3 = get_param(params, 3);
-        T4 p4 = get_param(params, 4);
-        T5 p5 = get_param(params, 5);
-        T6 p6 = get_param(params, 6);
-        T7 p7 = get_param(params, 7);
-        T8 p8 = get_param(params, 8);
-        T9 p9 = get_param(params, 9);
+	typename scalar_type<T0>::type p0 = get_param(params, 0);
+	typename scalar_type<T1>::type p1 = get_param(params, 1);
+	typename scalar_type<T2>::type p2 = get_param(params, 2);
+	typename scalar_type<T3>::type p3 = get_param(params, 3);
+	typename scalar_type<T4>::type p4 = get_param(params, 4);
+	typename scalar_type<T5>::type p5 = get_param(params, 5);
+	typename scalar_type<T6>::type p6 = get_param(params, 6);
+	typename scalar_type<T7>::type p7 = get_param(params, 7);
+	typename scalar_type<T8>::type p8 = get_param(params, 8);
+	typename scalar_type<T9>::type p9 = get_param(params, 9);
         var logprob = TypeParam().log_prob(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         vector<var> x;
         if (!is_constant<T0>::value)
@@ -1085,16 +1133,16 @@ public:
         logprob.grad(x, expected_grad);
       }
       {
-        T0 p0 = get_param(params, 0);
-        T1 p1 = get_param(params, 1);
-        T2 p2 = get_param(params, 2);
-        T3 p3 = get_param(params, 3);
-        T4 p4 = get_param(params, 4);
-        T5 p5 = get_param(params, 5);
-        T6 p6 = get_param(params, 6);
-        T7 p7 = get_param(params, 7);
-        T8 p8 = get_param(params, 8);
-        T9 p9 = get_param(params, 9);
+	typename scalar_type<T0>::type p0 = get_param(params, 0);
+	typename scalar_type<T1>::type p1 = get_param(params, 1);
+	typename scalar_type<T2>::type p2 = get_param(params, 2);
+	typename scalar_type<T3>::type p3 = get_param(params, 3);
+	typename scalar_type<T4>::type p4 = get_param(params, 4);
+	typename scalar_type<T5>::type p5 = get_param(params, 5);
+	typename scalar_type<T6>::type p6 = get_param(params, 6);
+	typename scalar_type<T7>::type p7 = get_param(params, 7);
+	typename scalar_type<T8>::type p8 = get_param(params, 8);
+	typename scalar_type<T9>::type p9 = get_param(params, 9);
         var logprob = call_log_prob.call_nopropto(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         vector<var> x;
         if (!is_constant<T0>::value)
