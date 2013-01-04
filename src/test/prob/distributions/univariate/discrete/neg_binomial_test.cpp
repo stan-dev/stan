@@ -12,7 +12,7 @@ using std::numeric_limits;
 class ProbDistributionsNegBinomial : public DistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+                    vector<double>& log_prob) {
     vector<double> param(3);
 
     param[0] = 10;           // n
@@ -26,10 +26,16 @@ public:
     param[2] = 3.5;          // beta
     parameters.push_back(param);
     log_prob.push_back(-142.6147); // expected log_prob
+
+    param[0] = 13;
+    param[1] = 1e11; // alpha > 1e10, causes redux to Poisson
+    param[2] = 1e10; // equiv to Poisson(1e11/1e10) = Poisson(10)
+    parameters.push_back(param);
+    log_prob.push_back(-2.618558); // log poisson(13|10)
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+                      vector<double>& value) {
     // n
     index.push_back(0U);
     value.push_back(-1);
@@ -45,8 +51,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsNegBinomial,
-			      DistributionTestFixture,
-			      ProbDistributionsNegBinomial);
+                              DistributionTestFixture,
+                              ProbDistributionsNegBinomial);
 
 
 const double p = 0.57;
