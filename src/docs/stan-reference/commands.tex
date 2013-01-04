@@ -816,24 +816,19 @@ dimensionality declaration, which is itself just a sequence of
 non-negative integer values.  The product of the dimensions must equal
 the length of the array.
 
-If the dimensions happen to form a contiguous sequence of integers,
+If the values happen to form a contiguous sequence of integers,
 they may be written with colon notation.  Thus the example above is
 equivalent to the following.
 %
 \begin{quote}
 \begin{verbatim}
-y <- structure(c(1,2,3,4,5,6), .Dim = 2:3)
+y <- structure(1:6, .Dim = c(2,3))
 \end{verbatim}
 \end{quote}
 %
-Similarly, the values may also be written with colon notation.  Thus
-the following is equivalent to the last two variable definitions.
-%
-\begin{quote}
-\begin{verbatim}
-y <- structure(1:6, .Dim = 2:3)
-\end{verbatim}
-\end{quote}
+The same applies to the specification of dimensions, though it is
+perhaps less likely to be used. In the above example,
+c(2,3) could be written as \code{2:3}.
 
 Arrays of more than two dimensions are written in a last-index major form.
 For example, 
