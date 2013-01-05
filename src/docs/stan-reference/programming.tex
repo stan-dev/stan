@@ -1445,6 +1445,202 @@ directly.
 
 
 
+\chapter{Clustering Models}
+
+\noindent
+Unsupervised methods for organizing data into groups are collectively
+referred to as clustering.  This chapter describes the implementation
+in Stan of two widely used statistical clustering models, soft
+$K$-means and latent Dirichlet allocation (LDA).  These models are
+typically expressed using discrete parameters for cluster assignments.
+Nevertheless, they can be implemented in Stan like any other mixture
+model by marginalizing out the discrete parameters (see
+\refchapter{mixture-modeling}).
+
+\section{Soft $K$-Means}
+
+$K$-means clustering is a method of clustering data represented as
+$D$-dimensional vectors.  Specifically, there will be $N$ items to be
+clustered, each represented as a vector $y_n \in \reals^D$.  In the
+``soft'' version of $K$-means, the assignments to clusters will be
+probabilistic.  
+
+\subsection{Geometric Hard  $K$-Means Clustering}
+
+$K$-means clustering is typically described geometrically in terms of
+the following algorithm, which assumes the number of clusters $K$ and
+data vectors $y$ as input.
+%
+\begin{enumerate}
+\item For each $n$ in $1:N$, randomly assign vector $y_n$ to a cluster in $1{:}K$;
+\item Repeat
+\begin{enumerate} 
+\item For each cluster $k$ in $1{:}K$, compute the cluster centroid $\mu_k$  by averaging the
+  vectors assigned to that cluster;
+\item For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$ to
+  for which the (Euclidean) distance from $y_n$ to $\mu_k$ is smallest;
+\item If no vectors changed cluster, return the cluster assignments.
+\end{enumerate}
+\end{enumerate}
+
+\subsection{Soft $K$-Means Clustering}
+
+Soft $K$-means clustering treats the cluster assignments as
+probability distributions over the clusters.  Because of the
+connection between Euclidean distance and multivariate normal models
+with a fixed covariance, soft $K$-means is just a multivariate normal
+mixture model.
+
+In the full generative model, each data point $n$ in $1{:}N$ is assigned
+a cluster $z_n \in 1{:}K$ with symmetric uniform probability,
+%
+\[
+z_n \sim \distro{Cateogrical}({\bf 1}/K),
+\]
+where ${\bf 1}$ is the unit vector of $K$ dimensions, so that ${\bf
+  1}/K$ is the symmetric $K$-simplex.  Thus the model assumes that
+each data point is drawn from a hard decision about cluster
+membership.  The softness arises only from the uncertainty about which
+cluster generated a data point.
+
+The data points themselves are generated from a multivariate normal
+distribution whose parameters are determined by the cluster assignment
+$z_n$,
+\[
+y_n \sim  \distro{Normal}(\mu_{z[n]},\Sigma_{z[n]})
+\]
+
+The sample implementation in this section assumes a fixed unit
+covariance matrix shared by all clusters $k$,
+\[
+\Sigma_k = \mbox{diag\_matrix}({\bf 1}),
+\]
+so that the log multivariate normal can be implemented directly up to a proportion
+by
+\[
+\mbox{Normal}\left( y_n | \mu_k, \mbox{diag\_matrix}({\bf 1}) \right)
+\propto \exp \left (- \frac{1}{2} \sum_{d=1}^D \left( \mu_{k,d} - y_{n,d}
+  \right)^2 \right).
+\]
+The spatial perspective on $K$-means arises by noting that the inner
+term is just half the negative Euclidean distance from the cluster
+mean $\mu_k$ to the data point $y_n$.
+
+\subsection{Stan Implementation of Soft $K$-Means}
+
+The following model is available in the Stan distribution (along with
+an R program to randomly generate data sets and a sample data set) in
+the directory \nolinkurl{stan/src/models/misc/soft-k-means}.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> N;  // number of data points
+  int<lower=1> D;  // number of dimensions
+  int<lower=1> K;  // number of clusters
+  vector[D] y[N];  // observations
+}
+transformed data {
+  real<upper=0> neg_log_K;
+  neg_log_K <- -log(K);
+}
+parameters {
+  vector[D] mu[K]; // cluster means
+}
+transformed parameters {
+  real<upper=0> soft_z[N,K]; // log unnormalized clusters
+  for (n in 1:N)
+    for (k in 1:K)
+      soft_z[n,k] <- neg_log_K 
+                     - 0.5 * dot_self(mu[k] - y[n]);
+}
+model {
+  for (k in 1:K)
+    mu[k] ~ normal(0,1);  // prior
+  for (n in 1:N)
+    lp__ <- lp__ + log_sum_exp(soft_z[n]); // likelihood
+}
+\end{Verbatim}
+\end{quote}
+%
+There is an independent unit normal prior on the centroid parameters;
+this prior could be swapped with other priors, or even a hierarchical
+model to fit an overall problem scale and location.
+
+The only parameter is \code{mu}, where \code{mu[k]} is the centroid
+for cluster $k$.  The transformed parameters \code{soft\_z[n]} contain
+the log of the unnormalized cluster assignment probabilities.  To
+normalize to probabilities, convert \code{soft\_z} back to a linear
+scale by exponentiating, then to a simplex by normalizing.  For
+instance, in R, the statement
+%
+\begin{quote}
+\begin{Verbatim}
+soft_z_norm[n] <- exp(soft_z[n]) / sum(exp(soft_z[n]));
+\end{Verbatim}
+\end{quote}
+%
+defines a properly normalized simplex \code{soft\_z\_norm}.
+
+
+\subsection{Generalizing Soft $K$-Means}
+
+The multivariate normal distribution with unit covariance matrix
+produces a log probability density proportional to Euclidean distance
+(i.e., $L_2$ distance).  Other distribtutions relate to other
+geometries.  For instance, replacing the normal distribution with the
+double exponential (Laplace) distribution produces a clustering model
+based on $L_1$ distance (i.e., Manhattan or taxicab
+distance). 
+
+Within the multivariate normal version of $K$-means, replacing the
+unit covariance matrix with a shared covariance matrix amounts to
+working with distances defined in a space transformed by the inverse
+covariance matrix (i.e., in a Riemann manifold). 
+
+Although there is no global spatial analog, it is common to see soft
+$K$-means specified with a per-cluster covariance matrix. In this
+situation, a hierarchical prior may be used to regularize.
+
+
+
+\section{The Difficulty of Bayesian Inference for Clustering}
+
+Two problems make it pretty much impossible to do proper, full
+Bayesian inference in clustering models, the lack of parameter
+identifiability and the multimodality of the posterior.
+
+\subsection{Non-Identifiability}
+
+A fundamental problem with mixture models is that the cluster
+assignments are not identified.  This is easy to see because permuting
+the cluster mean vectors \code{mu} leads to a model with identical
+likelihoods.  For instance, permuting the first two indexes in
+\code{mu} and the first two indexes in each \code{soft\_z[n]} leads to
+an identical likelihood (and prior).  
+
+The lack of identifiability means that the parameters cannot be
+compared across multiple Markov chains.  Since the only parameter in
+soft $K$-means is not identified, this leads to a problem in running
+multiple chains and monitoring convergence.  So typically only a
+single chain is run.  But even within a single chain, the indexes can
+swap if the chain is long enough or if the data is not cleanly
+separated.  
+
+\subsection{Multimodality}
+
+The other problem with clustering models is that their posteriors are
+highly multimodal.  This multimodality does not simply arise from the
+non-identifiability, but is an inherent problem in clustering that
+leads to many local maxima of the posterior.  
+
+Bayesian inference fails in cases of high multimodality because there
+is no way to visit all of the modes in the posterior in appropriate
+proportions.   
+
+The advice often given in this situation is to try many different
+initializations and select the result with the highest overall
+probability.
 
 
 \chapter{Reparameterizations and Changes of Variables}
