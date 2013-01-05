@@ -38,112 +38,167 @@ TYPED_TEST_P(AgradDistributionTestFixture, call_all_versions) {
   EXPECT_NO_THROW(logprob = _LOG_PROB_(param0, param1, param2));
   EXPECT_NO_THROW(logprob = _LOG_PROB_(param0, param1, param2, errno_policy()));
 }
-
-TYPED_TEST_P(AgradDistributionTestFixture, check_valid_iid) {
-  AgradTest<TypeParam, int, int, double>::test_valid();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iid) {
+  typedef AgradTest<TypeParam, int, int, double> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, check_valid_iiv) {
-  AgradTest<TypeParam, int, int, var>::test_valid();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iiv) {
+  typedef AgradTest<TypeParam, int, int, var> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_iid) {
-  AgradTest<TypeParam, int, int, double>::test_invalid();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iiD) {
+  typedef AgradTest<TypeParam, int, int, vector<double> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, check_invalid_iiv) {
-  AgradTest<TypeParam, int, int, var>::test_invalid();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iiV) {
+  typedef AgradTest<TypeParam, int, int, vector<var> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_iid) {
-  AgradTest<TypeParam, int, int, double>::test_propto();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iId) {
+  typedef AgradTest<TypeParam, int, vector<int>, double> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, logprob_propto_iiv) {
-  AgradTest<TypeParam, int, int, var>::test_propto();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iIv) {
+  typedef AgradTest<TypeParam, int, vector<int>, var> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_iid) {
-  AgradTest<TypeParam, int, int, double>::test_finite_diff();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iID) {
+  typedef AgradTest<TypeParam, int, vector<int>, vector<double> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, gradient_finite_diff_iiv) {
-  AgradTest<TypeParam, int, int, var>::test_finite_diff();
+TYPED_TEST_P(AgradDistributionTestFixture, test_iIV) {
+  typedef AgradTest<TypeParam, int, vector<int>, vector<var> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_iid) {
-  AgradTest<TypeParam, int, int, double>::test_gradient_function();
+TYPED_TEST_P(AgradDistributionTestFixture, test_Iid) {
+  typedef AgradTest<TypeParam, vector<int>, int, double> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, gradient_function_iiv) {
-  AgradTest<TypeParam, int, int, var>::test_gradient_function();
+TYPED_TEST_P(AgradDistributionTestFixture, test_Iiv) {
+  typedef AgradTest<TypeParam, vector<int>, int, var> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iid) {
-  AgradTest<TypeParam, int, int, double>::test_vectorized();
+TYPED_TEST_P(AgradDistributionTestFixture, test_IiD) {
+  typedef AgradTest<TypeParam, vector<int>, int, vector<double> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iiv) {
-  AgradTest<TypeParam, int, int, var>::test_vectorized();
+TYPED_TEST_P(AgradDistributionTestFixture, test_IiV) {
+  typedef AgradTest<TypeParam, vector<int>, int, vector<var> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iiD) {
-  AgradTest<TypeParam, int, int, vector<double> >::test_vectorized();
+TYPED_TEST_P(AgradDistributionTestFixture, test_IId) {
+  typedef AgradTest<TypeParam, vector<int>, vector<int>, double> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iiV) {
-  AgradTest<TypeParam, int, int, vector<var> >::test_vectorized();
+TYPED_TEST_P(AgradDistributionTestFixture, test_IIv) {
+  typedef AgradTest<TypeParam, vector<int>, vector<int>, var> Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iId) {
-  AgradTest<TypeParam, int, vector<int>, double>::test_vectorized();
+TYPED_TEST_P(AgradDistributionTestFixture, test_IID) {
+  typedef AgradTest<TypeParam, vector<int>, vector<int>, vector<double> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iIv) {
-  AgradTest<TypeParam, int, vector<int>, var>::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iID) {
-  AgradTest<TypeParam, int, vector<int>, vector<double> >::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_iIV) {
-  AgradTest<TypeParam, int, vector<int>, vector<var> >::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_Iid) {
-  AgradTest<TypeParam, vector<int>, int, double>::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_Iiv) {
-  AgradTest<TypeParam, vector<int>, int, var>::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IiD) {
-  AgradTest<TypeParam, vector<int>, int, vector<double> >::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IiV) {
-  AgradTest<TypeParam, vector<int>, int, vector<var> >::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IId) {
-  AgradTest<TypeParam, vector<int>, vector<int>, double>::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IIv) {
-  AgradTest<TypeParam, vector<int>, vector<int>, var>::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IID) {
-  AgradTest<TypeParam, vector<int>, vector<int>, vector<double> >::test_vectorized();
-}
-TYPED_TEST_P(AgradDistributionTestFixture, vectorized_IIV) {
-  AgradTest<TypeParam, vector<int>, vector<int>, vector<var> >::test_vectorized();
+TYPED_TEST_P(AgradDistributionTestFixture, test_IIV) {
+  typedef AgradTest<TypeParam, vector<int>, vector<int>, vector<var> > Test;
+  Test::test_valid();
+  Test::test_invalid();
+  Test::test_propto();
+  Test::test_finite_diff();
+  Test::test_gradient_function();
+  Test::test_vectorized();
 }
 
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   call_all_versions,
-			   check_valid_iid,
-			   check_valid_iiv,
-			   check_invalid_iid,
-			   check_invalid_iiv,
-			   logprob_propto_iid,
-			   logprob_propto_iiv,
-			   gradient_finite_diff_iid,
-			   gradient_finite_diff_iiv,
-			   gradient_function_iid,
-			   gradient_function_iiv,
-			   vectorized_iid,
-			   vectorized_iiv,
-			   vectorized_iiD,
-			   vectorized_iiV,
-			   vectorized_iId,
-			   vectorized_iIv,
-			   vectorized_iID,
-			   vectorized_iIV,
-			   vectorized_Iid,
-			   vectorized_Iiv,
-			   vectorized_IiD,
-			   vectorized_IiV,
-			   vectorized_IId,			   
-			   vectorized_IIv,
-			   vectorized_IID,
-			   vectorized_IIV);
+			   test_iid,
+			   test_iiv,
+			   test_iiD,
+			   test_iiV,
+			   test_iId,
+			   test_iIv,
+			   test_iID,
+			   test_iIV,
+			   test_Iid,
+			   test_Iiv,
+			   test_IiD,
+			   test_IiV,
+			   test_IId,			   
+			   test_IIv,
+			   test_IID,
+			   test_IIV);
 #endif
