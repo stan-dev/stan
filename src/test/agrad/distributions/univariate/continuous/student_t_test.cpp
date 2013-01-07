@@ -115,6 +115,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
 INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
 			      AgradDistributionTestFixture5,
 			      AgradDistributionsStudentT);
-INSTANTIATE_TYPED_TEST_CASE_P(AgradDistributionsStudentT,
-			      AgradDistributionTestFixture6,
-			      AgradDistributionsStudentT);
