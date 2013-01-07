@@ -1642,8 +1642,387 @@ The advice often given in this situation is to try many different
 initializations and select the result with the highest overall
 probability.
 
+\section{Naive Bayes Classification and Clustering}
 
-\chapter{Reparameterizations and Changes of Variables}
+Multinomial mixture models are referred to as ``naive Bayes'' because
+they are often applied to classification problems where the
+multinomial independence assumptions are clearly false. 
+
+Naive Bayes classification and clustering can be applied to any data
+with multinomial structure.  A typical example of this is natural
+language text classification and clustering, which is used an example
+in what follows. 
+
+The observed data consists of a sequence of $M$ documents made up of
+bags of words drawn from a vocabulary of $V$ distinct words.  A
+document $m$ has $N_m$ words, which are indexed as $w_{m,1}, \ldots,
+w_{m,N[m]} \in 1{:}V$.  Despite the ordered indexing of words ina
+document, this order is not part of the model, which is clearly
+defective for natural human language data.  A number of topics (or
+categories) $K$ is fixed.
+
+The multinomial mixture model generates a single category $z_m \in
+1{:}K$ for each document $m \in 1{:}M$ according to a categorical
+distribution,
+\[
+z_m \sim \distro{Categorical}(\theta).
+\]
+The $K$-simplex parameter $\theta$ represents the prevalence of each
+category in the data.
+
+Next, the words in each document are generated conditionally
+independently of each other and the words in other documents based on
+the category of the document, with word $n$ of document $m$ being
+generated according as
+\[
+w_{m,n} \sim \distro{Categorical}(\phi_{z[m]}).
+\]
+The parameter $\phi_{z[m]}$ is a $V$-simplex representing the
+probability of each word in the vocabulary in documents of category
+$z_m$.
+
+The parameters are typically given symmetric Dirichlet priors.
+
+\subsection{Representing Ragged Arrays in Stan}
+
+The specification for LDA in the previous sections have used a ragged
+array notation for the words $w$.  Because Stan does not support
+ragged arrays, the models are coded using an alternative strategy that
+provides an index for each word in a global list of words.   The data
+looks as follows, with the word arrays layed out in a column and each
+assigned to its document in a second column.
+%
+\begin{center}
+\begin{tabular}{r|cc}
+\code{n} & \code{w[n]} & \code{doc[n]} \\ \hline
+1 & $w_{1,1}$ & 1 \\
+2 & $w_{1,2}$ & 1 \\
+\vdots & \vdots & \vdots \\
+$N_1$ & $w_{1,N[1]}$ & 1 \\
+$N_1 + 1$ & $w_{2,1}$ & 2 \\
+$N_1 + 2$ & $w_{2,2}$ & 2 \\
+\vdots & \vdots & \vdots \\
+$N_1 + N_2$ & $w_{2,N[2]}$ & 2 \\
+$N_1 + N_2 + 1$ & $w_{3,1}$ & 3 \\
+\vdots & \vdots & \vdots \\
+$\code{N} = \sum_{m=1}^M N_m$ & $w_{M,N[M]}$ & $M$ \\
+\end{tabular}
+\end{center}
+%
+The relevant variables for the program are \code{N}, the total number
+of words in all the documents, the word value array \code{w}, and the
+document identity array \code{doc}.  
+
+\subsection{Estimation with Category-Labeled Training Data}
+
+The naive Bayes models along with R programs to simulate data for them
+and a sample data set are available in the distribtution in the
+directory \nolinkurl{src/models/misc/clustering/naive-bayes}.
+
+A naive Bayes model for estimating the simplex parameters given
+training data with documents of known categories can be coded in Stan
+as follows 
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  // training data
+  int<lower=1> K;               // num topics
+  int<lower=1> V;               // num words
+  int<lower=0> M;               // num docs
+  int<lower=0> N;               // total word instances
+  int<lower=1,upper=K> z[M];    // topic for doc m
+  int<lower=1,upper=V> w[N];    // word n
+  int<lower=1,upper=M> doc[N];  // doc ID for word n
+  // hyperparameters
+  vector<lower=0>[K] alpha;     // topic prior
+  vector<lower=0>[V] beta;      // word prior
+}
+parameters {
+  simplex[K] theta;   // topic prevalence
+  simplex[V] phi[K];  // word dist for topic k
+}
+model {
+  // priors
+  theta ~ dirichlet(alpha);
+  for (k in 1:K)  
+    phi[k] ~ dirichlet(beta);
+  // likelihood, including latent category
+  for (m in 1:M)
+    z[m] ~ categorical(theta);
+  for (n in 1:N)
+    w[n] ~ categorical(phi[z[doc[n]]]);
+}
+\end{Verbatim}
+\end{quote}
+%
+Note that the topic identifiers $z_m$ are declared as data, and the
+latent category assignments are included as part of the likelihood
+function.  The category assignment is often summed out of the
+likelihood to compute the marginal probability of one or more documents.
+
+\subsection{Estimation without Category-Labeled Training Data}
+
+Naive Bayes models can be used in an unsupervised fashion to cluster
+multinomial-structured data into a fixed number $K$ of categories.  
+The data declaration includes the same variables as the model in the
+previous section excluding the topic labels \code{z}.   Because
+\code{z} is discrete, it needs to be summed out of the model
+calculation.  This is done for naive Bayes as for other mixture
+models.  The parameters are the same up to the priors, but the
+likelihood is now computed as the marginal document probability
+\[
+\begin{array}{l}
+\log p(w_{m,1},\ldots,w_{m,N_m}|\theta,\phi)
+\\[2pt]
+\ \ \ = \ 
+\log \sum_{k=1}^K 
+\left( \distro{Categorical}(k|\theta)
+        \times \prod_{n=1}^{N_m} \distro{Categorical}(w_{m,n}|\phi_k)
+\right)
+\\[6pt]
+\ \ \ = \ 
+\log \sum_{k=1}^K \exp \left(
+\log \distro{Categorical}(k|\theta)
++ \sum_{n=1}^{N_m} \log \distro{Categorical}(w_{m,n}|\phi_k)
+\right).
+\end{array}
+\]
+%
+The last step shows how the \code{log\_sum\_exp} function can be used
+to stabilize the numerical calculation and return a result on the log scale.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  real gamma[M,K];
+  theta ~ dirichlet(alpha);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta);
+
+   for (m in 1:M) 
+     for (k in 1:K) 
+       gamma[m,k] <- categorical_log(k,theta);
+   for (n in 1:N)
+     for (k in 1:K)
+       gamma[doc[n],k] <- gamma[doc[n],k] 
+                          + categorical_log(w[n],phi[k]);
+   for (m in 1:M)
+     lp__ <- lp__ + log_sum_exp(gamma[m]);
+}
+\end{Verbatim}
+\end{quote}
+%
+The local variable \code{gamma[m,k]} represents the value
+\[
+\log \distro{Categorical}(k|\theta)
++ \sum_{n=1}^{N_m} \log \distro{Categorical}(w_{m,n}|\phi_k).
+\]
+%
+Given \code{gamma}, the posterior probability that document
+$m$ is assigned category $k$ is
+\[
+\exp \left( 
+\mbox{\code{gamma}}[m,k]  
+- \log \sum_{k=1}^K \exp \left( \code{gamma}[m,k] \right)
+\right).
+\]
+%
+If the variable \code{gamma} were declared and defined in the
+transformed parameter block, its sampled values would be saved by
+Stan.  The normalized posterior probabilities could also be defined as
+generated quantities.
+
+\subsection{Full Bayesian Inference for Naive Bayes}
+
+Full Bayesian posterior predictive inference for the naive Bayes model
+can be implemented in Stan by comining the models for labeled and
+unlabeled data.  The estimands include both the model parameters and
+the labels for the unlabeled data.  The model is essentially a missing
+data model assuming the unknown category labels are missing completely
+at random; see \citep{GelmanCarlinSternRubin:2003,GelmanHill:2007} for
+more information on missing data imputation.  The model is also an
+instance of semisupervised learning because the unlabeled data
+contributes to the parameter estimations.
+
+To specify a Stan model for performing full Bayesian inference, the
+model for labeled data is combined with the model for unlabeled data.
+A second document collection is declared as data, but without the
+category labels, leading to new variables \code{M2} \code{N2},
+\code{w2}, \and \code{doc2}.  The number of categories and number of
+words, as well as the hyperparameters are shared and only declined
+once.  Similarly, there is only one set of parameters.  Then the model
+contains a single set of statements for the prior, a set of statements
+for the labeled data and a set of statements for the unlabeled data.
+
+\subsection{Cutting Variables out of Estimation}
+
+An alternative to full Bayesian inference involves estimating a model
+using labeled data, then applying it to unlabeled data without
+updating the parameter estimates based on the unlabeled data.  This
+behavior can be implemented by simply removing the contribution of
+\code{gamma} to the log probability accumulator \code{lp\_\_}.  The
+value of \code{gamma} will still be calculated, but it will no longer
+have any affect on the log probabilty and hence no effect on the
+parameter estimation.
+%
+\footnote{BUGS provides a function \code{cut} that can be applied to
+  variables in the directed graphical model to remove their
+  contribution to the overall log probability function.}
+%
+At this point, a variable like \code{gamma} can be moved to the
+generated quantities block, which will be more efficient.
+
+Partially cut inferences can be defined by including the variable as a
+transformed parameter, but only including some of its contribution to
+the log probability function.  Anything that does not contribute to
+the accumulator \code{lp\_\_} will not affect estimation.
+
+
+
+\section{Latent Dirichlet Allocation}
+
+Latent Dirichlet allocation (LDA) is a mixed-membership multinomial
+clustering model.  Using the typical topic/document terminology common
+in discussions of LDA, each document is modeled as having a mixture
+of topics, with each word drawn from a topic based on the mixing
+proportions.  
+
+\subsection{The LDA Model}
+
+The basic document generation process generates each document
+independently.  For document $m$, the first step is to draw a topic
+distribtuion simplex $\theta_m$ over the $K$ topics,
+%
+\[
+\theta_m \sim \distro{Dirichlet}(\alpha).
+\]
+%
+The prior hyperparameter $\alpha$ is fixed to a $K$-vector of positive
+values.  Each word in the document is generated independently
+conditional on the distribution $\theta_m$.  First, a topic
+$z_{m,n} \in 1{:}K$ is drawn for the word,
+\[
+z_{m,n} \sim \distro{Categorical}(\theta_m).
+\]
+%
+Finally, the word $w_{m,n}$ is drawn according to the word distribution
+for topic $z_{m,n}$,
+\[
+w_{m,n} \sim \distro{Categorical}(\phi_{z[m,n]}).
+\]
+The distributions $\phi_k$ over words for topic $k$ are also given a
+Dirichlet prior,
+\[
+\phi_k \sim \distro{Dirichlet}(\beta)
+\]
+%
+where $\beta$ is a $V$-vector of positive values.
+
+\subsection{Summing out the Discrete Parameters}
+
+Although Stan does not (yet) support discrete sampling, it is possible
+to calculate the marginal distribution over the continuous parameters
+by summing out the discrete parameters as in other mixture models.
+The marginal posterior of the topic and word variables is
+%
+\begin{eqnarray*}
+p(\theta,\phi|w,\alpha,\beta)
+& \propto & 
+p(\theta|\alpha) \times p(\phi|\beta) \times p(w|\theta,\phi)
+\\[4pt]
+& = & 
+\prod_{m=1}^M p(\theta_m|\alpha)
+\times
+\prod_{k=1}^K p(\phi_k|\beta)
+\times
+\prod_{m=1}^M \prod_{n=1}^{M[n]} p(w_{m,n}|\theta_m,\phi).
+\end{eqnarray*}
+%
+The inner word-probability term is marginalized by summing out the
+topic assignments,
+\begin{eqnarray*}
+p(w_{m,n}|\theta_m,\phi)
+& = &
+\sum_{z=1}^K p(z,w_{m,n}|\theta_m,\phi).
+\\[4pt]
+& = &
+\sum_{z=1}^K p(z|\theta_m) \times p(w_{m,n}|\phi_z).
+\end{eqnarray*}
+%
+Putting this back together and converting to the log scale provides a
+formula that can be implemented directly in Stan,
+\[
+\begin{array}{l}
+\log p(\theta,\phi|w,\alpha,\beta)
+\\[6pt]
+{ } \ \ 
+\begin{array}{l}
+{ } = \sum_{m=1}^M \log \distro{Dirichlet}(\theta_m|\alpha)
+\ + \
+\sum_{k=1}^K \log \distro{Dirichlet}(\phi_k|\beta)
+\\[6pt]
+{ } \ \ \ \ \
++ \sum_{m=1}^M \sum_{n=1}^{N[m]} \log \left( 
+\sum_{z=1}^K
+  \distro{Categorical}(z|\theta_m) 
+   \times \distro{Categorical}(w_{m,n}|\phi_z)
+ \right)
+\end{array}
+\end{array}
+\]
+
+\subsection{Implementation of LDA}
+
+
+Applying the marginal derived in the last section to the data
+structure described in this section leads to the following Stan
+program for LDA.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> K;               // num topics
+  int<lower=2> V;               // num words
+  int<lower=1> M;               // num docs
+  int<lower=1> N;               // total word instances
+  int<lower=1,upper=V> w[N];    // word n
+  int<lower=1,upper=M> doc[N];  // doc ID for word n
+  vector<lower=0>[K] alpha;     // topic prior
+  vector<lower=0>[V] beta;      // word prior
+}
+parameters {
+  simplex[K] theta[M];   // topic dist for doc m
+  simplex[V] phi[K];     // word dist for topic k
+}
+model {
+  for (m in 1:M)  
+    theta[m] ~ dirichlet(alpha);  // prior
+  for (k in 1:K)  
+    phi[k] ~ dirichlet(beta);     // prior
+  for (n in 1:N) {
+    real gamma[K];
+    for (k in 1:K) 
+      gamma[k] <- log(theta[doc[n],k]) + log(phi[k,w[n]]);
+    lp__ <- lp__ + log_sum_exp(gamma);  // likelihood
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+As in the other mixture models, the log-sum-of-exponents function is
+used to stabilize the numerical arithmetic. 
+
+
+
+
+
+
+
+  
+
+
+\chapter{Reparameterization \& Change of Variables}
 \label{change-of-variables.chapter}
 
 \noindent
