@@ -1,6 +1,30 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
+\chapter{Vectorization}
+
+\section{Vectorized Functions}\label{prob-vectorization.section}
+
+The normal probability function is specified with the signature
+%
+\begin{quote}
+\begin{Verbatim}
+normal_log(reals,reals,reals);
+\end{Verbatim}
+\end{quote}
+%
+The pseudo-type \code{reals} is used to indicate that an argument
+position may be vectorized.  Argument positions declared as
+\code{reals} may be filled with a real, a one-dimensional array, a
+vector, or a row-vector.  If there is more than one array or vector
+argument, their types can be anything but their size must match.  For
+instance, it is legal to use
+\code{normal\_log(row\_vector,vector,real)} as long as the vector and
+row vector have the same size.
+
+The pseudo-type \code{ints} is used for vectorized arguments.
+
+
 \chapter{Integer-Valued Basic Functions}
 
 \noindent
@@ -1583,25 +1607,6 @@ where the multinomial coefficient is defined by
 \noindent
 The various continuous probability functions are organized by their
 support.
-
-\section{Vectorization}\label{prob-vectorization.section}
-
-The normal probability function is specified with the signature
-%
-\begin{quote}
-\begin{Verbatim}
-normal_log(reals,reals,reals);
-\end{Verbatim}
-\end{quote}
-%
-The pseudo-type \code{reals} is used to indicate that an argument
-position may be vectorized.  Argument positions declared as
-\code{reals} may be filled with a real, a one-dimensional array, a
-vector, or a row-vector.  If there is more than one array or vector
-argument, their types can be anything but their size must match.  For
-instance, it is legal to use
-\code{normal\_log(row\_vector,vector,real)} as long as the vector and
-row vector have the same size.
 
 \section{Univariate Continuous Probabilities}
 

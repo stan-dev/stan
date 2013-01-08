@@ -2130,16 +2130,17 @@ gradient behind the scenes.
 
 Multivariate transforms are more complex.  They require the log
 absolute Jacobian to be applied.  In Stan, this requires coding the
-transform and the Jacobian.  In the full case (where the Jacobian is
-not triangular), the code would look as follows.
-%
-\begin{quote}
-\begin{Verbatim}
-parameters {
+transform and the Jacobian determinant.  
+% In the full case (where the Jacobian is
+% not triangular), the code would look as follows.
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% parameters {
 
-}
-\end{Verbatim}
-\end{quote}
+% }
+% \end{Verbatim}
+% \end{quote}
 
 
 
@@ -2555,8 +2556,6 @@ Euclidean geometry.%
   this difficulty by simulating the Hamiltonian dynamics in a a space
   with a position-dependent metric; see
   \citep{GirolamiCalderhead:2011} and \citep{Betancourt:2012}.}
-
-  
 %
 The practical problem is that tail of the Cauchy
 requires a relatively large step size compared to the trunk.  With a
