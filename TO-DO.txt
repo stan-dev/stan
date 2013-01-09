@@ -11,50 +11,10 @@ The to-do list is organized into the following sections:
 * Testing                       * Release Mgmt
 * Command-Line                  * ModelsC++ API
 
-
-SUPPORTED PLATFORMS
+NEXT RELEASE (1.1.1 or 1.2.0)
 ======================================================================
-
-? what should we try to support ?
-
-{ Windows (7, 8), 
-  Mac (OS X Snow Leopard, Lion, Mountain Lion), 
-  Linux (???) } 
-x { g++ (4.2.1, 4.6, 4.7?), clang++ (3.1) }
-x { libc++, libstdc++ }
-x { c++11, NO c++11 }
-x optimization level
-
-Most common platforms for users
--------------------------------
-
-   Windows:  Latest RTools
-             g++ 4.6.3 prerelease
-
-   Mac:      Latest Xcode
-             g++ 4.2.1, clang++ 3.1svn
-
-   Linux:    ???
-
--s
-
-ming (minimal gcc for Windows -- binary called g++; 
-      what Rtools using)
-
-Common:  Windows RTools
-         (does anyone know how to install another compiler)
-
-g++: 4.7
-clang++: 
-
-clang++: can't 
-
-libc++:  LLVM: targets C++11 (http://libcxx.llvm.org)
-libstdc++:  GNU
-
-llvm-g++
-
-
+fix depth bound on number of steps so max is really max specified
+  -- explain number of leapfrog steps is 2^(depth-1).
 
 PRIORITIES?
 ======================================================================
