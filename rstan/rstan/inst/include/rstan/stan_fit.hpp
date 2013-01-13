@@ -668,7 +668,8 @@ namespace rstan {
                          << std::endl;
         sample_stream.close();
       }
-      rstan::io::rcout << std::endl; 
+      if (refresh > 0) 
+        rstan::io::rcout << std::endl; 
       
       holder = Rcpp::List(chains.begin(), chains.end());
       holder.attr("test_grad") = Rcpp::wrap(false); 

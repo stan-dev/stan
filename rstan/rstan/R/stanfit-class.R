@@ -603,14 +603,14 @@ sflist2stanfit <- function(sflist) {
 as.array.stanfit <- function(x, ...) {
   if (x@mode != 0) return(numeric(0)) 
   out <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...)
-  dimnames(out) <- dimnames(x)
+  # dimnames(out) <- dimnames(x)
   return(out)
 } 
 as.matrix.stanfit <- function(x, ...) {
   if (x@mode != 0) return(numeric(0)) 
-  out <- apply(extract(x, permuted = FALSE, inc_warmup = FALSE, ...), 
-               3, FUN = function(y) y)
-  dimnames(out) <- dimnames(x)[-2]
+  e <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...) 
+  out <- apply(e, 3, FUN = function(y) y)
+  dimnames(out) <- dimnames(e)[-2]
   return(out)
 }
  
