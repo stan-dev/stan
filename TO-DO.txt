@@ -95,6 +95,8 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* fix error message on = used for assignment
+
 * rewrite functions in matrix.hpp.
   -- Functions:
       -- elt_multiply() [fix inv_wishart_log, wishart_log]
