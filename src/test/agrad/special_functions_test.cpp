@@ -1505,6 +1505,26 @@ TEST(AgradSpecialFunctions, Phi) {
       << "y = " << y;
   }
 }
+
+TEST(AgradSpecialFunctions, Phi_approx) {
+  using stan::agrad::var;
+  using stan::math::value_of;
+  using std::abs;
+
+  std::vector<double> y_values;
+  y_values.push_back(0.0);
+  y_values.push_back(0.9);
+  y_values.push_back(-5.0);
+
+  for (size_t i = 0; i < y_values.size(); i++) {
+    var y, phi_y, phi_approx_y;
+    y = y_values[i];
+    phi_y = stan::agrad::Phi(y);
+    phi_approx_y = stan::agrad::Phi_approx(y);
+    EXPECT_NEAR(value_of(phi_y), value_of(phi_approx_y), 0.00014);
+  }
+}
+
 void test_log_inv_logit(const double x) {
   using stan::agrad::var;
   using stan::math::log_inv_logit;

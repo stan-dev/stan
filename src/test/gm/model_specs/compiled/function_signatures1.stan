@@ -121,6 +121,7 @@ transformed data {
   transformed_data_real <- erf(d_real);
   transformed_data_real <- erfc(d_real);
   transformed_data_real <- Phi(d_real);
+  transformed_data_real <- Phi_approx(d_real);
   transformed_data_real <- binary_log_loss(d_int, d_real);
 
   //   combinatorial functions
@@ -460,6 +461,8 @@ transformed parameters {
   transformed_param_real <- erfc(p_real);
   transformed_param_real <- Phi(d_real);
   transformed_param_real <- Phi(p_real);
+  transformed_param_real <- Phi_approx(d_real);
+  transformed_param_real <- Phi_approx(p_real);
   transformed_param_real <- binary_log_loss(d_int, d_real);
   transformed_param_real <- binary_log_loss(d_int, p_real);
 
