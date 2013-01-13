@@ -1384,6 +1384,19 @@ namespace stan {
     }
 
     /**
+     * Approximation of the unit normal CDF for variables (stan).
+     *
+     * http://www.jiem.org/index.php/jiem/article/download/60/27
+     *
+     * @param a Variable argument.
+     * @return The corresponding unit normal cdf approximation.
+     */
+
+    inline var Phi_approx(const stan::agrad::var& a) {
+      return inv_logit(0.07056 * pow(a,3.0) + 1.5976 * a);
+    }
+
+    /**
      * The log loss function for variables (stan).
      *
      * See stan::math::log_loss() for the double-based version.

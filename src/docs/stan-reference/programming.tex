@@ -834,6 +834,16 @@ statement with the following.
         y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
 \end{Verbatim}
 \end{quote}
+%
+A fast approximation to the cumulative unit normal distribution function 
+$\Phi$ is implemented in \Stan as the function \code{Phi\_approx}.  The 
+approximate probit regression model may be coded with the following.
+%
+\begin{quote}
+\begin{Verbatim}
+        y[n] ~ bernoulli(Phi_approx(alpha + beta * x[n]));
+\end{Verbatim}
+\end{quote}
 
 \section{Multi-Logit Regression}
 
