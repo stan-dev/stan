@@ -2016,10 +2016,165 @@ used to stabilize the numerical arithmetic.
 
 
 
+\chapter{Gaussian Processes}\label{gaussian-processes.chapter}
+
+\noindent
+Gaussian processes can be encoded in Stan by implementing their
+covariance kernel functions and plugging the result into the Gaussian
+form of their sampling distribution.  This form of model is easy to
+understand and may be used for simulation, model fitting, or posterior
+predictive inference.  A more efficient Stan implementation applies a
+Cholesky-factor reparameterization of the Gaussian.  
+
+After defining Gaussian processes, this chapter covers the basic
+implementations for simulation, hyperparamter estimation, and
+posterior predictive inference for univariate regressions,
+multivariate regressions, and multivariate logistic regressions.  In
+the final chapter, it shows how the parameters underlying these models
+may be transformed for improved sampling efficiency.  Gaussian
+processes are very general, and by necessity this chapter only touches
+on some basic models.  For more information, see \citep{RasmussenWilliams:2006}.
 
 
+\section{Gaussian Process Regression}
 
-  
+The data for a multivariate Gaussian process regression consists of a
+series of $N$ real input values $x_1,\ldots,x_N \in \reals^D$ paired
+with outputs $y_1,\ldots,y_N \in \reals$.  The defining feature of
+Gaussian processes is that the probability of a finite number of
+outputs $y$ conditioned on their inputs $x$ is Gaussian,
+\[
+y \sim \distro{Normal}(\mu(x),\Sigma(x)),
+\] 
+where $\mu(x)$ is an $N$-vector and and $\Sigma(x)$ is an $N \times N$
+covariance matrix.  The mean function $\mu : \reals^{N \times D}
+\rightarrow \reals^{N}$ can be anything, but the kernel
+$\Sigma : \reals^{N \times D} \rightarrow \reals^{N \times
+  N}$ must produce a positive-definite matrix for any input $x$.
+
+A popular covariance function, which will be used in the
+implementations later in this chapter, is
+\[
+\Sigma_{i,j} 
+= \eta^2 
+\exp \left(
+- \rho^2 \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
++ \mbox{\bf I}(i = j) \sigma^2,
+\]
+where $\eta$, $\rho$, and $\sigma$ are hyperparameters defining the
+covariance function and where $\mbox{\bf I}(i=j)$ is the indicator function
+with value 1 if $i = j$ and value 0 otherwise.  The only term term in
+this kernel involving the inputs $x_i$ and $x_j$ is the squared
+Euclidean distance,
+\[
+d(x_i,x_j) = \sum_{d=1}^D (x_{i,d} - x_{j,d})^2.
+\]
+A kernel which can be reduced to a function of distance between inputs
+is said to be stationary.  Related stationary distributions arise from
+changing the distance function, for instance to taxicab ($L_1$ norm)
+distance or to a scaled-by-dimension Euclidean distance; other
+stationary kernels may be defined using a transform of the distance
+other than scaled exponentiated negation.
+
+\section{Simulating from a Gaussian Process}
+
+It is simplest to start with a Stan model that does nothing more than
+simulate values of $y$ given values of $x$ as input.  The
+Euclidean-distance-based kernel function described in the previous
+section will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2
+= 1$, and $\sigma^2 = 0.1$, and the mean function $\mu$ will be taken
+to be a constant.  The model is then defined by computing the mean and
+covariance matrix in a transformed data block functions and then
+sampling according to the resulting multivariate Gaussian.  The
+following model is included in the Stan distribution in file
+\nolinkurl{src/models/misc/gaussian-process/gp-sim.stan}.  
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> N;
+  real x[N];
+}
+transformed data {
+  vector[N] mu;
+  cov_matrix[N] Sigma;
+  for (i in 1:N) 
+    mu[i] <- 0;
+  for (i in 1:N) 
+    for (j in 1:N)
+      Sigma[i,j] <- exp(-pow(x[i] - x[j],2)) 
+                    + if_else(i==j, 0.1, 0.0);
+}
+parameters {
+  vector[N] y;
+}
+model {
+  y ~ multi_normal(mu,Sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The input data is just the number of data points \code{N} and the
+vector of inputs \code{x}.  Such a model can be used with values of
+\code{x} evenly spaced over some interval in order to plot sample
+draws from a Gaussian process in that range.
+
+\subsection{Cholesky Factored and Transformed Implementation}
+
+A much more efficient implementation of the simulation model can be
+coded in Stan by relocating, rescaling and rotating an isotropic unit
+normal variate.  Suppose $z$ is an an isotropic unit normal variate
+\[
+z \sim \distro{Normal}({\bf 0}, {\bf 1}),
+\]
+where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is an
+$N$-vector of 1 values.  Now suppose that the Cholesky decomposition
+of $\Sigma(x)$ is the lower-triangular matrix $L$ such that $LL^{\top}
+= \Sigma(x)$.  Then the transformed variable $\mu + Lz$ has the
+intended target distribution,
+\[
+\mu + Lz \sim \distro{Normal}(\mu,\Sigma(x)).
+\]
+
+This transform can be applied directly to Gaussian process simulation,
+as shown in the model
+\nolinkurl{src/models/misc/gaussian-process/gp-sim-cholesky.stan} in
+the distribution.  This model has the same data declarations for
+\code{N} and \code{x}, and the same transformed data definitions of
+\code{mu} and \code{Sigma} as the previous model, with the addition of
+a transformed data variable for the Cholesky decomposition.  The
+parameters change to the raw parameters sampled from an isotropic unit
+normal, and the actual samples are defined as generated quantities.
+%
+\begin{quote}
+\begin{Verbatim}
+...
+transformed data {
+  matrix[N,N] L;
+...
+  L <- cholesky_decompose(Sigma);
+}
+parameters {
+  vector[N] z;
+}
+model {
+  z ~ normal(0,1);
+}
+generated quantities {
+  vector[N] y;
+  y <- mu + L * z;
+}
+\end{Verbatim}
+\end{quote}
+%
+The Cholesky decomposition is only computed once, after the data is
+loaded and the covariance matrix \code{Sigma} computed.  The isotropic
+normal distribution for \code{z} is specified as a vectorized
+univariate distribution for efficiency; this specifies that each
+\code{z[n]} has an independent unit normal distribution.  The sampled
+vector \code{y} is then defined as a generated quantity using a direct
+encoding of the transform described above.
 
 
 \chapter{Reparameterization \& Change of Variables}
