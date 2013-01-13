@@ -745,6 +745,20 @@ namespace stan {
         }
       };
 
+      // use for single precomputed partials
+      class precomp_v_vari : public op_v_vari {
+      protected:
+        double da_;
+      public:
+        precomp_v_vari(double val, vari* avi, double da)
+          : op_v_vari(val,avi),
+            da_(da) { 
+        }
+        void chain() {
+          avi_->adj_ += adj_ * da_;
+        }
+      };
+
       // FIXME: memory leak -- copy vector to local memory
       class op_vector_vari : public vari {
       protected:

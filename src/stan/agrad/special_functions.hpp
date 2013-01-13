@@ -1391,9 +1391,15 @@ namespace stan {
      * @param a Variable argument.
      * @return The corresponding unit normal cdf approximation.
      */
-
     inline var Phi_approx(const stan::agrad::var& a) {
-      return inv_logit(0.07056 * pow(a,3.0) + 1.5976 * a);
+      // return inv_logit(0.07056 * pow(a,3.0) + 1.5976 * a);
+
+      double av = a.vi_->val_;
+      double av_squared = av * av;
+      double av_cubed = av * av_squared;
+      double f = stan::math::inv_logit(0.07056 * av_cubed + 1.5976 * av);
+      double da = f * (1 - f) * (3.0 * 0.07056 * av_squared + 1.5976);
+      return var(new precomp_v_vari(f,a.vi_,da));
     }
 
     /**
