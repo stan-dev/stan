@@ -2361,12 +2361,121 @@ vector of size \code{D} and defining the covariance function as in
 this subsection.
 
 
-
-
-
-
 \section{Predictve Inference with a Gaussian Process}
 
+Suppose for a given sequence of inputs $x$ that the corresponding
+outputs $y$ are observed.  Given a new sequence of inputs $\tilde{x}$,
+the posterior predictive distribution of their labels is computed by
+sampling outputs $\tilde{y}$ according to
+\[
+p(\tilde{y}|\tilde{x},x,y)
+\ = \
+\frac{p(\tilde{y}, y|\tilde{x},x)}
+     {p(y|x)}
+\ \propto \
+p(\tilde{y}, y|\tilde{x},x).
+\]
+
+A direct implementation in Stan defines a model in terms of the the
+joint distribution of the observed $y$ and unobserved $\tilde{y}$.
+Although Stan does not support mixed vectors of parameters and data
+directly, such a vector may be synthesized as a local variable in the
+model block.  The following model, which takes this approach, is
+available in the distribution as
+\nolinkurl{src/models/misc/gaussian-process/gp-predict.stan}.  
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> N1;     
+  vector[N1] x1; 
+  vector[N1] y1;
+  int<lower=1> N2;
+  vector[N2] x2;
+}
+transformed data {
+  int<lower=1> N;
+  vector[N1+N2] x;
+  vector[N1+N2] mu;
+  cov_matrix[N1+N2] Sigma;
+  N <- N1 + N2;
+  for (n in 1:N1) x[n] <- x1[n];
+  for (n in 1:N2) x[N1 + n] <- x2[n];
+  for (i in 1:N) mu[i] <- 0;
+  for (i in 1:N) 
+    for (j in 1:N)
+      Sigma[i,j] <- exp(-pow(x[i] - x[j],2)) 
+                    + if_else(i==j, 0.1, 0.0);
+}
+parameters {
+  vector[N2] y2;
+}
+model {
+  vector[N] y;
+  for (n in 1:N1) y[n] <- y1[n];
+  for (n in 1:N2) y[N1 + n] <- y2[n];
+
+  y ~ multi_normal(mu,Sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The input vectors \code{x1} and \code{x2} are declared as data, as is
+the observed output vector \code{y1}.  The unknown output vector
+\code{y2}, which corresponds to input vector \code{x2}, is declared as
+a parameter and will be sampled when the model is executed.  
+
+A transformed data block is used to combine the input vectors
+\code{x1} and \code{x2} into a single vector \code{x}.  The covariance
+function is then applied to this combined input vector to produce the
+covariance matrix \code{Sigma}.  The mean vector \code{mu} is also
+declared and set to zero.
+
+The model block declares and define a local variable for the combined
+output vector \code{y}, which consists of the concatenation of the
+known outputs \code{y1} and unknown outputs \code{y2}.  Thus the
+combined output vector \code{y} is aligned with the combined
+input vector \code{x}.  All that is left is to define the multivariate
+normal sampling statement for \code{y}.
+
+\subsection{Cholesky Factorization Speedup}
+
+This model could be sped up fairly substantially by computing the
+Cholesky factor of \code{Sigma} in the transformed data block
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  matrix[N1+N2,N1+N2] L;
+...
+  L = cholesky_decompose(Sigma);
+...
+\end{Verbatim}
+\end{quote}
+%
+and then replacing \code{multi\_normal} with the more efficient
+\code{multi\_normal\_cholesky} in the model block.  
+%
+\begin{quote}
+\begin{Verbatim}
+...
+model {
+...
+  y ~ multi_normal_cholesky(mu,L);
+}
+\end{Verbatim}
+\end{quote}
+%  
+At this point, \code{Sigma} could be declared as a local
+variable in the data block so that its memory may be recovered after
+the data is loaded.
+
+\subsection{Hyperparameter Fitting}
+
+Hyperparameter fitting may be added to this model in the same way as
+for the simulation model.  The hyperparameters for the covariance
+function are declared as additional parameters and the definition of
+the covariance matrix \code{Sigma} is moved from teh transformed data
+block to a local variable block in the model.
 
 
 
