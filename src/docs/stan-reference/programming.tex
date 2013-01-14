@@ -2029,21 +2029,44 @@ used to stabilize the numerical arithmetic.
 \chapter{Gaussian Processes}\label{gaussian-processes.chapter}
 
 \noindent
-Gaussian processes can be encoded in Stan by implementing their
-covariance kernel functions and plugging the result into the Gaussian
+Gaussian process are continuous stochastic processes and thus may be
+interpreted as providing a probability distribution over functions.  A
+probability distribution over continuous functions may be viewed,
+roughly, as an uncountably infinite collection of random variables,
+one for each valid input.  The generality of the supported functions
+makes Gaussian priors popular choices for priors in general
+multivariate (non-linear) regression problems.
+
+The defining feature of a Gaussian process is that the distribution of
+the function's value at a finite number of input points is a
+multivariate normal distribution.  This makes it tractable to both fit
+models from finite amounts of observed data and make predictions for
+new data points. 
+
+Unlike a simple multivariate normal distribution, which is
+parameterized by a mean vector and covariance matrix, a Gaussian
+process is parameterized by a mean function and covariance function.
+The mean and covariance functions apply to vectors of inputs and
+return a mean vector and covariance matrix which provide the mean and
+covariance of the outputs corresponding to those input points in the
+functions drawn from the process.
+
+Gaussian processes can be encoded in Stan by implementing their mean
+and covariance functions and plugging the result into the Gaussian
 form of their sampling distribution.  This form of model is easy to
 understand and may be used for simulation, model fitting, or posterior
-predictive inference.  A more efficient Stan implementation applies a
-Cholesky-factor reparameterization of the Gaussian.  
+predictive inference.  More efficient Stan implementation for the
+basic (non-logistic) regression applies a Cholesky-factor
+reparameterization of the Gaussian and computes the posterior
+predictive distribution analytically.
 
 After defining Gaussian processes, this chapter covers the basic
-implementations for simulation, hyperparamter estimation, and
+implementations for simulation, hyperparameter estimation, and
 posterior predictive inference for univariate regressions,
-multivariate regressions, and multivariate logistic regressions.  In
-the final chapter, it shows how the parameters underlying these models
-may be transformed for improved sampling efficiency.  Gaussian
-processes are very general, and by necessity this chapter only touches
-on some basic models.  For more information, see \citep{RasmussenWilliams:2006}.
+multivariate regressions, and multivariate logistic regressions.
+Gaussian processes are very general, and by necessity this chapter
+only touches on some basic models.  For more information, see
+\citep{RasmussenWilliams:2006}.
 
 
 \section{Gaussian Process Regression}
@@ -2054,51 +2077,74 @@ with outputs $y_1,\ldots,y_N \in \reals$.  The defining feature of
 Gaussian processes is that the probability of a finite number of
 outputs $y$ conditioned on their inputs $x$ is Gaussian,
 \[
-y \sim \distro{Normal}(\mu(x),\Sigma(x)),
+y \sim \distro{Normal}(m(x),k(x)),
 \] 
-where $\mu(x)$ is an $N$-vector and and $\Sigma(x)$ is an $N \times N$
-covariance matrix.  The mean function $\mu : \reals^{N \times D}
-\rightarrow \reals^{N}$ can be anything, but the kernel
-$\Sigma : \reals^{N \times D} \rightarrow \reals^{N \times
-  N}$ must produce a positive-definite matrix for any input $x$.
+where $m(x)$ is an $N$-vector and and $k(x)$ is an $N \times N$
+covariance matrix.  The mean function $m : \reals^{N \times D}
+\rightarrow \reals^{N}$ can be anything, but the covariance function
+$k : \reals^{N \times D} \rightarrow \reals^{N \times N}$ must produce
+a positive-definite matrix for any input $x$.%
+%
+\footnote{Gaussian processes can be extended to covariance functions
+  producing positive semi-definite matrices, but Stan does not support
+  inference in the resulting models because the resulting distribution
+  does not have unconstrained support.}
 
 A popular covariance function, which will be used in the
-implementations later in this chapter, is
+implementations later in this chapter, is a generalized, squared
+exponential function,
 \[
-\Sigma_{i,j} 
+k(x)_{i,j}
 = \eta^2 
 \exp \left(
 - \rho^2 \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
 \right)
-+ \mbox{\bf I}(i = j) \sigma^2,
++ \delta_{i,j} \sigma^2,
 \]
 where $\eta$, $\rho$, and $\sigma$ are hyperparameters defining the
-covariance function and where $\mbox{\bf I}(i=j)$ is the indicator function
-with value 1 if $i = j$ and value 0 otherwise.  The only term term in
-this kernel involving the inputs $x_i$ and $x_j$ is the squared
-Euclidean distance,
-\[
-d(x_i,x_j) = \sum_{d=1}^D (x_{i,d} - x_{j,d})^2.
-\]
-A kernel which can be reduced to a function of distance between inputs
-is said to be stationary.  Related stationary distributions arise from
-changing the distance function, for instance to taxicab ($L_1$ norm)
-distance or to a scaled-by-dimension Euclidean distance; other
-stationary kernels may be defined using a transform of the distance
-other than scaled exponentiated negation.
+covariance function and where $\delta_{i,j}$ is the Kronecker delta
+function with value 1 if $i = j$ and value 0 otherwise; note that this
+test is between the indexes $i$ and $j$, not between values $x_i$ and
+$x_j$. The addition of $\sigma^2$ on the diagonal is import
+to ensure the positive definiteness of the resulting matrix in the case of
+two identical inputs $x_i = x_j$.  In statistical terms, $\sigma$ is
+the scale of the noise term in the regression.
+
+The only term in the squared exponential covariance function involving
+the inputs $x_i$ and $x_j$ is their vector difference, $x_i - x_j$.
+This produces a process with stationary covariance in the sense that
+if an input vector $x$ is translated by a vector $\epsilon$ to $x +
+\epsilon$, the covariance at any pair of outputs is unchanged, because
+$k(x) = k(x+\epsilon)$.
+
+The summation involved is just the squared Euclidean distance between
+$x_i$ and $x_j$ (i.e., the $L_2$ norm of their difference, $x_i -
+x_j$). This results in support for smooth functions in the process.
+The amount of variation in the function is controlled by the free
+hyperparameters $\eta$, $\rho$, and $\sigma$.  
+
+Changing the notion of distance from Euclidean to taxicab distance
+(i.e., an $L_1$ norm) changes the support to functions which are
+continuous but not smooth.
+
+
 
 \section{Simulating from a Gaussian Process}
 
 It is simplest to start with a Stan model that does nothing more than
-simulate values of $y$ given values of $x$ as input.  The
-Euclidean-distance-based kernel function described in the previous
-section will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2
-= 1$, and $\sigma^2 = 0.1$, and the mean function $\mu$ will be taken
-to be a constant.  The model is then defined by computing the mean and
-covariance matrix in a transformed data block functions and then
-sampling according to the resulting multivariate Gaussian.  The
-following model is included in the Stan distribution in file
-\nolinkurl{src/models/misc/gaussian-process/gp-sim.stan}.  
+simulate draws of functions $f$ from a Gaussian process.  In practical
+terms, the model will draw values $y_n = f(x_n)$ for finitely many
+input points $x_n$.
+
+The Stan model defines the mean and covariance functions in a
+transformed data block and then samples outputs $y$ in the model using
+a multivariate normal distribution.  To make the model concrete, the
+squared exponential covariance function described in the previous section
+will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2 = 1$,
+and $\sigma^2 = 0.1$, and the mean function $m$ is defined to always
+return the zero vector, $m(x) = {\bf 0}$.  The following model is
+included in the Stan distribution in file
+\nolinkurl{src/models/misc/gaussian-process/gp-sim.stan}.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -2125,10 +2171,46 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The input data is just the number of data points \code{N} and the
-vector of inputs \code{x}.  Such a model can be used with values of
-\code{x} evenly spaced over some interval in order to plot sample
-draws from a Gaussian process in that range.
+The input data is just the vector of inputs \code{x} and its size
+\code{N}.  Such a model can be used with values of \code{x} evenly
+spaced over some interval in order to plot sample draws from a
+Gaussian process in that range.
+
+\subsection{Multivariate Inputs}
+
+Only the covariance function's distance computation needs to change in
+moving from a univariate model to a multivariate model.  A
+multivariate sampling model is available in the source distribution at
+\nolinkurl{src/models/misc/gaussian-process/gp-multi-sim.stan}.  The
+only lines that change from the univariate model above are as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> D;
+  int<lower=1> N;
+  vector[D] x[N];
+}
+transformed data {
+...
+      Sigma[i,j] <- exp(-dot_self(x[i] - x[j])) 
+                    + if_else(i==j, 0.1, 0.0);
+...
+\end{Verbatim}
+\end{quote}
+%
+The data is now declared as an array of vectors instead of an array of
+scalars; the dimensionality \code{D} is also declared.  The squared
+Euclidean distance calculation is done using the \code{dot\_self}
+function, which returns the dot product of its argument with itself, here
+\code{x[i]~-~x[j]}.
+
+In the remainder of the chapter, univariate models will be used for
+simplicity, but any of them could be changed to multivariate in the
+same way as the simple sampling model.  The only extra computational
+overhead from a multivariate model is in the distance calculation,
+which is only done once when the transformed data block is run after
+the data is read.
 
 \subsection{Cholesky Factored and Transformed Implementation}
 
@@ -2138,13 +2220,13 @@ normal variate.  Suppose $z$ is an an isotropic unit normal variate
 \[
 z \sim \distro{Normal}({\bf 0}, {\bf 1}),
 \]
-where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is an
-$N$-vector of 1 values.  Now suppose that the Cholesky decomposition
-of $\Sigma(x)$ is the lower-triangular matrix $L$ such that $LL^{\top}
-= \Sigma(x)$.  Then the transformed variable $\mu + Lz$ has the
-intended target distribution,
+where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
+\times N$ unit matrix.  Let $L$ be the the Cholesky decomposition of
+$k(x)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
+k(x)$.  Then the transformed variable $\mu + Lz$ has the intended
+target distribution,
 \[
-\mu + Lz \sim \distro{Normal}(\mu,\Sigma(x)).
+\mu + Lz \sim \distro{Normal}(\mu,k(x)).
 \]
 
 This transform can be applied directly to Gaussian process simulation,
@@ -2185,6 +2267,107 @@ univariate distribution for efficiency; this specifies that each
 \code{z[n]} has an independent unit normal distribution.  The sampled
 vector \code{y} is then defined as a generated quantity using a direct
 encoding of the transform described above.
+
+
+\section{Fitting a Gaussian Process}
+
+The hyperparameters controlling the covariance function of a Gaussian
+process can be fit by assigning them priors, then computing the
+posterior distribution of the hyperparameters given observed data.
+Because the hyperparameters are required to be positive and are all
+essentially variance parameters, weakly informative half-Cauchy priors
+are a reasonable choice.
+
+A Stan model to fit the hyperparameters of the general squared
+exponential covariance function is provided in the distribution in
+\nolinkurl{src/models/misc/gaussian-process/gp-fit.stan}.  The Stan
+code is very similar to the simulation models in terms of the
+computations, but the blocks in which variables are declared and
+statements are executed has changed to accomodate the hyperparameter
+estimation problem.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> N;
+  vector[N] x;
+  vector[N] y;
+}
+transformed data {
+  vector[N] mu;
+  for (i in 1:N) mu[i] <- 0;
+}
+parameters {
+  real<lower=0> eta_sq;
+  real<lower=0> rho_sq;
+  real<lower=0> sigma_sq;
+}
+model {
+  matrix[N,N] Sigma;
+  for (i in 1:N)
+    for (j in i:N)
+      Sigma[i,j] <- eta_sq * exp(-rho_sq * pow(x[i] - x[j],2))
+                    + if_else(i==j, sigma_sq, 0.0);
+  for (i in 1:N)
+    for (j in (i+1):N)
+      Sigma[j,i] <- Sigma[i,j];
+
+  eta_sq ~ cauchy(0,5);
+  rho_sq ~ cauchy(0,5);
+  sigma_sq ~ cauchy(0,5);
+
+  y ~ multi_normal(mu,Sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The data block now declares a vector \code{y} of observed values
+\code{y[n]} for inputs \code{x[n]}.  The transformed data block now
+only defines the mean vector to be zero.  The three hyperparameters
+are defined as parameters constrained to be non-negative.  The
+computation of the covariance matrix \code{Sigma} is now in the model
+block because it involves unknown parameters and thus can't simply be
+precomputed as transformed data.  The rest of the model consists of
+the half-Cauchy priors for the hyperparameters and the multivariate
+normal likelihood, only now the value \code{y} is known and the
+covariance matrix \code{Sigma} is an unknown dependent on the
+hyperparameters.  
+
+Hamiltonian Monte Carlo sampling is quite fast and effective for
+hyperparameter inference in his model \citep{Neal:1997}, and the Stan
+implementation will fit hyperparameters in models with hundreds of
+data points in seconds.
+
+\subsection{Automatic Relevance Determination}
+
+For multivariate inputs $x \in \reals^D$, the squared exponential
+covariance function can be further generalized by fitting a precision
+parameter $\rho_d$ for each dimension,
+\[
+k(x)_{i,j} = \eta^2 \exp 
+\left(
+- \sum_{d=1}^D \rho_d^2 (x_{i,d} - x_{j,d})^2
+\right)
++ \delta_{i,j}\sigma^2.
+\]
+The estimation of $\rho$ was termed ``automatic relevance
+determination'' in \citep{Neal:1996}, because the larger $\rho_d$ is,
+the more dimension $d$ is weighted in the distance calculation.
+
+The implementation of automatic relevance determinantion in Stan is
+straightforward.  A model like the one to fit the basic
+hyperparameters can be generalized by declaring \code{rho} to be a
+vector of size \code{D} and defining the covariance function as in
+this subsection.
+
+
+
+
+
+
+\section{Predictve Inference with a Gaussian Process}
+
+
 
 
 \chapter{Reparameterization \& Change of Variables}
