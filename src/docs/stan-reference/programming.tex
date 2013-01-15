@@ -2360,6 +2360,12 @@ hyperparameters can be generalized by declaring \code{rho} to be a
 vector of size \code{D} and defining the covariance function as in
 this subsection.
 
+The collection of $\rho_d$ parameters can also be modeled
+hierarchically, for instance taking $\rho_d \sim
+\distro{HalfCauchy}(\nu,tau)$, with priors on $\nu$ and $\tau$ such as
+$\nu \sim \distro{HalfCauchy}(0,5)$ and $\tau \sim \distro{HalfCauchy}(0,5)$.
+
+
 
 \section{Predictve Inference with a Gaussian Process}
 
@@ -2469,13 +2475,147 @@ At this point, \code{Sigma} could be declared as a local
 variable in the data block so that its memory may be recovered after
 the data is loaded.
 
-\subsection{Hyperparameter Fitting}
+\subsection{Analytical Form of Joint Predictive Inference}
 
-Hyperparameter fitting may be added to this model in the same way as
-for the simulation model.  The hyperparameters for the covariance
-function are declared as additional parameters and the definition of
-the covariance matrix \code{Sigma} is moved from teh transformed data
-block to a local variable block in the model.
+
+\subsection{Joint Hyperparameter Fitting and Predictive Inference}
+
+Hyperparameter fitting may be carried out jointly with predictive
+inference in a single model.  This allows full Bayesian inference to
+account for the affect of the uncertainty in the hyperparameter
+estimates on the predictive inferences.  
+
+To encode a joint hyperparameter fit and predictive inference model in
+Stan, declare the hyperparameters as additional parameters,
+give them a prior in the model, move the definition of \code{Sigma} to
+a local variable in the model defined using the hyperparameters.
+% Because of the marginalization properties of Gaussian processes, the
+% predictive inference does not affect hyperparameter estimation (in
+% theory; in practice it can add noise).
+
+\section{Classification with Gaussian Processes}
+
+Gaussian processes can be generalized the same way as standard linear
+models by introducing a link function.  This allows them to be used as
+discrete data models, and in particular to perform classification
+using posterior predictive inference.  This section focuses on binary
+classification problems implemented with logistic Gaussian process
+regression.  
+
+\subsection{Logistic Gaussian Process Regression}
+
+For binary classification problems, the observed outputs $z_n \in
+\setlist{0,1}$ are binary.  These outputs are modeled using a Gaussian
+process with (unobserved) outputs $y_n$ through the logistic link,
+\[
+z_n \sim \distro{Bernoulli}(\mbox{logit}^{-1}(y_n)),
+\]
+or in other words,
+\[
+\mbox{Pr}[z_n = 1] = \mbox{logit}^{-1}(y_n).
+\]
+
+\subsection{Simulation}
+
+Simulation from a Gaussian process logistic regression is
+straightforward; just simulate from a Gaussian process and then
+simulate the $z_n$ from the $y_n$ using the sampling distribution
+above.  This cannot be done directly in Stan because it does not (yet)
+support discrete parameters or forward discrete sampling.
+
+\subsection{Hyperparameter Estimation and Predictive Inference}
+
+For hyperparameter estimation and predictive inference applications,
+the $y_n$ are typically latent parameters (i.e., not observed).
+Unfortunately, they can not be easily marginalized out analytically,
+so they must be estimated from the data through the observed
+categorical outputs $z_n$.  Predictive inference will proceed not by
+sampling $z_n$ values, but directly through their probabilities, given
+by $\mbox{logit}^{-1}(y_n)$.
+
+\subsection{Stan Implementations}
+
+Hyperparameter estimation and predictive inference are easily
+accomplished in Stan by declaring the vector $y$ as a parameter,
+adding the sampling statements for observed $z$, and then proceeding 
+as for the previous regression models.  
+
+The following full model for prediction using logistic Gaussian
+process regression is available in the distribution at
+\nolinkurl{src/models/misc/gaussian-process/gp-logit-predict.stan}.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> N1;     
+  vector[N1] x1; 
+  int<lower=0,upper=1> z1[N1];
+  int<lower=1> N2;
+  vector[N2] x2;
+}
+transformed data {
+ ... define mu as zero, compute Sigma from x1, x2 ...
+}
+parameters {
+  vector[N1] y1;
+  vector[N2] y2;
+}
+model {
+  vector[N] y;
+  for (n in 1:N1) y[n] <- y1[n];
+  for (n in 1:N2) y[N1 + n] <- y2[n];
+
+  y ~ multi_normal(mu,Sigma);
+  for (n in 1:N1)
+    z1[n] ~ bernoulli_logit(y1[n]);
+}
+\end{Verbatim}
+\end{quote}
+%
+The transformed data block in which \code{mu} and \code{Sigma} are
+defined is not shown because it is identical to the model for
+prediction in the previous section.  Now the observed outcomes
+\code{z1}, declared as data, are binary.  The variable \code{y1} is
+still drawn from the Gaussian process with values \code{y1[n]} being
+the values of the function for input \code{x1[n]}, only now
+\code{y1[n]} is interpreted as the logit-scaled probability that
+\code{z1[n]} is 1.  The variable \code{y2} plays the same role for
+probabilistic predictions for inputs \code{x2} and is also declared as
+a parameter.
+
+In the model, the full vector \code{y} is defined as before by
+concatenating \code{y1} and \code{y2}, only this time both \code{y1}
+and \code{y2} are parameters.  The full vector \code{y} is defined as
+being multivariate normal as before.  Additionally, the \code{z1[n]}
+variables are given a Bernoulli distribution with logit-scaled
+parameters.  Only the \code{z1[n]} values are observed and hence only
+they are sampled.  There is no \code{z2[n]} vector because Stan does
+not support discrete sampling; instead, the predictions are in the
+form of the logit-scaled probabilities \code{y2}.
+
+Samples form this model do not mix as well as for the standard model.
+This is largely because the \code{z1} values are quantized forms of
+\code{y1}, and thus provide less precise data for estimation.  
+
+The model could be sped up by applying a Cholesky decomposition to the
+covariance matrix \code{Sigma} and then replacing the
+\code{multi\_normal} distribution with \code{multi\_normal\_cholesky}.
+
+A pure logistic Gaussian process regression would not include a noise
+term in the definition of the covariance matrix.  This can be
+implemented by simply removing the noise term(s) \code{sigma\_sq} from
+the definition of \code{Sigma}.  Probit regression can be coded by
+subsituting the probit link for the logit.%
+%
+\footnote{Although it is possible to implement probit regression by
+  including the noise term \code{sigma\_sq} and then quantizing
+  \code{y1[n]} to produce \code{z1[n]}, this is not feasible in Stan
+  because it requires a complex constraint on \code{y} to be enforced
+  for multivariate normal distribution.}
+
+This simple prediction model could be extended in the same way as
+previous models by declaring the hyperparameters as parameters and
+defining the covariance matrix in the model block as a local variable.
 
 
 
