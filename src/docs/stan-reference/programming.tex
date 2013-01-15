@@ -2477,6 +2477,87 @@ the data is loaded.
 
 \subsection{Analytical Form of Joint Predictive Inference}
 
+Bayesian predictive inference for Gaussian processes can be sped up by
+deriving the posterior analytically, then directly sampling from it.
+This works for standard Gaussian processes, but not
+generalizations such as logistic Gaussian process regression.
+
+Jumping straight to the result,
+\[
+p(\tilde{y}|\tilde{x},y,x)
+= 
+\distro{Normal}(K^{\top}\Sigma^{-1}y,\
+                \Omega - K^{\top}\Sigma^{-1}K),
+\]
+where $\Sigma = k(x)$ is the result of applying the covariance
+function to the inputs $x$ with observed outputs $y$, $\Omega =
+k(\tilde{x})$ is the result of applying the covariance function to the
+inputs $\tilde{x}$ for which predictions are to be inferred, and $K$
+is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
+in the case of the generalized squared exponential covariance function
+would be
+\[
+K_{i,j} = \eta^2 \exp(-\rho^2 \sum_{d=1}^D (x_{i,d} -
+\tilde{x}_{j,d})^2).
+\]
+There is no noise term including $\sigma^2$ because the indexes of
+elements in $x$ and $\tilde{x}$ are never the same.
+
+Because a Stan model is only required to be proportional to the
+posterior, the posterior may be coded directly.  An example that uses
+the analytic form of the posterior and provides sampling of the
+resulting multivariate normal through the Cholesky decomposition is
+provided in
+\nolinkurl{src/models/misc/gaussian-process/gp-predict-analytic.stan}.  
+The data declaration is the same as for the standard example.  The
+calculation of the predictive mean \code{mu} and covariance Cholesky
+factor \code{L} is done in the transformed data block.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  vector[N2] mu;
+  matrix[N2,N2] L;
+  { 
+    matrix[N1,N1] Sigma;
+    matrix[N2,N2] Omega;
+    matrix[N1,N2] K;
+    
+    matrix[N2,N1] K_transpose_div_Sigma;
+    matrix[N2,N2] Tau;
+
+    for (i in 1:N1) 
+      for (j in 1:N1)
+        Sigma[i,j] <- exp(-pow(x1[i] - x1[j],2)) 
+          + if_else(i==j, 0.1, 0.0);
+    for (i in 1:N2) 
+      for (j in 1:N2)
+        Omega[i,j] <- exp(-pow(x2[i] - x2[j],2)) 
+          + if_else(i==j, 0.1, 0.0); 
+    for (i in 1:N1)
+      for (j in 1:N2)
+        K[i,j] <- exp(-pow(x1[i] - x2[j],2));
+    
+    K_transpose_div_Sigma <- K' / Sigma;
+    mu <- K_transpose_div_Sigma * y1; 
+    Tau <- Omega - K_transpose_div_Sigma * K;
+    for (i in 1:N2)
+      for (j in (i+1):N2)
+        Tau[i,j] <- Tau[j,i];
+
+    L <- cholesky_decompose(Tau);
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+This block implements the definitions of $\Sigma$, $\Omega$, and $K$
+directly.  The posterior mean vector $K^{\top}\Sigma^{-1}y$ is
+computed as \code{mu}.  The covariance has a Cholesky factor $L$ such
+that $LL^{\top} = \Omega - K^{\top}\Sigma^{-1}K$.  Given these two
+ingredients, sampling the predictive quantity $\tilde{y}$ is
+straightforward, as shown in the Cholesky example above.
+
 
 \subsection{Joint Hyperparameter Fitting and Predictive Inference}
 
