@@ -13,14 +13,16 @@ The to-do list is organized into the following sections:
 
 NEXT RELEASE (1.1.1 or 1.2.0)
 ======================================================================
-fix depth bound on number of steps so max is really max specified
-  -- explain number of leapfrog steps is 2^(depth-1).
+* fix depth bound on number of steps so max is really max specified
+   -- explain number of leapfrog steps is 2^(depth-1).
 
-fix segfault in 
-transformed data {
-  int N;
-  vector[N] x; // N not set yet, so should only use data, not tdata
-}
+* fix segfault in 
+  transformed data {
+    int N;
+    vector[N] x; // N not set yet, so should only use data, not tdata
+  }
+
+* debug BUGS vol 1 kidney model --- sometimes hangs
 
 PRIORITIES?
 ======================================================================
