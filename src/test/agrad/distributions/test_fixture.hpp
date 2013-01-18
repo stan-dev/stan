@@ -151,11 +151,26 @@ public:
       T8 p8 = get_params<T8>(parameters, n, 8);
       T9 p9 = get_params<T9>(parameters, n, 9);
 
-      EXPECT_NO_THROW(({ TestClass.template log_prob
-	      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+      var lp(0);
+      EXPECT_NO_THROW(({ lp = TestClass.template log_prob
+	      <true,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
 	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
 	<< "Valid parameters failed at index: " << n << " -- " 
 	<< parameters[n];
+
+      if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+	// all double inputs should result in a log probability of 0
+        EXPECT_FLOAT_EQ(0.0, lp.val())
+          << "All constant inputs should result in 0 log probability. Failed at index: " << n;
+      }
+      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value
+	  && all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+	lp = TestClass.template log_prob
+	  <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
+	  << "For all scalar and all constant inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+      }
     }
   }
 
@@ -180,7 +195,7 @@ TYPED_TEST_P(AgradDistributionTestFixture, CallAllVersions) {
 TYPED_TEST_P(AgradDistributionTestFixture, ValidValues) {
   this->test_valid_values();
 }
-
+/*
 TYPED_TEST_P(AgradDistributionTestFixture, InvalidValues) {
   FAIL() << "not implemented";
 }
@@ -202,17 +217,17 @@ TYPED_TEST_P(AgradDistributionTestFixture, RepeatAsVector) {
 
 TYPED_TEST_P(AgradDistributionTestFixture, Vectorized) {
   FAIL() << "not implemented";
-}
+}*/
 
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   CallAllVersions,
-                           ValidValues,
+                           ValidValues);/*,
 			   InvalidValues,
 			   Propto,
 			   FiniteDiff,
 			   Function,
 			   RepeatAsVector,
-			   Vectorized);
+			   Vectorized);*/
 
 
 

@@ -6,11 +6,22 @@
 
 using std::vector;
 using stan::agrad::var;
-
+using stan::is_vector;
+using stan::is_constant;
 
 //------------------------------------------------------------
 
 struct empty {};
+
+template <typename T>
+struct is_empty {
+  enum { value = false };
+};
+
+template <>
+struct is_empty<empty> {
+  enum { value = true };
+};
 
 //------------------------------------------------------------
 
@@ -167,8 +178,65 @@ vector<var> get_params<vector<var> >(const vector<vector<double> >& parameters, 
 }
 
 
-//------------------------------------------------------------
 
+
+//------------------------------------------------------------
+template <typename T0, typename T1, typename T2,
+	  typename T3, typename T4, typename T5, 
+	  typename T6, typename T7, typename T8, 
+	  typename T9>
+struct all_scalar {
+  enum {
+    value = (!is_vector<T0>::value || is_empty<T0>::value)
+    && (!is_vector<T1>::value || is_empty<T1>::value)
+    && (!is_vector<T2>::value || is_empty<T2>::value)
+    && (!is_vector<T3>::value || is_empty<T3>::value)
+    && (!is_vector<T4>::value || is_empty<T4>::value)
+    && (!is_vector<T5>::value || is_empty<T5>::value)
+    && (!is_vector<T6>::value || is_empty<T6>::value)
+    && (!is_vector<T7>::value || is_empty<T7>::value)
+    && (!is_vector<T8>::value || is_empty<T8>::value)
+    && (!is_vector<T9>::value || is_empty<T9>::value)
+  };
+};
+
+template <typename T0, typename T1, typename T2,
+	  typename T3, typename T4, typename T5, 
+	  typename T6, typename T7, typename T8, 
+	  typename T9>
+struct all_constant {
+  enum {
+    value = (is_constant<T0>::value || is_empty<T0>::value)
+    && (is_constant<T1>::value || is_empty<T1>::value)
+    && (is_constant<T2>::value || is_empty<T2>::value)
+    && (is_constant<T3>::value || is_empty<T3>::value)
+    && (is_constant<T4>::value || is_empty<T4>::value)
+    && (is_constant<T5>::value || is_empty<T5>::value)
+    && (is_constant<T6>::value || is_empty<T6>::value)
+    && (is_constant<T7>::value || is_empty<T7>::value)
+    && (is_constant<T8>::value || is_empty<T8>::value)
+    && (is_constant<T9>::value || is_empty<T9>::value)
+  };
+};
+
+template <typename T0, typename T1, typename T2,
+	  typename T3, typename T4, typename T5, 
+	  typename T6, typename T7, typename T8, 
+	  typename T9>
+struct all_var {
+  enum {
+    value = (!is_constant<T0>::value || is_empty<T0>::value)
+    && (!is_constant<T1>::value || is_empty<T1>::value)
+    && (!is_constant<T2>::value || is_empty<T2>::value)
+    && (!is_constant<T3>::value || is_empty<T3>::value)
+    && (!is_constant<T4>::value || is_empty<T4>::value)
+    && (!is_constant<T5>::value || is_empty<T5>::value)
+    && (!is_constant<T6>::value || is_empty<T6>::value)
+    && (!is_constant<T7>::value || is_empty<T7>::value)
+    && (!is_constant<T8>::value || is_empty<T8>::value)
+    && (!is_constant<T9>::value || is_empty<T9>::value)
+  };
+};
 
 
 #endif

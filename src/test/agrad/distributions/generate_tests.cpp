@@ -23,6 +23,7 @@ vector<string> lookup_argument(const string& argument) {
     args.push_back("Eigen::Matrix<int, 1, Eigen::Dynamic>");
   } else if (iequals(argument, "double")) {
     args.push_back("double");
+    args.push_back("var");
   } else if (iequals(argument, "doubles")) {
     args.push_back("double");
     args.push_back("std::vector<double>");
