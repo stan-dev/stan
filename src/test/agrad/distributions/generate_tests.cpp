@@ -51,7 +51,6 @@ std::ostream& operator<< (std::ostream& o, vector<T>& vec) {
 void write_includes(std::ostream& out, const string& include) {
   out << "#include <gtest/gtest.h>" << endl;
   out << "#include <boost/mpl/vector.hpp>" << endl;
-  out << "#include <stan/agrad/agrad.hpp>" << endl;
   out << "#include <test/agrad/distributions/test_fixture.hpp>" << endl;
   out << "#include <" << include.substr(include.find("src/")+4) << ">" << endl;  
   out << endl;
