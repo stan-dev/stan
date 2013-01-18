@@ -130,7 +130,10 @@ void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<s
       extra_args += ", empty";
     }
     for (size_t n = 0; n < args.size(); n++) {
-      out << "typedef boost::mpl::vector<" << base << args[n] << extra_args << " > type_" << N << ";" << std::endl;
+      out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
+      if (extra_args.size() == 0)
+	out << " ";
+      out << "> type_" << N << ";" << std::endl;
       N++;
     }
   }
