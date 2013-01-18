@@ -37,7 +37,9 @@ std::vector<std::string> lookup_argument(const std::string& argument) {
 
 void write_includes(std::ostream& out, const std::string& include) {
   out << "#include <gtest/gtest.h>" << std::endl;
-  //out << "#include <test/agrad/distributions/distribution_test_fixture.hpp>" << std::endl;
+  out << "#include <boost/mpl/vector.hpp>" << std::endl;
+  out << "#include <stan/agrad/agrad.hpp>" << std::endl;
+  out << "#include <test/agrad/distributions/new_distribution_test_fixture.hpp>" << std::endl;
   out << "#include <" << include.substr(include.find("src/")+4) << ">" << std::endl;  
   out << std::endl;
 }
@@ -116,29 +118,33 @@ std::vector<std::vector<std::string> > build_argument_sequence(const std::string
   return argument_sequence;
 }
 
-void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<std::vector<std::string> > argument_sequence) {
+void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<std::vector<std::string> > argument_sequence, const size_t depth) {
   std::vector<std::string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
     for (size_t n = 0; n < args.size(); n++)
-      write_typedef(out, base + args[n] + ", ", N, argument_sequence);
+      write_typedef(out, base + args[n] + ", ", N, argument_sequence, depth);
   } else {
+    std::string extra_args;
+    for (size_t n = depth; n < 10; n++) {
+      extra_args += ", empty";
+    }
     for (size_t n = 0; n < args.size(); n++) {
-      out << "typedef boost::mpl::vector<" << base << args[n] << " > type_" << N << ";" << std::endl;
+      out << "typedef boost::mpl::vector<" << base << args[n] << extra_args << " > type_" << N << ";" << std::endl;
       N++;
     }
   }
 }
 
-void write_types(std::ostream& out, const std::vector<std::vector<std::string> >& argument_sequence) {
+void write_types(std::ostream& out, const std::string& test_name, const std::vector<std::vector<std::string> >& argument_sequence) {
   size_t N = 0;
-  write_typedef(out, "", N, argument_sequence);
+  write_typedef(out, test_name + ", ", N, argument_sequence, argument_sequence.size());
   out << std::endl;
 }
 
 void write_test(std::ostream& out, const std::string& test_name, const size_t N) {
   for (size_t n = 0; n < N; n++)
-    out << "INSTANTIATE_TEST_CASE_P(type_" << n << ", " << test_name << ", " << "type_" << n << ");" << std::endl;
+    out << "INSTANTIATE_TYPED_TEST_CASE_P(type_" << n << ", " << test_name << ", " << "type_" << n << ");" << std::endl;
 }
 
 void write_test_cases(std::ostream& out, const std::string& in_name) {
@@ -146,8 +152,8 @@ void write_test_cases(std::ostream& out, const std::string& in_name) {
   std::string test_name = read_test_name_from_file(in_name);
   std::vector<std::vector<std::string> > argument_sequence = build_argument_sequence(arguments);
 
-  write_types(out, argument_sequence); 
-  write_test(out, test_name, size(argument_sequence));
+  write_types(out, test_name, argument_sequence); 
+  write_test(out, "AgradDistributionTestFixture", size(argument_sequence));
 }
 
 /** 
