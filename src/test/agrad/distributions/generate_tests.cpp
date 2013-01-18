@@ -144,12 +144,12 @@ std::vector<std::vector<std::string> > build_argument_sequence(const std::string
   return argument_sequence;
 }
 
-void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<std::vector<std::string> > argument_sequence, const size_t depth) {
+void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<std::vector<std::string> > argument_sequence, const size_t depth, const std::string& test_name) {
   std::vector<std::string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
     for (size_t n = 0; n < args.size(); n++)
-      write_typedef(out, base + args[n] + ", ", N, argument_sequence, depth);
+      write_typedef(out, base + args[n] + ", ", N, argument_sequence, depth, test_name);
   } else {
     std::string extra_args;
     for (size_t n = depth; n < 10; n++) {
@@ -159,7 +159,7 @@ void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<s
       out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
       if (extra_args.size() == 0)
 	out << " ";
-      out << "> type_" << N << ";" << std::endl;
+      out << "> " << test_name << "_" << N << ";" << std::endl;
       N++;
     }
   }
@@ -167,13 +167,13 @@ void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<s
 
 void write_types(std::ostream& out, const std::string& test_name, const std::vector<std::vector<std::string> >& argument_sequence) {
   size_t N = 0;
-  write_typedef(out, test_name + ", ", N, argument_sequence, argument_sequence.size());
+  write_typedef(out, test_name + ", ", N, argument_sequence, argument_sequence.size(), test_name);
   out << std::endl;
 }
 
 void write_test(std::ostream& out, const std::string& test_name, const std::string& fixture_name, const size_t N) {
   for (size_t n = 0; n < N; n++)
-    out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " << "type_" << n << ");" << std::endl;
+    out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " <<  test_name << "_" << n << ");" << std::endl;
 }
 
 void write_test_cases(std::ostream& out, const std::string& in_name) {
