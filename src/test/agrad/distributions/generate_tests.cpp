@@ -5,15 +5,6 @@
 #include <stdio.h>
 #include <boost/algorithm/string.hpp>
 
-template <class T>
-std::ostream& operator<< (std::ostream& o, std::vector<T>& vec) {
-  o << "vector size: " << vec.size() << std::endl;
-  for (size_t n = 0; n < vec.size(); n++) {
-    o << "  \'" << vec[n] << "\'" << std::endl;
-  }
-  return o;
-}
-
 std::vector<std::string> lookup_argument(const std::string& argument) {
   using boost::iequals;
   std::vector<std::string> args;
@@ -33,6 +24,15 @@ std::vector<std::string> lookup_argument(const std::string& argument) {
     args.push_back("Eigen::Matrix<double, -1, Eigen::Dynamic>");
   }
   return args;
+}
+
+template <class T>
+std::ostream& operator<< (std::ostream& o, std::vector<T>& vec) {
+  o << "vector size: " << vec.size() << std::endl;
+  for (size_t n = 0; n < vec.size(); n++) {
+    o << "  \'" << vec[n] << "\'" << std::endl;
+  }
+  return o;
 }
 
 void write_includes(std::ostream& out, const std::string& include) {
@@ -144,12 +144,12 @@ std::vector<std::vector<std::string> > build_argument_sequence(const std::string
   return argument_sequence;
 }
 
-void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<std::vector<std::string> > argument_sequence, const size_t depth, const std::string& test_name) {
+void write_types_typedef(std::ostream& out, std::string base, size_t& N, std::vector<std::vector<std::string> > argument_sequence, const size_t depth) {
   std::vector<std::string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
     for (size_t n = 0; n < args.size(); n++)
-      write_typedef(out, base + args[n] + ", ", N, argument_sequence, depth, test_name);
+      write_types_typedef(out, base + args[n] + ", ", N, argument_sequence, depth);
   } else {
     std::string extra_args;
     for (size_t n = depth; n < 10; n++) {
@@ -159,7 +159,7 @@ void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<s
       out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
       if (extra_args.size() == 0)
 	out << " ";
-      out << "> " << test_name << "_" << N << ";" << std::endl;
+      out << "> type_" << N << ";" << std::endl;
       N++;
     }
   }
@@ -167,13 +167,17 @@ void write_typedef(std::ostream& out, std::string base, size_t& N, std::vector<s
 
 void write_types(std::ostream& out, const std::string& test_name, const std::vector<std::vector<std::string> >& argument_sequence) {
   size_t N = 0;
-  write_typedef(out, test_name + ", ", N, argument_sequence, argument_sequence.size(), test_name);
+  write_types_typedef(out, "", N, argument_sequence, argument_sequence.size());
   out << std::endl;
 }
 
 void write_test(std::ostream& out, const std::string& test_name, const std::string& fixture_name, const size_t N) {
   for (size_t n = 0; n < N; n++)
+    out << "typedef boost::mpl::vector<" << test_name << ", type_" << n << "> " << test_name << "_" << n << ";" << std::endl;
+  out << std::endl;
+  for (size_t n = 0; n < N; n++)
     out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " <<  test_name << "_" << n << ");" << std::endl;
+  out << std::endl;
 }
 
 void write_test_cases(std::ostream& out, const std::string& in_name) {
@@ -207,6 +211,7 @@ int main(int argc, const char* argv[]) {
   std::string out_name = in_name.substr(0, last_in_suffix) + out_suffix;
   
   std::ofstream out(out_name.c_str());
+
   write_includes(out, in_name);
   write_test_cases(out, in_name);
 
