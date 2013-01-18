@@ -5,8 +5,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/agrad.hpp>
-
-struct empty {};
+#include <test/agrad/distributions/utility.hpp>
 
 using std::vector;
 using Eigen::Matrix;
@@ -17,25 +16,6 @@ using stan::is_vector;
 using stan::is_constant;
 using stan::is_constant_struct;
 
-using stan::math::default_policy;
-
-typedef boost::math::policies::policy<
-  boost::math::policies::domain_error<boost::math::policies::errno_on_error>
-  > errno_policy;
-
-/**
- * Utility functions
- **/
-std::ostream& operator<<(std::ostream& os, const vector<double>& param) {
-  os << "(";
-  for (size_t n = 0; n < param.size(); n++) {
-    os << param[n];
-    if (n < param.size()-1)
-      os << ", ";
-  }
-  os << ")";
-  return os;
-}
 
 
 /** 
@@ -93,6 +73,9 @@ public:
   */
 };
 
+
+
+
 using boost::mpl::at_c;
 template<class T>
 class AgradDistributionTestFixture : public ::testing::Test {
@@ -110,19 +93,72 @@ public:
   typedef typename at_c<typename at_c<T,1>::type, 9>::type T9;
   
   void call_all_versions() {
-    vector<double> parameters = first_valid_params();
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
     
-    /*TestClass.log_prob<true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>();
-    TestClass.log_prob<false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>();
-    TestClass.log_prob<true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>();
-    TestClass.log_prob<false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>();
-    TestClass.log_prob<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>();
-    TestClass.log_prob<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>();*/
+    T0 p0 = get_params<T0>(parameters, 0);
+    T1 p1 = get_params<T1>(parameters, 1);
+    T2 p2 = get_params<T2>(parameters, 2);
+    T3 p3 = get_params<T3>(parameters, 3);
+    T4 p4 = get_params<T4>(parameters, 4);
+    T5 p5 = get_params<T5>(parameters, 5);
+    T6 p6 = get_params<T6>(parameters, 6);
+    T7 p7 = get_params<T7>(parameters, 7);
+    T8 p8 = get_params<T8>(parameters, 8);
+    T9 p9 = get_params<T9>(parameters, 9);
+    
+    EXPECT_NO_THROW(({ TestClass.template log_prob
+	    <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling log_prob throws exception with default parameters";
 
-    std::cout << "first valid params: " << parameters << std::endl
-	      << "************************************************************" << std::endl;
-    FAIL();
+    EXPECT_NO_THROW(({ TestClass.template log_prob
+	    <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling log_prob throws exception with propto=true";
+
+    EXPECT_NO_THROW(({ TestClass.template log_prob
+	    <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling log_prob throws exception with propto=false";
+    
+    EXPECT_NO_THROW(({ TestClass.template log_prob
+	    <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling log_prob throws exception with propto=true, errno_policy";
+
+    EXPECT_NO_THROW(({ TestClass.template log_prob
+	    <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling log_prob throws exception with propto=false, errno_policy";
   }
+
+  void test_valid_values() {
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      T0 p0 = get_params<T0>(parameters, n, 0);
+      T1 p1 = get_params<T1>(parameters, n, 1);
+      T2 p2 = get_params<T2>(parameters, n, 2);
+      T3 p3 = get_params<T3>(parameters, n, 3);
+      T4 p4 = get_params<T4>(parameters, n, 4);
+      T5 p5 = get_params<T5>(parameters, n, 5);
+      T6 p6 = get_params<T6>(parameters, n, 6);
+      T7 p7 = get_params<T7>(parameters, n, 7);
+      T8 p8 = get_params<T8>(parameters, n, 8);
+      T9 p9 = get_params<T9>(parameters, n, 9);
+
+      EXPECT_NO_THROW(({ TestClass.template log_prob
+	      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+	<< "Valid parameters failed at index: " << n << " -- " 
+	<< parameters[n];
+    }
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> log_prob;
@@ -137,19 +173,12 @@ public:
 };
 TYPED_TEST_CASE_P(AgradDistributionTestFixture);
 
-//  Test::test_valid();
-//  Test::test_invalid();
-//  Test::test_propto();
-//  Test::test_finite_diff();
-//  Test::test_gradient_function();
-//  Test::test_vectorized();
-
 TYPED_TEST_P(AgradDistributionTestFixture, CallAllVersions) {
   this->call_all_versions();
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, ValidValues) {
-  FAIL() << "not implemented";
+  this->test_valid_values();
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, InvalidValues) {

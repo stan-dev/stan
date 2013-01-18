@@ -1,9 +1,9 @@
-#include <test/agrad/distributions/utility.hpp>
 #include <ostream>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 #include <utility>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 
 using std::vector;
@@ -19,15 +19,15 @@ vector<string> lookup_argument(const string& argument) {
   } else if (iequals(argument, "ints")) {
     args.push_back("int");
     args.push_back("std::vector<int>");
-    args.push_back("Eigen::Matrix<int, Eigen::Dynamic, -1>");
-    args.push_back("Eigen::Matrix<int, -1, Eigen::Dynamic>");
+    args.push_back("Eigen::Matrix<int, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<int, 1, Eigen::Dynamic>");
   } else if (iequals(argument, "double")) {
     args.push_back("double");
   } else if (iequals(argument, "doubles")) {
     args.push_back("double");
     args.push_back("std::vector<double>");
-    args.push_back("Eigen::Matrix<double, Eigen::Dynamic, -1>");
-    args.push_back("Eigen::Matrix<double, -1, Eigen::Dynamic>");
+    args.push_back("Eigen::Matrix<double, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<double, 1, Eigen::Dynamic>");
   }
   return args;
 }
