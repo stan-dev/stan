@@ -35,3 +35,17 @@ stan.kdev4
 src/test/gm/model_specs/compiled/*
 !src/test/gm/model_specs/compiled/*.stan
 !src/test/gm/model_specs/compiled/.gitignore
+
+# tests: generated agrad tests
+src/test/agrad/distributions/univariate/continuous/*_generated_test.cpp
+src/test/agrad/distributions/univariate/continuous/*_generated
+src/test/agrad/distributions/univariate/continuous/*_generated.exe
+src/test/agrad/distributions/univariate/discrete/*_generated_test.cpp
+src/test/agrad/distributions/univariate/discrete/*_generated
+src/test/agrad/distributions/univariate/discrete/*_generated.exe
+src/test/agrad/distributions/multivariate/continuous/*_generated_test.cpp
+src/test/agrad/distributions/multivariate/continuous/*_generated
+src/test/agrad/distributions/multivariate/continuous/*_generated.exe
+src/test/agrad/distributions/multivariate/discrete/*_generated_test.cpp
+src/test/agrad/distributions/multivariate/discrete/*_generated
+src/test/agrad/distributions/multivariate/discrete/*_generated.exe
