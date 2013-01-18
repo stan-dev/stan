@@ -3,7 +3,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionsNormal : public AgradDistributionTest {
+class AgradDistributionNormal : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
@@ -76,3 +76,6 @@ public:
   }
 
 };
+
+
+class AgradCdfNormal : public AgradCdfTest {};

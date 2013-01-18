@@ -58,4 +58,26 @@ TYPED_TEST_P(AgradDistributionTestFixture, DoesBlah) {
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
                            DoesBlah);
 
+
+
+
+
+class AgradCdfTest {
+};
+
+template<class T>
+class AgradCdfTestFixture : public ::testing::Test {
+};
+
+TYPED_TEST_CASE_P(AgradCdfTestFixture);
+
+
+TYPED_TEST_P(AgradCdfTestFixture, DoesBlah) {
+  FAIL();
+}
+
+REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
+                           DoesBlah);
+
+
 #endif
