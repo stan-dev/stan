@@ -2,6 +2,7 @@
 #define __STAN__GM__GENERATOR_HPP__
 
 #include <boost/variant/apply_visitor.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <cstddef>
 #include <ostream>
@@ -135,7 +136,12 @@ namespace stan {
         o_ << "nil";
       }
       void operator()(const int_literal& n) const { o_ << n.val_; }
-      void operator()(const double_literal& x) const { o_ << x.val_; }
+      void operator()(const double_literal& x) const { 
+        std::string num_str = boost::lexical_cast<std::string>(x.val_);
+        o_ << num_str;
+        if (num_str.find_first_of("eE.") == std::string::npos)
+          o_ << ".0"; // trailing 0 to ensure C++ makes it a double
+      }
       void operator()(const array_literal& x) const { 
         o_ << "stan::math::new_array<";
         generate_type("foobar", // not enough to use: base_type_to_string(x.type_.base_type_),
