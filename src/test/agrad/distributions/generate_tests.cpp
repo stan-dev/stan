@@ -39,7 +39,7 @@ void write_includes(std::ostream& out, const std::string& include) {
   out << "#include <gtest/gtest.h>" << std::endl;
   out << "#include <boost/mpl/vector.hpp>" << std::endl;
   out << "#include <stan/agrad/agrad.hpp>" << std::endl;
-  out << "#include <test/agrad/distributions/new_distribution_test_fixture.hpp>" << std::endl;
+  out << "#include <test/agrad/distributions/test_fixture.hpp>" << std::endl;
   out << "#include <" << include.substr(include.find("src/")+4) << ">" << std::endl;  
   out << std::endl;
 }
