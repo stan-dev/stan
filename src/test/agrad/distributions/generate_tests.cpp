@@ -110,6 +110,32 @@ std::string read_test_name_from_file(const std::string& in_name) {
   return test_name;
 }
 
+std::string read_fixture_name_from_file(const std::string& in_name) {
+  std::string fixture_name = "";
+  std::ifstream in(in_name.c_str());
+  
+  std::string file;
+  in.seekg(0, std::ios::end);
+  file.resize(in.tellg());
+  in.seekg(0, std::ios::beg);
+  in.read(&file[0], file.size());
+  in.close();
+  
+  size_t pos = 0;
+  std::string keyword = "class ";
+  std::string keyword2 = "public ";
+  while (fixture_name == "" && pos < file.size()) {
+    pos = file.find(keyword, pos) + keyword.size();
+    pos = file.find(":", pos);
+    pos = file.find(keyword2, pos) + keyword2.size();
+    fixture_name = file.substr(pos, file.find("{", pos)-pos);
+    boost::algorithm::trim(fixture_name);
+    fixture_name += "Fixture";
+  }
+  return fixture_name;
+}
+
+
 std::vector<std::vector<std::string> > build_argument_sequence(const std::string& arguments) {
   std::vector<std::string> argument_list = tokenize_arguments(arguments);
   std::vector<std::vector<std::string> > argument_sequence;
@@ -145,18 +171,19 @@ void write_types(std::ostream& out, const std::string& test_name, const std::vec
   out << std::endl;
 }
 
-void write_test(std::ostream& out, const std::string& test_name, const size_t N) {
+void write_test(std::ostream& out, const std::string& test_name, const std::string& fixture_name, const size_t N) {
   for (size_t n = 0; n < N; n++)
-    out << "INSTANTIATE_TYPED_TEST_CASE_P(type_" << n << ", " << test_name << ", " << "type_" << n << ");" << std::endl;
+    out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " << "type_" << n << ");" << std::endl;
 }
 
 void write_test_cases(std::ostream& out, const std::string& in_name) {
   std::string arguments = read_arguments_from_file(in_name);
   std::string test_name = read_test_name_from_file(in_name);
+  std::string fixture_name = read_fixture_name_from_file(in_name);
   std::vector<std::vector<std::string> > argument_sequence = build_argument_sequence(arguments);
 
   write_types(out, test_name, argument_sequence); 
-  write_test(out, "AgradDistributionTestFixture", size(argument_sequence));
+  write_test(out, test_name, fixture_name, size(argument_sequence));
 }
 
 /** 
