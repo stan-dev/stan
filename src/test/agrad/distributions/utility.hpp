@@ -7,7 +7,7 @@
 using std::vector;
 using stan::agrad::var;
 using stan::is_vector;
-using stan::is_constant;
+using stan::is_constant_struct;
 using stan::scalar_type;
 
 //------------------------------------------------------------
@@ -194,6 +194,27 @@ empty get_param<empty>(const vector<double>& /*params*/, const size_t /*n*/) {
 }
 
 //------------------------------------------------------------
+
+template <typename T>
+typename scalar_type<T>::type
+select_var_param(const vector<vector<double> >& parameters, const size_t n, const size_t p) {
+  typename scalar_type<T>::type param(0);
+  if (p < parameters[0].size()) {
+    if (is_vector<T>::value && !is_constant_struct<T>::value)
+      param = parameters[n][p];
+    else
+      param = parameters[0][p];
+  }
+  return param;
+}
+
+template <>
+empty select_var_param<empty>(const vector<vector<double> >& /*parameters*/, const size_t /*n*/, const size_t /*p*/) {
+  return empty();
+}
+
+
+//------------------------------------------------------------
 template <typename T0, typename T1, typename T2,
 	  typename T3, typename T4, typename T5, 
 	  typename T6, typename T7, typename T8, 
@@ -219,16 +240,16 @@ template <typename T0, typename T1, typename T2,
 	  typename T9>
 struct all_constant {
   enum {
-    value = (is_constant<T0>::value || is_empty<T0>::value)
-    && (is_constant<T1>::value || is_empty<T1>::value)
-    && (is_constant<T2>::value || is_empty<T2>::value)
-    && (is_constant<T3>::value || is_empty<T3>::value)
-    && (is_constant<T4>::value || is_empty<T4>::value)
-    && (is_constant<T5>::value || is_empty<T5>::value)
-    && (is_constant<T6>::value || is_empty<T6>::value)
-    && (is_constant<T7>::value || is_empty<T7>::value)
-    && (is_constant<T8>::value || is_empty<T8>::value)
-    && (is_constant<T9>::value || is_empty<T9>::value)
+    value = (is_constant_struct<T0>::value || is_empty<T0>::value)
+    && (is_constant_struct<T1>::value || is_empty<T1>::value)
+    && (is_constant_struct<T2>::value || is_empty<T2>::value)
+    && (is_constant_struct<T3>::value || is_empty<T3>::value)
+    && (is_constant_struct<T4>::value || is_empty<T4>::value)
+    && (is_constant_struct<T5>::value || is_empty<T5>::value)
+    && (is_constant_struct<T6>::value || is_empty<T6>::value)
+    && (is_constant_struct<T7>::value || is_empty<T7>::value)
+    && (is_constant_struct<T8>::value || is_empty<T8>::value)
+    && (is_constant_struct<T9>::value || is_empty<T9>::value)
   };
 };
 
@@ -238,20 +259,38 @@ template <typename T0, typename T1, typename T2,
 	  typename T9>
 struct all_var {
   enum {
-    value = (!is_constant<T0>::value || is_empty<T0>::value)
-    && (!is_constant<T1>::value || is_empty<T1>::value)
-    && (!is_constant<T2>::value || is_empty<T2>::value)
-    && (!is_constant<T3>::value || is_empty<T3>::value)
-    && (!is_constant<T4>::value || is_empty<T4>::value)
-    && (!is_constant<T5>::value || is_empty<T5>::value)
-    && (!is_constant<T6>::value || is_empty<T6>::value)
-    && (!is_constant<T7>::value || is_empty<T7>::value)
-    && (!is_constant<T8>::value || is_empty<T8>::value)
-    && (!is_constant<T9>::value || is_empty<T9>::value)
+    value = (!is_constant_struct<T0>::value || is_empty<T0>::value)
+    && (!is_constant_struct<T1>::value || is_empty<T1>::value)
+    && (!is_constant_struct<T2>::value || is_empty<T2>::value)
+    && (!is_constant_struct<T3>::value || is_empty<T3>::value)
+    && (!is_constant_struct<T4>::value || is_empty<T4>::value)
+    && (!is_constant_struct<T5>::value || is_empty<T5>::value)
+    && (!is_constant_struct<T6>::value || is_empty<T6>::value)
+    && (!is_constant_struct<T7>::value || is_empty<T7>::value)
+    && (!is_constant_struct<T8>::value || is_empty<T8>::value)
+    && (!is_constant_struct<T9>::value || is_empty<T9>::value)
   };
 };
 
 
+template <typename T0, typename T1, typename T2,
+	  typename T3, typename T4, typename T5, 
+	  typename T6, typename T7, typename T8, 
+	  typename T9>
+struct any_vector {
+  enum {
+    value = (is_vector<T0>::value || is_empty<T0>::value)
+    || (is_vector<T1>::value || is_empty<T1>::value)
+    || (is_vector<T2>::value || is_empty<T2>::value)
+    || (is_vector<T3>::value || is_empty<T3>::value)
+    || (is_vector<T4>::value || is_empty<T4>::value)
+    || (is_vector<T5>::value || is_empty<T5>::value)
+    || (is_vector<T6>::value || is_empty<T6>::value)
+    || (is_vector<T7>::value || is_empty<T7>::value)
+    || (is_vector<T8>::value || is_empty<T8>::value)
+    || (is_vector<T9>::value || is_empty<T9>::value)
+  };
+};
 
 
 #endif

@@ -276,6 +276,75 @@ public:
     test_nan_value<Scalar9>(parameters, 9);
   }
 
+  void test_propto() {
+    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for all double arguments";
+      return;
+    }
+    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << " No test for all non-vector arguments";
+      return;
+    }
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
+    var reference_logprob_true;
+    var reference_logprob_false;
+    {
+      Scalar0 p0 = get_param<Scalar0>(parameters[0], 0);
+      Scalar1 p1 = get_param<Scalar1>(parameters[0], 1);
+      Scalar2 p2 = get_param<Scalar2>(parameters[0], 2);
+      Scalar3 p3 = get_param<Scalar3>(parameters[0], 3);
+      Scalar4 p4 = get_param<Scalar4>(parameters[0], 4);
+      Scalar5 p5 = get_param<Scalar5>(parameters[0], 5);
+      Scalar6 p6 = get_param<Scalar6>(parameters[0], 6);
+      Scalar7 p7 = get_param<Scalar7>(parameters[0], 7);
+      Scalar8 p8 = get_param<Scalar8>(parameters[0], 8);
+      Scalar9 p9 = get_param<Scalar9>(parameters[0], 9);
+
+      reference_logprob_true 
+	= TestClass.template log_prob
+	<true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      reference_logprob_false 
+	= TestClass.template log_prob
+	<false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+    }
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      Scalar0 p0 = select_var_param<T0>(parameters, n, 0);
+      Scalar1 p1 = select_var_param<T1>(parameters, n, 1);
+      Scalar2 p2 = select_var_param<T2>(parameters, n, 2);
+      Scalar3 p3 = select_var_param<T3>(parameters, n, 3);
+      Scalar4 p4 = select_var_param<T4>(parameters, n, 4);
+      Scalar5 p5 = select_var_param<T5>(parameters, n, 5);
+      Scalar6 p6 = select_var_param<T6>(parameters, n, 6);
+      Scalar7 p7 = select_var_param<T7>(parameters, n, 7);
+      Scalar8 p8 = select_var_param<T8>(parameters, n, 8);
+      Scalar9 p9 = select_var_param<T9>(parameters, n, 9);
+
+      var logprob_true
+	= TestClass.template log_prob
+	<true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      var logprob_false
+	= TestClass.template log_prob
+	<false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+
+      EXPECT_FLOAT_EQ(reference_logprob_false.val() - logprob_false.val(),
+                      reference_logprob_true.val() - logprob_true.val())
+	<< "Proportional test failed at index: " << n << std::endl
+	<< "  reference params: " << parameters[0] << std::endl
+	<< "  current params:   " << parameters[n] << std::endl
+	<< "  ref<true> = " << reference_logprob_true << std::endl
+	<< "  cur<true> = " << logprob_true << std::endl
+	<< "  ref<false> = " << reference_logprob_false << std::endl
+	<< "  cur<false> = " << logprob_false;
+    }
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> log_prob;
@@ -301,11 +370,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, ValidValues) {
 TYPED_TEST_P(AgradDistributionTestFixture, InvalidValues) {
   this->test_invalid_values();
 }
-/*
-TYPED_TEST_P(AgradDistributionTestFixture, Propto) {
-  FAIL() << "not implemented";
-}
 
+TYPED_TEST_P(AgradDistributionTestFixture, Propto) {
+    this->test_propto();
+}
+/*
 TYPED_TEST_P(AgradDistributionTestFixture, FiniteDiff) {
   FAIL() << "not implemented";
 }
@@ -324,8 +393,8 @@ TYPED_TEST_P(AgradDistributionTestFixture, Vectorized) {
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   CallAllVersions,
                            ValidValues,
-			   InvalidValues);/*,
-			   Propto,
+			   InvalidValues,
+			   Propto);/*,,
 			   FiniteDiff,
 			   Function,
 			   RepeatAsVector,

@@ -29,6 +29,10 @@ vector<string> lookup_argument(const string& argument) {
     args.push_back("std::vector<double>");
     args.push_back("Eigen::Matrix<double, Eigen::Dynamic, 1>");
     args.push_back("Eigen::Matrix<double, 1, Eigen::Dynamic>");
+    args.push_back("var");
+    args.push_back("std::vector<var>");
+    args.push_back("Eigen::Matrix<var, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<var, 1, Eigen::Dynamic>");
   }
   return args;
 }
