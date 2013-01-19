@@ -8,6 +8,7 @@ using std::vector;
 using stan::agrad::var;
 using stan::is_vector;
 using stan::is_constant;
+using stan::scalar_type;
 
 //------------------------------------------------------------
 
@@ -177,8 +178,20 @@ vector<var> get_params<vector<var> >(const vector<vector<double> >& parameters, 
   return param;
 }
 
+//------------------------------------------------------------
 
+template <typename T>
+T get_param(const vector<double>& params, const size_t n) {
+  T param = 0;
+  if (n < params.size())
+    param = params[n];
+  return param;
+}
 
+template <>
+empty get_param<empty>(const vector<double>& /*params*/, const size_t /*n*/) {
+  return empty();
+}
 
 //------------------------------------------------------------
 template <typename T0, typename T1, typename T2,
@@ -237,6 +250,8 @@ struct all_var {
     && (!is_constant<T9>::value || is_empty<T9>::value)
   };
 };
+
+
 
 
 #endif

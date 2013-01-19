@@ -1,4 +1,4 @@
-// Arguments: Double, Double, Double
+// Arguments: Double, Double, Doubles
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
 using std::vector;
@@ -111,4 +111,3 @@ public:
     return lp;
     }*/
 };
-
