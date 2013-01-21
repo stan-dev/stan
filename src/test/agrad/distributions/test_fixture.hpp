@@ -422,6 +422,26 @@ public:
     add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
     logprob.grad(x, grad);
   }
+  
+  void calculate_gradients_with_function(const vector<double>& params, vector<double>& grad) {
+    Scalar0 p0 = get_param<Scalar0>(params, 0);
+    Scalar1 p1 = get_param<Scalar1>(params, 1);
+    Scalar2 p2 = get_param<Scalar2>(params, 2);
+    Scalar3 p3 = get_param<Scalar3>(params, 3);
+    Scalar4 p4 = get_param<Scalar4>(params, 4);
+    Scalar5 p5 = get_param<Scalar5>(params, 5);
+    Scalar6 p6 = get_param<Scalar6>(params, 6);
+    Scalar7 p7 = get_param<Scalar7>(params, 7);
+    Scalar8 p8 = get_param<Scalar8>(params, 8);
+    Scalar9 p9 = get_param<Scalar9>(params, 9);
+    
+    var logprob = TestClass.template log_prob_function
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+    vector<var> x;
+    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    logprob.grad(x, grad);
+  }
 
   void test_finite_diff() {
     if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
@@ -452,6 +472,35 @@ public:
     }
   }
 
+  void test_gradient_function() {
+    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for all double arguments";
+      return;
+    }
+    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for vector arguments";
+      return;
+    }
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      vector<double> expected_gradients;
+      vector<double> gradients;
+
+      calculate_gradients_with_function(parameters[n], expected_gradients);
+      calculate_gradients(parameters[n], gradients);
+
+      ASSERT_EQ(expected_gradients.size(), gradients.size()) 
+	<< "Number of expected gradients and calculated gradients must match -- error in test fixture";
+      for (size_t i = 0; i < expected_gradients.size(); i++) {
+	EXPECT_FLOAT_EQ(expected_gradients[i], gradients[i])
+	  << "Comparison of expected gradient to calculated gradient failed";
+      }
+    }
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> log_prob;
@@ -459,10 +508,6 @@ public:
     TestClass.valid_values(params, log_prob); 
     return params[0];
   }
-  /*
-  double e() {
-    return 1e-8;
-    }*/
 };
 TYPED_TEST_CASE_P(AgradDistributionTestFixture);
 
@@ -485,10 +530,11 @@ TYPED_TEST_P(AgradDistributionTestFixture, Propto) {
 TYPED_TEST_P(AgradDistributionTestFixture, FiniteDiff) {
   this->test_finite_diff();
 }
-/*
-TYPED_TEST_P(AgradDistributionTestFixture, Function) {
-}
 
+TYPED_TEST_P(AgradDistributionTestFixture, Function) {
+  this->test_gradient_function();
+}
+/*
 TYPED_TEST_P(AgradDistributionTestFixture, RepeatAsVector) {
   FAIL() << "not implemented";
 }
@@ -502,8 +548,8 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
                            ValidValues,
 			   InvalidValues,
 			   Propto,
-			   FiniteDiff);/*,
-			   Function,
+			   FiniteDiff,
+			   Function);/*,
 			   RepeatAsVector,
 			   Vectorized);*/
 

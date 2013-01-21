@@ -91,7 +91,6 @@ public:
     return stan::prob::normal_log<propto>(y, mu, sigma, Policy());
   }
   
-  /*
   template <typename T_y, typename T_loc, typename T_scale,
 	    typename T3, typename T4, typename T5, 
 	    typename T6, typename T7, typename T8, 
@@ -109,5 +108,5 @@ public:
     if (include_summand<true>::value)
       lp -= log(sqrt(2.0 * pi()));
     return lp;
-    }*/
+  }
 };
