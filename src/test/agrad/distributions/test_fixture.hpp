@@ -292,8 +292,8 @@ public:
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
-      SUCCEED() << " No test for all non-vector arguments";
+    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << " No test for vector arguments";
       return;
     }
     vector<double> log_prob;
@@ -356,7 +356,7 @@ public:
     }
   }
 
-  /*void add_finite_diff(const vector<double>& params, 
+  void add_finite_diff(const vector<double>& params, 
 		       vector<double>& finite_diff, 
 		       const size_t n) {
     const double e = 1e-8;
@@ -365,8 +365,8 @@ public:
     vector<double> plus(10);
     vector<double> minus(10);
     for (size_t i = 0; i < 10; i++) {
-      plus[i] = get_param<double>(params, 0);
-      minus[i] = get_param<double>(params, 0);
+      plus[i] = get_param<double>(params, i);
+      minus[i] = get_param<double>(params, i);
     }
     plus[n] += e;
     minus[n] -= e;
@@ -377,21 +377,30 @@ public:
       (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5],minus[6],minus[7],minus[8],minus[9]);
     
     finite_diff.push_back((lp_plus - lp_minus) / e2);
-    }*/
+  }
   
 
   void calculate_finite_diff(const vector<double>& params, vector<double>& finite_diff) {
-    //if (is_constant<Scalar0>::value)
-    //add_finite_diff(params, finite_diff, 0);
-    /*add_finite_diff<Scalar1>(params, finite_diff, 1);
-    add_finite_diff<Scalar2>(params, finite_diff, 2);
-    add_finite_diff<Scalar3>(params, finite_diff, 3);
-    add_finite_diff<Scalar4>(params, finite_diff, 4);
-    add_finite_diff<Scalar5>(params, finite_diff, 5);
-    add_finite_diff<Scalar6>(params, finite_diff, 6);
-    add_finite_diff<Scalar7>(params, finite_diff, 7);
-    add_finite_diff<Scalar8>(params, finite_diff, 8);
-    add_finite_diff<Scalar9>(params, finite_diff, 9);*/
+    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value)
+      add_finite_diff(params, finite_diff, 0);
+    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value)
+      add_finite_diff(params, finite_diff, 1);
+    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value)
+      add_finite_diff(params, finite_diff, 2);
+    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value)
+      add_finite_diff(params, finite_diff, 3);
+    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value)
+      add_finite_diff(params, finite_diff, 4);
+    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
+      add_finite_diff(params, finite_diff, 5);
+    if (!is_constant_struct<Scalar6>::value && !is_empty<Scalar6>::value)
+      add_finite_diff(params, finite_diff, 6);
+    if (!is_constant_struct<Scalar7>::value && !is_empty<Scalar7>::value)
+      add_finite_diff(params, finite_diff, 7);
+    if (!is_constant_struct<Scalar8>::value && !is_empty<Scalar8>::value)
+      add_finite_diff(params, finite_diff, 8);
+    if (!is_constant_struct<Scalar9>::value && !is_empty<Scalar9>::value)
+      add_finite_diff(params, finite_diff, 9);
   }
 
   void calculate_gradients(const vector<double>& params, vector<double>& grad) {
@@ -419,8 +428,8 @@ public:
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
-      SUCCEED() << " No test for all non-vector arguments";
+    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for vector arguments";
       return;
     }
     vector<double> log_prob;
@@ -428,16 +437,19 @@ public:
     TestClass.valid_values(parameters, log_prob);
     
     for (size_t n = 0; n < parameters.size(); n++) {
-      vector<double> finite_diff;
+      vector<double> finite_diffs;
       vector<double> gradients;
 
-      calculate_finite_diff(parameters[n], finite_diff);
+      calculate_finite_diff(parameters[n], finite_diffs);
       calculate_gradients(parameters[n], gradients);
-      std::cout << "gradients[" << n << "]:   " << gradients << std::endl;
-      std::cout << "finite_diff[" << n << "]: " << finite_diff << std::endl;
-    }
 
-    FAIL() << "finite_diff not implemented";
+      ASSERT_EQ(finite_diffs.size(), gradients.size()) 
+	<< "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
+      for (size_t i = 0; i < finite_diffs.size(); i++) {
+	EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
+	  << "Comparison of finite diff to calculated gradient failed";
+      }
+    }
   }
 
   vector<double> first_valid_params() {

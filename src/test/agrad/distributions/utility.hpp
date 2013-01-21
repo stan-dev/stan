@@ -279,16 +279,16 @@ template <typename T0, typename T1, typename T2,
 	  typename T9>
 struct any_vector {
   enum {
-    value = (is_vector<T0>::value || is_empty<T0>::value)
-    || (is_vector<T1>::value || is_empty<T1>::value)
-    || (is_vector<T2>::value || is_empty<T2>::value)
-    || (is_vector<T3>::value || is_empty<T3>::value)
-    || (is_vector<T4>::value || is_empty<T4>::value)
-    || (is_vector<T5>::value || is_empty<T5>::value)
-    || (is_vector<T6>::value || is_empty<T6>::value)
-    || (is_vector<T7>::value || is_empty<T7>::value)
-    || (is_vector<T8>::value || is_empty<T8>::value)
-    || (is_vector<T9>::value || is_empty<T9>::value)
+    value = is_vector<T0>::value
+    || is_vector<T1>::value
+    || is_vector<T2>::value
+    || is_vector<T3>::value
+    || is_vector<T4>::value
+    || is_vector<T5>::value
+    || is_vector<T6>::value
+    || is_vector<T7>::value
+    || is_vector<T8>::value
+    || is_vector<T9>::value
   };
 };
 
