@@ -186,41 +186,37 @@ public:
     }
   }
 
-  //template <typename Scalar>
   void test_nan_value(const vector<double>& parameters, const size_t n) {
-    //if (std::numeric_limits<Scalar>::has_quiet_NaN && parameters.size() > n) {
-    {
-      var lp(0);
-      vector<double> invalid_params(parameters);
-      invalid_params[n] = std::numeric_limits<double>::quiet_NaN();
+    var lp(0);
+    vector<double> invalid_params(parameters);
+    invalid_params[n] = std::numeric_limits<double>::quiet_NaN();
+    
+    Scalar0 p0 = get_param<Scalar0>(invalid_params, 0);
+    Scalar1 p1 = get_param<Scalar1>(invalid_params, 1);
+    Scalar2 p2 = get_param<Scalar2>(invalid_params, 2);
+    Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
+    Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
+    Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
+    Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
+    Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
+    Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
+    Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
-      Scalar0 p0 = get_param<Scalar0>(invalid_params, 0);
-      Scalar1 p1 = get_param<Scalar1>(invalid_params, 1);
-      Scalar2 p2 = get_param<Scalar2>(invalid_params, 2);
-      Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
-      Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
-      Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-      Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-      Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-      Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-      Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
+    EXPECT_THROW(({ TestClass.template log_prob
+	    <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+      std::domain_error) 
+      << "NaN value at index " << n << " did not fail with the default policy" << std::endl
+      << invalid_params;
       
-      EXPECT_THROW(({ TestClass.template log_prob
-	      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
-	std::domain_error) 
-	<< "NaN value at index " << n << " did not fail with the default policy" << std::endl
-	<< invalid_params;
-      
-      EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-	      <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-	<< "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
-	<< invalid_params;
-      EXPECT_TRUE(std::isnan(lp.val())) 
-	<< "NaN value at index " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
-	<< invalid_params;
-    }
+    EXPECT_NO_THROW(({ lp = TestClass.template log_prob
+	    <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+      << "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
+      << invalid_params;
+    EXPECT_TRUE(std::isnan(lp.val())) 
+      << "NaN value at index " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
+      << invalid_params;
   }
   
   void test_invalid_values() {
@@ -403,7 +399,7 @@ public:
       add_finite_diff(params, finite_diff, 9);
   }
 
-  void calculate_gradients(const vector<double>& params, vector<double>& grad) {
+  double calculate_gradients(const vector<double>& params, vector<double>& grad) {
     Scalar0 p0 = get_param<Scalar0>(params, 0);
     Scalar1 p1 = get_param<Scalar1>(params, 1);
     Scalar2 p2 = get_param<Scalar2>(params, 2);
@@ -421,9 +417,10 @@ public:
     vector<var> x;
     add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
     logprob.grad(x, grad);
+    return logprob.val();
   }
   
-  void calculate_gradients_with_function(const vector<double>& params, vector<double>& grad) {
+  double calculate_gradients_with_function(const vector<double>& params, vector<double>& grad) {
     Scalar0 p0 = get_param<Scalar0>(params, 0);
     Scalar1 p1 = get_param<Scalar1>(params, 1);
     Scalar2 p2 = get_param<Scalar2>(params, 2);
@@ -441,6 +438,7 @@ public:
     vector<var> x;
     add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
     logprob.grad(x, grad);
+    return logprob.val();
   }
 
   void test_finite_diff() {
@@ -501,6 +499,123 @@ public:
     }
   }
 
+  void test_multiple_gradient_values(const bool is_vec,
+				     const vector<double>& single_gradients, size_t& pos_single,
+				     const vector<double>& multiple_gradients, size_t& pos_multiple,
+				     const size_t N_REPEAT) {
+    if (is_vec) {
+      for (size_t i = 0; i < N_REPEAT; i++) {
+	EXPECT_FLOAT_EQ(single_gradients[pos_single],
+			multiple_gradients[pos_multiple])
+	  << "Comparison of single_gradient value to vectorized gradient failed";
+	pos_multiple++;
+      }
+      pos_single++; 
+    } else {
+      EXPECT_FLOAT_EQ(single_gradients[pos_single]*double(N_REPEAT), 
+		      multiple_gradients[pos_multiple])
+	<< "Comparison of single_gradient value to vectorized gradient failed";
+      pos_single++; pos_multiple++;
+    }
+  }
+
+  void test_repeat_as_vector() {
+    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for all double arguments";
+      return;
+    }
+    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for non-vector arguments";
+      return;
+    }
+    const size_t N_REPEAT = 3;
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      vector<double> single_gradients;
+      double single_lp = calculate_gradients(parameters[n], single_gradients);
+      
+      T0 p0 = get_repeated_params<T0>(parameters[n], 0, N_REPEAT);
+      T1 p1 = get_repeated_params<T1>(parameters[n], 1, N_REPEAT);
+      T2 p2 = get_repeated_params<T2>(parameters[n], 2, N_REPEAT);
+      T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
+      T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
+      T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
+      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
+      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
+      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
+      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
+
+      var multiple_lp = TestClass.template log_prob
+      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      vector<double> multiple_gradients;
+      vector<var> x;
+      add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      multiple_lp.grad(x, multiple_gradients);
+      
+
+      EXPECT_FLOAT_EQ(N_REPEAT * single_lp, multiple_lp.val())
+	<< "log prob with repeated vector input should match "
+	<< "a multiple of log prob of single input";
+
+      size_t pos_single = 0;
+      size_t pos_multiple = 0;
+      if (!is_constant_struct<T0>::value && !is_empty<T0>::value)
+	test_multiple_gradient_values(is_vector<T0>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T1>::value && !is_empty<T1>::value)
+	test_multiple_gradient_values(is_vector<T1>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T2>::value && !is_empty<T2>::value)
+	test_multiple_gradient_values(is_vector<T2>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T3>::value && !is_empty<T3>::value)
+	test_multiple_gradient_values(is_vector<T3>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T4>::value && !is_empty<T4>::value)
+	test_multiple_gradient_values(is_vector<T4>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T5>::value && !is_empty<T5>::value)
+	test_multiple_gradient_values(is_vector<T5>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
+	test_multiple_gradient_values(is_vector<T6>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
+	test_multiple_gradient_values(is_vector<T7>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
+	test_multiple_gradient_values(is_vector<T8>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
+	test_multiple_gradient_values(is_vector<T9>::value, 
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+    }
+  }
+    
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> log_prob;
@@ -534,14 +649,10 @@ TYPED_TEST_P(AgradDistributionTestFixture, FiniteDiff) {
 TYPED_TEST_P(AgradDistributionTestFixture, Function) {
   this->test_gradient_function();
 }
-/*
-TYPED_TEST_P(AgradDistributionTestFixture, RepeatAsVector) {
-  FAIL() << "not implemented";
-}
 
-TYPED_TEST_P(AgradDistributionTestFixture, Vectorized) {
-  FAIL() << "not implemented";
-}*/
+TYPED_TEST_P(AgradDistributionTestFixture, RepeatAsVector) {
+  this->test_repeat_as_vector();
+}
 
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   CallAllVersions,
@@ -549,12 +660,8 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   InvalidValues,
 			   Propto,
 			   FiniteDiff,
-			   Function);/*,
-			   RepeatAsVector,
-			   Vectorized);*/
-
-
-
+			   Function,
+			   RepeatAsVector);
 
 class AgradCdfTest {
 };
