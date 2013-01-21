@@ -5,6 +5,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/agrad.hpp>
+#include <stan/agrad/special_functions.hpp>
 #include <test/agrad/distributions/utility.hpp>
 
 using std::vector;
@@ -15,7 +16,7 @@ using stan::scalar_type;
 using stan::is_vector;
 using stan::is_constant;
 using stan::is_constant_struct;
-
+using stan::math::value_of;
 
 
 /** 
@@ -185,9 +186,10 @@ public:
     }
   }
 
-  template <typename Scalar>
+  //template <typename Scalar>
   void test_nan_value(const vector<double>& parameters, const size_t n) {
-    if (std::numeric_limits<Scalar>::has_quiet_NaN && parameters.size() > n) {
+    //if (std::numeric_limits<Scalar>::has_quiet_NaN && parameters.size() > n) {
+    {
       var lp(0);
       vector<double> invalid_params(parameters);
       invalid_params[n] = std::numeric_limits<double>::quiet_NaN();
@@ -263,17 +265,26 @@ public:
 	<< "Invalid value " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
 	<< invalid_params;
     }
-    
-    test_nan_value<Scalar0>(parameters, 0);
-    test_nan_value<Scalar1>(parameters, 1);
-    test_nan_value<Scalar2>(parameters, 2);
-    test_nan_value<Scalar3>(parameters, 3);
-    test_nan_value<Scalar4>(parameters, 4);
-    test_nan_value<Scalar5>(parameters, 5);
-    test_nan_value<Scalar6>(parameters, 6);
-    test_nan_value<Scalar7>(parameters, 7);
-    test_nan_value<Scalar8>(parameters, 8);
-    test_nan_value<Scalar9>(parameters, 9);
+    if (std::numeric_limits<Scalar0>::has_quiet_NaN && parameters.size() > 0) 
+      test_nan_value(parameters, 0);
+    if (std::numeric_limits<Scalar1>::has_quiet_NaN && parameters.size() > 1) 
+      test_nan_value(parameters, 1);
+    if (std::numeric_limits<Scalar2>::has_quiet_NaN && parameters.size() > 2) 
+      test_nan_value(parameters, 2);
+    if (std::numeric_limits<Scalar3>::has_quiet_NaN && parameters.size() > 3) 
+      test_nan_value(parameters, 3);
+    if (std::numeric_limits<Scalar4>::has_quiet_NaN && parameters.size() > 4) 
+      test_nan_value(parameters, 4);
+    if (std::numeric_limits<Scalar5>::has_quiet_NaN && parameters.size() > 5) 
+      test_nan_value(parameters, 5);
+    if (std::numeric_limits<Scalar6>::has_quiet_NaN && parameters.size() > 6) 
+      test_nan_value(parameters, 6);
+    if (std::numeric_limits<Scalar7>::has_quiet_NaN && parameters.size() > 7) 
+      test_nan_value(parameters, 7);
+    if (std::numeric_limits<Scalar8>::has_quiet_NaN && parameters.size() > 8) 
+      test_nan_value(parameters, 8);
+    if (std::numeric_limits<Scalar9>::has_quiet_NaN && parameters.size() > 9) 
+      test_nan_value(parameters, 9);
   }
 
   void test_propto() {
@@ -345,6 +356,90 @@ public:
     }
   }
 
+  /*void add_finite_diff(const vector<double>& params, 
+		       vector<double>& finite_diff, 
+		       const size_t n) {
+    const double e = 1e-8;
+    const double e2 = 2 * e;
+
+    vector<double> plus(10);
+    vector<double> minus(10);
+    for (size_t i = 0; i < 10; i++) {
+      plus[i] = get_param<double>(params, 0);
+      minus[i] = get_param<double>(params, 0);
+    }
+    plus[n] += e;
+    minus[n] -= e;
+    
+    double lp_plus = TestClass.log_prob
+      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5],plus[6],plus[7],plus[8],plus[9]);
+    double lp_minus = TestClass.log_prob
+      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5],minus[6],minus[7],minus[8],minus[9]);
+    
+    finite_diff.push_back((lp_plus - lp_minus) / e2);
+    }*/
+  
+
+  void calculate_finite_diff(const vector<double>& params, vector<double>& finite_diff) {
+    //if (is_constant<Scalar0>::value)
+    //add_finite_diff(params, finite_diff, 0);
+    /*add_finite_diff<Scalar1>(params, finite_diff, 1);
+    add_finite_diff<Scalar2>(params, finite_diff, 2);
+    add_finite_diff<Scalar3>(params, finite_diff, 3);
+    add_finite_diff<Scalar4>(params, finite_diff, 4);
+    add_finite_diff<Scalar5>(params, finite_diff, 5);
+    add_finite_diff<Scalar6>(params, finite_diff, 6);
+    add_finite_diff<Scalar7>(params, finite_diff, 7);
+    add_finite_diff<Scalar8>(params, finite_diff, 8);
+    add_finite_diff<Scalar9>(params, finite_diff, 9);*/
+  }
+
+  void calculate_gradients(const vector<double>& params, vector<double>& grad) {
+    Scalar0 p0 = get_param<Scalar0>(params, 0);
+    Scalar1 p1 = get_param<Scalar1>(params, 1);
+    Scalar2 p2 = get_param<Scalar2>(params, 2);
+    Scalar3 p3 = get_param<Scalar3>(params, 3);
+    Scalar4 p4 = get_param<Scalar4>(params, 4);
+    Scalar5 p5 = get_param<Scalar5>(params, 5);
+    Scalar6 p6 = get_param<Scalar6>(params, 6);
+    Scalar7 p7 = get_param<Scalar7>(params, 7);
+    Scalar8 p8 = get_param<Scalar8>(params, 8);
+    Scalar9 p9 = get_param<Scalar9>(params, 9);
+    
+    var logprob = TestClass.template log_prob
+      <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+    vector<var> x;
+    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    logprob.grad(x, grad);
+  }
+
+  void test_finite_diff() {
+    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for all double arguments";
+      return;
+    }
+    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << " No test for all non-vector arguments";
+      return;
+    }
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      vector<double> finite_diff;
+      vector<double> gradients;
+
+      calculate_finite_diff(parameters[n], finite_diff);
+      calculate_gradients(parameters[n], gradients);
+      std::cout << "gradients[" << n << "]:   " << gradients << std::endl;
+      std::cout << "finite_diff[" << n << "]: " << finite_diff << std::endl;
+    }
+
+    FAIL() << "finite_diff not implemented";
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> log_prob;
@@ -372,13 +467,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, InvalidValues) {
 }
 
 TYPED_TEST_P(AgradDistributionTestFixture, Propto) {
-    this->test_propto();
-}
-/*
-TYPED_TEST_P(AgradDistributionTestFixture, FiniteDiff) {
-  FAIL() << "not implemented";
+  this->test_propto();
 }
 
+TYPED_TEST_P(AgradDistributionTestFixture, FiniteDiff) {
+  this->test_finite_diff();
+}
+/*
 TYPED_TEST_P(AgradDistributionTestFixture, Function) {
 }
 
@@ -394,8 +489,8 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   CallAllVersions,
                            ValidValues,
 			   InvalidValues,
-			   Propto);/*,,
-			   FiniteDiff,
+			   Propto,
+			   FiniteDiff);/*,
 			   Function,
 			   RepeatAsVector,
 			   Vectorized);*/

@@ -1,15 +1,20 @@
 #include <ostream>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <utility>
 #include <vector>
+#include <iomanip>
 #include <boost/algorithm/string.hpp>
 
 using std::vector;
 using std::string;
+using std::stringstream;
 using std::endl;
 using std::pair;
+
+const int N_TESTS = 100;
 
 vector<string> lookup_argument(const string& argument) {
   using boost::iequals;
@@ -53,12 +58,15 @@ std::ostream& operator<< (std::ostream& o, vector<T>& vec) {
 
 
 
-void write_includes(std::ostream& out, const string& include) {
-  out << "#include <gtest/gtest.h>" << endl;
-  out << "#include <boost/mpl/vector.hpp>" << endl;
-  out << "#include <test/agrad/distributions/test_fixture.hpp>" << endl;
-  out << "#include <" << include.substr(include.find("src/")+4) << ">" << endl;  
-  out << endl;
+void write_includes(vector<std::ostream *>& outs, const string& include) {
+  for (size_t n = 0; n < outs.size(); n++) {
+    std::ostream* out = outs[n];
+    *out << "#include <gtest/gtest.h>" << endl;
+    *out << "#include <boost/mpl/vector.hpp>" << endl;
+    *out << "#include <test/agrad/distributions/test_fixture.hpp>" << endl;
+    *out << "#include <" << include.substr(include.find("src/")+4) << ">" << endl;  
+    *out << endl;
+  }
 }
 
 vector<string> tokenize_arguments(const string& arguments) {
@@ -106,8 +114,8 @@ string read_arguments_from_file(const string& in_name) {
   return arguments;
 }
 
-vector<pair<string, string> > read_test_names_from_file(const string& in_name) {
-  vector<pair<string, string> > names;
+pair<string, string> read_test_name_from_file(const string& in_name) {
+  pair<string, string> name;
   std::ifstream in(in_name.c_str());
   
   string file;
@@ -120,26 +128,24 @@ vector<pair<string, string> > read_test_names_from_file(const string& in_name) {
   size_t pos = 0;
   string class_keyword = "class ";
   string public_keyword = "public ";
-  while (pos < file.size()) {
-    pos = file.find(class_keyword, pos);
-    if (pos < file.size()) {
-      pos += class_keyword.size();
-      size_t pos2 = file.find(":", pos);
-      string test_name = file.substr(pos, pos2-pos);
-      pos = file.find(public_keyword, pos) + public_keyword.size();
-      pos2 = file.find("{", pos);
-      string fixture_name = file.substr(pos, pos2-pos);
-      pos = file.find("};", pos) + 2;
-      boost::algorithm::trim(test_name);
-      boost::algorithm::trim(fixture_name);
-      
-      if (fixture_name.find("Test") != string::npos) {
-	fixture_name += "Fixture";
-	names.push_back(pair<string, string>(test_name, fixture_name));
-      }
+  pos = file.find(class_keyword, pos);
+  if (pos < file.size()) {
+    pos += class_keyword.size();
+    size_t pos2 = file.find(":", pos);
+    string test_name = file.substr(pos, pos2-pos);
+    pos = file.find(public_keyword, pos) + public_keyword.size();
+    pos2 = file.find("{", pos);
+    string fixture_name = file.substr(pos, pos2-pos);
+    pos = file.find("};", pos) + 2;
+    boost::algorithm::trim(test_name);
+    boost::algorithm::trim(fixture_name);
+    
+    if (fixture_name.find("Test") != string::npos) {
+      fixture_name += "Fixture";
+      name = pair<string, string>(test_name, fixture_name);
     }
   }
-  return names;
+  return name;
 }
 
 vector<vector<string> > build_argument_sequence(const string& arguments) {
@@ -150,53 +156,59 @@ vector<vector<string> > build_argument_sequence(const string& arguments) {
   return argument_sequence;
 }
 
-void write_types_typedef(std::ostream& out, string base, size_t& N, vector<vector<string> > argument_sequence, const size_t depth) {
+void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, vector<vector<string> > argument_sequence, const size_t depth) {
   vector<string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
     for (size_t n = 0; n < args.size(); n++)
-      write_types_typedef(out, base + args[n] + ", ", N, argument_sequence, depth);
+      write_types_typedef(outs, base + args[n] + ", ", N, argument_sequence, depth);
   } else {
     string extra_args;
     for (size_t n = depth; n < 10; n++) {
       extra_args += ", empty";
     }
     for (size_t n = 0; n < args.size(); n++) {
-      out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
+      std::ostream* out = outs[int(N / N_TESTS)];
+      *out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
       if (extra_args.size() == 0)
-	out << " ";
-      out << "> type_" << N << ";" << endl;
+	*out << " ";
+      *out << "> type_" << N << ";" << endl;
       N++;
     }
   }
 }
 
-void write_types(std::ostream& out, const vector<vector<string> >& argument_sequence) {
+void write_types(vector<std::ostream *>& outs, const vector<vector<string> >& argument_sequence) {
   size_t N = 0;
-  write_types_typedef(out, "", N, argument_sequence, argument_sequence.size());
-  out << endl;
+  write_types_typedef(outs, "", N, argument_sequence, argument_sequence.size());
+  for (size_t n = 0; n < outs.size(); n++)
+    *outs[n] << endl;
 }
 
-void write_test(std::ostream& out, const string& test_name, const string& fixture_name, const size_t N) {
-  for (size_t n = 0; n < N; n++)
-    out << "typedef boost::mpl::vector<" << test_name << ", type_" << n << "> " << test_name << "_" << n << ";" << endl;
-  out << endl;
-  for (size_t n = 0; n < N; n++)
-    out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " <<  test_name << "_" << n << ");" << endl;
-  out << endl;
-}
-
-void write_test_cases(std::ostream& out, const string& in_name) {
-  string arguments = read_arguments_from_file(in_name);
-  vector<pair<string, string> > names = read_test_names_from_file(in_name);
-  vector<vector<string> > argument_sequence = build_argument_sequence(arguments);
-  
-  write_types(out, argument_sequence); 
-  for (size_t n = 0; n < names.size(); n++) {
-    string test_name = names[n].first;
-    string fixture_name = names[n].second;
-    write_test(out, test_name, fixture_name, size(argument_sequence));
+void write_test(vector<std::ostream *>& outs, const string& test_name, const string& fixture_name, const size_t N) {
+  for (size_t n = 0; n < N; n++) {
+    std::ostream *out = outs[int(n / N_TESTS)];
+    *out << "typedef boost::mpl::vector<" << test_name << ", type_" << n << "> " << test_name << "_" << n << ";" << endl;
   }
+  for (size_t i = 0; i < outs.size(); i++) {
+    *outs[i] << endl;
+  }
+  for (size_t n = 0; n < N; n++) {
+    std::ostream *out = outs[int(n / N_TESTS)];
+    *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " <<  test_name << "_" << n << ");" << endl;
+  }
+  for (size_t i = 0; i < outs.size(); i++) {
+    *outs[i] << endl;
+  }
+}
+
+void write_test_cases(vector<std::ostream *>& outs, const string& in_name, const vector<vector<string> >& argument_sequence) {
+  pair<string, string> name = read_test_name_from_file(in_name);
+  string test_name = name.first;
+  string fixture_name = name.second;
+  
+  write_types(outs, argument_sequence); 
+  write_test(outs, test_name, fixture_name, size(argument_sequence));
 }
 
 /** 
@@ -212,19 +224,32 @@ int main(int argc, const char* argv[]) {
     return -1;
   int return_code = 0;
   string in_suffix = "_test.hpp";
-  string out_suffix = "_generated_test.cpp";
 
   string in_name = argv[1];
   
   size_t last_in_suffix = in_name.find_last_of(in_suffix) + 1 - in_suffix.length();
-  string out_name = in_name.substr(0, last_in_suffix) + out_suffix;
+  string out_name_base = in_name.substr(0, last_in_suffix);
   
-  std::ofstream out(out_name.c_str());
+  string arguments = read_arguments_from_file(in_name);
+  vector<vector<string> > argument_sequence = build_argument_sequence(arguments);
+  
+  vector<std::ostream *> outs;
+  for (size_t n = 0; n < int(size(argument_sequence) / N_TESTS) + 1; n++) {
+    stringstream out_name;
+    out_name << out_name_base << "_generated_";
+    out_name << std::setw(5) << std::setfill('0') << n;
+    out_name << "_test.cpp";
+    outs.push_back(new std::ofstream(out_name.str().c_str()));
+  }
 
-  write_includes(out, in_name);
-  write_test_cases(out, in_name);
+  write_includes(outs, in_name);
+  write_test_cases(outs, in_name, argument_sequence);
 
-  out.close();
+  for (size_t n = 0; n < outs.size(); n++) {
+    static_cast<std::ofstream*>(outs[n])->close();
+    delete(outs[n]);
+  }
+  outs.clear();
   
   return 0;
 }

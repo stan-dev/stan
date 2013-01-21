@@ -292,6 +292,40 @@ struct any_vector {
   };
 };
 
+//------------------------------------------------------------
+template <typename T>
+void add_var(vector<var>& /*x*/, T& /*p*/) {
+}
+
+template <>
+void add_var<var>(vector<var>& x, var& p) {
+  x.push_back(p);
+}
+
+template <typename T0, typename T1, typename T2,
+	  typename T3, typename T4, typename T5, 
+	  typename T6, typename T7, typename T8, 
+	  typename T9>
+void add_vars(vector<var>& x, T0& p0, T1& p1, T2& p2, 
+	      T3& p3, T4& p4, T5& p5, T6& p6, T7& p7, 
+	      T8& p8, T9& p9) {
+  add_var(x, p0);
+  add_var(x, p1);
+  add_var(x, p2);
+  add_var(x, p3);
+  add_var(x, p4);
+  add_var(x, p5);
+  add_var(x, p6);
+  add_var(x, p7);
+  add_var(x, p8);
+  add_var(x, p9);
+}
+
+
+//------------------------------------------------------------
+
+
+
 
 #endif
 
