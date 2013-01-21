@@ -1455,6 +1455,180 @@ directly.
 
 
 
+\chapter{Measurement Error and Meta-Analysis}
+
+Most quantities used in statistical models arise from measurements.
+Most of these measurements are taken with some error.  For instance,
+measuring height in a doctor's office is rarely accurate to within
+more than one inch and weight measurement is even more variable given
+its variability.  Other medical measurements are also prone to
+measurement error, such as anti-tumor cell counts, biopsy results,
+human judgments as to stage of cancer based on image data.  
+
+When the measurement error is small relative to the quantity being
+measured, its affects on a model are usually small.  When measurement
+error is large relative to the quantity being measured, or when very
+precise relations can be estimated being measured quantities used as
+predictors and outcomes, it is useful to introduce an explicit model
+of measurement error.
+
+
+\section{Bayesian Measurement Error Model}
+
+A Bayesian approach to measurement error can be formulated directly by
+treating the true quantities being measured as missing data
+\citep{Clayton:1992, RichardsonGilks:1993}.  The measurement is then
+modeled based on the true value and a measurement error model.
+
+\subsection{Regression without Measurement Error}
+
+For example, consider a simple linear regression model where the
+observed data for $N$ cases includes a predictor $x_n$ and outcome
+$y_n$.  In Stan, a linear regression for $y$ based on $x$ with a slope
+and intercept is modeled as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> N;        // number of cases
+  real x[N];             // predictor (covariate)
+  real y[N];             // outcome (variate)
+}
+parameters {
+  real alpha;           // intercept
+  real beta;            // slope 
+  real<lower=0> sigma;  // outcome noise
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+  alpha ~ normal(0,10);  
+  beta ~ normal(0,10);
+  sigma ~ cauchy(0,5);
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Adding Measurement Error}
+
+Now suppose that the true values of the predictors $x_n$ are not
+known, but for each $n$, a measurement $u_n$ of $x_n$ is available.
+If the error in measurement can be modeled, the measured value $u_n$
+can be modeled in terms of the true value $x_n$ plus measurement
+noise.  The true value $x_n$ is treated as missing data and estimated
+along with other quantities in the model.  A very simple approach is
+to assume the measurement error is normal with known deviation $\tau$.
+This leads to the following regression model with constant measurement
+error.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  ...
+  real x_meas[N];     // measurement of x
+  real<lower=0> tau;  // measurement noise
+}
+parameters {
+  real x[N];   
+  ...
+}
+model {
+  x_meas ~ normal(x, tau);   // measurement model
+  y ~ normal(alpha + beta * x, sigma);
+  ... 
+}
+\end{Verbatim}
+\end{quote}
+%
+The regression and regression coefficients and overall noise model
+are the same as before, but now \code{x} is delcared as a parameter
+rather than as data.  Instead, \code{x\_meas} is the data with known
+measurement noise \code{tau}.  The model then specifies that the
+measurement error for \code{x\_meas[n]} given true value \code{x[n]}
+is normal with deviation \code{tau}.
+
+In cases where the measurement errors are not normal, richer
+measurement error models may be specified.  A simple generalization of
+the above model is to allow the measurement noise term \code{tau} to
+vary with item.  This only requires changing its declaration in the
+data block to
+\begin{quote}
+\begin{Verbatim}
+  real<lower=0> tau[N];  // measurement noise for case n
+\end{Verbatim}
+\end{quote}
+
+\subsection{Modeling the True Values}
+
+Although no prior is specified for the true value \code{x}, the
+posterior will be proper for the above model because
+\[
+\distro{Normal}(x|\mu,\Sigma) = \distro{Normal}(\mu|x,\Sigma).
+\]
+Nevertheless, it is common to provide some model of the true value $x$
+in terms of other covariates.  For instance, \citep{Clayton:1992}
+introduces an exposure model for the unknown (but noisily measured)
+risk factors $x$ in terms of known (without measurement error) risk
+factors $c$.  A simple model would regress $x_n$ on the covariates $c_n$
+with noise term $\upsilon$,
+\[
+x_n \sim \distro{Normal}(\gamma^{\top}c, \upsilon).
+\]
+This can be coded in Stan just like any other regression.  And, of
+course, other exposure models can be provided.
+
+
+\section{Meta-Analysis}
+
+Meta-analysis models combine the results of multiple (typically
+previously carried out) statistical models into a single model.  The
+Bayesian framework is particular convenient for meta-analysis, because
+each previous study in the meta-analysis can be treated as providing a
+noisy measurement of some underlying quantity of interest.  The model
+then follows directly from two components, a prior on the underlying
+quantities of interest and measurement-error style model for each of
+the studies being analyzed.
+
+\subsection{Eight Schools Model}
+
+The following model is not a meta-analysis per se, but has many of the
+same components.  What is observed is measured difference in test
+performance based on a pre-test tutoring treatment at eight different
+schools.  The available data is only provided in the form of a sample
+mean treatment effect $y_j$ and standard error $\sigma_j$ for each of
+$J$ schools.  The meta-analysis model combines the result of the
+studies in each school by modeling an overall mean treatment effect
+$\mu$ across schools.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> J;          // number of schools
+  real y[J];               // estimated treatment effect (school j)
+  real<lower=0> sigma[J];  // std err of effect estimate (school j)
+}
+parameters {
+  real mu;
+  real theta[J];
+  real<lower=0> tau;
+}
+model {
+  theta ~ normal(mu, tau); 
+  y ~ normal(theta,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The variable $\theta_j$ is introduced to model the true treatment
+effect at school $j$, with $\tau$ modeling the variability among the
+schools.  The observed treatment effect $y_j$ is modeled as having
+normal measurement error $\sigma$ around the true effect $\theta_j$.
+
+Meta-anlyses typically focus on a treatment effect such as the effect
+of coaching ($\mu$) in the eight schools model.  Unlike the eight
+schools example, the studies are not typically homogeneous.
+
+
 \chapter{Clustering Models}
 
 \noindent
