@@ -56,7 +56,7 @@ src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributio
 
 .PHONY: test-distributions
 test-distributions: $(GENERATED_AGRAD_TESTS)
-	make $(patsubst src/%_test.cpp,runtest/%$(EXE),$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
+	make $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
 
 .PHONY: test-unit
 test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test-distributions
