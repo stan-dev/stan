@@ -1457,35 +1457,29 @@ directly.
 
 \chapter{Measurement Error and Meta-Analysis}
 
+\noindent
 Most quantities used in statistical models arise from measurements.
-Most of these measurements are taken with some error.  For instance,
-measuring height in a doctor's office is rarely accurate to within
-more than one inch and weight measurement is even more variable given
-its variability.  Other medical measurements are also prone to
-measurement error, such as anti-tumor cell counts, biopsy results,
-human judgments as to stage of cancer based on image data.  
-
-When the measurement error is small relative to the quantity being
-measured, its affects on a model are usually small.  When measurement
-error is large relative to the quantity being measured, or when very
-precise relations can be estimated being measured quantities used as
-predictors and outcomes, it is useful to introduce an explicit model
-of measurement error.
+Most of these measurements are taken with some error.  When the
+measurement error is small relative to the quantity being measured,
+its effect on a model are usually small.  When measurement error is
+large relative to the quantity being measured, or when very precise
+relations can be estimated being measured quantities, it is useful to
+introduce an explicit model of measurement error.
 
 
 \section{Bayesian Measurement Error Model}
 
 A Bayesian approach to measurement error can be formulated directly by
 treating the true quantities being measured as missing data
-\citep{Clayton:1992, RichardsonGilks:1993}.  The measurement is then
-modeled based on the true value and a measurement error model.
+\citep{Clayton:1992, RichardsonGilks:1993}.  This requires a model of
+how the measurements are derived from the true values.
 
-\subsection{Regression without Measurement Error}
+\subsection{Regression with Measurement Error}
 
-For example, consider a simple linear regression model where the
-observed data for $N$ cases includes a predictor $x_n$ and outcome
-$y_n$.  In Stan, a linear regression for $y$ based on $x$ with a slope
-and intercept is modeled as follows.
+Before considering regression with measurement error, first consider a
+linear regression model where the observed data for $N$ cases includes
+a predictor $x_n$ and outcome $y_n$.  In Stan, a linear regression for
+$y$ based on $x$ with a slope and intercept is modeled as follows.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1509,12 +1503,10 @@ model {
 \end{quote}
 %
 
-\subsection{Adding Measurement Error}
-
 Now suppose that the true values of the predictors $x_n$ are not
-known, but for each $n$, a measurement $u_n$ of $x_n$ is available.
-If the error in measurement can be modeled, the measured value $u_n$
-can be modeled in terms of the true value $x_n$ plus measurement
+known, but for each $n$, a measurement $x^{\mbox{\footnotesize meas}}_n$ of $x_n$ is available.
+If the error in measurement can be modeled, the measured value
+$x^{\mbox{\footnotesize meas}}_n$ can be modeled in terms of the true value $x_n$ plus measurement
 noise.  The true value $x_n$ is treated as missing data and estimated
 along with other quantities in the model.  A very simple approach is
 to assume the measurement error is normal with known deviation $\tau$.
@@ -1529,7 +1521,7 @@ data {
   real<lower=0> tau;  // measurement noise
 }
 parameters {
-  real x[N];   
+  real x[N];          // unknown true value   
   ...
 }
 model {
@@ -1540,23 +1532,26 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The regression and regression coefficients and overall noise model
-are the same as before, but now \code{x} is delcared as a parameter
-rather than as data.  Instead, \code{x\_meas} is the data with known
-measurement noise \code{tau}.  The model then specifies that the
+The regression coefficients \code{alpha} and \code{beta} and
+regression noise scale \code{sigma} are the same as before, but now
+\code{x} is declared as a parameter rather than as data.  The data is
+now \code{x\_meas}, which is a measurement of the true \code{x} value
+with noise scale \code{tau}.  The model then specifies that the
 measurement error for \code{x\_meas[n]} given true value \code{x[n]}
 is normal with deviation \code{tau}.
 
-In cases where the measurement errors are not normal, richer
-measurement error models may be specified.  A simple generalization of
-the above model is to allow the measurement noise term \code{tau} to
-vary with item.  This only requires changing its declaration in the
-data block to
+A simple generalization of the above model is to allow the measurement
+noise term \code{tau} to vary with item.  This only requires changing
+its declaration in the data block to
+%
 \begin{quote}
 \begin{Verbatim}
   real<lower=0> tau[N];  // measurement noise for case n
 \end{Verbatim}
 \end{quote}
+%
+In cases where the measurement errors are not normal, richer
+measurement error models may be specified.  
 
 \subsection{Modeling the True Values}
 
@@ -1580,53 +1575,178 @@ course, other exposure models can be provided.
 
 \section{Meta-Analysis}
 
-Meta-analysis models combine the results of multiple (typically
-previously carried out) statistical models into a single model.  The
-Bayesian framework is particular convenient for meta-analysis, because
-each previous study in the meta-analysis can be treated as providing a
-noisy measurement of some underlying quantity of interest.  The model
-then follows directly from two components, a prior on the underlying
-quantities of interest and measurement-error style model for each of
+Meta-analysis aims to pool the data from several studies, such as the
+application of a tutoring program in several schools or treatment
+using a drug in several clinical trials.  
+
+The Bayesian framework is particularly convenient for meta-analysis,
+because each previous study can be treated as providing a noisy
+measurement of some underlying quantity of interest.  The model then
+follows directly from two components, a prior on the underlying
+quantities of interest and a measurement-error style model for each of
 the studies being analyzed.
 
-\subsection{Eight Schools Model}
+\subsection{Treatment Effects in Controlled Studies}
 
-The following model is not a meta-analysis per se, but has many of the
-same components.  What is observed is measured difference in test
-performance based on a pre-test tutoring treatment at eight different
-schools.  The available data is only provided in the form of a sample
-mean treatment effect $y_j$ and standard error $\sigma_j$ for each of
-$J$ schools.  The meta-analysis model combines the result of the
-studies in each school by modeling an overall mean treatment effect
-$\mu$ across schools.
+Suppose the data in question arise from a total of $M$ studies
+providing paired binomial data for a treatment and control group.  For
+instance, the data might be post-surgical pain reduction under a treatment
+of ibuprofen \citep{WarnThompsonSpiegelhalter:2002} or mortality after
+myocardial infarction under a treatment of beta blockers
+\citep[Section~5.6]{GelmanCarlinSternRubin:2003}.
+
+\subsubsection{Data}
+
+The clinical data consists of $J$ trials, each with $n^t$ treatment
+cases, $n^c$ control cases, $r^t$ successful outcomes among those treated and
+$r^c$ successful outcomes among those in the control group.  This data
+can be declared in Stan as follows.%
+%
+\footnote{Stan's integer constraints are not powerful enough to express the
+constraint that $\mbox{\code{r\_t[j]}} \leq \mbox{\code{n\_t[j]}}$,
+but this constraint could be checked in the transformed data block.}
 %
 \begin{quote}
 \begin{Verbatim}
 data {
-  int<lower=0> J;          // number of schools
-  real y[J];               // estimated treatment effect
-  real<lower=0> sigma[J];  // std err of effect estimate
+  int<lower=0> J;
+  int<lower=0> n_t[J];  // num cases, treatment
+  int<lower=0> r_t[J];  // num successes, treatment
+  int<lower=0> n_c[J];  // num cases, control
+  int<lower=0> r_c[J];  // num successes, control
 }
+\end{Verbatim}
+\end{quote}
+%
+
+\subsubsection{Converting to Log Odds and Standard Error}
+
+Although the clincial trial data is binomial in its raw format, it may
+be transformed to an unbounded scale by considering the log odds ratio
+\[
+y_j = \log \left( \frac{r^t_j / (n^t_j - r^t_j)}
+                       {r^c_j / (n^c_j - r^c_j)} \right)
+\ \ = \ \ 
+\log \left( \frac{r^t_j}{n^t_j - r^t_j} \right)
+- 
+\log \left( \frac{r^c_j}{n^c_j - r^c_j} \right)
+\]
+and corresponding standard errors
+\[
+\sigma_j = \sqrt{
+\frac{1}{r^T_i} 
++ \frac{1}{n^T_i - r^T_i}
++ \frac{1}{r^C_i} 
++ \frac{1}{n^C_i - r^C_i}
+}.
+\]
+%
+The log odds and standard errors can be defined in a
+transformed parameter block, though care must be taken not to use
+integer division (see \refsection{int-arithmetic}).
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  real y[J];
+  real<lower=0> sigma[J];
+  for (j in 1:J) 
+    y[j] <- log(r_t[j]) - log(n_t[j] - r_t[j])
+            - (log(r_c[j]) - log(n_c[j] - r_c[j]);
+  for (j in 1:J)
+    sigma[j] <- sqrt(1.0/r_t[i] + 1.0/(n_t[i] - r_t[i])
+                     + 1.0/r_c[i] + 1.0/(n_c[i] - r_c[i]));
+}
+\end{Verbatim}
+\end{quote}
+%
+This definition will be problematic if any of the success counts is 
+zero or equal to the number of trials.
+If that arises, a direct binomial model will be required or other
+transforms must be used than the unregularized sample log odds.
+
+\subsubsection{Non-Hierarchical Model}
+
+With the transformed data in hand, two standard forms of meta-analysis
+can be applied.  The first is a so-called ``fixed effects'' model,
+which assumes a single parameter for the global odds ratio.  This
+model is coded in Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
 parameters {
-  real mu;
-  real theta[J];
-  real<lower=0> tau;
+  real theta;  // global treatment effect, log odds
 }
 model {
-  theta ~ normal(mu, tau); 
   y ~ normal(theta,sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
-The variable $\theta_j$ is introduced to model the true treatment
-effect at school $j$, with $\tau$ modeling the variability among the
-schools.  The observed treatment effect $y_j$ is modeled as having
-normal measurement error $\sigma$ around the true effect $\theta_j$.
+The sampling statement for \code{y} is vectorized; it has the same
+effect as the following.
+\begin{quote}
+\begin{Verbatim}
+  for (j in 1:J)
+    y[j] ~ normal(theta,sigma[j]);
+\end{Verbatim}
+\end{quote}
+%
+It is common to include a prior for \code{theta} in this model, but it
+is not strictly necessary for the model to be proper because \code{y}
+is fixed and $\distro{Normal}(y|\mu,\sigma) =
+\distro{Normal}(\mu|y,\sigma)$.
 
-Meta-anlyses typically focus on a treatment effect such as the effect
-of coaching ($\mu$) in the eight schools model.  Unlike the eight
-schools example, the studies are not typically homogeneous.
+\subsubsection{Hierarchical Model}
+
+To model so-called ``random effects,'' where the treatment effect may
+vary by clinical trial, a hierarchical model can be used.  The
+parameters include per-trial treatment effects and the hierarchical
+prior parameters, which will be estimated along with other unknown
+quantities.  
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real theta[J];      // per-trial treatment effect
+  real mu;            // mean treatment effect
+  real<lower=0> tau;  // deviation of treatment effects
+}
+model {
+  y ~ normal(theta,sigma);
+  theta ~ normal(mu,tau);
+  mu ~ normal(0,10);
+  tau ~ cauchy(0,5);
+}
+\end{Verbatim}
+\end{quote}
+%
+Although the vectorized sampling statement for \code{y} appears
+unchanged, the parameter \code{theta} is now a vector.  The sampling
+statement for \code{theta} is also vectorized, with the
+hyperparameters \code{mu} and \code{tau} themselves being given wide
+priors compared to the scale of the data.
+
+\citet{Rubin:1981} provided a hierarchical Bayesian meta-analysis of
+the treatment effect of Scholastic Aptitude Test (SAT) coaching in
+eight schools based on the sample treatment effect and standard error
+in each school.  The model provided for this data in
+\citep[Section~5.5]{GelmanCarlinSternRubin:2003} is included with the
+data in the Stan distribution in directory
+\nolinkurl{src/models/misc/eight-schools/}.
+
+\subsubsection{Extensions and Alternatives}
+
+\citet{SmithSpiegelhalterThomas:1995} and
+\citet[Section~19.4]{GelmanCarlinSternRubin:2003} provide
+meta-analyses based directly on binomial data.
+\citet{WarnThompsonSpiegelhalter:2002} consider the modeling
+implications of using alternatives to the log-odds ratio in
+transforming the binomial data.
+
+If trial-specific predictors are available, these can be included
+directly in a regression model for the per-trial treatment effects
+$\theta_j$.
 
 
 \chapter{Clustering Models}
@@ -1635,7 +1755,9 @@ schools example, the studies are not typically homogeneous.
 Unsupervised methods for organizing data into groups are collectively
 referred to as clustering.  This chapter describes the implementation
 in Stan of two widely used statistical clustering models, soft
-$K$-means and latent Dirichlet allocation (LDA).  These models are
+$K$-means and latent Dirichlet allocation (LDA).  In addition, this
+chapter includes naive Bayesian classification, which can be viewed as
+a form of clustering which may be supervised.  These models are
 typically expressed using discrete parameters for cluster assignments.
 Nevertheless, they can be implemented in Stan like any other mixture
 model by marginalizing out the discrete parameters (see
@@ -1666,14 +1788,16 @@ data vectors $y$ as input.
 \item If no vectors changed cluster, return the cluster assignments.
 \end{enumerate}
 \end{enumerate}
+%
+This algorithm is guaranteed to terminate.
 
 \subsection{Soft $K$-Means Clustering}
 
 Soft $K$-means clustering treats the cluster assignments as
 probability distributions over the clusters.  Because of the
 connection between Euclidean distance and multivariate normal models
-with a fixed covariance, soft $K$-means is just a multivariate normal
-mixture model.
+with a fixed covariance, soft $K$-means can be expressed (and coded in
+Stan) as a multivariate normal mixture model.
 
 In the full generative model, each data point $n$ in $1{:}N$ is assigned
 a cluster $z_n \in 1{:}K$ with symmetric uniform probability,
@@ -1753,19 +1877,10 @@ model to fit an overall problem scale and location.
 
 The only parameter is \code{mu}, where \code{mu[k]} is the centroid
 for cluster $k$.  The transformed parameters \code{soft\_z[n]} contain
-the log of the unnormalized cluster assignment probabilities.  To
-normalize to probabilities, convert \code{soft\_z} back to a linear
-scale by exponentiating, then to a simplex by normalizing.  For
-instance, in R, the statement
-%
-\begin{quote}
-\begin{Verbatim}
-soft_z_norm[n] <- exp(soft_z[n]) / sum(exp(soft_z[n]));
-\end{Verbatim}
-\end{quote}
-%
-defines a properly normalized simplex \code{soft\_z\_norm}.
-
+the log of the unnormalized cluster assignment probabilities.  The
+vector \code{soft\_z[n]} can be converted back to a normalized simplex
+using the softmax function (see \refsection{softmax}), either externally
+externally or within the model's generated quantities block.
 
 \subsection{Generalizing Soft $K$-Means}
 
@@ -1780,51 +1895,54 @@ distance).
 Within the multivariate normal version of $K$-means, replacing the
 unit covariance matrix with a shared covariance matrix amounts to
 working with distances defined in a space transformed by the inverse
-covariance matrix (i.e., in a Riemann manifold). 
+covariance matrix.
 
 Although there is no global spatial analog, it is common to see soft
 $K$-means specified with a per-cluster covariance matrix. In this
-situation, a hierarchical prior may be used to regularize.
+situation, a hierarchical prior may be used for the covariance matrices.
 
 
 
 \section{The Difficulty of Bayesian Inference for Clustering}
 
-Two problems make it pretty much impossible to do proper, full
-Bayesian inference in clustering models, the lack of parameter
-identifiability and the multimodality of the posterior.
+Two problems make it pretty much impossible to perform full Bayesian
+inference for clustering models, the lack of parameter identifiability
+and the extreme multimodality of the posteriors.
 
 \subsection{Non-Identifiability}
 
-A fundamental problem with mixture models is that the cluster
-assignments are not identified.  This is easy to see because permuting
-the cluster mean vectors \code{mu} leads to a model with identical
-likelihoods.  For instance, permuting the first two indexes in
-\code{mu} and the first two indexes in each \code{soft\_z[n]} leads to
-an identical likelihood (and prior).  
+Cluster assignments are not identified --- permuting the cluster mean
+vectors \code{mu} leads to a model with identical likelihoods.  For
+instance, permuting the first two indexes in \code{mu} and the first
+two indexes in each \code{soft\_z[n]} leads to an identical likelihood
+(and prior).
 
-The lack of identifiability means that the parameters cannot be
-compared across multiple Markov chains.  Since the only parameter in
-soft $K$-means is not identified, this leads to a problem in running
-multiple chains and monitoring convergence.  So typically only a
-single chain is run.  But even within a single chain, the indexes can
-swap if the chain is long enough or if the data is not cleanly
-separated.  
+The lack of identifiability means that the the cluster parameters
+cannot be compared across multiple Markov chains.  In fact, the only
+parameter in soft $K$-means is not identified, leading to problems in
+monitoring convergence.  Clusters can even fail to be identified
+within a single chain, with indexes swapping if the chain is long
+enough or the data is not cleanly separated. 
 
 \subsection{Multimodality}
 
 The other problem with clustering models is that their posteriors are
-highly multimodal.  This multimodality does not simply arise from the
-non-identifiability, but is an inherent problem in clustering that
-leads to many local maxima of the posterior.  
+highly multimodal.  One form of multimodality is the
+non-identifiability leading to index swapping.  But even without
+the index problems the posteriors are highly mulitmodal.
 
 Bayesian inference fails in cases of high multimodality because there
 is no way to visit all of the modes in the posterior in appropriate
-proportions.   
+proportions and thus no way to evaluate integrals involved in
+posterior predictive inference.
 
-The advice often given in this situation is to try many different
-initializations and select the result with the highest overall
-probability.
+In light of these two problems, the advice often given in fitting
+clustering models is to try many different initializations and select
+the sample with the highest overall probability.  It is also popular
+to use optimization-based point estimators such as expectation
+maximization or variational Bayes, which can be much more efficient
+than sampling-based approaches.
+
 
 \section{Naive Bayes Classification and Clustering}
 
@@ -1840,7 +1958,7 @@ in what follows.
 The observed data consists of a sequence of $M$ documents made up of
 bags of words drawn from a vocabulary of $V$ distinct words.  A
 document $m$ has $N_m$ words, which are indexed as $w_{m,1}, \ldots,
-w_{m,N[m]} \in 1{:}V$.  Despite the ordered indexing of words ina
+w_{m,N[m]} \in 1{:}V$.  Despite the ordered indexing of words in a
 document, this order is not part of the model, which is clearly
 defective for natural human language data.  A number of topics (or
 categories) $K$ is fixed.
@@ -1852,12 +1970,12 @@ distribution,
 z_m \sim \distro{Categorical}(\theta).
 \]
 The $K$-simplex parameter $\theta$ represents the prevalence of each
-category in the data.
+category in the data.  
 
 Next, the words in each document are generated conditionally
 independently of each other and the words in other documents based on
 the category of the document, with word $n$ of document $m$ being
-generated according as
+generated as
 \[
 w_{m,n} \sim \distro{Categorical}(\phi_{z[m]}).
 \]
@@ -1865,7 +1983,9 @@ The parameter $\phi_{z[m]}$ is a $V$-simplex representing the
 probability of each word in the vocabulary in documents of category
 $z_m$.
 
-The parameters are typically given symmetric Dirichlet priors.
+The parameters $\theta$ and $\pi$ are typically given symmetric
+Dirichlet priors.  The prevalence $\theta$ is sometimes fixed to
+produce equal probabilities for each category $k \in 1:K$.
 
 \subsection{Representing Ragged Arrays in Stan}
 
@@ -1873,7 +1993,7 @@ The specification for LDA in the previous sections have used a ragged
 array notation for the words $w$.  Because Stan does not support
 ragged arrays, the models are coded using an alternative strategy that
 provides an index for each word in a global list of words.   The data
-looks as follows, with the word arrays layed out in a column and each
+is organized as follows, with the word arrays layed out in a column and each
 assigned to its document in a second column.
 %
 \begin{center}
@@ -1894,7 +2014,7 @@ $\code{N} = \sum_{m=1}^M N_m$ & $w_{M,N[M]}$ & $M$ \\
 \end{center}
 %
 The relevant variables for the program are \code{N}, the total number
-of words in all the documents, the word value array \code{w}, and the
+of words in all the documents, the word array \code{w}, and the
 document identity array \code{doc}.  
 
 \subsection{Estimation with Category-Labeled Training Data}
@@ -1927,11 +2047,9 @@ parameters {
   simplex[V] phi[K];  // word dist for topic k
 }
 model {
-  // priors
   theta ~ dirichlet(alpha);
   for (k in 1:K)  
     phi[k] ~ dirichlet(beta);
-  // likelihood, including latent category
   for (m in 1:M)
     z[m] ~ categorical(theta);
   for (n in 1:N)
@@ -1940,10 +2058,9 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-Note that the topic identifiers $z_m$ are declared as data, and the
+Note that the topic identifiers $z_m$ are declared as data and the
 latent category assignments are included as part of the likelihood
-function.  The category assignment is often summed out of the
-likelihood to compute the marginal probability of one or more documents.
+function.  
 
 \subsection{Estimation without Category-Labeled Training Data}
 
@@ -1974,7 +2091,8 @@ likelihood is now computed as the marginal document probability
 \]
 %
 The last step shows how the \code{log\_sum\_exp} function can be used
-to stabilize the numerical calculation and return a result on the log scale.
+to stabilize the numerical calculation and return a result on the log
+scale.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1983,32 +2101,33 @@ model {
   theta ~ dirichlet(alpha);
   for (k in 1:K)
     phi[k] ~ dirichlet(beta);
-
-   for (m in 1:M) 
-     for (k in 1:K) 
-       gamma[m,k] <- categorical_log(k,theta);
-   for (n in 1:N)
-     for (k in 1:K)
-       gamma[doc[n],k] <- gamma[doc[n],k] 
-                          + categorical_log(w[n],phi[k]);
-   for (m in 1:M)
-     lp__ <- lp__ + log_sum_exp(gamma[m]);
+  for (m in 1:M) 
+    for (k in 1:K) 
+      gamma[m,k] <- categorical_log(k,theta);
+  for (n in 1:N)
+    for (k in 1:K)
+      gamma[doc[n],k] <- gamma[doc[n],k] 
+                         + categorical_log(w[n],phi[k]);
+  for (m in 1:M)
+    lp__ <- lp__ + log_sum_exp(gamma[m]);
 }
 \end{Verbatim}
 \end{quote}
 %
 The local variable \code{gamma[m,k]} represents the value
 \[
-\log \distro{Categorical}(k|\theta)
+\gamma_{m,k} = \log \distro{Categorical}(k|\theta)
 + \sum_{n=1}^{N_m} \log \distro{Categorical}(w_{m,n}|\phi_k).
 \]
 %
-Given \code{gamma}, the posterior probability that document
+Given $\gamma$, the posterior probability that document
 $m$ is assigned category $k$ is
 \[
+\mbox{Pr}[z_m = k|w,\alpha,\beta]
+=
 \exp \left( 
-\mbox{\code{gamma}}[m,k]  
-- \log \sum_{k=1}^K \exp \left( \code{gamma}[m,k] \right)
+\gamma_{m,k}
+- \log \sum_{k=1}^K \exp \left( \gamma_{m,k} \right)
 \right).
 \]
 %
@@ -2020,63 +2139,51 @@ generated quantities.
 \subsection{Full Bayesian Inference for Naive Bayes}
 
 Full Bayesian posterior predictive inference for the naive Bayes model
-can be implemented in Stan by comining the models for labeled and
+can be implemented in Stan by combining the models for labeled and
 unlabeled data.  The estimands include both the model parameters and
-the labels for the unlabeled data.  The model is essentially a missing
-data model assuming the unknown category labels are missing completely
-at random; see \citep{GelmanCarlinSternRubin:2003,GelmanHill:2007} for
-more information on missing data imputation.  The model is also an
-instance of semisupervised learning because the unlabeled data
-contributes to the parameter estimations.
+the posterior distribution over categories for the unlabeled data.  The
+model is essentially a missing data model assuming the unknown
+category labels are missing completely at random; see
+\citep{GelmanCarlinSternRubin:2003,GelmanHill:2007} for more
+information on missing data imputation.  The model is also an instance
+of semisupervised learning because the unlabeled data contributes to
+the parameter estimations.
 
 To specify a Stan model for performing full Bayesian inference, the
 model for labeled data is combined with the model for unlabeled data.
 A second document collection is declared as data, but without the
 category labels, leading to new variables \code{M2} \code{N2},
 \code{w2}, \and \code{doc2}.  The number of categories and number of
-words, as well as the hyperparameters are shared and only declined
+words, as well as the hyperparameters are shared and only declared
 once.  Similarly, there is only one set of parameters.  Then the model
 contains a single set of statements for the prior, a set of statements
-for the labeled data and a set of statements for the unlabeled data.
+for the labeled data, and a set of statements for the unlabeled data.
 
-\subsection{Cutting Variables out of Estimation}
+\subsection{Prediction without Model Updates}
 
 An alternative to full Bayesian inference involves estimating a model
 using labeled data, then applying it to unlabeled data without
-updating the parameter estimates based on the unlabeled data.  This
-behavior can be implemented by simply removing the contribution of
-\code{gamma} to the log probability accumulator \code{lp\_\_}.  The
-value of \code{gamma} will still be calculated, but it will no longer
-have any affect on the log probabilty and hence no effect on the
-parameter estimation.
-%
-\footnote{BUGS provides a function \code{cut} that can be applied to
-  variables in the directed graphical model to remove their
-  contribution to the overall log probability function.}
-%
-At this point, a variable like \code{gamma} can be moved to the
-generated quantities block, which will be more efficient.
-
-Partially cut inferences can be defined by including the variable as a
-transformed parameter, but only including some of its contribution to
-the log probability function.  Anything that does not contribute to
-the accumulator \code{lp\_\_} will not affect estimation.
-
+updating the parameter estimates based on the unlabeled data.
+This behavior can be implemented by moving the definition of \code{gamma}
+for the unlabeled documents to the generated quantities block.
+Because the variables no longer contribute to the log probability
+accumulator \code{lp\_\_}, they no longer jointly contribute to
+the estimation of the model parameters.
 
 
 \section{Latent Dirichlet Allocation}
 
 Latent Dirichlet allocation (LDA) is a mixed-membership multinomial
-clustering model.  Using the typical topic/document terminology common
-in discussions of LDA, each document is modeled as having a mixture
-of topics, with each word drawn from a topic based on the mixing
-proportions.  
+clustering model \citep{BleiNgJordan:2003} that generalized naive
+Bayes.  Using the topic and document terminology common in discussions of
+LDA, each document is modeled as having a mixture of topics, with each
+word drawn from a topic based on the mixing proportions.
 
 \subsection{The LDA Model}
 
-The basic document generation process generates each document
-independently.  For document $m$, the first step is to draw a topic
-distribtuion simplex $\theta_m$ over the $K$ topics,
+The basic model assumes each document is generated independently based
+on fixed hyperparameters. For document $m$, the first step is to draw a topic
+distribution simplex $\theta_m$ over the $K$ topics,
 %
 \[
 \theta_m \sim \distro{Dirichlet}(\alpha).
@@ -2085,7 +2192,8 @@ distribtuion simplex $\theta_m$ over the $K$ topics,
 The prior hyperparameter $\alpha$ is fixed to a $K$-vector of positive
 values.  Each word in the document is generated independently
 conditional on the distribution $\theta_m$.  First, a topic
-$z_{m,n} \in 1{:}K$ is drawn for the word,
+$z_{m,n} \in 1{:}K$ is drawn for the word based on the
+document-specific topic-distribution,
 \[
 z_{m,n} \sim \distro{Categorical}(\theta_m).
 \]
@@ -2101,7 +2209,7 @@ Dirichlet prior,
 \phi_k \sim \distro{Dirichlet}(\beta)
 \]
 %
-where $\beta$ is a $V$-vector of positive values.
+where $\beta$ is a fixed $V$-vector of positive values.
 
 \subsection{Summing out the Discrete Parameters}
 
@@ -2123,7 +2231,7 @@ p(\theta|\alpha) \times p(\phi|\beta) \times p(w|\theta,\phi)
 \prod_{m=1}^M \prod_{n=1}^{M[n]} p(w_{m,n}|\theta_m,\phi).
 \end{eqnarray*}
 %
-The inner word-probability term is marginalized by summing out the
+The inner word-probability term is defined by summing out the
 topic assignments,
 \begin{eqnarray*}
 p(w_{m,n}|\theta_m,\phi)
@@ -2134,7 +2242,7 @@ p(w_{m,n}|\theta_m,\phi)
 \sum_{z=1}^K p(z|\theta_m) \times p(w_{m,n}|\phi_z).
 \end{eqnarray*}
 %
-Putting this back together and converting to the log scale provides a
+Plugging the distributions in and converting to the log scale provides a
 formula that can be implemented directly in Stan,
 \[
 \begin{array}{l}
@@ -2197,6 +2305,105 @@ model {
 As in the other mixture models, the log-sum-of-exponents function is
 used to stabilize the numerical arithmetic. 
 
+\subsection{Correlated Topic Model}
+
+To account for correlations in the distribution of topics for
+documents, \citep{BleiLafferty:2007} introduced a variant of LDA in
+which the Dirichlet prior on the per-document topic distribution is
+replaced with a multivariate logistic normal distribution.  
+
+The authors treat the prior as a fixed hyperparameter.  They use an
+$L_1$-regularized estimate of covariance, which is equivalent to the
+maximum a posteriori estimate given a double-exponential prior.  Stan
+does not (yet) support maximum a posteriori estimation, so the mean and
+covariance of the multivariate logistic normal must be specified as
+data.
+
+\subsubsection{Fixed Hyperparameter Correlated Topic Model}
+
+The Stan model in the previous section can be modified to implement
+the correlated topic model by replacing the Dirichlet topic prior
+\code{alpha} in the data declaration with the mean and covariance of
+the multivariate logistic normal prior.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  ... data as before without alpha ...
+  vector[K] mu;          // topic mean
+  cov_matrix[K] Sigma;   // topic covariance 
+}
+\end{Verbatim}
+\end{quote}
+%
+Rather than drawing the simplex parameter \code{theta} from a
+Dirichlet, a parameter \code{eta} is drawn from a multivariate normal
+distribution and then transformed using softmax into a simplex.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  simplex[V] phi[K];  // word dist for topic k
+  vector[K] eta[M];   // topic dist for doc m
+}
+transformed parameters {
+  simplex[K] theta[M];
+  for (m in 1:M)
+    theta[m] <- softmax(eta);
+}
+model {
+  eta ~ normal(mu,Sigma);
+  ... model as before w/o prior for theta ...
+}
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Full Bayes Correlated Topic Model}
+
+By adding a prior for the mean and covariance, Stan supports full
+Bayesian inference for the correlated topic model.  This requires
+moving the declarations of topic mean \code{mu} and covariance \code{Sigma} 
+from the data block to the parameters block and providing them with
+priors in the model.  A relatively efficient and interpretatable prior
+for the covariance matrix \code{Sigma} may be encoded as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  vector[K] mu;              // topic mean
+  corr_matrix[K] Omega;      // correlation matrix
+  vector<lower=0>[K] sigma;  // scales
+  vector[K] eta[M]           // topic dist for doc m
+  simplex[V] phi[K];         // word dist for topic k
+}
+transformed parameters {
+  cov_matrix[K] Sigma;       // covariance matrix
+  ... as above ...
+  Sigma <- sigma' * Omega * sigma;
+}
+model {
+  mu ~ normal(0,5);
+  Omega ~ lkj_corr(2.0);
+  sigma ~ cauchy(0,5);
+  ... as above ...
+}
+\end{Verbatim}
+\end{quote}
+%
+The $\distro{LkjCorr}$ distribution with shape $\alpha > 0$ has support
+on correlation matrices (i.e., symmetric positive definite with unit
+diagonal).  Its density is defined by
+\[
+\distro{LkjCorr}(\Omega|\alpha) \propto \mbox{det}(\Omega)^{\alpha - 1}
+\]
+With a scale of $\alpha = 2$, the weakly informative prior favors a
+unit correlation matrix.  Thus the compound effect of this prior on
+the covariance matrix $\Sigma$ for the multivariate logistic normal is
+a slight concentration around diagonal covariance matrices with scales
+determined by the prior on \code{sigma}.
+
+
+
 
 
 
@@ -2215,7 +2422,7 @@ The defining feature of a Gaussian process is that the distribution of
 the function's value at a finite number of input points is a
 multivariate normal distribution.  This makes it tractable to both fit
 models from finite amounts of observed data and make predictions for
-new data points. 
+finitely many new data points. 
 
 Unlike a simple multivariate normal distribution, which is
 parameterized by a mean vector and covariance matrix, a Gaussian
@@ -2246,10 +2453,10 @@ only touches on some basic models.  For more information, see
 \section{Gaussian Process Regression}
 
 The data for a multivariate Gaussian process regression consists of a
-series of $N$ real input values $x_1,\ldots,x_N \in \reals^D$ paired
-with outputs $y_1,\ldots,y_N \in \reals$.  The defining feature of
-Gaussian processes is that the probability of a finite number of
-outputs $y$ conditioned on their inputs $x$ is Gaussian,
+series of $N$ inputs $x_1,\ldots,x_N \in \reals^D$ paired with outputs
+$y_1,\ldots,y_N \in \reals$.  The defining feature of Gaussian
+processes is that the probability of a finite number of outputs $y$
+conditioned on their inputs $x$ is Gaussian,
 \[
 y \sim \distro{Normal}(m(x),k(x)),
 \] 
@@ -2347,8 +2554,8 @@ model {
 %
 The input data is just the vector of inputs \code{x} and its size
 \code{N}.  Such a model can be used with values of \code{x} evenly
-spaced over some interval in order to plot sample draws from a
-Gaussian process in that range.
+spaced over some interval in order to plot sample draws of functions from a
+Gaussian process.  
 
 \subsection{Multivariate Inputs}
 
@@ -2448,9 +2655,13 @@ encoding of the transform described above.
 The hyperparameters controlling the covariance function of a Gaussian
 process can be fit by assigning them priors, then computing the
 posterior distribution of the hyperparameters given observed data.
-Because the hyperparameters are required to be positive and are all
-essentially variance parameters, weakly informative half-Cauchy priors
-are a reasonable choice.
+Because the hyperparameters are required to be positive and expected
+to have reasonably small values, broad half-Cauchy distributions act
+as quite vague priors which could just as well be uniform over a
+constrained range of values.  The priors on the parameters should be
+defined based on prior knowledge of the scale of the output values
+($\eta$), the scale of the output noise ($\sigma$), and the scale at
+which distances are measured among inputs ($1/\rho$).
 
 A Stan model to fit the hyperparameters of the general squared
 exponential covariance function is provided in the distribution in
@@ -2502,13 +2713,13 @@ are defined as parameters constrained to be non-negative.  The
 computation of the covariance matrix \code{Sigma} is now in the model
 block because it involves unknown parameters and thus can't simply be
 precomputed as transformed data.  The rest of the model consists of
-the half-Cauchy priors for the hyperparameters and the multivariate
+the priors for the hyperparameters and the multivariate
 normal likelihood, only now the value \code{y} is known and the
 covariance matrix \code{Sigma} is an unknown dependent on the
 hyperparameters.  
 
 Hamiltonian Monte Carlo sampling is quite fast and effective for
-hyperparameter inference in his model \citep{Neal:1997}, and the Stan
+hyperparameter inference in this model \citep{Neal:1997}, and the Stan
 implementation will fit hyperparameters in models with hundreds of
 data points in seconds.
 
@@ -2516,7 +2727,7 @@ data points in seconds.
 
 For multivariate inputs $x \in \reals^D$, the squared exponential
 covariance function can be further generalized by fitting a precision
-parameter $\rho_d$ for each dimension,
+parameter $\rho_d^2$ for each dimension $d$,
 \[
 k(x)_{i,j} = \eta^2 \exp 
 \left(
@@ -2535,10 +2746,7 @@ vector of size \code{D} and defining the covariance function as in
 this subsection.
 
 The collection of $\rho_d$ parameters can also be modeled
-hierarchically, for instance taking $\rho_d \sim
-\distro{HalfCauchy}(\nu,tau)$, with priors on $\nu$ and $\tau$ such as
-$\nu \sim \distro{HalfCauchy}(0,5)$ and $\tau \sim \distro{HalfCauchy}(0,5)$.
-
+hierarchically.
 
 
 \section{Predictve Inference with a Gaussian Process}
@@ -2729,8 +2937,10 @@ This block implements the definitions of $\Sigma$, $\Omega$, and $K$
 directly.  The posterior mean vector $K^{\top}\Sigma^{-1}y$ is
 computed as \code{mu}.  The covariance has a Cholesky factor $L$ such
 that $LL^{\top} = \Omega - K^{\top}\Sigma^{-1}K$.  Given these two
-ingredients, sampling the predictive quantity $\tilde{y}$ is
-straightforward, as shown in the Cholesky example above.
+ingredients, sampling the predictive quantity $\tilde{y}$ is carried
+out by translating, scaling and rotating an isotropic normal sample 
+using the posterior mean and the Cholesky factorization of the
+posterior covariance.
 
 
 \subsection{Joint Hyperparameter Fitting and Predictive Inference}
@@ -2775,14 +2985,14 @@ or in other words,
 Simulation from a Gaussian process logistic regression is
 straightforward; just simulate from a Gaussian process and then
 simulate the $z_n$ from the $y_n$ using the sampling distribution
-above.  This cannot be done directly in Stan because it does not (yet)
+above.  This cannot be done directly in Stan because Stan does not (yet)
 support discrete parameters or forward discrete sampling.
 
 \subsection{Hyperparameter Estimation and Predictive Inference}
 
 For hyperparameter estimation and predictive inference applications,
 the $y_n$ are typically latent parameters (i.e., not observed).
-Unfortunately, they can not be easily marginalized out analytically,
+Unfortunately, they cannot be easily marginalized out analytically,
 so they must be estimated from the data through the observed
 categorical outputs $z_n$.  Predictive inference will proceed not by
 sampling $z_n$ values, but directly through their probabilities, given
