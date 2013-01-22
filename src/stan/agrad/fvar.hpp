@@ -107,10 +107,9 @@ namespace stan {
     fvar<typename stan::return_type<T1,T2>::type>
     operator+(const fvar<T1>& x1, 
               const fvar<T2>& x2) {
-      return 
-        fvar<typename 
-             stan::return_type<T1,T2>::type>(x1.val_ + x2.val_, 
-                                             x1.d_ + x2.d_);
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(x1.val_ + x2.val_, 
+                                                  x1.d_ + x2.d_);
     }
     template <typename T1, typename T2>
     inline
@@ -226,6 +225,16 @@ namespace stan {
                                               / (x2.val_ * x2.val_));
     }
 
+
+    template <typename T>
+    inline
+    fvar<T>
+    sin(const fvar<T>& x) {
+      using std::sin;
+      using std::cos;
+      return fvar<T>(sin(x.val_),
+                     x.d_ * cos(x.val_));
+    }
 
   }
 }

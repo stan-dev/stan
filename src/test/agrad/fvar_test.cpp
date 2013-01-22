@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <iostream>
+
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/agrad/fvar.hpp>
@@ -34,6 +36,25 @@ TEST(AgradFvar,fvar) {
   EXPECT_FLOAT_EQ(5.07, (++d).val_);
   EXPECT_FLOAT_EQ(5.07, d.val_);
 
+}
+
+TEST(AgradFvar, sin) {
+  using stan::agrad::fvar;
+  using std::sin;
+  using std::cos;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;   // derivatives w.r.t. x
+  fvar<double> y = sin(x);
+
+  EXPECT_FLOAT_EQ(sin(0.5), y.val_);
+  EXPECT_FLOAT_EQ(cos(0.5), y.d_);
+
+  fvar<double> z = 3 * sin(x) + x;
+  EXPECT_FLOAT_EQ(3 * sin(0.5) + 0.5, z.val_);
+  EXPECT_FLOAT_EQ(3 * cos(0.5) + 1, z.d_);
+                  
+  
 }
 
 
