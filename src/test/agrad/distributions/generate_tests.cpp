@@ -222,7 +222,6 @@ void write_test_cases(vector<std::ostream *>& outs, const string& in_name, const
 int main(int argc, const char* argv[]) {
   if (argc != 2)
     return -1;
-  int return_code = 0;
   string in_suffix = "_test.hpp";
 
   string in_name = argv[1];
@@ -236,9 +235,9 @@ int main(int argc, const char* argv[]) {
   vector<std::ostream *> outs;
   for (size_t n = 0; n < int(size(argument_sequence) / N_TESTS) + 1; n++) {
     stringstream out_name;
-    out_name << out_name_base << "_generated_";
-    out_name << std::setw(5) << std::setfill('0') << n;
-    out_name << "_test.cpp";
+    out_name << out_name_base;
+    out_name << "_" << std::setw(5) << std::setfill('0') << n;
+    out_name << "_generated_test.cpp";
     outs.push_back(new std::ofstream(out_name.str().c_str()));
   }
 

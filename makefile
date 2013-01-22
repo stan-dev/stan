@@ -208,8 +208,8 @@ clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
 	cd src/test/gm/model_specs/compiled; $(RM) *.cpp *.o function_signatures[0-9]$(EXE) illegal_generated_quantities illegal_transformed_data illegal_transformed_parameters
-	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_*_test.cpp
-	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_*_test.cpp
-	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_*_test.cpp
-	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_*_test.cpp
+	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
+	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
 

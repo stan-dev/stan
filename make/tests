@@ -40,8 +40,26 @@ test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
 UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
+
+GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
+GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_test.cpp)
+##
+# Agrad distributions test generator
+##
+test/agrad/distributions/generate_tests$(EXE) : src/test/agrad/distributions/generate_tests.cpp
+	@mkdir -p $(dir $@)
+	$(LINK.c) $(CFLAGS) $< $(OUTPUT_OPTION)
+
+src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributions/generate_tests$(EXE) src/test/agrad/distributions/%_test.hpp
+	@echo "--- Generating tests for $(word 2,$^) ---"
+	test/agrad/distributions/generate_tests$(EXE) $(word 2,$^)
+
+.PHONY: test-distributions
+test-distributions: $(GENERATED_AGRAD_TESTS)
+	make $(patsubst src/%_test.cpp,runtest/%$(EXE),$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
+
 .PHONY: test-unit
-test-unit: $(addprefix runtest/,$(UNIT_TESTS))
+test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test-distributions
 
 ##
 # Target to build all tests
