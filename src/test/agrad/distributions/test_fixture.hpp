@@ -175,8 +175,7 @@ public:
         EXPECT_FLOAT_EQ(0.0, lp.val())
           << "All constant inputs should result in 0 log probability. Failed at index: " << n;
       }
-      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value
-	  && all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
 	lp = TestClass.template log_prob
 	  <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
 	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
