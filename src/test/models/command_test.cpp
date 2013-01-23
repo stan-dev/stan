@@ -379,7 +379,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
 }
 
 TEST_P(ModelCommand, OptionsTest) {
-  bitset<options_count> options(GetParam());
+  bitset<options_count> options(1 << GetParam());
   vector<pair<string, string> > changed_options;
   
   std::string command = get_command(options, changed_options);
@@ -426,5 +426,4 @@ TEST_P(ModelCommand, OptionsTest) {
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
-                        //Range(27648, 27651));
-                        Range(0, 1<<options_count));
+                        Range(-1, int(options_count)));
