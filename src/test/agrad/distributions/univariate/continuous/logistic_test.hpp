@@ -1,37 +1,31 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/prob/distributions/univariate/continuous/cauchy.hpp>
+#include <stan/prob/distributions/univariate/continuous/logistic.hpp>
 
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionsCauchy : public AgradDistributionTest {
+class AgradDistributionsLogistic : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
     vector<double> param(3);
-    
-    param[0] = 1.0;                // y
-    param[1] = 0.0;                // mu
-    param[2] = 1.0;                // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-1.837877); // expected log_prob
 
-    param[0] = -1.5;                // y
-    param[1] = 0.0;                 // mu
-    param[2] = 1.0;                 // sigma
+    param[0] = 1.2;           // y
+    param[1] = 0.3;           // mu
+    param[2] = 2.0;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-2.323385); // expected log_prob
+    log_prob.push_back(-2.129645); // expected log_prob
 
-    param[0] = -1.5;                // y
-    param[1] = -1.0;                // mu
-    param[2] = 1.0;                 // sigma
+    param[0] = -1.0;          // y
+    param[1] = 0.2;           // mu
+    param[2] = 0.25;          // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.367873); // expected log_prob
+    log_prob.push_back(-3.430098); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+                      vector<double>& value) {
     // y
     
     // mu
@@ -49,10 +43,10 @@ public:
     value.push_back(-1.0);
 
     index.push_back(2U);
-    value.push_back(numeric_limits<double>::infinity());
+    value.push_back(-numeric_limits<double>::infinity());
 
     index.push_back(2U);
-    value.push_back(-numeric_limits<double>::infinity());
+    value.push_back(numeric_limits<double>::infinity());
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
@@ -62,7 +56,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
 	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::cauchy_log(y, mu, sigma);
+    return stan::prob::logistic_log(y, mu, sigma);
   }
 
   template <bool propto, 
@@ -73,7 +67,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
 	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::cauchy_log<propto>(y, mu, sigma);
+    return stan::prob::logistic_log<propto>(y, mu, sigma);
   }
   
   template <bool propto, 
@@ -85,7 +79,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
 	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::cauchy_log<propto>(y, mu, sigma, Policy());
+    return stan::prob::logistic_log<propto>(y, mu, sigma, Policy());
   }
   
   template <typename T_y, typename T_loc, typename T_scale,
@@ -94,25 +88,20 @@ public:
 	    typename T9>
   var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
 			const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::math::log1p;
-    using stan::math::square;
-    using stan::prob::include_summand;
-    
-    var lp = 0.0;
-    if (include_summand<true>::value)
-      lp += stan::prob::NEG_LOG_PI;
-    if (include_summand<true,T_scale>::value)
-      lp -= log(sigma);
-    if (include_summand<true,T_y,T_loc,T_scale>::value)
-      lp -= log1p(square((y - mu) / sigma));
-    return lp;
+      using stan::prob::include_summand;
+      using stan::math::log1p;
+      var lp(0.0);
+      if (include_summand<true,T_y,T_loc,T_scale>::value)
+	lp -= (y - mu) / sigma;
+      if (include_summand<true,T_scale>::value)
+	lp -= log(sigma);
+      if (include_summand<true,T_y,T_loc,T_scale>::value)
+	lp -= 2.0 * log1p(exp(-(y - mu)/sigma));
+      return lp;
   }
 };
 
 
-TEST(ProbDistributionsCauchy,Cumulative) {
-  using stan::prob::cauchy_cdf;
-  EXPECT_FLOAT_EQ(0.75, cauchy_cdf(1.0, 0.0, 1.0));
-  EXPECT_FLOAT_EQ(0.187167, cauchy_cdf(-1.5, 0.0, 1.0));
-  EXPECT_FLOAT_EQ(0.187167, cauchy_cdf(-2.5, -1.0, 1.0));
+TEST(ProbDistributionsLogisticCDF, Values) {
+    EXPECT_FLOAT_EQ(0.047191944, stan::prob::logistic_cdf(-3.45, 5.235, 2.89));
 }

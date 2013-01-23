@@ -142,6 +142,7 @@ help:
 	@echo '                     the Stan model as an executable.'
 	@echo '  Tests:'
 	@echo '  - test-unit      : Runs unit tests.'
+	@echo '  - test-distributions : Runs unit tests for the distributions (subset of test-unit)'
 	@echo '  - test-models    : Runs diagnostic models.'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all       : Runs all tests.'
