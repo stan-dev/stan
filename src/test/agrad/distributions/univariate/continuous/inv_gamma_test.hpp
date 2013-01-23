@@ -62,7 +62,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& beta,
 	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::gamma_log(y, alpha, beta);
+    return stan::prob::inv_gamma_log(y, alpha, beta);
   }
 
   template <bool propto, 
@@ -73,7 +73,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& beta,
 	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::gamma_log<propto>(y, alpha, beta);
+    return stan::prob::inv_gamma_log<propto>(y, alpha, beta);
   }
   
   template <bool propto, 
@@ -85,7 +85,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& beta,
 	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::gamma_log<propto>(y, alpha, beta, Policy());
+    return stan::prob::inv_gamma_log<propto>(y, alpha, beta, Policy());
   }
   
   template <typename T_y, typename T_shape, typename T_scale,

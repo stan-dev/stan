@@ -180,7 +180,15 @@ public:
 	  <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
 	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
 	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
-	  << "For all scalar and all constant inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+	  << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+      }
+      if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value 
+	  && all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+	lp = TestClass.template log_prob
+	  <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
+	  << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
       }
     }
   }
