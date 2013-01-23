@@ -22,12 +22,6 @@ public:
     param[2] = 5.0;           // alpha
     parameters.push_back(param);
     log_prob.push_back(-25.69865); // expected log_prob
-
-    param[0] = 0.0;           // y
-    param[1] = 0.15;          // y_min
-    param[2] = 5.0;           // alpha
-    parameters.push_back(param);
-    log_prob.push_back(log(0.0)); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
