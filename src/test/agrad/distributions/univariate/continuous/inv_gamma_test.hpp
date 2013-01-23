@@ -113,3 +113,7 @@ public:
     return lp;
   }
 };
+
+TEST(ProbDistributionsInvGammaCdf,Values) {
+    EXPECT_FLOAT_EQ(0.557873, stan::prob::inv_gamma_cdf(4.39, 1.349, 3.938));
+}
