@@ -1,4 +1,4 @@
-// Arguments: Double, Double, Double, Double
+// Arguments: Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 
 using std::vector;
