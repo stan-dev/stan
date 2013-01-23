@@ -100,3 +100,8 @@ public:
       return lp;
   }
 };
+
+
+TEST(ProbDistributionsLogisticCDF, Values) {
+    EXPECT_FLOAT_EQ(0.047191944, stan::prob::logistic_cdf(-3.45, 5.235, 2.89));
+}
