@@ -57,4 +57,17 @@ TEST(AgradFvar, sin) {
   
 }
 
+TEST(AgradFvar, cos) {
+  using stan::agrad::fvar;
+  using std::sin;
+  using std::cos;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;   // derivatives w.r.t. x
+  fvar<double> y = cos(x);
+
+  EXPECT_FLOAT_EQ(cos(0.5), y.val_);
+  EXPECT_FLOAT_EQ(-sin(0.5), y.d_);
+
+}
 
