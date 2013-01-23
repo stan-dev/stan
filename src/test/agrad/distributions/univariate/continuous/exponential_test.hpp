@@ -44,7 +44,7 @@ public:
 	    typename T3, typename T4, typename T5, 
 	    typename T6, typename T7, typename T8, 
 	    typename T9>
-  typename stan::return_type<T_y, T_inv_scale, T2>::type 
+  typename stan::return_type<T_y, T_inv_scale>::type 
   log_prob(const T_y& y, const T_inv_scale& beta, 
 	     const T2&, const T3&, const T4&, const T5&,
 	     const T6&, const T7&, const T8&, const T9&) {
@@ -96,3 +96,21 @@ public:
     return logp;
   }
 };
+
+TEST(ProbDistributionsExponential,Cumulative) {
+  using std::numeric_limits;
+  using stan::prob::exponential_cdf;
+  EXPECT_FLOAT_EQ(0.95021293, exponential_cdf(2.0,1.5));
+  EXPECT_FLOAT_EQ(1.0, exponential_cdf(15.0,3.9));
+  EXPECT_FLOAT_EQ(0.62280765, exponential_cdf(0.25,3.9));
+
+  // ??
+  // EXPECT_FLOAT_EQ(0.0,
+  //                 exponential_cdf(-numeric_limits<double>::infinity(),
+  //                                 1.5));
+  EXPECT_FLOAT_EQ(0.0, exponential_cdf(0.0,1.5));
+  EXPECT_FLOAT_EQ(1.0,
+                  exponential_cdf(numeric_limits<double>::infinity(),
+                                  1.5));
+
+}

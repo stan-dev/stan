@@ -175,13 +175,20 @@ public:
         EXPECT_FLOAT_EQ(0.0, lp.val())
           << "All constant inputs should result in 0 log probability. Failed at index: " << n;
       }
-      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value
-	  && all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
 	lp = TestClass.template log_prob
 	  <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
 	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
 	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
-	  << "For all scalar and all constant inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+	  << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+      }
+      if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value 
+	  && all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+	lp = TestClass.template log_prob
+	  <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
+	  << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
       }
     }
   }
@@ -465,7 +472,7 @@ public:
 	<< "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < finite_diffs.size(); i++) {
 	EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
-	  << "Comparison of finite diff to calculated gradient failed";
+	  << "Comparison of finite diff to calculated gradient failed for i=" << i;
       }
     }
   }
