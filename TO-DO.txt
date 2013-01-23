@@ -24,6 +24,8 @@ NEXT RELEASE (1.1.1 or 1.2.0)
 
 * debug BUGS vol 1 kidney model --- sometimes hangs
 
+* shift APIs from std::vector<T> to Eigen::Matrix<T,Dynamic,1>, etc.
+
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
