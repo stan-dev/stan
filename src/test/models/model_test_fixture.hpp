@@ -28,6 +28,7 @@ public:
   static std::vector<std::string> command_outputs;
   static const size_t skip;
   static size_t iterations;
+  static long elapsed_milliseconds;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -126,7 +127,7 @@ public:
   static void run_model() {
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::string command_output;
-      EXPECT_NO_THROW(command_output = run_command(get_command(chain))) 
+      EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
         << "Can not execute command: " << get_command(chain);
       command_outputs.push_back(command_output);
     }
@@ -200,6 +201,11 @@ public:
     return Derived::get_expected_values();
   }
 
+  static void write_results() {
+    //std::cout << "writing results" << std::endl;
+    //std::cout << "chains: " << chains->num_chains() << std::endl;
+  }
+
 };
   
 template<class Derived> 
@@ -220,6 +226,9 @@ const size_t Model_Test_Fixture<Derived>::skip = 3U;
 template<class Derived>
 size_t Model_Test_Fixture<Derived>::iterations = 2000U;
 
+template<class Derived>
+long Model_Test_Fixture<Derived>::elapsed_milliseconds = 0;
+
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
@@ -229,6 +238,7 @@ TYPED_TEST_P(Model_Test_Fixture, TestGradient) {
 
 TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
+  TypeParam::write_results();
 }
 
 TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
