@@ -52,6 +52,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       using boost::math::isinf;
+      using boost::math::isfinite;
       using stan::math::Phi;
       
       typename promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type lp(0.0);
@@ -75,7 +76,12 @@ namespace stan {
           if (isinf(sigma)) 
             lp -= log(beta - alpha);
           else
-            lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+	    if (!isinf(beta) && !isinf(alpha)) 
+	      lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+	    else if (isfinite(alpha)) 
+	      lp -= log(1.0 - Phi((alpha - mu)/sigma));
+	    else if (isfinite(beta)) 
+	      lp -= log(Phi((beta - mu)/sigma));
         }
       }
       

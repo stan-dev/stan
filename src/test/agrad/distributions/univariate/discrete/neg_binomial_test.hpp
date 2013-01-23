@@ -1,4 +1,4 @@
-#define _LOG_PROB_ neg_binomial_log
+// Arguments: Ints, Doubles, Doubles
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 
