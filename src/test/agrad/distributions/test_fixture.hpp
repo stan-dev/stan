@@ -472,7 +472,7 @@ public:
 	<< "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < finite_diffs.size(); i++) {
 	EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
-	  << "Comparison of finite diff to calculated gradient failed";
+	  << "Comparison of finite diff to calculated gradient failed for i=" << i;
       }
     }
   }
