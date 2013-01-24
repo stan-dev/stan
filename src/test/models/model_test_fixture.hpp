@@ -248,7 +248,7 @@ public:
     results << "\"" << model_path << ".stan\"" << ","
 	    << chains->num_chains() << ","
 	    << num_iterations() << ","
-	    << chains->num_chains() * chains->num_kept_samples() << ","
+	    << chains->num_kept_samples() << ","
 	    << N << ","
 	    << elapsed_milliseconds << ","
 	    << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
