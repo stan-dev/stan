@@ -35,7 +35,54 @@ TEST(AgradFvar,fvar) {
 
   EXPECT_FLOAT_EQ(5.07, (++d).val_);
   EXPECT_FLOAT_EQ(5.07, d.val_);
+}
 
+TEST(AgradFvar, sqrt) {
+  using stan::agrad::fvar;
+  using std::sqrt;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0; //derivatives w.r.t. x
+  fvar<double> a = sqrt(x);
+
+  EXPECT_FLOAT_EQ(sqrt(0.5), a.val_);
+  EXPECT_FLOAT_EQ(1 / (2 * sqrt(0.5)), a.d_);
+
+  fvar<double> b = 3 * sqrt(x) + x;
+  EXPECT_FLOAT_EQ(3 * sqrt(0.5) + 0.5, b.val_);
+  EXPECT_FLOAT_EQ(3 / (2 * sqrt(0.5)) + 1, b.d_);
+
+  fvar<double> c = -sqrt(x) + 5;
+  EXPECT_FLOAT_EQ(-sqrt(0.5) + 5, c.val_);
+  EXPECT_FLOAT_EQ(-1 / (2 * sqrt(0.5)), c.d_);
+
+  fvar<double> d = -3 * sqrt(x) + 5 * x;
+  EXPECT_FLOAT_EQ(-3 * sqrt(0.5) + 5 * 0.5, d.val_);
+  EXPECT_FLOAT_EQ(-3 / (2 * sqrt(0.5)) + 5, d.d_);
+}
+
+TEST(AgradFvar, exp) {
+  using stan::agrad::fvar;
+  using std::exp;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;   // derivatives w.r.t. x
+  
+  fvar<double> a = exp(x);
+  EXPECT_FLOAT_EQ(exp(0.5), a.val_);
+  EXPECT_FLOAT_EQ(exp(0.5), a.d_);
+
+  fvar<double> b = 2 * exp(x) + 4;
+  EXPECT_FLOAT_EQ(2 * exp(0.5) + 4, b.val_);
+  EXPECT_FLOAT_EQ(2 * exp(0.5), b.d_);
+
+  fvar<double> c = -exp(x) + 5;
+  EXPECT_FLOAT_EQ(-exp(0.5) + 5, c.val_);
+  EXPECT_FLOAT_EQ(-exp(0.5), c.d_);
+
+  fvar<double> d = -3 * exp(x) + 5 * x;
+  EXPECT_FLOAT_EQ(-3 * exp(0.5) + 5 * 0.5, d.val_);
+  EXPECT_FLOAT_EQ(-3 * exp(0.5) + 5, d.d_);
 }
 
 TEST(AgradFvar, sin) {
@@ -45,16 +92,22 @@ TEST(AgradFvar, sin) {
 
   fvar<double> x(0.5);
   x.d_ = 1.0;   // derivatives w.r.t. x
-  fvar<double> y = sin(x);
-
-  EXPECT_FLOAT_EQ(sin(0.5), y.val_);
-  EXPECT_FLOAT_EQ(cos(0.5), y.d_);
-
-  fvar<double> z = 3 * sin(x) + x;
-  EXPECT_FLOAT_EQ(3 * sin(0.5) + 0.5, z.val_);
-  EXPECT_FLOAT_EQ(3 * cos(0.5) + 1, z.d_);
-                  
   
+  fvar<double> a = sin(x);
+  EXPECT_FLOAT_EQ(sin(0.5), a.val_);
+  EXPECT_FLOAT_EQ(cos(0.5), a.d_);
+
+  fvar<double> b = 2 * sin(x) + 4;
+  EXPECT_FLOAT_EQ(2 * sin(0.5) + 4, b.val_);
+  EXPECT_FLOAT_EQ(2 * cos(0.5), b.d_);
+
+  fvar<double> c = -sin(x) + 5;
+  EXPECT_FLOAT_EQ(-sin(0.5) + 5, c.val_);
+  EXPECT_FLOAT_EQ(-cos(0.5), c.d_);
+
+  fvar<double> d = -3 * sin(x) + 5 * x;
+  EXPECT_FLOAT_EQ(-3 * sin(0.5) + 5 * 0.5, d.val_);
+  EXPECT_FLOAT_EQ(-3 * cos(0.5) + 5, d.d_);
 }
 
 TEST(AgradFvar, cos) {
@@ -64,10 +117,46 @@ TEST(AgradFvar, cos) {
 
   fvar<double> x(0.5);
   x.d_ = 1.0;   // derivatives w.r.t. x
-  fvar<double> y = cos(x);
+  
+  fvar<double> a = cos(x);
+  EXPECT_FLOAT_EQ(cos(0.5), a.val_);
+  EXPECT_FLOAT_EQ(-sin(0.5), a.d_);
 
-  EXPECT_FLOAT_EQ(cos(0.5), y.val_);
-  EXPECT_FLOAT_EQ(-sin(0.5), y.d_);
+  fvar<double> b = 2 * cos(x) + 4;
+  EXPECT_FLOAT_EQ(2 * cos(0.5) + 4, b.val_);
+  EXPECT_FLOAT_EQ(2 * -sin(0.5), b.d_);
 
+  fvar<double> c = -cos(x) + 5;
+  EXPECT_FLOAT_EQ(-cos(0.5) + 5, c.val_);
+  EXPECT_FLOAT_EQ(sin(0.5), c.d_);
+
+  fvar<double> d = -3 * cos(x) + 5 * x;
+  EXPECT_FLOAT_EQ(-3 * cos(0.5) + 5 * 0.5, d.val_);
+  EXPECT_FLOAT_EQ(-3 * -sin(0.5) + 5, d.d_);
+}
+
+TEST(AgradFvar, tan) {
+  using stan::agrad::fvar;
+  using std::tan;
+  using std::cos;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;   // derivatives w.r.t. x
+  
+  fvar<double> a = tan(x);
+  EXPECT_FLOAT_EQ(tan(0.5), a.val_);
+  EXPECT_FLOAT_EQ(1 / (cos(0.5) * cos(0.5)), a.d_);
+
+  fvar<double> b = 2 * tan(x) + 4;
+  EXPECT_FLOAT_EQ(2 * tan(0.5) + 4, b.val_);
+  EXPECT_FLOAT_EQ(2 / (cos(0.5) * cos(0.5)), b.d_);
+
+  fvar<double> c = -tan(x) + 5;
+  EXPECT_FLOAT_EQ(-tan(0.5) + 5, c.val_);
+  EXPECT_FLOAT_EQ(-1 / (cos(0.5) * cos(0.5)), c.d_);
+
+  fvar<double> d = -3 * tan(x) + 5 * x;
+  EXPECT_FLOAT_EQ(-3 * tan(0.5) + 5 * 0.5, d.val_);
+  EXPECT_FLOAT_EQ(-3 / (cos(0.5) * cos(0.5)) + 5, d.d_);
 }
 
