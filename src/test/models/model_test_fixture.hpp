@@ -7,6 +7,8 @@
 #include <utility>
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/binomial.hpp>
+#include <fstream>
+#include <algorithm>
 
 /** 
  * Model_Test_Fixture is a test fixture for google test
@@ -28,6 +30,7 @@ public:
   static std::vector<std::string> command_outputs;
   static const size_t skip;
   static size_t iterations;
+  static long elapsed_milliseconds;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -126,7 +129,7 @@ public:
   static void run_model() {
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::string command_output;
-      EXPECT_NO_THROW(command_output = run_command(get_command(chain))) 
+      EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
         << "Can not execute command: " << get_command(chain);
       command_outputs.push_back(command_output);
     }
@@ -200,6 +203,64 @@ public:
     return Derived::get_expected_values();
   }
 
+  static bool is_results_empty() {
+    std::ifstream results("models/timing.csv");
+    return (results.peek() == EOF);
+  }
+
+  static void write_header() {
+    if (!is_results_empty())
+      return;
+    std::ofstream results("models/timing.csv");
+    results << "model" << ","
+	    << "chains" << ","
+	    << "kept samples" << ","
+	    << "parameters" << ","
+	    << "time (ms)" << ","
+	    << "n_eff (min)" << ","
+	    << "n_eff (max)" << ","
+      	    << "n_eff (mean)" << ","
+      	    << "n_eff (median)" << ","
+	    << "time per n_eff (min)" << ","
+	    << "time per n_eff (max)" << ","
+	    << "time per n_eff (mean)" << ","
+	    << "time per n_eff (median)"
+	    << std::endl;
+    results.close();
+  }
+  
+  static void write_results() {
+    write_header();
+    std::ofstream results("models/timing.csv", std::ios_base::app);
+    
+    size_t N = chains->num_params();
+    std::vector<double> n_eff(chains->num_params());
+    for (size_t n = 0; n < N; n++)
+      n_eff[n] = chains->effective_sample_size(n);
+    std::sort(n_eff.begin(), n_eff.end());
+    double n_eff_median;
+    if (N % 2 == 0)
+      n_eff_median = (n_eff[N/2 - 1] + n_eff[N/2]) / 2;
+    else
+      n_eff_median = n_eff[N/2];
+
+    results << "\"" << model_path << ".stan\"" << ","
+	    << chains->num_chains() << ","
+	    << chains->num_chains() * chains->num_kept_samples() << ","
+	    << N << ","
+	    << elapsed_milliseconds << ","
+	    << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
+	    << *(std::max_element(n_eff.begin(), n_eff.end())) << ","
+      	    << stan::math::sum(n_eff) / N << ","
+	    << n_eff_median << ","
+	    << elapsed_milliseconds / *(std::min_element(n_eff.begin(), n_eff.end())) << ","
+	    << elapsed_milliseconds / *(std::max_element(n_eff.begin(), n_eff.end())) << ","
+	    << elapsed_milliseconds / (stan::math::sum(n_eff) / N) << ","
+	    << elapsed_milliseconds / n_eff_median
+	    << std::endl;
+    results.close();
+  }
+
 };
   
 template<class Derived> 
@@ -220,6 +281,9 @@ const size_t Model_Test_Fixture<Derived>::skip = 3U;
 template<class Derived>
 size_t Model_Test_Fixture<Derived>::iterations = 2000U;
 
+template<class Derived>
+long Model_Test_Fixture<Derived>::elapsed_milliseconds = 0;
+
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
@@ -229,6 +293,7 @@ TYPED_TEST_P(Model_Test_Fixture, TestGradient) {
 
 TYPED_TEST_P(Model_Test_Fixture, RunModel) {
   TypeParam::run_model();
+  TypeParam::write_results();
 }
 
 TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
