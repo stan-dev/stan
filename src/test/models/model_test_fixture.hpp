@@ -214,6 +214,7 @@ public:
     std::ofstream results("models/timing.csv");
     results << "model" << ","
 	    << "chains" << ","
+	    << "iterations per chain" << ","
 	    << "kept samples" << ","
 	    << "parameters" << ","
 	    << "time (ms)" << ","
@@ -246,6 +247,7 @@ public:
 
     results << "\"" << model_path << ".stan\"" << ","
 	    << chains->num_chains() << ","
+	    << num_iterations() << ","
 	    << chains->num_chains() * chains->num_kept_samples() << ","
 	    << N << ","
 	    << elapsed_milliseconds << ","

@@ -1,10 +1,10 @@
 demo/%$(EXE) : demo/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
 demo/%.o : src/demo/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(CFLAGS) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) -O$O $(CFLAGS) $(OUTPUT_OPTION) $<
 
 ##
 # If the target is demo/, include .d. 

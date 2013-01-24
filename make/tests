@@ -48,7 +48,7 @@ GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_te
 ##
 test/agrad/distributions/generate_tests$(EXE) : src/test/agrad/distributions/generate_tests.cpp
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(CFLAGS) $< $(OUTPUT_OPTION)
+	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
 src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributions/generate_tests$(EXE) src/test/agrad/distributions/%_test.hpp
 	@echo "--- Generating tests for $(word 2,$^) ---"
@@ -74,7 +74,7 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Generate autodependencies for test files.
@@ -92,7 +92,7 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 $(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest_no_fail/,$(MAKECMDGOALS)),)
 	-$@ --gtest_output="xml:$(basename $@).xml"
 endif
@@ -102,7 +102,7 @@ endif
 ##
 test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
@@ -111,14 +111,14 @@ endif
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 
 ##
@@ -129,7 +129,7 @@ test/%.d : src/test/%_test.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi

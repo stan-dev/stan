@@ -7,7 +7,7 @@ MODEL_HEADER := src/stan/model/model_header.hpp
 %$(EXE): %.o bin/libstan.a
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
 .PRECIOUS: %.cpp
 %.cpp : %.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
@@ -64,19 +64,19 @@ models/%.stan : src/models/%.stan
 $(MODEL_HEADER).gch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for g++ ---'
-	$(CC) $(CFLAGS) $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) -O$O $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).pch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for clang++ ---'
-	$(CC) $(CFLAGS) $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) -O$O $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
 	@if test -d $(dir $@); \
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi
