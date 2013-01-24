@@ -41,6 +41,14 @@ namespace stan {
 
 
 
+     template <typename T2>
+     inline
+     fvar<T>&
+     operator+=(const T2& x2) {
+       val_ += x2;
+       return *this;
+     }
+
       template <typename T2>
       inline
       fvar<T>&
@@ -53,9 +61,25 @@ namespace stan {
       template <typename T2>
       inline
       fvar<T>&
+      operator-=(const T2& x2) {
+        val_ -= x2;
+        return *this;
+      }
+
+      template <typename T2>
+      inline
+      fvar<T>&
       operator*=(const fvar<T2>& x2) {
         d_ = d_ * x2.val_ + val_ * x2.d_;
         val_ *= x2.val_;
+        return *this;
+      }
+
+      template <typename T2>
+      inline
+      fvar<T>&
+      operator*=(const T2& x2) {
+        val_ *= x2;
         return *this;
       }
 
@@ -67,6 +91,14 @@ namespace stan {
       operator/=(const fvar<T2>& x2) {
         d_ = (d_ * x2.val_ - val_ * x2.d_) / ( x2.v_ * x2.v_);
         val_ /= x2.val_;
+        return *this;
+      }
+
+      template <typename T2>
+      inline
+      fvar<T>&
+      operator/=(const T2& x2) {
+        val_ /= x2;
         return *this;
       }
 
@@ -234,6 +266,32 @@ namespace stan {
                                               / (x2.val_ * x2.val_));
     }
 
+    template <typename T>
+    inline
+    fvar<T>
+    sqrt(const fvar<T>& x) {
+      using std::sqrt;
+      return fvar<T>(sqrt(x.val_),
+                     x.d_ / (2 * sqrt(x.val_)));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    exp(const fvar<T>& x) {
+      using std::exp;
+      return fvar<T>(exp(x.val_),
+                     x.d_ * exp(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    log(const fvar<T>& x) {
+      using std::log;
+      return fvar<T>(log(x.val_),
+                     x.d_ / x.val_);
+    }
 
     template <typename T>
     inline
@@ -253,6 +311,16 @@ namespace stan {
       using std::cos;
       return fvar<T>(cos(x.val_),
                      x.d_ * -sin(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    tan(const fvar<T>& x) {
+      using std::cos;
+      using std::tan;
+      return fvar<T>(tan(x.val_),
+                     x.d_ / (cos(x.val_) * cos(x.val_)));
     }
   }
 }
