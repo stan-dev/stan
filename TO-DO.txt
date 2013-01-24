@@ -26,6 +26,9 @@ NEXT RELEASE (1.1.1 or 1.2.0)
 
 * shift APIs from std::vector<T> to Eigen::Matrix<T,Dynamic,1>, etc.
 
+* figure out what's going on with TS's model that's causing
+  Eigen to throw an assert failure
+
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
