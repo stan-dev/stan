@@ -19,6 +19,7 @@ SUFFIXES:
 ##
 CC = g++
 O = 3
+O_STANC = 0
 AR = ar
 
 ##
@@ -31,7 +32,7 @@ GTEST ?= lib/gtest_1.6.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -O$O -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE
+CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
@@ -59,20 +60,20 @@ PATH_SEPARATOR = /
 -include make/os_detect
 
 %$(EXE) : %.o %.cpp bin/libstan.a
-	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Rule for generating dependencies.
@@ -84,7 +85,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -94,7 +95,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -107,7 +108,8 @@ help:
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
-	@echo '  - O (Optimize Level):      ' $(O)
+	@echo '  - O (Optimization Level):  ' $(O)
+	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
 	@echo ''
 	@echo 'Build a Stan model:'
 	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
@@ -205,7 +207,7 @@ clean-models:
 clean-demo:
 	$(RM) -r demo
 
-clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
+clean-all: clean clean-dox clean-manual clean-models clean-demo
 	$(RM) -r test bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
 	cd src/test/gm/model_specs/compiled; $(RM) *.cpp *.o function_signatures[0-9]$(EXE) illegal_generated_quantities illegal_transformed_data illegal_transformed_parameters
