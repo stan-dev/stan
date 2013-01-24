@@ -275,6 +275,14 @@ namespace stan {
                      x.d_ * exp(x.val_));
     }
 
+    template <typename T>
+    inline
+    fvar<T>
+    log(const fvar<T>& x) {
+      using std::log;
+      return fvar<T>(log(x.val_),
+                     x.d_ / x.val_);
+    }
 
     template <typename T>
     inline

@@ -85,6 +85,30 @@ TEST(AgradFvar, exp) {
   EXPECT_FLOAT_EQ(-3 * exp(0.5) + 5, d.d_);
 }
 
+TEST(AgradFvar, log) {
+  using stan::agrad::fvar;
+  using std::log;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;   // derivatives w.r.t. x
+  
+  fvar<double> a = log(x);
+  EXPECT_FLOAT_EQ(log(0.5), a.val_);
+  EXPECT_FLOAT_EQ(1 / 0.5, a.d_);
+
+  fvar<double> b = 2 * log(x) + 4;
+  EXPECT_FLOAT_EQ(2 * log(0.5) + 4, b.val_);
+  EXPECT_FLOAT_EQ(2 / 0.5, b.d_);
+
+  fvar<double> c = -log(x) + 5;
+  EXPECT_FLOAT_EQ(-log(0.5) + 5, c.val_);
+  EXPECT_FLOAT_EQ(-1 / 0.5, c.d_);
+
+  fvar<double> d = -3 * log(x) + 5 * x;
+  EXPECT_FLOAT_EQ(-3 * log(0.5) + 5 * 0.5, d.val_);
+  EXPECT_FLOAT_EQ(-3 / 0.5 + 5, d.d_);
+}
+
 TEST(AgradFvar, sin) {
   using stan::agrad::fvar;
   using std::sin;
