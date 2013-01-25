@@ -39,16 +39,6 @@ namespace stan {
         return *this;
       }
 
-
-
-     template <typename T2>
-     inline
-     fvar<T>&
-     operator+=(const T2& x2) {
-       val_ += x2;
-       return *this;
-     }
-
       template <typename T2>
       inline
       fvar<T>&
