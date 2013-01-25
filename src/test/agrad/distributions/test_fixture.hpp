@@ -936,6 +936,152 @@ public:
       test_nan_value(parameters, 9);
   }
 
+  void add_finite_diff(const vector<double>& params, 
+		       vector<double>& finite_diff, 
+		       const size_t n) {
+    const double e = 1e-8;
+    const double e2 = 2 * e;
+
+    vector<double> plus(10);
+    vector<double> minus(10);
+    for (size_t i = 0; i < 10; i++) {
+      plus[i] = get_param<double>(params, i);
+      minus[i] = get_param<double>(params, i);
+    }
+    plus[n] += e;
+    minus[n] -= e;
+    
+    double cdf_plus = TestClass.cdf
+      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5],plus[6],plus[7],plus[8],plus[9]);
+    double cdf_minus = TestClass.cdf
+      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5],minus[6],minus[7],minus[8],minus[9]);
+    
+    finite_diff.push_back((cdf_plus - cdf_minus) / e2);
+  }
+
+  void calculate_finite_diff(const vector<double>& params, vector<double>& finite_diff) {
+    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value)
+      add_finite_diff(params, finite_diff, 0);
+    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value)
+      add_finite_diff(params, finite_diff, 1);
+    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value)
+      add_finite_diff(params, finite_diff, 2);
+    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value)
+      add_finite_diff(params, finite_diff, 3);
+    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value)
+      add_finite_diff(params, finite_diff, 4);
+    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
+      add_finite_diff(params, finite_diff, 5);
+    if (!is_constant_struct<Scalar6>::value && !is_empty<Scalar6>::value)
+      add_finite_diff(params, finite_diff, 6);
+    if (!is_constant_struct<Scalar7>::value && !is_empty<Scalar7>::value)
+      add_finite_diff(params, finite_diff, 7);
+    if (!is_constant_struct<Scalar8>::value && !is_empty<Scalar8>::value)
+      add_finite_diff(params, finite_diff, 8);
+    if (!is_constant_struct<Scalar9>::value && !is_empty<Scalar9>::value)
+      add_finite_diff(params, finite_diff, 9);
+  }
+
+  double calculate_gradients(const vector<double>& params, vector<double>& grad) {
+    Scalar0 p0 = get_param<Scalar0>(params, 0);
+    Scalar1 p1 = get_param<Scalar1>(params, 1);
+    Scalar2 p2 = get_param<Scalar2>(params, 2);
+    Scalar3 p3 = get_param<Scalar3>(params, 3);
+    Scalar4 p4 = get_param<Scalar4>(params, 4);
+    Scalar5 p5 = get_param<Scalar5>(params, 5);
+    Scalar6 p6 = get_param<Scalar6>(params, 6);
+    Scalar7 p7 = get_param<Scalar7>(params, 7);
+    Scalar8 p8 = get_param<Scalar8>(params, 8);
+    Scalar9 p9 = get_param<Scalar9>(params, 9);
+    
+    var cdf = TestClass.template cdf
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+    vector<var> x;
+    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    cdf.grad(x, grad);
+    return cdf.val();
+  }
+  
+  double calculate_gradients_with_function(const vector<double>& params, vector<double>& grad) {
+    Scalar0 p0 = get_param<Scalar0>(params, 0);
+    Scalar1 p1 = get_param<Scalar1>(params, 1);
+    Scalar2 p2 = get_param<Scalar2>(params, 2);
+    Scalar3 p3 = get_param<Scalar3>(params, 3);
+    Scalar4 p4 = get_param<Scalar4>(params, 4);
+    Scalar5 p5 = get_param<Scalar5>(params, 5);
+    Scalar6 p6 = get_param<Scalar6>(params, 6);
+    Scalar7 p7 = get_param<Scalar7>(params, 7);
+    Scalar8 p8 = get_param<Scalar8>(params, 8);
+    Scalar9 p9 = get_param<Scalar9>(params, 9);
+    
+    var cdf = TestClass.template cdf_function
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+    vector<var> x;
+    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    cdf.grad(x, grad);
+    return cdf.val();
+  }
+  
+  void test_finite_diff() {
+    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for all double arguments";
+      return;
+    }
+    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for vector arguments";
+      return;
+    }
+    vector<double> expected_cdf;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, expected_cdf);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      vector<double> finite_diffs;
+      vector<double> gradients;
+
+      calculate_finite_diff(parameters[n], finite_diffs);
+      calculate_gradients(parameters[n], gradients);
+
+      ASSERT_EQ(finite_diffs.size(), gradients.size()) 
+	<< "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
+      for (size_t i = 0; i < finite_diffs.size(); i++) {
+	EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
+	  << "Comparison of finite diff to calculated gradient failed for i=" << i;
+      }
+    }
+  }
+
+  void test_gradient_function() {
+    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for all double arguments";
+      return;
+    }
+    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for vector arguments";
+      return;
+    }
+    vector<double> log_prob;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, log_prob);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      vector<double> expected_gradients;
+      vector<double> gradients;
+
+      calculate_gradients_with_function(parameters[n], expected_gradients);
+      calculate_gradients(parameters[n], gradients);
+
+      ASSERT_EQ(expected_gradients.size(), gradients.size()) 
+	<< "Number of expected gradients and calculated gradients must match -- error in test fixture";
+      for (size_t i = 0; i < expected_gradients.size(); i++) {
+	EXPECT_FLOAT_EQ(expected_gradients[i], gradients[i])
+	  << "Comparison of expected gradient to calculated gradient failed";
+      }
+    }
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> cdf;
@@ -959,10 +1105,20 @@ TYPED_TEST_P(AgradCdfTestFixture, InvalidValues) {
   this->test_invalid_values();
 }
 
+TYPED_TEST_P(AgradCdfTestFixture, FiniteDiff) {
+  this->test_finite_diff();
+}
+
+TYPED_TEST_P(AgradCdfTestFixture, Function) {
+  this->test_gradient_function();
+}
+
 REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
 			   CallAllVersions,
 			   ValidValues,
-			   InvalidValues);
+			   InvalidValues,
+			   FiniteDiff,
+			   Function);
 
 
 #endif
