@@ -26,7 +26,6 @@ using stan::math::value_of;
  */
 class AgradDistributionTest {
 public:
-  
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
 			    vector<double>& /* log_prob */) {
     throw std::runtime_error("valid_values() not implemented");
@@ -35,47 +34,129 @@ public:
   // don't need to list nan. checked by the test.
   virtual void invalid_values(vector<size_t>& /*index*/, 
                               vector<double>& /*value*/) {
-    throw std::runtime_error("valid_values() not implemented");
+    throw std::runtime_error("invalid_values() not implemented");
   }
 
-  // also include:
+  // also include 4 templated functions:
   /*
-    template <bool propto, 
-	    typename T0, typename T1, typename T2,
+  template <typename T_y, typename T_loc, typename T_scale,
 	    typename T3, typename T4, typename T5, 
 	    typename T6, typename T7, typename T8, 
 	    typename T9>
-  typename return_type<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::type 
-  log_prob(const T0&, const T1&, const T2&,
-	   const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, const T9&) {
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+    return stan::prob::normal_log(y, mu, sigma);
   }
 
   template <bool propto, 
-	    typename T0, typename T1, typename T2,
+	    typename T_y, typename T_loc, typename T_scale,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, 
+	    typename T9>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+    return stan::prob::normal_log<propto>(y, mu, sigma);
+  }
+  
+  template <bool propto, 
+	    typename T_y, typename T_loc, typename T_scale,
 	    typename T3, typename T4, typename T5, 
 	    typename T6, typename T7, typename T8, 
 	    typename T9, 
 	    class Policy>
-  typename return_type<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::type 
-  log_prob(const T0&, const T1&, const T2&,
-	   const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, const T9&, const Policy&) {
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+    return stan::prob::normal_log<propto>(y, mu, sigma, Policy());
   }
-
-  template <typename T0, typename T1, typename T2,
+  
+  template <typename T_y, typename T_loc, typename T_scale,
 	    typename T3, typename T4, typename T5, 
 	    typename T6, typename T7, typename T8, 
 	    typename T9>
-  var log_prob_function(const T0&, const T1&, const T2&,
-			const T3&, const T4&, const T5&, 
-			const T6&, const T7&, const T8&, const T9&, const Policy&) {
+  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+			const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+    using stan::prob::include_summand;
+    using stan::math::pi;
+    using stan::math::square;
+    var lp(0.0);
+    if (include_summand<true,T_y,T_loc,T_scale>::value)
+      lp -= 0.5 * (y - mu) * (y - mu) / (sigma * sigma);
+    if (include_summand<true,T_scale>::value)
+      lp -= log(sigma);
+    if (include_summand<true>::value)
+      lp -= log(sqrt(2.0 * pi()));
+    return lp;
   }
   */
 };
 
 
+class AgradCdfTest {
+  virtual void valid_values(vector<vector<double> >& /*parameters*/,
+			    vector<double>& /* cdf */) {
+    throw std::runtime_error("valid_values() not implemented");
+  }
+  
+  // don't need to list nan. checked by the test.
+  virtual void invalid_values(vector<size_t>& /*index*/, 
+                              vector<double>& /*value*/) {
+    throw std::runtime_error("invalid_values() not implemented");
+  }
+  
+  virtual bool has_lower_bound() {
+    return false;
+  }
+  
+  virtual double lower_bound() {
+    return -std::numeric_limits<double>::infinity();
+  }
 
+  virtual bool has_upper_bound() {
+    return false;
+  }
+  
+  virtual double upper_bound() {
+    return std::numeric_limits<double>::infinity();
+  }
+
+  // also include 3 templated functions:
+  /*
+  template <typename T_y, typename T_loc, typename T_scale,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, 
+	    typename T9>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+    return stan::prob::normal_cdf(y, mu, sigma);
+  }
+
+  template <typename T_y, typename T_loc, typename T_scale,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, 
+	    typename T9,
+	    Policy>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+    return stan::prob::normal_cdf(y, mu, sigma, Policy());
+  }
+
+  template <typename T_y, typename T_loc, typename T_scale,
+	    typename T3, typename T4, typename T5, 
+	    typename T6, typename T7, typename T8, 
+	    typename T9>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  cdf_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      using stan::math::erf;
+      return (0.5 + 0.5 * erf((y - mu) / (sigma * SQRT_2)));
+  }
+  */
+};
 
 using boost::mpl::at_c;
 template<class T>
@@ -670,22 +751,70 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 			   Function,
 			   RepeatAsVector);
 
-class AgradCdfTest {
-};
 
 template<class T>
 class AgradCdfTestFixture : public ::testing::Test {
+public:
+  typename at_c<T,0>::type TestClass;
+  typedef typename at_c<typename at_c<T,1>::type, 0>::type T0;
+  typedef typename at_c<typename at_c<T,1>::type, 1>::type T1;
+  typedef typename at_c<typename at_c<T,1>::type, 2>::type T2;
+  typedef typename at_c<typename at_c<T,1>::type, 3>::type T3;
+  typedef typename at_c<typename at_c<T,1>::type, 4>::type T4;
+  typedef typename at_c<typename at_c<T,1>::type, 5>::type T5;
+  typedef typename at_c<typename at_c<T,1>::type, 6>::type T6;
+  typedef typename at_c<typename at_c<T,1>::type, 7>::type T7;
+  typedef typename at_c<typename at_c<T,1>::type, 8>::type T8;
+  typedef typename at_c<typename at_c<T,1>::type, 9>::type T9;
+
+  typedef typename scalar_type<T0>::type Scalar0;
+  typedef typename scalar_type<T1>::type Scalar1;
+  typedef typename scalar_type<T2>::type Scalar2;
+  typedef typename scalar_type<T3>::type Scalar3;
+  typedef typename scalar_type<T4>::type Scalar4;
+  typedef typename scalar_type<T5>::type Scalar5;
+  typedef typename scalar_type<T6>::type Scalar6;
+  typedef typename scalar_type<T7>::type Scalar7;
+  typedef typename scalar_type<T8>::type Scalar8;
+  typedef typename scalar_type<T9>::type Scalar9;
+  
+  void call_all_versions() {
+    vector<double> cdf;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, cdf);
+    
+    T0 p0 = get_params<T0>(parameters, 0);
+    T1 p1 = get_params<T1>(parameters, 1);
+    T2 p2 = get_params<T2>(parameters, 2);
+    T3 p3 = get_params<T3>(parameters, 3);
+    T4 p4 = get_params<T4>(parameters, 4);
+    T5 p5 = get_params<T5>(parameters, 5);
+    T6 p6 = get_params<T6>(parameters, 6);
+    T7 p7 = get_params<T7>(parameters, 7);
+    T8 p8 = get_params<T8>(parameters, 8);
+    T9 p9 = get_params<T9>(parameters, 9);
+    
+    EXPECT_NO_THROW(({ TestClass.template cdf
+	    <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling cdf throws exception with default parameters";
+
+    EXPECT_NO_THROW(({ TestClass.template cdf
+	    <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
+	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      << "Calling cdf throws exception with errno_policy";
+  }
 };
 
 TYPED_TEST_CASE_P(AgradCdfTestFixture);
 
 
-TYPED_TEST_P(AgradCdfTestFixture, DoesBlah) {
-  FAIL() << "not implemented";
+TYPED_TEST_P(AgradCdfTestFixture, CallAllVersions) {
+  this->call_all_versions();
 }
 
 REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
-                           DoesBlah);
+			   CallAllVersions);
 
 
 #endif
