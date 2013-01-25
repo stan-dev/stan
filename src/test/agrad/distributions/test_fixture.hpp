@@ -841,6 +841,108 @@ public:
       }
     }
   }
+
+  void test_nan_value(const vector<double>& parameters, const size_t n) {
+    var cdf(0);
+    vector<double> invalid_params(parameters);
+    invalid_params[n] = std::numeric_limits<double>::quiet_NaN();
+    
+    Scalar0 p0 = get_param<Scalar0>(invalid_params, 0);
+    Scalar1 p1 = get_param<Scalar1>(invalid_params, 1);
+    Scalar2 p2 = get_param<Scalar2>(invalid_params, 2);
+    Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
+    Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
+    Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
+    Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
+    Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
+    Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
+    Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
+      
+    EXPECT_THROW(({ TestClass.template cdf
+	    <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+      std::domain_error) 
+      << "NaN value at index " << n << " did not fail with the default policy" << std::endl
+      << invalid_params;
+      
+    EXPECT_NO_THROW(({ cdf = TestClass.template cdf
+	    <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+      << "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
+      << invalid_params;
+    EXPECT_TRUE(std::isnan(cdf.val())) 
+      << "NaN value at index " << n << " with the errno_policy should return NaN. Returns " << cdf << std::endl
+      << invalid_params;
+  }
+
+  void test_invalid_values() {
+    vector<double> parameters = this->first_valid_params();
+    
+    vector<size_t> index;
+    vector<double> invalid_values;
+    TestClass.invalid_values(index, invalid_values);
+
+    for (size_t n = 0; n < index.size(); n++) {
+      var cdf(0);
+      vector<double> invalid_params(parameters);
+      invalid_params[index[n]] = invalid_values[n];
+      
+      Scalar0 p0 = get_param<Scalar0>(invalid_params, 0);
+      Scalar1 p1 = get_param<Scalar1>(invalid_params, 1);
+      Scalar2 p2 = get_param<Scalar2>(invalid_params, 2);
+      Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
+      Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
+      Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
+      Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
+      Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
+      Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
+      Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
+
+      EXPECT_THROW(({ TestClass.template cdf
+	      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+		   std::domain_error) 
+	<< "Invalid value " << n << " did not fail with the default policy" << std::endl
+	<< invalid_params;
+      
+      EXPECT_NO_THROW(({ cdf = TestClass.template cdf
+	      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+	<< "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
+	<< invalid_params;
+      EXPECT_TRUE(std::isnan(cdf.val())) 
+	<< "Invalid value " << n << " with the errno_policy should return NaN. Returns " << cdf << std::endl
+	<< invalid_params;
+    }
+    if (std::numeric_limits<Scalar0>::has_quiet_NaN && parameters.size() > 0) 
+      test_nan_value(parameters, 0);
+    if (std::numeric_limits<Scalar1>::has_quiet_NaN && parameters.size() > 1) 
+      test_nan_value(parameters, 1);
+    if (std::numeric_limits<Scalar2>::has_quiet_NaN && parameters.size() > 2) 
+      test_nan_value(parameters, 2);
+    if (std::numeric_limits<Scalar3>::has_quiet_NaN && parameters.size() > 3) 
+      test_nan_value(parameters, 3);
+    if (std::numeric_limits<Scalar4>::has_quiet_NaN && parameters.size() > 4) 
+      test_nan_value(parameters, 4);
+    if (std::numeric_limits<Scalar5>::has_quiet_NaN && parameters.size() > 5) 
+      test_nan_value(parameters, 5);
+    if (std::numeric_limits<Scalar6>::has_quiet_NaN && parameters.size() > 6) 
+      test_nan_value(parameters, 6);
+    if (std::numeric_limits<Scalar7>::has_quiet_NaN && parameters.size() > 7) 
+      test_nan_value(parameters, 7);
+    if (std::numeric_limits<Scalar8>::has_quiet_NaN && parameters.size() > 8) 
+      test_nan_value(parameters, 8);
+    if (std::numeric_limits<Scalar9>::has_quiet_NaN && parameters.size() > 9) 
+      test_nan_value(parameters, 9);
+  }
+
+  vector<double> first_valid_params() {
+    vector<vector<double> > params;
+    vector<double> cdf;
+
+    TestClass.valid_values(params, cdf); 
+    return params[0];
+  }
 };
 
 TYPED_TEST_CASE_P(AgradCdfTestFixture);
@@ -853,9 +955,14 @@ TYPED_TEST_P(AgradCdfTestFixture, ValidValues) {
   this->test_valid_values();
 }
 
+TYPED_TEST_P(AgradCdfTestFixture, InvalidValues) {
+  this->test_invalid_values();
+}
+
 REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
 			   CallAllVersions,
-			   ValidValues);
+			   ValidValues,
+			   InvalidValues);
 
 
 #endif
