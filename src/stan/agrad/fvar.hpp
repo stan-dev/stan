@@ -1,6 +1,7 @@
 #ifndef __STAN__AGRAD__FVAR_HPP__
 #define __STAN__AGRAD__FVAR_HPP__
 
+#include <boost/math/special_functions/cbrt.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
@@ -40,14 +41,6 @@ namespace stan {
       }
 
 
-
-     template <typename T2>
-     inline
-     fvar<T>&
-     operator+=(const T2& x2) {
-       val_ += x2;
-       return *this;
-     }
 
       template <typename T2>
       inline
@@ -321,6 +314,15 @@ namespace stan {
       using std::tan;
       return fvar<T>(tan(x.val_),
                      x.d_ / (cos(x.val_) * cos(x.val_)));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    cbrt(const fvar<T>& x) {
+      using boost::math::cbrt;
+      return fvar<T>(cbrt(x.val_),
+                     x.d_ / ( pow(x.val_,2.0/3.0) * 3.0));
     }
   }
 }
