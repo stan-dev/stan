@@ -1,6 +1,7 @@
 #ifndef __STAN__AGRAD__FVAR_HPP__
 #define __STAN__AGRAD__FVAR_HPP__
 
+#include <boost/math/special_functions/cbrt.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
@@ -317,6 +318,20 @@ namespace stan {
       return fvar<T>(tan(x.val_),
                      x.d_ / (cos(x.val_) * cos(x.val_)));
     }
+<<<<<<< HEAD
+=======
+
+    template <typename T>
+    inline
+    fvar<T>
+    cbrt(const fvar<T>& x) {
+      using boost::math::cbrt;
+      return fvar<T>(cbrt(x.val_),
+                     x.d_ / ( pow(x.val_,2.0/3.0) * 3.0));
+    }
+  }
+}
+>>>>>>> 8b18a4e41b8a92f0ce2cab4ecf0c93bc8eb5e488
 
     template <typename T>
     inline
@@ -374,6 +389,15 @@ namespace stan {
       using std::tanh;
       return fvar<T>(tanh(x.val_),
                      x.d_ * (1 - tanh(x.val_) * tanh(x.val_)));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    cbrt(const fvar<T>& x) {
+      using boost::math::cbrt;
+      return fvar<T>(cbrt(x.val_),
+                     x.d_ / ( pow(x.val_,2.0/3.0) * 3.0));
     }
   }
 }
