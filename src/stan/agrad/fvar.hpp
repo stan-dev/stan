@@ -2,7 +2,14 @@
 #define __STAN__AGRAD__FVAR_HPP__
 
 #include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/special_functions.hpp>
+#include <stan/math/constants.hpp>
+#include <boost/math/constants/constants.hpp>
+#include <cmath>
+#include <math.h>
 
 namespace stan {
 
@@ -125,8 +132,7 @@ namespace stan {
       
     };
 
-
-
+//binary infix operators and unary prefix operators
     template <typename T>
     inline 
     fvar<T>
@@ -261,6 +267,7 @@ namespace stan {
                                               / (x2.val_ * x2.val_));
     }
 
+//power and log functions
     template <typename T>
     inline
     fvar<T>
@@ -268,6 +275,24 @@ namespace stan {
       using std::sqrt;
       return fvar<T>(sqrt(x.val_),
                      x.d_ / (2 * sqrt(x.val_)));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    cbrt(const fvar<T>& x) {
+      using boost::math::cbrt;
+      return fvar<T>(cbrt(x.val_),
+                     x.d_ / ( cbrt(x.val_) * cbrt(x.val_) * 3.0));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    square(const fvar<T>& x) {
+      using stan::math::square;
+      return fvar<T>(square(x.val_),
+                     x.d_ * 2 * x.val_);
     }
 
     template <typename T>
@@ -282,13 +307,78 @@ namespace stan {
     template <typename T>
     inline
     fvar<T>
+    exp2(const fvar<T>& x) {
+      using stan::math::exp2;
+      using std::log;
+      return fvar<T>(exp2(x.val_),
+                     x.d_ * exp2(x.val_) * log(2));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
     log(const fvar<T>& x) {
       using std::log;
-      return fvar<T>(log(x.val_),
+      using stan::math::NOT_A_NUMBER;
+      if(x.val_ < 0.0)
+	  return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
+      else
+          return fvar<T>(log(x.val_),
                      x.d_ / x.val_);
     }
 
+    template <typename T>
+    inline
+    fvar<T>
+    log2(const fvar<T>& x) {
+      using std::log;
+      using stan::math::log2;
+      using stan::math::NOT_A_NUMBER;
+      if(x.val_ < 0.0)
+	  return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
+      else
+          return fvar<T>(log2(x.val_),
+			 x.d_ / (x.val_ * log(2)));
+    }
 
+    template <typename T>
+    inline
+    fvar<T>
+    log10(const fvar<T>& x) {
+      using std::log;
+      using std::log10;
+      using stan::math::NOT_A_NUMBER;
+      if(x.val_ < 0.0)
+	  return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
+      else
+          return fvar<T>(log10(x.val_),
+			 x.d_ / (x.val_ * log(10)));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    pow(const fvar<T1>& x1, 
+              const T2& x2) {
+      using std::pow;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>( pow(x1.val_, x2),
+					   x1.d_ * x2 * pow(x1.val_, x2 - 1));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    pow(const T1& x1, 
+	const fvar<T2>& x2) {
+      using std::pow;
+      using std::log;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>( pow(x1, x2.val_),
+				      	  x2.d_ * log(x1) * pow(x1, x2.val_));
+    }
+
+//trig functions
     template <typename T>
     inline
     fvar<T>
@@ -318,20 +408,6 @@ namespace stan {
       return fvar<T>(tan(x.val_),
                      x.d_ / (cos(x.val_) * cos(x.val_)));
     }
-<<<<<<< HEAD
-=======
-
-    template <typename T>
-    inline
-    fvar<T>
-    cbrt(const fvar<T>& x) {
-      using boost::math::cbrt;
-      return fvar<T>(cbrt(x.val_),
-                     x.d_ / ( pow(x.val_,2.0/3.0) * 3.0));
-    }
-  }
-}
->>>>>>> 8b18a4e41b8a92f0ce2cab4ecf0c93bc8eb5e488
 
     template <typename T>
     inline
@@ -360,44 +436,6 @@ namespace stan {
       using std::atan;
       return fvar<T>(atan(x.val_),
                      x.d_ / (1 + x.val_ * x.val_));
-    }
-
-    template <typename T>
-    inline
-    fvar<T>
-    sinh(const fvar<T>& x) {
-      using std::sinh;
-      using std::cosh;
-      return fvar<T>(sinh(x.val_),
-                     x.d_ * cosh(x.val_));
-    }
-
-    template <typename T>
-    inline
-    fvar<T>
-    cosh(const fvar<T>& x) {
-      using std::sinh;
-      using std::cosh;
-      return fvar<T>(cosh(x.val_),
-                     x.d_ * sinh(x.val_));
-    }
-
-    template <typename T>
-    inline
-    fvar<T>
-    tanh(const fvar<T>& x) {
-      using std::tanh;
-      return fvar<T>(tanh(x.val_),
-                     x.d_ * (1 - tanh(x.val_) * tanh(x.val_)));
-    }
-
-    template <typename T>
-    inline
-    fvar<T>
-    cbrt(const fvar<T>& x) {
-      using boost::math::cbrt;
-      return fvar<T>(cbrt(x.val_),
-                     x.d_ / ( pow(x.val_,2.0/3.0) * 3.0));
     }
   }
 }
