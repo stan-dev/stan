@@ -31,6 +31,7 @@ namespace stan {
         d_ += x2.d_;
         return *this;
       }
+
       template <typename T2>
       inline
       fvar<T>&
@@ -79,7 +80,7 @@ namespace stan {
       inline
       fvar<T>&
       operator/=(const fvar<T2>& x2) {
-        d_ = (d_ * x2.val_ - val_ * x2.d_) / ( x2.v_ * x2.v_);
+        d_ = (d_ * x2.val_ - val_ * x2.d_) / ( x2.val_ * x2.val_);
         val_ /= x2.val_;
         return *this;
       }
@@ -132,7 +133,6 @@ namespace stan {
       return fvar<T>(-x.val_, -x.d_);
     }
 
-
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -142,6 +142,7 @@ namespace stan {
                   stan::return_type<T1,T2>::type>(x1.val_ + x2.val_, 
                                                   x1.d_ + x2.d_);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -152,6 +153,7 @@ namespace stan {
              stan::return_type<T1,T2>::type>(x1 + x2.val_, 
                                              x2.d_);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -163,8 +165,6 @@ namespace stan {
                                              x1.d_);
     }
 
-
-
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -174,6 +174,7 @@ namespace stan {
                   stan::return_type<T1,T2>::type>(x1.val_ - x2.val_, 
                                                   x1.d_ - x2.d_);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -183,6 +184,7 @@ namespace stan {
                   stan::return_type<T1,T2>::type>(x1 - x2.val_, 
                                                   -x2.d_);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -192,7 +194,6 @@ namespace stan {
                   stan::return_type<T1,T2>::type>(x1.val_ - x2, 
                                                   x1.d_);
     }
-
 
     template <typename T1, typename T2>
     inline
@@ -204,6 +205,7 @@ namespace stan {
                                                   x1.d_ * x2.val_ 
                                                   + x1.val_ * x2.d_);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -213,6 +215,7 @@ namespace stan {
                   stan::return_type<T1,T2>::type>(x1 * x2.val_, 
                                                   x1 * x2.d_);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -222,7 +225,6 @@ namespace stan {
                   stan::return_type<T1,T2>::type>(x1.val_ * x2,
                                                   x1.d_ * x2);
     }
-
 
     template <typename T1, typename T2>
     inline
@@ -236,6 +238,7 @@ namespace stan {
                                                 - x1.val_ * x2.d_ )
                                               / (x2.val_ * x2.val_));
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -244,6 +247,7 @@ namespace stan {
       return fvar<typename stan::return_type<T1,T2>::type>(x1.val_ / x2,
                                                            x1.d_ / x2);
     }
+
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
@@ -252,7 +256,7 @@ namespace stan {
       return fvar<typename 
                   stan
                   ::return_type<T1,T2>::type>(x1 / x2.val_, 
-                                              - x1.val_ * x2.d_ 
+                                              - x1 * x2.d_ 
                                               / (x2.val_ * x2.val_));
     }
 
@@ -283,6 +287,7 @@ namespace stan {
                      x.d_ / x.val_);
     }
 
+
     template <typename T>
     inline
     fvar<T>
@@ -312,8 +317,64 @@ namespace stan {
       return fvar<T>(tan(x.val_),
                      x.d_ / (cos(x.val_) * cos(x.val_)));
     }
+
+    template <typename T>
+    inline
+    fvar<T>
+    asin(const fvar<T>& x) {
+      using std::asin;
+      using std::sqrt;
+      return fvar<T>(asin(x.val_),
+                     x.d_ / sqrt(1 - x.val_ * x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    acos(const fvar<T>& x) {
+      using std::acos;
+      using std::sqrt;
+      return fvar<T>(acos(x.val_),
+                     x.d_ / -sqrt(1 - x.val_ * x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    atan(const fvar<T>& x) {
+      using std::atan;
+      return fvar<T>(atan(x.val_),
+                     x.d_ / (1 + x.val_ * x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    sinh(const fvar<T>& x) {
+      using std::sinh;
+      using std::cosh;
+      return fvar<T>(sinh(x.val_),
+                     x.d_ * cosh(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    cosh(const fvar<T>& x) {
+      using std::sinh;
+      using std::cosh;
+      return fvar<T>(cosh(x.val_),
+                     x.d_ * sinh(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    tanh(const fvar<T>& x) {
+      using std::tanh;
+      return fvar<T>(tanh(x.val_),
+                     x.d_ * (1 - tanh(x.val_) * tanh(x.val_)));
+    }
   }
 }
-
-
 #endif
