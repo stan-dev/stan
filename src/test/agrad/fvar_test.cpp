@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <cmath>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <boost/math/special_functions/cbrt.hpp>
-#include <stan/math/constants.hpp>
 #include <math.h>
+#include <stan/math/constants.hpp>
+#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/special_functions.hpp>
+#include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/hypot.hpp>
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
-
+#include <boost/math/special_functions/erf.hpp>
 
 TEST(AgradFvar,fvar) {
   using stan::agrad::fvar;
@@ -292,6 +293,7 @@ TEST(AgradFvar, operatorMultiply){
 
 TEST(AgradFvar, operatorDivide){
   using stan::agrad::fvar;
+  using std::isnan;
 
   fvar<double> x1(0.5);
   fvar<double> x2(0.4);
@@ -316,11 +318,17 @@ TEST(AgradFvar, operatorDivide){
 
   fvar<double> e = x4 / x3;
   EXPECT_FLOAT_EQ(2 / 0.5, e.val_);
-		  EXPECT_FLOAT_EQ(-2 * 1.0 / (0.5 * 0.5), e.d_);
+  EXPECT_FLOAT_EQ(-2 * 1.0 / (0.5 * 0.5), e.d_);
 
   fvar<double> f = x3 / -2;
   EXPECT_FLOAT_EQ(0.5 / -2, f.val_);
   EXPECT_FLOAT_EQ(1.0 / -2, f.d_);
+
+  fvar<double> x5(0.0);
+  x5.d_ = 1.0;
+  fvar<double> g = x3/x5;
+  isnan(g.val_);
+  isnan(g.d_);
 }
 
 TEST(AgradFvar, operatorPlusPlus){
@@ -363,8 +371,6 @@ TEST(AgradFvar, sqrt) {
   using stan::agrad::fvar;
   using std::sqrt;
   using std::isnan;
-  using stan::math::INFTY;
-  using stan::math::NOT_A_NUMBER;
 
   fvar<double> x(0.5);
   x.d_ = 1.0; //derivatives w.r.t. x
@@ -399,13 +405,13 @@ TEST(AgradFvar, sqrt) {
   z.d_ = 1.0;
   fvar<double> g = sqrt(z);
   EXPECT_FLOAT_EQ(sqrt(0.0), g.val_);
-  EXPECT_FLOAT_EQ(INFTY, g.d_); 
+  isnan(g.d_); 
 }
 
 TEST(AgradFvar, cbrt) {
   using stan::agrad::fvar;
   using boost::math::cbrt;
-  using stan::math::INFTY;
+  using std::isnan;
 
   fvar<double> x(0.5);
   x.d_ = 1.0; //derivatives w.r.t. x
@@ -434,7 +440,7 @@ TEST(AgradFvar, cbrt) {
   y.d_ = 1.0;
   fvar<double> f = cbrt(y);
   EXPECT_FLOAT_EQ(cbrt(0.0), f.val_);
-  EXPECT_FLOAT_EQ(INFTY, f.d_);
+  isnan(f.d_);
 }
 
 TEST(AgradFvar, square) {
@@ -554,9 +560,6 @@ TEST(AgradFvar, log) {
   using stan::agrad::fvar;
   using std::log;
   using std::isnan;
-  using stan::math::NOT_A_NUMBER;
-  using stan::math::NEGATIVE_INFTY;
-  using stan::math::INFTY;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;   // derivatives w.r.t. x
@@ -586,8 +589,8 @@ TEST(AgradFvar, log) {
   fvar<double> z(0.0);
   z.d_ = 1.0;
   fvar<double> f = log(z);
-  EXPECT_FLOAT_EQ(NEGATIVE_INFTY, f.val_);
-  EXPECT_FLOAT_EQ(INFTY, f.d_);
+  isnan(f.val_);
+  isnan(f.d_);
 }
 
 TEST(AgradFvar, log2) {
@@ -595,9 +598,6 @@ TEST(AgradFvar, log2) {
   using std::log;
   using std::isnan;
   using stan::math::log2;
-  using stan::math::NOT_A_NUMBER;
-  using stan::math::NEGATIVE_INFTY;
-  using stan::math::INFTY;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;   // derivatives w.r.t. x
@@ -627,8 +627,8 @@ TEST(AgradFvar, log2) {
   fvar<double> z(0.0);
   z.d_ = 1.0;
   fvar<double> f = log2(z);
-  EXPECT_FLOAT_EQ(NEGATIVE_INFTY, f.val_);
-  EXPECT_FLOAT_EQ(INFTY, f.d_);
+  isnan(f.val_);
+  isnan(f.d_);
 }
 
 TEST(AgradFvar, log10) {
@@ -636,9 +636,6 @@ TEST(AgradFvar, log10) {
   using std::log;
   using std::log10;
   using std::isnan;
-  using stan::math::NOT_A_NUMBER;
-  using stan::math::NEGATIVE_INFTY;
-  using stan::math::INFTY;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;
@@ -668,8 +665,8 @@ TEST(AgradFvar, log10) {
   fvar<double> z(0.0);
   z.d_ = 1.0;
   fvar<double> f = log10(z);
-  EXPECT_FLOAT_EQ(NEGATIVE_INFTY, f.val_);
-  EXPECT_FLOAT_EQ(INFTY, f.d_);
+  isnan(f.val_);
+  isnan(f.d_);
 }
 
 TEST(AgradFvar, pow) {
@@ -688,6 +685,33 @@ TEST(AgradFvar, pow) {
   fvar<double> b = pow(y, x);
   EXPECT_FLOAT_EQ(pow(5.0, 0.5), b.val_);
   EXPECT_FLOAT_EQ(log(5.0) * pow(5.0, 0.5), b.d_);
+}
+
+TEST(AgradFvar, hypot) {
+  using stan::agrad::fvar;
+  using boost::math::hypot;
+  using std::isnan;
+
+  fvar<double> x(0.5);
+  fvar<double> y(2.3);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<double> a = hypot(x, y);
+  EXPECT_FLOAT_EQ(hypot(0.5, 2.3), a.val_);
+  EXPECT_FLOAT_EQ((0.5 * 2.0 + 2.3 * 1.0) / hypot(0.5, 2.3), a.d_);
+
+  fvar<double> z(0.0);
+  fvar<double> w(-2.3);
+  z.d_ = 1.0;
+  w.d_ = 2.0;
+  fvar<double> b = hypot(x, z);
+  EXPECT_FLOAT_EQ(0.5, b.val_);
+  EXPECT_FLOAT_EQ(1.0, b.d_);
+
+  fvar<double> c = hypot(x, w);
+  isnan(c.val_);
+  isnan(c.d_);
 }
 
 TEST(AgradFvar, sin) {
@@ -1131,3 +1155,40 @@ TEST(AgradFvar, invCLogLog) {
   EXPECT_FLOAT_EQ(inv_cloglog(1.5), c.val_);
   EXPECT_FLOAT_EQ(-exp(1.5 - exp(1.5)), c.d_);
 }
+
+TEST(AgradFvar, erf){
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::sqrt;
+  using boost::math::erf;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;
+
+  fvar<double> a = erf(x);
+  EXPECT_FLOAT_EQ(erf(0.5), a.val_);
+  EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), a.d_);
+
+ fvar<double> b = erf(-x);
+  EXPECT_FLOAT_EQ(erf(-0.5), b.val_);
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), b.d_);
+}
+
+TEST(AgradFvar, erfc){
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::sqrt;
+  using boost::math::erfc;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;
+
+  fvar<double> a = erfc(x);
+  EXPECT_FLOAT_EQ(erfc(0.5), a.val_);
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), a.d_);
+
+ fvar<double> b = erfc(-x);
+  EXPECT_FLOAT_EQ(erfc(-0.5), b.val_);
+  EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), b.d_);
+}
+

@@ -1,19 +1,21 @@
 #ifndef __STAN__AGRAD__FVAR_HPP__
 #define __STAN__AGRAD__FVAR_HPP__
 
+#include <cmath>
+#include <math.h>
+#include <stan/meta/traits.hpp>
+#include <stan/math/special_functions.hpp>
+#include <stan/agrad/special_functions.hpp>
+#include <stan/math/constants.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/math/special_functions.hpp>
-#include <stan/math/constants.hpp>
 #include <boost/math/constants/constants.hpp>
-#include <cmath>
-#include <math.h>
 #include <boost/math/special_functions/hypot.hpp>
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
+#include <boost/math/special_functions/erf.hpp>
 
 namespace stan {
 
@@ -383,6 +385,39 @@ namespace stan {
     }
 
 //trig functions
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::typ>
+    hypot(const fvar<T1>& x1, const fvar<T2>& x2) {
+      using boost::math::hypot;
+      using std::sqrt;
+    return fvar<typename 
+		stan::return_type<T1,T2>::type>(hypot(x1.val_, x2.val_), 
+                    (x1.d_ * x1.val_ + x2.d_ * x2.val_) / hypot(x1.val_, x2.val_));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::typ>
+    hypot(const fvar<T1>& x1, const T2& x2) {
+      using boost::math::hypot;
+      using std::sqrt;
+    return fvar<typename 
+		stan::return_type<T1,T2>::type>(hypot(x1.val_, x2), 
+                       (x1.d_ * x1.val_) / hypot(x1.val_, x2));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::typ>
+    hypot(const T1& x1, const fvar<T2>& x2) {
+      using boost::math::hypot;
+      using std::sqrt;
+    return fvar<typename 
+		stan::return_type<T1,T2>::type>(hypot(x1, x2.val_), 
+                       (x2.d_ * x2.val_) / hypot(x1, x2.val_));
+    }
+
     template <typename T>
     inline
     fvar<T>
@@ -563,6 +598,28 @@ namespace stan {
       return fvar<T>(inv_cloglog(x.val_), x.d_ * -exp(x.val_ - exp(x.val_)));
     }
 
+//probability related functions
+    template <typename T>
+    inline
+    fvar<T>
+    erf(const fvar<T>& x) {
+      using boost::math::erf;
+      using std::sqrt;
+      using std::exp;
+      return fvar<T>(erf(x.val_), 
+            x.d_ * 2 * exp(-x.val_ * x.val_) / 
+              sqrt(boost::math::constants::pi<double>()));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    erfc(const fvar<T>& x) {
+      using boost::math::erfc;
+      using std::sqrt;
+      using std::exp;
+      return fvar<T>(erfc(x.val_), x.d_ * -2 * exp(-x.val_ * x.val_) / sqrt(boost::math::constants::pi<double>()));
+    }
   }
 }
 #endif
