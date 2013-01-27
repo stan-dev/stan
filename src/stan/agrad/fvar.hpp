@@ -11,6 +11,9 @@
 #include <cmath>
 #include <math.h>
 #include <boost/math/special_functions/hypot.hpp>
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
 
 namespace stan {
 
@@ -489,6 +492,77 @@ namespace stan {
       return fvar<T>(tanh(x.val_),
                      x.d_ * (1 - tanh(x.val_) * tanh(x.val_)));
     }
+
+    template <typename T>
+    inline
+    fvar<T>
+    asinh(const fvar<T>& x) {
+      using boost::math::asinh;
+      using std::sqrt;
+      return fvar<T>(asinh(x.val_), x.d_ / sqrt(x.val_ * x.val_ + 1));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    acosh(const fvar<T>& x) {
+      using boost::math::acosh;
+      using std::sqrt;
+      using stan::math::NOT_A_NUMBER;
+      if(x.val_ < 1)
+	return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
+      else 
+        return fvar<T>(acosh(x.val_),
+                     x.d_ /(sqrt(x.val_ - 1) * sqrt(x.val_ + 1)));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    atanh(const fvar<T>& x) {
+      using boost::math::atanh;
+      using stan::math::NOT_A_NUMBER;
+      if (x.val_ > 1 || x.val_ < -1)
+	return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
+      else
+       return fvar<T>(atanh(x.val_),
+                     x.d_ / (1 - x.val_ * x.val_));
+    }
+
+
+//link functions
+    template <typename T>
+    inline
+    fvar<T>
+    logit(const fvar<T>& x) {
+      using stan::math::logit;
+      using stan::math::NOT_A_NUMBER;
+      if(x.val_ > 1 || x.val_ < 0)
+	return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
+      else 
+        return fvar<T>(logit(x.val_), x.d_ / (x.val_ - x.val_ * x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    invLogit(const fvar<T>& x) {
+      using std::exp;
+      using std::pow;
+      using stan::math::inv_logit;
+      return fvar<T>(inv_logit(x.val_), 
+           x.d_ * inv_logit(x.val_) * (1 - inv_logit(x.val_)));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    invCLogLog(const fvar<T>& x) {
+      using std::exp;
+      using stan::math::inv_cloglog;
+      return fvar<T>(inv_cloglog(x.val_), x.d_ * -exp(x.val_ - exp(x.val_)));
+    }
+
   }
 }
 #endif
