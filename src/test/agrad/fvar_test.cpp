@@ -1,16 +1,12 @@
 #include <gtest/gtest.h>
-
 #include <iostream>
-
 #include <cmath>
-
 #include <boost/math/special_functions/fpclassify.hpp>
-
 #include <stan/agrad/fvar.hpp>
-
 #include <boost/math/special_functions/cbrt.hpp>
 #include <stan/math/constants.hpp>
 #include <math.h>
+#include <boost/math/special_functions/hypot.hpp>
 
 
 TEST(AgradFvar,fvar) {
@@ -871,3 +867,73 @@ TEST(AgradFvar, atan) {
   EXPECT_FLOAT_EQ(-3 / (1 + 0.5 * 0.5) + 5, d.d_);
 }
 
+TEST(AgradFvar, sinh) {
+  using stan::agrad::fvar;
+  using std::sinh;
+  using std::cosh;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;
+
+  fvar<double> a = sinh(x);
+  EXPECT_FLOAT_EQ(sinh(0.5), a.val_);
+  EXPECT_FLOAT_EQ(cosh(0.5), a.d_);
+
+  fvar<double> y(-1.2);
+  y.d_ = 1.0;
+
+  fvar<double> b = sinh(y);
+  EXPECT_FLOAT_EQ(sinh(-1.2), b.val_);
+  EXPECT_FLOAT_EQ(cosh(-1.2), b.d_);
+
+  fvar<double> c = sinh(-x);
+  EXPECT_FLOAT_EQ(sinh(-0.5), c.val_);
+  EXPECT_FLOAT_EQ(-cosh(-0.5), c.d_);
+}
+
+TEST(AgradFvar, cosh) {
+  using stan::agrad::fvar;
+  using std::sinh;
+  using std::cosh;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;
+
+  fvar<double> a = cosh(x);
+  EXPECT_FLOAT_EQ(cosh(0.5), a.val_);
+  EXPECT_FLOAT_EQ(sinh(0.5), a.d_);
+
+  fvar<double> y(-1.2);
+  y.d_ = 1.0;
+
+  fvar<double> b = cosh(y);
+  EXPECT_FLOAT_EQ(cosh(-1.2), b.val_);
+  EXPECT_FLOAT_EQ(sinh(-1.2), b.d_);
+
+  fvar<double> c = cosh(-x);
+  EXPECT_FLOAT_EQ(cosh(-0.5), c.val_);
+  EXPECT_FLOAT_EQ(-sinh(-0.5), c.d_);
+}
+
+TEST(AgradFvar, tanh) {
+  using stan::agrad::fvar;
+  using std::tanh;
+
+  fvar<double> x(0.5);
+  x.d_ = 1.0;
+
+  fvar<double> a = tanh(x);
+  EXPECT_FLOAT_EQ(tanh(0.5), a.val_);
+  EXPECT_FLOAT_EQ(1 - tanh(0.5) * tanh(0.5), a.d_);
+
+  fvar<double> y(-1.2);
+  y.d_ = 1.0;
+
+  fvar<double> b = tanh(y);
+  EXPECT_FLOAT_EQ(tanh(-1.2), b.val_);
+  EXPECT_FLOAT_EQ(1 - tanh(-1.2) * tanh(-1.2), b.d_);
+
+  fvar<double> c = tanh(-x);
+  EXPECT_FLOAT_EQ(tanh(-0.5), c.val_);
+  EXPECT_FLOAT_EQ(-1 * (1 - tanh(-0.5) * tanh(-0.5)), c.d_);
+}

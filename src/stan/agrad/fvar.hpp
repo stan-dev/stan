@@ -10,6 +10,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <math.h>
+#include <boost/math/special_functions/hypot.hpp>
 
 namespace stan {
 
@@ -436,6 +437,57 @@ namespace stan {
       using std::atan;
       return fvar<T>(atan(x.val_),
                      x.d_ / (1 + x.val_ * x.val_));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::typ>
+    atan2(const fvar<T1>& x1, const fvar<T2>& x2){
+      using std::atan2;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(atan2(x1.val_, x2.val_), 
+			      (x1.d_ * x2.val_ - x1.val_ * x2.d_) / 
+                                 (x2.val_ * x2.val_ + x1.val_ * x1.val_));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::typ>
+    atan2(const T1& x1, const fvar<T2>& x2){
+      using std::atan2;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(atan2(x1, x2.val_), 
+		     (-x1 * x2.d_) / (x1 * x1 + x2.val_ * x2.val_));
+    }
+
+//hyperbolic trig functions
+    template <typename T>
+    inline
+    fvar<T>
+    sinh(const fvar<T>& x) {
+      using std::sinh;
+      using std::cosh;
+      return fvar<T>(sinh(x.val_),
+                     x.d_ * cosh(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    cosh(const fvar<T>& x) {
+      using std::sinh;
+      using std::cosh;
+      return fvar<T>(cosh(x.val_),
+                     x.d_ * sinh(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    tanh(const fvar<T>& x) {
+      using std::tanh;
+      return fvar<T>(tanh(x.val_),
+                     x.d_ * (1 - tanh(x.val_) * tanh(x.val_)));
     }
   }
 }
