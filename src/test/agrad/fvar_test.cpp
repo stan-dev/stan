@@ -5,6 +5,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/special_functions.hpp>
+#include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/hypot.hpp>
@@ -673,6 +674,7 @@ TEST(AgradFvar, pow) {
   using stan::agrad::fvar;
   using std::pow;
   using std::log;
+  using std::isnan;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;
@@ -685,6 +687,18 @@ TEST(AgradFvar, pow) {
   fvar<double> b = pow(y, x);
   EXPECT_FLOAT_EQ(pow(5.0, 0.5), b.val_);
   EXPECT_FLOAT_EQ(log(5.0) * pow(5.0, 0.5), b.d_);
+
+  fvar<double> z(1.2);
+  z.d_ = 2.0;
+  fvar<double> c = pow(x, z);
+  EXPECT_FLOAT_EQ(pow(0.5, 1.2), c.val_);
+  EXPECT_FLOAT_EQ((2.0 * log(0.5) + 1.2 * 1.0 / 0.5) * pow(0.5, 1.2), c.d_);
+
+  fvar<double> w(-0.4);
+  w.d_ = 1.0;
+  fvar<double> d = pow(w, x);
+  isnan(d.val_);
+  isnan(d.d_);
 }
 
 TEST(AgradFvar, sin) {
@@ -1164,4 +1178,3 @@ TEST(AgradFvar, erfc){
   EXPECT_FLOAT_EQ(erfc(-0.5), b.val_);
   EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), b.d_);
 }
-

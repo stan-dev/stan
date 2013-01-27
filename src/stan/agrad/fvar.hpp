@@ -384,6 +384,19 @@ namespace stan {
 				      	  x2.d_ * log(x1) * pow(x1, x2.val_));
     }
 
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    pow(const fvar<T1>& x1, 
+	const fvar<T2>& x2) {
+      using std::pow;
+      using std::log;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>( pow(x1.val_, x2.val_),
+			   (x2.d_ * log(x1.val_) + x2.val_ * x1.d_ / 
+                              x1.val_) * pow(x1.val_, x2.val_));
+    }
+
 //trig functions
     template <typename T>
     inline
