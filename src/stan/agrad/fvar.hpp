@@ -254,7 +254,7 @@ namespace stan {
     inline
     fvar<typename stan::return_type<T1,T2>::type>
     operator/(const fvar<T1>& x1, 
-              T2& x2) {
+              const T2& x2) {
       return fvar<typename stan::return_type<T1,T2>::type>(x1.val_ / x2,
                                                            x1.d_ / x2);
     }
