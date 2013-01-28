@@ -1217,7 +1217,7 @@ public:
       if (!std::numeric_limits<Scalar0>::has_infinity)
 	return;
       for (size_t n = 0; n < parameters.size(); n++)
-	parameters[n][0] = -std::numeric_limits<Scalar0>::infinity();
+	parameters[n][0] = -std::numeric_limits<double>::infinity();
     } else {
       for (size_t n = 0; n < parameters.size(); n++)
 	parameters[n][0] = TestClass.lower_bound();
@@ -1253,7 +1253,7 @@ public:
       if (!std::numeric_limits<Scalar0>::has_infinity)
 	return;
       for (size_t n = 0; n < parameters.size(); n++)
-	parameters[n][0] = std::numeric_limits<Scalar0>::infinity();
+	parameters[n][0] = std::numeric_limits<double>::infinity();
     } else {
       for (size_t n = 0; n < parameters.size(); n++)
 	parameters[n][0] = TestClass.upper_bound();
