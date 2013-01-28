@@ -1082,6 +1082,130 @@ public:
     }
   }
 
+  void test_multiple_gradient_values(const bool is_vec,
+				     const double single_cdf,
+				     const vector<double>& single_gradients, size_t& pos_single,
+				     const vector<double>& multiple_gradients, size_t& pos_multiple,
+				     const size_t N_REPEAT) {
+    if (is_vec) {
+      for (size_t i = 0; i < N_REPEAT; i++) {
+	EXPECT_FLOAT_EQ(single_gradients[pos_single] * pow(single_cdf, N_REPEAT-1),
+			multiple_gradients[pos_multiple])
+	  << "Comparison of single_gradient value to vectorized gradient failed";
+	pos_multiple++;
+      }
+      pos_single++; 
+    } else {
+      EXPECT_FLOAT_EQ(N_REPEAT * single_gradients[pos_single] * pow(single_cdf, N_REPEAT-1), 
+		      multiple_gradients[pos_multiple])
+	<< "Comparison of single_gradient value to vectorized gradient failed";
+      pos_single++; pos_multiple++;
+    }
+  }
+
+  void test_repeat_as_vector() {
+    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      SUCCEED() << "No test for non-vector arguments";
+      return;
+    }
+    const size_t N_REPEAT = 3;
+    vector<double> expected_cdf;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, expected_cdf);
+    
+    for (size_t n = 0; n < parameters.size(); n++) {
+      vector<double> single_gradients;
+      double single_cdf = calculate_gradients(parameters[n], single_gradients);
+      
+      T0 p0 = get_repeated_params<T0>(parameters[n], 0, N_REPEAT);
+      T1 p1 = get_repeated_params<T1>(parameters[n], 1, N_REPEAT);
+      T2 p2 = get_repeated_params<T2>(parameters[n], 2, N_REPEAT);
+      T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
+      T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
+      T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
+      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
+      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
+      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
+      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
+
+      var multiple_cdf = TestClass.template cdf
+      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      vector<double> multiple_gradients;
+      vector<var> x;
+      add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      multiple_cdf.grad(x, multiple_gradients);
+      
+
+      EXPECT_FLOAT_EQ(pow(single_cdf, N_REPEAT), multiple_cdf.val())
+	<< "cdf with repeated vector input should match "
+	<< "a multiple of cdf of single input";
+
+      size_t pos_single = 0;
+      size_t pos_multiple = 0;
+      if (!is_constant_struct<T0>::value && !is_empty<T0>::value)
+	test_multiple_gradient_values(is_vector<T0>::value,
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T1>::value && !is_empty<T1>::value)
+	test_multiple_gradient_values(is_vector<T1>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T2>::value && !is_empty<T2>::value)
+	test_multiple_gradient_values(is_vector<T2>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T3>::value && !is_empty<T3>::value)
+	test_multiple_gradient_values(is_vector<T3>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T4>::value && !is_empty<T4>::value)
+	test_multiple_gradient_values(is_vector<T4>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,    
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T5>::value && !is_empty<T5>::value)
+	test_multiple_gradient_values(is_vector<T5>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
+	test_multiple_gradient_values(is_vector<T6>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
+	test_multiple_gradient_values(is_vector<T7>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
+	test_multiple_gradient_values(is_vector<T8>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+      if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
+	test_multiple_gradient_values(is_vector<T9>::value, 
+				      single_cdf,
+				      single_gradients, pos_single,
+				      multiple_gradients, pos_multiple,
+				      N_REPEAT);
+    }
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> cdf;
@@ -1113,12 +1237,17 @@ TYPED_TEST_P(AgradCdfTestFixture, Function) {
   this->test_gradient_function();
 }
 
+TYPED_TEST_P(AgradCdfTestFixture, RepeatAsVector) {
+  this->test_repeat_as_vector();
+}
+
 REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
 			   CallAllVersions,
 			   ValidValues,
 			   InvalidValues,
 			   FiniteDiff,
-			   Function);
+			   Function,
+			   RepeatAsVector);
 
 
 #endif
