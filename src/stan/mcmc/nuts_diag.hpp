@@ -54,18 +54,23 @@ namespace stan {
       /**
        * Determine whether we've started to make a "U-turn" at either end
        * of the position-state trajectory beginning with {xminus, mminus}
-       * and ending with {xplus, mplus}.
+       * and ending with {xplus, mplus}.  The dot products are
+       * adjusted for the diagonal step size matrix.
        *
        * @return false if we've made a U-turn, true otherwise.
        */
       inline static bool compute_criterion(std::vector<double>& xplus,
                                            std::vector<double>& xminus,
                                            std::vector<double>& mplus,
-                                           std::vector<double>& mminus) {
+                                           std::vector<double>& mminus,
+                                           std::vector<double>& step_sizes) {
         std::vector<double> total_direction;
         stan::math::sub(xplus, xminus, total_direction);
+        // adjustment for U-turn due to step sizes
+        for (size_t i = 0; i < total_direction.size(); ++i)
+          total_direction[i] /= step_sizes[i];
         return stan::math::dot(total_direction, mminus) > 0
-          && stan::math::dot(total_direction, mplus) > 0;
+            && stan::math::dot(total_direction, mplus) > 0;
       }
 
     public:
@@ -182,7 +187,7 @@ namespace stan {
         }
         this->_epsilon_last = epsilon; // use epsilon_last in tree build
 
-        while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
+        while (criterion && (_maxdepth < 0 || depth < _maxdepth)) {
           direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
             build_tree(xminus, mminus, gradminus, u, direction, depth,
@@ -197,7 +202,7 @@ namespace stan {
           // We can't look at the results of this last doubling if criterion==false
           if (!criterion)
             break;
-          criterion = compute_criterion(xplus, xminus, mplus, mminus);
+          criterion = compute_criterion(xplus, xminus, mplus, mminus,_step_sizes);
           // Metropolis-Hastings to determine if we can jump to a point in
           // the new half-tree
           if (this->_rand_uniform_01() < float(newnvalid) / (1e-100+float(nvalid))) {
@@ -408,7 +413,7 @@ namespace stan {
             criterion &= criterion2;
             nvalid += nvalid2;
           }
-          criterion &= compute_criterion(xplus, xminus, mplus, mminus);
+          criterion &= compute_criterion(xplus, xminus, mplus, mminus, _step_sizes);
         }
       }
 

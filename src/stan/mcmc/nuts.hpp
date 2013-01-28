@@ -165,7 +165,7 @@ namespace stan {
         }
         this->_epsilon_last = epsilon; // use epsilon_last in tree build
 
-        while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
+        while (criterion && (_maxdepth < 0 || depth < _maxdepth)) {
           direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
             build_tree(xminus, mminus, gradminus, u, direction, depth,
