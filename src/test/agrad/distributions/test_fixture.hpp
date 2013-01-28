@@ -95,6 +95,7 @@ public:
 
 
 class AgradCdfTest {
+public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
 			    vector<double>& /* cdf */) {
     throw std::runtime_error("valid_values() not implemented");
@@ -1206,6 +1207,78 @@ public:
     }
   }
 
+  void test_lower_bound() {
+    const size_t N_REPEAT = 3;
+    vector<double> expected_cdf;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, expected_cdf);
+
+    if (!TestClass.has_lower_bound()) {
+      if (!std::numeric_limits<Scalar0>::has_infinity)
+	return;
+      for (size_t n = 0; n < parameters.size(); n++)
+	parameters[n][0] = -std::numeric_limits<Scalar0>::infinity();
+    } else {
+      for (size_t n = 0; n < parameters.size(); n++)
+	parameters[n][0] = TestClass.lower_bound();
+    }
+
+    for (size_t n = 0; n < parameters.size(); n++) {
+      T0 p0 = get_repeated_params<T0>(parameters[n], 0, N_REPEAT);
+      T1 p1 = get_repeated_params<T1>(parameters[n], 1, N_REPEAT);
+      T2 p2 = get_repeated_params<T2>(parameters[n], 2, N_REPEAT);
+      T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
+      T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
+      T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
+      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
+      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
+      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
+      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
+      
+      var cdf_at_lower_bound = TestClass.template cdf
+	<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      EXPECT_FLOAT_EQ(0.0, cdf_at_lower_bound.val())
+	<< "CDF evaluated at lower bound should equal 0";
+    }
+  }
+  
+  void test_upper_bound() {
+    const size_t N_REPEAT = 3;
+    vector<double> expected_cdf;
+    vector<vector<double> > parameters;
+    TestClass.valid_values(parameters, expected_cdf);
+
+    if (!TestClass.has_upper_bound()) {
+      if (!std::numeric_limits<Scalar0>::has_infinity)
+	return;
+      for (size_t n = 0; n < parameters.size(); n++)
+	parameters[n][0] = std::numeric_limits<Scalar0>::infinity();
+    } else {
+      for (size_t n = 0; n < parameters.size(); n++)
+	parameters[n][0] = TestClass.upper_bound();
+    }
+
+    for (size_t n = 0; n < parameters.size(); n++) {
+      T0 p0 = get_repeated_params<T0>(parameters[n], 0, N_REPEAT);
+      T1 p1 = get_repeated_params<T1>(parameters[n], 1, N_REPEAT);
+      T2 p2 = get_repeated_params<T2>(parameters[n], 2, N_REPEAT);
+      T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
+      T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
+      T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
+      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
+      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
+      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
+      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
+      
+      var cdf_at_upper_bound = TestClass.template cdf
+	<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      EXPECT_FLOAT_EQ(1.0, cdf_at_upper_bound.val())
+	<< "CDF evaluated at upper bound should equal 1";
+    }
+  }
+
   vector<double> first_valid_params() {
     vector<vector<double> > params;
     vector<double> cdf;
@@ -1241,13 +1314,23 @@ TYPED_TEST_P(AgradCdfTestFixture, RepeatAsVector) {
   this->test_repeat_as_vector();
 }
 
+TYPED_TEST_P(AgradCdfTestFixture, LowerBound) {
+  this->test_lower_bound();
+}
+
+TYPED_TEST_P(AgradCdfTestFixture, UpperBound) {
+  this->test_upper_bound();
+}
+
 REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
 			   CallAllVersions,
 			   ValidValues,
 			   InvalidValues,
 			   FiniteDiff,
 			   Function,
-			   RepeatAsVector);
+			   RepeatAsVector,
+			   LowerBound,
+			   UpperBound);
 
 
 #endif
