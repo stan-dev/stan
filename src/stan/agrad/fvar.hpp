@@ -282,7 +282,7 @@ namespace stan {
       using std::abs;
       using stan::math::NOT_A_NUMBER;
       if(x.val_ > 0.0)
-         return fvar<T>(abs(x.val_), x.d_);
+        return fvar<T>(abs(x.val_), x.d_);
       else if(x.val_ == 0.0)
 	return fvar<T>(abs(x.val_), NOT_A_NUMBER);
       else 
@@ -308,21 +308,43 @@ namespace stan {
     fvar<typename stan::return_type<T1,T2>::type>
     fdim(const fvar<T1>& x1, 
               const fvar<T2>& x2) {
-      using stan::math::fdim;  
-      using stan::math::NOT_A_NUMBER;
-      if(x1.val_ > x2.val_)
+      using stan::math::fdim;
+      using std::floor;
+      if(x1.val_ < x2.val_)
+        return fvar<typename 
+		       stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 0);
+      else 
+	return fvar<typename stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_),
+			       x1.d_ * 1.0 - x2.d_ * floor(x1.val_ / x2.val_));	        }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    fdim(const fvar<T1>& x1, 
+              const T2& x2) {
+      using stan::math::fdim;
+      using std::floor;
+      if(x1.val_ < x2)
            return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
-                                              x1.d_ - x2.d_);
-      else if(x1.val_ == x2.val_ && x1.d_ == x2.d_)
-           return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
-                                              NOT_A_NUMBER);
-      else
-           return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
-                                              0);
+		       stan::return_type<T1,T2>::type>(fdim(x1.val_, x2), 0);
+      else 
+	return fvar<typename stan::return_type<T1,T2>::type>(fdim(x1.val_, x2),
+			       		  x1.d_);	       
     }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    fdim(const T1& x1, 
+	 const fvar<T2>& x2) {
+      using stan::math::fdim;
+      using std::floor;
+      if(x1 < x2.val_)
+           return fvar<typename 
+		       stan::return_type<T1,T2>::type>(fdim(x1, x2.val_), 0);
+      else 
+	return fvar<typename stan::return_type<T1,T2>::type>(fdim(x1, x2.val_),
+			       		  x2.d_ * -floor(x1 / x2.val_));	        }
 
     //bounds functions
     template <typename T>
@@ -919,6 +941,79 @@ namespace stan {
 		      	  (x1.d_ * exp(x1.val_)) / 
                              (exp(x1.val_) + exp(x2)));
     }
+
+    template <typename T>
+    inline
+    fvar<T>
+    log_inv_logit(const fvar<T>& x) {
+      using std::exp;
+      using stan::math::log_inv_logit;
+      return fvar<T>(log_inv_logit(x.val_),
+                        x.d_ * exp(-x.val_) / (1 + exp(-x.val_))); 
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    log1m_inv_logit(const fvar<T>& x) {
+      using std::exp;
+      using stan::math::log1m_inv_logit;
+      return fvar<T>(log1m_inv_logit(x.val_),
+                        -x.d_ * exp(x.val_) / (1 + exp(x.val_))); 
+    }
+
+//combinatorial functions
+    template <typename T>
+    inline
+    fvar<T>
+    tgamma(const fvar<T>& x) {
+      using boost::math::digamma;
+      using boost::math::tgamma;
+      return fvar<T>(tgamma(x.val_), x.d_ * tgamma(x.val_) * digamma(x.val_));
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    lgamma(const fvar<T>& x) {
+      using boost::math::digamma;
+      using boost::math::lgamma;
+      return fvar<T>(lgamma(x.val_), x.d_ * digamma(x.val_));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    lbeta(const fvar<T1>& x1, const fvar<T2>& x2){
+      using stan::math::lbeta;
+      using boost::math::tgamma;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(lbeta(x1.val_, x2.val_), 
+	              	  x1.d_ / tgamma(x1.val_) + x2.d_ / tgamma(x2.val_)                                    - (x1.d_ + x2.d_) / tgamma(x1.val_ + x2.val_));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    lbeta(const T1& x1, const fvar<T2>& x2){
+      using stan::math::lbeta;
+      using boost::math::tgamma;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(lbeta(x1, x2.val_), 
+	            x2.d_ / tgamma(x2.val_) - (x2.d_) / tgamma(x1 + x2.val_));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    lbeta(const fvar<T1>& x1, const T2& x2){
+      using stan::math::lbeta;
+      using boost::math::tgamma;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(lbeta(x1.val_, x2), 
+	              	  x1.d_ / tgamma(x1.val_) - x1.d_ / tgamma(x1.val_ + x2));
+    }
+
   }
 }
 #endif
