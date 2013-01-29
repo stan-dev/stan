@@ -5,7 +5,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/special_functions.hpp>
-#include <stan/math/special_functions.hpp>
+#include "stan/math/special_functions.hpp"
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/hypot.hpp>
@@ -14,6 +14,7 @@
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/digamma.hpp>
 
 TEST(AgradFvar,fvar) {
   using stan::agrad::fvar;
@@ -368,6 +369,88 @@ TEST(AgradFvar, operatorMinusMinus){
   EXPECT_FLOAT_EQ(-0.5 - 1.0, y.val_);
   EXPECT_FLOAT_EQ(1.0, y.d_);
 }
+
+TEST(AgradFvar, abs) {
+  using stan::agrad::fvar;
+  using std::abs;
+
+  fvar<int> x(2);
+  fvar<int> y(-3);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<int> a = abs(x);
+  EXPECT_FLOAT_EQ(abs(2), a.val_);
+  EXPECT_FLOAT_EQ(1.0, a.d_);
+
+  fvar<int> b = abs(-x);
+  EXPECT_FLOAT_EQ(abs(-2), b.val_);
+  EXPECT_FLOAT_EQ(1.0, b.d_);
+
+  fvar<int> c = abs(y);
+  EXPECT_FLOAT_EQ(abs(-3), c.val_);
+  EXPECT_FLOAT_EQ(-2.0, c.d_);
+
+  fvar<double> d = abs(2 * x);
+  EXPECT_FLOAT_EQ(abs(2 * 2), d.val_);
+  EXPECT_FLOAT_EQ(2 * 1.0, d.d_);
+
+  fvar<double> e = abs(y + 4);
+  EXPECT_FLOAT_EQ(abs(-3 + 4), e.val_);
+  EXPECT_FLOAT_EQ(2.0, e.d_);
+ }
+
+TEST(AgradFvar, fabs) {
+  using stan::agrad::fvar;
+  using std::fabs;
+
+  fvar<double> x(2.0);
+  fvar<double> y(-3.0);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<double> a = fabs(x);
+  EXPECT_FLOAT_EQ(fabs(2), a.val_);
+  EXPECT_FLOAT_EQ(1.0, a.d_);
+
+  fvar<double> b = fabs(-x);
+  EXPECT_FLOAT_EQ(fabs(-2), b.val_);
+  EXPECT_FLOAT_EQ(1.0, b.d_);
+
+  fvar<double> c = fabs(y);
+  EXPECT_FLOAT_EQ(fabs(-3), c.val_);
+  EXPECT_FLOAT_EQ(-2.0, c.d_);
+
+  fvar<double> d = fabs(x * 2);
+  EXPECT_FLOAT_EQ(fabs(2 * 2), d.val_);
+  EXPECT_FLOAT_EQ(2 * 1.0, d.d_);
+
+  fvar<double> e = fabs(y + 4);
+  EXPECT_FLOAT_EQ(fabs(-3.0 + 4), e.val_);
+  EXPECT_FLOAT_EQ(2.0, e.d_);
+ }
+
+TEST(AgradFvar, fdim) {
+  using stan::agrad::fvar;
+  using stan::math::fdim;
+
+  fvar<double> x(2.0);
+  fvar<double> y(-3.0);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<double> a = fdim(x, y);
+  EXPECT_FLOAT_EQ(fdim(2.0, -3.0), a.val_);
+  EXPECT_FLOAT_EQ(1.0 - 2.0, a.d_);
+
+  fvar<double> b = fdim(2 * x, y);
+  EXPECT_FLOAT_EQ(fdim(2 * 2.0, -3.0), b.val_);
+  EXPECT_FLOAT_EQ(2 * 1.0 - 2.0, b.d_);
+
+  fvar<double> c = fdim(y, x);
+  EXPECT_FLOAT_EQ(fdim(-3.0, 2.0), c.val_);
+  EXPECT_FLOAT_EQ(1.0 - 2.0, c.d_);
+ }
 
 TEST(AgradFvar, sqrt) {
   using stan::agrad::fvar;

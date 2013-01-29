@@ -4,12 +4,10 @@
 #include <cmath>
 #include <math.h>
 #include <stan/meta/traits.hpp>
-#include <stan/math/special_functions.hpp>
+#include "stan/math/special_functions.hpp"
 #include <stan/agrad/special_functions.hpp>
 #include <stan/math/constants.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
-#include <boost/math/special_functions/digamma.hpp>
-#include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/hypot.hpp>
 #include <boost/math/special_functions/asinh.hpp>
@@ -17,6 +15,8 @@
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+
 
 namespace stan {
 
@@ -273,6 +273,51 @@ namespace stan {
                                               - x1 * x2.d_ 
                                               / (x2.val_ * x2.val_));
     }
+
+    //absolute functions
+    template<typename T>
+    inline
+    fvar<T>
+    abs(const fvar<T>& x) {
+      using std::abs;
+      if(x.val_ > 0.0)
+         return fvar<T>(abs(x.val_), x.d_);
+      else 
+	return fvar<T>(abs(x.val_), -x.d_);
+    }
+
+    template<typename T>
+    inline
+    fvar<T>
+    fabs(const fvar<T>& x) {
+      using std::fabs;
+      if(x.val_ > 0.0)
+         return fvar<T>(fabs(x.val_), x.d_);
+      else 
+	return fvar<T>(fabs(x.val_), -x.d_);
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    fdim(const fvar<T1>& x1, 
+              const fvar<T2>& x2) {
+      using stan::math::fdim;  
+      if(x1.val_ > x2.val_)
+           return fvar<typename 
+                  stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
+                                              x1.d_ - x2.d_);
+      else
+           return fvar<typename 
+                  stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
+                                              x2.d_ - x1.d_);
+    }
+
+    //bounds functions
+
+    //arithmetic functions
+
+//rounding functions
 
 //power and log functions
     template <typename T>
