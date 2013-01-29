@@ -314,7 +314,7 @@ namespace stan {
            return fvar<typename 
                   stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
                                               x1.d_ - x2.d_);
-      else if(x1.val_ == x2.val_)
+      else if(x1.val_ == x2.val_ && x1.d_ == x2.d_)
            return fvar<typename 
                   stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
                                               NOT_A_NUMBER);
@@ -325,7 +325,37 @@ namespace stan {
     }
 
     //bounds functions
+    template <typename T>
+    inline
+    fvar<T>
+    floor(const fvar<T>& x) {
+      using std::floor;
+	return fvar<T>(floor(x.val_), 0);
+    }
 
+    template <typename T>
+    inline
+    fvar<T>
+    ceil(const fvar<T>& x) {
+      using std::ceil;
+	return fvar<T>(ceil(x.val_), 0);
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    round(const fvar<T>& x) {
+      using boost::math::round;
+	return fvar<T>(round(x.val_), 0);
+    }
+
+    template <typename T>
+    inline
+    fvar<T>
+    trunc(const fvar<T>& x) {
+      using boost::math::trunc;
+	return fvar<T>(trunc(x.val_), 0);
+    }
     //arithmetic functions
 
 //rounding functions

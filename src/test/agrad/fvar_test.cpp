@@ -467,6 +467,101 @@ TEST(AgradFvar, fdim) {
   isnan(d.d_);
  }
 
+TEST(AgradFvar, floor) {
+  using stan::agrad::fvar;
+  using std::floor;
+
+  fvar<double> x(0.5);
+  fvar<double> y(2.0);
+  y.d_ = 2.0;
+  x.d_ = 1.0;
+
+  fvar<double> a = floor(x);
+  EXPECT_FLOAT_EQ(floor(0.5), a.val_);
+  EXPECT_FLOAT_EQ(0, a.d_);
+
+  fvar<double> b = floor(y);
+  EXPECT_FLOAT_EQ(floor(2.0), b.val_);
+  EXPECT_FLOAT_EQ(0.0, b.d_);
+
+  fvar<double> c = floor(2 * x);
+  EXPECT_FLOAT_EQ(floor(2 * 0.5), c.val_);
+   EXPECT_FLOAT_EQ(0.0, c.d_);
+}
+
+TEST(AgradFvar, trunc) {
+  using stan::agrad::fvar;
+  using boost::math::trunc;
+
+  fvar<double> x(0.5);
+  fvar<double> y(2.4);
+  y.d_ = 2.0;
+  x.d_ = 1.0;
+
+  fvar<double> a = trunc(x);
+  EXPECT_FLOAT_EQ(trunc(0.5), a.val_);
+  EXPECT_FLOAT_EQ(0.0, a.d_);
+
+  fvar<double> b = trunc(y);
+  EXPECT_FLOAT_EQ(trunc(2.4), b.val_);
+  EXPECT_FLOAT_EQ(0.0, b.d_);
+
+  fvar<double> c = trunc(2 * x);
+  EXPECT_FLOAT_EQ(trunc(2 * 0.5), c.val_);
+  EXPECT_FLOAT_EQ(0.0, c.d_);
+}
+
+TEST(AgradFvar, round) {
+  using stan::agrad::fvar;
+  using boost::math::round;
+
+  fvar<double> x(0.5);
+  fvar<double> y(2.4);
+  y.d_ = 2.0;
+  x.d_ = 1.0;
+
+  fvar<double> a = round(x);
+  EXPECT_FLOAT_EQ(round(0.5), a.val_);
+  EXPECT_FLOAT_EQ(0.0, a.d_);
+
+  fvar<double> b = round(y);
+  EXPECT_FLOAT_EQ(round(2.4), b.val_);
+  EXPECT_FLOAT_EQ(0.0, b.d_);
+
+  fvar<double> c = round(2 * x);
+  EXPECT_FLOAT_EQ(round(2 * 0.5), c.val_);
+  EXPECT_FLOAT_EQ(0.0, c.d_);
+
+  fvar<double> z(1.25);
+  z.d_ = 1.0;
+
+  fvar<double> d = round(2 * z);
+  EXPECT_FLOAT_EQ(round(2 * 1.25), d.val_);
+   EXPECT_FLOAT_EQ(0.0, d.d_);
+}
+
+TEST(AgradFvar, ceil) {
+  using stan::agrad::fvar;
+  using std::ceil;
+
+  fvar<double> x(0.5);
+  fvar<double> y(2.0);
+  y.d_ = 2.0;
+  x.d_ = 1.0;
+
+  fvar<double> a = ceil(x);
+  EXPECT_FLOAT_EQ(ceil(0.5), a.val_);
+  EXPECT_FLOAT_EQ(0, a.d_);
+
+  fvar<double> b = ceil(y);
+  EXPECT_FLOAT_EQ(ceil(2.0), b.val_);
+   EXPECT_FLOAT_EQ(0.0, b.d_);
+
+  fvar<double> c = ceil(2 * x);
+  EXPECT_FLOAT_EQ(ceil(2 * 0.5), c.val_);
+   EXPECT_FLOAT_EQ(0.0, c.d_);
+}
+
 TEST(AgradFvar, sqrt) {
   using stan::agrad::fvar;
   using std::sqrt;
