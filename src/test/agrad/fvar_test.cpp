@@ -373,6 +373,7 @@ TEST(AgradFvar, operatorMinusMinus){
 TEST(AgradFvar, abs) {
   using stan::agrad::fvar;
   using std::abs;
+  using std::isnan;
 
   fvar<int> x(2);
   fvar<int> y(-3);
@@ -398,11 +399,16 @@ TEST(AgradFvar, abs) {
   fvar<double> e = abs(y + 4);
   EXPECT_FLOAT_EQ(abs(-3 + 4), e.val_);
   EXPECT_FLOAT_EQ(2.0, e.d_);
+
+  fvar<double> f = abs(x - 2);
+  EXPECT_FLOAT_EQ(abs(2 - 2), f.val_);
+  isnan(f.d_);
  }
 
 TEST(AgradFvar, fabs) {
   using stan::agrad::fvar;
   using std::fabs;
+  using std::isnan;
 
   fvar<double> x(2.0);
   fvar<double> y(-3.0);
@@ -428,11 +434,16 @@ TEST(AgradFvar, fabs) {
   fvar<double> e = fabs(y + 4);
   EXPECT_FLOAT_EQ(fabs(-3.0 + 4), e.val_);
   EXPECT_FLOAT_EQ(2.0, e.d_);
+
+  fvar<double> f = fabs(x - 2);
+  EXPECT_FLOAT_EQ(fabs(2.0 - 2), f.val_);
+  isnan(f.d_);
  }
 
 TEST(AgradFvar, fdim) {
   using stan::agrad::fvar;
   using stan::math::fdim;
+  using std::isnan;
 
   fvar<double> x(2.0);
   fvar<double> y(-3.0);
@@ -449,7 +460,11 @@ TEST(AgradFvar, fdim) {
 
   fvar<double> c = fdim(y, x);
   EXPECT_FLOAT_EQ(fdim(-3.0, 2.0), c.val_);
-  EXPECT_FLOAT_EQ(1.0 - 2.0, c.d_);
+  EXPECT_FLOAT_EQ(0.0, c.d_);
+
+  fvar<double> d = fdim(x, x);
+  EXPECT_FLOAT_EQ(fdim(2.0, 2.0), d.val_);
+  isnan(d.d_);
  }
 
 TEST(AgradFvar, sqrt) {

@@ -280,8 +280,11 @@ namespace stan {
     fvar<T>
     abs(const fvar<T>& x) {
       using std::abs;
+      using stan::math::NOT_A_NUMBER;
       if(x.val_ > 0.0)
          return fvar<T>(abs(x.val_), x.d_);
+      else if(x.val_ == 0.0)
+	return fvar<T>(abs(x.val_), NOT_A_NUMBER);
       else 
 	return fvar<T>(abs(x.val_), -x.d_);
     }
@@ -291,8 +294,11 @@ namespace stan {
     fvar<T>
     fabs(const fvar<T>& x) {
       using std::fabs;
+      using stan::math::NOT_A_NUMBER;
       if(x.val_ > 0.0)
          return fvar<T>(fabs(x.val_), x.d_);
+      else if(x.val_ == 0.0)
+	return fvar<T>(fabs(x.val_), NOT_A_NUMBER);
       else 
 	return fvar<T>(fabs(x.val_), -x.d_);
     }
@@ -303,14 +309,19 @@ namespace stan {
     fdim(const fvar<T1>& x1, 
               const fvar<T2>& x2) {
       using stan::math::fdim;  
+      using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2.val_)
            return fvar<typename 
                   stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
                                               x1.d_ - x2.d_);
+      else if(x1.val_ == x2.val_)
+           return fvar<typename 
+                  stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
+                                              NOT_A_NUMBER);
       else
            return fvar<typename 
                   stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_), 
-                                              x2.d_ - x1.d_);
+                                              0);
     }
 
     //bounds functions
