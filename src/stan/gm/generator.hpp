@@ -381,6 +381,31 @@ namespace stan {
     };
 
 
+    void generate_validate_positive(const std::string& var_name,
+                                    const expression& expr,
+                                    std::ostream& o) {
+      o << INDENT2;
+      o << "stan::math::validate_non_negative_index(\"" << var_name << "\", \"";
+      generate_expression(expr,o);
+      o << "\", ";
+      generate_expression(expr,o);
+      o << ");" << EOL;
+
+      // o << "if (0 > ";
+      // generate_expression(expr,o);
+      // o << ") {" << EOL;
+      // o << INDENT3 << "std::stringstream s__;" << EOL;
+      // o << INDENT3 << "s__ << \"Found negative index for variable declaration.\";" << EOL;
+      // o << INDENT3 << "s__ << \"; declared variable=" << var_name << "\";" << EOL;
+      // o << INDENT3 << "s__ << \"; dimension expression=";
+      // generate_expression(expr,o);
+      // o << "\";" << EOL;
+      // o << INDENT3 << "s__ << \"; expression value=\" << ";
+      // generate_expression(expr,o);
+      // o << ";" << EOL;
+      // o << INDENT3 << "throw std::invalid_argument(s__.str());" << EOL;
+      // o << INDENT2 << "}" << EOL;
+    }
 
     void generate_initialization(std::ostream& o,
                                  const std::string& var_name,
@@ -388,6 +413,15 @@ namespace stan {
                                  const std::vector<expression>& dims,
                                  const expression& type_arg1 = expression(),
                                  const expression& type_arg2 = expression()) {
+      // validate all dims are positive
+      for (size_t i = 0; i < dims.size(); ++i)
+        generate_validate_positive(var_name,dims[i],o);
+      if (!is_nil(type_arg1))
+        generate_validate_positive(var_name,type_arg1,o);
+      if (!is_nil(type_arg2))
+        generate_validate_positive(var_name,type_arg2,o);
+
+      // define variable with initializer
       o << INDENT2
         << var_name << " = ";
       generate_type(base_type,dims,dims.size(),o);
