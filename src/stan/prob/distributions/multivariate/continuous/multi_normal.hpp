@@ -52,11 +52,20 @@ namespace stan {
 
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
-      if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.size(), "Size of random variable",
+			    mu.size(), "size of location parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.size(), L.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.size(), "Size of random variable",
+			    L.rows(), "rows of covariance parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.size(), L.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.size(), "Size of random variable",
+			    L.cols(), "columns of covariance parameter",
+			    &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
@@ -149,11 +158,20 @@ namespace stan {
 
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
-      if (!check_size_match(function, y.cols(), mu.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.cols(), "Columns of random variable",
+			    mu.rows(), "rows of location parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.cols(), L.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.cols(), "Columns of random variable",
+			    L.rows(), "rows of covariance parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.cols(), L.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.cols(), "Columns of random variable",
+			    L.cols(), "columns of covariance parameter",
+			    &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
@@ -266,7 +284,10 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_symmetric;
 
-      if (!check_size_match(function, Sigma.rows(), Sigma.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    Sigma.rows(), "Rows of covariance parameter",
+			    Sigma.cols(), "columns of covariance parameter",
+			    &lp, Policy()))
         return lp;
       if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
         return lp;
@@ -276,8 +297,8 @@ namespace stan {
       Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
       if (LLT.info() != Eigen::Success) {
         lp = stan::math::policies::raise_domain_error<T_covar>(function,
-                                              "Covariance matrix is not positive definite (%1%)",
-                                              0,Policy());
+							       "Covariance matrix is not positive definite (%1%)",
+							       0, Policy());
         return lp;
       }
       Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> L(LLT.matrixL());
@@ -334,7 +355,10 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_symmetric;
 
-      if (!check_size_match(function, Sigma.rows(), Sigma.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    Sigma.rows(), "Rows of covariance matrix",
+			    Sigma.cols(), "columns of covariance matrix",
+			    &lp, Policy()))
         return lp;
       if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
         return lp;
