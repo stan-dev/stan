@@ -21,6 +21,7 @@ namespace stan {
 
     // FIXME: manage all this as a single singleton (thread local)
     extern std::vector<chainable*> var_stack_; 
+    extern std::vector<chainable*> var_nochain_stack_; 
     extern memory::stack_alloc memalloc_;
 
     static void recover_memory();
@@ -71,7 +72,6 @@ namespace stan {
        */
       virtual void set_zero_adjoint() {
       }
-      
 
       /**
        * Allocate memory from the underlying memory pool.  This memory is
@@ -136,6 +136,15 @@ namespace stan {
         var_stack_.push_back(this);
       }
 
+      vari(const double x,bool stacked): 
+        val_(x),
+        adj_(0.0) {
+        if (stacked)
+          var_stack_.push_back(this);
+        else
+          var_nochain_stack_.push_back(this);
+      }
+      
       /**
        * Throw an illegal argument exception.
        *
@@ -2171,7 +2180,8 @@ namespace stan {
      * Recover memory used for all variables for reuse.
      */
     static void recover_memory() {
-      var_stack_.resize(0);
+      var_stack_.clear();
+      var_nochain_stack_.clear();
       memalloc_.recover_all();
     }
 
@@ -2195,15 +2205,8 @@ namespace stan {
      * derivative propagation.
      */
     static void grad(chainable* vi) {
-      // old with subtle *2 bug
-      // std::vector<chainable*>::iterator begin = var_stack_.begin();
-      // std::vector<chainable*>::iterator it = var_stack_.end();
-      // for (; (it >= begin) && (*it != vi); --it) ;
-
       std::vector<chainable*>::iterator begin = var_stack_.begin();
-      std::vector<chainable*>::iterator it  = var_stack_.end();
-      if (begin == it) return; // nothing on stack
-      for (--it; (it >= begin) && (*it != vi); --it) ;
+      std::vector<chainable*>::iterator it  = var_stack_.end()-1;
 
       vi->init_dependent(); 
       // propagate derivates for remaining vars
@@ -2217,6 +2220,8 @@ namespace stan {
     static void set_zero_all_adjoints() {
       for (size_t i = 0; i < var_stack_.size(); ++i)
         var_stack_[i]->set_zero_adjoint();
+      for (size_t i = 0; i < var_nochain_stack_.size(); ++i)
+        var_nochain_stack_[i]->set_zero_adjoint();
     }
 
     /**

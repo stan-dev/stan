@@ -34,7 +34,10 @@ namespace stan {
       if (!check_simplex(function, theta, "Probabilites parameter", 
                          &lp, Policy()))
         return lp;
-      if (!check_size_match(function, ns.size(), theta.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    ns.size(), "Size of number of trials variable",
+			    theta.rows(), "rows of probabilities parameter",
+			    &lp, Policy()))
         return lp;
       using stan::math::multiply_log;
 

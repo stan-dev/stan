@@ -41,11 +41,20 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
-      if (!check_size_match(function, y.size(), mu.size(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.size(), "Size of random variable",
+			    mu.size(), "size of location parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.size(), Sigma.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.size(), "Size of random variable",
+			    Sigma.rows(), "rows of scale parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.size(), Sigma.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    y.size(), "Size of random variable",
+			    Sigma.cols(), "columns of scale parameter",
+			    &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
         return lp;

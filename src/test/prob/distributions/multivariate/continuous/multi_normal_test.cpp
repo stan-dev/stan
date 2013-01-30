@@ -210,3 +210,13 @@ TEST(ProbDistributionsMultiNormal,ErrnoPolicyMuMultiRow) {
   EXPECT_NO_THROW (result = stan::prob::multi_normal_log(y, mu, Sigma, errno_policy()));
   EXPECT_TRUE(std::isnan(result)) << "mu value of nan should result in nan: " << result;
 }
+TEST(ProbDistributionsMultiNormal,SizeMismatch) {
+  Matrix<double,Dynamic,Dynamic> y(1,3);
+  y << 2.0, -2.0, 11.0;
+  Matrix<double,Dynamic,1> mu(2,1);
+  mu << 1.0, -1.0;
+  Matrix<double,Dynamic,Dynamic> Sigma(2,3);
+  Sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0;  
+  EXPECT_THROW(stan::prob::multi_normal_log(y, mu, Sigma), std::domain_error);
+}

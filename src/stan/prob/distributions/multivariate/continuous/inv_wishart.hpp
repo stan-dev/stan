@@ -61,11 +61,20 @@ namespace stan {
       if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom parameter", 
                                  &lp, Policy()))
         return lp;
-      if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    W.rows(), "Rows of random variable",
+			    W.cols(), "columns of random variable",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, S.rows(), S.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    S.rows(), "Rows of scale parameter",
+			    S.cols(), "columns of scale parameter",
+			    &lp, Policy()))
         return lp;
-      if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+			    W.rows(), "Rows of random variable",
+			    S.rows(), "columns of scale parameter",
+			    &lp, Policy()))
         return lp;
       // FIXME: domain checks
         
