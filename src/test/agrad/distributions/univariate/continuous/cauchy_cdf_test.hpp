@@ -93,6 +93,6 @@ public:
 	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::atan2;
     using stan::math::pi;
-    return atan2(y-mu, sigma) / pi() + 0.5 * sigma;
+    return atan2(y-mu, sigma) / pi() + 0.5;
   }
 };
