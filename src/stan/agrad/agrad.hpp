@@ -1070,8 +1070,8 @@ namespace stan {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bvi_->val_ * bvi_->val_);
-          avi_->adj_ += bvi_->val_ / a_sq_plus_b_sq;
-          bvi_->adj_ -= avi_->val_ / a_sq_plus_b_sq;
+          avi_->adj_ += adj_ * bvi_->val_ / a_sq_plus_b_sq;
+          bvi_->adj_ -= adj_ * avi_->val_ / a_sq_plus_b_sq;
         }
       };
 
@@ -1082,7 +1082,7 @@ namespace stan {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bd_ * bd_);
-          avi_->adj_ += bd_ / a_sq_plus_b_sq;
+          avi_->adj_ += adj_ * bd_ / a_sq_plus_b_sq;
         }
       };
 
@@ -1093,7 +1093,7 @@ namespace stan {
         }
         void chain() {
           double a_sq_plus_b_sq = (ad_ * ad_) + (bvi_->val_ * bvi_->val_);
-          bvi_->adj_ -= ad_ / a_sq_plus_b_sq;
+          bvi_->adj_ -= adj_ * ad_ / a_sq_plus_b_sq;
         }
       };
 
