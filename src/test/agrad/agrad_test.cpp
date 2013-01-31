@@ -827,6 +827,23 @@ TEST(AgradAgrad,atan2_var_var) {
   EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9), g[1]);
 }
 
+TEST(AgradAgrad,atan2_dvd) {
+  AVAR sigma = 1;
+  AVEC x = createAVEC(sigma);
+  AVAR f = atan2(1.0,sigma) / 3.14;
+  VEC g;
+  f.grad(x,g);
+
+  AVAR sigma1 = 1;
+  AVEC x1 = createAVEC(sigma1);
+  AVAR f1 = atan2(1.0,sigma1);
+  VEC g1;
+  f1.grad(x1,g1);
+
+  EXPECT_FLOAT_EQ(3.14 * g[0],g1[0]);
+}
+
+
 TEST(AgradAgrad,atan2_var_double) {
   AVAR a = 1.2;
   double b = 3.9;
