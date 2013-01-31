@@ -2205,12 +2205,11 @@ namespace stan {
      * derivative propagation.
      */
     static void grad(chainable* vi) {
-      std::vector<chainable*>::iterator begin = var_stack_.begin();
-      std::vector<chainable*>::iterator it  = var_stack_.end()-1;
+      std::vector<chainable*>::reverse_iterator it;
 
       vi->init_dependent(); 
-      // propagate derivates for remaining vars
-      for (; it >= begin; --it)
+      // propagate derivates for vars
+      for (it = var_stack_.rbegin(); it < var_stack_.rend(); ++it)
         (*it)->chain();
     }
 
