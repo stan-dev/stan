@@ -43,6 +43,7 @@ namespace stan {
       using stan::math::dot_self;
       using stan::math::multiply;
       using stan::math::subtract;
+      using stan::math::sum;
       
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -82,21 +83,21 @@ namespace stan {
         lp -= L.diagonal().array().log().sum();
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-	Eigen::Matrix<typename 
+        Eigen::Matrix<typename 
 		      boost::math::tools::promote_args<T_y,T_loc>::type,
 		      Eigen::Dynamic, 1> y_minus_mu(y.size());
-	for (int i = 0; i < y.size(); i++)
-	  y_minus_mu(i) = y(i)-mu(i);
-	Eigen::Matrix<typename 
+        for (int i = 0; i < y.size(); i++)
+          y_minus_mu(i) = y(i)-mu(i);
+        Eigen::Matrix<typename 
 		      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
 		      Eigen::Dynamic, 1> 
-	  half(mdivide_left_tri_low(L,y_minus_mu));
+            half(mdivide_left_tri_low(L,y_minus_mu));
         // FIXME: this code does not compile. revert after fixing subtract()
-	//Eigen::Matrix<typename 
+        // Eigen::Matrix<typename 
         //               boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
         //               Eigen::Dynamic, 1> 
         //   half(mdivide_left_tri_low(L,subtract(y,mu)));
-	lp -= 0.5 * dot_self(half);
+        lp -= 0.5 * dot_self(half);
       }
       return lp;
     }
@@ -149,6 +150,8 @@ namespace stan {
       using stan::math::columns_dot_self;
       using stan::math::multiply;
       using stan::math::subtract;
+      using stan::math::sum;
+      using stan::math::log;
       
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -192,18 +195,20 @@ namespace stan {
         for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
           MU.row(i) = mu;
 	
-	Eigen::Matrix<typename boost::math::tools::promote_args<T_loc,T_y>::type,
-		      Eigen::Dynamic,Eigen::Dynamic>
-	  y_minus_MU(y.rows(), y.cols());
-	for (int i = 0; i < y.size(); i++)
-	  y_minus_MU(i) = y(i)-MU(i);
-	Eigen::Matrix<typename 
-                       boost::math::tools::promote_args<T_loc,T_y>::type,
-                       Eigen::Dynamic,Eigen::Dynamic> 
-	  z(y_minus_MU.transpose()); // was = 
+        Eigen::Matrix<typename
+                    boost::math::tools::promote_args<T_loc,T_y>::type,
+                    Eigen::Dynamic,Eigen::Dynamic>
+          y_minus_MU(y.rows(), y.cols());
+        for (int i = 0; i < y.size(); i++)
+          y_minus_MU(i) = y(i)-MU(i);
+
+        Eigen::Matrix<typename 
+                    boost::math::tools::promote_args<T_loc,T_y>::type,
+                    Eigen::Dynamic,Eigen::Dynamic> 
+          z(y_minus_MU.transpose()); // was = 
         
-	// FIXME: revert this code when subtract() is fixed.
-	// Eigen::Matrix<typename 
+        // FIXME: revert this code when subtract() is fixed.
+        // Eigen::Matrix<typename 
         //               boost::math::tools::promote_args<T_loc,T_y>::type,
         //               Eigen::Dynamic,Eigen::Dynamic> 
         //   z(subtract(y,MU).transpose()); // was = 
@@ -213,7 +218,7 @@ namespace stan {
                       Eigen::Dynamic,Eigen::Dynamic> 
           half(mdivide_left_tri_low(L,z));
           
-	  lp -= 0.5 * columns_dot_self(half).sum();
+        lp -= 0.5 * sum(columns_dot_self(half));
       }
       return lp;
     }
