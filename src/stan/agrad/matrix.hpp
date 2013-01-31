@@ -417,6 +417,13 @@ namespace stan {
             v_(v),
             size_(size) {
         }
+        template<typename Derived>
+        dot_self_vari(const Eigen::DenseBase<Derived> &v) : 
+          vari(var_dot_self(v)), size_(v.size()) {
+          v_ = (vari**)memalloc_.alloc(size_*sizeof(vari*));
+          for (size_t i = 0; i < size_; i++)
+            v_[i] = v[i].vi_;
+        }
         template <int R, int C>
         dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
           vari(var_dot_self(v)), size_(v.size()) {
@@ -429,6 +436,13 @@ namespace stan {
           double sum = 0.0;
           for (size_t i = 0; i < size; ++i)
             sum += square(v[i]->val_);
+          return sum;
+        }
+        template<typename Derived>
+        double var_dot_self(const Eigen::DenseBase<Derived> &v) {
+          double sum = 0.0;
+          for (int i = 0; i < v.size(); ++i)
+            sum += square(v(i).vi_->val_);
           return sum;
         }
         template <int R, int C>
@@ -702,6 +716,23 @@ namespace stan {
     inline var dot_self(const Eigen::Matrix<var, R, C>& v) {
       stan::math::validate_vector(v,"dot_self");
       return var(new dot_self_vari(v));
+    }
+    
+    /**
+     * Returns the dot product of each column of a matrix with itself.
+     * @param x Matrix.
+     * @tparam T scalar type
+     */
+    template<int R,int C>
+    inline Eigen::Matrix<var,1,C> 
+    columns_dot_self(const Eigen::Matrix<var,R,C>& x) {
+      Eigen::Matrix<var,1,C> ret(1,x.cols());
+      size_t i;
+      for (i = 0; i < x.cols(); i++) {
+        ret(i) = var(new dot_self_vari(x.col(i)));
+      }
+      return ret;
+//      return x.colwise().squaredNorm();
     }
     
     /**
