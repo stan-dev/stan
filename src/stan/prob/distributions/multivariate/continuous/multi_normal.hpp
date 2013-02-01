@@ -79,8 +79,10 @@ namespace stan {
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       
-      if (include_summand<propto,T_covar>::value)
-        lp -= L.diagonal().array().log().sum();
+      if (include_summand<propto,T_covar>::value) {
+        Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
+        lp -= sum(L_log_diag);
+      }
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
@@ -187,8 +189,10 @@ namespace stan {
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
 
-      if (include_summand<propto,T_covar>::value)
-        lp -= L.diagonal().array().log().sum() * y.rows();
+      if (include_summand<propto,T_covar>::value) {
+        Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
+        lp -= sum(L_log_diag) * y.rows();
+      }
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
