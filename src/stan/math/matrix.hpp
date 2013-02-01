@@ -826,10 +826,8 @@ namespace stan {
      * @return Determinant of the matrix.
      * @throw std::domain_error if matrix is not square.
      */
-    template <typename T>
-    inline
-    T
-    determinant(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    template <typename T,int R, int C>
+    inline T determinant(const Eigen::Matrix<T,R,C>& m) {
       stan::math::validate_square(m,"determinant");
       return m.determinant();
     }

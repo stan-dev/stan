@@ -452,7 +452,7 @@ namespace stan {
             sum += square(v(i).vi_->val_);
           return sum;
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < size_; ++i) 
             v_[i]->adj_ += adj_ * 2.0 * v_[i]->val_;
         }
@@ -496,7 +496,7 @@ namespace stan {
           for (size_t i = 0; i < length_; i++)
             v_[i] = v[i].vi_;
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
             v_[i]->adj_ += adj_;
           }
@@ -603,7 +603,7 @@ namespace stan {
             v2_ = shared_v2->v2_;
           }
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
             v1_[i]->adj_ += adj_ * v2_[i]->val_;
             v2_[i]->adj_ += adj_ * v1_[i]->val_;
@@ -693,7 +693,7 @@ namespace stan {
             v2_ = shared_v2->v2_;
           }
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
             v1_[i]->adj_ += adj_ * v2_[i];
           }
@@ -1369,6 +1369,50 @@ namespace stan {
       return res;
     }
     
+    template<int R,int C>
+    class determinant_vari : public vari {
+      Eigen::Matrix<double,R,C> _A;
+      Eigen::Matrix<vari*,R,C> _adjARef;
+    public:
+      determinant_vari(const Eigen::Matrix<var,R,C> &A)
+      : vari(determinant_vari_calc(A)), _A(A.rows(),A.cols()), _adjARef(A.rows(),A.cols())
+      {
+        size_t i,j;
+        for (j = 0; j < A.cols(); j++) {
+          for (i = 0; i < A.rows(); i++) {
+            _A(i,j) = A(i,j).val();
+            _adjARef(i,j) = A(i,j).vi_;
+          }
+        }
+      }
+      static 
+      double determinant_vari_calc(const Eigen::Matrix<var,R,C> &A)
+      {
+        Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
+        size_t i,j;
+        for (j = 0; j < A.cols(); j++)
+          for (i = 0; i < A.rows(); i++)
+            Ad(i,j) = A(i,j).val();
+        return Ad.determinant();
+      }
+      virtual void chain() {
+        Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());
+        size_t i,j;
+        adjA = (adj_ * val_) * _A.inverse().transpose();
+        for (j = 0; j < _adjARef.cols(); j++) {
+          for (i = 0; i < _adjARef.rows(); i++) {
+            _adjARef(i,j)->adj_ += adjA(i,j);
+          }
+        }
+      }
+    };
+    
+    template <int R, int C>
+    inline var determinant(const Eigen::Matrix<var,R,C>& m) {
+      stan::math::validate_square(m,"determinant");
+      return var(new determinant_vari<R,C>(m));
+    }
+
     /**
      * Return the division of the first scalar by
      * the second scalar.
