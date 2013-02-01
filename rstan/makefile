@@ -16,8 +16,14 @@ ifeq ($(uname_S), Linux)
   OS = linux
 endif
 
-R = R --arch x86_64 
-R = R
+ifdef R_HOME
+  R = $(R_HOME)/bin/R
+  RSCRIPT = $(R_HOME)/bin/Rscript
+else
+  # R = R --arch x86_64
+  R = R
+  RSCRIPT = Rscript
+endif
 
 ifeq ($(OS), win)
   LINKCMD1 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stanlib"  "..^\..^\..^\..^\lib"
@@ -27,7 +33,7 @@ else
   LINKCMD2 = ln -s ../../../../src ./rstan/inst/include/stansrc
 endif
   
-RSTANVER := $(shell Rscript -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])")
+RSTANVER := $(shell $(RSCRIPT) -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])")
 STANPKG := rstan_$(RSTANVER).tar.gz 
 
 build $(STANPKG): ./rstan/DESCRIPTION 
