@@ -1809,14 +1809,25 @@ namespace stan {
                       const Eigen::Matrix<T2,R2,C2> &A) {
       stan::math::validate_square(A,"mdivide_left_tri_low");
       stan::math::validate_multiplicable(b,A,"mdivide_right_tri");
-      return promote_common<Eigen::Matrix<T1,R1,C1>,
-                            Eigen::Matrix<T2,R1,C1> >(A)
-        .template triangularView<TriView>()
-        .transpose()
-        .solve(promote_common<Eigen::Matrix<T1,R2,C2>,
-                              Eigen::Matrix<T2,R2,C2> >(b)
-               .transpose())
-        .transpose();
+      // FIXME: This is nice and general but requires some extra memory and copying.
+      if (TriView == Eigen::Lower) {
+        return transpose(mdivide_left_tri<Eigen::Upper>(transpose(A),transpose(b)));
+      }
+      else if (TriView == Eigen::Upper) {
+        return transpose(mdivide_left_tri<Eigen::Lower>(transpose(A),transpose(b)));
+      }
+      else {
+        assert(TriView == Eigen::Lower || TriView == Eigen::Upper);
+      }
+
+//      return promote_common<Eigen::Matrix<T1,R1,C1>,
+//                            Eigen::Matrix<T2,R1,C1> >(A)
+//        .template triangularView<TriView>()
+//        .transpose()
+//        .solve(promote_common<Eigen::Matrix<T1,R2,C2>,
+//                              Eigen::Matrix<T2,R2,C2> >(b)
+//               .transpose())
+//        .transpose();
     }
     /**
      * Returns the solution of the system tri(A)x=b when tri(A) is a
@@ -1856,14 +1867,16 @@ namespace stan {
                   const Eigen::Matrix<T2,R2,C2> &A) {
       stan::math::validate_square(A,"mdivide_right");
       stan::math::validate_multiplicable(b,A,"mdivide_right");
-      return promote_common<Eigen::Matrix<T1,R2,C2>,
-                            Eigen::Matrix<T2,R2,C2> >(A)
-        .transpose()
-        .lu()
-        .solve(promote_common<Eigen::Matrix<T1,R1,C1>,
-                              Eigen::Matrix<T2,R1,C1> >(b)
-               .transpose())
-        .transpose();
+      // FIXME: This is nice and general but likely slow.
+      return transpose(mdivide_left(transpose(A),transpose(b)));
+//      return promote_common<Eigen::Matrix<T1,R2,C2>,
+//                            Eigen::Matrix<T2,R2,C2> >(A)
+//        .transpose()
+//        .lu()
+//        .solve(promote_common<Eigen::Matrix<T1,R1,C1>,
+//                              Eigen::Matrix<T2,R1,C1> >(b)
+//               .transpose())
+//        .transpose();
     }
 
     /**
