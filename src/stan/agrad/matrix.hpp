@@ -1413,6 +1413,50 @@ namespace stan {
       return var(new determinant_vari<R,C>(m));
     }
 
+    template<int R,int C>
+    class log_determinant_vari : public vari {
+      Eigen::Matrix<double,R,C> _A;
+      Eigen::Matrix<vari*,R,C> _adjARef;
+    public:
+      log_determinant_vari(const Eigen::Matrix<var,R,C> &A)
+      : vari(log_determinant_vari_calc(A)), _A(A.rows(),A.cols()), _adjARef(A.rows(),A.cols())
+      {
+        size_t i,j;
+        for (j = 0; j < A.cols(); j++) {
+          for (i = 0; i < A.rows(); i++) {
+            _A(i,j) = A(i,j).val();
+            _adjARef(i,j) = A(i,j).vi_;
+          }
+        }
+      }
+      static 
+      double log_determinant_vari_calc(const Eigen::Matrix<var,R,C> &A)
+      {
+        Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
+        size_t i,j;
+        for (j = 0; j < A.cols(); j++)
+          for (i = 0; i < A.rows(); i++)
+            Ad(i,j) = A(i,j).val();
+        return Ad.colPivHouseholderQr().logAbsDeterminant();
+      }
+      virtual void chain() {
+        Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());
+        size_t i,j;
+        adjA = adj_ * _A.inverse().transpose();
+        for (j = 0; j < _adjARef.cols(); j++) {
+          for (i = 0; i < _adjARef.rows(); i++) {
+            _adjARef(i,j)->adj_ += adjA(i,j);
+          }
+        }
+      }
+    };
+    
+    template <int R, int C>
+    inline var log_determinant(const Eigen::Matrix<var,R,C>& m) {
+      stan::math::validate_square(m,"log_determinant");
+      return var(new log_determinant_vari<R,C>(m));
+    }
+
     /**
      * Return the division of the first scalar by
      * the second scalar.

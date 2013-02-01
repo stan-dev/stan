@@ -244,11 +244,28 @@ TEST(AgradMatrix,determinant) {
   det = determinant(v);
   EXPECT_FLOAT_EQ(-2, det.val());
 }
+TEST(AgradMatrix,log_determinant) {
+  using stan::agrad::matrix_v;
+  using stan::math::log_determinant;
+  
+  matrix_v v(2,2);
+  v << 0, 1, 2, 3;
+  
+  AVAR det;
+  det = log_determinant(v);
+  EXPECT_FLOAT_EQ(std::log(2.0), det.val());
+}
 TEST(AgradMatrix,deteriminant_exception) {
   using stan::agrad::matrix_v;
   using stan::math::determinant;
 
   EXPECT_THROW(determinant(matrix_v(2,3)), std::domain_error);
+}
+TEST(AgradMatrix,log_deteriminant_exception) {
+  using stan::agrad::matrix_v;
+  using stan::math::log_determinant;
+  
+  EXPECT_THROW(log_determinant(matrix_v(2,3)), std::domain_error);
 }
 TEST(AgradMatrix,determinant_grad) {
   using stan::agrad::matrix_v;
@@ -274,6 +291,31 @@ TEST(AgradMatrix,determinant_grad) {
   EXPECT_FLOAT_EQ(-5.0,g[1]);
   EXPECT_FLOAT_EQ(-3.0,g[2]);
   EXPECT_FLOAT_EQ(2.0,g[3]);
+}
+TEST(AgradMatrix,log_determinant_grad) {
+  using stan::agrad::matrix_v;
+  using stan::math::log_determinant;
+  
+  matrix_v X(2,2);
+  AVAR a = 2.0;
+  AVAR b = 3.0;
+  AVAR c = 5.0;
+  AVAR d = 7.0;
+  X << a, b, c, d;
+  
+  AVEC x = createAVEC(a,b,c,d);
+  
+  AVAR f = log_determinant(X);
+  
+  // det = ad - bc
+  EXPECT_NEAR(0.0,f.val(),1E-12);
+  
+  VEC g;
+  f.grad(x,g);
+  EXPECT_FLOAT_EQ(-7.0,g[0]);
+  EXPECT_FLOAT_EQ(5.0,g[1]);
+  EXPECT_FLOAT_EQ(3.0,g[2]);
+  EXPECT_FLOAT_EQ(-2.0,g[3]);
 }
 TEST(AgradMatrix,determinant3by3) {
   // just test it can handle it
