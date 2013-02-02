@@ -1839,3 +1839,39 @@ TEST(AgradFvar, lbeta) {
   EXPECT_FLOAT_EQ(lbeta(1.3, 0.5), c.val_);
   EXPECT_FLOAT_EQ(1.0 / tgamma(0.5) - 1.0 / tgamma(1.3 + 0.5), c.d_);
 }
+
+TEST(AgradFvar, binom_coeff_log) {
+  using stan::agrad::fvar;
+  using stan::math::binomial_coefficient_log;
+  using boost::math::digamma;
+  using boost::math::tgamma;
+
+  fvar<double> x(2004.0);
+  x.d_ = 1.0;
+  fvar<double> y(1002.0);
+  y.d_ = 2.0;
+
+  fvar<double> a = binomial_coefficient_log(x, y);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1002.0), a.val_);
+  EXPECT_FLOAT_EQ(1.0 * digamma(2004.0 + 1) / gamma(2004.0 + 1) 
+        - 2.0 * digamma(1002.0 + 1) / gamma(1002.0 + 1) 
+         + (1.0 - 2.0) * digamma(2004.0 - 1002.0 + 1) / gamma(2004.0 - 1002.0 + 1), a.d_);
+
+  double z = 1003.0;
+
+  fvar<double> b = binomial_coefficient_log(x, z);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1003.0), b.val_);
+  EXPECT_FLOAT_EQ(1.0 * digamma(2004.0 + 1) / gamma(2004.0 + 1) + 1.0 * digamma(2004.0 - 1003.0 + 1) / gamma(2004.0 - 1003.0 + 1), b.d_);
+
+  double w = 2006.0;
+
+  fvar<double> c = binomial_coefficient_log(w, y);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2006.0, 1002.0), c.val_);
+  EXPECT_FLOAT_EQ( -1.0 * digamma(1002.0 + 1) / gamma(1002.0 + 1) - 1.0 * digamma(2006.0 - 1002.0 + 1) / gamma(2006.0 - 1002.0 + 1), c.d_);
+
+  double q = 1001.3;
+
+  fvar<double> d = binomial_coefficient_log(x, q);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1001.3), d.val_);
+  EXPECT_FLOAT_EQ(1.0 * digamma(2004.0 + 1) / gamma(2004.0 + 1) + 1.0 * digamma(2004.0 - 1001.3 + 1) / gamma(2004.0 - 1001.3 + 1), d.d_);
+}

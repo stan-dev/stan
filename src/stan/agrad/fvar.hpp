@@ -1153,6 +1153,50 @@ namespace stan {
 	              	  x1.d_ / tgamma(x1.val_) - x1.d_ / tgamma(x1.val_ + x2));
     }
 
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    binomial_coefficient_log(const fvar<T1>& x1, const fvar<T2>& x2){
+      using boost::math::digamma;
+      using boost::math::tgamma;
+      using stan::math::binomial_coefficient_log;
+      return fvar<typename stan::return_type<T1,T2>::type>(
+            binomial_coefficient_log(x1.val_, x2.val_),
+		     x1.d_ * digamma(x1.val_ + 1) / gamma(x1.val_ + 1) 
+               - x2.d_ * digamma(x2.val_ + 1) / gamma(x2.val_ + 1) 
+           + (x1.d_ - x2.d_) * digamma(x1.val_ - x2.val_ + 1) / 
+              gamma(x1.val_ - x2.val_ + 1));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    binomial_coefficient_log(const T1& x1, const fvar<T2>& x2){
+      using boost::math::digamma;
+      using boost::math::tgamma;
+      using stan::math::binomial_coefficient_log;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(
+                   binomial_coefficient_log(x1, x2.val_),
+               - x2.d_ * digamma(x2.val_ + 1) / gamma(x2.val_ + 1) 
+           - x2.d_ * digamma(x1 - x2.val_ + 1) / 
+              gamma(x1 - x2.val_ + 1));
+    }
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    binomial_coefficient_log(const fvar<T1>& x1, const T2& x2){
+      using boost::math::digamma;
+      using boost::math::tgamma;
+      using stan::math::binomial_coefficient_log;
+      return fvar<typename stan::return_type<T1,T2>::type>(
+                        binomial_coefficient_log(x1.val_, x2),
+		     x1.d_ * digamma(x1.val_ + 1) / gamma(x1.val_ + 1)
+           + x1.d_ * digamma(x1.val_ - x2 + 1) / 
+              gamma(x1.val_ - x2 + 1));
+    }
+
   }
 }
 #endif
