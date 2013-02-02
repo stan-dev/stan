@@ -289,12 +289,15 @@ namespace stan {
       static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
+      using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_positive;
       using stan::math::check_pos_definite;
       using stan::math::check_finite;
-      using stan::math::log_determinant;
       using stan::math::check_symmetric;
+      using stan::math::dot_product;
+      using stan::math::mdivide_left;
+      using stan::math::log_determinant;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
@@ -436,8 +439,11 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_pos_definite;
       using stan::math::check_finite;
-      using stan::math::log_determinant;
       using stan::math::check_symmetric;
+      using stan::math::check_not_nan;
+      using stan::math::sum;
+      using stan::math::mdivide_left;
+      using stan::math::log_determinant;
       using stan::math::columns_dot_product;
       
       if (!check_size_match(function, 
@@ -588,12 +594,16 @@ namespace stan {
       static const char* function = "stan::prob::multi_normal_prec_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
       using stan::math::check_size_match;
       using stan::math::check_positive;
       using stan::math::check_pos_definite;
       using stan::math::check_finite;
       using stan::math::log_determinant;
-      using stan::math::check_symmetric;
+      using stan::math::sum;
+      using stan::math::dot_product;
+      using stan::math::multiply;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
@@ -695,13 +705,16 @@ namespace stan {
       static const char* function = "stan::prob::multi_normal_prec_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
       using stan::math::check_size_match;
       using stan::math::check_positive;
       using stan::math::check_pos_definite;
       using stan::math::check_finite;
       using stan::math::log_determinant;
-      using stan::math::check_symmetric;
+      using stan::math::sum;
       using stan::math::columns_dot_product;
+      using stan::math::multiply;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance matrix",
