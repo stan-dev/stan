@@ -892,6 +892,42 @@ namespace stan {
       return fvar<T>(erfc(x.val_), x.d_ * -2 * exp(-x.val_ * x.val_) / sqrt(boost::math::constants::pi<double>()));
     }
 
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    binary_log_loss(const fvar<T1>& x1, const fvar<T2>& x2){
+      using stan::math::binary_log_loss;
+      using std::log;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(binary_log_loss(x1.val_, x2.val_),
+                        -x1.d_ * log(x2.val_) + x1.d_ * log(1 - x2.val_) 
+                        - x2.d_ * x1.val_ / x2.val_ 
+                       + x2.d_ * (1 - x1.val_) / (1 - x2.val_));
+    } 
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    binary_log_loss(const T1& x1, const fvar<T2>& x2){
+      using stan::math::binary_log_loss;
+      using std::log;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(binary_log_loss(x1, x2.val_),
+                        - x2.d_ * x1 / x2.val_ 
+                       + x2.d_ * (1 - x1) / (1 - x2.val_));
+    } 
+
+    template <typename T1, typename T2>
+    inline
+    fvar<typename stan::return_type<T1,T2>::type>
+    binary_log_loss(const fvar<T1>& x1, const T2& x2){
+      using stan::math::binary_log_loss;
+      using std::log;
+      return fvar<typename 
+                  stan::return_type<T1,T2>::type>(binary_log_loss(x1.val_, x2),
+				   	  -x1.d_ * log(x2) + x1.d_ * log(1 - x2));
+    } 
+
 //composed functions
     template <typename T>
     inline
@@ -909,7 +945,7 @@ namespace stan {
         const fvar<T3>& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1.val_, x2.val_, x3.val_), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2.val_, x3.val_), 
                         x1.d_ * x2.val_ + x2.d_ * x1.val_ + x3.d_);
     }
 
@@ -920,7 +956,7 @@ namespace stan {
         const fvar<T3>& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1, x2.val_, x3.val_), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1, x2.val_, x3.val_), 
                         x2.d_ * x1 + x3.d_);
     }
 
@@ -931,7 +967,7 @@ namespace stan {
         const fvar<T3>& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1.val_, x2, x3.val_), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2, x3.val_), 
                         x1.d_ * x2 + x3.d_);
     }
 
@@ -942,7 +978,7 @@ namespace stan {
         const T3& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1.val_, x2.val_, x3), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2.val_, x3), 
                         x1.d_ * x2.val_ + x2.d_ * x1.val_);
     }
 
@@ -953,7 +989,7 @@ namespace stan {
         const fvar<T3>& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1, x2, x3.val_), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1, x2, x3.val_), 
                         x3.d_);
     }
 
@@ -964,7 +1000,7 @@ namespace stan {
         const T3& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1.val_, x2, x3), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2, x3), 
                         x1.d_ * x2);
     }
 
@@ -975,7 +1011,7 @@ namespace stan {
         const T3& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(fma(x1, x2.val_, x3), 
+                  stan::return_type<T1,T2,T3>::type>(fma(x1, x2.val_, x3), 
                         x2.d_ * x1);
     }
 
@@ -1196,6 +1232,7 @@ namespace stan {
            + x1.d_ * digamma(x1.val_ - x2 + 1) / 
               gamma(x1.val_ - x2 + 1));
     }
+
 
   }
 }
