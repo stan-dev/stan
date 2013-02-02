@@ -732,7 +732,45 @@ namespace stan {
         ret(i) = var(new dot_self_vari(x.col(i)));
       }
       return ret;
-//      return x.colwise().squaredNorm();
+    }
+    
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<var, 1, C1>
+    columns_dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
+                        const Eigen::Matrix<var, R2, C2>& v2) {
+      stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
+      size_t j;
+      for (j = 0; j < v1.cols(); ++j) {
+        ret(j) = var(new dot_product_vv_vari(v1.col(j),v2.col(j)));
+      }
+      return ret;
+    }
+    
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<var, 1, C1>
+    columns_dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
+                        const Eigen::Matrix<double, R2, C2>& v2) {
+      stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
+      size_t j;
+      for (j = 0; j < v1.cols(); ++j) {
+        ret(j) = var(new dot_product_vd_vari(v1.col(j),v2.col(j)));
+      }
+      return ret;
+    }
+
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<var, 1, C1>
+    columns_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+                        const Eigen::Matrix<var, R2, C2>& v2) {
+      stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
+      size_t j;
+      for (j = 0; j < v1.cols(); ++j) {
+        ret(j) = var(new dot_product_vd_vari(v2.col(j),v1.col(j)));
+      }
+      return ret;
     }
     
     /**
