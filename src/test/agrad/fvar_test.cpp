@@ -5,7 +5,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/special_functions.hpp>
-#include "stan/math/special_functions.hpp"
+#include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/hypot.hpp>
@@ -572,6 +572,106 @@ TEST(AgradFvar, ceil) {
   EXPECT_FLOAT_EQ(ceil(2 * 0.5), c.val_);
    EXPECT_FLOAT_EQ(0.0, c.d_);
 }
+
+TEST(AgradFvar, fmod) {
+  using stan::agrad::fvar;
+  using std::fmod;
+  using std::floor;
+
+  fvar<double> x(2.0);
+  fvar<double> y(3.0);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<double> a = fmod(x, y);
+  EXPECT_FLOAT_EQ(fmod(2.0, 3.0), a.val_);
+  EXPECT_FLOAT_EQ(1.0 * 1.0 + 2.0 * -floor(2.0 / 3.0), a.d_);
+
+  double z = 4.0;
+  double w = 3.0;
+
+  fvar<double> e = fmod(x, z);
+  EXPECT_FLOAT_EQ(fmod(2.0, 4.0), e.val_);
+  EXPECT_FLOAT_EQ(1.0 / 4.0, e.d_);
+
+  fvar<double> f = fmod(w, x);
+  EXPECT_FLOAT_EQ(fmod(3.0, 2.0), f.val_);
+  EXPECT_FLOAT_EQ(1.0 * -floor(3.0 / 2.0), f.d_);
+ }
+
+TEST(AgradFvar, fmin) {
+  using stan::agrad::fvar;
+  using stan::agrad::fmin;
+  using std::isnan;
+
+  fvar<double> x(2.0);
+  fvar<double> y(-3.0);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<double> a = fmin(x, y);
+  EXPECT_FLOAT_EQ(-3.0, a.val_);
+  EXPECT_FLOAT_EQ(2.0, a.d_);
+
+  fvar<double> b = fmin(2 * x, y);
+  EXPECT_FLOAT_EQ(-3.0, b.val_);
+  EXPECT_FLOAT_EQ(2.0, b.d_);
+
+  fvar<double> c = fmin(y, x);
+  EXPECT_FLOAT_EQ(-3.0, c.val_);
+  EXPECT_FLOAT_EQ(2.0, c.d_);
+
+  fvar<double> d = fmin(x, x);
+  EXPECT_FLOAT_EQ(2.0, d.val_);
+  isnan(d.d_);
+
+  double z = 1.0;
+
+  fvar<double> e = fmin(x, z);
+  EXPECT_FLOAT_EQ(1.0, e.val_);
+  EXPECT_FLOAT_EQ(0.0, e.d_);
+
+  fvar<double> f = fmin(z, x);
+  EXPECT_FLOAT_EQ(1.0, f.val_);
+  EXPECT_FLOAT_EQ(0.0, f.d_);
+ }
+
+TEST(AgradFvar, fmax) {
+  using stan::agrad::fvar;
+  using stan::agrad::fmax;
+  using std::isnan;
+
+  fvar<double> x(2.0);
+  fvar<double> y(-3.0);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
+
+  fvar<double> a = fmax(x, y);
+  EXPECT_FLOAT_EQ(2.0, a.val_);
+  EXPECT_FLOAT_EQ(1.0, a.d_);
+
+  fvar<double> b = fmax(2 * x, y);
+  EXPECT_FLOAT_EQ(4.0, b.val_);
+  EXPECT_FLOAT_EQ(2 * 1.0, b.d_);
+
+  fvar<double> c = fmax(y, x);
+  EXPECT_FLOAT_EQ(2.0, c.val_);
+  EXPECT_FLOAT_EQ(1.0, c.d_);
+
+  fvar<double> d = fmax(x, x);
+  EXPECT_FLOAT_EQ(2.0, d.val_);
+  isnan(d.d_);
+
+  double z = 1.0;
+
+  fvar<double> e = fmax(x, z);
+  EXPECT_FLOAT_EQ(2.0, e.val_);
+  EXPECT_FLOAT_EQ(1.0, e.d_);
+
+  fvar<double> f = fmax(z, x);
+  EXPECT_FLOAT_EQ(2.0, f.val_);
+  EXPECT_FLOAT_EQ(1.0, f.d_);
+ }
 
 TEST(AgradFvar, sqrt) {
   using stan::agrad::fvar;
@@ -1295,7 +1395,6 @@ TEST(AgradFvar, acosh) {
 TEST(AgradFvar, atanh) {
   using stan::agrad::fvar;
   using boost::math::atanh;
-  using std::isnan;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;
@@ -1304,19 +1403,12 @@ TEST(AgradFvar, atanh) {
   EXPECT_FLOAT_EQ(atanh(0.5), a.val_);
   EXPECT_FLOAT_EQ(1 / (1 - 0.5 * 0.5), a.d_);
 
-  fvar<double> y(-1.2);
+  fvar<double> y(-0.9);
   y.d_ = 1.0;
 
   fvar<double> b = atanh(y);
-  isnan(b.val_);
-  isnan(b.d_);
-
-  fvar<double> z(1.5);
-  z.d_ = 1.0;
-
-  fvar<double> c = atanh(z);
-  isnan(c.val_);
-  isnan(c.d_);
+  EXPECT_FLOAT_EQ(atanh(-0.9), b.val_);
+  EXPECT_FLOAT_EQ(1 / (1 - 0.9 * 0.9), b.d_);
 }
 
 TEST(AgradFvar, logit) {
@@ -1432,6 +1524,49 @@ TEST(AgradFvar, erfc){
  fvar<double> b = erfc(-x);
   EXPECT_FLOAT_EQ(erfc(-0.5), b.val_);
   EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), b.d_);
+}
+
+TEST(AgradFvar, binary_log_loss) {
+  using stan::agrad::fvar;
+  using stan::math::binary_log_loss;
+  using std::log;
+  using std::isnan;
+
+  fvar<double> w(0.0);
+  fvar<double> x(1.0);
+  w.d_ = 1.0;
+  x.d_ = 2.0;
+  fvar<double> y(0.4);
+  y.d_ = 3.0;
+
+  double p = 0.0;
+  double r = 0.4;
+
+  fvar<double> a = binary_log_loss(w, y);
+  EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), a.val_);
+  EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(1 - 0.4) + 3.0 / 0.6, a.d_);
+
+  fvar<double> b = binary_log_loss(x, y);
+  EXPECT_FLOAT_EQ(binary_log_loss(1.0, 0.4), b.val_);
+  EXPECT_FLOAT_EQ(-2.0 * log(0.4) + 2.0 * log(1 - 0.4) - 3.0 * 1.0 / 0.4, b.d_);
+
+  fvar<double> c = binary_log_loss(p, y);
+  EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), c.val_);
+  EXPECT_FLOAT_EQ(3.0 * 1 / (1 - 0.4), c.d_);
+
+  fvar<double> d = binary_log_loss(w, r);
+  EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), d.val_);
+  EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(0.6), d.d_);
+
+  fvar<double> e = binary_log_loss(y, r);
+  isnan(e.val_);
+  isnan(e.d_);
+
+  double s = 1.2;
+
+  fvar<double> f = binary_log_loss(s, y);
+  isnan(f.val_);
+  isnan(f.d_);
 }
 
 TEST(AgradFvar, expm1) {
@@ -1745,4 +1880,40 @@ TEST(AgradFvar, lbeta) {
   fvar<double> c = lbeta(w, x);
   EXPECT_FLOAT_EQ(lbeta(1.3, 0.5), c.val_);
   EXPECT_FLOAT_EQ(1.0 / tgamma(0.5) - 1.0 / tgamma(1.3 + 0.5), c.d_);
+}
+
+TEST(AgradFvar, binom_coeff_log) {
+  using stan::agrad::fvar;
+  using stan::math::binomial_coefficient_log;
+  using boost::math::digamma;
+  using boost::math::tgamma;
+
+  fvar<double> x(2004.0);
+  x.d_ = 1.0;
+  fvar<double> y(1002.0);
+  y.d_ = 2.0;
+
+  fvar<double> a = binomial_coefficient_log(x, y);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1002.0), a.val_);
+  EXPECT_FLOAT_EQ(1.0 * digamma(2004.0 + 1) / gamma(2004.0 + 1) 
+        - 2.0 * digamma(1002.0 + 1) / gamma(1002.0 + 1) 
+         + (1.0 - 2.0) * digamma(2004.0 - 1002.0 + 1) / gamma(2004.0 - 1002.0 + 1), a.d_);
+
+  double z = 1003.0;
+
+  fvar<double> b = binomial_coefficient_log(x, z);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1003.0), b.val_);
+  EXPECT_FLOAT_EQ(1.0 * digamma(2004.0 + 1) / gamma(2004.0 + 1) + 1.0 * digamma(2004.0 - 1003.0 + 1) / gamma(2004.0 - 1003.0 + 1), b.d_);
+
+  double w = 2006.0;
+
+  fvar<double> c = binomial_coefficient_log(w, y);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2006.0, 1002.0), c.val_);
+  EXPECT_FLOAT_EQ( -1.0 * digamma(1002.0 + 1) / gamma(1002.0 + 1) - 1.0 * digamma(2006.0 - 1002.0 + 1) / gamma(2006.0 - 1002.0 + 1), c.d_);
+
+  double q = 1001.3;
+
+  fvar<double> d = binomial_coefficient_log(x, q);
+  EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1001.3), d.val_);
+  EXPECT_FLOAT_EQ(1.0 * digamma(2004.0 + 1) / gamma(2004.0 + 1) + 1.0 * digamma(2004.0 - 1001.3 + 1) / gamma(2004.0 - 1001.3 + 1), d.d_);
 }
