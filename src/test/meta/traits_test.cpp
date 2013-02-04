@@ -15,6 +15,8 @@ TEST(MetaTraits, isConstant) {
   EXPECT_FALSE(is_constant<stan::agrad::var>::value);
 }
 
+
+
 TEST(MetaTraits, is_vector) {
   using stan::is_vector;
   using std::vector;
@@ -115,6 +117,45 @@ TEST(MetaTraits, length) {
   EXPECT_EQ(1U, length(3));
   std::vector<double> x(10);
   EXPECT_EQ(10U, length(x));
+
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
+  EXPECT_EQ(6, length(m));
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> rv(2);
+  rv << 1, 2;
+  EXPECT_EQ(2, length(rv));
+
+  Eigen::Matrix<double,1,Eigen::Dynamic> v(2);
+  v << 1, 2;
+  EXPECT_EQ(2, length(v));
+}
+
+TEST(MetaTraits, get) {
+  using stan::get;
+
+  EXPECT_FLOAT_EQ(2.0, get(2.0,1));
+
+  std::vector<double> x(3);
+  x[1] = 5.0;
+  EXPECT_EQ(5.0, get(x,1));
+
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m(2,3);
+  m << 1, 3, 5, 
+       2, 4, 6;
+  EXPECT_EQ(1.0, get(m,0));
+  EXPECT_EQ(3.0, get(m,2));
+  EXPECT_EQ(6.0, get(m,5));
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> rv(2);
+  rv << 1, 2;
+  EXPECT_EQ(1.0, get(rv,0));
+  EXPECT_EQ(2.0, get(rv,1));
+
+  Eigen::Matrix<double,1,Eigen::Dynamic> v(2);
+  v << 1, 2;
+  EXPECT_EQ(1.0, get(v,0));
+  EXPECT_EQ(2.0, get(v,1));
 }
 
 TEST(MetaTraits, VectorView_double)  {
@@ -427,6 +468,7 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   EXPECT_FLOAT_EQ(1.0, dvv4[1]);
   EXPECT_FLOAT_EQ(2.0, dvv4[2]);
 }
+
 
 TEST(MetaTraits, scalar_type) {
   using boost::is_same;

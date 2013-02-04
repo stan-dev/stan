@@ -77,10 +77,12 @@ namespace stan {
         using stan::math::policies::raise_domain_error;
         std::ostringstream msg_o;
         msg_o << name << "[" << i << "] " << error_msg << error_msg2;
-        T_result tmp = raise_domain_error<T_result,typename T_y::value_type>(function,
-                                                                             msg_o.str().c_str(),
-                                                                             y[i],
-                                                                             Policy());
+        T_result tmp 
+          = raise_domain_error<T_result,
+                               typename T_y::value_type>(function,
+                                                         msg_o.str().c_str(),
+                                                         stan::get(y,i),
+                                                         Policy());
         if (result != 0)
           *result = tmp;
         return false;
@@ -117,7 +119,7 @@ namespace stan {
                           const Policy&) {
           // using stan::length;
           for (size_t n = 0; n < stan::length(y); n++) {
-            if ((boost::math::isnan)(y[n])) 
+            if ((boost::math::isnan)(stan::get(y,n)))
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must not be nan!","",
                                  result,Policy());
@@ -146,7 +148,9 @@ namespace stan {
                               const char* name,
                               T_result* result,
                               const Policy&) {
-      return not_nan<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
+      return not_nan<T_y,T_result,Policy,
+                     is_vector_like<T_y>::value>
+        ::check(function, y, name, result, Policy());
     }
 
     /**
@@ -208,7 +212,7 @@ namespace stan {
                           const Policy&) {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!(boost::math::isfinite)(y[n])) 
+            if (!(boost::math::isfinite)(stan::get(y,n)))
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be finite!","",
                                  result,Policy());
@@ -226,7 +230,9 @@ namespace stan {
                              const char* name,
                              T_result* result,
                              const Policy&) {
-      return finite<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
+      return finite<T_y,T_result,Policy,
+                    is_vector_like<T_y>::value>
+        ::check(function, y, name, result, Policy());
     }
 
     template <typename T_y, typename T_result>
@@ -284,7 +290,7 @@ namespace stan {
           using stan::length;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(y[n] > low_vec[n])) {
+            if (!(stan::get(y,n) > low_vec[n])) {
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be greater than ",
                                  low_vec[n],result,Policy());
@@ -302,7 +308,7 @@ namespace stan {
                               T_result* result,
                               const Policy&) {
       return greater<T_y,T_low,T_result,Policy,
-        is_vector<T_y>::value>::check(function,y,low,name,result,Policy());
+        is_vector_like<T_y>::value>::check(function,y,low,name,result,Policy());
     }
     template <typename T_y, typename T_low, typename T_result>
     inline bool check_greater(const char* function,
@@ -358,9 +364,10 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
+          using stan::get;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(y[n] >= low_vec[n]))
+            if (!(get(y,n) >= low_vec[n]))
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be greater than or equal to ",
                                  low_vec[n],result,Policy());
@@ -376,7 +383,7 @@ namespace stan {
                                        const char* name,  
                                        T_result* result,
                                        const Policy&) {
-      return greater_or_equal<T_y,T_low,T_result,Policy,is_vector<T_y>::value>::check(function,y,low,name,result,Policy());
+      return greater_or_equal<T_y,T_low,T_result,Policy,is_vector_like<T_y>::value>::check(function,y,low,name,result,Policy());
     }
     template <typename T_y, typename T_low, typename T_result>
     inline bool check_greater_or_equal(const char* function,
@@ -435,7 +442,7 @@ namespace stan {
           using stan::length;
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(y[n] < high_vec[n]))
+            if (!(stan::get(y,n) < high_vec[n]))
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be less than ",
                                  high_vec[n],result,Policy());
@@ -451,7 +458,8 @@ namespace stan {
                            const char* name,  
                            T_result* result,
                            const Policy&) {
-      return less<T_y,T_high,T_result,Policy,is_vector<T_y>::value>::check(function,y,high,name,result,Policy());
+      return less<T_y,T_high,T_result,Policy,is_vector_like<T_y>::value>
+        ::check(function,y,high,name,result,Policy());
     }
     template <typename T_y, typename T_high, typename T_result>
     inline bool check_less(const char* function,
@@ -509,7 +517,7 @@ namespace stan {
           using stan::length;
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(y[n] <= high_vec[n]))
+            if (!(stan::get(y,n) <= high_vec[n]))
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be less than or equal to ",
                                  high_vec[n],result,Policy());
@@ -525,7 +533,9 @@ namespace stan {
                                     const char* name,  
                                     T_result* result,
                                     const Policy&) {
-      return less_or_equal<T_y,T_high,T_result,Policy,is_vector<T_y>::value>::check(function,y,high,name,result,Policy());
+      return less_or_equal<T_y,T_high,T_result,Policy,
+                           is_vector_like<T_y>::value>
+        ::check(function,y,high,name,result,Policy());
     }
     template <typename T_y, typename T_high, typename T_result>
     inline bool check_less_or_equal(const char* function,
@@ -566,7 +576,9 @@ namespace stan {
           for (size_t n = 0; n < max_size(low, high); n++) {
             if (!(low_vec[n] <= y && y <= high_vec[n]))
               return dom_err(function,y,name," is %1%, but must be between ",
-                             std::pair<typename scalar_type<T_low>::type, typename scalar_type<T_high>::type>(low_vec[n],high_vec[n]),
+                             std::pair<typename scalar_type<T_low>::type, 
+                                       typename scalar_type<T_high>::type>(low_vec[n],
+                                                                           high_vec[n]),
                              result,Policy());
           }
           return true;
@@ -587,13 +599,16 @@ namespace stan {
                           T_result* result,
                           const Policy&) {
           using stan::length;
+          using stan::get;
           VectorView<const T_low> low_vec(low);
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(low_vec[n] <= y[n] && y[n] <= high_vec[n]))
+            if (!(low_vec[n] <= get(y,n) && get(y,n) <= high_vec[n]))
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be between ",
-                                 std::pair<typename scalar_type<T_low>::type, typename scalar_type<T_high>::type>(low_vec[n],high_vec[n]),
+                                 std::pair<typename scalar_type<T_low>::type, 
+                                           typename scalar_type<T_high>::type>(low_vec[n],
+                                                                               high_vec[n]),
                                  result,Policy());
           }
           return true;
@@ -608,7 +623,9 @@ namespace stan {
                               const char* name,  
                               T_result* result,
                               const Policy&) {
-      return bounded<T_y,T_low,T_high,T_result,Policy,is_vector<T_y>::value>::check(function,y,low,high,name,result,Policy());
+      return bounded<T_y,T_low,T_high,T_result,Policy,
+                     is_vector_like<T_y>::value>
+        ::check(function,y,low,high,name,result,Policy());
     }
     template <typename T_y, typename T_low, typename T_high, typename T_result>
     inline bool check_bounded(const char* function,
@@ -661,7 +678,8 @@ namespace stan {
                           const Policy&) {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!boost::is_unsigned<typename T_y::value_type>::value && !(y[n] >= 0)) 
+            if (!boost::is_unsigned<typename T_y::value_type>::value 
+                && !(stan::get(y,n) >= 0)) 
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be >= 0!","",
                                  result,Policy());
@@ -676,7 +694,9 @@ namespace stan {
                                   const char* name,
                                   T_result* result,
                                   const Policy&) {
-      return nonnegative<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
+      return nonnegative<T_y,T_result,Policy,
+                         is_vector_like<T_y>::value>
+        ::check(function, y, name, result, Policy());
     }
     template <typename T_y, typename T_result>
     inline bool check_nonnegative(const char* function,
@@ -727,7 +747,8 @@ namespace stan {
                           const Policy&) {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!boost::is_unsigned<typename T_y::value_type>::value && !(y[n] > 0)) 
+            if (!boost::is_unsigned<typename T_y::value_type>::value
+                && !(stan::get(y,n) > 0)) 
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be > 0!","",
                                  result,Policy());
@@ -742,7 +763,9 @@ namespace stan {
                                const char* name,
                                T_result* result,
                                const Policy&) {
-      return positive<T_y,T_result,Policy,is_vector<T_y>::value>::check(function, y, name, result, Policy());
+      return positive<T_y,T_result,Policy,
+                      is_vector_like<T_y>::value>
+        ::check(function, y, name, result, Policy());
     }
     template <typename T_x, typename T_result>
     inline bool check_positive(const char* function,

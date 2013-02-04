@@ -105,6 +105,20 @@ namespace stan {
     typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
+  template <typename T>
+  inline T get(const T& x, size_t n) {
+    return x;
+  }
+  template <typename T>
+  inline T get(const std::vector<T>& x, size_t n) {
+    return x[n];
+  }
+  template <typename T, int R, int C>
+  inline T get(const Eigen::Matrix<T,R,C>& m, size_t n) {
+    return m(static_cast<int>(n));
+  }
+
+  
 
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
@@ -115,14 +129,9 @@ namespace stan {
   size_t length(const std::vector<T>& x) {
     return x.size();
   }
-  
-  template <typename T>
-  size_t length(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
-    return v.size();
-  }
-  template <typename T>
-  size_t length(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
-    return rv.size();
+  template <typename T, int R, int C>
+  size_t length(const Eigen::Matrix<T,R,C>& m) {
+    return m.size();
   }
 
   template<typename T, bool is_vec>
