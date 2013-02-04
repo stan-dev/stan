@@ -337,9 +337,9 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= log_determinant(Sigma);
+        lp -= 0.5 * log_determinant(Sigma);
       }
-      
+
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
             boost::math::tools::promote_args<T_y,T_loc>::type,
@@ -484,7 +484,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= log_determinant(Sigma) * y.rows();
+        lp -= 0.5 * log_determinant(Sigma) * y.rows();
       }
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
