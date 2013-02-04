@@ -527,10 +527,18 @@ This approximation has a maximum absolute error of 0.00014 and may
 be used instead of \code{Phi} for probit regression.  See
 \citep{BowlingEtAl:2009} for details.  
 }
-%
+
 \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probability \farg{y\_hat} for 
-binary outcome \farg{y}}
+binary outcome \farg{y};
+
+The log loss function for predicting $\hat{y} \in [0,1]$ for 
+boolean outcome $y \in \setlist{0,1}$ is defined by
+\[
+\mbox{\code{binary\_log\_loss}}(y,\hat{y})
+= y \log \hat{y} + (1 - y) \log (1 - \hat{y}).
+\]
+}
 %
 \end{description}
 

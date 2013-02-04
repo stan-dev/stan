@@ -20,6 +20,8 @@ NEXT RELEASE (1.1.1 or 1.2.0)
     vector[N] x; // N not set yet, so should only use data, not tdata
   }
 
+* fix erroneous printing of extra samples in user-submitted model
+
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
