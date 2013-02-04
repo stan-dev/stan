@@ -337,9 +337,9 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= log_determinant(Sigma);
+        lp -= 0.5 * log_determinant(Sigma);
       }
-      
+
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
             boost::math::tools::promote_args<T_y,T_loc>::type,
@@ -353,41 +353,6 @@ namespace stan {
       }
       return lp;
     }
-//    template <bool propto,
-//              typename T_y, typename T_loc, typename T_covar, 
-//              class Policy>
-//    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-//    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-//             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-//             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-//             const Policy&) {
-//      static const char* function = "stan::prob::multi_normal_log(%1%)";
-//      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
-//
-//      using stan::math::check_size_match;
-//      using stan::math::check_positive;
-//      using stan::math::check_symmetric;
-//
-//      if (!check_size_match(function, 
-//			    Sigma.rows(), "Rows of covariance parameter",
-//			    Sigma.cols(), "columns of covariance parameter",
-//			    &lp, Policy()))
-//        return lp;
-//      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
-//        return lp;
-//      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
-//        return lp;
-//
-//      Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
-//      if (LLT.info() != Eigen::Success) {
-//        lp = stan::math::policies::raise_domain_error<T_covar>(function,
-//							       "Covariance matrix is not positive definite (%1%)",
-//							       0, Policy());
-//        return lp;
-//      }
-//      Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> L(LLT.matrixL());
-//      return multi_normal_cholesky_log<propto>(y,mu,L,Policy());
-//    }
 
     template <bool propto,
               typename T_y, typename T_loc, typename T_covar>
@@ -484,7 +449,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= log_determinant(Sigma) * y.rows();
+        lp -= 0.5 * log_determinant(Sigma) * y.rows();
       }
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
@@ -517,40 +482,6 @@ namespace stan {
       }
       return lp;      
     }
-//    template <bool propto,
-//              typename T_y, typename T_loc, typename T_covar, 
-//              class Policy>
-//    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-//    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-//             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-//             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-//             const Policy&) {
-//      static const char* function = "stan::prob::multi_normal_log(%1%)";
-//      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
-//
-//      using stan::math::check_size_match;
-//      using stan::math::check_positive;
-//      using stan::math::check_symmetric;
-//
-//      if (!check_size_match(function, 
-//			    Sigma.rows(), "Rows of covariance matrix",
-//			    Sigma.cols(), "columns of covariance matrix",
-//			    &lp, Policy()))
-//        return lp;
-//      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
-//        return lp;
-//      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
-//        return lp;
-//      Eigen::LLT< Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
-//      if (LLT.info() != Eigen::Success) {
-//        lp = stan::math::policies::raise_domain_error<T_covar>(function,
-//                                              "Sigma is not positive definite (%1%)",
-//                                              0,Policy());
-//        return lp;
-//      }
-//      Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic> L(LLT.matrixL());
-//      return multi_normal_cholesky_log<propto>(y,mu,L,Policy());
-//    }
 
     template <bool propto,
               typename T_y, typename T_loc, typename T_covar>
