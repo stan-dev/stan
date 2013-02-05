@@ -14,7 +14,7 @@
   \tabular{ll}{
     Package: \tab rstan\cr
     Type: \tab Package\cr
-    Version: \tab 1.1.0\cr
+    Version: \tab 1.1.1\cr
     Date: \tab \Sexpr[eval=TRUE,results=rd,stage=build]{date()}\cr
     License: \tab GPL-3 \cr
   }
@@ -43,7 +43,7 @@
   } 
 }
 \references{
-  The Stan Development Team (2012) 
+  The Stan Development Team (2013) 
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 }
