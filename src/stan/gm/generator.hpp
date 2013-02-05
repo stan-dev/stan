@@ -935,10 +935,27 @@ namespace stan {
             o_ << ')'; // close(2)
           } else if (type == "var") {
             o_ << ", DUMMY_VAR__";
+          } else if (type == "int") {
+            o_ << ", 0";
+          } else if (type == "double") {
+            o_ << ", 0.0";
+          } else {
+            // shouldn't hit this
           }
           o_ << ')'; // close(1)
         } else {
-          if (ctor_args.size() == 1) {// vector
+          if (ctor_args.size() == 0) { // scalar int or real
+            if (type == "int") {
+              o_ << "(0)";
+            } else if (type == "double") {
+              o_ << "(0.0)";
+            } else if (type == "var") {
+              o_ << "(DUMMY_VAR__)";
+            } else {
+              // shouldn't hit this, either
+            }
+          }
+          else if (ctor_args.size() == 1) {// vector
             o_ << '(';
             generate_expression(ctor_args[0],o_);
             o_ << ')';
@@ -974,11 +991,9 @@ namespace stan {
                                   int indent,
                                   std::ostream& o,
                                   bool is_var) {
-      o << EOL << "// START2" << EOL;
       local_var_decl_visgen vis(indent,is_var,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
-      o << EOL << "// END2" << EOL;
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1269,9 +1284,7 @@ namespace stan {
         if (has_local_vars) {
           generate_indent(indent_,o_);
           o_ << "{" << EOL;  // need brackets for scope
-          o_ << EOL2 << "// START" << EOL2;
           generate_local_var_decls(x.local_decl_,indent,o_,is_var_);
-          o_ << EOL2 << "// END" << EOL2;
         }
                                  
         for (size_t i = 0; i < x.statements_.size(); ++i)
