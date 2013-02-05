@@ -76,7 +76,6 @@ public:
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
 	   const T_alpha& alpha, const T_beta& beta, 
 	   const T5&, const T6&, const T7&, const T8&, const T9&) {
-    std::cout << stan::prob::trunc_normal_log(y, mu, sigma, alpha, beta) << std::endl;
     return stan::prob::trunc_normal_log(y, mu, sigma, alpha, beta);
   }
 
@@ -89,7 +88,6 @@ public:
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
 	   const T_alpha& alpha, const T_beta& beta, 
 	   const T5&, const T6&, const T7&, const T8&, const T9&) {
-    std::cout << stan::prob::trunc_normal_log<propto>(y, mu, sigma, alpha, beta) << std::endl;
     return stan::prob::trunc_normal_log<propto>(y, mu, sigma, alpha, beta);
   }
   
