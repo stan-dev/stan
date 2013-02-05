@@ -1383,6 +1383,7 @@ namespace stan {
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
 
       // use this dummy for inits
+      o << INDENT2 << "// Note: this is not a memory leak. Memory will be cleaned up with the arena allocator" << EOL;
       o << INDENT2 << "stan::agrad::vari* DUMMY_VARI_PTR__ = new vari(std::numeric_limits<double>::quiet_NaN(),false);" << EOL;
       o << INDENT2 << "stan::agrad::var DUMMY_VAR__ = var(DUMMY_VARI_PTR__);" << EOL2;
 
