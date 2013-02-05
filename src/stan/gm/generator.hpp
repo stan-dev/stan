@@ -974,11 +974,9 @@ namespace stan {
                                   int indent,
                                   std::ostream& o,
                                   bool is_var) {
-      o << EOL << "// START2" << EOL;
       local_var_decl_visgen vis(indent,is_var,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
-      o << EOL << "// END2" << EOL;
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1371,8 +1369,7 @@ namespace stan {
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
 
       // use this dummy for inits
-      o << INDENT2 << "stan::agrad::vari DUMMY_VARI__(std::numeric_limits<double>::quiet_NaN(),false);" << EOL;
-      o << INDENT2 << "stan::agrad::vari* DUMMY_VARI_PTR__ = &DUMMY_VARI__;" << EOL;
+      o << INDENT2 << "stan::agrad::vari* DUMMY_VARI_PTR__ = new vari(std::numeric_limits<double>::quiet_NaN(),false);" << EOL;
       o << INDENT2 << "stan::agrad::var DUMMY_VAR__ = var(DUMMY_VARI_PTR__);" << EOL2;
 
       o << INDENT2 << "var lp__(0.0);" << EOL2;
