@@ -31,6 +31,8 @@ Bug Fixes
   theta=0 or theta=1
 * many doc patches (mostly due to user comments -- thanks!)
 * replace boost sign() to avoid compiler conflicts
+* trapping mismatched dimension assignments in arrays, 
+  matrices, and vectors
 
 Enhancments
 ----------------------------------
