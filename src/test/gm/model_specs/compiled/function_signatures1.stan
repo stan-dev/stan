@@ -284,6 +284,7 @@ transformed data {
   //   linear algebra functions
   transformed_data_real <- trace(d_matrix);
   transformed_data_real <- determinant(d_matrix);
+  transformed_data_real <- log_determinant(d_matrix);
   transformed_data_matrix <- inverse(d_matrix);
   transformed_data_vector <- eigenvalues_sym(d_matrix);
   transformed_data_matrix <- eigenvectors_sym(d_matrix);
@@ -825,6 +826,8 @@ transformed parameters {
   transformed_param_real <- trace(p_matrix);
   transformed_param_real <- determinant(d_matrix);
   transformed_param_real <- determinant(p_matrix);
+  transformed_param_real <- log_determinant(d_matrix);
+  transformed_param_real <- log_determinant(p_matrix);
   transformed_param_matrix <- inverse(d_matrix);
   transformed_param_matrix <- inverse(p_matrix);
   transformed_param_vector <- eigenvalues_sym(d_matrix);
