@@ -1007,43 +1007,43 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(double_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(vector_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(row_vector_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(simplex_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(ordered_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(positive_ordered_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(corr_matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "initialize_variable(" << x.name_ << ",INIT_DUMMY__);" << EOL;
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
     };
 
@@ -1055,7 +1055,6 @@ namespace stan {
       generate_comment("initialized transformed params to avoid seg fault on val access",
                        indent,o);
       generate_indent(indent,o);
-      o << "var INIT_DUMMY__(std::numeric_limits<double>::quiet_NaN());" << EOL;
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
     }
