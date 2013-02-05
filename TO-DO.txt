@@ -11,81 +11,26 @@ The to-do list is organized into the following sections:
 * Testing                       * Release Mgmt
 * Command-Line                  * ModelsC++ API
 
-Stan 1.2.0 Release Notes
-======================================================================
 
-Bug Fixes
-----------------------------------
-* fixed bug in comparison operators, which swapped operator< with
-  operator<= and swapped operator> with operator>= semantics
-* auto-initialize all variables to prevent segfaults
-* atan2 gradient propagation fixed
-* fixed off-by-one in NUTS treedepth bound so NUTS goes
-  at most to specified tree depth rather than specified depth + 1
-* various compiler compatibility and minor consistency issues
-* fixed bug in metaprogram preventing lower/upper bound constraints 
-  on matrices
-* fixed print error for number of kept samples
-* fixed floating point literal precision issue in code generation
-* fixed bug in bernoulli_log for boundary chance of success 
-  theta=0 or theta=1
-* many doc patches (mostly due to user comments -- thanks!)
-* replace boost sign() to avoid compiler conflicts
-* trapping mismatched dimension assignments in arrays, 
-  matrices, and vectors
-
-Enhancments
-----------------------------------
-* user's guide chapters w. sample models
-    + gaussian processes
-    + measurement error and meta-analysis
-    + clustering (soft k-means, LDA, naive Bayes)
-    + ARCH, GARCH model section in regression chapter
-* sample models
-    + hidden Markov models (HMMs)
-    + non-negative matrix factorization (NNMF)
-* speed improvements to multivariate models and matrix solvers
-    + mdivide_left, mdivide_left_tri_low, mdivide_right,
-      mdivide_right_tri_low
-    + determinant, log determinant
-    + inverse
-* much more extensive probability tests
-* unstacked vari for multivariate auto-diff unfolding
-* faster multiply self transpose / columns_dot_self
-* cleaned up error messages for size mismatches in accessors
-* simplified vector view expression template parameterization
-* cleaned up many --pedantic compiler warnings
-
-New Functions
-----------------------------------
-* log absolute determinant, with optimized gradients
-* probability functions
-    + multivariate normal, precision parameterizations
-* model timing and n_eff output in CSV for all test models
-* ongoing vectorizations and reparameterizations 
-  of probability functions
-    + binomial_logit
-* faster Phi_approx computing an approximate cumulative unit
-  normal density
-  
-  
-
-HIGH PRIORITY BUGS 
-======================================================================
-* fix erroneous printing of extra samples in user-submitted model
 
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
 * (name): likely to be assigned to
 
+Contributed Code
+-------------------------------------------
++ R compiler
++ emacs modes, etc.
+
 Efficiency/Scalability of Code and Sampling
 -------------------------------------------
++ (Daniel) full multivariate probability function tests
 + (Yuanjun) adapting fixed covariance matrix during warmup
 + (Daniel) vectorized derivatives for prob functions
 + (Marcus) vectorization of multivariate prob functions
++ (Bob) replace std::vector with Eigen constructs in models
 * special function vectorization
-* matrix derivative partial evals
 * (Ben) covariance matrix w. caching (inverse, determinant, Cholesky)
 * multi-threading
 * ensemble samplers: DREAM, differential evolution, stretch/walk
@@ -113,6 +58,7 @@ Modeling Language
 
 Command and Interfaces
 ----------------------
+
 * command for multiple chains + report like print(fit) in RStan
 * Python, MATLAB, Julia, Stata, ??? interfaces
 * convergence diagnostics (basic I/O of leapfrog/gradients + evals)
@@ -153,6 +99,12 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* replace Eigen .sum() with stan::math::sum() for auto-dif
+
+* remove (unsigned) long long instances in dump and error testing
+
+* shift APIs from std::vector<T> to Eigen::Matrix<T,Dynamic,1>, etc.
+
 * remove chainable() intermediate class and get rid of virtual
   function for init zero
 
@@ -163,13 +115,6 @@ C++ API
 * evaluate different maximum number of steps
   -- during warmup
   -- during sampling
-
-* add multivariate distribution tests to make sure we don't
-  crash with an unhandled exception or assert() from Eigen
-
-* shift APIs from std::vector<T> to Eigen::Matrix<T,Dynamic,1>, etc.
-
-* fix error message on = used for assignment
 
 * rewrite functions in matrix.hpp.
   -- Functions:
@@ -209,17 +154,11 @@ C++ API
   mkdir /tmp/boost_1.52.0
   find ${STAN_HOME}/src/ -name \*\.\[ch]pp -exec bcp --scan --boost=${STAN_HOME}/lib/boost_1.52.0 '{}' /tmp/boost_1.52.0/ \; &> /tmp/boost_1.52.0/bcp.log 
 
-* poisson_log(y|alpha) = poisson(y|exp(alpha))
-
 * change step_size = epsilon +/- epsilon_pm to
   step_size = min(C, epsilon + normal(0,sigma))
 
-* remove (unsigned) long long instances in dump and error testing
-
 * check that positive definiteness enforced for transformed params,
   transformed data
-
-* replace Eigen .sum() with stan::math::sum() for auto-dif
 
 * switch error checking for agrad::var matrix ops to
   convert to double-based matrix for check as in vectorized univariates
@@ -318,7 +257,6 @@ C++ API
   - inv_square(x) = pow(x,-2)
   - inv_sqrt(x) = pow(x,-1/2)
 
-
 * signum function
   int signum(real); 
 
@@ -366,7 +304,7 @@ C++ API
 
 
 * matrix special products
-  -- wrap_multiply(u,v) = u' * v * u
+  -- quadratic_multiply(u,v) = u' * v * u
      ++ for square matrices,
         d/dx det(x' * A * x) = 2 det(x' * A * x) inv(x)'
         d/dx det(A) = det(A) inv(A)' = det(A) / A'

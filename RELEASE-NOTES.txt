@@ -15,7 +15,68 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.1.0
+v1.1.1 (5 February 2012)
+======================================================================
+
+Bug Fixes
+----------------------------------
+* fixed bug in comparison operators, which swapped operator< with
+  operator<= and swapped operator> with operator>= semantics
+* auto-initialize all variables to prevent segfaults
+* atan2 gradient propagation fixed
+* fixed off-by-one in NUTS treedepth bound so NUTS goes
+  at most to specified tree depth rather than specified depth + 1
+* various compiler compatibility and minor consistency issues
+* fixed bug in metaprogram preventing lower/upper bound constraints 
+  on matrices
+* fixed print error for number of kept samples
+* fixed floating point literal precision issue in code generation
+* fixed bug in bernoulli_log for boundary chance of success 
+  theta=0 or theta=1
+* many doc patches (mostly due to user comments -- thanks!)
+* replace boost sign() to avoid compiler conflicts
+* trapping mismatched dimension assignments in arrays, 
+  matrices, and vectors
+
+Enhancments
+----------------------------------
+* user's guide chapters w. sample models
+    + gaussian processes
+    + measurement error and meta-analysis
+    + clustering (soft k-means, LDA, naive Bayes)
+    + ARCH, GARCH model section in regression chapter
+* sample models
+    + hidden Markov models (HMMs)
+    + non-negative matrix factorization (NNMF)
+* speed improvements to multivariate models and matrix solvers
+    + mdivide_left, mdivide_left_tri_low, mdivide_right,
+      mdivide_right_tri_low
+    + determinant, log determinant
+    + inverse
+* much more extensive probability tests
+* unstacked vari for multivariate auto-diff unfolding
+* faster multiply self transpose / columns_dot_self
+* cleaned up error messages for size mismatches in accessors
+* simplified vector view expression template parameterization
+* cleaned up many --pedantic compiler warnings
+
+New Functions
+----------------------------------
+* log absolute determinant, with optimized gradients
+* probability functions
+    + multivariate normal, precision parameterizations
+* model timing and n_eff output in CSV for all test models
+* ongoing vectorizations and reparameterizations 
+  of probability functions
+    + binomial_logit
+* faster Phi_approx computing an approximate cumulative unit
+  normal density
+* added dims() function to extract dimensions of arrays of scalars,
+  vectors, and matrices  
+* added size()  function to extract the number of elements in an array
+
+
+v1.1.0  (17 Dec 2012)
 ======================================================================
 -- Backward Compatibility Issue
    * Categorical distribution recoded to match documentation;  it
