@@ -378,6 +378,24 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 add_ternary("weibull_cdf");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 
+
+// dims() is polymorphic by size
+for (size_t i = 0; i < 8; ++i) {
+  add("dims",expr_type(INT_T,1),expr_type(INT_T,i));
+  add("dims",expr_type(INT_T,1),expr_type(DOUBLE_T,i));
+  add("dims",expr_type(INT_T,1),expr_type(VECTOR_T,i));
+  add("dims",expr_type(INT_T,1),expr_type(ROW_VECTOR_T,i));
+  add("dims",expr_type(INT_T,1),expr_type(MATRIX_T,i));
+}
+// size() is polymorphic over arrays, so start i at 1
+for (size_t i = 1; i < 8; ++i) {
+  add("size",INT_T,expr_type(INT_T,i));
+  add("size",INT_T,expr_type(DOUBLE_T,i));
+  add("size",INT_T,expr_type(VECTOR_T,i));
+  add("size",INT_T,expr_type(ROW_VECTOR_T,i));
+  add("size",INT_T,expr_type(MATRIX_T,i));
+}
 //------------------------------------------------------------
 
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
+

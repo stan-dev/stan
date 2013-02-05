@@ -656,6 +656,34 @@ is empty}
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
 \end{description}
 
+The size of an array or matrix can be obtained using the \code{dims()}
+function.  The \code{dims()} function is defined to take an argument
+consisting of any variable with up to 8 array dimensions (and up to 2
+additional matrix dimensions) and returns an array of integers with
+the dimensions.  For example, if two variables are declared as follows,
+\begin{quote}
+\begin{Verbatim}
+real x[7,8,9];
+matrix[8,9] y[7];
+\end{Verbatim}
+\end{quote}
+%
+then calling \code{dims(x)} or \code{dims(y)} returns an integer 
+array of size 3 containing the elements 7, 8, and 9 in that order. 
+
+The \code{size()} function extracts the number of elements in an
+array.  The function is overloaded to apply to arrays of integers,
+reals, matrices, vectors, and row vectors.
+
+\begin{description}
+\fitem{int[]}{dims}{\farg{T} \farg{x}}{Returns an integer array
+  containing the dimensions of \farg{x}; the type of the argument
+  \farg{T} can be any Stan type with up to 8 array dimensions.}
+%
+\fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
+  in the array \farg{x};  the type of the array \farg{T} can be 
+  anything type.}
+\end{description}
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 \noindent
@@ -682,6 +710,8 @@ in the row vector \farg{x}}
 \fitem{int}{cols}{matrix \farg{x}}{The number of columns
 in the matrix \farg{x}}
 \end{description}
+
+
 
 
 \section{Matrix Arithmetic Operators}

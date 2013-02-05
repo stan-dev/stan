@@ -750,7 +750,7 @@ namespace stan {
       ss << "error in call to " << msg
          << "; require matching dimensions, but found"
          << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() << ");"
-	 << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() << ")";
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() << ")";
       throw std::domain_error(ss.str());
     }
 
@@ -762,8 +762,8 @@ namespace stan {
       std::stringstream ss;
       ss << "error in call to " << msg
          << "; require matching sizes, but found"
-	 << " arg1(size=" << x1.size() << ");"
-	 << " arg2(size=" << x2.size() << ");";
+         << " arg1(size=" << x1.size() << ");"
+         << " arg2(size=" << x2.size() << ");";
       throw std::domain_error(ss.str());
     }
 
@@ -776,9 +776,9 @@ namespace stan {
       ss << "error in call to " << msg
          << "; require matching sizes, but found"
          << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() 
-	 << ",size=" << (x1.rows() * x1.cols()) << ");"
-	 << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
-	 << ",size=" << (x2.rows() * x2.cols()) << ")";
+         << ",size=" << (x1.rows() * x1.cols()) << ");"
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
+         << ",size=" << (x2.rows() * x2.cols()) << ")";
       throw std::domain_error(ss.str());
     }
 
@@ -2093,6 +2093,48 @@ namespace stan {
       *o << ']';
     }
 
+    template <typename T>
+    inline
+    void
+    dims(const T& x, std::vector<int>& result) {
+      /* no op */
+    }
+    template <typename T, int R, int C>
+    inline
+    void
+    dims(const Eigen::Matrix<T,R,C>& x,
+         std::vector<int>& result) {
+      result.push_back(x.rows());
+      result.push_back(x.cols());
+    }
+    template <typename T>
+    inline
+    void
+    dims(const std::vector<T>& x,
+         std::vector<int>& result) {
+      result.push_back(x.size());
+      if (x.size() > 0)
+        dims(x[0],result);
+    }
+
+
+    template <typename T>
+    inline
+    std::vector<int>
+    dims(const T& x) {
+      std::vector<int> result;
+      dims(x,result);
+      return result;
+    }
+
+    template <typename T>
+    inline
+    int
+    size(const std::vector<T>& x) {
+      return x.size();
+    }
+    
+    
 
   }
 
