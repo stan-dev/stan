@@ -84,6 +84,48 @@ VEC cgradvec(AVAR f, AVEC x) {
 }
 
 
+TEST(AgradMatrix, fill) {
+  using stan::agrad::fill;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  AVAR x;
+  AVAR y = 10;
+  fill(x,y);
+  EXPECT_FLOAT_EQ(10.0, x.val());
+
+  AVEC z(2);
+  AVAR a = 15;
+  fill(z,a);
+  EXPECT_FLOAT_EQ(15.0, z[0].val());
+  EXPECT_FLOAT_EQ(15.0, z[1].val());
+  EXPECT_EQ(2,z.size());
+
+  Matrix<AVAR,Dynamic,Dynamic> m(2,3);
+  fill(m,AVAR(12));
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 3; ++j)
+      EXPECT_FLOAT_EQ(12.0, m(i,j).val());
+  
+  Matrix<AVAR,Dynamic,1> rv(3);
+  fill(rv,AVAR(13));
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(13.0, rv(i).val());
+
+  Matrix<AVAR,1,Dynamic> v(4);
+  fill(v,AVAR(22));
+  for (int i = 0; i < 4; ++i)
+    EXPECT_FLOAT_EQ(22.0, v(i).val());
+
+  vector<vector<AVAR> > d(3,vector<AVAR>(2));
+  fill(d,AVAR(54));
+  for (size_t i = 0; i < 3; ++i)
+    for (size_t j = 0; j < 2; ++j)
+      EXPECT_FLOAT_EQ(54, d[i][j].val());
+}
+
+
 // to_var tests
 TEST(AgradMatrix,to_var_scalar) {
   double d = 5.0;

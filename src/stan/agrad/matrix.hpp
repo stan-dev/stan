@@ -8,6 +8,23 @@
 
 namespace stan {
   namespace agrad {
+
+
+    void fill(var& x, const var& y) {
+      x = y;
+    }
+    template <typename T>
+    void fill(std::vector<T>& x, const var& y) {
+      for (size_t i = 0; i < x.size(); ++i)
+        fill(x[i],y);
+    }
+    template <int R, int C>
+    void fill(Eigen::Matrix<var,R,C>& x, const var& y) {
+      x.fill(y);
+    }
+
+
+
     class gevv_vvv_vari : public stan::agrad::vari {
     protected:
       stan::agrad::vari* alpha_;

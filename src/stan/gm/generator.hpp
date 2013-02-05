@@ -933,6 +933,8 @@ namespace stan {
             generate_type(type,dims.size() - dim - 1);
             generate_init_args(type,ctor_args,dims,dim + 1);
             o_ << ')'; // close(2)
+          } else if (type == "var") {
+            o_ << ", DUMMY_VAR__";
           }
           o_ << ')'; // close(1)
         } else {
@@ -940,8 +942,7 @@ namespace stan {
             o_ << '(';
             generate_expression(ctor_args[0],o_);
             o_ << ')';
-          }
-          if (ctor_args.size() > 1) { // matrix
+          } else if (ctor_args.size() > 1) { // matrix
             o_ << '(';
             generate_expression(ctor_args[0],o_);
             o_ << ',';
@@ -962,6 +963,10 @@ namespace stan {
         o_ << ' '  << name;
         generate_init_args(type,ctor_args,dims,0);
         o_ << ';' << EOL;
+        if (type == "matrix_v" || type == "row_vector_v" || type == "vector_v") {
+          generate_indent(indents_,o_);
+          o_ << "stan::agrad::fill(" << name << ",DUMMY_VAR__);" << EOL;
+        }
       }
     };
 
@@ -969,9 +974,11 @@ namespace stan {
                                   int indent,
                                   std::ostream& o,
                                   bool is_var) {
+      o << EOL << "// START2" << EOL;
       local_var_decl_visgen vis(indent,is_var,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
+      o << EOL << "// END2" << EOL;
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1262,7 +1269,9 @@ namespace stan {
         if (has_local_vars) {
           generate_indent(indent_,o_);
           o_ << "{" << EOL;  // need brackets for scope
+          o_ << EOL2 << "// START" << EOL2;
           generate_local_var_decls(x.local_decl_,indent,o_,is_var_);
+          o_ << EOL2 << "// END" << EOL2;
         }
                                  
         for (size_t i = 0; i < x.statements_.size(); ++i)
@@ -1360,6 +1369,12 @@ namespace stan {
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
+
+      // use this dummy for inits
+      o << INDENT2 << "stan::agrad::vari DUMMY_VARI__(std::numeric_limits<double>::quiet_NaN(),false);" << EOL;
+      o << INDENT2 << "stan::agrad::vari* DUMMY_VARI_PTR__ = &DUMMY_VARI__;" << EOL;
+      o << INDENT2 << "stan::agrad::var DUMMY_VAR__ = var(DUMMY_VARI_PTR__);" << EOL2;
+
       o << INDENT2 << "var lp__(0.0);" << EOL2;
 
       bool is_var = true;
