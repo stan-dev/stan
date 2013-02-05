@@ -7,7 +7,7 @@ data {
   int<lower=0> T;
   int<lower=0> I;
   int<lower=0> K;
-  matrix[T,I] X;
+  matrix<lower=0.0>[T,I] X;
   real<lower=0> sigma[I];
 }
 transformed data {
