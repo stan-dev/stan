@@ -749,8 +749,8 @@ namespace stan {
       std::stringstream ss;
       ss << "error in call to " << msg
          << "; require matching dimensions, but found"
-         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
-         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols();
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() << ");"
+	 << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() << ")";
       throw std::domain_error(ss.str());
     }
 
@@ -760,9 +760,10 @@ namespace stan {
                                         const char* msg) {
       if (x1.size() == x2.size()) return;
       std::stringstream ss;
-      ss << "require matching sizes in " << msg
-         << " found first argument size=" << x1.size()
-         << "; second argument size=" << x2.size();
+      ss << "error in call to " << msg
+         << "; require matching sizes, but found"
+	 << " arg1(size=" << x1.size() << ");"
+	 << " arg2(size=" << x2.size() << ");";
       throw std::domain_error(ss.str());
     }
 
@@ -774,10 +775,10 @@ namespace stan {
       std::stringstream ss;
       ss << "error in call to " << msg
          << "; require matching sizes, but found"
-         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
-         << " arg1 size=" << (x1.rows() * x1.cols())
-         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols()
-         << " arg2 size=" << (x2.rows() * x2.cols());
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() 
+	 << ",size=" << (x1.rows() * x1.cols()) << ");"
+	 << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
+	 << ",size=" << (x2.rows() * x2.cols()) << ")";
       throw std::domain_error(ss.str());
     }
 
