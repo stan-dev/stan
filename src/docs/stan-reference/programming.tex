@@ -619,13 +619,12 @@ data {
 parameters {
   simplex[K] theta;        // mixing proportions
   real mu[K];              // locations of mixture components
-  real<lower=0> sigma[K];  // scales of mixture components
+  real<lower=0,upper=10> sigma[K];  // scales of mixture components
 }
 model {
   real ps[K];              // temp for log component densities
   for (k in 1:K) {
     mu[k] ~ normal(0,10);
-    sigma[k] ~ uniform(0,10);
   }
   for (n in 1:N) {
     for (k in 1:K) {
@@ -639,12 +638,14 @@ model {
 \end{quote}
 %
 The model involves \code{K} mixture components and \code{N} data
-points.  The mixing proportion parameter \code{theta} is declared to
-be a unit $K$-simplex, whereas the component location parameter
-\code{mu} and scale parameter \code{sigma} are both defined to be
-arrays of size \code{K}.  The values in the scale array \code{sigma}
-are constrained to be non-negative.  The model declares a local 
-array variable \code{ps} to be size \code{K} and uses it to
+points. The mixing proportion parameter \code{theta} is declared to be
+a unit $K$-simplex, whereas the component location parameter \code{mu}
+and scale parameter \code{sigma} are both defined to be arrays of size
+\code{K}. The values in the scale array \code{sigma} are constrained
+to be non-negative, and have an upper bound of 10. Since no prior is
+explicitly defined for the \code{sigma} parameters, their implicit
+prior distributions are uniform over their ranges. The model declares
+a local array variable \code{ps} to be size \code{K} and uses it to
 accumulate the contributions from the mixture components.
 
 The locations and scales are drawn from simple priors for the sake of
@@ -726,9 +727,17 @@ For example, weak priors can be assigned to the coefficients as follows.
 \begin{Verbatim}
     alpha ~ normal(0,100);
     beta ~ normal(0,100);
-    sigma ~ uniform(0,100);
 \end{Verbatim}
 \end{quote}
+%
+And an upper bound to \code{sigma} can be given in order to implicitly
+give it a uniform prior.
+\begin{quote}
+\begin{verbatim}
+    real<lower=0,upper=100> sigma;
+\end{verbatim}
+\end{quote}
+
 %
 More informative priors based the (half) Cauchy distribution are coded
 as follows.
@@ -1025,13 +1034,12 @@ data {
 }
 parameters {
     real mu[D];
-    real<lower=0> sigma[D];
+    real<lower=0,upper=1000> sigma[D];
     vector[D] beta[L];
 }
 model {
     for (d in 1:D) {
         mu[d] ~ normal(0,100);
-        sigma[d] ~ uniform(0,1000);
         for (l in 1:L)
             beta[l,d] ~ normal(mu[d],sigma[d]);
     }

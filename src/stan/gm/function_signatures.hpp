@@ -195,6 +195,7 @@ add_unary("log");
 add("log",VECTOR_T,VECTOR_T);
 add("log",ROW_VECTOR_T,ROW_VECTOR_T);
 add("log",MATRIX_T,MATRIX_T);
+add("log_determinant",DOUBLE_T,MATRIX_T);
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");
 add_nullary("log10");
