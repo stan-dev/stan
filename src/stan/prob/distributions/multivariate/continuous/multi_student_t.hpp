@@ -38,6 +38,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_symmetric;
       using stan::math::check_positive;      
+      using stan::math::check_pos_definite;
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
@@ -62,6 +63,8 @@ namespace stan {
         return lp;
       if (!check_symmetric(function, Sigma, "Scale parameter", &lp, Policy()))
         return lp;
+      if (!check_pos_definite(function, Sigma, "Scale parameter", &lp, Policy()))
+        return lp;
 
       // allows infinities
       if (!check_not_nan(function, nu, 
@@ -78,6 +81,7 @@ namespace stan {
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma,Policy());
 
+/*
       Eigen::LLT< Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> > LLT = Sigma.llt();
       if (LLT.info() != Eigen::Success) {
         lp = stan::math::policies::raise_domain_error<T_scale>(function,
@@ -86,7 +90,7 @@ namespace stan {
         return lp;
       }
       Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> L = LLT.matrixL();
-      
+*/
       double d = y.size();
 
       if (include_summand<propto,T_dof>::value) {
@@ -99,14 +103,19 @@ namespace stan {
         lp -= (0.5 * d) * LOG_PI;
 
       using stan::math::multiply;
-      using stan::math::dot_self;
+//      using stan::math::dot_self;
+      using stan::math::dot_product;
       using stan::math::subtract;
       using Eigen::Array;
-      using stan::math::mdivide_left_tri;
+//      using stan::math::mdivide_left_tri;
+      using stan::math::mdivide_left;
+      using stan::math::log_determinant;
 
 
-      if (include_summand<propto,T_scale>::value)
-        lp -= L.diagonal().array().log().sum();
+      if (include_summand<propto,T_scale>::value) {
+//        lp -= L.diagonal().array().log().sum();
+        lp -= 0.5*log_determinant(Sigma);
+      }
 
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
 //      Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> I(d,d);
@@ -115,12 +124,16 @@ namespace stan {
         Eigen::Matrix<typename promote_args<T_y,T_loc>::type,
                       Eigen::Dynamic,
                       1> y_minus_mu = subtract(y,mu);
+//        Eigen::Matrix<typename promote_args<T_scale,T_y,T_loc>::type,
+//                      Eigen::Dynamic,
+//                      1> half = L = mdivide_left_tri<Eigen::Lower>(L, y_minus_mu);
         Eigen::Matrix<typename promote_args<T_scale,T_y,T_loc>::type,
                       Eigen::Dynamic,
-                      1> half = L = mdivide_left_tri<Eigen::Lower>(L, y_minus_mu);
+                      1> invSigma_dy = mdivide_left(Sigma, y_minus_mu);
         lp -= 0.5 
           * (nu + d)
-          * log(1.0 + dot_self(half) / nu);
+          * log(1.0 + dot_product(y_minus_mu,invSigma_dy) / nu);
+//          * log(1.0 + dot_self(half) / nu);
       }
       return lp;
     }

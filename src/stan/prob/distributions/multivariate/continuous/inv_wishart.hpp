@@ -97,7 +97,7 @@ namespace stan {
         lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value) {
 //        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
-        lp += nu * log_determinant(S);
+        lp += 0.5 * nu * log_determinant(S);
       }
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
         lp -= (nu + k + 1.0) * L.diagonal().array().log().sum();

@@ -1492,7 +1492,7 @@ namespace stan {
         for (j = 0; j < A.cols(); j++)
           for (i = 0; i < A.rows(); i++)
             Ad(i,j) = A(i,j).val();
-        return Ad.colPivHouseholderQr().logAbsDeterminant();
+        return Ad.fullPivHouseholderQr().logAbsDeterminant();
       }
       virtual void chain() {
         Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());
