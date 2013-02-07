@@ -91,11 +91,13 @@ namespace stan {
       using stan::math::mdivide_left_tri_low;
       using stan::math::crossprod;
       using stan::math::lmgamma;
+      using stan::math::log_determinant;
 
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value) {
-        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
+//        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
+        lp += nu * log_determinant(S);
       }
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
         lp -= (nu + k + 1.0) * L.diagonal().array().log().sum();
