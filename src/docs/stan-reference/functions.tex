@@ -2113,6 +2113,25 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 %
 \end{description}
 
+\subsection{Multivariate Normal Distribution (Precision Parameterization)}
+
+If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K
+  \times K}$ is symmetric and positive definite, then for $y \in
+\reals^K$,
+\[
+\distro{MultiNormalPrecision}(y|\mu,\Omega)
+= \distro{MultiNormal}(y|\mu,\Sigma^{-1})
+\]
+
+\begin{description}
+%
+\fitem{real}{multi\_normal\_prec\_log}{vector \farg{y}, vector
+  \farg{mu}, matrix \farg{P}}{The log of the multivariate normal density of vector
+  \farg{y} given location \farg{mu} and precision \farg{P}}
+%
+\end{description}
+
+
 \subsection{Multivariate Normal Distribution (Cholesky Parameterization)}
 
 If $K \in \nats$, $\mu \in \reals^K$, and $L \in \reals^{K \times K}$ is lower
