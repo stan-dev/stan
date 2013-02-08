@@ -17,7 +17,7 @@ public:
     parameters.push_back(param);
     cdf.push_back(0.890465); // expected cdf
 
-    param[0] = 192;          // n
+    param[0] = 82;          // n
     param[1] = 42.0;         // lambda
     parameters.push_back(param);
     cdf.push_back(1.0);      // expected cdf
@@ -80,14 +80,15 @@ public:
 	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::pow;
     using stan::agrad::pow;
-    using stan::agrad::tgamma;
-    using boost::math::tgamma;
+    using stan::agrad::lgamma;
+    using boost::math::lgamma;
     using std::exp;
     using stan::agrad::exp;
+    using std::log;
     
     typename stan::return_type<T_rate>::type cdf(0);
     for (int i = 0; i <= n; i++) {
-      cdf += pow(lambda, i) / tgamma(i+1);
+      cdf += exp(i * log(lambda) - lgamma(i+1));
     }
     cdf *= exp(-lambda);
     return cdf;
