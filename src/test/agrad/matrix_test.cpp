@@ -6,7 +6,7 @@
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
-
+typedef typename Eigen::Matrix<double,-1,-1>::size_type size_type;
 
 AVEC createAVEC(AVAR x) {
   AVEC v;
@@ -100,7 +100,7 @@ TEST(AgradMatrix, fill) {
   fill(z,a);
   EXPECT_FLOAT_EQ(15.0, z[0].val());
   EXPECT_FLOAT_EQ(15.0, z[1].val());
-  EXPECT_EQ(2,z.size());
+  EXPECT_EQ(2U,z.size());
 
   Matrix<AVAR,Dynamic,Dynamic> m(2,3);
   fill(m,AVAR(12));
@@ -2176,7 +2176,7 @@ TEST(AgradMatrix,transpose_vector) {
 
   row_vector_v a_tr = transpose(a);
   EXPECT_EQ(a.size(),a_tr.size());
-  for (size_t i = 0; i < 3; ++i)
+  for (size_type i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
 
   VEC g = cgradvec(a_tr(1),x);
@@ -2196,7 +2196,7 @@ TEST(AgradMatrix,transpose_row_vector) {
 
   vector_v a_tr = transpose(a);
   EXPECT_EQ(a.size(),a_tr.size());
-  for (size_t i = 0; i < 3; ++i)
+  for (size_type i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
 
   VEC g = cgradvec(a_tr(1),x);
@@ -2276,7 +2276,7 @@ TEST(AgradMatrix,mdivide_left_grad_vv) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k;
+  size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v A(2,2);
@@ -2328,7 +2328,7 @@ TEST(AgradMatrix,mdivide_left_grad_dv) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k;
+  size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v B(2,2);
@@ -2371,7 +2371,7 @@ TEST(AgradMatrix,mdivide_left_grad_vd) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k;
+  size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v A(2,2);
@@ -2510,7 +2510,7 @@ TEST(AgradMatrix,mdivide_left_tri_lower_grad_vv) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k,l;
+  size_type i,j,k,l;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v A(2,2);
@@ -2567,7 +2567,7 @@ TEST(AgradMatrix,mdivide_left_tri_lower_grad_dv) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k;
+  size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v B(2,2);
@@ -2608,7 +2608,7 @@ TEST(AgradMatrix,mdivide_left_tri_lower_grad_vd) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k,l;
+  size_type i,j,k,l;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v A(2,2);
@@ -2656,7 +2656,7 @@ TEST(AgradMatrix,mdivide_left_tri_upper_grad_vv) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k,l;
+  size_type i,j,k,l;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v A(2,2);
@@ -2713,7 +2713,7 @@ TEST(AgradMatrix,mdivide_left_tri_upper_grad_dv) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k;
+  size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v B(2,2);
@@ -2754,7 +2754,7 @@ TEST(AgradMatrix,mdivide_left_tri_upper_grad_vd) {
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
-  size_t i,j,k,l;
+  size_type i,j,k,l;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
       matrix_v A(2,2);
@@ -4604,7 +4604,7 @@ void test_cumulative_sum() {
   EXPECT_EQ(c.size(), d.size());
   EXPECT_FLOAT_EQ(c[0].val(),d[0].val());
   VEC grad = cgrad(d[0], c[0]);
-  EXPECT_EQ(1,grad.size());
+  EXPECT_EQ(1U,grad.size());
   EXPECT_FLOAT_EQ(1.0,grad[0]);
 
   T e(2);
@@ -4614,7 +4614,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(e[0].val(),f[0].val());
   EXPECT_FLOAT_EQ((e[0] + e[1]).val(), f[1].val());
   grad = cgrad(f[0],e[0],e[1]);
-  EXPECT_EQ(2,grad.size());
+  EXPECT_EQ(2U,grad.size());
   EXPECT_FLOAT_EQ(1.0,grad[0]);
   EXPECT_FLOAT_EQ(0.0,grad[1]);
 
@@ -4627,7 +4627,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ((g[0] + g[1] + g[2]).val(), h[2].val());
 
   grad = cgrad(h[2],g[0],g[1],g[2]);
-  EXPECT_EQ(3,grad.size());
+  EXPECT_EQ(3U,grad.size());
   EXPECT_FLOAT_EQ(1.0,grad[0]);
   EXPECT_FLOAT_EQ(1.0,grad[1]);
   EXPECT_FLOAT_EQ(1.0,grad[2]);
@@ -4675,16 +4675,16 @@ TEST(AgradMatrix, promoter) {
   vector<double> x(5);
   for (int i = 0; i < 5; ++i) x[i] = i * i;
   vector<double> y = promote_common<vector<double>, vector<double> >(x);
-  EXPECT_EQ(5,y.size());
+  EXPECT_EQ(5U,y.size());
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(x[i],y[i]);
   std::vector<var> z = 
     promote_common<std::vector<double>, std::vector<var> >(x);
-  EXPECT_EQ(5,z.size());
+  EXPECT_EQ(5U,z.size());
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(x[i],z[i].val());
   vector<var> w = promote_common<vector<var>, vector<var> >(z);
-  EXPECT_EQ(5,w.size());
+  EXPECT_EQ(5U,w.size());
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(x[i],w[i].val());
   
