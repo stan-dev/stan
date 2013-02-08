@@ -744,8 +744,7 @@ namespace stan {
     inline Eigen::Matrix<var,1,C> 
     columns_dot_self(const Eigen::Matrix<var,R,C>& x) {
       Eigen::Matrix<var,1,C> ret(1,x.cols());
-      size_t i;
-      for (i = 0; i < x.cols(); i++) {
+      for (size_type i = 0; i < x.cols(); i++) {
         ret(i) = var(new dot_self_vari(x.col(i)));
       }
       return ret;
@@ -1166,17 +1165,15 @@ namespace stan {
       _variRefA(A.rows(),A.cols()), _variRefB(B.rows(),B.cols()),
       _variRefC(B.rows(),B.cols())
       {
-        size_t i,j;
-        
-        for (j = 0; j < _variRefA.cols(); j++) {
-          for (i = 0; i < _variRefA.rows(); i++) {
+        for (size_type j = 0; j < _variRefA.cols(); j++) {
+          for (size_type i = 0; i < _variRefA.rows(); i++) {
             _variRefA(i,j) = A(i,j).vi_;
             _A(i,j) = A(i,j).val();
           }
         }
         
-        for (j = 0; j < _variRefB.cols(); j++) {
-          for (i = 0; i < _variRefB.rows(); i++) {
+        for (size_type j = 0; j < _variRefB.cols(); j++) {
+          for (size_type i = 0; i < _variRefB.rows(); i++) {
             _variRefB(i,j) = B(i,j).vi_;
             _C(i,j) = B(i,j).val();
           }
@@ -1184,8 +1181,8 @@ namespace stan {
         
         _C = _A.template triangularView<TriView>().solve(_C);
         
-        for (j = 0; j < _variRefC.cols(); j++) {
-          for (i = 0; i < _variRefC.rows(); i++) {
+        for (size_type j = 0; j < _variRefC.cols(); j++) {
+          for (size_type i = 0; i < _variRefC.rows(); i++) {
             _variRefC(i,j) = new vari(_C(i,j),false);
           }
         }
@@ -1196,9 +1193,8 @@ namespace stan {
         Eigen::Matrix<double,R2,C2> adjB(_variRefB.rows(),_variRefB.cols());
         Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
         
-        size_t i,j;
-        for (j = 0; j < adjC.cols(); j++)
-          for (i = 0; i < adjC.rows(); i++)
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
             adjC(i,j) = _variRefC(i,j)->adj_;
         
         
@@ -1206,21 +1202,21 @@ namespace stan {
         adjA.noalias() = -adjB*_C.transpose();
         
         if (TriView == Eigen::Lower) {
-          for (j = 0; j < adjA.cols(); j++)
-            for (i = j; i < adjA.rows(); i++)
+          for (size_type j = 0; j < adjA.cols(); j++)
+            for (size_type i = j; i < adjA.rows(); i++)
               _variRefA(i,j)->adj_ += adjA(i,j);
         }
         else if (TriView == Eigen::Upper) {
-          for (j = 0; j < adjA.cols(); j++)
-            for (i = 0; i < j+1; i++)
+          for (size_type j = 0; j < adjA.cols(); j++)
+            for (size_type i = 0; i < j+1; i++)
               _variRefA(i,j)->adj_ += adjA(i,j);
         }
         else {
           assert(TriView == Eigen::Lower || TriView == Eigen::Upper);
         }
         
-        for (j = 0; j < adjB.cols(); j++)
-          for (i = 0; i < adjB.rows(); i++)
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
             _variRefB(i,j)->adj_ += adjB(i,j);
       }
     };
@@ -1240,10 +1236,8 @@ namespace stan {
       _A(A), _C(B.rows(),B.cols()),
       _variRefB(B.rows(),B.cols()), _variRefC(B.rows(),B.cols())
       {
-        size_t i,j;
-        
-        for (j = 0; j < _variRefB.cols(); j++) {
-          for (i = 0; i < _variRefB.rows(); i++) {
+        for (size_type j = 0; j < _variRefB.cols(); j++) {
+          for (size_type i = 0; i < _variRefB.rows(); i++) {
             _variRefB(i,j) = B(i,j).vi_;
             _C(i,j) = B(i,j).val();
           }
@@ -1251,8 +1245,8 @@ namespace stan {
         
         _C = _A.template triangularView<TriView>().solve(_C);
         
-        for (j = 0; j < _variRefC.cols(); j++) {
-          for (i = 0; i < _variRefC.rows(); i++) {
+        for (size_type j = 0; j < _variRefC.cols(); j++) {
+          for (size_type i = 0; i < _variRefC.rows(); i++) {
             _variRefC(i,j) = new vari(_C(i,j),false);
           }
         }
@@ -1262,16 +1256,15 @@ namespace stan {
         Eigen::Matrix<double,R2,C2> adjB(_variRefB.rows(),_variRefB.cols());
         Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
         
-        size_t i,j;
-        for (j = 0; j < adjC.cols(); j++)
-          for (i = 0; i < adjC.rows(); i++)
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
             adjC(i,j) = _variRefC(i,j)->adj_;
         
         
         adjB = _A.template triangularView<TriView>().transpose().solve(adjC);
         
-        for (j = 0; j < adjB.cols(); j++)
-          for (i = 0; i < adjB.rows(); i++)
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
             _variRefB(i,j)->adj_ += adjB(i,j);
       }
     };
@@ -1291,10 +1284,8 @@ namespace stan {
       _A(A.rows(),A.cols()), _C(B.rows(),B.cols()),
       _variRefA(A.rows(),A.cols()), _variRefC(B.rows(),B.cols())
       {
-        size_t i,j;
-        
-        for (j = 0; j < _variRefA.cols(); j++) {
-          for (i = 0; i < _variRefA.rows(); i++) {
+        for (size_type j = 0; j < _variRefA.cols(); j++) {
+          for (size_type i = 0; i < _variRefA.rows(); i++) {
             _variRefA(i,j) = A(i,j).vi_;
             _A(i,j) = A(i,j).val();
           }
@@ -1302,8 +1293,8 @@ namespace stan {
         
         _C = _A.template triangularView<TriView>().solve(B);
         
-        for (j = 0; j < _variRefC.cols(); j++) {
-          for (i = 0; i < _variRefC.rows(); i++) {
+        for (size_type j = 0; j < _variRefC.cols(); j++) {
+          for (size_type i = 0; i < _variRefC.rows(); i++) {
             _variRefC(i,j) = new vari(_C(i,j),false);
           }
         }
@@ -1313,22 +1304,21 @@ namespace stan {
         Eigen::Matrix<double,R1,C1> adjA(_variRefA.rows(),_variRefA.cols());
         Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
         
-        size_t i,j;
-        for (j = 0; j < adjC.cols(); j++)
-          for (i = 0; i < adjC.rows(); i++)
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
             adjC(i,j) = _variRefC(i,j)->adj_;
         
         
         adjA.noalias() = -_A.template triangularView<TriView>().transpose().solve(adjC*_C.transpose());
         
         if (TriView == Eigen::Lower) {
-          for (j = 0; j < adjA.cols(); j++)
-            for (i = j; i < adjA.rows(); i++)
+          for (size_type j = 0; j < adjA.cols(); j++)
+            for (size_type i = j; i < adjA.rows(); i++)
               _variRefA(i,j)->adj_ += adjA(i,j);
         }
         else if (TriView == Eigen::Upper) {
-          for (j = 0; j < adjA.cols(); j++)
-            for (i = 0; i < j+1; i++)
+          for (size_type j = 0; j < adjA.cols(); j++)
+            for (size_type i = 0; i < j+1; i++)
               _variRefA(i,j)->adj_ += adjA(i,j);
         }
         else {
@@ -1352,10 +1342,8 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_tri_vv_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_vv_vari<TriView,R1,C1,R2,C2>(A,b);
       
-      size_t i,j;
-      
-      for (i = 0; i < res.rows(); i++)
-        for (j = 0; j < res.cols(); j++)
+      for (size_type i = 0; i < res.rows(); i++)
+        for (size_type j = 0; j < res.cols(); j++)
           res(i,j).vi_ = baseVari->_variRefC(i,j);
       
       return res;
@@ -1375,10 +1363,8 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_tri_dv_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_dv_vari<TriView,R1,C1,R2,C2>(A,b);
       
-      size_t i,j;
-      
-      for (i = 0; i < res.rows(); i++)
-        for (j = 0; j < res.cols(); j++)
+      for (size_type i = 0; i < res.rows(); i++)
+        for (size_type j = 0; j < res.cols(); j++)
           res(i,j).vi_ = baseVari->_variRefC(i,j);
       
       return res;
@@ -1398,10 +1384,8 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2>(A,b);
       
-      size_t i,j;
-      
-      for (i = 0; i < res.rows(); i++)
-        for (j = 0; j < res.cols(); j++)
+      for (size_type i = 0; i < res.rows(); i++)
+        for (size_type j = 0; j < res.cols(); j++)
           res(i,j).vi_ = baseVari->_variRefC(i,j);
       
       return res;
@@ -1415,9 +1399,8 @@ namespace stan {
       determinant_vari(const Eigen::Matrix<var,R,C> &A)
       : vari(determinant_vari_calc(A)), _A(A.rows(),A.cols()), _adjARef(A.rows(),A.cols())
       {
-        size_t i,j;
-        for (j = 0; j < A.cols(); j++) {
-          for (i = 0; i < A.rows(); i++) {
+        for (size_type j = 0; j < A.cols(); j++) {
+          for (size_type i = 0; i < A.rows(); i++) {
             _A(i,j) = A(i,j).val();
             _adjARef(i,j) = A(i,j).vi_;
           }
@@ -1427,18 +1410,16 @@ namespace stan {
       double determinant_vari_calc(const Eigen::Matrix<var,R,C> &A)
       {
         Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
-        size_t i,j;
-        for (j = 0; j < A.cols(); j++)
-          for (i = 0; i < A.rows(); i++)
+        for (size_type j = 0; j < A.cols(); j++)
+          for (size_type i = 0; i < A.rows(); i++)
             Ad(i,j) = A(i,j).val();
         return Ad.determinant();
       }
       virtual void chain() {
         Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());
-        size_t i,j;
         adjA = (adj_ * val_) * _A.inverse().transpose();
-        for (j = 0; j < _adjARef.cols(); j++) {
-          for (i = 0; i < _adjARef.rows(); i++) {
+        for (size_type j = 0; j < _adjARef.cols(); j++) {
+          for (size_type i = 0; i < _adjARef.rows(); i++) {
             _adjARef(i,j)->adj_ += adjA(i,j);
           }
         }
