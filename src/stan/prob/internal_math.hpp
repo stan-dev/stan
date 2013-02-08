@@ -15,7 +15,7 @@ namespace stan {
           
           double F = 1;
           
-          double tOld = 1;
+          //double tOld = 1;
           double tNew = 0;
           
           double logT = 0;
@@ -37,7 +37,7 @@ namespace stan {
               
               F += tNew;
               
-              tOld = tNew;
+              //tOld = tNew;
               
           }
           
