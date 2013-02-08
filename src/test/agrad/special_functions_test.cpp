@@ -1538,8 +1538,8 @@ TEST(AgradSpecialFunctions, Phi_approx) {
     var f2 = inv_logit(0.07056 * pow(a2,3.0) + 1.5976 * a2);
     f2.grad(as2,g2);
     
-    EXPECT_EQ(1,g.size());
-    EXPECT_EQ(1,g2.size());
+    EXPECT_EQ(1U,g.size());
+    EXPECT_EQ(1U,g2.size());
 
     EXPECT_FLOAT_EQ(g2[0], g[0]);
   }
