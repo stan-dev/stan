@@ -17,7 +17,7 @@ public:
     parameters.push_back(param);
     cdf.push_back(0.890465); // expected cdf
 
-    /*param[0] = 192;          // n
+    param[0] = 192;          // n
     param[1] = 42.0;         // lambda
     parameters.push_back(param);
     cdf.push_back(1.0);      // expected cdf
@@ -25,7 +25,7 @@ public:
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
-    cdf.push_back(0.04978707); // expected cdf*/
+    cdf.push_back(0.04978707); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -43,7 +43,11 @@ public:
   }
   
   bool has_lower_bound() {
-    return false;
+    return true;
+  }
+  
+  double lower_bound() {
+    return 0.0;
   }
     
   bool has_upper_bound() {
