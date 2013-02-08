@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace agrad {
-
+    typedef typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
 
     void fill(var& x, const var& y) {
       x = y;
@@ -757,8 +757,7 @@ namespace stan {
                         const Eigen::Matrix<var, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
       Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
-      size_t j;
-      for (j = 0; j < v1.cols(); ++j) {
+      for (size_type j = 0; j < v1.cols(); ++j) {
         ret(j) = var(new dot_product_vv_vari(v1.col(j),v2.col(j)));
       }
       return ret;
@@ -783,8 +782,7 @@ namespace stan {
                         const Eigen::Matrix<var, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
       Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
-      size_t j;
-      for (j = 0; j < v1.cols(); ++j) {
+      for (size_type j = 0; j < v1.cols(); ++j) {
         ret(j) = var(new dot_product_vd_vari(v2.col(j),v1.col(j)));
       }
       return ret;
@@ -943,17 +941,15 @@ namespace stan {
         _variRefA(A.rows(),A.cols()), _variRefB(B.rows(),B.cols()),
         _variRefC(B.rows(),B.cols())
       {
-        size_t i,j;
-        
-        for (j = 0; j < _variRefA.cols(); j++) {
-          for (i = 0; i < _variRefA.rows(); i++) {
+        for (size_type j = 0; j < _variRefA.cols(); j++) {
+          for (size_type i = 0; i < _variRefA.rows(); i++) {
             _variRefA(i,j) = A(i,j).vi_;
             _A(i,j) = A(i,j).val();
           }
         }
 
-        for (j = 0; j < _variRefB.cols(); j++) {
-          for (i = 0; i < _variRefB.rows(); i++) {
+        for (size_type j = 0; j < _variRefB.cols(); j++) {
+          for (size_type i = 0; i < _variRefB.rows(); i++) {
             _variRefB(i,j) = B(i,j).vi_;
             _C(i,j) = B(i,j).val();
           }
@@ -961,8 +957,8 @@ namespace stan {
         
         _C = _A.colPivHouseholderQr().solve(_C);
 
-        for (j = 0; j < _variRefC.cols(); j++) {
-          for (i = 0; i < _variRefC.rows(); i++) {
+        for (size_type j = 0; j < _variRefC.cols(); j++) {
+          for (size_type i = 0; i < _variRefC.rows(); i++) {
             _variRefC(i,j) = new vari(_C(i,j),false);
           }
         }
@@ -973,21 +969,20 @@ namespace stan {
         Eigen::Matrix<double,R2,C2> adjB(_variRefB.rows(),_variRefB.cols());
         Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
 
-        size_t i,j;
-        for (j = 0; j < adjC.cols(); j++)
-          for (i = 0; i < adjC.rows(); i++)
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
             adjC(i,j) = _variRefC(i,j)->adj_;
         
         
         adjB = _A.transpose().colPivHouseholderQr().solve(adjC);
         adjA.noalias() = -adjB*_C.transpose();
         
-        for (j = 0; j < adjA.cols(); j++)
-          for (i = 0; i < adjA.rows(); i++)
+        for (size_type j = 0; j < adjA.cols(); j++)
+          for (size_type i = 0; i < adjA.rows(); i++)
             _variRefA(i,j)->adj_ += adjA(i,j);
         
-        for (j = 0; j < adjB.cols(); j++)
-          for (i = 0; i < adjB.rows(); i++)
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
             _variRefB(i,j)->adj_ += adjB(i,j);
       }
     };
@@ -1007,10 +1002,8 @@ namespace stan {
       _A(A), _C(B.rows(),B.cols()),
       _variRefB(B.rows(),B.cols()), _variRefC(B.rows(),B.cols())
       {
-        size_t i,j;
-        
-        for (j = 0; j < _variRefB.cols(); j++) {
-          for (i = 0; i < _variRefB.rows(); i++) {
+        for (size_type j = 0; j < _variRefB.cols(); j++) {
+          for (size_type i = 0; i < _variRefB.rows(); i++) {
             _variRefB(i,j) = B(i,j).vi_;
             _C(i,j) = B(i,j).val();
           }
@@ -1018,8 +1011,8 @@ namespace stan {
         
         _C = _A.colPivHouseholderQr().solve(_C);
         
-        for (j = 0; j < _variRefC.cols(); j++) {
-          for (i = 0; i < _variRefC.rows(); i++) {
+        for (size_type j = 0; j < _variRefC.cols(); j++) {
+          for (size_type i = 0; i < _variRefC.rows(); i++) {
             _variRefC(i,j) = new vari(_C(i,j),false);
           }
         }
@@ -1029,16 +1022,15 @@ namespace stan {
         Eigen::Matrix<double,R2,C2> adjB(_variRefB.rows(),_variRefB.cols());
         Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
         
-        size_t i,j;
-        for (j = 0; j < adjC.cols(); j++)
-          for (i = 0; i < adjC.rows(); i++)
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
             adjC(i,j) = _variRefC(i,j)->adj_;
         
         
         adjB = _A.transpose().colPivHouseholderQr().solve(adjC);
         
-        for (j = 0; j < adjB.cols(); j++)
-          for (i = 0; i < adjB.rows(); i++)
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
             _variRefB(i,j)->adj_ += adjB(i,j);
       }
     };
@@ -1058,10 +1050,8 @@ namespace stan {
       _A(A.rows(),A.cols()), _C(B.rows(),B.cols()),
       _variRefA(A.rows(),A.cols()), _variRefC(B.rows(),B.cols())
       {
-        size_t i,j;
-        
-        for (j = 0; j < _variRefA.cols(); j++) {
-          for (i = 0; i < _variRefA.rows(); i++) {
+        for (size_type j = 0; j < _variRefA.cols(); j++) {
+          for (size_type i = 0; i < _variRefA.rows(); i++) {
             _variRefA(i,j) = A(i,j).vi_;
             _A(i,j) = A(i,j).val();
           }
@@ -1070,8 +1060,8 @@ namespace stan {
         
         _C = _A.colPivHouseholderQr().solve(B);
         
-        for (j = 0; j < _variRefC.cols(); j++) {
-          for (i = 0; i < _variRefC.rows(); i++) {
+        for (size_type j = 0; j < _variRefC.cols(); j++) {
+          for (size_type i = 0; i < _variRefC.rows(); i++) {
             _variRefC(i,j) = new vari(_C(i,j),false);
           }
         }
@@ -1081,15 +1071,14 @@ namespace stan {
         Eigen::Matrix<double,R1,C1> adjA(_variRefA.rows(),_variRefA.cols());
         Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
         
-        size_t i,j;
-        for (j = 0; j < adjC.cols(); j++)
-          for (i = 0; i < adjC.rows(); i++)
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
             adjC(i,j) = _variRefC(i,j)->adj_;
         
         adjA = -_A.transpose().colPivHouseholderQr().solve(adjC*_C.transpose());
         
-        for (j = 0; j < adjA.cols(); j++)
-          for (i = 0; i < adjA.rows(); i++)
+        for (size_type j = 0; j < adjA.cols(); j++)
+          for (size_type i = 0; i < adjA.rows(); i++)
             _variRefA(i,j)->adj_ += adjA(i,j);
       }
     };
@@ -1109,10 +1098,8 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_vv_vari<R1,C1,R2,C2>(A,b);
       
-      size_t i,j;
-      
-      for (i = 0; i < res.rows(); i++)
-        for (j = 0; j < res.cols(); j++)
+      for (size_type i = 0; i < res.rows(); i++)
+        for (size_type j = 0; j < res.cols(); j++)
           res(i,j).vi_ = baseVari->_variRefC(i,j);
       
       return res;
@@ -1133,10 +1120,8 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_vd_vari<R1,C1,R2,C2>(A,b);
       
-      size_t i,j;
-      
-      for (i = 0; i < res.rows(); i++)
-        for (j = 0; j < res.cols(); j++)
+      for (size_type i = 0; i < res.rows(); i++)
+        for (size_type j = 0; j < res.cols(); j++)
           res(i,j).vi_ = baseVari->_variRefC(i,j);
       
       return res;
@@ -1157,10 +1142,8 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_dv_vari<R1,C1,R2,C2>(A,b);
       
-      size_t i,j;
-      
-      for (i = 0; i < res.rows(); i++)
-        for (j = 0; j < res.cols(); j++)
+      for (size_type i = 0; i < res.rows(); i++)
+        for (size_type j = 0; j < res.cols(); j++)
           res(i,j).vi_ = baseVari->_variRefC(i,j);
       
       return res;
@@ -1476,9 +1459,8 @@ namespace stan {
       log_determinant_vari(const Eigen::Matrix<var,R,C> &A)
       : vari(log_determinant_vari_calc(A)), _A(A.rows(),A.cols()), _adjARef(A.rows(),A.cols())
       {
-        size_t i,j;
-        for (j = 0; j < A.cols(); j++) {
-          for (i = 0; i < A.rows(); i++) {
+        for (size_type j = 0; j < A.cols(); j++) {
+          for (size_type i = 0; i < A.rows(); i++) {
             _A(i,j) = A(i,j).val();
             _adjARef(i,j) = A(i,j).vi_;
           }
@@ -1488,18 +1470,16 @@ namespace stan {
       double log_determinant_vari_calc(const Eigen::Matrix<var,R,C> &A)
       {
         Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
-        size_t i,j;
-        for (j = 0; j < A.cols(); j++)
-          for (i = 0; i < A.rows(); i++)
+        for (size_type j = 0; j < A.cols(); j++)
+          for (size_type i = 0; i < A.rows(); i++)
             Ad(i,j) = A(i,j).val();
         return Ad.fullPivHouseholderQr().logAbsDeterminant();
       }
       virtual void chain() {
-        Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());
-        size_t i,j;
+        Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());        
         adjA = adj_ * _A.inverse().transpose();
-        for (j = 0; j < _adjARef.cols(); j++) {
-          for (i = 0; i < _adjARef.rows(); i++) {
+        for (size_type j = 0; j < _adjARef.cols(); j++) {
+          for (size_type i = 0; i < _adjARef.rows(); i++) {
             _adjARef(i,j)->adj_ += adjA(i,j);
           }
         }
@@ -1870,7 +1850,6 @@ namespace stan {
     inline void assign_to_var(Eigen::Matrix<LHS,R,C>& x, 
 			      const Eigen::Matrix<RHS,R,C>& y) {
       stan::math::validate_matching_sizes(x,y,"assign_to_var");
-      typedef typename Eigen::Matrix<LHS,R,C>::size_type size_type;
       for (size_type n = 0; n < x.cols(); ++n)
         for (size_type m = 0; m < x.rows(); ++m)
           assign_to_var(x(m,n),y(m,n));
