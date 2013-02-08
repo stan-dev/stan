@@ -1077,8 +1077,10 @@ public:
       vector<double> expected_gradients;
       vector<double> gradients;
 
-      calculate_gradients_with_function(parameters[n], expected_gradients);
-      calculate_gradients(parameters[n], gradients);
+      double expected_cdf = calculate_gradients_with_function(parameters[n], expected_gradients);
+      double cdf = calculate_gradients(parameters[n], gradients);
+
+      EXPECT_FLOAT_EQ(expected_cdf, cdf);
 
       ASSERT_EQ(expected_gradients.size(), gradients.size()) 
 	<< "Number of expected gradients and calculated gradients must match -- error in test fixture";
@@ -1218,7 +1220,7 @@ public:
     vector<double> expected_cdf;
     vector<vector<double> > parameters;
     TestClass.valid_values(parameters, expected_cdf);
-
+    
     if (!TestClass.has_lower_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity)
 	return;
