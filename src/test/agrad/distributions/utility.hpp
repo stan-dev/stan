@@ -11,7 +11,7 @@ using stan::is_vector;
 using stan::is_constant_struct;
 using stan::scalar_type;
 
-typedef typename Eigen::Matrix<double,1,1>::size_type size_type;
+typedef Eigen::Matrix<double,1,1>::size_type size_type;
 
 //------------------------------------------------------------
 
