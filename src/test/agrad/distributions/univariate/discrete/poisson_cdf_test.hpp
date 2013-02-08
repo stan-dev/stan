@@ -43,11 +43,7 @@ public:
   }
   
   bool has_lower_bound() {
-    return true;
-  }
-  
-  double lower_bound() {
-    return 0.0;
+    return false;
   }
     
   bool has_upper_bound() {
