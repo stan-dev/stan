@@ -233,7 +233,7 @@ int main(int argc, const char* argv[]) {
   vector<vector<string> > argument_sequence = build_argument_sequence(arguments);
   
   vector<std::ostream *> outs;
-  for (size_t n = 0; n < int(size(argument_sequence) / N_TESTS) + 1; n++) {
+  for (int n = 0; n < int(size(argument_sequence) / N_TESTS) + 1; n++) {
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
