@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace agrad {
-    typedef typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
 
     void fill(var& x, const var& y) {
       x = y;

@@ -17,7 +17,7 @@
 namespace stan {
   
   namespace math {
-    typedef typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
     // from input type F to output type T 
 
     // scalar, F != T  (base template)
