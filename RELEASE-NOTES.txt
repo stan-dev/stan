@@ -38,7 +38,7 @@ Bug Fixes
 * trapping mismatched dimension assignments in arrays, 
   matrices, and vectors
 
-Enhancments
+Enhancements
 ----------------------------------
 * user's guide chapters w. sample models
     + gaussian processes
@@ -64,11 +64,10 @@ New Functions
 ----------------------------------
 * log absolute determinant, with optimized gradients
 * probability functions
-    + multivariate normal, precision parameterizations
+    + multivariate normal, precision parameterization
 * model timing and n_eff output in CSV for all test models
 * ongoing vectorizations and reparameterizations 
   of probability functions
-    + binomial_logit
 * faster Phi_approx computing an approximate cumulative unit
   normal density
 * added dims() function to extract dimensions of arrays of scalars,
