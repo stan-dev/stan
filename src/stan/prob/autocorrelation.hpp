@@ -1,11 +1,12 @@
 #ifndef __STAN__PROB__AUTOCORRELATION_HPP__
 #define __STAN__PROB__AUTOCORRELATION_HPP__
 
+#include <stan/math/matrix.hpp>
+
 #include <vector>
 #include <complex>
 #include <unsupported/Eigen/FFT>
 
-#include <stan/math/matrix.hpp>
 
 namespace stan {
   
