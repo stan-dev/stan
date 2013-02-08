@@ -11,6 +11,8 @@ using stan::is_vector;
 using stan::is_constant_struct;
 using stan::scalar_type;
 
+typedef typename Eigen::Matrix<double,1,1>::size_type size_type;
+
 //------------------------------------------------------------
 
 struct empty {};
@@ -390,13 +392,13 @@ void add_var<vector<var> >(vector<var>& x, vector<var>& p) {
 
 template <>
 void add_var<Eigen::Matrix<var, 1, Eigen::Dynamic> >(vector<var>& x, Eigen::Matrix<var, 1, Eigen::Dynamic>& p) {
-  for (size_t n = 0; n < p.size(); n++)
+  for (size_type n = 0; n < p.size(); n++)
     x.push_back(p(n));
 }
 
 template <>
 void add_var<Eigen::Matrix<var, Eigen::Dynamic, 1> >(vector<var>& x, Eigen::Matrix<var, Eigen::Dynamic, 1>& p) {
-  for (size_t n = 0; n < p.size(); n++)
+  for (size_type n = 0; n < p.size(); n++)
     x.push_back(p(n));
 }
 
