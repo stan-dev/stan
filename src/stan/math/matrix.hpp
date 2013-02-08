@@ -17,7 +17,7 @@
 namespace stan {
   
   namespace math {
-
+    typedef typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
     // from input type F to output type T 
 
     // scalar, F != T  (base template)
@@ -886,8 +886,7 @@ namespace stan {
                         const Eigen::Matrix<double, R2, C2>& v2) {
       validate_matching_sizes(v1,v2,"columns_dot_product");
       Eigen::Matrix<double, 1, C1> ret(1,v1.cols());
-      size_t j;
-      for (j = 0; j < v1.cols(); ++j) {
+      for (size_type j = 0; j < v1.cols(); ++j) {
         ret(j) = v1.col(j).dot(v2.col(j));
       }
       return ret;
