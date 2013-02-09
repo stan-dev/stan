@@ -302,7 +302,7 @@ namespace stan {
 	  operands_and_partials.d_x1[i] -= gamma_p_derivative(n_dbl+1, lambda_dbl) / Pi;
       }
       if (!is_constant_struct<T_rate>::value) {
-	for (size_t i = 0; i < length(lambda); i++) {
+	for (size_t i = 0; i < stan::length(lambda); i++) {
 	  operands_and_partials.d_x1[i] *= P;
 	}
       }
