@@ -13,4 +13,4 @@ c(0, 0, 0)
 mu_var_prior <-
 structure(c(1E6, 0, 0, 0, 1E6, 0, 0, 0, 1E6), .Dim = c(3, 3))
 invR <-
-structure(c(10, 0, 0, 0, 10, 0, 0, 0, 10), .Dim = c(3, 3))
+structure(c(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1), .Dim = c(3, 3))
