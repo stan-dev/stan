@@ -290,10 +290,7 @@ namespace stan {
       using boost::math::gamma_q;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
-      
-      DoubleVectorView<!is_constant_struct<T_rate>::value,
-		       is_vector<T_n>::value|is_vector<T_rate>::value> 
-	dlambdas(size);
+
       for (size_t i = 0; i < size; i++) {
 	const double n_dbl = value_of(n_vec[i]);
 	const double lambda_dbl = value_of(lambda_vec[i]);
@@ -302,11 +299,11 @@ namespace stan {
 	P *= Pi;
 	
 	if (!is_constant_struct<T_rate>::value)
-	  dlambdas[i] -= gamma_p_derivative(n_dbl+1, lambda_dbl) / Pi;
+	  operands_and_partials.d_x1[i] -= gamma_p_derivative(n_dbl+1, lambda_dbl) / Pi;
       }
       if (!is_constant_struct<T_rate>::value) {
-	for (size_t i = 0; i < size; i++) {
-	  operands_and_partials.d_x1[i] += dlambdas[i] * P;
+	for (size_t i = 0; i < length(lambda); i++) {
+	  operands_and_partials.d_x1[i] *= P;
 	}
       }
       
