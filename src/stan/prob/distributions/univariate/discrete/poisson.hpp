@@ -290,24 +290,23 @@ namespace stan {
       using boost::math::gamma_q;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
-
+      
+      std::vector<double> Ps(size), dlambdas(size);
       for (size_t i = 0; i < size; i++) {
 	const double n_dbl = value_of(n_vec[i]);
 	const double lambda_dbl = value_of(lambda_vec[i]);
-        
-	const double Pi = gamma_q(n_dbl + 1, lambda_dbl);
-        
-	P *= Pi;
-        
-	if (!is_constant_struct<T_rate>::value)
-	  operands_and_partials.d_x1[i] += -gamma_p_derivative(n_dbl+1, 
-							       lambda_dbl) / Pi;
+
+	Ps[i] = gamma_q(n_dbl+1, lambda_dbl);
+	P *= Ps[i];
 	
+	if (!is_constant_struct<T_rate>::value)
+	  dlambdas[i] = gamma_p_derivative(n_dbl+1, lambda_dbl);
       }
-      
-      if (!is_constant_struct<T_rate>::value)
-	for (size_t i = 0; i < size; i++)
-	  operands_and_partials.d_x1[i] *= P;
+      if (!is_constant_struct<T_rate>::value) {
+	for (size_t i = 0; i < size; i++) {
+	  operands_and_partials.d_x1[i] -= dlambdas[i] * P / Ps[i];
+	}
+      }
       
       return operands_and_partials.to_var(P);
     }

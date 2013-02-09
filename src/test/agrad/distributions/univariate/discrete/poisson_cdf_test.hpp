@@ -1,4 +1,4 @@
-// Arguments: Int, Double
+// Arguments: Ints, Doubles
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
 #include <stan/agrad/special_functions.hpp>
 
@@ -21,7 +21,7 @@ public:
     param[1] = 42.0;         // lambda
     parameters.push_back(param);
     cdf.push_back(1.0);      // expected cdf
-
+    
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
