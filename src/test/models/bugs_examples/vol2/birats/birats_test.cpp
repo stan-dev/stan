@@ -21,11 +21,11 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
   static size_t num_iterations() {
-    return 8000U;
+    return 2000U;
   }
 
   static std::vector<size_t> skip_chains_test() {
@@ -39,7 +39,22 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("mu_beta"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 106.6));
+    expected_values.push_back(make_pair(index + 1U, 6.185));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma_y"),
+					  dims);
+    expected_values.push_back(make_pair(index, 6.136));
+    
     return expected_values;
   }
 

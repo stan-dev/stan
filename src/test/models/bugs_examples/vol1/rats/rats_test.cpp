@@ -56,7 +56,7 @@ public:
     
     index = chains->get_total_param_index(chains->param_name_to_index("sigma_y"),
 					  idxs);
-expected_values.push_back(make_pair(index, 6.086));
+    expected_values.push_back(make_pair(index, 6.086));
     
     return expected_values;
   }

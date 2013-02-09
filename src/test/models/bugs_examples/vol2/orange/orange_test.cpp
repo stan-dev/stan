@@ -61,10 +61,31 @@ public:
     index = chains->get_total_param_index(chains->param_name_to_index("sigma_C"),
 					  dims);
     expected_values.push_back(make_pair(index, 8.065));
+
+    dims[0] = 0;
+    dims.push_back(0);
+    index = chains->get_total_param_index(chains->param_name_to_index("theta"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 5.079));  // theta[1,1]
+    expected_values.push_back(make_pair(index + 1U, 5.395));  // theta[2,1]
+    expected_values.push_back(make_pair(index + 2U, 5.079));  // theta[3,1]
+    expected_values.push_back(make_pair(index + 3U, 5.441));  // theta[4,1]
+    expected_values.push_back(make_pair(index + 4U, 5.291));  // theta[5,1]
+
+    expected_values.push_back(make_pair(index + 5U, 2.134));  // theta[1,2]
+    expected_values.push_back(make_pair(index + 6U, 2.207));  // theta[2,2]
+    expected_values.push_back(make_pair(index + 7U, 2.187));  // theta[3,2]
+    expected_values.push_back(make_pair(index + 8U, 2.269));  // theta[4,2]
+    expected_values.push_back(make_pair(index + 9U, 2.299));  // theta[5,2]
+
+    expected_values.push_back(make_pair(index +10U, -5.851)); // theta[1,3]
+    expected_values.push_back(make_pair(index +11U, -5.825)); // theta[2,3]
+    expected_values.push_back(make_pair(index +12U, -5.908)); // theta[3,3]
+    expected_values.push_back(make_pair(index +13U, -5.816)); // theta[4,3]
+    expected_values.push_back(make_pair(index +14U, -5.907)); // theta[5,3]
     
     return expected_values;
   }
-
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Orange,
