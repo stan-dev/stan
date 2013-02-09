@@ -81,7 +81,7 @@ namespace stan {
             logp += multiply_log(n_vec[i], value_of(lambda_vec[i])) 
               - value_of(lambda_vec[i]);
         }
-
+	
         // gradients
         if (!is_constant_struct<T_rate>::value)
           operands_and_partials.d_x1[i] += n_vec[i] / value_of(lambda_vec[i]) - 1.0;
@@ -255,19 +255,19 @@ namespace stan {
         return P;
           
       if (!check_not_nan(function, lambda, "Rate parameter", &P, Policy()))
-	    return P;
+	return P;
           
       if (!check_nonnegative(function, lambda, "Rate parameter", &P, Policy()))
-	    return P;
+	return P;
           
       if (!(check_consistent_sizes(function, n,lambda,
 				   "Random variable","Rate parameter",
 				   &P, Policy())))
-	    return P;
+	return P;
           
       // Return if everything is constant and only proportionality is required
       if (!include_summand<propto,T_rate>::value)
-	    return 0.0;
+	return 0.0;
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -276,10 +276,12 @@ namespace stan {
           
       // Validate vector views - redundant with the above validations?
       for (size_t i = 0; i < size; i++)
-	    if (std::isinf(lambda_vec[i])) return LOG_ZERO;
+	if (std::isinf(lambda_vec[i])) 
+	  return LOG_ZERO;
           
       for (size_t i = 0; i < size; i++)
-	    if (lambda_vec[i] == 0 && n_vec[i] != 0) return LOG_ZERO;
+	if (lambda_vec[i] == 0 && n_vec[i] != 0) 
+	  return LOG_ZERO;
           
 
       // Compute vectorized CDF and gradient
@@ -288,34 +290,26 @@ namespace stan {
       using boost::math::gamma_q;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
-          
-      std::fill(operands_and_partials.all_partials,
-		operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
-          
-      for (size_t i = 0; i < size; i++) 
-	  {
 
-	    const double n_dbl = value_of(n_vec[i]);
-	    const double lambda_dbl = value_of(lambda_vec[i]);
-              
-	    const double Pi = gamma_q(n_dbl + 1, lambda_dbl);
-              
-	    P *= Pi;
-              
-	    if (!is_constant_struct<T_rate>::value)
-	      operands_and_partials.d_x1[i] += -gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
-              
-	  }
-          
       for (size_t i = 0; i < size; i++) {
-              
-	    if (!is_constant_struct<T_rate>::value)
-	      operands_and_partials.d_x1[n] *= P;
-              
-      }
-          
-      return operands_and_partials.to_var(P);
+	const double n_dbl = value_of(n_vec[i]);
+	const double lambda_dbl = value_of(lambda_vec[i]);
         
+	const double Pi = gamma_q(n_dbl + 1, lambda_dbl);
+        
+	P *= Pi;
+        
+	if (!is_constant_struct<T_rate>::value)
+	  operands_and_partials.d_x1[i] += -gamma_p_derivative(n_dbl+1, 
+							       lambda_dbl) / Pi;
+	
+      }
+      
+      if (!is_constant_struct<T_rate>::value)
+	for (size_t i = 0; i < size; i++)
+	  operands_and_partials.d_x1[i] *= P;
+      
+      return operands_and_partials.to_var(P);
     }
       
     template <bool propto, typename T_n, typename T_rate>
