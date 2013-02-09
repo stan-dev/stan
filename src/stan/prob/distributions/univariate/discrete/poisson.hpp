@@ -291,20 +291,22 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
       
-      std::vector<double> Ps(size), dlambdas(size);
+      DoubleVectorView<!is_constant_struct<T_rate>::value,
+		       is_vector<T_n>::value|is_vector<T_rate>::value> 
+	dlambdas(size);
       for (size_t i = 0; i < size; i++) {
 	const double n_dbl = value_of(n_vec[i]);
 	const double lambda_dbl = value_of(lambda_vec[i]);
 
-	Ps[i] = gamma_q(n_dbl+1, lambda_dbl);
-	P *= Ps[i];
+	const double Pi = gamma_q(n_dbl+1, lambda_dbl);
+	P *= Pi;
 	
 	if (!is_constant_struct<T_rate>::value)
-	  dlambdas[i] = gamma_p_derivative(n_dbl+1, lambda_dbl);
+	  dlambdas[i] -= gamma_p_derivative(n_dbl+1, lambda_dbl) / Pi;
       }
       if (!is_constant_struct<T_rate>::value) {
 	for (size_t i = 0; i < size; i++) {
-	  operands_and_partials.d_x1[i] -= dlambdas[i] * P / Ps[i];
+	  operands_and_partials.d_x1[i] += dlambdas[i] * P;
 	}
       }
       
