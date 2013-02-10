@@ -129,9 +129,9 @@ public:
   static void run_model() {
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::string command_output;
-      EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
-        << "Can not execute command: " << get_command(chain) << std::endl
-	<< "Output from run: " << command_output;
+      command_output = run_command(get_command(chain), elapsed_milliseconds);
+      //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
+      //<< "Can not execute command: " << get_command(chain) << std::endl;
       command_outputs.push_back(command_output);
     }
     populate_chains();
