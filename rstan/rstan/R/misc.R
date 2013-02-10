@@ -488,7 +488,11 @@ stan_rdump <- function(list, file = "", append = FALSE,
       vv <- data.matrix(vv) 
     } else if (is.list(vv)) {
       vv <- data_list2array(vv)
-    } 
+    }
+
+    if (is.logical(vv)) {
+      mode(vv) <- "integer"
+    }
     
     if (!is.numeric(vv))  next
 
