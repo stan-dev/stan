@@ -442,7 +442,7 @@ probs2str <- function(probs, digits = 1) {
 
 stan_rdump <- function(list, file = "", append = FALSE, 
                        envir = parent.frame(),
-                       width = options("width")$width) {
+                       width = options("width")$width, quiet = FALSE) {
   # Dump an R list or environment for a model data 
   # to the R dump file that Stan supports.
   #
@@ -453,6 +453,7 @@ stan_rdump <- function(list, file = "", append = FALSE,
   #   append: then TRUE, the file is opened with 
   #           mode of appending; otherwise, a new file
   #           is created.  
+  #   quiet: no warning if TRUE
   # 
   # Return:
  
@@ -460,7 +461,8 @@ stan_rdump <- function(list, file = "", append = FALSE,
     ex <- sapply(list, exists, envir = envir)
     if (!all(ex)) {
       notfound_list <- list[!ex] 
-      warning(paste("objects not found: ", paste(notfound_list, collapse = ', '), sep = '')) 
+      if (!quiet) 
+        warning(paste("objects not found: ", paste(notfound_list, collapse = ', '), sep = '')) 
     } 
     list <- list[ex] 
     if (!any(ex)) 
@@ -475,7 +477,7 @@ stan_rdump <- function(list, file = "", append = FALSE,
   }
 
   for (x in list) { 
-    if (!is_legal_stan_vname(x))
+    if (!is_legal_stan_vname(x) & !quiet)
       warning(paste("variable name ", x, " is not allowed in Stan", sep = ''))
   } 
 
@@ -488,9 +490,17 @@ stan_rdump <- function(list, file = "", append = FALSE,
       vv <- data.matrix(vv) 
     } else if (is.list(vv)) {
       vv <- data_list2array(vv)
+    } else if (is.logical(vv)) {
+      mode(vv) <- "integer"
+    } else if (is.factor(vv)) {
+      vv <- as.integer(vv)
     } 
     
-    if (!is.numeric(vv))  next
+    if (!is.numeric(vv))  {
+      if (!quiet) 
+        warning(paste0("variable ", v, " is not supported for dumping."))
+      next
+    } 
 
     if (is.vector(vv)) {
       if (length(vv) == 1) {
