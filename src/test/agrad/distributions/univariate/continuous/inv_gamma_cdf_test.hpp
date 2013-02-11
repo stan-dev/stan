@@ -1,4 +1,4 @@
-// Arguments: Double, Double
+// Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
 
 using std::vector;
@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // alpha (Shape)
     param[2] = 3.3;           // beta (Scale)
     parameters.push_back(param);
-    cdf.push_back(0.138011);  // expected CDF
+    cdf.push_back(0.138010737);  // expected CDF
 
   }
   
