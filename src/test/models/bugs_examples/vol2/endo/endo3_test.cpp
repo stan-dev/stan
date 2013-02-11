@@ -21,7 +21,7 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
   static size_t num_iterations() {
@@ -39,7 +39,17 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("beta"),
+					  dims);
+    expected_values.push_back(make_pair(index, 1.871));
+    
     return expected_values;
   }
 

@@ -8,6 +8,10 @@
   c <- array(1:18, dim = c(2, 3, 3)) 
   dump(c("a", "b", "c"), file = 'dumpabc.Rdump')
   rstan:::stan_rdump(c("a", "b", "c"), file = 'standumpabc.Rdump')
+  d <- factor(c("a", "b", "b", "a", "a"))
+  e <- factor(c(1, 3, 3, 1, 1))
+  f <- c(TRUE, TRUE, FALSE)
+  rstan:::stan_rdump(c("d", "e", "f"), file = 'standumpabc.Rdump', append = TRUE)
 
   cc <- c("# comment line 1", 
           " no comments line 1", 
@@ -123,6 +127,9 @@ test_stan_rdump <- function() {
   checkEquals(l$a, c(1, 3, 5)) 
   checkEquals(l$b, matrix(1:10, ncol = 2))
   checkEquals(l$c, array(1:18, dim = c(2, 3, 3))) 
+  checkEquals(l$d, c(1, 2, 2, 1, 1))
+  checkEquals(l$e, c(1, 2, 2, 1, 1))
+  checkEquals(l$f, c(1, 1, 0))
 } 
 
 test_seq_array_ind <- function() {

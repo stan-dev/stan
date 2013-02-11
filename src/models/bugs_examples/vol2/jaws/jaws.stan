@@ -25,12 +25,14 @@ transformed parameters {
   vector[M] mu;
   // for (m in 1:M) mu[m] <- beta0 + beta1 * (age[m] - mean_age); 
  
-  for (m in 1:M)  mu[m] <- beta0 + beta1 * age[m]; 
+  for (m in 1:M)  
+    mu[m] <- beta0 + beta1 * age[m]; 
 }  
 
 model {
   beta0 ~ normal(0, 32);
   beta1 ~ normal(0, 32);
   Sigma ~ inv_wishart(4, S); 
-  for (n in 1:N) Y[n] ~ multi_normal(mu, Sigma); 
+  for (n in 1:N) 
+    Y[n] ~ multi_normal(mu, Sigma); 
 } 

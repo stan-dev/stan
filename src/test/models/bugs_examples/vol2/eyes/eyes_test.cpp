@@ -39,7 +39,26 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("p1"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 0.6014));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("lambda"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 536.8));
+    expected_values.push_back(make_pair(index + 1U, 548.9));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
+					  dims);
+    expected_values.push_back(make_pair(index, 3.805));
+    
     return expected_values;
   }
 

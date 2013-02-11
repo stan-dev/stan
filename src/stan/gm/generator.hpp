@@ -574,6 +574,8 @@ namespace stan {
             o_ << ",";
           o_ << "lp__";
           o_ << ");" << EOL;
+	  generate_indent(2,o_);
+	  o_ << "(void) " << name << ";  // supress unused variable warning" << EOL;
           return;
         }
         if (declare_vars_) {
@@ -983,7 +985,7 @@ namespace stan {
         if (type == "matrix_v" || type == "row_vector_v" || type == "vector_v") {
           generate_indent(indents_,o_);
           o_ << "stan::agrad::fill(" << name << ",DUMMY_VAR__);" << EOL;
-        }
+        } 
       }
     };
 
@@ -1385,7 +1387,8 @@ namespace stan {
       // use this dummy for inits
       o << INDENT2 << "// Note: this is not a memory leak. Memory will be cleaned up with the arena allocator" << EOL;
       o << INDENT2 << "stan::agrad::vari* DUMMY_VARI_PTR__ = new vari(std::numeric_limits<double>::quiet_NaN(),false);" << EOL;
-      o << INDENT2 << "stan::agrad::var DUMMY_VAR__ = var(DUMMY_VARI_PTR__);" << EOL2;
+      o << INDENT2 << "stan::agrad::var DUMMY_VAR__ = var(DUMMY_VARI_PTR__);" << EOL;
+      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
 
       o << INDENT2 << "var lp__(0.0);" << EOL2;
 
@@ -2762,7 +2765,7 @@ namespace stan {
             generate_expression(read_args[j],o_);
           }
           o_ << ");" << EOL;
-          return;
+	  return;
         }
         o_ << INDENT2;
         for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";

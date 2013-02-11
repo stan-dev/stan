@@ -25,7 +25,7 @@ public:
   }
 
   static size_t num_iterations() {
-    return iterations;
+    return 10000U;
   }
 
   static std::vector<size_t> skip_chains_test() {
@@ -39,10 +39,31 @@ public:
 
   static std::vector<std::pair<size_t, double> >
   get_expected_values() {
+    using std::make_pair;
+    size_t index;
+    std::vector<size_t> dims;
+    dims.push_back(0);
+
     std::vector<std::pair<size_t, double> > expected_values;
+
+    index = chains->get_total_param_index(chains->param_name_to_index("mu"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 5.265));
+    expected_values.push_back(make_pair(index + 1U, 2.2));    
+    expected_values.push_back(make_pair(index + 2U, -5.88));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
+					  dims);
+    expected_values.push_back(make_pair(index + 0U, 0.2581));
+    expected_values.push_back(make_pair(index + 1U, 0.2679));
+    expected_values.push_back(make_pair(index + 2U, 0.2296));
+
+    index = chains->get_total_param_index(chains->param_name_to_index("sigma_C"),
+					  dims);
+    expected_values.push_back(make_pair(index, 7.853));
+    
     return expected_values;
   }
-
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_MvnOrange,
