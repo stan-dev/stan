@@ -574,6 +574,8 @@ namespace stan {
             o_ << ",";
           o_ << "lp__";
           o_ << ");" << EOL;
+	  generate_indent(2,o_);
+	  o_ << "(void) " << name << ";  // supress unused variable warning" << EOL;
           return;
         }
         if (declare_vars_) {
@@ -983,7 +985,7 @@ namespace stan {
         if (type == "matrix_v" || type == "row_vector_v" || type == "vector_v") {
           generate_indent(indents_,o_);
           o_ << "stan::agrad::fill(" << name << ",DUMMY_VAR__);" << EOL;
-        }
+        } 
       }
     };
 
@@ -2763,7 +2765,7 @@ namespace stan {
             generate_expression(read_args[j],o_);
           }
           o_ << ");" << EOL;
-          return;
+	  return;
         }
         o_ << INDENT2;
         for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
