@@ -162,12 +162,12 @@ namespace stan {
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
-        
-      if (y == 0) 
+
+      for (size_t i = 0; i < stan::length(y); i++) {
+        if (value_of(y_vec[i]) == 0) 
           return operands_and_partials.to_var(0.0);
-      if (y == std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(1.0);
-          
+      }
+        
       // Compute CDF and its gradients
       using stan::math::value_of;
       using boost::math::gamma_p_derivative;
@@ -192,6 +192,12 @@ namespace stan {
       // Compute vectorized CDF and gradient
       for (size_t n = 0; n < N; n++) {
               
+        // Explicit results for extreme values
+        // The gradients are technically ill-defined, but treated as zero
+        if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
+          continue;
+        }
+
         // Pull out values
         const double y_dbl = value_of(y_vec[n]);
         const double y_inv_dbl = 1.0 / y_dbl;
