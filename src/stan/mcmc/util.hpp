@@ -98,6 +98,49 @@ namespace stan {
         m[i] += 0.5 * epsilon * step_sizes[i] * g[i];
       return logp;
     }
+      
+      // Uses a nondiagonal mass matrix to conduct leapfrog
+      double nondiag_leapfrog(stan::model::prob_grad& model,
+                              std::vector<int> z,
+                              const Eigen::MatrixXd& _cov_L,
+                              std::vector<double>& x, std::vector<double>& m,
+                              std::vector<double>& g, double epsilon,
+                              std::ostream* error_msgs = 0,
+                              std::ostream* output_msgs = 0) {
+          Eigen::Map<Eigen::VectorXd> x_mat(&x[0],x.size());
+          Eigen::Map<Eigen::VectorXd> m_mat(&m[0],m.size());
+          Eigen::Map<Eigen::VectorXd> g_mat(&g[0],g.size());
+          m_mat += (0.5 * epsilon) * (_cov_L.transpose().triangularView<Eigen::Upper>() * g_mat);
+          x_mat += epsilon * (_cov_L.triangularView<Eigen::Lower>() * m_mat);
+          double logp;
+          try {
+              logp = model.grad_log_prob(x, z, g, output_msgs);
+          } catch (std::domain_error e) {
+              write_error_msgs(error_msgs,e);
+              logp = -std::numeric_limits<double>::infinity();
+          }
+          m_mat += (0.5 * epsilon) * (_cov_L.transpose().triangularView<Eigen::Upper>() * g_mat);
+          return logp;
+      }
+      
+      
+      void read_cov(std::string& cov_file,
+                    Eigen::MatrixXd& cov_L)
+      {
+          std::fstream cov_stream(cov_file.c_str());
+          for(int i = 0; i < cov_L.rows(); i++){
+              for(int j=0; j< cov_L.cols(); j++){
+                  cov_stream >> cov_L(i,j);
+              }
+          }
+          //cov_stream.read((char *)_cov_L.data(), sizeof(Eigen::MatrixXd::Scalar)*_cov_L.size());
+          // stan::io::dump data_var_context(mass_stream);
+          cov_stream.close();
+          cov_L = cov_L.selfadjointView<Eigen::Upper>().llt().matrixL();
+          
+      }
+
+
 
     // this is for eventual gibbs sampler for discrete
     int sample_unnorm_log(std::vector<double> probs, 

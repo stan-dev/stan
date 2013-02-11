@@ -22,6 +22,8 @@
 //#include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
 #include <stan/mcmc/nuts_diag.hpp>
+#include <stan/mcmc/nuts_nondiag.hpp>
+#include <stan/mcmc/nuts_massgiven.hpp>
 //#include <stan/model/prob_grad_ad.hpp>
 //#include <stan/model/prob_grad.hpp>
 //#include <stan/mcmc/sampler.hpp>
@@ -145,6 +147,14 @@ namespace stan {
       print_help_option(&std::cout,
                         "point_estimate","",
                         "Fit point estimate of hidden parameters by maximizing log joint probability");
+      
+      print_help_option(&std::cout,
+                          "nondiag_mass","",
+                          "Use a nondiagonal matrix to do the sampling");
+        
+        print_help_option(&std::cout,
+                          "cov_matrix","file",
+                          "Preset an estimated covariance matrix");
       
       std::cout << std::endl;
     }
@@ -298,6 +308,11 @@ namespace stan {
       int refresh = num_iterations / 200;
       refresh = refresh <= 0 ? 1 : refresh; // just for default
       command.val("refresh",refresh);
+        
+      bool nondiag_mass = command.has_flag("nondiag_mass");
+    
+        std::string cov_file = "";
+        command.val("cov_matrix", cov_file);
 
       unsigned int random_seed = 0;
       if (command.has_key("seed")) {
@@ -555,7 +570,55 @@ namespace stan {
       write_comment_property(sample_stream,"gamma",gamma);
       write_comment(sample_stream);
 
-      if (leapfrog_steps < 0 && !equal_step_sizes) {
+        
+        clock_t start = clock();
+        if (cov_file != ""){
+            stan::mcmc::nuts_massgiven<rng_t> nuts_massgiven_sampler(model,
+                                                                     cov_file,
+                                                                     max_treedepth, epsilon,
+                                                                     epsilon_pm, epsilon_adapt,
+                                                                     delta, gamma,
+                                                                     base_rng, &params_r,
+                                                                     &params_i);
+            
+            // cut & paste (see below) to enable sample-specific params
+            if (!append_samples) {
+                sample_stream << "lp__,"; // log probability first
+                nuts_massgiven_sampler.write_sampler_param_names(sample_stream);
+                model.write_csv_header(sample_stream);
+            }
+            nuts_massgiven_sampler.set_error_stream(std::cout);  // cout intended
+            nuts_massgiven_sampler.set_output_stream(std::cout);
+            
+            sample_from(nuts_massgiven_sampler,epsilon_adapt,refresh,
+                        num_iterations,num_warmup,num_thin,save_warmup,
+                        sample_stream,params_r,params_i,
+                        model);//Yuanjun add a comment here to allow nondiag_mass matrix
+            
+            }
+        else if (nondiag_mass){
+            stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,
+                                                                 max_treedepth, epsilon,
+                                                                 epsilon_pm, epsilon_adapt,
+                                                                 delta, gamma,
+                                                                 base_rng, &params_r,
+                                                                 &params_i);
+            
+            // cut & paste (see below) to enable sample-specific params
+            if (!append_samples) {
+                sample_stream << "lp__,"; // log probability first
+                nuts_nondiag_sampler.write_sampler_param_names(sample_stream);
+                model.write_csv_header(sample_stream);
+            }
+            nuts_nondiag_sampler.set_error_stream(std::cout);  // cout intended
+            nuts_nondiag_sampler.set_output_stream(std::cout);
+            
+            sample_from(nuts_nondiag_sampler,epsilon_adapt,refresh,
+                        num_iterations,num_warmup,num_thin,save_warmup,
+                        sample_stream,params_r,params_i,
+                        model);//Yuanjun add a comment here to allow nondiag_mass matrix
+     }
+     else if (leapfrog_steps < 0 && !equal_step_sizes) {
         // NUTS II (with varying step size estimation during warmup)
         stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
                                                    max_treedepth, epsilon, 
@@ -626,6 +689,9 @@ namespace stan {
                     sample_stream,params_r,params_i,
                     model);
       }
+        clock_t end = clock();
+        double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        std::cout<<"used " << deltaT << " seconds" <<std::endl;
       
       sample_stream.close();
       std::cout << std::endl << std::endl;
