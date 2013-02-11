@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <fstream>
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/mersenne_twister.hpp>
