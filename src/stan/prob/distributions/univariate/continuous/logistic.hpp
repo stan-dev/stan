@@ -36,7 +36,7 @@ namespace stan {
 
       // set up return value accumulator
       double logp(0.0);
-
+        
       // validate args (here done over var, which should be OK)      
       if (!check_finite(function, y, "Random variable", &logp, Policy()))
         return logp;
@@ -155,6 +155,7 @@ namespace stan {
           // Error checks
           static const char* function = "stan::prob::logistic_cdf(%1%)";
           
+          using stan::math::check_not_nan;
           using stan::math::check_positive;
           using stan::math::check_finite;
           using stan::math::check_consistent_sizes;
@@ -163,7 +164,7 @@ namespace stan {
           
           double P(1.0);
           
-          if (!check_finite(function, y, "Random variable", &P, Policy()))
+          if (!check_not_nan(function, y, "Random variable", &P, Policy()))
               return P;
           
           if (!check_finite(function, mu, "Location parameter", &P, Policy()))
@@ -191,10 +192,24 @@ namespace stan {
           std::fill(operands_and_partials.all_partials,
                     operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
           
+          // Explicit return for extreme values
+          // The gradients are technically ill-defined, but treated as zero
+          
+          for (size_t i = 0; i < stan::length(y); i++) {
+              if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
+                  return operands_and_partials.to_var(0.0);
+          }
+          
           // Compute vectorized CDF and its gradients
           using stan::math::value_of;
           
           for (size_t n = 0; n < N; n++) {
+              
+              // Explicit results for extreme values
+              // The gradients are technically ill-defined, but treated as zero
+              if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
+                  continue;
+              }
               
               // Pull out values
               const double y_dbl = value_of(y_vec[n]);
@@ -221,18 +236,17 @@ namespace stan {
               
           }
           
-          for (size_t n = 0; n < N; n++) {
-              
-              if (!is_constant_struct<T_y>::value)
-                  operands_and_partials.d_x1[n] *= P;
-              
-              if (!is_constant_struct<T_loc>::value)
-                  operands_and_partials.d_x2[n] *= P;
-              
-              if (!is_constant_struct<T_scale>::value)
-                  operands_and_partials.d_x3[n] *= P;
-              
-          }        
+          if (!is_constant_struct<T_y>::value) {
+              for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+          }
+          
+          if (!is_constant_struct<T_loc>::value) {
+              for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
+          }
+          
+          if (!is_constant_struct<T_scale>::value) {
+              for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
+          }
           
           return operands_and_partials.to_var(P);
           
