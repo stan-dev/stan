@@ -205,6 +205,7 @@ namespace stan {
           using stan::math::check_consistent_sizes;
           using stan::math::check_greater_or_equal;
           using stan::math::check_less_or_equal;
+          using stan::math::check_nonnegative;
           
           using boost::math::tools::promote_args;
           
@@ -225,7 +226,7 @@ namespace stan {
           if (!check_not_nan(function, y, "Random variable", &P, Policy()))
               return P;
           
-          if (!check_positive(function, y, "Random variable", &P, Policy())) 
+          if (!check_nonnegative(function, y, "Random variable", &P, Policy())) 
               return P;
           
           if (!(check_consistent_sizes(function, y, alpha, beta,
@@ -244,12 +245,20 @@ namespace stan {
           std::fill(operands_and_partials.all_partials,
                     operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
           
+          // Explicit return for extreme values
+          // The gradients are technically ill-defined, but treated as zero
+          
+          for (size_t i = 0; i < stan::length(y); i++) {
+              if (value_of(y_vec[i]) == 0) 
+                  return operands_and_partials.to_var(0.0);
+          }
+          
           // Compute CDF and its gradients
           using stan::math::value_of;
           using boost::math::gamma_p_derivative;
           using boost::math::gamma_q;
           using boost::math::digamma;
-	  using boost::math::tgamma;
+	      using boost::math::tgamma;
           
           // Cache a few expensive function calls if nu is a parameter
           DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value> gamma_vec(stan::length(alpha));
@@ -267,6 +276,12 @@ namespace stan {
           
           // Compute vectorized CDF and gradient
           for (size_t n = 0; n < N; n++) {
+              
+              // Explicit results for extreme values
+              // The gradients are technically ill-defined, but treated as zero
+              if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
+                  continue;
+              }
               
               // Pull out values
               const double y_dbl = value_of(y_vec[n]);
@@ -293,17 +308,16 @@ namespace stan {
               
           }
           
-          for (size_t n = 0; n < N; n++) {
-              
-              if (!is_constant_struct<T_y>::value)
-                  operands_and_partials.d_x1[n] *= P;
-              
-              if (!is_constant_struct<T_shape>::value)
-                  operands_and_partials.d_x2[n] *= P;
-              
-              if (!is_constant_struct<T_scale>::value)
-                  operands_and_partials.d_x3[n] *= P;
-              
+          if (!is_constant_struct<T_y>::value) {
+            for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+          }
+          
+          if (!is_constant_struct<T_shape>::value) {
+            for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
+          }
+          
+          if (!is_constant_struct<T_scale>::value) {
+              for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
           }
           
           return operands_and_partials.to_var(P);
