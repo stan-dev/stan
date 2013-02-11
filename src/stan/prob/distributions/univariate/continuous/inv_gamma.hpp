@@ -76,7 +76,7 @@ namespace stan {
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_shape,T_scale>::value)
-	return 0.0;
+	    return 0.0;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
