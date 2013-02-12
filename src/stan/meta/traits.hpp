@@ -51,6 +51,13 @@ namespace stan {
     enum { value = is_constant_struct<T>::value };
   };
 
+  template <typename T, int R, int C>
+  struct is_constant_struct<Eigen::Block<Eigen::Matrix<T,R,C> > > {
+    enum { value = is_constant_struct<T>::value };
+  };
+
+
+
 
   // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
 
