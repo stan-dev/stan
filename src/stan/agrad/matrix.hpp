@@ -1865,6 +1865,11 @@ namespace stan {
     
     
     template <typename LHS, typename RHS>
+    inline void assign(Eigen::Block<LHS> var, const RHS& val) {
+      assigner<needs_promotion<Eigen::Block<LHS>,RHS>::value, Eigen::Block<LHS>, RHS>::assign(var,val);
+    }
+    
+    template <typename LHS, typename RHS>
     inline void assign(LHS& var, const RHS& val) {
       assigner<needs_promotion<LHS,RHS>::value, LHS, RHS>::assign(var,val);
     }
