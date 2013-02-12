@@ -1,4 +1,4 @@
-// Arguments: Double, Double
+// Arguments: Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/inv_chi_square.hpp>
 
 using std::vector;
