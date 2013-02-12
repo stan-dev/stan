@@ -82,6 +82,8 @@ public:
     expected_help_options.push_back("save_warmup");
     expected_help_options.push_back("test_grad");
     expected_help_options.push_back("point_estimate");
+    expected_help_options.push_back("nondiag_mass");
+    expected_help_options.push_back("cov_matrix");
 
     expected_output.push_back(make_pair("data","(specified model requires no data)"));
     expected_output.push_back(make_pair("init", "random initialization"));
