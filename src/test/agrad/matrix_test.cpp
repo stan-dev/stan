@@ -4746,6 +4746,7 @@ TEST(AgradMatrix, promoter) {
 
 
 }
+
 TEST(MathMatrix,getAssignRow) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -4755,13 +4756,13 @@ TEST(MathMatrix,getAssignRow) {
   Matrix<double,Dynamic,Dynamic> m(2,3);
   m << 1, 2, 3, 4, 5, 6;
   
-  Matrix<double,Dynamic,1> v(3);
-  v << 10, 100, 1000;
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 10, 100, 1000;
   
-  assign(get_base1(m,1,"m",1),v);
+  assign(get_base1(m,1,"m",1),rv);  
   EXPECT_FLOAT_EQ(10.0, m(0,0));
   EXPECT_FLOAT_EQ(100.0, m(0,1));
-  EXPECT_FLOAT_EQ(10000.0, m(0,2));
+  EXPECT_FLOAT_EQ(1000.0, m(0,2));
 }
 
 

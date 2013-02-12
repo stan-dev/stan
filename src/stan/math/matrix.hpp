@@ -528,13 +528,13 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>
+    Eigen::Block<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
     get_base1(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
               size_t m,
               const char* error_msg,
               size_t idx) {
       check_range(x.rows(),m,error_msg,idx);
-      return x.row(m - 1);
+      return x.block(m-1,0,1,x.cols());
     }
 
     /**
