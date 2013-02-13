@@ -788,6 +788,13 @@ Testing
 RStan / PStan / MStan / Command Line
 ======================================================================
 
+* (RStan) Expose to R for a model:
+    -- log prob and gradient functions
+    -- inits -> unconstrained param transform
+    -- results -> constrained param transform
+  Then users could do all sorts of things just with our models,
+  like run optimizers, Metropolis, etc.
+
 * (Rstan) I/O functions to read in the output produced by
   command-line Stan (or write-to file RStan)
 
