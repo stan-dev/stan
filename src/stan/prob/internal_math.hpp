@@ -104,10 +104,14 @@ namespace stan {
           
           int k = 0;
           double tOld = 1.0;
-          double tNew = (a * b) / c;
+          double tNew = 0;
           
-          while(fabs(tNew) > precision)
+          while( (fabs(tNew) > precision) || (k == 0) )
           {
+              
+              tNew = ( (a + k) / (c + k) ) * ( (b + k) / (double)(k + 1) ) * z * tOld;
+
+              if(tNew == 0) break;
               
               gradAold = tNew * (gradAold / tOld + 1.0 / (a + k) );
               gradCold = tNew * (gradCold / tOld - 1.0 / (c + k) );              
@@ -117,10 +121,8 @@ namespace stan {
               
               ++k;
               
-              tNew = ( (a + k) / (c + k) ) * ( (b + k) / (k + 1) ) * z * tOld;
-              
-              if(tNew == 0) break;
-              
+              tOld = tNew;
+
           }
           
       }
@@ -142,7 +144,7 @@ namespace stan {
           double dF2 = 0;
           
           grad2F1(dF1, dF2, a + b, 1, a + 1, z);
-          
+
           g1 = (c1 - 1.0 / a) * c3 + C * (dF1 + dF2);
           g2 = c2 * c3 + C * dF1;
           
