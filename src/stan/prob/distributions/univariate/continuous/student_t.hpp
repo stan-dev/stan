@@ -284,8 +284,9 @@ namespace stan {
               }
               else
               {
-
+                  
                   double z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+                  zJacobian *= -1;
                   
                   const double Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
                   
@@ -295,7 +296,7 @@ namespace stan {
                   
                   if (!is_constant_struct<T_y>::value)
                       operands_and_partials.d_x1[n] 
-                        += - zJacobian * d_ibeta * J * sigma_inv / Pn;
+                        += zJacobian * d_ibeta * J * sigma_inv / Pn;
                   
                   if (!is_constant_struct<T_dof>::value) {
                       
@@ -306,17 +307,17 @@ namespace stan {
                                      digammaHalf, digammaNu_vec[n], digammaNuPlusHalf_vec[n], betaNuHalf_vec[n]);
                       
                       operands_and_partials.d_x2[n] 
-                        += - zJacobian * ( - d_ibeta * (r / t) * (r / t) + 0.5 * g2 ) / Pn;
+                        += zJacobian * ( - d_ibeta * (r / t) * (r / t) + 0.5 * g2 ) / Pn;
                       
                   }
                   
                   if (!is_constant_struct<T_loc>::value)
                       operands_and_partials.d_x3[n] 
-                        += zJacobian * d_ibeta * J * sigma_inv / Pn;
+                        += - zJacobian * d_ibeta * J * sigma_inv / Pn;
                   
                   if (!is_constant_struct<T_scale>::value)
                       operands_and_partials.d_x4[n] 
-                        += zJacobian * d_ibeta * J * sigma_inv * t / Pn;
+                        += - zJacobian * d_ibeta * J * sigma_inv * t / Pn;
                   
               }
 
