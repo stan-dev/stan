@@ -158,8 +158,6 @@ int stanc_helper(int argc, const char* argv[],
   } catch (const std::invalid_argument& e) {
     if (err_stream) {
       *err_stream << std::endl
-                  << "INVALID COMMAND-LINE ARGUMENT"
-                  << std::endl
                   << e.what()
                   << std::endl;
       *err_stream << "Execute \"stanc --help\" for more information" 
@@ -170,8 +168,6 @@ int stanc_helper(int argc, const char* argv[],
   } catch (const std::exception& e) {
     if (err_stream) {
       *err_stream << std::endl
-                  << "ERROR PARSING"
-                  << std::endl
                   << e.what()
                   << std::endl;
     }
