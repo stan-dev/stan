@@ -579,13 +579,12 @@ namespace stan {
         
       clock_t start = clock();
       if (cov_file != ""){
-        stan::mcmc::nuts_massgiven<rng_t> nuts_massgiven_sampler(model,
+        stan::mcmc::nuts_massgiven<rng_t> nuts_massgiven_sampler(model,params_r,params_i,
                                                                  cov_file,
                                                                  max_treedepth, epsilon,
                                                                  epsilon_pm, epsilon_adapt,
                                                                  delta, gamma,
-                                                                 base_rng, &params_r,
-                                                                 &params_i);
+                                                                 base_rng);
             
         // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
@@ -603,12 +602,11 @@ namespace stan {
             
       }
       else if (nondiag_mass){
-        stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,
+        stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,params_r,params_i,
                                                              max_treedepth, epsilon,
                                                              epsilon_pm, epsilon_adapt,
                                                              delta, gamma,
-                                                             base_rng, &params_r,
-                                                             &params_i);
+                                                             base_rng);
             
         // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
@@ -626,12 +624,11 @@ namespace stan {
       }
       else if (leapfrog_steps < 0 && !equal_step_sizes) {
         // NUTS II (with varying step size estimation during warmup)
-        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
+        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model,params_r,params_i, 
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
                                                    delta, gamma, 
-                                                   base_rng, &params_r,
-                                                   &params_i);
+                                                   base_rng);
 
         // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
@@ -650,12 +647,11 @@ namespace stan {
       } else if (leapfrog_steps < 0 && equal_step_sizes) {
 
         // NUTS I (equal step sizes)
-        stan::mcmc::nuts<rng_t> nuts_sampler(model, 
+        stan::mcmc::nuts<rng_t> nuts_sampler(model,params_r,params_i,
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
-                                             base_rng, &params_r,
-                                             &params_i);
+                                             base_rng);
 
         nuts_sampler.set_error_stream(std::cout);
         nuts_sampler.set_output_stream(std::cout); // cout intended
@@ -674,12 +670,11 @@ namespace stan {
       } else {
 
         // STANDARD HMC
-        stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
+        stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,params_r,params_i,
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,
                                                     delta, gamma,
-                                                    base_rng, &params_r,
-                                                    &params_i);
+                                                    base_rng);
 
         hmc_sampler.set_error_stream(std::cout); // intended
         hmc_sampler.set_output_stream(std::cout);
