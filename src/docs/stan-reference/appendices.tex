@@ -1092,7 +1092,7 @@ data {
 }
 model {
   for (n in 1:N) {
-    if (y[n] == 0)
+    if (y[n] == 0) {
       lp__ <- lp__ + log_sum_exp(bernoulli_log(1,theta),
                                  bernoulli_log(0,theta) 
                                     + poisson_log(0));
