@@ -574,8 +574,8 @@ namespace stan {
             o_ << ",";
           o_ << "lp__";
           o_ << ");" << EOL;
-	  generate_indent(2,o_);
-	  o_ << "(void) " << name << ";  // supress unused variable warning" << EOL;
+          generate_indent(2,o_);
+          o_ << "(void) " << name << ";  // supress unused variable warning" << EOL;
           return;
         }
         if (declare_vars_) {
@@ -2083,8 +2083,6 @@ namespace stan {
       o << INDENT << "void transform_inits(const stan::io::var_context& context__," << EOL;
       o << INDENT << "                     std::vector<int>& params_i__," << EOL;
       o << INDENT << "                     std::vector<double>& params_r__) {" << EOL;
-      o << INDENT2 << "params_r__.clear();" << EOL;
-      o << INDENT2 << "params_i__.clear();" << EOL;
       o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
@@ -2765,7 +2763,7 @@ namespace stan {
             generate_expression(read_args[j],o_);
           }
           o_ << ");" << EOL;
-	  return;
+          return;
         }
         o_ << INDENT2;
         for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
