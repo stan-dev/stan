@@ -3,6 +3,11 @@ bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
+.PRECIOUS: bin/print$(EXE)
+bin/print$(EXE) : bin/stan/command/print.o
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< 
+
 ##
 # Generate dependencies for bin/stanc
 ##
