@@ -43,9 +43,8 @@ namespace stan {
       chainable() { }
 
       /**
-       * Throws a logic exception.  Chainables are not destructible by
-       * clients because the vari stack manages all memory for
-       * auto-dif.
+       * Chainables are not destructible and should go on the function
+       * call stack or be allocated with operator new.
        */
       ~chainable() { 
         // handled automatically
@@ -153,7 +152,7 @@ namespace stan {
        * @throw Logic exception always.
        */
       ~vari() { 
-        throw std::logic_error("vari destruction handled automatically");
+        // throw std::logic_error("vari destruction handled automatically");
       }
 
       /**
