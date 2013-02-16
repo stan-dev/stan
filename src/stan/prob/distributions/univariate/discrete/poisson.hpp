@@ -242,7 +242,6 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -251,39 +250,26 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      if (!check_nonnegative(function, n, "Random variable", &P, Policy()))
-        return P;
-          
       if (!check_not_nan(function, lambda, "Rate parameter", &P, Policy()))
-	return P;
+          return P;
           
       if (!check_nonnegative(function, lambda, "Rate parameter", &P, Policy()))
-	return P;
+          return P;
           
       if (!(check_consistent_sizes(function, n,lambda,
 				   "Random variable","Rate parameter",
 				   &P, Policy())))
-	return P;
+          return P;
           
       // Return if everything is constant and only proportionality is required
       if (!include_summand<propto,T_rate>::value)
-	return 0.0;
+          return 0.0;
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
       VectorView<const T_rate> lambda_vec(lambda);
       size_t size = max_size(n, lambda);
           
-      // Validate vector views - redundant with the above validations?
-      for (size_t i = 0; i < size; i++)
-	if (std::isinf(lambda_vec[i])) 
-	  return LOG_ZERO;
-          
-      for (size_t i = 0; i < size; i++)
-	if (lambda_vec[i] == 0 && n_vec[i] != 0) 
-	  return LOG_ZERO;
-          
-
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
       using boost::math::gamma_p_derivative;
@@ -291,23 +277,43 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
-      for (size_t i = 0; i < size; i++) {
-	const double n_dbl = value_of(n_vec[i]);
-	const double lambda_dbl = value_of(lambda_vec[i]);
-
-	const double Pi = gamma_q(n_dbl+1, lambda_dbl);
-	P *= Pi;
-	
-	if (!is_constant_struct<T_rate>::value)
-	  operands_and_partials.d_x1[i] -= gamma_p_derivative(n_dbl+1, lambda_dbl) / Pi;
+      std::fill(operands_and_partials.all_partials,
+                  operands_and_partials.all_partials 
+                  + operands_and_partials.nvaris, 0.0);
+        
+      // Explicit return for extreme values
+      // The gradients are technically ill-defined, but treated as zero
+      for (size_t i = 0; i < stan::length(n); i++) {
+          if (value_of(n_vec[i]) < 0) 
+              return operands_and_partials.to_var(0.0);
       }
+        
+      for (size_t i = 0; i < size; i++) {
+          
+          // Explicit results for extreme values
+          // The gradients are technically ill-defined, but treated as zero
+          if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity()) {
+              continue;
+          }
+          
+          const double n_dbl = value_of(n_vec[i]);
+          const double lambda_dbl = value_of(lambda_vec[i]);
+
+          const double Pi = gamma_q(n_dbl+1, lambda_dbl);
+          P *= Pi;
+	
+          if (!is_constant_struct<T_rate>::value) {
+              operands_and_partials.d_x1[i] -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          }
+
+      }
+      
       if (!is_constant_struct<T_rate>::value) {
-	for (size_t i = 0; i < stan::length(lambda); i++) {
-	  operands_and_partials.d_x1[i] *= P;
-	}
+          for(size_t i = 0; i < stan::length(lambda); ++i) operands_and_partials.d_x1[i] *= P;
       }
       
       return operands_and_partials.to_var(P);
+      
     }
       
     template <bool propto, typename T_n, typename T_rate>
