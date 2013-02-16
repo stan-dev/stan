@@ -279,9 +279,6 @@ namespace stan {
           double P(1.0);
           
           // Validate arguments
-          if (!check_bounded(function, n, 0, 1, "n", &P, Policy()))
-              return P;
-          
           if (!check_finite(function, theta, "Probability parameter", &P, Policy()))
               return P;
           
@@ -306,51 +303,60 @@ namespace stan {
           
           // Compute vectorized CDF and gradient
           using stan::math::value_of;
-          using boost::math::ibetac;
-          using boost::math::ibeta_derivative;
-          
           agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
-          for (size_t i = 0; i < size; i++) {
-              
-              const double n_dbl = value_of(n_vec[i]);
-              const double theta_dbl = value_of(theta_vec[i]);
-              
-              const double Pi = ibetac(n_dbl + 1, 1 - n_dbl, theta_dbl);
-              
-              P *= Pi;
-              
-              if (!is_constant_struct<T_prob>::value)
-                  operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl + 1, 1 - n_dbl, theta_dbl) / Pi;
-              
+          std::fill(operands_and_partials.all_partials,
+                    operands_and_partials.all_partials 
+                    + operands_and_partials.nvaris, 0.0);
+          
+          // Explicit return for extreme values
+          // The gradients are technically ill-defined, but treated as zero
+          for (size_t i = 0; i < stan::length(n); i++) {
+              if (value_of(n_vec[i]) < 0) 
+                  return operands_and_partials.to_var(0.0);
           }
           
           for (size_t i = 0; i < size; i++) {
+          
+              // Explicit results for extreme values
+              // The gradients are technically ill-defined, but treated as zero
+              if (value_of(n_vec[i]) >= 1) continue;
+              else {
+
+                  const double Pi = 1 - value_of(theta_vec[i]);
               
-              if (!is_constant_struct<T_prob>::value)
-                  operands_and_partials.d_x1[i] *= P;
+                  P *= Pi;
+              
+                  if (!is_constant_struct<T_prob>::value)
+                      operands_and_partials.d_x1[i] += - 1 / Pi;
+                  
+              }
               
           }
           
-          return P;
+          if (!is_constant_struct<T_prob>::value) {
+              for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
+          }
+          
+          return operands_and_partials.to_var(P);
 
       }
       
-      template <bool propto, typename T_y, typename T_prob>
+      template <bool propto, typename T_n, typename T_prob>
       inline typename return_type<T_prob>::type
-      bernoulli_cdf(const T_y& n, const T_prob& theta) {
-          return bernoulli_log<propto>(n, theta, stan::math::default_policy());
+      bernoulli_cdf(const T_n& n, const T_prob& theta) {
+          return bernoulli_cdf<propto>(n, theta, stan::math::default_policy());
       }
       
-      template <typename T_y, typename T_prob, class Policy>
+      template <typename T_n, typename T_prob, class Policy>
       inline typename return_type<T_prob>::type
-      bernoulli_cdf(const T_y& n, const T_prob& theta, const Policy&) {
+      bernoulli_cdf(const T_n& n, const T_prob& theta, const Policy&) {
           return bernoulli_cdf<false>(n, theta, Policy());
       }
       
-      template <typename T_y, typename T_prob>
+      template <typename T_n, typename T_prob>
       inline typename return_type<T_prob>::type
-      bernoulli_cdf(const T_y& n, const T_prob& theta) {
+      bernoulli_cdf(const T_n& n, const T_prob& theta) {
           return bernoulli_cdf<false>(n, theta, stan::math::default_policy());
       }
 
