@@ -315,10 +315,6 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      if (!check_bounded(function, n, 0, N, "Successes variable", &P, 
-                         Policy()))
-        return P;
-          
       if (!check_nonnegative(function, N, "Population size parameter", &P,
                              Policy()))
         return P;
@@ -334,10 +330,10 @@ namespace stan {
       if (!(check_consistent_sizes(function, n, N, theta, 
                                     "Successes variable", "Population size parameter", "Probability parameter",
                                     &P, Policy())))
-          return P;
+        return P;
           
       // Return if everything constant and propto
-      if (!include_summand<propto,T_prob>::value)
+      if (!include_summand<propto, T_prob>::value)
         return 0.0;
           
       // Wrap arguments in vector views
@@ -348,7 +344,7 @@ namespace stan {
           
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      using boost::math::ibetac;
+      using boost::math::ibeta;
       using boost::math::ibeta_derivative;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
@@ -357,29 +353,44 @@ namespace stan {
                 operands_and_partials.all_partials 
                 + operands_and_partials.nvaris, 0.0);
           
+      // Explicit return for extreme values
+      // The gradients are technically ill-defined, but treated as zero
+      for (size_t i = 0; i < stan::length(n); i++) {
+        if (value_of(n_vec[i]) <= 0) 
+            return operands_and_partials.to_var(0.0);
+      }
+        
       for (size_t i = 0; i < size; i++) {
               
+        // Explicit results for extreme values
+        // The gradients are technically ill-defined, but treated as zero
+        if (value_of(n_vec[i]) >= value_of(N_vec[i])) {
+            continue;
+        }
+          
         const double n_dbl = value_of(n_vec[i]);
         const double N_dbl = value_of(N_vec[i]);
         const double theta_dbl = value_of(theta_vec[i]);
-              
 
-        const double Pi = ibetac(n_dbl + 1, N_dbl - n_dbl, theta_dbl);
-
+        const double Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+          
+          std::cout << i << "\t" << Pi << std::endl;
+          
         P *= Pi;
 
         if (!is_constant_struct<T_prob>::value)
-            operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl + 1, N_dbl - n_dbl, theta_dbl) / Pi;
+            operands_and_partials.d_x1[i] 
+              += - ibeta_derivative(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl) / Pi;
           
               
       }
           
-      for (size_t i = 0; i < size; i++) {
-        if (!is_constant_struct<T_prob>::value)
-          operands_and_partials.d_x1[i] *= P;
+      if (!is_constant_struct<T_prob>::value) {
+          for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
       }
           
-      return P;
+      return operands_and_partials.to_var(P);
+        
     }
       
     template <bool propto, typename T_n, typename T_N, typename T_prob>
