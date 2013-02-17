@@ -10,19 +10,20 @@ namespace stan {
   namespace math {
 
       
-      double F32(double a, double b, double c, double d, double e, double z)
+      double F32(double a, double b, double c, double d, double e, double z, double precision = 1e-6)
       {
           
           double F = 1;
           
-          //double tOld = 1;
           double tNew = 0;
           
           double logT = 0;
           
           double logZ = std::log(z);
           
-          for(int k = 0; k < 500; ++k)
+          int k = 0;
+          
+          while( (fabs(tNew) > precision) || (k == 0) )
           {
               
               double p = (a + k) * (b + k) * (c + k) / ( (d + k) * (e + k) * (k + 1) );
@@ -37,15 +38,15 @@ namespace stan {
               
               F += tNew;
               
-              //tOld = tNew;
-              
+              ++k;
+
           }
           
           return F;
           
       }
       
-      void gradF32(double* g, double a, double b, double c, double d, double e, double z)
+      void gradF32(double* g, double a, double b, double c, double d, double e, double z, double precision = 1e-6)
       {
           
           double gOld[6];
@@ -60,7 +61,9 @@ namespace stan {
           
           double logZ = std::log(z);
           
-          for(int k = 0; k < 500; ++k)
+          int k = 0;
+          
+          while( (fabs(tNew) > precision) || (k == 0) )
           {
               
               double C = (a + k) / (d + k);
@@ -87,6 +90,8 @@ namespace stan {
               for(int i = 0; i < 6; ++i) g[i] += gOld[i];
               
               tOld = tNew;
+          
+              ++k;
               
           }
           
@@ -112,6 +117,11 @@ namespace stan {
               tNew = ( (a + k) / (c + k) ) * ( (b + k) / (double)(k + 1) ) * z * tOld;
 
               if(tNew == 0) break;
+              if(tNew == std::numeric_limits<double>::infinity())
+              {
+                  std::cout << "Terminating grad2F1 calc (called from gradRegIncBeta) because of infinity!" << std::endl;
+                  break;
+              }
               
               gradAold = tNew * (gradAold / tOld + 1.0 / (a + k) );
               gradCold = tNew * (gradCold / tOld - 1.0 / (c + k) );              
