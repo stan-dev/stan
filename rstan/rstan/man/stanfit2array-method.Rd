@@ -25,16 +25,17 @@
 \arguments{
   \item{x}{An object of S4 class \code{stanfit}} 
   \item{\dots}{Additional parameters that can be passed to \code{extract} 
-    for extracting samples from \code{stanfit} object. For now, \code{pars}
-    is the only additional parameter.  
+    for extracting samples from \code{stanfit} object. For now,
+    \code{pars} and \code{inc_warmup} are the only valid additional parameters.
   } 
 } 
 
 \details{
-  \code{as.array} and \code{as.matrix} can be applied to a \code{stanfit}
-  object to coerce the samples without warmup to \code{array} or \code{matrix}.
-  The \code{as.data.frame} method first calls \code{as.matrix} and then coerces
-  this matrix to a \code{data.frame}.
+  \code{as.array} and \code{as.matrix} can be applied to a
+  \code{stanfit} object to coerce the samples to \code{array} or
+  \code{matrix}. Unlike \code{extract}, warmup samples are dropped by
+  default.  The \code{as.data.frame} method first calls \code{as.matrix}
+  and then coerces this matrix to a \code{data.frame}.
 
   The array has three named dimensions: iterations, chains, parameters. 
   For \code{as.matrix}, all chains are combined, leaving a matrix of iterations

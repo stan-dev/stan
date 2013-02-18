@@ -600,15 +600,15 @@ sflist2stanfit <- function(sflist) {
 # sflist2stan(list(l1=ss1, l2=ss2))
 
 
-as.array.stanfit <- function(x, ...) {
+as.array.stanfit <- function(x, inc_warmup = FALSE, ...) {
   if (x@mode != 0) return(numeric(0)) 
-  out <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...)
+  out <- extract(x, permuted = FALSE, inc_warmup = inc_warmup, ...)
   # dimnames(out) <- dimnames(x)
   return(out)
 } 
-as.matrix.stanfit <- function(x, ...) {
+as.matrix.stanfit <- function(x, inc_warmup = FALSE, ...) {
   if (x@mode != 0) return(numeric(0)) 
-  e <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...) 
+  e <- extract(x, permuted = FALSE, inc_warmup = inc_warmup, ...)
   out <- apply(e, 3, FUN = function(y) y)
   dimnames(out) <- dimnames(e)[-2]
   return(out)
