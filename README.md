@@ -1,7 +1,10 @@
 Stan
 ====
+<a href="http://mc-stan.org"><img src="https://github.com/stan-dev/stan/blob/master/logos/stanlogo-main.png style="float:right"></a>
 Stan is a C++ and R package for obtaining Bayesian inference using the
 No-U-Turn sampler, a variant of Hamiltonian Monte Carlo.
+
+
 
 Home Page
 ---------
