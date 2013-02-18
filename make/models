@@ -10,7 +10,7 @@ MODEL_HEADER := src/stan/model/model_header.hpp
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
 .PRECIOUS: %.cpp
-%.cpp : %.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
+%.cpp : %.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE) bin/print$(EXE)
 	@echo ''
 	@echo '--- Translating Stan graphical model to C++ code ---'
 	bin/stanc$(EXE) $< --o=$@

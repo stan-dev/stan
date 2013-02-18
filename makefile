@@ -134,6 +134,7 @@ help:
 	@echo 'Common targets:'
 	@echo '  Model related:'
 	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '  - bin/print$(EXE): Build the print utility.'
 	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
 	@echo '  - bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                     bin/stanc$(EXE))'
@@ -164,7 +165,7 @@ help:
 -include make/libstan  # libstan.a
 -include make/tests    # tests: test-all, test-unit, test-models
 -include make/models   # models
--include make/command  # bin/stanc
+-include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
 -include make/dist     # dist: for distribution
 -include make/manual   # manual: manual, doc/stan-reference.pdf
