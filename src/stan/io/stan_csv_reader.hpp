@@ -14,6 +14,7 @@ namespace stan {
     private:
       std::istream& in_;
       
+
     public:
       /** 
        * Default constructor.
@@ -36,8 +37,20 @@ namespace stan {
        */
       ~stan_csv_reader() { }
 
+      void read_metadata() { }
+      void read_header() { }
+      void read_adaptation() { }
+      void read_samples() { }
+
+      /** 
+       * Parses the file.
+       * 
+       */
       void parse() {
-	
+	// read_metadata
+	// read_header
+	// read_adaptation
+	// read_samples
       }
       
       
