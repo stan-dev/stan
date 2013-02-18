@@ -99,6 +99,13 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* refactoring:
+  -- remove mcmc/hmc.hpp
+  -- merge nuts_nondiag and nuts_givenmass
+  -- take in something other than string on input for nutsmass
+  -- merge in nuts_diag if possible
+
+
 * replace Eigen .sum() with stan::math::sum() for auto-dif
 
 * remove (unsigned) long long instances in dump and error testing
