@@ -5,8 +5,7 @@ No-U-Turn sampler, a variant of Hamiltonian Monte Carlo.
 
 Home Page
 ---------
-Stan's home page, with links to all the information you'll need for
-Stan, is:
+Stan's home page, with links to everything you'll need to use Stan is:
 
 [http://mc-stan.org/](http://mc-stan.org/)
 
