@@ -618,24 +618,24 @@ as.data.frame.stanfit <- function(x, ...) {
   return( as.data.frame(as.matrix(x, ...)) )
 }
 
-# function to avoid dependency on coda::mcmc
-# minimal needed to generate mcmc class from one an entry in the
-# list in the sims slot of a stanfit object.
+# function to create mcmc objects and avoid dependency on coda::mcmc
 to_mcmc <- function(x, thin, end) {
-    data <- do.call(cbind, x)
-    niter <- nrow(data)
+    x <- as.matrix(x)
+    niter <- nrow(x)
     start <- end - (niter - 1) * thin
-    attr(data, "mcpar") <- c(start, end, thin)
-    class(data) <- "mcmc"
-    data
+    attr(x, "mcpar") <- c(start, end, thin)
+    class(x) <- "mcmc"
+    x
 }
 
-as.mcmc.list.stanfit <- function(x) {
+as.mcmc.list.stanfit <- function(x, inc_warmup = FALSE, ...) {
     thin <- x@sim$thin
     end <- x@sim$iter
-    data <- lapply(x@sim$samples, to_mcmc, end=end, thin=thin)
-    class(data) <- "mcmc.list"
-    data
+    e <- extract(x, permuted = FALSE, inc_warmup = inc_warmup, ...)
+    out <- mapply(function(i, thin, end) to_mcmc(e[ , i, ], thin, end),
+                  seq_len(dim(e)[2]), end=end, thin=thin, SIMPLIFY=FALSE)
+    class(out) <- "mcmc.list"
+    out
 }
 
 

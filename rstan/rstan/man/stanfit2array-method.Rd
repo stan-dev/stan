@@ -4,6 +4,7 @@
 \alias{as.array.stanfit}
 \alias{as.matrix.stanfit}
 \alias{as.data.frame.stanfit}
+\alias{as.mcmc.list.stanfit}
 \alias{dim.stanfit}
 \alias{dimnames.stanfit}
 
@@ -17,6 +18,7 @@
   \method{as.array}{stanfit}(x, \dots) 
   \method{as.matrix}{stanfit}(x, \dots)
   \method{as.data.frame}{stanfit}(x, \dots)
+  \method{as.mcmc.list}{stanfit}(x, \dots)
   \method{is.array}{stanfit}(x) 
   \method{dim}{stanfit}(x)
   \method{dimnames}{stanfit}(x)
@@ -43,6 +45,9 @@
 \value{
   \code{as.array}, \code{as.matrix}, and \code{as.data.frame} return an array,
   matrix, or data.frame of samples respectively.
+
+  \code{as.mcmc.list} returns a \code{\link[coda]{mcmc.list}} object,
+  compatible with functions in the \pkg{coda} package.
 
   \code{dim} and \code{dimnames} return the dim and dimnames of the 
   array object that could be created. 
