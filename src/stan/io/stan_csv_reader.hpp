@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp>
-
+#include <stan/math/matrix.hpp>
 
 namespace stan {
   namespace io {
@@ -43,6 +43,7 @@ namespace stan {
     private:
       std::istream& in_;
       stan_csv_metadata metadata_;
+      Eigen::Matrix<std::string, Eigen::Dynamic, 1> header_;
 
     public:
       /** 
@@ -137,7 +138,33 @@ namespace stan {
 	  return false;
   	return true;
       }
-      void read_header() { }
+  
+      bool read_header() { 
+	std::string line;
+
+	if (in_.peek() != 'l')
+	  return false;
+	std::getline(in_, line);
+	std::stringstream ss(line);
+	
+	header_.resize(std::count(line.begin(), line.end(), ',') + 1);
+	int idx = 0;
+	while (ss.good()) {
+	  std::string token;
+	  std::getline(ss, token, ',');
+	  boost::trim(token);
+	  
+	  int pos = token.find('.');
+	  if (pos > 0) {
+	    token.replace(pos, 1, "[");
+	    std::replace(token.begin(), token.end(), '.', ',');
+	    token += "]";
+	  }
+	  header_(idx++) = token;
+	}
+	return false;
+      }
+
       void read_adaptation() { }
       void read_samples() { }
 
@@ -154,6 +181,10 @@ namespace stan {
       
       stan_csv_metadata metadata() {
 	return metadata_;
+      }
+
+      Eigen::Matrix<std::string, Eigen::Dynamic, 1> header() {
+	return header_;
       }
       
     };
