@@ -3,6 +3,10 @@
 
 #include <istream>
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <boost/algorithm/string.hpp>
+
 
 namespace stan {
   namespace io {
@@ -62,8 +66,76 @@ namespace stan {
        */
       ~stan_csv_reader() { }
 
-      void read_metadata() {
-	
+      bool read_metadata() {
+	std::stringstream ss;
+	std::string line;
+
+	if (in_.peek() != '#')
+	  return false;
+	while (in_.peek() == '#') {
+	  std::getline(in_, line);
+	  ss << line << '\n';
+	}
+	ss.seekg(std::ios_base::beg);	
+
+	char comment;
+	std::string lhs;
+
+	// skip first two lines
+	std::getline(ss, line);
+	std::getline(ss, line);
+
+	while (ss.good()) {
+	  ss >> comment;
+	  std::getline(ss, lhs, '=');
+	  boost::trim(lhs);
+	  if (lhs.compare("") == 0) { // no-op
+	  } else if (lhs.compare("stan_version_major") == 0) {
+	    ss >> metadata_.stan_version_major;
+	  } else if (lhs.compare("stan_version_minor") == 0) {
+	    ss >> metadata_.stan_version_minor;
+	  } else if (lhs.compare("stan_version_patch") == 0) {
+	    ss >> metadata_.stan_version_patch;
+	  } else if (lhs.compare("data") == 0) {
+	    ss >> metadata_.data;
+	  } else if (lhs.compare("init") == 0) {
+	    ss >> metadata_.init;
+	  } else if (lhs.compare("append_samples") == 0) {
+	    ss >> metadata_.append_samples;
+	  } else if (lhs.compare("save_warmup") == 0) {
+	    ss >> metadata_.save_warmup;
+	  } else if (lhs.compare("seed") == 0) {
+	    ss >> metadata_.seed;
+	  } else if (lhs.compare("chain_id") == 0) {
+	    ss >> metadata_.chain_id;
+	  } else if (lhs.compare("iter") == 0) {
+	    ss >> metadata_.iter;
+	  } else if (lhs.compare("warmup") == 0) {
+	    ss >> metadata_.warmup;
+	  } else if (lhs.compare("thin") == 0) {
+	    ss >> metadata_.thin;
+	  } else if (lhs.compare("equal_step_sizes") == 0) {
+	    ss >> metadata_.equal_step_sizes;
+	  } else if (lhs.compare("leapfrog_steps") == 0) {
+	    ss >> metadata_.leapfrog_steps;
+	  } else if (lhs.compare("max_treedepth") == 0) {
+	    ss >> metadata_.max_treedepth;
+	  } else if (lhs.compare("epsilon") == 0) {
+	    ss >> metadata_.epsilon;
+	  } else if (lhs.compare("epsilon_pm") == 0) {
+	    ss >> metadata_.epsilon_pm;
+	  } else if (lhs.compare("delta") == 0) {
+	    ss >> metadata_.delta;
+	  } else if (lhs.compare("gamma") == 0) {
+	    ss >> metadata_.gamma;
+	  } else {
+	    std::cout << "unused option: " << lhs << std::endl;
+	  }
+	  std::getline(ss, line);
+	}
+	if (ss.good() == false)
+	  return false;
+  	return true;
       }
       void read_header() { }
       void read_adaptation() { }
