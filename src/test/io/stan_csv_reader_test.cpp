@@ -28,7 +28,7 @@ public:
 
 TEST_F(StanIoStanCsvReader,read_metadata) {
   stan::io::stan_csv_reader reader(metadata);
-  reader.read_metadata();
+  EXPECT_TRUE(reader.read_metadata());
   
   stan::io::stan_csv_metadata metadata = reader.metadata();
   EXPECT_EQ(1U, metadata.stan_version_major);
@@ -55,7 +55,7 @@ TEST_F(StanIoStanCsvReader,read_metadata) {
 }
 TEST_F(StanIoStanCsvReader,read_header) { 
   stan::io::stan_csv_reader reader(header);
-  reader.read_header();
+  EXPECT_TRUE(reader.read_header());
   
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header = reader.header();
   ASSERT_EQ(51, header.size());
@@ -114,7 +114,7 @@ TEST_F(StanIoStanCsvReader,read_header) {
 
 TEST_F(StanIoStanCsvReader,read_adaptation) { 
   stan::io::stan_csv_reader reader(adaptation);
-  reader.read_adaptation();
+  EXPECT_TRUE(reader.read_adaptation());
   
   stan::io::stan_csv_adaptation adaptation = reader.adaptation();
 
@@ -170,9 +170,11 @@ TEST_F(StanIoStanCsvReader,read_adaptation) {
   EXPECT_FLOAT_EQ(1.33936, adaptation.step_size_multipliers(46));
 }
 
-TEST_F(StanIoStanCsvReader,DISABLED_read_samples) { 
+TEST_F(StanIoStanCsvReader,read_samples) { 
   stan::io::stan_csv_reader reader(samples);
-  reader.read_samples();
+  EXPECT_TRUE(reader.read_samples());
+  
+  
 }
 TEST_F(StanIoStanCsvReader,DISABLED_Parse) {
   stan::io::stan_csv_reader reader(blocker0);

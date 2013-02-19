@@ -52,6 +52,7 @@ namespace stan {
       stan_csv_metadata metadata_;
       Eigen::Matrix<std::string, Eigen::Dynamic, 1> header_;
       stan_csv_adaptation adaptation_;
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> samples_;
 
     public:
       /** 
@@ -143,7 +144,7 @@ namespace stan {
 	  }
 	  std::getline(ss, line);
 	}
-	if (ss.good() == false)
+	if (ss.good() == true)
 	  return false;
   	return true;
       }
@@ -171,7 +172,7 @@ namespace stan {
 	  }
 	  header_(idx++) = token;
 	}
-	return false;
+	return true;
       }
 
       bool read_adaptation() { 
@@ -222,17 +223,43 @@ namespace stan {
 	return true;
       }
       
-      void read_samples() { }
+      bool read_samples() { 
+	std::stringstream ss;
+	std::string line;
+
+	if (in_.peek() != '#')
+	  return false;
+	while (in_.good()) {
+	  bool comment_line = (in_.peek() == '#');
+	  std::getline(in_, line);
+	  if (!comment_line)
+	    ss << line << '\n';
+	}
+	ss.seekg(std::ios_base::beg);
+	std::cout << "ss: \n" << ss.str() << std::endl;
+
+	return false;
+      }
 
       /** 
        * Parses the file.
        * 
        */
       void parse() {
-	read_metadata();
-	read_header();
-	read_adaptation();
-	read_samples();
+	if (!read_metadata()) {
+	  std::cout << "Warning: non-fatal error reading metadata" << std::endl;
+	}
+	if (!read_header()) {
+	  std::cout << "Error: error reading header" << std::endl;
+	  exit(-1);
+	}
+	if (!read_adaptation()) {
+	  std::cout << "Warning: non-fatal error reading adapation data" << std::endl;
+	}
+	if (!read_samples()) {
+	  std::cout << "Error: error reading samples" << std::endl;
+	  exit(-1);
+	}
       }
       
       stan_csv_metadata metadata() {
@@ -245,6 +272,10 @@ namespace stan {
       
       stan_csv_adaptation adaptation() {
 	return adaptation_;
+      }
+
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> samples() {
+	return samples_;
       }
     };
     
