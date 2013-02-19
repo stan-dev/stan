@@ -25,7 +25,6 @@
 #include <stan/io/csv_writer.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/special_functions.hpp>
-#include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/sampler.hpp>
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/prob/distributions.hpp>
