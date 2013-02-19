@@ -5,6 +5,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/special_functions.hpp>
+#include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -1908,4 +1909,41 @@ TEST(AgradFvar, binom_coeff_log) {
   fvar<double> c = binomial_coefficient_log(w, y);
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2006.0, 1002.0), c.val_);
   EXPECT_FLOAT_EQ(2.0 * log(2006.0 - 1002.0) + (1002.0 * (0 - 2.0)) / (2006.0 - 1002.0) + 0 * log(2006.0 / (2006.0 - 1002.0)) + (2006.0 + 0.5) / (2006.0 / (2006.0 - 1002.0)) * (0 * (2006.0 - 1002.0) - (0 - 2.0) * 2006.0) / ((2006.0 - 1002.0) * (2006.0 - 1002.0)) + 0 / (12 * 2006.0 * 2006.0) - 2.0 + (0 - 2.0) / (12 * (2006.0 - 1002.0) * (2006.0 - 1002.0)) - digamma(1002.0 + 1) * 2.0, c.d_);
+}
+
+
+TEST(AgradFvar,lt) {
+  using stan::agrad::fvar;
+  fvar<double> v4 = 4;
+  fvar<double> v5 = 5;
+  double d4 = 4;
+  double d5 = 5;
+  
+  EXPECT_TRUE(v4 < v5);
+  EXPECT_TRUE(v4 < d5);
+  EXPECT_TRUE(d4 < v5);
+  EXPECT_TRUE(d4 < d5);
+
+  int i4 = 4;
+  int i5 = 5;
+
+  EXPECT_TRUE(v4 < v5);
+  EXPECT_TRUE(v4 < i5);
+  EXPECT_TRUE(i4 < v5);
+  EXPECT_TRUE(i4 < i5);
+  EXPECT_TRUE(i4 < d5);
+  EXPECT_TRUE(d4 < i5);
+}
+TEST(AgradFvar,Phi) {
+  using stan::agrad::fvar;
+  using stan::math::Phi;
+  fvar<double> x = 1.0;
+  
+  fvar<double> Phi_x = Phi(x);
+
+  EXPECT_FLOAT_EQ(Phi(1.0), Phi_x.val_);
+  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
+                  Phi_x.d_);
+  
+
 }
