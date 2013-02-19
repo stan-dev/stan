@@ -1297,6 +1297,19 @@ namespace stan {
             binomial_coefficient_log(x1.val_, x2), 0 * log(x1.val_ - x2) + (x2 * (x1.d_ - 0)) / (x1.val_ - x2) + x1.d_ * log(x1.val_ / (x1.val_ - x2)) + (x1.val_ + 0.5) / (x1.val_ / (x1.val_ - x2)) * (x1.d_ * (x1.val_ - x2) - (x1.d_ - 0) * x1.val_) / ((x1.val_ - x2) * (x1.val_ - x2)) + x1.d_ / (12 * x1.val_ * x1.val_) - 0 + (x1.d_ - 0) / (12 * (x1.val_ - x2) * (x1.val_ - x2)) - digamma(x2 + 1) * 0);
     }
 
+    template <typename T>
+    inline fvar<T> Phi(const fvar<T>& x) {
+      using stan::math::Phi;
+      using std::exp;
+      using std::sqrt;
+      double pi = boost::math::constants::pi<double>();
+      T xv = x.val_;
+      return fvar<T>(Phi(xv),
+                     exp(xv * xv / -2.0) / sqrt(2.0 * pi) );
+    }
+
+    //comparison operators
+
     template <typename T1, typename T2>
     inline bool operator<(const fvar<T1>& x,
                           const T2& y) {
@@ -1315,18 +1328,110 @@ namespace stan {
       return x.val_ < y.val_;
     }
 
-    template <typename T>
-    inline fvar<T> Phi(const fvar<T>& x) {
-      using stan::math::Phi;
-      using std::exp;
-      using std::sqrt;
-      double pi = boost::math::constants::pi<double>();
-      T xv = x.val_;
-      return fvar<T>(Phi(xv),
-                     exp(xv * xv / -2.0) / sqrt(2.0 * pi) );
+    template <typename T1, typename T2>
+    inline  
+    bool
+    operator<=(const fvar<T1>& x, const fvar<T2>& y) {
+      return x.val_ <= y.val_;
     }
 
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator<=(const fvar<T1>& x, const T2& y) {
+      return x.val_ <= y;
+    }
 
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator<=(const T1& x, const fvar<T2>& y) {
+      return x <= y.val_;
+    }  
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator>(const fvar<T1>& x, const fvar<T2>& y) {
+      return x.val_ > y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline
+    bool
+    operator>(const fvar<T1>& x, const T2& y) {
+      return x.val_ > y;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator>(const T1& x, const fvar<T2>& y) {
+      return x > y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline
+    bool
+    operator>=(const fvar<T1>& x, const fvar<T2>& y) {
+      return x.val_ >= y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator>=(const fvar<T1>& x, const T2& y) {
+      return x.val_ >= y;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator>=(const T1& x, const fvar<T2>& y) {
+      return x >= y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator!=(const fvar<T1>& x, const fvar<T2>& y) {
+      return x.val_ != y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator!=(const fvar<T1>& x, const T2& y) {
+      return x.val_ != y;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator!=(const T1& x, const fvar<T2>& y) {
+      return x != y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator==(const fvar<T1>& x, const fvar<T2>& y) {
+      return x.val_ == y.val_;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool
+    operator==(const fvar<T1>& x, const T2& y) {
+      return x.val_ == y;
+    }
+
+    template <typename T1, typename T2>
+    inline 
+    bool 
+    operator==(const T1& x, const fvar<T2>& y) {
+      return x == y.val_;
+    }
   }
 }
 #endif

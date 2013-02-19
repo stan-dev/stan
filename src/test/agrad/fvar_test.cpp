@@ -1858,6 +1858,15 @@ TEST(AgradFvar, lgamma){
   EXPECT_FLOAT_EQ(digamma(0.5), a.d_);
 }
 
+TEST(AgradFvar, lmgamma){
+  using stan::agrad::fvar;
+  using stan::math::lmgamma;
+  using boost::math::digamma;
+  using std::log;
+
+
+}
+
 TEST(AgradFvar, lbeta) {
   using stan::agrad::fvar;
   using boost::math::tgamma;
@@ -1911,6 +1920,17 @@ TEST(AgradFvar, binom_coeff_log) {
   EXPECT_FLOAT_EQ(2.0 * log(2006.0 - 1002.0) + (1002.0 * (0 - 2.0)) / (2006.0 - 1002.0) + 0 * log(2006.0 / (2006.0 - 1002.0)) + (2006.0 + 0.5) / (2006.0 / (2006.0 - 1002.0)) * (0 * (2006.0 - 1002.0) - (0 - 2.0) * 2006.0) / ((2006.0 - 1002.0) * (2006.0 - 1002.0)) + 0 / (12 * 2006.0 * 2006.0) - 2.0 + (0 - 2.0) / (12 * (2006.0 - 1002.0) * (2006.0 - 1002.0)) - digamma(1002.0 + 1) * 2.0, c.d_);
 }
 
+TEST(AgradFvar,Phi) {
+  using stan::agrad::fvar;
+  using stan::math::Phi;
+  fvar<double> x = 1.0;
+  
+  fvar<double> Phi_x = Phi(x);
+
+  EXPECT_FLOAT_EQ(Phi(1.0), Phi_x.val_);
+  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
+                  Phi_x.d_);
+}
 
 TEST(AgradFvar,lt) {
   using stan::agrad::fvar;
@@ -1934,16 +1954,130 @@ TEST(AgradFvar,lt) {
   EXPECT_TRUE(i4 < d5);
   EXPECT_TRUE(d4 < i5);
 }
-TEST(AgradFvar,Phi) {
+
+TEST(AgradFvar,lte) {
   using stan::agrad::fvar;
-  using stan::math::Phi;
-  fvar<double> x = 1.0;
+  fvar<double> v4 = 4;
+  fvar<double> v5 = 5;
+  double d4 = 4;
+  double d5 = 5;
   
-  fvar<double> Phi_x = Phi(x);
+  EXPECT_TRUE(v4 <= v5);
+  EXPECT_TRUE(v4 <= d5);
+  EXPECT_TRUE(d4 <= v5);
+  EXPECT_TRUE(d4 <= d5);
 
-  EXPECT_FLOAT_EQ(Phi(1.0), Phi_x.val_);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
-                  Phi_x.d_);
+  int i4 = 4;
+  int i5 = 5;
+  int i6 = 5;
+
+  EXPECT_TRUE(v4 <= v5);
+  EXPECT_TRUE(v4 <= i5);
+  EXPECT_TRUE(i4 <= v5);
+  EXPECT_TRUE(i4 <= i5);
+  EXPECT_TRUE(i4 <= d5);
+  EXPECT_TRUE(d4 <= i5);
+  EXPECT_TRUE(i5 <= i6);
+  EXPECT_TRUE(i5 <= d5);
+  EXPECT_FALSE(i5 <= v4);
+}
+
+TEST(AgradFvar,gt) {
+  using stan::agrad::fvar;
+  fvar<double> v4 = 4;
+  fvar<double> v5 = 5;
+  double d4 = 4;
+  double d5 = 5;
   
+  EXPECT_TRUE(v5 > v4);
+  EXPECT_TRUE(d5 > v4);
+  EXPECT_TRUE(v5 > d4);
+  EXPECT_TRUE(d5 > d4);
 
+  int i4 = 4;
+  int i5 = 5;
+
+  EXPECT_TRUE(v5 > v4);
+  EXPECT_TRUE(i5 > v4);
+  EXPECT_TRUE(v5 > i4);
+  EXPECT_TRUE(i5 > i4);
+  EXPECT_TRUE(d5 > i4);
+  EXPECT_TRUE(i5 > d4);
+}
+
+TEST(AgradFvar,gte) {
+  using stan::agrad::fvar;
+  fvar<double> v4 = 4;
+  fvar<double> v5 = 5;
+  double d4 = 4;
+  double d5 = 5;
+  
+  EXPECT_TRUE(v5 >= v4);
+  EXPECT_TRUE(d5 >= v4);
+  EXPECT_TRUE(v5 >= d4);
+  EXPECT_TRUE(d5 >= d4);
+
+  int i4 = 4;
+  int i5 = 5;
+  int i6 = 5;
+
+  EXPECT_TRUE(v5 >= v4);
+  EXPECT_TRUE(i5 >= v4);
+  EXPECT_TRUE(v5 >= i4);
+  EXPECT_TRUE(i5 >= i4);
+  EXPECT_TRUE(d5 >= i4);
+  EXPECT_TRUE(i5 >= d4);
+  EXPECT_TRUE(i6 >= i5);
+  EXPECT_TRUE(i6 >= v5);
+}
+
+TEST(AgradFvar,ne) {
+  using stan::agrad::fvar;
+  fvar<double> v4 = 4;
+  fvar<double> v5 = 5;
+  double d4 = 4;
+  double d5 = 5;
+  
+  EXPECT_TRUE(v5 != v4);
+  EXPECT_TRUE(d5 != v4);
+  EXPECT_TRUE(v5 != d4);
+  EXPECT_TRUE(d5 != d4);
+
+  int i4 = 4;
+  int i5 = 5;
+  int i6 = 5;
+
+  EXPECT_TRUE(i5 != v4);
+  EXPECT_TRUE(v5 != i4);
+  EXPECT_TRUE(i5 != i4);
+  EXPECT_TRUE(d5 != i4);
+  EXPECT_TRUE(i5 != d4);
+  EXPECT_FALSE(i6 != i5);
+  EXPECT_FALSE(i6 != v5);
+}
+
+
+TEST(AgradFvar,eq) {
+  using stan::agrad::fvar;
+  fvar<double> v4 = 4;
+  fvar<double> v5 = 5;
+  double d4 = 4;
+  double d5 = 5;
+  
+  EXPECT_FALSE(v5 == v4);
+  EXPECT_FALSE(d5 == v4);
+  EXPECT_FALSE(v5 == d4);
+  EXPECT_FALSE(d5 == d4);
+
+  int i4 = 4;
+  int i5 = 5;
+  int i6 = 5;
+
+  EXPECT_FALSE(i5 == v4);
+  EXPECT_FALSE(v5 == i4);
+  EXPECT_FALSE(i5 == i4);
+  EXPECT_FALSE(d5 == i4);
+  EXPECT_FALSE(i5 == d4);
+  EXPECT_TRUE(i6 == i5);
+  EXPECT_TRUE(i6 == v5);
 }
