@@ -112,9 +112,62 @@ TEST_F(StanIoStanCsvReader,read_header) {
   EXPECT_EQ("sigma_delta",header(50));
 }
 
-TEST_F(StanIoStanCsvReader,DISABLED_read_adaptation) { 
+TEST_F(StanIoStanCsvReader,read_adaptation) { 
   stan::io::stan_csv_reader reader(adaptation);
   reader.read_adaptation();
+  
+  stan::io::stan_csv_adaptation adaptation = reader.adaptation();
+
+  EXPECT_EQ("mcmc::nuts_diag", adaptation.sampler);
+  EXPECT_FLOAT_EQ(0.104225, adaptation.step_size);
+  ASSERT_EQ(47, adaptation.step_size_multipliers.size());
+  EXPECT_FLOAT_EQ(0.325114, adaptation.step_size_multipliers(0));
+  EXPECT_FLOAT_EQ(3.51248, adaptation.step_size_multipliers(1));
+  EXPECT_FLOAT_EQ(1.93143, adaptation.step_size_multipliers(2));
+  EXPECT_FLOAT_EQ(1.08468, adaptation.step_size_multipliers(3));
+  EXPECT_FLOAT_EQ(1.23781, adaptation.step_size_multipliers(4));
+  EXPECT_FLOAT_EQ(0.365398, adaptation.step_size_multipliers(5));
+  EXPECT_FLOAT_EQ(0.710215, adaptation.step_size_multipliers(6));
+  EXPECT_FLOAT_EQ(1.54178, adaptation.step_size_multipliers(7));
+  EXPECT_FLOAT_EQ(0.375339, adaptation.step_size_multipliers(8));
+  EXPECT_FLOAT_EQ(0.574698, adaptation.step_size_multipliers(9));
+  EXPECT_FLOAT_EQ(0.722729, adaptation.step_size_multipliers(10));
+  EXPECT_FLOAT_EQ(0.318383, adaptation.step_size_multipliers(11));
+  EXPECT_FLOAT_EQ(0.563756, adaptation.step_size_multipliers(12));
+  EXPECT_FLOAT_EQ(0.616147, adaptation.step_size_multipliers(13));
+  EXPECT_FLOAT_EQ(0.995688, adaptation.step_size_multipliers(14));
+  EXPECT_FLOAT_EQ(0.657117, adaptation.step_size_multipliers(15));
+  EXPECT_FLOAT_EQ(0.7757, adaptation.step_size_multipliers(16));
+  EXPECT_FLOAT_EQ(0.689116, adaptation.step_size_multipliers(17));
+  EXPECT_FLOAT_EQ(0.890119, adaptation.step_size_multipliers(18));
+  EXPECT_FLOAT_EQ(1.29209, adaptation.step_size_multipliers(19));
+  EXPECT_FLOAT_EQ(1.66928, adaptation.step_size_multipliers(20));
+  EXPECT_FLOAT_EQ(0.653107, adaptation.step_size_multipliers(21));
+  EXPECT_FLOAT_EQ(0.692784, adaptation.step_size_multipliers(22));
+  EXPECT_FLOAT_EQ(0.647013, adaptation.step_size_multipliers(23));
+  EXPECT_FLOAT_EQ(0.908997, adaptation.step_size_multipliers(24));
+  EXPECT_FLOAT_EQ(0.965595, adaptation.step_size_multipliers(25));
+  EXPECT_FLOAT_EQ(0.918005, adaptation.step_size_multipliers(26));
+  EXPECT_FLOAT_EQ(0.444468, adaptation.step_size_multipliers(27));
+  EXPECT_FLOAT_EQ(0.703633, adaptation.step_size_multipliers(28));
+  EXPECT_FLOAT_EQ(0.917533, adaptation.step_size_multipliers(29));
+  EXPECT_FLOAT_EQ(0.533222, adaptation.step_size_multipliers(30));
+  EXPECT_FLOAT_EQ(0.613215, adaptation.step_size_multipliers(31));
+  EXPECT_FLOAT_EQ(0.728461, adaptation.step_size_multipliers(32));
+  EXPECT_FLOAT_EQ(0.420359, adaptation.step_size_multipliers(33));
+  EXPECT_FLOAT_EQ(0.608283, adaptation.step_size_multipliers(34));
+  EXPECT_FLOAT_EQ(0.692184, adaptation.step_size_multipliers(35));
+  EXPECT_FLOAT_EQ(0.817112, adaptation.step_size_multipliers(36));
+  EXPECT_FLOAT_EQ(0.86689, adaptation.step_size_multipliers(37));
+  EXPECT_FLOAT_EQ(0.694276, adaptation.step_size_multipliers(38));
+  EXPECT_FLOAT_EQ(0.676297, adaptation.step_size_multipliers(39));
+  EXPECT_FLOAT_EQ(0.788411, adaptation.step_size_multipliers(40));
+  EXPECT_FLOAT_EQ(0.983241, adaptation.step_size_multipliers(41));
+  EXPECT_FLOAT_EQ(0.873982, adaptation.step_size_multipliers(42));
+  EXPECT_FLOAT_EQ(0.646372, adaptation.step_size_multipliers(43));
+  EXPECT_FLOAT_EQ(0.718841, adaptation.step_size_multipliers(44));
+  EXPECT_FLOAT_EQ(0.667207, adaptation.step_size_multipliers(45));
+  EXPECT_FLOAT_EQ(1.33936, adaptation.step_size_multipliers(46));
 }
 
 TEST_F(StanIoStanCsvReader,DISABLED_read_samples) { 

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <stan/math/matrix.hpp>
 
 namespace stan {
@@ -36,6 +37,12 @@ namespace stan {
       double gamma;
     };
 
+    struct stan_csv_adaptation {
+      std::string sampler;
+      double step_size;
+      Eigen::VectorXd step_size_multipliers;
+    };
+
     /**
      * Reads from a Stan output csv file.
      */
@@ -44,6 +51,7 @@ namespace stan {
       std::istream& in_;
       stan_csv_metadata metadata_;
       Eigen::Matrix<std::string, Eigen::Dynamic, 1> header_;
+      stan_csv_adaptation adaptation_;
 
     public:
       /** 
@@ -107,6 +115,7 @@ namespace stan {
 	    ss >> metadata_.save_warmup;
 	  } else if (lhs.compare("seed") == 0) {
 	    ss >> metadata_.seed;
+	    metadata_.random_seed = false;
 	  } else if (lhs.compare("chain_id") == 0) {
 	    ss >> metadata_.chain_id;
 	  } else if (lhs.compare("iter") == 0) {
@@ -165,7 +174,54 @@ namespace stan {
 	return false;
       }
 
-      void read_adaptation() { }
+      bool read_adaptation() { 
+	std::stringstream ss;
+	std::string line;
+
+	if (in_.peek() != '#')
+	  return false;
+	while (in_.peek() == '#') {
+	  std::getline(in_, line);
+	  ss << line << '\n';
+	}
+	ss.seekg(std::ios_base::beg);
+	
+	char comment;
+	// sampler
+	ss >> comment >> adaptation_.sampler;
+	std::getline(ss, line);
+	// clean up sampler field
+	std::replace(adaptation_.sampler.begin(), 
+		     adaptation_.sampler.end(), 
+		     '(', ' ');
+	std::replace(adaptation_.sampler.begin(), 
+		     adaptation_.sampler.end(),
+		     ')', ' ');
+	boost::trim(adaptation_.sampler);	
+
+	// step size
+	ss >> comment;
+	std::getline(ss, line, '=');
+	boost::trim(line);
+	ss >> adaptation_.step_size;
+	std::getline(ss, line);
+	
+	// parameter step size multipliers
+	std::getline(ss, line); // comment line
+	ss >> comment;
+	std::getline(ss, line); // step sizes
+	adaptation_.step_size_multipliers.resize(std::count(line.begin(), line.end(), ',') + 1);
+	ss.str(line);
+	int idx = 0;
+	while (ss.good()) {
+	  std::string token;
+	  std::getline(ss, token, ',');
+	  boost::trim(token);
+	  adaptation_.step_size_multipliers(idx++) = boost::lexical_cast<double>(token);
+	}
+	return true;
+      }
+      
       void read_samples() { }
 
       /** 
@@ -173,10 +229,10 @@ namespace stan {
        * 
        */
       void parse() {
-	// read_metadata()
-	// read_header()
-	// read_adaptation()
-	// read_samples()
+	read_metadata();
+	read_header();
+	read_adaptation();
+	read_samples();
       }
       
       stan_csv_metadata metadata() {
@@ -187,6 +243,9 @@ namespace stan {
 	return header_;
       }
       
+      stan_csv_adaptation adaptation() {
+	return adaptation_;
+      }
     };
     
   }
