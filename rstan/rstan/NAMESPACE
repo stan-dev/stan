@@ -17,7 +17,8 @@ export(
   stan_demo, 
   sflist2stanfit,
   read_stan_csv,
-  rstan_options 
+  rstan_options,
+  as.mcmc.list.stanfit
 # get_rstan.options
 )
 
