@@ -1861,10 +1861,13 @@ TEST(AgradFvar, lgamma){
 TEST(AgradFvar, lmgamma){
   using stan::agrad::fvar;
   using stan::math::lmgamma;
-  using boost::math::digamma;
-  using std::log;
 
+  int x = 3;
+  fvar<double> y(3.2);
+  y.d_ = 2.1;
 
+  fvar<double> a = lmgamma(x, y);
+  EXPECT_FLOAT_EQ(lmgamma(3, 3.2), a.val_);
 }
 
 TEST(AgradFvar, lbeta) {
