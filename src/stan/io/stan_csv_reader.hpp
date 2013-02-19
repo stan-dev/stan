@@ -227,18 +227,38 @@ namespace stan {
 	std::stringstream ss;
 	std::string line;
 
-	if (in_.peek() != '#')
+	int rows = 0;	
+	int cols = -1;
+
+	if (in_.peek() == '#')
 	  return false;
 	while (in_.good()) {
 	  bool comment_line = (in_.peek() == '#');
 	  std::getline(in_, line);
-	  if (!comment_line)
+	  if (!comment_line) {
 	    ss << line << '\n';
+	    int current_cols = std::count(line.begin(), line.end(), ',') + 1;
+	    if (cols == -1) {
+	      cols = current_cols;
+	    } else if (cols != current_cols) {
+	      std::cout << "Error: expected " << cols << " columns, but found " 
+			<< current_cols << " instead for row " << rows+1 << std::endl;
+	      return false;
+	    }
+	    rows++;
+	  }
 	}
 	ss.seekg(std::ios_base::beg);
-	std::cout << "ss: \n" << ss.str() << std::endl;
-
-	return false;
+	
+	samples_.resize(rows, cols);
+	char comma;
+	for (int row = 0; row < rows; row++)
+	  for (int col = 0; col < cols; col++) {
+	    ss >> samples_(row,col);
+	    if (col != cols-1)
+	      ss >> comma;
+	  }
+	return true;
       }
 
       /** 
