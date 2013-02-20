@@ -98,9 +98,11 @@ namespace stan {
 	  } else if (lhs.compare("stan_version_patch") == 0) {
 	    ss >> metadata.stan_version_patch;
 	  } else if (lhs.compare("data") == 0) {
-	    ss >> metadata.data;
+	    ss >> metadata.data;	    
 	  } else if (lhs.compare("init") == 0) {
-	    ss >> metadata.init;
+	    std::getline(ss, metadata.init);
+	    boost::trim(metadata.init);
+	    ss.unget();
 	  } else if (lhs.compare("append_samples") == 0) {
 	    ss >> metadata.append_samples;
 	  } else if (lhs.compare("save_warmup") == 0) {
