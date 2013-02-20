@@ -43,32 +43,23 @@ namespace stan {
       Eigen::VectorXd step_size_multipliers;
     };
 
+    struct stan_csv {
+      stan_csv_metadata metadata;
+      Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
+      stan_csv_adaptation adaptation;
+      Eigen::MatrixXd samples;
+    };
+
     /**
      * Reads from a Stan output csv file.
      */
     class stan_csv_reader {
-    private:
-      std::istream& in_;
-      stan_csv_metadata metadata_;
-      Eigen::Matrix<std::string, Eigen::Dynamic, 1> header_;
-      stan_csv_adaptation adaptation_;
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> samples_;
-
     public:
       /** 
        * Default constructor.
        * 
        */
-      stan_csv_reader() : in_(std::cin) {}
-      
-      /** 
-       * Constructor taking in stream.
-       *
-       * Warning: does not close the input stream.
-       * 
-       * @param in 
-       */
-      stan_csv_reader(std::istream& in) : in_(in) { }
+      stan_csv_reader() {}
       
       /** 
        * Destructor.
@@ -76,14 +67,14 @@ namespace stan {
        */
       ~stan_csv_reader() { }
 
-      bool read_metadata() {
+      bool read_metadata(std::istream& in, stan_csv_metadata& metadata) {
 	std::stringstream ss;
 	std::string line;
 
-	if (in_.peek() != '#')
+	if (in.peek() != '#')
 	  return false;
-	while (in_.peek() == '#') {
-	  std::getline(in_, line);
+	while (in.peek() == '#') {
+	  std::getline(in, line);
 	  ss << line << '\n';
 	}
 	ss.seekg(std::ios_base::beg);	
@@ -101,44 +92,44 @@ namespace stan {
 	  boost::trim(lhs);
 	  if (lhs.compare("") == 0) { // no-op
 	  } else if (lhs.compare("stan_version_major") == 0) {
-	    ss >> metadata_.stan_version_major;
+	    ss >> metadata.stan_version_major;
 	  } else if (lhs.compare("stan_version_minor") == 0) {
-	    ss >> metadata_.stan_version_minor;
+	    ss >> metadata.stan_version_minor;
 	  } else if (lhs.compare("stan_version_patch") == 0) {
-	    ss >> metadata_.stan_version_patch;
+	    ss >> metadata.stan_version_patch;
 	  } else if (lhs.compare("data") == 0) {
-	    ss >> metadata_.data;
+	    ss >> metadata.data;
 	  } else if (lhs.compare("init") == 0) {
-	    ss >> metadata_.init;
+	    ss >> metadata.init;
 	  } else if (lhs.compare("append_samples") == 0) {
-	    ss >> metadata_.append_samples;
+	    ss >> metadata.append_samples;
 	  } else if (lhs.compare("save_warmup") == 0) {
-	    ss >> metadata_.save_warmup;
+	    ss >> metadata.save_warmup;
 	  } else if (lhs.compare("seed") == 0) {
-	    ss >> metadata_.seed;
-	    metadata_.random_seed = false;
+	    ss >> metadata.seed;
+	    metadata.random_seed = false;
 	  } else if (lhs.compare("chain_id") == 0) {
-	    ss >> metadata_.chain_id;
+	    ss >> metadata.chain_id;
 	  } else if (lhs.compare("iter") == 0) {
-	    ss >> metadata_.iter;
+	    ss >> metadata.iter;
 	  } else if (lhs.compare("warmup") == 0) {
-	    ss >> metadata_.warmup;
+	    ss >> metadata.warmup;
 	  } else if (lhs.compare("thin") == 0) {
-	    ss >> metadata_.thin;
+	    ss >> metadata.thin;
 	  } else if (lhs.compare("equal_step_sizes") == 0) {
-	    ss >> metadata_.equal_step_sizes;
+	    ss >> metadata.equal_step_sizes;
 	  } else if (lhs.compare("leapfrog_steps") == 0) {
-	    ss >> metadata_.leapfrog_steps;
+	    ss >> metadata.leapfrog_steps;
 	  } else if (lhs.compare("max_treedepth") == 0) {
-	    ss >> metadata_.max_treedepth;
+	    ss >> metadata.max_treedepth;
 	  } else if (lhs.compare("epsilon") == 0) {
-	    ss >> metadata_.epsilon;
+	    ss >> metadata.epsilon;
 	  } else if (lhs.compare("epsilon_pm") == 0) {
-	    ss >> metadata_.epsilon_pm;
+	    ss >> metadata.epsilon_pm;
 	  } else if (lhs.compare("delta") == 0) {
-	    ss >> metadata_.delta;
+	    ss >> metadata.delta;
 	  } else if (lhs.compare("gamma") == 0) {
-	    ss >> metadata_.gamma;
+	    ss >> metadata.gamma;
 	  } else {
 	    std::cout << "unused option: " << lhs << std::endl;
 	  }
@@ -149,15 +140,15 @@ namespace stan {
   	return true;
       }
   
-      bool read_header() { 
+      bool read_header(std::istream& in, Eigen::Matrix<std::string, Eigen::Dynamic, 1>& header) { 
 	std::string line;
 
-	if (in_.peek() != 'l')
+	if (in.peek() != 'l')
 	  return false;
-	std::getline(in_, line);
+	std::getline(in, line);
 	std::stringstream ss(line);
 	
-	header_.resize(std::count(line.begin(), line.end(), ',') + 1);
+	header.resize(std::count(line.begin(), line.end(), ',') + 1);
 	int idx = 0;
 	while (ss.good()) {
 	  std::string token;
@@ -170,71 +161,71 @@ namespace stan {
 	    std::replace(token.begin(), token.end(), '.', ',');
 	    token += "]";
 	  }
-	  header_(idx++) = token;
+	  header(idx++) = token;
 	}
 	return true;
       }
 
-      bool read_adaptation() { 
+      bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation) { 
 	std::stringstream ss;
 	std::string line;
 
-	if (in_.peek() != '#')
+	if (in.peek() != '#')
 	  return false;
-	while (in_.peek() == '#') {
-	  std::getline(in_, line);
+	while (in.peek() == '#') {
+	  std::getline(in, line);
 	  ss << line << '\n';
 	}
 	ss.seekg(std::ios_base::beg);
 	
 	char comment;
 	// sampler
-	ss >> comment >> adaptation_.sampler;
+	ss >> comment >> adaptation.sampler;
 	std::getline(ss, line);
 	// clean up sampler field
-	std::replace(adaptation_.sampler.begin(), 
-		     adaptation_.sampler.end(), 
+	std::replace(adaptation.sampler.begin(), 
+		     adaptation.sampler.end(), 
 		     '(', ' ');
-	std::replace(adaptation_.sampler.begin(), 
-		     adaptation_.sampler.end(),
+	std::replace(adaptation.sampler.begin(), 
+		     adaptation.sampler.end(),
 		     ')', ' ');
-	boost::trim(adaptation_.sampler);	
+	boost::trim(adaptation.sampler);	
 
 	// step size
 	ss >> comment;
 	std::getline(ss, line, '=');
 	boost::trim(line);
-	ss >> adaptation_.step_size;
+	ss >> adaptation.step_size;
 	std::getline(ss, line);
 	
 	// parameter step size multipliers
 	std::getline(ss, line); // comment line
 	ss >> comment;
 	std::getline(ss, line); // step sizes
-	adaptation_.step_size_multipliers.resize(std::count(line.begin(), line.end(), ',') + 1);
+	adaptation.step_size_multipliers.resize(std::count(line.begin(), line.end(), ',') + 1);
 	ss.str(line);
 	int idx = 0;
 	while (ss.good()) {
 	  std::string token;
 	  std::getline(ss, token, ',');
 	  boost::trim(token);
-	  adaptation_.step_size_multipliers(idx++) = boost::lexical_cast<double>(token);
+	  adaptation.step_size_multipliers(idx++) = boost::lexical_cast<double>(token);
 	}
 	return true;
       }
       
-      bool read_samples() { 
+      bool read_samples(std::istream& in, Eigen::MatrixXd& samples) { 
 	std::stringstream ss;
 	std::string line;
 
 	int rows = 0;	
 	int cols = -1;
 
-	if (in_.peek() == '#')
+	if (in.peek() == '#')
 	  return false;
-	while (in_.good()) {
-	  bool comment_line = (in_.peek() == '#');
-	  std::getline(in_, line);
+	while (in.good()) {
+	  bool comment_line = (in.peek() == '#');
+	  std::getline(in, line);
 	  if (!comment_line) {
 	    ss << line << '\n';
 	    int current_cols = std::count(line.begin(), line.end(), ',') + 1;
@@ -250,11 +241,11 @@ namespace stan {
 	}
 	ss.seekg(std::ios_base::beg);
 	
-	samples_.resize(rows, cols);
+	samples.resize(rows, cols);
 	char comma;
 	for (int row = 0; row < rows; row++)
 	  for (int col = 0; col < cols; col++) {
-	    ss >> samples_(row,col);
+	    ss >> samples(row,col);
 	    if (col != cols-1)
 	      ss >> comma;
 	  }
@@ -265,38 +256,25 @@ namespace stan {
        * Parses the file.
        * 
        */
-      void parse() {
-	if (!read_metadata()) {
+      stan_csv parse(std::istream& in) {
+	stan_csv data;
+	if (!read_metadata(in, data.metadata)) {
 	  std::cout << "Warning: non-fatal error reading metadata" << std::endl;
 	}
-	if (!read_header()) {
+	if (!read_header(in, data.header)) {
 	  std::cout << "Error: error reading header" << std::endl;
 	  exit(-1);
 	}
-	if (!read_adaptation()) {
+	if (!read_adaptation(in, data.adaptation)) {
 	  std::cout << "Warning: non-fatal error reading adapation data" << std::endl;
 	}
-	if (!read_samples()) {
+	if (!read_samples(in, data.samples)) {
 	  std::cout << "Error: error reading samples" << std::endl;
 	  exit(-1);
 	}
+	return data;
       }
       
-      stan_csv_metadata metadata() {
-	return metadata_;
-      }
-
-      Eigen::Matrix<std::string, Eigen::Dynamic, 1> header() {
-	return header_;
-      }
-      
-      stan_csv_adaptation adaptation() {
-	return adaptation_;
-      }
-
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> samples() {
-	return samples_;
-      }
     };
     
   }
