@@ -381,64 +381,39 @@ TEST_F(StanIoStanCsvReader,read_metadata2) {
   EXPECT_FLOAT_EQ(0.05, metadata.gamma);
 }
 
-/*
-TEST_F(StanIoStanCsvReader,read_header1) { 
+TEST_F(StanIoStanCsvReader,read_header2) { 
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header1_stream, header));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header2_stream, header));
   
-  ASSERT_EQ(51, header.size());
+  ASSERT_EQ(309, header.size());
   EXPECT_EQ("lp__", header(0));
-  EXPECT_EQ("treedepth__",header(1));
-  EXPECT_EQ("stepsize__",header(2));
-  EXPECT_EQ("d",header(3));
-  EXPECT_EQ("sigmasq_delta",header(4));
-  EXPECT_EQ("mu[1]",header(5));
-  EXPECT_EQ("mu[2]",header(6));
-  EXPECT_EQ("mu[3]",header(7));
-  EXPECT_EQ("mu[4]",header(8));
-  EXPECT_EQ("mu[5]",header(9));
-  EXPECT_EQ("mu[6]",header(10));
-  EXPECT_EQ("mu[7]",header(11));
-  EXPECT_EQ("mu[8]",header(12));
-  EXPECT_EQ("mu[9]",header(13));
-  EXPECT_EQ("mu[10]",header(14));
-  EXPECT_EQ("mu[11]",header(15));
-  EXPECT_EQ("mu[12]",header(16));
-  EXPECT_EQ("mu[13]",header(17));
-  EXPECT_EQ("mu[14]",header(18));
-  EXPECT_EQ("mu[15]",header(19));
-  EXPECT_EQ("mu[16]",header(20));
-  EXPECT_EQ("mu[17]",header(21));
-  EXPECT_EQ("mu[18]",header(22));
-  EXPECT_EQ("mu[19]",header(23));
-  EXPECT_EQ("mu[20]",header(24));
-  EXPECT_EQ("mu[21]",header(25));
-  EXPECT_EQ("mu[22]",header(26));
-  EXPECT_EQ("delta[1]",header(27));
-  EXPECT_EQ("delta[2]",header(28));
-  EXPECT_EQ("delta[3]",header(29));
-  EXPECT_EQ("delta[4]",header(30));
-  EXPECT_EQ("delta[5]",header(31));
-  EXPECT_EQ("delta[6]",header(32));
-  EXPECT_EQ("delta[7]",header(33));
-  EXPECT_EQ("delta[8]",header(34));
-  EXPECT_EQ("delta[9]",header(35));
-  EXPECT_EQ("delta[10]",header(36));
-  EXPECT_EQ("delta[11]",header(37));
-  EXPECT_EQ("delta[12]",header(38));
-  EXPECT_EQ("delta[13]",header(39));
-  EXPECT_EQ("delta[14]",header(40));
-  EXPECT_EQ("delta[15]",header(41));
-  EXPECT_EQ("delta[16]",header(42));
-  EXPECT_EQ("delta[17]",header(43));
-  EXPECT_EQ("delta[18]",header(44));
-  EXPECT_EQ("delta[19]",header(45));
-  EXPECT_EQ("delta[20]",header(46));
-  EXPECT_EQ("delta[21]",header(47));
-  EXPECT_EQ("delta[22]",header(48));
-  EXPECT_EQ("delta_new",header(49));
-  EXPECT_EQ("sigma_delta",header(50));
+  EXPECT_EQ("treedepth__", header(1));
+  EXPECT_EQ("stepsize__", header(2));
+  EXPECT_EQ("a0", header(3));
+  EXPECT_EQ("alpha_Base", header(4));
+  EXPECT_EQ("alpha_Trt", header(5));
+  EXPECT_EQ("alpha_BT", header(6));
+  EXPECT_EQ("alpha_Age", header(7));
+  EXPECT_EQ("alpha_V4", header(8));
+  EXPECT_EQ("b1[1]", header(9));
+  EXPECT_EQ("b1[2]", header(10));
+  // ...
+  EXPECT_EQ("b1[59]", header(67));
+  EXPECT_EQ("b[1,1]", header(68));
+  EXPECT_EQ("b[1,2]", header(69));
+  EXPECT_EQ("b[1,3]", header(70));
+  EXPECT_EQ("b[1,4]", header(71));
+  EXPECT_EQ("b[2,1]", header(72));
+  //...
+  EXPECT_EQ("b[59,4]", header(303));
+  EXPECT_EQ("sigmasq_b", header(304));
+  EXPECT_EQ("sigmasq_b1", header(305));
+  EXPECT_EQ("sigma_b", header(306));
+  EXPECT_EQ("sigma_b1", header(307));
+  EXPECT_EQ("alpha0", header(308));
 }
+
+/*
 
 TEST_F(StanIoStanCsvReader,read_adaptation1) { 
   stan::io::stan_csv_adaptation adaptation;
