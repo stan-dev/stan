@@ -258,7 +258,6 @@ TEST_F(McmcChains_New, blocker_sd) {
   stan::mcmc::chains_new<> chains(blocker1);
   
   using std::sqrt;
-  Eigen::VectorXd means1 = blocker1.samples.colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
     ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(0,j), 1e-11)
       << "1: chain, param sd. index: " << j;
@@ -266,32 +265,34 @@ TEST_F(McmcChains_New, blocker_sd) {
       << "1: param sd. index: " << j;
   }
 
-/*ASSERT_NO_THROW(chains.add(blocker2))
+  ASSERT_NO_THROW(chains.add(blocker2))
     << "adding a second chain";
-  Eigen::VectorXd means2 = blocker2.samples.colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
-    ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
-      << "2: chain, param mean";
-    ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
-      << "2: param mean";
+    ASSERT_NEAR(sd(blocker2.samples.col(j)), chains.sd(1,j), 1e-11)
+      << "2: chain, param sd. index: " << j;
+    Eigen::VectorXd x(blocker1.samples.rows() + blocker2.samples.rows());
+    x << blocker1.samples.col(j), blocker2.samples.col(j);
+    ASSERT_NEAR(sd(x), chains.sd(j), 1e-11)
+      << "2: param sd. index: " << j;
   }
-
-
+  
   ASSERT_NO_THROW(chains.set_warmup(500));
-  means1 = blocker1.samples.bottomRows(500).colwise().mean();
-  means2 = blocker2.samples.bottomRows(500).colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
-    ASSERT_FLOAT_EQ(means1(j), chains.mean(0,j))
-      << "3: chain mean 1 with warmup";
-    ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
-      << "3: chain mean 2 with warmup";
-    ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
-      << "3: param mean with warmup";
-      }*/
+    Eigen::VectorXd x1(500), x2(500), x(1000);
+    x1 << blocker1.samples.col(j).bottomRows(500);
+    x2 << blocker2.samples.col(j).bottomRows(500);
+    x << x1, x2;
+    
+    ASSERT_NEAR(sd(x1), chains.sd(0,j), 1e-11)
+      << "3: chain sd 1 with warmup";
+    ASSERT_NEAR(sd(x2), chains.sd(1,j), 1e-11)
+      << "3: chain sd 2 with warmup";
+    ASSERT_NEAR(sd(x), chains.sd(j), 1e-11)
+      << "3: param sd with warmup";
+  }
 }
 
 /*
-
 void test_permutation(size_t N) {
   int seed = 187049587;
   boost::random::ecuyer1988 rng(seed);
