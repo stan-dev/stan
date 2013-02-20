@@ -1,10 +1,124 @@
 #include <stan/mcmc/chains.hpp>
+#include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/additive_combine.hpp>
 #include <set>
 #include <exception>
 #include <utility>
 #include <fstream>
+
+
+
+class McmcChains_New : public testing::Test {
+public:
+  
+  void SetUp() {
+    blocker1_stream.open("src/test/mcmc/test_csv_files/blocker1.csv");
+    blocker2_stream.open("src/test/mcmc/test_csv_files/blocker2.csv");
+    epil1_stream.open("src/test/mcmc/test_csv_files/epil1.csv");
+    epil2_stream.open("src/test/mcmc/test_csv_files/epil2.csv");
+  }
+  
+  void TearDown() {
+    blocker1_stream.close();
+    blocker2_stream.close();
+    epil1_stream.close();
+    epil2_stream.close();
+  }
+  std::ifstream blocker1_stream, blocker2_stream, epil1_stream, epil2_stream;
+};
+
+TEST_F(McmcChains_New, constructor) {
+  // construct with Eigen::Vector
+  // construct with stan_csv
+  FAIL() << "Test not implemented";
+}
+
+TEST_F(McmcChains_New, add) {
+  // add all variants
+  FAIL() << "Test not implemented";
+}
+
+TEST_F(McmcChains_New, blocker1_num_chains) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  
+  EXPECT_EQ(1, chains.num_chains());
+}
+TEST_F(McmcChains_New, blocker1_param_names) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  ASSERT_EQ(blocker1.header.size(), chains.num_params());
+  ASSERT_EQ(blocker1.header.size(), chains.param_names().size());
+  for (int i = 0; i < blocker1.header.size(); i++) {
+    EXPECT_EQ(blocker1.header(i), chains.param_names()(i));
+  }
+}
+TEST_F(McmcChains_New, blocker1_param_name) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  ASSERT_EQ(blocker1.header.size(), chains.num_params());
+  for (int i = 0; i < blocker1.header.size(); i++) {
+    EXPECT_EQ(blocker1.header(i), chains.param_name(i));
+  }
+}
+TEST_F(McmcChains_New, blocker1_index) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  ASSERT_EQ(blocker1.header.size(), chains.num_params());
+  for (int i = 0; i < blocker1.header.size(); i++)
+    EXPECT_EQ(i, chains.index(blocker1.header(i)));
+}
+TEST_F(McmcChains_New, blocker1_warmup) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+
+  ASSERT_EQ(1, chains.warmup().size());
+  EXPECT_EQ(0, chains.warmup()(0));
+  EXPECT_EQ(0, chains.warmup(0));
+
+  chains.set_warmup(10);
+  ASSERT_EQ(1, chains.warmup().size());
+  EXPECT_EQ(10, chains.warmup()(0));
+  EXPECT_EQ(10, chains.warmup(0));
+
+
+  chains.set_warmup(100);
+  ASSERT_EQ(1, chains.warmup().size());
+  EXPECT_EQ(100, chains.warmup()(0));
+  EXPECT_EQ(100, chains.warmup(0));
+ 
+  chains.add(blocker1);
+  ASSERT_EQ(2, chains.warmup().size());
+  EXPECT_EQ(100, chains.warmup()(0));
+  EXPECT_EQ(100, chains.warmup(0));
+  EXPECT_EQ(0, chains.warmup()(1));
+  EXPECT_EQ(0, chains.warmup(1));
+
+
+  chains.set_warmup(1, 20);
+  ASSERT_EQ(2, chains.warmup().size());
+  EXPECT_EQ(100, chains.warmup()(0));
+  EXPECT_EQ(100, chains.warmup(0));
+  EXPECT_EQ(20, chains.warmup()(1));
+  EXPECT_EQ(20, chains.warmup(1));
+
+
+  chains.set_warmup(50);
+  ASSERT_EQ(2, chains.warmup().size());
+  EXPECT_EQ(50, chains.warmup()(0));
+  EXPECT_EQ(50, chains.warmup(0));
+  EXPECT_EQ(50, chains.warmup()(1));
+  EXPECT_EQ(50, chains.warmup(1));
+}
+
+
+
 
 TEST(McmcChains, validate_dim_idxs) {
   using stan::mcmc::validate_dims_idxs;
@@ -1140,3 +1254,4 @@ TEST(McmcChains,correlation) {
   EXPECT_FLOAT_EQ(0.1845687,   c.correlation(index1, index2)) <<
     "correlation";
 }
+

@@ -29,6 +29,8 @@
 #include <stan/prob/autocorrelation.hpp>
 #include <stan/prob/autocovariance.hpp>
 
+#include <stan/io/stan_csv_reader.hpp>
+
 namespace stan {  
 
   namespace mcmc {
@@ -214,7 +216,191 @@ namespace stan {
         x_to[i] = x_from[pi[i]];
     }
 
-    
+    //--------------------------------------------------------------------------------
+    /**
+     * An <code>mcmc::chains</code> object stores parameter names and
+     * dimensionalities along with samples from multiple chains.
+     *
+     * <p><b>Synchronization</b>: For arbitrary concurrent use, the
+     * read and write methods need to be read/write locked.  Multiple
+     * writers can be used concurrently if they write to different
+     * chains.  Readers for single chains need only be read/write locked
+     * with writers of that chain.  For reading across chains, full
+     * read/write locking is required.  Thus methods will be classified
+     * as global or single-chain read or write methods.
+     *
+     * <p><b>Storage Order</b>: Storage is column/last-index major.
+     */
+    template <typename RNG = boost::random::ecuyer1988>
+    class chains_new {
+    private:
+      Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names_;
+      Eigen::Matrix<Eigen::MatrixXd, Eigen::Dynamic, 1> samples_;
+      Eigen::VectorXi warmup_;
+
+    public:
+      chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
+	: param_names_(param_names) { }
+      
+      chains_new(const stan::io::stan_csv& stan_csv) 
+	: param_names_(stan_csv.header) {
+	add(stan_csv.samples);
+      }
+      
+      inline int num_chains() {
+        return samples_.size();
+      }
+      
+      inline int num_params() { 
+        return param_names_.size();
+      }
+
+      const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names() {
+        return param_names_;
+      }
+
+      const std::string& param_name(int j) {
+        return param_names_(j);
+      }
+
+      int index(const std::string& name) {
+	int index = -1;
+	for (int i = 0; i < param_names_.size(); i++)
+	  if (param_names_(i) == name)
+	    return i;
+	return index;
+      }
+
+      void set_warmup(int chain, int warmup) {
+	warmup_(chain) = warmup;
+      }
+      
+      void set_warmup(int warmup) {
+	warmup_.setConstant(warmup);
+      }
+      
+      const Eigen::VectorXi& warmup() {
+	return warmup_;
+      }
+      
+      const int warmup(int chain) {
+	return warmup_(chain);
+      }
+
+      void add(const int chain,
+               const Eigen::RowVectorXd& theta) {
+	if (theta.cols() != num_params())
+	  throw std::invalid_argument("number of columns in theta does not match chains");
+	if (chain > num_chains()) {
+	  samples_.conservativeResize(chain+1);
+	  warmup_.conservativeResize(chain+1);
+	}
+	int row = samples_(chain).rows();
+	samples_(chain).conservativeResize(row+1);
+	samples_(chain)(row) = theta;
+	warmup_(chain) = 0;
+      }
+      
+      void add(const int chain,
+	       const Eigen::MatrixXd& sample) {
+	if (sample.cols() != num_params())
+	  throw std::invalid_argument("number of columns in sample does not match chains");
+	if (chain > num_chains()) {
+	  samples_.conservativeResize(chain+1);
+	  warmup_.conservativeResize(chain+1);
+	}
+	int row = samples_(chain).rows();
+	samples_(chain).conservativeResize(row+sample.rows());
+	samples_(chain).bottomRows(sample.rows()) = sample;
+	warmup_(chain) = 0;
+      }
+
+      void add(const Eigen::MatrixXd& sample) {
+	if (sample.cols() != num_params())
+	  throw std::invalid_argument("number of columns in sample does not match chains");
+	int n = num_chains();
+	samples_.conservativeResize(n+1);
+	warmup_.conservativeResize(n+1);
+	samples_(n) = sample;
+	warmup_(n) = 0;
+      }
+
+      void add(const stan::io::stan_csv& stan_csv) {
+	if (!param_names_.cwiseEqual(stan_csv.header).all()) {
+	  //std::cerr << "add: existing parameter names " 
+	  //<< param_names_ << " does not match "
+	  //<< stan_csv.header << std::endl;
+	  throw std::invalid_argument("header does not match chain's header");
+	}
+	add(stan_csv.samples);
+      }
+      
+      double mean(int chain, int index) {
+	return 0;
+      }
+      
+      double mean(int index) {
+      	return 0;
+      }
+
+      double sd(int chain, int index) { 
+      	return 0;
+      }
+      
+      double sd(int index) {
+	return 0;
+      }
+      
+      double variance(int chain, int index) {
+	return 0;
+      }
+      
+      double variance(int index) { 	
+	return 0;
+      }
+
+      double covariance(int chain, int index1, int index2) {
+	return 0;
+      }
+      
+      double covariance(int index1, int index2) {
+	return 0;
+      }
+
+      double correlation(int chain, int index1, int index2) {
+	return 0;
+      }
+      
+      double correlation(int index1, int index2) { 	
+	return 0;
+      }
+
+      double quantile(int chain, int index, double prob) {
+	return 0;
+      }
+      
+      double quantile(int index, double prob) { 	
+	return 0;
+      }
+
+      Eigen::VectorXd quantiles(int chain, int index, Eigen::VectorXd& probs) {
+	
+      }
+
+      Eigen::VectorXd quantiles(int index, Eigen::VectorXd& probs) {
+	
+      }
+
+      // central_interval
+      // autocorrelation
+      // autocovariance
+      // effective_sample_size
+      // split_potential_scale_reduction
+
+     
+    };
+    //--------------------------------------------------------------------------------
+
     /**
      * An <code>mcmc::chains</code> object stores parameter names and
      * dimensionalities along with samples from multiple chains.
@@ -232,7 +418,6 @@ namespace stan {
     template <typename RNG = boost::random::ecuyer1988>
     class chains {
     private:
-
       size_t _warmup;
       const std::vector<std::string> _names;
       const std::vector<std::vector<size_t> > _dimss;
@@ -1804,7 +1989,7 @@ namespace stan {
       }
       return thetas.size();
     }
-
+    
   }
 }
 
